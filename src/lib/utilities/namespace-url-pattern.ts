@@ -7,3 +7,8 @@ export const namespaceUrlPattern = new UrlPattern(
   '/namespaces/:namespace/*',
   urlPatternOpts,
 );
+
+export const workflowRoutePattern = new UrlPattern(
+  '/namespaces/:namespace/workflows*',
+  urlPatternOpts,
+);

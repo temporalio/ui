@@ -4,7 +4,6 @@
   import { page } from '$app/stores';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
-  import { workflowStatuses } from '$lib/models/workflow-status';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -18,17 +17,18 @@
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowStatus,
   } from '$lib/types/workflows';
-  import { decodePayload } from '$lib/utilities/decode-payload';
+  import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { getExponentialBackoffSeconds } from '$lib/utilities/refresh-rate';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import WorkflowCountStatus from './workflow-count-status.svelte';
+  import WorkflowCountStatus from '../workflow-status.svelte';
 
   export let staticQuery = '';
   $: namespace = $page.params.namespace;
   $: query = staticQuery || $queryWithParentWorkflowId;
+  $: perPage = $page.url.searchParams.get('per-page');
 
   let statusGroups: { status: WorkflowStatus; count: number }[] = [];
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
@@ -65,37 +65,17 @@
     loading = true;
   };
 
-  const getStatusAndCountOfGroup = (groups = []) => {
-    return groups
-      .map((group) => {
-        const status = decodePayload(
-          group?.groupValues[0],
-        ) as unknown as WorkflowStatus;
-        const count = parseInt(group.count);
-        return {
-          status,
-          count,
-        };
-      })
-      .sort((a, b) => {
-        return (
-          workflowStatuses.indexOf(a.status) -
-          workflowStatuses.indexOf(b.status)
-        );
-      });
-  };
-
   const fetchNewCounts = async () => {
     setBackoffInterval();
     try {
       const { count, groups } = await fetchWorkflowCountByExecutionStatus({
         namespace,
         query,
+      }).catch((_e) => {
+        return { count: '0', groups: [] };
       });
       $workflowCount.newCount = parseInt(count) - $workflowCount.count;
       newStatusGroups = getStatusAndCountOfGroup(groups);
-    } catch (e) {
-      console.error('Fetching workflow counts failed: ', e?.message);
     } finally {
       loading = false;
     }
@@ -116,11 +96,11 @@
       const { count, groups } = await fetchWorkflowCountByExecutionStatus({
         namespace,
         query,
+      }).catch((_e) => {
+        return { count: '0', groups: [] };
       });
       $workflowCount.count = parseInt(count);
       statusGroups = getStatusAndCountOfGroup(groups);
-    } catch (e) {
-      console.error('Fetching workflow counts failed: ', e?.message);
     } finally {
       loading = false;
     }
@@ -154,7 +134,7 @@
     }
   };
 
-  $: query, namespace, $refresh, fetchCounts();
+  $: namespace, query, perPage, $refresh, fetchCounts();
 </script>
 
 <div class="flex min-h-[24px] flex-wrap items-center gap-2">
@@ -167,6 +147,7 @@
           newCount={newStatusGroups.find((g) => g.status === status)
             ? newStatusGroups.find((g) => g.status === status).count - count
             : 0}
+          test-id="workflow-status-{status}"
         />
       </button>
     {:else}

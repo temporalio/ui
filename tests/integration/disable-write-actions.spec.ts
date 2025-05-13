@@ -14,9 +14,9 @@ test.describe('Enable write actions by default', () => {
   });
 
   test('Cancel workflow button enabled', async ({ page }) => {
-    const workflowActionButton = page.locator(
-      '#workflow-actions-primary-button',
-    );
+    const workflowActionButton = page
+      .locator('#workflow-actions-primary-button')
+      .locator('visible=true');
     await expect(workflowActionButton).toBeEnabled();
   });
 });
@@ -29,9 +29,9 @@ test.describe('Disable write actions on workflow actions', () => {
   });
 
   test('Cancel workflow button disabled', async ({ page }) => {
-    const workflowActionButton = page.locator(
-      '#workflow-actions-primary-button',
-    );
+    const workflowActionButton = page
+      .locator('#workflow-actions-primary-button')
+      .locator('visible=true');
     await expect(workflowActionButton).toBeDisabled();
   });
 });
@@ -39,7 +39,7 @@ test.describe('Disable write actions on workflow actions', () => {
 test.describe('Disable write actions on empty schedules list actions', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(schedulesUrl);
-    await mockSchedulesApis(page, true);
+    await mockSchedulesApis(page, true, true);
     await mockSettingsApi(page, { DisableWriteActions: true });
   });
 
@@ -47,9 +47,11 @@ test.describe('Disable write actions on empty schedules list actions', () => {
     await page.goto(schedulesUrl);
 
     const namespace = await page.locator('h1').innerText();
+    console.log('Namespace:', namespace);
     expect(namespace).toBe('0 Schedules');
-
+    console.log('Namespace:after', namespace);
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeDisabled();
+    console.log('Namespace:afterafter', namespace);
   });
 });

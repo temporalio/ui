@@ -9,6 +9,7 @@
 
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
   import EventLinksExpanded from './event-links-expanded.svelte';
+  import EventMetadataExpanded from './event-metadata-expanded.svelte';
 
   export let group: EventGroup | undefined = undefined;
   export let event: WorkflowEvent | undefined = undefined;
@@ -45,6 +46,9 @@
               })}
             </div>
           </div>
+          {#if groupEvent?.userMetadata?.summary}
+            <EventMetadataExpanded value={groupEvent.userMetadata.summary} />
+          {/if}
           <EventLinksExpanded links={groupEvent?.links} />
           {#each details as [key, value] (key)}
             <EventDetailsRowExpanded {key} {value} {attributes} />

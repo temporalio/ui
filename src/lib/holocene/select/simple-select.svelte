@@ -17,6 +17,7 @@
     required?: boolean;
     options?: SelectOptionValue[];
     'data-testid'?: string;
+    class?: string;
   }
 
   let className: string = null;
@@ -51,7 +52,7 @@
 
 <style lang="postcss">
   select {
-    @apply border-secondary bg-transparent text-primary outline-none focus-visible:outline focus-visible:outline-blue-700;
+    @apply border-secondary bg-transparent text-primary outline-none dark:surface-primary focus-visible:outline focus-visible:outline-blue-700;
   }
 
   .remove {

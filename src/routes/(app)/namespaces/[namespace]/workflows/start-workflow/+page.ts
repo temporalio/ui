@@ -6,7 +6,11 @@ import { routeForWorkflows } from '$lib/utilities/route-for';
 
 export const load: PageLoad = async function ({ params, parent }) {
   const data = await parent();
-  if (data.settings.startWorkflowDisabled) {
+  const disabled =
+    data?.settings?.disableWriteActions ||
+    data?.settings?.startWorkflowDisabled;
+
+  if (disabled) {
     const { namespace } = params;
     redirect(302, routeForWorkflows({ namespace }));
   }

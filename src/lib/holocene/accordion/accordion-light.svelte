@@ -1,7 +1,5 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
-  import { slide } from 'svelte/transition';
 
   import { v4 } from 'uuid';
 
@@ -14,21 +12,26 @@
     open?: boolean;
     expandable?: boolean;
     error?: string;
-    onToggle?: () => void;
+    onToggle?: () => Promise<void>;
     'data-testid'?: string;
   }
 
   export let id: string = v4();
   export let open = false;
-  export let onToggle = noop;
+  export let onToggle = undefined;
+  export let icon: IconName | undefined = undefined;
 
-  const toggleAccordion = () => {
-    open = !open;
-    onToggle();
+  const toggleAccordion = async () => {
+    if (onToggle) {
+      await onToggle();
+      open = !open;
+    } else {
+      open = !open;
+    }
   };
 </script>
 
-<div class="w-full" {...$$restProps}>
+<div class="w-full {$$restProps.class}">
   <button
     id="{id}-trigger"
     aria-expanded={open}
@@ -37,27 +40,20 @@
     type="button"
     on:click={toggleAccordion}
   >
-    <div class="flex w-full flex-row items-center justify-between gap-2">
+    <div class="flex w-full flex-row items-center justify-between gap-2 pr-4">
       <slot name="title" />
       <slot name="description" />
-      <div
-        class="flex flex-row items-center gap-2 pr-2"
-        on:click|stopPropagation
-        on:keyup|stopPropagation
-        role="none"
-      >
+      <div class="flex items-center gap-4">
         <slot name="action" />
-        <Icon class="m-2 shrink-0" name={open ? 'arrow-down' : 'arrow-right'} />
+        <Icon name={icon ? icon : open ? 'arrow-down' : 'arrow-right'} />
       </div>
     </div>
   </button>
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
-    role="textbox"
     class="block w-full bg-primary p-2"
     class:hidden={!open}
-    transition:slide
   >
     <slot {open} />
   </div>

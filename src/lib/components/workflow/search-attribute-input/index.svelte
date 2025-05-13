@@ -11,21 +11,27 @@
     customSearchAttributes,
     type SearchAttributeInput,
   } from '$lib/stores/search-attributes';
+  import type { SelectOptionValue } from '$lib/types/global';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   import DatetimeInput from './datetime-input.svelte';
 
-  export let attributesToAdd: SearchAttributeInput[] = [];
+  export let attributes: SearchAttributeInput[] = [];
+
   export let attribute: SearchAttributeInput;
   export let onRemove: (attribute: string) => void;
 
+  let label: SelectOptionValue;
+  let _label = attribute.label || (label && label.toString());
+
   $: isDisabled = (value: string) => {
-    return !!attributesToAdd.find((a) => a.label === value);
+    return !!attributes.find((a) => a.label === value);
   };
 
   const getType = (attr: string) => $customSearchAttributes[attr];
 
   const handleAttributeChange = (attr: string) => {
+    attribute.label = attr;
     const type = getType(attr);
 
     if (type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST) {
@@ -45,9 +51,10 @@
     <div class="grow [&_button]:w-full">
       <Select
         id="search-attribute"
+        data-testid="search-attribute-select"
         label={translate('workflows.custom-search-attribute')}
         placeholder={translate('workflows.select-attribute')}
-        bind:value={attribute.label}
+        bind:value={_label}
         onChange={handleAttributeChange}
       >
         {#each $customSearchAttributeOptions as { value, label, type }}
@@ -76,11 +83,16 @@
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
     <DatetimeInput bind:value={attribute.value} />
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.INT || attribute.type === SEARCH_ATTRIBUTE_TYPE.DOUBLE}
-    <NumberInput
-      label={translate('common.value')}
-      id="attribute-value"
-      bind:value={attribute.value}
-    />
+    <div>
+      <NumberInput
+        label={translate('common.value')}
+        id="attribute-value"
+        valid={attribute.value < Number.MAX_SAFE_INTEGER}
+        hintText="Number is too large"
+        bind:value={attribute.value}
+        max={Number.MAX_SAFE_INTEGER}
+      />
+    </div>
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST}
     <ChipInput
       label={translate('common.value')}
@@ -93,6 +105,7 @@
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.TEXT || attribute.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD || attribute.type === SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED}
     <Input
       label={translate('common.value')}
+      data-testid="custom-search-attribute-value"
       id="attribute-value"
       class="grow"
       bind:value={attribute.value}
@@ -111,6 +124,7 @@
   <Button
     variant="ghost"
     leadingIcon="close"
+    data-testid="search-attribute-close-button"
     class="mt-6 w-10 rounded-full max-sm:hidden"
     on:click={() => onRemove(attribute.label)}
   />

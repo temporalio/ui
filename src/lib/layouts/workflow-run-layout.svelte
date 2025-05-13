@@ -6,10 +6,9 @@
   import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
+  import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
-  import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import {
     fetchAllEvents,
     throttleRefresh,
@@ -101,28 +100,24 @@
 
     $workflowRun = { ...$workflowRun, workflow, workers };
 
-    workflow.pendingActivities = await toDecodedPendingActivities(
-      workflow,
-      namespace,
-      settings,
-      $authUser?.accessToken,
-    );
-
     workflowRunController = new AbortController();
-    getWorkflowMetadata(
-      {
-        namespace,
-        workflow: {
-          id: workflowId,
-          runId,
+
+    if (workflow.isRunning && workers?.pollers?.length) {
+      getWorkflowMetadata(
+        {
+          namespace,
+          workflow: {
+            id: workflowId,
+            runId,
+          },
         },
-      },
-      settings,
-      $authUser?.accessToken,
-      workflowRunController.signal,
-    ).then((metadata) => {
-      $workflowRun.metadata = metadata;
-    });
+        settings,
+        $authUser?.accessToken,
+        workflowRunController.signal,
+      ).then((metadata) => {
+        $workflowRun.metadata = metadata;
+      });
+    }
 
     $fullEventHistory = await fetchAllEvents({
       namespace,
@@ -134,27 +129,21 @@
     });
   };
 
-  const getOnlyWorkflowWithPendingActivities = async (refresh: number) => {
-    if (refresh && $workflowRun?.workflow?.isRunning) {
-      const { settings } = $page.data;
-
+  const getOnlyWorkflowWithPendingActivities = async (
+    refresh: number,
+    pause: boolean,
+  ) => {
+    if (refresh && !pause && $workflowRun?.workflow?.isRunning) {
       const { workflow, error } = await fetchWorkflow({
         namespace,
         workflowId,
         runId,
       });
-
       if (error) {
         workflowError = error;
         return;
       }
       $workflowRun.workflow = workflow;
-      workflow.pendingActivities = await toDecodedPendingActivities(
-        workflow,
-        namespace,
-        settings,
-        $authUser?.accessToken,
-      );
     }
   };
 
@@ -178,7 +167,7 @@
   $: runId, clearWorkflowData();
 
   $: getWorkflowAndEventHistory(namespace, workflowId, runId);
-  $: getOnlyWorkflowWithPendingActivities($refresh);
+  $: getOnlyWorkflowWithPendingActivities($refresh, $pauseLiveUpdates);
 
   const setCurrentEvents = (fullHistory, pause) => {
     if (!pause) {
@@ -219,12 +208,12 @@
     class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
       ? 'top-[540px]'
       : 'top-0'}
-    } flex h-full flex-col gap-4"
+   flex h-full flex-col"
   >
     {#if workflowError}
       <WorkflowError error={workflowError} />
     {:else if !$workflowRun.workflow}
-      <Loading class="pt-24" />
+      <SkeletonWorkflow />
     {:else}
       <div class="border-b border-subtle px-4 pt-8 md:pt-20 xl:px-8">
         <WorkflowHeader />

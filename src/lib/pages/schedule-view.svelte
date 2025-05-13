@@ -6,6 +6,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
@@ -37,7 +38,6 @@
     triggerImmediately,
     unpauseSchedule,
   } from '$lib/services/schedule-service';
-  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { coreUserStore } from '$lib/stores/core-user';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
@@ -266,8 +266,8 @@
   {#if $loading}
     <Loading title={translate('schedules.deleting')} class="my-2" />
   {:else}
-    <header class="mb-8 flex flex-row justify-between gap-4">
-      <div class="relative flex flex-col gap-4">
+    <header class="flex flex-row flex-wrap justify-between gap-4">
+      <div class="relative flex flex-col">
         <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}
         </Link>
@@ -276,7 +276,7 @@
             {scheduleId}
           </span>
         </h1>
-        <div class="flex items-center gap-2 text-lg">
+        <div class="flex flex-wrap items-center gap-2 text-lg">
           <WorkflowStatus
             status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
           />
@@ -284,25 +284,21 @@
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>
-        <div class="flex items-center gap-2 text-sm">
-          <p>
-            {translate('common.created', {
-              created: formatDate(schedule?.info?.createTime, $timeFormat, {
+        <p class="flex items-center gap-2 text-right text-sm">
+          {translate('common.created', {
+            created: formatDate(schedule?.info?.createTime, $timeFormat, {
+              relative: $relativeTime,
+            }),
+          })}
+        </p>
+        {#if schedule?.info?.updateTime}
+          <p class="flex items-center gap-2 text-right text-sm">
+            {translate('common.last-updated', {
+              updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
                 relative: $relativeTime,
               }),
             })}
           </p>
-        </div>
-        {#if schedule?.info?.updateTime}
-          <div class="flex items-center gap-2 text-sm">
-            <p>
-              {translate('common.last-updated', {
-                updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
-                  relative: $relativeTime,
-                }),
-              })}
-            </p>
-          </div>
         {/if}
       </div>
       <SplitButton
@@ -342,39 +338,38 @@
         </MenuItem>
       </SplitButton>
     </header>
+    <CodecServerErrorBanner />
     <div class="flex flex-col gap-4 pb-24">
       {#if schedule?.info?.invalidScheduleError}
         <div class="w-full xl:w-1/2">
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      {#if $groupByCountEnabled}
-        <div class="flex w-full flex-col gap-2 text-lg">
-          <div class="flex items-center gap-2">
-            <span data-testid="workflow-count"
-              >{$workflowCount.count.toLocaleString()}
-              <Translate
-                key="common.workflows-plural"
-                count={$workflowCount.count}
-              />
-            </span>
-            <Button
-              size="xs"
-              variant="ghost"
-              leadingIcon="retry"
-              on:click={() => {
-                scheduleFetch = fetchSchedule(parameters);
-                $refresh = Date.now();
-              }}
-            >
-              {#if $workflowCount.newCount > 0}
-                +{$workflowCount.newCount.toLocaleString()}
-              {/if}
-            </Button>
-          </div>
-          <WorkflowCounts staticQuery={workflowQuery} />
+      <div class="flex w-full flex-col gap-2 text-lg">
+        <div class="flex items-center gap-2">
+          <span data-testid="workflow-count"
+            >{$workflowCount.count.toLocaleString()}
+            <Translate
+              key="common.workflows-plural"
+              count={$workflowCount.count}
+            />
+          </span>
+          <Button
+            size="xs"
+            variant="ghost"
+            leadingIcon="retry"
+            on:click={() => {
+              scheduleFetch = fetchSchedule(parameters);
+              $refresh = Date.now();
+            }}
+          >
+            {#if $workflowCount.newCount > 0}
+              +{$workflowCount.newCount.toLocaleString()}
+            {/if}
+          </Button>
         </div>
-      {/if}
+        <WorkflowCounts staticQuery={workflowQuery} />
+      </div>
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
           <ScheduleRecentRuns

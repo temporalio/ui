@@ -18,7 +18,9 @@
       removeChipButtonLabel: 'Remove',
       labelHidden: false,
       validator: isEmail,
+      maxLength: undefined,
       chips: ['tobias@temporal.io'],
+      scrollTo: false,
     },
     argTypes: {
       label: { name: 'Label', control: 'text' },
@@ -30,11 +32,13 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       chips: { name: 'Chips', table: { disable: true } },
       validator: { table: { disable: true } },
+      maxLength: { name: 'Maximum Length', control: 'number' },
       removeChipButtonLabel: {
         name: 'Aria label for remove button',
         control: 'text',
         table: { category: 'Accessibility' },
       },
+      scrollTo: { name: 'Scroll To', control: 'boolean' },
     },
   } satisfies Meta<ChipInput>;
 </script>
@@ -80,11 +84,32 @@
 />
 
 <Story
-  name="Invalid"
+  name="Error"
   play={async ({ canvasElement, id }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByTestId(id);
     await userEvent.type(input, 'bonbon');
+    await userEvent.keyboard('{enter}');
+  }}
+/>
+
+<Story
+  name="With Maximum Length"
+  args={{ maxLength: 10 }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.click(input);
+  }}
+/>
+
+<Story
+  name="Scroll Input Into View"
+  args={{ class: 'max-h-20 w-96', scrollTo: true }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.type(input, 'finn@temporal.io');
     await userEvent.keyboard('{enter}');
   }}
 />

@@ -1,3 +1,8 @@
+import { get } from 'svelte/store';
+
+import { page } from '$app/stores';
+
+import { authUser } from '$lib/stores/auth-user';
 import type {
   PendingActivity,
   PendingActivityWithMetadata,
@@ -47,9 +52,9 @@ const decodePendingActivity = async ({
 
 export const toDecodedPendingActivities = async (
   workflow: WorkflowExecution,
-  namespace: string,
-  settings: Settings,
-  accessToken: string,
+  namespace: string = get(page).params.namespace,
+  settings: Settings = get(page).data.settings,
+  accessToken: string = get(authUser).accessToken,
 ) => {
   const pendingActivities = workflow?.pendingActivities ?? [];
   const decodedActivities: PendingActivity[] = [];

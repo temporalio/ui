@@ -53,6 +53,8 @@
 
 <Story name="Disabled" args={{ disabled: true }} />
 
+<Story name="Loading" args={{ loading: true }} />
+
 <Story
   name="Disabled with Icon"
   args={{ disabled: true, leadingIcon: 'regions' }}
@@ -61,3 +63,8 @@
 <Story name="Disabled and Selected" args={{ disabled: true, value: 'pizza' }} />
 
 <Story name="Label Hidden" args={{ labelHidden: true }} />
+
+<Story
+  name="Invalid with error message"
+  args={{ valid: false, error: 'This value is invalid' }}
+/>

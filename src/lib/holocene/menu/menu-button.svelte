@@ -1,19 +1,12 @@
-<script lang="ts" context="module">
-  export type MenuButtonVariant =
-    | 'primary'
-    | 'secondary'
-    | 'ghost'
-    | 'table-header';
-</script>
-
 <script lang="ts">
-  import type { HTMLButtonAttributes } from 'svelte/elements';
-
   import { createEventDispatcher, getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import Button, {
+    type ButtonWithoutHrefProps,
+  } from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     MENU_CONTEXT,
@@ -21,17 +14,13 @@
   } from '$lib/holocene/menu/menu-container.svelte';
   import { MENU_ITEM_SELECTORS } from '$lib/holocene/menu/menu-item.svelte';
 
-  interface $$Props extends HTMLButtonAttributes {
+  interface $$Props extends ButtonWithoutHrefProps {
     controls: string;
     count?: number;
-    disabled?: boolean;
     hasIndicator?: boolean;
-    id?: string;
     label?: string;
-    variant?: MenuButtonVariant;
     class?: string;
     active?: boolean;
-    'data-testid'?: string;
   }
 
   let className = '';
@@ -42,7 +31,7 @@
   export let hasIndicator = false;
   export let id: string = null;
   export let label: string = null;
-  export let variant: MenuButtonVariant = 'secondary';
+  export let variant: ButtonStyles['variant'] = 'secondary';
 
   const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);

@@ -11,7 +11,10 @@ test.describe('Batch and Bulk Workflow Actions', () => {
   test.describe('when advanced visibility is enabled', () => {
     test.beforeEach(async ({ page }) => {
       await mockWorkflowsApis(page);
-      await mockClusterApi(page, { visibilityStore: 'elasticsearch' });
+      await mockClusterApi(page, {
+        visibilityStore: 'elasticsearch',
+        persistenceStore: 'postgres,elasticsearch',
+      });
       await mockBatchOperationApis(page);
 
       await page.goto('/namespaces/default/workflows');
@@ -37,7 +40,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     test('allows running workflows to be terminated by a query', async ({
       page,
     }) => {
-      await page.getByTestId('filter-configuration-menu-button').click();
+      await page.locator('#search-attribute-filter-button').click();
       await page.getByTestId('manual-search-toggle').click();
       await page.locator('#manual-search').fill('ExecutionStatus="Running"');
       await page.getByTestId('manual-search-button').click();
@@ -78,7 +81,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
     test('allows running workflows to be cancelled by a query', async ({
       page,
     }) => {
-      await page.getByTestId('filter-configuration-menu-button').click();
+      await page.locator('#search-attribute-filter-button').click();
       await page.getByTestId('manual-search-toggle').click();
       await page.locator('#manual-search').fill('ExecutionStatus="Running"');
       await page.getByTestId('manual-search-button').click();

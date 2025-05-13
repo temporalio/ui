@@ -13,7 +13,8 @@ type RouteParameters = {
   run: string;
   view?: EventView | string;
   queryParams?: Record<string, string>;
-  eventId: string;
+  eventId?: string;
+  eventType?: string;
   scheduleId: string;
   queue: string;
   schedule: string;
@@ -38,11 +39,11 @@ export type ScheduleParameters = Pick<
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'view' | 'queryParams'
+  'namespace' | 'workflow' | 'run' | 'eventId' | 'view' | 'queryParams'
 >;
 export type EventParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'view' | 'eventId'
+  'namespace' | 'workflow' | 'run' | 'view' | 'eventId' | 'eventType'
 >;
 
 export type AuthenticationParameters = {
@@ -174,15 +175,42 @@ export const routeForEventHistoryEvent = ({
   return `${routeForWorkflow(parameters)}/history/events/${eventId}`;
 };
 
-export const routeForEventGroup = ({
-  eventId,
-  ...parameters
-}: EventParameters): string => {
-  return `${routeForWorkflow(parameters)}/history/event-groups/${eventId}`;
-};
-
 export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
+};
+
+export const routeForWorkerDeployments = ({
+  namespace,
+}: {
+  namespace: string;
+}) => {
+  return `${base}/namespaces/${namespace}/worker-deployments`;
+};
+
+export const routeForWorkerDeployment = ({
+  namespace,
+  deployment,
+}: {
+  namespace: string;
+  deployment: string;
+}) => {
+  const deploymentName = encodeURIForSvelte(deployment);
+  return `${base}/namespaces/${namespace}/worker-deployments/${deploymentName}`;
+};
+
+export const routeForWorkerDeploymentVersion = ({
+  namespace,
+  deployment,
+  version,
+}: {
+  namespace: string;
+  deployment: string;
+  version: string;
+}) => {
+  return `${routeForWorkerDeployment({
+    namespace,
+    deployment,
+  })}/version/${version}`;
 };
 
 export const routeForRelationships = (
@@ -213,6 +241,12 @@ export const routeForWorkflowMetadata = (
   parameters: WorkflowParameters,
 ): string => {
   return `${routeForWorkflow(parameters)}/metadata`;
+};
+
+export const routeForWorkflowUpdate = (
+  parameters: WorkflowParameters,
+): string => {
+  return `${routeForWorkflow(parameters)}/update`;
 };
 
 export const routeForPendingActivities = (

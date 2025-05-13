@@ -1,18 +1,4 @@
-<script lang="ts">
-  import type {
-    HTMLAnchorAttributes,
-    HTMLButtonAttributes,
-  } from 'svelte/elements';
-
-  import { cva, type VariantProps } from 'class-variance-authority';
-  import { twMerge as merge } from 'tailwind-merge';
-
-  import { goto } from '$app/navigation';
-
-  import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
+<script context="module" lang="ts">
   const buttonStyles = cva(
     [
       'relative',
@@ -69,19 +55,40 @@
     count?: number;
     id?: string;
     'data-testid'?: string;
+    class?: string;
   };
 
-  type ButtonWithoutHrefProps = BaseProps & HTMLButtonAttributes;
-  type ButtonWithHrefProps = BaseProps &
+  export type ButtonStyles = VariantProps<typeof buttonStyles>;
+
+  export type ButtonWithoutHrefProps = BaseProps &
+    ButtonStyles &
+    HTMLButtonAttributes;
+
+  export type ButtonWithHrefProps = BaseProps &
+    ButtonStyles &
     HTMLAnchorAttributes & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
       disabled?: boolean;
     };
+</script>
 
-  type ButtonStyles = VariantProps<typeof buttonStyles>;
+<script lang="ts">
+  import type {
+    HTMLAnchorAttributes,
+    HTMLButtonAttributes,
+  } from 'svelte/elements';
 
-  type $$Props = (ButtonWithoutHrefProps | ButtonWithHrefProps) & ButtonStyles;
+  import { cva, type VariantProps } from 'class-variance-authority';
+  import { twMerge as merge } from 'tailwind-merge';
+
+  import { goto } from '$app/navigation';
+
+  import Badge from '$lib/holocene/badge.svelte';
+  import type { IconName } from '$lib/holocene/icon';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+
+  type $$Props = ButtonWithoutHrefProps | ButtonWithHrefProps;
 
   export let variant: ButtonStyles['variant'] = 'primary';
   export let size: ButtonStyles['size'] = 'md';

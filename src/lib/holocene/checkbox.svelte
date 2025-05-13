@@ -22,6 +22,7 @@
     required?: boolean;
     valid?: boolean;
     error?: string;
+    class?: string;
   }
 
   export let id = '';

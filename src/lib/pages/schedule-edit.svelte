@@ -37,6 +37,7 @@
       taskQueue,
       input,
       encoding,
+      messageType,
       hour,
       minute,
       second,
@@ -47,6 +48,7 @@
       days,
       months,
       searchAttributes,
+      workflowSearchAttributes,
     } = args;
     const action: ScheduleActionParameters = {
       namespace,
@@ -56,7 +58,9 @@
       taskQueue,
       input,
       encoding,
+      messageType,
       searchAttributes,
+      workflowSearchAttributes,
     };
     const spec: Partial<ScheduleSpecParameters> = {
       hour,

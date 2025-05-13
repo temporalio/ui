@@ -105,6 +105,8 @@ const nexusEvents = [
   'NexusOperationCanceled',
   'NexusOperationTimedOut',
   'NexusOperationCancelRequested',
+  'NexusOperationCancelRequestCompleted',
+  'NexusOperationCancelRequestFailed',
 ] as const;
 
 export type EventType = (typeof eventTypes)[number];
@@ -123,6 +125,7 @@ export const eventTypes = [
   'WorkflowExecutionStarted',
   'WorkflowExecutionTerminated',
   'WorkflowExecutionTimedOut',
+  'WorkflowExecutionOptionsUpdated',
   'WorkflowTaskCompleted',
   'WorkflowTaskFailed',
   'WorkflowTaskScheduled',
@@ -146,6 +149,7 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'workflowExecutionCompletedEventAttributes',
   'workflowExecutionFailedEventAttributes',
   'workflowExecutionTimedOutEventAttributes',
+  'workflowExecutionOptionsUpdatedEventAttributes' as unknown as EventAttributeKey,
   'workflowTaskStartedEventAttributes',
   'workflowTaskScheduledEventAttributes',
   'workflowTaskCompletedEventAttributes',
@@ -193,6 +197,8 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'nexusOperationCanceledEventAttributes',
   'nexusOperationTimedOutEventAttributes',
   'nexusOperationCancelRequestedEventAttributes',
+  'nexusOperationCancelRequestCompletedEventAttributes' as unknown as EventAttributeKey,
+  'nexusOperationCancelRequestFailedEventAttributes' as unknown as EventAttributeKey,
   'workflowPropertiesModifiedEventAttributes',
 ] as const;
 

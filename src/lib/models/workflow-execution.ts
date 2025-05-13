@@ -2,11 +2,13 @@ import type {
   Callbacks,
   PendingActivity,
   PendingActivityInfo,
+  PendingActivityState,
   PendingChildren,
   PendingNexusOperation,
 } from '$lib/types/events';
 import type { Callback } from '$lib/types/nexus';
 import type {
+  DecodedWorkflowSearchAttributes,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
   WorkflowExecutionAPIResponse,
@@ -15,6 +17,7 @@ import type {
 import { decodePayload } from '$lib/utilities/decode-payload';
 import {
   toCallbackStateReadable,
+  toPendingActivityStateReadable,
   toPendingNexusOperationStateReadable,
   toWorkflowStatusReadable,
 } from '$lib/utilities/screaming-enums';
@@ -28,8 +31,12 @@ export const toPendingActivities = (
   return pendingActivity.map((activity): PendingActivity => {
     const attributes = simplifyAttributes(activity, true);
     const id = activity.activityId;
-
-    return { ...attributes, id };
+    const state = activity.state as unknown as PendingActivityState;
+    return {
+      ...attributes,
+      id,
+      state: toPendingActivityStateReadable(state),
+    };
   });
 };
 
@@ -57,7 +64,7 @@ const toCallbacks = (callbacks?: Callbacks): Callbacks => {
 
 const toSearchAttributes = (
   apiSearchAttributes: WorkflowSearchAttributes,
-): WorkflowSearchAttributes => {
+): DecodedWorkflowSearchAttributes => {
   if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
   const decoded = Object.entries(apiSearchAttributes.indexedFields).reduce(
     (searchAttributes, [searchAttributeName, payload]) => {
@@ -106,7 +113,6 @@ export const toWorkflowExecution = (
     response.workflowExecutionInfo.stateTransitionCount;
   const defaultWorkflowTaskTimeout =
     response.executionConfig?.defaultWorkflowTaskTimeout;
-
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
   );
@@ -115,6 +121,9 @@ export const toWorkflowExecution = (
     toPendingNexusOperations(response?.pendingNexusOperations);
   const pendingWorkflowTask = response?.pendingWorkflowTask;
   const callbacks = toCallbacks(response?.callbacks);
+  const rootExecution = response.workflowExecutionInfo?.rootExecution;
+  const versioningInfo = response.workflowExecutionInfo?.versioningInfo;
+  const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
 
   let summary;
   let details;
@@ -135,6 +144,7 @@ export const toWorkflowExecution = (
     historySizeBytes,
     searchAttributes,
     memo,
+    rootExecution,
     url,
     taskQueue,
     assignedBuildId,
@@ -144,6 +154,7 @@ export const toWorkflowExecution = (
     pendingNexusOperations,
     pendingWorkflowTask,
     callbacks,
+    versioningInfo,
     summary,
     details,
     parentNamespaceId,
@@ -151,6 +162,7 @@ export const toWorkflowExecution = (
     stateTransitionCount,
     isRunning,
     defaultWorkflowTaskTimeout,
+    workflowExtendedInfo,
     get canBeTerminated(): boolean {
       return isRunning && writeActionsAreAllowed();
     },

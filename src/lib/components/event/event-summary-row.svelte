@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
   import { fade, slide } from 'svelte/transition';
 
   import { page } from '$app/stores';
 
+  import Badge from '$lib/holocene/badge.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -35,16 +36,17 @@
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
+  import MetadataDecoder from './metadata-decoder.svelte';
 
   export let event: IterableEvent;
   export let group: EventGroup | undefined = undefined;
   export let initialItem: IterableEvent | undefined;
   export let index = 0;
   export let compact = false;
-  export let expandAll = false;
+  export let expanded = false;
   export let typedError = false;
   export let active = false;
-  export let onRowClick: () => void = noop;
+  export let onRowClick: () => void = () => {};
 
   $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).shift()
@@ -57,7 +59,6 @@
     workflow,
     run,
   });
-  $: expanded = expandAll;
   $: attributes = formatAttributes(event);
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
@@ -89,8 +90,8 @@
   $: displayName = isEventGroup(event)
     ? event.label
     : isLocalActivityMarkerEvent(event)
-    ? 'Local Activity'
-    : spaceBetweenCapitalLetters(event.name);
+      ? 'Local Activity'
+      : spaceBetweenCapitalLetters(event.name);
 
   $: primaryAttribute = getPrimaryAttributeForEvent(
     isEventGroup(event) ? event.initialEvent : event,
@@ -108,17 +109,30 @@
     isEventGroup(event) &&
     !event.isPending &&
     event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt;
+  $: showSecondaryAttribute =
+    compact &&
+    secondaryAttribute?.key &&
+    secondaryAttribute?.key !== primaryAttribute?.key &&
+    !currentEvent?.userMetadata?.summary;
+  $: eventTime = formatDate(currentEvent?.eventTime, $timeFormat, {
+    relative: $relativeTime,
+  });
+  $: abbrEventTime = formatDate(currentEvent?.eventTime, $timeFormat, {
+    relative: $relativeTime,
+    abbrFormat: true,
+  });
 </script>
 
 <tr
   class="row dense"
   id={`${event.id}-${index}`}
-  class:expanded={expanded && !expandAll}
+  class:expanded
   class:active
   class:failure
   class:canceled
   class:terminated
   class:typedError
+  data-eventid={event.id}
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
@@ -153,10 +167,13 @@
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
       bottom
     >
-      {formatDate(currentEvent?.eventTime, $timeFormat, {
-        relative: $relativeTime,
-        abbrFormat: true,
-      })}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={abbrEventTime}
+      >
+        {abbrEventTime}
+      </Copyable>
     </Tooltip>
   </td>
   <td class="hidden text-right md:block">
@@ -165,9 +182,13 @@
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
       bottom
     >
-      {formatDate(currentEvent?.eventTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={eventTime}
+      >
+        {eventTime}
+      </Copyable>
     </Tooltip>
   </td>
   <td class="truncate md:min-w-fit">
@@ -198,15 +219,32 @@
         {/if}
       </div>
     {/if}
+    {#if primaryAttribute?.key}
+      <EventDetailsRow {...primaryAttribute} {attributes} />
+    {/if}
+    {#if currentEvent?.userMetadata?.summary}
+      <MetadataDecoder
+        value={currentEvent.userMetadata.summary}
+        let:decodedValue
+      >
+        {#if decodedValue}
+          <div
+            class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
+          >
+            <p class="whitespace-nowrap text-right text-xs">Summary</p>
+            <Badge type="secondary" class="block select-none truncate">
+              {decodedValue}
+            </Badge>
+          </div>
+        {/if}
+      </MetadataDecoder>
+    {/if}
     {#if currentEvent?.links?.length}
       <EventLink
         link={currentEvent.links[0]}
         class="max-w-xl"
         linkClass="truncate"
       />
-    {/if}
-    {#if primaryAttribute?.key}
-      <EventDetailsRow {...primaryAttribute} {attributes} />
     {/if}
     {#if nonPendingActivityAttempt}
       <EventDetailsRow
@@ -215,7 +253,7 @@
         {attributes}
       />
     {/if}
-    {#if compact && secondaryAttribute?.key}
+    {#if showSecondaryAttribute}
       <EventDetailsRow {...secondaryAttribute} {attributes} />
     {/if}
   </td>

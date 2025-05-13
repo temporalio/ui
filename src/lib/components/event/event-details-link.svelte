@@ -13,7 +13,6 @@
   export let value: string;
   export let attributes: CombinedAttributes;
   export let type: EventLinkType;
-  export let light = false;
 
   $: ({ workflow, namespace } = $page.params);
 
@@ -40,6 +39,6 @@
   $: href = hrefs[type];
 </script>
 
-<Link class={$$restProps.class} {href} {light}>
+<Link class={$$restProps.class} {href}>
   {value}
 </Link>

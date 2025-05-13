@@ -3,14 +3,12 @@
   import { page, updated } from '$app/stores';
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
-  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
-  import Banner from '$lib/holocene/banner/banner.svelte';
-  import { ErrorBoundary } from '$lib/holocene/error-boundary';
+  import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
@@ -30,6 +28,7 @@
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
+    routeForWorkerDeployments,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
@@ -54,20 +53,59 @@
     };
   });
 
-  $: linkList = getLinkList(activeNamespaceName, !!$inProgressBatchOperation);
+  $: routes = getRoutes(activeNamespaceName);
+  $: linkList = getLinkList(routes, !!$inProgressBatchOperation);
+
+  const getRoutes = (namespace: string) => {
+    return {
+      workflowsRoute: routeForWorkflows({ namespace }),
+      schedulesRoute: routeForSchedules({ namespace }),
+      batchOperationsRoute: routeForBatchOperations({ namespace }),
+      workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
+      archivalRoute: routeForArchivalWorkfows({ namespace }),
+      namespacesRoute: routeForNamespaces(),
+      nexusRoute: routeForNexus(),
+      historyImportRoute: routeForEventHistoryImport(),
+    };
+  };
+
+  $: ({
+    workflowsRoute,
+    schedulesRoute,
+    batchOperationsRoute,
+    workerDeploymentsRoute,
+    archivalRoute,
+  } = routes);
+  $: showNamespacePicker = [
+    workflowsRoute,
+    schedulesRoute,
+    workerDeploymentsRoute,
+    batchOperationsRoute,
+    archivalRoute,
+  ].some((route) => $page.url.href.includes(route));
 
   const getLinkList = (
-    namespace: string,
+    {
+      workflowsRoute,
+      schedulesRoute,
+      batchOperationsRoute,
+      workerDeploymentsRoute,
+      archivalRoute,
+      namespacesRoute,
+      nexusRoute,
+      historyImportRoute,
+    }: {
+      workflowsRoute: string;
+      schedulesRoute: string;
+      batchOperationsRoute: string;
+      workerDeploymentsRoute: string;
+      archivalRoute: string;
+      namespacesRoute: string;
+      nexusRoute: string;
+      historyImportRoute: string;
+    },
     inProgressBatch: boolean,
   ): NavLinkListItem[] => {
-    const workflowsRoute = routeForWorkflows({ namespace });
-    const schedulesRoute = routeForSchedules({ namespace });
-    const batchOperationsRoute = routeForBatchOperations({ namespace });
-    const archivalRoute = routeForArchivalWorkfows({ namespace });
-    const namespacesRoute = routeForNamespaces();
-    const nexusRoute = routeForNexus();
-    const historyImportRoute = routeForEventHistoryImport();
-
     return [
       {
         href: workflowsRoute,
@@ -90,6 +128,13 @@
         isActive: (path) => path.includes(batchOperationsRoute),
       },
       {
+        href: workerDeploymentsRoute,
+        icon: 'merge',
+        label: translate('deployments.deployments'),
+        tooltip: translate('deployments.worker-deployments'),
+        isActive: (path) => path.includes(workerDeploymentsRoute),
+      },
+      {
         href: archivalRoute,
         icon: 'archives',
         label: translate('common.archive'),
@@ -105,6 +150,7 @@
           !path.includes(workflowsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
+          !path.includes(workerDeploymentsRoute) &&
           !path.includes(archivalRoute),
       },
       {
@@ -147,6 +193,10 @@
         subPath: 'batch-operations',
         fullRoute: routeForBatchOperations({ namespace }),
       },
+      {
+        subPath: 'worker-deployments',
+        fullRoute: routeForWorkerDeployments({ namespace }),
+      },
     ];
 
     for (const { subPath, fullRoute } of namespacePages) {
@@ -183,6 +233,7 @@
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
+    position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud} />
@@ -190,27 +241,28 @@
   <MainContentContainer>
     <DataEncoderSettings class="hidden md:flex" />
     <TopNavigation>
-      <NamespacePicker {namespaceList} slot="left" />
+      <svelte:fragment slot="left">
+        {#if showNamespacePicker}
+          <NamespacePicker {namespaceList} />
+        {/if}
+      </svelte:fragment>
       <UserMenu {logout} />
     </TopNavigation>
-    <CodecServerErrorBanner>
-      <Banner
-        id="settings-banner-text"
-        message={$page.data.settings?.bannerText}
-        dismissable
-        dismissLabel={translate('common.close')}
-        slot="fallback"
-      />
-    </CodecServerErrorBanner>
     <div
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
     >
-      <ErrorBoundary onError={() => {}}>
+      <ErrorBoundary>
         <slot />
       </ErrorBoundary>
     </div>
-    <BottomNavigation slot="footer" {linkList} {namespaceList} {isCloud}>
+    <BottomNavigation
+      slot="footer"
+      {linkList}
+      {namespaceList}
+      {isCloud}
+      {showNamespacePicker}
+    >
       <UserMenuMobile {logout} />
     </BottomNavigation>
   </MainContentContainer>

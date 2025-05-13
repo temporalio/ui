@@ -5,6 +5,7 @@
 
   import { page } from '$app/stores';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -31,9 +32,9 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import type { PayloadInputEncoding } from '../payload-input-with-encoding.svelte';
-  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
+  import SchedulesSearchAttributesInputs from './schedules-search-attributes-inputs.svelte';
 
   import type { Schedule, SearchAttribute } from '$types';
 
@@ -65,20 +66,14 @@
 
   let errors = {};
   let name = scheduleId ?? '';
-  const decodedWorkflow = decodePayloadAttributes(
-    schedule?.action?.startWorkflow,
-  );
-  const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
-  const indexedFields =
-    decodedSearchAttributes?.searchAttributes.indexedFields ??
-    ({} as { [k: string]: string });
 
-  let workflowType = decodedWorkflow?.workflowType?.name ?? '';
-  let workflowId = decodedWorkflow?.workflowId ?? '';
-  let taskQueue = decodedWorkflow?.taskQueue?.name ?? '';
+  let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
+  let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
+  let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
   let input = '';
   let editInput = !schedule;
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
+  let messageType = '';
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
   let months: string[] = [];
@@ -88,7 +83,28 @@
   let second = '';
   let phase = '';
   let cronString = '';
+
+  const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
+  const decodedWorkflowSearchAttributes = decodePayloadAttributes({
+    searchAttributes: schedule?.action?.startWorkflow?.searchAttributes ?? {},
+  });
+
+  const indexedFields =
+    decodedSearchAttributes?.searchAttributes.indexedFields ??
+    ({} as { [k: string]: string });
+  const workflowIndexedFields =
+    decodedWorkflowSearchAttributes?.searchAttributes.indexedFields ??
+    ({} as { [k: string]: string });
+
   let searchAttributesInput = Object.entries(indexedFields).map(
+    ([label, value]) => ({
+      label,
+      value,
+      type: $customSearchAttributes[label],
+    }),
+  ) as SearchAttributeInput[];
+
+  let workflowSearchAttributesInput = Object.entries(workflowIndexedFields).map(
     ([label, value]) => ({
       label,
       value,
@@ -104,6 +120,7 @@
       taskQueue,
       ...(editInput && { input }),
       encoding: $encoding,
+      messageType,
       hour,
       minute,
       second,
@@ -114,6 +131,7 @@
       days,
       months,
       searchAttributes: searchAttributesInput,
+      workflowSearchAttributes: workflowSearchAttributesInput,
     };
 
     onConfirm(preset, args, schedule);
@@ -179,6 +197,7 @@
         <Input
           id="name"
           bind:value={name}
+          data-testid="schedule-name-input"
           label={translate('schedules.name-label')}
           error={errors['name']}
           maxLength={232}
@@ -190,6 +209,7 @@
         <Input
           id="workflowType"
           bind:value={workflowType}
+          data-testid="schedule-type-input"
           label={translate('schedules.workflow-type-label')}
           error={errors['workflowType']}
           on:input={onInput}
@@ -199,6 +219,7 @@
         <Input
           id="workflowId"
           bind:value={workflowId}
+          data-testid="schedule-workflow-id-input"
           label={translate('schedules.workflow-id-label')}
           error={errors['workflowId']}
           on:input={onInput}
@@ -208,6 +229,7 @@
         <Input
           id="taskQueue"
           bind:value={taskQueue}
+          data-testid="schedule-task-queue-input"
           label={translate('schedules.task-queue-label')}
           error={errors['taskQueue']}
           on:input={onInput}
@@ -218,12 +240,9 @@
           bind:input
           bind:editInput
           bind:encoding
+          bind:messageType
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
-        />
-        <AddSearchAttributes
-          bind:attributesToAdd={searchAttributesInput}
-          class="w-full"
         />
         <SchedulesCalendarView
           let:preset
@@ -238,18 +257,28 @@
           bind:phase
           bind:cronString
         >
+          <SchedulesSearchAttributesInputs
+            bind:searchAttributesInput
+            bind:workflowSearchAttributesInput
+          />
           <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
             <Button
               disabled={isDisabled(preset) || !writeActionsAreAllowed()}
               on:click={() => handleConfirm(preset, schedule)}
-              class="max-sm:w-full">{confirmText}</Button
+              class="max-sm:w-full"
+              data-testid="create-schedule-button">{confirmText}</Button
             >
-            <Button variant="ghost" href={backHref} class="max-sm:w-full"
+            <Button
+              variant="ghost"
+              href={backHref}
+              class="max-sm:w-full"
+              data-testid="cancel-schedule-button"
               >{translate('common.cancel')}</Button
             >
           </div>
         </SchedulesCalendarView>
         <Alert intent="error" title={$error} hidden={!$error} />
+        <CodecServerErrorBanner />
       </form>
     </Card>
   {/if}

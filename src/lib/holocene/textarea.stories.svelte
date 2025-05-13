@@ -41,17 +41,19 @@
 <script lang="ts">
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
+  import { userEvent, within } from '@storybook/test';
 
   import { shouldNotBeTransparent } from './test-utilities';
 </script>
 
-<Template let:args>
+<Template let:args let:context>
   <Textarea
     on:input={action('input')}
     on:blur={action('blue')}
     on:change={action('change')}
     on:focus={action('focus')}
     on:keydown={action('keydown')}
+    id={context.id}
     {...args}
   />
 </Template>
@@ -69,7 +71,15 @@
 
 <Story name="Hidden Label" args={{ labelHidden: true }} />
 
-<Story name="With Maximum Length" args={{ maxLength: 10 }} />
+<Story
+  name="With Maximum Length"
+  args={{ maxLength: 10 }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByTestId(id);
+    await userEvent.click(input);
+  }}
+/>
 
 <Story name="With Value" args={{ value: 'Some text…' }} />
 

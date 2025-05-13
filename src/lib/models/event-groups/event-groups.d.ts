@@ -1,4 +1,6 @@
+import type { Payload } from '$lib/types';
 import type {
+  EventLink,
   PendingActivity,
   PendingNexusOperation,
   WorkflowEvent,
@@ -29,6 +31,8 @@ interface EventGroup
   level: number | undefined;
   pendingActivity: PendingActivity | undefined;
   pendingNexusOperation: PendingNexusOperation | undefined;
+  userMetadata?: { summary?: Payload };
+  links: EventLink[];
 }
 
 type EventGroups = EventGroup[];

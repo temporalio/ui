@@ -10,7 +10,12 @@ import type {
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type { Payloads, Payload as RawPayload } from '$lib/types';
+import type {
+  Failure,
+  Memo,
+  Payloads,
+  Payload as RawPayload,
+} from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
@@ -50,6 +55,16 @@ const toArray = (payloads: Payload | Payload[]): Payload[] => {
   }
 };
 
+const decodeMetadata = (metadata: Record<string, unknown>) => {
+  return Object.entries(metadata).reduce(
+    (acc, [key, value]) => {
+      acc[key] = atob(String(value));
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+};
+
 export function decodePayload(
   payload: Payload,
   returnDataOnly: boolean = true,
@@ -61,7 +76,12 @@ export function decodePayload(
 
   try {
     const data = parseWithBigInt(atob(String(payload?.data ?? '')));
-    return returnDataOnly ? data : { ...payload, data };
+    if (returnDataOnly) return data;
+    const metadata = decodeMetadata(payload?.metadata);
+    return {
+      metadata,
+      data,
+    };
   } catch (_e) {
     console.warn('Could not parse payload: ', _e);
     // Couldn't correctly decode this just let the user deal with the data as is
@@ -69,7 +89,12 @@ export function decodePayload(
 
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
   if (encoding === 'binary/null') {
-    return returnDataOnly ? null : { ...payload, data: null };
+    if (returnDataOnly) return null;
+    const metadata = decodeMetadata(payload?.metadata);
+    return {
+      metadata,
+      data: null,
+    };
   }
 
   return payload;
@@ -90,7 +115,6 @@ export const decodePayloadAttributes = <
     has(eventAttribute.searchAttributes, 'indexedFields')
   ) {
     const searchAttributes = eventAttribute.searchAttributes.indexedFields;
-
     Object.entries(searchAttributes).forEach(([key, value]) => {
       searchAttributes[key] = decodePayload(value, returnDataOnly);
     });
@@ -191,11 +215,11 @@ export const decodeSingleReadablePayloadWithCodec = async (
 };
 
 export const decodeAllPotentialPayloadsWithCodec = async (
-  anyAttributes: EventAttribute | PotentiallyDecodable,
+  anyAttributes: EventAttribute | PotentiallyDecodable | Failure,
   namespace: string = get(page).params.namespace,
   settings: Settings = get(page).data.settings,
   accessToken: string = get(authUser).accessToken,
-): Promise<EventAttribute | PotentiallyDecodable> => {
+): Promise<EventAttribute | PotentiallyDecodable | Failure> => {
   const decode = decodeReadablePayloads(settings);
 
   if (anyAttributes) {
@@ -232,13 +256,20 @@ export const isSinglePayload = (payload: unknown): boolean => {
 };
 
 export const cloneAllPotentialPayloadsWithCodec = async (
-  anyAttributes: PotentiallyDecodable | EventAttribute | WorkflowEvent | null,
+  anyAttributes:
+    | PotentiallyDecodable
+    | EventAttribute
+    | WorkflowEvent
+    | Memo
+    | null,
   namespace: string,
   settings: Settings,
   accessToken: string,
   decodeSetting: DownloadEventHistorySetting = 'readable',
   returnDataOnly: boolean = true,
-): Promise<PotentiallyDecodable | EventAttribute | WorkflowEvent | null> => {
+): Promise<
+  PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
+> => {
   if (!anyAttributes) return anyAttributes;
 
   const decode =
@@ -284,8 +315,10 @@ export const convertPayloadToJsonWithCodec = async ({
   settings,
   accessToken,
 }: {
-  attributes: EventAttribute | PotentiallyDecodable;
-} & EventRequestMetadata): Promise<EventAttribute | PotentiallyDecodable> => {
+  attributes: EventAttribute | PotentiallyDecodable | Failure;
+} & EventRequestMetadata): Promise<
+  EventAttribute | PotentiallyDecodable | Failure
+> => {
   const decodedAttributes = await decodeAllPotentialPayloadsWithCodec(
     attributes,
     namespace,

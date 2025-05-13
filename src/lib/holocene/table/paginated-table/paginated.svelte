@@ -18,8 +18,10 @@
 
   type Item = $$Generic;
 
+  export let id: string = null;
   export let items: Item[];
   export let variant: 'primary' | 'split' = 'primary';
+  export let loading = false;
   export let updating = false;
   export let perPageLabel: string;
   export let pageButtonLabel: (page: number) => string;
@@ -31,7 +33,7 @@
 
   $: url = $page.url;
   $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
-  $: currentPageParam = url.searchParams.get(currentPageKey) ?? '1';
+  $: currentPageParam = url.searchParams.get(currentPageKey) || '1';
   $: store = pagination(items, perPageParam, currentPageParam);
 
   // keep the 'page-size' url search param within the supported options
@@ -89,11 +91,13 @@
 </script>
 
 <PaginatedTable
+  {loading}
   {updating}
   {variant}
   {maxHeight}
   visibleItems={$store.items}
   {fixed}
+  {id}
 >
   <slot name="caption" slot="caption" />
   <slot name="headers" slot="headers" visibleItems={$store.items} />
@@ -108,7 +112,7 @@
     />
   </svelte:fragment>
 
-  <div class="flex items-center gap-2" slot="actions-center">
+  <div class="hidden items-center gap-2 md:flex" slot="actions-center">
     {#each $store.pageShortcuts as page}
       {#if isNaN(page)}
         <span class="text-primary">...</span>
@@ -131,6 +135,7 @@
     aria-label={$$restProps['aria-label']}
     slot="actions-end"
   >
+    <slot name="actions-end-additional" />
     <IconButton
       label={previousPageButtonLabel}
       disabled={!$store.hasPrevious}
@@ -145,5 +150,5 @@
     />
   </nav>
 
-  <slot name="empty" slot="empty" {updating} />
+  <slot name="empty" slot="empty" />
 </PaginatedTable>

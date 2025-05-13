@@ -1,3 +1,4 @@
+import type { Payload } from '$lib/types';
 import type {
   ActivityTaskScheduledEvent,
   CommonHistoryEvent,
@@ -51,7 +52,7 @@ type StartingEvents = {
 };
 
 const createGroupFor = <K extends keyof StartingEvents>(
-  event: StartingEvents[K],
+  event: StartingEvents[K] & { userMetadata?: { summary: Payload } },
 ): EventGroup => {
   const id = getGroupId(event);
   const name = getEventGroupName(event);
@@ -80,6 +81,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     level: undefined,
     pendingActivity: undefined,
     pendingNexusOperation: undefined,
+    userMetadata: event?.userMetadata,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -88,6 +90,9 @@ const createGroupFor = <K extends keyof StartingEvents>(
     },
     get eventList() {
       return Array.from(this.events, ([_key, value]) => value);
+    },
+    get links() {
+      return Array.from(this.events, ([_key, value]) => value.links).flat();
     },
     get lastEvent() {
       return getLastEvent(this);

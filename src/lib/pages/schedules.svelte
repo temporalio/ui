@@ -11,8 +11,10 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -26,7 +28,7 @@
   import { schedulesCount } from '$lib/stores/schedules';
   import {
     customSearchAttributes,
-    searchAttributes,
+    scheduleSearchAttributes,
   } from '$lib/stores/search-attributes';
   import { temporalVersion } from '$lib/stores/versions';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
@@ -70,7 +72,10 @@
   onMount(() => {
     if (query) {
       // Set filters from inital page load query if it exists
-      $scheduleFilters = toListWorkflowFilters(query, $searchAttributes);
+      $scheduleFilters = toListWorkflowFilters(
+        query,
+        $scheduleSearchAttributes,
+      );
     }
   });
 
@@ -105,15 +110,10 @@
         {#if showActions}
           <SearchAttributeFilter
             bind:filters={$scheduleFilters}
-            options={searchAttributeOptions}
+            {searchAttributeOptions}
             refresh={() => {
               refresh = Date.now();
             }}
-          />
-          <Button
-            leadingIcon="settings"
-            variant="secondary"
-            on:click={openCustomizationDrawer}
           />
           {#if !createDisabled}
             <Button
@@ -173,6 +173,18 @@
         </EmptyState>
       {/if}
     </svelte:fragment>
+    <svelte:fragment slot="actions-end-additional">
+      <Tooltip text="Configure Columns" top>
+        <Button
+          on:click={openCustomizationDrawer}
+          data-testid="workflows-summary-table-configuration-button"
+          size="xs"
+          variant="ghost"
+        >
+          <Icon name="settings" />
+        </Button>
+      </Tooltip>
+    </svelte:fragment>
   </PaginatedTable>
 {/key}
 
@@ -180,6 +192,6 @@
   {availableColumns}
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.SCHEDULES}
-  type={translate('schedules.schedule')}
-  title={translate('common.schedules')}
+  type={translate('common.columns')}
+  title={translate('common.schedules-table')}
 />

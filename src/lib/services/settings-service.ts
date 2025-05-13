@@ -28,12 +28,19 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
       endpoint: settingsResponse?.Codec?.Endpoint,
       passAccessToken: settingsResponse?.Codec?.PassAccessToken,
       includeCredentials: settingsResponse?.Codec?.IncludeCredentials,
+      customErrorMessage: {
+        default: {
+          message: settingsResponse?.Codec?.DefaultErrorMessage || '',
+          link: settingsResponse?.Codec?.DefaultErrorLink || '',
+        },
+      },
     },
     defaultNamespace: settingsResponse?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
     disableWriteActions: !!settingsResponse?.DisableWriteActions || false,
     workflowTerminateDisabled: !!settingsResponse?.WorkflowTerminateDisabled,
     workflowCancelDisabled: !!settingsResponse?.WorkflowCancelDisabled,
     workflowSignalDisabled: !!settingsResponse?.WorkflowSignalDisabled,
+    workflowUpdateDisabled: !!settingsResponse?.WorkflowUpdateDisabled,
     workflowResetDisabled: !!settingsResponse?.WorkflowResetDisabled,
     batchActionsDisabled: !!settingsResponse?.BatchActionsDisabled,
     startWorkflowDisabled: !!settingsResponse?.StartWorkflowDisabled,

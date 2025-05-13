@@ -6,6 +6,7 @@ import type {
   WorkflowVersionTimpstamp,
 } from '$lib/types';
 
+import type { VersioningInfo } from './deployments';
 import type {
   Callbacks,
   Payload,
@@ -21,7 +22,10 @@ import type { Optional, Replace } from './global';
  */
 
 type WorkflowExeuctionWithAssignedBuildId =
-  import('$lib/types').WorkflowExecutionInfo & { assignedBuildId: string };
+  import('$lib/types').WorkflowExecutionInfo & {
+    assignedBuildId: string;
+    versioningInfo?: VersioningInfo;
+  };
 
 export type WorkflowExecutionInfo = Replace<
   WorkflowExeuctionWithAssignedBuildId,
@@ -78,6 +82,11 @@ export type WorkflowExecutionConfigWithMetadata = WorkflowExecutionConfig & {
   userMetadata?: UserMetadata;
 };
 
+export type WorkflowExtendedInfo = {
+  resetRunId?: string;
+  originalStartTime?: string;
+};
+
 export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
@@ -86,6 +95,7 @@ export type WorkflowExecutionAPIResponse = Optional<{
   executionConfig: WorkflowExecutionConfigWithMetadata;
   callbacks: Callbacks;
   pendingWorkflowTask: PendingWorkflowTaskInfo;
+  workflowExtendedInfo: WorkflowExtendedInfo;
 }>;
 
 export type WorkflowStatus =
@@ -142,6 +152,10 @@ export type WorkflowSearchAttributes = {
   indexedFields?: Record<string, Payload>;
 };
 
+export type DecodedWorkflowSearchAttributes = {
+  indexedFields?: Record<string, string>;
+};
+
 export interface MostRecentWOrkflowVersionStamp
   extends WorkflowVersionTimpstamp {
   useVersioning?: boolean;
@@ -160,8 +174,9 @@ export type WorkflowExecution = {
   historySizeBytes: string;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
   assignedBuildId?: string;
-  searchAttributes?: WorkflowSearchAttributes;
+  searchAttributes?: DecodedWorkflowSearchAttributes;
   memo: Memo;
+  rootExecution?: WorkflowIdentifier;
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
   pendingActivities: PendingActivity[];
@@ -174,8 +189,10 @@ export type WorkflowExecution = {
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
   callbacks: Callbacks;
+  versioningInfo?: VersioningInfo;
   summary?: Payload;
   details?: Payload;
+  workflowExtendedInfo: WorkflowExtendedInfo;
 };
 
 export type WorkflowTaskFailedCause =

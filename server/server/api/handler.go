@@ -50,9 +50,11 @@ type Auth struct {
 }
 
 type CodecResponse struct {
-	Endpoint           string
-	PassAccessToken    bool
-	IncludeCredentials bool
+	Endpoint            string
+	PassAccessToken     bool
+	IncludeCredentials  bool
+	DefaultErrorMessage string
+	DefaultErrorLink    string
 }
 
 type SettingsResponse struct {
@@ -68,6 +70,7 @@ type SettingsResponse struct {
 	WorkflowTerminateDisabled     bool
 	WorkflowCancelDisabled        bool
 	WorkflowSignalDisabled        bool
+	WorkflowUpdateDisabled        bool
 	WorkflowResetDisabled         bool
 	BatchActionsDisabled          bool
 	StartWorkflowDisabled         bool
@@ -133,15 +136,18 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			FeedbackURL:                 cfg.FeedbackURL,
 			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
 			Codec: &CodecResponse{
-				Endpoint:           cfg.Codec.Endpoint,
-				PassAccessToken:    cfg.Codec.PassAccessToken,
-				IncludeCredentials: cfg.Codec.IncludeCredentials,
+				Endpoint:            cfg.Codec.Endpoint,
+				PassAccessToken:     cfg.Codec.PassAccessToken,
+				IncludeCredentials:  cfg.Codec.IncludeCredentials,
+				DefaultErrorMessage: cfg.Codec.DefaultErrorMessage,
+				DefaultErrorLink:    cfg.Codec.DefaultErrorLink,
 			},
 			Version:                       version.UIVersion,
 			DisableWriteActions:           cfg.DisableWriteActions,
 			WorkflowTerminateDisabled:     cfg.WorkflowTerminateDisabled,
 			WorkflowCancelDisabled:        cfg.WorkflowCancelDisabled,
 			WorkflowSignalDisabled:        cfg.WorkflowSignalDisabled,
+			WorkflowUpdateDisabled:        cfg.WorkflowUpdateDisabled,
 			WorkflowResetDisabled:         cfg.WorkflowResetDisabled,
 			BatchActionsDisabled:          cfg.BatchActionsDisabled,
 			StartWorkflowDisabled:         cfg.StartWorkflowDisabled,
@@ -212,7 +218,7 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 
 func withMarshaler() runtime.ServeMuxOption {
 	return runtime.WithMarshalerOption(runtime.MIMEWildcard, temporalProtoMarshaler{
-		contentType: runtime.MIMEWildcard,
+		contentType: "application/json",
 		mOpts: temporalproto.CustomJSONMarshalOptions{
 			Indent: "  ",
 		},

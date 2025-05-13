@@ -44,7 +44,6 @@
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { groupByCountEnabled } from '$lib/stores/capability-enablement';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
@@ -219,21 +218,17 @@
       >
     {/if}
   </div>
-  {#if $groupByCountEnabled}
-    <WorkflowCounts />
-  {/if}
+  <WorkflowCounts />
 </header>
 
-<div class="flex flex-col gap-2 md:flex-row">
-  <WorkflowSearchAttributeFilter onClickConfigure={openCustomizationDrawer} />
-</div>
-<WorkflowsSummaryConfigurableTable>
+<WorkflowSearchAttributeFilter />
+<WorkflowsSummaryConfigurableTable onClickConfigure={openCustomizationDrawer}>
   <slot name="cloud" slot="cloud" />
 </WorkflowsSummaryConfigurableTable>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}
-  type={translate('common.workflows', { count: 1 })}
-  title={translate('common.workflows', { count: 2 })}
+  type={translate('common.columns')}
+  title={translate('common.workflows-table')}
 />

@@ -50,6 +50,8 @@
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
+  import Button from '../button.svelte';
+
   import AsyncTest from './async-test.svelte';
 </script>
 
@@ -134,14 +136,12 @@
     multiselect: true,
     value: [],
   }}
-  play={async () => {
-    // re-enable this to get ally errors. Need to come back and resolve this
-    // DT-2629
-    // const canvas = within(canvasElement);
-    // const combobox = canvas.getByTestId(id);
-    // await userEvent.type(combobox, 'E');
-    // const menu = canvas.getByRole('listbox');
-    // expect(menu).toBeInTheDocument();
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+    await userEvent.type(combobox, 'E');
+    const menu = canvas.getByRole('listbox');
+    expect(menu).toBeInTheDocument();
   }}
 />
 
@@ -183,4 +183,48 @@
   let:context
 >
   <AsyncTest id={context.id}></AsyncTest>
+</Story>
+
+<Story
+  name="With Action"
+  let:args
+  let:context
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+    await userEvent.type(combobox, 'E');
+  }}
+>
+  <div class="w-64">
+    <Combobox
+      id={context.id}
+      data-testid={context.id}
+      on:change={action('change')}
+      on:filter={action('filter')}
+      leadingIcon="search"
+      options={[
+        'English',
+        'English (UK)',
+        'German',
+        'French',
+        'Japanese',
+        'Spanish',
+        'Portuguese',
+        'Mandarin',
+        'Hindi',
+        'Russian',
+        'Italian',
+      ]}
+      {...args}
+    >
+      <Button
+        on:click={() => {}}
+        slot="action"
+        variant="ghost"
+        size="xs"
+        leadingIcon="close"
+        aria-label="clear"
+      />
+    </Combobox>
+  </div>
 </Story>

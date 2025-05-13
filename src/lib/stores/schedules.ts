@@ -34,6 +34,14 @@ type ScheduleParameterArgs = {
 // "timezoneName": "string",
 // "timezoneData": "string"
 
+const getSearchAttributes = (
+  attrs: (typeof setSearchAttributes.arguments)[0],
+) => {
+  return attrs.length === 0
+    ? null
+    : { indexedFields: { ...setSearchAttributes(attrs) } };
+};
+
 const setBodySpec = (
   body: DescribeFullSchedule,
   spec: Partial<ScheduleSpecParameters>,
@@ -90,14 +98,16 @@ export const submitCreateSchedule = async ({
     taskQueue,
     input,
     encoding,
+    messageType,
     searchAttributes,
+    workflowSearchAttributes,
   } = action;
 
   let payloads;
 
   if (input) {
     try {
-      payloads = await encodePayloads(input, encoding);
+      payloads = await encodePayloads({ input, encoding, messageType });
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
@@ -126,6 +136,14 @@ export const submitCreateSchedule = async ({
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           input: payloads ? { payloads } : null,
+          searchAttributes:
+            workflowSearchAttributes.length === 0
+              ? null
+              : {
+                  indexedFields: {
+                    ...setSearchAttributes(workflowSearchAttributes),
+                  },
+                },
         },
       },
     },
@@ -166,14 +184,16 @@ export const submitEditSchedule = async (
     taskQueue,
     input,
     encoding,
+    messageType,
     searchAttributes,
+    workflowSearchAttributes,
   } = action;
 
   let payloads;
 
   if (input) {
     try {
-      payloads = await encodePayloads(input, encoding);
+      payloads = await encodePayloads({ input, encoding, messageType });
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
@@ -183,14 +203,7 @@ export const submitEditSchedule = async (
   const { preset } = presets;
   const body: DescribeFullSchedule = {
     schedule_id: scheduleId,
-    searchAttributes:
-      searchAttributes.length === 0
-        ? null
-        : {
-            indexedFields: {
-              ...setSearchAttributes(searchAttributes),
-            },
-          },
+    searchAttributes: getSearchAttributes(searchAttributes),
     schedule: {
       ...schedule,
       action: {
@@ -200,6 +213,7 @@ export const submitEditSchedule = async (
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
           ...(input !== undefined && { input: payloads ? { payloads } : null }),
+          searchAttributes: getSearchAttributes(workflowSearchAttributes),
         },
       },
     },
@@ -210,10 +224,10 @@ export const submitEditSchedule = async (
     try {
       const entries = Object.entries(fields);
       for (const [key, value] of entries) {
-        const encodedValue = await encodePayloads(
-          stringifyWithBigInt(value),
-          'json/plain',
-        );
+        const encodedValue = await encodePayloads({
+          input: stringifyWithBigInt(value),
+          encoding: 'json/plain',
+        });
         fields[key] = encodedValue[0];
       }
     } catch (e) {

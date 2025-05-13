@@ -4,6 +4,10 @@
 
 ## Development
 
+https://github.com/temporalio/ui-server is automatically updated to mirror
+changes to https://github.com/temporalio/ui/tree/main/server; commits should be
+made to the UI repository.
+
 For contributions follow UI's development guide https://github.com/temporalio/ui
 
 

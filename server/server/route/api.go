@@ -25,8 +25,10 @@ package route
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
+	"go.temporal.io/api/workflowservice/v1"
 
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/config"
@@ -40,7 +42,19 @@ func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.
 				return c.JSON(http.StatusInternalServerError, err)
 			}
 
-			if cfg.DisableWriteActions && c.Request().Method != http.MethodGet {
+			if c.Request().Method == http.MethodGet {
+				return next(c)
+			}
+
+			if cfg.DisableWriteActions {
+				path := c.Request().URL.Path
+				method := c.Request().Method
+
+				if method == http.MethodPost && strings.HasPrefix(path, "/api/v1/namespaces/") &&
+					strings.Contains(path, "/workflows/") && strings.Contains(path, "/query/") {
+					return next(c)
+				}
+
 				return echo.ErrMethodNotAllowed
 			}
 
@@ -57,10 +71,15 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 
 	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
 	conn, err := api.CreateGRPCConnection(cfgProvider)
-
 	if err != nil {
 		return fmt.Errorf("Failed to create gRPC connection to Temporal server: %w", err)
 	}
+
+	route.GET(
+		api.WorkflowRawHistoryUrl,
+		api.WorkflowRawHistoryHandler(workflowservice.NewWorkflowServiceClient(conn)),
+		writeControlMiddleware,
+	)
 
 	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 

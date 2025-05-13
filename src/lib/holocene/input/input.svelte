@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { HTMLInputAttributes } from 'svelte/elements';
+  import type { FullAutoFill, HTMLInputAttributes } from 'svelte/elements';
 
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -18,6 +18,7 @@
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
+    prefix?: string;
     valid?: boolean;
     hintText?: string;
     maxLength?: number;
@@ -27,6 +28,7 @@
     autoFocus?: boolean;
     error?: boolean;
     'data-testid'?: string;
+    class?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -48,11 +50,12 @@
   export let icon: IconName = null;
   export let placeholder = '';
   export let suffix = '';
+  export let prefix = '';
   export let name = id;
   export let copyable = false;
   export let disabled = false;
   export let clearable = false;
-  export let autocomplete = 'off';
+  export let autocomplete: FullAutoFill = 'off';
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
@@ -102,6 +105,8 @@
         <span class="icon-container">
           <Icon name={icon} />
         </span>
+      {:else if prefix}
+        <p class="prefix">{prefix}</p>
       {/if}
       <input
         class="input"
@@ -198,6 +203,10 @@
 
   .input {
     @apply m-2 w-full bg-transparent placeholder:text-secondary focus:outline-none;
+  }
+
+  .prefix {
+    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
   }
 
   .suffix {

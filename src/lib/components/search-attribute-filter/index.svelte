@@ -1,9 +1,8 @@
 <script lang="ts" context="module">
-  import { afterUpdate } from 'svelte/internal';
   import { writable, type Writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
-  import { setContext } from 'svelte';
+  import { afterUpdate, setContext, tick } from 'svelte';
 
   export const FILTER_CONTEXT = 'filter-context';
 
@@ -20,10 +19,16 @@
   import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
+  import CopyButton from '$lib/holocene/copyable/button.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
+  import {
+    type SearchAttributeOption,
+    sortedSearchAttributeOptions,
+  } from '$lib/stores/search-attributes';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     getFocusedElementId,
@@ -43,7 +48,7 @@
 
   import BooleanFilter from './boolean-filter.svelte';
   import CloseFilter from './close-filter-button.svelte';
-  import DateTimeFilter from './datetime-filter.svelte';
+  import DatetimeFilter from './datetime-filter.svelte';
   import DurationFilter from './duration-filter.svelte';
   import FilterList from './filter-list.svelte';
   import ListFilter from './list-filter.svelte';
@@ -53,16 +58,18 @@
   import TextFilter from './text-filter.svelte';
 
   export let filters: SearchAttributeFilter[];
-  export let options = $sortedSearchAttributeOptions;
+  export let searchAttributeOptions: SearchAttributeOption[] = null;
   export let showFilter = true;
   export let refresh: () => void;
+
+  $: options = searchAttributeOptions ?? $sortedSearchAttributeOptions;
 
   const filter = writable<SearchAttributeFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
 
   $: searchParamQuery = $page.url.searchParams.get('query');
-  $: showClearAllButton = showFilter && filters.length && !$filter.attribute;
+  $: showActions = filters.length && !$filter.attribute;
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
@@ -71,6 +78,12 @@
     focusedElementId,
     resetFilter,
   });
+
+  const { copy, copied } = copyToClipboard();
+
+  function handleCopy(e: Event) {
+    copy(e, searchParamQuery);
+  }
 
   function onSearch() {
     const searchQuery = toListWorkflowQueryFromFilters(combineFilters(filters));
@@ -126,7 +139,9 @@
   }
 
   afterUpdate(() => {
-    updateFocus();
+    tick().then(() => {
+      updateFocus();
+    });
   });
 
   function resetFilter() {
@@ -147,7 +162,7 @@
     {#if showFilter}
       <div
         class="flex"
-        class:filter={!showClearAllButton}
+        class:filter={!showActions}
         on:keyup={handleKeyUp}
         role="none"
       >
@@ -193,7 +208,7 @@
               class="flex w-full items-center"
               in:fly={{ x: -100, duration: 150 }}
             >
-              <DateTimeFilter />
+              <DatetimeFilter />
               <CloseFilter />
             </div>
           {:else if isBooleanFilter($filter)}
@@ -208,15 +223,22 @@
         {/if}
       </div>
     {/if}
-    <div
-      class="flex flex-col sm:flex-row {showClearAllButton
-        ? 'w-full justify-between'
-        : 'justify-end'}"
-    >
-      {#if showClearAllButton}
-        <Button variant="ghost" on:click={handleClearInput}
-          >{translate('common.clear-all')}</Button
-        >
+
+    <div class="flex flex-col items-center justify-end gap-1 sm:flex-row">
+      {#if showActions}
+        {#if showFilter}
+          <Button variant="ghost" on:click={handleClearInput}>
+            {translate('common.clear-all')}
+          </Button>
+        {/if}
+        <Tooltip topRight text={translate('workflows.copy-search-input')}>
+          <CopyButton
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            copied={$copied}
+            on:click={handleCopy}
+          />
+        </Tooltip>
       {/if}
     </div>
     <slot name="actions" />

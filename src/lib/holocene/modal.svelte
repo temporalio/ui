@@ -22,6 +22,7 @@
     'data-testid'?: string;
     open: boolean;
     error?: string;
+    class?: string;
   }
 
   export let hideConfirm = false;
@@ -149,7 +150,7 @@
   }
 
   .large {
-    @apply lg:w-1/2;
+    @apply lg:max-w-3xl;
   }
 
   .title {

@@ -4,7 +4,11 @@ import { v4 } from 'uuid';
 
 import { page } from '$app/stores';
 
-import type { PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
+import {
+  isPayloadInputEncodingType,
+  type PayloadInputEncoding,
+} from '$lib/components/payload-input-with-encoding.svelte';
+import { translate } from '$lib/i18n/translate';
 import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
@@ -14,12 +18,17 @@ import { isCloud } from '$lib/stores/advanced-visibility';
 import { authUser } from '$lib/stores/auth-user';
 import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import { temporalVersion } from '$lib/stores/versions';
-import { canFetchChildWorkflows } from '$lib/stores/workflows';
+import {
+  canFetchChildWorkflows,
+  hideWorkflowQueryErrors,
+  workflowError,
+} from '$lib/stores/workflows';
 import {
   ResetReapplyExcludeType,
   ResetReapplyType,
   type ResetWorkflowRequest,
   type SearchAttribute,
+  type UpdateWorkflowResponse,
 } from '$lib/types';
 import type {
   ValidWorkflowEndpoints,
@@ -33,8 +42,10 @@ import type {
 } from '$lib/types/global';
 import type {
   ArchiveFilterParameters,
+  CountWorkflowExecutionsResponse,
   ListWorkflowExecutionsResponse,
   WorkflowExecution,
+  WorkflowIdentifier,
 } from '$lib/types/workflows';
 import {
   cloneAllPotentialPayloadsWithCodec,
@@ -50,6 +61,7 @@ import {
   isForbidden,
   isUnauthorized,
 } from '$lib/utilities/handle-error';
+import { paginated } from '$lib/utilities/paginated';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
@@ -62,6 +74,7 @@ import {
 import { formatReason } from '$lib/utilities/workflow-actions';
 
 import { fetchInitialEvent } from './events-service';
+import { fetchWorkflowCountByExecutionStatus } from './workflow-counts';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -85,6 +98,17 @@ type SignalWorkflowOptions = {
   name: string;
   input: string;
   encoding: PayloadInputEncoding;
+  messageType: string;
+};
+
+type UpdateWorkflowOptions = {
+  namespace: string;
+  workflow: WorkflowIdentifier;
+  name: string;
+  identity?: string;
+  input: string;
+  updateId?: string;
+  encoding: PayloadInputEncoding;
 };
 
 type StartWorkflowOptions = {
@@ -94,6 +118,7 @@ type StartWorkflowOptions = {
   workflowType: string;
   input: string;
   encoding: PayloadInputEncoding;
+  messageType: string;
   summary: string;
   details: string;
   searchAttributes: SearchAttributeInput[];
@@ -323,13 +348,14 @@ export async function signalWorkflow({
   name,
   input,
   encoding,
+  messageType,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
     signalName: name,
   });
-  const payloads = await encodePayloads(input, encoding);
+  const payloads = await encodePayloads({ input, encoding, messageType });
   const settings = get(page).data.settings;
   const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
@@ -353,6 +379,47 @@ export async function signalWorkflow({
           'execution.runId': runId,
         },
       };
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+  });
+}
+
+export async function updateWorkflow({
+  namespace,
+  workflow: { workflowId, runId },
+  name,
+  identity,
+  updateId,
+  input = '',
+  encoding,
+}: UpdateWorkflowOptions): Promise<UpdateWorkflowResponse> {
+  const route = routeForApi('workflow.update', {
+    namespace,
+    workflowId,
+    updateName: name,
+  });
+  const payloads = await encodePayloads({ input, encoding });
+  const body = {
+    workflowExecution: {
+      runId,
+    },
+    request: {
+      meta: {
+        updateId,
+        identity,
+      },
+      input: {
+        args: {
+          payloads,
+        },
+      },
+    },
+  };
 
   return requestFromAPI(route, {
     notifyOnError: false,
@@ -503,6 +570,7 @@ export async function startWorkflow({
   summary,
   details,
   encoding,
+  messageType,
   searchAttributes,
 }: StartWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow', {
@@ -515,7 +583,7 @@ export async function startWorkflow({
 
   if (input) {
     try {
-      payloads = await encodePayloads(input, encoding);
+      payloads = await encodePayloads({ input, encoding, messageType });
     } catch (_) {
       throw new Error('Could not encode input for starting workflow');
     }
@@ -524,13 +592,19 @@ export async function startWorkflow({
   try {
     if (summary) {
       summaryPayload = (
-        await encodePayloads(stringifyWithBigInt(summary), 'json/plain')
+        await encodePayloads({
+          input: stringifyWithBigInt(summary),
+          encoding: 'json/plain',
+        })
       )[0];
     }
 
     if (details) {
       detailsPayload = (
-        await encodePayloads(stringifyWithBigInt(details), 'json/plain')
+        await encodePayloads({
+          input: stringifyWithBigInt(details),
+          encoding: 'json/plain',
+        })
       )[0];
     }
   } catch (e) {
@@ -579,6 +653,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
   workflowId?: string;
 }): Promise<{
   input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
   searchAttributes: Record<string, string | Payload> | undefined;
   summary: string;
   details: string;
@@ -588,6 +664,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
   };
   const emptyValues = {
     input: '',
+    encoding: 'json/plain' as PayloadInputEncoding,
+    messageType: '',
     searchAttributes: undefined,
     summary: '',
     details: '',
@@ -627,6 +705,8 @@ export const fetchInitialValuesForStartWorkflow = async ({
       namespace,
       get(page).data.settings,
       get(authUser).accessToken,
+      'readable',
+      false,
     )) as PotentiallyDecodable;
 
     let summary = '';
@@ -649,10 +729,23 @@ export const fetchInitialValuesForStartWorkflow = async ({
       }
     }
     const input = convertedAttributes?.payloads
-      ? stringifyWithBigInt(convertedAttributes.payloads[0])
+      ? stringifyWithBigInt(convertedAttributes.payloads[0]?.data)
       : '';
+    const encoding =
+      convertedAttributes?.payloads &&
+      isPayloadInputEncodingType(
+        convertedAttributes.payloads[0]?.metadata?.encoding,
+      )
+        ? convertedAttributes.payloads[0]?.metadata?.encoding
+        : 'json/plain';
+    const messageType = convertedAttributes?.payloads
+      ? convertedAttributes.payloads[0]?.metadata?.messageType
+      : '';
+
     return {
       input,
+      encoding,
+      messageType,
       searchAttributes: workflow?.searchAttributes?.indexedFields,
       summary,
       details,
@@ -660,4 +753,256 @@ export const fetchInitialValuesForStartWorkflow = async ({
   } catch (e) {
     return emptyValues;
   }
+};
+
+export interface RootNode {
+  workflow: WorkflowExecution;
+  children: RootNode[];
+  siblingCount?: number;
+  scheduleId?: string;
+  rootPaths: { runId: string; workflowId: string }[];
+}
+
+const buildRoots = (
+  root: WorkflowExecution,
+  workflows: WorkflowExecution[],
+) => {
+  const childrenMap = new Map<string, WorkflowExecution[]>();
+
+  workflows.forEach((workflow) => {
+    if (workflow.parent) {
+      const key = `${workflow.parent.workflowId}:${workflow.parent.runId}`;
+      const children = childrenMap.get(key) || [];
+      children.push(workflow);
+      childrenMap.set(key, children);
+    }
+  });
+
+  const buildNode = (
+    workflow: WorkflowExecution,
+    paths: { runId: string; workflowId: string }[],
+  ): RootNode => {
+    const key = `${workflow.id}:${workflow.runId}`;
+    const children = childrenMap.get(key) || [];
+
+    const node: RootNode = {
+      workflow,
+      scheduleId:
+        workflow?.searchAttributes?.indexedFields?.TemporalScheduledById,
+      children: [],
+      rootPaths: [...paths, { runId: workflow.runId, workflowId: workflow.id }],
+    };
+
+    node.children = children.map((child) => buildNode(child, node.rootPaths));
+
+    return node;
+  };
+
+  return buildNode(root, []);
+};
+
+const buildDirectRoots = ({
+  parent,
+  workflow,
+  children,
+  siblingCount,
+}: {
+  parent: WorkflowExecution | undefined;
+  workflow: WorkflowExecution;
+  children: WorkflowExecution[];
+  siblingCount: number;
+}): RootNode => {
+  const childNodes: RootNode[] = children.map((child) => {
+    const rootPaths = parent
+      ? [
+          { runId: parent.runId, workflowId: parent.id },
+          { runId: workflow.runId, workflowId: workflow.id },
+          { runId: child.runId, workflowId: child.id },
+        ]
+      : [
+          { runId: workflow.runId, workflowId: workflow.id },
+          { runId: child.runId, workflowId: child.id },
+        ];
+    return {
+      workflow: child,
+      siblingCount,
+      children: [],
+      rootPaths,
+    };
+  });
+
+  const currentNode: RootNode = {
+    workflow,
+    children: childNodes,
+    rootPaths: parent
+      ? [
+          { runId: parent.runId, workflowId: parent.id },
+          { runId: workflow.runId, workflowId: workflow.id },
+        ]
+      : [{ runId: workflow.runId, workflowId: workflow.id }],
+  };
+
+  if (!parent) return currentNode;
+
+  const parentNode: RootNode = {
+    workflow: parent,
+    children: [currentNode],
+    rootPaths: [{ runId: parent.runId, workflowId: parent.id }],
+  };
+
+  return parentNode;
+};
+
+export async function fetchAllRootWorkflowsCount(
+  namespace: string,
+  rootWorkflowId: string,
+  rootRunId?: string,
+): Promise<CountWorkflowExecutionsResponse> {
+  let query = `RootWorkflowId = "${rootWorkflowId}"`;
+  if (rootRunId) {
+    query += ` AND RootRunId = "${rootRunId}"`;
+  }
+
+  const count = await fetchWorkflowCountByExecutionStatus({
+    namespace,
+    query,
+  });
+  return count;
+}
+
+export async function fetchAllRootWorkflows(
+  namespace: string,
+  rootWorkflowId: string,
+  rootRunId?: string,
+): Promise<RootNode | undefined> {
+  let query = `RootWorkflowId = "${rootWorkflowId}"`;
+  if (rootRunId) {
+    query += ` AND RootRunId = "${rootRunId}"`;
+  }
+
+  const root = await fetchWorkflow({
+    namespace,
+    workflowId: rootWorkflowId,
+    runId: rootRunId,
+  });
+  const workflows = await fetchAllPaginatedWorkflows(namespace, { query });
+  return buildRoots(root?.workflow, workflows);
+}
+
+type DirectWorkflowInputs = {
+  namespace: string;
+  parentWorkflowId: string;
+  parentRunId?: string;
+  workflow: WorkflowExecution;
+};
+
+export async function fetchAllDirectWorkflows({
+  namespace,
+  parentWorkflowId,
+  parentRunId,
+  workflow,
+}: DirectWorkflowInputs): Promise<RootNode> {
+  let parent;
+
+  const fetchChildWorkflows = async (
+    workflowId: string,
+    runId: string,
+  ): Promise<WorkflowExecution[]> => {
+    const query = `ParentWorkflowId = "${workflowId}" AND ParentRunId = "${runId}"`;
+    return await fetchAllPaginatedWorkflows(namespace, { query });
+  };
+
+  let siblingCount = 0;
+  if (parentWorkflowId) {
+    parent = await fetchWorkflow({
+      namespace,
+      workflowId: parentWorkflowId,
+      runId: parentRunId,
+    });
+
+    const query = `ParentWorkflowId = "${parentWorkflowId}" AND ParentRunId = "${parentRunId}"`;
+    const { count } = await fetchWorkflowCountByExecutionStatus({
+      namespace,
+      query,
+    });
+    siblingCount = parseInt(count);
+  }
+
+  const children = await fetchChildWorkflows(workflow.id, workflow.runId);
+  return buildDirectRoots({
+    parent: parent?.workflow,
+    workflow,
+    children,
+    siblingCount,
+  });
+}
+
+export const fetchAllPaginatedWorkflows = async (
+  namespace: string,
+  parameters: ValidWorkflowParameters,
+  request = fetch,
+  archived = false,
+): Promise<WorkflowExecution[]> => {
+  const rawQuery =
+    parameters.query || toListWorkflowQuery(parameters, archived);
+  let query: string;
+  try {
+    query = decodeURIComponent(rawQuery);
+  } catch {
+    query = rawQuery;
+  }
+
+  const route = routeForApi('workflows', { namespace });
+  const { executions } = await paginated(async (token: string) => {
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      token,
+      request,
+      params: { query },
+    });
+  });
+  return toWorkflowExecutions({ executions });
+};
+
+type PaginatedWorkflowsPromise = (
+  pageSize: number,
+  token: string,
+) => Promise<{ items: WorkflowExecution[]; nextPageToken: string }>;
+
+export const fetchPaginatedWorkflows = async (
+  namespace: string,
+  query: string = '',
+  request = fetch,
+): Promise<PaginatedWorkflowsPromise> => {
+  return (pageSize = 100, token = '') => {
+    workflowError.set('');
+
+    const onError: ErrorCallback = (err) => {
+      handleUnauthorizedOrForbiddenError(err);
+
+      if (get(hideWorkflowQueryErrors)) {
+        workflowError.set(translate('workflows.workflows-error-querying'));
+      } else {
+        workflowError.set(
+          err?.body?.message || translate('workflows.workflows-error-querying'),
+        );
+      }
+    };
+
+    const route = routeForApi('workflows', { namespace });
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: {
+        pageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
+      request,
+      onError,
+      handleError: onError,
+    }).then(({ executions = [], nextPageToken = '' }) => {
+      return {
+        items: toWorkflowExecutions({ executions }),
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
 };

@@ -4,7 +4,6 @@
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
-  import { expandAllEvents } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import type {
@@ -27,12 +26,13 @@
   export let items: IterableEventWithPending[];
   export let groups: EventGroups = [];
   export let updating = false;
+  export let loading = false;
   export let compact = false;
-  export let openExpanded = false;
+  export let minimized = true;
+
+  $: showGraph = !compact;
 
   $: initialItem = $fullEventHistory?.[0];
-
-  $: expandAll = openExpanded || $expandAllEvents === 'true';
 
   const history = (items: IterableEventWithPending[]) => {
     return items as WorkflowEventWithPending[];
@@ -51,9 +51,9 @@
   items={filteredForStatus(items)}
   let:visibleItems
   variant="split"
-  maxHeight="calc(100vh - 200px)"
+  maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
 >
-  {#if !compact}
+  {#if showGraph}
     <HistoryGraph {groups} history={history(visibleItems)} />
   {/if}
   <div class="w-full">
@@ -64,7 +64,6 @@
           {index}
           group={event}
           {compact}
-          {expandAll}
           {initialItem}
         />
       {:else if isPendingActivity(event)}
@@ -75,7 +74,6 @@
             (g) =>
               isPendingActivity(event) && g?.pendingActivity?.id === event.id,
           )}
-          {expandAll}
         />
       {:else if isPendingNexusOperation(event)}
         <PendingNexusSummaryRow
@@ -87,7 +85,6 @@
               g?.pendingNexusOperation?.scheduledEventId ===
                 event.scheduledEventId,
           )}
-          {expandAll}
         />
       {:else}
         <EventSummaryRow
@@ -95,12 +92,11 @@
           {index}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
           {compact}
-          {expandAll}
           {initialItem}
         />
       {/if}
     {:else}
-      <EventEmptyRow loading={!$fullEventHistory.length} />
+      <EventEmptyRow loading={!$fullEventHistory.length || loading} />
     {/each}
   </div>
 </Paginated>

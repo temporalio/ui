@@ -19,6 +19,7 @@
     required?: boolean;
     description?: string;
     maxLength?: number;
+    class?: string;
   };
 
   export let disabled = false;
@@ -54,7 +55,7 @@
     <textarea
       bind:value
       class={merge(
-        'surface-primary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-none',
+        'surface-primary min-h-fit w-full px-3 py-2 text-sm placeholder:text-secondary focus-visible:outline-none',
         disabled && 'cursor-not-allowed opacity-50',
       )}
       {id}
@@ -68,7 +69,9 @@
       on:blur
       on:keydown|stopPropagation
       maxlength={maxLength > 0 ? maxLength : undefined}
-    />
+      data-testid={id}
+      {...$$restProps}
+    ></textarea>
   </div>
   <div class="flex justify-between gap-2">
     <div
@@ -118,9 +121,5 @@
 
   .count > .error {
     @apply text-danger;
-  }
-
-  textarea {
-    @apply surface-primary dark:bg-transparent;
   }
 </style>

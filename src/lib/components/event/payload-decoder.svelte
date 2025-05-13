@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import { authUser } from '$lib/stores/auth-user';
+  import type { Memo } from '$lib/types';
   import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
   import {
     cloneAllPotentialPayloadsWithCodec,
@@ -15,7 +16,11 @@
   } from '$lib/utilities/get-codec';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export let value: PotentiallyDecodable | EventAttribute | WorkflowEvent;
+  export let value:
+    | PotentiallyDecodable
+    | EventAttribute
+    | WorkflowEvent
+    | Memo;
   export let key = '';
   export let onDecode: (decodedValue: string) => void | undefined = undefined;
 
@@ -36,7 +41,7 @@
   };
 
   const decodePayloads = async (
-    _value: PotentiallyDecodable | EventAttribute | WorkflowEvent,
+    _value: PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo,
   ) => {
     try {
       const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
@@ -49,12 +54,11 @@
         convertedAttributes,
       ) as object;
       const keyExists = key && decodedAttributes?.[key];
-      if (keyExists) {
-        decodedValue = stringifyWithBigInt(keyExists);
-      } else {
-        decodedValue = stringifyWithBigInt(decodedAttributes);
+      let finalValue = keyExists ? decodedAttributes[key] : decodedAttributes;
+      if (Array.isArray(finalValue) && finalValue.length === 1) {
+        finalValue = finalValue[0];
       }
-
+      decodedValue = stringifyWithBigInt(finalValue);
       if (onDecode) {
         onDecode(decodedValue);
       }

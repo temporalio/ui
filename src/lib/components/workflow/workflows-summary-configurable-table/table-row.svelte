@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { getContext } from 'svelte';
 
   import { page } from '$app/stores';
@@ -16,7 +14,7 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
-  import { showChildWorkflows } from '$lib/stores/filters';
+  import { hideChildWorkflows } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
@@ -24,7 +22,7 @@
 
   export let workflow: WorkflowExecution | undefined = undefined;
   export let empty = false;
-  export let viewChildren: (workflow?: WorkflowExecution) => void = noop;
+  export let viewChildren: (workflow?: WorkflowExecution) => void = () => {};
   export let childCount: number | undefined = undefined;
   export let child = false;
 
@@ -58,7 +56,10 @@
       />
     </td>
     <td
-      class="cursor-point relative flex items-center justify-center gap-0.5 pt-2"
+      class="cursor-point relative flex items-center justify-center gap-0.5 py-0.5 {$hideChildWorkflows ||
+      child
+        ? 'w-auto'
+        : 'w-6'}"
     >
       {#if !workflowCreateDisabled($page)}
         <StartWorkflowButton
@@ -69,7 +70,7 @@
         />
       {/if}
       <IsTemporalServerVersionGuard minimumVersion="1.23.0">
-        {#if !$showChildWorkflows && !child}
+        {#if $hideChildWorkflows && !child}
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
@@ -87,6 +88,8 @@
         {/if}
       </IsTemporalServerVersionGuard>
     </td>
+  {:else}
+    <td></td>
   {/if}
   <slot />
 </tr>

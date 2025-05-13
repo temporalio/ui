@@ -53,6 +53,7 @@
     loadingText?: string;
     open?: Writable<boolean>;
     maxMenuHeight?: string;
+    class?: string;
   }
 
   type MultiSelectProps = {
@@ -384,12 +385,15 @@
 
   <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
     {#if leadingIcon}
-      <Icon width={20} height={20} class="ml-2" name={leadingIcon} />
+      <Icon class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
     <div
-      class="input-wrapper"
-      class:gap-1={multiselect}
-      class:py-1={multiselect && displayChips}
+      class={merge(
+        'input-wrapper',
+        multiselect && 'gap-1',
+        multiselect && 'm-1',
+        leadingIcon && multiselect && 'ml-2',
+      )}
     >
       {#if multiselect && isArrayValue(value) && value.length > 0}
         {#if displayChips}
@@ -415,7 +419,15 @@
         type="text"
         value={displayValue}
         class:disabled
-        class={merge('combobox-input', className)}
+        class={merge(
+          'combobox-input',
+          multiselect
+            ? value.length > 0 || leadingIcon
+              ? 'indent-0'
+              : 'indent-1'
+            : 'indent-2',
+          className,
+        )}
         role="combobox"
         autocomplete="off"
         autocapitalize="off"
@@ -436,7 +448,7 @@
       />
     </div>
     {#if $$slots.action}
-      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+      <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
         {#if actionTooltip}
           <Tooltip text={actionTooltip} right>
             <slot name="action" />
@@ -494,7 +506,6 @@
 
     {#each list as option}
       <ComboboxOption
-        {multiselect}
         on:click={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}
@@ -519,7 +530,7 @@
 
 <style lang="postcss">
   .combobox-wrapper {
-    @apply surface-primary flex w-full flex-row items-center border border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
+    @apply surface-primary flex max-h-28 min-h-10 w-full flex-row items-center overflow-auto border border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
 
     &.invalid {
       @apply border border-danger text-danger focus-within:ring-danger/70;
@@ -535,10 +546,10 @@
   }
 
   .input-wrapper {
-    @apply ml-2 flex w-full flex-wrap items-center;
+    @apply flex w-full flex-wrap items-center;
   }
 
   .combobox-input {
-    @apply flex h-9 grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
+    @apply flex grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
   }
 </style>

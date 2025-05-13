@@ -10,10 +10,13 @@ export type WorkflowAPIRoutePath =
   | 'workflow.terminate'
   | 'workflow.cancel'
   | 'workflow.reset'
+  | 'events.raw'
   | 'events.ascending'
   | 'events.descending';
 
 export type WorkflowSignalAPIRoutePath = 'workflow.signal';
+
+export type WorkflowUpdateAPIRoutePath = 'workflow.update';
 
 export type WorkflowQueryAPIRoutePath = 'query';
 
@@ -44,6 +47,9 @@ export type ScheduleAPIRoutePath =
   | 'schedule.edit';
 export type SearchAttributesRoutePath = 'search-attributes';
 export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
+export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
+export type WorkerDeploymentAPIRoutePath = 'worker-deployment';
+export type WorkerDeploymentVersionAPIRoutePath = 'worker-deployment-version';
 
 export type APIRoutePath =
   | ParameterlessAPIRoutePath
@@ -54,23 +60,32 @@ export type APIRoutePath =
   | WorkerAPIRoutePath
   | WorkflowAPIRoutePath
   | WorkflowSignalAPIRoutePath
+  | WorkflowUpdateAPIRoutePath
   | WorkflowQueryAPIRoutePath
   | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
   | NamespaceAPIRoutePath
   | BatchAPIRoutePath
-  | NexusAPIRoutePath;
+  | NexusAPIRoutePath
+  | WorkerDeploymentsAPIRoutePath
+  | WorkerDeploymentAPIRoutePath
+  | WorkerDeploymentVersionAPIRoutePath;
 
 export type APIRouteParameters = {
   namespace: string;
   workflowId: string;
   scheduleId: string;
+  // feel like this might not be the "right" spot for this.
+  runId: string;
   batchJobId: string;
   queue: string;
   queryType: string;
   signalName: string;
+  updateName: string;
   activityId: string;
   endpointId: string;
+  deploymentName: string;
+  version: string;
 };
 
 export type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
@@ -86,9 +101,19 @@ export type WorkflowSignalRouteParameters = Pick<
   'namespace' | 'workflowId' | 'signalName'
 >;
 
+export type WorkflowUpdateRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'workflowId' | 'updateName'
+>;
+
 export type WorkflowRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'workflowId'
+>;
+
+export type WorkflowRawHistoryRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'workflowId' | 'runId'
 >;
 
 export type WorkflowQueryRouteParameters = Pick<
@@ -123,3 +148,17 @@ export type ScheduleRouteParameters = Pick<
 >;
 
 export type NexusRouteParameters = Pick<APIRouteParameters, 'endpointId'>;
+
+export type WorkerDeploymentListRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace'
+>;
+export type WorkerDeploymentRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'deploymentName'
+>;
+
+export type WorkerDeploymentVersionRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'version'
+>;

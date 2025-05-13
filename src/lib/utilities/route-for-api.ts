@@ -22,16 +22,25 @@ import type {
   TaskQueueAPIRoutePath,
   TaskQueueRouteParameters,
   WorkerAPIRoutePath,
+  WorkerDeploymentAPIRoutePath,
+  WorkerDeploymentListRouteParameters,
+  WorkerDeploymentRouteParameters,
+  WorkerDeploymentsAPIRoutePath,
+  WorkerDeploymentVersionAPIRoutePath,
+  WorkerDeploymentVersionRouteParameters,
   WorkflowActivitiesAPIRoutePath,
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
   WorkflowListRouteParameters,
   WorkflowQueryAPIRoutePath,
   WorkflowQueryRouteParameters,
+  WorkflowRawHistoryRouteParameters,
   WorkflowRouteParameters,
   WorkflowsAPIRoutePath,
   WorkflowSignalAPIRoutePath,
   WorkflowSignalRouteParameters,
+  WorkflowUpdateAPIRoutePath,
+  WorkflowUpdateRouteParameters,
 } from '$lib/types/api';
 
 import { getApiOrigin } from './get-api-origin';
@@ -99,9 +108,13 @@ const encode = (
       queue: '',
       queryType: '',
       signalName: '',
+      updateName: '',
       batchJobId: '',
+      runId: '',
       activityId: '',
       endpointId: '',
+      deploymentName: '',
+      version: '',
     },
   );
 };
@@ -119,6 +132,7 @@ export function pathForApi(
     namespaces: '/namespaces',
     namespace: `/namespaces/${parameters?.namespace}`,
     'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
+    'events.raw': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/run/${parameters?.runId}/history.json`,
     'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history`,
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/history-reverse`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/query/${parameters.queryType}`,
@@ -135,6 +149,7 @@ export function pathForApi(
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/terminate`,
     'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/cancel`,
     'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/signal/${parameters.signalName}`,
+    'workflow.update': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/update/${parameters.updateName}`,
     'workflow.reset': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/reset`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
@@ -147,6 +162,9 @@ export function pathForApi(
     'nexus-endpoints': '/nexus/endpoints',
     'nexus-endpoint': `/nexus/endpoints/${parameters.endpointId}`,
     'nexus-endpoint.update': `/nexus/endpoints/${parameters.endpointId}/update`,
+    'worker-deployments': `/namespaces/${parameters.namespace}/worker-deployments`,
+    'worker-deployment': `/namespaces/${parameters.namespace}/worker-deployments/${parameters.deploymentName}`,
+    'worker-deployment-version': `/namespaces/${parameters.namespace}/worker-deployment-versions/${parameters.version}`,
   };
 
   return getPath(routes[route]);
@@ -177,8 +195,18 @@ export function routeForApi(
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
+  route: WorkflowAPIRoutePath,
+  parameters: WorkflowRawHistoryRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
   route: WorkflowSignalAPIRoutePath,
   parameters: WorkflowSignalRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkflowUpdateAPIRoutePath,
+  parameters: WorkflowUpdateRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
@@ -213,6 +241,21 @@ export function routeForApi(
 export function routeForApi(
   route: NexusAPIRoutePath,
   parameters: NexusRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkerDeploymentsAPIRoutePath,
+  parameters: WorkerDeploymentListRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkerDeploymentAPIRoutePath,
+  parameters: WorkerDeploymentRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkerDeploymentVersionAPIRoutePath,
+  parameters: WorkerDeploymentVersionRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(route: ParameterlessAPIRoutePath): string;

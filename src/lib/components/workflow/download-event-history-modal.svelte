@@ -8,6 +8,8 @@
   import { downloadEventHistorySetting } from '$lib/stores/events';
   import { exportHistory } from '$lib/utilities/export-history';
 
+  import WorkflowRawHistoryLink from '../workflow-raw-history-link.svelte';
+
   export let open = false;
   export let namespace: string;
   export let workflowId: string;
@@ -36,7 +38,7 @@
   on:cancelModal={() => (open = false)}
 >
   <h3 slot="title">
-    {translate('common.download-json')}
+    {translate('common.download-event-history-json')}
   </h3>
   <div slot="content" class="flex flex-col gap-4">
     <RadioGroup
@@ -65,5 +67,7 @@
         description={translate('events.readable-description')}
       />
     </RadioGroup>
+
+    <WorkflowRawHistoryLink />
   </div>
 </Modal>

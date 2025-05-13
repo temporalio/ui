@@ -22,9 +22,10 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isTimerStartedEvent(event)) {
-    return `${event.timerStartedEventAttributes
-      ?.timerId} (${formatDurationAbbreviated(
-      event.timerStartedEventAttributes?.startToFireTimeout,
+    return `${
+      event.timerStartedEventAttributes?.timerId
+    } (${formatDurationAbbreviated(
+      String(event.timerStartedEventAttributes?.startToFireTimeout),
     )})`;
   }
 

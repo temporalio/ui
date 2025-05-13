@@ -6,6 +6,7 @@
 
   import { page } from '$app/stores';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding, {
     type PayloadInputEncoding,
   } from '$lib/components/payload-input-with-encoding.svelte';
@@ -49,7 +50,7 @@
   let summary = '';
   let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
-  let inputRetrieved = 0;
+  let messageType = '';
 
   let initialWorkflowId = '';
   let initialWorkflowType = '';
@@ -86,6 +87,7 @@
         summary,
         details,
         encoding: $encoding,
+        messageType,
         searchAttributes,
       });
       toaster.push({
@@ -132,7 +134,8 @@
       workflowType: type,
     });
     input = initialValues.input;
-    inputRetrieved = Date.now();
+    encoding.set(initialValues.encoding);
+    messageType = initialValues.messageType;
     summary = initialValues.summary;
     details = initialValues.details;
 
@@ -261,9 +264,7 @@
       label="Workflow Type"
       on:blur={(e) => onInputChange(e, 'workflowType')}
     />
-    {#key inputRetrieved}
-      <PayloadInputWithEncoding bind:input bind:encoding />
-    {/key}
+    <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">
@@ -313,5 +314,6 @@
     {#if error}
       <Alert intent="error" title={error} />
     {/if}
+    <CodecServerErrorBanner />
   </Card>
 </div>

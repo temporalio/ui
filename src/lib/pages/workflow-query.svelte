@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   import PayloadInput from '$lib/components/payload-input.svelte';
@@ -11,7 +13,11 @@
   import Select from '$lib/holocene/select/select.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { getQuery, type ParsedQuery } from '$lib/services/query-service';
+  import {
+    getQuery,
+    getWorkflowMetadata,
+    type ParsedQuery,
+  } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { Payloads } from '$lib/types';
@@ -45,6 +51,28 @@
   let queryResult: Promise<ParsedQuery>;
   let encodePayloadResult: Promise<Payloads>;
 
+  onMount(() => {
+    if (!$workflowRun.metadata) {
+      fetchCurrentDetails();
+    }
+  });
+
+  const fetchCurrentDetails = async () => {
+    const { settings } = $page.data;
+    const metadata = await getWorkflowMetadata(
+      {
+        namespace,
+        workflow: {
+          id: workflowId,
+          runId: runId,
+        },
+      },
+      settings,
+      $authUser?.accessToken,
+    );
+    $workflowRun.metadata = metadata;
+  };
+
   const reset = () => {
     loading = false;
     initialQueryType = queryType;
@@ -57,7 +85,11 @@
 
     try {
       encodePayloadResult = input
-        ? encodePayloads(input, 'json/plain', false)
+        ? encodePayloads({
+            input,
+            encoding: 'json/plain',
+            encodeWithCodec: false,
+          })
         : Promise.resolve(null);
       payloads = await encodePayloadResult;
     } catch (e) {

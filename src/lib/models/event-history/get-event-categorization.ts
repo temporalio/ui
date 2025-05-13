@@ -57,6 +57,7 @@ export const eventTypeCategorizations: Readonly<
   WorkflowExecutionStarted: CATEGORIES.WORKFLOW,
   WorkflowExecutionTerminated: CATEGORIES.WORKFLOW,
   WorkflowExecutionTimedOut: CATEGORIES.WORKFLOW,
+  WorkflowExecutionOptionsUpdated: CATEGORIES.WORKFLOW,
   WorkflowTaskCompleted: CATEGORIES.WORKFLOW,
   WorkflowTaskFailed: CATEGORIES.WORKFLOW,
   WorkflowTaskScheduled: CATEGORIES.WORKFLOW,
@@ -79,6 +80,8 @@ export const eventTypeCategorizations: Readonly<
   NexusOperationCanceled: CATEGORIES.NEXUS,
   NexusOperationTimedOut: CATEGORIES.NEXUS,
   NexusOperationCancelRequested: CATEGORIES.NEXUS,
+  NexusOperationCancelRequestCompleted: CATEGORIES.NEXUS,
+  NexusOperationCancelRequestFailed: CATEGORIES.NEXUS,
 
   MarkerRecorded: CATEGORIES.OTHER,
   UpsertWorkflowSearchAttributes: CATEGORIES.OTHER,

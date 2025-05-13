@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -19,12 +17,12 @@
   export let index: number;
   export let expandAll = false;
   export let active = false;
-  export let onRowClick: () => void = noop;
+  export let onRowClick: () => void = () => {};
 
   $: expanded = expandAll;
   $: ({ workflow, run, namespace } = $page.params);
   $: href = routeForEventHistoryEvent({
-    eventId: event.activityId,
+    eventId: group?.id,
     namespace,
     workflow,
     run,
@@ -44,14 +42,17 @@
   data-testid="pending-activity-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td>
-    <Link data-testid="link" {href}>
-      {event.activityId}
-    </Link>
+  <td class="font-mono">
+    {#if group?.id}
+      <Link data-testid="link" {href}>
+        {group.id}
+      </Link>
+    {:else}
+      {event.id}
+    {/if}
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex w-full items-center gap-2">
-      <!-- <Icon name="activity" /> -->
       <p class="event-name truncate font-semibold md:text-base">
         Pending Activity
       </p>
@@ -78,7 +79,7 @@
       />
     </div></td
   >
-  <td />
+  <td></td>
 </tr>
 {#if expanded}
   <tr class="row expanded">
@@ -90,7 +91,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex select-none items-center gap-4 px-1 text-sm no-underline;
+    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
   }
 
   .expanded-cell {

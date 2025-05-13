@@ -34,10 +34,10 @@
     body.id = endpoint.id;
     body.version = endpoint.version;
 
-    const payloads = await encodePayloads(
-      JSON.stringify(body.spec.descriptionString),
-      'json/plain',
-    );
+    const payloads = await encodePayloads({
+      input: JSON.stringify(body.spec.descriptionString),
+      encoding: 'json/plain',
+    });
     body.spec.description = payloads[0];
 
     delete body.spec.allowedCallerNamespaces;
@@ -58,7 +58,7 @@
     error = undefined;
     loading = true;
     try {
-      await deleteNexusEndpoint(endpoint.id, endpoint.version);
+      await deleteNexusEndpoint(endpoint.id, String(endpoint.version));
       goto(routeForNexus());
     } catch (e) {
       error = e as NetworkError;

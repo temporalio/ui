@@ -1,5 +1,6 @@
 import activity from './svg/activity.svelte';
 import add from './svg/add.svelte';
+import apple from './svg/apple.svelte';
 import archives from './svg/archives.svelte';
 import arrowDown from './svg/arrow-down.svelte';
 import arrowLeft from './svg/arrow-left.svelte';
@@ -22,11 +23,15 @@ import chevronLeft from './svg/chevron-left.svelte';
 import chevronRight from './svg/chevron-right.svelte';
 import chevronSelectorVertical from './svg/chevron-selector-vertical.svelte';
 import chevronUp from './svg/chevron-up.svelte';
+import circleCheckFilled from './svg/circle-check-filled.svelte';
+import circleCheck from './svg/circle-check.svelte';
+import cirlceQuestion from './svg/circle-question.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
 import cometSolid from './svg/comet-solid.svelte';
 import comet from './svg/comet.svelte';
 import compact from './svg/compact.svelte';
+import connection from './svg/connection.svelte';
 import converterDown from './svg/converter-down.svelte';
 import converterUp from './svg/converter-up.svelte';
 import copy from './svg/copy.svelte';
@@ -34,8 +39,10 @@ import creditCard from './svg/credit-card.svelte';
 import descending from './svg/descending.svelte';
 import dollarBadge from './svg/dollar-badge.svelte';
 import download from './svg/download.svelte';
+import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
 import exit from './svg/exit.svelte';
+import expand from './svg/expand.svelte';
 import externalLink from './svg/external-link.svelte';
 import eyeHide from './svg/eye-hide.svelte';
 import eyeShow from './svg/eye-show.svelte';
@@ -51,19 +58,23 @@ import fireExtinguisher from './svg/fire-extinguisher.svelte';
 import flag from './svg/flag.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
+import heartbeat from './svg/heartbeat.svelte';
 import hyphen from './svg/hyphen.svelte';
 import importIcon from './svg/import.svelte';
+import inactive from './svg/inactive.svelte';
 import info from './svg/info.svelte';
-import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
 import keyboard from './svg/keyboard.svelte';
 import labs from './svg/labs.svelte';
 import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
+import linux from './svg/linux.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import marker from './svg/marker.svelte';
 import merge from './svg/merge.svelte';
+import microsoft from './svg/microsoft.svelte';
+import minimize from './svg/minimize.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
@@ -92,6 +103,7 @@ import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
 import table from './svg/table.svelte';
+import target from './svg/target.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
@@ -100,6 +112,8 @@ import transcoderError from './svg/transcoder-error.svelte';
 import transcoderOff from './svg/transcoder-off.svelte';
 import transcoderOn from './svg/transcoder-on.svelte';
 import trash from './svg/trash.svelte';
+import trendingDown from './svg/trending-down.svelte';
+import trendingUp from './svg/trending-up.svelte';
 import tutorial from './svg/tutorial.svelte';
 import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
@@ -107,10 +121,12 @@ import usage from './svg/usage.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workflow from './svg/workflow.svelte';
+import xmarkFilled from './svg/xmark-filled.svelte';
 
 export const icons = {
   activity,
   add,
+  apple,
   archives,
   'arrow-down': arrowDown,
   'arrow-left': arrowLeft,
@@ -132,11 +148,15 @@ export const icons = {
   'chevron-right': chevronRight,
   'chevron-up': chevronUp,
   'chevron-selector-vertical': chevronSelectorVertical,
+  'circle-check': circleCheck,
+  'circle-check-filled': circleCheckFilled,
+  'circle-question': cirlceQuestion,
   clock,
   close,
   'comet-solid': cometSolid,
   comet,
   compact,
+  connection,
   'converter-down': converterDown,
   'converter-up': converterUp,
   copy,
@@ -144,8 +164,10 @@ export const icons = {
   descending,
   download,
   'dollar-badge': dollarBadge,
+  drained,
   error,
   exit,
+  expand,
   'external-link': externalLink,
   'eye-hide': eyeHide,
   'eye-show': eyeShow,
@@ -161,19 +183,23 @@ export const icons = {
   'fire-extinguisher': fireExtinguisher,
   github,
   graph,
+  heartbeat,
   hyphen,
+  inactive,
   import: importIcon,
   info,
-  'inverted-checkmark': invertedCheckmark,
   json,
   keyboard,
   labs,
   'lightning-bolt': lightningBolt,
   link,
+  linux,
   lock,
   logout,
   marker,
   merge,
+  microsoft,
+  minimize,
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
@@ -203,6 +229,7 @@ export const icons = {
   support,
   'spinner-solid': spinnerSolid,
   table,
+  target,
   'temporal-logo': temporalLogo,
   terminal,
   timeline,
@@ -211,6 +238,8 @@ export const icons = {
   'transcoder-on': transcoderOn,
   'transcoder-off': transcoderOff,
   trash,
+  'trending-up': trendingUp,
+  'trending-down': trendingDown,
   tutorial,
   update,
   upload,
@@ -218,6 +247,7 @@ export const icons = {
   'vertical-ellipsis': verticalEllipsis,
   warning,
   workflow,
+  'xmark-filled': xmarkFilled,
 } as const;
 
 export type IconName = keyof typeof icons;

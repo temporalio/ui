@@ -3,17 +3,17 @@
 
   import { page } from '$app/stores';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
+  import WorkflowCurrentDetails from '$lib/components/workflow/metadata/workflow-current-details.svelte';
+  import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import WorkflowVersioningHeader from '$lib/components/workflow-versioning-header.svelte';
-  import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -25,7 +25,6 @@
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-  import { has } from '$lib/utilities/has';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
@@ -55,20 +54,15 @@
     $workflowRun?.workflow?.status,
     $fullEventHistory,
   );
-  $: workflowHasBeenReset = has($resetWorkflows, runId);
-  $: workflowUsesVersioning =
-    workflow?.assignedBuildId ??
-    workflow?.mostRecentWorkerVersionStamp?.useVersioning;
+  $: resetRunId =
+    $workflowRun?.workflow.workflowExtendedInfo?.resetRunId ||
+    $resetWorkflows[$workflowRun?.workflow?.runId];
+  $: workflowHasBeenReset = !!resetRunId;
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
     $namespaces,
   );
-
-  $: summary = $workflowRun?.userMetadata?.summary;
-  $: details = $workflowRun?.userMetadata?.details;
-  $: hasUserMetadata = summary || details;
-  $: currentDetails = $workflowRun?.metadata?.currentDetails;
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -99,64 +93,46 @@
 </div>
 <header class="flex flex-col gap-2">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-    <div class="flex flex-col items-center gap-4 lg:flex-row">
-      <WorkflowStatus status={workflow?.status} big />
+    <div
+      class="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-center"
+    >
+      <div
+        class="flex flex-wrap items-center justify-between gap-4 max-lg:w-full"
+      >
+        <WorkflowStatus status={workflow?.status} big />
+        <div class="lg:hidden">
+          <WorkflowActions
+            {isRunning}
+            {cancelInProgress}
+            {workflow}
+            {namespace}
+          />
+        </div>
+      </div>
       <div class="flex flex-col flex-wrap gap-0">
-        <h1 data-testid="workflow-id-heading" class="gap-0 overflow-hidden">
+        <h1
+          data-testid="workflow-id-heading"
+          class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+        >
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             content={workflow?.id}
             clickAllToCopy
             container-class="w-full"
-            class="overflow-hidden text-ellipsis"
+            class="overflow-hidden text-ellipsis text-left"
           />
         </h1>
-        {#if workflowUsesVersioning}
-          <WorkflowVersioningHeader {workflow} />
-        {/if}
       </div>
     </div>
-    <div class="px-2">
+    <div class="max-lg:hidden">
       <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
     </div>
   </div>
-  {#if hasUserMetadata}
-    <AccordionLight let:open>
-      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-        <Icon
-          name="info"
-          class="text-brand"
-          width={32}
-          height={32}
-        />{translate('workflows.summary-and-details')}
-      </div>
-      {#if open && summary}
-        <h3>{translate('workflows.summary')}</h3>
-        <Markdown content={summary} />
-      {/if}
-      {#if open && details}
-        <h3>{translate('workflows.details')}</h3>
-        <Markdown content={details} />
-      {/if}
-    </AccordionLight>
-  {/if}
-  {#if currentDetails}
-    <AccordionLight let:open>
-      <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-        <Icon
-          name="flag"
-          class="text-brand"
-          width={32}
-          height={32}
-        />{translate('workflows.current-details')}
-      </div>
-      {#if open}
-        <Markdown content={currentDetails} />
-      {/if}
-    </AccordionLight>
-  {/if}
-  <WorkflowDetails />
+  <CodecServerErrorBanner />
+  <WorkflowSummaryAndDetails />
+  <WorkflowCurrentDetails />
+  <WorkflowDetails {workflow} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
@@ -180,7 +156,7 @@
           href={routeForEventHistory({
             namespace,
             workflow: $workflowRun?.workflow?.id,
-            run: $resetWorkflows[$workflowRun?.workflow?.runId],
+            run: resetRunId,
           })}>here</Link
         >.
       </Alert>
@@ -206,6 +182,19 @@
         </Badge>
       </Tab>
       <Tab
+        label={translate('workflows.relationships')}
+        id="relationships-tab"
+        href={routeForRelationships(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForRelationships(routeParameters),
+        )}
+      >
+        <Badge type="primary" class="px-2 py-0">
+          {workflowRelationships.relationshipCount}
+        </Badge></Tab
+      >
+      <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
         href={routeForWorkers(routeParameters)}
@@ -217,19 +206,6 @@
         <Badge type="primary" class="px-2 py-0">
           {workers?.pollers?.length}
         </Badge>
-      </Tab>
-      <Tab
-        label={translate('workflows.relationships')}
-        id="relationships-tab"
-        href={routeForRelationships(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForRelationships(routeParameters),
-        )}
-      >
-        <Badge type="primary" class="px-2 py-0"
-          >{workflowRelationships.relationshipCount}</Badge
-        >
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}

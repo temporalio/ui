@@ -21,16 +21,16 @@
 
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
-  import { noop, onMount } from 'svelte/internal';
   import { writable, type Writable } from 'svelte/store';
 
-  import { setContext } from 'svelte';
+  import { onMount, setContext } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
+  import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
-  import type { MenuButtonVariant } from '$lib/holocene/menu/menu-button.svelte';
 
   type T = $$Generic;
 
@@ -41,12 +41,15 @@
     value?: T;
     placeholder?: string;
     disabled?: boolean;
+    loading?: boolean;
     leadingIcon?: IconName;
     onChange?: (value: T) => void;
     'data-testid'?: string;
     menuClass?: string;
-    variant?: MenuButtonVariant;
+    variant?: ButtonStyles['variant'];
     required?: boolean;
+    valid?: boolean;
+    error?: string;
   };
 
   export let label: string;
@@ -55,11 +58,14 @@
   export let value: T = undefined;
   export let placeholder = '';
   export let disabled = false;
+  export let loading = false;
   export let leadingIcon: IconName = null;
-  export let onChange: (value: T) => void = noop;
+  export let onChange: (value: T) => void = () => {};
   export let menuClass: string | undefined = undefined;
-  export let variant: MenuButtonVariant = 'secondary';
+  export let variant: ButtonStyles['variant'] = 'secondary';
   export let required = false;
+  export let error = '';
+  export let valid = true;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -103,12 +109,13 @@
   });
 </script>
 
-<MenuContainer {open}>
+<MenuContainer class="w-full" {open}>
   <Label class="pb-1" {label} hidden={labelHidden} for={id} {required} />
   {#key $labelCtx}
     <MenuButton
+      class={twMerge('w-full', !valid ? 'border-danger' : undefined)}
       hasIndicator={!disabled}
-      {disabled}
+      disabled={disabled || loading}
       controls="{id}-select"
       {variant}
       data-testid={`${$$restProps['data-testid'] ?? ''}-button`}
@@ -130,16 +137,22 @@
       />
       {#if disabled}
         <Icon slot="trailing" name="lock" />
+      {:else if loading}
+        <Icon name="spinner" class="animate-spin" />
       {/if}
     </MenuButton>
   {/key}
   <Menu role="listbox" id="{id}-select" class={menuClass}>
     <slot />
   </Menu>
+
+  {#if error && !valid}
+    <span class="text-xs text-danger">{error}</span>
+  {/if}
 </MenuContainer>
 
 <style lang="postcss">
   input {
-    @apply pointer-events-none w-full bg-transparent text-sm;
+    @apply pointer-events-none w-full grow bg-transparent text-sm;
   }
 </style>

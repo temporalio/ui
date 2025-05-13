@@ -113,6 +113,9 @@ const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Task Queue', pinned: false },
   { label: 'Scheduled By ID', pinned: false },
   { label: 'Scheduled Start Time', pinned: false },
+  { label: 'Deployment', pinned: false },
+  { label: 'Deployment Version', pinned: false },
+  { label: 'Versioning Behavior', pinned: false },
 ];
 
 const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [

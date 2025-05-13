@@ -76,7 +76,7 @@ const temporal = plugin(
       },
       '.surface-interactive': {
         backgroundColor: css('--color-interactive-surface'),
-        color: css('--color-text-primary'),
+        color: css('--color-text-white'),
         '&:focus-visible': {
           backgroundColor: css('--color-interactive-hover'),
         },
@@ -187,6 +187,7 @@ const temporal = plugin(
         success: css('--color-surface-success'),
         warning: css('--color-surface-warning'),
         danger: css('--color-surface-danger'),
+        'code-block': css('--color-surface-code-block'),
 
         DEFAULT: css('--color-surface-primary'),
       }),
@@ -206,11 +207,13 @@ const temporal = plugin(
 
         DEFAULT: css('--color-border-primary'),
       }),
-      ringColor: {
+      ringColor: ({ theme }) => ({
+        ...theme('colors'),
         primary: css('--color-border-focus-info'),
         danger: css('--color-border-focus-danger'),
         success: css('--color-surface-success-loud'),
-      },
+        brand: css('--color-surface-brand'),
+      }),
       textColor: ({ theme }) => ({
         ...theme('colors'),
         primary: css('--color-text-primary'),

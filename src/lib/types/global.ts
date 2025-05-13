@@ -82,12 +82,19 @@ export type Settings = {
     endpoint?: string;
     passAccessToken?: boolean;
     includeCredentials?: boolean;
+    customErrorMessage?: {
+      default?: {
+        message?: string;
+        link?: string;
+      };
+    };
   };
   defaultNamespace: string;
   disableWriteActions: boolean;
   workflowTerminateDisabled: boolean;
   workflowCancelDisabled: boolean;
   workflowSignalDisabled: boolean;
+  workflowUpdateDisabled: boolean;
   workflowResetDisabled: boolean;
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
@@ -131,7 +138,7 @@ export type User = {
 export type ClusterInformation = import('$lib/types').GetClusterInfoResponse;
 export type SystemInformation = import('$lib/types').GetSystemInfoResponse;
 
-export type SelectOptionValue = number | string | boolean;
+export type SelectOptionValue = number | string | boolean | undefined;
 
 export type BooleanString = 'true' | 'false';
 

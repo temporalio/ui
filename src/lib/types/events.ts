@@ -44,7 +44,7 @@ export type PendingActivity = Replace<
   {
     id: string;
     state: PendingActivityState;
-    activityType?: { name: string };
+    activityType?: string;
   }
 >;
 

@@ -113,6 +113,20 @@
       {content && typeof content === 'string'
         ? formatDate(content, $timeFormat, { relative: $relativeTime })
         : ''}
+    {:else if label === 'Deployment'}
+      {@const content =
+        workflow.searchAttributes?.indexedFields?.TemporalWorkerDeployment}
+      {content && typeof content === 'string' ? content : ''}
+    {:else if label === 'Deployment Version'}
+      {@const content =
+        workflow.searchAttributes?.indexedFields
+          ?.TemporalWorkerDeploymentVersion}
+      {content && typeof content === 'string' ? content : ''}
+    {:else if label === 'Versioning Behavior'}
+      {@const content =
+        workflow.searchAttributes?.indexedFields
+          ?.TemporalWorkflowVersioningBehavior}
+      {content && typeof content === 'string' ? content : ''}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
       {@const content = workflow.searchAttributes.indexedFields[label]}
       {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
@@ -130,7 +144,7 @@
 
 <style lang="postcss">
   .workflows-summary-table-body-cell {
-    @apply h-10 whitespace-nowrap;
+    @apply h-8 whitespace-nowrap;
 
     &.filterable {
       @apply relative pr-24;

@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
 
+  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
+  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
 
   import {
     CategoryIcon,
@@ -126,15 +128,24 @@
           </Text>
         {/key}
       {:else}
-        <Text
-          point={textPosition}
-          {textAnchor}
-          {backdrop}
-          backdropHeight={radius * 2}
-          config={TimelineConfig}
+        <MetadataDecoder
+          value={group?.userMetadata?.summary}
+          prefix={isActivityTaskScheduledEvent(group.initialEvent)
+            ? group?.displayName
+            : ''}
+          fallback={group?.displayName}
+          let:decodedValue
         >
-          {group?.displayName}
-        </Text>
+          <Text
+            point={textPosition}
+            {textAnchor}
+            {backdrop}
+            backdropHeight={radius * 2}
+            config={TimelineConfig}
+          >
+            {decodedValue}
+          </Text>
+        </MetadataDecoder>
       {/if}
     {/if}
     <Dot

@@ -1,5 +1,3 @@
-import { noop } from 'svelte/internal';
-
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -14,8 +12,8 @@ export const fetchWorkflowCount = async (
     const countRoute = routeForApi('workflows.count', { namespace });
     const result = await requestFromAPI<{ count: string }>(countRoute, {
       params: query ? { query } : {},
-      onError: noop,
-      handleError: noop,
+      onError: () => {},
+      handleError: () => {},
       request,
     });
     count = parseInt(result?.count || '0');
@@ -51,11 +49,17 @@ export const fetchWorkflowCountByExecutionStatus = async ({
 
 export const fetchScheduleCount = async ({
   namespace,
+  query,
 }: {
   namespace: string;
+  query?: string;
 }): Promise<string> => {
-  const query =
+  const scheduleFixedQuery =
     'TemporalNamespaceDivision="TemporalScheduler" AND ExecutionStatus="Running"';
+
+  const fullQuery = query
+    ? `${scheduleFixedQuery} AND ${query}`
+    : scheduleFixedQuery;
   const countRoute = routeForApi('workflows.count', {
     namespace,
   });
@@ -63,7 +67,7 @@ export const fetchScheduleCount = async ({
     countRoute,
     {
       params: {
-        query,
+        query: fullQuery,
       },
       notifyOnError: false,
     },

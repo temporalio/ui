@@ -12,6 +12,7 @@
   type $$Props = HTMLAnchorAttributes & {
     href: string;
     active?: boolean;
+    interactive?: boolean;
     newTab?: boolean;
     class?: string;
     icon?: IconName;
@@ -24,14 +25,16 @@
   export { className as class };
   export let href: string;
   export let active = false;
+  export let interactive = false;
   export let newTab = false;
   export let icon: IconName = null;
   export let text: string = '';
   export let light = false;
 
   const onLinkClick = (e: MouseEvent) => {
-    // Skip if middle mouse click or new tab
-    if (e.button === 1 || newTab || e.metaKey) return;
+    if (e.button === 1 || newTab || e.metaKey || e.ctrlKey || e.shiftKey)
+      return;
+
     e.preventDefault();
     goto(href);
   };
@@ -40,9 +43,10 @@
 <a
   {href}
   target={newTab ? '_blank' : null}
-  rel={newTab ? 'noreferrer' : null}
+  rel={newTab ? 'noreferrer noopener' : null}
   class={merge('link', icon ? 'inline-flex' : 'inline', className)}
   class:active
+  class:interactive
   class:light
   on:click|stopPropagation={onLinkClick}
   tabindex={href ? null : 0}
@@ -63,6 +67,10 @@
 
     &.active {
       @apply text-brand;
+    }
+
+    &.interactive {
+      @apply text-white hover:text-indigo-200 focus-visible:text-indigo-200;
     }
 
     &.light {

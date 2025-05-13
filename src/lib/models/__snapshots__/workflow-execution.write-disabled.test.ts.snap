@@ -27,6 +27,7 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
   "pendingChildren": [],
   "pendingNexusOperations": [],
   "pendingWorkflowTask": null,
+  "rootExecution": undefined,
   "runId": "346e7a24-c660-4f91-a777-ffe3274d8144",
   "searchAttributes": {
     "indexedFields": {
@@ -45,6 +46,8 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
   "summary": undefined,
   "taskQueue": "canary-task-queue",
   "url": "/workflows/temporal.fixture.cancelled.workflow.id/346e7a24-c660-4f91-a777-ffe3274d8144",
+  "versioningInfo": undefined,
+  "workflowExtendedInfo": {},
 }
 `;
 
@@ -75,6 +78,7 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
   "pendingChildren": [],
   "pendingNexusOperations": [],
   "pendingWorkflowTask": null,
+  "rootExecution": undefined,
   "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1",
   "searchAttributes": {
     "indexedFields": {
@@ -93,6 +97,8 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
   "summary": undefined,
   "taskQueue": "canary-task-queue",
   "url": "/workflows/temporal.fixture.completed.workflow.id/202dcff6-7f35-4c65-995c-bcadce524fb1",
+  "versioningInfo": undefined,
+  "workflowExtendedInfo": {},
 }
 `;
 
@@ -120,6 +126,7 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
   "pendingChildren": [],
   "pendingNexusOperations": [],
   "pendingWorkflowTask": null,
+  "rootExecution": undefined,
   "runId": "7e00b341-c579-4bb5-9e28-810d34ef4329",
   "searchAttributes": {
     "indexedFields": {
@@ -134,6 +141,8 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
   "summary": undefined,
   "taskQueue": "canary-task-queue",
   "url": "/workflows/temporal.fixture.failed.workflow.id/7e00b341-c579-4bb5-9e28-810d34ef4329",
+  "versioningInfo": undefined,
+  "workflowExtendedInfo": {},
 }
 `;
 
@@ -190,6 +199,7 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
   "pendingChildren": [],
   "pendingNexusOperations": [],
   "pendingWorkflowTask": null,
+  "rootExecution": undefined,
   "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
   "searchAttributes": {
     "indexedFields": {
@@ -208,6 +218,8 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
   "summary": undefined,
   "taskQueue": "canary-task-queue",
   "url": "/workflows/temporal.fixture.running.workflow.id/2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+  "versioningInfo": undefined,
+  "workflowExtendedInfo": {},
 }
 `;
 
@@ -269,6 +281,7 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
   "pendingChildren": [],
   "pendingNexusOperations": [],
   "pendingWorkflowTask": null,
+  "rootExecution": undefined,
   "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace",
   "searchAttributes": {
     "indexedFields": {
@@ -287,6 +300,8 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
   "summary": undefined,
   "taskQueue": "canary-task-queue",
   "url": "/workflows/temporal.fixture.completed.workflow.id/16c5fbe5-f82d-43c1-acbc-18c65c449ace",
+  "versioningInfo": undefined,
+  "workflowExtendedInfo": {},
 }
 `;
 
@@ -323,6 +338,7 @@ exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 
     "startedTime": null,
     "state": "Scheduled",
   },
+  "rootExecution": undefined,
   "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
   "searchAttributes": {
     "indexedFields": {
@@ -341,6 +357,8 @@ exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 
   "summary": undefined,
   "taskQueue": "canary-task-queue",
   "url": "/workflows/temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility/445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+  "versioningInfo": undefined,
+  "workflowExtendedInfo": {},
 }
 `;
 
@@ -369,6 +387,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "pendingChildren": [],
     "pendingNexusOperations": [],
     "pendingWorkflowTask": undefined,
+    "rootExecution": undefined,
     "runId": "346e7a24-c660-4f91-a777-ffe3274d8144",
     "searchAttributes": {
       "indexedFields": {
@@ -387,6 +406,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "summary": undefined,
     "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.cancelled.workflow.id/346e7a24-c660-4f91-a777-ffe3274d8144",
+    "versioningInfo": undefined,
+    "workflowExtendedInfo": {},
   },
   {
     "assignedBuildId": undefined,
@@ -411,6 +432,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "pendingChildren": [],
     "pendingNexusOperations": [],
     "pendingWorkflowTask": undefined,
+    "rootExecution": undefined,
     "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1",
     "searchAttributes": {
       "indexedFields": {
@@ -429,6 +451,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "summary": undefined,
     "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.completed.workflow.id/202dcff6-7f35-4c65-995c-bcadce524fb1",
+    "versioningInfo": undefined,
+    "workflowExtendedInfo": {},
   },
   {
     "assignedBuildId": undefined,
@@ -453,6 +477,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "pendingChildren": [],
     "pendingNexusOperations": [],
     "pendingWorkflowTask": undefined,
+    "rootExecution": undefined,
     "runId": "7e00b341-c579-4bb5-9e28-810d34ef4329",
     "searchAttributes": {
       "indexedFields": {
@@ -467,6 +492,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "summary": undefined,
     "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.failed.workflow.id/7e00b341-c579-4bb5-9e28-810d34ef4329",
+    "versioningInfo": undefined,
+    "workflowExtendedInfo": {},
   },
   {
     "assignedBuildId": undefined,
@@ -491,6 +518,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "pendingChildren": [],
     "pendingNexusOperations": [],
     "pendingWorkflowTask": undefined,
+    "rootExecution": undefined,
     "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
     "searchAttributes": {
       "indexedFields": {
@@ -509,6 +537,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "summary": undefined,
     "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.running.workflow.id/2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+    "versioningInfo": undefined,
+    "workflowExtendedInfo": {},
   },
   {
     "assignedBuildId": undefined,
@@ -533,6 +563,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "pendingChildren": [],
     "pendingNexusOperations": [],
     "pendingWorkflowTask": undefined,
+    "rootExecution": undefined,
     "runId": "dfd4039d-4bc0-4864-9a24-85d136814977",
     "searchAttributes": {
       "indexedFields": {
@@ -551,6 +582,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "summary": undefined,
     "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.completed.workflow.id/dfd4039d-4bc0-4864-9a24-85d136814977",
+    "versioningInfo": undefined,
+    "workflowExtendedInfo": {},
   },
   {
     "assignedBuildId": undefined,
@@ -575,6 +608,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "pendingChildren": [],
     "pendingNexusOperations": [],
     "pendingWorkflowTask": undefined,
+    "rootExecution": undefined,
     "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace",
     "searchAttributes": {
       "indexedFields": {
@@ -593,6 +627,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "summary": undefined,
     "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.terminated.workflow.id/16c5fbe5-f82d-43c1-acbc-18c65c449ace",
+    "versioningInfo": undefined,
+    "workflowExtendedInfo": {},
   },
   {
     "assignedBuildId": undefined,
@@ -617,6 +653,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "pendingChildren": [],
     "pendingNexusOperations": [],
     "pendingWorkflowTask": undefined,
+    "rootExecution": undefined,
     "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
     "searchAttributes": {
       "indexedFields": {
@@ -635,6 +672,8 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "summary": undefined,
     "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.timed-out.workflow.id/445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+    "versioningInfo": undefined,
+    "workflowExtendedInfo": {},
   },
 ]
 `;
