@@ -5,25 +5,32 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: summary = $workflowRun?.userMetadata?.summary;
-  $: details = $workflowRun?.userMetadata?.details;
-  $: hasUserMetadata = summary || details;
+  const summary = $derived($workflowRun?.userMetadata?.summary);
+  const details = $derived($workflowRun?.userMetadata?.details);
+  const hasUserMetadata = $derived(summary || details);
 </script>
 
 {#if hasUserMetadata}
-  <AccordionLight let:open>
-    <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-      <Icon name="info" class="text-brand" width={32} height={32} />{translate(
-        'workflows.summary-and-details',
-      )}
-    </div>
-    {#if open && summary}
-      <h3>{translate('workflows.summary')}</h3>
-      <Markdown content={summary} />
-    {/if}
-    {#if open && details}
-      <h3>{translate('workflows.details')}</h3>
-      <Markdown content={details} />
-    {/if}
+  <AccordionLight>
+    {#snippet titleName()}
+      <div class="flex w-full items-center gap-2 p-2 text-xl">
+        <Icon
+          name="info"
+          class="text-brand"
+          width={32}
+          height={32}
+        />{translate('workflows.summary-and-details')}
+      </div>
+    {/snippet}
+    {#snippet children({ open })}
+      {#if open && summary}
+        <h3>{translate('workflows.summary')}</h3>
+        <Markdown content={summary} />
+      {/if}
+      {#if open && details}
+        <h3>{translate('workflows.details')}</h3>
+        <Markdown content={details} />
+      {/if}
+    {/snippet}
   </AccordionLight>
 {/if}

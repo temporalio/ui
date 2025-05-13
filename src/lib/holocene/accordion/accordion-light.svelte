@@ -7,7 +7,7 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  type Props = HTMLAttributes<HTMLDivElement> & {
+  type Props = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
     id?: string;
     icon?: IconName;
     open?: boolean;
@@ -15,10 +15,10 @@
     error?: string;
     onToggle?: () => Promise<void>;
     'data-testid'?: string;
-    title?: string;
+    titleName?: Snippet;
     description?: Snippet;
     action?: Snippet;
-    children?: Snippet<[open: boolean]>;
+    children: Snippet<[{ open: boolean }]>;
   };
 
   let {
@@ -26,11 +26,11 @@
     icon = undefined,
     open = false,
     onToggle = undefined,
-    title,
+    titleName,
     description,
     action,
     children,
-    ...restProps
+    class: className = '',
   }: Props = $props();
 
   const toggleAccordion = async () => {
@@ -43,7 +43,7 @@
   };
 </script>
 
-<div class="w-full {restProps.class}">
+<div class="w-full {className}">
   <button
     id="{id}-trigger"
     aria-expanded={open}
@@ -53,7 +53,7 @@
     onclick={toggleAccordion}
   >
     <div class="flex w-full flex-row items-center justify-between gap-2 pr-4">
-      {title}
+      {@render titleName?.()}
       {@render description?.()}
       <div class="flex items-center gap-4">
         {@render action?.()}
@@ -67,6 +67,6 @@
     class="block w-full bg-primary p-2"
     class:hidden={!open}
   >
-    {@render children?.(open)}
+    {@render children({ open })}
   </div>
 </div>

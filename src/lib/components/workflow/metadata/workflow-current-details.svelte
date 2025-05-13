@@ -11,10 +11,10 @@
   import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
-  $: currentDetails = $workflowRun?.metadata?.currentDetails || '';
-  $: closedWithoutDetails = !workflow.isRunning && !currentDetails;
+  const namespace = $derived(() => $page.params.namespace);
+  const workflow = $derived(() => $workflowRun.workflow);
+  const currentDetails = $derived($workflowRun?.metadata?.currentDetails || '');
+  const closedWithoutDetails = $derived(!workflow.isRunning && !currentDetails);
 
   let loading = false;
 
@@ -48,11 +48,13 @@
   onToggle={closedWithoutDetails ? fetchCurrentDetails : undefined}
   icon={closedWithoutDetails ? 'retry' : undefined}
 >
-  <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-    <Icon name="flag" class="text-brand" width={32} height={32} />
-    {translate('workflows.current-details')}
-    {#if loading}{translate('common.loading')}{/if}
-  </div>
+  {#snippet titleName()}
+    <div class="flex w-full items-center gap-2 p-2 text-xl">
+      <Icon name="flag" class="text-brand" width={32} height={32} />
+      {translate('workflows.current-details')}
+      {#if loading}{translate('common.loading')}{/if}
+    </div>
+  {/snippet}
   {#if open}
     {#key currentDetails}
       <Markdown content={currentDetails} />
