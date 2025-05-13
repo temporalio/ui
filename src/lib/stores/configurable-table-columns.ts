@@ -118,9 +118,6 @@ const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Schedule Spec' },
 ];
 
-const isNotParentWorkflowIdColumn = (column: ConfigurableTableHeader) =>
-  column.label !== 'Parent Workflow ID';
-
 export const persistedWorkflowTableColumns = persistStore<State>(
   'namespace-workflow-table-columns',
   {},
@@ -149,19 +146,10 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
       columns: State,
       namespace: string,
       defaultColumns: ConfigurableTableHeader[],
-      update: (columns: State) => void,
     ) => {
       if (!columns?.[namespace]?.length) {
         columns[namespace] = [...defaultColumns];
         return columns[namespace];
-      }
-      const filteredColumns = columns[namespace].filter(
-        isNotParentWorkflowIdColumn,
-      );
-
-      if (filteredColumns.length !== columns[namespace].length) {
-        columns[namespace] = filteredColumns;
-        update(columns);
       }
 
       return columns[namespace];
@@ -172,13 +160,11 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
         $persistedWorkflowTableColumns,
         namespace,
         DEFAULT_WORKFLOWS_COLUMNS,
-        (columns) => persistedWorkflowTableColumns.set(columns),
       ),
       schedules: useOrAddDefaultTableColumnsToNamespace(
         $persistedSchedulesTableColumns,
         namespace,
         DEFAULT_SCHEDULES_COLUMNS,
-        (columns) => persistedSchedulesTableColumns.set(columns),
       ),
     });
 
