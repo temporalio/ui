@@ -1,10 +1,8 @@
 <script lang="ts">
-  import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import Navigation from '$lib/holocene/navigation/navigation-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NavLinkListItem } from '$lib/types/global';
-  import { useDarkMode } from '$lib/utilities/dark-mode';
 
   export let isCloud = false;
   export let linkList: NavLinkListItem[];
@@ -27,15 +25,5 @@
       />
     {/if}
   {/each}
-  <svelte:fragment slot="bottom">
-    <NavigationButton
-      onClick={() => ($useDarkMode = !$useDarkMode)}
-      tooltip={$useDarkMode
-        ? translate('common.night')
-        : translate('common.day')}
-      label={$useDarkMode ? translate('common.night') : translate('common.day')}
-      icon={$useDarkMode ? 'moon' : 'sun'}
-    />
-    <slot name="bottom" />
-  </svelte:fragment>
+  <slot name="bottom" />
 </Navigation>
