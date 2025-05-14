@@ -78,7 +78,7 @@ import { fetchWorkflowCountByExecutionStatus } from './workflow-counts';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
-  runId: string;
+  runId?: string;
 };
 
 export type CombinedWorkflowExecutionsResponse = {
@@ -278,9 +278,11 @@ export async function fetchWorkflow(
   return requestFromAPI(route, {
     request,
     notifyOnError: false,
-    params: {
-      'execution.runId': parameters.runId,
-    },
+    params: parameters.runId
+      ? {
+          'execution.runId': parameters.runId,
+        }
+      : {},
   })
     .then((response) => {
       return { workflow: toWorkflowExecution(response) };

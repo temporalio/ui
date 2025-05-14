@@ -139,7 +139,7 @@
   <CodecServerErrorBanner />
   <WorkflowSummaryAndDetails />
   <WorkflowCurrentDetails />
-  <WorkflowDetails {workflow} />
+  <WorkflowDetails {workflow} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
