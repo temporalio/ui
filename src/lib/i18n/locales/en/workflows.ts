@@ -156,6 +156,7 @@ export const Strings = {
   'first-execution': 'First Execution',
   'previous-execution': 'Previous Execution',
   'current-execution': 'Current Execution',
+  'latest-execution': 'Latest Execution',
   'next-execution': 'Next Execution',
   'child-id': 'Child Workflow ID',
   'child-run-id': 'Child Run ID',
