@@ -23,6 +23,7 @@ batchActionsDisabled: {{ env "TEMPORAL_BATCH_ACTIONS_DISABLED" | default "false"
 startWorkflowDisabled: {{ env "TEMPORAL_START_WORKFLOW_DISABLED" | default "false" }}
 hideWorkflowQueryErrors: {{ env "TEMPORAL_HIDE_WORKFLOW_QUERY_ERRORS" | default "false" }} 
 refreshWorkflowCountsDisabled: {{ env "TEMPORAL_REFRESH_WORKFLOW_COUNTS_DISABLED" | default "false" }}
+additionalClaims: {{ env "TEMPORAL_OAUTH_ADDITIONAL_CLAIMS" | default "false" }}
 cors:
   cookieInsecure: {{ env "TEMPORAL_CSRF_COOKIE_INSECURE" | default "false" }}
   allowOrigins:
