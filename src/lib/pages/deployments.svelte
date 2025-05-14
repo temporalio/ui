@@ -26,15 +26,13 @@
   };
 
   const columns = [
-    { label: translate('deployments.name'), pinned: true },
+    { label: translate('deployments.name') },
     {
       label: translate('deployments.deployment-version'),
-      pinned: true,
     },
-    { label: translate('deployments.deployed'), pinned: true },
+    { label: translate('deployments.deployed') },
     {
       label: translate('deployments.workflows'),
-      pinned: true,
     },
   ];
 </script>

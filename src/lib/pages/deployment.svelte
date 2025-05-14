@@ -24,14 +24,12 @@
   $: deploymentFetch = fetchDeployment(parameters);
 
   const columns = [
-    { label: translate('deployments.version'), pinned: true },
+    { label: translate('deployments.version') },
     {
       label: translate('deployments.deployed'),
-      pinned: true,
     },
     {
       label: translate('deployments.workflows'),
-      pinned: true,
     },
   ];
 </script>
