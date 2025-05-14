@@ -7,19 +7,21 @@
     useDarkModePreference,
   } from '$lib/utilities/dark-mode';
 
-  $: buttonText =
+  let buttonText = $derived(
     $useDarkModePreference == null
       ? translate('common.system-default')
       : $useDarkModePreference
         ? translate('common.night')
-        : translate('common.day');
+        : translate('common.day'),
+  );
+
+  function cycleDarkModePreference() {
+    $useDarkModePreference = getNextDarkModePreference($useDarkModePreference);
+  }
 </script>
 
 <NavigationButton
-  onClick={() =>
-    ($useDarkModePreference = getNextDarkModePreference(
-      $useDarkModePreference,
-    ))}
+  onClick={cycleDarkModePreference}
   tooltip={buttonText}
   label={buttonText}
   icon={$useDarkMode ? 'moon' : 'sun'}

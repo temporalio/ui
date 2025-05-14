@@ -8,23 +8,24 @@
     useDarkModePreference,
   } from '$lib/utilities/dark-mode';
 
-  $: buttonText =
+  let buttonText = $derived(
     $useDarkModePreference == null
       ? translate('common.system-default')
       : $useDarkModePreference
         ? translate('common.night')
-        : translate('common.day');
+        : translate('common.day'),
+  );
+
+  function cycleDarkModePreference() {
+    $useDarkModePreference = getNextDarkModePreference($useDarkModePreference);
+  }
 </script>
 
 <Tooltip bottomRight text={buttonText}>
   <IconButton
     variant="ghost"
     label={buttonText}
-    class="relative flex items-center"
     icon={$useDarkMode ? 'moon' : 'sun'}
-    on:click={() =>
-      ($useDarkModePreference = getNextDarkModePreference(
-        $useDarkModePreference,
-      ))}
+    on:click={cycleDarkModePreference}
   />
 </Tooltip>
