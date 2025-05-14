@@ -30,6 +30,7 @@
   export let cancelInProgress: boolean;
   export let isRunning: boolean;
   export let first: string | undefined = undefined;
+  export let next: string | undefined = undefined;
 
   let cancelConfirmationModalOpen = false;
   let terminateConfirmationModalOpen = false;
@@ -210,7 +211,7 @@
     >
       {translate('workflows.start-workflow-like-this-one')}
     </MenuItem>
-    {#if terminateEnabled && first}
+    {#if terminateEnabled && next}
       <MenuDivider />
       <MenuItem
         on:click={() => (terminateConfirmationModalOpen = true)}

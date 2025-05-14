@@ -107,6 +107,7 @@
             {workflow}
             {namespace}
             first={workflowRelationships.first}
+            next={workflowRelationships.next}
           />
         </div>
       </div>
@@ -133,6 +134,7 @@
         {workflow}
         {namespace}
         first={workflowRelationships.first}
+        next={workflowRelationships.next}
       />
     </div>
   </div>
