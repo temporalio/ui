@@ -58,7 +58,7 @@ type Claims struct {
 	Picture       string `json:"picture"`
 }
 
-func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, provider *oidc.Provider) (*User, error) {
+func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, provider *oidc.Provider, additionalClaimsConfig map[string]string) (*User, error) {
 	state, err := r.Cookie("state")
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie is not set in request")
@@ -98,6 +98,17 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	if additionalClaimsConfig != nil {
+		var claimTokenValues map[string]interface{}
+		if err := idToken.Claims(&claimTokenValues); err != nil {
+			return nil, echo.NewHTTPError(http.StatusInternalServerError, "Error parse claims")
+		}
+
+		if err := VerifyAdditionalClaims(additionalClaimsConfig, claimTokenValues); err != nil {
+			return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+	}
+
 	user := User{
 		OAuth2Token: oauth2Token,
 		IDToken: &IDToken{
@@ -107,4 +118,25 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 	}
 
 	return &user, nil
+}
+
+func VerifyAdditionalClaims(additionalClaims map[string]string, claimTokenValues map[string]interface{}) error {
+	for configClaimKey, configClaimValue := range additionalClaims {
+		claimValues := claimTokenValues[configClaimKey]
+		if claimValues != nil {
+			switch t := claimValues.(type) {
+			case string:
+				if t == configClaimValue {
+					return nil
+				}
+			case []interface{}:
+				for _, claimValue := range t {
+					if claimValue == configClaimValue {
+						return nil
+					}
+				}
+			}
+		}
+	}
+	return echo.NewHTTPError(http.StatusInternalServerError, "No additional Claims defined")
 }
