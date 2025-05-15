@@ -1,10 +1,9 @@
 <script lang="ts">
   import Svg from '../svg.svelte';
 
-  export let active = false;
+  let { active = false, ...props } = $props();
 
-  $: liquidFill = active ? '#00F37E' : 'currentColor';
-  let props = $props();
+  let liquidFill = $derived(active ? '#00F37E' : 'currentColor');
 </script>
 
 <Svg {...props}>
