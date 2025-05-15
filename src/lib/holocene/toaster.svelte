@@ -5,13 +5,13 @@
 
   import type { ToastPosition } from '$lib/types/holocene';
 
-  import type { Toaster } from '../stores/toaster';
+  import type { Toaster as Toast } from '../stores/toaster';
 
   import Link from './link.svelte';
   import ToastComponent from './toast.svelte';
 
-  export let pop: Toaster['pop'];
-  export let toasts: Toaster['toasts'];
+  export let pop: Toast['pop'];
+  export let toasts: Toast['toasts'];
   export let closeButtonLabel: string;
   export let position: Writable<ToastPosition>;
 

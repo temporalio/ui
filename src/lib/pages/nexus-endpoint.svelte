@@ -4,14 +4,14 @@
   import Link from '$lib/holocene/link.svelte';
   import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { NexusEndpoint } from '$lib/types/nexus';
+  import type { NexusEndpoint as Endpoint } from '$lib/types/nexus';
   import {
     routeForNamespace,
     routeForNexus,
     routeForNexusEndpointEdit,
   } from '$lib/utilities/route-for';
 
-  export let endpoint: NexusEndpoint;
+  export let endpoint: Endpoint;
   export let editDisabled = false;
 </script>
 
