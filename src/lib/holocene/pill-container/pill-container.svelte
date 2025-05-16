@@ -23,24 +23,24 @@
 
   let { class: className = '', children }: Props = $props();
 
-  const pills: string[] = [];
+  const pills: { id: string; disabled: boolean }[] = [];
   const activePill = writable<string>(null);
 
   setContext<PillsContext>(PILLS, {
     registerPill: (pill: string, disabled = false) => {
-      pills.push(pill);
+      pills.push({ id: pill, disabled });
 
       if (!disabled) {
         activePill.update((current) => current || pill);
       }
 
       onDestroy(() => {
-        const i = pills.indexOf(pill);
+        const i = pills.findIndex((p) => p.id === pill);
         pills.splice(i, 1);
 
         activePill.update((current) =>
           current === pill
-            ? pills[i] || pills.find((p) => p !== pill)
+            ? (pills.find((p) => p.id !== pill && !p.disabled)?.id ?? null)
             : current,
         );
       });

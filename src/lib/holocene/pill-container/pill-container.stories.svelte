@@ -12,13 +12,15 @@
 </script>
 
 <script lang="ts">
-  import { Story } from '@storybook/addon-svelte-csf';
+  import { Story, Template } from '@storybook/addon-svelte-csf';
 </script>
 
-<PillContainer>
-  <Pill id="A">Pill A</Pill>
-  <Pill id="B" disabled={true}>Pill B</Pill>
-  <Pill id="C" disabled={true}>Pill C</Pill>
-</PillContainer>
+<Template>
+  <PillContainer>
+    <Pill id="A">Pill A</Pill>
+    <Pill id="B">Pill B</Pill>
+    <Pill id="C">Pill C</Pill>
+  </PillContainer>
+</Template>
 
 <Story name="Default" />
