@@ -1,7 +1,7 @@
 <script lang="ts" module>
   export type PillsContext = {
     activePill: Writable<string>;
-    registerPill: (pill: string) => void;
+    registerPill: (pill: string, disabled?: boolean) => void;
     selectPill: (pill: string) => void;
   };
 
@@ -27,15 +27,21 @@
   const activePill = writable<string>(null);
 
   setContext<PillsContext>(PILLS, {
-    registerPill: (pill: string) => {
+    registerPill: (pill: string, disabled = false) => {
       pills.push(pill);
-      activePill.update((current) => current || pill);
+
+      if (!disabled) {
+        activePill.update((current) => current || pill);
+      }
 
       onDestroy(() => {
         const i = pills.indexOf(pill);
         pills.splice(i, 1);
+
         activePill.update((current) =>
-          current === pill ? pills[i] || pills[pills.length - 1] : current,
+          current === pill
+            ? pills[i] || pills.find((p) => p !== pill)
+            : current,
         );
       });
     },
