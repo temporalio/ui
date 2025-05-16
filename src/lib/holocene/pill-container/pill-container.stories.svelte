@@ -8,15 +8,10 @@
     title: 'Pill Container',
     component: PillContainer,
     subcomponents: { Pill },
-    argTypes: {
-      PILLS: {
-        name: 'Pill Container',
-        table: {
-          disable: true,
-        },
-      },
+    parameters: {
+      controls: { hideNoControlsWarning: true },
     },
-  } satisfies Meta<Omit<PillContainer, 'PILLS'>>;
+  } satisfies Meta<typeof PillContainer>;
 </script>
 
 <script lang="ts">
