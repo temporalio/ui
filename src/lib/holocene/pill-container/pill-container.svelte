@@ -1,7 +1,7 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type PillsContext = {
     activePill: Writable<string>;
-    registerPill: (pill: string) => void;
+    registerPill: (pill: string, disabled?: boolean) => void;
     selectPill: (pill: string) => void;
   };
 
@@ -12,29 +12,36 @@
   import type { HTMLAttributes } from 'svelte/elements';
   import { type Writable, writable } from 'svelte/store';
 
+  import type { Snippet } from 'svelte';
   import { onDestroy, setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  type $$Props = HTMLAttributes<HTMLDivElement> & {
+  type Props = HTMLAttributes<HTMLDivElement> & {
     class?: string;
+    children?: Snippet;
   };
 
-  let className = '';
-  export { className as class };
+  let { class: className = '', children }: Props = $props();
 
-  const pills: string[] = [];
+  const pills: { id: string; disabled: boolean }[] = [];
   const activePill = writable<string>(null);
 
   setContext<PillsContext>(PILLS, {
-    registerPill: (pill: string) => {
-      pills.push(pill);
-      activePill.update((current) => current || pill);
+    registerPill: (pill: string, disabled = false) => {
+      pills.push({ id: pill, disabled });
+
+      if (!disabled) {
+        activePill.update((current) => current || pill);
+      }
 
       onDestroy(() => {
-        const i = pills.indexOf(pill);
+        const i = pills.findIndex((p) => p.id === pill);
         pills.splice(i, 1);
+
         activePill.update((current) =>
-          current === pill ? pills[i] || pills[pills.length - 1] : current,
+          current === pill
+            ? (pills.find((p) => p.id !== pill && !p.disabled)?.id ?? null)
+            : current,
         );
       });
     },
@@ -51,5 +58,5 @@
     className,
   )}
 >
-  <slot />
+  {@render children?.()}
 </div>
