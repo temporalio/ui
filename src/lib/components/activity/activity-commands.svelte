@@ -6,47 +6,36 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { unpauseActivity } from '$lib/services/workflow-activities-service';
-  import { refresh } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
 
   import ActivityOptionsUpdateDrawer from './activity-options-update-drawer.svelte';
   import ActivityPauseConfirmationModal from './activity-pause-confirmation-modal.svelte';
   import ActivityResetConfirmationModal from './activity-reset-confirmation-modal.svelte';
+  import ActivityUnpauseConfirmationModal from './activity-unpause-confirmation-modal.svelte';
 
   type Props = {
     activity: PendingActivity;
     class?: string;
   };
 
+  let { activity, class: className = '' }: Props = $props();
   const { namespace, workflow, run } = $derived(page.params);
   const execution: WorkflowExecution = $derived({
     workflowId: workflow,
     runId: run,
   });
 
-  let { activity, class: className = '' }: Props = $props();
-  let { activityId: id } = $derived(activity);
-
   let pauseConfirmationModalOpen = $state(false);
+  let unpauseConfirmationModalOpen = $state(false);
   let resetConfirmationModalOpen = $state(false);
   let optionsUpdateDrawerOpen = $state(false);
 
   const onPause = async () => {
     if (activity.paused) {
-      onActivityUnpause();
+      unpauseConfirmationModalOpen = true;
     } else {
       pauseConfirmationModalOpen = true;
     }
-  };
-
-  const onActivityUnpause = async () => {
-    await unpauseActivity({
-      namespace,
-      execution,
-      id,
-    });
-    $refresh = Date.now();
   };
 
   const onReset = () => {
@@ -101,6 +90,13 @@
 
 <ActivityPauseConfirmationModal
   bind:open={pauseConfirmationModalOpen}
+  {namespace}
+  {execution}
+  {activity}
+/>
+
+<ActivityUnpauseConfirmationModal
+  bind:open={unpauseConfirmationModalOpen}
   {namespace}
   {execution}
   {activity}
