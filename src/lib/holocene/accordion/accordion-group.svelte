@@ -1,5 +1,7 @@
 <script lang="ts">
-  let { children } = $props();
+  import type { Snippet } from 'svelte';
+
+  const { children }: { children?: Snippet } = $props();
 </script>
 
 <div class="*:border-t-0 [&>*:first-child]:border-t">
