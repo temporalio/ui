@@ -8,9 +8,6 @@
     title: 'Pill Container',
     component: PillContainer,
     subcomponents: { Pill },
-    parameters: {
-      controls: { hideNoControlsWarning: true },
-    },
   } satisfies Meta<typeof PillContainer>;
 </script>
 
@@ -18,11 +15,11 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
 </script>
 
-<Template let:args>
-  <PillContainer {...args}>
-    <Pill id="A">Pill A</Pill>
-    <Pill id="B">Pill B</Pill>
-    <Pill id="C">Pill C</Pill>
+<Template>
+  <PillContainer>
+    <Pill id="A" active={true}>Pill A</Pill>
+    <Pill id="B" disabled={true}>Pill B</Pill>
+    <Pill id="C" disabled={true}>Pill C</Pill>
   </PillContainer>
 </Template>
 
