@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type PillsContext = {
     activePill: Writable<string>;
     registerPill: (pill: string) => void;
@@ -12,15 +12,16 @@
   import type { HTMLAttributes } from 'svelte/elements';
   import { type Writable, writable } from 'svelte/store';
 
+  import type { Snippet } from 'svelte';
   import { onDestroy, setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  type $$Props = HTMLAttributes<HTMLDivElement> & {
+  type Props = HTMLAttributes<HTMLDivElement> & {
     class?: string;
+    children?: Snippet;
   };
 
-  let className = '';
-  export { className as class };
+  let { class: className = '', children }: Props = $props();
 
   const pills: string[] = [];
   const activePill = writable<string>(null);
@@ -51,5 +52,5 @@
     className,
   )}
 >
-  <slot />
+  {@render children?.()}
 </div>
