@@ -3,6 +3,7 @@
 
   import { page } from '$app/state';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
@@ -29,6 +30,7 @@
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   let { activity }: { activity: PendingActivity } = $props();
+
   const { namespace, workflow, run } = $derived(page.params);
 
   const failed = $derived(activity.attempt > 1);
@@ -51,64 +53,88 @@
         <h4>{activity.activityType}</h4>
       </div>
     </div>
-    <div class="grid grid-cols-1 gap-2 xl:grid-cols-2">
-      {@render detail(translate('workflows.activity-id'), activity.activityId)}
-      {@render detail(translate('workflows.attempt'), attempts)}
-      {#if activity.scheduledTime}
-        {@render detail(translate('workflows.next-retry'), nextRetry)}
-      {/if}
-      {#if activity.expirationTime}
+    <div class="flex flex-1 gap-2">
+      <div class="flex flex-1 flex-col gap-2">
+        {#if activity.paused && activity.pauseInfo}
+          {@render detail(
+            translate('activities.paused-by'),
+            activity.pauseInfo?.manual?.identity || '',
+          )}
+          {@render detail(
+            translate('activities.paused-since'),
+            formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
+              relative: $relativeTime,
+            }),
+          )}
+          {@render detail(
+            translate('activities.pause-reason'),
+            activity.pauseInfo?.manual?.reason || '',
+          )}
+        {/if}
         {@render detail(
-          translate('workflows.retry-expiration'),
-          formatRetryExpiration(
-            activity.maximumAttempts,
-            formatDuration(
-              getDuration({
-                start: Date.now(),
-                end: activity.expirationTime,
-              }),
+          translate('workflows.activity-id'),
+          activity.activityId,
+        )}
+        {#if activity.scheduledTime}
+          {@render detail(translate('workflows.next-retry'), nextRetry)}
+        {/if}
+        {#if activity.lastAttemptCompleteTime}
+          {@render detail(
+            translate('workflows.last-attempt-completed-time'),
+            formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
+              relative: $relativeTime,
+            }),
+          )}
+        {/if}
+        {@render detail(
+          translate('workflows.scheduled-event'),
+          scheduleEventLink,
+        )}
+      </div>
+      <div class="flex flex-1 flex-col gap-2">
+        {@render detail(translate('workflows.attempt'), attempts)}
+        {#if activity.expirationTime}
+          {@render detail(
+            translate('workflows.retry-expiration'),
+            formatRetryExpiration(
+              activity.maximumAttempts,
+              formatDuration(
+                getDuration({
+                  start: Date.now(),
+                  end: activity.expirationTime,
+                }),
+              ),
             ),
-          ),
-        )}
-      {/if}
-      {#if activity.lastHeartbeatTime}
-        {@render detail(
-          translate('workflows.last-heartbeat'),
-          formatDate(activity.lastHeartbeatTime, $timeFormat, {
-            relative: $relativeTime,
-            relativeStrict: true,
-          }),
-        )}
-      {/if}
-      {#if activity.lastAttemptCompleteTime}
-        {@render detail(
-          translate('workflows.last-attempt-completed-time'),
-          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
-            relative: $relativeTime,
-          }),
-        )}
-      {/if}
-      {#if activity.lastStartedTime}
-        {@render detail(
-          translate('workflows.last-started-time'),
-          formatDate(activity.lastStartedTime, $timeFormat, {
-            relative: $relativeTime,
-          }),
-        )}
-      {/if}
-      {@render detail(
-        translate('workflows.scheduled-event'),
-        scheduleEventLink,
-      )}
-      {#if activity.lastWorkerIdentity}
-        {@render detail(
-          translate('workflows.last-worker-identity'),
-          activity.lastWorkerIdentity,
-        )}
-      {/if}
+          )}
+        {/if}
+        {#if activity.lastHeartbeatTime}
+          {@render detail(
+            translate('workflows.last-heartbeat'),
+            formatDate(activity.lastHeartbeatTime, $timeFormat, {
+              relative: $relativeTime,
+              relativeStrict: true,
+            }),
+          )}
+        {/if}
+        {#if activity.lastStartedTime}
+          {@render detail(
+            translate('workflows.last-started-time'),
+            formatDate(activity.lastStartedTime, $timeFormat, {
+              relative: $relativeTime,
+            }),
+          )}
+        {/if}
+        {#if activity.lastWorkerIdentity}
+          {@render detail(
+            translate('workflows.last-worker-identity'),
+            activity.lastWorkerIdentity,
+          )}
+        {/if}
+      </div>
     </div>
   </div>
   <div class="flex w-full flex-col gap-2 md:flex-1">
+    <ActivityCommands {activity} class="justify-end" />
     {#if failed}
       {@render failures()}
     {/if}

@@ -136,6 +136,24 @@ export type ActivityTaskCompletedByIdRequest =
   temporal.api.workflowservice.v1.IRespondActivityTaskCompletedRequest;
 export type ActivityTaskCompletedByIdResponse =
   temporal.api.workflowservice.v1.IRespondActivityTaskCompletedResponse;
+export type ActivityPauseRequest =
+  temporal.api.workflowservice.v1.IPauseActivityRequest;
+export type ActivityPauseResponse =
+  temporal.api.workflowservice.v1.IPauseActivityResponse;
+export type ActivityUnpauseRequest =
+  temporal.api.workflowservice.v1.IUnpauseActivityRequest;
+export type ActivityUnpauseResponse =
+  temporal.api.workflowservice.v1.IUnpauseActivityResponse;
+export type ActivityResetRequest =
+  temporal.api.workflowservice.v1.IResetActivityRequest;
+export type ActivityResetResponse =
+  temporal.api.workflowservice.v1.IResetActivityResponse;
+export type ActivityUpdateOptionsRequest =
+  temporal.api.workflowservice.v1.IUpdateActivityOptionsRequest;
+export type ActivityUpdateOptionsResponse =
+  temporal.api.workflowservice.v1.IUpdateActivityOptionsResponse;
+export type ActivityOptions = temporal.api.activity.v1.IActivityOptions;
+
 export type WorkflowPropertiesModifiedEventAttributes =
   temporal.api.history.v1.IWorkflowPropertiesModifiedEventAttributes;
 

@@ -210,7 +210,7 @@
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-subtle px-4 py-2;
+    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
   }
 
   .noBorder {

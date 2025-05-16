@@ -50,6 +50,8 @@ export const Strings = {
   'continued-as-new': 'Continued as New',
   terminated: 'Terminated',
   canceled: 'Canceled',
+  pause: 'Pause',
+  unpause: 'Unpause',
   paused: 'Paused',
   reset: 'Reset',
   signal: 'Send a Signal',

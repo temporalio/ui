@@ -202,9 +202,14 @@
     {#if pendingAttempt}
       <div
         class="flex items-center gap-1 {pendingAttempt > 1 &&
-          'surface-retry px-1 py-0.5'}"
+          !hasPendingActivity.paused &&
+          'surface-retry px-1 py-0.5'} {hasPendingActivity.paused &&
+          'bg-yellow-200 px-1 py-0.5 text-black'}"
       >
-        <Icon class="mr-1.5 inline" name="retry" />
+        <Icon
+          class="mr-1.5 inline"
+          name={hasPendingActivity.paused ? 'pause' : 'retry'}
+        />
         {translate('workflows.attempt')}
         {pendingAttempt}
         {#if hasPendingActivity}

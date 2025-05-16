@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -59,7 +60,9 @@
 
   $: {
     if (group?.pendingActivity) {
-      if (group.pendingActivity.attempt > 1) {
+      if (group.pendingActivity.paused) {
+        status = translate('workflows.paused');
+      } else if (group.pendingActivity.attempt > 1) {
         status = translate('events.event-classification.retrying');
       } else {
         status = translate('events.event-classification.pending');
@@ -150,6 +153,9 @@
           </div>
         </div>
         <div class="flex w-full flex-col gap-2 xl:w-1/2">
+          {#if group?.pendingActivity}
+            <ActivityCommands activity={group.pendingActivity} />
+          {/if}
           {#each codeBlockAttributes as [key, value] (key)}
             <div>
               <div class="font-medium leading-4 text-secondary">

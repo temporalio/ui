@@ -7,6 +7,8 @@
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
+  import ActivityCommands from '../activity/activity-commands.svelte';
+
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
   import EventLinksExpanded from './event-links-expanded.svelte';
   import EventMetadataExpanded from './event-metadata-expanded.svelte';
@@ -69,6 +71,12 @@
                 : 'Nexus Operation'}
             </div>
           </div>
+          {#if isPendingActivity(pendingEvent)}
+            <ActivityCommands
+              activity={pendingEvent}
+              class="justify-start py-2"
+            />
+          {/if}
           {#each details as [key, value] (key)}
             <EventDetailsRowExpanded {key} {value} attributes={pendingEvent} />
           {/each}
