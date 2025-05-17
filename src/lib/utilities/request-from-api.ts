@@ -4,7 +4,7 @@ import { getAuthUser } from '$lib/stores/auth-user';
 import type { NetworkError } from '$lib/types/global';
 
 import { handleError as handleRequestError } from './handle-error';
-import { isFunction } from './is-function';
+import { isFunction } from './is';
 import { toURL } from './to-url';
 
 export type TemporalAPIError = {
