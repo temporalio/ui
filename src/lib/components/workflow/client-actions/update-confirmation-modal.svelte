@@ -108,7 +108,7 @@
   on:cancelModal={hideModal}
   on:confirmModal={update}
 >
-  <h3 slot="title">{translate('workflows.update-modal-title')}</h3>
+  <h3 slot="modal-title">{translate('workflows.update-modal-title')}</h3>
   <div class="flex flex-col gap-4" slot="content">
     {#if updateDefinitions?.length > 0 && !customUpdate}
       <Select

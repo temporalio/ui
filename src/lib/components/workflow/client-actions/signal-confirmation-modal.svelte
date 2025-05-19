@@ -88,7 +88,7 @@
   on:cancelModal={hideSignalModal}
   on:confirmModal={signal}
 >
-  <h3 slot="title">{translate('workflows.signal-modal-title')}</h3>
+  <h3 slot="modal-title">{translate('workflows.signal-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     {#if signalDefinitions?.length > 0 && !customSignal}
       <Select

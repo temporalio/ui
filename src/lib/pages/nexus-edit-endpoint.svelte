@@ -89,7 +89,7 @@
   on:cancelModal={() => (deleteConfirmationModalOpen = false)}
   confirmDisabled={confirmDeleteInput !== endpoint.spec.name}
 >
-  <h3 slot="title">{translate('nexus.delete-modal-title')}</h3>
+  <h3 slot="modal-title">{translate('nexus.delete-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     <p>
       {translate('nexus.delete-modal-confirmation-preface')}

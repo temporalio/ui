@@ -83,7 +83,7 @@
   on:cancelModal={hideResetModal}
   confirmDisabled={!$eventId}
 >
-  <h3 slot="title">{translate('workflows.reset-modal-title')}</h3>
+  <h3 slot="modal-title">{translate('workflows.reset-modal-title')}</h3>
   <svelte:fragment slot="content">
     <div class="flex w-full flex-col gap-4">
       <Select
