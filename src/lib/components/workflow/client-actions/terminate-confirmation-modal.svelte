@@ -61,7 +61,7 @@
   on:cancelModal={hideModal}
   on:confirmModal={terminate}
 >
-  <h3 slot="modal-title">{translate('workflows.terminate-modal-title')}</h3>
+  <h3 slot="modalTitle">{translate('workflows.terminate-modal-title')}</h3>
   <div slot="content">
     <p>
       {translate('workflows.terminate-modal-confirmation')}

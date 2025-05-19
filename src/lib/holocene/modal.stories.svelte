@@ -100,7 +100,7 @@
     on:cancelModal={action('cancel')}
     {...args}
   >
-    <h3 slot="modal-title">Modal Title</h3>
+    <h3 slot="modalTitle">Modal Title</h3>
     <p slot="content">
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
       Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies

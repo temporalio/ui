@@ -79,7 +79,7 @@
   confirmText={translate('workflows.terminate')}
   on:confirmModal={terminateWorkflows}
 >
-  <h3 slot="modal-title">
+  <h3 slot="modalTitle">
     <Translate key="workflows.batch-terminate-modal-title" />
   </h3>
   <svelte:fragment slot="content">

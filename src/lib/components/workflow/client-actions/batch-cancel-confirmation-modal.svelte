@@ -79,7 +79,7 @@
   confirmText={translate('common.confirm')}
   on:confirmModal={cancelWorkflows}
 >
-  <h3 slot="modal-title">
+  <h3 slot="modalTitle">
     <Translate key="workflows.batch-cancel-modal-title" />
   </h3>
   <svelte:fragment slot="content">

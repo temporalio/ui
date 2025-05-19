@@ -414,7 +414,7 @@
       on:confirmModal={() => handlePause(schedule)}
       on:cancelModal={resetReason}
     >
-      <h3 slot="modal-title">
+      <h3 slot="modalTitle">
         {schedule?.schedule.state.paused
           ? translate('schedules.unpause-modal-title')
           : translate('schedules.pause-modal-title')}
@@ -454,7 +454,7 @@
       on:confirmModal={() => handleTriggerImmediately()}
       on:cancelModal={closeTriggerModal}
     >
-      <h3 slot="modal-title">
+      <h3 slot="modalTitle">
         {translate('schedules.trigger-modal-title')}
       </h3>
       <div slot="content">
@@ -485,7 +485,7 @@
       on:confirmModal={() => handleBackfill()}
       on:cancelModal={closeBackfillModal}
     >
-      <h3 slot="modal-title">
+      <h3 slot="modalTitle">
         {translate('schedules.schedule')}
         {translate('schedules.backfill')}
       </h3>
@@ -570,7 +570,7 @@
       on:confirmModal={handleDelete}
       on:cancelModal={resetReason}
     >
-      <h3 slot="modal-title">{translate('schedules.delete-modal-title')}</h3>
+      <h3 slot="modalTitle">{translate('schedules.delete-modal-title')}</h3>
       <div slot="content">
         <p>
           {translate('schedules.delete-modal-confirmation', {
