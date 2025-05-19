@@ -106,7 +106,7 @@
     />
   {/if}
   <div id="modal-title-{id}" class="title">
-    <slot name="title" />
+    <slot name="modal-title" />
   </div>
   <form on:submit|preventDefault={confirmModal} method="dialog">
     <div id="modal-content-{id}" class="content">

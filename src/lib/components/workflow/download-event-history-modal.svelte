@@ -37,7 +37,7 @@
   on:confirmModal={() => onDownloadClick()}
   on:cancelModal={() => (open = false)}
 >
-  <h3 slot="title">
+  <h3 slot="modal-title">
     {translate('common.download-event-history-json')}
   </h3>
   <div slot="content" class="flex flex-col gap-4">
