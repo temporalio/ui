@@ -51,7 +51,7 @@
   confirmType="destructive"
   on:confirmModal={cancel}
 >
-  <h3 slot="modal-title">{translate('workflows.cancel-modal-title')}</h3>
+  <h3 slot="modalTitle">{translate('workflows.cancel-modal-title')}</h3>
   <svelte:fragment slot="content">
     <p>
       {translate('workflows.cancel-modal-confirmation')}

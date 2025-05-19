@@ -83,7 +83,7 @@
   on:confirmModal={resetWorkflows}
   confirmType="destructive"
 >
-  <h3 slot="modal-title">
+  <h3 slot="modalTitle">
     <Translate key="workflows.batch-reset-modal-title" />
   </h3>
   <svelte:fragment slot="content">
