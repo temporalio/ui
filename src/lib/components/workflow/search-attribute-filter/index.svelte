@@ -1,6 +1,6 @@
 <script lang="ts">
   import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
-  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  import WorkflowTypeaheadSearch from '$lib/components/workflow/workflow-typeahead-search.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -34,7 +34,7 @@
     }}
   >
     {#if $searchInputViewOpen}
-      <WorkflowAdvancedSearch />
+      <WorkflowTypeaheadSearch />
     {/if}
   </SearchAttributeFilter>
 </div>
