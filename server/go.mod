@@ -13,7 +13,7 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 	go.temporal.io/api v1.47.0
 	golang.org/x/net v0.38.0
-	golang.org/x/oauth2 v0.22.0
+	golang.org/x/oauth2 v0.30.0
 	google.golang.org/grpc v1.66.0
 	google.golang.org/protobuf v1.36.5
 	gopkg.in/validator.v2 v2.0.0-20210331031555-b37d688a7fb0
