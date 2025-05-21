@@ -45,7 +45,7 @@
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
-  import { workflowFilters } from '$lib/stores/filters';
+  import { hideChildWorkflows, workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
@@ -155,7 +155,7 @@
     handleSelectPage,
   });
 
-  $: namespace, query, perPage, $refresh, resetSelection();
+  $: namespace, query, perPage, $refresh, $hideChildWorkflows, resetSelection();
 
   let customizationDrawerOpen = false;
 

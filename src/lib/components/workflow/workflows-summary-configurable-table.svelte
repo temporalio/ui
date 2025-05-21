@@ -12,11 +12,10 @@
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
-  import { hideChildWorkflows } from '$lib/stores/filters';
   import {
+    queryWithParentWorkflowId,
     refresh,
     workflowCount,
-    workflowsQuery,
   } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
@@ -41,7 +40,7 @@
     childrenIds = [];
   };
 
-  $: $hideChildWorkflows, $refresh, $workflowsQuery, clearChildren();
+  $: $refresh, $queryWithParentWorkflowId, clearChildren();
 
   const viewChildren = async (workflow: WorkflowExecution) => {
     if (childrenActive(workflow)) {
@@ -67,10 +66,11 @@
     );
   };
 
-  $: onFetch = () => fetchPaginatedWorkflows(namespace, $workflowsQuery);
+  $: onFetch = () =>
+    fetchPaginatedWorkflows(namespace, $queryWithParentWorkflowId);
 </script>
 
-{#key [namespace, $workflowsQuery, $refresh]}
+{#key [namespace, $queryWithParentWorkflowId, $refresh]}
   <PaginatedTable
     total={$workflowCount.count}
     {onFetch}
