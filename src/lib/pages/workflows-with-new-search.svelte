@@ -50,6 +50,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
+    queryWithParentWorkflowId,
     refresh,
     workflowCount,
     workflowsQuery,
@@ -156,7 +157,7 @@
     handleSelectPage,
   });
 
-  $: namespace, query, perPage, $refresh, resetSelection();
+  $: namespace, $queryWithParentWorkflowId, perPage, $refresh, resetSelection();
 
   let customizationDrawerOpen = false;
 
