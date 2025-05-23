@@ -78,7 +78,7 @@ import { fetchWorkflowCountByExecutionStatus } from './workflow-counts';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
-  runId: string;
+  runId?: string;
 };
 
 export type CombinedWorkflowExecutionsResponse = {
@@ -128,6 +128,7 @@ type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
   reason: string;
+  first: string | undefined;
 };
 
 export type ResetWorkflowOptions = {
@@ -277,9 +278,11 @@ export async function fetchWorkflow(
   return requestFromAPI(route, {
     request,
     notifyOnError: false,
-    params: {
-      'execution.runId': parameters.runId,
-    },
+    params: parameters.runId
+      ? {
+          'execution.runId': parameters.runId,
+        }
+      : {},
   })
     .then((response) => {
       return { workflow: toWorkflowExecution(response) };
@@ -293,6 +296,7 @@ export async function terminateWorkflow({
   workflow,
   namespace,
   reason,
+  first,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
@@ -312,12 +316,15 @@ export async function terminateWorkflow({
       body: stringifyWithBigInt({
         reason: formattedReason,
         ...(email && { identity: email }),
+        firstExecutionRunId: first,
       }),
     },
     notifyOnError: false,
-    params: {
-      'execution.runId': workflow.runId,
-    },
+    params: first
+      ? {}
+      : {
+          'execution.runId': workflow.runId,
+        },
   });
 }
 
