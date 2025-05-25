@@ -40,6 +40,7 @@ module.exports = {
   },
   rules: {
     quotes: ['error', 'single', { avoidEscape: true }],
+    'no-constant-condition': ['error', { checkLoops: false }],
     '@typescript-eslint/no-unused-vars': [
       'error',
       {

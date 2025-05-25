@@ -76,6 +76,7 @@
     "audit:holocene-props": "esno scripts/generate-holocene-props.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
     "@codemirror/autocomplete": "^6.17.0",
     "@codemirror/commands": "^6.6.0",
     "@codemirror/lang-json": "^6.0.1",
@@ -233,9 +234,9 @@
   },
   "peerDependencies": {
     "@sveltejs/kit": "^2.20.2",
-    "svelte": "^5.25.5",
     "date-fns": "2.29.x",
-    "date-fns-tz": "1.3.x"
+    "date-fns-tz": "1.3.x",
+    "svelte": "^5.25.5"
   },
   "packageManager": "pnpm@8.15.7+sha256.50783dd0fa303852de2dd1557cd4b9f07cb5b018154a6e76d0f40635d6cee019"
 }
