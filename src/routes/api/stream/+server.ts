@@ -2,13 +2,15 @@ import Anthropic from '@anthropic-ai/sdk';
 
 import type { RequestHandler } from './$types';
 
+import type { SearchAttributes } from '$lib/types/workflows';
+
 import { ANTHROPIC_API_KEY } from '$env/static/private';
 
 const anthropic = new Anthropic({
   apiKey: ANTHROPIC_API_KEY,
 });
 
-const systemPrompt = (date: Date) => `
+const systemPrompt = (date: Date, customSearchAttributes: SearchAttributes) => `
 You are a specialized assistant that generates valid Temporal Cloud visibility List Filter queries. Your ONLY output should be the query string itself - no explanations, no formatting, no additional text.
 Core Rules
 
@@ -44,9 +46,11 @@ WorkflowType - Keyword - The type of Workflow.
 
 Custom Attributes:
 
-Text type: Word - based matching with =
-Keyword type: Exact match or STARTS_WITH
-Int, Double, Bool, DateTime types supported
+${Object.entries(customSearchAttributes)
+  .map(([key, value]) => {
+    return `${key} - ${value}`;
+  })
+  .join('\n')}
 
 Operators
 
@@ -76,7 +80,7 @@ Return ONLY the query string, nothing else
 `;
 
 export const POST: RequestHandler = async ({ request }) => {
-  const { prompt } = await request.json();
+  const { prompt, customSearchAttributes } = await request.json();
 
   // Create a ReadableStream to send data chunks
   const stream = new ReadableStream({
@@ -88,7 +92,7 @@ export const POST: RequestHandler = async ({ request }) => {
         const stream = await anthropic.messages.create({
           model: 'claude-3-opus-20240229', // or 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'
           max_tokens: 1024,
-          system: systemPrompt(new Date()),
+          system: systemPrompt(new Date(), customSearchAttributes),
           messages: [
             {
               role: 'user',

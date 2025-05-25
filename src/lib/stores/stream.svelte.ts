@@ -1,3 +1,5 @@
+import { type SearchAttributes } from '$lib/types/workflows';
+
 interface StreamOptions {
   onComplete?: (data: CompletionData) => void;
   onChunk?: (data: ChunkData) => void;
@@ -47,7 +49,11 @@ export function createStreamStore(): StreamStore {
       return error;
     },
 
-    async stream(prompt: string, options: StreamOptions = {}) {
+    async stream(
+      prompt: string,
+      customSearchAttributes: SearchAttributes,
+      options: StreamOptions = {},
+    ) {
       response = '';
       isStreaming = true;
       error = null;
@@ -63,7 +69,7 @@ export function createStreamStore(): StreamStore {
         const res = await fetch('/api/stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({ prompt, customSearchAttributes }),
           signal: abortController.signal,
         });
 

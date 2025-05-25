@@ -7,7 +7,10 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { workflowFilters } from '$lib/stores/filters';
-  import { searchAttributes } from '$lib/stores/search-attributes';
+  import {
+    customSearchAttributes,
+    searchAttributes,
+  } from '$lib/stores/search-attributes';
   import { createStreamStore } from '$lib/stores/stream.svelte.js';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -34,7 +37,7 @@
     e.preventDefault();
     if (!inputValue.trim() || streamStore.isStreaming) return;
 
-    await streamStore.stream(inputValue, {
+    await streamStore.stream(inputValue, $customSearchAttributes, {
       onComplete: (data) => {
         console.log('Stream completed (inline):', data);
 
