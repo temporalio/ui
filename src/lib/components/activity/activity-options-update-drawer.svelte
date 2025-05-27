@@ -9,6 +9,7 @@
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { updateActivityOptions } from '$lib/services/workflow-activities-service';
+  import { toaster } from '$lib/stores/toaster';
   import type { ActivityOptions } from '$lib/types';
   import type { PendingActivity } from '$lib/types/events';
 
@@ -21,10 +22,10 @@
 
   const fromDurationToNumber = (duration) => {
     if (!duration || !duration.endsWith('s')) {
-      return;
+      return '';
     }
 
-    return Number(duration?.replace('s', ''));
+    return duration?.replace('s', '');
   };
 
   const fromNumberToDuration = (duration: number): string => {
@@ -92,6 +93,10 @@
         type: includeType ? type : undefined,
         activityOptions,
       });
+      toaster.push({
+        variant: 'success',
+        message: `Options for Activity ${id} have been updated.`,
+      });
     } catch (error) {
       console.error('Error updating activity options:', error);
     } finally {
@@ -101,12 +106,17 @@
 
   const resetOriginalValues = async () => {
     try {
+      // TODO: Get original values from the activity scheduled event
       await updateActivityOptions({
         namespace,
         execution,
         id: includeType ? undefined : id,
         type: includeType ? type : undefined,
         activityOptions: { ...activity.activityOptions },
+      });
+      toaster.push({
+        variant: 'success',
+        message: `Options for Activity ${id} have been reset to original values.`,
       });
     } catch (error) {
       console.error('Error reseting activity options:', error);
@@ -127,11 +137,12 @@
 >
   <DrawerContent title="Update Activity {activity.activityId}">
     <form onsubmit={onUpdate} class="flex flex-col gap-4">
-      <NumberInput
+      <Input
         id="heartbeat-timeout"
         label="Heartbeat Timeout Duration"
         bind:value={heartbeatTimeout}
         suffix="seconds"
+        class="xl:w-1/2"
       />
       <NumberInput
         id="retry-backoff-coefficient"
@@ -140,40 +151,44 @@
         step={0.01}
         min={1}
       />
-      <NumberInput
+      <Input
         id="retry-initial-interval"
         label="Retry Initial Interval Duration"
         bind:value={initialInterval}
         suffix="seconds"
+        class="xl:w-1/2"
       />
       <NumberInput
         id="maximum-attempts"
         label="Retry Maximum Attempts"
         bind:value={maximumAttempts}
       />
-      <NumberInput
+      <Input
         id="schedule-to-close-timeout"
         label="Schedule to Close Timeout Duration"
         bind:value={scheduleToCloseTimeout}
         suffix="seconds"
+        class="xl:w-1/2"
       />
-      <NumberInput
+      <Input
         id="schedule-to-start-timeout"
         label="Schedule to Start Timeout Duration"
         bind:value={scheduleToStartTimeout}
         suffix="seconds"
+        class="xl:w-1/2"
       />
-      <NumberInput
+      <Input
         id="start-to-close-timeout"
         label="Start to Close Timeout Duration"
         bind:value={startToCloseTimeout}
         suffix="seconds"
+        class="xl:w-1/2"
       />
       <Input
         id="task-queue-name"
         label="Task Queue Name"
         bind:value={taskQueue}
-        class="w-full"
+        class="xl:w-1/2"
       />
       <Checkbox
         bind:checked={includeType}
