@@ -36,7 +36,7 @@
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
-  import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
+  // import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
   import StreamQuery from '$lib/components/workflow/stream-query.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
@@ -219,7 +219,7 @@
 </header>
 
 <StreamQuery />
-<WorkflowSearchAttributeFilter />
+<!-- <WorkflowSearchAttributeFilter /> -->
 <WorkflowsSummaryConfigurableTable onClickConfigure={openCustomizationDrawer}>
   <slot name="cloud" slot="cloud" />
 </WorkflowsSummaryConfigurableTable>

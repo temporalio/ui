@@ -23,7 +23,11 @@ interface StreamStore {
   readonly response: string;
   readonly isStreaming: boolean;
   readonly error: string | null;
-  stream(prompt: string, options?: StreamOptions): Promise<void>;
+  stream(
+    prompt: string,
+    customSearchAttributes: SearchAttributes,
+    options?: StreamOptions,
+  ): Promise<void>;
   cancel(): void;
   clear(): void;
   onComplete(callback: (data: CompletionData) => void): () => void;
