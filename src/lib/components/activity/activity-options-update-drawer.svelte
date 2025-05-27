@@ -6,8 +6,10 @@
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import NumberInput from '$lib/holocene/input/number-input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { updateActivityOptions } from '$lib/services/workflow-activities-service';
+  import type { ActivityOptions } from '$lib/types';
   import type { PendingActivity } from '$lib/types/events';
 
   type Props = {
@@ -18,22 +20,20 @@
   };
 
   const fromDurationToNumber = (duration) => {
-    if (!duration?.seconds === undefined || duration.seconds === undefined) {
-      return 0;
+    if (!duration || !duration.endsWith('s')) {
+      return;
     }
-    return Number(duration.seconds);
+
+    return Number(duration?.replace('s', ''));
   };
 
-  const fromNumberToDuration = (duration: number) => {
+  const fromNumberToDuration = (duration: number): string => {
     if (!duration) return undefined;
-    return {
-      seconds: duration + 's',
-    };
+    return duration + 's';
   };
 
   let { open = $bindable(), namespace, execution, activity }: Props = $props();
   let { activityId: id, activityType: type } = $derived(activity);
-  $inspect('Activity Options: ', activity.activityOptions);
   let taskQueue = $state(activity.activityOptions?.taskQueue?.name);
   let scheduleToCloseTimeout = $state(
     fromDurationToNumber(activity?.activityOptions?.scheduleToCloseTimeout),
@@ -77,7 +77,7 @@
       backoffCoefficient,
       maximumInterval: fromNumberToDuration(maximumInterval),
     },
-  });
+  }) as unknown as ActivityOptions;
 
   const closeCustomizationDrawer = () => {
     open = false;
@@ -127,65 +127,53 @@
 >
   <DrawerContent title="Update Activity {activity.activityId}">
     <form onsubmit={onUpdate} class="flex flex-col gap-4">
-      <Input
-        type="number"
+      <NumberInput
         id="heartbeat-timeout"
         label="Heartbeat Timeout Duration"
         bind:value={heartbeatTimeout}
-        class="xl:w-1/2"
         suffix="seconds"
       />
-      <Input
-        type="number"
+      <NumberInput
         id="retry-backoff-coefficient"
         label="Retry Backoff Coefficient"
         bind:value={backoffCoefficient}
-        class="xl:w-1/2"
+        step={0.01}
+        min={1}
       />
-      <Input
-        type="number"
+      <NumberInput
         id="retry-initial-interval"
         label="Retry Initial Interval Duration"
         bind:value={initialInterval}
-        class="xl:w-1/2"
         suffix="seconds"
       />
-      <Input
-        type="number"
+      <NumberInput
         id="maximum-attempts"
         label="Retry Maximum Attempts"
         bind:value={maximumAttempts}
-        class="xl:w-1/2"
       />
-      <Input
-        type="number"
+      <NumberInput
         id="schedule-to-close-timeout"
         label="Schedule to Close Timeout Duration"
         bind:value={scheduleToCloseTimeout}
-        class="xl:w-1/2"
         suffix="seconds"
       />
-      <Input
-        type="number"
+      <NumberInput
         id="schedule-to-start-timeout"
         label="Schedule to Start Timeout Duration"
         bind:value={scheduleToStartTimeout}
-        class="xl:w-1/2"
         suffix="seconds"
       />
-      <Input
-        type="number"
+      <NumberInput
         id="start-to-close-timeout"
         label="Start to Close Timeout Duration"
         bind:value={startToCloseTimeout}
-        class="xl:w-1/2"
         suffix="seconds"
       />
       <Input
         id="task-queue-name"
         label="Task Queue Name"
         bind:value={taskQueue}
-        class="xl:w-1/2"
+        class="w-full"
       />
       <Checkbox
         bind:checked={includeType}

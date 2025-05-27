@@ -169,6 +169,8 @@ export const updateActivityOptions = async ({
     namespace,
   });
 
+  const fullMask =
+    'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts';
   return requestFromAPI(route, {
     options: {
       method: 'POST',
@@ -178,6 +180,7 @@ export const updateActivityOptions = async ({
         id,
         type,
         activityOptions,
+        updateMask: fullMask,
       }),
     },
   });

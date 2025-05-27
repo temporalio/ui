@@ -68,7 +68,7 @@
           )}
           {@render detail(
             translate('activities.pause-reason'),
-            activity.pauseInfo?.manual?.reason || '',
+            activity.pauseInfo?.manual?.reason || '-',
           )}
         {/if}
         {@render detail(
@@ -146,7 +146,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div>
-    <p class="font-mono text-xs">{label}</p>
+    <p class="font-mono text-sm">{label}</p>
     {#if typeof value === 'string' || typeof value === 'number'}
       {value}
     {:else}

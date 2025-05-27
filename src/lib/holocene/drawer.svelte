@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { setContext } from 'svelte';
+  import { onDestroy, onMount, setContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { clickoutside } from '$lib/holocene/outside-click';
@@ -16,6 +16,10 @@
   export let id = 'navigation-drawer';
   export let closeButtonLabel: string;
   export let closePadding: boolean = true;
+  export let target: 'body' | string = 'body';
+
+  let portalTarget: HTMLElement | null = null;
+  let portalElement: HTMLElement | null = null;
 
   let className = '';
   export { className as class };
@@ -28,9 +32,42 @@
   $: {
     setContext('drawer-pos', position);
   }
+
+  onMount(() => {
+    if (target !== 'body') {
+      portalTarget = document.querySelector(target);
+      if (!portalTarget) portalTarget = document.body;
+    } else {
+      portalTarget = document.body;
+    }
+
+    portalElement = document.createElement('div');
+    portalElement.className = 'drawer-portal';
+    portalTarget.appendChild(portalElement);
+  });
+
+  onDestroy(() => {
+    if (portalElement && portalTarget) {
+      portalTarget.removeChild(portalElement);
+    }
+  });
+
+  function portal(node: HTMLElement) {
+    if (portalElement) {
+      portalElement.appendChild(node);
+    }
+
+    return {
+      destroy() {
+        if (node.parentNode) {
+          node.parentNode.removeChild(node);
+        }
+      },
+    };
+  }
 </script>
 
-{#if open}
+{#if open && portalElement}
   <aside
     {id}
     class={merge(
@@ -43,6 +80,7 @@
     class:max-w-fit={position === 'right'}
     transition:fly={flyParams}
     role="region"
+    use:portal
     use:focusTrap={true}
     use:clickoutside={onClick}
   >

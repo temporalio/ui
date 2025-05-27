@@ -18,6 +18,7 @@
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
+  export let step: number = 1;
   export let search = false;
 
   let valid = true;
@@ -60,6 +61,7 @@
         {placeholder}
         {id}
         {name}
+        {step}
         autocomplete="off"
         spellcheck="false"
         bind:value

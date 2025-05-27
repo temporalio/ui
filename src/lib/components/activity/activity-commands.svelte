@@ -47,7 +47,7 @@
   };
 </script>
 
-<div class="flex items-center gap-4 {className}">
+<div class="flex items-center gap-2 {className}">
   <Tooltip
     bottomLeft
     width={200}

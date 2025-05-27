@@ -6,6 +6,7 @@
   export let classification: string | undefined = undefined;
   export let scheduling = false;
   export let pending = false;
+  export let paused = false;
   export let strokeWidth: number = 2;
   export let strokeDasharray = 'none';
 
@@ -16,7 +17,7 @@
 <line
   class="line {status} {category} {classification}"
   class:scheduling
-  class:animate-line={pending}
+  class:animate-line={pending && !paused}
   stroke-width={strokeWidth}
   stroke-dasharray={pending ? '3' : strokeDasharray}
   x1={Math.max(0, x1)}
