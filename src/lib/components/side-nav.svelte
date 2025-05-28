@@ -25,5 +25,7 @@
       />
     {/if}
   {/each}
-  <slot name="bottom" />
+  <svelte:fragment slot="bottom">
+    <slot name="bottom" />
+  </svelte:fragment>
 </Navigation>
