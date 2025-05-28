@@ -2,10 +2,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventLink } from '$lib/types/events';
-  import {
-    getEventLinkHref,
-    getEventLinkValue,
-  } from '$lib/utilities/event-link-href';
+  import { getEventLinkHref } from '$lib/utilities/event-link-href';
 
   export let link: EventLink;
   export let value = link.workflowEvent.workflowId;
@@ -14,7 +11,7 @@
 
   $: if (!href) {
     href = getEventLinkHref(link);
-    value = getEventLinkValue(link);
+    value = href.split('workflows/')?.[1] || href;
   }
 </script>
 

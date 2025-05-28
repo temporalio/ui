@@ -44,7 +44,6 @@
     titles[callback.state] || translate('nexus.nexus-callback'),
   );
   const links = $derived(callback?.callback?.links || []);
-  $inspect(links, 'links');
 </script>
 
 <Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>

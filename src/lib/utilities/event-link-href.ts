@@ -35,18 +35,3 @@ export const getEventLinkHref = (link: EventLink): string => {
     });
   }
 };
-
-export const getEventLinkValue = (link: EventLink): string => {
-  if (link.workflowEvent?.eventRef?.eventId) {
-    return `${link.workflowEvent.workflowId}/history/events/${link.workflowEvent.eventRef.eventId}`;
-  } else if (
-    link.workflowEvent?.eventRef?.eventType ===
-    'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED'
-  ) {
-    return `${link.workflowEvent.workflowId}/history/events/1`;
-  } else if (link.workflowEvent?.requestIdRef?.requestId) {
-    return `${link.workflowEvent.workflowId}/history/events/${link.workflowEvent.requestIdRef.requestId}`;
-  } else {
-    return `${link.workflowEvent.workflowId}/history`;
-  }
-};

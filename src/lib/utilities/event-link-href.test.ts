@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getEventLinkHref, getEventLinkValue } from './event-link-href';
+import { getEventLinkHref } from './event-link-href';
 
 describe('getEventLinkHref', () => {
   it('should return event history event route when eventId exists', () => {
@@ -92,91 +92,5 @@ describe('getEventLinkHref', () => {
     expect(result).toBe(
       '/namespaces/test-ns/workflows/test-wf/test-run/history/events/99',
     );
-  });
-});
-
-describe('getEventLinkValue', () => {
-  it('should return workflow path with eventId when eventId exists', () => {
-    const link = {
-      workflowEvent: {
-        workflowId: 'test-workflow',
-        eventRef: {
-          eventId: '42',
-        },
-      },
-    };
-
-    const result = getEventLinkValue(link);
-    expect(result).toBe('test-workflow/history/events/42');
-  });
-
-  it('should return workflow path with eventId 1 for workflow execution started', () => {
-    const link = {
-      workflowEvent: {
-        workflowId: 'test-workflow',
-        eventRef: {
-          eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED',
-        },
-      },
-    };
-
-    const result = getEventLinkValue(link);
-    expect(result).toBe('test-workflow/history/events/1');
-  });
-
-  it('should return workflow path with requestId when requestId exists', () => {
-    const link = {
-      workflowEvent: {
-        workflowId: 'test-workflow',
-        requestIdRef: {
-          requestId: 'req-789',
-        },
-      },
-    };
-
-    const result = getEventLinkValue(link);
-    expect(result).toBe('test-workflow/history/events/req-789');
-  });
-
-  it('should return workflow history path as fallback', () => {
-    const link = {
-      workflowEvent: {
-        workflowId: 'test-workflow',
-      },
-    };
-
-    const result = getEventLinkValue(link);
-    expect(result).toBe('test-workflow/history');
-  });
-
-  it('should prioritize eventId over other conditions', () => {
-    const link = {
-      workflowEvent: {
-        workflowId: 'test-workflow',
-        eventRef: {
-          eventId: '100',
-          eventType: 'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED',
-        },
-        requestIdRef: {
-          requestId: 'req-999',
-        },
-      },
-    };
-
-    const result = getEventLinkValue(link);
-    expect(result).toBe('test-workflow/history/events/100');
-  });
-
-  it('should handle undefined nested properties safely', () => {
-    const link = {
-      workflowEvent: {
-        workflowId: 'test-workflow',
-        eventRef: {},
-        requestIdRef: {},
-      },
-    };
-
-    const result = getEventLinkValue(link);
-    expect(result).toBe('test-workflow/history');
   });
 });

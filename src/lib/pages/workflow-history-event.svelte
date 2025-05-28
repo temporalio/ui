@@ -56,13 +56,15 @@
       ? ascendingGroups
       : [...ascendingGroups].reverse();
 
-  $: visibleItem = $fullEventHistory.find(
+  $: initialEvent = $fullEventHistory.find(
     (e) =>
-      ids.includes(e.id) ||
+      eventId === e.id ||
       (isNexusOperationScheduledEvent(e) &&
-        ids.includes(e.attributes?.requestId)),
+        eventId === e.attributes?.requestId),
   );
-  $: visibleItems = visibleItem ? [visibleItem] : [];
+  $: visibleItems = $fullEventHistory.filter(
+    (e) => ids.includes(e.id) || e.id === initialEvent?.id,
+  );
   $: loading = !visibleItems.length;
 
   const loadPrevious = () => {
@@ -115,7 +117,7 @@
         <EventSummaryRow
           {event}
           {index}
-          expanded={event.id === visibleItem?.id}
+          expanded={event.id === initialEvent?.id}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
           initialItem={$fullEventHistory[0]}
         />
