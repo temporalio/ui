@@ -7,7 +7,7 @@
     useDarkModePreference,
   } from '$lib/utilities/dark-mode';
 
-  let buttonText = $derived(
+  const buttonText = $derived(
     $useDarkModePreference == null
       ? translate('common.system-default')
       : $useDarkModePreference
@@ -15,7 +15,7 @@
         : translate('common.day'),
   );
 
-  let buttonIcon: IconName = $derived(
+  const buttonIcon: IconName = $derived(
     $useDarkModePreference == null
       ? 'system-window'
       : $useDarkModePreference
