@@ -102,6 +102,7 @@ import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
+import systemWindow from './svg/system-window.svelte';
 import table from './svg/table.svelte';
 import target from './svg/target.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
@@ -246,6 +247,7 @@ export const icons = {
   usage,
   'vertical-ellipsis': verticalEllipsis,
   warning,
+  'system-window': systemWindow,
   workflow,
   'xmark-filled': xmarkFilled,
 } as const;
