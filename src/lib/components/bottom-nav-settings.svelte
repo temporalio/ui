@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
 
+  import DarkModeNavigationButton from '$lib/components/dark-mode-navigation-button.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { dataEncoder } from '$lib/stores/data-encoder';
-  import { useDarkMode } from '$lib/utilities/dark-mode';
 
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
 
@@ -43,14 +43,7 @@
     />
     <DataEncoderSettings />
     <div class="border-b border-subtle"></div>
-    <NavigationButton
-      onClick={() => ($useDarkMode = !$useDarkMode)}
-      tooltip={$useDarkMode
-        ? translate('common.night')
-        : translate('common.day')}
-      label={$useDarkMode ? translate('common.night') : translate('common.day')}
-      icon={$useDarkMode ? 'moon' : 'sun'}
-    />
+    <DarkModeNavigationButton />
     <slot />
   </div>
 {/if}

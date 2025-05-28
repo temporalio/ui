@@ -1,4 +1,8 @@
 import DarkMode from './dark-mode.svelte';
 
 export default DarkMode;
-export { useDarkMode } from './dark-mode';
+export {
+  useDarkMode,
+  useDarkModePreference,
+  getNextDarkModePreference,
+} from './dark-mode';
