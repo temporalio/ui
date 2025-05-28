@@ -5,12 +5,11 @@
 
   import WorkflowCallback from './workflow-callback.svelte';
 
-  export let callbacks: Callback[];
+  let { callbacks }: { callbacks: Callback[] } = $props();
 
-  $: initialEvent = $fullEventHistory[0];
-  $: link = initialEvent?.links?.[0];
-
-  $: firstCallback = callbacks[0];
+  const initialEvent = $derived($fullEventHistory[0]);
+  const link = $derived(initialEvent?.links?.[0]);
+  const firstCallback = $derived(callbacks[0]);
 </script>
 
 <WorkflowCallback callback={firstCallback} {link}>

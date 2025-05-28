@@ -176,6 +176,7 @@ export type PendingChildrenInfo =
 export type PendingNexusInfo =
   temporal.api.workflow.v1.IPendingNexusOperationInfo;
 export type CallbackInfo = temporal.api.workflow.v1.ICallbackInfo;
+export type Callback = temporal.api.common.v1.ICallback;
 export type WorkflowExecutionConfig =
   temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =
