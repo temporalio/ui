@@ -1,4 +1,11 @@
-import type { CallbackInfo, Endpoint, EndpointSpec } from '$lib/types';
+import type {
+  CallbackInfo,
+  Endpoint,
+  EndpointSpec,
+  Callback as ICallback,
+} from '$lib/types';
+
+import type { EventLink } from './events';
 
 export interface NexusEndpointSpec extends EndpointSpec {
   descriptionString?: string;
@@ -9,6 +16,11 @@ export interface NexusEndpoint extends Endpoint {
   state?: string;
   spec?: NexusEndpointSpec;
 }
+
 export interface Callback extends CallbackInfo {
   blockedReason?: string;
+  callback?: CallbackWithLinks;
+}
+interface CallbackWithLinks extends ICallback {
+  links?: EventLink[];
 }
