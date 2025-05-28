@@ -1,10 +1,10 @@
 <script lang="ts">
+  import type { IconName } from '$lib/holocene/icon';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     getNextDarkModePreference,
-    useDarkMode,
     useDarkModePreference,
   } from '$lib/utilities/dark-mode';
 
@@ -16,6 +16,14 @@
         : translate('common.day'),
   );
 
+  let buttonIcon: IconName = $derived(
+    $useDarkModePreference == null
+      ? 'system-window'
+      : $useDarkModePreference
+        ? 'moon'
+        : 'sun',
+  );
+
   function cycleDarkModePreference() {
     $useDarkModePreference = getNextDarkModePreference($useDarkModePreference);
   }
@@ -25,7 +33,7 @@
   <IconButton
     variant="ghost"
     label={buttonText}
-    icon={$useDarkMode ? 'moon' : 'sun'}
+    icon={buttonIcon}
     on:click={cycleDarkModePreference}
   />
 </Tooltip>
