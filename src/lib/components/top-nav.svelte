@@ -1,4 +1,5 @@
 <script lang="ts">
+  import DarkModeIconButton from '$lib/components/dark-mode-icon-button.svelte';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -18,6 +19,7 @@
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
     <DataEncoderStatus />
+    <DarkModeIconButton />
     <slot />
   </div>
 </nav>
