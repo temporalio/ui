@@ -172,6 +172,7 @@ export const Strings = {
   'execution-details': 'Execution Details',
   day: 'Day',
   night: 'Night',
+  'system-default': 'System Default',
   docs: 'Docs',
   'upload-error': 'Error uploading file',
   description: 'Description',
