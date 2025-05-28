@@ -19,7 +19,7 @@ export interface NexusEndpoint extends Endpoint {
 
 export interface Callback extends CallbackInfo {
   blockedReason?: string;
-  callback: CallbackWithLinks;
+  callback?: CallbackWithLinks;
 }
 interface CallbackWithLinks extends ICallback {
   links?: EventLink[];
