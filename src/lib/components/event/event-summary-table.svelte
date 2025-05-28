@@ -40,13 +40,6 @@
 
   $: filteredForStatus = (items: IterableEventWithPending[]) =>
     getFailedOrPendingEvents(items, $eventStatusFilter);
-
-  const iterableKey = (event: IterableEventWithPending) => {
-    if (isEventGroup(event)) return event.id;
-    if (isPendingActivity(event)) return event.id;
-    if (isPendingNexusOperation(event)) return event.scheduledEventId;
-    return event.id;
-  };
 </script>
 
 <Paginated
@@ -64,7 +57,7 @@
     <HistoryGraph {groups} history={history(visibleItems)} />
   {/if}
   <div class="w-full">
-    {#each visibleItems as event, index (iterableKey(event))}
+    {#each visibleItems as event, index}
       {#if isEventGroup(event)}
         <EventSummaryRow
           {event}
