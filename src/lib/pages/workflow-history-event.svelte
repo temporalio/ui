@@ -9,6 +9,7 @@
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { isNexusOperationScheduledEvent } from '$lib/utilities/is-event-type';
 
   $: ({
     id: eventId,
@@ -55,7 +56,13 @@
       ? ascendingGroups
       : [...ascendingGroups].reverse();
 
-  $: visibleItems = $fullEventHistory.filter((e) => ids.includes(e.id));
+  $: visibleItem = $fullEventHistory.find(
+    (e) =>
+      ids.includes(e.id) ||
+      (isNexusOperationScheduledEvent(e) &&
+        ids.includes(e.attributes?.requestId)),
+  );
+  $: visibleItems = visibleItem ? [visibleItem] : [];
   $: loading = !visibleItems.length;
 
   const loadPrevious = () => {
@@ -108,7 +115,7 @@
         <EventSummaryRow
           {event}
           {index}
-          expanded={event.id === eventId}
+          expanded={event.id === visibleItem?.id}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
           initialItem={$fullEventHistory[0]}
         />

@@ -20,7 +20,6 @@
     children,
   }: { callback: Callback; link?: Link; children?: Snippet } = $props();
 
-  $inspect(callback, 'callback');
   const completedTime = $derived(
     formatDate(callback.lastAttemptCompleteTime, $timeFormat),
   );
@@ -51,7 +50,7 @@
 <Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>
   <div class="flex flex-col gap-2 pt-2">
     {#if links.length}
-      {#each links as link (link.workflowEvent.eventRef?.eventId)}
+      {#each links as link (link.workflowEvent?.eventRef?.eventId || link.workflowEvent?.requestIdRef.requestId)}
         <EventLink {link} />
         <EventLink
           {link}

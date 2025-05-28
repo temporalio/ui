@@ -9,7 +9,7 @@ export type EventHistory = Replace<
 
 export type EventLink = {
   workflowEvent: {
-    eventRef: {
+    eventRef?: {
       eventType: string;
       eventId?: string;
     };
