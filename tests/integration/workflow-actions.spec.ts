@@ -3,14 +3,17 @@ import { expect, test } from '@playwright/test';
 import { ResetReapplyExcludeType, ResetReapplyType } from '$src/lib/types';
 import {
   mockClusterApi,
+  mockEventHistoryApi,
   mockSettingsApi,
   mockWorkflowApis,
 } from '~/test-utilities/mock-apis';
+import { mockContinuedAsNewEventHistory } from '~/test-utilities/mocks/event-history';
 import {
   mockCompletedWorkflow,
   mockWorkflow,
   mockWorkflowResetApi,
   WORKFLOW_RESET_API,
+  WORKFLOW_TERMINATE_API,
 } from '~/test-utilities/mocks/workflow';
 
 test.describe('Workflow Actions for a Completed Workflow', () => {
@@ -36,7 +39,13 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await mockSettingsApi(page, { DisableWriteActions: true });
 
       await expect(
-        page.getByTestId('workflow-reset-button').locator('visible=true'),
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
       ).toBeDisabled();
     });
 
@@ -46,7 +55,13 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await mockSettingsApi(page, { WorkflowResetDisabled: true });
 
       await expect(
-        page.getByTestId('workflow-reset-button').locator('visible=true'),
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
       ).toBeDisabled();
     });
 
@@ -55,10 +70,21 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
+      await expect(
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
+      ).toBeEnabled();
+
       await page
-        .getByTestId('workflow-reset-button')
+        .locator('#workflow-actions-primary-button')
         .locator('visible=true')
         .click();
+
       await page
         .getByTestId('workflow-reset-event-id-select-button')
         .locator('visible=true')
@@ -89,14 +115,26 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
+      await expect(
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
+      ).toBeEnabled();
+
       await page
-        .getByTestId('workflow-reset-button')
+        .locator('#workflow-actions-primary-button')
         .locator('visible=true')
         .click();
+
       await page
         .getByTestId('workflow-reset-event-id-select-button')
         .locator('visible=true')
         .click();
+
       await page
         .locator('#reset-event-id-select')
         .locator('[role="option"]')
@@ -138,14 +176,26 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
+      await expect(
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
+      ).toBeEnabled();
+
       await page
-        .getByTestId('workflow-reset-button')
+        .locator('#workflow-actions-primary-button')
         .locator('visible=true')
         .click();
+
       await page
         .getByTestId('workflow-reset-event-id-select-button')
         .locator('visible=true')
         .click();
+
       await page
         .locator('#reset-event-id-select')
         .locator('[role="option"]')
@@ -172,14 +222,26 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     test('Allows excluding Signals after the reset point', async ({ page }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
+      await expect(
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
+      ).toBeEnabled();
+
       await page
-        .getByTestId('workflow-reset-button')
+        .locator('#workflow-actions-primary-button')
         .locator('visible=true')
         .click();
+
       await page
         .getByTestId('workflow-reset-event-id-select-button')
         .locator('visible=true')
         .click();
+
       await page
         .locator('#reset-event-id-select')
         .locator('[role="option"]')
@@ -211,10 +273,21 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
     test('Allows excluding Updates after the reset point', async ({ page }) => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
+      await expect(
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
+      ).toBeEnabled();
+
       await page
-        .getByTestId('workflow-reset-button')
+        .locator('#workflow-actions-primary-button')
         .locator('visible=true')
         .click();
+
       await page
         .getByTestId('workflow-reset-event-id-select-button')
         .locator('visible=true')
@@ -245,6 +318,75 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       ]);
 
       expect(body.resetReapplyType).toBe(3);
+    });
+  });
+  test.describe('Workflow Terminate', () => {
+    test.beforeEach(async ({ page }) => {
+      await mockWorkflowApis(page, mockCompletedWorkflow);
+      await mockEventHistoryApi(page, mockContinuedAsNewEventHistory);
+      await mockClusterApi(page, { serverVersion: '1.24.0' });
+      await page.goto(workflowUrl);
+    });
+
+    test('Allows terminating latest run if next execution exists', async ({
+      page,
+    }) => {
+      const requestPromise = page.waitForRequest(WORKFLOW_TERMINATE_API);
+
+      await expect(
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(page.getByText('Latest Execution')).toBeVisible();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
+      ).toBeEnabled();
+
+      await page
+        .locator('#workflow-actions-menu-button')
+        .locator('visible=true')
+        .click();
+
+      await page
+        .getByTestId('terminate-button')
+        .locator('visible=true')
+        .click();
+
+      await page
+        .getByTestId('terminate-confirmation-modal')
+        .locator('visible=true')
+        .getByTestId('confirm-modal-button')
+        .click();
+
+      await requestPromise;
+    });
+
+    test('Does not allow terminating if no latest run exists', async ({
+      page,
+    }) => {
+      await mockEventHistoryApi(page);
+
+      await expect(
+        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      ).toBeEnabled();
+
+      await expect(page.getByText('Latest Execution')).toBeHidden();
+
+      await expect(
+        page
+          .locator('#workflow-actions-primary-button')
+          .locator('visible=true'),
+      ).toBeEnabled();
+
+      await page
+        .locator('#workflow-actions-menu-button')
+        .locator('visible=true')
+        .click();
+
+      await expect(page.getByTestId('terminate-button')).toBeHidden();
     });
   });
 });

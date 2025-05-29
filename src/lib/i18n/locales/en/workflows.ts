@@ -11,6 +11,7 @@ export const Strings = {
   'filtered-workflows-count':
     'Results {{filtered, number}} of {{total, number}} workflows',
   terminate: 'Terminate',
+  'terminate-latest': 'Terminate Latest Run',
   'batch-terminate-modal-title': 'Terminate Workflows',
   'batch-cancel-modal-title': 'Cancel Workflows',
   'batch-reset-modal-title': 'Reset Workflows',
@@ -156,6 +157,7 @@ export const Strings = {
   'first-execution': 'First Execution',
   'previous-execution': 'Previous Execution',
   'current-execution': 'Current Execution',
+  'latest-execution': 'Latest Execution',
   'next-execution': 'Next Execution',
   'child-id': 'Child Workflow ID',
   'child-run-id': 'Child Run ID',
