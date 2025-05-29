@@ -35,5 +35,6 @@
     label={buttonText}
     icon={buttonIcon}
     on:click={cycleDarkModePreference}
+    data-testid="dark-mode-icon-button"
   />
 </Tooltip>
