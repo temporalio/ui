@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -18,6 +18,18 @@
   const streamStore = createStreamStore();
   let inputValue = $state(streamStore.response || '');
   let result = $derived(streamStore.response || '');
+  const query = $derived(page.url.searchParams.get('query'));
+
+  onMount(() => {
+    if (query && !result) {
+      result = query;
+      try {
+        $workflowFilters = toListWorkflowFilters(query, $searchAttributes);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  });
 
   function onCompletion(query: string) {
     try {
@@ -89,7 +101,7 @@
       <Button
         variant="ghost"
         disabled={!result.trim()}
-        on:click={() => onCompletion('')}>Reset</Button
+        on:click={() => onCompletion('')}>Clear</Button
       >
     </div>
 
@@ -105,7 +117,7 @@
   </form>
 
   {#if result}
-    <CodeBlock content={result} />
+    <CodeBlock language="text" content={result} />
   {/if}
 </div>
 
