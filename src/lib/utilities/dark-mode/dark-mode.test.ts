@@ -25,16 +25,16 @@ describe('dark-mode utilities', () => {
   });
 
   describe('useDarkMode', () => {
-    it('should return true if prefers-color-scheme is dark and preference is null', () => {
+    it('should return true if prefers-color-scheme is dark and preference is system', () => {
       matchMediaMock.mockReturnValue({ matches: true }); // prefers dark
-      useDarkModePreference.set(null);
+      useDarkModePreference.set('system');
       const value = get(useDarkMode);
       expect(value).toBe(true);
     });
 
-    it('should return false if prefers-color-scheme is not dark and preference is null', () => {
+    it('should return false if prefers-color-scheme is not dark and preference is system', () => {
       matchMediaMock.mockReturnValue({ matches: false });
-      useDarkModePreference.set(null);
+      useDarkModePreference.set('system');
       const value = get(useDarkMode);
       expect(value).toBe(false);
     });
@@ -51,16 +51,16 @@ describe('dark-mode utilities', () => {
   });
 
   describe('getNextDarkModePreference', () => {
-    it('should return true if the current value is null', () => {
-      expect(getNextDarkModePreference(null)).toBe(true);
+    it('should return true if the current value is system', () => {
+      expect(getNextDarkModePreference('system')).toBe(true);
     });
 
     it('should return false if the current value is true', () => {
       expect(getNextDarkModePreference(true)).toBe(false);
     });
 
-    it('should return null if the current value is false', () => {
-      expect(getNextDarkModePreference(false)).toBe(null);
+    it('should return system if the current value is false', () => {
+      expect(getNextDarkModePreference(false)).toBe('system');
     });
   });
 
