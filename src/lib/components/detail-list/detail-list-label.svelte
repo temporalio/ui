@@ -8,6 +8,6 @@
   const { children }: Props = $props();
 </script>
 
-<dd class="font-mono">
+<dd class="col-[1] font-mono">
   {@render children()}
 </dd>

@@ -62,35 +62,33 @@
   };
 </script>
 
-<DetailList aria-label="workflow details">
-  <DetailListColumn>
-    <DetailListLabel>{translate('common.start')}</DetailListLabel>
-    <DetailListTextValue
-      text={formatDate(workflow?.startTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
-      tooltipText={$relativeTime
-        ? formatDate(workflow?.startTime, $timeFormat, { relative: false })
-        : formatDate(workflow?.startTime, $timeFormat, { relative: true })}
-    />
+<DetailList aria-label="workflow details" rowCount={3}>
+  <DetailListLabel>{translate('common.start')}</DetailListLabel>
+  <DetailListTextValue
+    text={formatDate(workflow?.startTime, $timeFormat, {
+      relative: $relativeTime,
+    })}
+    tooltipText={$relativeTime
+      ? formatDate(workflow?.startTime, $timeFormat, { relative: false })
+      : formatDate(workflow?.startTime, $timeFormat, { relative: true })}
+  />
 
-    <DetailListLabel>{translate('common.end')}</DetailListLabel>
-    <DetailListTextValue
-      text={workflow?.endTime
-        ? formatDate(workflow?.endTime, $timeFormat, {
-            relative: $relativeTime,
-          })
-        : '-'}
-      tooltipText={$relativeTime
-        ? formatDate(workflow?.endTime, $timeFormat, { relative: false })
-        : formatDate(workflow?.endTime, $timeFormat, { relative: true })}
-    />
+  <DetailListLabel>{translate('common.end')}</DetailListLabel>
+  <DetailListTextValue
+    text={workflow?.endTime
+      ? formatDate(workflow?.endTime, $timeFormat, {
+          relative: $relativeTime,
+        })
+      : '-'}
+    tooltipText={$relativeTime
+      ? formatDate(workflow?.endTime, $timeFormat, { relative: false })
+      : formatDate(workflow?.endTime, $timeFormat, { relative: true })}
+  />
 
-    <DetailListLabel>
-      {translate('common.duration')}
-    </DetailListLabel>
-    <DetailListTextValue text={elapsedTime} />
-  </DetailListColumn>
+  <DetailListLabel>
+    {translate('common.duration')}
+  </DetailListLabel>
+  <DetailListTextValue text={elapsedTime} />
 
   <DetailListColumn>
     <DetailListLabel>{translate('common.run-id')}</DetailListLabel>

@@ -3,16 +3,16 @@
 
   interface Props {
     children: Snippet;
-    maxRows?: number; // subgrid cannot create implicit rows, so make more rows than needed
     'aria-label': string;
+    rowCount: number;
   }
-  let { children, 'aria-label': ariaLabel, maxRows = 10 }: Props = $props();
+  let { children, 'aria-label': ariaLabel, rowCount }: Props = $props();
 </script>
 
 <dl
-  class="grid grid-cols-[repeat(auto-fit,_minmax(0px,_max-content)_minmax(0px,_max-content))] items-center gap-x-12"
+  class="grid auto-cols-[max-content_minmax(0,max-content)] grid-flow-col gap-x-4 gap-y-1"
+  style={`--row-count: ${rowCount}`}
   aria-label={ariaLabel}
-  style={`grid-template-rows: repeat(${maxRows}, auto);`}
 >
   {@render children()}
 </dl>

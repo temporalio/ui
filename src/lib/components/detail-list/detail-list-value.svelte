@@ -13,15 +13,13 @@
   let { children, copyable, copyableText }: Props = $props();
 </script>
 
-<dt class="flex gap-2">
+<dt class="col-[2] flex gap-2">
+  {@render children()}
   {#if copyable}
-    {@render children()}
     <CopyButton
       iconTitle={translate('common.copy-icon-title')}
       successIconTitle={translate('common.copy-success-icon-title')}
       {copyableText}
     />
-  {:else}
-    {@render children()}
   {/if}
 </dt>

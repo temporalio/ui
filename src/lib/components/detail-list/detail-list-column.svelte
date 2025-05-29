@@ -9,7 +9,7 @@
 </script>
 
 <div
-  class="grid grid-cols-subgrid grid-rows-subgrid items-center gap-3 [grid-column:auto/span_2] [grid-row:1/-1]"
+  class="contents lg:col-span-2 lg:row-[span_var(--row-count)] lg:grid lg:grid-cols-subgrid lg:grid-rows-subgrid [&:not(:first-child)]:ml-8"
 >
   {@render children()}
 </div>
