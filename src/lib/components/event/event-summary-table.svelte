@@ -42,8 +42,10 @@
     getFailedOrPendingEvents(items, $eventStatusFilter);
 
   const iterableKey = (event: IterableEventWithPending) => {
-    if (isPendingNexusOperation(event)) return event.scheduledEventId;
-    return event.id;
+    if (isPendingNexusOperation(event))
+      return `pending-nexus-${event.scheduledEventId}`;
+    if (isPendingActivity(event)) return `pending-activity-${event.id}`;
+    return `event-${event.id}`;
   };
 </script>
 
