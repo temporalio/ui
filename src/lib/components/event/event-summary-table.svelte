@@ -59,6 +59,13 @@
     { label: 'Details', pinned: true },
     { label: 'Actions', pinned: true },
   ];
+
+  const iterableKey = (event: IterableEventWithPending) => {
+    if (isPendingNexusOperation(event))
+      return `pending-nexus-${event.scheduledEventId}`;
+    if (isPendingActivity(event)) return `pending-activity-${event.id}`;
+    return `event-${event.id}`;
+  };
 </script>
 
 <div class="flex">
@@ -86,7 +93,7 @@
           <TableHeaderCell {column} />
         {/each}
       </TableHeaderRow>
-      {#each visibleItems as event, index}
+      {#each visibleItems as event, index (iterableKey(event))}
         {#if isEventGroup(event)}
           <EventSummaryRow
             {event}

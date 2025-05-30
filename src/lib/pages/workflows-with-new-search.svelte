@@ -49,8 +49,8 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
+    queryWithParentWorkflowId,
     refresh,
-    updating,
     workflowCount,
     workflowsQuery,
     workflowsSearchParams,
@@ -62,6 +62,7 @@
   $: query = $page.url.searchParams.get('query');
   $: query, ($workflowsQuery = query);
   $: namespace = $page.params.namespace;
+  $: perPage = $page.url.searchParams.get('per-page');
 
   // For returning to page from 'Back to Workflows' with previous search
   $: searchParams = $page.url.searchParams.toString();
@@ -155,11 +156,7 @@
     handleSelectPage,
   });
 
-  $: {
-    if ($updating) {
-      resetSelection();
-    }
-  }
+  $: namespace, $queryWithParentWorkflowId, perPage, $refresh, resetSelection();
 
   let customizationDrawerOpen = false;
 

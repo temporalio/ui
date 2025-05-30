@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import { translate } from '$lib/i18n/translate';
+  import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
@@ -19,6 +20,8 @@
   import WorkflowDetail from './workflow-detail.svelte';
 
   export let workflow: WorkflowExecution;
+  export let next: string | undefined = undefined;
+  let latestRunId: string | undefined = undefined;
 
   $: ({ namespace } = $page.params);
 
@@ -40,6 +43,20 @@
   $: totalActions = $fullEventHistory
     .reduce((acc, e) => e.billableActions + acc, 0)
     .toString();
+
+  $: {
+    if (next && !latestRunId) {
+      fetchLatestRun();
+    }
+  }
+
+  const fetchLatestRun = async () => {
+    const result = await fetchWorkflow({
+      namespace,
+      workflowId: workflow.id,
+    });
+    latestRunId = result?.workflow?.runId;
+  };
 </script>
 
 <div
@@ -151,6 +168,17 @@
           namespace,
           workflow: workflow?.parent?.workflowId,
           run: workflow?.parent?.runId,
+        })}
+      />
+    {/if}
+    {#if latestRunId}
+      <WorkflowDetail
+        title={translate('workflows.latest-execution')}
+        content={latestRunId}
+        href={routeForWorkflow({
+          namespace,
+          workflow: workflow?.id,
+          run: latestRunId,
         })}
       />
     {/if}

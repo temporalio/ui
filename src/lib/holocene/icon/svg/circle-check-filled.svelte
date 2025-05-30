@@ -1,8 +1,9 @@
 <script lang="ts">
   import Svg from '../svg.svelte';
+  let props = $props();
 </script>
 
-<Svg {...$$props}>
+<Svg {...props}>
   <g clip-path="url(#clip0_2145_49)">
     <path
       fill-rule="evenodd"

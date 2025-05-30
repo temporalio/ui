@@ -9,13 +9,21 @@ export type EventHistory = Replace<
 
 export type EventLink = {
   workflowEvent: {
-    eventRef: {
+    eventRef?: {
       eventType: string;
       eventId?: string;
+    };
+    requestIdRef?: {
+      requestId: string;
+      eventType: string;
     };
     namespace: string;
     workflowId: string;
     runId: string;
+  };
+
+  batchJob?: {
+    jobId: string;
   };
 };
 

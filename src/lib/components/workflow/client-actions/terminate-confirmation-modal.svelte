@@ -13,6 +13,7 @@
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let refresh: Writable<number>;
+  export let first: string | undefined = undefined;
 
   let reason: string = '';
   let error: string = '';
@@ -31,6 +32,7 @@
         workflow,
         namespace,
         reason,
+        first,
       });
       open = false;
       reason = '';

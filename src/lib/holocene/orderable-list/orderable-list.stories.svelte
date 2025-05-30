@@ -5,8 +5,8 @@
   import OrderableList from './orderable-list.svelte';
 
   const items = [
-    { label: 'Item A', pinned: true },
-    { label: 'Item B', pinned: true },
+    { label: 'Item A' },
+    { label: 'Item B' },
     { label: 'Item C' },
     { label: 'Item D' },
     { label: 'Item E' },
@@ -51,7 +51,6 @@
         addButtonLabel="Add"
         static={false}
         label={item.label}
-        pinned={item.pinned}
         moveUpButtonLabel="Move Up"
         moveDownButtonLabel="Move Down"
         removeButtonLabel="Remove"

@@ -67,7 +67,10 @@
   on:scroll={handleScroll}
 >
   <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
-    <div class="sticky top-[120px]" class:invisible={!!$activeGroups.length}>
+    <div
+      class="pointer-events-none sticky top-[120px]"
+      class:invisible={!!$activeGroups.length}
+    >
       <div class="flex w-full justify-between text-xs">
         <p class="w-60 -translate-x-24 rotate-90">
           {formatDate(startTime, $timeFormat)}
@@ -119,7 +122,7 @@
             />
           {/key}
         {/if}
-        {#if $activeGroups.includes(group.id)}
+        {#if !readOnly && $activeGroups.includes(group.id)}
           <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
         {/if}
       {/each}

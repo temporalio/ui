@@ -1,24 +1,30 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
+  import { formatDate } from '$lib/utilities/format-date';
 
-  const { namespace } = $page.params;
-  $: ({ workflow, workers } = $workflowRun);
+  let { workflow, workers } = $derived($workflowRun);
+  const namespace = $derived(page.params.namespace);
+  let stackTrace: Eventual<ParsedQuery> = $state();
 
-  let currentdate = new Date();
-  let isLoading = false;
+  let refreshDate = $derived(
+    formatDate($refresh ? new Date($refresh) : new Date(), $timeFormat, {
+      relative: $relativeTime,
+      abbrFormat: true,
+    }),
+  );
 
   const getStackTrace = () =>
     getWorkflowStackTrace(
@@ -26,37 +32,24 @@
         workflow,
         namespace,
       },
-      $page.data?.settings,
+      page.data?.settings,
       $authUser?.accessToken,
     );
 
-  let stackTrace: Eventual<ParsedQuery>;
-  $: {
-    if (workflow?.isRunning) stackTrace = getStackTrace();
-  }
-
-  const refreshStackTrace = () => {
-    stackTrace = getWorkflowStackTrace(
-      {
-        workflow,
-        namespace,
-      },
-      $page.data?.settings,
-      $authUser?.accessToken,
-    );
-
-    stackTrace.then(() => {
-      currentdate = new Date();
-    });
-  };
+  $effect(() => {
+    if (workflow?.isRunning) {
+      stackTrace = getStackTrace();
+    }
+  });
 </script>
 
 <section>
   {#if workflow?.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}
-      <div class="text-center">
-        <Loading />
-        <p>{translate('workflows.no-workers-failure-message')}</p>
+      <div class="flex flex-col gap-2">
+        <Skeleton class="h-16 w-1/3 rounded-sm" />
+        <Skeleton class="h-3 w-32" />
+        <Skeleton class="h-48 w-full rounded-sm" />
       </div>
     {:then result}
       <Alert
@@ -65,19 +58,10 @@
         title={translate('workflows.call-stack-alert')}
         class="mb-4 w-fit"
       />
-      <div class="flex items-center gap-4">
-        <Button
-          on:click={refreshStackTrace}
-          leadingIcon="retry"
-          loading={isLoading}
-        >
-          {translate('common.refresh')}
-        </Button>
-        <p>
-          {translate('workflows.call-stack-at')}
-          {currentdate.toLocaleTimeString()}
-        </p>
-      </div>
+      <p>
+        {translate('workflows.call-stack-at')}
+        {refreshDate}
+      </p>
       <div class="my-2 flex h-full items-start">
         <CodeBlock
           content={result}

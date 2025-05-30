@@ -161,7 +161,7 @@
         </div>
       </div>
       {#if childWorkflowStartedEvent}
-        <div class="surface-primary px-4">
+        <div class="surface-primary p-4">
           <div class="font-medium leading-4 text-secondary">Child Workflow</div>
           {#key group.eventList.length}
             <GraphWidget
@@ -170,8 +170,8 @@
                 .workflowId}
               runId={childWorkflowStartedEvent.attributes.workflowExecution
                 .runId}
-              viewportHeight={200}
-              class="surface-primary overflow-x-hidden border border-subtle"
+              viewportHeight={320}
+              class="surface-primary overflow-x-hidden border border-b-0 border-subtle"
               onLoad={onDecode}
             />
           {/key}

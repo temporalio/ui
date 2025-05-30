@@ -21,6 +21,7 @@
   import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { Payloads } from '$lib/types';
+  import type { WorkflowInteractionDefinition } from '$lib/types/workflows';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -41,15 +42,30 @@
   $: edited = initialQueryType !== queryType || input !== initialInput;
 
   $: metadataError = $workflowRun.metadata?.error?.message;
-  $: queryTypes =
+  $: queryTypes = sortByName(
     $workflowRun?.metadata?.definition?.queryDefinitions?.filter((query) => {
       return query?.name !== '__stack_trace';
-    }) || [];
+    }) || [],
+  );
 
   $: queryType = queryType || queryTypes?.[0]?.name;
 
   let queryResult: Promise<ParsedQuery>;
   let encodePayloadResult: Promise<Payloads>;
+
+  const sortByName = (
+    list: WorkflowInteractionDefinition[],
+  ): WorkflowInteractionDefinition[] => {
+    return [...list].sort((a, b) => {
+      const aStartsWithDunder = a.name.startsWith('__');
+      const bStartsWithDunder = b.name.startsWith('__');
+
+      if (aStartsWithDunder && !bStartsWithDunder) return 1;
+      if (!aStartsWithDunder && bStartsWithDunder) return -1;
+
+      return a.name.localeCompare(b.name);
+    });
+  };
 
   onMount(() => {
     if (!$workflowRun.metadata) {
