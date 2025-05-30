@@ -7,6 +7,7 @@
   import { isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import { currentPageKey, perPageKey } from '$lib/stores/pagination';
@@ -53,12 +54,15 @@
     getFailedOrPendingEvents(items, $eventStatusFilter);
 
   const columns = [
-    { label: 'Event ID', pinned: true },
-    { label: 'Timestamp', pinned: true },
-    { label: 'Event Type', pinned: true },
-    { label: 'Details', pinned: true },
-    { label: 'Actions', pinned: true },
+    { label: 'Event ID' },
+    { label: 'Timestamp' },
+    { label: 'Event Type' },
+    { label: 'Details' },
   ];
+
+  $: if ($isCloud && columns.length === 4) {
+    columns.push({ label: 'Actions' });
+  }
 
   const iterableKey = (event: IterableEventWithPending) => {
     if (isPendingNexusOperation(event))

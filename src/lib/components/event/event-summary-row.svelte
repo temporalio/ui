@@ -14,6 +14,7 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { IterableEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -260,19 +261,23 @@
       {/if}
     </div>
   </td>
-  <td>
-    <div class="flex justify-center gap-0.5 font-mono">
-      {#if event.billableActions}
-        <Badge type="success">
-          💰{event.billableActions}
-        </Badge>
-      {/if}
-    </div>
-  </td>
+  {#if $isCloud}
+    <td>
+      <div class="flex justify-center gap-0.5 font-mono">
+        {#if event.billableActions}
+          <Tooltip text="Estimated Billable Actions" topRight>
+            <Badge type="subtle">
+              <Icon name="rocket-ship" class="mx-1" />{event.billableActions}
+            </Badge>
+          </Tooltip>
+        {/if}
+      </div>
+    </td>
+  {/if}
 </tr>
 {#if expanded}
   <tr class:typedError class="w-full px-2 text-sm no-underline">
-    <td colspan="5">
+    <td colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>

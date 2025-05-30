@@ -68,11 +68,6 @@
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
   >
     <WorkflowDetail
-      content={`💰${totalActions}`}
-      title="Billable Actions"
-      badge="success"
-    />
-    <WorkflowDetail
       title={translate('common.start')}
       tooltip={$relativeTime
         ? formatDate(workflow?.startTime, $timeFormat, {
@@ -190,6 +185,13 @@
       <WorkflowDetail
         title={translate('workflows.state-transitions')}
         content={workflow?.stateTransitionCount}
+      />
+    {:else}
+      <WorkflowDetail
+        content={totalActions}
+        title="Billable Actions (estimate)"
+        icon="rocket-ship"
+        badge="subtle"
       />
     {/if}
   </div>

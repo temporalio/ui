@@ -23,9 +23,6 @@
   {#if title}
     <span class="font-mono">{title}</span>
   {/if}
-  {#if icon}
-    <Icon name={icon} />
-  {/if}
   {#if copyable}
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
@@ -59,11 +56,18 @@
         <Badge
           type={badge}
           class="w-fit select-all truncate rounded-sm leading-4"
-          >{content}</Badge
         >
+          {#if icon}
+            <Icon name={icon} class="mx-1" />
+          {/if}
+          {content}
+        </Badge>
       {:else}
-        <span class="w-fit select-all truncate rounded-sm leading-4"
-          >{content}</span
+        <span class="w-fit select-all truncate rounded-sm leading-4">
+          {#if icon}
+            <Icon name={icon} class="mx-1" />
+          {/if}
+          {content}</span
         >
       {/if}
     </Tooltip>
