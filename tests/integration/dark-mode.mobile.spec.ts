@@ -1,15 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  mockWorkflowsApis,
-  waitForWorkflowsApis,
-} from '~/test-utilities/mock-apis';
+import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
 
 test.describe('Dark Mode Toggle', () => {
   test.beforeEach(async ({ page }) => {
     await mockWorkflowsApis(page);
-    await page.goto('/namespaces/default/workflows');
-    await waitForWorkflowsApis(page, false);
+    await page.goto('/');
   });
 
   test('user can toggle dark mode between on, off, and system default', async ({
@@ -19,9 +15,11 @@ test.describe('Dark Mode Toggle', () => {
     const systemDefaultLabel = 'System Default';
     const dayLabel = 'Day';
 
+    // on mobile, the dark mode button is in the profile menu
+    await page.getByTestId('nav-profile-button').click();
+
     // starts on day mode
-    // const button = page.getByRole('button', { name: dayLabel });
-    const button = page.getByTestId('dark-mode-icon-button');
+    const button = page.getByTestId('dark-mode-navigation-button');
 
     await expect(button).toBeVisible();
 
@@ -31,21 +29,21 @@ test.describe('Dark Mode Toggle', () => {
 
     // after day is system mode
     await button.click();
-    await expect(button).toHaveAttribute('aria-label', systemDefaultLabel);
+    await expect(button).toHaveAccessibleName(systemDefaultLabel);
     expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
       JSON.stringify('system'),
     );
 
     // after system is dark mode
     await button.click();
-    await expect(button).toHaveAttribute('aria-label', nightLabel);
+    await expect(button).toHaveAccessibleName(nightLabel);
     expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
       JSON.stringify(true),
     );
 
     // cycle back to day
     await button.click();
-    await expect(button).toHaveAttribute('aria-label', dayLabel);
+    await expect(button).toHaveAccessibleName(dayLabel);
     expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
       JSON.stringify(false),
     );
