@@ -33,4 +33,5 @@
   tooltip={buttonText}
   label={buttonText}
   icon={buttonIcon}
+  data-testid="dark-mode-navigation-button"
 />
