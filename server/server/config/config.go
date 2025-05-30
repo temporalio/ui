@@ -113,7 +113,8 @@ type (
 		// CallbackURL - URL for the callback URL, ex. https://localhost:8080/sso/callback
 		CallbackURL string `yaml:"callbackUrl"`
 		// Options added as URL query params when redirecting to auth provider. Can be used to configure custom auth flows such as Auth0 invitation flow.
-		Options map[string]interface{} `yaml:"options"`
+		Options          map[string]interface{} `yaml:"options"`
+		AdditionalClaims map[string]string      `yaml:"additionalClaims"`
 	}
 
 	Codec struct {
