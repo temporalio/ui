@@ -14,7 +14,9 @@ test.describe('Dark Mode Dropdown', () => {
   test('user can select System Default option via dropdown menu', async ({
     page,
   }) => {
-    const menuButton = page.getByTestId('dark-mode-menu-button');
+    const menuButton = page
+      .getByTestId('dark-mode-menu-button')
+      .locator('visible=true');
     await expect(menuButton).toBeVisible();
 
     await menuButton.click();
@@ -24,7 +26,9 @@ test.describe('Dark Mode Dropdown', () => {
   });
 
   test('user can select Night option via dropdown menu', async ({ page }) => {
-    const menuButton = page.getByTestId('dark-mode-menu-button');
+    const menuButton = page
+      .getByTestId('dark-mode-menu-button')
+      .locator('visible=true');
     await expect(menuButton).toBeVisible();
 
     await menuButton.click();
@@ -34,7 +38,9 @@ test.describe('Dark Mode Dropdown', () => {
   });
 
   test('user can select Day option via dropdown menu', async ({ page }) => {
-    const menuButton = page.getByTestId('dark-mode-menu-button');
+    const menuButton = page
+      .getByTestId('dark-mode-menu-button')
+      .locator('visible=true');
     await expect(menuButton).toBeVisible();
 
     await menuButton.click();
