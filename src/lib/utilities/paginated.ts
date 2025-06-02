@@ -6,7 +6,7 @@ import type {
 } from '$lib/types/global';
 
 import { handleError } from './handle-error';
-import { isFunction } from './is-function';
+import { isFunction } from './is';
 import { merge } from './merge';
 
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
