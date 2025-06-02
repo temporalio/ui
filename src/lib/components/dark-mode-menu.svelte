@@ -14,13 +14,13 @@
   interface Props {
     position: 'left' | 'right';
     hideLabel?: boolean;
-    size: ButtonStyles['size'];
+    size?: ButtonStyles['size'];
   }
 
   const {
     position = 'right',
     hideLabel = false,
-    size = 'md',
+    size = undefined,
   }: Props = $props();
 
   const menuButtonText = $derived(
