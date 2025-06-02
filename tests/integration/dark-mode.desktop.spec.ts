@@ -1,48 +1,45 @@
 import { expect, test } from '@playwright/test';
 
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
+import '../test-utilities/custom-matchers';
 
-test.describe('Dark Mode Toggle', () => {
+test.describe('Dark Mode Dropdown', () => {
+  const localStorageKey = 'dark mode';
+
   test.beforeEach(async ({ page }) => {
     await mockWorkflowsApis(page);
     await page.goto('/');
   });
 
-  test('user can toggle dark mode between on, off, and system default', async ({
+  test('user can select System Default option via dropdown menu', async ({
     page,
   }) => {
-    const nightLabel = 'Night';
-    const systemDefaultLabel = 'System Default';
-    const dayLabel = 'Day';
+    const menuButton = page.getByTestId('dark-mode-menu-button');
+    await expect(menuButton).toBeVisible();
 
-    // starts on day mode
-    const button = page.getByTestId('dark-mode-icon-button');
+    await menuButton.click();
+    await page.getByRole('menuitem', { name: 'System Default' }).click();
+    await expect(menuButton).toHaveAccessibleName('System Default');
+    await expect(page).toHaveLocalStorageItem(localStorageKey, 'system');
+  });
 
-    await expect(button).toBeVisible();
+  test('user can select Night option via dropdown menu', async ({ page }) => {
+    const menuButton = page.getByTestId('dark-mode-menu-button');
+    await expect(menuButton).toBeVisible();
 
-    expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
-      null, // nothing in local storage yet
-    );
+    await menuButton.click();
+    await page.getByRole('menuitem', { name: 'Night' }).click();
+    await expect(menuButton).toHaveAccessibleName('Night');
+    await expect(page).toHaveLocalStorageItem(localStorageKey, true);
+  });
 
-    // after day is system mode
-    await button.click();
-    await expect(button).toHaveAccessibleName(systemDefaultLabel);
-    expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
-      JSON.stringify('system'),
-    );
+  test('user can select Day option via dropdown menu', async ({ page }) => {
+    const menuButton = page.getByTestId('dark-mode-menu-button');
+    await expect(menuButton).toBeVisible();
 
-    // after system is dark mode
-    await button.click();
-    await expect(button).toHaveAccessibleName(nightLabel);
-    expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
-      JSON.stringify(true),
-    );
-
-    // cycle back to day
-    await button.click();
-    await expect(button).toHaveAccessibleName(dayLabel);
-    expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
-      JSON.stringify(false),
-    );
+    await menuButton.click();
+    await page.getByRole('menuitem', { name: 'Day' }).click();
+    await expect(menuButton).toHaveAccessibleName('Day');
+    await expect(page).toHaveLocalStorageItem(localStorageKey, false);
   });
 });
