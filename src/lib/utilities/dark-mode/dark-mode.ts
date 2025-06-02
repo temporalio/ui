@@ -2,7 +2,7 @@ import { derived } from 'svelte/store';
 
 import { persistStore } from '$lib/stores/persist-store';
 
-type DarkModePreference = boolean | 'system';
+export type DarkModePreference = boolean | 'system';
 
 export const useDarkModePreference = persistStore<DarkModePreference>(
   'dark mode',
