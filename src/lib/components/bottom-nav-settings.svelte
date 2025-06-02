@@ -25,7 +25,7 @@
 
 {#if open}
   <div class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8">
-    <TimezoneSelect position="left" />
+    <TimezoneSelect position="left" size="sm" />
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}
@@ -43,7 +43,7 @@
     />
     <DataEncoderSettings />
     <div class="border-b border-subtle"></div>
-    <DarkModeMenu position="left" />
+    <DarkModeMenu position="left" size="sm" />
     <slot />
   </div>
 {/if}
