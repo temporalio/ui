@@ -47,7 +47,7 @@
   >
     <Icon slot="leading" name={menuButtonIcon} aria-hidden />
   </MenuButton>
-  <Menu id="dark-mode-menu" {position}>
+  <Menu id="dark-mode-menu" {position} class="w-max">
     <MenuItem
       on:click={() => setDarkModePreference(true)}
       selected={$useDarkModePreference === true}
