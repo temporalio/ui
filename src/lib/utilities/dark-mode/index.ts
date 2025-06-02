@@ -6,3 +6,5 @@ export {
   useDarkModePreference,
   getNextDarkModePreference,
 } from './dark-mode';
+
+export type { DarkModePreference } from './dark-mode';

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
 
-  import DarkModeNavigationButton from '$lib/components/dark-mode-navigation-button.svelte';
+  import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
@@ -25,7 +25,7 @@
 
 {#if open}
   <div class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8">
-    <TimezoneSelect position="left" />
+    <TimezoneSelect position="left" size="sm" />
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}
@@ -43,7 +43,7 @@
     />
     <DataEncoderSettings />
     <div class="border-b border-subtle"></div>
-    <DarkModeNavigationButton />
+    <DarkModeMenu position="left" size="sm" />
     <slot />
   </div>
 {/if}
