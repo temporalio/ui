@@ -19,7 +19,7 @@
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
     <DataEncoderStatus />
-    <DarkModeMenu position={screenWidth < 768 ? 'left' : 'right'} />
+    <DarkModeMenu hideLabel position={screenWidth < 768 ? 'left' : 'right'} />
     <slot />
   </div>
 </nav>

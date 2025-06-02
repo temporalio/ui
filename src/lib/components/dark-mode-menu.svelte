@@ -12,9 +12,10 @@
 
   interface Props {
     position: 'left' | 'right';
+    hideLabel?: boolean;
   }
 
-  const { position = 'right' }: Props = $props();
+  const { position = 'right', hideLabel = false }: Props = $props();
 
   const menuButtonText = $derived(
     $useDarkModePreference == 'system'
@@ -45,6 +46,7 @@
     variant="ghost"
     data-testid="dark-mode-menu-button"
   >
+    {#if !hideLabel}{menuButtonText}{/if}
     <Icon slot="leading" name={menuButtonIcon} aria-hidden />
   </MenuButton>
   <Menu id="dark-mode-menu" {position} class="w-max">
