@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import Icon, { type IconName } from '$lib/holocene/icon';
   import {
     Menu,
@@ -13,9 +14,14 @@
   interface Props {
     position: 'left' | 'right';
     hideLabel?: boolean;
+    size: ButtonStyles['size'];
   }
 
-  const { position = 'right', hideLabel = false }: Props = $props();
+  const {
+    position = 'right',
+    hideLabel = false,
+    size = 'md',
+  }: Props = $props();
 
   const menuButtonText = $derived(
     $useDarkModePreference == 'system'
@@ -45,6 +51,7 @@
     label={menuButtonText}
     variant="ghost"
     data-testid="dark-mode-menu-button"
+    {size}
   >
     {#if !hideLabel}{menuButtonText}{/if}
     <Icon slot="leading" name={menuButtonIcon} aria-hidden />
