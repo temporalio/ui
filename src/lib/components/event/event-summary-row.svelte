@@ -1,6 +1,8 @@
 <script lang="ts">
   import { fade, slide } from 'svelte/transition';
 
+  import { onMount } from 'svelte';
+
   import { page } from '$app/stores';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -10,30 +12,19 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isEventGroup } from '$lib/models/event-groups';
-  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
     eventOrGroupIsCanceled,
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
-  import { authUser } from '$lib/stores/auth-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { IterableEvent } from '$lib/types/events';
-  import {
-    cloneAllPotentialPayloadsWithCodec,
-    decodePayloadAttributes,
-  } from '$lib/utilities/decode-payload';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import {
-    getCodecEndpoint,
-    getCodecIncludeCredentials,
-    getCodecPassAccessToken,
-  } from '$lib/utilities/get-codec';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
   import {
+    decodeLocalActivity,
     getPrimaryAttributeForEvent,
     getSecondaryAttributeForEvent,
   } from '$lib/utilities/get-single-attribute-for-event';
@@ -41,7 +32,6 @@
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
   } from '$lib/utilities/is-event-type';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -49,154 +39,148 @@
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
+  const {
+    event,
+    group,
+    initialItem,
+    index,
+    compact,
+    typedError,
+    active,
+    onRowClick = () => {},
+  } = $props();
 
-  let primaryLocalAttribute: SummaryAttribute | undefined;
+  let expanded = $state(false);
+  let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
 
-  export let event: IterableEvent;
-  export let group: EventGroup | undefined = undefined;
-  export let initialItem: IterableEvent | undefined;
-  export let index = 0;
-  export let compact = false;
-  export let expanded = false;
-  export let typedError = false;
-  export let active = false;
-  export let onRowClick: () => void = () => {};
+  const selectedId = $derived(() =>
+    isEventGroup(event) ? Array.from(event.events.keys()).shift() : event.id,
+  );
 
-  $: codecSettings = {
-    ...$page.data.settings,
-    codec: {
-      ...$page.data.settings?.codec,
-      endpoint: getCodecEndpoint($page.data.settings),
-      passAccessToken: getCodecPassAccessToken($page.data.settings),
-      includeCredentials: getCodecIncludeCredentials($page.data.settings),
-    },
-  };
+  const { workflow, run, namespace } = $page.params;
 
-  $: selectedId = isEventGroup(event)
-    ? Array.from(event.events.keys()).shift()
-    : event.id;
+  const href = $derived(() =>
+    routeForEventHistoryEvent({ eventId: event.id, namespace, workflow, run }),
+  );
 
-  $: ({ workflow, run, namespace } = $page.params);
-  $: href = routeForEventHistoryEvent({
-    eventId: event.id,
-    namespace,
-    workflow,
-    run,
-  });
-  $: attributes = formatAttributes(event);
+  const attributes = $derived(() => formatAttributes(event));
 
-  $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
-  $: elapsedTime = formatDistanceAbbreviated({
-    start: initialItem?.eventTime,
-    end: isEventGroup(event)
-      ? event.initialEvent?.eventTime
-      : currentEvent.eventTime,
-    includeMillisecondsForUnderSecond: true,
-  });
+  const currentEvent = $derived(() =>
+    isEventGroup(event) ? event.events.get(selectedId()) : event,
+  );
 
-  $: duration = isEventGroup(event)
-    ? formatDistanceAbbreviated({
-        start: event.initialEvent?.eventTime,
-        end: event.lastEvent?.eventTime,
-        includeMillisecondsForUnderSecond: true,
-      })
-    : '';
+  const elapsedTime = $derived(() =>
+    formatDistanceAbbreviated({
+      start: initialItem?.eventTime,
+      end: isEventGroup(event)
+        ? event.initialEvent?.eventTime
+        : currentEvent()?.eventTime,
+      includeMillisecondsForUnderSecond: true,
+    }),
+  );
+
+  const duration = $derived(() =>
+    isEventGroup(event)
+      ? formatDistanceAbbreviated({
+          start: event.initialEvent?.eventTime,
+          end: event.lastEvent?.eventTime,
+          includeMillisecondsForUnderSecond: true,
+        })
+      : '',
+  );
+
+  const failure = $derived(() => eventOrGroupIsFailureOrTimedOut(event));
+  const canceled = $derived(() => eventOrGroupIsCanceled(event));
+  const terminated = $derived(() => eventOrGroupIsTerminated(event));
+
+  const displayName = $derived(() =>
+    isEventGroup(event)
+      ? event.label
+      : isLocalActivityMarkerEvent(event)
+        ? 'Local Activity'
+        : spaceBetweenCapitalLetters(event.name),
+  );
+
+  const primaryAttribute = $derived(() =>
+    !isLocalActivityMarkerEvent(event)
+      ? getPrimaryAttributeForEvent(
+          isEventGroup(event) ? event.initialEvent : event,
+        )
+      : undefined,
+  );
+
+  const secondaryAttribute = $derived(() =>
+    getSecondaryAttributeForEvent(
+      isEventGroup(event) ? event.lastEvent : event,
+      primaryAttribute()?.key,
+    ),
+  );
+
+  const hasPendingActivity = $derived(
+    () => isEventGroup(event) && event?.pendingActivity,
+  );
+
+  const pendingAttempt = $derived(
+    () =>
+      isEventGroup(event) &&
+      event.isPending &&
+      (event?.pendingActivity?.attempt ||
+        event?.pendingNexusOperation?.attempt),
+  );
+
+  const nonPendingActivityAttempt = $derived(
+    () =>
+      isEventGroup(event) &&
+      !event.isPending &&
+      event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt,
+  );
+
+  const showSecondaryAttribute = $derived(
+    () =>
+      compact &&
+      secondaryAttribute()?.key &&
+      secondaryAttribute()?.key !== primaryAttribute()?.key &&
+      !currentEvent()?.userMetadata?.summary,
+  );
+
+  const eventTime = $derived(() =>
+    formatDate(currentEvent()?.eventTime, $timeFormat, {
+      relative: $relativeTime,
+    }),
+  );
+
+  const abbrEventTime = $derived(() =>
+    formatDate(currentEvent()?.eventTime, $timeFormat, {
+      relative: $relativeTime,
+      abbrFormat: true,
+    }),
+  );
 
   const onLinkClick = () => {
     expanded = !expanded;
     onRowClick();
   };
 
-  $: failure = eventOrGroupIsFailureOrTimedOut(event);
-  $: canceled = eventOrGroupIsCanceled(event);
-  $: terminated = eventOrGroupIsTerminated(event);
-
-  $: displayName = isEventGroup(event)
-    ? event.label
-    : isLocalActivityMarkerEvent(event)
-      ? 'Local Activity'
-      : spaceBetweenCapitalLetters(event.name);
-
-  $: primaryAttribute = getPrimaryAttributeForEvent(
-    isEventGroup(event) ? event.initialEvent : event,
-  );
-  $: primaryLocalAttribute = isLocalActivityMarkerEvent(event)
-    ? getPrimaryAttributeForEvent(
-        isEventGroup(event) ? event.initialEvent : event,
-      )
-    : undefined;
-  $: secondaryAttribute = getSecondaryAttributeForEvent(
-    isEventGroup(event) ? event.lastEvent : event,
-    primaryAttribute?.key,
-  );
-  $: hasPendingActivity = isEventGroup(event) && event?.pendingActivity;
-  $: pendingAttempt =
-    isEventGroup(event) &&
-    event.isPending &&
-    (event?.pendingActivity?.attempt || event?.pendingNexusOperation?.attempt);
-  $: nonPendingActivityAttempt =
-    isEventGroup(event) &&
-    !event.isPending &&
-    event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt;
-  $: showSecondaryAttribute =
-    compact &&
-    secondaryAttribute?.key &&
-    secondaryAttribute?.key !== primaryAttribute?.key &&
-    !currentEvent?.userMetadata?.summary;
-  $: eventTime = formatDate(currentEvent?.eventTime, $timeFormat, {
-    relative: $relativeTime,
+  onMount(() => {
+    if (isLocalActivityMarkerEvent(event))
+      primaryLocalAttribute = decodeLocalActivity(event);
   });
-  $: abbrEventTime = formatDate(currentEvent?.eventTime, $timeFormat, {
-    relative: $relativeTime,
-    abbrFormat: true,
-  });
-
-  $: if (isLocalActivityMarkerEvent(event)) {
-    decodeLocalActivity();
-  }
-
-  async function decodeLocalActivity() {
-    const converted = await cloneAllPotentialPayloadsWithCodec(
-      event.attributes,
-      $page.params.namespace,
-      codecSettings,
-      $authUser.accessToken,
-    );
-
-    const decoded = decodePayloadAttributes(converted) as {
-      activityType?: { name?: unknown };
-    };
-
-    if (decoded.activityType?.name) {
-      primaryLocalAttribute = {
-        key: 'Activity Type',
-        value: stringifyWithBigInt(decoded.activityType.name),
-      };
-    }
-  }
-
-  $: {
-    console.log('event', event);
-    console.log('currentEvent', currentEvent);
-    console.log('primaryLocalAttribute', primaryLocalAttribute);
-    console.log('secondaryAttribute', secondaryAttribute);
-    console.log('primaryAttribute', primaryAttribute);
-  }
+  $inspect('primaryattr', primaryLocalAttribute);
 </script>
 
 <tr
   class="dense flex select-none items-center gap-4 px-2 text-sm no-underline"
-  class:border={failure || canceled || terminated}
-  class:border-danger={failure}
-  class:border-warning={canceled}
-  class:border-pink-700={terminated}
+  class:border={failure() || canceled() || terminated()}
+  class:border-danger={failure()}
+  class:border-warning={canceled()}
+  class:border-pink-700={terminated()}
   class:typedError
   class:expanded
   class:active
   id={`${event.id}-${index}`}
   data-eventid={event.id}
   data-testid="event-summary-row"
-  on:click|stopPropagation={onLinkClick}
+  onclick={onLinkClick}
 >
   {#if isEventGroup(event)}
     <td class="w-24 min-w-fit font-mono">
@@ -218,83 +202,88 @@
     </td>
   {:else}
     <td class="font-mono">
-      <Link data-testid="link" {href}>
+      <Link data-testid="link" href={href()}>
         {event.id}
       </Link>
     </td>
   {/if}
   <td class="text-right md:hidden">
     <Tooltip
-      hide={(isEventGroup(event) && !duration) || !elapsedTime}
-      text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
+      hide={(isEventGroup(event) && !duration()) || !elapsedTime()}
+      text={isEventGroup(event)
+        ? `Duration: ${duration()}`
+        : `+${elapsedTime()}`}
       bottom
     >
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        content={abbrEventTime}
+        content={abbrEventTime()}
       >
-        {abbrEventTime}
+        {abbrEventTime()}
       </Copyable>
     </Tooltip>
   </td>
   <td class="hidden text-right md:block">
     <Tooltip
-      hide={(isEventGroup(event) && !duration) || !elapsedTime}
-      text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
+      hide={(isEventGroup(event) && !duration()) || !elapsedTime()}
+      text={isEventGroup(event)
+        ? `Duration: ${duration()}`
+        : `+${elapsedTime()}`}
       bottom
     >
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        content={eventTime}
+        content={eventTime()}
       >
-        {eventTime}
+        {eventTime()}
       </Copyable>
     </Tooltip>
   </td>
   <td class="truncate md:min-w-fit">
     <p
       class="whitespace-nowrap font-semibold md:text-base"
-      class:text-danger={failure}
-      class:text-pink-700={terminated}
-      class:text-warning={canceled}
+      class:text-danger={failure()}
+      class:text-pink-700={terminated()}
+      class:text-warning={canceled()}
     >
-      {displayName}
+      {displayName()}
     </p>
   </td>
   <td
     class="hidden w-full items-center gap-2 text-right text-sm font-normal md:flex xl:text-left"
   >
-    {#if pendingAttempt}
+    {#if pendingAttempt()}
       <div
-        class="flex items-center gap-1 {pendingAttempt > 1 &&
-          'surface-retry px-1 py-0.5'}"
+        class="flex items-center gap-1 {pendingAttempt() > 1
+          ? 'surface-retry px-1 py-0.5'
+          : ''}"
       >
         <Icon class="mr-1.5 inline" name="retry" />
         {translate('workflows.attempt')}
-        {pendingAttempt}
-        {#if hasPendingActivity}
-          / {hasPendingActivity.maximumAttempts || '∞'}
-          {#if pendingAttempt > 1}
+        {pendingAttempt()}
+        {#if hasPendingActivity()}
+          / {hasPendingActivity().maximumAttempts || '∞'}
+          {#if pendingAttempt() > 1}
             • {translate('workflows.next-retry')}
             {toTimeDifference({
-              date: hasPendingActivity.scheduledTime,
+              date: hasPendingActivity().scheduledTime,
               negativeDefault: 'None',
             })}
           {/if}
         {/if}
       </div>
     {/if}
-    {#if !primaryLocalAttribute && primaryAttribute?.key}
-      <EventDetailsRow {...primaryAttribute} {attributes} />
+    {#if !primaryLocalAttribute && primaryAttribute()?.key}
+      <EventDetailsRow {...primaryAttribute()} attributes={attributes()} />
     {/if}
     {#if primaryLocalAttribute}
-      <EventDetailsRow {...primaryLocalAttribute} {attributes} />
+      <EventDetailsRow {...primaryLocalAttribute} attributes={attributes()} />
     {/if}
-    {#if currentEvent?.userMetadata?.summary}
+    {#if currentEvent()?.userMetadata?.summary}
       <MetadataDecoder
-        value={currentEvent.userMetadata.summary}
+        value={currentEvent().userMetadata.summary}
         let:decodedValue
       >
         {#if decodedValue}
@@ -309,22 +298,22 @@
         {/if}
       </MetadataDecoder>
     {/if}
-    {#if currentEvent?.links?.length}
+    {#if currentEvent()?.links?.length}
       <EventLink
-        link={currentEvent.links[0]}
+        link={currentEvent().links[0]}
         class="max-w-xl"
         linkClass="truncate"
       />
     {/if}
-    {#if nonPendingActivityAttempt}
+    {#if nonPendingActivityAttempt()}
       <EventDetailsRow
         key="attempt"
-        value={nonPendingActivityAttempt.toString()}
-        {attributes}
+        value={nonPendingActivityAttempt().toString()}
+        attributes={attributes()}
       />
     {/if}
-    {#if showSecondaryAttribute}
-      <EventDetailsRow {...secondaryAttribute} {attributes} />
+    {#if showSecondaryAttribute()}
+      <EventDetailsRow {...secondaryAttribute()} attributes={attributes()} />
     {/if}
   </td>
 </tr>
@@ -336,7 +325,7 @@
     class="expanded flex select-none items-center gap-4 px-2 text-sm no-underline"
   >
     <td class="w-full text-sm no-underline" class:border-b-0={typedError}>
-      <EventDetailsFull {group} event={currentEvent} />
+      <EventDetailsFull {group} event={currentEvent()} />
     </td>
   </tr>
 {/if}

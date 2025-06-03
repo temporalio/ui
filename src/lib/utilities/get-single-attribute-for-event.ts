@@ -380,3 +380,29 @@ export const getSecondaryAttributeForEvent = (
 
   return emptyAttribute;
 };
+
+export const decodeLocalActivity = (
+  event: WorkflowEvent,
+): SummaryAttribute | undefined => {
+  if (!isLocalActivityMarkerEvent(event)) return;
+
+  const payloads = (event.markerRecordedEventAttributes?.details?.data
+    ?.payloads ||
+    event.markerRecordedEventAttributes?.details?.type?.payloads ||
+    []) as unknown as Payload[];
+
+  if (!payloads?.length) return;
+  const decodedPayloads = payloads.map((p) => decodePayload(p));
+  const payload = decodedPayloads?.[0];
+
+  if (isJavaSDK(event)) {
+    return formatSummaryValue('ActivityType', payload);
+  }
+
+  const activityType = getActivityType(payload);
+  if (activityType) {
+    return formatSummaryValue('ActivityType', activityType);
+  }
+
+  return;
+};
