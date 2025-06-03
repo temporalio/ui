@@ -179,8 +179,13 @@
     }
   }
 
-  console.log('event', event);
-  console.log('currentEvent', currentEvent);
+  $: {
+    console.log('event', event);
+    console.log('currentEvent', currentEvent);
+    console.log('primaryLocalAttribute', primaryLocalAttribute);
+    console.log('secondaryAttribute', secondaryAttribute);
+    console.log('primaryAttribute', primaryAttribute);
+  }
 </script>
 
 <tr
