@@ -21,6 +21,7 @@
     label?: string;
     class?: string;
     active?: boolean;
+    size?: ButtonStyles['size'];
   }
 
   let className = '';
@@ -32,6 +33,7 @@
   export let id: string = null;
   export let label: string = null;
   export let variant: ButtonStyles['variant'] = 'secondary';
+  export let size: ButtonStyles['size'] = 'md';
 
   const dispatch = createEventDispatcher<{ click: { open: boolean } }>();
   const { open, menuElement } = getContext<MenuContext>(MENU_CONTEXT);
@@ -89,6 +91,7 @@
   aria-label={label}
   {variant}
   class={merge(className)}
+  {size}
   {...$$restProps}
 >
   <slot name="leading" />

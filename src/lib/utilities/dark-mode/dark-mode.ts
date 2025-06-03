@@ -2,7 +2,7 @@ import { derived } from 'svelte/store';
 
 import { persistStore } from '$lib/stores/persist-store';
 
-type DarkModePreference = boolean | null;
+export type DarkModePreference = boolean | 'system';
 
 export const useDarkModePreference = persistStore<DarkModePreference>(
   'dark mode',
@@ -13,7 +13,7 @@ export const useDarkModePreference = persistStore<DarkModePreference>(
 export const useDarkMode = derived(
   useDarkModePreference,
   ($useDarkModePreference) => {
-    if ($useDarkModePreference == null) {
+    if ($useDarkModePreference == 'system') {
       return (
         window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false
       );
@@ -24,7 +24,7 @@ export const useDarkMode = derived(
 );
 
 export const getNextDarkModePreference = (value: DarkModePreference) =>
-  value == null ? true : value == true ? false : null;
+  value == 'system' ? true : value == true ? false : 'system';
 
 export const darkMode = (node: HTMLElement) => {
   useDarkMode.subscribe((value) => {
