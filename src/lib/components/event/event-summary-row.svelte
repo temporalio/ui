@@ -73,8 +73,8 @@
   const elapsedTime = $derived(
     formatDistanceAbbreviated({
       start: initialItem?.eventTime,
-      end: isEventGroup(event)
-        ? event.initialEvent?.eventTime
+      end: isEventGroup(currentEvent)
+        ? currentEvent.initialEvent?.eventTime
         : currentEvent()?.eventTime,
       includeMillisecondsForUnderSecond: true,
     }),
