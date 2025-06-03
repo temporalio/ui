@@ -44,13 +44,14 @@
     group,
     initialItem,
     index,
-    compact,
+    compact = false,
     typedError = false,
     active = false,
+    expanded: expandedProp = false,
     onRowClick = () => {},
   } = $props();
 
-  let expanded = $state(false);
+  let expanded = $state(expandedProp);
   let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
 
   const selectedId = $derived(() =>
