@@ -16,12 +16,23 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { authUser } from '$lib/stores/auth-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { IterableEvent } from '$lib/types/events';
+  import {
+    cloneAllPotentialPayloadsWithCodec,
+    decodePayloadAttributes,
+  } from '$lib/utilities/decode-payload';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import {
+    getCodecEndpoint,
+    getCodecIncludeCredentials,
+    getCodecPassAccessToken,
+  } from '$lib/utilities/get-codec';
+  import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
   import {
     getPrimaryAttributeForEvent,
     getSecondaryAttributeForEvent,
@@ -30,6 +41,7 @@
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
   } from '$lib/utilities/is-event-type';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -37,6 +49,8 @@
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
+
+  let primaryLocalAttribute: SummaryAttribute | undefined;
 
   export let event: IterableEvent;
   export let group: EventGroup | undefined = undefined;
@@ -47,6 +61,16 @@
   export let typedError = false;
   export let active = false;
   export let onRowClick: () => void = () => {};
+
+  $: codecSettings = {
+    ...$page.data.settings,
+    codec: {
+      ...$page.data.settings?.codec,
+      endpoint: getCodecEndpoint($page.data.settings),
+      passAccessToken: getCodecPassAccessToken($page.data.settings),
+      includeCredentials: getCodecIncludeCredentials($page.data.settings),
+    },
+  };
 
   $: selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).shift()
@@ -96,6 +120,11 @@
   $: primaryAttribute = getPrimaryAttributeForEvent(
     isEventGroup(event) ? event.initialEvent : event,
   );
+  $: primaryLocalAttribute = isLocalActivityMarkerEvent(event)
+    ? getPrimaryAttributeForEvent(
+        isEventGroup(event) ? event.initialEvent : event,
+      )
+    : undefined;
   $: secondaryAttribute = getSecondaryAttributeForEvent(
     isEventGroup(event) ? event.lastEvent : event,
     primaryAttribute?.key,
@@ -121,17 +150,49 @@
     relative: $relativeTime,
     abbrFormat: true,
   });
+
+  $: if (isLocalActivityMarkerEvent(event)) {
+    decodeLocalActivity();
+  }
+
+  async function decodeLocalActivity() {
+    try {
+      const converted = await cloneAllPotentialPayloadsWithCodec(
+        event.attributes,
+        $page.params.namespace,
+        codecSettings,
+        $authUser.accessToken,
+      );
+
+      const decoded = decodePayloadAttributes(converted) as {
+        activityType?: { name?: unknown };
+      };
+
+      if (decoded.activityType?.name) {
+        primaryLocalAttribute = {
+          key: 'Activity Type',
+          value: stringifyWithBigInt(decoded.activityType.name),
+        };
+      }
+    } catch (err) {
+      console.error('Failed to decode local activity type:', err);
+    }
+  }
+
+  console.log('event', event);
+  console.log('currentEvent', currentEvent);
 </script>
 
 <tr
-  class="row dense"
-  id={`${event.id}-${index}`}
+  class="dense flex select-none items-center gap-4 px-2 text-sm no-underline"
+  class:border={failure || canceled || terminated}
+  class:border-danger={failure}
+  class:border-warning={canceled}
+  class:border-pink-700={terminated}
+  class:typedError
   class:expanded
   class:active
-  class:failure
-  class:canceled
-  class:terminated
-  class:typedError
+  id={`${event.id}-${index}`}
   data-eventid={event.id}
   data-testid="event-summary-row"
   on:click|stopPropagation={onLinkClick}
@@ -192,7 +253,12 @@
     </Tooltip>
   </td>
   <td class="truncate md:min-w-fit">
-    <p class="event-name whitespace-nowrap font-semibold md:text-base">
+    <p
+      class="whitespace-nowrap font-semibold md:text-base"
+      class:text-danger={failure}
+      class:text-pink-700={terminated}
+      class:text-warning={canceled}
+    >
       {displayName}
     </p>
   </td>
@@ -219,8 +285,11 @@
         {/if}
       </div>
     {/if}
-    {#if primaryAttribute?.key}
+    {#if !primaryLocalAttribute && primaryAttribute?.key}
       <EventDetailsRow {...primaryAttribute} {attributes} />
+    {/if}
+    {#if primaryLocalAttribute}
+      <EventDetailsRow {...primaryLocalAttribute} {attributes} />
     {/if}
     {#if currentEvent?.userMetadata?.summary}
       <MetadataDecoder
@@ -263,48 +332,10 @@
     in:fade
     out:slide={{ duration: 175 }}
     class:typedError
-    class="row expanded"
+    class="expanded flex select-none items-center gap-4 px-2 text-sm no-underline"
   >
-    <td class="expanded-cell w-full">
+    <td class="w-full text-sm no-underline" class:border-b-0={typedError}>
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
 {/if}
-
-<style lang="postcss">
-  .row {
-    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
-  }
-
-  .failure {
-    @apply border border-danger;
-  }
-
-  .failure .event-name {
-    @apply text-danger;
-  }
-
-  .canceled {
-    @apply border border-warning;
-  }
-
-  .canceled .event-name {
-    @apply text-warning;
-  }
-
-  .terminated {
-    @apply border border-pink-700;
-  }
-
-  .terminated .event-name {
-    @apply text-pink-700;
-  }
-
-  .expanded-cell {
-    @apply text-sm no-underline;
-  }
-
-  .typedError .expanded-cell {
-    @apply border-b-0;
-  }
-</style>
