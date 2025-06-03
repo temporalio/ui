@@ -28,8 +28,8 @@
     {#each group.eventList as groupEvent}
       <EventCard event={groupEvent}>
         {#snippet title()}
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex gap-2">
+          <div class="flex items-center justify-between gap-4 text-lg">
+            <div class="flex items-center gap-2">
               <p class="font-mono">{groupEvent.id}</p>
               <p class="font-medium">
                 {spaceBetweenCapitalLetters(groupEvent.name)}
