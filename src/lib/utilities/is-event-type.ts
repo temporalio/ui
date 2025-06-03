@@ -52,6 +52,7 @@ import type {
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowExecutionUpdateAdmittedEvent,
   WorkflowExecutionUpdateCompletedEvent,
+  WorkflowExecutionUpdateRejectedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
   WorkflowTaskScheduledEvent,
