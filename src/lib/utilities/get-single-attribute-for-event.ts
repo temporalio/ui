@@ -21,7 +21,7 @@ import {
   isPendingNexusOperation,
 } from './is-pending-activity';
 
-export type SummaryAttribute = {
+type SummaryAttribute = {
   key: string;
   value: string | Record<string, unknown> | Payloads;
 };
