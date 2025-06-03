@@ -18,7 +18,7 @@
 
 {#snippet content()}
   <span
-    class="w-fit select-all truncate rounded-sm leading-4"
+    class="w-fit select-all truncate rounded-sm"
     class:surface-subtle={isBadge}>{text}</span
   >
 {/snippet}
