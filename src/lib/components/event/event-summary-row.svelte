@@ -156,26 +156,22 @@
   }
 
   async function decodeLocalActivity() {
-    try {
-      const converted = await cloneAllPotentialPayloadsWithCodec(
-        event.attributes,
-        $page.params.namespace,
-        codecSettings,
-        $authUser.accessToken,
-      );
+    const converted = await cloneAllPotentialPayloadsWithCodec(
+      event.attributes,
+      $page.params.namespace,
+      codecSettings,
+      $authUser.accessToken,
+    );
 
-      const decoded = decodePayloadAttributes(converted) as {
-        activityType?: { name?: unknown };
+    const decoded = decodePayloadAttributes(converted) as {
+      activityType?: { name?: unknown };
+    };
+
+    if (decoded.activityType?.name) {
+      primaryLocalAttribute = {
+        key: 'Activity Type',
+        value: stringifyWithBigInt(decoded.activityType.name),
       };
-
-      if (decoded.activityType?.name) {
-        primaryLocalAttribute = {
-          key: 'Activity Type',
-          value: stringifyWithBigInt(decoded.activityType.name),
-        };
-      }
-    } catch (err) {
-      console.error('Failed to decode local activity type:', err);
     }
   }
 
