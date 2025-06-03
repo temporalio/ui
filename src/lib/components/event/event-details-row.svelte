@@ -18,12 +18,6 @@
   export let showKey = true;
 
   $: linkType = displayLinkType(key, attributes);
-
-  console.log('key:', key);
-  console.log('value:', value);
-  console.log('attributes:', attributes);
-  console.log('linkType:', linkType);
-  console.log('showKey:', showKey);
 </script>
 
 {#if key}

@@ -166,7 +166,6 @@
     if (isLocalActivityMarkerEvent(event))
       primaryLocalAttribute = decodeLocalActivity(event);
   });
-  $inspect('primaryattr', primaryLocalAttribute);
 </script>
 
 <tr
