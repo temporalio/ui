@@ -45,8 +45,8 @@
     initialItem,
     index,
     compact,
-    typedError,
-    active,
+    typedError = false,
+    active = false,
     onRowClick = () => {},
   } = $props();
 
