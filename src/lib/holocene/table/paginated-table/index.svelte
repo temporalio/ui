@@ -84,7 +84,7 @@
     }
 
     :global(tr > th) {
-      @apply h-8 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-normal;
+      @apply h-9 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-normal;
     }
   }
 
@@ -94,7 +94,7 @@
     }
 
     :global(tr.dense) {
-      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-9 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
     :global(tr.expanded) {
