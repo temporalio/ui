@@ -4,7 +4,6 @@
   import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
-  import { isPendingActivity } from '$lib/utilities/is-pending-activity';
 
   import WorkflowPendingActivity from '../workflow/pending-activity/workflow-pending-activity.svelte';
 
@@ -36,7 +35,7 @@
                 {spaceBetweenCapitalLetters(groupEvent.name)}
               </p>
             </div>
-            <div class="text-sm">
+            <div class="font-mono text-sm">
               {formatDate(groupEvent.eventTime, $timeFormat, {
                 relative: $relativeTime,
               })}
@@ -51,11 +50,7 @@
       {@const details = Object.entries(group?.pendingNexusOperation)}
       <div class="w-full border-subtle [&:not(:last-child)]:border-r">
         <div class="pending flex w-full justify-between px-2 py-1 text-white">
-          <div class="flex gap-2">
-            Pending {isPendingActivity(group?.pendingNexusOperation)
-              ? 'Activity'
-              : 'Nexus Operation'}
-          </div>
+          <div class="flex gap-2">Pending Nexus Operation</div>
         </div>
         {#each details as [key, value] (key)}
           <EventDetailsRowExpanded

@@ -50,7 +50,11 @@
 <Card class="flex flex-1 flex-col gap-2 bg-primary">
   {@render title?.()}
   <div class="flex flex-1 flex-col gap-2 xl:flex-row">
-    <div class="grid flex-1 grid-cols-2 items-start gap-2 overflow-hidden">
+    <div
+      class="grid flex-1 {payloadFields.length
+        ? 'grid-cols-2'
+        : 'grid-cols-4'} items-start gap-2 overflow-hidden"
+    >
       <EventLinksExpanded links={event?.links} />
       {#if event?.userMetadata?.summary}
         {@render eventSummary(event.userMetadata.summary)}
@@ -62,11 +66,13 @@
         {@render link(key, value)}
       {/each}
     </div>
-    <div class="w-full flex-1 overflow-hidden">
-      {#each payloadFields as [key, value] (key)}
-        {@render payloads(key, value)}
-      {/each}
-    </div>
+    {#if payloadFields.length}
+      <div class="w-full flex-1 overflow-hidden">
+        {#each payloadFields as [key, value] (key)}
+          {@render payloads(key, value)}
+        {/each}
+      </div>
+    {/if}
   </div>
 </Card>
 
@@ -76,7 +82,7 @@
 
 {#snippet eventSummary(value: Payload)}
   <div class="block w-full select-all px-2 py-1 text-left">
-    <p class="font-mono text-xs text-secondary">Summary</p>
+    <p class="font-mono text-sm text-secondary">Summary</p>
     <MetadataDecoder
       {value}
       let:decodedValue
@@ -92,7 +98,7 @@
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div class="w-full">
     <div class="flex flex-col">
-      <p class="font-mono text-xs text-secondary">
+      <p class="font-mono text-sm text-secondary">
         {format(key)}
       </p>
       {#if value?.payloads}
@@ -130,7 +136,7 @@
     </div>
     {#if stackTrace}
       <div class="flex flex-col">
-        <p class="font-mono text-xs text-secondary">
+        <p class="font-mono text-sm text-secondary">
           {translate('workflows.call-stack-tab')}
         </p>
         <CodeBlock
@@ -147,7 +153,7 @@
 
 {#snippet link(key, value)}
   <div>
-    <p class="font-mono text-xs text-secondary">
+    <p class="font-mono text-sm text-secondary">
       {format(key)}
     </p>
     <Copyable
@@ -167,7 +173,7 @@
 
 {#snippet details(key, value)}
   <div>
-    <p class="font-mono text-xs text-secondary">
+    <p class="font-mono text-sm text-secondary">
       {format(key)}
     </p>
     <p class="whitespace-pre-line">

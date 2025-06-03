@@ -190,7 +190,7 @@
       <WorkflowDetail
         content={totalActions}
         title="Billable Actions (estimate)"
-        icon="rocket-ship"
+        icon="dollar-invoice"
         badge="subtle"
       />
     {/if}
