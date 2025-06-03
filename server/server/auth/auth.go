@@ -104,6 +104,17 @@ func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProvider
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 	}
 
+	// Handle token swapping for OIDC providers that require ID token as Bearer
+	if len(cfg.Auth.Providers) > 0 && cfg.Auth.Providers[0].UseIDTokenAsBearer {
+		idToken := c.Request().Header.Get(AuthorizationExtrasHeader)
+		if idToken != "" {
+			// Replace the Authorization header with ID token
+			c.Request().Header.Set(echo.HeaderAuthorization, "Bearer "+idToken)
+			// Remove the Authorization-Extras header to avoid confusion
+			c.Request().Header.Del(AuthorizationExtrasHeader)
+		}
+	}
+
 	return nil
 }
 
