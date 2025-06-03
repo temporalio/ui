@@ -3,23 +3,24 @@
 
   import { page } from '$app/stores';
 
-  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  // import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Link from '$lib/holocene/link.svelte';
+  // import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
-  import { format } from '$lib/utilities/format-camel-case';
+  // import { format } from '$lib/utilities/format-camel-case';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  // import { routeForEventHistory } from '$lib/utilities/route-for';
 
-  import { mergeEventGroupDetails } from '../constants';
+  // import { mergeEventGroupDetails } from '../constants';
 
   import GraphWidget from './graph-widget.svelte';
-  import GroupDetailsText from './group-details-text.svelte';
+  // import GroupDetailsText from './group-details-text.svelte';
 
   export let group: EventGroup;
   export let canvasWidth: number;
@@ -39,14 +40,14 @@
   $: ({ namespace } = $page.params);
   $: width = canvasWidth;
   $: title = group.displayName;
-  $: attributes = mergeEventGroupDetails(group);
-  $: codeBlockAttributes = Object.entries(attributes).filter(
-    ([, value]) => typeof value === 'object',
-  );
-  $: textAttributes = Object.entries(attributes).filter(
-    ([, value]) => typeof value !== 'object',
-  );
-  $: link = group.links?.[0];
+  // $: attributes = mergeEventGroupDetails(group);
+  // $: codeBlockAttributes = Object.entries(attributes).filter(
+  //   ([, value]) => typeof value === 'object',
+  // );
+  // $: textAttributes = Object.entries(attributes).filter(
+  //   ([, value]) => typeof value !== 'object',
+  // );
+  // $: link = group.links?.[0];
 
   $: childWorkflowStartedEvent =
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
@@ -100,8 +101,8 @@
           >
         </div>
       </div>
-      <div class="surface-primary flex flex-col gap-4 p-4 xl:flex-row">
-        <div class="w-full xl:w-1/2">
+      <div class="surface-primary p-2">
+        <!-- <div class="w-full xl:w-1/2">
           <div class="grid grid-cols-2 gap-3">
             {#if group.userMetadata?.summary}
               <MetadataDecoder
@@ -148,8 +149,9 @@
               </div>
             {/each}
           </div>
-        </div>
-        <div class="flex w-full flex-col gap-2 xl:w-1/2">
+        </div> -->
+        <EventDetailsFull {group} event={group.initialEvent} />
+        <!-- <div class="flex w-full flex-col gap-2 xl:w-1/2">
           {#each codeBlockAttributes as [key, value] (key)}
             <div>
               <div class="font-medium leading-4 text-secondary">
@@ -158,7 +160,7 @@
               <GroupDetailsText {key} {value} {attributes} {onDecode} />
             </div>
           {/each}
-        </div>
+        </div> -->
       </div>
       {#if childWorkflowStartedEvent}
         <div class="surface-primary p-4">
