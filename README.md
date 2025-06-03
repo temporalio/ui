@@ -149,6 +149,7 @@ Set these environment variables if you want to change their defaults
 
 
 ## Releases
+On every commit to main, a draft release will be either created or updated with the commit. When ready to create a release, update (if needed) and publish the draft release. This will automatically kick off a matching ui-server release that will publish the Docker image (https://github.com/temporalio/ui-server/releases).
 
-Our `ui` repo releases page (https://github.com/temporalio/ui/releases) is for managing our [npm package](https://www.npmjs.com/package/@temporalio/ui). The package includes a copy of `/lib` directory with types.
-Our `ui-server` repo releases page (https://github.com/temporalio/ui-server/releases) is for managing docker images for the entire front-end app.
+
+Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
