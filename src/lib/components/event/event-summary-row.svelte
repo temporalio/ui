@@ -267,7 +267,7 @@
         {#if event.billableActions}
           <Tooltip text="Estimated Billable Actions" topRight>
             <Badge type="subtle">
-              <Icon name="rocket-ship" class="mx-1" />{event.billableActions}
+              <Icon name="dollar-invoice" class="mx-1" />{event.billableActions}
             </Badge>
           </Tooltip>
         {/if}
