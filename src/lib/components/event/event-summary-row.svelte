@@ -176,7 +176,7 @@
       </Copyable>
     </Tooltip>
   </td>
-  <td class="hidden text-right md:block">
+  <td class="hidden text-right md:table-cell">
     <Tooltip
       hide={(isEventGroup(event) && !duration) || !elapsedTime}
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
