@@ -1,14 +1,18 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
-
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
-  import { format } from '$lib/utilities/format-camel-case';
+  import type { EventLink as ELink } from '$lib/types/events';
+  import { getEventLinkHref } from '$lib/utilities/event-link-href';
+  import {
+    format,
+    spaceBetweenCapitalLetters,
+  } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import {
@@ -17,13 +21,13 @@
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
+  import { routeForNamespace } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
-  import EventLinksExpanded from './event-links-expanded.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
-  let { event, title }: { event: WorkflowEvent; title?: Snippet } = $props();
+  let { event }: { event: WorkflowEvent } = $props();
 
   const attributes = $derived(formatAttributes(event));
   const fields = $derived(Object.entries(attributes));
@@ -47,15 +51,25 @@
   );
 </script>
 
-<Card class="flex flex-1 flex-col gap-2 bg-primary">
-  {@render title?.()}
+<Card class="flex flex-1 cursor-default flex-col gap-2 bg-primary">
+  <div class="flex items-center justify-between gap-2 border-b border-subtle">
+    <div class="flex items-center gap-2 text-base">
+      <p class="font-mono">{event.id}</p>
+      <p class="font-medium">
+        {spaceBetweenCapitalLetters(event.name)}
+      </p>
+    </div>
+    <p class="text-sm">
+      {formatDate(event.eventTime, $timeFormat, {
+        relative: $relativeTime,
+      })}
+    </p>
+  </div>
   <div class="flex flex-1 flex-col gap-2 xl:flex-row">
-    <div
-      class="grid flex-1 {payloadFields.length
-        ? 'grid-cols-2'
-        : 'grid-cols-4'} items-start gap-2 overflow-hidden"
-    >
-      <EventLinksExpanded links={event?.links} />
+    <div class="w-full overflow-hidden xl:w-1/2">
+      {#if event?.links?.length}
+        {@render eventLinks(event.links)}
+      {/if}
       {#if event?.userMetadata?.summary}
         {@render eventSummary(event.userMetadata.summary)}
       {/if}
@@ -67,7 +81,7 @@
       {/each}
     </div>
     {#if payloadFields.length}
-      <div class="w-full flex-1 overflow-hidden">
+      <div class="w-full flex-1 overflow-hidden xl:w-1/2">
         {#each payloadFields as [key, value] (key)}
           {@render payloads(key, value)}
         {/each}
@@ -76,20 +90,60 @@
   </div>
 </Card>
 
-<!-- {#snippet eventLinks(event?.links)}
+{#snippet eventLink(link: ELink)}
+  {@const href = getEventLinkHref(link)}
+  {@const value = href.split('workflows/')?.[1] || href}
+  <div class="flex items-start gap-2">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {translate('nexus.link')}
+    </p>
+    <Copyable
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      content={value}
+    >
+      <Link {href} class="whitespace-pre-line">{value}</Link>
+    </Copyable>
+  </div>
+{/snippet}
 
-{/snippet} -->
+{#snippet eventNamespaceLink(link: ELink)}
+  {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
+  <div class="flex items-start gap-2">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {translate('nexus.link-namespace')}
+    </p>
+    <Copyable
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      content={link.workflowEvent.namespace}
+    >
+      <Link {href} class="whitespace-pre-line"
+        >{link.workflowEvent.namespace}</Link
+      >
+    </Copyable>
+  </div>
+{/snippet}
+
+{#snippet eventLinks(links: ELink[])}
+  {#each links as link}
+    {@render eventLink(link)}
+    {@render eventNamespaceLink(link)}
+  {/each}
+{/snippet}
 
 {#snippet eventSummary(value: Payload)}
   <div class="block w-full select-all px-2 py-1 text-left">
-    <p class="font-mono text-sm text-secondary">Summary</p>
-    <MetadataDecoder
-      {value}
-      let:decodedValue
-      fallback={translate('events.decode-failed')}
-    >
-      {decodedValue}
-    </MetadataDecoder>
+    <p class="min-w-56 text-sm text-secondary/80">
+      Summary8/p>
+      <MetadataDecoder
+        {value}
+        let:decodedValue
+        fallback={translate('events.decode-failed')}
+      >
+        {decodedValue}
+      </MetadataDecoder>
+    </p>
   </div>
 {/snippet}
 
@@ -98,7 +152,7 @@
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div class="w-full">
     <div class="flex flex-col">
-      <p class="font-mono text-sm text-secondary">
+      <p class="min-w-56 text-sm text-secondary/80">
         {format(key)}
       </p>
       {#if value?.payloads}
@@ -136,7 +190,7 @@
     </div>
     {#if stackTrace}
       <div class="flex flex-col">
-        <p class="font-mono text-sm text-secondary">
+        <p class="min-w-56 text-sm text-secondary/80">
           {translate('workflows.call-stack-tab')}
         </p>
         <CodeBlock
@@ -152,8 +206,8 @@
 {/snippet}
 
 {#snippet link(key, value)}
-  <div>
-    <p class="font-mono text-sm text-secondary">
+  <div class="flex items-start gap-2">
+    <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
     <Copyable
@@ -172,8 +226,8 @@
 {/snippet}
 
 {#snippet details(key, value)}
-  <div>
-    <p class="font-mono text-sm text-secondary">
+  <div class="flex items-start gap-2">
+    <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
     <p class="whitespace-pre-line">

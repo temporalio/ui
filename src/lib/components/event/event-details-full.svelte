@@ -1,9 +1,6 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowEvent } from '$lib/types/events';
-  import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
-  import { formatDate } from '$lib/utilities/format-date';
 
   import WorkflowPendingActivity from '../workflow/pending-activity/workflow-pending-activity.svelte';
 
@@ -26,23 +23,7 @@
 {#if showEventGroup}
   <div class="flex flex-col gap-1 overflow-hidden py-2">
     {#each group.eventList as groupEvent}
-      <EventCard event={groupEvent}>
-        {#snippet title()}
-          <div class="flex items-center justify-between gap-4 text-lg">
-            <div class="flex items-center gap-2">
-              <p class="font-mono">{groupEvent.id}</p>
-              <p class="font-medium">
-                {spaceBetweenCapitalLetters(groupEvent.name)}
-              </p>
-            </div>
-            <div class="font-mono text-sm">
-              {formatDate(groupEvent.eventTime, $timeFormat, {
-                relative: $relativeTime,
-              })}
-            </div>
-          </div>
-        {/snippet}
-      </EventCard>
+      <EventCard event={groupEvent} />
     {/each}
     {#if group?.pendingActivity}
       <WorkflowPendingActivity activity={group.pendingActivity} />

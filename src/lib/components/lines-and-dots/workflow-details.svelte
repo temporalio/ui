@@ -95,7 +95,10 @@
           })
         : '-'}
     />
-    <WorkflowDetail content={elapsedTime} icon="clock" />
+    <WorkflowDetail
+      title={translate('common.duration')}
+      content={elapsedTime}
+    />
   </div>
   <div
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
