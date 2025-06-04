@@ -12,12 +12,14 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isEventGroup } from '$lib/models/event-groups';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
     eventOrGroupIsCanceled,
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import type { WorkflowEvent } from '$lib/types/events';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
@@ -39,6 +41,18 @@
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
+  interface Props {
+    event: WorkflowEvent;
+    group?: EventGroup;
+    initialItem: WorkflowEvent;
+    index: number;
+    compact?: boolean;
+    typedError?: boolean;
+    active?: boolean;
+    expanded?: boolean;
+    onRowClick?: () => void;
+  }
+
   const {
     event,
     group,
@@ -49,7 +63,7 @@
     active = false,
     expanded: expandedProp = false,
     onRowClick = () => {},
-  } = $props();
+  }: Props = $props();
 
   let expanded = $state(expandedProp);
   let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
@@ -75,7 +89,7 @@
       start: initialItem?.eventTime,
       end: isEventGroup(currentEvent)
         ? currentEvent.initialEvent?.eventTime
-        : currentEvent()?.eventTime,
+        : currentEvent?.eventTime,
       includeMillisecondsForUnderSecond: true,
     }),
   );
@@ -138,7 +152,7 @@
     compact &&
       secondaryAttribute?.key &&
       secondaryAttribute?.key !== primaryAttribute?.key &&
-      !currentEvent()?.userMetadata?.summary,
+      !currentEvent?.userMetadata?.summary,
   );
 
   const eventTime = $derived(
