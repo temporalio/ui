@@ -168,8 +168,9 @@
     }),
   );
 
-  const onLinkClick = () => {
+  const onLinkClick = (event) => {
     expanded = !expanded;
+    event.stopPropagation();
     onRowClick();
   };
 
