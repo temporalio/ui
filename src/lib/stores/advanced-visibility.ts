@@ -13,8 +13,8 @@ import { temporalVersion } from './versions';
 // FOR TESTING PURPOSES ONLY - DON'T FORGET TO CHANGE THIS BACK
 export const isCloud = derived(
   [page],
-  // ([$page]) => !$page.data?.settings?.runtimeEnvironment?.isCloud,
-  ([$page]) => $page.data?.settings?.runtimeEnvironment?.isCloud,
+  ([$page]) => !$page.data?.settings?.runtimeEnvironment?.isCloud,
+  // ([$page]) => $page.data?.settings?.runtimeEnvironment?.isCloud,
 );
 
 export const supportsAdvancedVisibility = derived(
