@@ -16,7 +16,7 @@ import {
   isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionStartedEvent,
   isWorkflowExecutionUpdateAcceptedEvent,
-  // isWorkflowExecutionUpdateRejectedEvent,
+  isWorkflowExecutionUpdateRejectedEvent,
   isWorkflowTaskCompletedEvent,
 } from '$lib/utilities/is-event-type';
 
@@ -33,7 +33,7 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
     if (isWorkflowExecutionUpdateAcceptedEvent(event)) return 1;
     if (isUpsertWorkflowSearchAttributesEvent(event)) return 1;
     if (isWorkflowExecutionContinuedAsNewEvent(event)) return 1;
-    // if (isWorkflowExecutionUpdateRejectedEvent(event)) return 1; // Need to figure out how to add this type
+    if (isWorkflowExecutionUpdateRejectedEvent(event)) return 1;
 
     if (isMarkerRecordedEvent(event)) {
       const nonBillable = ['core_patch', 'Version'];
