@@ -35,7 +35,9 @@
     {#if logo}
       <img src={logo} alt="SDK Icon" class="h-6 w-6" aria-hidden="true" />
     {/if}
-    {sdk}
-    {version}
+    <span class="truncate">
+      {sdk}
+      {version}
+    </span>
   </p>
 {/if}
