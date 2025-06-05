@@ -7,7 +7,6 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -41,17 +40,17 @@
   );
 </script>
 
-<Card
-  class="flex flex-1 flex-col items-start gap-2 overflow-hidden bg-primary md:flex-row"
+<div
+  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
-  <div class="flex flex-1 flex-col space-y-2 truncate">
-    <div class="flex-1">
-      <div class="flex flex-wrap items-center space-x-3">
-        <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
-        <h4>{activity.activityType}</h4>
-      </div>
+  <div class="flex-1">
+    <div class="flex flex-wrap items-center space-x-3">
+      <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
+      <h4>{activity.activityType}</h4>
     </div>
-    <div class="grid grid-cols-1 gap-2 xl:grid-cols-2">
+  </div>
+  <div class="flex flex-1 flex-col gap-2 xl:flex-row">
+    <div class="w-full overflow-hidden xl:w-1/2">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
@@ -107,25 +106,29 @@
         )}
       {/if}
     </div>
+    <div class="flex w-full flex-col gap-2 md:flex-1 xl:w-1/2">
+      {#if failed}
+        {@render failures()}
+      {/if}
+      {#if activity.heartbeatDetails}
+        {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
+      {/if}
+    </div>
   </div>
-  <div class="flex w-full flex-col gap-2 md:flex-1">
-    {#if failed}
-      {@render failures()}
-    {/if}
-    {#if activity.heartbeatDetails}
-      {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
-    {/if}
-  </div>
-</Card>
+</div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div>
-    <p class="font-mono text-xs">{label}</p>
-    {#if typeof value === 'string' || typeof value === 'number'}
-      {value}
-    {:else}
-      {@render value?.()}
-    {/if}
+  <div class="flex items-start gap-2">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {label}
+    </p>
+    <p class="whitespace-pre-line">
+      {#if typeof value === 'string' || typeof value === 'number'}
+        {value}
+      {:else}
+        {@render value?.()}
+      {/if}
+    </p>
   </div>
 {/snippet}
 

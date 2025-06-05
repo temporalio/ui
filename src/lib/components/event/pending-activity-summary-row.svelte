@@ -6,6 +6,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { PendingActivity } from '$lib/types/events';
   import { formatDate } from '$lib/utilities/format-date';
@@ -107,6 +108,9 @@
       />
     </div>
   </td>
+  {#if $isCloud}
+    <td></td>
+  {/if}
 </tr>
 {#if expanded}
   <tr class="w-full px-2 text-sm no-underline">

@@ -2,7 +2,7 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
 
-  import WorkflowPendingActivity from '../workflow/pending-activity/workflow-pending-activity.svelte';
+  import PendingActivityCard from '../workflow/pending-activity/pending-activity-card.svelte';
 
   import EventCard from './event-card.svelte';
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
@@ -26,7 +26,7 @@
       <EventCard event={groupEvent} />
     {/each}
     {#if group?.pendingActivity}
-      <WorkflowPendingActivity activity={group.pendingActivity} />
+      <PendingActivityCard activity={group.pendingActivity} />
     {:else if group?.pendingNexusOperation}
       {@const details = Object.entries(group?.pendingNexusOperation)}
       <div class="w-full border-subtle [&:not(:last-child)]:border-r">

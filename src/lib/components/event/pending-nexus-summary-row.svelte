@@ -5,6 +5,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
@@ -73,6 +74,9 @@
     </div>
   </td>
   <td></td>
+  {#if $isCloud}
+    <td></td>
+  {/if}
 </tr>
 {#if expanded}
   <tr class="w-full bg-primary px-2 text-sm no-underline">
