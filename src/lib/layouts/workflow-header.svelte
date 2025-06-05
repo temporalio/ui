@@ -37,48 +37,55 @@
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
-  $: ({ namespace, workflow: workflowId, run: runId, id } = $page.params);
-  $: ({ workflow, workers } = $workflowRun);
-
-  $: routeParameters = {
+  const {
     namespace,
     workflow: workflowId,
     run: runId,
-  };
+    id: eventId,
+  } = $derived($page.params);
+  const { workflow, workers } = $derived($workflowRun);
+  const routeParameters = $derived({
+    namespace,
+    workflow: workflowId,
+    run: runId,
+  });
 
-  $: isRunning = $workflowRun?.workflow?.isRunning;
-  $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow?.status,
+  const isRunning = $derived($workflowRun?.workflow?.isRunning);
+  const activitiesCanceled = $derived(
+    ['Terminated', 'TimedOut', 'Canceled'].includes(
+      $workflowRun.workflow?.status,
+    ),
   );
-  $: cancelInProgress = isCancelInProgress(
-    $workflowRun?.workflow?.status,
-    $fullEventHistory,
+  const cancelInProgress = $derived(
+    isCancelInProgress($workflowRun?.workflow?.status, $fullEventHistory),
   );
-  $: resetRunId =
+  const resetRunId = $derived(
     $workflowRun?.workflow.workflowExtendedInfo?.resetRunId ||
-    $resetWorkflows[$workflowRun?.workflow?.runId];
-  $: workflowHasBeenReset = !!resetRunId;
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
+      $resetWorkflows[$workflowRun?.workflow?.runId],
+  );
+  const workflowHasBeenReset = $derived(!!resetRunId);
+  const workflowRelationships = $derived(
+    getWorkflowRelationships(workflow, $fullEventHistory, $namespaces),
+  );
+  const workflowsHref = $derived(
+    `${routeForWorkflows({
+      namespace,
+    })}?${$workflowsSearchParams}`,
   );
 </script>
 
 <div class="flex items-center justify-between pb-4">
   <div class="flex items-center gap-2">
     <Link
-      href={`${routeForWorkflows({
-        namespace,
-      })}?${$workflowsSearchParams}`}
+      href={workflowsHref}
       data-testid="back-to-workflows"
       icon="chevron-left"
     >
-      {id
+      {eventId
         ? translate('common.workflows')
         : translate('workflows.back-to-workflows')}
     </Link>
-    {#if id}
+    {#if eventId}
       <Link
         href={routeForEventHistory({
           ...routeParameters,
@@ -86,7 +93,7 @@
         data-testid="back-to-workflow-execution"
         icon="chevron-left"
       >
-        {workflow?.runId}
+        {workflow.runId}
       </Link>
     {/if}
   </div>
@@ -164,7 +171,7 @@
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
             namespace,
-            workflow: $workflowRun?.workflow?.id,
+            workflow: workflowId,
             run: resetRunId,
           })}>here</Link
         >.
