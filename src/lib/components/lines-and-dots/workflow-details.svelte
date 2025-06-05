@@ -187,12 +187,12 @@
       />
     {/if}
 
-    <DetailListLabel>{translate('commmon.history-size-bytes')}</DetailListLabel>
+    <DetailListLabel>{translate('common.history-size-bytes')}</DetailListLabel>
     <DetailListTextValue text={workflow?.historySizeBytes} />
 
     {#if !$isCloud}
       <DetailListLabel
-        >{translate('workflows.state-transition')}</DetailListLabel
+        >{translate('workflows.state-transitions')}</DetailListLabel
       >
       <DetailListTextValue text={workflow?.stateTransitionCount} />
     {/if}
