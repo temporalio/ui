@@ -276,8 +276,8 @@
   {/if}
 </tr>
 {#if expanded}
-  <tr class:typedError class="w-full px-2 text-sm no-underline">
-    <td colspan={$isCloud ? 5 : 4}>
+  <tr class:typedError class="w-full text-sm no-underline">
+    <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>

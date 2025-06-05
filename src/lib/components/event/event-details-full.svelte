@@ -21,7 +21,7 @@
 </script>
 
 {#if showEventGroup}
-  <div class="flex flex-col gap-1 overflow-hidden py-2">
+  <div class="flex flex-col overflow-hidden">
     {#each group.eventList as groupEvent}
       <EventCard event={groupEvent} />
     {/each}

@@ -61,7 +61,7 @@
 
 <g role="button" tabindex="0" class="relative z-50">
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div bind:offsetHeight class="flex flex-col border-b border-subtle">
+    <div bind:offsetHeight class="flex flex-col">
       <div
         class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
       >
@@ -86,7 +86,7 @@
           >
         </div>
       </div>
-      <div class="surface-primary px-2">
+      <div class="surface-primary">
         <EventDetailsFull {group} event={group.initialEvent} />
       </div>
       {#if childWorkflowStartedEvent}

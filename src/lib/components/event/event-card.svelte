@@ -51,8 +51,10 @@
   );
 </script>
 
-<Card class="flex flex-1 cursor-default flex-col gap-2 bg-primary">
-  <div class="flex items-center justify-between gap-2 border-b border-subtle">
+<Card
+  class="flex flex-1 cursor-default flex-col gap-2 border-0 border-b bg-primary"
+>
+  <div class="flex items-center justify-between gap-2">
     <div class="flex items-center gap-2 text-base">
       <p class="font-mono">{event.id}</p>
       <p class="font-medium">
