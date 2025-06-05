@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -14,14 +14,20 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
-  $: namespace = $page.params.namespace;
-  $: deploymentName = $page.params.deployment;
-  $: parameters = {
+  const namespace = $derived(page.params.namespace);
+  const deploymentName = $derived(page.params.deployment);
+  const parameters = $derived({
     namespace,
     deploymentName: decodeURIForSvelte(deploymentName),
-  };
+  });
+  const workflowHref = $derived(
+    routeForWorkflowsWithQuery({
+      namespace: page.params.namespace,
+      query: `TemporalWorkerDeployment="${deploymentName}"`,
+    }),
+  );
 
-  $: deploymentFetch = fetchDeployment(parameters);
+  const deploymentFetch = $derived(fetchDeployment(parameters));
 
   const columns = [
     { label: translate('deployments.version') },
@@ -51,11 +57,8 @@
       </div>
       <div class="flex w-full items-center justify-between">
         <h1>{deploymentName}</h1>
-        <Button
-          href={routeForWorkflowsWithQuery({
-            namespace: $page.params.namespace,
-            query: `TemporalWorkerDeployment="${deploymentName}"`,
-          })}>{translate('deployments.go-to-workflows')}</Button
+        <Button href={workflowHref}
+          >{translate('deployments.go-to-workflows')}</Button
         >
       </div>
     </div>

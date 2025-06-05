@@ -13,33 +13,38 @@
 
   import DeploymentStatus from './deployment-status.svelte';
 
-  export let routingConfig: RoutingConfig;
-  export let version: VersionSummary;
-  export let columns: ConfigurableTableHeader[];
+  type Props = {
+    routingConfig: RoutingConfig;
+    version: VersionSummary;
+    columns: ConfigurableTableHeader[];
+  };
+  let { routingConfig, version, columns }: Props = $props();
 
-  $: isCurrent = version.version === routingConfig.currentVersion;
-  $: isRamping = version.version === routingConfig.rampingVersion;
-  $: drainageStatus = version.drainageStatus;
+  const isCurrent = $derived(version.version === routingConfig.currentVersion);
+  const isRamping = version.version === routingConfig.rampingVersion;
+  const drainageStatus = version.drainageStatus;
 
-  $: status = (
+  const status = $derived(
     isCurrent
       ? translate('deployments.current')
       : isRamping
         ? translate('deployments.ramping')
         : drainageStatus
           ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
-          : translate('common.inactive')
+          : translate('common.inactive'),
   ) as Status;
 
-  $: statusLabel = isCurrent
-    ? translate('deployments.current')
-    : isRamping
-      ? translate('deployments.ramping', {
-          percentage: routingConfig.rampingVersionPercentage,
-        })
-      : drainageStatus
-        ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
-        : translate('common.inactive');
+  const statusLabel = $derived(
+    isCurrent
+      ? translate('deployments.current')
+      : isRamping
+        ? translate('deployments.ramping', {
+            percentage: routingConfig.rampingVersionPercentage,
+          })
+        : drainageStatus
+          ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
+          : translate('common.inactive'),
+  );
 </script>
 
 <tr>
