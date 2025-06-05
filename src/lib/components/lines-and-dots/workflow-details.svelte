@@ -63,7 +63,7 @@
   };
 </script>
 
-<DetailList aria-label="workflow details" rowCount={4}>
+<DetailList aria-label="workflow details" rowCount={5}>
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
   <DetailListTextValue
     text={formatDate(workflow?.startTime, $timeFormat, {
