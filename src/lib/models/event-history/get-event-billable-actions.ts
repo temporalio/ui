@@ -25,7 +25,7 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
     if (isWorkflowExecutionStartedEvent(event)) return 1;
     if (isActivityTaskScheduledEvent(event)) return 1;
     if (isTimerStartedEvent(event)) return 1;
-    if (isWorkflowExecutionSignaledEvent(event)) return 1; // Need to return 0 if it starts a  workflow
+    if (isWorkflowExecutionSignaledEvent(event) && event.id !== '2') return 1;
     if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) return 1;
     if (isNexusOperationScheduledEvent(event)) return 1;
     if (isNexusOperationCancelRequestedEvent(event)) return 1;
