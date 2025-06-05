@@ -63,7 +63,7 @@
   };
 </script>
 
-<DetailList aria-label="workflow details" rowCount={3}>
+<DetailList aria-label="workflow details" rowCount={4}>
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
   <DetailListTextValue
     text={formatDate(workflow?.startTime, $timeFormat, {
@@ -154,13 +154,6 @@
   {/if}
 
   <DetailListColumn>
-    <DetailListLabel>SDK</DetailListLabel>
-    <DetailListValue>
-      <SdkLogo />
-    </DetailListValue>
-  </DetailListColumn>
-
-  <DetailListColumn>
     {#if workflow?.parent}
       <DetailListLabel>{translate('workflows.parent-workflow')}</DetailListLabel
       >
@@ -196,5 +189,10 @@
       >
       <DetailListTextValue text={workflow?.stateTransitionCount} />
     {/if}
+
+    <DetailListLabel>SDK</DetailListLabel>
+    <DetailListValue>
+      <SdkLogo />
+    </DetailListValue>
   </DetailListColumn>
 </DetailList>
