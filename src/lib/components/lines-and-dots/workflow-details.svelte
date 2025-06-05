@@ -22,6 +22,7 @@
     DetailListLinkValue,
     DetailListTextValue,
   } from '../detail-list';
+  import DetailListValue from '../detail-list/detail-list-value.svelte';
 
   import SdkLogo from './sdk-logo.svelte';
 
@@ -152,7 +153,12 @@
     </DetailListColumn>
   {/if}
 
-  <SdkLogo />
+  <DetailListColumn>
+    <DetailListLabel>SDK</DetailListLabel>
+    <DetailListValue>
+      <SdkLogo />
+    </DetailListValue>
+  </DetailListColumn>
 
   <DetailListColumn>
     {#if workflow?.parent}

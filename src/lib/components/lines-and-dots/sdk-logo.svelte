@@ -31,14 +31,11 @@
 </script>
 
 {#if sdk && version}
-  <div class="flex h-4 items-center justify-between gap-16 whitespace-nowrap">
-    <span class="font-mono">SDK</span>
-    <p class="flex items-center gap-1">
-      {#if logo}
-        <img src={logo} alt="SDK Icon" class="h-6 w-6" />
-      {/if}
-      {sdk}
-      {version}
-    </p>
-  </div>
+  <p class="flex items-center gap-1">
+    {#if logo}
+      <img src={logo} alt="SDK Icon" class="h-6 w-6" aria-hidden="true" />
+    {/if}
+    {sdk}
+    {version}
+  </p>
 {/if}
