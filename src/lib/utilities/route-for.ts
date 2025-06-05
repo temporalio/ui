@@ -245,10 +245,22 @@ export const routeForWorkflowQuery = (
   return `${routeForWorkflow(parameters)}/query`;
 };
 
-export const routeForWorkflowMetadata = (
+export const routeForUserMetadata = (
   parameters: WorkflowParameters,
 ): string => {
-  return `${routeForWorkflow(parameters)}/metadata`;
+  return `${routeForWorkflow(parameters)}/user-metadata`;
+};
+
+export const routeForWorkflowSearchAttributes = (
+  parameters: WorkflowParameters,
+): string => {
+  return `${routeForWorkflow(parameters)}/search-attributes`;
+};
+
+export const routeForWorkflowMemo = (
+  parameters: WorkflowParameters,
+): string => {
+  return `${routeForWorkflow(parameters)}/memo`;
 };
 
 export const routeForWorkflowUpdate = (

@@ -1,12 +1,10 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
-  import WorkflowCurrentDetails from '$lib/components/workflow/metadata/workflow-current-details.svelte';
-  import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -31,10 +29,12 @@
     routeForEventHistory,
     routeForPendingActivities,
     routeForRelationships,
+    routeForUserMetadata,
     routeForWorkers,
-    routeForWorkflowMetadata,
+    routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
+    routeForWorkflowSearchAttributes,
   } from '$lib/utilities/route-for';
 
   const {
@@ -42,7 +42,7 @@
     workflow: workflowId,
     run: runId,
     id: eventId,
-  } = $derived($page.params);
+  } = $derived(page.params);
   const { workflow, workers } = $derived($workflowRun);
   const routeParameters = $derived({
     namespace,
@@ -93,7 +93,7 @@
         data-testid="back-to-workflow-execution"
         icon="chevron-left"
       >
-        {workflow.runId}
+        {runId}
       </Link>
     {/if}
   </div>
@@ -126,7 +126,7 @@
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={workflow?.id}
+            content={workflowId}
             clickAllToCopy
             container-class="w-full"
             class="overflow-hidden text-ellipsis text-left"
@@ -146,8 +146,6 @@
     </div>
   </div>
   <CodecServerErrorBanner />
-  <WorkflowSummaryAndDetails />
-  <WorkflowCurrentDetails />
   <WorkflowDetails {workflow} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
@@ -187,22 +185,31 @@
           ...routeParameters,
         })}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForEventHistory({
             ...routeParameters,
           }),
         )}
       >
         <Badge type="primary" class="px-2 py-0">
-          {workflow?.historyEvents}
+          {workflow.historyEvents}
         </Badge>
       </Tab>
+      <Tab
+        label={translate('workflows.user-metadata-tab')}
+        id="user-metadata-tab"
+        href={routeForUserMetadata(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForUserMetadata(routeParameters),
+        )}
+      />
       <Tab
         label={translate('workflows.relationships')}
         id="relationships-tab"
         href={routeForRelationships(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForRelationships(routeParameters),
         )}
       >
@@ -215,7 +222,7 @@
         id="workers-tab"
         href={routeForWorkers(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForWorkers(routeParameters),
         )}
       >
@@ -228,7 +235,7 @@
         id="pending-activities-tab"
         href={routeForPendingActivities(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForPendingActivities(routeParameters),
         )}
       >
@@ -248,7 +255,7 @@
         id="call-stack-tab"
         href={routeForCallStack(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForCallStack(routeParameters),
         )}
       />
@@ -257,17 +264,26 @@
         id="queries-tab"
         href={routeForWorkflowQuery(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForWorkflowQuery(routeParameters),
         )}
       />
       <Tab
-        label={translate('workflows.metadata-tab')}
-        id="metadata-tab"
-        href={routeForWorkflowMetadata(routeParameters)}
+        label={translate('workflows.search-attributes-tab')}
+        id="search-attributes-tab"
+        href={routeForWorkflowSearchAttributes(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
-          routeForWorkflowMetadata(routeParameters),
+          page.url.pathname,
+          routeForWorkflowSearchAttributes(routeParameters),
+        )}
+      />
+      <Tab
+        label={translate('workflows.memo-tab')}
+        id="memo-tab"
+        href={routeForWorkflowMemo(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForWorkflowMemo(routeParameters),
         )}
       />
     </TabList>

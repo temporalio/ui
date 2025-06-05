@@ -125,8 +125,10 @@ export const Strings = {
   'pending-activities-tab': 'Pending Activities',
   'call-stack-tab': 'Call Stack',
   'queries-tab': 'Queries',
-  'metadata-tab': 'Metadata',
+  'user-metadata-tab': 'User Metadata',
   'update-tab': 'Update',
+  'search-attributes-tab': 'Search Attributes',
+  'memo-tab': 'Memo',
   'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
     'We are having technical difficulties retrieving this Workflow',

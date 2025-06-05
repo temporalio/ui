@@ -94,4 +94,7 @@ export const Strings = {
   'event-types': 'Event Types',
   'decode-failed': 'Decoding failed',
   'view-raw-history': 'View Raw History',
+  'empty-search-attributes': 'No Search Attributes Found',
+  'empty-memo-attributes': 'No Memo Attributes Found',
+  'empty-header-attributes': 'No Header Attributes Found',
 } as const;

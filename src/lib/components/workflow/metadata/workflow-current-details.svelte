@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
 
-  import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
+  import { page } from '$app/state';
+
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Markdown from '$lib/holocene/monaco/markdown.svelte';
@@ -11,18 +12,17 @@
   import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
-  $: currentDetails = $workflowRun?.metadata?.currentDetails || '';
-  $: closedWithoutDetails = !workflow.isRunning && !currentDetails;
+  const { namespace } = $derived(page.params);
+  const { workflow } = $derived($workflowRun);
+  const currentDetails = $derived($workflowRun?.metadata?.currentDetails || '');
 
-  let loading = false;
+  let loading = $state(false);
 
   const fetchCurrentDetails = async () => {
     if (loading) return;
     loading = true;
     try {
-      const { settings } = $page.data;
+      const { settings } = page.data;
       const metadata = await getWorkflowMetadata(
         {
           namespace,
@@ -41,24 +41,15 @@
       loading = false;
     }
   };
+
+  onMount(() => {
+    fetchCurrentDetails();
+  });
 </script>
 
-<AccordionLight
-  let:open
-  onToggle={closedWithoutDetails ? fetchCurrentDetails : undefined}
-  icon={closedWithoutDetails ? 'retry' : undefined}
->
-  <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-    <Icon name="flag" class="text-brand" width={32} height={32} />
-    {translate('workflows.current-details')}
-    {#if loading}{translate('common.loading')}{/if}
-  </div>
-  {#if open}
-    {#key currentDetails}
-      <Markdown content={currentDetails} />
-    {/key}
-  {/if}
-  <svelte:fragment slot="action">
+<div class="flex flex-1 flex-col gap-2">
+  <div class="flex items-center justify-between">
+    <h3>{translate('workflows.current-details')}</h3>
     {#if workflow.isRunning}
       <Tooltip text={translate('workflows.update-details')} left>
         <Button
@@ -70,5 +61,8 @@
         </Button>
       </Tooltip>
     {/if}
-  </svelte:fragment>
-</AccordionLight>
+  </div>
+  {#key currentDetails}
+    <Markdown content={currentDetails} />
+  {/key}
+</div>
