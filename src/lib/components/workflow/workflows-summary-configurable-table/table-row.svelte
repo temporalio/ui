@@ -43,6 +43,7 @@
   data-testid="workflows-summary-configurable-table-row"
   class:empty
   class:child
+  class="dense"
 >
   {#if !empty && $supportsBulkActions}
     <td class="relative">

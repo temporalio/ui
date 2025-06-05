@@ -45,31 +45,31 @@
   }
 
   table.fancy {
-    @apply surface-primary border-separate border-spacing-0 border border-table;
+    @apply surface-primary border-separate border-spacing-0 border border-subtle;
 
     thead {
-      @apply surface-table;
+      @apply surface-table-header;
 
       :global(th) {
-        @apply border-t border-table p-2 text-off-white;
+        @apply px-2 py-1 text-sm font-normal;
       }
 
       :global(td) {
-        @apply border-t border-table p-2;
+        @apply border-t border-subtle p-2;
 
         &:first-child {
-          @apply border-l border-table;
+          @apply border-l border-subtle;
         }
 
         &:last-child {
-          @apply border-r border-table;
+          @apply border-r border-subtle;
         }
       }
     }
 
     tbody :global {
       td {
-        @apply border-t border-table p-2 text-sm;
+        @apply border-t border-subtle p-2 text-sm;
 
         &:first-child:is(.expanded-cell) {
           @apply px-0;

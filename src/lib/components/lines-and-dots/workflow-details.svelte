@@ -4,6 +4,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
@@ -39,6 +40,9 @@
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ];
+  $: totalActions = $fullEventHistory
+    .reduce((acc, e) => e.billableActions + acc, 0)
+    .toString();
 
   $: {
     if (next && !latestRunId) {
@@ -91,7 +95,10 @@
           })
         : '-'}
     />
-    <WorkflowDetail content={elapsedTime} icon="clock" />
+    <WorkflowDetail
+      title={translate('common.duration')}
+      content={elapsedTime}
+    />
   </div>
   <div
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
@@ -181,6 +188,13 @@
       <WorkflowDetail
         title={translate('workflows.state-transitions')}
         content={workflow?.stateTransitionCount}
+      />
+    {:else}
+      <WorkflowDetail
+        content={totalActions}
+        title="Billable Actions (estimate)"
+        icon="dollar-invoice"
+        badge="subtle"
       />
     {/if}
   </div>

@@ -7,7 +7,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: #334155;
     box-sizing: content-box;
     box-shadow:
@@ -23,8 +23,8 @@
     background: linear-gradient(to right, #64748b 0%, #475569 100%);
     box-shadow:
       inset 0 2px 5px rgb(255 255 255 / 30%),
-      inset 0 -2px 4px rgb(0 0 0 / 40%),
-      0 0 4px rgb(100 116 139 / 50%);
+      inset 0 -2px 3px rgb(0 0 0 / 40%),
+      0 0 3px rgb(100 116 139 / 50%);
   }
 
   .meter > span::after {

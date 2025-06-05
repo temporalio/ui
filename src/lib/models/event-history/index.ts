@@ -16,6 +16,7 @@ import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
 import { toEventNameReadable } from '$lib/utilities/screaming-enums';
 
+import { getEventBillableActions } from './get-event-billable-actions';
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
@@ -43,6 +44,13 @@ export async function getEventAttributes(
   };
 }
 
+export const toBillableEvent = (event: WorkflowEvent) => {
+  return {
+    ...event,
+    billableActions: getEventBillableActions(event),
+  };
+};
+
 export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
   const id = String(historyEvent.eventId);
   const eventType = toEventNameReadable(historyEvent.eventType);
@@ -52,7 +60,7 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
 
   const { key, attributes } = findAttributesAndKey(historyEvent);
   const links = historyEvent?.links || [];
-  return {
+  const event = {
     ...historyEvent,
     name: eventType,
     id,
@@ -61,8 +69,10 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
     classification,
     category,
     links,
+    billableActions: 0,
     attributes: simplifyAttributes({ type: key, ...attributes }),
   };
+  return toBillableEvent(event);
 };
 
 export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {

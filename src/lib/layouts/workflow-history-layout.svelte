@@ -136,10 +136,7 @@
       </ToggleButtons>
     </div>
   </div>
-  <div
-    class="flex w-full flex-col border border-subtle {!$minimizeEventView &&
-      'border-t-0'}"
-  >
+  <div class="flex w-full flex-col border-t border-subtle">
     <TimelineGraph
       {workflow}
       {groups}
@@ -158,6 +155,6 @@
 
 <style lang="postcss">
   .sticky-header {
-    @apply sticky top-0 z-30 border-b border-subtle md:top-12;
+    @apply sticky top-0 z-30 md:top-12;
   }
 </style>

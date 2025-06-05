@@ -60,7 +60,7 @@
 </script>
 
 <div
-  class="relative h-auto overflow-auto border-b border-subtle"
+  class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary"
   bind:clientWidth={canvasWidth}
   style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
   on:scroll={handleScroll}
