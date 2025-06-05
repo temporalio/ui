@@ -17,15 +17,14 @@
 </script>
 
 {#snippet content()}
-  <span
-    class="w-fit select-all truncate rounded-sm"
-    class:surface-subtle={isBadge}>{text}</span
-  >
+  <div class="select-all truncate rounded-sm" class:surface-subtle={isBadge}>
+    {text}
+  </div>
 {/snippet}
 
 <DetailListValue {copyable} {copyableText}>
   {#if tooltipText}
-    <Tooltip text={tooltipText} top>
+    <Tooltip text={tooltipText} top class="min-w-0">
       {@render content()}
     </Tooltip>
   {:else}
