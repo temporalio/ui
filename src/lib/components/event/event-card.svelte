@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Card from '$lib/holocene/card.svelte';
+  import { page } from '$app/state';
+
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -42,17 +43,28 @@
       ([key, _value]) => displayLinkType(key, attributes) !== 'none',
     ),
   );
+
+  const hiddenDetailFields = $derived.by(() => {
+    if (event.category === 'activity')
+      return ['scheduledEventId', 'startedEventId', 'namespaceId'];
+    if (event.category === 'child-workflow')
+      return ['initiatedEventId', 'startedEventId', 'namespaceId'];
+    return ['namespaceId'];
+  });
   const detailFields = $derived(
     fields.filter(
       ([key, value]) =>
         typeof value !== 'object' &&
-        displayLinkType(key, attributes) === 'none',
+        displayLinkType(key, attributes) === 'none' &&
+        !hiddenDetailFields.includes(key) &&
+        (key !== 'namespace' ||
+          (key === 'namespace' && page.params.namespace !== value)),
     ),
   );
 </script>
 
-<Card
-  class="flex flex-1 cursor-default flex-col gap-2 border-0 border-b bg-primary"
+<div
+  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
   <div class="flex items-center justify-between gap-2">
     <div class="flex items-center gap-2 text-base">
@@ -90,7 +102,7 @@
       </div>
     {/if}
   </div>
-</Card>
+</div>
 
 {#snippet eventLink(link: ELink)}
   {@const href = getEventLinkHref(link)}
