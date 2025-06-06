@@ -21,7 +21,7 @@ import {
   isPendingNexusOperation,
 } from './is-pending-activity';
 
-type SummaryAttribute = {
+export type SummaryAttribute = {
   key: string;
   value: string | Record<string, unknown> | Payloads;
 };
@@ -220,7 +220,10 @@ export const shouldDisplayAsTime = (key: string): boolean => {
   return key?.toLowerCase()?.endsWith('time');
 };
 
-const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
+export const formatSummaryValue = (
+  key: string,
+  value: unknown,
+): SummaryAttribute => {
   if (typeof value === 'object') {
     if (isSinglePayload(value)) {
       return { key, value };
@@ -272,7 +275,7 @@ const getFirstDisplayAttribute = ({
   }
 };
 
-const getActivityType = (payload: Payload) => {
+export const getActivityType = (payload: Payload) => {
   if (has(payload, 'ActivityType')) return payload.ActivityType;
   if (has(payload, 'activity_type')) return payload.activity_type;
 };
