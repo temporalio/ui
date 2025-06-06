@@ -5,7 +5,17 @@
 
   import Accordion from './accordion.svelte';
 
-  export const meta = {
+  interface AccordionProps {
+    title: string;
+    subtitle?: string;
+    open?: boolean;
+    expandable?: boolean;
+    error?: string;
+    icon?: string;
+    onToggle?: () => void;
+  }
+
+  export const meta: Meta<AccordionProps> = {
     title: 'Accordion',
     component: Accordion,
     args: {
@@ -16,18 +26,14 @@
       error: '',
     },
     argTypes: {
-      title: { name: 'Title', control: 'text' },
-      subtitle: { name: 'Subtitle', control: 'text' },
-      open: { name: 'Open', control: 'boolean' },
-      expandable: { name: 'Expandable', control: 'boolean' },
-      error: { name: 'Error', control: 'text' },
-      icon: {
-        name: 'Icon',
-        control: 'select',
-        options: iconNames,
-      },
+      title: { control: 'text' },
+      subtitle: { control: 'text' },
+      open: { control: 'boolean' },
+      expandable: { control: 'boolean' },
+      error: { control: 'text' },
+      icon: { control: 'select', options: iconNames },
     },
-  } satisfies Meta<Accordion>;
+  };
 </script>
 
 <script lang="ts">
