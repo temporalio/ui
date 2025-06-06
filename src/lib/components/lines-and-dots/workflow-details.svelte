@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+
+  import { page } from '$app/state';
 
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
@@ -21,38 +23,40 @@
     DetailListLabel,
     DetailListLinkValue,
     DetailListTextValue,
+    DetailListValue,
   } from '../detail-list';
-  import DetailListValue from '../detail-list/detail-list-value.svelte';
 
   import SdkLogo from './sdk-logo.svelte';
 
-  export let workflow: WorkflowExecution;
-  export let next: string | undefined = undefined;
-  let latestRunId: string | undefined = undefined;
+  interface Props {
+    workflow: WorkflowExecution;
+    next?: string;
+  }
 
-  $: ({ namespace } = $page.params);
+  let { workflow, next }: Props = $props();
 
-  $: elapsedTime = formatDistanceAbbreviated({
-    start: workflow?.startTime,
-    end: workflow?.endTime || Date.now(),
-    includeMilliseconds: true,
-  });
-  $: deployment =
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'];
-  $: deploymentVersion =
+  let latestRunId = $state<string | undefined>(undefined);
+  let namespace = $derived(page.params.namespace);
+  let elapsedTime = $derived(
+    formatDistanceAbbreviated({
+      start: workflow?.startTime,
+      end: workflow?.endTime || Date.now(),
+      includeMilliseconds: true,
+    }),
+  );
+  let deployment = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
+  );
+  let deploymentVersion = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkerDeploymentVersion'
-    ];
-  $: versioningBehavior =
+    ],
+  );
+  let versioningBehavior = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
-    ];
-
-  $: {
-    if (next && !latestRunId) {
-      fetchLatestRun();
-    }
-  }
+    ],
+  );
 
   const fetchLatestRun = async () => {
     const result = await fetchWorkflow({
@@ -61,6 +65,12 @@
     });
     latestRunId = result?.workflow?.runId;
   };
+
+  onMount(() => {
+    if (next && !latestRunId) {
+      fetchLatestRun();
+    }
+  });
 </script>
 
 <DetailList aria-label="workflow details" rowCount={5}>
@@ -115,7 +125,7 @@
     <DetailListLinkValue
       text={workflow?.taskQueue}
       href={routeForWorkers({
-        namespace: $page.params.namespace,
+        namespace,
         workflow: workflow?.id,
         run: workflow?.runId,
       })}
@@ -137,11 +147,7 @@
         <DetailListLabel>
           {translate('deployments.deployment-version')}
         </DetailListLabel>
-        <DetailListTextValue
-          text={workflow.searchAttributes.indexedFields[
-            'TemporalWorkerDeploymentVersion'
-          ]}
-        />
+        <DetailListTextValue text={deploymentVersion} />
       {/if}
 
       {#if versioningBehavior}
