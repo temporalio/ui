@@ -220,7 +220,10 @@ export const shouldDisplayAsTime = (key: string): boolean => {
   return key?.toLowerCase()?.endsWith('time');
 };
 
-const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
+export const formatSummaryValue = (
+  key: string,
+  value: unknown,
+): SummaryAttribute => {
   if (typeof value === 'object') {
     if (isSinglePayload(value)) {
       return { key, value };
@@ -272,7 +275,7 @@ const getFirstDisplayAttribute = ({
   }
 };
 
-const getActivityType = (payload: Payload) => {
+export const getActivityType = (payload: Payload) => {
   if (has(payload, 'ActivityType')) return payload.ActivityType;
   if (has(payload, 'activity_type')) return payload.activity_type;
 };
@@ -379,30 +382,4 @@ export const getSecondaryAttributeForEvent = (
   }
 
   return emptyAttribute;
-};
-
-export const decodeLocalActivity = (
-  event: WorkflowEvent,
-): SummaryAttribute | undefined => {
-  if (!isLocalActivityMarkerEvent(event)) return;
-
-  const payloads = (event.markerRecordedEventAttributes?.details?.data
-    ?.payloads ||
-    event.markerRecordedEventAttributes?.details?.type?.payloads ||
-    []) as unknown as Payload[];
-
-  if (!payloads?.length) return;
-  const decodedPayloads = payloads.map((p) => decodePayload(p));
-  const payload = decodedPayloads?.[0];
-
-  if (isJavaSDK(event)) {
-    return formatSummaryValue('ActivityType', payload);
-  }
-
-  const activityType = getActivityType(payload);
-  if (activityType) {
-    return formatSummaryValue('ActivityType', activityType);
-  }
-
-  return;
 };

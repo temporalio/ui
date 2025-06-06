@@ -18,15 +18,26 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { authUser } from '$lib/stores/auth-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowEvent } from '$lib/types/events';
+  import type { Payload, WorkflowEvent } from '$lib/types/events';
+  import {
+    cloneAllPotentialPayloadsWithCodec,
+    decodePayloadAttributes,
+  } from '$lib/utilities/decode-payload';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import {
+    getCodecEndpoint,
+    getCodecIncludeCredentials,
+    getCodecPassAccessToken,
+  } from '$lib/utilities/get-codec';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
   import {
-    decodeLocalActivity,
+    formatSummaryValue,
+    getActivityType,
     getPrimaryAttributeForEvent,
     getSecondaryAttributeForEvent,
   } from '$lib/utilities/get-single-attribute-for-event';
@@ -41,6 +52,7 @@
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
+
   interface Props {
     event: WorkflowEvent;
     group?: EventGroup;
@@ -67,6 +79,56 @@
 
   let expanded = $state(expandedProp);
   let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
+
+  type DecodedLocalActivity = {
+    details?: {
+      data?: {
+        payloads?: Payload[];
+      };
+    };
+  };
+
+  export const decodeLocalActivity = async (
+    event,
+  ): Promise<SummaryAttribute | undefined> => {
+    const settings = {
+      ...page.data.settings,
+      codec: {
+        ...page.data.settings?.codec,
+        endpoint: getCodecEndpoint(page.data.settings),
+        passAccessToken: getCodecPassAccessToken(page.data.settings),
+        includeCredentials: getCodecIncludeCredentials(page.data.settings),
+      },
+    };
+    const accessToken = $authUser.accessToken;
+    const namespace = page.params.namespace;
+    if (!isLocalActivityMarkerEvent(event)) return;
+    try {
+      const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
+        event.attributes,
+        namespace,
+        settings,
+        accessToken,
+      );
+      const payloads = (event.markerRecordedEventAttributes?.details?.data
+        ?.payloads ||
+        event.markerRecordedEventAttributes?.details?.type?.payloads ||
+        []) as unknown as Payload[];
+
+      if (!payloads?.length) return;
+      const decodedAttributes = decodePayloadAttributes(
+        convertedAttributes,
+      ) as DecodedLocalActivity;
+      const payload = decodedAttributes?.details?.data?.payloads?.[0];
+      const activityType = getActivityType(payload);
+      if (activityType) {
+        return formatSummaryValue('ActivityType', activityType);
+      }
+    } catch (err) {
+      console.error('Failed to decode local activity type:', err);
+    }
+    return;
+  };
 
   const selectedId = $derived(
     isEventGroup(event) ? Array.from(event.events.keys()).shift() : event.id,
@@ -174,9 +236,10 @@
     onRowClick();
   };
 
-  onMount(() => {
-    if (isLocalActivityMarkerEvent(event))
-      primaryLocalAttribute = decodeLocalActivity(event);
+  onMount(async () => {
+    if (isLocalActivityMarkerEvent(event)) {
+      primaryLocalAttribute = await decodeLocalActivity(event);
+    }
   });
 </script>
 
@@ -286,7 +349,7 @@
     {#if !primaryLocalAttribute && primaryAttribute?.key}
       <EventDetailsRow {...primaryAttribute} {attributes} />
     {/if}
-    {#if primaryLocalAttribute}
+    {#if primaryLocalAttribute && primaryLocalAttribute.key}
       <EventDetailsRow {...primaryLocalAttribute} {attributes} />
     {/if}
     {#if currentEvent?.userMetadata?.summary}
