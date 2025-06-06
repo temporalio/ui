@@ -36,7 +36,7 @@
   let { workflow, next }: Props = $props();
 
   let latestRunId = $state<string | undefined>(undefined);
-  let namespace = $derived(page.params.namespace);
+  let { namespace } = $derived(page.params);
   let elapsedTime = $derived(
     formatDistanceAbbreviated({
       start: workflow?.startTime,
