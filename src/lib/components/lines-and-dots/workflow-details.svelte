@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { page } from '$app/state';
 
   import { translate } from '$lib/i18n/translate';
@@ -66,7 +64,7 @@
     latestRunId = result?.workflow?.runId;
   };
 
-  onMount(() => {
+  $effect(() => {
     if (next && !latestRunId) {
       fetchLatestRun();
     }
