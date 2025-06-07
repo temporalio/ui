@@ -36,7 +36,7 @@
   const { name, group } = ctx;
 </script>
 
-<div class="flex flex-col gap-1">
+<div>
   <Label {disabled} class={className}>
     <input
       bind:group={$group}
@@ -62,7 +62,7 @@
 
 <style lang="postcss">
   .description {
-    @apply ml-7 text-xs font-normal text-primary;
+    @apply ml-7 text-sm font-normal text-primary;
   }
 
   input[type='radio'] {
