@@ -151,5 +151,12 @@ Set these environment variables if you want to change their defaults
 ## Releases
 On every commit to main, a draft release will be either created or updated with the commit. When ready to create a release, update (if needed) and publish the draft release. This will automatically kick off a matching ui-server release that will publish the Docker image (https://github.com/temporalio/ui-server/releases).
 
+### Version Management
+The release process includes automatic version injection:
+- **Local builds**: Use the current version defined in `server/server/version/version.go`
+- **Release builds**: Version is injected at build time using Go's `-ldflags` to match the release tag
+- **After release**: A PR is automatically created to update the source code version to match the published release
+
+This ensures that the version reported by the application always matches the actual release version.
 
 Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
