@@ -28,5 +28,6 @@ const (
 	clientNameHeaderName    = "client-name"
 	clientNameHeaderValue   = "temporal-ui"
 	clientVersionHeaderName = "client-version"
-	UIVersion               = "2.37.2"
 )
+
+var UIVersion = "2.37.2"

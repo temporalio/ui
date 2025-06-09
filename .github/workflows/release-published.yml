@@ -4,6 +4,17 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+
+env:
+  RELEASE_TAG: ${{ github.event.release.tag_name }}
+  PR_TITLE: 'Update version to ${{ github.event.release.tag_name }} after release'
+  BRANCH_NAME: update-version-latest
+
 jobs:
   create_release:
     runs-on: ubuntu-latest
@@ -50,3 +61,31 @@ jobs:
               "release_tag": "${{ github.event.release.tag_name }}",
               "release_url": "${{ github.event.release.html_url }}"
             }
+
+      - name: Update version in source code
+        run: |
+          # Extract version from release tag (remove 'v' prefix if present)
+          VERSION="${{ env.RELEASE_TAG }}"
+          VERSION="${VERSION#v}"
+          echo "Updating version file to: $VERSION"
+
+          # Update the version.go file
+          sed -i "s/var UIVersion = \".*\"/var UIVersion = \"$VERSION\"/" server/server/version/version.go
+
+      - name: Create or update PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}
+          base: main
+          title: ${{ env.PR_TITLE }}
+          draft: true
+          body: |
+            **Version updated to [${{ env.RELEASE_TAG }}](${{ github.event.release.html_url }}) after release**
+
+            This PR updates the version in `server/server/version/version.go` to match the published release.
+
+            ---
+
+            **Release URL**: ${{ github.event.release.html_url }}
+            **Release Tag**: ${{ env.RELEASE_TAG }}
