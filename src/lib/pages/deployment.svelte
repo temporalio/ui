@@ -30,7 +30,8 @@
   const deploymentFetch = $derived(fetchDeployment(parameters));
 
   const columns = [
-    { label: translate('deployments.version') },
+    { label: translate('deployments.build-id') },
+    { label: translate('deployments.status') },
     {
       label: translate('deployments.deployed'),
     },
@@ -79,7 +80,7 @@
 
       <tr slot="headers" class="text-left">
         {#each columns as { label }, index}
-          <th class={index === 0 && 'w-full'}>{label}</th>
+          <th class={index === 1 && 'w-full'}>{label}</th>
         {/each}
       </tr>
 

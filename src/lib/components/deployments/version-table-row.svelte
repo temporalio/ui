@@ -5,9 +5,14 @@
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { RoutingConfig, VersionSummary } from '$lib/types/deployments';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
+  import {
+    isVersionSummaryNew,
+    type RoutingConfig,
+    type VersionSummary,
+  } from '$lib/types/deployments';
   import { formatDate } from '$lib/utilities/format-date';
+  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
@@ -22,7 +27,19 @@
 
   const isCurrent = $derived(version.version === routingConfig.currentVersion);
   const isRamping = version.version === routingConfig.rampingVersion;
-  const drainageStatus = version.drainageStatus;
+  const drainageStatus = $derived(
+    isVersionSummaryNew(version) ? version.status : version.drainageStatus,
+  );
+  const buildId = $derived(
+    isVersionSummaryNew(version)
+      ? version.deploymentVersion.buildId
+      : getBuildIdFromVersion(version.version),
+  );
+  const statusEnum = $derived(
+    isVersionSummaryNew(version)
+      ? 'WorkerDeploymentVersionStatus'
+      : 'VersionDrainageStatus',
+  );
 
   const status = $derived(
     isCurrent
@@ -30,7 +47,7 @@
       : isRamping
         ? translate('deployments.ramping')
         : drainageStatus
-          ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
+          ? fromScreamingEnum(drainageStatus, statusEnum)
           : translate('common.inactive'),
   ) as Status;
 
@@ -42,20 +59,20 @@
             percentage: routingConfig.rampingVersionPercentage,
           })
         : drainageStatus
-          ? fromScreamingEnum(drainageStatus, 'VersionDrainageStatus')
+          ? fromScreamingEnum(drainageStatus, statusEnum)
           : translate('common.inactive'),
   );
 </script>
 
 <tr>
   {#each columns as { label } (label)}
-    {#if label === translate('deployments.version')}
+    {#if label === translate('deployments.build-id')}
       <td class="p-2 text-left">
-        <DeploymentStatus
-          {status}
-          version={version.version}
-          label={statusLabel}
-        />
+        {buildId}
+      </td>
+    {:else if label === translate('deployments.status')}
+      <td class="p-2 text-left">
+        <DeploymentStatus {status} label={statusLabel} />
       </td>
     {:else if label === translate('deployments.deployed')}
       <td class="whitespace-pre-line break-words p-2 text-left"

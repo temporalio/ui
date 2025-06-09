@@ -28,7 +28,10 @@
   const columns = [
     { label: translate('deployments.name') },
     {
-      label: translate('deployments.deployment-version'),
+      label: translate('deployments.build-id'),
+    },
+    {
+      label: translate('deployments.status'),
     },
     { label: translate('deployments.deployed') },
     {

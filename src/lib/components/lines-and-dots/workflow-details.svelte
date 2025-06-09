@@ -8,6 +8,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForWorkerDeployment,
     routeForWorkers,
@@ -34,23 +35,30 @@
   let { workflow, next }: Props = $props();
 
   let latestRunId = $state<string | undefined>(undefined);
-  let { namespace } = $derived(page.params);
-  let elapsedTime = $derived(
+
+  const { namespace } = $derived(page.params);
+  const elapsedTime = $derived(
     formatDistanceAbbreviated({
       start: workflow?.startTime,
       end: workflow?.endTime || Date.now(),
       includeMilliseconds: true,
     }),
   );
-  let deployment = $derived(
+  const deployment = $derived(
     workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
   );
-  let deploymentVersion = $derived(
+  const deploymentVersion = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkerDeploymentVersion'
     ],
   );
-  let versioningBehavior = $derived(
+
+  const versioningBuildId = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ||
+      getBuildIdFromVersion(deploymentVersion),
+  );
+
+  const versioningBehavior = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ],
@@ -141,11 +149,11 @@
         })}
       />
 
-      {#if deploymentVersion}
+      {#if versioningBuildId}
         <DetailListLabel>
-          {translate('deployments.deployment-version')}
+          {translate('deployments.build-id')}
         </DetailListLabel>
-        <DetailListTextValue text={deploymentVersion} />
+        <DetailListTextValue text={versioningBuildId} />
       {/if}
 
       {#if versioningBehavior}

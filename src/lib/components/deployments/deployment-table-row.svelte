@@ -7,6 +7,7 @@
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkerDeploymentSummary } from '$lib/types/deployments';
   import { formatDate } from '$lib/utilities/format-date';
+  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForWorkerDeployment,
     routeForWorkflowsWithQuery,
@@ -29,13 +30,22 @@
           })}>{deployment.name}</Link
         ></td
       >
-    {:else if label === translate('deployments.deployment-version')}
+    {:else if label === translate('deployments.build-id')}
       <td class="whitespace-pre-line break-words p-2 text-left">
         <div class="flex flex-col gap-1">
-          {#if deployment.routingConfig.rampingVersion}
+          {#if deployment?.rampingVersionSummary?.deploymentVersion?.buildId}
+            {deployment.rampingVersionSummary.deploymentVersion.buildId}
+          {/if}
+          {deployment?.currentVersionSummary?.deploymentVersion?.buildId ||
+            getBuildIdFromVersion(deployment.routingConfig.currentVersion)}
+        </div>
+      </td>
+    {:else if label === translate('deployments.status')}
+      <td class="whitespace-pre-line break-words p-2 text-left">
+        <div class="flex flex-col gap-1">
+          {#if deployment.routingConfig.rampingVersionPercentage}
             <DeploymentStatus
               status="Ramping"
-              version={deployment.routingConfig.rampingVersion}
               label={translate('deployments.ramping-percentage', {
                 percentage: deployment.routingConfig.rampingVersionPercentage,
               })}
@@ -43,7 +53,6 @@
           {/if}
           <DeploymentStatus
             status="Current"
-            version={deployment.routingConfig.currentVersion}
             label={translate('deployments.current')}
           />
         </div>
