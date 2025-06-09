@@ -70,7 +70,7 @@ jobs:
           echo "Updating version file to: $VERSION"
 
           # Update the version.go file
-          sed -i "s/var UIVersion = \".*\"/var UIVersion = \"$VERSION\"/" server/server/version/version.go
+          sed -i "s/UIVersion               = \".*\"/UIVersion               = \"$VERSION\"/" server/server/version/version.go
 
       - name: Create or update PR
         uses: peter-evans/create-pull-request@v6
