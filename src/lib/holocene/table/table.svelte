@@ -51,7 +51,7 @@
       @apply surface-table-header;
 
       :global(th) {
-        @apply px-2 py-1 text-sm font-normal;
+        @apply p-2 text-sm;
       }
 
       :global(td) {

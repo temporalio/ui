@@ -283,4 +283,6 @@ export const Strings = {
   'update-name-label': 'Update name',
   'no-current-details': 'No Current Details',
   'update-details': 'Update Details',
+  'billable-actions': 'Billable Actions (estimate)',
+  'estimated-billable-actions': 'Estimated Billable Actions',
 } as const;

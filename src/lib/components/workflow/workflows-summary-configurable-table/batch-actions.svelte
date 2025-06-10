@@ -62,11 +62,11 @@
 </script>
 
 {#if $allSelected}
-  <span class="font-semibold">
+  <span class="font-medium">
     <Translate key="workflows.all-selected" count={$workflowCount.count} />
   </span>
 {:else}
-  <span class="font-semibold"
+  <span class="font-medium"
     ><Translate
       key="workflows.n-selected"
       count={selectedWorkflowsCount}

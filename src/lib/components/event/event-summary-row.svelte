@@ -203,11 +203,11 @@
   >
     <div class="flex items-center gap-2">
       {#if pendingAttempt}
-        <div
-          class="flex items-center gap-1 {pendingAttempt > 1 &&
-            'surface-retry px-1 py-0.5'}"
-        >
-          <Icon class="mr-1.5 inline" name="retry" />
+        <Badge class="mr-1" type={pendingAttempt > 1 ? 'danger' : 'default'}>
+          <Icon
+            class="mr-1 inline {pendingAttempt > 1 && 'font-bold text-red-400'}"
+            name="retry"
+          />
           {translate('workflows.attempt')}
           {pendingAttempt}
           {#if hasPendingActivity}
@@ -220,7 +220,7 @@
               })}
             {/if}
           {/if}
-        </div>
+        </Badge>
       {/if}
       {#if primaryAttribute?.key}
         <EventDetailsRow {...primaryAttribute} {attributes} />
@@ -265,9 +265,12 @@
     <td>
       <div class="flex justify-center gap-0.5 font-mono">
         {#if event.billableActions}
-          <Tooltip text="Estimated Billable Actions" topRight>
-            <Badge type="subtle">
-              <Icon name="dollar-invoice" class="mx-1" />{event.billableActions}
+          <Tooltip
+            text={translate('workflows.estimated-billable-actions')}
+            topRight
+          >
+            <Badge type="subtle" class="shrink-0 gap-1 px-1">
+              <Icon name="dollar-invoice" />{event.billableActions}
             </Badge>
           </Tooltip>
         {/if}

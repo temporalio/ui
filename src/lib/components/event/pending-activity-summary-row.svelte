@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -85,11 +86,11 @@
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex items-center gap-1">
-      <div
-        class="flex items-center gap-1 {event.attempt > 1 &&
-          'surface-retry px-1 py-0.5'}"
-      >
-        <Icon class="mr-1.5 inline" name="retry" />
+      <Badge class="mr-1" type={event.attempt > 1 ? 'danger' : 'default'}>
+        <Icon
+          class="mr-1 inline {event.attempt > 1 && 'font-bold text-red-400'}"
+          name="retry"
+        />
         {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}
         {#if event.attempt > 1}
@@ -99,7 +100,7 @@
             negativeDefault: 'None',
           })}
         {/if}
-      </div>
+      </Badge>
       <EventDetailsRow
         key="activityType"
         value={event.activityType}

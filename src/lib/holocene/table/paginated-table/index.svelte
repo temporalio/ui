@@ -61,7 +61,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply surface-primary min-h-[154px] overflow-auto;
+    @apply surface-primary min-h-[154px] grow overflow-auto;
   }
 
   .primary {
@@ -84,7 +84,7 @@
     }
 
     :global(tr > th) {
-      @apply h-9 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-normal;
+      @apply h-9 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-medium;
     }
   }
 

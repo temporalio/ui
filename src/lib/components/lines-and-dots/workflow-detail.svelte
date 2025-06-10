@@ -21,7 +21,7 @@
   class="flex items-center justify-between gap-16 truncate whitespace-nowrap {$$restProps.class}"
 >
   {#if title}
-    <span class="font-mono">{title}</span>
+    {title}
   {/if}
   {#if copyable}
     <Copyable
@@ -29,12 +29,12 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       {content}
       visible
-      container-class="gap-1 w-full justify-end"
+      container-class="gap-1 w-full justify-end font-mono"
     >
       {#if href}
         <Link
           {href}
-          class="flex w-fit flex-row items-center gap-1 truncate rounded-sm leading-4"
+          class="flex w-fit flex-row items-center gap-1 truncate rounded-sm font-mono leading-4"
           ><span class="truncate">{content}</span>
           {#if filterable}
             <Icon name="filter" class="shrink-0" />
@@ -42,30 +42,34 @@
         </Link>
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
-          <span class="w-fit select-all truncate rounded-sm leading-4"
+          <span class="w-fit select-all truncate rounded-sm font-mono leading-4"
             >{content}</span
           >
         </Tooltip>
       {/if}
     </Copyable>
   {:else if href}
-    <Link {href} class="value eading-4 truncate rounded-sm">{content}</Link>
+    <Link {href} class="value eading-4 truncate rounded-sm font-mono"
+      >{content}</Link
+    >
   {:else}
     <Tooltip text={tooltip} hide={!tooltip} top>
       {#if badge}
         <Badge
           type={badge}
-          class="w-fit select-all truncate rounded-sm leading-4"
+          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
         >
           {#if icon}
-            <Icon name={icon} class="mx-1" />
+            <Icon name={icon} class="shrink-0" />
           {/if}
           {content}
         </Badge>
       {:else}
-        <span class="w-fit select-all truncate rounded-sm leading-4">
+        <span
+          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
+        >
           {#if icon}
-            <Icon name={icon} class="mx-1" />
+            <Icon name={icon} class="shrink-0" />
           {/if}
           {content}</span
         >

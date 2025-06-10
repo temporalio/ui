@@ -66,7 +66,7 @@
 <div
   class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
-  <div class="flex items-center justify-between gap-2">
+  <div class="flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center gap-2 text-base">
       <p class="font-mono">{event.id}</p>
       <p class="font-medium">
@@ -80,7 +80,7 @@
     </p>
   </div>
   <div class="flex flex-1 flex-col gap-2 xl:flex-row">
-    <div class="w-full overflow-hidden xl:w-1/2">
+    <div class="w-full overflow-auto xl:w-1/2">
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
       {/if}

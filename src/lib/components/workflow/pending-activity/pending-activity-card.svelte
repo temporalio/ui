@@ -50,7 +50,7 @@
     </div>
   </div>
   <div class="flex flex-1 flex-col gap-2 xl:flex-row">
-    <div class="w-full overflow-hidden xl:w-1/2">
+    <div class="w-full overflow-auto xl:w-1/2">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
@@ -122,7 +122,7 @@
     <p class="min-w-56 text-sm text-secondary/80">
       {label}
     </p>
-    <p class="whitespace-pre-line">
+    <p class="w-full whitespace-pre-line">
       {#if typeof value === 'string' || typeof value === 'number'}
         {value}
       {:else}
@@ -152,10 +152,12 @@
       ? translate('workflows.last-failure-with-stack-trace')
       : translate('workflows.last-failure')}
   >
-    <div class="flex flex-col gap-2">
+    <div class="-mt-4 flex flex-col gap-2">
       <div class="flex flex-1 flex-col">
         {#if activity.lastFailure}
-          <p class="font-mono text-xs">{translate('workflows.last-failure')}</p>
+          <p class="text-sm text-secondary/80">
+            {translate('workflows.last-failure')}
+          </p>
           <CodeBlock
             class="pb-2"
             content={stringifyWithBigInt(
@@ -168,7 +170,9 @@
       </div>
       <div class="flex flex-1 flex-col">
         {#if activity.lastFailure?.stackTrace}
-          <p class="font-mono text-xs">{translate('common.stack-trace')}</p>
+          <p class="text-sm text-secondary/80">
+            {translate('common.stack-trace')}
+          </p>
           <CodeBlock
             language="text"
             content={activity.lastFailure.stackTrace}
@@ -197,12 +201,13 @@
   <div class="flex items-center gap-1">
     {formatDate(activity.scheduledTime, $timeFormat, {
       relative: $relativeTime,
+      relativeLabel: '',
     })}
     <strong
-      >{toTimeDifference({
+      >({toTimeDifference({
         date: activity.scheduledTime,
         negativeDefault: translate('workflows.no-retry'),
-      })}</strong
+      })})</strong
     >
   </div>
 {/snippet}
@@ -211,13 +216,14 @@
   <div class="flex items-center gap-1">
     <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
       <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
-      {activity.attempt} of {formatMaximumAttempts(activity.maximumAttempts)}
+      {activity.attempt ?? 0} of {formatMaximumAttempts(
+        activity.maximumAttempts,
+      )}
     </Badge>
     {#if activity.maximumAttempts}
-      <span class="text-sm text-secondary"
-        >{formatAttemptsLeft(activity.maximumAttempts, activity.attempt)}
-        remaining</span
-      >
+      <p class="text-sm text-secondary">
+        {formatAttemptsLeft(activity.maximumAttempts, activity.attempt)} remaining
+      </p>
     {/if}
   </div>
 {/snippet}

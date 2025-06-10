@@ -154,10 +154,6 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-black'),
         color: css('--color-text-white'),
       },
-      '.surface-retry': {
-        backgroundColor: colors.red[300],
-        color: css('--color-text-black'),
-      },
     });
   },
   {

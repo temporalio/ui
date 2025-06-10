@@ -157,7 +157,6 @@
   <div
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
   >
-    <SdkLogo />
     {#if workflow?.parent}
       <WorkflowDetail
         title={translate('workflows.parent-workflow')}
@@ -184,6 +183,7 @@
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
     />
+    <SdkLogo />
     {#if !$isCloud}
       <WorkflowDetail
         title={translate('workflows.state-transitions')}
@@ -192,7 +192,7 @@
     {:else}
       <WorkflowDetail
         content={totalActions}
-        title="Billable Actions (estimate)"
+        title={translate('workflows.billable-actions')}
         icon="dollar-invoice"
         badge="subtle"
       />

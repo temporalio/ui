@@ -81,65 +81,61 @@
       <HistoryGraph {groups} history={paginatedHistory(items)} />
     {/if}
   </div>
-  <div class="flex-1">
-    <Paginated
-      perPageLabel={translate('common.per-page')}
-      nextPageButtonLabel={translate('common.next-page')}
-      previousPageButtonLabel={translate('common.previous-page')}
-      pageButtonLabel={(page) => translate('common.go-to-page', { page })}
-      {updating}
-      items={filteredForStatus(items)}
-      let:visibleItems
-      maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
-    >
-      <TableHeaderRow slot="headers" class="!h-8">
-        {#each columns as column}
-          <TableHeaderCell {column} />
-        {/each}
-      </TableHeaderRow>
-      {#each visibleItems as event, index (iterableKey(event))}
-        {#if isEventGroup(event)}
-          <EventSummaryRow
-            {event}
-            {index}
-            group={event}
-            {compact}
-            {initialItem}
-          />
-        {:else if isPendingActivity(event)}
-          <PendingActivitySummaryRow
-            {event}
-            {index}
-            group={groups.find(
-              (g) =>
-                isPendingActivity(event) && g?.pendingActivity?.id === event.id,
-            )}
-          />
-        {:else if isPendingNexusOperation(event)}
-          <PendingNexusSummaryRow
-            {event}
-            {index}
-            group={groups.find(
-              (g) =>
-                isPendingNexusOperation(event) &&
-                g?.pendingNexusOperation?.scheduledEventId ===
-                  event.scheduledEventId,
-            )}
-          />
-        {:else}
-          <EventSummaryRow
-            {event}
-            {index}
-            group={groups.find(
-              (g) => isEvent(event) && g.eventIds.has(event.id),
-            )}
-            {compact}
-            {initialItem}
-          />
-        {/if}
-      {:else}
-        <EventEmptyRow loading={!$fullEventHistory.length || loading} />
+  <Paginated
+    perPageLabel={translate('common.per-page')}
+    nextPageButtonLabel={translate('common.next-page')}
+    previousPageButtonLabel={translate('common.previous-page')}
+    pageButtonLabel={(page) => translate('common.go-to-page', { page })}
+    {updating}
+    items={filteredForStatus(items)}
+    let:visibleItems
+    maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
+  >
+    <TableHeaderRow slot="headers" class="!h-8">
+      {#each columns as column}
+        <TableHeaderCell {column} />
       {/each}
-    </Paginated>
-  </div>
+    </TableHeaderRow>
+    {#each visibleItems as event, index (iterableKey(event))}
+      {#if isEventGroup(event)}
+        <EventSummaryRow
+          {event}
+          {index}
+          group={event}
+          {compact}
+          {initialItem}
+        />
+      {:else if isPendingActivity(event)}
+        <PendingActivitySummaryRow
+          {event}
+          {index}
+          group={groups.find(
+            (g) =>
+              isPendingActivity(event) && g?.pendingActivity?.id === event.id,
+          )}
+        />
+      {:else if isPendingNexusOperation(event)}
+        <PendingNexusSummaryRow
+          {event}
+          {index}
+          group={groups.find(
+            (g) =>
+              isPendingNexusOperation(event) &&
+              g?.pendingNexusOperation?.scheduledEventId ===
+                event.scheduledEventId,
+          )}
+        />
+      {:else}
+        <EventSummaryRow
+          {event}
+          {index}
+          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
+          {compact}
+          {initialItem}
+        />
+      {/if}
+    {:else}
+      <EventEmptyRow loading={!$fullEventHistory.length || loading} />
+    {/each}
+  </Paginated>
 </div>

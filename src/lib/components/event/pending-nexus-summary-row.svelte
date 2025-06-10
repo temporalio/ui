@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -54,11 +55,12 @@
       <div class="flex w-full items-center gap-2">
         <p class="font-semibold md:text-base">Pending Nexus Operation</p>
         {#if event.attempt}
-          <div
-            class="flex items-center gap-1 {event.attempt > 1 &&
-              'surface-retry px-1 py-0.5'}"
-          >
-            <Icon class="mr-1.5 inline" name="retry" />
+          <Badge class="mx-1" type={event.attempt > 1 ? 'danger' : 'default'}>
+            <Icon
+              class="mr-1 inline {event.attempt > 1 &&
+                'font-bold text-red-400'}"
+              name="retry"
+            />
             {translate('workflows.attempt')}
             {event.attempt}
             {#if event.attempt > 1}
@@ -68,7 +70,7 @@
                 negativeDefault: 'None',
               })}
             {/if}
-          </div>
+          </Badge>
         {/if}
       </div>
     </div>
