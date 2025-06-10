@@ -160,3 +160,21 @@ The release process includes automatic version injection:
 This ensures that the version reported by the application always matches the actual release version.
 
 Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
+=======
+Our `ui` repo releases page (https://github.com/temporalio/ui/releases) is for managing our [npm package](https://www.npmjs.com/package/@temporalio/ui). The package includes a copy of `/lib` directory with types.
+Our `ui-server` repo releases page (https://github.com/temporalio/ui-server/releases) is for managing docker images for the entire front-end app.
+
+### Release Management
+
+This repository uses automated workflows for version management and releases. See [GitHub Workflows Documentation](.github/WORKFLOWS.md) for detailed information about:
+
+- **Version Bump Workflow**: Automatically updates versions in both `package.json` and `server/server/version/version.go`
+- **Release Draft Workflow**: Creates draft releases when version changes are detected
+- **Release Published Workflow**: Builds and packages releases when published
+
+**Quick Start for Maintainers**:
+1. Use Actions → "Version Bump" to update versions
+2. Review and merge the auto-generated version bump PR
+3. Review and publish the auto-generated draft release
+
+**Version Validation**: Run `pnpm validate:versions` to ensure version files are in sync and ready for release.

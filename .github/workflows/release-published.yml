@@ -21,6 +21,42 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate release version
+        run: |
+          RELEASE_TAG="${{ github.event.release.tag_name }}"
+          # Remove 'v' prefix if present
+          RELEASE_VERSION=${RELEASE_TAG#v}
+          
+          # Get current versions from files
+          PACKAGE_VERSION=$(jq -r '.version' package.json)
+          GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
+          
+          echo "Release tag: $RELEASE_TAG"
+          echo "Release version: $RELEASE_VERSION"
+          echo "Package.json version: $PACKAGE_VERSION"
+          echo "Version.go version: $GO_VERSION"
+          
+          # Validate versions are in sync
+          if [[ "$PACKAGE_VERSION" != "$GO_VERSION" ]]; then
+            echo "❌ Version files are not in sync!"
+            echo "package.json: $PACKAGE_VERSION"
+            echo "version.go: $GO_VERSION"
+            exit 1
+          fi
+          
+          # Validate release version matches current version
+          if [[ "$RELEASE_VERSION" != "$PACKAGE_VERSION" ]]; then
+            echo "❌ Release version does not match current version!"
+            echo "Release: $RELEASE_VERSION"
+            echo "Current: $PACKAGE_VERSION"
+            echo ""
+            echo "Please ensure the release tag matches the version in the code."
+            echo "Use the Version Bump workflow to update versions before creating a release."
+            exit 1
+          fi
+          
+          echo "✅ Version validation passed: $RELEASE_VERSION"
+
       - name: Setup Node
         uses: ./.github/actions/setup-node
 

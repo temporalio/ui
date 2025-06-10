@@ -9,7 +9,48 @@ permissions:
   contents: read
 
 jobs:
+  check_version_change:
+    runs-on: ubuntu-latest
+    outputs:
+      version-ready: ${{ steps.version-check.outputs.version-ready }}
+      current-version: ${{ steps.version-check.outputs.current-version }}
+      previous-version: ${{ steps.version-check.outputs.previous-version }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Validate version for release readiness
+        id: version-check
+        run: |
+          # Use the validation script to check both sync and increase
+          if ./scripts/validate-versions.sh --quiet; then
+            echo "✅ Version validation passed"
+            VERSION_READY="true"
+          else
+            echo "❌ Version validation failed"
+            VERSION_READY="false"
+          fi
+          
+          # Get version details for outputs (using Go version as source of truth)
+          CURRENT_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
+          PREVIOUS_VERSION=$(git show HEAD~1:server/server/version/version.go 2>/dev/null | grep 'UIVersion.*=' | sed 's/.*"\(.*\)".*/\1/' 2>/dev/null || echo "")
+          
+          echo "Current version: $CURRENT_VERSION"
+          echo "Previous version: $PREVIOUS_VERSION"
+          
+          # Set outputs
+          echo "version-ready=$VERSION_READY" >> $GITHUB_OUTPUT
+          echo "current-version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "previous-version=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
+
   update_release_draft:
+    needs: check_version_change
+    # Only run if version validation passed (sync + increase)
+    if: needs.check_version_change.outputs.version-ready == 'true'
+    
     permissions:
       contents: write
       pull-requests: write
@@ -19,7 +60,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: release-drafter/release-drafter@v6
+      - name: Create release draft
+        uses: release-drafter/release-drafter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -42,3 +84,25 @@ jobs:
             {
               "ref": "${{ github.sha }}"
             }
+
+  skip_notification:
+    needs: check_version_change
+    # Run if version validation failed
+    if: needs.check_version_change.outputs.version-ready == 'false'
+    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip reason - Version validation failed
+        run: |
+          echo "## ℹ️ Release Draft Skipped"
+          echo ""
+          echo "**Reason:** Version validation failed"
+          echo "**Current Version:** ${{ needs.check_version_change.outputs.current-version }}"
+          echo "**Previous Version:** ${{ needs.check_version_change.outputs.previous-version }}"
+          echo ""
+          echo "Draft releases are only created when:"
+          echo "1. Both package.json and version.go have matching versions"
+          echo "2. The version has increased compared to the previous commit"
+          echo ""
+          echo "To create a release, use the Version Bump workflow:"
+          echo "Actions → Version Bump → Run workflow"
