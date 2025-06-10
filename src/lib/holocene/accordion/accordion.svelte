@@ -1,15 +1,5 @@
-<script lang="ts">
-  import type { HTMLAttributes } from 'svelte/elements';
-
-  import type { Snippet } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
-  import { v4 } from 'uuid';
-
-  import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
-  type Props = HTMLAttributes<HTMLDivElement> & {
+<script module>
+  export type Props = HTMLAttributes<HTMLDivElement> & {
     title: string;
     id?: string;
     subtitle?: string;
@@ -24,6 +14,18 @@
     action?: Snippet;
     children?: Snippet;
   };
+</script>
+
+<script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
+  import type { Snippet } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
+  import { v4 } from 'uuid';
+
+  import Badge from '$lib/holocene/badge.svelte';
+  import type { IconName } from '$lib/holocene/icon';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   let {
     title,
