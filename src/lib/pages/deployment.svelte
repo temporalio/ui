@@ -27,11 +27,15 @@
     }),
   );
 
-  const deploymentFetch = $derived(fetchDeployment(parameters));
+  const deploymentFetch = $derived(
+    fetchDeployment(parameters).then((res) => {
+      console.log('Deployment fetch response:', res);
+      return res;
+    }),
+  );
 
   const columns = [
     { label: translate('deployments.build-id') },
-    { label: translate('deployments.status') },
     {
       label: translate('deployments.deployed'),
     },

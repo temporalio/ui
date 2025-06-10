@@ -67,21 +67,20 @@
 <tr>
   {#each columns as { label } (label)}
     {#if label === translate('deployments.build-id')}
-      <td class="p-2 text-left">
-        {buildId}
-      </td>
-    {:else if label === translate('deployments.status')}
-      <td class="p-2 text-left">
-        <DeploymentStatus {status} label={statusLabel} />
+      <td class="w-full text-left">
+        <div class="flex items-center gap-2">
+          {buildId}
+          <DeploymentStatus {status} label={statusLabel} />
+        </div>
       </td>
     {:else if label === translate('deployments.deployed')}
-      <td class="whitespace-pre-line break-words p-2 text-left"
+      <td class="whitespace-pre-line break-words text-left"
         >{formatDate(version?.createTime, $timeFormat, {
           relative: $relativeTime,
         })}</td
       >
     {:else if label === translate('deployments.workflows')}
-      <td class="whitespace-pre-line break-words p-2 text-center"
+      <td class="whitespace-pre-line break-words text-center"
         ><p>
           <Link
             icon="external-link"

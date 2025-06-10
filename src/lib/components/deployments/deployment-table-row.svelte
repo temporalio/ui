@@ -31,30 +31,34 @@
         ></td
       >
     {:else if label === translate('deployments.build-id')}
+      {@const rampingBuildID =
+        deployment?.rampingVersionSummary?.deploymentVersion?.buildId ||
+        getBuildIdFromVersion(deployment?.routingConfig?.rampingVersion)}
+      {@const currentBuildId =
+        deployment?.currentVersionSummary?.deploymentVersion?.buildId ||
+        getBuildIdFromVersion(deployment?.routingConfig?.currentVersion)}
       <td class="whitespace-pre-line break-words p-2 text-left">
         <div class="flex flex-col gap-1">
-          {#if deployment?.rampingVersionSummary?.deploymentVersion?.buildId}
-            {deployment.rampingVersionSummary.deploymentVersion.buildId}
-          {/if}
-          {deployment?.currentVersionSummary?.deploymentVersion?.buildId ||
-            getBuildIdFromVersion(deployment.routingConfig.currentVersion)}
-        </div>
-      </td>
-    {:else if label === translate('deployments.status')}
-      <td class="whitespace-pre-line break-words p-2 text-left">
-        <div class="flex flex-col gap-1">
-          {#if deployment.routingConfig.rampingVersionPercentage}
+          <div class="flex items-center gap-2">
+            {#if rampingBuildID}
+              {rampingBuildID}
+            {/if}
+            {#if deployment?.routingConfig?.rampingVersionPercentage}
+              <DeploymentStatus
+                status="Ramping"
+                label={translate('deployments.ramping-percentage', {
+                  percentage: deployment.routingConfig.rampingVersionPercentage,
+                })}
+              />
+            {/if}
+          </div>
+          <div class="flex items-center gap-2">
+            {currentBuildId}
             <DeploymentStatus
-              status="Ramping"
-              label={translate('deployments.ramping-percentage', {
-                percentage: deployment.routingConfig.rampingVersionPercentage,
-              })}
+              status="Current"
+              label={translate('deployments.current')}
             />
-          {/if}
-          <DeploymentStatus
-            status="Current"
-            label={translate('deployments.current')}
-          />
+          </div>
         </div>
       </td>
     {:else if label === translate('deployments.deployed')}

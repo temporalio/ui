@@ -17,7 +17,9 @@
   };
 
   const deploymentStatus = cva(
-    ['flex items-center gap-1 px-1 transition-colors'],
+    [
+      'flex items-center gap-1 px-1 transition-colors rounded-sm border border-subtle',
+    ],
     {
       variants: {
         status: {
