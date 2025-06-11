@@ -26,7 +26,7 @@
   let { routingConfig, version, columns }: Props = $props();
 
   const isCurrent = $derived(version.version === routingConfig.currentVersion);
-  const isRamping = version.version === routingConfig.rampingVersion;
+  const isRamping = $derived(version.version === routingConfig.rampingVersion);
   const drainageStatus = $derived(
     isVersionSummaryNew(version) ? version.status : version.drainageStatus,
   );
@@ -55,7 +55,7 @@
     isCurrent
       ? translate('deployments.current')
       : isRamping
-        ? translate('deployments.ramping', {
+        ? translate('deployments.ramping-percentage', {
             percentage: routingConfig.rampingVersionPercentage,
           })
         : drainageStatus
