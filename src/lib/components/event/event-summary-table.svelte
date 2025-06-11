@@ -67,7 +67,7 @@
     {#each visibleItems as event, index (iterableKey(event))}
       {#if isEventGroup(event)}
         <EventSummaryRow
-          {event}
+          event={event.initialEvent}
           {index}
           group={event}
           {compact}

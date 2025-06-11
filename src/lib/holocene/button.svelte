@@ -120,6 +120,7 @@
     type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
+    data-variant={variant}
     class={merge(
       buttonStyles({
         variant,
@@ -156,6 +157,7 @@
     type="button"
     on:click|stopPropagation
     on:keydown|stopPropagation
+    data-variant={variant}
     class={merge(
       buttonStyles({
         variant,
