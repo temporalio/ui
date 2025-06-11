@@ -34,7 +34,7 @@
     },
     { label: translate('deployments.deployed') },
     {
-      label: translate('deployments.workflows'),
+      label: translate('deployments.actions'),
     },
   ];
 </script>

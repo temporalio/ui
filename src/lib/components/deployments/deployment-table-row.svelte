@@ -113,18 +113,16 @@
           </p>
         </div>
       </td>
-    {:else if label === translate('deployments.workflows')}
-      <td class="w-24 truncate py-1 text-right"
-        ><p>
-          <Link
-            icon="external-link"
-            href={routeForWorkflowsWithQuery({
-              namespace: $page.params.namespace,
-              query: `TemporalWorkerDeployment="${deployment.name}"`,
-            })}
-          />
-        </p></td
-      >
+    {:else if label === translate('deployments.actions')}
+      <td class="w-24 truncate py-1">
+        <Link
+          icon="external-link"
+          href={routeForWorkflowsWithQuery({
+            namespace: $page.params.namespace,
+            query: `TemporalWorkerDeployment="${deployment.name}"`,
+          })}>{translate('deployments.go-to-workflows')}</Link
+        >
+      </td>
     {/if}
   {/each}
 </tr>

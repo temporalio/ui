@@ -91,18 +91,16 @@
           relative: $relativeTime,
         })}</td
       >
-    {:else if label === translate('deployments.workflows')}
-      <td class="w-24 whitespace-pre-line break-words text-right"
-        ><p>
-          <Link
-            icon="external-link"
-            href={routeForWorkflowsWithQuery({
-              namespace: $page.params.namespace,
-              query: `TemporalWorkerDeploymentVersion="${version.version}"`,
-            })}
-          />
-        </p></td
-      >
+    {:else if label === translate('deployments.actions')}
+      <td class="w-24 whitespace-pre-line break-words">
+        <Link
+          icon="external-link"
+          href={routeForWorkflowsWithQuery({
+            namespace: $page.params.namespace,
+            query: `TemporalWorkerDeploymentVersion="${version.version}"`,
+          })}>{translate('deployments.go-to-workflows')}</Link
+        >
+      </td>
     {/if}
   {/each}
 </tr>

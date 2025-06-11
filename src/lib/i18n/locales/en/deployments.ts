@@ -39,4 +39,5 @@ export const Strings = {
   'first-task': 'First Task',
   'last-task': 'Last Task',
   'rollout-id': 'Rollout ID',
+  actions: 'Actions',
 } as const;
