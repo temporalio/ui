@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+
+  import { page } from '$app/state';
 
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -9,16 +11,15 @@
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { isNexusOperationScheduledEvent } from '$lib/utilities/is-event-type';
 
-  $: ({
+  const {
     id: eventId,
     namespace,
     workflow: workflowId,
     run: runId,
-  } = $page.params);
+  } = $derived(page.params);
 
-  $: ids = [eventId];
+  let ids = $derived([eventId]);
 
   const resetFullHistory = () => {
     $fullEventHistory = [];
@@ -39,33 +40,47 @@
     }
   };
 
-  $: fetchEvents(namespace, workflowId, runId);
+  onMount(() => {
+    fetchEvents(namespace, workflowId, runId);
+  });
 
-  $: ({ workflow } = $workflowRun);
-  $: pendingActivities = workflow?.pendingActivities;
-  $: pendingNexusOperations = workflow?.pendingNexusOperations;
+  const { workflow } = $derived($workflowRun);
+  $inspect(workflow);
+  const pendingActivities = $derived(workflow?.pendingActivities);
+  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
-  $: ascendingGroups = groupEvents(
-    $fullEventHistory,
-    'ascending',
-    pendingActivities,
-    pendingNexusOperations,
+  const ascendingGroups = $derived(
+    groupEvents(
+      $fullEventHistory,
+      'ascending',
+      pendingActivities,
+      pendingNexusOperations,
+    ),
   );
-  $: groups =
+  const groups = $derived(
     $eventFilterSort === 'ascending'
       ? ascendingGroups
-      : [...ascendingGroups].reverse();
+      : [...ascendingGroups].reverse(),
+  );
 
-  $: initialEvent = $fullEventHistory.find(
-    (e) =>
-      eventId === e.id ||
-      (isNexusOperationScheduledEvent(e) &&
-        eventId === e.attributes?.requestId),
+  const initialEvent = $derived(
+    $fullEventHistory.find(
+      (e) =>
+        e.id === eventId ||
+        e.id ===
+          workflow.workflowExtendedInfo?.requestIdInfos?.[eventId]?.eventId,
+    ),
   );
-  $: visibleItems = $fullEventHistory.filter(
-    (e) => ids.includes(e.id) || e.id === initialEvent?.id,
+
+  const visibleItems = $derived(
+    $fullEventHistory.filter(
+      (e) => ids.includes(e.id) || e.id === initialEvent?.id,
+    ),
   );
-  $: loading = !visibleItems.length;
+  const loading = $derived(!visibleItems.length);
+  const lastEventId = $derived(
+    $fullEventHistory[$fullEventHistory.length - 1]?.id,
+  );
 
   const loadPrevious = () => {
     const firstId = parseInt(ids[0]);
@@ -94,8 +109,6 @@
 
     ids = [...ids, ...nextTen];
   };
-
-  $: lastEventId = $fullEventHistory[$fullEventHistory.length - 1]?.id;
 </script>
 
 <div

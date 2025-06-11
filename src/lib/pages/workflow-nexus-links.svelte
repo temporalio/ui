@@ -29,7 +29,7 @@
       <th>{translate('common.workflow-id')}</th>
       <th>{translate('common.run-id')}</th>
       <th class="w-24">{translate('common.event-id')}</th>
-      <th class="w-24">{translate('common.request-id')}</th>
+      <th>{translate('common.request-id')}</th>
     </TableHeaderRow>
     {#each links as link}
       <TableRow data-testid="worker-row">
@@ -40,7 +40,7 @@
             })}>{link.workflowEvent.namespace}</Link
           >
         </td>
-        <td class="text-left" data-testid="worker-build-id">
+        <td class="text-left" data-testid="link-workflow-id">
           <Link
             href={routeForEventHistory({
               namespace: link.workflowEvent.namespace,
@@ -49,7 +49,7 @@
             })}>{link.workflowEvent.workflowId}</Link
           >
         </td>
-        <td class="text-left" data-testid="worker-build-id">
+        <td class="text-left" data-testid="link-rund-id">
           <Link
             href={routeForEventHistory({
               namespace: link.workflowEvent.namespace,
@@ -58,14 +58,14 @@
             })}>{link.workflowEvent.runId}</Link
           >
         </td>
-        <td class="text-left" data-testid="worker-last-access-time">
+        <td class="text-left" data-testid="link-eventRef">
           {#if link?.workflowEvent?.eventRef?.eventId || link?.workflowEvent?.eventRef?.eventType === 'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED'}
             <Link href={getEventLinkHref(link)}
               >{link.workflowEvent.eventRef?.eventId || '1'}</Link
             >
           {/if}
         </td>
-        <td class="text-left" data-testid="worker-last-access-time">
+        <td class="text-left" data-testid="link-requestRef">
           {#if link?.workflowEvent?.requestIdRef}
             <Link href={getEventLinkHref(link)}
               >{link.workflowEvent.requestIdRef.requestId}</Link

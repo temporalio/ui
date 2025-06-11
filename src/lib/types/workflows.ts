@@ -85,6 +85,8 @@ export type WorkflowExecutionConfigWithMetadata = WorkflowExecutionConfig & {
 export type WorkflowExtendedInfo = {
   resetRunId?: string;
   originalStartTime?: string;
+  requestIdInfos?: Record<string, { eventType: string; eventId: string }>;
+  runExpirationTime?: string;
 };
 
 export type WorkflowExecutionAPIResponse = Optional<{
