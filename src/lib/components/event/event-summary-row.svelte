@@ -20,7 +20,11 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { authUser } from '$lib/stores/auth-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type { Payload, WorkflowEvent } from '$lib/types/events';
+  import type {
+    IterableEvent,
+    Payload,
+    WorkflowEvent,
+  } from '$lib/types/events';
   import {
     cloneAllPotentialPayloadsWithCodec,
     decodePayloadAttributes,
@@ -54,8 +58,8 @@
   import MetadataDecoder from './metadata-decoder.svelte';
 
   interface Props {
-    event: WorkflowEvent;
-    group?: EventGroup;
+    event: IterableEvent;
+    group: EventGroup | undefined;
     initialItem: WorkflowEvent;
     index: number;
     compact?: boolean;
@@ -88,7 +92,7 @@
     };
   };
 
-  export const decodeLocalActivity = async (
+  const decodeLocalActivity = async (
     event,
   ): Promise<SummaryAttribute | undefined> => {
     const settings = {
@@ -102,7 +106,6 @@
     };
     const accessToken = $authUser.accessToken;
     const namespace = page.params.namespace;
-    if (!isLocalActivityMarkerEvent(event)) return;
     try {
       const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
         event.attributes,
