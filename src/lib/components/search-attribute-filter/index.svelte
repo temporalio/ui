@@ -162,7 +162,7 @@
     {#if showFilter}
       <div
         class="flex"
-        class:filter={!showActions}
+        class:grow={!showActions}
         on:keyup={handleKeyUp}
         role="none"
       >
@@ -245,9 +245,3 @@
   </div>
   <FilterList bind:filters />
 </div>
-
-<style lang="postcss">
-  .filter {
-    @apply grow;
-  }
-</style>
