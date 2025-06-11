@@ -67,10 +67,22 @@
 <tr>
   {#each columns as { label } (label)}
     {#if label === translate('deployments.build-id')}
-      <td class="w-full text-left">
+      <td class="text-left">
+        {buildId}
+      </td>
+    {:else if label === translate('deployments.status')}
+      <td class="text-left">
         <div class="flex items-center gap-2">
-          {buildId}
           <DeploymentStatus {status} label={statusLabel} />
+          {#if isCurrent && isVersionSummaryNew(version) && version?.currentSinceTime}
+            Since {formatDate(version?.currentSinceTime, $timeFormat, {
+              relative: $relativeTime,
+            })}
+          {:else if isRamping && isVersionSummaryNew(version) && version?.rampingSinceTime}
+            Since {formatDate(version?.rampingSinceTime, $timeFormat, {
+              relative: $relativeTime,
+            })}
+          {/if}
         </div>
       </td>
     {:else if label === translate('deployments.deployed')}
@@ -80,7 +92,7 @@
         })}</td
       >
     {:else if label === translate('deployments.workflows')}
-      <td class="whitespace-pre-line break-words text-center"
+      <td class="w-24 whitespace-pre-line break-words text-right"
         ><p>
           <Link
             icon="external-link"

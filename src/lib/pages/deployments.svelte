@@ -58,13 +58,12 @@
           <h1>
             {translate('deployments.worker-deployments')}
           </h1>
-          <Badge class="shrink-0">Pre-Release</Badge>
+          <Badge class="shrink-0">Public Preview</Badge>
         </div>
       </div>
-
       <tr slot="headers" class="text-left">
-        {#each columns as { label }, index}
-          <th class={index === 0 && 'w-full'}>{label}</th>
+        {#each columns as { label }}
+          <th>{label}</th>
         {/each}
       </tr>
       {#each visibleItems as deployment}

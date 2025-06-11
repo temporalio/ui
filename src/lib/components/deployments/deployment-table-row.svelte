@@ -15,14 +15,26 @@
 
   import DeploymentStatus from './deployment-status.svelte';
 
-  export let deployment: WorkerDeploymentSummary;
-  export let columns: ConfigurableTableHeader[];
+  type Props = {
+    deployment: WorkerDeploymentSummary;
+    columns: ConfigurableTableHeader[];
+  };
+  let { deployment, columns }: Props = $props();
+
+  const rampingBuildID = $derived(
+    deployment?.rampingVersionSummary?.deploymentVersion?.buildId ||
+      getBuildIdFromVersion(deployment?.routingConfig?.rampingVersion),
+  );
+  const currentBuildId = $derived(
+    deployment?.currentVersionSummary?.deploymentVersion?.buildId ||
+      getBuildIdFromVersion(deployment?.routingConfig?.currentVersion),
+  );
 </script>
 
 <tr>
   {#each columns as { label } (label)}
     {#if label === translate('deployments.name')}
-      <td class="p-2 text-left"
+      <td class="text-left"
         ><Link
           href={routeForWorkerDeployment({
             namespace: $page.params.namespace,
@@ -31,27 +43,22 @@
         ></td
       >
     {:else if label === translate('deployments.build-id')}
-      {@const rampingBuildID =
-        deployment?.rampingVersionSummary?.deploymentVersion?.buildId ||
-        getBuildIdFromVersion(deployment?.routingConfig?.rampingVersion)}
-      {@const currentBuildId =
-        deployment?.currentVersionSummary?.deploymentVersion?.buildId ||
-        getBuildIdFromVersion(deployment?.routingConfig?.currentVersion)}
-      <td class="whitespace-pre-line break-words p-2 text-left">
+      <td class="whitespace-pre-line break-words text-left">
         <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-2">
-            {#if rampingBuildID}
+          {#if rampingBuildID}
+            <div class="flex items-center gap-2">
               {rampingBuildID}
-            {/if}
-            {#if deployment?.routingConfig?.rampingVersionPercentage}
-              <DeploymentStatus
-                status="Ramping"
-                label={translate('deployments.ramping-percentage', {
-                  percentage: deployment.routingConfig.rampingVersionPercentage,
-                })}
-              />
-            {/if}
-          </div>
+              {#if deployment?.routingConfig?.rampingVersionPercentage}
+                <DeploymentStatus
+                  status="Ramping"
+                  label={translate('deployments.ramping-percentage', {
+                    percentage:
+                      deployment.routingConfig.rampingVersionPercentage,
+                  })}
+                />
+              {/if}
+            </div>
+          {/if}
           <div class="flex items-center gap-2">
             {currentBuildId}
             <DeploymentStatus
@@ -62,9 +69,9 @@
         </div>
       </td>
     {:else if label === translate('deployments.deployed')}
-      <td class="truncate p-2 text-left">
+      <td class="truncate py-2 text-left">
         <div class="flex flex-col gap-1">
-          {#if deployment.routingConfig.rampingVersionChangedTime}
+          {#if rampingBuildID && deployment.routingConfig.rampingVersionChangedTime}
             <p>
               {formatDate(
                 deployment.routingConfig.rampingVersionChangedTime,
@@ -83,7 +90,7 @@
         </div>
       </td>
     {:else if label === translate('deployments.workflows')}
-      <td class="truncate p-2 text-center"
+      <td class="truncate text-center"
         ><p>
           <Link
             icon="external-link"

@@ -10,8 +10,8 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
+    routeForTaskQueue,
     routeForWorkerDeployment,
-    routeForWorkers,
     routeForWorkflow,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
@@ -130,10 +130,9 @@
     <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
     <DetailListLinkValue
       text={workflow?.taskQueue}
-      href={routeForWorkers({
+      href={routeForTaskQueue({
         namespace,
-        workflow: workflow?.id,
-        run: workflow?.runId,
+        queue: workflow?.taskQueue,
       })}
     />
   </DetailListColumn>
