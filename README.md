@@ -149,32 +149,33 @@ Set these environment variables if you want to change their defaults
 
 
 ## Releases
-On every commit to main, a draft release will be either created or updated with the commit. When ready to create a release, update (if needed) and publish the draft release. This will automatically kick off a matching ui-server release that will publish the Docker image (https://github.com/temporalio/ui-server/releases).
 
-### Version Management
-The release process includes automatic version injection:
-- **Local builds**: Use the current version defined in `server/server/version/version.go`
-- **Release builds**: Version is injected at build time using Go's `-ldflags` to match the release tag
-- **After release**: A PR is automatically created to update the source code version to match the published release
-
-This ensures that the version reported by the application always matches the actual release version.
-
-Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
-=======
-Our `ui` repo releases page (https://github.com/temporalio/ui/releases) is for managing our [npm package](https://www.npmjs.com/package/@temporalio/ui). The package includes a copy of `/lib` directory with types.
-Our `ui-server` repo releases page (https://github.com/temporalio/ui-server/releases) is for managing docker images for the entire front-end app.
+This repository uses an automated release management system that enforces version bump PRs before releases and maintains dual version sync between `package.json` and `server/server/version/version.go`.
 
 ### Release Management
 
-This repository uses automated workflows for version management and releases. See [GitHub Workflows Documentation](.github/WORKFLOWS.md) for detailed information about:
+The release system uses custom GitHub Actions for modular, reusable functionality. See [GitHub Workflows Documentation](.github/WORKFLOWS.md) for detailed information about the 8 custom actions and 3 workflows.
 
-- **Version Bump Workflow**: Automatically updates versions in both `package.json` and `server/server/version/version.go`
-- **Release Draft Workflow**: Creates draft releases when version changes are detected
-- **Release Published Workflow**: Builds and packages releases when published
+**Release Process**:
+1. **Version Bump**: Use Actions → "Version Bump" to create a PR with updated versions
+   - **Auto mode**: Analyzes commits since last tag for semantic versioning
+   - **Manual mode**: Specify major/minor/patch bump type
+   - **Specific version**: Override with exact version (e.g., "2.38.0")
+   - **Dry run**: Preview changes without making modifications
+2. **Review and Merge**: Review the auto-generated version bump PR and merge to main
+3. **Draft Release**: Automatically created when version changes are detected
+4. **Publish Release**: Review and publish the auto-generated draft release
+5. **UI-server Release**: A published release automatically triggers a matching release in the ui-server repository
 
-**Quick Start for Maintainers**:
-1. Use Actions → "Version Bump" to update versions
-2. Review and merge the auto-generated version bump PR
-3. Review and publish the auto-generated draft release
+**Version Source of Truth**: The Go `UIVersion` constant in `server/server/version/version.go` is the authoritative source. All validation uses this as the reference, and `package.json` must be kept in sync.
 
-**Version Validation**: Run `pnpm validate:versions` to ensure version files are in sync and ready for release.
+**Version Validation**: 
+- Run `pnpm validate:versions` to ensure version files are in sync and ready for release
+- Validation compares against last git tag (not last commit) for robust release workflows
+- Custom actions provide detailed validation and error messages
+
+**Integration**:
+- Draft releases trigger downstream ui-server releases and Docker image publishing
+- UI repo releases (https://github.com/temporalio/ui/releases) contain the latest UI artifacts
+- Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
+- UI-server repo releases (https://github.com/temporalio/ui-server/releases) manage Docker images
