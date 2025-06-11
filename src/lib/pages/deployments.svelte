@@ -16,7 +16,6 @@
   const namespace = $derived(page.params.namespace);
 
   const onFetch = $derived.by(() => {
-    // This creates a new function whenever namespace or onError change
     return () => {
       error = '';
       return fetchPaginatedDeployments(namespace, '', onError);
