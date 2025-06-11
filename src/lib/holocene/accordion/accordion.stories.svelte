@@ -3,9 +3,9 @@
 
   import { iconNames } from '$lib/holocene/icon';
 
-  import Accordion from './accordion.svelte';
+  import Accordion, { type Props } from './accordion.svelte';
 
-  export const meta = {
+  export const meta: Meta<Props> = {
     title: 'Accordion',
     component: Accordion,
     args: {
@@ -16,18 +16,14 @@
       error: '',
     },
     argTypes: {
-      title: { name: 'Title', control: 'text' },
-      subtitle: { name: 'Subtitle', control: 'text' },
-      open: { name: 'Open', control: 'boolean' },
-      expandable: { name: 'Expandable', control: 'boolean' },
-      error: { name: 'Error', control: 'text' },
-      icon: {
-        name: 'Icon',
-        control: 'select',
-        options: iconNames,
-      },
+      title: { control: 'text' },
+      subtitle: { control: 'text' },
+      open: { control: 'boolean' },
+      expandable: { control: 'boolean' },
+      error: { control: 'text' },
+      icon: { control: 'select', options: iconNames },
     },
-  } satisfies Meta<Accordion>;
+  };
 </script>
 
 <script lang="ts">
@@ -41,7 +37,11 @@
 
 <Template let:args>
   <div class="flex flex-col gap-2">
-    <Accordion {...args} onToggle={action('onToggle')}>
+    <Accordion
+      {...args}
+      onToggle={action('onToggle')}
+      onclick={() => window.alert('CLICKED')}
+    >
       <p>Accordion Content</p>
     </Accordion>
     <AccordionGroup>
