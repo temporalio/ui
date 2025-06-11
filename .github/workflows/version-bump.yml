@@ -21,6 +21,10 @@ on:
           - major
           - minor
           - patch
+      specific_version:
+        description: 'Specific version to set (e.g., 2.38.0) - overrides version_type'
+        required: false
+        type: string
       force_update:
         description: 'Force update (override validation checks)'
         required: false
@@ -35,37 +39,22 @@ jobs:
   version-bump:
     runs-on: ubuntu-latest
     outputs:
-      version-changed: ${{ steps.version-check.outputs.version-changed }}
+      version-changed: ${{ steps.calculate-version.outputs.version-changed }}
       new-version: ${{ steps.calculate-version.outputs.new-version }}
-      pr-number: ${{ steps.create-pr.outputs.pr-number }}
-    
+      pr-number: ${{ steps.create-pr.outputs.pull-request-number }}
+      pr-url: ${{ steps.create-pr.outputs.pull-request-url }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node
-        uses: ./.github/actions/setup-node
-
       - name: Validate current versions are in sync
         id: validate-sync
-        run: |
-          PACKAGE_VERSION=$(jq -r '.version' package.json)
-          GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
-          
-          echo "Package version: $PACKAGE_VERSION"
-          echo "Go version: $GO_VERSION"
-          
-          if [[ "$PACKAGE_VERSION" != "$GO_VERSION" ]] && [[ "${{ inputs.force_update }}" != "true" ]]; then
-            echo "❌ Version mismatch detected!"
-            echo "package.json: $PACKAGE_VERSION"
-            echo "version.go: $GO_VERSION"
-            echo "Please sync versions before running version bump workflow."
-            exit 1
-          fi
-          
-          echo "current-version=$GO_VERSION" >> $GITHUB_OUTPUT
+        uses: ./.github/actions/validate-version-sync
+        with:
+          force: ${{ inputs.force_update }}
 
       - name: Get last version tag
         id: last-tag
@@ -77,96 +66,19 @@ jobs:
       - name: Analyze merged PRs since last version
         id: analyze-prs
         if: inputs.mode == 'auto' || inputs.mode == 'dry-run'
-        run: |
-          LAST_TAG="${{ steps.last-tag.outputs.last-tag }}"
-          
-          # Get commits since last tag
-          if [[ "$LAST_TAG" == "v0.0.0" ]]; then
-            COMMITS=$(git log --oneline --format="%H %s" HEAD~10..HEAD)
-          else
-            COMMITS=$(git log --oneline --format="%H %s" ${LAST_TAG}..HEAD)
-          fi
-          
-          echo "Analyzing commits since $LAST_TAG:"
-          echo "$COMMITS"
-          
-          # For now, we'll determine version bump based on conventional commits or manual analysis
-          # In a real implementation, you'd want to integrate with GitHub API to get PR labels
-          BUMP_TYPE="patch"
-          
-          # Simple heuristic: look for breaking changes, features, or fixes in commit messages
-          if echo "$COMMITS" | grep -i "BREAKING\|breaking change\|major" >/dev/null; then
-            BUMP_TYPE="major"
-          elif echo "$COMMITS" | grep -i "feat\|feature\|minor" >/dev/null; then
-            BUMP_TYPE="minor"
-          fi
-          
-          echo "bump-type=$BUMP_TYPE" >> $GITHUB_OUTPUT
-          echo "Determined bump type: $BUMP_TYPE"
-          
-          # Generate changelog
-          CHANGELOG=$(echo "$COMMITS" | sed 's/^[a-f0-9]* /- /')
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+        uses: ./.github/actions/analyze-version-bump-type
+        with:
+          last-tag: ${{ steps.last-tag.outputs.last-tag }}
 
       - name: Calculate new version
         id: calculate-version
-        run: |
-          CURRENT_VERSION="${{ steps.validate-sync.outputs.current-version }}"
-          
-          if [[ "${{ inputs.mode }}" == "manual" ]]; then
-            BUMP_TYPE="${{ inputs.version_type }}"
-          else
-            BUMP_TYPE="${{ steps.analyze-prs.outputs.bump-type }}"
-          fi
-          
-          echo "Current version: $CURRENT_VERSION"
-          echo "Bump type: $BUMP_TYPE"
-          
-          # Parse semantic version
-          if [[ $CURRENT_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-            MAJOR=${BASH_REMATCH[1]}
-            MINOR=${BASH_REMATCH[2]}
-            PATCH=${BASH_REMATCH[3]}
-          else
-            echo "❌ Invalid semantic version format: $CURRENT_VERSION"
-            exit 1
-          fi
-          
-          # Calculate new version
-          case $BUMP_TYPE in
-            major)
-              NEW_VERSION="$((MAJOR + 1)).0.0"
-              ;;
-            minor)
-              NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
-              ;;
-            patch)
-              NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
-              ;;
-            *)
-              echo "❌ Invalid bump type: $BUMP_TYPE"
-              exit 1
-              ;;
-          esac
-          
-          echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "New version will be: $NEW_VERSION"
+        uses: ./.github/actions/calculate-version-bump
+        with:
+          current-version: ${{ steps.validate-sync.outputs.current-version }}
+          bump-type: ${{ inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type }}
+          specific-version: ${{ inputs.specific_version }}
+          mode: ${{ inputs.mode }}
 
-      - name: Check if version changed
-        id: version-check
-        run: |
-          CURRENT="${{ steps.validate-sync.outputs.current-version }}"
-          NEW="${{ steps.calculate-version.outputs.new-version }}"
-          
-          if [[ "$CURRENT" != "$NEW" ]]; then
-            echo "version-changed=true" >> $GITHUB_OUTPUT
-            echo "✅ Version will change from $CURRENT to $NEW"
-          else
-            echo "version-changed=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No version change needed (current: $CURRENT)"
-          fi
 
       - name: Dry run summary
         if: inputs.mode == 'dry-run'
@@ -175,106 +87,78 @@ jobs:
           echo ""
           echo "**Current Version:** ${{ steps.validate-sync.outputs.current-version }}"
           echo "**New Version:** ${{ steps.calculate-version.outputs.new-version }}"
-          echo "**Bump Type:** ${{ steps.analyze-prs.outputs.bump-type }}"
-          echo "**Version Changed:** ${{ steps.version-check.outputs.version-changed }}"
+          if [[ -n "${{ inputs.specific_version }}" ]]; then
+            echo "**Version Source:** Specific version (manual override)"
+            echo "**Specified Version:** ${{ inputs.specific_version }}"
+          else
+            echo "**Version Source:** ${{ inputs.mode == 'manual' && 'Manual bump type' || 'Auto-detected from commits' }}"
+            echo "**Bump Type:** ${{ steps.analyze-prs.outputs.bump-type }}"
+          fi
+          echo "**Version Changed:** ${{ steps.calculate-version.outputs.version-changed }}"
           echo ""
-          echo "### 📝 Changes Since Last Version"
-          echo "${{ steps.analyze-prs.outputs.changelog }}"
-          echo ""
+          if [[ -z "${{ inputs.specific_version }}" ]]; then
+            echo "### 📝 Changes Since Last Version"
+            echo "${{ steps.analyze-prs.outputs.changelog }}"
+            echo ""
+          fi
           echo "**Note:** This was a dry run. No files were modified."
 
-      - name: Update package.json
-        if: inputs.mode != 'dry-run' && steps.version-check.outputs.version-changed == 'true'
-        run: |
-          NEW_VERSION="${{ steps.calculate-version.outputs.new-version }}"
-          jq ".version = \"$NEW_VERSION\"" package.json > tmp.json && mv tmp.json package.json
-          echo "✅ Updated package.json to version $NEW_VERSION"
-
-      - name: Update version.go
-        if: inputs.mode != 'dry-run' && steps.version-check.outputs.version-changed == 'true'
-        run: |
-          NEW_VERSION="${{ steps.calculate-version.outputs.new-version }}"
-          sed -i "s/UIVersion.*=.*\".*\"/UIVersion               = \"$NEW_VERSION\"/" server/server/version/version.go
-          echo "✅ Updated version.go to version $NEW_VERSION"
+      - name: Update version files
+        if: inputs.mode != 'dry-run' && steps.calculate-version.outputs.version-changed == 'true'
+        id: update-files
+        uses: ./.github/actions/update-version-files
+        with:
+          new-version: ${{ steps.calculate-version.outputs.new-version }}
 
       - name: Create Pull Request
-        if: inputs.mode != 'dry-run' && steps.version-check.outputs.version-changed == 'true'
+        if: inputs.mode != 'dry-run' && steps.calculate-version.outputs.version-changed == 'true'
         id: create-pr
-        run: |
-          NEW_VERSION="${{ steps.calculate-version.outputs.new-version }}"
-          BRANCH_NAME="version-bump-$NEW_VERSION"
-          
-          # Configure git
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Create and switch to new branch
-          git checkout -b "$BRANCH_NAME"
-          
-          # Add changes
-          git add package.json server/server/version/version.go
-          
-          # Check if there are changes to commit
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            echo "pr-number=" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          # Commit changes
-          git commit -m "chore: bump version to $NEW_VERSION
-
-          Auto-generated version bump from ${{ steps.validate-sync.outputs.current-version }} to $NEW_VERSION
-
-          Bump type: ${{ inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type }}
-
-          Changes included:
-          ${{ steps.analyze-prs.outputs.changelog || 'Manual version bump' }}"
-          
-          # Push branch
-          git push origin "$BRANCH_NAME"
-          
-          # Create PR
-          PR_BODY="## 🚀 Version Bump to $NEW_VERSION
-
-          This PR updates the version from \`${{ steps.validate-sync.outputs.current-version }}\` to \`$NEW_VERSION\`.
-
-          ### 📋 Files Updated
-          - \`package.json\`
-          - \`server/server/version/version.go\`
-
-          ### 📝 Bump Details
-          - **Bump Type:** ${{ inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type }}
-          - **Mode:** ${{ inputs.mode }}
-
-          ### 📖 Changes Since Last Version
-          ${{ steps.analyze-prs.outputs.changelog || 'Manual version bump - no automatic changelog generated' }}
-
-          ---
-          🤖 This PR was automatically created by the Version Bump workflow."
-          
-          gh pr create \
-            --title "chore: bump version to $NEW_VERSION" \
-            --body "$PR_BODY" \
-            --head "$BRANCH_NAME" \
-            --base main
-          
-          PR_NUMBER=$(gh pr view "$BRANCH_NAME" --json number --jq '.number')
-          echo "pr-number=$PR_NUMBER" >> $GITHUB_OUTPUT
-          echo "✅ Created PR #$PR_NUMBER"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            chore: bump version to ${{ steps.calculate-version.outputs.new-version }}
+            
+            Auto-generated version bump from ${{ steps.validate-sync.outputs.current-version }} to ${{ steps.calculate-version.outputs.new-version }}
+            
+            ${{ inputs.specific_version && format('Specific version: {0}', inputs.specific_version) || format('Bump type: {0}', inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type) }}
+            
+            ${{ inputs.specific_version && 'Manual version override' || format('Changes included:\n{0}', steps.analyze-prs.outputs.changelog || 'Manual version bump') }}
+          title: "chore: bump version to ${{ steps.calculate-version.outputs.new-version }}"
+          body: |
+            ## 🚀 Version Bump to ${{ steps.calculate-version.outputs.new-version }}
+            
+            This PR updates the version from `${{ steps.validate-sync.outputs.current-version }}` to `${{ steps.calculate-version.outputs.new-version }}`.
+            
+            ### 📋 Files Updated
+            - `package.json`
+            - `server/server/version/version.go`
+            
+            ### 📝 Bump Details
+            ${{ inputs.specific_version && format('- **Version Source:** Specific version override\n- **Specified Version:** {0}', inputs.specific_version) || format('- **Bump Type:** {0}', inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type) }}
+            - **Mode:** ${{ inputs.mode }}
+            
+            ${{ inputs.specific_version && '### 📌 Manual Version Override\n\nThis version was manually specified rather than calculated from commit history.' || format('### 📖 Changes Since Last Version\n{0}', steps.analyze-prs.outputs.changelog || 'Manual version bump - no automatic changelog generated') }}
+            
+            ---
+            🤖 This PR was automatically created by the Version Bump workflow.
+          branch: version-bump-${{ steps.calculate-version.outputs.new-version }}
+          delete-branch: true
+          committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
 
       - name: Summary
         if: inputs.mode != 'dry-run'
         run: |
-          if [[ "${{ steps.version-check.outputs.version-changed }}" == "true" ]]; then
+          if [[ "${{ steps.calculate-version.outputs.version-changed }}" == "true" ]]; then
             echo "🎉 Version bump completed!"
             echo "- Old version: ${{ steps.validate-sync.outputs.current-version }}"
             echo "- New version: ${{ steps.calculate-version.outputs.new-version }}"
-            if [[ -n "${{ steps.create-pr.outputs.pr-number }}" ]]; then
-              echo "- Pull Request: #${{ steps.create-pr.outputs.pr-number }}"
+            if [[ -n "${{ steps.create-pr.outputs.pull-request-number }}" ]]; then
+              echo "- Pull Request: #${{ steps.create-pr.outputs.pull-request-number }}"
+              echo "- Pull Request URL: ${{ steps.create-pr.outputs.pull-request-url }}"
             fi
           else
             echo "ℹ️ No version change was needed."
           fi
+

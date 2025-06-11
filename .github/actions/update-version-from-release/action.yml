@@ -1,0 +1,40 @@
+name: 'Update Version from Release'
+description: 'Updates version.go to match the published release tag'
+inputs:
+  release-tag:
+    description: 'Release tag from GitHub release event'
+    required: true
+outputs:
+  updated-version:
+    description: 'Version that was set in the files'
+    value: ${{ steps.update.outputs.updated-version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Update version in source code
+      id: update
+      shell: bash
+      run: |
+        # Extract version from release tag (remove 'v' prefix if present)
+        RELEASE_TAG="${{ inputs.release-tag }}"
+        VERSION="${RELEASE_TAG#v}"
+        
+        echo "🔄 Updating version file to: $VERSION"
+
+        # Update the version.go file
+        sed -i "s/UIVersion               = \".*\"/UIVersion               = \"$VERSION\"/" server/server/version/version.go
+        
+        # Verify the update
+        UPDATED_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
+        
+        if [[ "$UPDATED_VERSION" == "$VERSION" ]]; then
+          echo "✅ Version.go updated successfully: $VERSION"
+        else
+          echo "❌ Failed to update version.go"
+          echo "  Expected: $VERSION"
+          echo "  Actual: $UPDATED_VERSION"
+          exit 1
+        fi
+        
+        echo "updated-version=$VERSION" >> $GITHUB_OUTPUT

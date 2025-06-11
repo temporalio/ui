@@ -10,11 +10,6 @@ permissions:
   issues: write
   actions: write
 
-env:
-  RELEASE_TAG: ${{ github.event.release.tag_name }}
-  PR_TITLE: 'Update version to ${{ github.event.release.tag_name }} after release'
-  BRANCH_NAME: update-version-latest
-
 jobs:
   create_release:
     runs-on: ubuntu-latest
@@ -22,49 +17,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Validate release version
-        run: |
-          RELEASE_TAG="${{ github.event.release.tag_name }}"
-          # Remove 'v' prefix if present
-          RELEASE_VERSION=${RELEASE_TAG#v}
-          
-          # Get current versions from files
-          PACKAGE_VERSION=$(jq -r '.version' package.json)
-          GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
-          
-          echo "Release tag: $RELEASE_TAG"
-          echo "Release version: $RELEASE_VERSION"
-          echo "Package.json version: $PACKAGE_VERSION"
-          echo "Version.go version: $GO_VERSION"
-          
-          # Validate versions are in sync
-          if [[ "$PACKAGE_VERSION" != "$GO_VERSION" ]]; then
-            echo "❌ Version files are not in sync!"
-            echo "package.json: $PACKAGE_VERSION"
-            echo "version.go: $GO_VERSION"
-            exit 1
-          fi
-          
-          # Validate release version matches current version
-          if [[ "$RELEASE_VERSION" != "$PACKAGE_VERSION" ]]; then
-            echo "❌ Release version does not match current version!"
-            echo "Release: $RELEASE_VERSION"
-            echo "Current: $PACKAGE_VERSION"
-            echo ""
-            echo "Please ensure the release tag matches the version in the code."
-            echo "Use the Version Bump workflow to update versions before creating a release."
-            exit 1
-          fi
-          
-          echo "✅ Version validation passed: $RELEASE_VERSION"
+        id: validate-release
+        uses: ./.github/actions/validate-published-release
+        with:
+          release-tag: ${{ github.event.release.tag_name }}
 
       - name: Setup Node
         uses: ./.github/actions/setup-node
 
       - name: Build package
-        run: |
-          pnpm package
-          # make tar from dist folder
-          tar -czf temporal-ui-package.tar.gz dist
+        id: build-package
+        uses: ./.github/actions/build-and-package
 
       - name: upload package artifact
         uses: actions/upload-release-asset@v1
@@ -72,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./temporal-ui-package.tar.gz
+          asset_path: ${{ steps.build-package.outputs.package-path }}
           asset_name: temporal-ui-package.tar.gz
           asset_content_type: application/gzip
 
@@ -98,30 +61,3 @@ jobs:
               "release_url": "${{ github.event.release.html_url }}"
             }
 
-      - name: Update version in source code
-        run: |
-          # Extract version from release tag (remove 'v' prefix if present)
-          VERSION="${{ env.RELEASE_TAG }}"
-          VERSION="${VERSION#v}"
-          echo "Updating version file to: $VERSION"
-
-          # Update the version.go file
-          sed -i "s/UIVersion               = \".*\"/UIVersion               = \"$VERSION\"/" server/server/version/version.go
-
-      - name: Create or update PR
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ env.BRANCH_NAME }}
-          base: main
-          title: ${{ env.PR_TITLE }}
-          draft: true
-          body: |
-            **Version updated to [${{ env.RELEASE_TAG }}](${{ github.event.release.html_url }}) after release**
-
-            This PR updates the version in `server/server/version/version.go` to match the published release.
-
-            ---
-
-            **Release URL**: ${{ github.event.release.html_url }}
-            **Release Tag**: ${{ env.RELEASE_TAG }}

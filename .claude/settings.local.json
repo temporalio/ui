@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(jq:*)",
+      "Bash(grep:*)",
+      "Bash(./scripts/validate-versions.sh:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": []
+  }
+}

@@ -1,0 +1,62 @@
+name: 'Validate Version Sync'
+description: 'Validates that package.json and version.go have matching versions'
+inputs:
+  force:
+    description: 'Force validation to pass even with mismatches'
+    required: false
+    default: 'false'
+outputs:
+  package-version:
+    description: 'Version from package.json'
+    value: ${{ steps.extract.outputs.package-version }}
+  go-version:
+    description: 'Version from version.go (source of truth)'
+    value: ${{ steps.extract.outputs.go-version }}
+  versions-match:
+    description: 'Whether versions are in sync'
+    value: ${{ steps.validate.outputs.versions-match }}
+  current-version:
+    description: 'Current version (Go version as source of truth)'
+    value: ${{ steps.extract.outputs.go-version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Extract versions
+      id: extract
+      shell: bash
+      run: |
+        PACKAGE_VERSION=$(jq -r '.version' package.json)
+        GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
+        
+        echo "package-version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+        echo "go-version=$GO_VERSION" >> $GITHUB_OUTPUT
+        
+        echo "📦 package.json version: $PACKAGE_VERSION"
+        echo "🔧 version.go version: $GO_VERSION (source of truth)"
+
+    - name: Validate sync
+      id: validate
+      shell: bash
+      run: |
+        PACKAGE_VERSION="${{ steps.extract.outputs.package-version }}"
+        GO_VERSION="${{ steps.extract.outputs.go-version }}"
+        FORCE="${{ inputs.force }}"
+        
+        if [[ "$PACKAGE_VERSION" == "$GO_VERSION" ]]; then
+          echo "versions-match=true" >> $GITHUB_OUTPUT
+          echo "✅ Versions are in sync: $GO_VERSION"
+        else
+          echo "versions-match=false" >> $GITHUB_OUTPUT
+          echo "❌ Version mismatch detected!"
+          echo "  package.json: $PACKAGE_VERSION"
+          echo "  version.go: $GO_VERSION (source of truth)"
+          
+          if [[ "$FORCE" != "true" ]]; then
+            echo "💡 Fix this by updating package.json to match version.go"
+            echo "💡 Or use the Version Bump workflow to sync both files"
+            exit 1
+          else
+            echo "⚠️ Continuing due to force=true"
+          fi
+        fi

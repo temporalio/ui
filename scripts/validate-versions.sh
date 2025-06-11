@@ -129,7 +129,7 @@ get_go_version() {
   grep 'UIVersion.*=' "$version_go" | sed 's/.*"\([^"]*\)".*/\1/'
 }
 
-# Get previous version from git history (using Go version as source of truth)
+# Get previous version from last git tag (more reliable than last commit)
 get_previous_version() {
   local project_root="$1"
   
@@ -137,16 +137,19 @@ get_previous_version() {
   local original_dir="$(pwd)"
   cd "$project_root" || return 1
   
-  # Get previous version.go UIVersion using relative path
-  local previous_version
-  previous_version=$(git show HEAD~1:server/server/version/version.go 2>/dev/null | \
-    grep 'UIVersion.*=' | \
-    sed 's/.*"\([^"]*\)".*/\1/')
+  # Get last tag and extract version
+  local last_tag
+  last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
   
   # Return to original directory
   cd "$original_dir" || return 1
   
-  echo "$previous_version"
+  # Remove 'v' prefix if present and return
+  if [[ -n "$last_tag" ]]; then
+    echo "${last_tag#v}"
+  else
+    echo ""
+  fi
 }
 
 # Compare semantic versions
