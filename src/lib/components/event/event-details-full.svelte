@@ -3,9 +3,9 @@
   import type { WorkflowEvent } from '$lib/types/events';
 
   import PendingActivityCard from '../workflow/pending-activity/pending-activity-card.svelte';
+  import PendingNexusOperationCard from '../workflow/pending-nexus-operation/pending-nexus-operation-card.svelte';
 
   import EventCard from './event-card.svelte';
-  import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
 
   let {
     group = undefined,
@@ -28,19 +28,7 @@
     {#if group?.pendingActivity}
       <PendingActivityCard activity={group.pendingActivity} />
     {:else if group?.pendingNexusOperation}
-      {@const details = Object.entries(group?.pendingNexusOperation)}
-      <div class="w-full border-subtle [&:not(:last-child)]:border-r">
-        <div class="pending flex w-full justify-between px-2 py-1 text-white">
-          <div class="flex gap-2">Pending Nexus Operation</div>
-        </div>
-        {#each details as [key, value] (key)}
-          <EventDetailsRowExpanded
-            {key}
-            {value}
-            attributes={group?.pendingNexusOperation}
-          />
-        {/each}
-      </div>
+      <PendingNexusOperationCard operation={group.pendingNexusOperation} />
     {/if}
   </div>
 {:else if event}

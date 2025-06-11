@@ -65,6 +65,7 @@ export type PendingActivityState =
 export type PendingChildren = import('$lib/types').PendingChildrenInfo;
 export type PendingNexusOperation = import('$lib/types').PendingNexusInfo & {
   scheduledEventId: string;
+  scheduleToCloseTimeout: string;
 };
 export type Callbacks = import('$lib/types').CallbackInfo[];
 

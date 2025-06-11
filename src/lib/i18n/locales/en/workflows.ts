@@ -285,4 +285,7 @@ export const Strings = {
   'update-details': 'Update Details',
   'billable-actions': 'Billable Actions (estimate)',
   'estimated-billable-actions': 'Estimated Billable Actions',
+  'pending-nexus-operation': 'Pending Nexus Operation',
+  'schedule-event-id': 'Scheduled Event ID',
+  'schedule-to-close-timeout': 'Schedule to Close Timeout',
 } as const;
