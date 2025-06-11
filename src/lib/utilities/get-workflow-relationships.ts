@@ -5,6 +5,7 @@ import type {
   ChildWorkflowExecutionFailedEvent,
   ChildWorkflowExecutionTerminatedEvent,
   ChildWorkflowExecutionTimedOutEvent,
+  EventLink,
   IterableEvent,
   WorkflowEvents,
 } from '$lib/types/events';
@@ -133,4 +134,19 @@ export const getWorkflowRelationships = (
     scheduleId,
     relationshipCount,
   };
+};
+
+export const getWorkflowLinks = (
+  fullEventHistory: WorkflowEvents,
+): EventLink[] => {
+  const links = new Set<EventLink>();
+  for (const event of fullEventHistory) {
+    if (event.links && event.links.length > 0) {
+      for (const link of event.links) {
+        links.add(link);
+      }
+    }
+  }
+
+  return Array.from(links);
 };

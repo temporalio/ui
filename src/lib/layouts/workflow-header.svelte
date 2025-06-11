@@ -24,11 +24,15 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+  import {
+    getWorkflowLinks,
+    getWorkflowRelationships,
+  } from '$lib/utilities/get-workflow-relationships';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
     routeForEventHistory,
+    routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
     routeForWorkers,
@@ -63,6 +67,7 @@
     $fullEventHistory,
     $namespaces,
   );
+  $: linksCount = getWorkflowLinks($fullEventHistory)?.length || 0;
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -236,6 +241,20 @@
           </div>
         </Badge>
       </Tab>
+      <Tab
+        label={translate('workflows.nexus-links-tab')}
+        id="nexus-links-tab"
+        href={routeForNexusLinks(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForNexusLinks(routeParameters),
+        )}
+      >
+        <Badge type="primary" class="px-2 py-0">
+          {linksCount}
+        </Badge>
+      </Tab>
+
       <Tab
         label={translate('workflows.call-stack-tab')}
         id="call-stack-tab"

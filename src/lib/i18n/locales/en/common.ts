@@ -64,6 +64,8 @@ export const Strings = {
   'workflow-type': 'Workflow Type',
   'workflow-id': 'Workflow ID',
   'run-id': 'Run ID',
+  'event-id': 'Event ID',
+  'request-id': 'Request ID',
   'task-queue': 'Task Queue',
   preview: 'Preview',
   status: 'Status',

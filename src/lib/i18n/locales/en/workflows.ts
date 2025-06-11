@@ -123,6 +123,7 @@ export const Strings = {
   'workflow-history': 'Workflow History',
   'workers-tab': 'Workers',
   'pending-activities-tab': 'Pending Activities',
+  'nexus-links-tab': 'Nexus Links',
   'call-stack-tab': 'Call Stack',
   'queries-tab': 'Queries',
   'metadata-tab': 'Metadata',
