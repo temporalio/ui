@@ -25,7 +25,7 @@ outputs:
     description: 'Major version number'
     value: ${{ steps.parse.outputs.major }}
   minor:
-    description: 'Minor version number'  
+    description: 'Minor version number'
     value: ${{ steps.parse.outputs.minor }}
   patch:
     description: 'Patch version number'
@@ -39,24 +39,24 @@ runs:
       shell: bash
       run: |
         CURRENT_VERSION="${{ inputs.current-version }}"
-        
+
         echo "🔍 Parsing version: $CURRENT_VERSION"
-        
+
         # Validate semantic version format
         if [[ ! $CURRENT_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
           echo "❌ Invalid semantic version format: $CURRENT_VERSION"
           echo "Expected format: x.y.z (e.g., 1.2.3)"
           exit 1
         fi
-        
+
         MAJOR=${BASH_REMATCH[1]}
         MINOR=${BASH_REMATCH[2]}
         PATCH=${BASH_REMATCH[3]}
-        
+
         echo "major=$MAJOR" >> $GITHUB_OUTPUT
         echo "minor=$MINOR" >> $GITHUB_OUTPUT
         echo "patch=$PATCH" >> $GITHUB_OUTPUT
-        
+
         echo "📊 Current: $MAJOR.$MINOR.$PATCH"
 
     - name: Calculate new version
@@ -69,7 +69,7 @@ runs:
         MAJOR="${{ steps.parse.outputs.major }}"
         MINOR="${{ steps.parse.outputs.minor }}"
         PATCH="${{ steps.parse.outputs.patch }}"
-        
+
         # Check if specific version was provided
         if [[ -n "$SPECIFIC_VERSION" ]]; then
           echo "🎯 Using specific version: $SPECIFIC_VERSION"
@@ -116,7 +116,7 @@ runs:
               ;;
           esac
         fi
-        
+
         # Check if version actually changed
         if [[ "$CURRENT_VERSION" != "$NEW_VERSION" ]]; then
           VERSION_CHANGED="true"
@@ -125,6 +125,6 @@ runs:
           VERSION_CHANGED="false" 
           echo "ℹ️ No version change (already at $CURRENT_VERSION)"
         fi
-        
+
         echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
         echo "version-changed=$VERSION_CHANGED" >> $GITHUB_OUTPUT

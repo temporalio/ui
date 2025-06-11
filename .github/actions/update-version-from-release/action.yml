@@ -19,15 +19,15 @@ runs:
         # Extract version from release tag (remove 'v' prefix if present)
         RELEASE_TAG="${{ inputs.release-tag }}"
         VERSION="${RELEASE_TAG#v}"
-        
+
         echo "🔄 Updating version file to: $VERSION"
 
         # Update the version.go file
         sed -i "s/UIVersion               = \".*\"/UIVersion               = \"$VERSION\"/" server/server/version/version.go
-        
+
         # Verify the update
         UPDATED_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
-        
+
         if [[ "$UPDATED_VERSION" == "$VERSION" ]]; then
           echo "✅ Version.go updated successfully: $VERSION"
         else
@@ -36,5 +36,5 @@ runs:
           echo "  Actual: $UPDATED_VERSION"
           exit 1
         fi
-        
+
         echo "updated-version=$VERSION" >> $GITHUB_OUTPUT

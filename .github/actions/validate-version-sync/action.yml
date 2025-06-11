@@ -28,10 +28,10 @@ runs:
       run: |
         PACKAGE_VERSION=$(jq -r '.version' package.json)
         GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
-        
+
         echo "package-version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
         echo "go-version=$GO_VERSION" >> $GITHUB_OUTPUT
-        
+
         echo "📦 package.json version: $PACKAGE_VERSION"
         echo "🔧 version.go version: $GO_VERSION (source of truth)"
 
@@ -42,7 +42,7 @@ runs:
         PACKAGE_VERSION="${{ steps.extract.outputs.package-version }}"
         GO_VERSION="${{ steps.extract.outputs.go-version }}"
         FORCE="${{ inputs.force }}"
-        
+
         if [[ "$PACKAGE_VERSION" == "$GO_VERSION" ]]; then
           echo "versions-match=true" >> $GITHUB_OUTPUT
           echo "✅ Versions are in sync: $GO_VERSION"

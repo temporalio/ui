@@ -28,9 +28,9 @@ runs:
       run: |
         LAST_TAG="${{ inputs.last-tag }}"
         MAX_COMMITS="${{ inputs.max-commits }}"
-        
+
         echo "🔍 Analyzing commits since: $LAST_TAG"
-        
+
         # Get commits since last tag
         if [[ "$LAST_TAG" == "v0.0.0" ]] || [[ -z "$LAST_TAG" ]]; then
           echo "📝 No previous tag found, analyzing last $MAX_COMMITS commits"
@@ -39,7 +39,7 @@ runs:
           echo "📝 Analyzing commits since $LAST_TAG"
           COMMITS=$(git log --oneline --format="%H %s" ${LAST_TAG}..HEAD 2>/dev/null || echo "")
         fi
-        
+
         if [[ -z "$COMMITS" ]]; then
           echo "⚠️ No commits found to analyze"
           echo "bump-type=patch" >> $GITHUB_OUTPUT
@@ -47,16 +47,16 @@ runs:
           echo "commit-count=0" >> $GITHUB_OUTPUT
           exit 0
         fi
-        
+
         # Count commits
         COMMIT_COUNT=$(echo "$COMMITS" | wc -l | tr -d ' ')
         echo "📊 Found $COMMIT_COUNT commits to analyze"
-        
+
         # Analyze commit messages for version bump indicators
         BUMP_TYPE="patch"  # Default to patch
-        
+
         echo "🔍 Scanning commit messages..."
-        
+
         # Check for breaking changes (major)
         if echo "$COMMITS" | grep -iE "(BREAKING|breaking change|major)" >/dev/null; then
           BUMP_TYPE="major"
@@ -69,27 +69,27 @@ runs:
         else
           echo "🔧 Found fixes/improvements → patch bump"
         fi
-        
+
         # Generate changelog
         CHANGELOG=$(echo "$COMMITS" | sed 's/^[a-f0-9]* /- /' | head -20)
-        
+
         echo "📋 Changelog preview:"
         echo "$CHANGELOG" | head -5
         if [[ $COMMIT_COUNT -gt 5 ]]; then
           echo "... and $((COMMIT_COUNT - 5)) more commits"
         fi
-        
+
         # Set outputs
         echo "bump-type=$BUMP_TYPE" >> $GITHUB_OUTPUT
         echo "commit-count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
-        
+
         # Use heredoc for multiline changelog
         cat >> $GITHUB_OUTPUT << 'EOF'
         changelog<<CHANGELOG_EOF
         ${{ env.CHANGELOG_CONTENT }}
         CHANGELOG_EOF
         EOF
-        
+
         # Store changelog in environment for the heredoc
         {
           echo "CHANGELOG_CONTENT<<CHANGELOG_HEREDOC_EOF"

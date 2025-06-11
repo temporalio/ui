@@ -28,15 +28,15 @@ runs:
       run: |
         NEW_VERSION="${{ inputs.new-version }}"
         DRY_RUN="${{ inputs.dry-run }}"
-        
+
         echo "🎯 Target version: $NEW_VERSION"
-        
+
         # Validate semantic version format
         if [[ ! $NEW_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           echo "❌ Invalid semantic version format: $NEW_VERSION"
           exit 1
         fi
-        
+
         if [[ "$DRY_RUN" == "true" ]]; then
           echo "🔍 DRY RUN - Would update:"
           echo "  📦 package.json: $(jq -r '.version' package.json) → $NEW_VERSION"
@@ -46,13 +46,13 @@ runs:
           echo "go-updated=false" >> $GITHUB_OUTPUT
           exit 0
         fi
-        
+
         # Update package.json
         echo "📦 Updating package.json..."
         ORIGINAL_PACKAGE_VERSION=$(jq -r '.version' package.json)
         jq ".version = \"$NEW_VERSION\"" package.json > tmp.json && mv tmp.json package.json
         UPDATED_PACKAGE_VERSION=$(jq -r '.version' package.json)
-        
+
         if [[ "$UPDATED_PACKAGE_VERSION" == "$NEW_VERSION" ]]; then
           echo "✅ package.json updated: $ORIGINAL_PACKAGE_VERSION → $NEW_VERSION"
           echo "package-updated=true" >> $GITHUB_OUTPUT
@@ -61,13 +61,13 @@ runs:
           echo "package-updated=false" >> $GITHUB_OUTPUT
           exit 1
         fi
-        
+
         # Update version.go
         echo "🔧 Updating version.go..."
         ORIGINAL_GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
         sed -i "s/UIVersion.*=.*\".*\"/UIVersion               = \"$NEW_VERSION\"/" server/server/version/version.go
         UPDATED_GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
-        
+
         if [[ "$UPDATED_GO_VERSION" == "$NEW_VERSION" ]]; then
           echo "✅ version.go updated: $ORIGINAL_GO_VERSION → $NEW_VERSION"
           echo "go-updated=true" >> $GITHUB_OUTPUT
@@ -76,11 +76,11 @@ runs:
           echo "go-updated=false" >> $GITHUB_OUTPUT
           exit 1
         fi
-        
+
         # Verify both files now match
         FINAL_PACKAGE_VERSION=$(jq -r '.version' package.json)
         FINAL_GO_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
-        
+
         if [[ "$FINAL_PACKAGE_VERSION" == "$FINAL_GO_VERSION" ]] && [[ "$FINAL_PACKAGE_VERSION" == "$NEW_VERSION" ]]; then
           echo "✅ Both files successfully updated and in sync: $NEW_VERSION"
           echo "files-updated=true" >> $GITHUB_OUTPUT

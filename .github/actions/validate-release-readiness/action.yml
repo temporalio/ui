@@ -19,7 +19,7 @@ runs:
       shell: bash
       run: |
         echo "🔍 Validating release readiness..."
-        
+
         # Use the validation script to check both sync and increase
         if ./scripts/validate-versions.sh --quiet; then
           echo "✅ Version validation passed"
@@ -31,7 +31,7 @@ runs:
 
         # Get version details for outputs (using Go version as source of truth)
         CURRENT_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
-        
+
         # Get version from last tag instead of last commit
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
         if [[ -n "$LAST_TAG" ]]; then
