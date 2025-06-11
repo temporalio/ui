@@ -90,7 +90,7 @@
         </div>
       </td>
     {:else if label === translate('deployments.workflows')}
-      <td class="truncate text-center"
+      <td class="w-24 truncate text-right"
         ><p>
           <Link
             icon="external-link"
