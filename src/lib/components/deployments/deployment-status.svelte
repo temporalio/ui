@@ -8,7 +8,7 @@
   export let status: DeploymentStatus;
   export let label: string;
 
-  const icon: Record<DeploymentStatus, IconName> = {
+  const icon: Partial<Record<DeploymentStatus, IconName>> = {
     Current: 'heartbeat',
     Ramping: 'trending-up',
     Draining: 'trending-down',
@@ -23,6 +23,7 @@
     {
       variants: {
         status: {
+          Latest: 'text-secondary',
           Ramping: 'text-cyan-600 dark:text-cyan-400',
           Current: 'text-blue-600 dark:text-blue-400',
           Draining: 'text-yellow-600 dark:text-yellow-200',

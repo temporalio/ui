@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -11,14 +11,17 @@
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
-  let error = '';
+  let error = $state('');
 
-  $: namespace = $page.params.namespace;
+  const namespace = $derived(page.params.namespace);
 
-  $: onFetch = () => {
-    error = '';
-    return fetchPaginatedDeployments(namespace, '', onError);
-  };
+  const onFetch = $derived.by(() => {
+    // This creates a new function whenever namespace or onError change
+    return () => {
+      error = '';
+      return fetchPaginatedDeployments(namespace, '', onError);
+    };
+  });
 
   const onError = (err: APIErrorResponse) => {
     error =

@@ -25,6 +25,7 @@ export const Strings = {
   version: 'Version',
   status: 'Status',
   current: 'Current',
+  latest: 'Latest',
   'task-queue-name': 'Task Queue Name',
   'task-queue-type': 'Task Queue Type',
   'rollout-started': 'Rollout Started At',

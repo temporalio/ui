@@ -115,6 +115,7 @@ export interface WorkerDeploymentVersionResponse {
 export type DeploymentStatus =
   | 'Ramping'
   | 'Current'
+  | 'Latest'
   | 'Draining'
   | 'Drained'
   | 'Inactive';
