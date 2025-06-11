@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -19,10 +18,7 @@
 
 <section class="flex flex-col gap-4">
   <h2 data-testid="nexus-links-title">
-    {translate('workflows.nexus-links-tab')}:
-  </h2>
-  <h2 class="flex items-center gap-2" data-testid="workers">
-    <Badge type="count">{links?.length || 0}</Badge>
+    {translate('workflows.nexus-links-tab')}
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <caption class="sr-only" slot="caption"
