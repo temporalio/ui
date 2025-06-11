@@ -149,7 +149,33 @@ Set these environment variables if you want to change their defaults
 
 
 ## Releases
-On every commit to main, a draft release will be either created or updated with the commit. When ready to create a release, update (if needed) and publish the draft release. This will automatically kick off a matching ui-server release that will publish the Docker image (https://github.com/temporalio/ui-server/releases).
 
+This repository uses an automated release management system that enforces version bump PRs before releases and maintains dual version sync between `package.json` and `server/server/version/version.go`.
 
-Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
+### Release Management
+
+The release system uses custom GitHub Actions for modular, reusable functionality. See [GitHub Workflows Documentation](.github/WORKFLOWS.md) for detailed information about the 8 custom actions and 3 workflows.
+
+**Release Process**:
+1. **Version Bump**: Use Actions → "Version Bump" to create a PR with updated versions
+   - **Auto mode**: Analyzes commits since last tag for semantic versioning
+   - **Manual mode**: Specify major/minor/patch bump type
+   - **Specific version**: Override with exact version (e.g., "2.38.0")
+   - **Dry run**: Preview changes without making modifications
+2. **Review and Merge**: Review the auto-generated version bump PR and merge to main
+3. **Draft Release**: Automatically created when version changes are detected
+4. **Publish Release**: Review and publish the auto-generated draft release
+5. **UI-server Release**: A published release automatically triggers a matching release in the ui-server repository
+
+**Version Source of Truth**: The Go `UIVersion` constant in `server/server/version/version.go` is the authoritative source. All validation uses this as the reference, and `package.json` must be kept in sync.
+
+**Version Validation**: 
+- Run `pnpm validate:versions` to ensure version files are in sync and ready for release
+- Validation compares against last git tag (not last commit) for robust release workflows
+- Custom actions provide detailed validation and error messages
+
+**Integration**:
+- Draft releases trigger downstream ui-server releases and Docker image publishing
+- UI repo releases (https://github.com/temporalio/ui/releases) contain the latest UI artifacts
+- Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
+- UI-server repo releases (https://github.com/temporalio/ui-server/releases) manage Docker images

@@ -1,0 +1,36 @@
+name: 'Build and Package'
+description: 'Builds the UI package and creates tarball for release'
+outputs:
+  package-path:
+    description: 'Path to the generated package tarball'
+    value: ${{ steps.package.outputs.package-path }}
+  package-size:
+    description: 'Size of the generated package'
+    value: ${{ steps.package.outputs.package-size }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build and package
+      id: package
+      shell: bash
+      run: |
+        echo "🏗️ Building UI package..."
+
+        # Build the package
+        pnpm package
+
+        # Create tarball from dist folder
+        PACKAGE_PATH="./temporal-ui-package.tar.gz"
+        tar -czf "$PACKAGE_PATH" dist
+
+        # Get package size for logging
+        PACKAGE_SIZE=$(ls -lh "$PACKAGE_PATH" | awk '{print $5}')
+
+        echo "✅ Package built successfully"
+        echo "📦 Package path: $PACKAGE_PATH"
+        echo "📊 Package size: $PACKAGE_SIZE"
+
+        # Set outputs
+        echo "package-path=$PACKAGE_PATH" >> $GITHUB_OUTPUT
+        echo "package-size=$PACKAGE_SIZE" >> $GITHUB_OUTPUT
