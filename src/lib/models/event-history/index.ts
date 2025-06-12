@@ -12,6 +12,7 @@ import {
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
+import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
 import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
 import { toEventNameReadable } from '$lib/utilities/screaming-enums';
@@ -43,6 +44,29 @@ export async function getEventAttributes(
     ...decodedAttributes,
   };
 }
+
+export const resetBillableActionsBeforeEvent = (
+  eventId: string,
+  events: WorkflowEvent[],
+): WorkflowEvent[] => {
+  if (!eventId || events.length <= 1) return events;
+
+  const index = events.findIndex((event) => event.id === eventId);
+  if (index === -1) return events;
+
+  const updatedEvents = [...events];
+
+  if (Number(events[0].id) > Number(events[1].id)) {
+    for (let i = events.length - 1; i > index; i--) {
+      updatedEvents[i] = { ...updatedEvents[i], billableActions: 0 };
+    }
+  } else {
+    for (let i = 0; i < index; i++) {
+      updatedEvents[i] = { ...updatedEvents[i], billableActions: 0 };
+    }
+  }
+  return updatedEvents;
+};
 
 export const toBillableEvent = (event: WorkflowEvent) => {
   return {
@@ -76,7 +100,13 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
 };
 
 export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
-  return events.map(toEvent);
+  const formattedEvents = events.map(toEvent);
+  const failedEvent = formattedEvents.find(isWorkflowTaskFailedEventDueToReset);
+  if (failedEvent) {
+    return resetBillableActionsBeforeEvent(failedEvent.id, formattedEvents);
+  }
+
+  return formattedEvents;
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

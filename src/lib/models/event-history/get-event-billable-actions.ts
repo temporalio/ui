@@ -1,12 +1,11 @@
 import type { WorkflowEvent } from '$lib/types/events';
-import { getErrorCause } from '$lib/utilities/get-workflow-task-failed-event';
+import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
 import {
   isActivityTaskScheduledEvent,
   isActivityTaskStartedEvent,
   isMarkerRecordedEvent,
   isNexusOperationCancelRequestedEvent,
   isNexusOperationScheduledEvent,
-  isPureWorkflowTaskFailedEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
@@ -41,9 +40,7 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
       if (event.attributes?.workflowTaskCompletedEventId) return 1;
     }
 
-    if (isPureWorkflowTaskFailedEvent(event)) {
-      if (getErrorCause(event) === 'ResetWorkflow') return 1;
-    }
+    if (isWorkflowTaskFailedEventDueToReset(event)) return 1;
 
     if (isStartChildWorkflowExecutionInitiatedEvent(event)) return 2;
 

@@ -8,6 +8,7 @@ import type {
 } from '$lib/types/events';
 import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
 
+import { isPureWorkflowTaskFailedEvent } from './is-event-type';
 import { toWorkflowTaskFailureReadable } from './screaming-enums';
 
 const isFailedTaskEvent = (
@@ -21,6 +22,12 @@ const isCompletedTaskEvent = (
 ): event is WorkflowTaskCompletedEvent => {
   return event.eventType === 'WorkflowTaskCompleted';
 };
+
+export const isWorkflowTaskFailedEventDueToReset = (
+  event: WorkflowEvent,
+): boolean =>
+  isPureWorkflowTaskFailedEvent(event) &&
+  getErrorCause(event) === 'ResetWorkflow';
 
 export const getErrorCause = (
   error: WorkflowTaskFailedEvent,

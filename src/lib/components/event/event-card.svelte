@@ -149,7 +149,7 @@
 {#snippet eventSummary(value: Payload)}
   <div class="block w-full select-all px-2 py-1 text-left">
     <p class="min-w-56 text-sm text-secondary/80">
-      Summary8/p>
+      Summary
       <MetadataDecoder
         {value}
         let:decodedValue
