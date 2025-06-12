@@ -61,4 +61,11 @@ export const Strings = {
   'blocked-reason': 'Blocked Reason',
   link: 'Link',
   'link-namespace': 'Link Namespace',
+  'nexus-service': 'Nexus Service',
+  'nexus-endpoint-simple': 'Nexus Endpoint',
+  'nexus-operation': 'Nexus Operation',
+  'caller-event': 'Caller Event',
+  'handler-event': 'Handler Event',
+  'caller-namespace': 'Caller Namespace',
+  'handler-namespace': 'Handler Namespace',
 } as const;

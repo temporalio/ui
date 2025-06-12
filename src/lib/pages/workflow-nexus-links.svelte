@@ -1,78 +1,113 @@
 <script lang="ts">
+  import { page } from '$app/state';
+
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { groupEvents } from '$lib/models/event-groups';
   import { fullEventHistory } from '$lib/stores/events';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
-  import { getWorkflowLinks } from '$lib/utilities/get-workflow-relationships';
+  import { isNexusOperationScheduledEvent } from '$lib/utilities/is-event-type';
   import {
-    routeForEventHistory,
+    routeForEventHistoryEvent,
     routeForNamespace,
   } from '$lib/utilities/route-for';
+  import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  const links = $derived(getWorkflowLinks($fullEventHistory));
+  const { namespace, id, run } = $derived(page.params);
+  const { workflow } = $derived($workflowRun);
+  const pendingActivities = $derived(workflow?.pendingActivities);
+  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
+
+  const groups = $derived(
+    groupEvents(
+      $fullEventHistory,
+      'ascending',
+      pendingActivities,
+      pendingNexusOperations,
+    ),
+  );
+  const nexusGroups = $derived(
+    groups.filter((group) => group.category === 'nexus'),
+  );
+  $inspect(nexusGroups);
 </script>
 
 <section class="flex flex-col gap-4">
   <h2 data-testid="nexus-links-title">
     {translate('workflows.nexus-links-tab')}
   </h2>
+  <h3>Outbound</h3>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <caption class="sr-only" slot="caption"
       >{translate('workflows.workers-tab')}</caption
     >
     <TableHeaderRow slot="headers">
-      <th>{translate('namespaces.namespace')}</th>
-      <th>{translate('common.workflow-id')}</th>
-      <th>{translate('common.run-id')}</th>
-      <th class="w-24">{translate('common.event-id')}</th>
-      <th>{translate('common.request-id')}</th>
+      <th>{translate('nexus.caller-event')}</th>
+      <th>{translate('nexus.caller-namespace')}</th>
+      <th>{translate('nexus.nexus-endpoint-simple')}</th>
+      <th>{translate('nexus.nexus-service')}</th>
+      <th>{translate('nexus.nexus-operation')}</th>
+      <th>{translate('nexus.handler-namespace')}</th>
+      <th>{translate('nexus.handler-event')}</th>
     </TableHeaderRow>
-    {#each links as link}
-      <TableRow data-testid="worker-row">
-        <td class="text-left" data-testid="link-namespace">
-          <Link
-            href={routeForNamespace({
-              namespace: link.workflowEvent.namespace,
-            })}>{link.workflowEvent.namespace}</Link
-          >
-        </td>
-        <td class="text-left" data-testid="link-workflow-id">
-          <Link
-            href={routeForEventHistory({
-              namespace: link.workflowEvent.namespace,
-              workflow: link.workflowEvent.workflowId,
-              run: link.workflowEvent.runId,
-            })}>{link.workflowEvent.workflowId}</Link
-          >
-        </td>
-        <td class="text-left" data-testid="link-rund-id">
-          <Link
-            href={routeForEventHistory({
-              namespace: link.workflowEvent.namespace,
-              workflow: link.workflowEvent.workflowId,
-              run: link.workflowEvent.runId,
-            })}>{link.workflowEvent.runId}</Link
-          >
-        </td>
-        <td class="text-left" data-testid="link-eventRef">
-          {#if link?.workflowEvent?.eventRef?.eventId || link?.workflowEvent?.eventRef?.eventType === 'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED'}
-            <Link href={getEventLinkHref(link)}
-              >{link.workflowEvent.eventRef?.eventId || '1'}</Link
+    {#each nexusGroups as group}
+      {@const link = group.links[0]}
+      {@const scheduledEvent = group.eventList.find((e) =>
+        isNexusOperationScheduledEvent(e),
+      )}
+      {#if link}
+        <TableRow data-testid="worker-row">
+          <td class="text-left" data-testid="link-event">
+            <Link
+              href={routeForEventHistoryEvent({
+                namespace,
+                workflow: id,
+                run,
+                eventId: scheduledEvent.id,
+              })}>{scheduledEvent.id}</Link
             >
-          {/if}
-        </td>
-        <td class="text-left" data-testid="link-requestRef">
-          {#if link?.workflowEvent?.requestIdRef}
-            <Link href={getEventLinkHref(link)}
-              >{link.workflowEvent.requestIdRef.requestId}</Link
+          </td>
+          <td class="text-left" data-testid="link-namespace">
+            <Link
+              href={routeForNamespace({
+                namespace,
+              })}>{namespace}</Link
             >
-          {/if}
-        </td>
-      </TableRow>
+          </td>
+          <td class="text-left" data-testid="link-endpoint">
+            {scheduledEvent?.attributes?.endpoint}
+          </td>
+          <td class="text-left" data-testid="link-service">
+            {scheduledEvent?.attributes?.service}
+          </td>
+          <td class="text-left" data-testid="link-operation">
+            {scheduledEvent?.attributes?.operation}
+          </td>
+          <td class="text-left" data-testid="link-namespace">
+            <Link
+              href={routeForNamespace({
+                namespace: link.workflowEvent.namespace,
+              })}>{link.workflowEvent.namespace}</Link
+            >
+          </td>
+          <td class="text-left" data-testid="link-href">
+            {#if link?.workflowEvent}
+              <Link href={getEventLinkHref(link)}
+                >{fromScreamingEnum(
+                  link.workflowEvent?.eventRef?.eventType ||
+                    link.workflowEvent?.requestIdRef?.eventType,
+                  'EventType',
+                )}</Link
+              >
+            {/if}
+          </td>
+        </TableRow>
+      {/if}
     {:else}
       <tr class="w-full">
         <td colspan="5">
