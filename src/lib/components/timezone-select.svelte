@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
@@ -24,6 +25,7 @@
   import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
 
   export let position: 'left' | 'right' = 'right';
+  export let size: ButtonStyles['size'] = 'md';
 
   const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
@@ -79,6 +81,7 @@
     controls="timezones-menu"
     hasIndicator
     variant="ghost"
+    {size}
     data-testid="timezones-menu-button"
   >
     <Icon slot="leading" name="clock" />
