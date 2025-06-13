@@ -2,7 +2,9 @@
   import { page } from '$app/stores';
 
   import { translate } from '$lib/i18n/translate';
+  import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
@@ -18,6 +20,8 @@
   import WorkflowDetail from './workflow-detail.svelte';
 
   export let workflow: WorkflowExecution;
+  export let next: string | undefined = undefined;
+  let latestRunId: string | undefined = undefined;
 
   $: ({ namespace } = $page.params);
 
@@ -36,6 +40,23 @@
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ];
+  $: totalActions = $fullEventHistory
+    .reduce((acc, e) => e.billableActions + acc, 0)
+    .toString();
+
+  $: {
+    if (next && !latestRunId) {
+      fetchLatestRun();
+    }
+  }
+
+  const fetchLatestRun = async () => {
+    const result = await fetchWorkflow({
+      namespace,
+      workflowId: workflow.id,
+    });
+    latestRunId = result?.workflow?.runId;
+  };
 </script>
 
 <div
@@ -74,7 +95,10 @@
           })
         : '-'}
     />
-    <WorkflowDetail content={elapsedTime} icon="clock" />
+    <WorkflowDetail
+      title={translate('common.duration')}
+      content={elapsedTime}
+    />
   </div>
   <div
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
@@ -133,7 +157,6 @@
   <div
     class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
   >
-    <SdkLogo />
     {#if workflow?.parent}
       <WorkflowDetail
         title={translate('workflows.parent-workflow')}
@@ -145,14 +168,33 @@
         })}
       />
     {/if}
+    {#if latestRunId}
+      <WorkflowDetail
+        title={translate('workflows.latest-execution')}
+        content={latestRunId}
+        href={routeForWorkflow({
+          namespace,
+          workflow: workflow?.id,
+          run: latestRunId,
+        })}
+      />
+    {/if}
     <WorkflowDetail
       title={translate('common.history-size-bytes')}
       content={workflow?.historySizeBytes}
     />
+    <SdkLogo />
     {#if !$isCloud}
       <WorkflowDetail
         title={translate('workflows.state-transitions')}
         content={workflow?.stateTransitionCount}
+      />
+    {:else}
+      <WorkflowDetail
+        content={totalActions}
+        title={translate('workflows.billable-actions')}
+        icon="dollar-invoice"
+        badge="subtle"
       />
     {/if}
   </div>

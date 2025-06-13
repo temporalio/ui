@@ -61,11 +61,11 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply surface-primary min-h-[154px] overflow-auto;
+    @apply surface-primary min-h-[154px] grow overflow-auto;
   }
 
   .primary {
-    @apply border border-table;
+    @apply border border-subtle;
   }
 
   .split {
@@ -73,28 +73,28 @@
   }
 
   .paginated-table {
-    @apply w-full;
+    @apply w-full border-separate border-spacing-0;
   }
 
   .paginated-table-header {
     @apply sticky top-0 z-10;
 
     :global(tr) {
-      @apply surface-table h-10 text-off-white;
+      @apply surface-table-header;
     }
 
     :global(tr > th) {
-      @apply whitespace-nowrap px-2 text-left font-medium;
+      @apply h-9 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-medium;
     }
   }
 
   .paginated-table-body {
     :global(tr.primary) {
-      @apply border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
     :global(tr.dense) {
-      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-9 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
     :global(tr.expanded) {
@@ -124,7 +124,7 @@
 
   .primary .paginated-table-body {
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-table last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
   }
 
@@ -137,6 +137,6 @@
   }
 
   .paginated-table-controls {
-    @apply surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-table px-4 py-2;
+    @apply surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2;
   }
 </style>

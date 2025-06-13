@@ -8,7 +8,7 @@
   } from '$lib/utilities/dark-mode';
 
   const buttonText = $derived(
-    $useDarkModePreference == null
+    $useDarkModePreference == 'system'
       ? translate('common.system-default')
       : $useDarkModePreference
         ? translate('common.night')
@@ -16,7 +16,7 @@
   );
 
   const buttonIcon: IconName = $derived(
-    $useDarkModePreference == null
+    $useDarkModePreference == 'system'
       ? 'system-window'
       : $useDarkModePreference
         ? 'moon'
@@ -33,4 +33,5 @@
   tooltip={buttonText}
   label={buttonText}
   icon={buttonIcon}
+  data-testid="dark-mode-navigation-button"
 />

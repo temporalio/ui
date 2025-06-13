@@ -1,5 +1,5 @@
 <script lang="ts">
-  import WorkflowPendingActivity from '$lib/components/workflow/pending-activity/workflow-pending-activity.svelte';
+  import PendingActivityCard from '$lib/components/workflow/pending-activity/pending-activity-card.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -16,11 +16,11 @@
 
 <div class="pb-16">
   {#if pendingActivities.length}
-    <ul role="list" class="grid grid-cols-1 gap-4">
+    <div class="flex flex-col gap-4">
       {#each pendingActivities as activity (activity.id)}
-        <WorkflowPendingActivity {activity} />
+        <PendingActivityCard {activity} />
       {/each}
-    </ul>
+    </div>
   {:else}
     <EmptyState title={translate('workflows.pending-activities-empty-state')} />
   {/if}

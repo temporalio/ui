@@ -33,6 +33,7 @@ interface EventGroup
   pendingNexusOperation: PendingNexusOperation | undefined;
   userMetadata?: { summary?: Payload };
   links: EventLink[];
+  billableActions: number;
 }
 
 type EventGroups = EventGroup[];

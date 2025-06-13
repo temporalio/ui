@@ -44,6 +44,7 @@
     titles[callback.state] || translate('nexus.nexus-callback'),
   );
   const links = $derived(callback?.callback?.links || []);
+  const showCallbackUrl = $derived(!links.length && !link && callbackUrl);
 </script>
 
 <Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>
@@ -90,7 +91,7 @@
         </p>
       {/if}
     </div>
-    {#if !link}
+    {#if showCallbackUrl}
       <p class="flex items-center gap-2">
         {translate('nexus.callback-url')}
         <Badge type="subtle">{callbackUrl}</Badge>

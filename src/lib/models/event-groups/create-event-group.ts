@@ -119,6 +119,12 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get isTerminated() {
       return Boolean(this.eventList.find(eventIsTerminated));
     },
+    get billableActions() {
+      return this.eventList.reduce(
+        (acc, event) => event.billableActions + acc,
+        0,
+      );
+    },
   };
 };
 

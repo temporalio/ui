@@ -133,7 +133,7 @@
   id="activity-options-update-drawer"
   dark={false}
   closeButtonLabel={translate('common.close')}
-  class="w-1/3 min-w-fit max-w-[50vw]"
+  class="min-w-[33vw] max-w-[50vw]"
 >
   <DrawerContent title="Update Activity {activity.activityId}">
     <form onsubmit={onUpdate} class="flex flex-col gap-4">
