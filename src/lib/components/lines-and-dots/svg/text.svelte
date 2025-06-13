@@ -44,19 +44,21 @@
     class={!backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
-<text
-  bind:this={textElement}
-  class="cursor-pointer select-none outline-none {category} text-primary"
-  class:label
-  class:backdrop
-  x={textX}
-  y={y + 1}
-  font-size={fontSize}
-  font-weight={fontWeight}
-  text-anchor={textAnchor}
->
-  <slot />
-</text>
+{#key textX}
+  <text
+    bind:this={textElement}
+    class="cursor-pointer select-none outline-none {category} text-primary"
+    class:label
+    class:backdrop
+    x={textX}
+    y={y + 1}
+    font-size={fontSize}
+    font-weight={fontWeight}
+    text-anchor={textAnchor}
+  >
+    <slot />
+  </text>
+{/key}
 
 <style lang="postcss">
   text {

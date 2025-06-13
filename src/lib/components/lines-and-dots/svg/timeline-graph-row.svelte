@@ -135,6 +135,12 @@
         paused={!!pauseTime}
         strokeWidth={radius * 2}
       />
+      <Dot
+        point={[x, y]}
+        classification={group.lastEvent.classification}
+        icon={'retry'}
+        r={radius}
+      />
     {/if}
     {#if showText}
       <MetadataDecoder

@@ -244,7 +244,7 @@
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
-    <p class="whitespace-pre-line">
+    <p class="whitespace-pre-line break-all">
       {shouldDisplayAsTime(key) ? formatDate(value, $timeFormat) : value}
     </p>
   </div>
