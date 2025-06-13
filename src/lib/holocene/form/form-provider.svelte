@@ -11,52 +11,17 @@
 <script lang="ts">
   import { createFormContext } from './form-context';
 
-  let {
-    formKey,
-    mode = 'spa',
-    action,
-    method = 'POST',
-    onUpdate,
-    onServerSuccess,
-    onServerError,
-    defaultValues,
-    schema,
-    enableClientValidation = true,
-    children,
-  }: FormProps = $props();
+  let { children, ...formParams }: FormProps = $props();
 
-  createFormContext({
-    formKey,
-    mode,
-    action,
-    method,
-    onUpdate,
-    onServerSuccess,
-    onServerError,
-    defaultValues,
-    schema,
-    enableClientValidation,
-  });
+  const context = createFormContext(formParams);
+  const { enhance } = context.form;
 
-  function handleSubmit(event: Event) {
-    event.preventDefault();
-
-    if (mode === 'spa' && onUpdate) {
-      // Get form data
-      const form = event.target as HTMLFormElement;
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-
-      // Call the onUpdate handler
-      onUpdate(data);
-    }
-  }
+  // Extract action and method for server mode
+  const action = formParams.mode === 'server' ? formParams.action : undefined;
+  const method =
+    formParams.mode === 'server' ? formParams.method || 'POST' : undefined;
 </script>
 
-<form
-  action={mode === 'server' || mode === 'progressive' ? action : undefined}
-  method={mode === 'server' || mode === 'progressive' ? method : undefined}
-  onsubmit={handleSubmit}
->
+<form {action} {method} use:enhance>
   {@render children()}
 </form>

@@ -36,6 +36,7 @@
     <h3 class="mb-4 text-lg font-semibold">Simple Form</h3>
     <Form
       formKey={SIMPLE_FORM}
+      mode="spa"
       onUpdate={handleSubmit}
       defaultValues={{ name: '' }}
     >
