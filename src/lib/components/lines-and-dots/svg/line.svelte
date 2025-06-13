@@ -22,8 +22,9 @@
     height="10"
     patternUnits="userSpaceOnUse"
   >
-    <rect x="0" y="0" width="10" height="10" fill="#00964e" />
-    <rect x="5" y="0" width="5" height="10" fill="#c71607" />
+    <rect x="0" y="0" width="3.33" height="10" fill="#00964e" />
+    <rect x="3.33" y="0" width="3.33" height="10" fill="#c71607" />
+    <rect x="6.66" y="0" width="3.33" height="10" fill="#00964e" />
   </pattern>
 </defs>
 <line
