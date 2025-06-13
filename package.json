@@ -108,10 +108,12 @@
     "mdast-util-to-hast": "^13.2.0",
     "monaco-editor": "^0.50.0",
     "remark-stringify": "^10.0.3",
+    "sveltekit-superforms": "^2.26.1",
     "tailwind-merge": "^1.14.0",
     "unist-util-remove": "^4.0.0",
     "url-pattern": "^1.0.3",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "zod": "^3.25.64"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
@@ -143,6 +145,7 @@
     "@temporalio/testing": "1.11.8",
     "@temporalio/worker": "1.11.8",
     "@temporalio/workflow": "1.11.8",
+    "@types/base-64": "^1.0.0",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/json-bigint": "^1.0.1",
