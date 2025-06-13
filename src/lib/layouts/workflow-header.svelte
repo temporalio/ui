@@ -25,7 +25,7 @@
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import {
-    getWorkflowLinks,
+    getWorkflowLinksFromHistory,
     getWorkflowRelationships,
   } from '$lib/utilities/get-workflow-relationships';
   import { pathMatches } from '$lib/utilities/path-matches';
@@ -67,7 +67,12 @@
     $fullEventHistory,
     $namespaces,
   );
-  $: linksCount = getWorkflowLinks($fullEventHistory)?.length || 0;
+  $: outboundLinks =
+    getWorkflowLinksFromHistory($fullEventHistory)?.length || 0;
+  $: inboundLinks =
+    workflow?.callbacks?.filter((callback) => callback?.callback?.links.length)
+      ?.length || 0;
+  $: linkCount = outboundLinks + inboundLinks;
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -208,6 +213,21 @@
           {workflowRelationships.relationshipCount}
         </Badge></Tab
       >
+      {#if linkCount > 0}
+        <Tab
+          label={translate('workflows.nexus-links-tab')}
+          id="nexus-links-tab"
+          href={routeForNexusLinks(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForNexusLinks(routeParameters),
+          )}
+        >
+          <Badge type="primary" class="px-2 py-0">
+            {linkCount}
+          </Badge>
+        </Tab>
+      {/if}
       <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
@@ -235,26 +255,13 @@
           class="px-2 py-0"
         >
           <div class="flex items-center gap-1">
-            {#if activitiesCanceled}<Icon name="canceled" />
+            {#if activitiesCanceled}
+              <Icon name="canceled" />
             {/if}
             {workflow?.pendingActivities?.length}
           </div>
         </Badge>
       </Tab>
-      <Tab
-        label={translate('workflows.nexus-links-tab')}
-        id="nexus-links-tab"
-        href={routeForNexusLinks(routeParameters)}
-        active={pathMatches(
-          $page.url.pathname,
-          routeForNexusLinks(routeParameters),
-        )}
-      >
-        <Badge type="primary" class="px-2 py-0">
-          {linksCount}
-        </Badge>
-      </Tab>
-
       <Tab
         label={translate('workflows.call-stack-tab')}
         id="call-stack-tab"

@@ -137,6 +137,21 @@ export const getWorkflowRelationships = (
   };
 };
 
+export const getWorkflowLinksFromHistory = (
+  history: WorkflowEvents,
+): EventLink[] => {
+  const links = new Set<EventLink>();
+  for (const event of history) {
+    if (event.links && event.links.length > 0) {
+      for (const link of event.links) {
+        links.add(link);
+      }
+    }
+  }
+
+  return Array.from(links);
+};
+
 export const getWorkflowLinks = (groups: EventGroup[]): EventLink[] => {
   const links = new Set<EventLink>();
   for (const group of groups) {

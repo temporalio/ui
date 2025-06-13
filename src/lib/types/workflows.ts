@@ -5,10 +5,10 @@ import type {
   WorkflowExecutionStatus,
   WorkflowVersionTimpstamp,
 } from '$lib/types';
+import type { Callback } from '$lib/types/nexus';
 
 import type { VersioningInfo } from './deployments';
 import type {
-  Callbacks,
   Payload,
   PendingActivity,
   PendingActivityInfo,
@@ -95,7 +95,7 @@ export type WorkflowExecutionAPIResponse = Optional<{
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
   executionConfig: WorkflowExecutionConfigWithMetadata;
-  callbacks: Callbacks;
+  callbacks: Callback[];
   pendingWorkflowTask: PendingWorkflowTaskInfo;
   workflowExtendedInfo: WorkflowExtendedInfo;
 }>;
@@ -190,7 +190,7 @@ export type WorkflowExecution = {
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
-  callbacks: Callbacks;
+  callbacks: Callback[];
   versioningInfo?: VersioningInfo;
   summary?: Payload;
   details?: Payload;
