@@ -21,3 +21,4 @@ server/ui/assets
 /audits
 go.work
 go.work.sum
+.claude

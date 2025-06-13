@@ -121,8 +121,8 @@
             />
           {/key}
         {/if}
-        {#if $activeGroups.includes(group.id) && !readOnly}
-          <GroupDetailsRow y={y + radius} {group} {canvasWidth} />
+        {#if !readOnly && $activeGroups.includes(group.id)}
+          <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
         {/if}
       {/each}
     </svg>

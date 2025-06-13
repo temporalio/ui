@@ -91,7 +91,7 @@
     {/if}
   </div>
 </div>
-<header class="flex flex-col gap-2">
+<header class="flex flex-col gap-4">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div
       class="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-center"
@@ -106,6 +106,8 @@
             {cancelInProgress}
             {workflow}
             {namespace}
+            first={workflowRelationships.first}
+            next={workflowRelationships.next}
           />
         </div>
       </div>
@@ -126,13 +128,20 @@
       </div>
     </div>
     <div class="max-lg:hidden">
-      <WorkflowActions {isRunning} {cancelInProgress} {workflow} {namespace} />
+      <WorkflowActions
+        {isRunning}
+        {cancelInProgress}
+        {workflow}
+        {namespace}
+        first={workflowRelationships.first}
+        next={workflowRelationships.next}
+      />
     </div>
   </div>
   <CodecServerErrorBanner />
   <WorkflowSummaryAndDetails />
   <WorkflowCurrentDetails />
-  <WorkflowDetails {workflow} />
+  <WorkflowDetails {workflow} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert

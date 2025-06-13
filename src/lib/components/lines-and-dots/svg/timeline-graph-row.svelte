@@ -123,44 +123,29 @@
       />
     {/if}
     {#if showText}
-      {#if pendingActivity}
-        {#key pendingActivity.attempt}
-          <Text
-            point={textPosition}
-            {textAnchor}
-            {backdrop}
-            config={TimelineConfig}
-            icon="retry"
-          >
-            {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
-            •
-            {group?.displayName}
-          </Text>
-        {/key}
-      {:else}
-        <MetadataDecoder
-          value={group?.userMetadata?.summary}
-          prefix={isActivityTaskScheduledEvent(group.initialEvent)
-            ? group?.displayName
-            : ''}
-          fallback={group?.displayName}
-          let:decodedValue
+      <MetadataDecoder
+        value={group?.userMetadata?.summary}
+        prefix={isActivityTaskScheduledEvent(group.initialEvent)
+          ? group?.displayName
+          : ''}
+        fallback={group?.displayName}
+        let:decodedValue
+      >
+        <Text
+          point={textPosition}
+          {textAnchor}
+          {backdrop}
+          backdropHeight={radius * 2}
+          config={TimelineConfig}
+          icon={retried ? 'retry' : undefined}
         >
-          <Text
-            point={textPosition}
-            {textAnchor}
-            {backdrop}
-            config={TimelineConfig}
-            icon={retried ? 'retry' : undefined}
-          >
-            {#if retried}
-              {activityTaskScheduled.attributes.attempt} • {decodedValue}
-            {:else}
-              {decodedValue}
-            {/if}
-          </Text>
-        </MetadataDecoder>
-      {/if}
+          {#if retried}
+            {activityTaskScheduled.attributes.attempt} • {decodedValue}
+          {:else}
+            {decodedValue}
+          {/if}
+        </Text>
+      </MetadataDecoder>
     {/if}
     <Dot
       point={[x, y]}

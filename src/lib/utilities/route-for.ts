@@ -15,6 +15,7 @@ type RouteParameters = {
   queryParams?: Record<string, string>;
   eventId?: string;
   eventType?: string;
+  requestId?: string;
   scheduleId: string;
   queue: string;
   schedule: string;
@@ -43,7 +44,13 @@ export type EventHistoryParameters = Pick<
 >;
 export type EventParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'view' | 'eventId' | 'eventType'
+  | 'namespace'
+  | 'workflow'
+  | 'run'
+  | 'view'
+  | 'eventId'
+  | 'eventType'
+  | 'requestId'
 >;
 
 export type AuthenticationParameters = {
@@ -170,9 +177,10 @@ export const routeForEventHistory = ({
 
 export const routeForEventHistoryEvent = ({
   eventId,
+  requestId,
   ...parameters
 }: EventParameters): string => {
-  return `${routeForWorkflow(parameters)}/history/events/${eventId}`;
+  return `${routeForWorkflow(parameters)}/history/events/${eventId || requestId}`;
 };
 
 export const routeForWorkers = (parameters: WorkflowParameters): string => {

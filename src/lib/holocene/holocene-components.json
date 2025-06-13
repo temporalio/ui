@@ -891,14 +891,6 @@
       "type": "string"
     },
     {
-      "name": "maxPinnedItems",
-      "type": "number"
-    },
-    {
-      "name": "pinned",
-      "type": "boolean"
-    },
-    {
       "name": "readonly",
       "type": "boolean"
     },
@@ -1009,11 +1001,7 @@
       "type": "'left' | 'right'"
     }
   ],
-  "progress-bar": [
-    {
-      "name": "width"
-    }
-  ],
+  "progress-bar": [],
   "scroll-to-top": [
     {
       "name": "hidden"

@@ -53,12 +53,6 @@
         moveDownButtonLabel={translate('workflows.move-column-down-label', {
           column: label,
         })}
-        pinButtonLabel={translate('workflows.pin-column-label', {
-          column: label,
-        })}
-        unpinButtonLabel={translate('workflows.unpin-column-label', {
-          column: label,
-        })}
       />
     {:else}
       <OrderableListItem

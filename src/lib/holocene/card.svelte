@@ -1,9 +1,13 @@
-<div class="card surface-primary {$$props.class}">
-  <slot />
-</div>
+<script lang="ts">
+  import type { Snippet } from 'svelte';
 
-<style lang="postcss">
-  .card {
-    @apply border border-subtle p-4;
-  }
-</style>
+  type Props = {
+    class?: string;
+    children?: Snippet;
+  };
+  let { class: className = '', children }: Props = $props();
+</script>
+
+<div class="surface-primary border border-subtle p-4 {className}">
+  {@render children?.()}
+</div>

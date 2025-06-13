@@ -1,0 +1,91 @@
+name: Release Drafter
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check_version_change:
+    runs-on: ubuntu-latest
+    outputs:
+      version-ready: ${{ steps.version-check.outputs.version-ready }}
+      current-version: ${{ steps.version-check.outputs.current-version }}
+      previous-version: ${{ steps.version-check.outputs.previous-version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Validate version for release readiness
+        id: version-check
+        uses: ./.github/actions/validate-release-readiness
+
+  update_release_draft:
+    needs: check_version_change
+    # Only run if version validation passed (sync + increase)
+    if: needs.check_version_change.outputs.version-ready == 'true'
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create release draft
+        uses: release-drafter/release-drafter@v6
+        with:
+          version: ${{ needs.check_version_change.outputs.current-version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare dispatch token
+        id: dispatch_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private-key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+          permission-contents: write
+          repositories: ${{ vars.DOWNSTREAM_REPO }}
+
+      - name: Trigger ui-server workflow
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ steps.dispatch_token.outputs.token }}
+          repository: ${{ vars.DOWNSTREAM_ORG }}/${{ vars.DOWNSTREAM_REPO }}
+          event-type: sync-from-ui-commit
+          client-payload: |
+            {
+              "ref": "${{ github.sha }}"
+            }
+
+  skip_notification:
+    needs: check_version_change
+    # Run if version validation failed
+    if: needs.check_version_change.outputs.version-ready == 'false'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip reason - Version validation failed
+        run: |
+          echo "## ℹ️ Release Draft Skipped"
+          echo ""
+          echo "**Reason:** Version validation failed"
+          echo "**Current Version:** ${{ needs.check_version_change.outputs.current-version }}"
+          echo "**Previous Version:** ${{ needs.check_version_change.outputs.previous-version }}"
+          echo ""
+          echo "Draft releases are only created when:"
+          echo "1. Both package.json and version.go have matching versions"
+          echo "2. The version has increased compared to the previous commit"
+          echo ""
+          echo "To create a release, use the Version Bump workflow:"
+          echo "Actions → Version Bump → Run workflow"

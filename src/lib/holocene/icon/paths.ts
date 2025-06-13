@@ -102,6 +102,7 @@ import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
+import systemWindow from './svg/system-window.svelte';
 import table from './svg/table.svelte';
 import target from './svg/target.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
@@ -118,6 +119,7 @@ import tutorial from './svg/tutorial.svelte';
 import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
+import userGroup from './svg/user-group.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workflow from './svg/workflow.svelte';
@@ -244,8 +246,10 @@ export const icons = {
   update,
   upload,
   usage,
+  'user-group': userGroup,
   'vertical-ellipsis': verticalEllipsis,
   warning,
+  'system-window': systemWindow,
   workflow,
   'xmark-filled': xmarkFilled,
 } as const;

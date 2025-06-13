@@ -15,7 +15,7 @@ export const Strings = {
   name: 'Deployment Name',
   'current-version': 'Current Version',
   'deployment-version': 'Deployment Version',
-  'deployment-behavior': 'Deployment Behavior',
+  'versioning-behavior': 'Versioning Behavior',
   created: 'Created At',
   deployed: 'Deployed At',
   ramping: 'Ramping',

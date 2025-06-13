@@ -3,7 +3,7 @@ name: 'Chromatic'
 on:
   push:
     branches: [main]
-  pull_request:
+  pull_request_target:
     branches: [main, 'codefreeze-*']
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+        uses: ./.github/actions/setup-node
       - name: Run Chromatic
         uses: chromaui/action@latest
         with:

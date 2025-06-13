@@ -26,8 +26,8 @@ RUN adduser -u 5000 -G temporal -D temporal
 RUN mkdir ./config
 
 COPY --from=server-builder /home/server-builder/ui-server ./
+COPY config/docker.yaml ./config/docker.yaml
 COPY docker/start-ui-server.sh ./start-ui-server.sh
-COPY docker/config-template.yaml ./config-template.yaml
 
 RUN chown temporal:temporal /home/ui-server -R
 

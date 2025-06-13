@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -12,14 +14,21 @@
 
   import EventLink from '../event/event-link.svelte';
 
-  export let callback: Callback;
-  export let link: Link | undefined = undefined;
+  let {
+    callback,
+    link,
+    children,
+  }: { callback: Callback; link?: Link; children?: Snippet } = $props();
 
-  $: completedTime = formatDate(callback.lastAttemptCompleteTime, $timeFormat);
-  $: nextTime = formatDate(callback.nextAttemptScheduleTime, $timeFormat);
-  $: failure = callback?.lastAttemptFailure?.message;
-  $: blockedReason = callback?.blockedReason;
-  $: callbackUrl = callback?.callback?.nexus?.url;
+  const completedTime = $derived(
+    formatDate(callback.lastAttemptCompleteTime, $timeFormat),
+  );
+  const nextTime = $derived(
+    formatDate(callback.nextAttemptScheduleTime, $timeFormat),
+  );
+  const failure = $derived(callback?.lastAttemptFailure?.message);
+  const blockedReason = $derived(callback?.blockedReason);
+  const callbackUrl = $derived(callback?.callback?.nexus?.url);
 
   const titles = {
     Standby: translate('nexus.callback.standby'),
@@ -30,13 +39,27 @@
   };
 
   const failedState = 'Failed' as unknown as CallbackState;
-  $: failed = callback.state === failedState;
-  $: title = titles[callback.state] || translate('nexus.nexus-callback');
+  const failed = $derived(callback.state === failedState);
+  const title = $derived(
+    titles[callback.state] || translate('nexus.nexus-callback'),
+  );
+  const links = $derived(callback?.callback?.links || []);
+  const showCallbackUrl = $derived(!links.length && !link && callbackUrl);
 </script>
 
 <Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>
   <div class="flex flex-col gap-2 pt-2">
-    {#if link}
+    {#if links.length}
+      {#each links as link (link.workflowEvent?.eventRef?.eventId || link.workflowEvent?.requestIdRef.requestId)}
+        <EventLink {link} />
+        <EventLink
+          {link}
+          label={translate('nexus.link-namespace')}
+          value={link.workflowEvent.namespace}
+          href={routeForNamespace({ namespace: link.workflowEvent.namespace })}
+        />
+      {/each}
+    {:else if link}
       <EventLink {link} />
       <EventLink
         {link}
@@ -68,7 +91,7 @@
         </p>
       {/if}
     </div>
-    {#if !link}
+    {#if showCallbackUrl}
       <p class="flex items-center gap-2">
         {translate('nexus.callback-url')}
         <Badge type="subtle">{callbackUrl}</Badge>
@@ -92,5 +115,5 @@
       </div>
     {/if}
   </div>
-  <slot />
+  {@render children?.()}
 </Alert>

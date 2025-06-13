@@ -8,6 +8,7 @@ import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
 } from '$lib/components/payload-input-with-encoding.svelte';
+import { translate } from '$lib/i18n/translate';
 import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
@@ -17,7 +18,11 @@ import { isCloud } from '$lib/stores/advanced-visibility';
 import { authUser } from '$lib/stores/auth-user';
 import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import { temporalVersion } from '$lib/stores/versions';
-import { canFetchChildWorkflows } from '$lib/stores/workflows';
+import {
+  canFetchChildWorkflows,
+  hideWorkflowQueryErrors,
+  workflowError,
+} from '$lib/stores/workflows';
 import {
   ResetReapplyExcludeType,
   ResetReapplyType,
@@ -73,7 +78,7 @@ import { fetchWorkflowCountByExecutionStatus } from './workflow-counts';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
-  runId: string;
+  runId?: string;
 };
 
 export type CombinedWorkflowExecutionsResponse = {
@@ -123,6 +128,7 @@ type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
   reason: string;
+  first: string | undefined;
 };
 
 export type ResetWorkflowOptions = {
@@ -272,9 +278,11 @@ export async function fetchWorkflow(
   return requestFromAPI(route, {
     request,
     notifyOnError: false,
-    params: {
-      'execution.runId': parameters.runId,
-    },
+    params: parameters.runId
+      ? {
+          'execution.runId': parameters.runId,
+        }
+      : {},
   })
     .then((response) => {
       return { workflow: toWorkflowExecution(response) };
@@ -288,6 +296,7 @@ export async function terminateWorkflow({
   workflow,
   namespace,
   reason,
+  first,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
@@ -307,12 +316,15 @@ export async function terminateWorkflow({
       body: stringifyWithBigInt({
         reason: formattedReason,
         ...(email && { identity: email }),
+        firstExecutionRunId: first,
       }),
     },
     notifyOnError: false,
-    params: {
-      'execution.runId': workflow.runId,
-    },
+    params: first
+      ? {}
+      : {
+          'execution.runId': workflow.runId,
+        },
   });
 }
 
@@ -956,4 +968,48 @@ export const fetchAllPaginatedWorkflows = async (
     });
   });
   return toWorkflowExecutions({ executions });
+};
+
+type PaginatedWorkflowsPromise = (
+  pageSize: number,
+  token: string,
+) => Promise<{ items: WorkflowExecution[]; nextPageToken: string }>;
+
+export const fetchPaginatedWorkflows = async (
+  namespace: string,
+  query: string = '',
+  request = fetch,
+): Promise<PaginatedWorkflowsPromise> => {
+  return (pageSize = 100, token = '') => {
+    workflowError.set('');
+
+    const onError: ErrorCallback = (err) => {
+      handleUnauthorizedOrForbiddenError(err);
+
+      if (get(hideWorkflowQueryErrors)) {
+        workflowError.set(translate('workflows.workflows-error-querying'));
+      } else {
+        workflowError.set(
+          err?.body?.message || translate('workflows.workflows-error-querying'),
+        );
+      }
+    };
+
+    const route = routeForApi('workflows', { namespace });
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: {
+        pageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
+      request,
+      onError,
+      handleError: onError,
+    }).then(({ executions = [], nextPageToken = '' }) => {
+      return {
+        items: toWorkflowExecutions({ executions }),
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
 };
