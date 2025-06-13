@@ -22,7 +22,6 @@
     DetailListLabel,
     DetailListLinkValue,
     DetailListTextValue,
-    DetailListValue,
   } from '../detail-list';
 
   import SdkLogo from './sdk-logo.svelte';
@@ -202,10 +201,6 @@
       </DetailListLabel>
       <DetailListTextValue text={totalActions} iconName="dollar-invoice" />
     {/if}
-
-    <DetailListLabel>SDK</DetailListLabel>
-    <DetailListValue>
-      <SdkLogo />
-    </DetailListValue>
+    <SdkLogo />
   </DetailListColumn>
 </DetailList>

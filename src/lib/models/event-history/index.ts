@@ -51,7 +51,9 @@ export const toBillableEvent = (
 ) => {
   return {
     ...event,
-    billableActions: getEventBillableActions(event, shouldNotAddBillableAction),
+    billableActions: shouldNotAddBillableAction(event)
+      ? 0
+      : getEventBillableActions(event),
   };
 };
 
@@ -85,7 +87,7 @@ export const toEvent = (
 };
 
 export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
-  const failedEvent = events.find(isWorkflowTaskFailedEventDueToReset);
+  const failedEvent = events.findLast(isWorkflowTaskFailedEventDueToReset);
   const shouldNotAddBillableAction = (event: WorkflowEvent): boolean => {
     if (failedEvent) return Number(event.id) < Number(failedEvent.eventId);
     return false;
