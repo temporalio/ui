@@ -124,7 +124,7 @@
           data-testid="pause"
           on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
         >
-          {$pauseLiveUpdates ? 'Resume' : 'Pause'}
+          {$pauseLiveUpdates ? 'Unfreeze' : 'Freeze'}
         </ToggleButton>
         <ToggleButton
           data-testid="download"
