@@ -45,37 +45,22 @@ export async function getEventAttributes(
   };
 }
 
-export const resetBillableActionsBeforeEvent = (
-  eventId: string,
-  events: WorkflowEvent[],
-): WorkflowEvent[] => {
-  if (!eventId || events.length <= 1) return events;
-
-  const index = events.findIndex((event) => event.id === eventId);
-  if (index === -1) return events;
-
-  const updatedEvents = [...events];
-
-  if (Number(events[0].id) > Number(events[1].id)) {
-    for (let i = events.length - 1; i > index; i--) {
-      updatedEvents[i] = { ...updatedEvents[i], billableActions: 0 };
-    }
-  } else {
-    for (let i = 0; i < index; i++) {
-      updatedEvents[i] = { ...updatedEvents[i], billableActions: 0 };
-    }
-  }
-  return updatedEvents;
-};
-
-export const toBillableEvent = (event: WorkflowEvent) => {
+export const toBillableEvent = (
+  event: WorkflowEvent,
+  shouldNotAddBillableAction: (event: WorkflowEvent) => boolean = () => false,
+) => {
   return {
     ...event,
-    billableActions: getEventBillableActions(event),
+    billableActions: getEventBillableActions(event, shouldNotAddBillableAction),
   };
 };
 
-export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
+export const toEvent = (
+  historyEvent: HistoryEvent,
+  options: {
+    shouldNotAddBillableAction?: (event: WorkflowEvent) => boolean;
+  } = {},
+): WorkflowEvent => {
   const id = String(historyEvent.eventId);
   const eventType = toEventNameReadable(historyEvent.eventType);
   const timestamp = formatDate(String(historyEvent.eventTime));
@@ -96,17 +81,17 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
     billableActions: 0,
     attributes: simplifyAttributes({ type: key, ...attributes }),
   };
-  return toBillableEvent(event);
+  return toBillableEvent(event, options.shouldNotAddBillableAction);
 };
 
 export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
-  const formattedEvents = events.map(toEvent);
-  const failedEvent = formattedEvents.find(isWorkflowTaskFailedEventDueToReset);
-  if (failedEvent) {
-    return resetBillableActionsBeforeEvent(failedEvent.id, formattedEvents);
-  }
+  const failedEvent = events.find(isWorkflowTaskFailedEventDueToReset);
+  const shouldNotAddBillableAction = (event: WorkflowEvent): boolean => {
+    if (failedEvent) return Number(event.id) < Number(failedEvent.eventId);
+    return false;
+  };
 
-  return formattedEvents;
+  return events.map((event) => toEvent(event, { shouldNotAddBillableAction }));
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

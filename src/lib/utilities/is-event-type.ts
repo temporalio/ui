@@ -236,7 +236,9 @@ export const findAttributesAndKey = (
 
 const hasAttributes =
   <T extends EventWithAttributes<EventAttributeKey>>(key: EventAttributeKey) =>
-  (event: IterableEvent | CommonHistoryEvent | undefined): event is T => {
+  (
+    event: IterableEvent | CommonHistoryEvent | HistoryEvent | undefined,
+  ): event is T => {
     return Boolean(event?.[key]);
   };
 

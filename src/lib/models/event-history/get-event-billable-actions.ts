@@ -19,8 +19,12 @@ import {
   isWorkflowTaskCompletedEvent,
 } from '$lib/utilities/is-event-type';
 
-export const getEventBillableActions = (event: WorkflowEvent): number => {
+export const getEventBillableActions = (
+  event: WorkflowEvent,
+  shouldNotAddBillableAction: (event: WorkflowEvent) => boolean,
+): number => {
   try {
+    if (shouldNotAddBillableAction(event)) return 0;
     if (isWorkflowExecutionStartedEvent(event)) return 1;
     if (isActivityTaskScheduledEvent(event)) return 1;
     if (isTimerStartedEvent(event)) return 1;

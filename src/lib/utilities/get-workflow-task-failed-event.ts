@@ -1,6 +1,7 @@
 import type { EventSortOrder } from '$lib/stores/event-view';
 import type { WorkflowTaskFailedEventAttributes } from '$lib/types';
 import type {
+  HistoryEvent,
   WorkflowEvent,
   WorkflowEvents,
   WorkflowTaskCompletedEvent,
@@ -24,7 +25,7 @@ const isCompletedTaskEvent = (
 };
 
 export const isWorkflowTaskFailedEventDueToReset = (
-  event: WorkflowEvent,
+  event: WorkflowEvent | HistoryEvent,
 ): boolean =>
   isPureWorkflowTaskFailedEvent(event) &&
   getErrorCause(event) === 'ResetWorkflow';
