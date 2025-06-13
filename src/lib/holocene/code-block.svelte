@@ -16,9 +16,10 @@
   import { EditorState } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
   import { createEventDispatcher, onMount } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import ExpandButton from '$lib/holocene/expandable/button.svelte';
+  import { Maximizable } from '$lib/holocene/maximizable';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import {
@@ -67,14 +68,16 @@
   export let label = '';
 
   const { copy, copied } = copyToClipboard();
-  let expanded = false;
+  let maximized = false;
+  let scrollSnapshot;
 
   const handleCopy = (e: Event) => {
     copy(e, content);
   };
 
-  const handleExpand = () => {
-    expanded = !expanded;
+  const handleMaximize = () => {
+    scrollSnapshot = view?.scrollSnapshot();
+    maximized = !maximized;
   };
 
   let editor: HTMLElement;
@@ -108,10 +111,14 @@
     }
   });
 
-  const createEditorView = (isDark: boolean, expanded: boolean): EditorView => {
+  const createEditorView = (
+    isDark: boolean,
+    maximized: boolean,
+  ): EditorView => {
     return new EditorView({
       parent: editor,
-      state: createEditorState(value, isDark, expanded),
+      state: createEditorState(value, isDark, maximized),
+      scrollTo: scrollSnapshot,
       dispatch(transaction) {
         view.update([transaction]);
         if (transaction.docChanged) {
@@ -124,11 +131,11 @@
   const createEditorState = (
     value: string | null | undefined,
     isDark: boolean,
-    expanded: boolean,
+    maximized: boolean,
   ): EditorState => {
     const extensions = [
       keymap.of([...standardKeymap, ...historyKeymap]),
-      TEMPORAL_THEME({ isDark, copyable }),
+      TEMPORAL_THEME({ isDark, hasActions: copyable || maximizable }),
       syntaxHighlighting(TEMPORAL_SYNTAX, { fallback: true }),
       indentUnit.of('  '),
       closeBrackets(),
@@ -157,7 +164,7 @@
       extensions.push(foldGutter());
     }
 
-    if (minHeight || (maxHeight && !expanded)) {
+    if (minHeight || (maxHeight && !maximized)) {
       extensions.push(
         EditorView.theme({
           '&': {
@@ -176,16 +183,16 @@
   };
 
   onMount(() => {
-    createView($useDarkMode, expanded);
+    createView($useDarkMode, maximized);
     return () => view?.destroy();
   });
 
-  const createView = (isDark: boolean, expanded) => {
+  const createView = (isDark: boolean, maximized: boolean) => {
     if (view) view.destroy();
-    view = createEditorView(isDark, expanded);
+    view = createEditorView(isDark, maximized);
   };
 
-  $: createView($useDarkMode, expanded);
+  $: createView($useDarkMode, maximized);
 
   const resetView = (value = '', format = true) => {
     const formattedValue = format ? formatValue({ value, language }) : value;
@@ -206,7 +213,8 @@
 
   $: content, language, setView();
 
-  $: expandable = !editable && maxHeight && contentHeight(editor) > maxHeight;
+  $: maximizable =
+    (!editable && maxHeight && contentHeight(editor) > maxHeight) ?? false;
 
   const contentHeight = (element: HTMLElement) => {
     const childElement = element?.querySelector('.cm-content') as HTMLElement;
@@ -217,28 +225,32 @@
   };
 </script>
 
-<div class="relative min-w-[80px] grow">
-  <div
-    bind:this={editor}
-    class={className}
-    class:inline
-    data-testid={$$props.testId}
-    class:editable
-    class:readOnly={!editable}
-    {...$$restProps}
-  ></div>
-  <div class="absolute right-1 top-1 flex items-center">
-    {#if expandable}
-      <ExpandButton class="text-secondary" on:click={handleExpand} {expanded} />
-    {/if}
-    {#if copyable}
-      <CopyButton
-        {copyIconTitle}
-        {copySuccessIconTitle}
-        class="text-secondary"
-        on:click={handleCopy}
-        copied={$copied}
-      />
-    {/if}
-  </div>
+<div class="min-w-[80px] grow">
+  <Maximizable
+    {maximized}
+    onToggleMaximize={handleMaximize}
+    enabled={maximizable}
+  >
+    <div
+      bind:this={editor}
+      class={merge('h-full', className)}
+      class:inline
+      data-testid={$$props.testId}
+      class:editable
+      class:readOnly={!editable}
+      {...$$restProps}
+    ></div>
+
+    {#snippet actions()}
+      {#if copyable}
+        <CopyButton
+          {copyIconTitle}
+          {copySuccessIconTitle}
+          class="m-0 rounded-full text-secondary"
+          on:click={handleCopy}
+          copied={$copied}
+        />
+      {/if}
+    {/snippet}
+  </Maximizable>
 </div>

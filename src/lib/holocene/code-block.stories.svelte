@@ -131,6 +131,21 @@
 />
 
 <Story
+  name="Maximum Height + Copyable"
+  args={{
+    maxHeight: 100,
+    content: stringifyWithBigInt(
+      Object.getOwnPropertyDescriptors(Array.prototype),
+      null,
+      2,
+    ),
+    copyable: true,
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
+  }}
+/>
+
+<Story
   name="Shell"
   args={{
     language: 'shell',

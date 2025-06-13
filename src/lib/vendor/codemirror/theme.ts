@@ -7,10 +7,10 @@ import { css } from '$lib/theme/utilities';
 
 export const TEMPORAL_THEME = ({
   isDark,
-  copyable,
+  hasActions,
 }: {
   isDark: boolean;
-  copyable: boolean;
+  hasActions: boolean;
 }) =>
   EditorView.theme(
     {
@@ -19,15 +19,17 @@ export const TEMPORAL_THEME = ({
         backgroundColor: css('--color-surface-code-block'),
         borderWidth: '1px',
         borderColor: css('--color-border-subtle'),
-        padding: '0.5rem',
+        height: '100%',
       },
       '.cm-scroller': {
         fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+        padding: '0.5rem',
       },
       '.cm-content': {
         caretColor: css('--color-text-primary'),
         fontSize: '0.875em',
-        ...(copyable && { marginRight: '1.75rem' }),
+        ...(hasActions && { marginRight: '2rem' }),
+        marginRight: '1.75rem',
       },
       '.cm-editor&.cm-focused': {
         outline: `3px solid ${colors.indigo['600']}`,
