@@ -12,8 +12,8 @@
   import IconButton from '../icon-button.svelte';
 
   type BaseProps = HTMLInputAttributes & {
-    id: string;
-    value: string;
+    id?: string;
+    value?: string;
     label: string;
     labelHidden?: boolean;
     icon?: IconName;
@@ -29,6 +29,9 @@
     error?: boolean;
     'data-testid'?: string;
     class?: string;
+    // Optional form integration props
+    formKey?: symbol;
+    name?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -43,15 +46,15 @@
 
   type $$Props = BaseProps | CopyableProps | ClearableProps;
 
-  export let id: string;
-  export let value: string;
+  export let id: string = undefined;
+  export let value: string = '';
   export let label: string;
   export let labelHidden = false;
   export let icon: IconName = null;
   export let placeholder = '';
   export let suffix = '';
   export let prefix = '';
-  export let name = id;
+  export let name: string = undefined;
   export let copyable = false;
   export let disabled = false;
   export let clearable = false;
@@ -68,10 +71,22 @@
   export let copyButtonLabel = '';
   export let clearButtonLabel = '';
 
+  // Optional form integration props (unused for now)
+  // export let formKey: symbol = undefined;
+
   let className = '';
   export { className as class };
 
-  let testId = $$props['data-testid'] || id;
+  // Form integration logic (simplified)
+  let actualId = id || 'input-' + Math.random().toString(36).substr(2, 9);
+  let testId = $$props['data-testid'] || actualId;
+  let formName = name || actualId;
+
+  // For now, just use the regular props (form integration coming later)
+  $: actualValue = value;
+  $: actualValid = valid;
+  $: actualError = error;
+  $: actualHintText = hintText;
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
@@ -88,7 +103,7 @@
 </script>
 
 <div class={merge('flex flex-col gap-1', className)}>
-  <Label {required} {label} hidden={labelHidden} for={id} />
+  <Label {required} {label} hidden={labelHidden} for={actualId} />
   <div class="input-group flex">
     <slot name="before-input" {disabled} />
     <div
@@ -97,9 +112,9 @@
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
       )}
       class:disabled
-      class:error
+      class:error={actualError}
       class:noBorder
-      class:invalid={!valid}
+      class:invalid={!actualValid}
     >
       {#if icon}
         <span class="icon-container">
@@ -116,12 +131,12 @@
         data-1p-ignore="true"
         maxlength={maxLength > 0 ? maxLength : undefined}
         {placeholder}
-        {id}
-        {name}
+        id={actualId}
+        name={formName}
         {spellcheck}
         {required}
         {autocomplete}
-        bind:value
+        bind:value={actualValue}
         on:click|stopPropagation
         on:input
         on:keydown|stopPropagation
@@ -134,7 +149,10 @@
       />
       {#if copyable}
         <div class="copy-icon-container">
-          <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
+          <button
+            aria-label={copyButtonLabel}
+            on:click={(e) => copy(e, actualValue)}
+          >
             {#if $copied}
               <Icon name="checkmark" />
             {:else}
@@ -146,7 +164,7 @@
         <div class="disabled-icon-container">
           <Icon name="lock" />
         </div>
-      {:else if clearable && value}
+      {:else if clearable && actualValue}
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
@@ -158,9 +176,10 @@
       {#if maxLength && !disabled && !hideCount}
         <span class="count">
           <span
-            class:ok={maxLength - value.length > 5}
-            class:warn={maxLength - value.length <= 5}
-            class:error={maxLength === value.length}>{value.length}</span
+            class:ok={maxLength - actualValue.length > 5}
+            class:warn={maxLength - actualValue.length <= 5}
+            class:error={maxLength === actualValue.length}
+            >{actualValue.length}</span
           >/{maxLength}
         </span>
       {/if}
@@ -175,12 +194,12 @@
 
   <span
     class="hint-text inline-block"
-    class:invalid={!valid}
-    class:error
-    class:hidden={!hintText}
-    role={error ? 'alert' : null}
+    class:invalid={!actualValid}
+    class:error={actualError}
+    class:hidden={!actualHintText}
+    role={actualError ? 'alert' : null}
   >
-    {hintText}
+    {actualHintText}
   </span>
 </div>
 
