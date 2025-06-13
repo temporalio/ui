@@ -6,7 +6,10 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
-  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
+  import {
+    isActivityTaskScheduledEvent,
+    isActivityTaskStartedEvent,
+  } from '$lib/utilities/is-event-type';
 
   import {
     CategoryIcon,
@@ -74,6 +77,10 @@
     if (readOnly) return;
     setActiveGroup(group);
   };
+
+  $: activityTaskScheduled = group.eventList.find(isActivityTaskStartedEvent);
+  $: retried =
+    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1;
 </script>
 
 <g
@@ -94,6 +101,7 @@
         category={group.category}
         classification={group.lastEvent.classification}
         strokeWidth={radius * 2}
+        {retried}
         scheduling={index === 0 &&
           group.lastEvent.classification === 'Completed'}
       />
@@ -127,14 +135,18 @@
           {backdrop}
           backdropHeight={radius * 2}
           config={TimelineConfig}
-          icon={pendingActivity ? 'retry' : undefined}
+          icon={pendingActivity || retried ? 'retry' : undefined}
         >
           {#if pendingActivity}
             {translate('workflows.attempt')}
             {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
             {'• '}
+            {decodedValue}
+          {:else if retried}
+            {activityTaskScheduled.attributes.attempt} • {decodedValue}
+          {:else}
+            {decodedValue}
           {/if}
-          {decodedValue}
         </Text>
       </MetadataDecoder>
     {/if}

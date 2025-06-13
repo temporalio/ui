@@ -50,7 +50,7 @@
   class:label
   class:backdrop
   x={textX}
-  {y}
+  y={y + 1}
   font-size={fontSize}
   font-weight={fontWeight}
   text-anchor={textAnchor}
