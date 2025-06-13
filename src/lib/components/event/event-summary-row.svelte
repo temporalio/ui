@@ -203,9 +203,18 @@
   >
     <div class="flex items-center gap-2">
       {#if pendingAttempt}
-        <Badge class="mr-1" type={pendingAttempt > 1 ? 'danger' : 'default'}>
+        <Badge
+          class="mr-1"
+          type={hasPendingActivity.paused
+            ? 'warning'
+            : pendingAttempt > 1
+              ? 'danger'
+              : 'default'}
+        >
           <Icon
-            class="mr-1 inline {pendingAttempt > 1 && 'font-bold text-red-400'}"
+            class="mr-1 inline {pendingAttempt > 1 &&
+              'font-bold text-red-400'} {hasPendingActivity.paused &&
+              'font-bold text-yellow-700'}"
             name={hasPendingActivity.paused ? 'pause' : 'retry'}
           />
           {translate('workflows.attempt')}

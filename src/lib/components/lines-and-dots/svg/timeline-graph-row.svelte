@@ -157,7 +157,9 @@
           {backdrop}
           backdropHeight={radius * 2}
           config={TimelineConfig}
-          icon={pendingActivity || retried ? 'retry' : undefined}
+          icon={(pendingActivity && !pendingActivity.paused) || retried
+            ? 'retry'
+            : undefined}
         >
           {#if pendingActivity}
             {translate('workflows.attempt')}
