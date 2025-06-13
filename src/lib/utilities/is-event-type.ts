@@ -44,6 +44,7 @@ import type {
   WorkflowExecutionCompletedEvent,
   WorkflowExecutionContinuedAsNewEvent,
   WorkflowExecutionFailedEvent,
+  WorkflowExecutionOptionsUpdatedEvent,
   WorkflowExecutionSignaledEvent,
   WorkflowExecutionStartedEvent,
   WorkflowExecutionTerminatedEvent,
@@ -51,6 +52,7 @@ import type {
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowExecutionUpdateAdmittedEvent,
   WorkflowExecutionUpdateCompletedEvent,
+  WorkflowExecutionUpdateRejectedEvent,
   WorkflowTaskCompletedEvent,
   WorkflowTaskFailedEvent,
   WorkflowTaskScheduledEvent,
@@ -199,6 +201,7 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'nexusOperationCancelRequestedEventAttributes',
   'nexusOperationCancelRequestCompletedEventAttributes' as unknown as EventAttributeKey,
   'nexusOperationCancelRequestFailedEventAttributes' as unknown as EventAttributeKey,
+  'workflowExecutionOptionsUpdatedEventAttributes' as unknown as EventAttributeKey,
   'workflowPropertiesModifiedEventAttributes',
 ] as const;
 
@@ -233,7 +236,9 @@ export const findAttributesAndKey = (
 
 const hasAttributes =
   <T extends EventWithAttributes<EventAttributeKey>>(key: EventAttributeKey) =>
-  (event: IterableEvent | CommonHistoryEvent | undefined): event is T => {
+  (
+    event: IterableEvent | CommonHistoryEvent | HistoryEvent | undefined,
+  ): event is T => {
     return Boolean(event?.[key]);
   };
 
@@ -334,6 +339,11 @@ export const isTimerCanceledEvent = hasAttributes<TimerCanceledEvent>(
 export const isMarkerRecordedEvent = hasAttributes<MarkerRecordedEvent>(
   'markerRecordedEventAttributes',
 );
+
+export const isWorkflowExecutionOptionsUpdatedEvent =
+  hasAttributes<WorkflowExecutionOptionsUpdatedEvent>(
+    'workflowExecutionOptionsUpdatedEventAttributes',
+  );
 
 export const isWorkflowExecutionSignaledEvent =
   hasAttributes<WorkflowExecutionSignaledEvent>(
@@ -460,6 +470,11 @@ export const isLocalActivityMarkerEvent = (
 export const isWorkflowExecutionUpdateAcceptedEvent =
   hasAttributes<WorkflowExecutionUpdateAcceptedEvent>(
     'workflowExecutionUpdateAcceptedEventAttributes',
+  );
+
+export const isWorkflowExecutionUpdateRejectedEvent =
+  hasAttributes<WorkflowExecutionUpdateRejectedEvent>(
+    'workflowExecutionUpdateRejectedEventAttributes',
   );
 
 export const isWorkflowExecutionUpdateAdmittedEvent =

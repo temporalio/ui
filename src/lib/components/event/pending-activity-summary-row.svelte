@@ -1,11 +1,16 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Badge from '$lib/holocene/badge.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { isCloud } from '$lib/stores/advanced-visibility';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { PendingActivity } from '$lib/types/events';
+  import { formatDate } from '$lib/utilities/format-date';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -26,6 +31,13 @@
     namespace,
     workflow,
     run,
+  });
+  $: eventTime = formatDate(group?.eventTime, $timeFormat, {
+    relative: $relativeTime,
+  });
+  $: abbrEventTime = formatDate(group?.eventTime, $timeFormat, {
+    relative: $relativeTime,
+    abbrFormat: true,
   });
 
   const onLinkClick = () => {
@@ -51,16 +63,34 @@
       {event.id}
     {/if}
   </td>
+  <td class="text-right md:hidden">
+    <Copyable
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      content={abbrEventTime}
+    >
+      {abbrEventTime}
+    </Copyable>
+  </td>
+  <td class="hidden text-right md:block">
+    <Copyable
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      content={eventTime}
+    >
+      {eventTime}
+    </Copyable>
+  </td>
+  <td class="">
+    <p class="truncate font-semibold md:text-base">Pending Activity</p>
+  </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
-    <div class="flex w-full items-center gap-2">
-      <p class="event-name truncate font-semibold md:text-base">
-        Pending Activity
-      </p>
-      <div
-        class="flex items-center gap-1 {event.attempt > 1 &&
-          'surface-retry px-1 py-0.5'}"
-      >
-        <Icon class="mr-1.5 inline" name="retry" />
+    <div class="flex items-center gap-1">
+      <Badge class="mr-1" type={event.attempt > 1 ? 'danger' : 'default'}>
+        <Icon
+          class="mr-1 inline {event.attempt > 1 && 'font-bold text-red-400'}"
+          name="retry"
+        />
         {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}
         {#if event.attempt > 1}
@@ -70,31 +100,23 @@
             negativeDefault: 'None',
           })}
         {/if}
-      </div>
+      </Badge>
       <EventDetailsRow
         key="activityType"
         value={event.activityType}
         showKey
         attributes={event}
       />
-    </div></td
-  >
-  <td></td>
+    </div>
+  </td>
+  {#if $isCloud}
+    <td></td>
+  {/if}
 </tr>
 {#if expanded}
-  <tr class="row expanded">
-    <td class="expanded-cell w-full">
+  <tr class="w-full px-2 text-sm no-underline">
+    <td class="bg-primary" colspan="5">
       <EventDetailsFull {group} />
     </td>
   </tr>
 {/if}
-
-<style lang="postcss">
-  .row {
-    @apply flex select-none items-center gap-4 px-2 text-sm no-underline;
-  }
-
-  .expanded-cell {
-    @apply text-sm no-underline;
-  }
-</style>

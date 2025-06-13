@@ -4,6 +4,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
@@ -21,7 +22,6 @@
     DetailListLabel,
     DetailListLinkValue,
     DetailListTextValue,
-    DetailListValue,
   } from '../detail-list';
 
   import SdkLogo from './sdk-logo.svelte';
@@ -54,6 +54,9 @@
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ],
+  );
+  let totalActions = $derived(
+    $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
   );
 
   const fetchLatestRun = async () => {
@@ -192,11 +195,12 @@
         >{translate('workflows.state-transitions')}</DetailListLabel
       >
       <DetailListTextValue text={workflow?.stateTransitionCount} />
+    {:else}
+      <DetailListLabel>
+        {translate('workflows.billable-actions')}
+      </DetailListLabel>
+      <DetailListTextValue text={totalActions} iconName="dollar-invoice" />
     {/if}
-
-    <DetailListLabel>SDK</DetailListLabel>
-    <DetailListValue>
-      <SdkLogo />
-    </DetailListValue>
+    <SdkLogo />
   </DetailListColumn>
 </DetailList>

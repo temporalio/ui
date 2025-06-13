@@ -4,7 +4,7 @@
     "moduleResolution": "bundler",
     // "strict": true,
     "module": "es2020",
-    "lib": ["es2020", "dom", "DOM.Iterable"],
+    "lib": ["es2020", "es2023", "dom", "DOM.Iterable"],
     "target": "es2019",
     /**
 			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript
