@@ -154,7 +154,7 @@ importers:
         specifier: ^8.6.11
         version: 8.6.11(react@18.2.0)(storybook@8.6.11(prettier@3.5.3))
       '@storybook/addon-svelte-csf':
-        specifier: ^5.0.0-next.23
+        specifier: 5.0.0-next.27
         version: 5.0.0-next.27(@storybook/svelte@8.6.11(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5))(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1)))(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1))
       '@storybook/addon-themes':
         specifier: ^8.6.11

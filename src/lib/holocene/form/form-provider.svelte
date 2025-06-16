@@ -15,13 +15,8 @@
 
   const context = createFormContext(formParams);
   const { enhance } = context.form;
-
-  // Extract action and method for server mode
-  const action = formParams.mode === 'server' ? formParams.action : undefined;
-  const method =
-    formParams.mode === 'server' ? formParams.method || 'POST' : undefined;
 </script>
 
-<form {action} {method} use:enhance>
+<form use:enhance>
   {@render children()}
 </form>

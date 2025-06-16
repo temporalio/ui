@@ -4,6 +4,7 @@
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import { useFormField } from '$lib/holocene/form/form-field-utils.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -29,9 +30,6 @@
     error?: boolean;
     'data-testid'?: string;
     class?: string;
-    // Optional form integration props
-    formKey?: symbol;
-    name?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -71,30 +69,43 @@
   export let copyButtonLabel = '';
   export let clearButtonLabel = '';
 
-  // Optional form integration props (unused for now)
-  // export let formKey: symbol = undefined;
-
   let className = '';
   export { className as class };
 
-  // Form integration logic (simplified)
   let actualId = id || 'input-' + Math.random().toString(36).substr(2, 9);
   let testId = $$props['data-testid'] || actualId;
   let formName = name || actualId;
 
-  // For now, just use the regular props (form integration coming later)
-  $: actualValue = value;
-  $: actualValid = valid;
-  $: actualError = error;
-  $: actualHintText = hintText;
+  $: field = useFormField({
+    name: formName,
+    propValue: value,
+    propValid: valid,
+    propError: error,
+    propHintText: hintText,
+    onPropUpdate: (val) => {
+      value = val as string;
+    },
+  });
+
+  $: actualValue = (field.value ?? '') as string;
+  $: actualValid = field.valid;
+  $: actualError = field.error;
+  $: actualHintText = field.hintText;
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
   }
 
   const dispatch = createEventDispatcher();
+
+  function handleInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    field.setValue(target.value);
+    dispatch('input', event);
+  }
+
   function onClear() {
-    value = '';
+    field.setValue('');
     dispatch('clear', {});
   }
 
@@ -138,7 +149,7 @@
         {autocomplete}
         bind:value={actualValue}
         on:click|stopPropagation
-        on:input
+        on:input={handleInput}
         on:keydown|stopPropagation
         on:change
         on:focus

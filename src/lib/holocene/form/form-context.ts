@@ -26,75 +26,45 @@ export type OnUpdateParams = {
 export type MaybePromise<T> = T | Promise<T>;
 
 export interface BaseSPAFormParams {
-  mode: 'spa';
-  formKey: symbol;
   schema?: z.ZodObject<z.ZodRawShape>;
   defaultValues?: Record<string, unknown>;
   onUpdate: (event: OnUpdateParams) => MaybePromise<unknown | void> | undefined;
 }
 
-export interface BaseServerFormParams {
-  mode: 'server';
-  formKey: symbol;
-  schema?: z.ZodObject<z.ZodRawShape>;
-  action?: string;
-  method?: 'GET' | 'POST';
-  data: SuperValidated<Record<string, unknown>>;
-}
-
-export type FormContextParams = BaseSPAFormParams | BaseServerFormParams;
+export type FormContextParams = BaseSPAFormParams;
 
 export interface FormContext {
-  formKey: symbol;
-  mode: FormContextParams['mode'];
   form: ReturnType<typeof superForm>;
 }
 
+export const formKey = Symbol('form');
+
 export function createFormContext(params: FormContextParams): FormContext {
-  const { formKey, mode, schema } = params;
+  const { schema, defaultValues = {}, onUpdate } = params;
 
-  let f: ReturnType<typeof superForm>;
+  const f = superForm(defaultValues, {
+    resetForm: false,
+    dataType: 'json',
+    SPA: true,
+    validators: schema ? zodClient(schema) : false,
 
-  if (mode === 'spa') {
-    const { defaultValues = {}, onUpdate } = params;
+    onUpdate: async (event) => {
+      const result = await onUpdate(event as OnUpdateParams);
+      return result;
+    },
 
-    f = superForm(defaultValues, {
-      resetForm: false,
-      dataType: 'json',
-      SPA: true,
-      validators: schema ? zodClient(schema) : undefined,
-      onUpdate: async (event: OnUpdateParams) => {
-        const result = await onUpdate(event);
-        return result;
-      },
-      onError: ({ result }) => {
-        toaster.push({
-          message: result?.error?.message || 'An error occurred',
-          variant: 'error',
-        });
-      },
-    });
-  } else {
-    // Server mode
-    const { data } = params;
-
-    f = superForm(data, {
-      resetForm: false,
-      dataType: 'json',
-      validators: schema ? zodClient(schema) : undefined,
-      onError: ({ result }) => {
-        toaster.push({
-          message: result?.error?.message || 'An error occurred',
-          variant: 'error',
-        });
-      },
-    });
-  }
+    onError: ({ result }) => {
+      toaster.push({
+        message: result?.error?.message || 'An error occurred',
+        variant: 'error',
+      });
+    },
+  });
 
   const context: FormContext = {
-    formKey,
-    mode,
-    form: f,
+    get form() {
+      return f;
+    },
   };
 
   setContext(formKey, context);
@@ -102,6 +72,6 @@ export function createFormContext(params: FormContextParams): FormContext {
   return context;
 }
 
-export function getFormContext(formKey: symbol): FormContext | undefined {
+export function getFormContext(): FormContext | undefined {
   return getContext(formKey);
 }

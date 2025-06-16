@@ -1,56 +1,32 @@
-<script lang="ts" context="module">
-  import type { Meta } from '@storybook/svelte';
-
-  import Form from './form-provider.svelte';
-
-  export const meta = {
-    title: 'Form/Form',
-    component: Form,
-  } satisfies Meta<Form>;
-</script>
-
-<script lang="ts">
+<script lang="ts" module>
   import { action } from '@storybook/addon-actions';
-  import { Story } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
 
   import Button from '../button.svelte';
   import Input from '../input/input.svelte';
 
-  // Form key
-  const SIMPLE_FORM = Symbol('simple-form');
+  import Form from './form-provider.svelte';
 
-  // Storybook action for form submission
-  const onFormSubmit = action('form-submitted');
+  const defaultValues = { username: 'johndoe' };
 
-  // Demo submission handler
-  function handleSubmit(data: Record<string, unknown>) {
-    // Send to Storybook actions
-    onFormSubmit(data);
-
-    console.log('Form submitted:', data);
-  }
+  const { Story } = defineMeta({
+    title: 'Forms/Form',
+    tags: ['autodocs', 'notest'],
+    args: {
+      defaultValues,
+      onUpdate: async (values: Record<string, unknown>) => {
+        action('submitted')(values);
+        return 'Form submitted successfully';
+      },
+    },
+  });
 </script>
 
-<Story name="Simple Form">
-  <div class="max-w-md">
-    <h3 class="mb-4 text-lg font-semibold">Simple Form</h3>
-    <Form
-      formKey={SIMPLE_FORM}
-      mode="spa"
-      onUpdate={handleSubmit}
-      defaultValues={{ name: '' }}
-    >
-      <div class="space-y-4">
-        <Input
-          id="name"
-          value=""
-          label="Name"
-          placeholder="Enter your name"
-          required
-        />
-
-        <Button type="submit" variant="primary">Submit</Button>
-      </div>
+<Story name="Basic Form">
+  {#snippet children(args)}
+    <Form onUpdate={args.onUpdate} defaultValues={args.defaultValues}>
+      <Input name="username" type="text" label="Username" />
+      <Button type="submit">Submit</Button>
     </Form>
-  </div>
+  {/snippet}
 </Story>
