@@ -387,7 +387,7 @@
   </td>
   {#if $isCloud}
     <td>
-      <div class="flex justify-center gap-0.5 font-mono">
+      <div class="flex justify-center gap-0.5">
         {#if event.billableActions}
           <Tooltip
             text={translate('workflows.estimated-billable-actions')}
