@@ -9,22 +9,25 @@
 
   const defaultValues = { username: 'johndoe' };
 
+  const onUpdate = async (values: Record<string, unknown>) => {
+    action('submitted')(values);
+    return 'Form submitted successfully';
+  };
+
+  const config = { defaultValues, onUpdate };
+
   const { Story } = defineMeta({
     title: 'Forms/Form',
     tags: ['autodocs', 'notest'],
     args: {
-      defaultValues,
-      onUpdate: async (values: Record<string, unknown>) => {
-        action('submitted')(values);
-        return 'Form submitted successfully';
-      },
+      config,
     },
   });
 </script>
 
 <Story name="Basic Form">
   {#snippet children(args)}
-    <Form onUpdate={args.onUpdate} defaultValues={args.defaultValues}>
+    <Form config={args.config}>
       <Input name="username" type="text" label="Username" />
       <Button type="submit">Submit</Button>
     </Form>

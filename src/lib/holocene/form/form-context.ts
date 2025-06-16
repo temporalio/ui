@@ -25,13 +25,15 @@ export type OnUpdateParams = {
 
 export type MaybePromise<T> = T | Promise<T>;
 
-export interface BaseSPAFormParams {
+export interface BaseSPAFormConfig {
   schema?: z.ZodObject<z.ZodRawShape>;
   defaultValues?: Record<string, unknown>;
   onUpdate: (event: OnUpdateParams) => MaybePromise<unknown | void> | undefined;
 }
 
-export type FormContextParams = BaseSPAFormParams;
+export interface FormContextParams {
+  config: BaseSPAFormConfig;
+}
 
 export interface FormContext {
   form: ReturnType<typeof superForm>;
@@ -40,7 +42,7 @@ export interface FormContext {
 export const formKey = Symbol('form');
 
 export function createFormContext(params: FormContextParams): FormContext {
-  const { schema, defaultValues = {}, onUpdate } = params;
+  const { schema, defaultValues = {}, onUpdate } = params.config;
 
   const f = superForm(defaultValues, {
     resetForm: false,

@@ -72,9 +72,9 @@
   let className = '';
   export { className as class };
 
-  let actualId = id || 'input-' + Math.random().toString(36).substr(2, 9);
-  let testId = $$props['data-testid'] || actualId;
-  let formName = name || actualId;
+  let resolvedId = id || 'input-' + Math.random().toString(36).substr(2, 9);
+  let testId = $$props['data-testid'] || resolvedId;
+  let formName = name || resolvedId;
 
   $: field = useFormField({
     name: formName,
@@ -87,10 +87,10 @@
     },
   });
 
-  $: actualValue = (field.value ?? '') as string;
-  $: actualValid = field.valid;
-  $: actualError = field.error;
-  $: actualHintText = field.hintText;
+  $: resolvedValue = (field.value ?? '') as string;
+  $: resolvedValid = field.valid;
+  $: resolvedError = field.error;
+  $: resolvedHintText = field.hintText;
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
@@ -114,7 +114,7 @@
 </script>
 
 <div class={merge('flex flex-col gap-1', className)}>
-  <Label {required} {label} hidden={labelHidden} for={actualId} />
+  <Label {required} {label} hidden={labelHidden} for={resolvedId} />
   <div class="input-group flex">
     <slot name="before-input" {disabled} />
     <div
@@ -123,9 +123,9 @@
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
       )}
       class:disabled
-      class:error={actualError}
+      class:error={resolvedError}
       class:noBorder
-      class:invalid={!actualValid}
+      class:invalid={!resolvedValid}
     >
       {#if icon}
         <span class="icon-container">
@@ -142,12 +142,12 @@
         data-1p-ignore="true"
         maxlength={maxLength > 0 ? maxLength : undefined}
         {placeholder}
-        id={actualId}
+        id={resolvedId}
         name={formName}
         {spellcheck}
         {required}
         {autocomplete}
-        bind:value={actualValue}
+        bind:value={resolvedValue}
         on:click|stopPropagation
         on:input={handleInput}
         on:keydown|stopPropagation
@@ -162,7 +162,7 @@
         <div class="copy-icon-container">
           <button
             aria-label={copyButtonLabel}
-            on:click={(e) => copy(e, actualValue)}
+            on:click={(e) => copy(e, resolvedValue)}
           >
             {#if $copied}
               <Icon name="checkmark" />
@@ -175,7 +175,7 @@
         <div class="disabled-icon-container">
           <Icon name="lock" />
         </div>
-      {:else if clearable && actualValue}
+      {:else if clearable && resolvedValue}
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
@@ -187,10 +187,10 @@
       {#if maxLength && !disabled && !hideCount}
         <span class="count">
           <span
-            class:ok={maxLength - actualValue.length > 5}
-            class:warn={maxLength - actualValue.length <= 5}
-            class:error={maxLength === actualValue.length}
-            >{actualValue.length}</span
+            class:ok={maxLength - resolvedValue.length > 5}
+            class:warn={maxLength - resolvedValue.length <= 5}
+            class:error={maxLength === resolvedValue.length}
+            >{resolvedValue.length}</span
           >/{maxLength}
         </span>
       {/if}
@@ -205,12 +205,12 @@
 
   <span
     class="hint-text inline-block"
-    class:invalid={!actualValid}
-    class:error={actualError}
-    class:hidden={!actualHintText}
-    role={actualError ? 'alert' : null}
+    class:invalid={!resolvedValid}
+    class:error={resolvedError}
+    class:hidden={!resolvedHintText}
+    role={resolvedError ? 'alert' : null}
   >
-    {actualHintText}
+    {resolvedHintText}
   </span>
 </div>
 

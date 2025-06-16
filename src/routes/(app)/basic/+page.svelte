@@ -9,9 +9,11 @@
     console.log('Form submitted with values:', values);
     return 'Form submitted successfully';
   }
+
+  const config = { onUpdate, defaultValues };
 </script>
 
-<Form {onUpdate} {defaultValues}>
+<Form {config}>
   <Input name="username" type="text" label="Username" />
 
   <Button type="submit">Submit</Button>
