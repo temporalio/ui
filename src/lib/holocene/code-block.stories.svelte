@@ -131,7 +131,7 @@
 />
 
 <Story
-  name="Maximum Height + Copyable"
+  name="Copyable (Maximum Height)"
   args={{
     maxHeight: 100,
     content: stringifyWithBigInt(
@@ -154,14 +154,6 @@
 />
 
 <Story
-  name="Text"
-  args={{
-    language: 'text',
-    content: 'Hello, World!',
-  }}
-/>
-
-<Story
   name="Copyable (Shell)"
   args={{
     language: 'shell',
@@ -169,6 +161,14 @@
     content: 'echo "Hello, World!"',
     copyIconTitle: 'Click to copy content',
     copySuccessIconTitle: 'Content copied to clipboard',
+  }}
+/>
+
+<Story
+  name="Text"
+  args={{
+    language: 'text',
+    content: 'Hello, World!',
   }}
 />
 
