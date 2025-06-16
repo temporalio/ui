@@ -33,7 +33,9 @@ on:
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
+  actions: write
 
 jobs:
   version-bump:
@@ -114,7 +116,6 @@ jobs:
         id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: |
             chore: bump version to ${{ steps.calculate-version.outputs.new-version }}
 
@@ -143,8 +144,10 @@ jobs:
             🤖 This PR was automatically created by the Version Bump workflow.
           branch: version-bump-${{ steps.calculate-version.outputs.new-version }}
           delete-branch: true
-          committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
-          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+          reviewers: ${{ github.actor }}
+          committer: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          draft: always-true
 
       - name: Summary
         if: inputs.mode != 'dry-run'
