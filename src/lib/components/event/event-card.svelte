@@ -79,8 +79,8 @@
       })}
     </p>
   </div>
-  <div class="flex flex-1 flex-col gap-2 xl:flex-row">
-    <div class="w-full overflow-auto xl:w-1/2">
+  <div class="flex flex-wrap gap-2">
+    <div>
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
       {/if}
@@ -95,7 +95,7 @@
       {/each}
     </div>
     {#if payloadFields.length}
-      <div class="w-full flex-1 overflow-hidden xl:w-1/2">
+      <div class="w-full xl:w-1/2">
         {#each payloadFields as [key, value] (key)}
           {@render payloads(key, value)}
         {/each}
@@ -164,59 +164,53 @@
 {#snippet payloads(key, value)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
-  <div class="w-full">
-    <div class="flex flex-col">
-      <p class="min-w-56 text-sm text-secondary/80">
-        {format(key)}
-      </p>
-      {#if value?.payloads}
-        <PayloadDecoder {value} key="payloads" let:decodedValue>
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </PayloadDecoder>
-      {:else if key === 'searchAttributes'}
-        <PayloadDecoder
-          key="searchAttributes"
-          value={{ searchAttributes: codeBlockValue }}
-          let:decodedValue
-        >
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </PayloadDecoder>
-      {:else}
-        <PayloadDecoder value={codeBlockValue} let:decodedValue>
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </PayloadDecoder>
-      {/if}
-    </div>
-    {#if stackTrace}
-      <div class="flex flex-col">
-        <p class="min-w-56 text-sm text-secondary/80">
-          {translate('workflows.call-stack-tab')}
-        </p>
-        <CodeBlock
-          content={stackTrace}
-          language="text"
-          class="mb-2 h-full lg:pr-2"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      </div>
-    {/if}
-  </div>
+  <p class="min-w-56 text-sm text-secondary/80">
+    {format(key)}
+  </p>
+  {#if value?.payloads}
+    <PayloadDecoder {value} key="payloads" let:decodedValue>
+      <CodeBlock
+        content={decodedValue}
+        maxHeight={384}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </PayloadDecoder>
+  {:else if key === 'searchAttributes'}
+    <PayloadDecoder
+      key="searchAttributes"
+      value={{ searchAttributes: codeBlockValue }}
+      let:decodedValue
+    >
+      <CodeBlock
+        content={decodedValue}
+        maxHeight={384}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </PayloadDecoder>
+  {:else}
+    <PayloadDecoder value={codeBlockValue} let:decodedValue>
+      <CodeBlock
+        content={decodedValue}
+        maxHeight={384}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </PayloadDecoder>
+  {/if}
+  {#if stackTrace}
+    <p class="min-w-56 text-sm text-secondary/80">
+      {translate('workflows.call-stack-tab')}
+    </p>
+    <CodeBlock
+      content={stackTrace}
+      language="text"
+      maxHeight={384}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    />
+  {/if}
 {/snippet}
 
 {#snippet link(key, value)}

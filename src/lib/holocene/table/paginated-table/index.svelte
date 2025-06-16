@@ -101,8 +101,8 @@
       @apply w-full hover:bg-primary;
     }
 
-    :global(tr.dense:nth-of-type(odd)) {
-      @apply surface-background hover:bg-interactive-table-hover;
+    :global(tr:nth-of-type(odd)) {
+      @apply surface-background;
     }
 
     :global(tr.dense.expanded) {

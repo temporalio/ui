@@ -5,7 +5,6 @@
 
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -49,8 +48,8 @@
       <h4>{activity.activityType}</h4>
     </div>
   </div>
-  <div class="flex flex-1 flex-col gap-2 xl:flex-row">
-    <div class="w-full overflow-auto xl:w-1/2">
+  <div class="flex flex-wrap gap-2">
+    <div>
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
@@ -106,7 +105,7 @@
         )}
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-2 md:flex-1 xl:w-1/2">
+    <div class="flex w-full flex-col gap-2 xl:w-1/2">
       {#if failed}
         {@render failures()}
       {/if}
@@ -147,42 +146,28 @@
 {/snippet}
 
 {#snippet failures()}
-  <Accordion
-    title={activity.lastFailure?.stackTrace
-      ? translate('workflows.last-failure-with-stack-trace')
-      : translate('workflows.last-failure')}
-  >
-    <div class="-mt-4 flex flex-col gap-2">
-      <div class="flex flex-1 flex-col">
-        {#if activity.lastFailure}
-          <p class="text-sm text-secondary/80">
-            {translate('workflows.last-failure')}
-          </p>
-          <CodeBlock
-            class="pb-2"
-            content={stringifyWithBigInt(
-              omit(activity.lastFailure, 'stackTrace'),
-            )}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/if}
-      </div>
-      <div class="flex flex-1 flex-col">
-        {#if activity.lastFailure?.stackTrace}
-          <p class="text-sm text-secondary/80">
-            {translate('common.stack-trace')}
-          </p>
-          <CodeBlock
-            language="text"
-            content={activity.lastFailure.stackTrace}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/if}
-      </div>
-    </div>
-  </Accordion>
+  {#if activity.lastFailure}
+    <p class="text-sm text-secondary/80">
+      {translate('workflows.last-failure')}
+    </p>
+    <CodeBlock
+      maxHeight={384}
+      content={stringifyWithBigInt(omit(activity.lastFailure, 'stackTrace'))}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    />
+  {/if}
+  {#if activity.lastFailure?.stackTrace}
+    <p class="text-sm text-secondary/80">
+      {translate('common.stack-trace')}
+    </p>
+    <CodeBlock
+      language="text"
+      content={activity.lastFailure.stackTrace}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+    />
+  {/if}
 {/snippet}
 
 {#snippet scheduleEventLink()}

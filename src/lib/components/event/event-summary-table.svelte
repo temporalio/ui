@@ -74,7 +74,7 @@
 
 <div class="flex">
   <div
-    class="overflow-auto pt-[33px]"
+    class="pt-9"
     style="max-height: {minimized ? 'calc(100vh - 200px)' : '20000px'}"
   >
     {#if showGraph}
