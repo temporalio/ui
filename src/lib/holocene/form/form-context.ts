@@ -23,12 +23,18 @@ export type OnUpdateParams = {
   >;
 };
 
+export type OnErrorParams = {
+  result: ActionResult & { type: 'error' };
+  message?: string;
+};
+
 export type MaybePromise<T> = T | Promise<T>;
 
 export interface BaseSPAFormConfig {
   schema?: z.ZodObject<z.ZodRawShape>;
   defaultValues?: Record<string, unknown>;
   onUpdate: (event: OnUpdateParams) => MaybePromise<unknown | void> | undefined;
+  onError?: (event: OnErrorParams) => MaybePromise<void> | undefined;
 }
 
 export interface FormContextParams {
@@ -41,8 +47,24 @@ export interface FormContext {
 
 export const formKey = Symbol('form');
 
+export function formatErrorMessage(event: OnErrorParams): string {
+  // Prioritize custom message, then result error message, then fallback
+  return (
+    event.message ||
+    event.result?.error?.message ||
+    'An unexpected error occurred. Please try again.'
+  );
+}
+
+function defaultErrorHandler(event: OnErrorParams): void {
+  toaster.push({
+    message: formatErrorMessage(event),
+    variant: 'error',
+  });
+}
+
 export function createFormContext(params: FormContextParams): FormContext {
-  const { schema, defaultValues = {}, onUpdate } = params.config;
+  const { schema, defaultValues = {}, onUpdate, onError } = params.config;
 
   const f = superForm(defaultValues, {
     resetForm: false,
@@ -55,11 +77,17 @@ export function createFormContext(params: FormContextParams): FormContext {
       return result;
     },
 
-    onError: ({ result }) => {
-      toaster.push({
-        message: result?.error?.message || 'An error occurred',
-        variant: 'error',
-      });
+    onError: async (event) => {
+      const errorEvent: OnErrorParams = {
+        result: event.result as ActionResult & { type: 'error' },
+        message: event.result?.error?.message,
+      };
+
+      if (onError) {
+        await onError(errorEvent);
+      } else {
+        defaultErrorHandler(errorEvent);
+      }
     },
   });
 

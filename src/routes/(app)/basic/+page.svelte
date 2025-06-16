@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
-  import { Form } from '$lib/holocene/form';
+  import { Form, type OnErrorParams } from '$lib/holocene/form';
   import Input from '$lib/holocene/input/input.svelte';
 
   let defaultValues = { username: 'johndoe' };
@@ -10,7 +10,12 @@
     return 'Form submitted successfully';
   }
 
-  const config = { onUpdate, defaultValues };
+  function onError(event: OnErrorParams) {
+    console.error('Custom error handler:', event);
+    // Custom error handling logic here
+  }
+
+  const config = { onUpdate, onError, defaultValues };
 </script>
 
 <Form {config}>
