@@ -92,8 +92,8 @@
   );
   let maximized = $state(false);
 
-  // a state compartment, allowing updates on based on props e.g. styles
-  const dynamicCompartment = $state(new Compartment());
+  // a compartment allows us to update extensions like the theme
+  const compartment = $state(new Compartment());
 
   const staticExtensions: Extension[] = [
     keymap.of([...standardKeymap, ...historyKeymap]),
@@ -121,15 +121,12 @@
     ].filter((ext) => ext != null),
   );
 
-  const getNewView = () =>
+  const createView = () =>
     new EditorView({
       parent: editorElement,
       state: EditorState.create({
         doc: formatContent(language, content, inline),
-        extensions: [
-          staticExtensions,
-          dynamicCompartment.of(dynamicExtensions),
-        ],
+        extensions: [staticExtensions, compartment.of(dynamicExtensions)],
       }),
       dispatch(transaction, view) {
         view.update([transaction]);
@@ -142,7 +139,7 @@
   // keep dynamic extensions up to date in codemirror
   $effect(() => {
     view?.dispatch({
-      effects: dynamicCompartment.reconfigure(dynamicExtensions),
+      effects: compartment.reconfigure(dynamicExtensions),
     });
   });
 
@@ -165,7 +162,7 @@
   });
 
   onMount(() => {
-    view = getNewView();
+    view = createView();
     return () => {
       view?.destroy();
     };
