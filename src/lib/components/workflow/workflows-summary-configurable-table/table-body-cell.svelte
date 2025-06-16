@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/state';
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
@@ -15,15 +17,24 @@
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistance } from '$lib/utilities/format-time';
+  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
+  import {
+    routeForEventHistory,
+    routeForWorkerDeployment,
+  } from '$lib/utilities/route-for';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
-  export let column: ConfigurableTableHeader;
-  export let workflow: WorkflowExecution;
+  type Props = {
+    column: ConfigurableTableHeader;
+    workflow: WorkflowExecution;
+  };
+  let { column, workflow }: Props = $props();
 
-  $: ({ label } = column);
+  const { label } = $derived(column);
+  const namespace = $derived(page.params.namespace);
 
-  let filterOrCopyButtonsVisible = false;
+  let filterOrCopyButtonsVisible = $state(false);
   const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
   const hideFilterOrCopy = () => (filterOrCopyButtonsVisible = false);
   const handleFocusOut = (e: FocusEvent) => {
@@ -35,36 +46,103 @@
       hideFilterOrCopy();
     }
   };
+
+  const filterableLabels = [
+    'Type',
+    'Workflow ID',
+    'Run ID',
+    'Deployment',
+    'Versioning Behavior',
+    'Deployment Version',
+    'Build ID',
+  ];
 </script>
 
-{#if label === 'Run ID' || label === 'Workflow ID' || label === 'Type'}
+{#if filterableLabels.includes(label)}
   <td
     class="workflows-summary-table-body-cell filterable"
     data-testid="workflows-summary-table-body-cell"
-    on:mouseover={showFilterOrCopy}
-    on:focus={showFilterOrCopy}
-    on:focusin={showFilterOrCopy}
-    on:focusout={handleFocusOut}
-    on:mouseleave={hideFilterOrCopy}
-    on:blur={hideFilterOrCopy}
+    onmouseover={showFilterOrCopy}
+    onfocus={showFilterOrCopy}
+    onfocusin={showFilterOrCopy}
+    onfocusout={handleFocusOut}
+    onmouseleave={hideFilterOrCopy}
+    onblur={hideFilterOrCopy}
   >
     {#if label === 'Type'}
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="WorkflowType"
-        {workflow}
+        value={workflow.name}
+        href={routeForEventHistory({
+          namespace,
+          workflow: workflow.id,
+          run: workflow.runId,
+        })}
       />
     {:else if label === 'Workflow ID'}
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="WorkflowId"
-        {workflow}
+        value={workflow.id}
+        href={routeForEventHistory({
+          namespace,
+          workflow: workflow.id,
+          run: workflow.runId,
+        })}
       />
     {:else if label === 'Run ID'}
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="RunId"
-        {workflow}
+        value={workflow.runId}
+        href={routeForEventHistory({
+          namespace,
+          workflow: workflow.id,
+          run: workflow.runId,
+        })}
+      />
+    {:else if label === 'Deployment'}
+      {@const deployment =
+        workflow.searchAttributes?.indexedFields?.TemporalWorkerDeployment}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="TemporalWorkerDeployment"
+        value={deployment && typeof deployment === 'string' ? deployment : ''}
+        href={routeForWorkerDeployment({
+          namespace,
+          deployment,
+        })}
+      />
+    {:else if label === 'Deployment Version'}
+      {@const version =
+        workflow.searchAttributes?.indexedFields
+          ?.TemporalWorkerDeploymentVersion}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="TemporalWorkerDeploymentVersion"
+        value={version && typeof version === 'string' ? version : ''}
+      />
+    {:else if label === 'Build ID'}
+      {@const buildId =
+        workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ||
+        getBuildIdFromVersion(
+          workflow.searchAttributes?.indexedFields
+            ?.TemporalWorkerDeploymentVersion,
+        )}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="TemporalWorkerBuildId"
+        value={buildId && typeof buildId === 'string' ? buildId : ''}
+      />
+    {:else if label === 'Versioning Behavior'}
+      {@const behavior =
+        workflow.searchAttributes?.indexedFields
+          ?.TemporalWorkflowVersioningBehavior}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="TemporalWorkflowVersioningBehavior"
+        value={behavior && typeof behavior === 'string' ? behavior : ''}
       />
     {/if}
   </td>
@@ -113,20 +191,6 @@
       {content && typeof content === 'string'
         ? formatDate(content, $timeFormat, { relative: $relativeTime })
         : ''}
-    {:else if label === 'Deployment'}
-      {@const content =
-        workflow.searchAttributes?.indexedFields?.TemporalWorkerDeployment}
-      {content && typeof content === 'string' ? content : ''}
-    {:else if label === 'Deployment Version'}
-      {@const content =
-        workflow.searchAttributes?.indexedFields
-          ?.TemporalWorkerDeploymentVersion}
-      {content && typeof content === 'string' ? content : ''}
-    {:else if label === 'Versioning Behavior'}
-      {@const content =
-        workflow.searchAttributes?.indexedFields
-          ?.TemporalWorkflowVersioningBehavior}
-      {content && typeof content === 'string' ? content : ''}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
       {@const content = workflow.searchAttributes.indexedFields[label]}
       {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
