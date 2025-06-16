@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import MaximizeButton from './button.svelte';
@@ -7,7 +7,7 @@
   interface Props {
     children: Snippet;
     maximized: boolean;
-    onToggleMaximize: () => void;
+    onMaximize: (maximized: boolean) => void;
     class?: string;
     enabled?: boolean;
     actions?: Snippet;
@@ -16,11 +16,36 @@
   let {
     children,
     maximized,
-    onToggleMaximize,
+    onMaximize,
     class: className = undefined,
     enabled = true,
     actions = undefined,
   }: Props = $props();
+
+  let escapeListener = $state((event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      onMaximize(false);
+    }
+  });
+
+  $effect(() => {
+    if (maximized) {
+      document.addEventListener('keydown', escapeListener);
+    } else {
+      document.removeEventListener('keydown', escapeListener);
+    }
+  });
+
+  onMount(() => {
+    // on unmount
+    return () => {
+      document.removeEventListener('keydown', escapeListener);
+    };
+  });
+
+  const handleClick = () => {
+    onMaximize(!maximized);
+  };
 </script>
 
 <div
@@ -44,7 +69,7 @@
     {#if enabled}
       <MaximizeButton
         class="m-0 rounded-full text-secondary"
-        onClick={onToggleMaximize}
+        onClick={handleClick}
         {maximized}
       />
     {/if}

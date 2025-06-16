@@ -166,24 +166,22 @@
 
   onMount(() => {
     view = getNewView();
-    return () => view?.destroy();
+    return () => {
+      view?.destroy();
+    };
   });
+
+  const onMaximize = (value: boolean) => {
+    maximized = value;
+  };
 
   const handleCopy = (e: Event) => {
     copy(e, content);
   };
-
-  const handleMaximize = () => {
-    maximized = !maximized;
-  };
 </script>
 
 <div class="min-w-[80px] grow">
-  <Maximizable
-    {maximized}
-    onToggleMaximize={handleMaximize}
-    enabled={maximizable}
-  >
+  <Maximizable {maximized} {onMaximize} enabled={maximizable}>
     <div
       bind:this={editorElement}
       class={merge('h-full', className)}
