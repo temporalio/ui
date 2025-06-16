@@ -15,6 +15,7 @@ export const Strings = {
   name: 'Deployment Name',
   'current-version': 'Current Version',
   'deployment-version': 'Deployment Version',
+  'build-id': 'Build ID',
   'versioning-behavior': 'Versioning Behavior',
   created: 'Created At',
   deployed: 'Deployed At',
@@ -24,6 +25,7 @@ export const Strings = {
   version: 'Version',
   status: 'Status',
   current: 'Current',
+  latest: 'Latest',
   'task-queue-name': 'Task Queue Name',
   'task-queue-type': 'Task Queue Type',
   'rollout-started': 'Rollout Started At',
@@ -37,4 +39,5 @@ export const Strings = {
   'first-task': 'First Task',
   'last-task': 'Last Task',
   'rollout-id': 'Rollout ID',
+  actions: 'Actions',
 } as const;

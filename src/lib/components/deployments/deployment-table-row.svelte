@@ -7,6 +7,7 @@
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkerDeploymentSummary } from '$lib/types/deployments';
   import { formatDate } from '$lib/utilities/format-date';
+  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForWorkerDeployment,
     routeForWorkflowsWithQuery,
@@ -14,14 +15,36 @@
 
   import DeploymentStatus from './deployment-status.svelte';
 
-  export let deployment: WorkerDeploymentSummary;
-  export let columns: ConfigurableTableHeader[];
+  type Props = {
+    deployment: WorkerDeploymentSummary;
+    columns: ConfigurableTableHeader[];
+  };
+  let { deployment, columns }: Props = $props();
+
+  const latestBuildId = $derived(
+    deployment?.latestVersionSummary?.deploymentVersion?.buildId,
+  );
+  const rampingBuildId = $derived(
+    deployment?.rampingVersionSummary?.deploymentVersion?.buildId ||
+      getBuildIdFromVersion(deployment?.routingConfig?.rampingVersion),
+  );
+  const rampingVersionDeployedTimestamp = $derived(
+    deployment?.rampingVersionSummary?.createTime ||
+      deployment?.routingConfig?.rampingVersionChangedTime,
+  );
+  const currentBuildId = $derived(
+    deployment?.currentVersionSummary?.deploymentVersion?.buildId ||
+      getBuildIdFromVersion(deployment?.routingConfig?.currentVersion),
+  );
+  const latestNotDuplicate = $derived(
+    latestBuildId !== rampingBuildId && latestBuildId !== currentBuildId,
+  );
 </script>
 
 <tr>
   {#each columns as { label } (label)}
     {#if label === translate('deployments.name')}
-      <td class="p-2 text-left"
+      <td class="py-1 text-left"
         ><Link
           href={routeForWorkerDeployment({
             namespace: $page.params.namespace,
@@ -29,37 +52,60 @@
           })}>{deployment.name}</Link
         ></td
       >
-    {:else if label === translate('deployments.deployment-version')}
-      <td class="whitespace-pre-line break-words p-2 text-left">
+    {:else if label === translate('deployments.build-id')}
+      <td class="whitespace-pre-line break-words py-1 text-left">
         <div class="flex flex-col gap-1">
-          {#if deployment.routingConfig.rampingVersion}
-            <DeploymentStatus
-              status="Ramping"
-              version={deployment.routingConfig.rampingVersion}
-              label={translate('deployments.ramping-percentage', {
-                percentage: deployment.routingConfig.rampingVersionPercentage,
-              })}
-            />
+          {#if latestBuildId && latestNotDuplicate}
+            <div class="flex items-center gap-2">
+              {latestBuildId}
+              <DeploymentStatus
+                status="Latest"
+                label={translate('deployments.latest')}
+              />
+            </div>
           {/if}
-          <DeploymentStatus
-            status="Current"
-            version={deployment.routingConfig.currentVersion}
-            label={translate('deployments.current')}
-          />
+          {#if rampingBuildId}
+            <div class="flex items-center gap-2">
+              {rampingBuildId}
+              {#if deployment?.routingConfig?.rampingVersionPercentage}
+                <DeploymentStatus
+                  status="Ramping"
+                  label={translate('deployments.ramping-percentage', {
+                    percentage:
+                      deployment.routingConfig.rampingVersionPercentage,
+                  })}
+                />
+              {/if}
+            </div>
+          {/if}
+          <div class="flex items-center gap-2">
+            {currentBuildId}
+            <DeploymentStatus
+              status="Current"
+              label={translate('deployments.current')}
+            />
+          </div>
         </div>
       </td>
     {:else if label === translate('deployments.deployed')}
-      <td class="truncate p-2 text-left">
+      <td class="truncate py-1 text-left">
         <div class="flex flex-col gap-1">
-          {#if deployment.routingConfig.rampingVersionChangedTime}
+          {#if latestBuildId && latestNotDuplicate && deployment.latestVersionSummary?.createTime}
             <p>
               {formatDate(
-                deployment.routingConfig.rampingVersionChangedTime,
+                deployment.latestVersionSummary.createTime,
                 $timeFormat,
                 {
                   relative: $relativeTime,
                 },
               )}
+            </p>
+          {/if}
+          {#if rampingBuildId && rampingVersionDeployedTimestamp}
+            <p>
+              {formatDate(rampingVersionDeployedTimestamp, $timeFormat, {
+                relative: $relativeTime,
+              })}
             </p>
           {/if}
           <p>
@@ -69,18 +115,16 @@
           </p>
         </div>
       </td>
-    {:else if label === translate('deployments.workflows')}
-      <td class="truncate p-2 text-center"
-        ><p>
-          <Link
-            icon="external-link"
-            href={routeForWorkflowsWithQuery({
-              namespace: $page.params.namespace,
-              query: `TemporalWorkerDeployment="${deployment.name}"`,
-            })}
-          />
-        </p></td
-      >
+    {:else if label === translate('deployments.actions')}
+      <td class="w-24 truncate py-1">
+        <Link
+          icon="external-link"
+          href={routeForWorkflowsWithQuery({
+            namespace: $page.params.namespace,
+            query: `TemporalWorkerDeployment="${deployment.name}"`,
+          })}>{translate('deployments.go-to-workflows')}</Link
+        >
+      </td>
     {/if}
   {/each}
 </tr>

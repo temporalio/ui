@@ -137,7 +137,6 @@ export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
       'StartTime',
       'CloseTime',
     ];
-
     return $searchAttributeOptions
       .sort((a, b) => {
         if (a.label < b.label) return -1;
