@@ -4,5 +4,5 @@ export const getBuildIdFromVersion = (version: string | undefined): string => {
   if (newDelimiter) return newDelimiter;
   const oldDelimiter = version.split('.')[1];
   if (oldDelimiter) return oldDelimiter;
-  return '';
+  return version;
 };

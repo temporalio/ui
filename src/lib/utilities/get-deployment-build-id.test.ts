@@ -15,7 +15,10 @@ describe('getBuildIdFromVersion', () => {
   it('should return build id with : delimiter', () => {
     expect(getBuildIdFromVersion('orders:v12')).toEqual('v12');
   });
-  it('should return empty string with invalid delimiter', () => {
-    expect(getBuildIdFromVersion('orders/v12')).toEqual('');
+  it('should return version string with invalid delimiter', () => {
+    expect(getBuildIdFromVersion('orders/v12')).toEqual('orders/v12');
+  });
+  it('should return version string with __unversioned__', () => {
+    expect(getBuildIdFromVersion('__unversioned__')).toEqual('__unversioned__');
   });
 });

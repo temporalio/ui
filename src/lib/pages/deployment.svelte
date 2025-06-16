@@ -57,7 +57,7 @@
     </div>
   </div>
 </header>
-<div class="bg-primary p-8">
+<div class="p-8">
   {#await deploymentFetch}
     <SkeletonTable rows={15} />
   {:then deployment}

@@ -28,14 +28,16 @@
     deployment?.rampingVersionSummary?.deploymentVersion?.buildId ||
       getBuildIdFromVersion(deployment?.routingConfig?.rampingVersion),
   );
-  const latestIsNotRamping = $derived(latestBuildId !== rampingBuildId);
+  const rampingVersionDeployedTimestamp = $derived(
+    deployment?.rampingVersionSummary?.createTime ||
+      deployment?.routingConfig?.rampingVersionChangedTime,
+  );
   const currentBuildId = $derived(
     deployment?.currentVersionSummary?.deploymentVersion?.buildId ||
       getBuildIdFromVersion(deployment?.routingConfig?.currentVersion),
   );
-  const rampingVersionDeployedTimestamp = $derived(
-    deployment?.rampingVersionSummary?.createTime ||
-      deployment?.routingConfig?.rampingVersionChangedTime,
+  const latestNotDuplicate = $derived(
+    latestBuildId !== rampingBuildId && latestBuildId !== currentBuildId,
   );
 </script>
 
@@ -53,7 +55,7 @@
     {:else if label === translate('deployments.build-id')}
       <td class="whitespace-pre-line break-words py-1 text-left">
         <div class="flex flex-col gap-1">
-          {#if latestBuildId && latestIsNotRamping}
+          {#if latestBuildId && latestNotDuplicate}
             <div class="flex items-center gap-2">
               {latestBuildId}
               <DeploymentStatus
@@ -88,7 +90,7 @@
     {:else if label === translate('deployments.deployed')}
       <td class="truncate py-1 text-left">
         <div class="flex flex-col gap-1">
-          {#if latestBuildId && latestIsNotRamping && deployment.latestVersionSummary?.createTime}
+          {#if latestBuildId && latestNotDuplicate && deployment.latestVersionSummary?.createTime}
             <p>
               {formatDate(
                 deployment.latestVersionSummary.createTime,
