@@ -36,18 +36,14 @@
     language?: EditorLanguage;
     editable?: boolean;
     copyable?: boolean;
+    copyIconTitle?: string;
+    copySuccessIconTitle?: string;
     inline?: boolean;
     testId?: string;
     minHeight?: number;
     maxHeight?: number;
     label?: string;
     class?: string;
-  }
-
-  interface PropsWithoutCopyable extends BaseProps {
-    copyable: false;
-    copyIconTitle: never;
-    copySuccessIconTitle: never;
   }
 
   interface PropsWithCopyable extends BaseProps {
@@ -70,7 +66,7 @@
     maxHeight = undefined,
     label = '',
     ...editorProps
-  }: PropsWithoutCopyable | PropsWithCopyable = $props();
+  }: BaseProps | PropsWithCopyable = $props();
 
   const svelteDispatch = createEventDispatcher<{ change: string }>();
 
