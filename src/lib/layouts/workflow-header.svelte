@@ -25,7 +25,7 @@
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import {
-    getWorkflowLinksFromHistory,
+    getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
   } from '$lib/utilities/get-workflow-relationships';
   import { pathMatches } from '$lib/utilities/path-matches';
@@ -68,9 +68,9 @@
     $namespaces,
   );
   $: outboundLinks =
-    getWorkflowLinksFromHistory($fullEventHistory)?.length || 0;
+    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0;
   $: inboundLinks =
-    workflow?.callbacks?.filter((callback) => callback?.callback?.links.length)
+    workflow?.callbacks?.filter((callback) => callback?.callback?.links?.length)
       ?.length || 0;
   $: linkCount = outboundLinks + inboundLinks;
 </script>

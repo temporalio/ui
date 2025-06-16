@@ -1,4 +1,3 @@
-import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { DescribeNamespaceResponse } from '$lib/types';
 import type {
   ChildWorkflowExecutionCanceledEvent,
@@ -137,26 +136,13 @@ export const getWorkflowRelationships = (
   };
 };
 
-export const getWorkflowLinksFromHistory = (
+export const getWorkflowNexusLinksFromHistory = (
   history: WorkflowEvents,
 ): EventLink[] => {
   const links = new Set<EventLink>();
   for (const event of history) {
-    if (event.links && event.links.length > 0) {
+    if (event.category === 'nexus' && event.links && event.links.length > 0) {
       for (const link of event.links) {
-        links.add(link);
-      }
-    }
-  }
-
-  return Array.from(links);
-};
-
-export const getWorkflowLinks = (groups: EventGroup[]): EventLink[] => {
-  const links = new Set<EventLink>();
-  for (const group of groups) {
-    if (group.links && group.links.length > 0) {
-      for (const link of group.links) {
         links.add(link);
       }
     }

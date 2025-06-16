@@ -31,10 +31,12 @@
     ),
   );
   const nexusGroups = $derived(
-    groups.filter((group) => group.category === 'nexus' && group.links.length),
+    groups.filter((group) => group.category === 'nexus' && group.links?.length),
   );
   const callbacks = $derived(
-    workflow?.callbacks?.filter((callback) => callback?.callback?.links.length),
+    workflow?.callbacks?.filter(
+      (callback) => callback?.callback?.links?.length,
+    ),
   );
 </script>
 
@@ -111,7 +113,7 @@
       {/each}
     </Table>
   {/if}
-  {#if callbacks.length}
+  {#if callbacks?.length}
     <h3>Inbound</h3>
     <Table class="mb-6 w-full min-w-[600px] table-fixed">
       <caption class="sr-only" slot="caption"
