@@ -33,7 +33,9 @@ on:
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
+  actions: write
 
 jobs:
   version-bump:
@@ -145,6 +147,7 @@ jobs:
           delete-branch: true
           committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
           author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+          draft: always-true
 
       - name: Summary
         if: inputs.mode != 'dry-run'
