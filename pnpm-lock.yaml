@@ -154,8 +154,8 @@ importers:
         specifier: ^8.6.11
         version: 8.6.11(react@18.2.0)(storybook@8.6.11(prettier@3.5.3))
       '@storybook/addon-svelte-csf':
-        specifier: 5.0.0-next.27
-        version: 5.0.0-next.27(@storybook/svelte@8.6.11(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5))(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1)))(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1))
+        specifier: 5.0.0-next.23
+        version: 5.0.0-next.23(@storybook/svelte@8.6.11(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5))(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1)))(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1))
       '@storybook/addon-themes':
         specifier: ^8.6.11
         version: 8.6.11(storybook@8.6.11(prettier@3.5.3))
@@ -1832,12 +1832,11 @@ packages:
     peerDependencies:
       storybook: ^8.6.11
 
-  '@storybook/addon-svelte-csf@5.0.0-next.27':
-    resolution: {integrity: sha512-iWEg084pWy2m9Z7jLDg+zXS8cjA2eRBrLe127KV9P1RYtyYzh45ALN72wVNoHmWzLNQl2CAh0ggTCKjMHHEjRg==}
+  '@storybook/addon-svelte-csf@5.0.0-next.23':
+    resolution: {integrity: sha512-GAdvA1f5wMhfrkP9znwDZzBFEopkELTRz8US+5XqucYHFfATiJIOALB+dW+CsUuknsfPxaA/Yqz9314ZYrT4iQ==}
     peerDependencies:
-      '@storybook/svelte': ^0.0.0-0 || ^8.2.0 || ^9.0.0-0
+      '@storybook/svelte': ^8.0.0
       '@sveltejs/vite-plugin-svelte': ^4.0.0 || ^5.0.0
-      storybook: ^0.0.0-0 || ^8.2.0 || ^9.0.0-0
       svelte: ^5.0.0
       vite: ^5.0.0 || ^6.0.0
 
@@ -1900,6 +1899,11 @@ packages:
 
   '@storybook/csf@0.1.13':
     resolution: {integrity: sha512-7xOOwCLGB3ebM87eemep89MYRFTko+D8qE7EdAAq74lgdqRR5cOUtYWJLjO2dLtP94nqoOdHJo6MdLLKzg412Q==}
+
+  '@storybook/docs-tools@8.6.14':
+    resolution: {integrity: sha512-wbNMhVEBwNGat3kIIdJSHLKeWxegvI9nIuAjAKU2ZUztbEPnmhVLLEQqghmk0dtyJDK/Ee08RGxi3dsueC34Rw==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
 
   '@storybook/global@5.0.0':
     resolution: {integrity: sha512-FcOqPAXACP0I3oJ/ws6/rrPT9WGhu915Cg8D02a9YxLo0DE9zI+a9A5gRGvmQ09fiWPukqI8ZAEoQEdWUKMQdQ==}
@@ -1971,6 +1975,11 @@ packages:
 
   '@storybook/theming@8.6.11':
     resolution: {integrity: sha512-G7IK5P9gzofUjfYhMo9Pdgbqcr22eoKFLD808Q8RxJopDoypdZKg4tes2iD+6YnrtnHS0nEoP/soMmfFYl9FIw==}
+    peerDependencies:
+      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+
+  '@storybook/types@8.6.14':
+    resolution: {integrity: sha512-33kzHZa7h6/EygeLZDcm1PNRTlybokz8dzAh2JYjpETf77pG8jhPmEfrI2oHSAdgNeK7A3OMcGA/EwEN7EJdzw==}
     peerDependencies:
       storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
 
@@ -9266,22 +9275,24 @@ snapshots:
       storybook: 8.6.11(prettier@3.5.3)
       ts-dedent: 2.2.0
 
-  '@storybook/addon-svelte-csf@5.0.0-next.27(@storybook/svelte@8.6.11(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5))(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1)))(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1))':
+  '@storybook/addon-svelte-csf@5.0.0-next.23(@storybook/svelte@8.6.11(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5))(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1)))(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1))':
     dependencies:
       '@storybook/csf': 0.1.13
+      '@storybook/docs-tools': 8.6.14(storybook@8.6.11(prettier@3.5.3))
       '@storybook/svelte': 8.6.11(storybook@8.6.11(prettier@3.5.3))(svelte@5.25.5)
+      '@storybook/types': 8.6.14(storybook@8.6.11(prettier@3.5.3))
       '@sveltejs/vite-plugin-svelte': 5.0.3(svelte@5.25.5)(vite@6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1))
       dedent: 1.5.3
       es-toolkit: 1.32.0
       esrap: 1.4.5
       magic-string: 0.30.17
-      storybook: 8.6.11(prettier@3.5.3)
       svelte: 5.25.5
       svelte-ast-print: 0.4.2(svelte@5.25.5)
       vite: 6.2.7(@types/node@18.15.3)(jiti@1.21.0)(terser@5.28.1)
       zimmerframe: 1.1.2
     transitivePeerDependencies:
       - babel-plugin-macros
+      - storybook
 
   '@storybook/addon-themes@8.6.11(storybook@8.6.11(prettier@3.5.3))':
     dependencies:
@@ -9355,6 +9366,10 @@ snapshots:
   '@storybook/csf@0.1.13':
     dependencies:
       type-fest: 2.19.0
+
+  '@storybook/docs-tools@8.6.14(storybook@8.6.11(prettier@3.5.3))':
+    dependencies:
+      storybook: 8.6.11(prettier@3.5.3)
 
   '@storybook/global@5.0.0': {}
 
@@ -9490,6 +9505,10 @@ snapshots:
       storybook: 8.6.11(prettier@3.5.3)
 
   '@storybook/theming@8.6.11(storybook@8.6.11(prettier@3.5.3))':
+    dependencies:
+      storybook: 8.6.11(prettier@3.5.3)
+
+  '@storybook/types@8.6.14(storybook@8.6.11(prettier@3.5.3))':
     dependencies:
       storybook: 8.6.11(prettier@3.5.3)
 
