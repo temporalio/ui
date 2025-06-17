@@ -79,8 +79,8 @@
       })}
     </p>
   </div>
-  <div class="flex flex-wrap gap-2">
-    <div>
+  <div class="flex flex-wrap">
+    <div class="w-full xl:w-1/2">
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
       {/if}
@@ -147,9 +147,9 @@
 {/snippet}
 
 {#snippet eventSummary(value: Payload)}
-  <div class="block w-full select-all px-2 py-1 text-left">
-    <p class="min-w-56 text-sm text-secondary/80">
-      Summary
+  <div class="flex items-start gap-2">
+    <p class="min-w-56 text-sm text-secondary/80">Summary</p>
+    <p class="whitespace-pre-line">
       <MetadataDecoder
         {value}
         let:decodedValue

@@ -34,15 +34,3 @@
 {:else if event}
   <EventCard {event} />
 {/if}
-
-<style lang="postcss">
-  .pending {
-    background: repeating-linear-gradient(
-      to right,
-      #444ce7 0,
-      #444ce7 4px,
-      #2f34a4 4px,
-      #2f34a4 8px
-    );
-  }
-</style>
