@@ -63,7 +63,7 @@
   class={merge(
     'relative',
     maximized
-      ? 'fixed bottom-0 left-0 right-0 top-0 z-10 h-full w-full overflow-y-auto bg-white dark:bg-black'
+      ? 'fixed bottom-0 left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-white dark:bg-black'
       : '',
     className,
   )}
