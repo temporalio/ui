@@ -63,7 +63,7 @@
 </script>
 
 <tr
-  class="row dense"
+  class="hover:cursor-pointer"
   id={`${event.id}-${index}`}
   data-testid="pending-activity-summary-row"
   onclick={onLinkClick}

@@ -51,7 +51,7 @@
       @apply surface-table-header;
 
       :global(th) {
-        @apply p-2 text-sm;
+        @apply border-b border-subtle p-2 text-sm;
       }
 
       :global(td) {
@@ -68,8 +68,16 @@
     }
 
     tbody :global {
+      tr:nth-of-type(odd) {
+        @apply surface-background;
+      }
+
+      tr {
+        @apply border-b border-subtle last-of-type:border-0;
+      }
+
       td {
-        @apply border-t border-subtle p-2 text-sm;
+        @apply p-2 text-sm;
 
         &:first-child:is(.expanded-cell) {
           @apply px-0;

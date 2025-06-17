@@ -63,7 +63,7 @@
 </script>
 
 <tr
-  class="dense"
+  class="hover:cursor-pointer"
   id={`${event.scheduledEventId}-${index}`}
   data-testid="pending-nexus-summary-row"
   onclick={onLinkClick}

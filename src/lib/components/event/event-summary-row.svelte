@@ -242,7 +242,7 @@
 </script>
 
 <tr
-  class="dense"
+  class="hover:cursor-pointer"
   class:border={failure || canceled || terminated}
   class:border-danger={failure}
   class:border-warning={canceled}
