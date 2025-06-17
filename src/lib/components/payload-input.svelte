@@ -52,7 +52,7 @@
         {id}
         maxHeight={320}
         content={input}
-        on:change={handleInputChange}
+        onChange={handleInputChange}
         editable={editing}
         copyable={false}
       />
