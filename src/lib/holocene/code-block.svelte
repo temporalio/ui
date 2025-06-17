@@ -24,7 +24,6 @@
     type EditorLanguage,
     getActionsTheme,
     getEditorTheme,
-    getFocusableExtension,
     getHeightTheme,
     getLanguageExtension,
     getLineBreakExtension,
@@ -113,7 +112,6 @@
       !inline ? EditorView.lineWrapping : undefined,
       !inline && !editable ? foldGutter() : undefined,
       getHeightTheme({ maxHeight, minHeight, maximized }),
-      getFocusableExtension(maxHeight, maximized),
     ].filter((ext) => ext != null),
   );
 
@@ -154,6 +152,15 @@
           insert: formatContent(language, content, inline),
         },
       });
+    }
+  });
+
+  // add tabindex if maximizable, so up/down arrows can scroll
+  $effect(() => {
+    if (maximizable) {
+      view?.scrollDOM?.setAttribute('tabindex', '0');
+    } else {
+      view?.scrollDOM?.removeAttribute('tabindex');
     }
   });
 
