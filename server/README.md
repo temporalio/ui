@@ -14,10 +14,6 @@ For contributions follow UI's development guide https://github.com/temporalio/ui
 
 The development server uses [Air](https://github.com/air-verse/air) for automatic hot reloading when Go source files change. Air will be automatically installed on first run in development mode, which may take a moment.
 
-### Environment Variables
-
-- `UI_SERVER_VERBOSE=true` - Enable verbose output to see Air build logs and server output for debugging
-
 ## Configuration
 
 ### CORS Settings
