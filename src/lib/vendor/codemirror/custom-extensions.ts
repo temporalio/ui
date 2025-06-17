@@ -92,8 +92,3 @@ export const getLanguageExtension = (language: EditorLanguage) =>
     json: json(),
     shell: StreamLanguage.define(shell),
   })[language] ?? undefined;
-
-export const getFocusableExtension = (maxHeight: number, maximized: boolean) =>
-  maxHeight && !maximized
-    ? EditorView.editorAttributes.of({ tabindex: '0' })
-    : undefined;
