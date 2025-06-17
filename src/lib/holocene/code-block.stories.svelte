@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
 
+  import type { Props } from '$lib/holocene/code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export const meta = {
@@ -51,7 +52,7 @@
         table: { category: 'Copy Icon' },
       },
     },
-  } satisfies Meta<CodeBlock>;
+  } satisfies Meta<Props>;
 </script>
 
 <script lang="ts">
