@@ -12,7 +12,7 @@
   } from '@codemirror/language';
   import { Compartment, EditorState, type Extension } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
@@ -43,6 +43,7 @@
     maxHeight?: number;
     label?: string;
     class?: string;
+    onChange?: (event: CustomEvent<string>) => void;
   }
 
   interface PropsWithCopyable extends BaseProps {
@@ -64,10 +65,9 @@
     minHeight = undefined,
     maxHeight = undefined,
     label = '',
+    onChange = undefined,
     ...editorProps
   }: BaseProps | PropsWithCopyable = $props();
-
-  const svelteDispatch = createEventDispatcher<{ change: string }>();
 
   // codemirror
   let editorElement = $state<HTMLElement | undefined>();
@@ -125,7 +125,11 @@
       dispatch(transaction, view) {
         view.update([transaction]);
         if (transaction.docChanged) {
-          svelteDispatch('change', view.state.doc.toString());
+          onChange?.(
+            new CustomEvent<string>('change', {
+              detail: view.state.doc.toString(),
+            }),
+          );
         }
       },
     });
