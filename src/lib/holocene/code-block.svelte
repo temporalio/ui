@@ -52,6 +52,8 @@
     copySuccessIconTitle: string;
   }
 
+  export type Props = BaseProps | PropsWithCopyable;
+
   let {
     content,
     language = 'json',
@@ -67,7 +69,7 @@
     label = '',
     onChange = undefined,
     ...editorProps
-  }: BaseProps | PropsWithCopyable = $props();
+  }: Props = $props();
 
   // codemirror
   let editorElement = $state<HTMLElement | undefined>();
