@@ -5,7 +5,8 @@ bannerText:
 cors:
   cookieInsecure: false
   allowOrigins:
-    - http://localhost:3000 # used at development by https://github.com/temporalio/ui
+    - "*"
+  unsafeAllowAllOrigins: true
 refreshInterval: 1m
 defaultNamespace: default
 showTemporalSystemNamespace: false
