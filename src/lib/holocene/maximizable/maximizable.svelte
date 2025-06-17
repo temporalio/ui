@@ -46,6 +46,17 @@
   const handleClick = () => {
     onMaximize(!maximized);
   };
+
+  const handleFocusOut = (event: FocusEvent) => {
+    if (
+      maximized &&
+      (!(event.currentTarget instanceof Element) ||
+        !(event.relatedTarget instanceof Element) ||
+        !event.currentTarget.contains(event.relatedTarget))
+    ) {
+      onMaximize(false);
+    }
+  };
 </script>
 
 <div
@@ -56,6 +67,7 @@
       : '',
     className,
   )}
+  onfocusout={handleFocusOut}
 >
   {@render children()}
 
