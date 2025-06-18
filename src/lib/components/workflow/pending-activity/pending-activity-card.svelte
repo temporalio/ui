@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import { page } from '$app/state';
+
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -9,8 +11,10 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { coreUserStore } from '$lib/stores/core-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { PendingActivity } from '$lib/types/events';
+  import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
@@ -24,6 +28,15 @@
 
   let { activity }: { activity: PendingActivity } = $props();
   const failed = $derived(activity.attempt > 1);
+
+  let coreUser = coreUserStore();
+  let showActivityCommands = $derived(
+    activityCommandsEnabled(
+      page.data.settings,
+      $coreUser,
+      page.params.namespace,
+    ),
+  );
 </script>
 
 <div
@@ -34,7 +47,9 @@
       <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
       <h4>{activity.activityType}</h4>
     </div>
-    <ActivityCommands {activity} class="justify-end" />
+    {#if showActivityCommands}
+      <ActivityCommands {activity} class="justify-end" />
+    {/if}
   </div>
   <div class="flex flex-1 flex-col gap-2 xl:flex-row">
     <div class="w-full overflow-auto xl:w-1/2">

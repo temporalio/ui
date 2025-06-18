@@ -76,6 +76,7 @@ type SettingsResponse struct {
 	StartWorkflowDisabled         bool
 	HideWorkflowQueryErrors       bool
 	RefreshWorkflowCountsDisabled bool
+	ActivityCommandsDisabled      bool
 }
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware, conn *grpc.ClientConn) echo.HandlerFunc {
@@ -153,6 +154,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			StartWorkflowDisabled:         cfg.StartWorkflowDisabled,
 			HideWorkflowQueryErrors:       cfg.HideWorkflowQueryErrors,
 			RefreshWorkflowCountsDisabled: cfg.RefreshWorkflowCountsDisabled,
+			ActivityCommandsDisabled:      cfg.ActivityCommandsDisabled,
 		}
 
 		return c.JSON(http.StatusOK, settings)
