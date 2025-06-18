@@ -48,8 +48,8 @@
       <h4>{activity.activityType}</h4>
     </div>
   </div>
-  <div class="flex flex-wrap gap-2">
-    <div>
+  <div class="flex flex-wrap gap-4">
+    <div class="flex flex-col gap-1">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
@@ -105,7 +105,7 @@
         )}
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-2 xl:w-1/2">
+    <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if failed}
         {@render failures()}
       {/if}
@@ -117,7 +117,7 @@
 </div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flex items-start gap-2">
+  <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {label}
     </p>
@@ -147,26 +147,30 @@
 
 {#snippet failures()}
   {#if activity.lastFailure}
-    <p class="text-sm text-secondary/80">
-      {translate('workflows.last-failure')}
-    </p>
-    <CodeBlock
-      maxHeight={384}
-      content={stringifyWithBigInt(omit(activity.lastFailure, 'stackTrace'))}
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    />
+    <div>
+      <p class="text-sm text-secondary/80">
+        {translate('workflows.last-failure')}
+      </p>
+      <CodeBlock
+        maxHeight={384}
+        content={stringifyWithBigInt(omit(activity.lastFailure, 'stackTrace'))}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </div>
   {/if}
   {#if activity.lastFailure?.stackTrace}
-    <p class="text-sm text-secondary/80">
-      {translate('common.stack-trace')}
-    </p>
-    <CodeBlock
-      language="text"
-      content={activity.lastFailure.stackTrace}
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    />
+    <div>
+      <p class="text-sm text-secondary/80">
+        {translate('common.stack-trace')}
+      </p>
+      <CodeBlock
+        language="text"
+        content={activity.lastFailure.stackTrace}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </div>
   {/if}
 {/snippet}
 

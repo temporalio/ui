@@ -79,8 +79,8 @@
       })}
     </p>
   </div>
-  <div class="flex flex-wrap">
-    <div class="w-full xl:w-1/2">
+  <div class="flex flex-wrap gap-4">
+    <div class="flex flex-col gap-1">
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
       {/if}
@@ -95,7 +95,7 @@
       {/each}
     </div>
     {#if payloadFields.length}
-      <div class="w-full xl:w-1/2">
+      <div class="flex w-full flex-col gap-1 xl:w-1/2">
         {#each payloadFields as [key, value] (key)}
           {@render payloads(key, value)}
         {/each}
@@ -107,7 +107,7 @@
 {#snippet eventLink(link: ELink)}
   {@const href = getEventLinkHref(link)}
   {@const value = href.split('workflows/')?.[1] || href}
-  <div class="flex items-start gap-2">
+  <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {translate('nexus.link')}
     </p>
@@ -123,7 +123,7 @@
 
 {#snippet eventNamespaceLink(link: ELink)}
   {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
-  <div class="flex items-start gap-2">
+  <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {translate('nexus.link-namespace')}
     </p>
@@ -147,7 +147,7 @@
 {/snippet}
 
 {#snippet eventSummary(value: Payload)}
-  <div class="flex items-start gap-2">
+  <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">Summary</p>
     <p class="whitespace-pre-line">
       <MetadataDecoder
@@ -164,57 +164,61 @@
 {#snippet payloads(key, value)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
-  <p class="min-w-56 text-sm text-secondary/80">
-    {format(key)}
-  </p>
-  {#if value?.payloads}
-    <PayloadDecoder {value} key="payloads" let:decodedValue>
-      <CodeBlock
-        content={decodedValue}
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
-    </PayloadDecoder>
-  {:else if key === 'searchAttributes'}
-    <PayloadDecoder
-      key="searchAttributes"
-      value={{ searchAttributes: codeBlockValue }}
-      let:decodedValue
-    >
-      <CodeBlock
-        content={decodedValue}
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
-    </PayloadDecoder>
-  {:else}
-    <PayloadDecoder value={codeBlockValue} let:decodedValue>
-      <CodeBlock
-        content={decodedValue}
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
-    </PayloadDecoder>
-  {/if}
-  {#if stackTrace}
+  <div>
     <p class="min-w-56 text-sm text-secondary/80">
-      {translate('workflows.call-stack-tab')}
+      {format(key)}
     </p>
-    <CodeBlock
-      content={stackTrace}
-      language="text"
-      maxHeight={384}
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    />
+    {#if value?.payloads}
+      <PayloadDecoder {value} key="payloads" let:decodedValue>
+        <CodeBlock
+          content={decodedValue}
+          maxHeight={384}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      </PayloadDecoder>
+    {:else if key === 'searchAttributes'}
+      <PayloadDecoder
+        key="searchAttributes"
+        value={{ searchAttributes: codeBlockValue }}
+        let:decodedValue
+      >
+        <CodeBlock
+          content={decodedValue}
+          maxHeight={384}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      </PayloadDecoder>
+    {:else}
+      <PayloadDecoder value={codeBlockValue} let:decodedValue>
+        <CodeBlock
+          content={decodedValue}
+          maxHeight={384}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      </PayloadDecoder>
+    {/if}
+  </div>
+  {#if stackTrace}
+    <div>
+      <p class="min-w-56 text-sm text-secondary/80">
+        {translate('workflows.call-stack-tab')}
+      </p>
+      <CodeBlock
+        content={stackTrace}
+        language="text"
+        maxHeight={384}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </div>
   {/if}
 {/snippet}
 
 {#snippet link(key, value)}
-  <div class="flex items-start gap-2">
+  <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
@@ -234,7 +238,7 @@
 {/snippet}
 
 {#snippet details(key, value)}
-  <div class="flex items-start gap-2">
+  <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
