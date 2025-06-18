@@ -1,14 +1,7 @@
 import { createServerForm } from './server-form';
 import { createSPAForm } from './spa-form';
-import type {
-  FormConfig,
-  FormContext,
-  ServerFormConfig,
-  SPAFormConfig,
-} from '../types';
+import type { FormConfig, FormContext } from '../types';
 
-export function createFormContext(config: SPAFormConfig): FormContext;
-export function createFormContext(config: ServerFormConfig): FormContext;
 export function createFormContext(config: FormConfig): FormContext {
   switch (config.type) {
     case 'spa':

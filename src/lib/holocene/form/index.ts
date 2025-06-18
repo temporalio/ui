@@ -1,5 +1,6 @@
 export { default as Form } from './context/form-provider.svelte';
-export { createFormContext, getFormContext } from './context/form-context';
+export { getFormContext } from './context/form-context';
+export { createFormContext } from './factories';
 export { useFormField } from './use-form-field.svelte';
 
 export type {
