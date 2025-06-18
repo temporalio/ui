@@ -1,11 +1,41 @@
-export { default as Form } from './form-provider.svelte';
+export { default as FormProvider } from './context/form-provider.svelte';
+export { createFormContext, getFormContext } from './context/form-context';
+export { useFormField } from './utils/form-field-utils.svelte';
+
+export type {
+  // Main config types
+  FormConfig,
+  SPAFormConfig,
+  ServerFormConfig,
+
+  // Base types
+  BaseFormConfig,
+  SPAFormOptions,
+  ServerFormOptions,
+
+  // Context types
+  FormContext,
+  FormContextParams,
+
+  // Field utility types
+  FormFieldBinding,
+  FormFieldOptions,
+
+  // Event types
+  OnUpdateParams,
+  OnErrorParams,
+  MaybePromise,
+} from './types';
+
+// Re-export factory functions for advanced usage
 export {
-  createFormContext,
-  getFormContext,
+  createSPAForm,
+  createServerForm,
   formatErrorMessage,
-  type FormContext,
-  type FormContextParams,
-  type OnErrorParams,
-  type OnUpdateParams,
-} from './form-context';
-export type { FormProps } from './form-provider.svelte';
+  defaultErrorHandler,
+} from './factories';
+
+export type { FormProps } from './context/form-provider.svelte';
+
+// Legacy export alias
+export { default as Form } from './context/form-provider.svelte';

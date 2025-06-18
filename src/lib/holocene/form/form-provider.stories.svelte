@@ -5,7 +5,7 @@
   import Button from '../button.svelte';
   import Input from '../input/input.svelte';
 
-  import Form from './form-provider.svelte';
+  import Form from './context/form-provider.svelte';
 
   const defaultValues = { username: 'johndoe' };
 
@@ -14,7 +14,11 @@
     return 'Form submitted successfully';
   };
 
-  const config = { defaultValues, onUpdate };
+  const config = {
+    type: 'spa' as const,
+    defaultValues,
+    onUpdate,
+  };
 
   const { Story } = defineMeta({
     title: 'Forms/Form',

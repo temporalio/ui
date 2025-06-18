@@ -28,7 +28,11 @@
       email: 'john@example.com',
     },
     onUpdate: async ({ form }) => {
-      console.log('Form submitted with values:', form);
+      console.log(form);
+      console.log('Form submitted with values:', form.data);
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return 'User created successfully!';
     },
     onError: async ({ message }) => {
       console.error('Form submission error:', message);
@@ -37,8 +41,8 @@
 </script>
 
 <Form {config}>
-  <Input id="username" name="username" type="text" label="Username" />
-  <Input id="email" name="email" type="email" label="Email" />
+  <Input name="username" type="text" label="Username" />
+  <Input name="email" type="email" label="Email" />
 
   <Button type="submit">Submit</Button>
 </Form>
