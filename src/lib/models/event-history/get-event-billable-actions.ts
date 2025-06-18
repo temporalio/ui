@@ -28,6 +28,22 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
     if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) return 1;
     if (isNexusOperationScheduledEvent(event)) return 1;
     if (isNexusOperationCancelRequestedEvent(event)) return 1;
+    if (isWorkflowExecutionUpdateAcceptedEvent(event)) return 1;
+    if (isWorkflowExecutionContinuedAsNewEvent(event)) return 1;
+    if (isWorkflowExecutionUpdateRejectedEvent(event)) return 1;
+    if (isUpsertWorkflowSearchAttributesEvent(event)) {
+      const searchAttributeFields = Object.keys(
+        event.searchAttributes.indexedFields,
+      );
+      if (
+        searchAttributeFields?.length === 1 &&
+        !!event.searchAttributes.indexedFields?.TemporalChangeVersion
+      ) {
+        // Non-billable search attribute update
+        return 0;
+      }
+      return 1;
+    }
     if (
       isWorkflowExecutionOptionsUpdatedEvent(event) &&
       (!!event.attributes?.versioningOverride ||
@@ -35,11 +51,8 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
       (!!event.attributes.attachedCompletionCallbacks ||
         !!event.attributes.attachedRequestId)
     )
+      // Non-billable async callback
       return 1;
-    if (isWorkflowExecutionUpdateAcceptedEvent(event)) return 1;
-    if (isUpsertWorkflowSearchAttributesEvent(event)) return 1;
-    if (isWorkflowExecutionContinuedAsNewEvent(event)) return 1;
-    if (isWorkflowExecutionUpdateRejectedEvent(event)) return 1;
 
     if (isMarkerRecordedEvent(event)) {
       const nonBillable = ['core_patch', 'Version'];
