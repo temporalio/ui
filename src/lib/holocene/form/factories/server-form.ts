@@ -1,6 +1,6 @@
 import { superForm } from 'sveltekit-superforms';
 
-import { defaultErrorHandler } from './base';
+import { defaultErrorHandler } from './utils';
 import type { FormContext, OnErrorParams, ServerFormConfig } from '../types';
 
 export function createServerForm(config: ServerFormConfig): FormContext {

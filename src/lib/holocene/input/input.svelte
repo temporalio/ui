@@ -73,7 +73,10 @@
   export { className as class };
 
   let resolvedId =
-    id || name || 'input-' + Math.random().toString(36).substr(2, 9);
+    id ||
+    (name
+      ? `input-${name}`
+      : `input-${Math.random().toString(36).substr(2, 9)}`);
   let resolvedName = name || resolvedId;
   let testId = $$props['data-testid'] || resolvedId;
 

@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import type { FormProps } from '../types';
+  import type { FormProps } from './types';
 </script>
 
 <script lang="ts">

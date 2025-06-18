@@ -1,7 +1,7 @@
 import { superForm } from 'sveltekit-superforms';
 import { zodClient } from 'sveltekit-superforms/adapters';
 
-import { defaultErrorHandler } from './base';
+import { defaultErrorHandler } from './utils';
 import type {
   FormContext,
   OnErrorParams,

@@ -7,7 +7,7 @@
   import Button from '../button.svelte';
   import Input from '../input/input.svelte';
 
-  import Form from './context/form-provider.svelte';
+  import Form from './form.svelte';
 
   const defaultValues = { username: 'johndoe' };
 

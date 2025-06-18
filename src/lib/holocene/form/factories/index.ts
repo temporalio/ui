@@ -17,4 +17,4 @@ export function createFormContext(config: FormConfig): FormContext {
 
 export { createSPAForm } from './spa-form';
 export { createServerForm } from './server-form';
-export { formatErrorMessage, defaultErrorHandler } from './base';
+export { formatErrorMessage, defaultErrorHandler } from './utils';

@@ -2,7 +2,7 @@ import { writable, type Writable } from 'svelte/store';
 
 import { onDestroy } from 'svelte';
 
-import { getFormContext } from './context/form-context';
+import { getFormContext } from './form-context';
 
 export interface FormFieldBinding {
   bindableValue: Writable<string>;
