@@ -37,8 +37,8 @@
 </script>
 
 <Form {config}>
-  <Input id="username" name="username" type="text" label="Username" />
-  <Input id="email" name="email" type="email" label="Email" />
+  <Input name="username" type="text" label="Username" />
+  <Input name="email" type="email" label="Email" />
 
   <Button type="submit">Submit</Button>
 </Form>

@@ -4,7 +4,7 @@
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { getFormContext } from '$lib/holocene/form/context/form-context';
+  import { useFormField } from '$lib/holocene/form/use-form-field.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -77,55 +77,23 @@
   let resolvedName = name || resolvedId;
   let testId = $$props['data-testid'] || resolvedId;
 
-  // Form context integration - simplified version
-  let formContext = null;
-  try {
-    formContext = getFormContext();
-  } catch (e) {
-    formContext = null;
-  }
+  // Form integration using subscription-based helper
+  $: formField = useFormField({
+    name: resolvedName,
+    value,
+    valid,
+    error,
+    hintText,
+  });
 
-  // Extract form stores
-  let formData = null;
-  let formErrors = null;
-  let formConstraints = null;
-
-  $: if (formContext) {
-    formData = formContext.form.form;
-    formErrors = formContext.form.errors;
-    formConstraints = formContext.form.constraints;
-  }
-
-  // Bindable value that works with form context
-  let bindableValue = '';
-
-  // Keep bindableValue in sync with form data or prop value
-  $: if (formContext && formData) {
-    bindableValue = $formData[resolvedName] ?? '';
-  } else {
-    bindableValue = value || '';
-  }
-
-  // Update form data when bindableValue changes
-  $: if (
-    formContext &&
-    formData &&
-    bindableValue !== ($formData[resolvedName] ?? '')
-  ) {
-    formData.update((data) => ({ ...data, [resolvedName]: bindableValue }));
-  }
-
-  // Don't update props to avoid cyclical dependency
-
-  // Use form context if available, otherwise use props
-  $: resolvedValid =
-    formContext && formErrors ? !$formErrors[resolvedName] : valid;
-  $: resolvedError =
-    formContext && formErrors ? !!$formErrors[resolvedName] : error;
-  $: resolvedHintText =
-    formContext && formErrors ? $formErrors[resolvedName]?.[0] || '' : hintText;
-  $: resolvedConstraints =
-    formContext && formConstraints ? $formConstraints[resolvedName] : null;
+  // Extract resolved values from form field binding
+  $: ({
+    bindableValue,
+    resolvedValid,
+    resolvedError,
+    resolvedHintText,
+    resolvedConstraints,
+  } = formField);
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
@@ -133,7 +101,7 @@
 
   const dispatch = createEventDispatcher();
   function onClear() {
-    bindableValue = '';
+    formField.setValue('');
     dispatch('clear', {});
   }
 
@@ -151,9 +119,9 @@
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
       )}
       class:disabled
-      class:error={resolvedError}
+      class:error={$resolvedError}
       class:noBorder
-      class:invalid={!resolvedValid}
+      class:invalid={!$resolvedValid}
     >
       {#if icon}
         <span class="icon-container">
@@ -175,7 +143,7 @@
         {spellcheck}
         {required}
         {autocomplete}
-        bind:value={bindableValue}
+        bind:value={$bindableValue}
         on:click|stopPropagation
         on:input
         on:keydown|stopPropagation
@@ -185,13 +153,13 @@
         use:callFocus
         data-testid={testId}
         {...$$restProps}
-        {...resolvedConstraints}
+        {...$resolvedConstraints}
       />
       {#if copyable}
         <div class="copy-icon-container">
           <button
             aria-label={copyButtonLabel}
-            on:click={(e) => copy(e, bindableValue)}
+            on:click={(e) => copy(e, $bindableValue)}
           >
             {#if $copied}
               <Icon name="checkmark" />
@@ -204,7 +172,7 @@
         <div class="disabled-icon-container">
           <Icon name="lock" />
         </div>
-      {:else if clearable && bindableValue}
+      {:else if clearable && $bindableValue}
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
@@ -216,10 +184,10 @@
       {#if maxLength && !disabled && !hideCount}
         <span class="count">
           <span
-            class:ok={maxLength - bindableValue.length > 5}
-            class:warn={maxLength - bindableValue.length <= 5}
-            class:error={maxLength === bindableValue.length}
-            >{bindableValue.length}</span
+            class:ok={maxLength - $bindableValue.length > 5}
+            class:warn={maxLength - $bindableValue.length <= 5}
+            class:error={maxLength === $bindableValue.length}
+            >{$bindableValue.length}</span
           >/{maxLength}
         </span>
       {/if}
@@ -234,12 +202,12 @@
 
   <span
     class="hint-text inline-block"
-    class:invalid={!resolvedValid}
-    class:error={resolvedError}
-    class:hidden={!resolvedHintText}
-    role={resolvedError ? 'alert' : null}
+    class:invalid={!$resolvedValid}
+    class:error={$resolvedError}
+    class:hidden={!$resolvedHintText}
+    role={$resolvedError ? 'alert' : null}
   >
-    {resolvedHintText}
+    {$resolvedHintText}
   </span>
 </div>
 

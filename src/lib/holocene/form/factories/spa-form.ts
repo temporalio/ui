@@ -23,9 +23,10 @@ export function createSPAForm(config: SPAFormConfig): FormContext {
     resetForm: options.resetForm ?? false,
     dataType: options.dataType ?? 'json',
     validators: schema ? zodClient(schema) : false,
-    validationMethod: 'oninput',
 
     onUpdate: async (event) => {
+      if (!event.form.valid) return;
+
       const result = await onUpdate(event as OnUpdateParams);
       return result;
     },
