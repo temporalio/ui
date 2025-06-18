@@ -1,5 +1,7 @@
+import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/svelte';
 import i18next from 'i18next';
-import { vi } from 'vitest';
+import { afterEach, vi } from 'vitest';
 
 import { i18nNamespaces } from './src/lib/i18n';
 import resources from './src/lib/i18n/locales';
@@ -24,6 +26,10 @@ const BroadcastChannelMock = vi.fn(() => ({
 }));
 
 vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
+
+afterEach(() => {
+  cleanup();
+});
 
 vi.mock('esm-env', () => {
   const BROWSER = true;
