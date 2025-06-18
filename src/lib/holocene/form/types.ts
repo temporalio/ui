@@ -1,4 +1,5 @@
 import type { ActionResult } from '@sveltejs/kit';
+import type { Snippet } from 'svelte';
 import { superForm, type SuperValidated } from 'sveltekit-superforms';
 import { z } from 'zod';
 
@@ -19,6 +20,11 @@ export type OnUpdateParams = {
       }
     >
   >;
+};
+
+export type FormProps = {
+  config: FormConfig;
+  children: Snippet;
 };
 
 export type OnErrorParams = {

@@ -1,4 +1,4 @@
-export { default as FormProvider } from './context/form-provider.svelte';
+export { default as Form } from './context/form-provider.svelte';
 export { createFormContext, getFormContext } from './context/form-context';
 export { useFormField } from './use-form-field.svelte';
 
@@ -25,6 +25,9 @@ export type {
   OnUpdateParams,
   OnErrorParams,
   MaybePromise,
+
+  // Component props
+  FormProps,
 } from './types';
 
 // Re-export factory functions for advanced usage
@@ -34,8 +37,3 @@ export {
   formatErrorMessage,
   defaultErrorHandler,
 } from './factories';
-
-export type { FormProps } from './context/form-provider.svelte';
-
-// Legacy export alias
-export { default as Form } from './context/form-provider.svelte';

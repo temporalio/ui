@@ -3,6 +3,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import { z } from 'zod';
 
+  import type { OnErrorParams } from './types';
   import Button from '../button.svelte';
   import Input from '../input/input.svelte';
 
@@ -55,6 +56,29 @@
     },
   };
 
+  const advancedConfig = {
+    type: 'spa' as const,
+    schema: userSchema,
+    defaultValues: {
+      username: '',
+      email: '',
+    },
+    onUpdate: async ({ form }: { form: Record<string, unknown> }) => {
+      action('form-submitted')(form);
+      // Simulate API call with delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return 'User created successfully!';
+    },
+    onError: async ({ result, message }: OnErrorParams) => {
+      action('form-error')({ result, message });
+      // Custom error handling logic would go here
+    },
+    options: {
+      resetForm: true,
+      dataType: 'json' as const,
+    },
+  };
+
   const { Story } = defineMeta({
     title: 'Forms/Form',
     tags: ['autodocs', 'notest'],
@@ -74,6 +98,16 @@
 </Story>
 
 <Story name="With Validation" args={{ config: validationConfig }}>
+  {#snippet children(args)}
+    <Form config={args.config}>
+      <Input name="username" type="text" label="Username" />
+      <Input name="email" type="email" label="Email" />
+      <Button type="submit">Submit</Button>
+    </Form>
+  {/snippet}
+</Story>
+
+<Story name="Advanced Options" args={{ config: advancedConfig }}>
   {#snippet children(args)}
     <Form config={args.config}>
       <Input name="username" type="text" label="Username" />

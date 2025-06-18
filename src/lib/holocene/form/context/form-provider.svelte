@@ -1,12 +1,5 @@
 <script lang="ts" module>
-  import type { Snippet } from 'svelte';
-
-  import type { FormConfig } from '../types';
-
-  export type FormProps = {
-    config: FormConfig;
-    children: Snippet;
-  };
+  import type { FormProps } from '../types';
 </script>
 
 <script lang="ts">
