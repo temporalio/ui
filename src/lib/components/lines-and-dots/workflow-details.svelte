@@ -206,7 +206,7 @@
       <DetailListLabel>
         {translate('workflows.billable-actions')}
       </DetailListLabel>
-      <DetailListTextValue text={totalActions} iconName="dollar-invoice" />
+      <DetailListTextValue text={totalActions} />
     {/if}
     <SdkLogo />
   </DetailListColumn>

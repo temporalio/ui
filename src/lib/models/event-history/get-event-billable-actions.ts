@@ -28,7 +28,14 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
     if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) return 1;
     if (isNexusOperationScheduledEvent(event)) return 1;
     if (isNexusOperationCancelRequestedEvent(event)) return 1;
-    if (isWorkflowExecutionOptionsUpdatedEvent(event)) return 1;
+    if (
+      isWorkflowExecutionOptionsUpdatedEvent(event) &&
+      (!!event.attributes?.versioningOverride ||
+        event?.attributes.unsetVersioningOverride) &&
+      (!!event.attributes.attachedCompletionCallbacks ||
+        !!event.attributes.attachedRequestId)
+    )
+      return 1;
     if (isWorkflowExecutionUpdateAcceptedEvent(event)) return 1;
     if (isUpsertWorkflowSearchAttributesEvent(event)) return 1;
     if (isWorkflowExecutionContinuedAsNewEvent(event)) return 1;

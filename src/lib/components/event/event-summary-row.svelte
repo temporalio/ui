@@ -393,8 +393,8 @@
             text={translate('workflows.estimated-billable-actions')}
             topRight
           >
-            <Badge type="subtle" class="shrink-0 gap-1 px-1">
-              <Icon name="dollar-invoice" />{event.billableActions}
+            <Badge type="subtle" class="text-bold shrink-0 gap-1 px-1.5">
+              {event.billableActions}
             </Badge>
           </Tooltip>
         {/if}
