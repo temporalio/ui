@@ -1,15 +1,15 @@
-import { writable, type Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 import { onDestroy } from 'svelte';
 
 import { getFormContext } from './form-context';
 
 export interface FormFieldBinding {
-  bindableValue: Writable<string>;
-  resolvedValid: Writable<boolean>;
-  resolvedError: Writable<boolean>;
-  resolvedHintText: Writable<string>;
-  resolvedConstraints: Writable<Record<string, unknown> | null>;
+  bindableValue: string;
+  resolvedValid: boolean;
+  resolvedError: boolean;
+  resolvedHintText: string;
+  resolvedConstraints: Record<string, unknown> | null;
   setValue: (value: string) => void;
 }
 
@@ -23,13 +23,7 @@ export interface FormFieldOptions {
 
 export function useFormField(options: FormFieldOptions): FormFieldBinding {
   const { name, value, valid, error, hintText } = options;
-
-  let formContext = null;
-  try {
-    formContext = getFormContext();
-  } catch (e) {
-    formContext = null;
-  }
+  const formContext = getFormContext();
 
   if (formContext && name) {
     return createFormFieldBinding(
@@ -45,14 +39,14 @@ export function useFormField(options: FormFieldOptions): FormFieldBinding {
   }
 
   // Fallback to props when no form context
-  const localValue = writable(value || '');
+  let localValue = $derived(value || '');
   return {
     bindableValue: localValue,
-    resolvedValid: writable(valid),
-    resolvedError: writable(error),
-    resolvedHintText: writable(hintText),
-    resolvedConstraints: writable(null),
-    setValue: (newValue: string) => localValue.set(newValue),
+    resolvedValid: valid,
+    resolvedError: error,
+    resolvedHintText: hintText,
+    resolvedConstraints: null,
+    setValue: (newValue: string) => (localValue = newValue),
   };
 }
 
@@ -67,25 +61,23 @@ function createFormFieldBinding(
   propHintText: string,
 ): FormFieldBinding {
   // Create reactive stores for all resolved values
-  const bindableStore = writable(propValue || '');
-  const resolvedValidStore = writable(propValid);
-  const resolvedErrorStore = writable(propError);
-  const resolvedHintTextStore = writable(propHintText);
-  const resolvedConstraintsStore = writable<Record<string, unknown> | null>(
-    null,
-  );
+  let bindableStore = $state(propValue || '');
+  let resolvedValidStore = $state(propValid);
+  let resolvedErrorStore = $state(propError);
+  let resolvedHintTextStore = $state(propHintText);
+  let resolvedConstraintsStore = $state<Record<string, unknown> | null>(null);
 
   // Subscribe to form data changes and update bindable store
   const unsubData = formData.subscribe((val) => {
     const formValue = val?.[name] ?? '';
-    bindableStore.set(formValue);
+    bindableStore = formValue;
   });
 
   // Subscribe to bindable store changes and update form data
-  const unsubBindable = bindableStore.subscribe((value) => {
+  $effect(() => {
     formData.update((d) => ({
       ...(d as Record<string, unknown>),
-      [name]: value,
+      [name]: bindableStore,
     }));
   });
 
@@ -95,33 +87,42 @@ function createFormFieldBinding(
     const hasError = !!errorArray;
     const hintText = errorArray?.[0] || propHintText;
 
-    resolvedValidStore.set(!hasError);
-    resolvedErrorStore.set(hasError);
-    resolvedHintTextStore.set(hintText);
+    resolvedValidStore = !hasError;
+    resolvedErrorStore = hasError;
+    resolvedHintTextStore = hintText;
   });
 
   // Subscribe to form constraints
   const unsubConstraints = formConstraints.subscribe((val) => {
     const constraints = val?.[name] || null;
-    resolvedConstraintsStore.set(constraints);
+    resolvedConstraintsStore = constraints;
   });
 
   // Cleanup subscriptions
   onDestroy(() => {
     unsubData();
-    unsubBindable();
     unsubErrors();
     unsubConstraints();
   });
 
   return {
-    bindableValue: bindableStore,
-    resolvedValid: resolvedValidStore,
-    resolvedError: resolvedErrorStore,
-    resolvedHintText: resolvedHintTextStore,
-    resolvedConstraints: resolvedConstraintsStore,
+    get bindableValue() {
+      return bindableStore;
+    },
+    get resolvedValid() {
+      return resolvedValidStore;
+    },
+    get resolvedError() {
+      return resolvedErrorStore;
+    },
+    get resolvedHintText() {
+      return resolvedHintTextStore;
+    },
+    get resolvedConstraints() {
+      return resolvedConstraintsStore;
+    },
     setValue: (value: string) => {
-      bindableStore.set(value);
+      bindableStore = value;
     },
   };
 }
