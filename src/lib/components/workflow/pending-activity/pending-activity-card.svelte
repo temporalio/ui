@@ -48,8 +48,8 @@
       <h4>{activity.activityType}</h4>
     </div>
   </div>
-  <div class="flex flex-wrap gap-4">
-    <div class="flex flex-col gap-1">
+  <div class="flex flex-wrap">
+    <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
@@ -110,7 +110,7 @@
         {@render failures()}
       {/if}
       {#if activity.heartbeatDetails}
-        {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
+        {@render heartbeat()}
       {/if}
     </div>
   </div>
@@ -132,17 +132,23 @@
 {/snippet}
 
 {#snippet heartbeat()}
-  <PayloadDecoder
-    value={activity.heartbeatDetails}
-    let:decodedValue
-    key="payloads"
-  >
-    <CodeBlock
-      content={decodedValue}
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    />
-  </PayloadDecoder>
+  <div>
+    <p class="text-sm text-secondary/80">
+      {translate('workflows.heartbeat-details')}
+    </p>
+
+    <PayloadDecoder
+      value={activity.heartbeatDetails}
+      let:decodedValue
+      key="payloads"
+    >
+      <CodeBlock
+        content={decodedValue}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </PayloadDecoder>
+  </div>
 {/snippet}
 
 {#snippet failures()}

@@ -21,9 +21,15 @@ import {
 
 export const getEventBillableActions = (event: WorkflowEvent): number => {
   try {
-    if (isWorkflowExecutionStartedEvent(event)) return 1;
+    if (isWorkflowExecutionStartedEvent(event)) {
+      // Charge 2 for scheduled workflows
+      if (event.attributes.searchAttributes.indexedFields.TemporalScheduledById)
+        return 2;
+      return 1;
+    }
     if (isActivityTaskScheduledEvent(event)) return 1;
     if (isTimerStartedEvent(event)) return 1;
+    // Don't charge for signaled with start workflows
     if (isWorkflowExecutionSignaledEvent(event) && event.id !== '2') return 1;
     if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) return 1;
     if (isNexusOperationScheduledEvent(event)) return 1;
@@ -31,28 +37,21 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
     if (isWorkflowExecutionUpdateAcceptedEvent(event)) return 1;
     if (isWorkflowExecutionContinuedAsNewEvent(event)) return 1;
     if (isWorkflowExecutionUpdateRejectedEvent(event)) return 1;
+    if (isWorkflowExecutionOptionsUpdatedEvent(event)) return 1;
+
     if (isUpsertWorkflowSearchAttributesEvent(event)) {
       const searchAttributeFields = Object.keys(
-        event.searchAttributes.indexedFields,
+        event.attributes.searchAttributes.indexedFields,
       );
       if (
         searchAttributeFields?.length === 1 &&
-        !!event.searchAttributes.indexedFields?.TemporalChangeVersion
+        !!event.attributes.searchAttributes.indexedFields?.TemporalChangeVersion
       ) {
         // Non-billable search attribute update
-        return 0;
+        return 3;
       }
       return 1;
     }
-    if (
-      isWorkflowExecutionOptionsUpdatedEvent(event) &&
-      (!!event.attributes?.versioningOverride ||
-        event?.attributes.unsetVersioningOverride) &&
-      (!!event.attributes.attachedCompletionCallbacks ||
-        !!event.attributes.attachedRequestId)
-    )
-      // Non-billable async callback
-      return 1;
 
     if (isMarkerRecordedEvent(event)) {
       const nonBillable = ['core_patch', 'Version'];

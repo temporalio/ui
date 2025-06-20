@@ -79,8 +79,8 @@
       })}
     </p>
   </div>
-  <div class="flex flex-wrap gap-4">
-    <div class="flex flex-col gap-1">
+  <div class="flex flex-wrap">
+    <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
       {/if}
@@ -242,7 +242,7 @@
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
-    <p class="whitespace-pre-line">
+    <p class="whitespace-pre-line break-all">
       {shouldDisplayAsTime(key) ? formatDate(value, $timeFormat) : value}
     </p>
   </div>

@@ -79,8 +79,8 @@
 <g
   role="button"
   tabindex="0"
-  on:click|preventDefault={onClick}
-  on:keypress|preventDefault={onClick}
+  on:click={onClick}
+  on:keypress={onClick}
   class="relative cursor-pointer"
   {height}
 >

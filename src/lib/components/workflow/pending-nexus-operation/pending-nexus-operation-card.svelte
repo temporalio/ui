@@ -27,8 +27,8 @@
     </div>
   </div>
 
-  <div class="flex flex-wrap gap-4">
-    <div class="flex flex-col gap-1">
+  <div class="flex flex-wrap">
+    <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if operation.endpoint}
         {@render detail(translate('nexus.endpoint'), operation.endpoint)}
       {/if}
