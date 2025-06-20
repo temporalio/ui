@@ -61,7 +61,7 @@
   ];
 
   $: if ($isCloud && columns.length === 4) {
-    columns.push({ label: 'Actions' });
+    columns.push({ label: 'Billable Actions' });
   }
 
   const iterableKey = (event: IterableEventWithPending) => {
