@@ -47,7 +47,7 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
       );
       if (
         searchAttributeFields?.length === 1 &&
-        !!event.attributes.searchAttributes.indexedFields?.TemporalChangeVersion
+        event.attributes?.searchAttributes?.indexedFields?.TemporalChangeVersion
       ) {
         // Non-billable search attribute update
         return 0;
