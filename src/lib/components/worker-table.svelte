@@ -10,7 +10,9 @@
   import { translate } from '$lib/i18n/translate';
   import { type GetPollersResponse } from '$lib/services/pollers-service';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { formatDate } from '$lib/utilities/format-date';
+  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
   import PollerIcon from './poller-icon.svelte';
@@ -21,6 +23,28 @@
   let { workers }: Props = $props();
 
   const { namespace } = $derived(page.params);
+  const { workflow } = $derived($workflowRun);
+
+  const deploymentVersion = $derived(
+    workflow?.searchAttributes?.indexedFields?.[
+      'TemporalWorkerDeploymentVersion'
+    ],
+  );
+
+  const versioningBuildId = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ||
+      getBuildIdFromVersion(deploymentVersion),
+  );
+
+  const versioningBehavior = $derived(
+    workflow?.searchAttributes?.indexedFields?.[
+      'TemporalWorkflowVersioningBehavior'
+    ],
+  );
+
+  const pinnedBuildId = $derived(
+    versioningBehavior === 'Pinned' ? versioningBuildId : '',
+  );
 
   const getDeploymentName = (poller) => {
     const deployment =
@@ -35,12 +59,25 @@
       poller?.workerVersionCapabilities?.buildId;
     return buildId ?? '';
   };
+
+  const pollers = $derived(
+    pinnedBuildId
+      ? workers?.pollers?.filter(
+          (p) => getDeploymentBuildId(p) === pinnedBuildId,
+        )
+      : workers?.pollers || [],
+  );
 </script>
 
 <h2 class="flex items-center gap-2" data-testid="workers">
   {translate('workers.workers')}
-  <Badge type="count">{workers?.pollers?.length || 0}</Badge>
+  <Badge type="count">{pollers?.length || 0}</Badge>
 </h2>
+{#if pinnedBuildId}
+  <p>
+    {translate('workers.viewing-pinned-build-ids')}
+  </p>
+{/if}
 <Table class="mb-6 w-full min-w-[600px] table-fixed">
   <caption class="sr-only" slot="caption"
     >{translate('workflows.workers-tab')}</caption
@@ -61,7 +98,7 @@
       <p class="text-center">{translate('workflows.activity-handler')}</p>
     </th>
   </TableHeaderRow>
-  {#each workers?.pollers as poller}
+  {#each pollers as poller}
     {@const deployment = getDeploymentName(poller)}
     {@const buildId = getDeploymentBuildId(poller)}
     <TableRow data-testid="worker-row">
