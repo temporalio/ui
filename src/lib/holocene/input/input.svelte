@@ -4,6 +4,7 @@
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import { useFormField } from '$lib/holocene/form/use-form-field.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -12,8 +13,8 @@
   import IconButton from '../icon-button.svelte';
 
   type BaseProps = HTMLInputAttributes & {
-    id: string;
-    value: string;
+    id?: string;
+    value?: string;
     label: string;
     labelHidden?: boolean;
     icon?: IconName;
@@ -43,15 +44,15 @@
 
   type $$Props = BaseProps | CopyableProps | ClearableProps;
 
-  export let id: string;
-  export let value: string;
+  export let id: string = undefined;
+  export let value: string = '';
   export let label: string;
   export let labelHidden = false;
   export let icon: IconName = null;
   export let placeholder = '';
   export let suffix = '';
   export let prefix = '';
-  export let name = id;
+  export let name: string = undefined;
   export let copyable = false;
   export let disabled = false;
   export let clearable = false;
@@ -71,7 +72,31 @@
   let className = '';
   export { className as class };
 
-  let testId = $$props['data-testid'] || id;
+  let resolvedId =
+    id ||
+    (name
+      ? `input-${name}`
+      : `input-${Math.random().toString(36).substr(2, 9)}`);
+  let resolvedName = name || resolvedId;
+  let testId = $$props['data-testid'] || resolvedId;
+
+  // Form integration using subscription-based helper
+  $: formField = useFormField({
+    name: resolvedName,
+    value,
+    valid,
+    error,
+    hintText,
+  });
+
+  // Extract resolved values from form field binding
+  $: ({
+    bindableValue,
+    resolvedValid,
+    resolvedError,
+    resolvedHintText,
+    resolvedConstraints,
+  } = formField);
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
@@ -79,7 +104,7 @@
 
   const dispatch = createEventDispatcher();
   function onClear() {
-    value = '';
+    formField.setValue('');
     dispatch('clear', {});
   }
 
@@ -88,7 +113,7 @@
 </script>
 
 <div class={merge('flex flex-col gap-1', className)}>
-  <Label {required} {label} hidden={labelHidden} for={id} />
+  <Label {required} {label} hidden={labelHidden} for={resolvedId} />
   <div class="input-group flex">
     <slot name="before-input" {disabled} />
     <div
@@ -97,9 +122,9 @@
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
       )}
       class:disabled
-      class:error
+      class:error={$resolvedError}
       class:noBorder
-      class:invalid={!valid}
+      class:invalid={!$resolvedValid}
     >
       {#if icon}
         <span class="icon-container">
@@ -116,12 +141,12 @@
         data-1p-ignore="true"
         maxlength={maxLength > 0 ? maxLength : undefined}
         {placeholder}
-        {id}
-        {name}
+        id={resolvedId}
+        name={resolvedName}
         {spellcheck}
         {required}
         {autocomplete}
-        bind:value
+        bind:value={$bindableValue}
         on:click|stopPropagation
         on:input
         on:keydown|stopPropagation
@@ -131,10 +156,14 @@
         use:callFocus
         data-testid={testId}
         {...$$restProps}
+        {...$resolvedConstraints}
       />
       {#if copyable}
         <div class="copy-icon-container">
-          <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
+          <button
+            aria-label={copyButtonLabel}
+            on:click={(e) => copy(e, $bindableValue)}
+          >
             {#if $copied}
               <Icon name="checkmark" />
             {:else}
@@ -146,7 +175,7 @@
         <div class="disabled-icon-container">
           <Icon name="lock" />
         </div>
-      {:else if clearable && value}
+      {:else if clearable && $bindableValue}
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
@@ -158,9 +187,10 @@
       {#if maxLength && !disabled && !hideCount}
         <span class="count">
           <span
-            class:ok={maxLength - value.length > 5}
-            class:warn={maxLength - value.length <= 5}
-            class:error={maxLength === value.length}>{value.length}</span
+            class:ok={maxLength - $bindableValue.length > 5}
+            class:warn={maxLength - $bindableValue.length <= 5}
+            class:error={maxLength === $bindableValue.length}
+            >{$bindableValue.length}</span
           >/{maxLength}
         </span>
       {/if}
@@ -175,12 +205,12 @@
 
   <span
     class="hint-text inline-block"
-    class:invalid={!valid}
-    class:error
-    class:hidden={!hintText}
-    role={error ? 'alert' : null}
+    class:invalid={!$resolvedValid}
+    class:error={$resolvedError}
+    class:hidden={!$resolvedHintText}
+    role={$resolvedError ? 'alert' : null}
   >
-    {hintText}
+    {$resolvedHintText}
   </span>
 </div>
 
