@@ -39,6 +39,7 @@
   const latestNotDuplicate = $derived(
     latestBuildId !== rampingBuildId && latestBuildId !== currentBuildId,
   );
+  const versionedCurrent = $derived(currentBuildId !== '__unversioned__');
 </script>
 
 <tr>
@@ -79,11 +80,15 @@
             </div>
           {/if}
           <div class="flex items-center gap-2">
-            {currentBuildId}
-            <DeploymentStatus
-              status="Current"
-              label={translate('deployments.current')}
-            />
+            {versionedCurrent
+              ? currentBuildId
+              : translate('deployments.unversioned')}
+            {#if versionedCurrent}
+              <DeploymentStatus
+                status="Current"
+                label={translate('deployments.current')}
+              />
+            {/if}
           </div>
         </div>
       </td>
@@ -109,9 +114,13 @@
             </p>
           {/if}
           <p>
-            {formatDate(deployment.createTime, $timeFormat, {
-              relative: $relativeTime,
-            })}
+            {#if versionedCurrent}
+              {formatDate(deployment.createTime, $timeFormat, {
+                relative: $relativeTime,
+              })}
+            {:else}
+              -
+            {/if}
           </p>
         </div>
       </td>
