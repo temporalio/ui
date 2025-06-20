@@ -6,7 +6,6 @@ import {
   isMarkerRecordedEvent,
   isNexusOperationCancelRequestedEvent,
   isNexusOperationScheduledEvent,
-  isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
   isUpsertWorkflowSearchAttributesEvent,
@@ -22,18 +21,17 @@ import {
 export const getEventBillableActions = (event: WorkflowEvent): number => {
   try {
     if (isWorkflowExecutionStartedEvent(event)) {
-      // Charge 2 for scheduled workflows
+      // Charge 2 additional for scheduled workflows
       if (
         event.attributes?.searchAttributes?.indexedFields?.TemporalScheduledById
       )
-        return 2;
+        return 3;
       return 1;
     }
     if (isActivityTaskScheduledEvent(event)) return 1;
     if (isTimerStartedEvent(event)) return 1;
     // Don't charge for signaled with start workflows
     if (isWorkflowExecutionSignaledEvent(event) && event.id !== '2') return 1;
-    if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) return 1;
     if (isNexusOperationScheduledEvent(event)) return 1;
     if (isNexusOperationCancelRequestedEvent(event)) return 1;
     if (isWorkflowExecutionUpdateAcceptedEvent(event)) return 1;
