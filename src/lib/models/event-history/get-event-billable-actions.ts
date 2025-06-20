@@ -23,7 +23,9 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
   try {
     if (isWorkflowExecutionStartedEvent(event)) {
       // Charge 2 for scheduled workflows
-      if (event.attributes.searchAttributes.indexedFields.TemporalScheduledById)
+      if (
+        event.attributes?.searchAttributes?.indexedFields?.TemporalScheduledById
+      )
         return 2;
       return 1;
     }
@@ -48,7 +50,7 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
         !!event.attributes.searchAttributes.indexedFields?.TemporalChangeVersion
       ) {
         // Non-billable search attribute update
-        return 3;
+        return 0;
       }
       return 1;
     }
