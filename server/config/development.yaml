@@ -49,6 +49,9 @@ tls:
   keyData:
   enableHostVerification: false
   serverName:
+uiServerTLS:
+  certFile:
+  keyFile:
 codec:
   endpoint:
   passAccessToken: false
