@@ -12,10 +12,12 @@ import {
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
+import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
 import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
 import { toEventNameReadable } from '$lib/utilities/screaming-enums';
 
+import { getEventBillableActions } from './get-event-billable-actions';
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
@@ -43,7 +45,24 @@ export async function getEventAttributes(
   };
 }
 
-export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
+export const toBillableEvent = (
+  event: WorkflowEvent,
+  shouldNotAddBillableAction: (event: WorkflowEvent) => boolean = () => false,
+) => {
+  return {
+    ...event,
+    billableActions: shouldNotAddBillableAction(event)
+      ? 0
+      : getEventBillableActions(event),
+  };
+};
+
+export const toEvent = (
+  historyEvent: HistoryEvent,
+  options: {
+    shouldNotAddBillableAction?: (event: WorkflowEvent) => boolean;
+  } = {},
+): WorkflowEvent => {
   const id = String(historyEvent.eventId);
   const eventType = toEventNameReadable(historyEvent.eventType);
   const timestamp = formatDate(String(historyEvent.eventTime));
@@ -52,7 +71,7 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
 
   const { key, attributes } = findAttributesAndKey(historyEvent);
   const links = historyEvent?.links || [];
-  return {
+  const event = {
     ...historyEvent,
     name: eventType,
     id,
@@ -61,12 +80,20 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
     classification,
     category,
     links,
+    billableActions: 0,
     attributes: simplifyAttributes({ type: key, ...attributes }),
   };
+  return toBillableEvent(event, options.shouldNotAddBillableAction);
 };
 
 export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
-  return events.map(toEvent);
+  const failedEvent = events.findLast(isWorkflowTaskFailedEventDueToReset);
+  const shouldNotAddBillableAction = (event: WorkflowEvent): boolean => {
+    if (failedEvent) return Number(event.id) < Number(failedEvent.eventId);
+    return false;
+  };
+
+  return events.map((event) => toEvent(event, { shouldNotAddBillableAction }));
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

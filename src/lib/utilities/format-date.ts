@@ -41,7 +41,7 @@ export function formatDate(
       date = timestampToDate(date);
     }
 
-    const parsed = parseJSON(date);
+    const parsed = parseJSON(new Date(date));
 
     const format = abbrFormat
       ? parsed.getSeconds()

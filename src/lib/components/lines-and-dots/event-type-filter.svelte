@@ -109,6 +109,7 @@
           $eventTypeFilter = defaultOptions;
           $eventStatusFilter = !$eventStatusFilter;
         }}
+        class="items-start"
       >
         <Checkbox
           on:change={() => {

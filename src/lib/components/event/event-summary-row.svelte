@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { fade, slide } from 'svelte/transition';
-
   import { onMount } from 'svelte';
 
   import { page } from '$app/state';
@@ -18,6 +16,7 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import { authUser } from '$lib/stores/auth-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type {
@@ -63,8 +62,6 @@
     initialItem: WorkflowEvent;
     index: number;
     compact?: boolean;
-    typedError?: boolean;
-    active?: boolean;
     expanded?: boolean;
     onRowClick?: () => void;
   }
@@ -75,8 +72,6 @@
     initialItem,
     index,
     compact = false,
-    typedError = false,
-    active = false,
     expanded: expandedProp = false,
     onRowClick = () => {},
   }: Props = $props();
@@ -247,21 +242,18 @@
 </script>
 
 <tr
-  class="dense flex select-none items-center gap-4 px-2 text-sm no-underline"
+  class="hover:cursor-pointer"
   class:border={failure || canceled || terminated}
   class:border-danger={failure}
   class:border-warning={canceled}
   class:border-pink-700={terminated}
-  class:typedError
-  class:expanded
-  class:active
   id={`${event.id}-${index}`}
   data-eventid={event.id}
   data-testid="event-summary-row"
   onclick={onLinkClick}
 >
   {#if isEventGroup(event)}
-    <td class="w-24 min-w-fit font-mono">
+    <td class="font-mono">
       <div class="flex items-center gap-0.5">
         {#each event.eventList as groupEvent}
           <Link
@@ -289,6 +281,7 @@
     <Tooltip
       hide={(isEventGroup(event) && !duration) || !elapsedTime}
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
+      class="block"
       bottom
     >
       <Copyable
@@ -300,10 +293,11 @@
       </Copyable>
     </Tooltip>
   </td>
-  <td class="hidden text-right md:block">
+  <td class="hidden text-right md:table-cell">
     <Tooltip
       hide={(isEventGroup(event) && !duration) || !elapsedTime}
       text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
+      class="block"
       bottom
     >
       <Copyable
@@ -315,7 +309,7 @@
       </Copyable>
     </Tooltip>
   </td>
-  <td class="truncate md:min-w-fit">
+  <td class="truncate">
     <p
       class="whitespace-nowrap font-semibold md:text-base"
       class:text-danger={failure}
@@ -326,79 +320,91 @@
     </p>
   </td>
   <td
-    class="hidden w-full items-center gap-2 text-right text-sm font-normal md:flex xl:text-left"
+    class="w-full items-center gap-2 text-right text-sm font-normal xl:text-left"
   >
-    {#if pendingAttempt}
-      <div
-        class="flex items-center gap-1 {pendingAttempt > 1
-          ? 'surface-retry px-1 py-0.5'
-          : ''}"
-      >
-        <Icon class="mr-1.5 inline" name="retry" />
-        {translate('workflows.attempt')}
-        {pendingAttempt}
-        {#if hasPendingActivity}
-          / {hasPendingActivity.maximumAttempts || '∞'}
-          {#if pendingAttempt > 1}
-            • {translate('workflows.next-retry')}
-            {toTimeDifference({
-              date: hasPendingActivity.scheduledTime,
-              negativeDefault: 'None',
-            })}
+    <div class="flex items-center gap-2">
+      {#if pendingAttempt}
+        <Badge class="mr-1" type={pendingAttempt > 1 ? 'danger' : 'default'}>
+          <Icon
+            class="mr-1 inline {pendingAttempt > 1 && 'font-bold text-red-400'}"
+            name="retry"
+          />
+          {translate('workflows.attempt')}
+          {pendingAttempt}
+          {#if hasPendingActivity}
+            / {hasPendingActivity.maximumAttempts || '∞'}
+            {#if pendingAttempt > 1}
+              • {translate('workflows.next-retry')}
+              {toTimeDifference({
+                date: hasPendingActivity.scheduledTime,
+                negativeDefault: 'None',
+              })}
+            {/if}
           {/if}
+        </Badge>
+      {/if}
+      {#if !primaryLocalAttribute && primaryAttribute?.key}
+        <EventDetailsRow {...primaryAttribute} {attributes} />
+      {/if}
+      {#if primaryLocalAttribute && primaryLocalAttribute.key}
+        <EventDetailsRow {...primaryLocalAttribute} {attributes} />
+      {/if}
+      {#if currentEvent?.userMetadata?.summary}
+        <MetadataDecoder
+          value={currentEvent.userMetadata.summary}
+          let:decodedValue
+        >
+          {#if decodedValue}
+            <div
+              class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
+            >
+              <p class="whitespace-nowrap text-right text-xs">Summary</p>
+              <Badge type="secondary" class="block select-none truncate">
+                {decodedValue}
+              </Badge>
+            </div>
+          {/if}
+        </MetadataDecoder>
+      {/if}
+      {#if currentEvent?.links?.length}
+        <EventLink
+          link={currentEvent.links[0]}
+          class="max-w-xl"
+          linkClass="truncate"
+        />
+      {/if}
+      {#if nonPendingActivityAttempt}
+        <EventDetailsRow
+          key="attempt"
+          value={nonPendingActivityAttempt.toString()}
+          {attributes}
+        />
+      {/if}
+      {#if showSecondaryAttribute}
+        <EventDetailsRow {...secondaryAttribute} {attributes} />
+      {/if}
+    </div>
+  </td>
+  {#if $isCloud}
+    <td>
+      <div class="flex justify-center gap-0.5">
+        {#if event.billableActions}
+          <Tooltip
+            text={translate('workflows.estimated-billable-actions')}
+            topRight
+          >
+            <Badge type="subtle" class="text-bold shrink-0 gap-1 px-1.5">
+              {event.billableActions}
+            </Badge>
+          </Tooltip>
         {/if}
       </div>
-    {/if}
-    {#if !primaryLocalAttribute && primaryAttribute?.key}
-      <EventDetailsRow {...primaryAttribute} {attributes} />
-    {/if}
-    {#if primaryLocalAttribute && primaryLocalAttribute.key}
-      <EventDetailsRow {...primaryLocalAttribute} {attributes} />
-    {/if}
-    {#if currentEvent?.userMetadata?.summary}
-      <MetadataDecoder
-        value={currentEvent.userMetadata.summary}
-        let:decodedValue
-      >
-        {#if decodedValue}
-          <div
-            class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
-          >
-            <p class="whitespace-nowrap text-right text-xs">Summary</p>
-            <Badge type="secondary" class="block select-none truncate">
-              {decodedValue}
-            </Badge>
-          </div>
-        {/if}
-      </MetadataDecoder>
-    {/if}
-    {#if currentEvent?.links?.length}
-      <EventLink
-        link={currentEvent.links[0]}
-        class="max-w-xl"
-        linkClass="truncate"
-      />
-    {/if}
-    {#if nonPendingActivityAttempt}
-      <EventDetailsRow
-        key="attempt"
-        value={nonPendingActivityAttempt.toString()}
-        {attributes}
-      />
-    {/if}
-    {#if showSecondaryAttribute}
-      <EventDetailsRow {...secondaryAttribute} {attributes} />
-    {/if}
-  </td>
+    </td>
+  {/if}
 </tr>
 {#if expanded}
-  <tr
-    in:fade
-    out:slide={{ duration: 175 }}
-    class:typedError
-    class="expanded flex select-none items-center gap-4 px-2 text-sm no-underline"
-  >
-    <td class="w-full text-sm no-underline" class:border-b-0={typedError}>
+  <tr class="w-full text-sm no-underline">
+    <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>

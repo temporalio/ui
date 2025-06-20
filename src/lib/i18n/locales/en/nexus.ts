@@ -61,4 +61,8 @@ export const Strings = {
   'blocked-reason': 'Blocked Reason',
   link: 'Link',
   'link-namespace': 'Link Namespace',
+  service: 'Service',
+  operation: 'Operation',
+  'operation-token': 'Operation Token',
+  'cancellation-info': 'Cancellation Info',
 } as const;

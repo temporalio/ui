@@ -65,6 +65,7 @@ export type PendingActivityState =
 export type PendingChildren = import('$lib/types').PendingChildrenInfo;
 export type PendingNexusOperation = import('$lib/types').PendingNexusInfo & {
   scheduledEventId: string;
+  scheduleToCloseTimeout: string;
 };
 export type Callbacks = import('$lib/types').CallbackInfo[];
 
@@ -96,6 +97,7 @@ export interface WorkflowEvent extends HistoryEvent {
   category: EventTypeCategory;
   name: EventType;
   links?: EventLink[];
+  billableActions?: number;
 }
 
 export type WorkflowEvents = WorkflowEvent[];
@@ -174,6 +176,8 @@ export type WorkflowExecutionStartedEvent =
   EventWithAttributes<'workflowExecutionStartedEventAttributes'>;
 export type WorkflowExecutionCompletedEvent =
   EventWithAttributes<'workflowExecutionCompletedEventAttributes'>;
+export type WorkflowExecutionOptionsUpdatedEvent =
+  EventWithAttributes<'workflowExecutionOptionsUpdatedEventAttributes'>;
 export type WorkflowExecutionFailedEvent =
   EventWithAttributes<'workflowExecutionFailedEventAttributes'>;
 export type WorkflowExecutionTimedOutEvent =
@@ -253,6 +257,8 @@ export type WorkflowExecutionUpdateAdmittedEvent =
   EventWithAttributes<'workflowExecutionUpdateAdmittedEventAttributes'>;
 export type WorkflowExecutionUpdateAcceptedEvent =
   EventWithAttributes<'workflowExecutionUpdateAcceptedEventAttributes'>;
+export type WorkflowExecutionUpdateRejectedEvent =
+  EventWithAttributes<'workflowExecutionUpdateRejectedEventAttributes'>;
 export type WorkflowExecutionUpdateCompletedEvent =
   EventWithAttributes<'workflowExecutionUpdateCompletedEventAttributes'>;
 export type NexusOperationScheduledEvent =

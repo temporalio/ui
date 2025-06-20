@@ -1,8 +1,9 @@
-import type { PendingActivityInfo } from '$lib/types';
+import type { PendingActivityInfo, PendingNexusInfo } from '$lib/types';
 import type {
   EventAttributeKey,
   EventAttributesWithType,
   PendingActivity,
+  PendingNexusOperation,
 } from '$lib/types/events';
 import { formatDate } from '$lib/utilities/format-date';
 import { formatDuration } from '$lib/utilities/format-time';
@@ -94,6 +95,10 @@ export function simplifyAttributes(
   attributes: PendingActivityInfo,
   preserveTimestamps?: boolean,
 ): PendingActivity;
+export function simplifyAttributes(
+  attributes: PendingNexusInfo,
+  preserveTimestamps?: boolean,
+): PendingNexusOperation;
 export function simplifyAttributes<
   T = EventAttributesWithType<EventAttributeKey> | PendingActivityInfo,
 >(attributes: T, preserveTimestamps = false): T {

@@ -11,6 +11,8 @@
   import rust from '$lib/vendor/sdk-logos/rust-logo.png';
   import typescript from '$lib/vendor/sdk-logos/ts-logo.png';
 
+  import { DetailListLabel, DetailListValue } from '../detail-list';
+
   const sdkLogos: Record<string, string> = {
     go,
     typescript,
@@ -31,15 +33,21 @@
 </script>
 
 {#if sdk && version}
-  <p class="flex w-full items-center gap-1">
-    {#if logo}
-      <span class="relative flex w-6 shrink-0 items-center" aria-hidden="true">
-        <img src={logo} alt="SDK Icon" class="absolute h-6 w-6" />
+  <DetailListLabel>SDK</DetailListLabel>
+  <DetailListValue>
+    <p class="flex w-full items-center gap-1">
+      {#if logo}
+        <span
+          class="relative flex w-6 shrink-0 items-center"
+          aria-hidden="true"
+        >
+          <img src={logo} alt="SDK Icon" class="absolute h-6 w-6" />
+        </span>
+      {/if}
+      <span class="truncate">
+        {sdk}
+        {version}
       </span>
-    {/if}
-    <span class="truncate">
-      {sdk}
-      {version}
-    </span>
-  </p>
+    </p>
+  </DetailListValue>
 {/if}
