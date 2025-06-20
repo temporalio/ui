@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
 
+  import type { Props } from '$lib/holocene/code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export const meta = {
@@ -51,7 +52,7 @@
         table: { category: 'Copy Icon' },
       },
     },
-  } satisfies Meta<CodeBlock>;
+  } satisfies Meta<Props>;
 </script>
 
 <script lang="ts">
@@ -62,19 +63,19 @@
 </script>
 
 <Template id="json" let:args>
-  <CodeBlock language="json" {...args} on:change={action('change')} />
+  <CodeBlock language="json" {...args} onChange={action('change')} />
 </Template>
 
 <Template id="shell" let:args>
-  <CodeBlock language="shell" {...args} on:change={action('change')} />
+  <CodeBlock language="shell" {...args} onChange={action('change')} />
 </Template>
 
 <Template id="text" let:args>
-  <CodeBlock language="text" {...args} on:change={action('change')} />
+  <CodeBlock language="text" {...args} onChange={action('change')} />
 </Template>
 
 <Template let:args>
-  <CodeBlock {...args} />
+  <CodeBlock {...args} onChange={action('change')} />
 </Template>
 
 <Story
@@ -131,18 +132,25 @@
 />
 
 <Story
-  name="Shell"
+  name="Copyable (Maximum Height)"
   args={{
-    language: 'shell',
-    content: 'echo "Hello, World!"',
+    maxHeight: 100,
+    content: stringifyWithBigInt(
+      Object.getOwnPropertyDescriptors(Array.prototype),
+      null,
+      2,
+    ),
+    copyable: true,
+    copyIconTitle: 'Click to copy content',
+    copySuccessIconTitle: 'Content copied to clipboard',
   }}
 />
 
 <Story
-  name="Text"
+  name="Shell"
   args={{
-    language: 'text',
-    content: 'Hello, World!',
+    language: 'shell',
+    content: 'echo "Hello, World!"',
   }}
 />
 
@@ -154,6 +162,14 @@
     content: 'echo "Hello, World!"',
     copyIconTitle: 'Click to copy content',
     copySuccessIconTitle: 'Content copied to clipboard',
+  }}
+/>
+
+<Story
+  name="Text"
+  args={{
+    language: 'text',
+    content: 'Hello, World!',
   }}
 />
 

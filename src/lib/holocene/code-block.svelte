@@ -3,242 +3,211 @@
 
   import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
   import { historyKeymap, standardKeymap } from '@codemirror/commands';
-  import { json } from '@codemirror/lang-json';
   import {
     bracketMatching,
     foldGutter,
     indentOnInput,
     indentUnit,
-    StreamLanguage,
     syntaxHighlighting,
   } from '@codemirror/language';
-  import { shell } from '@codemirror/legacy-modes/mode/shell';
-  import { EditorState } from '@codemirror/state';
+  import { Compartment, EditorState, type Extension } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import ExpandButton from '$lib/holocene/expandable/button.svelte';
+  import { Maximizable } from '$lib/holocene/maximizable';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { useDarkMode } from '$lib/utilities/dark-mode';
+  import { formatJSON } from '$lib/utilities/format-json';
   import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
-  import {
-    TEMPORAL_SYNTAX,
-    TEMPORAL_THEME,
-  } from '$lib/vendor/codemirror/theme';
+    type EditorLanguage,
+    getActionsTheme,
+    getEditorTheme,
+    getHeightTheme,
+    getLanguageExtension,
+    getLineBreakExtension,
+    highlightStyles,
+  } from '$lib/vendor/codemirror/custom-extensions';
 
-  type BaseProps = HTMLAttributes<HTMLDivElement> & {
+  interface BaseProps extends HTMLAttributes<HTMLDivElement> {
     content: string;
-    language?: 'json' | 'text' | 'shell';
+    language?: EditorLanguage;
     editable?: boolean;
+    copyable?: boolean;
+    copyIconTitle?: string;
+    copySuccessIconTitle?: string;
     inline?: boolean;
     testId?: string;
-    copyable?: boolean;
     minHeight?: number;
     maxHeight?: number;
     label?: string;
     class?: string;
-  };
+    onChange?: (event: CustomEvent<string>) => void;
+  }
 
-  type CopyableProps = BaseProps & {
+  interface PropsWithCopyable extends BaseProps {
     copyable: true;
     copyIconTitle: string;
     copySuccessIconTitle: string;
-  };
+  }
 
-  type $$Props = BaseProps | CopyableProps;
+  export type Props = BaseProps | PropsWithCopyable;
 
-  const dispatch = createEventDispatcher<{ change: string }>();
+  let {
+    content,
+    language = 'json',
+    class: className = undefined,
+    editable = false,
+    copyable = true,
+    copyIconTitle = '',
+    copySuccessIconTitle = '',
+    inline = false,
+    testId = undefined,
+    minHeight = undefined,
+    maxHeight = undefined,
+    label = '',
+    onChange = undefined,
+    ...editorProps
+  }: Props = $props();
 
-  export let content: string;
-  let className: string = null;
-  export { className as class };
-  export let editable = false;
-  export let inline = false;
-  export let language = 'json';
-  export let copyable = true;
-  export let copyIconTitle = '';
-  export let copySuccessIconTitle = '';
-  export let minHeight = undefined;
-  export let maxHeight = undefined;
-  export let label = '';
+  // codemirror
+  let editorElement = $state<HTMLElement | undefined>();
+  let view = $state<EditorView | undefined>();
 
+  // content
   const { copy, copied } = copyToClipboard();
-  let expanded = false;
+  const formatContent = (
+    language: EditorLanguage,
+    content: string,
+    inline: boolean,
+  ) => (language === 'json' ? formatJSON(content, inline ? 0 : 2) : content);
 
-  const handleCopy = (e: Event) => {
-    copy(e, content);
-  };
+  // ui
+  let maximizable = $derived(
+    (maxHeight && view?.contentHeight > maxHeight) ?? false,
+  );
+  let maximized = $state(false);
 
-  const handleExpand = () => {
-    expanded = !expanded;
-  };
+  // a compartment allows us to update extensions like the theme
+  const compartment = $state(new Compartment());
 
-  let editor: HTMLElement;
-  let view: EditorView;
+  const staticExtensions: Extension[] = [
+    keymap.of([...standardKeymap, ...historyKeymap]),
+    syntaxHighlighting(highlightStyles, { fallback: true }),
+    indentUnit.of('  '),
+    closeBrackets(),
+    autocompletion(),
+    indentOnInput(),
+    bracketMatching(),
+  ];
 
-  const formatJSON = (jsonData: string): string => {
-    if (!jsonData) return;
+  let dynamicExtensions: Extension[] = $derived(
+    [
+      getEditorTheme({ isDark: $useDarkMode }),
+      getActionsTheme({ hasActions: copyable || maximizable }),
+      EditorState.readOnly.of(!editable),
+      EditorView.editable.of(editable),
+      EditorView.contentAttributes.of({ 'aria-label': label }),
+      getLineBreakExtension(editable),
+      getLanguageExtension(language),
+      !inline ? EditorView.lineWrapping : undefined,
+      !inline && !editable ? foldGutter() : undefined,
+      getHeightTheme({ maxHeight, minHeight, maximized }),
+    ].filter((ext) => ext != null),
+  );
 
-    let parsedData: string;
-    try {
-      parsedData = parseWithBigInt(jsonData);
-    } catch (error) {
-      parsedData = jsonData;
-    }
+  const createView = () =>
+    new EditorView({
+      parent: editorElement,
+      state: EditorState.create({
+        doc: formatContent(language, content, inline),
+        extensions: [staticExtensions, compartment.of(dynamicExtensions)],
+      }),
+      dispatch(transaction, view) {
+        view.update([transaction]);
+        if (transaction.docChanged) {
+          onChange?.(
+            new CustomEvent<string>('change', {
+              detail: view.state.doc.toString(),
+            }),
+          );
+        }
+      },
+    });
 
-    return stringifyWithBigInt(parsedData, undefined, inline ? 0 : 2);
-  };
+  // keep dynamic extensions up to date in codemirror
+  $effect(() => {
+    view?.dispatch({
+      effects: compartment.reconfigure(dynamicExtensions),
+    });
+  });
 
-  const formatValue = ({ value, language }) =>
-    language === 'json' ? formatJSON(value) : value;
-
-  $: value = formatValue({ value: content, language });
-
-  const lineBreakReplacer = EditorView.updateListener.of((update) => {
-    if (editable) return;
-    const newText = update.state.doc.toString().replace(/\\n/g, '\n');
-    if (newText !== update.state.doc.toString()) {
-      update.view.dispatch({
-        changes: { from: 0, to: update.state.doc.length, insert: newText },
+  // reset view if content change
+  $effect(() => {
+    editable;
+    language;
+    content;
+    inline;
+    const doc = view?.state?.doc;
+    if (doc && (!editable || doc.toString() !== content)) {
+      view?.dispatch({
+        changes: {
+          from: 0,
+          to: doc.length,
+          insert: formatContent(language, content, inline),
+        },
       });
     }
   });
 
-  const createEditorView = (isDark: boolean, expanded: boolean): EditorView => {
-    return new EditorView({
-      parent: editor,
-      state: createEditorState(value, isDark, expanded),
-      dispatch(transaction) {
-        view.update([transaction]);
-        if (transaction.docChanged) {
-          dispatch('change', view.state.doc.toString());
-        }
-      },
-    });
-  };
-
-  const createEditorState = (
-    value: string | null | undefined,
-    isDark: boolean,
-    expanded: boolean,
-  ): EditorState => {
-    const extensions = [
-      keymap.of([...standardKeymap, ...historyKeymap]),
-      TEMPORAL_THEME({ isDark, copyable }),
-      syntaxHighlighting(TEMPORAL_SYNTAX, { fallback: true }),
-      indentUnit.of('  '),
-      closeBrackets(),
-      autocompletion(),
-      indentOnInput(),
-      bracketMatching(),
-      EditorState.readOnly.of(!editable),
-      EditorView.editable.of(editable),
-      EditorView.contentAttributes.of({ 'aria-label': label }),
-      lineBreakReplacer,
-    ];
-
-    if (language === 'json') {
-      extensions.push(json());
+  // add tabindex if maximizable, so up/down arrows can scroll
+  $effect(() => {
+    if (maximizable) {
+      view?.scrollDOM?.setAttribute('tabindex', '0');
+    } else {
+      view?.scrollDOM?.removeAttribute('tabindex');
     }
-
-    if (language === 'shell') {
-      extensions.push(StreamLanguage.define(shell));
-    }
-
-    if (!inline) {
-      extensions.push(EditorView.lineWrapping);
-    }
-
-    if (!inline && !editable) {
-      extensions.push(foldGutter());
-    }
-
-    if (minHeight || (maxHeight && !expanded)) {
-      extensions.push(
-        EditorView.theme({
-          '&': {
-            ...(minHeight ? { 'min-height': `${minHeight}px` } : {}),
-            ...(maxHeight ? { 'max-height': `${maxHeight}px` } : {}),
-          },
-        }),
-      );
-      extensions.push(EditorView.contentAttributes.of({ tabindex: '0' }));
-    }
-
-    return EditorState.create({
-      doc: value,
-      extensions,
-    });
-  };
-
-  onMount(() => {
-    createView($useDarkMode, expanded);
-    return () => view?.destroy();
   });
 
-  const createView = (isDark: boolean, expanded) => {
-    if (view) view.destroy();
-    view = createEditorView(isDark, expanded);
+  onMount(() => {
+    view = createView();
+    return () => {
+      view?.destroy();
+    };
+  });
+
+  const onMaximize = (value: boolean) => {
+    maximized = value;
   };
 
-  $: createView($useDarkMode, expanded);
-
-  const resetView = (value = '', format = true) => {
-    const formattedValue = format ? formatValue({ value, language }) : value;
-    view.dispatch({
-      changes: {
-        from: 0,
-        to: view.state.doc.length,
-        insert: formattedValue,
-      },
-    });
-  };
-
-  const setView = () => {
-    if (view && (!editable || view.state.doc.toString() !== content)) {
-      resetView(content);
-    }
-  };
-
-  $: content, language, setView();
-
-  $: expandable = !editable && maxHeight && contentHeight(editor) > maxHeight;
-
-  const contentHeight = (element: HTMLElement) => {
-    const childElement = element?.querySelector('.cm-content') as HTMLElement;
-    if (childElement) {
-      return childElement?.offsetHeight || 0;
-    }
-    return 0;
+  const handleCopy = (e: Event) => {
+    copy(e, content);
   };
 </script>
 
-<div class="relative min-w-[80px] grow">
-  <div
-    bind:this={editor}
-    class={className}
-    class:inline
-    data-testid={$$props.testId}
-    class:editable
-    class:readOnly={!editable}
-    {...$$restProps}
-  ></div>
-  <div class="absolute right-1 top-1 flex items-center">
-    {#if expandable}
-      <ExpandButton class="text-secondary" on:click={handleExpand} {expanded} />
-    {/if}
-    {#if copyable}
-      <CopyButton
-        {copyIconTitle}
-        {copySuccessIconTitle}
-        class="text-secondary"
-        on:click={handleCopy}
-        copied={$copied}
-      />
-    {/if}
-  </div>
+<div class="min-w-[80px] grow">
+  <Maximizable {maximized} {onMaximize} enabled={maximizable}>
+    <div
+      bind:this={editorElement}
+      class={merge('h-full', className)}
+      class:inline
+      data-testid={testId}
+      class:editable
+      class:readOnly={!editable}
+      {...editorProps}
+    ></div>
+
+    {#snippet actions()}
+      {#if copyable}
+        <CopyButton
+          {copyIconTitle}
+          {copySuccessIconTitle}
+          class="m-0 rounded-full text-secondary"
+          on:click={handleCopy}
+          copied={$copied}
+        />
+      {/if}
+    {/snippet}
+  </Maximizable>
 </div>
