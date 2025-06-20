@@ -122,9 +122,9 @@
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
       )}
       class:disabled
-      class:error={$resolvedError}
+      class:error={resolvedError}
       class:noBorder
-      class:invalid={!$resolvedValid}
+      class:invalid={!resolvedValid}
     >
       {#if icon}
         <span class="icon-container">
@@ -146,7 +146,7 @@
         {spellcheck}
         {required}
         {autocomplete}
-        bind:value={$bindableValue}
+        bind:value={bindableValue}
         on:click|stopPropagation
         on:input
         on:keydown|stopPropagation
@@ -156,13 +156,13 @@
         use:callFocus
         data-testid={testId}
         {...$$restProps}
-        {...$resolvedConstraints}
+        {...resolvedConstraints}
       />
       {#if copyable}
         <div class="copy-icon-container">
           <button
             aria-label={copyButtonLabel}
-            on:click={(e) => copy(e, $bindableValue)}
+            on:click={(e) => copy(e, bindableValue)}
           >
             {#if $copied}
               <Icon name="checkmark" />
@@ -175,7 +175,7 @@
         <div class="disabled-icon-container">
           <Icon name="lock" />
         </div>
-      {:else if clearable && $bindableValue}
+      {:else if clearable && bindableValue}
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
@@ -187,10 +187,10 @@
       {#if maxLength && !disabled && !hideCount}
         <span class="count">
           <span
-            class:ok={maxLength - $bindableValue.length > 5}
-            class:warn={maxLength - $bindableValue.length <= 5}
-            class:error={maxLength === $bindableValue.length}
-            >{$bindableValue.length}</span
+            class:ok={maxLength - bindableValue.length > 5}
+            class:warn={maxLength - bindableValue.length <= 5}
+            class:error={maxLength === bindableValue.length}
+            >{bindableValue.length}</span
           >/{maxLength}
         </span>
       {/if}
@@ -205,12 +205,12 @@
 
   <span
     class="hint-text inline-block"
-    class:invalid={!$resolvedValid}
-    class:error={$resolvedError}
-    class:hidden={!$resolvedHintText}
-    role={$resolvedError ? 'alert' : null}
+    class:invalid={!resolvedValid}
+    class:error={resolvedError}
+    class:hidden={!resolvedHintText}
+    role={resolvedError ? 'alert' : null}
   >
-    {$resolvedHintText}
+    {resolvedHintText}
   </span>
 </div>
 
