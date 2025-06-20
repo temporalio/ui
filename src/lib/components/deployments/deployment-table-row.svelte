@@ -40,6 +40,9 @@
     latestBuildId !== rampingBuildId && latestBuildId !== currentBuildId,
   );
   const versionedCurrent = $derived(currentBuildId !== '__unversioned__');
+  const currentLabel = $derived(
+    versionedCurrent ? currentBuildId : translate('deployments.unversioned'),
+  );
 </script>
 
 <tr>
@@ -80,9 +83,7 @@
             </div>
           {/if}
           <div class="flex items-center gap-2">
-            {versionedCurrent
-              ? currentBuildId
-              : translate('deployments.unversioned')}
+            {currentLabel}
             {#if versionedCurrent}
               <DeploymentStatus
                 status="Current"
