@@ -147,7 +147,7 @@ Set these environment variables if you want to change their defaults
 | VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8322 | Build |
 | VITE_MODE | Build target                                                     | development           | Build |
 | UI_SERVER_VERBOSE | Enable verbose output to see Air build logs and server output for debugging | false | Development |
-
+| UI_SERVER_HOT_RELOAD | Enable hot reload using Air                           | false | Development |
 
 ## Releases
 

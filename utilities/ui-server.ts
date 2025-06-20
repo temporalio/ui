@@ -29,10 +29,11 @@ export const createUIServer = async (
 
   // Check for verbose mode via env var or options
   const verbose = options?.verbose ?? process.env.UI_SERVER_VERBOSE === 'true';
+  const hotReload = process.env.UI_SERVER_HOT_RELOAD === 'true';
 
   let uiServerProcess: ReturnType<typeof $>;
 
-  if (env === 'development') {
+  if (hotReload) {
     // Install Air if not already available
     try {
       await $`which air`.quiet();
