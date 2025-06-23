@@ -24,4 +24,6 @@ export const Strings = {
     'You can increase the number of Compatible Version sets via the limit.versionCompatibleSetsPerQueue dynamic config property.',
   'viewing-pinned-build-ids':
     'Viewing workers for pinned Build ID. Go to the Task Queue page to view all workers.',
+  'viewing-auto-upgrade-build-ids':
+    'Viewing workers for current and ramping Build IDs. Go to the Task Queue page to view all workers.',
 } as const;

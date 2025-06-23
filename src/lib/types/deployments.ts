@@ -111,6 +111,11 @@ export interface WorkerDeploymentVersionResponse {
   workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
 }
 
+export const VersioningBehaviorEnum = {
+  Pinned: 'Pinned',
+  AutoUpgrade: 'AutoUpgrade',
+};
+
 export type DeploymentStatus =
   | 'Ramping'
   | 'Current'

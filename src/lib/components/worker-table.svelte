@@ -11,6 +11,7 @@
   import { type GetPollersResponse } from '$lib/services/pollers-service';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { VersioningBehaviorEnum } from '$lib/types/deployments';
   import { formatDate } from '$lib/utilities/format-date';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
@@ -25,15 +26,19 @@
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
 
-  const deploymentVersion = $derived(
+  const workflowDeploymentName = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
+  );
+
+  const workflowDeploymentVersion = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkerDeploymentVersion'
     ],
   );
 
-  const versioningBuildId = $derived(
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ||
-      getBuildIdFromVersion(deploymentVersion),
+  const workflowVersioningBuildId = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ??
+      getBuildIdFromVersion(workflowDeploymentVersion),
   );
 
   const versioningBehavior = $derived(
@@ -42,47 +47,75 @@
     ],
   );
 
-  const pinnedBuildId = $derived(
-    versioningBehavior === 'Pinned' ? versioningBuildId : '',
+  const pinnedBehavior = $derived(
+    versioningBehavior === VersioningBehaviorEnum.Pinned,
+  );
+  const autoUpgradeBehavior = $derived(
+    versioningBehavior === VersioningBehaviorEnum.AutoUpgrade,
   );
 
-  // const autoUpgradeBuildId = $derived(
-  //   versioningBehavior === 'AutoUpgrade' ? versioningBuildId : '',
-  // );
+  const rampingDeployment = $derived(
+    workers?.versioningInfo?.rampingDeploymentVersion?.deploymentName,
+  );
+  const rampingBuildId = $derived(
+    workers?.versioningInfo?.rampingDeploymentVersion?.buildId,
+  );
 
-  const getDeploymentName = (poller) => {
+  const getPollerDeploymentName = (poller) => {
     const deployment =
       poller?.deploymentOptions?.deploymentName ??
       poller?.workerVersionCapabilities?.deploymentSeriesName;
     return deployment ?? '';
   };
 
-  const getDeploymentBuildId = (poller) => {
+  const getPollerBuildId = (poller) => {
     const buildId =
       poller?.deploymentOptions?.buildId ??
       poller?.workerVersionCapabilities?.buildId;
     return buildId ?? '';
   };
 
-  const pollers = $derived(
-    pinnedBuildId
-      ? workers?.pollers?.filter(
-          (p) => getDeploymentBuildId(p) === pinnedBuildId,
-        )
-      : workers?.pollers || [],
+  const pollerHasWorkflowBuildId = $derived(
+    (poller) =>
+      getPollerDeploymentName(poller) === workflowDeploymentName &&
+      getPollerBuildId(poller) === workflowVersioningBuildId,
   );
 
-  $inspect('Workers : ', workers);
-  $inspect('Workflow : ', workflow);
+  const pollerHasRampingBuildId = $derived(
+    (poller) =>
+      getPollerDeploymentName(poller) === rampingDeployment &&
+      getPollerBuildId(poller) === rampingBuildId,
+  );
+
+  const pollers = $derived.by(() => {
+    try {
+      if (pinnedBehavior) {
+        return workers?.pollers?.filter(pollerHasWorkflowBuildId) ?? [];
+      } else if (autoUpgradeBehavior) {
+        return (
+          workers?.pollers?.filter(
+            (p) => pollerHasWorkflowBuildId(p) || pollerHasRampingBuildId(p),
+          ) ?? []
+        );
+      }
+      return workers?.pollers ?? [];
+    } catch (error) {
+      return workers?.pollers ?? [];
+    }
+  });
 </script>
 
 <h2 class="flex items-center gap-2" data-testid="workers">
   {translate('workers.workers')}
   <Badge type="count">{pollers?.length || 0}</Badge>
 </h2>
-{#if pinnedBuildId}
+{#if pinnedBehavior}
   <p>
     {translate('workers.viewing-pinned-build-ids')}
+  </p>
+{:else if autoUpgradeBehavior}
+  <p>
+    {translate('workers.viewing-auto-upgrade-build-ids')}
   </p>
 {/if}
 <Table class="mb-6 w-full min-w-[600px] table-fixed">
@@ -106,8 +139,8 @@
     </th>
   </TableHeaderRow>
   {#each pollers as poller}
-    {@const deployment = getDeploymentName(poller)}
-    {@const buildId = getDeploymentBuildId(poller)}
+    {@const deployment = getPollerDeploymentName(poller)}
+    {@const buildId = getPollerBuildId(poller)}
     <TableRow data-testid="worker-row">
       <td class="text-left" data-testid="worker-identity">
         <p class="select-all">{poller.identity}</p>
