@@ -32,21 +32,27 @@ export function useFormField(options: FormFieldOptions): FormFieldBinding {
       formContext.form.constraints,
       name,
       value,
-      valid,
-      error,
       hintText,
     );
   }
 
-  // Fallback to props when no form context
-  let localValue = $derived(value || '');
+  // Fallback to props when no form context - use $state outside component
+  let bindableValue = $state(value || '');
+
   return {
-    bindableValue: localValue,
+    get bindableValue() {
+      return bindableValue;
+    },
+    set bindableValue(newValue: string) {
+      bindableValue = newValue;
+    },
     resolvedValid: valid,
     resolvedError: error,
     resolvedHintText: hintText,
     resolvedConstraints: null,
-    setValue: (newValue: string) => (localValue = newValue),
+    setValue: (newValue: string) => {
+      bindableValue = newValue;
+    },
   };
 }
 
@@ -56,46 +62,57 @@ function createFormFieldBinding(
   formConstraints: ReturnType<typeof writable>,
   name: string,
   propValue: string,
-  propValid: boolean,
-  propError: boolean,
   propHintText: string,
 ): FormFieldBinding {
-  // Create reactive stores for all resolved values
-  let bindableStore = $state(propValue || '');
-  let resolvedValidStore = $state(propValid);
-  let resolvedErrorStore = $state(propError);
-  let resolvedHintTextStore = $state(propHintText);
-  let resolvedConstraintsStore = $state<Record<string, unknown> | null>(null);
+  // Use $state and $derived for reactive values
+  let bindableValue = $state(propValue || '');
+  let formErrorsSnapshot = $state({});
+  let formConstraintsSnapshot = $state({});
 
-  // Subscribe to form data changes and update bindable store
-  const unsubData = formData.subscribe((val) => {
-    const formValue = val?.[name] ?? '';
-    bindableStore = formValue;
+  // Derived values based on current form state
+  const resolvedValid = $derived(() => {
+    const errorArray = formErrorsSnapshot?.[name];
+    return !errorArray;
   });
 
-  // Subscribe to bindable store changes and update form data
+  const resolvedError = $derived(() => {
+    const errorArray = formErrorsSnapshot?.[name];
+    return !!errorArray;
+  });
+
+  const resolvedHintText = $derived(() => {
+    const errorArray = formErrorsSnapshot?.[name];
+    return errorArray?.[0] || propHintText;
+  });
+
+  const resolvedConstraints = $derived(() => {
+    return formConstraintsSnapshot?.[name] || null;
+  });
+
+  // Subscribe to form data changes and sync with $state
+  const unsubData = formData.subscribe((val) => {
+    const formValue = val?.[name] ?? '';
+    if (bindableValue !== formValue) {
+      bindableValue = formValue;
+    }
+  });
+
+  // Update form data when bindable value changes using $effect
   $effect(() => {
     formData.update((d) => ({
       ...(d as Record<string, unknown>),
-      [name]: bindableStore,
+      [name]: bindableValue,
     }));
   });
 
-  // Subscribe to form errors and update reactive stores
+  // Subscribe to form errors and update $state
   const unsubErrors = formErrors.subscribe((val) => {
-    const errorArray = val?.[name];
-    const hasError = !!errorArray;
-    const hintText = errorArray?.[0] || propHintText;
-
-    resolvedValidStore = !hasError;
-    resolvedErrorStore = hasError;
-    resolvedHintTextStore = hintText;
+    formErrorsSnapshot = val;
   });
 
-  // Subscribe to form constraints
+  // Subscribe to form constraints and update $state
   const unsubConstraints = formConstraints.subscribe((val) => {
-    const constraints = val?.[name] || null;
-    resolvedConstraintsStore = constraints;
+    formConstraintsSnapshot = val;
   });
 
   // Cleanup subscriptions
@@ -107,22 +124,25 @@ function createFormFieldBinding(
 
   return {
     get bindableValue() {
-      return bindableStore;
+      return bindableValue;
+    },
+    set bindableValue(value: string) {
+      bindableValue = value;
     },
     get resolvedValid() {
-      return resolvedValidStore;
+      return resolvedValid();
     },
     get resolvedError() {
-      return resolvedErrorStore;
+      return resolvedError();
     },
     get resolvedHintText() {
-      return resolvedHintTextStore;
+      return resolvedHintText();
     },
     get resolvedConstraints() {
-      return resolvedConstraintsStore;
+      return resolvedConstraints();
     },
     setValue: (value: string) => {
-      bindableStore = value;
+      bindableValue = value;
     },
   };
 }

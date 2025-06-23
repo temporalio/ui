@@ -3,7 +3,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { Form, type SPAFormConfig } from '$lib/holocene/form';
-  import Input from '$lib/holocene/input/input.svelte';
+  import FormInput from '$lib/holocene/form/form-input.svelte';
 
   const userSchema = z.object({
     username: z
@@ -37,8 +37,8 @@
 </script>
 
 <Form {config}>
-  <Input name="username" type="text" label="Username" />
-  <Input name="email" type="email" label="Email" />
+  <FormInput name="username" type="text" label="Username" />
+  <FormInput name="email" type="email" label="Email" />
 
   <Button type="submit">Submit</Button>
 </Form>

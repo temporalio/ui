@@ -11,5 +11,11 @@ export function setFormContext(params: FormContextParams): FormContext {
 }
 
 export function getFormContext(): FormContext | undefined {
-  return getContext(formKey);
+  try {
+    return getContext(formKey);
+  } catch {
+    // getContext throws when called outside component initialization
+    // This is expected in unit tests or when fields are used standalone
+    return undefined;
+  }
 }
