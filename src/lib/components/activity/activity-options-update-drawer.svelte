@@ -7,6 +7,7 @@
   import Drawer from '$lib/holocene/drawer.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
+  import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import { updateActivityOptions } from '$lib/services/workflow-activities-service';
   import { toaster } from '$lib/stores/toaster';
@@ -136,7 +137,7 @@
   id="activity-options-update-drawer"
   dark={false}
   closeButtonLabel={translate('common.close')}
-  class="min-w-[33vw] max-w-[50vw]"
+  class="w-[480px]"
 >
   <DrawerContent title="Update Activity {activity.activityId}">
     <form onsubmit={onUpdate} class="flex flex-col gap-4">
@@ -145,54 +146,85 @@
         label="Heartbeat Timeout Duration"
         bind:value={heartbeatTimeout}
         suffix="seconds"
-        class="xl:w-1/2"
+        class="w-fit"
       />
-      <NumberInput
-        id="retry-backoff-coefficient"
-        label="Retry Backoff Coefficient"
-        bind:value={backoffCoefficient}
-        step={0.01}
-        min={1}
-      />
+      <div>
+        <Label
+          for="retry-backoff-coefficient"
+          label="Retry Backoff Coefficient"
+        />
+        <p class="mb-1 text-xs text-secondary">
+          Coefficient used to calculate the next retry interval. The next retry
+          interval is previous interval multiplied by the coefficient. Must be 1
+          or larger.
+        </p>
+        <NumberInput
+          id="retry-backoff-coefficient"
+          label="Retry Backoff Coefficient"
+          labelHidden
+          bind:value={backoffCoefficient}
+          step={0.01}
+          min={1}
+        />
+      </div>
       <Input
         id="retry-initial-interval"
         label="Retry Initial Interval Duration"
         bind:value={initialInterval}
         suffix="seconds"
-        class="xl:w-1/2"
+        class="w-fit"
       />
       <NumberInput
         id="maximum-attempts"
         label="Retry Maximum Attempts"
         bind:value={maximumAttempts}
       />
-      <Input
-        id="schedule-to-close-timeout"
-        label="Schedule to Close Timeout Duration"
-        bind:value={scheduleToCloseTimeout}
-        suffix="seconds"
-        class="xl:w-1/2"
-      />
+      <div>
+        <Label
+          for="schedule-to-close-timeout"
+          label="Schedule to Close Timeout Duration"
+        />
+        <p class="mb-1 text-xs text-secondary">
+          Limits time an activity task can stay in a task queue before a worker
+          picks it up.
+        </p>
+        <Input
+          id="schedule-to-close-timeout"
+          label="Schedule to Close Timeout Duration"
+          labelHidden
+          bind:value={scheduleToCloseTimeout}
+          suffix="seconds"
+          class="w-fit"
+        />
+      </div>
       <Input
         id="schedule-to-start-timeout"
         label="Schedule to Start Timeout Duration"
         bind:value={scheduleToStartTimeout}
         suffix="seconds"
-        class="xl:w-1/2"
+        class="w-fit"
       />
       <Input
         id="start-to-close-timeout"
         label="Start to Close Timeout Duration"
         bind:value={startToCloseTimeout}
         suffix="seconds"
-        class="xl:w-1/2"
+        class="w-fit"
       />
-      <Input
-        id="task-queue-name"
-        label="Task Queue Name"
-        bind:value={taskQueue}
-        class="xl:w-1/2"
-      />
+      <div>
+        <Label for="task-queue-name" label="Task Queue Name" />
+        <p class="mb-1 text-xs text-secondary">
+          Indicates how long the caller is willing to wait for an activity
+          completion. Limits how long retries will be attempted.
+        </p>
+        <Input
+          id="task-queue-name"
+          label="Task Queue Name"
+          labelHidden
+          bind:value={taskQueue}
+          class="w-fit"
+        />
+      </div>
       <Checkbox
         bind:checked={includeType}
         label={translate('activities.apply-to-all-activity-types', {

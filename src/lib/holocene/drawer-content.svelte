@@ -21,7 +21,7 @@
 
 <style lang="postcss">
   .title-wrapper {
-    @apply flex flex-col justify-center gap-2 px-8 py-4;
+    @apply flex flex-col justify-center gap-2 p-6;
 
     &.bottom {
       @apply items-start;
@@ -33,14 +33,6 @@
   }
 
   .content {
-    @apply whitespace-normal px-8;
-
-    &.right {
-      @apply py-4;
-    }
-
-    &.bottom {
-      @apply py-8;
-    }
+    @apply whitespace-normal px-6 pb-6;
   }
 </style>
