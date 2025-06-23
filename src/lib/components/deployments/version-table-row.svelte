@@ -25,6 +25,8 @@
   };
   let { routingConfig, version, columns }: Props = $props();
 
+  $inspect('RoutingConfig', routingConfig);
+  $inspect('version', version);
   const isCurrent = $derived(version.version === routingConfig.currentVersion);
   const isRamping = $derived(version.version === routingConfig.rampingVersion);
   const drainageStatus = $derived(

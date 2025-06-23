@@ -9,7 +9,6 @@ export interface DeploymentVersionParameters {
   namespace: string;
   version: string;
 }
-
 interface WorkerDeploymentVersion {
   buildId: string;
   deploymentName: string;

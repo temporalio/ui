@@ -46,6 +46,10 @@
     versioningBehavior === 'Pinned' ? versioningBuildId : '',
   );
 
+  // const autoUpgradeBuildId = $derived(
+  //   versioningBehavior === 'AutoUpgrade' ? versioningBuildId : '',
+  // );
+
   const getDeploymentName = (poller) => {
     const deployment =
       poller?.deploymentOptions?.deploymentName ??
@@ -67,6 +71,9 @@
         )
       : workers?.pollers || [],
   );
+
+  $inspect('Workers : ', workers);
+  $inspect('Workflow : ', workflow);
 </script>
 
 <h2 class="flex items-center gap-2" data-testid="workers">
