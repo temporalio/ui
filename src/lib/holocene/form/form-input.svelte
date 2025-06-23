@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
+
   import type { IconName } from '$lib/holocene/icon';
   import Input from '$lib/holocene/input/input.svelte';
 
@@ -37,8 +39,8 @@
     class?: string;
 
     // Snippet props for slots
-    'before-input'?: import('svelte').Snippet<[{ disabled: boolean }]>;
-    'after-input'?: import('svelte').Snippet<[{ disabled: boolean }]>;
+    'before-input'?: Snippet<[{ disabled: boolean }]>;
+    'after-input'?: Snippet<[{ disabled: boolean }]>;
   }
 
   let {
