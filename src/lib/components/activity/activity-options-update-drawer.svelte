@@ -10,6 +10,7 @@
   import { translate } from '$lib/i18n/translate';
   import { updateActivityOptions } from '$lib/services/workflow-activities-service';
   import { toaster } from '$lib/stores/toaster';
+  import { refresh } from '$lib/stores/workflow-run';
   import type { ActivityOptions } from '$lib/types';
   import type { PendingActivity } from '$lib/types/events';
 
@@ -93,6 +94,7 @@
         type: includeType ? type : undefined,
         activityOptions,
       });
+      $refresh = Date.now();
       toaster.push({
         variant: 'success',
         message: `Options for Activity ${id} have been updated.`,
@@ -114,6 +116,7 @@
         type: includeType ? type : undefined,
         activityOptions: { ...activity.activityOptions },
       });
+      $refresh = Date.now();
       toaster.push({
         variant: 'success',
         message: `Options for Activity ${id} have been reset to original values.`,
