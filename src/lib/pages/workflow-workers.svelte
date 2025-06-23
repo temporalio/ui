@@ -14,14 +14,15 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <h2 data-testid="task-queue-name">
-    {translate('common.task-queue')}:
-    <Link
-      href={routeForTaskQueue({
-        namespace,
-        queue: taskQueue,
-      })}>{taskQueue}</Link
-    >
-  </h2>
-  <WorkerTable {workers} />
+  <WorkerTable {workers}>
+    <p data-testid="task-queue-name">
+      {translate('common.task-queue')}:
+      <Link
+        href={routeForTaskQueue({
+          namespace,
+          queue: taskQueue,
+        })}>{taskQueue}</Link
+      >
+    </p>
+  </WorkerTable>
 </section>

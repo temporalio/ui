@@ -16,10 +16,10 @@ export const getDeploymentFromVersion = (
   version: string | undefined,
 ): string => {
   if (!version) return '';
-  const newDelimiter = version.split(':')[0];
-  if (newDelimiter) return newDelimiter;
-  const oldDelimiter = version.split('.')[0];
-  if (oldDelimiter) return oldDelimiter;
+  const newDelimiter = version.split(':');
+  if (newDelimiter && newDelimiter.length === 2) return newDelimiter[0];
+  const oldDelimiter = version.split('.');
+  if (oldDelimiter && oldDelimiter.length === 2) return oldDelimiter[0];
   return version;
 };
 

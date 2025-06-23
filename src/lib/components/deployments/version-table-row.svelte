@@ -29,9 +29,6 @@
   };
   let { routingConfig, version, columns }: Props = $props();
 
-  $inspect('RoutingConfig', routingConfig);
-  $inspect('version', version);
-
   const currentDeploymentName = $derived(
     routingConfig.currentDeploymentVersion?.deploymentName,
   );
