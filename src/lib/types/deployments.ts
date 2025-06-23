@@ -9,7 +9,7 @@ export interface DeploymentVersionParameters {
   namespace: string;
   version: string;
 }
-interface WorkerDeploymentVersion {
+export interface WorkerDeploymentVersion {
   buildId: string;
   deploymentName: string;
 }
@@ -41,7 +41,7 @@ export interface ListWorkerDeploymentsResponse {
 export function isVersionSummaryNew(
   version: VersionSummary,
 ): version is VersionSummaryNew {
-  return 'status' in version;
+  return 'deploymentVersion' in version;
 }
 
 export type VersionSummary = VersionSummaryOld | VersionSummaryNew;
