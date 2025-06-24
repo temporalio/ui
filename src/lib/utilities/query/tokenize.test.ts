@@ -159,7 +159,12 @@ describe('tokenize', () => {
   });
 
   it('should tokenize the startsWithInQuery for values with IS conditional in them', () => {
-    const query = '`WorkflowType` STARTS_WITH "Issue"';
+    const query = '`WorkflowType` STARTS_WITH "issue"';
     expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'issue']);
+  });
+
+  it('should tokenize the startsWithInQuery for values with JOIN conditional in them', () => {
+    const query = '`WorkflowType` STARTS_WITH "Joiner"';
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Joiner']);
   });
 });
