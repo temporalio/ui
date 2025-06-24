@@ -4,11 +4,14 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
+  import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
+  import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import {
     routeForTaskQueue,
     routeForWorkerDeployment,
@@ -62,6 +65,14 @@
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ],
+  );
+
+  const workflowCompletedTasks = $derived(
+    $fullEventHistory.filter(isWorkflowTaskCompletedEvent),
+  );
+
+  const { sdk, version: sdkVersion } = $derived(
+    getSDKandVersion(workflowCompletedTasks),
   );
 
   const fetchLatestRun = async () => {
@@ -201,9 +212,11 @@
       <DetailListTextValue text={workflow?.stateTransitionCount} />
     {/if}
 
-    <DetailListLabel>SDK</DetailListLabel>
-    <DetailListValue>
-      <SdkLogo />
-    </DetailListValue>
+    {#if sdk && sdkVersion}
+      <DetailListLabel>SDK</DetailListLabel>
+      <DetailListValue>
+        <SdkLogo {sdk} version={sdkVersion} />
+      </DetailListValue>
+    {/if}
   </DetailListColumn>
 </DetailList>
