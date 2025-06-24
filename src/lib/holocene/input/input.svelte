@@ -206,7 +206,7 @@
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
+    @apply block h-full w-fit text-nowrap border-r border-subtle px-4 py-2 text-secondary;
   }
 
   .suffix {

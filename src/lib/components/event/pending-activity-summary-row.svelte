@@ -103,11 +103,14 @@
         {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}
         {#if event.attempt > 1}
-          • {translate('workflows.next-retry')}
-          {toTimeDifference({
+          {@const timeDifference = toTimeDifference({
             date: event.scheduledTime,
-            negativeDefault: 'None',
+            negativeDefault: '',
           })}
+          {#if timeDifference}
+            • {translate('workflows.next-retry')}
+            {timeDifference}
+          {/if}
         {/if}
       </Badge>
       <EventDetailsRow

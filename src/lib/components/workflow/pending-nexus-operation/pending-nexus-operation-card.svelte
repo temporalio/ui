@@ -47,7 +47,13 @@
       {/if}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if operation.nextAttemptScheduleTime}
-        {@render detail(translate('workflows.next-retry'), nextRetry)}
+        {@const timeDifference = toTimeDifference({
+          date: operation.nextAttemptScheduleTime,
+          negativeDefault: '',
+        })}
+        {#if timeDifference}
+          {@render nextRetry(timeDifference)}
+        {/if}
       {/if}
       {#if operation.lastAttemptCompleteTime}
         {@render detail(
@@ -113,18 +119,18 @@
   </div>
 </div>
 
-{#snippet nextRetry()}
-  <div class="flex items-center gap-1">
-    {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
-      relative: $relativeTime,
-      relativeLabel: '',
-    })}
-    <strong
-      >({toTimeDifference({
-        date: operation.nextAttemptScheduleTime,
-        negativeDefault: translate('workflows.no-retry'),
-      })})</strong
-    >
+{#snippet nextRetry(timeDifference)}
+  <div class="flex items-start gap-2">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {translate('workflows.next-retry')}
+    </p>
+    <p class="flex w-full items-center gap-1 whitespace-pre-line">
+      {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
+        relative: $relativeTime,
+        relativeLabel: '',
+      })}
+      <strong>({timeDifference})</strong>
+    </p>
   </div>
 {/snippet}
 

@@ -222,11 +222,14 @@
           {#if hasPendingActivity}
             / {hasPendingActivity.maximumAttempts || '∞'}
             {#if pendingAttempt > 1}
-              • {translate('workflows.next-retry')}
-              {toTimeDifference({
+              {@const timeDifference = toTimeDifference({
                 date: hasPendingActivity.scheduledTime,
-                negativeDefault: 'None',
+                negativeDefault: '',
               })}
+              {#if timeDifference}
+                • {translate('workflows.next-retry')}
+                {timeDifference}
+              {/if}
             {/if}
           {/if}
         </Badge>

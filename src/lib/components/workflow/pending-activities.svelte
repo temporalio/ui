@@ -104,17 +104,20 @@
                     </Badge>
                   </div>
                   {#if failed && pendingActivity.scheduledTime}
-                    <div class="pending-activity-detail">
-                      <h4 class="pending-activity-detail-header">
-                        {translate('workflows.next-retry')}
-                      </h4>
-                      <Badge type={failed ? 'danger' : undefined}>
-                        {toTimeDifference({
-                          date: pendingActivity.scheduledTime,
-                          negativeDefault: 'None',
-                        })}
-                      </Badge>
-                    </div>
+                    {@const timeDifference = toTimeDifference({
+                      date: pendingActivity.scheduledTime,
+                      negativeDefault: '',
+                    })}
+                    {#if timeDifference}
+                      <div class="pending-activity-detail">
+                        <h4 class="pending-activity-detail-header">
+                          {translate('workflows.next-retry')}
+                        </h4>
+                        <Badge type={failed ? 'danger' : undefined}>
+                          {timeDifference}
+                        </Badge>
+                      </div>
+                    {/if}
                   {/if}
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">

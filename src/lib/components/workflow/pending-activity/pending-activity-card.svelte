@@ -78,7 +78,13 @@
       {/if}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
-        {@render detail(translate('workflows.next-retry'), nextRetry)}
+        {@const timeDifference = toTimeDifference({
+          date: activity.scheduledTime,
+          negativeDefault: '',
+        })}
+        {#if timeDifference}
+          {@render nextRetry(timeDifference)}
+        {/if}
       {/if}
       <!-- {@render detail(translate('workflows.activity-id'), activity.activityId)} -->
       {#if activity.lastAttemptCompleteTime}
@@ -150,7 +156,7 @@
 </div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flitems-start flex gap-2">
+  <div class="flex items-start gap-2">
     <p class="min-w-56 text-sm text-secondary/80">
       {label}
     </p>
@@ -217,18 +223,18 @@
   </Accordion>
 {/snippet}
 
-{#snippet nextRetry()}
-  <div class="flex items-center gap-1">
-    {formatDate(activity.scheduledTime, $timeFormat, {
-      relative: $relativeTime,
-      relativeLabel: '',
-    })}
-    <strong
-      >({toTimeDifference({
-        date: activity.scheduledTime,
-        negativeDefault: translate('workflows.no-retry'),
-      })})</strong
-    >
+{#snippet nextRetry(timeDifference)}
+  <div class="flex items-start gap-2">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {translate('workflows.next-retry')}
+    </p>
+    <p class="flex w-full items-center gap-1 whitespace-pre-line">
+      {formatDate(activity.scheduledTime, $timeFormat, {
+        relative: $relativeTime,
+        relativeLabel: '',
+      })}
+      <strong>({timeDifference})</strong>
+    </p>
   </div>
 {/snippet}
 
