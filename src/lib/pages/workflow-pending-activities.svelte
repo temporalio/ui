@@ -2,7 +2,9 @@
   import PendingActivityCard from '$lib/components/workflow/pending-activity/pending-activity-card.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
 
   const pendingActivities = $derived(
     $workflowRun.workflow?.pendingActivities?.sort((a, b) => {
@@ -12,13 +14,19 @@
       return parseInt(a.activityId) - parseInt(b.activityId);
     }) || [],
   );
+  const scheduledEvents = $derived(
+    $fullEventHistory.filter(isActivityTaskScheduledEvent),
+  );
 </script>
 
 <div class="pb-16">
   {#if pendingActivities.length}
     <div class="flex flex-col gap-4">
       {#each pendingActivities as activity (activity.id)}
-        <PendingActivityCard {activity} />
+        {@const scheduledEvent = scheduledEvents.find(
+          (event) => event.id === activity.activityId,
+        )}
+        <PendingActivityCard {activity} {scheduledEvent} />
       {/each}
     </div>
   {:else}

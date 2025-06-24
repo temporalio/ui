@@ -13,13 +13,17 @@
   import { toaster } from '$lib/stores/toaster';
   import { refresh } from '$lib/stores/workflow-run';
   import type { ActivityOptions } from '$lib/types';
-  import type { PendingActivity } from '$lib/types/events';
+  import type {
+    ActivityTaskScheduledEvent,
+    PendingActivity,
+  } from '$lib/types/events';
 
   type Props = {
     open: boolean;
     namespace: string;
     execution: WorkflowExecution;
     activity: PendingActivity;
+    scheduledEvent: ActivityTaskScheduledEvent;
   };
 
   const fromDurationToNumber = (duration) => {
@@ -35,7 +39,13 @@
     return duration + 's';
   };
 
-  let { open = $bindable(), namespace, execution, activity }: Props = $props();
+  let {
+    open = $bindable(),
+    namespace,
+    execution,
+    activity,
+    scheduledEvent,
+  }: Props = $props();
   let { activityId: id, activityType: type } = $derived(activity);
   let taskQueue = $state(activity.activityOptions?.taskQueue?.name);
   let scheduleToCloseTimeout = $state(
@@ -109,13 +119,20 @@
 
   const resetOriginalValues = async () => {
     try {
-      // TODO: Get original values from the activity scheduled event
+      const originalActivityOptions: ActivityOptions = {};
+      Object.keys(activity.activityOptions).forEach((key) => {
+        const newValue =
+          scheduledEvent.activityTaskScheduledEventAttributes[key];
+        if (newValue !== undefined) {
+          originalActivityOptions[key] = newValue;
+        }
+      });
       await updateActivityOptions({
         namespace,
         execution,
         id: includeType ? undefined : id,
         type: includeType ? type : undefined,
-        activityOptions: { ...activity.activityOptions },
+        activityOptions: originalActivityOptions,
       });
       $refresh = Date.now();
       toaster.push({
