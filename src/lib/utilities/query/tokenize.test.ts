@@ -13,7 +13,6 @@ const valuesWithSpacesQuery =
   '`Custom Key Word`="Hello there world" AND `WorkflowId`="one and two = three" OR `WorkflowType`="example=\'one\'"';
 const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
 const startsWithQuery = '`WorkflowType` STARTS_WITH "Hello"';
-const startsWithInQuery = '`WorkflowType` STARTS_WITH "Inspect"';
 
 describe('tokenize', () => {
   it('should eliminate spaces', () => {
@@ -154,9 +153,13 @@ describe('tokenize', () => {
     expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Hello']);
   });
 
-  it('should tokenize the startsWithQuery', () => {
-    const query = startsWithInQuery;
-
+  it('should tokenize the startsWithInQuery for values with IN conditional in them', () => {
+    const query = '`WorkflowType` STARTS_WITH "Inspect"';
     expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Inspect']);
+  });
+
+  it('should tokenize the startsWithInQuery for values with IS conditional in them', () => {
+    const query = '`WorkflowType` STARTS_WITH "Issue"';
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'issue']);
   });
 });
