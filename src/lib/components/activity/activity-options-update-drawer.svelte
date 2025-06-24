@@ -48,27 +48,66 @@
   }: Props = $props();
   let { activityId: id, activityType: type } = $derived(activity);
   let taskQueue = $state(activity.activityOptions?.taskQueue?.name);
+  let originalTaskQueue = $derived(
+    scheduledEvent?.activityTaskScheduledEventAttributes?.taskQueue?.name,
+  );
   let scheduleToCloseTimeout = $state(
     fromDurationToNumber(activity?.activityOptions?.scheduleToCloseTimeout),
+  );
+  let originalScheduleToCloseTimeout = $derived(
+    fromDurationToNumber(
+      scheduledEvent?.activityTaskScheduledEventAttributes
+        ?.scheduleToCloseTimeout,
+    ),
   );
   let scheduleToStartTimeout = $state(
     fromDurationToNumber(activity?.activityOptions?.scheduleToStartTimeout),
   );
+  let originalScheduleToStartTimeout = $derived(
+    fromDurationToNumber(
+      scheduledEvent?.activityTaskScheduledEventAttributes
+        ?.scheduleToStartTimeout,
+    ),
+  );
   let startToCloseTimeout = $state(
     fromDurationToNumber(activity?.activityOptions?.startToCloseTimeout),
+  );
+  let originalStartToCloseTimeout = $derived(
+    fromDurationToNumber(
+      scheduledEvent?.activityTaskScheduledEventAttributes?.startToCloseTimeout,
+    ),
   );
   let heartbeatTimeout = $state(
     fromDurationToNumber(activity?.activityOptions?.heartbeatTimeout),
   );
+  let originalHeartbeatTimeout = $derived(
+    fromDurationToNumber(
+      scheduledEvent?.activityTaskScheduledEventAttributes?.heartbeatTimeout,
+    ),
+  );
   let maximumAttempts = $state(
     activity?.activityOptions?.retryPolicy?.maximumAttempts,
+  );
+  let originalMaximumAttempts = $derived(
+    scheduledEvent?.activityTaskScheduledEventAttributes?.retryPolicy
+      ?.maximumAttempts,
   );
   let backoffCoefficient = $state(
     activity?.activityOptions?.retryPolicy?.backoffCoefficient,
   );
+  let originalBackoffCoefficient = $derived(
+    scheduledEvent?.activityTaskScheduledEventAttributes?.retryPolicy
+      ?.backoffCoefficient,
+  );
   let initialInterval = $state(
     fromDurationToNumber(
       activity?.activityOptions?.retryPolicy?.initialInterval,
+    ),
+  );
+  let originalInitialInterval = $derived(
+    fromDurationToNumber(
+      scheduledEvent?.activityTaskScheduledEventAttributes?.retryPolicy
+        ?.initialInterval,
     ),
   );
   let maximumInterval = $state(
@@ -76,9 +115,15 @@
       activity?.activityOptions?.retryPolicy?.maximumInterval,
     ),
   );
+  let originalMaximumInterval = $derived(
+    fromDurationToNumber(
+      scheduledEvent?.activityTaskScheduledEventAttributes?.retryPolicy
+        ?.maximumInterval,
+    ),
+  );
   let includeType = $state(false);
 
-  const activityOptions = $derived({
+  let activityOptions = $derived({
     taskQueue: { name: taskQueue },
     scheduleToCloseTimeout: fromNumberToDuration(scheduleToCloseTimeout),
     scheduleToStartTimeout: fromNumberToDuration(scheduleToStartTimeout),
@@ -89,6 +134,24 @@
       initialInterval: fromNumberToDuration(initialInterval),
       backoffCoefficient,
       maximumInterval: fromNumberToDuration(maximumInterval),
+    },
+  }) as unknown as ActivityOptions;
+
+  let originalActivityOptions = $derived({
+    taskQueue: { name: originalTaskQueue },
+    scheduleToCloseTimeout: fromNumberToDuration(
+      originalScheduleToCloseTimeout,
+    ),
+    scheduleToStartTimeout: fromNumberToDuration(
+      originalScheduleToStartTimeout,
+    ),
+    startToCloseTimeout: fromNumberToDuration(originalStartToCloseTimeout),
+    heartbeatTimeout: fromNumberToDuration(originalHeartbeatTimeout),
+    retryPolicy: {
+      maximumAttempts: originalMaximumAttempts,
+      initialInterval: fromNumberToDuration(originalInitialInterval),
+      backoffCoefficient: originalBackoffCoefficient,
+      maximumInterval: fromNumberToDuration(originalMaximumInterval),
     },
   }) as unknown as ActivityOptions;
 
@@ -119,14 +182,6 @@
 
   const resetOriginalValues = async () => {
     try {
-      const originalActivityOptions: ActivityOptions = {};
-      Object.keys(activity.activityOptions).forEach((key) => {
-        const newValue =
-          scheduledEvent.activityTaskScheduledEventAttributes[key];
-        if (newValue !== undefined) {
-          originalActivityOptions[key] = newValue;
-        }
-      });
       await updateActivityOptions({
         namespace,
         execution,
@@ -164,6 +219,9 @@
         bind:value={heartbeatTimeout}
         suffix="seconds"
         class="w-fit"
+        prefix={heartbeatTimeout !== originalHeartbeatTimeout
+          ? originalHeartbeatTimeout
+          : undefined}
       />
       <div>
         <Label
@@ -182,6 +240,9 @@
           bind:value={backoffCoefficient}
           step={0.01}
           min={1}
+          prefix={backoffCoefficient !== originalBackoffCoefficient
+            ? String(originalBackoffCoefficient)
+            : undefined}
         />
       </div>
       <Input
@@ -190,11 +251,17 @@
         bind:value={initialInterval}
         suffix="seconds"
         class="w-fit"
+        prefix={initialInterval !== originalInitialInterval
+          ? originalInitialInterval
+          : undefined}
       />
       <NumberInput
         id="maximum-attempts"
         label="Retry Maximum Attempts"
         bind:value={maximumAttempts}
+        prefix={maximumAttempts !== originalMaximumAttempts
+          ? String(originalMaximumAttempts)
+          : undefined}
       />
       <div>
         <Label
@@ -212,6 +279,9 @@
           bind:value={scheduleToCloseTimeout}
           suffix="seconds"
           class="w-fit"
+          prefix={scheduleToCloseTimeout !== originalScheduleToCloseTimeout
+            ? originalScheduleToCloseTimeout
+            : undefined}
         />
       </div>
       <Input
@@ -220,6 +290,9 @@
         bind:value={scheduleToStartTimeout}
         suffix="seconds"
         class="w-fit"
+        prefix={scheduleToStartTimeout !== originalScheduleToStartTimeout
+          ? originalScheduleToStartTimeout
+          : undefined}
       />
       <Input
         id="start-to-close-timeout"
@@ -227,6 +300,9 @@
         bind:value={startToCloseTimeout}
         suffix="seconds"
         class="w-fit"
+        prefix={startToCloseTimeout !== originalStartToCloseTimeout
+          ? originalStartToCloseTimeout
+          : undefined}
       />
       <div>
         <Label for="task-queue-name" label="Task Queue Name" />
@@ -239,7 +315,10 @@
           label="Task Queue Name"
           labelHidden
           bind:value={taskQueue}
-          class="w-fit"
+          class="w-full"
+          hintText={taskQueue !== originalTaskQueue
+            ? originalTaskQueue
+            : undefined}
         />
       </div>
       <Checkbox
