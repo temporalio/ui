@@ -12,6 +12,8 @@ const combinedQuery =
 const valuesWithSpacesQuery =
   '`Custom Key Word`="Hello there world" AND `WorkflowId`="one and two = three" OR `WorkflowType`="example=\'one\'"';
 const keywordListQuery = '`CustomKeywordListField`in("Hello", "World")';
+const startsWithQuery = '`WorkflowType` STARTS_WITH "Hello"';
+const startsWithInQuery = '`WorkflowType` STARTS_WITH "Inspect"';
 
 describe('tokenize', () => {
   it('should eliminate spaces', () => {
@@ -144,5 +146,17 @@ describe('tokenize', () => {
       'AND',
       '2022-04-20T18:09:49-06:00',
     ]);
+  });
+
+  it('should tokenize the startsWithQuery', () => {
+    const query = startsWithQuery;
+
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Hello']);
+  });
+
+  it('should tokenize the startsWithQuery', () => {
+    const query = startsWithInQuery;
+
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Inspect']);
   });
 });

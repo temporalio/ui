@@ -73,6 +73,7 @@ export const tokenize = (string: string): Tokens => {
     }
 
     // Conditional can be up to three characters long (!==)
+    // TODO: Fix for starts_with
     const midConditional = `${string[cursor]}${string[cursor + 1]}`;
     const maxConditional = `${string[cursor]}${string[cursor + 1]}${
       string[cursor + 2]
