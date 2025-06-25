@@ -40,6 +40,8 @@ auth:
         audience: myorg-dev
         organization: org_xxxxxxxxxxxx
         invitation:
+      additionalClaims:
+        group: "local"
 tls:
   caFile:
   certFile:
