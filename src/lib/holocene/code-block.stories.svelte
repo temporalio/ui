@@ -63,19 +63,19 @@
 </script>
 
 <Template id="json" let:args>
-  <CodeBlock language="json" {...args} onChange={action('change')} />
+  <CodeBlock language="json" {...args} onchange={action('change')} />
 </Template>
 
 <Template id="shell" let:args>
-  <CodeBlock language="shell" {...args} onChange={action('change')} />
+  <CodeBlock language="shell" {...args} onchange={action('change')} />
 </Template>
 
 <Template id="text" let:args>
-  <CodeBlock language="text" {...args} onChange={action('change')} />
+  <CodeBlock language="text" {...args} onchange={action('change')} />
 </Template>
 
 <Template let:args>
-  <CodeBlock {...args} onChange={action('change')} />
+  <CodeBlock {...args} onchange={action('change')} />
 </Template>
 
 <Story

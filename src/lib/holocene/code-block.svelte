@@ -30,7 +30,7 @@
     highlightStyles,
   } from '$lib/vendor/codemirror/custom-extensions';
 
-  interface BaseProps extends HTMLAttributes<HTMLDivElement> {
+  interface BaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onchange'> {
     content: string;
     language?: EditorLanguage;
     editable?: boolean;
@@ -43,7 +43,7 @@
     maxHeight?: number;
     label?: string;
     class?: string;
-    onChange?: (event: CustomEvent<string>) => void;
+    onchange?: (text: string) => void;
   }
 
   interface PropsWithCopyable extends BaseProps {
@@ -67,7 +67,7 @@
     minHeight = undefined,
     maxHeight = undefined,
     label = '',
-    onChange = undefined,
+    onchange = undefined,
     ...editorProps
   }: Props = $props();
 
@@ -127,11 +127,7 @@
       dispatch(transaction, view) {
         view.update([transaction]);
         if (transaction.docChanged) {
-          onChange?.(
-            new CustomEvent<string>('change', {
-              detail: view.state.doc.toString(),
-            }),
-          );
+          onchange?.(view.state.doc.toString());
         }
       },
     });

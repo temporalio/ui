@@ -28,8 +28,8 @@
     }
   };
 
-  const handleInputChange = (event: CustomEvent<string>): void => {
-    input = event.detail;
+  const handleInputChange = (text: string): void => {
+    input = text;
   };
 
   const clearValues = () => {
@@ -52,7 +52,7 @@
         {id}
         maxHeight={320}
         content={input}
-        onChange={handleInputChange}
+        onchange={handleInputChange}
         editable={editing}
         copyable={false}
       />
