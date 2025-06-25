@@ -202,11 +202,11 @@
   }
 
   .input {
-    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:outline-none;
+    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:text-brand focus:outline-none;
   }
 
   .prefix {
-    @apply block h-full w-fit text-nowrap border-r border-subtle px-4 py-2 text-secondary;
+    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
   }
 
   .suffix {

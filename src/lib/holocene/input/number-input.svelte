@@ -11,7 +11,6 @@
   export let label: string;
   export let labelHidden = false;
   export let units = '';
-  export let prefix = '';
   export let placeholder = '';
   export let name = id;
   export let disabled = false;
@@ -50,11 +49,9 @@
         <span class="icon-container">
           <Icon name={icon} />
         </span>
-      {:else if prefix}
-        <p class="prefix">{prefix}</p>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-primary focus:outline-none"
+        class="m-2 block w-full bg-transparent text-center text-primary focus:text-brand focus:outline-none"
         type="number"
         {max}
         {min}
@@ -75,7 +72,9 @@
         on:keydown
       />
     </div>
-    <div class="units">{units}</div>
+    {#if units}
+      <div class="units">{units}</div>
+    {/if}
   </div>
 </div>
 {#if !valid && hintText}
@@ -97,10 +96,6 @@
 
   .icon-container {
     @apply ml-2 flex items-center justify-center;
-  }
-
-  .prefix {
-    @apply block h-full w-fit text-nowrap border-r border-subtle px-4 py-2 text-secondary;
   }
 
   .invalid {
