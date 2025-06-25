@@ -38,6 +38,7 @@ import copy from './svg/copy.svelte';
 import creditCard from './svg/credit-card.svelte';
 import descending from './svg/descending.svelte';
 import dollarBadge from './svg/dollar-badge.svelte';
+import dollarInvoice from './svg/dollar-invoice.svelte';
 import download from './svg/download.svelte';
 import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
@@ -166,6 +167,7 @@ export const icons = {
   descending,
   download,
   'dollar-badge': dollarBadge,
+  'dollar-invoice': dollarInvoice,
   drained,
   error,
   exit,

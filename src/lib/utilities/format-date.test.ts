@@ -48,6 +48,12 @@ describe('formatDate', () => {
     );
   });
 
+  it('should format already formatted strings', () => {
+    expect(formatDate('2022-04-13 UTC 16:29:35.63')).toEqual(
+      '2022-04-13 UTC 16:29:35.63',
+    );
+  });
+
   it('should format local time', () => {
     expect(formatDate(date, 'local')).toEqual('2022-04-13 UTC 16:29:35.63');
   });

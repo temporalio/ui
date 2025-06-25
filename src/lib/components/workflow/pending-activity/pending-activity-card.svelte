@@ -5,9 +5,7 @@
 
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -41,17 +39,17 @@
   );
 </script>
 
-<Card
-  class="flex flex-col items-start gap-2 overflow-hidden bg-primary md:flex-row"
+<div
+  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
-  <div class="flex flex-1 flex-col space-y-2 truncate">
-    <div class="flex-1">
-      <div class="flex flex-wrap items-center space-x-3">
-        <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
-        <h4>{activity.activityType}</h4>
-      </div>
+  <div class="flex-1">
+    <div class="flex flex-wrap items-center space-x-3">
+      <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
+      <h4>{activity.activityType}</h4>
     </div>
-    <div class="grid grid-cols-1 gap-2 xl:grid-cols-2">
+  </div>
+  <div class="flex flex-col gap-1 xl:flex-row">
+    <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
@@ -107,75 +105,78 @@
         )}
       {/if}
     </div>
+    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+      {#if failed}
+        {@render failures()}
+      {/if}
+      {#if activity.heartbeatDetails}
+        {@render heartbeat()}
+      {/if}
+    </div>
   </div>
-  <div class="flex w-full flex-col gap-2 md:flex-1">
-    {#if failed}
-      {@render failures()}
-    {/if}
-    {#if activity.heartbeatDetails}
-      {@render detail(translate('workflows.heartbeat-details'), heartbeat)}
-    {/if}
-  </div>
-</Card>
+</div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div>
-    <p class="font-mono text-xs">{label}</p>
-    {#if typeof value === 'string' || typeof value === 'number'}
-      {value}
-    {:else}
-      {@render value?.()}
-    {/if}
+  <div class="flex items-start gap-4">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {label}
+    </p>
+    <p class="w-full whitespace-pre-line">
+      {#if typeof value === 'string' || typeof value === 'number'}
+        {value}
+      {:else}
+        {@render value?.()}
+      {/if}
+    </p>
   </div>
 {/snippet}
 
 {#snippet heartbeat()}
-  <PayloadDecoder
-    value={activity.heartbeatDetails}
-    let:decodedValue
-    key="payloads"
-  >
-    <CodeBlock
-      content={decodedValue}
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    />
-  </PayloadDecoder>
+  <div>
+    <p class="mb-1 text-sm text-secondary/80">
+      {translate('workflows.heartbeat-details')}
+    </p>
+    <PayloadDecoder
+      value={activity.heartbeatDetails}
+      let:decodedValue
+      key="payloads"
+    >
+      <CodeBlock
+        content={decodedValue}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </PayloadDecoder>
+  </div>
 {/snippet}
 
 {#snippet failures()}
-  <Accordion
-    title={activity.lastFailure?.stackTrace
-      ? translate('workflows.last-failure-with-stack-trace')
-      : translate('workflows.last-failure')}
-  >
-    <div class="flex flex-col gap-2">
-      <div class="flex flex-1 flex-col">
-        {#if activity.lastFailure}
-          <p class="font-mono text-xs">{translate('workflows.last-failure')}</p>
-          <CodeBlock
-            class="pb-2"
-            content={stringifyWithBigInt(
-              omit(activity.lastFailure, 'stackTrace'),
-            )}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/if}
-      </div>
-      <div class="flex flex-1 flex-col">
-        {#if activity.lastFailure?.stackTrace}
-          <p class="font-mono text-xs">{translate('common.stack-trace')}</p>
-          <CodeBlock
-            language="text"
-            content={activity.lastFailure.stackTrace}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/if}
-      </div>
+  {#if activity.lastFailure}
+    <div>
+      <p class="mb-1 text-sm text-secondary/80">
+        {translate('workflows.last-failure')}
+      </p>
+      <CodeBlock
+        maxHeight={384}
+        content={stringifyWithBigInt(omit(activity.lastFailure, 'stackTrace'))}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
     </div>
-  </Accordion>
+  {/if}
+  {#if activity.lastFailure?.stackTrace}
+    <div>
+      <p class="mb-1 text-sm text-secondary/80">
+        {translate('common.stack-trace')}
+      </p>
+      <CodeBlock
+        language="text"
+        content={activity.lastFailure.stackTrace}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </div>
+  {/if}
 {/snippet}
 
 {#snippet scheduleEventLink()}
@@ -191,30 +192,32 @@
 {/snippet}
 
 {#snippet nextRetry()}
-  <div class="flex items-center gap-1">
+  <div class="flex flex-wrap items-center gap-1">
     {formatDate(activity.scheduledTime, $timeFormat, {
       relative: $relativeTime,
+      relativeLabel: '',
     })}
     <strong
-      >{toTimeDifference({
+      >({toTimeDifference({
         date: activity.scheduledTime,
         negativeDefault: translate('workflows.no-retry'),
-      })}</strong
+      })})</strong
     >
   </div>
 {/snippet}
 
 {#snippet attempts()}
-  <div class="flex items-center gap-1">
-    <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
+  <div class="flex flex-wrap items-center gap-1">
+    <Badge class="mr-1 text-nowrap" type={failed ? 'danger' : 'default'}>
       <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
-      {activity.attempt} of {formatMaximumAttempts(activity.maximumAttempts)}
+      {activity.attempt ?? 0} of {formatMaximumAttempts(
+        activity.maximumAttempts,
+      )}
     </Badge>
     {#if activity.maximumAttempts}
-      <span class="text-sm text-secondary"
-        >{formatAttemptsLeft(activity.maximumAttempts, activity.attempt)}
-        remaining</span
-      >
+      <p class="text-sm text-secondary">
+        {formatAttemptsLeft(activity.maximumAttempts, activity.attempt)} remaining
+      </p>
     {/if}
   </div>
 {/snippet}

@@ -66,6 +66,9 @@
       'TemporalWorkflowVersioningBehavior'
     ],
   );
+  let totalActions = $derived(
+    $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
+  );
 
   const workflowCompletedTasks = $derived(
     $fullEventHistory.filter(isWorkflowTaskCompletedEvent),
@@ -210,6 +213,11 @@
         >{translate('workflows.state-transitions')}</DetailListLabel
       >
       <DetailListTextValue text={workflow?.stateTransitionCount} />
+    {:else}
+      <DetailListLabel>
+        {translate('workflows.billable-actions')}
+      </DetailListLabel>
+      <DetailListTextValue text={totalActions} />
     {/if}
 
     {#if sdk && sdkVersion}

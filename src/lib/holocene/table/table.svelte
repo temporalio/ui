@@ -45,31 +45,39 @@
   }
 
   table.fancy {
-    @apply surface-primary border-separate border-spacing-0 border border-table;
+    @apply surface-primary border-separate border-spacing-0 border border-subtle;
 
     thead {
-      @apply surface-table;
+      @apply surface-table-header;
 
       :global(th) {
-        @apply border-t border-table p-2 text-off-white;
+        @apply border-b border-subtle p-2 text-sm;
       }
 
       :global(td) {
-        @apply border-t border-table p-2;
+        @apply border-t border-subtle p-2;
 
         &:first-child {
-          @apply border-l border-table;
+          @apply border-l border-subtle;
         }
 
         &:last-child {
-          @apply border-r border-table;
+          @apply border-r border-subtle;
         }
       }
     }
 
     tbody :global {
+      tr:nth-of-type(odd) {
+        @apply surface-background;
+      }
+
+      tr {
+        @apply border-b border-subtle last-of-type:border-0;
+      }
+
       td {
-        @apply border-t border-table p-2 text-sm;
+        @apply p-2 text-sm;
 
         &:first-child:is(.expanded-cell) {
           @apply px-0;
