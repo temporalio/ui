@@ -7,7 +7,6 @@
   interface Props {
     children: Snippet;
     maximized: boolean;
-    onMaximize: (maximized: boolean) => void;
     class?: string;
     enabled?: boolean;
     actions?: Snippet;
@@ -15,8 +14,7 @@
 
   let {
     children,
-    maximized,
-    onMaximize,
+    maximized = $bindable(false),
     class: className = undefined,
     enabled = true,
     actions = undefined,
@@ -24,7 +22,7 @@
 
   let escapeListener = $state((event: KeyboardEvent) => {
     if (event.key === 'Escape') {
-      onMaximize(false);
+      maximized = false;
     }
   });
 
@@ -44,7 +42,7 @@
   });
 
   const handleClick = () => {
-    onMaximize(!maximized);
+    maximized = !maximized;
   };
 
   const handleFocusOut = (event: FocusEvent) => {
@@ -54,7 +52,7 @@
         !(event.relatedTarget instanceof Element) ||
         !event.currentTarget.contains(event.relatedTarget))
     ) {
-      onMaximize(false);
+      maximized = false;
     }
   };
 </script>

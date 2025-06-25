@@ -173,17 +173,13 @@
     };
   });
 
-  const onMaximize = (value: boolean) => {
-    maximized = value;
-  };
-
   const handleCopy = (e: Event) => {
     copy(e, content);
   };
 </script>
 
 <div class="min-w-[80px] grow">
-  <Maximizable {maximized} {onMaximize} enabled={maximizable}>
+  <Maximizable bind:maximized enabled={maximizable}>
     <div
       bind:this={editorElement}
       class={merge('h-full', className)}
