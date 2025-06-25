@@ -30,27 +30,32 @@
     highlightStyles,
   } from '$lib/vendor/codemirror/custom-extensions';
 
-  interface BaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onchange'> {
+  type Override<T, NewT> = Omit<T, keyof NewT> & NewT;
+
+  interface BaseProps
+    extends Override<
+      HTMLAttributes<HTMLDivElement>,
+      { onchange?: (text: string) => void }
+    > {
     content: string;
     language?: EditorLanguage;
     editable?: boolean;
-    copyable?: boolean;
-    copyIconTitle?: string;
-    copySuccessIconTitle?: string;
+    copyable: false;
+    copyIconTitle?: never;
+    copySuccessIconTitle?: never;
     inline?: boolean;
     testId?: string;
     minHeight?: number;
     maxHeight?: number;
     label?: string;
     class?: string;
-    onchange?: (text: string) => void;
   }
 
-  interface PropsWithCopyable extends BaseProps {
-    copyable: true;
-    copyIconTitle: string;
-    copySuccessIconTitle: string;
-  }
+  interface PropsWithCopyable
+    extends Override<
+      BaseProps,
+      { copyable?: true; copyIconTitle?: string; copySuccessIconTitle?: string }
+    > {}
 
   export type Props = BaseProps | PropsWithCopyable;
 
