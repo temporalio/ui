@@ -66,7 +66,7 @@
     {#if enabled}
       <MaximizeButton
         class="m-0 rounded-full text-secondary"
-        onClick={handleClick}
+        onclick={handleClick}
         {maximized}
       />
     {/if}

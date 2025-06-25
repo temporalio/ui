@@ -1,27 +1,24 @@
 <script lang="ts">
-  import type { HTMLButtonAttributes } from 'svelte/elements';
-
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
 
-  interface Props extends HTMLButtonAttributes {
+  interface Props {
     maximized: boolean;
-    onClick: (e: MouseEvent) => void;
+    onclick: (e: MouseEvent) => void;
     class?: string;
     'data-testid'?: string;
     'data-theme'?: string;
   }
 
-  let {
-    maximized,
-    onClick,
-    class: className = undefined,
-    ...restProps
-  }: Props = $props();
+  let { maximized, onclick, class: className = undefined }: Props = $props();
 
-  const iconTitle = $derived(maximized ? 'minimize' : 'expand');
-  const iconName = $derived(maximized ? 'minimize' : 'expand');
+  const minimizeText = translate('common.minimize');
+  const maximizeText = translate('common.maximize');
+
+  const iconTitle = $derived(maximized ? minimizeText : maximizeText);
+  const svgName = $derived(maximized ? 'minimize' : 'expand');
 </script>
 
 <button
@@ -29,8 +26,7 @@
     'surface-interactive-secondary m-1 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
     className,
   )}
-  onclick={onClick}
-  {...restProps}
+  {onclick}
 >
-  <Icon title={iconTitle} name={iconName} />
+  <Icon title={iconTitle} name={svgName} />
 </button>
