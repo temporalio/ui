@@ -79,7 +79,7 @@
       })}
     </p>
   </div>
-  <div class="flex flex-wrap">
+  <div class="flex flex-col gap-1 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
@@ -165,7 +165,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="mb-1 min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -203,7 +203,7 @@
   </div>
   {#if stackTrace}
     <div>
-      <p class="min-w-56 text-sm text-secondary/80">
+      <p class="mb-1 min-w-56 text-sm text-secondary/80">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock

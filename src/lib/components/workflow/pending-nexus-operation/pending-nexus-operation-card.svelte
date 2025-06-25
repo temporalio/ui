@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div class="flex flex-wrap">
+  <div class="flex flex-col gap-1 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if operation.endpoint}
         {@render detail(translate('nexus.endpoint'), operation.endpoint)}
@@ -84,7 +84,7 @@
       {/if}
       {#if operation.blockedReason}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="mb-1 text-sm text-secondary/80">
             {translate('nexus.blocked-reason')}
           </p>
           <CodeBlock
@@ -97,7 +97,7 @@
       {/if}
       {#if Object.keys(operation.cancellationInfo ?? {}).length > 0}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="mb-1 text-sm text-secondary/80">
             {translate('nexus.cancellation-info')}
           </p>
           <CodeBlock
@@ -113,7 +113,7 @@
 </div>
 
 {#snippet nextRetry()}
-  <div class="flex items-center gap-1">
+  <div class="flex flex-wrap items-center gap-1">
     {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
       relative: $relativeTime,
       relativeLabel: '',
@@ -143,7 +143,7 @@
 {/snippet}
 
 {#snippet attempts()}
-  <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
+  <Badge class="text-no-wrap mr-1" type={failed ? 'danger' : 'default'}>
     <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
     {operation.attempt ?? 0}
   </Badge>
@@ -152,7 +152,7 @@
 {#snippet failures()}
   {#if operation.lastAttemptFailure}
     <div>
-      <p class="text-sm text-secondary/80">
+      <p class="mb-1 text-sm text-secondary/80">
         {translate('workflows.last-failure')}
       </p>
       <CodeBlock
@@ -168,7 +168,7 @@
 
   {#if operation.lastAttemptFailure?.stackTrace}
     <div>
-      <p class="text-sm text-secondary/80">
+      <p class="mb-1 text-sm text-secondary/80">
         {translate('common.stack-trace')}
       </p>
       <CodeBlock
