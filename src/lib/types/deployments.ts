@@ -9,8 +9,7 @@ export interface DeploymentVersionParameters {
   namespace: string;
   version: string;
 }
-
-interface WorkerDeploymentVersion {
+export interface WorkerDeploymentVersion {
   buildId: string;
   deploymentName: string;
 }
@@ -42,7 +41,7 @@ export interface ListWorkerDeploymentsResponse {
 export function isVersionSummaryNew(
   version: VersionSummary,
 ): version is VersionSummaryNew {
-  return 'status' in version;
+  return 'deploymentVersion' in version;
 }
 
 export type VersionSummary = VersionSummaryOld | VersionSummaryNew;
@@ -111,6 +110,11 @@ export interface WorkerDeploymentVersionInfo {
 export interface WorkerDeploymentVersionResponse {
   workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
 }
+
+export const VersioningBehaviorEnum = {
+  Pinned: 'Pinned',
+  AutoUpgrade: 'AutoUpgrade',
+};
 
 export type DeploymentStatus =
   | 'Ramping'

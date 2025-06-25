@@ -18,6 +18,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
@@ -213,7 +214,8 @@
         )}
       >
         <Badge type="primary" class="px-2 py-0">
-          {workers?.pollers?.length}
+          {getWorkflowPollersWithVersions(workflow, workers)?.pollers?.length ||
+            0}
         </Badge>
       </Tab>
       <Tab

@@ -7,6 +7,8 @@ import type {
 } from '$lib/types/events';
 import { formatDate } from '$lib/utilities/format-date';
 import { formatDuration } from '$lib/utilities/format-time';
+import { has } from '$lib/utilities/has';
+import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
 const keysToBeFormattedAsTime = [
   'closeTime',
@@ -114,6 +116,17 @@ export function simplifyAttributes<
     if (isDuration(key)) {
       attributes[key] = formatDuration(value);
     }
+
+    if (key === 'versioningBehavior') {
+      attributes[key] = fromScreamingEnum(value, 'VersioningBehavior');
+    }
+  }
+
+  if (
+    has(attributes, 'workerVersion') &&
+    has(attributes, 'deploymentVersion')
+  ) {
+    delete attributes.workerVersion;
   }
 
   return attributes;

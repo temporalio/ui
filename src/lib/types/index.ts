@@ -152,6 +152,7 @@ export type PendingNexusOperationState =
 export type CallbackState = temporal.api.enums.v1.CallbackState;
 export type PendingWorkflowTaskInfo =
   temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
+export type VersioningBehavior = temporal.api.enums.v1.VersioningBehavior;
 
 // temporal.api.enums.v1.ResetReapplyExcludeType
 export enum ResetReapplyExcludeType {

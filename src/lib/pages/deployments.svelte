@@ -60,7 +60,7 @@
           <h1>
             {translate('deployments.worker-deployments')}
           </h1>
-          <Badge class="shrink-0">Pre-Release</Badge>
+          <Badge class="shrink-0">Public Preview</Badge>
         </div>
       </div>
       <tr slot="headers" class="text-left">

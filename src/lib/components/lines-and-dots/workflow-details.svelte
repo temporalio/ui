@@ -10,6 +10,8 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
+  import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
+  import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import {
     routeForTaskQueue,
     routeForWorkerDeployment,
@@ -23,6 +25,7 @@
     DetailListLabel,
     DetailListLinkValue,
     DetailListTextValue,
+    DetailListValue,
   } from '../detail-list';
 
   import SdkLogo from './sdk-logo.svelte';
@@ -65,6 +68,14 @@
   );
   let totalActions = $derived(
     $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
+  );
+
+  const workflowCompletedTasks = $derived(
+    $fullEventHistory.filter(isWorkflowTaskCompletedEvent),
+  );
+
+  const { sdk, version: sdkVersion } = $derived(
+    getSDKandVersion(workflowCompletedTasks),
   );
 
   const fetchLatestRun = async () => {
@@ -208,6 +219,12 @@
       </DetailListLabel>
       <DetailListTextValue text={totalActions} />
     {/if}
-    <SdkLogo />
+
+    {#if sdk && sdkVersion}
+      <DetailListLabel>SDK</DetailListLabel>
+      <DetailListValue>
+        <SdkLogo {sdk} version={sdkVersion} />
+      </DetailListValue>
+    {/if}
   </DetailListColumn>
 </DetailList>

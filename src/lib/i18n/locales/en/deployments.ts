@@ -40,4 +40,5 @@ export const Strings = {
   'last-task': 'Last Task',
   'rollout-id': 'Rollout ID',
   actions: 'Actions',
+  unversioned: 'No Current Version',
 } as const;

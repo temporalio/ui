@@ -12,7 +12,11 @@
     type VersionSummary,
   } from '$lib/types/deployments';
   import { formatDate } from '$lib/utilities/format-date';
-  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
+  import {
+    getBuildIdFromVersion,
+    getDeploymentFromVersion,
+    getDeploymentVersionFromStruct,
+  } from '$lib/utilities/get-deployment-build-id';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
@@ -25,15 +29,41 @@
   };
   let { routingConfig, version, columns }: Props = $props();
 
-  const isCurrent = $derived(version.version === routingConfig.currentVersion);
-  const isRamping = $derived(version.version === routingConfig.rampingVersion);
-  const drainageStatus = $derived(
-    isVersionSummaryNew(version) ? version.status : version.drainageStatus,
+  const currentDeploymentName = $derived(
+    routingConfig.currentDeploymentVersion?.deploymentName,
   );
-  const buildId = $derived(
+  const currentBuildId = $derived(
+    routingConfig.currentDeploymentVersion?.buildId,
+  );
+
+  const rampingDeploymentName = $derived(
+    routingConfig.rampingDeploymentVersion?.deploymentName,
+  );
+  const rampingBuildId = $derived(
+    routingConfig.rampingDeploymentVersion?.buildId,
+  );
+
+  const versionDeploymentName = $derived(
+    isVersionSummaryNew(version)
+      ? version.deploymentVersion.deploymentName
+      : getDeploymentFromVersion(version.version),
+  );
+  const versionBuildId = $derived(
     isVersionSummaryNew(version)
       ? version.deploymentVersion.buildId
       : getBuildIdFromVersion(version.version),
+  );
+
+  const isCurrent = $derived(
+    versionDeploymentName === currentDeploymentName &&
+      versionBuildId === currentBuildId,
+  );
+  const isRamping = $derived(
+    versionDeploymentName === rampingDeploymentName &&
+      versionBuildId === rampingBuildId,
+  );
+  const drainageStatus = $derived(
+    isVersionSummaryNew(version) ? version.status : version.drainageStatus,
   );
   const statusEnum = $derived(
     isVersionSummaryNew(version)
@@ -68,7 +98,7 @@
   {#each columns as { label } (label)}
     {#if label === translate('deployments.build-id')}
       <td class="text-left">
-        {buildId}
+        {versionBuildId}
       </td>
     {:else if label === translate('deployments.status')}
       <td class="text-left">
@@ -97,7 +127,7 @@
           icon="external-link"
           href={routeForWorkflowsWithQuery({
             namespace: $page.params.namespace,
-            query: `TemporalWorkerDeploymentVersion="${version.version}"`,
+            query: `TemporalWorkerDeploymentVersion="${getDeploymentVersionFromStruct(version)}"`,
           })}>{translate('deployments.go-to-workflows')}</Link
         >
       </td>
