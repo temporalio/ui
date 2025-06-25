@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, type Snippet } from 'svelte';
+  import { type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import MaximizeButton from './button.svelte';
@@ -20,26 +20,11 @@
     actions = undefined,
   }: Props = $props();
 
-  let escapeListener = $state((event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
+  let escapeListener = (event: KeyboardEvent) => {
+    if (maximized && event.key === 'Escape') {
       maximized = false;
     }
-  });
-
-  $effect(() => {
-    if (maximized) {
-      document.addEventListener('keydown', escapeListener);
-    } else {
-      document.removeEventListener('keydown', escapeListener);
-    }
-  });
-
-  onMount(() => {
-    // on unmount
-    return () => {
-      document.removeEventListener('keydown', escapeListener);
-    };
-  });
+  };
 
   const handleClick = () => {
     maximized = !maximized;
@@ -56,6 +41,8 @@
     }
   };
 </script>
+
+<svelte:window onkeydown={escapeListener} />
 
 <div
   class={merge(
