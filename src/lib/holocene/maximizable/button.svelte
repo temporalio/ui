@@ -19,6 +19,9 @@
     class: className = undefined,
     ...restProps
   }: Props = $props();
+
+  const iconTitle = $derived(maximized ? 'minimize' : 'expand');
+  const iconName = $derived(maximized ? 'minimize' : 'expand');
 </script>
 
 <button
@@ -29,8 +32,5 @@
   onclick={onClick}
   {...restProps}
 >
-  <Icon
-    title={maximized ? 'minimize' : 'expand'}
-    name={maximized ? 'minimize' : 'expand'}
-  />
+  <Icon title={iconTitle} name={iconName} />
 </button>
