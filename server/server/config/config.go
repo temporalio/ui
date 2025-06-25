@@ -115,6 +115,8 @@ type (
 		CallbackURL string `yaml:"callbackUrl"`
 		// Options added as URL query params when redirecting to auth provider. Can be used to configure custom auth flows such as Auth0 invitation flow.
 		Options map[string]interface{} `yaml:"options"`
+		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
+		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
 	}
 
 	Codec struct {
