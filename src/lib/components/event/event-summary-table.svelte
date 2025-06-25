@@ -36,6 +36,7 @@
   export let loading = false;
   export let compact = false;
   export let minimized = true;
+  export let hoveredEventId: string | null = null;
 
   $: showGraph = !minimized && !compact;
 
