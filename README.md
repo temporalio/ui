@@ -6,6 +6,8 @@ Temporal must be running in development.
 
 Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
 
+Make sure [Corepack](https://pnpm.io/installation#using-corepack) is installed and run `corepack enable pnpm`. 
+
 ### Using Temporal CLI
 
 You can install [Temporal CLI][] using [Homebrew][]:
