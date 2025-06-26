@@ -106,6 +106,7 @@ const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Deployment' },
   { label: 'Deployment Version' },
   { label: 'Versioning Behavior' },
+  { label: 'Change Version' },
 ];
 
 const DEFAULT_AVAILABLE_WORKFLOWS_COLUMNS_CORE: ConfigurableTableHeader[] = [
