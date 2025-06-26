@@ -63,10 +63,11 @@
     index: number;
     compact?: boolean;
     expanded?: boolean;
+    hoveredEventId?: string | undefined;
     onRowClick?: () => void;
   }
 
-  const {
+  let {
     event,
     group,
     initialItem,
@@ -74,6 +75,7 @@
     compact = false,
     expanded: expandedProp = false,
     onRowClick = () => {},
+    hoveredEventId = $bindable(),
   }: Props = $props();
 
   let expanded = $state(expandedProp);
