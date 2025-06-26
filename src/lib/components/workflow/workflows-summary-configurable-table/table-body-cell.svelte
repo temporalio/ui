@@ -191,6 +191,8 @@
       {content && typeof content === 'string'
         ? formatDate(content, $timeFormat, { relative: $relativeTime })
         : ''}
+    {:else if label === 'Change Version'}
+      {workflow.searchAttributes?.indexedFields?.TemporalChangeVersion}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
       {@const content = workflow.searchAttributes.indexedFields[label]}
       {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
