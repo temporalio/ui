@@ -424,3 +424,13 @@
     </td>
   </tr>
 {/if}
+
+<style lang="postcss">
+  tr[data-testid='event-summary-row'].active {
+    @apply bg-slate-800;
+  }
+
+  tr[data-testid='event-summary-row'].active:hover {
+    @apply border-l-4 border-slate-600 bg-slate-300;
+  }
+</style>
