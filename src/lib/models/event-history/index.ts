@@ -99,9 +99,7 @@ export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
     return false;
   };
 
-  // Track workflow task IDs that have already been billed for markers
   const processedWorkflowTaskIds = new Set<string>();
-
   return events.map((event) =>
     toEvent(event, { shouldNotAddBillableAction, processedWorkflowTaskIds }),
   );

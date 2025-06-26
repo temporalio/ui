@@ -23,11 +23,15 @@ export const getEventBillableActions = (
 ): number => {
   try {
     if (isWorkflowExecutionStartedEvent(event)) {
-      // Charge 2 additional for scheduled workflows
-      if (
-        event.attributes?.searchAttributes?.indexedFields?.TemporalScheduledById
-      )
-        return 3;
+      // Charge 2 additional for scheduled workflows if first run
+      const firstRunId = event.attributes?.firstExecutionRunId;
+      const currentRunId = event.attributes?.originalExecutionRunId;
+      const isFirstRun = firstRunId === currentRunId;
+      const isScheduledFirstRun =
+        isFirstRun &&
+        event.attributes?.searchAttributes?.indexedFields
+          ?.TemporalScheduledById;
+      if (isScheduledFirstRun) return 3;
       return 1;
     }
     if (isActivityTaskScheduledEvent(event)) return 1;
@@ -62,15 +66,12 @@ export const getEventBillableActions = (
       const workflowTaskId = event.attributes?.workflowTaskCompletedEventId;
       if (workflowTaskId && processedWorkflowTaskIds) {
         if (processedWorkflowTaskIds.has(String(workflowTaskId))) {
-          // This workflow task already has a billable marker, don't charge for additional ones
           return 0;
         }
-        // First billable marker for this workflow task, mark it as processed
         processedWorkflowTaskIds.add(String(workflowTaskId));
         return 1;
       }
 
-      // Fallback for when no context is provided
       if (workflowTaskId) return 1;
     }
 
