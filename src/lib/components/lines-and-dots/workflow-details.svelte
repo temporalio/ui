@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
@@ -214,9 +215,17 @@
       >
       <DetailListTextValue text={workflow?.stateTransitionCount} />
     {:else}
-      <DetailListLabel>
-        {translate('workflows.billable-actions')}
-      </DetailListLabel>
+      <Tooltip
+        bottomLeft
+        text={translate('workflows.billable-actions-disclaimer')}
+        width={240}
+      >
+        <DetailListLabel
+          href="https://docs.temporal.io/cloud/actions#actions-in-workflows"
+        >
+          {translate('workflows.billable-actions')}
+        </DetailListLabel>
+      </Tooltip>
       <DetailListTextValue text={totalActions} />
     {/if}
 

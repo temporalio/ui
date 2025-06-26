@@ -17,14 +17,21 @@ import {
   isWorkflowTaskCompletedEvent,
 } from '$lib/utilities/is-event-type';
 
-export const getEventBillableActions = (event: WorkflowEvent): number => {
+export const getEventBillableActions = (
+  event: WorkflowEvent,
+  processedWorkflowTaskIds?: Set<string>,
+): number => {
   try {
     if (isWorkflowExecutionStartedEvent(event)) {
-      // Charge 2 additional for scheduled workflows
-      if (
-        event.attributes?.searchAttributes?.indexedFields?.TemporalScheduledById
-      )
-        return 3;
+      // Charge 2 additional for scheduled workflows if first run
+      const firstRunId = event.attributes?.firstExecutionRunId;
+      const currentRunId = event.attributes?.originalExecutionRunId;
+      const isFirstRun = firstRunId === currentRunId;
+      const isScheduledFirstRun =
+        isFirstRun &&
+        event.attributes?.searchAttributes?.indexedFields
+          ?.TemporalScheduledById;
+      if (isScheduledFirstRun) return 3;
       return 1;
     }
     if (isActivityTaskScheduledEvent(event)) return 1;
@@ -54,7 +61,18 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
     if (isMarkerRecordedEvent(event)) {
       const nonBillable = ['core_patch', 'Version'];
       if (nonBillable.includes(event?.attributes?.markerName)) return 0;
-      if (event.attributes?.workflowTaskCompletedEventId) return 1;
+
+      // Check if any other markers are associated with same workflow task. If so, only charge for one marker, not all of them for the workflow task
+      const workflowTaskId = event.attributes?.workflowTaskCompletedEventId;
+      if (workflowTaskId && processedWorkflowTaskIds) {
+        if (processedWorkflowTaskIds.has(String(workflowTaskId))) {
+          return 0;
+        }
+        processedWorkflowTaskIds.add(String(workflowTaskId));
+        return 1;
+      }
+
+      if (workflowTaskId) return 1;
     }
 
     if (isWorkflowTaskFailedEventDueToReset(event)) return 1;
