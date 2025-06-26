@@ -235,6 +235,16 @@
     event.stopPropagation();
     onRowClick();
   };
+  const handleMouseEnter = () => {
+    hoveredEventId = event.id;
+  };
+  const handleMouseLeave = () => {
+    hoveredEventId = undefined;
+  };
+
+  let hasRelatedActivities = (group, hoveredEventId) => {
+    return group?.eventIds?.has(hoveredEventId);
+  };
 
   onMount(async () => {
     if (isLocalActivityMarkerEvent(event)) {
@@ -252,6 +262,9 @@
   id={`${event.id}-${index}`}
   data-eventid={event.id}
   data-testid="event-summary-row"
+  onmouseenter={handleMouseEnter}
+  onmouseleave={handleMouseLeave}
+  class:active={hasRelatedActivities(group, hoveredEventId)}
   onclick={onLinkClick}
 >
   {#if isEventGroup(event)}
