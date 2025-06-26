@@ -9,7 +9,6 @@ import {
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
   isUpsertWorkflowSearchAttributesEvent,
-  isWorkflowExecutionContinuedAsNewEvent,
   isWorkflowExecutionOptionsUpdatedEvent,
   isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionStartedEvent,
@@ -35,7 +34,6 @@ export const getEventBillableActions = (event: WorkflowEvent): number => {
     if (isNexusOperationScheduledEvent(event)) return 1;
     if (isNexusOperationCancelRequestedEvent(event)) return 1;
     if (isWorkflowExecutionUpdateAcceptedEvent(event)) return 1;
-    if (isWorkflowExecutionContinuedAsNewEvent(event)) return 1;
     if (isWorkflowExecutionUpdateRejectedEvent(event)) return 1;
     if (isWorkflowExecutionOptionsUpdatedEvent(event)) return 1;
 
