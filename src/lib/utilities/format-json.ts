@@ -1,15 +1,16 @@
 import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 
-export function formatJSON(jsonData: string, space: 0 | 2): string {
-  if (!jsonData) return;
+export function formatJSON(value: string, space: 0 | 2): string {
+  if (!value) return '';
 
-  let parsedData: string;
+  let result: string = '';
 
   try {
-    parsedData = parseWithBigInt(jsonData);
-  } catch (error) {
-    parsedData = jsonData;
+    const jsonData = parseWithBigInt(value);
+    result = stringifyWithBigInt(jsonData, undefined, space);
+  } catch {
+    result = value;
   }
 
-  return stringifyWithBigInt(parsedData, undefined, space);
+  return result;
 }
