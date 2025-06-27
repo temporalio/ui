@@ -1,0 +1,175 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Markdown } from '@storybook/addon-docs/blocks';
+
+import SearchAttributesForm from './search-attributes-form.stories.svelte';
+
+<Meta of={SearchAttributesForm} />
+
+# SearchAttributesForm Component
+
+A reusable form component for managing custom search attributes with SuperForms and configurable adapters.
+
+## Features
+
+- **Adapter Pattern**: Duck-typed interface allows different implementations (OSS vs Cloud)
+- **SuperForms Integration**: Built-in validation with Zod schema and SuperForms
+- **Comprehensive Error Handling**: Form state management with proper error display
+- **Accessibility**: Full ARIA support and keyboard navigation
+- **Type Safety**: Full TypeScript support with Svelte 5 runes
+
+## Architecture
+
+The component uses a two-part architecture:
+
+1. **Parent Component**: Handles async data loading with `#await` pattern
+2. **Child Component**: Renders the form with SuperForms configuration
+
+## Adapter Pattern
+
+The component uses an adapter pattern to abstract different API implementations:
+
+```typescript
+interface SearchAttributesAdapter {
+  fetchAttributes(): Promise<SearchAttributeDefinition[]>;
+  upsertAttributes(attributes: SearchAttributeDefinition[]): Promise<void>;
+  getSupportedTypes(): SearchAttributeTypeOption[];
+}
+```
+
+## Usage Examples
+
+### Basic Usage
+
+```svelte
+<script lang="ts">
+  import { SearchAttributesForm } from '$lib/components/search-attributes-form';
+  import { DefaultSearchAttributesAdapter } from '$lib/components/search-attributes-form/adapters/default-adapter';
+
+  const adapter = new DefaultSearchAttributesAdapter('my-namespace');
+
+  const handleSave = (attributes) => {
+    console.log('Saved attributes:', attributes);
+  };
+
+  const handleCancel = () => {
+    console.log('Form cancelled');
+  };
+</script>
+
+<SearchAttributesForm {adapter} onSave={handleSave} onCancel={handleCancel} />
+```
+
+### Custom Adapter Implementation
+
+```typescript
+class CloudSearchAttributesAdapter implements SearchAttributesAdapter {
+  namespace: string;
+  apiClient: CloudApiClient;
+
+  constructor(namespace: string, apiClient: CloudApiClient) {
+    this.namespace = namespace;
+    this.apiClient = apiClient;
+  }
+
+  async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
+    return this.apiClient.getSearchAttributes(this.namespace);
+  }
+
+  async upsertAttributes(
+    attributes: SearchAttributeDefinition[],
+  ): Promise<void> {
+    return this.apiClient.updateSearchAttributes(this.namespace, attributes);
+  }
+
+
+  getSupportedTypes(): SearchAttributeTypeOption[] {
+    return [
+      { label: 'Text', value: 'Text' },
+      { label: 'Keyword', value: 'Keyword' },
+      { label: 'Int', value: 'Int' },
+      { label: 'Double', value: 'Double' },
+      { label: 'Bool', value: 'Bool' },
+      { label: 'DateTime', value: 'DateTime' },
+      { label: 'KeywordList', value: 'KeywordList' },
+    ];
+  }
+}
+```
+
+### Integration with SvelteKit
+
+```svelte
+<!-- src/routes/namespaces/[namespace]/search-attributes/+page.svelte -->
+<script lang="ts">
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { SearchAttributesForm } from '$lib/components/search-attributes-form';
+  import { DefaultSearchAttributesAdapter } from '$lib/components/search-attributes-form/adapters/default-adapter';
+
+  const namespace = $page.params.namespace;
+  const adapter = new DefaultSearchAttributesAdapter(namespace);
+
+  const handleSave = (attributes) => {
+    goto(`/namespaces/${namespace}`);
+  };
+
+  const handleCancel = () => {
+    goto(`/namespaces/${namespace}`);
+  };
+</script>
+
+<div class="container mx-auto py-8">
+  <h1 class="mb-6 text-2xl font-bold">
+    Manage Search Attributes for {namespace}
+  </h1>
+
+  <SearchAttributesForm {adapter} onSave={handleSave} onCancel={handleCancel} />
+</div>
+```
+
+## Props
+
+<Markdown>
+  {`
+| Prop       | Type                                                | Default    | Description                           |
+| ---------- | --------------------------------------------------- | ---------- | ------------------------------------- |
+| adapter  | SearchAttributesAdapter                           | Required   | Adapter instance for API operations   |
+| onSave   | (attributes: SearchAttributeDefinition[]) => void | () => {} | Callback fired when form is saved     |
+| onCancel | () => void                                        | () => {} | Callback fired when form is cancelled |
+| class    | string                                            | ''       | Additional CSS classes                |
+  `}
+</Markdown>
+
+## Loading States
+
+The component automatically handles three states:
+
+- **Loading**: Shows skeleton loaders while fetching initial data
+- **Success**: Renders the form with loaded attributes
+- **Error**: Shows detailed error messages with retry functionality
+
+## Error Handling
+
+The component provides comprehensive error handling through SuperForms and the adapter pattern:
+
+- **Form State Management**: Prevents form from getting stuck in "Saving..." state
+- **SuperForms Integration**: Proper error handling with `onUpdate` and `onError` callbacks
+- **User-Friendly Messages**: Automatic conversion of technical errors to readable messages
+- **Form-Level Validation**: Displays validation errors for unique constraints
+- **Field-Level Validation**: Individual field validation with real-time feedback
+- **API Error Display**: Status messages with proper intent styling
+
+## Validation
+
+Form validation is handled by Zod schema with the following rules:
+
+- Attribute names are required (min 1 character)
+- Attribute names must be unique within the form
+- Attribute types must be one of the supported types from the adapter
+
+## Accessibility
+
+- Proper ARIA labels and roles
+- Keyboard navigation support
+- Screen reader friendly error messages
+- Focus management for form interactions

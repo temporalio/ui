@@ -99,6 +99,118 @@ pnpm stylelint:fix     # Fix Stylelint issues
 - **Styling**: Use class-variance-authority (cva) for component variants
 - **Events**: Define custom events with proper typing
 
+### Svelte 5 Runes and Patterns
+
+This project uses Svelte 5 with its new runes system. Follow these patterns:
+
+#### Props and State
+
+```typescript
+// Use $props() for component props
+let { class: className = '', namespace, adapter }: Props = $props();
+
+// Use $state() for reactive local state
+let count = $state(0);
+let user = $state({ name: '', email: '' });
+```
+
+#### Reactive Declarations
+
+```typescript
+// Use $derived() instead of $: for computed values
+const doubleCount = $derived(count * 2);
+const formattedName = $derived(user.name.toUpperCase());
+
+// For complex derivations
+const expensiveCalculation = $derived(() => {
+  return heavyComputation(someValue);
+});
+```
+
+#### Effects
+
+```typescript
+// Use $effect() instead of afterUpdate/beforeUpdate
+$effect(() => {
+  console.log('Count changed:', count);
+  // Cleanup function (optional)
+  return () => cleanup();
+});
+
+// Use $effect.pre() for effects that run before DOM updates
+$effect.pre(() => {
+  measureElement();
+});
+```
+
+#### Rune File Extensions
+
+- **Utilities with runes**: Use `.svelte.ts` extension for utilities that use `$state`, `$derived`, etc.
+- **Regular utilities**: Use `.ts` extension for pure TypeScript utilities
+- **Components**: Always use `.svelte` extension
+
+#### Rune Constraints
+
+- `$state()` can only be used inside `.svelte` and `.svelte.ts` files
+- `$derived()` must be used as a variable declaration initializer or class field
+- `$effect()` runs after DOM updates, `$effect.pre()` runs before
+
+#### Store Integration
+
+When working with Svelte stores in Svelte 5 components:
+
+```typescript
+// Create a bridge utility for stores
+export function storeToState<T>(store: Readable<T>) {
+  let state = $state(/* initial value */);
+
+  $effect(() => {
+    const unsubscribe = store.subscribe((value) => {
+      untrack(() => {
+        state = value;
+      });
+    });
+    return unsubscribe;
+  });
+
+  return { value: state };
+}
+
+// Use in components
+const { form, errors } = $derived(
+  storesToState({
+    form: superFormInstance.form,
+    errors: superFormInstance.errors,
+  }),
+);
+```
+
+#### SuperForms Integration
+
+When using SuperForms with Svelte 5:
+
+```typescript
+// Create SuperForm instance
+const superFormInstance = $derived(
+  superForm(initialData, {
+    // configuration
+  }),
+);
+
+// Convert stores to state for cleaner template usage
+const { form, errors, submitting } = $derived(
+  storesToState({
+    form: superFormInstance.form,
+    errors: superFormInstance.errors,
+    submitting: superFormInstance.submitting,
+  }),
+);
+
+// Use state values in template
+// form.value.fieldName instead of $form.fieldName
+// errors.value.fieldName instead of $errors.fieldName
+```
+
 ### Import Organization
 
 Import order (enforced by ESLint):
