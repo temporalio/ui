@@ -166,6 +166,10 @@ export const variables = {
     dark: 'slate.950',
   },
   '--color-interactive-table-hover': {
+    light: 'indigo.200',
+    dark: 'slate.700',
+  },
+  '--color-surface-table-related-hover': {
     light: 'indigo.100',
     dark: 'slate.900',
   },
