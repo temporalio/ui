@@ -427,10 +427,10 @@
 
 <style lang="postcss">
   tr[data-testid='event-summary-row'].active {
-    @apply surface-table-header;
+    @apply surface-table-related-hover;
   }
 
   tr[data-testid='event-summary-row'].active:hover {
-    @apply surface-interactive;
+    @apply surface-table-header;
   }
 </style>
