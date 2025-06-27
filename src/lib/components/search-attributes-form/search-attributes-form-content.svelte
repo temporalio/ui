@@ -1,5 +1,6 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -35,7 +36,7 @@
     createFormConfig(adapter, onSave, initialAttributes),
   );
 
-  const { form, errors, submitting, message, enhance } =
+  const { form, errors, submitting, message, enhance, tainted, isTainted } =
     $derived(superFormInstance);
 
   const { addAttribute, removeAttribute, handleCancel } = $derived(
@@ -137,10 +138,21 @@
         type="submit"
         variant="primary"
         disabled={$submitting || $form.attributes.length === 0}
+        class="relative"
       >
         {$submitting
           ? translate('search-attributes.saving-button')
           : translate('search-attributes.save-button')}
+        {#if isTainted($tainted)}
+          <Badge
+            class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
+            type="count"
+          >
+            {Object.values($tainted.attributes || {}).filter((attr) =>
+              Object.values(attr).some((value) => value === true),
+            ).length}
+          </Badge>
+        {/if}
       </Button>
 
       <Button
