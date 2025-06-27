@@ -77,19 +77,51 @@
   }: Props = $props();
 
   // codemirror
+
   let editorElement = $state<HTMLElement | undefined>();
   let view = $state<EditorView | undefined>();
 
   // content
+
   const { copy, copied } = copyToClipboard();
-  const formatContent = (
-    language: EditorLanguage,
-    content: string,
-    inline: boolean,
-  ) => (language === 'json' ? formatJSON(content, inline ? 0 : 2) : content);
+
+  const format = (
+    contentToFormat: string,
+    languageFormat: EditorLanguage,
+    inlineFormat: boolean,
+  ) =>
+    languageFormat === 'json'
+      ? formatJSON(contentToFormat, inlineFormat ? 0 : 2)
+      : contentToFormat;
+
+  const getFormattedContent = () => {
+    return format(content, language, inline);
+  };
+
+  const getFormattedDoc = () => {
+    const doc = view?.state?.doc;
+    if (!doc) return '';
+    return format(doc.toString(), language, inline);
+  };
+
+  const replaceContent = (newContent: string) => {
+    const doc = view?.state?.doc;
+    if (!doc) return;
+
+    if (doc.toString() !== newContent) {
+      view?.dispatch({
+        changes: {
+          from: 0,
+          to: doc.length,
+          insert: newContent,
+        },
+      });
+    }
+  };
 
   // ui
-  let maximizable = $derived(
+
+  const maximizable = $derived(
     (maxHeight && view?.contentHeight > maxHeight) ?? false,
   );
   let maximized = $state(false);
@@ -126,40 +158,24 @@
     new EditorView({
       parent: editorElement,
       state: EditorState.create({
-        doc: formatContent(language, content, inline),
+        doc: getFormattedContent(),
         extensions: [staticExtensions, compartment.of(dynamicExtensions)],
       }),
-      dispatch(transaction, view) {
+      dispatch(transaction) {
         view.update([transaction]);
         if (transaction.docChanged) {
-          onchange?.(view.state.doc.toString());
+          onchange?.(getFormattedDoc());
         }
       },
     });
+
+  // lifecycle
 
   // keep dynamic extensions up to date in codemirror
   $effect(() => {
     view?.dispatch({
       effects: compartment.reconfigure(dynamicExtensions),
     });
-  });
-
-  // reset view if content change
-  $effect(() => {
-    editable;
-    language;
-    content;
-    inline;
-    const doc = view?.state?.doc;
-    if (doc && (!editable || doc.toString() !== content)) {
-      view?.dispatch({
-        changes: {
-          from: 0,
-          to: doc.length,
-          insert: formatContent(language, content, inline),
-        },
-      });
-    }
   });
 
   // add tabindex if maximizable, so up/down arrows can scroll
@@ -171,15 +187,43 @@
     }
   });
 
+  // when content prop changes, update the document
+  $effect(() => {
+    content;
+    language;
+    inline;
+    editable;
+    view?.hasFocus;
+
+    const doc = view?.state?.doc;
+    if (!doc) return;
+
+    const userIsEditing = editable && view?.hasFocus;
+
+    if (!userIsEditing) {
+      const formattedContent = getFormattedContent();
+      if (doc.toString() !== formattedContent) {
+        replaceContent(formattedContent);
+      }
+    }
+  });
+
   onMount(() => {
     view = createView();
+    view.contentDOM.onblur = handleEditorBlur;
     return () => {
       view?.destroy();
     };
   });
 
+  // handlers
+
   const handleCopy = (e: Event) => {
-    copy(e, content);
+    copy(e, getFormattedDoc());
+  };
+
+  const handleEditorBlur = () => {
+    replaceContent(getFormattedDoc());
   };
 </script>
 
@@ -193,6 +237,7 @@
       class:editable
       class:readOnly={!editable}
       {...editorProps}
+      onblur={handleEditorBlur}
     ></div>
 
     {#snippet actions()}
