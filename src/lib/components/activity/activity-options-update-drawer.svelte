@@ -214,7 +214,7 @@
         </p>
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-2">
-            <Input
+            <NumberInput
               id="original-heartbeat-timeout"
               label="Original Heartbeat Timeout Duration"
               labelHidden
@@ -282,7 +282,7 @@
         </p>
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-2">
-            <Input
+            <NumberInput
               id="original-retry-initial-interval"
               label="Original Retry Initial Interval Duration"
               labelHidden
@@ -343,7 +343,7 @@
         </p>
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-2">
-            <Input
+            <NumberInput
               id="original-schedule-to-close-timeout"
               label="Orginal Schedule to Close Timeout Duration"
               labelHidden
@@ -379,7 +379,7 @@
         </p>
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-2">
-            <Input
+            <NumberInput
               id="original-schedule-to-start-timeout"
               label="Original Schedule to Start Timeout Duration"
               labelHidden
@@ -414,7 +414,7 @@
         </p>
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex items-center gap-2">
-            <Input
+            <NumberInput
               id="original-start-to-close-timeout"
               label="Original Start to Close Timeout Duration"
               labelHidden
