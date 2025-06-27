@@ -81,7 +81,6 @@ class CloudSearchAttributesAdapter implements SearchAttributesAdapter {
     return this.apiClient.updateSearchAttributes(this.namespace, attributes);
   }
 
-
   getSupportedTypes(): SearchAttributeTypeOption[] {
     return [
       { label: 'Text', value: 'Text' },
