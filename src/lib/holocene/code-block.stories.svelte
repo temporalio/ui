@@ -60,22 +60,27 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+
+  let editableContent = $state(
+    stringifyWithBigInt({ hello: 'world' }, null, 2),
+  );
+
+  const handleEditableChange = (text: string) => {
+    editableContent = text;
+    action('change')(text);
+  };
 </script>
-
-<Template id="json" let:args>
-  <CodeBlock language="json" {...args} onchange={action('change')} />
-</Template>
-
-<Template id="shell" let:args>
-  <CodeBlock language="shell" {...args} onchange={action('change')} />
-</Template>
-
-<Template id="text" let:args>
-  <CodeBlock language="text" {...args} onchange={action('change')} />
-</Template>
 
 <Template let:args>
   <CodeBlock {...args} onchange={action('change')} />
+</Template>
+
+<Template id="editable" let:args>
+  <CodeBlock
+    {...args}
+    content={editableContent}
+    onchange={handleEditableChange}
+  />
 </Template>
 
 <Story
@@ -87,9 +92,9 @@
 
 <Story
   name="Editable"
+  template="editable"
   args={{
     editable: true,
-    content: stringifyWithBigInt({ hello: 'world' }, null, 2),
   }}
 />
 
