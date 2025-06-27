@@ -104,6 +104,7 @@
       <div class="border-t border-subtle pt-4">
         <Button
           variant="secondary"
+          size="sm"
           on:click={addAttribute}
           disabled={$submitting}
         >

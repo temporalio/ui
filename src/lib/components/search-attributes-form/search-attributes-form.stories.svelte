@@ -220,7 +220,7 @@
 
 <Template let:args>
   <div class="space-y-6">
-    <h1 class="text-xl font-bold">
+    <h1 class="text-sm font-medium">
       {translate('search-attributes.story-title', { namespace: 'default' })}
     </h1>
     <SearchAttributesForm {...args} />
