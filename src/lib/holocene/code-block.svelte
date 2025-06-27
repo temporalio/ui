@@ -79,7 +79,7 @@
   // codemirror
 
   let editorElement = $state<HTMLElement | undefined>();
-  let view = $state<EditorView | undefined>();
+  let editorView = $state<EditorView | undefined>();
 
   // content
 
@@ -99,17 +99,17 @@
   };
 
   const getFormattedDoc = () => {
-    const doc = view?.state?.doc;
+    const doc = editorView?.state?.doc;
     if (!doc) return '';
     return format(doc.toString(), language, inline);
   };
 
   const replaceContent = (newContent: string) => {
-    const doc = view?.state?.doc;
+    const doc = editorView?.state?.doc;
     if (!doc) return;
 
     if (doc.toString() !== newContent) {
-      view?.dispatch({
+      editorView?.dispatch({
         changes: {
           from: 0,
           to: doc.length,
@@ -122,7 +122,7 @@
   // ui
 
   const maximizable = $derived(
-    (maxHeight && view?.contentHeight > maxHeight) ?? false,
+    (maxHeight && editorView?.contentHeight > maxHeight) ?? false,
   );
   let maximized = $state(false);
 
@@ -154,7 +154,7 @@
     ].filter((ext) => ext != null),
   );
 
-  const createView = () =>
+  const createEditorView = () =>
     new EditorView({
       parent: editorElement,
       state: EditorState.create({
@@ -162,7 +162,7 @@
         extensions: [staticExtensions, compartment.of(dynamicExtensions)],
       }),
       dispatch(transaction) {
-        view.update([transaction]);
+        editorView.update([transaction]);
         if (transaction.docChanged) {
           onchange?.(getFormattedDoc());
         }
@@ -173,7 +173,7 @@
 
   // keep dynamic extensions up to date in codemirror
   $effect(() => {
-    view?.dispatch({
+    editorView?.dispatch({
       effects: compartment.reconfigure(dynamicExtensions),
     });
   });
@@ -181,9 +181,9 @@
   // add tabindex if maximizable, so up/down arrows can scroll
   $effect(() => {
     if (maximizable) {
-      view?.scrollDOM?.setAttribute('tabindex', '0');
+      editorView?.scrollDOM?.setAttribute('tabindex', '0');
     } else {
-      view?.scrollDOM?.removeAttribute('tabindex');
+      editorView?.scrollDOM?.removeAttribute('tabindex');
     }
   });
 
@@ -193,12 +193,12 @@
     language;
     inline;
     editable;
-    view?.hasFocus;
+    editorView?.hasFocus;
 
-    const doc = view?.state?.doc;
+    const doc = editorView?.state?.doc;
     if (!doc) return;
 
-    const userIsEditing = editable && view?.hasFocus;
+    const userIsEditing = editable && editorView?.hasFocus;
 
     if (!userIsEditing) {
       const formattedContent = getFormattedContent();
@@ -206,14 +206,6 @@
         replaceContent(formattedContent);
       }
     }
-  });
-
-  onMount(() => {
-    view = createView();
-    view.contentDOM.onblur = handleEditorBlur;
-    return () => {
-      view?.destroy();
-    };
   });
 
   // handlers
@@ -225,17 +217,25 @@
   const handleEditorBlur = () => {
     replaceContent(getFormattedDoc());
   };
+
+  onMount(() => {
+    editorView = createEditorView();
+    editorView.contentDOM.onblur = handleEditorBlur;
+    return () => {
+      editorView?.destroy();
+    };
+  });
 </script>
 
 <div class="min-w-[80px] grow">
   <Maximizable bind:maximized enabled={maximizable}>
     <div
       bind:this={editorElement}
-      class={merge('h-full', className)}
       class:inline
-      data-testid={testId}
       class:editable
       class:readOnly={!editable}
+      class={merge('h-full', className)}
+      data-testid={testId}
       {...editorProps}
       onblur={handleEditorBlur}
     ></div>
