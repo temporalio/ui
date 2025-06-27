@@ -6,10 +6,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type {
-    ActivityTaskScheduledEvent,
-    PendingActivity,
-  } from '$lib/types/events';
+  import type { PendingActivity } from '$lib/types/events';
 
   import ActivityOptionsUpdateDrawer from './activity-options-update-drawer.svelte';
   import ActivityPauseConfirmationModal from './activity-pause-confirmation-modal.svelte';
@@ -18,11 +15,10 @@
 
   type Props = {
     activity: PendingActivity;
-    scheduledEvent: ActivityTaskScheduledEvent;
     class?: string;
   };
 
-  let { activity, scheduledEvent, class: className = '' }: Props = $props();
+  let { activity, class: className = '' }: Props = $props();
   const { namespace, workflow, run } = $derived(page.params);
   const execution: WorkflowExecution = $derived({
     workflowId: workflow,
@@ -118,5 +114,4 @@
   {namespace}
   {execution}
   {activity}
-  {scheduledEvent}
 />

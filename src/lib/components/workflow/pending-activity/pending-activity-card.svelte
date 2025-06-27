@@ -13,10 +13,7 @@
   import { translate } from '$lib/i18n/translate';
   import { coreUserStore } from '$lib/stores/core-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import type {
-    ActivityTaskScheduledEvent,
-    PendingActivity,
-  } from '$lib/types/events';
+  import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
   import { formatDate } from '$lib/utilities/format-date';
   import {
@@ -29,11 +26,7 @@
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  let {
-    activity,
-    scheduledEvent,
-  }: { activity: PendingActivity; scheduledEvent: ActivityTaskScheduledEvent } =
-    $props();
+  let { activity }: { activity: PendingActivity } = $props();
   const failed = $derived(activity.attempt > 1);
 
   let coreUser = coreUserStore();
@@ -55,7 +48,7 @@
       <h4>{activity.activityType}</h4>
     </div>
     {#if showActivityCommands}
-      <ActivityCommands {activity} {scheduledEvent} class="justify-end" />
+      <ActivityCommands {activity} class="justify-end" />
     {/if}
   </div>
   <div class="flex flex-1 flex-col gap-2 xl:flex-row">

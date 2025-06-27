@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
-  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
 
   import PendingActivityCard from '../workflow/pending-activity/pending-activity-card.svelte';
   import PendingNexusOperationCard from '../workflow/pending-nexus-operation/pending-nexus-operation-card.svelte';
@@ -24,10 +23,7 @@
 {#if showEventGroup}
   <div class="flex flex-col overflow-hidden">
     {#if group?.pendingActivity}
-      <PendingActivityCard
-        activity={group.pendingActivity}
-        scheduledEvent={group.eventList.find(isActivityTaskScheduledEvent)}
-      />
+      <PendingActivityCard activity={group.pendingActivity} />
     {:else if group?.pendingNexusOperation}
       <PendingNexusOperationCard operation={group.pendingNexusOperation} />
     {/if}
