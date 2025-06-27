@@ -1,6 +1,7 @@
 <script lang="ts">
   import Card from '$lib/holocene/card.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   interface Props {
     class?: string;
@@ -14,8 +15,8 @@
     <div
       class="text-gray-700 grid grid-cols-[1fr_140px_40px] gap-3 border-b border-subtle pb-2 text-sm font-medium"
     >
-      <div>Attribute</div>
-      <div>Type</div>
+      <div>{translate('search-attributes.column-attribute')}</div>
+      <div>{translate('search-attributes.column-type')}</div>
       <div></div>
     </div>
 

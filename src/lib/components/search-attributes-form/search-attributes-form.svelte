@@ -1,5 +1,6 @@
 <script lang="ts">
   import ApiError from '$lib/components/api-error.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { ApiError as ApiErrorType } from '$lib/utilities/api-error-handler';
 
   import type {
@@ -53,6 +54,6 @@
     {retryCount}
     {maxRetries}
     onRetry={retryLoad}
-    title="Failed to Load Search Attributes"
+    title={translate('search-attributes.load-error-title')}
   />
 {/await}

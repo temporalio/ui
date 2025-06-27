@@ -3,6 +3,7 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import type { Meta } from '@storybook/svelte';
 
+  import { translate } from '$lib/i18n/translate';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { createApiError } from '$lib/utilities/api-error-handler';
 
@@ -46,13 +47,34 @@
 
     getSupportedTypes(): SearchAttributeTypeOption[] {
       return [
-        { label: 'Keyword', value: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
-        { label: 'Text', value: SEARCH_ATTRIBUTE_TYPE.TEXT },
-        { label: 'Int', value: SEARCH_ATTRIBUTE_TYPE.INT },
-        { label: 'Double', value: SEARCH_ATTRIBUTE_TYPE.DOUBLE },
-        { label: 'Bool', value: SEARCH_ATTRIBUTE_TYPE.BOOL },
-        { label: 'DateTime', value: SEARCH_ATTRIBUTE_TYPE.DATETIME },
-        { label: 'KeywordList', value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST },
+        {
+          label: translate('search-attributes.type-keyword'),
+          value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        },
+        {
+          label: translate('search-attributes.type-text'),
+          value: SEARCH_ATTRIBUTE_TYPE.TEXT,
+        },
+        {
+          label: translate('search-attributes.type-int'),
+          value: SEARCH_ATTRIBUTE_TYPE.INT,
+        },
+        {
+          label: translate('search-attributes.type-double'),
+          value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+        },
+        {
+          label: translate('search-attributes.type-bool'),
+          value: SEARCH_ATTRIBUTE_TYPE.BOOL,
+        },
+        {
+          label: translate('search-attributes.type-datetime'),
+          value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+        },
+        {
+          label: translate('search-attributes.type-keywordlist'),
+          value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+        },
       ];
     }
   }
@@ -94,13 +116,34 @@
 
     getSupportedTypes(): SearchAttributeTypeOption[] {
       return [
-        { label: 'Keyword', value: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
-        { label: 'Text', value: SEARCH_ATTRIBUTE_TYPE.TEXT },
-        { label: 'Int', value: SEARCH_ATTRIBUTE_TYPE.INT },
-        { label: 'Double', value: SEARCH_ATTRIBUTE_TYPE.DOUBLE },
-        { label: 'Bool', value: SEARCH_ATTRIBUTE_TYPE.BOOL },
-        { label: 'DateTime', value: SEARCH_ATTRIBUTE_TYPE.DATETIME },
-        { label: 'KeywordList', value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST },
+        {
+          label: translate('search-attributes.type-keyword'),
+          value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        },
+        {
+          label: translate('search-attributes.type-text'),
+          value: SEARCH_ATTRIBUTE_TYPE.TEXT,
+        },
+        {
+          label: translate('search-attributes.type-int'),
+          value: SEARCH_ATTRIBUTE_TYPE.INT,
+        },
+        {
+          label: translate('search-attributes.type-double'),
+          value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+        },
+        {
+          label: translate('search-attributes.type-bool'),
+          value: SEARCH_ATTRIBUTE_TYPE.BOOL,
+        },
+        {
+          label: translate('search-attributes.type-datetime'),
+          value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+        },
+        {
+          label: translate('search-attributes.type-keywordlist'),
+          value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+        },
       ];
     }
   }
@@ -134,13 +177,34 @@
 
     getSupportedTypes(): SearchAttributeTypeOption[] {
       return [
-        { label: 'Keyword', value: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
-        { label: 'Text', value: SEARCH_ATTRIBUTE_TYPE.TEXT },
-        { label: 'Int', value: SEARCH_ATTRIBUTE_TYPE.INT },
-        { label: 'Double', value: SEARCH_ATTRIBUTE_TYPE.DOUBLE },
-        { label: 'Bool', value: SEARCH_ATTRIBUTE_TYPE.BOOL },
-        { label: 'DateTime', value: SEARCH_ATTRIBUTE_TYPE.DATETIME },
-        { label: 'KeywordList', value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST },
+        {
+          label: translate('search-attributes.type-keyword'),
+          value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        },
+        {
+          label: translate('search-attributes.type-text'),
+          value: SEARCH_ATTRIBUTE_TYPE.TEXT,
+        },
+        {
+          label: translate('search-attributes.type-int'),
+          value: SEARCH_ATTRIBUTE_TYPE.INT,
+        },
+        {
+          label: translate('search-attributes.type-double'),
+          value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+        },
+        {
+          label: translate('search-attributes.type-bool'),
+          value: SEARCH_ATTRIBUTE_TYPE.BOOL,
+        },
+        {
+          label: translate('search-attributes.type-datetime'),
+          value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+        },
+        {
+          label: translate('search-attributes.type-keywordlist'),
+          value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+        },
       ];
     }
   }
@@ -150,16 +214,15 @@
     component: SearchAttributesForm,
     parameters: {
       layout: 'padded',
-      docs: {
-        page: () => import('./search-attributes-form.mdx'),
-      },
     },
   } satisfies Meta<SearchAttributesForm>;
 </script>
 
 <Template let:args>
   <div class="space-y-6">
-    <h1 class="text-xl font-bold">Custom Search Attributes for default</h1>
+    <h1 class="text-xl font-bold">
+      {translate('search-attributes.story-title', { namespace: 'default' })}
+    </h1>
     <SearchAttributesForm {...args} />
   </div>
 </Template>

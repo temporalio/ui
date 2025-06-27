@@ -1,3 +1,4 @@
+import { translate } from '$lib/i18n/translate';
 import { fetchSearchAttributesForNamespace } from '$lib/services/search-attributes-service';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 import { createApiError } from '$lib/utilities/api-error-handler';
@@ -42,9 +43,7 @@ export class DefaultSearchAttributesAdapter implements SearchAttributesAdapter {
   ): Promise<void> {
     try {
       // TODO: Implement when SDK team adds CRUD endpoints
-      throw new Error(
-        'CRUD operations will be implemented when SDK team adds endpoints',
-      );
+      throw new Error(translate('search-attributes.crud-not-implemented'));
     } catch (error) {
       throw createApiError(error, 'save search attributes');
     }
@@ -53,9 +52,7 @@ export class DefaultSearchAttributesAdapter implements SearchAttributesAdapter {
   async deleteAttribute(_attributeName: string): Promise<void> {
     try {
       // TODO: Implement when SDK team adds CRUD endpoints
-      throw new Error(
-        'CRUD operations will be implemented when SDK team adds endpoints',
-      );
+      throw new Error(translate('search-attributes.crud-not-implemented'));
     } catch (error) {
       throw createApiError(error, 'delete search attribute');
     }
@@ -63,13 +60,34 @@ export class DefaultSearchAttributesAdapter implements SearchAttributesAdapter {
 
   getSupportedTypes(): SearchAttributeTypeOption[] {
     return [
-      { label: 'Keyword', value: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
-      { label: 'Text', value: SEARCH_ATTRIBUTE_TYPE.TEXT },
-      { label: 'Int', value: SEARCH_ATTRIBUTE_TYPE.INT },
-      { label: 'Double', value: SEARCH_ATTRIBUTE_TYPE.DOUBLE },
-      { label: 'Bool', value: SEARCH_ATTRIBUTE_TYPE.BOOL },
-      { label: 'DateTime', value: SEARCH_ATTRIBUTE_TYPE.DATETIME },
-      { label: 'KeywordList', value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST },
+      {
+        label: translate('search-attributes.type-keyword'),
+        value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      },
+      {
+        label: translate('search-attributes.type-text'),
+        value: SEARCH_ATTRIBUTE_TYPE.TEXT,
+      },
+      {
+        label: translate('search-attributes.type-int'),
+        value: SEARCH_ATTRIBUTE_TYPE.INT,
+      },
+      {
+        label: translate('search-attributes.type-double'),
+        value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+      },
+      {
+        label: translate('search-attributes.type-bool'),
+        value: SEARCH_ATTRIBUTE_TYPE.BOOL,
+      },
+      {
+        label: translate('search-attributes.type-datetime'),
+        value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      },
+      {
+        label: translate('search-attributes.type-keywordlist'),
+        value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+      },
     ];
   }
 }

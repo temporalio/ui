@@ -3,6 +3,7 @@ import { zodClient } from 'sveltekit-superforms/adapters';
 import type { SuperFormData } from 'sveltekit-superforms/client';
 import { z } from 'zod';
 
+import { translate } from '$lib/i18n/translate';
 import type { ApiError } from '$lib/utilities/api-error-handler';
 
 import type {
@@ -30,7 +31,9 @@ export const createFormSchema = (supportedTypeValues: string[]) => {
     attributes: z
       .array(
         z.object({
-          name: z.string().min(1, 'Attribute name is required'),
+          name: z
+            .string()
+            .min(1, translate('search-attributes.validation-name-required')),
           type: z.enum(supportedTypeValues as [string, ...string[]]),
         }),
       )
@@ -40,7 +43,7 @@ export const createFormSchema = (supportedTypeValues: string[]) => {
           return names.length === new Set(names).size;
         },
         {
-          message: 'Attribute names must be unique',
+          message: translate('search-attributes.validation-names-unique'),
           path: ['attributes'],
         },
       ),
@@ -70,12 +73,12 @@ export const createFormConfig = (
         try {
           await adapter.upsertAttributes(form.data.attributes);
           onSave(form.data.attributes);
-          return 'Search attributes saved successfully';
+          return translate('search-attributes.save-success');
         } catch (error) {
           // Adapter should return an ApiError with user-friendly message
           const apiError = error as ApiError;
           const errorMessage =
-            apiError.userMessage || 'Failed to save search attributes';
+            apiError.userMessage || translate('search-attributes.save-error');
 
           // Return error result instead of throwing to ensure SuperForms handles it
           throw new Error(errorMessage);
@@ -89,8 +92,8 @@ export const createFormConfig = (
             intent: 'error',
             text:
               result.error?.message ||
-              'An error occurred while saving search attributes',
-            title: 'Error',
+              translate('search-attributes.save-error-generic'),
+            title: translate('search-attributes.error-title'),
           };
         });
       },

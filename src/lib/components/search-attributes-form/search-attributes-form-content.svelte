@@ -6,6 +6,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import type {
     SearchAttributeDefinition,
@@ -48,8 +49,8 @@
       <div
         class="text-gray-700 grid grid-cols-[1fr_140px_40px] gap-3 border-b border-subtle pb-2 text-sm font-medium"
       >
-        <div>Attribute</div>
-        <div>Type</div>
+        <div>{translate('search-attributes.column-attribute')}</div>
+        <div>{translate('search-attributes.column-type')}</div>
         <div></div>
       </div>
 
@@ -57,7 +58,9 @@
         <div class="grid grid-cols-[1fr_140px_40px] items-start gap-3">
           <Input
             id={`attributes-${index}`}
-            label={`Attribute ${index + 1}`}
+            label={translate('search-attributes.attribute-label', {
+              index: index + 1,
+            })}
             labelHidden={true}
             name={`attributes.${index}.name`}
             bind:value={attribute.name}
@@ -69,10 +72,12 @@
 
           <Select
             id={`attributes-${index}-type`}
-            label={`Type for Attribute ${index + 1}`}
+            label={translate('search-attributes.type-label', {
+              index: index + 1,
+            })}
             labelHidden={true}
             name={`attributes.${index}.type`}
-            placeholder="Select type"
+            placeholder={translate('search-attributes.select-type-placeholder')}
             error={$errors.attributes?.[index]?.['type']?.[0]}
             bind:value={attribute.type}
             disabled={$submitting}
@@ -102,14 +107,17 @@
           on:click={addAttribute}
           disabled={$submitting}
         >
-          Add New Custom Search Attribute
+          {translate('search-attributes.add-attribute-button')}
         </Button>
       </div>
     </Card>
 
     <!-- Form-level validation errors -->
     {#if $errors.attributes?.attributes}
-      <Alert intent="error" title="Validation Error">
+      <Alert
+        intent="error"
+        title={translate('search-attributes.validation-error-title')}
+      >
         {#each $errors.attributes.attributes as error}
           <p>{error}</p>
         {/each}
@@ -129,7 +137,9 @@
         variant="primary"
         disabled={$submitting || $form.attributes.length === 0}
       >
-        {$submitting ? 'Saving...' : 'Save'}
+        {$submitting
+          ? translate('search-attributes.saving-button')
+          : translate('search-attributes.save-button')}
       </Button>
 
       <Button
@@ -138,7 +148,7 @@
         on:click={handleCancel}
         disabled={$submitting}
       >
-        Cancel
+        {translate('search-attributes.cancel-button')}
       </Button>
     </div>
   </form>
