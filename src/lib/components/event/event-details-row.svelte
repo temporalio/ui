@@ -65,4 +65,12 @@
   .payload {
     @apply overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs;
   }
+
+  .payload code {
+    @apply text-primary;
+  }
+
+  .payload pre {
+    @apply text-primary;
+  }
 </style>
