@@ -124,6 +124,38 @@ pnpm dev:local-temporal
 temporal operator namespace create default
 ```
 
+## OSS API Development
+
+### Understanding OSS API Endpoints
+
+When developing new features that require API endpoints for the OSS version of Temporal, the available APIs can be found in the [Temporal API repository](https://github.com/temporalio/api). These gRPC APIs are converted to HTTP through the ui-server's gRPC proxy.
+
+**Key Resources:**
+- **API Definitions**: https://github.com/temporalio/api/tree/master/temporal/api
+- **Service Definitions**: Look for `*_service.proto` files for available operations
+- **HTTP Conversion**: The ui-server automatically converts gRPC calls to HTTP endpoints
+
+**Common API Patterns:**
+- **WorkflowService**: `temporal/api/workflowservice/v1/service.proto` - Core workflow operations
+- **OperatorService**: `temporal/api/operatorservice/v1/service.proto` - Administrative operations (search attributes, clusters, etc.)
+- **Endpoint Mapping**: gRPC service methods map to HTTP POST endpoints at `/api/v1/{service}/{method}`
+
+**Example:**
+- gRPC: `temporal.api.operatorservice.v1.OperatorService.ListSearchAttributes`
+- HTTP: `POST /api/v1/operator/list-search-attributes`
+
+**Finding Available Operations:**
+1. Browse the API repository to find relevant service files
+2. Look for existing method definitions in `*_service.proto` files
+3. Check if the operation you need already exists before requesting new endpoints
+4. For new operations, coordinate with the SDK team to add them to the appropriate service
+
+**Development Workflow:**
+1. Check existing API definitions for required operations
+2. Use existing endpoints where possible via services in `src/lib/services/`
+3. For missing endpoints, create adapters with TODO comments (like in `SearchAttributesAdapter`)
+4. Coordinate with SDK team to implement missing gRPC methods
+5. Update adapters once endpoints are available
 
 ## Testing
 We use [Playwright](https://playwright.dev) to interactively test the Temporal UI.
