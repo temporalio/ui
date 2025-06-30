@@ -219,6 +219,7 @@
         bottomLeft
         text={translate('workflows.billable-actions-disclaimer')}
         width={240}
+        class="col-[1]"
       >
         <DetailListLabel
           href="https://docs.temporal.io/cloud/actions#actions-in-workflows"
