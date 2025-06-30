@@ -28,8 +28,8 @@
     </div>
   </div>
 
-  <div class="flex flex-1 flex-col gap-2 xl:flex-row">
-    <div class="w-full overflow-auto xl:w-1/2">
+  <div class="flex flex-1 flex-col gap-4 xl:flex-row">
+    <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if operation.endpoint}
         {@render detail(translate('nexus.endpoint'), operation.endpoint)}
       {/if}
@@ -85,7 +85,7 @@
         )}
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-2 md:flex-1 xl:w-1/2">
+    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
         {@render failures()}
       {/if}
@@ -120,7 +120,7 @@
 </div>
 
 {#snippet nextRetry(timeDifference)}
-  <div class="flex items-start gap-2">
+  <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {translate('workflows.next-retry')}
     </p>
@@ -135,7 +135,7 @@
 {/snippet}
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flex items-start gap-2">
+  <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {label}
     </p>
@@ -162,7 +162,7 @@
       ? translate('workflows.last-failure-with-stack-trace')
       : translate('workflows.last-failure')}
   >
-    <div class="-mt-4 flex flex-col gap-2">
+    <div class="-mt-4 flex flex-col gap-4">
       <div class="flex flex-1 flex-col">
         {#if operation.lastAttemptFailure}
           <p class="text-sm text-secondary/80">
