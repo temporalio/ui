@@ -15,23 +15,15 @@
 
   import SearchAttributesForm from './search-attributes-form.svelte';
 
-  // Mock adapter for testing with data
-  class MockAdapter implements SearchAttributesAdapter {
-    namespace: string;
-    onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
-    onCancel?: () => void;
+  // Mock adapter for testing with data - similar to default adapter pattern
+  const mockAdapter: SearchAttributesAdapter = {
+    onSuccess: (attributes) => {
+      action('onSuccess')(attributes);
+    },
 
-    constructor(
-      namespace: string,
-      callbacks?: {
-        onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
-        onCancel?: () => void;
-      },
-    ) {
-      this.namespace = namespace;
-      this.onSuccess = callbacks?.onSuccess;
-      this.onCancel = callbacks?.onCancel;
-    }
+    onCancel: () => {
+      action('onCancel')();
+    },
 
     async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
       // Simulate API delay
@@ -41,19 +33,19 @@
         { name: 'Amount', type: SEARCH_ATTRIBUTE_TYPE.DOUBLE },
         { name: 'ProcessedAt', type: SEARCH_ATTRIBUTE_TYPE.DATETIME },
       ];
-    }
+    },
 
     async upsertAttributes(
       attributes: SearchAttributeDefinition[],
     ): Promise<void> {
-      action('upsertAttributes')(this.namespace, attributes);
+      action('upsertAttributes')(attributes);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
+    },
 
     async deleteAttribute(attributeName: string): Promise<void> {
-      action('deleteAttribute')(this.namespace, attributeName);
+      action('deleteAttribute')(attributeName);
       await new Promise((resolve) => setTimeout(resolve, 500));
-    }
+    },
 
     getSupportedTypes(): SearchAttributeTypeOption[] {
       return [
@@ -86,26 +78,18 @@
           value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
         },
       ];
-    }
-  }
+    },
+  };
 
   // Mock adapter for error testing
-  class ErrorMockAdapter implements SearchAttributesAdapter {
-    namespace: string;
-    onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
-    onCancel?: () => void;
+  const errorMockAdapter: SearchAttributesAdapter = {
+    onSuccess: (attributes) => {
+      action('onSuccess')(attributes);
+    },
 
-    constructor(
-      namespace: string,
-      callbacks?: {
-        onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
-        onCancel?: () => void;
-      },
-    ) {
-      this.namespace = namespace;
-      this.onSuccess = callbacks?.onSuccess;
-      this.onCancel = callbacks?.onCancel;
-    }
+    onCancel: () => {
+      action('onCancel')();
+    },
 
     async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
       // Simulate API delay
@@ -120,19 +104,19 @@
       networkError.statusText = 'Internal Server Error';
       networkError.response = {};
       throw createApiError(networkError, 'load search attributes');
-    }
+    },
 
     async upsertAttributes(
       attributes: SearchAttributeDefinition[],
     ): Promise<void> {
-      action('upsertAttributes')(this.namespace, attributes);
+      action('upsertAttributes')(attributes);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
+    },
 
     async deleteAttribute(attributeName: string): Promise<void> {
-      action('deleteAttribute')(this.namespace, attributeName);
+      action('deleteAttribute')(attributeName);
       await new Promise((resolve) => setTimeout(resolve, 500));
-    }
+    },
 
     getSupportedTypes(): SearchAttributeTypeOption[] {
       return [
@@ -165,45 +149,37 @@
           value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
         },
       ];
-    }
-  }
+    },
+  };
 
   // Mock adapter for empty state testing
-  class EmptyMockAdapter implements SearchAttributesAdapter {
-    namespace: string;
-    onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
-    onCancel?: () => void;
+  const emptyMockAdapter: SearchAttributesAdapter = {
+    onSuccess: (attributes) => {
+      action('onSuccess')(attributes);
+    },
 
-    constructor(
-      namespace: string,
-      callbacks?: {
-        onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
-        onCancel?: () => void;
-      },
-    ) {
-      this.namespace = namespace;
-      this.onSuccess = callbacks?.onSuccess;
-      this.onCancel = callbacks?.onCancel;
-    }
+    onCancel: () => {
+      action('onCancel')();
+    },
 
     async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 800));
       // Return empty row for proper empty state display
       return [{ name: '', type: SEARCH_ATTRIBUTE_TYPE.KEYWORD }];
-    }
+    },
 
     async upsertAttributes(
       attributes: SearchAttributeDefinition[],
     ): Promise<void> {
-      action('upsertAttributes')(this.namespace, attributes);
+      action('upsertAttributes')(attributes);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
+    },
 
     async deleteAttribute(attributeName: string): Promise<void> {
-      action('deleteAttribute')(this.namespace, attributeName);
+      action('deleteAttribute')(attributeName);
       await new Promise((resolve) => setTimeout(resolve, 500));
-    }
+    },
 
     getSupportedTypes(): SearchAttributeTypeOption[] {
       return [
@@ -236,8 +212,8 @@
           value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
         },
       ];
-    }
-  }
+    },
+  };
 
   export const meta = {
     title: 'Forms/SearchAttributes',
@@ -260,10 +236,7 @@
 <Story
   name="With Existing Attributes"
   args={{
-    adapter: new MockAdapter('default', {
-      onSuccess: action('onSuccess'),
-      onCancel: action('onCancel'),
-    }),
+    adapter: mockAdapter,
   }}
   parameters={{
     docs: {
@@ -278,10 +251,7 @@
 <Story
   name="Empty State"
   args={{
-    adapter: new EmptyMockAdapter('empty', {
-      onSuccess: action('onSuccess'),
-      onCancel: action('onCancel'),
-    }),
+    adapter: emptyMockAdapter,
   }}
   parameters={{
     docs: {
@@ -296,10 +266,7 @@
 <Story
   name="Error State"
   args={{
-    adapter: new ErrorMockAdapter('error-namespace', {
-      onSuccess: action('onSuccess'),
-      onCancel: action('onCancel'),
-    }),
+    adapter: errorMockAdapter,
   }}
   parameters={{
     docs: {
