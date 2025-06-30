@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { page } from '$app/stores';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -113,9 +115,11 @@
             : 'default'}
       >
         <Icon
-          class="mr-1 inline {event.attempt > 1 &&
-            'font-bold text-red-400'} {event.paused &&
-            'font-bold text-yellow-700'}"
+          class={merge(
+            'mr-1 inline',
+            event.attempt > 1 && 'font-bold text-red-400',
+            event.paused && 'font-bold text-yellow-700',
+          )}
           name={event.paused ? 'pause' : 'retry'}
         />
         {translate('workflows.attempt')}

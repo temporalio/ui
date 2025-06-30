@@ -66,7 +66,7 @@ type (
 		HideWorkflowQueryErrors bool `yaml:"hideWorkflowQueryErrors"`
 		// Whether to disable refreshing workflow counts in UI
 		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
-		// Whether to disabled activity commands in the UI
+		// Whether to disable activity commands in the UI
 		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`

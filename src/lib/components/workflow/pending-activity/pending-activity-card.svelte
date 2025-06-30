@@ -42,7 +42,7 @@
 <div
   class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
-  <div class="flex flex-1 justify-between">
+  <div class="flex flex-1 flex-wrap justify-between gap-2">
     <div class="flex flex-wrap items-center space-x-3">
       <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
       <h4>{activity.activityType}</h4>
@@ -234,14 +234,14 @@
 
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
-    <Badge class="mr-1 text-nowrap" type={failed ? 'danger' : 'default'}>
+    <Badge type={failed ? 'danger' : 'default'}>
       <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
       {activity.attempt ?? 0} of {formatMaximumAttempts(
         activity.maximumAttempts,
       )}
     </Badge>
     {#if activity.maximumAttempts}
-      <p class="text-sm text-secondary">
+      <p class="ml-1 text-sm text-secondary">
         {formatAttemptsLeft(activity.maximumAttempts, activity.attempt)} remaining
       </p>
     {/if}
