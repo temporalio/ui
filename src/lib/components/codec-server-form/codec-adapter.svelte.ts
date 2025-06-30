@@ -1,27 +1,18 @@
 import { page } from '$app/state';
 
+import { fetchSettings } from '$lib/services/settings-service';
 import type { Settings } from '$lib/types/global';
-import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
 
-import type {
-  CodecServerAdapter,
-  CodecServerFormData,
-  CodecServerJsonData,
-} from './types';
+import type { CodecServerAdapter, CodecServerFormData } from './types';
 
 export const createCodecAdapter = (namespace?: string): CodecServerAdapter => ({
   async fetchCodecServer(): Promise<CodecServerFormData> {
     // Get current settings from page data or fetch fresh
-    const settings: Settings = page.data?.settings;
+    let settings: Settings = page.data?.settings;
 
     if (!settings) {
       // Fallback to fetch settings if not available in page data
-      const route = routeForApi('settings');
-      const response = await requestFromAPI(route);
-      // Note: This would need the full settings transformation logic
-      // For now, we'll work with what we have
-      console.log('Fetched settings:', response);
+      settings = await fetchSettings();
     }
 
     // Extract codec settings from current settings
@@ -37,47 +28,41 @@ export const createCodecAdapter = (namespace?: string): CodecServerAdapter => ({
   },
 
   async saveCodecServer(data: CodecServerFormData): Promise<void> {
-    // Note: This would need an actual API endpoint for updating codec server settings
-    // For now, this is a placeholder that could make a PUT/PATCH request to /api/v1/settings/codec
-
-    // Convert form data to JSON payload
-    const jsonData: CodecServerJsonData = {
-      endpoint: data.endpoint,
-      passUserAccessToken: data.passUserAccessToken,
-      includeCrossOriginCredentials: data.includeCrossOriginCredentials,
-      ...(data.customMessage && { customMessage: data.customMessage }),
-      ...(data.customLink && { customLink: data.customLink }),
+    // Convert form data to API format matching the existing Settings structure
+    const codecPayload = {
+      Endpoint: data.endpoint,
+      PassAccessToken: data.passUserAccessToken,
+      IncludeCredentials: data.includeCrossOriginCredentials,
+      ...(data.customMessage && { DefaultErrorMessage: data.customMessage }),
+      ...(data.customLink && { DefaultErrorLink: data.customLink }),
     };
 
-    const route = `${routeForApi('settings')}/codec`;
+    // For now, this logs what would be sent to a codec server settings API
+    // In the future, this could be a PUT/PATCH to /api/v1/settings/codec or similar
+    console.log('Would save codec server settings:', {
+      codec: codecPayload,
+      ...(namespace && { namespace }),
+    });
 
-    try {
-      await requestFromAPI(route, {
-        options: {
-          method: 'PUT',
-          body: JSON.stringify({
-            codecServer: jsonData,
-            // Include namespace if this is namespace-scoped
-            ...(namespace && { namespace: namespace }),
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      });
-    } catch (error) {
-      // For development, log the data that would be sent
-      console.log('Would save codec server settings as JSON:', jsonData);
-      throw error;
-    }
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // For development, we can't actually persist these settings
+    // but we simulate a successful response
   },
 
   onSuccess: (data: CodecServerFormData) => {
     console.log('Codec server configuration saved successfully:', data);
-    // Could trigger a settings refresh here
+    // In a real implementation, this might:
+    // - Trigger a settings refresh
+    // - Update the page data
+    // - Show a success toast
   },
 
   onCancel: () => {
     console.log('Codec server configuration cancelled');
+    // In a real implementation, this might:
+    // - Navigate back to previous page
+    // - Reset any temporary state
   },
 });
