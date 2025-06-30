@@ -53,10 +53,14 @@
   const decodeUserMetadata = async (workflow: WorkflowExecution) => {
     const userMetadata = { summary: '', details: '' };
     try {
+      console.log('full workflow', workflow);
+      console.log('workflow summary', workflow?.summary);
+      console.log('workflow details', workflow?.details);
       if (workflow?.summary) {
         const decodedSummary = await decodeSingleReadablePayloadWithCodec(
           workflow.summary,
         );
+        console.log('type of workflow summary', decodedSummary);
         if (typeof decodedSummary === 'string') {
           userMetadata.summary = decodedSummary;
         }

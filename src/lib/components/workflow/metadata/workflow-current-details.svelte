@@ -15,6 +15,11 @@
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
   const currentDetails = $derived($workflowRun?.metadata?.currentDetails || '');
+  const summary = $derived($workflowRun?.userMetadata?.summary);
+  const details = $derived($workflowRun?.userMetadata?.details);
+  const borderClass = $derived(() =>
+    summary || details ? 'border-l border-subtle' : '',
+  );
 
   let loading = $state(false);
 
@@ -35,6 +40,7 @@
         $authUser?.accessToken,
       );
       $workflowRun.metadata = metadata;
+      console.log('Current details fetched:', metadata.currentDetails);
     } catch (error) {
       console.error('Error fetching current details:', error);
     } finally {
@@ -45,11 +51,15 @@
   onMount(() => {
     fetchCurrentDetails();
   });
+
+  $inspect(currentDetails);
 </script>
 
-<div class="flex flex-1 flex-col gap-2">
+<div
+  class={`surface-background flex h-full flex-1 flex-col gap-2 border-l border-subtle p-6 ${borderClass}`}
+>
   <div class="flex items-center justify-between">
-    <h3>{translate('workflows.current-details')}</h3>
+    <h3 class="pl-6 pt-6">{translate('workflows.current-details')}</h3>
     {#if workflow.isRunning}
       <Tooltip text={translate('workflows.update-details')} left>
         <Button
@@ -63,6 +73,10 @@
     {/if}
   </div>
   {#key currentDetails}
-    <Markdown content={currentDetails} />
+    <Markdown
+      className="p-2"
+      overrideTheme="background"
+      content={currentDetails}
+    />
   {/key}
 </div>

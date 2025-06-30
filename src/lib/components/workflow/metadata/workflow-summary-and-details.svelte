@@ -7,14 +7,21 @@
   const details = $derived($workflowRun?.userMetadata?.details);
 </script>
 
-<div class="flex flex-1 flex-col gap-2">
-  <h3>{translate('workflows.summary-and-details')}</h3>
+<div class="flex flex-1 flex-col gap-2 p-6">
   {#if summary}
-    <h3>{translate('workflows.summary')}</h3>
-    <Markdown content={summary} />
+    <div class="border border-subtle">
+      <h3 class="pl-6 pt-6" data-testid="user-metadata-summary-heading">
+        {translate('workflows.summary')}
+      </h3>
+      <Markdown className="p-2" overrideTheme="primary" content={summary} />
+    </div>
   {/if}
   {#if details}
-    <h3>{translate('workflows.details')}</h3>
-    <Markdown content={details} />
+    <div class="border border-subtle">
+      <h3 class="pl-6 pt-6" data-testid="user-metadata-details-heading">
+        {translate('workflows.details')}
+      </h3>
+      <Markdown className="p-2" overrideTheme="primary" content={details} />
+    </div>
   {/if}
 </div>

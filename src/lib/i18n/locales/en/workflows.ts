@@ -285,4 +285,6 @@ export const Strings = {
   'update-name-label': 'Update name',
   'no-current-details': 'No Current Details',
   'update-details': 'Update Details',
+  'no-user-metadata': 'No User Metadata (yet)',
+  'check-back': 'Check back later.',
 } as const;

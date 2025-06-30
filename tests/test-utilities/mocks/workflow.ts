@@ -16,8 +16,25 @@ export const mockWorkflow = {
     workflowExecutionTimeout: '0s',
     workflowRunTimeout: '0s',
     defaultWorkflowTaskTimeout: '10s',
+    userMetadata: {
+      summary: {
+        metadata: {
+          encoding: 'anNvbi9wbGFpbg==',
+          type: 'VGV4dA==',
+        },
+        data: 'Ik5lc3NpJ3Mgc3luY2hyb25pemVkIGRhdGEgb3BlcmF0aW9uIHdvcmtmbG93Ig==',
+      },
+      details: {
+        metadata: {
+          encoding: 'anNvbi9wbGFpbg==',
+          type: 'VGV4dA==',
+        },
+        data: 'Ik5lc3NpIGlzIHdhaXRpbmcgZm9yIHJlc291cmNlIGxvY2sgdG8gcGVyZm9ybSBzeW5jaHJvbml6ZWQgb3BlcmF0aW9ucy4gSW5jbHVkZXMgdGltZW91dCBoYW5kbGluZyBhbmQgZ3JhY2VmdWwgcmVzb3VyY2UgcmVsZWFzZSBtZWNoYW5pc21zLiI=',
+      },
+    },
   },
   workflowExecutionInfo: {
+    currentDetails: 'Waiting for resource lock',
     execution: {
       workflowId: '09db15_Running',
       runId: '4284ef9a-947f-4db2-bf15-dbc377e71fa6',
@@ -34,7 +51,16 @@ export const mockWorkflow = {
     historySizeBytes: '',
     executionTime: '2022-04-28T05:50:48.264756929Z',
     memo: {
-      fields: {},
+      fields: {
+        businessContext: 'Q2 2025 performance testing',
+        details: 'User created fast processing order',
+        environment: 'staging',
+        orderContext:
+          '{"orderId":"ord_98765","totalAmount":299.99,"currency":"USD","items":["laptop","mouse","keyboard"]}',
+        summary: 'Workflow to demonstrate EJSON encoding of User',
+        userProfile:
+          '{"userId":"user_12345","name":"Jane Doe","email":"jane.doe@example.com","tier":"premium","registrationDate":"2024-01-15","preferences":{"emailNotifications":true,"smsAlerts":false,"theme":"dark"}}',
+      },
     },
     searchAttributes: {
       indexedFields: {
@@ -148,7 +174,18 @@ export const mockCompletedWorkflow = {
     status: 'WORKFLOW_EXECUTION_STATUS_COMPLETED',
     historyLength: '16',
     executionTime: '2024-05-17T15:25:26.888913Z',
-    memo: {},
+    memo: {
+      fields: {
+        businessContext: 'Q2 2025 performance testing',
+        details: 'User created fast processing order',
+        environment: 'staging',
+        orderContext:
+          '{"orderId":"ord_98765","totalAmount":299.99,"currency":"USD","items":["laptop","mouse","keyboard"]}',
+        summary: 'Workflow to demonstrate EJSON encoding of User',
+        userProfile:
+          '{"userId":"user_12345","name":"Jane Doe","email":"jane.doe@example.com","tier":"premium","registrationDate":"2024-01-15","preferences":{"emailNotifications":true,"smsAlerts":false,"theme":"dark"}}',
+      },
+    },
     searchAttributes: {
       indexedFields: {
         BuildIds: {

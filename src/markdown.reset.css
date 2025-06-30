@@ -130,3 +130,35 @@ body[data-theme='dark'] {
     color: #8098f9;
   }
 }
+
+body[data-theme='light-background'] {
+  background-color: #f8fafc;
+  color: #121416;
+  a {
+    color: #444ce7;
+  }
+}
+
+body[data-theme='dark-background'] {
+  background-color: #141414;
+  color: #f8fafc;
+  a {
+    color: #8098f9;
+  }
+}
+
+body[data-theme='light-primary'] {
+  background-color: #fff;
+  color: #121416;
+  a {
+    color: #444ce7;
+  }
+}
+
+body[data-theme='dark-primary'] {
+  background-color: #000;
+  color: #f8fafc;
+  a {
+    color: #8098f9;
+  }
+}
