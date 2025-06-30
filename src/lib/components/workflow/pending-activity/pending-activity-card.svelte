@@ -6,7 +6,7 @@
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -204,9 +204,9 @@
           />
         {/if}
       </div>
-      <div class="flex flex-1 flex-col">
-        {#if activity.lastFailure?.stackTrace}
-          <p class="text-sm text-secondary/80">
+      {#if activity.lastFailure?.stackTrace}
+        <div>
+          <p class="mb-1 text-sm text-secondary/80">
             {translate('common.stack-trace')}
           </p>
           <CodeBlock
@@ -215,22 +215,9 @@
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
-        {/if}
-      </div>
+        </div>
+      {/if}
     </div>
-    {#if activity.lastFailure?.stackTrace}
-      <div>
-        <p class="mb-1 text-sm text-secondary/80">
-          {translate('common.stack-trace')}
-        </p>
-        <CodeBlock
-          language="text"
-          content={activity.lastFailure.stackTrace}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      </div>
-    {/if}
   </Accordion>
 {/snippet}
 

@@ -73,7 +73,7 @@
       {event.scheduledEventId || ''}
     </Link>
   </td>
-  <td class="text-right md:hidden">
+  <td class="table-cell text-right md:hidden">
     {#if abbrEventTime}
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
@@ -84,7 +84,7 @@
       </Copyable>
     {/if}
   </td>
-  <td class="hidden text-right md:block">
+  <td class="hidden text-right md:table-cell">
     {#if eventTime}
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}

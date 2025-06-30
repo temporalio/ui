@@ -77,7 +77,7 @@
       {event.id}
     {/if}
   </td>
-  <td class="text-right md:hidden">
+  <td class="table-cell text-right md:hidden">
     {#if abbrEventTime}
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
@@ -88,7 +88,7 @@
       </Copyable>
     {/if}
   </td>
-  <td class="hidden text-right md:block">
+  <td class="hidden text-right md:table-cell">
     {#if eventTime}
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
@@ -104,10 +104,19 @@
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex items-center gap-1">
-      <Badge class="mr-1" type={event.attempt > 1 ? 'danger' : 'default'}>
+      <Badge
+        class="mr-1"
+        type={event.paused
+          ? 'warning'
+          : event.attempt > 1
+            ? 'danger'
+            : 'default'}
+      >
         <Icon
-          class="mr-1 inline {event.attempt > 1 && 'font-bold text-red-400'}"
-          name="retry"
+          class="mr-1 inline {event.attempt > 1 &&
+            'font-bold text-red-400'} {event.paused &&
+            'font-bold text-yellow-700'}"
+          name={event.paused ? 'pause' : 'retry'}
         />
         {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}
