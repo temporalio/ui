@@ -121,10 +121,6 @@
     relative: $relativeTime,
     abbrFormat: true,
   });
-
-  console.log('currentEvent', currentEvent);
-  console.log('event', event);
-  console.log('group', group);
 </script>
 
 <tr

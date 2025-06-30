@@ -40,7 +40,6 @@
         $authUser?.accessToken,
       );
       $workflowRun.metadata = metadata;
-      console.log('Current details fetched:', metadata.currentDetails);
     } catch (error) {
       console.error('Error fetching current details:', error);
     } finally {
