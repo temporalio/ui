@@ -7,7 +7,7 @@
 
   export let content: string;
   export let className: string = '';
-  export let overrideTheme: string = '';
+  export let overrideTheme: 'background' | 'primary' | '' | undefined = '';
 
   let iframe;
 
