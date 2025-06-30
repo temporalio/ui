@@ -7,7 +7,7 @@
   const details = $derived($workflowRun?.userMetadata?.details);
 </script>
 
-<div class="flex flex-1 flex-col gap-2 p-6">
+<div class="flex flex-1 flex-col items-center gap-2 p-6">
   {#if summary}
     <div class="border border-subtle">
       <h3 class="pl-6 pt-6" data-testid="user-metadata-summary-heading">
