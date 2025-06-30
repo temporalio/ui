@@ -20,27 +20,37 @@
     class?: string;
     adapter: SearchAttributesAdapter;
     initialAttributes: SearchAttributeDefinition[];
-    onSave?: (attributes: SearchAttributeDefinition[]) => void;
-    onCancel?: () => void;
   }
 
-  let {
-    class: className = '',
-    adapter,
-    initialAttributes,
-    onSave = () => {},
-    onCancel = () => {},
-  }: Props = $props();
+  let { class: className = '', adapter, initialAttributes }: Props = $props();
 
   const { superFormInstance, supportedTypes, defaultType } = $derived(
-    createFormConfig(adapter, onSave, initialAttributes),
+    createFormConfig(
+      adapter,
+      adapter.onSuccess || (() => {}),
+      initialAttributes,
+    ),
   );
 
-  const { form, errors, submitting, message, enhance, tainted, isTainted } =
-    $derived(superFormInstance);
+  const {
+    form,
+    errors,
+    submitting,
+    message,
+    enhance,
+    tainted,
+    isTainted,
+    reset,
+  } = $derived(superFormInstance);
 
   const { addAttribute, removeAttribute, handleCancel } = $derived(
-    createFormHandlers(form, defaultType, initialAttributes, onCancel),
+    createFormHandlers(
+      form,
+      defaultType,
+      initialAttributes,
+      adapter.onCancel || (() => {}),
+      reset,
+    ),
   );
 </script>
 

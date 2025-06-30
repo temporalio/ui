@@ -3,10 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { ApiError as ApiErrorType } from '$lib/utilities/api-error-handler';
 
-  import type {
-    SearchAttributeDefinition,
-    SearchAttributesAdapter,
-  } from './types';
+  import type { SearchAttributesAdapter } from './types';
 
   import { loadInitialAttributes } from './config.svelte';
   import SearchAttributesFormContent from './search-attributes-form-content.svelte';
@@ -15,16 +12,9 @@
   interface Props {
     class?: string;
     adapter: SearchAttributesAdapter;
-    onSave?: (attributes: SearchAttributeDefinition[]) => void;
-    onCancel?: () => void;
   }
 
-  let {
-    class: className = '',
-    adapter,
-    onSave = () => {},
-    onCancel = () => {},
-  }: Props = $props();
+  let { class: className = '', adapter }: Props = $props();
 
   let retryCount = $state(0);
   let maxRetries = 3;
@@ -44,8 +34,6 @@
     class={className}
     {adapter}
     {initialAttributes}
-    {onSave}
-    {onCancel}
   />
 {:catch error}
   <ApiError

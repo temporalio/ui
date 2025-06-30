@@ -17,4 +17,6 @@ export interface SearchAttributesAdapter {
   upsertAttributes(attributes: SearchAttributeDefinition[]): Promise<void>;
   deleteAttribute(attributeName: string): Promise<void>;
   getSupportedTypes(): SearchAttributeTypeOption[];
+  onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+  onCancel?: () => void;
 }

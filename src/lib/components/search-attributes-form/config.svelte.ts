@@ -118,6 +118,7 @@ export const createFormHandlers = (
   defaultType: string,
   initialAttributes: SearchAttributeDefinition[],
   onCancel: () => void,
+  reset: () => void,
 ) => {
   return {
     addAttribute: () => {
@@ -135,10 +136,7 @@ export const createFormHandlers = (
     },
 
     handleCancel: () => {
-      formStore.update((form: SearchAttributesFormData) => ({
-        ...form,
-        attributes: initialAttributes,
-      }));
+      reset();
       onCancel();
     },
   };

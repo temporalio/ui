@@ -18,9 +18,19 @@
   // Mock adapter for testing with data
   class MockAdapter implements SearchAttributesAdapter {
     namespace: string;
+    onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+    onCancel?: () => void;
 
-    constructor(namespace: string) {
+    constructor(
+      namespace: string,
+      callbacks?: {
+        onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+        onCancel?: () => void;
+      },
+    ) {
       this.namespace = namespace;
+      this.onSuccess = callbacks?.onSuccess;
+      this.onCancel = callbacks?.onCancel;
     }
 
     async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
@@ -82,9 +92,19 @@
   // Mock adapter for error testing
   class ErrorMockAdapter implements SearchAttributesAdapter {
     namespace: string;
+    onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+    onCancel?: () => void;
 
-    constructor(namespace: string) {
+    constructor(
+      namespace: string,
+      callbacks?: {
+        onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+        onCancel?: () => void;
+      },
+    ) {
       this.namespace = namespace;
+      this.onSuccess = callbacks?.onSuccess;
+      this.onCancel = callbacks?.onCancel;
     }
 
     async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
@@ -151,9 +171,19 @@
   // Mock adapter for empty state testing
   class EmptyMockAdapter implements SearchAttributesAdapter {
     namespace: string;
+    onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+    onCancel?: () => void;
 
-    constructor(namespace: string) {
+    constructor(
+      namespace: string,
+      callbacks?: {
+        onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+        onCancel?: () => void;
+      },
+    ) {
       this.namespace = namespace;
+      this.onSuccess = callbacks?.onSuccess;
+      this.onCancel = callbacks?.onCancel;
     }
 
     async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
@@ -230,9 +260,10 @@
 <Story
   name="With Existing Attributes"
   args={{
-    adapter: new MockAdapter('default'),
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
+    adapter: new MockAdapter('default', {
+      onSuccess: action('onSuccess'),
+      onCancel: action('onCancel'),
+    }),
   }}
   parameters={{
     docs: {
@@ -247,9 +278,10 @@
 <Story
   name="Empty State"
   args={{
-    adapter: new EmptyMockAdapter('empty'),
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
+    adapter: new EmptyMockAdapter('empty', {
+      onSuccess: action('onSuccess'),
+      onCancel: action('onCancel'),
+    }),
   }}
   parameters={{
     docs: {
@@ -264,9 +296,10 @@
 <Story
   name="Error State"
   args={{
-    adapter: new ErrorMockAdapter('error-namespace'),
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
+    adapter: new ErrorMockAdapter('error-namespace', {
+      onSuccess: action('onSuccess'),
+      onCancel: action('onCancel'),
+    }),
   }}
   parameters={{
     docs: {

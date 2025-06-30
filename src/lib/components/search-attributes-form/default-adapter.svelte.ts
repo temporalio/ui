@@ -1,3 +1,5 @@
+import { page } from '$app/state';
+
 import { translate } from '$lib/i18n/translate';
 import { fetchSearchAttributesForNamespace } from '$lib/services/search-attributes-service';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
@@ -9,18 +11,25 @@ import type {
   SearchAttributeTypeOption,
 } from './types';
 
-export class DefaultSearchAttributesAdapter implements SearchAttributesAdapter {
-  constructor(
-    private namespace: string,
-    private request: typeof fetch = fetch,
-  ) {}
+export const defaultAdapter: SearchAttributesAdapter = {
+  onSuccess: (attributes) => {
+    console.log('Search attributes saved successfully:', attributes);
+    // Add any other success handling here (toasts, navigation, etc.)
+  },
+
+  onCancel: () => {
+    console.log('Search attributes form cancelled');
+    // Add any cancel handling here (navigation, confirmation, etc.)
+  },
 
   async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
     try {
-      const response = await fetchSearchAttributesForNamespace(
-        this.namespace,
-        this.request,
-      );
+      const namespace = page.params.namespace;
+      if (!namespace) {
+        throw new Error('No namespace found in page params');
+      }
+
+      const response = await fetchSearchAttributesForNamespace(namespace);
 
       const attributes = Object.entries(response.customAttributes).map(
         ([name, type]) => ({
@@ -32,11 +41,16 @@ export class DefaultSearchAttributesAdapter implements SearchAttributesAdapter {
       // Always return at least one empty row for the UI
       return attributes.length > 0
         ? attributes
-        : [{ name: '', type: this.getSupportedTypes()[0]?.value || '' }];
+        : [
+            {
+              name: '',
+              type: defaultAdapter.getSupportedTypes()[0]?.value || '',
+            },
+          ];
     } catch (error) {
       throw createApiError(error, 'load search attributes');
     }
-  }
+  },
 
   async upsertAttributes(
     _attributes: SearchAttributeDefinition[],
@@ -47,7 +61,7 @@ export class DefaultSearchAttributesAdapter implements SearchAttributesAdapter {
     } catch (error) {
       throw createApiError(error, 'save search attributes');
     }
-  }
+  },
 
   async deleteAttribute(_attributeName: string): Promise<void> {
     try {
@@ -56,7 +70,7 @@ export class DefaultSearchAttributesAdapter implements SearchAttributesAdapter {
     } catch (error) {
       throw createApiError(error, 'delete search attribute');
     }
-  }
+  },
 
   getSupportedTypes(): SearchAttributeTypeOption[] {
     return [
@@ -89,5 +103,5 @@ export class DefaultSearchAttributesAdapter implements SearchAttributesAdapter {
         value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
       },
     ];
-  }
-}
+  },
+};
