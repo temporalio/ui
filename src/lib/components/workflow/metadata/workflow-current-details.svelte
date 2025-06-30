@@ -50,8 +50,6 @@
   onMount(() => {
     fetchCurrentDetails();
   });
-
-  $inspect(currentDetails);
 </script>
 
 <div

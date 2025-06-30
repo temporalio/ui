@@ -7,10 +7,6 @@
   const summary = $derived($workflowRun?.userMetadata?.summary);
   const details = $derived($workflowRun?.userMetadata?.details);
   const currentDetails = $derived($workflowRun?.metadata?.currentDetails);
-  $inspect($workflowRun);
-  $inspect(summary);
-  $inspect(details);
-  $inspect(currentDetails);
 </script>
 
 <div class="flex flex-col gap-6 bg-primary lg:flex-row">
