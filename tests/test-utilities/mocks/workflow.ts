@@ -174,18 +174,7 @@ export const mockCompletedWorkflow = {
     status: 'WORKFLOW_EXECUTION_STATUS_COMPLETED',
     historyLength: '16',
     executionTime: '2024-05-17T15:25:26.888913Z',
-    memo: {
-      fields: {
-        businessContext: 'Q2 2025 performance testing',
-        details: 'User created fast processing order',
-        environment: 'staging',
-        orderContext:
-          '{"orderId":"ord_98765","totalAmount":299.99,"currency":"USD","items":["laptop","mouse","keyboard"]}',
-        summary: 'Workflow to demonstrate EJSON encoding of User',
-        userProfile:
-          '{"userId":"user_12345","name":"Jane Doe","email":"jane.doe@example.com","tier":"premium","registrationDate":"2024-01-15","preferences":{"emailNotifications":true,"smsAlerts":false,"theme":"dark"}}',
-      },
-    },
+    memo: {},
     searchAttributes: {
       indexedFields: {
         BuildIds: {
