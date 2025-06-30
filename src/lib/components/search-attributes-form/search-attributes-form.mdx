@@ -7,13 +7,15 @@ import SearchAttributesForm from './search-attributes-form.stories.svelte';
 
 # SearchAttributesForm Component
 
-A reusable form component for managing custom search attributes with SuperForms and configurable adapters.
+A reusable form component for managing custom search attributes with SuperForms and reactive adapters.
 
 ## Features
 
-- **Adapter Pattern**: Duck-typed interface allows different implementations (OSS vs Cloud)
-- **SuperForms Integration**: Built-in validation with Zod schema and SuperForms
+- **Reactive Adapter Pattern**: Self-contained adapters that automatically access page context
+- **Zero Configuration**: Default adapter requires no setup - automatically gets namespace from URL
+- **SuperForms Integration**: Built-in validation with Zod schema and dirty state tracking
 - **Comprehensive Error Handling**: Form state management with proper error display
+- **i18n Support**: Full internationalization with translate() function calls
 - **Accessibility**: Full ARIA support and keyboard navigation
 - **Type Safety**: Full TypeScript support with Svelte 5 runes
 
@@ -26,15 +28,24 @@ The component uses a two-part architecture:
 
 ## Adapter Pattern
 
-The component uses an adapter pattern to abstract different API implementations:
+The component uses a reactive adapter pattern with self-contained objects that access Svelte context:
 
 ```typescript
 interface SearchAttributesAdapter {
   fetchAttributes(): Promise<SearchAttributeDefinition[]>;
   upsertAttributes(attributes: SearchAttributeDefinition[]): Promise<void>;
+  deleteAttribute(attributeName: string): Promise<void>;
   getSupportedTypes(): SearchAttributeTypeOption[];
+  onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+  onCancel?: () => void;
 }
 ```
+
+The default adapter automatically:
+- Gets the namespace from `page.params.namespace` 
+- Handles success/error callbacks
+- Provides proper internationalization
+- No configuration required
 
 ## Usage Examples
 
@@ -42,34 +53,49 @@ interface SearchAttributesAdapter {
 
 ```svelte
 <script lang="ts">
-  import { SearchAttributesForm } from '$lib/components/search-attributes-form';
   import { defaultAdapter } from '$lib/components/search-attributes-form/default-adapter.svelte';
+  import SearchAttributesForm from '$lib/components/search-attributes-form/search-attributes-form.svelte';
 </script>
 
-<SearchAttributesForm {adapter: defaultAdapter} />
+<SearchAttributesForm adapter={defaultAdapter} />
 ```
+
+The default adapter automatically gets the namespace from the URL and handles all callbacks internally.
 
 ### Custom Adapter Implementation
 
 ```typescript
-class CloudSearchAttributesAdapter implements SearchAttributesAdapter {
-  namespace: string;
-  apiClient: CloudApiClient;
+// custom-adapter.svelte.ts
+import { page } from '$app/state';
+import { goto } from '$app/navigation';
 
-  constructor(namespace: string, apiClient: CloudApiClient) {
-    this.namespace = namespace;
-    this.apiClient = apiClient;
-  }
+export const customAdapter: SearchAttributesAdapter = {
+  onSuccess: (attributes) => {
+    // Custom success handling
+    console.log('Saved:', attributes);
+    goto(`/namespaces/${page.params.namespace}/settings`);
+  },
+
+  onCancel: () => {
+    // Custom cancel handling
+    goto(`/namespaces/${page.params.namespace}`);
+  },
 
   async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
-    return this.apiClient.getSearchAttributes(this.namespace);
-  }
+    const namespace = page.params.namespace;
+    const response = await customApiClient.getSearchAttributes(namespace);
+    return response.attributes;
+  },
 
-  async upsertAttributes(
-    attributes: SearchAttributeDefinition[],
-  ): Promise<void> {
-    return this.apiClient.updateSearchAttributes(this.namespace, attributes);
-  }
+  async upsertAttributes(attributes: SearchAttributeDefinition[]): Promise<void> {
+    const namespace = page.params.namespace;
+    await customApiClient.updateSearchAttributes(namespace, attributes);
+  },
+
+  async deleteAttribute(attributeName: string): Promise<void> {
+    const namespace = page.params.namespace;
+    await customApiClient.deleteSearchAttribute(namespace, attributeName);
+  },
 
   getSupportedTypes(): SearchAttributeTypeOption[] {
     return [
@@ -81,8 +107,8 @@ class CloudSearchAttributesAdapter implements SearchAttributesAdapter {
       { label: 'DateTime', value: 'DateTime' },
       { label: 'KeywordList', value: 'KeywordList' },
     ];
-  }
-}
+  },
+};
 ```
 
 ### Integration with SvelteKit
@@ -90,16 +116,31 @@ class CloudSearchAttributesAdapter implements SearchAttributesAdapter {
 ```svelte
 <!-- src/routes/namespaces/[namespace]/search-attributes/+page.svelte -->
 <script lang="ts">
-  import { SearchAttributesForm } from '$lib/components/search-attributes-form';
   import { defaultAdapter } from '$lib/components/search-attributes-form/default-adapter.svelte';
+  import SearchAttributesForm from '$lib/components/search-attributes-form/search-attributes-form.svelte';
 </script>
 
-<div class="container mx-auto py-8">
-  <h1 class="mb-6 text-2xl font-bold">Custom Search Attributes</h1>
+<svelte:head>
+  <title>Custom Search Attributes</title>
+</svelte:head>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Custom Search Attributes</h1>
+    <p class="text-gray-600 mt-2">
+      Manage custom search attributes for this namespace.
+    </p>
+  </div>
 
   <SearchAttributesForm adapter={defaultAdapter} />
 </div>
 ```
+
+No configuration needed! The adapter automatically:
+- Gets the namespace from the URL (`/namespaces/[namespace]/search-attributes`)
+- Handles success/error states
+- Provides internationalization
+- Manages form state and validation
 
 ## Props
 
@@ -130,6 +171,17 @@ The component provides comprehensive error handling through SuperForms and the a
 - **Form-Level Validation**: Displays validation errors for unique constraints
 - **Field-Level Validation**: Individual field validation with real-time feedback
 - **API Error Display**: Status messages with proper intent styling
+- **Dirty State Tracking**: Shows count badge on Save button when form has unsaved changes
+- **Form Reset**: Cancel button properly resets form to initial state
+
+## Dirty State Management
+
+The form automatically tracks unsaved changes using SuperForms `isTainted` state:
+
+- **Visual Indicator**: Save button shows a count badge with number of modified attributes
+- **Smart Counting**: Only counts attributes with actual field changes (ignores empty objects)
+- **Real-time Updates**: Badge updates immediately as user makes changes
+- **Form Reset**: Cancel button clears dirty state and resets to initial values
 
 ## Validation
 
