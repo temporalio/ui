@@ -5,7 +5,7 @@ import type { Settings } from '$lib/types/global';
 
 import type { CodecServerAdapter, CodecServerFormData } from './types';
 
-export const createCodecAdapter = (namespace?: string): CodecServerAdapter => ({
+export const createCodecAdapter = (): CodecServerAdapter => ({
   async fetchCodecServer(): Promise<CodecServerFormData> {
     // Get current settings from page data or fetch fresh
     let settings: Settings = page.data?.settings;
@@ -37,11 +37,11 @@ export const createCodecAdapter = (namespace?: string): CodecServerAdapter => ({
       ...(data.customLink && { DefaultErrorLink: data.customLink }),
     };
 
+    // For OSS: cluster-level codec server configuration
     // For now, this logs what would be sent to a codec server settings API
-    // In the future, this could be a PUT/PATCH to /api/v1/settings/codec or similar
-    console.log('Would save codec server settings:', {
+    // In the future, this could be a PUT/PATCH to /api/v1/settings/codec
+    console.log('Would save cluster-level codec server settings:', {
       codec: codecPayload,
-      ...(namespace && { namespace }),
     });
 
     // Simulate API call delay
@@ -52,17 +52,17 @@ export const createCodecAdapter = (namespace?: string): CodecServerAdapter => ({
   },
 
   onSuccess: (data: CodecServerFormData) => {
-    console.log('Codec server configuration saved successfully:', data);
+    console.log('Cluster-level codec server configuration saved:', data);
     // In a real implementation, this might:
-    // - Trigger a settings refresh
-    // - Update the page data
+    // - Trigger a cluster settings refresh
+    // - Update the global page data
     // - Show a success toast
   },
 
   onCancel: () => {
     console.log('Codec server configuration cancelled');
     // In a real implementation, this might:
-    // - Navigate back to previous page
+    // - Navigate back to cluster settings
     // - Reset any temporary state
   },
 });
