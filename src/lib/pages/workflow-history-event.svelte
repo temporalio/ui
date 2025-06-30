@@ -136,32 +136,12 @@
 
 <style lang="postcss">
   tbody {
-    :global(tr.dense) {
-      @apply h-8 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
-    }
-
-    :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
-    }
-
-    :global(tr.dense:nth-of-type(odd)) {
-      @apply surface-primary hover:bg-interactive-table-hover;
-    }
-
-    :global(tr.dense.expanded) {
-      @apply bg-interactive-secondary-active;
-    }
-
-    :global(tr.dense.active) {
-      @apply bg-interactive-table-hover;
+    :global(tr:nth-of-type(odd)) {
+      @apply surface-primary;
     }
 
     :global(tr > td) {
       @apply whitespace-nowrap p-2;
-    }
-
-    :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
     }
   }
 </style>

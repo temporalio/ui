@@ -48,10 +48,13 @@ export async function getEventAttributes(
 export const toBillableEvent = (
   event: WorkflowEvent,
   shouldNotAddBillableAction: (event: WorkflowEvent) => boolean = () => false,
+  processedWorkflowTaskIds?: Set<string>,
 ) => {
   return {
     ...event,
-    billableActions: getEventBillableActions(event, shouldNotAddBillableAction),
+    billableActions: shouldNotAddBillableAction(event)
+      ? 0
+      : getEventBillableActions(event, processedWorkflowTaskIds),
   };
 };
 
@@ -59,6 +62,7 @@ export const toEvent = (
   historyEvent: HistoryEvent,
   options: {
     shouldNotAddBillableAction?: (event: WorkflowEvent) => boolean;
+    processedWorkflowTaskIds?: Set<string>;
   } = {},
 ): WorkflowEvent => {
   const id = String(historyEvent.eventId);
@@ -81,17 +85,24 @@ export const toEvent = (
     billableActions: 0,
     attributes: simplifyAttributes({ type: key, ...attributes }),
   };
-  return toBillableEvent(event, options.shouldNotAddBillableAction);
+  return toBillableEvent(
+    event,
+    options.shouldNotAddBillableAction,
+    options.processedWorkflowTaskIds,
+  );
 };
 
 export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
-  const failedEvent = events.find(isWorkflowTaskFailedEventDueToReset);
+  const failedEvent = events.findLast(isWorkflowTaskFailedEventDueToReset);
   const shouldNotAddBillableAction = (event: WorkflowEvent): boolean => {
     if (failedEvent) return Number(event.id) < Number(failedEvent.eventId);
     return false;
   };
 
-  return events.map((event) => toEvent(event, { shouldNotAddBillableAction }));
+  const processedWorkflowTaskIds = new Set<string>();
+  return events.map((event) =>
+    toEvent(event, { shouldNotAddBillableAction, processedWorkflowTaskIds }),
+  );
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

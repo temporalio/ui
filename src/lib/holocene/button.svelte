@@ -31,7 +31,7 @@
           ghost:
             'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary/70',
           'table-header':
-            'bg-transparent border-transparent text-off-white focus-visible:ring-primary/70 focus-visible:border-transparent',
+            'bg-transparent border-transparent focus-visible:ring-primary/70 focus-visible:border-transparent',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -120,6 +120,7 @@
     type="button"
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
+    data-variant={variant}
     class={merge(
       buttonStyles({
         variant,
@@ -156,6 +157,7 @@
     type="button"
     on:click|stopPropagation
     on:keydown|stopPropagation
+    data-variant={variant}
     class={merge(
       buttonStyles({
         variant,

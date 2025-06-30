@@ -178,7 +178,7 @@ const decodeReadablePayloads =
     }
   };
 
-const decodePayloads =
+export const decodePayloads =
   (settings: Settings) =>
   async (payloads: unknown[]): Promise<unknown[]> => {
     if (getCodecEndpoint(settings)) {

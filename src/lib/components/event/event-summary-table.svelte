@@ -61,7 +61,7 @@
   ];
 
   $: if ($isCloud && columns.length === 4) {
-    columns.push({ label: 'Actions' });
+    columns.push({ label: 'Billable Actions' });
   }
 
   const iterableKey = (event: IterableEventWithPending) => {
@@ -74,7 +74,7 @@
 
 <div class="flex">
   <div
-    class="overflow-auto pt-[33px]"
+    class="pt-9"
     style="max-height: {minimized ? 'calc(100vh - 200px)' : '20000px'}"
   >
     {#if showGraph}
@@ -99,7 +99,7 @@
     {#each visibleItems as event, index (iterableKey(event))}
       {#if isEventGroup(event)}
         <EventSummaryRow
-          {event}
+          event={event.initialEvent}
           {index}
           group={event}
           {compact}

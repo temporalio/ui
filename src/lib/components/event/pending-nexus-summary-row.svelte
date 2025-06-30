@@ -16,43 +16,57 @@
 
   import EventDetailsFull from './event-details-full.svelte';
 
-  export let event: PendingNexusOperation;
-  export let group: EventGroup | undefined = undefined;
-  export let index: number;
-  export let expandAll = false;
-  export let active = false;
-  export let onRowClick: () => void = () => {};
+  interface Props {
+    event: PendingNexusOperation;
+    group: EventGroup | undefined;
+    index: number;
+    expanded?: boolean;
+    onRowClick?: () => void;
+  }
 
-  $: expanded = expandAll;
-  $: ({ workflow, run, namespace } = $page.params);
-  $: href = routeForEventHistoryEvent({
-    eventId: event.scheduledEventId,
-    namespace,
-    workflow,
-    run,
-  });
+  const {
+    event,
+    group,
+    index,
+    expanded: expandedProp = false,
+    onRowClick = () => {},
+  }: Props = $props();
 
-  $: eventTime = formatDate(group?.eventTime, $timeFormat, {
-    relative: $relativeTime,
-  });
-  $: abbrEventTime = formatDate(group?.eventTime, $timeFormat, {
-    relative: $relativeTime,
-    abbrFormat: true,
-  });
+  let expanded = $state(expandedProp);
+  let { workflow, run, namespace } = $derived($page.params);
+  let href = $derived(
+    routeForEventHistoryEvent({
+      eventId: event.scheduledEventId,
+      namespace,
+      workflow,
+      run,
+    }),
+  );
 
-  const onLinkClick = () => {
+  let eventTime = $derived(
+    formatDate(group?.eventTime, $timeFormat, {
+      relative: $relativeTime,
+    }),
+  );
+  let abbrEventTime = $derived(
+    formatDate(group?.eventTime, $timeFormat, {
+      relative: $relativeTime,
+      abbrFormat: true,
+    }),
+  );
+
+  const onLinkClick = (e: Event) => {
+    e.stopPropagation();
     expanded = !expanded;
     onRowClick();
   };
 </script>
 
 <tr
-  class="row dense"
+  class="hover:cursor-pointer"
   id={`${event.scheduledEventId}-${index}`}
-  class:expanded={expanded && !expandAll}
-  class:active
   data-testid="pending-nexus-summary-row"
-  on:click|stopPropagation={onLinkClick}
+  onclick={onLinkClick}
 >
   <td class="font-mono">
     <Link data-testid="link" {href}>
@@ -60,22 +74,26 @@
     </Link>
   </td>
   <td class="text-right md:hidden">
-    <Copyable
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      content={abbrEventTime}
-    >
-      {abbrEventTime}
-    </Copyable>
+    {#if abbrEventTime}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={abbrEventTime}
+      >
+        {abbrEventTime}
+      </Copyable>
+    {/if}
   </td>
   <td class="hidden text-right md:block">
-    <Copyable
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      content={eventTime}
-    >
-      {eventTime}
-    </Copyable>
+    {#if eventTime}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={eventTime}
+      >
+        {eventTime}
+      </Copyable>
+    {/if}
   </td>
   <td
     class="w-full overflow-hidden text-right text-sm font-normal xl:text-left"
@@ -116,7 +134,7 @@
 </tr>
 {#if expanded}
   <tr class="w-full px-2 text-sm no-underline">
-    <td class="bg-primary" colspan="5">
+    <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} />
     </td>
   </tr>

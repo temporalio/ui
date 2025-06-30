@@ -1,51 +1,53 @@
 import { expect, test } from '@playwright/test';
 
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
+import '../test-utilities/custom-matchers';
 
-test.describe('Dark Mode Toggle', () => {
+test.describe('Dark Mode Dropdown on Mobile', () => {
+  const localStorageKey = 'dark mode';
+
   test.beforeEach(async ({ page }) => {
     await mockWorkflowsApis(page);
     await page.goto('/');
+    // Open the profile menu that contains the dark mode button
+    await page.getByTestId('nav-profile-button').click();
   });
 
-  test('user can toggle dark mode between on, off, and system default', async ({
+  test('user can select System Default option via dropdown menu', async ({
     page,
   }) => {
-    const nightLabel = 'Night';
-    const systemDefaultLabel = 'System Default';
-    const dayLabel = 'Day';
-
-    // on mobile, the dark mode button is in the profile menu
-    await page.getByTestId('nav-profile-button').click();
-
-    // starts on day mode
-    const button = page.getByTestId('dark-mode-navigation-button');
-
+    const button = page
+      .getByTestId('dark-mode-menu-button')
+      .locator('visible=true');
     await expect(button).toBeVisible();
 
-    expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
-      null, // nothing in local storage yet
-    );
-
-    // after day is system mode
     await button.click();
-    await expect(button).toHaveAccessibleName(systemDefaultLabel);
-    expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
-      JSON.stringify('system'),
-    );
+    await page.getByRole('menuitem', { name: 'System Default' }).click();
+    await expect(button).toHaveAccessibleName('System Default');
+    await expect(page).toHaveLocalStorageItem(localStorageKey, 'system');
+  });
 
-    // after system is dark mode
-    await button.click();
-    await expect(button).toHaveAccessibleName(nightLabel);
-    expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
-      JSON.stringify(true),
-    );
+  test('user can select Night option via dropdown menu', async ({ page }) => {
+    const button = page
+      .getByTestId('dark-mode-menu-button')
+      .locator('visible=true');
+    await expect(button).toBeVisible();
 
-    // cycle back to day
     await button.click();
-    await expect(button).toHaveAccessibleName(dayLabel);
-    expect(await page.evaluate(() => localStorage.getItem('dark mode'))).toBe(
-      JSON.stringify(false),
-    );
+    await page.getByRole('menuitem', { name: 'Night' }).click();
+    await expect(button).toHaveAccessibleName('Night');
+    await expect(page).toHaveLocalStorageItem(localStorageKey, true);
+  });
+
+  test('user can select Day option via dropdown menu', async ({ page }) => {
+    const button = page
+      .getByTestId('dark-mode-menu-button')
+      .locator('visible=true');
+    await expect(button).toBeVisible();
+
+    await button.click();
+    await page.getByRole('menuitem', { name: 'Day' }).click();
+    await expect(button).toHaveAccessibleName('Day');
+    await expect(page).toHaveLocalStorageItem(localStorageKey, false);
   });
 });

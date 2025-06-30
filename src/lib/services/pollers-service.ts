@@ -5,6 +5,7 @@ import type {
   TaskQueueCompatibleVersionSet,
   TaskQueueStatus,
 } from '$lib/types';
+import type { RoutingConfig } from '$lib/types/deployments';
 import type { NamespaceScopedRequest } from '$lib/types/global';
 import {
   type APIErrorResponse,
@@ -23,6 +24,7 @@ export type GetWorkerTaskReachabilityRequest = NamespaceScopedRequest & {
 export type GetPollersResponse = {
   pollers?: PollerWithTaskQueueTypes[];
   taskQueueStatus: TaskQueueStatus;
+  versioningInfo?: RoutingConfig;
 };
 
 export type AssignmentRule = {
@@ -140,9 +142,14 @@ export async function getPollers(
   const taskQueueStatus = !activityPollers.pollers.length
     ? workflowPollers.taskQueueStatus
     : activityPollers.taskQueueStatus;
+  const versioningInfo = !activityPollers.pollers.length
+    ? workflowPollers.versioningInfo
+    : activityPollers.versioningInfo;
+
   return {
     pollers,
     taskQueueStatus,
+    versioningInfo,
   };
 }
 export type VersionResults = {

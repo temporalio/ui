@@ -82,7 +82,11 @@ export const tokenize = (string: string): Tokens => {
       addBufferToTokens();
       cursor += 3;
       continue;
-    } else if (isConditional(midConditional)) {
+    } else if (
+      isConditional(midConditional) &&
+      (isSpace(string[cursor + 2]) || isParenthesis(string[cursor + 2]))
+    ) {
+      // To prevent false positives like "inspect" being a "in" conditional, check for space or parenthesis after the midConditional
       buffer += midConditional;
       addBufferToTokens();
       cursor += 2;

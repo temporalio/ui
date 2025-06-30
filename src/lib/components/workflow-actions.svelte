@@ -153,20 +153,18 @@
     menuLabel={translate('workflows.workflow-actions')}
   >
     {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
-      {#if !$isCloud || ($isCloud && testId !== 'update-button')}
-        {#if destructive}
-          <MenuDivider />
-        {/if}
-        <MenuItem
-          on:click={onClick}
-          {destructive}
-          disabled={!enabled}
-          data-testid={testId}
-          {description}
-        >
-          {label}
-        </MenuItem>
+      {#if destructive}
+        <MenuDivider />
       {/if}
+      <MenuItem
+        on:click={onClick}
+        {destructive}
+        disabled={!enabled}
+        data-testid={testId}
+        {description}
+      >
+        {label}
+      </MenuItem>
     {/each}
     {#if !workflowCreateDisabled($page)}
       <MenuDivider />

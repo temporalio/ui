@@ -1,0 +1,50 @@
+name: 'Validate Release Readiness'
+description: 'Validates that current version is ready for release (sync + version increase)'
+outputs:
+  version-ready:
+    description: 'Whether version is ready for release'
+    value: ${{ steps.validate.outputs.version-ready }}
+  current-version:
+    description: 'Current version from version.go'
+    value: ${{ steps.validate.outputs.current-version }}
+  previous-version:
+    description: 'Previous version from last commit'
+    value: ${{ steps.validate.outputs.previous-version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate version for release readiness
+      id: validate
+      shell: bash
+      run: |
+        echo "🔍 Validating release readiness..."
+
+        # Use the validation script to check both sync and increase
+        if ./scripts/validate-versions.sh --quiet; then
+          echo "✅ Version validation passed"
+          VERSION_READY="true"
+        else
+          echo "❌ Version validation failed"
+          VERSION_READY="false"
+        fi
+
+        # Get version details for outputs (using Go version as source of truth)
+        CURRENT_VERSION=$(grep 'UIVersion.*=' server/server/version/version.go | sed 's/.*"\(.*\)".*/\1/')
+
+        # Get version from last tag instead of last commit
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        if [[ -n "$LAST_TAG" ]]; then
+          # Remove 'v' prefix if present
+          PREVIOUS_VERSION="${LAST_TAG#v}"
+        else
+          PREVIOUS_VERSION=""
+        fi
+
+        echo "📊 Current version: $CURRENT_VERSION"
+        echo "📊 Previous version: $PREVIOUS_VERSION"
+
+        # Set outputs
+        echo "version-ready=$VERSION_READY" >> $GITHUB_OUTPUT
+        echo "current-version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        echo "previous-version=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT

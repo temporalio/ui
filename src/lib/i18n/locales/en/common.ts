@@ -56,6 +56,8 @@ export const Strings = {
   event: 'Event',
   'collapse-all': 'Collapse All',
   'expand-all': 'Expand All',
+  maximize: 'Maximize',
+  minimize: 'Minimize',
   id: 'ID',
   yes: 'Yes',
   no: 'No',

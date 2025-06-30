@@ -4,20 +4,30 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+
 jobs:
   create_release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate release version
+        id: validate-release
+        uses: ./.github/actions/validate-published-release
+        with:
+          release-tag: ${{ github.event.release.tag_name }}
+
       - name: Setup Node
         uses: ./.github/actions/setup-node
 
       - name: Build package
-        run: |
-          pnpm package
-          # make tar from dist folder
-          tar -czf temporal-ui-package.tar.gz dist
+        id: build-package
+        uses: ./.github/actions/build-and-package
 
       - name: upload package artifact
         uses: actions/upload-release-asset@v1
@@ -25,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./temporal-ui-package.tar.gz
+          asset_path: ${{ steps.build-package.outputs.package-path }}
           asset_name: temporal-ui-package.tar.gz
           asset_content_type: application/gzip
 

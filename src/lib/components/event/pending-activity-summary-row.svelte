@@ -17,42 +17,56 @@
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
 
-  export let event: PendingActivity;
-  export let group: EventGroup | undefined = undefined;
-  export let index: number;
-  export let expandAll = false;
-  export let active = false;
-  export let onRowClick: () => void = () => {};
+  interface Props {
+    event: PendingActivity;
+    group: EventGroup | undefined;
+    index: number;
+    expanded?: boolean;
+    onRowClick?: () => void;
+  }
 
-  $: expanded = expandAll;
-  $: ({ workflow, run, namespace } = $page.params);
-  $: href = routeForEventHistoryEvent({
-    eventId: group?.id,
-    namespace,
-    workflow,
-    run,
-  });
-  $: eventTime = formatDate(group?.eventTime, $timeFormat, {
-    relative: $relativeTime,
-  });
-  $: abbrEventTime = formatDate(group?.eventTime, $timeFormat, {
-    relative: $relativeTime,
-    abbrFormat: true,
-  });
+  const {
+    event,
+    group,
+    index,
+    expanded: expandedProp = false,
+    onRowClick = () => {},
+  }: Props = $props();
 
-  const onLinkClick = () => {
+  let expanded = $state(expandedProp);
+  let { workflow, run, namespace } = $derived($page.params);
+  let href = $derived(
+    routeForEventHistoryEvent({
+      eventId: group?.id,
+      namespace,
+      workflow,
+      run,
+    }),
+  );
+  let eventTime = $derived(
+    formatDate(group?.eventTime, $timeFormat, {
+      relative: $relativeTime,
+    }),
+  );
+  let abbrEventTime = $derived(
+    formatDate(group?.eventTime, $timeFormat, {
+      relative: $relativeTime,
+      abbrFormat: true,
+    }),
+  );
+
+  const onLinkClick = (e: Event) => {
+    e.stopPropagation();
     expanded = !expanded;
     onRowClick();
   };
 </script>
 
 <tr
-  class="row dense"
+  class="hover:cursor-pointer"
   id={`${event.id}-${index}`}
-  class:expanded={expanded && !expandAll}
-  class:active
   data-testid="pending-activity-summary-row"
-  on:click|stopPropagation={onLinkClick}
+  onclick={onLinkClick}
 >
   <td class="font-mono">
     {#if group?.id}
@@ -64,41 +78,36 @@
     {/if}
   </td>
   <td class="text-right md:hidden">
-    <Copyable
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      content={abbrEventTime}
-    >
-      {abbrEventTime}
-    </Copyable>
+    {#if abbrEventTime}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={abbrEventTime}
+      >
+        {abbrEventTime}
+      </Copyable>
+    {/if}
   </td>
   <td class="hidden text-right md:block">
-    <Copyable
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      content={eventTime}
-    >
-      {eventTime}
-    </Copyable>
+    {#if eventTime}
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={eventTime}
+      >
+        {eventTime}
+      </Copyable>
+    {/if}
   </td>
   <td class="">
     <p class="truncate font-semibold md:text-base">Pending Activity</p>
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex items-center gap-1">
-      <Badge
-        class="mr-1"
-        type={event.paused
-          ? 'warning'
-          : event.attempt > 1
-            ? 'danger'
-            : 'default'}
-      >
+      <Badge class="mr-1" type={event.attempt > 1 ? 'danger' : 'default'}>
         <Icon
-          class="mr-1 inline {event.attempt > 1 &&
-            'font-bold text-red-400'} {event.paused &&
-            'font-bold text-yellow-700'}"
-          name={event.paused ? 'pause' : 'retry'}
+          class="mr-1 inline {event.attempt > 1 && 'font-bold text-red-400'}"
+          name="retry"
         />
         {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}
@@ -127,7 +136,7 @@
 </tr>
 {#if expanded}
   <tr class="w-full px-2 text-sm no-underline">
-    <td class="bg-primary" colspan="5">
+    <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} />
     </td>
   </tr>

@@ -93,24 +93,12 @@
       @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
-    :global(tr.dense) {
-      @apply h-9 hover:cursor-pointer hover:bg-interactive-table-hover hover:bg-fixed;
-    }
-
     :global(tr.expanded) {
       @apply w-full hover:bg-primary;
     }
 
-    :global(tr.dense:nth-of-type(odd)) {
-      @apply surface-background hover:bg-interactive-table-hover;
-    }
-
-    :global(tr.dense.expanded) {
-      @apply bg-interactive-secondary-active;
-    }
-
-    :global(tr.dense.active) {
-      @apply bg-interactive-table-hover;
+    :global(tr:nth-of-type(odd)) {
+      @apply surface-background;
     }
 
     :global(tr > td) {
