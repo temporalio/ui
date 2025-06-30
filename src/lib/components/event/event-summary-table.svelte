@@ -36,6 +36,7 @@
   export let loading = false;
   export let compact = false;
   export let minimized = true;
+  export let hoveredEventId: string | undefined = undefined;
 
   $: showGraph = !minimized && !compact;
 
@@ -99,6 +100,7 @@
     {#each visibleItems as event, index (iterableKey(event))}
       {#if isEventGroup(event)}
         <EventSummaryRow
+          bind:hoveredEventId
           event={event.initialEvent}
           {index}
           group={event}
@@ -127,6 +129,7 @@
         />
       {:else}
         <EventSummaryRow
+          bind:hoveredEventId
           {event}
           {index}
           group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}

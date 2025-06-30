@@ -63,10 +63,11 @@
     index: number;
     compact?: boolean;
     expanded?: boolean;
+    hoveredEventId?: string | undefined;
     onRowClick?: () => void;
   }
 
-  const {
+  let {
     event,
     group,
     initialItem,
@@ -74,6 +75,7 @@
     compact = false,
     expanded: expandedProp = false,
     onRowClick = () => {},
+    hoveredEventId = $bindable(),
   }: Props = $props();
 
   let expanded = $state(expandedProp);
@@ -233,6 +235,16 @@
     event.stopPropagation();
     onRowClick();
   };
+  const handleMouseEnter = () => {
+    hoveredEventId = event.id;
+  };
+  const handleMouseLeave = () => {
+    hoveredEventId = undefined;
+  };
+
+  let hasRelatedActivities = (group, hoveredEventId) => {
+    return group?.eventIds?.has(hoveredEventId);
+  };
 
   onMount(async () => {
     if (isLocalActivityMarkerEvent(event)) {
@@ -250,6 +262,9 @@
   id={`${event.id}-${index}`}
   data-eventid={event.id}
   data-testid="event-summary-row"
+  onmouseenter={handleMouseEnter}
+  onmouseleave={handleMouseLeave}
+  class:active={hasRelatedActivities(group, hoveredEventId)}
   onclick={onLinkClick}
 >
   {#if isEventGroup(event)}
@@ -409,3 +424,13 @@
     </td>
   </tr>
 {/if}
+
+<style lang="postcss">
+  tr[data-testid='event-summary-row'].active {
+    @apply surface-table-related-hover;
+  }
+
+  tr[data-testid='event-summary-row'].active:hover {
+    @apply surface-table-header;
+  }
+</style>
