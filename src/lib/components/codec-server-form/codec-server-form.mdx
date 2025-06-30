@@ -60,7 +60,7 @@ interface CodecServerFormData {
   import { createCodecAdapter } from '$lib/components/codec-server-form/codec-adapter.svelte';
   import CodecServerForm from '$lib/components/codec-server-form/codec-server-form.svelte';
 
-  // Integrates with existing OSS API
+  // OSS adapter operates at cluster level
   const adapter = createCodecAdapter();
 </script>
 
@@ -102,11 +102,12 @@ export const customCodecAdapter: CodecServerAdapter = {
 ### Integration with SvelteKit
 
 ```svelte
-<!-- src/routes/namespaces/[namespace]/codec-server/+page.svelte -->
+<!-- src/routes/cluster/codec-server/+page.svelte -->
 <script lang="ts">
   import { createCodecAdapter } from '$lib/components/codec-server-form/codec-adapter.svelte';
   import CodecServerForm from '$lib/components/codec-server-form/codec-server-form.svelte';
 
+  // Cluster-level configuration for OSS
   const adapter = createCodecAdapter();
 </script>
 
@@ -117,11 +118,10 @@ export const customCodecAdapter: CodecServerAdapter = {
 <div class="space-y-6">
   <div>
     <h1 class="text-2xl font-bold">
-      Codec Server for {$page.params.namespace}
+      Codec Server Configuration
     </h1>
     <p class="text-gray-600 mt-2">
-      Configure codec server endpoint to decode payloads for users interacting
-      with this namespace.
+      Configure cluster-level codec server endpoint to decode payloads for all users.
     </p>
   </div>
 
