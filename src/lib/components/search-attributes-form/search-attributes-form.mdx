@@ -42,7 +42,8 @@ interface SearchAttributesAdapter {
 ```
 
 The default adapter automatically:
-- Gets the namespace from `page.params.namespace` 
+
+- Gets the namespace from `page.params.namespace`
 - Handles success/error callbacks
 - Provides proper internationalization
 - No configuration required
@@ -87,7 +88,9 @@ export const customAdapter: SearchAttributesAdapter = {
     return response.attributes;
   },
 
-  async upsertAttributes(attributes: SearchAttributeDefinition[]): Promise<void> {
+  async upsertAttributes(
+    attributes: SearchAttributeDefinition[],
+  ): Promise<void> {
     const namespace = page.params.namespace;
     await customApiClient.updateSearchAttributes(namespace, attributes);
   },
@@ -137,6 +140,7 @@ export const customAdapter: SearchAttributesAdapter = {
 ```
 
 No configuration needed! The adapter automatically:
+
 - Gets the namespace from the URL (`/namespaces/[namespace]/search-attributes`)
 - Handles success/error states
 - Provides internationalization
