@@ -9,10 +9,11 @@ export const activityCommandsEnabled = (
   coreUser: CoreUser,
   namespace: string,
 ): boolean => {
-  // TODO: Remove isCloud check when feature is ready for Cloud
+  // TODO: Remove isCloud check and add back isActivityCommandsDisabled check when feature is ready for Cloud
   return (
     !settings.disableWriteActions &&
     !coreUser.namespaceWriteDisabled(namespace) &&
+    // !coreUser.isActivityCommandsDisabled &&
     !settings.activityCommandsDisabled &&
     !get(isCloud)
   );
