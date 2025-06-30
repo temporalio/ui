@@ -1,6 +1,7 @@
 <script lang="ts">
+  import FormMessage from '$lib/components/form-message.svelte';
+  import TaintedBadge from '$lib/components/tainted-badge.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -167,12 +168,7 @@
       </div>
     </Card>
 
-    <!-- Status message -->
-    {#if $message}
-      <Alert intent={$message.intent} title={$message.title}>
-        {$message.text}
-      </Alert>
-    {/if}
+    <FormMessage {message} />
 
     <div class="flex gap-3">
       <Button
@@ -182,15 +178,7 @@
         class="relative"
       >
         {$submitting ? 'Saving...' : 'Save'}
-        {#if isTainted($tainted)}
-          <Badge
-            class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-            type="count"
-          >
-            {Object.values($tainted || {}).filter((value) => value === true)
-              .length}
-          </Badge>
-        {/if}
+        <TaintedBadge {tainted} {isTainted} />
       </Button>
 
       <Button
