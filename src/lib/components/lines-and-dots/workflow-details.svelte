@@ -1,50 +1,83 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
+  import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
+  import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import {
+    routeForTaskQueue,
     routeForWorkerDeployment,
-    routeForWorkers,
     routeForWorkflow,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
+  import {
+    DetailList,
+    DetailListColumn,
+    DetailListLabel,
+    DetailListLinkValue,
+    DetailListTextValue,
+    DetailListValue,
+  } from '../detail-list';
+
   import SdkLogo from './sdk-logo.svelte';
-  import WorkflowDetail from './workflow-detail.svelte';
 
-  export let workflow: WorkflowExecution;
-  export let next: string | undefined = undefined;
-  let latestRunId: string | undefined = undefined;
+  interface Props {
+    workflow: WorkflowExecution;
+    next?: string;
+  }
 
-  $: ({ namespace } = $page.params);
+  let { workflow, next }: Props = $props();
 
-  $: elapsedTime = formatDistanceAbbreviated({
-    start: workflow?.startTime,
-    end: workflow?.endTime || Date.now(),
-    includeMilliseconds: true,
-  });
-  $: deployment =
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'];
-  $: deploymentVersion =
+  let latestRunId = $state<string | undefined>(undefined);
+
+  const { namespace } = $derived(page.params);
+  const elapsedTime = $derived(
+    formatDistanceAbbreviated({
+      start: workflow?.startTime,
+      end: workflow?.endTime || Date.now(),
+      includeMilliseconds: true,
+    }),
+  );
+  const deployment = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
+  );
+  const deploymentVersion = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkerDeploymentVersion'
-    ];
-  $: versioningBehavior =
+    ],
+  );
+
+  const versioningBuildId = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ||
+      getBuildIdFromVersion(deploymentVersion),
+  );
+
+  const versioningBehavior = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
-    ];
+    ],
+  );
+  let totalActions = $derived(
+    $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
+  );
 
-  $: {
-    if (next && !latestRunId) {
-      fetchLatestRun();
-    }
-  }
+  const workflowCompletedTasks = $derived(
+    $fullEventHistory.filter(isWorkflowTaskCompletedEvent),
+  );
+
+  const { sdk, version: sdkVersion } = $derived(
+    getSDKandVersion(workflowCompletedTasks),
+  );
 
   const fetchLatestRun = async () => {
     const result = await fetchWorkflow({
@@ -53,108 +86,105 @@
     });
     latestRunId = result?.workflow?.runId;
   };
+
+  $effect(() => {
+    if (next && !latestRunId) {
+      fetchLatestRun();
+    }
+  });
 </script>
 
-<div
-  class="flex w-full flex-col gap-2 {deployment
-    ? '2xl:flex-row 2xl:gap-8'
-    : 'xl:flex-row xl:gap-8'}"
->
-  <div
-    class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
-  >
-    <WorkflowDetail
-      title={translate('common.start')}
-      tooltip={$relativeTime
-        ? formatDate(workflow?.startTime, $timeFormat, {
-            relative: false,
-          })
-        : formatDate(workflow?.startTime, $timeFormat, {
-            relative: true,
-          })}
-      content={formatDate(workflow?.startTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
-    />
-    <WorkflowDetail
-      title={translate('common.end')}
-      tooltip={$relativeTime
-        ? formatDate(workflow?.endTime, $timeFormat, {
-            relative: false,
-          })
-        : formatDate(workflow?.endTime, $timeFormat, {
-            relative: true,
-          })}
-      content={workflow?.endTime
-        ? formatDate(workflow?.endTime, $timeFormat, {
-            relative: $relativeTime,
-          })
-        : '-'}
-    />
-    <WorkflowDetail content={elapsedTime} icon="clock" />
-  </div>
-  <div
-    class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
-  >
-    <WorkflowDetail
-      title={translate('common.run-id')}
-      content={workflow?.runId}
+<DetailList aria-label="workflow details" rowCount={5}>
+  <DetailListLabel>{translate('common.start')}</DetailListLabel>
+  <DetailListTextValue
+    text={formatDate(workflow?.startTime, $timeFormat, {
+      relative: $relativeTime,
+    })}
+    tooltipText={$relativeTime
+      ? formatDate(workflow?.startTime, $timeFormat, { relative: false })
+      : formatDate(workflow?.startTime, $timeFormat, { relative: true })}
+  />
+
+  <DetailListLabel>{translate('common.end')}</DetailListLabel>
+  <DetailListTextValue
+    text={workflow?.endTime
+      ? formatDate(workflow?.endTime, $timeFormat, {
+          relative: $relativeTime,
+        })
+      : '-'}
+    tooltipText={$relativeTime
+      ? formatDate(workflow?.endTime, $timeFormat, { relative: false })
+      : formatDate(workflow?.endTime, $timeFormat, { relative: true })}
+  />
+
+  <DetailListLabel>
+    {translate('common.duration')}
+  </DetailListLabel>
+  <DetailListTextValue text={elapsedTime} />
+
+  <DetailListColumn>
+    <DetailListLabel>{translate('common.run-id')}</DetailListLabel>
+    <DetailListTextValue
       copyable
+      copyableText={workflow?.runId}
+      text={workflow?.runId}
     />
-    <WorkflowDetail
-      title={translate('common.workflow-type')}
-      content={workflow?.name}
+
+    <DetailListLabel>{translate('common.workflow-type')}</DetailListLabel>
+    <DetailListLinkValue
       copyable
-      filterable
+      copyableText={workflow?.name}
+      text={workflow?.name}
       href={routeForWorkflowsWithQuery({
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
       })}
+      iconName="filter"
     />
-    <WorkflowDetail
-      title={translate('common.task-queue')}
-      content={workflow?.taskQueue}
-      href={routeForWorkers({
-        namespace: $page.params.namespace,
-        workflow: workflow?.id,
-        run: workflow?.runId,
+
+    <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
+    <DetailListLinkValue
+      text={workflow?.taskQueue}
+      href={routeForTaskQueue({
+        namespace,
+        queue: workflow?.taskQueue,
       })}
     />
-  </div>
+  </DetailListColumn>
+
   {#if deployment}
-    <div class="flex w-full flex-col gap-2 2xl:w-1/4">
-      <WorkflowDetail
-        title={translate('deployments.deployment')}
-        content={deployment}
+    <DetailListColumn>
+      <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
+      <DetailListLinkValue
+        text={deployment}
         href={routeForWorkerDeployment({
           namespace,
           deployment,
         })}
       />
-      {#if deploymentVersion}
-        <WorkflowDetail
-          title={translate('deployments.deployment-version')}
-          content={workflow.searchAttributes.indexedFields[
-            'TemporalWorkerDeploymentVersion'
-          ]}
-        />
+
+      {#if versioningBuildId}
+        <DetailListLabel>
+          {translate('deployments.build-id')}
+        </DetailListLabel>
+        <DetailListTextValue text={versioningBuildId} />
       {/if}
+
       {#if versioningBehavior}
-        <WorkflowDetail
-          title={translate('deployments.versioning-behavior')}
-          content={versioningBehavior}
-        />
+        <DetailListLabel>
+          {translate('deployments.versioning-behavior')}
+        </DetailListLabel>
+        <DetailListTextValue text={versioningBehavior} />
       {/if}
-    </div>
+    </DetailListColumn>
   {/if}
-  <div
-    class="flex w-full flex-col gap-2 {deployment ? '2xl:w-1/4' : 'xl:w-1/3'}"
-  >
-    <SdkLogo />
+
+  <DetailListColumn>
     {#if workflow?.parent}
-      <WorkflowDetail
-        title={translate('workflows.parent-workflow')}
-        content={workflow?.parent?.workflowId}
+      <DetailListLabel>{translate('workflows.parent-workflow')}</DetailListLabel
+      >
+      <DetailListLinkValue
+        text={workflow?.parent?.workflowId}
         href={routeForWorkflow({
           namespace,
           workflow: workflow?.parent?.workflowId,
@@ -163,9 +193,11 @@
       />
     {/if}
     {#if latestRunId}
-      <WorkflowDetail
-        title={translate('workflows.latest-execution')}
-        content={latestRunId}
+      <DetailListLabel
+        >{translate('workflows.latest-execution')}</DetailListLabel
+      >
+      <DetailListLinkValue
+        text={latestRunId}
         href={routeForWorkflow({
           namespace,
           workflow: workflow?.id,
@@ -173,15 +205,36 @@
         })}
       />
     {/if}
-    <WorkflowDetail
-      title={translate('common.history-size-bytes')}
-      content={workflow?.historySizeBytes}
-    />
+
+    <DetailListLabel>{translate('common.history-size-bytes')}</DetailListLabel>
+    <DetailListTextValue text={workflow?.historySizeBytes} />
+
     {#if !$isCloud}
-      <WorkflowDetail
-        title={translate('workflows.state-transitions')}
-        content={workflow?.stateTransitionCount}
-      />
+      <DetailListLabel
+        >{translate('workflows.state-transitions')}</DetailListLabel
+      >
+      <DetailListTextValue text={workflow?.stateTransitionCount} />
+    {:else}
+      <Tooltip
+        bottomLeft
+        text={translate('workflows.billable-actions-disclaimer')}
+        width={240}
+        class="col-[1]"
+      >
+        <DetailListLabel
+          href="https://docs.temporal.io/cloud/actions#actions-in-workflows"
+        >
+          {translate('workflows.billable-actions')}
+        </DetailListLabel>
+      </Tooltip>
+      <DetailListTextValue text={totalActions} />
     {/if}
-  </div>
-</div>
+
+    {#if sdk && sdkVersion}
+      <DetailListLabel>SDK</DetailListLabel>
+      <DetailListValue>
+        <SdkLogo {sdk} version={sdkVersion} />
+      </DetailListValue>
+    {/if}
+  </DetailListColumn>
+</DetailList>

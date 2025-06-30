@@ -62,11 +62,11 @@
 </script>
 
 {#if $allSelected}
-  <span class="font-semibold">
+  <span class="font-medium">
     <Translate key="workflows.all-selected" count={$workflowCount.count} />
   </span>
 {:else}
-  <span class="font-semibold"
+  <span class="font-medium"
     ><Translate
       key="workflows.n-selected"
       count={selectedWorkflowsCount}
@@ -93,7 +93,7 @@
     <Button
       size="xs"
       variant="ghost"
-      class="text-off-white focus-visible:border-table"
+      class="focus-visible:border-table"
       data-testid="bulk-cancel-button"
       disabled={!$cancelableWorkflows.length}
       on:click={openBatchCancelConfirmationModal}
@@ -104,7 +104,7 @@
     <Button
       size="xs"
       variant="ghost"
-      class="text-off-white focus-visible:border-table"
+      class="focus-visible:border-table"
       data-testid="bulk-reset-button"
       on:click={openBatchResetConfirmationModal}
       >{translate('workflows.reset')}</Button

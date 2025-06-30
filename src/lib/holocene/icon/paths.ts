@@ -38,6 +38,7 @@ import copy from './svg/copy.svelte';
 import creditCard from './svg/credit-card.svelte';
 import descending from './svg/descending.svelte';
 import dollarBadge from './svg/dollar-badge.svelte';
+import dollarInvoice from './svg/dollar-invoice.svelte';
 import download from './svg/download.svelte';
 import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
@@ -119,6 +120,7 @@ import tutorial from './svg/tutorial.svelte';
 import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
+import userGroup from './svg/user-group.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workflow from './svg/workflow.svelte';
@@ -165,6 +167,7 @@ export const icons = {
   descending,
   download,
   'dollar-badge': dollarBadge,
+  'dollar-invoice': dollarInvoice,
   drained,
   error,
   exit,
@@ -245,6 +248,7 @@ export const icons = {
   update,
   upload,
   usage,
+  'user-group': userGroup,
   'vertical-ellipsis': verticalEllipsis,
   warning,
   'system-window': systemWindow,

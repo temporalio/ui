@@ -6,10 +6,9 @@
   import type { DeploymentStatus } from '$lib/types/deployments';
 
   export let status: DeploymentStatus;
-  export let version: string;
   export let label: string;
 
-  const icon: Record<DeploymentStatus, IconName> = {
+  const icon: Partial<Record<DeploymentStatus, IconName>> = {
     Current: 'heartbeat',
     Ramping: 'trending-up',
     Draining: 'trending-down',
@@ -19,11 +18,12 @@
 
   const deploymentStatus = cva(
     [
-      'flex items-center gap-1 rounded-sm border border-subtle px-1 transition-colors',
+      'flex items-center gap-1 px-1 transition-colors rounded-sm border border-subtle',
     ],
     {
       variants: {
         status: {
+          Latest: 'text-secondary',
           Ramping: 'text-cyan-600 dark:text-cyan-400',
           Current: 'text-blue-600 dark:text-blue-400',
           Draining: 'text-yellow-600 dark:text-yellow-200',
@@ -35,11 +35,6 @@
   );
 </script>
 
-<p class="flex items-center gap-2">
-  <span class="rounded-sm border border-subtle px-1">
-    {version}
-  </span>
-  <span class={deploymentStatus({ status })}>
-    <Icon name={icon[status]} />{label}</span
-  >
+<p class={deploymentStatus({ status })}>
+  <Icon name={icon[status]} />{label}
 </p>

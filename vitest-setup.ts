@@ -27,5 +27,6 @@ vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
 
 vi.mock('esm-env', () => {
   const BROWSER = true;
-  return { BROWSER };
+  const DEV = false;
+  return { BROWSER, DEV };
 });

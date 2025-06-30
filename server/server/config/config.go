@@ -72,7 +72,8 @@ type (
 	}
 
 	CORS struct {
-		AllowOrigins []string `yaml:"allowOrigins"`
+		AllowOrigins          []string `yaml:"allowOrigins"`
+		UnsafeAllowAllOrigins bool     `yaml:"unsafeAllowAllOrigins"`
 		// CookieInsecure allows CSRF cookie to be sent to servers that the browser considers
 		// unsecured. Useful for cases where the connection is secured via VPN rather than
 		// HTTPS directly.
@@ -114,6 +115,8 @@ type (
 		CallbackURL string `yaml:"callbackUrl"`
 		// Options added as URL query params when redirecting to auth provider. Can be used to configure custom auth flows such as Auth0 invitation flow.
 		Options map[string]interface{} `yaml:"options"`
+		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
+		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
 	}
 
 	Codec struct {

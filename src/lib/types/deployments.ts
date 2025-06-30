@@ -9,20 +9,28 @@ export interface DeploymentVersionParameters {
   namespace: string;
   version: string;
 }
-
+export interface WorkerDeploymentVersion {
+  buildId: string;
+  deploymentName: string;
+}
 export interface RoutingConfig {
-  currentVersion: string;
-  rampingVersion: string;
-  rampingVersionPercentage: number;
-  currentVersionChangedTime: Timestamp;
-  rampingVersionChangedTime: Timestamp;
-  rampingVersionPercentageChangedTime: Timestamp;
+  currentVersion?: string;
+  currentDeploymentVersion?: WorkerDeploymentVersion;
+  rampingVersion?: string;
+  rampingDeploymentVersion?: WorkerDeploymentVersion;
+  rampingVersionPercentage?: number;
+  currentVersionChangedTime?: Timestamp;
+  rampingVersionChangedTime?: Timestamp;
+  rampingVersionPercentageChangedTime?: Timestamp;
 }
 
 export interface WorkerDeploymentSummary {
   name: string;
   createTime: Timestamp;
   routingConfig: RoutingConfig;
+  latestVersionSummary?: VersionSummaryNew;
+  currentVersionSummary: VersionSummaryNew;
+  rampingVersionSummary?: VersionSummaryNew;
 }
 
 export interface ListWorkerDeploymentsResponse {
@@ -30,11 +38,36 @@ export interface ListWorkerDeploymentsResponse {
   workerDeployments: WorkerDeploymentSummary[];
 }
 
-export interface VersionSummary {
+export function isVersionSummaryNew(
+  version: VersionSummary,
+): version is VersionSummaryNew {
+  return 'deploymentVersion' in version;
+}
+
+export type VersionSummary = VersionSummaryOld | VersionSummaryNew;
+export interface VersionSummaryOld {
   version: string;
   createTime: Timestamp;
   drainageStatus: string;
 }
+
+export interface VersionSummaryNew {
+  version: string;
+  status?: string;
+  drainageStatus?: string;
+  deploymentVersion?: WorkerDeploymentVersion;
+  createTime: Timestamp;
+  drainageInfo?: {
+    lastChangedTime?: Timestamp;
+    lastCheckedTime?: Timestamp;
+  };
+  currentSinceTime?: Timestamp;
+  rampingSinceTime?: Timestamp;
+  routingUpdateTime?: Timestamp;
+  firstActivationTime?: Timestamp;
+  lastDeactivationTime?: Timestamp;
+}
+
 export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {
   lastModifierIdentity: string;
   versionSummaries: VersionSummary[];
@@ -78,9 +111,15 @@ export interface WorkerDeploymentVersionResponse {
   workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
 }
 
+export const VersioningBehaviorEnum = {
+  Pinned: 'Pinned',
+  AutoUpgrade: 'AutoUpgrade',
+};
+
 export type DeploymentStatus =
   | 'Ramping'
   | 'Current'
+  | 'Latest'
   | 'Draining'
   | 'Drained'
   | 'Inactive';

@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { fullEventHistory } from '$lib/stores/events';
-  import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
-  import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import dotNet from '$lib/vendor/sdk-logos/dot-net-logo.png';
   import go from '$lib/vendor/sdk-logos/go-logo.png';
   import java from '$lib/vendor/sdk-logos/java-logo.png';
@@ -22,23 +19,23 @@
     rust,
   };
 
-  $: workflowCompletedTasks = $fullEventHistory.filter(
-    isWorkflowTaskCompletedEvent,
-  );
+  interface Props {
+    sdk: string;
+    version: string;
+  }
 
-  $: ({ sdk, version } = getSDKandVersion(workflowCompletedTasks));
-  $: logo = sdkLogos[sdk.toLowerCase()];
+  let { sdk, version }: Props = $props();
+  const logo = $derived(sdkLogos[sdk.toLowerCase()]);
 </script>
 
-{#if sdk && version}
-  <div class="flex h-4 items-center justify-between gap-16 whitespace-nowrap">
-    <span class="font-mono">SDK</span>
-    <p class="flex items-center gap-1">
-      {#if logo}
-        <img src={logo} alt="SDK Icon" class="h-6 w-6" />
-      {/if}
-      {sdk}
-      {version}
-    </p>
-  </div>
-{/if}
+<p class="flex w-full items-center gap-1">
+  {#if logo}
+    <span class="relative flex w-6 shrink-0 items-center" aria-hidden="true">
+      <img src={logo} alt="SDK Icon" class="absolute h-6 w-6" />
+    </span>
+  {/if}
+  <span class="truncate">
+    {sdk}
+    {version}
+  </span>
+</p>

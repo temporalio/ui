@@ -287,4 +287,11 @@ export const Strings = {
   'update-details': 'Update Details',
   'no-user-metadata': 'No User Metadata (yet)',
   'check-back': 'Check back later.',
+  'billable-actions': 'Billable Actions (estimate)',
+  'estimated-billable-actions': 'Estimated Billable Actions',
+  'billable-actions-disclaimer':
+    'This is an estimated count and does not capture all Billable Actions. View documentation for more details.',
+  'pending-nexus-operation': 'Pending Nexus Operation',
+  'schedule-event-id': 'Scheduled Event ID',
+  'schedule-to-close-timeout': 'Schedule to Close Timeout',
 } as const;

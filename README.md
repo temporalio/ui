@@ -6,6 +6,8 @@ Temporal must be running in development.
 
 Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
 
+Make sure [Corepack](https://pnpm.io/installation#using-corepack) is installed and run `corepack enable pnpm`. 
+
 ### Using Temporal CLI
 
 You can install [Temporal CLI][] using [Homebrew][]:
@@ -122,6 +124,38 @@ pnpm dev:local-temporal
 temporal operator namespace create default
 ```
 
+## OSS API Development
+
+### Understanding OSS API Endpoints
+
+When developing new features that require API endpoints for the OSS version of Temporal, the available APIs can be found in the [Temporal API repository](https://github.com/temporalio/api). These gRPC APIs are converted to HTTP through the ui-server's gRPC proxy.
+
+**Key Resources:**
+- **API Definitions**: https://github.com/temporalio/api/tree/master/temporal/api
+- **Service Definitions**: Look for `*_service.proto` files for available operations
+- **HTTP Conversion**: The ui-server automatically converts gRPC calls to HTTP endpoints
+
+**Common API Patterns:**
+- **WorkflowService**: `temporal/api/workflowservice/v1/service.proto` - Core workflow operations
+- **OperatorService**: `temporal/api/operatorservice/v1/service.proto` - Administrative operations (search attributes, clusters, etc.)
+- **Endpoint Mapping**: gRPC service methods map to HTTP POST endpoints at `/api/v1/{service}/{method}`
+
+**Example:**
+- gRPC: `temporal.api.operatorservice.v1.OperatorService.ListSearchAttributes`
+- HTTP: `POST /api/v1/operator/list-search-attributes`
+
+**Finding Available Operations:**
+1. Browse the API repository to find relevant service files
+2. Look for existing method definitions in `*_service.proto` files
+3. Check if the operation you need already exists before requesting new endpoints
+4. For new operations, coordinate with the SDK team to add them to the appropriate service
+
+**Development Workflow:**
+1. Check existing API definitions for required operations
+2. Use existing endpoints where possible via services in `src/lib/services/`
+3. For missing endpoints, create adapters with TODO comments (like in `SearchAttributesAdapter`)
+4. Coordinate with SDK team to implement missing gRPC methods
+5. Update adapters once endpoints are available
 
 ## Testing
 We use [Playwright](https://playwright.dev) to interactively test the Temporal UI.
@@ -146,10 +180,37 @@ Set these environment variables if you want to change their defaults
 | --------- | ---------------------------------------------------------------- | --------------------- | ----- |
 | VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8322 | Build |
 | VITE_MODE | Build target                                                     | development           | Build |
-
+| UI_SERVER_VERBOSE | Enable verbose output to see Air build logs and server output for debugging | false | Development |
+| UI_SERVER_HOT_RELOAD | Enable hot reload using Air                           | false | Development |
 
 ## Releases
-On every commit to main, a draft release will be either created or updated with the commit. When ready to create a release, update (if needed) and publish the draft release. This will automatically kick off a matching ui-server release that will publish the Docker image (https://github.com/temporalio/ui-server/releases).
 
+This repository uses an automated release management system that enforces version bump PRs before releases and maintains dual version sync between `package.json` and `server/server/version/version.go`.
 
-Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
+### Release Management
+
+The release system uses custom GitHub Actions for modular, reusable functionality. See [GitHub Workflows Documentation](.github/WORKFLOWS.md) for detailed information about the 8 custom actions and 3 workflows.
+
+**Release Process**:
+1. **Version Bump**: Use Actions → "Version Bump" to create a PR with updated versions
+   - **Auto mode**: Analyzes commits since last tag for semantic versioning
+   - **Manual mode**: Specify major/minor/patch bump type
+   - **Specific version**: Override with exact version (e.g., "2.38.0")
+   - **Dry run**: Preview changes without making modifications
+2. **Review and Merge**: Review the auto-generated version bump PR and merge to main
+3. **Draft Release**: Automatically created when version changes are detected
+4. **Publish Release**: Review and publish the auto-generated draft release
+5. **UI-server Release**: A published release automatically triggers a matching release in the ui-server repository
+
+**Version Source of Truth**: The Go `UIVersion` constant in `server/server/version/version.go` is the authoritative source. All validation uses this as the reference, and `package.json` must be kept in sync.
+
+**Version Validation**: 
+- Run `pnpm validate:versions` to ensure version files are in sync and ready for release
+- Validation compares against last git tag (not last commit) for robust release workflows
+- Custom actions provide detailed validation and error messages
+
+**Integration**:
+- Draft releases trigger downstream ui-server releases and Docker image publishing
+- UI repo releases (https://github.com/temporalio/ui/releases) contain the latest UI artifacts
+- Our [npm package](https://www.npmjs.com/package/@temporalio/ui) will be manually published as needed.
+- UI-server repo releases (https://github.com/temporalio/ui-server/releases) manage Docker images

@@ -76,6 +76,10 @@ export const variables = {
     light: 'space-black',
     dark: 'slate.900',
   },
+  '--color-surface-table-header': {
+    light: 'slate.50',
+    dark: 'slate.800',
+  },
   '--color-surface-success': {
     light: 'green.100',
     dark: 'green.950',
@@ -162,6 +166,10 @@ export const variables = {
     dark: 'slate.950',
   },
   '--color-interactive-table-hover': {
+    light: 'indigo.200',
+    dark: 'slate.700',
+  },
+  '--color-surface-table-related-hover': {
     light: 'indigo.100',
     dark: 'slate.900',
   },
