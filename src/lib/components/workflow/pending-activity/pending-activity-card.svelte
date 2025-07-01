@@ -6,6 +6,7 @@
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -25,7 +26,10 @@
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  let { activity }: { activity: PendingActivity } = $props();
+  let {
+    activity,
+    totalPending,
+  }: { activity: PendingActivity; totalPending?: number } = $props();
   const failed = $derived(activity.attempt > 1 && !!activity.lastFailure);
 
   let coreUser = coreUserStore();
@@ -127,7 +131,11 @@
     </div>
     <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
-        {@render failures()}
+        {#if totalPending > 20}
+          {@render failuresAccordion()}
+        {:else}
+          {@render failuresCodeBlock()}
+        {/if}
       {/if}
       {#if activity.heartbeatDetails}
         {@render heartbeat()}
@@ -171,7 +179,7 @@
   </div>
 {/snippet}
 
-{#snippet failures()}
+{#snippet failuresCodeBlock()}
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if activity.lastFailure}
@@ -203,6 +211,19 @@
       </div>
     {/if}
   </div>
+{/snippet}
+
+{#snippet failuresAccordion()}
+  <Accordion
+    title={activity.lastFailure?.stackTrace
+      ? translate('workflows.last-failure-with-stack-trace')
+      : translate('workflows.last-failure')}
+    let:open
+  >
+    {#if open}
+      {@render failuresCodeBlock()}
+    {/if}
+  </Accordion>
 {/snippet}
 
 {#snippet nextRetry(timeDifference)}

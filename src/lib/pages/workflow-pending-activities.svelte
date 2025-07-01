@@ -18,7 +18,10 @@
   {#if pendingActivities.length}
     <div class="flex flex-col gap-4">
       {#each pendingActivities as activity (activity.id)}
-        <PendingActivityCard {activity} />
+        <PendingActivityCard
+          {activity}
+          totalPending={pendingActivities.length}
+        />
       {/each}
     </div>
   {:else}
