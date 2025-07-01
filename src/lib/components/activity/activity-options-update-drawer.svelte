@@ -87,7 +87,9 @@
     open = false;
   };
 
-  const onUpdate = async () => {
+  const onUpdate = async (e: SubmitEvent) => {
+    e.preventDefault();
+
     try {
       await updateActivityOptions({
         namespace,
