@@ -6,7 +6,6 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
   import emptyImage from '$lib/vendor/empty-state-dark_2x.png';
-  import noResultsImages from '$lib/vendor/empty-state-light_2x.png';
 
   $: query = $page.url.searchParams.get('query');
 
@@ -75,10 +74,6 @@
     {/if}
   </div>
   <div class="bg-[#DDD6FE]">
-    <img
-      src={query ? noResultsImages : emptyImage}
-      alt=""
-      class="aspect-auto"
-    />
+    <img src={query || emptyImage} alt="" class="aspect-auto" />
   </div>
 </div>
