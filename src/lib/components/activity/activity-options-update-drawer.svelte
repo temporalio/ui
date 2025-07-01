@@ -23,7 +23,7 @@
     activity: PendingActivity;
   };
 
-  const fromDurationToNumber = (duration: string) => {
+  const fromDurationToNumber = (duration: string): string => {
     if (!duration || !duration.endsWith('s')) {
       return '';
     }
@@ -31,7 +31,7 @@
     return duration?.replace('s', '');
   };
 
-  const fromNumberToDuration = (duration: number): string => {
+  const fromNumberToDuration = (duration: string): string => {
     if (!duration) return undefined;
     return duration + 's';
   };
@@ -146,7 +146,7 @@
             bind:value={heartbeatTimeout}
             suffix="sec"
             class="w-36"
-            error={isNaN(heartbeatTimeout)}
+            error={isNaN(Number(heartbeatTimeout))}
           />
           <p class="text-nowrap text-secondary">
             {formatSecondsAbbreviated(heartbeatTimeout)}
@@ -190,7 +190,7 @@
             bind:value={initialInterval}
             suffix="sec"
             class="w-36"
-            error={isNaN(initialInterval)}
+            error={isNaN(Number(initialInterval))}
           />
           <p class="text-nowrap text-secondary">
             {formatSecondsAbbreviated(initialInterval)}
@@ -229,7 +229,7 @@
             bind:value={scheduleToCloseTimeout}
             suffix="sec"
             class="w-36"
-            error={isNaN(scheduleToCloseTimeout)}
+            error={isNaN(Number(scheduleToCloseTimeout))}
           />
           <p class="text-nowrap text-secondary">
             {formatSecondsAbbreviated(scheduleToCloseTimeout)}
@@ -254,7 +254,7 @@
             bind:value={scheduleToStartTimeout}
             suffix="sec"
             class="w-36"
-            error={isNaN(scheduleToStartTimeout)}
+            error={isNaN(Number(scheduleToStartTimeout))}
           />
           <p class="text-nowrap text-secondary">
             {formatSecondsAbbreviated(scheduleToStartTimeout)}
@@ -278,7 +278,7 @@
             bind:value={startToCloseTimeout}
             suffix="sec"
             class="w-36"
-            error={isNaN(startToCloseTimeout)}
+            error={isNaN(Number(startToCloseTimeout))}
           />
           <p class="text-nowrap text-secondary">
             {formatSecondsAbbreviated(startToCloseTimeout)}
