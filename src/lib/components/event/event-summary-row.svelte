@@ -142,7 +142,7 @@
   const attributes = $derived(formatAttributes(event));
 
   const currentEvent = $derived(
-    isEventGroup(event) ? event.events.get(selectedId()) : event,
+    isEventGroup(event) ? event.events.get(selectedId) : event,
   );
 
   const elapsedTime = $derived(
@@ -195,16 +195,16 @@
   const hasPendingActivity = $derived(group?.pendingActivity);
 
   const pendingAttempt = $derived(
-    group?.isPending &&
-      compact &&
-      (group?.pendingActivity?.attempt ||
-        group?.pendingNexusOperation?.attempt),
+    isEventGroup(event) &&
+      event?.isPending &&
+      (event?.pendingActivity?.attempt ||
+        event?.pendingNexusOperation?.attempt),
   );
 
   const nonPendingActivityAttempt = $derived(
-    !group?.isPending &&
-      compact &&
-      group?.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt,
+    isEventGroup(event) &&
+      !event?.isPending &&
+      event?.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt,
   );
 
   const showSecondaryAttribute = $derived(

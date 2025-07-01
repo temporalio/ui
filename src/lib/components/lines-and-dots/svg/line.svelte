@@ -23,7 +23,7 @@
     patternUnits="userSpaceOnUse"
   >
     <rect x="0" y="0" width="5" height="10" fill="#00964e" />
-    <rect x="5" y="0" width="5" height="10" fill="#c71607" />
+    <rect x="5" y="0" width="5" height="10" fill="#c71607" opacity="0.5" />
   </pattern>
 </defs>
 <line
@@ -122,7 +122,7 @@
 
   .retried {
     stroke: url('#retried-pattern');
-    opacity: 0.5;
+    opacity: 0.85;
   }
 
   @keyframes dash {
