@@ -125,6 +125,7 @@ export const Strings = {
   'pending-activities-tab': 'Pending Activities',
   'call-stack-tab': 'Call Stack',
   'queries-tab': 'Queries',
+  'metadata-tab': 'Metadata',
   'user-metadata-tab': 'User Metadata',
   'update-tab': 'Update',
   'search-attributes-tab': 'Search Attributes',
