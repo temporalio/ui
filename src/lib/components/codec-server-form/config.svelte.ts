@@ -2,6 +2,7 @@ import { superForm } from 'sveltekit-superforms';
 import { zodClient } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 
+import { translate } from '$lib/i18n/translate';
 import { createApiError } from '$lib/utilities/api-error-handler';
 
 import type { CodecServerAdapter, CodecServerFormData } from './types';
@@ -9,15 +10,15 @@ import type { CodecServerAdapter, CodecServerFormData } from './types';
 const codecServerSchema = z.object({
   endpoint: z
     .string()
-    .url('Please enter a valid URL')
-    .min(1, 'Endpoint is required'),
+    .url(translate('codec-server.validation-endpoint-url'))
+    .min(1, translate('codec-server.validation-endpoint-required')),
   passUserAccessToken: z.boolean(),
   includeCrossOriginCredentials: z.boolean(),
   customMessage: z.string().optional(),
   customLink: z
     .string()
     .refine((val) => val === '' || z.string().url().safeParse(val).success, {
-      message: 'Please enter a valid URL',
+      message: translate('codec-server.validation-custom-link-url'),
     })
     .optional(),
 });
@@ -51,7 +52,7 @@ export const createFormConfig = (
         try {
           await adapter.saveCodecServer(form.data);
           onSuccess(form.data);
-          return 'Codec server configuration saved successfully';
+          return translate('codec-server.save-success');
         } catch (error) {
           console.error('Failed to save codec server configuration:', error);
           throw createApiError(error, 'save codec server configuration');

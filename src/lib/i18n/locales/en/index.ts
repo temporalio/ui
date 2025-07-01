@@ -1,4 +1,5 @@
 import * as Batch from './batch';
+import * as CodecServer from './codec-server';
 import * as Common from './common';
 import * as DataEncoder from './data-encoder';
 import * as DatePicker from './date-picker';
@@ -16,6 +17,7 @@ export const EN = 'en' as const;
 
 export const English = {
   [Batch.Namespace]: Batch.Strings,
+  [CodecServer.Namespace]: CodecServer.Strings,
   [Common.Namespace]: Common.Strings,
   [DatePicker.Namespace]: DatePicker.Strings,
   [Deployments.Namespace]: Deployments.Strings,

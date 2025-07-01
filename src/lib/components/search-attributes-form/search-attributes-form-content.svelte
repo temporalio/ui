@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { derived } from 'svelte/store';
-
-  import FormMessage from '$lib/components/form-message.svelte';
-  import TaintedBadge from '$lib/components/tainted-badge.svelte';
+  import Message from '$lib/components/form/message.svelte';
+  import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -49,10 +47,15 @@
     createFormHandlers(
       form,
       defaultType,
-      initialAttributes,
       adapter.onCancel || (() => {}),
       reset,
     ),
+  );
+
+  const taintedCount = $derived(
+    Object.values($tainted.attributes || {}).filter((attr) =>
+      Object.values(attr).some((value) => value === true),
+    ).length,
   );
 </script>
 
@@ -126,12 +129,10 @@
       </div>
     </Card>
 
-    <FormMessage
-      {message}
-      errors={derived(errors, ($errors) => ({
-        attributes: $errors.attributes?.attributes,
-      }))}
-      errorTitle={translate('search-attributes.validation-error-title')}
+    <Message
+      value={$message}
+      errors={$errors.attributes?.attributes}
+      errorsTitle={translate('search-attributes.validation-error-title')}
     />
 
     <div class="flex gap-3 pt-4">
@@ -144,7 +145,7 @@
         {$submitting
           ? translate('search-attributes.saving-button')
           : translate('search-attributes.save-button')}
-        <TaintedBadge {tainted} {isTainted} />
+        <TaintedBadge show={isTainted($tainted)} count={taintedCount} />
       </Button>
 
       <Button
