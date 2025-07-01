@@ -7,7 +7,7 @@ SvelteKit + Svelte 5 + TypeScript + TailwindCSS + Holocene design system
 ```bash
 pnpm lint              # Run all linters
 pnpm check             # TypeScript type checking
-pnpm test              # Run unit tests
+pnpm test -- --run              # Run unit tests
 ```
 
 ## Svelte 5 Patterns

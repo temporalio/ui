@@ -1,6 +1,6 @@
 <script lang="ts">
-  import FormMessage from '$lib/components/form-message.svelte';
-  import TaintedBadge from '$lib/components/tainted-badge.svelte';
+  import Message from '$lib/components/form/message.svelte';
+  import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
@@ -8,6 +8,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Textarea from '$lib/holocene/textarea.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import type { CodecServerAdapter, CodecServerFormData } from './types';
 
@@ -38,6 +39,10 @@
 
   const { handleCancel } = $derived(createFormHandlers(adapter, reset));
 
+  const taintedCount = $derived(
+    Object.values($tainted || {}).filter((value) => value === true).length,
+  );
+
   // Show custom section if there are existing values
   let showCustomSection = $state(
     !!(initialData.customMessage || initialData.customLink),
@@ -50,27 +55,22 @@
       <!-- Info Alert -->
       <Alert intent="info" class="text-sm">
         <Icon name="info" slot="icon" />
-        Users can use this Namespace-level codec server endpoint or override it in
-        their browser with another endpoint.
+        {translate('codec-server.info-message')}
       </Alert>
 
       <!-- Endpoint Input -->
       <div class="space-y-2">
         <p class="text-gray-700 text-sm">
-          Enter a <button
-            type="button"
-            class="text-blue-600 underline hover:no-underline"
-            >Codec Server endpoint</button
-          > to decode payloads for users interacting with this Namespace
+          {translate('codec-server.endpoint-description')}
         </p>
 
         <Input
           id="endpoint"
-          label="Codec Server Endpoint"
+          label={translate('codec-server.endpoint-label')}
           labelHidden={true}
           name="endpoint"
           bind:value={$form.endpoint}
-          placeholder="Paste your endpoint here"
+          placeholder={translate('codec-server.endpoint-placeholder')}
           error={!!$errors.endpoint?.[0]}
           hintText={$errors.endpoint?.[0]}
           disabled={$submitting}
@@ -82,14 +82,14 @@
       <div class="space-y-3">
         <ToggleSwitch
           id="passUserAccessToken"
-          label="Pass the user access token"
+          label={translate('codec-server.pass-access-token-label')}
           bind:checked={$form.passUserAccessToken}
           disabled={$submitting}
         />
 
         <ToggleSwitch
           id="includeCrossOriginCredentials"
-          label="Include cross-origin credentials"
+          label={translate('codec-server.cross-origin-credentials-label')}
           bind:checked={$form.includeCrossOriginCredentials}
           disabled={$submitting}
         />
@@ -98,8 +98,7 @@
       <!-- Custom Message and Link Section -->
       <div class="space-y-4">
         <p class="text-gray-600 text-sm">
-          Optionally customize the error message and provide a redirect link for
-          users when the Codec Server fails.
+          {translate('codec-server.custom-section-description')}
         </p>
 
         {#if !showCustomSection}
@@ -110,7 +109,7 @@
             on:click={() => (showCustomSection = true)}
           >
             <Icon name="add" class="h-4 w-4" />
-            Add Custom Message and Link
+            {translate('codec-server.add-custom-button')}
           </Button>
         {/if}
 
@@ -119,10 +118,12 @@
             <div>
               <Textarea
                 id="customMessage"
-                label="Custom Message"
+                label={translate('codec-server.custom-message-label')}
                 name="customMessage"
                 bind:value={$form.customMessage}
-                placeholder=""
+                placeholder={translate(
+                  'codec-server.custom-message-placeholder',
+                )}
                 disabled={$submitting}
                 rows={3}
               />
@@ -131,18 +132,16 @@
             <div>
               <Input
                 id="customLink"
-                label="Custom Link"
+                label={translate('codec-server.custom-link-label')}
                 name="customLink"
                 bind:value={$form.customLink}
-                placeholder=""
+                placeholder={translate('codec-server.custom-link-placeholder')}
                 error={!!$errors.customLink?.[0]}
                 hintText={$errors.customLink?.[0]}
                 disabled={$submitting}
               />
               <p class="text-gray-600 mt-1 text-sm">
-                Only include trusted links. This URL will be visible to end
-                users and should point to a secure destination in case of Codec
-                Server failure.
+                {translate('codec-server.custom-link-description')}
               </p>
             </div>
 
@@ -160,7 +159,7 @@
                 }}
               >
                 <Icon name="trash" class="h-4 w-4" />
-                Remove Custom Message and Link
+                {translate('codec-server.remove-custom-button')}
               </Button>
             </div>
           </div>
@@ -168,7 +167,11 @@
       </div>
     </Card>
 
-    <FormMessage {message} />
+    <Message
+      value={$message}
+      errors={$errors._errors}
+      errorsTitle={translate('codec-server.validation-error-title')}
+    />
 
     <div class="flex gap-3">
       <Button
@@ -177,8 +180,10 @@
         disabled={$submitting}
         class="relative"
       >
-        {$submitting ? 'Saving...' : 'Save'}
-        <TaintedBadge {tainted} {isTainted} />
+        {$submitting
+          ? translate('codec-server.saving-button')
+          : translate('codec-server.save-button')}
+        <TaintedBadge show={isTainted($tainted)} count={taintedCount} />
       </Button>
 
       <Button
@@ -187,7 +192,7 @@
         on:click={handleCancel}
         disabled={$submitting}
       >
-        Cancel
+        {translate('codec-server.cancel-button')}
       </Button>
     </div>
   </form>
