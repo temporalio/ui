@@ -194,19 +194,21 @@
     ),
   );
 
-  const hasPendingActivity = $derived(group?.pendingActivity);
+  const hasPendingActivity = $derived(
+    isEventGroup(event) && event?.pendingActivity,
+  );
 
   const pendingAttempt = $derived(
     isEventGroup(event) &&
-      event?.isPending &&
+      event.isPending &&
       (event?.pendingActivity?.attempt ||
         event?.pendingNexusOperation?.attempt),
   );
 
   const nonPendingActivityAttempt = $derived(
     isEventGroup(event) &&
-      !event?.isPending &&
-      event?.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt,
+      !event.isPending &&
+      event.eventList.find(isActivityTaskStartedEvent)?.attributes?.attempt,
   );
 
   const showSecondaryAttribute = $derived(
