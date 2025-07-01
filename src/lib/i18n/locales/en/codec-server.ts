@@ -3,8 +3,10 @@ export const Namespace = 'codec-server';
 export const Strings = {
   'info-message':
     'Users can use this Namespace-level codec server endpoint or override it in their browser with another endpoint.',
-  'endpoint-description':
-    'Enter a Codec Server endpoint to decode payloads for users interacting with this Namespace',
+  'endpoint-description-prefix': 'Enter a ',
+  'endpoint-link-text': 'Codec Server endpoint',
+  'endpoint-description-suffix':
+    ' to decode payloads for users interacting with this Namespace',
   'endpoint-label': 'Codec Server Endpoint',
   'endpoint-placeholder': 'https://your-codec-server.com/api/v1',
   'pass-access-token-label': 'Pass User Access Token',

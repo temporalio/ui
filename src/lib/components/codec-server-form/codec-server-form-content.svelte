@@ -6,6 +6,7 @@
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Textarea from '$lib/holocene/textarea.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -61,7 +62,14 @@
       <!-- Endpoint Input -->
       <div class="space-y-2">
         <p class="text-gray-700 text-sm">
-          {translate('codec-server.endpoint-description')}
+          {translate('codec-server.endpoint-description-prefix')}
+          <Link
+            href="https://docs.temporal.io/dataconversion#codec-server"
+            newTab
+          >
+            {translate('codec-server.endpoint-link-text')}
+          </Link>
+          {translate('codec-server.endpoint-description-suffix')}
         </p>
 
         <Input
