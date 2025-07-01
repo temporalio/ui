@@ -6,7 +6,6 @@
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -27,7 +26,7 @@
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   let { activity }: { activity: PendingActivity } = $props();
-  const failed = $derived(activity.attempt > 1);
+  const failed = $derived(activity.attempt > 1 && !!activity.lastFailure);
 
   let coreUser = coreUserStore();
   let showActivityCommands = $derived(
@@ -131,14 +130,7 @@
         {@render failures()}
       {/if}
       {#if activity.heartbeatDetails}
-        <div>
-          <p class="min-w-56 text-sm text-secondary/80">
-            {translate('workflows.heartbeat-details')}
-          </p>
-          <p class="w-full whitespace-pre-line">
-            {@render heartbeat()}
-          </p>
-        </div>
+        {@render heartbeat()}
       {/if}
     </div>
   </div>
@@ -161,7 +153,7 @@
 
 {#snippet heartbeat()}
   <div>
-    <p class="mb-1 text-sm text-secondary/80">
+    <p class="text-sm text-secondary/80">
       {translate('workflows.heartbeat-details')}
     </p>
     <PayloadDecoder
@@ -171,6 +163,7 @@
     >
       <CodeBlock
         content={decodedValue}
+        maxHeight={384}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
@@ -179,42 +172,37 @@
 {/snippet}
 
 {#snippet failures()}
-  <Accordion
-    title={activity.lastFailure?.stackTrace
-      ? translate('workflows.last-failure-with-stack-trace')
-      : translate('workflows.last-failure')}
-  >
-    <div class="-mt-4 flex flex-col gap-4">
-      <div class="flex flex-1 flex-col">
-        {#if activity.lastFailure}
-          <p class="text-sm text-secondary/80">
-            {translate('workflows.last-failure')}
-          </p>
-          <CodeBlock
-            class="pb-2"
-            content={stringifyWithBigInt(
-              omit(activity.lastFailure, 'stackTrace'),
-            )}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/if}
-      </div>
-      {#if activity.lastFailure?.stackTrace}
-        <div>
-          <p class="mb-1 text-sm text-secondary/80">
-            {translate('common.stack-trace')}
-          </p>
-          <CodeBlock
-            language="text"
-            content={activity.lastFailure.stackTrace}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </div>
+  <div class="flex flex-col gap-2">
+    <div class="flex flex-1 flex-col">
+      {#if activity.lastFailure}
+        <p class="text-sm text-secondary/80">
+          {translate('workflows.last-failure')}
+        </p>
+        <CodeBlock
+          content={stringifyWithBigInt(
+            omit(activity.lastFailure, 'stackTrace'),
+          )}
+          maxHeight={384}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
       {/if}
     </div>
-  </Accordion>
+    {#if activity.lastFailure?.stackTrace}
+      <div>
+        <p class="text-sm text-secondary/80">
+          {translate('common.stack-trace')}
+        </p>
+        <CodeBlock
+          language="text"
+          maxHeight={384}
+          content={activity.lastFailure.stackTrace}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      </div>
+    {/if}
+  </div>
 {/snippet}
 
 {#snippet nextRetry(timeDifference)}
