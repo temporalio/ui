@@ -16,9 +16,7 @@
   export let id = 'navigation-drawer';
   export let closeButtonLabel: string;
   export let closePadding: boolean = true;
-  export let target: 'body' | string = 'body';
 
-  let portalTarget: HTMLElement | null = null;
   let portalElement: HTMLElement | null = null;
 
   let className = '';
@@ -34,21 +32,14 @@
   }
 
   onMount(() => {
-    if (target !== 'body') {
-      portalTarget = document.querySelector(target);
-      if (!portalTarget) portalTarget = document.body;
-    } else {
-      portalTarget = document.body;
-    }
-
     portalElement = document.createElement('div');
     portalElement.className = 'drawer-portal';
-    portalTarget.appendChild(portalElement);
+    document.body.appendChild(portalElement);
   });
 
   onDestroy(() => {
-    if (portalElement && portalTarget) {
-      portalTarget.removeChild(portalElement);
+    if (portalElement) {
+      document.body.removeChild(portalElement);
     }
   });
 
