@@ -128,7 +128,10 @@ export const Strings = {
   'call-stack-tab': 'Call Stack',
   'queries-tab': 'Queries',
   'metadata-tab': 'Metadata',
+  'user-metadata-tab': 'User Metadata',
   'update-tab': 'Update',
+  'search-attributes-tab': 'Search Attributes',
+  'memo-tab': 'Memo',
   'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
     'We are having technical difficulties retrieving this Workflow',
@@ -285,6 +288,8 @@ export const Strings = {
   'update-name-label': 'Update name',
   'no-current-details': 'No Current Details',
   'update-details': 'Update Details',
+  'no-user-metadata': 'No User Metadata (yet)',
+  'check-back': 'Check back later.',
   'billable-actions': 'Billable Actions (estimate)',
   'estimated-billable-actions': 'Estimated Billable Actions',
   'billable-actions-disclaimer':

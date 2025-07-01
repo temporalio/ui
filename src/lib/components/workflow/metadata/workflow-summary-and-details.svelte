@@ -1,29 +1,27 @@
 <script lang="ts">
-  import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: summary = $workflowRun?.userMetadata?.summary;
-  $: details = $workflowRun?.userMetadata?.details;
-  $: hasUserMetadata = summary || details;
+  const summary = $derived($workflowRun?.userMetadata?.summary);
+  const details = $derived($workflowRun?.userMetadata?.details);
 </script>
 
-{#if hasUserMetadata}
-  <AccordionLight let:open>
-    <div slot="title" class="flex w-full items-center gap-2 p-2 text-xl">
-      <Icon name="info" class="text-brand" width={32} height={32} />{translate(
-        'workflows.summary-and-details',
-      )}
+<div class="flex flex-1 flex-col gap-2 p-6">
+  {#if summary}
+    <div class="border border-subtle">
+      <h3 class="pl-6 pt-6" data-testid="user-metadata-summary-heading">
+        {translate('workflows.summary')}
+      </h3>
+      <Markdown className="p-2" overrideTheme="primary" content={summary} />
     </div>
-    {#if open && summary}
-      <h3>{translate('workflows.summary')}</h3>
-      <Markdown content={summary} />
-    {/if}
-    {#if open && details}
-      <h3>{translate('workflows.details')}</h3>
-      <Markdown content={details} />
-    {/if}
-  </AccordionLight>
-{/if}
+  {/if}
+  {#if details}
+    <div class="border border-subtle">
+      <h3 class="pl-6 pt-6" data-testid="user-metadata-details-heading">
+        {translate('workflows.details')}
+      </h3>
+      <Markdown className="p-2" overrideTheme="primary" content={details} />
+    </div>
+  {/if}
+</div>
