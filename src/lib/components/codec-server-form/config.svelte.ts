@@ -31,6 +31,7 @@ export const createFormConfig = (
   adapter: CodecServerAdapter,
   onSuccess: (data: CodecServerFormData) => void,
   initialData: CodecServerFormData,
+  showCustomSection: () => boolean,
 ) => {
   const superFormInstance = superForm(
     {
@@ -50,8 +51,13 @@ export const createFormConfig = (
         if (!form.valid) return;
 
         try {
-          await adapter.saveCodecServer(form.data);
-          onSuccess(form.data);
+          const dataToSave = {
+            ...form.data,
+            customMessage: showCustomSection() ? form.data.customMessage : '',
+            customLink: showCustomSection() ? form.data.customLink : '',
+          };
+          await adapter.saveCodecServer(dataToSave);
+          onSuccess(dataToSave);
           return translate('codec-server.save-success');
         } catch (error) {
           console.error('Failed to save codec server configuration:', error);

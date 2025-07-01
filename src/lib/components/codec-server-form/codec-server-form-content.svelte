@@ -24,7 +24,12 @@
   let { class: className = '', adapter, initialData }: Props = $props();
 
   const { superFormInstance } = $derived(
-    createFormConfig(adapter, adapter.onSuccess || (() => {}), initialData),
+    createFormConfig(
+      adapter,
+      adapter.onSuccess || (() => {}),
+      initialData,
+      () => showCustomSection,
+    ),
   );
 
   const {
@@ -159,10 +164,6 @@
                 variant="secondary"
                 size="sm"
                 on:click={() => {
-                  // Clear the form values first
-                  $form.customMessage = '';
-                  $form.customLink = '';
-                  // Then hide the section
                   showCustomSection = false;
                 }}
               >
