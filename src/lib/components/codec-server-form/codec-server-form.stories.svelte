@@ -5,7 +5,6 @@
 
   import type { CodecServerAdapter, CodecServerFormData } from './types';
 
-  import { createCodecAdapter } from './codec-adapter.svelte';
   import CodecServerForm from './codec-server-form.svelte';
 
   const defaultAdapter: CodecServerAdapter = {
@@ -61,8 +60,6 @@
     },
   };
 
-  const codecAdapter = createCodecAdapter();
-
   export const meta = {
     title: 'Forms/Codec Server Form',
     component: CodecServerForm,
@@ -82,10 +79,3 @@
 <Story name="Default" args={{ adapter: defaultAdapter }} />
 
 <Story name="Prefilled" args={{ adapter: prefilledAdapter }} />
-
-<Story name="Codec Adapter" args={{ adapter: codecAdapter }} />
-
-<Story
-  name="With Custom Class"
-  args={{ adapter: defaultAdapter, class: 'max-w-2xl' }}
-/>
