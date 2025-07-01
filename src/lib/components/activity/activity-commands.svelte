@@ -6,7 +6,6 @@
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
 
   import ActivityOptionsUpdateDrawer from './activity-options-update-drawer.svelte';
@@ -25,7 +24,6 @@
     workflowId: workflow,
     runId: run,
   });
-  const isRunning = $derived($workflowRun.workflow?.isRunning);
 
   let pauseConfirmationModalOpen = $state(false);
   let unpauseConfirmationModalOpen = $state(false);
@@ -62,7 +60,6 @@
       size="sm"
       leadingIcon={activity.paused ? 'play' : 'pause'}
       on:click={onPause}
-      disabled={!isRunning}
     >
       {activity.paused
         ? translate('workflows.unpause')
@@ -75,7 +72,6 @@
       size="sm"
       leadingIcon="pencil"
       on:click={onUpdate}
-      disabled={!isRunning}
     >
       {translate('common.update')}
     </Button>
@@ -86,7 +82,6 @@
       size="sm"
       leadingIcon="retry"
       on:click={onReset}
-      disabled={!isRunning}
     >
       {translate('workflows.reset')}
     </Button>

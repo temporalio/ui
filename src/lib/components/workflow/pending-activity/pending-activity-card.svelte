@@ -13,6 +13,7 @@
   import { translate } from '$lib/i18n/translate';
   import { coreUserStore } from '$lib/stores/core-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
   import { formatDate } from '$lib/utilities/format-date';
@@ -31,6 +32,7 @@
     totalPending,
   }: { activity: PendingActivity; totalPending?: number } = $props();
   const failed = $derived(activity.attempt > 1 && !!activity.lastFailure);
+  const isRunning = $derived($workflowRun?.workflow?.isRunning);
 
   let coreUser = coreUserStore();
   let showActivityCommands = $derived(
@@ -38,7 +40,7 @@
       page.data.settings,
       $coreUser,
       page.params.namespace,
-    ),
+    ) && isRunning,
   );
 </script>
 
