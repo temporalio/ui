@@ -250,6 +250,11 @@
   onMount(async () => {
     if (isLocalActivityMarkerEvent(event)) {
       primaryLocalAttribute = await decodeLocalActivity(event);
+    } else if (
+      isEventGroup(event) &&
+      isLocalActivityMarkerEvent(event.initialEvent)
+    ) {
+      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent);
     }
   });
 </script>
