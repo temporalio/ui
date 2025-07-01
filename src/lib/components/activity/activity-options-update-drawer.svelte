@@ -23,7 +23,7 @@
     activity: PendingActivity;
   };
 
-  const fromDurationToNumber = (duration) => {
+  const fromDurationToNumber = (duration: string) => {
     if (!duration || !duration.endsWith('s')) {
       return '';
     }
@@ -40,16 +40,22 @@
   let { activityId: id, activityType: type } = $derived(activity);
   let taskQueue = $state(activity.activityOptions?.taskQueue?.name);
   let scheduleToCloseTimeout = $state(
-    fromDurationToNumber(activity?.activityOptions?.scheduleToCloseTimeout),
+    fromDurationToNumber(
+      String(activity?.activityOptions?.scheduleToCloseTimeout),
+    ),
   );
   let scheduleToStartTimeout = $state(
-    fromDurationToNumber(activity?.activityOptions?.scheduleToStartTimeout),
+    fromDurationToNumber(
+      String(activity?.activityOptions?.scheduleToStartTimeout),
+    ),
   );
   let startToCloseTimeout = $state(
-    fromDurationToNumber(activity?.activityOptions?.startToCloseTimeout),
+    fromDurationToNumber(
+      String(activity?.activityOptions?.startToCloseTimeout),
+    ),
   );
   let heartbeatTimeout = $state(
-    fromDurationToNumber(activity?.activityOptions?.heartbeatTimeout),
+    fromDurationToNumber(String(activity?.activityOptions?.heartbeatTimeout)),
   );
   let maximumAttempts = $state(
     activity?.activityOptions?.retryPolicy?.maximumAttempts,
@@ -59,12 +65,12 @@
   );
   let initialInterval = $state(
     fromDurationToNumber(
-      activity?.activityOptions?.retryPolicy?.initialInterval,
+      String(activity?.activityOptions?.retryPolicy?.initialInterval),
     ),
   );
   let maximumInterval = $state(
     fromDurationToNumber(
-      activity?.activityOptions?.retryPolicy?.maximumInterval,
+      String(activity?.activityOptions?.retryPolicy?.maximumInterval),
     ),
   );
   let includeType = $state(false);

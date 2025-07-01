@@ -30,7 +30,7 @@
   class="line {status} {category} {classification}"
   class:scheduling
   class:animate-line={pending && !paused}
-  class:retried
+  class:retried={retried && classification === 'Completed'}
   stroke-width={strokeWidth}
   stroke-dasharray={pending ? '3' : strokeDasharray}
   x1={Math.max(0, x1)}
