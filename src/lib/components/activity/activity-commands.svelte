@@ -109,9 +109,11 @@
   {activity}
 />
 
-<ActivityOptionsUpdateDrawer
-  bind:open={optionsUpdateDrawerOpen}
-  {namespace}
-  {execution}
-  {activity}
-/>
+{#key optionsUpdateDrawerOpen}
+  <ActivityOptionsUpdateDrawer
+    bind:open={optionsUpdateDrawerOpen}
+    {namespace}
+    {execution}
+    {activity}
+  />
+{/key}
