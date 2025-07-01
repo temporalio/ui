@@ -202,7 +202,7 @@
   }
 
   .input {
-    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:outline-none;
+    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:text-brand focus:outline-none;
   }
 
   .prefix {
@@ -210,7 +210,7 @@
   }
 
   .suffix {
-    @apply block h-full w-fit border-l border-subtle px-4 py-2;
+    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
   }
 
   .noBorder {

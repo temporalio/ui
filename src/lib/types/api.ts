@@ -22,7 +22,11 @@ export type WorkflowQueryAPIRoutePath = 'query';
 
 export type WorkflowActivitiesAPIRoutePath =
   | 'activity.complete'
-  | 'activity.fail';
+  | 'activity.fail'
+  | 'activity.pause'
+  | 'activity.unpause'
+  | 'activity.reset'
+  | 'activity.update-options';
 
 export type BatchAPIRoutePath = 'batch-operations.list' | 'batch-operations';
 

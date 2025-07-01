@@ -3,16 +3,19 @@
 
   import { page } from '$app/state';
 
+  import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fullEventHistory } from '$lib/stores/events';
+  import { coreUserStore } from '$lib/stores/core-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
+  import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
@@ -20,40 +23,75 @@
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
-  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
   import { omit } from '$lib/utilities/omit';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-  import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  let { activity }: { activity: PendingActivity } = $props();
-  const { namespace, workflow, run } = $derived(page.params);
+  let {
+    activity,
+    totalPending,
+  }: { activity: PendingActivity; totalPending?: number } = $props();
+  const failed = $derived(activity.attempt > 1 && !!activity.lastFailure);
+  const isRunning = $derived($workflowRun?.workflow?.isRunning);
 
-  const failed = $derived(activity.attempt > 1);
-  const scheduledEvent = $derived(
-    $fullEventHistory?.find(
-      (event) =>
-        isActivityTaskScheduledEvent(event) &&
-        event.attributes.activityId === activity.activityId,
-    ),
+  let coreUser = coreUserStore();
+  let showActivityCommands = $derived(
+    activityCommandsEnabled(
+      page.data.settings,
+      $coreUser,
+      page.params.namespace,
+    ) && isRunning,
   );
 </script>
 
 <div
   class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
-  <div class="flex-1">
+  <div class="flex flex-1 flex-wrap justify-between gap-2">
     <div class="flex flex-wrap items-center space-x-3">
       <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
       <h4>{activity.activityType}</h4>
     </div>
+    {#if showActivityCommands}
+      <ActivityCommands {activity} class="justify-end" />
+    {/if}
   </div>
-  <div class="flex flex-col gap-1 xl:flex-row">
+  <div class="flex flex-1 flex-col gap-4 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
+      {#if activity.paused && activity.pauseInfo}
+        {@render detail(
+          translate('activities.paused-by'),
+          activity.pauseInfo?.manual?.identity || '',
+        )}
+        {@render detail(
+          translate('activities.paused-since'),
+          formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
+            relative: $relativeTime,
+          }),
+        )}
+        {@render detail(
+          translate('activities.pause-reason'),
+          activity.pauseInfo?.manual?.reason || '-',
+        )}
+      {/if}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if activity.scheduledTime}
-        {@render detail(translate('workflows.next-retry'), nextRetry)}
+        {@const timeDifference = toTimeDifference({
+          date: activity.scheduledTime,
+          negativeDefault: '',
+        })}
+        {#if timeDifference}
+          {@render nextRetry(timeDifference)}
+        {/if}
+      {/if}
+      {#if activity.lastAttemptCompleteTime}
+        {@render detail(
+          translate('workflows.last-attempt-completed-time'),
+          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
+            relative: $relativeTime,
+          }),
+        )}
       {/if}
       {#if activity.expirationTime}
         {@render detail(
@@ -78,14 +116,6 @@
           }),
         )}
       {/if}
-      {#if activity.lastAttemptCompleteTime}
-        {@render detail(
-          translate('workflows.last-attempt-completed-time'),
-          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
-            relative: $relativeTime,
-          }),
-        )}
-      {/if}
       {#if activity.lastStartedTime}
         {@render detail(
           translate('workflows.last-started-time'),
@@ -94,10 +124,6 @@
           }),
         )}
       {/if}
-      {@render detail(
-        translate('workflows.scheduled-event'),
-        scheduleEventLink,
-      )}
       {#if activity.lastWorkerIdentity}
         {@render detail(
           translate('workflows.last-worker-identity'),
@@ -105,9 +131,13 @@
         )}
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
-        {@render failures()}
+        {#if totalPending > 20}
+          {@render failuresAccordion()}
+        {:else}
+          {@render failuresCodeBlock()}
+        {/if}
       {/if}
       {#if activity.heartbeatDetails}
         {@render heartbeat()}
@@ -133,7 +163,7 @@
 
 {#snippet heartbeat()}
   <div>
-    <p class="mb-1 text-sm text-secondary/80">
+    <p class="text-sm text-secondary/80">
       {translate('workflows.heartbeat-details')}
     </p>
     <PayloadDecoder
@@ -143,6 +173,7 @@
     >
       <CodeBlock
         content={decodedValue}
+        maxHeight={384}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
@@ -150,72 +181,78 @@
   </div>
 {/snippet}
 
-{#snippet failures()}
-  {#if activity.lastFailure}
-    <div>
-      <p class="mb-1 text-sm text-secondary/80">
-        {translate('workflows.last-failure')}
-      </p>
-      <CodeBlock
-        maxHeight={384}
-        content={stringifyWithBigInt(omit(activity.lastFailure, 'stackTrace'))}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+{#snippet failuresCodeBlock()}
+  <div class="flex flex-col gap-2">
+    <div class="flex flex-1 flex-col">
+      {#if activity.lastFailure}
+        <p class="text-sm text-secondary/80">
+          {translate('workflows.last-failure')}
+        </p>
+        <CodeBlock
+          content={stringifyWithBigInt(
+            omit(activity.lastFailure, 'stackTrace'),
+          )}
+          maxHeight={384}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      {/if}
     </div>
-  {/if}
-  {#if activity.lastFailure?.stackTrace}
-    <div>
-      <p class="mb-1 text-sm text-secondary/80">
-        {translate('common.stack-trace')}
-      </p>
-      <CodeBlock
-        language="text"
-        content={activity.lastFailure.stackTrace}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
-    </div>
-  {/if}
+    {#if activity.lastFailure?.stackTrace}
+      <div>
+        <p class="text-sm text-secondary/80">
+          {translate('common.stack-trace')}
+        </p>
+        <CodeBlock
+          language="text"
+          maxHeight={384}
+          content={activity.lastFailure.stackTrace}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      </div>
+    {/if}
+  </div>
 {/snippet}
 
-{#snippet scheduleEventLink()}
-  <Link
-    class="text-primary hover:underline"
-    href={routeForEventHistoryEvent({
-      namespace: namespace,
-      eventId: scheduledEvent?.id,
-      workflow,
-      run,
-    })}>{scheduledEvent?.id}</Link
+{#snippet failuresAccordion()}
+  <Accordion
+    title={activity.lastFailure?.stackTrace
+      ? translate('workflows.last-failure-with-stack-trace')
+      : translate('workflows.last-failure')}
+    let:open
   >
+    {#if open}
+      {@render failuresCodeBlock()}
+    {/if}
+  </Accordion>
 {/snippet}
 
-{#snippet nextRetry()}
-  <div class="flex flex-wrap items-center gap-1">
-    {formatDate(activity.scheduledTime, $timeFormat, {
-      relative: $relativeTime,
-      relativeLabel: '',
-    })}
-    <strong
-      >({toTimeDifference({
-        date: activity.scheduledTime,
-        negativeDefault: translate('workflows.no-retry'),
-      })})</strong
-    >
+{#snippet nextRetry(timeDifference)}
+  <div class="flex items-start gap-4">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {translate('workflows.next-retry')}
+    </p>
+    <p class="flex w-full items-center gap-1 whitespace-pre-line">
+      {formatDate(activity.scheduledTime, $timeFormat, {
+        relative: $relativeTime,
+        relativeLabel: '',
+      })}
+      <strong>({timeDifference})</strong>
+    </p>
   </div>
 {/snippet}
 
 {#snippet attempts()}
   <div class="flex flex-wrap items-center gap-1">
-    <Badge class="mr-1 text-nowrap" type={failed ? 'danger' : 'default'}>
+    <Badge type={failed ? 'danger' : 'default'}>
       <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
       {activity.attempt ?? 0} of {formatMaximumAttempts(
         activity.maximumAttempts,
       )}
     </Badge>
     {#if activity.maximumAttempts}
-      <p class="text-sm text-secondary">
+      <p class="ml-1 text-sm text-secondary">
         {formatAttemptsLeft(activity.maximumAttempts, activity.attempt)} remaining
       </p>
     {/if}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -143,7 +144,7 @@
   const attributes = $derived(formatAttributes(event));
 
   const currentEvent = $derived(
-    isEventGroup(event) ? event.events.get(selectedId()) : event,
+    isEventGroup(event) ? event.events.get(selectedId) : event,
   );
 
   const elapsedTime = $derived(
@@ -339,21 +340,35 @@
   >
     <div class="flex items-center gap-2">
       {#if pendingAttempt}
-        <Badge class="mr-1" type={pendingAttempt > 1 ? 'danger' : 'default'}>
+        <Badge
+          class="mr-1"
+          type={hasPendingActivity.paused
+            ? 'warning'
+            : pendingAttempt > 1
+              ? 'danger'
+              : 'default'}
+        >
           <Icon
-            class="mr-1 inline {pendingAttempt > 1 && 'font-bold text-red-400'}"
-            name="retry"
+            class={merge(
+              'mr-1 inline',
+              pendingAttempt > 1 && 'font-bold text-red-400',
+              hasPendingActivity.paused && 'font-bold text-yellow-700',
+            )}
+            name={hasPendingActivity.paused ? 'pause' : 'retry'}
           />
           {translate('workflows.attempt')}
           {pendingAttempt}
           {#if hasPendingActivity}
             / {hasPendingActivity.maximumAttempts || '∞'}
             {#if pendingAttempt > 1}
-              • {translate('workflows.next-retry')}
-              {toTimeDifference({
+              {@const timeDifference = toTimeDifference({
                 date: hasPendingActivity.scheduledTime,
-                negativeDefault: 'None',
+                negativeDefault: '',
               })}
+              {#if timeDifference}
+                • {translate('workflows.next-retry')}
+                {timeDifference}
+              {/if}
             {/if}
           {/if}
         </Badge>

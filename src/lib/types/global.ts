@@ -98,6 +98,7 @@ export type Settings = {
   workflowResetDisabled: boolean;
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
+  activityCommandsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
   notifyOnNewVersion: boolean;
   feedbackURL: string;

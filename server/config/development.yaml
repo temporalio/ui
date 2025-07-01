@@ -22,6 +22,7 @@ batchActionsDisabled: false
 startWorkflowDisabled: false
 hideWorkflowQueryErrors: false
 refreshWorkflowCountsDisabled: false
+activityCommandsDisabled: false
 auth:
   enabled: false
   providers:

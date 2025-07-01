@@ -45,7 +45,9 @@
 
   $: {
     if (group?.pendingActivity) {
-      if (group.pendingActivity.attempt > 1) {
+      if (group.pendingActivity.paused) {
+        status = translate('workflows.paused');
+      } else if (group.pendingActivity.attempt > 1) {
         status = translate('events.event-classification.retrying');
       } else {
         status = translate('events.event-classification.pending');

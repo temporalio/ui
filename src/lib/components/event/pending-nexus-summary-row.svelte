@@ -73,7 +73,7 @@
       {event.scheduledEventId || ''}
     </Link>
   </td>
-  <td class="text-right md:hidden">
+  <td class="table-cell text-right md:hidden">
     {#if abbrEventTime}
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
@@ -84,7 +84,7 @@
       </Copyable>
     {/if}
   </td>
-  <td class="hidden text-right md:block">
+  <td class="hidden text-right md:table-cell">
     {#if eventTime}
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
@@ -113,11 +113,14 @@
             {translate('workflows.attempt')}
             {event.attempt}
             {#if event.attempt > 1}
-              • {translate('workflows.next-retry')}
-              {toTimeDifference({
+              {@const timeDifference = toTimeDifference({
                 date: event.nextAttemptScheduleTime,
-                negativeDefault: 'None',
+                negativeDefault: '',
               })}
+              {#if timeDifference}
+                • {translate('workflows.next-retry')}
+                {timeDifference}
+              {/if}
             {/if}
           </Badge>
         {/if}
