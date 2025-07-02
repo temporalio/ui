@@ -19,11 +19,11 @@ export const createCodecAdapter = (): CodecServerAdapter => ({
     const codecSettings = settings?.codec;
 
     return {
-      endpoint: codecSettings?.endpoint || '',
-      passUserAccessToken: codecSettings?.passAccessToken || false,
-      includeCrossOriginCredentials: codecSettings?.includeCredentials || false,
-      customMessage: codecSettings?.customErrorMessage?.default?.message || '',
-      customLink: codecSettings?.customErrorMessage?.default?.link || '',
+      endpoint: codecSettings?.endpoint ?? '',
+      passUserAccessToken: codecSettings?.passAccessToken ?? false,
+      includeCrossOriginCredentials: codecSettings?.includeCredentials ?? false,
+      customMessage: codecSettings?.customErrorMessage?.default?.message ?? '',
+      customLink: codecSettings?.customErrorMessage?.default?.link ?? '',
     };
   },
 
