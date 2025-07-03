@@ -63,6 +63,22 @@ describe('tokenize', () => {
     ]);
   });
 
+  it('should tokenize the not equal to conditional', () => {
+    const result = [
+      'WorkflowId',
+      '=',
+      'Hello',
+      'and',
+      'WorkflowType',
+      '!=',
+      'World',
+    ];
+    let query = '`WorkflowId`="Hello" and `WorkflowType`!="World"';
+    expect(tokenize(query)).toEqual(result);
+    query = '`WorkflowId` = "Hello" and `WorkflowType` != "World"';
+    expect(tokenize(query)).toEqual(result);
+  });
+
   it('should tokenize the customAttributesWithSpacesQuery', () => {
     const query = customAttributesWithSpacesQuery;
 
@@ -149,6 +165,12 @@ describe('tokenize', () => {
 
   it('should tokenize the startsWithQuery', () => {
     const query = startsWithQuery;
+
+    expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Hello']);
+  });
+
+  it('should tokenize the startsWithQuery without spaces', () => {
+    const query = '`WorkflowType`STARTS_WITH"Hello"';
 
     expect(tokenize(query)).toEqual(['WorkflowType', 'STARTS_WITH', 'Hello']);
   });
