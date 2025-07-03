@@ -15,13 +15,9 @@
 
   let { class: className = '', adapter }: Props = $props();
 
-  let retryCount = $state(0);
-  let maxRetries = 3;
-
   let dataPromise = $derived(loadInitialData(adapter));
 
-  const retryLoad = () => {
-    retryCount++;
+  const retryLoad = async () => {
     dataPromise = loadInitialData(adapter);
   };
 </script>
@@ -34,9 +30,7 @@
   <ApiError
     class={className}
     error={error as ApiErrorType}
-    {retryCount}
-    {maxRetries}
-    onRetry={retryLoad}
+    retryConfig={{ retryFn: retryLoad }}
     title="Failed to load codec server settings"
   />
 {/await}
