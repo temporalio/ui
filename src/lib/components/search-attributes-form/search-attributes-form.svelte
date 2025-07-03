@@ -16,13 +16,9 @@
 
   let { class: className = '', adapter }: Props = $props();
 
-  let retryCount = $state(0);
-  let maxRetries = 3;
-
   let attributesPromise = $derived(loadInitialAttributes(adapter));
 
-  const retryLoad = () => {
-    retryCount++;
+  const retryLoad = async () => {
     attributesPromise = loadInitialAttributes(adapter);
   };
 </script>
@@ -39,9 +35,7 @@
   <ApiError
     class={className}
     error={error as ApiErrorType}
-    {retryCount}
-    {maxRetries}
-    onRetry={retryLoad}
+    retryConfig={{ retryFn: retryLoad }}
     title={translate('search-attributes.load-error-title')}
   />
 {/await}
