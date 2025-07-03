@@ -116,7 +116,6 @@ export const loadInitialAttributes = async (
 export const createFormHandlers = (
   formStore: SuperFormData<SearchAttributesFormData>,
   defaultType: string,
-  initialAttributes: SearchAttributeDefinition[],
   onCancel: () => void,
   reset: () => void,
 ) => {
