@@ -27,6 +27,6 @@ export interface CodecServerApiData {
 export interface CodecServerAdapter {
   fetchCodecServer(): Promise<CodecServerFormData>;
   saveCodecServer(data: CodecServerFormData): Promise<void>;
-  onSuccess?: (data: CodecServerFormData) => void;
+  onSuccess?: (data: CodecServerFormData) => Promise<void>;
   onCancel?: () => void;
 }
