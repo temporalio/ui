@@ -45,5 +45,11 @@
     {translate('namespaces.select-namespace-welcome')}
   </h1>
   <p class="mb-8">{translate('namespaces.select-namespace')}</p>
-  <NamespacePicker {namespaceList} namespace="" />
+  <NamespacePicker
+    {namespaceList}
+    namespace=""
+    noResultsText={$namespaces.length
+      ? translate('common.no-results')
+      : translate('namespaces.select-namespace-empty-state')}
+  />
 </div>

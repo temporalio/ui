@@ -9,6 +9,7 @@
 
   export let namespaceList: NamespaceListItem[] = [];
   export let namespace: string = $page.params.namespace || $lastUsedNamespace;
+  export let noResultsText = translate('common.no-results');
 
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
@@ -26,7 +27,7 @@
 
 <Combobox
   label={translate('namespaces.namespace-label', { namespace })}
-  noResultsText={translate('common.no-results')}
+  {noResultsText}
   labelHidden
   value={namespace}
   id="namespace-switcher"
