@@ -52,7 +52,7 @@ export const createFormSchema = (supportedTypeValues: string[]) => {
 
 export const createFormConfig = (
   adapter: SearchAttributesAdapter,
-  onSave: (attributes: SearchAttributeDefinition[]) => void,
+  onSuccess: (attributes: SearchAttributeDefinition[]) => Promise<void>,
   initialAttributes: SearchAttributeDefinition[],
 ) => {
   const supportedTypes = adapter.getSupportedTypes();
@@ -72,7 +72,7 @@ export const createFormConfig = (
 
         try {
           await adapter.upsertAttributes(form.data.attributes);
-          onSave(form.data.attributes);
+          await onSuccess(form.data.attributes);
           return translate('search-attributes.save-success');
         } catch (error) {
           // Adapter should return an ApiError with user-friendly message

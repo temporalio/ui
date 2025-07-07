@@ -51,7 +51,7 @@ export const createCodecAdapter = (): CodecServerAdapter => ({
     // but we simulate a successful response
   },
 
-  onSuccess: (data: CodecServerFormData) => {
+  onSuccess: async (data: CodecServerFormData) => {
     console.log('Cluster-level codec server configuration saved:', data);
     // In a real implementation, this might:
     // - Trigger a cluster settings refresh
