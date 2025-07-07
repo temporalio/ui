@@ -8,8 +8,8 @@
   import { routeForNamespace } from '$lib/utilities/route-for';
 
   export let namespaceList: NamespaceListItem[] = [];
+  export let namespace: string = $page.params.namespace || $lastUsedNamespace;
 
-  $: namespace = $page.params.namespace || $lastUsedNamespace;
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
