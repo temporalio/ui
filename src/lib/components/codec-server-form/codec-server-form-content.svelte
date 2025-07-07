@@ -24,12 +24,7 @@
   let { class: className = '', adapter, initialData }: Props = $props();
 
   const { superFormInstance } = $derived(
-    createFormConfig(
-      adapter,
-      adapter.onSuccess || (() => {}),
-      initialData,
-      () => showCustomSection,
-    ),
+    createFormConfig(adapter, initialData, () => showCustomSection),
   );
 
   const {
