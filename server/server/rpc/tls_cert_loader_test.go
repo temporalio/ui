@@ -69,11 +69,13 @@ func TestCertLoader_ReloadsNewKeyPair(t *testing.T) {
 				certPEM2, keyPEM2 = generateCertKeyPair(t, "updated")
 			}
 
-			// Write the new certificate (always updated)
+			// Write the new certificate
 			assert.NoError(t, os.WriteFile(certPath, certPEM2, 0644))
 
-			// Write the key file (same key if reuseKey is true, new key otherwise)
-			assert.NoError(t, os.WriteFile(keyPath, keyPEM2, 0644))
+			// Write the new key if we are not reusing the existing key
+			if !tt.reuseKey {
+				assert.NoError(t, os.WriteFile(keyPath, keyPEM2, 0644))
+			}
 
 			// Second load should pick up the updated pair
 			loaded2, err := loader.GetClientCertificate(nil)
@@ -88,6 +90,9 @@ func TestCertLoader_ReloadsNewKeyPair(t *testing.T) {
 
 			// Compare the loaded private key with the expected one
 			assert.Equal(t, expect2.PrivateKey, loaded2.PrivateKey)
+
+			// Ensure the loader did not return the old certificate
+			assert.NotEqual(t, expect1.Certificate, loaded2.Certificate)
 		})
 	}
 }
