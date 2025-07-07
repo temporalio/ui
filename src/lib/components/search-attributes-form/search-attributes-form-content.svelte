@@ -25,11 +25,7 @@
   let { class: className = '', adapter, initialAttributes }: Props = $props();
 
   const { superFormInstance, supportedTypes, defaultType } = $derived(
-    createFormConfig(
-      adapter,
-      adapter.onSuccess || (() => {}),
-      initialAttributes,
-    ),
+    createFormConfig(adapter, initialAttributes),
   );
 
   const {

@@ -29,7 +29,6 @@ export const loadInitialData = async (adapter: CodecServerAdapter) => {
 
 export const createFormConfig = (
   adapter: CodecServerAdapter,
-  onSuccess: (data: CodecServerFormData) => Promise<void>,
   initialData: CodecServerFormData,
   showCustomSection: () => boolean,
 ) => {
@@ -57,7 +56,7 @@ export const createFormConfig = (
             customLink: showCustomSection() ? form.data.customLink : '',
           };
           await adapter.saveCodecServer(dataToSave);
-          await onSuccess(dataToSave);
+          await adapter.onSuccess(dataToSave);
           return translate('codec-server.save-success');
         } catch (error) {
           console.error('Failed to save codec server configuration:', error);

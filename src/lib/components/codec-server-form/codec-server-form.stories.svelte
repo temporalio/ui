@@ -24,7 +24,7 @@
       await new Promise((resolve) => setTimeout(resolve, 1000));
     },
 
-    onSuccess: (data: CodecServerFormData) => {
+    onSuccess: async (data: CodecServerFormData) => {
       action('onSuccess')(data);
     },
 
@@ -51,7 +51,7 @@
       await new Promise((resolve) => setTimeout(resolve, 1000));
     },
 
-    onSuccess: (data: CodecServerFormData) => {
+    onSuccess: async (data: CodecServerFormData) => {
       action('onSuccess')(data);
     },
 
