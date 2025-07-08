@@ -38,9 +38,6 @@ dependencies:
   '@sveltejs/package':
     specifier: ^2.3.10
     version: 2.3.10(svelte@5.25.5)(typescript@5.2.2)
-  '@sveltejs/svelte-virtual-list':
-    specifier: ^3.0.1
-    version: 3.0.1
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -3326,10 +3323,6 @@ packages:
       svelte2tsx: 0.7.35(svelte@5.25.5)(typescript@5.2.2)
     transitivePeerDependencies:
       - typescript
-    dev: false
-
-  /@sveltejs/svelte-virtual-list@3.0.1:
-    resolution: {integrity: sha512-aF9TptS7NKKS7/TqpsxQBSDJ9Q0XBYzBehCeIC5DzdMEgrJZpIYao9LRLnyyo6SVodpapm2B7FE/Lj+FSA5/SQ==}
     dev: false
 
   /@sveltejs/vite-plugin-svelte-inspector@4.0.1(@sveltejs/vite-plugin-svelte@5.0.3)(svelte@5.25.5)(vite@6.2.7):
