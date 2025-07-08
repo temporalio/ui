@@ -134,7 +134,7 @@
   >
     {#if leadingIcon || loading}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+        <Icon name={loading ? 'spinner-solid' : leadingIcon} />
       </span>
     {/if}
     <slot />
@@ -169,7 +169,7 @@
   >
     {#if leadingIcon || loading}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+        <Icon name={loading ? 'spinner-solid' : leadingIcon} />
       </span>
     {/if}
     <slot />
