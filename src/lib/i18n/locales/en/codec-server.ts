@@ -33,4 +33,5 @@ export const Strings = {
   'saving-button': 'Saving...',
   'cancel-button': 'Cancel',
   'save-success': 'Codec server configuration saved successfully',
+  'load-error-title': 'Failed to load codec server settings',
 };

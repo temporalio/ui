@@ -1,5 +1,6 @@
 <script lang="ts">
   import ApiError from '$lib/components/api-error.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { ApiError as ApiErrorType } from '$lib/utilities/api-error-handler';
 
   import type { CodecServerAdapter } from './types';
@@ -30,7 +31,7 @@
   <ApiError
     class={className}
     error={error as ApiErrorType}
-    retryConfig={{ retryFn: retryLoad }}
-    title="Failed to load codec server settings"
+    retryConfig={{ onRetry: retryLoad }}
+    title={translate('codec-server.load-error-title')}
   />
 {/await}

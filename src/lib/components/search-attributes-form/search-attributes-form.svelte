@@ -35,7 +35,7 @@
   <ApiError
     class={className}
     error={error as ApiErrorType}
-    retryConfig={{ retryFn: retryLoad }}
+    retryConfig={{ onRetry: retryLoad }}
     title={translate('search-attributes.load-error-title')}
   />
 {/await}

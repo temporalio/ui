@@ -2,11 +2,12 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { ApiError as ApiErrorType } from '$lib/utilities/api-error-handler';
 
   interface RetryConfig {
     maxRetries?: number;
-    retryFn: () => Promise<unknown>;
+    onRetry: () => Promise<unknown>;
   }
 
   interface Props {
@@ -20,12 +21,12 @@
     class: className = '',
     error,
     retryConfig,
-    title = 'An Error Occurred',
+    title = translate('common.error-occurred'),
   }: Props = $props();
 
   let retryCount = $state(0);
   let isRetrying = $state(false);
-  const maxRetries = retryConfig?.maxRetries ?? 3;
+  const maxRetries = $derived(retryConfig?.maxRetries ?? 3);
 
   const handleRetry = async () => {
     if (!retryConfig || retryCount >= maxRetries) return;
@@ -34,7 +35,7 @@
     retryCount++;
 
     try {
-      await retryConfig.retryFn();
+      await retryConfig.onRetry();
     } catch (err) {
       console.error('Retry failed:', err);
     } finally {
@@ -47,13 +48,12 @@
   <Alert intent="error" {title}>
     <div class="space-y-3">
       <p>
-        {error.userMessage || 'An unexpected error occurred.'}
+        {error.userMessage || translate('common.unexpected-error')}
       </p>
 
       {#if error.isTemporary}
         <p class="text-sm text-orange-600">
-          This appears to be a temporary issue. Please try again in a few
-          moments.
+          {translate('common.temporary-error')}
         </p>
       {/if}
 
@@ -66,19 +66,28 @@
             disabled={isRetrying}
           >
             <Icon name="retry" />
-            {isRetrying ? 'Retrying...' : 'Try Again'}
+            {isRetrying
+              ? translate('common.retrying')
+              : translate('common.try-again')}
           </Button>
           {#if retryCount > 0}
             <span class="text-gray-500 self-center text-sm">
-              Attempt {retryCount + 1} of {maxRetries + 1}
+              {translate('common.retry-attempt', {
+                current: retryCount + 1,
+                total: maxRetries + 1,
+              })}
             </span>
           {/if}
         </div>
       {:else if retryConfig && retryCount >= maxRetries}
         <div class="text-gray-600 text-sm">
-          <p>Unable to complete operation after {maxRetries + 1} attempts.</p>
           <p>
-            Please refresh the page or contact support if the problem persists.
+            {translate('common.max-retries-exceeded', {
+              attempts: maxRetries + 1,
+            })}
+          </p>
+          <p>
+            {translate('common.retry-support-message')}
           </p>
         </div>
       {/if}
