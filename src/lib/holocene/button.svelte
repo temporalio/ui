@@ -132,15 +132,15 @@
     tabindex={href ? null : 0}
     {...$$restProps}
   >
-    {#if leadingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner-solid' : leadingIcon} />
+    {#if leadingIcon}
+      <span>
+        <Icon name={leadingIcon} />
       </span>
     {/if}
     <slot />
-    {#if trailingIcon}
-      <span>
-        <Icon name={trailingIcon} />
+    {#if trailingIcon || loading}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner-solid' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
@@ -167,15 +167,16 @@
     )}
     {...$$restProps}
   >
-    {#if leadingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner-solid' : leadingIcon} />
+    {#if leadingIcon}
+      <span>
+        <Icon name={leadingIcon} />
       </span>
     {/if}
     <slot />
-    {#if trailingIcon}
-      <span>
-        <Icon name={trailingIcon} />
+
+    {#if trailingIcon || loading}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner-solid' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
