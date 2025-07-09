@@ -36,7 +36,7 @@ interface SearchAttributesAdapter {
   upsertAttributes(attributes: SearchAttributeDefinition[]): Promise<void>;
   deleteAttribute(attributeName: string): Promise<void>;
   getSupportedTypes(): SearchAttributeTypeOption[];
-  onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+  onSuccess?: (attributes: SearchAttributeDefinition[]) => Promise<void>;
   onCancel?: () => void;
 }
 ```
@@ -71,7 +71,7 @@ import { page } from '$app/state';
 import { goto } from '$app/navigation';
 
 export const customAdapter: SearchAttributesAdapter = {
-  onSuccess: (attributes) => {
+  onSuccess: async (attributes) => {
     // Custom success handling
     console.log('Saved:', attributes);
     goto(`/namespaces/${page.params.namespace}/settings`);
