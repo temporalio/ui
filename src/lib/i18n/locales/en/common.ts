@@ -203,4 +203,14 @@ export const Strings = {
   column: 'Column',
   columns: 'Columns',
   'child-count': 'Child Count',
+  'unexpected-error': 'An unexpected error occurred.',
+  'temporary-error':
+    'This appears to be a temporary issue. Please try again in a few moments.',
+  retrying: 'Retrying...',
+  'try-again': 'Try Again',
+  'retry-attempt': 'Attempt {{current}} of {{total}}',
+  'max-retries-exceeded':
+    'Unable to complete operation after {{attempts}} attempts.',
+  'retry-support-message':
+    'Please refresh the page or contact support if the problem persists.',
 } as const;
