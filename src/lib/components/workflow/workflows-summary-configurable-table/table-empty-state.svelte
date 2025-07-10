@@ -5,9 +5,14 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
-  import emptyImage from '$lib/vendor/empty-state-dark_2x.png';
+  import { useDarkMode } from '$lib/utilities/dark-mode';
+  import emptyImageDark from '$lib/vendor/empty-state-dark_2x.png';
+  import emptyImageLight from '$lib/vendor/empty-state-light_2x.png';
 
   $: query = $page.url.searchParams.get('query');
+
+  $: emptyImage = $useDarkMode ? emptyImageDark : emptyImageLight;
+  $: noResultsImages = $useDarkMode ? emptyImageDark : emptyImageLight;
 
   const samples = [
     'samples-go',
@@ -74,8 +79,10 @@
     {/if}
   </div>
   <div class="bg-[#DDD6FE]">
-    {#if !query}
-      <img src={emptyImage} alt="" class="aspect-auto" />
-    {/if}
+    <img
+      src={query ? noResultsImages : emptyImage}
+      alt=""
+      class="aspect-auto"
+    />
   </div>
 </div>
