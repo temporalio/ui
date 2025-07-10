@@ -78,11 +78,13 @@
       </ul>
     {/if}
   </div>
-  <div class="bg-[#DDD6FE]">
+  <div
+    class="flex h-64 items-center justify-center overflow-hidden bg-[#DDD6FE] xl:h-auto xl:flex-1"
+  >
     <img
       src={query ? noResultsImages : emptyImage}
       alt=""
-      class="aspect-auto"
+      class="max-h-full max-w-full object-contain"
     />
   </div>
 </div>
