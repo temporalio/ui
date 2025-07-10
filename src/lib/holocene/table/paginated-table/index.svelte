@@ -27,7 +27,7 @@
     {#if $$slots.loading}
       <slot name="loading" />
     {:else}
-      <SkeletonTable rows={15} />
+      <SkeletonTable rows={15} class="!border-0" />
     {/if}
   {:else}
     <table
