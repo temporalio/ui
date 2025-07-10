@@ -5,10 +5,14 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
-  import emptyImage from '$lib/vendor/empty-state-dark_2x.png';
-  import noResultsImages from '$lib/vendor/empty-state-light_2x.png';
+  import { useDarkMode } from '$lib/utilities/dark-mode';
+  import emptyImageDark from '$lib/vendor/empty-state-dark_2x.png';
+  import emptyImageLight from '$lib/vendor/empty-state-light_2x.png';
 
   $: query = $page.url.searchParams.get('query');
+
+  $: emptyImage = $useDarkMode ? emptyImageDark : emptyImageLight;
+  $: noResultsImages = $useDarkMode ? emptyImageDark : emptyImageLight;
 
   const samples = [
     'samples-go',
@@ -28,7 +32,7 @@
   aria-live="polite"
 >
   <div
-    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 border-b border-subtle p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r"
+    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px]"
   >
     <h2>
       {#if query}
@@ -74,11 +78,13 @@
       </ul>
     {/if}
   </div>
-  <div class="bg-[#DDD6FE]">
+  <div
+    class="flex h-64 items-center justify-center overflow-hidden bg-[#DDD6FE] xl:h-auto xl:flex-1"
+  >
     <img
       src={query ? noResultsImages : emptyImage}
       alt=""
-      class="aspect-auto"
+      class="max-h-full max-w-full object-contain"
     />
   </div>
 </div>
