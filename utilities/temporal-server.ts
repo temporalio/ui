@@ -85,8 +85,22 @@ export const createTemporalServer = async ({
     flags.push(`--db-filename=${dbFilename}`);
   }
 
-  const temporal =
-    $`${cliPath} server start-dev --dynamic-config-value frontend.enableUpdateWorkflowExecution=true --dynamic-config-value frontend.enableUpdateWorkflowExecutionAsyncAccepted=true --dynamic-config-value frontend.workerVersioningDataAPIs=true --dynamic-config-value frontend.workerVersioningWorkflowAPIs=true --dynamic-config-value worker.buildIdScavengerEnabled=true --dynamic-config-value system.enableNexus=true ${flags}`.quiet();
+  [
+    { flag: 'frontend.enableUpdateWorkflowExecution', value: 'true' },
+    {
+      flag: 'frontend.enableUpdateWorkflowExecutionAsyncAccepted',
+      value: 'true',
+    },
+    { flag: 'frontend.workerVersioningDataAPIs', value: 'true' },
+    { flag: 'frontend.workerVersioningWorkflowAPIs', value: 'true' },
+    { flag: 'worker.buildIdScavengerEnabled', value: 'true' },
+    { flag: 'system.enableNexus', value: 'true' },
+  ].forEach(({ flag, value }) => {
+    flags.push('--dynamic-config-value');
+    flags.push(`${flag}=${value}`);
+  });
+
+  const temporal = $`${cliPath} server start-dev ${flags}`.quiet();
 
   temporal.catch(async ({ stdout, stderr, exitCode }) => {
     console.log('EXIT CODE', exitCode);
