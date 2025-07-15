@@ -11,7 +11,6 @@
 
   $: query = $page.url.searchParams.get('query');
 
-  $: emptyImage = $useDarkMode ? emptyImageDark : emptyImageLight;
   $: noResultsImages = $useDarkMode ? emptyImageDark : emptyImageLight;
 
   const samples = [
@@ -24,13 +23,7 @@
   ];
 </script>
 
-<svelte:head>
-  <link rel="preload" as="image" href={emptyImage} />
-</svelte:head>
-<div
-  class="flex h-auto w-full flex-col overflow-hidden xl:flex-row"
-  aria-live="polite"
->
+<div class="h-auto w-full overflow-hidden xl:flex-row" aria-live="polite">
   <div
     class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px]"
   >
@@ -78,11 +71,16 @@
       </ul>
     {/if}
   </div>
-  <div
-    class="flex h-64 items-center justify-center overflow-hidden bg-[#DDD6FE] xl:h-auto xl:flex-1"
-  >
+  <div class="bg-[#DDD6FE]">
+    {#if !query}
+      <img
+        src={noResultsImages}
+        alt=""
+        class="max-h-full max-w-full object-contain"
+      />
+    {/if}
     <img
-      src={query ? noResultsImages : emptyImage}
+      src={noResultsImages}
       alt=""
       class="max-h-full max-w-full object-contain"
     />
