@@ -9,9 +9,11 @@
   export let rows = 10;
   export let columns = 4;
   export let columnWidths: number[] = new Array(columns).fill(100 / columns);
+  export let className = '';
+  export { className as class };
 </script>
 
-<Table class="w-full table-fixed" variant="fancy">
+<Table class="w-full table-fixed {className}" variant="fancy">
   <TableHeaderRow slot="headers" class="h-8">
     <slot name="headers">
       {#each Array.from(new Array(columns)) as _column, i}
