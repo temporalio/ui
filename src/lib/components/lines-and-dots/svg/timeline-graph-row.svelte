@@ -94,6 +94,7 @@
   $: activityTaskScheduled = group.eventList.find(isActivityTaskStartedEvent);
   $: retried =
     activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1;
+  $: pendingLine = group.isPending || !!pauseTime;
 </script>
 
 <g
@@ -104,6 +105,19 @@
   class="relative cursor-pointer"
   {height}
 >
+  {#if pendingLine}
+    {@const width = pauseTime
+      ? points[1] - points[0]
+      : canvasWidth - 2 * gutter}
+    <rect
+      y={y - height / 2}
+      x={points[0]}
+      {width}
+      {height}
+      fill="transparent"
+      pointer-events="all"
+    />
+  {/if}
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}
     {@const showText = textIndex === index}

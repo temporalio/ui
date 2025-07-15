@@ -90,7 +90,7 @@
     {/if}
   </div>
 </div>
-<div class="relative px-2 pb-24 md:px-4 lg:px-8">
+<div class="relative select-none px-2 pb-24 md:px-4 lg:px-8">
   <div
     class="flex flex-wrap items-center justify-between gap-2 bg-off-white/50 py-2 xl:gap-8 dark:bg-space-black/50"
     class:sticky-header={!$minimizeEventView}
