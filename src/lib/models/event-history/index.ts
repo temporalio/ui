@@ -72,7 +72,12 @@ export const toEvent = (
   const category = getEventCategory(eventType);
 
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  const links = historyEvent?.links || [];
+  const completionLinks =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (attributes as any)?.completionCallbacks?.[0]?.links ||
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (attributes as any)?.attachedCompletionCallbacks?.[0]?.links;
+  const links = historyEvent?.links || completionLinks || [];
   const event = {
     ...historyEvent,
     name: eventType,
