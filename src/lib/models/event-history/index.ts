@@ -72,6 +72,7 @@ export const toEvent = (
   const category = getEventCategory(eventType);
 
   const { key, attributes } = findAttributesAndKey(historyEvent);
+  // TODO: When TS SDK supports new fields, remove this workaround
   const completionLinks =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (attributes as any)?.completionCallbacks?.[0]?.links ||
