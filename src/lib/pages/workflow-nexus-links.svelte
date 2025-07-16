@@ -17,7 +17,7 @@
   } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  const { namespace, id, run } = $derived(page.params);
+  const { namespace, workflow: workflowId, run } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
   const pendingActivities = $derived(workflow?.pendingActivities);
   const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
@@ -44,53 +44,21 @@
   <h2 data-testid="nexus-links-title">
     {translate('workflows.nexus-links-tab')}
   </h2>
-  {#if nexusGroups.length}
-    <h3>Outbound</h3>
+  {#if callbacks?.length}
+    <h3>Inbound</h3>
     <Table class="mb-6 w-full min-w-[600px] table-fixed">
       <caption class="sr-only" slot="caption"
         >{translate('workflows.workers-tab')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th>{translate('nexus.caller-event')}</th>
+        <th>{translate('nexus.caller-link')}</th>
         <th>{translate('nexus.caller-namespace')}</th>
-        <th>{translate('nexus.nexus-endpoint-simple')}</th>
-        <th>{translate('nexus.nexus-service')}</th>
-        <th>{translate('nexus.nexus-operation')}</th>
-        <th>{translate('nexus.handler-namespace')}</th>
-        <th>{translate('nexus.handler-event')}</th>
+        <th>{translate('nexus.caller-event')}</th>
       </TableHeaderRow>
-      {#each nexusGroups as group}
-        {@const link = group.links[0]}
-        {@const scheduledEvent = group.eventList.find((e) =>
-          isNexusOperationScheduledEvent(e),
-        )}
+      {#each callbacks as { callback }}
+        {@const link = callback.links[0]}
         <TableRow data-testid="worker-row">
-          <td class="text-left" data-testid="link-event">
-            <Link
-              href={routeForEventHistoryEvent({
-                namespace,
-                workflow: id,
-                run,
-                eventId: scheduledEvent.id,
-              })}>{scheduledEvent.id}</Link
-            >
-          </td>
-          <td class="text-left" data-testid="link-namespace">
-            <Link
-              href={routeForNamespace({
-                namespace,
-              })}>{namespace}</Link
-            >
-          </td>
-          <td class="text-left" data-testid="link-endpoint">
-            {scheduledEvent?.attributes?.endpoint}
-          </td>
-          <td class="text-left" data-testid="link-service">
-            {scheduledEvent?.attributes?.service}
-          </td>
-          <td class="text-left" data-testid="link-operation">
-            {scheduledEvent?.attributes?.operation}
-          </td>
+          <td class="text-left" data-testid="link-event"> </td>
           <td class="text-left" data-testid="link-namespace">
             <Link
               href={routeForNamespace({
@@ -113,25 +81,38 @@
       {/each}
     </Table>
   {/if}
-  {#if callbacks?.length}
-    <h3>Inbound</h3>
+  {#if nexusGroups.length}
+    <h3>Outbound</h3>
     <Table class="mb-6 w-full min-w-[600px] table-fixed">
       <caption class="sr-only" slot="caption"
         >{translate('workflows.workers-tab')}</caption
       >
       <TableHeaderRow slot="headers">
-        <!-- <th>{translate('nexus.handler-event')}</th> -->
-        <th>{translate('nexus.handler-namespace')}</th>
-        <!-- <th>{translate('nexus.nexus-endpoint-simple')}</th>
+        <th>{translate('nexus.source-event')}</th>
+        <th>{translate('nexus.source-namespace')}</th>
+        <th>{translate('nexus.nexus-endpoint-simple')}</th>
         <th>{translate('nexus.nexus-service')}</th>
-        <th>{translate('nexus.nexus-operation')}</th> -->
-        <th>{translate('nexus.caller-namespace')}</th>
-        <th>{translate('nexus.caller-event')}</th>
+        <th>{translate('nexus.nexus-operation')}</th>
+        <th>{translate('nexus.target-link')}</th>
+        <th>{translate('common.event-type')}</th>
       </TableHeaderRow>
-      {#each callbacks as { callback }}
-        {@const link = callback.links[0]}
+      {#each nexusGroups as group}
+        {@const link = group.links[0]}
+        {console.log('link', link)}
+        {@const scheduledEvent = group.eventList.find((e) =>
+          isNexusOperationScheduledEvent(e),
+        )}
         <TableRow data-testid="worker-row">
-          <!-- <td class="text-left" data-testid="link-event"> </td> -->
+          <td class="text-left" data-testid="link-event">
+            <Link
+              href={routeForEventHistoryEvent({
+                namespace,
+                workflow: workflowId,
+                run,
+                eventId: scheduledEvent.id,
+              })}>{scheduledEvent.id}</Link
+            >
+          </td>
           <td class="text-left" data-testid="link-namespace">
             <Link
               href={routeForNamespace({
@@ -139,9 +120,15 @@
               })}>{namespace}</Link
             >
           </td>
-          <!-- <td class="text-left" data-testid="link-endpoint">-</td>
-          <td class="text-left" data-testid="link-service">-</td>
-          <td class="text-left" data-testid="link-operation">-</td> -->
+          <td class="text-left" data-testid="link-endpoint">
+            {scheduledEvent?.attributes?.endpoint}
+          </td>
+          <td class="text-left" data-testid="link-service">
+            {scheduledEvent?.attributes?.service}
+          </td>
+          <td class="text-left" data-testid="link-operation">
+            {scheduledEvent?.attributes?.operation}
+          </td>
           <td class="text-left" data-testid="link-namespace">
             <Link
               href={routeForNamespace({

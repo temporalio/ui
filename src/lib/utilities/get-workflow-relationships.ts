@@ -1,11 +1,10 @@
-import type { DescribeNamespaceResponse } from '$lib/types';
+import type { DescribeNamespaceResponse, EventLink } from '$lib/types';
 import type {
   ChildWorkflowExecutionCanceledEvent,
   ChildWorkflowExecutionCompletedEvent,
   ChildWorkflowExecutionFailedEvent,
   ChildWorkflowExecutionTerminatedEvent,
   ChildWorkflowExecutionTimedOutEvent,
-  EventLink,
   IterableEvent,
   WorkflowEvents,
 } from '$lib/types/events';

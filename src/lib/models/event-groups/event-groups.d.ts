@@ -1,6 +1,5 @@
-import type { Payload } from '$lib/types';
+import type { EventLink, Payload } from '$lib/types';
 import type {
-  EventLink,
   PendingActivity,
   PendingNexusOperation,
   WorkflowEvent,

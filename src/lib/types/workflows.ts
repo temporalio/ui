@@ -3,6 +3,7 @@ import type {
   Payloads,
   PendingWorkflowTaskInfo,
   WorkflowExecutionStatus,
+  WorkflowExtendedInfo,
   WorkflowVersionTimpstamp,
 } from '$lib/types';
 import type { Callback } from '$lib/types/nexus';
@@ -78,23 +79,12 @@ export type UserMetadata = {
   details?: Payload;
 };
 
-export type WorkflowExecutionConfigWithMetadata = WorkflowExecutionConfig & {
-  userMetadata?: UserMetadata;
-};
-
-export type WorkflowExtendedInfo = {
-  resetRunId?: string;
-  originalStartTime?: string;
-  requestIdInfos?: Record<string, { eventType: string; eventId: string }>;
-  runExpirationTime?: string;
-};
-
 export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
-  executionConfig: WorkflowExecutionConfigWithMetadata;
+  executionConfig: WorkflowExecutionConfig;
   callbacks: Callback[];
   pendingWorkflowTask: PendingWorkflowTaskInfo;
   workflowExtendedInfo: WorkflowExtendedInfo;
