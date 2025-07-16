@@ -1,7 +1,7 @@
 import type { Timestamp } from '@temporalio/common';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import type { ActivityOptions } from '$lib/types';
+import type { ActivityOptions, EventLink } from '$lib/types';
 
 import type { Replace, Settings } from './global';
 
@@ -9,26 +9,6 @@ export type EventHistory = Replace<
   import('$lib/types').History,
   { events: HistoryEvent[] }
 >;
-
-export type EventLink = {
-  workflowEvent: {
-    eventRef?: {
-      eventType: string;
-      eventId?: string;
-    };
-    requestIdRef?: {
-      requestId: string;
-      eventType: string;
-    };
-    namespace: string;
-    workflowId: string;
-    runId: string;
-  };
-
-  batchJob?: {
-    jobId: string;
-  };
-};
 
 export type HistoryEvent = Replace<
   import('$lib/types').HistoryEvent,
