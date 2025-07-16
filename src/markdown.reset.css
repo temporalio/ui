@@ -5,6 +5,9 @@ body {
   border: 0;
   font-size: 100%;
   vertical-align: baseline;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
 }
 
 body {
@@ -95,10 +98,78 @@ blockquote {
 
 code {
   font-family: monospace;
-  padding-top: 0.125rem;
-  padding-bottom: 0.125rem;
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+}
+body[data-theme='light-background'] code {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+}
+body[data-theme='dark-background'] code {
+  font-family: monospace;
+  border-radius: 0.25rem;
+  background: #292d3e;
+  color: #f8fafc;
+}
+body[data-theme='light-primary'] code {
+  font-family: monospace;
+  border-radius: 0.25rem;
+  background: pink;
+  color: #121416;
+}
+body[data-theme='dark-primary'] code {
+  font-family: monospace;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+}
+
+body[data-theme='light-background'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border-color: #aebed9;
+  background: #e8efff;
+  color: #141414;
+}
+body[data-theme='dark-background'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border-color: #1e293b;
+  background: #292d3e;
+  color: #f8fafc;
+}
+
+body[data-theme='light-primary'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: pink;
+  color: #121416;
+}
+body[data-theme='dark-primary'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: #e8efff;
+  color: #121416;
+}
+body[data-theme='light-primary'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background: pink;
+  color: #121416;
+}
+body[data-theme='dark-primary'] pre {
+  font-family: monospace;
+  padding: 0.5rem;
   border-radius: 0.25rem;
   background: #e8efff;
   color: #121416;
@@ -106,7 +177,7 @@ code {
 
 pre {
   font-family: monospace;
-  padding: 0.25rem;
+  padding: 0.5rem;
   border-radius: 0.25rem;
   background: #e8efff;
   color: #121416;
@@ -157,6 +228,54 @@ body[data-theme='light-primary'] {
 
 body[data-theme='dark-primary'] {
   background-color: #000;
+  color: #f8fafc;
+  a {
+    color: #8098f9;
+  }
+}
+
+body[data-theme='light-info'] {
+  background-color: #e8efff;
+  color: #121416;
+  a {
+    color: #444ce7;
+  }
+}
+
+body[data-theme='dark-info'] {
+  background-color: #000;
+  color: #f8fafc;
+  a {
+    color: #8098f9;
+  }
+}
+
+body[data-theme='light-details'] {
+  background-color: #e0eaff;
+  color: #121416;
+  a {
+    color: #444ce7;
+  }
+}
+
+body[data-theme='light-details'] pre {
+  background-color: #e0eaff;
+  color: #121416;
+  a {
+    color: #444ce7;
+  }
+}
+
+body[data-theme='dark-details'] {
+  background-color: #1a1c4c;
+  color: #f8fafc;
+  a {
+    color: #8098f9;
+  }
+}
+
+body[data-theme='dark-details'] pre {
+  background-color: #141414;
   color: #f8fafc;
   a {
     color: #8098f9;
