@@ -16,7 +16,7 @@ export const toTimeDifference = ({
     const scheduled = Number(new Date(start));
     const timeFromNow = (scheduled - now) / 1000;
 
-    if (negativeDefault && timeFromNow < 0) {
+    if (negativeDefault !== undefined && timeFromNow < 0) {
       return negativeDefault;
     }
 

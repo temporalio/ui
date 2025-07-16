@@ -265,10 +265,11 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			border-left-color: #92a4c3;
 			background: #e8efff;
 			color: #121416;
-			p {
-				font-size: 1.25rem;
-				line-height: 1.75rem;
-			}
+		}
+
+		blockquote p {
+			font-size: 1.25rem;
+			line-height: 1.75rem;
 		}
 
 		code {
@@ -288,26 +289,29 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			border-radius: 0.25rem;
 			background: #e8efff;
 			color: #121416;
-			code {
-				padding: 0;
-			}
+		}
+
+		pre code {
+			padding: 0;
 		}
 
 		body[data-theme='light'] {
 			background-color: #fff;
 			color: #121416;
-			a {
-				color: #444ce7;
-			}
+		}
+
+		body[data-theme='light'] a {
+			color: #444ce7;
 		}
 
 		body[data-theme='dark'] {
   		background-color: #141414;
 			color: #f8fafc;
-			a {
+		}
+			
+		body[data-theme='dark'] a {
 				color: #8098f9;
-			}
-		}`,
+			}`,
 		}
 
 		// Set headers

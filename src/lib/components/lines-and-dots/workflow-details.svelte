@@ -1,16 +1,21 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
+  import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
+  import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import {
+    routeForTaskQueue,
     routeForWorkerDeployment,
-    routeForWorkers,
     routeForWorkflow,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
@@ -34,26 +39,44 @@
   let { workflow, next }: Props = $props();
 
   let latestRunId = $state<string | undefined>(undefined);
-  let { namespace } = $derived(page.params);
-  let elapsedTime = $derived(
+
+  const { namespace } = $derived(page.params);
+  const elapsedTime = $derived(
     formatDistanceAbbreviated({
       start: workflow?.startTime,
       end: workflow?.endTime || Date.now(),
       includeMilliseconds: true,
     }),
   );
-  let deployment = $derived(
+  const deployment = $derived(
     workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
   );
-  let deploymentVersion = $derived(
+  const deploymentVersion = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkerDeploymentVersion'
     ],
   );
-  let versioningBehavior = $derived(
+
+  const versioningBuildId = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ||
+      getBuildIdFromVersion(deploymentVersion),
+  );
+
+  const versioningBehavior = $derived(
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ],
+  );
+  let totalActions = $derived(
+    $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
+  );
+
+  const workflowCompletedTasks = $derived(
+    $fullEventHistory.filter(isWorkflowTaskCompletedEvent),
+  );
+
+  const { sdk, version: sdkVersion } = $derived(
+    getSDKandVersion(workflowCompletedTasks),
   );
 
   const fetchLatestRun = async () => {
@@ -122,10 +145,9 @@
     <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
     <DetailListLinkValue
       text={workflow?.taskQueue}
-      href={routeForWorkers({
+      href={routeForTaskQueue({
         namespace,
-        workflow: workflow?.id,
-        run: workflow?.runId,
+        queue: workflow?.taskQueue,
       })}
     />
   </DetailListColumn>
@@ -141,11 +163,11 @@
         })}
       />
 
-      {#if deploymentVersion}
+      {#if versioningBuildId}
         <DetailListLabel>
-          {translate('deployments.deployment-version')}
+          {translate('deployments.build-id')}
         </DetailListLabel>
-        <DetailListTextValue text={deploymentVersion} />
+        <DetailListTextValue text={versioningBuildId} />
       {/if}
 
       {#if versioningBehavior}
@@ -192,11 +214,27 @@
         >{translate('workflows.state-transitions')}</DetailListLabel
       >
       <DetailListTextValue text={workflow?.stateTransitionCount} />
+    {:else}
+      <Tooltip
+        bottomLeft
+        text={translate('workflows.billable-actions-disclaimer')}
+        width={240}
+        class="col-[1]"
+      >
+        <DetailListLabel
+          href="https://docs.temporal.io/cloud/actions#actions-in-workflows"
+        >
+          {translate('workflows.billable-actions')}
+        </DetailListLabel>
+      </Tooltip>
+      <DetailListTextValue text={totalActions} />
     {/if}
 
-    <DetailListLabel>SDK</DetailListLabel>
-    <DetailListValue>
-      <SdkLogo />
-    </DetailListValue>
+    {#if sdk && sdkVersion}
+      <DetailListLabel>SDK</DetailListLabel>
+      <DetailListValue>
+        <SdkLogo {sdk} version={sdkVersion} />
+      </DetailListValue>
+    {/if}
   </DetailListColumn>
 </DetailList>

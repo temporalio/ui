@@ -1,3 +1,4 @@
+import * as Activities from './activities';
 import * as Batch from './batch';
 import * as Common from './common';
 import * as DataEncoder from './data-encoder';
@@ -7,6 +8,7 @@ import * as Events from './events';
 import * as Namespaces from './namespaces';
 import * as Nexus from './nexus';
 import * as Schedules from './schedules';
+import * as SearchAttributes from './search-attributes';
 import * as TypedErrors from './typed-errors';
 import * as Workers from './workers';
 import * as Workflows from './workflows';
@@ -14,6 +16,7 @@ import * as Workflows from './workflows';
 export const EN = 'en' as const;
 
 export const English = {
+  [Activities.Namespace]: Activities.Strings,
   [Batch.Namespace]: Batch.Strings,
   [Common.Namespace]: Common.Strings,
   [DatePicker.Namespace]: DatePicker.Strings,
@@ -25,5 +28,6 @@ export const English = {
   [DataEncoder.Namespace]: DataEncoder.Strings,
   [Namespaces.Namespace]: Namespaces.Strings,
   [Nexus.Namespace]: Nexus.Strings,
+  [SearchAttributes.Namespace]: SearchAttributes.Strings,
   [Workers.Namespace]: Workers.Strings,
 } as const;

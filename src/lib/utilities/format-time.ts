@@ -233,3 +233,9 @@ export const getTimestampDifference = (
   const parse2 = Date.parse(date2);
   return Math.abs(parse1 - parse2);
 };
+
+export const formatSecondsAbbreviated = (seconds: number | string): string => {
+  const start = new Date();
+  const end = new Date(start.getTime() + Number(seconds) * 1000);
+  return formatDistanceAbbreviated({ start, end, includeMilliseconds: true });
+};

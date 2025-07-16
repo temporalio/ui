@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { IconName } from '$lib/holocene/icon';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   import DetailListValue from './detail-list-value.svelte';
@@ -13,11 +14,18 @@
     iconName?: IconName | undefined;
   }
 
-  let { copyable, copyableText, text, tooltipText, isBadge }: Props = $props();
+  let { copyable, copyableText, text, tooltipText, isBadge, iconName }: Props =
+    $props();
 </script>
 
 {#snippet content()}
-  <div class="select-all truncate rounded-sm" class:surface-subtle={isBadge}>
+  <div
+    class="flex select-all items-center gap-1 truncate rounded-sm"
+    class:surface-subtle={isBadge}
+  >
+    {#if iconName}
+      <Icon name={iconName} class="shrink-0" />
+    {/if}
     {text}
   </div>
 {/snippet}

@@ -3,242 +3,253 @@
 
   import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
   import { historyKeymap, standardKeymap } from '@codemirror/commands';
-  import { json } from '@codemirror/lang-json';
   import {
     bracketMatching,
     foldGutter,
     indentOnInput,
     indentUnit,
-    StreamLanguage,
     syntaxHighlighting,
   } from '@codemirror/language';
-  import { shell } from '@codemirror/legacy-modes/mode/shell';
-  import { EditorState } from '@codemirror/state';
+  import { Compartment, EditorState, type Extension } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import ExpandButton from '$lib/holocene/expandable/button.svelte';
+  import { Maximizable } from '$lib/holocene/maximizable';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { useDarkMode } from '$lib/utilities/dark-mode';
+  import { formatJSON } from '$lib/utilities/format-json';
   import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
-  import {
-    TEMPORAL_SYNTAX,
-    TEMPORAL_THEME,
-  } from '$lib/vendor/codemirror/theme';
+    type EditorLanguage,
+    getActionsTheme,
+    getEditorTheme,
+    getHeightTheme,
+    getLanguageExtension,
+    getLineBreakExtension,
+    highlightStyles,
+  } from '$lib/vendor/codemirror/custom-extensions';
 
-  type BaseProps = HTMLAttributes<HTMLDivElement> & {
+  type Override<T, NewT> = Omit<T, keyof NewT> & NewT;
+
+  interface BaseProps
+    extends Override<
+      HTMLAttributes<HTMLDivElement>,
+      { onchange?: (text: string) => void }
+    > {
     content: string;
-    language?: 'json' | 'text' | 'shell';
+    language?: EditorLanguage;
     editable?: boolean;
+    copyable: false;
+    copyIconTitle?: never;
+    copySuccessIconTitle?: never;
     inline?: boolean;
     testId?: string;
-    copyable?: boolean;
     minHeight?: number;
     maxHeight?: number;
     label?: string;
     class?: string;
-  };
+  }
 
-  type CopyableProps = BaseProps & {
-    copyable: true;
-    copyIconTitle: string;
-    copySuccessIconTitle: string;
-  };
+  interface PropsWithCopyable
+    extends Override<
+      BaseProps,
+      { copyable?: true; copyIconTitle?: string; copySuccessIconTitle?: string }
+    > {}
 
-  type $$Props = BaseProps | CopyableProps;
+  export type Props = BaseProps | PropsWithCopyable;
 
-  const dispatch = createEventDispatcher<{ change: string }>();
+  let {
+    content,
+    language = 'json',
+    class: className = undefined,
+    editable = false,
+    copyable = true,
+    copyIconTitle = '',
+    copySuccessIconTitle = '',
+    inline = false,
+    testId = undefined,
+    minHeight = undefined,
+    maxHeight = undefined,
+    label = '',
+    onchange = undefined,
+    ...editorProps
+  }: Props = $props();
 
-  export let content: string;
-  let className: string = null;
-  export { className as class };
-  export let editable = false;
-  export let inline = false;
-  export let language = 'json';
-  export let copyable = true;
-  export let copyIconTitle = '';
-  export let copySuccessIconTitle = '';
-  export let minHeight = undefined;
-  export let maxHeight = undefined;
-  export let label = '';
+  // codemirror
+
+  let editorElement = $state<HTMLElement | undefined>();
+  let editorView = $state<EditorView | undefined>();
+
+  // content
 
   const { copy, copied } = copyToClipboard();
-  let expanded = false;
 
-  const handleCopy = (e: Event) => {
-    copy(e, content);
+  const format = (
+    contentToFormat: string,
+    languageFormat: EditorLanguage,
+    inlineFormat: boolean,
+  ) =>
+    languageFormat === 'json'
+      ? formatJSON(contentToFormat, inlineFormat ? 0 : 2)
+      : contentToFormat;
+
+  const getFormattedContent = () => {
+    return format(content, language, inline);
   };
 
-  const handleExpand = () => {
-    expanded = !expanded;
+  const getFormattedDoc = () => {
+    const doc = editorView?.state?.doc;
+    if (!doc) return '';
+    return format(doc.toString(), language, inline);
   };
 
-  let editor: HTMLElement;
-  let view: EditorView;
+  const replaceContent = (newContent: string) => {
+    const doc = editorView?.state?.doc;
+    if (!doc) return;
 
-  const formatJSON = (jsonData: string): string => {
-    if (!jsonData) return;
-
-    let parsedData: string;
-    try {
-      parsedData = parseWithBigInt(jsonData);
-    } catch (error) {
-      parsedData = jsonData;
-    }
-
-    return stringifyWithBigInt(parsedData, undefined, inline ? 0 : 2);
-  };
-
-  const formatValue = ({ value, language }) =>
-    language === 'json' ? formatJSON(value) : value;
-
-  $: value = formatValue({ value: content, language });
-
-  const lineBreakReplacer = EditorView.updateListener.of((update) => {
-    if (editable) return;
-    const newText = update.state.doc.toString().replace(/\\n/g, '\n');
-    if (newText !== update.state.doc.toString()) {
-      update.view.dispatch({
-        changes: { from: 0, to: update.state.doc.length, insert: newText },
+    if (doc.toString() !== newContent) {
+      editorView?.dispatch({
+        changes: {
+          from: 0,
+          to: doc.length,
+          insert: newContent,
+        },
       });
     }
-  });
-
-  const createEditorView = (isDark: boolean, expanded: boolean): EditorView => {
-    return new EditorView({
-      parent: editor,
-      state: createEditorState(value, isDark, expanded),
-      dispatch(transaction) {
-        view.update([transaction]);
-        if (transaction.docChanged) {
-          dispatch('change', view.state.doc.toString());
-        }
-      },
-    });
   };
 
-  const createEditorState = (
-    value: string | null | undefined,
-    isDark: boolean,
-    expanded: boolean,
-  ): EditorState => {
-    const extensions = [
-      keymap.of([...standardKeymap, ...historyKeymap]),
-      TEMPORAL_THEME({ isDark, copyable }),
-      syntaxHighlighting(TEMPORAL_SYNTAX, { fallback: true }),
-      indentUnit.of('  '),
-      closeBrackets(),
-      autocompletion(),
-      indentOnInput(),
-      bracketMatching(),
+  // ui
+
+  const maximizable = $derived(
+    (maxHeight && editorView?.contentHeight > maxHeight) ?? false,
+  );
+  let maximized = $state(false);
+
+  // a compartment allows us to update extensions like the theme
+  const compartment = $state(new Compartment());
+
+  const staticExtensions: Extension[] = [
+    keymap.of([...standardKeymap, ...historyKeymap]),
+    syntaxHighlighting(highlightStyles, { fallback: true }),
+    indentUnit.of('  '),
+    closeBrackets(),
+    autocompletion(),
+    indentOnInput(),
+    bracketMatching(),
+  ];
+
+  let dynamicExtensions: Extension[] = $derived(
+    [
+      getEditorTheme({ isDark: $useDarkMode }),
+      getActionsTheme({ hasActions: copyable || maximizable }),
       EditorState.readOnly.of(!editable),
       EditorView.editable.of(editable),
       EditorView.contentAttributes.of({ 'aria-label': label }),
-      lineBreakReplacer,
-    ];
+      getLineBreakExtension(editable),
+      getLanguageExtension(language),
+      !inline ? EditorView.lineWrapping : undefined,
+      !inline && !editable ? foldGutter() : undefined,
+      getHeightTheme({ maxHeight, minHeight, maximized }),
+    ].filter((ext) => ext != null),
+  );
 
-    if (language === 'json') {
-      extensions.push(json());
-    }
-
-    if (language === 'shell') {
-      extensions.push(StreamLanguage.define(shell));
-    }
-
-    if (!inline) {
-      extensions.push(EditorView.lineWrapping);
-    }
-
-    if (!inline && !editable) {
-      extensions.push(foldGutter());
-    }
-
-    if (minHeight || (maxHeight && !expanded)) {
-      extensions.push(
-        EditorView.theme({
-          '&': {
-            ...(minHeight ? { 'min-height': `${minHeight}px` } : {}),
-            ...(maxHeight ? { 'max-height': `${maxHeight}px` } : {}),
-          },
-        }),
-      );
-      extensions.push(EditorView.contentAttributes.of({ tabindex: '0' }));
-    }
-
-    return EditorState.create({
-      doc: value,
-      extensions,
+  const createEditorView = () =>
+    new EditorView({
+      parent: editorElement,
+      state: EditorState.create({
+        doc: getFormattedContent(),
+        extensions: [staticExtensions, compartment.of(dynamicExtensions)],
+      }),
+      dispatch(transaction) {
+        editorView.update([transaction]);
+        if (transaction.docChanged) {
+          onchange?.(getFormattedDoc());
+        }
+      },
     });
+
+  // lifecycle
+
+  // keep dynamic extensions up to date in codemirror
+  $effect(() => {
+    editorView?.dispatch({
+      effects: compartment.reconfigure(dynamicExtensions),
+    });
+  });
+
+  // add tabindex if maximizable, so up/down arrows can scroll
+  $effect(() => {
+    if (maximizable) {
+      editorView?.scrollDOM?.setAttribute('tabindex', '0');
+    } else {
+      editorView?.scrollDOM?.removeAttribute('tabindex');
+    }
+  });
+
+  // when content prop changes, update the document
+  $effect(() => {
+    content;
+    language;
+    inline;
+    editable;
+    editorView?.hasFocus;
+
+    const doc = editorView?.state?.doc;
+    if (!doc) return;
+
+    const userIsEditing = editable && editorView?.hasFocus;
+
+    if (!userIsEditing) {
+      const formattedContent = getFormattedContent();
+      if (doc.toString() !== formattedContent) {
+        replaceContent(formattedContent);
+      }
+    }
+  });
+
+  // handlers
+
+  const handleCopy = (e: Event) => {
+    copy(e, getFormattedDoc());
+  };
+
+  const handleEditorBlur = () => {
+    replaceContent(getFormattedDoc());
   };
 
   onMount(() => {
-    createView($useDarkMode, expanded);
-    return () => view?.destroy();
+    editorView = createEditorView();
+    editorView.contentDOM.onblur = handleEditorBlur;
+    return () => {
+      editorView?.destroy();
+    };
   });
-
-  const createView = (isDark: boolean, expanded) => {
-    if (view) view.destroy();
-    view = createEditorView(isDark, expanded);
-  };
-
-  $: createView($useDarkMode, expanded);
-
-  const resetView = (value = '', format = true) => {
-    const formattedValue = format ? formatValue({ value, language }) : value;
-    view.dispatch({
-      changes: {
-        from: 0,
-        to: view.state.doc.length,
-        insert: formattedValue,
-      },
-    });
-  };
-
-  const setView = () => {
-    if (view && (!editable || view.state.doc.toString() !== content)) {
-      resetView(content);
-    }
-  };
-
-  $: content, language, setView();
-
-  $: expandable = !editable && maxHeight && contentHeight(editor) > maxHeight;
-
-  const contentHeight = (element: HTMLElement) => {
-    const childElement = element?.querySelector('.cm-content') as HTMLElement;
-    if (childElement) {
-      return childElement?.offsetHeight || 0;
-    }
-    return 0;
-  };
 </script>
 
-<div class="relative min-w-[80px] grow">
-  <div
-    bind:this={editor}
-    class={className}
-    class:inline
-    data-testid={$$props.testId}
-    class:editable
-    class:readOnly={!editable}
-    {...$$restProps}
-  ></div>
-  <div class="absolute right-1 top-1 flex items-center">
-    {#if expandable}
-      <ExpandButton class="text-secondary" on:click={handleExpand} {expanded} />
-    {/if}
-    {#if copyable}
-      <CopyButton
-        {copyIconTitle}
-        {copySuccessIconTitle}
-        class="text-secondary"
-        on:click={handleCopy}
-        copied={$copied}
-      />
-    {/if}
-  </div>
+<div class="min-w-[80px] grow">
+  <Maximizable bind:maximized enabled={maximizable}>
+    <div
+      bind:this={editorElement}
+      class:inline
+      class:editable
+      class:readOnly={!editable}
+      class={merge('h-full', className)}
+      data-testid={testId}
+      {...editorProps}
+      onblur={handleEditorBlur}
+    ></div>
+
+    {#snippet actions()}
+      {#if copyable}
+        <CopyButton
+          {copyIconTitle}
+          {copySuccessIconTitle}
+          class="m-0 rounded-full text-secondary"
+          on:click={handleCopy}
+          copied={$copied}
+        />
+      {/if}
+    {/snippet}
+  </Maximizable>
 </div>

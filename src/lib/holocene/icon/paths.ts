@@ -38,6 +38,7 @@ import copy from './svg/copy.svelte';
 import creditCard from './svg/credit-card.svelte';
 import descending from './svg/descending.svelte';
 import dollarBadge from './svg/dollar-badge.svelte';
+import dollarInvoice from './svg/dollar-invoice.svelte';
 import download from './svg/download.svelte';
 import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
@@ -81,6 +82,7 @@ import namespace from './svg/namespace.svelte';
 import nexus from './svg/nexus.svelte';
 import officeBuildings from './svg/office-buildings.svelte';
 import pause from './svg/pause.svelte';
+import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import play from './svg/play.svelte';
@@ -166,6 +168,7 @@ export const icons = {
   descending,
   download,
   'dollar-badge': dollarBadge,
+  'dollar-invoice': dollarInvoice,
   drained,
   error,
   exit,
@@ -209,6 +212,7 @@ export const icons = {
   'office-buildings': officeBuildings,
   play,
   pause,
+  pencil,
   'pin-filled': pinFilled,
   pin,
   regions,

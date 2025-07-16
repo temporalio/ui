@@ -51,6 +51,8 @@ export const Strings = {
   'continued-as-new': 'Continued as New',
   terminated: 'Terminated',
   canceled: 'Canceled',
+  pause: 'Pause',
+  unpause: 'Unpause',
   paused: 'Paused',
   reset: 'Reset',
   signal: 'Send a Signal',
@@ -284,4 +286,11 @@ export const Strings = {
   'update-name-label': 'Update name',
   'no-current-details': 'No Current Details',
   'update-details': 'Update Details',
+  'billable-actions': 'Billable Actions (estimate)',
+  'estimated-billable-actions': 'Estimated Billable Actions',
+  'billable-actions-disclaimer':
+    'This is an estimated count and does not capture all Billable Actions. View documentation for more details.',
+  'pending-nexus-operation': 'Pending Nexus Operation',
+  'schedule-event-id': 'Scheduled Event ID',
+  'schedule-to-close-timeout': 'Schedule to Close Timeout',
 } as const;

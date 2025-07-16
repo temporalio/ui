@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
-  import { derived } from 'svelte/store'; // ✅ ADD THIS
 
   import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -41,9 +40,7 @@
 
   registerPill(id, disabled);
 
-  const isActive = derived(activePill, ($activePill) =>
-    isNull(active) ? $activePill === id : active,
-  );
+  let isActive = $derived(isNull(active) ? $activePill === id : active);
 
   const handleClick = () => {
     if (disabled) return;
@@ -60,7 +57,7 @@
   class={merge(
     'surface-subtle flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
-    $isActive ? 'bg-interactive text-white' : '',
+    isActive && 'bg-interactive text-white',
     className,
   )}
   {disabled}

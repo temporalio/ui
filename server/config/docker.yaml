@@ -23,8 +23,10 @@ batchActionsDisabled: {{ env "TEMPORAL_BATCH_ACTIONS_DISABLED" | default "false"
 startWorkflowDisabled: {{ env "TEMPORAL_START_WORKFLOW_DISABLED" | default "false" }}
 hideWorkflowQueryErrors: {{ env "TEMPORAL_HIDE_WORKFLOW_QUERY_ERRORS" | default "false" }} 
 refreshWorkflowCountsDisabled: {{ env "TEMPORAL_REFRESH_WORKFLOW_COUNTS_DISABLED" | default "false" }}
+activityCommandsDisabled: {{ env "TEMPORAL_ACTIVITY_COMMANDS_DISABLED" | default "false" }}
 cors:
   cookieInsecure: {{ env "TEMPORAL_CSRF_COOKIE_INSECURE" | default "false" }}
+  unsafeAllowAllOrigins: {{ env "TEMPORAL_CORS_UNSAFE_ALLOW_ALL_ORIGINS" | default "false" }}
   allowOrigins:
     # override framework's default that allows all origins "*"
     {{- if env "TEMPORAL_CORS_ORIGINS" }}
@@ -53,6 +55,7 @@ auth:
     clientId: {{ env "TEMPORAL_AUTH_CLIENT_ID" }}
     clientSecret: {{ env "TEMPORAL_AUTH_CLIENT_SECRET" }}
     callbackUrl: {{ env "TEMPORAL_AUTH_CALLBACK_URL" }}
+    useIdTokenAsBearer: {{ env "TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER" | default "false" }}
     scopes:
     {{- if env "TEMPORAL_AUTH_SCOPES" }}
     {{- range env "TEMPORAL_AUTH_SCOPES" | split "," }}

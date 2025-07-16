@@ -68,4 +68,8 @@ export const Strings = {
   'handler-event': 'Handler Event',
   'caller-namespace': 'Caller Namespace',
   'handler-namespace': 'Handler Namespace',
+  service: 'Service',
+  operation: 'Operation',
+  'operation-token': 'Operation Token',
+  'cancellation-info': 'Cancellation Info',
 } as const;

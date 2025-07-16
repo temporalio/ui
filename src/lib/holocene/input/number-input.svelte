@@ -18,6 +18,7 @@
   export let hintText = '';
   export let max: number = undefined;
   export let min: number = undefined;
+  export let step: number = 1;
   export let search = false;
 
   let valid = true;
@@ -50,7 +51,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-primary focus:outline-none"
+        class="m-2 block w-full bg-transparent text-center text-primary focus:text-brand focus:outline-none"
         type="number"
         {max}
         {min}
@@ -60,6 +61,7 @@
         {placeholder}
         {id}
         {name}
+        {step}
         autocomplete="off"
         spellcheck="false"
         bind:value
@@ -70,7 +72,9 @@
         on:keydown
       />
     </div>
-    <div class="units">{units}</div>
+    {#if units}
+      <div class="units">{units}</div>
+    {/if}
   </div>
 </div>
 {#if !valid && hintText}

@@ -12,10 +12,16 @@ import {
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
+import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
 import { has } from '$lib/utilities/has';
-import { findAttributesAndKey } from '$lib/utilities/is-event-type';
+import {
+  findAttributesAndKey,
+  isWorkflowExecutionOptionsUpdatedEvent,
+  isWorkflowExecutionStartedEvent,
+} from '$lib/utilities/is-event-type';
 import { toEventNameReadable } from '$lib/utilities/screaming-enums';
 
+import { getEventBillableActions } from './get-event-billable-actions';
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
@@ -43,7 +49,26 @@ export async function getEventAttributes(
   };
 }
 
-export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
+export const toBillableEvent = (
+  event: WorkflowEvent,
+  shouldNotAddBillableAction: (event: WorkflowEvent) => boolean = () => false,
+  processedWorkflowTaskIds?: Set<string>,
+) => {
+  return {
+    ...event,
+    billableActions: shouldNotAddBillableAction(event)
+      ? 0
+      : getEventBillableActions(event, processedWorkflowTaskIds),
+  };
+};
+
+export const toEvent = (
+  historyEvent: HistoryEvent,
+  options: {
+    shouldNotAddBillableAction?: (event: WorkflowEvent) => boolean;
+    processedWorkflowTaskIds?: Set<string>;
+  } = {},
+): WorkflowEvent => {
   const id = String(historyEvent.eventId);
   const eventType = toEventNameReadable(historyEvent.eventType);
   const timestamp = formatDate(String(historyEvent.eventTime));
@@ -51,8 +76,19 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
   const category = getEventCategory(eventType);
 
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  const links = historyEvent?.links || [];
-  return {
+
+  const completionCallbacks =
+    isWorkflowExecutionStartedEvent(historyEvent) &&
+    historyEvent.workflowExecutionStartedEventAttributes
+      ?.completionCallbacks?.[0]?.links;
+  const attachedCompletionCallbacks =
+    isWorkflowExecutionOptionsUpdatedEvent(historyEvent) &&
+    historyEvent.workflowExecutionOptionsUpdatedEventAttributes
+      ?.attachedCompletionCallbacks?.[0]?.links;
+
+  const completionLinks = completionCallbacks || attachedCompletionCallbacks;
+  const links = historyEvent?.links || completionLinks || [];
+  const event = {
     ...historyEvent,
     name: eventType,
     id,
@@ -61,12 +97,27 @@ export const toEvent = (historyEvent: HistoryEvent): WorkflowEvent => {
     classification,
     category,
     links,
+    billableActions: 0,
     attributes: simplifyAttributes({ type: key, ...attributes }),
   };
+  return toBillableEvent(
+    event,
+    options.shouldNotAddBillableAction,
+    options.processedWorkflowTaskIds,
+  );
 };
 
 export const toEventHistory = (events: HistoryEvent[]): WorkflowEvents => {
-  return events.map(toEvent);
+  const failedEvent = events.findLast(isWorkflowTaskFailedEventDueToReset);
+  const shouldNotAddBillableAction = (event: WorkflowEvent): boolean => {
+    if (failedEvent) return Number(event.id) < Number(failedEvent.eventId);
+    return false;
+  };
+
+  const processedWorkflowTaskIds = new Set<string>();
+  return events.map((event) =>
+    toEvent(event, { shouldNotAddBillableAction, processedWorkflowTaskIds }),
+  );
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

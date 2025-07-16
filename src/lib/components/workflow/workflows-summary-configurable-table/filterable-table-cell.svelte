@@ -5,29 +5,23 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import {
-    searchAttributeToWorkflowKey,
-    type TextFilterAttributes,
-  } from '$lib/models/workflow-filters';
+  import { type TextFilterAttributes } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
-  import {
-    SEARCH_ATTRIBUTE_TYPE,
-    type WorkflowExecution,
-  } from '$lib/types/workflows';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
 
-  export let attribute: TextFilterAttributes;
-  export let workflow: WorkflowExecution;
-  export let filterOrCopyButtonsVisible = false;
-
-  $: value = workflow[searchAttributeToWorkflowKey[attribute]];
-  $: namespace = $page.params.namespace;
-  $: href = routeForEventHistory({
-    namespace,
-    workflow: workflow.id,
-    run: workflow.runId,
-  });
+  type Props = {
+    attribute: TextFilterAttributes;
+    filterOrCopyButtonsVisible: boolean;
+    value: string;
+    href?: string;
+  };
+  let {
+    attribute,
+    filterOrCopyButtonsVisible = false,
+    value,
+    href,
+  }: Props = $props();
 
   const onRowFilterClick = () => {
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
@@ -52,7 +46,11 @@
   };
 </script>
 
-<Link {href}>{value}</Link>
+{#if href}
+  <Link {href}>{value}</Link>
+{:else}
+  {value}
+{/if}
 <FilterOrCopyButtons
   copyIconTitle={translate('common.copy-icon-title')}
   copySuccessIconTitle={translate('common.copy-success-icon-title')}

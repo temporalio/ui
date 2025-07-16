@@ -1,7 +1,7 @@
 <script lang="ts">
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { EventLink } from '$lib/types/events';
+  import type { EventLink } from '$lib/types';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
 
   export let link: EventLink;

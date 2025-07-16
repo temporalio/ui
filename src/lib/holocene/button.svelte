@@ -31,7 +31,7 @@
           ghost:
             'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary/70',
           'table-header':
-            'bg-transparent border-transparent text-off-white focus-visible:ring-primary/70 focus-visible:border-transparent',
+            'bg-transparent border-transparent focus-visible:ring-primary/70 focus-visible:border-transparent',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -132,15 +132,15 @@
     tabindex={href ? null : 0}
     {...$$restProps}
   >
-    {#if leadingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+    {#if leadingIcon}
+      <span>
+        <Icon name={leadingIcon} />
       </span>
     {/if}
     <slot />
-    {#if trailingIcon}
-      <span>
-        <Icon name={trailingIcon} />
+    {#if trailingIcon || loading}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner-solid' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
@@ -167,15 +167,16 @@
     )}
     {...$$restProps}
   >
-    {#if leadingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : leadingIcon} />
+    {#if leadingIcon}
+      <span>
+        <Icon name={leadingIcon} />
       </span>
     {/if}
     <slot />
-    {#if trailingIcon}
-      <span>
-        <Icon name={trailingIcon} />
+
+    {#if trailingIcon || loading}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner-solid' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
