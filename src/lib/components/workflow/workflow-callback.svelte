@@ -7,7 +7,7 @@
   import { translate } from '$lib/i18n/translate';
   import { timeFormat } from '$lib/stores/time-format';
   import type { CallbackState } from '$lib/types';
-  import type { EventLink as Link } from '$lib/types/events';
+  import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForNamespace } from '$lib/utilities/route-for';

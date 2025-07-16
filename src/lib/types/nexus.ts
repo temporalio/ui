@@ -4,8 +4,7 @@ import type {
   EndpointSpec,
   Callback as ICallback,
 } from '$lib/types';
-
-import type { EventLink } from './events';
+import type { EventLink } from '$lib/types';
 
 export interface NexusEndpointSpec extends EndpointSpec {
   descriptionString?: string;
