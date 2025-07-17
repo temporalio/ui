@@ -194,8 +194,11 @@
     ),
   );
 
-  const hasPendingActivity = $derived(
+  const isPendingActivity = $derived(
     isEventGroup(event) && event?.pendingActivity,
+  );
+  const isPausedPendingActivity = $derived(
+    isPendingActivity && isPendingActivity?.paused,
   );
 
   const pendingAttempt = $derived(
@@ -347,7 +350,7 @@
       {#if pendingAttempt}
         <Badge
           class="mr-1"
-          type={hasPendingActivity.paused
+          type={isPausedPendingActivity
             ? 'warning'
             : pendingAttempt > 1
               ? 'danger'
@@ -357,17 +360,17 @@
             class={merge(
               'mr-1 inline',
               pendingAttempt > 1 && 'font-bold text-red-400',
-              hasPendingActivity.paused && 'font-bold text-yellow-700',
+              isPausedPendingActivity && 'font-bold text-yellow-700',
             )}
-            name={hasPendingActivity.paused ? 'pause' : 'retry'}
+            name={isPausedPendingActivity ? 'pause' : 'retry'}
           />
           {translate('workflows.attempt')}
           {pendingAttempt}
-          {#if hasPendingActivity}
-            / {hasPendingActivity.maximumAttempts || '∞'}
+          {#if isPendingActivity}
+            / {isPendingActivity?.maximumAttempts || '∞'}
             {#if pendingAttempt > 1}
               {@const timeDifference = toTimeDifference({
-                date: hasPendingActivity.scheduledTime,
+                date: isPendingActivity?.scheduledTime,
                 negativeDefault: '',
               })}
               {#if timeDifference}
