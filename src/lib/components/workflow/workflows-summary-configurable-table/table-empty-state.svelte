@@ -23,6 +23,9 @@
   ];
 </script>
 
+<svelte:head>
+  <link rel="preload" as="image" href={noResultsImages} />
+</svelte:head>
 <div class="h-auto w-full overflow-hidden xl:flex-row" aria-live="polite">
   <div
     class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px]"
