@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { SearchAttributes } from '$lib/types/workflows';
 
 import {
+  formatDateTimeRange,
   formatListFilterValue,
   isBooleanFilter,
   isDateTimeFilter,
@@ -172,5 +173,34 @@ describe('formatListFilterValue', () => {
 
   it('should return an array with the value', () => {
     expect(formatListFilterValue('example')).toStrictEqual(['example']);
+  });
+});
+
+describe('formatDateTimeRange', () => {
+  it('should format a date range between two dates', () => {
+    expect(
+      formatDateTimeRange(
+        'BETWEEN "2025-07-17T00:00:00.000Z" AND "2025-07-17T00:00:00.000Z"',
+        'UTC',
+        false,
+      ),
+    ).toStrictEqual('between 2025-07-17 00:00 AM and 2025-07-17 00:00 AM');
+    expect(
+      formatDateTimeRange(
+        'BETWEEN 2025-07-17T00:00:00.000Z AND 2025-07-17T00:00:00.000Z',
+        'UTC',
+        false,
+      ),
+    ).toStrictEqual('between 2025-07-17 00:00 AM and 2025-07-17 00:00 AM');
+  });
+
+  it('should format a date range between two dates with a different time format', () => {
+    expect(
+      formatDateTimeRange(
+        'BETWEEN "2025-07-17T00:00:00.000Z" AND "2025-07-17T00:00:00.000Z"',
+        'Pacific Daylight Time',
+        false,
+      ),
+    ).toStrictEqual('between 2025-07-16 17:00 PM and 2025-07-16 17:00 PM');
   });
 });
