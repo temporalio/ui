@@ -26,9 +26,12 @@
 <svelte:head>
   <link rel="preload" as="image" href={noResultsImages} />
 </svelte:head>
-<div class="h-auto w-full overflow-hidden xl:flex-row" aria-live="polite">
+<div
+  class="h-auto w-full overflow-hidden xl:flex xl:min-h-[480px] xl:flex-row"
+  aria-live="polite"
+>
   <div
-    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px]"
+    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
   >
     <h2>
       {#if query}
@@ -74,11 +77,14 @@
       </ul>
     {/if}
   </div>
-  <div class="bg-[#DDD6FE]">
+  <div
+    class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:min-h-full xl:flex-1 xl:items-stretch xl:justify-center"
+    style="background-image: url({noResultsImages});"
+  >
     <img
       src={noResultsImages}
       alt=""
-      class="max-h-full max-w-full object-contain"
+      class="max-h-full max-w-full object-contain xl:hidden"
     />
   </div>
 </div>
