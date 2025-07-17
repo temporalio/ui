@@ -72,13 +72,6 @@
     {/if}
   </div>
   <div class="bg-[#DDD6FE]">
-    {#if !query}
-      <img
-        src={noResultsImages}
-        alt=""
-        class="max-h-full max-w-full object-contain"
-      />
-    {/if}
     <img
       src={noResultsImages}
       alt=""
