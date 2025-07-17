@@ -2,7 +2,9 @@ import { get } from 'svelte/store';
 
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { searchAttributes } from '$lib/stores/search-attributes';
+import type { TimeFormat } from '$lib/stores/time-format';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+import { formatDate } from '$lib/utilities/format-date';
 
 export function isStatusFilter({ attribute }: SearchAttributeFilter) {
   return attribute === 'ExecutionStatus';
@@ -97,3 +99,22 @@ export function formatListFilterValue(value: string): string[] {
   if (value) return [value];
   return [];
 }
+
+export const formatDateTimeRange = (
+  value: string,
+  format: TimeFormat,
+  relative: boolean,
+) => {
+  const [conditon, start, operator, end] = value.split(' ');
+  return `${conditon.toLowerCase()} ${formatDate(
+    start.replace(/"/g, ''),
+    format,
+    {
+      relative,
+      abbrFormat: true,
+    },
+  )} ${operator.toLowerCase()} ${formatDate(end.replace(/"/g, ''), format, {
+    relative,
+    abbrFormat: true,
+  })}`;
+};

@@ -11,14 +11,11 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
-  import {
-    relativeTime,
-    timeFormat,
-    type TimeFormat,
-  } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
   import { isNullConditional, isStartsWith } from '$lib/utilities/is';
   import {
+    formatDateTimeRange,
     isDateTimeFilter,
     isTextFilter,
   } from '$lib/utilities/query/search-attribute-filter';
@@ -69,21 +66,6 @@
     if (['>', '>='].includes(conditional))
       return translate('common.after').toLowerCase();
     return conditional;
-  };
-
-  const formatDateTimeRange = (
-    value: string,
-    format: TimeFormat,
-    relative: boolean,
-  ) => {
-    const [conditon, start, operator, end] = value.split(' ');
-    return `${conditon.toLowerCase()} ${formatDate(start, format, {
-      relative,
-      abbrFormat: true,
-    })} ${operator.toLowerCase()} ${formatDate(end, format, {
-      relative,
-      abbrFormat: true,
-    })}`;
   };
 </script>
 
