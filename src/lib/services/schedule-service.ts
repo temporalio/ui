@@ -92,13 +92,14 @@ export async function fetchSchedule(
 }
 
 export async function deleteSchedule(
-  parameters: ScheduleParameters,
+  parameters: ScheduleParameters & { identity?: string },
   request = fetch,
 ): Promise<void> {
   const route = routeForApi('schedule', parameters);
   return requestFromAPI(route, {
     request,
     options: { method: 'DELETE' },
+    params: parameters.identity ? { identity: parameters.identity } : {},
   });
 }
 
@@ -106,14 +107,17 @@ type CreateScheduleOptions = {
   namespace: string;
   scheduleId: string;
   body: CreateScheduleRequest;
+  identity?: string;
 };
 
 export async function createSchedule({
   namespace,
   scheduleId,
   body,
+  identity,
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
   let error = '';
+
   const onError: ErrorCallback = (err) =>
     (error =
       err?.body?.message ??
@@ -131,6 +135,7 @@ export async function createSchedule({
         body: stringifyWithBigInt({
           request_id: uuidv4(),
           ...body,
+          ...(identity ? { identity } : {}),
         }),
       },
       onError,
@@ -145,12 +150,14 @@ type EditScheduleOptions = {
   scheduleId: string;
   request_id: string;
   body: UpdateScheduleRequest;
+  identity?: string;
 };
 
 export async function editSchedule({
   namespace,
   scheduleId,
   body,
+  identity,
 }: Partial<EditScheduleOptions>): Promise<{ error: string }> {
   let error = '';
   const onError: ErrorCallback = (err) =>
@@ -168,6 +175,7 @@ export async function editSchedule({
       body: stringifyWithBigInt({
         request_id: uuidv4(),
         ...body,
+        ...(identity ? { identity } : {}),
       }),
     },
     onError,
@@ -180,12 +188,14 @@ type PauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
   reason: string;
+  identity?: string;
 };
 
 export async function pauseSchedule({
   namespace,
   scheduleId,
   reason,
+  identity,
 }: PauseScheduleOptions): Promise<null> {
   const options = {
     patch: {
@@ -203,6 +213,7 @@ export async function pauseSchedule({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
+        ...(identity ? { identity } : {}),
       }),
     },
     onError: (error) => console.error(error),
@@ -213,12 +224,14 @@ type UnpauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
   reason: string;
+  identity?: string;
 };
 
 export async function unpauseSchedule({
   namespace,
   scheduleId,
   reason,
+  identity,
 }: UnpauseScheduleOptions): Promise<null> {
   const options = {
     patch: {
@@ -236,6 +249,7 @@ export async function unpauseSchedule({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
+        ...(identity ? { identity } : {}),
       }),
     },
   });
