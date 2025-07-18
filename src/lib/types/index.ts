@@ -41,6 +41,10 @@ export type UpdateWorkflowRequest =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionRequest;
 export type UpdateWorkflowResponse =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionResponse;
+export type PendingWorkflowTaskInfo =
+  temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
+export type WorkflowExtendedInfo =
+  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo;
 
 // api.history
 
@@ -168,8 +172,6 @@ export type TaskReachability = temporal.api.enums.v1.TaskReachability;
 export type PendingNexusOperationState =
   temporal.api.enums.v1.PendingNexusOperationState;
 export type CallbackState = temporal.api.enums.v1.CallbackState;
-export type PendingWorkflowTaskInfo =
-  temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
 export type VersioningBehavior = temporal.api.enums.v1.VersioningBehavior;
 export type EventType = temporal.api.enums.v1.EventType;
 
