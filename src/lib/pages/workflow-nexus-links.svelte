@@ -142,13 +142,13 @@
             >
           </td>
           <td class="break-all text-left" data-testid="link-endpoint">
-            {scheduledEvent?.attributes?.endpoint}
+            {scheduledEvent?.nexusOperationScheduledEventAttributes?.endpoint}
           </td>
           <td class="break-all text-left" data-testid="link-service">
-            {scheduledEvent?.attributes?.service}
+            {scheduledEvent?.nexusOperationScheduledEventAttributes?.service}
           </td>
           <td class="break-all text-left" data-testid="link-operation">
-            {scheduledEvent?.attributes?.operation}
+            {scheduledEvent?.nexusOperationScheduledEventAttributes?.operation}
           </td>
           <td class="break-all text-left" data-testid="link-namespace">
             {#if link?.workflowEvent}
