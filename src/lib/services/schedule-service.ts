@@ -259,12 +259,14 @@ type TriggerImmediatelyOptions = {
   namespace: string;
   scheduleId: string;
   overlapPolicy: OverlapPolicy;
+  identity?: string;
 };
 
 export async function triggerImmediately({
   namespace,
   scheduleId,
   overlapPolicy,
+  identity,
 }: TriggerImmediatelyOptions): Promise<null> {
   const options = {
     patch: {
@@ -284,6 +286,7 @@ export async function triggerImmediately({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
+        ...(identity ? { identity } : {}),
       }),
     },
   });
@@ -300,6 +303,7 @@ export async function backfillRequest({
   overlapPolicy,
   startTime,
   endTime,
+  identity,
 }: BackfillOptions): Promise<null> {
   const options = {
     patch: {
@@ -323,6 +327,7 @@ export async function backfillRequest({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
+        ...(identity ? { identity } : {}),
       }),
     },
   });
