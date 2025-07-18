@@ -1,5 +1,6 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
+  import { get } from 'svelte/store';
 
   import { addDays, addHours, startOfDay } from 'date-fns';
 
@@ -38,6 +39,7 @@
     triggerImmediately,
     unpauseSchedule,
   } from '$lib/services/schedule-service';
+  import { authUser } from '$lib/stores/auth-user';
   import { coreUserStore } from '$lib/stores/core-user';
   import { loading } from '$lib/stores/schedules';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
@@ -116,10 +118,11 @@
     $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed();
 
   const handleDelete = async () => {
+    const identity = get(authUser).email;
     error = '';
     try {
       $loading = true;
-      await deleteSchedule({ namespace, scheduleId });
+      await deleteSchedule({ namespace, scheduleId, identity });
       deleteConfirmationModalOpen = false;
       setTimeout(() => {
         $loading = false;
@@ -135,16 +138,19 @@
   };
 
   const handlePause = async (schedule: DescribeScheduleResponse) => {
+    const identity = get(authUser).email;
     schedule?.schedule?.state?.paused
       ? await unpauseSchedule({
           namespace,
           scheduleId,
           reason,
+          identity,
         })
       : await pauseSchedule({
           namespace,
           scheduleId,
           reason,
+          identity,
         });
     scheduleFetch = fetchSchedule(parameters);
     reason = '';
@@ -157,11 +163,14 @@
   };
 
   const handleTriggerImmediately = async () => {
+    const identity = get(authUser).email;
+
     scheduleUpdating = true;
     await triggerImmediately({
       namespace,
       scheduleId,
       overlapPolicy: $overlapPolicy,
+      identity,
     });
     setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
@@ -216,6 +225,8 @@
   };
 
   const handleBackfill = async () => {
+    const identity = get(authUser).email;
+
     scheduleUpdating = true;
 
     const startTime = getUTCString({
@@ -237,6 +248,7 @@
       overlapPolicy: $overlapPolicy,
       startTime,
       endTime,
+      identity,
     });
     setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
