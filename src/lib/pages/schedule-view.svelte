@@ -163,11 +163,14 @@
   };
 
   const handleTriggerImmediately = async () => {
+    const identity = get(authUser).email;
+
     scheduleUpdating = true;
     await triggerImmediately({
       namespace,
       scheduleId,
       overlapPolicy: $overlapPolicy,
+      identity,
     });
     setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
@@ -222,6 +225,8 @@
   };
 
   const handleBackfill = async () => {
+    const identity = get(authUser).email;
+
     scheduleUpdating = true;
 
     const startTime = getUTCString({
@@ -243,6 +248,7 @@
       overlapPolicy: $overlapPolicy,
       startTime,
       endTime,
+      identity,
     });
     setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
