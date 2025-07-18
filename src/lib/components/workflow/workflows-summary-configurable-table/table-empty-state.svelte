@@ -24,7 +24,8 @@
 </script>
 
 <svelte:head>
-  <link rel="preload" as="image" href={noResultsImages} />
+  <link rel="preload" as="image" href={emptyImageDark} />
+  <link rel="preload" as="image" href={emptyImageLight} />
 </svelte:head>
 <div
   class="h-auto w-full overflow-hidden xl:flex xl:min-h-[480px] xl:flex-row"
