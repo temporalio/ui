@@ -39,20 +39,6 @@
       (callback) => callback?.callback?.links?.length,
     ),
   );
-
-  // const requestIds = $derived(
-  //   workflow?.workflowExtendedInfo?.requestIdInfos
-  //     ? Object.values(workflow?.workflowExtendedInfo?.requestIdInfos)
-  //     : [],
-  // );
-  // const getLinkFromRequestId = $derived((requestId) => {
-  //   const event = $fullEventHistory.find(
-  //     (event) => event.id === requestId.eventId,
-  //   );
-  //   if (event?.links?.length) {
-  //     return event.links[0];
-  //   }
-  // });
 </script>
 
 <section class="flex flex-col gap-4">
@@ -69,22 +55,14 @@
         <th>{translate('nexus.caller-event')}</th>
         <th>{translate('nexus.caller-workflow')}</th>
         <th>{translate('nexus.caller-namespace')}</th>
-        <th>{translate('nexus.handler-event')}</th>
       </TableHeaderRow>
       {#each callbacks as callback}
         {@const link = callback?.callback?.links?.[0]}
         <TableRow data-testid="worker-row">
           <td class="break-all text-left" data-testid="caller-event">
             {#if link?.workflowEvent}
-              <Link href={getEventLinkHref(link)}
-                >{fromScreamingEnum(
-                  link.workflowEvent?.eventRef?.eventType ||
-                    link.workflowEvent?.requestIdRef?.eventType,
-                  'EventType',
-                )}
-                {#if link.workflowEvent?.eventRef?.eventId}
-                  ({link.workflowEvent.eventRef.eventId})
-                {/if}
+              <Link href={getEventLinkHref(link)}>
+                {link.workflowEvent?.eventRef?.eventId}
               </Link>
             {/if}
           </td>
@@ -107,10 +85,6 @@
                 })}>{link.workflowEvent.namespace}</Link
               >
             {/if}
-          </td>
-          <td class="break-all text-left" data-testid="handler-event">
-            How do I associate callback to handler event? No requestId on
-            callback
           </td>
         </TableRow>
       {/each}
