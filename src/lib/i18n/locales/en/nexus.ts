@@ -60,6 +60,7 @@ export const Strings = {
   'last-attempt-failure': 'Last Attempt Failure',
   'blocked-reason': 'Blocked Reason',
   link: 'Link',
+  'links-empty-state': 'No Nexus Links found.',
   'link-namespace': 'Link Namespace',
   'nexus-service': 'Nexus Service',
   'nexus-endpoint-simple': 'Nexus Endpoint',

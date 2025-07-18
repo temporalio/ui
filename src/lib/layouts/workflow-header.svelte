@@ -18,6 +18,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
@@ -70,9 +71,7 @@
   );
   $: outboundLinks =
     getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0;
-  $: inboundLinks =
-    workflow?.callbacks?.filter((callback) => callback?.callback?.links?.length)
-      ?.length || 0;
+  $: inboundLinks = getInboundNexusLinkEvents($fullEventHistory)?.length || 0;
   $: linkCount = outboundLinks + inboundLinks;
 </script>
 

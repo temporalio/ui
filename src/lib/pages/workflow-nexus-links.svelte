@@ -7,6 +7,10 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
+  import {
+    getInboundLinkForEvent,
+    getInboundNexusLinkEvents,
+  } from '$lib/runes/inbound-nexus-links.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
@@ -34,10 +38,8 @@
   const nexusGroups = $derived(
     groups.filter((group) => group.category === 'nexus' && group.links?.length),
   );
-  const callbacks = $derived(
-    workflow?.callbacks?.filter(
-      (callback) => callback?.callback?.links?.length,
-    ),
+  const inboundLinkEvents = $derived(
+    getInboundNexusLinkEvents($fullEventHistory),
   );
 </script>
 
@@ -45,19 +47,25 @@
   <h2 data-testid="nexus-links-title">
     {translate('workflows.nexus-links-tab')}
   </h2>
-  {#if callbacks?.length}
+  {#if !inboundLinkEvents?.length && !nexusGroups.length}
+    <p>
+      {translate('nexus.links-empty-state')}
+    </p>
+  {/if}
+  {#if inboundLinkEvents?.length}
     <h3>Inbound</h3>
     <Table class="mb-6 w-full min-w-[600px] table-fixed">
       <caption class="sr-only" slot="caption"
         >{translate('workflows.workers-tab')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th>{translate('nexus.caller-event')}</th>
+        <th class="w-24">{translate('nexus.caller-event')}</th>
         <th>{translate('nexus.caller-workflow')}</th>
         <th>{translate('nexus.caller-namespace')}</th>
+        <th>{translate('nexus.handler-event')}</th>
       </TableHeaderRow>
-      {#each callbacks as callback}
-        {@const link = callback?.callback?.links?.[0]}
+      {#each inboundLinkEvents as event}
+        {@const link = getInboundLinkForEvent(event)}
         <TableRow data-testid="worker-row">
           <td class="break-all text-left" data-testid="caller-event">
             {#if link?.workflowEvent}
@@ -86,6 +94,18 @@
               >
             {/if}
           </td>
+          <td class="break-all text-left" data-testid="handler-event">
+            <Link
+              href={routeForEventHistoryEvent({
+                namespace: namespace,
+                workflow: workflowId,
+                run,
+                eventId: event.id,
+              })}
+              >{event.name}
+              ({event.id})
+            </Link>
+          </td>
         </TableRow>
       {/each}
     </Table>
@@ -97,7 +117,7 @@
         >{translate('workflows.workers-tab')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th>{translate('nexus.source-event')}</th>
+        <th class="w-28">{translate('nexus.source-event')}</th>
         <th>{translate('nexus.nexus-endpoint-simple')}</th>
         <th>{translate('nexus.nexus-service')}</th>
         <th>{translate('nexus.nexus-operation')}</th>

@@ -108,7 +108,8 @@ export type CommonEventKey =
   | 'classification'
   | 'category'
   | 'workerMayIgnore'
-  | 'name';
+  | 'name'
+  | 'links';
 
 export type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 
