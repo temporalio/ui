@@ -73,7 +73,6 @@
   $: inboundLinks =
     workflow?.callbacks?.filter((callback) => callback?.callback?.links?.length)
       ?.length || 0;
-  $: console.log('workflow?.callbacks: ', workflow?.callbacks);
   $: linkCount = outboundLinks + inboundLinks;
 </script>
 
