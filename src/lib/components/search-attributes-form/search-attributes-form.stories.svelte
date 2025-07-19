@@ -17,7 +17,7 @@
 
   // Mock adapter for testing with data - similar to default adapter pattern
   const mockAdapter: SearchAttributesAdapter = {
-    onSuccess: (attributes) => {
+    onSuccess: async (attributes) => {
       action('onSuccess')(attributes);
     },
 
@@ -83,7 +83,7 @@
 
   // Mock adapter for error testing
   const errorMockAdapter: SearchAttributesAdapter = {
-    onSuccess: (attributes) => {
+    onSuccess: async (attributes) => {
       action('onSuccess')(attributes);
     },
 
@@ -154,7 +154,7 @@
 
   // Mock adapter for empty state testing
   const emptyMockAdapter: SearchAttributesAdapter = {
-    onSuccess: (attributes) => {
+    onSuccess: async (attributes) => {
       action('onSuccess')(attributes);
     },
 

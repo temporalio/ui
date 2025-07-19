@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import Message from '$lib/components/form/message.svelte';
+  import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -25,11 +25,7 @@
   let { class: className = '', adapter, initialAttributes }: Props = $props();
 
   const { superFormInstance, supportedTypes, defaultType } = $derived(
-    createFormConfig(
-      adapter,
-      adapter.onSuccess || (() => {}),
-      initialAttributes,
-    ),
+    createFormConfig(adapter, initialAttributes),
   );
 
   const {
@@ -47,10 +43,15 @@
     createFormHandlers(
       form,
       defaultType,
-      initialAttributes,
       adapter.onCancel || (() => {}),
       reset,
     ),
+  );
+
+  const taintedCount = $derived(
+    Object.values($tainted.attributes || {}).filter((attr) =>
+      Object.values(attr).some((value) => value === true),
+    ).length,
   );
 </script>
 
@@ -124,24 +125,11 @@
       </div>
     </Card>
 
-    <!-- Form-level validation errors -->
-    {#if $errors.attributes?.attributes}
-      <Alert
-        intent="error"
-        title={translate('search-attributes.validation-error-title')}
-      >
-        {#each $errors.attributes.attributes as error}
-          <p>{error}</p>
-        {/each}
-      </Alert>
-    {/if}
-
-    <!-- Status message -->
-    {#if $message}
-      <Alert intent={$message.intent} title={$message.title}>
-        {$message.text}
-      </Alert>
-    {/if}
+    <Message
+      value={$message}
+      errors={$errors.attributes?.attributes}
+      errorsTitle={translate('search-attributes.validation-error-title')}
+    />
 
     <div class="flex gap-3 pt-4">
       <Button
@@ -153,16 +141,7 @@
         {$submitting
           ? translate('search-attributes.saving-button')
           : translate('search-attributes.save-button')}
-        {#if isTainted($tainted)}
-          <Badge
-            class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
-            type="count"
-          >
-            {Object.values($tainted.attributes || {}).filter((attr) =>
-              Object.values(attr).some((value) => value === true),
-            ).length}
-          </Badge>
-        {/if}
+        <TaintedBadge show={isTainted($tainted)} count={taintedCount} />
       </Button>
 
       <Button
