@@ -263,6 +263,10 @@ export const routeForPendingActivities = (
   return `${routeForWorkflow(parameters)}/pending-activities`;
 };
 
+export const routeForNexusLinks = (parameters: WorkflowParameters): string => {
+  return `${routeForWorkflow(parameters)}/nexus-links`;
+};
+
 export const routeForAuthentication = (
   parameters: AuthenticationParameters,
 ): string => {
