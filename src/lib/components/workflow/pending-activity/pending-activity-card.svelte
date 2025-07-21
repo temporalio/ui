@@ -43,8 +43,6 @@
       page.params.namespace,
     ) && isRunning,
   );
-
-  $inspect('activity.lastFailure: ', activity.lastFailure);
 </script>
 
 <div
