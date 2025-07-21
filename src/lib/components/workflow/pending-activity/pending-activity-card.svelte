@@ -194,7 +194,6 @@
             <PayloadDecoder
               value={activity.lastFailure as PotentiallyDecodable}
               let:decodedValue
-              key="last-failure-attributes"
             >
               <CodeBlock
                 content={decodedValue}
