@@ -5,10 +5,13 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
-  import emptyImage from '$lib/vendor/empty-state-dark_2x.png';
-  import noResultsImages from '$lib/vendor/empty-state-light_2x.png';
+  import { useDarkMode } from '$lib/utilities/dark-mode';
+  import emptyImageDark from '$lib/vendor/empty-state-dark_2x.png';
+  import emptyImageLight from '$lib/vendor/empty-state-light_2x.png';
 
   $: query = $page.url.searchParams.get('query');
+
+  $: noResultsImages = $useDarkMode ? emptyImageDark : emptyImageLight;
 
   const samples = [
     'samples-go',
@@ -21,14 +24,15 @@
 </script>
 
 <svelte:head>
-  <link rel="preload" as="image" href={emptyImage} />
+  <link rel="preload" as="image" href={emptyImageDark} />
+  <link rel="preload" as="image" href={emptyImageLight} />
 </svelte:head>
 <div
-  class="flex h-auto w-full flex-col overflow-hidden xl:flex-row"
+  class="h-auto w-full overflow-hidden xl:flex xl:min-h-[480px] xl:flex-row"
   aria-live="polite"
 >
   <div
-    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 border-b border-subtle p-8 xl:min-w-[520px] xl:border-b-0 xl:border-r"
+    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
   >
     <h2>
       {#if query}
@@ -74,11 +78,14 @@
       </ul>
     {/if}
   </div>
-  <div class="bg-[#DDD6FE]">
+  <div
+    class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:min-h-full xl:flex-1 xl:items-stretch xl:justify-center"
+    style="background-image: url({noResultsImages});"
+  >
     <img
-      src={query ? noResultsImages : emptyImage}
+      src={noResultsImages}
       alt=""
-      class="aspect-auto"
+      class="max-h-full max-w-full object-contain xl:hidden"
     />
   </div>
 </div>
