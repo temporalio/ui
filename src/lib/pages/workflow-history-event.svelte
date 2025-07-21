@@ -45,7 +45,6 @@
   });
 
   const { workflow } = $derived($workflowRun);
-  $inspect(workflow);
   const pendingActivities = $derived(workflow?.pendingActivities);
   const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 

@@ -158,7 +158,10 @@
         icon: 'nexus',
         label: translate('nexus.nexus'),
         hidden: !$page.data?.systemInfo?.capabilities?.nexus,
-        isActive: (path) => path.includes(nexusRoute),
+        isActive: (path) => {
+          const match = path.split('/').find((segment) => segment === 'nexus');
+          return !!match;
+        },
       },
       {
         href: historyImportRoute,

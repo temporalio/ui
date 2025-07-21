@@ -138,14 +138,18 @@ export const getWorkflowRelationships = (
 export const getWorkflowNexusLinksFromHistory = (
   history: WorkflowEvents,
 ): EventLink[] => {
-  const links = new Set<EventLink>();
-  for (const event of history) {
-    if (event.category === 'nexus' && event.links && event.links.length > 0) {
-      for (const link of event.links) {
-        links.add(link);
+  try {
+    const links = new Set<EventLink>();
+    for (const event of history) {
+      if (event.category === 'nexus' && event.links && event.links.length > 0) {
+        for (const link of event.links) {
+          links.add(link);
+        }
       }
     }
-  }
 
-  return Array.from(links);
+    return Array.from(links);
+  } catch (error) {
+    return [];
+  }
 };
