@@ -12,7 +12,7 @@ import type {
 } from './types';
 
 export const defaultAdapter: SearchAttributesAdapter = {
-  onSuccess: (attributes) => {
+  onSuccess: async (attributes) => {
     console.log('Search attributes saved successfully:', attributes);
     // Add any other success handling here (toasts, navigation, etc.)
   },
