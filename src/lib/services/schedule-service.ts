@@ -1,6 +1,9 @@
+import { get } from 'svelte/store';
+
 import { v4 as uuidv4 } from 'uuid';
 
 import { translate } from '$lib/i18n/translate';
+import { authUser } from '$lib/stores/auth-user';
 import type {
   CreateScheduleRequest,
   ListScheduleResponse,
@@ -92,14 +95,15 @@ export async function fetchSchedule(
 }
 
 export async function deleteSchedule(
-  parameters: ScheduleParameters & { identity?: string },
+  parameters: ScheduleParameters,
   request = fetch,
 ): Promise<void> {
+  const identity = get(authUser).email;
   const route = routeForApi('schedule', parameters);
   return requestFromAPI(route, {
     request,
     options: { method: 'DELETE' },
-    params: parameters.identity ? { identity: parameters.identity } : {},
+    params: identity ? { identity } : {},
   });
 }
 
@@ -107,17 +111,15 @@ type CreateScheduleOptions = {
   namespace: string;
   scheduleId: string;
   body: CreateScheduleRequest;
-  identity?: string;
 };
 
 export async function createSchedule({
   namespace,
   scheduleId,
   body,
-  identity,
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
+  const identity = get(authUser).email;
   let error = '';
-
   const onError: ErrorCallback = (err) =>
     (error =
       err?.body?.message ??
@@ -150,15 +152,14 @@ type EditScheduleOptions = {
   scheduleId: string;
   request_id: string;
   body: UpdateScheduleRequest;
-  identity?: string;
 };
 
 export async function editSchedule({
   namespace,
   scheduleId,
   body,
-  identity,
 }: Partial<EditScheduleOptions>): Promise<{ error: string }> {
+  const identity = get(authUser).email;
   let error = '';
   const onError: ErrorCallback = (err) =>
     (error =
@@ -188,15 +189,14 @@ type PauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
   reason: string;
-  identity?: string;
 };
 
 export async function pauseSchedule({
   namespace,
   scheduleId,
   reason,
-  identity,
 }: PauseScheduleOptions): Promise<null> {
+  const identity = get(authUser).email;
   const options = {
     patch: {
       pause: reason,
@@ -224,15 +224,14 @@ type UnpauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
   reason: string;
-  identity?: string;
 };
 
 export async function unpauseSchedule({
   namespace,
   scheduleId,
   reason,
-  identity,
 }: UnpauseScheduleOptions): Promise<null> {
+  const identity = get(authUser).email;
   const options = {
     patch: {
       unpause: reason,
@@ -259,15 +258,14 @@ type TriggerImmediatelyOptions = {
   namespace: string;
   scheduleId: string;
   overlapPolicy: OverlapPolicy;
-  identity?: string;
 };
 
 export async function triggerImmediately({
   namespace,
   scheduleId,
   overlapPolicy,
-  identity,
 }: TriggerImmediatelyOptions): Promise<null> {
+  const identity = get(authUser).email;
   const options = {
     patch: {
       triggerImmediately: {
@@ -303,8 +301,8 @@ export async function backfillRequest({
   overlapPolicy,
   startTime,
   endTime,
-  identity,
 }: BackfillOptions): Promise<null> {
+  const identity = get(authUser).email;
   const options = {
     patch: {
       backfillRequest: [
