@@ -16,7 +16,6 @@
   const relevantEvents = $derived(
     $fullEventHistory.filter((event) => {
       if (event.userMetadata?.summary || event.userMetadata?.details) {
-        console.log('User Metadata Event:', event);
         return true;
       }
 
@@ -24,7 +23,6 @@
     }),
   );
 
-  // Group the relevant events
   const eventGroups = $derived(
     groupEvents(
       relevantEvents,
