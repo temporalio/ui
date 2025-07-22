@@ -8,8 +8,9 @@
   import { routeForNamespace } from '$lib/utilities/route-for';
 
   export let namespaceList: NamespaceListItem[] = [];
+  export let namespace: string = $page.params.namespace || $lastUsedNamespace;
+  export let noResultsText = translate('common.no-results');
 
-  $: namespace = $page.params.namespace || $lastUsedNamespace;
   $: namespaceExists = namespaceList.some(
     (namespaceListItem) => namespaceListItem.namespace === namespace,
   );
@@ -26,7 +27,7 @@
 
 <Combobox
   label={translate('namespaces.namespace-label', { namespace })}
-  noResultsText={translate('common.no-results')}
+  {noResultsText}
   labelHidden
   value={namespace}
   id="namespace-switcher"

@@ -8,20 +8,20 @@
 </script>
 
 <div class="flex min-h-full flex-1 flex-col gap-2 p-6">
-  {#if summary}
-    <div class="border border-subtle">
-      <h3 class="pl-6 pt-6" data-testid="user-metadata-summary-heading">
-        {translate('workflows.summary')}
-      </h3>
+  <div class="border border-subtle">
+    <h3 class="pl-6 pt-6" data-testid="user-metadata-summary-heading">
+      {translate('workflows.summary')}
+    </h3>
+    {#if summary}
       <Markdown className="p-2" overrideTheme="primary" content={summary} />
-    </div>
-  {/if}
-  {#if details}
-    <div class="border border-subtle">
-      <h3 class="pl-6 pt-6" data-testid="user-metadata-details-heading">
-        {translate('workflows.details')}
-      </h3>
+    {/if}
+  </div>
+  <div class="border border-subtle">
+    <h3 class="pl-6 pt-6" data-testid="user-metadata-details-heading">
+      {translate('workflows.details')}
+    </h3>
+    {#if details}
       <Markdown className="p-2" overrideTheme="primary" content={details} />
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>

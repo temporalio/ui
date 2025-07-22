@@ -6,7 +6,10 @@
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
-  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
+  import {
+    isActivityTaskScheduledEvent,
+    isActivityTaskStartedEvent,
+  } from '$lib/utilities/is-event-type';
 
   import {
     CategoryIcon,
@@ -32,6 +35,7 @@
   $: timelineWidth = canvasWidth - 2 * gutter;
   $: active = !activeGroups.length || activeGroups.includes(group.id);
   $: pendingActivity = group?.pendingActivity;
+  $: pauseTime = pendingActivity && pendingActivity.pauseInfo?.pauseTime;
 
   const getDistancePointsAndPositions = (
     endTime: string | Date,
@@ -55,6 +59,18 @@
       return Math.round(ratio * timelineWidth) + gutter;
     });
 
+    if (pauseTime) {
+      const distance = getMillisecondDuration({
+        start: startTime,
+        end: pauseTime,
+        onlyUnderSecond: false,
+      });
+
+      const ratio = distance / workflowDistance;
+      const pausePoint = Math.round(ratio * timelineWidth) + gutter;
+      points.push(pausePoint);
+    }
+
     const { textAnchor, textIndex, textPosition, backdrop } =
       timelineTextPosition(
         points,
@@ -74,6 +90,11 @@
     if (readOnly) return;
     setActiveGroup(group);
   };
+
+  $: activityTaskScheduled = group.eventList.find(isActivityTaskStartedEvent);
+  $: retried =
+    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1;
+  $: pendingLine = group.isPending || !!pauseTime;
 </script>
 
 <g
@@ -84,6 +105,19 @@
   class="relative cursor-pointer"
   {height}
 >
+  {#if pendingLine}
+    {@const width = pauseTime
+      ? points[1] - points[0]
+      : canvasWidth - 2 * gutter}
+    <rect
+      y={y - height / 2}
+      x={points[0]}
+      {width}
+      {height}
+      fill="transparent"
+      pointer-events="all"
+    />
+  {/if}
   {#each points as x, index}
     {@const nextPoint = points[index + 1]}
     {@const showText = textIndex === index}
@@ -93,12 +127,15 @@
         endPoint={[nextPoint, y]}
         category={group.category}
         classification={group.lastEvent.classification}
+        pending={!!pauseTime}
+        paused={!!pauseTime}
         strokeWidth={radius * 2}
+        {retried}
         scheduling={index === 0 &&
           group.lastEvent.classification === 'Completed'}
       />
     {/if}
-    {#if !nextPoint && group.isPending}
+    {#if !nextPoint && group.isPending && !pauseTime}
       <Line
         startPoint={[x, y]}
         endPoint={[canvasWidth - gutter, y]}
@@ -109,7 +146,14 @@
           : group.category}
         classification={group.lastEvent.classification}
         pending
+        paused={!!pauseTime}
         strokeWidth={radius * 2}
+      />
+      <Dot
+        point={[x, y]}
+        classification={group.lastEvent.classification}
+        icon={'retry'}
+        r={radius}
       />
     {/if}
     {#if showText}
@@ -127,21 +171,27 @@
           {backdrop}
           backdropHeight={radius * 2}
           config={TimelineConfig}
-          icon={pendingActivity ? 'retry' : undefined}
+          icon={(pendingActivity && !pendingActivity.paused) || retried
+            ? 'retry'
+            : undefined}
         >
           {#if pendingActivity}
             {translate('workflows.attempt')}
             {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
             {'• '}
+            {decodedValue}
+          {:else if retried}
+            {activityTaskScheduled.attributes.attempt} • {decodedValue}
+          {:else}
+            {decodedValue}
           {/if}
-          {decodedValue}
         </Text>
       </MetadataDecoder>
     {/if}
     <Dot
       point={[x, y]}
       classification={group.eventList[index]?.classification}
-      icon={CategoryIcon[group.category]}
+      icon={pauseTime && index !== 0 ? 'pause' : CategoryIcon[group.category]}
       r={radius}
     />
   {/each}

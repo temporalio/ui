@@ -101,7 +101,7 @@
       {#if isEventGroup(event)}
         <EventSummaryRow
           bind:hoveredEventId
-          event={event.initialEvent}
+          {event}
           {index}
           group={event}
           {compact}

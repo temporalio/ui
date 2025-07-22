@@ -1,4 +1,7 @@
+import type { Timestamp } from '@temporalio/common';
+
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { ActivityOptions } from '$lib/types';
 
 import type { Replace, Settings } from './global';
 
@@ -47,12 +50,22 @@ export type Payload = {
   data?: string;
 };
 
+export type PauseInfo = {
+  manual: {
+    reason: string;
+    identity: string;
+  };
+  pauseTime: Timestamp;
+};
+
 export type PendingActivity = Replace<
   PendingActivityInfo,
   {
     id: string;
     state: PendingActivityState;
     activityType?: string;
+    pauseInfo?: PauseInfo;
+    activityOptions?: ActivityOptions;
   }
 >;
 

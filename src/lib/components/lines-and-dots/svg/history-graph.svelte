@@ -23,7 +23,7 @@
   const { height, radius } = HistoryConfig;
 
   const nodeBuffer = 4 * radius;
-  const maxWidth = 300;
+  const maxWidth = 600;
 
   let canvasWidth = nodeBuffer;
   let visualWidth = 0;

@@ -6,6 +6,8 @@
   export let classification: string | undefined = undefined;
   export let scheduling = false;
   export let pending = false;
+  export let paused = false;
+  export let retried = false;
   export let strokeWidth: number = 2;
   export let strokeDasharray = 'none';
 
@@ -13,10 +15,23 @@
   $: [x2, y2] = endPoint;
 </script>
 
+<defs>
+  <pattern
+    id="retried-pattern"
+    width="10"
+    height="10"
+    patternUnits="userSpaceOnUse"
+  >
+    <rect x="0" y="0" width="5" height="10" fill="#00964e" />
+    <rect x="5" y="0" width="2.5" height="10" fill="#c71607" opacity="0.75" />
+    <rect x="7.5" y="0" width="5" height="10" fill="#00964e" />
+  </pattern>
+</defs>
 <line
   class="line {status} {category} {classification}"
   class:scheduling
-  class:animate-line={pending}
+  class:animate-line={pending && !paused}
+  class:retried={retried && classification === 'Completed'}
   stroke-width={strokeWidth}
   stroke-dasharray={pending ? '3' : strokeDasharray}
   x1={Math.max(0, x1)}
@@ -104,6 +119,11 @@
   .animate-line {
     stroke-dashoffset: 0;
     animation: dash 60s linear infinite;
+  }
+
+  .retried {
+    stroke: url('#retried-pattern');
+    opacity: 0.85;
   }
 
   @keyframes dash {

@@ -82,6 +82,7 @@ import namespace from './svg/namespace.svelte';
 import nexus from './svg/nexus.svelte';
 import officeBuildings from './svg/office-buildings.svelte';
 import pause from './svg/pause.svelte';
+import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import play from './svg/play.svelte';
@@ -211,6 +212,7 @@ export const icons = {
   'office-buildings': officeBuildings,
   play,
   pause,
+  pencil,
   'pin-filled': pinFilled,
   pin,
   regions,

@@ -51,6 +51,8 @@ export const Strings = {
   'continued-as-new': 'Continued as New',
   terminated: 'Terminated',
   canceled: 'Canceled',
+  pause: 'Pause',
+  unpause: 'Unpause',
   paused: 'Paused',
   reset: 'Reset',
   signal: 'Send a Signal',
@@ -295,4 +297,5 @@ export const Strings = {
   'pending-nexus-operation': 'Pending Nexus Operation',
   'schedule-event-id': 'Scheduled Event ID',
   'schedule-to-close-timeout': 'Schedule to Close Timeout',
+  'related-events': 'Related Events',
 } as const;

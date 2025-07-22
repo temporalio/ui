@@ -90,7 +90,7 @@
       class="mt-4 block w-full p-4"
       class:hidden={!open}
     >
-      <slot />
+      <slot {open} />
     </div>
   </div>
 {:else}
@@ -122,7 +122,7 @@
     </div>
 
     <div class="mt-6 block w-full" class:hidden={!open}>
-      <slot />
+      <slot {open} />
     </div>
   </div>
 {/if}

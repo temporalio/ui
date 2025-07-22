@@ -4,6 +4,7 @@ import {
   formatDistance,
   formatDistanceAbbreviated,
   formatDurationAbbreviated,
+  formatSecondsAbbreviated,
   fromSecondsToDaysOrHours,
   fromSecondsToMinutesAndSeconds,
   getDuration,
@@ -320,5 +321,16 @@ describe('getTimestampDifference', () => {
         '1year, 13d, 9h, 46m, 1s',
       );
     });
+  });
+});
+
+describe('formatSecondsAbbreviated', () => {
+  it('should return "13m 20s" for 800 seconds', () => {
+    expect(formatSecondsAbbreviated(800)).toBe('13m 20s');
+    expect(formatSecondsAbbreviated('800')).toBe('13m 20s');
+  });
+  it('should return "1ms" for 0.001 seconds', () => {
+    expect(formatSecondsAbbreviated(0.001)).toBe('1ms');
+    expect(formatSecondsAbbreviated('0.001')).toBe('1ms');
   });
 });

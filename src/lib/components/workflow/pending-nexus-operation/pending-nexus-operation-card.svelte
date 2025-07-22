@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div class="flex flex-col gap-1 xl:flex-row">
+  <div class="flex flex-1 flex-col gap-4 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if operation.endpoint}
         {@render detail(translate('nexus.endpoint'), operation.endpoint)}
@@ -46,7 +46,13 @@
       {/if}
       {@render detail(translate('workflows.attempt'), attempts)}
       {#if operation.nextAttemptScheduleTime}
-        {@render detail(translate('workflows.next-retry'), nextRetry)}
+        {@const timeDifference = toTimeDifference({
+          date: operation.nextAttemptScheduleTime,
+          negativeDefault: '',
+        })}
+        {#if timeDifference}
+          {@render nextRetry(timeDifference)}
+        {/if}
       {/if}
       {#if operation.lastAttemptCompleteTime}
         {@render detail(
@@ -78,13 +84,13 @@
         )}
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
         {@render failures()}
       {/if}
       {#if operation.blockedReason}
         <div class="flex flex-1 flex-col">
-          <p class="mb-1 text-sm text-secondary/80">
+          <p class="text-sm text-secondary/80">
             {translate('nexus.blocked-reason')}
           </p>
           <CodeBlock
@@ -97,7 +103,7 @@
       {/if}
       {#if Object.keys(operation.cancellationInfo ?? {}).length > 0}
         <div class="flex flex-1 flex-col">
-          <p class="mb-1 text-sm text-secondary/80">
+          <p class="text-sm text-secondary/80">
             {translate('nexus.cancellation-info')}
           </p>
           <CodeBlock
@@ -112,18 +118,18 @@
   </div>
 </div>
 
-{#snippet nextRetry()}
-  <div class="flex flex-wrap items-center gap-1">
-    {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
-      relative: $relativeTime,
-      relativeLabel: '',
-    })}
-    <strong
-      >({toTimeDifference({
-        date: operation.nextAttemptScheduleTime,
-        negativeDefault: translate('workflows.no-retry'),
-      })})</strong
-    >
+{#snippet nextRetry(timeDifference)}
+  <div class="flex items-start gap-4">
+    <p class="min-w-56 text-sm text-secondary/80">
+      {translate('workflows.next-retry')}
+    </p>
+    <p class="flex w-full items-center gap-1 whitespace-pre-line">
+      {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
+        relative: $relativeTime,
+        relativeLabel: '',
+      })}
+      <strong>({timeDifference})</strong>
+    </p>
   </div>
 {/snippet}
 
@@ -143,41 +149,42 @@
 {/snippet}
 
 {#snippet attempts()}
-  <Badge class="text-no-wrap mr-1" type={failed ? 'danger' : 'default'}>
+  <Badge class="mr-1" type={failed ? 'danger' : 'default'}>
     <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
     {operation.attempt ?? 0}
   </Badge>
 {/snippet}
 
 {#snippet failures()}
-  {#if operation.lastAttemptFailure}
-    <div>
-      <p class="mb-1 text-sm text-secondary/80">
-        {translate('workflows.last-failure')}
-      </p>
-      <CodeBlock
-        maxHeight={384}
-        content={stringifyWithBigInt(
-          omit(operation.lastAttemptFailure, 'stackTrace'),
-        )}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+  <div class="flex flex-col gap-2">
+    <div class="flex flex-1 flex-col">
+      {#if operation.lastAttemptFailure}
+        <p class="text-sm text-secondary/80">
+          {translate('workflows.last-failure')}
+        </p>
+        <CodeBlock
+          content={stringifyWithBigInt(
+            omit(operation.lastAttemptFailure, 'stackTrace'),
+          )}
+          maxHeight={384}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      {/if}
     </div>
-  {/if}
-
-  {#if operation.lastAttemptFailure?.stackTrace}
-    <div>
-      <p class="mb-1 text-sm text-secondary/80">
-        {translate('common.stack-trace')}
-      </p>
-      <CodeBlock
-        maxHeight={384}
-        language="text"
-        content={operation.lastAttemptFailure.stackTrace}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+    <div class="flex flex-1 flex-col">
+      {#if operation.lastAttemptFailure?.stackTrace}
+        <p class="text-sm text-secondary/80">
+          {translate('common.stack-trace')}
+        </p>
+        <CodeBlock
+          language="text"
+          maxHeight={384}
+          content={operation.lastAttemptFailure.stackTrace}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      {/if}
     </div>
-  {/if}
+  </div>
 {/snippet}
