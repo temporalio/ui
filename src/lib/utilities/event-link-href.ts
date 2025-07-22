@@ -1,4 +1,4 @@
-import type { EventLink } from '$lib/types/events';
+import type { EventLink, EventType } from '$lib/types';
 
 import { routeForEventHistory, routeForEventHistoryEvent } from './route-for';
 
@@ -12,7 +12,7 @@ export const getEventLinkHref = (link: EventLink): string => {
     });
   } else if (
     link.workflowEvent?.eventRef?.eventType ===
-    'EVENT_TYPE_WORKFLOW_EXECUTION_STARTED'
+    ('EVENT_TYPE_WORKFLOW_EXECUTION_STARTED' as unknown as EventType)
   ) {
     return routeForEventHistoryEvent({
       namespace: link.workflowEvent.namespace,

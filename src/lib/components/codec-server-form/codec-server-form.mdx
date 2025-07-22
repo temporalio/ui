@@ -1,0 +1,230 @@
+import { Meta } from '@storybook/blocks';
+import { Markdown } from '@storybook/blocks';
+
+import CodecServerForm from './codec-server-form.stories.svelte';
+
+<Meta of={CodecServerForm} />
+
+# CodecServerForm Component
+
+A reusable form component for managing codec server configuration with SuperForms and reactive adapters.
+
+## Features
+
+- **Reactive Adapter Pattern**: Self-contained adapters that integrate with existing settings API
+- **SuperForms Integration**: Built-in validation with Zod schema and dirty state tracking
+- **Smart Visibility**: Custom section automatically shows when values are populated
+- **Toggle Switches**: Modern UI controls for boolean settings
+- **URL Validation**: Required valid endpoints with optional custom links
+- **Comprehensive Error Handling**: Form state management with proper error display
+- **Type Safety**: Full TypeScript support with Svelte 5 runes
+
+## Architecture
+
+The component uses a two-part architecture:
+
+1. **Parent Component**: Handles async data loading with `#await` pattern
+2. **Child Component**: Renders the form with SuperForms configuration
+
+## Adapter Pattern
+
+The component uses a reactive adapter pattern for flexible data integration:
+
+```typescript
+interface CodecServerAdapter {
+  fetchCodecServer(): Promise<CodecServerFormData>;
+  saveCodecServer(data: CodecServerFormData): Promise<void>;
+  onSuccess?: (data: CodecServerFormData) => Promise<void>;
+  onCancel?: () => void;
+}
+```
+
+### Form Data Structure
+
+```typescript
+interface CodecServerFormData {
+  endpoint: string; // Required valid URL
+  passUserAccessToken: boolean; // Toggle for access token
+  includeCrossOriginCredentials: boolean; // Toggle for CORS credentials
+  customMessage?: string; // Optional error message
+  customLink?: string; // Optional redirect URL
+}
+```
+
+## Usage Examples
+
+### Basic Usage with Codec Adapter
+
+```svelte
+<script lang="ts">
+  import { createCodecAdapter } from '$lib/components/codec-server-form/codec-adapter.svelte';
+  import CodecServerForm from '$lib/components/codec-server-form/codec-server-form.svelte';
+
+  // OSS adapter operates at cluster level
+  const adapter = createCodecAdapter();
+</script>
+
+<CodecServerForm {adapter} />
+```
+
+### Custom Adapter Implementation
+
+```typescript
+// custom-codec-adapter.svelte.ts
+import type { CodecServerAdapter, CodecServerFormData } from './types';
+
+export const customCodecAdapter: CodecServerAdapter = {
+  async fetchCodecServer(): Promise<CodecServerFormData> {
+    const response = await fetch('/api/v1/codec-server');
+    return await response.json();
+  },
+
+  async saveCodecServer(data: CodecServerFormData): Promise<void> {
+    await fetch('/api/v1/codec-server', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  },
+
+  onSuccess: (data) => {
+    console.log('Codec server updated:', data);
+    // Trigger settings refresh, redirect, etc.
+  },
+
+  onCancel: () => {
+    // Handle cancel action
+    history.back();
+  },
+};
+```
+
+### Integration with SvelteKit
+
+```svelte
+<!-- src/routes/cluster/codec-server/+page.svelte -->
+<script lang="ts">
+  import { createCodecAdapter } from '$lib/components/codec-server-form/codec-adapter.svelte';
+  import CodecServerForm from '$lib/components/codec-server-form/codec-server-form.svelte';
+
+  // Cluster-level configuration for OSS
+  const adapter = createCodecAdapter();
+</script>
+
+<svelte:head>
+  <title>Codec Server Configuration</title>
+</svelte:head>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Codec Server Configuration</h1>
+    <p class="text-gray-600 mt-2">
+      Configure cluster-level codec server endpoint to decode payloads for all
+      users.
+    </p>
+  </div>
+
+  <CodecServerForm {adapter} />
+</div>
+```
+
+## Props
+
+<Markdown>
+  {`
+| Prop    | Type                | Default  | Description                         |
+| ------- | ------------------- | -------- | ----------------------------------- |
+| adapter | CodecServerAdapter  | Required | Adapter instance for API operations |
+| class   | string              | ''       | Additional CSS classes              |
+  `}
+</Markdown>
+
+## Form Sections
+
+### Main Configuration
+
+- **Info Alert**: Explains that users can override the namespace-level endpoint in their browser
+- **Endpoint Input**: Required valid URL field with validation
+- **Access Token Toggle**: Whether to pass user access token to codec server
+- **Cross-Origin Credentials Toggle**: Whether to include credentials in requests
+
+### Custom Error Handling (Expandable)
+
+- **Smart Visibility**: Automatically visible if custom values exist
+- **Custom Message**: Optional error message for codec server failures
+- **Custom Link**: Optional redirect URL with validation and security warning
+- **Remove Button**: Clears all custom values and hides the section
+
+## Loading States
+
+The component automatically handles three states:
+
+- **Loading**: Shows skeleton loaders while fetching initial data
+- **Success**: Renders the form with loaded configuration
+- **Error**: Shows detailed error messages with retry functionality
+
+## Validation
+
+Form validation is handled by Zod schema with the following rules:
+
+- **Endpoint**: Required valid URL format
+- **Custom Link**: Optional but must be valid URL if provided
+- **Access Token**: Boolean toggle (no validation needed)
+- **Cross-Origin Credentials**: Boolean toggle (no validation needed)
+- **Custom Message**: Optional string (no validation needed)
+
+## Error Handling
+
+The component provides comprehensive error handling:
+
+- **Form State Management**: Prevents form from getting stuck in "Saving..." state
+- **SuperForms Integration**: Proper error handling with `onUpdate` callbacks
+- **Field-Level Validation**: Real-time feedback for URL validation
+- **API Error Display**: Status messages with proper intent styling
+- **Dirty State Tracking**: Shows count badge on Save button when form has unsaved changes
+- **Form Reset**: Cancel button properly resets form to initial state
+
+## Dirty State Management
+
+The form automatically tracks unsaved changes using SuperForms `isTainted` state:
+
+- **Visual Indicator**: Save button shows a count badge with number of modified fields
+- **Real-time Updates**: Badge updates immediately as user makes changes
+- **Form Reset**: Cancel button clears dirty state and resets to initial values
+
+## Custom Section Behavior
+
+The expandable custom section has intelligent visibility:
+
+- **Hidden by default** when no custom values exist
+- **Visible by default** when custom message or link are populated
+- **Add button** shows when section is hidden
+- **Remove button** clears values and hides section when visible
+- **Security warning** displayed for custom links
+
+## Accessibility
+
+- Proper ARIA labels and roles for all form controls
+- Toggle switches with appropriate accessibility markup
+- Keyboard navigation support
+- Screen reader friendly error messages and descriptions
+- Focus management for form interactions
+- Semantic HTML structure with proper form labeling
+
+## API Integration
+
+The component is designed to work with the existing Temporal settings API:
+
+### Current API Structure (Read-only)
+
+```
+GET /api/v1/settings
+```
+
+### Expected Update API (Future)
+
+```
+PUT /api/v1/settings/codec
+```
+
+The codec adapter handles the transformation between the form data structure and the API format, ensuring compatibility with both current and future endpoints.

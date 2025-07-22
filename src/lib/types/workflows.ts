@@ -3,12 +3,13 @@ import type {
   Payloads,
   PendingWorkflowTaskInfo,
   WorkflowExecutionStatus,
+  WorkflowExtendedInfo,
   WorkflowVersionTimpstamp,
 } from '$lib/types';
+import type { Callback } from '$lib/types/nexus';
 
 import type { VersioningInfo } from './deployments';
 import type {
-  Callbacks,
   Payload,
   PendingActivity,
   PendingActivityInfo,
@@ -78,22 +79,13 @@ export type UserMetadata = {
   details?: Payload;
 };
 
-export type WorkflowExecutionConfigWithMetadata = WorkflowExecutionConfig & {
-  userMetadata?: UserMetadata;
-};
-
-export type WorkflowExtendedInfo = {
-  resetRunId?: string;
-  originalStartTime?: string;
-};
-
 export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
   pendingChildren: PendingChildren[];
   pendingNexusOperations: PendingNexusOperation[];
-  executionConfig: WorkflowExecutionConfigWithMetadata;
-  callbacks: Callbacks;
+  executionConfig: WorkflowExecutionConfig;
+  callbacks: Callback[];
   pendingWorkflowTask: PendingWorkflowTaskInfo;
   workflowExtendedInfo: WorkflowExtendedInfo;
 }>;
@@ -188,7 +180,7 @@ export type WorkflowExecution = {
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
-  callbacks: Callbacks;
+  callbacks: Callback[];
   versioningInfo?: VersioningInfo;
   summary?: Payload;
   details?: Payload;

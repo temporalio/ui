@@ -14,7 +14,11 @@ import {
 import { formatDate } from '$lib/utilities/format-date';
 import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
 import { has } from '$lib/utilities/has';
-import { findAttributesAndKey } from '$lib/utilities/is-event-type';
+import {
+  findAttributesAndKey,
+  isWorkflowExecutionOptionsUpdatedEvent,
+  isWorkflowExecutionStartedEvent,
+} from '$lib/utilities/is-event-type';
 import { toEventNameReadable } from '$lib/utilities/screaming-enums';
 
 import { getEventBillableActions } from './get-event-billable-actions';
@@ -72,12 +76,17 @@ export const toEvent = (
   const category = getEventCategory(eventType);
 
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  // TODO: When TS SDK supports new fields, remove this workaround
-  const completionLinks =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (attributes as any)?.completionCallbacks?.[0]?.links ||
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (attributes as any)?.attachedCompletionCallbacks?.[0]?.links;
+
+  const completionCallbacks =
+    isWorkflowExecutionStartedEvent(historyEvent) &&
+    historyEvent.workflowExecutionStartedEventAttributes
+      ?.completionCallbacks?.[0]?.links;
+  const attachedCompletionCallbacks =
+    isWorkflowExecutionOptionsUpdatedEvent(historyEvent) &&
+    historyEvent.workflowExecutionOptionsUpdatedEventAttributes
+      ?.attachedCompletionCallbacks?.[0]?.links;
+
+  const completionLinks = completionCallbacks || attachedCompletionCallbacks;
   const links = historyEvent?.links || completionLinks || [];
   const event = {
     ...historyEvent,

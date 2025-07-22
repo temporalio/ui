@@ -41,6 +41,10 @@ export type UpdateWorkflowRequest =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionRequest;
 export type UpdateWorkflowResponse =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionResponse;
+export type PendingWorkflowTaskInfo =
+  temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
+export type WorkflowExtendedInfo =
+  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo;
 
 // api.history
 
@@ -168,9 +172,8 @@ export type TaskReachability = temporal.api.enums.v1.TaskReachability;
 export type PendingNexusOperationState =
   temporal.api.enums.v1.PendingNexusOperationState;
 export type CallbackState = temporal.api.enums.v1.CallbackState;
-export type PendingWorkflowTaskInfo =
-  temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
 export type VersioningBehavior = temporal.api.enums.v1.VersioningBehavior;
+export type EventType = temporal.api.enums.v1.EventType;
 
 // temporal.api.enums.v1.ResetReapplyExcludeType
 export enum ResetReapplyExcludeType {
@@ -251,6 +254,7 @@ export type BatchTerminateOperation =
 // api.nexus
 export type Endpoint = temporal.api.nexus.v1.IEndpoint;
 export type EndpointSpec = temporal.api.nexus.v1.IEndpointSpec;
+export type EventLink = temporal.api.common.v1.ILink;
 
 // api.failure
 export type Failure = temporal.api.failure.v1.IFailure;

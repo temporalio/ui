@@ -1,4 +1,4 @@
-import type { DescribeNamespaceResponse } from '$lib/types';
+import type { DescribeNamespaceResponse, EventLink } from '$lib/types';
 import type {
   ChildWorkflowExecutionCanceledEvent,
   ChildWorkflowExecutionCompletedEvent,
@@ -133,4 +133,23 @@ export const getWorkflowRelationships = (
     scheduleId,
     relationshipCount,
   };
+};
+
+export const getWorkflowNexusLinksFromHistory = (
+  history: WorkflowEvents,
+): EventLink[] => {
+  try {
+    const links = new Set<EventLink>();
+    for (const event of history) {
+      if (event.category === 'nexus' && event.links && event.links.length > 0) {
+        for (const link of event.links) {
+          links.add(link);
+        }
+      }
+    }
+
+    return Array.from(links);
+  } catch (error) {
+    return [];
+  }
 };

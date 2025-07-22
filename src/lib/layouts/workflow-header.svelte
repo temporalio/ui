@@ -16,6 +16,7 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
@@ -23,11 +24,15 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
-  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
+  import {
+    getWorkflowNexusLinksFromHistory,
+    getWorkflowRelationships,
+  } from '$lib/utilities/get-workflow-relationships';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
     routeForEventHistory,
+    routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
     routeForUserMetadata,
@@ -73,6 +78,10 @@
       namespace,
     })}?${$workflowsSearchParams}`,
   );
+  $: outboundLinks =
+    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0;
+  $: inboundLinks = getInboundNexusLinkEvents($fullEventHistory)?.length || 0;
+  $: linkCount = outboundLinks + inboundLinks;
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -218,6 +227,21 @@
           {workflowRelationships.relationshipCount}
         </Badge></Tab
       >
+      {#if linkCount > 0}
+        <Tab
+          label={translate('workflows.nexus-links-tab')}
+          id="nexus-links-tab"
+          href={routeForNexusLinks(routeParameters)}
+          active={pathMatches(
+            $page.url.pathname,
+            routeForNexusLinks(routeParameters),
+          )}
+        >
+          <Badge type="primary" class="px-2 py-0">
+            {linkCount}
+          </Badge>
+        </Tab>
+      {/if}
       <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
@@ -246,7 +270,8 @@
           class="px-2 py-0"
         >
           <div class="flex items-center gap-1">
-            {#if activitiesCanceled}<Icon name="canceled" />
+            {#if activitiesCanceled}
+              <Icon name="canceled" />
             {/if}
             {workflow?.pendingActivities?.length}
           </div>

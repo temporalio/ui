@@ -6,9 +6,9 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import type { EventLink as ELink } from '$lib/types';
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
-  import type { EventLink as ELink } from '$lib/types/events';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import {
     format,
