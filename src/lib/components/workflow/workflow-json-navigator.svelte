@@ -86,16 +86,15 @@
 <div class="min-h-screen py-4">
   {#if $decodeEventHistory}
     {#key [index, $decodeEventHistory]}
-      <PayloadDecoder
-        value={fromEventToRawEvent(events[index - 1])}
-        let:decodedValue
-      >
-        <CodeBlock
-          content={decodedValue}
-          testId="event-history-json"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
+      <PayloadDecoder value={fromEventToRawEvent(events[index - 1])}>
+        {#snippet children(decodedValue)}
+          <CodeBlock
+            content={decodedValue}
+            testId="event-history-json"
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        {/snippet}
       </PayloadDecoder>
     {/key}
   {:else}

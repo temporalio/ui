@@ -53,35 +53,41 @@
   {#if content}
     {#key $minimizeEventView}
       {#if payloadsSize > 0}
-        <PayloadDecoder value={parsedContent} key="payloads" let:decodedValue>
-          {#if payloadsSize > 1}
-            {#each parsePayloads(decodedValue) as decodedContent}
+        <PayloadDecoder value={parsedContent} key="payloads">
+          {#snippet children(decodedValue)}
+            {#if payloadsSize > 1}
+              {#each parsePayloads(decodedValue) as decodedContent}
+                <CodeBlock
+                  content={stringifyWithBigInt(decodedContent)}
+                  copyIconTitle={translate('common.copy-icon-title')}
+                  copySuccessIconTitle={translate(
+                    'common.copy-success-icon-title',
+                  )}
+                  maxHeight={300}
+                />
+              {/each}
+            {:else}
               <CodeBlock
-                content={stringifyWithBigInt(decodedContent)}
+                content={decodedValue}
                 copyIconTitle={translate('common.copy-icon-title')}
                 copySuccessIconTitle={translate(
                   'common.copy-success-icon-title',
                 )}
                 maxHeight={300}
               />
-            {/each}
-          {:else}
+            {/if}
+          {/snippet}
+        </PayloadDecoder>
+      {:else}
+        <PayloadDecoder value={parseWithBigInt(content)}>
+          {#snippet children(decodedValue)}
             <CodeBlock
               content={decodedValue}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
               maxHeight={300}
             />
-          {/if}
-        </PayloadDecoder>
-      {:else}
-        <PayloadDecoder value={parseWithBigInt(content)} let:decodedValue>
-          <CodeBlock
-            content={decodedValue}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            maxHeight={300}
-          />
+          {/snippet}
         </PayloadDecoder>
       {/if}
     {/key}

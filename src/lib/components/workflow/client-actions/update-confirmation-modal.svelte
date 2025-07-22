@@ -172,8 +172,10 @@
     {#if success}
       <Alert intent="success" title="Success">
         {#if success?.payloads?.[0] && success.payloads[0].data}
-          <PayloadDecoder value={success.payloads[0]} let:decodedValue>
-            <CodeBlock class="mt-4" content={decodedValue} language="text" />
+          <PayloadDecoder value={success.payloads[0]}>
+            {#snippet children(decodedValue)}
+              <CodeBlock class="mt-4" content={decodedValue} language="text" />
+            {/snippet}
           </PayloadDecoder>
         {/if}
       </Alert>

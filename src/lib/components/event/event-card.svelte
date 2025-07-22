@@ -169,35 +169,40 @@
       {format(key)}
     </p>
     {#if value?.payloads}
-      <PayloadDecoder {value} key="payloads" let:decodedValue>
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={384}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
+      <PayloadDecoder {value} key="payloads">
+        {#snippet children(decodedValue)}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={384}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        {/snippet}
       </PayloadDecoder>
     {:else if key === 'searchAttributes'}
       <PayloadDecoder
         key="searchAttributes"
         value={{ searchAttributes: codeBlockValue }}
-        let:decodedValue
       >
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={384}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
+        {#snippet children(decodedValue)}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={384}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        {/snippet}
       </PayloadDecoder>
     {:else}
-      <PayloadDecoder value={codeBlockValue} let:decodedValue>
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={384}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
+      <PayloadDecoder value={codeBlockValue}>
+        {#snippet children(decodedValue)}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={384}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        {/snippet}
       </PayloadDecoder>
     {/if}
   </div>
