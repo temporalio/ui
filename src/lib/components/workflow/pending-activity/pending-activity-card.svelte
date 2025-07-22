@@ -16,6 +16,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
+  import { type PotentiallyDecodable } from '$lib/utilities/decode-payload';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
@@ -186,14 +187,32 @@
         <p class="text-sm text-secondary/80">
           {translate('workflows.last-failure')}
         </p>
-        <CodeBlock
-          content={stringifyWithBigInt(
-            omit(activity.lastFailure, 'stackTrace'),
-          )}
-          maxHeight={384}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
+        {#if activity.lastFailure?.encodedAttributes}
+          {#key activity.attempt}
+            <PayloadDecoder
+              value={activity.lastFailure as PotentiallyDecodable}
+              let:decodedValue
+            >
+              <CodeBlock
+                content={decodedValue}
+                maxHeight={384}
+                copyIconTitle={translate('common.copy-icon-title')}
+                copySuccessIconTitle={translate(
+                  'common.copy-success-icon-title',
+                )}
+              />
+            </PayloadDecoder>
+          {/key}
+        {:else}
+          <CodeBlock
+            content={stringifyWithBigInt(
+              omit(activity.lastFailure, 'stackTrace'),
+            )}
+            maxHeight={384}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        {/if}
       {/if}
     </div>
     {#if activity.lastFailure?.stackTrace}
