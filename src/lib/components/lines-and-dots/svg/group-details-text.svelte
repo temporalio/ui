@@ -25,10 +25,12 @@
   {#if value?.payloads}
     <PayloadDecoder {value} key="payloads" {onDecode}>
       {#snippet children(decodedValue)}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
       {/snippet}
     </PayloadDecoder>
   {:else if key === 'searchAttributes'}
@@ -38,19 +40,23 @@
       {onDecode}
     >
       {#snippet children(decodedValue)}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
       {/snippet}
     </PayloadDecoder>
   {:else}
     <PayloadDecoder value={codeBlockValue} {onDecode}>
       {#snippet children(decodedValue)}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
       {/snippet}
     </PayloadDecoder>
   {/if}

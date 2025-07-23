@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   import { page } from '$app/stores';
 
@@ -30,7 +30,7 @@
   let keyedValue = key && value?.[key] ? value[key] : value;
   let decodedValue = $state(stringifyWithBigInt(keyedValue));
 
-  $effect(() => {
+  onMount(() => {
     decodePayloads(value);
   });
 

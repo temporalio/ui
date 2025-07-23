@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -9,9 +11,15 @@
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
-  export let events: WorkflowEvents = [];
+  interface Props {
+    events?: WorkflowEvents;
+    decode?: Snippet;
+  }
 
-  let index = 1;
+  let { events = [], decode }: Props = $props();
+
+  let index = $state(1);
+  let rawEvent = $derived(fromEventToRawEvent(events[index - 1]));
 
   function handleKeydown(event: KeyboardEvent) {
     switch (event.code) {
@@ -52,7 +60,7 @@
       <button
         class="caret"
         disabled={index === 1}
-        on:click={() => {
+        onclick={() => {
           index -= 1;
         }}
         aria-label={translate('common.previous')}
@@ -67,7 +75,7 @@
       <button
         class="caret"
         disabled={index === events.length}
-        on:click={() => {
+        onclick={() => {
           index += 1;
         }}
         aria-label={translate('common.next')}
@@ -81,12 +89,12 @@
       </button>
     </div>
   </div>
-  <slot name="decode" />
+  {@render decode?.()}
 </div>
 <div class="min-h-screen py-4">
-  {#if $decodeEventHistory}
+  {#if $decodeEventHistory && events.length > 0}
     {#key [index, $decodeEventHistory]}
-      <PayloadDecoder value={fromEventToRawEvent(events[index - 1])}>
+      <PayloadDecoder value={rawEvent}>
         {#snippet children(decodedValue)}
           <CodeBlock
             content={decodedValue}
@@ -100,11 +108,7 @@
   {:else}
     {#key index}
       <CodeBlock
-        content={stringifyWithBigInt(
-          fromEventToRawEvent(events[index - 1]),
-          undefined,
-          2,
-        )}
+        content={stringifyWithBigInt(rawEvent, undefined, 2)}
         testId="event-history-json"
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}

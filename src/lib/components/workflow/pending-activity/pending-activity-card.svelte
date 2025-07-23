@@ -188,18 +188,22 @@
           {translate('workflows.last-failure')}
         </p>
         {#if activity.lastFailure?.encodedAttributes}
-          <PayloadDecoder value={activity.lastFailure as PotentiallyDecodable}>
-            {#snippet children(decodedValue)}
-              <CodeBlock
-                content={decodedValue}
-                maxHeight={384}
-                copyIconTitle={translate('common.copy-icon-title')}
-                copySuccessIconTitle={translate(
-                  'common.copy-success-icon-title',
-                )}
-              />
-            {/snippet}
-          </PayloadDecoder>
+          {#key activity.attempt}
+            <PayloadDecoder
+              value={activity.lastFailure as PotentiallyDecodable}
+            >
+              {#snippet children(decodedValue)}
+                <CodeBlock
+                  content={decodedValue}
+                  maxHeight={384}
+                  copyIconTitle={translate('common.copy-icon-title')}
+                  copySuccessIconTitle={translate(
+                    'common.copy-success-icon-title',
+                  )}
+                />
+              {/snippet}
+            </PayloadDecoder>
+          {/key}
         {:else}
           <CodeBlock
             content={stringifyWithBigInt(
