@@ -23,36 +23,41 @@
 
 {#if typeof value === 'object'}
   {#if value?.payloads}
-    <PayloadDecoder {value} key="payloads" let:decodedValue {onDecode}>
-      {#key decodedValue}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
-      {/key}
+    <PayloadDecoder {value} key="payloads" {onDecode}>
+      {#snippet children(decodedValue)}
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
+      {/snippet}
     </PayloadDecoder>
   {:else if key === 'searchAttributes'}
     <PayloadDecoder
       key="searchAttributes"
       value={{ searchAttributes: codeBlockValue }}
-      let:decodedValue
       {onDecode}
     >
-      {#key decodedValue}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
-      {/key}
+      {#snippet children(decodedValue)}
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
+      {/snippet}
     </PayloadDecoder>
   {:else}
-    <PayloadDecoder value={codeBlockValue} let:decodedValue {onDecode}>
-      {#key decodedValue}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={staticCodeBlockHeight - fontSizeRatio}
-        />
-      {/key}
+    <PayloadDecoder value={codeBlockValue} {onDecode}>
+      {#snippet children(decodedValue)}
+        {#key decodedValue}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={staticCodeBlockHeight - fontSizeRatio}
+          />
+        {/key}
+      {/snippet}
     </PayloadDecoder>
   {/if}
 {:else if linkType !== 'none'}

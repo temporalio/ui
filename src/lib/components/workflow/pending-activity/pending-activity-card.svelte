@@ -167,17 +167,15 @@
     <p class="text-sm text-secondary/80">
       {translate('workflows.heartbeat-details')}
     </p>
-    <PayloadDecoder
-      value={activity.heartbeatDetails}
-      let:decodedValue
-      key="payloads"
-    >
-      <CodeBlock
-        content={decodedValue}
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+    <PayloadDecoder value={activity.heartbeatDetails} key="payloads">
+      {#snippet children(decodedValue)}
+        <CodeBlock
+          content={decodedValue}
+          maxHeight={384}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        />
+      {/snippet}
     </PayloadDecoder>
   </div>
 {/snippet}
@@ -193,16 +191,17 @@
           {#key activity.attempt}
             <PayloadDecoder
               value={activity.lastFailure as PotentiallyDecodable}
-              let:decodedValue
             >
-              <CodeBlock
-                content={decodedValue}
-                maxHeight={384}
-                copyIconTitle={translate('common.copy-icon-title')}
-                copySuccessIconTitle={translate(
-                  'common.copy-success-icon-title',
-                )}
-              />
+              {#snippet children(decodedValue)}
+                <CodeBlock
+                  content={decodedValue}
+                  maxHeight={384}
+                  copyIconTitle={translate('common.copy-icon-title')}
+                  copySuccessIconTitle={translate(
+                    'common.copy-success-icon-title',
+                  )}
+                />
+              {/snippet}
             </PayloadDecoder>
           {/key}
         {:else}
