@@ -1,29 +1,26 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
+  import TableBodyCell from '$lib/components/workflow/workflows-summary-configurable-table/table-body-cell.svelte';
+  import TableHeaderCell from '$lib/components/workflow/workflows-summary-configurable-table/table-header-cell.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedArchivedWorkflows } from '$lib/services/workflow-service';
+  import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import { queryWithParentWorkflowId } from '$lib/stores/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
 
-  const namespace = page.params.namespace;
-  $: onFetch = () =>
-    fetchPaginatedArchivedWorkflows(namespace, $queryWithParentWorkflowId);
+  const namespace = $derived(page.params.namespace);
+  const onFetch = $derived(() =>
+    fetchPaginatedArchivedWorkflows(namespace, $queryWithParentWorkflowId),
+  );
 
-  const columns = [
-    { label: translate('common.status'), key: 'status' },
-    { label: translate('common.workflow-id'), key: 'id' },
-    { label: translate('common.workflow-type'), key: 'name' },
-    { label: translate('common.run-id'), key: 'runId' },
-    { label: translate('common.start-time'), key: 'startTime' },
-    { label: translate('common.end-time'), key: 'endTime' },
-  ];
+  const columns = $derived(
+    $configurableTableColumns?.[namespace]?.workflows ?? [],
+  );
 </script>
 
 {#key [namespace]}
@@ -36,26 +33,18 @@
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
   >
-    <caption class="sr-only" slot="caption">
-      {translate('common.workflows')}
-    </caption>
-    <tr slot="headers" class="text-left">
-      {#each columns as { label }}
-        <th>{label}</th>
+    <tr slot="headers">
+      {#each columns as column}
+        <TableHeaderCell {column} />
       {/each}
     </tr>
     {#each visibleItems as workflow}
-      <TableRow>
-        {#each columns as column (column.key)}
-          <td>{workflow[column.key]}</td>
+      <tr data-testid="workflows-summary-configurable-table-row" class="dense">
+        {#each columns as column}
+          <TableBodyCell {workflow} {column} />
         {/each}
-      </TableRow>
+      </tr>
     {/each}
-    <svelte:fragment slot="empty">
-      <TableEmptyState>
-        <slot name="cloud" slot="cloud" />
-      </TableEmptyState>
-    </svelte:fragment>
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
       <Tooltip text={translate('common.download-json')} top>
         <Button
