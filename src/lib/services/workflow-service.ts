@@ -1013,3 +1013,42 @@ export const fetchPaginatedWorkflows = async (
     });
   };
 };
+
+export const fetchPaginatedArchivedWorkflows = async (
+  namespace: string,
+  query: string = '',
+  request = fetch,
+): Promise<PaginatedWorkflowsPromise> => {
+  return (pageSize = 100, token = '') => {
+    workflowError.set('');
+
+    const onError: ErrorCallback = (err) => {
+      handleUnauthorizedOrForbiddenError(err);
+
+      if (get(hideWorkflowQueryErrors)) {
+        workflowError.set(translate('workflows.workflows-error-querying'));
+      } else {
+        workflowError.set(
+          err?.body?.message || translate('workflows.workflows-error-querying'),
+        );
+      }
+    };
+
+    const route = routeForApi('workflows.archived', { namespace });
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: {
+        pageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
+      request,
+      onError,
+      handleError: onError,
+    }).then(({ executions = [], nextPageToken = '' }) => {
+      return {
+        items: toWorkflowExecutions({ executions }),
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
+};
