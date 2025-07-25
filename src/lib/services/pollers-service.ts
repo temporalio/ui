@@ -63,7 +63,7 @@ type PollersData = {
   [key: string]: Poller;
 };
 
-type TaskQueueType = 'ACTIVITY' | 'WORKFLOW';
+type TaskQueueType = 'ACTIVITY' | 'WORKFLOW' | 'NEXUS';
 
 export type Poller = {
   lastAccessTime: PollerInfo['lastAccessTime'];
@@ -89,8 +89,14 @@ export async function getPollers(
     params: { taskQueueType: '2' },
   });
 
+  const nexusPollers = await requestFromAPI<GetPollersResponse>(route, {
+    request,
+    params: { taskQueueType: '3' },
+  });
+
   if (!workflowPollers?.pollers) workflowPollers.pollers = [];
   if (!activityPollers?.pollers) activityPollers.pollers = [];
+  if (!nexusPollers?.pollers) nexusPollers.pollers = [];
 
   activityPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
     poller.taskQueueTypes = ['ACTIVITY'];
@@ -98,6 +104,10 @@ export async function getPollers(
 
   workflowPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
     poller.taskQueueTypes = ['WORKFLOW'];
+  });
+
+  nexusPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
+    poller.taskQueueTypes = ['NEXUS'];
   });
 
   const r =
@@ -131,20 +141,55 @@ export async function getPollers(
     }),
   );
 
-  activityPollers.pollers?.reduce(
-    r('ACTIVITY'),
-    workflowPollers.pollers.reduce(r('WORKFLOW'), {}),
+  nexusPollers.pollers.filter((pollerN: PollerWithTaskQueueTypes) =>
+    activityPollers.pollers.some((pollerA: PollerWithTaskQueueTypes) => {
+      if (pollerN.identity === pollerA.identity) {
+        pollerA.taskQueueTypes = [
+          ...pollerA.taskQueueTypes,
+          ...pollerN.taskQueueTypes,
+        ];
+        return pollerA;
+      }
+    }),
   );
 
-  const pollers = !activityPollers.pollers.length
-    ? workflowPollers.pollers
-    : activityPollers.pollers;
-  const taskQueueStatus = !activityPollers.pollers.length
-    ? workflowPollers.taskQueueStatus
-    : activityPollers.taskQueueStatus;
-  const versioningInfo = !activityPollers.pollers.length
-    ? workflowPollers.versioningInfo
-    : activityPollers.versioningInfo;
+  nexusPollers.pollers.filter((pollerN: PollerWithTaskQueueTypes) =>
+    workflowPollers.pollers.some((pollerW: PollerWithTaskQueueTypes) => {
+      if (pollerN.identity === pollerW.identity) {
+        pollerW.taskQueueTypes = [
+          ...pollerW.taskQueueTypes,
+          ...pollerN.taskQueueTypes,
+        ];
+        return pollerW;
+      }
+    }),
+  );
+
+  nexusPollers.pollers?.reduce(
+    r('NEXUS'),
+    activityPollers.pollers?.reduce(
+      r('ACTIVITY'),
+      workflowPollers.pollers.reduce(r('WORKFLOW'), {}),
+    ),
+  );
+
+  const pollers = nexusPollers.pollers.length
+    ? nexusPollers.pollers
+    : !activityPollers.pollers.length
+      ? workflowPollers.pollers
+      : activityPollers.pollers;
+
+  const taskQueueStatus = nexusPollers.pollers.length
+    ? nexusPollers.taskQueueStatus
+    : !activityPollers.pollers.length
+      ? workflowPollers.taskQueueStatus
+      : activityPollers.taskQueueStatus;
+
+  const versioningInfo = nexusPollers.pollers.length
+    ? nexusPollers.versioningInfo
+    : !activityPollers.pollers.length
+      ? workflowPollers.versioningInfo
+      : activityPollers.versioningInfo;
 
   return {
     pollers,
@@ -152,6 +197,7 @@ export async function getPollers(
     versioningInfo,
   };
 }
+
 export type VersionResults = {
   rules: TaskQueueRules;
   compatibility: TaskQueueCompatibility;
