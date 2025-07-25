@@ -4,12 +4,13 @@
   import type { PageData } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import ArchivalTable from './_archival-table.svelte';
 
-  export let data: PageData & { archivalQueryingNotSupported: boolean };
+  export let data: PageData;
 
   $: ({
     namespace: {
@@ -17,7 +18,6 @@
     },
     archivalEnabled,
     visibilityArchivalEnabled,
-    // archivalQueryingNotSupported,
   } = data);
 </script>
 
@@ -29,7 +29,7 @@
   <h1 data-testid="archived-enabled-title">
     {translate('workflows.archived-workflows')}
   </h1>
-  <!-- {#if !archivalQueryingNotSupported}<WorkflowFilters />{/if} -->
+  <WorkflowAdvancedSearch />
   <ArchivalTable />
 {:else if archivalEnabled}
   <h1 data-testid="visibility-disabled-title">

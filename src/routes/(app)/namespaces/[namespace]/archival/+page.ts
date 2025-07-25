@@ -26,7 +26,7 @@ export const load: PageLoad = async function ({ params, url }) {
   const isGSBucket = namespace.config?.historyArchivalUri
     ?.toLowerCase()
     ?.startsWith('gs://');
-  const archivalQueryingNotSupported = isS3Bucket || isGSBucket;
+  const archivalQueryingSupported = !isS3Bucket && !isGSBucket;
 
   // const parameters: ArchiveFilterParameters = archivalQueryingNotSupported
   //   ? {}
@@ -50,6 +50,6 @@ export const load: PageLoad = async function ({ params, url }) {
     namespace,
     archivalEnabled,
     visibilityArchivalEnabled,
-    archivalQueryingNotSupported,
+    archivalQueryingSupported,
   };
 };

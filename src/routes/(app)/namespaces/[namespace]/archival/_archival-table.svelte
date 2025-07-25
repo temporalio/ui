@@ -9,21 +9,20 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedArchivedWorkflows } from '$lib/services/workflow-service';
-  import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
-  import { queryWithParentWorkflowId } from '$lib/stores/workflows';
+  import { DEFAULT_WORKFLOWS_COLUMNS } from '$lib/stores/configurable-table-columns';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
 
   const namespace = $derived(page.params.namespace);
+  const query = $derived(page.url.searchParams.get('query'));
+
   const onFetch = $derived(() =>
-    fetchPaginatedArchivedWorkflows(namespace, $queryWithParentWorkflowId),
+    fetchPaginatedArchivedWorkflows(namespace, query),
   );
 
-  const columns = $derived(
-    $configurableTableColumns?.[namespace]?.workflows ?? [],
-  );
+  const columns = $derived(DEFAULT_WORKFLOWS_COLUMNS);
 </script>
 
-{#key [namespace]}
+{#key [namespace, query]}
   <PaginatedTable
     {onFetch}
     let:visibleItems
