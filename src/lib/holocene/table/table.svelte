@@ -6,7 +6,7 @@
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   interface $$Props extends HTMLTableAttributes {
-    variant?: 'simple' | 'split' | 'primary';
+    variant?: 'simple' | 'primary';
     updating?: boolean;
     class?: string;
     'data-testid'?: string;
@@ -16,7 +16,7 @@
 
   let className = '';
   export { className as class };
-  export let variant: 'simple' | 'split' | 'primary' = 'primary';
+  export let variant: 'simple' | 'primary' = 'primary';
   export let updating = false;
   export let fixed = false;
   export let bordered = true;
@@ -64,8 +64,7 @@
       }
     }
 
-    &.primary,
-    &.split {
+    &.primary {
       :global(tr) {
         @apply surface-table-header;
       }
@@ -83,8 +82,7 @@
       }
     }
 
-    &.primary,
-    &.split {
+    &.primary {
       :global(tr) {
         @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
       }

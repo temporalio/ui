@@ -5,7 +5,6 @@
   type Item = $$Generic;
 
   export let visibleItems: Item[];
-  export let variant: 'primary' | 'split' = 'primary';
   export let loading = false;
   export let updating = false;
   export let maxHeight = '';
@@ -20,7 +19,7 @@
 </script>
 
 <div
-  class="paginated-table-wrapper {variant}"
+  class="paginated-table-wrapper"
   bind:this={tableContainer}
   style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`}"
 >
@@ -31,7 +30,7 @@
       <SkeletonTable bordered={false} rows={15} />
     {/if}
   {:else}
-    <Table bordered={false} {variant} {updating} {fixed} {id}>
+    <Table bordered={false} {updating} {fixed} {id}>
       <slot slot="caption" name="caption" />
       <slot slot="headers" name="headers" {visibleItems} />
       <slot />
@@ -50,15 +49,7 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply surface-primary min-h-[154px] grow overflow-auto;
-
-    &.primary {
-      @apply border border-subtle;
-    }
-
-    &.split {
-      @apply border-t border-subtle;
-    }
+    @apply surface-primary min-h-[154px] grow overflow-auto border border-subtle;
   }
 
   .paginated-table-controls {
