@@ -1,15 +1,24 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import Table from '$lib/holocene/table/table.svelte';
 
   type Item = $$Generic;
+
+  interface $$Props extends HTMLAttributes<HTMLTableElement> {
+    visibleItems: Item[];
+    loading?: boolean;
+    updating?: boolean;
+    maxHeight?: string;
+    fixed?: boolean;
+  }
 
   export let visibleItems: Item[];
   export let loading = false;
   export let updating = false;
   export let maxHeight = '';
   export let fixed = false;
-  export let id: string = null;
 
   let tableContainer: HTMLDivElement;
 
@@ -30,7 +39,7 @@
       <SkeletonTable bordered={false} rows={15} />
     {/if}
   {:else}
-    <Table bordered={false} {updating} {fixed} {id}>
+    <Table bordered={false} {updating} {fixed} {...$$restProps}>
       <slot slot="caption" name="caption" />
       <slot slot="headers" name="headers" {visibleItems} />
       <slot />
