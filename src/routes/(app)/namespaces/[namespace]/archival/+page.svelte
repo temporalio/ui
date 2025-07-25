@@ -6,6 +6,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import ArchivalTable from './_archival-table.svelte';
@@ -18,6 +19,7 @@
     },
     archivalEnabled,
     visibilityArchivalEnabled,
+    archivalQueryingSupported,
   } = data);
 </script>
 
@@ -29,6 +31,11 @@
   <h1 data-testid="archived-enabled-title">
     {translate('workflows.archived-workflows')}
   </h1>
+  {#if archivalQueryingSupported}
+    <Link newTab href="https://docs.temporal.io/list-filter"
+      >List Filter Documentation</Link
+    >
+  {/if}
   <WorkflowAdvancedSearch />
   <ArchivalTable />
 {:else if archivalEnabled}

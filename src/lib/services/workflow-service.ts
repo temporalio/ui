@@ -1020,18 +1020,8 @@ export const fetchPaginatedArchivedWorkflows = async (
   request = fetch,
 ): Promise<PaginatedWorkflowsPromise> => {
   return (pageSize = 100, token = '') => {
-    workflowError.set('');
-
     const onError: ErrorCallback = (err) => {
       handleUnauthorizedOrForbiddenError(err);
-
-      if (get(hideWorkflowQueryErrors)) {
-        workflowError.set(translate('workflows.workflows-error-querying'));
-      } else {
-        workflowError.set(
-          err?.body?.message || translate('workflows.workflows-error-querying'),
-        );
-      }
     };
 
     const route = routeForApi('workflows.archived', { namespace });
