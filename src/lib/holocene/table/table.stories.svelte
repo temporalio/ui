@@ -7,12 +7,10 @@
     title: 'Table',
     component: Table,
     args: {
-      variant: 'simple',
       columns: 3,
       rows: 3,
     },
     argTypes: {
-      variant: { control: 'radio', options: ['primary', 'simple'] },
       columns: { control: 'number' },
       rows: { control: 'number' },
     },
@@ -26,12 +24,7 @@
 </script>
 
 <Template let:args let:context>
-  <Table
-    class="w-full"
-    variant={args.variant}
-    updating={args.updating}
-    data-testid={context.id}
-  >
+  <Table class="w-full" updating={args.updating} data-testid={context.id}>
     <tr slot="headers">
       {#each Array(args.columns) as _, index}
         <th>Heading {index + 1}</th>
@@ -47,10 +40,6 @@
   </Table>
 </Template>
 
-<Story name="Simple" />
-
 <Story name="Primary" args={{ variant: 'primary' }} />
-
-<Story name="Simple, Updating" args={{ updating: true }} />
 
 <Story name="Primary, Updating" args={{ updating: true, variant: 'primary' }} />

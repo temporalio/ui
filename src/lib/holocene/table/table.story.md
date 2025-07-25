@@ -1,23 +1,11 @@
 # Table
 
-The `<Table />` component supports 2 different sets of styles, a "simple" and "primary" variant. These styles can be controlled by specifying the desired style type in the `variant` prop as one of `"simple"` or `"primary"`. `"primary"` is the default.
-
-i.e.
-
-```svelte
-<Table variant="primary" />
-
-<!-- or -->
-
-<Table variant="simple" />
-```
-
-It's intended for `<Table />` and its sibling components `<TableHeaderRow />` and `<TableRow />` to be composed by the caller to achieve proper styling for "primary" tables. These components are not required for "simple" tables. Callers should supply their own table cells via native `<th />` and `<td />` elements.
+It's intended for `<Table />` and its sibling components `<TableHeaderRow />` and `<TableRow />` to be composed by the caller to achieve proper styling for "primary" tables. Callers should supply their own table cells via native `<th />` and `<td />` elements.
 
 An example of proper `<Table />` usage is as such:
 
 ```svelte
-<Table variant="primary">
+<Table>
   <TableHeaderRow slot="headers">
     <th>Email</th>
     <th>Role</th>
