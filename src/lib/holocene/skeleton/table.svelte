@@ -12,7 +12,7 @@
   export let bordered: boolean = true;
 </script>
 
-<Table class="w-full" fixed variant="primary" {bordered}>
+<Table class="w-full" fixed {bordered}>
   <TableHeaderRow slot="headers" class="h-8">
     <slot name="headers">
       {#each Array.from(new Array(columns)) as _column, i}
