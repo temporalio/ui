@@ -157,7 +157,7 @@
 </script>
 
 <div class="flex grow flex-col">
-  <div class="flex grow flex-col gap-4 sm:flex-row sm:items-center">
+  <div class="flex grow gap-4">
     <slot />
     {#if showFilter}
       <div
@@ -224,7 +224,7 @@
       </div>
     {/if}
 
-    <div class="flex flex-col items-center justify-end gap-1 sm:flex-row">
+    <div class="flex items-center justify-end gap-1">
       {#if showActions}
         {#if showFilter}
           <Button variant="ghost" on:click={handleClearInput}>
