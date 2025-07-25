@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ProgressBar from '$lib/holocene/progress-bar.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
 
   type Item = $$Generic;
 
@@ -10,6 +10,7 @@
   export let updating = false;
   export let maxHeight = '';
   export let fixed = false;
+  export let id: string = null;
 
   let tableContainer: HTMLDivElement;
 
@@ -30,23 +31,11 @@
       <SkeletonTable rows={15} class="!border-0" />
     {/if}
   {:else}
-    <table
-      class="paginated-table"
-      class:table-fixed={fixed}
-      class:table-auto={!fixed}
-      {...$$restProps}
-    >
-      <slot name="caption" />
-      <thead class="paginated-table-header">
-        <slot name="headers" {visibleItems} />
-        {#if updating}
-          <ProgressBar />
-        {/if}
-      </thead>
-      <tbody class="paginated-table-body">
-        <slot />
-      </tbody>
-    </table>
+    <Table bordered={false} {variant} {updating} {fixed} {id}>
+      <slot slot="caption" name="caption" />
+      <slot slot="headers" name="headers" {visibleItems} />
+      <slot />
+    </Table>
     {#if visibleItems.length}
       <div class="paginated-table-controls">
         <slot name="actions-start" />
@@ -62,65 +51,13 @@
 <style lang="postcss">
   .paginated-table-wrapper {
     @apply surface-primary min-h-[154px] grow overflow-auto;
-  }
 
-  .primary {
-    @apply border border-subtle;
-  }
-
-  .split {
-    @apply border-t border-subtle;
-  }
-
-  .paginated-table {
-    @apply w-full border-separate border-spacing-0;
-  }
-
-  .paginated-table-header {
-    @apply sticky top-0 z-10;
-
-    :global(tr) {
-      @apply surface-table-header;
+    &.primary {
+      @apply border border-subtle;
     }
 
-    :global(tr > th) {
-      @apply h-9 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-medium;
-    }
-  }
-
-  .paginated-table-body {
-    :global(tr.primary) {
-      @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
-    }
-
-    :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
-    }
-
-    :global(tr:nth-of-type(odd)) {
-      @apply surface-background;
-    }
-
-    :global(tr > td) {
-      @apply whitespace-nowrap px-2;
-    }
-
-    :global(tr > td > .table-link) {
-      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
-    }
-  }
-
-  .primary .paginated-table-body {
-    :global(tr:not(.empty)) {
-      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
-    }
-  }
-
-  .split .paginated-table-body {
-    @apply flex;
-
-    :global(tr > td) {
-      @apply px-0;
+    &.split {
+      @apply border-t border-subtle;
     }
   }
 

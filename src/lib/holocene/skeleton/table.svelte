@@ -13,7 +13,7 @@
   export { className as class };
 </script>
 
-<Table class="w-full table-fixed {className}" variant="fancy">
+<Table class="w-full table-fixed {className}" variant="primary">
   <TableHeaderRow slot="headers" class="h-8">
     <slot name="headers">
       {#each Array.from(new Array(columns)) as _column, i}
