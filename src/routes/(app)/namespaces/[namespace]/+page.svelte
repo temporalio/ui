@@ -68,7 +68,7 @@
 </h2>
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
-    <Table variant="simple">
+    <Table>
       <caption class="sr-only" slot="caption"
         >{`${translate('namespaces.namespace')} ${translate(
           'common.details',
@@ -145,7 +145,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <Table variant="simple">
+    <Table>
       <caption class="sr-only" slot="caption"
         >{translate('namespaces.versions')}</caption
       >
@@ -167,7 +167,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <Table variant="simple">
+    <Table>
       <caption class="sr-only" slot="caption"
         >{translate('namespaces.client-actions')}</caption
       >
