@@ -28,7 +28,7 @@
     {#if $$slots.loading}
       <slot name="loading" />
     {:else}
-      <SkeletonTable rows={15} class="!border-0" />
+      <SkeletonTable bordered={false} rows={15} />
     {/if}
   {:else}
     <Table bordered={false} {variant} {updating} {fixed} {id}>
