@@ -11,16 +11,16 @@
 
   import ArchivalTable from './_archival-table.svelte';
 
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
 
-  $: ({
+  const {
     namespace: {
       namespaceInfo: { name: namespaceName },
     },
     archivalEnabled,
     visibilityArchivalEnabled,
     archivalQueryingSupported,
-  } = data);
+  } = $derived(data);
 </script>
 
 <PageTitle
