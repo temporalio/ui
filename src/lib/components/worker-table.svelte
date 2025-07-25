@@ -122,6 +122,9 @@
     <th class="w-2/12 text-center">
       <p class="text-center">{translate('workflows.activity-handler')}</p>
     </th>
+    <th class="w-2/12 text-center">
+      <p class="text-center">{translate('workflows.nexus-handler')}</p>
+    </th>
   </TableHeaderRow>
   {#each pollers as poller}
     {@const deployment = getPollerDeploymentName(poller)}
@@ -176,10 +179,15 @@
           includesTaskQueueType={poller.taskQueueTypes.includes('ACTIVITY')}
         />
       </td>
+      <td data-testid="nexus-poller">
+        <PollerIcon
+          includesTaskQueueType={poller.taskQueueTypes.includes('NEXUS')}
+        />
+      </td>
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan="5">
+      <td colspan="7">
         <EmptyState title={translate('workflows.workers-empty-state')} />
       </td>
     </tr>

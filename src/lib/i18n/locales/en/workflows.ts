@@ -181,6 +181,7 @@ export const Strings = {
   'last-accessed': 'Last Accessed',
   'workflow-task-handler': 'Workflow Task Handler',
   'activity-handler': 'Activity Handler',
+  'nexus-handler': 'Nexus Handler',
   'workers-empty-state': 'No Workers Found',
   'call-stack-empty-state': 'No Call Stacks Found',
   'no-workers-failure-message':
