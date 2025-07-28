@@ -78,10 +78,13 @@
       namespace,
     })}?${$workflowsSearchParams}`,
   );
-  $: outboundLinks =
-    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0;
-  $: inboundLinks = getInboundNexusLinkEvents($fullEventHistory)?.length || 0;
-  $: linkCount = outboundLinks + inboundLinks;
+  const outboundLinks = $derived(
+    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
+  );
+  const inboundLinks = $derived(
+    getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
+  );
+  const linkCount = $derived(outboundLinks + inboundLinks);
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -233,7 +236,7 @@
           id="nexus-links-tab"
           href={routeForNexusLinks(routeParameters)}
           active={pathMatches(
-            $page.url.pathname,
+            page.url.pathname,
             routeForNexusLinks(routeParameters),
           )}
         >

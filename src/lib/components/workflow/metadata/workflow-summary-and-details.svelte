@@ -13,7 +13,13 @@
       {translate('workflows.summary')}
     </h3>
     {#if summary}
-      <Markdown className="p-2" overrideTheme="primary" content={summary} />
+      <Markdown className="p-3" overrideTheme="primary" content={summary} />
+    {:else}
+      <div class="pb-6 pl-6 text-secondary/70">
+        <p class="text-sm italic">
+          {translate('workflows.no-summary-available')}
+        </p>
+      </div>
     {/if}
   </div>
   <div class="border border-subtle">
@@ -21,7 +27,13 @@
       {translate('workflows.details')}
     </h3>
     {#if details}
-      <Markdown className="p-2" overrideTheme="primary" content={details} />
+      <Markdown className="p-3" overrideTheme="primary" content={details} />
+    {:else}
+      <div class="pb-6 pl-6 text-secondary/70">
+        <p class="text-sm italic">
+          {translate('workflows.no-details-available')}
+        </p>
+      </div>
     {/if}
   </div>
 </div>

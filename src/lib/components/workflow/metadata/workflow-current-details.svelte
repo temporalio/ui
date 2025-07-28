@@ -78,7 +78,7 @@
     </div>
     {#key currentDetails}
       <Markdown
-        className="p-2"
+        className="p-3"
         overrideTheme="background"
         content={currentDetails}
       />

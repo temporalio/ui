@@ -207,6 +207,12 @@ export const Strings = {
   details: 'Details',
   'summary-and-details': 'Summary & Details',
   'current-details': 'Current Details',
+  'no-summary-available': 'No summary available',
+  'no-details-available': 'No details available',
+  'no-current-details-available': 'No current details',
+  'no-metadata-events': 'No events with metadata',
+  'no-metadata-events-description':
+    'Events with user metadata (summary or details) will appear here when available.',
   'maximum-attempts': 'Maximum Attempts',
   'retry-expiration': 'Retry Expiration',
   state: 'State',

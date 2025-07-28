@@ -119,14 +119,14 @@ body[data-theme='dark-background'] code {
 body[data-theme='light-primary'] code {
   font-family: monospace;
   border-radius: 0.25rem;
-  background: pink;
+  background: #e8efff;
   color: #121416;
 }
 body[data-theme='dark-primary'] code {
   font-family: monospace;
   border-radius: 0.25rem;
-  background: #e8efff;
-  color: #121416;
+  background: #292d3e;
+  color: #f8fafc;
 }
 
 body[data-theme='light-background'] pre {
@@ -150,29 +150,15 @@ body[data-theme='light-primary'] pre {
   font-family: monospace;
   padding: 0.5rem;
   border-radius: 0.25rem;
-  background: pink;
+  background: #e8efff;
   color: #121416;
 }
 body[data-theme='dark-primary'] pre {
   font-family: monospace;
   padding: 0.5rem;
   border-radius: 0.25rem;
-  background: #e8efff;
-  color: #121416;
-}
-body[data-theme='light-primary'] pre {
-  font-family: monospace;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  background: pink;
-  color: #121416;
-}
-body[data-theme='dark-primary'] pre {
-  font-family: monospace;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  background: #e8efff;
-  color: #121416;
+  background: #292d3e;
+  color: #f8fafc;
 }
 
 pre {
@@ -228,54 +214,6 @@ body[data-theme='light-primary'] {
 
 body[data-theme='dark-primary'] {
   background-color: #000;
-  color: #f8fafc;
-  a {
-    color: #8098f9;
-  }
-}
-
-body[data-theme='light-info'] {
-  background-color: #e8efff;
-  color: #121416;
-  a {
-    color: #444ce7;
-  }
-}
-
-body[data-theme='dark-info'] {
-  background-color: #000;
-  color: #f8fafc;
-  a {
-    color: #8098f9;
-  }
-}
-
-body[data-theme='light-details'] {
-  background-color: #e0eaff;
-  color: #121416;
-  a {
-    color: #444ce7;
-  }
-}
-
-body[data-theme='light-details'] pre {
-  background-color: #e0eaff;
-  color: #121416;
-  a {
-    color: #444ce7;
-  }
-}
-
-body[data-theme='dark-details'] {
-  background-color: #1a1c4c;
-  color: #f8fafc;
-  a {
-    color: #8098f9;
-  }
-}
-
-body[data-theme='dark-details'] pre {
-  background-color: #141414;
   color: #f8fafc;
   a {
     color: #8098f9;
