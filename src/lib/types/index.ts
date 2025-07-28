@@ -216,6 +216,10 @@ export type Header = temporal.api.common.v1.IHeader;
 
 // api.taskqueue
 
+export type TaskQueueRequest =
+  temporal.api.workflowservice.v1.IDescribeTaskQueueRequest;
+export type TaskQueueResponse =
+  temporal.api.workflowservice.v1.IDescribeTaskQueueResponse;
 export type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
 export type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
 export type TaskQueueCompatibleVersionSet =
