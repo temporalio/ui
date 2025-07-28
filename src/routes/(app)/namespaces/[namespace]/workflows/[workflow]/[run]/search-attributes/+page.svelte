@@ -24,13 +24,14 @@
       <PayloadDecoder
         value={{ searchAttributes: workflow.searchAttributes }}
         key="searchAttributes"
-        let:decodedValue
       >
-        <CodeBlock
-          content={decodedValue}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
+        {#snippet children(decodedValue)}
+          <CodeBlock
+            content={decodedValue}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        {/snippet}
       </PayloadDecoder>
     {:else}
       <p>{translate('events.empty-search-attributes')}</p>

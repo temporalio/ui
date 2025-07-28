@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   import { page } from '$app/stores';
 
@@ -18,16 +18,17 @@
   } from '$lib/utilities/get-codec';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export let value:
-    | PotentiallyDecodable
-    | EventAttribute
-    | WorkflowEvent
-    | Memo;
-  export let key = '';
-  export let onDecode: (decodedValue: string) => void | undefined = undefined;
+  interface Props {
+    value: PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo;
+    key?: string;
+    onDecode?: (decodedValue: string) => void;
+    children: Snippet<[decodedValue: string]>;
+  }
+
+  let { value, key = '', onDecode, children }: Props = $props();
 
   let keyedValue = key && value?.[key] ? value[key] : value;
-  let decodedValue = stringifyWithBigInt(keyedValue);
+  let decodedValue = $state(stringifyWithBigInt(keyedValue));
 
   onMount(() => {
     decodePayloads(value);
@@ -70,4 +71,4 @@
   };
 </script>
 
-<slot {decodedValue} />
+{@render children(decodedValue)}
