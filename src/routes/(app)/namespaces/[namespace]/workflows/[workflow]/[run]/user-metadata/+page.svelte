@@ -29,7 +29,10 @@
   );
 </script>
 
-<div class="flex min-h-screen flex-col gap-6 bg-primary lg:flex-row">
+<div
+  class="flex flex-col gap-6 bg-primary lg:flex-row"
+  class:min-h-screen={eventGroups.length === 0}
+>
   <WorkflowSummaryAndDetails />
   <WorkflowCurrentDetails />
 </div>
