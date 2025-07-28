@@ -10,6 +10,7 @@
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
+  import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
@@ -175,14 +176,6 @@
         label: translate('common.docs'),
         external: true,
       },
-      {
-        href:
-          $page.data?.settings?.feedbackURL ||
-          'https://github.com/temporalio/ui/issues/new/choose',
-        icon: 'feedback',
-        label: translate('common.feedback'),
-        external: true,
-      },
     ];
   };
 
@@ -239,7 +232,17 @@
     position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud} />
+    <SideNavigation {linkList} {isCloud}>
+      <NavigationItem
+        link={$page.data?.settings?.feedbackURL ||
+          'https://github.com/temporalio/ui/issues/new/choose'}
+        label={translate('common.feedback')}
+        icon="feedback"
+        tooltip={translate('common.feedback')}
+        external
+        slot="bottom"
+      />
+    </SideNavigation>
   </div>
   <MainContentContainer>
     <DataEncoderSettings class="hidden md:flex" />
