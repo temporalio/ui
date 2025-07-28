@@ -24,7 +24,10 @@
 </script>
 
 {#if open}
-  <div class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8">
+  <div
+    class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8"
+    data-theme="dark"
+  >
     <TimezoneSelect position="left" size="sm" />
     <NavigationButton
       onClick={onCodecServerClick}
