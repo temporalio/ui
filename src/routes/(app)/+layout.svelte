@@ -108,6 +108,18 @@
   ): NavLinkListItem[] => {
     return [
       {
+        href: namespacesRoute,
+        icon: 'namespace',
+        label: translate('common.namespaces'),
+        isActive: (path) =>
+          path.includes(namespacesRoute) &&
+          !path.includes(workflowsRoute) &&
+          !path.includes(schedulesRoute) &&
+          !path.includes(batchOperationsRoute) &&
+          !path.includes(workerDeploymentsRoute) &&
+          !path.includes(archivalRoute),
+      },
+      {
         href: workflowsRoute,
         icon: 'workflow',
         label: translate('common.workflows'),
@@ -135,25 +147,6 @@
         isActive: (path) => path.includes(workerDeploymentsRoute),
       },
       {
-        href: archivalRoute,
-        icon: 'archives',
-        label: translate('common.archive'),
-        isActive: (path) => path.includes(archivalRoute),
-      },
-      {
-        href: namespacesRoute,
-        icon: 'namespace',
-        label: translate('common.namespaces'),
-        divider: true,
-        isActive: (path) =>
-          path.includes(namespacesRoute) &&
-          !path.includes(workflowsRoute) &&
-          !path.includes(schedulesRoute) &&
-          !path.includes(batchOperationsRoute) &&
-          !path.includes(workerDeploymentsRoute) &&
-          !path.includes(archivalRoute),
-      },
-      {
         href: nexusRoute,
         icon: 'nexus',
         label: translate('nexus.nexus'),
@@ -162,6 +155,13 @@
           const match = path.split('/').find((segment) => segment === 'nexus');
           return !!match;
         },
+      },
+      {
+        href: archivalRoute,
+        icon: 'archives',
+        divider: true,
+        label: translate('common.archive'),
+        isActive: (path) => path.includes(archivalRoute),
       },
       {
         href: historyImportRoute,
