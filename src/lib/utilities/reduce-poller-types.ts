@@ -1,18 +1,12 @@
+import type {
+  Poller,
+  PollerWithTaskQueueTypes,
+  TaskQueueType,
+} from '$lib/services/pollers-service';
 import type { PollerInfo, TaskQueueResponse } from '$lib/types';
 
 type PollersData = {
   [key: string]: Poller;
-};
-
-type TaskQueueType = 'ACTIVITY' | 'WORKFLOW' | 'NEXUS';
-
-export type Poller = {
-  lastAccessTime: PollerInfo['lastAccessTime'];
-  taskQueueTypes: TaskQueueType[];
-};
-
-export type PollerWithTaskQueueTypes = PollerInfo & {
-  taskQueueTypes?: TaskQueueType[];
 };
 
 export const reducePollerTypes = ({

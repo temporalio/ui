@@ -6,7 +6,7 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
-type TaskQueueType = 'ACTIVITY' | 'WORKFLOW' | 'NEXUS';
+export type TaskQueueType = 'ACTIVITY' | 'WORKFLOW' | 'NEXUS';
 
 export type Poller = {
   lastAccessTime: PollerInfo['lastAccessTime'];
