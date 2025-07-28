@@ -1,14 +1,14 @@
 import { writable } from 'svelte/store';
 
-import type { GetPollersResponse } from '$lib/services/pollers-service';
 import { persistStore } from '$lib/stores/persist-store';
+import type { TaskQueueResponse } from '$lib/types';
 import type { WorkflowExecution, WorkflowMetadata } from '$lib/types/workflows';
 
 export const refresh = writable(0);
 
 export type WorkflowRunWithWorkers = {
   workflow: WorkflowExecution | null;
-  workers: GetPollersResponse;
+  workers: TaskQueueResponse;
   metadata: WorkflowMetadata;
   userMetadata: {
     summary: string;

@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type {
-  GetPollersResponse,
-  PollerWithTaskQueueTypes,
-} from '$lib/services/pollers-service';
+import type { PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
+import type { TaskQueueResponse } from '$lib/types';
 import { VersioningBehaviorEnum } from '$lib/types/deployments';
 import type { WorkflowExecution } from '$lib/types/workflows';
 
@@ -57,14 +55,14 @@ describe('getWorkflowPollersWithVersions', () => {
     pollers: PollerWithTaskQueueTypes[],
     currentDeployment?: { deploymentName: string; buildId: string },
     rampingDeployment?: { deploymentName: string; buildId: string },
-  ): GetPollersResponse =>
+  ): TaskQueueResponse =>
     ({
       pollers,
       versioningInfo: {
         currentDeploymentVersion: currentDeployment,
         rampingDeploymentVersion: rampingDeployment,
       },
-    }) as GetPollersResponse;
+    }) as TaskQueueResponse;
 
   describe('Pinned behavior', () => {
     it('should filter pollers matching workflow deployment and build ID when pinned', () => {
@@ -202,7 +200,7 @@ describe('getWorkflowPollersWithVersions', () => {
         'v1.0.0',
         'build-123',
       );
-      const workers = undefined as unknown as GetPollersResponse;
+      const workers = undefined as unknown as TaskQueueResponse;
 
       const result = getWorkflowPollersWithVersions(workflow, workers);
 

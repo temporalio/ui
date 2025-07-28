@@ -1,7 +1,5 @@
-import type {
-  GetPollersResponse,
-  PollerWithTaskQueueTypes,
-} from '$lib/services/pollers-service';
+import type { PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
+import type { TaskQueueResponse } from '$lib/types';
 import { VersioningBehaviorEnum } from '$lib/types/deployments';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
@@ -18,7 +16,7 @@ type PollersWithVersions = {
 
 export function getWorkflowPollersWithVersions(
   workflow: WorkflowExecution,
-  workers: GetPollersResponse,
+  workers: TaskQueueResponse,
 ): PollersWithVersions {
   const workflowDeploymentName = $derived(
     workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
