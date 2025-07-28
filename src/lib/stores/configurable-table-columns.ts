@@ -85,7 +85,7 @@ type Action =
       };
     };
 
-const DEFAULT_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
+export const DEFAULT_WORKFLOWS_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Status' },
   { label: 'Workflow ID' },
   { label: 'Run ID' },

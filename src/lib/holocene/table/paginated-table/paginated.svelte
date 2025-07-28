@@ -20,7 +20,6 @@
 
   export let id: string = null;
   export let items: Item[];
-  export let variant: 'primary' | 'split' = 'primary';
   export let loading = false;
   export let updating = false;
   export let perPageLabel: string;
@@ -93,7 +92,6 @@
 <PaginatedTable
   {loading}
   {updating}
-  {variant}
   {maxHeight}
   visibleItems={$store.items}
   {fixed}

@@ -26,7 +26,7 @@
     previousButtonLabel={translate('common.previous')}
     nextButtonLabel={translate('common.next')}
   >
-    <Table variant="fancy" class="w-full">
+    <Table class="w-full">
       <caption class="sr-only" slot="caption"
         >{translate('common.namespaces')}</caption
       >

@@ -11,7 +11,6 @@ declare namespace App {
   interface PageData {
     workflow?: import('$types').WorkflowExecution;
     settings?: import('$types').Settings;
-    workers?: import('$types').GetPollersResponse;
     cluster?: import('$types').ClusterInformation;
   }
 }

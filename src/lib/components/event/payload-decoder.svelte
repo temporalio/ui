@@ -25,7 +25,7 @@
     children: Snippet<[decodedValue: string]>;
   }
 
-  let { value, key = '', onDecode, children }: Props = $props();
+  let { children, value, key = '', onDecode }: Props = $props();
 
   let keyedValue = key && value?.[key] ? value[key] : value;
   let decodedValue = $state(stringifyWithBigInt(keyedValue));

@@ -1013,3 +1013,32 @@ export const fetchPaginatedWorkflows = async (
     });
   };
 };
+
+export const fetchPaginatedArchivedWorkflows = async (
+  namespace: string,
+  query: string = '',
+  request = fetch,
+): Promise<PaginatedWorkflowsPromise> => {
+  return (pageSize = 100, token = '') => {
+    const onError: ErrorCallback = (err) => {
+      handleUnauthorizedOrForbiddenError(err);
+    };
+
+    const route = routeForApi('workflows.archived', { namespace });
+    return requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: {
+        pageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
+      request,
+      onError,
+      handleError: onError,
+    }).then(({ executions = [], nextPageToken = '' }) => {
+      return {
+        items: toWorkflowExecutions({ executions }),
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
+};

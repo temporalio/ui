@@ -1,61 +1,43 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import type { PageData } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
-  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import WorkflowFilters from './_workflow-filters.svelte';
+  import ArchivalTable from './_archival-table.svelte';
 
-  export let data: PageData & { archivalQueryingNotSupported: boolean };
+  let { data }: { data: PageData } = $props();
 
-  $: ({
+  const {
     namespace: {
       namespaceInfo: { name: namespaceName },
     },
-    workflows,
     archivalEnabled,
     visibilityArchivalEnabled,
-    archivalQueryingNotSupported,
-  } = data);
+    archivalQueryingSupported,
+  } = $derived(data);
 </script>
 
 <PageTitle
   title={`${translate('workflows.archival')} | ${namespaceName}`}
-  url={$page.url.href}
+  url={page.url.href}
 />
 {#if archivalEnabled && visibilityArchivalEnabled}
   <h1 data-testid="archived-enabled-title">
     {translate('workflows.archived-workflows')}
   </h1>
-  {#if !archivalQueryingNotSupported}<WorkflowFilters />{/if}
-  {#if workflows?.length}
-    <Pagination
-      items={workflows}
-      let:visibleItems
-      aria-label={translate('workflows.archived-workflows')}
-      pageSizeSelectLabel={translate('common.per-page')}
-      previousButtonLabel={translate('common.previous')}
-      nextButtonLabel={translate('common.next')}
+  {#if archivalQueryingSupported}
+    <Link newTab href="https://docs.temporal.io/list-filter"
+      >List Filter Documentation</Link
     >
-      <WorkflowsSummaryTable>
-        {#each visibleItems as event}
-          <WorkflowsSummaryRow workflow={event} namespace={namespaceName} />
-        {/each}
-      </WorkflowsSummaryTable>
-    </Pagination>
-  {:else}
-    <EmptyState
-      title={translate('workflows.workflow-empty-state-title')}
-      content={translate('workflows.archival-empty-state-description')}
-    />
   {/if}
+  <WorkflowAdvancedSearch />
+  <ArchivalTable />
 {:else if archivalEnabled}
   <h1 data-testid="visibility-disabled-title">
     {translate('workflows.visibility-disabled-archival')}

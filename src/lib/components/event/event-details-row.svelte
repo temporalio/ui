@@ -33,10 +33,14 @@
       <div
         class="flex max-w-sm items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
-        <PayloadDecoder {value} key="payloads" let:decodedValue>
-          <div class={merge('payload', $$props.class)}>
-            <code><pre class="truncate">{decodedValue.slice(0, 60)}</pre></code>
-          </div>
+        <PayloadDecoder {value} key="payloads">
+          {#snippet children(decodedValue)}
+            <div class={merge('payload', $$props.class)}>
+              <code>
+                <pre class="truncate">{decodedValue.slice(0, 60)}</pre>
+              </code>
+            </div>
+          {/snippet}
         </PayloadDecoder>
       </div>
     {:else if linkType !== 'none'}
