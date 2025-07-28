@@ -101,27 +101,23 @@
     {translate('workers.viewing-auto-upgrade-build-ids')}
   </p>
 {/if}
-<Table class="mb-6 w-full min-w-[600px] table-fixed">
+<Table class="mb-6" fixed>
   <caption class="sr-only" slot="caption"
     >{translate('workflows.workers-tab')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th class={'w-4/12'}>{translate('common.id')}</th>
-    <th class={'w-3/12'}>{translate('workers.buildId')}</th>
-    <th class={'w-3/12'}>{translate('deployments.deployment')}</th>
-    <th class="hidden w-2/12 md:table-cell"
-      >{translate('workflows.last-accessed')}</th
-    >
-    <th class="w-2/12">
-      <p class="text-center">
-        {translate('workflows.workflow-task-handler')}
-      </p>
+    <th>{translate('common.id')}</th>
+    <th>{translate('workers.buildId')}</th>
+    <th>{translate('deployments.deployment')}</th>
+    <th class="hidden md:table-cell">{translate('workflows.last-accessed')}</th>
+    <th>
+      {translate('workflows.workflow-task-handler')}
     </th>
-    <th class="w-2/12 text-center">
-      <p class="text-center">{translate('workflows.activity-handler')}</p>
+    <th>
+      {translate('workflows.activity-handler')}
     </th>
-    <th class="w-2/12 text-center">
-      <p class="text-center">{translate('workflows.nexus-handler')}</p>
+    <th>
+      {translate('workflows.nexus-handler')}
     </th>
   </TableHeaderRow>
   {#each pollers as poller}
@@ -130,42 +126,33 @@
     {@const status = getPollerStatus(poller)}
     {@const label = getPollerLabel(poller)}
     <TableRow data-testid="worker-row">
-      <td class="text-left" data-testid="worker-identity">
-        <p class="select-all">{poller.identity}</p>
+      <td class="select-all break-all" data-testid="worker-identity">
+        {poller.identity}
       </td>
-      <td class="text-left" data-testid="worker-build-id">
+      <td class="select-all break-all" data-testid="worker-build-id">
         <div class="flex items-center gap-2">
-          <p class="select-all break-all">
-            {buildId}
-          </p>
+          {buildId}
           {#if status}
             <DeploymentStatus {status} {label} />
           {/if}
         </div>
       </td>
-      <td class="text-left" data-testid="worker-deployment">
-        <p class="select-all break-all">
-          {#if deployment}
-            <Link
-              href={routeForWorkerDeployment({
-                namespace,
-                deployment,
-              })}
-            >
-              {deployment}
-            </Link>
-          {/if}
-        </p>
+      <td class="select-all break-all" data-testid="worker-deployment">
+        {#if deployment}
+          <Link
+            href={routeForWorkerDeployment({
+              namespace,
+              deployment,
+            })}
+          >
+            {deployment}
+          </Link>
+        {/if}
       </td>
-      <td
-        class="hidden text-left md:table-cell"
-        data-testid="worker-last-access-time"
-      >
-        <p class="select-all">
-          {formatDate(poller.lastAccessTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-        </p>
+      <td class="hidden md:table-cell" data-testid="worker-last-access-time">
+        {formatDate(poller.lastAccessTime, $timeFormat, {
+          relative: $relativeTime,
+        })}
       </td>
       <td data-testid="workflow-poller">
         <PollerIcon
