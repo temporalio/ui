@@ -1,3 +1,7 @@
+<!--
+@component ApiPagination
+@deprecated This component is deprecated. Use `src/lib/holocene/table/paginated-table/api-paginated.svelte` instead.
+-->
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 

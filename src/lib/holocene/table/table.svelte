@@ -6,98 +6,85 @@
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   interface $$Props extends HTMLTableAttributes {
-    variant?: 'simple' | 'fancy';
     updating?: boolean;
     class?: string;
     'data-testid'?: string;
+    fixed?: boolean;
+    bordered?: boolean;
   }
 
   let className = '';
   export { className as class };
-  export let variant: 'simple' | 'fancy' = 'fancy';
   export let updating = false;
+  export let fixed = false;
+  export let bordered = true;
 </script>
 
-<table class={merge(variant, className)} {...$$restProps}>
+<table
+  class={merge(
+    'holocene-table relative w-full border-separate border-spacing-0',
+    fixed ? 'table-fixed' : 'table-auto',
+    className,
+  )}
+  class:bordered
+  {...$$restProps}
+>
   <slot name="caption" />
-  <thead>
+  <thead class="holocene-table-header">
     <slot name="headers" />
     {#if updating}
       <ProgressBar />
     {/if}
   </thead>
-  <tbody>
+  <tbody class="holocene-table-body">
     <slot />
   </tbody>
 </table>
 
 <style lang="postcss">
-  table {
-    @apply relative;
+  .holocene-table {
+    @apply surface-primary;
 
-    thead :global(th) {
-      @apply text-left text-sm font-medium;
-    }
-
-    tbody :global(td) {
-      @apply text-left text-sm;
+    &.bordered {
+      @apply border border-subtle;
     }
   }
 
-  table.fancy {
-    @apply surface-primary border-separate border-spacing-0 border border-subtle;
+  .holocene-table-header {
+    @apply sticky top-0 z-10;
 
-    thead {
+    :global(tr) {
       @apply surface-table-header;
-
-      :global(th) {
-        @apply border-b border-subtle p-2 text-sm;
-      }
-
-      :global(td) {
-        @apply border-t border-subtle p-2;
-
-        &:first-child {
-          @apply border-l border-subtle;
-        }
-
-        &:last-child {
-          @apply border-r border-subtle;
-        }
-      }
     }
 
-    tbody :global {
-      tr:nth-of-type(odd) {
-        @apply surface-background;
-      }
-
-      tr {
-        @apply border-b border-subtle last-of-type:border-0;
-      }
-
-      td {
-        @apply p-2 text-sm;
-
-        &:first-child:is(.expanded-cell) {
-          @apply px-0;
-        }
-      }
+    :global(tr > th) {
+      @apply h-9 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-medium;
     }
   }
 
-  table.simple {
-    thead :global(td),
-    thead :global(th) {
-      @apply border-b border-primary p-2;
+  .holocene-table-body {
+    :global(tr) {
+      @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
 
-    tbody :global(td) {
-      @apply border-b p-2;
+    :global(tr.expanded) {
+      @apply w-full hover:bg-primary;
     }
 
-    &:last-child {
-      @apply border-b-0;
+    :global(tr:nth-of-type(odd)) {
+      @apply surface-background;
+    }
+
+    :global(tr > td) {
+      @apply whitespace-nowrap px-2;
+    }
+
+    :global(tr > td > .table-link) {
+      @apply hover:text-blue-700 hover:underline hover:decoration-blue-700;
+    }
+
+    :global(tr:not(.empty)) {
+      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
   }
 </style>
