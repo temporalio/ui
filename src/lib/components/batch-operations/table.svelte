@@ -25,7 +25,7 @@
   };
 </script>
 
-<Table class="w-full table-fixed">
+<Table class="w-full">
   <caption class="sr-only" slot="caption">
     {translate('batch.list-page-title')}
   </caption>

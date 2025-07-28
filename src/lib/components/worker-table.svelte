@@ -101,7 +101,7 @@
     {translate('workers.viewing-auto-upgrade-build-ids')}
   </p>
 {/if}
-<Table class="mb-6 w-full min-w-[600px] table-fixed">
+<Table class="mb-6 w-full">
   <caption class="sr-only" slot="caption"
     >{translate('workflows.workers-tab')}</caption
   >
