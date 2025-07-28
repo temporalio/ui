@@ -1,18 +1,46 @@
 <script lang="ts">
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Markdown from '$lib/holocene/monaco/markdown.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getPollers } from '$lib/services/pollers-service';
   import type { NexusEndpoint as Endpoint } from '$lib/types/nexus';
+  import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForNamespace,
     routeForNexus,
     routeForNexusEndpointEdit,
+    routeForTaskQueue,
   } from '$lib/utilities/route-for';
 
-  export let endpoint: Endpoint;
-  export let editDisabled = false;
+  let {
+    endpoint,
+    editDisabled = false,
+  }: { endpoint: Endpoint; editDisabled?: boolean } = $props();
+
+  let pollerCount: number | undefined = $state(undefined);
+
+  const checkTaskQueue = async (endpoint: Endpoint) => {
+    const targetNamespace = endpoint?.spec?.target?.worker?.namespace;
+    const targetTaskQueue = endpoint?.spec?.target?.worker?.taskQueue;
+    if (targetNamespace && targetTaskQueue) {
+      try {
+        const { pollers } = await getPollers({
+          namespace: targetNamespace,
+          queue: targetTaskQueue,
+        });
+        pollerCount = pollers.length;
+      } catch (error) {
+        pollerCount = undefined;
+      }
+    }
+  };
+
+  $effect(() => {
+    checkTaskQueue(endpoint);
+  });
 </script>
 
 <div class="flex flex-col gap-8">
@@ -53,9 +81,31 @@
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
           content={endpoint.spec.target.worker.taskQueue}
         >
-          <i>{endpoint.spec.target.worker.taskQueue}</i>
+          <Link
+            href={routeForTaskQueue({
+              namespace: endpoint.spec.target.worker.namespace,
+              queue: endpoint.spec.target.worker.taskQueue,
+            })}
+          >
+            <i>{endpoint.spec.target.worker.taskQueue}</i>
+          </Link>
         </Copyable>
       </div>
+      {#if pollerCount !== undefined}
+        <Alert
+          intent={pollerCount > 0 ? 'success' : 'warning'}
+          title={pollerCount
+            ? 'Task Queue is Active'
+            : 'Task Queue is Inactive'}
+        >
+          <div class="flex w-full items-center justify-between">
+            <p>
+              {pollerCount}
+              {pluralize('Worker', pollerCount)}
+            </p>
+          </div></Alert
+        >
+      {/if}
     </div>
   </div>
   <div class="w-full xl:w-1/2">

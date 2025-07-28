@@ -4,11 +4,11 @@
   import WorkerTable from '$lib/components/worker-table.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { type GetPollersResponse } from '$lib/services/pollers-service';
+  import type { TaskQueueResponse } from '$lib/types';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
 
   export let taskQueue: string;
-  export let workers: GetPollersResponse;
+  export let workers: TaskQueueResponse;
 
   $: ({ namespace } = $page.params);
 </script>

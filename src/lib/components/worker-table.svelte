@@ -11,12 +11,10 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
-  import {
-    type GetPollersResponse,
-    type PollerWithTaskQueueTypes,
-  } from '$lib/services/pollers-service';
+  import { type PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { TaskQueueResponse } from '$lib/types';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
@@ -25,7 +23,7 @@
   import PollerIcon from './poller-icon.svelte';
 
   type Props = {
-    workers: GetPollersResponse;
+    workers: TaskQueueResponse;
     children?: Snippet;
   };
   let { workers, children }: Props = $props();
@@ -122,6 +120,9 @@
     <th class="w-2/12 text-center">
       <p class="text-center">{translate('workflows.activity-handler')}</p>
     </th>
+    <th class="w-2/12 text-center">
+      <p class="text-center">{translate('workflows.nexus-handler')}</p>
+    </th>
   </TableHeaderRow>
   {#each pollers as poller}
     {@const deployment = getPollerDeploymentName(poller)}
@@ -176,10 +177,15 @@
           includesTaskQueueType={poller.taskQueueTypes.includes('ACTIVITY')}
         />
       </td>
+      <td data-testid="nexus-poller">
+        <PollerIcon
+          includesTaskQueueType={poller.taskQueueTypes.includes('NEXUS')}
+        />
+      </td>
     </TableRow>
   {:else}
     <tr class="w-full">
-      <td colspan="5">
+      <td colspan="7">
         <EmptyState title={translate('workflows.workers-empty-state')} />
       </td>
     </tr>
