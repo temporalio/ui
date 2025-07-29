@@ -106,6 +106,7 @@ import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
 import systemWindow from './svg/system-window.svelte';
 import table from './svg/table.svelte';
+import tag from './svg/tag.svelte';
 import target from './svg/target.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
@@ -235,6 +236,7 @@ export const icons = {
   support,
   'spinner-solid': spinnerSolid,
   table,
+  tag,
   target,
   'temporal-logo': temporalLogo,
   terminal,
