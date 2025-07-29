@@ -181,9 +181,11 @@
         class="invisible text-right text-sm font-medium tracking-widest group-focus-within:visible"
       >
         <span
-          class:text-success={maxLength - value?.length > 5}
-          class:text-warning={maxLength - value?.length <= 5}
-          class:text-danger={maxLength === value?.length}
+          class={merge(
+            maxLength - value?.length > 5 && 'text-success',
+            maxLength - value?.length <= 5 && 'text-warning',
+            maxLength === value?.length && 'text-danger',
+          )}
         >
           {value?.length ?? 0}
         </span>/{maxLength}
