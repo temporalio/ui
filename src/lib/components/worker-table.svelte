@@ -110,13 +110,13 @@
     <th>{translate('workers.buildId')}</th>
     <th>{translate('deployments.deployment')}</th>
     <th class="hidden md:table-cell">{translate('workflows.last-accessed')}</th>
-    <th>
+    <th class="!text-center xl:w-48">
       {translate('workflows.workflow-task-handler')}
     </th>
-    <th>
+    <th class="!text-center xl:w-36">
       {translate('workflows.activity-handler')}
     </th>
-    <th>
+    <th class="!text-center xl:w-36">
       {translate('workflows.nexus-handler')}
     </th>
   </TableHeaderRow>
@@ -155,19 +155,25 @@
         })}
       </td>
       <td data-testid="workflow-poller">
-        <PollerIcon
-          includesTaskQueueType={poller.taskQueueTypes.includes('WORKFLOW')}
-        />
+        <div class="flex items-center justify-center">
+          <PollerIcon
+            includesTaskQueueType={poller.taskQueueTypes.includes('WORKFLOW')}
+          />
+        </div>
       </td>
       <td data-testid="activity-poller">
-        <PollerIcon
-          includesTaskQueueType={poller.taskQueueTypes.includes('ACTIVITY')}
-        />
+        <div class="flex items-center justify-center">
+          <PollerIcon
+            includesTaskQueueType={poller.taskQueueTypes.includes('ACTIVITY')}
+          />
+        </div>
       </td>
       <td data-testid="nexus-poller">
-        <PollerIcon
-          includesTaskQueueType={poller.taskQueueTypes.includes('NEXUS')}
-        />
+        <div class="flex items-center justify-center">
+          <PollerIcon
+            includesTaskQueueType={poller.taskQueueTypes.includes('NEXUS')}
+          />
+        </div>
       </td>
     </TableRow>
   {:else}
