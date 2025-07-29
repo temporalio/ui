@@ -3,6 +3,8 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
+  import MetadataEvents from './metadata-events.svelte';
+
   const summary = $derived($workflowRun?.userMetadata?.summary);
   const details = $derived($workflowRun?.userMetadata?.details);
 </script>
@@ -36,4 +38,5 @@
       </div>
     {/if}
   </div>
+  <MetadataEvents />
 </div>
