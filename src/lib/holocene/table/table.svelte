@@ -23,7 +23,7 @@
 <table
   class={merge(
     'holocene-table relative w-full border-separate border-spacing-0',
-    fixed ? 'table-fixed' : 'table-auto',
+    fixed ? 'layout-fixed' : 'layout-auto',
     className,
   )}
   class:bordered
@@ -43,10 +43,30 @@
 
 <style lang="postcss">
   .holocene-table {
-    @apply surface-primary;
+    @apply surface-primary table-auto;
 
     &.bordered {
       @apply border border-subtle;
+    }
+
+    &.layout-auto {
+      @apply table-auto;
+    }
+
+    &.layout-fixed {
+      @apply table-fixed;
+    }
+  }
+
+  .holocene-table.layout-auto > .holocene-table-header {
+    :global(tr > th) {
+      @apply whitespace-nowrap;
+    }
+  }
+
+  .holocene-table.layout-auto > .holocene-table-body {
+    :global(tr > td) {
+      @apply whitespace-nowrap;
     }
   }
 
@@ -58,7 +78,7 @@
     }
 
     :global(tr > th) {
-      @apply h-9 whitespace-nowrap border-b border-subtle px-2 text-left text-sm font-medium;
+      @apply h-9 border-b border-subtle px-2 text-left text-sm font-medium;
     }
   }
 
@@ -76,7 +96,7 @@
     }
 
     :global(tr > td) {
-      @apply whitespace-nowrap px-2;
+      @apply px-2;
     }
 
     :global(tr > td > .table-link) {
