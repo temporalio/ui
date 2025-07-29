@@ -10,6 +10,7 @@
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
+  import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
@@ -108,6 +109,18 @@
   ): NavLinkListItem[] => {
     return [
       {
+        href: namespacesRoute,
+        icon: 'namespace',
+        label: translate('common.namespaces'),
+        isActive: (path) =>
+          path.includes(namespacesRoute) &&
+          !path.includes(workflowsRoute) &&
+          !path.includes(schedulesRoute) &&
+          !path.includes(batchOperationsRoute) &&
+          !path.includes(workerDeploymentsRoute) &&
+          !path.includes(archivalRoute),
+      },
+      {
         href: workflowsRoute,
         icon: 'workflow',
         label: translate('common.workflows'),
@@ -135,25 +148,6 @@
         isActive: (path) => path.includes(workerDeploymentsRoute),
       },
       {
-        href: archivalRoute,
-        icon: 'archives',
-        label: translate('common.archive'),
-        isActive: (path) => path.includes(archivalRoute),
-      },
-      {
-        href: namespacesRoute,
-        icon: 'namespace',
-        label: translate('common.namespaces'),
-        divider: true,
-        isActive: (path) =>
-          path.includes(namespacesRoute) &&
-          !path.includes(workflowsRoute) &&
-          !path.includes(schedulesRoute) &&
-          !path.includes(batchOperationsRoute) &&
-          !path.includes(workerDeploymentsRoute) &&
-          !path.includes(archivalRoute),
-      },
-      {
         href: nexusRoute,
         icon: 'nexus',
         label: translate('nexus.nexus'),
@@ -162,6 +156,13 @@
           const match = path.split('/').find((segment) => segment === 'nexus');
           return !!match;
         },
+      },
+      {
+        href: archivalRoute,
+        icon: 'archives',
+        divider: true,
+        label: translate('common.archive'),
+        isActive: (path) => path.includes(archivalRoute),
       },
       {
         href: historyImportRoute,
@@ -173,14 +174,6 @@
         href: 'http://docs.temporal.io',
         icon: 'book',
         label: translate('common.docs'),
-        external: true,
-      },
-      {
-        href:
-          $page.data?.settings?.feedbackURL ||
-          'https://github.com/temporalio/ui/issues/new/choose',
-        icon: 'feedback',
-        label: translate('common.feedback'),
         external: true,
       },
     ];
@@ -239,7 +232,17 @@
     position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud} />
+    <SideNavigation {linkList} {isCloud}>
+      <NavigationItem
+        link={$page.data?.settings?.feedbackURL ||
+          'https://github.com/temporalio/ui/issues/new/choose'}
+        label={translate('common.feedback')}
+        icon="feedback"
+        tooltip={translate('common.feedback')}
+        external
+        slot="bottom"
+      />
+    </SideNavigation>
   </div>
   <MainContentContainer>
     <DataEncoderSettings class="hidden md:flex" />

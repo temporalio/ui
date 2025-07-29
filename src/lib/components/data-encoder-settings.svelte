@@ -82,7 +82,7 @@
   <aside
     in:fly={{ y: -50, delay: 0, duration: 500 }}
     class={merge(
-      'surface-primary relative flex h-[540px] w-full flex-col gap-6 overflow-auto border-b border-subtle p-4 md:p-12',
+      'surface-primary relative flex h-[540px] w-full flex-col gap-6 border-b border-subtle p-4 md:p-12',
       className,
     )}
   >
@@ -111,6 +111,7 @@
               level: namespaceOrCluster,
             })}
         subtitle={!$override ? $page?.data?.settings?.codec?.endpoint : ''}
+        class="max-sm:[&_h3]:text-xs"
       >
         <RadioGroup name="override" group={override}>
           <RadioInput
