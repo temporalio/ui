@@ -54,7 +54,7 @@
   {/if}
   {#if inboundLinkEvents?.length}
     <h3>Inbound</h3>
-    <Table class="mb-6 w-full min-w-[600px] table-fixed">
+    <Table class="mb-6 w-full min-w-[600px]" fixed>
       <caption class="sr-only" slot="caption"
         >{translate('workflows.workers-tab')}</caption
       >
@@ -112,7 +112,7 @@
   {/if}
   {#if nexusGroups.length}
     <h3>Outbound</h3>
-    <Table class="mb-6 w-full min-w-[600px] table-fixed">
+    <Table class="mb-6 w-full min-w-[600px]" fixed>
       <caption class="sr-only" slot="caption"
         >{translate('workflows.workers-tab')}</caption
       >

@@ -4,16 +4,21 @@
   import type { LayoutData } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import TaskQueueStatus from '$lib/components/task-queue-status.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEndpoint from '$lib/pages/nexus-endpoint.svelte';
 
-  export let data: LayoutData;
+  let { data }: { data: LayoutData } = $props();
 
-  $: ({ endpoint } = data);
+  const { endpoint } = $derived(data);
 </script>
 
 <PageTitle
   title={translate('nexus.nexus-endpoint', { id: $page.params.id })}
   url={$page.url.href}
 />
-<NexusEndpoint {endpoint} />
+<NexusEndpoint {endpoint}>
+  {#snippet taskQueueStatus()}
+    <TaskQueueStatus {endpoint} />
+  {/snippet}
+</NexusEndpoint>
