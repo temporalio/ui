@@ -29,6 +29,8 @@
     data-theme="dark"
   >
     <TimezoneSelect position="left" size="sm" />
+    <DarkModeMenu position="left" size="sm" />
+    <hr class="border-subtle" />
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}
@@ -43,10 +45,9 @@
           ? 'transcoder-error'
           : 'transcoder-on'
         : 'transcoder-off'}
+      class="border border-transparent pl-4"
     />
     <DataEncoderSettings />
-    <div class="border-b border-subtle"></div>
-    <DarkModeMenu position="left" size="sm" />
     <slot />
   </div>
 {/if}
