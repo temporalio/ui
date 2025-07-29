@@ -1,6 +1,8 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
+  import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
@@ -20,6 +22,7 @@
   import { workflowRoutePattern } from '$lib/utilities/namespace-url-pattern';
   import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
 
   import IsTemporalServerVersionGuard from '../is-temporal-server-version-guard.svelte';
 
@@ -55,13 +58,14 @@
       );
 
   $: workflowsPage = workflowRoutePattern.match(window?.location?.pathname);
+  $: query = $page.url.searchParams.get('query');
 </script>
 
 <MenuContainer>
   <MenuButton
     id="search-attribute-filter-button"
     controls="search-attribute-menu"
-    disabled={$activeQueryIndex !== null}
+    disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
     count={$filter.attribute ? 0 : filters.length}
     on:click={() => (searchAttributeValue = '')}
     class="text-nowrap"
