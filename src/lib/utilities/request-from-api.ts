@@ -38,6 +38,8 @@ type RequestFromAPIOptions = {
   signal?: AbortController['signal'];
 };
 
+export const MAX_QUERY_LENGTH = 15000;
+
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
   (obj as TemporalAPIError)?.message !== undefined &&
   typeof (obj as TemporalAPIError)?.message === 'string';
@@ -79,6 +81,11 @@ export const requestFromAPI = async <T>(
       ...params,
       ...nextPageToken,
     });
+  }
+
+  const queryString = query.toString();
+  if (queryString.length >= MAX_QUERY_LENGTH) {
+    query = new URLSearchParams(queryString.substring(0, MAX_QUERY_LENGTH - 1));
   }
   const url = toURL(endpoint, query);
 
