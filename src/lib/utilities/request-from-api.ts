@@ -82,11 +82,6 @@ export const requestFromAPI = async <T>(
       ...nextPageToken,
     });
   }
-
-  const queryString = query.toString();
-  if (queryString.length >= MAX_QUERY_LENGTH) {
-    query = new URLSearchParams(queryString.substring(0, MAX_QUERY_LENGTH - 1));
-  }
   const url = toURL(endpoint, query);
 
   try {
@@ -95,7 +90,13 @@ export const requestFromAPI = async <T>(
       options = await withAuth(options, isBrowser);
     }
 
-    const response = await request(url, options);
+    const queryIsTooLong = query.toString().length > MAX_QUERY_LENGTH;
+    const response = queryIsTooLong
+      ? new Response(JSON.stringify({ message: 'Query string is too long' }), {
+          status: 414,
+          statusText: 'URI Too Long',
+        })
+      : await request(url, options);
     const body = await response.json();
 
     const { status, statusText } = response;
