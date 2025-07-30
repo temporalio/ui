@@ -264,9 +264,10 @@
 
 <tr
   class={merge(
-    failure && '!bg-danger hover:!bg-danger/60',
-    canceled && '!bg-warning hover:!bg-warning/60',
-    terminated && '!bg-pink-700/30 hover:!bg-pink-700/60',
+    'cursor-pointer',
+    failure && '!bg-red-400/40 hover:!bg-red-400/60',
+    canceled && '!bg-yellow-400/30 hover:!bg-yellow-400/50',
+    terminated && '!bg-pink-700/30 hover:!bg-pink-700/50',
     hasRelatedActivities(group, hoveredEventId) && 'active',
   )}
   id={`${event.id}-${index}`}
