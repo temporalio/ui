@@ -264,7 +264,7 @@
 
 <tr
   class={merge(
-    'cursor-pointer',
+    'hover:cursor-pointer',
     failure && '!bg-red-400/40 hover:!bg-red-400/60',
     canceled && '!bg-yellow-400/30 hover:!bg-yellow-400/50',
     terminated && '!bg-pink-700/30 hover:!bg-pink-700/50',
