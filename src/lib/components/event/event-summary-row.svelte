@@ -263,17 +263,18 @@
 </script>
 
 <tr
-  class="hover:cursor-pointer"
-  class:border={failure || canceled || terminated}
-  class:border-danger={failure}
-  class:border-warning={canceled}
-  class:border-pink-700={terminated}
+  class={merge(
+    'hover:cursor-pointer',
+    failure && '!bg-red-400/40 hover:!bg-red-400/60',
+    canceled && '!bg-yellow-400/30 hover:!bg-yellow-400/50',
+    terminated && '!bg-pink-700/30 hover:!bg-pink-700/50',
+    hasRelatedActivities(group, hoveredEventId) && 'active',
+  )}
   id={`${event.id}-${index}`}
   data-eventid={event.id}
   data-testid="event-summary-row"
   onmouseenter={handleMouseEnter}
   onmouseleave={handleMouseLeave}
-  class:active={hasRelatedActivities(group, hoveredEventId)}
   onclick={onLinkClick}
 >
   {#if isEventGroup(event)}
@@ -334,12 +335,7 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p
-      class="whitespace-nowrap font-semibold md:text-base"
-      class:text-danger={failure}
-      class:text-pink-700={terminated}
-      class:text-warning={canceled}
-    >
+    <p class="whitespace-nowrap font-semibold md:text-base">
       {displayName}
     </p>
   </td>
