@@ -48,13 +48,15 @@
   const templatedContent = replaceTemplate(content);
 </script>
 
-<section class={`h-full w-full ${className}`} in:fade={{ duration: 1000 }}>
+<section class="h-full w-full {className}" in:fade={{ duration: 1000 }}>
   {#key theme}
     <iframe
       bind:this={iframe}
       on:load={resizeIframe}
       title="output"
-      src={`/render?content=${encodeURIComponent(templatedContent)}&theme=${theme}&overrideTheme=${overrideTheme}`}
+      src="/render?content={encodeURIComponent(
+        templatedContent,
+      )}&theme={theme}&overrideTheme={overrideTheme}"
       class="w-full"
     ></iframe>
   {/key}

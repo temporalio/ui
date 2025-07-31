@@ -17,6 +17,7 @@
   const currentDetails = $derived($workflowRun?.metadata?.currentDetails || '');
 
   let loading = $state(false);
+  let lastFetched = $state<Date | null>(null);
 
   const fetchCurrentDetails = async () => {
     if (loading) return;
@@ -35,6 +36,7 @@
         $authUser?.accessToken,
       );
       $workflowRun.metadata = metadata;
+      lastFetched = new Date();
     } catch (error) {
       console.error('Error fetching current details:', error);
     } finally {
@@ -57,17 +59,28 @@
 
 <div class="flex h-full flex-1 flex-col border-l border-subtle">
   <div class="surface-information w-full px-6 py-2">
-    <p class="hidden sm:block">
-      Press the <span
-        class="mx-1 rounded bg-subtle px-1 text-sm font-medium leading-4"
-        >R</span
-      > for freshness.
-    </p>
-    <div class="flex items-center sm:hidden">
-      <p>Press for freshness</p>
-      <Button variant="ghost" on:click={fetchCurrentDetails} disabled={loading}>
-        <Icon name="retry" />
-      </Button>
+    <div class="flex items-center justify-between">
+      <p class="hidden sm:block">
+        Press the <span
+          class="mx-1 rounded bg-subtle px-1 text-sm font-medium leading-4"
+          >R</span
+        > for freshness.
+      </p>
+      <div class="flex items-center sm:hidden">
+        <p>Press for freshness</p>
+        <Button
+          variant="ghost"
+          on:click={fetchCurrentDetails}
+          disabled={loading}
+        >
+          <Icon name="retry" />
+        </Button>
+      </div>
+      {#if lastFetched}
+        <p class="text-xs text-secondary">
+          Last fetched: {lastFetched.toLocaleTimeString()}
+        </p>
+      {/if}
     </div>
   </div>
   <div

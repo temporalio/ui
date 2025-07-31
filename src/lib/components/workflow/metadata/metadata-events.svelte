@@ -5,9 +5,7 @@
   import { groupEvents } from '$lib/models/event-groups';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
-
   const { workflow } = $derived($workflowRun);
-
   const metadataGroups = $derived(
     groupEvents(
       $fullEventHistory,
@@ -16,6 +14,8 @@
       workflow?.pendingNexusOperations,
     ).filter((group) => group.userMetadata?.summary),
   );
+
+  $inspect('Metadata groups:', metadataGroups);
 </script>
 
 <div class="overflow-x-auto border border-subtle px-6">
@@ -33,6 +33,7 @@
         <div class="flex w-20 items-center justify-center">
           <WorkflowStatus status={group.finalClassification} />
         </div>
+        <div class="text-sm font-medium">{group.label}</div>
         <MetadataDecoder
           value={group.userMetadata.summary}
           fallback={translate('events.decode-failed')}
