@@ -97,7 +97,6 @@ import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
 import signal from './svg/signal.svelte';
 import sliders from './svg/sliders.svelte';
-import spinnerSolid from './svg/spinner-solid.svelte';
 import spinner from './svg/spinner.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
@@ -234,7 +233,6 @@ export const icons = {
   sun,
   summary,
   support,
-  'spinner-solid': spinnerSolid,
   table,
   tag,
   target,
