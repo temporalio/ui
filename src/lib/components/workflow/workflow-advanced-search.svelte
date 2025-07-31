@@ -63,7 +63,7 @@
 <div class="w-full" in:fade>
   <form
     on:submit|preventDefault={onSearch}
-    class="flex items-center gap-0"
+    class="flex gap-0"
     in:fly={{ x: -100, duration: 150 }}
     role="search"
   >
@@ -80,7 +80,7 @@
       on:clear={handleClearInput}
       bind:value={manualSearchString}
       maxLength={MAX_QUERY_LENGTH}
-      hideCount
+      hideCount={manualSearchString?.length < MAX_QUERY_LENGTH}
     />
     <Button data-testid="manual-search-button" variant="primary" type="submit">
       {translate('common.search')}
