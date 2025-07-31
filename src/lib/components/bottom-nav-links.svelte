@@ -8,7 +8,7 @@
 
 {#if open}
   <div
-    class="flex h-full flex-col flex-col-reverse justify-start gap-6 overflow-auto px-4 py-8"
+    class="flex h-full flex-col-reverse justify-start gap-6 overflow-auto px-4 py-8"
   >
     {#each linkList as item}
       {#if item.divider}

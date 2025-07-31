@@ -12,6 +12,7 @@ type RenderOptions = {
   host: string;
   nonce: string;
   theme?: string;
+  overrideTheme?: string;
 };
 
 /**
@@ -33,7 +34,7 @@ const generateContentSecurityPolicy = ({ nonce }: RenderOptions) => {
  */
 const createPage = (
   ast: ReturnType<typeof toHast>,
-  { nonce, theme }: RenderOptions,
+  { nonce, theme, overrideTheme }: RenderOptions,
 ) => {
   const cssPath = path.resolve('src/markdown.reset.css');
   const css = fs.readFileSync(cssPath, 'utf8');
@@ -49,7 +50,14 @@ const createPage = (
         }),
         h('style', { nonce }, css),
       ]),
-      h('body.prose', { 'data-theme': theme }, h('main', ast)),
+      h(
+        'body',
+        {
+          class: 'prose',
+          'data-theme': overrideTheme ? `${theme}-${overrideTheme}` : theme,
+        },
+        h('main', ast),
+      ),
     ]),
   );
 };
@@ -60,6 +68,7 @@ export const GET = async (req: Request) => {
   const host = url.origin;
   const content = url.searchParams.get('content') || '';
   const theme = url.searchParams.get('theme') || '';
+  const overrideTheme = url.searchParams.get('overrideTheme') || '';
 
   if (host === null) return new Response('Not found', { status: 404 });
   if (content === null) return new Response('Not found', { status: 404 });
@@ -67,13 +76,14 @@ export const GET = async (req: Request) => {
   const nonce = generateNonce();
 
   const response = new Response(
-    createPage(await process(content), { nonce, host, theme }),
+    createPage(await process(content), { nonce, host, theme, overrideTheme }),
     {
       headers: {
         'Content-Type': 'text/html',
         'Content-Security-Policy': generateContentSecurityPolicy({
           nonce,
           host,
+          overrideTheme,
         }),
       },
     },
