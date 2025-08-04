@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatReason, getPlacholder } from './workflow-actions';
+import { formatReason, getPlaceholder } from './workflow-actions';
 import { Action } from '../models/workflow-actions';
 
-describe('getPlacholder', () => {
+describe('getPlaceholder', () => {
   describe('without an authorized user', () => {
     it('should return the correct placeholder', () => {
-      expect(getPlacholder(Action.Cancel)).toEqual('Canceled from the Web UI');
-      expect(getPlacholder(Action.Reset)).toEqual('Reset from the Web UI');
-      expect(getPlacholder(Action.Terminate)).toEqual(
+      expect(getPlaceholder(Action.Cancel)).toEqual('Canceled from the Web UI');
+      expect(getPlaceholder(Action.Reset)).toEqual('Reset from the Web UI');
+      expect(getPlaceholder(Action.Terminate)).toEqual(
         'Terminated from the Web UI',
       );
     });
@@ -16,13 +16,13 @@ describe('getPlacholder', () => {
 
   describe('with authorized user', () => {
     it('should return the correct placeholder', () => {
-      expect(getPlacholder(Action.Cancel, 'test@temporal.io')).toEqual(
+      expect(getPlaceholder(Action.Cancel, 'test@temporal.io')).toEqual(
         'Canceled from the Web UI by test@temporal.io',
       );
-      expect(getPlacholder(Action.Reset, 'test@temporal.io')).toEqual(
+      expect(getPlaceholder(Action.Reset, 'test@temporal.io')).toEqual(
         'Reset from the Web UI by test@temporal.io',
       );
-      expect(getPlacholder(Action.Terminate, 'test@temporal.io')).toEqual(
+      expect(getPlaceholder(Action.Terminate, 'test@temporal.io')).toEqual(
         'Terminated from the Web UI by test@temporal.io',
       );
     });

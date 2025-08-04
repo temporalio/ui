@@ -129,6 +129,7 @@ type TerminateWorkflowOptions = {
   namespace: string;
   reason: string;
   first: string | undefined;
+  identity: string;
 };
 
 export type ResetWorkflowOptions = {
@@ -136,6 +137,7 @@ export type ResetWorkflowOptions = {
   workflow: WorkflowExecution;
   eventId: string;
   reason: string;
+  identity: string;
   // used pre temporal server v1.24
   includeSignals: boolean;
   // used post temporal server v1.24
@@ -297,25 +299,23 @@ export async function terminateWorkflow({
   namespace,
   reason,
   first,
+  identity,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
   });
-
-  const email = get(authUser).email;
   const formattedReason = formatReason({
     reason,
     action: Action.Terminate,
-    email,
+    identity,
   });
-
   return await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
         reason: formattedReason,
-        ...(email && { identity: email }),
+        ...(identity && { identity }),
         firstExecutionRunId: first,
       }),
     },
@@ -445,17 +445,17 @@ export async function resetWorkflow({
   includeSignals,
   excludeSignals,
   excludeUpdates,
+  identity,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow.reset', {
     namespace,
     workflowId,
   });
 
-  const email = get(authUser).email;
   const formattedReason = formatReason({
     action: Action.Reset,
     reason,
-    email,
+    identity,
   });
 
   const body: Replace<
@@ -469,6 +469,7 @@ export async function resetWorkflow({
     workflowTaskFinishEventId: eventId,
     requestId: v4(),
     reason: formattedReason,
+    ...(identity && { identity }),
   };
 
   if (get(isCloud) || minimumVersionRequired('1.24.0', get(temporalVersion))) {
