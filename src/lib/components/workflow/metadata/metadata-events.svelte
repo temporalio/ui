@@ -29,17 +29,15 @@
   {/if}
   <div class="py-4">
     {#each metadataGroups as group}
-      <div class="flex items-center gap-2 text-lg">
-        <div class="flex w-20 items-center justify-center">
-          <WorkflowStatus status={group.finalClassification} />
-        </div>
+      <div class="flex items-center gap-4 text-lg">
+        <WorkflowStatus status={group.finalClassification} />
         <div class="text-sm font-medium">{group.label}</div>
         <MetadataDecoder
           value={group.userMetadata.summary}
           fallback={translate('events.decode-failed')}
           let:decodedValue
         >
-          <span class="font-mono text-secondary">{decodedValue}</span>
+          <span class="text-sm font-medium">{decodedValue}</span>
         </MetadataDecoder>
       </div>
     {/each}

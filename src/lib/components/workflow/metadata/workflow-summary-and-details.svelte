@@ -9,7 +9,7 @@
   const details = $derived($workflowRun?.userMetadata?.details);
 </script>
 
-<div class="flex min-h-full flex-1 flex-col gap-2 p-6">
+<div class="flex h-full flex-1 flex-col gap-2 p-6">
   <div class="border border-subtle">
     <h3 class="pl-6 pt-6" data-testid="user-metadata-summary-heading">
       {translate('workflows.summary')}
