@@ -22,3 +22,4 @@ server/ui/assets
 go.work
 go.work.sum
 .claude
+.serena/

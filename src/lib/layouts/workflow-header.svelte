@@ -56,17 +56,6 @@
     run: runId,
   };
 
-  $: log = {
-    namespace,
-    workflowId,
-    runId,
-    id,
-    workflow: $workflowRun?.workflow,
-    fullEventHistory: $fullEventHistory,
-  };
-
-  $: console.log(JSON.stringify(log, null, 2));
-
   $: isRunning = $workflowRun?.workflow?.isRunning;
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
     $workflowRun.workflow?.status,
