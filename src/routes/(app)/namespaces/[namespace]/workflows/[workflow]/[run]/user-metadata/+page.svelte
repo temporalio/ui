@@ -1,9 +1,16 @@
 <script>
-  import WorkflowCurrentDetails from '$lib/components/workflow/metadata/workflow-current-details.svelte';
-  import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
+  import { page } from '$app/state';
+
+  import PageTitle from '$lib/components/page-title.svelte';
+  import WorkflowUserMetadata from '$lib/components/workflow/metadata/workflow-user-metadata.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import WorkflowPaddedLayout from '$lib/layouts/workflow-padded-layout.svelte';
 </script>
 
-<div class="flex flex-col gap-6 bg-primary lg:flex-row">
-  <WorkflowSummaryAndDetails />
-  <WorkflowCurrentDetails />
-</div>
+<PageTitle
+  title={`${translate('workflows.user-metadata-tab')} | ${page.params.workflow}`}
+  url={page.url.href}
+/>
+<WorkflowPaddedLayout>
+  <WorkflowUserMetadata />
+</WorkflowPaddedLayout>
