@@ -178,7 +178,7 @@
     </span>
     {#if maxLength && !disabled && !hideCount}
       <span
-        class="invisible text-right text-sm font-medium tracking-widest group-focus-within:visible"
+        class="invisible text-right text-xs tracking-widest group-focus-within:visible"
       >
         <span
           class={merge(
