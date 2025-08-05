@@ -80,7 +80,8 @@
       on:clear={handleClearInput}
       bind:value={manualSearchString}
       maxLength={MAX_QUERY_LENGTH}
-      hideCount={manualSearchString?.length < MAX_QUERY_LENGTH}
+      hideCount={!manualSearchString ||
+        manualSearchString.length < MAX_QUERY_LENGTH}
     />
     <Button data-testid="manual-search-button" variant="primary" type="submit">
       {translate('common.search')}

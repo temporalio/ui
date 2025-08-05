@@ -165,7 +165,7 @@
   </div>
 
   <div
-    class="flex justify-between gap-2"
+    class="inline-flex justify-between gap-2"
     class:hidden={!hintText && (!maxLength || disabled || hideCount)}
   >
     <span
