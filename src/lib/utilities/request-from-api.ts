@@ -90,7 +90,9 @@ export const requestFromAPI = async <T>(
       options = await withAuth(options, isBrowser);
     }
 
-    const queryIsTooLong = query.toString().length > MAX_QUERY_LENGTH;
+    const queryIsTooLong = [...query.values()].some(
+      (value) => value.length > MAX_QUERY_LENGTH,
+    );
     const response = queryIsTooLong
       ? new Response(JSON.stringify({ message: 'Query string is too long' }), {
           status: 414,
