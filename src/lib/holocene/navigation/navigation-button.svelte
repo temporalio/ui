@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import type { IconName } from '$lib/holocene/icon';
 
   import Icon from '../icon/icon.svelte';
@@ -10,6 +12,8 @@
   export let animate = false;
   export let active = false;
   export let disabled = false;
+  export let className = '';
+  export { className as class };
 </script>
 
 <div
@@ -18,8 +22,11 @@
   on:keypress={onClick}
   tabindex="0"
   data-testid={$$props['data-testid']}
-  class:disabled
-  class="relative mb-1 flex items-center whitespace-nowrap p-1 pl-2 text-sm font-medium hover:bg-white hover:text-black group-[.surface-primary]:hover:bg-black group-[.surface-primary]:hover:text-white group-[.surface-primary]:dark:hover:bg-white group-[.surface-primary]:dark:hover:text-black"
+  class={merge(
+    'relative mb-1 flex items-center whitespace-nowrap p-1 pl-2 text-sm hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+    disabled && 'pointer-events-none cursor-not-allowed text-subtle',
+    className,
+  )}
 >
   {#if icon}
     <div
@@ -34,9 +41,3 @@
     {label}
   </div>
 </div>
-
-<style lang="postcss">
-  .disabled {
-    @apply pointer-events-none cursor-not-allowed text-subtle;
-  }
-</style>

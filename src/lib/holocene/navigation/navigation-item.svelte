@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { page } from '$app/stores';
 
   import type { IconName } from '$lib/holocene/icon';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { navOpen } from '$lib/stores/nav-open';
-
-  import Icon from '../icon/icon.svelte';
 
   export let link: string;
   export let label: string;
@@ -33,8 +34,13 @@
     aria-disabled={disabled}
     class:disabled
     tabindex={disabled ? -1 : 0}
-    class:active
-    class="mb-1 flex items-center whitespace-nowrap rounded-sm p-1 pl-2 text-sm font-medium"
+    class={merge(
+      'mb-1 flex items-center whitespace-nowrap p-1 pl-2 text-sm ',
+      'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+      active &&
+        'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
+      disabled && 'pointer-events-none cursor-not-allowed text-subtle',
+    )}
     class:text-disabled={disabled}
   >
     {#if icon}
@@ -53,14 +59,3 @@
     </div>
   </a>
 </div>
-
-<style lang="postcss">
-  a:hover,
-  a.active {
-    @apply bg-white text-black group-[.surface-primary]:bg-black group-[.surface-primary]:text-white group-[.surface-primary]:dark:bg-white group-[.surface-primary]:dark:text-black;
-  }
-
-  a.disabled {
-    @apply pointer-events-none cursor-not-allowed text-subtle;
-  }
-</style>

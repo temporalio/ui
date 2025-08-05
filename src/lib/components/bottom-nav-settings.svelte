@@ -24,8 +24,13 @@
 </script>
 
 {#if open}
-  <div class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8">
+  <div
+    class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8"
+    data-theme="dark"
+  >
     <TimezoneSelect position="left" size="sm" />
+    <DarkModeMenu position="left" size="sm" />
+    <hr class="border-subtle" />
     <NavigationButton
       onClick={onCodecServerClick}
       tooltip={translate('data-encoder.codec-server')}
@@ -40,10 +45,9 @@
           ? 'transcoder-error'
           : 'transcoder-on'
         : 'transcoder-off'}
+      class="border border-transparent pl-4"
     />
     <DataEncoderSettings />
-    <div class="border-b border-subtle"></div>
-    <DarkModeMenu position="left" size="sm" />
     <slot />
   </div>
 {/if}
