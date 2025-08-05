@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { onDestroy, onMount } from 'svelte';
 
   import { page } from '$app/stores';
@@ -35,6 +36,8 @@
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+
+  export let workflowDetailsAddition: Snippet | undefined = undefined;
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: showJson = $page.url.searchParams.has('json');
@@ -216,7 +219,7 @@
       <SkeletonWorkflow />
     {:else}
       <div class="border-b border-subtle px-4 pt-8 md:pt-20 xl:px-8">
-        <WorkflowHeader />
+        <WorkflowHeader {workflowDetailsAddition} />
       </div>
       <slot />
     {/if}

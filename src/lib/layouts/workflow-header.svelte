@@ -1,6 +1,8 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/stores';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
@@ -42,6 +44,8 @@
     routeForWorkflowQuery,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
+
+  export let workflowDetailsAddition: Snippet | undefined = undefined;
 
   $: ({ namespace, workflow: workflowId, run: runId, id } = $page.params);
   $: ({ workflow, workers } = $workflowRun);
@@ -151,6 +155,7 @@
   <CodecServerErrorBanner />
   <WorkflowSummaryAndDetails />
   <WorkflowCurrentDetails />
+  {@render workflowDetailsAddition?.()}
   <WorkflowDetails {workflow} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
