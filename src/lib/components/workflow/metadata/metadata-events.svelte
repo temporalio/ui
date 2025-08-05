@@ -14,8 +14,6 @@
       workflow?.pendingNexusOperations,
     ).filter((group) => group.userMetadata?.summary),
   );
-
-  $inspect('Metadata groups:', metadataGroups);
 </script>
 
 <div class="overflow-x-auto border border-subtle px-6">
