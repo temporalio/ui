@@ -1,10 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
 
-  import {
-    DetailListLabel,
-    DetailListValue,
-  } from '$lib/components/detail-list';
+  import { DetailListValue } from '$lib/components/detail-list';
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
@@ -23,9 +20,8 @@
 </script>
 
 <WorkflowRunLayout>
-  {#snippet workflowDetailsAddition()}
+  {#snippet additionalDetails()}
     <div class="flex gap-2">
-      <DetailListLabel>Namespace Tags:</DetailListLabel>
       <DetailListValue>
         <div class="flex flex-wrap gap-2">
           {#each mockNamespaceTags as tag}

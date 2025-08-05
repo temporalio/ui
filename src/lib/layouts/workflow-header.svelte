@@ -45,7 +45,7 @@
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
-  export let workflowDetailsAddition: Snippet | undefined = undefined;
+  export let additionalDetails: Snippet | undefined = undefined;
 
   $: ({ namespace, workflow: workflowId, run: runId, id } = $page.params);
   $: ({ workflow, workers } = $workflowRun);
@@ -155,7 +155,7 @@
   <CodecServerErrorBanner />
   <WorkflowSummaryAndDetails />
   <WorkflowCurrentDetails />
-  {@render workflowDetailsAddition?.()}
+  {@render additionalDetails?.()}
   <WorkflowDetails {workflow} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
