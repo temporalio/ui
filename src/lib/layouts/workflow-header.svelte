@@ -209,15 +209,6 @@
         </Badge>
       </Tab>
       <Tab
-        label={translate('workflows.user-metadata-tab')}
-        id="user-metadata-tab"
-        href={routeForUserMetadata(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForUserMetadata(routeParameters),
-        )}
-      />
-      <Tab
         label={translate('workflows.relationships')}
         id="relationships-tab"
         href={routeForRelationships(routeParameters)}
@@ -296,6 +287,15 @@
         active={pathMatches(
           page.url.pathname,
           routeForWorkflowQuery(routeParameters),
+        )}
+      />
+      <Tab
+        label={translate('workflows.user-metadata-tab')}
+        id="user-metadata-tab"
+        href={routeForUserMetadata(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForUserMetadata(routeParameters),
         )}
       />
       <Tab
