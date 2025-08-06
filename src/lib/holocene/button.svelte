@@ -140,7 +140,7 @@
     <slot />
     {#if trailingIcon || loading}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner-solid' : trailingIcon} />
+        <Icon name={loading ? 'spinner' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
@@ -176,7 +176,7 @@
 
     {#if trailingIcon || loading}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner-solid' : trailingIcon} />
+        <Icon name={loading ? 'spinner' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}

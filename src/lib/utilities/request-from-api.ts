@@ -38,6 +38,8 @@ type RequestFromAPIOptions = {
   signal?: AbortController['signal'];
 };
 
+export const MAX_QUERY_LENGTH = 15000;
+
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
   (obj as TemporalAPIError)?.message !== undefined &&
   typeof (obj as TemporalAPIError)?.message === 'string';
@@ -88,7 +90,15 @@ export const requestFromAPI = async <T>(
       options = await withAuth(options, isBrowser);
     }
 
-    const response = await request(url, options);
+    const queryIsTooLong = [...query.values()].some(
+      (value) => value.length > MAX_QUERY_LENGTH,
+    );
+    const response = queryIsTooLong
+      ? new Response(JSON.stringify({ message: 'Query string is too long' }), {
+          status: 414,
+          statusText: 'URI Too Long',
+        })
+      : await request(url, options);
     const body = await response.json();
 
     const { status, statusText } = response;

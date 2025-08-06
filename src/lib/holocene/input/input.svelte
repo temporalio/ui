@@ -87,7 +87,7 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={merge('flex flex-col gap-1', className)}>
+<div class={merge('group flex flex-col gap-1', className)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="input-group flex">
     <slot name="before-input" {disabled} />
@@ -155,15 +155,6 @@
           />
         </div>
       {/if}
-      {#if maxLength && !disabled && !hideCount}
-        <span class="count">
-          <span
-            class:ok={maxLength - value.length > 5}
-            class:warn={maxLength - value.length <= 5}
-            class:error={maxLength === value.length}>{value.length}</span
-          >/{maxLength}
-        </span>
-      {/if}
       {#if suffix}
         <div class="suffix">
           {suffix}
@@ -173,15 +164,34 @@
     <slot name="after-input" {disabled} />
   </div>
 
-  <span
-    class="hint-text inline-block"
-    class:invalid={!valid}
-    class:error
-    class:hidden={!hintText}
-    role={error ? 'alert' : null}
+  <div
+    class="inline-flex justify-between gap-2"
+    class:hidden={!hintText && (!maxLength || disabled || hideCount)}
   >
-    {hintText}
-  </span>
+    <span
+      class="hint-text inline-block"
+      class:invalid={!valid}
+      class:error
+      role={error ? 'alert' : null}
+    >
+      {hintText}
+    </span>
+    {#if maxLength && !disabled && !hideCount}
+      <span
+        class="invisible text-right text-xs tracking-widest group-focus-within:visible"
+      >
+        <span
+          class={merge(
+            maxLength - value?.length > 5 && 'text-success',
+            maxLength - value?.length <= 5 && 'text-warning',
+            maxLength === value?.length && 'text-danger',
+          )}
+        >
+          {value?.length ?? 0}
+        </span>/{maxLength}
+      </span>
+    {/if}
+  </div>
 </div>
 
 <style lang="postcss">
@@ -231,26 +241,6 @@
 
   .clear-icon-container {
     @apply mr-2 flex w-6 cursor-pointer items-center justify-center;
-  }
-
-  .count {
-    @apply mx-2 hidden text-sm font-medium tracking-widest;
-
-    > .ok {
-      @apply text-success;
-    }
-
-    > .warn {
-      @apply text-warning;
-    }
-
-    > .error {
-      @apply text-danger;
-    }
-  }
-
-  .input:focus ~ .count {
-    @apply block;
   }
 
   .hint-text {

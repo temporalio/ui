@@ -12,6 +12,7 @@
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { refresh, workflowsQuery } from '$lib/stores/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   let manualSearchString = '';
@@ -62,7 +63,7 @@
 <div class="w-full" in:fade>
   <form
     on:submit|preventDefault={onSearch}
-    class="flex items-center gap-0"
+    class="flex gap-0"
     in:fly={{ x: -100, duration: 150 }}
     role="search"
   >
@@ -78,6 +79,9 @@
       clearButtonLabel={translate('common.clear-input-button-label')}
       on:clear={handleClearInput}
       bind:value={manualSearchString}
+      maxLength={MAX_QUERY_LENGTH}
+      hideCount={!manualSearchString ||
+        manualSearchString.length < MAX_QUERY_LENGTH}
     />
     <Button data-testid="manual-search-button" variant="primary" type="submit">
       {translate('common.search')}
