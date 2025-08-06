@@ -47,10 +47,8 @@
   $: pendingActivity = group?.pendingActivity;
   $: pauseTime = pendingActivity && pendingActivity.pauseInfo?.pauseTime;
 
-  // Local activity decoding
   let decodedLocalActivity: SummaryAttribute | undefined;
 
-  // Decode local activity when group has local activity markers
   onMount(async () => {
     if (hasLocalActivityMarker(group)) {
       const localActivityEvent = getLocalActivityMarkerEvent(group);
@@ -62,7 +60,6 @@
             accessToken: $authUser.accessToken,
           });
 
-          // Store the decoded information in the group for future use
           if (decodedLocalActivity) {
             group.decodedLocalActivity = decodedLocalActivity;
           }
