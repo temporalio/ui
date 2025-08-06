@@ -60,35 +60,33 @@
 <div class="flex h-full flex-1 flex-col border-l border-subtle">
   <div class="surface-information w-full px-6 py-2">
     <div class="flex items-center justify-between">
-      <p class="hidden sm:block">
-        Press the <span
-          class="mx-1 rounded bg-subtle px-1 text-sm font-medium leading-4"
-          >R</span
-        > for freshness.
-      </p>
-      <div class="flex items-center sm:hidden">
-        <p>Press for freshness</p>
-        <Button
-          variant="ghost"
-          on:click={fetchCurrentDetails}
-          disabled={loading}
-        >
-          <Icon name="retry" />
-        </Button>
-      </div>
-      {#if lastFetched}
-        <p class="text-xs text-secondary">
-          Last fetched: {lastFetched.toLocaleTimeString()}
+      <h3>{translate('workflows.current-details')}</h3>
+      <div class="flex flex-row items-center gap-2 lg:flex-col xl:flex-row">
+        <p class="hidden sm:block">
+          Press the <span
+            class="mx-1 rounded bg-subtle px-1 text-sm font-medium leading-4"
+            >R</span
+          > for freshness
         </p>
-      {/if}
+        <div class="flex items-center sm:hidden">
+          <p>Press for freshness</p>
+          <Button
+            variant="ghost"
+            on:click={fetchCurrentDetails}
+            disabled={loading}
+          >
+            <Icon name="retry" />
+          </Button>
+        </div>
+        {#if lastFetched}
+          <p class="text-xs text-secondary">
+            {lastFetched.toLocaleTimeString()}
+          </p>
+        {/if}
+      </div>
     </div>
   </div>
-  <div
-    class="surface-background flex h-full flex-col justify-between gap-2 p-6"
-  >
-    <div class="flex flex-col gap-2">
-      <h3 class="pl-6 pt-6">{translate('workflows.current-details')}</h3>
-    </div>
+  <div class="surface-background h-full">
     {#key currentDetails}
       <Markdown
         className="p-3"

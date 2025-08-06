@@ -16,28 +16,27 @@
   );
 </script>
 
-<div class="overflow-x-auto border border-subtle px-6">
-  <h3 class="pt-6" data-testid="user-metadata-details-heading">
-    Events with Metadata
-  </h3>
-  {#if !metadataGroups.length}
-    <div class="text-secondary/70">
-      <p class="text-sm italic">No events with metadata</p>
-    </div>
-  {/if}
-  <div class="py-4">
-    {#each metadataGroups as group}
-      <div class="flex items-center gap-4 text-lg">
-        <WorkflowStatus status={group.finalClassification} />
-        <div class="text-sm font-medium">{group.label}</div>
+{#if !metadataGroups.length}
+  <div class="px-6 text-secondary/70">
+    <p class="text-sm italic">No events with metadata</p>
+  </div>
+{/if}
+<div class="flex flex-col gap-2">
+  {#each metadataGroups as group}
+    <div
+      class="flex items-center justify-between gap-4 border-b border-subtle px-3 pb-1 text-lg"
+    >
+      <div class="flex items-center gap-2">
+        <p class="w-32 min-w-32 text-sm font-medium">{group.label}</p>
         <MetadataDecoder
           value={group.userMetadata.summary}
           fallback={translate('events.decode-failed')}
           let:decodedValue
         >
-          <span class="text-sm font-medium">{decodedValue}</span>
+          <span class="text-sm">{decodedValue}</span>
         </MetadataDecoder>
       </div>
-    {/each}
-  </div>
+      <WorkflowStatus status={group.finalClassification} />
+    </div>
+  {/each}
 </div>

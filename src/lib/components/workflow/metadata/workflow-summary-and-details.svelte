@@ -9,34 +9,45 @@
   const details = $derived($workflowRun?.userMetadata?.details);
 </script>
 
-<div class="flex h-full flex-1 flex-col gap-2 p-6">
-  <div class="border border-subtle">
-    <h3 class="pl-6 pt-6" data-testid="user-metadata-summary-heading">
-      {translate('workflows.summary')}
-    </h3>
+<div class="flex h-full flex-1 flex-col bg-primary">
+  <div>
+    <div class="surface-information w-full px-6 py-2">
+      <h3 data-testid="user-metadata-summary-heading">
+        {translate('workflows.summary')}
+      </h3>
+    </div>
     {#if summary}
       <Markdown className="p-3" overrideTheme="primary" content={summary} />
     {:else}
-      <div class="pb-6 pl-6 text-secondary/70">
+      <div class="py-6 pl-6 text-secondary/70">
         <p class="text-sm italic">
           {translate('workflows.no-summary-available')}
         </p>
       </div>
     {/if}
   </div>
-  <div class="border border-subtle">
-    <h3 class="pl-6 pt-6" data-testid="user-metadata-details-heading">
-      {translate('workflows.details')}
-    </h3>
+  <div>
+    <div class="surface-information w-full px-6 py-2">
+      <h3 data-testid="user-metadata-summary-heading">
+        {translate('workflows.details')}
+      </h3>
+    </div>
     {#if details}
       <Markdown className="p-3" overrideTheme="primary" content={details} />
     {:else}
-      <div class="pb-6 pl-6 text-secondary/70">
+      <div class="py-6 pl-6 text-secondary/70">
         <p class="text-sm italic">
           {translate('workflows.no-details-available')}
         </p>
       </div>
     {/if}
   </div>
-  <MetadataEvents />
+  <div>
+    <div class="surface-information w-full px-6 py-2">
+      <h3 data-testid="user-metadata-summary-heading">Events with Metadata</h3>
+    </div>
+    <div class="py-6">
+      <MetadataEvents />
+    </div>
+  </div>
 </div>
