@@ -38,6 +38,7 @@
 
   $: expandedGroupHeight = readOnly ? 0 : $activeGroupHeight;
   $: filteredGroups = getFailedOrPendingGroups(groups, $eventStatusFilter);
+
   $: startTime = $fullEventHistory[0]?.eventTime || workflow.startTime;
   $: timelineHeight =
     Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight;
