@@ -9,7 +9,9 @@
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { formatDate } from '$lib/utilities/format-date';
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
@@ -80,7 +82,9 @@
         </div>
         {#if lastFetched}
           <p class="text-xs text-secondary">
-            {lastFetched.toLocaleTimeString()}
+            {formatDate(lastFetched, $timeFormat, {
+              relative: $relativeTime,
+            })}
           </p>
         {/if}
       </div>
