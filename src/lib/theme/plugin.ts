@@ -126,6 +126,10 @@ const temporal = plugin(
           backgroundColor: css('--color-interactive-ghost-active'),
         },
       },
+      '.surface-information': {
+        backgroundColor: css('--color-surface-information'),
+        color: css('--color-text-primary'),
+      },
       '.surface-inverse': {
         backgroundColor: css('--color-surface-inverse'),
         color: css('--color-text-inverse'),

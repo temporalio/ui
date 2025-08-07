@@ -1,12 +1,10 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
-  import WorkflowCurrentDetails from '$lib/components/workflow/metadata/workflow-current-details.svelte';
-  import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -37,58 +35,70 @@
     routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
+    routeForUserMetadata,
     routeForWorkers,
-    routeForWorkflowMetadata,
+    routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
+    routeForWorkflowSearchAttributes,
   } from '$lib/utilities/route-for';
 
-  $: ({ namespace, workflow: workflowId, run: runId, id } = $page.params);
-  $: ({ workflow, workers } = $workflowRun);
-
-  $: routeParameters = {
+  const {
     namespace,
     workflow: workflowId,
     run: runId,
-  };
+    id: eventId,
+  } = $derived(page.params);
+  const { workflow, workers } = $derived($workflowRun);
+  const routeParameters = $derived({
+    namespace,
+    workflow: workflowId,
+    run: runId,
+  });
 
-  $: isRunning = $workflowRun?.workflow?.isRunning;
-  $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow?.status,
+  const isRunning = $derived($workflowRun?.workflow?.isRunning);
+  const activitiesCanceled = $derived(
+    ['Terminated', 'TimedOut', 'Canceled'].includes(
+      $workflowRun.workflow?.status,
+    ),
   );
-  $: cancelInProgress = isCancelInProgress(
-    $workflowRun?.workflow?.status,
-    $fullEventHistory,
+  const cancelInProgress = $derived(
+    isCancelInProgress($workflowRun?.workflow?.status, $fullEventHistory),
   );
-  $: resetRunId =
+  const resetRunId = $derived(
     $workflowRun?.workflow.workflowExtendedInfo?.resetRunId ||
-    $resetWorkflows[$workflowRun?.workflow?.runId];
-  $: workflowHasBeenReset = !!resetRunId;
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    $namespaces,
+      $resetWorkflows[$workflowRun?.workflow?.runId],
   );
-  $: outboundLinks =
-    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0;
-  $: inboundLinks = getInboundNexusLinkEvents($fullEventHistory)?.length || 0;
-  $: linkCount = outboundLinks + inboundLinks;
+  const workflowHasBeenReset = $derived(!!resetRunId);
+  const workflowRelationships = $derived(
+    getWorkflowRelationships(workflow, $fullEventHistory, $namespaces),
+  );
+  const workflowsHref = $derived(
+    `${routeForWorkflows({
+      namespace,
+    })}?${$workflowsSearchParams}`,
+  );
+  const outboundLinks = $derived(
+    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
+  );
+  const inboundLinks = $derived(
+    getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
+  );
+  const linkCount = $derived(outboundLinks + inboundLinks);
 </script>
 
 <div class="flex items-center justify-between pb-4">
   <div class="flex items-center gap-2">
     <Link
-      href={`${routeForWorkflows({
-        namespace,
-      })}?${$workflowsSearchParams}`}
+      href={workflowsHref}
       data-testid="back-to-workflows"
       icon="chevron-left"
     >
-      {id
+      {eventId
         ? translate('common.workflows')
         : translate('workflows.back-to-workflows')}
     </Link>
-    {#if id}
+    {#if eventId}
       <Link
         href={routeForEventHistory({
           ...routeParameters,
@@ -96,7 +106,7 @@
         data-testid="back-to-workflow-execution"
         icon="chevron-left"
       >
-        {workflow?.runId}
+        {runId}
       </Link>
     {/if}
   </div>
@@ -129,7 +139,7 @@
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={workflow?.id}
+            content={workflowId}
             clickAllToCopy
             container-class="w-full"
             class="overflow-hidden text-ellipsis text-left"
@@ -149,8 +159,6 @@
     </div>
   </div>
   <CodecServerErrorBanner />
-  <WorkflowSummaryAndDetails />
-  <WorkflowCurrentDetails />
   <WorkflowDetails {workflow} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
@@ -174,7 +182,7 @@
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
             namespace,
-            workflow: $workflowRun?.workflow?.id,
+            workflow: workflowId,
             run: resetRunId,
           })}>here</Link
         >.
@@ -190,14 +198,14 @@
           ...routeParameters,
         })}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForEventHistory({
             ...routeParameters,
           }),
         )}
       >
         <Badge type="primary" class="px-2 py-0">
-          {workflow?.historyEvents}
+          {workflow.historyEvents}
         </Badge>
       </Tab>
       <Tab
@@ -205,7 +213,7 @@
         id="relationships-tab"
         href={routeForRelationships(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForRelationships(routeParameters),
         )}
       >
@@ -219,7 +227,7 @@
           id="nexus-links-tab"
           href={routeForNexusLinks(routeParameters)}
           active={pathMatches(
-            $page.url.pathname,
+            page.url.pathname,
             routeForNexusLinks(routeParameters),
           )}
         >
@@ -233,7 +241,7 @@
         id="workers-tab"
         href={routeForWorkers(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForWorkers(routeParameters),
         )}
       >
@@ -247,7 +255,7 @@
         id="pending-activities-tab"
         href={routeForPendingActivities(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForPendingActivities(routeParameters),
         )}
       >
@@ -268,7 +276,7 @@
         id="call-stack-tab"
         href={routeForCallStack(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForCallStack(routeParameters),
         )}
       />
@@ -277,17 +285,35 @@
         id="queries-tab"
         href={routeForWorkflowQuery(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
+          page.url.pathname,
           routeForWorkflowQuery(routeParameters),
         )}
       />
       <Tab
-        label={translate('workflows.metadata-tab')}
-        id="metadata-tab"
-        href={routeForWorkflowMetadata(routeParameters)}
+        label={translate('workflows.user-metadata-tab')}
+        id="user-metadata-tab"
+        href={routeForUserMetadata(routeParameters)}
         active={pathMatches(
-          $page.url.pathname,
-          routeForWorkflowMetadata(routeParameters),
+          page.url.pathname,
+          routeForUserMetadata(routeParameters),
+        )}
+      />
+      <Tab
+        label={translate('workflows.search-attributes-tab')}
+        id="search-attributes-tab"
+        href={routeForWorkflowSearchAttributes(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForWorkflowSearchAttributes(routeParameters),
+        )}
+      />
+      <Tab
+        label={translate('workflows.memo-tab')}
+        id="memo-tab"
+        href={routeForWorkflowMemo(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForWorkflowMemo(routeParameters),
         )}
       />
     </TabList>

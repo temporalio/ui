@@ -47,11 +47,8 @@ test.describe('Disable write actions on empty schedules list actions', () => {
     await page.goto(schedulesUrl);
 
     const namespace = await page.locator('h1').innerText();
-    console.log('Namespace:', namespace);
     expect(namespace).toBe('0 Schedules');
-    console.log('Namespace:after', namespace);
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeDisabled();
-    console.log('Namespace:afterafter', namespace);
   });
 });

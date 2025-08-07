@@ -161,6 +161,12 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 	e.GET(renderPath, func(c echo.Context) error {
 		content := c.QueryParam("content")
 		theme := c.QueryParam("theme")
+		overrideTheme := c.QueryParam("overrideTheme")
+
+		finalTheme := theme
+		if theme != "" && overrideTheme != "" {
+			finalTheme = fmt.Sprintf("%s-%s", theme, overrideTheme)
+		}
 
 		// Process markdown to HTML
 		renderedHTML := processMarkdown(content)
@@ -175,7 +181,7 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 		}{
 			Content: template.HTML(renderedHTML),
 			Nonce:   nonce,
-			Theme:   theme,
+			Theme:   finalTheme,
 			CSS: `*,
 		body {
 			margin: 0;
@@ -311,7 +317,43 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			
 		body[data-theme='dark'] a {
 				color: #8098f9;
-			}`,
+			}
+				
+			body[data-theme='light-background'] {
+  background-color: #f8fafc;
+  color: #121416;
+  }
+
+  body[data-theme='light-background']a {
+    color: #444ce7;
+  }
+
+body[data-theme='dark-background'] {
+  background-color: #141414;
+  color: #f8fafc;
+  }
+ body[data-theme='dark-background'] a {
+    color: #8098f9;
+  }
+
+body[data-theme='light-primary'] {
+  background-color: #fff;
+  color: #121416;
+  }
+  body[data-theme='light-primary']a {
+    color: #444ce7;
+  }
+
+body[data-theme='dark-primary'] {
+  background-color: #000;
+  color: #f8fafc;
+  }
+
+  body[data-theme='dark-primary']a {
+    color: #8098f9;
+  }
+`,
+
 		}
 
 		// Set headers
