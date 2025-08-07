@@ -39,14 +39,10 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await mockSettingsApi(page, { DisableWriteActions: true });
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeDisabled();
     });
 
     test('is disabled when reset is disabled via Settings API', async ({
@@ -55,14 +51,10 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await mockSettingsApi(page, { WorkflowResetDisabled: true });
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeDisabled();
     });
 
     test('allows reapplying signals after the reset point', async ({
@@ -71,19 +63,12 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-primary-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'Reset' }).click();
 
       await page
         .getByTestId('workflow-reset-event-id-select-button')
@@ -116,19 +101,12 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-primary-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'Reset' }).click();
 
       await page
         .getByTestId('workflow-reset-event-id-select-button')
@@ -177,19 +155,12 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-primary-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'Reset' }).click();
 
       await page
         .getByTestId('workflow-reset-event-id-select-button')
@@ -223,19 +194,12 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-primary-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'Reset' }).click();
 
       await page
         .getByTestId('workflow-reset-event-id-select-button')
@@ -274,19 +238,12 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const requestPromise = page.waitForRequest(WORKFLOW_RESET_API);
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-primary-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'Reset' }).click();
 
       await page
         .getByTestId('workflow-reset-event-id-select-button')
@@ -334,21 +291,14 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       const requestPromise = page.waitForRequest(WORKFLOW_TERMINATE_API);
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
       await expect(page.getByText('Latest Execution')).toBeVisible();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-menu-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'More Actions' }).click();
 
       await page
         .getByTestId('terminate-button')
@@ -370,21 +320,14 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       await mockEventHistoryApi(page);
 
       await expect(
-        page.locator('#workflow-actions-menu-button').locator('visible=true'),
+        page.getByRole('button', { name: 'More Actions' }),
       ).toBeEnabled();
 
       await expect(page.getByText('Latest Execution')).toBeHidden();
 
-      await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
-      ).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Reset' })).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-menu-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'More Actions' }).click();
 
       await expect(page.getByTestId('terminate-button')).toBeHidden();
     });
@@ -412,11 +355,11 @@ test.describe('Workflow actions for a Running Workflow', () => {
     await mockSettingsApi(page, { DisableWriteActions: true });
 
     await expect(
-      page.locator('#workflow-actions-menu-button').locator('visible=true'),
+      page.getByRole('button', { name: 'More Actions' }),
     ).toBeDisabled();
 
     await expect(
-      page.locator('#workflow-actions-primary-button').locator('visible=true'),
+      page.getByRole('button', { name: 'Request Cancellation' }),
     ).toBeDisabled();
   });
 
@@ -427,36 +370,20 @@ test.describe('Workflow actions for a Running Workflow', () => {
       await mockSettingsApi(page, { WorkflowCancelDisabled: true });
 
       await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
+        page.getByRole('button', { name: 'Request Cancellation' }),
       ).toBeDisabled();
 
-      await page
-        .locator('#workflow-actions-menu-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'More Actions' }).click();
 
       await expect(
-        page
-          .locator('#workflow-actions-menu')
-          .locator('visible=true')
-          .getByText('Send a Signal'),
+        page.getByRole('menuitem', { name: 'Send a Signal' }),
       ).toBeEnabled();
 
       await expect(
-        page
-          .locator('#workflow-actions-menu')
-          .locator('visible=true')
-          .getByText('Terminate'),
+        page.getByRole('menuitem', { name: 'Terminate' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-menu')
-          .locator('visible=true')
-          .getByText('Reset'),
-      ).toBeEnabled();
+      await expect(page.getByRole('menuitem', { name: 'Reset' })).toBeEnabled();
     });
   });
 
@@ -467,36 +394,23 @@ test.describe('Workflow actions for a Running Workflow', () => {
       await mockSettingsApi(page, { WorkflowTerminateDisabled: true });
 
       await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
+        page.getByRole('button', { name: 'Request Cancellation' }),
       ).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-menu-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'More Actions' }).click();
 
       await expect(
-        page
-          .locator('#workflow-actions-menu')
-          .locator('visible=true')
-          .getByText('Send a Signal'),
+        page.getByRole('menuitem', { name: 'Send a Signal' }),
       ).toBeEnabled();
 
       await expect(
         page
-          .locator('#workflow-actions-menu')
+          .locator('#workflow-actions')
           .locator('visible=true')
           .getByText('Terminate'),
       ).toBeDisabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-menu')
-          .locator('visible=true')
-          .getByText('Reset'),
-      ).toBeEnabled();
+      await expect(page.getByRole('menuitem', { name: 'Reset' })).toBeEnabled();
     });
   });
 
@@ -507,36 +421,23 @@ test.describe('Workflow actions for a Running Workflow', () => {
       await mockSettingsApi(page, { WorkflowSignalDisabled: true });
 
       await expect(
-        page
-          .locator('#workflow-actions-primary-button')
-          .locator('visible=true'),
+        page.getByRole('button', { name: 'Request Cancellation' }),
       ).toBeEnabled();
 
-      await page
-        .locator('#workflow-actions-menu-button')
-        .locator('visible=true')
-        .click();
+      await page.getByRole('button', { name: 'More Actions' }).click();
 
       await expect(
         page
-          .locator('#workflow-actions-menu')
+          .locator('#workflow-actions')
           .locator('visible=true')
           .getByText('Send a Signal'),
       ).toBeDisabled();
 
       await expect(
-        page
-          .locator('#workflow-actions-menu')
-          .locator('visible=true')
-          .getByText('Terminate'),
+        page.getByRole('menuitem', { name: 'Terminate' }),
       ).toBeEnabled();
 
-      await expect(
-        page
-          .locator('#workflow-actions-menu')
-          .locator('visible=true')
-          .getByText('Reset'),
-      ).toBeEnabled();
+      await expect(page.getByRole('menuitem', { name: 'Reset' })).toBeEnabled();
     });
   });
 });
