@@ -65,21 +65,21 @@ describe('formatReason', () => {
         formatReason({
           action: Action.Cancel,
           reason,
-          email: 'test@temporal.io',
+          identity: 'test@temporal.io',
         }),
       ).toEqual('Testing Canceled from the Web UI by test@temporal.io');
       expect(
         formatReason({
           action: Action.Reset,
           reason,
-          email: 'test@temporal.io',
+          identity: 'test@temporal.io',
         }),
       ).toEqual('Testing Reset from the Web UI by test@temporal.io');
       expect(
         formatReason({
           action: Action.Terminate,
           reason,
-          email: 'test@temporal.io',
+          identity: 'test@temporal.io',
         }),
       ).toEqual('Testing Terminated from the Web UI by test@temporal.io');
     });
@@ -91,21 +91,21 @@ describe('formatReason', () => {
         formatReason({
           action: Action.Cancel,
           reason,
-          email: 'test@temporal.io',
+          identity: 'test@temporal.io',
         }),
       ).toEqual('Canceled from the Web UI by test@temporal.io');
       expect(
         formatReason({
           action: Action.Reset,
           reason,
-          email: 'test@temporal.io',
+          identity: 'test@temporal.io',
         }),
       ).toEqual('Reset from the Web UI by test@temporal.io');
       expect(
         formatReason({
           action: Action.Terminate,
           reason,
-          email: 'test@temporal.io',
+          identity: 'test@temporal.io',
         }),
       ).toEqual('Terminated from the Web UI by test@temporal.io');
     });
