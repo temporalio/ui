@@ -28,63 +28,88 @@
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowUpdateEnabled } from '$lib/utilities/workflow-update-enabled';
 
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let cancelInProgress: boolean;
-  export let isRunning: boolean;
-  export let first: string | undefined = undefined;
-  export let next: string | undefined = undefined;
+  interface Props {
+    workflow: WorkflowExecution;
+    namespace: string;
+    cancelInProgress: boolean;
+    isRunning: boolean;
+    first?: string;
+    next?: string;
+  }
 
-  let cancelConfirmationModalOpen = false;
-  let terminateConfirmationModalOpen = false;
-  let resetConfirmationModalOpen = false;
-  let signalConfirmationModalOpen = false;
-  let updateConfirmationModalOpen = false;
+  let { workflow, namespace, cancelInProgress, isRunning, first, next }: Props =
+    $props();
 
-  let resetDescription: string;
+  let cancelConfirmationModalOpen = $state(false);
+  let terminateConfirmationModalOpen = $state(false);
+  let resetConfirmationModalOpen = $state(false);
+  let signalConfirmationModalOpen = $state(false);
+  let updateConfirmationModalOpen = $state(false);
+
   let coreUser = coreUserStore();
 
-  $: cancelEnabled = workflowCancelEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let cancelEnabled = $derived(
+    workflowCancelEnabled($page.data.settings, $coreUser, namespace),
   );
 
-  $: signalEnabled = workflowSignalEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let signalEnabled = $derived(
+    workflowSignalEnabled($page.data.settings, $coreUser, namespace),
   );
 
-  $: updateEnabled = workflowUpdateEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let updateEnabled = $derived(
+    workflowUpdateEnabled($page.data.settings, $coreUser, namespace),
   );
 
-  $: terminateEnabled = workflowTerminateEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let terminateEnabled = $derived(
+    workflowTerminateEnabled($page.data.settings, $coreUser, namespace),
   );
 
-  $: resetAuthorized = workflowResetEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let resetAuthorized = $derived(
+    workflowResetEnabled($page.data.settings, $coreUser, namespace),
   );
 
   // https://github.com/temporalio/temporal/releases/tag/v1.27.1
-  $: canResetWithPendingChildWorkflows =
+  let canResetWithPendingChildWorkflows = $derived(
     minimumVersionRequired('1.27.1', $temporalVersion) ||
-    $isCloud ||
-    workflow.pendingChildren.length === 0;
+      $isCloud ||
+      workflow.pendingChildren.length === 0,
+  );
 
-  $: resetEnabled =
+  let resetEnabled = $derived(
     resetAuthorized &&
-    canResetWithPendingChildWorkflows &&
-    $resetEvents.length > 0;
-  $: actionsDisabled = !resetEnabled && !signalEnabled && !terminateEnabled;
+      canResetWithPendingChildWorkflows &&
+      $resetEvents.length > 0,
+  );
+  let actionsDisabled = $derived(
+    !resetEnabled && !signalEnabled && !terminateEnabled,
+  );
+
+  const getResetDescription = ({
+    resetAuthorized,
+    canResetWithPendingChildWorkflows,
+    resetEvents,
+  }) => {
+    if (!resetAuthorized) {
+      return translate('workflows.reset-disabled-unauthorized');
+    } else if (resetAuthorized && !canResetWithPendingChildWorkflows) {
+      return translate('workflows.reset-disabled-pending-children');
+    } else if (
+      resetAuthorized &&
+      canResetWithPendingChildWorkflows &&
+      resetEvents.length === 0
+    ) {
+      return translate('workflows.reset-disabled-no-events');
+    }
+    return '';
+  };
+
+  let resetDescription = $derived(
+    getResetDescription({
+      resetAuthorized,
+      canResetWithPendingChildWorkflows,
+      resetEvents: $resetEvents,
+    }),
+  );
 
   let workflowActions: {
     label: string;
@@ -93,23 +118,7 @@
     testId: string;
     destructive?: boolean;
     description?: string;
-  }[];
-
-  $: {
-    if (!resetAuthorized) {
-      resetDescription = translate('workflows.reset-disabled-unauthorized');
-    } else if (resetAuthorized && !canResetWithPendingChildWorkflows) {
-      resetDescription = translate('workflows.reset-disabled-pending-children');
-    } else if (
-      resetAuthorized &&
-      canResetWithPendingChildWorkflows &&
-      $resetEvents.length === 0
-    ) {
-      resetDescription = translate('workflows.reset-disabled-no-events');
-    }
-  }
-
-  $: workflowActions = [
+  }[] = $derived([
     {
       label: translate('workflows.reset'),
       onClick: () => (resetConfirmationModalOpen = true),
@@ -141,7 +150,7 @@
         ? ''
         : translate('workflows.terminate-disabled'),
     },
-  ];
+  ]);
 </script>
 
 <div class="flex items-center gap-2">
