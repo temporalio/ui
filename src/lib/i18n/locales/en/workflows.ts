@@ -81,6 +81,7 @@ export const Strings = {
   json: 'JSON',
   download: 'Download',
   'workflow-actions': 'Workflow Actions',
+  'more-actions': 'More Actions',
   'reset-disabled-unauthorized':
     'Resetting workflows is not enabled, please contact your administrator for assistance.',
   'reset-disabled-pending-children':

@@ -7,8 +7,11 @@
   import SignalConfirmationModal from '$lib/components/workflow/client-actions/signal-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import UpdateConfirmationModal from '$lib/components/workflow/client-actions/update-confirmation-modal.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
-  import SplitButton from '$lib/holocene/split-button.svelte';
+  import MenuButton from '$lib/holocene/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
+  import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { coreUserStore } from '$lib/stores/core-user';
@@ -25,63 +28,88 @@
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowUpdateEnabled } from '$lib/utilities/workflow-update-enabled';
 
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let cancelInProgress: boolean;
-  export let isRunning: boolean;
-  export let first: string | undefined = undefined;
-  export let next: string | undefined = undefined;
+  interface Props {
+    workflow: WorkflowExecution;
+    namespace: string;
+    cancelInProgress: boolean;
+    isRunning: boolean;
+    first?: string;
+    next?: string;
+  }
 
-  let cancelConfirmationModalOpen = false;
-  let terminateConfirmationModalOpen = false;
-  let resetConfirmationModalOpen = false;
-  let signalConfirmationModalOpen = false;
-  let updateConfirmationModalOpen = false;
+  let { workflow, namespace, cancelInProgress, isRunning, first, next }: Props =
+    $props();
 
-  let resetDescription: string;
+  let cancelConfirmationModalOpen = $state(false);
+  let terminateConfirmationModalOpen = $state(false);
+  let resetConfirmationModalOpen = $state(false);
+  let signalConfirmationModalOpen = $state(false);
+  let updateConfirmationModalOpen = $state(false);
+
   let coreUser = coreUserStore();
 
-  $: cancelEnabled = workflowCancelEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let cancelEnabled = $derived(
+    workflowCancelEnabled($page.data.settings, $coreUser, namespace),
   );
 
-  $: signalEnabled = workflowSignalEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let signalEnabled = $derived(
+    workflowSignalEnabled($page.data.settings, $coreUser, namespace),
   );
 
-  $: updateEnabled = workflowUpdateEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let updateEnabled = $derived(
+    workflowUpdateEnabled($page.data.settings, $coreUser, namespace),
   );
 
-  $: terminateEnabled = workflowTerminateEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let terminateEnabled = $derived(
+    workflowTerminateEnabled($page.data.settings, $coreUser, namespace),
   );
 
-  $: resetAuthorized = workflowResetEnabled(
-    $page.data.settings,
-    $coreUser,
-    namespace,
+  let resetAuthorized = $derived(
+    workflowResetEnabled($page.data.settings, $coreUser, namespace),
   );
 
   // https://github.com/temporalio/temporal/releases/tag/v1.27.1
-  $: canResetWithPendingChildWorkflows =
+  let canResetWithPendingChildWorkflows = $derived(
     minimumVersionRequired('1.27.1', $temporalVersion) ||
-    $isCloud ||
-    workflow.pendingChildren.length === 0;
+      $isCloud ||
+      workflow.pendingChildren.length === 0,
+  );
 
-  $: resetEnabled =
+  let resetEnabled = $derived(
     resetAuthorized &&
-    canResetWithPendingChildWorkflows &&
-    $resetEvents.length > 0;
-  $: actionsDisabled = !resetEnabled && !signalEnabled && !terminateEnabled;
+      canResetWithPendingChildWorkflows &&
+      $resetEvents.length > 0,
+  );
+  let actionsDisabled = $derived(
+    !resetEnabled && !signalEnabled && !terminateEnabled,
+  );
+
+  const getResetDescription = ({
+    resetAuthorized,
+    canResetWithPendingChildWorkflows,
+    resetEvents,
+  }) => {
+    if (!resetAuthorized) {
+      return translate('workflows.reset-disabled-unauthorized');
+    } else if (resetAuthorized && !canResetWithPendingChildWorkflows) {
+      return translate('workflows.reset-disabled-pending-children');
+    } else if (
+      resetAuthorized &&
+      canResetWithPendingChildWorkflows &&
+      resetEvents.length === 0
+    ) {
+      return translate('workflows.reset-disabled-no-events');
+    }
+    return '';
+  };
+
+  let resetDescription = $derived(
+    getResetDescription({
+      resetAuthorized,
+      canResetWithPendingChildWorkflows,
+      resetEvents: $resetEvents,
+    }),
+  );
 
   let workflowActions: {
     label: string;
@@ -90,23 +118,7 @@
     testId: string;
     destructive?: boolean;
     description?: string;
-  }[];
-
-  $: {
-    if (!resetAuthorized) {
-      resetDescription = translate('workflows.reset-disabled-unauthorized');
-    } else if (resetAuthorized && !canResetWithPendingChildWorkflows) {
-      resetDescription = translate('workflows.reset-disabled-pending-children');
-    } else if (
-      resetAuthorized &&
-      canResetWithPendingChildWorkflows &&
-      $resetEvents.length === 0
-    ) {
-      resetDescription = translate('workflows.reset-disabled-no-events');
-    }
-  }
-
-  $: workflowActions = [
+  }[] = $derived([
     {
       label: translate('workflows.reset'),
       onClick: () => (resetConfirmationModalOpen = true),
@@ -138,89 +150,113 @@
         ? ''
         : translate('workflows.terminate-disabled'),
     },
-  ];
+  ]);
 </script>
 
-{#if isRunning}
-  <SplitButton
-    id="workflow-actions"
-    menuClass="w-[16rem] md:w-[24rem]"
-    position="right"
-    disabled={actionsDisabled}
-    primaryActionDisabled={!cancelEnabled || cancelInProgress}
-    on:click={() => (cancelConfirmationModalOpen = true)}
-    label={translate('workflows.request-cancellation')}
-    menuLabel={translate('workflows.workflow-actions')}
-  >
-    {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
-      {#if destructive}
-        <MenuDivider />
-      {/if}
-      <MenuItem
-        on:click={onClick}
-        {destructive}
-        disabled={!enabled}
-        data-testid={testId}
-        {description}
-      >
-        {label}
-      </MenuItem>
-    {/each}
-    {#if !workflowCreateDisabled($page)}
-      <MenuDivider />
-      <MenuItem
-        on:click={() =>
-          goto(
-            routeForWorkflowStart({
-              namespace,
-              workflowId: workflow.id,
-              taskQueue: workflow.taskQueue,
-              workflowType: workflow.name,
-            }),
-          )}
-        data-testid="start-workflow-button"
-      >
-        {translate('workflows.start-workflow-like-this-one')}
-      </MenuItem>
-    {/if}
-  </SplitButton>
-{:else}
-  <SplitButton
-    id="workflow-actions"
-    menuClass="w-[16rem]"
-    position="right"
-    primaryActionDisabled={!resetEnabled}
-    on:click={() => (resetConfirmationModalOpen = true)}
-    label={translate('workflows.reset')}
-    menuLabel={translate('workflows.workflow-actions')}
-  >
-    <MenuItem
-      on:click={() =>
-        goto(
-          routeForWorkflowStart({
-            namespace,
-            workflowId: workflow.id,
-            taskQueue: workflow.taskQueue,
-            workflowType: workflow.name,
-          }),
-        )}
-      disabled={workflowCreateDisabled($page)}
-      data-testid="start-workflow-button"
+<div class="flex items-center gap-2">
+  {#if isRunning}
+    <Button
+      on:click={() => (cancelConfirmationModalOpen = true)}
+      disabled={!cancelEnabled || cancelInProgress}
+      size="sm"
     >
-      {translate('workflows.start-workflow-like-this-one')}
-    </MenuItem>
-    {#if terminateEnabled && next}
-      <MenuDivider />
-      <MenuItem
-        on:click={() => (terminateConfirmationModalOpen = true)}
-        data-testid="terminate-button"
-        destructive
+      {translate('workflows.request-cancellation')}
+    </Button>
+    <MenuContainer>
+      <MenuButton
+        disabled={actionsDisabled}
+        hasIndicator
+        controls="workflow-actions"
+        variant="secondary"
+        size="sm"
       >
-        {translate('workflows.terminate-latest')}
-      </MenuItem>
-    {/if}
-  </SplitButton>
-{/if}
+        {translate('workflows.more-actions')}
+      </MenuButton>
+      <Menu
+        id="workflow-actions"
+        position="right"
+        class="w-[16rem] md:w-[24rem]"
+      >
+        {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
+          {#if destructive}
+            <MenuDivider />
+          {/if}
+          <MenuItem
+            on:click={onClick}
+            {destructive}
+            disabled={!enabled}
+            data-testid={testId}
+            {description}
+          >
+            {label}
+          </MenuItem>
+        {/each}
+        {#if !workflowCreateDisabled($page)}
+          <MenuDivider />
+          <MenuItem
+            on:click={() =>
+              goto(
+                routeForWorkflowStart({
+                  namespace,
+                  workflowId: workflow.id,
+                  taskQueue: workflow.taskQueue,
+                  workflowType: workflow.name,
+                }),
+              )}
+            data-testid="start-workflow-button"
+          >
+            {translate('workflows.start-workflow-like-this-one')}
+          </MenuItem>
+        {/if}
+      </Menu>
+    </MenuContainer>
+  {:else}
+    <Button
+      on:click={() => (resetConfirmationModalOpen = true)}
+      disabled={!resetEnabled}
+      size="sm"
+    >
+      {translate('workflows.reset')}
+    </Button>
+    <MenuContainer>
+      <MenuButton
+        hasIndicator
+        controls="workflow-actions"
+        variant="secondary"
+        size="sm"
+      >
+        {translate('workflows.more-actions')}
+      </MenuButton>
+      <Menu id="workflow-actions" position="right" class="w-[16rem]">
+        <MenuItem
+          on:click={() =>
+            goto(
+              routeForWorkflowStart({
+                namespace,
+                workflowId: workflow.id,
+                taskQueue: workflow.taskQueue,
+                workflowType: workflow.name,
+              }),
+            )}
+          disabled={workflowCreateDisabled($page)}
+          data-testid="start-workflow-button"
+        >
+          {translate('workflows.start-workflow-like-this-one')}
+        </MenuItem>
+        {#if terminateEnabled && next}
+          <MenuDivider />
+          <MenuItem
+            on:click={() => (terminateConfirmationModalOpen = true)}
+            data-testid="terminate-button"
+            destructive
+          >
+            {translate('workflows.terminate-latest')}
+          </MenuItem>
+        {/if}
+      </Menu>
+    </MenuContainer>
+  {/if}
+</div>
 
 {#if resetEnabled}
   <ResetConfirmationModal

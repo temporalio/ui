@@ -112,15 +112,15 @@
   </div>
 </div>
 <header class="flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
+  <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
     <div
-      class="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-center"
+      class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
     >
       <div
-        class="flex flex-wrap items-center justify-between gap-4 max-lg:w-full"
+        class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
       >
         <WorkflowStatus status={workflow?.status} big />
-        <div class="lg:hidden">
+        <div class="xl:hidden">
           <WorkflowActions
             {isRunning}
             {cancelInProgress}
@@ -147,7 +147,7 @@
         </h1>
       </div>
     </div>
-    <div class="max-lg:hidden">
+    <div class="max-xl:hidden">
       <WorkflowActions
         {isRunning}
         {cancelInProgress}
