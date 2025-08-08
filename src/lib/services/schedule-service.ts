@@ -97,7 +97,7 @@ export async function deleteSchedule(
     scheduleId,
     identity,
   }: ScheduleParameters & {
-    identity: string;
+    identity?: string;
   },
   request = fetch,
 ): Promise<void> {
@@ -113,7 +113,7 @@ type CreateScheduleOptions = {
   namespace: string;
   scheduleId: string;
   body: CreateScheduleRequest;
-  identity: string;
+  identity?: string;
 };
 
 export async function createSchedule({
@@ -162,7 +162,7 @@ export async function editSchedule({
   scheduleId,
   body,
   identity,
-}: Partial<EditScheduleOptions> & { identity: string }): Promise<{
+}: Partial<EditScheduleOptions> & { identity?: string }): Promise<{
   error: string;
 }> {
   let error = '';
@@ -194,7 +194,7 @@ type PauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
   reason: string;
-  identity: string;
+  identity?: string;
 };
 
 export async function pauseSchedule({
@@ -230,7 +230,7 @@ type UnpauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
   reason: string;
-  identity: string;
+  identity?: string;
 };
 
 export async function unpauseSchedule({
@@ -265,7 +265,7 @@ type TriggerImmediatelyOptions = {
   namespace: string;
   scheduleId: string;
   overlapPolicy: OverlapPolicy;
-  identity: string;
+  identity?: string;
 };
 
 export async function triggerImmediately({

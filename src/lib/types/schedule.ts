@@ -33,7 +33,7 @@ export type SchedulePreset =
 export type ScheduleOffsetUnit = 'days' | 'hrs' | 'min' | 'sec';
 
 export type ScheduleActionParameters = {
-  identity: string;
+  identity?: string;
   namespace: string;
   name: string;
   workflowType: string;

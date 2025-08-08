@@ -122,6 +122,7 @@ type StartWorkflowOptions = {
   summary: string;
   details: string;
   searchAttributes: SearchAttributeInput[];
+  identity?: string;
 };
 
 type TerminateWorkflowOptions = {
@@ -129,7 +130,7 @@ type TerminateWorkflowOptions = {
   namespace: string;
   reason: string;
   first: string | undefined;
-  identity: string;
+  identity?: string;
 };
 
 export type ResetWorkflowOptions = {
@@ -137,7 +138,7 @@ export type ResetWorkflowOptions = {
   workflow: WorkflowExecution;
   eventId: string;
   reason: string;
-  identity: string;
+  identity?: string;
   // used pre temporal server v1.24
   includeSignals: boolean;
   // used post temporal server v1.24
