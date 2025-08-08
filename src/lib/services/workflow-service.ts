@@ -581,6 +581,7 @@ export async function startWorkflow({
   encoding,
   messageType,
   searchAttributes,
+  identity,
 }: StartWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow', {
     namespace,
@@ -641,6 +642,7 @@ export async function startWorkflow({
               ...setSearchAttributes(searchAttributes),
             },
           },
+    ...(identity ? { identity } : {}),
   });
 
   return requestFromAPI(route, {
