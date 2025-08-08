@@ -13,6 +13,7 @@
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { temporalVersion } from '$lib/stores/versions';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
@@ -28,6 +29,8 @@
   let includeSignals = true;
   let excludeSignals = false;
   let excludeUpdates = false;
+
+  const identity = getIdentity();
 
   const hideResetModal = () => {
     open = false;
@@ -50,6 +53,7 @@
         includeSignals,
         excludeSignals,
         excludeUpdates,
+        identity,
       });
 
       if (response && response.runId) {

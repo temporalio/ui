@@ -15,11 +15,11 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { batchResetWorkflows } from '$lib/services/batch-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
-  import { getPlacholder } from '$lib/utilities/workflow-actions';
+  import { getPlaceholder } from '$lib/utilities/workflow-actions';
 
   import BatchOperationConfirmationForm from './batch-operation-confirmation-form.svelte';
 
@@ -28,8 +28,9 @@
   let error = '';
   let jobIdPlaceholder = v4();
   let resetType = writable<'first' | 'last'>('first');
+  const identity = getIdentity();
   const reason = writable('');
-  const reasonPlaceholder = getPlacholder(Action.Reset, $authUser.email);
+  const reasonPlaceholder = getPlaceholder(Action.Reset, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
 

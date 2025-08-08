@@ -15,11 +15,12 @@
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { clearAuthUser } from '$lib/stores/auth-user';
+  import { authUser, clearAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
+  import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
     routeForArchivalWorkfows,
@@ -218,6 +219,10 @@
 
   afterNavigate(() => {
     document.getElementById('content')?.scrollTo(0, 0);
+  });
+
+  setCoreContext({
+    getUserIdentifier: () => $authUser.email || '',
   });
 </script>
 

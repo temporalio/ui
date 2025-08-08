@@ -7,6 +7,7 @@
   import { terminateWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
   export let open: boolean;
@@ -18,6 +19,8 @@
   let reason: string = '';
   let error: string = '';
   let loading = false;
+
+  const identity = getIdentity();
 
   const hideModal = () => {
     open = false;
@@ -33,6 +36,7 @@
         namespace,
         reason,
         first,
+        identity,
       });
       open = false;
       reason = '';

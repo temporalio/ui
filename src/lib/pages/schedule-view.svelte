@@ -43,6 +43,7 @@
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate, getUTCString } from '$lib/utilities/format-date';
   import {
@@ -56,6 +57,8 @@
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
   let workflowQuery = `TemporalScheduledById="${scheduleId}"`;
+
+  const identity = getIdentity();
 
   const parameters = {
     namespace,
@@ -119,7 +122,7 @@
     error = '';
     try {
       $loading = true;
-      await deleteSchedule({ namespace, scheduleId });
+      await deleteSchedule({ identity, namespace, scheduleId });
       deleteConfirmationModalOpen = false;
       setTimeout(() => {
         $loading = false;
@@ -137,11 +140,13 @@
   const handlePause = async (schedule: DescribeScheduleResponse) => {
     schedule?.schedule?.state?.paused
       ? await unpauseSchedule({
+          identity,
           namespace,
           scheduleId,
           reason,
         })
       : await pauseSchedule({
+          identity,
           namespace,
           scheduleId,
           reason,
@@ -159,6 +164,7 @@
   const handleTriggerImmediately = async () => {
     scheduleUpdating = true;
     await triggerImmediately({
+      identity,
       namespace,
       scheduleId,
       overlapPolicy: $overlapPolicy,
@@ -232,6 +238,7 @@
     });
 
     await backfillRequest({
+      identity,
       namespace,
       scheduleId,
       overlapPolicy: $overlapPolicy,

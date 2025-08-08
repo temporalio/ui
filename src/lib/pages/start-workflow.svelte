@@ -32,6 +32,7 @@
   } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForEventHistory,
@@ -42,6 +43,8 @@
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   $: ({ namespace } = $page.params);
+
+  const identity = getIdentity();
 
   let workflowId = '';
   let taskQueue = '';
@@ -89,6 +92,7 @@
         encoding: $encoding,
         messageType,
         searchAttributes,
+        identity,
       });
       toaster.push({
         variant: 'success',

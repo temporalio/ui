@@ -91,6 +91,7 @@ export const submitCreateSchedule = async ({
   presets,
 }: ScheduleParameterArgs): Promise<void> => {
   const {
+    identity,
     namespace,
     name,
     workflowId,
@@ -154,6 +155,7 @@ export const submitCreateSchedule = async ({
   // Wait 2 seconds for create to get it on fetchAllSchedules
   loading.set(true);
   const { error: err } = await createSchedule({
+    identity,
     scheduleId: name,
     namespace,
     body,
@@ -177,6 +179,7 @@ export const submitEditSchedule = async (
   scheduleId: string,
 ): Promise<void> => {
   const {
+    identity,
     namespace,
     name,
     workflowId,
@@ -246,6 +249,7 @@ export const submitEditSchedule = async (
   // Wait 2 seconds for edit to get it on fetchSchedule
   loading.set(true);
   const { error: err } = await editSchedule({
+    identity,
     namespace,
     scheduleId,
     body,
