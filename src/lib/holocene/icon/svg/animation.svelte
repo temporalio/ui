@@ -4,17 +4,15 @@
   type Step = {
     class: string;
     label: string;
-    count?: number;
   };
   type Props = {
+    width: number;
+    height: number;
     steps: Step[];
     animate?: boolean;
     delay?: number;
-    showCounts?: boolean;
   };
-  let props: Props = $props();
-
-  let { steps, animate = true, delay = 500, showCounts = true } = props;
+  let { width, height, steps, animate = true, delay = 500 }: Props = $props();
   let step = $state(animate ? 0 : steps.length - 1);
   let interval;
 
@@ -70,30 +68,6 @@
     return stops;
   });
 
-  // Calculate positions for count labels along the path
-  const countPositions = $derived.by(() => {
-    const currentSteps = steps.slice(0, step + 1);
-    return currentSteps
-      .map((stepItem, index) => {
-        if (!stepItem.count) return null;
-
-        // Calculate position along the straight line from (32,45) to (68,45)
-        const t =
-          currentSteps.length === 1 ? 0.5 : index / (currentSteps.length - 1);
-
-        // Linear interpolation between start and end points
-        const x = 32 + (68 - 32) * t;
-        const y = 45;
-
-        return {
-          x,
-          y: y - 14, // Position above the path
-          count: stepItem.count,
-        };
-      })
-      .filter(Boolean);
-  });
-
   onMount(() => {
     interval = setInterval(() => {
       if (step < steps.length - 1) {
@@ -105,18 +79,13 @@
   });
 </script>
 
-<svg
-  viewBox="0 0 100 100"
-  width="400"
-  height="400"
-  xmlns="http://www.w3.org/2000/svg"
->
+<svg viewBox="0 0 100 100" {width} {height} xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient
       id="stepGradient"
-      x1="32"
+      x1="20"
       y1="45"
-      x2="68"
+      x2="80"
       y2="45"
       gradientUnits="userSpaceOnUse"
     >
@@ -147,7 +116,7 @@
     filter="url(#dropShadow)"
   />
   <path
-    d="M 32 45 C 2 30, 98 30, 68 45"
+    d="M 20 45 C -28 30, 128 30, 80 45"
     stroke-width="4"
     fill="transparent"
     stroke="url(#stepGradient)"
@@ -166,24 +135,6 @@
   >
     {steps[step]?.label || ''}
   </text>
-
-  {#if showCounts}
-    <!-- Count labels with background for better readability -->
-    {#each countPositions as position}
-      <g transform="rotate(-75, {position.x}, {position.y})">
-        <text
-          x={position.x}
-          y={position.y}
-          text-anchor="start"
-          dominant-baseline="middle"
-          font-size="2.5"
-          class="font-mono font-semibold"
-        >
-          {position.count}x
-        </text>
-      </g>
-    {/each}
-  {/if}
 </svg>
 
 <style>
