@@ -148,7 +148,7 @@
   />
   <path
     d="M 32 45 C 2 30, 98 30, 68 45"
-    stroke-width="3"
+    stroke-width="4"
     fill="transparent"
     stroke="url(#stepGradient)"
     filter="url(#glow)"
