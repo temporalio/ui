@@ -7,6 +7,37 @@
   let step = $state(0);
   let interval;
 
+  // Color mapping for each step class
+  const colorMap = {
+    workflow: '#ebebeb',
+    marker: '#ebebeb',
+    command: '#ebebeb',
+    timer: '#fbbf24',
+    signal: '#d300d8',
+    activity: '#a78bfa',
+    pending: '#a78bfa',
+    retry: '#f87171',
+    child: '#67e4f9',
+    completed: '#00964e',
+    failed: '#c71607',
+    terminated: '#c71607',
+    signaled: '#d300d8',
+    fired: '#f8a208',
+    'timed-out': '#f97316',
+    canceled: '#fed64b',
+    running: '#3b82f6',
+  };
+
+  // Generate gradient stops based on current step
+  const gradientStops = $derived.by(() => {
+    const currentSteps = steps.slice(0, step + 1);
+    return currentSteps.map((stepItem, index) => {
+      const color = colorMap[stepItem.class] || '#3b82f6';
+      const percentage = (index / Math.max(currentSteps.length - 1, 1)) * 100;
+      return { color, percentage };
+    });
+  });
+
   onMount(() => {
     interval = setInterval(() => {
       if (step < steps.length - 1) {
@@ -24,11 +55,18 @@
   height="400"
   xmlns="http://www.w3.org/2000/svg"
 >
+  <defs>
+    <linearGradient id="stepGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      {#each gradientStops as stop}
+        <stop offset="{stop.percentage}%" stop-color={stop.color} />
+      {/each}
+    </linearGradient>
+  </defs>
   <path
     d="M 32 45 C 2 30, 98 30, 68 45"
     stroke-width="3"
     fill="transparent"
-    class={steps[step]?.class || 'running'}
+    stroke="url(#stepGradient)"
   />
   <text
     x="35"
