@@ -70,8 +70,9 @@
   />
   <text
     x="35"
-    y="49"
+    y="48"
     textLength="30"
+    font-size="11"
     dominant-baseline="top"
     lengthAdjust="spacingAndGlyphs"
     style="transform-origin: 32px 45px; transform: scaleY(.8);"

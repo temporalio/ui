@@ -4,8 +4,10 @@
   const steps = [
     { class: 'running', label: 'Start' },
     { class: 'timer', label: 'Sleep' },
-    { class: 'signal', label: 'Child' },
+    { class: 'child', label: 'Child x3' },
+    { class: 'signal', label: 'Signal' },
     { class: 'completed', label: 'Activity x15' },
+    { class: 'timer', label: 'Sleep' },
     { class: 'completed', label: 'Completed' },
   ];
 </script>
