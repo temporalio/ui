@@ -1,5 +1,6 @@
 import activity from './svg/activity.svelte';
 import add from './svg/add.svelte';
+import animation from './svg/animation.svelte';
 import apple from './svg/apple.svelte';
 import archives from './svg/archives.svelte';
 import arrowDown from './svg/arrow-down.svelte';
@@ -130,6 +131,7 @@ import xmarkFilled from './svg/xmark-filled.svelte';
 export const icons = {
   activity,
   add,
+  animation,
   apple,
   archives,
   'arrow-down': arrowDown,
