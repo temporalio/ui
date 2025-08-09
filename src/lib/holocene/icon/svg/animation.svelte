@@ -3,8 +3,8 @@
 
   let props = $props();
 
-  let { steps } = props;
-  let step = $state(0);
+  let { steps, animate = true, delay = 500 } = props;
+  let step = $state(animate ? 0 : steps.length - 1);
   let interval;
 
   // Color mapping for each step class
@@ -28,14 +28,35 @@
     running: '#3b82f6',
   };
 
-  // Generate gradient stops based on current step
+  // Generate gradient stops based on current step with hard stops
   const gradientStops = $derived.by(() => {
     const currentSteps = steps.slice(0, step + 1);
-    return currentSteps.map((stepItem, index) => {
-      const color = colorMap[stepItem.class] || '#3b82f6';
-      const percentage = (index / Math.max(currentSteps.length - 1, 1)) * 100;
-      return { color, percentage };
-    });
+    const stops = [];
+
+    if (currentSteps.length === 1) {
+      // Single step - use solid color
+      const color = colorMap[currentSteps[0].class] || '#3b82f6';
+      stops.push({ color, percentage: 0 });
+      stops.push({ color, percentage: 100 });
+    } else {
+      // Multiple steps - equal segments with hard boundaries
+      const segmentSize = 100 / currentSteps.length;
+
+      currentSteps.forEach((stepItem, index) => {
+        const color = colorMap[stepItem.class] || '#3b82f6';
+        const start = index * segmentSize;
+        const end = (index + 1) * segmentSize;
+
+        // Ensure first color starts at 0% and last color ends at 100%
+        const actualStart = index === 0 ? 0 : start;
+        const actualEnd = index === currentSteps.length - 1 ? 100 : end;
+
+        stops.push({ color, percentage: actualStart });
+        stops.push({ color, percentage: actualEnd });
+      });
+    }
+
+    return stops;
   });
 
   onMount(() => {
@@ -43,7 +64,7 @@
       if (step < steps.length - 1) {
         step += 1;
       }
-    }, 1000);
+    }, delay);
 
     return () => clearInterval(interval);
   });
@@ -56,7 +77,14 @@
   xmlns="http://www.w3.org/2000/svg"
 >
   <defs>
-    <linearGradient id="stepGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient
+      id="stepGradient"
+      x1="32"
+      y1="45"
+      x2="68"
+      y2="45"
+      gradientUnits="userSpaceOnUse"
+    >
       {#each gradientStops as stop}
         <stop offset="{stop.percentage}%" stop-color={stop.color} />
       {/each}

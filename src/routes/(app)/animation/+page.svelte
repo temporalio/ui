@@ -7,8 +7,12 @@
     { class: 'child', label: 'Child x3' },
     { class: 'signal', label: 'Signal' },
     { class: 'completed', label: 'Activity x15' },
+
+    { class: 'child', label: 'Child x3' },
+    { class: 'signal', label: 'Signal' },
+    { class: 'completed', label: 'Activity x15' },
     { class: 'timer', label: 'Sleep' },
-    { class: 'completed', label: 'Completed' },
+    { class: 'failed', label: 'Failed' },
   ];
 </script>
 
