@@ -10,15 +10,15 @@
     { class: 'signal', label: 'Signal' },
     { class: 'completed', label: 'Activity' },
     { class: 'completed', label: 'Activity' },
+    { class: 'pending', label: 'Activity' },
     { class: 'completed', label: 'Activity' },
-    { class: 'completed', label: 'Activity' },
-    { class: 'completed', label: 'Activity' },
+    { class: 'retry', label: 'Activity' },
     { class: 'completed', label: 'Activity' },
     { class: 'child', label: 'Child' },
     { class: 'signal', label: 'Signal' },
     { class: 'completed', label: 'Activity' },
     { class: 'timer', label: 'Sleep' },
-    { class: 'failed', label: 'Failed' },
+    { class: 'running', label: 'Running' },
   ];
 </script>
 
