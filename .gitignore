@@ -10,7 +10,7 @@ node_modules
 /build-local
 /.history
 /build
-/bin
+/bin/cli
 server/ui-server
 server/api
 server/ui/assets
