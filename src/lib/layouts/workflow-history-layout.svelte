@@ -10,7 +10,7 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
-  import BoxAnimation from '$lib/holocene/icon/svg/box-animation.svelte';
+  import BoxAnimationContainer from '$lib/holocene/icon/svg/box-animation-container.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -137,10 +137,7 @@
       </ToggleButtons>
     </div>
   </div>
-  <BoxAnimation
-    steps={groups.map((g) => g.label.split(' ')[0].toLowerCase())}
-  />
-
+  <BoxAnimationContainer {workflow} history={$filteredEventHistory} />
   <div class="flex w-full flex-col border-t border-subtle">
     <TimelineGraph
       {workflow}
