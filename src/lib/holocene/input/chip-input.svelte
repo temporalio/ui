@@ -20,10 +20,10 @@
   export let external = false;
   export let maxLength = 0;
 
-  const values = writable<string[]>(chips);
+  const values = writable<string[]>(Array.isArray(chips) ? [...chips] : []);
   let displayValue = '';
 
-  $: chips, ($values = chips);
+  $: chips, ($values = chips ?? []);
   $: invalid = $values.some((chip) => !validator(chip));
 
   let className = '';
