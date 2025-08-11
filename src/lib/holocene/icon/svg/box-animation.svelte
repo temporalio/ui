@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  import Icon from '../icon.svelte';
+
   type Props = {
     steps: string[];
     animate?: boolean;
@@ -27,159 +29,157 @@
   {@const start = index * width}
   {@const x = start + width / 2}
   {@const y = mid + 5}
-  <g class="fly-in" style="animation-delay: {index * 100}ms;">
-    <path
-      d={`M ${x} ${y} L ${x} ${y - 4} M ${x - 1} ${y - 3} L ${x} ${y - 4} L ${x + 1} ${y - 3}`}
-      stroke-width=".25"
-      stroke="#d300d8"
-      fill="none"
-    />
-  </g>
+  <rect
+    x={start}
+    y={mid - 5}
+    {width}
+    height="4"
+    fill="transparent"
+    stroke="#d300d8"
+    stroke-width=".15"
+  />
+  <path
+    d={`M ${x} ${y} L ${x} ${y - 4} M ${x - 1} ${y - 3} L ${x} ${y - 4} L ${x + 1} ${y - 3}`}
+    stroke-width=".25"
+    stroke="#d300d8"
+    fill="none"
+  />
 {/snippet}
 
 {#snippet update(index: number, width: number)}
   {@const start = index * width}
   {@const x = start + width / 2}
   {@const y = mid + 5}
-  <g class="fly-in" style="animation-delay: {index * 100}ms;">
-    <path
-      d={`M ${x} ${y} L ${x} ${y - 4} M ${x - 1} ${y - 3} L ${x} ${y - 4} L ${x + 1} ${y - 3}`}
-      stroke-width=".25"
-      stroke="purple"
-      fill="none"
-    />
-    <path
-      d={`M ${x + 1.5} ${y - 4} L ${x + 1.5} ${y} M ${x + 0.5} ${y - 1} L ${x + 1.5} ${y} L ${x + 2.5} ${y - 1}`}
-      stroke-width=".25"
-      stroke="purple"
-      fill="none"
-    />
-  </g>
+  <rect
+    x={start}
+    y={mid - 5}
+    {width}
+    height="4"
+    fill="transparent"
+    stroke="purple"
+    stroke-width=".15"
+  />
+  <path
+    d={`M ${x} ${y} L ${x} ${y - 4} M ${x - 1} ${y - 3} L ${x} ${y - 4} L ${x + 1} ${y - 3}`}
+    stroke-width=".25"
+    stroke="purple"
+    fill="none"
+  />
+  <path
+    d={`M ${x + 1.5} ${y - 4} L ${x + 1.5} ${y} M ${x + 0.5} ${y - 1} L ${x + 1.5} ${y} L ${x + 2.5} ${y - 1}`}
+    stroke-width=".25"
+    stroke="purple"
+    fill="none"
+  />
 {/snippet}
 
 {#snippet activity(index: number, width: number)}
   {@const x = index * width}
   {@const y = mid - 5}
   {@const pending = index % 3 === 0}
-  <g class="fly-in" style="animation-delay: {index * 100}ms;">
-    <rect
-      {x}
-      {y}
-      {width}
-      height="4"
-      stroke="black"
-      stroke-width=".15"
-      fill={pending ? 'lightgreen' : '#00964e'}
-    />
-    {#if pending}
-      <line
-        x1={x + width / 2}
-        y1={y}
-        x2={x + width / 2}
-        y2={y - 4}
-        stroke="black"
-        stroke-width=".25"
-        stroke-dasharray=".5"
-      />
-      <g transform={`translate(${x + width / 2}, ${y - 4})`}>
-        <rect
-          x="-1"
-          y="-2"
-          width="2"
-          height="1.65"
-          rx="0.2"
-          fill="none"
-          stroke="black"
-          stroke-width="0.1"
-        />
-        <circle cx="-0.4" cy="-1.3" r="0.15" fill="black" />
-        <circle cx="0.4" cy="-1.3" r="0.15" fill="black" />
-        <rect x="-0.3" y="-0.8" width="0.6" height="0.1" fill="black" />
-      </g>
-    {/if}
+  <rect
+    {x}
+    {y}
+    {width}
+    height="4"
+    stroke="black"
+    stroke-width=".15"
+    fill={pending ? 'lightgreen' : '#00964e'}
+  />
+  <g transform={`translate(${x + width / 3}, ${y + 0.75}) scale(0.75)`}>
+    <Icon width={3} height={3} name="toolbox" />
   </g>
+  {#if pending}
+    <line
+      x1={x + width / 2}
+      y1={y}
+      x2={x + width / 2}
+      y2={y - 4}
+      stroke="black"
+      stroke-width=".25"
+      stroke-dasharray=".5"
+    />
+    <g transform={`translate(${x + width / 4.5}, ${y - 6})`}>
+      <Icon width={3} height={3} name="robot" />
+    </g>
+  {/if}
 {/snippet}
 
 {#snippet child(index: number, width: number)}
   {@const x = index * width}
   {@const y = mid - 5}
-  <g class="fly-in" style="animation-delay: {index * 100}ms;">
-    <rect
-      {x}
-      {y}
-      {width}
-      height="4"
-      fill="#67e4f9"
-      stroke="black"
-      stroke-width=".15"
-    />
-    {#if true}
-      <line
-        x1={x + width / 2}
-        y1={y + 4}
-        x2={x + width / 2}
-        y2={y + 15}
-        stroke="black"
-        stroke-width=".25"
-        stroke-dasharray=".5"
-      />
-      <line
-        x1={x + width / 2}
-        y1={y + 15}
-        x2={100}
-        y2={y + 15}
-        stroke-width="1"
-        stroke="black"
-      />
-    {/if}
+  <rect
+    {x}
+    {y}
+    {width}
+    height="4"
+    fill="#67e4f9"
+    stroke="black"
+    stroke-width=".15"
+  />
+  <g transform={`translate(${x + width / 3}, ${y + 0.75}) scale(0.75)`}>
+    <Icon width={3} height={3} name="relationship" />
   </g>
+  {#if true}
+    <path
+      d={`M ${x + width / 2} ${y + 4} L ${x + width / 2} ${y + 12} C ${x + width / 2 + 20} ${y + 12}, ${100 - 20} ${y + 12}, 100 ${y + 12}`}
+      stroke="black"
+      stroke-width=".25"
+      stroke-dasharray=".5"
+      fill="none"
+    />
+  {/if}
 {/snippet}
 
 {#snippet timer(index: number, width: number)}
   {@const x = index * width}
-  <g class="fly-in" style="animation-delay: {index * 100}ms;">
-    <rect
-      {x}
-      y={mid - 5}
-      {width}
-      height="4"
-      fill="#fbbf24"
-      stroke="black"
-      stroke-width=".15"
-    />
+  {@const y = mid - 5}
+
+  <rect
+    {x}
+    y={mid - 5}
+    {width}
+    height="4"
+    fill="#fbbf24"
+    stroke="black"
+    stroke-width=".15"
+  />
+  <g transform={`translate(${x + width / 3}, ${y + 0.75}) scale(0.75)`}>
+    <Icon width={3} height={3} name="retention" />
   </g>
 {/snippet}
 
 {#snippet marker(index: number, width: number)}
   {@const x = index * width}
-  <g class="fly-in" style="animation-delay: {index * 100}ms;">
-    <rect
-      {x}
-      y={mid - 5}
-      {width}
-      height="4"
-      fill="grey"
-      stroke="black"
-      stroke-width=".15"
-    />
-  </g>
+  <rect
+    {x}
+    y={mid - 5}
+    {width}
+    height="4"
+    fill="grey"
+    stroke="black"
+    stroke-width=".15"
+  />
 {/snippet}
 
 {#snippet renderStep(type, index)}
   {@const width = 100 / steps.length}
-  {#if type === 'signal'}
-    {@render signal(index, width)}
-  {:else if type === 'update'}
-    {@render update(index, width)}
-  {:else if type === 'activity'}
-    {@render activity(index, width)}
-  {:else if type === 'timer'}
-    {@render timer(index, width)}
-  {:else if type === 'child'}
-    {@render child(index, width)}
-  {:else if type === 'marker'}
-    {@render marker(index, width)}
-  {/if}
+  {@const delay = (1000 / steps.length) * index}
+  <g class="fly-in" style="animation-delay: {delay}ms;">
+    {#if type === 'signal'}
+      {@render signal(index, width)}
+    {:else if type === 'update'}
+      {@render update(index, width)}
+    {:else if type === 'activity'}
+      {@render activity(index, width)}
+    {:else if type === 'timer'}
+      {@render timer(index, width)}
+    {:else if type === 'child'}
+      {@render child(index, width)}
+    {:else if type === 'marker'}
+      {@render marker(index, width)}
+    {/if}
+  </g>
 {/snippet}
 
 <svg viewBox="-1 0 101 {height}" xmlns="http://www.w3.org/2000/svg">
@@ -271,12 +271,12 @@
 
   @keyframes flyIn {
     0% {
-      transform: translateX(-10px) scale(0.8);
+      transform: translateX(-10px) scale(0.95);
       opacity: 0;
     }
 
     50% {
-      transform: translateX(2px) scale(1.1);
+      transform: translateX(2px) scale(1.05);
     }
 
     100% {
@@ -286,6 +286,6 @@
   }
 
   .fly-in {
-    animation: flyIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: flyIn 0.3s cubic-bezier(0.24, 1.36, 0.44, 1) both;
   }
 </style>
