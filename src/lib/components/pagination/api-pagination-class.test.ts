@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ApiPagination, identity } from './api-pagination-class.svelte';
+import { ApiPagination } from './api-pagination-class.svelte';
 
+function identity<T>(i: T) {
+  return i;
+}
 // Mock data structure
 type TestItem = {
   id: string;
@@ -345,5 +348,42 @@ describe('ApiPagination', () => {
     // Try to go next on last page
     await pagination.nextPage();
     expect(pagination.currentPage).toBe(4);
+  });
+
+  it('should infer types correctly when using plain TypeScript functions', async () => {
+    const plainApiFetch = async (_: TestParams): Promise<TestResponse> => {
+      return {
+        items: [
+          { id: '1', value: 10 },
+          { id: '2', value: 20 },
+        ],
+        nextPageToken: 'next-token',
+        total: 2,
+      };
+    };
+
+    const typedPagination = new ApiPagination({
+      onFetch: plainApiFetch,
+      itemsKeyname: 'items',
+      nextPageKeyname: 'nextPageToken',
+      sizeKeyname: 'pageSize',
+      pageTokenKeyname: 'pageToken',
+      transformFunction: (item) => {
+        // Verify item is properly typed as TestItem (not unknown)
+        const _typecheck: TestItem = item;
+        return {
+          ...item,
+          transformedId: `plain-${item.id}`,
+          doubledValue: item.value * 3,
+        };
+      },
+    });
+
+    await typedPagination.fetch({ pageSize: 2 });
+
+    expect(typedPagination.currentItems).toEqual([
+      { id: '1', value: 10, transformedId: 'plain-1', doubledValue: 30 },
+      { id: '2', value: 20, transformedId: 'plain-2', doubledValue: 60 },
+    ]);
   });
 });
