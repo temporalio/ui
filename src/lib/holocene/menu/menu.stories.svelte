@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -91,3 +91,97 @@
 <Story name="Keep Open" args={{ keepOpen: true }} />
 
 <Story name="Right" args={{ position: 'right' }} />
+
+<Story name="Edge Avoidance - Right Edge">
+  <div class="flex h-screen w-screen items-start justify-end p-4">
+    <MenuContainer>
+      <MenuButton hasIndicator variant="primary" controls="edge-right">
+        <Icon slot="leading" name="temporal-logo" />
+        Right Edge Menu
+      </MenuButton>
+      <Menu id="edge-right" class="w-64" position="left">
+        <MenuItem
+          >This menu should flip to the right when near the right edge</MenuItem
+        >
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+      </Menu>
+    </MenuContainer>
+  </div>
+</Story>
+
+<Story name="Edge Avoidance - Left Edge">
+  <div class="flex h-screen w-screen items-start justify-start p-4">
+    <MenuContainer>
+      <MenuButton hasIndicator variant="primary" controls="edge-left">
+        <Icon slot="leading" name="temporal-logo" />
+        Left Edge Menu
+      </MenuButton>
+      <Menu id="edge-left" class="w-64" position="right">
+        <MenuItem
+          >This menu should flip to the left when near the left edge</MenuItem
+        >
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+      </Menu>
+    </MenuContainer>
+  </div>
+</Story>
+
+<Story name="Edge Avoidance - Top Edge">
+  <div class="flex h-screen w-screen items-start justify-center p-4">
+    <MenuContainer>
+      <MenuButton hasIndicator variant="primary" controls="edge-top">
+        <Icon slot="leading" name="temporal-logo" />
+        Top Edge Menu
+      </MenuButton>
+      <Menu id="edge-top" class="w-64" position="top-left">
+        <MenuItem>This menu should flip down when near the top edge</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+        <MenuItem>Item 4</MenuItem>
+        <MenuItem>Item 5</MenuItem>
+      </Menu>
+    </MenuContainer>
+  </div>
+</Story>
+
+<Story name="Escape Key Test">
+  <div class="flex h-screen w-screen items-center justify-center">
+    <MenuContainer>
+      <MenuButton hasIndicator variant="primary" controls="escape-test">
+        <Icon slot="leading" name="temporal-logo" />
+        Press ESC to close
+      </MenuButton>
+      <Menu id="escape-test" class="w-64">
+        <MenuItem>Press Escape key to close this menu</MenuItem>
+        <MenuItem>Tab through items and press Escape</MenuItem>
+        <MenuItem>Works from anywhere in the menu</MenuItem>
+      </Menu>
+    </MenuContainer>
+  </div>
+</Story>
+
+<Story name="Window Resize Test">
+  <div class="flex h-screen w-screen items-start justify-end p-4">
+    <div class="text-center">
+      <p class="text-gray-600 mb-4 text-sm">
+        Open the menu below, then resize your browser window to see edge
+        avoidance in action
+      </p>
+      <MenuContainer>
+        <MenuButton hasIndicator variant="primary" controls="resize-test">
+          <Icon slot="leading" name="temporal-logo" />
+          Resize Test Menu
+        </MenuButton>
+        <Menu id="resize-test" class="w-64" position="left">
+          <MenuItem>Resize the browser window</MenuItem>
+          <MenuItem>Menu will adjust position automatically</MenuItem>
+          <MenuItem>Try making window narrower</MenuItem>
+          <MenuItem>Or taller/shorter</MenuItem>
+          <MenuItem>Edge avoidance responds to resize</MenuItem>
+        </Menu>
+      </MenuContainer>
+    </div>
+  </div>
+</Story>
