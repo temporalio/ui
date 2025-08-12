@@ -185,4 +185,9 @@ export const Strings = {
     description:
       "A workflow task completed requesting a feature that's disabled on the server (either system wide or - typically - for the workflow's namespace). Check the workflow task failure message for more information.",
   },
+  GrpcMessageTooLarge: {
+    title: 'gRPC Message Too Large',
+    description:
+      'A Workflow Task failed because the gRPC message exceeded the maximum allowed size.',
+  },
 } as const;
