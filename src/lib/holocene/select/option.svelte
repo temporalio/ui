@@ -47,6 +47,7 @@
 
   $: {
     if (slotWrapper) {
+      console.log('$effect');
       _value = value ?? slotWrapper.textContent;
       selected = $selectValue === _value;
       label = slotWrapper.textContent;
