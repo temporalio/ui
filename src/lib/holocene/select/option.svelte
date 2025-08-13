@@ -55,6 +55,7 @@
 
   onMount(() => {
     if (slotWrapper) {
+      label = slotWrapper.textContent;
       $options.push({ value, label, nativeElement: optionElement });
     }
   });
