@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { HTMLAttributes } from 'svelte/elements';
   import { writable, type Writable } from 'svelte/store';
 
@@ -13,21 +13,25 @@
     open: Writable<boolean>;
     keepOpen: Writable<boolean>;
     menuElement: Writable<HTMLUListElement>;
+    containerElement: Writable<HTMLDivElement>;
   };
 </script>
 
 <script lang="ts">
-  interface $$Props extends HTMLAttributes<HTMLUListElement> {
+  interface $$Props extends HTMLAttributes<HTMLDivElement> {
     open?: Writable<boolean>;
     class?: string;
   }
 
-  let className = '';
-  export { className as class };
-  export let open: Writable<boolean> = writable(false);
+  let {
+    class: className = '',
+    open = writable(false),
+    ...restProps
+  }: $$Props = $props();
 
   const keepOpen = writable(false);
   const menuElement: Writable<HTMLUListElement> = writable(null);
+  const containerElement: Writable<HTMLDivElement> = writable(null);
   const dispatch = createEventDispatcher<{ close: undefined }>();
 
   const closeMenu = () => {
@@ -37,17 +41,26 @@
     }
   };
 
+  const handleKeydown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      closeMenu();
+    }
+  };
+
   setContext<MenuContext>(MENU_CONTEXT, {
     open,
     keepOpen,
     menuElement,
+    containerElement,
   });
 </script>
 
 <div
   use:clickoutside={closeMenu}
   class={merge('relative', className)}
-  {...$$restProps}
+  bind:this={$containerElement}
+  onkeydown={handleKeydown}
+  {...restProps}
 >
   <slot {open} />
 </div>
