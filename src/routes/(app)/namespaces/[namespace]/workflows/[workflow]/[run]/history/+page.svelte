@@ -3,7 +3,7 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
-  import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
+  import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout-hack.svelte';
   const workflow = $page.params.workflow;
 </script>
 

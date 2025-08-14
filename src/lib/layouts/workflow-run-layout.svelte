@@ -8,7 +8,7 @@
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
-  import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
+  import WorkflowHeader from '$lib/layouts/workflow-header-hack.svelte';
   import {
     fetchAllEvents,
     throttleRefresh,

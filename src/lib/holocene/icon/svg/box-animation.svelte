@@ -15,8 +15,8 @@
   };
   let { groups, onClick }: Props = $props();
 
-  const height = 24;
-  const mid = height / 2;
+  const height = 36;
+  const mid = height - 10;
   const fullWidth = $derived(100 / groups.length);
   const blockWidth = $derived(fullWidth * 1);
   const blockOffset = $derived(fullWidth * 0.0);
@@ -30,10 +30,14 @@
   </g>
 {/snippet}
 
-{#snippet signal(_group: EventGroup, index: number)}
+{#snippet signal(group: EventGroup, index: number)}
   {@const start = index * fullWidth + blockOffset}
   {@const x = start + blockWidth / 2}
   {@const y = mid + 4}
+  {console.log(
+    'group.initialEvent.attributes: ',
+    group.initialEvent.attributes,
+  )}
   <rect
     x={start}
     y={mid - 5}
@@ -46,13 +50,23 @@
   />
   {@render icon('json', start, mid - 5)}
   <path
-    d={`M ${x} ${y} L ${x} ${y - 3} M ${x - 0.5} ${y - 2} L ${x} ${y - 3} L ${x + 0.5} ${y - 2}`}
+    d={`M ${x} ${y} L ${x} ${y - 2.5} M ${x - 0.5} ${y - 2} L ${x} ${y - 2.5} L ${x + 0.5} ${y - 2}`}
     stroke-width=".25"
     stroke="#d300d8"
     fill="none"
     stroke-linecap="round"
     stroke-linejoin="round"
   />
+  <text
+    {x}
+    y={y + 1.5}
+    text-anchor="middle"
+    font-size="1px"
+    font-weight="bold"
+    fill="#374151"
+  >
+    {group.initialEvent.attributes.signalName}
+  </text>
 {/snippet}
 
 {#snippet update(_group: EventGroup, index: number)}
@@ -88,7 +102,93 @@
   />
 {/snippet}
 
-{#snippet activity(group: EventGroup, index: number)}
+{#snippet agent(group: EventGroup, index: number)}
+  {@const x = index * fullWidth + blockOffset}
+  {@const y = mid - 5}
+  {@const attempts = group.eventList[1]?.attributes?.attempt ?? 0}
+  {@const retried = attempts > 1}
+  {@const pending = group.isPending}
+  <defs>
+    <linearGradient id="redToGreenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c71607" />
+      <stop offset="60%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+
+  <rect
+    {x}
+    {y}
+    width={blockWidth}
+    height="4"
+    stroke="#374151"
+    stroke-width=".15"
+    fill={retried
+      ? 'url(#redToGreenGradient)'
+      : pending
+        ? '#a78bfa'
+        : '#10b981'}
+    filter="url(#subtle-shadow)"
+  />
+  {@render icon('circle-question', x, y)}
+  <line
+    x1={x + blockWidth / 2}
+    y1={y}
+    x2={x + blockWidth / 2}
+    y2={y - 2.5}
+    stroke="#64748b"
+    stroke-width=".25"
+    stroke-dasharray=".5"
+    stroke-linecap="round"
+    class="retried"
+  />
+  <rect
+    {x}
+    y={y - 6}
+    width={blockWidth}
+    height="4"
+    stroke="#374151"
+    stroke-width=".15"
+    fill={retried
+      ? 'url(#redToGreenGradient)'
+      : pending
+        ? '#a78bfa'
+        : '#10b981'}
+    filter="url(#subtle-shadow)"
+  />
+  {@render icon('toolbox', x, y - 6)}
+  <line
+    x1={x + blockWidth / 2}
+    y1={y - 6}
+    x2={x + blockWidth / 2}
+    y2={y - 8.5}
+    stroke="#64748b"
+    stroke-width=".25"
+    stroke-dasharray=".5"
+    stroke-linecap="round"
+    class="retried"
+  />
+  <rect
+    {x}
+    y={y - 12}
+    width={blockWidth}
+    height="4"
+    stroke="#374151"
+    stroke-width=".15"
+    fill={retried
+      ? 'url(#redToGreenGradient)'
+      : pending
+        ? '#a78bfa'
+        : '#10b981'}
+    filter="url(#subtle-shadow)"
+  />
+  {@render icon('robot', x, y - 12)}
+
+  <!-- <g transform={`translate(${x + blockWidth / 2 - 1.5}, ${y - 5.5})`}>
+    <Icon width={3} height={3} name="robot" />
+  </g> -->
+{/snippet}
+
+<!-- {#snippet activity(group: EventGroup, index: number)}
   {@const x = index * fullWidth + blockOffset}
   {@const y = mid - 5}
   {@const attempts = group.eventList[1]?.attributes?.attempt ?? 0}
@@ -144,7 +244,7 @@
       {attempts}x
     </text>
   {/if}
-{/snippet}
+{/snippet} -->
 
 {#snippet child(group: EventGroup, index: number)}
   {@const x = index * fullWidth + blockOffset}
@@ -240,7 +340,7 @@
     {:else if type === 'update'}
       {@render update(group, index)}
     {:else if isActivityTaskScheduledEvent(group.initialEvent)}
-      {@render activity(group, index)}
+      {@render agent(group, index)}
     {:else if type === 'timer'}
       {@render timer(group, index)}
     {:else if type === 'child'}
