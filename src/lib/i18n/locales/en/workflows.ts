@@ -16,7 +16,7 @@ export const Strings = {
   'batch-cancel-modal-title': 'Cancel Workflows',
   'batch-reset-modal-title': 'Reset Workflows',
   'workflow-action-reason-placeholder': '{{action}} from the Web UI',
-  'workflow-action-reason-placeholder-with-identity':
+  'workflow-action-reason-placeholder_one':
     '{{action}} from the Web UI by {{identity}}',
   'batch-operation-confirmation-all':
     'Are you sure you want to {{action}} all workflows matching the following query? This action cannot be undone.',

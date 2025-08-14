@@ -21,14 +21,11 @@ export const getPlaceholder = (action: Action, identity?: string): string => {
       unhandledAction(action);
   }
 
-  return identity
-    ? translate('workflows.workflow-action-reason-placeholder-with-identity', {
-        action: translatedAction,
-        identity,
-      })
-    : translate('workflows.workflow-action-reason-placeholder', {
-        action: translatedAction,
-      });
+  return translate('workflows.workflow-action-reason-placeholder', {
+    action: translatedAction,
+    identity,
+    count: identity ? 1 : 0,
+  });
 };
 
 export const formatReason = ({
