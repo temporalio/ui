@@ -228,7 +228,7 @@
 {/snippet}
 
 {#snippet renderStep(group, index)}
-  {@const delay = Math.min(1000 / groups.length, 150) * index}
+  {@const delay = Math.min(300 / groups.length, 150) * index}
   {@const type = group.category.split('-')[0].toLowerCase()}
   <g
     class="fly-in"
@@ -272,65 +272,6 @@
 </svg>
 
 <style>
-  .workflow,
-  .marker,
-  .command {
-    stroke: #ebebeb;
-  }
-
-  .timer {
-    stroke: #fbbf24;
-  }
-
-  .signal {
-    stroke: #d300d8;
-  }
-
-  .activity {
-    stroke: #a78bfa;
-  }
-
-  .pending {
-    stroke: #a78bfa;
-  }
-
-  .retry {
-    stroke: theme('colors.red.300');
-  }
-
-  .child {
-    stroke: #67e4f9;
-  }
-
-  .completed {
-    stroke: #00964e;
-  }
-
-  .failed,
-  .terminated {
-    stroke: #c71607;
-  }
-
-  .signaled {
-    stroke: #d300d8;
-  }
-
-  .fired {
-    stroke: #f8a208;
-  }
-
-  .timed-out {
-    stroke: #f97316;
-  }
-
-  .canceled {
-    stroke: #fed64b;
-  }
-
-  .running {
-    stroke: #3b82f6;
-  }
-
   .retried {
     opacity: 0.85;
     stroke-dashoffset: 0;
@@ -364,10 +305,9 @@
   }
 
   .fly-in {
-    animation: flyIn 0.3s cubic-bezier(0.24, 1.36, 0.44, 1) both;
+    animation: flyIn 0.1s cubic-bezier(0.24, 1.36, 0.44, 1) both;
   }
 
-  /* Professional enterprise styling */
   svg {
     overflow: visible;
   }
@@ -377,6 +317,6 @@
   }
 
   rect:hover {
-    filter: url("#subtle-shadow") brightness(1.15);
+    filter: url('#subtle-shadow') brightness(1.15);
   }
 </style>
