@@ -1,7 +1,7 @@
 <script lang="ts">
+  import Button from '$lib/anthropocene/button.svelte';
   import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowFilters } from '$lib/stores/filters';

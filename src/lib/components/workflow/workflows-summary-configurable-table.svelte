@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';

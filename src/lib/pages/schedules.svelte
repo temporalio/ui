@@ -4,12 +4,12 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -164,7 +164,7 @@
           {#if !createDisabled}
             <Button
               data-testid="create-schedule"
-              on:click={() => goto(routeForScheduleCreate({ namespace }))}
+              onclick={() => goto(routeForScheduleCreate({ namespace }))}
               disabled={!writeActionsAreAllowed()}
             >
               {translate('schedules.create')}
@@ -176,7 +176,7 @@
     <svelte:fragment slot="actions-end-additional">
       <Tooltip text="Configure Columns" top>
         <Button
-          on:click={openCustomizationDrawer}
+          onclick={openCustomizationDrawer}
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"

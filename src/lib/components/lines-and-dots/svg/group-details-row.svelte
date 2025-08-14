@@ -3,9 +3,9 @@
 
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';

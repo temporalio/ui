@@ -3,7 +3,7 @@
 
   import { page } from '$app/stores';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import {

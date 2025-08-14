@@ -3,7 +3,7 @@
 
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
 
   interface $$Props extends HTMLButtonAttributes {

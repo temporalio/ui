@@ -30,6 +30,7 @@
 
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
@@ -40,7 +41,6 @@
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';

@@ -6,8 +6,8 @@
 
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -142,13 +142,13 @@
         <Button
           disabled={Boolean(error)}
           data-testid="confirm-data-encoder-button"
-          on:click={onConfirm}
+          onclick={onConfirm}
           type="submit">{translate('common.apply')}</Button
         >
         <Button
           variant="ghost"
           data-testid="cancel-data-encoder-button"
-          on:click={onCancel}>{translate('common.cancel')}</Button
+          onclick={onCancel}>{translate('common.cancel')}</Button
         >
       </div>
     </div>

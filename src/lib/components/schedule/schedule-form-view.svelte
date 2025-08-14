@@ -5,10 +5,10 @@
 
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';

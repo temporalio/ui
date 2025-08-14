@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { WorkflowExecution } from '@temporalio/client';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';

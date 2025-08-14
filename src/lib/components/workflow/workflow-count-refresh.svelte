@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import { refresh } from '$lib/stores/workflows';
 
   export let count = 0;

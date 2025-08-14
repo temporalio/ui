@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';

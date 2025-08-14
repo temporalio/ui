@@ -9,7 +9,7 @@
 
   import { page } from '$app/stores';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {

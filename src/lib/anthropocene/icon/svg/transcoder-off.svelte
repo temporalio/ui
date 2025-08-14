@@ -1,0 +1,13 @@
+<script lang="ts">
+  import Svg from '../svg.svelte';
+  let props = $props();
+</script>
+
+<Svg {...props}>
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M3.31653 3L9.19612 4.17592L8.80388 6.13708L4.68347 5.31299L2.36447 12.5H21.6355L19.3165 5.313L15.1961 6.13708L14.8039 4.17592L20.6835 3L24 13.3459V22H13.5144L12.3686 17.5H11.6314L10.4856 22H0V13.3459L3.31653 3ZM14.1179 16.2649L15.0689 20H22V14.5H13.7134L14.1179 16.2649ZM10.2866 14.5H2V20H8.93106L9.88212 16.2649L10.2866 14.5Z"
+    fill="currentcolor"
+  />
+</Svg>

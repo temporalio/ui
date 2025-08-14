@@ -1,0 +1,1405 @@
+{
+  "accordion": [
+    {
+      "name": "title",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "subtitle"
+    },
+    {
+      "name": "icon"
+    },
+    {
+      "name": "open"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "readOnly"
+    },
+    {
+      "name": "error"
+    },
+    {
+      "name": "onToggle"
+    },
+    {
+      "name": "class",
+      "required": false
+    }
+  ],
+  "alert": [
+    {
+      "name": "intent",
+      "required": true,
+      "type": "'warning' | 'error' | 'success' | 'info'"
+    },
+    {
+      "name": "title"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "bold"
+    },
+    {
+      "name": "class",
+      "required": false
+    }
+  ],
+  "api-pagination": [
+    {
+      "name": "onError",
+      "type": "(error: Error) => void | undefined"
+    },
+    {
+      "name": "onFetch",
+      "required": true,
+      "type": "() => Promise<PaginatedRequest<T>>"
+    },
+    {
+      "name": "onShiftUp",
+      "type": "(event: KeyboardEvent) => void | undefined"
+    },
+    {
+      "name": "onShiftDown",
+      "type": "(event: KeyboardEvent) => void | undefined"
+    },
+    {
+      "name": "onSpace",
+      "type": "(event: KeyboardEvent) => void | undefined"
+    },
+    {
+      "name": "pageSizeOptions",
+      "type": "string[] | number[]"
+    },
+    {
+      "name": "defaultPageSize",
+      "type": "string | number | undefined"
+    },
+    {
+      "name": "total",
+      "type": "string | number"
+    }
+  ],
+  "autocomplete": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "label"
+    },
+    {
+      "name": "placeholder"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "copyable"
+    },
+    {
+      "name": "theme",
+      "type": "'dark' | 'light'"
+    },
+    {
+      "name": "options",
+      "required": true,
+      "type": "string[]"
+    },
+    {
+      "name": "onOptionClick",
+      "required": true,
+      "type": "(option: string) => void"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "class",
+      "required": false
+    }
+  ],
+  "badge": [
+    {
+      "name": "type",
+      "type": "BadgeType"
+    }
+  ],
+  "button": [
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "variant",
+      "type": "| 'primary'\n    | 'secondary'\n    | 'destructive'\n    | 'login'\n    | 'link'"
+    },
+    {
+      "name": "thin"
+    },
+    {
+      "name": "loading"
+    },
+    {
+      "name": "href",
+      "type": "string"
+    },
+    {
+      "name": "target",
+      "type": "'_self' | '_external'"
+    },
+    {
+      "name": "active"
+    },
+    {
+      "name": "large"
+    },
+    {
+      "name": "as",
+      "type": "'button' | 'anchor'"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "iconClass",
+      "type": "string"
+    },
+    {
+      "name": "classes",
+      "type": "string"
+    },
+    {
+      "name": "testId",
+      "type": "string"
+    },
+    {
+      "name": "count"
+    },
+    {
+      "name": "type"
+    },
+    {
+      "name": "unround"
+    },
+    {
+      "name": "unroundRight"
+    },
+    {
+      "name": "unroundLeft"
+    },
+    {
+      "name": "id",
+      "type": "string"
+    }
+  ],
+  "calendar": [
+    {
+      "name": "date",
+      "required": true,
+      "type": "Date | undefined"
+    },
+    {
+      "name": "month",
+      "required": true,
+      "type": "number | undefined"
+    },
+    {
+      "name": "year",
+      "required": true,
+      "type": "number | undefined"
+    },
+    {
+      "name": "isAllowed"
+    }
+  ],
+  "card": [],
+  "checkbox": [
+    {
+      "name": "id"
+    },
+    {
+      "name": "checked"
+    },
+    {
+      "name": "label"
+    },
+    {
+      "name": "onDark"
+    },
+    {
+      "name": "indeterminate"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "value",
+      "type": "T"
+    },
+    {
+      "name": "group",
+      "type": "T[]"
+    }
+  ],
+  "chip": [
+    {
+      "name": "intent",
+      "type": "'warning' | 'default'"
+    }
+  ],
+  "code-block": [
+    {
+      "name": "content",
+      "required": true,
+      "type": "Parameters<typeof JSON.stringify>[0]"
+    },
+    {
+      "name": "inline"
+    },
+    {
+      "name": "language"
+    },
+    {
+      "name": "copyable"
+    },
+    {
+      "name": "async"
+    }
+  ],
+  "codec-endpoint-settings": [
+    {
+      "name": "endpoint"
+    },
+    {
+      "name": "passToken"
+    },
+    {
+      "name": "includeCreds"
+    },
+    {
+      "name": "error"
+    }
+  ],
+  "data-converter-port-settings": [
+    {
+      "name": "port"
+    }
+  ],
+  "data-encoder-settings": [],
+  "data-encoder-status": [],
+  "date-picker": [
+    {
+      "name": "isAllowed"
+    },
+    {
+      "name": "selected"
+    }
+  ],
+  "day-of-month-picker": [
+    {
+      "name": "daysOfMonth",
+      "required": true,
+      "type": "number[]"
+    }
+  ],
+  "day-of-week-picker": [
+    {
+      "name": "daysOfWeek",
+      "required": true,
+      "type": "string[]"
+    }
+  ],
+  "drawer": [
+    {
+      "name": "flyin",
+      "required": true,
+      "type": "boolean"
+    },
+    {
+      "name": "flyout",
+      "required": true,
+      "type": "boolean"
+    },
+    {
+      "name": "onClose",
+      "required": true,
+      "type": "() => void"
+    }
+  ],
+  "dropdown-button": [
+    {
+      "name": "label",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "readonly"
+    }
+  ],
+  "radio-menu-item": [
+    {
+      "name": "checked",
+      "type": "boolean"
+    },
+    {
+      "name": "value",
+      "required": true,
+      "type": "T"
+    }
+  ],
+  "dropdown-menu": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "position",
+      "type": "'right' | 'left'"
+    }
+  ],
+  "empty-state": [
+    {
+      "name": "title",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "content"
+    },
+    {
+      "name": "error"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    }
+  ],
+  "error-boundary-fallback": [
+    {
+      "name": "error"
+    }
+  ],
+  "error-boundary": [
+    {
+      "name": "error"
+    },
+    {
+      "name": "onError"
+    }
+  ],
+  "error": [
+    {
+      "name": "error",
+      "type": "App.Error | NetworkError"
+    },
+    {
+      "name": "status"
+    }
+  ],
+  "feature-tag": [
+    {
+      "name": "feature",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "alpha"
+    }
+  ],
+  "filter-or-copy-buttons": [
+    {
+      "name": "show"
+    },
+    {
+      "name": "filterable"
+    },
+    {
+      "name": "copyable"
+    },
+    {
+      "name": "content",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "onFilter",
+      "type": "() => void"
+    },
+    {
+      "name": "filtered"
+    },
+    {
+      "name": "class",
+      "required": false
+    }
+  ],
+  "icon-button": [
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "classes"
+    },
+    {
+      "name": "hoverable"
+    }
+  ],
+  "chip-input": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "chips",
+      "required": true,
+      "type": "string[]"
+    },
+    {
+      "name": "label"
+    },
+    {
+      "name": "placeholder"
+    },
+    {
+      "name": "name"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "required"
+    },
+    {
+      "name": "hintText"
+    },
+    {
+      "name": "validator",
+      "type": "(value: string) => boolean"
+    }
+  ],
+  "input": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "label"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "placeholder"
+    },
+    {
+      "name": "suffix"
+    },
+    {
+      "name": "name"
+    },
+    {
+      "name": "copyable",
+      "type": "boolean"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "clearable"
+    },
+    {
+      "name": "theme",
+      "type": "'dark' | 'light'"
+    },
+    {
+      "name": "autocomplete"
+    },
+    {
+      "name": "valid"
+    },
+    {
+      "name": "hintText"
+    },
+    {
+      "name": "maxLength"
+    },
+    {
+      "name": "spellcheck",
+      "type": "boolean"
+    },
+    {
+      "name": "unroundRight",
+      "type": "boolean"
+    },
+    {
+      "name": "unroundLeft",
+      "type": "boolean"
+    },
+    {
+      "name": "autoFocus"
+    },
+    {
+      "name": "error"
+    },
+    {
+      "name": "required"
+    },
+    {
+      "name": "class",
+      "required": false
+    }
+  ],
+  "number-input": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "label"
+    },
+    {
+      "name": "units"
+    },
+    {
+      "name": "placeholder"
+    },
+    {
+      "name": "name"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "theme",
+      "type": "'dark' | 'light'"
+    },
+    {
+      "name": "autocomplete"
+    },
+    {
+      "name": "hintText"
+    },
+    {
+      "name": "max",
+      "type": "null | number"
+    },
+    {
+      "name": "spellcheck",
+      "type": "boolean"
+    }
+  ],
+  "range-input": [
+    {
+      "name": "label",
+      "type": "string"
+    },
+    {
+      "name": "min",
+      "type": "number"
+    },
+    {
+      "name": "max",
+      "type": "number"
+    },
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "type": "number"
+    }
+  ],
+  "typeahead-input": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "options",
+      "type": "{ label: string; value: string }[]"
+    },
+    {
+      "name": "placeholder"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "autoFocus"
+    },
+    {
+      "name": "unroundRight",
+      "type": "boolean"
+    },
+    {
+      "name": "unroundLeft",
+      "type": "boolean"
+    },
+    {
+      "name": "onChange",
+      "type": "(value: string) => void"
+    }
+  ],
+  "json-editor": [
+    {
+      "name": "value",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "class",
+      "required": false,
+      "type": "string"
+    }
+  ],
+  "arrow-down": [],
+  "arrow-left": [],
+  "arrow-right": [],
+  "arrow-up": [],
+  "shortcut": [
+    {
+      "name": "tooltipText",
+      "type": "string"
+    },
+    {
+      "name": "arrow",
+      "type": "'up' | 'down' | 'left' | 'right' | undefined"
+    }
+  ],
+  "labs-mode-guard": [],
+  "link": [
+    {
+      "name": "href",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "active"
+    },
+    {
+      "name": "newTab"
+    }
+  ],
+  "loading": [
+    {
+      "name": "title"
+    }
+  ],
+  "logo": [
+    {
+      "name": "width"
+    },
+    {
+      "name": "height"
+    },
+    {
+      "name": "isCloud",
+      "required": true,
+      "type": "boolean"
+    },
+    {
+      "name": "title"
+    }
+  ],
+  "main-content-container": [],
+  "modal": [
+    {
+      "name": "hideConfirm"
+    },
+    {
+      "name": "confirmText"
+    },
+    {
+      "name": "cancelText"
+    },
+    {
+      "name": "confirmType",
+      "type": "ComponentProps<Button>['variant']"
+    },
+    {
+      "name": "confirmDisabled"
+    },
+    {
+      "name": "large"
+    },
+    {
+      "name": "loading"
+    },
+    {
+      "name": "hightlightNav"
+    },
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "open"
+    },
+    {
+      "name": "close"
+    },
+    {
+      "name": "setError"
+    },
+    {
+      "name": "class",
+      "required": false
+    }
+  ],
+  "month-picker": [
+    {
+      "name": "months",
+      "required": true,
+      "type": "string[]"
+    }
+  ],
+  "namespace-selector": [],
+  "nav-tooltip": [
+    {
+      "name": "props"
+    }
+  ],
+  "import-nav": [
+    {
+      "name": "isCloud",
+      "required": true,
+      "type": "boolean"
+    },
+    {
+      "name": "linkList",
+      "required": true,
+      "type": "Partial<Record<string, string>>"
+    }
+  ],
+  "nav-container": [
+    {
+      "name": "isCloud"
+    },
+    {
+      "name": "linkList",
+      "required": true,
+      "type": "Partial<Record<string, string>>"
+    }
+  ],
+  "nav-row": [
+    {
+      "name": "link",
+      "type": "string | null"
+    },
+    {
+      "name": "isCloud",
+      "required": true,
+      "type": "boolean"
+    },
+    {
+      "name": "noFilter"
+    },
+    {
+      "name": "wrap"
+    },
+    {
+      "name": "externalLink"
+    },
+    {
+      "name": "handleClick",
+      "type": "() => void"
+    }
+  ],
+  "side-nav": [
+    {
+      "name": "isCloud"
+    },
+    {
+      "name": "activeNamespace",
+      "required": true,
+      "type": "Namespace"
+    },
+    {
+      "name": "linkList",
+      "required": true,
+      "type": "Partial<Record<string, string>>"
+    }
+  ],
+  "top-nav": [
+    {
+      "name": "logout",
+      "required": true,
+      "type": "() => void"
+    },
+    {
+      "name": "namespaceList",
+      "type": "NamespaceListItem[]"
+    }
+  ],
+  "orderable-list-item": [
+    {
+      "name": "static",
+      "required": false,
+      "type": "boolean"
+    },
+    {
+      "name": "label",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "readonly",
+      "type": "boolean"
+    },
+    {
+      "name": "index",
+      "type": "number"
+    },
+    {
+      "name": "totalItems",
+      "type": "number"
+    }
+  ],
+  "orderable-list": [],
+  "page-transition": [],
+  "pagination": [
+    {
+      "name": "items",
+      "required": true,
+      "type": "T[]"
+    },
+    {
+      "name": "floatId",
+      "type": "string | undefined"
+    },
+    {
+      "name": "startingIndex",
+      "type": "string | number"
+    },
+    {
+      "name": "currentPageKey"
+    },
+    {
+      "name": "itemsPerPage",
+      "type": "number | null"
+    },
+    {
+      "name": "updating"
+    }
+  ],
+  "menu-button": [
+    {
+      "name": "controls",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "dark"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "hasIndicator"
+    },
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    }
+  ],
+  "menu-container": [],
+  "menu-divider": [],
+  "menu-item": [
+    {
+      "name": "dark"
+    },
+    {
+      "name": "selected"
+    },
+    {
+      "name": "destructive"
+    },
+    {
+      "name": "active"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "href"
+    },
+    {
+      "name": "testId",
+      "type": "string"
+    },
+    {
+      "name": "tooltipProps",
+      "type": "ComponentProps<Tooltip>"
+    }
+  ],
+  "menu": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "dark"
+    },
+    {
+      "name": "keepOpen"
+    },
+    {
+      "name": "position",
+      "type": "'left' | 'right'"
+    }
+  ],
+  "progress-bar": [],
+  "scroll-to-top": [
+    {
+      "name": "hidden"
+    },
+    {
+      "name": "onScrollToTopClick",
+      "required": true,
+      "type": "() => void"
+    }
+  ],
+  "filter-select": [
+    {
+      "name": "label",
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "required": true,
+      "type": "SelectOptionValue"
+    },
+    {
+      "name": "options",
+      "type": "SelectOptionValue[]"
+    },
+    {
+      "name": "parameter",
+      "type": "string"
+    }
+  ],
+  "option-group": [
+    {
+      "name": "label",
+      "required": true,
+      "type": "string"
+    }
+  ],
+  "option": [
+    {
+      "name": "value",
+      "required": true,
+      "type": "T"
+    },
+    {
+      "name": "description",
+      "type": "string"
+    }
+  ],
+  "select": [
+    {
+      "name": "label"
+    },
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "type": "T"
+    },
+    {
+      "name": "placeholder"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean"
+    },
+    {
+      "name": "unroundRight",
+      "type": "boolean"
+    },
+    {
+      "name": "onChange",
+      "type": "(value: T) => void"
+    }
+  ],
+  "simple-option": [
+    {
+      "name": "value",
+      "type": "SelectOptionValue"
+    }
+  ],
+  "simple-select": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "required": true,
+      "type": "SelectOptionValue"
+    },
+    {
+      "name": "label",
+      "type": "string"
+    },
+    {
+      "name": "dark",
+      "type": "boolean"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean"
+    },
+    {
+      "name": "name"
+    },
+    {
+      "name": "options",
+      "type": "SelectOptionValue[]"
+    }
+  ],
+  "index": [],
+  "table": [
+    {
+      "name": "class",
+      "required": false,
+      "type": "string"
+    },
+    {
+      "name": "variant",
+      "type": "'simple' | 'fancy'"
+    },
+    {
+      "name": "updating"
+    }
+  ],
+  "split-button": [
+    {
+      "name": "label"
+    },
+    {
+      "name": "icon",
+      "type": "IconName | undefined"
+    },
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "variant",
+      "type": "| 'primary'\n    | 'secondary'\n    | 'destructive'\n    | 'login'\n    | 'link'"
+    },
+    {
+      "name": "thin"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "position",
+      "type": "'left' | 'right'"
+    },
+    {
+      "name": "href"
+    },
+    {
+      "name": "primaryActionDisabled"
+    }
+  ],
+  "tab-list": [
+    {
+      "name": "label",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "class",
+      "required": false,
+      "type": "string"
+    }
+  ],
+  "tab-panel": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "tabId",
+      "required": true,
+      "type": "string"
+    }
+  ],
+  "tab": [
+    {
+      "name": "label",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "href",
+      "type": "string"
+    },
+    {
+      "name": "panelId",
+      "type": "string"
+    },
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "active",
+      "type": "boolean"
+    },
+    {
+      "name": "onClick",
+      "type": "() => void"
+    }
+  ],
+  "tabs": [],
+  "bulk-action-button": [
+    {
+      "name": "testId",
+      "type": "string"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean"
+    },
+    {
+      "name": "variant",
+      "type": "'primary' | 'destructive'"
+    }
+  ],
+  "table-header-row": [],
+  "table-row": [
+    {
+      "name": "href",
+      "type": "string"
+    },
+    {
+      "name": "class",
+      "required": false
+    }
+  ],
+  "textarea": [
+    {
+      "name": "disabled"
+    },
+    {
+      "name": "error"
+    },
+    {
+      "name": "isValid"
+    },
+    {
+      "name": "placeholder"
+    },
+    {
+      "name": "rows"
+    },
+    {
+      "name": "spellcheck",
+      "type": "boolean"
+    },
+    {
+      "name": "value",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "label"
+    },
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "required"
+    },
+    {
+      "name": "class",
+      "required": false
+    }
+  ],
+  "time-picker": [
+    {
+      "name": "hour"
+    },
+    {
+      "name": "minute"
+    },
+    {
+      "name": "second"
+    },
+    {
+      "name": "half",
+      "type": "'AM' | 'PM'"
+    }
+  ],
+  "toast": [
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "variant",
+      "required": true,
+      "type": "ToastVariant"
+    }
+  ],
+  "toaster": [
+    {
+      "name": "pop",
+      "required": true,
+      "type": "Toaster['pop']"
+    },
+    {
+      "name": "toasts",
+      "required": true,
+      "type": "Toaster['toasts']"
+    }
+  ],
+  "toggle-button": [
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "group"
+    },
+    {
+      "name": "href"
+    },
+    {
+      "name": "base"
+    },
+    {
+      "name": "active",
+      "type": "boolean"
+    }
+  ],
+  "toggle-buttons": [],
+  "toggle-switch": [
+    {
+      "name": "checked"
+    },
+    {
+      "name": "id",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "name": "disabled"
+    }
+  ],
+  "tooltip": [
+    {
+      "name": "text"
+    },
+    {
+      "name": "icon",
+      "type": "IconName"
+    },
+    {
+      "name": "top"
+    },
+    {
+      "name": "topRight"
+    },
+    {
+      "name": "right"
+    },
+    {
+      "name": "bottom"
+    },
+    {
+      "name": "bottomLeft"
+    },
+    {
+      "name": "bottomRight"
+    },
+    {
+      "name": "left"
+    },
+    {
+      "name": "topLeft"
+    },
+    {
+      "name": "copyable"
+    },
+    {
+      "name": "hide",
+      "type": "boolean | null"
+    },
+    {
+      "name": "width",
+      "type": "number | null"
+    }
+  ]
+}

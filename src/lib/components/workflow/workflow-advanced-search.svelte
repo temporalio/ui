@@ -4,7 +4,7 @@
 
   import { page } from '$app/stores';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowFilters } from '$lib/stores/filters';

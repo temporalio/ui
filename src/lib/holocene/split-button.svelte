@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';

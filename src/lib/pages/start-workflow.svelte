@@ -6,13 +6,13 @@
 
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding, {
     type PayloadInputEncoding,
   } from '$lib/components/payload-input-with-encoding.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -225,7 +225,7 @@
         class="mt-0 md:mt-6"
         variant="secondary"
         leadingIcon="retry"
-        on:click={generateRandomWorkflowId}>Random UUID</Button
+        onclick={generateRandomWorkflowId}>Random UUID</Button
       >
     </div>
     <div class="flex w-full items-center justify-between gap-4">
@@ -301,12 +301,12 @@
         variant="ghost"
         class="max-sm:w-full"
         trailingIcon={viewAdvancedOptions ? 'chevron-up' : 'chevron-down'}
-        on:click={() => (viewAdvancedOptions = !viewAdvancedOptions)}
+        onclick={() => (viewAdvancedOptions = !viewAdvancedOptions)}
         >{translate('common.more-options')}</Button
       >
       <Button
         disabled={!enableStart}
-        on:click={onWorkflowStart}
+        onclick={onWorkflowStart}
         data-testid="start-workflow-button"
         class="max-sm:w-full">{translate('workflows.start-workflow')}</Button
       >

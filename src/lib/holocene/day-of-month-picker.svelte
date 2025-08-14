@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
 
   const daysInMonth = Array.from({ length: 31 }).map((_, i) => i + 1);
 

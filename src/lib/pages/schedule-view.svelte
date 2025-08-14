@@ -6,6 +6,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
@@ -16,7 +17,6 @@
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -358,7 +358,7 @@
             size="xs"
             variant="ghost"
             leadingIcon="retry"
-            on:click={() => {
+            onclick={() => {
               scheduleFetch = fetchSchedule(parameters);
               $refresh = Date.now();
             }}
