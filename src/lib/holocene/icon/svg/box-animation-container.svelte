@@ -1,5 +1,6 @@
 <script lang="ts">
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
@@ -16,7 +17,7 @@
     getStackTrace,
   } from '$lib/utilities/get-single-attribute-for-event';
 
-  import BoxAnimation from './box-animation.svelte';
+  import AgentAnimation from './agent-animation.svelte';
 
   let {
     workflow,
@@ -79,22 +80,33 @@
   };
 </script>
 
-<div class="rounded-sm border border-subtle bg-primary px-8">
-  <BoxAnimation {groups} {onClick} />
-  {#key activeGroup}
-    <div class="flex items-start gap-2 pb-4">
-      <div class="flex w-full flex-col gap-1 xl:w-1/2">
-        {#each inputPayloads as [key, value] (key)}
-          {@render payloads(key, value)}
-        {/each}
+<div class="rounded-sm border border-subtle bg-primary px-1.5">
+  <AgentAnimation {groups} {onClick} />
+  {#if activeGroup}
+    {#key activeGroup}
+      <div class="relative flex items-start gap-2 pb-4">
+        <Button
+          variant="ghost"
+          size="xs"
+          leadingIcon="close"
+          class="absolute -top-3 right-2"
+          on:click={() => clearGroupInputResult()}
+        ></Button>
+        <div class="flex w-full flex-col gap-1">
+          {#each inputPayloads as [key, value] (key)}
+            {@render payloads(key, value)}
+          {/each}
+        </div>
+        {#if resultPayloads.length}
+          <div class="flex w-full flex-col gap-1">
+            {#each resultPayloads as [key, value] (key)}
+              {@render payloads(key, value)}
+            {/each}
+          </div>
+        {/if}
       </div>
-      <div class="flex w-full flex-col gap-1 xl:w-1/2">
-        {#each resultPayloads as [key, value] (key)}
-          {@render payloads(key, value)}
-        {/each}
-      </div>
-    </div>
-  {/key}
+    {/key}
+  {/if}
 </div>
 
 {#snippet payloads(key, value)}
