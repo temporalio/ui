@@ -30,3 +30,8 @@ Follow the setup.md
 
 - Add API model and key
 - AGENT_GOAL=goal_choose_agent_type
+
+
+Animation file
+
+box-animation.svelte
