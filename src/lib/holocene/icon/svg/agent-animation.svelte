@@ -16,27 +16,29 @@
   };
   let { groups, onClick }: Props = $props();
 
-  function groupByUserPrompt(eventGroups: EventGroups): EventGroups[] {
-    const groupedByPrompt: EventGroups[] = [];
-    let currentGroup: EventGroups = [];
+  const groupByUserPrompt = $derived(
+    (eventGroups: EventGroups): EventGroups[] => {
+      const groupedByPrompt: EventGroups[] = [];
+      let currentGroup: EventGroups = [];
 
-    for (const group of eventGroups) {
-      if (group.initialEvent?.attributes?.signalName === 'user_prompt') {
-        if (currentGroup.length > 0) {
-          groupedByPrompt.push(currentGroup);
+      for (const group of eventGroups) {
+        if (group.initialEvent?.attributes?.signalName === 'user_prompt') {
+          if (currentGroup.length > 0) {
+            groupedByPrompt.push(currentGroup);
+          }
+          currentGroup = [group];
+        } else {
+          currentGroup.push(group);
         }
-        currentGroup = [group];
-      } else {
-        currentGroup.push(group);
       }
-    }
 
-    if (currentGroup.length > 0) {
-      groupedByPrompt.push(currentGroup);
-    }
+      if (currentGroup.length > 0) {
+        groupedByPrompt.push(currentGroup);
+      }
 
-    return groupedByPrompt;
-  }
+      return groupedByPrompt;
+    },
+  );
 
   const promptGroups = $derived(groupByUserPrompt(groups));
   const height = 48;
@@ -271,7 +273,7 @@
 {/snippet}
 
 {#snippet renderStep(group, index, x)}
-  {@const delay = Math.min(300 / groups.length, 150) * index}
+  {@const delay = Math.min(300 / promptGroups.length, 150) * index}
   {@const type = group.category.split('-')[0].toLowerCase()}
   <g
     class="fly-in"
@@ -296,7 +298,7 @@
 
 {#snippet renderPromptGroup(group, index)}
   {@const x = index * fullWidth + blockOffset}
-  {@const delay = Math.min(300 / groups.length, 150) * index}
+  {@const delay = Math.min(300 / promptGroups.length, 150) * index}
   <g
     class="fly-in"
     style="animation-delay: {delay}ms;"
@@ -323,9 +325,11 @@
     stroke="#374151"
     stroke-linecap="round"
   />
-  {#each promptGroups as group, index}
-    {@render renderPromptGroup(group, index)}
-  {/each}
+  {#key promptGroups.length}
+    {#each promptGroups as group, index}
+      {@render renderPromptGroup(group, index)}
+    {/each}
+  {/key}
 </svg>
 
 <style>

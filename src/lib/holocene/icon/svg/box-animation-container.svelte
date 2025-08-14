@@ -5,6 +5,7 @@
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import type { Failure } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { format } from '$lib/utilities/format-camel-case';
@@ -40,6 +41,8 @@
   let activeGroup: EventGroup | undefined = $state(undefined);
   let input: CombinedAttributes | undefined = $state(undefined);
   let result: CombinedAttributes | undefined = $state(undefined);
+  let lastFailure: Failure | undefined = $state(undefined);
+
   const inputFields = $derived(input ? Object.entries(input) : []);
   const resultFields = $derived(result ? Object.entries(result) : []);
 
@@ -61,6 +64,7 @@
     activeGroup = undefined;
     input = undefined;
     result = undefined;
+    lastFailure = undefined;
   };
 
   const setGroupInputResult = (group: EventGroup) => {
@@ -69,6 +73,8 @@
     if (group?.initialEvent) input = formatAttributes(group.initialEvent);
     if (group?.lastEvent && group.eventList.length > 1)
       result = formatAttributes(group.lastEvent);
+    if (group?.pendingActivity && group.pendingActivity?.lastFailure)
+      lastFailure = group.pendingActivity.lastFailure;
   };
 
   const onClick = (group: EventGroup) => {
@@ -102,6 +108,11 @@
             {#each resultPayloads as [key, value] (key)}
               {@render payloads(key, value)}
             {/each}
+          </div>
+        {/if}
+        {#if lastFailure}
+          <div class="flex w-full flex-col gap-1">
+            {@render payloads('lastFailure', lastFailure)}
           </div>
         {/if}
       </div>
