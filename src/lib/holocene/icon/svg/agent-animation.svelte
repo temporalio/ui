@@ -40,14 +40,14 @@
     },
   );
 
-  const promptGroups = $derived(groupByUserPrompt(groups));
   const height = 48;
   const mid = height - 10;
+  const promptGroups = $derived(groupByUserPrompt(groups));
   const totalGroups = $derived(promptGroups.length);
+  const blockWidth = $derived(100 / totalGroups);
 
-  const fullWidth = $derived(100 / totalGroups);
-  const blockWidth = $derived(fullWidth * 1);
-  const blockOffset = $derived(fullWidth * 0.0);
+  $inspect('promptGroups: ', promptGroups);
+  $inspect('blockWidth: ', blockWidth);
 
   const activityIcon = {
     'tool:envVars': 'search',
@@ -57,16 +57,20 @@
   };
 </script>
 
-{#snippet icon(name: IconName, x: number, y: number, size: number = 3)}
-  <g
-    transform={`translate(${x + blockWidth / 2 - 1.125}, ${y + 0.9}) scale(0.75)`}
-  >
+{#snippet icon(
+  name: IconName,
+  x: number,
+  y: number,
+  width: number,
+  size: number = 3,
+)}
+  <g transform={`translate(${x + width / 2 - 1.125}, ${y + 0.9}) scale(0.75)`}>
     <Icon width={size} height={size} {name} />
   </g>
 {/snippet}
 
-{#snippet signal(group: EventGroup, index: number, x: number)}
-  {@const midX = x + blockWidth / 2}
+{#snippet signal(group: EventGroup, index: number, x: number, width: number)}
+  {@const midX = x + width / 2}
   {@const y = mid - 5 * (index + 1)}
   {@const pathY = mid + 4}
   {@const isUserPrompt =
@@ -74,17 +78,17 @@
   <rect
     {x}
     {y}
-    width={blockWidth}
+    {width}
     height="4"
     fill="#d300d8"
     filter="url(#subtle-shadow)"
     opacity=".25"
   />
   {#if isUserPrompt}
-    {@render icon('keyboard', x, y)}
+    {@render icon('keyboard', x, y, width)}
   {:else}
-    {@render icon('close', x + 1, y + 0.5, 2)}
-    {@render icon('success', x - 0.5, y + 0.5, 2)}
+    {@render icon('close', x + 1, y + 0.5, width, 2)}
+    {@render icon('success', x - 0.5, y + 0.5, width, 2)}
   {/if}
   <path
     d={`M ${midX} ${pathY} L ${midX} ${pathY - 2.5} M ${midX - 0.5} ${pathY - 2} L ${midX} ${pathY - 2.5} L ${midX + 0.5} ${pathY - 2}`}
@@ -95,24 +99,24 @@
     stroke-linejoin="round"
   />
   {#if isUserPrompt}
-    {@render icon('astronaut', x, y + 9)}
+    {@render icon('astronaut', x, y + 9, width)}
   {/if}
 {/snippet}
 
-{#snippet update(_group: EventGroup, index: number, x: number)}
-  {@const midX = x + blockWidth / 2}
-  {@const y = mid + 4 + blockWidth * index}
+{#snippet update(_group: EventGroup, index: number, x: number, width: number)}
+  {@const midX = x + width / 2}
+  {@const y = mid + 4 + width * index}
   <rect
     {x}
     y={mid - 5}
-    width={blockWidth}
+    {width}
     height="4"
     fill="transparent"
     stroke="#374151"
     stroke-width=".15"
     filter="url(#subtle-shadow)"
   />
-  {@render icon('json', x, mid - 5)}
+  {@render icon('json', x, mid - 5, width)}
   <path
     d={`M ${midX} ${y} L ${midX} ${y - 3} M ${midX - 0.5} ${y - 2} L ${midX} ${y - 3} L ${midX + 0.5} ${y - 2}`}
     stroke-width=".25"
@@ -131,7 +135,7 @@
   />
 {/snippet}
 
-{#snippet activity(group: EventGroup, index: number, x: number)}
+{#snippet activity(group: EventGroup, index: number, x: number, width: number)}
   {@const y = mid - 5 * (index + 1)}
   {@const attempts = group.isPending
     ? group.pendingActivity.attempt
@@ -148,7 +152,7 @@
   <rect
     {x}
     {y}
-    width={blockWidth}
+    {width}
     height="4"
     fill={retried && !pending
       ? 'url(#redToGreenGradient)'
@@ -164,13 +168,13 @@
     value={group.initialEvent.userMetadata.summary}
     let:decodedValue
   >
-    {@render icon(activityIcon[decodedValue] ?? 'robot', x, y)}
+    {@render icon(activityIcon[decodedValue] ?? 'robot', x, y, width)}
   </MetadataDecoder>
   {#if pending}
     <line
-      x1={x + blockWidth / 2}
+      x1={x + width / 2}
       y1={y}
-      x2={x + blockWidth / 2}
+      x2={x + width / 2}
       y2={y - 2}
       stroke="#FFC3A8"
       stroke-width=".25"
@@ -178,11 +182,11 @@
       stroke-linecap="round"
       class="retried"
     />
-    {@render icon('retry', x, y - 5.5)}
+    {@render icon('retry', x, y - 5.5, width)}
   {/if}
   {#if attempts > 1}
     <text
-      x={x + blockWidth / 2}
+      x={x + width / 2}
       y={y - 5.5}
       text-anchor="middle"
       font-size="1px"
@@ -194,14 +198,14 @@
   {/if}
 {/snippet}
 
-{#snippet child(group: EventGroup, index: number, x: number)}
+{#snippet child(group: EventGroup, index: number, x: number, width: number)}
   {@const y = mid - 5 * (index + 1)}
   {@const status = group.finalClassification}
 
   <rect
     {x}
     {y}
-    width={blockWidth}
+    {width}
     height="4"
     fill={status === 'Failed'
       ? 'red'
@@ -212,10 +216,10 @@
     stroke-width=".15"
     filter="url(#subtle-shadow)"
   />
-  {@render icon('relationship', x, y)}
+  {@render icon('relationship', x, y, width)}
   {#if true}
     <path
-      d={`M ${x + blockWidth / 2} ${y + 4} L ${x + blockWidth / 2} ${y + 12} C ${x + blockWidth / 2 + 20} ${y + 12}, ${100 - x} ${y + 12}, 100 ${y + 12}`}
+      d={`M ${x + width / 2} ${y + 4} L ${x + width / 2} ${y + 12} C ${x + width / 2 + 20} ${y + 12}, ${100 - x} ${y + 12}, 100 ${y + 12}`}
       stroke="#64748b"
       stroke-width=".25"
       stroke-dasharray=".5"
@@ -226,7 +230,7 @@
   {/if}
 {/snippet}
 
-{#snippet timer(group: EventGroup, index: number, x: number)}
+{#snippet timer(group: EventGroup, index: number, x: number, width: number)}
   {@const y = mid - 5 * (index + 1)}
   {@const duration = formatDistanceAbbreviated({
     start: group?.initialEvent?.eventTime,
@@ -235,17 +239,17 @@
   <rect
     {x}
     y={mid - 5}
-    width={blockWidth}
+    {width}
     height="4"
     fill="#f59e0b"
     stroke="#374151"
     stroke-width=".15"
     filter="url(#subtle-shadow)"
   />
-  {@render icon('retention', x, y)}
+  {@render icon('retention', x, y, width)}
   {#if duration}
     <text
-      x={x + blockWidth / 2}
+      x={x + width / 2}
       y={mid - 5.5}
       text-anchor="middle"
       font-size="1px"
@@ -257,55 +261,55 @@
   {/if}
 {/snippet}
 
-{#snippet marker(_group: EventGroup, index: number, x: number)}
+{#snippet marker(_group: EventGroup, index: number, x: number, width: number)}
   {@const y = mid - 5 * (index + 1)}
   <rect
     {x}
     y={mid - 5}
-    width={blockWidth}
+    {width}
     height="4"
     fill="#9ca3af"
     stroke="#374151"
     stroke-width=".15"
     filter="url(#subtle-shadow)"
   />
-  {@render icon('marker', x, y)}
+  {@render icon('marker', x, y, width)}
 {/snippet}
 
-{#snippet renderStep(group, index, x)}
+{#snippet renderStep(group, index, x, blockWidth)}
   {@const delay = Math.min(300 / promptGroups.length, 150) * index}
   {@const type = group.category.split('-')[0].toLowerCase()}
   <g
-    class="fly-in"
+    class="fly-in cursor-pointer"
     style="animation-delay: {delay}ms;"
     onclick={() => onClick(group)}
   >
     {#if type === 'signal'}
-      {@render signal(group, index, x)}
+      {@render signal(group, index, x, blockWidth)}
     {:else if type === 'update'}
-      {@render update(group, index, x)}
+      {@render update(group, index, x, blockWidth)}
     {:else if isActivityTaskScheduledEvent(group.initialEvent)}
-      {@render activity(group, index, x)}
+      {@render activity(group, index, x, blockWidth)}
     {:else if type === 'timer'}
-      {@render timer(group, index, x)}
+      {@render timer(group, index, x, blockWidth)}
     {:else if type === 'child'}
-      {@render child(group, index, x)}
+      {@render child(group, index, x, blockWidth)}
     {:else if type === 'other'}
-      {@render marker(group, index, x)}
+      {@render marker(group, index, x, blockWidth)}
     {/if}
   </g>
 {/snippet}
 
-{#snippet renderPromptGroup(group, index)}
-  {@const x = index * fullWidth + blockOffset}
-  {@const delay = Math.min(300 / promptGroups.length, 150) * index}
+{#snippet renderPromptGroup(group, index, blockWidth, numGroups)}
+  {@const x = index * blockWidth}
+  {@const delay = Math.min(300 / numGroups, 150) * index}
   <g
     class="fly-in"
     style="animation-delay: {delay}ms;"
     onclick={() => onClick(group)}
   >
     {#each group as event, i}
-      {@render renderStep(event, i, x)}
+      {@render renderStep(event, i, x, blockWidth)}
     {/each}
   </g>
 {/snippet}
@@ -325,11 +329,9 @@
     stroke="#374151"
     stroke-linecap="round"
   />
-  {#key promptGroups.length}
-    {#each promptGroups as group, index}
-      {@render renderPromptGroup(group, index)}
-    {/each}
-  {/key}
+  {#each promptGroups as group, index}
+    {@render renderPromptGroup(group, index, blockWidth, promptGroups.length)}
+  {/each}
 </svg>
 
 <style>
@@ -367,6 +369,7 @@
 
   .fly-in {
     animation: flyIn 0.1s cubic-bezier(0.24, 1.36, 0.44, 1) both;
+    transition: transform 0.3s ease-in-out;
   }
 
   svg {

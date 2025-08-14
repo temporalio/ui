@@ -78,9 +78,8 @@
   };
 
   const onClick = (group: EventGroup) => {
-    if (activeGroup?.id === group.id) {
-      clearGroupInputResult();
-    } else {
+    // clearGroupInputResult();
+    if (group?.id !== activeGroup?.id) {
       setGroupInputResult(group);
     }
   };
