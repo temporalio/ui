@@ -34,4 +34,6 @@ Follow the setup.md
 
 Animation file
 
+```
 box-animation.svelte
+```
