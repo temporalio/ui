@@ -3,8 +3,12 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
+  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { isActivityTaskScheduledEvent } from '$lib/utilities/is-event-type';
+  import {
+    isActivityTaskScheduledEvent,
+    isActivityTaskStartedEvent,
+  } from '$lib/utilities/is-event-type';
 
   import Icon from '../icon.svelte';
   import { type IconName } from '../paths';
@@ -12,14 +16,69 @@
   type Props = {
     groups: EventGroups;
     onClick: (group: EventGroup) => void;
+    scrollThreshold?: number;
+    minBlockUnitWidth?: number;
+    unitPx?: number;
   };
-  let { groups, onClick }: Props = $props();
+  let {
+    groups,
+    onClick,
+    scrollThreshold = 20,
+    minBlockUnitWidth = 8,
+    unitPx = 14,
+  }: Props = $props();
 
   const height = 24;
   const mid = height / 2;
-  const fullWidth = $derived(100 / groups.length);
+  // Scrolling / sizing
+  const totalWidthUnits = $derived(
+    groups.length > scrollThreshold ? groups.length * minBlockUnitWidth : 100,
+  );
+  const fullWidth = $derived(totalWidthUnits / groups.length);
   const blockWidth = $derived(fullWidth * 1);
   const blockOffset = $derived(fullWidth * 0.0);
+  const scrollEnabled = $derived(groups.length > scrollThreshold);
+  const svgStyle = $derived(
+    scrollEnabled
+      ? `width: ${totalWidthUnits * unitPx}px; height: ${height * unitPx}px;`
+      : '',
+  );
+  // Estimate how many characters fit based on block width within the 100-unit viewBox
+  const maxChars = $derived(Math.max(12, Math.floor(blockWidth * 2)));
+  const labelOffsetY = 9.5; // vertical padding between bar and label
+
+  const truncateText = (text: string, max: number): string => {
+    if (!text) return '';
+    if (text.length <= max) return text;
+    if (max <= 1) return text.slice(0, 1);
+    return text.slice(0, max - 1) + '…';
+  };
+
+  const extractNameFromSummary = (summary: unknown): string => {
+    if (summary && typeof summary === 'object' && 'name' in summary) {
+      const value = (summary as Record<string, unknown>)['name'];
+      return typeof value === 'string' ? value : JSON.stringify(value);
+    }
+    if (typeof summary === 'string') {
+      try {
+        const parsed = JSON.parse(summary);
+        if (parsed && typeof parsed === 'object' && 'name' in parsed) {
+          const value = (parsed as Record<string, unknown>)['name'];
+          return typeof value === 'string' ? value : JSON.stringify(value);
+        }
+        return summary;
+      } catch {
+        return summary;
+      }
+    }
+    return '';
+  };
+  let selectedGroupId = $state<string | null>(null);
+
+  const handleClick = (group: EventGroup) => {
+    selectedGroupId = selectedGroupId === group.id ? null : group.id;
+    onClick(group);
+  };
 </script>
 
 {#snippet icon(name: IconName, x: number, y: number)}
@@ -91,7 +150,8 @@
 {#snippet activity(group: EventGroup, index: number)}
   {@const x = index * fullWidth + blockOffset}
   {@const y = mid - 5}
-  {@const attempts = group.eventList[1]?.attributes?.attempt ?? 0}
+  {@const startedEvent = group.eventList.find(isActivityTaskStartedEvent)}
+  {@const attempts = startedEvent?.attributes?.attempt ?? 0}
   {@const retried = attempts > 1}
   {@const pending = group.isPending}
   <defs>
@@ -143,6 +203,43 @@
     >
       {attempts}x
     </text>
+  {/if}
+  {#if group?.userMetadata?.summary}
+    {#await decodeSingleReadablePayloadWithCodec(group.userMetadata.summary) then decoded}
+      {@const fullName = extractNameFromSummary(decoded)}
+      {#if selectedGroupId === group.id}
+        <g transform={`translate(${x + blockWidth / 2}, ${y + labelOffsetY})`}>
+          <text
+            x={0}
+            y={0}
+            text-anchor="middle"
+            font-size="1.5px"
+            fill="#374151"
+            style="pointer-events: none;"
+          >
+            {fullName}
+          </text>
+        </g>
+      {:else if !selectedGroupId}
+        {@const name = truncateText(fullName, maxChars)}
+        {#if name}
+          <g
+            transform={`translate(${x + blockWidth / 2}, ${y + labelOffsetY}) rotate(-35)`}
+          >
+            <text
+              x={0}
+              y={0}
+              text-anchor="middle"
+              font-size="1px"
+              fill="#374151"
+              style="pointer-events: none;"
+            >
+              {name}
+            </text>
+          </g>
+        {/if}
+      {/if}
+    {/await}
   {/if}
 {/snippet}
 
@@ -232,8 +329,12 @@
   {@const type = group.category.split('-')[0].toLowerCase()}
   <g
     class="fly-in"
-    style="animation-delay: {delay}ms;"
-    onclick={() => onClick(group)}
+    style="animation-delay: {delay}ms; outline: none; -webkit-tap-highlight-color: transparent;"
+    role="button"
+    tabindex="0"
+    onclick={() => handleClick(group)}
+    onkeydown={(e) =>
+      (e.key === 'Enter' || e.key === ' ') && handleClick(group)}
   >
     {#if type === 'signal'}
       {@render signal(group, index)}
@@ -251,25 +352,34 @@
   </g>
 {/snippet}
 
-<svg viewBox="-1 0 101 {height}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="subtle-shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-opacity="0.15" />
-    </filter>
-  </defs>
-  <line
-    x1="0"
-    y1={mid}
-    x2="100"
-    y2={mid}
-    stroke-width="1"
-    stroke="#374151"
-    stroke-linecap="round"
-  />
-  {#each groups as group, index}
-    {@render renderStep(group, index)}
-  {/each}
-</svg>
+<div
+  class="box-animation-scroll"
+  style="overflow-x: {scrollEnabled ? 'auto' : 'visible'};"
+>
+  <svg
+    viewBox={`-1 0 ${totalWidthUnits + 1} ${height}`}
+    xmlns="http://www.w3.org/2000/svg"
+    style={svgStyle}
+  >
+    <defs>
+      <filter id="subtle-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-opacity="0.15" />
+      </filter>
+    </defs>
+    <line
+      x1="0"
+      y1={mid}
+      x2={totalWidthUnits}
+      y2={mid}
+      stroke-width="1"
+      stroke="#374151"
+      stroke-linecap="round"
+    />
+    {#each groups as group, index}
+      {@render renderStep(group, index)}
+    {/each}
+  </svg>
+</div>
 
 <style>
   .retried {
@@ -318,5 +428,19 @@
 
   rect:hover {
     filter: url('#subtle-shadow') brightness(1.15);
+  }
+
+  /* Remove intrusive browser focus/tap highlight on SVG group buttons */
+  g[role='button'] {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  g[role='button']:focus {
+    outline: none;
+  }
+
+  g[role='button']:focus-visible {
+    outline: none;
   }
 </style>
