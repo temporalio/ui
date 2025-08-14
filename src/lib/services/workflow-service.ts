@@ -642,7 +642,7 @@ export async function startWorkflow({
               ...setSearchAttributes(searchAttributes),
             },
           },
-    ...(identity ? { identity } : {}),
+    ...(identity && { identity }),
   });
 
   return requestFromAPI(route, {

@@ -140,7 +140,7 @@ export async function createSchedule({
         body: stringifyWithBigInt({
           request_id: uuidv4(),
           ...body,
-          ...(identity ? { identity } : {}),
+          ...(identity && { identity }),
         }),
       },
       onError,
@@ -181,7 +181,7 @@ export async function editSchedule({
       body: stringifyWithBigInt({
         request_id: uuidv4(),
         ...body,
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
     onError,
@@ -219,7 +219,7 @@ export async function pauseSchedule({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
     onError: (error) => console.error(error),
@@ -255,7 +255,7 @@ export async function unpauseSchedule({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
   });
@@ -292,7 +292,7 @@ export async function triggerImmediately({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
   });
@@ -333,7 +333,7 @@ export async function backfillRequest({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
   });
