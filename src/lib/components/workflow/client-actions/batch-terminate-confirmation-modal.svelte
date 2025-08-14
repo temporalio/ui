@@ -13,18 +13,19 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { batchTerminateWorkflows } from '$lib/services/batch-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
-  import { getPlacholder } from '$lib/utilities/workflow-actions';
+  import { getPlaceholder } from '$lib/utilities/workflow-actions';
 
   import BatchOperationConfirmationModalBody from './batch-operation-confirmation-form.svelte';
 
   export let namespace: string;
   export let open: boolean;
+  const identity = getIdentity();
   const reason = writable('');
-  const reasonPlaceholder = getPlacholder(Action.Terminate, $authUser.email);
+  const reasonPlaceholder = getPlaceholder(Action.Terminate, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
   let jobIdPlaceholder = v4();

@@ -10,8 +10,11 @@
     SchedulePresetsParameters,
     ScheduleSpecParameters,
   } from '$lib/types/schedule';
+  import { getIdentity } from '$lib/utilities/core-context';
 
   let { namespace } = $page.params;
+
+  const identity = getIdentity();
 
   const handleCreate = (
     preset: SchedulePreset,
@@ -39,6 +42,7 @@
     } = args;
 
     const action: ScheduleActionParameters = {
+      identity,
       namespace,
       name,
       workflowType,

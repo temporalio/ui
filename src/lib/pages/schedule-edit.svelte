@@ -14,11 +14,13 @@
     SchedulePresetsParameters,
     ScheduleSpecParameters,
   } from '$lib/types/schedule';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
 
+  const identity = getIdentity();
   const parameters = {
     namespace,
     scheduleId: decodeURIForSvelte(scheduleId),
@@ -51,6 +53,7 @@
       workflowSearchAttributes,
     } = args;
     const action: ScheduleActionParameters = {
+      identity,
       namespace,
       name,
       workflowType,

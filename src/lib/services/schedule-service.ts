@@ -1,9 +1,6 @@
-import { get } from 'svelte/store';
-
 import { v4 as uuidv4 } from 'uuid';
 
 import { translate } from '$lib/i18n/translate';
-import { authUser } from '$lib/stores/auth-user';
 import type {
   CreateScheduleRequest,
   ListScheduleResponse,
@@ -95,11 +92,16 @@ export async function fetchSchedule(
 }
 
 export async function deleteSchedule(
-  parameters: ScheduleParameters,
+  {
+    namespace,
+    scheduleId,
+    identity,
+  }: ScheduleParameters & {
+    identity?: string;
+  },
   request = fetch,
 ): Promise<void> {
-  const identity = get(authUser).email;
-  const route = routeForApi('schedule', parameters);
+  const route = routeForApi('schedule', { namespace, scheduleId });
   return requestFromAPI(route, {
     request,
     options: { method: 'DELETE' },
@@ -111,14 +113,15 @@ type CreateScheduleOptions = {
   namespace: string;
   scheduleId: string;
   body: CreateScheduleRequest;
+  identity?: string;
 };
 
 export async function createSchedule({
   namespace,
   scheduleId,
   body,
+  identity,
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
-  const identity = get(authUser).email;
   let error = '';
   const onError: ErrorCallback = (err) =>
     (error =
@@ -137,7 +140,7 @@ export async function createSchedule({
         body: stringifyWithBigInt({
           request_id: uuidv4(),
           ...body,
-          ...(identity ? { identity } : {}),
+          ...(identity && { identity }),
         }),
       },
       onError,
@@ -158,8 +161,10 @@ export async function editSchedule({
   namespace,
   scheduleId,
   body,
-}: Partial<EditScheduleOptions>): Promise<{ error: string }> {
-  const identity = get(authUser).email;
+  identity,
+}: Partial<EditScheduleOptions> & { identity?: string }): Promise<{
+  error: string;
+}> {
   let error = '';
   const onError: ErrorCallback = (err) =>
     (error =
@@ -176,7 +181,7 @@ export async function editSchedule({
       body: stringifyWithBigInt({
         request_id: uuidv4(),
         ...body,
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
     onError,
@@ -189,14 +194,15 @@ type PauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
   reason: string;
+  identity?: string;
 };
 
 export async function pauseSchedule({
   namespace,
   scheduleId,
   reason,
+  identity,
 }: PauseScheduleOptions): Promise<null> {
-  const identity = get(authUser).email;
   const options = {
     patch: {
       pause: reason,
@@ -213,7 +219,7 @@ export async function pauseSchedule({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
     onError: (error) => console.error(error),
@@ -224,14 +230,15 @@ type UnpauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
   reason: string;
+  identity?: string;
 };
 
 export async function unpauseSchedule({
   namespace,
   scheduleId,
   reason,
+  identity,
 }: UnpauseScheduleOptions): Promise<null> {
-  const identity = get(authUser).email;
   const options = {
     patch: {
       unpause: reason,
@@ -248,7 +255,7 @@ export async function unpauseSchedule({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
   });
@@ -258,14 +265,15 @@ type TriggerImmediatelyOptions = {
   namespace: string;
   scheduleId: string;
   overlapPolicy: OverlapPolicy;
+  identity?: string;
 };
 
 export async function triggerImmediately({
   namespace,
   scheduleId,
   overlapPolicy,
+  identity,
 }: TriggerImmediatelyOptions): Promise<null> {
-  const identity = get(authUser).email;
   const options = {
     patch: {
       triggerImmediately: {
@@ -284,7 +292,7 @@ export async function triggerImmediately({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
   });
@@ -299,10 +307,10 @@ export async function backfillRequest({
   namespace,
   scheduleId,
   overlapPolicy,
+  identity,
   startTime,
   endTime,
 }: BackfillOptions): Promise<null> {
-  const identity = get(authUser).email;
   const options = {
     patch: {
       backfillRequest: [
@@ -325,7 +333,7 @@ export async function backfillRequest({
       body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
-        ...(identity ? { identity } : {}),
+        ...(identity && { identity }),
       }),
     },
   });
