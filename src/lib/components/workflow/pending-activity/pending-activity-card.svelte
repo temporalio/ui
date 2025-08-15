@@ -167,16 +167,18 @@
     <p class="text-sm text-secondary/80">
       {translate('workflows.heartbeat-details')}
     </p>
-    <PayloadDecoder value={activity.heartbeatDetails} key="payloads">
-      {#snippet children(decodedValue)}
-        <CodeBlock
-          content={decodedValue}
-          maxHeight={384}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      {/snippet}
-    </PayloadDecoder>
+    {#key activity.attempt}
+      <PayloadDecoder value={activity.heartbeatDetails} key="payloads">
+        {#snippet children(decodedValue)}
+          <CodeBlock
+            content={decodedValue}
+            maxHeight={384}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        {/snippet}
+      </PayloadDecoder>
+    {/key}
   </div>
 {/snippet}
 
