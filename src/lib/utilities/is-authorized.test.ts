@@ -2,20 +2,24 @@ import { describe, expect, it } from 'vitest';
 
 import { isAuthorized } from './is-authorized';
 
-const user = {
-  accessToken: 'xxx',
+const codeUser = {
+  accessToken: 'accessToken',
+};
+
+const implicitUser = {
+  idToken: 'idToken',
 };
 
 const noUser = {
   name: 'name',
   email: 'email',
   picture: 'picture',
-  idToken: 'idToken',
 };
 
-const getSettings = (enabled: boolean) => ({
+const getSettings = (enabled: boolean, flow: string) => ({
   auth: {
     enabled,
+    flow,
     options: [],
   },
   baseUrl: 'www.base.com',
@@ -29,16 +33,40 @@ const getSettings = (enabled: boolean) => ({
 });
 
 describe('isAuthorized', () => {
-  it('should return true if auth no enabled and no user', () => {
-    expect(isAuthorized(getSettings(false), noUser)).toBe(true);
+  it('should return true if auth not enabled and no user', () => {
+    expect(isAuthorized(getSettings(false, 'authorization-code'), noUser)).toBe(
+      true,
+    );
   });
-  it('should return true if auth no enabled and user', () => {
-    expect(isAuthorized(getSettings(false), user)).toBe(true);
+  it('should return true if auth not enabled and user', () => {
+    expect(
+      isAuthorized(getSettings(false, 'authorization-code'), codeUser),
+    ).toBe(true);
   });
-  it('should return false if auth enabled and no user', () => {
-    expect(isAuthorized(getSettings(true), noUser)).toBe(false);
+  it('should return false if code auth enabled and no user', () => {
+    expect(isAuthorized(getSettings(true, 'authorization-code'), noUser)).toBe(
+      false,
+    );
   });
-  it('should return true if auth enabled and user', () => {
-    expect(isAuthorized(getSettings(true), user)).toBe(true);
+  it('should return false if code auth enabled and implicit user', () => {
+    expect(
+      isAuthorized(getSettings(true, 'authorization-code'), implicitUser),
+    ).toBe(false);
+  });
+  it('should return true if code auth enabled and code user', () => {
+    expect(
+      isAuthorized(getSettings(true, 'authorization-code'), codeUser),
+    ).toBe(true);
+  });
+  it('should return false if implicit auth enabled and no user', () => {
+    expect(isAuthorized(getSettings(true, 'implicit'), noUser)).toBe(false);
+  });
+  it('should return false if implicit auth enabled and implicit user', () => {
+    expect(isAuthorized(getSettings(true, 'implicit'), codeUser)).toBe(false);
+  });
+  it('should return true if implicit auth enabled and implicit user', () => {
+    expect(isAuthorized(getSettings(true, 'implicit'), implicitUser)).toBe(
+      true,
+    );
   });
 });
