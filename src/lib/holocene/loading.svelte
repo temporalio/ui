@@ -49,7 +49,7 @@
   {:else}
     <Logo height={160} width={160} />
   {/if}
-  <h2>
+  <h4>
     {title}
-  </h2>
+  </h4>
 </div>
