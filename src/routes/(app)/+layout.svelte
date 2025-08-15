@@ -3,6 +3,7 @@
   import { page, updated } from '$app/stores';
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
+  import CommandPalette from '$lib/components/command-palette.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
@@ -37,6 +38,7 @@
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   let namespaceList: NamespaceListItem[];
+  let commandPaletteOpen = false;
 
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
@@ -228,6 +230,7 @@
 
 <DarkMode />
 <SkipNavigation />
+<CommandPalette bind:open={commandPaletteOpen} />
 
 <div class="flex w-screen flex-row">
   <Toaster
