@@ -81,7 +81,7 @@
         id: 'create-schedule',
         title: 'Create Schedule',
         subtitle: 'Create a new workflow schedule',
-        icon: 'plus',
+        icon: 'add',
         category: 'Actions',
         action: () => {
           goto(routeForScheduleCreate({ namespace }));
@@ -247,7 +247,7 @@
 <Modal
   {open}
   on:close={close}
-  class="command-palette-modal"
+  class="max-w-2xl [&_.modal-content]:p-0"
   large
   id="command-palette"
   cancelText="Close"
@@ -261,12 +261,12 @@
     </div>
   </svelte:fragment>
 
-  <div class="command-palette-container" slot="content">
-    <div class="search-container">
+  <div class="flex h-full flex-1 flex-col" slot="content">
+    <div class="border-b border-slate-200 pb-4 dark:border-slate-700">
       <Input
         bind:value={searchQuery}
         placeholder="Search for commands..."
-        class="command-search-input"
+        class="border-none shadow-none [&_input]:border-none [&_input]:px-4 [&_input]:py-3 [&_input]:text-lg [&_input]:shadow-none [&_input]:ring-0 [&_input]:focus:border-none [&_input]:focus:ring-0"
         icon="search"
         labelHidden
         label="Search commands"
@@ -275,53 +275,77 @@
       />
     </div>
 
-    <div class="commands-list" role="listbox">
+    <div class="max-h-96 flex-1 overflow-y-auto" role="listbox">
       {#each filteredCommands as command, index (command.id)}
         <button
           type="button"
-          class="command-item"
+          class="flex w-full items-center justify-between rounded-sm border border-transparent px-4 py-3 text-left transition-colors duration-150 hover:bg-slate-50 dark:hover:bg-slate-800"
           class:selected={index === selectedIndex}
           onclick={() => handleCommandClick(command)}
           onmouseenter={() => (selectedIndex = index)}
           role="option"
           aria-selected={index === selectedIndex}
         >
-          <div class="command-content">
+          <div class="flex items-center gap-3">
             {#if command.icon}
-              <div class="command-icon">
+              <div
+                class="h-5 w-5 flex-shrink-0 text-slate-500 dark:text-slate-400"
+              >
                 <Icon name={command.icon} />
               </div>
             {/if}
-            <div class="command-text">
-              <div class="command-title">{command.title}</div>
+            <div class="flex flex-col">
+              <div class="font-medium text-slate-900 dark:text-slate-100">
+                {command.title}
+              </div>
               {#if command.subtitle}
-                <div class="command-subtitle">{command.subtitle}</div>
+                <div class="text-sm text-slate-500 dark:text-slate-400">
+                  {command.subtitle}
+                </div>
               {/if}
             </div>
           </div>
           {#if command.category}
-            <div class="command-category">{command.category}</div>
+            <div
+              class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+            >
+              {command.category}
+            </div>
           {/if}
         </button>
       {:else}
-        <div class="no-results">
+        <div
+          class="flex flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400"
+        >
           <Icon name="search" />
-          <p>No commands found</p>
-          <p class="text-sm text-slate-500">Try a different search term</p>
+          <p class="mt-2">No commands found</p>
+          <p class="mt-2 text-sm text-slate-500">Try a different search term</p>
         </div>
       {/each}
     </div>
 
-    <div class="command-palette-footer">
-      <div class="keyboard-hints">
-        <span class="hint">
-          <kbd>↑</kbd><kbd>↓</kbd> to navigate
+    <div class="border-t border-slate-200 pt-3 dark:border-slate-700">
+      <div class="flex gap-4 text-sm text-slate-500 dark:text-slate-400">
+        <span class="flex items-center gap-1">
+          <kbd
+            class="rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700"
+            >↑</kbd
+          ><kbd
+            class="rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700"
+            >↓</kbd
+          > to navigate
         </span>
-        <span class="hint">
-          <kbd>⏎</kbd> to select
+        <span class="flex items-center gap-1">
+          <kbd
+            class="rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700"
+            >⏎</kbd
+          > to select
         </span>
-        <span class="hint">
-          <kbd>Esc</kbd> to close
+        <span class="flex items-center gap-1">
+          <kbd
+            class="rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700"
+            >Esc</kbd
+          > to close
         </span>
       </div>
     </div>
@@ -329,87 +353,28 @@
 </Modal>
 
 <style lang="postcss">
-  .command-palette-container {
-    @apply flex h-full flex-1 flex-col gap-4;
+  .selected {
+    @apply border-blue-200 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30;
   }
 
-  .search-container {
-    @apply border-b border-slate-200 pb-4 dark:border-slate-700;
+  :global(.body::backdrop) {
+    background: linear-gradient(-45deg, #64748b, #6366f1, #475569, #4f46e5);
+    background-size: 100% 100%;
+    animation: gradientShift 4s ease-in-out infinite;
+    opacity: 0.25;
   }
 
-  :global(.command-search-input) {
-    @apply border-none shadow-none;
-  }
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
 
-  :global(.command-search-input input) {
-    @apply border-none px-4 py-3 text-lg shadow-none ring-0 focus:border-none focus:ring-0;
-  }
+    50% {
+      background-position: 100% 50%;
+    }
 
-  .commands-list {
-    @apply max-h-96 flex-1 overflow-y-auto;
-  }
-
-  .command-item {
-    @apply flex w-full items-center justify-between rounded-lg border border-transparent px-4 py-3 text-left transition-colors duration-150 hover:bg-slate-50 dark:hover:bg-slate-800;
-  }
-
-  .command-item.selected {
-    @apply border border-blue-200 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30;
-  }
-
-  .command-content {
-    @apply flex items-center gap-3;
-  }
-
-  .command-icon {
-    @apply h-5 w-5 flex-shrink-0 text-slate-500 dark:text-slate-400;
-  }
-
-  .command-text {
-    @apply flex flex-col;
-  }
-
-  .command-title {
-    @apply font-medium text-slate-900 dark:text-slate-100;
-  }
-
-  .command-subtitle {
-    @apply text-sm text-slate-500 dark:text-slate-400;
-  }
-
-  .command-category {
-    @apply rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300;
-  }
-
-  .no-results {
-    @apply flex flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400;
-  }
-
-  .no-results p {
-    @apply mt-2;
-  }
-
-  .command-palette-footer {
-    @apply border-t border-slate-200 pt-3 dark:border-slate-700;
-  }
-
-  .keyboard-hints {
-    @apply flex gap-4 text-sm text-slate-500 dark:text-slate-400;
-  }
-
-  .hint {
-    @apply flex items-center gap-1;
-  }
-
-  kbd {
-    @apply rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700;
-  }
-
-  :global(.command-palette-modal) {
-    @apply max-w-2xl;
-  }
-
-  :global(.command-palette-modal .modal-content) {
-    @apply p-0;
+    100% {
+      background-position: 0% 50%;
+    }
   }
 </style>

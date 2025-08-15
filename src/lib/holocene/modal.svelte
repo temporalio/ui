@@ -88,7 +88,7 @@
   {id}
   on:close={handleCancel}
   bind:this={modalElement}
-  class={merge('body', className)}
+  class={merge('body ', className)}
   class:large
   class:hightlightNav
   aria-modal="true"
@@ -119,7 +119,7 @@
         {error}
       </p>
     </div>
-    <div class="flex items-center justify-end space-x-2 p-6">
+    <div class="flex items-center justify-end space-x-2 px-5 py-4">
       <Button variant="ghost" disabled={loading} on:click={closeModal}
         >{cancelText}</Button
       >
@@ -138,7 +138,7 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto border border-secondary p-0 text-primary shadow-xl md:h-max;
+    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-sm border border-secondary p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {
@@ -158,6 +158,6 @@
   }
 
   .content {
-    @apply whitespace-normal p-8;
+    @apply whitespace-normal p-4;
   }
 </style>
