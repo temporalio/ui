@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import type { ButtonStyles } from '$lib/anthropocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
   import { atob } from '$lib/utilities/atob';

@@ -1,0 +1,45 @@
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  import type { IconName } from '$lib/anthropocene/icon';
+  import Icon from '$lib/anthropocene/icon/icon.svelte';
+
+  interface Props {
+    title: string;
+    content?: string;
+    error?: string;
+    icon?: IconName;
+    class?: string;
+    testId?: string;
+    children?: Snippet;
+  }
+
+  let {
+    title,
+    content = '',
+    error = '',
+    icon = 'comet',
+    class: className = '',
+    testId,
+    children,
+  }: Props = $props();
+</script>
+
+<div
+  class="my-12 flex w-full flex-col items-center justify-start gap-2 text-primary {className}"
+  data-testid={testId}
+>
+  <span class=" flex h-16 w-16 items-center justify-center rounded-full">
+    <Icon name={icon} class="block h-full w-full" /></span
+  >
+  <p class="text-xl font-medium">{title}</p>
+  {#if content}
+    <p class="text-center">{content}</p>
+  {/if}
+  {#if error}
+    <p class="border border-danger bg-danger p-5 text-center">
+      {error}
+    </p>
+  {/if}
+  {#if children}{@render children()}{/if}
+</div>

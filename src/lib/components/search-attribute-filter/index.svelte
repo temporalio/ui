@@ -18,7 +18,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';

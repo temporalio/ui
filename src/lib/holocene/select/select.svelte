@@ -26,7 +26,7 @@
   import { onMount, setContext } from 'svelte';
   import { twMerge } from 'tailwind-merge';
 
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import type { ButtonStyles } from '$lib/anthropocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
