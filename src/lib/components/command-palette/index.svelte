@@ -5,7 +5,6 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import {
     routeForArchivalWorkfows,
     routeForBatchOperations,
@@ -182,16 +181,24 @@
     if (!open) return;
 
     switch (event.key) {
+      case 'ArrowLeft':
+        if (ActiveComponent) {
+          event.preventDefault();
+          onBack();
+        }
+        break;
       case 'ArrowDown':
         event.preventDefault();
         selectedIndex = Math.min(
           selectedIndex + 1,
           filteredCommands.length - 1,
         );
+        scrollToSelected();
         break;
       case 'ArrowUp':
         event.preventDefault();
         selectedIndex = Math.max(selectedIndex - 1, 0);
+        scrollToSelected();
         break;
       case 'Enter':
         event.preventDefault();
@@ -206,6 +213,22 @@
     }
   }
 
+  function scrollToSelected() {
+    // Use requestAnimationFrame to ensure DOM is updated with new selectedIndex
+    requestAnimationFrame(() => {
+      const selectedButton = document.querySelector(
+        '[role="listbox"] button[aria-selected="true"]',
+      );
+      if (selectedButton) {
+        selectedButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        });
+      }
+    });
+  }
+
   function handleGlobalKeydown(event: KeyboardEvent) {
     if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
       event.preventDefault();
@@ -218,14 +241,27 @@
   }
 
   function close() {
-    open = false;
-    searchQuery = '';
-    selectedIndex = 0;
+    const modal = document.getElementById('command-palette');
+    if (modal) {
+      modal.classList.add('closing');
+      setTimeout(() => {
+        open = false;
+        searchQuery = '';
+        selectedIndex = 0;
+        modal.classList.remove('closing');
+      }, 150);
+    } else {
+      open = false;
+      searchQuery = '';
+      selectedIndex = 0;
+    }
   }
 
   function toggle() {
-    open = !open;
     if (open) {
+      close();
+    } else {
+      open = true;
       searchQuery = '';
       selectedIndex = 0;
       ActiveComponent = undefined;
@@ -248,31 +284,70 @@
       document.removeEventListener('keydown', handleKeydown);
     };
   });
+
+  function onBack() {
+    ActiveComponent = undefined;
+  }
 </script>
+
+{#snippet keyboardShortcuts()}
+  <div class="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
+    <span class="flex items-center gap-1.5">
+      {#if ActiveComponent}
+        <kbd
+          class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+          >←</kbd
+        >
+      {/if}
+      <kbd
+        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        >↑</kbd
+      ><kbd
+        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        >↓</kbd
+      >
+      <span class="text-slate-400">navigate</span>
+    </span>
+    <span class="flex items-center gap-1.5">
+      <kbd
+        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        >⏎</kbd
+      >
+      <span class="text-slate-400">select</span>
+    </span>
+    <span class="flex items-center gap-1.5">
+      <kbd
+        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        >Esc</kbd
+      >
+      <span class="text-slate-400">close</span>
+    </span>
+  </div>
+{/snippet}
 
 {#snippet commandList()}
   {#each filteredCommands as command, index (command.id)}
     <button
       type="button"
-      class="flex w-full items-center justify-between rounded-sm border border-transparent px-4 py-3 text-left transition-colors duration-150 hover:bg-slate-50 dark:hover:bg-slate-800"
+      class="flex w-full items-center justify-between rounded-lg border border-transparent px-6 py-4 text-left transition-all duration-200 hover:bg-slate-50 hover:shadow-sm dark:hover:bg-slate-800"
       class:selected={index === selectedIndex}
       onclick={() => handleCommandClick(command)}
       onmouseenter={() => (selectedIndex = index)}
       role="option"
       aria-selected={index === selectedIndex}
     >
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-4">
         {#if command.icon}
-          <div class="h-5 w-5 flex-shrink-0 text-slate-500 dark:text-slate-400">
+          <div class="h-6 w-6 flex-shrink-0 text-secondary">
             <Icon name={command.icon} />
           </div>
         {/if}
-        <div class="flex flex-col">
-          <div class="font-medium text-slate-900 dark:text-slate-100">
+        <div class="flex flex-col gap-1">
+          <div class="text-lg font-semibold text-secondary">
             {command.title}
           </div>
           {#if command.subtitle}
-            <div class="text-sm text-slate-500 dark:text-slate-400">
+            <div class="text-sm text-secondary">
               {command.subtitle}
             </div>
           {/if}
@@ -280,7 +355,7 @@
       </div>
       {#if command.category}
         <div
-          class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+          class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300"
         >
           {command.category}
         </div>
@@ -288,11 +363,11 @@
     </button>
   {:else}
     <div
-      class="flex flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400"
+      class="flex min-h-96 flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400"
     >
       <Icon name="search" />
-      <p class="mt-2">No commands found</p>
-      <p class="mt-2 text-sm text-slate-500">Try a different search term</p>
+      <h3 class="mt-2 text-secondary">No commands found</h3>
+      <p class="mt-2 text-secondary">Try a different search term</p>
     </div>
   {/each}
 {/snippet}
@@ -300,96 +375,79 @@
 <Modal
   {open}
   on:close={close}
-  class="max-w-2xl [&_.modal-content]:p-0"
+  class="command-palette-modal h-[70vh] max-h-[600px] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
   large
   id="command-palette"
   cancelText="Close"
   confirmText="Select"
   hideConfirm={true}
+  loading={true}
 >
-  <svelte:fragment slot="title">
-    <div class="flex items-center gap-2 text-lg font-medium">
-      <Loading title="" size={48} />
-      Command Palette
-    </div>
-  </svelte:fragment>
-
-  <div class="flex h-full flex-1 flex-col px-4" slot="content">
-    {#if !ActiveComponent}
-      <div class="border-b border-slate-200 pb-4 dark:border-slate-700">
-        <Input
-          id="action-search"
-          bind:value={searchQuery}
-          placeholder="Search for commands..."
-          class="border-none shadow-none [&_input]:border-none [&_input]:px-4 [&_input]:py-3 [&_input]:text-lg [&_input]:shadow-none [&_input]:ring-0 [&_input]:focus:border-none [&_input]:focus:ring-0"
-          icon="search"
-          labelHidden
-          label="Search commands"
-          autocomplete="off"
-          spellcheck={false}
-        />
+  <div class="flex h-full flex-1 flex-col" slot="content">
+    <div
+      class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
+    >
+      <div class="flex items-center justify-between px-6 py-3">
+        <div
+          class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
+        >
+          <div class="h-5 w-5 text-indigo-600 dark:text-indigo-400">
+            <Icon name="search" />
+          </div>
+          Command Palette
+        </div>
+        <div class="flex items-center gap-4">
+          {@render keyboardShortcuts()}
+          <button
+            type="button"
+            onclick={close}
+            class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+            aria-label="Close"
+          >
+            <Icon name="close" class="h-4 w-4" />
+          </button>
+        </div>
       </div>
-    {/if}
-
-    <div class="max-h-96 flex-1 overflow-y-auto" role="listbox">
-      {#if ActiveComponent}
-        <ActiveComponent />
-      {:else}
-        {@render commandList()}
+      {#if !ActiveComponent}
+        <div class="px-6">
+          <Input
+            id="action-search"
+            bind:value={searchQuery}
+            placeholder="Search for commands..."
+            icon="search"
+            labelHidden
+            label="Search commands"
+            autocomplete="off"
+            spellcheck={false}
+          />
+        </div>
       {/if}
     </div>
 
-    <div class="border-t border-slate-200 pt-3 dark:border-slate-700">
-      <div class="flex gap-4 text-sm text-slate-500 dark:text-slate-400">
-        <span class="flex items-center gap-1">
-          <kbd
-            class="rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700"
-            >↑</kbd
-          ><kbd
-            class="rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700"
-            >↓</kbd
-          > to navigate
-        </span>
-        <span class="flex items-center gap-1">
-          <kbd
-            class="rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700"
-            >⏎</kbd
-          > to select
-        </span>
-        <span class="flex items-center gap-1">
-          <kbd
-            class="rounded border border-slate-300 bg-slate-100 px-2 py-1 text-xs dark:border-slate-600 dark:bg-slate-700"
-            >Esc</kbd
-          > to close
-        </span>
-      </div>
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto px-6 py-4" role="listbox">
+      {#if ActiveComponent}
+        <ActiveComponent {onBack} />
+      {:else}
+        {@render commandList()}
+      {/if}
     </div>
   </div>
 </Modal>
 
 <style lang="postcss">
   .selected {
-    @apply border-blue-200 bg-blue-50;
+    @apply border-indigo-200 bg-indigo-50 shadow-sm;
   }
 
   :global(.body::backdrop) {
-    background: linear-gradient(-45deg, #64748b, #6366f1, #475569, #4f46e5);
-    background-size: 100% 100%;
-    animation: gradientShift 4s ease-in-out infinite;
-    opacity: 0.25;
+    background: rgb(15 23 42 / 75%);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  @keyframes gradientShift {
-    0% {
-      background-position: 0% 50%;
-    }
-
-    50% {
-      background-position: 100% 50%;
-    }
-
-    100% {
-      background-position: 0% 50%;
-    }
+  :global(.body[open]::backdrop) {
+    opacity: 1;
   }
 </style>

@@ -16,9 +16,10 @@
     class?: string;
     adapter: StartWorkflowAdapter;
     initialAttributes: StartWorkflowFormData;
+    onBack: () => void;
   }
 
-  let { adapter = defaultAdapter }: Props = $props();
+  let { adapter = defaultAdapter, onBack }: Props = $props();
 
   const initialAttributes = $derived({
     id: page.params.workflow,
@@ -50,7 +51,7 @@
   );
 </script>
 
-<div class="space-y-6 px-4 py-6">
+<div class="space-y-6 px-4">
   <h2>Start Workflow</h2>
   <form use:enhance class="space-y-4">
     <Input
@@ -90,25 +91,34 @@
       errorsTitle={translate('search-attributes.validation-error-title')}
     />
 
-    <div class="flex justify-end gap-3 pt-4">
-      <Button
-        type="submit"
-        variant="primary"
-        disabled={$submitting || !$form.name}
-        class="relative"
-      >
-        {$submitting ? 'Starting' : 'Start'}
-        <TaintedBadge show={isTainted($tainted)} count={taintedCount} />
-      </Button>
-
+    <div class="flex justify-between gap-3 pt-4">
       <Button
         type="button"
         variant="secondary"
-        on:click={handleCancel}
-        disabled={$submitting}
+        leadingIcon="chevron-left"
+        on:click={onBack}
+        disabled={$submitting}>Back</Button
       >
-        {translate('search-attributes.cancel-button')}
-      </Button>
+      <div class="flex items-center gap-3">
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={$submitting || !$form.name}
+          class="relative"
+        >
+          {$submitting ? 'Starting' : 'Start'}
+          <TaintedBadge show={isTainted($tainted)} count={taintedCount} />
+        </Button>
+
+        <Button
+          type="button"
+          variant="secondary"
+          on:click={handleCancel}
+          disabled={$submitting}
+        >
+          {translate('search-attributes.cancel-button')}
+        </Button>
+      </div>
     </div>
   </form>
 </div>

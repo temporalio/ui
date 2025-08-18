@@ -24,11 +24,7 @@
     class?: string;
   }
 
-  export let hideConfirm = false;
-  export let confirmText: string;
   export let cancelText: string;
-  export let confirmType: ComponentProps<Button>['variant'] = 'primary';
-  export let confirmDisabled = false;
   export let large = false;
   export let loading = false;
   export let hightlightNav = false;
@@ -104,7 +100,7 @@
       on:click={closeModal}
     />
   {/if}
-  <div id="modal-title-{id}" class="title">
+  <div id="modal-title-{id}">
     <slot name="title" />
   </div>
   <form on:submit|preventDefault={confirmModal} method="dialog">
@@ -143,6 +139,6 @@
   }
 
   .content {
-    @apply whitespace-normal p-4;
+    @apply whitespace-normal;
   }
 </style>
