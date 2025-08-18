@@ -16,7 +16,6 @@
     hideConfirm?: boolean;
     hightlightNav?: boolean;
     id: string;
-    large?: boolean;
     loading?: boolean;
     'data-testid'?: string;
     open: boolean;
@@ -25,7 +24,6 @@
   }
 
   export let cancelText: string;
-  export let large = false;
   export let loading = false;
   export let hightlightNav = false;
   export let id: string;
@@ -84,7 +82,6 @@
   on:close={handleCancel}
   bind:this={modalElement}
   class={merge('body ', className)}
-  class:large
   class:hightlightNav
   aria-modal="true"
   aria-labelledby="modal-title-{id}"
@@ -119,7 +116,7 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto rounded-sm border border-secondary p-0 text-primary shadow-xl md:h-max;
+    @apply surface-primary z-50 w-full overflow-y-auto rounded-sm border border-secondary p-0 text-primary shadow-xl md:h-max lg:max-w-4xl;
   }
 
   .body::backdrop {
@@ -128,10 +125,6 @@
 
   .body.hightlightNav::backdrop {
     @apply left-[60px] top-[40px];
-  }
-
-  .large {
-    @apply lg:max-w-3xl;
   }
 
   .title {
