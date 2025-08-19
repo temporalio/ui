@@ -32,7 +32,18 @@
       },
       language: {
         control: 'select',
-        options: ['json', 'shell', 'text'],
+        options: [
+          'json',
+          'shell',
+          'text',
+          'java',
+          'python',
+          'go',
+          'php',
+          'dotnet',
+          'ruby',
+          'typescript',
+        ],
         table: { category: 'Content' },
       },
       minHeight: {
@@ -186,5 +197,106 @@
     content: 'Hello, World!',
     copyIconTitle: 'Click to copy content',
     copySuccessIconTitle: 'Content copied to clipboard',
+  }}
+/>
+
+<Story
+  name="Java"
+  args={{
+    language: 'java',
+    content: `// Initialize client connection
+    WorkflowServiceStubs service =
+        WorkflowServiceStubs.newServiceStubs(
+            WorkflowServiceStubsOptions.newBuilder()
+                .addApiKey(
+                    () ->
+                        "<APIKey>")
+                .setTarget("<endpoint>")
+                .setEnableHttps(true)
+                ...
+                .build());
+
+    WorkflowClient client =
+        WorkflowClient.newInstance(
+            service, WorkflowClientOptions.newBuilder().setNamespace("<namespace_id>.<account_id>").build());
+`,
+  }}
+/>
+
+<Story
+  name="Typescript"
+  args={{
+    language: 'typescript',
+    content: `// Initialize client connection
+const connection = await Connection.connect({
+    address: "<endpoint>",
+    tls: true,
+    apiKey: "<APIKey>",
+});
+const client = new Client({
+    connection,
+    namespace: "<namespace_id>.<account_id>",
+});
+`,
+  }}
+/>
+
+<Story
+  name="Python"
+  args={{
+    language: 'python',
+    content: `# stuff
+client = await Client.connect(
+    "<endpoint>",
+    namespace="<namespace_id>.<account_id>",
+    api_key="<APIKey>",
+    tls=True,
+)`,
+  }}
+/>
+
+<Story
+  name="Ruby"
+  args={{
+    language: 'ruby',
+    content: `# Initialize client connection
+client = Temporalio::Client.connect(
+  "<endpoint>",
+  "<namespace_id>.<account_id>",
+  api_key: "<APIKey>",
+  tls: true
+)
+`,
+  }}
+/>
+
+<Story
+  name="Go"
+  args={{
+    language: 'go',
+    content: `// Initialize client connection
+clientOptions := client.Options{
+    HostPort: "<endpoint>",
+    Namespace: "<namespace_id>.<account_id>",
+    ConnectionOptions: client.ConnectionOptions{TLS: &tls.Config{}},
+    Credentials: client.NewAPIKeyStaticCredentials("<APIKey>"),
+}
+c, err := client.Dial(clientOptions)
+`,
+  }}
+/>
+
+<Story
+  name=".NET"
+  args={{
+    language: 'dotnet',
+    content: `// Initialize client connection
+var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
+{
+    Namespace = "<namespace_id>.<account_id>",
+    ApiKey = "<APIKey>",
+    Tls = new(),
+});
+`,
   }}
 />

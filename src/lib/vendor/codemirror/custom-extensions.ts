@@ -1,5 +1,12 @@
+import { go } from '@codemirror/lang-go';
+import { java } from '@codemirror/lang-java';
 import { json } from '@codemirror/lang-json';
+import { php } from '@codemirror/lang-php';
 import { HighlightStyle, StreamLanguage } from '@codemirror/language';
+import { csharp } from '@codemirror/legacy-modes/mode/clike';
+import { typescript } from '@codemirror/legacy-modes/mode/javascript';
+import { python } from '@codemirror/legacy-modes/mode/python';
+import { ruby } from '@codemirror/legacy-modes/mode/ruby';
 import { shell } from '@codemirror/legacy-modes/mode/shell';
 import { EditorView } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
@@ -7,7 +14,17 @@ import colors from 'tailwindcss/colors';
 
 import { css } from '$lib/theme/utilities';
 
-export type EditorLanguage = 'json' | 'text' | 'shell';
+export type EditorLanguage =
+  | 'json'
+  | 'text'
+  | 'shell'
+  | 'go'
+  | 'typescript'
+  | 'python'
+  | 'dotnet'
+  | 'php'
+  | 'java'
+  | 'ruby';
 
 export const getEditorTheme = ({ isDark }: { isDark: boolean }) =>
   EditorView.theme(
@@ -64,12 +81,12 @@ export const getHeightTheme = ({
 export const highlightStyles = HighlightStyle.define(
   [
     { tag: tags.punctuation, color: css('--color-text-primary') },
-    { tag: tags.string, color: css('--color-text-primary') },
+    { tag: tags.string, color: css('--color-text-success') },
     { tag: tags.propertyName, color: css('--color-text-brand') },
     { tag: tags.bool, color: css('--color-text-primary') },
     { tag: tags.number, color: css('--color-text-primary') },
     { tag: tags.operator, color: css('--color-text-pink') },
-    { tag: tags.comment, color: css('--color-text-success') },
+    { tag: tags.comment, color: css('--color-text-subtle') },
     { tag: tags.variableName, color: css('--color-text-pink') },
   ],
   { themeType: 'light' },
@@ -90,5 +107,12 @@ export const getLineBreakExtension = (editable: boolean) =>
 export const getLanguageExtension = (language: EditorLanguage) =>
   ({
     json: json(),
+    java: java(),
+    go: go(),
+    php: php(),
+    python: StreamLanguage.define(python),
     shell: StreamLanguage.define(shell),
+    dotnet: StreamLanguage.define(csharp),
+    ruby: StreamLanguage.define(ruby),
+    typescript: StreamLanguage.define(typescript),
   })[language] ?? undefined;
