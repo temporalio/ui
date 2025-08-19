@@ -470,7 +470,6 @@ export async function resetWorkflow({
     workflowTaskFinishEventId: eventId,
     requestId: v4(),
     reason: formattedReason,
-    ...(identity && { identity }),
   };
 
   if (get(isCloud) || minimumVersionRequired('1.24.0', get(temporalVersion))) {
