@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import type { Props } from '$lib/holocene/code-block.svelte';
@@ -70,7 +70,16 @@
   import { action } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+
+  const content = {
+    'File A': 'console.log("***");',
+    'File B': 'console.log("***");',
+  };
+
+  let activeTab = $state('File A');
+  let hidden = $state(true);
 
   let editableContent = $state(
     stringifyWithBigInt({ hello: 'world' }, null, 2),
@@ -300,3 +309,25 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
 `,
   }}
 />
+
+<Story name="With Header">
+  <CodeBlock
+    copyable
+    language="typescript"
+    tabs={['File A', 'File B']}
+    bind:activeTab
+    content={hidden
+      ? content[activeTab]
+      : content[activeTab].replace('***', 'secret')}
+  >
+    {#snippet headerActions()}
+      <button onclick={() => (hidden = !hidden)}>
+        {#if hidden}
+          <Icon name="eye-show" />
+        {:else}
+          <Icon name="eye-hide" />
+        {/if}
+      </button>
+    {/snippet}
+  </CodeBlock>
+</Story>

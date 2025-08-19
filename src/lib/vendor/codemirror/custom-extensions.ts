@@ -26,15 +26,19 @@ export type EditorLanguage =
   | 'java'
   | 'ruby';
 
-export const getEditorTheme = ({ isDark }: { isDark: boolean }) =>
+export const getEditorTheme = (isDark: boolean, header: boolean) =>
   EditorView.theme(
     {
       '&': {
         color: css('--color-text-primary'),
         backgroundColor: css('--color-surface-code-block'),
-        borderWidth: '1px',
-        borderColor: css('--color-border-subtle'),
         height: '100%',
+        ...(header
+          ? {}
+          : {
+              borderWidth: '1px',
+              borderColor: css('--color-border-subtle'),
+            }),
       },
       '.cm-scroller': {
         fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',

@@ -12,8 +12,8 @@
   } from '@codemirror/language';
   import { Compartment, EditorState, type Extension } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
-  import { onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
+  import { onMount, type Snippet } from 'svelte';
+  import { twMerge as merge, twMerge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { Maximizable } from '$lib/holocene/maximizable';
@@ -49,6 +49,9 @@
     maxHeight?: number;
     label?: string;
     class?: string;
+    tabs?: string[];
+    activeTab?: string;
+    headerActions?: Snippet<[]>;
   }
 
   interface PropsWithCopyable
@@ -73,6 +76,9 @@
     maxHeight = undefined,
     label = '',
     onchange = undefined,
+    tabs,
+    activeTab = $bindable(),
+    headerActions,
     ...editorProps
   }: Props = $props();
 
@@ -124,6 +130,7 @@
   const maximizable = $derived(
     (maxHeight && editorView?.contentHeight > maxHeight) ?? false,
   );
+  const hasHeader = $derived(!!tabs);
   let maximized = $state(false);
 
   // a compartment allows us to update extensions like the theme
@@ -141,7 +148,7 @@
 
   let dynamicExtensions: Extension[] = $derived(
     [
-      getEditorTheme({ isDark: $useDarkMode }),
+      getEditorTheme($useDarkMode, hasHeader),
       getActionsTheme({ hasActions: copyable || maximizable }),
       EditorState.readOnly.of(!editable),
       EditorView.editable.of(editable),
@@ -227,7 +234,44 @@
   });
 </script>
 
-<div class="min-w-[80px] grow">
+{#snippet tab(title: string)}
+  <button
+    class={twMerge(
+      'h-full border-b-2 border-transparent py-2',
+      title === activeTab ? 'border-brand' : '',
+    )}
+    onclick={() => (activeTab = title)}
+  >
+    {title}
+  </button>
+{/snippet}
+
+<div
+  class={twMerge('min-w-[80px] grow', hasHeader && ['border border-subtle'])}
+>
+  {#if tabs && tabs.length > 0}
+    <div
+      class="flex flex-row items-center justify-between border-b border-subtle bg-code-block px-3"
+    >
+      <div class="flex flex-row items-center gap-4">
+        {#each tabs as title (title)}
+          {@render tab(title)}
+        {/each}
+      </div>
+      <div class="flex flex-row items-center gap-4">
+        {@render headerActions?.()}
+        {#if copyable}
+          <CopyButton
+            {copyIconTitle}
+            {copySuccessIconTitle}
+            class="m-0 rounded-full text-secondary"
+            on:click={handleCopy}
+            copied={$copied}
+          />
+        {/if}
+      </div>
+    </div>
+  {/if}
   <Maximizable bind:maximized enabled={maximizable}>
     <div
       bind:this={editorElement}
@@ -241,7 +285,7 @@
     ></div>
 
     {#snippet actions()}
-      {#if copyable}
+      {#if copyable && !hasHeader}
         <CopyButton
           {copyIconTitle}
           {copySuccessIconTitle}
