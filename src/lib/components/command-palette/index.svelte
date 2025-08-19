@@ -15,10 +15,9 @@
     routeForSchedules,
     routeForWorkerDeployments,
     routeForWorkflows,
-    // routeForWorkflowStart,
+    routeForWorkflowStart,
   } from '$lib/utilities/route-for';
 
-  import StartWorkflowForm from './actions/start-workflow/form.svelte';
   import Modal from './modal.svelte';
 
   interface Props {
@@ -51,12 +50,10 @@
         title: 'Start Workflow',
         subtitle: 'Create a new workflow execution',
         icon: 'play',
-        category: 'Actions',
+        category: 'Navigation',
         action: () => {
-          ActiveComponent = StartWorkflowForm;
-          // goto(routeForWorkflowStart({ namespace }));
-
-          // close();
+          goto(routeForWorkflowStart({ namespace }));
+          close();
         },
       },
       {
@@ -64,7 +61,7 @@
         title: 'Create Schedule',
         subtitle: 'Create a new workflow schedule',
         icon: 'add',
-        category: 'Action',
+        category: 'Navigation',
         action: () => {
           goto(routeForScheduleCreate({ namespace }));
           close();
