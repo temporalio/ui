@@ -18,11 +18,11 @@
     endpoint,
     editDisabled = false,
     editHidden = false,
-    route = routeForNexus,
+    backHref = routeForNexus,
     taskQueueStatus,
   }: {
     endpoint: Endpoint;
-    route?: () => string;
+    backHref?: () => string;
     editDisabled?: boolean;
     editHidden?: boolean;
     taskQueueStatus?: Snippet;
@@ -31,7 +31,7 @@
 
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={route()} icon="chevron-left">
+    <Link href={backHref()} icon="chevron-left">
       {translate('nexus.back-to-endpoints')}
     </Link>
   </div>
