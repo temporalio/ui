@@ -41,15 +41,12 @@
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
-  import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { currentPageKey } from '$lib/stores/pagination';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
     queryWithParentWorkflowId,
@@ -60,8 +57,9 @@
   } from '$lib/stores/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
+
+  import QueryTabs from './query-tabs.svelte';
 
   $: query = $page.url.searchParams.get('query');
   $: query, ($workflowsQuery = query);
@@ -167,16 +165,6 @@
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
-
-  const setTab = (_query: string) => {
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: _query,
-      allowEmpty: true,
-      clearParameters: [currentPageKey],
-    });
-  };
 </script>
 
 <BatchTerminateConfirmationModal
@@ -234,41 +222,7 @@
 
 <!-- <WorkflowSearchAttributeFilter /> -->
 <div>
-  <TabButtons>
-    <TabButton
-      icon="bookmark"
-      data-testid="all"
-      class="h-10"
-      active={query === ''}
-      on:click={() => setTab('')}>All</TabButton
-    >
-    <TabButton
-      data-testid="running"
-      class="h-10"
-      active={query === "StartTime >= '2025-08-19T05:00:00.000Z'"}
-      on:click={() => setTab("StartTime >= '2025-08-19T05:00:00.000Z'")}
-      >Today</TabButton
-    >
-    <TabButton
-      data-testid="running"
-      class="h-10"
-      active={query === 'ExecutionStatus = "Running"'}
-      on:click={() => setTab('ExecutionStatus = "Running"')}>Running</TabButton
-    >
-    <TabButton
-      data-testid="failed"
-      class="h-10"
-      active={query === 'ExecutionStatus = "Failed"'}
-      on:click={() => setTab('ExecutionStatus = "Failed"')}>Failed</TabButton
-    >
-    <TabButton
-      data-testid="running"
-      class="h-10"
-      active={query === 'CustomKeywordField = "Kittens"'}
-      on:click={() => setTab('CustomKeywordField = "Kittens"')}
-      >Silly Kittens in the last 24 Hours</TabButton
-    >
-  </TabButtons>
+  <QueryTabs />
   <WorkflowsSummaryConfigurableTable onClickConfigure={openCustomizationDrawer}>
     <slot name="cloud" slot="cloud" />
   </WorkflowsSummaryConfigurableTable>
