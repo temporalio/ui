@@ -17,17 +17,21 @@
   let {
     endpoint,
     editDisabled = false,
+    editHidden = false,
+    route = routeForNexus,
     taskQueueStatus,
   }: {
     endpoint: Endpoint;
+    route?: () => string;
     editDisabled?: boolean;
+    editHidden?: boolean;
     taskQueueStatus?: Snippet;
   } = $props();
 </script>
 
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={routeForNexus()} icon="chevron-left">
+    <Link href={route()} icon="chevron-left">
       {translate('nexus.back-to-endpoints')}
     </Link>
   </div>
@@ -38,6 +42,7 @@
       </h1>
       <Button
         href={routeForNexusEndpointEdit(endpoint.id)}
+        hidden={editHidden}
         disabled={editDisabled}>{translate('common.edit')}</Button
       >
     </div>
