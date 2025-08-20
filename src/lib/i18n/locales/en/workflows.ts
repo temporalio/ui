@@ -194,6 +194,8 @@ export const Strings = {
     'Please make sure you have at least one worker running.',
   'call-stack-alert':
     'This is a call stack showing each location where Workflow code is waiting.',
+  'call-stack-error':
+    'Call stack could not be retrieved. Check if Codec Server is required.',
   'call-stack-at': 'Call Stack at',
   'call-stack-link-preface': 'To enable ',
   'call-stack-link': 'call stacks',

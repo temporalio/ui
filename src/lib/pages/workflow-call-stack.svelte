@@ -52,25 +52,32 @@
         <Skeleton class="h-48 w-full rounded-sm" />
       </div>
     {:then result}
-      <Alert
-        intent="info"
-        icon="info"
-        title={translate('workflows.call-stack-alert')}
-        class="mb-4 w-fit"
-      />
-      <p>
-        {translate('workflows.call-stack-at')}
-        {refreshDate}
-      </p>
-      <div class="my-2 flex h-full items-start">
-        <CodeBlock
-          content={result}
-          language="text"
-          testId="query-call-stack"
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      {#if typeof result === 'string'}
+        <Alert
+          intent="info"
+          title={translate('workflows.call-stack-alert')}
+          class="mb-4 w-fit"
         />
-      </div>
+        <p>
+          {translate('workflows.call-stack-at')}
+          {refreshDate}
+        </p>
+        <div class="my-2 flex h-full items-start">
+          <CodeBlock
+            content={result}
+            language="text"
+            testId="query-call-stack"
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        </div>
+      {:else}
+        <Alert
+          intent="warning"
+          title={translate('workflows.call-stack-error')}
+          class="mb-4 w-fit"
+        />
+      {/if}
     {:catch _error}
       <EmptyState
         title={translate('common.error-occurred')}
