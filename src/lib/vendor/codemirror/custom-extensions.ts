@@ -85,7 +85,7 @@ export const getHeightTheme = ({
 export const highlightStyles = HighlightStyle.define(
   [
     { tag: tags.punctuation, color: css('--color-text-primary') },
-    { tag: tags.string, color: css('--color-text-success') },
+    { tag: tags.string, color: css('--color-text-primary') },
     { tag: tags.propertyName, color: css('--color-text-brand') },
     { tag: tags.bool, color: css('--color-text-primary') },
     { tag: tags.number, color: css('--color-text-primary') },

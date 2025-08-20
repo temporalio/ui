@@ -126,12 +126,12 @@
   };
 
   // ui
-
-  const maximizable = $derived(
-    (maxHeight && editorView?.contentHeight > maxHeight) ?? false,
-  );
   const hasHeader = $derived(!!tabs);
   let maximized = $state(false);
+
+  const maximizable = $derived(
+    (maxHeight && !hasHeader && editorView?.contentHeight > maxHeight) ?? false,
+  );
 
   // a compartment allows us to update extensions like the theme
   const compartment = $state(new Compartment());
