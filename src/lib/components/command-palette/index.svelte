@@ -373,7 +373,6 @@
   {open}
   on:close={close}
   class="command-palette-modal h-[70vh] max-h-[600px] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
-  large
   id="command-palette"
   cancelText="Close"
   confirmText="Select"

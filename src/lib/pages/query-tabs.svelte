@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import QueryPalette from '$lib/components/query-palette/index.svelte';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -17,14 +18,19 @@
   };
 
   const query = $derived(page.url.searchParams.get('query'));
+  let viewCommandPalette = $state(true);
+
+  const showCommandPalette = () => {
+    viewCommandPalette = true;
+  };
 </script>
 
 <TabButtons>
   <TabButton
-    icon="add"
-    data-testid="all"
+    icon="search"
+    data-testid="search"
     class="h-10"
-    on:click={() => setTab('')}
+    on:click={() => showCommandPalette()}
   ></TabButton>
   <TabButton
     icon="bookmark"
@@ -60,3 +66,4 @@
     >Silly Kittens in the last 24 Hours</TabButton
   >
 </TabButtons>
+<QueryPalette bind:open={viewCommandPalette} />
