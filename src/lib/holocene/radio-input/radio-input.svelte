@@ -43,6 +43,9 @@
       type="radio"
       class="surface-primary"
       aria-describedby={description ? `${id}-description` : null}
+      data-track-name="radio-input"
+      data-track-intent="select"
+      data-track-text={label}
       {name}
       {value}
       {id}
