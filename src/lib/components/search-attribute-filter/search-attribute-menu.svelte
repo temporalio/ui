@@ -30,6 +30,9 @@
 
   export let filters: SearchAttributeFilter[];
   export let options: SearchAttributeOption[];
+  export let showOptions = workflowRoutePattern.match(
+    window?.location?.pathname,
+  );
 
   const { filter, activeQueryIndex, focusedElementId } =
     getContext<FilterContext>(FILTER_CONTEXT);
@@ -57,7 +60,6 @@
         option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
       );
 
-  $: workflowsPage = workflowRoutePattern.match(window?.location?.pathname);
   $: query = $page.url.searchParams.get('query');
 </script>
 
@@ -66,16 +68,16 @@
     id="search-attribute-filter-button"
     controls="search-attribute-menu"
     disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
-    count={$filter.attribute ? 0 : filters.length}
+    count={showOptions ? ($filter.attribute ? 0 : filters.length) : 0}
     on:click={() => (searchAttributeValue = '')}
     class="text-nowrap"
   >
     <svelte:fragment slot="leading">
       {#if !$filter.attribute}
-        <Icon name="filter" />
+        <Icon name="add" />
       {/if}
     </svelte:fragment>
-    {$filter.attribute || translate('workflows.filter')}
+    {$filter.attribute || 'Search Attribute'}
   </MenuButton>
   <Menu id="search-attribute-menu" keepOpen>
     <MenuItem
@@ -96,7 +98,7 @@
         class="w-full"
       />
     </MenuItem>
-    {#if workflowsPage}
+    {#if showOptions}
       <MenuItem
         class="min-w-56"
         data-testid="manual-search-toggle"

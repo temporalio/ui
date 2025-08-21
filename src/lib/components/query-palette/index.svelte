@@ -1,22 +1,24 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
+  import { workflowFilters } from '$lib/stores/filters';
 
   import Modal from '../command-palette/modal.svelte';
 
+  import SavedQuery from './saved-query/index.svelte';
+  import FilterList from './search-attribute-filter/filter-list.svelte';
+  import SearchAttributeFilterMenu from './search-attribute-filter/menu.svelte';
+
   interface Props {
     open?: boolean;
+    editingQuery: SavedQuery | undefined;
   }
 
-  let { open = $bindable(false) }: Props = $props();
+  let { open = $bindable(false), editingQuery }: Props = $props();
 
-  let query = $derived(page.url.searchParams.get('query'));
-
-  let searchQuery = $state('');
-
+  const query = $derived(page.url.searchParams.get('query') || '');
   function handleGlobalKeydown(event: KeyboardEvent) {
     if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
       event.preventDefault();
@@ -30,12 +32,10 @@
       modal.classList.add('closing');
       setTimeout(() => {
         open = false;
-        searchQuery = '';
         modal.classList.remove('closing');
       }, 150);
     } else {
       open = false;
-      searchQuery = '';
     }
   }
 
@@ -44,16 +44,8 @@
       close();
     } else {
       open = true;
-      searchQuery = '';
     }
   }
-
-  // Reset selected index when search changes
-  $effect(() => {
-    if (searchQuery) {
-      // selectedIndex = 0;
-    }
-  });
 
   $effect(() => {
     document.addEventListener('keydown', handleGlobalKeydown);
@@ -69,23 +61,6 @@
     <span class="flex items-center gap-1.5">
       <kbd
         class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
-        >↑</kbd
-      ><kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
-        >↓</kbd
-      >
-      <span class="text-slate-400">navigate</span>
-    </span>
-    <span class="flex items-center gap-1.5">
-      <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
-        >⏎</kbd
-      >
-      <span class="text-slate-400">select</span>
-    </span>
-    <span class="flex items-center gap-1.5">
-      <kbd
-        class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
         >Esc</kbd
       >
       <span class="text-slate-400">close</span>
@@ -96,7 +71,7 @@
 <Modal
   {open}
   on:close={close}
-  class="command-palette-modal h-[70vh] max-h-[600px] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
+  class="command-palette-modal h-[70vh] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
   id="command-palette"
   cancelText="Close"
   confirmText="Select"
@@ -111,10 +86,10 @@
         <div
           class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
         >
-          <div class="h-5 w-5 text-indigo-600 dark:text-indigo-400">
+          <div class="h-5 w-5">
             <Icon name="search" />
           </div>
-          Query Palette
+          Query Generator
         </div>
         <div class="flex items-center gap-4">
           {@render keyboardShortcuts()}
@@ -128,33 +103,23 @@
           </button>
         </div>
       </div>
-      <div class="px-6">
-        <Input
-          id="action-search"
-          bind:value={query}
-          placeholder="Query string"
-          icon="search"
-          labelHidden
-          label="Search commands"
-          disabled
-          autocomplete="off"
-          spellcheck={false}
-        />
+      <div class="flex flex-col gap-2 px-6">
+        <SavedQuery {editingQuery} />
+        <FilterList bind:filters={$workflowFilters} />
       </div>
     </div>
 
     <!-- Scrollable Content -->
-    <div class="min-h-96 flex-1 overflow-y-auto px-6 py-4" role="listbox">
-      <WorkflowSearchAttributeFilter />
+    <div class="min-h-[500px] flex-1 overflow-y-auto px-6 py-4" role="listbox">
+      <SearchAttributeFilterMenu />
+    </div>
+    <div class="w-full p-1">
+      <CodeBlock id="query-input" content={query} />
     </div>
   </div>
 </Modal>
 
 <style lang="postcss">
-  .selected {
-    @apply border-indigo-200 bg-indigo-50 shadow-sm;
-  }
-
   :global(.body::backdrop) {
     background: rgb(15 23 42 / 0%);
     backdrop-filter: blur(0.5px);

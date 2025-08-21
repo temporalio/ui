@@ -5,7 +5,13 @@
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import { currentPageKey } from '$lib/stores/pagination';
+  import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  const query = $derived(page.url.searchParams.get('query'));
+
+  let viewCommandPalette = $state(false);
+  let editingQuery: SavedQuery | undefined = $state();
 
   const setTab = (_query: string) => {
     updateQueryParameters({
@@ -16,9 +22,6 @@
       clearParameters: [currentPageKey],
     });
   };
-
-  const query = $derived(page.url.searchParams.get('query'));
-  let viewCommandPalette = $state(true);
 
   const showCommandPalette = () => {
     viewCommandPalette = true;
@@ -33,7 +36,6 @@
     on:click={() => showCommandPalette()}
   ></TabButton>
   <TabButton
-    icon="bookmark"
     data-testid="all"
     class="h-10"
     active={query === ''}
@@ -58,12 +60,20 @@
     active={query === 'ExecutionStatus = "Failed"'}
     on:click={() => setTab('ExecutionStatus = "Failed"')}>Failed</TabButton
   >
-  <TabButton
-    data-testid="running"
-    class="h-10"
-    active={query === 'CustomKeywordField = "Kittens"'}
-    on:click={() => setTab('CustomKeywordField = "Kittens"')}
-    >Silly Kittens in the last 24 Hours</TabButton
-  >
+  {#each $savedQueries as savedQuery}
+    <TabButton
+      icon="bookmark"
+      data-testid={savedQuery.id}
+      class="h-10"
+      active={query === savedQuery.query}
+      on:click={() => setTab(savedQuery.query)}
+      on:dblclick={() => {
+        editingQuery = savedQuery;
+        viewCommandPalette = true;
+      }}
+    >
+      <p class="max-w-24 truncate text-xs">{savedQuery.name}</p>
+    </TabButton>
+  {/each}
 </TabButtons>
-<QueryPalette bind:open={viewCommandPalette} />
+<QueryPalette bind:open={viewCommandPalette} {editingQuery} />

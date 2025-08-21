@@ -55,6 +55,7 @@
   href={href ? href + $page.url.search : null}
   class:disabled={$$restProps.disabled}
   on:click
+  on:dblclick
   role="button"
   tabindex="0"
   {...$$restProps}
