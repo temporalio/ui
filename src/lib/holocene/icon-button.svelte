@@ -26,6 +26,9 @@
   leadingIcon={icon}
   class={merge('h-9 w-9 shrink-0 rounded-full p-0', className)}
   aria-label={label}
+  data-track-name="icon-button"
+  data-track-intent={variant}
+  data-track-text={label}
   on:click
   {...$$restProps}
 />

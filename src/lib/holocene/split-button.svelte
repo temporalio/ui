@@ -21,6 +21,9 @@
       disabled={disabled || primaryActionDisabled}
       id="{id}-primary-button"
       {href}
+      data-track-name="split-button"
+      data-track-intent="primary"
+      data-track-text={label}
       on:click
     >
       {#if icon}

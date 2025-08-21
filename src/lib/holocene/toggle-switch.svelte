@@ -20,6 +20,9 @@
   )}
   {disabled}
   data-testid={$$props['data-testid']}
+  data-track-name="toggle-switch"
+  data-track-intent="toggle"
+  data-track-text={label}
 >
   <span
     class="whitespace-nowrap text-sm font-medium"

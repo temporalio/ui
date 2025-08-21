@@ -121,6 +121,9 @@
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
     data-variant={variant}
+    data-track-name="button"
+    data-track-intent={variant}
+    data-track-text="*textContent*"
     class={merge(
       buttonStyles({
         variant,
@@ -158,6 +161,9 @@
     on:click|stopPropagation
     on:keydown|stopPropagation
     data-variant={variant}
+    data-track-name="button"
+    data-track-intent={variant}
+    data-track-text="*textContent*"
     class={merge(
       buttonStyles({
         variant,
