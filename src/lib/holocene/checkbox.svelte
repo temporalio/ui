@@ -71,9 +71,6 @@
 
 <div
   data-testid={$$restProps['data-testid'] ?? null}
-  data-track-name="checkbox"
-  data-track-intent="toggle"
-  data-track-text={label}
   on:click|stopPropagation
   on:keypress|stopPropagation
   role="none"
@@ -100,6 +97,9 @@
       {value}
       type="checkbox"
       class="peer sr-only"
+      data-track-name="checkbox"
+      data-track-intent="toggle"
+      data-track-text={label}
       bind:checked
       {disabled}
       {required}
