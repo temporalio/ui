@@ -188,19 +188,17 @@
   };
 
   onMount(async () => {
-    let targetEvent: WorkflowEvent | undefined;
-
     if (isLocalActivityMarkerEvent(event)) {
-      targetEvent = event as WorkflowEvent;
+      primaryLocalAttribute = await decodeLocalActivity(event, {
+        namespace: page.params.namespace,
+        settings: page.data.settings,
+        accessToken: $authUser.accessToken,
+      });
     } else if (
       isEventGroup(event) &&
       isLocalActivityMarkerEvent(event.initialEvent)
     ) {
-      targetEvent = event.initialEvent;
-    }
-
-    if (targetEvent) {
-      primaryLocalAttribute = await decodeLocalActivity(targetEvent, {
+      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent, {
         namespace: page.params.namespace,
         settings: page.data.settings,
         accessToken: $authUser.accessToken,
