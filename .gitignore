@@ -22,3 +22,6 @@ server/ui/assets
 go.work
 go.work.sum
 .claude
+
+# Claude Code local settings
+.claude/settings.local.json

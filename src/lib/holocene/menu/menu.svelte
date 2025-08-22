@@ -2,7 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
   import { fly } from 'svelte/transition';
 
-  import { getContext } from 'svelte';
+  import { getContext, tick } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { getFocusableElements } from '$lib/utilities/focus-trap';
@@ -18,48 +18,123 @@
     class?: string;
   }
 
-  let className = '';
-  let height = 0;
-  export { className as class };
-  export let id: string;
-  export let keepOpen = false;
-  export let position: 'left' | 'right' | 'top-left' | 'top-right' = 'left';
-  export let menuElement: HTMLUListElement = null;
-  export let maxHeight: string = 'max-h-[20rem]';
+  let {
+    class: className = '',
+    id,
+    keepOpen = false,
+    position = 'left' as 'left' | 'right' | 'top-left' | 'top-right',
+    menuElement = $bindable(),
+    maxHeight = 'max-h-[20rem]',
+    ...restProps
+  }: $$Props = $props();
+
+  let height = $state(0);
+  let width = $state(0);
+  let adjustedPosition = $state(position);
 
   const {
     keepOpen: keepOpenCtx,
     menuElement: menuElementCtx,
+    containerElement: containerElementCtx,
     open,
   } = getContext<MenuContext>(MENU_CONTEXT);
 
-  $: $keepOpenCtx = keepOpen;
-  $: $menuElementCtx = menuElement;
+  $effect(() => {
+    $keepOpenCtx = keepOpen;
+  });
 
-  $: menuItems = menuElement ? getFocusableElements(menuElement) : [];
-  $: lastMenuItem = menuItems[menuItems.length - 1];
+  $effect(() => {
+    $menuElementCtx = menuElement;
+  });
+
+  const menuItems = $derived(
+    menuElement ? getFocusableElements(menuElement) : [],
+  );
+  const lastMenuItem = $derived(menuItems[menuItems.length - 1]);
 
   const handleFocusOut = (e: FocusEvent) => {
     if (!$keepOpenCtx && e.target === lastMenuItem) $open = false;
   };
+
+  const checkEdgeAvoidance = async () => {
+    if (!menuElement || !$containerElementCtx) return;
+
+    await tick();
+
+    const menuRect = menuElement.getBoundingClientRect();
+    const containerRect = $containerElementCtx.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const _viewportHeight = window.innerHeight;
+
+    let newPosition = position;
+
+    // Check horizontal edge avoidance
+    if (position === 'left' || position === 'top-left') {
+      if (menuRect.right > viewportWidth) {
+        newPosition = position === 'left' ? 'right' : 'top-right';
+      }
+    } else if (position === 'right' || position === 'top-right') {
+      if (menuRect.left < 0) {
+        newPosition = position === 'right' ? 'left' : 'top-left';
+      }
+    }
+
+    // Check vertical edge avoidance for top positions
+    if (newPosition === 'top-left' || newPosition === 'top-right') {
+      if (containerRect.top - menuRect.height < 0) {
+        newPosition = newPosition === 'top-left' ? 'left' : 'right';
+      }
+    }
+
+    adjustedPosition = newPosition;
+  };
+
+  const handleKeydown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      $open = false;
+    }
+  };
+
+  $effect(() => {
+    if ($open && menuElement) {
+      checkEdgeAvoidance();
+    }
+  });
+
+  $effect(() => {
+    if (!$open) return;
+
+    const handleResize = () => {
+      checkEdgeAvoidance();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  });
 </script>
 
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class={merge('menu', maxHeight, position, className)}
+  class={merge('menu', maxHeight, adjustedPosition, className)}
   class:hidden={!$open}
   aria-labelledby={id}
   tabindex={-1}
-  style={position === 'top-right' || position === 'top-left'
+  style={adjustedPosition === 'top-right' || adjustedPosition === 'top-left'
     ? `top: -${height + 16}px;`
     : ''}
   {id}
   bind:this={menuElement}
   bind:clientHeight={height}
-  on:focusout={handleFocusOut}
-  on:click|stopPropagation
-  {...$$restProps}
+  bind:clientWidth={width}
+  onfocusout={handleFocusOut}
+  onkeydown={handleKeydown}
+  onclick={(e) => e.stopPropagation()}
+  {...restProps}
 >
   <slot />
 </ul>
