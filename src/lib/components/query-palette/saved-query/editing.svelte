@@ -11,7 +11,6 @@
   let { editingQuery }: { editingQuery: SavedQuery } = $props();
 
   let queryName = $state(editingQuery.name);
-  let editing = $state(false);
   const query = $derived(page.url.searchParams.get('query') || '');
 
   const onEnter = (event: Event) => {
@@ -40,53 +39,22 @@
     placeholder="Save query with name"
     icon="bookmark"
     class="grow lg:w-3/4 [&_*]:border-r-0"
-    disabled={!editing}
     clearButtonLabel={translate('common.clear-input-button-label')}
     on:clear={() => (queryName = '')}
     bind:value={queryName}
     maxLength={80}
   />
-  {#if editing}
-    <Button
-      disabled={!queryName}
-      data-testid="save-button"
-      variant="primary"
-      type="submit"
-    >
-      {translate('common.update')}
-    </Button>
-    <Button
-      data-testid="cancel-query"
-      variant="secondary"
-      type="button"
-      on:click={() => {
-        editing = false;
-      }}
-    >
-      {translate('common.cancel')}
-    </Button>
-  {:else}
-    <Button
-      data-testid="rename-button"
-      variant="secondary"
-      type="button"
-      on:click={() => (editing = true)}
-    >
-      Rename
-    </Button>
-    <Button data-testid="save-button" variant="primary" type="submit"
-      >Save</Button
-    >
-    <Button
-      data-testid="delete-query"
-      variant="destructive"
-      type="button"
-      on:click={() => {
-        $savedQueries = $savedQueries.filter((q) => q.id !== editingQuery.id);
-        editingQuery = undefined;
-      }}
-    >
-      {translate('common.delete')}
-    </Button>
-  {/if}
+  <Button data-testid="save-button" variant="primary" type="submit">Save</Button
+  >
+  <Button
+    data-testid="delete-query"
+    variant="destructive"
+    type="button"
+    on:click={() => {
+      $savedQueries = $savedQueries.filter((q) => q.id !== editingQuery.id);
+      editingQuery = undefined;
+    }}
+  >
+    {translate('common.delete')}
+  </Button>
 </form>

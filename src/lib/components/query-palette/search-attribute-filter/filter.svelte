@@ -24,20 +24,14 @@
   import DurationFilter from '$lib/components/search-attribute-filter/duration-filter.svelte';
   import ListFilter from '$lib/components/search-attribute-filter/list-filter.svelte';
   import NumberFilter from '$lib/components/search-attribute-filter/number-filter.svelte';
-  import SearchAttributeMenu from '$lib/components/search-attribute-filter/search-attribute-menu.svelte';
   import StatusFilter from '$lib/components/search-attribute-filter/status-filter.svelte';
   import TextFilter from '$lib/components/search-attribute-filter/text-filter.svelte';
-  import Button from '$lib/holocene/button.svelte';
-  import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     type SearchAttributeOption,
     sortedSearchAttributeOptions,
   } from '$lib/stores/search-attributes';
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     getFocusedElementId,
@@ -54,6 +48,8 @@
     emptyFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  import AttributeList from './attribute-list.svelte';
 
   export let filters: SearchAttributeFilter[];
   export let searchAttributeOptions: SearchAttributeOption[] = null;
@@ -76,12 +72,6 @@
     focusedElementId,
     resetFilter,
   });
-
-  const { copy, copied } = copyToClipboard();
-
-  function handleCopy(e: Event) {
-    copy(e, searchParamQuery);
-  }
 
   function onSearch() {
     const searchQuery = toListWorkflowQueryFromFilters(combineFilters(filters));
@@ -107,11 +97,6 @@
       filters = [...filters, $filter];
     }
     filter.set(emptyFilter());
-    onSearch();
-  }
-
-  function handleClearInput() {
-    filters = [];
     onSearch();
   }
 
@@ -154,89 +139,70 @@
   }
 </script>
 
-<div class="flex grow gap-4">
-  <slot />
-  {#if showFilter}
-    <div
-      class="flex"
-      class:grow={!showActions}
-      on:keyup={handleKeyUp}
-      role="none"
-    >
-      {#if isStatusFilter($filter)}
-        <StatusFilter bind:filters />
-      {:else}
-        <SearchAttributeMenu {filters} {options} showOptions={false} />
-      {/if}
-
-      {#if $filter.attribute}
-        {#if isTextFilter($filter)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <TextFilter />
-            <CloseFilter />
-          </div>
-        {:else if isListFilter($filter)}
-          <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
-            <ListFilter>
-              <CloseFilter />
-            </ListFilter>
-          </div>
-        {:else if isDurationFilter($filter)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <DurationFilter />
-            <CloseFilter />
-          </div>
-        {:else if isNumberFilter($filter)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <NumberFilter />
-            <CloseFilter />
-          </div>
-        {:else if isDateTimeFilter($filter)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <DatetimeFilter />
-            <CloseFilter />
-          </div>
-        {:else if isBooleanFilter($filter)}
-          <div
-            class="flex w-full items-center"
-            in:fly={{ x: -100, duration: 150 }}
-          >
-            <BooleanFilter />
-            <CloseFilter />
-          </div>
+<div class="relative flex w-full items-start overflow-auto">
+  <AttributeList {options} bind:filters />
+  <div class="flex w-1/2 grow gap-4">
+    {#if showFilter}
+      <div
+        class="flex"
+        class:grow={!showActions}
+        on:keyup={handleKeyUp}
+        role="none"
+      >
+        {#if isStatusFilter($filter)}
+          <StatusFilter bind:filters />
         {/if}
-      {/if}
-    </div>
-  {/if}
 
-  <div class="flex items-center justify-end gap-1">
-    {#if showActions}
-      {#if showFilter}
-        <Button variant="ghost" on:click={handleClearInput}>
-          {translate('common.clear-all')}
-        </Button>
-      {/if}
-      <Tooltip topRight text={translate('workflows.copy-search-input')}>
-        <CopyButton
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          copied={$copied}
-          on:click={handleCopy}
-        />
-      </Tooltip>
+        {#if $filter.attribute}
+          {#if isTextFilter($filter)}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <TextFilter />
+              <CloseFilter />
+            </div>
+          {:else if isListFilter($filter)}
+            <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+              <ListFilter>
+                <CloseFilter />
+              </ListFilter>
+            </div>
+          {:else if isDurationFilter($filter)}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <DurationFilter />
+              <CloseFilter />
+            </div>
+          {:else if isNumberFilter($filter)}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <NumberFilter />
+              <CloseFilter />
+            </div>
+          {:else if isDateTimeFilter($filter)}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <DatetimeFilter />
+              <CloseFilter />
+            </div>
+          {:else if isBooleanFilter($filter)}
+            <div
+              class="flex w-full items-center"
+              in:fly={{ x: -100, duration: 150 }}
+            >
+              <BooleanFilter />
+              <CloseFilter />
+            </div>
+          {/if}
+        {/if}
+      </div>
     {/if}
   </div>
-  <slot name="actions" />
 </div>

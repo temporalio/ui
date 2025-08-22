@@ -1,15 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { workflowFilters } from '$lib/stores/filters';
+  import { searchInputViewOpen } from '$lib/stores/filters';
+  import { refresh } from '$lib/stores/workflows';
 
   import Modal from '../command-palette/modal.svelte';
 
   import SavedQuery from './saved-query/index.svelte';
   import FilterList from './search-attribute-filter/filter-list.svelte';
-  import SearchAttributeFilterMenu from './search-attribute-filter/menu.svelte';
+  import SearchAttributeFilter from './search-attribute-filter/filter.svelte';
 
   interface Props {
     open?: boolean;
@@ -18,7 +17,6 @@
 
   let { open = $bindable(false), editingQuery }: Props = $props();
 
-  const query = $derived(page.url.searchParams.get('query') || '');
   function handleGlobalKeydown(event: KeyboardEvent) {
     if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
       event.preventDefault();
@@ -71,7 +69,7 @@
 <Modal
   {open}
   on:close={close}
-  class="command-palette-modal h-[70vh] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
+  class="command-palette-modal h-[60vh] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
   id="command-palette"
   cancelText="Close"
   confirmText="Select"
@@ -110,11 +108,14 @@
     </div>
 
     <!-- Scrollable Content -->
-    <div class="min-h-[500px] flex-1 overflow-y-auto px-6 py-4" role="listbox">
-      <SearchAttributeFilterMenu />
-    </div>
-    <div class="w-full p-1">
-      <CodeBlock id="query-input" content={query} />
+    <div class="max-h-96 flex-1 overflow-y-auto px-6" role="listbox">
+      <SearchAttributeFilter
+        showFilter={!$searchInputViewOpen}
+        bind:filters={$workflowFilters}
+        refresh={() => {
+          $refresh = Date.now();
+        }}
+      />
     </div>
   </div>
 </Modal>
