@@ -7,6 +7,7 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchNamespace } from '$lib/services/namespaces-service';
   import {
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
@@ -68,6 +69,18 @@
 
   $: onFetch = () =>
     fetchPaginatedWorkflows(namespace, $queryWithParentWorkflowId);
+
+  const handleExportWorkflows = async (
+    workflows: WorkflowExecution[],
+    page: number,
+  ) => {
+    try {
+      const namespaceDetails = await fetchNamespace(namespace);
+      exportWorkflows(workflows, page, namespaceDetails);
+    } catch (error) {
+      exportWorkflows(workflows, page);
+    }
+  };
 </script>
 
 {#key [namespace, $queryWithParentWorkflowId, $refresh]}
@@ -123,7 +136,7 @@
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
       <Tooltip text={translate('common.download-json')} top>
         <Button
-          on:click={() => exportWorkflows(visibleItems, page)}
+          on:click={() => handleExportWorkflows(visibleItems, page)}
           data-testid="export-history-button"
           size="xs"
           variant="ghost"
