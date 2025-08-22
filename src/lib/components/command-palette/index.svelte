@@ -371,7 +371,7 @@
 
 <Modal
   {open}
-  on:close={close}
+  onclose={close}
   class="command-palette-modal h-[70vh] max-h-[600px] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
   id="command-palette"
   cancelText="Close"
@@ -379,56 +379,58 @@
   hideConfirm={true}
   loading={true}
 >
-  <div class="flex h-full flex-1 flex-col" slot="content">
-    <div
-      class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
-    >
-      <div class="flex items-center justify-between px-6 py-3">
-        <div
-          class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
-        >
-          <div class="h-5 w-5 text-indigo-600 dark:text-indigo-400">
-            <Icon name="search" />
-          </div>
-          Command Palette
-        </div>
-        <div class="flex items-center gap-4">
-          {@render keyboardShortcuts()}
-          <button
-            type="button"
-            onclick={close}
-            class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-            aria-label="Close"
+  {#snippet content()}
+    <div class="flex h-full flex-1 flex-col">
+      <div
+        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
+      >
+        <div class="flex items-center justify-between px-6 py-3">
+          <div
+            class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
           >
-            <Icon name="close" class="h-4 w-4" />
-          </button>
+            <div class="h-5 w-5 text-indigo-600 dark:text-indigo-400">
+              <Icon name="search" />
+            </div>
+            Command Palette
+          </div>
+          <div class="flex items-center gap-4">
+            {@render keyboardShortcuts()}
+            <button
+              type="button"
+              onclick={close}
+              class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              aria-label="Close"
+            >
+              <Icon name="close" class="h-4 w-4" />
+            </button>
+          </div>
         </div>
+        {#if !ActiveComponent}
+          <div class="px-6">
+            <Input
+              id="action-search"
+              bind:value={searchQuery}
+              placeholder="Search for commands..."
+              icon="search"
+              labelHidden
+              label="Search commands"
+              autocomplete="off"
+              spellcheck={false}
+            />
+          </div>
+        {/if}
       </div>
-      {#if !ActiveComponent}
-        <div class="px-6">
-          <Input
-            id="action-search"
-            bind:value={searchQuery}
-            placeholder="Search for commands..."
-            icon="search"
-            labelHidden
-            label="Search commands"
-            autocomplete="off"
-            spellcheck={false}
-          />
-        </div>
-      {/if}
-    </div>
 
-    <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto px-6 py-4" role="listbox">
-      {#if ActiveComponent}
-        <ActiveComponent {onBack} />
-      {:else}
-        {@render commandList()}
-      {/if}
+      <!-- Scrollable Content -->
+      <div class="flex-1 overflow-y-auto px-6 py-4" role="listbox">
+        {#if ActiveComponent}
+          <ActiveComponent {onBack} />
+        {:else}
+          {@render commandList()}
+        {/if}
+      </div>
     </div>
-  </div>
+  {/snippet}
 </Modal>
 
 <style lang="postcss">

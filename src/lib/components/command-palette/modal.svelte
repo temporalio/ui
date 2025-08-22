@@ -1,19 +1,16 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import { type ComponentProps, createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { focusTrap } from '$lib/utilities/focus-trap';
 
-  interface $$Props extends HTMLAttributes<HTMLDialogElement> {
-    cancelText: string;
-    confirmDisabled?: boolean;
-    confirmText: string;
-    confirmType?: ComponentProps<Button>['variant'];
-    hideConfirm?: boolean;
+  interface Props extends HTMLAttributes<HTMLDialogElement> {
+    content: Snippet;
+    cancelText?: string;
     hightlightNav?: boolean;
     id: string;
     loading?: boolean;
@@ -23,21 +20,23 @@
     class?: string;
   }
 
-  export let cancelText: string;
-  export let loading = false;
-  export let hightlightNav = false;
-  export let id: string;
-  export let open: boolean;
-  export let error = '';
+  let {
+    content,
+    cancelText = translate('common.cancel'),
+    hightlightNav = false,
+    id,
+    loading = false,
+    'data-testid': dataTestId,
+    open = $bindable(),
+    error = '',
+    class: className,
+  }: Props = $props();
 
-  let className = '';
   export { className as class };
 
   let modalElement: HTMLDialogElement;
 
-  $: toggleModal(open, modalElement);
-
-  export const toggleModal = (open: boolean, modal: HTMLDialogElement) => {
+  const toggleModal = (open: boolean, modal: HTMLDialogElement) => {
     if (open) {
       modal?.showModal();
     } else {
@@ -45,19 +44,9 @@
     }
   };
 
-  const dispatch = createEventDispatcher<{
-    cancelModal: undefined;
-    confirmModal: undefined;
-  }>();
-
   const handleCancel = () => {
-    dispatch('cancelModal');
     open = false;
     error = '';
-  };
-
-  const confirmModal = () => {
-    dispatch('confirmModal');
   };
 
   const closeModal = () => {
@@ -68,25 +57,22 @@
     if (event.target === modalElement) closeModal();
   };
 
-  $: {
-    if (open && modalElement) {
-      modalElement.focus();
-    }
-  }
+  $effect(() => {
+    toggleModal(open, modalElement);
+  });
 </script>
 
 <svelte:window on:click={handleClick} />
 
 <dialog
   {id}
-  on:close={handleCancel}
+  onclose={handleCancel}
   bind:this={modalElement}
   class={merge('body', className)}
   class:hightlightNav
   aria-modal="true"
   aria-labelledby="modal-title-{id}"
-  data-testid={$$props['data-testid']}
-  {...$$restProps}
+  data-testid={dataTestId}
   use:focusTrap={true}
 >
   {#if !loading}
@@ -97,21 +83,16 @@
       on:click={closeModal}
     />
   {/if}
-  <div id="modal-title-{id}">
-    <slot name="title" />
+  <div id="modal-content-{id}" class="content">
+    {@render content?.()}
+    <p
+      class="mt-2 text-sm font-normal text-danger"
+      class:hidden={!error}
+      role="alert"
+    >
+      {error}
+    </p>
   </div>
-  <form on:submit|preventDefault={confirmModal} method="dialog">
-    <div id="modal-content-{id}" class="content">
-      <slot name="content" />
-      <p
-        class="mt-2 text-sm font-normal text-danger"
-        class:hidden={!error}
-        role="alert"
-      >
-        {error}
-      </p>
-    </div>
-  </form>
 </dialog>
 
 <style lang="postcss">

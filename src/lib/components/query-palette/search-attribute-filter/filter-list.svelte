@@ -54,7 +54,7 @@
   };
 </script>
 
-<div class="flex flex-wrap gap-2" class:pt-2={visibleFilters.length}>
+<div class="flex flex-wrap gap-2">
   {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
     {@const { attribute, value, conditional, customDate } = workflowFilter}
     {#if attribute}
@@ -64,15 +64,10 @@
             attribute,
           })}
           on:remove={() => removeQuery(i)}
-          on:click={() => {
-            // $activeQueryIndex = i;
-            // $filter = { ...workflowFilter };
-          }}
-          intent="default"
           button
         >
           {#if attribute === 'ExecutionStatus' && isWorkflowStatusType(value)}
-            <span class="flex">
+            <span class="flex items-center">
               {attribute}
               {conditional}
               <span class="-py-1 ml-1">

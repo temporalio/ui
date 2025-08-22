@@ -2,6 +2,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { searchInputViewOpen } from '$lib/stores/filters';
+  import { type SavedQuery as SQ } from '$lib/stores/saved-queries';
   import { refresh } from '$lib/stores/workflows';
 
   import Modal from '../command-palette/modal.svelte';
@@ -12,17 +13,11 @@
 
   interface Props {
     open?: boolean;
-    editingQuery: SavedQuery | undefined;
+    editingQuery: SQ | undefined;
   }
 
-  let { open = $bindable(false), editingQuery }: Props = $props();
-
-  function handleGlobalKeydown(event: KeyboardEvent) {
-    if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-      event.preventDefault();
-      toggle();
-    }
-  }
+  let { open = $bindable(false), editingQuery = $bindable(undefined) }: Props =
+    $props();
 
   function close() {
     const modal = document.getElementById('command-palette');
@@ -37,20 +32,10 @@
     }
   }
 
-  function toggle() {
-    if (open) {
-      close();
-    } else {
-      open = true;
-    }
-  }
-
   $effect(() => {
-    document.addEventListener('keydown', handleGlobalKeydown);
-
-    return () => {
-      document.removeEventListener('keydown', handleGlobalKeydown);
-    };
+    if (!open && editingQuery) {
+      editingQuery = undefined;
+    }
   });
 </script>
 
@@ -67,57 +52,53 @@
 {/snippet}
 
 <Modal
-  {open}
-  on:close={close}
+  bind:open
+  onclose={close}
   class="command-palette-modal h-[60vh] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
   id="command-palette"
-  cancelText="Close"
-  confirmText="Select"
-  hideConfirm={true}
   loading={true}
 >
-  <div class="flex h-full flex-1 flex-col" slot="content">
-    <div
-      class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
-    >
-      <div class="flex items-center justify-between px-6 py-3">
-        <div
-          class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
-        >
-          <div class="h-5 w-5">
-            <Icon name="search" />
-          </div>
-          Query Generator
-        </div>
-        <div class="flex items-center gap-4">
-          {@render keyboardShortcuts()}
-          <button
-            type="button"
-            onclick={close}
-            class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-            aria-label="Close"
+  {#snippet content()}
+    <div class="flex h-full flex-1 flex-col">
+      <div
+        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
+      >
+        <div class="flex items-center justify-between px-6 py-3">
+          <div
+            class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
           >
-            <Icon name="close" class="h-4 w-4" />
-          </button>
+            Query Command Center
+          </div>
+          <div class="flex items-center gap-4">
+            {@render keyboardShortcuts()}
+            <button
+              type="button"
+              onclick={close}
+              class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              aria-label="Close"
+            >
+              <Icon name="close" class="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2 px-6">
+          <SavedQuery {editingQuery} />
+          <FilterList bind:filters={$workflowFilters} />
         </div>
       </div>
-      <div class="flex flex-col gap-2 px-6">
-        <SavedQuery {editingQuery} />
-        <FilterList bind:filters={$workflowFilters} />
+
+      <!-- Scrollable Content -->
+      <div class="max-h-96 flex-1 overflow-y-auto" role="listbox">
+        <SearchAttributeFilter
+          showFilter={!$searchInputViewOpen}
+          bind:filters={$workflowFilters}
+          refresh={() => {
+            $refresh = Date.now();
+          }}
+        />
       </div>
     </div>
-
-    <!-- Scrollable Content -->
-    <div class="max-h-96 flex-1 overflow-y-auto" role="listbox">
-      <SearchAttributeFilter
-        showFilter={!$searchInputViewOpen}
-        bind:filters={$workflowFilters}
-        refresh={() => {
-          $refresh = Date.now();
-        }}
-      />
-    </div>
-  </div>
+  {/snippet}
 </Modal>
 
 <style lang="postcss">
