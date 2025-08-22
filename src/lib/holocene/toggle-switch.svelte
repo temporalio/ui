@@ -20,9 +20,6 @@
   )}
   {disabled}
   data-testid={$$props['data-testid']}
-  data-track-name="toggle-switch"
-  data-track-intent="toggle"
-  data-track-text={label}
 >
   <span
     class="whitespace-nowrap text-sm font-medium"
@@ -38,6 +35,9 @@
     type="checkbox"
     class="peer sr-only"
     role="switch"
+    data-track-name="toggle-switch"
+    data-track-intent="toggle"
+    data-track-text={label}
   />
   <span
     class="surface-background not-sr-only flex h-5 w-9 items-center rounded-xl border border-secondary p-px peer-checked:justify-end peer-checked:border-interactive peer-checked:bg-interactive peer-checked:text-off-white {disabled

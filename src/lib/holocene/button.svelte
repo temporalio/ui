@@ -56,6 +56,7 @@
     id?: string;
     'data-testid'?: string;
     class?: string;
+    disableTracking?: boolean;
   };
 
   export type ButtonStyles = VariantProps<typeof buttonStyles>;
@@ -100,6 +101,7 @@
   export let id: string = null;
   export let href: string = null;
   export let target: string = null;
+  export let disableTracking = false;
 
   let className = '';
   export { className as class };
@@ -110,6 +112,15 @@
     e.preventDefault();
     goto(href);
   };
+
+  let dataTrackObj = {};
+  if (!disableTracking) {
+    dataTrackObj = {
+      'data-track-name': 'button',
+      'data-track-intent': variant,
+      'data-track-text': '*textContent*',
+    };
+  }
 </script>
 
 {#if href && !disabled}
@@ -121,9 +132,7 @@
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
     data-variant={variant}
-    data-track-name="button"
-    data-track-intent={variant}
-    data-track-text="*textContent*"
+    {...dataTrackObj}
     class={merge(
       buttonStyles({
         variant,
@@ -161,9 +170,7 @@
     on:click|stopPropagation
     on:keydown|stopPropagation
     data-variant={variant}
-    data-track-name="button"
-    data-track-intent={variant}
-    data-track-text="*textContent*"
+    {...dataTrackObj}
     class={merge(
       buttonStyles({
         variant,

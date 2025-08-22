@@ -21,6 +21,7 @@
       disabled={disabled || primaryActionDisabled}
       id="{id}-primary-button"
       {href}
+      disableTracking={true}
       data-track-name="split-button"
       data-track-intent="primary"
       data-track-text={label}
