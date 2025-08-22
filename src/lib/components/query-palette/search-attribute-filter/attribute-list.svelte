@@ -40,7 +40,9 @@
       );
 </script>
 
-<div class="grid w-1/2 grid-cols-1 gap-2 border-r border-subtle py-4">
+<div
+  class="flex w-1/2 flex-col gap-2 overflow-y-auto border-r border-subtle p-4"
+>
   {#each filteredOptions as { value, label, type }}
     {@const disabled = isOptionDisabled(value, filters)}
     <button
@@ -53,6 +55,6 @@
       {label}
     </button>
   {:else}
-    <p class="whitespace-nowrap" disabled>{translate('common.no-results')}</p>
+    <p class="whitespace-nowrap">{translate('common.no-results')}</p>
   {/each}
 </div>

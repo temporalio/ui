@@ -139,12 +139,12 @@
   }
 </script>
 
-<div class="relative flex w-full items-start overflow-auto">
+<div class="relative flex h-full w-full items-start">
   <AttributeList {options} bind:filters />
-  <div class="flex w-1/2 grow gap-4">
+  <div class="sticky top-0 flex h-full w-1/2 grow flex-col gap-4 py-4">
     {#if showFilter}
       <div
-        class="flex"
+        class="relative"
         class:grow={!showActions}
         on:keyup={handleKeyUp}
         role="none"
@@ -154,53 +154,31 @@
         {/if}
 
         {#if $filter.attribute}
-          {#if isTextFilter($filter)}
-            <div
-              class="flex w-full items-center"
-              in:fly={{ x: -100, duration: 150 }}
-            >
+          <div
+            class="flex w-full items-center"
+            in:fly={{ x: -100, duration: 150 }}
+          >
+            {#if isTextFilter($filter)}
               <TextFilter />
               <CloseFilter />
-            </div>
-          {:else if isListFilter($filter)}
-            <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+            {:else if isListFilter($filter)}
               <ListFilter>
                 <CloseFilter />
               </ListFilter>
-            </div>
-          {:else if isDurationFilter($filter)}
-            <div
-              class="flex w-full items-center"
-              in:fly={{ x: -100, duration: 150 }}
-            >
+            {:else if isDurationFilter($filter)}
               <DurationFilter />
               <CloseFilter />
-            </div>
-          {:else if isNumberFilter($filter)}
-            <div
-              class="flex w-full items-center"
-              in:fly={{ x: -100, duration: 150 }}
-            >
+            {:else if isNumberFilter($filter)}
               <NumberFilter />
               <CloseFilter />
-            </div>
-          {:else if isDateTimeFilter($filter)}
-            <div
-              class="flex w-full items-center"
-              in:fly={{ x: -100, duration: 150 }}
-            >
+            {:else if isDateTimeFilter($filter)}
               <DatetimeFilter />
               <CloseFilter />
-            </div>
-          {:else if isBooleanFilter($filter)}
-            <div
-              class="flex w-full items-center"
-              in:fly={{ x: -100, duration: 150 }}
-            >
+            {:else if isBooleanFilter($filter)}
               <BooleanFilter />
               <CloseFilter />
-            </div>
-          {/if}
+            {/if}
+          </div>
         {/if}
       </div>
     {/if}

@@ -108,7 +108,7 @@
     </div>
 
     <!-- Scrollable Content -->
-    <div class="max-h-96 flex-1 overflow-y-auto px-6" role="listbox">
+    <div class="max-h-96 flex-1 overflow-y-auto" role="listbox">
       <SearchAttributeFilter
         showFilter={!$searchInputViewOpen}
         bind:filters={$workflowFilters}
