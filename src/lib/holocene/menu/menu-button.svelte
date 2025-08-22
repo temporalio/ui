@@ -92,6 +92,7 @@
   {variant}
   class={merge(className)}
   {size}
+  disableTracking={true}
   {...$$restProps}
 >
   <slot name="leading" />

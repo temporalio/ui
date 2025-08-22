@@ -27,6 +27,9 @@
     'surface-interactive-secondary h-6 border border-[transparent] bg-transparent p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
     className,
   )}
+  data-track-name="copyable-button"
+  data-track-intent="copy"
+  data-track-text={copyIconTitle}
   on:click
   {...$$restProps}
 >

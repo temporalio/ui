@@ -34,6 +34,9 @@
     aria-disabled={disabled}
     class:disabled
     tabindex={disabled ? -1 : 0}
+    data-track-name="navigation-item"
+    data-track-intent="navigate"
+    data-track-text={label}
     class={merge(
       'mb-1 flex items-center whitespace-nowrap p-1 pl-2 text-sm ',
       'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',

@@ -50,6 +50,9 @@
       aria-controls="{id}-content"
       class="flex w-full flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
       type="button"
+      data-track-name="accordion"
+      data-track-intent="toggle"
+      data-track-text={title}
       on:click={toggleAccordion}
     >
       <div class="flex w-full flex-row items-center justify-between gap-2">

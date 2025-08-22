@@ -48,6 +48,9 @@
   class:active
   class:interactive
   class:light
+  data-track-name="link"
+  data-track-intent="navigate"
+  data-track-text={text || '*textContent*'}
   on:click|stopPropagation={onLinkClick}
   tabindex={href ? null : 0}
   {...$$restProps}
