@@ -22,6 +22,7 @@
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { routeForNamespace } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
@@ -30,6 +31,11 @@
 
   let { event }: { event: WorkflowEvent } = $props();
 
+  const displayName = $derived(
+    isLocalActivityMarkerEvent(event)
+      ? 'Local Activity'
+      : spaceBetweenCapitalLetters(event.name),
+  );
   const attributes = $derived(formatAttributes(event));
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
@@ -70,7 +76,7 @@
     <div class="flex items-center gap-2 text-base">
       <p class="font-mono">{event.id}</p>
       <p class="font-medium">
-        {spaceBetweenCapitalLetters(event.name)}
+        {displayName}
       </p>
     </div>
     <p class="text-sm">
