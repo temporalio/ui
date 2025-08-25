@@ -101,7 +101,7 @@
   {#if hasIndicator}
     <div class="flex">
       <Icon
-        name={$open ? 'chevron-up' : 'chevron-down'}
+        name="chevron-down"
         class={merge('transition-transform', $open && 'rotate-180')}
       />
     </div>
