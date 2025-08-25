@@ -26,7 +26,7 @@ vi.mock('./handle-error', () => {
   return { handleError: vi.fn() };
 });
 
-const withCookie = async (cookie: string, fn: () => void) => {
+const withCookie = async (cookie: string, fn: () => Promise<void>) => {
   const currentCookie = document.cookie;
 
   Object.defineProperty(document, 'cookie', {
@@ -34,7 +34,7 @@ const withCookie = async (cookie: string, fn: () => void) => {
     value: cookie,
   });
 
-  fn();
+  await fn();
 
   Object.defineProperty(document, 'cookie', {
     writable: true,
