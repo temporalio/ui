@@ -1,3 +1,40 @@
+<script context="module" lang="ts">
+  import { cva, type VariantProps } from 'class-variance-authority';
+
+  const comboboxStyles = cva(
+    [
+      'surface-primary',
+      'flex',
+      'max-h-28',
+      'min-h-10',
+      'w-full',
+      'flex-row',
+      'items-center',
+      'overflow-auto',
+      'border',
+      'text-sm',
+      'dark:focus-within:surface-primary',
+      'focus-within:outline-none',
+      'focus-within:ring-2',
+    ],
+    {
+      variants: {
+        variant: {
+          default:
+            'border-subtle focus-within:border-interactive focus-within:ring-primary/70',
+          ghost:
+            'bg-transparent border-transparent focus-within:border-transparent focus-within:ring-transparent hover:surface-interactive-ghost',
+        },
+      },
+      defaultVariants: {
+        variant: 'default',
+      },
+    },
+  );
+
+  export type ComboboxStyles = VariantProps<typeof comboboxStyles>;
+</script>
+
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { writable, type Writable } from 'svelte/store';
@@ -41,6 +78,7 @@
     readonly?: boolean;
     required?: boolean;
     leadingIcon?: IconName;
+    showChevron?: boolean;
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
@@ -53,6 +91,7 @@
     loadingText?: string;
     open?: Writable<boolean>;
     maxMenuHeight?: string;
+    variant?: ComboboxStyles['variant'];
     class?: string;
   }
 
@@ -106,6 +145,7 @@
   export let readonly = false;
   export let required = false;
   export let leadingIcon: IconName = null;
+  export let showChevron = false;
   export let optionValueKey: keyof T = null;
   export let optionLabelKey: keyof T = optionValueKey;
   export let minSize = 0;
@@ -122,6 +162,7 @@
   export let hrefDisabled = false;
   export let loading = false;
   export let loadingText = 'Loading more results';
+  export let variant: ComboboxStyles['variant'] = 'default';
 
   export let numberOfItemsSelectedLabel = (count: number) =>
     `${count} option${count > 1 ? 's' : ''} selected`;
@@ -383,7 +424,17 @@
 <MenuContainer {open} on:close={handleMenuClose}>
   <Label class="pb-1" hidden={labelHidden} {required} {label} for={id} />
 
-  <div class="combobox-wrapper" class:disabled class:invalid={!valid}>
+  <div
+    class={merge(
+      comboboxStyles({ variant }),
+      !valid &&
+        variant === 'default' &&
+        'border border-danger text-danger focus-within:ring-danger/70',
+      disabled && 'opacity-50',
+      className,
+    )}
+    class:disabled
+  >
     {#if leadingIcon}
       <Icon class="ml-2 shrink-0" name={leadingIcon} />
     {/if}
@@ -480,6 +531,22 @@
         {/if}
       </div>
     {/if}
+    {#if showChevron}
+      <button
+        type="button"
+        class="hover:bg-gray-100 ml-1 flex h-full items-center rounded p-3 focus:outline-none"
+        on:click|stopPropagation={() => ($open ? closeList() : openList())}
+        aria-label={$open ? 'Close options' : 'Open options'}
+        tabindex="-1"
+      >
+        <Icon
+          name="chevron-down"
+          class="transition-transform duration-200 {$open
+            ? 'rotate-180'
+            : 'rotate-0'}"
+        />
+      </button>
+    {/if}
   </div>
 
   <Menu
@@ -529,18 +596,6 @@
 </MenuContainer>
 
 <style lang="postcss">
-  .combobox-wrapper {
-    @apply surface-primary flex max-h-28 min-h-10 w-full flex-row items-center overflow-auto border border-subtle text-sm dark:focus-within:surface-primary focus-within:border-interactive focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70;
-
-    &.invalid {
-      @apply border border-danger text-danger focus-within:ring-danger/70;
-    }
-
-    &.disabled {
-      @apply opacity-50;
-    }
-  }
-
   .error {
     @apply text-xs text-danger;
   }

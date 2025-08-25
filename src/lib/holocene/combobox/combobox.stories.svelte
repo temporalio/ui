@@ -186,6 +186,32 @@
 </Story>
 
 <Story
+  name="Ghost Variant"
+  args={{
+    variant: 'ghost',
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+    await userEvent.type(combobox, 'English');
+  }}
+/>
+
+<Story
+  name="With Chevron"
+  args={{
+    showChevron: true,
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+    await userEvent.click(combobox);
+  }}
+/>
+
+<Story
   name="With Action"
   let:args
   let:context
