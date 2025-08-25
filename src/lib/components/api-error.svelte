@@ -1,6 +1,6 @@
 <script lang="ts">
+  import Button from '$lib/anthropocene/button.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ApiError as ApiErrorType } from '$lib/utilities/api-error-handler';

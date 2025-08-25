@@ -36,7 +36,7 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import type { IconName } from '../icon';

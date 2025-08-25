@@ -5,8 +5,8 @@
 
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Chip from '$lib/holocene/chip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';

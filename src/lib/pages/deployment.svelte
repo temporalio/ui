@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';

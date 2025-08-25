@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import { iconNames } from '$lib/holocene/icon';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
