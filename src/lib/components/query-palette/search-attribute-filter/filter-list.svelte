@@ -153,7 +153,7 @@
               'm-0.5 rounded',
               'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs',
               'text-slate-900 dark:text-white',
-              'hover:text-red-900',
+              'hover:bg-subtle',
             )}
           >
             <Icon name="close" />
