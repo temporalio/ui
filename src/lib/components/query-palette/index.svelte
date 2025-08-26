@@ -106,11 +106,7 @@
         rgb(59 130 246 / 6%) 0%,
         transparent 60%
       ),
-      linear-gradient(
-        135deg,
-        rgb(15 23 42 / 20%) 0%,
-        rgb(68 76 231 / 50%) 50%
-      );
+      linear-gradient(135deg, rgb(15 23 42 / 20%) 0%, rgb(68 76 231 / 20%) 50%);
     backdrop-filter: blur(0.5px) saturate(120%) brightness(80%);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
