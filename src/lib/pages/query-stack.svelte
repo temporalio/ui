@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { page } from '$app/state';
 
   import QueryPalette from '$lib/components/query-palette/index.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
@@ -46,50 +48,66 @@
   };
 </script>
 
-<div>
-  <Button
-    variant="secondary"
-    leadingIcon="search"
+<div class="w-48">
+  <button
     data-testid="search"
-    class="h-10"
-    on:click={() => showCommandPalette()}
-  ></Button>
-  <Button
+    class={merge(
+      'm-1.5 w-full rounded-l-sm',
+      'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+      'text-slate-900 dark:text-white',
+    )}
+    onclick={() => showCommandPalette()}><Icon name="search" /></button
+  >
+  <button
     data-testid="all"
-    class="h-10"
-    variant={query === '' ? 'primary' : 'secondary'}
-    on:click={() => setTab('')}>All</Button
+    class={merge(
+      'm-1.5 w-full rounded-l-sm',
+      'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+      'text-slate-900 dark:text-white',
+      query === '' && 'bg-subtle',
+    )}
+    onclick={() => setTab('')}>All</button
   >
-  <Button
+  <button
     data-testid="today"
-    class="h-10"
-    variant={query === `StartTime >= "${getToday()}"` ? 'primary' : 'secondary'}
-    on:click={() => setTab(`StartTime >= "${getToday()}"`)}
+    class={merge(
+      'm-1.5 w-full rounded-l-sm',
+      'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+      'text-slate-900 dark:text-white',
+      query === `StartTime >= "${getToday()}"` && 'bg-subtle',
+    )}
+    onclick={() => setTab(`StartTime >= "${getToday()}"`)}
   >
-    Today</Button
+    Today</button
   >
-  <Button
+  <button
     data-testid="last-hour"
-    class="h-10"
-    variant={query === `StartTime >= "${getLastHour()}"`
-      ? 'primary'
-      : 'secondary'}
-    on:click={() => setTab(`StartTime >= "${getLastHour()}"`)}>Last Hour</Button
+    class={merge(
+      'm-1.5 w-full rounded-l-sm',
+      'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+      'text-slate-900 dark:text-white',
+      query === `StartTime >= "${getLastHour()}"` && 'bg-subtle',
+    )}
+    onclick={() => setTab(`StartTime >= "${getLastHour()}"`)}>Last Hour</button
   >
   {#each $savedQueries as savedQuery}
-    <Button
-      variant={query === savedQuery.query ? 'primary' : 'secondary'}
-      leadingIcon="bookmark"
+    <button
       data-testid={savedQuery.id}
-      class="h-10"
-      on:click={() => setTab(savedQuery.query)}
-      on:dblclick={() => {
+      class={merge(
+        'm-1.5 w-full rounded-l-sm',
+        'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+        'text-slate-900 dark:text-white',
+        query === savedQuery.query && 'bg-subtle',
+      )}
+      onclick={() => setTab(savedQuery.query)}
+      ondblclick={() => {
         editingQuery = savedQuery;
         viewCommandPalette = true;
       }}
     >
+      <Icon class="text-yellow-500" name="bookmark" />
       <p class="max-w-24 truncate text-xs">{savedQuery.name}</p>
-    </Button>
+    </button>
   {/each}
 </div>
 <QueryPalette bind:open={viewCommandPalette} bind:editingQuery />

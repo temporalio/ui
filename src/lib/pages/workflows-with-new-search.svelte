@@ -90,7 +90,7 @@
     $selectedWorkflows = [];
   };
 
-  let queryLayout: 'tabs' | 'stack' = 'tabs';
+  let queryLayout: 'tabs' | 'stack' = 'stack';
   let batchTerminateConfirmationModalOpen = false;
   let batchCancelConfirmationModalOpen = false;
   let batchResetConfirmationModalOpen = false;
