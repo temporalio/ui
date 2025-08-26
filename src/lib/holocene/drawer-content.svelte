@@ -1,9 +1,10 @@
 <script lang="ts">
   import { getContext } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   export let title: string = '';
 
-  let position = getContext('drawer-pos');
+  let position: 'bottom' | 'right' = getContext('drawer-pos');
 </script>
 
 <div class="title-wrapper {position}">
@@ -15,7 +16,7 @@
   {/if}
 </div>
 
-<div class="content {position}">
+<div class={twMerge('content', position, $$props.class)}>
   <slot />
 </div>
 
