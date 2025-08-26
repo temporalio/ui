@@ -1,14 +1,11 @@
 <script lang="ts">
+  import FilterList from '$lib/components/query-palette/search-attribute-filter/filter-list.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { workflowFilters } from '$lib/stores/filters';
-  import { searchInputViewOpen } from '$lib/stores/filters';
   import { type SavedQuery as SQ } from '$lib/stores/saved-queries';
-  import { refresh } from '$lib/stores/workflows';
 
   import Modal from '../command-palette/modal.svelte';
 
   import SavedQuery from './saved-query/index.svelte';
-  import FilterList from './search-attribute-filter/filter-list.svelte';
   import SearchAttributeFilter from './search-attribute-filter/filter.svelte';
 
   interface Props {
@@ -26,7 +23,7 @@
       setTimeout(() => {
         open = false;
         modal.classList.remove('closing');
-      }, 150);
+      }, 50);
     } else {
       open = false;
     }
@@ -54,7 +51,7 @@
 <Modal
   bind:open
   onclose={close}
-  class="command-palette-modal h-[60vh] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
+  class="command-palette-modal h-[80vh] w-[90vw] max-w-4xl lg:h-[60vh] [&_.modal-content]:p-0"
   id="command-palette"
   loading={true}
 >
@@ -67,6 +64,7 @@
           <div
             class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
           >
+            <Icon name="search" class="h-5 w-5" />
             Query Command Center
           </div>
           <div class="flex items-center gap-4">
@@ -82,20 +80,14 @@
           </div>
         </div>
         <div class="flex flex-col gap-2 px-6">
-          <SavedQuery {editingQuery} />
-          <FilterList bind:filters={$workflowFilters} />
+          <SavedQuery {editingQuery} {close} />
         </div>
       </div>
-
-      <!-- Scrollable Content -->
-      <div class="max-h-96 flex-1 overflow-y-auto" role="listbox">
-        <SearchAttributeFilter
-          showFilter={!$searchInputViewOpen}
-          bind:filters={$workflowFilters}
-          refresh={() => {
-            $refresh = Date.now();
-          }}
-        />
+      <div class="max-h-96 min-h-96 overflow-y-auto" role="listbox">
+        <SearchAttributeFilter />
+      </div>
+      <div class="flex flex-col gap-1 border-t border-subtle p-2 text-xs">
+        <FilterList />
       </div>
     </div>
   {/snippet}
@@ -103,13 +95,21 @@
 
 <style lang="postcss">
   :global(.body::backdrop) {
-    background: rgb(15 23 42 / 0%);
-    backdrop-filter: blur(0.5px);
+    background:
+      radial-gradient(
+        circle at 30% 20%,
+        rgb(255 255 255 / 8%) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 70% 80%,
+        rgb(59 130 246 / 6%) 0%,
+        transparent 60%
+      ),
+      linear-gradient(135deg, rgb(15 23 42 / 20%) 0%, #444ce7 100%);
+    backdrop-filter: blur(1px) saturate(120%) brightness(110%);
     opacity: 0;
-    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  :global(.body[open]::backdrop) {
-    opacity: 1;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%);
   }
 </style>

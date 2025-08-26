@@ -40,6 +40,7 @@
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
@@ -58,6 +59,7 @@
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
+  import QueryStack from './query-stack.svelte';
   import QueryTabs from './query-tabs.svelte';
 
   $: query = $page.url.searchParams.get('query');
@@ -88,6 +90,7 @@
     $selectedWorkflows = [];
   };
 
+  let queryLayout: 'tabs' | 'stack' = 'tabs';
   let batchTerminateConfirmationModalOpen = false;
   let batchCancelConfirmationModalOpen = false;
   let batchResetConfirmationModalOpen = false;
@@ -164,6 +167,15 @@
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
+
+  const handleToggleChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.checked) {
+      queryLayout = 'tabs';
+    } else {
+      queryLayout = 'stack';
+    }
+  };
 </script>
 
 <BatchTerminateConfirmationModal
@@ -208,22 +220,43 @@
       {/if}
       <WorkflowCountRefresh count={$workflowCount.newCount} />
     </h1>
-    {#if !workflowCreateDisabled($page)}
-      <Button
-        leadingIcon="lightning-bolt"
-        href={routeForWorkflowStart({ namespace })}
-        >{translate('workflows.start-workflow')}</Button
-      >
-    {/if}
+    <div class="flex items-center gap-4">
+      <ToggleSwitch
+        id="tabs-or-stack"
+        label="Tabs"
+        checked={queryLayout === 'tabs'}
+        on:change={handleToggleChange}
+      />
+      {#if !workflowCreateDisabled($page)}
+        <Button
+          leadingIcon="lightning-bolt"
+          href={routeForWorkflowStart({ namespace })}
+          >{translate('workflows.start-workflow')}</Button
+        >
+      {/if}
+    </div>
   </div>
   <WorkflowCounts />
 </header>
 
 <div>
-  <QueryTabs />
-  <WorkflowsSummaryConfigurableTable onClickConfigure={openCustomizationDrawer}>
-    <slot name="cloud" slot="cloud" />
-  </WorkflowsSummaryConfigurableTable>
+  {#if queryLayout === 'tabs'}
+    <QueryTabs />
+    <WorkflowsSummaryConfigurableTable
+      onClickConfigure={openCustomizationDrawer}
+    >
+      <slot name="cloud" slot="cloud" />
+    </WorkflowsSummaryConfigurableTable>
+  {:else}
+    <div class="flex">
+      <QueryStack />
+      <WorkflowsSummaryConfigurableTable
+        onClickConfigure={openCustomizationDrawer}
+      >
+        <slot name="cloud" slot="cloud" />
+      </WorkflowsSummaryConfigurableTable>
+    </div>
+  {/if}
 </div>
 <ConfigurableTableHeadersDrawer
   {availableColumns}

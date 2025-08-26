@@ -1,43 +1,35 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
+  import { twMerge as merge } from 'tailwind-merge';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Chip from '$lib/holocene/chip.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { isWorkflowStatusType } from '$lib/models/workflow-status';
+  import { workflowFilters } from '$lib/stores/filters';
+  import { currentPageKey } from '$lib/stores/pagination';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
   import { isNullConditional, isStartsWith } from '$lib/utilities/is';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     formatDateTimeRange,
     isDateTimeFilter,
     isTextFilter,
   } from '$lib/utilities/query/search-attribute-filter';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  export let filters: SearchAttributeFilter[];
+  let totalFiltersInView = $state(20);
+  let viewRawQuery = $state(false);
 
-  const removeQuery = (index: number) => {
-    filters.splice(index, 1);
-    filters = filters;
-    updateQueryParamsFromFilter($page.url, filters);
-
-    if (index === filters.length) {
-      const previousQuery = filters[filters.length - 1];
-      if (previousQuery) {
-        previousQuery.operator = '';
-      }
-    }
-  };
-
-  let totalFiltersInView = 5;
-
-  $: visibleFilters = filters.slice(0, totalFiltersInView);
-  $: hasMoreFilters = totalFiltersInView < filters.length;
+  let query = $derived(page.url.searchParams.get('query') || '');
+  const visibleFilters = $derived(
+    $workflowFilters.slice(0, totalFiltersInView),
+  );
+  const hasMoreFilters = $derived(totalFiltersInView < $workflowFilters.length);
 
   const viewMoreFilters = () => {
     if (hasMoreFilters) {
@@ -52,53 +44,121 @@
       return translate('common.after').toLowerCase();
     return conditional;
   };
+
+  const clearFilters = () => {
+    $workflowFilters = [];
+    updateQueryParameters({
+      url: page.url,
+      parameter: 'query',
+      value: '',
+      allowEmpty: true,
+      clearParameters: [currentPageKey],
+    });
+  };
+
+  const removeFilter = (filter: SearchAttributeFilter) => {
+    $workflowFilters = $workflowFilters.filter(
+      (f) => f.attribute !== filter.attribute,
+    );
+    const searchQuery = toListWorkflowQueryFromFilters(
+      combineFilters($workflowFilters),
+    );
+    updateQueryParameters({
+      url: page.url,
+      parameter: 'query',
+      value: searchQuery,
+      allowEmpty: true,
+      clearParameters: [currentPageKey],
+    });
+  };
 </script>
 
+{#snippet filterValue(workflowFilter)}
+  {@const { value, conditional, customDate } = workflowFilter}
+  {#if isNullConditional(conditional)}
+    {conditional}
+    {String(value)}
+  {:else if isDateTimeFilter(workflowFilter)}
+    {#if customDate}
+      {formatDateTimeRange(value, $timeFormat, $relativeTime)}
+    {:else}
+      {getDateTimeConditonal(conditional)}
+      {formatDate(value, $timeFormat, {
+        relative: $relativeTime,
+        abbrFormat: true,
+      })}
+    {/if}
+  {:else}
+    {isStartsWith(conditional)
+      ? translate('common.starts-with').toLocaleLowerCase()
+      : conditional}
+    {isTextFilter(workflowFilter) ? `"${value}"` : value}
+  {/if}
+{/snippet}
+
 <div class="flex flex-wrap gap-2">
+  <Button
+    variant="secondary"
+    size="xs"
+    leadingIcon={viewRawQuery ? 'eye-hide' : 'json'}
+    on:click={() => (viewRawQuery = !viewRawQuery)}
+  />
+  <Button
+    variant="secondary"
+    size="xs"
+    on:click={clearFilters}
+    disabled={!$workflowFilters.length}>Clear All</Button
+  >
   {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
-    {@const { attribute, value, conditional, customDate } = workflowFilter}
+    {@const { attribute } = workflowFilter}
     {#if attribute}
-      <div in:fade data-testid="{workflowFilter.attribute}-{i}">
-        <Chip
-          removeButtonLabel={translate('workflows.remove-filter-label', {
-            attribute,
-          })}
-          on:remove={() => removeQuery(i)}
-          button
+      <div
+        class="inline-flex max-w-full flex-wrap"
+        role="img"
+        data-testid="{workflowFilter.attribute}-{i}"
+        aria-label={workflowFilter.attribute}
+      >
+        <div
+          class={merge(
+            'm1',
+            'inline-flex min-w-0 max-w-full items-center overflow-hidden rounded',
+            'bg-blue-200 text-slate-900',
+            'dark:bg-indigo-700 dark:text-white',
+          )}
         >
-          {#if attribute === 'ExecutionStatus' && isWorkflowStatusType(value)}
-            <span class="flex items-center">
-              {attribute}
-              {conditional}
-              <span class="-py-1 ml-1">
-                <WorkflowStatus status={value} />
-              </span>
-            </span>
-          {:else}
-            <span class="max-w-xs truncate md:max-w-lg xl:max-w-2xl">
-              {attribute}
-              {#if isNullConditional(conditional)}
-                {conditional}
-                {String(value)}
-              {:else if isDateTimeFilter(workflowFilter)}
-                {#if customDate}
-                  {formatDateTimeRange(value, $timeFormat, $relativeTime)}
-                {:else}
-                  {getDateTimeConditonal(conditional)}
-                  {formatDate(value, $timeFormat, {
-                    relative: $relativeTime,
-                    abbrFormat: true,
-                  })}
-                {/if}
-              {:else}
-                {isStartsWith(conditional)
-                  ? translate('common.starts-with').toLocaleLowerCase()
-                  : conditional}
-                {isTextFilter(workflowFilter) ? `"${value}"` : value}
-              {/if}
-            </span>
-          {/if}
-        </Chip>
+          <div
+            class={merge(
+              'flex min-w-0 flex-shrink items-center gap-1 px-2 pr-1 text-xs leading-4',
+            )}
+          >
+            <span class={merge('min-w-0 hyphens-auto break-words font-medium')}
+              >{attribute}</span
+            >
+          </div>
+          <div
+            class={merge(
+              'm-1 rounded',
+              'flex min-w-0 flex-shrink items-start px-2 py-[.125rem] text-xs leading-[.95rem]',
+              'bg-blue-300 text-slate-900',
+              'dark:bg-indigo-800 dark:text-white',
+            )}
+          >
+            <span class={merge('min-w-0 hyphens-auto break-words font-normal')}
+              >{@render filterValue(workflowFilter)}</span
+            >
+          </div>
+          <button
+            onclick={() => removeFilter(workflowFilter)}
+            class={merge(
+              'm-0.5 rounded',
+              'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs',
+              'text-slate-900 dark:text-white',
+              'hover:text-red-900',
+            )}
+          >
+            <Icon name="close" />
+          </button>
+        </div>
       </div>
     {/if}
   {/each}
@@ -108,3 +168,6 @@
     >
   {/if}
 </div>
+{#if viewRawQuery}
+  <CodeBlock editable content={query} />
+{/if}

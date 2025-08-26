@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
+  import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
@@ -12,18 +13,10 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
 
-  export let filters: SearchAttributeFilter[];
   export let options: SearchAttributeOption[];
+  export let activeFilter: SearchAttributeFilter;
 
   const { filter } = getContext<FilterContext>(FILTER_CONTEXT);
-
-  function isOptionDisabled(value: string, filters: SearchAttributeFilter[]) {
-    return filters.some(
-      (filter) =>
-        ['=', '!=', 'is', 'is not'].includes(filter.conditional) &&
-        filter.attribute === value,
-    );
-  }
 
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
@@ -41,20 +34,34 @@
 </script>
 
 <div
-  class="flex w-1/2 flex-col gap-2 overflow-y-auto border-r border-subtle p-4"
+  class="flex w-full flex-row gap-2 overflow-auto border-r border-subtle p-4 lg:w-1/3 lg:flex-col"
 >
-  {#each filteredOptions as { value, label, type }}
-    {@const disabled = isOptionDisabled(value, filters)}
-    <button
-      class="bg-gray-100 flex cursor-pointer items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-indigo-500/50"
-      on:click={() => {
-        handleNewQuery(value, type);
-      }}
-      {disabled}
-    >
-      {label}
-    </button>
-  {:else}
-    <p class="whitespace-nowrap">{translate('common.no-results')}</p>
-  {/each}
+  <Input
+    id="search-attribute"
+    label="search"
+    class="hidden lg:block"
+    labelHidden
+    bind:value={searchAttributeValue}
+    placeholder={translate('common.search')}
+  />
+  <ol class="flex gap-0.5 lg:flex-col">
+    {#each filteredOptions as { value, label, type }}
+      <li class="w-full">
+        <button
+          class="bg-gray-100 flex w-full cursor-pointer items-center gap-2 rounded-sm px-2
+          py-1 text-sm hover:bg-brand hover:text-white {activeFilter?.attribute ===
+          value
+            ? 'bg-brand text-white'
+            : ''}"
+          on:click={() => {
+            handleNewQuery(value, type);
+          }}
+        >
+          {label}
+        </button>
+      </li>
+    {:else}
+      <li class="whitespace-nowrap">{translate('common.no-results')}</li>
+    {/each}
+  </ol>
 </div>

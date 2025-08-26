@@ -2,8 +2,7 @@
   import { page } from '$app/state';
 
   import QueryPalette from '$lib/components/query-palette/index.svelte';
-  import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
-  import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
@@ -47,40 +46,42 @@
   };
 </script>
 
-<TabButtons class="w-full overflow-auto">
-  <TabButton
-    icon="search"
+<div>
+  <Button
+    variant="secondary"
+    leadingIcon="search"
     data-testid="search"
     class="h-10"
     on:click={() => showCommandPalette()}
-  ></TabButton>
-  <TabButton
+  ></Button>
+  <Button
     data-testid="all"
     class="h-10"
-    active={query === ''}
-    on:click={() => setTab('')}>All</TabButton
+    variant={query === '' ? 'primary' : 'secondary'}
+    on:click={() => setTab('')}>All</Button
   >
-  <TabButton
+  <Button
     data-testid="today"
     class="h-10"
-    active={query === `StartTime >= "${getToday()}"`}
+    variant={query === `StartTime >= "${getToday()}"` ? 'primary' : 'secondary'}
     on:click={() => setTab(`StartTime >= "${getToday()}"`)}
   >
-    Today</TabButton
+    Today</Button
   >
-  <TabButton
+  <Button
     data-testid="last-hour"
     class="h-10"
-    active={query === `StartTime >= "${getLastHour()}"`}
-    on:click={() => setTab(`StartTime >= "${getLastHour()}"`)}
-    >Last Hour</TabButton
+    variant={query === `StartTime >= "${getLastHour()}"`
+      ? 'primary'
+      : 'secondary'}
+    on:click={() => setTab(`StartTime >= "${getLastHour()}"`)}>Last Hour</Button
   >
   {#each $savedQueries as savedQuery}
-    <TabButton
-      icon="bookmark"
+    <Button
+      variant={query === savedQuery.query ? 'primary' : 'secondary'}
+      leadingIcon="bookmark"
       data-testid={savedQuery.id}
       class="h-10"
-      active={query === savedQuery.query}
       on:click={() => setTab(savedQuery.query)}
       on:dblclick={() => {
         editingQuery = savedQuery;
@@ -88,7 +89,7 @@
       }}
     >
       <p class="max-w-24 truncate text-xs">{savedQuery.name}</p>
-    </TabButton>
+    </Button>
   {/each}
-</TabButtons>
+</div>
 <QueryPalette bind:open={viewCommandPalette} bind:editingQuery />
