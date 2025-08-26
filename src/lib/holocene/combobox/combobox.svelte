@@ -23,7 +23,7 @@
           default:
             'border-subtle focus-within:border-interactive focus-within:ring-primary/70',
           ghost:
-            'bg-transparent border-transparent focus-within:border-transparent focus-within:ring-transparent hover:surface-interactive-ghost',
+            'bg-transparent border-transparent focus-within:border-transparent focus-within:ring-transparent focus-within:bg-transparent hover:surface-interactive-secondary',
         },
       },
       defaultVariants: {
