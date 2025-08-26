@@ -534,7 +534,7 @@
     {#if showChevron}
       <button
         type="button"
-        class="hover:bg-gray-100 ml-1 flex h-full items-center rounded p-3 focus:outline-none"
+        class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
         on:click|stopPropagation={() => ($open ? closeList() : openList())}
         aria-label={$open ? 'Close options' : 'Open options'}
         tabindex="-1"
