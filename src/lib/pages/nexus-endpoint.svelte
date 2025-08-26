@@ -17,9 +17,11 @@
   let {
     endpoint,
     editDisabled = false,
+    backHref = routeForNexus(),
     taskQueueStatus,
   }: {
     endpoint: Endpoint;
+    backHref?: string;
     editDisabled?: boolean;
     taskQueueStatus?: Snippet;
   } = $props();
@@ -27,7 +29,7 @@
 
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={routeForNexus()} icon="chevron-left">
+    <Link href={backHref} icon="chevron-left">
       {translate('nexus.back-to-endpoints')}
     </Link>
   </div>
