@@ -58,7 +58,7 @@
     data-testid="all"
     class="h-10"
     active={query === ''}
-    on:click={() => setTab('')}>All</TabButton
+    on:click={() => setTab('')}><p class="text-xs">All</p></TabButton
   >
   <TabButton
     data-testid="today"
@@ -66,18 +66,17 @@
     active={query === `StartTime >= "${getToday()}"`}
     on:click={() => setTab(`StartTime >= "${getToday()}"`)}
   >
-    Today</TabButton
+    <p class="text-xs">Today</p></TabButton
   >
   <TabButton
     data-testid="last-hour"
     class="h-10"
     active={query === `StartTime >= "${getLastHour()}"`}
     on:click={() => setTab(`StartTime >= "${getLastHour()}"`)}
-    >Last Hour</TabButton
+    ><p class="text-xs">Last Hour</p></TabButton
   >
   {#each $savedQueries as savedQuery}
     <TabButton
-      icon="bookmark"
       data-testid={savedQuery.id}
       class="h-10"
       active={query === savedQuery.query}

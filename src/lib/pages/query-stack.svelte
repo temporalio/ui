@@ -48,21 +48,21 @@
   };
 </script>
 
-<div class="w-48">
+<div class="w-36 min-w-36 max-w-36">
   <button
     data-testid="search"
     class={merge(
       'm-1.5 w-full rounded-l-sm',
-      'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+      'flex flex-shrink items-start gap-1 px-1 py-1 text-xs',
       'text-slate-900 dark:text-white',
     )}
-    onclick={() => showCommandPalette()}><Icon name="search" /></button
+    onclick={() => showCommandPalette()}><Icon name="search" />Search</button
   >
   <button
     data-testid="all"
     class={merge(
       'm-1.5 w-full rounded-l-sm',
-      'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+      'flex  items-start px-1 py-1 text-xs',
       'text-slate-900 dark:text-white',
       query === '' && 'bg-subtle',
     )}
@@ -72,7 +72,7 @@
     data-testid="today"
     class={merge(
       'm-1.5 w-full rounded-l-sm',
-      'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+      'flex  items-start px-1 py-1 text-xs',
       'text-slate-900 dark:text-white',
       query === `StartTime >= "${getToday()}"` && 'bg-subtle',
     )}
@@ -84,7 +84,7 @@
     data-testid="last-hour"
     class={merge(
       'm-1.5 w-full rounded-l-sm',
-      'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+      'flex  items-start px-1 py-1 text-xs',
       'text-slate-900 dark:text-white',
       query === `StartTime >= "${getLastHour()}"` && 'bg-subtle',
     )}
@@ -95,7 +95,7 @@
       data-testid={savedQuery.id}
       class={merge(
         'm-1.5 w-full rounded-l-sm',
-        'flex min-w-0 flex-shrink items-start px-1 py-1 text-xs',
+        'flex  items-start px-1 py-1 text-xs',
         'text-slate-900 dark:text-white',
         query === savedQuery.query && 'bg-subtle',
       )}
@@ -105,8 +105,7 @@
         viewCommandPalette = true;
       }}
     >
-      <Icon class="text-yellow-500" name="bookmark" />
-      <p class="max-w-24 truncate text-xs">{savedQuery.name}</p>
+      <p class="truncate text-xs">{savedQuery.name}</p>
     </button>
   {/each}
 </div>

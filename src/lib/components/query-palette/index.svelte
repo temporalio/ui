@@ -97,7 +97,7 @@
   :global(.body::backdrop) {
     background:
       radial-gradient(
-        circle at 30% 20%,
+        circle at 30% 50%,
         rgb(255 255 255 / 8%) 0%,
         transparent 60%
       ),
@@ -106,8 +106,12 @@
         rgb(59 130 246 / 6%) 0%,
         transparent 60%
       ),
-      linear-gradient(135deg, rgb(15 23 42 / 20%) 0%, #444ce7 100%);
-    backdrop-filter: blur(1px) saturate(120%) brightness(110%);
+      linear-gradient(
+        135deg,
+        rgb(15 23 42 / 20%) 0%,
+        rgb(68 76 231 / 50%) 50%
+      );
+    backdrop-filter: blur(0.5px) saturate(120%) brightness(80%);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%);

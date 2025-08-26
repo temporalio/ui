@@ -57,9 +57,7 @@
   };
 
   const removeFilter = (filter: SearchAttributeFilter) => {
-    $workflowFilters = $workflowFilters.filter(
-      (f) => f.attribute !== filter.attribute,
-    );
+    $workflowFilters = $workflowFilters.filter((f) => f !== filter);
     const searchQuery = toListWorkflowQueryFromFilters(
       combineFilters($workflowFilters),
     );

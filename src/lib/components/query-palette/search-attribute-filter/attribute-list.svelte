@@ -49,9 +49,9 @@
       <li class="w-full">
         <button
           class="bg-gray-100 flex w-full cursor-pointer items-center gap-2 rounded-sm px-2
-          py-1 text-sm hover:bg-brand hover:text-white {activeFilter?.attribute ===
+          py-1 text-sm hover:bg-interactive hover:text-white {activeFilter?.attribute ===
           value
-            ? 'bg-brand text-white'
+            ? 'bg-interactive text-white'
             : ''}"
           on:click={() => {
             handleNewQuery(value, type);
