@@ -21,7 +21,7 @@
     taskQueueStatus,
   }: {
     endpoint: Endpoint;
-    backHref: string;
+    backHref?: string;
     editDisabled?: boolean;
     editHidden?: boolean;
     taskQueueStatus?: Snippet;
