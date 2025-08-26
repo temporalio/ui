@@ -23,7 +23,6 @@
     endpoint: Endpoint;
     backHref?: string;
     editDisabled?: boolean;
-    editHidden?: boolean;
     taskQueueStatus?: Snippet;
   } = $props();
 </script>
