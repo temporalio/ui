@@ -39,7 +39,7 @@
       'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
       active &&
         'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
-      disabled && 'pointer-events-none cursor-not-allowed text-subtle',
+      disabled && 'pointer-events-none cursor-not-allowed opacity-50',
     )}
     class:text-disabled={disabled}
   >

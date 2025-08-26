@@ -209,6 +209,6 @@
   }
 
   .menu-item-description {
-    @apply mr-6 text-xs font-normal text-subtle;
+    @apply mr-6 text-xs font-normal text-secondary;
   }
 </style>

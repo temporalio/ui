@@ -273,7 +273,7 @@
       <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">
           <h3>{translate('workflows.user-metadata')}</h3>
-          <p class="flex items-center gap-1 text-sm text-subtle">
+          <p class="flex items-center gap-1 text-sm text-secondary">
             {translate('workflows.markdown-supported')}
             <Tooltip
               topRight
