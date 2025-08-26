@@ -5,10 +5,9 @@
   import { translate } from '$lib/i18n/translate';
   import { isNullConditional } from '$lib/utilities/is';
 
-  import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from '../index.svelte';
 
-  const { filter, focusedElementId } =
-    getContext<FilterContext>(FILTER_CONTEXT);
+  const { filter } = getContext<FilterContext>(FILTER_CONTEXT);
   const defaultConditionOptions = [
     { value: '>' },
     { value: '>=' },
@@ -18,9 +17,11 @@
     { value: '<' },
   ];
 
-  export let options: { value: string; label?: string }[] =
-    defaultConditionOptions;
-  export let inputId: string;
+  let {
+    options = defaultConditionOptions,
+  }: {
+    options?: { value: string; label?: string }[];
+  } = $props();
 
   let conditionalOptions = [
     ...options,
@@ -28,10 +29,14 @@
     { value: 'is not', label: translate('common.is-not-null') },
   ];
 
-  $: filterConditionalOption = conditionalOptions.find(
-    (o) => o.value === $filter.conditional,
+  const filterConditionalOption = $derived(
+    conditionalOptions.find((o) => o.value === $filter.conditional),
   );
-  $: filterConditionalOption, updateFilterConditional();
+
+  $effect(() => {
+    filterConditionalOption;
+    updateFilterConditional();
+  });
 
   function handleNullFilter() {
     $filter.value = null;
@@ -51,7 +56,6 @@
       size="xs"
       on:click={() => {
         $filter.conditional = value;
-        $focusedElementId = inputId;
         if (isNullConditional(value)) handleNullFilter();
       }}
     >

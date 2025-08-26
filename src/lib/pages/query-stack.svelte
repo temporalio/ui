@@ -3,8 +3,6 @@
 
   import { page } from '$app/state';
 
-  import QueryPalette from '$lib/components/query-palette/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
@@ -12,10 +10,9 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  const query = $derived(page.url.searchParams.get('query'));
-
-  let viewCommandPalette = $state(false);
-  let editingQuery: SavedQuery | undefined = $state(undefined);
+  let { onDoubleClick }: { onDoubleClick: (query: SavedQuery) => void } =
+    $props();
+  const query = $derived(page.url.searchParams.get('query') || '');
 
   const setTab = (_query: string) => {
     updateQueryParameters({
@@ -28,10 +25,6 @@
     if (_query) {
       $workflowFilters = toListWorkflowFilters(_query, $searchAttributes);
     }
-  };
-
-  const showCommandPalette = () => {
-    viewCommandPalette = true;
   };
 
   const getToday = () => {
@@ -48,33 +41,35 @@
   };
 </script>
 
-<div class="w-36 min-w-36 max-w-36">
-  <button
-    data-testid="search"
+<div class="mt-1 w-[140px] min-w-[140px] max-w-[140px]">
+  <p
     class={merge(
-      'm-1.5 w-full rounded-l-sm',
-      'flex flex-shrink items-start gap-1 px-1 py-1 text-xs',
+      'w-full',
+      'flex items-start px-1 py-1 text-xs',
       'text-slate-900 dark:text-white',
+      'border-b border-subtle',
     )}
-    onclick={() => showCommandPalette()}><Icon name="search" />Search</button
   >
+    Saved Queries
+  </p>
   <button
     data-testid="all"
     class={merge(
-      'm-1.5 w-full rounded-l-sm',
+      'w-full rounded-l-sm',
       'flex  items-start px-1 py-1 text-xs',
       'text-slate-900 dark:text-white',
-      query === '' && 'bg-subtle',
+      query === '' && 'bg-subtle dark:bg-interactive',
     )}
     onclick={() => setTab('')}>All</button
   >
   <button
     data-testid="today"
     class={merge(
-      'm-1.5 w-full rounded-l-sm',
+      'w-full rounded-l-sm',
       'flex  items-start px-1 py-1 text-xs',
       'text-slate-900 dark:text-white',
-      query === `StartTime >= "${getToday()}"` && 'bg-subtle',
+      query === `StartTime >= "${getToday()}"` &&
+        'bg-subtle dark:bg-interactive',
     )}
     onclick={() => setTab(`StartTime >= "${getToday()}"`)}
   >
@@ -83,30 +78,39 @@
   <button
     data-testid="last-hour"
     class={merge(
-      'm-1.5 w-full rounded-l-sm',
+      'w-full rounded-l-sm',
       'flex  items-start px-1 py-1 text-xs',
       'text-slate-900 dark:text-white',
-      query === `StartTime >= "${getLastHour()}"` && 'bg-subtle',
+      query === `StartTime >= "${getLastHour()}"` &&
+        'bg-subtle dark:bg-interactive',
     )}
     onclick={() => setTab(`StartTime >= "${getLastHour()}"`)}>Last Hour</button
+  >
+  <button
+    data-testid="last-hour"
+    class={merge(
+      'w-full rounded-l-sm',
+      'flex  items-start px-1 py-1 text-xs',
+      'text-slate-900 dark:text-white',
+      query === 'ParentWorkflowId is not null' &&
+        'bg-subtle dark:bg-interactive',
+    )}
+    onclick={() => setTab('ParentWorkflowId is not null')}
+    >Child Workflows</button
   >
   {#each $savedQueries as savedQuery}
     <button
       data-testid={savedQuery.id}
       class={merge(
-        'm-1.5 w-full rounded-l-sm',
+        'w-full rounded-l-sm',
         'flex  items-start px-1 py-1 text-xs',
         'text-slate-900 dark:text-white',
-        query === savedQuery.query && 'bg-subtle',
+        query === savedQuery.query && 'bg-subtle dark:bg-interactive',
       )}
       onclick={() => setTab(savedQuery.query)}
-      ondblclick={() => {
-        editingQuery = savedQuery;
-        viewCommandPalette = true;
-      }}
+      ondblclick={() => onDoubleClick(savedQuery)}
     >
       <p class="truncate text-xs">{savedQuery.name}</p>
     </button>
   {/each}
 </div>
-<QueryPalette bind:open={viewCommandPalette} bind:editingQuery />

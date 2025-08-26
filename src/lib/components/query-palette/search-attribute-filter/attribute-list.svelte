@@ -11,10 +11,13 @@
   } from '$lib/types/workflows';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
-  import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from '../index.svelte';
 
-  export let options: SearchAttributeOption[];
-  export let activeFilter: SearchAttributeFilter;
+  let {
+    options,
+    activeFilter,
+  }: { options: SearchAttributeOption[]; activeFilter: SearchAttributeFilter } =
+    $props();
 
   const { filter } = getContext<FilterContext>(FILTER_CONTEXT);
 
@@ -24,13 +27,17 @@
     filter.set({ ...emptyFilter(), attribute: value, conditional, type });
   }
 
-  let searchAttributeValue = '';
+  let searchAttributeValue = $state('');
 
-  $: filteredOptions = !searchAttributeValue
-    ? options
-    : options.filter((option) =>
-        option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
-      );
+  const filteredOptions = $derived(
+    !searchAttributeValue
+      ? options
+      : options.filter((option) =>
+          option.value
+            .toLowerCase()
+            .includes(searchAttributeValue.toLowerCase()),
+        ),
+  );
 </script>
 
 <div
@@ -53,7 +60,7 @@
           value
             ? 'bg-interactive text-white'
             : ''}"
-          on:click={() => {
+          onclick={() => {
             handleNewQuery(value, type);
           }}
         >

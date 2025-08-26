@@ -1,28 +1,10 @@
-<script lang="ts" module>
-  import { writable, type Writable } from 'svelte/store';
+<script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { setContext } from 'svelte';
+  import { getContext } from 'svelte';
 
-  export const FILTER_CONTEXT = 'filter-context';
-  export interface FilterContext {
-    filter: Writable<SearchAttributeFilter>;
-    activeQueryIndex: Writable<number>;
-    handleSubmit: () => void;
-    focusedElementId: Writable<string>;
-    resetFilter: () => void;
-  }
-</script>
-
-<script lang="ts">
-  import { page } from '$app/state';
-
-  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
-  import { currentPageKey } from '$lib/stores/pagination';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
-  import { refresh } from '$lib/stores/workflows';
-  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     isBooleanFilter,
     isDateTimeFilter,
@@ -32,11 +14,8 @@
     isStatusFilter,
     isTextFilter,
   } from '$lib/utilities/query/search-attribute-filter';
-  import {
-    combineFilters,
-    emptyFilter,
-  } from '$lib/utilities/query/to-list-workflow-filters';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  import { FILTER_CONTEXT, type FilterContext } from '../index.svelte';
 
   import AttributeList from './attribute-list.svelte';
   import BooleanFilter from './boolean-filter.svelte';
@@ -47,54 +26,9 @@
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
 
+  const { filter, resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
+
   const options = $derived($sortedSearchAttributeOptions);
-
-  const filter = writable<SearchAttributeFilter>(emptyFilter());
-  const activeQueryIndex = writable<number>(null);
-  const focusedElementId = writable<string>('');
-
-  const query = $derived(page.url.searchParams.get('query') || '');
-
-  setContext<FilterContext>(FILTER_CONTEXT, {
-    filter,
-    activeQueryIndex,
-    handleSubmit,
-    focusedElementId,
-    resetFilter,
-  });
-
-  function onSearch() {
-    const searchQuery = toListWorkflowQueryFromFilters(
-      combineFilters($workflowFilters),
-    );
-
-    if (searchQuery && searchQuery === query) {
-      $refresh = Date.now();
-    } else {
-      updateQueryParameters({
-        url: page.url,
-        parameter: 'query',
-        value: searchQuery,
-        allowEmpty: true,
-        clearParameters: [currentPageKey],
-      });
-    }
-  }
-
-  function handleSubmit() {
-    if ($activeQueryIndex !== null) {
-      $workflowFilters[$activeQueryIndex] = $filter;
-      $activeQueryIndex = null;
-    } else {
-      $workflowFilters = [...$workflowFilters, $filter];
-    }
-    filter.set(emptyFilter());
-    onSearch();
-  }
-
-  function resetFilter() {
-    filter.set(emptyFilter());
-  }
 
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape' && !isTextFilter($filter)) {

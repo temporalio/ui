@@ -8,8 +8,9 @@
   import { isInConditional } from '$lib/utilities/is';
   import { formatListFilterValue } from '$lib/utilities/query/search-attribute-filter';
 
+  import { FILTER_CONTEXT, type FilterContext } from '../index.svelte';
+
   import ConditionalMenu from './conditional-menu.svelte';
-  import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
@@ -59,9 +60,7 @@
       external
     />
     <div class="flex h-fit items-center">
-      <Button disabled={!chips.length} type="button">
-        {translate('common.add')}
-      </Button>
+      <Button leadingIcon="add" type="button" />
       <slot />
     </div>
   {:else}

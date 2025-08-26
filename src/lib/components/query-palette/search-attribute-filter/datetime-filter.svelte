@@ -30,8 +30,9 @@
   } from '$lib/stores/time-format';
   import { toDate } from '$lib/utilities/to-duration';
 
+  import { FILTER_CONTEXT, type FilterContext } from '../index.svelte';
+
   import ConditionalMenu from './conditional-menu.svelte';
-  import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
@@ -216,7 +217,6 @@
   {/if}
 {/if}
 <ConditionalMenu
-  inputId="time-range-filter"
   options={[
     { value: '<=', label: translate('common.before') },
     { value: 'BETWEEN', label: translate('common.between') },

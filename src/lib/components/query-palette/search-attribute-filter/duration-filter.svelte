@@ -6,8 +6,9 @@
   import { translate } from '$lib/i18n/translate';
   import { isValidDurationQuery } from '$lib/utilities/to-duration';
 
+  import { FILTER_CONTEXT, type FilterContext } from '../index.svelte';
+
   import ConditionalMenu from './conditional-menu.svelte';
-  import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
@@ -57,7 +58,7 @@
   on:input={validateDuration}
   valid={isValid}
 />
-<ConditionalMenu inputId="duration-filter" />
+<ConditionalMenu />
 <Button class="w-full" size="sm" on:click={handleClick}
   >{translate('common.apply')}</Button
 >
