@@ -65,7 +65,7 @@
           }}
         >
           {label}
-          <small class="text-xs text-secondary">{type}</small>
+          <small class="text-xs">{type}</small>
         </button>
       </li>
     {:else}

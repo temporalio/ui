@@ -127,10 +127,10 @@
       >
         <div class="flex items-center justify-between px-6 py-3">
           <div
-            class="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100"
+            class="flex items-center gap-3 text-xl font-semibold text-slate-900 dark:text-slate-100"
           >
-            <Icon name="search" class="h-5 w-5" />
-            Query Generator
+            <Icon name="filter" class="h-5 w-5" />
+            Builder
           </div>
           <div class="flex items-center gap-4">
             {@render keyboardShortcuts()}

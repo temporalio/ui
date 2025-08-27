@@ -114,117 +114,138 @@
   {/if}
 {/snippet}
 
-<div class="flex flex-wrap items-center gap-1">
-  {#if !editable}
-    <button
-      onclick={showQueryCommand}
-      class={merge(
-        'query-generator',
-        'px-2 py-1',
-        'inline-flex max-w-full items-center overflow-hidden rounded',
-        'bg-green-200 text-green-900 hover:bg-green-400',
-      )}
-    >
-      <div
-        class={merge(
-          'flex min-w-0 flex-shrink items-center px-1 text-xs leading-4',
-        )}
-      >
-        <Icon name="search" />
-        <span
-          class={merge(
-            'slide-in-left min-w-0 hyphens-auto break-words font-medium',
-          )}
-        >
-          Query Generator
-        </span>
+<div
+  class="w-full overflow-hidden {!editable &&
+    'border border-b-0 border-subtle bg-secondary p-2 shadow-sm'}"
+>
+  <div class="flex flex-wrap items-center gap-2">
+    {#if !editable}
+      <div class="flex items-center gap-2">
+        <Icon class="text-secondary" name="filter" />
+        <p class="hidden text-sm font-medium text-secondary lg:block">
+          Active Filters
+        </p>
       </div>
-    </button>
-  {/if}
-  {#if editable}
-    <Button
-      variant="secondary"
-      size="xs"
-      leadingIcon={viewRawQuery ? 'eye-hide' : 'json'}
-      on:click={() => (viewRawQuery = !viewRawQuery)}
-    />
-    <Button
-      variant="secondary"
-      size="xs"
-      on:click={clearFilters}
-      disabled={!$workflowFilters.length}>Clear All</Button
-    >
-  {/if}
-  {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
-    {@const { attribute } = workflowFilter}
-    {#if attribute}
-      <div
-        class="inline-flex h-full max-w-full flex-wrap"
-        role="img"
-        data-testid="{workflowFilter.attribute}-{i}"
-        aria-label={workflowFilter.attribute}
+    {/if}
+
+    {#if editable}
+      <Button
+        variant="ghost"
+        size="xs"
+        leadingIcon={viewRawQuery ? 'eye-hide' : 'json'}
+        on:click={() => (viewRawQuery = !viewRawQuery)}
+        class="h-6 w-6 p-0"
+      />
+      <Button
+        variant="ghost"
+        size="xs"
+        on:click={clearFilters}
+        disabled={!$workflowFilters.length}
+        class="h-6 px-2 text-xs"
+      >
+        Clear All
+      </Button>
+    {/if}
+    {#if !editable}
+      <button
+        onclick={showQueryCommand}
+        class={merge(
+          'query-generator',
+          'h-6 px-1',
+          'inline-flex max-w-full items-center overflow-hidden rounded',
+          'border border-slate-400 text-primary',
+        )}
       >
         <div
           class={merge(
-            'inline-flex min-w-0 max-w-full items-center overflow-hidden rounded',
-            'bg-blue-100 text-slate-900',
-            'dark:bg-indigo-900 dark:text-white',
+            'flex min-w-0 flex-shrink items-center px-1 text-xs leading-4',
           )}
+        >
+          <Icon name="add" />
+          <span
+            class={merge(
+              'slide-in-left min-w-0 hyphens-auto break-words font-medium',
+            )}
+          >
+            Builder
+          </span>
+        </div>
+      </button>
+    {/if}
+    {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
+      {@const { attribute } = workflowFilter}
+      {#if attribute}
+        <div
+          class="inline-flex max-w-full flex-wrap"
+          role="img"
+          data-testid="{workflowFilter.attribute}-{i}"
+          aria-label={workflowFilter.attribute}
         >
           <div
             class={merge(
-              'flex min-w-0 flex-shrink items-center gap-1 px-1 pr-1 text-xs leading-4',
+              'inline-flex min-w-0 max-w-full items-center overflow-hidden rounded px-1 py-0.5',
+              'bg-blue-100 text-slate-900',
+              'dark:bg-indigo-900 dark:text-white',
             )}
           >
-            <span class={merge('min-w-0 hyphens-auto break-words font-medium')}
-              >{attribute}</span
-            >
-          </div>
-          <div
-            class={merge(
-              'rounded',
-              'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs leading-[.95rem]',
-              'bg-blue-500 text-white',
-              'text-white dark:bg-indigo-500',
-            )}
-          >
-            <span class={merge('min-w-0 hyphens-auto break-words font-normal')}
-              >{@render conditional(workflowFilter)}</span
-            >
-          </div>
-          <div
-            class={merge(
-              'rounded',
-              'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs leading-[.95rem]',
-              'text-primary',
-            )}
-          >
-            <span class={merge('min-w-0 hyphens-auto break-words font-normal')}
-              >{@render filterValue(workflowFilter)}</span
-            >
-          </div>
-          {#if editable}
-            <button
-              onclick={() => removeFilter(workflowFilter)}
+            <div
               class={merge(
-                'm-0.5 rounded',
-                'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs',
-                'text-primary',
-                'hover:bg-subtle',
+                'flex min-w-0 flex-shrink items-center gap-1 px-1 pr-1 text-xs leading-4',
               )}
             >
-              <Icon name="close" />
-            </button>
-          {/if}
+              <span
+                class={merge('min-w-0 hyphens-auto break-words font-medium')}
+                >{attribute}</span
+              >
+            </div>
+            <div
+              class={merge(
+                'rounded',
+                'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs leading-[.95rem]',
+                'bg-blue-500 text-white',
+                'text-white dark:bg-indigo-500',
+              )}
+            >
+              <span
+                class={merge('min-w-0 hyphens-auto break-words font-normal')}
+                >{@render conditional(workflowFilter)}</span
+              >
+            </div>
+            <div
+              class={merge(
+                'rounded',
+                'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs leading-[.95rem]',
+                'text-primary',
+              )}
+            >
+              <span
+                class={merge('min-w-0 hyphens-auto break-words font-normal')}
+                >{@render filterValue(workflowFilter)}</span
+              >
+            </div>
+            {#if editable}
+              <button
+                onclick={() => removeFilter(workflowFilter)}
+                class={merge(
+                  'm-0.5 rounded',
+                  'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs',
+                  'text-primary',
+                  'hover:bg-subtle',
+                )}
+              >
+                <Icon name="close" />
+              </button>
+            {/if}
+          </div>
         </div>
-      </div>
+      {/if}
+    {/each}
+    {#if hasMoreFilters}
+      <Button variant="secondary" size="xs" on:click={viewMoreFilters}
+        >{translate('common.view-more')}</Button
+      >
     {/if}
-  {/each}
-  {#if hasMoreFilters}
-    <Button variant="secondary" size="xs" on:click={viewMoreFilters}
-      >{translate('common.view-more')}</Button
-    >
-  {/if}
+  </div>
 </div>
 {#if viewRawQuery}
   <CodeBlock editable content={query} />

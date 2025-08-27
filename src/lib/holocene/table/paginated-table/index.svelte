@@ -36,7 +36,7 @@
     {#if $$slots.loading}
       <slot name="loading" />
     {:else}
-      <SkeletonTable bordered={false} rows={15} />
+      <SkeletonTable bordered={false} rows={25} />
     {/if}
   {:else}
     <Table bordered={false} {updating} {fixed} {...$$restProps}>

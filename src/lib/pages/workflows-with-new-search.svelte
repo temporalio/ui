@@ -252,7 +252,9 @@
 
 <div class="flex overflow-auto">
   <QueryStack {onDoubleClick} />
-  <div class="flex w-[calc(100%-160px)] shrink flex-col gap-1">
+  <div
+    class="flex w-[calc(100%-80px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]"
+  >
     <FilterList
       editable={false}
       showQueryCommand={() => (viewCommandPalette = true)}
