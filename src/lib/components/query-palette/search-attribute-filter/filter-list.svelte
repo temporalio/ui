@@ -160,6 +160,7 @@
           >
             <button
               class={merge('inline-flex min-w-0 max-w-full items-center')}
+              class:cursor-default={!editable}
               onclick={() => onFilterClick?.(workflowFilter)}
             >
               <div

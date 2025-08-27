@@ -16,8 +16,8 @@
 
   const { filter } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  const statusFilters = [...$workflowFilters].filter((filter) =>
-    isStatusFilter(filter),
+  const statusFilters = $derived(
+    [...$workflowFilters].filter((filter) => isStatusFilter(filter)),
   );
 
   function mapStatusToFilter(value: string) {

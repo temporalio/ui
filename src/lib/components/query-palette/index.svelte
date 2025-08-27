@@ -43,6 +43,7 @@
 
   const query = $derived(page.url.searchParams.get('query') || '');
   const filter = writable<SearchAttributeFilter>(emptyFilter());
+
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
     handleSubmit,

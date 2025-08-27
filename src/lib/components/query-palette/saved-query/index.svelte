@@ -19,11 +19,16 @@
     close: () => void;
   } = $props();
 
+  const namespace = $derived(page.params.namespace);
   const query = $derived(page.url.searchParams.get('query') || '');
   let queryName = $derived(editingQuery?.name || '');
 
   const onEnter = (event: Event) => {
     event.preventDefault();
+
+    if (!$savedQueries[namespace]) {
+      $savedQueries[namespace] = [];
+    }
 
     if (editingQuery) {
       const updatedQuery = {
@@ -31,7 +36,7 @@
         name: queryName,
         query,
       };
-      $savedQueries = $savedQueries.map((q) =>
+      $savedQueries[namespace] = $savedQueries[namespace].map((q) =>
         q.id === editingQuery.id ? updatedQuery : q,
       );
     } else {
@@ -40,13 +45,15 @@
         name: queryName,
         query,
       };
-      $savedQueries = [...$savedQueries, newQuery];
+      $savedQueries[namespace] = [...$savedQueries[namespace], newQuery];
     }
     close();
   };
 
   const deleteFilter = () => {
-    $savedQueries = $savedQueries.filter((q) => q.id !== editingQuery.id);
+    $savedQueries[namespace] = $savedQueries[namespace].filter(
+      (q) => q.id !== editingQuery.id,
+    );
     editingQuery = undefined;
     $workflowFilters = [];
     updateQueryParameters({

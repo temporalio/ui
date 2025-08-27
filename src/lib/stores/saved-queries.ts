@@ -6,8 +6,8 @@ export type SavedQuery = {
   query: string;
 };
 
-export const savedQueries = persistStore<SavedQuery[]>(
-  'saved-queries',
-  [],
+export const savedQueries = persistStore<Record<string, SavedQuery[]>>(
+  'saved-namespace-queries',
+  {},
   true,
 );
