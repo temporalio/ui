@@ -11,8 +11,13 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  let { onDoubleClick }: { onDoubleClick: (query: SavedQuery) => void } =
-    $props();
+  let {
+    onDoubleClick,
+    showQueryCommand,
+  }: {
+    onDoubleClick: (query: SavedQuery) => void;
+    showQueryCommand?: () => void;
+  } = $props();
   const query = $derived(page.url.searchParams.get('query') || '');
 
   const setTab = (_query: string) => {
@@ -43,14 +48,14 @@
 </script>
 
 <div
-  class="w-[80px] min-w-[80px] max-w-[80px] overflow-hidden rounded-l-sm border border-r-0 border-subtle bg-secondary shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
+  class="max-h-[82vh] w-[80px] min-w-[80px] max-w-[80px] overflow-auto rounded-l-sm border border-r-0 border-subtle bg-secondary shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
 >
   <!-- Header -->
-  <div class="border-b border-subtle px-2 py-2.5">
+  <div class="border-b border-subtle px-2 py-2">
     <div class="flex items-center justify-center gap-2 lg:justify-start">
       <Icon
         name="bookmark"
-        class="h-4 w-4 text-yellow-600 dark:text-yellow-400"
+        class="h-5 w-5 text-yellow-600 dark:text-yellow-400"
       />
       <p
         class="hidden text-sm font-medium text-slate-500 lg:block dark:text-slate-400"
@@ -73,7 +78,7 @@
         <button
           data-testid="all"
           class={merge(
-            'group flex w-full items-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200',
+            'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200 lg:justify-start',
             'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
             'hover:shadow-sm active:scale-[0.98]',
             query === '' &&
@@ -90,14 +95,14 @@
                 : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
             )}
           />
-          All Workflows
+          <span class="hidden lg:inline">All Workflows</span>
         </button>
 
         <!-- Today -->
         <button
           data-testid="today"
           class={merge(
-            'group flex w-full items-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200',
+            'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200 lg:justify-start',
             'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
             'hover:shadow-sm active:scale-[0.98]',
             query === `StartTime >= "${getToday()}"` &&
@@ -114,14 +119,14 @@
                 : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
             )}
           />
-          Today
+          <span class="hidden lg:inline">Today</span>
         </button>
 
         <!-- Last Hour -->
         <button
           data-testid="last-hour"
           class={merge(
-            'group flex w-full items-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200',
+            'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200 lg:justify-start',
             'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
             'hover:shadow-sm active:scale-[0.98]',
             query === `StartTime >= "${getLastHour()}"` &&
@@ -138,14 +143,14 @@
                 : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
             )}
           />
-          Last Hour
+          <span class="hidden lg:inline">Last Hour</span>
         </button>
 
         <!-- Child Workflows -->
         <button
           data-testid="child-workflows"
           class={merge(
-            'group flex w-full items-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200',
+            'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200 lg:justify-start',
             'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
             'hover:shadow-sm active:scale-[0.98]',
             query === 'ParentWorkflowId is not null' &&
@@ -162,15 +167,14 @@
                 : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
             )}
           />
-          Child Workflows
+          <span class="hidden lg:inline">Child Workflows</span>
         </button>
       </div>
     </div>
 
-    <!-- Saved Queries Section -->
     {#if $savedQueries.length > 0}
       <div class="border-t border-subtle pt-3">
-        <div class="mb-2 px-2 py-1">
+        <div class="mb-2 px-1 py-1 lg:px-2">
           <span
             class="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
             >Custom Queries</span
@@ -178,11 +182,31 @@
         </div>
 
         <div class="space-y-1">
+          <button
+            data-testid="builder"
+            class={merge(
+              'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:justify-start lg:text-sm',
+              'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+              'hover:shadow-sm active:scale-[0.98]',
+            )}
+            onclick={showQueryCommand}
+          >
+            <Icon
+              name="add"
+              class={merge(
+                'h-4 w-4 flex-shrink-0 transition-colors duration-200',
+                'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
+              )}
+            />
+            <span class="hidden truncate text-left font-medium lg:inline-block"
+              >Open Builder</span
+            >
+          </button>
           {#each $savedQueries as savedQuery}
             <button
               data-testid={savedQuery.id}
               class={merge(
-                'group flex w-full items-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200',
+                'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:justify-start lg:text-sm',
                 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
                 'hover:shadow-sm active:scale-[0.98]',
                 query === savedQuery.query &&
@@ -200,11 +224,12 @@
                     : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
                 )}
               />
-              <span class="truncate text-left font-medium"
+              <span
+                class="hidden truncate text-left font-medium lg:inline-block"
                 >{savedQuery.name}</span
               >
               <div
-                class="ml-auto opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                class="ml-auto hidden opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:inline-block"
               >
                 <Icon
                   name="pencil"
@@ -217,19 +242,38 @@
       </div>
     {/if}
 
-    <!-- Empty State -->
     {#if $savedQueries.length === 0}
       <div class="border-t border-subtle pt-3">
-        <div class="px-3 py-4 text-center">
+        <div class="space-y-2 px-3 py-4 text-center">
           <Icon
             name="bookmark"
             class="mx-auto mb-2 h-8 w-8 text-slate-300 dark:text-slate-600"
           />
           <p class="text-sm text-slate-500 dark:text-slate-400">
-            No saved queries yet
+            No custom queries yet
           </p>
+          <button
+            data-testid="builder"
+            class={merge(
+              'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:text-sm',
+              'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+              'hover:shadow-sm active:scale-[0.98]',
+            )}
+            onclick={showQueryCommand}
+          >
+            <Icon
+              name="add"
+              class={merge(
+                'h-4 w-4 flex-shrink-0 transition-colors duration-200',
+                'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
+              )}
+            />
+            <span class="hidden truncate text-left font-medium lg:inline-block"
+              >Open Builder</span
+            >
+          </button>
           <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">
-            Double-click a query to edit it in Builder
+            Double-click a custom query to edit it in Builder
           </p>
         </div>
       </div>

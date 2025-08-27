@@ -251,14 +251,14 @@
 </header>
 
 <div class="flex overflow-auto">
-  <QueryStack {onDoubleClick} />
+  <QueryStack
+    {onDoubleClick}
+    showQueryCommand={() => (viewCommandPalette = true)}
+  />
   <div
     class="flex w-[calc(100%-80px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]"
   >
-    <FilterList
-      editable={false}
-      showQueryCommand={() => (viewCommandPalette = true)}
-    />
+    <FilterList editable={false} />
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
     >

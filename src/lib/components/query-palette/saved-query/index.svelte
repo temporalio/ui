@@ -1,8 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { onDestroy } from 'svelte';
-
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
@@ -60,10 +58,6 @@
     });
     close();
   };
-
-  onDestroy(() => {
-    queryName = '';
-  });
 </script>
 
 <form

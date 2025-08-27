@@ -78,6 +78,7 @@
   }
 
   function close() {
+    editingQuery = undefined;
     const modal = document.getElementById('command-palette');
     if (modal) {
       modal.classList.add('closing');
