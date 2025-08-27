@@ -45,7 +45,7 @@
 
   interface Props {
     event: IterableEvent;
-    group?: EventGroup;
+    group: EventGroup | undefined;
     initialItem: WorkflowEvent;
     index: number;
     compact?: boolean;
