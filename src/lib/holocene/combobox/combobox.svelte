@@ -541,9 +541,11 @@
       >
         <Icon
           name="chevron-down"
-          class="transition-transform duration-200 {$open
-            ? 'rotate-180'
-            : 'rotate-0'}"
+          class={merge(
+            'transition-transform duration-200',
+            $open && 'rotate-180',
+            !$open && 'rotate-0',
+          )}
         />
       </button>
     {/if}

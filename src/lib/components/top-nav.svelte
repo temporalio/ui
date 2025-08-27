@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { twMerge as merge } from 'tailwind-merge';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
@@ -8,7 +8,7 @@
 
   let screenWidth: number;
 
-  let className = '';
+  let className: ClassNameValue = '';
   export { className as class };
 </script>
 
