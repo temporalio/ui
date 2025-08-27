@@ -52,7 +52,9 @@
         name="bookmark"
         class="h-4 w-4 text-yellow-600 dark:text-yellow-400"
       />
-      <p class="hidden text-sm font-medium text-secondary lg:block">
+      <p
+        class="hidden text-sm font-medium text-slate-500 lg:block dark:text-slate-400"
+      >
         Saved Queries
       </p>
     </div>
@@ -227,7 +229,7 @@
             No saved queries yet
           </p>
           <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">
-            Double-click a query to save it
+            Double-click a query to edit it in Builder
           </p>
         </div>
       </div>

@@ -25,11 +25,11 @@
   let {
     editable = true,
     showQueryCommand,
-    // onFilterClick,
+    onFilterClick,
   }: {
     editable: boolean;
     showQueryCommand: () => void;
-    // onFilterClick?: (filter: SearchAttributeFilter) => void;
+    onFilterClick?: (filter: SearchAttributeFilter) => void;
   } = $props();
 
   let totalFiltersInView = $state(20);
@@ -120,11 +120,9 @@
 >
   <div class="flex flex-wrap items-center gap-2">
     {#if !editable}
-      <div class="flex items-center gap-2">
-        <Icon class="text-secondary" name="filter" />
-        <p class="hidden text-sm font-medium text-secondary lg:block">
-          Active Filters
-        </p>
+      <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+        <Icon name="filter" />
+        <p class="hidden text-sm font-medium lg:block">Active Filters</p>
       </div>
     {/if}
 
@@ -180,6 +178,7 @@
           role="img"
           data-testid="{workflowFilter.attribute}-{i}"
           aria-label={workflowFilter.attribute}
+          onclick={() => onFilterClick?.(workflowFilter)}
         >
           <div
             class={merge(
@@ -225,7 +224,10 @@
             </div>
             {#if editable}
               <button
-                onclick={() => removeFilter(workflowFilter)}
+                onclick={(e) => {
+                  e.stopPropagation();
+                  removeFilter(workflowFilter);
+                }}
                 class={merge(
                   'm-0.5 rounded',
                   'flex min-w-0 flex-shrink items-start px-1 py-[.125rem] text-xs',
