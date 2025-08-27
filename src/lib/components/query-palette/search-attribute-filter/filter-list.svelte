@@ -27,8 +27,8 @@
     showQueryCommand,
     onFilterClick,
   }: {
-    editable: boolean;
-    showQueryCommand: () => void;
+    editable?: boolean;
+    showQueryCommand?: () => void;
     onFilterClick?: (filter: SearchAttributeFilter) => void;
   } = $props();
 
