@@ -21,6 +21,7 @@
   import { currentPageKey } from '$lib/stores/pagination';
   import { type SavedQuery as SQ } from '$lib/stores/saved-queries';
   import { refresh } from '$lib/stores/workflows';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     combineFilters,
@@ -37,6 +38,7 @@
     open?: boolean;
     editingQuery: SQ | undefined;
   }
+  const { copy, copied } = copyToClipboard();
 
   let { open = $bindable(false), editingQuery = $bindable(undefined) }: Props =
     $props();
@@ -96,6 +98,12 @@
     filter.set(_filter);
   }
 
+  function copyShareableLink(e: MouseEvent) {
+    const shareableLink =
+      page.url.toString() + '&savedQuery=' + editingQuery.name;
+    copy(e, shareableLink);
+  }
+
   $effect(() => {
     if (!open && editingQuery) {
       editingQuery = undefined;
@@ -105,6 +113,19 @@
 
 {#snippet keyboardShortcuts()}
   <div class="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
+    {#if editingQuery}
+      <button
+        class="flex items-center gap-1.5 rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"
+        onclick={copyShareableLink}
+      >
+        Share
+        {#if $copied}
+          <Icon name="checkmark" />
+        {:else}
+          <Icon name="copy" />
+        {/if}
+      </button>
+    {/if}
     <span class="flex items-center gap-1.5">
       <kbd
         class="rounded border border-slate-300 bg-slate-50 px-2 py-1 font-mono text-xs dark:border-slate-600 dark:bg-slate-700"

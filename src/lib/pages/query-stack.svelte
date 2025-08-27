@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -20,10 +22,29 @@
   } = $props();
 
   const query = $derived(page.url.searchParams.get('query') || '');
+  const savedQuery = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
 
   const namespaceSavedQueries = $derived($savedQueries[namespace] || []);
 
+  onMount(() => {
+    if (savedQuery) {
+      if (!$savedQueries[namespace]) $savedQueries[namespace] = [];
+
+      $savedQueries[namespace] = [
+        ...$savedQueries[namespace],
+        {
+          name: savedQuery,
+          query,
+          id: Date.now().toString(),
+        },
+      ];
+
+      const url = new URL(page.url);
+      url.searchParams.delete('savedQuery');
+      goto(url);
+    }
+  });
   const setTab = (_query: string) => {
     updateQueryParameters({
       url: page.url,
