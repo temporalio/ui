@@ -13,32 +13,35 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  $: ({ value } = $filter);
-  $: _value = value;
+  let value = $state('');
+
+  $effect(() => {
+    value = $filter.value;
+  });
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter' && _value !== '') {
+    if (e.key === 'Enter' && value !== '') {
       e.preventDefault();
-      $filter.value = _value;
+      $filter.value = value;
       handleSubmit();
     }
   }
 
   function handleClick(e: PointerEvent) {
-    if (_value !== '') {
+    if (value !== '') {
       e.preventDefault();
-      $filter.value = _value;
+      $filter.value = value;
       handleSubmit();
     }
   }
 
-  $: options = [
+  const options = $derived([
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
     ...($prefixSearchEnabled && $filter.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD
       ? [{ value: 'STARTS_WITH', label: translate('common.starts-with') }]
       : []),
-  ];
+  ]);
 </script>
 
 <Input
@@ -49,7 +52,7 @@
   placeholder={`${translate('common.enter')} ${$filter.attribute}`}
   icon="search"
   class="w-full"
-  bind:value={_value}
+  bind:value
   on:keydown={handleKeydown}
 />
 <ConditionalMenu {options} />

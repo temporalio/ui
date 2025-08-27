@@ -12,21 +12,24 @@
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
   const min = 0;
 
-  $: ({ value } = $filter);
-  $: _value = value ? Number(value) : null;
+  let value = $state(null);
+
+  $effect(() => {
+    value = $filter?.value ? Number($filter.value) : null;
+  });
 
   const handleKeydown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter' && _value !== null && _value >= min) {
-      $filter.value = String(_value);
+    if (e.key === 'Enter' && value !== null && value >= min) {
+      $filter.value = String(value);
       e.preventDefault();
       handleSubmit();
     }
   };
 
   function handleClick(e: PointerEvent) {
-    if (_value) {
+    if (value) {
       e.preventDefault();
-      $filter.value = String(_value);
+      $filter.value = String(value);
       handleSubmit();
     }
   }
@@ -38,13 +41,13 @@
   id="number-filter"
   icon="search"
   placeholder={translate('common.number-input-placeholder')}
-  bind:value={_value}
+  bind:value
   {min}
   on:keydown={handleKeydown}
   search
   class="w-full"
 />
-<ConditionalMenu inputId="number-filter" />
+<ConditionalMenu />
 <Button class="w-full" size="sm" on:click={handleClick}
   >{translate('common.apply')}</Button
 >

@@ -1,28 +1,24 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Translate from '$lib/i18n/translate.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
+  import { workflowFilters } from '$lib/stores/filters';
   import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import { FILTER_CONTEXT, type FilterContext } from '../index.svelte';
 
-  export let filters: SearchAttributeFilter[];
-
   const { filter } = getContext<FilterContext>(FILTER_CONTEXT);
-  $: _filters = [...filters];
-  $: statusFilters = _filters.filter((filter) => isStatusFilter(filter));
 
-  function apply() {
-    filters = _filters;
-    updateQueryParamsFromFilter($page.url, filters);
-  }
+  const statusFilters = [...$workflowFilters].filter((filter) =>
+    isStatusFilter(filter),
+  );
 
   function mapStatusToFilter(value: string) {
     return {
@@ -47,10 +43,14 @@
 
   const onStatusClick = (status: string) => {
     if (status === 'All') {
-      _filters = filters.filter((f) => f.attribute !== 'ExecutionStatus');
+      $workflowFilters = $workflowFilters.filter(
+        (f) => f.attribute !== 'ExecutionStatus',
+      );
     } else if (statusFilters.find((s) => s.value === status)) {
-      const nonStatusFilters = filters.filter((f) => !isStatusFilter(f));
-      _filters = [
+      const nonStatusFilters = $workflowFilters.filter(
+        (f) => !isStatusFilter(f),
+      );
+      $workflowFilters = [
         ...nonStatusFilters,
         ...mapStatusesToFilters(
           statusFilters.filter((s) => s.value !== status),
@@ -58,10 +58,12 @@
       ];
     } else {
       if (!statusFilters.length) {
-        _filters = [..._filters, mapStatusToFilter(status)];
+        $workflowFilters = [...$workflowFilters, mapStatusToFilter(status)];
       } else {
-        const nonStatusFilters = _filters.filter((f) => !isStatusFilter(f));
-        _filters = [
+        const nonStatusFilters = $workflowFilters.filter(
+          (f) => !isStatusFilter(f),
+        );
+        $workflowFilters = [
           ...nonStatusFilters,
           ...mapStatusesToFilters([
             ...statusFilters,
@@ -70,7 +72,8 @@
         ];
       }
     }
-    apply();
+
+    updateQueryParamsFromFilter(page.url, $workflowFilters);
   };
 </script>
 

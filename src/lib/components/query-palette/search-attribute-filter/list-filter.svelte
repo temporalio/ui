@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
@@ -14,39 +14,49 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  $: ({ value, conditional } = $filter);
-  $: _value = value;
-  $: chips = formatListFilterValue(_value);
-  $: options = [
+  let { children }: { children?: Snippet } = $props();
+
+  let value = $state('');
+  let conditional = $state('');
+  let chips = $state<string[]>([]);
+
+  $effect(() => {
+    value = $filter.value;
+    conditional = $filter.conditional;
+    chips = formatListFilterValue(value);
+  });
+
+  const options = $derived([
     { value: 'in', label: 'In' },
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
-  ];
+  ]);
 
-  function onSubmit() {
+  function onSubmit(e: Event) {
+    e.preventDefault();
     $filter.value = `(${chips.map((item) => `"${item}"`).join(', ')})`;
     handleSubmit();
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter' && _value !== '') {
+    if (e.key === 'Enter' && value !== '') {
       e.preventDefault();
       e.stopPropagation();
-      $filter.value = _value;
+      $filter.value = value;
       handleSubmit();
     }
   }
 
   function handleClick(e: PointerEvent) {
-    if (_value !== '') {
+    if (value !== '') {
       e.preventDefault();
-      $filter.value = _value;
+      $filter.value = value;
       handleSubmit();
     }
   }
 </script>
 
-<form class="flex grow" on:submit|preventDefault={onSubmit}>
+<form class="flex grow" onsubmit={onSubmit}>
   {#if isInConditional(conditional)}
     <ChipInput
       label={$filter.attribute}
@@ -61,7 +71,7 @@
     />
     <div class="flex h-fit items-center">
       <Button leadingIcon="add" type="button" />
-      <slot />
+      {@render children?.()}
     </div>
   {:else}
     <Input
@@ -72,13 +82,13 @@
       placeholder={`${translate('common.enter')} ${$filter.attribute}`}
       icon="search"
       class="w-full"
-      bind:value={_value}
+      bind:value
       on:keydown={handleKeydown}
     />
-    <slot />
+    {@render children?.()}
   {/if}
 </form>
-<ConditionalMenu inputId="list-filter" {options} />
+<ConditionalMenu {options} />
 <Button class="w-full" size="sm" on:click={handleClick}
   >{translate('common.apply')}</Button
 >

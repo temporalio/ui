@@ -12,13 +12,16 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  $: ({ value } = $filter);
-  $: _value = value;
+  let value = $state('');
 
-  let isValid = true;
+  $effect(() => {
+    value = $filter.value;
+  });
+
+  let isValid = $state(true);
 
   const handleKeydown = (e: KeyboardEvent) => {
-    const newValue = _value.trim();
+    const newValue = value.trim();
     if (isValid && e.key === 'Enter' && newValue !== '') {
       $filter.value = newValue;
       e.preventDefault();
@@ -27,9 +30,9 @@
   };
 
   function handleClick(e: PointerEvent) {
-    if (_value !== '') {
+    if (value !== '') {
       e.preventDefault();
-      $filter.value = _value;
+      $filter.value = value;
       handleSubmit();
     }
   }
@@ -53,7 +56,7 @@
   } (${translate('workflows.duration-filter-placeholder')})`}
   icon="search"
   class="w-full"
-  bind:value={_value}
+  bind:value
   on:keydown={handleKeydown}
   on:input={validateDuration}
   valid={isValid}

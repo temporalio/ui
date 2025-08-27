@@ -55,7 +55,7 @@
     {#each filteredOptions as { value, label, type }}
       <li class="w-full">
         <button
-          class="bg-gray-100 flex w-full cursor-pointer items-center gap-2 rounded-sm px-2
+          class="bg-gray-100 flex w-full cursor-pointer flex-col items-start rounded-sm px-2
           py-1 text-sm hover:bg-interactive hover:text-white {activeFilter?.attribute ===
           value
             ? 'bg-interactive text-white'
@@ -65,6 +65,7 @@
           }}
         >
           {label}
+          <small class="text-xs text-secondary">{type}</small>
         </button>
       </li>
     {:else}

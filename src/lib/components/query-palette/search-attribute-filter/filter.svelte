@@ -3,7 +3,6 @@
 
   import { getContext } from 'svelte';
 
-  import { workflowFilters } from '$lib/stores/filters';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
   import {
     isBooleanFilter,
@@ -44,7 +43,7 @@
   >
     <div class="relative" onkeyup={handleKeyUp} role="none">
       {#if isStatusFilter($filter)}
-        <StatusFilter bind:filters={$workflowFilters} />
+        <StatusFilter />
       {:else if $filter.attribute}
         <div
           class="flex flex-col gap-2 px-2"
