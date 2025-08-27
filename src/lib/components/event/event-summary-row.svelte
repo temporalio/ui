@@ -45,10 +45,12 @@
 
   interface Props {
     event: IterableEvent;
-    group: EventGroup | undefined;
+    group?: EventGroup;
     initialItem: WorkflowEvent;
     index: number;
     compact?: boolean;
+    typedError?: boolean;
+    active?: boolean;
     expanded?: boolean;
     hoveredEventId?: string | undefined;
     onRowClick?: () => void;
@@ -112,7 +114,7 @@
     isEventGroup(event)
       ? event.label
       : isLocalActivityMarkerEvent(event)
-        ? 'Local Activity'
+        ? translate('events.category.local-activity')
         : spaceBetweenCapitalLetters(event.name),
   );
 

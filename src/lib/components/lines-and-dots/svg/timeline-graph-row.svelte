@@ -216,7 +216,7 @@
           {:else if retried}
             {activityTaskScheduled.attributes.attempt} • {decodedValue}
           {:else if decodedLocalActivity}
-            {decodedValue}
+            {decodedLocalActivity.value}
           {:else}
             {decodedValue}
           {/if}

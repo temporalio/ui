@@ -33,7 +33,7 @@
 
   const displayName = $derived(
     isLocalActivityMarkerEvent(event)
-      ? 'Local Activity'
+      ? translate('events.category.local-activity')
       : spaceBetweenCapitalLetters(event.name),
   );
   const attributes = $derived(formatAttributes(event));

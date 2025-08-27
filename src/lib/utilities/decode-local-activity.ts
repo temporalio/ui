@@ -1,5 +1,5 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import type { Payload, WorkflowEvent } from '$lib/types/events';
+import type { IterableEvent, Payload, WorkflowEvent } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
 
 import {
@@ -33,10 +33,10 @@ export type LocalActivityDecodeOptions = {
 };
 
 export const decodeLocalActivity = async (
-  event: WorkflowEvent,
+  event: IterableEvent,
   options: LocalActivityDecodeOptions,
 ): Promise<SummaryAttribute | undefined> => {
-  if (!isLocalActivityMarkerEvent(event)) {
+  if (!('eventType' in event) || !isLocalActivityMarkerEvent(event)) {
     return undefined;
   }
 
