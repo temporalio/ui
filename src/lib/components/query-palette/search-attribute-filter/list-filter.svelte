@@ -89,6 +89,6 @@
   {/if}
 </form>
 <ConditionalMenu {options} />
-<Button class="w-full" size="sm" on:click={handleClick}
+<Button class="w-full" size="sm" on:click={handleClick} disabled={!value}
   >{translate('common.apply')}</Button
 >
