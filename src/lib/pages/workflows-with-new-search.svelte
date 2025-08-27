@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Readable, Writable } from 'svelte/store';
 
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -24,7 +24,7 @@
 </script>
 
 <script lang="ts">
-  import { derived, writable } from 'svelte/store';
+  import { derived as derivedStore, writable } from 'svelte/store';
 
   import { onMount, setContext } from 'svelte';
 
@@ -117,16 +117,16 @@
   const allSelected = writable<boolean>(false);
   const pageSelected = writable<boolean>(false);
   const selectedWorkflows = writable<WorkflowExecution[]>([]);
-  const batchActionsVisible = derived(
+  const batchActionsVisible = derivedStore(
     selectedWorkflows,
     (workflows) => workflows.length > 0,
   );
 
-  const terminableWorkflows = derived(selectedWorkflows, (workflows) =>
+  const terminableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
     workflows.filter((workflow) => workflow.canBeTerminated),
   );
 
-  const cancelableWorkflows = derived(selectedWorkflows, (workflows) =>
+  const cancelableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
     workflows.filter((workflow) => workflow.status === 'Running'),
   );
 

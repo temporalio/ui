@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -28,7 +30,7 @@
 
   let searchQuery = $state('');
   let selectedIndex = $state(0);
-  let ActiveComponent = $state();
+  let ActiveComponent: Snippet | undefined = $state();
 
   interface CommandItem {
     id: string;
