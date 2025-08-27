@@ -42,11 +42,15 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Button from './button.svelte';
   import DrawerContent from './drawer-content.svelte';
+
+  let open = true;
 </script>
 
 <Template let:args>
-  <Drawer {...args} onClick={action('click')}>
+  <Button on:click={() => (open = !open)}>Toggle Drawer</Button>
+  <Drawer bind:open {...args} onClick={action('click')}>
     <DrawerContent title="Drawer Title">
       <p class={merge(args.position === 'right' && 'max-w-80')}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
