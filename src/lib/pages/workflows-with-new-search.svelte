@@ -209,7 +209,7 @@
       <WorkflowCountRefresh count={$workflowCount.newCount} />
     </h1>
     {#if $$slots['header-actions'] || workflowStartEnabled}
-      <div>
+      <div class="flex items-center gap-4">
         <slot name="header-actions" />
         {#if workflowStartEnabled}
           <Button
