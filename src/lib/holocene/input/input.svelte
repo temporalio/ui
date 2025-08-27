@@ -134,7 +134,13 @@
       />
       {#if copyable}
         <div class="copy-icon-container">
-          <button aria-label={copyButtonLabel} on:click={(e) => copy(e, value)}>
+          <button
+            aria-label={copyButtonLabel}
+            data-track-name="input-copy-button"
+            data-track-intent="copy"
+            data-track-text={label || copyButtonLabel}
+            on:click={(e) => copy(e, value)}
+          >
             {#if $copied}
               <Icon name="checkmark" />
             {:else}

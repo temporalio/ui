@@ -22,6 +22,9 @@
   on:keypress={onClick}
   tabindex="0"
   data-testid={$$props['data-testid']}
+  data-track-name="navigation-button"
+  data-track-intent="action"
+  data-track-text={label}
   class={merge(
     'relative mb-1 flex items-center whitespace-nowrap p-1 pl-2 text-sm hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
     disabled && 'pointer-events-none cursor-not-allowed opacity-50',

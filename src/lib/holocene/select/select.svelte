@@ -119,6 +119,9 @@
       controls="{id}-select"
       {variant}
       data-testid={`${$$restProps['data-testid'] ?? ''}-button`}
+      data-track-name="select"
+      data-track-intent="select"
+      data-track-text={label}
     >
       <slot name="leading" slot="leading">
         {#if leadingIcon}

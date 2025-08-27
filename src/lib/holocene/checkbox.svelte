@@ -97,6 +97,9 @@
       {value}
       type="checkbox"
       class="peer sr-only"
+      data-track-name="checkbox"
+      data-track-intent="toggle"
+      data-track-text={label}
       bind:checked
       {disabled}
       {required}

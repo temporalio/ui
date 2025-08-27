@@ -56,6 +56,9 @@
   class:active={isActive}
   class:disabled
   data-testid={id ?? $$props['data-testid']}
+  data-track-name="tab"
+  data-track-intent="select"
+  data-track-text={label}
   on:click={handleClick}
   {...$$restProps}
 >
