@@ -41,6 +41,7 @@
 
 {#if expandable}
   <div
+    data-track-container={title}
     class={merge('surface-primary w-full border border-subtle', className)}
     {...$$restProps}
   >
@@ -97,7 +98,11 @@
     </div>
   </div>
 {:else}
-  <div class="surface-primary w-full border border-subtle p-4" {...$$restProps}>
+  <div
+    class="surface-primary w-full border border-subtle p-4"
+    data-track-container={title}
+    {...$$restProps}
+  >
     <div class="flex w-full flex-col">
       <div class="flex w-full flex-row items-center justify-between gap-2">
         <div class="flex w-full items-center gap-2">
