@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -39,7 +39,7 @@
     category?: string;
   }
 
-  const namespace = $derived($page.params?.namespace || 'default');
+  const namespace = $derived(page.params?.namespace || 'default');
   const commands = $derived(getCommands(namespace));
   const filteredCommands = $derived(filterCommands(commands, searchQuery));
 
@@ -375,8 +375,6 @@
   class="command-palette-modal h-[70vh] max-h-[600px] w-[90vw] max-w-4xl [&_.modal-content]:p-0"
   id="command-palette"
   cancelText="Close"
-  confirmText="Select"
-  hideConfirm={true}
   loading={true}
 >
   {#snippet content()}

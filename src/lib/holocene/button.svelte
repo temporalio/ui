@@ -18,6 +18,8 @@
       'focus-visible:ring-2',
       'whitespace-nowrap',
       'no-underline',
+      'hover:shadow-sm active:scale-[0.98]',
+      'transition-all duration-200',
     ],
     {
       variants: {
