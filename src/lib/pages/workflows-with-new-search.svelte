@@ -157,6 +157,7 @@
   });
 
   $: namespace, $queryWithParentWorkflowId, perPage, $refresh, resetSelection();
+  $: workflowStartEnabled = !workflowCreateDisabled($page);
 
   let customizationDrawerOpen = false;
 
@@ -207,12 +208,17 @@
       {/if}
       <WorkflowCountRefresh count={$workflowCount.newCount} />
     </h1>
-    {#if !workflowCreateDisabled($page)}
-      <Button
-        leadingIcon="lightning-bolt"
-        href={routeForWorkflowStart({ namespace })}
-        >{translate('workflows.start-workflow')}</Button
-      >
+    {#if $$slots['header-actions'] || workflowStartEnabled}
+      <div>
+        <slot name="header-actions" />
+        {#if workflowStartEnabled}
+          <Button
+            leadingIcon="lightning-bolt"
+            href={routeForWorkflowStart({ namespace })}
+            >{translate('workflows.start-workflow')}</Button
+          >
+        {/if}
+      </div>
     {/if}
   </div>
   <WorkflowCounts />
