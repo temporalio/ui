@@ -22,9 +22,14 @@
   let className = '';
   export { className as class };
 
-  $: flyParams = {
-    duration: 500,
-    ...(position === 'bottom' ? { y: 200 } : { x: 200 }),
+  $: flyParamsIn = {
+    duration: 250,
+    ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
+  };
+
+  $: flyParamsOut = {
+    duration: 150,
+    ...(position === 'bottom' ? { y: 200 } : { x: 100 }),
   };
 
   $: {
@@ -69,7 +74,8 @@
       className,
     )}
     class:max-w-fit={position === 'right'}
-    transition:fly={flyParams}
+    in:fly={flyParamsIn}
+    out:fly={flyParamsOut}
     role="region"
     use:portal
     use:focusTrap={true}
