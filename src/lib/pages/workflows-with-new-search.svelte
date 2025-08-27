@@ -221,7 +221,7 @@
 
 <header class="flex flex-col gap-2">
   <div class="flex flex-col justify-between gap-2 md:flex-row">
-    <div class="flex flex-col justify-between gap-2 md:flex-row">
+    <div class="flex flex-col justify-between gap-2 lg:flex-row">
       <h1 class="flex items-center gap-2" data-cy="workflows-title">
         {#if $supportsAdvancedVisibility}
           <span data-testid="workflow-count"
