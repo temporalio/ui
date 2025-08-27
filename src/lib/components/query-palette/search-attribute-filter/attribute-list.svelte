@@ -4,7 +4,10 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import type { SearchAttributeOption } from '$lib/stores/search-attributes';
+  import {
+    isCustomSearchAttribute,
+    sortedSearchAttributeOptions,
+  } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
@@ -13,13 +16,11 @@
 
   import { FILTER_CONTEXT, type FilterContext } from '../index.svelte';
 
-  let {
-    options,
-    activeFilter,
-  }: { options: SearchAttributeOption[]; activeFilter: SearchAttributeFilter } =
-    $props();
+  let { activeFilter }: { activeFilter: SearchAttributeFilter } = $props();
 
   const { filter } = getContext<FilterContext>(FILTER_CONTEXT);
+
+  const options = $derived($sortedSearchAttributeOptions);
 
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
@@ -65,7 +66,12 @@
           }}
         >
           {label}
-          <small class="text-xs">{type}</small>
+          <div class="flex items-center gap-1 text-xs">
+            {#if isCustomSearchAttribute(label)}
+              Custom
+            {/if}
+            {type}
+          </div>
         </button>
       </li>
     {:else}

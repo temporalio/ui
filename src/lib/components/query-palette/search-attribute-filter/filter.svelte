@@ -3,7 +3,6 @@
 
   import { getContext } from 'svelte';
 
-  import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
   import {
     isBooleanFilter,
     isDateTimeFilter,
@@ -27,8 +26,6 @@
 
   const { filter, resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  const options = $derived($sortedSearchAttributeOptions);
-
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === 'Escape' && !isTextFilter($filter)) {
       resetFilter();
@@ -37,7 +34,7 @@
 </script>
 
 <div class="relative flex h-full w-full grow flex-col items-start lg:flex-row">
-  <AttributeList {options} activeFilter={$filter} />
+  <AttributeList activeFilter={$filter} />
   <div
     class="sticky top-0 flex h-full w-full grow flex-col gap-4 py-4 lg:w-2/3"
   >

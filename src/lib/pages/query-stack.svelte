@@ -48,7 +48,7 @@
 </script>
 
 <div
-  class="max-h-[82vh] w-[80px] min-w-[80px] max-w-[80px] overflow-auto rounded-l-sm border border-r-0 border-subtle bg-secondary shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
+  class="surface-primary max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
 >
   <!-- Header -->
   <div class="border-b border-subtle px-2 py-2">
@@ -57,19 +57,17 @@
         name="bookmark"
         class="h-5 w-5 text-yellow-600 dark:text-yellow-400"
       />
-      <p
-        class="hidden text-sm font-medium text-slate-500 lg:block dark:text-slate-400"
-      >
+      <p class="hidden text-sm font-medium text-secondary lg:block">
         Saved Queries
       </p>
     </div>
   </div>
 
   <div class="p-2">
-    <div class="mb-3">
-      <div class="mb-2 px-2 py-1">
+    <div class="mb-3 text-center">
+      <div class="mb-2 py-1 lg:px-2">
         <span
-          class="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
+          class="text-xs font-medium text-slate-500 lg:uppercase lg:tracking-wider dark:text-slate-400"
           >Quick Filters</span
         >
       </div>
@@ -87,7 +85,7 @@
           onclick={() => setTab('')}
         >
           <Icon
-            name="search"
+            name="workflow"
             class={merge(
               'h-4 w-4 font-medium transition-colors duration-200',
               query === ''
@@ -159,7 +157,7 @@
           onclick={() => setTab('ParentWorkflowId is not null')}
         >
           <Icon
-            name="workflow"
+            name="relationship"
             class={merge(
               'h-4 w-4 font-medium transition-colors duration-200',
               query === 'ParentWorkflowId is not null'
@@ -173,10 +171,10 @@
     </div>
 
     {#if $savedQueries.length > 0}
-      <div class="border-t border-subtle pt-3">
-        <div class="mb-2 px-1 py-1 lg:px-2">
+      <div class="border-t border-subtle pt-3 text-center">
+        <div class="mb-2 py-1 lg:px-2">
           <span
-            class="text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400"
+            class="text-xs font-medium text-slate-500 lg:uppercase lg:tracking-wider dark:text-slate-400"
             >Custom Queries</span
           >
         </div>
