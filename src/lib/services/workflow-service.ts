@@ -47,6 +47,7 @@ import type {
   WorkflowExecution,
   WorkflowIdentifier,
 } from '$lib/types/workflows';
+import { DataClient } from '$lib/utilities/api/fetch';
 import {
   cloneAllPotentialPayloadsWithCodec,
   decodeSingleReadablePayloadWithCodec,
@@ -985,6 +986,29 @@ export const fetchPaginatedWorkflows = async (
 ): Promise<PaginatedWorkflowsPromise> => {
   return (pageSize = 100, token = '') => {
     workflowError.set('');
+
+    return DataClient.GET('/api/v1/namespaces/{namespace}/workflows', {
+      params: {
+        path: {
+          namespace,
+        },
+        query: {
+          pageSize,
+          nextPageToken: token,
+          query,
+        },
+      },
+    })
+      .then((data) => {
+        // data.data.executions;
+        return data.data;
+      })
+      .then(({ executions = [], nextPageToken = '' }) => {
+        return {
+          items: executions.map((execute) => toWorkflowExecution(execute)),
+          nextPageToken: nextPageToken ? String(nextPageToken) : '',
+        };
+      });
 
     const onError: ErrorCallback = (err) => {
       handleUnauthorizedOrForbiddenError(err);

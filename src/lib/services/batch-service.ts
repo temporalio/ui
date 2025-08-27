@@ -4,6 +4,8 @@ import { Action } from '$lib/models/workflow-actions';
 import { getAuthUser } from '$lib/stores/auth-user';
 import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 import { temporalVersion } from '$lib/stores/versions';
+import type { components } from '$lib/types/temporalio.d.ts';
+import { DataClient } from '$lib/utilities/api/fetch';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -61,6 +63,43 @@ const queryFromWorkflows = (
   }, '');
 };
 
+// const niceBatchActionToOperation = (
+//   action: Action,
+//   resetType?: 'first' | 'last',
+// ): NiceStartBatchType => {
+//   const identity = getAuthUser().email;
+
+//   switch (action) {
+//     case Action.Cancel:
+//       return {
+//         cancellationOperation: { identity },
+//       };
+//     case Action.Terminate:
+//       return {
+//         terminationOperation: { identity },
+//       };
+//     case Action.Reset: {
+//       const options =
+//         resetType === 'first'
+//           ? { firstWorkflowTask: {} }
+//           : { lastWorkflowTask: {} };
+
+//       return {
+//         resetOperation: {
+//           identity,
+//           // options is a new field for server versions 1.23 and later
+//           options,
+//           // resetType is a deprecated field for server versions 1.23 and earlier
+//           resetType:
+//             resetType === 'first'
+//               ? ResetType.RESET_TYPE_FIRST_WORKFLOW_TASK
+//               : ResetType.RESET_TYPE_LAST_WORKFLOW_TASK,
+//         },
+//       };
+//     }
+//   }
+// };
+
 const batchActionToOperation = (
   action: Action,
   resetType?: 'first' | 'last',
@@ -103,11 +142,14 @@ const toWorkflowExecutionInput = ({
   runId,
 }: WorkflowExecution): WorkflowExecutionInput => ({ workflowId: id, runId });
 
+type NiceStartBatchType =
+  components['requestBodies']['WorkflowServiceStartBatchOperationBody']['content']['application/json'];
+
 const createBatchOperationRequest = (
   action: Action,
   options: CreateBatchOperationOptions,
-): StartBatchOperationRequest => {
-  const body: StartBatchOperationRequest = {
+): NiceStartBatchType => {
+  const body: NiceStartBatchType = {
     jobId: options.jobId,
     namespace: options.namespace,
     reason: options.reason,
@@ -170,6 +212,24 @@ export async function batchTerminateWorkflows(
   });
 
   const body = createBatchOperationRequest(Action.Terminate, options);
+
+  const _: components['requestBodies']['WorkflowServiceStartBatchOperationBody']['content']['application/json'] =
+    {};
+  // let thing = typeof body.;
+
+  DataClient.POST('/api/v1/namespaces/{namespace}/batch-operations/{jobId}', {
+    params: {
+      path: {
+        jobId: options.jobId,
+        namespace: options.namespace,
+      },
+    },
+    body: body,
+  })
+    .then((data) => {
+      return data.data;
+    })
+    .then(() => {});
 
   await requestFromAPI<null>(route, {
     options: {

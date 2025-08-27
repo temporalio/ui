@@ -1,4 +1,5 @@
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
+import { DataClient } from '$lib/utilities/api/fetch';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
@@ -34,6 +35,23 @@ export const fetchWorkflowCountByExecutionStatus = async ({
   query,
 }: WorkflowCountByExecutionStatusOptions): Promise<CountWorkflowExecutionsResponse> => {
   const groupByClause = 'GROUP BY ExecutionStatus';
+  return DataClient.GET('/api/v1/namespaces/{namespace}/workflow-count', {
+    params: {
+      path: {
+        namespace,
+      },
+      query: {
+        query,
+      },
+    },
+  })
+    .then((data) => {
+      return data.data;
+    })
+    .then((data) => {
+      return { count: data.count, groups };
+    });
+
   const countRoute = routeForApi('workflows.count', {
     namespace,
   });

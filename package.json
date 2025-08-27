@@ -74,7 +74,8 @@
     "workflows": "esno scripts/workflows.ts",
     "audit:tailwind": "esno scripts/audit-tailwind-colors",
     "audit:holocene-props": "esno scripts/generate-holocene-props.ts",
-    "validate:versions": "./scripts/validate-versions.sh"
+    "validate:versions": "./scripts/validate-versions.sh",
+    "open-api-typegen": "pnpm dlx swagger2openapi https://raw.githubusercontent.com/temporalio/api/refs/heads/master/openapi/openapiv2.json -o temptemporal.json && pnpm dlx openapi-typescript temptemporal.json -o ./src/lib/utilities/api/temporalio.d.ts && rm ./temptemporal.json"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.17.0",
@@ -84,9 +85,6 @@
     "@codemirror/legacy-modes": "^6.4.0",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.29.0",
-    "@codemirror/lang-java": "^6.0.2",
-    "@codemirror/lang-go": "^6.0.1",
-    "@codemirror/lang-php": "^6.0.2",
     "@fontsource-variable/inter": "^5.0.8",
     "@fontsource/noto-sans-mono": "^5.0.9",
     "@lezer/highlight": "^1.1.3",
@@ -108,6 +106,7 @@
     "mdast-util-from-markdown": "^2.0.1",
     "mdast-util-to-hast": "^13.2.0",
     "monaco-editor": "^0.50.0",
+    "openapi-fetch": "^0.14.0",
     "remark-stringify": "^10.0.3",
     "sveltekit-superforms": "^2.26.1",
     "tailwind-merge": "^1.14.0",
