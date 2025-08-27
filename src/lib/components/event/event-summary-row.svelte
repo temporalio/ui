@@ -49,8 +49,6 @@
     initialItem: WorkflowEvent;
     index: number;
     compact?: boolean;
-    typedError?: boolean;
-    active?: boolean;
     expanded?: boolean;
     hoveredEventId?: string | undefined;
     onRowClick?: () => void;
