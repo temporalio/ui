@@ -12,7 +12,6 @@
   import {
     decodeLocalActivity,
     getLocalActivityMarkerEvent,
-    hasLocalActivityMarker,
   } from '$lib/utilities/decode-local-activity';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
@@ -50,22 +49,20 @@
   let decodedLocalActivity: SummaryAttribute | undefined;
 
   onMount(async () => {
-    if (hasLocalActivityMarker(group)) {
-      const localActivityEvent = getLocalActivityMarkerEvent(group);
-      if (localActivityEvent) {
-        try {
-          decodedLocalActivity = await decodeLocalActivity(localActivityEvent, {
-            namespace: page.params.namespace,
-            settings: page.data.settings,
-            accessToken: $authUser.accessToken,
-          });
+    const localActivityEvent = getLocalActivityMarkerEvent(group);
+    if (localActivityEvent) {
+      try {
+        decodedLocalActivity = await decodeLocalActivity(localActivityEvent, {
+          namespace: page.params.namespace,
+          settings: page.data.settings,
+          accessToken: $authUser.accessToken,
+        });
 
-          if (decodedLocalActivity) {
-            group.decodedLocalActivity = decodedLocalActivity;
-          }
-        } catch (error) {
-          console.warn('Failed to decode local activity:', error);
+        if (decodedLocalActivity) {
+          group.decodedLocalActivity = decodedLocalActivity;
         }
+      } catch (error) {
+        console.warn('Failed to decode local activity:', error);
       }
     }
   });
@@ -195,7 +192,9 @@
         prefix={isActivityTaskScheduledEvent(group.initialEvent)
           ? group?.displayName
           : ''}
-        fallback={decodedLocalActivity ? translate('events.category.local-activity') : group?.displayName}
+        fallback={decodedLocalActivity
+          ? translate('events.category.local-activity')
+          : group?.displayName}
         let:decodedValue
       >
         <Text
