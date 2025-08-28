@@ -71,6 +71,8 @@ type (
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
 		HideLogs       bool     `yaml:"hideLogs"`
+		// TLS configuration options to start UI Server in TLS mode
+		UIServerTLS UIServerTLS `yaml:"uiServerTLS"`
 	}
 
 	CORS struct {
@@ -91,6 +93,11 @@ type (
 		KeyData                string `yaml:"keyData"`
 		EnableHostVerification bool   `yaml:"enableHostVerification"`
 		ServerName             string `yaml:"serverName"`
+	}
+
+	UIServerTLS struct {
+		CertFile string `yaml:"certFile"`
+		KeyFile  string `yaml:"keyFile"`
 	}
 
 	Auth struct {
