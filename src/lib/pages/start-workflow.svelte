@@ -64,6 +64,26 @@
 
   let searchAttributes: SearchAttributeInput[] = [];
 
+  $: errorWorkflowDetails = extractWorkflowFromError(error);
+
+  function extractWorkflowFromError(errorMessage: string): {
+    workflowId?: string;
+    runId?: string;
+  } {
+    if (!errorMessage) return {};
+    const workflowIdMatch = errorMessage.match(
+      /workflow[_\s]*id[:\s=]+['"]*([^'"\s,;)]+)['"]*\s*/i,
+    );
+    const runIdMatch = errorMessage.match(
+      /run[_\s]*id[:\s=]+['"]*([^'"\s,;)]+)['"]*\s*/i,
+    );
+
+    return {
+      workflowId: workflowIdMatch?.[1]?.trim(),
+      runId: runIdMatch?.[1]?.trim(),
+    };
+  }
+
   $: taskQueueParam = $page.url.searchParams.get('taskQueue');
 
   onMount(() => {
@@ -316,7 +336,23 @@
       >
     </div>
     {#if error}
-      <Alert intent="error" title={error} />
+      <Alert intent="error" title={error}>
+        {#if errorWorkflowDetails.workflowId && errorWorkflowDetails.runId}
+          <div class="mt-2">
+            <Link
+              href={routeForEventHistory({
+                namespace,
+                workflow: errorWorkflowDetails.workflowId,
+                run: errorWorkflowDetails.runId,
+              })}
+              class="inline-flex items-center gap-1"
+            >
+              <Icon name="external-link" class="h-4 w-4" />
+              {translate('workflows.view-running-workflow')}
+            </Link>
+          </div>
+        {/if}
+      </Alert>
     {/if}
     <CodecServerErrorBanner />
   </Card>
