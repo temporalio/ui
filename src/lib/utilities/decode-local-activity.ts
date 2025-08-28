@@ -84,15 +84,6 @@ export const decodeLocalActivity = async (
   return undefined;
 };
 
-export const hasLocalActivityMarker = (
-  eventOrGroup: WorkflowEvent | EventGroup,
-): boolean => {
-  if ('eventList' in eventOrGroup) {
-    return eventOrGroup.eventList.some(isLocalActivityMarkerEvent);
-  } else {
-    return isLocalActivityMarkerEvent(eventOrGroup);
-  }
-};
 
 export const getLocalActivityMarkerEvent = (
   eventOrGroup: WorkflowEvent | EventGroup,
