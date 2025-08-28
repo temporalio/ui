@@ -1,11 +1,20 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
+  import { onMount } from 'svelte';
+
+  import { page } from '$app/state';
 
   import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
+  import { authUser } from '$lib/stores/auth-user';
+  import {
+    decodeLocalActivity,
+    getLocalActivityMarkerEvent,
+  } from '$lib/utilities/decode-local-activity';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
+  import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
@@ -36,6 +45,27 @@
   $: active = !activeGroups.length || activeGroups.includes(group.id);
   $: pendingActivity = group?.pendingActivity;
   $: pauseTime = pendingActivity && pendingActivity.pauseInfo?.pauseTime;
+
+  let decodedLocalActivity: SummaryAttribute | undefined;
+
+  onMount(async () => {
+    const localActivityEvent = getLocalActivityMarkerEvent(group);
+    if (localActivityEvent) {
+      try {
+        decodedLocalActivity = await decodeLocalActivity(localActivityEvent, {
+          namespace: page.params.namespace,
+          settings: page.data.settings,
+          accessToken: $authUser.accessToken,
+        });
+
+        if (decodedLocalActivity) {
+          group.decodedLocalActivity = decodedLocalActivity;
+        }
+      } catch (error) {
+        console.warn('Failed to decode local activity:', error);
+      }
+    }
+  });
 
   const getDistancePointsAndPositions = (
     endTime: string | Date,
@@ -162,7 +192,9 @@
         prefix={isActivityTaskScheduledEvent(group.initialEvent)
           ? group?.displayName
           : ''}
-        fallback={group?.displayName}
+        fallback={decodedLocalActivity
+          ? translate('events.category.local-activity')
+          : group?.displayName}
         let:decodedValue
       >
         <Text
@@ -182,6 +214,8 @@
             {decodedValue}
           {:else if retried}
             {activityTaskScheduled.attributes.attempt} • {decodedValue}
+          {:else if decodedLocalActivity}
+            {decodedLocalActivity.value}
           {:else}
             {decodedValue}
           {/if}
@@ -191,7 +225,11 @@
     <Dot
       point={[x, y]}
       classification={group.eventList[index]?.classification}
-      icon={pauseTime && index !== 0 ? 'pause' : CategoryIcon[group.category]}
+      icon={pauseTime && index !== 0
+        ? 'pause'
+        : decodedLocalActivity
+          ? CategoryIcon['local-activity']
+          : CategoryIcon[group.category]}
       r={radius}
     />
   {/each}
