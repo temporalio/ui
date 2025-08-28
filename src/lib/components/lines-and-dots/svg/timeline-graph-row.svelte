@@ -195,7 +195,7 @@
         prefix={isActivityTaskScheduledEvent(group.initialEvent)
           ? group?.displayName
           : ''}
-        fallback={decodedLocalActivity ? 'Local Activity' : group?.displayName}
+        fallback={decodedLocalActivity ? translate('events.category.local-activity') : group?.displayName}
         let:decodedValue
       >
         <Text
