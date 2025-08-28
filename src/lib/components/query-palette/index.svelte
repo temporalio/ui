@@ -146,7 +146,7 @@
   {#snippet content()}
     <div class="flex h-full flex-1 flex-col">
       <div
-        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
+        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
       >
         <div class="flex items-center justify-between px-6 py-3">
           <div
@@ -167,15 +167,15 @@
             </button>
           </div>
         </div>
-        <div class="flex flex-col gap-2 px-6">
-          <SavedQuery {editingQuery} {close} />
+        <div class="flex flex-col gap-1 border-t border-subtle p-2 text-xs">
+          <FilterList onFilterClick={setFilter} />
         </div>
       </div>
       <div class="max-h-96 min-h-96 overflow-y-auto" role="listbox">
         <Filter />
       </div>
-      <div class="flex flex-col gap-1 border-t border-subtle p-2 text-xs">
-        <FilterList onFilterClick={setFilter} />
+      <div class="flex flex-col gap-2 border-t border-subtle px-4 pt-6">
+        <SavedQuery {editingQuery} {close} />
       </div>
     </div>
   {/snippet}
