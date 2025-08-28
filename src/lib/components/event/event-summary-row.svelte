@@ -189,14 +189,11 @@
 
   onMount(async () => {
     if (isLocalActivityMarkerEvent(event)) {
-      primaryLocalAttribute = await decodeLocalActivity(
-        event as WorkflowEvent,
-        {
-          namespace: page.params.namespace,
-          settings: page.data.settings,
-          accessToken: $authUser.accessToken,
-        },
-      );
+      primaryLocalAttribute = await decodeLocalActivity(event, {
+        namespace: page.params.namespace,
+        settings: page.data.settings,
+        accessToken: $authUser.accessToken,
+      });
     } else if (
       isEventGroup(event) &&
       isLocalActivityMarkerEvent(event.initialEvent)
