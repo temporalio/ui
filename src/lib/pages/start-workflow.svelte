@@ -72,19 +72,28 @@
   } {
     if (!errorMessage) return {};
 
-    const workflowIdMatch = errorMessage.match(
-      /workflow[_\s]*id[:\s=]+['"]*([^'"\s,;).]+)['"]*[.\s]*/i,
-    );
-    const runIdMatch = errorMessage.match(
-      /run[_\s]*id[:\s=]+['"]*([^'"\s,;).]+)['"]*[.\s]*/i,
-    );
+    let workflowId: string | undefined;
+    let runId: string | undefined;
 
-    const result = {
-      workflowId: workflowIdMatch?.[1]?.trim(),
-      runId: runIdMatch?.[1]?.trim(),
+    const workflowParts = errorMessage.split('WorkflowId: ');
+    if (workflowParts.length > 1) {
+      const workflowPart = workflowParts[1].split(', RunId:')[0];
+      if (workflowPart) {
+        workflowId = workflowPart.trim();
+      }
+    }
+
+    const runParts = errorMessage.split('RunId: ');
+    if (runParts.length > 1) {
+      const runPart = runParts[1].slice(0, -1).trim();
+      if (runPart) {
+        runId = runPart;
+      }
+    }
+    return {
+      workflowId,
+      runId,
     };
-
-    return result;
   }
 
   $: taskQueueParam = $page.url.searchParams.get('taskQueue');
