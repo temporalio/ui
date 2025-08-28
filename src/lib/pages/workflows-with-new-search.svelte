@@ -30,7 +30,7 @@
 
   import { page } from '$app/state';
 
-  import QueryPalette from '$lib/components/query-palette/index.svelte';
+  import QueryDrawer from '$lib/components/query-palette/index.svelte';
   import FilterList from '$lib/components/query-palette/search-attribute-filter/filter-list.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
@@ -272,4 +272,4 @@
   type={translate('common.columns')}
   title={translate('common.workflows-table')}
 />
-<QueryPalette bind:open={viewCommandPalette} bind:editingQuery />
+<QueryDrawer bind:open={viewCommandPalette} bind:editingQuery />

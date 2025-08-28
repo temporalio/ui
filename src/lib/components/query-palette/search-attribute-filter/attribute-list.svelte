@@ -42,7 +42,7 @@
 </script>
 
 <div
-  class="flex w-full flex-row gap-2 overflow-auto border-r border-subtle p-4 lg:w-1/3 lg:flex-col"
+  class="flex flex-col gap-2 overflow-auto border-r border-subtle p-4 lg:min-w-fit"
 >
   <Input
     id="search-attribute"
@@ -52,7 +52,7 @@
     bind:value={searchAttributeValue}
     placeholder={translate('common.search')}
   />
-  <ol class="flex gap-0.5 lg:flex-col">
+  <ol class="flex flex-col gap-0.5">
     {#each filteredOptions as { value, label, type }}
       <li class="w-full">
         <button

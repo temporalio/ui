@@ -67,59 +67,62 @@
   };
 </script>
 
-<form
-  onsubmit={onEnter}
-  class="flex gap-0"
-  in:fly={{ x: -100, duration: 150 }}
-  role="search"
->
-  {#if editingQuery}
-    <Input
-      id="manual-search"
-      type="search"
-      label="Save Query"
-      labelHidden
-      placeholder="Save query with name"
-      icon="bookmark"
-      class="grow lg:w-3/4 [&_*]:border-r-0"
-      clearButtonLabel={translate('common.clear-input-button-label')}
-      on:clear={() => (queryName = '')}
-      bind:value={queryName}
-      maxLength={80}
-    />
-    <Button data-testid="save-button" variant="primary" type="submit"
-      >Save</Button
-    >
-    <Button
-      data-testid="delete-query"
-      variant="destructive"
-      type="button"
-      on:click={deleteFilter}
-    >
-      {translate('common.delete')}
-    </Button>
-  {:else}
-    <Input
-      id="manual-search"
-      type="search"
-      label="Save Query"
-      labelHidden
-      placeholder="Name"
-      icon="bookmark"
-      class="grow lg:w-3/4 [&_*]:border-r-0"
-      clearable
-      clearButtonLabel={translate('common.clear-input-button-label')}
-      on:clear={() => (queryName = '')}
-      bind:value={queryName}
-      maxLength={80}
-    />
-    <Button
-      disabled={!queryName}
-      data-testid="manual-search-button"
-      variant="primary"
-      type="submit"
-    >
-      {translate('common.save')}
-    </Button>
-  {/if}
-</form>
+<div class="flex flex-col gap-2 border-t border-subtle px-4 py-4">
+  <p class="text-xs text-secondary">Custom Query Name</p>
+  <form
+    onsubmit={onEnter}
+    class="flex gap-0"
+    in:fly={{ x: -100, duration: 150 }}
+    role="search"
+  >
+    {#if editingQuery}
+      <Input
+        id="manual-search"
+        type="search"
+        label="Save Query"
+        labelHidden
+        placeholder="Save query with name"
+        icon="bookmark"
+        class="grow lg:w-3/4 [&_*]:border-r-0"
+        clearButtonLabel={translate('common.clear-input-button-label')}
+        on:clear={() => (queryName = '')}
+        bind:value={queryName}
+        maxLength={80}
+      />
+      <Button data-testid="save-button" variant="primary" type="submit"
+        >Save</Button
+      >
+      <Button
+        data-testid="delete-query"
+        variant="destructive"
+        type="button"
+        on:click={deleteFilter}
+      >
+        {translate('common.delete')}
+      </Button>
+    {:else}
+      <Input
+        id="manual-search"
+        type="search"
+        label="Save Query"
+        labelHidden
+        placeholder="Name"
+        icon="bookmark"
+        class="grow lg:w-3/4 [&_*]:border-r-0"
+        clearable
+        clearButtonLabel={translate('common.clear-input-button-label')}
+        on:clear={() => (queryName = '')}
+        bind:value={queryName}
+        maxLength={80}
+      />
+      <Button
+        disabled={!queryName}
+        data-testid="manual-search-button"
+        variant="primary"
+        type="submit"
+      >
+        {translate('common.save')}
+      </Button>
+    {/if}
+  </form>
+</div>

@@ -33,11 +33,9 @@
   }
 </script>
 
-<div class="relative flex h-full w-full grow flex-col items-start lg:flex-row">
+<div class="flex h-full w-full flex-row items-start overflow-y-auto">
   <AttributeList activeFilter={$filter} />
-  <div
-    class="sticky top-0 flex h-full w-full grow flex-col gap-4 py-4 lg:w-2/3"
-  >
+  <div class="sticky top-0 flex w-2/3 flex-col gap-4 py-4">
     <div class="relative" onkeyup={handleKeyUp} role="none">
       {#if isStatusFilter($filter)}
         <StatusFilter />
