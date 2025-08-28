@@ -71,17 +71,20 @@
     runId?: string;
   } {
     if (!errorMessage) return {};
+
     const workflowIdMatch = errorMessage.match(
-      /workflow[_\s]*id[:\s=]+['"]*([^'"\s,;)]+)['"]*\s*/i,
+      /workflow[_\s]*id[:\s=]+['"]*([^'"\s,;).]+)['"]*[.\s]*/i,
     );
     const runIdMatch = errorMessage.match(
-      /run[_\s]*id[:\s=]+['"]*([^'"\s,;)]+)['"]*\s*/i,
+      /run[_\s]*id[:\s=]+['"]*([^'"\s,;).]+)['"]*[.\s]*/i,
     );
 
-    return {
+    const result = {
       workflowId: workflowIdMatch?.[1]?.trim(),
       runId: runIdMatch?.[1]?.trim(),
     };
+
+    return result;
   }
 
   $: taskQueueParam = $page.url.searchParams.get('taskQueue');
