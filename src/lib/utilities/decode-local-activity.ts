@@ -84,7 +84,6 @@ export const decodeLocalActivity = async (
   return undefined;
 };
 
-
 export const getLocalActivityMarkerEvent = (
   eventOrGroup: WorkflowEvent | EventGroup,
 ): WorkflowEvent | undefined => {
