@@ -26,17 +26,17 @@
     <div id="event-view-toggle" class="surface-primary flex gap-4">
       <ToggleButtons>
         <ToggleButton
-          icon="feed"
+          leadingIcon="feed"
           href={routeForEventHistoryImport($lastUsedNamespace, 'feed')}
           >{translate('workflows.history')}</ToggleButton
         >
         <ToggleButton
-          icon="compact"
+          leadingIcon="compact"
           href={routeForEventHistoryImport($lastUsedNamespace, 'compact')}
           >{translate('workflows.compact')}</ToggleButton
         >
         <ToggleButton
-          icon="json"
+          leadingIcon="json"
           href={routeForEventHistoryImport($lastUsedNamespace, 'json')}
           >{translate('workflows.json')}</ToggleButton
         >

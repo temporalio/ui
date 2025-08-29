@@ -12,6 +12,7 @@
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { clearActives } from '$lib/stores/active-events';
@@ -102,33 +103,41 @@
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
           <ToggleButton
-            icon={reverseSort ? 'descending' : 'ascending'}
+            leadingIcon={reverseSort ? 'descending' : 'ascending'}
             data-testid="zoom-in"
             on:click={onSort}
-            >{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+            size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
           >
         {/if}
-        <ToggleButton
-          icon={$minimizeEventView ? 'minimize' : 'expand'}
-          data-testid="expandAll"
-          tooltip={$minimizeEventView
+        <Tooltip
+          text={$minimizeEventView
             ? 'Timeline and Event History are collapsed to minimized height'
             : 'Timeline and Event History are expanded to full height'}
-          on:click={() => ($minimizeEventView = !$minimizeEventView)}
-          >{$minimizeEventView ? 'Minimized' : 'Expanded'}</ToggleButton
+          top
         >
+          <ToggleButton
+            leadingIcon={$minimizeEventView ? 'minimize' : 'expand'}
+            data-testid="expandAll"
+            size="sm"
+            on:click={() => ($minimizeEventView = !$minimizeEventView)}
+            >{$minimizeEventView ? 'Minimized' : 'Expanded'}</ToggleButton
+          >
+        </Tooltip>
         <EventTypeFilter {compact} minimized={$minimizeEventView} />
         <ToggleButton
           disabled={!workflow.isRunning}
-          icon={$pauseLiveUpdates ? 'play' : 'pause'}
+          leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
           data-testid="pause"
+          class="border-l-0"
+          size="sm"
           on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
         >
           {$pauseLiveUpdates ? 'Unfreeze' : 'Freeze'}
         </ToggleButton>
         <ToggleButton
           data-testid="download"
-          icon="download"
+          leadingIcon="download"
+          size="sm"
           on:click={() => (showDownloadPrompt = true)}
         >
           {translate('common.download')}

@@ -65,7 +65,7 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton controls="status-menu">
+  <MenuButton controls="status-menu" size="sm">
     <div
       slot="leading"
       class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
