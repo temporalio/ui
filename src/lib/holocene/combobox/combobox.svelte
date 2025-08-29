@@ -422,96 +422,105 @@
 </script>
 
 <MenuContainer {open} on:close={handleMenuClose}>
-  <Label class="pb-1" hidden={labelHidden} {required} {label} for={id} />
-
-  <div
-    class={merge(
-      comboboxStyles({ variant }),
-      !valid &&
-        variant === 'default' &&
-        'border border-danger text-danger focus-within:ring-danger/70',
-      disabled && 'opacity-50',
-      className,
-    )}
-    class:disabled
-  >
-    {#if leadingIcon}
-      <Icon class="ml-2 shrink-0" name={leadingIcon} />
-    {/if}
+  <div class="flex flex-col gap-1">
+    <Label hidden={labelHidden} {required} {label} for={id} />
     <div
       class={merge(
-        'input-wrapper',
-        multiselect && 'gap-1',
-        multiselect && 'm-1',
-        leadingIcon && multiselect && 'ml-2',
+        comboboxStyles({ variant }),
+        !valid &&
+          variant === 'default' &&
+          'border border-danger text-danger focus-within:ring-danger/70',
+        disabled && 'opacity-50',
+        className,
       )}
+      class:disabled
     >
-      {#if multiselect && isArrayValue(value) && value.length > 0}
-        {#if displayChips}
-          {#each value.slice(0, chipLimit) as v}
-            <Chip
-              on:remove={() => removeOption(v)}
-              removeButtonLabel={removeChipLabel}>{v}</Chip
-            >
-          {/each}
-          {#if value.length > chipLimit}
-            <p>+{value.slice(chipLimit).length}</p>
-          {/if}
-        {:else}
-          <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
-        {/if}
+      {#if leadingIcon}
+        <Icon class="ml-2 shrink-0" name={leadingIcon} />
       {/if}
-      <input
-        {id}
-        {placeholder}
-        {required}
-        {readonly}
-        {disabled}
-        type="text"
-        value={displayValue}
-        class:disabled
+      <div
         class={merge(
-          'combobox-input',
-          multiselect
-            ? value.length > 0 || leadingIcon
-              ? 'indent-0'
-              : 'indent-1'
-            : 'indent-2',
-          className,
+          'input-wrapper',
+          multiselect && 'gap-1',
+          multiselect && 'm-1',
+          leadingIcon && multiselect && 'ml-2',
         )}
-        role="combobox"
-        autocomplete="off"
-        autocapitalize="off"
-        spellcheck="false"
-        data-lpignore="true"
-        data-1p-ignore="true"
-        aria-controls="{id}-listbox"
-        aria-expanded={$open}
-        aria-required={required}
-        aria-autocomplete="list"
-        on:focus|stopPropagation={openList}
-        on:input|stopPropagation={handleInput}
-        on:keydown|stopPropagation={handleInputKeydown}
-        on:click|stopPropagation={handleInputClick}
-        data-testid={$$props['data-testid'] ?? id}
-        bind:this={inputElement}
-        {...$$restProps}
-      />
-    </div>
-    {#if $$slots.action}
-      <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
-        {#if actionTooltip}
-          <Tooltip text={actionTooltip} right>
-            <slot name="action" />
-          </Tooltip>
-        {:else}
-          <slot name="action" />
+      >
+        {#if multiselect && isArrayValue(value) && value.length > 0}
+          {#if displayChips}
+            {#each value.slice(0, chipLimit) as v}
+              <Chip
+                on:remove={() => removeOption(v)}
+                removeButtonLabel={removeChipLabel}>{v}</Chip
+              >
+            {/each}
+            {#if value.length > chipLimit}
+              <p>+{value.slice(chipLimit).length}</p>
+            {/if}
+          {:else}
+            <Badge>{numberOfItemsSelectedLabel(value.length)}</Badge>
+          {/if}
         {/if}
+        <input
+          {id}
+          {placeholder}
+          {required}
+          {readonly}
+          {disabled}
+          type="text"
+          value={displayValue}
+          class:disabled
+          class={merge(
+            'combobox-input',
+            multiselect
+              ? value.length > 0 || leadingIcon
+                ? 'indent-0'
+                : 'indent-1'
+              : 'indent-2',
+            className,
+          )}
+          role="combobox"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          aria-controls="{id}-listbox"
+          aria-expanded={$open}
+          aria-required={required}
+          aria-autocomplete="list"
+          on:focus|stopPropagation={openList}
+          on:input|stopPropagation={handleInput}
+          on:keydown|stopPropagation={handleInputKeydown}
+          on:click|stopPropagation={handleInputClick}
+          data-testid={$$props['data-testid'] ?? id}
+          bind:this={inputElement}
+          {...$$restProps}
+        />
       </div>
-    {:else if href}
-      <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
-        {#if actionTooltip}
-          <Tooltip text={actionTooltip} right>
+      {#if $$slots.action}
+        <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
+          {#if actionTooltip}
+            <Tooltip text={actionTooltip} right>
+              <slot name="action" />
+            </Tooltip>
+          {:else}
+            <slot name="action" />
+          {/if}
+        </div>
+      {:else if href}
+        <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+          {#if actionTooltip}
+            <Tooltip text={actionTooltip} right>
+              <Button
+                variant="ghost"
+                size="xs"
+                {href}
+                disabled={hrefDisabled}
+                leadingIcon="external-link"
+              />
+            </Tooltip>
+          {:else}
             <Button
               variant="ghost"
               size="xs"
@@ -519,36 +528,28 @@
               disabled={hrefDisabled}
               leadingIcon="external-link"
             />
-          </Tooltip>
-        {:else}
-          <Button
-            variant="ghost"
-            size="xs"
-            {href}
-            disabled={hrefDisabled}
-            leadingIcon="external-link"
+          {/if}
+        </div>
+      {/if}
+      {#if showChevron}
+        <button
+          type="button"
+          class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
+          on:click|stopPropagation={() => ($open ? closeList() : openList())}
+          aria-label={$open ? 'Close options' : 'Open options'}
+          tabindex="-1"
+        >
+          <Icon
+            name="chevron-down"
+            class={merge(
+              'transition-transform duration-200',
+              $open && 'rotate-180',
+              !$open && 'rotate-0',
+            )}
           />
-        {/if}
-      </div>
-    {/if}
-    {#if showChevron}
-      <button
-        type="button"
-        class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
-        on:click|stopPropagation={() => ($open ? closeList() : openList())}
-        aria-label={$open ? 'Close options' : 'Open options'}
-        tabindex="-1"
-      >
-        <Icon
-          name="chevron-down"
-          class={merge(
-            'transition-transform duration-200',
-            $open && 'rotate-180',
-            !$open && 'rotate-0',
-          )}
-        />
-      </button>
-    {/if}
+        </button>
+      {/if}
+    </div>
   </div>
 
   <Menu
