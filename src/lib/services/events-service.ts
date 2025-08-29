@@ -20,7 +20,7 @@ import type {
 } from '$lib/types/global';
 import { isSortOrder } from '$lib/utilities/is';
 import { paginated } from '$lib/utilities/paginated';
-import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { authTokens, requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
@@ -39,12 +39,14 @@ export type FetchEventsParametersWithSettings = FetchEventsParameters & {
   accessToken: string;
 };
 
-export const getEndpointForRawHistory = ({
+export const getEndpointForRawHistory = async ({
   namespace,
   workflowId,
   runId,
-}: FetchEventsParameters): string => {
-  return routeForApi(
+}: FetchEventsParameters): Promise<string> => {
+  const tokens = await authTokens();
+
+  const route = routeForApi(
     'events.raw',
     {
       namespace,
@@ -53,6 +55,14 @@ export const getEndpointForRawHistory = ({
     },
     true,
   );
+
+  const url = new URL(route);
+
+  if (!tokens.accessToken) return url.toString();
+
+  url.searchParams.append('accessToken', tokens.accessToken);
+
+  return url.toString();
 };
 
 const getEndpointForSortOrder = (
