@@ -72,24 +72,14 @@
   } {
     if (!errorMessage) return {};
 
-    let workflowId: string | undefined;
-    let runId: string | undefined;
+    const match = errorMessage.match(/WorkflowId: (.+?), RunId: (.+?)\.?$/);
+    if (!match) return {};
 
-    const workflowParts = errorMessage.split('WorkflowId: ');
-    if (workflowParts.length > 1) {
-      const workflowPart = workflowParts[1].split(', RunId:')[0];
-      if (workflowPart) {
-        workflowId = workflowPart.trim();
-      }
-    }
+    const workflowId = match[1]?.trim();
+    const runId = match[2]?.trim();
 
-    const runParts = errorMessage.split('RunId: ');
-    if (runParts.length > 1) {
-      const runPart = runParts[1].slice(0, -1).trim();
-      if (runPart) {
-        runId = runPart;
-      }
-    }
+    if (!workflowId || !runId) return {};
+
     return {
       workflowId,
       runId,
