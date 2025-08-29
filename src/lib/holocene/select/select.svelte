@@ -50,6 +50,7 @@
     required?: boolean;
     valid?: boolean;
     error?: string;
+    position?: 'left' | 'right';
   };
 
   export let label: string;
@@ -66,6 +67,7 @@
   export let required = false;
   export let error = '';
   export let valid = true;
+  export let position: 'left' | 'right' | undefined = undefined;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -118,7 +120,7 @@
       disabled={disabled || loading}
       controls="{id}-select"
       {variant}
-      data-testid={`${$$restProps['data-testid'] ?? ''}-button`}
+      data-testid={`${$$restProps['data-testid'] ?? id}-button`}
       data-track-name="select"
       data-track-intent="select"
       data-track-text={label}
@@ -145,7 +147,7 @@
       {/if}
     </MenuButton>
   {/key}
-  <Menu role="listbox" id="{id}-select" class={menuClass}>
+  <Menu role="listbox" id="{id}-select" class={menuClass} {position}>
     <slot />
   </Menu>
 
