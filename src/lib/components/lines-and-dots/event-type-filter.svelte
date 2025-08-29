@@ -98,6 +98,7 @@
           $eventTypeFilter.length === defaultOptions.length}
         label={translate('common.all')}
         labelHidden
+        class="mt-px"
       />
       {translate('common.all')}
     </MenuItem>
@@ -120,6 +121,7 @@
           checked={$eventStatusFilter}
           label={translate('common.all')}
           labelHidden
+          class="mt-px"
         />
         {translate('common.pending-and-failed')}
       </MenuItem>
@@ -140,6 +142,7 @@
         checked={!$eventStatusFilter && !$eventTypeFilter.length}
         label={translate('common.none')}
         labelHidden
+        class="mt-px"
       />
       {translate('common.none')}
     </MenuItem>
@@ -159,6 +162,7 @@
           checked={$eventTypeFilter.some((type) => type === option.value)}
           label={option.label}
           labelHidden
+          class="mt-px"
         />
         {option.label}
       </MenuItem>
