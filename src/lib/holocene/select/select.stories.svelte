@@ -29,6 +29,11 @@
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       onChange: { table: { disable: true } },
       value: { table: { disable: true } },
+      position: {
+        name: 'Position',
+        control: 'inline-radio',
+        options: ['left', 'right'],
+      },
     },
   } satisfies Meta<Select<string>>;
 </script>
@@ -68,3 +73,5 @@
   name="Invalid with error message"
   args={{ valid: false, error: 'This value is invalid' }}
 />
+
+<Story name="Right" args={{ position: 'right' }} />
