@@ -71,9 +71,9 @@
       position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
       position === 'right' && 'right-0 top-0 h-full border-l',
       dark && 'bg-black text-off-white',
+      position === 'right' && 'w-screen sm:max-w-fit',
       className,
     )}
-    class:max-w-fit={position === 'right'}
     in:fly={flyParamsIn}
     out:fly={flyParamsOut}
     role="region"
