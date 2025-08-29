@@ -77,13 +77,14 @@
   };
 </script>
 
-<div class="flex flex-wrap items-center justify-center gap-2">
+<div class="flex flex-wrap items-center justify-center gap-2 lg:flex-col">
   {#each workflowStatusFilters as status (status)}
     {@const active =
       statusFilters.some((filter) => filter.value === status) ||
       (!statusFilters.length && status === 'All')}
     <Button
       variant={active ? 'primary' : 'secondary'}
+      class="w-96"
       data-testid={status}
       on:click={() => {
         onStatusClick(status);

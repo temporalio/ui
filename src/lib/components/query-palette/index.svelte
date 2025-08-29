@@ -114,7 +114,7 @@
 <Drawer
   bind:open
   position="right"
-  class="w-full max-w-[1000px]"
+  class="w-full lg:w-[800px] lg:min-w-[800px] lg:max-w-[800px]"
   id="command-palette"
   onClick={close}
   closeButtonLabel={translate('common.close')}
