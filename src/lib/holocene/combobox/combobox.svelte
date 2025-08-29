@@ -433,7 +433,6 @@
         disabled && 'opacity-50',
         className,
       )}
-      class:disabled
     >
       {#if leadingIcon}
         <Icon class="ml-2 shrink-0" name={leadingIcon} />
@@ -469,7 +468,6 @@
           {disabled}
           type="text"
           value={displayValue}
-          class:disabled
           class={merge(
             'combobox-input',
             multiselect
