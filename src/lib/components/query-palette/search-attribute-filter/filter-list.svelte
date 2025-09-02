@@ -119,7 +119,7 @@
   <div class="flex flex-wrap items-center gap-2">
     {#if !editable}
       <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-        <Icon name="filter" class="my-1 h-5 w-5" />
+        <Icon name="filter" class="my-1 " />
         <p class="hidden text-sm font-medium lg:block">Active Filters</p>
       </div>
     {/if}
@@ -176,9 +176,8 @@
               <div
                 class={merge(
                   'rounded',
-                  'flex min-w-0 flex-shrink flex-col items-center justify-center px-1 pb-[.125rem] text-xs',
-                  'bg-blue-500 text-white',
-                  'text-white dark:bg-indigo-500',
+                  'flex min-w-0 flex-shrink flex-col items-center justify-center px-1 pb-[.125rem] text-xs shadow-sm',
+                  'bg-slate-500 text-white dark:bg-indigo-500 ',
                 )}
               >
                 {@render conditional(workflowFilter)}

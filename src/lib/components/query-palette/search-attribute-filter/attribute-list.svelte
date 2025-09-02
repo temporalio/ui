@@ -68,7 +68,7 @@
           {label}
           <div class="flex items-center gap-1 text-xs">
             {#if isCustomSearchAttribute(label)}
-              Custom
+              ✨ Custom
             {/if}
             {type}
           </div>
