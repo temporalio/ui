@@ -92,6 +92,7 @@
   {variant}
   class={merge(className)}
   {size}
+  disableTracking={true}
   {...$$restProps}
 >
   <slot name="leading" />
@@ -100,7 +101,10 @@
   </div>
   {#if hasIndicator}
     <div class="flex">
-      <Icon name={$open ? 'chevron-up' : 'chevron-down'} />
+      <Icon
+        name="chevron-down"
+        class={merge('transition-transform', $open && 'rotate-180')}
+      />
     </div>
   {/if}
   <slot name="trailing" />

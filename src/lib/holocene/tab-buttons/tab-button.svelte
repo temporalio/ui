@@ -54,6 +54,9 @@
   class:active={href ? $page.url.pathname.includes(base) : active}
   href={href ? href + $page.url.search : null}
   class:disabled={$$restProps.disabled}
+  data-track-name="tab-button"
+  data-track-intent="select"
+  data-track-text="*textContent*"
   on:click
   on:dblclick
   role="button"

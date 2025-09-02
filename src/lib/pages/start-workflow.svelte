@@ -64,6 +64,28 @@
 
   let searchAttributes: SearchAttributeInput[] = [];
 
+  $: errorWorkflowDetails = extractWorkflowFromError(error);
+
+  function extractWorkflowFromError(errorMessage: string): {
+    workflowId?: string;
+    runId?: string;
+  } {
+    if (!errorMessage) return {};
+
+    const match = errorMessage.match(/WorkflowId: (.+?), RunId: (.+?)\.?$/);
+    if (!match) return {};
+
+    const workflowId = match[1]?.trim();
+    const runId = match[2]?.trim();
+
+    if (!workflowId || !runId) return {};
+
+    return {
+      workflowId,
+      runId,
+    };
+  }
+
   $: taskQueueParam = $page.url.searchParams.get('taskQueue');
 
   onMount(() => {
@@ -273,7 +295,7 @@
       <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">
           <h3>{translate('workflows.user-metadata')}</h3>
-          <p class="flex items-center gap-1 text-sm text-subtle">
+          <p class="flex items-center gap-1 text-sm text-secondary">
             {translate('workflows.markdown-supported')}
             <Tooltip
               topRight
@@ -316,7 +338,23 @@
       >
     </div>
     {#if error}
-      <Alert intent="error" title={error} />
+      <Alert intent="error" title={error}>
+        {#if errorWorkflowDetails.workflowId && errorWorkflowDetails.runId}
+          <div class="mt-2">
+            <Link
+              href={routeForEventHistory({
+                namespace,
+                workflow: errorWorkflowDetails.workflowId,
+                run: errorWorkflowDetails.runId,
+              })}
+              class="inline-flex items-center gap-1"
+            >
+              <Icon name="external-link" class="h-4 w-4" />
+              {translate('workflows.view-running-workflow')}
+            </Link>
+          </div>
+        {/if}
+      </Alert>
     {/if}
     <CodecServerErrorBanner />
   </Card>

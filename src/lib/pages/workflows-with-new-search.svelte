@@ -105,6 +105,7 @@
     $selectedWorkflows = [];
   };
 
+  let customizationDrawerOpen = $state(false);
   let viewCommandPalette = $state(false);
   let editingQuery: SavedQuery | undefined = $state(undefined);
 
@@ -121,6 +122,7 @@
     selectedWorkflows,
     (workflows) => workflows.length > 0,
   );
+  const workflowStartEnabled = $derived(!workflowCreateDisabled(page));
 
   const terminableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
     workflows.filter((workflow) => workflow.canBeTerminated),
@@ -177,8 +179,6 @@
     handleSelectAll,
     handleSelectPage,
   });
-
-  let customizationDrawerOpen = $state(false);
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -238,15 +238,25 @@
       </h1>
       <WorkflowCounts />
     </div>
-    <div class="flex">
-      {#if !workflowCreateDisabled(page)}
-        <Button
-          leadingIcon="lightning-bolt"
-          href={routeForWorkflowStart({ namespace })}
-          >{translate('workflows.start-workflow')}</Button
-        >
-      {/if}
-    </div>
+    {#if $$slots['header-actions'] || workflowStartEnabled}
+      <div class="flex items-center gap-4">
+        <slot name="header-actions" />
+        {#if workflowStartEnabled}
+          <Button
+            leadingIcon="lightning-bolt"
+            href={routeForWorkflowStart({ namespace })}
+            >{translate('workflows.start-workflow')}</Button
+          >
+        {/if}
+      </div>
+    {/if}
+    {#if !workflowCreateDisabled(page)}
+      <Button
+        leadingIcon="lightning-bolt"
+        href={routeForWorkflowStart({ namespace })}
+        >{translate('workflows.start-workflow')}</Button
+      >
+    {/if}
   </div>
 </header>
 

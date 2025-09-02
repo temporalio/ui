@@ -41,6 +41,7 @@
 
 {#if expandable}
   <div
+    data-track-container={title}
     class={merge('surface-primary w-full border border-subtle', className)}
     {...$$restProps}
   >
@@ -50,6 +51,9 @@
       aria-controls="{id}-content"
       class="flex w-full flex-col p-4 focus-visible:bg-interactive-secondary-hover focus-visible:outline-none"
       type="button"
+      data-track-name="accordion"
+      data-track-intent="toggle"
+      data-track-text={title}
       on:click={toggleAccordion}
     >
       <div class="flex w-full flex-row items-center justify-between gap-2">
@@ -94,7 +98,11 @@
     </div>
   </div>
 {:else}
-  <div class="surface-primary w-full border border-subtle p-4" {...$$restProps}>
+  <div
+    class="surface-primary w-full border border-subtle p-4"
+    data-track-container={title}
+    {...$$restProps}
+  >
     <div class="flex w-full flex-col">
       <div class="flex w-full flex-row items-center justify-between gap-2">
         <div class="flex w-full items-center gap-2">

@@ -136,6 +136,9 @@
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
+    data-track-name="menuitem"
+    data-track-intent="navigate"
+    data-track-text="*textContent*"
     on:keydown|stopPropagation={handleKeydown}
     {...$$restProps}
   >
@@ -157,6 +160,9 @@
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
+    data-track-name="menuitem"
+    data-track-intent="action"
+    data-track-text="*textContent*"
     on:click={handleClick}
     on:keydown|stopPropagation={handleKeydown}
     {...$$restProps}
@@ -209,6 +215,6 @@
   }
 
   .menu-item-description {
-    @apply mr-6 text-xs font-normal text-subtle;
+    @apply mr-6 text-xs font-normal text-secondary;
   }
 </style>

@@ -19,7 +19,13 @@
 
 <span class={merge('chip', intent)}>
   {#if button}
-    <button class="flex items-center gap-1" on:click>
+    <button
+      class="flex items-center gap-1"
+      data-track-name="chip"
+      data-track-intent="action"
+      data-track-text="*textContent*"
+      on:click
+    >
       <slot />
     </button>
   {:else}
@@ -28,6 +34,9 @@
   <button
     aria-label={removeButtonLabel}
     class:hidden={disabled}
+    data-track-name="chip"
+    data-track-intent="remove"
+    data-track-text={removeButtonLabel}
     on:click={handleRemove}
   >
     <Icon name="close" />

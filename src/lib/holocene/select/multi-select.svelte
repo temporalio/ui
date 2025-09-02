@@ -61,7 +61,16 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton hasIndicator controls={id} {variant} {active} {disabled}>
+  <MenuButton
+    hasIndicator
+    controls={id}
+    {variant}
+    {active}
+    {disabled}
+    data-track-name="multi-select"
+    data-track-intent="select"
+    data-track-text={label}
+  >
     {#if icon}<Icon class="md:hidden" name={icon} />{/if}
     <span class="max-md:hidden">{label}</span>
   </MenuButton>
