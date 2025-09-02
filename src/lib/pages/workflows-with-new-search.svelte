@@ -250,13 +250,6 @@
         {/if}
       </div>
     {/if}
-    {#if !workflowCreateDisabled(page)}
-      <Button
-        leadingIcon="lightning-bolt"
-        href={routeForWorkflowStart({ namespace })}
-        >{translate('workflows.start-workflow')}</Button
-      >
-    {/if}
   </div>
 </header>
 
