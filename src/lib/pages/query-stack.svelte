@@ -76,14 +76,11 @@
   class="surface-primary max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
 >
   <div class="border-b border-subtle px-2 py-1.5">
-    <div class="flex items-center justify-center gap-2 lg:justify-start">
-      <Icon
-        name="bookmark"
-        class="h-5 w-5 text-yellow-600 dark:text-yellow-400"
-      />
-      <p class="hidden text-sm font-medium text-secondary lg:block">
-        Saved Queries
-      </p>
+    <div
+      class="flex items-center justify-center gap-2 text-slate-500 lg:justify-start dark:text-slate-400"
+    >
+      <Icon name="bookmark" class="h-5 w-5 " />
+      <p class="hidden text-sm font-medium lg:block">Saved Queries</p>
     </div>
   </div>
 
@@ -92,10 +89,9 @@
       <div class="mb-2 py-1 lg:px-2">
         <span
           class="text-xs font-medium text-slate-500 lg:uppercase lg:tracking-wider dark:text-slate-400"
-          >Quick Filters</span
+          >Quick</span
         >
       </div>
-
       <div class="space-y-1">
         <button
           data-testid="all"
@@ -119,8 +115,6 @@
           />
           <span class="hidden lg:inline">All Workflows</span>
         </button>
-
-        <!-- Child Workflows -->
         <button
           data-testid="child-workflows"
           class={merge(
@@ -143,7 +137,6 @@
           />
           <span class="hidden lg:inline">Parent Workflows</span>
         </button>
-        <!-- Today -->
         <button
           data-testid="today"
           class={merge(
@@ -166,8 +159,6 @@
           />
           <span class="hidden lg:inline">Today</span>
         </button>
-
-        <!-- Last Hour -->
         <button
           data-testid="last-hour"
           class={merge(
@@ -198,7 +189,7 @@
         <div class="mb-2 py-1 lg:px-2">
           <span
             class="text-xs font-medium text-slate-500 lg:uppercase lg:tracking-wider dark:text-slate-400"
-            >Custom Queries</span
+            >Custom</span
           >
         </div>
 
@@ -224,40 +215,7 @@
             >
           </button>
           {#each namespaceSavedQueries as savedQuery}
-            <button
-              data-testid={savedQuery.id}
-              class={merge(
-                'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:justify-start lg:text-sm',
-                'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-                'hover:shadow-sm active:scale-[0.98]',
-                query === savedQuery.query &&
-                  'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
-              )}
-              onclick={() => setTab(savedQuery.query)}
-              ondblclick={() => onDoubleClick(savedQuery)}
-            >
-              <Icon
-                name="bookmark"
-                class={merge(
-                  'h-4 w-4 flex-shrink-0 transition-colors duration-200',
-                  query === savedQuery.query
-                    ? 'text-indigo-600 dark:text-indigo-400'
-                    : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
-                )}
-              />
-              <span
-                class="hidden truncate text-left font-medium lg:inline-block"
-                >{savedQuery.name}</span
-              >
-              <div
-                class="ml-auto hidden opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:inline-block"
-              >
-                <Icon
-                  name="pencil"
-                  class="h-3 w-3 text-slate-400 dark:text-slate-500"
-                />
-              </div>
-            </button>
+            {@render customQueryButton(savedQuery)}
           {/each}
         </div>
       </div>
@@ -301,3 +259,36 @@
     {/if}
   </div>
 </div>
+
+{#snippet customQueryButton(savedQuery: SavedQuery)}
+  <button
+    data-testid={savedQuery.id}
+    class={merge(
+      'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:justify-start lg:text-sm',
+      'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+      'hover:shadow-sm active:scale-[0.98]',
+      query === savedQuery.query &&
+        'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
+    )}
+    onclick={() => setTab(savedQuery.query)}
+    ondblclick={() => onDoubleClick(savedQuery)}
+  >
+    <Icon
+      name="bookmark"
+      class={merge(
+        'h-4 w-4 flex-shrink-0 transition-colors duration-200',
+        query === savedQuery.query
+          ? 'text-yellow-500 dark:text-yellow-400'
+          : 'text-slate-500 group-hover:text-indigo-600 dark:text-slate-400 dark:group-hover:text-indigo-400',
+      )}
+    />
+    <span class="hidden truncate text-left font-medium lg:inline-block"
+      >{savedQuery.name}</span
+    >
+    <div
+      class="ml-auto hidden opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:inline-block"
+    >
+      <Icon name="pencil" class="h-3 w-3 text-slate-400 dark:text-slate-500" />
+    </div>
+  </button>
+{/snippet}
