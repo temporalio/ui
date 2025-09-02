@@ -75,8 +75,6 @@ export const Strings = {
     title: 'Workflow Worker Unhandled Failure',
     description:
       'The Workflow Task failed due to an unhandled failure from the Workflow code.',
-    action: 'deterministic constraints',
-    link: 'https://docs.temporal.io/workflows/#deterministic-constraints',
   },
   WorkflowTaskHeartbeatError: {
     title: 'Workflow Task Heartbeat Error',
