@@ -75,8 +75,7 @@
 <div
   class="surface-primary max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
 >
-  <!-- Header -->
-  <div class="border-b border-subtle px-2 py-2">
+  <div class="border-b border-subtle px-2 py-1.5">
     <div class="flex items-center justify-center gap-2 lg:justify-start">
       <Icon
         name="bookmark"
