@@ -127,6 +127,8 @@ export const Strings = {
     title: 'Non Deterministic Error',
     description:
       'A non-deterministic error has caused the Workflow Task to fail. This usually means the workflow code has a non-backward compatible change without a proper versioning branch.',
+    action: 'deterministic constraints',
+    link: 'https://docs.temporal.io/workflows/#deterministic-constraints',
   },
   BadModifyWorkflowPropertiesAttributes: {
     title: 'Bad Modify Workflow Properties Attributes',
