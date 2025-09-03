@@ -51,6 +51,7 @@
     required?: boolean;
     valid?: boolean;
     error?: string;
+    position?: 'left' | 'right';
   };
 
   export let label: string;
@@ -68,6 +69,7 @@
   export let required = false;
   export let error = '';
   export let valid = true;
+  export let position: 'left' | 'right' | undefined = undefined;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -112,42 +114,44 @@
 </script>
 
 <MenuContainer class="w-full" {open}>
-  <Label class="pb-1" {label} hidden={labelHidden} for={id} {required} />
-  {#key $labelCtx}
-    <MenuButton
-      class={merge('w-full', !valid && 'border-danger', menuButtonClass)}
-      hasIndicator={!disabled}
-      disabled={disabled || loading}
-      controls="{id}-select"
-      {variant}
-      data-testid={`${$$restProps['data-testid'] ?? ''}-button`}
-      data-track-name="select"
-      data-track-intent="select"
-      data-track-text={label}
-    >
-      <slot name="leading" slot="leading">
-        {#if leadingIcon}
-          <Icon name={leadingIcon} />
+  <div class="flex flex-col gap-1">
+    <Label {label} hidden={labelHidden} for={id} {required} />
+    {#key $labelCtx}
+      <MenuButton
+        class={merge('w-full', !valid && 'border-danger', menuButtonClass)}
+        hasIndicator={!disabled}
+        disabled={disabled || loading}
+        controls="{id}-select"
+        {variant}
+        data-testid={`${$$restProps['data-testid'] ?? id}-button`}
+        data-track-name="select"
+        data-track-intent="select"
+        data-track-text={label}
+      >
+        <slot name="leading" slot="leading">
+          {#if leadingIcon}
+            <Icon name={leadingIcon} />
+          {/if}
+        </slot>
+        <input
+          {id}
+          value={!value && placeholder !== '' ? placeholder : $labelCtx}
+          tabindex="-1"
+          disabled
+          class:disabled
+          {required}
+          aria-required={required}
+          {...$$restProps}
+        />
+        {#if disabled}
+          <Icon slot="trailing" name="lock" />
+        {:else if loading}
+          <Icon name="spinner" class="animate-spin" />
         {/if}
-      </slot>
-      <input
-        {id}
-        value={!value && placeholder !== '' ? placeholder : $labelCtx}
-        tabindex="-1"
-        disabled
-        class:disabled
-        {required}
-        aria-required={required}
-        {...$$restProps}
-      />
-      {#if disabled}
-        <Icon slot="trailing" name="lock" />
-      {:else if loading}
-        <Icon name="spinner" class="animate-spin" />
-      {/if}
-    </MenuButton>
-  {/key}
-  <Menu role="listbox" id="{id}-select" class={menuClass}>
+      </MenuButton>
+    {/key}
+  </div>
+  <Menu role="listbox" id="{id}-select" class={menuClass} {position}>
     <slot />
   </Menu>
 

@@ -69,11 +69,11 @@
     class={merge(
       'surface-primary fixed z-[55] h-auto overflow-y-auto border-subtle text-primary',
       position === 'bottom' && 'bottom-0 left-0 right-0 border-t',
-      position === 'right' && 'right-0 top-0 h-full border-l',
+      position === 'right' &&
+        'right-0 top-0 h-full w-screen border-l sm:max-w-fit',
       dark && 'bg-black text-off-white',
       className,
     )}
-    class:max-w-fit={position === 'right'}
     in:fly={flyParamsIn}
     out:fly={flyParamsOut}
     role="region"
