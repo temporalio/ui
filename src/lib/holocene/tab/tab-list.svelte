@@ -1,29 +1,34 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     label: string;
     class?: string;
+    borderBottom?: boolean;
+    children: Snippet;
   }
 
-  export let label: string;
-  let className = '';
-  export { className as class };
+  let {
+    label,
+    class: className = '',
+    borderBottom = false,
+    children,
+    ...restProps
+  }: Props = $props();
 </script>
 
 <div
-  class={merge('tab-list', className)}
+  class={merge(
+    'flex flex-row gap-4',
+    borderBottom && 'border-b border-subtle',
+    className,
+  )}
   role="tablist"
   aria-label={label}
-  {...$$restProps}
+  {...restProps}
 >
-  <slot />
+  {@render children()}
 </div>
-
-<style lang="postcss">
-  .tab-list {
-    @apply flex flex-row gap-4;
-  }
-</style>
