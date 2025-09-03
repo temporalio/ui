@@ -24,7 +24,7 @@
   import { writable, type Writable } from 'svelte/store';
 
   import { onMount, setContext } from 'svelte';
-  import { twMerge } from 'tailwind-merge';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
@@ -45,6 +45,7 @@
     leadingIcon?: IconName;
     onChange?: (value: T) => void;
     'data-testid'?: string;
+    menuButtonClass?: string;
     menuClass?: string;
     variant?: ButtonStyles['variant'];
     required?: boolean;
@@ -62,6 +63,7 @@
   export let loading = false;
   export let leadingIcon: IconName = null;
   export let onChange: (value: T) => void = () => {};
+  export let menuButtonClass: ClassNameValue = undefined;
   export let menuClass: string | undefined = undefined;
   export let variant: ButtonStyles['variant'] = 'secondary';
   export let required = false;
@@ -116,7 +118,7 @@
     <Label {label} hidden={labelHidden} for={id} {required} />
     {#key $labelCtx}
       <MenuButton
-        class={twMerge('w-full', !valid ? 'border-danger' : undefined)}
+        class={merge('w-full', !valid && 'border-danger', menuButtonClass)}
         hasIndicator={!disabled}
         disabled={disabled || loading}
         controls="{id}-select"

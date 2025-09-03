@@ -36,7 +36,7 @@
     <p>
       {translate(`typed-errors.${cause}.description`)}
     </p>
-    {#if cause === 'WorkflowWorkerUnhandledFailure' || cause === 'BadSearchAttributes'}
+    {#if cause === 'NonDeterministicError' || cause === 'BadSearchAttributes'}
       <p>
         {translate('typed-errors.link-preface')}<Link
           newTab

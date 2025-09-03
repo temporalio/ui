@@ -1,4 +1,5 @@
 import activity from './svg/activity.svelte';
+import addSquare from './svg/add-square.svelte';
 import add from './svg/add.svelte';
 import apple from './svg/apple.svelte';
 import archives from './svg/archives.svelte';
@@ -126,9 +127,11 @@ import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workflow from './svg/workflow.svelte';
 import xmarkFilled from './svg/xmark-filled.svelte';
+import xmarkSquare from './svg/xmark-square.svelte';
 
 export const icons = {
   activity,
+  'add-square': addSquare,
   add,
   apple,
   archives,
@@ -256,6 +259,7 @@ export const icons = {
   'system-window': systemWindow,
   workflow,
   'xmark-filled': xmarkFilled,
+  'xmark-square': xmarkSquare,
 } as const;
 
 export type IconName = keyof typeof icons;
