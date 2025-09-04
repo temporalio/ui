@@ -1,8 +1,14 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import { onMount, tick } from 'svelte';
+
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+
+  let globalTableOffset: number | null = null;
+  let isCalculating = false;
+  let hasCalculatedEarly = false;
 
   type Item = $$Generic;
 
@@ -21,10 +27,38 @@
   export let fixed = false;
 
   let tableContainer: HTMLDivElement;
+  let tableOffset = 0;
 
-  $: tableOffset = tableContainer?.offsetTop
-    ? tableContainer?.offsetTop + 32
-    : 0;
+  const calculateTableOffset = async () => {
+    if (isCalculating) return;
+    if (globalTableOffset !== null && hasCalculatedEarly) return;
+    isCalculating = true;
+    await tick();
+    if (
+      tableContainer?.offsetTop !== undefined &&
+      tableContainer.offsetTop > 0
+    ) {
+      const newOffset = tableContainer.offsetTop + 32;
+      if (globalTableOffset === null || newOffset < globalTableOffset) {
+        globalTableOffset = newOffset;
+        hasCalculatedEarly = true;
+        tableOffset = newOffset;
+      } else if (globalTableOffset !== null) {
+        tableOffset = globalTableOffset;
+      }
+    }
+    isCalculating = false;
+  };
+
+  $: if (tableContainer && !isCalculating) {
+    calculateTableOffset();
+  }
+
+  onMount(() => {
+    if (globalTableOffset !== null) {
+      tableOffset = globalTableOffset;
+    }
+  });
 </script>
 
 <div
