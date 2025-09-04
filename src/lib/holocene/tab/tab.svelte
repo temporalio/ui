@@ -3,6 +3,7 @@
 
   import type { Snippet } from 'svelte';
   import { getContext } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { isNull } from '$lib/utilities/is';
 
@@ -48,24 +49,18 @@
     selectTab(id);
     onClick && onClick();
   };
-
-  const tabClasses = $derived(
-    [
-      'flex cursor-pointer items-center gap-1 whitespace-nowrap border-b border-transparent text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
-      isActive && 'border-brand text-brand',
-      disabled && 'cursor-not-allowed opacity-50',
-      !disabled && 'hover:text-brand',
-    ]
-      .filter(Boolean)
-      .join(' '),
-  );
 </script>
 
 <svelte:element
   this={href ? 'a' : 'button'}
   type={href ? undefined : 'button'}
   role="tab"
-  class={tabClasses}
+  class={merge(
+    'flex cursor-pointer items-center gap-1 whitespace-nowrap border-b border-transparent text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    isActive && 'border-brand text-brand',
+    disabled && 'cursor-not-allowed opacity-50',
+    !disabled && 'hover:text-brand',
+  )}
   style="line-height: 2rem"
   aria-selected={isActive}
   aria-controls={panelId}
