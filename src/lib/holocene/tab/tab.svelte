@@ -56,12 +56,11 @@
   type={href ? undefined : 'button'}
   role="tab"
   class={merge(
-    'flex cursor-pointer items-center gap-1 whitespace-nowrap border-b border-transparent text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    'flex cursor-pointer items-center gap-1 whitespace-nowrap border-b border-transparent text-sm font-medium leading-8 outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
     isActive && 'border-brand text-brand',
     disabled && 'cursor-not-allowed opacity-50',
     !disabled && 'hover:text-brand',
   )}
-  style="line-height: 2rem"
   aria-selected={isActive}
   aria-controls={panelId}
   tabindex={isActive ? 0 : -1}

@@ -7,25 +7,19 @@
   interface Props extends HTMLAttributes<HTMLDivElement> {
     label: string;
     class?: string;
-    borderBottom?: boolean;
     children: Snippet;
   }
 
   let {
     label,
     class: className = '',
-    borderBottom = false,
     children,
     ...restProps
   }: Props = $props();
 </script>
 
 <div
-  class={merge(
-    'flex flex-row gap-4',
-    borderBottom && 'border-b border-subtle',
-    className,
-  )}
+  class={merge('flex flex-row gap-4 border-b border-subtle', className)}
   role="tablist"
   aria-label={label}
   {...restProps}
