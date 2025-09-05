@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { fly } from 'svelte/transition';
 
   import { getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -45,10 +44,16 @@
 </script>
 
 <ul
-  in:fly={{ duration: 100 }}
   role="menu"
-  class={merge('menu', maxHeight, position, className)}
-  class:hidden={!$open}
+  class={merge(
+    'menu',
+    'transition-all duration-100 ease-out',
+    !$open && 'invisible scale-95 opacity-0',
+    $open && 'visible scale-100 opacity-100',
+    maxHeight,
+    position,
+    className,
+  )}
   aria-labelledby={id}
   tabindex={-1}
   style={position === 'top-right' || position === 'top-left'
