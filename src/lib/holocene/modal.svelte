@@ -148,7 +148,7 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-black/50 transition-opacity duration-200;
+    @apply cursor-pointer transition-opacity duration-200;
   }
 
   .body.hightlightNav::backdrop {
