@@ -104,6 +104,7 @@ import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
+import switchIcon from './svg/switch.svelte';
 import systemWindow from './svg/system-window.svelte';
 import table from './svg/table.svelte';
 import tag from './svg/tag.svelte';
@@ -236,6 +237,7 @@ export const icons = {
   sun,
   summary,
   support,
+  switch: switchIcon,
   table,
   tag,
   target,
