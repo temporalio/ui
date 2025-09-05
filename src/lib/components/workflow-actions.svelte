@@ -2,12 +2,12 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
   import SignalConfirmationModal from '$lib/components/workflow/client-actions/signal-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import UpdateConfirmationModal from '$lib/components/workflow/client-actions/update-confirmation-modal.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';

@@ -50,7 +50,7 @@ const { form, errors, constraints, enhance } = createSPAForm({
   import { createSPAForm } from '$lib/utilities/form/create-spa-form';
   import { z } from 'zod';
   import Input from '$lib/holocene/input/input.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
 
   const userSchema = z.object({
     username: z.string().min(3),

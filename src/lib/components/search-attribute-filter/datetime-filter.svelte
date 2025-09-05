@@ -3,7 +3,7 @@
   import { zonedTimeToUtc } from 'date-fns-tz';
   import { getContext } from 'svelte';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
