@@ -88,7 +88,13 @@
   {id}
   on:close={handleCancel}
   bind:this={modalElement}
-  class={merge('body', className)}
+  class={merge(
+    'body',
+    'transition-all duration-200 ease-out',
+    open && 'scale-100 opacity-100',
+    !open && 'scale-95 opacity-0',
+    className,
+  )}
   class:large
   class:hightlightNav
   aria-modal="true"
@@ -142,7 +148,7 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer;
+    @apply cursor-pointer transition-opacity duration-200;
   }
 
   .body.hightlightNav::backdrop {
