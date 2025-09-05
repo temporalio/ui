@@ -190,7 +190,7 @@
     </div>
   {/if}
   <Tabs>
-    <TabList class="flex-wrap" label="workflow detail">
+    <TabList label="workflow detail">
       <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
