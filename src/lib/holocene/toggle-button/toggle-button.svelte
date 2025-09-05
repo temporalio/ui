@@ -50,5 +50,9 @@
   href={href ? href + $page.url.search : null}
   {...$$restProps}
 >
-  <slot />
+  {#if $$restProps.leadingIcon}
+    <span class="hidden md:block"><slot /></span>
+  {:else}
+    <slot />
+  {/if}
 </Button>

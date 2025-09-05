@@ -19,7 +19,10 @@
 </script>
 
 <div
-  class={merge('flex flex-row gap-4 border-b border-subtle', className)}
+  class={merge(
+    'flex flex-wrap gap-x-4 gap-y-1 border-b border-subtle',
+    className,
+  )}
   role="tablist"
   aria-label={label}
   {...restProps}
