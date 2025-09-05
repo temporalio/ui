@@ -93,6 +93,7 @@
     maxMenuHeight?: string;
     variant?: ComboboxStyles['variant'];
     class?: string;
+    optionClass?: string;
   }
 
   type MultiSelectProps = {
@@ -163,6 +164,7 @@
   export let loading = false;
   export let loadingText = 'Loading more results';
   export let variant: ComboboxStyles['variant'] = 'default';
+  export let optionClass = '';
 
   export let numberOfItemsSelectedLabel = (count: number) =>
     `${count} option${count > 1 ? 's' : ''} selected`;
@@ -577,6 +579,7 @@
         on:click={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
         label={getDisplayValue(option)}
+        class={optionClass}
       />
     {:else}
       {#if loading === false}
