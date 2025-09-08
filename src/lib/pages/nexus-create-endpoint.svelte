@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusForm, { endpointForm } from '$lib/pages/nexus-form.svelte';
@@ -43,7 +43,7 @@
   <div class="flex flex-row items-center gap-4 max-sm:flex-col">
     <Button
       variant="primary"
-      on:click={onCreate}
+      onclick={onCreate}
       disabled={createDisabled}
       class="max-sm:w-full"
       {loading}>{translate('nexus.create-endpoint')}</Button
@@ -51,8 +51,7 @@
     <Button
       variant="ghost"
       class="max-sm:w-full"
-      on:click={() => goto(routeForNexus())}
-      >{translate('common.cancel')}</Button
+      onclick={() => goto(routeForNexus())}>{translate('common.cancel')}</Button
     >
   </div>
 </div>

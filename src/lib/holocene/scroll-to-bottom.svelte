@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$lib/anthropocene/button.svelte';
 
   export let hidden: boolean;
   export let onScrollToBottomClick: () => void;

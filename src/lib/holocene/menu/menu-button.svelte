@@ -2,11 +2,11 @@
   import { createEventDispatcher, getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Badge from '$lib/holocene/badge.svelte';
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
+  import type { ButtonStyles } from '$lib/anthropocene/button.svelte';
   import Button, {
     type ButtonWithoutHrefProps,
-  } from '$lib/holocene/button.svelte';
+  } from '$lib/anthropocene/button.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     MENU_CONTEXT,

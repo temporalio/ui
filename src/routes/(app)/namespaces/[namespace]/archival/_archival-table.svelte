@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import Button from '$lib/anthropocene/button.svelte';
   import TableBodyCell from '$lib/components/workflow/workflows-summary-configurable-table/table-body-cell.svelte';
   import TableHeaderCell from '$lib/components/workflow/workflows-summary-configurable-table/table-header-cell.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -47,7 +47,7 @@
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
       <Tooltip text={translate('common.download-json')} top>
         <Button
-          on:click={() => exportWorkflows(visibleItems, page)}
+          onclick={() => exportWorkflows(visibleItems, page)}
           data-testid="export-history-button"
           size="xs"
           variant="ghost"
