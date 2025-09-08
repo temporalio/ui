@@ -96,7 +96,8 @@
 
     await userEvent.type(combobox, 'Japanese');
 
-    const menu = canvas.getByRole('listbox');
+    // Wait for the listbox to appear since it may have a transition
+    const menu = await canvas.findByRole('listbox');
 
     expect(menu).toBeInTheDocument();
   }}
@@ -113,7 +114,8 @@
 
     await userEvent.type(combobox, 'Jerseyan');
 
-    const menu = canvas.getByRole('listbox');
+    // Wait for the listbox to appear since it may have a transition
+    const menu = await canvas.findByRole('listbox');
     const noResults = canvas.getByText('No Results');
 
     expect(menu).toBeInTheDocument();
@@ -140,7 +142,8 @@
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
     await userEvent.type(combobox, 'E');
-    const menu = canvas.getByRole('listbox');
+    // Wait for the listbox to appear since it may have a transition
+    const menu = await canvas.findByRole('listbox');
     expect(menu).toBeInTheDocument();
   }}
 />
@@ -153,7 +156,8 @@
 
     await userEvent.type(combobox, 'one');
 
-    const menu = canvas.getByRole('listbox');
+    // Wait for the listbox to appear since it may have a transition
+    const menu = await canvas.findByRole('listbox');
 
     expect(menu).toBeInTheDocument();
 
