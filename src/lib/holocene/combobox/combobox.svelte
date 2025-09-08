@@ -94,6 +94,7 @@
     variant?: ComboboxStyles['variant'];
     class?: string;
     optionClass?: string;
+    autoWidth?: boolean;
   }
 
   type MultiSelectProps = {
@@ -165,6 +166,7 @@
   export let loadingText = 'Loading more results';
   export let variant: ComboboxStyles['variant'] = 'default';
   export let optionClass = '';
+  export let autoWidth = false;
 
   export let numberOfItemsSelectedLabel = (count: number) =>
     `${count} option${count > 1 ? 's' : ''} selected`;
@@ -177,6 +179,8 @@
   let selectedOption: string | T;
   let menuElement: HTMLUListElement;
   let inputElement: HTMLInputElement;
+  let measureElement: HTMLSpanElement;
+  let inputWidth = 'auto';
 
   export let open = writable<boolean>(false);
   export let maxMenuHeight: string = 'max-h-[20rem]';
@@ -194,8 +198,23 @@
   // We want this to react to external changes to the options prop to support async use cases
   $: list = filterOptions(filterValue, options);
 
+  // Dynamically adjust input width based on content when autoWidth is enabled
   $: {
-    if (inputElement && displayValue) {
+    if (autoWidth && measureElement && inputElement) {
+      const textToMeasure = displayValue || placeholder || '';
+      measureElement.textContent = textToMeasure;
+      const measuredWidth = measureElement.offsetWidth;
+      // Add some padding for cursor and better UX
+      const paddingBuffer = 20;
+      const minWidth = 100;
+      const maxWidth = 400;
+      const targetWidth = Math.min(
+        Math.max(measuredWidth + paddingBuffer, minWidth),
+        maxWidth,
+      );
+      inputWidth = `${targetWidth}px`;
+    } else if (!autoWidth && inputElement && displayValue) {
+      // Use the original size-based behavior for backward compatibility
       if (displayValue.length < minSize) {
         inputElement.size = minSize;
       } else if (displayValue.length > maxSize) {
@@ -470,6 +489,7 @@
           {disabled}
           type="text"
           value={displayValue}
+          style={autoWidth ? `width: ${inputWidth}` : undefined}
           class={merge(
             'combobox-input',
             multiselect
@@ -497,6 +517,15 @@
           bind:this={inputElement}
           {...$$restProps}
         />
+        {#if autoWidth}
+          <!-- Hidden span for measuring text width -->
+          <span
+            bind:this={measureElement}
+            class="combobox-input"
+            style="position: absolute; visibility: hidden; white-space: pre;"
+            aria-hidden="true"
+          />
+        {/if}
       </div>
       {#if $$slots.action}
         <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
@@ -609,10 +638,6 @@
   }
 
   .combobox-input {
-    @apply bg-transparent pr-2 text-primary placeholder:text-secondary focus:outline-none;
-
-    min-width: 0;
-    width: auto;
-    flex: 1 1 auto;
+    @apply flex grow bg-transparent pr-2 text-primary placeholder:text-secondary focus:outline-none;
   }
 </style>
