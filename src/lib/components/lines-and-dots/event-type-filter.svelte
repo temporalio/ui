@@ -65,7 +65,7 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton controls="status-menu">
+  <MenuButton controls="status-menu" size="sm">
     <div
       slot="leading"
       class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
@@ -98,6 +98,7 @@
           $eventTypeFilter.length === defaultOptions.length}
         label={translate('common.all')}
         labelHidden
+        class="mt-px"
       />
       {translate('common.all')}
     </MenuItem>
@@ -120,6 +121,7 @@
           checked={$eventStatusFilter}
           label={translate('common.all')}
           labelHidden
+          class="mt-px"
         />
         {translate('common.pending-and-failed')}
       </MenuItem>
@@ -140,6 +142,7 @@
         checked={!$eventStatusFilter && !$eventTypeFilter.length}
         label={translate('common.none')}
         labelHidden
+        class="mt-px"
       />
       {translate('common.none')}
     </MenuItem>
@@ -159,6 +162,7 @@
           checked={$eventTypeFilter.some((type) => type === option.value)}
           label={option.label}
           labelHidden
+          class="mt-px"
         />
         {option.label}
       </MenuItem>

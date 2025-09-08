@@ -79,7 +79,7 @@
     {/if}
   </div>
   <div
-    class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:min-h-full xl:flex-1 xl:items-stretch xl:justify-center"
+    class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:min-h-full xl:max-w-[1050px] xl:flex-1 xl:items-stretch xl:justify-center"
     style="background-image: url({noResultsImages});"
   >
     <img

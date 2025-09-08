@@ -34,7 +34,7 @@
   } = workflowRelationships);
 </script>
 
-<div class="flex flex-col gap-4 px-2 py-4 md:px-4 lg:px-8">
+<div class="flex flex-col gap-4 px-4 py-4 xl:px-8">
   <div class="flex w-full flex-wrap gap-4">
     {#if scheduleId}
       <SchedulerTable {scheduleId} {namespace} />

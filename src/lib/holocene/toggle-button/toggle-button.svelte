@@ -1,37 +1,28 @@
 <script lang="ts">
-  import type {
-    HTMLAnchorAttributes,
-    HTMLButtonAttributes,
-  } from 'svelte/elements';
-
   import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/stores';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { getAppContext } from '$lib/utilities/get-context';
 
-  import Tooltip from '../tooltip.svelte';
+  import type {
+    ButtonWithHrefProps,
+    ButtonWithoutHrefProps,
+  } from '../button.svelte';
+  import Button from '../button.svelte';
 
   type BaseProps = {
-    icon?: IconName;
     group?: boolean;
     active?: boolean;
-    'data-testid'?: string;
-    tooltip?: string;
-    class?: string;
   };
 
   type AnchorProps = BaseProps &
-    HTMLAnchorAttributes & {
-      href: string;
+    ButtonWithHrefProps & {
       base?: string;
     };
 
   type ButtonProps = BaseProps &
-    HTMLButtonAttributes & {
-      href?: never;
+    ButtonWithoutHrefProps & {
       base?: never;
     };
 
@@ -39,61 +30,29 @@
 
   let className = '';
   export { className as class };
-  export let icon: IconName = null;
   export let group = getAppContext('group');
-  export let href = '';
+  export let href = null;
   export let base = href;
   export let active = false;
-  export let tooltip = '';
+  export let variant: Button['variant'] = 'secondary';
 </script>
 
-<svelte:element
-  this={href ? 'a' : 'button'}
-  class={merge('toggle-button', className)}
-  class:group
-  class:active={href ? $page.url.pathname.includes(base) : active}
-  href={href ? href + $page.url.search : null}
-  class:disabled={$$restProps.disabled}
-  data-track-name="toggle-button"
-  data-track-intent="toggle"
-  data-track-text="*textContent*"
+<Button
   on:click
-  role="button"
-  tabindex="0"
+  class={merge(
+    (href ? $page.url.pathname.includes(base) : active) &&
+      'bg-interactive-secondary-active',
+    group && '[&:not(:last-child)]:border-r-0',
+    className,
+  )}
+  data-track-name="toggle-button"
+  {variant}
+  href={href ? href + $page.url.search : null}
   {...$$restProps}
 >
-  <Tooltip hide={!tooltip} text={tooltip} top>
-    {#if icon}
-      <div class="flex items-center gap-2">
-        <Icon name={icon} />
-        {#if $$slots.default}
-          <span class="hidden md:block"><slot /></span>
-        {/if}
-      </div>
-    {:else}
-      <slot />
-    {/if}
-  </Tooltip>
-</svelte:element>
-
-<style lang="postcss">
-  .toggle-button {
-    @apply surface-primary flex items-center justify-center border border-subtle px-4 py-2 text-sm leading-4 text-primary focus-visible:outline-none;
-
-    &:not(.disabled) {
-      @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary focus-visible:ring-2 focus-visible:ring-primary/70;
-    }
-  }
-
-  .toggle-button.active {
-    @apply bg-interactive-secondary-active;
-  }
-
-  .toggle-button.disabled {
-    @apply cursor-not-allowed opacity-50;
-  }
-
-  .group:not(:last-child) {
-    @apply border-r-0;
-  }
-</style>
+  {#if $$restProps.leadingIcon}
+    <span class="hidden md:block"><slot /></span>
+  {:else}
+    <slot />
+  {/if}
+</Button>
