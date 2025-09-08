@@ -609,6 +609,10 @@
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
+    @apply bg-transparent pr-2 text-primary placeholder:text-secondary focus:outline-none;
+
+    min-width: 0;
+    width: auto;
+    flex: 1 1 auto;
   }
 </style>
