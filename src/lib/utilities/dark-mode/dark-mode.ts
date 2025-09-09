@@ -6,7 +6,7 @@ export type DarkModePreference = boolean | 'system';
 
 export const useDarkModePreference = persistStore<DarkModePreference>(
   'dark mode',
-  !!import.meta.env.VITE_DARK_MODE,
+  'system',
   true,
 );
 
