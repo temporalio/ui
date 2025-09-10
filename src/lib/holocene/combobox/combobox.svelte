@@ -221,6 +221,7 @@
   }
 
   const openList = () => {
+    if ($open) return;
     $open = true;
     filterValue = '';
     inputElement.focus();
@@ -364,6 +365,7 @@
         closeList();
         break;
       case 'ArrowDown':
+        openList();
         focusFirstOption();
         break;
       case 'Enter':
