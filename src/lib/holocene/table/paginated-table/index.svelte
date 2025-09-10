@@ -1,7 +1,12 @@
 <script lang="ts">
-  import type { HTMLAttributes } from 'svelte/elements';
+  import type { ClassValue, HTMLAttributes } from 'svelte/elements';
 
-  import { twMerge as merge } from 'tailwind-merge';
+  import { clsx } from 'clsx';
+  import { twMerge as twMergeOriginal } from 'tailwind-merge';
+
+  function merge(...args: ClassValue[]) {
+    return twMergeOriginal(clsx(...args));
+  }
 
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import Table from '$lib/holocene/table/table.svelte';
@@ -14,7 +19,7 @@
     updating?: boolean;
     maxHeight?: string;
     fixed?: boolean;
-    class?: string;
+    class?: ClassValue;
   };
 
   export let visibleItems: Item[];
@@ -23,7 +28,7 @@
   export let maxHeight = '';
   export let fixed = false;
 
-  let className = '';
+  let className: ClassValue = '';
   export { className as class };
 
   let tableContainer: HTMLDivElement;
