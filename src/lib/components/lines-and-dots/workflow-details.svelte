@@ -150,6 +150,18 @@
         queue: workflow?.taskQueue,
       })}
     />
+
+    {#if workflow?.priority}
+      {@const { priorityKey, fairnessKey } = workflow.priority}
+      {#if priorityKey}
+        <DetailListLabel>{translate('workflows.priority')}</DetailListLabel>
+        <DetailListTextValue text={String(priorityKey)} />
+      {/if}
+      {#if fairnessKey}
+        <DetailListLabel>{translate('workflows.fairness')}</DetailListLabel>
+        <DetailListTextValue text={fairnessKey} />
+      {/if}
+    {/if}
   </DetailListColumn>
 
   {#if deployment}

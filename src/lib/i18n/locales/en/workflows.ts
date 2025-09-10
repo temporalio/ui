@@ -310,4 +310,6 @@ export const Strings = {
   'schedule-event-id': 'Scheduled Event ID',
   'schedule-to-close-timeout': 'Schedule to Close Timeout',
   'related-events': 'Related Events',
+  priority: 'Priority',
+  fairness: 'Fairness',
 } as const;

@@ -206,6 +206,7 @@ export type WorkflowExecutionInfo =
 export type WorkflowVersionTimpstamp =
   temporal.api.common.v1.IWorkerVersionStamp;
 export type SearchAttribute = temporal.api.common.v1.ISearchAttributes;
+export type Priority = temporal.api.common.v1.IPriority;
 
 // api response
 export type Payload = temporal.api.common.v1.IPayload;

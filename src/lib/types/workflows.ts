@@ -2,6 +2,7 @@ import type {
   Memo,
   Payloads,
   PendingWorkflowTaskInfo,
+  Priority,
   WorkflowExecutionStatus,
   WorkflowExtendedInfo,
   WorkflowVersionTimpstamp,
@@ -182,6 +183,7 @@ export type WorkflowExecution = {
   canBeTerminated: boolean;
   callbacks: Callback[];
   versioningInfo?: VersioningInfo;
+  priority?: Priority;
   summary?: Payload;
   details?: Payload;
   workflowExtendedInfo: WorkflowExtendedInfo;
