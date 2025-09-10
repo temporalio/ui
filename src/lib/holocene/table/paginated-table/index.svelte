@@ -31,9 +31,6 @@
   $: tableOffset = tableContainer?.offsetTop
     ? tableContainer.offsetTop + 32
     : 0;
-
-  const controlsClasses =
-    'surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2';
 </script>
 
 <div
@@ -57,7 +54,9 @@
       <slot />
     </Table>
     {#if visibleItems.length}
-      <div class={controlsClasses}>
+      <div
+        class="surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2"
+      >
         <slot name="actions-start" />
         <slot name="actions-center" />
         <slot name="actions-end" />
