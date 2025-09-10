@@ -364,7 +364,6 @@
         closeList();
         break;
       case 'ArrowDown':
-        openList();
         focusFirstOption();
         break;
       case 'Enter':
