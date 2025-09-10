@@ -13,14 +13,14 @@
 
   type Item = $$Generic;
 
-  type $$Props = HTMLAttributes<HTMLTableElement> & {
+  interface $$Props extends HTMLAttributes<HTMLTableElement> {
     visibleItems: Item[];
     loading?: boolean;
     updating?: boolean;
     maxHeight?: string;
     fixed?: boolean;
     class?: ClassValue;
-  };
+  }
 
   export let visibleItems: Item[];
   export let loading = false;
