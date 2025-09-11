@@ -123,6 +123,7 @@ export const toWorkflowExecution = (
   const callbacks = toCallbacks(response?.callbacks);
   const rootExecution = response.workflowExecutionInfo?.rootExecution;
   const versioningInfo = response.workflowExecutionInfo?.versioningInfo;
+  const priority = response.workflowExecutionInfo?.priority;
   const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
 
   let summary;
@@ -155,6 +156,7 @@ export const toWorkflowExecution = (
     pendingWorkflowTask,
     callbacks,
     versioningInfo,
+    priority,
     summary,
     details,
     parentNamespaceId,
