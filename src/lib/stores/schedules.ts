@@ -47,7 +47,7 @@ const setBodySpec = (
   spec: Partial<ScheduleSpecParameters>,
   presets: SchedulePresetsParameters,
 ) => {
-  const { hour, minute, second, phase, cronString } = spec;
+  const { hour, minute, second, phase, cronString, timezoneName } = spec;
   const { preset, months, days, daysOfMonth, daysOfWeek } = presets;
   if (preset === 'string') {
     // Add the cronString as a comment to the cronString to view it for frequency
@@ -82,6 +82,7 @@ const setBodySpec = (
     ];
     body.schedule.spec.interval = [];
     body.schedule.spec.cronString = [];
+    body.schedule.spec.timezoneName = timezoneName || 'UTC';
   }
 };
 

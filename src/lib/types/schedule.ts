@@ -57,6 +57,7 @@ export type ScheduleSpecParameters = {
   cronString: string;
   searchAttributes: SearchAttributeInput[];
   workflowSearchAttributes?: SearchAttributeInput[];
+  timezoneName: string;
 };
 
 // For UI Only
