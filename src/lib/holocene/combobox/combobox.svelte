@@ -221,6 +221,7 @@
   }
 
   const openList = () => {
+    if ($open) return;
     $open = true;
     filterValue = '';
     inputElement.focus();
