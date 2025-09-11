@@ -9,6 +9,7 @@
   export let months: string[];
   export let hour: string;
   export let minute: string;
+  export let timezoneName: string;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -23,5 +24,5 @@
     <DayOfMonthPicker bind:daysOfMonth />
   </div>
   <MonthPicker bind:months />
-  <SchedulesTimeView bind:hour bind:minute />
+  <SchedulesTimeView bind:hour bind:minute {timezoneName} />
 </div>
