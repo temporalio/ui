@@ -54,9 +54,6 @@ dependencies:
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
-  clsx:
-    specifier: ^2.1.1
-    version: 2.1.1
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
