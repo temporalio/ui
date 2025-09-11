@@ -83,6 +83,7 @@
   let second = '';
   let phase = '';
   let cronString = '';
+  let timezoneName = schedule?.spec?.timezoneName ?? '';
 
   const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
   const decodedWorkflowSearchAttributes = decodePayloadAttributes({
@@ -132,6 +133,7 @@
       months,
       searchAttributes: searchAttributesInput,
       workflowSearchAttributes: workflowSearchAttributesInput,
+      timezoneName: timezoneName.trim(),
     };
 
     onConfirm(preset, args, schedule);
@@ -256,6 +258,7 @@
           bind:second
           bind:phase
           bind:cronString
+          bind:timezoneName
         >
           <SchedulesSearchAttributesInputs
             bind:searchAttributesInput

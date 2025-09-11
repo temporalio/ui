@@ -29,6 +29,7 @@
   export let second: string;
   export let phase: string;
   export let cronString: string;
+  export let timezoneName: string;
 
   const clearSchedule = () => {
     daysOfWeek = [];
@@ -106,7 +107,12 @@
       />
     </TabPanel>
     <TabPanel id="daily-panel" tabId="daily-tab">
-      <ScheduleDayOfWeekView bind:daysOfWeek bind:hour bind:minute />
+      <ScheduleDayOfWeekView
+        bind:daysOfWeek
+        bind:hour
+        bind:minute
+        bind:timezoneName
+      />
     </TabPanel>
     <TabPanel id="monthly-panel" tabId="monthly-tab">
       <ScheduleDayOfMonthView
@@ -114,6 +120,7 @@
         bind:months
         bind:hour
         bind:minute
+        bind:timezoneName
       />
     </TabPanel>
     <TabPanel

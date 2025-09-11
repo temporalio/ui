@@ -39,6 +39,7 @@
       months,
       searchAttributes,
       workflowSearchAttributes,
+      timezoneName,
     } = args;
 
     const action: ScheduleActionParameters = {
@@ -60,6 +61,7 @@
       second,
       phase,
       cronString,
+      timezoneName,
     };
     const presets: SchedulePresetsParameters = {
       preset,
