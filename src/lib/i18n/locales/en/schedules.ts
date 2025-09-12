@@ -74,7 +74,7 @@ export const Strings = {
     'Select the day(s) of the week this schedule will always run on.',
   'time-view-heading': 'Time',
   'time-view-description':
-    'Specify the time (UTC) for this schedule to run. By default, the schedule will run at 00:00 UTC if left blank.',
+    'Specify the time ({{- timezoneName}}) for this schedule to run. By default, the schedule will run at 00:00 {{- timezoneName}} if left blank.',
   'interval-view-heading': 'Recurring Time',
   'interval-view-description':
     'Specify the time interval for this schedule to run (for example every 5 minutes).',
