@@ -24,6 +24,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
@@ -83,7 +84,6 @@
     getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
   );
   const linkCount = $derived(outboundLinks + inboundLinks);
-  const startDelay = $derived(workflow?.startDelay);
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -118,15 +118,14 @@
       <div
         class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
       >
-        <div class="flex items-center gap-2">
+        {#if isWorkflowDelayed(workflow)}
+          <Badge type="warning" class="flex gap-2 px-4 text-lg">
+            {translate('workflows.delayed')}
+            <Icon name="clock" />
+          </Badge>
+        {:else}
           <WorkflowStatus status={workflow?.status} big />
-          {#if startDelay}
-            <Badge type="warning" class="flex gap-2 text-nowrap px-4 text-lg">
-              {translate('workflows.delayed')}
-              <Icon name="clock" />
-            </Badge>
-          {/if}
-        </div>
+        {/if}
         <div class="xl:hidden">
           <WorkflowActions
             {isRunning}
