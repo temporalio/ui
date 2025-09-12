@@ -12,6 +12,8 @@
   let className = '';
   export { className as class };
   export let attributesToAdd: SAInput[] = [];
+  export let buttonCopy = translate('workflows.add-search-attribute');
+  export let variant: Button['variant'] = 'ghost';
 
   const addSearchAttribute = () => {
     attributesToAdd = [
@@ -34,7 +36,7 @@
     <SearchAttributeInput {attributes} bind:attribute {onRemove} />
   {/each}
   <Button
-    variant="ghost"
+    {variant}
     leadingIcon="add"
     class="max-sm:w-full"
     data-testid="add-search-attribute-button"
@@ -46,6 +48,6 @@
           a.value === '' ||
           a.value === null ||
           (Array.isArray(a.value) && a.value.length === 0),
-      ).length > 0}>{translate('workflows.add-search-attribute')}</Button
+      ).length > 0}>{buttonCopy}</Button
   >
 </div>

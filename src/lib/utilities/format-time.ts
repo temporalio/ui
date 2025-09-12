@@ -239,3 +239,16 @@ export const formatSecondsAbbreviated = (seconds: number | string): string => {
   const end = new Date(start.getTime() + Number(seconds) * 1000);
   return formatDistanceAbbreviated({ start, end, includeMilliseconds: true });
 };
+
+export const fromDurationToNumber = (duration: string): string => {
+  if (!duration || !duration.endsWith('s')) {
+    return '';
+  }
+
+  return duration?.replace('s', '');
+};
+
+export const fromNumberToDuration = (duration: string): string => {
+  if (!duration) return undefined;
+  return duration + 's';
+};

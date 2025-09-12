@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
 
   import { TimelineConfig } from '../constants';
 
@@ -24,6 +25,7 @@
     classification={workflow.status}
     strokeWidth={radius * 2}
     pending={workflow.isRunning}
+    delayed={isWorkflowDelayed(workflow)}
   />
   <Dot point={[start, y]} classification={workflow.status} r={radius} />
   <Icon

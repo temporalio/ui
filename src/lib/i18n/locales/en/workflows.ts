@@ -312,4 +312,8 @@ export const Strings = {
   'related-events': 'Related Events',
   priority: 'Priority',
   fairness: 'Fairness',
+  'workflow-start-delay': 'Workflow Start Delay',
+  'start-delay': 'Start Delay',
+  delayed: 'Delayed',
+  execution: 'Execution',
 } as const;

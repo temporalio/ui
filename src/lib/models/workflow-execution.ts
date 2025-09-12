@@ -81,6 +81,22 @@ const toSearchAttributes = (
   };
 };
 
+const getStartDelay = ({
+  executionTime,
+  startTime,
+}: {
+  executionTime: string;
+  startTime: string;
+}): string => {
+  if (!executionTime || !startTime) return undefined;
+  const delayMs =
+    new Date(executionTime).getTime() - new Date(startTime).getTime();
+  if (delayMs > 0) {
+    return delayMs / 1000 + 's';
+  }
+  return undefined;
+};
+
 export const toWorkflowExecution = (
   response?: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
@@ -125,6 +141,7 @@ export const toWorkflowExecution = (
   const versioningInfo = response.workflowExecutionInfo?.versioningInfo;
   const priority = response.workflowExecutionInfo?.priority;
   const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
+  const startDelay = getStartDelay({ executionTime, startTime });
 
   let summary;
   let details;
@@ -165,6 +182,7 @@ export const toWorkflowExecution = (
     isRunning,
     defaultWorkflowTaskTimeout,
     workflowExtendedInfo,
+    startDelay,
     get canBeTerminated(): boolean {
       return isRunning && writeActionsAreAllowed();
     },

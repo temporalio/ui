@@ -7,6 +7,7 @@ export const Strings = {
   'attribute-label': 'Attribute {{index}}',
   'type-label': 'Type for Attribute {{index}}',
   'select-type-placeholder': 'Select type',
+  'custom-search-attributes': 'Custom Search Attributes',
 
   // Buttons
   'add-attribute-button': 'Add New Custom Search Attribute',

@@ -8,8 +8,13 @@
   import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatDate } from '$lib/utilities/format-date';
-  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import {
+    formatDistanceAbbreviated,
+    formatSecondsAbbreviated,
+    fromDurationToNumber,
+  } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
   import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
@@ -100,10 +105,27 @@
     text={formatDate(workflow?.startTime, $timeFormat, {
       relative: $relativeTime,
     })}
-    tooltipText={$relativeTime
-      ? formatDate(workflow?.startTime, $timeFormat, { relative: false })
-      : formatDate(workflow?.startTime, $timeFormat, { relative: true })}
+    tooltipText={formatDate(workflow?.startTime, $timeFormat, {
+      relative: !$relativeTime,
+    })}
   />
+
+  {#if isWorkflowDelayed(workflow)}
+    <DetailListLabel>{translate('workflows.execution')}</DetailListLabel>
+    <DetailListTextValue
+      text={formatDate(workflow?.executionTime, $timeFormat, {
+        relative: $relativeTime,
+      })}
+      tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
+        relative: !$relativeTime,
+      })}
+    />
+  {:else if workflow?.startDelay}
+    <DetailListLabel>{translate('workflows.start-delay')}</DetailListLabel>
+    <DetailListTextValue
+      text={formatSecondsAbbreviated(fromDurationToNumber(workflow.startDelay))}
+    />
+  {/if}
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
   <DetailListTextValue
@@ -112,9 +134,9 @@
           relative: $relativeTime,
         })
       : '-'}
-    tooltipText={$relativeTime
-      ? formatDate(workflow?.endTime, $timeFormat, { relative: false })
-      : formatDate(workflow?.endTime, $timeFormat, { relative: true })}
+    tooltipText={formatDate(workflow?.endTime, $timeFormat, {
+      relative: !$relativeTime,
+    })}
   />
 
   <DetailListLabel>
