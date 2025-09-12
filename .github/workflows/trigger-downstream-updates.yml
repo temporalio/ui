@@ -41,13 +41,13 @@ jobs:
           else
             SHA="${{ github.sha }}"
           fi
-          
+
           # Create workflow inputs JSON (compact format for GITHUB_OUTPUT)
           INPUTS=$(jq -nc \
             --arg sha "$SHA" \
             --arg mode "release" \
             '{"target-sha": $sha, "mode": $mode}')
-          
+
           echo "inputs=$INPUTS" >> $GITHUB_OUTPUT
           echo "sha=$SHA" >> $GITHUB_OUTPUT
           echo "sha_short=$(echo $SHA | cut -c1-8)" >> $GITHUB_OUTPUT
