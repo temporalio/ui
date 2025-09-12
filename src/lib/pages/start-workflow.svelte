@@ -33,6 +33,10 @@
   import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
+  import {
+    formatSecondsAbbreviated,
+    fromNumberToDuration,
+  } from '$lib/utilities/format-time';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForEventHistory,
@@ -54,6 +58,7 @@
   let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
   let messageType = '';
+  let workflowStartDelay = '';
 
   let initialWorkflowId = '';
   let initialWorkflowType = '';
@@ -115,6 +120,7 @@
         messageType,
         searchAttributes,
         identity,
+        workflowStartDelay: fromNumberToDuration(workflowStartDelay),
       });
       toaster.push({
         variant: 'success',
@@ -293,8 +299,54 @@
     <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
+        <div>
+          <h3>{translate('search-attributes.custom-search-attributes')}</h3>
+          <p class="text-xs text-secondary">
+            Indexed fields used in a List Filter to filter a list of Workflow
+            Executions.
+          </p>
+        </div>
+        <AddSearchAttributes
+          bind:attributesToAdd={searchAttributes}
+          buttonCopy={translate('common.add')}
+          variant="secondary"
+        />
+      </Card>
+      <Card class="flex flex-col gap-2">
+        <div>
+          <Label
+            for="workflow-start-delay"
+            label={translate('workflows.workflow-start-delay')}
+            class="text-xl"
+          />
+          <p class="text-xs text-secondary">
+            Time to wait before dispatching the first workflow task.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <Input
+            id="workflow-start-delay"
+            label={translate('workflows.workflow-start-delay')}
+            labelHidden
+            bind:value={workflowStartDelay}
+            suffix="sec"
+            class="w-36"
+            error={isNaN(Number(workflowStartDelay))}
+          />
+          <p class="text-nowrap text-secondary">
+            {formatSecondsAbbreviated(workflowStartDelay)}
+          </p>
+        </div>
+      </Card>
+      <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">
-          <h3>{translate('workflows.user-metadata')}</h3>
+          <div>
+            <h3>{translate('workflows.user-metadata')}</h3>
+            <p class="text-xs text-secondary">
+              Add context to Workflow Execution to help identity and understand
+              its operations.
+            </p>
+          </div>
           <p class="flex items-center gap-1 text-sm text-secondary">
             {translate('workflows.markdown-supported')}
             <Tooltip
@@ -318,7 +370,6 @@
           on:change={(event) => (details = event.detail.value)}
         />
       </Card>
-      <AddSearchAttributes bind:attributesToAdd={searchAttributes} />
     {/if}
     <div
       class="mt-4 flex w-full flex-row justify-between gap-4 max-sm:flex-col"
