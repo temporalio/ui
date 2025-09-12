@@ -187,6 +187,7 @@ export type WorkflowExecution = {
   summary?: Payload;
   details?: Payload;
   workflowExtendedInfo: WorkflowExtendedInfo;
+  startDelay?: string;
 };
 
 export type WorkflowTaskFailedCause =

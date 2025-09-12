@@ -313,4 +313,5 @@ export const Strings = {
   priority: 'Priority',
   fairness: 'Fairness',
   'workflow-start-delay': 'Workflow Start Delay',
+  delayed: 'Delayed',
 } as const;

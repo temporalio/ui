@@ -56,18 +56,16 @@
     run: runId,
   });
 
-  const isRunning = $derived($workflowRun?.workflow?.isRunning);
+  const isRunning = $derived(workflow?.isRunning);
   const activitiesCanceled = $derived(
-    ['Terminated', 'TimedOut', 'Canceled'].includes(
-      $workflowRun.workflow?.status,
-    ),
+    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
   );
   const cancelInProgress = $derived(
-    isCancelInProgress($workflowRun?.workflow?.status, $fullEventHistory),
+    isCancelInProgress(workflow?.status, $fullEventHistory),
   );
   const resetRunId = $derived(
-    $workflowRun?.workflow.workflowExtendedInfo?.resetRunId ||
-      $resetWorkflows[$workflowRun?.workflow?.runId],
+    workflow.workflowExtendedInfo?.resetRunId ||
+      $resetWorkflows[workflow?.runId],
   );
   const workflowHasBeenReset = $derived(!!resetRunId);
   const workflowRelationships = $derived(
@@ -85,6 +83,7 @@
     getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
   );
   const linkCount = $derived(outboundLinks + inboundLinks);
+  const startDelay = $derived(workflow?.startDelay);
 </script>
 
 <div class="flex items-center justify-between pb-4">
@@ -119,7 +118,15 @@
       <div
         class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
       >
-        <WorkflowStatus status={workflow?.status} big />
+        <div class="flex items-center gap-2">
+          <WorkflowStatus status={workflow?.status} big />
+          {#if startDelay}
+            <Badge type="warning" class="flex gap-2 text-nowrap px-4 text-lg">
+              {translate('workflows.delayed')}
+              <Icon name="clock" />
+            </Badge>
+          {/if}
+        </div>
         <div class="xl:hidden">
           <WorkflowActions
             {isRunning}
