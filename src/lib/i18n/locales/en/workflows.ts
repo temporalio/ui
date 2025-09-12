@@ -314,4 +314,5 @@ export const Strings = {
   fairness: 'Fairness',
   'workflow-start-delay': 'Workflow Start Delay',
   delayed: 'Delayed',
+  execution: 'Execution',
 } as const;
