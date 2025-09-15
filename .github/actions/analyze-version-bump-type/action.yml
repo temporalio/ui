@@ -84,15 +84,8 @@ runs:
         echo "commit-count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
 
         # Use heredoc for multiline changelog
-        cat >> $GITHUB_OUTPUT << 'EOF'
-        changelog<<CHANGELOG_EOF
-        ${{ env.CHANGELOG_CONTENT }}
-        CHANGELOG_EOF
-        EOF
-
-        # Store changelog in environment for the heredoc
         {
-          echo "CHANGELOG_CONTENT<<CHANGELOG_HEREDOC_EOF"
+          echo "changelog<<CHANGELOG_EOF"
           echo "$CHANGELOG"
-          echo "CHANGELOG_HEREDOC_EOF"
-        } >> $GITHUB_ENV
+          echo "CHANGELOG_EOF"
+        } >> $GITHUB_OUTPUT

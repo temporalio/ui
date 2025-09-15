@@ -154,7 +154,8 @@ jobs:
             ${{ inputs.specific_version && format('- **Version Source:** Specific version override\n- **Specified Version:** {0}', inputs.specific_version) || format('- **Bump Type:** {0}', inputs.mode == 'manual' && inputs.version_type || steps.analyze-prs.outputs.bump-type) }}
             - **Mode:** ${{ inputs.mode }}
 
-            ${{ inputs.specific_version && '### 📌 Manual Version Override\n\nThis version was manually specified rather than calculated from commit history.' || format('### 📖 Changes Since Last Version\n{0}', steps.analyze-prs.outputs.changelog || 'Manual version bump - no automatic changelog generated') }}
+            ### ${{ inputs.specific_version && '📌 Manual Version Override' || '📖 Changes Since Last Version' }}
+            ${{ inputs.specific_version && 'This version was manually specified rather than calculated from commit history.' || steps.analyze-prs.outputs.changelog || 'Manual version bump - no automatic changelog generated' }}
 
             ---
             🤖 This PR was automatically created by the Version Bump workflow.
