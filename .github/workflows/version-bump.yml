@@ -72,12 +72,12 @@ jobs:
         with:
           from-ref: ${{ steps.last-tag.outputs.last-tag }}
           to-ref: HEAD
-      
+
       - name: Get HEAD SHA for changelog
         id: get-head-sha
         run: |
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-      
+
       - name: Generate changelog
         id: generate-changelog
         if: steps.last-tag.outputs.last-tag != ''
@@ -172,7 +172,7 @@ jobs:
 
             ### 📖 Changes Since Last Version
             ${{ steps.generate-changelog.outputs.changelog || 'No commits found since last version' }}
-            
+
             ${{ inputs.specific_version && '**Note:** This version was manually specified rather than calculated from commit history.' || '' }}
 
             ---
