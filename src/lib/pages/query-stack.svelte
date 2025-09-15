@@ -62,6 +62,33 @@
     lastHour.setSeconds(0, 0);
     return lastHour.toISOString();
   };
+
+  const systemViews: SavedQuery[] = [
+    {
+      id: 'all',
+      name: 'All Workflows',
+      query: '',
+      icon: 'workflow',
+    },
+    {
+      id: 'child-workflows',
+      name: 'Parent Workflows',
+      query: 'ParentWorkflowId is null',
+      icon: 'relationship',
+    },
+    {
+      id: 'today',
+      name: 'Today',
+      query: `StartTime >= "${getToday()}"`,
+      icon: 'calendar',
+    },
+    {
+      id: 'last-hour',
+      name: 'Last Hour',
+      query: `StartTime >= "${getLastHour()}"`,
+      icon: 'clock',
+    },
+  ];
 </script>
 
 <div
@@ -78,94 +105,9 @@
   <div class="p-2">
     <div class="mb-3 text-center">
       <div class="space-y-1">
-        <button
-          data-testid="all"
-          class={merge(
-            'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200 lg:justify-start',
-            'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-            'hover:shadow-sm active:scale-[0.98]',
-            query === '' &&
-              'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
-          )}
-          onclick={() => setTab('')}
-        >
-          <Icon
-            name="workflow"
-            class={merge(
-              'h-4 w-4 font-medium transition-colors duration-200',
-              query === ''
-                ? 'text-indigo-600 dark:text-indigo-400'
-                : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
-            )}
-          />
-          <span class="hidden lg:inline">All Workflows</span>
-        </button>
-        <button
-          data-testid="child-workflows"
-          class={merge(
-            'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200 lg:justify-start',
-            'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-            'hover:shadow-sm active:scale-[0.98]',
-            query === 'ParentWorkflowId is null' &&
-              'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
-          )}
-          onclick={() => setTab('ParentWorkflowId is null')}
-        >
-          <Icon
-            name="relationship"
-            class={merge(
-              'h-4 w-4 font-medium transition-colors duration-200',
-              query === 'ParentWorkflowId is not null'
-                ? 'text-indigo-600 dark:text-indigo-400'
-                : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
-            )}
-          />
-          <span class="hidden lg:inline">Parent Workflows</span>
-        </button>
-        <button
-          data-testid="today"
-          class={merge(
-            'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200 lg:justify-start',
-            'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-            'hover:shadow-sm active:scale-[0.98]',
-            query === `StartTime >= "${getToday()}"` &&
-              'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
-          )}
-          onclick={() => setTab(`StartTime >= "${getToday()}"`)}
-        >
-          <Icon
-            name="calendar"
-            class={merge(
-              'h-4 w-4 font-medium transition-colors duration-200',
-              query === `StartTime >= "${getToday()}"`
-                ? 'text-indigo-600 dark:text-indigo-400'
-                : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
-            )}
-          />
-          <span class="hidden lg:inline">Today</span>
-        </button>
-        <button
-          data-testid="last-hour"
-          class={merge(
-            'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-sm transition-all duration-200 lg:justify-start',
-            'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-            'hover:shadow-sm active:scale-[0.98]',
-            query === `StartTime >= "${getLastHour()}"` &&
-              'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
-          )}
-          onclick={() => setTab(`StartTime >= "${getLastHour()}"`)}
-        >
-          <Icon
-            name="clock"
-            class={merge(
-              'h-4 w-4 font-medium transition-colors duration-200',
-              query === `StartTime >= "${getLastHour()}"`
-                ? 'text-indigo-600 dark:text-indigo-400'
-                : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
-            )}
-          />
-          <span class="hidden lg:inline">Last Hour</span>
-        </button>
+        {#each systemViews as view}
+          {@render queryButton(view)}
+        {/each}
       </div>
     </div>
 
@@ -173,7 +115,7 @@
       <div class="border-t border-subtle pt-3 text-center">
         <div class="space-y-1">
           {#each namespaceSavedQueries as savedQuery}
-            {@render customQueryButton(savedQuery)}
+            {@render queryButton(savedQuery)}
           {/each}
         </div>
       </div>
@@ -217,7 +159,7 @@
   </div>
 </div>
 
-{#snippet customQueryButton(savedQuery: SavedQuery)}
+{#snippet queryButton(savedQuery: SavedQuery)}
   <button
     data-testid={savedQuery.id}
     class={merge(
@@ -230,11 +172,11 @@
     onclick={() => setTab(savedQuery.query)}
   >
     <Icon
-      name="bookmark"
+      name={savedQuery?.icon || 'bookmark'}
       class={merge(
-        'h-4 w-4 flex-shrink-0 transition-colors duration-200',
+        'h-4 w-4 flex-shrink-0 transition-colors duration-200 lg:hidden',
         query === savedQuery.query
-          ? 'text-yellow-500 dark:text-yellow-400'
+          ? 'text-indigo-500 dark:text-indigo-400'
           : 'text-slate-500 group-hover:text-indigo-600 dark:text-slate-400 dark:group-hover:text-indigo-400',
       )}
     />
