@@ -31,13 +31,13 @@
   import { page } from '$app/state';
 
   import QueryDrawer from '$lib/components/query-palette/index.svelte';
-  import FilterList from '$lib/components/query-palette/search-attribute-filter/filter-list.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
@@ -253,6 +253,7 @@
   </div>
 </header>
 
+<WorkflowSearchAttributeFilter />
 <div class="flex overflow-auto">
   <QueryStack
     {onDoubleClick}
@@ -261,7 +262,6 @@
   <div
     class="flex w-[calc(100%-80px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]"
   >
-    <FilterList editable={false} />
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
     >
