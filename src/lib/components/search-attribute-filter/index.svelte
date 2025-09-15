@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { writable, type Writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
-  import { afterUpdate, setContext, tick } from 'svelte';
+  import { setContext, type Snippet, tick } from 'svelte';
 
   export const FILTER_CONTEXT = 'filter-context';
 
@@ -16,7 +16,7 @@
 </script>
 
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
@@ -24,6 +24,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
+  import { savedQueries } from '$lib/stores/saved-queries';
   import {
     type SearchAttributeOption,
     sortedSearchAttributeOptions,
@@ -49,27 +50,53 @@
   import BooleanFilter from './boolean-filter.svelte';
   import CloseFilter from './close-filter-button.svelte';
   import DatetimeFilter from './datetime-filter.svelte';
+  import DeleteViewModal from './delete-view-modal.svelte';
   import DurationFilter from './duration-filter.svelte';
+  import EditViewModal from './edit-view-modal.svelte';
   import FilterList from './filter-list.svelte';
   import ListFilter from './list-filter.svelte';
   import NumberFilter from './number-filter.svelte';
+  import SaveViewModal from './save-view-modal.svelte';
   import SearchAttributeMenu from './search-attribute-menu.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
 
-  export let filters: SearchAttributeFilter[];
-  export let searchAttributeOptions: SearchAttributeOption[] = null;
-  export let showFilter = true;
-  export let refresh: () => void;
+  type Props = {
+    filters: SearchAttributeFilter[];
+    searchAttributeOptions?: SearchAttributeOption[] | null;
+    showFilter?: boolean;
+    refresh: () => void;
+    children?: Snippet;
+    actions?: Snippet;
+  };
 
-  $: options = searchAttributeOptions ?? $sortedSearchAttributeOptions;
+  let {
+    filters,
+    searchAttributeOptions = null,
+    showFilter = true,
+    refresh,
+    children,
+    actions,
+  }: Props = $props();
 
   const filter = writable<SearchAttributeFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
 
-  $: searchParamQuery = $page.url.searchParams.get('query');
-  $: showActions = filters.length && !$filter.attribute;
+  let saveViewModalOpen = $state(false);
+  let editViewModalOpen = $state(false);
+  let deleteViewModalOpen = $state(false);
+
+  const namespace = $derived(page.params.namespace);
+  const searchParamQuery = $derived(page.url.searchParams.get('query'));
+  const showActions = $derived(filters.length && !$filter.attribute);
+  const options = $derived(
+    searchAttributeOptions ?? $sortedSearchAttributeOptions,
+  );
+
+  const savedQueryView = $derived(
+    $savedQueries[namespace]?.find((q) => q.query === searchParamQuery),
+  );
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
@@ -92,7 +119,7 @@
       refresh();
     } else {
       updateQueryParameters({
-        url: $page.url,
+        url: page.url,
         parameter: 'query',
         value: searchQuery,
         allowEmpty: true,
@@ -123,9 +150,6 @@
     }
   }
 
-  $: $activeQueryIndex, updateFocusedElementId();
-  $: !showFilter && resetFilter();
-
   function updateFocus() {
     if ($focusedElementId) {
       const element = document.getElementById($focusedElementId);
@@ -138,12 +162,6 @@
     }
   }
 
-  afterUpdate(() => {
-    tick().then(() => {
-      updateFocus();
-    });
-  });
-
   function resetFilter() {
     activeQueryIndex.set(null);
     filter.set(emptyFilter());
@@ -154,16 +172,31 @@
       resetFilter();
     }
   }
+
+  $effect(() => {
+    $activeQueryIndex;
+    updateFocusedElementId();
+  });
+
+  $effect(() => {
+    !showFilter && resetFilter();
+  });
+
+  $effect(() => {
+    tick().then(() => {
+      updateFocus();
+    });
+  });
 </script>
 
 <div class="flex grow flex-col">
   <div class="flex grow gap-4">
-    <slot />
+    {@render children?.()}
     {#if showFilter}
       <div
         class="flex"
         class:grow={!showActions}
-        on:keyup={handleKeyUp}
+        onkeyup={handleKeyUp}
         role="none"
       >
         {#if isStatusFilter($filter)}
@@ -226,6 +259,18 @@
 
     <div class="flex items-center justify-end gap-1">
       {#if showActions}
+        <Button variant="secondary" on:click={() => (saveViewModalOpen = true)}>
+          {translate('common.save')}
+        </Button>
+        {#if savedQueryView}
+          <Button
+            variant="destructive"
+            on:click={() => (deleteViewModalOpen = true)}
+          >
+            {translate('common.delete')}
+          </Button>
+        {/if}
+
         {#if showFilter}
           <Button variant="ghost" on:click={handleClearInput}>
             {translate('common.clear-all')}
@@ -241,7 +286,10 @@
         </Tooltip>
       {/if}
     </div>
-    <slot name="actions" />
+    {@render actions?.()}
   </div>
   <FilterList bind:filters />
 </div>
+<SaveViewModal bind:open={saveViewModalOpen} />
+<EditViewModal view={savedQueryView} bind:open={editViewModalOpen} />
+<DeleteViewModal view={savedQueryView} bind:open={deleteViewModalOpen} />
