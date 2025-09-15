@@ -46,7 +46,7 @@ jobs:
           INPUTS=$(jq -nc \
             --arg sha "$SHA" \
             --arg mode "release" \
-            '{"target-sha": $sha, "mode": $mode}')
+            '{"ui_commit_sha": $sha, "mode": $mode}')
 
           echo "inputs=$INPUTS" >> $GITHUB_OUTPUT
           echo "sha=$SHA" >> $GITHUB_OUTPUT
