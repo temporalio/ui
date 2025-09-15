@@ -5,6 +5,12 @@
 
   export let hour = '';
   export let minute = '';
+  export let timezoneName: string;
+
+  $: timezoneHint =
+    timezoneName.toLowerCase() === 'utc'
+      ? 'Universal Standard Time (UTC)'
+      : timezoneName;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -13,7 +19,7 @@
       {translate('schedules.time-view-heading')}
     </h3>
     <p class="text-secondary">
-      {translate('schedules.time-view-description')}
+      {translate('schedules.time-view-description', { timezoneName })}
     </p>
 
     <TimePicker
@@ -27,7 +33,7 @@
   <div class="flex w-full flex-row items-center gap-2">
     <Icon name="clock" aria-hidden="true" />
     <span class="text-xs font-normal text-slate-500"
-      >{translate('common.based-on-time-preface')} Universal Standard Time (UTC)
+      >{translate('common.based-on-time-preface')} {timezoneHint}
     </span>
   </div>
 </div>

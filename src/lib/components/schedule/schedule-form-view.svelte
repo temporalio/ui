@@ -83,6 +83,7 @@
   let second = '';
   let phase = '';
   let cronString = '';
+  let timezoneName = schedule?.spec?.timezoneName ?? 'UTC';
 
   const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
   const decodedWorkflowSearchAttributes = decodePayloadAttributes({
@@ -256,6 +257,7 @@
           bind:second
           bind:phase
           bind:cronString
+          {timezoneName}
         >
           <SchedulesSearchAttributesInputs
             bind:searchAttributesInput

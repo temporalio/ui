@@ -7,6 +7,7 @@
   export let daysOfWeek: string[];
   export let hour: string;
   export let minute: string;
+  export let timezoneName: string;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -19,5 +20,5 @@
     </p>
     <DayOfWeekPicker bind:daysOfWeek />
   </div>
-  <SchedulesTimeView bind:hour bind:minute />
+  <SchedulesTimeView bind:hour bind:minute {timezoneName} />
 </div>
