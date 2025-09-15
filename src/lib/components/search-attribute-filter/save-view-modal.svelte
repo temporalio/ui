@@ -35,16 +35,6 @@
     };
     $savedQueries[namespace] = [...$savedQueries[namespace], newQuery];
     hideModal();
-    // if (editingQuery) {
-    //   const updatedQuery = {
-    //     ...editingQuery,
-    //     name: queryName,
-    //     query,
-    //   };
-    //   $savedQueries[namespace] = $savedQueries[namespace].map((q) =>
-    //     q.id === editingQuery.id ? updatedQuery : q,
-    //   );
-    // }
   };
 </script>
 

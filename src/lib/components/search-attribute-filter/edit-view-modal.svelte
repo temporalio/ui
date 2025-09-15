@@ -8,12 +8,12 @@
 
   interface Props {
     open?: boolean;
-    view: SavedQuery;
+    view?: SavedQuery;
   }
 
   let { open = $bindable(), view }: Props = $props();
 
-  let name = $state(view.name);
+  let name = $state(view?.name ?? '');
 
   const namespace = $derived(page.params.namespace);
   const query = $derived(page.url.searchParams.get('query'));
