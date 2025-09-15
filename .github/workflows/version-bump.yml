@@ -111,11 +111,27 @@ jobs:
         with:
           new-version: ${{ steps.calculate-version.outputs.new-version }}
 
+      - name: Generate token for cross-repo access
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private-key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+          owner: temporalio
+          repositories: ui
+
       - name: Create Pull Request
         if: inputs.mode != 'dry-run' && steps.calculate-version.outputs.version-changed == 'true'
         id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ steps.generate_token.outputs.token }}
+          branch: version-bump-${{ steps.calculate-version.outputs.new-version }}
+          delete-branch: true
+          reviewers: ${{ github.actor }}
+          committer: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
+          draft: always-true
           commit-message: |
             chore: bump version to ${{ steps.calculate-version.outputs.new-version }}
 
@@ -142,12 +158,6 @@ jobs:
 
             ---
             🤖 This PR was automatically created by the Version Bump workflow.
-          branch: version-bump-${{ steps.calculate-version.outputs.new-version }}
-          delete-branch: true
-          reviewers: ${{ github.actor }}
-          committer: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
-          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
-          draft: always-true
 
       - name: Summary
         if: inputs.mode != 'dry-run'
