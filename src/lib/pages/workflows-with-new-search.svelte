@@ -30,7 +30,6 @@
 
   import { page } from '$app/state';
 
-  import QueryDrawer from '$lib/components/query-palette/index.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
@@ -48,7 +47,6 @@
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import type { SavedQuery } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
     queryWithParentWorkflowId,
@@ -106,8 +104,6 @@
   };
 
   let customizationDrawerOpen = $state(false);
-  let viewCommandPalette = $state(false);
-  let editingQuery: SavedQuery | undefined = $state(undefined);
 
   let batchTerminateConfirmationModalOpen = $state(false);
   let batchCancelConfirmationModalOpen = $state(false);
@@ -183,11 +179,6 @@
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
-
-  const onDoubleClick = (query: SavedQuery) => {
-    editingQuery = query;
-    viewCommandPalette = true;
-  };
 </script>
 
 <BatchTerminateConfirmationModal
@@ -255,10 +246,7 @@
 
 <WorkflowSearchAttributeFilter />
 <div class="flex overflow-auto">
-  <QueryStack
-    {onDoubleClick}
-    showQueryCommand={() => (viewCommandPalette = true)}
-  />
+  <QueryStack />
   <div
     class="flex w-[calc(100%-80px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]"
   >
@@ -275,4 +263,3 @@
   type={translate('common.columns')}
   title={translate('common.workflows-table')}
 />
-<QueryDrawer bind:open={viewCommandPalette} bind:editingQuery />

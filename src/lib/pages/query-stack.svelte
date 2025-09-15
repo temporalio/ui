@@ -13,14 +13,6 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  let {
-    onDoubleClick,
-    showQueryCommand,
-  }: {
-    onDoubleClick: (query: SavedQuery) => void;
-    showQueryCommand?: () => void;
-  } = $props();
-
   const query = $derived(page.url.searchParams.get('query') || '');
   const savedQuery = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
@@ -77,21 +69,14 @@
 >
   <div class="border-b border-subtle px-2 py-[.47rem]">
     <div
-      class="flex items-center justify-center gap-2 text-slate-500 lg:justify-start dark:text-slate-400"
+      class="flex items-center justify-center gap-2 text-center text-slate-500 lg:justify-start dark:text-slate-400"
     >
-      <Icon name="bookmark" class="h-5 w-5 " />
-      <p class="hidden text-sm font-medium lg:block">Saved Queries</p>
+      <p class="text-xs font-medium lg:block lg:text-sm">Saved Views</p>
     </div>
   </div>
 
   <div class="p-2">
     <div class="mb-3 text-center">
-      <div class="mb-2 py-1 lg:px-2">
-        <span
-          class="text-xs font-medium text-slate-500 lg:uppercase lg:tracking-wider dark:text-slate-400"
-          >Quick</span
-        >
-      </div>
       <div class="space-y-1">
         <button
           data-testid="all"
@@ -186,34 +171,7 @@
 
     {#if namespaceSavedQueries.length > 0}
       <div class="border-t border-subtle pt-3 text-center">
-        <div class="mb-2 py-1 lg:px-2">
-          <span
-            class="text-xs font-medium text-slate-500 lg:uppercase lg:tracking-wider dark:text-slate-400"
-            >Custom</span
-          >
-        </div>
-
         <div class="space-y-1">
-          <button
-            data-testid="builder"
-            class={merge(
-              'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:justify-start lg:text-sm',
-              'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-              'hover:shadow-sm active:scale-[0.98]',
-            )}
-            onclick={showQueryCommand}
-          >
-            <Icon
-              name="add"
-              class={merge(
-                'h-4 w-4 flex-shrink-0 transition-colors duration-200',
-                'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
-              )}
-            />
-            <span class="hidden truncate text-left font-medium lg:inline-block"
-              >Open Builder</span
-            >
-          </button>
           {#each namespaceSavedQueries as savedQuery}
             {@render customQueryButton(savedQuery)}
           {/each}
@@ -238,7 +196,6 @@
               'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
               'hover:shadow-sm active:scale-[0.98]',
             )}
-            onclick={showQueryCommand}
           >
             <Icon
               name="add"
@@ -271,7 +228,6 @@
         'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
     )}
     onclick={() => setTab(savedQuery.query)}
-    ondblclick={() => onDoubleClick(savedQuery)}
   >
     <Icon
       name="bookmark"
@@ -285,10 +241,5 @@
     <span class="hidden truncate text-left font-medium lg:inline-block"
       >{savedQuery.name}</span
     >
-    <div
-      class="ml-auto hidden opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:inline-block"
-    >
-      <Icon name="pencil" class="h-3 w-3 text-slate-400 dark:text-slate-500" />
-    </div>
   </button>
 {/snippet}
