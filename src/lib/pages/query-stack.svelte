@@ -71,6 +71,13 @@
       icon: 'workflow',
     },
     {
+      id: 'task-failures',
+      name: 'Task Failures',
+      query: 'ExecutionStatus = "Running"',
+      icon: 'error',
+      count: 8,
+    },
+    {
       id: 'child-workflows',
       name: 'Parent Workflows',
       query: 'ParentWorkflowId is null',
@@ -167,7 +174,7 @@
       'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
       'hover:shadow-sm active:scale-[0.98]',
       query === savedQuery.query &&
-        'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
+        'border border-indigo-200 bg-indigo-50 text-red-700 shadow-sm dark:border-red-800 dark:bg-red-900/20 dark:text-indigo-300',
     )}
     onclick={() => setTab(savedQuery.query)}
   >
@@ -183,5 +190,11 @@
     <span class="hidden truncate text-left font-medium lg:inline-block"
       >{savedQuery.name}</span
     >
+    {#if savedQuery.count !== undefined}
+      <span
+        class="hidden rounded-full bg-red-200 px-2 py-0.5 font-mono text-xs font-medium text-red-900 lg:inline-block dark:bg-slate-700 dark:text-slate-300"
+        >{savedQuery.count}</span
+      >
+    {/if}
   </button>
 {/snippet}

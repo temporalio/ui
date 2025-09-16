@@ -7,6 +7,7 @@ export type SavedQuery = {
   name: string;
   query: string;
   icon?: IconName;
+  count?: number;
 };
 
 export const savedQueries = persistStore<Record<string, SavedQuery[]>>(
