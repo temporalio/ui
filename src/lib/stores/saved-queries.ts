@@ -1,3 +1,5 @@
+import type { ClassNameValue } from 'tailwind-merge';
+
 import type { IconName } from '$lib/holocene/icon';
 
 import { persistStore } from './persist-store';
@@ -8,6 +10,7 @@ export type SavedQuery = {
   query: string;
   icon?: IconName;
   count?: number;
+  class?: ClassNameValue;
 };
 
 export const savedQueries = persistStore<Record<string, SavedQuery[]>>(

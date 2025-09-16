@@ -17,7 +17,7 @@
   const savedQuery = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
 
-  const namespaceSavedQueries = $derived([]);
+  const namespaceSavedQueries = $derived($savedQueries[namespace] || []);
 
   onMount(() => {
     if (savedQuery) {
@@ -76,6 +76,7 @@
       query: 'ExecutionStatus = "Running"',
       icon: 'error',
       count: 8,
+      class: 'text-red-700 dark:text-red-300',
     },
     {
       id: 'child-workflows',
@@ -134,7 +135,7 @@
             class="mx-auto mb-2 h-8 w-8 text-slate-300 dark:text-slate-600"
           />
           <p class="text-sm text-slate-500 dark:text-slate-400">
-            We can add saved queries here whenever we are ready.
+            No custom queries yet
           </p>
         </div>
       </div>
@@ -151,6 +152,7 @@
       'hover:shadow-sm active:scale-[0.98]',
       query === savedQuery.query &&
         'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
+      savedQuery.class,
     )}
     onclick={() => setTab(savedQuery.query)}
   >
@@ -168,7 +170,7 @@
     >
     {#if savedQuery.count !== undefined}
       <span
-        class="hidden rounded-full bg-red-200 px-2 py-0.5 font-mono text-xs font-medium text-red-900 lg:inline-block dark:bg-slate-700 dark:text-slate-300"
+        class="hidden rounded-full bg-red-100 px-2 py-0.5 font-mono text-xs font-medium text-red-900 lg:inline-block dark:bg-slate-700 dark:text-slate-300"
         >{savedQuery.count}</span
       >
     {/if}
