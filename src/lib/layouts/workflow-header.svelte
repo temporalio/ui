@@ -118,14 +118,11 @@
       <div
         class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
       >
-        {#if isWorkflowDelayed(workflow)}
-          <Badge type="warning" class="flex gap-2 px-4 text-lg">
-            {translate('workflows.delayed')}
-            <Icon name="clock" />
-          </Badge>
-        {:else}
-          <WorkflowStatus status={workflow?.status} big />
-        {/if}
+        <WorkflowStatus
+          status={workflow?.status}
+          big
+          delayed={isWorkflowDelayed(workflow)}
+        />
         <div class="xl:hidden">
           <WorkflowActions
             {isRunning}

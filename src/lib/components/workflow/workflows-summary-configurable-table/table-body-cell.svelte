@@ -14,6 +14,7 @@
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowExecution,
   } from '$lib/types/workflows';
+  import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistance } from '$lib/utilities/format-time';
@@ -152,7 +153,10 @@
     data-testid="workflows-summary-table-body-cell"
   >
     {#if label === 'Status'}
-      <WorkflowStatus status={workflow.status} />
+      <WorkflowStatus
+        status={workflow.status}
+        delayed={isWorkflowDelayed(workflow)}
+      />
     {:else if label === 'End'}
       {formatDate(workflow.endTime, $timeFormat, {
         relative: $relativeTime,
