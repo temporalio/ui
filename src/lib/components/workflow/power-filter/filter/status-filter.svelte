@@ -90,6 +90,7 @@
     on:click={() => {
       if ($open) resetFilter();
     }}
+    size="xs"
   >
     {$filter.attribute}
   </MenuButton>

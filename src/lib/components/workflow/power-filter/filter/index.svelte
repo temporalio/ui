@@ -29,8 +29,6 @@
   import StatusFilter from '$lib/components/workflow/power-filter/filter/status-filter.svelte';
   import TextFilter from '$lib/components/workflow/power-filter/filter/text-filter.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import CopyButton from '$lib/holocene/copyable/button.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
@@ -41,7 +39,6 @@
     sortedSearchAttributeOptions,
   } from '$lib/stores/search-attributes';
   import { refresh } from '$lib/stores/workflows';
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
     getFocusedElementId,
@@ -71,7 +68,6 @@
     filters = $workflowFilters,
     searchAttributeOptions = null,
     showFilter = !$searchInputViewOpen,
-    children,
     actions,
   }: Props = $props();
 
@@ -92,12 +88,6 @@
     focusedElementId,
     resetFilter,
   });
-
-  const { copy, copied } = copyToClipboard();
-
-  function handleCopy(e: Event) {
-    copy(e, searchParamQuery);
-  }
 
   function onSearch() {
     const searchQuery = toListWorkflowQueryFromFilters(combineFilters(filters));
@@ -176,8 +166,10 @@
   });
 </script>
 
-<div class="flex grow items-center gap-2">
-  {@render children?.()}
+<div class="flex shrink items-center justify-start gap-2">
+  <FilterList filters={$workflowFilters} />
+  <SearchAttributeMenu {filters} {options} />
+
   {#if showFilter}
     <div
       class="flex"
@@ -187,8 +179,6 @@
     >
       {#if isStatusFilter($filter)}
         <StatusFilter bind:filters />
-      {:else}
-        <SearchAttributeMenu {filters} {options} />
       {/if}
 
       {#if $filter.attribute}
@@ -242,23 +232,14 @@
       {/if}
     </div>
   {/if}
-  <FilterList filters={$workflowFilters} />
 
   <div class="flex items-center justify-end gap-1">
     {#if showActions}
       {#if showFilter}
-        <Button variant="ghost" on:click={handleClearInput}>
+        <Button size="xs" variant="ghost" on:click={handleClearInput}>
           {translate('common.clear-all')}
         </Button>
       {/if}
-      <Tooltip topRight text={translate('workflows.copy-search-input')}>
-        <CopyButton
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          copied={$copied}
-          on:click={handleCopy}
-        />
-      </Tooltip>
     {/if}
   </div>
   {@render actions?.()}

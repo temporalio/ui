@@ -75,8 +75,9 @@
       placeholder={translate('workflows.search-placeholder')}
       icon="search"
       class="grow  [&_*]:border-0"
-      inputClass="bg-blue-50"
+      inputClass="bg-blue-50 text-primary !border-r border-subtle"
       clearable
+      copyButtonLabel={translate('common.copy-icon-title')}
       clearButtonLabel={translate('common.clear-input-button-label')}
       on:clear={handleClearInput}
       bind:value={manualSearchString}

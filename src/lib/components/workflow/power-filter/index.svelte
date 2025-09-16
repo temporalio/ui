@@ -28,7 +28,7 @@
 </script>
 
 {#snippet viewToggleButtons()}
-  <div class="flex items-center gap-1 border-r border-subtle pr-1">
+  <div class="flex items-center gap-1 border-r border-subtle pr-2">
     <Button
       variant={view === 'search' ? 'primary' : 'ghost'}
       size="xs"
@@ -69,8 +69,10 @@
   <div
     class="flex w-full items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
   >
-    {@render viewToggleButtons()}
-    {@render content()}
+    <div class="flex shrink items-center justify-start gap-2">
+      {@render viewToggleButtons()}
+      {@render content()}
+    </div>
     {@render actionToggleButtons()}
   </div>
   {#if viewManualQuery}
