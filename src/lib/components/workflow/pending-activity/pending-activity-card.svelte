@@ -129,6 +129,20 @@
           activity.lastWorkerIdentity,
         )}
       {/if}
+      {#if activity.priority}
+        {#if activity.priority.priorityKey}
+          {@render detail(
+            translate('workflows.priority'),
+            activity.priority.priorityKey,
+          )}
+        {/if}
+        {#if activity.priority.fairnessKey}
+          {@render detail(
+            translate('workflows.fairness'),
+            activity.priority.fairnessKey,
+          )}
+        {/if}
+      {/if}
     </div>
     <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
