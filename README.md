@@ -185,7 +185,7 @@ Set these environment variables if you want to change their defaults
 
 ## Releases
 
-This repository uses an automated release management system that enforces version bump PRs before releases and maintains dual version sync between `package.json` and `server/server/version/version.go`.
+This repository uses an automated release management system that enforces version bump PRs before releases and maintains dual version sync between `package.json` and `server/server/version/version.go`. This is a test.
 
 ### Release Management
 
