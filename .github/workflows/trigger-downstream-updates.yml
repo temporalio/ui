@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-    # paths:
-    # Only trigger when actual code changes are made
-    # - 'src/**'
-    # - 'package.json'
-    # - 'pnpm-lock.yaml'
+    paths:
+      # Only trigger when actual code changes are made
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
   workflow_dispatch:
     inputs:
       target-sha:
