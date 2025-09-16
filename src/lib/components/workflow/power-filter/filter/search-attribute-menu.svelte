@@ -65,7 +65,6 @@
     controls="search-attribute-menu"
     leadingIcon="add"
     disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
-    count={showOptions ? ($filter.attribute ? 0 : filters.length) : 0}
     on:click={() => (searchAttributeValue = '')}
     class="text-nowrap"
     size="xs"
