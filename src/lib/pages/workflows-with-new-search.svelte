@@ -36,13 +36,15 @@
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
-  import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
+  // import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
+  import PowerFilter from '$lib/components/workflow/power-filter/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import SavedQueryViews from '$lib/pages/saved-query-views.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
@@ -58,8 +60,6 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
-
-  import QueryStack from './query-stack.svelte';
 
   const query = $derived(page.url.searchParams.get('query'));
   const namespace = $derived(page.params.namespace);
@@ -244,9 +244,10 @@
   </div>
 </header>
 
-<WorkflowSearchAttributeFilter />
+<!-- <WorkflowSearchAttributeFilter /> -->
+<PowerFilter />
 <div class="flex overflow-auto">
-  <QueryStack />
+  <SavedQueryViews />
   <div
     class="flex w-[calc(100%-80px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]"
   >

@@ -29,6 +29,7 @@
     error?: boolean;
     'data-testid'?: string;
     class?: string;
+    inputClass?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -70,6 +71,7 @@
 
   let className = '';
   export { className as class };
+  export let inputClass = '';
 
   let testId = $$props['data-testid'] || id;
 
@@ -95,6 +97,7 @@
       class={merge(
         'input-container',
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        inputClass,
       )}
       class:disabled
       class:error
