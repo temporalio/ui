@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import { writable, type Writable } from 'svelte/store';
 
-  import { setContext, type Snippet, tick } from 'svelte';
+  import { setContext, type Snippet } from 'svelte';
 
   export const FILTER_CONTEXT = 'filter-context';
 
@@ -18,8 +18,6 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import DropdownFilterList from '$lib/components/workflow/power-filter/filter/dropdown-filter-list.svelte';
-  import SearchAttributeMenu from '$lib/components/workflow/power-filter/filter/search-attribute-menu.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -29,21 +27,25 @@
   } from '$lib/stores/search-attributes';
   import { refresh } from '$lib/stores/workflows';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
-  import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
-  import {
-    combineFilters,
-    emptyFilter,
-  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  import DropdownFilterList from './dropdown-filter-list.svelte';
+  import SearchAttributeMenu from './search-attribute-menu.svelte';
 
   type Props = {
     filters?: SearchAttributeFilter[];
     searchAttributeOptions?: SearchAttributeOption[] | null;
     children?: Snippet;
+    actions?: Snippet;
   };
 
-  let { filters = $workflowFilters, searchAttributeOptions = null }: Props =
-    $props();
+  let {
+    filters = $workflowFilters,
+    searchAttributeOptions = null,
+    actions,
+  }: Props = $props();
 
   const filter = writable<SearchAttributeFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
@@ -93,42 +95,16 @@
     onSearch();
   }
 
-  function updateFocusedElementId() {
-    if ($activeQueryIndex !== null) {
-      $focusedElementId = getFocusedElementId($filter);
-    }
-  }
-
-  function updateFocus() {
-    if ($focusedElementId) {
-      const element = document.getElementById($focusedElementId);
-      if (element) {
-        element.focus();
-        if (element instanceof HTMLButtonElement) {
-          element.click();
-        }
-      }
-    }
-  }
-
   function resetFilter() {
     activeQueryIndex.set(null);
     filter.set(emptyFilter());
   }
-
-  $effect(() => {
-    $activeQueryIndex;
-    updateFocusedElementId();
-  });
-
-  $effect(() => {
-    tick().then(() => {
-      updateFocus();
-    });
-  });
 </script>
 
 <div class="flex shrink items-center justify-start gap-2">
   <DropdownFilterList />
   <SearchAttributeMenu {options} />
+
+  <div class="flex items-center justify-end gap-1"></div>
+  {@render actions?.()}
 </div>

@@ -30,13 +30,13 @@
 {#snippet viewToggleButtons()}
   <div class="flex items-center gap-1 border-r border-subtle pr-2">
     <Button
-      variant={view === 'search' ? 'primary' : 'ghost'}
+      variant={view === 'search' ? 'secondary' : 'ghost'}
       size="xs"
       leadingIcon="rocket-ship"
       on:click={() => (view = 'search')}
     />
     <Button
-      variant={view === 'filter' ? 'primary' : 'ghost'}
+      variant={view === 'filter' ? 'secondary' : 'ghost'}
       size="xs"
       leadingIcon="filter"
       on:click={() => (view = 'filter')}
