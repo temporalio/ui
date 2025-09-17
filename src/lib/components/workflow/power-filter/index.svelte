@@ -69,7 +69,7 @@
   <div
     class="flex w-full items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
   >
-    <div class="flex shrink items-center justify-start gap-2">
+    <div class="flex grow items-center justify-start gap-2">
       {@render viewToggleButtons()}
       {@render content()}
     </div>
