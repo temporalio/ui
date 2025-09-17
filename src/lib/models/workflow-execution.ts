@@ -92,7 +92,7 @@ const getStartDelay = ({
   const delayMs =
     new Date(executionTime).getTime() - new Date(startTime).getTime();
   if (delayMs > 0) {
-    return delayMs / 1000 + 's';
+    return Math.round(delayMs / 1000) + 's';
   }
   return undefined;
 };
