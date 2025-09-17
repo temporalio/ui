@@ -134,7 +134,10 @@
           handleNewQuery(value, type);
         }}
       >
-        {label}
+        <div>
+          <p class="leading-3">{label}</p>
+          <small class="text-secondary">{type}</small>
+        </div>
       </MenuItem>
     {:else}
       <MenuItem class="whitespace-nowrap" disabled

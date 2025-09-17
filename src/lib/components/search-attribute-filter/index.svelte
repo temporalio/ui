@@ -24,7 +24,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { savedQueries } from '$lib/stores/saved-queries';
   import {
     type SearchAttributeOption,
     sortedSearchAttributeOptions,
@@ -50,13 +49,10 @@
   import BooleanFilter from './boolean-filter.svelte';
   import CloseFilter from './close-filter-button.svelte';
   import DatetimeFilter from './datetime-filter.svelte';
-  import DeleteViewModal from './delete-view-modal.svelte';
   import DurationFilter from './duration-filter.svelte';
-  import EditViewModal from './edit-view-modal.svelte';
   import FilterList from './filter-list.svelte';
   import ListFilter from './list-filter.svelte';
   import NumberFilter from './number-filter.svelte';
-  import SaveViewModal from './save-view-modal.svelte';
   import SearchAttributeMenu from './search-attribute-menu.svelte';
   import StatusFilter from './status-filter.svelte';
   import TextFilter from './text-filter.svelte';
@@ -71,7 +67,7 @@
   };
 
   let {
-    filters,
+    filters = $bindable([]),
     searchAttributeOptions = null,
     showFilter = true,
     refresh,
@@ -83,19 +79,10 @@
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
 
-  let saveViewModalOpen = $state(false);
-  let editViewModalOpen = $state(false);
-  let deleteViewModalOpen = $state(false);
-
-  const namespace = $derived(page.params.namespace);
   const searchParamQuery = $derived(page.url.searchParams.get('query'));
   const showActions = $derived(filters.length && !$filter.attribute);
   const options = $derived(
     searchAttributeOptions ?? $sortedSearchAttributeOptions,
-  );
-
-  const savedQueryView = $derived(
-    $savedQueries[namespace]?.find((q) => q.query === searchParamQuery),
   );
 
   setContext<FilterContext>(FILTER_CONTEXT, {
@@ -259,18 +246,6 @@
 
     <div class="flex items-center justify-end gap-1">
       {#if showActions}
-        <Button variant="secondary" on:click={() => (saveViewModalOpen = true)}>
-          {translate('common.save')}
-        </Button>
-        {#if savedQueryView}
-          <Button
-            variant="destructive"
-            on:click={() => (deleteViewModalOpen = true)}
-          >
-            {translate('common.delete')}
-          </Button>
-        {/if}
-
         {#if showFilter}
           <Button variant="ghost" on:click={handleClearInput}>
             {translate('common.clear-all')}
@@ -290,6 +265,3 @@
   </div>
   <FilterList bind:filters />
 </div>
-<SaveViewModal bind:open={saveViewModalOpen} />
-<EditViewModal view={savedQueryView} bind:open={editViewModalOpen} />
-<DeleteViewModal view={savedQueryView} bind:open={deleteViewModalOpen} />
