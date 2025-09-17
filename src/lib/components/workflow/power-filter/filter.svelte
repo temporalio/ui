@@ -16,6 +16,8 @@
 </script>
 
 <script lang="ts">
+  import { afterNavigate } from '$app/navigation';
+
   import DropdownFilterList from '$lib/components/workflow/power-filter/dropdown-filter-list.svelte';
   import SearchAttributeMenu from '$lib/components/workflow/power-filter/search-attribute-menu.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
@@ -29,6 +31,10 @@
   const chipOpenIndex = writable<number>(null);
 
   const options = $derived($sortedSearchAttributeOptions);
+
+  afterNavigate(() => {
+    chipOpenIndex.set(null);
+  });
 
   setContext<FilterContext>(FILTER_CONTEXT, {
     filter,
