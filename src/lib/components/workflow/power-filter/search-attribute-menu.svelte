@@ -26,7 +26,7 @@
   } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
 
-  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
 
   export let options: SearchAttributeOption[];
 
@@ -35,23 +35,44 @@
 
   const open = writable(false);
 
-  function isOptionDisabled(value: string) {
-    return $workflowFilters.some(
-      (filter) =>
-        ['=', '!=', 'is', 'is not'].includes(filter.conditional) &&
-        filter.attribute === value,
-    );
-  }
+  // function isOptionDisabled(value: string) {
+  //   return $workflowFilters.some(
+  //     (filter) =>
+  //       ['=', '!=', 'is', 'is not'].includes(filter.conditional) &&
+  //       filter.attribute === value,
+  //   );
+  // }
+
+  const getDefaultConditional = (type: SearchAttributeType) => {
+    switch (type) {
+      case SEARCH_ATTRIBUTE_TYPE.BOOL:
+        return 'true';
+      case SEARCH_ATTRIBUTE_TYPE.DATETIME:
+        return '>=';
+      case SEARCH_ATTRIBUTE_TYPE.INT:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.DOUBLE:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST:
+        return 'in';
+      case SEARCH_ATTRIBUTE_TYPE.KEYWORD:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.TEXT:
+        return '=';
+      default:
+        return '=';
+    }
+  };
 
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
-    const conditional = type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST ? 'in' : '=';
-    // Create a new filter, submit to parent to append to list
-    const newFilter = { ...emptyFilter(), attribute: value, conditional, type };
-    filter.set(newFilter);
-    // Parent will push and set chipOpenIndex to new chip
+    filter.set({
+      ...emptyFilter(),
+      attribute: value,
+      conditional: getDefaultConditional(type),
+      type,
+    });
     handleSubmit();
-    // Close the attribute menu after selection
     $open = false;
   }
 
@@ -108,12 +129,10 @@
     <hr class="border-subtle" />
 
     {#each filteredOptions as { value, label, type }}
-      {@const disabled = isOptionDisabled(value)}
       <MenuItem
         on:click={() => {
           handleNewQuery(value, type);
         }}
-        {disabled}
       >
         {label}
       </MenuItem>

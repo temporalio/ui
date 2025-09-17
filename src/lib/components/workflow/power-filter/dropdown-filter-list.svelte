@@ -11,7 +11,7 @@
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import DropdownFilterChip from './dropdown-filter-chip.svelte';
-  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
 
   const { filter, activeQueryIndex, chipOpenIndex } =
     getContext<FilterContext>(FILTER_CONTEXT);
@@ -21,11 +21,12 @@
   const visibleFilters = $derived(
     $workflowFilters.slice(0, totalFiltersInView),
   );
+
   const hasMoreFilters = $derived(totalFiltersInView < $workflowFilters.length);
 
   function updateFilter(index: number, updatedFilter: SearchAttributeFilter) {
     const next = [...$workflowFilters];
-    next[index] = updatedFilter;
+    next[index] = { ...updatedFilter };
     $workflowFilters = next;
     updateQueryParamsFromFilter(page.url, $workflowFilters, true);
   }
@@ -36,7 +37,6 @@
     $workflowFilters = next;
     updateQueryParamsFromFilter(page.url, $workflowFilters, true);
 
-    // Handle operator cleanup
     if (index === $workflowFilters.length && $workflowFilters.length > 0) {
       const previousQuery = $workflowFilters[$workflowFilters.length - 1];
       if (previousQuery) {
@@ -44,7 +44,6 @@
       }
     }
 
-    // Reset active filter if it was the one being removed
     if (index === $activeQueryIndex) {
       $activeQueryIndex = null;
       $filter = emptyFilter();

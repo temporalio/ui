@@ -8,8 +8,9 @@
   import { isInConditional } from '$lib/utilities/is';
   import { formatListFilterValue } from '$lib/utilities/query/search-attribute-filter';
 
+  import { FILTER_CONTEXT, type FilterContext } from '../filter.svelte';
+
   import ConditionalMenu from './conditional-menu.svelte';
-  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 

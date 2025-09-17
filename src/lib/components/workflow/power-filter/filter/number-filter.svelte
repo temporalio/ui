@@ -4,8 +4,9 @@
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import { FILTER_CONTEXT, type FilterContext } from '../filter.svelte';
+
   import ConditionalMenu from './conditional-menu.svelte';
-  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
   const { filter, focusedElementId, handleSubmit } =
     getContext<FilterContext>(FILTER_CONTEXT);

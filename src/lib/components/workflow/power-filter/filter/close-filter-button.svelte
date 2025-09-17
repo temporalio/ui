@@ -4,7 +4,7 @@
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from '../filter.svelte';
 
   const { resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
 </script>

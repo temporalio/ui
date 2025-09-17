@@ -20,7 +20,7 @@
   import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
-  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
+  import { FILTER_CONTEXT, type FilterContext } from '../filter.svelte';
 
   export let filters: SearchAttributeFilter[];
 

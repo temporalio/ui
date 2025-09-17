@@ -1,15 +1,16 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import DeleteViewModal from '$lib/components/search-attribute-filter/delete-view-modal.svelte';
-  import EditViewModal from '$lib/components/search-attribute-filter/edit-view-modal.svelte';
-  import SaveViewModal from '$lib/components/search-attribute-filter/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { workflowFilters } from '$lib/stores/filters';
   import { savedQueries } from '$lib/stores/saved-queries';
 
-  import Filter from './filter/index.svelte';
+  import DeleteViewModal from './delete-view-modal.svelte';
+  import EditViewModal from './edit-view-modal.svelte';
+  import Filter from './filter.svelte';
   import ManualQuery from './manual-query.svelte';
+  import SaveViewModal from './save-view-modal.svelte';
   import Search from './search.svelte';
 
   let view: 'filter' | 'search' = $state('filter');
@@ -52,8 +53,20 @@
       leadingIcon="json"
       on:click={() => (viewManualQuery = !viewManualQuery)}
     />
-    <Button variant="primary" size="xs">{translate('common.save')}</Button>
-    <Button variant="secondary" size="xs">{translate('common.discard')}</Button>
+    <Button
+      variant="primary"
+      size="xs"
+      disabled={!$workflowFilters.length}
+      on:click={() => (saveViewModalOpen = true)}
+      >{translate('common.save')}</Button
+    >
+    <Button
+      variant="secondary"
+      size="xs"
+      disabled={!savedQueryView}
+      on:click={() => (deleteViewModalOpen = true)}
+      >{translate('common.discard')}</Button
+    >
   </div>
 {/snippet}
 
