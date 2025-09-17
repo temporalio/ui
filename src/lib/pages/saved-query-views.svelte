@@ -70,14 +70,14 @@
       query: '',
       icon: 'workflow',
     },
-    {
-      id: 'task-failures',
-      name: 'Task Failures',
-      query: 'ExecutionStatus = "Running"',
-      icon: 'error',
-      count: 8,
-      class: 'text-red-700 dark:text-red-300',
-    },
+    // {
+    //   id: 'task-failures',
+    //   name: 'Task Failures',
+    //   query: 'ExecutionStatus = "Running"',
+    //   icon: 'error',
+    //   count: 8,
+    //   class: 'text-red-700 dark:text-red-300',
+    // },
     {
       id: 'child-workflows',
       name: 'Parent Workflows',
