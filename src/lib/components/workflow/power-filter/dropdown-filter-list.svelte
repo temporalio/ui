@@ -26,16 +26,16 @@
 
   function updateFilter(index: number, updatedFilter: SearchAttributeFilter) {
     const next = [...$workflowFilters];
-    next[index] = { ...updatedFilter };
+    next[index] = updatedFilter;
     $workflowFilters = next;
-    updateQueryParamsFromFilter(page.url, $workflowFilters, true);
+    updateQueryParamsFromFilter(page.url, $workflowFilters);
   }
 
   function removeFilter(index: number) {
     const next = [...$workflowFilters];
     next.splice(index, 1);
     $workflowFilters = next;
-    updateQueryParamsFromFilter(page.url, $workflowFilters, true);
+    updateQueryParamsFromFilter(page.url, $workflowFilters);
 
     if (index === $workflowFilters.length && $workflowFilters.length > 0) {
       const previousQuery = $workflowFilters[$workflowFilters.length - 1];

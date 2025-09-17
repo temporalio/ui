@@ -2,6 +2,7 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowFilters } from '$lib/stores/filters';
   import { savedQueries } from '$lib/stores/saved-queries';
@@ -11,10 +12,6 @@
   import Filter from './filter.svelte';
   import ManualQuery from './manual-query.svelte';
   import SaveViewModal from './save-view-modal.svelte';
-  import Search from './search.svelte';
-
-  let view: 'filter' | 'search' = $state('filter');
-  let query = $state('');
 
   let viewManualQuery = $state(false);
   let saveViewModalOpen = $state(false);
@@ -29,19 +26,8 @@
 </script>
 
 {#snippet viewToggleButtons()}
-  <div class="flex items-center gap-1 border-r border-subtle pr-2">
-    <Button
-      variant={view === 'search' ? 'secondary' : 'ghost'}
-      size="xs"
-      leadingIcon="rocket-ship"
-      on:click={() => (view = 'search')}
-    />
-    <Button
-      variant={view === 'filter' ? 'secondary' : 'ghost'}
-      size="xs"
-      leadingIcon="filter"
-      on:click={() => (view = 'filter')}
-    />
+  <div class="flex items-center gap-1 pl-2">
+    <Icon name="filter-lines" class="text-muted h-4 w-4" />
   </div>
 {/snippet}
 
@@ -70,21 +56,13 @@
   </div>
 {/snippet}
 
-{#snippet content()}
-  {#if view === 'search'}
-    <Search bind:query />
-  {:else}
-    <Filter />
-  {/if}
-{/snippet}
-
 <div>
   <div
     class="flex w-full items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
   >
     <div class="flex grow items-center justify-start gap-2">
       {@render viewToggleButtons()}
-      {@render content()}
+      <Filter />
     </div>
     {@render actionToggleButtons()}
   </div>

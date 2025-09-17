@@ -148,11 +148,6 @@
     $open = false;
   }
 
-  function cancelChanges() {
-    localFilter = { ...filter };
-    $open = false;
-  }
-
   function handleStatusSelect(status: string) {
     localFilter = {
       ...localFilter,
@@ -295,20 +290,12 @@
 
         <div class="flex justify-end gap-2">
           <Button
-            trailingIcon="close"
+            trailingIcon="trash"
             variant="secondary"
             size="xs"
             type="button"
             on:click={onRemove}>Remove</Button
           >
-          <Button
-            variant="ghost"
-            size="xs"
-            type="button"
-            on:click={cancelChanges}
-          >
-            Cancel
-          </Button>
           <Button variant="primary" size="xs" type="submit">Apply</Button>
         </div>
       </div>
