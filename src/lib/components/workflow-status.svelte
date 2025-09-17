@@ -96,26 +96,12 @@
     )}
     data-testid={$$props['test-id']}
   >
-    {#if delayed}
-      <span
-        class={merge(
-          workflowStatus({
-            status: 'Paused',
-          }),
-          'rounded-r-none',
-          big && 'h-8 px-2',
-        )}
-      >
-        <Icon name="clock" class={merge(!big && 'px-0.5')} />
-      </span>
-    {/if}
     <span
       class={merge(
         workflowStatus({
           status,
         }),
-        newCount && 'rounded-r-none',
-        delayed && 'rounded-l-none',
+        (newCount || delayed) && 'rounded-r-none',
         big && 'h-8 px-4',
       )}
     >
@@ -126,10 +112,24 @@
       {/if}
 
       {label[status]}
-      {#if status === 'Running'}
+      {#if status === 'Running' && !delayed}
         <HeartBeat {delay} />
       {/if}
     </span>
+    {#if delayed}
+      <span
+        class={merge(
+          workflowStatus({
+            status: 'Paused',
+          }),
+          'rounded-l-none',
+          newCount && 'rounded-r-none',
+          big && 'h-8 px-2',
+        )}
+      >
+        <Icon name="clock" class={merge(!big && 'px-0.5')} />
+      </span>
+    {/if}
     {#if newCount}
       <span
         class={merge(
