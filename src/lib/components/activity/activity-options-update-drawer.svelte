@@ -14,26 +14,17 @@
   import { refresh } from '$lib/stores/workflow-run';
   import type { ActivityOptions } from '$lib/types';
   import type { PendingActivity } from '$lib/types/events';
-  import { formatSecondsAbbreviated } from '$lib/utilities/format-time';
+  import {
+    formatSecondsAbbreviated,
+    fromDurationToNumber,
+    fromNumberToDuration,
+  } from '$lib/utilities/format-time';
 
   type Props = {
     open: boolean;
     namespace: string;
     execution: WorkflowExecution;
     activity: PendingActivity;
-  };
-
-  const fromDurationToNumber = (duration: string): string => {
-    if (!duration || !duration.endsWith('s')) {
-      return '';
-    }
-
-    return duration?.replace('s', '');
-  };
-
-  const fromNumberToDuration = (duration: string): string => {
-    if (!duration) return undefined;
-    return duration + 's';
   };
 
   let { open = $bindable(), namespace, execution, activity }: Props = $props();

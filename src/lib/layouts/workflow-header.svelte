@@ -24,6 +24,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
@@ -56,18 +57,16 @@
     run: runId,
   });
 
-  const isRunning = $derived($workflowRun?.workflow?.isRunning);
+  const isRunning = $derived(workflow?.isRunning);
   const activitiesCanceled = $derived(
-    ['Terminated', 'TimedOut', 'Canceled'].includes(
-      $workflowRun.workflow?.status,
-    ),
+    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
   );
   const cancelInProgress = $derived(
-    isCancelInProgress($workflowRun?.workflow?.status, $fullEventHistory),
+    isCancelInProgress(workflow?.status, $fullEventHistory),
   );
   const resetRunId = $derived(
-    $workflowRun?.workflow.workflowExtendedInfo?.resetRunId ||
-      $resetWorkflows[$workflowRun?.workflow?.runId],
+    workflow.workflowExtendedInfo?.resetRunId ||
+      $resetWorkflows[workflow?.runId],
   );
   const workflowHasBeenReset = $derived(!!resetRunId);
   const workflowRelationships = $derived(
@@ -119,7 +118,11 @@
       <div
         class="flex flex-wrap items-center justify-between gap-4 max-xl:w-full"
       >
-        <WorkflowStatus status={workflow?.status} big />
+        <WorkflowStatus
+          status={workflow?.status}
+          big
+          delayed={isWorkflowDelayed(workflow)}
+        />
         <div class="xl:hidden">
           <WorkflowActions
             {isRunning}

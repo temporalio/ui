@@ -23,7 +23,6 @@
       'items-center',
       'justify-center',
       'text-nowrap',
-      'break-all',
       'rounded-sm',
       'p-1',
       'text-sm',

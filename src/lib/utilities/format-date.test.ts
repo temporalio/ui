@@ -60,6 +60,11 @@ describe('formatDate', () => {
 
   it('should format relative local time', () => {
     expect(formatDate(date, 'local', { relative: true })).toContain('ago');
+    const currentDate = new Date();
+    const futureDate = currentDate.setDate(currentDate.getDate() + 1);
+    expect(formatDate(futureDate, 'local', { relative: true })).toContain(
+      'from now',
+    );
   });
 
   it('should not format other timezones as relative', () => {

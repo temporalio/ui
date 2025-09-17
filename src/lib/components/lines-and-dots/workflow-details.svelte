@@ -100,10 +100,22 @@
     text={formatDate(workflow?.startTime, $timeFormat, {
       relative: $relativeTime,
     })}
-    tooltipText={$relativeTime
-      ? formatDate(workflow?.startTime, $timeFormat, { relative: false })
-      : formatDate(workflow?.startTime, $timeFormat, { relative: true })}
+    tooltipText={formatDate(workflow?.startTime, $timeFormat, {
+      relative: !$relativeTime,
+    })}
   />
+
+  {#if workflow?.startDelay}
+    <DetailListLabel>{translate('workflows.execution-start')}</DetailListLabel>
+    <DetailListTextValue
+      text={formatDate(workflow?.executionTime, $timeFormat, {
+        relative: $relativeTime,
+      })}
+      tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
+        relative: !$relativeTime,
+      })}
+    />
+  {/if}
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
   <DetailListTextValue
@@ -112,9 +124,9 @@
           relative: $relativeTime,
         })
       : '-'}
-    tooltipText={$relativeTime
-      ? formatDate(workflow?.endTime, $timeFormat, { relative: false })
-      : formatDate(workflow?.endTime, $timeFormat, { relative: true })}
+    tooltipText={formatDate(workflow?.endTime, $timeFormat, {
+      relative: !$relativeTime,
+    })}
   />
 
   <DetailListLabel>
