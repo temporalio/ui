@@ -54,7 +54,7 @@
   <div
     class="flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
   >
-    <div class="flex grow items-center justify-start gap-2">
+    <div class="flex grow items-center justify-start gap-2 pl-2">
       <Icon name="filter-lines" class="text-muted h-4 w-4" />
       <Filter />
     </div>
