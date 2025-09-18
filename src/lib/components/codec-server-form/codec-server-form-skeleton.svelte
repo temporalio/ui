@@ -10,7 +10,7 @@
 </script>
 
 <div class="space-y-6 {className}">
-  <Card class="space-y-6">
+  <Card class="space-y-6 p-4">
     <!-- Info alert skeleton -->
     <Skeleton class="h-16 w-full rounded" />
 
@@ -34,7 +34,7 @@
   </Card>
 
   <div class="flex gap-3">
-    <Skeleton class="h-10 w-16 rounded" />
+    <Skeleton class="h-10 w-20 rounded" />
     <Skeleton class="h-10 w-20 rounded" />
   </div>
 </div>
