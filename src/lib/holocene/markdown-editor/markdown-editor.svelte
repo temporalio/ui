@@ -9,7 +9,7 @@
   import { useDarkMode } from '$lib/utilities/dark-mode';
   import { getEditorThemeWithLineNumbers } from '$lib/vendor/codemirror/custom-extensions';
 
-  import MarkdownPreview from './markdown-preview.svelte';
+  import MarkdownPreview from './preview.svelte';
 
   interface Props {
     content: string;

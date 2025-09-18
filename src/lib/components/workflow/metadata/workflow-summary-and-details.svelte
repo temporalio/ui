@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Markdown from '$lib/holocene/markdown-editor/markdown-preview.svelte';
+  import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 

@@ -5,7 +5,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Markdown from '$lib/holocene/markdown-editor/markdown-preview.svelte';
+  import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
