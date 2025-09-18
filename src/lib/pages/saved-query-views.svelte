@@ -66,7 +66,10 @@
   const savedQuery = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
 
-  const namespaceSavedQueries = $derived($savedQueries[namespace] || []);
+  const namespaceSavedQueries = $derived(
+    $savedQueries?.[namespace]?.sort((a, b) => a.name.localeCompare(b.name)) ||
+      [],
+  );
   const systemQuery = $derived(
     query && systemViews.find((q) => q.query === query),
   );
