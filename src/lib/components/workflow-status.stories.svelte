@@ -25,6 +25,7 @@
           disable: true,
         },
       },
+      delayed: { name: 'Delayed', control: 'boolean' },
     },
   } satisfies Meta<WorkflowStatus>;
 
@@ -67,3 +68,5 @@
 <Story name="Big" args={{ big: true }} />
 
 <Story name="Big with Counts" args={{ big: true, ...withNewCount }} />
+
+<Story name="Delayed" args={{ delayed: true }} />

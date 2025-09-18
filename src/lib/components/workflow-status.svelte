@@ -4,7 +4,9 @@
   import { cva } from 'class-variance-authority';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventClassification } from '$lib/models/event-history/get-event-classification';
   import type { ScheduleStatus } from '$lib/types/schedule';
@@ -25,6 +27,7 @@
   export let loading = false;
   export let newCount: number | undefined = undefined;
   export let big = false;
+  export let delayed = false;
 
   const label: Record<Status, string> = {
     Running: translate('workflows.running'),
@@ -49,7 +52,9 @@
   };
 
   const workflowStatus = cva(
-    ['flex items-center rounded-sm px-1 py-0.5 whitespace-nowrap text-black'],
+    [
+      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap text-black gap-1 font-medium',
+    ],
     {
       variants: {
         status: {
@@ -78,43 +83,63 @@
   );
 </script>
 
-<div
-  class="relative flex items-center gap-0 text-center text-xs leading-4"
-  data-testid={$$props['test-id']}
+<Tooltip
+  topLeft
+  text={translate('workflows.delayed')}
+  hide={!delayed}
+  class="block"
 >
-  <span
-    class="flex items-center gap-1 font-medium {workflowStatus({
-      status,
-    })}"
-    class:rounded-r-none={newCount}
-    class:big
+  <div
+    class={merge(
+      'relative flex items-center gap-0 text-center text-xs leading-4',
+      big && 'text-lg',
+    )}
+    data-testid={$$props['test-id']}
   >
-    {#if loading}
-      <Spinner class="h-4 w-4 animate-spin" />
-    {:else if count >= 0}
-      {count.toLocaleString()}
-    {/if}
-
-    {label[status]}
-    {#if status === 'Running'}
-      <HeartBeat {delay} />
-    {/if}
-  </span>
-  {#if newCount}
     <span
       class={merge(
-        'font-base surface-primary rounded-r px-1 py-0.5 text-xs',
-        big && 'text-lg',
+        workflowStatus({
+          status,
+        }),
+        (newCount || delayed) && 'rounded-r-none',
+        big && 'h-8 px-4',
       )}
-      in:fade
     >
-      {#if newCount > 0}+{/if}{newCount}
-    </span>
-  {/if}
-</div>
+      {#if loading}
+        <Spinner class="h-4 w-4 animate-spin" />
+      {:else if count >= 0}
+        {count.toLocaleString()}
+      {/if}
 
-<style lang="postcss">
-  .big {
-    @apply flex justify-center px-4 text-lg;
-  }
-</style>
+      {label[status]}
+      {#if status === 'Running' && !delayed}
+        <HeartBeat {delay} />
+      {/if}
+    </span>
+    {#if delayed}
+      <span
+        class={merge(
+          workflowStatus({
+            status: 'Paused',
+          }),
+          'rounded-l-none',
+          newCount && 'rounded-r-none',
+          big && 'h-8 px-2',
+        )}
+      >
+        <Icon name="clock" class={merge(!big && 'px-0.5')} />
+      </span>
+    {/if}
+    {#if newCount}
+      <span
+        class={merge(
+          'font-base surface-primary rounded-r-sm px-1 py-0.5',
+          big && 'px-2',
+        )}
+        in:fade
+      >
+        {#if newCount > 0}+{/if}{newCount}
+      </span>
+    {/if}
+  </div>
+</Tooltip>

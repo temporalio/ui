@@ -123,6 +123,7 @@ type StartWorkflowOptions = {
   details: string;
   searchAttributes: SearchAttributeInput[];
   identity?: string;
+  workflowStartDelay?: string;
 };
 
 type TerminateWorkflowOptions = {
@@ -581,6 +582,7 @@ export async function startWorkflow({
   messageType,
   searchAttributes,
   identity,
+  workflowStartDelay,
 }: StartWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow', {
     namespace,
@@ -642,6 +644,7 @@ export async function startWorkflow({
             },
           },
     ...(identity && { identity }),
+    ...(workflowStartDelay && { workflowStartDelay }),
   });
 
   return requestFromAPI(route, {

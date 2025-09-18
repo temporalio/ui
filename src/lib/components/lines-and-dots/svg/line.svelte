@@ -10,6 +10,7 @@
   export let retried = false;
   export let strokeWidth: number = 2;
   export let strokeDasharray = 'none';
+  export let delayed = false;
 
   $: [x1, y1] = startPoint;
   $: [x2, y2] = endPoint;
@@ -32,6 +33,7 @@
   class:scheduling
   class:animate-line={pending && !paused}
   class:retried={retried && classification === 'Completed'}
+  class:delayed
   stroke-width={strokeWidth}
   stroke-dasharray={pending ? '3' : strokeDasharray}
   x1={Math.max(0, x1)}
@@ -114,6 +116,10 @@
 
   .Running {
     stroke: #3b82f6;
+
+    &.delayed {
+      stroke: #fbbf24;
+    }
   }
 
   .animate-line {

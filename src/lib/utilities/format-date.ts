@@ -29,17 +29,18 @@ export function formatDate(
 ): string {
   if (!date) return '';
 
-  const {
-    relative = false,
-    relativeLabel = 'ago',
-    relativeStrict = false,
-    abbrFormat = false,
-  } = options;
-
   try {
     if (isTimestamp(date)) {
       date = timestampToDate(date);
     }
+
+    const isFutureDate = new Date(date).getTime() - Date.now() > 0;
+    const {
+      relative = false,
+      relativeLabel = isFutureDate ? 'from now' : 'ago',
+      relativeStrict = false,
+      abbrFormat = false,
+    } = options;
 
     const parsed = parseJSON(new Date(date));
 
