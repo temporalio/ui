@@ -5,7 +5,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Markdown from '$lib/holocene/monaco/markdown.svelte';
+  import Markdown from '$lib/holocene/markdown-editor/markdown-preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
@@ -93,7 +93,7 @@
   <div class="surface-background h-full">
     {#key currentDetails}
       <Markdown
-        className="p-3"
+        class="p-3"
         overrideTheme="background"
         content={currentDetails}
       />
