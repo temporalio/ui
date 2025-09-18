@@ -1,41 +1,49 @@
 <script lang="ts">
-  import ApiError from '$lib/components/api-error.svelte';
+  import FormError from '$lib/components/form/form-error.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { ApiError as ApiErrorType } from '$lib/utilities/api-error-handler';
 
-  import type { SearchAttributesAdapter } from './types';
+  import type { SearchAttributeDefinition } from './types';
 
-  import { loadInitialAttributes } from './config.svelte';
   import SearchAttributesFormContent from './search-attributes-form-content.svelte';
   import SearchAttributesFormSkeleton from './search-attributes-form-skeleton.svelte';
 
   interface Props {
     class?: string;
-    adapter: SearchAttributesAdapter;
+    initialAttributesPromise: Promise<SearchAttributeDefinition[]>;
+    onSave: (attributes: SearchAttributeDefinition[]) => Promise<void>;
+    onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+    onCancel?: () => void;
+    onRetry?: () => void;
+    getSupportedTypes: () => { label: string; value: string }[];
   }
 
-  let { class: className = '', adapter }: Props = $props();
-
-  let attributesPromise = $derived(loadInitialAttributes(adapter));
-
-  const retryLoad = async () => {
-    attributesPromise = loadInitialAttributes(adapter);
-  };
+  let {
+    class: className = '',
+    initialAttributesPromise,
+    onSave,
+    onSuccess,
+    onCancel,
+    onRetry,
+    getSupportedTypes,
+  }: Props = $props();
 </script>
 
-{#await attributesPromise}
+{#await initialAttributesPromise}
   <SearchAttributesFormSkeleton class={className} />
 {:then initialAttributes}
   <SearchAttributesFormContent
     class={className}
-    {adapter}
     {initialAttributes}
+    {onSave}
+    {onSuccess}
+    {onCancel}
+    {getSupportedTypes}
   />
 {:catch error}
-  <ApiError
+  <FormError
     class={className}
-    error={error as ApiErrorType}
-    retryConfig={{ onRetry: retryLoad }}
     title={translate('search-attributes.load-error-title')}
+    message={error.message}
+    {onRetry}
   />
 {/await}

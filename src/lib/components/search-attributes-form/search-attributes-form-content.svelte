@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { superForm } from 'sveltekit-superforms';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { z } from 'zod';
+
   import Message from '$lib/components/form/message.svelte';
   import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
@@ -11,147 +14,215 @@
 
   import type {
     SearchAttributeDefinition,
-    SearchAttributesAdapter,
+    SearchAttributeTypeOption,
   } from './types';
-
-  import { createFormConfig, createFormHandlers } from './config.svelte';
 
   interface Props {
     class?: string;
-    adapter: SearchAttributesAdapter;
     initialAttributes: SearchAttributeDefinition[];
+    onSave: (attributes: SearchAttributeDefinition[]) => Promise<void>;
+    onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
+    onCancel?: () => void;
+    showTainted?: boolean;
+    getSupportedTypes: () => SearchAttributeTypeOption[];
   }
 
-  let { class: className = '', adapter, initialAttributes }: Props = $props();
+  let {
+    class: className = '',
+    initialAttributes,
+    onSave,
+    onSuccess = () => {},
+    onCancel = () => {},
+    showTainted = true,
+    getSupportedTypes,
+  }: Props = $props();
 
-  const { superFormInstance, supportedTypes, defaultType } = $derived(
-    createFormConfig(adapter, initialAttributes),
-  );
+  const supportedTypes = $derived(getSupportedTypes());
+  const defaultType = $derived(supportedTypes[0]?.value || '');
+
+  // Create form schema
+  const createFormSchema = (typeValues: string[]) => {
+    return z.object({
+      attributes: z
+        .array(
+          z.object({
+            name: z
+              .string()
+              .min(1, translate('search-attributes.validation-name-required')),
+            type: z.enum(typeValues as [string, ...string[]]),
+          }),
+        )
+        .refine(
+          (attributes) => {
+            const names = attributes.map((attr) => attr.name);
+            return names.length === new Set(names).size;
+          },
+          {
+            message: translate('search-attributes.validation-names-unique'),
+          },
+        ),
+    });
+  };
+
+  const typeValues = getSupportedTypes().map((type) => type.value);
 
   const {
-    form,
+    form: formData,
     errors,
     submitting,
     message,
     enhance,
     tainted,
-    isTainted,
     reset,
-  } = $derived(superFormInstance);
+  } = superForm(
+    { attributes: initialAttributes },
+    {
+      taintedMessage: true,
+      SPA: true,
+      dataType: 'json',
+      validators: zodClient(createFormSchema(typeValues)),
+      resetForm: false,
+      onUpdate: async ({ form }) => {
+        if (!form.valid) return;
 
-  const { addAttribute, removeAttribute, handleCancel } = $derived(
-    createFormHandlers(
-      form,
-      defaultType,
-      adapter.onCancel || (() => {}),
-      reset,
-    ),
+        try {
+          await onSave(form.data.attributes);
+          onSuccess(form.data.attributes);
+          return { type: 'success' };
+        } catch (error) {
+          return {
+            type: 'error',
+            error: {
+              message:
+                error.message || translate('search-attributes.save-error'),
+            },
+          };
+        }
+      },
+    },
   );
 
+  const addAttribute = () => {
+    $formData.attributes = [
+      ...$formData.attributes,
+      { name: '', type: defaultType },
+    ];
+  };
+
+  const removeAttribute = (index: number) => {
+    $formData.attributes = $formData.attributes.filter((_, i) => i !== index);
+  };
+
+  const handleCancel = () => {
+    reset();
+    onCancel();
+  };
+
   const taintedCount = $derived(
-    Object.values($tainted.attributes || {}).filter((attr) =>
+    Object.values($tainted?.attributes || {}).filter((attr) =>
       Object.values(attr).some((value) => value === true),
     ).length,
   );
+
+  const disabled = $derived($submitting || taintedCount === 0);
 </script>
 
-<div class="space-y-6 {className}">
-  <form use:enhance class="space-y-4">
-    <Card class="space-y-3">
-      <div
-        class="text-gray-700 grid grid-cols-[1fr_140px_40px] gap-3 border-b border-subtle pb-2 text-sm font-medium"
-      >
-        <div>{translate('search-attributes.column-attribute')}</div>
-        <div>{translate('search-attributes.column-type')}</div>
-        <div></div>
-      </div>
+<Card class={className}>
+  <form use:enhance>
+    <div class="p-4">
+      <div class="space-y-4">
+        <Message value={$message} />
 
-      {#each $form.attributes as attribute, index}
-        <div class="grid grid-cols-[1fr_140px_40px] items-start gap-3">
-          <Input
-            id={`attributes-${index}`}
-            label={translate('search-attributes.attribute-label', {
-              index: index + 1,
-            })}
-            labelHidden={true}
-            name={`attributes.${index}.name`}
-            bind:value={attribute.name}
-            placeholder=""
-            error={!!$errors.attributes?.[index]?.['name']?.[0]}
-            hintText={$errors.attributes?.[index]?.['name']?.[0]}
-            disabled={$submitting}
-          />
-
-          <Select
-            id={`attributes-${index}-type`}
-            label={translate('search-attributes.type-label', {
-              index: index + 1,
-            })}
-            labelHidden={true}
-            name={`attributes.${index}.type`}
-            placeholder={translate('search-attributes.select-type-placeholder')}
-            error={$errors.attributes?.[index]?.['type']?.[0]}
-            bind:value={attribute.type}
-            disabled={$submitting}
-          >
-            {#each supportedTypes as option}
-              <Option value={option.value}>
-                {option.label}
-              </Option>
-            {/each}
-          </Select>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            on:click={() => removeAttribute(index)}
-            disabled={$submitting}
-            class="h-10 w-10 p-0"
-          >
-            <Icon name="trash" />
-          </Button>
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium">Search Attributes</h3>
         </div>
-      {/each}
 
-      <div class="border-t border-subtle pt-4">
+        <div class="space-y-3 border-b border-b-subtle pb-3">
+          <div
+            class="grid grid-cols-[1fr,200px,auto] gap-3 border-b border-b-subtle pb-2 text-sm font-medium"
+          >
+            <div>{translate('search-attributes.column-attribute')}</div>
+            <div>{translate('search-attributes.column-type')}</div>
+            <div class="w-8"></div>
+          </div>
+
+          {#each $formData.attributes as attribute, index}
+            <div class="grid grid-cols-[1fr,200px,auto] gap-3">
+              <Input
+                id="attribute-name-{index}"
+                bind:value={attribute.name}
+                label={translate('search-attributes.attribute-label', {
+                  index: index + 1,
+                })}
+                labelHidden
+                disabled={$submitting}
+                error={!!$errors?.attributes?.[index]?.['name']?.[0]}
+              />
+
+              <Select
+                id="attribute-type-{index}"
+                bind:value={attribute.type}
+                label={translate('search-attributes.type-label', {
+                  index: index + 1,
+                })}
+                labelHidden
+                disabled={$submitting}
+                placeholder={translate(
+                  'search-attributes.select-type-placeholder',
+                )}
+              >
+                {#each supportedTypes as type}
+                  <Option value={type.value}>{type.label}</Option>
+                {/each}
+              </Select>
+
+              <Button
+                variant="ghost"
+                size="xs"
+                on:click={() => removeAttribute(index)}
+                disabled={$submitting}
+                type="button"
+                leadingIcon="trash"
+              />
+            </div>
+            {#if $errors?.attributes?.[index]?.['name']?.[0]}
+              <div class="col-span-2 mt-1 text-xs text-danger">
+                {$errors.attributes[index]['name'][0]}
+              </div>
+            {/if}
+          {/each}
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 pt-0">
+      <div class="flex gap-3">
+        <Button size="sm" type="submit" {disabled} loading={$submitting}>
+          <TaintedBadge show={showTainted} count={taintedCount} />
+          {translate('search-attributes.save-button')}
+        </Button>
+
         <Button
           variant="secondary"
           size="sm"
+          on:click={handleCancel}
+          disabled={$submitting}
+          type="button"
+        >
+          {translate('common.cancel')}
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
           on:click={addAttribute}
           disabled={$submitting}
+          type="button"
+          leadingIcon="add"
         >
           {translate('search-attributes.add-attribute-button')}
         </Button>
       </div>
-    </Card>
-
-    <Message
-      value={$message}
-      errors={$errors.attributes?.attributes}
-      errorsTitle={translate('search-attributes.validation-error-title')}
-    />
-
-    <div class="flex gap-3 pt-4">
-      <Button
-        type="submit"
-        variant="primary"
-        disabled={$submitting || $form.attributes.length === 0}
-        class="relative"
-      >
-        {$submitting
-          ? translate('search-attributes.saving-button')
-          : translate('search-attributes.save-button')}
-        <TaintedBadge show={isTainted($tainted)} count={taintedCount} />
-      </Button>
-
-      <Button
-        type="button"
-        variant="secondary"
-        on:click={handleCancel}
-        disabled={$submitting}
-      >
-        {translate('search-attributes.cancel-button')}
-      </Button>
     </div>
   </form>
-</div>
+</Card>
