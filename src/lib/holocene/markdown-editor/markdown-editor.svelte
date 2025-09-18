@@ -33,6 +33,6 @@
   {#if activeTab === 'edit'}
     <Editor darkMode={$useDarkMode} bind:content />
   {:else}
-    <Preview {content} />
+    <Preview class="border border-subtle" {content} />
   {/if}
 </div>
