@@ -10,6 +10,7 @@ export type SavedQuery = {
   query: string;
   icon?: IconName;
   count?: number;
+  badge?: string;
   class?: ClassNameValue;
 };
 

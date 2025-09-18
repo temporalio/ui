@@ -13,43 +13,6 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  const query = $derived(page.url.searchParams.get('query') || '');
-  const savedQuery = page.url.searchParams.get('savedQuery');
-  const namespace = $derived(page.params.namespace);
-
-  const namespaceSavedQueries = $derived($savedQueries[namespace] || []);
-
-  onMount(() => {
-    if (savedQuery) {
-      if (!$savedQueries[namespace]) $savedQueries[namespace] = [];
-
-      $savedQueries[namespace] = [
-        ...$savedQueries[namespace],
-        {
-          name: savedQuery,
-          query,
-          id: Date.now().toString(),
-        },
-      ];
-
-      const url = new URL(page.url);
-      url.searchParams.delete('savedQuery');
-      goto(url);
-    }
-  });
-  const setTab = (_query: string) => {
-    updateQueryParameters({
-      url: page.url,
-      parameter: 'query',
-      value: _query,
-      allowEmpty: true,
-      clearParameters: [currentPageKey],
-    });
-    if (_query) {
-      $workflowFilters = toListWorkflowFilters(_query, $searchAttributes);
-    }
-  };
-
   const getToday = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -97,6 +60,52 @@
       icon: 'clock',
     },
   ];
+
+  const query = $derived(page.url.searchParams.get('query') || '');
+  const savedQuery = page.url.searchParams.get('savedQuery');
+  const namespace = $derived(page.params.namespace);
+
+  const namespaceSavedQueries = $derived($savedQueries[namespace] || []);
+  const systemQuery = $derived(
+    query && systemViews.find((q) => q.query === query),
+  );
+  const unsavedQuery = $derived(
+    query &&
+      !namespaceSavedQueries.find((q) => q.query === query) &&
+      !systemQuery,
+  );
+
+  onMount(() => {
+    if (savedQuery) {
+      if (!$savedQueries[namespace]) $savedQueries[namespace] = [];
+
+      $savedQueries[namespace] = [
+        ...$savedQueries[namespace],
+        {
+          name: savedQuery,
+          query,
+          id: Date.now().toString(),
+        },
+      ];
+
+      const url = new URL(page.url);
+      url.searchParams.delete('savedQuery');
+      goto(url);
+    }
+  });
+
+  const setTab = (_query: string) => {
+    updateQueryParameters({
+      url: page.url,
+      parameter: 'query',
+      value: _query,
+      allowEmpty: true,
+      clearParameters: [currentPageKey],
+    });
+    if (_query) {
+      $workflowFilters = toListWorkflowFilters(_query, $searchAttributes);
+    }
+  };
 </script>
 
 <div
@@ -108,8 +117,8 @@
     <p class="text-xs font-medium leading-3 lg:block lg:text-sm">Saved Views</p>
   </div>
 
-  <div class="p-2">
-    <div class="mb-3 text-center">
+  <div class="space-y-2 p-2">
+    <div class="border-b border-subtle pb-2 text-center">
       <div class="space-y-1">
         {#each systemViews as view}
           {@render queryButton(view)}
@@ -118,7 +127,7 @@
     </div>
 
     {#if namespaceSavedQueries.length > 0}
-      <div class="border-t border-subtle pt-3 text-center">
+      <div class="text-center">
         <div class="space-y-1">
           {#each namespaceSavedQueries as savedQuery}
             {@render queryButton(savedQuery)}
@@ -127,17 +136,21 @@
       </div>
     {/if}
 
-    {#if namespaceSavedQueries.length === 0}
-      <div class="border-t border-subtle pt-3">
-        <div class="space-y-2 px-3 py-4 text-center">
-          <Icon
-            name="bookmark"
-            class="mx-auto mb-2 h-8 w-8 text-slate-300 dark:text-slate-600"
-          />
-          <p class="text-sm text-slate-500 dark:text-slate-400">
-            No custom queries yet
-          </p>
-        </div>
+    {#if unsavedQuery && !systemQuery}
+      <div class="space-y-1">
+        {@render queryButton({
+          id: 'unsaved',
+          name: 'New View',
+          query,
+          icon: 'bookmark',
+          badge: 'Unsaved',
+        })}
+      </div>
+    {/if}
+
+    {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
+      <div class="space-y-1">
+        {@render emptyButton()}
       </div>
     {/if}
   </div>
@@ -168,6 +181,12 @@
     <span class="hidden truncate text-left font-medium lg:inline-block"
       >{savedQuery.name}</span
     >
+    {#if savedQuery.badge}
+      <span
+        class="right-2 top-2 hidden rounded-sm bg-subtle px-2 py-0.5 text-xs font-bold italic text-primary lg:static lg:ml-auto lg:block"
+        >{savedQuery.badge}</span
+      >
+    {/if}
     {#if savedQuery.count !== undefined}
       <span
         class="hidden rounded-full bg-red-100 px-2 py-0.5 font-mono text-xs font-medium text-red-900 lg:inline-block dark:bg-slate-700 dark:text-slate-300"
@@ -175,4 +194,27 @@
       >
     {/if}
   </button>
+{/snippet}
+
+{#snippet emptyButton()}
+  <div
+    class={merge(
+      'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:justify-start lg:text-sm',
+    )}
+  >
+    <Icon
+      name="temporal-logo"
+      class={merge(
+        'h-4 w-4 flex-shrink-0 transition-colors duration-200 lg:hidden',
+        'text-slate-500 group-hover:text-indigo-600 dark:text-slate-400 dark:group-hover:text-indigo-400',
+      )}
+    />
+    <span class="hidden truncate text-left font-medium lg:inline-block"
+      >No views</span
+    >
+    <span
+      class="right-2 top-2 hidden rounded-sm bg-subtle px-2 py-0.5 text-xs font-bold italic lg:static lg:ml-auto lg:block"
+      >Add Filter</span
+    >
+  </div>
 {/snippet}
