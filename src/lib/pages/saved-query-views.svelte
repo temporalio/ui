@@ -166,7 +166,7 @@
 
 {#snippet queryButton(savedQuery: SavedQuery)}
   <Button
-    variant="primary"
+    variant="ghost"
     data-testid={savedQuery.id}
     on:click={() => setTab(savedQuery.query)}
     class="w-full"
