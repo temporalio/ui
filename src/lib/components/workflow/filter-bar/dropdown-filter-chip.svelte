@@ -129,11 +129,6 @@
     ...defaultConditionOptions,
   ];
 
-  const booleanConditionalOptions = [
-    { value: 'true', label: translate('common.true'), id: 'is-true' },
-    { value: 'false', label: translate('common.false'), id: 'is-false' },
-  ];
-
   const listConditionalOptions = [
     { value: 'in', label: 'In' },
     { value: '=', label: translate('common.equal-to') },
@@ -513,7 +508,26 @@
           </div>
         {:else if isBooleanFilter(localFilter)}
           <div class="space-y-2">
-            {@render conditionalButtons(booleanConditionalOptions)}
+            <ToggleButtons>
+              <ToggleButton
+                variant={localFilter.value === 'true' ? 'primary' : 'secondary'}
+                on:click={() => {
+                  localFilter.conditional = '=';
+                  localFilter.value = 'true';
+                }}
+                size="xs">True</ToggleButton
+              >
+              <ToggleButton
+                variant={localFilter.value === 'false'
+                  ? 'primary'
+                  : 'secondary'}
+                on:click={() => {
+                  localFilter.conditional = '=';
+                  localFilter.value = 'false';
+                }}
+                size="xs">False</ToggleButton
+              >
+            </ToggleButtons>
           </div>
         {:else}
           <div class="space-y-2">

@@ -59,22 +59,24 @@
   }
 </script>
 
-<div class="flex flex-wrap items-center gap-2">
-  {#each visibleFilters as workflowFilter, i (workflowFilter.attribute + '-' + i)}
-    {#if workflowFilter.attribute}
-      <DropdownFilterChip
-        filter={workflowFilter}
-        index={i}
-        openIndex={$chipOpenIndex}
-        onUpdate={(updatedFilter) => updateFilter(i, updatedFilter)}
-        onRemove={() => removeFilter(i)}
-      />
-    {/if}
-  {/each}
+{#if visibleFilters.length > 0}
+  <div class="flex flex-wrap items-center gap-2">
+    {#each visibleFilters as workflowFilter, i (workflowFilter.attribute + '-' + i)}
+      {#if workflowFilter.attribute}
+        <DropdownFilterChip
+          filter={workflowFilter}
+          index={i}
+          openIndex={$chipOpenIndex}
+          onUpdate={(updatedFilter) => updateFilter(i, updatedFilter)}
+          onRemove={() => removeFilter(i)}
+        />
+      {/if}
+    {/each}
 
-  {#if hasMoreFilters}
-    <Button variant="secondary" size="xs" on:click={viewMoreFilters}>
-      {translate('common.view-more')}
-    </Button>
-  {/if}
-</div>
+    {#if hasMoreFilters}
+      <Button variant="secondary" size="xs" on:click={viewMoreFilters}>
+        {translate('common.view-more')}
+      </Button>
+    {/if}
+  </div>
+{/if}

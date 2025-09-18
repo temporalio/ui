@@ -18,8 +18,8 @@
 <script lang="ts">
   import { afterNavigate } from '$app/navigation';
 
-  import DropdownFilterList from '$lib/components/workflow/power-filter/dropdown-filter-list.svelte';
-  import SearchAttributeMenu from '$lib/components/workflow/power-filter/search-attribute-menu.svelte';
+  import DropdownFilterList from '$lib/components/workflow/filter-bar/dropdown-filter-list.svelte';
+  import SearchAttributeMenu from '$lib/components/workflow/filter-bar/search-attribute-menu.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';

@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -112,7 +113,7 @@
   class="surface-primary max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
 >
   <div
-    class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center text-slate-500 lg:justify-start lg:py-[.47rem] dark:text-slate-400"
+    class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
   >
     <p class="text-xs font-medium leading-3 lg:block lg:text-sm">Saved Views</p>
   </div>
@@ -150,71 +151,48 @@
 
     {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
       <div class="space-y-1">
-        {@render emptyButton()}
+        {@render queryButton({
+          id: 'no-views',
+          name: 'No views',
+          query,
+          icon: 'bookmark',
+          badge: 'Add Filter',
+          disabled: true,
+        })}
       </div>
     {/if}
   </div>
 </div>
 
 {#snippet queryButton(savedQuery: SavedQuery)}
-  <button
+  <Button
+    variant="primary"
     data-testid={savedQuery.id}
-    class={merge(
-      'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:justify-start lg:text-sm',
-      'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-      'hover:shadow-sm active:scale-[0.98]',
-      query === savedQuery.query &&
-        'border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300',
-      savedQuery.class,
-    )}
-    onclick={() => setTab(savedQuery.query)}
+    on:click={() => setTab(savedQuery.query)}
+    class="w-full"
+    active={savedQuery.query === query && !savedQuery.disabled}
+    disabled={savedQuery.disabled}
+    size="sm"
   >
     <Icon
       name={savedQuery?.icon || 'bookmark'}
       class={merge(
         'h-4 w-4 flex-shrink-0 transition-colors duration-200 lg:hidden',
-        query === savedQuery.query
-          ? 'text-indigo-500 dark:text-indigo-400'
-          : 'text-slate-500 group-hover:text-indigo-600 dark:text-slate-400 dark:group-hover:text-indigo-400',
       )}
     />
-    <span class="hidden truncate text-left font-medium lg:inline-block"
+    <span class="hidden truncate text-left text-sm font-normal lg:inline-block"
       >{savedQuery.name}</span
     >
-    {#if savedQuery.badge}
-      <span
-        class="right-2 top-2 hidden rounded-sm bg-subtle px-2 py-0.5 text-xs font-bold italic text-primary lg:static lg:ml-auto lg:block"
-        >{savedQuery.badge}</span
-      >
-    {/if}
+    <span
+      class:invisible={!savedQuery?.badge}
+      class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+      >{savedQuery?.badge || ''}</span
+    >
     {#if savedQuery.count !== undefined}
       <span
         class="hidden rounded-full bg-red-100 px-2 py-0.5 font-mono text-xs font-medium text-red-900 lg:inline-block dark:bg-slate-700 dark:text-slate-300"
         >{savedQuery.count}</span
       >
     {/if}
-  </button>
-{/snippet}
-
-{#snippet emptyButton()}
-  <div
-    class={merge(
-      'group flex w-full items-center justify-center gap-3 rounded-sm border border-transparent px-2 py-1 text-xs transition-all duration-200 lg:justify-start lg:text-sm',
-    )}
-  >
-    <Icon
-      name="temporal-logo"
-      class={merge(
-        'h-4 w-4 flex-shrink-0 transition-colors duration-200 lg:hidden',
-        'text-slate-500 group-hover:text-indigo-600 dark:text-slate-400 dark:group-hover:text-indigo-400',
-      )}
-    />
-    <span class="hidden truncate text-left font-medium lg:inline-block"
-      >No views</span
-    >
-    <span
-      class="right-2 top-2 hidden rounded-sm bg-subtle px-2 py-0.5 text-xs font-bold italic lg:static lg:ml-auto lg:block"
-      >Add Filter</span
-    >
-  </div>
+  </Button>
 {/snippet}

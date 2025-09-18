@@ -12,6 +12,7 @@ export type SavedQuery = {
   count?: number;
   badge?: string;
   class?: ClassNameValue;
+  disabled?: boolean;
 };
 
 export const savedQueries = persistStore<Record<string, SavedQuery[]>>(

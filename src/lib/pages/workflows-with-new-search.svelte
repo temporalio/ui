@@ -37,7 +37,7 @@
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   // import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
-  import PowerFilter from '$lib/components/workflow/power-filter/index.svelte';
+  import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
@@ -245,7 +245,7 @@
 </header>
 
 <!-- <WorkflowSearchAttributeFilter /> -->
-<PowerFilter />
+<FilterBar />
 <div class="flex overflow-auto">
   <SavedQueryViews />
   <div
