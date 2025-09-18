@@ -3,62 +3,55 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import type { Meta } from '@storybook/svelte';
 
-  import type { CodecServerAdapter, CodecServerFormData } from './types';
+  import type { CodecServerFormData } from './types';
 
   import CodecServerForm from './codec-server-form.svelte';
 
-  const defaultAdapter: CodecServerAdapter = {
-    async fetchCodecServer(): Promise<CodecServerFormData> {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return {
-        endpoint: '',
-        passUserAccessToken: false,
-        includeCrossOriginCredentials: false,
-        customMessage: '',
-        customLink: '',
-      };
-    },
+  async function fetchDefaultData(): Promise<CodecServerFormData> {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return {
+      endpoint: '',
+      passUserAccessToken: false,
+      includeCrossOriginCredentials: false,
+      customMessage: '',
+      customLink: '',
+    };
+  }
 
-    async saveCodecServer(data: CodecServerFormData): Promise<void> {
-      action('saveCodecServer')(data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    },
+  async function fetchPrefilledData(): Promise<CodecServerFormData> {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    return {
+      endpoint:
+        'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server',
+      passUserAccessToken: true,
+      includeCrossOriginCredentials: false,
+      customMessage: 'Custom error message for codec server failures',
+      customLink: 'https://example.com/help',
+    };
+  }
 
-    onSuccess: async (data: CodecServerFormData) => {
-      action('onSuccess')(data);
-    },
+  // Mock data fetcher with error
+  async function fetchDataWithError(): Promise<CodecServerFormData> {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Simulate a network error
+    throw new Error(
+      'Failed to load codec server configuration: Internal Server Error',
+    );
+  }
 
-    onCancel: () => {
-      action('onCancel')();
-    },
-  };
+  async function handleSave(data: CodecServerFormData): Promise<void> {
+    action('onSave')(data);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
 
-  const prefilledAdapter: CodecServerAdapter = {
-    async fetchCodecServer(): Promise<CodecServerFormData> {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      return {
-        endpoint:
-          'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server',
-        passUserAccessToken: true,
-        includeCrossOriginCredentials: false,
-        customMessage: 'Custom error message for codec server failures',
-        customLink: 'https://example.com/help',
-      };
-    },
+  function handleSuccess(data: CodecServerFormData) {
+    action('onSuccess')(data);
+  }
 
-    async saveCodecServer(data: CodecServerFormData): Promise<void> {
-      action('saveCodecServer')(data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    },
-
-    onSuccess: async (data: CodecServerFormData) => {
-      action('onSuccess')(data);
-    },
-
-    onCancel: () => {
-      action('onCancel')();
-    },
-  };
+  function handleCancel() {
+    action('onCancel')();
+  }
 
   export const meta = {
     title: 'Forms/Codec Server Form',
@@ -76,6 +69,41 @@
   </div>
 </Template>
 
-<Story name="Default" args={{ adapter: defaultAdapter }} />
+<Story
+  name="Default"
+  args={{
+    initialDataPromise: fetchDefaultData(),
+    onSave: handleSave,
+    onSuccess: handleSuccess,
+    onCancel: handleCancel,
+  }}
+/>
 
-<Story name="Prefilled" args={{ adapter: prefilledAdapter }} />
+<Story
+  name="Prefilled"
+  args={{
+    initialDataPromise: fetchPrefilledData(),
+    onSave: handleSave,
+    onSuccess: handleSuccess,
+    onCancel: handleCancel,
+  }}
+/>
+
+<Story
+  name="Error State"
+  args={{
+    initialDataPromise: fetchDataWithError(),
+    onSave: handleSave,
+    onSuccess: handleSuccess,
+    onCancel: handleCancel,
+    onRetry: action('onRetry'),
+  }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          'Form that encounters a server error when loading. Shows error handling with retry functionality.',
+      },
+    },
+  }}
+/>

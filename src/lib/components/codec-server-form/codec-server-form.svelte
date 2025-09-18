@@ -1,37 +1,46 @@
 <script lang="ts">
-  import ApiError from '$lib/components/api-error.svelte';
+  import FormError from '$lib/components/form/form-error.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { ApiError as ApiErrorType } from '$lib/utilities/api-error-handler';
 
-  import type { CodecServerAdapter } from './types';
+  import type { CodecServerFormData } from './types';
 
   import CodecServerFormContent from './codec-server-form-content.svelte';
   import CodecServerFormSkeleton from './codec-server-form-skeleton.svelte';
-  import { loadInitialData } from './config.svelte';
 
   interface Props {
     class?: string;
-    adapter: CodecServerAdapter;
+    initialDataPromise: Promise<CodecServerFormData>;
+    onSave: (data: CodecServerFormData) => Promise<void>;
+    onSuccess?: (data: CodecServerFormData) => void;
+    onCancel?: () => void;
+    onRetry?: () => void;
   }
 
-  let { class: className = '', adapter }: Props = $props();
-
-  let dataPromise = $derived(loadInitialData(adapter));
-
-  const retryLoad = async () => {
-    dataPromise = loadInitialData(adapter);
-  };
+  let {
+    class: className = '',
+    initialDataPromise,
+    onSave,
+    onSuccess,
+    onCancel,
+    onRetry,
+  }: Props = $props();
 </script>
 
-{#await dataPromise}
+{#await initialDataPromise}
   <CodecServerFormSkeleton class={className} />
 {:then initialData}
-  <CodecServerFormContent class={className} {adapter} {initialData} />
-{:catch error}
-  <ApiError
+  <CodecServerFormContent
     class={className}
-    error={error as ApiErrorType}
-    retryConfig={{ onRetry: retryLoad }}
+    {initialData}
+    {onSave}
+    {onSuccess}
+    {onCancel}
+  />
+{:catch error}
+  <FormError
+    class={className}
     title={translate('codec-server.load-error-title')}
+    message={error.message}
+    {onRetry}
   />
 {/await}
