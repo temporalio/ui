@@ -3,7 +3,6 @@
   import { EditorState } from '@codemirror/state';
   import { EditorView, lineNumbers } from '@codemirror/view';
   import { onMount, tick } from 'svelte';
-  import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
@@ -14,10 +13,9 @@
 
   interface Props {
     content: string;
-    class?: ClassNameValue;
   }
 
-  let { content = $bindable(''), class: className = '' }: Props = $props();
+  let { content = $bindable('') }: Props = $props();
   let editorElement: HTMLElement | null = $state(null);
   let editorView: EditorView | null = $state(null);
   let activeTab: 'edit' | 'preview' = $state('edit');
@@ -62,7 +60,7 @@
   });
 </script>
 
-<div class={twMerge(className)}>
+<div>
   <TabButtons>
     <TabButton
       on:click={() => setActiveTab('edit')}

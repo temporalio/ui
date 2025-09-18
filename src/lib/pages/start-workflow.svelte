@@ -307,7 +307,7 @@
           </p>
         </div>
         <Label label={translate('workflows.summary')} for="summary" />
-        <MarkdownEditor bind:content={summary} class="min-h-48" />
+        <MarkdownEditor bind:content={summary} />
         <Label label={translate('workflows.details')} for="details" />
         <MarkdownEditor bind:content={details} />
       </Card>
