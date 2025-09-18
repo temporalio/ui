@@ -34,14 +34,14 @@
       query: '',
       icon: 'workflow',
     },
-    // {
-    //   id: 'task-failures',
-    //   name: 'Task Failures',
-    //   query: 'ExecutionStatus = "Running"',
-    //   icon: 'error',
-    //   count: 8,
-    //   class: 'text-red-700 dark:text-red-300',
-    // },
+    {
+      id: 'task-failures',
+      name: 'Task Failures',
+      query: 'ExecutionStatus = "Failed" OR ExecutionStatus = "Terminated"',
+      icon: 'error',
+      count: 8,
+      class: 'text-danger',
+    },
     {
       id: 'child-workflows',
       name: 'Parent Workflows',
@@ -169,7 +169,7 @@
     variant="ghost"
     data-testid={savedQuery.id}
     on:click={() => setTab(savedQuery.query)}
-    class="w-full"
+    class={merge('w-full', savedQuery.class || '')}
     active={savedQuery.query === query && !savedQuery.disabled}
     disabled={savedQuery.disabled}
     size="sm"
@@ -190,7 +190,7 @@
     >
     {#if savedQuery.count !== undefined}
       <span
-        class="hidden rounded-full bg-red-100 px-2 py-0.5 font-mono text-xs font-medium text-red-900 lg:inline-block dark:bg-slate-700 dark:text-slate-300"
+        class="surface-danger hidden rounded-full px-2 py-0.5 font-mono text-xs font-medium lg:inline-block"
         >{savedQuery.count}</span
       >
     {/if}
