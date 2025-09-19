@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Markdown from '$lib/holocene/monaco/markdown.svelte';
+  import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
@@ -17,7 +17,7 @@
       </h3>
     </div>
     {#if summary}
-      <Markdown className="p-3" overrideTheme="primary" content={summary} />
+      <Markdown class="p-3" overrideTheme="primary" content={summary} />
     {:else}
       <div class="py-6 pl-6 text-secondary/70">
         <p class="text-sm italic">
@@ -33,7 +33,7 @@
       </h3>
     </div>
     {#if details}
-      <Markdown className="p-3" overrideTheme="primary" content={details} />
+      <Markdown class="p-3" overrideTheme="primary" content={details} />
     {:else}
       <div class="py-6 pl-6 text-secondary/70">
         <p class="text-sm italic">
