@@ -5,6 +5,9 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import DeleteViewModal from '$lib/components/workflow/filter-bar/delete-view-modal.svelte';
+  import EditViewModal from '$lib/components/workflow/filter-bar/edit-view-modal.svelte';
+  import SaveViewModal from '$lib/components/workflow/filter-bar/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { workflowFilters } from '$lib/stores/filters';
@@ -62,6 +65,10 @@
     },
   ];
 
+  let saveViewModalOpen = $state(false);
+  let editViewModalOpen = $state(false);
+  let deleteViewModalOpen = $state(false);
+
   const query = $derived(page.url.searchParams.get('query') || '');
   const savedQuery = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
@@ -77,6 +84,9 @@
     query &&
       !namespaceSavedQueries.find((q) => q.query === query) &&
       !systemQuery,
+  );
+  const savedQueryView = $derived(
+    $savedQueries[namespace]?.find((q) => q.query === savedQuery),
   );
 
   onMount(() => {
@@ -99,6 +109,15 @@
   });
 
   const setTab = (_query: string) => {
+    if (_query === query && unsavedQuery) {
+      saveViewModalOpen = true;
+      return;
+    }
+
+    if (_query) {
+      $workflowFilters = toListWorkflowFilters(_query, $searchAttributes);
+    }
+
     updateQueryParameters({
       url: page.url,
       parameter: 'query',
@@ -106,9 +125,6 @@
       allowEmpty: true,
       clearParameters: [currentPageKey],
     });
-    if (_query) {
-      $workflowFilters = toListWorkflowFilters(_query, $searchAttributes);
-    }
   };
 </script>
 
@@ -166,6 +182,9 @@
     {/if}
   </div>
 </div>
+<SaveViewModal bind:open={saveViewModalOpen} />
+<EditViewModal view={savedQueryView} bind:open={editViewModalOpen} />
+<DeleteViewModal view={savedQueryView} bind:open={deleteViewModalOpen} />
 
 {#snippet queryButton(savedQuery: SavedQuery)}
   <Button
