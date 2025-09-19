@@ -33,6 +33,10 @@
     return lastHour.toISOString();
   };
 
+  const clearAllSavedViews = () => {
+    $savedQueries[namespace] = [];
+  };
+
   const systemViews: SavedQuery[] = [
     {
       id: 'all',
@@ -95,7 +99,8 @@
   const unsavedQuery = $derived(
     query &&
       !systemQueryView &&
-      !namespaceSavedQueries.find((q) => q.query === query),
+      !namespaceSavedQueries.find((q) => q.query === query) &&
+      activeQueryView?.query !== query,
   );
 
   onMount(() => {
@@ -196,7 +201,15 @@
   <div
     class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
   >
-    <p class="text-xs font-medium leading-3 lg:block lg:text-sm">Saved Views</p>
+    <div class="flex w-full justify-between">
+      <p class="text-xs font-medium leading-3 lg:block lg:text-sm">
+        Saved Views
+      </p>
+      <button
+        class="hidden rounded-sm p-0.5 text-xs leading-3 hover:bg-secondary lg:inline-block"
+        onclick={clearAllSavedViews}>Clear All</button
+      >
+    </div>
   </div>
 
   <div class="space-y-2 p-2">
