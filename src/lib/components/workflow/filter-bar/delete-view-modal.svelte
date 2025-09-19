@@ -1,39 +1,23 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { workflowFilters } from '$lib/stores/filters';
-  import { currentPageKey } from '$lib/stores/pagination';
-  import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { type SavedQuery } from '$lib/stores/saved-queries';
 
   interface Props {
     open?: boolean;
     view: SavedQuery;
+    onDeleteView: () => void;
   }
 
-  let { open = $bindable(), view: savedQueryView }: Props = $props();
-
-  const namespace = $derived(page.params.namespace);
+  let { open = $bindable(), view, onDeleteView }: Props = $props();
 
   const hideModal = () => {
     open = false;
   };
 
-  const onDeleteView = (event: Event) => {
+  const onDelete = (event: Event) => {
     event.preventDefault();
-    $savedQueries[namespace] = $savedQueries[namespace].filter(
-      (q) => q.id !== savedQueryView.id,
-    );
-    $workflowFilters = [];
-    updateQueryParameters({
-      url: page.url,
-      parameter: 'query',
-      value: '',
-      allowEmpty: true,
-      clearParameters: [currentPageKey],
-    });
+    onDeleteView();
     hideModal();
   };
 </script>
@@ -44,8 +28,8 @@
   confirmText={translate('common.delete')}
   cancelText={translate('common.close')}
   on:cancelModal={close}
-  on:confirmModal={onDeleteView}
+  on:confirmModal={onDelete}
 >
   <h3 slot="title">Delete View</h3>
-  <p slot="content">Are you sure you want to delete {savedQueryView?.name}?</p>
+  <p slot="content">Are you sure you want to delete {view?.name}?</p>
 </Modal>

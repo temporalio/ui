@@ -4,17 +4,16 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { savedQueries } from '$lib/stores/saved-queries';
+  import { type SavedQuery } from '$lib/stores/saved-queries';
 
   interface Props {
     open?: boolean;
+    onCreateView: (view: SavedQuery) => void;
   }
 
-  let { open = $bindable() }: Props = $props();
+  let { open = $bindable(), onCreateView }: Props = $props();
 
   let name = $state('');
-
-  const namespace = $derived(page.params.namespace);
   const query = $derived(page.url.searchParams.get('query'));
 
   const hideModal = () => {
@@ -22,18 +21,17 @@
     name = '';
   };
 
-  const onSaveView = (event: Event) => {
+  const onSave = (event: Event) => {
     event.preventDefault();
-    if (!$savedQueries[namespace]) {
-      $savedQueries[namespace] = [];
-    }
 
-    const newQuery = {
+    const newView = {
       id: Date.now().toString(),
       name,
       query,
+      type: 'user',
     };
-    $savedQueries[namespace] = [...$savedQueries[namespace], newQuery];
+
+    onCreateView(newView);
     hideModal();
   };
 </script>
@@ -44,7 +42,7 @@
   confirmText={translate('common.save')}
   cancelText={translate('common.close')}
   on:cancelModal={close}
-  on:confirmModal={onSaveView}
+  on:confirmModal={onSave}
 >
   <h3 slot="title">Save as View</h3>
   <div class="flex h-full flex-1 flex-col" slot="content">

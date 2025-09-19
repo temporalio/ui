@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { slide } from 'svelte/transition';
+
   import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
@@ -14,6 +16,7 @@
   import { currentPageKey } from '$lib/stores/pagination';
   import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -36,92 +39,151 @@
       name: 'All Workflows',
       query: '',
       icon: 'workflow',
+      type: 'system',
     },
-    {
-      id: 'task-failures',
-      name: 'Task Failures',
-      query: 'ExecutionStatus = "Failed" OR ExecutionStatus = "Terminated"',
-      icon: 'error',
-      count: 8,
-      class: 'text-danger',
-    },
+    // {
+    //   id: 'task-failures',
+    //   name: 'Task Failures',
+    //   query: 'ExecutionStatus = "Failed" OR ExecutionStatus = "Terminated"',
+    //   icon: 'error',
+    //   count: 8,
+    //   class: 'text-danger',
+    // },
     {
       id: 'child-workflows',
       name: 'Parent Workflows',
       query: 'ParentWorkflowId is null',
       icon: 'relationship',
+      type: 'system',
     },
     {
       id: 'today',
       name: 'Today',
       query: `StartTime >= "${getToday()}"`,
       icon: 'calendar',
+      type: 'system',
     },
     {
       id: 'last-hour',
       name: 'Last Hour',
       query: `StartTime >= "${getLastHour()}"`,
       icon: 'clock',
+      type: 'system',
     },
   ];
+
+  let activeQueryView: SavedQuery | undefined = $state();
 
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
   let deleteViewModalOpen = $state(false);
 
   const query = $derived(page.url.searchParams.get('query') || '');
-  const savedQuery = page.url.searchParams.get('savedQuery');
+  const savedQueryParam = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
 
-  const namespaceSavedQueries = $derived(
+  let namespaceSavedQueries = $derived(
     $savedQueries?.[namespace]?.sort((a, b) => a.name.localeCompare(b.name)) ||
       [],
   );
-  const systemQuery = $derived(
+  const systemQueryView = $derived(
     query && systemViews.find((q) => q.query === query),
+  );
+  const savedQueryView = $derived(
+    query && namespaceSavedQueries.find((q) => q.query === query),
   );
   const unsavedQuery = $derived(
     query &&
-      !namespaceSavedQueries.find((q) => q.query === query) &&
-      !systemQuery,
-  );
-  const savedQueryView = $derived(
-    $savedQueries[namespace]?.find((q) => q.query === savedQuery),
+      !systemQueryView &&
+      !namespaceSavedQueries.find((q) => q.query === query),
   );
 
   onMount(() => {
-    if (savedQuery) {
+    if (savedQueryParam) {
+      const queryToSave = {
+        name: savedQueryParam,
+        query,
+        id: Date.now().toString(),
+        type: 'user',
+      };
+
       if (!$savedQueries[namespace]) $savedQueries[namespace] = [];
 
-      $savedQueries[namespace] = [
-        ...$savedQueries[namespace],
-        {
-          name: savedQuery,
-          query,
-          id: Date.now().toString(),
-        },
-      ];
+      $savedQueries[namespace] = [...$savedQueries[namespace], queryToSave];
+      activeQueryView = queryToSave;
 
       const url = new URL(page.url);
       url.searchParams.delete('savedQuery');
       goto(url);
+    } else if (savedQueryView && !activeQueryView) {
+      activeQueryView = savedQueryView;
     }
   });
 
-  const setTab = (_query: string) => {
-    if (_query === query && unsavedQuery) {
+  const setActiveQueryView = (view: SavedQuery) => {
+    activeQueryView = view;
+    if (unsavedQuery && view.id === 'unsaved') {
       saveViewModalOpen = true;
       return;
     }
 
-    if (_query) {
-      $workflowFilters = toListWorkflowFilters(_query, $searchAttributes);
+    if (view.query) {
+      $workflowFilters = toListWorkflowFilters(view.query, $searchAttributes);
     }
 
     updateQueryParameters({
       url: page.url,
       parameter: 'query',
-      value: _query,
+      value: view.query,
+      allowEmpty: true,
+      clearParameters: [currentPageKey],
+    });
+  };
+
+  const { copy, copied } = copyToClipboard();
+
+  const handleCopy = (e: Event) => {
+    const sharableViewUrl =
+      new URL(page.url.href) +
+      '&savedQuery=' +
+      encodeURIComponent(activeQueryView.name);
+    copy(e, sharableViewUrl);
+  };
+
+  const onCreateView = (view: SavedQuery) => {
+    if (!$savedQueries[namespace]) {
+      $savedQueries[namespace] = [];
+    }
+
+    $savedQueries[namespace] = [...$savedQueries[namespace], view];
+    activeQueryView = view;
+  };
+
+  const onSaveView = (view: SavedQuery) => {
+    if (!$savedQueries[namespace]) {
+      $savedQueries[namespace] = [];
+    }
+
+    if (view.id === activeQueryView?.id) {
+      $savedQueries[namespace] = $savedQueries[namespace].map((q) =>
+        q.id === view.id ? view : q,
+      );
+    } else {
+      $savedQueries[namespace] = [...$savedQueries[namespace], view];
+    }
+    activeQueryView = view;
+  };
+
+  const onDeleteView = () => {
+    $savedQueries[namespace] = $savedQueries[namespace].filter(
+      (q) => q?.id !== activeQueryView?.id,
+    );
+    $workflowFilters = [];
+    activeQueryView = undefined;
+    updateQueryParameters({
+      url: page.url,
+      parameter: 'query',
+      value: '',
       allowEmpty: true,
       clearParameters: [currentPageKey],
     });
@@ -141,7 +203,10 @@
     <div class="border-b border-subtle pb-2 text-center">
       <div class="space-y-1">
         {#each systemViews as view}
-          {@render queryButton(view)}
+          {@render queryButton({
+            ...view,
+            active: query === view.query,
+          })}
         {/each}
       </div>
     </div>
@@ -150,13 +215,16 @@
       <div class="text-center">
         <div class="space-y-1">
           {#each namespaceSavedQueries as savedQuery}
-            {@render queryButton(savedQuery)}
+            {@render queryButton({
+              ...savedQuery,
+              active: savedQuery.id === activeQueryView?.id,
+            })}
           {/each}
         </div>
       </div>
     {/if}
 
-    {#if unsavedQuery && !systemQuery}
+    {#if unsavedQuery && !activeQueryView}
       <div class="space-y-1">
         {@render queryButton({
           id: 'unsaved',
@@ -164,6 +232,8 @@
           query,
           icon: 'bookmark',
           badge: 'Unsaved',
+          type: 'system',
+          active: true,
         })}
       </div>
     {/if}
@@ -176,45 +246,100 @@
           query,
           icon: 'bookmark',
           badge: 'Add Filter',
+          type: 'system',
+          active: false,
           disabled: true,
         })}
       </div>
     {/if}
   </div>
 </div>
-<SaveViewModal bind:open={saveViewModalOpen} />
-<EditViewModal view={savedQueryView} bind:open={editViewModalOpen} />
-<DeleteViewModal view={savedQueryView} bind:open={deleteViewModalOpen} />
+<SaveViewModal bind:open={saveViewModalOpen} {onCreateView} />
+<EditViewModal
+  view={activeQueryView}
+  bind:open={editViewModalOpen}
+  {onSaveView}
+  {onCreateView}
+/>
+<DeleteViewModal
+  view={activeQueryView}
+  bind:open={deleteViewModalOpen}
+  {onDeleteView}
+/>
 
-{#snippet queryButton(savedQuery: SavedQuery)}
+{#snippet queryButton(view: SavedQuery)}
   <Button
     variant="ghost"
-    data-testid={savedQuery.id}
-    on:click={() => setTab(savedQuery.query)}
-    class={merge('w-full', savedQuery.class || '')}
-    active={savedQuery.query === query && !savedQuery.disabled}
-    disabled={savedQuery.disabled}
+    data-testid={view.id}
+    on:click={() => setActiveQueryView(view)}
+    class={merge('w-full', view.class || '')}
+    active={view?.active}
+    disabled={view?.disabled}
     size="sm"
   >
     <Icon
-      name={savedQuery?.icon || 'bookmark'}
+      name={view?.icon || 'bookmark'}
       class={merge(
         'h-4 w-4 flex-shrink-0 transition-colors duration-200 lg:hidden',
       )}
     />
     <span class="hidden truncate text-left text-sm font-normal lg:inline-block"
-      >{savedQuery.name}</span
+      >{view.name}</span
     >
     <span
-      class:invisible={!savedQuery?.badge}
+      class:invisible={!view?.badge}
       class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-      >{savedQuery?.badge || ''}</span
+      >{view?.badge || ''}</span
     >
-    {#if savedQuery.count !== undefined}
+    {#if view.count !== undefined}
       <span
         class="surface-danger hidden rounded-full px-2 py-0.5 font-mono text-xs font-medium lg:inline-block"
-        >{savedQuery.count}</span
+        >{view.count}</span
       >
     {/if}
   </Button>
+  {#if activeQueryView?.id === view?.id && view.type === 'user'}
+    <div class="flex items-center gap-1" transition:slide>
+      <Button
+        size="xs"
+        class="w-full"
+        variant="secondary"
+        on:click={() => {
+          if (view.id === 'unsaved') {
+            saveViewModalOpen = true;
+          } else {
+            editViewModalOpen = true;
+          }
+        }}>Save</Button
+      >
+      <Button
+        leadingIcon={$copied ? 'checkmark' : 'copy'}
+        size="xs"
+        class="w-full"
+        variant="ghost"
+        on:click={handleCopy}>Share</Button
+      >
+      <Button
+        variant="destructive"
+        size="xs"
+        class="w-full"
+        on:click={() => (deleteViewModalOpen = true)}>Discard</Button
+      >
+    </div>
+  {:else if unsavedQuery && view?.id === 'unsaved'}
+    <div class="flex items-center gap-1" transition:slide>
+      <Button
+        size="xs"
+        class="w-full"
+        variant="secondary"
+        on:click={() => {
+          if (view.id === 'unsaved') {
+            saveViewModalOpen = true;
+          } else {
+            editViewModalOpen = true;
+          }
+        }}>Save</Button
+      >
+    </div>
+  {/if}
 {/snippet}
