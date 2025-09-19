@@ -231,6 +231,11 @@
             {@render queryButton({
               ...savedQuery,
               active: savedQuery.id === activeQueryView?.id,
+              badge:
+                savedQuery.id === activeQueryView?.id &&
+                savedQuery.query !== query
+                  ? 'Unsaved'
+                  : undefined,
             })}
           {/each}
         </div>
