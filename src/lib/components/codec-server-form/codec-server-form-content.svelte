@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { superForm } from 'sveltekit-superforms';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { z } from 'zod';
+
   import Message from '$lib/components/form/message.svelte';
   import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -11,48 +15,100 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import type { CodecServerAdapter, CodecServerFormData } from './types';
-
-  import { createFormConfig, createFormHandlers } from './config.svelte';
+  import type { CodecServerFormData } from './types';
 
   interface Props {
     class?: string;
-    adapter: CodecServerAdapter;
     initialData: CodecServerFormData;
+    onSave: (data: CodecServerFormData) => Promise<void>;
+    onSuccess?: (data: CodecServerFormData) => void;
+    onCancel?: () => void;
   }
 
-  let { class: className = '', adapter, initialData }: Props = $props();
-
-  const { superFormInstance } = $derived(
-    createFormConfig(adapter, initialData, () => showCustomSection),
-  );
-
-  const {
-    form,
-    errors,
-    submitting,
-    message,
-    enhance,
-    tainted,
-    isTainted,
-    reset,
-  } = $derived(superFormInstance);
-
-  const { handleCancel } = $derived(createFormHandlers(adapter, reset));
-
-  const taintedCount = $derived(
-    Object.values($tainted || {}).filter((value) => value === true).length,
-  );
+  let {
+    class: className = '',
+    initialData,
+    onSave,
+    onSuccess = () => {},
+    onCancel = () => {},
+  }: Props = $props();
 
   // Show custom section if there are existing values
   let showCustomSection = $state(
     !!(initialData.customMessage || initialData.customLink),
   );
+
+  const codecServerSchema = z.object({
+    endpoint: z
+      .string()
+      .url(translate('codec-server.validation-endpoint-url'))
+      .min(1, translate('codec-server.validation-endpoint-required')),
+    passUserAccessToken: z.boolean(),
+    includeCrossOriginCredentials: z.boolean(),
+    customMessage: z.string().optional(),
+    customLink: z
+      .string()
+      .refine((val) => val === '' || z.string().url().safeParse(val).success, {
+        message: translate('codec-server.validation-custom-link-url'),
+      })
+      .optional(),
+  });
+
+  const formInstance = superForm(
+    {
+      endpoint: initialData.endpoint || '',
+      passUserAccessToken: initialData.passUserAccessToken || false,
+      includeCrossOriginCredentials:
+        initialData.includeCrossOriginCredentials || false,
+      customMessage: initialData.customMessage || '',
+      customLink: initialData.customLink || '',
+    },
+    {
+      SPA: true,
+      dataType: 'json',
+      resetForm: false,
+      validators: zodClient(codecServerSchema),
+      onUpdate: async ({ form }) => {
+        if (!form.valid) return;
+
+        try {
+          const dataToSave = {
+            ...form.data,
+            customMessage: showCustomSection ? form.data.customMessage : '',
+            customLink: showCustomSection ? form.data.customLink : '',
+          };
+          await onSave(dataToSave);
+          onSuccess(dataToSave);
+          return { type: 'success' };
+        } catch (error) {
+          return {
+            type: 'error',
+            error: {
+              message:
+                error.message || 'Failed to save codec server configuration',
+            },
+          };
+        }
+      },
+    },
+  );
+
+  const { form, errors, submitting, message, enhance, isTainted, reset } =
+    formInstance;
+
+  const handleCancel = () => {
+    reset();
+    onCancel();
+  };
+
+  const taintedCount = $derived(isTainted() ? 1 : 0);
+
+  const disabled = $derived($submitting || taintedCount === 0);
 </script>
 
 <div class="space-y-6 {className}">
   <form use:enhance class="space-y-6">
-    <Card class="space-y-6">
+    <Card class="space-y-6 p-4">
       <!-- Info Alert -->
       <Alert intent="info" class="text-sm">
         <Icon name="info" slot="icon" />
@@ -171,23 +227,14 @@
       </div>
     </Card>
 
-    <Message
-      value={$message}
-      errors={$errors._errors}
-      errorsTitle={translate('codec-server.validation-error-title')}
-    />
+    {#if $message}
+      <Message value={$message} />
+    {/if}
 
     <div class="flex gap-3">
-      <Button
-        type="submit"
-        variant="primary"
-        disabled={$submitting}
-        class="relative"
-      >
-        {$submitting
-          ? translate('codec-server.saving-button')
-          : translate('codec-server.save-button')}
-        <TaintedBadge show={isTainted($tainted)} count={taintedCount} />
+      <Button type="submit" variant="primary" {disabled} loading={$submitting}>
+        <TaintedBadge show={true} count={taintedCount} />
+        {translate('codec-server.save-button')}
       </Button>
 
       <Button
@@ -196,7 +243,7 @@
         on:click={handleCancel}
         disabled={$submitting}
       >
-        {translate('codec-server.cancel-button')}
+        {translate('common.cancel')}
       </Button>
     </div>
   </form>
