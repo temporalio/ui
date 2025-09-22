@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { slide } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
 
   import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -31,10 +31,6 @@
     lastHour.setHours(lastHour.getHours() - 1);
     lastHour.setSeconds(0, 0);
     return lastHour.toISOString();
-  };
-
-  const clearAllSavedViews = () => {
-    $savedQueries[namespace] = [];
   };
 
   const systemViews: SavedQuery[] = [
@@ -80,6 +76,7 @@
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
   let deleteViewModalOpen = $state(false);
+  let collapsedLg = $state(false);
   let pendingQueryTarget: string | undefined = $state();
 
   const query = $derived(page.url.searchParams.get('query') || '');
@@ -225,23 +222,45 @@
 </script>
 
 <div
-  class="surface-primary relative max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
+  class={merge(
+    'surface-primary relative max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-hidden rounded-l-sm border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
+    collapsedLg
+      ? 'lg:w-[60px] lg:min-w-[60px] lg:max-w-[60px]'
+      : 'lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]',
+  )}
+  style="will-change: width"
 >
   <div
     class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
   >
-    <div class="flex w-full justify-between">
-      <p class="text-xs font-medium leading-3 lg:block lg:text-sm">
-        Saved Views
-      </p>
+    <div
+      class={merge(
+        'flex w-full items-center justify-between',
+        collapsedLg ? 'lg:justify-center' : 'lg:justify-between',
+      )}
+    >
+      {#if !collapsedLg}
+        <p
+          class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
+          out:fade={{ delay: 0, duration: 180 }}
+          in:slide={{ delay: 80, duration: 180 }}
+        >
+          Saved Views
+        </p>
+      {/if}
+      <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
       <button
-        class="hidden rounded-sm p-0.5 text-xs leading-3 hover:bg-secondary lg:inline-block"
-        onclick={clearAllSavedViews}>Clear All</button
+        class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
+        aria-label={collapsedLg ? 'Expand saved views' : 'Collapse saved views'}
+        title={collapsedLg ? 'Expand' : 'Collapse'}
+        onclick={() => (collapsedLg = !collapsedLg)}
       >
+        <Icon name={collapsedLg ? 'chevron-right' : 'chevron-left'} />
+      </button>
     </div>
   </div>
 
-  <div class="space-y-2 p-2 pb-8">
+  <div class="space-y-2 p-1.5 pb-8">
     <div class="border-b border-subtle pb-2 text-center">
       <div class="space-y-1">
         {#each systemViews as view}
@@ -292,7 +311,12 @@
       </div>
     {/if}
   </div>
-  <div class="absolute bottom-2 right-2 hidden text-xs text-secondary lg:block">
+  <div
+    class={merge(
+      'absolute bottom-2 right-2 hidden text-xs text-secondary',
+      collapsedLg ? 'lg:hidden' : 'lg:block',
+    )}
+  >
     {namespaceSavedQueries.length} / 20
   </div>
 </div>
@@ -322,26 +346,39 @@
     <Icon
       name={view?.icon || 'bookmark'}
       class={merge(
-        'h-4 w-4 flex-shrink-0 transition-colors duration-200 lg:hidden',
+        'h-4 w-4 flex-shrink-0  transition-colors duration-200',
+        collapsedLg ? '' : 'lg:hidden',
       )}
     />
-    <span class="hidden truncate text-left text-sm font-normal lg:inline-block"
-      >{view.name}</span
-    >
-    <span
-      class:invisible={!view?.badge}
-      class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-      >{view?.badge || ''}</span
-    >
-    {#if view.count !== undefined}
+    {#if !collapsedLg}
       <span
-        class="surface-danger hidden rounded-full px-2 py-0.5 font-mono text-xs font-medium lg:inline-block"
-        >{view.count}</span
+        class="hidden truncate text-left text-sm font-normal lg:inline-block"
+        out:fade={{ delay: 80, duration: 140 }}
+        in:slide={{ delay: 80, duration: 180 }}>{view.name}</span
       >
+      <span
+        class:invisible={!view?.badge}
+        class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+        out:fade={{ delay: 90, duration: 140 }}
+        in:slide={{ delay: 90, duration: 180 }}>{view?.badge || ''}</span
+      >
+      {#if view.count !== undefined}
+        <span
+          class="surface-danger hidden rounded-full px-2 py-0.5 font-mono text-xs font-medium lg:inline-block"
+          out:fade={{ delay: 100, duration: 140 }}
+          in:slide={{ delay: 100, duration: 180 }}>{view.count}</span
+        >
+      {/if}
     {/if}
   </Button>
   {#if activeQueryView?.id === view?.id && view.type === 'user'}
-    <div class="flex items-center gap-1" transition:slide>
+    <div
+      class={merge(
+        'items-center gap-1',
+        collapsedLg ? 'flex flex-col' : 'flex flex-col lg:flex-row',
+      )}
+      transition:slide
+    >
       <Button
         size="xs"
         class="w-full"
@@ -355,13 +392,20 @@
         size="xs"
         class="w-full"
         variant="ghost"
-        on:click={handleCopy}>Share</Button
+        on:click={handleCopy}
+        ><span class={merge('hidden', !collapsedLg && 'lg:inline')}>Share</span
+        ></Button
       >
       <Button
         variant="destructive"
         size="xs"
         class="w-full"
-        on:click={() => (deleteViewModalOpen = true)}>Discard</Button
+        on:click={() => (deleteViewModalOpen = true)}
+        ><span class={merge('inline', !collapsedLg && 'lg:hidden')}
+          ><Icon name="trash" /></span
+        ><span class={merge('hidden', !collapsedLg && 'lg:inline')}
+          >Discard</span
+        ></Button
       >
     </div>
   {:else if unsavedQuery && view?.id === 'unsaved'}
