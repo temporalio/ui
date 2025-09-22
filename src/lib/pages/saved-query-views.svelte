@@ -225,7 +225,7 @@
 </script>
 
 <div
-  class="surface-primary max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
+  class="surface-primary relative max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]"
 >
   <div
     class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
@@ -241,7 +241,7 @@
     </div>
   </div>
 
-  <div class="space-y-2 p-2">
+  <div class="space-y-2 p-2 pb-8">
     <div class="border-b border-subtle pb-2 text-center">
       <div class="space-y-1">
         {#each systemViews as view}
@@ -291,6 +291,9 @@
         })}
       </div>
     {/if}
+  </div>
+  <div class="absolute bottom-2 right-2 hidden text-xs text-secondary lg:block">
+    {namespaceSavedQueries.length} / 20
   </div>
 </div>
 <SaveViewModal bind:open={saveViewModalOpen} {onCreateView} />
@@ -344,11 +347,7 @@
         class="w-full"
         variant="secondary"
         on:click={() => {
-          if (view.id === 'unsaved') {
-            saveViewModalOpen = true;
-          } else {
-            editViewModalOpen = true;
-          }
+          editViewModalOpen = true;
         }}>Save</Button
       >
       <Button
@@ -367,7 +366,14 @@
     </div>
   {:else if unsavedQuery && view?.id === 'unsaved'}
     <div class="flex items-center gap-1" transition:slide>
-      <Button size="xs" class="w-full" variant="secondary">Save</Button>
+      <Button
+        size="xs"
+        class="w-full"
+        variant="secondary"
+        on:click={() => {
+          saveViewModalOpen = true;
+        }}>Save</Button
+      >
     </div>
   {/if}
 {/snippet}
