@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { fade, slide } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
+  import { fade, fly, slide } from 'svelte/transition';
 
   import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -372,22 +373,16 @@
         out:fade={{ delay: 90, duration: 140 }}
         in:slide={{ delay: 90, duration: 180 }}>{view?.badge || ''}</span
       >
-      {#if view.count !== undefined}
-        <span
-          class="surface-danger hidden rounded-full px-2 py-0.5 font-mono text-xs font-medium lg:inline-block"
-          out:fade={{ delay: 100, duration: 140 }}
-          in:slide={{ delay: 100, duration: 180 }}>{view.count}</span
-        >
-      {/if}
     {/if}
   </Button>
   {#if activeQueryView?.id === view?.id && view.type === 'user'}
     <div
       class={merge(
-        'items-center gap-1',
+        'items-center gap-1 overflow-hidden transition-all',
         savedQueriesCollapsed ? 'flex flex-col' : 'flex flex-col lg:flex-row',
       )}
-      transition:slide
+      in:fly={{ y: 3, duration: 110, delay: 0, easing: cubicOut }}
+      out:fly={{ y: -3, duration: 0, easing: cubicOut }}
     >
       <Button
         size="xs"
@@ -420,7 +415,11 @@
       >
     </div>
   {:else if unsavedQuery && view?.id === 'unsaved'}
-    <div class="flex items-center gap-1" transition:slide>
+    <div
+      class="flex items-center gap-1 overflow-hidden"
+      in:fly={{ y: 3, duration: 110, delay: 0, easing: cubicOut }}
+      out:fly={{ y: -3, duration: 90, easing: cubicOut }}
+    >
       <Button
         size="xs"
         class="scale-85 w-full transition-all"
