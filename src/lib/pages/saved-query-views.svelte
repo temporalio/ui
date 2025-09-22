@@ -223,7 +223,7 @@
 
 <div
   class={merge(
-    'surface-primary relative max-h-[82vh] w-[60px] min-w-[60px] max-w-[60px] overflow-hidden rounded-l-sm border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
+    'surface-primary relative  h-auto max-h-[68.8dvh] w-[60px] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[74dvh] lg:max-h-[74dvh] lg:min-h-[74dvh]',
     collapsedLg
       ? 'lg:w-[60px] lg:min-w-[60px] lg:max-w-[60px]'
       : 'lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]',
@@ -246,6 +246,14 @@
           in:slide={{ delay: 80, duration: 180 }}
         >
           Saved Views
+          <span
+            class={merge(
+              'text-xs text-secondary',
+              collapsedLg ? 'lg:hidden' : 'lg:inline',
+            )}
+          >
+            {namespaceSavedQueries.length} / 20
+          </span>
         </p>
       {/if}
       <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
@@ -260,7 +268,7 @@
     </div>
   </div>
 
-  <div class="space-y-2 p-1.5 pb-8">
+  <div class="space-y-2 p-1.5">
     <div class="border-b border-subtle pb-2 text-center">
       <div class="space-y-1">
         {#each systemViews as view}
@@ -310,14 +318,6 @@
         })}
       </div>
     {/if}
-  </div>
-  <div
-    class={merge(
-      'absolute bottom-2 right-2 hidden text-xs text-secondary',
-      collapsedLg ? 'lg:hidden' : 'lg:block',
-    )}
-  >
-    {namespaceSavedQueries.length} / 20
   </div>
 </div>
 <SaveViewModal bind:open={saveViewModalOpen} {onCreateView} />

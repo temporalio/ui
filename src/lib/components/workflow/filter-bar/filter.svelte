@@ -63,7 +63,7 @@
   }
 </script>
 
-<div class="flex shrink items-center justify-start gap-2">
+<div class="flex shrink flex-wrap items-center justify-start gap-2">
   <DropdownFilterList />
   <SearchAttributeMenu {options} />
 </div>
