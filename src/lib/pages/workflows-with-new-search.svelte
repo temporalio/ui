@@ -1,6 +1,8 @@
 <script lang="ts" module>
   import type { Readable, Writable } from 'svelte/store';
 
+  import { twMerge as merge } from 'tailwind-merge';
+
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   export const BATCH_OPERATION_CONTEXT = 'BATCH_OPERATION_CONTEXT';
@@ -103,6 +105,7 @@
     $selectedWorkflows = [];
   };
 
+  let savedQueriesCollapsed = $state(false);
   let customizationDrawerOpen = $state(false);
 
   let batchTerminateConfirmationModalOpen = $state(false);
@@ -247,9 +250,12 @@
 <!-- <WorkflowSearchAttributeFilter /> -->
 <FilterBar />
 <div class="flex overflow-auto">
-  <SavedQueryViews />
+  <SavedQueryViews bind:savedQueriesCollapsed />
   <div
-    class="flex w-[calc(100%-80px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]"
+    class={merge(
+      'flex w-[calc(100%-80px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]',
+      savedQueriesCollapsed && 'lg:w-[calc(100%-80px)]',
+    )}
   >
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}

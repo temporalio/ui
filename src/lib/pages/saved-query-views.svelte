@@ -72,11 +72,12 @@
     },
   ];
 
+  let { savedQueriesCollapsed = $bindable(false) } = $props();
+
   let activeQueryView: SavedQuery | undefined = $state();
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
   let deleteViewModalOpen = $state(false);
-  let collapsedLg = $state(false);
   let pendingQueryTarget: string | undefined = $state();
 
   const query = $derived(page.url.searchParams.get('query') || '');
@@ -224,7 +225,7 @@
 <div
   class={merge(
     'surface-primary relative  h-auto max-h-[68.8dvh] w-[60px] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[74dvh] lg:max-h-[74dvh] lg:min-h-[74dvh]',
-    collapsedLg
+    savedQueriesCollapsed
       ? 'lg:w-[60px] lg:min-w-[60px] lg:max-w-[60px]'
       : 'lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]',
   )}
@@ -236,10 +237,10 @@
     <div
       class={merge(
         'flex w-full items-center justify-between',
-        collapsedLg ? 'lg:justify-center' : 'lg:justify-between',
+        savedQueriesCollapsed ? 'lg:justify-center' : 'lg:justify-between',
       )}
     >
-      {#if !collapsedLg}
+      {#if !savedQueriesCollapsed}
         <p
           class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
           out:fade={{ delay: 0, duration: 180 }}
@@ -249,7 +250,7 @@
           <span
             class={merge(
               'text-xs text-secondary',
-              collapsedLg ? 'lg:hidden' : 'lg:inline',
+              savedQueriesCollapsed ? 'lg:hidden' : 'lg:inline',
             )}
           >
             {namespaceSavedQueries.length} / 20
@@ -259,11 +260,13 @@
       <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
       <button
         class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
-        aria-label={collapsedLg ? 'Expand saved views' : 'Collapse saved views'}
-        title={collapsedLg ? 'Expand' : 'Collapse'}
-        onclick={() => (collapsedLg = !collapsedLg)}
+        aria-label={savedQueriesCollapsed
+          ? 'Expand saved views'
+          : 'Collapse saved views'}
+        title={savedQueriesCollapsed ? 'Expand' : 'Collapse'}
+        onclick={() => (savedQueriesCollapsed = !savedQueriesCollapsed)}
       >
-        <Icon name={collapsedLg ? 'chevron-right' : 'chevron-left'} />
+        <Icon name={savedQueriesCollapsed ? 'chevron-right' : 'chevron-left'} />
       </button>
     </div>
   </div>
@@ -347,10 +350,10 @@
       name={view?.icon || 'bookmark'}
       class={merge(
         'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-        collapsedLg ? '' : 'lg:hidden',
+        savedQueriesCollapsed ? '' : 'lg:hidden',
       )}
     />
-    {#if !collapsedLg}
+    {#if !savedQueriesCollapsed}
       <span
         class="hidden truncate text-left text-sm font-normal lg:inline-block"
         out:fade={{ delay: 80, duration: 140 }}
@@ -375,7 +378,7 @@
     <div
       class={merge(
         'items-center gap-1',
-        collapsedLg ? 'flex flex-col' : 'flex flex-col lg:flex-row',
+        savedQueriesCollapsed ? 'flex flex-col' : 'flex flex-col lg:flex-row',
       )}
       transition:slide
     >
@@ -393,7 +396,8 @@
         class="w-full"
         variant="ghost"
         on:click={handleCopy}
-        ><span class={merge('hidden', !collapsedLg && 'lg:inline')}>Share</span
+        ><span class={merge('hidden', !savedQueriesCollapsed && 'lg:inline')}
+          >Share</span
         ></Button
       >
       <Button
@@ -401,9 +405,9 @@
         size="xs"
         class="w-full"
         on:click={() => (deleteViewModalOpen = true)}
-        ><span class={merge('inline', !collapsedLg && 'lg:hidden')}
+        ><span class={merge('inline', !savedQueriesCollapsed && 'lg:hidden')}
           ><Icon name="trash" /></span
-        ><span class={merge('hidden', !collapsedLg && 'lg:inline')}
+        ><span class={merge('hidden', !savedQueriesCollapsed && 'lg:inline')}
           >Discard</span
         ></Button
       >

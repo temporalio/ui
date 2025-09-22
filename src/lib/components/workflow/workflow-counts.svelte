@@ -36,8 +36,8 @@
 
   let attempt = 1;
   let loading = false;
-  const initialIntervalSeconds = 5;
-  const maxAttempts = 100;
+  const initialIntervalSeconds = 20;
+  const maxAttempts = 20;
 
   onDestroy(() => {
     clearNewCounts();
