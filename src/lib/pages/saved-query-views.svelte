@@ -57,6 +57,13 @@
       type: 'system',
     },
     {
+      id: 'running',
+      name: 'Running',
+      query: 'ExecutionStatus = "Running"',
+      icon: 'workflow',
+      type: 'system',
+    },
+    {
       id: 'today',
       name: 'Today',
       query: `StartTime >= "${getToday()}"`,
@@ -384,7 +391,7 @@
     >
       <Button
         size="xs"
-        class="w-full"
+        class="w-full scale-90"
         variant="secondary"
         on:click={() => {
           editViewModalOpen = true;
@@ -393,7 +400,7 @@
       <Button
         leadingIcon={$copied ? 'checkmark' : 'copy'}
         size="xs"
-        class="w-full"
+        class="w-full scale-90"
         variant="ghost"
         on:click={handleCopy}
         ><span class={merge('hidden', !savedQueriesCollapsed && 'lg:inline')}
@@ -403,7 +410,7 @@
       <Button
         variant="destructive"
         size="xs"
-        class="w-full"
+        class="w-full scale-90"
         on:click={() => (deleteViewModalOpen = true)}
         ><span class={merge('inline', !savedQueriesCollapsed && 'lg:hidden')}
           ><Icon name="trash" /></span
@@ -416,7 +423,7 @@
     <div class="flex items-center gap-1" transition:slide>
       <Button
         size="xs"
-        class="w-full"
+        class="scale-85 w-full transition-all"
         variant="secondary"
         on:click={() => {
           saveViewModalOpen = true;
