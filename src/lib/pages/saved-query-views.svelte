@@ -77,7 +77,6 @@
   ];
 
   let activeQueryView: SavedQuery | undefined = $state();
-
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
   let deleteViewModalOpen = $state(false);
@@ -96,12 +95,19 @@
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
   );
-  const unsavedQuery = $derived(
-    query &&
-      !systemQueryView &&
-      !namespaceSavedQueries.find((q) => q.query === query) &&
-      activeQueryView?.query !== query,
-  );
+  // const activeSystemView = $derived(
+  //   activeQueryView?.type === 'system' ? activeQueryView : undefined,
+  // );
+  const unsaveView: SavedQuery = $derived({
+    id: 'unsaved',
+    name: 'New View',
+    query,
+    icon: 'bookmark',
+    badge: 'Unsaved',
+    type: 'system',
+    active: true,
+  });
+  const unsavedQuery = $derived(query && activeQueryView?.id === 'unsaved');
 
   onMount(() => {
     if (savedQueryParam) {
@@ -122,8 +128,18 @@
       goto(url);
     } else if (savedQueryView && !activeQueryView) {
       activeQueryView = savedQueryView;
+    } else if (systemQueryView && !activeQueryView) {
+      activeQueryView = systemQueryView;
+    } else if (query) {
+      activeQueryView = unsaveView;
     }
   });
+
+  // $effect(() => {
+  //   if (query && activeSystemView && query !== activeSystemView.query) {
+  //     activeQueryView = unsaveView;
+  //   }
+  // });
 
   const setActiveQueryView = (view: SavedQuery) => {
     activeQueryView = view;
@@ -242,17 +258,9 @@
       </div>
     {/if}
 
-    {#if unsavedQuery && !activeQueryView}
+    {#if unsavedQuery}
       <div class="space-y-1">
-        {@render queryButton({
-          id: 'unsaved',
-          name: 'New View',
-          query,
-          icon: 'bookmark',
-          badge: 'Unsaved',
-          type: 'system',
-          active: true,
-        })}
+        {@render queryButton(unsaveView)}
       </div>
     {/if}
 
