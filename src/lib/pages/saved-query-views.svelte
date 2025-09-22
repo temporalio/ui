@@ -80,6 +80,7 @@
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
   let deleteViewModalOpen = $state(false);
+  let pendingQueryTarget: string | undefined = $state();
 
   const query = $derived(page.url.searchParams.get('query') || '');
   const savedQueryParam = page.url.searchParams.get('savedQuery');
@@ -95,9 +96,6 @@
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
   );
-  // const activeSystemView = $derived(
-  //   activeQueryView?.type === 'system' ? activeQueryView : undefined,
-  // );
   const unsaveView: SavedQuery = $derived({
     id: 'unsaved',
     name: 'New View',
@@ -126,23 +124,38 @@
       const url = new URL(page.url);
       url.searchParams.delete('savedQuery');
       goto(url);
-    } else if (savedQueryView && !activeQueryView) {
+    } else if (savedQueryView) {
       activeQueryView = savedQueryView;
-    } else if (systemQueryView && !activeQueryView) {
+    } else if (systemQueryView) {
       activeQueryView = systemQueryView;
     } else if (query) {
       activeQueryView = unsaveView;
     }
   });
 
-  // $effect(() => {
-  //   if (query && activeSystemView && query !== activeSystemView.query) {
-  //     activeQueryView = unsaveView;
-  //   }
-  // });
+  $effect(() => {
+    if (pendingQueryTarget !== undefined) {
+      if (query === pendingQueryTarget) pendingQueryTarget = undefined;
+      return;
+    }
+
+    if (activeQueryView?.type === 'system') {
+      if (query && activeQueryView.query !== query) {
+        if (savedQueryView) {
+          activeQueryView = savedQueryView;
+        } else if (systemQueryView) {
+          activeQueryView = systemQueryView;
+        } else {
+          activeQueryView = unsaveView;
+        }
+      }
+    }
+  });
 
   const setActiveQueryView = (view: SavedQuery) => {
     activeQueryView = view;
+    pendingQueryTarget = view.query || '';
+
     if (unsavedQuery && view.id === 'unsaved') {
       saveViewModalOpen = true;
       return;
@@ -354,18 +367,7 @@
     </div>
   {:else if unsavedQuery && view?.id === 'unsaved'}
     <div class="flex items-center gap-1" transition:slide>
-      <Button
-        size="xs"
-        class="w-full"
-        variant="secondary"
-        on:click={() => {
-          if (view.id === 'unsaved') {
-            saveViewModalOpen = true;
-          } else {
-            editViewModalOpen = true;
-          }
-        }}>Save</Button
-      >
+      <Button size="xs" class="w-full" variant="secondary">Save</Button>
     </div>
   {/if}
 {/snippet}
