@@ -253,8 +253,8 @@
   <SavedQueryViews bind:savedQueriesCollapsed />
   <div
     class={merge(
-      'flex w-[calc(100%-80px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]',
-      savedQueriesCollapsed && 'lg:w-[calc(100%-80px)]',
+      'flex w-[calc(100%-60px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]',
+      savedQueriesCollapsed && 'lg:w-[calc(100%-60px)]',
     )}
   >
     <WorkflowsSummaryConfigurableTable
