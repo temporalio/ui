@@ -231,7 +231,7 @@
 
 <div
   class={merge(
-    'surface-primary relative  h-auto max-h-[68.8dvh] w-[60px] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[74dvh] lg:max-h-[74dvh] lg:min-h-[74dvh]',
+    'surface-primary relative h-auto w-[60px] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[73dvh] lg:max-h-[73dvh] lg:min-h-[73dvh]',
     savedQueriesCollapsed
       ? 'lg:w-[60px] lg:min-w-[60px] lg:max-w-[60px]'
       : 'lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]',

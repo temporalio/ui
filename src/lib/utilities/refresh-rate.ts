@@ -1,4 +1,4 @@
-export const getExponentialBackoffSeconds = (
+export const getExponentialBackoff = (
   initialIntervalSeconds: number,
   attempt: number,
   maxAttempts: number,
@@ -14,5 +14,5 @@ export const getExponentialBackoffSeconds = (
     maxIntervalSeconds,
     Math.round(exponentialBackoff),
   );
-  return intervalSeconds;
+  return intervalSeconds * 1000;
 };
