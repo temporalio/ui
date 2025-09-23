@@ -41,14 +41,14 @@
       icon: 'workflow',
       type: 'system',
     },
-    // {
-    //   id: 'task-failures',
-    //   name: 'Task Failures',
-    //   query: 'ExecutionStatus = "Failed" OR ExecutionStatus = "Terminated"',
-    //   icon: 'error',
-    //   count: 8,
-    //   class: 'text-danger',
-    // },
+    {
+      id: 'task-failures',
+      name: 'Task Failures',
+      query: 'ExecutionStatus = "Failed" OR ExecutionStatus = "Terminated"',
+      icon: 'error',
+      count: 17,
+      class: 'text-danger',
+    },
     {
       id: 'child-workflows',
       name: 'Parent Workflows',
@@ -60,7 +60,7 @@
       id: 'running',
       name: 'Running',
       query: 'ExecutionStatus = "Running"',
-      icon: 'workflow',
+      icon: 'heartbeat',
       type: 'system',
     },
     {
@@ -371,6 +371,12 @@
         class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
         out:fade={{ delay: 90, duration: 140 }}
         in:slide={{ delay: 90, duration: 180 }}>{view?.badge || ''}</span
+      >
+      <span
+        class:invisible={!view?.count}
+        class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+        out:fade={{ delay: 90, duration: 140 }}
+        in:slide={{ delay: 90, duration: 180 }}>{view?.count || ''}</span
       >
     {/if}
   </Button>
