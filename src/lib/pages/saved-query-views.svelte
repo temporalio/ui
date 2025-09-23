@@ -48,6 +48,7 @@
       icon: 'error',
       count: 17,
       class: 'text-danger',
+      type: 'system',
     },
     {
       id: 'child-workflows',
