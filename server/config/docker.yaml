@@ -31,7 +31,7 @@ cors:
     # override framework's default that allows all origins "*"
     {{- if env "TEMPORAL_CORS_ORIGINS" }}
     {{- range env "TEMPORAL_CORS_ORIGINS" | split "," }}
-    - {{ . }}
+    - "{{ . }}"
     {{- end }}
     {{- else }}
     - "http://localhost:8080"
