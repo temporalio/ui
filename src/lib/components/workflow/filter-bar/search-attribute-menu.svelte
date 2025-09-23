@@ -20,6 +20,7 @@
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
+  import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
   import {
     emptyFilter,
     updateQueryParamsFromFilter,
@@ -28,20 +29,15 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
 
-  export let options: SearchAttributeOption[];
+  let { options }: { options: SearchAttributeOption[] } = $props();
+
+  const query = $derived(page.url.searchParams.get('query'));
+  let searchAttributeValue = $state('');
 
   const { filter, activeQueryIndex, handleSubmit } =
     getContext<FilterContext>(FILTER_CONTEXT);
 
   const open = writable(false);
-
-  // function isOptionDisabled(value: string) {
-  //   return $workflowFilters.some(
-  //     (filter) =>
-  //       ['=', '!=', 'is', 'is not'].includes(filter.conditional) &&
-  //       filter.attribute === value,
-  //   );
-  // }
 
   const getDefaultConditional = (type: SearchAttributeType) => {
     switch (type) {
@@ -76,15 +72,15 @@
     $open = false;
   }
 
-  let searchAttributeValue = '';
-
-  $: filteredOptions = !searchAttributeValue
-    ? options
-    : options.filter((option) =>
-        option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
-      );
-
-  $: query = page.url.searchParams.get('query');
+  const filteredOptions = $derived(
+    !searchAttributeValue
+      ? options
+      : options.filter((option) =>
+          option.value
+            .toLowerCase()
+            .includes(searchAttributeValue.toLowerCase()),
+        ),
+  );
 
   function clearAllFilters() {
     $workflowFilters = [];
@@ -133,6 +129,8 @@
         on:click={() => {
           handleNewQuery(value, type);
         }}
+        disabled={value === 'ExecutionStatus' &&
+          !!$workflowFilters.find((f) => isStatusFilter(f))}
       >
         <div>
           <p class="leading-3">{label}</p>

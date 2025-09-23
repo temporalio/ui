@@ -4,7 +4,6 @@
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
 
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -19,7 +18,6 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { workflowStatuses } from '$lib/models/workflow-status';
   import {
     endDate,
     endHour,
@@ -139,10 +137,6 @@
   function getDisplayKeyWithConditional(filter: SearchAttributeFilter): string {
     const { attribute, conditional } = filter;
 
-    if (isStatusFilter(filter)) {
-      return `${attribute} =`;
-    }
-
     if (isDateTimeFilter(filter)) {
       if (filter.customDate) return `${attribute} Between`;
 
@@ -198,14 +192,6 @@
     }
     onUpdate(localFilter);
     $open = false;
-  }
-
-  function handleStatusSelect(status: string) {
-    localFilter = {
-      ...localFilter,
-      value: status,
-      conditional: '=',
-    };
   }
 
   function timeError(x: string) {
@@ -329,21 +315,7 @@
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-medium">Filter by {filter.attribute}</h3>
         </div>
-
-        {#if isStatusFilter(localFilter)}
-          <div class="space-y-2">
-            {#each workflowStatuses as status}
-              <button
-                class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-subtle"
-                class:bg-primary={localFilter.value === status}
-                class:text-primary-foreground={localFilter.value === status}
-                onclick={() => handleStatusSelect(status)}
-              >
-                <WorkflowStatus {status} />
-              </button>
-            {/each}
-          </div>
-        {:else if isTextFilter(localFilter)}
+        {#if isTextFilter(localFilter)}
           <div class="space-y-3">
             {@render conditionalButtons(conditionalOptions)}
             <Input

@@ -7,21 +7,31 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
+  import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import DropdownFilterChip from './dropdown-filter-chip.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
+  import StatusDropdownFilterChip from './status-dropdown-filter-chip.svelte';
 
   const { filter, activeQueryIndex, chipOpenIndex } =
     getContext<FilterContext>(FILTER_CONTEXT);
 
   let totalFiltersInView = $state(10);
 
+  const firstExecutionStatusIndex = $derived(
+    $workflowFilters.findIndex((filter) => isStatusFilter(filter)),
+  );
   const visibleFilters = $derived(
     $workflowFilters.slice(0, totalFiltersInView),
   );
-
+  const executionStatusFilters = $derived(
+    $workflowFilters.filter((filter) => filter.attribute === 'ExecutionStatus'),
+  );
+  const nonStatusFilters = $derived(
+    $workflowFilters.filter((filter) => !isStatusFilter(filter)),
+  );
   const hasMoreFilters = $derived(totalFiltersInView < $workflowFilters.length);
 
   function updateFilter(index: number, updatedFilter: SearchAttributeFilter) {
@@ -29,6 +39,21 @@
     next[index] = updatedFilter;
     $workflowFilters = next;
     updateQueryParamsFromFilter(page.url, $workflowFilters);
+  }
+
+  function updateStatusFilters(
+    index: number,
+    updatedFilters: SearchAttributeFilter[],
+  ) {
+    if (updatedFilters.length === 0) {
+      $workflowFilters = nonStatusFilters;
+      updateQueryParamsFromFilter(page.url, $workflowFilters);
+    } else {
+      const next = [...$workflowFilters];
+      next.splice(index, executionStatusFilters.length, ...updatedFilters);
+      $workflowFilters = next;
+      updateQueryParamsFromFilter(page.url, $workflowFilters);
+    }
   }
 
   function removeFilter(index: number) {
@@ -62,7 +87,14 @@
 {#if visibleFilters.length > 0}
   <div class="flex flex-wrap items-center gap-2">
     {#each visibleFilters as workflowFilter, i (workflowFilter.attribute + '-' + i)}
-      {#if workflowFilter.attribute}
+      {#if isStatusFilter(workflowFilter) && i === firstExecutionStatusIndex}
+        <StatusDropdownFilterChip
+          filters={executionStatusFilters}
+          index={i}
+          openIndex={$chipOpenIndex}
+          onUpdate={(statusFilters) => updateStatusFilters(i, statusFilters)}
+        />
+      {:else if !isStatusFilter(workflowFilter) && workflowFilter.attribute}
         <DropdownFilterChip
           filter={workflowFilter}
           index={i}
