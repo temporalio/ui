@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { cubicOut } from 'svelte/easing';
-  import { fade, fly, slide } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
 
   import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -381,8 +380,7 @@
         'items-center gap-1 overflow-hidden transition-all',
         savedQueriesCollapsed ? 'flex flex-col' : 'flex flex-col lg:flex-row',
       )}
-      in:fly={{ y: 3, duration: 110, delay: 0, easing: cubicOut }}
-      out:fly={{ y: -3, duration: 0, easing: cubicOut }}
+      transition:slide
     >
       <Button
         size="xs"
@@ -415,11 +413,7 @@
       >
     </div>
   {:else if unsavedQuery && view?.id === 'unsaved'}
-    <div
-      class="flex items-center gap-1 overflow-hidden"
-      in:fly={{ y: 3, duration: 110, delay: 0, easing: cubicOut }}
-      out:fly={{ y: -3, duration: 90, easing: cubicOut }}
-    >
+    <div class="flex items-center gap-1 overflow-hidden" transition:slide>
       <Button
         size="xs"
         class="scale-85 w-full transition-all"
