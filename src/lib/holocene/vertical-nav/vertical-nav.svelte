@@ -47,57 +47,59 @@
   const itemElements = new Map<string, HTMLElement>();
 
   let navElement = $state<HTMLElement>();
-  let hoverBackgroundElement = $state<HTMLElement>();
-  let activeBackgroundElement = $state<HTMLElement>();
   let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  $effect(() => {
+  // Sync activeItemId prop to internal store
+  $effect.pre(() => {
     if (activeItemId !== null) {
       activeItem.set(activeItemId);
     }
   });
 
-  // Handle active item background (static)
-  $effect(() => {
-    if (activeBackgroundElement && navElement && $activeItem) {
-      const element = itemElements.get($activeItem);
-      if (element) {
-        const navRect = navElement.getBoundingClientRect();
-        const itemRect = element.getBoundingClientRect();
-        const top = itemRect.top - navRect.top;
-        const height = itemRect.height;
-
-        activeBackgroundElement.style.transform = `translateY(${top}px)`;
-        activeBackgroundElement.style.height = `${height}px`;
-        activeBackgroundElement.style.opacity = '1';
-      }
-    } else if (activeBackgroundElement) {
-      activeBackgroundElement.style.opacity = '0';
+  // Calculate active item position and styles
+  const activeBackgroundStyles = $derived.by(() => {
+    if (!navElement || !$activeItem) {
+      return { transform: '', height: '', opacity: '0' };
     }
+
+    const element = itemElements.get($activeItem);
+    if (!element) {
+      return { transform: '', height: '', opacity: '0' };
+    }
+
+    const navRect = navElement.getBoundingClientRect();
+    const itemRect = element.getBoundingClientRect();
+    const top = itemRect.top - navRect.top;
+    const height = itemRect.height;
+
+    return {
+      transform: `translateY(${top}px)`,
+      height: `${height}px`,
+      opacity: '1',
+    };
   });
 
-  // Handle hover background (animated) - only show if not hovering the active item
-  $effect(() => {
-    if (
-      hoverBackgroundElement &&
-      navElement &&
-      $hoveredItem &&
-      $hoveredItem !== $activeItem
-    ) {
-      const element = itemElements.get($hoveredItem);
-      if (element) {
-        const navRect = navElement.getBoundingClientRect();
-        const itemRect = element.getBoundingClientRect();
-        const top = itemRect.top - navRect.top;
-        const height = itemRect.height;
-
-        hoverBackgroundElement.style.transform = `translateY(${top}px)`;
-        hoverBackgroundElement.style.height = `${height}px`;
-        hoverBackgroundElement.style.opacity = '1';
-      }
-    } else if (hoverBackgroundElement) {
-      hoverBackgroundElement.style.opacity = '0';
+  // Calculate hover item position and styles
+  const hoverBackgroundStyles = $derived.by(() => {
+    if (!navElement || !$hoveredItem || $hoveredItem === $activeItem) {
+      return { transform: '', height: '', opacity: '0' };
     }
+
+    const element = itemElements.get($hoveredItem);
+    if (!element) {
+      return { transform: '', height: '', opacity: '0' };
+    }
+
+    const navRect = navElement.getBoundingClientRect();
+    const itemRect = element.getBoundingClientRect();
+    const top = itemRect.top - navRect.top;
+    const height = itemRect.height;
+
+    return {
+      transform: `translateY(${top}px)`,
+      height: `${height}px`,
+      opacity: '1',
+    };
   });
 
   $effect(() => {
@@ -161,15 +163,19 @@
 >
   <!-- Active item background (static) -->
   <div
-    bind:this={activeBackgroundElement}
-    class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-active transition-all ${ACTIVE_TRANSITION_DURATION} opacity-0 ease-out`}
+    style:transform={activeBackgroundStyles.transform}
+    style:height={activeBackgroundStyles.height}
+    style:opacity={activeBackgroundStyles.opacity}
+    class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-active transition-all ${ACTIVE_TRANSITION_DURATION} ease-out`}
     aria-hidden="true"
   ></div>
 
   <!-- Hover background (animated) -->
   <div
-    bind:this={hoverBackgroundElement}
-    class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-hover transition-all ${HOVER_TRANSITION_DURATION} opacity-0 ease-out`}
+    style:transform={hoverBackgroundStyles.transform}
+    style:height={hoverBackgroundStyles.height}
+    style:opacity={hoverBackgroundStyles.opacity}
+    class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-hover transition-all ${HOVER_TRANSITION_DURATION} ease-out`}
     aria-hidden="true"
   ></div>
 
