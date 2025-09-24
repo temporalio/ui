@@ -52,6 +52,7 @@
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
     queryWithParentWorkflowId,
     refresh,
@@ -59,6 +60,7 @@
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
+  import { formatDate } from '$lib/utilities/format-date';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
@@ -67,6 +69,14 @@
   const namespace = $derived(page.params.namespace);
   const perPage = $derived(page.url.searchParams.get('per-page'));
   const searchParams = $derived(page.url.searchParams.toString());
+
+  let refreshTime = $state(new Date());
+
+  const refreshTimeFormatted = $derived(
+    formatDate(refreshTime, $timeFormat, {
+      relative: $relativeTime,
+    }),
+  );
 
   const availableColumns = $derived(
     availableWorkflowSystemSearchAttributeColumns(
@@ -215,22 +225,27 @@
 
 <header class="flex flex-col gap-2">
   <div class="flex flex-col justify-between gap-2 md:flex-row">
-    <div class="flex flex-col justify-between gap-2 lg:flex-row">
-      <h1 class="flex items-center gap-2" data-cy="workflows-title">
-        {#if $supportsAdvancedVisibility}
-          <span data-testid="workflow-count"
-            >{$workflowCount.count.toLocaleString()}</span
-          >
-          <Translate
-            key="common.workflows-plural"
-            count={$workflowCount.count}
-          />
-        {:else}
-          <Translate key="workflows.recent-workflows" />
-        {/if}
-        <WorkflowCountRefresh count={$workflowCount.newCount} />
-      </h1>
-      <WorkflowCounts />
+    <div class="flex flex-row flex-wrap items-start gap-2">
+      <div>
+        <h1 class="flex items-center gap-2 leading-7" data-cy="workflows-title">
+          {#if $supportsAdvancedVisibility}
+            <span data-testid="workflow-count"
+              >{$workflowCount.count.toLocaleString()}</span
+            >
+            <Translate
+              key="common.workflows-plural"
+              count={$workflowCount.count}
+            />
+          {:else}
+            <Translate key="workflows.recent-workflows" />
+          {/if}
+        </h1>
+        <p class="text-xs text-secondary">
+          {refreshTimeFormatted}
+        </p>
+      </div>
+      <WorkflowCountRefresh count={$workflowCount.newCount} />
+      <WorkflowCounts bind:refreshTime />
     </div>
     {#if $$slots['header-actions'] || workflowStartEnabled}
       <div class="flex items-center gap-4">

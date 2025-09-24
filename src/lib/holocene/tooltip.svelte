@@ -78,7 +78,7 @@
     <slot />
     <div
       class={merge(
-        'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
+        'tooltip absolute left-0 top-0 z-[9999] hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
         show && 'inline-block opacity-90',
       )}
       class:left

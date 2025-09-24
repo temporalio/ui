@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fade, slide } from 'svelte/transition';
+  import { slide } from 'svelte/transition';
 
   import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -12,6 +12,7 @@
   import SaveViewModal from '$lib/components/workflow/filter-bar/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
@@ -41,26 +42,26 @@
       icon: 'workflow',
       type: 'system',
     },
-    {
-      id: 'task-failures',
-      name: 'Task Failures',
-      query: 'ExecutionStatus = "Failed" OR ExecutionStatus = "Terminated"',
-      icon: 'error',
-      count: 17,
-      class: 'text-danger',
-      type: 'system',
-    },
+    // {
+    //   id: 'task-failures',
+    //   name: 'Task Failures',
+    //   query: 'ExecutionStatus = "Failed" OR ExecutionStatus = "Terminated"',
+    //   icon: 'error',
+    //   count: 17,
+    //   class: 'text-danger',
+    //   type: 'system',
+    // },
     {
       id: 'child-workflows',
       name: 'Parent Workflows',
-      query: 'ParentWorkflowId is null',
+      query: '`ParentWorkflowId` is null',
       icon: 'relationship',
       type: 'system',
     },
     {
       id: 'running',
       name: 'Running',
-      query: 'ExecutionStatus = "Running"',
+      query: '`ExecutionStatus`="Running"',
       icon: 'heartbeat',
       type: 'system',
     },
@@ -232,7 +233,7 @@
 
 <div
   class={merge(
-    'surface-primary relative h-auto w-[60px] w-[60px] min-w-[60px] max-w-[60px] overflow-auto rounded-l-sm border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[73dvh] lg:max-h-[73dvh] lg:min-h-[73dvh]',
+    'surface-primary relative h-auto w-[60px] w-[60px] min-w-[60px] max-w-[60px] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[73dvh] lg:max-h-[73dvh] lg:min-h-[73dvh]',
     savedQueriesCollapsed
       ? 'lg:w-[60px] lg:min-w-[60px] lg:max-w-[60px]'
       : 'lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]',
@@ -251,8 +252,7 @@
       {#if !savedQueriesCollapsed}
         <p
           class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
-          out:fade={{ delay: 0, duration: 180 }}
-          in:slide={{ delay: 80, duration: 180 }}
+          in:slide
         >
           Saved Views
           <span
@@ -354,30 +354,30 @@
     disabled={view?.disabled}
     size="sm"
   >
-    <Icon
-      name={view?.icon || 'bookmark'}
-      class={merge(
-        'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-        savedQueriesCollapsed ? '' : 'lg:hidden',
-      )}
-    />
+    <Tooltip text={view.name} right hide={!savedQueriesCollapsed}>
+      <Icon
+        name={view?.icon || 'bookmark'}
+        class={merge(
+          'h-4 w-4 flex-shrink-0  transition-colors duration-200',
+          savedQueriesCollapsed ? '' : 'lg:hidden',
+        )}
+      />
+    </Tooltip>
+
     {#if !savedQueriesCollapsed}
       <span
         class="hidden truncate text-left text-sm font-normal lg:inline-block"
-        out:fade={{ delay: 80, duration: 140 }}
-        in:slide={{ delay: 80, duration: 180 }}>{view.name}</span
+        in:slide>{view.name}</span
       >
       <span
         class:invisible={!view?.badge}
         class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-        out:fade={{ delay: 90, duration: 140 }}
-        in:slide={{ delay: 90, duration: 180 }}>{view?.badge || ''}</span
+        in:slide>{view?.badge || ''}</span
       >
       <span
         class:invisible={!view?.count}
         class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-        out:fade={{ delay: 90, duration: 140 }}
-        in:slide={{ delay: 90, duration: 180 }}>{view?.count || ''}</span
+        in:slide>{view?.count || ''}</span
       >
     {/if}
   </Button>

@@ -7,7 +7,6 @@
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
     disableWorkflowCountsRefresh,
     queryWithParentWorkflowId,
@@ -18,7 +17,6 @@
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowStatus,
   } from '$lib/types/workflows';
-  import { formatDate } from '$lib/utilities/format-date';
   import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
@@ -27,7 +25,11 @@
 
   import WorkflowCountStatus from '../workflow-status.svelte';
 
-  let { staticQuery = '' } = $props();
+  type Props = {
+    staticQuery?: string;
+    refreshTime?: Date;
+  };
+  let { staticQuery = '', refreshTime = $bindable() }: Props = $props();
 
   const namespace = $derived(page.params.namespace);
   const query = $derived(staticQuery || $queryWithParentWorkflowId);
@@ -36,14 +38,6 @@
   let statusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
   let refreshInterval: ReturnType<typeof setInterval>;
-
-  let refreshTime = $state(new Date());
-
-  const refreshTimeFormatted = $derived(
-    formatDate(refreshTime, $timeFormat, {
-      relative: $relativeTime,
-    }),
-  );
 
   let attempt = $state(1);
   let loading = $state(false);
@@ -160,7 +154,7 @@
   });
 </script>
 
-<div class="flex min-h-[24px] flex-wrap items-center gap-2">
+<div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
   {#each statusGroups as { count, status } (status)}
     {#if !loading}
       <button onclick={() => onStatusClick(status)}>
@@ -177,5 +171,4 @@
       <Skeleton class="h-6 w-24 rounded-sm" />
     {/if}
   {/each}
-  <p class="font-mono text-[11px] text-secondary">{refreshTimeFormatted}</p>
 </div>

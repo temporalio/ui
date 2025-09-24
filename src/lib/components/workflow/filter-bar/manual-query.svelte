@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-  import { fly } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -15,17 +14,17 @@
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  let manualSearchString = '';
+  let manualSearchString = $state('');
 
-  $: query = $page.url.searchParams.get('query');
+  const query = $derived(page.url.searchParams.get('query'));
 
   function setManualString(query: string) {
     manualSearchString = query;
   }
 
-  $: {
+  $effect(() => {
     setManualString(query);
-  }
+  });
 
   const onSearch = () => {
     if (!manualSearchString) {
@@ -46,7 +45,7 @@
       $refresh = Date.now();
     } else {
       updateQueryParameters({
-        url: $page.url,
+        url: page.url,
         parameter: 'query',
         value: manualSearchString,
         allowEmpty: true,
@@ -61,14 +60,9 @@
 </script>
 
 <div class="w-full border border-t-0 border-subtle" in:fade>
-  <form
-    on:submit|preventDefault={onSearch}
-    class="flex gap-0"
-    in:fly={{ x: -100, duration: 150 }}
-    role="search"
-  >
+  <form onsubmit={onSearch} class="flex gap-0" transition:slide role="search">
     <Input
-      id="manual-search"
+      id="query"
       type="search"
       label={translate('workflows.search-placeholder')}
       labelHidden
