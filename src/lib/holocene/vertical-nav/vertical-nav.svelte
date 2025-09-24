@@ -48,6 +48,7 @@
 
   let navElement = $state<HTMLElement>();
   let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+  let enableTransitions = $state(false);
 
   // Sync activeItemId prop to internal store
   $effect.pre(() => {
@@ -116,6 +117,8 @@
     hoveredItem,
     selectItem: (id: string) => {
       activeItem.set(id);
+      // Reset transition state after clicking
+      enableTransitions = false;
     },
     setHoveredItem: (id: string | null) => {
       // Clear any existing timeout
@@ -127,11 +130,25 @@
       if (id !== null) {
         // Immediate hover when entering an item
         hoveredItem.set(id);
+
+        // If hovering the active item, reset transitions
+        if (id === $activeItem) {
+          enableTransitions = false;
+        } else {
+          // Enable transitions after first hover on non-active items
+          if (!enableTransitions) {
+            setTimeout(() => {
+              enableTransitions = true;
+            }, 100);
+          }
+        }
       } else {
         // Debounce when leaving (prevents jumpy behavior)
         hoverTimeout = setTimeout(() => {
           hoveredItem.set(null);
           hoverTimeout = null;
+          // Reset transition state when fully exited
+          enableTransitions = false;
         }, HOVER_EXIT_DELAY_MS);
       }
     },
@@ -175,7 +192,11 @@
     style:transform={hoverBackgroundStyles.transform}
     style:height={hoverBackgroundStyles.height}
     style:opacity={hoverBackgroundStyles.opacity}
-    class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-hover transition-all ${HOVER_TRANSITION_DURATION} ease-out`}
+    class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-hover ${
+      enableTransitions
+        ? `transition-all ${HOVER_TRANSITION_DURATION} ease-out`
+        : 'transition-opacity duration-300 ease-in'
+    }`}
     aria-hidden="true"
   ></div>
 
