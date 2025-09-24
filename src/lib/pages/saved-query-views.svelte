@@ -12,7 +12,6 @@
   import SaveViewModal from '$lib/components/workflow/filter-bar/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
@@ -349,38 +348,39 @@
     variant="ghost"
     data-testid={view.id}
     on:click={() => setActiveQueryView(view)}
-    class={merge('w-full', view.class || '')}
+    class={merge('flex w-full justify-start', view.class || '')}
     active={view?.active}
     disabled={view?.disabled}
     size="sm"
   >
-    <Tooltip text={view.name} right hide={!savedQueriesCollapsed}>
-      <Icon
-        name={view?.icon || 'bookmark'}
-        class={merge(
-          'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-          savedQueriesCollapsed ? '' : 'lg:hidden',
-        )}
-      />
-    </Tooltip>
+    <Icon
+      name={view?.icon || 'bookmark'}
+      class={merge(
+        'h-4 w-4 flex-shrink-0  transition-colors duration-200',
+        savedQueriesCollapsed ? '' : 'lg:hidden',
+      )}
+    />
 
     {#if !savedQueriesCollapsed}
       <span
         class="hidden truncate text-left text-sm font-normal lg:inline-block"
         in:slide>{view.name}</span
       >
-      <span
-        class:invisible={!view?.badge}
-        class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-        in:slide>{view?.badge || ''}</span
-      >
-      <span
-        class:invisible={!view?.count}
-        class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-        in:slide>{view?.count || ''}</span
-      >
+      {#if view?.badge}
+        <span
+          class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+          in:slide>{view?.badge || ''}</span
+        >
+      {/if}
+      {#if view?.count}
+        <span
+          class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+          in:slide>{view?.count || ''}</span
+        >
+      {/if}
     {/if}
   </Button>
+
   {#if activeQueryView?.id === view?.id && view.type === 'user'}
     <div
       class={merge(
