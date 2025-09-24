@@ -49,6 +49,7 @@
   let navElement = $state<HTMLElement>();
   let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
   let enableTransitions = $state(false);
+  let hideHoverBackground = $state(false);
 
   // Sync activeItemId prop to internal store
   $effect.pre(() => {
@@ -117,39 +118,57 @@
     hoveredItem,
     selectItem: (id: string) => {
       activeItem.set(id);
-      // Reset transition state after clicking
+      // Hide hover background completely after clicking
+      hideHoverBackground = true;
+      hoveredItem.set(null);
       enableTransitions = false;
     },
     setHoveredItem: (id: string | null) => {
-      // Clear any existing timeout
+      // Clear any existing hover timeout
       if (hoverTimeout) {
         clearTimeout(hoverTimeout);
         hoverTimeout = null;
       }
 
-      if (id !== null) {
-        // Immediate hover when entering an item
-        hoveredItem.set(id);
-
-        // If hovering the active item, reset transitions
-        if (id === $activeItem) {
-          enableTransitions = false;
-        } else {
-          // Enable transitions after first hover on non-active items
-          if (!enableTransitions) {
-            setTimeout(() => {
-              enableTransitions = true;
-            }, 100);
-          }
-        }
-      } else {
-        // Debounce when leaving (prevents jumpy behavior)
+      // Handle mouse leave
+      if (id === null) {
         hoverTimeout = setTimeout(() => {
           hoveredItem.set(null);
           hoverTimeout = null;
-          // Reset transition state when fully exited
           enableTransitions = false;
         }, HOVER_EXIT_DELAY_MS);
+        return;
+      }
+
+      // Skip hover for active item
+      if (id === $activeItem) {
+        hoveredItem.set(null);
+        enableTransitions = false;
+        return;
+      }
+
+      // Check if this is first hover after click or no previous hover
+      const isFirstHover = hideHoverBackground || !$hoveredItem;
+
+      // Reset the hide flag
+      if (hideHoverBackground) {
+        hideHoverBackground = false;
+      }
+
+      // Set hovered item
+      hoveredItem.set(id);
+
+      // Don't enable transitions for first hover (appear, not animate)
+      if (isFirstHover) {
+        enableTransitions = false;
+        return;
+      }
+
+      // Enable transitions for subsequent hovers
+      if (!enableTransitions) {
+        requestAnimationFrame(() => {
+          enableTransitions = true;
+        });
       }
     },
     registerItem: (id: string, element: HTMLElement) => {
@@ -188,17 +207,19 @@
   ></div>
 
   <!-- Hover background (animated) -->
-  <div
-    style:transform={hoverBackgroundStyles.transform}
-    style:height={hoverBackgroundStyles.height}
-    style:opacity={hoverBackgroundStyles.opacity}
-    class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-hover ${
-      enableTransitions
-        ? `transition-all ${HOVER_TRANSITION_DURATION} ease-out`
-        : 'transition-opacity duration-300 ease-in'
-    }`}
-    aria-hidden="true"
-  ></div>
+  {#if !hideHoverBackground && $hoveredItem && $hoveredItem !== $activeItem}
+    <div
+      style:transform={hoverBackgroundStyles.transform}
+      style:height={hoverBackgroundStyles.height}
+      style:opacity={hoverBackgroundStyles.opacity}
+      class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-hover ${
+        enableTransitions
+          ? `transition-all ${HOVER_TRANSITION_DURATION} ease-out`
+          : ''
+      }`}
+      aria-hidden="true"
+    ></div>
+  {/if}
 
   <ul class="relative z-10 m-0 flex list-none flex-col gap-0.5 p-0">
     {@render children()}
