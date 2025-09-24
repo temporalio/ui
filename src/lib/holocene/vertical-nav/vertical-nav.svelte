@@ -16,7 +16,7 @@
   // Animation constants
   const HOVER_EXIT_DELAY_MS = 100;
   const ACTIVE_TRANSITION_DURATION = 'duration-300';
-  const HOVER_TRANSITION_DURATION = 'duration-200';
+  const HOVER_TRANSITION_DURATION = 'duration-300';
 </script>
 
 <script lang="ts">
@@ -50,6 +50,7 @@
   let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
   let enableTransitions = $state(false);
   let hideHoverBackground = $state(false);
+  let showHoverOpacity = $state(false);
 
   // Sync activeItemId prop to internal store
   $effect.pre(() => {
@@ -84,12 +85,12 @@
   // Calculate hover item position and styles
   const hoverBackgroundStyles = $derived.by(() => {
     if (!navElement || !$hoveredItem || $hoveredItem === $activeItem) {
-      return { transform: '', height: '', opacity: '0' };
+      return { transform: '', height: '' };
     }
 
     const element = itemElements.get($hoveredItem);
     if (!element) {
-      return { transform: '', height: '', opacity: '0' };
+      return { transform: '', height: '' };
     }
 
     const navRect = navElement.getBoundingClientRect();
@@ -100,7 +101,6 @@
     return {
       transform: `translateY(${top}px)`,
       height: `${height}px`,
-      opacity: '1',
     };
   });
 
@@ -122,6 +122,7 @@
       hideHoverBackground = true;
       hoveredItem.set(null);
       enableTransitions = false;
+      showHoverOpacity = false;
     },
     setHoveredItem: (id: string | null) => {
       // Clear any existing hover timeout
@@ -136,6 +137,7 @@
           hoveredItem.set(null);
           hoverTimeout = null;
           enableTransitions = false;
+          showHoverOpacity = false;
         }, HOVER_EXIT_DELAY_MS);
         return;
       }
@@ -144,6 +146,7 @@
       if (id === $activeItem) {
         hoveredItem.set(null);
         enableTransitions = false;
+        showHoverOpacity = false;
         return;
       }
 
@@ -158,13 +161,18 @@
       // Set hovered item
       hoveredItem.set(id);
 
-      // Don't enable transitions for first hover (appear, not animate)
+      // Handle first hover (fade in, no position animation)
       if (isFirstHover) {
         enableTransitions = false;
+        // Delay showing opacity to allow position to be set first
+        requestAnimationFrame(() => {
+          showHoverOpacity = true;
+        });
         return;
       }
 
       // Enable transitions for subsequent hovers
+      showHoverOpacity = true;
       if (!enableTransitions) {
         requestAnimationFrame(() => {
           enableTransitions = true;
@@ -211,11 +219,11 @@
     <div
       style:transform={hoverBackgroundStyles.transform}
       style:height={hoverBackgroundStyles.height}
-      style:opacity={hoverBackgroundStyles.opacity}
+      style:opacity={showHoverOpacity ? '1' : '0'}
       class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-hover ${
         enableTransitions
           ? `transition-all ${HOVER_TRANSITION_DURATION} ease-out`
-          : ''
+          : `transition-opacity ${HOVER_TRANSITION_DURATION} ease-in`
       }`}
       aria-hidden="true"
     ></div>
