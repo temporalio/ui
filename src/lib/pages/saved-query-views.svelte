@@ -13,6 +13,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { workflowFilters } from '$lib/stores/filters';
+  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
   import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -79,8 +80,6 @@
       type: 'system',
     },
   ];
-
-  let { savedQueriesCollapsed = $bindable(false) } = $props();
 
   let activeQueryView: SavedQuery | undefined = $state();
   let saveViewModalOpen = $state(false);
@@ -233,9 +232,9 @@
 <div
   class={merge(
     'surface-primary relative h-auto w-[60px] w-[60px] min-w-[60px] max-w-[60px] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[73dvh] lg:max-h-[73dvh] lg:min-h-[73dvh]',
-    savedQueriesCollapsed
-      ? 'lg:w-[60px] lg:min-w-[60px] lg:max-w-[60px]'
-      : 'lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]',
+    $savedQueryNavOpen
+      ? 'lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]'
+      : 'lg:w-[60px] lg:min-w-[60px] lg:max-w-[60px]',
   )}
   style="will-change: width"
 >
@@ -245,10 +244,10 @@
     <div
       class={merge(
         'flex w-full items-center justify-between',
-        savedQueriesCollapsed ? 'lg:justify-center' : 'lg:justify-between',
+        $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
       )}
     >
-      {#if !savedQueriesCollapsed}
+      {#if $savedQueryNavOpen}
         <p
           class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
           in:slide
@@ -257,7 +256,7 @@
           <span
             class={merge(
               'text-xs text-secondary',
-              savedQueriesCollapsed ? 'lg:hidden' : 'lg:inline',
+              $savedQueryNavOpen ? 'lg:inline' : 'lg:hidden',
             )}
           >
             {namespaceSavedQueries.length} / 20
@@ -267,13 +266,13 @@
       <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
       <button
         class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
-        aria-label={savedQueriesCollapsed
-          ? 'Expand saved views'
-          : 'Collapse saved views'}
-        title={savedQueriesCollapsed ? 'Expand' : 'Collapse'}
-        onclick={() => (savedQueriesCollapsed = !savedQueriesCollapsed)}
+        aria-label={$savedQueryNavOpen
+          ? 'Collapse saved views'
+          : 'Expand saved views'}
+        title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
+        onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
       >
-        <Icon name={savedQueriesCollapsed ? 'chevron-right' : 'chevron-left'} />
+        <Icon name={$savedQueryNavOpen ? 'chevron-left' : 'chevron-right'} />
       </button>
     </div>
   </div>
@@ -357,11 +356,11 @@
       name={view?.icon || 'bookmark'}
       class={merge(
         'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-        savedQueriesCollapsed ? '' : 'lg:hidden',
+        $savedQueryNavOpen ? 'lg:hidden' : '',
       )}
     />
 
-    {#if !savedQueriesCollapsed}
+    {#if $savedQueryNavOpen}
       <span
         class="hidden truncate text-left text-sm font-normal lg:inline-block"
         in:slide>{view.name}</span
@@ -384,10 +383,10 @@
   {#if activeQueryView?.id === view?.id && view.type === 'user'}
     <div
       class={merge(
-        'items-center gap-1 overflow-hidden transition-all',
-        savedQueriesCollapsed ? 'flex flex-col' : 'flex flex-col lg:flex-row',
+        'flex flex-col items-center gap-1 overflow-hidden transition-all ',
+        $savedQueryNavOpen && 'lg:flex-row',
       )}
-      transition:slide
+      in:slide
     >
       <Button
         size="xs"
@@ -403,7 +402,7 @@
         class="w-full scale-90"
         variant="ghost"
         on:click={handleCopy}
-        ><span class={merge('hidden', !savedQueriesCollapsed && 'lg:inline')}
+        ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
           >Share</span
         ></Button
       >
@@ -412,9 +411,9 @@
         size="xs"
         class="w-full scale-90"
         on:click={() => (deleteViewModalOpen = true)}
-        ><span class={merge('inline', !savedQueriesCollapsed && 'lg:hidden')}
+        ><span class={merge('inline', $savedQueryNavOpen && 'lg:hidden')}
           ><Icon name="trash" /></span
-        ><span class={merge('hidden', !savedQueriesCollapsed && 'lg:inline')}
+        ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
           >Discard</span
         ></Button
       >

@@ -51,6 +51,7 @@
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
@@ -115,7 +116,6 @@
     $selectedWorkflows = [];
   };
 
-  let savedQueriesCollapsed = $state(false);
   let customizationDrawerOpen = $state(false);
 
   let batchTerminateConfirmationModalOpen = $state(false);
@@ -265,11 +265,11 @@
 <!-- <WorkflowSearchAttributeFilter /> -->
 <FilterBar />
 <div class="flex overflow-auto">
-  <SavedQueryViews bind:savedQueriesCollapsed />
+  <SavedQueryViews />
   <div
     class={merge(
       'flex w-[calc(100%-60px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]',
-      savedQueriesCollapsed && 'lg:w-[calc(100%-60px)]',
+      !$savedQueryNavOpen && 'lg:w-[calc(100%-60px)]',
     )}
   >
     <WorkflowsSummaryConfigurableTable
