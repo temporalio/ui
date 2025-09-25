@@ -60,9 +60,10 @@
   <h3 slot="title">Edit View</h3>
   <div class="flex h-full flex-1 flex-col" slot="content">
     <Input
-      id="view-name"
+      id="create-view"
       label="Name"
       required
+      maxLength={255}
       bind:value={name}
       placeholder="Name of view"
       class="w-full"

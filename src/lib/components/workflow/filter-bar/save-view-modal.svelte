@@ -50,6 +50,7 @@
       id="view-name"
       label="Name"
       required
+      maxLength={255}
       bind:value={name}
       placeholder="Name of view"
       class="w-full"

@@ -334,6 +334,10 @@
       </div>
     </div>
 
+    {#if unsavedQuery}
+      {@render queryButton(unsaveView)}
+    {/if}
+
     {#if namespaceSavedQueries.length > 0}
       <div class="text-center">
         <div class="space-y-1">
@@ -349,12 +353,6 @@
             })}
           {/each}
         </div>
-      </div>
-    {/if}
-
-    {#if unsavedQuery}
-      <div class="space-y-1">
-        {@render queryButton(unsaveView)}
       </div>
     {/if}
 
