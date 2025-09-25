@@ -227,6 +227,51 @@
       clearParameters: [currentPageKey],
     });
   };
+
+  function portal(
+    node: HTMLElement,
+    target: HTMLElement | string = document.body,
+  ) {
+    const targetEl =
+      typeof target === 'string'
+        ? (document.querySelector(target) as HTMLElement | null)
+        : (target as HTMLElement | null);
+    if (targetEl) targetEl.appendChild(node);
+    return {
+      destroy() {
+        if (node.parentNode) node.parentNode.removeChild(node);
+      },
+    };
+  }
+
+  let showTooltip = $state(false);
+  let tooltipText: string | undefined = $state();
+  let tooltipX = $state(0);
+  let tooltipY = $state(0);
+
+  const positionTooltipFrom = (el: HTMLElement) => {
+    const rect = el.getBoundingClientRect();
+    tooltipX = Math.round(rect.right + 8);
+    tooltipY = Math.round(rect.top + 16);
+  };
+
+  const onQueryBtnEnter = (e: MouseEvent, name: string) => {
+    if ($savedQueryNavOpen) return;
+    const el = e.currentTarget as HTMLElement;
+    tooltipText = name;
+    positionTooltipFrom(el);
+    showTooltip = true;
+  };
+
+  const onQueryBtnMove = (e: MouseEvent) => {
+    if (!showTooltip) return;
+    const el = e.currentTarget as HTMLElement;
+    positionTooltipFrom(el);
+  };
+
+  const onQueryBtnLeave = () => {
+    showTooltip = false;
+  };
 </script>
 
 <div
@@ -343,91 +388,111 @@
 />
 
 {#snippet queryButton(view: SavedQuery)}
-  <Button
-    variant="ghost"
-    data-testid={view.id}
-    on:click={() => setActiveQueryView(view)}
-    class={merge('flex w-full justify-start', view.class || '')}
-    active={view?.active}
-    disabled={view?.disabled}
-    size="sm"
+  <div
+    class="w-full"
+    role="menuitem"
+    tabindex="-1"
+    onmouseenter={(e) => onQueryBtnEnter(e, view.name)}
+    onmousemove={onQueryBtnMove}
+    onmouseleave={onQueryBtnLeave}
   >
-    <Icon
-      name={view?.icon || 'bookmark'}
-      class={merge(
-        'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-        $savedQueryNavOpen ? 'lg:hidden' : '',
-      )}
-    />
-
-    {#if $savedQueryNavOpen}
-      <span
-        class="hidden truncate text-left text-sm font-normal lg:inline-block"
-        in:slide>{view.name}</span
-      >
-      {#if view?.badge}
-        <span
-          class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-          in:slide>{view?.badge || ''}</span
-        >
-      {/if}
-      {#if view?.count}
-        <span
-          class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-          in:slide>{view?.count || ''}</span
-        >
-      {/if}
-    {/if}
-  </Button>
-
-  {#if activeQueryView?.id === view?.id && view.type === 'user'}
-    <div
-      class={merge(
-        'flex flex-col items-center gap-1 overflow-hidden transition-all ',
-        $savedQueryNavOpen && 'lg:flex-row',
-      )}
-      in:slide
+    <Button
+      variant="ghost"
+      data-testid={view.id}
+      on:click={() => setActiveQueryView(view)}
+      class={merge('flex w-full justify-start', view.class || '')}
+      active={view?.active}
+      disabled={view?.disabled}
+      size="sm"
     >
-      <Button
-        size="xs"
-        class="w-full scale-90"
-        variant="secondary"
-        on:click={() => {
-          editViewModalOpen = true;
-        }}>Save</Button
+      <Icon
+        name={view?.icon || 'bookmark'}
+        class={merge(
+          'h-4 w-4 flex-shrink-0  transition-colors duration-200',
+          $savedQueryNavOpen ? 'lg:hidden' : '',
+        )}
+      />
+
+      {#if $savedQueryNavOpen}
+        <span
+          class="hidden truncate text-left text-sm font-normal lg:inline-block"
+          in:slide>{view.name}</span
+        >
+        {#if view?.badge}
+          <span
+            class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+            in:slide>{view?.badge || ''}</span
+          >
+        {/if}
+        {#if view?.count}
+          <span
+            class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+            in:slide>{view?.count || ''}</span
+          >
+        {/if}
+      {/if}
+    </Button>
+
+    {#if activeQueryView?.id === view?.id && view.type === 'user'}
+      <div
+        class={merge(
+          'flex flex-col items-center gap-1 overflow-hidden transition-all ',
+          $savedQueryNavOpen && 'lg:flex-row',
+        )}
+        in:slide
       >
-      <Button
-        leadingIcon={$copied ? 'checkmark' : 'copy'}
-        size="xs"
-        class="w-full scale-90"
-        variant="ghost"
-        on:click={handleCopy}
-        ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-          >Share</span
-        ></Button
-      >
-      <Button
-        variant="destructive"
-        size="xs"
-        class="w-full scale-90"
-        on:click={() => (deleteViewModalOpen = true)}
-        ><span class={merge('inline', $savedQueryNavOpen && 'lg:hidden')}
-          ><Icon name="trash" /></span
-        ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-          >Discard</span
-        ></Button
-      >
-    </div>
-  {:else if unsavedQuery && view?.id === 'unsaved'}
-    <div class="flex items-center gap-1 overflow-hidden" transition:slide>
-      <Button
-        size="xs"
-        class="scale-85 w-full transition-all"
-        variant="secondary"
-        on:click={() => {
-          saveViewModalOpen = true;
-        }}>Save</Button
-      >
-    </div>
-  {/if}
+        <Button
+          size="xs"
+          class="w-full scale-90"
+          variant="secondary"
+          on:click={() => {
+            editViewModalOpen = true;
+          }}>Save</Button
+        >
+        <Button
+          leadingIcon={$copied ? 'checkmark' : 'copy'}
+          size="xs"
+          class="w-full scale-90"
+          variant="ghost"
+          on:click={handleCopy}
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
+            >Share</span
+          ></Button
+        >
+        <Button
+          variant="destructive"
+          size="xs"
+          class="w-full scale-90"
+          on:click={() => (deleteViewModalOpen = true)}
+          ><span class={merge('inline', $savedQueryNavOpen && 'lg:hidden')}
+            ><Icon name="trash" /></span
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
+            >Discard</span
+          ></Button
+        >
+      </div>
+    {:else if unsavedQuery && view?.id === 'unsaved'}
+      <div class="flex items-center gap-1 overflow-hidden" transition:slide>
+        <Button
+          size="xs"
+          class="scale-85 w-full transition-all"
+          variant="secondary"
+          on:click={() => {
+            saveViewModalOpen = true;
+          }}>Save</Button
+        >
+      </div>
+    {/if}
+  </div>
 {/snippet}
+
+{#if showTooltip && tooltipText}
+  <div
+    use:portal
+    class="pointer-events-none z-[9999] inline-block select-none rounded-md bg-slate-800 p-2 text-xs text-slate-50 opacity-95"
+    style={`position: fixed; top: ${tooltipY}px; left: ${tooltipX}px; transform: translateY(-50%); max-width: 280px;`}
+    role="tooltip"
+  >
+    {tooltipText}
+  </div>
+{/if}

@@ -11,10 +11,7 @@
 
 {#snippet actionToggleButtons()}
   <div class="flex items-center gap-1">
-    <Tooltip
-      text={viewManualQuery ? 'Hide raw query' : 'View raw query'}
-      bottom
-    >
+    <Tooltip text={viewManualQuery ? 'Hide raw query' : 'View raw query'} left>
       <Button
         variant="ghost"
         size="xs"
