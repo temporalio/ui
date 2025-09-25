@@ -276,10 +276,10 @@
 
 <div
   class={merge(
-    'surface-primary relative h-auto w-[60px] w-[60px] min-w-[60px] max-w-[60px] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[73dvh] lg:max-h-[73dvh] lg:min-h-[73dvh]',
+    'surface-primary relative h-auto w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out lg:h-[var(--panel-h)] lg:max-h-[var(--panel-h)] lg:min-h-[var(--panel-h)]',
     $savedQueryNavOpen
-      ? 'lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px]'
-      : 'lg:w-[60px] lg:min-w-[60px] lg:max-w-[60px]',
+      ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
+      : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
   )}
   style="will-change: width"
 >
@@ -472,10 +472,13 @@
         >
       </div>
     {:else if unsavedQuery && view?.id === 'unsaved'}
-      <div class="flex items-center gap-1 overflow-hidden" transition:slide>
+      <div
+        class="flex items-center gap-1 overflow-hidden pt-0.5"
+        transition:slide
+      >
         <Button
           size="xs"
-          class="scale-85 w-full transition-all"
+          class="w-full transition-all"
           variant="secondary"
           on:click={() => {
             saveViewModalOpen = true;

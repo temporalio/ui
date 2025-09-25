@@ -39,7 +39,10 @@
     className,
   )}
   bind:this={tableContainer}
-  style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`}"
+  style="max-height: {maxHeight ||
+    `calc(100vh - ${tableOffset}px)`};
+
+ --table-header-h: 2.25rem;"
 >
   {#if loading}
     {#if $$slots.loading}
@@ -62,7 +65,9 @@
         <slot name="actions-end" />
       </div>
     {:else}
-      <slot name="empty" />
+      <div style="height: calc(100% - var(--table-header-h));">
+        <slot name="empty" />
+      </div>
     {/if}
   {/if}
 </div>

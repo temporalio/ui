@@ -38,7 +38,6 @@
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
-  // import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
@@ -268,8 +267,8 @@
   <SavedQueryViews />
   <div
     class={merge(
-      'flex w-[calc(100%-60px)] shrink flex-col transition-all lg:w-[calc(100%-240px)]',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-60px)]',
+      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
+      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
     )}
   >
     <WorkflowsSummaryConfigurableTable

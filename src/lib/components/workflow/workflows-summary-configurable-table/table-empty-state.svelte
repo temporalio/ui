@@ -28,7 +28,7 @@
   <link rel="preload" as="image" href={emptyImageLight} />
 </svelte:head>
 <div
-  class="h-auto w-full overflow-hidden xl:flex xl:min-h-[480px] xl:flex-row"
+  class="w-full overflow-hidden xl:flex xl:h-full xl:flex-row"
   aria-live="polite"
 >
   <div
@@ -79,7 +79,7 @@
     {/if}
   </div>
   <div
-    class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:min-h-full xl:max-w-[1050px] xl:flex-1 xl:items-stretch xl:justify-center"
+    class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:h-full xl:max-w-[1050px] xl:flex-1 xl:items-stretch xl:justify-center"
     style="background-image: url({noResultsImages});"
   >
     <img
