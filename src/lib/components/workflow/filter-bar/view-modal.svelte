@@ -142,7 +142,7 @@
   confirmText={translate('common.save')}
   cancelText={translate('common.close')}
   confirmDisabled={!nameValid}
-  on:cancelModal={close}
+  on:cancelModal={hideModal}
   on:confirmModal={onConfirm}
 >
   <h3 slot="title">{view ? 'Edit View' : 'Save as View'}</h3>

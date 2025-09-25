@@ -27,7 +27,7 @@
   id="delete-view-modal"
   confirmText={translate('common.delete')}
   cancelText={translate('common.close')}
-  on:cancelModal={close}
+  on:cancelModal={hideModal}
   on:confirmModal={onDelete}
 >
   <h3 slot="title">Delete View</h3>
