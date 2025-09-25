@@ -2,7 +2,6 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { twMerge as merge } from 'tailwind-merge';
-  import { v4 } from 'uuid';
 
   import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
@@ -22,7 +21,7 @@
   }
 
   export let title: string;
-  export let id: string = v4();
+  export let id: string = crypto.randomUUID();
   export let subtitle = '';
   export let icon = null;
   export let open = false;

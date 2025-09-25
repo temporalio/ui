@@ -2,7 +2,6 @@
   import { writable, type Writable } from 'svelte/store';
 
   import { onMount } from 'svelte';
-  import { v4 } from 'uuid';
 
   import { page } from '$app/stores';
 
@@ -142,7 +141,7 @@
   };
 
   const generateRandomWorkflowId = () => {
-    workflowId = v4();
+    workflowId = crypto.randomUUID();
     updateQueryParameters({
       parameter: 'workflowId',
       value: workflowId,
