@@ -15,6 +15,9 @@
     onCancel?: () => void;
     onRetry?: () => void;
     getSupportedTypes: () => { label: string; value: string }[];
+    hideTainted?: boolean;
+    hideDeleteButton?: boolean;
+    hideCancelButton?: boolean;
   }
 
   let {
@@ -25,6 +28,9 @@
     onCancel,
     onRetry,
     getSupportedTypes,
+    hideTainted = false,
+    hideDeleteButton = false,
+    hideCancelButton = false,
   }: Props = $props();
 </script>
 
@@ -38,6 +44,9 @@
     {onSuccess}
     {onCancel}
     {getSupportedTypes}
+    {hideTainted}
+    {hideDeleteButton}
+    {hideCancelButton}
   />
 {:catch error}
   <FormError
