@@ -121,6 +121,14 @@
     <div class="space-y-6 p-4">
       <Message value={$message} />
 
+      <!-- Title and Description -->
+      <div>
+        <h3 class="text-lg font-medium">Codec Server</h3>
+        <p class="text-gray-600 mt-1">
+          Decode your data remotely through endpoints.
+        </p>
+      </div>
+
       <!-- Info Alert -->
       <Alert intent="info" class="text-sm">
         <Icon name="info" slot="icon" />
