@@ -45,8 +45,9 @@
   const codecServerSchema = z.object({
     endpoint: z
       .string()
-      .url(translate('codec-server.validation-endpoint-url'))
-      .min(1, translate('codec-server.validation-endpoint-required')),
+      .refine((val) => val === '' || z.string().url().safeParse(val).success, {
+        message: translate('codec-server.validation-endpoint-url'),
+      }),
     passUserAccessToken: z.boolean(),
     includeCrossOriginCredentials: z.boolean(),
     customMessage: z.string().optional(),
