@@ -32,7 +32,7 @@
     initialData,
     onSave,
     onSuccess = () => {},
-    onCancel = () => {},
+    onCancel,
     hideTainted = false,
     hideCancelButton = false,
   }: Props = $props();
@@ -104,7 +104,7 @@
 
   const handleCancel = () => {
     reset();
-    onCancel();
+    onCancel?.();
   };
 
   const taintedCount = $derived(
