@@ -119,7 +119,7 @@
         bind:value={searchAttributeValue}
         icon="search"
         placeholder={translate('common.search')}
-        class="w-full"
+        class="w-full min-w-[300px]"
       />
     </MenuItem>
     <hr class="border-subtle" />
