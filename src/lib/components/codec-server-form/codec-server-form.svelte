@@ -14,6 +14,8 @@
     onSuccess?: (data: CodecServerFormData) => void;
     onCancel?: () => void;
     onRetry?: () => void;
+    hideTainted?: boolean;
+    hideCancelButton?: boolean;
   }
 
   let {
@@ -23,6 +25,8 @@
     onSuccess,
     onCancel,
     onRetry,
+    hideTainted = false,
+    hideCancelButton = false,
   }: Props = $props();
 </script>
 
@@ -35,6 +39,8 @@
     {onSave}
     {onSuccess}
     {onCancel}
+    {hideTainted}
+    {hideCancelButton}
   />
 {:catch error}
   <FormError

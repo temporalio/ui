@@ -23,6 +23,8 @@
     onSave: (data: CodecServerFormData) => Promise<void>;
     onSuccess?: (data: CodecServerFormData) => void;
     onCancel?: () => void;
+    hideTainted?: boolean;
+    hideCancelButton?: boolean;
   }
 
   let {
@@ -31,6 +33,8 @@
     onSave,
     onSuccess = () => {},
     onCancel = () => {},
+    hideTainted = false,
+    hideCancelButton = false,
   }: Props = $props();
 
   // Show custom section if there are existing values
@@ -64,6 +68,7 @@
       customLink: initialData.customLink || '',
     },
     {
+      taintedMessage: true,
       SPA: true,
       dataType: 'json',
       resetForm: false,
@@ -93,7 +98,7 @@
     },
   );
 
-  const { form, errors, submitting, message, enhance, isTainted, reset } =
+  const { form, errors, submitting, message, enhance, tainted, reset } =
     formInstance;
 
   const handleCancel = () => {
@@ -101,14 +106,20 @@
     onCancel();
   };
 
-  const taintedCount = $derived(isTainted() ? 1 : 0);
+  const taintedCount = $derived(
+    $tainted
+      ? Object.values($tainted).filter((value) => value === true).length
+      : 0,
+  );
 
   const disabled = $derived($submitting || taintedCount === 0);
 </script>
 
-<div class="space-y-6 {className}">
-  <form use:enhance class="space-y-6">
-    <Card class="space-y-6 p-4">
+<Card class={className}>
+  <form use:enhance>
+    <div class="space-y-6 p-4">
+      <Message value={$message} />
+
       <!-- Info Alert -->
       <Alert intent="info" class="text-sm">
         <Icon name="info" slot="icon" />
@@ -160,24 +171,11 @@
       </div>
 
       <!-- Custom Message and Link Section -->
-      <div class="space-y-4">
-        <p class="text-gray-600 text-sm">
-          {translate('codec-server.custom-section-description')}
-        </p>
-
-        {#if !showCustomSection}
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            on:click={() => (showCustomSection = true)}
-          >
-            <Icon name="add" class="h-4 w-4" />
-            {translate('codec-server.add-custom-button')}
-          </Button>
-        {/if}
-
-        {#if showCustomSection}
+      {#if showCustomSection}
+        <div class="space-y-4">
+          <p class="text-gray-600 text-sm">
+            {translate('codec-server.custom-section-description')}
+          </p>
           <div class="space-y-4">
             <div>
               <Textarea
@@ -216,6 +214,8 @@
                 size="sm"
                 on:click={() => {
                   showCustomSection = false;
+                  $form.customMessage = '';
+                  $form.customLink = '';
                 }}
               >
                 <Icon name="trash" class="h-4 w-4" />
@@ -223,28 +223,48 @@
               </Button>
             </div>
           </div>
+        </div>
+      {/if}
+
+      {#if !showCustomSection}
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          on:click={() => (showCustomSection = true)}
+          disabled={$submitting}
+          leadingIcon="add"
+        >
+          {translate('codec-server.add-custom-button')}
+        </Button>
+      {/if}
+    </div>
+
+    <div class="p-4">
+      <div class="flex gap-3">
+        <Button
+          type="submit"
+          size="sm"
+          variant="primary"
+          {disabled}
+          loading={$submitting}
+        >
+          <TaintedBadge show={!hideTainted} count={taintedCount} />
+          {translate('codec-server.save-button')}
+        </Button>
+
+        {#if !hideCancelButton}
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            on:click={handleCancel}
+            disabled={$submitting}
+          >
+            {translate('common.cancel')}
+          </Button>
         {/if}
       </div>
-    </Card>
-
-    {#if $message}
-      <Message value={$message} />
-    {/if}
-
-    <div class="flex gap-3">
-      <Button type="submit" variant="primary" {disabled} loading={$submitting}>
-        <TaintedBadge show={true} count={taintedCount} />
-        {translate('codec-server.save-button')}
-      </Button>
-
-      <Button
-        type="button"
-        variant="secondary"
-        on:click={handleCancel}
-        disabled={$submitting}
-      >
-        {translate('common.cancel')}
-      </Button>
     </div>
   </form>
-</div>
+</Card>

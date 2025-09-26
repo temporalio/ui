@@ -23,7 +23,9 @@
     onSave: (attributes: SearchAttributeDefinition[]) => Promise<void>;
     onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
     onCancel?: () => void;
-    showTainted?: boolean;
+    hideTainted?: boolean;
+    hideDeleteButton?: boolean;
+    hideCancelButton?: boolean;
     getSupportedTypes: () => SearchAttributeTypeOption[];
   }
 
@@ -33,7 +35,9 @@
     onSave,
     onSuccess = () => {},
     onCancel = () => {},
-    showTainted = true,
+    hideTainted = false,
+    hideDeleteButton = false,
+    hideCancelButton = false,
     getSupportedTypes,
   }: Props = $props();
 
@@ -139,15 +143,23 @@
 
         <div class="space-y-3 border-b border-b-subtle pb-3">
           <div
-            class="grid grid-cols-[1fr,200px,auto] gap-3 border-b border-b-subtle pb-2 text-sm font-medium"
+            class="grid gap-3 border-b border-b-subtle pb-2 text-sm font-medium"
+            class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
+            class:grid-cols-[1fr,200px]={hideDeleteButton}
           >
             <div>{translate('search-attributes.column-attribute')}</div>
             <div>{translate('search-attributes.column-type')}</div>
-            <div class="w-8"></div>
+            {#if !hideDeleteButton}
+              <div class="w-8"></div>
+            {/if}
           </div>
 
           {#each $formData.attributes as attribute, index}
-            <div class="grid grid-cols-[1fr,200px,auto] gap-3">
+            <div
+              class="grid gap-3"
+              class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
+              class:grid-cols-[1fr,200px]={hideDeleteButton}
+            >
               <Input
                 id="attribute-name-{index}"
                 bind:value={attribute.name}
@@ -176,14 +188,16 @@
                 {/each}
               </Select>
 
-              <Button
-                variant="ghost"
-                size="xs"
-                on:click={() => removeAttribute(index)}
-                disabled={$submitting}
-                type="button"
-                leadingIcon="trash"
-              />
+              {#if !hideDeleteButton}
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  on:click={() => removeAttribute(index)}
+                  disabled={$submitting}
+                  type="button"
+                  leadingIcon="trash"
+                />
+              {/if}
             </div>
             {#if $errors?.attributes?.[index]?.['name']?.[0]}
               <div class="col-span-2 mt-1 text-xs text-danger">
@@ -198,19 +212,21 @@
     <div class="p-4 pt-0">
       <div class="flex gap-3">
         <Button size="sm" type="submit" {disabled} loading={$submitting}>
-          <TaintedBadge show={showTainted} count={taintedCount} />
+          <TaintedBadge show={!hideTainted} count={taintedCount} />
           {translate('search-attributes.save-button')}
         </Button>
 
-        <Button
-          variant="secondary"
-          size="sm"
-          on:click={handleCancel}
-          disabled={$submitting}
-          type="button"
-        >
-          {translate('common.cancel')}
-        </Button>
+        {#if !hideCancelButton}
+          <Button
+            variant="secondary"
+            size="sm"
+            on:click={handleCancel}
+            disabled={$submitting}
+            type="button"
+          >
+            {translate('common.cancel')}
+          </Button>
+        {/if}
 
         <Button
           variant="ghost"
