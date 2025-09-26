@@ -34,7 +34,7 @@
     initialAttributes,
     onSave,
     onSuccess = () => {},
-    onCancel = () => {},
+    onCancel,
     hideTainted = false,
     hideDeleteButton = false,
     hideCancelButton = false,
@@ -119,7 +119,7 @@
 
   const handleCancel = () => {
     reset();
-    onCancel();
+    onCancel?.();
   };
 
   const taintedCount = $derived(
