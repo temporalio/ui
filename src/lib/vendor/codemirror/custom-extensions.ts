@@ -34,6 +34,10 @@ const baseTheme = {
   },
   '.cm-scroller': {
     fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+    // Ensure inner scroller reliably captures wheel/touchpad scroll,
+    // especially on Firefox with mouse wheels.
+    overflow: 'auto',
+    overscrollBehavior: 'contain',
   },
   '.cm-content': {
     caretColor: css('--color-text-primary'),
