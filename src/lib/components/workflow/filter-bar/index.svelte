@@ -17,6 +17,7 @@
         size="xs"
         leadingIcon="json"
         active={viewManualQuery}
+        data-testid="toggle-manual-query"
         on:click={() => (viewManualQuery = !viewManualQuery)}
       />
     </Tooltip>

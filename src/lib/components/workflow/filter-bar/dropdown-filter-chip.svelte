@@ -525,10 +525,16 @@
             trailingIcon="trash"
             variant="secondary"
             size="xs"
+            data-testid="remove-filter-button"
             type="button"
             on:click={onRemove}>Remove</Button
           >
-          <Button variant="primary" size="xs" type="submit">Apply</Button>
+          <Button
+            variant="primary"
+            size="xs"
+            data-testid="apply-filter-button"
+            type="submit">Apply</Button
+          >
         </div>
       </div>
     </form>

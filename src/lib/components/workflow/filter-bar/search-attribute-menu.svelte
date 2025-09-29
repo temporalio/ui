@@ -96,6 +96,7 @@
     controls="search-attribute-menu"
     leadingIcon="add"
     variant="secondary"
+    data-testid="add-filter-button"
     disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
     on:click={() => (searchAttributeValue = '')}
     class="text-nowrap"

@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+
 import { expect, test } from '@playwright/test';
 
 import {
@@ -21,6 +23,9 @@ test.beforeEach(async ({ page }) => {
   await waitForWorkflowsApis(page);
 });
 
+const getQueryParam = (url: string) =>
+  new URL(url, 'http://localhost').searchParams.get('query') || '';
+
 const getDatetime = (query: string) =>
   query.split('=')[1].replace(/['"']+/g, '');
 const validDatetime = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})Z$/;
@@ -32,29 +37,34 @@ test('it should update the datetime filter based on the selected timezone', asyn
   await page.getByTestId('top-nav').getByPlaceholder('Search').fill('PDT');
   await page.getByText('Pacific Daylight Time (PDT) UTC-07:00').click();
 
-  await page.getByRole('button', { name: 'Filter' }).click();
+  await page.getByTestId('add-filter-button').click();
   await page.getByText('CloseTime').click();
-  await page.getByRole('menuitem', { name: 'After' }).click();
+  await page.getByRole('button', { name: 'After' }).click();
   await page.getByLabel('Absolute', { exact: true }).check();
   await page.getByLabel('hrs', { exact: true }).fill('5');
   await page.getByRole('button', { name: 'Apply' }).click();
 
-  await page.locator('#search-attribute-filter-button').click();
-  await page.getByTestId('manual-search-toggle').click();
+  await expect
+    .poll(() => getQueryParam(page.url()))
+    .toBe('`CloseTime`>=\"2025-09-29T12:00:00.000Z\"');
 
-  let filter = await page.getByTestId('CloseTime-0').innerText();
-  expect(filter).toContain('05:00 AM');
+  await expect(
+    page.getByRole('button', { name: 'CloseTime >= 2025-09-29 05:00' }),
+  ).toBeVisible();
 
-  let query = await page.locator('#manual-search').inputValue();
+  await page.getByTestId('toggle-manual-query').click();
+
+  let query = await page.getByTestId('manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 
   await page.getByTestId('timezones-menu-button').click();
   await page.getByTestId('top-nav').getByPlaceholder('Search').fill('MDT');
   await page.getByText('Mountain Daylight Time (MDT) UTC-06:00').click();
 
-  filter = await page.getByTestId('CloseTime-0').innerText();
-  expect(filter).toContain('06:00 AM');
+  await expect(
+    page.getByRole('button', { name: 'CloseTime >= 2025-09-29 06:00' }),
+  ).toBeVisible();
 
-  query = await page.locator('#manual-search').inputValue();
+  query = await page.getByTestId('manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 });

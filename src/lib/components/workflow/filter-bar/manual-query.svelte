@@ -78,6 +78,7 @@
       maxLength={MAX_QUERY_LENGTH}
       hideCount={!manualSearchString ||
         manualSearchString.length < MAX_QUERY_LENGTH}
+      data-testid="manual-search-input"
     />
     <Button data-testid="manual-search-button" variant="ghost" type="submit">
       {translate('common.search')}

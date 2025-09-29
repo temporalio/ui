@@ -32,7 +32,7 @@ test.describe('Dark Mode Dropdown', () => {
     await expect(menuButton).toBeVisible();
 
     await menuButton.click();
-    await page.getByRole('menuitem', { name: 'Night' }).click();
+    await page.getByTestId('night-mode').click();
     await expect(menuButton).toHaveAccessibleName('Night');
     await expect(page).toHaveLocalStorageItem(localStorageKey, true);
   });
@@ -44,7 +44,7 @@ test.describe('Dark Mode Dropdown', () => {
     await expect(menuButton).toBeVisible();
 
     await menuButton.click();
-    await page.getByRole('menuitem', { name: 'Day' }).click();
+    await page.getByTestId('day-mode').click();
     await expect(menuButton).toHaveAccessibleName('Day');
     await expect(page).toHaveLocalStorageItem(localStorageKey, false);
   });

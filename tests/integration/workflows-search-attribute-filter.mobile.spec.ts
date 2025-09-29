@@ -46,7 +46,8 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('nav-profile-button').click();
 
-  await page.getByRole('button', { name: 'Filter' }).click();
+  await page.getByTestId('add-filter-button').click();
+
   await page.getByText('CloseTime').click();
   await page.getByRole('menuitem', { name: 'After' }).click();
   await page.getByLabel('Absolute', { exact: true }).check();
@@ -54,12 +55,12 @@ test('it should update the datetime filter based on the selected timezone', asyn
   await page.getByRole('button', { name: 'Apply' }).click();
 
   await page.locator('#search-attribute-filter-button').click();
-  await page.getByTestId('manual-search-toggle').click();
+  await page.getByTestId('toggle-manual-query').click();
 
   let filter = await page.getByTestId('CloseTime-0').innerText();
   expect(filter).toContain('05:00 AM');
 
-  let query = await page.locator('#manual-search').inputValue();
+  let query = await page.getByTestId('manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 
   await page.getByTestId('nav-profile-button').click();
@@ -83,6 +84,6 @@ test('it should update the datetime filter based on the selected timezone', asyn
   filter = await page.getByTestId('CloseTime-0').innerText();
   expect(filter).toContain('06:00 AM');
 
-  query = await page.locator('#manual-search').inputValue();
+  query = await page.getByTestId('manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 });

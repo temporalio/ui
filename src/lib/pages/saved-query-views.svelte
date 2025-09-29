@@ -19,71 +19,12 @@
     MAX_SAVED_WORKFLOW_QUERIES,
     type SavedQuery,
     savedWorkflowQueries,
+    systemWorkflowViews,
   } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-
-  const getToday = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today.toISOString();
-  };
-
-  const getLastHour = () => {
-    const lastHour = new Date();
-    lastHour.setHours(lastHour.getHours() - 1);
-    lastHour.setSeconds(0, 0);
-    return lastHour.toISOString();
-  };
-
-  const systemViews: SavedQuery[] = [
-    {
-      id: 'all',
-      name: 'All Workflows',
-      query: '',
-      icon: 'workflow',
-      type: 'system',
-    },
-    // {
-    //   id: 'task-failures',
-    //   name: 'Task Failures',
-    //   query: 'ExecutionStatus = "Failed" OR ExecutionStatus = "Terminated"',
-    //   icon: 'error',
-    //   count: 17,
-    //   class: 'text-danger',
-    //   type: 'system',
-    // },
-    {
-      id: 'child-workflows',
-      name: 'Parent Workflows',
-      query: '`ParentWorkflowId` is null',
-      icon: 'relationship',
-      type: 'system',
-    },
-    {
-      id: 'running',
-      name: 'Running',
-      query: '`ExecutionStatus`="Running"',
-      icon: 'heartbeat',
-      type: 'system',
-    },
-    {
-      id: 'today',
-      name: 'Today',
-      query: `StartTime >= "${getToday()}"`,
-      icon: 'calendar',
-      type: 'system',
-    },
-    {
-      id: 'last-hour',
-      name: 'Last Hour',
-      query: `StartTime >= "${getLastHour()}"`,
-      icon: 'clock',
-      type: 'system',
-    },
-  ];
 
   let activeQueryView: SavedQuery | undefined = $state();
   let saveViewModalOpen = $state(false);
@@ -105,8 +46,8 @@
     ) || [],
   );
   const systemQueryView = $derived(
-    (query && systemViews.find((q) => q.query === query)) ||
-      (!query && systemViews.find((q) => q.id === 'all')),
+    (query && systemWorkflowViews.find((q) => q.query === query)) ||
+      (!query && systemWorkflowViews.find((q) => q.id === 'all')),
   );
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
@@ -347,7 +288,7 @@
   <div class="space-y-2 p-1.5">
     <div class="border-b border-subtle pb-2 text-center">
       <div class="space-y-1">
-        {#each systemViews as view}
+        {#each systemWorkflowViews as view}
           {@render queryButton({
             ...view,
             active: query === view.query,
@@ -418,7 +359,9 @@
   >
     <Button
       variant="ghost"
-      data-testid={view.id}
+      data-testid={view.type === 'system'
+        ? view.id
+        : view.name.toLowerCase().replace(/\s+/g, '-')}
       on:click={() => setActiveQueryView(view)}
       class={merge('flex w-full justify-start', view.class || '')}
       active={view?.active}
@@ -440,8 +383,9 @@
         >
         {#if view?.badge}
           <span
+            data-testid={view.badge}
             class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-            in:slide>{view?.badge || ''}</span
+            in:slide>{view.badge || ''}</span
           >
         {/if}
         {#if view?.count}
@@ -465,6 +409,7 @@
           size="xs"
           class="w-full scale-90"
           variant="secondary"
+          data-testid="save-view-button"
           on:click={() => {
             editViewModalOpen = true;
           }}>Save</Button
@@ -474,6 +419,7 @@
           size="xs"
           class="w-full scale-90"
           variant="ghost"
+          data-testid="share-view-button"
           on:click={handleCopy}
           ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
             >Share</span
@@ -483,6 +429,7 @@
           variant="destructive"
           size="xs"
           class="w-full scale-90"
+          data-testid="remove-view-button"
           on:click={() => (deleteViewModalOpen = true)}
           ><span class={merge('inline', $savedQueryNavOpen && 'lg:hidden')}
             ><Icon name="trash" /></span
@@ -501,6 +448,7 @@
           class="w-full transition-all"
           variant="secondary"
           disabled={maxViewsReached}
+          data-testid="create-view-button"
           on:click={() => {
             saveViewModalOpen = true;
           }}>Save</Button

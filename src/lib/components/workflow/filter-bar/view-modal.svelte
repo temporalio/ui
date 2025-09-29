@@ -166,12 +166,14 @@
       error={!nameValid}
       placeholder="Name of view"
       class="w-full"
+      data-testid={`${id}-input`}
     />
     {#if view}
       <Button
         variant="secondary"
         class="self-start"
         disabled={!nameValid || maxViewsReached}
+        data-testid="create-as-new-button"
         on:click={onCreateAsNew}>Create New</Button
       >
     {/if}
