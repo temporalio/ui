@@ -5,7 +5,11 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
+  import {
+    MAX_SAVED_WORKFLOW_QUERIES,
+    type SavedQuery,
+    savedWorkflowQueries,
+  } from '$lib/stores/saved-queries';
 
   interface Props {
     open?: boolean;
@@ -24,8 +28,12 @@
   }: Props = $props();
 
   let name = $state('');
+
   const query = $derived(page.url.searchParams.get('query'));
   const namespace = $derived(page.params.namespace);
+  const maxViewsReached = $derived(
+    $savedWorkflowQueries?.[namespace]?.length >= MAX_SAVED_WORKFLOW_QUERIES,
+  );
 
   let wasOpen = $state(false);
 
@@ -45,7 +53,7 @@
   const startsWithInvalid = /^[.-]/;
   const endsWithInvalid = /[.-]$/;
   const existing = $derived(
-    ($savedQueries?.[namespace] || []).filter((q) => q.type === 'user'),
+    ($savedWorkflowQueries?.[namespace] || []).filter((q) => q.type === 'user'),
   );
 
   const trimmedName = $derived(name?.trim() ?? '');
@@ -141,7 +149,7 @@
   {id}
   confirmText={translate('common.save')}
   cancelText={translate('common.close')}
-  confirmDisabled={!nameValid}
+  confirmDisabled={!nameValid || maxViewsReached}
   on:cancelModal={hideModal}
   on:confirmModal={onConfirm}
 >
@@ -163,7 +171,7 @@
       <Button
         variant="secondary"
         class="self-start"
-        disabled={!nameValid}
+        disabled={!nameValid || maxViewsReached}
         on:click={onCreateAsNew}>Create New</Button
       >
     {/if}

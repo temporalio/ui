@@ -17,8 +17,10 @@ export type SavedQuery = {
   type?: string;
 };
 
-export const savedQueries = persistStore<Record<string, SavedQuery[]>>(
-  'saved-namespace-queries',
+export const MAX_SAVED_WORKFLOW_QUERIES = 2;
+
+export const savedWorkflowQueries = persistStore<Record<string, SavedQuery[]>>(
+  'saved-workflow-queries',
   {},
   true,
 );

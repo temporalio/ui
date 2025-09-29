@@ -15,7 +15,11 @@
   import { workflowFilters } from '$lib/stores/filters';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
-  import { savedQueries, type SavedQuery } from '$lib/stores/saved-queries';
+  import {
+    MAX_SAVED_WORKFLOW_QUERIES,
+    type SavedQuery,
+    savedWorkflowQueries,
+  } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
@@ -91,12 +95,18 @@
   const savedQueryParam = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
 
-  let namespaceSavedQueries = $derived(
-    $savedQueries?.[namespace]?.sort((a, b) => a.name.localeCompare(b.name)) ||
-      [],
+  const maxViewsReached = $derived(
+    $savedWorkflowQueries?.[namespace]?.length >= MAX_SAVED_WORKFLOW_QUERIES,
+  );
+
+  const namespaceSavedQueries = $derived(
+    $savedWorkflowQueries?.[namespace]?.sort((a, b) =>
+      a.name.localeCompare(b.name),
+    ) || [],
   );
   const systemQueryView = $derived(
-    query && systemViews.find((q) => q.query === query),
+    (query && systemViews.find((q) => q.query === query)) ||
+      (!query && systemViews.find((q) => q.id === 'all')),
   );
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
@@ -121,11 +131,17 @@
         type: 'user',
       };
 
-      if (!$savedQueries[namespace]) $savedQueries[namespace] = [];
+      if (!$savedWorkflowQueries[namespace])
+        $savedWorkflowQueries[namespace] = [];
 
-      $savedQueries[namespace] = [...$savedQueries[namespace], queryToSave];
+      if (!maxViewsReached) {
+        $savedWorkflowQueries[namespace] = [
+          ...$savedWorkflowQueries[namespace],
+          queryToSave,
+        ];
+      }
+
       activeQueryView = queryToSave;
-
       const url = new URL(page.url);
       url.searchParams.delete('savedQuery');
       goto(url);
@@ -190,31 +206,37 @@
   };
 
   const onCreateView = (view: SavedQuery) => {
-    if (!$savedQueries[namespace]) {
-      $savedQueries[namespace] = [];
+    if (!$savedWorkflowQueries[namespace]) {
+      $savedWorkflowQueries[namespace] = [];
     }
 
-    $savedQueries[namespace] = [...$savedQueries[namespace], view];
+    $savedWorkflowQueries[namespace] = [
+      ...$savedWorkflowQueries[namespace],
+      view,
+    ];
     activeQueryView = view;
   };
 
   const onSaveView = (view: SavedQuery) => {
-    if (!$savedQueries[namespace]) {
-      $savedQueries[namespace] = [];
+    if (!$savedWorkflowQueries[namespace]) {
+      $savedWorkflowQueries[namespace] = [];
     }
 
     if (view.id === activeQueryView?.id) {
-      $savedQueries[namespace] = $savedQueries[namespace].map((q) =>
-        q.id === view.id ? view : q,
+      $savedWorkflowQueries[namespace] = $savedWorkflowQueries[namespace].map(
+        (q) => (q.id === view.id ? view : q),
       );
     } else {
-      $savedQueries[namespace] = [...$savedQueries[namespace], view];
+      $savedWorkflowQueries[namespace] = [
+        ...$savedWorkflowQueries[namespace],
+        view,
+      ];
     }
     activeQueryView = view;
   };
 
   const onDeleteView = () => {
-    $savedQueries[namespace] = $savedQueries[namespace].filter(
+    $savedWorkflowQueries[namespace] = $savedWorkflowQueries[namespace].filter(
       (q) => q?.id !== activeQueryView?.id,
     );
     $workflowFilters = [];
@@ -478,6 +500,7 @@
           size="xs"
           class="w-full transition-all"
           variant="secondary"
+          disabled={maxViewsReached}
           on:click={() => {
             saveViewModalOpen = true;
           }}>Save</Button
