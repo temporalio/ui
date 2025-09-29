@@ -18,7 +18,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Editor from '$lib/holocene/monaco/editor.svelte';
+  import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
@@ -359,16 +359,9 @@
           </p>
         </div>
         <Label label={translate('workflows.summary')} for="summary" />
-        <Editor
-          content={summary}
-          on:change={(event) => (summary = event.detail.value)}
-          class="min-h-48"
-        />
+        <MarkdownEditor bind:content={summary} />
         <Label label={translate('workflows.details')} for="details" />
-        <Editor
-          content={details}
-          on:change={(event) => (details = event.detail.value)}
-        />
+        <MarkdownEditor bind:content={details} />
       </Card>
     {/if}
     <div

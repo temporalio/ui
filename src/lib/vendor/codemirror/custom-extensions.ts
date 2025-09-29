@@ -26,34 +26,74 @@ export type EditorLanguage =
   | 'java'
   | 'ruby';
 
-export const getEditorTheme = (isDark: boolean, header: boolean) =>
+const baseTheme = {
+  '&': {
+    color: css('--color-text-primary'),
+    backgroundColor: css('--color-surface-code-block'),
+    height: '100%',
+  },
+  '.cm-scroller': {
+    fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+    // Ensure inner scroller reliably captures wheel/touchpad scroll,
+    // especially on Firefox with mouse wheels.
+    overflow: 'auto',
+    overscrollBehavior: 'contain',
+  },
+  '.cm-content': {
+    caretColor: css('--color-text-primary'),
+    fontSize: '0.875em',
+  },
+  '.cm-editor&.cm-focused': {
+    outline: `2px solid ${colors.indigo['600']}`,
+  },
+  '.cm-gutters': {
+    backgroundColor: 'transparent',
+    borderRight: 'none',
+  },
+};
+
+const headerStyles = (header: boolean) =>
+  header
+    ? {}
+    : {
+        borderWidth: '1px',
+        borderColor: css('--color-border-subtle'),
+      };
+
+export const getEditorTheme = (isDark: boolean, header) =>
   EditorView.theme(
     {
+      ...baseTheme,
       '&': {
-        color: css('--color-text-primary'),
-        backgroundColor: css('--color-surface-code-block'),
-        height: '100%',
-        ...(header
-          ? {}
-          : {
-              borderWidth: '1px',
-              borderColor: css('--color-border-subtle'),
-            }),
+        ...baseTheme['&'],
+        ...headerStyles(header),
       },
       '.cm-scroller': {
-        fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+        ...baseTheme['.cm-scroller'],
         padding: '0.5rem',
       },
-      '.cm-content': {
-        caretColor: css('--color-text-primary'),
-        fontSize: '0.875em',
-      },
-      '.cm-editor&.cm-focused': {
-        outline: `3px solid ${colors.indigo['600']}`,
+    },
+    { dark: isDark },
+  );
+
+export const getEditorThemeWithLineNumbers = (
+  isDark: boolean,
+  header: boolean,
+) =>
+  EditorView.theme(
+    {
+      ...baseTheme,
+      '&': {
+        ...baseTheme['&'],
+        ...headerStyles(header),
       },
       '.cm-gutters': {
-        backgroundColor: 'transparent',
-        borderRight: 'none',
+        ...baseTheme['.cm-gutters'],
+        color: css('--color-text-information'),
+        borderRight: `1px solid ${css('--color-border-subtle')}`,
+      },
+      '.cm-gutter .cm-gutterElement': {
+        padding: '0 0.5rem',
       },
     },
     { dark: isDark },

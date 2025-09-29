@@ -278,6 +278,7 @@ const getFirstDisplayAttribute = ({
 export const getActivityType = (payload: Payload) => {
   if (has(payload, 'ActivityType')) return payload.ActivityType;
   if (has(payload, 'activity_type')) return payload.activity_type;
+  if (typeof payload === 'string') return payload;
 };
 
 const isJavaSDK = (event: WorkflowEvent): boolean => {

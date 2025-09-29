@@ -23,6 +23,9 @@ export type DecodedLocalActivity = {
     data?: {
       payloads?: Payload[];
     };
+    type?: {
+      payloads?: Payload[];
+    };
   };
 };
 
@@ -71,7 +74,8 @@ export const decodeLocalActivity = async (
       convertedAttributes,
     ) as DecodedLocalActivity;
 
-    const payload = decodedAttributes?.details?.data?.payloads?.[0];
+    const payload = (decodedAttributes?.details?.data?.payloads ||
+      decodedAttributes?.details?.type?.payloads)?.[0];
     const activityType = getActivityType(payload);
 
     if (activityType) {
