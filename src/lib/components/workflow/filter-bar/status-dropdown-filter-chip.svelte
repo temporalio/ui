@@ -100,7 +100,7 @@
           localFilters.some((filter) => filter.value === status) ||
           (!localFilters.length && status === 'All')}
         <MenuItem
-          data-testid={status}
+          data-testid={`status-dropdown-filter-chip-${status}`}
           on:click={() => handleStatusSelect(status)}
         >
           <Checkbox

@@ -146,7 +146,12 @@
   </Menu>
 </MenuContainer>
 {#if $workflowFilters.length > 0}
-  <Button variant="ghost" size="xs" on:click={clearAllFilters}>
+  <Button
+    variant="ghost"
+    size="xs"
+    on:click={clearAllFilters}
+    data-testid="clear-all-filters-button"
+  >
     {translate('common.clear-all')}
   </Button>
 {/if}

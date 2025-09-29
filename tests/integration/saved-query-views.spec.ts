@@ -1,5 +1,3 @@
-/* eslint-disable no-useless-escape */
-
 import { expect, test } from '@playwright/test';
 
 import {
@@ -38,12 +36,12 @@ test.describe('Saved Query Views', () => {
     await page.getByTestId('today').click();
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toMatch(/^StartTime >= \"\d{4}-\d{2}-\d{2}T/);
+      .toMatch(/^StartTime >= "\d{4}-\d{2}-\d{2}T/);
 
     await page.getByTestId('last-hour').click();
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toMatch(/^StartTime >= \"\d{4}-\d{2}-\d{2}T/);
+      .toMatch(/^StartTime >= "\d{4}-\d{2}-\d{2}T/);
 
     await page.getByTestId('all').click();
     await expect.poll(() => getQueryParam(page.url())).toBe('');
@@ -62,7 +60,7 @@ test.describe('Saved Query Views', () => {
     await page.getByTestId('apply-filter-button').click();
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toBe('`WorkflowId`=\"user-view-1\"');
+      .toBe('`WorkflowId`="user-view-1"');
 
     await page.getByTestId('create-view-button').click();
     await page.getByTestId('save-view-modal-input').fill('My View');
@@ -73,7 +71,7 @@ test.describe('Saved Query Views', () => {
 
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toBe('`WorkflowId`=\"user-view-1\"');
+      .toBe('`WorkflowId`="user-view-1"');
     await expect(page.getByTestId('my-view')).toBeVisible();
 
     await page.locator('#search-attribute-filter-button').click();
@@ -87,7 +85,7 @@ test.describe('Saved Query Views', () => {
 
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toContain('`WorkflowId`=\"user-view-1\" AND `TaskQueue`=\"queue-z\"');
+      .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await expect(page.getByTestId('my-view')).toBeVisible();
     await page.getByTestId('save-view-button').click();
@@ -101,7 +99,7 @@ test.describe('Saved Query Views', () => {
     await expect(page.getByTestId('my-view-2')).toBeVisible();
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toContain('`WorkflowId`=\"user-view-1\" AND `TaskQueue`=\"queue-z\"');
+      .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await page.getByTestId('my-view-2').click();
     await page.getByRole('button', { name: 'Discard' }).click();
@@ -124,7 +122,7 @@ test.describe('Saved Query Views', () => {
     await page.getByTestId('apply-filter-button').click();
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toBe('`WorkflowId`=\"user-view-1\"');
+      .toBe('`WorkflowId`="user-view-1"');
 
     await page.getByTestId('create-view-button').click();
     await page.getByTestId('save-view-modal-input').fill('Original view');
@@ -135,7 +133,7 @@ test.describe('Saved Query Views', () => {
 
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toBe('`WorkflowId`=\"user-view-1\"');
+      .toBe('`WorkflowId`="user-view-1"');
     await expect(page.getByTestId('original-view')).toBeVisible();
 
     await page.locator('#search-attribute-filter-button').click();
@@ -149,7 +147,7 @@ test.describe('Saved Query Views', () => {
 
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toContain('`WorkflowId`=\"user-view-1\" AND `TaskQueue`=\"queue-z\"');
+      .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await expect(page.getByTestId('original-view')).toBeVisible();
     await page.getByTestId('save-view-button').click();
@@ -158,7 +156,7 @@ test.describe('Saved Query Views', () => {
     await expect(page.getByTestId('original-view-copy')).toBeVisible();
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toContain('`WorkflowId`=\"user-view-1\" AND `TaskQueue`=\"queue-z\"');
+      .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await page.getByTestId('original-view-copy').click();
     await page.getByRole('button', { name: 'Discard' }).click();
@@ -177,7 +175,7 @@ test.describe('Saved Query Views', () => {
 
     await expect
       .poll(() => getQueryParam(page.url()))
-      .toBe('`WorkflowId` STARTS_WITH \"cats\"');
+      .toBe('`WorkflowId` STARTS_WITH "cats"');
 
     await expect(page.getByTestId('cats')).toBeVisible();
   });
