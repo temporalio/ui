@@ -41,46 +41,65 @@
   const handleFocusOut = (e: FocusEvent) => {
     if (!$keepOpenCtx && e.target === lastMenuItem) $open = false;
   };
+
+  function portal(
+    node: HTMLElement,
+    target: HTMLElement | string = document.body,
+  ) {
+    positionMenuFrom(node, node.previousElementSibling);
+    const targetElement =
+      typeof target === 'string' ? document.querySelector(target) : target;
+    if (targetElement) targetElement.appendChild(node);
+    return {
+      destroy() {
+        if (node.parentNode) node.parentNode.removeChild(node);
+      },
+    };
+  }
+
+  let menuX = 0;
+  let menuY = 0;
+
+  const positionMenuFrom = (menuElement: HTMLElement, menuButton: Element) => {
+    if (!menuElement || !menuButton) return;
+    const button = menuButton.getBoundingClientRect();
+    const menu = menuElement.getBoundingClientRect();
+    if (position === 'right' || position === 'top-right') {
+      menuX = Math.round(button.right) - menu.width;
+    }
+    if (position === 'left' || position === 'top-left') {
+      menuX = Math.round(button.left);
+    }
+
+    menuY = Math.round(button.top + button.height);
+    if (position === 'top-right' || position === 'top-left') {
+      menuY = menuY - menu.height - button.height;
+    }
+  };
 </script>
 
-<ul
-  role="menu"
-  class={merge(
-    'menu',
-    'transition-all duration-100 ease-out',
-    !$open && 'invisible scale-95 opacity-0',
-    $open && 'visible scale-100 opacity-100',
-    maxHeight,
-    position,
-    className,
-  )}
-  aria-labelledby={id}
-  tabindex={-1}
-  style={position === 'top-right' || position === 'top-left'
-    ? `top: -${height + 16}px;`
-    : ''}
-  {id}
-  bind:this={menuElement}
-  bind:clientHeight={height}
-  on:focusout={handleFocusOut}
-  on:click|stopPropagation
-  {...$$restProps}
->
-  <slot />
-</ul>
-
-<style lang="postcss">
-  .menu {
-    @apply surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto border border-subtle text-primary shadow;
-
-    &.left,
-    &.top-left {
-      @apply left-0 origin-top-left;
-    }
-
-    &.right,
-    &.top-right {
-      @apply right-0 origin-top-right;
-    }
-  }
-</style>
+{#if $open}
+  <ul
+    role="menu"
+    use:portal
+    class={merge(
+      'surface-primary absolute z-20 mt-1 min-w-fit list-none overflow-auto border border-subtle text-primary shadow',
+      'transition-all duration-100 ease-out',
+      !$open && 'scale-95 opacity-0',
+      $open && 'scale-100 opacity-100',
+      maxHeight,
+      className,
+    )}
+    aria-labelledby={id}
+    tabindex={-1}
+    style={`top: ${menuY}px; left: ${menuX}px;`}
+    {id}
+    bind:this={menuElement}
+    bind:clientHeight={height}
+    on:focusout={handleFocusOut}
+    on:click|stopPropagation
+    {...$$restProps}
+  >
+    <slot />
+  </ul>
+{/if}
