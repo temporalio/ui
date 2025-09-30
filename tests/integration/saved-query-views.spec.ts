@@ -88,7 +88,7 @@ test.describe('Saved Query Views', () => {
       .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await expect(page.getByTestId('my-view')).toBeVisible();
-    await page.getByTestId('save-view-button').click();
+    await page.getByTestId('edit-view-button').click();
 
     await page.getByTestId('edit-view-modal-input').fill('My View 2');
     await page
@@ -102,8 +102,8 @@ test.describe('Saved Query Views', () => {
       .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await page.getByTestId('my-view-2').click();
-    await page.getByRole('button', { name: 'Discard' }).click();
-    await page.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Delete this Saved View' }).click();
 
     await expect(page.getByTestId('my-view-2')).toBeHidden();
     await expect.poll(() => getQueryParam(page.url())).toBe('');
@@ -150,7 +150,7 @@ test.describe('Saved Query Views', () => {
       .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await expect(page.getByTestId('original-view')).toBeVisible();
-    await page.getByTestId('save-view-button').click();
+    await page.getByTestId('edit-view-button').click();
     await page.getByTestId('create-as-new-button').click();
 
     await expect(page.getByTestId('original-view-copy')).toBeVisible();
