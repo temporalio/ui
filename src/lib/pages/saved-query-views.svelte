@@ -362,7 +362,9 @@
       data-testid={view.type === 'system'
         ? view.id
         : view.name.toLowerCase().replace(/\s+/g, '-')}
-      data-track-name="saved-querry-button"
+      data-track-name={view.type === 'system'
+        ? 'system-query-button'
+        : 'user-query-button'}
       data-track-intent="action"
       data-track-text={view.name}
       on:click={() => setActiveQueryView(view)}
