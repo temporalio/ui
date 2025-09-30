@@ -325,7 +325,14 @@
     {/if}
 
     {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
-      <p class="pl-4 text-secondary">No Views</p>
+      <p
+        class={merge(
+          ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
+          !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
+        )}
+      >
+        No Views
+      </p>
     {/if}
   </div>
 </div>
