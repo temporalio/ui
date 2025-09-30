@@ -87,7 +87,7 @@
       endsWithInvalid.test(trimmedName)
     )
       return 'Name cannot start or end with hyphens (-) or periods (.)';
-    if (collidesWithOther) return 'A view with this name already exists';
+    if (collidesWithOther) return 'Name must be unique';
     return '';
   });
 
@@ -157,7 +157,7 @@
   {id}
   confirmText={translate('common.save')}
   cancelText={translate('common.close')}
-  confirmDisabled={!nameValid || maxViewsReached}
+  confirmDisabled={!nameValid || (!view && maxViewsReached)}
   on:cancelModal={hideModal}
   on:confirmModal={onConfirm}
 >

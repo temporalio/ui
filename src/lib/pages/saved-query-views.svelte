@@ -99,6 +99,11 @@
       return;
     }
 
+    if (!query && activeQueryView?.type === 'user') {
+      activeQueryView = undefined;
+      return;
+    }
+
     if (activeQueryView?.type === 'system') {
       if (query && activeQueryView.query !== query) {
         if (savedQueryView) {
@@ -401,20 +406,37 @@
 
     {#if activeQueryView?.id === view?.id && view.type === 'user'}
       <div
+        in:slide
         class={merge(
           'flex flex-col items-center gap-1 pt-0.5 transition-all',
           $savedQueryNavOpen && 'lg:flex-row',
         )}
-        in:slide
       >
+        {#if view.id === activeQueryView?.id && view.query !== query}
+          <Button
+            size="xs"
+            class="w-full"
+            variant="primary"
+            data-testid="save-view-button"
+            data-track-name="save-view-button"
+            data-track-intent="action"
+            data-track-text="save"
+            on:click={() => {
+              onSaveView({
+                ...view,
+                query,
+              });
+            }}>Save</Button
+          >
+        {/if}
         <Button
           size="xs"
           class="w-full"
           variant="secondary"
-          data-testid="save-view-button"
-          data-track-name="save-view-button"
+          data-testid="edit-view-button"
+          data-track-name="edit-view-button"
           data-track-intent="action"
-          data-track-text="save"
+          data-track-text="edit"
           on:click={() => {
             editViewModalOpen = true;
           }}>Edit</Button
@@ -422,7 +444,7 @@
         <Button
           leadingIcon={$copied ? 'checkmark' : 'copy'}
           size="xs"
-          class="w-full"
+          class="w-full opacity-80"
           variant="ghost"
           data-testid="share-view-button"
           data-track-name="share-view-button"

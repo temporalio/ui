@@ -98,7 +98,9 @@
       {#each workflowStatusFilters as status (status)}
         {@const checked =
           localFilters.some((filter) => filter.value === status) ||
-          (!localFilters.length && status === 'All')}
+          (localFilters.length === 1 &&
+            !localFilters[0].value &&
+            status === 'All')}
         <MenuItem
           data-testid={`status-dropdown-filter-chip-${status}`}
           on:click={() => handleStatusSelect(status)}
