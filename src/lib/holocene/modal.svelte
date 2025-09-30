@@ -125,19 +125,25 @@
         {error}
       </p>
     </div>
-    <div class="flex items-center justify-end space-x-2 p-6">
-      <Button variant="ghost" disabled={loading} on:click={closeModal}
-        >{cancelText}</Button
-      >
-      {#if !hideConfirm}
-        <Button
-          variant={confirmType}
-          {loading}
-          disabled={confirmDisabled || loading}
-          data-testid="confirm-modal-button"
-          type="submit">{confirmText}</Button
+
+    <div class="flex items-center justify-between p-6">
+      <slot name="footer">
+        <div></div>
+      </slot>
+      <div class="flex items-center justify-end space-x-2">
+        <Button variant="ghost" disabled={loading} on:click={closeModal}
+          >{cancelText}</Button
         >
-      {/if}
+        {#if !hideConfirm}
+          <Button
+            variant={confirmType}
+            {loading}
+            disabled={confirmDisabled || loading}
+            data-testid="confirm-modal-button"
+            type="submit">{confirmText}</Button
+          >
+        {/if}
+      </div>
     </div>
   </form>
 </dialog>

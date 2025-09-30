@@ -7,7 +7,6 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import DeleteViewModal from '$lib/components/workflow/filter-bar/delete-view-modal.svelte';
   import EditViewModal from '$lib/components/workflow/filter-bar/edit-view-modal.svelte';
   import SaveViewModal from '$lib/components/workflow/filter-bar/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -29,7 +28,6 @@
   let activeQueryView: SavedQuery | undefined = $state();
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
-  let deleteViewModalOpen = $state(false);
   let pendingQueryTarget: string | undefined = $state();
 
   const query = $derived(page.url.searchParams.get('query') || '');
@@ -115,13 +113,9 @@
   });
 
   const setActiveQueryView = (view: SavedQuery) => {
+    if (view.id === activeQueryView?.id) return;
     activeQueryView = view;
     pendingQueryTarget = view.query || '';
-
-    if (unsavedQuery && view.id === 'unsaved') {
-      saveViewModalOpen = true;
-      return;
-    }
 
     if (view.query) {
       $workflowFilters = toListWorkflowFilters(view.query, $searchAttributes);
@@ -176,9 +170,9 @@
     activeQueryView = view;
   };
 
-  const onDeleteView = () => {
+  const onDeleteView = (view: SavedQuery) => {
     $savedWorkflowQueries[namespace] = $savedWorkflowQueries[namespace].filter(
-      (q) => q?.id !== activeQueryView?.id,
+      (q) => q?.id !== view.id,
     );
     $workflowFilters = [];
     activeQueryView = undefined;
@@ -261,14 +255,6 @@
           in:slide
         >
           Saved Views
-          <span
-            class={merge(
-              'text-xs text-secondary',
-              $savedQueryNavOpen ? 'lg:inline' : 'lg:hidden',
-            )}
-          >
-            {namespaceSavedQueries.length} / 20
-          </span>
         </p>
       {/if}
       <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
@@ -286,7 +272,7 @@
   </div>
 
   <div class="space-y-2 p-1.5">
-    <div class="border-b border-subtle pb-2 text-center">
+    <div class="pb-2 text-center">
       <div class="space-y-1">
         {#each systemWorkflowViews as view}
           {@render queryButton({
@@ -296,6 +282,25 @@
         {/each}
       </div>
     </div>
+
+    {#if $savedQueryNavOpen}
+      <p
+        class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
+        in:slide
+      >
+        Custom Views
+        <span
+          class={merge(
+            'text-xs text-secondary',
+            $savedQueryNavOpen ? 'lg:inline' : 'lg:hidden',
+          )}
+        >
+          {namespaceSavedQueries.length} / 20
+        </span>
+      </p>
+    {/if}
+
+    <div class="border-t border-subtle"></div>
 
     {#if unsavedQuery}
       {@render queryButton(unsaveView)}
@@ -320,18 +325,7 @@
     {/if}
 
     {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
-      <div class="space-y-1">
-        {@render queryButton({
-          id: 'no-views',
-          name: 'No views',
-          query,
-          icon: 'bookmark',
-          badge: 'Add Filter',
-          type: 'system',
-          active: false,
-          disabled: true,
-        })}
-      </div>
+      <p class="pl-4 text-secondary">No Views</p>
     {/if}
   </div>
 </div>
@@ -341,10 +335,6 @@
   bind:open={editViewModalOpen}
   {onSaveView}
   {onCreateView}
-/>
-<DeleteViewModal
-  view={activeQueryView}
-  bind:open={deleteViewModalOpen}
   {onDeleteView}
 />
 
@@ -405,14 +395,14 @@
     {#if activeQueryView?.id === view?.id && view.type === 'user'}
       <div
         class={merge(
-          'flex flex-col items-center gap-1 overflow-hidden transition-all ',
+          'flex flex-col items-center gap-1 pt-0.5 transition-all',
           $savedQueryNavOpen && 'lg:flex-row',
         )}
         in:slide
       >
         <Button
           size="xs"
-          class="w-full scale-90"
+          class="w-full"
           variant="secondary"
           data-testid="save-view-button"
           data-track-name="save-view-button"
@@ -420,12 +410,12 @@
           data-track-text="save"
           on:click={() => {
             editViewModalOpen = true;
-          }}>Save</Button
+          }}>Edit</Button
         >
         <Button
           leadingIcon={$copied ? 'checkmark' : 'copy'}
           size="xs"
-          class="w-full scale-90"
+          class="w-full"
           variant="ghost"
           data-testid="share-view-button"
           data-track-name="share-view-button"
@@ -436,21 +426,6 @@
             >Share</span
           ></Button
         >
-        <Button
-          variant="destructive"
-          size="xs"
-          class="w-full scale-90"
-          data-testid="remove-view-button"
-          data-track-name="remove-view-button"
-          data-track-intent="action"
-          data-track-text="remove"
-          on:click={() => (deleteViewModalOpen = true)}
-          ><span class={merge('inline', $savedQueryNavOpen && 'lg:hidden')}
-            ><Icon name="trash" /></span
-          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-            >Discard</span
-          ></Button
-        >
       </div>
     {:else if unsavedQuery && view?.id === 'unsaved'}
       <div
@@ -459,7 +434,7 @@
       >
         <Button
           size="xs"
-          class="w-full transition-all"
+          class="w-full break-all transition-all"
           variant="secondary"
           disabled={maxViewsReached}
           data-testid="create-view-button"
@@ -468,7 +443,15 @@
           data-track-text="create"
           on:click={() => {
             saveViewModalOpen = true;
-          }}>Save</Button
+          }}
+          ><span
+            class={merge(
+              'inline lg:hidden',
+              !$savedQueryNavOpen && 'lg:inline',
+            )}>New</span
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
+            >Save as New</span
+          ></Button
         >
       </div>
     {/if}

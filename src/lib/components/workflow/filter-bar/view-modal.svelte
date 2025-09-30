@@ -2,6 +2,7 @@
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -16,6 +17,7 @@
     view?: SavedQuery;
     onSaveView?: (view: SavedQuery) => void;
     onCreateView?: (view: SavedQuery) => void;
+    onDeleteView?: (view: SavedQuery) => void;
     id?: string;
   }
 
@@ -24,6 +26,7 @@
     view,
     onSaveView,
     onCreateView,
+    onDeleteView,
     id = 'view-modal',
   }: Props = $props();
 
@@ -142,6 +145,11 @@
     onCreateView(updatedView);
     hideModal();
   };
+
+  const onDelete = () => {
+    onDeleteView(view);
+    hideModal();
+  };
 </script>
 
 <Modal
@@ -154,7 +162,7 @@
   on:confirmModal={onConfirm}
 >
   <h3 slot="title">{view ? 'Edit View' : 'Save as View'}</h3>
-  <div class="flex h-full flex-1 flex-col" slot="content">
+  <div class="flex h-full flex-1 flex-col gap-1" slot="content">
     <Input
       id="view-name"
       label="Name"
@@ -169,13 +177,25 @@
       data-testid={`${id}-input`}
     />
     {#if view}
-      <Button
-        variant="secondary"
-        class="self-start"
-        disabled={!nameValid || maxViewsReached}
-        data-testid="create-as-new-button"
-        on:click={onCreateAsNew}>Create New</Button
-      >
+      <div class="flex items-center justify-start gap-2">
+        <Button
+          variant="secondary"
+          disabled={!nameValid || maxViewsReached}
+          data-testid="create-as-new-button"
+          on:click={onCreateAsNew}
+          >{name === view.name ? 'Create Copy' : 'Create New'}</Button
+        >
+      </div>
     {/if}
   </div>
+  <Button
+    variant="ghost"
+    slot="footer"
+    class="flex items-center gap-1 text-sm underline {!onDeleteView
+      ? 'invisible'
+      : ''}"
+    on:click={onDelete}
+  >
+    <Icon name="trash" /> Delete this Saved View
+  </Button>
 </Modal>

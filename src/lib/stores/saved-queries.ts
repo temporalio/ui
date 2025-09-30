@@ -68,7 +68,7 @@ export const systemWorkflowViews: SavedQuery[] = [
   },
 ];
 
-export const MAX_SAVED_WORKFLOW_QUERIES = 2;
+export const MAX_SAVED_WORKFLOW_QUERIES = 20;
 
 export const savedWorkflowQueries = persistStore<Record<string, SavedQuery[]>>(
   'saved-workflow-queries',

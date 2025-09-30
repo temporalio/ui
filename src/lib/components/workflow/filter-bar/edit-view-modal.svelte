@@ -8,9 +8,23 @@
     view?: SavedQuery;
     onSaveView: (view: SavedQuery) => void;
     onCreateView: (view: SavedQuery) => void;
+    onDeleteView: (view: SavedQuery) => void;
   }
 
-  let { open = $bindable(), view, onSaveView, onCreateView }: Props = $props();
+  let {
+    open = $bindable(),
+    view,
+    onSaveView,
+    onCreateView,
+    onDeleteView,
+  }: Props = $props();
 </script>
 
-<ViewModal id="edit-view-modal" bind:open {view} {onSaveView} {onCreateView} />
+<ViewModal
+  id="edit-view-modal"
+  bind:open
+  {view}
+  {onSaveView}
+  {onCreateView}
+  {onDeleteView}
+/>
