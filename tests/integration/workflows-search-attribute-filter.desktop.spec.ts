@@ -35,19 +35,19 @@ test('it should update the datetime filter based on the selected timezone', asyn
   await page.getByTestId('top-nav').getByPlaceholder('Search').fill('PDT');
   await page.getByText('Pacific Daylight Time (PDT) UTC-07:00').click();
 
-  await page.getByTestId('add-filter-button').click();
-  await page.getByText('CloseTime').click();
-  await page.getByRole('button', { name: 'After' }).click();
-  await page.getByLabel('Absolute', { exact: true }).check();
-  await page.getByLabel('hrs', { exact: true }).fill('5');
-  await page.getByRole('button', { name: 'Apply' }).click();
+  await page.getByTestId('toggle-manual-query').click();
+  await page
+    .getByTestId('manual-search-input')
+    .fill('`CloseTime`>="2025-12-25T12:00:00.000Z"');
+
+  await page.getByTestId('manual-search-button').click();
 
   await expect
     .poll(() => getQueryParam(page.url()))
-    .toBe('`CloseTime`>="2025-09-29T12:00:00.000Z"');
+    .toBe('`CloseTime`>="2025-12-25T12:00:00.000Z"');
 
   await expect(
-    page.getByRole('button', { name: 'CloseTime >= 2025-09-29 05:00' }),
+    page.getByRole('button', { name: 'CloseTime >= 2025-12-25 04:00' }),
   ).toBeVisible();
 
   await page.getByTestId('toggle-manual-query').click();
@@ -60,7 +60,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
   await page.getByText('Mountain Daylight Time (MDT) UTC-06:00').click();
 
   await expect(
-    page.getByRole('button', { name: 'CloseTime >= 2025-09-29 06:00' }),
+    page.getByRole('button', { name: 'CloseTime >= 2025-12-25 05:00' }),
   ).toBeVisible();
 
   query = await page.getByTestId('manual-search-input').inputValue();

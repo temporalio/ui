@@ -159,8 +159,8 @@ test.describe('Saved Query Views', () => {
       .toContain('`WorkflowId`="user-view-1" AND `TaskQueue`="queue-z"');
 
     await page.getByTestId('original-view-copy').click();
-    await page.getByRole('button', { name: 'Discard' }).click();
-    await page.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Delete this Saved View' }).click();
 
     await expect(page.getByTestId('original-view-copy')).toBeHidden();
     await expect.poll(() => getQueryParam(page.url())).toBe('');
