@@ -39,8 +39,7 @@
     className,
   )}
   bind:this={tableContainer}
-  style="max-height: {maxHeight ||
-    `calc(100vh - ${tableOffset}px)`};
+  style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`};
 
  --table-header-h: 2.25rem;"
 >

@@ -362,6 +362,9 @@
       data-testid={view.type === 'system'
         ? view.id
         : view.name.toLowerCase().replace(/\s+/g, '-')}
+      data-track-name="saved-querry-button"
+      data-track-intent="action"
+      data-track-text={view.name}
       on:click={() => setActiveQueryView(view)}
       class={merge('flex w-full justify-start', view.class || '')}
       active={view?.active}
@@ -410,6 +413,9 @@
           class="w-full scale-90"
           variant="secondary"
           data-testid="save-view-button"
+          data-track-name="save-view-button"
+          data-track-intent="action"
+          data-track-text="save"
           on:click={() => {
             editViewModalOpen = true;
           }}>Save</Button
@@ -420,6 +426,9 @@
           class="w-full scale-90"
           variant="ghost"
           data-testid="share-view-button"
+          data-track-name="share-view-button"
+          data-track-intent="action"
+          data-track-text="share"
           on:click={handleCopy}
           ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
             >Share</span
@@ -430,6 +439,9 @@
           size="xs"
           class="w-full scale-90"
           data-testid="remove-view-button"
+          data-track-name="remove-view-button"
+          data-track-intent="action"
+          data-track-text="remove"
           on:click={() => (deleteViewModalOpen = true)}
           ><span class={merge('inline', $savedQueryNavOpen && 'lg:hidden')}
             ><Icon name="trash" /></span
@@ -449,6 +461,9 @@
           variant="secondary"
           disabled={maxViewsReached}
           data-testid="create-view-button"
+          data-track-name="create-view-button"
+          data-track-intent="action"
+          data-track-text="create"
           on:click={() => {
             saveViewModalOpen = true;
           }}>Save</Button
