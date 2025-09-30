@@ -58,7 +58,6 @@
   data-track-intent="select"
   data-track-text="*textContent*"
   on:click
-  on:dblclick
   role="button"
   tabindex="0"
   {...$$restProps}

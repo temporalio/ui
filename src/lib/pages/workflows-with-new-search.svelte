@@ -261,7 +261,6 @@
   </div>
 </header>
 
-<!-- <WorkflowSearchAttributeFilter /> -->
 <FilterBar />
 <div class="flex overflow-auto">
   <SavedQueryViews />
