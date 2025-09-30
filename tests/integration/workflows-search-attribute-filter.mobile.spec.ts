@@ -49,7 +49,8 @@ test('it should update the datetime filter based on the selected timezone', asyn
   await page.getByTestId('add-filter-button').click();
 
   await page.getByText('CloseTime').click();
-  await page.getByRole('menuitem', { name: 'After' }).click();
+
+  await page.getByRole('button', { name: 'After' }).click();
   await page.getByLabel('Absolute', { exact: true }).check();
   await page.getByLabel('hrs', { exact: true }).fill('5');
   await page.getByRole('button', { name: 'Apply' }).click();
