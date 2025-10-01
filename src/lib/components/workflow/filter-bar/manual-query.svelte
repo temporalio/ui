@@ -69,7 +69,7 @@
       placeholder={translate('workflows.search-placeholder')}
       icon="search"
       class="grow  [&_*]:border-0"
-      inputClass="surface-information !border-r border-subtle"
+      inputContainerClass="surface-information !border-r border-subtle"
       clearable
       copyButtonLabel={translate('common.copy-icon-title')}
       clearButtonLabel={translate('common.clear-input-button-label')}

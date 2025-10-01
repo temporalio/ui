@@ -18,7 +18,6 @@
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
-  import { workflowRoutePattern } from '$lib/utilities/namespace-url-pattern';
   import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
@@ -27,9 +26,6 @@
 
   export let filters: SearchAttributeFilter[];
   export let options: SearchAttributeOption[];
-  export let showOptions = workflowRoutePattern.match(
-    window?.location?.pathname,
-  );
 
   const { filter, activeQueryIndex, focusedElementId } =
     getContext<FilterContext>(FILTER_CONTEXT);
@@ -65,7 +61,6 @@
     id="search-attribute-filter-button"
     controls="search-attribute-menu"
     disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
-    count={showOptions ? ($filter.attribute ? 0 : filters.length) : 0}
     on:click={() => (searchAttributeValue = '')}
     class="text-nowrap"
   >

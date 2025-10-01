@@ -76,7 +76,7 @@
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
-    maxHeight="73dvh"
+    maxHeight="var(--panel-h)"
   >
     <caption class="sr-only" slot="caption">
       {translate('common.workflows')}
