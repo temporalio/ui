@@ -19,7 +19,7 @@ const setPosition = (position: ToastPosition): void => {
 
 const push = (toast: Toast) => {
   const toastWithDefaults: Toast = {
-    id: crypto.randomUUID(),
+    id: crypto.randomUUID() as string,
     duration: 3000,
     variant: 'primary',
     ...toast,
