@@ -1,16 +1,12 @@
 export const getExponentialBackoff = (
   initialIntervalSeconds: number,
   attempt: number,
-  maxAttempts: number,
 ): number => {
-  if (attempt === 1) initialIntervalSeconds * 1000;
-  const maxIntervalSeconds = 3600;
-  const growthFactor = Math.pow(
-    maxIntervalSeconds / initialIntervalSeconds,
-    1 / maxAttempts,
-  );
+  if (attempt <= 1) return initialIntervalSeconds * 1000;
+  const maxIntervalSeconds = 300;
+  const growthMultiplier = 1.2; // Gentler 30% growth per attempt
   const exponentialBackoff =
-    initialIntervalSeconds * Math.pow(growthFactor, attempt);
+    initialIntervalSeconds * Math.pow(growthMultiplier, attempt - 1);
   const intervalSeconds = Math.min(
     maxIntervalSeconds,
     Math.round(exponentialBackoff),
