@@ -31,6 +31,7 @@
   }: Props = $props();
 
   let name = $state('');
+  let touched = $state(false);
 
   const query = $derived(page.url.searchParams.get('query'));
   const namespace = $derived(page.params.namespace);
@@ -43,6 +44,7 @@
   $effect(() => {
     if (open && !wasOpen) {
       name = view?.name ?? '';
+      touched = false;
     }
     wasOpen = open;
   });
@@ -169,9 +171,10 @@
       required
       maxLength={255}
       bind:value={name}
-      valid={nameValid}
-      hintText={nameValid ? '' : nameError()}
-      error={!nameValid}
+      on:input={() => (touched = true)}
+      valid={!touched || nameValid}
+      hintText={touched && !nameValid ? nameError() : ''}
+      error={touched && !nameValid}
       placeholder="Name of view"
       class="w-full"
       data-testid={`${id}-input`}
@@ -183,7 +186,7 @@
           disabled={!nameValid || maxViewsReached}
           data-testid="create-as-new-button"
           on:click={onCreateAsNew}
-          >{name === view.name ? 'Create Copy' : 'Create New'}</Button
+          size="sm">{name === view.name ? 'Create Copy' : 'Create New'}</Button
         >
       </div>
     {/if}
