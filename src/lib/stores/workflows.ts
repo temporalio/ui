@@ -26,17 +26,6 @@ export const canFetchChildWorkflows = derived(
   },
 );
 
-const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
-export const queryWithParentWorkflowId = derived(
-  [query, canFetchChildWorkflows],
-  ([$query, $canFetchChildWorkflows]) => {
-    if ($canFetchChildWorkflows && !$query) {
-      return 'ParentWorkflowId is NULL';
-    }
-    return $query;
-  },
-);
-
 export type ParsedParameters = FilterParameters & { timeRange?: string };
 export const workflowsSearchParams = writable<string>('');
 
