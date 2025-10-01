@@ -10,7 +10,6 @@ export const SEARCH_ATTRIBUTES_API =
 
 const MOCK_SEARCH_ATTRIBUTES: SearchAttributesResponse = {
   systemAttributes: {
-    BatcherNamespace: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     BatcherUser: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     BinaryChecksums: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,

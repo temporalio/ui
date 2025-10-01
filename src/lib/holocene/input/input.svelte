@@ -221,7 +221,7 @@
   }
 
   .input {
-    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:text-brand focus:outline-none;
+    @apply m-2 w-full bg-transparent focus:text-brand focus:outline-none;
   }
 
   .prefix {

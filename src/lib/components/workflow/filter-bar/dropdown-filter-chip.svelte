@@ -167,6 +167,10 @@
       return value;
     }
 
+    if (isNullFilter) {
+      return 'null';
+    }
+
     if (isDateTimeFilter(filter)) {
       if (filter.customDate) return value.split('BETWEEN')[1];
       return formatDate(value, $timeFormat, {
@@ -226,6 +230,7 @@
   };
 
   const onTimeApply = () => {
+    if (isNullFilter) return;
     if ($timeFormatType === 'relative' && !isTimeRange) {
       if (!$relativeTimeDuration) return;
       localFilter.value = toDate(
@@ -287,12 +292,13 @@
   <ToggleButtons>
     {#each options as option}
       <ToggleButton
-        variant={localFilter.conditional === option.value
-          ? 'primary'
-          : 'secondary'}
+        variant="secondary"
+        active={localFilter.conditional === option.value}
         on:click={() => {
           if (isNullConditional(option.value)) {
             localFilter.value = null;
+          } else if (isNullFilter) {
+            localFilter.value = filter.value;
           }
           localFilter.conditional = option.value;
         }}
@@ -304,12 +310,13 @@
 
 <MenuContainer {open}>
   <MenuButton size="xs" controls={controlsId} hasIndicator class="bg-secondary">
-    {getDisplayKeyWithConditional(filter)}<span class="pl-1 text-brand"
-      >{getDisplayValue(filter)}</span
+    {getDisplayKeyWithConditional(localFilter)}<span
+      class="max-w-[160px] truncate pl-1 lg:max-w-full"
+      >{getDisplayValue(localFilter)}</span
     >
   </MenuButton>
 
-  <Menu id={controlsId} class="max-h-fit w-80 max-w-fit p-4">
+  <Menu id={controlsId} class="max-h-fit w-64 p-4 lg:max-w-fit">
     <form onsubmit={applyChanges}>
       <div class="space-y-4">
         <div class="flex items-center justify-between">
@@ -327,7 +334,7 @@
             />
           </div>
         {:else if isDateTimeFilter(localFilter)}
-          <div class="min-w-[360px] space-y-3">
+          <div class="space-y-3 lg:min-w-[360px]">
             {@render conditionalButtons(dateConditionalOptions)}
             {#if isTimeRange}
               <div class="flex flex-col gap-2">
@@ -370,6 +377,7 @@
                   value="relative"
                   name="time-filter-type"
                   group={timeFormatType}
+                  disabled={isNullFilter}
                 />
                 <div class="ml-6 flex gap-2 pt-2">
                   <Input
@@ -380,14 +388,14 @@
                     placeholder="00"
                     error={timeError($relativeTimeDuration)}
                     class="h-10"
-                    disabled={$timeFormatType !== 'relative'}
+                    disabled={$timeFormatType !== 'relative' || isNullFilter}
                   />
                   <Select
                     bind:value={$relativeTimeUnit}
                     id="relative-datetime-unit-input"
                     label={translate('common.time-unit')}
                     labelHidden
-                    disabled={$timeFormatType !== 'relative'}
+                    disabled={$timeFormatType !== 'relative' || isNullFilter}
                   >
                     {#each TIME_UNIT_OPTIONS as unit}
                       <Option value={unit}
@@ -404,6 +412,7 @@
                   value="absolute"
                   name="time-filter-type"
                   group={timeFormatType}
+                  disabled={isNullFilter}
                 />
                 <div class="ml-6 flex flex-col gap-2">
                   <DatePicker
@@ -414,7 +423,7 @@
                     todayLabel={translate('common.today')}
                     closeLabel={translate('common.close')}
                     clearLabel={translate('common.clear-input-button-label')}
-                    disabled={$timeFormatType !== 'absolute'}
+                    disabled={$timeFormatType !== 'absolute' || isNullFilter}
                   />
                   <TimePicker
                     bind:hour={$startHour}
@@ -472,8 +481,8 @@
                 id="list-filter"
                 type="search"
                 placeholder={`${translate('common.enter')} ${localFilter.attribute}`}
-                icon="search"
                 class="w-full"
+                disabled={isNullFilter}
                 bind:value={localFilter.value}
               />
             {/if}
@@ -487,6 +496,7 @@
                   localFilter.conditional = '=';
                   localFilter.value = 'true';
                 }}
+                active={localFilter.value === 'true'}
                 size="xs">True</ToggleButton
               >
               <ToggleButton
@@ -497,6 +507,7 @@
                   localFilter.conditional = '=';
                   localFilter.value = 'false';
                 }}
+                active={localFilter.value === 'false'}
                 size="xs">False</ToggleButton
               >
             </ToggleButtons>
