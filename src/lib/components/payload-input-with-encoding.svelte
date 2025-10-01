@@ -17,7 +17,7 @@
 
   import PayloadInput from './payload-input.svelte';
 
-  export let id = crypto.randomUUID();
+  export let id: string = crypto.randomUUID();
   export let input: string;
   export let encoding: Writable<PayloadInputEncoding>;
   export let messageType: string;

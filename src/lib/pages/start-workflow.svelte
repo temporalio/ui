@@ -49,7 +49,7 @@
 
   const identity = getIdentity();
 
-  let workflowId = '';
+  let workflowId: string = '';
   let taskQueue = '';
   let workflowType = '';
   let input = '';

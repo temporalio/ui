@@ -27,7 +27,7 @@
   const reasonPlaceholder = getPlaceholder(Action.Cancel, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
-  let jobIdPlaceholder = crypto.randomUUID();
+  let jobIdPlaceholder: string = crypto.randomUUID();
   let error = '';
 
   const { allSelected, cancelableWorkflows } =

@@ -7,7 +7,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let id = crypto.randomUUID();
+  export let id: string = crypto.randomUUID();
   export let error = false;
   export let input: string;
   export let label = translate('workflows.signal-payload-input-label');
