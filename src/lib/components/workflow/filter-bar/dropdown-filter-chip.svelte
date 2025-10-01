@@ -311,7 +311,7 @@
 <MenuContainer {open}>
   <MenuButton size="xs" controls={controlsId} hasIndicator class="bg-secondary">
     {getDisplayKeyWithConditional(localFilter)}<span
-      class="max-w-[160px] truncate pl-1 lg:max-w-full"
+      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
       >{getDisplayValue(localFilter)}</span
     >
   </MenuButton>
