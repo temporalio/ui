@@ -13,7 +13,6 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { hideChildWorkflows, searchInputViewOpen } from '$lib/stores/filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
@@ -23,8 +22,6 @@
   import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
-
-  import IsTemporalServerVersionGuard from '../is-temporal-server-version-guard.svelte';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
@@ -98,31 +95,6 @@
         class="w-full"
       />
     </MenuItem>
-    {#if showOptions}
-      <MenuItem
-        class="min-w-56"
-        data-testid="manual-search-toggle"
-        on:click={() => ($searchInputViewOpen = !$searchInputViewOpen)}
-        description={translate('workflows.view-search-description')}
-        >{translate('workflows.view-search-input')}</MenuItem
-      >
-      <IsTemporalServerVersionGuard minimumVersion="1.23.0">
-        <MenuItem
-          on:click={() => ($hideChildWorkflows = !$hideChildWorkflows)}
-          description={$hideChildWorkflows
-            ? 'Child Workflows hidden by default when no filter applied'
-            : ''}
-        >
-          <div class="flex items-center gap-1">
-            {#if $hideChildWorkflows}
-              <Icon name="eye-hide" />{translate('workflows.hide-children')}
-            {:else}
-              <Icon name="eye-show" />{translate('workflows.show-children')}
-            {/if}
-          </div>
-        </MenuItem>
-      </IsTemporalServerVersionGuard>
-    {/if}
     <hr class="border-subtle" />
 
     {#each filteredOptions as { value, label, type }}

@@ -54,7 +54,6 @@
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
-    queryWithParentWorkflowId,
     refresh,
     workflowCount,
     workflowsQuery,
@@ -103,7 +102,7 @@
 
   $effect(() => {
     namespace;
-    $queryWithParentWorkflowId;
+    query;
     perPage;
     $refresh;
     resetSelection();

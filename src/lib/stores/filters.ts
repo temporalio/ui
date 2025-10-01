@@ -12,18 +12,6 @@ export const query = derived([page], ([$page]) =>
   $page.url.searchParams.get('query'),
 );
 
-export const showChildWorkflows = persistStore<boolean>(
-  'showChildWorkflows',
-  true,
-  true,
-);
-
-export const hideChildWorkflows = persistStore<boolean>(
-  'hideChildWorkflows',
-  false,
-  true,
-);
-
 const category = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );

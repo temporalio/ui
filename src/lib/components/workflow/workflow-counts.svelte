@@ -9,7 +9,6 @@
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     disableWorkflowCountsRefresh,
-    queryWithParentWorkflowId,
     refresh,
     workflowCount,
   } from '$lib/stores/workflows';
@@ -31,8 +30,9 @@
   };
   let { staticQuery = '', refreshTime = $bindable() }: Props = $props();
 
+  const queryParam = $derived(page.url.searchParams.get('query'));
   const namespace = $derived(page.params.namespace);
-  const query = $derived(staticQuery || $queryWithParentWorkflowId);
+  const query = $derived(staticQuery || queryParam);
   const perPage = $derived(page.url.searchParams.get('per-page'));
 
   let statusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
@@ -42,25 +42,12 @@
   let attempt = $state(1);
   let loading = $state(false);
 
-  const initialIntervalSeconds = 60;
+  const initialIntervalSeconds = 5;
   const maxAttempts = 20;
 
-  onDestroy(() => {
-    clearNewCounts();
-  });
-
-  const setBackoffInterval = () => {
-    attempt += 1;
-    clearInterval(refreshInterval);
-    if (attempt <= maxAttempts) {
-      const interval = getExponentialBackoff(
-        initialIntervalSeconds,
-        attempt,
-        maxAttempts,
-      );
-      refreshInterval = setInterval(() => fetchNewCounts(), interval);
-    }
-  };
+  const intervalSeconds = $derived(
+    getExponentialBackoff(initialIntervalSeconds, attempt, maxAttempts),
+  );
 
   const clearNewCounts = () => {
     clearInterval(refreshInterval);
@@ -71,37 +58,15 @@
     refreshTime = new Date();
   };
 
-  const fetchNewCounts = async () => {
-    setBackoffInterval();
-    if (attempt > maxAttempts) {
-      clearInterval(refreshInterval);
-      return;
-    }
-
-    try {
-      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
-        namespace,
-        query,
-      }).catch((_e) => {
-        return { count: '0', groups: [] };
-      });
-      $workflowCount.newCount = parseInt(count) - $workflowCount.count;
-      newStatusGroups = getStatusAndCountOfGroup(groups);
-    } finally {
-      loading = false;
+  const fetchNewCount = () => {
+    clearInterval(refreshInterval);
+    attempt += 1;
+    if (attempt <= maxAttempts) {
+      refreshInterval = setInterval(() => fetchNewCount(), intervalSeconds);
     }
   };
 
   const fetchCounts = async () => {
-    clearNewCounts();
-    if (!$disableWorkflowCountsRefresh) {
-      const interval = getExponentialBackoff(
-        initialIntervalSeconds,
-        attempt,
-        maxAttempts,
-      );
-      refreshInterval = setInterval(() => fetchNewCounts(), interval);
-    }
     try {
       const { count, groups } = await fetchWorkflowCountByExecutionStatus({
         namespace,
@@ -113,6 +78,14 @@
       statusGroups = getStatusAndCountOfGroup(groups);
     } finally {
       loading = false;
+    }
+  };
+
+  const fetchInitialCounts = async () => {
+    clearNewCounts();
+    fetchCounts();
+    if (!$disableWorkflowCountsRefresh) {
+      refreshInterval = setInterval(() => fetchNewCount(), intervalSeconds);
     }
   };
 
@@ -150,7 +123,11 @@
     perPage;
     $refresh;
 
-    fetchCounts();
+    fetchInitialCounts();
+  });
+
+  onDestroy(() => {
+    clearNewCounts();
   });
 </script>
 

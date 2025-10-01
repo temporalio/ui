@@ -6,7 +6,6 @@ import type { FilterParameters } from '$lib/types/workflows';
 import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 import { isCloud } from './advanced-visibility';
-import { hideChildWorkflows } from './filters';
 import { temporalVersion } from './versions';
 
 export const refresh = writable(0);
@@ -29,9 +28,9 @@ export const canFetchChildWorkflows = derived(
 
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 export const queryWithParentWorkflowId = derived(
-  [query, canFetchChildWorkflows, hideChildWorkflows],
-  ([$query, $canFetchChildWorkflows, $hideChildWorkflows]) => {
-    if ($canFetchChildWorkflows && $hideChildWorkflows && !$query) {
+  [query, canFetchChildWorkflows],
+  ([$query, $canFetchChildWorkflows]) => {
+    if ($canFetchChildWorkflows && !$query) {
       return 'ParentWorkflowId is NULL';
     }
     return $query;

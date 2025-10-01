@@ -3,6 +3,7 @@ export const getExponentialBackoff = (
   attempt: number,
   maxAttempts: number,
 ): number => {
+  if (attempt === 1) initialIntervalSeconds * 1000;
   const maxIntervalSeconds = 3600;
   const growthFactor = Math.pow(
     maxIntervalSeconds / initialIntervalSeconds,
