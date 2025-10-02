@@ -36,7 +36,7 @@
   let success;
 
   let name = '';
-  let updateId: string = crypto.randomUUID();
+  let updateId = crypto.randomUUID();
   let input = '';
   let customUpdate = false;
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
