@@ -12,6 +12,7 @@
     width?: number;
     class?: string;
     show?: boolean;
+    'aria-hidden'?: boolean;
   };
 
   type BasePositionProps = {
@@ -69,6 +70,7 @@
   export let hide: boolean | null = false;
   export let width: number | null = null;
   export let show = false;
+  let ariaHidden = $$restProps['aria-hidden'] ?? false;
 </script>
 
 {#if hide}
@@ -90,6 +92,7 @@
       class:topRight
       class:topLeft
       style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
+      aria-hidden={ariaHidden}
     >
       <div class="inline-block rounded-md bg-slate-800 px-2 py-2">
         <div class="flex gap-2 text-slate-100">
