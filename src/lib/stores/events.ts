@@ -21,35 +21,22 @@ import { persistStore } from './persist-store';
 
 const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {
-    try {
-      return decodeURIForSvelte($page.params.namespace);
-    } catch {
-      return $page.params.namespace;
-    }
+    return decodeURIForSvelte($page.params.namespace);
   }
   return '';
 });
 
 const workflowId = derived([page], ([$page]) => {
   if ($page.params.workflow) {
-    try {
-      return decodeURIForSvelte($page.params.workflow);
-    } catch {
-      return $page.params.workflow;
-    }
+    return decodeURIForSvelte($page.params.workflow);
   }
   return '';
 });
 
 const runId = derived([page], ([$page]) => {
   if ($page.params.run) {
-    try {
-      return decodeURIForSvelte($page.params.run);
-    } catch {
-      return $page.params.run;
-    }
+    return decodeURIForSvelte($page.params.run);
   }
-
   return '';
 });
 
