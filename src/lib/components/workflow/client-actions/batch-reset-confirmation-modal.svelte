@@ -25,7 +25,7 @@
   export let namespace: string;
   export let open = false;
   let error = '';
-  let jobIdPlaceholder: string = crypto.randomUUID();
+  let jobIdPlaceholder = crypto.randomUUID();
   let resetType = writable<'first' | 'last'>('first');
   const identity = getIdentity();
   const reason = writable('');
