@@ -23,7 +23,7 @@ const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {
     try {
       return decodeURIForSvelte($page.params.namespace);
-    } catch (error) {
+    } catch {
       return $page.params.namespace;
     }
   }
@@ -34,7 +34,7 @@ const workflowId = derived([page], ([$page]) => {
   if ($page.params.workflow) {
     try {
       return decodeURIForSvelte($page.params.workflow);
-    } catch (error) {
+    } catch {
       return $page.params.workflow;
     }
   }
@@ -45,7 +45,7 @@ const runId = derived([page], ([$page]) => {
   if ($page.params.run) {
     try {
       return decodeURIForSvelte($page.params.run);
-    } catch (error) {
+    } catch {
       return $page.params.run;
     }
   }
