@@ -68,6 +68,6 @@
       />
     </RadioGroup>
 
-    <WorkflowRawHistoryLink />
+    <WorkflowRawHistoryLink {namespace} {workflowId} {runId} />
   </div>
 </Modal>

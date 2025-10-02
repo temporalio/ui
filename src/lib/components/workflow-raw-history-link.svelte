@@ -2,10 +2,11 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { parameters } from '$lib/stores/events';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
-  const { namespace, workflowId, runId } = $parameters;
+  export let namespace: string;
+  export let workflowId: string;
+  export let runId: string;
 
   $: href = routeForEventHistory({
     namespace,
