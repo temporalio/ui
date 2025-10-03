@@ -48,4 +48,10 @@ describe('decodeURIForSvelte', () => {
     const path = decodeURIForSvelte('Workflow%2525ID%2524');
     expect(path).toEqual('Workflow%25ID%24');
   });
+
+  it('should return original url if path is malformed url', () => {
+    const uri = 'test-workflow-%!s(*string=0xc000208bf0)-123456789-987654321';
+    const path = decodeURIForSvelte(uri);
+    expect(path).toEqual(uri);
+  });
 });
