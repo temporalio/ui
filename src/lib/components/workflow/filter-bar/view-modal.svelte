@@ -163,7 +163,7 @@
   on:cancelModal={hideModal}
   on:confirmModal={onConfirm}
 >
-  <h3 slot="title">{view ? 'Edit View' : 'Save as View'}</h3>
+  <h3 slot="title">{view ? 'Edit View' : 'Save as New View'}</h3>
   <div class="flex h-full flex-1 flex-col gap-1" slot="content">
     <Input
       id="view-name"
