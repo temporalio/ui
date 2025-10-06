@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { editDisabled } from './schedule-edit-disabled';
+import { editDisabled } from './edit-disabled';
 
 describe('editDisabled', () => {
   const coreUser = {

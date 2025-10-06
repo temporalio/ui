@@ -9,7 +9,8 @@
   export let data: PageData;
 
   $: ({ endpoints } = data);
+  $: createDisabled = $page.data.settings?.disableWriteActions ?? false;
 </script>
 
 <PageTitle title={translate('nexus.endpoints')} url={$page.url.href} />
-<NexusEndpoints {endpoints} />
+<NexusEndpoints {endpoints} {createDisabled} />

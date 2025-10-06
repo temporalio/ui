@@ -44,13 +44,13 @@
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { getIdentity } from '$lib/utilities/core-context';
+  import { editDisabled } from '$lib/utilities/edit-disabled';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { formatDate, getUTCString } from '$lib/utilities/format-date';
   import {
     routeForScheduleEdit,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-  import { editDisabled } from '$lib/utilities/schedule-edit-disabled';
 
   import type { DescribeScheduleResponse } from '$types';
 
