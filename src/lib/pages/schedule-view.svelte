@@ -50,7 +50,7 @@
     routeForScheduleEdit,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
+  import { editDisabled } from '$lib/utilities/schedule-edit-disabled';
 
   import type { DescribeScheduleResponse } from '$types';
 
@@ -115,8 +115,7 @@
     ];
 
   let coreUser = coreUserStore();
-  $: editDisabled =
-    $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed();
+  $: isEditDisabled = editDisabled($page.data.settings, $coreUser, namespace);
 
   const handleDelete = async () => {
     error = '';
@@ -315,7 +314,7 @@
           : translate('schedules.pause')}
         menuLabel={translate('schedules.schedule-actions')}
         id="schedule-actions"
-        disabled={editDisabled}
+        disabled={isEditDisabled}
         on:click={() => (pauseConfirmationModalOpen = true)}
       >
         <MenuItem
