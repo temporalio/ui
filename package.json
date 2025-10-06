@@ -114,7 +114,6 @@
     "tailwind-merge": "^1.14.0",
     "unist-util-remove": "^4.0.0",
     "url-pattern": "^1.0.3",
-    "uuid": "^9.0.0",
     "zod": "^3.25.64"
   },
   "devDependencies": {
@@ -158,7 +157,6 @@
     "@types/sanitize-html": "^2.8.0",
     "@types/tar-fs": "^2.0.4",
     "@types/unist": "^3.0.0",
-    "@types/uuid": "^9.0.0",
     "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",
