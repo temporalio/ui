@@ -98,23 +98,35 @@ jobs:
 
       - name: Dry run summary
         if: inputs.mode == 'dry-run'
+        env:
+          CURRENT_VERSION: ${{ steps.validate-sync.outputs.current-version }}
+          NEW_VERSION: ${{ steps.calculate-version.outputs.new-version }}
+          SPECIFIC_VERSION: ${{ inputs.specific_version }}
+          INPUT_MODE: ${{ inputs.mode }}
+          BUMP_TYPE: ${{ steps.analyze-prs.outputs.bump-type }}
+          VERSION_CHANGED: ${{ steps.calculate-version.outputs.version-changed }}
+          CHANGELOG: ${{ steps.generate-changelog.outputs.changelog }}
         run: |
           echo "## 🔍 Dry Run Results"
           echo ""
-          echo "**Current Version:** ${{ steps.validate-sync.outputs.current-version }}"
-          echo "**New Version:** ${{ steps.calculate-version.outputs.new-version }}"
-          if [[ -n "${{ inputs.specific_version }}" ]]; then
+          echo "**Current Version:** $CURRENT_VERSION"
+          echo "**New Version:** $NEW_VERSION"
+          if [[ -n "$SPECIFIC_VERSION" ]]; then
             echo "**Version Source:** Specific version (manual override)"
-            echo "**Specified Version:** ${{ inputs.specific_version }}"
+            echo "**Specified Version:** $SPECIFIC_VERSION"
           else
-            echo "**Version Source:** ${{ inputs.mode == 'manual' && 'Manual bump type' || 'Auto-detected from commits' }}"
-            echo "**Bump Type:** ${{ steps.analyze-prs.outputs.bump-type }}"
+            VERSION_SOURCE="Auto-detected from commits"
+            if [ "$INPUT_MODE" = "manual" ]; then
+              VERSION_SOURCE="Manual bump type"
+            fi
+            echo "**Version Source:** $VERSION_SOURCE"
+            echo "**Bump Type:** $BUMP_TYPE"
           fi
-          echo "**Version Changed:** ${{ steps.calculate-version.outputs.version-changed }}"
+          echo "**Version Changed:** $VERSION_CHANGED"
           echo ""
-          if [[ -n "${{ steps.generate-changelog.outputs.changelog }}" ]]; then
+          if [[ -n "$CHANGELOG" ]]; then
             echo "### 📝 Changes Since Last Version"
-            echo "${{ steps.generate-changelog.outputs.changelog }}"
+            echo "$CHANGELOG"
             echo ""
           fi
           echo "**Note:** This was a dry run. No files were modified."

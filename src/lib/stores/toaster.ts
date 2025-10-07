@@ -1,7 +1,5 @@
 import { get, writable, type Writable } from 'svelte/store';
 
-import { v4 } from 'uuid';
-
 import type { Toast, ToastPosition } from '$lib/types/holocene';
 
 const toasts = writable<Toast[]>([]);
@@ -21,7 +19,7 @@ const setPosition = (position: ToastPosition): void => {
 
 const push = (toast: Toast) => {
   const toastWithDefaults: Toast = {
-    id: v4(),
+    id: crypto.randomUUID(),
     duration: 3000,
     variant: 'primary',
     ...toast,

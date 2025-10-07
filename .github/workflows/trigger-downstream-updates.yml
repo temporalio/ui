@@ -34,12 +34,15 @@ jobs:
 
       - name: Prepare workflow inputs
         id: prepare
+        env:
+          INPUT_TARGET_SHA: ${{ github.event.inputs.target-sha }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           # Determine SHA to use
-          if [ -n "${{ github.event.inputs.target-sha }}" ]; then
-            SHA="${{ github.event.inputs.target-sha }}"
+          if [ -n "$INPUT_TARGET_SHA" ]; then
+            SHA="$INPUT_TARGET_SHA"
           else
-            SHA="${{ github.sha }}"
+            SHA="$GITHUB_SHA"
           fi
 
           # Create workflow inputs JSON (compact format for GITHUB_OUTPUT)

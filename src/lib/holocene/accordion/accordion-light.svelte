@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import { v4 } from 'uuid';
-
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
@@ -16,7 +14,7 @@
     'data-testid'?: string;
   }
 
-  export let id: string = v4();
+  export let id: string = crypto.randomUUID();
   export let open = false;
   export let onToggle = undefined;
   export let icon: IconName | undefined = undefined;
