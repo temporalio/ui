@@ -65,7 +65,7 @@ test.describe('Saved Query Views', () => {
     await page.getByTestId('create-view-button').click();
     await page.getByTestId('save-view-modal-input').fill('My View');
     await page
-      .getByLabel('Save as View')
+      .getByLabel('Save as New View')
       .getByTestId('confirm-modal-button')
       .click();
 
@@ -127,7 +127,7 @@ test.describe('Saved Query Views', () => {
     await page.getByTestId('create-view-button').click();
     await page.getByTestId('save-view-modal-input').fill('Original view');
     await page
-      .getByLabel('Save as View')
+      .getByLabel('Save as New View')
       .getByTestId('confirm-modal-button')
       .click();
 
