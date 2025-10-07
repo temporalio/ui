@@ -2,32 +2,27 @@
   import { translate } from '$lib/i18n/translate';
   import type { BatchOperation } from '$lib/types/batch';
 
-  export let operation: BatchOperation;
+  interface Props {
+    operation: BatchOperation;
+  }
 
-  let completePercent: number;
-  let failurePercent: number;
-  let progressPercent: number;
+  let { operation }: Props = $props();
 
-  $: {
-    const {
-      completeOperationCount,
-      failureOperationCount,
-      totalOperationCount,
-    } = operation;
+  let { completeOperationCount, failureOperationCount, totalOperationCount } =
+    $derived(operation);
 
-    completePercent = Math.round(
-      (completeOperationCount / totalOperationCount) * 100,
-    );
-
-    failurePercent = Math.round(
-      (failureOperationCount / totalOperationCount) * 100,
-    );
-
-    progressPercent = Math.round(
+  let completePercent = $derived(
+    Math.round((completeOperationCount / totalOperationCount) * 100),
+  );
+  let failurePercent = $derived(
+    Math.round((failureOperationCount / totalOperationCount) * 100),
+  );
+  let progressPercent = $derived(
+    Math.round(
       ((completeOperationCount + failureOperationCount) / totalOperationCount) *
         100,
-    );
-  }
+    ),
+  );
 </script>
 
 <div class="flex flex-col gap-4">
