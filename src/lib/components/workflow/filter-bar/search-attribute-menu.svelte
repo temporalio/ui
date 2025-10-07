@@ -42,7 +42,7 @@
   const getDefaultConditional = (type: SearchAttributeType) => {
     switch (type) {
       case SEARCH_ATTRIBUTE_TYPE.BOOL:
-        return 'true';
+        return '=';
       case SEARCH_ATTRIBUTE_TYPE.DATETIME:
         return '>=';
       case SEARCH_ATTRIBUTE_TYPE.INT:
