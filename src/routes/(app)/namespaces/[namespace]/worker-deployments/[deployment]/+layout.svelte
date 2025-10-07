@@ -1,5 +1,12 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
+
+  interface Props {
+    children: Snippet;
+  }
+  let { children }: Props = $props();
 </script>
 
 <div
@@ -8,5 +15,5 @@
     : 'top-0'}
 flex h-full flex-col"
 >
-  <slot />
+  {@render children()}
 </div>
