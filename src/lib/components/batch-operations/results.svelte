@@ -50,13 +50,13 @@
 
   <div>
     <div class="flex justify-between">
-      <span class=" text-xs font-semibold text-green-700"
+      <span class="text-xs font-semibold text-success"
         >{translate('batch.operations-succeeded', {
           count: operation.completeOperationCount,
         })}</span
       >
       <span
-        class=" text-xs font-semibold"
+        class="text-xs font-semibold"
         class:text-red-700={failurePercent > 0}
         >{translate('batch.operations-failed', {
           count: operation.failureOperationCount,
