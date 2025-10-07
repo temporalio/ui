@@ -8,19 +8,27 @@
 
   let { operation }: Props = $props();
 
-  let { completeOperationCount, failureOperationCount, totalOperationCount } =
-    $derived(operation);
+  let {
+    completeOperationCount = 0,
+    failureOperationCount = 0,
+    totalOperationCount = 0,
+  } = $derived(operation);
+
+  const getPercentage = (count: number, total: number) => {
+    const percentage = Math.round((count / total) * 100);
+    return isNaN(percentage) ? 0 : percentage;
+  };
 
   let completePercent = $derived(
-    Math.round((completeOperationCount / totalOperationCount) * 100),
+    getPercentage(completeOperationCount, totalOperationCount),
   );
   let failurePercent = $derived(
-    Math.round((failureOperationCount / totalOperationCount) * 100),
+    getPercentage(failureOperationCount, totalOperationCount),
   );
   let progressPercent = $derived(
-    Math.round(
-      ((completeOperationCount + failureOperationCount) / totalOperationCount) *
-        100,
+    getPercentage(
+      completeOperationCount + failureOperationCount,
+      totalOperationCount,
     ),
   );
 </script>
@@ -35,9 +43,9 @@
         })}
       </span>
       <span class="text-xs font-semibold">
-        {Intl.NumberFormat('en-US').format(operation.completeOperationCount)} / {Intl.NumberFormat(
+        {Intl.NumberFormat('en-US').format(completeOperationCount)} / {Intl.NumberFormat(
           'en-US',
-        ).format(operation.totalOperationCount)}
+        ).format(totalOperationCount)}
       </span>
     </div>
     <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
@@ -52,14 +60,14 @@
     <div class="flex justify-between">
       <span class="text-xs font-semibold text-success"
         >{translate('batch.operations-succeeded', {
-          count: operation.completeOperationCount,
+          count: completeOperationCount,
         })}</span
       >
       <span
         class="text-xs font-semibold"
         class:text-red-700={failurePercent > 0}
         >{translate('batch.operations-failed', {
-          count: operation.failureOperationCount,
+          count: failureOperationCount,
         })}</span
       >
     </div>
