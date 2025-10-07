@@ -63,9 +63,3 @@ export async function CompletedWorkflow(
 export async function RunningWorkflow(): Promise<void> {
   return await workflow.sleep('10 days');
 }
-
-export async function TimeoutTestWorkflow(input: string): Promise<string> {
-  // This workflow will run for a while to test timeout display
-  await workflow.sleep('30 seconds');
-  return await Activity(input);
-}
