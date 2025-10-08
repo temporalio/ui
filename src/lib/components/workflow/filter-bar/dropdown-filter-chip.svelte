@@ -452,6 +452,7 @@
               type="number"
               placeholder="Enter number..."
               disabled={isNullFilter}
+              step="any"
               bind:value={localFilter.value}
             />
           </div>
