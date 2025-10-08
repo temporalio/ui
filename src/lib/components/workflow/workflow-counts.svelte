@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
@@ -9,7 +9,6 @@
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     disableWorkflowCountsRefresh,
-    queryWithParentWorkflowId,
     refresh,
     workflowCount,
   } from '$lib/stores/workflows';
@@ -20,91 +19,31 @@
   import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import { getExponentialBackoffSeconds } from '$lib/utilities/refresh-rate';
+  import { getExponentialBackoff } from '$lib/utilities/refresh-rate';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import WorkflowCountStatus from '../workflow-status.svelte';
 
-  export let staticQuery = '';
-  $: namespace = $page.params.namespace;
-  $: query = staticQuery || $queryWithParentWorkflowId;
-  $: perPage = $page.url.searchParams.get('per-page');
-
-  let statusGroups: { status: WorkflowStatus; count: number }[] = [];
-  let newStatusGroups: { status: WorkflowStatus; count: number }[] = [];
-  let refreshInterval: ReturnType<typeof setInterval>;
-
-  let attempt = 1;
-  let loading = false;
-  const initialIntervalSeconds = 5;
-  const maxAttempts = 100;
-
-  onDestroy(() => {
-    clearNewCounts();
-  });
-
-  const setBackoffInterval = () => {
-    attempt += 1;
-    clearInterval(refreshInterval);
-    if (attempt <= maxAttempts) {
-      const interval =
-        getExponentialBackoffSeconds(
-          initialIntervalSeconds,
-          attempt,
-          maxAttempts,
-        ) * 1000;
-      refreshInterval = setInterval(() => fetchNewCounts(), interval);
-    }
+  type Props = {
+    staticQuery?: string;
+    refreshTime?: Date;
   };
+  let { staticQuery = '', refreshTime = $bindable() }: Props = $props();
 
-  const clearNewCounts = () => {
-    clearInterval(refreshInterval);
-    newStatusGroups = [];
-    $workflowCount.newCount = 0;
-    attempt = 1;
-    loading = true;
-  };
+  const queryParam = $derived(page.url.searchParams.get('query'));
+  const namespace = $derived(page.params.namespace);
+  const query = $derived(staticQuery || queryParam);
+  const perPage = $derived(page.url.searchParams.get('per-page'));
 
-  const fetchNewCounts = async () => {
-    setBackoffInterval();
-    try {
-      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
-        namespace,
-        query,
-      }).catch((_e) => {
-        return { count: '0', groups: [] };
-      });
-      $workflowCount.newCount = parseInt(count) - $workflowCount.count;
-      newStatusGroups = getStatusAndCountOfGroup(groups);
-    } finally {
-      loading = false;
-    }
-  };
+  let statusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
+  let newStatusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
+  let refreshInterval: ReturnType<typeof setTimeout>;
 
-  const fetchCounts = async () => {
-    clearNewCounts();
-    if (!$disableWorkflowCountsRefresh) {
-      const interval =
-        getExponentialBackoffSeconds(
-          initialIntervalSeconds,
-          attempt,
-          maxAttempts,
-        ) * 1000;
-      refreshInterval = setInterval(() => fetchNewCounts(), interval);
-    }
-    try {
-      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
-        namespace,
-        query,
-      }).catch((_e) => {
-        return { count: '0', groups: [] };
-      });
-      $workflowCount.count = parseInt(count);
-      statusGroups = getStatusAndCountOfGroup(groups);
-    } finally {
-      loading = false;
-    }
-  };
+  let attempt = $state(1);
+  let loading = $state(false);
+
+  const initialIntervalSeconds = 60;
+  const maxAttempts = 20;
 
   const onStatusClick = (status) => {
     const statusExists = $workflowFilters.some(
@@ -126,7 +65,7 @@
         combineFilters($workflowFilters),
       );
       updateQueryParameters({
-        url: $page.url,
+        url: page.url,
         parameter: 'query',
         value: searchQuery,
         clearParameters: [currentPageKey],
@@ -134,13 +73,85 @@
     }
   };
 
-  $: namespace, query, perPage, $refresh, fetchCounts();
+  const clearNewCounts = () => {
+    clearTimeout(refreshInterval);
+    newStatusGroups = [];
+    $workflowCount.newCount = 0;
+    attempt = 1;
+  };
+
+  const fetchInitialCounts = async () => {
+    loading = true;
+    try {
+      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
+        namespace,
+        query,
+      }).catch((_e) => {
+        return { count: '0', groups: [] };
+      });
+      $workflowCount.count = parseInt(count);
+      statusGroups = getStatusAndCountOfGroup(groups);
+    } finally {
+      refreshTime = new Date();
+      loading = false;
+    }
+  };
+
+  const fetchNewCounts = async () => {
+    try {
+      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
+        namespace,
+        query,
+      }).catch((_e) => {
+        return { count: '0', groups: [] };
+      });
+      $workflowCount.newCount = parseInt(count) - $workflowCount.count;
+      newStatusGroups = getStatusAndCountOfGroup(groups);
+    } finally {
+      refreshTime = new Date();
+      attempt += 1;
+    }
+  };
+
+  const scheduleNext = () => {
+    const intervalSeconds = getExponentialBackoff(
+      initialIntervalSeconds,
+      attempt,
+    );
+    refreshInterval = setTimeout(async () => {
+      await fetchNewCounts();
+      if (!$disableWorkflowCountsRefresh && attempt <= maxAttempts) {
+        scheduleNext();
+      }
+    }, intervalSeconds);
+  };
+
+  const scheduleFirst = async () => {
+    clearNewCounts();
+    await fetchInitialCounts();
+    if (!$disableWorkflowCountsRefresh) {
+      scheduleNext();
+    }
+  };
+
+  $effect(() => {
+    namespace;
+    query;
+    perPage;
+    $refresh;
+
+    scheduleFirst();
+  });
+
+  onDestroy(() => {
+    clearNewCounts();
+  });
 </script>
 
-<div class="flex min-h-[24px] flex-wrap items-center gap-2">
+<div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
   {#each statusGroups as { count, status } (status)}
     {#if !loading}
-      <button on:click={() => onStatusClick(status)}>
+      <button onclick={() => onStatusClick(status)}>
         <WorkflowCountStatus
           {status}
           {count}

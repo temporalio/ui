@@ -78,8 +78,8 @@
     <slot />
     <div
       class={merge(
-        'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-90',
-        show && 'inline-block opacity-90',
+        'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-95',
+        show && 'inline-block opacity-95',
       )}
       class:left
       class:right
@@ -92,7 +92,7 @@
       style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
     >
       <div class="inline-block rounded-md bg-slate-800 px-2 py-2">
-        <div class="flex gap-2 text-slate-100">
+        <div class="flex gap-2 text-slate-50">
           <slot name="content">
             {#if icon}<Icon name={icon} class="inline h-4 text-white" />{/if}
             <span>{text}</span>

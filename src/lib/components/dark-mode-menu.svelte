@@ -66,6 +66,7 @@
     <MenuItem
       on:click={() => setDarkModePreference(true)}
       selected={$useDarkModePreference === true}
+      data-testid="night-mode"
     >
       <Icon slot="leading" name="moon" />
       Night
@@ -73,6 +74,7 @@
     <MenuItem
       on:click={() => setDarkModePreference(false)}
       selected={$useDarkModePreference === false}
+      data-testid="day-mode"
     >
       <Icon slot="leading" name="sun" />
       Day
@@ -80,6 +82,7 @@
     <MenuItem
       on:click={() => setDarkModePreference('system')}
       selected={$useDarkModePreference === 'system'}
+      data-testid="system-mode"
     >
       <Icon slot="leading" name="system-window" />
       System Default

@@ -610,6 +610,6 @@
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary placeholder:text-secondary focus:outline-none;
+    @apply flex grow bg-transparent text-primary focus:outline-none;
   }
 </style>

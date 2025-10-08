@@ -1,5 +1,7 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Readable, Writable } from 'svelte/store';
+
+  import { twMerge as merge } from 'tailwind-merge';
 
   import type { WorkflowExecution } from '$lib/types/workflows';
 
@@ -24,11 +26,11 @@
 </script>
 
 <script lang="ts">
-  import { derived, writable } from 'svelte/store';
+  import { derived as derivedStore, writable } from 'svelte/store';
 
   import { onMount, setContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
@@ -36,49 +38,74 @@
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
-  import WorkflowSearchAttributeFilter from '$lib/components/workflow/search-attribute-filter/index.svelte';
+  import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import SavedQueryViews from '$lib/pages/saved-query-views.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { searchAttributes } from '$lib/stores/search-attributes';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
-    queryWithParentWorkflowId,
     refresh,
     workflowCount,
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
+  import { formatDate } from '$lib/utilities/format-date';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
-  $: query = $page.url.searchParams.get('query');
-  $: query, ($workflowsQuery = query);
-  $: namespace = $page.params.namespace;
-  $: perPage = $page.url.searchParams.get('per-page');
+  const query = $derived(page.url.searchParams.get('query'));
+  const namespace = $derived(page.params.namespace);
+  const perPage = $derived(page.url.searchParams.get('per-page'));
+  const searchParams = $derived(page.url.searchParams.toString());
 
-  // For returning to page from 'Back to Workflows' with previous search
-  $: searchParams = $page.url.searchParams.toString();
-  $: searchParams, ($workflowsSearchParams = searchParams);
+  let refreshTime = $state(new Date());
 
-  $: availableColumns = availableWorkflowSystemSearchAttributeColumns(
-    namespace,
-    $page.data.settings,
+  const refreshTimeFormatted = $derived(
+    formatDate(refreshTime, $timeFormat, {
+      relative: $relativeTime,
+    }),
+  );
+
+  const availableColumns = $derived(
+    availableWorkflowSystemSearchAttributeColumns(
+      namespace,
+      page.data.settings,
+    ),
   );
 
   onMount(() => {
-    $lastUsedNamespace = $page.params.namespace;
+    $lastUsedNamespace = page.params.namespace;
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query, $searchAttributes);
     }
+  });
+
+  $effect(() => {
+    $workflowsQuery = query;
+  });
+
+  $effect(() => {
+    $workflowsSearchParams = searchParams;
+  });
+
+  $effect(() => {
+    namespace;
+    query;
+    perPage;
+    $refresh;
+    resetSelection();
   });
 
   const resetSelection = () => {
@@ -87,24 +114,28 @@
     $selectedWorkflows = [];
   };
 
-  let batchTerminateConfirmationModalOpen = false;
-  let batchCancelConfirmationModalOpen = false;
-  let batchResetConfirmationModalOpen = false;
-  let terminateConfirmationModalOpen = false;
-  let cancelConfirmationModalOpen = false;
+  let customizationDrawerOpen = $state(false);
+
+  let batchTerminateConfirmationModalOpen = $state(false);
+  let batchCancelConfirmationModalOpen = $state(false);
+  let batchResetConfirmationModalOpen = $state(false);
+  let terminateConfirmationModalOpen = $state(false);
+  let cancelConfirmationModalOpen = $state(false);
+
   const allSelected = writable<boolean>(false);
   const pageSelected = writable<boolean>(false);
   const selectedWorkflows = writable<WorkflowExecution[]>([]);
-  const batchActionsVisible = derived(
+  const batchActionsVisible = derivedStore(
     selectedWorkflows,
     (workflows) => workflows.length > 0,
   );
+  const workflowStartEnabled = $derived(!workflowCreateDisabled(page));
 
-  const terminableWorkflows = derived(selectedWorkflows, (workflows) =>
+  const terminableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
     workflows.filter((workflow) => workflow.canBeTerminated),
   );
 
-  const cancelableWorkflows = derived(selectedWorkflows, (workflows) =>
+  const cancelableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
     workflows.filter((workflow) => workflow.status === 'Running'),
   );
 
@@ -156,11 +187,6 @@
     handleSelectPage,
   });
 
-  $: namespace, $queryWithParentWorkflowId, perPage, $refresh, resetSelection();
-  $: workflowStartEnabled = !workflowCreateDisabled($page);
-
-  let customizationDrawerOpen = false;
-
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
@@ -197,17 +223,28 @@
 
 <header class="flex flex-col gap-2">
   <div class="flex flex-col justify-between gap-2 md:flex-row">
-    <h1 class="flex items-center gap-2" data-cy="workflows-title">
-      {#if $supportsAdvancedVisibility}
-        <span data-testid="workflow-count"
-          >{$workflowCount.count.toLocaleString()}</span
-        >
-        <Translate key="common.workflows-plural" count={$workflowCount.count} />
-      {:else}
-        <Translate key="workflows.recent-workflows" />
-      {/if}
+    <div class="flex flex-row flex-wrap items-start gap-2">
+      <div>
+        <h1 class="flex items-center gap-2 leading-7" data-cy="workflows-title">
+          {#if $supportsAdvancedVisibility}
+            <span data-testid="workflow-count"
+              >{$workflowCount.count.toLocaleString()}</span
+            >
+            <Translate
+              key="common.workflows-plural"
+              count={$workflowCount.count}
+            />
+          {:else}
+            <Translate key="workflows.recent-workflows" />
+          {/if}
+        </h1>
+        <p class="text-xs text-secondary">
+          {refreshTimeFormatted}
+        </p>
+      </div>
       <WorkflowCountRefresh count={$workflowCount.newCount} />
-    </h1>
+      <WorkflowCounts bind:refreshTime />
+    </div>
     {#if $$slots['header-actions'] || workflowStartEnabled}
       <div class="flex items-center gap-4">
         <slot name="header-actions" />
@@ -221,14 +258,24 @@
       </div>
     {/if}
   </div>
-  <WorkflowCounts />
 </header>
 
-<WorkflowSearchAttributeFilter />
-<WorkflowsSummaryConfigurableTable onClickConfigure={openCustomizationDrawer}>
-  <slot name="cloud" slot="cloud" />
-</WorkflowsSummaryConfigurableTable>
-
+<FilterBar />
+<div class="flex overflow-auto">
+  <SavedQueryViews />
+  <div
+    class={merge(
+      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
+      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
+    )}
+  >
+    <WorkflowsSummaryConfigurableTable
+      onClickConfigure={openCustomizationDrawer}
+    >
+      <slot name="cloud" slot="cloud" />
+    </WorkflowsSummaryConfigurableTable>
+  </div>
+</div>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

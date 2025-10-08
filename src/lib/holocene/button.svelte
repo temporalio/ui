@@ -18,18 +18,20 @@
       'focus-visible:ring-2',
       'whitespace-nowrap',
       'no-underline',
+      'active:scale-[0.98]',
+      'transition-all duration-200',
     ],
     {
       variants: {
         variant: {
           primary:
-            'surface-interactive border-transparent text-white focus-visible:ring-primary/70',
+            'surface-interactive border-transparent text-white focus-visible:ring-primary/70 data-[active=true]:bg-subtle data-[active=true]:text-primary',
           secondary:
-            'surface-primary border-subtle focus-visible:ring-primary/70 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary',
+            'surface-primary border-subtle focus-visible:ring-primary/70 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary data-[active=true]:bg-subtle',
           destructive:
-            'surface-interactive-danger border-transparent focus-visible:ring-danger/70',
+            'surface-interactive-danger border-transparent focus-visible:ring-danger/70 data-[active=true]:surface-interactive-danger',
           ghost:
-            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary/70',
+            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary/70 data-[active=true]:bg-subtle',
           'table-header':
             'bg-transparent border-transparent focus-visible:ring-primary/70 focus-visible:border-transparent',
         },
@@ -48,6 +50,7 @@
   );
 
   type BaseProps = {
+    active?: boolean;
     disabled?: boolean;
     loading?: boolean;
     leadingIcon?: IconName;
@@ -95,6 +98,7 @@
   export let size: ButtonStyles['size'] = 'md';
   export let disabled = false;
   export let loading = false;
+  export let active = false;
   export let leadingIcon: IconName = null;
   export let trailingIcon: IconName = null;
   export let count = 0;
@@ -132,6 +136,7 @@
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
     data-variant={variant}
+    data-active={active}
     {...dataTrackObj}
     class={merge(
       buttonStyles({
@@ -170,6 +175,7 @@
     on:click|stopPropagation
     on:keydown|stopPropagation
     data-variant={variant}
+    data-active={active}
     {...dataTrackObj}
     class={merge(
       buttonStyles({

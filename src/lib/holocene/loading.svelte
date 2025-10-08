@@ -7,6 +7,7 @@
   import webmLogo from '$lib/vendor/Temporal_Logo_Animation.webm';
 
   export let title = translate('common.loading');
+  export let size = 160;
 
   let isAutoplayAllowed = true;
   let videoElement: HTMLVideoElement;
@@ -28,9 +29,7 @@
   });
 </script>
 
-<div
-  class="my-12 flex flex-col items-center justify-start gap-4 {$$props.class}"
->
+<div class="flex flex-col items-center justify-start gap-4 {$$props.class}">
   {#if isAutoplayAllowed}
     <video
       autoplay
@@ -38,8 +37,8 @@
       muted
       playsinline
       preload="auto"
-      height="160"
-      width="160"
+      height={size}
+      width={size}
       class="dark:invert"
       bind:this={videoElement}
     >
@@ -47,9 +46,11 @@
       <source src={webmLogo} type="video/webm" />
     </video>
   {:else}
-    <Logo height={160} width={160} />
+    <Logo height={size} width={size} />
   {/if}
-  <h4>
-    {title}
-  </h4>
+  {#if title}
+    <h4>
+      {title}
+    </h4>
+  {/if}
 </div>

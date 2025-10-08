@@ -13,18 +13,14 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { hideChildWorkflows, searchInputViewOpen } from '$lib/stores/filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
-  import { workflowRoutePattern } from '$lib/utilities/namespace-url-pattern';
   import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
-
-  import IsTemporalServerVersionGuard from '../is-temporal-server-version-guard.svelte';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
@@ -57,7 +53,6 @@
         option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
       );
 
-  $: workflowsPage = workflowRoutePattern.match(window?.location?.pathname);
   $: query = $page.url.searchParams.get('query');
 </script>
 
@@ -66,16 +61,15 @@
     id="search-attribute-filter-button"
     controls="search-attribute-menu"
     disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
-    count={$filter.attribute ? 0 : filters.length}
     on:click={() => (searchAttributeValue = '')}
     class="text-nowrap"
   >
     <svelte:fragment slot="leading">
       {#if !$filter.attribute}
-        <Icon name="filter" />
+        <Icon name="add" />
       {/if}
     </svelte:fragment>
-    {$filter.attribute || translate('workflows.filter')}
+    {$filter.attribute || 'Search Attribute'}
   </MenuButton>
   <Menu id="search-attribute-menu" keepOpen>
     <MenuItem
@@ -96,31 +90,6 @@
         class="w-full"
       />
     </MenuItem>
-    {#if workflowsPage}
-      <MenuItem
-        class="min-w-56"
-        data-testid="manual-search-toggle"
-        on:click={() => ($searchInputViewOpen = !$searchInputViewOpen)}
-        description={translate('workflows.view-search-description')}
-        >{translate('workflows.view-search-input')}</MenuItem
-      >
-      <IsTemporalServerVersionGuard minimumVersion="1.23.0">
-        <MenuItem
-          on:click={() => ($hideChildWorkflows = !$hideChildWorkflows)}
-          description={$hideChildWorkflows
-            ? 'Child Workflows hidden by default when no filter applied'
-            : ''}
-        >
-          <div class="flex items-center gap-1">
-            {#if $hideChildWorkflows}
-              <Icon name="eye-hide" />{translate('workflows.hide-children')}
-            {:else}
-              <Icon name="eye-show" />{translate('workflows.show-children')}
-            {/if}
-          </div>
-        </MenuItem>
-      </IsTemporalServerVersionGuard>
-    {/if}
     <hr class="border-subtle" />
 
     {#each filteredOptions as { value, label, type }}

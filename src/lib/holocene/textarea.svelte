@@ -55,7 +55,7 @@
     <textarea
       bind:value
       class={merge(
-        'surface-primary min-h-fit w-full px-3 py-2 text-sm placeholder:text-secondary focus-visible:outline-none',
+        'surface-primary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-none',
         disabled && 'cursor-not-allowed opacity-50',
       )}
       {id}
