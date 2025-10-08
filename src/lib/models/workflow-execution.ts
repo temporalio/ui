@@ -129,6 +129,8 @@ export const toWorkflowExecution = (
     response.workflowExecutionInfo.stateTransitionCount;
   const defaultWorkflowTaskTimeout =
     response.executionConfig?.defaultWorkflowTaskTimeout;
+  const workflowExecutionTimeout =
+    response.executionConfig?.workflowExecutionTimeout;
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
   );
@@ -181,6 +183,7 @@ export const toWorkflowExecution = (
     stateTransitionCount,
     isRunning,
     defaultWorkflowTaskTimeout,
+    workflowExecutionTimeout,
     workflowExtendedInfo,
     startDelay,
     get canBeTerminated(): boolean {

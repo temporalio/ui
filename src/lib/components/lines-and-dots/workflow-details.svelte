@@ -9,7 +9,10 @@
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
-  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import {
+    formatDistanceAbbreviated,
+    formatDuration,
+  } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
   import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
@@ -133,6 +136,14 @@
     {translate('common.duration')}
   </DetailListLabel>
   <DetailListTextValue text={elapsedTime} />
+
+  {#if workflow?.workflowExecutionTimeout && workflow.workflowExecutionTimeout !== '0s'}
+    <DetailListLabel>{translate('workflows.workflow-timeout')}</DetailListLabel>
+    <DetailListTextValue
+      text={formatDuration(workflow.workflowExecutionTimeout)}
+      tooltipText={workflow.workflowExecutionTimeout}
+    />
+  {/if}
 
   <DetailListColumn>
     <DetailListLabel>{translate('common.run-id')}</DetailListLabel>
