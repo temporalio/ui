@@ -39,6 +39,15 @@ export const systemWorkflowViews: SavedQuery[] = [
     type: 'system',
   },
   {
+    id: 'task-failures',
+    name: 'Task Failures',
+    query:
+      '`TemporalReportedProblems` IN ("category=WorkflowTaskFailed") OR `TemporalReportedProblems` IN ("category=WorkflowTaskTimedout")',
+    icon: 'error',
+    type: 'system',
+    count: 8,
+  },
+  {
     id: 'child-workflows',
     name: 'Parent Workflows',
     query: '`ParentWorkflowId` is null',

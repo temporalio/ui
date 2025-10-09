@@ -360,7 +360,7 @@
     onmouseleave={onQueryBtnLeave}
   >
     <Button
-      variant="ghost"
+      variant={view.icon === 'error' ? 'destructive' : 'ghost'}
       data-testid={view.type === 'system'
         ? view.id
         : view.name.toLowerCase().replace(/\s+/g, '-')}
