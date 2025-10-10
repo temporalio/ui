@@ -34,6 +34,7 @@ export const loading = writable(true);
 export const workflowCount = writable({
   count: 0,
   newCount: 0,
+  taskFailureCount: 0,
 });
 export const workflowError = writable('');
 export const workflowsQuery = writable<string>('');

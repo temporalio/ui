@@ -30,6 +30,9 @@ const getLastHour = () => {
   return lastHour.toISOString();
 };
 
+export const TASK_FAILURES_QUERY =
+  '`TemporalReportedProblems` IN ("category=WorkflowTaskFailed") OR `TemporalReportedProblems` IN ("category=WorkflowTaskTimedout")';
+
 export const systemWorkflowViews: SavedQuery[] = [
   {
     id: 'all',
@@ -41,11 +44,9 @@ export const systemWorkflowViews: SavedQuery[] = [
   {
     id: 'task-failures',
     name: 'Task Failures',
-    query:
-      '`TemporalReportedProblems` IN ("category=WorkflowTaskFailed") OR `TemporalReportedProblems` IN ("category=WorkflowTaskTimedout")',
+    query: TASK_FAILURES_QUERY,
     icon: 'error',
     type: 'system',
-    count: 8,
   },
   {
     id: 'child-workflows',
