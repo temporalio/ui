@@ -342,7 +342,9 @@ export const routeForBatchOperation = ({
   namespace: string;
   jobId: string;
 }) => {
-  return `${base}/namespaces/${namespace}/batch-operations/${jobId}`;
+  const jId = encodeURIForSvelte(jobId);
+
+  return `${base}/namespaces/${namespace}/batch-operations/${jId}`;
 };
 
 export const hasParameters =
