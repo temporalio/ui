@@ -28,6 +28,7 @@ import type {
   WorkerDeploymentsAPIRoutePath,
   WorkerDeploymentVersionAPIRoutePath,
   WorkerDeploymentVersionRouteParameters,
+  WorkerRouteParameters,
   WorkflowActivitiesAPIRoutePath,
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
@@ -145,6 +146,8 @@ export function pathForApi(
     'task-queue.compatibility': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-build-id-compatibility`,
     'task-queue.rules': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-versioning-rules`,
     user: '/me',
+    workers: `/namespaces/${parameters?.namespace}/workers`,
+    worker: `/namespaces/${parameters?.namespace}/workers/describe/${parameters?.workerInstanceKey}`,
     'worker-task-reachability': `/namespaces/${parameters?.namespace}/worker-task-reachability`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/terminate`,
     'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/cancel`,
@@ -190,7 +193,7 @@ export function routeForApi(
 ): string;
 export function routeForApi(
   route: WorkerAPIRoutePath,
-  parameters: NamespaceRouteParameters,
+  parameters: NamespaceRouteParameters | WorkerRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
