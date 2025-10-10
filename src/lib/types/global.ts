@@ -127,10 +127,14 @@ export type User = {
   gender?: string;
   birthdate?: string;
   zoneinfo?: string;
-  // Temporal-specific claims
+  // Temporal-specific claims (frontend format)
   temporal_namespaces?: string;
   temporal_permissions?: string;
   temporal_workflow_actions?: string;
+  // Temporal-specific claims (server format)
+  TemporalNamespaces?: string;
+  TemporalPermissions?: string;
+  TemporalWorkflowActions?: string;
   locale?: string;
   phone_number?: string;
   phone_number_verified?: boolean;

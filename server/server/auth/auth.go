@@ -59,6 +59,11 @@ func SetUser(c echo.Context, user *User) error {
 		userR.Name = user.IDToken.Claims.Name
 		userR.Email = user.IDToken.Claims.Email
 		userR.Picture = user.IDToken.Claims.Picture
+		// Extract temporal-specific claims
+		userR.TemporalNamespaces = user.IDToken.Claims.TemporalNamespaces
+		userR.TemporalPermissions = user.IDToken.Claims.TemporalPermissions
+		userR.TemporalWorkflowActions = user.IDToken.Claims.TemporalWorkflowActions
+		
 	}
 
 	b, err := json.Marshal(userR)

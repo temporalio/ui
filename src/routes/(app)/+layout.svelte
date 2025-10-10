@@ -24,6 +24,7 @@
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
+  import { filterNamespacesByUserPermissions } from '$lib/utilities/namespace-filter';
   import {
     routeForArchivalWorkfows,
     routeForBatchOperations,
@@ -51,10 +52,12 @@
   let namespaceNames = $derived(
     isCloud
       ? [page.params.namespace]
-      : $namespaces.map(
-          (namespace: Namespace) => namespace?.namespaceInfo?.name,
-        ),
+      : filterNamespacesByUserPermissions(
+          $namespaces,
+          $authUser?.temporal_namespaces,
+        ).map((namespace: Namespace) => namespace?.namespaceInfo?.name),
   );
+
   let namespaceList: NamespaceListItem[] = $derived(
     namespaceNames.map((namespace: string) => {
       const getHref = (namespace: string) =>

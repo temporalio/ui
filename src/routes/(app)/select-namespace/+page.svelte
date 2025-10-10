@@ -6,8 +6,10 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
+  import { authUser } from '$lib/stores/auth-user';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
+  import { filterNamespacesByUserPermissions } from '$lib/utilities/namespace-filter';
   import { routeForWorkflows } from '$lib/utilities/route-for';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
@@ -26,7 +28,10 @@
   };
 
   let namespaceList = $derived(
-    $namespaces.map((namespace: Namespace) => {
+    filterNamespacesByUserPermissions(
+      $namespaces,
+      $authUser?.temporal_namespaces,
+    ).map((namespace: Namespace) => {
       return {
         namespace: namespace.namespaceInfo.name,
         onClick: navigateToNamespace,

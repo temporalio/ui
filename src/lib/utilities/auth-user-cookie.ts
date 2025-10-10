@@ -11,6 +11,10 @@ type UserResponse = {
   Name: string;
   Email: string;
   Picture: string;
+  // Temporal-specific claims from server
+  TemporalNamespaces?: string;
+  TemporalPermissions?: string;
+  TemporalWorkflowActions?: string;
 };
 
 const cookieName = 'user';
@@ -42,6 +46,10 @@ export const getAuthUserCookie = (isBrowser = BROWSER): User => {
         name: user?.Name,
         picture: user?.Picture,
         email: user?.Email,
+        // Extract temporal claims from server
+        TemporalNamespaces: user?.TemporalNamespaces,
+        TemporalPermissions: user?.TemporalPermissions,
+        TemporalWorkflowActions: user?.TemporalWorkflowActions,
       };
     } catch (e) {
       console.error(e);

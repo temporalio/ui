@@ -18,6 +18,10 @@ export const setAuthUser = (user: User) => {
     temporal_namespaces,
     temporal_permissions,
     temporal_workflow_actions,
+    // Handle server-side temporal claims (with capital T)
+    TemporalNamespaces,
+    TemporalPermissions,
+    TemporalWorkflowActions,
   } = user;
 
   if (!accessToken) {
@@ -30,9 +34,11 @@ export const setAuthUser = (user: User) => {
     name,
     email,
     picture,
-    temporal_namespaces,
-    temporal_permissions,
-    temporal_workflow_actions,
+    // Use server-side claims if available, otherwise use frontend claims
+    temporal_namespaces: TemporalNamespaces || temporal_namespaces,
+    temporal_permissions: TemporalPermissions || temporal_permissions,
+    temporal_workflow_actions:
+      TemporalWorkflowActions || temporal_workflow_actions,
   });
 };
 
