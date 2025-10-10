@@ -6,8 +6,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { namespaces } from '$lib/stores/namespaces';
+  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import { routeForWorkflows } from '$lib/utilities/route-for';
 

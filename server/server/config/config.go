@@ -96,6 +96,8 @@ type (
 	Auth struct {
 		// Enabled - UI checks this first before reading your provider config
 		Enabled bool `yaml:"enabled"`
+		// JWTSecret - Secret key for JWT token validation
+		JWTSecret string `yaml:"jwtSecret"`
 		// A list of auth providers. Currently enables only the first provider in the list.
 		Providers []AuthProvider `yaml:"providers"`
 	}

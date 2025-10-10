@@ -30,6 +30,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -79,6 +80,7 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options))
 	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider))
 	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider)) // compatibility with UI v1
+	api.GET("/logout", logout(providerCfg))
 }
 
 func authenticate(config *oauth2.Config, options map[string]interface{}) func(echo.Context) error {
@@ -168,7 +170,8 @@ func setCallbackCookie(c echo.Context, name, value string) {
 		MaxAge:   int(time.Hour.Seconds()),
 		Secure:   c.Request().TLS != nil,
 		Path:     "/",
-		HttpOnly: true,
+		HttpOnly: false, // Changed to false to allow JavaScript access if needed
+		SameSite: http.SameSiteLaxMode, // Added SameSite for better cookie handling
 	}
 	c.SetCookie(cookie)
 }
@@ -230,4 +233,72 @@ func nonceFromString(nonce string) (*Nonce, error) {
 type Nonce struct {
 	Nonce     string `json:"nonce"`
 	ReturnURL string `json:"return_url"`
+}
+
+// logout handles user logout and clears all cookies
+func logout(providerCfg config.AuthProvider) func(echo.Context) error {
+	return func(c echo.Context) error {
+		// Clear all auth-related cookies
+		clearAuthCookies(c)
+		
+		// Get Keycloak logout URL
+		keycloakLogoutURL := fmt.Sprintf("%s/protocol/openid-connect/logout", providerCfg.ProviderURL)
+		
+		// Add post_logout_redirect_uri parameter if available
+		postLogoutRedirectURI := c.QueryParam("post_logout_redirect_uri")
+		if postLogoutRedirectURI == "" {
+			postLogoutRedirectURI = "http://localhost:8088" // Default redirect
+		}
+		
+		// Build logout URL with parameters to ensure complete logout
+		logoutURL := fmt.Sprintf("%s?post_logout_redirect_uri=%s&client_id=%s", 
+			keycloakLogoutURL, 
+			url.QueryEscape(postLogoutRedirectURI),
+			providerCfg.ClientID)
+		
+		// Set additional headers to prevent caching
+		c.Response().Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Response().Header().Set("Pragma", "no-cache")
+		c.Response().Header().Set("Expires", "0")
+		
+		// Redirect to Keycloak logout
+		return c.Redirect(http.StatusFound, logoutURL)
+	}
+}
+
+// clearAuthCookies clears all authentication-related cookies
+func clearAuthCookies(c echo.Context) {
+	// List of common auth cookie names
+	authCookies := []string{
+		"user", "auth", "session", "token", "access_token", "id_token", 
+		"refresh_token", "temporal_auth", "temporal_session", "state", "nonce",
+		"kc-access", "kc-refresh", "kc-state", "kc-nonce", "AUTH_SESSION_ID",
+		"KEYCLOAK_SESSION", "KEYCLOAK_IDENTITY", "KEYCLOAK_SESSION_LEGACY",
+	}
+	
+	// Clear cookies for current domain and parent domain
+	for _, cookieName := range authCookies {
+		// Clear cookie for current path
+		cookie := &http.Cookie{
+			Name:     cookieName,
+			Value:    "",
+			MaxAge:   -1,
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   c.Request().TLS != nil,
+		}
+		c.SetCookie(cookie)
+		
+		// Clear cookie for parent domain (if applicable)
+		host := c.Request().Host
+		if domainParts := strings.Split(host, "."); len(domainParts) > 1 {
+			parentDomain := "." + strings.Join(domainParts[len(domainParts)-2:], ".")
+			cookie.Domain = parentDomain
+			c.SetCookie(cookie)
+		}
+		
+		// Clear cookie for root domain
+		cookie.Domain = ""
+		c.SetCookie(cookie)
+	}
 }

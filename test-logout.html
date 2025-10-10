@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test Logout</title>
+  </head>
+  <body>
+    <h1>Test Logout Functionality</h1>
+    <button onclick="testLogout()">Test Logout</button>
+    <div id="result"></div>
+
+    <script>
+      function testLogout() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = 'Testing logout...';
+
+        // Test the logout endpoint
+        fetch('/auth/logout', {
+          method: 'GET',
+          credentials: 'include',
+        })
+          .then((response) => {
+            if (response.ok) {
+              resultDiv.innerHTML =
+                'Logout successful - redirected to Keycloak logout';
+            } else {
+              resultDiv.innerHTML = 'Logout failed: ' + response.status;
+            }
+          })
+          .catch((error) => {
+            resultDiv.innerHTML = 'Logout error: ' + error.message;
+          });
+      }
+    </script>
+  </body>
+</html>

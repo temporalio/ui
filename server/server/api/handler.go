@@ -25,7 +25,9 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/context"
@@ -34,6 +36,7 @@ import (
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
 	"github.com/temporalio/ui-server/v2/server/rpc"
+	"github.com/temporalio/ui-server/v2/server/temporal_auth"
 	"github.com/temporalio/ui-server/v2/server/version"
 	"go.temporal.io/api/operatorservice/v1"
 	"go.temporal.io/api/serviceerror"
@@ -86,6 +89,72 @@ func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddle
 			return err
 		}
 
+		// Apply authorization middleware if auth is enabled
+		cfg, err := cfgProvider.GetConfig()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+
+		if cfg.Auth.Enabled {
+			// Special case: Allow namespaces list endpoint to pass through without ANY authentication checks
+			// This allows showing all namespaces without requiring any token
+			if c.Request().Method == "GET" && c.Request().URL.Path == "/api/v1/namespaces" {
+				// Skip ALL authentication checks for namespaces list - show all namespaces without token
+			} else {
+				// Apply authentication checks for all other endpoints
+				authHeader := c.Request().Header.Get("Authorization")
+				if authHeader == "" {
+					return echo.NewHTTPError(http.StatusUnauthorized, "Authorization header required")
+				}
+
+				tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+				if tokenString == authHeader {
+					return echo.NewHTTPError(http.StatusUnauthorized, "Bearer token required")
+				}
+
+				// Parse and validate JWT token
+				jwtSecret := "your-jwt-secret-key-for-temporal-ui" // Default fallback
+				if cfg.Auth.JWTSecret != "" {
+					jwtSecret = cfg.Auth.JWTSecret
+				}
+
+				authService := temporal_auth.NewAuthorizationService(jwtSecret)
+				token, err := authService.ParseJWTToken(tokenString)
+				if err != nil {
+					return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("Invalid token: %v", err))
+				}
+
+				// Extract namespace from request
+				namespace := c.Request().Header.Get("X-Temporal-Namespace")
+				if namespace == "" {
+					// Try to extract from URL path
+					path := c.Request().URL.Path
+					if strings.Contains(path, "/namespaces/") {
+						parts := strings.Split(path, "/namespaces/")
+						if len(parts) > 1 {
+							namespace = strings.Split(parts[1], "/")[0]
+						}
+					}
+				}
+				
+				// If still no namespace, use default
+				if namespace == "" {
+					namespace = "default"
+				}
+
+				// Check namespace access
+				if !authService.CheckNamespaceAccess(token, namespace) {
+					return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("Access denied to namespace: %s", namespace))
+				}
+
+				// Check permission based on HTTP method and path
+				permission := authService.GetRequiredPermission(c.Request().Method, c.Request().URL.Path)
+				if permission != "" && !authService.CheckPermission(token, permission) {
+					return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("Permission denied: %s", permission))
+				}
+			}
+		}
+
 		mux, err := getTemporalClientMux(c, conn, apiMiddleware)
 		if err != nil {
 			return err
@@ -126,6 +195,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			}
 		}
 
+		// Initialize with default settings
 		settings := &SettingsResponse{
 			Auth: &Auth{
 				Enabled: cfg.Auth.Enabled,
@@ -155,6 +225,39 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			HideWorkflowQueryErrors:       cfg.HideWorkflowQueryErrors,
 			RefreshWorkflowCountsDisabled: cfg.RefreshWorkflowCountsDisabled,
 			ActivityCommandsDisabled:      cfg.ActivityCommandsDisabled,
+		}
+
+		// Apply user-specific workflow controls if auth is enabled
+		if cfg.Auth.Enabled {
+			authHeader := c.Request().Header.Get("Authorization")
+			if authHeader != "" {
+				tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+				if tokenString != authHeader {
+					// Parse JWT token to get user-specific controls
+					jwtSecret := "your-jwt-secret-key-for-temporal-ui"
+					if cfg.Auth.JWTSecret != "" {
+						jwtSecret = cfg.Auth.JWTSecret
+					}
+
+					authService := temporal_auth.NewAuthorizationService(jwtSecret)
+					token, err := authService.ParseJWTToken(tokenString)
+					if err == nil {
+						// Get workflow controls from JWT claims
+						workflowControls := authService.GetWorkflowControls(token)
+						
+						// Apply user-specific controls
+						if workflowControls["workflowResetDisabled"] {
+							settings.WorkflowResetDisabled = true
+						}
+						if workflowControls["workflowTerminateDisabled"] {
+							settings.WorkflowTerminateDisabled = true
+						}
+						if workflowControls["workflowSignalDisabled"] {
+							settings.WorkflowSignalDisabled = true
+						}
+					}
+				}
+			}
 		}
 
 		return c.JSON(http.StatusOK, settings)
@@ -225,4 +328,54 @@ func withMarshaler() runtime.ServeMuxOption {
 			Indent: "  ",
 		},
 	})
+}
+
+// handleNamespacesList handles the namespaces list endpoint with filtering
+func handleNamespacesList(c echo.Context, conn *grpc.ClientConn, authService *temporal_auth.AuthorizationService, token *jwt.Token) error {
+	// Create gRPC client
+	client := workflowservice.NewWorkflowServiceClient(conn)
+	
+	// Create request to list namespaces
+	req := &workflowservice.ListNamespacesRequest{}
+	
+	// Call Temporal server to get all namespaces
+	ctx := c.Request().Context()
+	resp, err := client.ListNamespaces(ctx, req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to list namespaces: %v", err))
+	}
+	
+	// Filter namespaces based on user permissions
+	userNamespaces := authService.GetUserNamespaces(token)
+	var filteredNamespaces []*workflowservice.DescribeNamespaceResponse
+	
+	if userNamespaces == nil || len(userNamespaces) == 0 {
+		// No restrictions, return all namespaces
+		filteredNamespaces = resp.Namespaces
+	} else {
+		// Filter namespaces based on user access
+		for _, namespace := range resp.Namespaces {
+			namespaceName := namespace.NamespaceInfo.Name
+			hasAccess := false
+			
+			for _, allowedNS := range userNamespaces {
+				if allowedNS == "*" || allowedNS == namespaceName {
+					hasAccess = true
+					break
+				}
+			}
+			
+			if hasAccess {
+				filteredNamespaces = append(filteredNamespaces, namespace)
+			}
+		}
+	}
+	
+	// Create filtered response
+	filteredResp := &workflowservice.ListNamespacesResponse{
+		Namespaces: filteredNamespaces,
+	}
+	
+	// Return filtered response
+	return c.JSON(http.StatusOK, filteredResp)
 }

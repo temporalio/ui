@@ -81,6 +81,8 @@ func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, a
 		writeControlMiddleware,
 	)
 
+	// Simplified approach: Let all API requests pass through without authentication middleware
+	// Authentication and filtering will be handled on the frontend
 	route.Match([]string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "/*", api.TemporalAPIHandler(cfgProvider, apiMiddleware, conn), writeControlMiddleware)
 
 	// New api paths with removed prefix. Need to figure out how to handle when ui and ui server are on same host

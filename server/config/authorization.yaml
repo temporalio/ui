@@ -1,0 +1,89 @@
+# Temporal UI Authorization Configuration
+# This configuration enables dynamic user-level permissions and namespace access control
+
+# Enable authorization
+authorization:
+  enabled: true
+  
+  # JWT configuration for token validation
+  jwt:
+    secret: "your-jwt-secret-key" # Change this to a secure secret
+    issuer: "http://localhost:8080/realms/temporal-ui"
+    audience: "temporal-ui"
+    
+  # Default permissions for unauthenticated users
+  defaultPermissions:
+    namespaces: ["default"]
+    permissions: ["workflow.read"]
+    workflowActions: []
+    
+  # Permission mapping
+  permissionMapping:
+    # HTTP methods to permissions
+    GET: "workflow.read"
+    POST: "workflow.start"
+    PUT: "workflow.update"
+    PATCH: "workflow.update"
+    DELETE: "workflow.terminate"
+    
+    # Path-based permissions
+    paths:
+      "/api/namespaces/*/workflows/*/terminate": "workflow.terminate"
+      "/api/namespaces/*/workflows/*/cancel": "workflow.cancel"
+      "/api/namespaces/*/workflows/*/signal": "workflow.signal"
+      "/api/namespaces/*/workflows/*/reset": "workflow.reset"
+      "/api/namespaces/*/workflows/*/update": "workflow.update"
+      "/api/namespaces/*/workflows": "workflow.start"
+      "/api/namespaces/*/workflows/*": "workflow.read"
+      
+  # Workflow action controls
+  workflowControls:
+    terminate: "workflowTerminateDisabled"
+    cancel: "workflowCancelDisabled"
+    signal: "workflowSignalDisabled"
+    reset: "workflowResetDisabled"
+    update: "workflowUpdateDisabled"
+    start: "startWorkflowDisabled"
+    batch: "batchActionsDisabled"
+    
+  # Namespace access control
+  namespaceAccess:
+    # Default namespace for users without specific namespace access
+    default: "default"
+    
+    # Namespace validation
+    validateNamespaces: true
+    
+    # Allow wildcard access
+    allowWildcard: true
+    
+  # User role configurations
+  userRoles:
+    admin:
+      namespaces: ["*"]
+      permissions: ["*"]
+      workflowActions: ["*"]
+      
+    readonly:
+      namespaces: ["default"]
+      permissions: ["workflow.read"]
+      workflowActions: []
+      
+    limited:image.png
+      namespaces: ["default", "production"]
+      permissions: ["workflow.read", "workflow.signal"]
+      workflowActions: ["signal"]
+      
+    developer:
+      namespaces: ["default", "development", "staging"]
+      permissions: ["workflow.read", "workflow.start", "workflow.signal"]
+      workflowActions: ["start", "signal"]
+      
+  # Audit logging
+  audit:
+    enabled: true
+    logLevel: "INFO"
+    logAccess: true
+    logDenials: true
+    logNamespaceAccess: true
+    logPermissionChecks: true

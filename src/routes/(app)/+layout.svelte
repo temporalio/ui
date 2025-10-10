@@ -220,8 +220,66 @@
     return routeForWorkflows({ namespace });
   }
 
-  const logout = () => {
+  const logout = async () => {
+    // Clear auth user from store and cookies
     clearAuthUser();
+
+    // Clear all browser storage
+    try {
+      // Clear localStorage
+      localStorage.clear();
+
+      // Clear sessionStorage
+      sessionStorage.clear();
+
+      // Clear IndexedDB (if any)
+      if ('indexedDB' in window) {
+        const databases = await indexedDB.databases();
+        for (const db of databases) {
+          indexedDB.deleteDatabase(db.name);
+        }
+      }
+
+      // Clear all cookies (client-side) - more comprehensive approach
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        const eqPos = cookie.indexOf('=');
+        const name =
+          eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        // Clear cookie for current domain
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        // Clear cookie for parent domain
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+        // Clear cookie for all subdomains
+        const domainParts = window.location.hostname.split('.');
+        if (domainParts.length > 1) {
+          const parentDomain = '.' + domainParts.slice(-2).join('.');
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${parentDomain}`;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to clear browser storage:', error);
+    }
+
+    // Call server logout endpoint to clear server-side cookies and redirect to Keycloak logout
+    try {
+      const response = await fetch('/auth/logout', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        // Server will redirect to Keycloak logout, so we don't need to do anything else
+        return;
+      }
+    } catch (error) {
+      console.warn(
+        'Server logout failed, proceeding with client-side logout:',
+        error,
+      );
+    }
+
+    // Fallback: redirect to login page if server logout fails
     goto(routeForLoginPage());
   };
 

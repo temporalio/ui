@@ -1,0 +1,50 @@
+# Temporal UI Configuration Example
+# Copy this file to .env and update the values
+
+# External Temporal Server Configuration
+TEMPORAL_ADDRESS=your-temporal-server:7233
+UI_PORT=8080
+
+# Authentication Configuration
+AUTH_ENABLED=true
+AUTH_PROVIDER_URL=https://your-auth-provider.com
+AUTH_CLIENT_ID=your-client-id
+AUTH_CLIENT_SECRET=your-client-secret
+AUTH_CALLBACK_URL=https://your-domain:8080/auth/sso/callback
+AUTH_SCOPES=openid,profile,email
+AUTH_LABEL=SSO Login
+
+# TLS Configuration (if your Temporal server uses TLS)
+TLS_CA=/path/to/ca.cert
+TLS_CERT=/path/to/cert.pem
+TLS_KEY=/path/to/key.pem
+TLS_ENABLE_HOST_VERIFICATION=true
+TLS_SERVER_NAME=your-temporal-server
+
+# CORS Configuration
+CORS_ORIGINS=http://localhost:8080,https://localhost:8080,https://your-domain.com
+
+# Docker Configuration
+USE_DOCKER=false
+
+# Common Auth Provider Examples:
+
+# Auth0
+# AUTH_PROVIDER_URL=https://your-domain.auth0.com/
+# AUTH_CALLBACK_URL=https://your-domain:8080/auth/sso/callback
+
+# Google OAuth
+# AUTH_PROVIDER_URL=https://accounts.google.com
+# AUTH_CALLBACK_URL=https://your-domain:8080/auth/sso/callback
+
+# Microsoft Azure AD
+# AUTH_PROVIDER_URL=https://login.microsoftonline.com/your-tenant-id/v2.0
+# AUTH_CALLBACK_URL=https://your-domain:8080/auth/sso/callback
+
+# Keycloak
+# AUTH_PROVIDER_URL=https://your-keycloak-server/realms/your-realm
+# AUTH_CALLBACK_URL=https://your-domain:8080/auth/sso/callback
+
+# Okta
+# AUTH_PROVIDER_URL=https://your-domain.okta.com/oauth2/default
+# AUTH_CALLBACK_URL=https://your-domain:8080/auth/sso/callback

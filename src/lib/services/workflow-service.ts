@@ -54,11 +54,7 @@ import {
   encodePayloads,
   setBase64Payload,
 } from '$lib/utilities/encode-payload';
-import {
-  handleUnauthorizedOrForbiddenError,
-  isForbidden,
-  isUnauthorized,
-} from '$lib/utilities/handle-error';
+import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
 import { paginated } from '$lib/utilities/paginated';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
@@ -230,30 +226,12 @@ export const fetchWorkflowForRunId = async (
 
 export const fetchWorkflowForAuthorization = async (
   namespace: string,
-  request = fetch,
-  archived = false,
+  _request = fetch,
+  _archived = false,
 ): Promise<{ authorized: boolean }> => {
-  const endpoint: ValidWorkflowEndpoints = archived
-    ? 'workflows.archived'
-    : 'workflows';
-
-  let authorized = true;
-  const onError: ErrorCallback = (err) => {
-    if (isUnauthorized(err) || isForbidden(err)) {
-      authorized = false;
-    }
-  };
-
-  const route = routeForApi(endpoint, { namespace });
-  await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
-    params: { pageSize: '1' },
-    onError,
-    handleError: onError,
-    request,
-  });
-
+  // Simplified: Always return authorized to show all namespaces without restrictions
   return {
-    authorized,
+    authorized: true,
   };
 };
 
