@@ -6,25 +6,36 @@
   import { translate } from '$lib/i18n/translate';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
-  import type { WorkflowTaskFailedEvent } from '$lib/types/events';
+  import type {
+    WorkflowTaskFailedEvent,
+    WorkflowTaskTimedOutEvent,
+  } from '$lib/types/events';
   import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
-  import { getErrorCause } from '$lib/utilities/get-workflow-task-failed-event';
+  import {
+    getErrorCause,
+    isFailedTaskEvent,
+    isTimedOutTaskEvent,
+  } from '$lib/utilities/get-workflow-task-failed-event';
 
   import { CategoryIcon } from './constants';
 
   import WorkflowErrorStackTrace from './workflow-error-stack-trace.svelte';
   import WorkflowPendingTask from './workflow-pending-task.svelte';
 
-  export let error: WorkflowTaskFailedEvent;
-  export let pendingTask: PendingWorkflowTaskInfo | undefined = undefined;
-
-  let cause: WorkflowTaskFailedCause;
-
-  $: {
-    cause = getErrorCause(error);
+  interface Props {
+    error: WorkflowTaskFailedEvent | WorkflowTaskTimedOutEvent;
+    pendingTask: PendingWorkflowTaskInfo | undefined;
   }
+
+  let { error, pendingTask }: Props = $props();
+
+  let cause: WorkflowTaskFailedCause = $derived(getErrorCause(error));
+  let failure = $derived(isFailedTaskEvent(error) && error.attributes?.failure);
+  let timeoutType = $derived(
+    isTimedOutTaskEvent(error) && error.attributes?.timeoutType,
+  );
 </script>
 
 {#if cause && cause !== 'ResetWorkflow'}
@@ -61,9 +72,17 @@
         })}
       </div>
       <div class="flex flex-col gap-2 bg-primary p-4">
-        {#if error.attributes?.failure}
+        {#if timeoutType}
+          <p>
+            <span class="mr-2 text-secondary">Timeout Type</span>
+            {timeoutType}
+          </p>
+        {/if}
+        {#if failure || pendingTask}
           <AccordionGroup>
-            <WorkflowErrorStackTrace failure={error.attributes.failure} />
+            {#if failure}
+              <WorkflowErrorStackTrace {failure} />
+            {/if}
             {#if pendingTask}
               <WorkflowPendingTask {pendingTask} />
             {/if}

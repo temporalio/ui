@@ -8,7 +8,6 @@
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import { timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatDate } from '$lib/utilities/format-date';
@@ -29,8 +28,7 @@
   export let groups: EventGroups;
   export let viewportHeight: number | undefined;
   export let readOnly = false;
-  export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
-    undefined;
+  export let error: boolean = false;
 
   const { height, gutter, radius } = TimelineConfig;
 
@@ -90,7 +88,7 @@
       height={canvasHeight}
       width={canvasWidth}
       class="-mt-4"
-      class:error={workflowTaskFailedError}
+      class:error
     >
       <Line
         startPoint={[gutter, 0]}
