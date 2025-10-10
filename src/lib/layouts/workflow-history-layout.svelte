@@ -149,7 +149,7 @@
     <TimelineGraph
       {workflow}
       {groups}
-      {workflowTaskFailedError}
+      error={Boolean(workflowTaskFailedError)}
       viewportHeight={$minimizeEventView ? 360 : undefined}
     />
     <EventSummary {groups} {history} minimized={$minimizeEventView} />

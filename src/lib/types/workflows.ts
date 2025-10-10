@@ -223,4 +223,5 @@ export type WorkflowTaskFailedCause =
   | 'PendingSignalsLimitExceeded'
   | 'PendingRequestCancelLimitExceeded'
   | 'BadUpdateWorkflowExecutionMessage'
-  | 'UnhandledUpdate';
+  | 'UnhandledUpdate'
+  | 'WorkflowTaskTimedOut';
