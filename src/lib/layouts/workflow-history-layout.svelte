@@ -24,6 +24,7 @@
   import {
     currentEventHistory,
     filteredEventHistory,
+    fullEventHistory,
     pauseLiveUpdates,
   } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -79,7 +80,10 @@
 <div class="flex flex-col gap-0 px-4 pt-4 xl:px-8">
   <WorkflowCallStackError />
   <div class="flex flex-col gap-2">
-    <InputAndResults />
+    <InputAndResults
+      workflow={$workflowRun.workflow}
+      history={$fullEventHistory}
+    />
     {#if workflowTaskFailedError}
       <WorkflowError
         error={workflowTaskFailedError}

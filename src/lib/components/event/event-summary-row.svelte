@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -23,6 +24,7 @@
   import { authUser } from '$lib/stores/auth-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { toaster } from '$lib/stores/toaster';
+  import { workflowComparison } from '$lib/stores/workflow-comparison';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
@@ -40,10 +42,7 @@
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
   } from '$lib/utilities/is-event-type';
-  import {
-    routeForEventHistoryEvent,
-    routeForWorkflow,
-  } from '$lib/utilities/route-for';
+  import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import EventDetailsFull from './event-details-full.svelte';
@@ -212,16 +211,25 @@
         excludeUpdates: false,
       });
 
-      const resetWorkflowUrl = routeForWorkflow({
-        namespace,
-        workflow,
-        run: result.runId,
-      });
+      if (!$workflowComparison.isComparing) {
+        workflowComparison.startComparison(workflow, run);
+      }
+
+      workflowComparison.addComparison(workflow, result.runId, eventId);
+
+      const currentUrl = new URL(window.location.href);
+      const compareParams = currentUrl.searchParams.getAll('compare');
+      compareParams.push(result.runId);
+      currentUrl.searchParams.delete('compare');
+      compareParams.forEach((id) =>
+        currentUrl.searchParams.append('compare', id),
+      );
+
+      goto(currentUrl.toString(), { replaceState: true, noScroll: true });
 
       toaster.push({
         variant: 'success',
-        message: 'Workflow reset successfully',
-        link: resetWorkflowUrl,
+        message: 'Workflow reset added to comparison',
       });
     } catch (error) {
       toaster.push({

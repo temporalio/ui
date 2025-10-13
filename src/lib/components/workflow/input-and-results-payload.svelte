@@ -11,9 +11,13 @@
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
-  export let title: string;
-  export let content: string = '';
-  export let isRunning: boolean = false;
+  type Props = {
+    title: string;
+    showTitle?: boolean;
+    content: string;
+    isRunning: boolean;
+  };
+  let { title, showTitle = true, content, isRunning }: Props = $props();
 
   const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {
@@ -41,15 +45,17 @@
     }
   };
 
-  $: parsedContent = parseContent(content);
-  $: payloads = getPayloads(parsedContent);
-  $: payloadsSize = payloads.length;
+  const parsedContent = $derived(parseContent(content));
+  const payloads = $derived(getPayloads(parsedContent));
+  const payloadsSize = $derived(payloads.length);
 </script>
 
 <div class="flex w-full grow flex-col gap-2">
-  <h2 class="flex items-center gap-2">
-    {title}
-  </h2>
+  {#if showTitle}
+    <h2 class="flex items-center gap-2">
+      {title}
+    </h2>
+  {/if}
   {#if content}
     {#key $minimizeEventView}
       {#if payloadsSize > 0}

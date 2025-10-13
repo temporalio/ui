@@ -65,7 +65,7 @@ const getEventResult = (event: CompletionEvent) => {
 };
 
 export const getWorkflowStartedCompletedAndTaskFailedEvents = (
-  eventHistory: WorkflowEvent[],
+  eventHistory: WorkflowEvent[] = [],
 ): WorkflowInputAndResults => {
   let input: string;
   let results: string;
