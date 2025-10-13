@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -17,9 +18,12 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { resetWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { authUser } from '$lib/stores/auth-user';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { toaster } from '$lib/stores/toaster';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -32,10 +36,14 @@
     getSecondaryAttributeForEvent,
   } from '$lib/utilities/get-single-attribute-for-event';
   import {
+    isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
   } from '$lib/utilities/is-event-type';
-  import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
+  import {
+    routeForEventHistoryEvent,
+    routeForWorkflow,
+  } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   import EventDetailsFull from './event-details-full.svelte';
@@ -170,6 +178,60 @@
       abbrFormat: true,
     }),
   );
+
+  const isActivity = $derived(
+    isEventGroup(event) && event.category === 'activity',
+  );
+
+  const workflowTaskCompletedEventId = $derived(() => {
+    if (!isActivity || !isEventGroup(event)) return null;
+    const scheduledEvent = event.eventList.find(isActivityTaskScheduledEvent);
+    return (
+      scheduledEvent?.activityTaskScheduledEventAttributes
+        ?.workflowTaskCompletedEventId ?? null
+    );
+  });
+
+  let isResetting = $state(false);
+
+  const handleReset = async (e: MouseEvent) => {
+    e.stopPropagation();
+
+    const eventId = workflowTaskCompletedEventId();
+    if (!eventId) return;
+
+    isResetting = true;
+    try {
+      const result = await resetWorkflow({
+        namespace,
+        workflow: $workflowRun?.workflow,
+        eventId,
+        reason: `Resetting from activity ${event.id}`,
+        includeSignals: false,
+        excludeSignals: false,
+        excludeUpdates: false,
+      });
+
+      const resetWorkflowUrl = routeForWorkflow({
+        namespace,
+        workflow,
+        run: result.runId,
+      });
+
+      toaster.push({
+        variant: 'success',
+        message: 'Workflow reset successfully',
+        link: resetWorkflowUrl,
+      });
+    } catch (error) {
+      toaster.push({
+        variant: 'error',
+        message: error?.message || 'Failed to reset workflow',
+      });
+    } finally {
+      isResetting = false;
+    }
+  };
 
   const onLinkClick = (event) => {
     expanded = !expanded;
@@ -377,6 +439,22 @@
             </Badge>
           </Tooltip>
         {/if}
+      </div>
+    </td>
+  {/if}
+  {#if compact && isActivity && workflowTaskCompletedEventId()}
+    <td onclick={(e) => e.stopPropagation()}>
+      <div class="flex justify-center">
+        <Tooltip text="Reset workflow to this activity" left>
+          <Button
+            variant="ghost"
+            size="xs"
+            disabled={isResetting}
+            on:click={handleReset}
+          >
+            <Icon name="retry" />
+          </Button>
+        </Tooltip>
       </div>
     </td>
   {/if}

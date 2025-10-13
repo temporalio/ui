@@ -59,6 +59,7 @@
     { label: 'Timestamp' },
     { label: 'Event Type' },
     { label: 'Details' },
+    { label: 'Actions' },
   ];
 
   $: if ($isCloud && columns.length === 4) {
