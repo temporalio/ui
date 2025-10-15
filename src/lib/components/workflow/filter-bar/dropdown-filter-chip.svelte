@@ -450,14 +450,10 @@
             <Input
               id={`${controlsId}-number`}
               label="Value"
-              type="number"
               placeholder={isDurationFilter(localFilter)
-                ? `${translate('common.enter')} ${
-                    localFilter.attribute
-                  } (${translate('workflows.duration-filter-placeholder')})`
+                ? `${translate('workflows.duration-filter-placeholder')}`
                 : translate('common.number-input-placeholder')}
               disabled={isNullFilter}
-              step="any"
               bind:value={localFilter.value}
             />
           </div>
