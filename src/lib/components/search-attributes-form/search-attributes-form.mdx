@@ -7,12 +7,11 @@ import SearchAttributesForm from './search-attributes-form.stories.svelte';
 
 # SearchAttributesForm Component
 
-A reusable form component for managing custom search attributes with SuperForms and reactive adapters.
+A reusable form component for managing custom search attributes with SuperForms validation.
 
 ## Features
 
-- **Reactive Adapter Pattern**: Self-contained adapters that automatically access page context
-- **Zero Configuration**: Default adapter requires no setup - automatically gets namespace from URL
+- **Promise-Based Loading**: Async data loading with built-in error handling
 - **SuperForms Integration**: Built-in validation with Zod schema and dirty state tracking
 - **Comprehensive Error Handling**: Form state management with proper error display
 - **i18n Support**: Full internationalization with translate() function calls
@@ -21,32 +20,25 @@ A reusable form component for managing custom search attributes with SuperForms 
 
 ## Architecture
 
-The component uses a two-part architecture:
+The component uses two main parts:
 
 1. **Parent Component**: Handles async data loading with `#await` pattern
-2. **Child Component**: Renders the form with SuperForms configuration
+2. **Content Component**: Renders the form with SuperForms configuration
 
-## Adapter Pattern
+## Props Interface
 
-The component uses a reactive adapter pattern with self-contained objects that access Svelte context:
+The component accepts the following props:
 
 ```typescript
-interface SearchAttributesAdapter {
-  fetchAttributes(): Promise<SearchAttributeDefinition[]>;
-  upsertAttributes(attributes: SearchAttributeDefinition[]): Promise<void>;
-  deleteAttribute(attributeName: string): Promise<void>;
-  getSupportedTypes(): SearchAttributeTypeOption[];
-  onSuccess?: (attributes: SearchAttributeDefinition[]) => Promise<void>;
+interface Props {
+  class?: string;
+  initialAttributesPromise: Promise<SearchAttributeDefinition[]>;
+  onSave: (attributes: SearchAttributeDefinition[]) => Promise<void>;
+  onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
   onCancel?: () => void;
+  getSupportedTypes: () => SearchAttributeTypeOption[];
 }
 ```
-
-The default adapter automatically:
-
-- Gets the namespace from `page.params.namespace`
-- Handles success/error callbacks
-- Provides proper internationalization
-- No configuration required
 
 ## Usage Examples
 
@@ -54,64 +46,82 @@ The default adapter automatically:
 
 ```svelte
 <script lang="ts">
-  import { defaultAdapter } from '$lib/components/search-attributes-form/default-adapter.svelte';
+  import { page } from '$app/state';
   import SearchAttributesForm from '$lib/components/search-attributes-form/search-attributes-form.svelte';
-</script>
+  import { fetchSearchAttributesForNamespace } from '$lib/services/search-attributes-service';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+  import { translate } from '$lib/i18n/translate';
 
-<SearchAttributesForm adapter={defaultAdapter} />
-```
+  const namespace = $derived(page.params.namespace);
 
-The default adapter automatically gets the namespace from the URL and handles all callbacks internally.
+  async function fetchAttributes(): Promise<SearchAttributeDefinition[]> {
+    const response = await fetchSearchAttributesForNamespace(namespace);
+    return Object.entries(response.customAttributes).map(([name, type]) => ({
+      name,
+      type,
+    }));
+  }
 
-### Custom Adapter Implementation
-
-```typescript
-// custom-adapter.svelte.ts
-import { page } from '$app/state';
-import { goto } from '$app/navigation';
-
-export const customAdapter: SearchAttributesAdapter = {
-  onSuccess: async (attributes) => {
-    // Custom success handling
-    console.log('Saved:', attributes);
-    goto(`/namespaces/${page.params.namespace}/settings`);
-  },
-
-  onCancel: () => {
-    // Custom cancel handling
-    goto(`/namespaces/${page.params.namespace}`);
-  },
-
-  async fetchAttributes(): Promise<SearchAttributeDefinition[]> {
-    const namespace = page.params.namespace;
-    const response = await customApiClient.getSearchAttributes(namespace);
-    return response.attributes;
-  },
-
-  async upsertAttributes(
+  async function handleSave(
     attributes: SearchAttributeDefinition[],
   ): Promise<void> {
-    const namespace = page.params.namespace;
-    await customApiClient.updateSearchAttributes(namespace, attributes);
-  },
+    // Implement save logic
+    await saveSearchAttributes(namespace, attributes);
+  }
 
-  async deleteAttribute(attributeName: string): Promise<void> {
-    const namespace = page.params.namespace;
-    await customApiClient.deleteSearchAttribute(namespace, attributeName);
-  },
+  function handleSuccess(attributes: SearchAttributeDefinition[]) {
+    console.log('Successfully saved:', attributes);
+    // Show toast, redirect, etc.
+  }
 
-  getSupportedTypes(): SearchAttributeTypeOption[] {
+  function handleCancel() {
+    console.log('Form cancelled');
+    // Navigate back, reset state, etc.
+  }
+
+  function getSupportedTypes(): SearchAttributeTypeOption[] {
     return [
-      { label: 'Text', value: 'Text' },
-      { label: 'Keyword', value: 'Keyword' },
-      { label: 'Int', value: 'Int' },
-      { label: 'Double', value: 'Double' },
-      { label: 'Bool', value: 'Bool' },
-      { label: 'DateTime', value: 'DateTime' },
-      { label: 'KeywordList', value: 'KeywordList' },
+      {
+        label: translate('search-attributes.type-keyword'),
+        value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      },
+      {
+        label: translate('search-attributes.type-text'),
+        value: SEARCH_ATTRIBUTE_TYPE.TEXT,
+      },
+      {
+        label: translate('search-attributes.type-int'),
+        value: SEARCH_ATTRIBUTE_TYPE.INT,
+      },
+      {
+        label: translate('search-attributes.type-double'),
+        value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+      },
+      {
+        label: translate('search-attributes.type-bool'),
+        value: SEARCH_ATTRIBUTE_TYPE.BOOL,
+      },
+      {
+        label: translate('search-attributes.type-datetime'),
+        value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      },
+      {
+        label: translate('search-attributes.type-keywordlist'),
+        value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+      },
     ];
-  },
-};
+  }
+
+  const initialAttributesPromise = fetchAttributes();
+</script>
+
+<SearchAttributesForm
+  {initialAttributesPromise}
+  onSave={handleSave}
+  onSuccess={handleSuccess}
+  onCancel={handleCancel}
+  {getSupportedTypes}
+/>
 ```
 
 ### Integration with SvelteKit
@@ -119,8 +129,86 @@ export const customAdapter: SearchAttributesAdapter = {
 ```svelte
 <!-- src/routes/namespaces/[namespace]/search-attributes/+page.svelte -->
 <script lang="ts">
-  import { defaultAdapter } from '$lib/components/search-attributes-form/default-adapter.svelte';
+  import { page } from '$app/state';
   import SearchAttributesForm from '$lib/components/search-attributes-form/search-attributes-form.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { fetchSearchAttributesForNamespace } from '$lib/services/search-attributes-service';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+
+  import type {
+    SearchAttributeDefinition,
+    SearchAttributeTypeOption,
+  } from '$lib/components/search-attributes-form/types';
+
+  const namespace = $derived(page.params.namespace);
+
+  async function fetchAttributes(): Promise<SearchAttributeDefinition[]> {
+    if (!namespace) {
+      throw new Error('No namespace found in page params');
+    }
+
+    const response = await fetchSearchAttributesForNamespace(namespace);
+    const attributes = Object.entries(response.customAttributes).map(
+      ([name, type]) => ({ name, type }),
+    );
+
+    // Always return at least one empty row for the UI
+    return attributes.length > 0
+      ? attributes
+      : [{ name: '', type: getSupportedTypes()[0]?.value || '' }];
+  }
+
+  async function handleSave(
+    attributes: SearchAttributeDefinition[],
+  ): Promise<void> {
+    // TODO: Implement when SDK team adds CRUD endpoints
+    throw new Error(translate('search-attributes.crud-not-implemented'));
+  }
+
+  function handleSuccess(attributes: SearchAttributeDefinition[]) {
+    console.log('Search attributes saved successfully');
+    // Add any other success handling here (toasts, navigation, etc.)
+  }
+
+  function handleCancel() {
+    console.log('Search attributes form cancelled');
+    // Add any cancel handling here (navigation, confirmation, etc.)
+  }
+
+  function getSupportedTypes(): SearchAttributeTypeOption[] {
+    return [
+      {
+        label: translate('search-attributes.type-keyword'),
+        value: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      },
+      {
+        label: translate('search-attributes.type-text'),
+        value: SEARCH_ATTRIBUTE_TYPE.TEXT,
+      },
+      {
+        label: translate('search-attributes.type-int'),
+        value: SEARCH_ATTRIBUTE_TYPE.INT,
+      },
+      {
+        label: translate('search-attributes.type-double'),
+        value: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+      },
+      {
+        label: translate('search-attributes.type-bool'),
+        value: SEARCH_ATTRIBUTE_TYPE.BOOL,
+      },
+      {
+        label: translate('search-attributes.type-datetime'),
+        value: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      },
+      {
+        label: translate('search-attributes.type-keywordlist'),
+        value: SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+      },
+    ];
+  }
+
+  const initialAttributesPromise = fetchAttributes();
 </script>
 
 <svelte:head>
@@ -135,25 +223,28 @@ export const customAdapter: SearchAttributesAdapter = {
     </p>
   </div>
 
-  <SearchAttributesForm adapter={defaultAdapter} />
+  <SearchAttributesForm
+    {initialAttributesPromise}
+    onSave={handleSave}
+    onSuccess={handleSuccess}
+    onCancel={handleCancel}
+    {getSupportedTypes}
+  />
 </div>
 ```
-
-No configuration needed! The adapter automatically:
-
-- Gets the namespace from the URL (`/namespaces/[namespace]/search-attributes`)
-- Handles success/error states
-- Provides internationalization
-- Manages form state and validation
 
 ## Props
 
 <Markdown>
   {`
-| Prop    | Type                    | Default  | Description                         |
-| ------- | ----------------------- | -------- | ----------------------------------- |
-| adapter | SearchAttributesAdapter | Required | Adapter instance for API operations |
-| class   | string                  | ''       | Additional CSS classes              |
+| Prop                    | Type                                                    | Default    | Description                             |
+| ----------------------- | ------------------------------------------------------- | ---------- | --------------------------------------- |
+| initialAttributesPromise | Promise<SearchAttributeDefinition[]>                  | Required   | Promise that resolves to initial data  |
+| onSave                  | (attributes: SearchAttributeDefinition[]) => Promise<void> | Required   | Save handler function                  |
+| onSuccess               | (attributes: SearchAttributeDefinition[]) => void     | () => {}   | Success callback after save            |
+| onCancel                | () => void                                            | () => {}   | Cancel callback                        |
+| getSupportedTypes       | () => SearchAttributeTypeOption[]                     | Required   | Function returning supported types     |
+| class                   | string                                                 | ''         | Additional CSS classes                 |
   `}
 </Markdown>
 
@@ -161,31 +252,31 @@ No configuration needed! The adapter automatically:
 
 The component automatically handles three states:
 
-- **Loading**: Shows skeleton loaders while fetching initial data
+- **Loading**: Shows skeleton loaders while the promise resolves
 - **Success**: Renders the form with loaded attributes
-- **Error**: Shows detailed error messages with retry functionality
+- **Error**: Shows error messages with retry functionality
 
 ## Error Handling
 
-The component provides comprehensive error handling through SuperForms and the adapter pattern:
+The component provides comprehensive error handling through SuperForms:
 
 - **Form State Management**: Prevents form from getting stuck in "Saving..." state
-- **SuperForms Integration**: Proper error handling with `onUpdate` and `onError` callbacks
+- **SuperForms Integration**: Proper error handling with `onUpdate` callback
 - **User-Friendly Messages**: Automatic conversion of technical errors to readable messages
 - **Form-Level Validation**: Displays validation errors for unique constraints
 - **Field-Level Validation**: Individual field validation with real-time feedback
 - **API Error Display**: Status messages with proper intent styling
-- **Dirty State Tracking**: Shows count badge on Save button when form has unsaved changes
+- **Dirty State Tracking**: Shows when form has unsaved changes
 - **Form Reset**: Cancel button properly resets form to initial state
 
 ## Dirty State Management
 
-The form automatically tracks unsaved changes using SuperForms `isTainted` state:
+The form automatically tracks unsaved changes using SuperForms `isTainted` function:
 
-- **Visual Indicator**: Save button shows a count badge with number of modified attributes
-- **Smart Counting**: Only counts attributes with actual field changes (ignores empty objects)
+- **Visual Indicator**: Save button shows a badge when there are unsaved changes
 - **Real-time Updates**: Badge updates immediately as user makes changes
 - **Form Reset**: Cancel button clears dirty state and resets to initial values
+- **Save Button State**: Disabled when no changes or while submitting
 
 ## Validation
 
@@ -193,7 +284,7 @@ Form validation is handled by Zod schema with the following rules:
 
 - Attribute names are required (min 1 character)
 - Attribute names must be unique within the form
-- Attribute types must be one of the supported types from the adapter
+- Attribute types must be one of the supported types
 
 ## Accessibility
 
@@ -201,3 +292,12 @@ Form validation is handled by Zod schema with the following rules:
 - Keyboard navigation support
 - Screen reader friendly error messages
 - Focus management for form interactions
+
+## Key Benefits
+
+1. **Flexibility**: Each handler can be customized independently
+2. **Testability**: Individual functions are easier to test in isolation
+3. **Composability**: Functions can be shared across different components
+4. **Type Safety**: Direct function signatures provide better TypeScript inference
+5. **Simplicity**: Clean API with direct function props
+6. **Tree Shaking**: Better optimization as unused functions can be eliminated
