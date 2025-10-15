@@ -271,7 +271,7 @@
   <Loading />
 {:then schedule}
   {#if $loading}
-    <Loading title={translate('schedules.deleting')} class="my-2" />
+    <Loading class="my-2" />
   {:else}
     <header class="flex flex-row flex-wrap justify-between gap-4">
       <div class="relative flex flex-col">
