@@ -25,9 +25,7 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/context"
@@ -36,7 +34,6 @@ import (
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
 	"github.com/temporalio/ui-server/v2/server/rpc"
-	"github.com/temporalio/ui-server/v2/server/temporal_auth"
 	"github.com/temporalio/ui-server/v2/server/version"
 	"go.temporal.io/api/operatorservice/v1"
 	"go.temporal.io/api/serviceerror"
@@ -177,38 +174,9 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			ActivityCommandsDisabled:      cfg.ActivityCommandsDisabled,
 		}
 
-		// Apply user-specific workflow controls if auth is enabled
-		if cfg.Auth.Enabled {
-			authHeader := c.Request().Header.Get("Authorization")
-			if authHeader != "" {
-				tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-				if tokenString != authHeader {
-					// Parse JWT token to get user-specific controls
-					jwtSecret := "your-jwt-secret-key-for-temporal-ui"
-					if cfg.Auth.JWTSecret != "" {
-						jwtSecret = cfg.Auth.JWTSecret
-					}
-
-					authService := temporal_auth.NewAuthorizationService(jwtSecret)
-					token, err := authService.ParseJWTToken(tokenString)
-					if err == nil {
-						// Get workflow controls from JWT claims
-						workflowControls := authService.GetWorkflowControls(token)
-						
-						// Apply user-specific controls
-						if workflowControls["workflowResetDisabled"] {
-							settings.WorkflowResetDisabled = true
-						}
-						if workflowControls["workflowTerminateDisabled"] {
-							settings.WorkflowTerminateDisabled = true
-						}
-						if workflowControls["workflowSignalDisabled"] {
-							settings.WorkflowSignalDisabled = true
-						}
-					}
-				}
-			}
-		}
+		// NOTE: Server-side authorization has been removed
+		// Authorization is handled on the FRONTEND using JWT claims
+		// The server returns all settings without modification
 
 		return c.JSON(http.StatusOK, settings)
 	}
@@ -280,52 +248,5 @@ func withMarshaler() runtime.ServeMuxOption {
 	})
 }
 
-// handleNamespacesList handles the namespaces list endpoint with filtering
-func handleNamespacesList(c echo.Context, conn *grpc.ClientConn, authService *temporal_auth.AuthorizationService, token *jwt.Token) error {
-	// Create gRPC client
-	client := workflowservice.NewWorkflowServiceClient(conn)
-	
-	// Create request to list namespaces
-	req := &workflowservice.ListNamespacesRequest{}
-	
-	// Call Temporal server to get all namespaces
-	ctx := c.Request().Context()
-	resp, err := client.ListNamespaces(ctx, req)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to list namespaces: %v", err))
-	}
-	
-	// Filter namespaces based on user permissions
-	userNamespaces := authService.GetUserNamespaces(token)
-	var filteredNamespaces []*workflowservice.DescribeNamespaceResponse
-	
-	if userNamespaces == nil || len(userNamespaces) == 0 {
-		// No restrictions, return all namespaces
-		filteredNamespaces = resp.Namespaces
-	} else {
-		// Filter namespaces based on user access
-		for _, namespace := range resp.Namespaces {
-			namespaceName := namespace.NamespaceInfo.Name
-			hasAccess := false
-			
-			for _, allowedNS := range userNamespaces {
-				if allowedNS == "*" || allowedNS == namespaceName {
-					hasAccess = true
-					break
-				}
-			}
-			
-			if hasAccess {
-				filteredNamespaces = append(filteredNamespaces, namespace)
-			}
-		}
-	}
-	
-	// Create filtered response
-	filteredResp := &workflowservice.ListNamespacesResponse{
-		Namespaces: filteredNamespaces,
-	}
-	
-	// Return filtered response
-	return c.JSON(http.StatusOK, filteredResp)
-}
+// Unused function removed - server-side namespace filtering is not used
+// Namespace filtering is handled on the frontend using JWT claims

@@ -79,12 +79,6 @@ COPY --from=frontend-builder /app/build ./build
 # Copy configuration files
 COPY server/config/ ./config/
 
-# Copy Keycloak plugins (if needed for deployment)
-COPY keycloak-plugins/ ./keycloak-plugins/
-
-# Copy scripts
-COPY scripts/ ./scripts/
-
 # Set ownership
 RUN chown -R temporal:temporal /app
 
