@@ -40,6 +40,7 @@
     formatListFilterValue,
     isBooleanFilter,
     isDateTimeFilter,
+    isDurationFilter,
     isListFilter,
     isNumberFilter,
     isStatusFilter,
@@ -449,7 +450,9 @@
             <Input
               id={`${controlsId}-number`}
               label="Value"
-              placeholder="Enter number..."
+              placeholder={isDurationFilter(localFilter)
+                ? translate('workflows.duration-filter-placeholder')
+                : translate('common.number-input-placeholder')}
               disabled={isNullFilter}
               bind:value={localFilter.value}
             />
