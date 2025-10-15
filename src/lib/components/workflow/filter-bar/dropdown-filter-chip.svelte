@@ -451,7 +451,7 @@
               id={`${controlsId}-number`}
               label="Value"
               placeholder={isDurationFilter(localFilter)
-                ? `${translate('workflows.duration-filter-placeholder')}`
+                ? translate('workflows.duration-filter-placeholder')
                 : translate('common.number-input-placeholder')}
               disabled={isNullFilter}
               bind:value={localFilter.value}
