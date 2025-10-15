@@ -453,7 +453,7 @@
   {#if compact && isActivity && workflowTaskCompletedEventId()}
     <td onclick={(e) => e.stopPropagation()}>
       <div class="flex justify-center">
-        <Tooltip text="Reset workflow to this activity" left>
+        <Tooltip text="Reset to this point" left>
           <Button
             variant="ghost"
             size="xs"

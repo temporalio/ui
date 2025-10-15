@@ -11,7 +11,7 @@
   type Props = {
     workflow: WorkflowExecution;
     history: WorkflowEvents;
-    showTitle: boolean;
+    showTitle?: boolean;
   };
   let { workflow, history, showTitle = true }: Props = $props();
 
