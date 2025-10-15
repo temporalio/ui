@@ -39,7 +39,7 @@
     "dev:temporal-cli": "vite dev --mode temporal-server",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --mode docker",
     "build:local": "vite build",
-    "build:docker": "VITE_API=http://localhost:8080 vite build",
+    "build:docker": "VITE_API= vite build",
     "build:server": "VITE_API= BUILD_PATH=server/ui/assets/local vite build",
     "temporal-server": "esno scripts/start-temporal-server.ts --codecEndpoint http://127.0.0.1:8888",
     "codec-server": "esno ./scripts/start-codec-server.ts --port 8888",

@@ -1,0 +1,50 @@
+# Docker configuration for Temporal UI
+# This is a simple version that uses the server's built-in env var support
+temporalGrpcAddress: "127.0.0.1:7233"
+port: 8080
+enableUi: true
+defaultNamespace: "default"
+showTemporalSystemNamespace: false
+notifyOnNewVersion: true
+disableWriteActions: false
+
+# TLS configuration
+tls:
+  enableHostVerification: false
+
+# CORS configuration
+cors:
+  cookieInsecure: true
+  allowOrigins:
+    - "http://localhost:8080"
+  unsafeAllowAllOrigins: false
+
+# Authentication configuration
+auth:
+  enabled: false
+  providers:
+    - label: "sso"
+      type: "oidc"
+      providerUrl: ""
+      issuerUrl: ""
+      clientId: ""
+      clientSecret: ""
+      callbackUrl: ""
+      useIdTokenAsBearer: false
+      scopes:
+        - "openid"
+        - "profile"
+        - "email"
+
+# Codec configuration  
+codec:
+  endpoint: ""
+  passAccessToken: false
+  includeCredentials: false
+  defaultErrorMessage: ""
+  defaultErrorLink: ""
+
+forwardHeaders: []
+
+hideLogs: false
+

@@ -160,6 +160,14 @@ USER_ID=$(kcadm.sh get users -r $REALM_NAME | jq -r ".[] | select(.username == \
 CLIENT_SECRET=$(kcadm.sh get clients/$CLIENT_UUID/client-secret -r $REALM_NAME | jq -r '.value')
 ```
 
+### Update List of core addtributes:
+
+kcadm.sh get realms/temporal-auth-ui/users/profile > user-profile.json
+
+# Update JSON with 3 new attributes.
+
+kcadm.sh update realms/temporal-auth-ui/users/profile -f user-profile.json
+
 ### List User Attributes
 
 ```bash

@@ -96,63 +96,13 @@ func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddle
 		}
 
 		if cfg.Auth.Enabled {
-			// Special case: Allow namespaces list endpoint to pass through without ANY authentication checks
-			// This allows showing all namespaces without requiring any token
-			if c.Request().Method == "GET" && c.Request().URL.Path == "/api/v1/namespaces" {
-				// Skip ALL authentication checks for namespaces list - show all namespaces without token
-			} else {
-				// Apply authentication checks for all other endpoints
-				authHeader := c.Request().Header.Get("Authorization")
-				if authHeader == "" {
-					return echo.NewHTTPError(http.StatusUnauthorized, "Authorization header required")
-				}
-
-				tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-				if tokenString == authHeader {
-					return echo.NewHTTPError(http.StatusUnauthorized, "Bearer token required")
-				}
-
-				// Parse and validate JWT token
-				jwtSecret := "your-jwt-secret-key-for-temporal-ui" // Default fallback
-				if cfg.Auth.JWTSecret != "" {
-					jwtSecret = cfg.Auth.JWTSecret
-				}
-
-				authService := temporal_auth.NewAuthorizationService(jwtSecret)
-				token, err := authService.ParseJWTToken(tokenString)
-				if err != nil {
-					return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("Invalid token: %v", err))
-				}
-
-				// Extract namespace from request
-				namespace := c.Request().Header.Get("X-Temporal-Namespace")
-				if namespace == "" {
-					// Try to extract from URL path
-					path := c.Request().URL.Path
-					if strings.Contains(path, "/namespaces/") {
-						parts := strings.Split(path, "/namespaces/")
-						if len(parts) > 1 {
-							namespace = strings.Split(parts[1], "/")[0]
-						}
-					}
-				}
-				
-				// If still no namespace, use default
-				if namespace == "" {
-					namespace = "default"
-				}
-
-				// Check namespace access
-				if !authService.CheckNamespaceAccess(token, namespace) {
-					return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("Access denied to namespace: %s", namespace))
-				}
-
-				// Check permission based on HTTP method and path
-				permission := authService.GetRequiredPermission(c.Request().Method, c.Request().URL.Path)
-				if permission != "" && !authService.CheckPermission(token, permission) {
-					return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("Permission denied: %s", permission))
-				}
-			}
+			// NOTE: We use OIDC for authentication (login via Keycloak)
+			// Authorization (namespace filtering) is handled on the FRONTEND using JWT claims
+			// The server does NOT perform authorization checks - it trusts the authenticated user
+			// and returns all data. The frontend filters based on temporal_namespaces claim.
+			
+			// All endpoints are accessible to authenticated users
+			// Frontend will filter namespaces based on user's temporal_namespaces attribute
 		}
 
 		mux, err := getTemporalClientMux(c, conn, apiMiddleware)
