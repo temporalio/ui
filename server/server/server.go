@@ -148,7 +148,14 @@ func (s *Server) Start() error {
 	}
 
 	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-	if err := s.httpServer.Start(address); err != http.ErrServerClosed {
+	if cfg.UIServerTLS.CertFile != "" && cfg.UIServerTLS.KeyFile != "" {
+		s.httpServer.Logger.Info("Starting UI server with TLS...")
+		err = s.httpServer.StartTLS(address, cfg.UIServerTLS.CertFile, cfg.UIServerTLS.KeyFile)
+	} else {
+		err = s.httpServer.Start(address)
+	}
+
+	if err != http.ErrServerClosed {
 		s.httpServer.Logger.Fatal(err)
 	}
 	return nil
