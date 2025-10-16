@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/base64"
 	"encoding/pem"
 	"math/big"
 	"os"
@@ -79,6 +80,22 @@ func TestCertLoader_ReloadsNewKeyPair(t *testing.T) {
 			assert.NotEqual(t, expect1.Certificate, loaded2.Certificate)
 		})
 	}
+}
+
+func TestLoadCACert_FromBase64Data(t *testing.T) {
+	certPEM, _ := generateCertKeyPair(t, "ca")
+
+	caData := base64.StdEncoding.EncodeToString(certPEM)
+
+	pool, err := LoadCACert("", caData)
+	assert.NoError(t, err)
+	assert.NotNil(t, pool)
+}
+
+func TestLoadCACert_EmptyInputsError(t *testing.T) {
+	pool, err := LoadCACert("", "")
+	assert.EqualError(t, err, "no CA certificate source provided")
+	assert.Nil(t, pool)
 }
 
 func generateCertKeyPair(t *testing.T, commonName string) (certPEM, keyPEM []byte) {
