@@ -35,10 +35,10 @@ export const setAuthUser = (user: User) => {
     email,
     picture,
     // Use server-side claims if available, otherwise use frontend claims
-    temporal_namespaces: TemporalNamespaces || temporal_namespaces,
-    temporal_permissions: TemporalPermissions || temporal_permissions,
+    temporal_namespaces: TemporalNamespaces ?? temporal_namespaces,
+    temporal_permissions: TemporalPermissions ?? temporal_permissions,
     temporal_workflow_actions:
-      TemporalWorkflowActions || temporal_workflow_actions,
+      TemporalWorkflowActions ?? temporal_workflow_actions ?? '',
   });
 };
 

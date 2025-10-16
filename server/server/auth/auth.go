@@ -64,6 +64,11 @@ func SetUser(c echo.Context, user *User) error {
 		userR.TemporalPermissions = user.IDToken.Claims.TemporalPermissions
 		userR.TemporalWorkflowActions = user.IDToken.Claims.TemporalWorkflowActions
 		
+		// If temporal_workflow_actions is missing, default to empty string (no actions allowed)
+		if userR.TemporalWorkflowActions == "" {
+			userR.TemporalWorkflowActions = ""
+		}
+		
 	}
 
 	b, err := json.Marshal(userR)

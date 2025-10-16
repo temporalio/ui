@@ -13,10 +13,15 @@ export const workflowTerminateEnabled = (
 ): boolean => {
   const user = get(authUser);
 
+  const canTerminate = canPerformWorkflowAction(
+    user,
+    WORKFLOW_ACTIONS.TERMINATE,
+  );
+
   return (
     !settings.disableWriteActions &&
     !settings.workflowTerminateDisabled &&
     !coreUser.namespaceWriteDisabled(namespace) &&
-    canPerformWorkflowAction(user, WORKFLOW_ACTIONS.TERMINATE)
+    canTerminate
   );
 };

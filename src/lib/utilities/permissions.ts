@@ -28,7 +28,10 @@ export function canPerformWorkflowAction(
 
   const actions =
     user.temporal_workflow_actions || user.TemporalWorkflowActions;
-  if (!actions) return false;
+
+  // If actions is undefined, null, empty string, or "none", deny all actions
+  if (!actions || actions === '' || actions.toLowerCase() === 'none')
+    return false;
 
   // If actions is "*", user can perform all actions
   if (actions === '*') return true;
