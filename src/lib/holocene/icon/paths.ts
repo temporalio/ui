@@ -11,7 +11,6 @@ import ascending from './svg/ascending.svelte';
 import astronaut from './svg/astronaut.svelte';
 import batchOperation from './svg/batch-operation.svelte';
 import book from './svg/book-sparkles.svelte';
-// import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import calendar from './svg/calendar.svelte';
@@ -59,10 +58,12 @@ import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
 import fireExtinguisher from './svg/fire-extinguisher.svelte';
 import flag from './svg/flag.svelte';
+import folders from './svg/folders.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import heartbeat from './svg/heartbeat.svelte';
 import hyphen from './svg/hyphen.svelte';
+import identities from './svg/identities.svelte';
 import importIcon from './svg/import.svelte';
 import inactive from './svg/inactive.svelte';
 import info from './svg/info.svelte';
@@ -83,6 +84,7 @@ import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import nexus from './svg/nexus.svelte';
 import officeBuildings from './svg/office-buildings.svelte';
+import overview from './svg/overview.svelte';
 import pause from './svg/pause.svelte';
 import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
@@ -192,10 +194,12 @@ export const icons = {
   'filter-lines': filterLines,
   'filter-solid': filterSolid,
   'fire-extinguisher': fireExtinguisher,
+  folders,
   github,
   graph,
   heartbeat,
   hyphen,
+  identities,
   inactive,
   import: importIcon,
   info,
@@ -216,6 +220,7 @@ export const icons = {
   namespace,
   nexus,
   'office-buildings': officeBuildings,
+  overview,
   play,
   pause,
   pencil,
