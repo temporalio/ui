@@ -32,6 +32,8 @@ auth:
       issuerUrl: "" # needed if the Issuer Url and the Provider Url are different
       clientId: xxxxxxxxxxxxxxxxxxxx
       clientSecret: xxxxxxxxxxxxxxxxxxxx
+      caFile:
+      caData:
       scopes:
         - openid
         - profile

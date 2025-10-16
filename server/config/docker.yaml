@@ -59,6 +59,8 @@ auth:
     clientSecret: {{ env "TEMPORAL_AUTH_CLIENT_SECRET" }}
     callbackUrl: {{ env "TEMPORAL_AUTH_CALLBACK_URL" }}
     useIdTokenAsBearer: {{ env "TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER" | default "false" }}
+    caFile: {{ env "TEMPORAL_AUTH_CA" | default "" }}
+    caData: {{ env "TEMPORAL_AUTH_CA_DATA" | default "" }}
     scopes:
     {{- if env "TEMPORAL_AUTH_SCOPES" }}
     {{- range env "TEMPORAL_AUTH_SCOPES" | split "," }}
