@@ -3,7 +3,6 @@
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import { translate } from '$lib/i18n/translate';
   import { fetchSchedule } from '$lib/services/schedule-service';
   import { submitEditSchedule } from '$lib/stores/schedules';
   import type {
@@ -85,7 +84,7 @@
 </script>
 
 {#await scheduleFetch}
-  <Loading title={translate('schedules.loading')} />
+  <Loading />
 {:then { schedule, searchAttributes }}
   <ScheduleFormView onConfirm={handleEdit} {schedule} {searchAttributes} />
 {/await}
