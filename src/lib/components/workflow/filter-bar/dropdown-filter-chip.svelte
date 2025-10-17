@@ -449,10 +449,8 @@
             <Input
               id={`${controlsId}-number`}
               label="Value"
-              type="number"
               placeholder="Enter number..."
               disabled={isNullFilter}
-              step="any"
               bind:value={localFilter.value}
             />
           </div>
