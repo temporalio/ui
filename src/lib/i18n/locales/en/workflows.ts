@@ -313,4 +313,5 @@ export const Strings = {
   'workflow-start-delay': 'Workflow Start Delay',
   delayed: 'Delayed',
   'execution-start': 'Execution Start',
+  'workflow-timeout': 'Workflow Timeout',
 } as const;
