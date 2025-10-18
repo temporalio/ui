@@ -9,17 +9,27 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { authUser } from '$lib/stores/auth-user';
   import { namespaces } from '$lib/stores/namespaces';
+  import { filterNamespacesByUserPermissions } from '$lib/utilities/namespace-filter';
   import { routeForNamespace } from '$lib/utilities/route-for';
+
+  // Apply user permission filtering to namespaces
+  let filteredNamespaces = $derived(
+    filterNamespacesByUserPermissions(
+      $namespaces,
+      $authUser?.temporal_namespaces,
+    ),
+  );
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
 <h1 data-testid="namespace-selector-title" class="mb-8">
   {translate('common.namespaces')}
 </h1>
-{#if $namespaces?.length > 0}
+{#if filteredNamespaces?.length > 0}
   <Pagination
-    items={$namespaces}
+    items={filteredNamespaces}
     let:visibleItems
     aria-label={translate('common.namespaces')}
     pageSizeSelectLabel={translate('common.per-page')}

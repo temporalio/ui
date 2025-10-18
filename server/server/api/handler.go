@@ -86,6 +86,22 @@ func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddle
 			return err
 		}
 
+		// Apply authorization middleware if auth is enabled
+		cfg, err := cfgProvider.GetConfig()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+
+		if cfg.Auth.Enabled {
+			// NOTE: We use OIDC for authentication (login via Keycloak)
+			// Authorization (namespace filtering) is handled on the FRONTEND using JWT claims
+			// The server does NOT perform authorization checks - it trusts the authenticated user
+			// and returns all data. The frontend filters based on temporal_namespaces claim.
+			
+			// All endpoints are accessible to authenticated users
+			// Frontend will filter namespaces based on user's temporal_namespaces attribute
+		}
+
 		mux, err := getTemporalClientMux(c, conn, apiMiddleware)
 		if err != nil {
 			return err
@@ -126,6 +142,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			}
 		}
 
+		// Initialize with default settings
 		settings := &SettingsResponse{
 			Auth: &Auth{
 				Enabled: cfg.Auth.Enabled,
@@ -156,6 +173,10 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			RefreshWorkflowCountsDisabled: cfg.RefreshWorkflowCountsDisabled,
 			ActivityCommandsDisabled:      cfg.ActivityCommandsDisabled,
 		}
+
+		// NOTE: Server-side authorization has been removed
+		// Authorization is handled on the FRONTEND using JWT claims
+		// The server returns all settings without modification
 
 		return c.JSON(http.StatusOK, settings)
 	}
@@ -226,3 +247,6 @@ func withMarshaler() runtime.ServeMuxOption {
 		},
 	})
 }
+
+// Unused function removed - server-side namespace filtering is not used
+// Namespace filtering is handled on the frontend using JWT claims

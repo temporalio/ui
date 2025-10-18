@@ -44,6 +44,10 @@ type UserResponse struct {
 	Name        string
 	Email       string
 	Picture     string
+	// Temporal-specific claims
+	TemporalNamespaces      string
+	TemporalPermissions     string
+	TemporalWorkflowActions string
 }
 
 type IDToken struct {
@@ -56,6 +60,10 @@ type Claims struct {
 	EmailVerified bool   `json:"email_verified"`
 	Name          string `json:"name"`
 	Picture       string `json:"picture"`
+	// Temporal-specific claims (using underscores as they appear in JWT)
+	TemporalNamespaces      string `json:"temporal_namespaces"`
+	TemporalPermissions     string `json:"temporal_permissions"`
+	TemporalWorkflowActions string `json:"temporal_workflow_actions"`
 }
 
 func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, provider *oidc.Provider) (*User, error) {

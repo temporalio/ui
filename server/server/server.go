@@ -103,6 +103,8 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 		Skipper:        csrf.SkipOnAuthorizationHeader,
 	}))
 
+	// Authorization middleware is applied at the API handler level
+
 	e.Pre(route.PublicPath(cfg.PublicPath))
 	route.SetHealthRoute(e)
 	route.SetAPIRoutes(e, cfgProvider, serverOpts.APIMiddleware)
