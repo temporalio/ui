@@ -67,6 +67,8 @@ export const Strings = {
   'remaining-actions': 'Remaining Actions',
   'overlap-policy': 'Overlap Policy',
   'catchup-window': 'Catchup Window',
+  'pause-on-failure': 'Pause on Failure',
+  'keep-original-workflow-id': 'Keep Original Workflow ID',
   'recurring-dates-heading': 'Recurring date(s)',
   'recurring-dates-description':
     'Select the specific dates for the schedule to always run on.',

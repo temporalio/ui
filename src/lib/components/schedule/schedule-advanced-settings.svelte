@@ -51,6 +51,18 @@
           : translate('common.none')}
       </span>
     </li>
+    {#if policies?.pauseOnFailure}
+      <li>
+        {translate('schedules.pause-on-failure')}
+        <span>{translate('common.enabled')}</span>
+      </li>
+    {/if}
+    {#if policies?.keepOriginalWorkflowId}
+      <li>
+        {translate('schedules.keep-original-workflow-id')}
+        <span>{translate('common.enabled')}</span>
+      </li>
+    {/if}
   </ul>
 </Accordion>
 
