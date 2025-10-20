@@ -42,9 +42,7 @@
       ? $fullEventHistory[0]?.eventTime
       : workflow.executionTime;
   $: startTime =
-    (!isWorkflowDelayed(workflow) && firstStartTime) ||
-    $fullEventHistory[0]?.eventTime ||
-    workflow.startTime;
+    (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime;
   $: timelineHeight =
     Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight;
   $: canvasHeight = timelineHeight + 120;
