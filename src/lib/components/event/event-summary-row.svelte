@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -25,6 +26,7 @@
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { toaster } from '$lib/stores/toaster';
   import { workflowComparison } from '$lib/stores/workflow-comparison';
+  import { refresh } from '$lib/stores/workflow-run';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
@@ -74,6 +76,7 @@
 
   let expanded = $state(expandedProp);
   let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
+  let resetConfirmationModalOpen = $state(false);
 
   const selectedId = $derived(
     isEventGroup(event) ? Array.from(event.events.keys()).shift() : event.id,
@@ -193,7 +196,7 @@
 
   let isResetting = $state(false);
 
-  const handleReset = async (e: MouseEvent) => {
+  const _handleReset = async (e: MouseEvent) => {
     e.stopPropagation();
 
     const eventId = workflowTaskCompletedEventId();
@@ -458,7 +461,7 @@
             variant="ghost"
             size="xs"
             disabled={isResetting}
-            on:click={handleReset}
+            on:click={() => (resetConfirmationModalOpen = true)}
           >
             <Icon name="retry" />
           </Button>
@@ -474,6 +477,13 @@
     </td>
   </tr>
 {/if}
+
+<ResetConfirmationModal
+  {refresh}
+  workflow={$workflowRun?.workflow}
+  {namespace}
+  bind:open={resetConfirmationModalOpen}
+/>
 
 <style lang="postcss">
   tr[data-testid='event-summary-row'].active {

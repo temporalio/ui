@@ -105,6 +105,10 @@ export const Strings = {
     'Exclude Signals that happened after the Reset point.',
   'reset-exclude-updates':
     'Exclude Updates that happened after the Reset point.',
+
+  'reset-override-behavior-label': 'Override Behavior',
+  'reset-deployment-name-label': 'Deployment Name',
+  'reset-build-id-label': 'Build ID',
   'cancel-modal-title': 'Cancel Workflow',
   'cancel-modal-confirmation':
     'Are you sure you want to cancel this workflow? This action cannot be undone.',

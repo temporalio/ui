@@ -210,6 +210,7 @@ export const validResetEventTypes = [
   'WorkflowTaskCompleted',
   'WorkflowTaskFailed',
   'WorkflowTaskTimedOut',
+  'WorkflowTaskStarted',
 ];
 
 export const findAttributeKey = (event: HistoryEvent): EventAttributeKey => {
