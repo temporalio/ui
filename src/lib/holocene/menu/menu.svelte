@@ -46,7 +46,7 @@
 <ul
   role="menu"
   class={merge(
-    'menu',
+    'menu w-full',
     'transition-all duration-100 ease-out',
     !$open && 'invisible scale-95 opacity-0',
     $open && 'visible scale-100 opacity-100',

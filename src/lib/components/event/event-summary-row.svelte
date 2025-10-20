@@ -20,9 +20,9 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
-  import { resetWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { authUser } from '$lib/stores/auth-user';
+  import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { toaster } from '$lib/stores/toaster';
   import { workflowComparison } from '$lib/stores/workflow-comparison';
@@ -40,9 +40,9 @@
     getSecondaryAttributeForEvent,
   } from '$lib/utilities/get-single-attribute-for-event';
   import {
-    isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
+    isWorkflowTaskStartedEvent,
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
@@ -181,48 +181,36 @@
     }),
   );
 
-  const isActivity = $derived(
-    isEventGroup(event) && event.category === 'activity',
-  );
-
-  const workflowTaskCompletedEventId = $derived(() => {
-    if (!isActivity || !isEventGroup(event)) return null;
-    const scheduledEvent = event.eventList.find(isActivityTaskScheduledEvent);
-    return (
-      scheduledEvent?.activityTaskScheduledEventAttributes
-        ?.workflowTaskCompletedEventId ?? null
+  const workflowTaskStartedEventId = $derived.by(() => {
+    if (!isEventGroup(event) && isWorkflowTaskStartedEvent(event))
+      return event.id;
+    if (!isEventGroup(event)) return null;
+    const completedEventId = event.eventList.find(
+      (event) => event.attributes.workflowTaskCompletedEventId,
+    )?.attributes?.workflowTaskCompletedEventId;
+    if (!completedEventId) return null;
+    const workflowTaskCompletedEvent = $fullEventHistory.find(
+      (e) => e.id === completedEventId,
     );
+    if (!workflowTaskCompletedEvent) return null;
+    return workflowTaskCompletedEvent.attributes.startedEventId;
   });
 
-  let isResetting = $state(false);
-
-  const _handleReset = async (e: MouseEvent) => {
-    e.stopPropagation();
-
-    const eventId = workflowTaskCompletedEventId();
-    if (!eventId) return;
-
-    isResetting = true;
+  const onResetCompletion = async ({ runId }: { runId: string }) => {
     try {
-      const result = await resetWorkflow({
-        namespace,
-        workflow: $workflowRun?.workflow,
-        eventId,
-        reason: `Resetting from activity ${event.id}`,
-        includeSignals: false,
-        excludeSignals: false,
-        excludeUpdates: false,
-      });
-
       if (!$workflowComparison.isComparing) {
         workflowComparison.startComparison(workflow, run);
       }
 
-      workflowComparison.addComparison(workflow, result.runId, eventId);
+      workflowComparison.addComparison(
+        workflow,
+        runId,
+        workflowTaskStartedEventId,
+      );
 
       const currentUrl = new URL(window.location.href);
       const compareParams = currentUrl.searchParams.getAll('compare');
-      compareParams.push(result.runId);
+      compareParams.push(runId);
       currentUrl.searchParams.delete('compare');
       compareParams.forEach((id) =>
         currentUrl.searchParams.append('compare', id),
@@ -239,8 +227,6 @@
         variant: 'error',
         message: error?.message || 'Failed to reset workflow',
       });
-    } finally {
-      isResetting = false;
     }
   };
 
@@ -453,14 +439,13 @@
       </div>
     </td>
   {/if}
-  {#if compact && isActivity && workflowTaskCompletedEventId()}
+  {#if workflowTaskStartedEventId}
     <td onclick={(e) => e.stopPropagation()}>
       <div class="flex justify-center">
         <Tooltip text="Reset to this point" left>
           <Button
             variant="ghost"
             size="xs"
-            disabled={isResetting}
             on:click={() => (resetConfirmationModalOpen = true)}
           >
             <Icon name="retry" />
@@ -468,6 +453,8 @@
         </Tooltip>
       </div>
     </td>
+  {:else}
+    <td></td>
   {/if}
 </tr>
 {#if expanded}
@@ -482,6 +469,8 @@
   {refresh}
   workflow={$workflowRun?.workflow}
   {namespace}
+  presetEventId={workflowTaskStartedEventId || ''}
+  {onResetCompletion}
   bind:open={resetConfirmationModalOpen}
 />
 

@@ -62,7 +62,7 @@
       workflowId,
       runId,
       sort: 'ascending',
-      signal: workflowRunController.signal,
+      // signal: workflowRunController.signal,
       historySize: workflow.historyEvents,
     });
     const ascendingGroups = groupEvents(history, 'ascending', [], []);
@@ -73,11 +73,11 @@
     return [workflow, history, groups];
   };
 
-  // const abortPolling = () => {
-  //   if (workflowRunController) {
-  //     workflowRunController.abort();
-  //   }
-  // };
+  const _abortPolling = () => {
+    if (workflowRunController) {
+      workflowRunController.abort();
+    }
+  };
 </script>
 
 {#if currentExecution}
@@ -86,7 +86,7 @@
     ? [...ascendingGroups].reverse()
     : ascendingGroups}
   <div class="flex flex-col gap-0 px-4 pt-4 xl:px-8">
-    <div class="flex flex-col gap-2">
+    <div class="flex h-36 flex-col gap-2">
       <InputAndResults
         showTitle={false}
         workflow={$workflowRun.workflow}
@@ -112,7 +112,7 @@
 {:else}
   {#await getWorkflowAndEventHistory() then [workflow, history, groups]}
     <div class="flex flex-col gap-0 px-4 pt-4 xl:px-8">
-      <div class="flex flex-col gap-2">
+      <div class="flex h-36 flex-col gap-2">
         <InputAndResults showTitle={false} {workflow} {history} />
       </div>
     </div>

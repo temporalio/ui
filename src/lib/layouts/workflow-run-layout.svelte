@@ -215,9 +215,7 @@
     {:else if !$workflowRun.workflow}
       <SkeletonWorkflow />
     {:else}
-      <div class="px-4 pt-8 md:pt-20 xl:px-8">
-        <WorkflowHeader />
-      </div>
+      <WorkflowHeader />
       <slot />
     {/if}
   </div>

@@ -21,10 +21,16 @@
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let refresh: Writable<number>;
+  export let presetEventId: string = '';
+  export let onResetCompletion: ({
+    runId,
+  }: {
+    runId: string;
+  }) => void = () => {};
 
   let error = '';
   let loading = false;
-  let eventId: Writable<string> = writable('');
+  let eventId: Writable<string> = writable(presetEventId);
   let reason: string;
   let includeSignals = true;
   let excludeSignals = false;
@@ -61,6 +67,10 @@
         excludeUpdates,
         identity,
       });
+
+      if (onResetCompletion) {
+        onResetCompletion(response);
+      }
 
       if (response && response.runId) {
         resetWorkflows.update((previous) => ({
@@ -140,7 +150,7 @@
         id="reset-pinned-override-behavior-checkbox"
         data-testid="reset-pinned-override-behavior-checkbox"
         bind:checked={workflowUpdateOptions}
-        label="Update Options"
+        label="Update Workflow Options"
       />
 
       {#if workflowUpdateOptions}

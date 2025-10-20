@@ -12,6 +12,7 @@
   const originalWorkflow = $derived($workflowComparison.originalWorkflow);
   const comparisons = $derived($workflowComparison.comparisons);
 
+  $inspect('comparisons: ', comparisons);
   const handleExitComparison = () => {
     workflowComparison.exitComparison();
 
@@ -23,7 +24,7 @@
 
 <div class="comparison-container flex h-full flex-col">
   <div
-    class="bg-surface flex items-center justify-between border-b border-subtle p-4"
+    class="flex items-center justify-between border-b border-subtle bg-secondary px-4 py-2"
   >
     <div class="flex items-center gap-2">
       <h2 class="text-lg font-semibold">Comparison Mode</h2>
