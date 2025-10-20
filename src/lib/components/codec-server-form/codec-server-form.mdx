@@ -7,11 +7,11 @@ import CodecServerForm from './codec-server-form.stories.svelte';
 
 # CodecServerForm Component
 
-A reusable form component for managing codec server configuration with SuperForms and reactive adapters.
+A reusable form component for managing codec server configuration with SuperForms validation.
 
 ## Features
 
-- **Reactive Adapter Pattern**: Self-contained adapters that integrate with existing settings API
+- **Promise-Based Loading**: Async data loading with built-in error handling
 - **SuperForms Integration**: Built-in validation with Zod schema and dirty state tracking
 - **Smart Visibility**: Custom section automatically shows when values are populated
 - **Toggle Switches**: Modern UI controls for boolean settings
@@ -21,21 +21,23 @@ A reusable form component for managing codec server configuration with SuperForm
 
 ## Architecture
 
-The component uses a two-part architecture:
+The component uses two main parts:
 
 1. **Parent Component**: Handles async data loading with `#await` pattern
-2. **Child Component**: Renders the form with SuperForms configuration
+2. **Content Component**: Renders the form with SuperForms configuration
 
-## Adapter Pattern
+## Props Interface
 
-The component uses a reactive adapter pattern for flexible data integration:
+The component accepts the following props:
 
 ```typescript
-interface CodecServerAdapter {
-  fetchCodecServer(): Promise<CodecServerFormData>;
-  saveCodecServer(data: CodecServerFormData): Promise<void>;
-  onSuccess?: (data: CodecServerFormData) => Promise<void>;
+interface Props {
+  class?: string;
+  initialDataPromise: Promise<CodecServerFormData>;
+  onSave: (data: CodecServerFormData) => Promise<void>;
+  onSuccess?: (data: CodecServerFormData) => void;
   onCancel?: () => void;
+  onRetry?: () => void;
 }
 ```
 
@@ -53,62 +55,93 @@ interface CodecServerFormData {
 
 ## Usage Examples
 
-### Basic Usage with Codec Adapter
+### Basic Usage
 
 ```svelte
 <script lang="ts">
-  import { createCodecAdapter } from '$lib/components/codec-server-form/codec-adapter.svelte';
   import CodecServerForm from '$lib/components/codec-server-form/codec-server-form.svelte';
+  import type { CodecServerFormData } from '$lib/components/codec-server-form/types';
 
-  // OSS adapter operates at cluster level
-  const adapter = createCodecAdapter();
-</script>
-
-<CodecServerForm {adapter} />
-```
-
-### Custom Adapter Implementation
-
-```typescript
-// custom-codec-adapter.svelte.ts
-import type { CodecServerAdapter, CodecServerFormData } from './types';
-
-export const customCodecAdapter: CodecServerAdapter = {
-  async fetchCodecServer(): Promise<CodecServerFormData> {
+  async function fetchCodecServerConfig(): Promise<CodecServerFormData> {
     const response = await fetch('/api/v1/codec-server');
     return await response.json();
-  },
+  }
 
-  async saveCodecServer(data: CodecServerFormData): Promise<void> {
+  async function handleSave(data: CodecServerFormData): Promise<void> {
     await fetch('/api/v1/codec-server', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-  },
+  }
 
-  onSuccess: (data) => {
+  function handleSuccess(data: CodecServerFormData) {
     console.log('Codec server updated:', data);
-    // Trigger settings refresh, redirect, etc.
-  },
+    // Show toast, redirect, etc.
+  }
 
-  onCancel: () => {
-    // Handle cancel action
-    history.back();
-  },
-};
+  function handleCancel() {
+    console.log('Form cancelled');
+    // Navigate back, reset state, etc.
+  }
+
+  const initialDataPromise = fetchCodecServerConfig();
+</script>
+
+<CodecServerForm
+  {initialDataPromise}
+  onSave={handleSave}
+  onSuccess={handleSuccess}
+  onCancel={handleCancel}
+/>
 ```
 
 ### Integration with SvelteKit
 
 ```svelte
-<!-- src/routes/cluster/codec-server/+page.svelte -->
+<!-- src/routes/namespaces/[namespace]/codec-server/+page.svelte -->
 <script lang="ts">
-  import { createCodecAdapter } from '$lib/components/codec-server-form/codec-adapter.svelte';
+  import { page } from '$app/state';
   import CodecServerForm from '$lib/components/codec-server-form/codec-server-form.svelte';
+  import type { CodecServerFormData } from '$lib/components/codec-server-form/types';
 
-  // Cluster-level configuration for OSS
-  const adapter = createCodecAdapter();
+  const namespace = $derived(page.params.namespace);
+
+  async function fetchCodecServerConfig(): Promise<CodecServerFormData> {
+    // TODO: Replace with actual service call when available
+    // For now, return default values
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return {
+      endpoint: '',
+      passUserAccessToken: false,
+      includeCrossOriginCredentials: false,
+      customMessage: '',
+      customLink: '',
+    };
+  }
+
+  async function handleSave(data: CodecServerFormData): Promise<void> {
+    // TODO: Implement when codec server update endpoint is available
+    console.log('Saving codec server config:', data);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  function handleSuccess(data: CodecServerFormData) {
+    console.log('Codec server configuration saved successfully');
+    // Add any other success handling here (toasts, navigation, etc.)
+  }
+
+  function handleCancel() {
+    console.log('Codec server form cancelled');
+    // Add any cancel handling here (navigation, confirmation, etc.)
+  }
+
+  function handleRetry() {
+    console.log('Retrying load');
+    // Refresh the promise or reload the page
+  }
+
+  const initialDataPromise = fetchCodecServerConfig();
 </script>
 
 <svelte:head>
@@ -119,12 +152,17 @@ export const customCodecAdapter: CodecServerAdapter = {
   <div>
     <h1 class="text-2xl font-bold">Codec Server Configuration</h1>
     <p class="text-gray-600 mt-2">
-      Configure cluster-level codec server endpoint to decode payloads for all
-      users.
+      Configure codec server endpoint to decode payloads for this namespace.
     </p>
   </div>
 
-  <CodecServerForm {adapter} />
+  <CodecServerForm
+    {initialDataPromise}
+    onSave={handleSave}
+    onSuccess={handleSuccess}
+    onCancel={handleCancel}
+    onRetry={handleRetry}
+  />
 </div>
 ```
 
@@ -132,10 +170,14 @@ export const customCodecAdapter: CodecServerAdapter = {
 
 <Markdown>
   {`
-| Prop    | Type                | Default  | Description                         |
-| ------- | ------------------- | -------- | ----------------------------------- |
-| adapter | CodecServerAdapter  | Required | Adapter instance for API operations |
-| class   | string              | ''       | Additional CSS classes              |
+| Prop               | Type                                          | Default    | Description                             |
+| ------------------ | --------------------------------------------- | ---------- | --------------------------------------- |
+| initialDataPromise | Promise<CodecServerFormData>                 | Required   | Promise that resolves to initial data  |
+| onSave             | (data: CodecServerFormData) => Promise<void> | Required   | Save handler function                  |
+| onSuccess          | (data: CodecServerFormData) => void          | () => {}   | Success callback after save            |
+| onCancel           | () => void                                   | () => {}   | Cancel callback                        |
+| onRetry            | () => void                                   | undefined  | Retry callback for error state         |
+| class              | string                                        | ''         | Additional CSS classes                 |
   `}
 </Markdown>
 
@@ -159,9 +201,9 @@ export const customCodecAdapter: CodecServerAdapter = {
 
 The component automatically handles three states:
 
-- **Loading**: Shows skeleton loaders while fetching initial data
+- **Loading**: Shows skeleton loaders while the promise resolves
 - **Success**: Renders the form with loaded configuration
-- **Error**: Shows detailed error messages with retry functionality
+- **Error**: Shows error messages with retry functionality
 
 ## Validation
 
@@ -178,19 +220,20 @@ Form validation is handled by Zod schema with the following rules:
 The component provides comprehensive error handling:
 
 - **Form State Management**: Prevents form from getting stuck in "Saving..." state
-- **SuperForms Integration**: Proper error handling with `onUpdate` callbacks
+- **SuperForms Integration**: Proper error handling with `onUpdate` callback
 - **Field-Level Validation**: Real-time feedback for URL validation
 - **API Error Display**: Status messages with proper intent styling
-- **Dirty State Tracking**: Shows count badge on Save button when form has unsaved changes
+- **Dirty State Tracking**: Shows when form has unsaved changes
 - **Form Reset**: Cancel button properly resets form to initial state
 
 ## Dirty State Management
 
-The form automatically tracks unsaved changes using SuperForms `isTainted` state:
+The form automatically tracks unsaved changes using SuperForms `isTainted` function:
 
-- **Visual Indicator**: Save button shows a count badge with number of modified fields
+- **Visual Indicator**: Save button shows a badge when there are unsaved changes
 - **Real-time Updates**: Badge updates immediately as user makes changes
 - **Form Reset**: Cancel button clears dirty state and resets to initial values
+- **Save Button State**: Disabled when no changes or while submitting
 
 ## Custom Section Behavior
 
@@ -211,20 +254,11 @@ The expandable custom section has intelligent visibility:
 - Focus management for form interactions
 - Semantic HTML structure with proper form labeling
 
-## API Integration
+## Key Benefits
 
-The component is designed to work with the existing Temporal settings API:
-
-### Current API Structure (Read-only)
-
-```
-GET /api/v1/settings
-```
-
-### Expected Update API (Future)
-
-```
-PUT /api/v1/settings/codec
-```
-
-The codec adapter handles the transformation between the form data structure and the API format, ensuring compatibility with both current and future endpoints.
+1. **Flexibility**: Each handler can be customized independently
+2. **Testability**: Individual functions are easier to test in isolation
+3. **Composability**: Functions can be shared across different components
+4. **Type Safety**: Direct function signatures provide better TypeScript inference
+5. **Simplicity**: Clean API with direct function props
+6. **Tree Shaking**: Better optimization as unused functions can be eliminated
