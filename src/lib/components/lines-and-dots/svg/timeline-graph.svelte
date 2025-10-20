@@ -37,8 +37,12 @@
 
   $: expandedGroupHeight = readOnly ? 0 : $activeGroupHeight;
   $: filteredGroups = getFailedOrPendingGroups(groups, $eventStatusFilter);
+  $: firstStartTime =
+    $fullEventHistory[0]?.eventTime < workflow.executionTime
+      ? $fullEventHistory[0]?.eventTime
+      : workflow.executionTime;
   $: startTime =
-    (!isWorkflowDelayed(workflow) && workflow.executionTime) ||
+    (!isWorkflowDelayed(workflow) && firstStartTime) ||
     $fullEventHistory[0]?.eventTime ||
     workflow.startTime;
   $: timelineHeight =
