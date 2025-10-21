@@ -37,10 +37,12 @@
 
   $: expandedGroupHeight = readOnly ? 0 : $activeGroupHeight;
   $: filteredGroups = getFailedOrPendingGroups(groups, $eventStatusFilter);
+  $: firstStartTime =
+    $fullEventHistory[0]?.eventTime < workflow.executionTime
+      ? $fullEventHistory[0]?.eventTime
+      : workflow.executionTime;
   $: startTime =
-    (!isWorkflowDelayed(workflow) && workflow.executionTime) ||
-    $fullEventHistory[0]?.eventTime ||
-    workflow.startTime;
+    (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime;
   $: timelineHeight =
     Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight;
   $: canvasHeight = timelineHeight + 120;
