@@ -97,7 +97,7 @@
       obj[`section_${i}`] = {
         id: i,
         name: `Section ${i}`,
-        items: Array.from({ length: 1000 }, (_, j) => ({
+        items: Array.from({ length: 100 }, (_, j) => ({
           index: j,
           flags: { a: true, b: false, c: null },
           values: Array.from({ length: 6 }, (_, k) => ({
