@@ -91,28 +91,26 @@
   };
 
   // Generate a large JSON document to validate folding behavior
-  const createLargeJson = (sections = 250) => {
+  const createLargeJson = () => {
     const obj: Record<string, unknown> = {};
-    for (let i = 0; i < sections; i++) {
-      obj[`section_${i}`] = {
-        id: i,
-        name: `Section ${i}`,
-        items: Array.from({ length: 100 }, (_, j) => ({
-          index: j,
-          flags: { a: true, b: false, c: null },
-          values: Array.from({ length: 6 }, (_, k) => ({
-            k,
-            v: `value-${i}-${j}-${k}`,
-          })),
-          nested: { foo: { bar: { baz: j, list: [1, 2, 3, 4, 5] } } },
+    obj['section'] = {
+      id: 1,
+      name: 'Section',
+      items: Array.from({ length: 200 }, (_, j) => ({
+        index: j,
+        flags: { a: true, b: false, c: null },
+        values: Array.from({ length: 6 }, (_, k) => ({
+          k,
+          v: `value-${j}-${k}`,
         })),
-        meta: {
-          createdAt: new Date(0).toISOString(),
-          tags: ['alpha', 'beta', 'gamma', 'delta'],
-          notes: `This is a generated payload for folding test #${i}`,
-        },
-      };
-    }
+        nested: { foo: { bar: { baz: j, list: [1, 2, 3, 4, 5] } } },
+      })),
+      meta: {
+        createdAt: new Date(0).toISOString(),
+        tags: ['alpha', 'beta', 'gamma', 'delta'],
+        notes: 'This is a generated payload for folding test',
+      },
+    };
     return stringifyWithBigInt(obj, null, 2);
   };
 
