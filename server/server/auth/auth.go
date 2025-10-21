@@ -43,13 +43,13 @@ const (
 )
 
 func SetUser(c echo.Context, user *User) error {
-	if user.OAuth2Token == nil {
-		return errors.New("no OAuth2Token")
-	}
+    if user.OAuth2Token == nil {
+        return errors.New("no OAuth2Token")
+    }
 
-	userR := UserResponse{
-		AccessToken: user.OAuth2Token.AccessToken,
-	}
+    userR := UserResponse{
+        AccessToken: user.OAuth2Token.AccessToken,
+    }
 
 	if user.IDToken != nil {
 		userR.IDToken = user.IDToken.RawToken
@@ -67,22 +67,35 @@ func SetUser(c echo.Context, user *User) error {
 	}
 
 	s := base64.StdEncoding.EncodeToString(b)
-	parts := splitCookie(s)
+    parts := splitCookie(s)
 
-	for i, p := range parts {
-		cookie := &http.Cookie{
-			Name:     "user" + strconv.Itoa(i),
-			Value:    p,
-			MaxAge:   int(time.Minute.Seconds()),
-			Secure:   c.Request().TLS != nil,
-			HttpOnly: false,
-			Path:     "/",
-			SameSite: http.SameSiteStrictMode,
-		}
-		c.SetCookie(cookie)
-	}
+    for i, p := range parts {
+        cookie := &http.Cookie{
+            Name:     "user" + strconv.Itoa(i),
+            Value:    p,
+            MaxAge:   int(time.Minute.Seconds()),
+            Secure:   c.Request().TLS != nil,
+            HttpOnly: false,
+            Path:     "/",
+            SameSite: http.SameSiteStrictMode,
+        }
+        c.SetCookie(cookie)
+    }
 
-	return nil
+    if rt := user.OAuth2Token.RefreshToken; rt != "" {
+        refreshCookie := &http.Cookie{
+            Name:     "refresh",
+            Value:    rt,
+            MaxAge:   int((30 * 24 * time.Hour).Seconds()),
+            Secure:   c.Request().TLS != nil,
+            HttpOnly: true,
+            Path:     "/",
+            SameSite: http.SameSiteStrictMode,
+        }
+        c.SetCookie(refreshCookie)
+    }
+
+    return nil
 }
 
 // ValidateAuthHeaderExists validates that the autorization header exists if auth is enabled.
