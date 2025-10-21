@@ -34,7 +34,6 @@ export const handleError = (
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    // Prefer seamless SSO redirect over manual login
     window.location.assign(routeForSsoRedirect());
   }
 

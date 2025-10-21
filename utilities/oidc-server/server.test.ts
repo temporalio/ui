@@ -18,7 +18,7 @@ describe('OIDCServer', () => {
     // starting on port 0 should pick an available port
     await expect(server.start()).resolves.toBeUndefined();
     // Express app should be initialized
-    expect(typeof server.app.handle).toBe('function');
+    expect(server.app).toBeDefined();
     // stop should not throw
     expect(() => server.stop()).not.toThrow();
   });

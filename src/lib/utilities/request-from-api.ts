@@ -120,6 +120,7 @@ export const requestFromAPI = async <T>(
         status = response.status;
         statusText = response.statusText;
       }
+      // If refresh failed, let the error flow to handleError() which will redirect to login
     }
 
     const body = await response.json();

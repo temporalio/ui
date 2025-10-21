@@ -34,6 +34,7 @@ auth:
         - openid
         - profile
         - email
+        - offline_access
       callbackUrl: http://localhost:8081/auth/sso/callback
       options: # added as URL query params when redirecting to auth provider
         audience: myorg-dev
