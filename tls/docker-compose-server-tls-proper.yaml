@@ -1,0 +1,89 @@
+services:
+  # PostgreSQL for Temporal (no SSL)
+  postgresql:
+    container_name: temporal-postgresql
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+      POSTGRES_DB: temporal
+    ports:
+      - "5432:5432"
+    volumes:
+      - temporal-postgres:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    # Disable SSL for PostgreSQL
+    command: postgres -c ssl=off -c max_connections=200
+    networks:
+      - temporal-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Temporal Server with TLS using proper config structure
+  temporal:
+    container_name: temporal-server
+    image: temporalio/server:1.24.2
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      # Database configuration
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      - SQL_TLS_ENABLED=false
+      - SQL_TLS=false
+
+      # Disable Elasticsearch
+      - ENABLE_ES=false
+
+      # Set environment for config loading
+      - TEMPORAL_ENVIRONMENT=docker
+      # Use minimal config
+      # - TEMPORAL_CONFIG_FILE_PATH=/etc/temporal/config/docker-minimal.yaml
+    ports:
+      - "7233:7233" # gRPC with TLS
+    volumes:
+      - ./certs:/etc/temporal/certs:ro
+      - ./config/config-template.yaml:/etc/temporal/config/config_template.yaml:ro
+    networks:
+      - temporal-network
+    restart: on-failure
+
+  # Temporal UI (connects to Temporal with TLS)
+  temporal-ui:
+    container_name: temporal-ui
+    image: temporalio/ui:2.31.2
+    environment:
+      # Temporal server address
+      - TEMPORAL_ADDRESS=temporal:7233
+
+      # TLS Configuration for connecting to Temporal server
+      - TEMPORAL_TLS_CERT=/etc/temporal/certs/client.crt
+      - TEMPORAL_TLS_KEY=/etc/temporal/certs/client.key
+      - TEMPORAL_TLS_CA=/etc/temporal/certs/ca.crt
+      - TEMPORAL_TLS_ENABLE_HOST_VERIFICATION=false
+      - TEMPORAL_TLS_SERVER_NAME=temporal-server
+
+      # CORS
+      - TEMPORAL_CORS_ORIGINS=http://localhost:8999
+    ports:
+      - "8999:8080"
+    volumes:
+      - ./certs:/etc/temporal/certs:ro
+    networks:
+      - temporal-network
+    restart: on-failure
+
+networks:
+  temporal-network:
+    driver: bridge
+
+volumes:
+  temporal-postgres:
+    driver: local
