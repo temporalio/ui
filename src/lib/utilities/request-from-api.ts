@@ -86,7 +86,6 @@ export const requestFromAPI = async <T>(
   const url = toURL(endpoint, query);
 
   try {
-    // First attempt
     options = withSecurityOptions(options, isBrowser);
     if (!endpoint.endsWith('api/v1/settings')) {
       options = await withAuth(options, isBrowser);
@@ -96,7 +95,7 @@ export const requestFromAPI = async <T>(
       (value) => value.length > MAX_QUERY_LENGTH,
     );
 
-    const doFetch = async () =>
+    const makeRequest = async () =>
       queryIsTooLong
         ? new Response(
             JSON.stringify({ message: 'Query string is too long' }),
@@ -107,19 +106,17 @@ export const requestFromAPI = async <T>(
           )
         : await request(url, options);
 
-    let response = await doFetch();
+    let response = await makeRequest();
     let { status, statusText } = response;
 
-    // On unauthorized/forbidden, try a one-time silent refresh then retry
     if (isBrowser && (status === 401 || status === 403)) {
       const refreshed = await refreshTokens();
       if (refreshed) {
-        // Rebuild auth headers and retry once
         options = withSecurityOptions(init.options, isBrowser);
         if (!endpoint.endsWith('api/v1/settings')) {
           options = await withAuth(options, isBrowser);
         }
-        response = await doFetch();
+        response = await makeRequest();
         status = response.status;
         statusText = response.statusText;
       }
