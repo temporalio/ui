@@ -75,10 +75,11 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 		Scopes:       providerCfg.Scopes,
 	}
 
-	api := e.Group("/auth")
-	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider)) // compatibility with UI v1
+    api := e.Group("/auth")
+    api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options))
+    api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider))
+    api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider)) // compatibility with UI v1
+    api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider))
 }
 
 func authenticate(config *oauth2.Config, options map[string]interface{}) func(echo.Context) error {
@@ -147,6 +148,51 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 
 		return c.Redirect(http.StatusSeeOther, returnUrl)
 	}
+}
+
+// refreshTokens exchanges a refresh token (stored in an HttpOnly cookie) for a new access token
+// and optionally a new ID token. It resets the cookies using auth.SetUser and returns 200.
+func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider) func(echo.Context) error {
+    return func(c echo.Context) error {
+        // Read refresh cookie
+        refreshCookie, err := c.Request().Cookie("refresh")
+        if err != nil || refreshCookie.Value == "" {
+            return echo.NewHTTPError(http.StatusUnauthorized, "missing refresh token")
+        }
+
+        // Use the refresh token to obtain a new token set
+        ts := oauthCfg.TokenSource(ctx, &oauth2.Token{RefreshToken: refreshCookie.Value})
+        newTok, err := ts.Token()
+        if err != nil {
+            return echo.NewHTTPError(http.StatusUnauthorized, "unable to refresh token: "+err.Error())
+        }
+
+        var user auth.User
+        user.OAuth2Token = newTok
+
+        // Try to capture a new ID token if provided and verify it
+        if raw, ok := newTok.Extra("id_token").(string); ok && raw != "" {
+            oidcConfig := &oidc.Config{ClientID: oauthCfg.ClientID}
+            verifier := provider.Verifier(oidcConfig)
+            idTok, verr := verifier.Verify(ctx, raw)
+            if verr == nil {
+                var claims auth.Claims
+                // If claims fail, we still proceed with tokens
+                _ = idTok.Claims(&claims)
+                user.IDToken = &auth.IDToken{RawToken: raw, Claims: &claims}
+            } else {
+                // If verification fails, do not include ID token
+                user.IDToken = nil
+            }
+        }
+
+        if err := auth.SetUser(c, &user); err != nil {
+            return echo.NewHTTPError(http.StatusInternalServerError, "unable to set refreshed user: "+err.Error())
+        }
+
+        // Respond OK. UI can read the short-lived 'user*' cookie to pick up tokens.
+        return c.NoContent(http.StatusOK)
+    }
 }
 
 func setCallbackCookie(c echo.Context, name, value string) {
