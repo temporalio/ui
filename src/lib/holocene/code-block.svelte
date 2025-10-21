@@ -5,6 +5,8 @@
   import { historyKeymap, standardKeymap } from '@codemirror/commands';
   import {
     bracketMatching,
+    codeFolding,
+    ensureSyntaxTree,
     foldGutter,
     indentOnInput,
     indentUnit,
@@ -125,6 +127,21 @@
     }
   };
 
+  // Ensure the entire document is parsed so folding works on large JSON blocks
+  const FULL_PARSE_THRESHOLD = 100_000; // chars
+  const ensureFullParse = () => {
+    if (!editorView) return;
+    if (language !== 'json') return;
+    const len = editorView.state.doc.length;
+    if (len < FULL_PARSE_THRESHOLD) return;
+    try {
+      // Give the parser a budget to cover long documents
+      ensureSyntaxTree(editorView.state, len, 2000);
+    } catch {
+      // no-op: parsing is best-effort
+    }
+  };
+
   // ui
   const hasHeader = $derived(!!tabs);
   let maximized = $state(false);
@@ -155,6 +172,7 @@
       EditorView.contentAttributes.of({ 'aria-label': label }),
       getLineBreakExtension(editable),
       getLanguageExtension(language),
+      codeFolding(),
       !inline ? EditorView.lineWrapping : undefined,
       !inline && !editable ? foldGutter() : undefined,
       getHeightTheme({ maxHeight, minHeight, maximized }),
@@ -212,6 +230,8 @@
       if (doc.toString() !== formattedContent) {
         replaceContent(formattedContent);
       }
+      // After content and/or language changes, ensure the full syntax tree is available
+      ensureFullParse();
     }
   });
 
@@ -228,6 +248,8 @@
   onMount(() => {
     editorView = createEditorView();
     editorView.contentDOM.onblur = handleEditorBlur;
+    // Ensure initial parse covers full document so fold handles appear immediately
+    ensureFullParse();
     return () => {
       editorView?.destroy();
     };
