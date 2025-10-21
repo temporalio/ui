@@ -90,7 +90,6 @@
     action('change')(text);
   };
 
-  // Generate a large JSON document to validate folding behavior
   const createLargeJson = () => {
     const obj: Record<string, unknown> = {};
     obj['section'] = {
