@@ -38,7 +38,7 @@
 
 <div class={merge('flex flex-col gap-1', $$props.class)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
-  <div class="flex items-center gap-2">
+  <div class="flex items-center">
     <div
       class="surface-primary relative box-border flex h-10 min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
       class:opacity-50={disabled}
@@ -73,7 +73,11 @@
       />
     </div>
     {#if units}
-      <div class="units">{units}</div>
+      <div
+        class="flex h-10 items-center border-y border-r border-subtle bg-subtle px-2"
+      >
+        <p class="text-sm font-normal text-primary">{units}</p>
+      </div>
     {/if}
   </div>
 </div>
@@ -82,10 +86,6 @@
 {/if}
 
 <style lang="postcss">
-  .units {
-    @apply text-sm font-medium text-primary;
-  }
-
   .search {
     @apply w-fit;
 
