@@ -31,7 +31,7 @@ const getLastHour = () => {
 };
 
 export const TASK_FAILURES_QUERY =
-  '`TemporalReportedProblems` IN ("category=WorkflowTaskFailed") OR `TemporalReportedProblems` IN ("category=WorkflowTaskTimedout")';
+  '`ExecutionStatus`="Running" AND `TemporalReportedProblems` IN ("category=WorkflowTaskFailed") OR `TemporalReportedProblems` IN ("category=WorkflowTaskTimedout")';
 
 export const systemWorkflowViews: SavedQuery[] = [
   {
@@ -47,19 +47,20 @@ export const systemWorkflowViews: SavedQuery[] = [
     query: TASK_FAILURES_QUERY,
     icon: 'error',
     type: 'system',
-  },
-  {
-    id: 'child-workflows',
-    name: 'Parent Workflows',
-    query: '`ParentWorkflowId` is null',
-    icon: 'relationship',
-    type: 'system',
+    class: 'text-danger',
   },
   {
     id: 'running',
     name: 'Running',
     query: '`ExecutionStatus`="Running"',
     icon: 'heartbeat',
+    type: 'system',
+  },
+  {
+    id: 'child-workflows',
+    name: 'Parent Workflows',
+    query: '`ParentWorkflowId` is null',
+    icon: 'relationship',
     type: 'system',
   },
   {

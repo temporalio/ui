@@ -22,7 +22,6 @@
     systemWorkflowViews,
   } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import { workflowCount } from '$lib/stores/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -62,12 +61,18 @@
     active: true,
   });
   const unsavedQuery = $derived(query && activeQueryView?.id === 'unsaved');
+  let taskFailureCount = $state(0);
+
+  const setTaskFailureCount = () =>
+    fetchWorkflowTaskFailures(namespace).then(
+      (count) => (taskFailureCount = count),
+    );
 
   onMount(() => {
-    fetchWorkflowTaskFailures(namespace);
+    setTaskFailureCount();
 
     const interval = setInterval(() => {
-      fetchWorkflowTaskFailures(namespace);
+      setTaskFailureCount();
     }, 60000);
 
     if (savedQueryParam) {
@@ -295,8 +300,7 @@
           {@render queryButton({
             ...view,
             active: query === view.query,
-            count:
-              view.id === 'task-failures' ? $workflowCount.taskFailureCount : 0,
+            count: view.id === 'task-failures' ? taskFailureCount : 0,
           })}
         {/each}
       </div>
@@ -365,142 +369,140 @@
 />
 
 {#snippet queryButton(view: SavedQuery)}
-  {#key view?.count}
-    <div
-      class="w-full"
-      role="menuitem"
-      tabindex="-1"
-      onmouseenter={(e) => onQueryBtnEnter(e, view.name)}
-      onmousemove={onQueryBtnMove}
-      onmouseleave={onQueryBtnLeave}
+  <div
+    class="w-full"
+    role="menuitem"
+    tabindex="-1"
+    onmouseenter={(e) => onQueryBtnEnter(e, view.name)}
+    onmousemove={onQueryBtnMove}
+    onmouseleave={onQueryBtnLeave}
+  >
+    <Button
+      variant="ghost"
+      data-testid={view.type === 'system'
+        ? view.id
+        : view.name.toLowerCase().replace(/\s+/g, '-')}
+      data-track-name={view.type === 'system'
+        ? 'system-query-button'
+        : 'user-query-button'}
+      data-track-intent="action"
+      data-track-text={view.name}
+      on:click={() => setActiveQueryView(view)}
+      class={merge('flex w-full justify-start', view.class || '')}
+      active={view?.active}
+      disabled={view?.disabled}
+      size="sm"
     >
-      <Button
-        variant={view.icon === 'error' ? 'destructive' : 'ghost'}
-        data-testid={view.type === 'system'
-          ? view.id
-          : view.name.toLowerCase().replace(/\s+/g, '-')}
-        data-track-name={view.type === 'system'
-          ? 'system-query-button'
-          : 'user-query-button'}
-        data-track-intent="action"
-        data-track-text={view.name}
-        on:click={() => setActiveQueryView(view)}
-        class={merge('flex w-full justify-start', view.class || '')}
-        active={view?.active}
-        disabled={view?.disabled}
-        size="sm"
-      >
-        <Icon
-          name={view?.icon || 'bookmark'}
-          class={merge(
-            'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-            $savedQueryNavOpen ? 'lg:hidden' : '',
-          )}
-        />
+      <Icon
+        name={view?.icon || 'bookmark'}
+        class={merge(
+          'h-4 w-4 flex-shrink-0  transition-colors duration-200',
+          $savedQueryNavOpen ? 'lg:hidden' : '',
+        )}
+      />
 
-        {#if $savedQueryNavOpen}
-          <span
-            class="hidden truncate text-left text-sm font-normal lg:inline-block"
-            in:slide>{view.name}</span
-          >
-          {#if view?.badge}
-            <span
-              data-testid={view.badge}
-              class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-              in:slide>{view.badge || ''}</span
-            >
-          {/if}
-          {#if view?.count}
-            <span
-              class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-              in:slide>{view.count}</span
-            >
-          {/if}
-        {/if}
-      </Button>
-
-      {#if activeQueryView?.id === view?.id && view.type === 'user'}
-        <div
-          in:slide
-          class={merge(
-            'flex flex-col items-center gap-1 pt-0.5 transition-all',
-            $savedQueryNavOpen && 'lg:flex-row',
-          )}
+      {#if $savedQueryNavOpen}
+        <span
+          class="hidden truncate text-left text-sm font-normal lg:inline-block"
+          in:slide>{view.name}</span
         >
-          {#if view.id === activeQueryView?.id && view.query !== query}
-            <Button
-              size="xs"
-              class="w-full"
-              variant="primary"
-              data-testid="save-view-button"
-              data-track-name="save-view-button"
-              data-track-intent="action"
-              data-track-text="save"
-              on:click={() => {
-                onSaveView({
-                  ...view,
-                  query,
-                });
-              }}>Save</Button
-            >
-          {/if}
+        {#if view?.badge}
+          <span
+            data-testid={view.badge}
+            class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+            in:slide>{view.badge || ''}</span
+          >
+        {/if}
+        {#if view?.count}
+          <span
+            class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
+            in:slide>{view.count}</span
+          >
+        {/if}
+      {/if}
+    </Button>
+
+    {#if activeQueryView?.id === view?.id && view.type === 'user'}
+      <div
+        in:slide
+        class={merge(
+          'flex flex-col items-center gap-1 pt-0.5 transition-all',
+          $savedQueryNavOpen && 'lg:flex-row',
+        )}
+      >
+        {#if view.id === activeQueryView?.id && view.query !== query}
           <Button
             size="xs"
             class="w-full"
-            variant="secondary"
-            data-testid="edit-view-button"
-            data-track-name="edit-view-button"
+            variant="primary"
+            data-testid="save-view-button"
+            data-track-name="save-view-button"
             data-track-intent="action"
-            data-track-text="edit"
+            data-track-text="save"
             on:click={() => {
-              editViewModalOpen = true;
-            }}>Edit</Button
+              onSaveView({
+                ...view,
+                query,
+              });
+            }}>Save</Button
           >
-          <Button
-            leadingIcon={$copied ? 'checkmark' : 'copy'}
-            size="xs"
-            class="w-full opacity-80"
-            variant="ghost"
-            data-testid="share-view-button"
-            data-track-name="share-view-button"
-            data-track-intent="action"
-            data-track-text="share"
-            on:click={handleCopy}
-            ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-              >Share</span
-            ></Button
-          >
-        </div>
-      {:else if unsavedQuery && view?.id === 'unsaved'}
-        <div
-          class="flex items-center gap-1 overflow-hidden pt-0.5"
-          transition:slide
+        {/if}
+        <Button
+          size="xs"
+          class="w-full"
+          variant="secondary"
+          data-testid="edit-view-button"
+          data-track-name="edit-view-button"
+          data-track-intent="action"
+          data-track-text="edit"
+          on:click={() => {
+            editViewModalOpen = true;
+          }}>Edit</Button
         >
-          <Button
-            size="xs"
-            class="w-full break-all transition-all"
-            variant="secondary"
-            disabled={maxViewsReached}
-            data-testid="create-view-button"
-            data-track-name="create-view-button"
-            data-track-intent="action"
-            data-track-text="create"
-            on:click={() => {
-              saveViewModalOpen = true;
-            }}
-            ><span
-              class={merge(
-                'inline lg:hidden',
-                !$savedQueryNavOpen && 'lg:inline',
-              )}>New</span
-            ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-              >Save as New</span
-            ></Button
-          >
-        </div>
-      {/if}
-    </div>
-  {/key}
+        <Button
+          leadingIcon={$copied ? 'checkmark' : 'copy'}
+          size="xs"
+          class="w-full opacity-80"
+          variant="ghost"
+          data-testid="share-view-button"
+          data-track-name="share-view-button"
+          data-track-intent="action"
+          data-track-text="share"
+          on:click={handleCopy}
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
+            >Share</span
+          ></Button
+        >
+      </div>
+    {:else if unsavedQuery && view?.id === 'unsaved'}
+      <div
+        class="flex items-center gap-1 overflow-hidden pt-0.5"
+        transition:slide
+      >
+        <Button
+          size="xs"
+          class="w-full break-all transition-all"
+          variant="secondary"
+          disabled={maxViewsReached}
+          data-testid="create-view-button"
+          data-track-name="create-view-button"
+          data-track-intent="action"
+          data-track-text="create"
+          on:click={() => {
+            saveViewModalOpen = true;
+          }}
+          ><span
+            class={merge(
+              'inline lg:hidden',
+              !$savedQueryNavOpen && 'lg:inline',
+            )}>New</span
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
+            >Save as New</span
+          ></Button
+        >
+      </div>
+    {/if}
+  </div>
 {/snippet}
 
 {#if showTooltip && tooltipText}

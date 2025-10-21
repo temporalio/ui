@@ -43,6 +43,7 @@
     routeForWorkflows,
     routeForWorkflowSearchAttributes,
   } from '$lib/utilities/route-for';
+  import { isWorkflowTaskFailure } from '$lib/utilities/task-failure-workflows';
 
   const {
     namespace,
@@ -122,6 +123,7 @@
           status={workflow?.status}
           big
           delayed={isWorkflowDelayed(workflow)}
+          taskFailure={isWorkflowTaskFailure(workflow)}
         />
         <div class="xl:hidden">
           <WorkflowActions

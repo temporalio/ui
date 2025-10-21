@@ -23,6 +23,7 @@
     routeForEventHistory,
     routeForWorkerDeployment,
   } from '$lib/utilities/route-for';
+  import { isWorkflowTaskFailure } from '$lib/utilities/task-failure-workflows';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
@@ -156,6 +157,7 @@
       <WorkflowStatus
         status={workflow.status}
         delayed={isWorkflowDelayed(workflow)}
+        taskFailure={isWorkflowTaskFailure(workflow)}
       />
     {:else if label === 'End'}
       {formatDate(workflow.endTime, $timeFormat, {

@@ -313,5 +313,6 @@ export const Strings = {
   fairness: 'Fairness',
   'workflow-start-delay': 'Workflow Start Delay',
   delayed: 'Delayed',
+  'task-failure': 'Task Failure',
   'execution-start': 'Execution Start',
 } as const;

@@ -1,7 +1,4 @@
-import { get } from 'svelte/store';
-
 import { TASK_FAILURES_QUERY } from '$lib/stores/saved-queries';
-import { workflowCount } from '$lib/stores/workflows';
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -31,7 +28,7 @@ export const fetchWorkflowCount = async (
 export const fetchWorkflowTaskFailures = async (
   namespace: string,
   request = fetch,
-): Promise<void> => {
+): Promise<number> => {
   try {
     const countRoute = routeForApi('workflows.count', { namespace });
     const result = await requestFromAPI<{ count: string }>(countRoute, {
@@ -40,7 +37,7 @@ export const fetchWorkflowTaskFailures = async (
       handleError: () => {},
       request,
     });
-    get(workflowCount).taskFailureCount = parseInt(result?.count || '0');
+    return parseInt(result?.count || '0');
   } catch (e) {
     // Don't fail the workflows call due to count
   }
