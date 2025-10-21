@@ -62,6 +62,7 @@
 </script>
 
 <div
+  id="event-history-timeline-graph"
   class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary"
   bind:clientWidth={canvasWidth}
   style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}

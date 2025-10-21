@@ -382,7 +382,10 @@
   {/if}
 </tr>
 {#if expanded}
-  <tr class="w-full text-sm no-underline">
+  <tr
+    class="w-full text-sm no-underline"
+    data-testid="event-summary-row-expanded"
+  >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} event={currentEvent} />
     </td>
