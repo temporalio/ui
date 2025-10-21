@@ -317,6 +317,13 @@ export const routeForLoginPage = (error = '', isBrowser = BROWSER): string => {
   return `${base}/login`;
 };
 
+export const routeForSsoRedirect = (isBrowser = BROWSER): string => {
+  if (!isBrowser) return `${base}/auth/sso`;
+  const url = new URL(`${base}/auth/sso`, window.location.origin);
+  url.searchParams.set('returnUrl', window.location.href);
+  return url.toString();
+};
+
 export const routeForEventHistoryImport = (
   namespace?: string,
   view?: EventView,

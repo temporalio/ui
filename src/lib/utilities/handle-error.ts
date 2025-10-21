@@ -7,7 +7,7 @@ import type { NetworkError } from '$lib/types/global';
 import { has } from './has';
 import { isNetworkError } from './is-network-error';
 import type { APIErrorResponse, TemporalAPIError } from './request-from-api';
-import { routeForLoginPage } from './route-for';
+import { routeForSsoRedirect } from './route-for';
 
 interface NetworkErrorWithReport extends NetworkError {
   report?: boolean;
@@ -34,11 +34,12 @@ export const handleError = (
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.message));
+    // Prefer seamless SSO redirect over manual login
+    window.location.assign(routeForSsoRedirect());
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.message));
+    window.location.assign(routeForSsoRedirect());
   }
 
   if (isNetworkError(error)) {
@@ -57,15 +58,13 @@ export const handleUnauthorizedOrForbiddenError = (
   error: APIErrorResponse,
   isBrowser = BROWSER,
 ): void => {
-  const msg = `${error?.status} ${error?.body?.message}`;
-
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(msg));
+    window.location.assign(routeForSsoRedirect());
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(msg));
+    window.location.assign(routeForSsoRedirect());
     return;
   }
 };
