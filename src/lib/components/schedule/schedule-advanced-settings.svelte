@@ -46,21 +46,29 @@
     <li>
       {translate('schedules.catchup-window')}
       <span
-        >{policies?.catchupWindow !== undefined
+        >{policies?.catchupWindow != null
           ? formatDuration(policies.catchupWindow.toString())
           : translate('common.none')}
       </span>
     </li>
-    {#if policies?.pauseOnFailure}
+    {#if policies?.pauseOnFailure != null}
       <li>
         {translate('schedules.pause-on-failure')}
-        <span>{translate('common.enabled')}</span>
+        <span
+          >{policies.pauseOnFailure
+            ? translate('common.true')
+            : translate('common.false')}</span
+        >
       </li>
     {/if}
-    {#if policies?.keepOriginalWorkflowId}
+    {#if policies?.keepOriginalWorkflowId != null}
       <li>
         {translate('schedules.keep-original-workflow-id')}
-        <span>{translate('common.enabled')}</span>
+        <span
+          >{policies.keepOriginalWorkflowId
+            ? translate('common.true')
+            : translate('common.false')}</span
+        >
       </li>
     {/if}
   </ul>
