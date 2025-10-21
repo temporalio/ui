@@ -2,11 +2,21 @@
  * OIDC provider configuration.
  */
 const configuration: Record<string, unknown> = {
+  conformIdTokenClaims: false,
+  ttl: {
+    AccessToken: 60, // 1 minute for testing
+    IdToken: 60, // 1 minute for testing
+    RefreshToken: 60 * 60 * 24, // 1 day
+  },
+  scopes: ['openid', 'profile', 'email', 'offline_access'],
+  issueRefreshToken: async () => {
+    return true;
+  },
   clients: [
     {
       client_id: 'temporal-ui',
       client_secret: 'temporal-secret',
-      grant_types: ['authorization_code'],
+      grant_types: ['authorization_code', 'refresh_token'],
       redirect_uris: ['http://localhost:8081/auth/sso/callback'],
       response_types: ['code'],
       token_endpoint_auth_method: 'client_secret_basic',

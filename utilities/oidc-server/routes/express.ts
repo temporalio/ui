@@ -47,15 +47,15 @@ export default function registerRoutes(
 ): void {
   app.use((req: Request, res: Response, next: NextFunction) => {
     const orig = res.render.bind(res);
-    res.render = (view: string, locals: Record<string, unknown>) => {
-      app.render(view, locals, (err, html) => {
+    res.render = ((view: string, locals?: Record<string, unknown>) => {
+      app.render(view, locals || {}, (err, html) => {
         if (err) throw err;
         orig('_layout', {
           ...locals,
           body: html,
         });
       });
-    };
+    }) as typeof res.render;
     next();
   });
 

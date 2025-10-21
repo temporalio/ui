@@ -28,11 +28,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"unicode/utf8"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
@@ -43,13 +47,13 @@ const (
 )
 
 func SetUser(c echo.Context, user *User) error {
-    if user.OAuth2Token == nil {
-        return errors.New("no OAuth2Token")
-    }
+	if user.OAuth2Token == nil {
+		return errors.New("no OAuth2Token")
+	}
 
-    userR := UserResponse{
-        AccessToken: user.OAuth2Token.AccessToken,
-    }
+	userR := UserResponse{
+		AccessToken: user.OAuth2Token.AccessToken,
+	}
 
 	if user.IDToken != nil {
 		userR.IDToken = user.IDToken.RawToken
@@ -67,35 +71,77 @@ func SetUser(c echo.Context, user *User) error {
 	}
 
 	s := base64.StdEncoding.EncodeToString(b)
-    parts := splitCookie(s)
+	parts := splitCookie(s)
 
-    for i, p := range parts {
-        cookie := &http.Cookie{
-            Name:     "user" + strconv.Itoa(i),
-            Value:    p,
-            MaxAge:   int(time.Minute.Seconds()),
-            Secure:   c.Request().TLS != nil,
-            HttpOnly: false,
-            Path:     "/",
-            SameSite: http.SameSiteStrictMode,
-        }
-        c.SetCookie(cookie)
-    }
+	for i, p := range parts {
+		cookie := &http.Cookie{
+			Name:     "user" + strconv.Itoa(i),
+			Value:    p,
+			MaxAge:   int(time.Minute.Seconds()),
+			Secure:   c.Request().TLS != nil,
+			HttpOnly: false,
+			Path:     "/",
+			SameSite: http.SameSiteStrictMode,
+		}
+		c.SetCookie(cookie)
+	}
 
-    if rt := user.OAuth2Token.RefreshToken; rt != "" {
-        refreshCookie := &http.Cookie{
-            Name:     "refresh",
-            Value:    rt,
-            MaxAge:   int((30 * 24 * time.Hour).Seconds()),
-            Secure:   c.Request().TLS != nil,
-            HttpOnly: true,
-            Path:     "/",
-            SameSite: http.SameSiteStrictMode,
-        }
-        c.SetCookie(refreshCookie)
-    }
+	if rt := user.OAuth2Token.RefreshToken; rt != "" {
+		log.Printf("[Auth] Setting refresh token cookie (length: %d)", len(rt))
+		refreshCookie := &http.Cookie{
+			Name:     "refresh",
+			Value:    rt,
+			MaxAge:   int((30 * 24 * time.Hour).Seconds()),
+			Secure:   c.Request().TLS != nil,
+			HttpOnly: true,
+			Path:     "/",
+			SameSite: http.SameSiteStrictMode,
+		}
+		c.SetCookie(refreshCookie)
+	} else {
+		log.Println("[Auth] No refresh token received from OAuth provider")
+	}
 
-    return nil
+	return nil
+}
+
+func validateJWTExpiration(tokenString string) error {
+	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+
+	if tokenString == "" {
+		log.Println("[JWT Validation] Token is empty, skipping validation")
+		return nil
+	}
+
+	parser := jwt.NewParser(jwt.WithoutClaimsValidation())
+	token, _, err := parser.ParseUnverified(tokenString, jwt.MapClaims{})
+	if err != nil {
+		log.Printf("[JWT Validation] Failed to parse JWT: %v, skipping validation", err)
+		return nil
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		log.Println("[JWT Validation] Failed to extract claims, skipping validation")
+		return nil
+	}
+
+	exp, ok := claims["exp"].(float64)
+	if !ok {
+		log.Println("[JWT Validation] No exp claim found, skipping validation")
+		return nil
+	}
+
+	expirationTime := time.Unix(int64(exp), 0)
+	now := time.Now()
+
+	if now.After(expirationTime) {
+		log.Printf("[JWT Validation] Token expired at %v (current time: %v)", expirationTime, now)
+		return errors.New("token expired")
+	}
+
+	log.Printf("[JWT Validation] Token valid, expires at %v (time remaining: %v)", expirationTime, expirationTime.Sub(now))
+	return nil
 }
 
 // ValidateAuthHeaderExists validates that the autorization header exists if auth is enabled.
@@ -117,9 +163,23 @@ func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProvider
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 	}
 
+	// The Authorization-Extras header contains the ID token (JWT) that we should validate
+	// The Authorization header contains the access token (opaque string)
+	idToken := c.Request().Header.Get(AuthorizationExtrasHeader)
+	if idToken != "" {
+		log.Println("[Auth] Validating ID token from Authorization-Extras header")
+		if err := validateJWTExpiration(idToken); err != nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid ID token: %v", err))
+		}
+	} else {
+		log.Println("[Auth] No Authorization-Extras header, validating Authorization header")
+		if err := validateJWTExpiration(token); err != nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid token: %v", err))
+		}
+	}
+
 	// Handle token swapping for OIDC providers that require ID token as Bearer
 	if len(cfg.Auth.Providers) > 0 && cfg.Auth.Providers[0].UseIDTokenAsBearer {
-		idToken := c.Request().Header.Get(AuthorizationExtrasHeader)
 		if idToken != "" {
 			// Replace the Authorization header with ID token
 			c.Request().Header.Set(echo.HeaderAuthorization, "Bearer "+idToken)
