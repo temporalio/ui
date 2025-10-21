@@ -1,0 +1,14 @@
+system.enableTLS:
+  - value: true
+system.tlsRequireClientAuth:
+  - value: true
+frontend.enableClientVersionCheck:
+  - value: true
+frontend.rps:
+  - value: 2400
+history.maxAutoResetPoints:
+  - value: 20
+matching.numTaskqueueWritePartitions:
+  - value: 3
+matching.numTaskqueueReadPartitions:
+  - value: 3

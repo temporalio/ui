@@ -1,0 +1,119 @@
+# Temporal Server Configuration for Docker with TLS
+log:
+  stdout: true
+  level: info
+
+# Database configuration
+persistence:
+  defaultStore: default
+  visibilityStore: visibility
+  numHistoryShards: 4
+  datastores:
+    default:
+      sql:
+        pluginName: "postgres"
+        databaseName: "temporal"
+        connectAddr: "postgresql:5432"
+        connectProtocol: "tcp"
+        user: "temporal"
+        password: "temporal"
+        maxConns: 20
+        maxIdleConns: 20
+        maxConnLifetime: "1h"
+        tls:
+          enabled: false
+    visibility:
+      sql:
+        pluginName: "postgres"
+        databaseName: "temporal_visibility"
+        connectAddr: "postgresql:5432"
+        connectProtocol: "tcp"
+        user: "temporal"
+        password: "temporal"
+        maxConns: 10
+        maxIdleConns: 10
+        maxConnLifetime: "1h"
+        tls:
+          enabled: false
+
+# Global TLS configuration
+global:
+  membership:
+    maxJoinDuration: 30s
+    broadcastAddress: "0.0.0.0"
+
+  tls:
+    frontend:
+      server:
+        requireClientAuth: true
+        certFile: /etc/temporal/certs/server.crt
+        keyFile: /etc/temporal/certs/server.key
+        clientCaFiles:
+          - /etc/temporal/certs/ca.crt
+
+# Services configuration
+services:
+  frontend:
+    rpc:
+      grpcPort: 7233
+      membershipPort: 6933
+      bindOnLocalHost: false
+      tls:
+        certFile: /etc/temporal/certs/server.crt
+        keyFile: /etc/temporal/certs/server.key
+        clientCaFiles:
+          - /etc/temporal/certs/ca.crt
+        requireClientAuth: true
+
+  matching:
+    rpc:
+      grpcPort: 7235
+      membershipPort: 6935
+      bindOnLocalHost: false
+
+  history:
+    rpc:
+      grpcPort: 7234
+      membershipPort: 6934
+      bindOnLocalHost: false
+
+  worker:
+    rpc:
+      grpcPort: 7239
+      membershipPort: 6939
+      bindOnLocalHost: false
+
+# Cluster configuration
+clusterMetadata:
+  enableGlobalNamespace: false
+  failoverVersionIncrement: 10
+  masterClusterName: "active"
+  currentClusterName: "active"
+  clusterInformation:
+    active:
+      enabled: true
+      initialFailoverVersion: 1
+      rpcName: "frontend"
+      rpcAddress: "0.0.0.0:7233"
+
+dcRedirectionPolicy:
+  policy: "noop"
+
+# Archival configuration
+archival:
+  history:
+    state: "disabled"
+    enableRead: false
+  visibility:
+    state: "disabled"
+    enableRead: false
+
+namespaceDefaults:
+  archival:
+    history:
+      state: "disabled"
+    visibility:
+      state: "disabled"
+
+publicClient:
+  hostPort: "0.0.0.0:7233"
