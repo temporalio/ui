@@ -353,7 +353,6 @@ body[data-theme='dark-primary'] {
     color: #8098f9;
   }
 `,
-
 		}
 
 		// Set headers
