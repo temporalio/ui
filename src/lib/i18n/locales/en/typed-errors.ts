@@ -190,4 +190,8 @@ export const Strings = {
     description:
       'A Workflow Task failed because the gRPC message exceeded the maximum allowed size.',
   },
+  WorkflowTaskTimedOut: {
+    title: 'Workflow Task Timed Out',
+    description: 'The Workflow Task encountered a timeout.',
+  },
 } as const;
