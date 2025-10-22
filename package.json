@@ -114,7 +114,7 @@
     "tailwind-merge": "^1.14.0",
     "unist-util-remove": "^4.0.0",
     "url-pattern": "^1.0.3",
-    "zod": "^3.25.64"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
