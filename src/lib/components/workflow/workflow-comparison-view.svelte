@@ -3,7 +3,6 @@
   import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
-  import WorkflowHistoryComparisonLayout from '$lib/layouts/workflow-history-comparison-layout.svelte';
   import { workflowComparison } from '$lib/stores/workflow-comparison';
 
   import WorkflowComparisonPanel from './workflow-comparison-panel.svelte';
@@ -22,7 +21,7 @@
   };
 </script>
 
-<div class="comparison-container flex h-full flex-col">
+<div class="flex h-full flex-col">
   <div
     class="flex items-center justify-between border-b border-subtle bg-secondary px-4 py-2"
   >
@@ -40,57 +39,21 @@
     />
   </div>
 
-  <div class="comparison-grid flex-1 overflow-auto">
-    <div class="comparison-panel border-r border-subtle">
-      <div class="panel-header z-10 bg-secondary p-3">
-        <div class="flex items-center justify-between">
-          <h3 class="font-semibold">Original</h3>
-          {#if originalWorkflow}
-            <p class="truncate text-xs text-secondary">
-              {originalWorkflow.runId}
-            </p>
-          {/if}
-        </div>
-      </div>
-      <div class="panel-content">
-        <WorkflowHistoryComparisonLayout />
-      </div>
-    </div>
-
+  <div class="flex grow">
+    <WorkflowComparisonPanel
+      {namespace}
+      workflowId={originalWorkflow.workflowId}
+      runId={originalWorkflow.runId}
+      index={0}
+    />
     {#each comparisons as comparison, index (comparison.runId)}
       <WorkflowComparisonPanel
         {namespace}
         workflowId={comparison.workflowId}
         runId={comparison.runId}
         resetFromEventId={comparison.resetFromEventId}
-        {index}
+        index={index + 1}
       />
     {/each}
   </div>
 </div>
-
-<style lang="postcss">
-  .comparison-container {
-    @apply h-full;
-  }
-
-  .comparison-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
-    gap: 0;
-  }
-
-  .comparison-panel {
-    @apply flex flex-col;
-
-    min-width: 600px;
-  }
-
-  .panel-header {
-    @apply border-b border-subtle;
-  }
-
-  .panel-content {
-    @apply flex-1 overflow-auto;
-  }
-</style>

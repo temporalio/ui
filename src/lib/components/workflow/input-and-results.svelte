@@ -12,8 +12,9 @@
     workflow: WorkflowExecution;
     history: WorkflowEvents;
     showTitle?: boolean;
+    maxHeight?: number | undefined;
   };
-  let { workflow, history, showTitle = true }: Props = $props();
+  let { workflow, history, showTitle = true, maxHeight }: Props = $props();
 
   const workflowEvents = $derived(
     getWorkflowStartedCompletedAndTaskFailedEvents(history),
@@ -30,11 +31,13 @@
     content={workflowEvents.input}
     {isRunning}
     {showTitle}
+    {maxHeight}
   />
   <InputAndResultsPayload
     title={translate('workflows.result')}
     content={workflowEvents.results}
     {isRunning}
     {showTitle}
+    {maxHeight}
   />
 </div>

@@ -16,8 +16,15 @@
     showTitle?: boolean;
     content: string;
     isRunning: boolean;
+    maxHeight?: number | undefined;
   };
-  let { title, showTitle = true, content, isRunning }: Props = $props();
+  let {
+    title,
+    showTitle = true,
+    content,
+    isRunning,
+    maxHeight = 300,
+  }: Props = $props();
 
   const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {
@@ -69,7 +76,7 @@
                   copySuccessIconTitle={translate(
                     'common.copy-success-icon-title',
                   )}
-                  maxHeight={300}
+                  {maxHeight}
                 />
               {/each}
             {:else}
@@ -79,7 +86,7 @@
                 copySuccessIconTitle={translate(
                   'common.copy-success-icon-title',
                 )}
-                maxHeight={300}
+                {maxHeight}
               />
             {/if}
           {/snippet}
@@ -91,7 +98,7 @@
               content={decodedValue}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              maxHeight={300}
+              {maxHeight}
             />
           {/snippet}
         </PayloadDecoder>
@@ -102,7 +109,7 @@
       content={isRunning ? 'Results will appear upon completion.' : 'null'}
       language="text"
       copyable={false}
-      maxHeight={300}
+      {maxHeight}
     />
   {/if}
 </div>

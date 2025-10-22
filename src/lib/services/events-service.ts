@@ -30,6 +30,7 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     rawPayloads?: boolean;
     sort?: EventSortOrder;
     signal?: AbortSignal;
+    setHistory?: boolean;
     historySize?: string;
     maximumPageSize?: string;
   };
@@ -99,15 +100,16 @@ export const fetchAllEvents = async ({
   runId,
   sort = 'ascending',
   signal,
+  setHistory = true,
   historySize,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
   const onStart = () => {
-    if (!signal) return;
+    if (!signal || !setHistory) return;
     fullEventHistory.set([]);
   };
 
   const onUpdate = (full, current) => {
-    if (!signal) return;
+    if (!signal || !setHistory) return;
     fullEventHistory.set([...toEventHistory(full.history?.events)]);
     const next = current?.history?.events;
     const hasNewHistory =
@@ -119,7 +121,7 @@ export const fetchAllEvents = async ({
   };
 
   const onComplete = () => {
-    if (!signal) return;
+    if (!signal || !setHistory) return;
     refresh.set(Date.now());
   };
 
