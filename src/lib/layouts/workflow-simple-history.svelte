@@ -8,7 +8,7 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { isWorkflowTaskFailedEvent } from '$lib/utilities/is-event-type';
+  import { isPureWorkflowTaskFailedEvent } from '$lib/utilities/is-event-type';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import GroupCard from './group-card.svelte';
@@ -62,9 +62,9 @@
   };
 
   const findResetEventId = (history: WorkflowEvents) => {
-    const workflowResetEvent = history.find(
+    const workflowResetEvent = history.findLast(
       (e) =>
-        isWorkflowTaskFailedEvent(e) &&
+        isPureWorkflowTaskFailedEvent(e) &&
         e.workflowTaskFailedEventAttributes.cause ===
           'WORKFLOW_TASK_FAILED_CAUSE_RESET_WORKFLOW',
     );
@@ -81,7 +81,11 @@
 
 <div class="flex w-full flex-col border-r border-subtle">
   {#await getWorkflowAndEventHistory()}
-    <Skeleton class="h-48 w-full rounded-none p-3" />
+    <div class="flex flex-col gap-2 p-3">
+      <Skeleton class="h-16 w-full rounded-none p-3" />
+      <Skeleton class="h-32 w-full rounded-none p-3" />
+      <Skeleton class="h-32 w-full rounded-none p-3" />
+    </div>
   {:then [workflow, history, groups, resetEventId]}
     <div class="z-10 p-3">
       <div class="flex flex-1 justify-between">
