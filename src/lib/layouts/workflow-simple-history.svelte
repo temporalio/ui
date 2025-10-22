@@ -1,26 +1,32 @@
 <script lang="ts">
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
-  import Card from '$lib/holocene/card.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
-  import { eventFilterSort } from '$lib/stores/event-view';
   import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { isWorkflowTaskFailedEvent } from '$lib/utilities/is-event-type';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import GroupCard from './group-card.svelte';
 
-  let { namespace, workflowId, runId } = $props();
+  let { namespace, workflowId, runId, index } = $props();
 
   let workflowRunController: AbortController;
 
-  // $: pendingActivities = workflow?.pendingActivities;
-  // $: pendingNexusOperations = workflow?.pendingNexusOperations;
-  const reverseSort = $derived($eventFilterSort === 'descending');
+  const workflowUrl = $derived(
+    routeForEventHistory({
+      namespace,
+      workflow: workflowId,
+      run: runId,
+    }),
+  );
 
   const getWorkflowAndEventHistory = async (): Promise<
-    [WorkflowExecution, WorkflowEvents, EventGroups]
+    [WorkflowExecution, WorkflowEvents, EventGroups, string | null]
   > => {
     const result = await fetchWorkflow({
       namespace,
@@ -40,12 +46,30 @@
       setHistory: false,
       historySize: workflow.historyEvents,
     });
-    const ascendingGroups = groupEvents(history, 'ascending', [], []);
-    const groups = reverseSort
-      ? [...ascendingGroups].reverse()
-      : ascendingGroups;
+    const resetEvent = findResetEventId(history);
+    const resetEventId = resetEvent ? resetEvent.id : null;
+    // const baseRunId = resetEvent ? resetEvent.attributes.baseRunId : null;
+    const reverseGroups = [
+      ...groupEvents(history, 'ascending', [], []),
+    ].reverse();
+    const groups =
+      index === 0
+        ? reverseGroups
+        : reverseGroups.filter(
+            (group) => parseInt(group.eventList[0].id) > parseInt(resetEventId),
+          );
+    return [workflow, history, groups, resetEventId];
+  };
 
-    return [workflow, history, groups];
+  const findResetEventId = (history: WorkflowEvents) => {
+    const workflowResetEvent = history.find(
+      (e) =>
+        isWorkflowTaskFailedEvent(e) &&
+        e.workflowTaskFailedEventAttributes.cause ===
+          'WORKFLOW_TASK_FAILED_CAUSE_RESET_WORKFLOW',
+    );
+    if (!workflowResetEvent) return null;
+    return workflowResetEvent;
   };
 
   const _abortPolling = () => {
@@ -55,10 +79,26 @@
   };
 </script>
 
-{#await getWorkflowAndEventHistory() then [workflow, history, groups]}
-  <div class="flex flex-col">
-    <Card class="surface-primary">
-      <div class="flex flex-col gap-2">
+<div class="flex w-full flex-col border-r border-subtle">
+  {#await getWorkflowAndEventHistory()}
+    <Skeleton class="h-48 w-full rounded-none p-3" />
+  {:then [workflow, history, groups, resetEventId]}
+    <div class="z-10 p-3">
+      <div class="flex flex-1 justify-between">
+        <div class="flex items-center gap-2">
+          <h3 class="font-semibold">
+            {resetEventId ? `Reset ${index + 1}` : 'Original'}
+          </h3>
+        </div>
+      </div>
+      <div class="mt-1 flex items-center gap-2 text-xs text-secondary">
+        <Link href={workflowUrl} target="_blank" class="truncate text-xs"
+          >{runId}</Link
+        >
+      </div>
+    </div>
+    <div class="flex-1 overflow-auto">
+      <div class="flex flex-col gap-2 p-2">
         <InputAndResults
           showTitle={false}
           {workflow}
@@ -66,13 +106,11 @@
           maxHeight={20000}
         />
       </div>
-    </Card>
-  </div>
-  <div class="relative">
-    <div class="flex w-full flex-col gap-2">
-      {#each groups as group}
-        <GroupCard {group} {history} />
-      {/each}
+      <div class="flex w-full flex-col">
+        {#each groups as group}
+          <GroupCard {group} {history} />
+        {/each}
+      </div>
     </div>
-  </div>
-{/await}
+  {/await}
+</div>

@@ -1,17 +1,13 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
+  import WorkflowSimpleHistory from '$lib/layouts/workflow-simple-history.svelte';
   import { workflowComparison } from '$lib/stores/workflow-comparison';
 
-  import WorkflowComparisonPanel from './workflow-comparison-panel.svelte';
-
-  const { namespace } = $derived($page.params);
-  const originalWorkflow = $derived($workflowComparison.originalWorkflow);
   const comparisons = $derived($workflowComparison.comparisons);
 
-  $inspect('comparisons: ', comparisons);
   const handleExitComparison = () => {
     workflowComparison.exitComparison();
 
@@ -19,9 +15,11 @@
     currentUrl.searchParams.delete('compare');
     goto(currentUrl.toString(), { replaceState: true, noScroll: true });
   };
+
+  const { namespace, workflow: workflowId, run: runId } = $derived(page.params);
 </script>
 
-<div class="flex h-full flex-col">
+<div class="flex h-full flex-col pt-8">
   <div
     class="flex items-center justify-between border-b border-subtle bg-secondary px-4 py-2"
   >
@@ -40,18 +38,12 @@
   </div>
 
   <div class="flex grow">
-    <WorkflowComparisonPanel
-      {namespace}
-      workflowId={originalWorkflow.workflowId}
-      runId={originalWorkflow.runId}
-      index={0}
-    />
+    <WorkflowSimpleHistory {namespace} {workflowId} {runId} index={0} />
     {#each comparisons as comparison, index (comparison.runId)}
-      <WorkflowComparisonPanel
+      <WorkflowSimpleHistory
         {namespace}
-        workflowId={comparison.workflowId}
+        {workflowId}
         runId={comparison.runId}
-        resetFromEventId={comparison.resetFromEventId}
         index={index + 1}
       />
     {/each}

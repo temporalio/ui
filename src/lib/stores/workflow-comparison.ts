@@ -16,6 +16,12 @@ export type WorkflowComparisonState = {
   comparisons: WorkflowComparison[];
 };
 
+const compareInitialState: WorkflowComparisonState = {
+  isComparing: true,
+  originalWorkflow: null,
+  comparisons: [],
+};
+
 const initialState: WorkflowComparisonState = {
   isComparing: false,
   originalWorkflow: null,
@@ -24,7 +30,7 @@ const initialState: WorkflowComparisonState = {
 
 function createWorkflowComparisonStore() {
   const { subscribe, set, update } =
-    writable<WorkflowComparisonState>(initialState);
+    writable<WorkflowComparisonState>(compareInitialState);
 
   return {
     subscribe,
