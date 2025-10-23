@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -16,12 +18,16 @@
     goto(currentUrl.toString(), { replaceState: true, noScroll: true });
   };
 
+  onDestroy(() => {
+    workflowComparison.exitComparison();
+  });
+
   const { namespace, workflow: workflowId, run: runId } = $derived(page.params);
 </script>
 
-<div class="flex h-full flex-col pt-8">
+<div class="relative flex h-full flex-col overflow-auto pt-12">
   <div
-    class="flex items-center justify-between border-b border-subtle bg-secondary px-4 py-2"
+    class="sticky left-0 top-0 flex items-center justify-between border-b border-subtle bg-secondary px-4 py-2"
   >
     <div class="flex items-center gap-2">
       <h2 class="text-lg font-semibold">Comparison Mode</h2>
@@ -37,8 +43,10 @@
     />
   </div>
 
-  <div class="flex grow">
-    <WorkflowSimpleHistory {namespace} {workflowId} {runId} index={0} />
+  <div class="relative flex grow bg-subtle">
+    <div class="sticky left-0 top-0 z-20">
+      <WorkflowSimpleHistory {namespace} {workflowId} {runId} index={0} />
+    </div>
     {#each comparisons as comparison, index (comparison.runId)}
       <WorkflowSimpleHistory
         {namespace}

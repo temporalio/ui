@@ -17,6 +17,7 @@
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
   import { temporalVersion } from '$lib/stores/versions';
+  import { workflowComparison } from '$lib/stores/workflow-comparison';
   import { refresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
@@ -151,9 +152,16 @@
         : translate('workflows.terminate-disabled'),
     },
   ]);
+
+  const handleEnterComparison = () => {
+    workflowComparison.startComparison(workflow.id, workflow.runId);
+  };
 </script>
 
 <div class="flex items-center gap-2">
+  <Button variant="secondary" on:click={handleEnterComparison}
+    >Reset & Compare</Button
+  >
   {#if isRunning}
     <Button
       on:click={() => (cancelConfirmationModalOpen = true)}

@@ -61,7 +61,11 @@
       if (Array.isArray(finalValue) && finalValue.length === 1) {
         finalValue = finalValue[0];
       }
-      decodedValue = stringifyWithBigInt(finalValue);
+      if (typeof finalValue === 'string') {
+        decodedValue = finalValue;
+      } else {
+        decodedValue = stringifyWithBigInt(finalValue);
+      }
       if (onDecode) {
         onDecode(decodedValue);
       }

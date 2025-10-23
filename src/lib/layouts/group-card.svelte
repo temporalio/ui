@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { fade, slide } from 'svelte/transition';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -10,16 +13,23 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { toaster } from '$lib/stores/toaster';
   import { workflowComparison } from '$lib/stores/workflow-comparison';
   import { refresh } from '$lib/stores/workflow-run';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowEvents } from '$lib/types/events';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
-  let { group, history }: { group: EventGroup; history: WorkflowEvents } =
-    $props();
+  let {
+    group,
+    history,
+    index,
+  }: { group: EventGroup; history: WorkflowEvents; index: number } = $props();
   const { workflow, run, namespace } = $derived(page.params);
 
+  let showResults = $state(false);
   let showInputs = $state(false);
   let resetConfirmationModalOpen = $state(false);
 
@@ -31,6 +41,7 @@
     const workflowTaskCompletedEvent = history.find(
       (e) => e.id === completedEventId,
     );
+
     if (!workflowTaskCompletedEvent) return null;
     return workflowTaskCompletedEvent.attributes.startedEventId;
   });
@@ -68,34 +79,69 @@
       });
     }
   };
+
+  const duration = $derived(
+    formatDistanceAbbreviated({
+      start: group?.initialEvent?.eventTime,
+      end: group?.lastEvent?.eventTime,
+      includeMilliseconds: true,
+    }),
+  );
 </script>
 
-<div class="surface-primary p-2">
-  <div class="flex items-center justify-between border-b border-subtle pb-1">
-    <h3 class="text-sm">{group.displayName}</h3>
-    {#if workflowTaskStartedEventId}
-      <Tooltip text="Reset to this point" left>
-        <Button
-          variant="secondary"
-          size="xs"
-          on:click={() => (resetConfirmationModalOpen = true)}
-        >
-          <Icon name="retry" />
-        </Button>
-      </Tooltip>
-    {/if}
+<div class="surface-primary rounded-sm border border-subtle p-2">
+  <div class="flex items-center justify-between">
+    <h3 class="whitespace-pre-line text-sm">
+      <MetadataDecoder
+        value={group.userMetadata.summary}
+        let:decodedValue
+        fallback={group.displayName}
+      >
+        {decodedValue}
+      </MetadataDecoder>
+    </h3>
 
-    <!-- <p class="text-xs">
+    <div class="flex items-center gap-2">
+      <Button
+        variant={showInputs ? 'primary' : 'secondary'}
+        size="xs"
+        on:click={() => (showInputs = !showInputs)}
+      >
+        Input
+      </Button>
+      <Button
+        variant={showResults ? 'primary' : 'secondary'}
+        size="xs"
+        on:click={() => (showResults = !showResults)}
+      >
+        Result
+      </Button>
+      {#if index === 0 && workflowTaskStartedEventId}
+        <Tooltip text="Reset to this point" left>
+          <Button
+            variant="secondary"
+            size="xs"
+            on:click={() => (resetConfirmationModalOpen = true)}
+          >
+            <Icon name="retry" />
+          </Button>
+        </Tooltip>
+      {/if}
+    </div>
+  </div>
+  <div class="">
+    <p class="flex items-center gap-1"><Icon name="clock" /> {duration}</p>
+    <p class="text-xs">
       {formatDate(group.eventTime, $timeFormat, {
         relative: $relativeTime,
       })}
-    </p> -->
+    </p>
   </div>
   <div class="flex flex-col gap-2 pt-2">
     {#if showInputs}
       <PayloadDecoder value={group.input} key="payloads">
         {#snippet children(decodedInput)}
-          <div>
+          <div in:fade out:slide>
             <CodeBlock
               content={decodedInput}
               copyIconTitle={translate('common.copy-icon-title')}
@@ -105,25 +151,29 @@
         {/snippet}
       </PayloadDecoder>
     {/if}
-    <PayloadDecoder value={group.result} key="payloads">
-      {#snippet children(decodedResult)}
-        <div>
-          <CodeBlock
-            content={decodedResult}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </div>
-      {/snippet}
-    </PayloadDecoder>
+    {#if showResults}
+      <PayloadDecoder value={group.result} key="payloads">
+        {#snippet children(decodedResult)}
+          <div in:fade out:slide>
+            <CodeBlock
+              content={decodedResult}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            />
+          </div>
+        {/snippet}
+      </PayloadDecoder>
+    {/if}
   </div>
 </div>
 
-<ResetConfirmationModal
-  {refresh}
-  workflow={$workflowRun?.workflow}
-  {namespace}
-  presetEventId={workflowTaskStartedEventId || ''}
-  {onResetCompletion}
-  bind:open={resetConfirmationModalOpen}
-/>
+{#if resetConfirmationModalOpen}
+  <ResetConfirmationModal
+    {refresh}
+    workflow={$workflowRun?.workflow}
+    {namespace}
+    presetEventId={workflowTaskStartedEventId || ''}
+    {onResetCompletion}
+    bind:open={resetConfirmationModalOpen}
+  />
+{/if}

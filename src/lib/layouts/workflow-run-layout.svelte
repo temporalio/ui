@@ -25,6 +25,7 @@
     pauseLiveUpdates,
     timelineEvents,
   } from '$lib/stores/events';
+  import { workflowComparison } from '$lib/stores/workflow-comparison';
   import {
     initialWorkflowRun,
     refresh,
@@ -188,6 +189,8 @@
   onDestroy(() => {
     clearWorkflowData();
   });
+
+  $: isComparing = $workflowComparison.isComparing;
 </script>
 
 {#if showJson}
@@ -215,7 +218,9 @@
     {:else if !$workflowRun.workflow}
       <SkeletonWorkflow />
     {:else}
-      <WorkflowHeader />
+      {#if !isComparing}
+        <WorkflowHeader />
+      {/if}
       <slot />
     {/if}
   </div>

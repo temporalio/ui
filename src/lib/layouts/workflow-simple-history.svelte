@@ -1,5 +1,6 @@
 <script lang="ts">
-  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
+  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { groupEvents } from '$lib/models/event-groups';
@@ -7,8 +8,9 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import type { WorkflowEvents } from '$lib/types/events';
-  import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { isPureWorkflowTaskFailedEvent } from '$lib/utilities/is-event-type';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import GroupCard from './group-card.svelte';
@@ -26,7 +28,7 @@
   );
 
   const getWorkflowAndEventHistory = async (): Promise<
-    [WorkflowExecution, WorkflowEvents, EventGroups, string | null]
+    [WorkflowEvents, EventGroups, string | null]
   > => {
     const result = await fetchWorkflow({
       namespace,
@@ -58,7 +60,7 @@
         : reverseGroups.filter(
             (group) => parseInt(group.eventList[0].id) > parseInt(resetEventId),
           );
-    return [workflow, history, groups, resetEventId];
+    return [history, groups, resetEventId];
   };
 
   const findResetEventId = (history: WorkflowEvents) => {
@@ -79,14 +81,27 @@
   };
 </script>
 
-<div class="flex w-full flex-col border-r border-subtle">
+<div
+  class="surface-primary flex w-full min-w-[320px] max-w-md flex-col border-r border-subtle"
+>
   {#await getWorkflowAndEventHistory()}
+    <div class="z-10 p-3">
+      <div class="flex flex-1 justify-between">
+        <div class="flex items-center gap-2">
+          <h3 class="font-semibold">Fetching Reset</h3>
+        </div>
+      </div>
+      <div class="mt-1 flex items-center gap-2 text-xs text-secondary"></div>
+    </div>
     <div class="flex flex-col gap-2 p-3">
       <Skeleton class="h-16 w-full rounded-none p-3" />
       <Skeleton class="h-32 w-full rounded-none p-3" />
       <Skeleton class="h-32 w-full rounded-none p-3" />
     </div>
-  {:then [workflow, history, groups, resetEventId]}
+  {:then [history, groups, resetEventId]}
+    {@const workflowEvents =
+      getWorkflowStartedCompletedAndTaskFailedEvents(history)}
+
     <div class="z-10 p-3">
       <div class="flex flex-1 justify-between">
         <div class="flex items-center gap-2">
@@ -102,17 +117,19 @@
       </div>
     </div>
     <div class="flex-1 overflow-auto">
-      <div class="flex flex-col gap-2 p-2">
-        <InputAndResults
-          showTitle={false}
-          {workflow}
-          {history}
-          maxHeight={20000}
-        />
+      <div class="flex h-24 max-h-24 flex-col gap-2 overflow-auto p-2">
+        <PayloadDecoder
+          value={parseWithBigInt(workflowEvents.results)}
+          key="payloads"
+        >
+          {#snippet children(decodedValue)}
+            <CodeBlock content={decodedValue} />
+          {/snippet}
+        </PayloadDecoder>
       </div>
-      <div class="flex w-full flex-col">
+      <div class="flex w-full flex-col gap-2 px-2">
         {#each groups as group}
-          <GroupCard {group} {history} />
+          <GroupCard {group} {history} {index} />
         {/each}
       </div>
     </div>
