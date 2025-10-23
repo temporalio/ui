@@ -1,6 +1,7 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
+  import { base } from '$app/paths';
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -13,6 +14,7 @@
   const toggle = () => ($navOpen = !$navOpen);
 
   $: version = $page.data?.settings?.version ?? '';
+  $: baseUrl = base === '' ? '/' : base;
 </script>
 
 <nav
@@ -30,7 +32,7 @@
   <div
     class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
   >
-    <a href="/" class="flex w-fit items-center gap-1 text-nowrap">
+    <a href={baseUrl} class="flex w-fit items-center gap-1 text-nowrap">
       <Logo height={24} width={24} class="m-1" />
       <p class="text-base font-medium group-data-[nav=closed]:hidden">
         {isCloud ? 'Cloud' : 'Self-Hosted'}
