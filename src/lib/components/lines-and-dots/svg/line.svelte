@@ -14,33 +14,35 @@
 
   $: [x1, y1] = startPoint;
   $: [x2, y2] = endPoint;
+  $: completedWithRetries = retried && classification === 'Completed';
 </script>
 
-<defs>
-  <pattern
-    id="retried-pattern"
-    width="10"
-    height="10"
-    patternUnits="userSpaceOnUse"
+{#if completedWithRetries}
+  <foreignObject
+    x={x1}
+    y={y1 - strokeWidth / 2}
+    width={x2 - x1}
+    height={strokeWidth}
   >
-    <rect x="0" y="0" width="5" height="10" fill="#00964e" />
-    <rect x="5" y="0" width="2.5" height="10" fill="#c71607" opacity="0.75" />
-    <rect x="7.5" y="0" width="5" height="10" fill="#00964e" />
-  </pattern>
-</defs>
-<line
-  class="line {status} {category} {classification}"
-  class:scheduling
-  class:animate-line={pending && !paused}
-  class:retried={retried && classification === 'Completed'}
-  class:delayed
-  stroke-width={strokeWidth}
-  stroke-dasharray={pending ? '3' : strokeDasharray}
-  x1={Math.max(0, x1)}
-  x2={Math.max(0, x2)}
-  {y1}
-  {y2}
-/>
+    <div
+      class="h-full w-full"
+      style="background: linear-gradient(255deg, #1FF1A5 0%, #F55 100%);"
+    ></div>
+  </foreignObject>
+{:else}
+  <line
+    class="line {status} {category} {classification}"
+    class:scheduling
+    class:animate-line={pending && !paused}
+    class:delayed
+    stroke-width={strokeWidth}
+    stroke-dasharray={pending ? '3' : strokeDasharray}
+    x1={Math.max(0, x1)}
+    x2={Math.max(0, x2)}
+    {y1}
+    {y2}
+  />
+{/if}
 
 <style lang="postcss">
   .line {
@@ -95,7 +97,7 @@
 
   .Failed,
   .Terminated {
-    stroke: #c71607;
+    stroke: #1ff1a5;
   }
 
   .Signaled {
@@ -125,11 +127,6 @@
   .animate-line {
     stroke-dashoffset: 0;
     animation: dash 60s linear infinite;
-  }
-
-  .retried {
-    stroke: url('#retried-pattern');
-    opacity: 0.85;
   }
 
   @keyframes dash {
