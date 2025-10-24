@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade, slide } from 'svelte/transition';
+
   import type {
     EventGroup,
     EventGroups,
@@ -76,10 +78,10 @@
       class:invisible={!!$activeGroups.length}
     >
       <div class="flex w-full justify-between text-xs">
-        <p class="w-60 -translate-x-24 rotate-90">
+        <p class="w-60 -translate-x-24 rotate-90" in:fade out:slide>
           {formatDate(startTime, $timeFormat)}
         </p>
-        <p class="w-60 translate-x-24 rotate-90">
+        <p class="w-60 translate-x-24 rotate-90" in:fade out:slide>
           {formatDate(endTime, $timeFormat)}
         </p>
       </div>

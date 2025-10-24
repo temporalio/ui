@@ -40,6 +40,7 @@
   export let readOnly = false;
 
   const { height, gutter, radius } = TimelineConfig;
+  let hovering = false;
 
   $: timelineWidth = canvasWidth - 2 * gutter;
   $: active = !activeGroups.length || activeGroups.includes(group.id);
@@ -121,17 +122,39 @@
     setActiveGroup(group);
   };
 
+  const onMouseEnter = () => {
+    if (readOnly) return;
+    hovering = true;
+  };
+
+  const onMouseLeave = () => {
+    if (readOnly) return;
+    hovering = false;
+  };
+
   $: activityTaskScheduled = group.eventList.find(isActivityTaskStartedEvent);
   $: retried =
     activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1;
   $: pendingLine = group.isPending || !!pauseTime;
 </script>
 
+<defs>
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+    <feMerge>
+      <feMergeNode in="coloredBlur" />
+      <feMergeNode in="SourceGraphic" />
+    </feMerge>
+  </filter>
+</defs>
+
 <g
   role="button"
   tabindex="0"
   on:click={onClick}
   on:keypress={onClick}
+  on:mouseenter={onMouseEnter}
+  on:mouseleave={onMouseLeave}
   class="relative cursor-pointer"
   {height}
 >
@@ -161,6 +184,7 @@
         paused={!!pauseTime}
         strokeWidth={radius * 2}
         {retried}
+        {hovering}
         scheduling={index === 0 &&
           group.lastEvent.classification === 'Completed'}
       />
@@ -178,6 +202,7 @@
         pending
         paused={!!pauseTime}
         strokeWidth={radius * 2}
+        {hovering}
       />
       <Dot
         point={[x, y]}
@@ -239,5 +264,9 @@
   g {
     pointer-events: bounding-box;
     outline: none;
+  }
+
+  .hovering {
+    background-color: purple;
   }
 </style>

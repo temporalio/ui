@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   import { tick } from 'svelte';
 
   import { page } from '$app/stores';
@@ -61,55 +63,59 @@
   };
 </script>
 
-<g role="button" tabindex="0" class="relative z-50">
+<g role="button" tabindex="0" class="relative z-50" in:fade>
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div bind:offsetHeight class="flex flex-col">
-      <div
-        class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
-      >
-        <div class="flex h-full items-center gap-4 px-2">
-          {#if status}
-            <WorkflowStatus {status} />
-          {/if}
-          {title}
-          {#if duration}
-            <div class="flex items-center gap-1">
-              <Icon name="clock" />
-              {duration}
+    <div class="bg-interactive p-4">
+      <div bind:offsetHeight class="flex flex-col">
+        <div
+          class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
+        >
+          <div class="flex h-full items-center gap-4 px-2">
+            {#if status}
+              <WorkflowStatus {status} />
+            {/if}
+            {title}
+            {#if duration}
+              <div class="flex items-center gap-1">
+                <Icon name="clock" />
+                {duration}
+              </div>
+            {/if}
+          </div>
+          <div class="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="xs"
+              on:click={() => setActiveGroup(group)}
+              >{translate('common.close')} <Icon name="close" /></Button
+            >
+          </div>
+        </div>
+        <div class="surface-primary">
+          <EventDetailsFull {group} event={group.initialEvent} />
+        </div>
+        {#if childWorkflowStartedEvent}
+          <div class="surface-primary p-4">
+            <div class="font-medium leading-4 text-secondary">
+              Child Workflow
             </div>
-          {/if}
-        </div>
-        <div class="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="xs"
-            on:click={() => setActiveGroup(group)}
-            >{translate('common.close')} <Icon name="close" /></Button
-          >
-        </div>
+            {#key group.eventList.length}
+              <GraphWidget
+                {namespace}
+                workflowId={childWorkflowStartedEvent.attributes
+                  .workflowExecution.workflowId}
+                runId={childWorkflowStartedEvent.attributes.workflowExecution
+                  .runId}
+                viewportHeight={320}
+                class="surface-primary overflow-x-hidden border-t border-subtle"
+                onLoad={onDecode}
+              />
+            {/key}
+          </div>
+        {/if}
       </div>
-      <div class="surface-primary">
-        <EventDetailsFull {group} event={group.initialEvent} />
-      </div>
-      {#if childWorkflowStartedEvent}
-        <div class="surface-primary p-4">
-          <div class="font-medium leading-4 text-secondary">Child Workflow</div>
-          {#key group.eventList.length}
-            <GraphWidget
-              {namespace}
-              workflowId={childWorkflowStartedEvent.attributes.workflowExecution
-                .workflowId}
-              runId={childWorkflowStartedEvent.attributes.workflowExecution
-                .runId}
-              viewportHeight={320}
-              class="surface-primary overflow-x-hidden border-t border-subtle"
-              onLoad={onDecode}
-            />
-          {/key}
-        </div>
-      {/if}
-    </div>
-  </foreignObject>
+    </div></foreignObject
+  >
 </g>
 
 <style lang="postcss">
