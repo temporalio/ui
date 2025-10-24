@@ -160,7 +160,7 @@
 
 <div class="flex items-center gap-2">
   <Button variant="secondary" on:click={handleEnterComparison}
-    >Reset & Compare</Button
+    >Compare & Reset</Button
   >
   {#if isRunning}
     <Button

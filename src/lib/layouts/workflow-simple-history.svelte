@@ -88,7 +88,7 @@
     <div class="z-10 p-3">
       <div class="flex flex-1 justify-between">
         <div class="flex items-center gap-2">
-          <h3 class="font-semibold">Fetching Reset</h3>
+          <h3 class="font-semibold">Resetting...</h3>
         </div>
       </div>
       <div class="mt-1 flex items-center gap-2 text-xs text-secondary"></div>
