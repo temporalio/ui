@@ -79,6 +79,19 @@ describe('formatDate', () => {
     ).toContain('custom');
   });
 
+  it('should format relative time with days instead of months if flexibleUnits is not enabled', () => {
+    const currentDate = new Date();
+    const pastDate = currentDate.setDate(currentDate.getDate() - 90);
+    let formattedDate = formatDate(pastDate, 'local', {
+      relative: true,
+      flexibleUnits: true,
+    });
+    expect(formattedDate).toEqual('3 months ago');
+
+    formattedDate = formatDate(pastDate, 'local', { relative: true });
+    expect(formattedDate).toEqual('90 days ago');
+  });
+
   it('should shorten format for local and other timezones', () => {
     expect(formatDate(date, 'local', { abbrFormat: true })).toEqual(
       '2022-04-13 16:29:35 PM',

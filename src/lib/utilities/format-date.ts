@@ -1,9 +1,4 @@
-import {
-  formatDistanceToNow,
-  formatDistanceToNowStrict,
-  parseISO,
-  parseJSON,
-} from 'date-fns';
+import { formatDistanceToNowStrict, parseISO, parseJSON } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import {
@@ -23,8 +18,8 @@ export function formatDate(
   options: {
     relative?: boolean;
     relativeLabel?: string;
-    relativeStrict?: boolean;
     abbrFormat?: boolean;
+    flexibleUnits?: boolean;
   } = {},
 ): string {
   if (!date) return '';
@@ -38,8 +33,8 @@ export function formatDate(
     const {
       relative = false,
       relativeLabel = isFutureDate ? 'from now' : 'ago',
-      relativeStrict = false,
       abbrFormat = false,
+      flexibleUnits = false,
     } = options;
 
     const parsed = parseJSON(new Date(date));
@@ -52,9 +47,11 @@ export function formatDate(
 
     if (timeFormat === 'local') {
       if (relative)
-        return relativeStrict
-          ? formatDistanceToNowStrict(parsed) + ` ${relativeLabel}`
-          : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
+        return (
+          formatDistanceToNowStrict(parsed, {
+            ...(!flexibleUnits && { unit: 'day' }),
+          }) + ` ${relativeLabel}`
+        );
       return dateTz.format(parsed, format);
     }
     const timezone = getTimezone(timeFormat);
