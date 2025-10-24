@@ -265,7 +265,7 @@
     </SideNavigation>
   </div>
   <MainContentContainer>
-    <DataEncoderSettings class="hidden md:flex" />
+    <DataEncoderSettings />
     <TopNavigation>
       <svelte:fragment slot="left">
         {#if showNamespacePicker}

@@ -76,7 +76,7 @@
   };
 </script>
 
-<div class="flex flex-col gap-0 px-4 pt-4 xl:px-8">
+<div class="flex flex-col gap-0 pt-4">
   <WorkflowCallStackError />
   <div class="flex flex-col gap-2">
     <InputAndResults />
@@ -91,7 +91,7 @@
     {/if}
   </div>
 </div>
-<div class="relative px-4 pb-24 xl:px-8">
+<div class="relative pb-24">
   <div
     class="surface-background flex flex-wrap items-center justify-between gap-2 border-b border-subtle py-2 xl:gap-8"
     class:sticky-header={!$minimizeEventView}
