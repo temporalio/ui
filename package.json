@@ -110,7 +110,7 @@
     "mdast-util-from-markdown": "^2.0.1",
     "mdast-util-to-hast": "^13.2.0",
     "remark-stringify": "^10.0.3",
-    "sveltekit-superforms": "^2.26.1",
+    "sveltekit-superforms": "^2.27.4",
     "tailwind-merge": "^1.14.0",
     "unist-util-remove": "^4.0.0",
     "url-pattern": "^1.0.3",

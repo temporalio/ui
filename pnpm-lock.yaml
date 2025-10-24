@@ -109,7 +109,7 @@ dependencies:
     specifier: ^10.0.3
     version: 10.0.3
   sveltekit-superforms:
-    specifier: ^2.26.1
+    specifier: ^2.27.4
     version: 2.27.4(@sveltejs/kit@2.36.1)(esbuild@0.25.11)(svelte@5.25.5)(typescript@5.2.2)
   tailwind-merge:
     specifier: ^1.14.0
