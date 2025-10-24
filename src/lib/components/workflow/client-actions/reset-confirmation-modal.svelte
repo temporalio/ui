@@ -35,8 +35,7 @@
   let includeSignals = true;
   let excludeSignals = false;
 
-  let workflowUpdateOptions = false;
-  let overrideBehavior = 'pinned';
+  let overrideBehavior = 'unspecified';
   let deploymentName = '';
   let buildId = '';
 
@@ -146,37 +145,27 @@
       />
 
       <!-- {#if $isCloud || minimumVersionRequired('1.28.0', $temporalVersion)} -->
-      <Checkbox
-        id="reset-pinned-override-behavior-checkbox"
-        data-testid="reset-pinned-override-behavior-checkbox"
-        bind:checked={workflowUpdateOptions}
-        label="Update Workflow Options"
+      <Select
+        id="reset-override-behavior-select"
+        data-testid="reset-override-behavior-select"
+        bind:value={overrideBehavior}
+        label={translate('workflows.reset-override-behavior-label')}
+      >
+        <Option value="pinned">Pinned</Option>
+        <Option value="unspecified">Auto-Upgrade</Option>
+      </Select>
+      <Input
+        id="reset-deployment-name"
+        data-testid="reset-deployment-name"
+        bind:value={deploymentName}
+        label={translate('workflows.reset-deployment-name-label')}
       />
-
-      {#if workflowUpdateOptions}
-        <Select
-          id="reset-override-behavior-select"
-          data-testid="reset-override-behavior-select"
-          bind:value={overrideBehavior}
-          label={translate('workflows.reset-override-behavior-label')}
-        >
-          <Option value="pinned">Pinned</Option>
-          <Option value="unspecified">Auto-Upgrade</Option>
-        </Select>
-        <Input
-          id="reset-deployment-name"
-          data-testid="reset-deployment-name"
-          bind:value={deploymentName}
-          label={translate('workflows.reset-deployment-name-label')}
-        />
-        <Input
-          id="reset-build-id"
-          data-testid="reset-build-id"
-          bind:value={buildId}
-          label={translate('workflows.reset-build-id-label')}
-        />
-      {/if}
-      <!-- {/if} -->
+      <Input
+        id="reset-build-id"
+        data-testid="reset-build-id"
+        bind:value={buildId}
+        label={translate('workflows.reset-build-id-label')}
+      />
     </div>
   </svelte:fragment>
 </Modal>
