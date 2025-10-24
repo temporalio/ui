@@ -147,6 +147,23 @@
       />
     {/if}
   </td>
+{:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label) && $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.KEYWORD && typeof workflow.searchAttributes.indexedFields[label] === 'string'}
+  <td
+    class="workflows-summary-table-body-cell filterable"
+    data-testid="workflows-summary-table-body-cell"
+    onmouseover={showFilterOrCopy}
+    onfocus={showFilterOrCopy}
+    onfocusin={showFilterOrCopy}
+    onfocusout={handleFocusOut}
+    onmouseleave={hideFilterOrCopy}
+    onblur={hideFilterOrCopy}
+  >
+    <FilterableTableCell
+      {filterOrCopyButtonsVisible}
+      attribute={label}
+      value={workflow.searchAttributes.indexedFields[label]}
+    />
+  </td>
 {:else}
   <td
     class="workflows-summary-table-body-cell"
