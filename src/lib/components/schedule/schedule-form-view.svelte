@@ -51,9 +51,6 @@
   let scheduleId = $page.params.schedule;
 
   let title = translate(schedule ? 'schedules.edit' : 'schedules.create');
-  let loadingText = translate(
-    schedule ? 'schedules.editing' : 'schedules.creating',
-  );
   let backTitle = translate(
     schedule ? 'schedules.back-to-schedule' : 'schedules.back-to-schedules',
   );
@@ -187,7 +184,7 @@
 
 <div class="flex flex-col gap-4 pb-10">
   {#if $loading}
-    <Loading title={loadingText} />
+    <Loading />
   {:else}
     <Link href={backHref} icon="chevron-left">
       {backTitle}
