@@ -6,7 +6,10 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+  import {
+    SEARCH_ATTRIBUTE_TYPE,
+    type SearchAttributeType,
+  } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   type Props = {
@@ -14,12 +17,14 @@
     filterOrCopyButtonsVisible: boolean;
     value: string;
     href?: string;
+    type?: SearchAttributeType;
   };
   let {
     attribute,
     filterOrCopyButtonsVisible = false,
     value,
     href,
+    type = SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   }: Props = $props();
 
   const onRowFilterClick = () => {
@@ -30,7 +35,7 @@
     if (!filter || filter.value !== value) {
       const newFilter: SearchAttributeFilter = {
         attribute,
-        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        type,
         value,
         conditional: '=',
         operator: '',

@@ -157,6 +157,7 @@
         {filterOrCopyButtonsVisible}
         attribute={label}
         value={content}
+        type={$customSearchAttributes[label]}
       />
     {/if}
   </td>
