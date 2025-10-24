@@ -86,7 +86,7 @@
   const linkCount = $derived(outboundLinks + inboundLinks);
 </script>
 
-<div class="flex items-center justify-between pb-4">
+<div class="flex items-center justify-between">
   <div class="flex items-center gap-2">
     <Link
       href={workflowsHref}

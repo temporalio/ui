@@ -1,14 +1,16 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { writable } from 'svelte/store';
-  import { fly } from 'svelte/transition';
 
-  import { twMerge as merge } from 'tailwind-merge';
+  export const viewDataEncoderSettings = writable<boolean>(false);
+</script>
 
-  import { page } from '$app/stores';
+<script lang="ts">
+  import { page } from '$app/state';
 
-  import Accordion from '$lib/holocene/accordion/accordion.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
+  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
+  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     codecEndpoint,
@@ -18,31 +20,20 @@
   } from '$lib/stores/data-encoder-config';
   import { refresh } from '$lib/stores/workflow-run';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
+  import { trimTrailingSlash } from '$lib/utilities/trim-trailing-slash';
 
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
 
-  export const viewDataEncoderSettings = writable<boolean>(false);
-</script>
-
-<script lang="ts">
-  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
-  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
-  import { trimTrailingSlash } from '$lib/utilities/trim-trailing-slash';
-
-  let className = '';
-  export { className as class };
-
-  let endpoint = $codecEndpoint ?? '';
-  let passToken = $passAccessToken ?? false;
-  let includeCreds = $includeCredentials ?? false;
+  let endpoint = $state($codecEndpoint ?? '');
+  let passToken = $state($passAccessToken ?? false);
+  let includeCreds = $state($includeCredentials ?? false);
+  let error = $state('');
   let override = writable($overrideRemoteCodecConfiguration);
-
-  $: error = '';
-  $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
+  let namespaceOrCluster = page.data?.settings?.runtimeEnvironment?.isCloud
     ? translate('common.namespaces')
     : translate('common.cluster');
 
-  $: {
+  $effect(() => {
     if (passToken && !validateHttps(endpoint)) {
       error = translate('data-encoder.access-token-https-error');
     } else if (endpoint && !validateHttpOrHttps(endpoint)) {
@@ -50,11 +41,13 @@
     } else {
       error = '';
     }
-  }
+  });
 
-  $: if (!$viewDataEncoderSettings) {
-    onCancel();
-  }
+  $effect(() => {
+    if (!$viewDataEncoderSettings) {
+      onCancel();
+    }
+  });
 
   const onCancel = () => {
     endpoint = $codecEndpoint;
@@ -72,85 +65,62 @@
     $viewDataEncoderSettings = false;
     $overrideRemoteCodecConfiguration = $override;
 
-    if ($page.url.pathname.endsWith('history')) {
+    if (page.url.pathname.endsWith('history')) {
       $refresh = Date.now();
     }
   };
 </script>
 
-{#if $viewDataEncoderSettings}
-  <aside
-    in:fly={{ y: -50, delay: 0, duration: 500 }}
-    class={merge(
-      'surface-primary relative flex h-[540px] w-full flex-col gap-6 border-b border-subtle p-4 md:p-12',
-      className,
-    )}
-  >
-    <div class="flex w-full flex-col gap-4 xl:w-1/2">
-      <div class="flex items-center justify-between space-x-2">
-        <h3 data-testid="data-encoder-title">
-          {translate('common.codec-server')}
-        </h3>
-      </div>
-      <p class="text-sm">
-        {translate('data-encoder.codec-server-description-prefix')}<Link
-          href="https://docs.temporal.io/dataconversion#codec-server"
-          newTab>{translate('common.codec-server')}</Link
-        >
-        {translate('data-encoder.codec-server-description-suffix', {
+<Modal
+  bind:open={$viewDataEncoderSettings}
+  id="data-encoder-settings"
+  cancelText={translate('common.cancel')}
+  confirmText={translate('common.apply')}
+  confirmDisabled={Boolean(error)}
+  on:cancelModal={onCancel}
+  on:confirmModal={onConfirm}
+  large
+>
+  <h3 slot="title" data-testid="data-encoder-title">
+    {translate('common.codec-server')}
+  </h3>
+  <div slot="content" class="flex w-full flex-col gap-4">
+    <p class="text-sm">
+      {translate('data-encoder.codec-server-description-prefix')}<Link
+        href="https://docs.temporal.io/dataconversion#codec-server"
+        newTab>{translate('common.codec-server')}</Link
+      >
+      {translate('data-encoder.codec-server-description-suffix', {
+        level: namespaceOrCluster,
+      })}
+    </p>
+
+    <RadioGroup name="override" group={override}>
+      <RadioInput
+        id="use-configuration-endpoint-radio"
+        data-testid="use-configuration-endpoint-input"
+        value={false}
+        label={translate('data-encoder.no-browser-override-description', {
           level: namespaceOrCluster,
         })}
-      </p>
-      <Accordion
-        data-testid="override-accordion"
-        title={$override
-          ? translate('data-encoder.browser-override-description', {
-              level: namespaceOrCluster,
-            })
-          : translate('data-encoder.no-browser-override-description', {
-              level: namespaceOrCluster,
-            })}
-        subtitle={!$override ? $page?.data?.settings?.codec?.endpoint : ''}
-        class="max-sm:[&_h3]:text-xs"
-      >
-        <RadioGroup name="override" group={override}>
-          <RadioInput
-            id="use-configuration-endpoint-radio"
-            data-testid="use-configuration-endpoint-input"
-            value={false}
-            label={translate('data-encoder.no-browser-override-description', {
-              level: namespaceOrCluster,
-            })}
-          />
-          <RadioInput
-            id="use-local-endpoint-radio"
-            data-testid="use-local-endpoint-input"
-            value={true}
-            label={translate('data-encoder.browser-override-description', {
-              level: namespaceOrCluster,
-            })}
-          />
-        </RadioGroup>
-      </Accordion>
+      />
+      <RadioInput
+        id="use-local-endpoint-radio"
+        data-testid="use-local-endpoint-input"
+        value={true}
+        label={translate('data-encoder.browser-override-description', {
+          level: namespaceOrCluster,
+        })}
+      />
+    </RadioGroup>
+
+    {#if $override}
       <CodecEndpointSettings
         bind:endpoint
         bind:passToken
         bind:includeCreds
         {error}
       />
-      <div class="flex items-center gap-4">
-        <Button
-          disabled={Boolean(error)}
-          data-testid="confirm-data-encoder-button"
-          on:click={onConfirm}
-          type="submit">{translate('common.apply')}</Button
-        >
-        <Button
-          variant="ghost"
-          data-testid="cancel-data-encoder-button"
-          on:click={onCancel}>{translate('common.cancel')}</Button
-        >
-      </div>
-    </div>
-  </aside>
-{/if}
+    {/if}
+  </div>
+</Modal>
