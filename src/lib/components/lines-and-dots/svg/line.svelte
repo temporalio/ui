@@ -92,12 +92,12 @@
   }
 
   .Completed {
-    stroke: #00964e;
+    stroke: #1ff1a5;
   }
 
   .Failed,
   .Terminated {
-    stroke: #1ff1a5;
+    stroke: #f55;
   }
 
   .Signaled {
