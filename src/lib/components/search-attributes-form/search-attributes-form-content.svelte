@@ -26,6 +26,7 @@
     hideTainted?: boolean;
     hideDeleteButton?: boolean;
     hideCancelButton?: boolean;
+    disableTypeForExisting?: boolean;
     getSupportedTypes: () => SearchAttributeTypeOption[];
   }
 
@@ -38,6 +39,7 @@
     hideTainted = false,
     hideDeleteButton = false,
     hideCancelButton = false,
+    disableTypeForExisting = false,
     getSupportedTypes,
   }: Props = $props();
 
@@ -81,7 +83,6 @@
   } = superForm(
     { attributes: initialAttributes },
     {
-      taintedMessage: true,
       SPA: true,
       dataType: 'json',
       validators: zodClient(createFormSchema(typeValues)),
@@ -129,6 +130,11 @@
   );
 
   const disabled = $derived($submitting || taintedCount === 0);
+
+  // Track initial attribute names to identify existing attributes
+  const initialAttributeNames = $derived(
+    new Set(initialAttributes.map((attr) => attr.name)),
+  );
 </script>
 
 <Card class={className}>
@@ -178,7 +184,9 @@
                   index: index + 1,
                 })}
                 labelHidden
-                disabled={$submitting}
+                disabled={$submitting ||
+                  (disableTypeForExisting &&
+                    initialAttributeNames.has(attribute.name))}
                 placeholder={translate(
                   'search-attributes.select-type-placeholder',
                 )}
