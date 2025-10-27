@@ -1,4 +1,9 @@
-import { formatDistanceToNowStrict, parseISO, parseJSON } from 'date-fns';
+import {
+  differenceInHours,
+  formatDistanceToNowStrict,
+  parseISO,
+  parseJSON,
+} from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import {
@@ -29,7 +34,8 @@ export function formatDate(
       date = timestampToDate(date);
     }
 
-    const isFutureDate = new Date(date).getTime() - Date.now() > 0;
+    const currentDate = Date.now();
+    const isFutureDate = new Date(date).getTime() - currentDate > 0;
     const {
       relative = false,
       relativeLabel = isFutureDate ? 'from now' : 'ago',
@@ -49,7 +55,10 @@ export function formatDate(
       if (relative)
         return (
           formatDistanceToNowStrict(parsed, {
-            ...(!flexibleUnits && { unit: 'day' }),
+            ...(!flexibleUnits &&
+              Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
+                unit: 'day',
+              }),
           }) + ` ${relativeLabel}`
         );
       return dateTz.format(parsed, format);
