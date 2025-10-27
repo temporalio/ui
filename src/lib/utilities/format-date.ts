@@ -1,5 +1,5 @@
 import {
-  formatDistanceToNow,
+  differenceInHours,
   formatDistanceToNowStrict,
   parseISO,
   parseJSON,
@@ -23,8 +23,8 @@ export function formatDate(
   options: {
     relative?: boolean;
     relativeLabel?: string;
-    relativeStrict?: boolean;
     abbrFormat?: boolean;
+    flexibleUnits?: boolean;
   } = {},
 ): string {
   if (!date) return '';
@@ -34,12 +34,13 @@ export function formatDate(
       date = timestampToDate(date);
     }
 
-    const isFutureDate = new Date(date).getTime() - Date.now() > 0;
+    const currentDate = Date.now();
+    const isFutureDate = new Date(date).getTime() - currentDate > 0;
     const {
       relative = false,
       relativeLabel = isFutureDate ? 'from now' : 'ago',
-      relativeStrict = false,
       abbrFormat = false,
+      flexibleUnits = false,
     } = options;
 
     const parsed = parseJSON(new Date(date));
@@ -52,9 +53,14 @@ export function formatDate(
 
     if (timeFormat === 'local') {
       if (relative)
-        return relativeStrict
-          ? formatDistanceToNowStrict(parsed) + ` ${relativeLabel}`
-          : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
+        return (
+          formatDistanceToNowStrict(parsed, {
+            ...(!flexibleUnits &&
+              Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
+                unit: 'day',
+              }),
+          }) + ` ${relativeLabel}`
+        );
       return dateTz.format(parsed, format);
     }
     const timezone = getTimezone(timeFormat);
