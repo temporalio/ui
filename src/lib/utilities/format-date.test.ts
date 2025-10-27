@@ -79,7 +79,7 @@ describe('formatDate', () => {
     ).toContain('custom');
   });
 
-  it('should format relative time with days instead of months if flexibleUnits is not enabled', () => {
+  it('should format relative time with days instead of months for past dates if flexibleUnits is not enabled', () => {
     const currentDate = new Date();
     const pastDate = currentDate.setDate(currentDate.getDate() - 90);
     let formattedDate = formatDate(pastDate, 'local', {
@@ -90,6 +90,45 @@ describe('formatDate', () => {
 
     formattedDate = formatDate(pastDate, 'local', { relative: true });
     expect(formattedDate).toEqual('90 days ago');
+  });
+
+  it('should format relative time with days instead of months for future dates if flexibleUnits is not enabled', () => {
+    const currentDate = new Date();
+    const futureDate = currentDate.setDate(currentDate.getDate() + 90);
+    let formattedDate = formatDate(futureDate, 'local', {
+      relative: true,
+      flexibleUnits: true,
+    });
+    expect(formattedDate).toEqual('3 months from now');
+
+    formattedDate = formatDate(futureDate, 'local', { relative: true });
+    expect(formattedDate).toEqual('90 days from now');
+  });
+
+  it('should not format relative time with days if less than a day for past dates even if flexibleUnits is enabled', () => {
+    const currentDate = new Date();
+    const pastDate = currentDate.setHours(currentDate.getHours() - 23);
+    let formattedDate = formatDate(pastDate, 'local', {
+      relative: true,
+      flexibleUnits: true,
+    });
+    expect(formattedDate).toEqual('23 hours ago');
+
+    formattedDate = formatDate(pastDate, 'local', { relative: true });
+    expect(formattedDate).toEqual('23 hours ago');
+  });
+
+  it('should not format relative time with days if less than a day for future dates even if flexibleUnits is enabled', () => {
+    const currentDate = new Date();
+    const futureDate = currentDate.setHours(currentDate.getHours() + 23);
+    let formattedDate = formatDate(futureDate, 'local', {
+      relative: true,
+      flexibleUnits: true,
+    });
+    expect(formattedDate).toEqual('23 hours from now');
+
+    formattedDate = formatDate(futureDate, 'local', { relative: true });
+    expect(formattedDate).toEqual('23 hours from now');
   });
 
   it('should shorten format for local and other timezones', () => {
