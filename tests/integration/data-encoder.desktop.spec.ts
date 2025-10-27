@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { DataEncoderSettingsPage } from '~/pages/data-encoder-settings';
 import {
   mockSettingsApi,
   mockWorkflowsApis,
@@ -18,41 +19,32 @@ test.describe('Data Encoder without Configuration Settings', () => {
   test('Navigate to Data Encoder UI and configure Local Setting', async ({
     page,
   }) => {
-    const dataEncoderStatusButton = page.getByTestId('data-encoder-status');
-    await expect(dataEncoderStatusButton).toBeEnabled();
-    await dataEncoderStatusButton.click();
+    const dataEncoder = new DataEncoderSettingsPage(page);
 
-    const dataEncoderTitle = await page
-      .getByTestId('data-encoder-title')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+    await expect(dataEncoder.statusButton).toBeEnabled();
+    await dataEncoder.openSettings();
 
-    const dataEncoderConfirmButton = page.locator(
-      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
-    );
-    await expect(dataEncoderConfirmButton).toBeEnabled();
+    const title = await dataEncoder.getTitle();
+    expect(title).toBe('Codec Server');
 
-    await page.getByTestId('use-local-endpoint-input').click();
+    await expect(dataEncoder.confirmButton).toBeEnabled();
 
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
+    await dataEncoder.selectLocalEndpoint();
 
-    await page.locator('#data-encoder-endpoint-input').fill('localhost:8080');
-    await expect(page.locator('.error-msg')).toHaveText(
+    await expect(dataEncoder.endpointInput).toHaveValue('');
+
+    await dataEncoder.setEndpoint('localhost:8080');
+    await expect(dataEncoder.errorMessage).toHaveText(
       'Endpoint must start with http:// or https://',
     );
-    await expect(dataEncoderConfirmButton).toBeDisabled();
+    await expect(dataEncoder.confirmButton).toBeDisabled();
 
-    await page
-      .locator('#data-encoder-endpoint-input')
-      .fill('http://localhost:8080');
-    await dataEncoderConfirmButton.click();
+    await dataEncoder.setEndpoint('http://localhost:8080');
+    await dataEncoder.confirm();
 
-    const dataEncoderStatusConfiguredButton = page.getByTestId(
-      'data-encoder-status-configured',
-    );
-    await expect(dataEncoderStatusConfiguredButton).toBeVisible();
-    await dataEncoderStatusConfiguredButton.click();
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
+    await expect(dataEncoder.statusConfiguredButton).toBeVisible();
+    await dataEncoder.openConfiguredSettings();
+    await expect(dataEncoder.endpointInput).toHaveValue(
       'http://localhost:8080',
     );
   });
@@ -60,48 +52,33 @@ test.describe('Data Encoder without Configuration Settings', () => {
   test('Navigate to Data Encoder UI and configure and cancel Local Settings', async ({
     page,
   }) => {
-    const dataEncoderStatusButton = page.getByTestId('data-encoder-status');
-    await expect(dataEncoderStatusButton).toBeEnabled();
-    await dataEncoderStatusButton.click();
+    const dataEncoder = new DataEncoderSettingsPage(page);
 
-    const dataEncoderTitle = await page
-      .getByTestId('data-encoder-title')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+    await expect(dataEncoder.statusButton).toBeEnabled();
+    await dataEncoder.openSettings();
 
-    const dataEncoderConfirmButton = page.locator(
-      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
-    );
+    const title = await dataEncoder.getTitle();
+    expect(title).toBe('Codec Server');
 
-    await expect(dataEncoderConfirmButton).toBeEnabled();
-    await page.getByTestId('use-local-endpoint-input').click();
+    await expect(dataEncoder.confirmButton).toBeEnabled();
+    await dataEncoder.selectLocalEndpoint();
 
-    await page
-      .locator('#data-encoder-endpoint-input')
-      .fill('https://localhost:8080');
+    await dataEncoder.setEndpoint('https://localhost:8080');
 
-    await dataEncoderConfirmButton.click();
+    await dataEncoder.confirm();
 
-    const dataEncoderStatusConfiguredButton = page.getByTestId(
-      'data-encoder-status-configured',
-    );
-    await expect(dataEncoderStatusConfiguredButton).toBeVisible();
-    await dataEncoderStatusConfiguredButton.click();
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
+    await expect(dataEncoder.statusConfiguredButton).toBeVisible();
+    await dataEncoder.openConfiguredSettings();
+    await expect(dataEncoder.endpointInput).toHaveValue(
       'https://localhost:8080',
     );
-    await page
-      .locator('#data-encoder-endpoint-input')
-      .fill('http://localhost:9999');
+    await dataEncoder.setEndpoint('http://localhost:9999');
 
-    const dataEncoderCancelButton = page.locator(
-      '#data-encoder-settings >> [data-testid="cancel-modal-button"]',
-    );
-    await dataEncoderCancelButton.click();
-    await expect(dataEncoderStatusConfiguredButton).toBeVisible();
-    await dataEncoderStatusConfiguredButton.click();
+    await dataEncoder.cancel();
+    await expect(dataEncoder.statusConfiguredButton).toBeVisible();
+    await dataEncoder.openConfiguredSettings();
 
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
+    await expect(dataEncoder.endpointInput).toHaveValue(
       'https://localhost:8080',
     );
   });
@@ -109,45 +86,32 @@ test.describe('Data Encoder without Configuration Settings', () => {
   test('Navigate to Data Encoder UI and configure Local Settings with Pass Access Token', async ({
     page,
   }) => {
-    const dataEncoderStatusButton = page.getByTestId('data-encoder-status');
-    await expect(dataEncoderStatusButton).toBeEnabled();
-    await dataEncoderStatusButton.click();
+    const dataEncoder = new DataEncoderSettingsPage(page);
 
-    const dataEncoderConfirmButton = page.locator(
-      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
-    );
+    await expect(dataEncoder.statusButton).toBeEnabled();
+    await dataEncoder.openSettings();
 
-    await expect(dataEncoderConfirmButton).toBeEnabled();
-    await page.getByTestId('use-local-endpoint-input').click();
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
+    await expect(dataEncoder.confirmButton).toBeEnabled();
+    await dataEncoder.selectLocalEndpoint();
+    await expect(dataEncoder.endpointInput).toHaveValue('');
 
-    await page
-      .locator('#data-encoder-endpoint-input')
-      .fill('http://localhost:8080');
+    await dataEncoder.setEndpoint('http://localhost:8080');
 
-    await page
-      .locator('label')
-      .filter({ hasText: 'Pass the user access token' })
-      .click();
+    await dataEncoder.enablePassAccessToken();
 
-    await expect(page.locator('.error-msg')).toHaveText(
+    await expect(dataEncoder.errorMessage).toHaveText(
       'Endpoint must be https:// if passing access token',
     );
-    await expect(dataEncoderConfirmButton).toBeDisabled();
+    await expect(dataEncoder.confirmButton).toBeDisabled();
 
-    await page
-      .locator('#data-encoder-endpoint-input')
-      .fill('https://localhost:8080');
+    await dataEncoder.setEndpoint('https://localhost:8080');
 
-    await expect(dataEncoderConfirmButton).toBeEnabled();
-    await dataEncoderConfirmButton.click();
+    await expect(dataEncoder.confirmButton).toBeEnabled();
+    await dataEncoder.confirm();
 
-    const dataEncoderStatusConfiguredButton = page.getByTestId(
-      'data-encoder-status-configured',
-    );
-    await expect(dataEncoderStatusConfiguredButton).toBeVisible();
-    await dataEncoderStatusConfiguredButton.click();
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
+    await expect(dataEncoder.statusConfiguredButton).toBeVisible();
+    await dataEncoder.openConfiguredSettings();
+    await expect(dataEncoder.endpointInput).toHaveValue(
       'https://localhost:8080',
     );
   });
@@ -155,35 +119,24 @@ test.describe('Data Encoder without Configuration Settings', () => {
   test('Navigate to Data Encoder UI and configure Local Settings with Include Credentials', async ({
     page,
   }) => {
-    const dataEncoderStatusButton = page.getByTestId('data-encoder-status');
-    await expect(dataEncoderStatusButton).toBeEnabled();
-    await dataEncoderStatusButton.click();
+    const dataEncoder = new DataEncoderSettingsPage(page);
 
-    const dataEncoderConfirmButton = page.locator(
-      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
-    );
+    await expect(dataEncoder.statusButton).toBeEnabled();
+    await dataEncoder.openSettings();
 
-    await expect(dataEncoderConfirmButton).toBeEnabled();
-    await page.getByTestId('use-local-endpoint-input').click();
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
+    await expect(dataEncoder.confirmButton).toBeEnabled();
+    await dataEncoder.selectLocalEndpoint();
+    await expect(dataEncoder.endpointInput).toHaveValue('');
 
-    await page
-      .locator('#data-encoder-endpoint-input')
-      .fill('http://localhost:8080');
+    await dataEncoder.setEndpoint('http://localhost:8080');
 
-    await page
-      .locator('label')
-      .filter({ hasText: 'Include cross-origin credentials' })
-      .click();
+    await dataEncoder.enableIncludeCredentials();
 
-    await dataEncoderConfirmButton.click();
+    await dataEncoder.confirm();
 
-    const dataEncoderStatusConfiguredButton = page.getByTestId(
-      'data-encoder-status-configured',
-    );
-    await expect(dataEncoderStatusConfiguredButton).toBeVisible();
-    await dataEncoderStatusConfiguredButton.click();
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue(
+    await expect(dataEncoder.statusConfiguredButton).toBeVisible();
+    await dataEncoder.openConfiguredSettings();
+    await expect(dataEncoder.endpointInput).toHaveValue(
       'http://localhost:8080',
     );
   });
@@ -204,45 +157,30 @@ test.describe('Data Encoder with Configuration Settings', () => {
   });
 
   test('Navigate to Data Encoder UI', async ({ page }) => {
-    const dataEncoderStatusConfiguredButton = page.getByTestId(
-      'data-encoder-status-configured',
-    );
-    await expect(dataEncoderStatusConfiguredButton).toBeEnabled();
-    await dataEncoderStatusConfiguredButton.click();
-    const dataEncoderTitle = await page
-      .getByTestId('data-encoder-title')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+    const dataEncoder = new DataEncoderSettingsPage(page);
 
-    await expect(
-      page.getByTestId('use-configuration-endpoint-input'),
-    ).toBeChecked();
-    await expect(
-      page.getByTestId('use-local-endpoint-input'),
-    ).not.toBeChecked();
+    await expect(dataEncoder.statusConfiguredButton).toBeEnabled();
+    await dataEncoder.openConfiguredSettings();
+    const title = await dataEncoder.getTitle();
+    expect(title).toBe('Codec Server');
 
-    const dataEncoderConfirmButton = page.locator(
-      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
-    );
+    await expect(dataEncoder.useConfigurationEndpointRadio).toBeChecked();
+    await expect(dataEncoder.useLocalEndpointRadio).not.toBeChecked();
 
-    await expect(dataEncoderConfirmButton).toBeEnabled();
+    await expect(dataEncoder.confirmButton).toBeEnabled();
 
-    await page.getByTestId('use-local-endpoint-input').click();
-    await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
-    await page
-      .locator('#data-encoder-endpoint-input')
-      .fill('http://localhost:8080');
+    await dataEncoder.selectLocalEndpoint();
+    await expect(dataEncoder.endpointInput).toHaveValue('');
+    await dataEncoder.setEndpoint('http://localhost:8080');
 
-    await expect(
-      page.getByTestId('use-configuration-endpoint-input'),
-    ).not.toBeChecked();
+    await expect(dataEncoder.useConfigurationEndpointRadio).not.toBeChecked();
 
-    await expect(page.getByTestId('use-local-endpoint-input')).toBeChecked();
+    await expect(dataEncoder.useLocalEndpointRadio).toBeChecked();
 
-    await dataEncoderConfirmButton.click();
+    await dataEncoder.confirm();
 
-    await expect(dataEncoderStatusConfiguredButton).toBeEnabled();
+    await expect(dataEncoder.statusConfiguredButton).toBeEnabled();
 
-    await dataEncoderStatusConfiguredButton.click();
+    await dataEncoder.openConfiguredSettings();
   });
 });
