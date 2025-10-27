@@ -5,6 +5,8 @@
 </script>
 
 <script lang="ts">
+  import { MediaQuery } from 'svelte/reactivity';
+
   import { page } from '$app/state';
 
   import Link from '$lib/holocene/link.svelte';
@@ -69,6 +71,8 @@
       $refresh = Date.now();
     }
   };
+
+  const md = new MediaQuery('max-width:768px');
 </script>
 
 <Modal
@@ -80,6 +84,7 @@
   on:cancelModal={onCancel}
   on:confirmModal={onConfirm}
   large
+  {...md.current && { 'data-theme': 'dark' }}
 >
   <h3 slot="title" data-testid="data-encoder-title">
     {translate('common.codec-server')}

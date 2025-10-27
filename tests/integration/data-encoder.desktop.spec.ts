@@ -27,10 +27,12 @@ test.describe('Data Encoder without Configuration Settings', () => {
       .innerText();
     expect(dataEncoderTitle).toBe('Codec Server');
 
-    const dataEncoderConfirmButton = page.getByTestId(
-      'confirm-data-encoder-button',
+    const dataEncoderConfirmButton = page.locator(
+      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
     );
     await expect(dataEncoderConfirmButton).toBeEnabled();
+
+    await page.getByTestId('use-local-endpoint-input').click();
 
     await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
 
@@ -67,10 +69,12 @@ test.describe('Data Encoder without Configuration Settings', () => {
       .innerText();
     expect(dataEncoderTitle).toBe('Codec Server');
 
-    const dataEncoderConfirmButton = page.getByTestId(
-      'confirm-data-encoder-button',
+    const dataEncoderConfirmButton = page.locator(
+      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
     );
+
     await expect(dataEncoderConfirmButton).toBeEnabled();
+    await page.getByTestId('use-local-endpoint-input').click();
 
     await page
       .locator('#data-encoder-endpoint-input')
@@ -90,8 +94,8 @@ test.describe('Data Encoder without Configuration Settings', () => {
       .locator('#data-encoder-endpoint-input')
       .fill('http://localhost:9999');
 
-    const dataEncoderCancelButton = page.getByTestId(
-      'cancel-data-encoder-button',
+    const dataEncoderCancelButton = page.locator(
+      '#data-encoder-settings >> [data-testid="cancel-modal-button"]',
     );
     await dataEncoderCancelButton.click();
     await expect(dataEncoderStatusConfiguredButton).toBeVisible();
@@ -109,11 +113,12 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await expect(dataEncoderStatusButton).toBeEnabled();
     await dataEncoderStatusButton.click();
 
-    const dataEncoderConfirmButton = page.getByTestId(
-      'confirm-data-encoder-button',
+    const dataEncoderConfirmButton = page.locator(
+      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
     );
-    await expect(dataEncoderConfirmButton).toBeEnabled();
 
+    await expect(dataEncoderConfirmButton).toBeEnabled();
+    await page.getByTestId('use-local-endpoint-input').click();
     await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
 
     await page
@@ -154,11 +159,12 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await expect(dataEncoderStatusButton).toBeEnabled();
     await dataEncoderStatusButton.click();
 
-    const dataEncoderConfirmButton = page.getByTestId(
-      'confirm-data-encoder-button',
+    const dataEncoderConfirmButton = page.locator(
+      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
     );
-    await expect(dataEncoderConfirmButton).toBeEnabled();
 
+    await expect(dataEncoderConfirmButton).toBeEnabled();
+    await page.getByTestId('use-local-endpoint-input').click();
     await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
 
     await page
@@ -208,42 +214,35 @@ test.describe('Data Encoder with Configuration Settings', () => {
       .innerText();
     expect(dataEncoderTitle).toBe('Codec Server');
 
-    await expect(page.getByTestId('override-accordion')).toHaveText(
-      /Use Cluster-level setting, where available/,
+    await expect(
+      page.getByTestId('use-configuration-endpoint-input'),
+    ).toBeChecked();
+    await expect(
+      page.getByTestId('use-local-endpoint-input'),
+    ).not.toBeChecked();
+
+    const dataEncoderConfirmButton = page.locator(
+      '#data-encoder-settings >> [data-testid="confirm-modal-button"]',
     );
 
-    const dataEncoderConfirmButton = page.getByTestId(
-      'confirm-data-encoder-button',
-    );
     await expect(dataEncoderConfirmButton).toBeEnabled();
 
+    await page.getByTestId('use-local-endpoint-input').click();
     await expect(page.locator('#data-encoder-endpoint-input')).toHaveValue('');
-
     await page
       .locator('#data-encoder-endpoint-input')
       .fill('http://localhost:8080');
 
-    await page.getByTestId('override-accordion').click();
-    await page.getByTestId('use-local-endpoint-input').click();
+    await expect(
+      page.getByTestId('use-configuration-endpoint-input'),
+    ).not.toBeChecked();
 
-    await page
-      .getByRole('button', {
-        name: 'Use my browser setting and ignore Cluster-level setting.',
-      })
-      .click();
-
-    await expect(page.getByTestId('override-accordion')).toHaveText(
-      /Use my browser setting and ignore Cluster-level setting/,
-    );
+    await expect(page.getByTestId('use-local-endpoint-input')).toBeChecked();
 
     await dataEncoderConfirmButton.click();
 
     await expect(dataEncoderStatusConfiguredButton).toBeEnabled();
 
     await dataEncoderStatusConfiguredButton.click();
-
-    await expect(page.getByTestId('override-accordion')).toHaveText(
-      /Use my browser setting and ignore Cluster-level setting/,
-    );
   });
 });
