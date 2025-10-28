@@ -29,17 +29,6 @@
   const handleClick = () => {
     maximized = !maximized;
   };
-
-  const handleFocusOut = (event: FocusEvent) => {
-    if (
-      maximized &&
-      (!(event.currentTarget instanceof Element) ||
-        !(event.relatedTarget instanceof Element) ||
-        !event.currentTarget.contains(event.relatedTarget))
-    ) {
-      maximized = false;
-    }
-  };
 </script>
 
 <svelte:window onkeydown={escapeListener} />
@@ -51,7 +40,6 @@
       'fixed bottom-0 left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-white dark:bg-black',
     className,
   )}
-  onfocusout={handleFocusOut}
 >
   {@render children()}
 
