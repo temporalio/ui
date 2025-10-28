@@ -7,15 +7,14 @@
   import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
-  import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import type {
     SearchAttributeDefinition,
     SearchAttributeTypeOption,
   } from './types';
+
+  import SearchAttributeRow from './search-attribute-row.svelte';
 
   interface Props {
     class?: string;
@@ -161,57 +160,17 @@
           </div>
 
           {#each $formData.attributes as attribute, index}
-            <div
-              class="grid gap-3"
-              class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
-              class:grid-cols-[1fr,200px]={hideDeleteButton}
-            >
-              <Input
-                id="attribute-name-{index}"
-                bind:value={attribute.name}
-                label={translate('search-attributes.attribute-label', {
-                  index: index + 1,
-                })}
-                labelHidden
-                disabled={$submitting}
-                error={!!$errors?.attributes?.[index]?.['name']?.[0]}
-              />
-
-              <Select
-                id="attribute-type-{index}"
-                bind:value={attribute.type}
-                label={translate('search-attributes.type-label', {
-                  index: index + 1,
-                })}
-                labelHidden
-                disabled={$submitting ||
-                  (disableTypeForExisting &&
-                    initialAttributeNames.has(attribute.name))}
-                placeholder={translate(
-                  'search-attributes.select-type-placeholder',
-                )}
-              >
-                {#each supportedTypes as type}
-                  <Option value={type.value}>{type.label}</Option>
-                {/each}
-              </Select>
-
-              {#if !hideDeleteButton}
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  on:click={() => removeAttribute(index)}
-                  disabled={$submitting}
-                  type="button"
-                  leadingIcon="trash"
-                />
-              {/if}
-            </div>
-            {#if $errors?.attributes?.[index]?.['name']?.[0]}
-              <div class="col-span-2 mt-1 text-xs text-danger">
-                {$errors.attributes[index]['name'][0]}
-              </div>
-            {/if}
+            <SearchAttributeRow
+              {attribute}
+              {index}
+              {supportedTypes}
+              submitting={$submitting}
+              error={$errors?.attributes?.[index]?.['name']?.[0]}
+              {hideDeleteButton}
+              {disableTypeForExisting}
+              {initialAttributeNames}
+              onRemove={() => removeAttribute(index)}
+            />
           {/each}
         </div>
       </div>
