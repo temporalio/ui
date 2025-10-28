@@ -8,7 +8,6 @@
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import { timeFormat } from '$lib/stores/time-format';
-  import type { WorkflowTaskFailedEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatDate } from '$lib/utilities/format-date';
@@ -29,8 +28,7 @@
   export let groups: EventGroups;
   export let viewportHeight: number | undefined;
   export let readOnly = false;
-  export let workflowTaskFailedError: WorkflowTaskFailedEvent | undefined =
-    undefined;
+  export let error: boolean = false;
 
   const { height, gutter, radius } = TimelineConfig;
 
@@ -39,10 +37,12 @@
 
   $: expandedGroupHeight = readOnly ? 0 : $activeGroupHeight;
   $: filteredGroups = getFailedOrPendingGroups(groups, $eventStatusFilter);
+  $: firstStartTime =
+    $fullEventHistory[0]?.eventTime < workflow.executionTime
+      ? $fullEventHistory[0]?.eventTime
+      : workflow.executionTime;
   $: startTime =
-    (!isWorkflowDelayed(workflow) && workflow.executionTime) ||
-    $fullEventHistory[0]?.eventTime ||
-    workflow.startTime;
+    (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime;
   $: timelineHeight =
     Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight;
   $: canvasHeight = timelineHeight + 120;
@@ -64,6 +64,7 @@
 </script>
 
 <div
+  id="event-history-timeline-graph"
   class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary"
   bind:clientWidth={canvasWidth}
   style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
@@ -90,7 +91,7 @@
       height={canvasHeight}
       width={canvasWidth}
       class="-mt-4"
-      class:error={workflowTaskFailedError}
+      class:error
     >
       <Line
         startPoint={[gutter, 0]}
