@@ -69,7 +69,6 @@
       customLink: initialData.customLink || '',
     },
     {
-      taintedMessage: true,
       SPA: true,
       dataType: 'json',
       resetForm: false,
