@@ -28,10 +28,6 @@
     deployment?.rampingVersionSummary?.deploymentVersion?.buildId ||
       getBuildIdFromVersion(deployment?.routingConfig?.rampingVersion),
   );
-  const rampingVersionDeployedTimestamp = $derived(
-    deployment?.rampingVersionSummary?.createTime ||
-      deployment?.routingConfig?.rampingVersionChangedTime,
-  );
   const currentBuildId = $derived(
     deployment?.currentVersionSummary?.deploymentVersion?.buildId ||
       getBuildIdFromVersion(deployment?.routingConfig?.currentVersion),
@@ -95,35 +91,9 @@
       </td>
     {:else if label === translate('deployments.deployed')}
       <td class="truncate py-1 text-left">
-        <div class="flex flex-col gap-1">
-          {#if latestBuildId && latestNotDuplicate && deployment.latestVersionSummary?.createTime}
-            <p>
-              {formatDate(
-                deployment.latestVersionSummary.createTime,
-                $timeFormat,
-                {
-                  relative: $relativeTime,
-                },
-              )}
-            </p>
-          {/if}
-          {#if rampingBuildId && rampingVersionDeployedTimestamp}
-            <p>
-              {formatDate(rampingVersionDeployedTimestamp, $timeFormat, {
-                relative: $relativeTime,
-              })}
-            </p>
-          {/if}
-          <p>
-            {#if versionedCurrent}
-              {formatDate(deployment.createTime, $timeFormat, {
-                relative: $relativeTime,
-              })}
-            {:else}
-              -
-            {/if}
-          </p>
-        </div>
+        {formatDate(deployment.createTime, $timeFormat, {
+          relative: $relativeTime,
+        })}
       </td>
     {:else if label === translate('deployments.actions')}
       <td class="w-24 truncate py-1">
