@@ -4,7 +4,7 @@
   let { class: className }: { class?: ClassNameValue } = $props();
 </script>
 
-<div id="loading-content">
+<div data-testid="loading">
   <div
     class={twMerge(
       'w-[45dvw] min-w-fit max-w-[500px] scale-[.30] antialiased',
