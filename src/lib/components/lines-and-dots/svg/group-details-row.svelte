@@ -23,7 +23,7 @@
   export let y: number;
 
   let offsetHeight;
-  $: contentHeight = offsetHeight || 0;
+  $: contentHeight = offsetHeight + 20 || 0;
 
   const setActiveGroupHeight = (height) => {
     $activeGroupHeight = height;
@@ -65,10 +65,10 @@
 
 <g role="button" tabindex="0" class="relative z-50" in:fade>
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div class="bg-interactive p-4">
+    <div class="rounded-lg bg-purple-500 p-2">
       <div bind:offsetHeight class="flex flex-col">
         <div
-          class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
+          class="relative flex h-full items-center justify-between rounded-t-lg bg-purple-800 text-sm text-white"
         >
           <div class="flex h-full items-center gap-4 px-2">
             {#if status}
@@ -87,13 +87,11 @@
               variant="ghost"
               size="xs"
               on:click={() => setActiveGroup(group)}
-              >{translate('common.close')} <Icon name="close" /></Button
+              ><Icon name="close" class="text-white" /></Button
             >
           </div>
         </div>
-        <div class="surface-primary">
-          <EventDetailsFull {group} event={group.initialEvent} />
-        </div>
+        <EventDetailsFull {group} event={group.initialEvent} />
         {#if childWorkflowStartedEvent}
           <div class="surface-primary p-4">
             <div class="font-medium leading-4 text-secondary">

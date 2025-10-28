@@ -120,7 +120,6 @@
             <TimelineGraphRow
               {y}
               {group}
-              activeGroups={$activeGroups}
               {canvasWidth}
               {startTime}
               {endTime}

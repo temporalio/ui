@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { HistoryConfig } from '../constants';
-
   export let startPoint = [0, 1000];
   export let endPoint = [0, 1000];
   export let status: string | undefined = undefined;
@@ -13,36 +11,21 @@
   export let strokeWidth: number = 2;
   export let strokeDasharray = 'none';
   export let delayed = false;
-  export let hovering = false;
-
-  const { radius } = HistoryConfig;
 
   $: [x1, y1] = startPoint;
   $: [x2, y2] = endPoint;
   $: completedWithRetries = retried && classification === 'Completed';
 </script>
 
-{#if hovering}
-  <foreignObject
-    x={x1 - radius * 4}
-    y={y1 - strokeWidth / 2 - radius * 1.5}
-    width={x2 - x1 + radius * 8}
-    height={strokeWidth + radius * 3}
-  >
-    <div
-      class="h-full w-full rounded-full border-2 border-interactive bg-interactive/80 shadow-lg"
-    ></div>
-  </foreignObject>
-{/if}
 {#if completedWithRetries}
   <foreignObject
     x={x1}
     y={y1 - strokeWidth / 2}
     width={x2 - x1}
-    height={strokeWidth + radius}
+    height={strokeWidth}
   >
     <div
-      class="z-50 h-full w-full"
+      class="h-full w-full"
       style="background: linear-gradient(255deg, #1FF1A5 0%, #F55 100%);"
     ></div>
   </foreignObject>

@@ -30,24 +30,35 @@
   import Line from './line.svelte';
   import Text from './text.svelte';
 
-  export let y = 0;
-  export let group: EventGroup;
-  export let activeGroups: string[] = [];
-  export let startTime: string | Timestamp;
-  export let endTime: string | Date;
-  export let canvasWidth: number;
-  export let active = true;
-  export let readOnly = false;
+  type Props = {
+    y: number;
+    group: EventGroup;
+    startTime: string | Timestamp;
+    endTime: string | Date;
+    canvasWidth: number;
+    readOnly: boolean;
+  };
+
+  let {
+    y = 0,
+    group,
+    startTime,
+    endTime,
+    canvasWidth,
+    readOnly = false,
+  }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
-  let hovering = false;
 
-  $: timelineWidth = canvasWidth - 2 * gutter;
-  $: active = !activeGroups.length || activeGroups.includes(group.id);
-  $: pendingActivity = group?.pendingActivity;
-  $: pauseTime = pendingActivity && pendingActivity.pauseInfo?.pauseTime;
+  let hovering = $state(false);
 
-  let decodedLocalActivity: SummaryAttribute | undefined;
+  const timelineWidth = $derived(canvasWidth - 2 * gutter);
+  const pendingActivity = $derived(group?.pendingActivity);
+  const pauseTime = $derived(
+    pendingActivity && pendingActivity.pauseInfo?.pauseTime,
+  );
+
+  let decodedLocalActivity: SummaryAttribute | undefined = $state(undefined);
 
   onMount(async () => {
     const localActivityEvent = getLocalActivityMarkerEvent(group);
@@ -114,8 +125,9 @@
     return { points, textAnchor, textIndex, textPosition, backdrop };
   };
 
-  $: ({ points, textAnchor, textIndex, textPosition, backdrop } =
-    getDistancePointsAndPositions(endTime, timelineWidth, y));
+  const { points, textAnchor, textIndex, textPosition, backdrop } = $derived(
+    getDistancePointsAndPositions(endTime, timelineWidth, y),
+  );
 
   const onClick = () => {
     if (readOnly) return;
@@ -132,29 +144,34 @@
     hovering = false;
   };
 
-  $: activityTaskScheduled = group.eventList.find(isActivityTaskStartedEvent);
-  $: retried =
-    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1;
-  $: pendingLine = group.isPending || !!pauseTime;
+  const activityTaskScheduled = $derived(
+    group.eventList.find(isActivityTaskStartedEvent),
+  );
+  const retried = $derived(
+    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1,
+  );
+  const pendingLine = $derived(group.isPending || !!pauseTime);
 </script>
 
-<defs>
-  <filter id="glow">
-    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-    <feMerge>
-      <feMergeNode in="coloredBlur" />
-      <feMergeNode in="SourceGraphic" />
-    </feMerge>
-  </filter>
-</defs>
-
+{#if hovering}
+  <foreignObject
+    x={points[0] - radius * 1.5}
+    y={y - radius * 1.5}
+    width={points[points.length - 1] - points[0] + radius * 3}
+    height={radius * 3}
+  >
+    <div
+      class="h-full w-full rounded-full border-2 border-purple-500 bg-purple-500/80"
+    ></div>
+  </foreignObject>
+{/if}
 <g
   role="button"
   tabindex="0"
-  on:click={onClick}
-  on:keypress={onClick}
-  on:mouseenter={onMouseEnter}
-  on:mouseleave={onMouseLeave}
+  onclick={onClick}
+  onkeypress={onClick}
+  onmouseenter={onMouseEnter}
+  onmouseleave={onMouseLeave}
   class="relative cursor-pointer"
   {height}
 >
@@ -184,7 +201,6 @@
         paused={!!pauseTime}
         strokeWidth={radius * 2}
         {retried}
-        {hovering}
         scheduling={index === 0 &&
           group.lastEvent.classification === 'Completed'}
       />
@@ -202,7 +218,6 @@
         pending
         paused={!!pauseTime}
         strokeWidth={radius * 2}
-        {hovering}
       />
       <Dot
         point={[x, y]}
@@ -264,9 +279,5 @@
   g {
     pointer-events: bounding-box;
     outline: none;
-  }
-
-  .hovering {
-    background-color: purple;
   }
 </style>
