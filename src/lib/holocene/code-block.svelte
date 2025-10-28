@@ -164,8 +164,8 @@
     [
       getEditorTheme($useDarkMode, hasHeader),
       getActionsTheme({ hasActions: copyable || maximizable }),
-      EditorState.readOnly.of(!editable),
-      EditorView.editable.of(editable),
+      EditorState.readOnly.of(!editable), // when false, user can type in the editor
+      EditorView.editable.of(true), // always true, it means focusable, text-selectable, and scrollable by keyboard
       EditorView.contentAttributes.of({ 'aria-label': label }),
       getLineBreakExtension(editable),
       getLanguageExtension(language),
@@ -197,15 +197,6 @@
     editorView?.dispatch({
       effects: compartment.reconfigure(dynamicExtensions),
     });
-  });
-
-  // add tabindex if maximizable, so up/down arrows can scroll
-  $effect(() => {
-    if (maximizable) {
-      editorView?.scrollDOM?.setAttribute('tabindex', '0');
-    } else {
-      editorView?.scrollDOM?.removeAttribute('tabindex');
-    }
   });
 
   // when content prop changes, update the document
@@ -297,7 +288,6 @@
       class={merge('h-full', className)}
       data-testid={testId}
       {...editorProps}
-      onblur={handleEditorBlur}
     ></div>
 
     {#snippet actions()}
