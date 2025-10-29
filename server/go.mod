@@ -1,6 +1,6 @@
 module github.com/temporalio/ui-server/v2
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
@@ -14,7 +14,7 @@ require (
 	go.temporal.io/api v1.51.0
 	golang.org/x/net v0.40.0
 	golang.org/x/oauth2 v0.30.0
-	google.golang.org/grpc v1.66.0
+	google.golang.org/grpc v1.66.1
 	google.golang.org/protobuf v1.36.5
 	gopkg.in/validator.v2 v2.0.0-20210331031555-b37d688a7fb0
 	gopkg.in/yaml.v3 v3.0.1

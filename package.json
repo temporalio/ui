@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.41.0",
+  "version": "2.42.1",
   "engines": {
     "pnpm": ">=8.6.0",
     "node": ">=18.15.0"
@@ -110,11 +110,11 @@
     "mdast-util-from-markdown": "^2.0.1",
     "mdast-util-to-hast": "^13.2.0",
     "remark-stringify": "^10.0.3",
-    "sveltekit-superforms": "^2.26.1",
+    "sveltekit-superforms": "^2.27.4",
     "tailwind-merge": "^1.14.0",
     "unist-util-remove": "^4.0.0",
     "url-pattern": "^1.0.3",
-    "zod": "^3.25.64"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",

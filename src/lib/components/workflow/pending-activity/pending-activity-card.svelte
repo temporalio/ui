@@ -111,7 +111,6 @@
           translate('workflows.last-heartbeat'),
           formatDate(activity.lastHeartbeatTime, $timeFormat, {
             relative: $relativeTime,
-            relativeStrict: true,
           }),
         )}
       {/if}

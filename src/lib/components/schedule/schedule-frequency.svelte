@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { type ClassNameValue, twMerge } from 'tailwind-merge';
+
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { StructuredCalendar } from '$lib/types/schedule';
@@ -6,22 +8,35 @@
 
   import type { IntervalSpec } from '$types';
 
-  export let calendar: StructuredCalendar | undefined = undefined;
-  export let interval: IntervalSpec | undefined = undefined;
-  export let timezoneName = 'UTC';
+  interface Props {
+    class?: ClassNameValue;
+    frequency: (StructuredCalendar | IntervalSpec)[];
+    timezoneName?: string;
+    inline?: boolean;
+  }
 
-  export let inline = false;
+  let {
+    class: className = '',
+    frequency,
+    timezoneName = 'UTC',
+    inline = false,
+  }: Props = $props();
 </script>
 
-{#key [calendar, interval]}
-  <div class="flex flex-col {$$props.class}">
+{#key frequency}
+  <div class={twMerge('flex flex-col', className)}>
     <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
-    <CodeBlock
-      copyable
-      {inline}
-      testId="schedule-calendar"
-      language="json"
-      content={stringifyWithBigInt(calendar || interval)}
-    />
+    <div class="flex flex-col gap-2">
+      {#each frequency as content}
+        <CodeBlock
+          copyable
+          {inline}
+          testId="schedule-calendar"
+          language="json"
+          content={stringifyWithBigInt(content)}
+          {...frequency.length > 1 ? { maxHeight: 300 } : {}}
+        />
+      {/each}
+    </div>
   </div>
 {/key}

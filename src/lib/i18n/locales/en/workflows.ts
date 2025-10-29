@@ -275,8 +275,7 @@ export const Strings = {
   'advanced-search': 'Advanced Search',
   'time-range': 'Time Range',
   'pending-activities-link': 'Show all Pending Activities',
-  'duration-filter-placeholder':
-    'e.g. "2h45m", "hh:mm:ss", or "1000" nanoseconds',
+  'duration-filter-placeholder': 'e.g. 2h45m, hh:mm:ss, or 1000 ns',
   'start-workflow': 'Start Workflow',
   'start-workflow-like-this-one': 'Start Workflow Like This One',
   'custom-search-attribute': 'Custom Search Attribute',
@@ -315,4 +314,5 @@ export const Strings = {
   delayed: 'Delayed',
   'task-failure': 'Task Failure',
   'execution-start': 'Execution Start',
+  'workflow-timeout': 'Workflow Timeout',
 } as const;

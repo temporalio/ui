@@ -5,6 +5,7 @@
   import { historyKeymap, standardKeymap } from '@codemirror/commands';
   import {
     bracketMatching,
+    ensureSyntaxTree,
     foldGutter,
     indentOnInput,
     indentUnit,
@@ -125,6 +126,19 @@
     }
   };
 
+  const FULL_PARSE_THRESHOLD = 100_000;
+  const ensureFullParse = () => {
+    if (!editorView) return;
+    if (language !== 'json') return;
+    const len = editorView.state.doc.length;
+    if (len < FULL_PARSE_THRESHOLD) return;
+    try {
+      ensureSyntaxTree(editorView.state, len, 2000);
+    } catch {
+      // no-op: parsing is best-effort
+    }
+  };
+
   // ui
   const hasHeader = $derived(!!tabs);
   let maximized = $state(false);
@@ -212,6 +226,7 @@
       if (doc.toString() !== formattedContent) {
         replaceContent(formattedContent);
       }
+      ensureFullParse();
     }
   });
 
@@ -228,6 +243,7 @@
   onMount(() => {
     editorView = createEditorView();
     editorView.contentDOM.onblur = handleEditorBlur;
+    ensureFullParse();
     return () => {
       editorView?.destroy();
     };
