@@ -159,45 +159,45 @@
   </div>
   {#if activity.activityOptions}
     <AccordionLight>
-      <h5 slot="title">Activity Options</h5>
+      <h5 slot="title">{translate('activities.activity-options')}</h5>
       <div class="flex max-md:flex-col md:flex-row">
         <div class="w-1/2">
           {@render detail(
-            'Task Queue',
+            translate('common.task-queue'),
             activity.activityOptions.taskQueue.name,
           )}
           {@render detail(
-            'Start to Close Timeout',
+            translate('activities.start-to-close-timeout'),
             activity.activityOptions.startToCloseTimeout,
           )}
           {@render detail(
-            'Schedule to Close Timeout',
+            translate('activities.schedule-to-close-timeout'),
             activity.activityOptions.scheduleToCloseTimeout,
           )}
           {@render detail(
-            'Schedule to Start Timeout',
+            translate('activities.schedule-to-start-timeout'),
             activity.activityOptions.scheduleToStartTimeout,
           )}
           {@render detail(
-            'Heartbeat Timeout',
+            translate('activities.heartbeat-timeout'),
             activity.activityOptions.heartbeatTimeout,
           )}
         </div>
         <div>
           {@render detail(
-            'Retry Policy Initial Interval',
+            translate('activities.retry-policy-initial-interval'),
             activity.activityOptions.retryPolicy.initialInterval,
           )}
           {@render detail(
-            'Retry Policy Backoff Coefficient',
+            translate('activities.retry-policy-backoff-coefficient'),
             activity.activityOptions.retryPolicy.backoffCoefficient,
           )}
           {@render detail(
-            'Retry Policy Maximum Interval',
+            translate('activities.retry-policy-maximum-interval'),
             activity.activityOptions.retryPolicy.maximumInterval,
           )}
           {@render detail(
-            'Retry Policy Maximum Attempts',
+            translate('activities.retry-policy-maximum-attempts'),
             activity.activityOptions.retryPolicy.maximumAttempts,
           )}
         </div>
