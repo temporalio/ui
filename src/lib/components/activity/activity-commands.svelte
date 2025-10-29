@@ -57,7 +57,7 @@
   >
     <Button
       variant="secondary"
-      size="sm"
+      size="xs"
       leadingIcon={activity.paused ? 'play' : 'pause'}
       on:click={onPause}
     >
@@ -69,7 +69,7 @@
   <Tooltip bottomLeft width={200} text="Update this Activity Options.">
     <Button
       variant="secondary"
-      size="sm"
+      size="xs"
       leadingIcon="pencil"
       on:click={onUpdate}
     >
@@ -79,7 +79,7 @@
   <Tooltip bottom width={200} text="Reset this Activity.">
     <Button
       variant="secondary"
-      size="sm"
+      size="xs"
       leadingIcon="retry"
       on:click={onReset}
     >

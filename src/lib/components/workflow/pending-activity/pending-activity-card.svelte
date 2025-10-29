@@ -5,7 +5,6 @@
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -47,18 +46,15 @@
   class="flex flex-1 cursor-default flex-col gap-2 overflow-hidden rounded-t-md border border-purple-800 bg-purple-800/50 text-white shadow-md"
 >
   <div
-    class="flex flex-wrap items-center justify-between gap-2 bg-purple-800 p-2"
+    class="flex flex-wrap items-center justify-between gap-2 bg-purple-800 px-2 py-1"
   >
-    <div class="flex flex-wrap items-center space-x-3">
-      <WorkflowStatus status={activity.paused ? 'Paused' : activity.state} />
-      <h4>{activity.activityType}</h4>
-    </div>
+    <p class="text-base font-medium">Pending</p>
     {#if showActivityCommands}
       <ActivityCommands {activity} class="justify-end" />
     {/if}
   </div>
-  <div class="flex flex-1 flex-col gap-4 xl:flex-row">
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+  <div class="flex flex-1 flex-col gap-1 p-2">
+    <div class="flex w-full flex-col gap-1">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {#if activity.paused && activity.pauseInfo}
         {@render detail(
@@ -146,7 +142,7 @@
         {/if}
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
+    <div class="flex w-full flex-col gap-1">
       {#if failed}
         {#if totalPending > 20}
           {@render failuresAccordion()}

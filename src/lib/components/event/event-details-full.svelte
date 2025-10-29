@@ -47,7 +47,7 @@
           <PayloadDecoder value={group?.result} key="payloads">
             {#snippet children(decodedValue)}
               <CodeBlock
-                content={decodedValue}
+                content={decodedValue || 'Results will appear upon completion'}
                 maxHeight={384}
                 copyIconTitle={translate('common.copy-icon-title')}
                 copySuccessIconTitle={translate(
