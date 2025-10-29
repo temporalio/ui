@@ -130,7 +130,7 @@
             status: 'Paused',
           }),
           'rounded-l-none',
-          newCount && 'rounded-r-none',
+          (newCount || taskFailure) && 'rounded-r-none',
           big && 'h-8 px-2',
         )}
       >

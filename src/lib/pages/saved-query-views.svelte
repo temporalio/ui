@@ -23,6 +23,7 @@
   } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import { namespaceHasReportedProblemsSearchAttribute } from '$lib/utilities/get-namespace-capabilities';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -34,6 +35,9 @@
   const query = $derived(page.url.searchParams.get('query') || '');
   const savedQueryParam = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
+  const shouldSetTaskFailureCount = $derived(
+    namespaceHasReportedProblemsSearchAttribute(namespace),
+  );
 
   const maxViewsReached = $derived(
     $savedWorkflowQueries?.[namespace]?.length >= MAX_SAVED_WORKFLOW_QUERIES,
@@ -69,10 +73,10 @@
     );
 
   onMount(() => {
-    setTaskFailureCount();
+    if (shouldSetTaskFailureCount) setTaskFailureCount();
 
     const interval = setInterval(() => {
-      setTaskFailureCount();
+      if (shouldSetTaskFailureCount) setTaskFailureCount();
     }, 60000);
 
     if (savedQueryParam) {
@@ -297,11 +301,13 @@
     <div class="pb-2 text-center">
       <div class="space-y-1">
         {#each systemWorkflowViews as view}
-          {@render queryButton({
-            ...view,
-            active: query === view.query,
-            count: view.id === 'task-failures' ? taskFailureCount : 0,
-          })}
+          {#if !view.hidden}
+            {@render queryButton({
+              ...view,
+              active: query === view.query,
+              count: view.id === 'task-failures' ? taskFailureCount : 0,
+            })}
+          {/if}
         {/each}
       </div>
     </div>

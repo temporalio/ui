@@ -43,7 +43,7 @@
     routeForWorkflows,
     routeForWorkflowSearchAttributes,
   } from '$lib/utilities/route-for';
-  import { isWorkflowTaskFailure } from '$lib/utilities/task-failure-workflows';
+  import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
   const {
     namespace,

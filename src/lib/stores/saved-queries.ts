@@ -1,6 +1,10 @@
 import type { ClassNameValue } from 'tailwind-merge';
 
+import { page } from '$app/state';
+
 import type { IconName } from '$lib/holocene/icon';
+import { namespaceHasReportedProblemsSearchAttribute } from '$lib/utilities/get-namespace-capabilities';
+import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
 
 import { persistStore } from './persist-store';
 
@@ -15,6 +19,7 @@ export type SavedQuery = {
   disabled?: boolean;
   active?: boolean;
   type?: string;
+  hidden?: boolean;
 };
 
 const getToday = () => {
@@ -29,9 +34,6 @@ const getLastHour = () => {
   lastHour.setSeconds(0, 0);
   return lastHour.toISOString();
 };
-
-export const TASK_FAILURES_QUERY =
-  '`ExecutionStatus`="Running" AND `TemporalReportedProblems` IN ("category=WorkflowTaskFailed") OR `TemporalReportedProblems` IN ("category=WorkflowTaskTimedout")';
 
 export const systemWorkflowViews: SavedQuery[] = [
   {
@@ -48,6 +50,7 @@ export const systemWorkflowViews: SavedQuery[] = [
     icon: 'error',
     type: 'system',
     class: 'text-danger',
+    hidden: !namespaceHasReportedProblemsSearchAttribute(page.params.namespace),
   },
   {
     id: 'running',

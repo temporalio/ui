@@ -1,7 +1,7 @@
-import { TASK_FAILURES_QUERY } from '$lib/stores/saved-queries';
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
 
 export const fetchWorkflowCount = async (
   namespace: string,
