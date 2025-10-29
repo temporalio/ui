@@ -161,32 +161,34 @@
     <AccordionLight>
       <h5 slot="title">{translate('activities.activity-options')}</h5>
       <div class="flex max-md:flex-col md:flex-row">
-        <div class="w-1/2">
+        <div class="md:w-1/2">
           {@render detail(
             translate('common.task-queue'),
             activity.activityOptions.taskQueue.name,
           )}
           {@render detail(
             translate('activities.start-to-close-timeout'),
-            activity.activityOptions.startToCloseTimeout,
+            formatDuration(activity.activityOptions.startToCloseTimeout),
           )}
           {@render detail(
             translate('activities.schedule-to-close-timeout'),
-            activity.activityOptions.scheduleToCloseTimeout,
+            formatDuration(activity.activityOptions.scheduleToCloseTimeout),
           )}
           {@render detail(
             translate('activities.schedule-to-start-timeout'),
-            activity.activityOptions.scheduleToStartTimeout,
+            formatDuration(activity.activityOptions.scheduleToStartTimeout),
           )}
           {@render detail(
             translate('activities.heartbeat-timeout'),
-            activity.activityOptions.heartbeatTimeout,
+            formatDuration(activity.activityOptions.heartbeatTimeout),
           )}
         </div>
         <div>
           {@render detail(
             translate('activities.retry-policy-initial-interval'),
-            activity.activityOptions.retryPolicy.initialInterval,
+            formatDuration(
+              activity.activityOptions.retryPolicy.initialInterval,
+            ),
           )}
           {@render detail(
             translate('activities.retry-policy-backoff-coefficient'),
@@ -194,7 +196,9 @@
           )}
           {@render detail(
             translate('activities.retry-policy-maximum-interval'),
-            activity.activityOptions.retryPolicy.maximumInterval,
+            formatDuration(
+              activity.activityOptions.retryPolicy.maximumInterval,
+            ),
           )}
           {@render detail(
             translate('activities.retry-policy-maximum-attempts'),
