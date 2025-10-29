@@ -87,6 +87,7 @@
     "@codemirror/language": "^6.11.3",
     "@codemirror/language-data": "^6.5.1",
     "@codemirror/legacy-modes": "^6.5.1",
+    "@codemirror/merge": "^6.11.1",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.2",
     "@fontsource-variable/inter": "^5.0.8",

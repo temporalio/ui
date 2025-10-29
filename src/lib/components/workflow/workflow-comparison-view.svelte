@@ -42,7 +42,6 @@
       on:click={handleExitComparison}
     />
   </div>
-
   <div class="relative flex grow bg-subtle">
     <div class="sticky left-0 top-0 z-20">
       <WorkflowSimpleHistory {namespace} {workflowId} {runId} index={0} />

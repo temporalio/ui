@@ -117,7 +117,7 @@
       </div>
     </div>
     <div class="flex-1 overflow-auto">
-      <div class="flex h-24 max-h-24 flex-col gap-2 overflow-auto p-2">
+      <div class="flex flex-col gap-2 overflow-auto p-2">
         <PayloadDecoder
           value={parseWithBigInt(workflowEvents.results)}
           key="payloads"

@@ -4,20 +4,25 @@
   import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
+  import { decodePayloads } from '$lib/components/event/payloads-decoder';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
+  import CodeBlockCompare from '$lib/holocene/code-block-compare.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
+  import { fetchAllEvents } from '$lib/services/events-service';
+  import { fetchWorkflow } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
@@ -25,10 +30,12 @@
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
   } from '$lib/utilities/get-workflow-relationships';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
@@ -84,6 +91,45 @@
     getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
   );
   const linkCount = $derived(outboundLinks + inboundLinks);
+  const workflowEvents = $derived(
+    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory),
+  );
+
+  let workflowRunController: AbortController;
+
+  const getWorkflowAndEventHistory = async (): Promise<[string, string]> => {
+    const result = await fetchWorkflow({
+      namespace,
+      workflowId,
+      runId: resetRunId,
+    });
+    const workflow = result.workflow;
+
+    workflowRunController = new AbortController();
+
+    const compareHistory = await fetchAllEvents({
+      namespace,
+      workflowId,
+      runId: resetRunId,
+      sort: 'ascending',
+      signal: workflowRunController.signal,
+      setHistory: false,
+      historySize: workflow.historyEvents,
+    });
+
+    const resetCompleted =
+      getWorkflowStartedCompletedAndTaskFailedEvents(compareHistory);
+
+    const originalResult = await decodePayloads(
+      parseWithBigInt(workflowEvents.results),
+      'payloads',
+    );
+    const resetResult = await decodePayloads(
+      parseWithBigInt(resetCompleted.results),
+      'payloads',
+    );
+    return [originalResult, resetResult];
+  };
 </script>
 
 <header class="flex flex-col gap-4 px-4 pt-8 md:pt-20 xl:px-8">
@@ -183,14 +229,36 @@
         data-testid="workflow-reset-alert"
         title={translate('workflows.reset-success-alert-title')}
       >
-        You can find the resulting Workflow Execution <Link
-          href={routeForEventHistory({
-            namespace,
-            workflow: workflowId,
-            run: resetRunId,
-          })}>here</Link
-        >.
-      </Alert>
+        <div class="flex flex-col gap-4">
+          <p>
+            You can find the resulting Workflow Execution <Link
+              href={routeForEventHistory({
+                namespace,
+                workflow: workflowId,
+                run: resetRunId,
+              })}>here</Link
+            >.
+          </p>
+
+          <div>
+            <h6>Result Diff</h6>
+            {#await getWorkflowAndEventHistory()}
+              <div class="flex flex-col gap-2 p-3">
+                <Skeleton class="h-32 w-full rounded-none p-3" />
+              </div>
+            {:then [originalResult, resetResult]}
+              <CodeBlockCompare
+                contentA={originalResult}
+                contentB={resetResult}
+                copyIconTitle={translate('common.copy-icon-title')}
+                copySuccessIconTitle={translate(
+                  'common.copy-success-icon-title',
+                )}
+              />
+            {/await}
+          </div>
+        </div></Alert
+      >
     </div>
   {/if}
 </header>

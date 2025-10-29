@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
@@ -25,7 +24,6 @@
   import { fullEventHistory } from '$lib/stores/events';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { toaster } from '$lib/stores/toaster';
-  import { workflowComparison } from '$lib/stores/workflow-comparison';
   import { refresh } from '$lib/stores/workflow-run';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
@@ -196,38 +194,12 @@
     return workflowTaskCompletedEvent.attributes.startedEventId;
   });
 
-  const onResetCompletion = async ({ runId }: { runId: string }) => {
-    try {
-      if (!$workflowComparison.isComparing) {
-        workflowComparison.startComparison(workflow, run);
-      }
-
-      workflowComparison.addComparison(
-        workflow,
-        runId,
-        workflowTaskStartedEventId,
-      );
-
-      const currentUrl = new URL(window.location.href);
-      const compareParams = currentUrl.searchParams.getAll('compare');
-      compareParams.push(runId);
-      currentUrl.searchParams.delete('compare');
-      compareParams.forEach((id) =>
-        currentUrl.searchParams.append('compare', id),
-      );
-
-      goto(currentUrl.toString(), { replaceState: true, noScroll: true });
-
-      toaster.push({
-        variant: 'success',
-        message: 'Workflow reset added to comparison',
-      });
-    } catch (error) {
-      toaster.push({
-        variant: 'error',
-        message: error?.message || 'Failed to reset workflow',
-      });
-    }
+  const onResetCompletion = async () => {
+    $refresh = Date.now();
+    toaster.push({
+      variant: 'success',
+      message: 'Workflow reset added to comparison',
+    });
   };
 
   const onLinkClick = (event) => {
