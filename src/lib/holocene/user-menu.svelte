@@ -22,7 +22,12 @@
 </script>
 
 <MenuContainer>
-  <MenuButton variant="ghost" hasIndicator controls="user-menu">
+  <MenuButton
+    variant="ghost"
+    hasIndicator
+    data-testid="user-menu-trigger"
+    controls="user-menu"
+  >
     {#if $authUser.accessToken}
       <img
         src={$authUser?.picture}

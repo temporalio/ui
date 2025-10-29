@@ -2,6 +2,7 @@
   import Icon from '$lib/holocene/icon';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { useDarkModePreference } from '$lib/utilities/dark-mode';
   import {
     type DarkModePreference,
@@ -20,8 +21,9 @@
   };
 </script>
 
-<ToggleButtons class="pl-4">
+<ToggleButtons data-testid="dark-mode-toggle-buttons" class="pl-4">
   <ToggleButton
+    aria-label={translate('common.system-default')}
     data-testid="system-mode"
     on:click={() => setDarkModePreference('system')}
     active={$useDarkModePreference === 'system'}
@@ -30,6 +32,7 @@
     <Icon name="system-window" />
   </ToggleButton>
   <ToggleButton
+    aria-label={translate('common.day')}
     data-testid="day-mode"
     on:click={() => setDarkModePreference(false)}
     active={$useDarkModePreference === false}
@@ -38,6 +41,7 @@
     <Icon name="sun" />
   </ToggleButton>
   <ToggleButton
+    aria-label={translate('common.night')}
     data-testid="night-mode"
     on:click={() => setDarkModePreference(true)}
     active={$useDarkModePreference === true}
