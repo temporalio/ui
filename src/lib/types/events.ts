@@ -1,7 +1,24 @@
 import type { Timestamp } from '@temporalio/common';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import type { ActivityOptions, EventLink } from '$lib/types';
+import type { EventLink } from '$lib/types';
+
+type ActivityOptions = {
+  taskQueue: {
+    name: string;
+    normalName: string;
+  };
+  scheduleToCloseTimeout: string;
+  scheduleToStartTimeout: string;
+  startToCloseTimeout: string;
+  heartbeatTimeout: string;
+  retryPolicy: {
+    backoffCoefficient: number;
+    initialInterval: string;
+    maximumAttempts: number;
+    maximumInterval: string;
+  };
+};
 
 import type { Replace, Settings } from './global';
 

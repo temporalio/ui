@@ -43,7 +43,7 @@
       <slot name="description" />
       <div class="flex items-center gap-4">
         <slot name="action" />
-        <Icon name={icon ? icon : open ? 'arrow-down' : 'arrow-right'} />
+        <Icon name={icon ? icon : open ? 'chevron-up' : 'chevron-down'} />
       </div>
     </div>
   </button>

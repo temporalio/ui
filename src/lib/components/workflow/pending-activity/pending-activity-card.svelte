@@ -6,6 +6,7 @@
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import AccordionLight from '$lib/holocene/accordion/accordion-light.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -156,10 +157,57 @@
       {/if}
     </div>
   </div>
+  {#if activity.activityOptions}
+    <AccordionLight>
+      <h5 slot="title">Activity Options</h5>
+      <div class="flex max-md:flex-col md:flex-row">
+        <div class="w-1/2">
+          {@render detail(
+            'Task Queue',
+            activity.activityOptions.taskQueue.name,
+          )}
+          {@render detail(
+            'Start to Close Timeout',
+            activity.activityOptions.startToCloseTimeout,
+          )}
+          {@render detail(
+            'Schedule to Close Timeout',
+            activity.activityOptions.scheduleToCloseTimeout,
+          )}
+          {@render detail(
+            'Schedule to Start Timeout',
+            activity.activityOptions.scheduleToStartTimeout,
+          )}
+          {@render detail(
+            'Heartbeat Timeout',
+            activity.activityOptions.heartbeatTimeout,
+          )}
+        </div>
+        <div>
+          {@render detail(
+            'Retry Policy Initial Interval',
+            activity.activityOptions.retryPolicy.initialInterval,
+          )}
+          {@render detail(
+            'Retry Policy Backoff Coefficient',
+            activity.activityOptions.retryPolicy.backoffCoefficient,
+          )}
+          {@render detail(
+            'Retry Policy Maximum Interval',
+            activity.activityOptions.retryPolicy.maximumInterval,
+          )}
+          {@render detail(
+            'Retry Policy Maximum Attempts',
+            activity.activityOptions.retryPolicy.maximumAttempts,
+          )}
+        </div>
+      </div>
+    </AccordionLight>
+  {/if}
 </div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flex items-start gap-4">
+  <div class="flex items-center gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {label}
     </p>
