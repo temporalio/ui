@@ -24,6 +24,7 @@
     systemWorkflowViews,
   } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
+  import { refresh } from '$lib/stores/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { namespaceHasReportedProblemsSearchAttribute } from '$lib/utilities/get-namespace-capabilities';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
@@ -75,8 +76,6 @@
     );
 
   onMount(() => {
-    if (shouldSetTaskFailureCount) setTaskFailureCount();
-
     const interval = setInterval(() => {
       if (shouldSetTaskFailureCount) setTaskFailureCount();
     }, 60000);
@@ -140,6 +139,11 @@
     }
   });
 
+  $effect(() => {
+    $refresh;
+    if (shouldSetTaskFailureCount) setTaskFailureCount();
+  });
+
   const setActiveQueryView = (view: SavedQuery) => {
     if (view.id === activeQueryView?.id) return;
     activeQueryView = view;
@@ -148,6 +152,8 @@
     if (view.query) {
       $workflowFilters = toListWorkflowFilters(view.query, $searchAttributes);
     }
+
+    if (view.id === 'task-failures') setTaskFailureCount();
 
     updateQueryParameters({
       url: page.url,
