@@ -17,9 +17,7 @@
   const failed = $derived(operation.attempt > 1);
 </script>
 
-<div
-  class="flex flex-1 cursor-default flex-col gap-2 border-b border-purple-400 bg-purple-600/50 p-4 hover:bg-purple-700/50"
->
+<div class="flex flex-1 cursor-default flex-col gap-2 p-4 text-white">
   <div class="flex-1">
     <div class="flex flex-wrap items-center space-x-3">
       <Badge>{operation.state}</Badge>

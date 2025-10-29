@@ -161,7 +161,7 @@
     height={radius * 3}
   >
     <div
-      class="h-full w-full rounded-full border-2 border-purple-500 bg-purple-500/80"
+      class="h-full w-full rounded-full border-2 border-purple-600 bg-purple-500/80"
     ></div>
   </foreignObject>
 {/if}

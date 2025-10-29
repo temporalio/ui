@@ -1,4 +1,4 @@
-import type { EventLink, Payload } from '$lib/types';
+import type { EventLink, Payload, Payloads } from '$lib/types';
 import type {
   PendingActivity,
   PendingNexusOperation,
@@ -24,6 +24,8 @@ interface EventGroup
   lastEvent: WorkflowEvent;
   eventList: WorkflowEvent[];
   finalClassification: EventClassification;
+  input: Payloads | undefined;
+  result: Payloads | undefined;
   isPending: boolean;
   isFailureOrTimedOut: boolean;
   isCanceled: boolean;

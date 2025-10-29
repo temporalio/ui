@@ -40,8 +40,11 @@
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
     fields.filter(
-      ([_key, value]) =>
-        typeof value === 'object' && Object.keys(value).length > 0,
+      ([key, value]) =>
+        typeof value === 'object' &&
+        Object.keys(value).length > 0 &&
+        key !== 'input' &&
+        key !== 'result',
     ),
   );
   const linkFields = $derived(
@@ -70,9 +73,11 @@
 </script>
 
 <div
-  class="flex flex-1 cursor-default flex-col gap-2 border-b border-purple-400 bg-purple-600/50 p-4 text-white hover:bg-purple-700/50"
+  class="flex flex-1 cursor-default flex-col gap-2 overflow-hidden rounded-t-md border border-purple-800 bg-purple-800/50 text-white shadow-md"
 >
-  <div class="flex flex-wrap items-center justify-between gap-2">
+  <div
+    class="flex flex-wrap items-center justify-between gap-2 bg-purple-800 p-2"
+  >
     <div class="flex items-center gap-2 text-base">
       <p class="font-mono">{event.id}</p>
       <p class="font-medium">
@@ -85,8 +90,8 @@
       })}
     </p>
   </div>
-  <div class="flex flex-col gap-1 xl:flex-row">
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+  <div class="flex flex-col gap-1 p-2">
+    <div class="flex w-full flex-col gap-1">
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
       {/if}
@@ -101,7 +106,7 @@
       {/each}
     </div>
     {#if payloadFields.length}
-      <div class="flex w-full flex-col gap-1 xl:w-1/2">
+      <div class="flex w-full flex-col gap-1">
         {#each payloadFields as [key, value] (key)}
           {@render payloads(key, value)}
         {/each}
@@ -114,7 +119,7 @@
   {@const href = getEventLinkHref(link)}
   {@const value = href.split('workflows/')?.[1] || href}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-white/70">
       {translate('nexus.link')}
     </p>
     <Copyable
@@ -130,7 +135,7 @@
 {#snippet eventNamespaceLink(link: ELink)}
   {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-white/70">
       {translate('nexus.link-namespace')}
     </p>
     <Copyable
@@ -154,7 +159,7 @@
 
 {#snippet eventSummary(value: Payload)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm">Summary</p>
+    <p class="min-w-56 text-sm text-white/70">Summary</p>
     <p class="whitespace-pre-line">
       <MetadataDecoder
         {value}
@@ -171,7 +176,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
-    <p class="mb-1 min-w-56 text-sm">
+    <p class="mb-1 min-w-56 text-sm text-white/70">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -214,7 +219,7 @@
   </div>
   {#if stackTrace}
     <div>
-      <p class="mb-1 min-w-56 text-sm">
+      <p class="mb-1 min-w-56 text-sm text-white/70">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock
@@ -230,7 +235,7 @@
 
 {#snippet link(key, value)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-white/70">
       {format(key)}
     </p>
     <Copyable
@@ -242,7 +247,7 @@
         value={String(value)}
         {attributes}
         type={displayLinkType(key, attributes)}
-        class="whitespace-pre-line"
+        class="whitespace-pre-line !text-white"
       />
     </Copyable>
   </div>
@@ -250,7 +255,7 @@
 
 {#snippet details(key, value)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-white/70">
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">
