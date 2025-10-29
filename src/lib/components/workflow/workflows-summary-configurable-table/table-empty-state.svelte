@@ -1,17 +1,30 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
   import { useDarkMode } from '$lib/utilities/dark-mode';
+  import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
   import emptyImageDark from '$lib/vendor/empty-state-dark_2x.png';
   import emptyImageLight from '$lib/vendor/empty-state-light_2x.png';
+  import noWorkflowTaskFailuresLight from '$lib/vendor/no-workflow-task-failures_light.svg';
+  import noWorkflowsLight from '$lib/vendor/no-workflows_light.svg';
 
-  $: query = $page.url.searchParams.get('query');
+  let query = $derived(page.url.searchParams.get('query'));
 
-  $: noResultsImages = $useDarkMode ? emptyImageDark : emptyImageLight;
+  let noResultsImages = $derived(
+    $useDarkMode ? emptyImageDark : emptyImageLight,
+  );
+  let hasTaskFailuresQuery = $derived(query === TASK_FAILURES_QUERY);
+  // TODO: add dark mode images for these
+  let noWorkflows = $derived(
+    $useDarkMode ? noWorkflowsLight : noWorkflowsLight,
+  );
+  let noWorkflowTaskFailures = $derived(
+    $useDarkMode ? noWorkflowTaskFailuresLight : noWorkflowTaskFailuresLight,
+  );
 
   const samples = [
     'samples-go',
@@ -26,66 +39,87 @@
 <svelte:head>
   <link rel="preload" as="image" href={emptyImageDark} />
   <link rel="preload" as="image" href={emptyImageLight} />
+  <link rel="preload" as="image" href={noWorkflowsLight} />
+  <link rel="preload" as="image" href={noWorkflowTaskFailuresLight} />
 </svelte:head>
-<div
-  class="w-full overflow-hidden xl:flex xl:h-full xl:flex-row"
-  aria-live="polite"
->
+
+{#if query}
   <div
-    class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
+    class="flex h-full w-full flex-col items-center justify-center p-4"
+    aria-live="polite"
   >
-    <h2>
-      {#if query}
-        {translate('workflows.workflow-query-empty-state-title')}
-      {:else}
+    <div class="text-center">
+      <h2>
+        {hasTaskFailuresQuery
+          ? translate(
+              'workflows.workflow-task-failures-query-empty-state-title',
+            )
+          : translate('workflows.workflow-query-empty-state-title')}
+      </h2>
+      <p>
+        {hasTaskFailuresQuery
+          ? translate(
+              'workflows.workflow-task-failures-query-empty-state-description',
+            )
+          : translate('workflows.workflow-query-empty-state-description')}
+      </p>
+      <img
+        src={hasTaskFailuresQuery ? noWorkflowTaskFailures : noWorkflows}
+        alt=""
+        class="m-auto mt-8"
+      />
+    </div>
+  </div>
+{:else}
+  <div
+    class="w-full overflow-hidden xl:flex xl:h-full xl:flex-row"
+    aria-live="polite"
+  >
+    <div
+      class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
+    >
+      <h2>
         {translate('workflows.workflow-empty-state-title')}
+      </h2>
+      {#if $workflowError}
+        <Alert
+          intent="warning"
+          icon="warning"
+          title={translate('workflows.workflow-query-error-state')}
+          style="overflow-wrap: anywhere"
+        >
+          {$workflowError}
+        </Alert>
+      {:else}
+        <slot name="cloud" />
+        <p>
+          {translate('workflows.workflow-empty-state-description')}
+          <Link newTab href="https://github.com/temporalio"
+            >github.com/temporalio</Link
+          >.
+        </p>
+        <ul class="flex flex-col gap-2">
+          {#each samples as sample}
+            <li>
+              <Link
+                icon="github"
+                newTab
+                href="https://github.com/temporalio/{sample}">{sample}</Link
+              >
+            </li>
+          {/each}
+        </ul>
       {/if}
-    </h2>
-    {#if $workflowError}
-      <Alert
-        intent="warning"
-        icon="warning"
-        title={translate('workflows.workflow-query-error-state')}
-        style="overflow-wrap: anywhere"
-      >
-        {$workflowError}
-      </Alert>
-    {:else if query}
-      <p>
-        {translate('workflows.workflow-query-empty-state-preface')}
-      </p>
-      <p>
-        {translate('workflows.workflow-query-empty-state-postface')}
-      </p>
-    {:else}
-      <slot name="cloud" />
-      <p>
-        {translate('workflows.workflow-empty-state-description')}
-        <Link newTab href="https://github.com/temporalio"
-          >github.com/temporalio</Link
-        >.
-      </p>
-      <ul class="flex flex-col gap-2">
-        {#each samples as sample}
-          <li>
-            <Link
-              icon="github"
-              newTab
-              href="https://github.com/temporalio/{sample}">{sample}</Link
-            >
-          </li>
-        {/each}
-      </ul>
-    {/if}
+    </div>
+    <div
+      class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:h-full xl:max-w-[1050px] xl:flex-1 xl:items-stretch xl:justify-center"
+      style="background-image: url({noResultsImages});"
+    >
+      <img
+        src={noResultsImages}
+        alt=""
+        class="max-h-full max-w-full object-contain xl:hidden"
+      />
+    </div>
   </div>
-  <div
-    class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:h-full xl:max-w-[1050px] xl:flex-1 xl:items-stretch xl:justify-center"
-    style="background-image: url({noResultsImages});"
-  >
-    <img
-      src={noResultsImages}
-      alt=""
-      class="max-h-full max-w-full object-contain xl:hidden"
-    />
-  </div>
-</div>
+{/if}

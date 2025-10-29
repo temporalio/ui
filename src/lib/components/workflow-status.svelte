@@ -148,7 +148,10 @@
           big && 'h-8 px-2',
         )}
       >
-        <Icon name="error" class={merge(!big && 'px-0.5')} />
+        <Icon
+          name="exclamation-octagon"
+          class={merge(!big && 'px-0.5 text-red-900')}
+        />
       </span>
     {/if}
 

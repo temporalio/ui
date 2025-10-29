@@ -1,5 +1,3 @@
-import type { ClassNameValue } from 'tailwind-merge';
-
 import { page } from '$app/state';
 
 import type { IconName } from '$lib/holocene/icon';
@@ -15,7 +13,6 @@ export type SavedQuery = {
   icon?: IconName;
   count?: number;
   badge?: string;
-  class?: ClassNameValue;
   disabled?: boolean;
   active?: boolean;
   type?: string;
@@ -47,9 +44,8 @@ export const systemWorkflowViews: SavedQuery[] = [
     id: 'task-failures',
     name: 'Task Failures',
     query: TASK_FAILURES_QUERY,
-    icon: 'error',
+    icon: 'happy-lappy',
     type: 'system',
-    class: 'text-danger',
     hidden: !namespaceHasReportedProblemsSearchAttribute(page.params.namespace),
   },
   {

@@ -2,7 +2,7 @@
   import { slide } from 'svelte/transition';
 
   import { onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
@@ -10,7 +10,9 @@
   import EditViewModal from '$lib/components/workflow/filter-bar/edit-view-modal.svelte';
   import SaveViewModal from '$lib/components/workflow/filter-bar/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { fetchWorkflowTaskFailures } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
@@ -305,7 +307,7 @@
             {@render queryButton({
               ...view,
               active: query === view.query,
-              count: view.id === 'task-failures' ? taskFailureCount : 0,
+              ...(view.id === 'task-failures' && { count: taskFailureCount }),
             })}
           {/if}
         {/each}
@@ -314,18 +316,14 @@
 
     {#if $savedQueryNavOpen}
       <p
-        class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
+        class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
         in:slide
       >
-        Custom Views
-        <span
-          class={merge(
-            'text-xs text-secondary',
-            $savedQueryNavOpen ? 'lg:inline' : 'lg:hidden',
-          )}
-        >
-          {namespaceSavedQueries.length} / 20
-        </span>
+        {translate('workflows.custom-views')}
+        {@render queryBadge({
+          className: 'surface-subtle font-mono',
+          content: `${namespaceSavedQueries.length}/${MAX_SAVED_WORKFLOW_QUERIES}`,
+        })}
       </p>
     {/if}
 
@@ -394,13 +392,18 @@
       data-track-intent="action"
       data-track-text={view.name}
       on:click={() => setActiveQueryView(view)}
-      class={merge('flex w-full justify-start', view.class || '')}
-      active={view?.active}
-      disabled={view?.disabled}
+      class={merge(
+        'flex w-full justify-start',
+        view.count > 0 && 'text-red-900',
+      )}
+      active={view.active}
+      disabled={view.disabled}
       size="sm"
     >
       <Icon
-        name={view?.icon || 'bookmark'}
+        name={view.id === 'task-failures' && view.count > 0
+          ? 'exclamation-octagon'
+          : view.icon || 'bookmark'}
         class={merge(
           'h-4 w-4 flex-shrink-0  transition-colors duration-200',
           $savedQueryNavOpen ? 'lg:hidden' : '',
@@ -412,23 +415,24 @@
           class="hidden truncate text-left text-sm font-normal lg:inline-block"
           in:slide>{view.name}</span
         >
-        {#if view?.badge}
-          <span
-            data-testid={view.badge}
-            class="surface-information right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-            in:slide>{view.badge || ''}</span
-          >
+        {#if view.badge}
+          {@render queryBadge({
+            className: 'surface-information italic',
+            content: view.badge,
+          })}
         {/if}
-        {#if view?.count}
-          <span
-            class="surface-danger right-2 top-2 hidden rounded-sm px-2 py-0.5 text-xs font-medium italic text-primary lg:static lg:ml-auto lg:block"
-            in:slide>{view.count}</span
-          >
+        {#if view.count != undefined}
+          {@render queryBadge({
+            className: `font-mono ${view.count > 0 ? 'surface-danger text-red-900' : 'surface-information'}`,
+            content: view.count,
+            icon: view.count > 0 ? 'exclamation-octagon' : 'happy-lappy',
+            iconClass: view.count > 0 ? 'bg-red-200' : 'bg-subtle',
+          })}
         {/if}
       {/if}
     </Button>
 
-    {#if activeQueryView?.id === view?.id && view.type === 'user'}
+    {#if activeQueryView?.id === view.id && view.type === 'user'}
       <div
         in:slide
         class={merge(
@@ -480,7 +484,7 @@
           ></Button
         >
       </div>
-    {:else if unsavedQuery && view?.id === 'unsaved'}
+    {:else if unsavedQuery && view.id === 'unsaved'}
       <div
         class="flex items-center gap-1 overflow-hidden pt-0.5"
         transition:slide
@@ -509,6 +513,31 @@
       </div>
     {/if}
   </div>
+{/snippet}
+
+{#snippet queryBadge({
+  className,
+  content,
+  iconClass,
+  icon,
+}: {
+  className?: ClassNameValue;
+  content: string | number;
+  iconClass?: ClassNameValue;
+  icon?: IconName;
+})}
+  <span
+    class={merge(
+      'right-2 top-2 hidden items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-primary lg:static lg:ml-auto lg:flex',
+      className,
+    )}
+    in:slide
+  >
+    {content}
+    {#if icon}
+      <Icon name={icon} class={merge('rounded-full', iconClass)} />
+    {/if}
+  </span>
 {/snippet}
 
 {#if showTooltip && tooltipText}
