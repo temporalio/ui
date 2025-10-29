@@ -1,4 +1,5 @@
 <script lang="ts">
+  import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
   import {
     Menu,
     MenuButton,
@@ -9,6 +10,7 @@
   import { authUser } from '$lib/stores/auth-user';
 
   import Icon from './icon/icon.svelte';
+  import MenuDivider from './menu/menu-divider.svelte';
 
   export let logout: () => void;
 
@@ -19,9 +21,9 @@
   }
 </script>
 
-{#if $authUser.accessToken}
-  <MenuContainer>
-    <MenuButton variant="ghost" hasIndicator controls="user-menu">
+<MenuContainer>
+  <MenuButton variant="ghost" hasIndicator controls="user-menu">
+    {#if $authUser.accessToken}
       <img
         src={$authUser?.picture}
         alt={$authUser?.profile ?? translate('common.user-profile')}
@@ -39,8 +41,16 @@
           </div>
         {/if}
       </div>
-    </MenuButton>
-    <Menu id="user-menu" position="right">
+    {:else}
+      <img
+        src="/ziggy-full-face.png"
+        alt={translate('common.user-profile')}
+        class="h-[24px] w-[24px]"
+      />
+    {/if}
+  </MenuButton>
+  <Menu id="user-menu" position="right" class="w-60">
+    {#if $authUser.accessToken}
       <MenuItem hoverable={false}>
         <div class="flex items-center justify-start gap-4">
           <Icon name="astronaut" />
@@ -53,6 +63,39 @@
           {translate('common.log-out')}
         </div>
       </MenuItem>
-    </Menu>
-  </MenuContainer>
-{/if}
+      <MenuDivider />
+    {:else}
+      <MenuItem disabled>Anonymous Tardigrade</MenuItem>
+      <MenuDivider />
+    {/if}
+    <MenuItem hoverable={false}>
+      {translate('common.theme')}
+      <DarkModeMenu />
+    </MenuItem>
+    <MenuDivider />
+    <MenuItem
+      hoverable={false}
+      class="text-subtle"
+      newTab
+      href="https://t.mp/slack"
+    >
+      {translate('common.slack-community')}
+    </MenuItem>
+    <MenuItem
+      hoverable={false}
+      class="text-subtle"
+      newTab
+      href="https://community.temporal.io/"
+    >
+      {translate('common.community-forum')}
+    </MenuItem>
+    <MenuItem
+      hoverable={false}
+      class="text-subtle"
+      newTab
+      href="https://temporal.io/change-log"
+    >
+      {translate('common.change-log')}
+    </MenuItem>
+  </Menu>
+</MenuContainer>

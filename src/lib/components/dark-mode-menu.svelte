@@ -1,13 +1,7 @@
 <script lang="ts">
-  import type { ButtonStyles } from '$lib/holocene/button.svelte';
-  import Icon, { type IconName } from '$lib/holocene/icon';
-  import {
-    Menu,
-    MenuButton,
-    MenuContainer,
-    MenuItem,
-  } from '$lib/holocene/menu';
-  import { translate } from '$lib/i18n/translate';
+  import Icon from '$lib/holocene/icon';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { useDarkModePreference } from '$lib/utilities/dark-mode';
   import {
     type DarkModePreference,
@@ -15,34 +9,10 @@
   } from '$lib/utilities/dark-mode/dark-mode';
 
   interface Props {
-    position: 'left' | 'right';
-    hideLabel?: boolean;
-    size?: ButtonStyles['size'];
     onchange?: (prefersDarkMode: boolean) => void;
   }
 
-  const {
-    position = 'right',
-    hideLabel = false,
-    size = undefined,
-    onchange,
-  }: Props = $props();
-
-  const menuButtonText = $derived(
-    $useDarkModePreference == 'system'
-      ? translate('common.system-default')
-      : $useDarkModePreference
-        ? translate('common.night')
-        : translate('common.day'),
-  );
-
-  const menuButtonIcon: IconName = $derived(
-    $useDarkModePreference == 'system'
-      ? 'system-window'
-      : $useDarkModePreference
-        ? 'moon'
-        : 'sun',
-  );
+  const { onchange }: Props = $props();
 
   const setDarkModePreference = (preference: DarkModePreference) => {
     $useDarkModePreference = preference;
@@ -50,42 +20,29 @@
   };
 </script>
 
-<MenuContainer>
-  <MenuButton
-    controls="dark-mode-menu"
-    hasIndicator
-    label={menuButtonText}
-    variant="ghost"
-    data-testid="dark-mode-menu-button"
-    {size}
+<ToggleButtons class="pl-4">
+  <ToggleButton
+    data-testid="system-mode"
+    on:click={() => setDarkModePreference('system')}
+    active={$useDarkModePreference === 'system'}
+    size="xs"
   >
-    {#if !hideLabel}{menuButtonText}{/if}
-    <Icon slot="leading" name={menuButtonIcon} aria-hidden />
-  </MenuButton>
-  <Menu id="dark-mode-menu" {position} class="w-max">
-    <MenuItem
-      on:click={() => setDarkModePreference(true)}
-      selected={$useDarkModePreference === true}
-      data-testid="night-mode"
-    >
-      <Icon slot="leading" name="moon" />
-      Night
-    </MenuItem>
-    <MenuItem
-      on:click={() => setDarkModePreference(false)}
-      selected={$useDarkModePreference === false}
-      data-testid="day-mode"
-    >
-      <Icon slot="leading" name="sun" />
-      Day
-    </MenuItem>
-    <MenuItem
-      on:click={() => setDarkModePreference('system')}
-      selected={$useDarkModePreference === 'system'}
-      data-testid="system-mode"
-    >
-      <Icon slot="leading" name="system-window" />
-      System Default
-    </MenuItem>
-  </Menu>
-</MenuContainer>
+    <Icon name="system-window" />
+  </ToggleButton>
+  <ToggleButton
+    data-testid="day-mode"
+    on:click={() => setDarkModePreference(false)}
+    active={$useDarkModePreference === false}
+    size="xs"
+  >
+    <Icon name="sun" />
+  </ToggleButton>
+  <ToggleButton
+    data-testid="night-mode"
+    on:click={() => setDarkModePreference(true)}
+    active={$useDarkModePreference === true}
+    size="xs"
+  >
+    <Icon name="moon" />
+  </ToggleButton>
+</ToggleButtons>

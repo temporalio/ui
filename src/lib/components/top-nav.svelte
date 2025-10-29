@@ -1,7 +1,6 @@
 <script lang="ts">
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
-  import DarkModeMenu from '$lib/components/dark-mode-menu.svelte';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import TimezoneSelect from '$lib/components/timezone-select.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -10,7 +9,6 @@
 
   let className: ClassNameValue = '';
   export { className as class };
-  export let onThemeChange: (prefersDarkMode: boolean) => void = () => {};
 </script>
 
 <svelte:window bind:innerWidth={screenWidth} />
@@ -35,11 +33,6 @@
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
     <DataEncoderStatus />
-    <DarkModeMenu
-      onchange={onThemeChange}
-      hideLabel
-      position={screenWidth < 768 ? 'left' : 'right'}
-    />
     <slot />
   </div>
 </nav>

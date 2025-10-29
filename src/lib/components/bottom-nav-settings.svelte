@@ -28,8 +28,14 @@
     class="flex h-full flex-col justify-start gap-6 overflow-auto px-4 py-8"
     data-theme="dark"
   >
-    <TimezoneSelect position="left" size="sm" />
-    <DarkModeMenu position="left" size="sm" />
+    <div class="flex items-center justify-between">
+      <p>Timezone</p>
+      <TimezoneSelect size="sm" />
+    </div>
+    <div class="flex items-center justify-between">
+      <p>{translate('common.theme')}</p>
+      <DarkModeMenu />
+    </div>
     <hr class="border-subtle" />
     <NavigationButton
       onClick={onCodecServerClick}
