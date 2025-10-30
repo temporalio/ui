@@ -4,7 +4,7 @@
   let { class: className }: { class?: ClassNameValue } = $props();
 </script>
 
-<div data-testid="loading">
+<div data-testid="loading" class="flex justify-center">
   <div
     class={twMerge(
       'w-[45dvw] min-w-fit max-w-[500px] scale-[.30] antialiased',
@@ -45,7 +45,7 @@
     </svg>
   </div>
   <style>
-    :root {
+    [data-testid='loading'] {
       --vertical-shape1: 730 118;
       --vertical-shape2: 433 420;
       --vertical-offset-start: -59;
@@ -57,14 +57,9 @@
       --horizontal-offset-shape2: -575;
 
       /* Drop Shadow  */
-      --ellipse-shadow: rgb(0 0 0 / 15%);
+      --ellipse-shadow: rgb(var(--color-text-primary) / 15%);
       --ellipse-drop-shadow: drop-shadow(0 4px 12px var(--ellipse-shadow));
-      --stroke-color: black;
-    }
-
-    :root.dark {
-      --stroke-color: white;
-      --ellipse-shadow: rgb(255 255 255 / 25%);
+      --stroke-color: rgb(var(--color-text-primary));
     }
 
     /* Default states - no animation */
