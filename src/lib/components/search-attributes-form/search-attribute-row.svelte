@@ -5,13 +5,11 @@
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import type {
-    SearchAttributeDefinition,
-    SearchAttributeTypeOption,
-  } from './types';
+  import type { SearchAttributeTypeOption } from './types';
 
   interface Props {
-    attribute: SearchAttributeDefinition;
+    name: string;
+    type: string;
     index: number;
     supportedTypes: SearchAttributeTypeOption[];
     submitting: boolean;
@@ -20,10 +18,13 @@
     disableTypeForExisting?: boolean;
     initialAttributeNames: Set<string>;
     onRemove: () => void;
+    onNameChange: (value: string) => void;
+    onTypeChange: (value: string) => void;
   }
 
   let {
-    attribute,
+    name,
+    type,
     index,
     supportedTypes,
     submitting,
@@ -32,16 +33,42 @@
     disableTypeForExisting = false,
     initialAttributeNames,
     onRemove,
+    onNameChange,
+    onTypeChange,
   }: Props = $props();
 
   const isTypeDisabled = $derived(
     submitting ||
-      (disableTypeForExisting &&
-        attribute.name &&
-        initialAttributeNames.has(attribute.name)),
+      (disableTypeForExisting && name && initialAttributeNames.has(name)),
   );
 
   const hasError = $derived(!!error);
+
+  const inputProps = $derived({
+    id: `attribute-name-${index}`,
+    value: name,
+    label: translate('search-attributes.attribute-label', {
+      index: index + 1,
+    }),
+    labelHidden: true,
+    disabled: submitting,
+    error: hasError,
+    oninput: (e: Event) =>
+      onNameChange((e.currentTarget as HTMLInputElement).value),
+  });
+
+  const selectProps = $derived({
+    id: `attribute-type-${index}`,
+    value: type,
+    label: translate('search-attributes.type-label', {
+      index: index + 1,
+    }),
+    labelHidden: true,
+    disabled: isTypeDisabled,
+    placeholder: translate('search-attributes.select-type-placeholder'),
+    onchange: (e: Event) =>
+      onTypeChange((e.currentTarget as HTMLSelectElement).value),
+  });
 </script>
 
 <div
@@ -49,27 +76,9 @@
   class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
   class:grid-cols-[1fr,200px]={hideDeleteButton}
 >
-  <Input
-    id="attribute-name-{index}"
-    bind:value={attribute.name}
-    label={translate('search-attributes.attribute-label', {
-      index: index + 1,
-    })}
-    labelHidden
-    disabled={submitting}
-    error={hasError}
-  />
+  <Input {...inputProps} />
 
-  <Select
-    id="attribute-type-{index}"
-    bind:value={attribute.type}
-    label={translate('search-attributes.type-label', {
-      index: index + 1,
-    })}
-    labelHidden
-    disabled={isTypeDisabled}
-    placeholder={translate('search-attributes.select-type-placeholder')}
-  >
+  <Select {...selectProps}>
     {#each supportedTypes as type}
       <Option value={type.value}>{type.label}</Option>
     {/each}
