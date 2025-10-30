@@ -383,7 +383,13 @@
     class="w-full"
     role="menuitem"
     tabindex="-1"
-    onmouseenter={(e) => onQueryBtnEnter(e, view.name)}
+    onmouseenter={(e) =>
+      onQueryBtnEnter(
+        e,
+        view.id === 'task-failures'
+          ? `${view.name} • ${view.count ?? 0}`
+          : view.name,
+      )}
     onmousemove={onQueryBtnMove}
     onmouseleave={onQueryBtnLeave}
   >
