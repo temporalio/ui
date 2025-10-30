@@ -161,7 +161,8 @@
 
           {#each $formData.attributes as attribute, index}
             <SearchAttributeRow
-              {attribute}
+              name={attribute.name}
+              type={attribute.type}
               {index}
               {supportedTypes}
               submitting={$submitting}
@@ -170,6 +171,12 @@
               {disableTypeForExisting}
               {initialAttributeNames}
               onRemove={() => removeAttribute(index)}
+              onNameChange={(value) => {
+                $formData.attributes[index].name = value;
+              }}
+              onTypeChange={(value) => {
+                $formData.attributes[index].type = value;
+              }}
             />
           {/each}
         </div>
