@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { FormEventHandler } from 'svelte/elements';
+
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
@@ -44,31 +46,9 @@
 
   const hasError = $derived(!!error);
 
-  const inputProps = $derived({
-    id: `attribute-name-${index}`,
-    value: name,
-    label: translate('search-attributes.attribute-label', {
-      index: index + 1,
-    }),
-    labelHidden: true,
-    disabled: submitting,
-    error: hasError,
-    oninput: (e: Event) =>
-      onNameChange((e.currentTarget as HTMLInputElement).value),
-  });
-
-  const selectProps = $derived({
-    id: `attribute-type-${index}`,
-    value: type,
-    label: translate('search-attributes.type-label', {
-      index: index + 1,
-    }),
-    labelHidden: true,
-    disabled: isTypeDisabled,
-    placeholder: translate('search-attributes.select-type-placeholder'),
-    onchange: (e: Event) =>
-      onTypeChange((e.currentTarget as HTMLSelectElement).value),
-  });
+  const handleNameInput: FormEventHandler<HTMLInputElement> = (e) => {
+    onNameChange(e.currentTarget.value);
+  };
 </script>
 
 <div
@@ -76,9 +56,29 @@
   class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
   class:grid-cols-[1fr,200px]={hideDeleteButton}
 >
-  <Input {...inputProps} />
+  <Input
+    id={`attribute-name-${index}`}
+    value={name}
+    label={translate('search-attributes.attribute-label', {
+      index: index + 1,
+    })}
+    labelHidden
+    disabled={submitting}
+    error={hasError}
+    oninput={handleNameInput}
+  />
 
-  <Select {...selectProps}>
+  <Select
+    id={`attribute-type-${index}`}
+    value={type}
+    label={translate('search-attributes.type-label', {
+      index: index + 1,
+    })}
+    labelHidden
+    disabled={isTypeDisabled}
+    placeholder={translate('search-attributes.select-type-placeholder')}
+    onChange={onTypeChange}
+  >
     {#each supportedTypes as type}
       <Option value={type.value}>{type.label}</Option>
     {/each}
