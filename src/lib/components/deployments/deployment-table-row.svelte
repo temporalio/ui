@@ -43,6 +43,13 @@
   const currentLabel = $derived(
     versionedCurrent ? currentBuildId : translate('deployments.unversioned'),
   );
+  const latestDeploymentTimestamp = $derived(
+    latestBuildId &&
+      latestBuildId === currentBuildId &&
+      deployment.latestVersionSummary?.createTime
+      ? deployment.latestVersionSummary.createTime
+      : deployment.createTime,
+  );
 </script>
 
 <tr>
@@ -116,7 +123,7 @@
           {/if}
           <p>
             {#if versionedCurrent}
-              {formatDate(deployment.createTime, $timeFormat, {
+              {formatDate(latestDeploymentTimestamp, $timeFormat, {
                 relative: $relativeTime,
               })}
             {:else}
