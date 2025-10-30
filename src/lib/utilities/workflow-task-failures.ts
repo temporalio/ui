@@ -6,10 +6,10 @@ export const TemporalReportedProblems = [
 ];
 
 export const TASK_FAILURES_QUERY =
-  '`ExecutionStatus`="Running" AND ' +
-  TemporalReportedProblems.map(
-    (problem) => '`TemporalReportedProblems` IN ("' + problem + '")',
-  ).join(' OR ');
+  '`ExecutionStatus`="Running" AND `TemporalReportedProblems` IN ' +
+  `(${TemporalReportedProblems.map((problem) => '"' + problem + '"').join(
+    ', ',
+  )})`;
 
 export const isWorkflowTaskFailure = (workflow: WorkflowExecution): boolean => {
   if (!workflow.searchAttributes || workflow.status !== 'Running') return false;
