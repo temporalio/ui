@@ -51,6 +51,8 @@
     }
   });
 
+  const confirmDisabled = $derived(!!error || ($override && !endpoint));
+
   const onCancel = () => {
     endpoint = $codecEndpoint;
     passToken = $passAccessToken;
@@ -80,7 +82,7 @@
   id="data-encoder-settings"
   cancelText={translate('common.cancel')}
   confirmText={translate('common.apply')}
-  confirmDisabled={Boolean(error)}
+  {confirmDisabled}
   on:cancelModal={onCancel}
   on:confirmModal={onConfirm}
   large
