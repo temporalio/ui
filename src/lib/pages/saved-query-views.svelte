@@ -400,7 +400,7 @@
       on:click={() => setActiveQueryView(view)}
       class={merge(
         'flex w-full justify-start',
-        view.count > 0 && 'text-red-900',
+        view.count > 0 && 'text-danger',
       )}
       active={view.active}
       disabled={view.disabled}
@@ -429,10 +429,10 @@
         {/if}
         {#if view.count != undefined}
           {@render queryBadge({
-            className: `font-mono ${view.count > 0 ? 'surface-danger text-red-900' : 'surface-information'}`,
+            className: `font-mono ${view.count > 0 ? 'surface-danger text-danger' : 'surface-information'}`,
             content: view.count,
             icon: view.count > 0 ? 'exclamation-octagon' : 'happy-lappy',
-            iconClass: view.count > 0 ? 'bg-red-200' : 'bg-subtle',
+            iconClass: view.count > 0 ? 'bg-red-200 text-red-900' : 'bg-subtle',
           })}
         {/if}
       {/if}
@@ -541,7 +541,9 @@
   >
     {content}
     {#if icon}
-      <Icon name={icon} class={merge('rounded-full', iconClass)} />
+      <span class={merge('rounded-full', iconClass)}>
+        <Icon name={icon} class="p-0.5" />
+      </span>
     {/if}
   </span>
 {/snippet}
