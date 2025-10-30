@@ -1,7 +1,4 @@
-import { page } from '$app/state';
-
 import type { IconName } from '$lib/holocene/icon';
-import { namespaceHasReportedProblemsSearchAttribute } from '$lib/utilities/get-namespace-capabilities';
 import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
 
 import { persistStore } from './persist-store';
@@ -16,7 +13,6 @@ export type SavedQuery = {
   disabled?: boolean;
   active?: boolean;
   type?: string;
-  hidden?: boolean;
 };
 
 const getToday = () => {
@@ -32,7 +28,7 @@ const getLastHour = () => {
   return lastHour.toISOString();
 };
 
-export const DEFAULT_SYSTEM_QUERY: SavedQuery = {
+export const DEFAULT_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
   name: 'All Workflows',
   query: '',
@@ -40,16 +36,17 @@ export const DEFAULT_SYSTEM_QUERY: SavedQuery = {
   type: 'system',
 };
 
+export const TASK_FAILURES_VIEW: SavedQuery = {
+  id: 'task-failures',
+  name: 'Task Failures',
+  query: TASK_FAILURES_QUERY,
+  icon: 'happy-lappy',
+  type: 'system',
+};
+
 export const systemWorkflowViews: SavedQuery[] = [
-  DEFAULT_SYSTEM_QUERY,
-  {
-    id: 'task-failures',
-    name: 'Task Failures',
-    query: TASK_FAILURES_QUERY,
-    icon: 'happy-lappy',
-    type: 'system',
-    hidden: !namespaceHasReportedProblemsSearchAttribute(page.params.namespace),
-  },
+  DEFAULT_SYSTEM_VIEW,
+  TASK_FAILURES_VIEW,
   {
     id: 'running',
     name: 'Running',

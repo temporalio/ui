@@ -18,11 +18,12 @@
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
-    DEFAULT_SYSTEM_QUERY,
+    DEFAULT_SYSTEM_VIEW,
     MAX_SAVED_WORKFLOW_QUERIES,
     type SavedQuery,
     savedWorkflowQueries,
     systemWorkflowViews,
+    TASK_FAILURES_VIEW,
   } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { refresh } from '$lib/stores/workflows';
@@ -39,7 +40,7 @@
   const query = $derived(page.url.searchParams.get('query') || '');
   const savedQueryParam = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
-  const shouldSetTaskFailureCount = $derived(
+  const hasTaskFailureAttribute = $derived(
     namespaceHasReportedProblemsSearchAttribute(namespace),
   );
 
@@ -54,7 +55,7 @@
   );
   const systemQueryView = $derived(
     (query && systemWorkflowViews.find((q) => q.query === query)) ||
-      (!query && DEFAULT_SYSTEM_QUERY),
+      (!query && DEFAULT_SYSTEM_VIEW),
   );
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
@@ -78,7 +79,7 @@
 
   onMount(() => {
     const interval = setInterval(() => {
-      if (shouldSetTaskFailureCount) setTaskFailureCount();
+      if (hasTaskFailureAttribute) setTaskFailureCount();
     }, 60000);
 
     if (savedQueryParam) {
@@ -122,8 +123,8 @@
       return;
     }
 
-    if (!query && activeQueryView?.id !== DEFAULT_SYSTEM_QUERY.id) {
-      activeQueryView = DEFAULT_SYSTEM_QUERY;
+    if (!query && activeQueryView?.id !== DEFAULT_SYSTEM_VIEW.id) {
+      activeQueryView = DEFAULT_SYSTEM_VIEW;
       return;
     }
 
@@ -142,7 +143,7 @@
 
   $effect(() => {
     $refresh;
-    if (shouldSetTaskFailureCount) setTaskFailureCount();
+    if (hasTaskFailureAttribute) setTaskFailureCount();
   });
 
   const setActiveQueryView = (view: SavedQuery) => {
@@ -154,7 +155,7 @@
       $workflowFilters = toListWorkflowFilters(view.query, $searchAttributes);
     }
 
-    if (view.id === 'task-failures') setTaskFailureCount();
+    if (view.id === TASK_FAILURES_VIEW.id) setTaskFailureCount();
 
     updateQueryParameters({
       url: page.url,
@@ -310,11 +311,13 @@
     <div class="pb-2 text-center">
       <div class="space-y-1">
         {#each systemWorkflowViews as view}
-          {#if !view.hidden}
+          {#if view.id !== TASK_FAILURES_VIEW.id || hasTaskFailureAttribute}
             {@render queryButton({
               ...view,
               active: query === view.query,
-              ...(view.id === 'task-failures' && { count: taskFailureCount }),
+              ...(view.id === TASK_FAILURES_VIEW.id && {
+                count: taskFailureCount,
+              }),
             })}
           {/if}
         {/each}
@@ -387,7 +390,7 @@
     onmouseenter={(e) =>
       onQueryBtnEnter(
         e,
-        view.id === 'task-failures'
+        view.id === TASK_FAILURES_VIEW.id
           ? `${view.name} • ${view.count ?? 0}`
           : view.name,
       )}
@@ -414,7 +417,7 @@
       size="sm"
     >
       <Icon
-        name={view.id === 'task-failures' && view.count > 0
+        name={view.id === TASK_FAILURES_VIEW.id && view.count > 0
           ? 'exclamation-octagon'
           : view.icon || 'bookmark'}
         class={merge(
