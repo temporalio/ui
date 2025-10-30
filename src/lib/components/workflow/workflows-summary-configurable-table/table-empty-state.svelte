@@ -9,8 +9,9 @@
   import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
   import emptyImageDark from '$lib/vendor/empty-state-dark_2x.png';
   import emptyImageLight from '$lib/vendor/empty-state-light_2x.png';
-  import noWorkflowTaskFailuresLight from '$lib/vendor/no-workflow-task-failures_light.svg';
-  import noWorkflowsLight from '$lib/vendor/no-workflows_light.svg';
+
+  import NoWorkflowTaskFailures from './empty-states/no-workflow-task-failures.svelte';
+  import NoWorkflows from './empty-states/no-workflows.svelte';
 
   let query = $derived(page.url.searchParams.get('query'));
 
@@ -18,13 +19,6 @@
     $useDarkMode ? emptyImageDark : emptyImageLight,
   );
   let hasTaskFailuresQuery = $derived(query === TASK_FAILURES_QUERY);
-  // TODO: add dark mode images for these
-  let noWorkflows = $derived(
-    $useDarkMode ? noWorkflowsLight : noWorkflowsLight,
-  );
-  let noWorkflowTaskFailures = $derived(
-    $useDarkMode ? noWorkflowTaskFailuresLight : noWorkflowTaskFailuresLight,
-  );
 
   const samples = [
     'samples-go',
@@ -39,8 +33,6 @@
 <svelte:head>
   <link rel="preload" as="image" href={emptyImageDark} />
   <link rel="preload" as="image" href={emptyImageLight} />
-  <link rel="preload" as="image" href={noWorkflowsLight} />
-  <link rel="preload" as="image" href={noWorkflowTaskFailuresLight} />
 </svelte:head>
 
 {#if query}
@@ -56,18 +48,18 @@
             )
           : translate('workflows.workflow-query-empty-state-title')}
       </h2>
-      <p>
+      <p class="text-secondary">
         {hasTaskFailuresQuery
           ? translate(
               'workflows.workflow-task-failures-query-empty-state-description',
             )
           : translate('workflows.workflow-query-empty-state-description')}
       </p>
-      <img
-        src={hasTaskFailuresQuery ? noWorkflowTaskFailures : noWorkflows}
-        alt=""
-        class="m-auto mt-8"
-      />
+      {#if hasTaskFailuresQuery}
+        <NoWorkflowTaskFailures class="m-auto mt-8 text-subtle" />
+      {:else}
+        <NoWorkflows class="m-auto mt-8 text-subtle" />
+      {/if}
     </div>
   </div>
 {:else}
