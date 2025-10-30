@@ -23,7 +23,7 @@
   );
 </script>
 
-<div class="bg-purple-700 text-white">
+<div class="bg-purple-600 text-white">
   {#if showEventGroup}
     <div class="flex flex-col overflow-hidden">
       <div class="flex flex-col gap-2 p-4 lg:flex-row">
@@ -58,15 +58,15 @@
           </PayloadDecoder>
         </div>
       </div>
-      <div class="flex flex-col gap-1 xl:flex-row">
+      <div class="flex flex-col gap-1 p-1 xl:flex-row">
+        {#each group.eventList as groupEvent}
+          <EventCard event={groupEvent} />
+        {/each}
         {#if group?.pendingActivity}
           <PendingActivityCard activity={group.pendingActivity} />
         {:else if group?.pendingNexusOperation}
           <PendingNexusOperationCard operation={group.pendingNexusOperation} />
         {/if}
-        {#each group.eventList as groupEvent}
-          <EventCard event={groupEvent} />
-        {/each}
       </div>
     </div>
   {:else if event}
