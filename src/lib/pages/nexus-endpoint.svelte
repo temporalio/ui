@@ -4,7 +4,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import Markdown from '$lib/holocene/monaco/markdown.svelte';
+  import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NexusEndpoint as Endpoint } from '$lib/types/nexus';
   import {

@@ -1,6 +1,8 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { afterNavigate, goto } from '$app/navigation';
-  import { page, updated } from '$app/stores';
+  import { page, updated } from '$app/state';
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
@@ -36,27 +38,36 @@
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  let namespaceList: NamespaceListItem[];
+  interface Props {
+    children: Snippet;
+  }
 
-  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
-  $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
-  $: namespaceNames = isCloud
-    ? [$page.params.namespace]
-    : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
-  $: namespaceList = namespaceNames.map((namespace: string) => {
-    const getHref = (namespace: string) =>
-      isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
-    return {
-      namespace,
-      onClick: (namespace: string) => {
-        $lastUsedNamespace = namespace;
-        goto(getHref(namespace));
-      },
-    };
-  });
+  let { children }: Props = $props();
 
-  $: routes = getRoutes(activeNamespaceName);
-  $: linkList = getLinkList(routes, !!$inProgressBatchOperation);
+  let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
+  let activeNamespaceName = $derived(
+    page.params?.namespace ?? $lastUsedNamespace,
+  );
+  let namespaceNames = $derived(
+    isCloud
+      ? [page.params.namespace]
+      : $namespaces.map(
+          (namespace: Namespace) => namespace?.namespaceInfo?.name,
+        ),
+  );
+  let namespaceList: NamespaceListItem[] = $derived(
+    namespaceNames.map((namespace: string) => {
+      const getHref = (namespace: string) =>
+        isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
+      return {
+        namespace,
+        onClick: (namespace: string) => {
+          $lastUsedNamespace = namespace;
+          goto(getHref(namespace));
+        },
+      };
+    }),
+  );
 
   const getRoutes = (namespace: string) => {
     return {
@@ -70,21 +81,6 @@
       historyImportRoute: routeForEventHistoryImport(),
     };
   };
-
-  $: ({
-    workflowsRoute,
-    schedulesRoute,
-    batchOperationsRoute,
-    workerDeploymentsRoute,
-    archivalRoute,
-  } = routes);
-  $: showNamespacePicker = [
-    workflowsRoute,
-    schedulesRoute,
-    workerDeploymentsRoute,
-    batchOperationsRoute,
-    archivalRoute,
-  ].some((route) => $page.url.href.includes(route));
 
   const getLinkList = (
     {
@@ -152,7 +148,7 @@
         href: nexusRoute,
         icon: 'nexus',
         label: translate('nexus.nexus'),
-        hidden: !$page.data?.systemInfo?.capabilities?.nexus,
+        hidden: !page.data?.systemInfo?.capabilities?.nexus,
         isActive: (path) => {
           const match = path.split('/').find((segment) => segment === 'nexus');
           return !!match;
@@ -180,6 +176,25 @@
     ];
   };
 
+  let routes = $derived(getRoutes(activeNamespaceName));
+  let linkList = $derived(getLinkList(routes, !!$inProgressBatchOperation));
+  let {
+    workflowsRoute,
+    schedulesRoute,
+    batchOperationsRoute,
+    workerDeploymentsRoute,
+    archivalRoute,
+  } = $derived(routes);
+  let showNamespacePicker = $derived(
+    [
+      workflowsRoute,
+      schedulesRoute,
+      workerDeploymentsRoute,
+      batchOperationsRoute,
+      archivalRoute,
+    ].some((route) => page.url.href.includes(route)),
+  );
+
   function getCurrentHref(namespace: string) {
     const namespacePages = [
       {
@@ -197,7 +212,7 @@
     ];
 
     for (const { subPath, fullRoute } of namespacePages) {
-      if ($page.url.pathname.endsWith(subPath)) {
+      if (page.url.pathname.endsWith(subPath)) {
         return fullRoute;
       }
     }
@@ -210,8 +225,8 @@
     goto(routeForLoginPage());
   };
 
-  updated.subscribe(async (value) => {
-    if (value) {
+  $effect(() => {
+    if (updated.current) {
       // Hard refresh when version does not match
       window.location.reload();
     }
@@ -239,7 +254,7 @@
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud}>
       <NavigationItem
-        link={$page.data?.settings?.feedbackURL ||
+        link={page.data?.settings?.feedbackURL ||
           'https://github.com/temporalio/ui/issues/new/choose'}
         label={translate('common.feedback')}
         icon="feedback"
@@ -264,7 +279,7 @@
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
     >
       <ErrorBoundary>
-        <slot />
+        {@render children()}
       </ErrorBoundary>
     </div>
     <BottomNavigation

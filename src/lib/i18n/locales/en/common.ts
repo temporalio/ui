@@ -79,6 +79,7 @@ export const Strings = {
   edit: 'Edit',
   update: 'Update',
   delete: 'Delete',
+  discard: 'Discard',
   view: 'View',
   memo: 'Memo',
   notes: 'Notes',

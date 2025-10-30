@@ -29,6 +29,7 @@
     error?: boolean;
     'data-testid'?: string;
     class?: string;
+    inputContainerClass?: string;
   };
 
   type CopyableProps = BaseProps & {
@@ -70,6 +71,7 @@
 
   let className = '';
   export { className as class };
+  export let inputContainerClass = '';
 
   let testId = $$props['data-testid'] || id;
 
@@ -95,6 +97,7 @@
       class={merge(
         'input-container',
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        inputContainerClass,
       )}
       class:disabled
       class:error
@@ -218,7 +221,7 @@
   }
 
   .input {
-    @apply m-2 w-full bg-transparent placeholder:text-secondary focus:text-brand focus:outline-none;
+    @apply m-2 w-full bg-transparent focus:text-brand focus:outline-none;
   }
 
   .prefix {

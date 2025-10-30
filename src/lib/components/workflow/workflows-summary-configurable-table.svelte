@@ -12,11 +12,7 @@
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
-  import {
-    queryWithParentWorkflowId,
-    refresh,
-    workflowCount,
-  } from '$lib/stores/workflows';
+  import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
 
@@ -29,6 +25,7 @@
 
   $: ({ namespace } = $page.params);
   $: columns = $configurableTableColumns?.[namespace]?.workflows ?? [];
+  $: query = $page.url.searchParams.get('query');
 
   let childrenIds: {
     workflowId: string;
@@ -40,7 +37,7 @@
     childrenIds = [];
   };
 
-  $: $refresh, $queryWithParentWorkflowId, clearChildren();
+  $: $refresh, query, clearChildren();
 
   const viewChildren = async (workflow: WorkflowExecution) => {
     if (childrenActive(workflow)) {
@@ -66,11 +63,10 @@
     );
   };
 
-  $: onFetch = () =>
-    fetchPaginatedWorkflows(namespace, $queryWithParentWorkflowId);
+  $: onFetch = () => fetchPaginatedWorkflows(namespace, query);
 </script>
 
-{#key [namespace, $queryWithParentWorkflowId, $refresh]}
+{#key [namespace, query, $refresh]}
   <PaginatedTable
     total={$workflowCount.count}
     {onFetch}
@@ -80,6 +76,7 @@
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
+    maxHeight="var(--panel-h)"
   >
     <caption class="sr-only" slot="caption">
       {translate('common.workflows')}

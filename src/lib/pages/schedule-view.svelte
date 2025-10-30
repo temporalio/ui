@@ -271,7 +271,7 @@
   <Loading />
 {:then schedule}
   {#if $loading}
-    <Loading title={translate('schedules.deleting')} class="my-2" />
+    <Loading class="my-2" />
   {:else}
     <header class="flex flex-row flex-wrap justify-between gap-4">
       <div class="relative flex flex-col">
@@ -402,8 +402,10 @@
             input={schedule?.schedule?.action?.startWorkflow?.input}
           />
           <ScheduleFrequencyPanel
-            calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
-            interval={schedule?.schedule?.spec?.interval?.[0]}
+            frequency={[
+              ...(schedule?.schedule?.spec?.structuredCalendar ?? []),
+              ...(schedule?.schedule?.spec?.interval ?? []),
+            ]}
             timezoneName={schedule?.schedule?.spec?.timezoneName}
           />
         </div>

@@ -110,6 +110,7 @@ export const toListWorkflowFilters = (
             if (hasValidStartTime && hasValidEndTime) {
               filter.value = `BETWEEN "${start}" AND "${end}"`;
               filter.customDate = true;
+              filter.conditional = 'BETWEEN';
             } else {
               console.error('Error parsing Datetime field from query');
             }

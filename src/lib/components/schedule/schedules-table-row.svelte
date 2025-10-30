@@ -23,8 +23,6 @@
   export let columns: ConfigurableTableHeader[];
 
   $: spec = schedule?.info?.spec;
-  $: calendar = spec?.structuredCalendar?.[0];
-  $: interval = spec?.interval?.[0];
   $: timezoneName = spec?.timezoneName || 'UTC';
   $: searchAttributes = schedule?.searchAttributes ?? {};
   $: decodedAttributes = decodePayloadAttributes({ searchAttributes });
@@ -47,7 +45,7 @@
   });
 </script>
 
-<tr>
+<tr class="max-h-32">
   {#each columns as { label } (label)}
     {#if label === translate('common.status')}
       <td class="cell">
@@ -94,7 +92,12 @@
     {:else if label === translate('schedules.schedule-spec')}
       <td class="cell">
         <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
-        <ScheduleBasicFrequency {calendar} {interval} />
+        <ScheduleBasicFrequency
+          frequency={[
+            ...(spec?.structuredCalendar ?? []),
+            ...(spec?.interval ?? []),
+          ]}
+        />
       </td>
     {:else}
       <td class="cell">

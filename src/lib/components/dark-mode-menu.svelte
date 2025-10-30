@@ -9,18 +9,23 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import { useDarkModePreference } from '$lib/utilities/dark-mode';
-  import type { DarkModePreference } from '$lib/utilities/dark-mode/dark-mode';
+  import {
+    type DarkModePreference,
+    prefersDarkMode,
+  } from '$lib/utilities/dark-mode/dark-mode';
 
   interface Props {
     position: 'left' | 'right';
     hideLabel?: boolean;
     size?: ButtonStyles['size'];
+    onchange?: (prefersDarkMode: boolean) => void;
   }
 
   const {
     position = 'right',
     hideLabel = false,
     size = undefined,
+    onchange,
   }: Props = $props();
 
   const menuButtonText = $derived(
@@ -41,6 +46,7 @@
 
   const setDarkModePreference = (preference: DarkModePreference) => {
     $useDarkModePreference = preference;
+    onchange?.(prefersDarkMode(preference));
   };
 </script>
 
@@ -60,6 +66,7 @@
     <MenuItem
       on:click={() => setDarkModePreference(true)}
       selected={$useDarkModePreference === true}
+      data-testid="night-mode"
     >
       <Icon slot="leading" name="moon" />
       Night
@@ -67,6 +74,7 @@
     <MenuItem
       on:click={() => setDarkModePreference(false)}
       selected={$useDarkModePreference === false}
+      data-testid="day-mode"
     >
       <Icon slot="leading" name="sun" />
       Day
@@ -74,6 +82,7 @@
     <MenuItem
       on:click={() => setDarkModePreference('system')}
       selected={$useDarkModePreference === 'system'}
+      data-testid="system-mode"
     >
       <Icon slot="leading" name="system-window" />
       System Default

@@ -9,8 +9,6 @@
 <script lang="ts">
   import { type Writable } from 'svelte/store';
 
-  import { v4 as uuid } from 'uuid';
-
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
@@ -19,7 +17,7 @@
 
   import PayloadInput from './payload-input.svelte';
 
-  export let id = uuid();
+  export let id: string = crypto.randomUUID();
   export let input: string;
   export let encoding: Writable<PayloadInputEncoding>;
   export let messageType: string;

@@ -1,7 +1,5 @@
 import { get } from 'svelte/store';
 
-import { v4 } from 'uuid';
-
 import { page } from '$app/stores';
 
 import {
@@ -469,7 +467,7 @@ export async function resetWorkflow({
       runId,
     },
     workflowTaskFinishEventId: eventId,
-    requestId: v4(),
+    requestId: crypto.randomUUID(),
     reason: formattedReason,
   };
 

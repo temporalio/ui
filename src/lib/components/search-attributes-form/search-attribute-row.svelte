@@ -1,0 +1,94 @@
+<script lang="ts">
+  import Button from '$lib/holocene/button.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
+  import { translate } from '$lib/i18n/translate';
+
+  import type {
+    SearchAttributeDefinition,
+    SearchAttributeTypeOption,
+  } from './types';
+
+  interface Props {
+    attribute: SearchAttributeDefinition;
+    index: number;
+    supportedTypes: SearchAttributeTypeOption[];
+    submitting: boolean;
+    error?: string;
+    hideDeleteButton?: boolean;
+    disableTypeForExisting?: boolean;
+    initialAttributeNames: Set<string>;
+    onRemove: () => void;
+  }
+
+  let {
+    attribute,
+    index,
+    supportedTypes,
+    submitting,
+    error,
+    hideDeleteButton = false,
+    disableTypeForExisting = false,
+    initialAttributeNames,
+    onRemove,
+  }: Props = $props();
+
+  const isTypeDisabled = $derived(
+    submitting ||
+      (disableTypeForExisting &&
+        attribute.name &&
+        initialAttributeNames.has(attribute.name)),
+  );
+
+  const hasError = $derived(!!error);
+</script>
+
+<div
+  class="grid gap-3"
+  class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
+  class:grid-cols-[1fr,200px]={hideDeleteButton}
+>
+  <Input
+    id="attribute-name-{index}"
+    bind:value={attribute.name}
+    label={translate('search-attributes.attribute-label', {
+      index: index + 1,
+    })}
+    labelHidden
+    disabled={submitting}
+    error={hasError}
+  />
+
+  <Select
+    id="attribute-type-{index}"
+    bind:value={attribute.type}
+    label={translate('search-attributes.type-label', {
+      index: index + 1,
+    })}
+    labelHidden
+    disabled={isTypeDisabled}
+    placeholder={translate('search-attributes.select-type-placeholder')}
+  >
+    {#each supportedTypes as type}
+      <Option value={type.value}>{type.label}</Option>
+    {/each}
+  </Select>
+
+  {#if !hideDeleteButton}
+    <Button
+      variant="ghost"
+      size="xs"
+      on:click={onRemove}
+      disabled={submitting}
+      type="button"
+      leadingIcon="trash"
+    />
+  {/if}
+</div>
+
+{#if error}
+  <div class="col-span-2 mt-1 text-xs text-danger">
+    {error}
+  </div>
+{/if}

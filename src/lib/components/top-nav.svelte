@@ -10,6 +10,7 @@
 
   let className: ClassNameValue = '';
   export { className as class };
+  export let onThemeChange: (prefersDarkMode: boolean) => void = () => {};
 </script>
 
 <svelte:window bind:innerWidth={screenWidth} />
@@ -34,7 +35,11 @@
   <div class="flex items-center gap-2">
     <TimezoneSelect position={screenWidth < 768 ? 'left' : 'right'} />
     <DataEncoderStatus />
-    <DarkModeMenu hideLabel position={screenWidth < 768 ? 'left' : 'right'} />
+    <DarkModeMenu
+      onchange={onThemeChange}
+      hideLabel
+      position={screenWidth < 768 ? 'left' : 'right'}
+    />
     <slot />
   </div>
 </nav>
