@@ -32,14 +32,16 @@ const getLastHour = () => {
   return lastHour.toISOString();
 };
 
+export const DEFAULT_SYSTEM_QUERY: SavedQuery = {
+  id: 'all',
+  name: 'All Workflows',
+  query: '',
+  icon: 'workflow',
+  type: 'system',
+};
+
 export const systemWorkflowViews: SavedQuery[] = [
-  {
-    id: 'all',
-    name: 'All Workflows',
-    query: '',
-    icon: 'workflow',
-    type: 'system',
-  },
+  DEFAULT_SYSTEM_QUERY,
   {
     id: 'task-failures',
     name: 'Task Failures',

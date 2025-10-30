@@ -18,6 +18,7 @@
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
+    DEFAULT_SYSTEM_QUERY,
     MAX_SAVED_WORKFLOW_QUERIES,
     type SavedQuery,
     savedWorkflowQueries,
@@ -53,7 +54,7 @@
   );
   const systemQueryView = $derived(
     (query && systemWorkflowViews.find((q) => q.query === query)) ||
-      (!query && systemWorkflowViews.find((q) => q.id === 'all')),
+      (!query && DEFAULT_SYSTEM_QUERY),
   );
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
@@ -121,8 +122,8 @@
       return;
     }
 
-    if (!query && activeQueryView?.type === 'user') {
-      activeQueryView = undefined;
+    if (!query && activeQueryView?.id !== DEFAULT_SYSTEM_QUERY.id) {
+      activeQueryView = DEFAULT_SYSTEM_QUERY;
       return;
     }
 
