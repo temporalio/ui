@@ -417,7 +417,7 @@
                 />
                 <div class="ml-6 flex flex-col gap-2">
                   <DatePicker
-                    label={''}
+                    label=""
                     labelHidden
                     on:datechange={onStartDateChange}
                     selected={new Date($startDate)}

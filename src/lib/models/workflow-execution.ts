@@ -47,6 +47,7 @@ const toPendingNexusOperations = (
   return operations.map((operation): PendingNexusOperation => {
     return {
       ...operation,
+      scheduledEventId: String(operation.scheduledEventId),
       state: toPendingNexusOperationStateReadable(operation.state),
     };
   });

@@ -70,7 +70,7 @@
       {#if operation.scheduledEventId}
         {@render detail(
           translate('workflows.schedule-event-id'),
-          operation.scheduledEventId,
+          operation.scheduledEventId.toString(),
         )}
       {/if}
       {#if operation.scheduledTime}

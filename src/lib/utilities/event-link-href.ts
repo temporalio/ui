@@ -8,7 +8,7 @@ export const getEventLinkHref = (link: EventLink): string => {
       namespace: link.workflowEvent.namespace,
       workflow: link.workflowEvent.workflowId,
       run: link.workflowEvent.runId,
-      eventId: link.workflowEvent.eventRef.eventId,
+      eventId: String(link.workflowEvent.eventRef.eventId),
     });
   } else if (
     link.workflowEvent?.eventRef?.eventType ===

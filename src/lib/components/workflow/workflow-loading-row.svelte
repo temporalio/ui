@@ -26,6 +26,6 @@
   }
 
   .row:last-of-type .cell {
-    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+    @apply border-b-0 first-of-type:rounded-bl-lg last-of-type:rounded-br-lg;
   }
 </style>

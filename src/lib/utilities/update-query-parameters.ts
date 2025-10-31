@@ -62,7 +62,7 @@ export const updateQueryParameters = async ({
     const query = newQuery?.toString();
     const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
 
-    goto(newUrl, options);
+    await goto(newUrl, options);
   }
 
   return value;
@@ -110,6 +110,6 @@ export const updateMultipleQueryParameters = async ({
     const query = newQuery?.toString();
     const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
 
-    goto(newUrl, gotoOptions);
+    await goto(newUrl, gotoOptions);
   }
 };

@@ -37,7 +37,7 @@
     childrenIds = [];
   };
 
-  $: $refresh, query, clearChildren();
+  $: ($refresh, query, clearChildren());
 
   const viewChildren = async (workflow: WorkflowExecution) => {
     if (childrenActive(workflow)) {

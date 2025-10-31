@@ -33,7 +33,7 @@ const queryKeys: Readonly<Record<string, QueryKey>> = {
   closeTime: 'CloseTime',
 } as const;
 
-const filterKeys: Readonly<FilterKey[]> = [
+const filterKeys: readonly FilterKey[] = [
   'workflowId',
   'workflowType',
   'timeRange',

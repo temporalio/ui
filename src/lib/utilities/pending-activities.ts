@@ -50,7 +50,7 @@ export const getPendingNexusOperation = (
 
   if (isNexusOperationScheduledEvent(event)) {
     pendingOperation = pendingNexusOperations.find(
-      (p) => p.scheduledEventId === event.id,
+      (p) => p.scheduledEventId?.toString() === event.id,
     );
   }
 

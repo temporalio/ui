@@ -147,9 +147,9 @@
         bind:value={$timeFormat}
         label={translate('common.time-format')}
       >
-        <Option value={'relative'}>{translate('common.relative')}</Option>
-        <Option value={'UTC'}>{translate('common.utc')}</Option>
-        <Option value={'local'}>{translate('common.local')}</Option>
+        <Option value="relative">{translate('common.relative')}</Option>
+        <Option value="UTC">{translate('common.utc')}</Option>
+        <Option value="local">{translate('common.local')}</Option>
       </Select>
     </div>
   {/if}

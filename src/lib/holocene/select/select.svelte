@@ -77,7 +77,7 @@
   const labelCtx = writable<string>(value?.toString());
   const open = writable<boolean>(false);
 
-  $: value, updateContext();
+  $: (value, updateContext());
 
   function updateContext() {
     $valueCtx = value;
