@@ -227,7 +227,7 @@
         {#snippet children(decodedValue)}
           <CodeBlock
             content={decodedValue}
-            maxHeight={384}
+            maxHeight={320}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -241,7 +241,7 @@
         {#snippet children(decodedValue)}
           <CodeBlock
             content={decodedValue}
-            maxHeight={384}
+            maxHeight={320}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -252,7 +252,7 @@
         {#snippet children(decodedValue)}
           <CodeBlock
             content={decodedValue}
-            maxHeight={384}
+            maxHeight={320}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -268,7 +268,7 @@
       <CodeBlock
         content={stackTrace}
         language="text"
-        maxHeight={384}
+        maxHeight={320}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />

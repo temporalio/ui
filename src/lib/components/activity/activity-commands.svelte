@@ -56,7 +56,7 @@
       : 'Pauses this Activity, starting before it retries or the next time it heartbeats. It won’t time out while it’s paused.'}
   >
     <Button
-      variant="secondary"
+      variant="ghost"
       size="xs"
       leadingIcon={activity.paused ? 'play' : 'pause'}
       on:click={onPause}
@@ -67,22 +67,12 @@
     </Button>
   </Tooltip>
   <Tooltip bottomLeft width={200} text="Update this Activity Options.">
-    <Button
-      variant="secondary"
-      size="xs"
-      leadingIcon="pencil"
-      on:click={onUpdate}
-    >
+    <Button variant="ghost" size="xs" leadingIcon="pencil" on:click={onUpdate}>
       {translate('common.update')}
     </Button>
   </Tooltip>
   <Tooltip bottom width={200} text="Reset this Activity.">
-    <Button
-      variant="secondary"
-      size="xs"
-      leadingIcon="retry"
-      on:click={onReset}
-    >
+    <Button variant="ghost" size="xs" leadingIcon="retry" on:click={onReset}>
       {translate('workflows.reset')}
     </Button>
   </Tooltip>

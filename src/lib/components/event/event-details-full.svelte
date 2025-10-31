@@ -61,7 +61,7 @@
     },
   });
 
-  const timeDot = cva(['h-3 w-3 rounded-full'], {
+  const timeDot = cva(['h-3 w-3 rounded-full shadow-lg'], {
     variants: {
       category: {
         workflow: 'bg-blue-900 ',
@@ -98,6 +98,8 @@
   const emptyValue = $derived(
     group.isPending ? 'Results will appear upon completion' : 'null',
   );
+
+  $inspect('Group: ', group);
 </script>
 
 <div
@@ -108,8 +110,8 @@
   {#if showEventGroup}
     <div class="flex flex-col gap-2 overflow-hidden">
       {@render inputAndResults()}
-      {@render durationTimes()}
       {@render eventCards()}
+      {@render durationTimes()}
     </div>
   {:else if event}
     <EventCard {event} />
@@ -132,7 +134,7 @@
           {#snippet children(decodedValue)}
             <CodeBlock
               content={decodedValue}
-              maxHeight={384}
+              maxHeight={320}
               class="grow"
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -154,7 +156,7 @@
         {#snippet children(decodedValue)}
           <CodeBlock
             content={decodedValue ?? emptyValue}
-            maxHeight={384}
+            maxHeight={320}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -181,20 +183,6 @@
 {#snippet durationTimes()}
   <div class="flex flex-col gap-1">
     <div>
-      <div>
-        <div class="w-full border-t-2 border-white"></div>
-        <div
-          class="-mt-[7px] flex flex-row justify-between gap-1 text-xs xl:text-sm"
-        >
-          {#each group.eventList as _}
-            <div
-              class={timeDot({
-                category: group ? group.category : event.category,
-              })}
-            ></div>
-          {/each}
-        </div>
-      </div>
       <div class="flex flex-row justify-between gap-2 text-xs xl:text-sm">
         {#each group.eventList as event, index}
           <p class="font-mono">
@@ -215,6 +203,23 @@
             </p>
           {/if}
         {/each}
+      </div>
+      <div class="pt-1">
+        <div
+          class="w-full border-t-2 {group.isPending &&
+            'border-dashed'} border-white"
+        ></div>
+        <div
+          class="-mt-[7px] flex flex-row justify-between gap-1 text-xs xl:text-sm"
+        >
+          {#each group.eventList as _}
+            <div
+              class={timeDot({
+                category: group ? group.category : event.category,
+              })}
+            ></div>
+          {/each}
+        </div>
       </div>
     </div>
   </div>
