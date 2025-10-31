@@ -3,6 +3,7 @@
 
   import { page } from '$app/state';
 
+  import Button from '$lib/holocene/button.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import type { Memo } from '$lib/types';
   import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
@@ -24,13 +25,21 @@
     onDecode?: (decodedValue: string) => void;
     children: Snippet<[decodedValue: string]>;
     error?: Snippet<[retry: () => Promise<string>, err: unknown]>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    loading?: Snippet<[keyedVal: any]>;
+    loading?: Snippet<[keyedVal: string]>;
   }
 
-  let { children, value, key = '', onDecode, error, loading }: Props = $props();
+  let {
+    children,
+    value,
+    key = '',
+    onDecode,
+    error = errorSnip,
+    loading = loadingSnip,
+  }: Props = $props();
 
-  let keyedValue = key && value?.[key] ? value[key] : value;
+  let keyedValue = stringifyWithBigInt(
+    key && value?.[key] ? value[key] : value,
+  );
 
   let decodeValuePromise = $state<Promise<string>>(decodePayloads(value));
 
@@ -68,9 +77,24 @@
       return decodedValue;
     } catch (e) {
       console.error('Could not decode payloads');
+      // hmm before this just ate the error we want to throw this to get an error here
+      // but maybe this is leaking information to the users? But it also might be good
+      // to allow that? Think about this harder maybe ask app sec about if this is an okay
+      // design choice
+      throw e;
     }
   }
 </script>
+
+{#snippet loadingSnip(val)}
+  {val}
+{/snippet}
+
+{#snippet errorSnip(retry, error)}
+  <div>{error}</div>
+
+  <Button on:click={retry}>Retry Decoding</Button>
+{/snippet}
 
 {#await decodeValuePromise}
   {@render loading?.(keyedValue)}
