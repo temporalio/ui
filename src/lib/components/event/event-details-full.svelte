@@ -6,7 +6,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowEvent } from '$lib/types/events';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -22,14 +21,12 @@
     event = undefined,
   }: { group?: EventGroup; event?: WorkflowEvent } = $props();
 
-  const workflow = $derived($workflowRun.workflow);
   const pendingEvent = $derived(
     group?.pendingActivity || group?.pendingNexusOperation,
   );
   const showEventGroup = $derived(
     group && (group.eventList.length > 1 || pendingEvent),
   );
-  const isRunning = $derived(workflow.isRunning);
 
   const durationBetweenEvents = (
     eventA: WorkflowEvent,
@@ -74,6 +71,27 @@
       },
     },
   });
+
+  const eventTitle = cva(['p-2 rounded-t-lg'], {
+    variants: {
+      category: {
+        workflow: 'bg-blue-900 ',
+        activity: 'bg-purple-900 ',
+        'child-workflow': 'bg-green-900 ',
+        timer: 'bg-yellow-900 ',
+        signal: 'bg-pink-900 ',
+        update: 'bg-blue-900 ',
+        other: 'bg-slate-900',
+        nexus: 'bg-indigo-900',
+        'local-activity': 'bg-slate-900 ',
+        default: 'bg-purple-900 ',
+      },
+    },
+  });
+
+  const emptyValue = $derived(
+    group.isPending ? 'Results will appear upon completion' : 'null',
+  );
 </script>
 
 <div
@@ -95,13 +113,20 @@
 {#snippet inputAndResults()}
   <div class="flex flex-col gap-2 lg:flex-row">
     {#if group.input !== undefined}
-      <div class="flex w-full flex-col gap-1">
-        <h4 class="text-white/90">Input</h4>
+      <div class={'flex w-full flex-col'}>
+        <div
+          class={eventTitle({
+            category: group ? group.category : event.category,
+          })}
+        >
+          <p class="text-base font-medium text-white/90">Input</p>
+        </div>
         <PayloadDecoder value={group?.input} key="payloads">
           {#snippet children(decodedValue)}
             <CodeBlock
               content={decodedValue}
               maxHeight={384}
+              class="grow"
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
             />
@@ -110,14 +135,18 @@
       </div>
     {/if}
     <!-- {#if group.result !== undefined} -->
-    <div class="flex w-full flex-col gap-1">
-      <h4 class="text-white/90">Result</h4>
+    <div class="flex w-full flex-col">
+      <div
+        class={eventTitle({
+          category: group ? group.category : event.category,
+        })}
+      >
+        <p class="text-base font-medium text-white/90">Result</p>
+      </div>
       <PayloadDecoder value={group?.result} key="payloads">
         {#snippet children(decodedValue)}
           <CodeBlock
-            content={decodedValue || isRunning
-              ? 'Results will appear upon completion'
-              : 'null'}
+            content={decodedValue ?? emptyValue}
             maxHeight={384}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -145,39 +174,41 @@
 {#snippet durationTimes()}
   <div class="my-2 flex flex-col gap-1">
     <div>
-      <div class="w-full border-t-2 border-white"></div>
-      <div
-        class="-mt-[7px] flex flex-row justify-between gap-1 text-xs xl:text-sm"
-      >
-        {#each group.eventList as _}
-          <div
-            class={timeDot({
-              category: group ? group.category : event.category,
+      <div>
+        <div class="w-full border-t-2 border-white"></div>
+        <div
+          class="-mt-[7px] flex flex-row justify-between gap-1 text-xs xl:text-sm"
+        >
+          {#each group.eventList as _}
+            <div
+              class={timeDot({
+                category: group ? group.category : event.category,
+              })}
+            ></div>
+          {/each}
+        </div>
+      </div>
+      <div class="flex flex-row justify-between gap-2 text-xs xl:text-sm">
+        {#each group.eventList as event, index}
+          <p class="font-mono">
+            {formatDate(event.eventTime, $timeFormat, {
+              relative: $relativeTime,
             })}
-          ></div>
+          </p>
+
+          {#if index !== group.eventList.length - 1}
+            <p
+              class="flex items-center gap-1 rounded bg-white/20 px-1.5 py-0.5 font-mono"
+            >
+              <Icon name="clock" />
+              {durationBetweenEvents(
+                group?.eventList[index],
+                group?.eventList[index + 1],
+              ) || '0ms'}
+            </p>
+          {/if}
         {/each}
       </div>
-    </div>
-    <div class="flex flex-row justify-between gap-2 text-xs xl:text-sm">
-      {#each group.eventList as event, index}
-        <p class="font-mono">
-          {formatDate(event.eventTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-        </p>
-
-        {#if index !== group.eventList.length - 1}
-          <p
-            class="flex items-center gap-1 rounded bg-white/20 px-1.5 py-0.5 font-mono"
-          >
-            <Icon name="clock" />
-            {durationBetweenEvents(
-              group?.eventList[index],
-              group?.eventList[index + 1],
-            )}
-          </p>
-        {/if}
-      {/each}
     </div>
   </div>
 {/snippet}
