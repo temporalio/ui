@@ -23,15 +23,19 @@
     key?: string;
     onDecode?: (decodedValue: string) => void;
     children: Snippet<[decodedValue: string]>;
+    error?: Snippet<[retry: () => Promise<string>, err: unknown]>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    loading?: Snippet<[keyedVal: any]>;
   }
 
-  let { children, value, key = '', onDecode }: Props = $props();
+  let { children, value, key = '', onDecode, error, loading }: Props = $props();
 
   let keyedValue = key && value?.[key] ? value[key] : value;
-  let decodedValue = $state(stringifyWithBigInt(keyedValue));
+
+  let decodeValuePromise = $state<Promise<string> | null>(null);
 
   onMount(() => {
-    decodePayloads(value);
+    decodeValuePromise = decodePayloads(value);
   });
 
   const decodePayloads = async (
@@ -61,14 +65,21 @@
       if (Array.isArray(finalValue) && finalValue.length === 1) {
         finalValue = finalValue[0];
       }
-      decodedValue = stringifyWithBigInt(finalValue);
+      let decodedValue = stringifyWithBigInt(finalValue);
       if (onDecode) {
         onDecode(decodedValue);
       }
+      return decodedValue;
     } catch (e) {
       console.error('Could not decode payloads');
     }
   };
 </script>
 
-{@render children(decodedValue)}
+{#await decodeValuePromise}
+  {@render loading?.(keyedValue)}
+{:then decoded}
+  {@render children(decoded)}
+{:catch err}
+  {@render error?.(() => decodePayloads(value), err)}
+{/await}
