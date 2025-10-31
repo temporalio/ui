@@ -323,10 +323,14 @@
         </Badge>
       {/if}
       {#if !primaryLocalAttribute && primaryAttribute?.key}
-        <EventDetailsRow {...primaryAttribute} {attributes} />
+        <EventDetailsRow {...primaryAttribute} {attributes} showKey={false} />
       {/if}
       {#if primaryLocalAttribute && primaryLocalAttribute.key}
-        <EventDetailsRow {...primaryLocalAttribute} {attributes} />
+        <EventDetailsRow
+          {...primaryLocalAttribute}
+          {attributes}
+          showKey={false}
+        />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
         <MetadataDecoder

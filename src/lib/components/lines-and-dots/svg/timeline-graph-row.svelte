@@ -151,13 +151,25 @@
     activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1,
   );
   const pendingLine = $derived(group.isPending || !!pauseTime);
+
+  const multiEventHoverWidth = $derived(
+    points.length >= 2 && points[points.length - 1] - points[0] + radius * 3,
+  );
+  const pendingHoverWidth = $derived(
+    pendingActivity && canvasWidth - points[0] - radius * 1.5,
+  );
+  const singleEventHoverWidth = $derived(radius * 3);
+
+  const hoverWidth = $derived(
+    multiEventHoverWidth || pendingHoverWidth || singleEventHoverWidth,
+  );
 </script>
 
 {#if hovering}
   <foreignObject
     x={points[0] - radius * 1.5}
     y={y - radius * 1.5}
-    width={points[points.length - 1] - points[0] + radius * 3}
+    width={hoverWidth}
     height={radius * 3}
   >
     <div
