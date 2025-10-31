@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
+
   import { page } from '$app/state';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { timeFormat } from '$lib/stores/time-format';
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
@@ -70,13 +72,59 @@
           (key === 'namespace' && page.params.namespace !== value)),
     ),
   );
+
+  const eventContainer = cva(
+    [
+      'flex flex-1 cursor-default flex-col gap-2 overflow-hidden rounded-t-md text-white shadow-md',
+    ],
+    {
+      variants: {
+        category: {
+          workflow: 'bg-blue-800 ',
+          activity: 'bg-purple-800 ',
+          'child-workflow': 'bg-green-800 ',
+          timer: 'bg-yellow-800 ',
+          signal: 'bg-pink-800 ',
+          update: 'bg-blue-800 ',
+          other: 'bg-slate-800',
+          nexus: 'bg-indigo-800',
+          'local-activity': 'bg-slate-800 ',
+          default: 'bg-purple-800 ',
+        },
+      },
+    },
+  );
+
+  const eventTitle = cva(
+    ['flex flex-wrap items-center justify-between gap-2 p-2'],
+    {
+      variants: {
+        category: {
+          workflow: 'bg-blue-900 ',
+          activity: 'bg-purple-900 ',
+          'child-workflow': 'bg-green-900 ',
+          timer: 'bg-yellow-900 ',
+          signal: 'bg-pink-900 ',
+          update: 'bg-blue-900 ',
+          other: 'bg-slate-900',
+          nexus: 'bg-indigo-900',
+          'local-activity': 'bg-slate-900 ',
+          default: 'bg-purple-900 ',
+        },
+      },
+    },
+  );
 </script>
 
 <div
-  class="flex flex-1 cursor-default flex-col gap-2 overflow-hidden rounded-t-md border border-purple-800 bg-purple-800/50 text-white shadow-md"
+  class={eventContainer({
+    category: event.category,
+  })}
 >
   <div
-    class="flex flex-wrap items-center justify-between gap-2 bg-purple-800 p-2"
+    class={eventTitle({
+      category: event.category,
+    })}
   >
     <div class="flex items-center gap-2 text-base">
       <p class="font-mono">{event.id}</p>
@@ -84,11 +132,6 @@
         {displayName}
       </p>
     </div>
-    <p class="text-sm">
-      {formatDate(event.eventTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
-    </p>
   </div>
   <div class="flex flex-col gap-1 p-2">
     <div class="flex w-full flex-col gap-1">
@@ -127,7 +170,7 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={value}
     >
-      <Link {href} class="whitespace-pre-line">{value}</Link>
+      <Link {href} class="whitespace-pre-line !text-white">{value}</Link>
     </Copyable>
   </div>
 {/snippet}
@@ -143,7 +186,7 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={link.workflowEvent.namespace}
     >
-      <Link {href} class="whitespace-pre-line"
+      <Link {href} class="whitespace-pre-line !text-white"
         >{link.workflowEvent.namespace}</Link
       >
     </Copyable>

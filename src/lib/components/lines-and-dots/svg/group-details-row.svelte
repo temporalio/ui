@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
 
+  import { cva } from 'class-variance-authority';
   import { tick } from 'svelte';
 
   import { page } from '$app/stores';
@@ -61,59 +62,79 @@
     await tick();
     contentHeight = offsetHeight;
   };
+
+  const groupCategory = cva(
+    [
+      'relative flex h-full items-center justify-between rounded-t-lg text-sm text-white',
+    ],
+    {
+      variants: {
+        category: {
+          workflow: 'bg-blue-800 ',
+          activity: 'bg-purple-800 ',
+          'child-workflow': 'bg-green-800 ',
+          timer: 'bg-yellow-800 ',
+          signal: 'bg-pink-800 ',
+          update: 'bg-blue-800 ',
+          other: 'bg-slate-800',
+          nexus: 'bg-indigo-800',
+          'local-activity': 'bg-slate-800 ',
+          default: 'bg-purple-900 ',
+        },
+      },
+    },
+  );
 </script>
 
 <g role="button" tabindex="0" class="relative z-50" in:fade>
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div class="rounded-lg bg-purple-500 p-2">
-      <div bind:offsetHeight class="flex flex-col">
-        <div
-          class="relative flex h-full items-center justify-between rounded-t-lg bg-purple-800 text-sm text-white"
-        >
-          <div class="flex h-full items-center gap-4 px-2">
-            {#if status}
-              <WorkflowStatus {status} />
-            {/if}
-            {title}
-            {#if duration}
-              <div class="flex items-center gap-1">
-                <Icon name="clock" />
-                {duration}
-              </div>
-            {/if}
-          </div>
-          <div class="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="xs"
-              on:click={() => setActiveGroup(group)}
-              ><Icon name="close" class="text-white" /></Button
-            >
-          </div>
-        </div>
-        <EventDetailsFull {group} event={group.initialEvent} />
-        {#if childWorkflowStartedEvent}
-          <div class="surface-primary p-4">
-            <div class="font-medium leading-4 text-secondary">
-              Child Workflow
+    <div bind:offsetHeight class="flex flex-col">
+      <div
+        class={groupCategory({
+          category: group ? group.category : 'default',
+        })}
+      >
+        <div class="flex h-full items-center gap-4 px-2">
+          {#if status}
+            <WorkflowStatus {status} />
+          {/if}
+          {title}
+          {#if duration}
+            <div class="flex items-center gap-1">
+              <Icon name="clock" />
+              {duration}
             </div>
-            {#key group.eventList.length}
-              <GraphWidget
-                {namespace}
-                workflowId={childWorkflowStartedEvent.attributes
-                  .workflowExecution.workflowId}
-                runId={childWorkflowStartedEvent.attributes.workflowExecution
-                  .runId}
-                viewportHeight={320}
-                class="surface-primary overflow-x-hidden border-t border-subtle"
-                onLoad={onDecode}
-              />
-            {/key}
-          </div>
-        {/if}
+          {/if}
+        </div>
+        <div class="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="xs"
+            on:click={() => setActiveGroup(group)}
+            ><Icon name="close" class="text-white" /></Button
+          >
+        </div>
       </div>
-    </div></foreignObject
-  >
+      <EventDetailsFull {group} event={group.initialEvent} />
+      {#if childWorkflowStartedEvent}
+        <div class="surface-primary p-4">
+          <div class="font-medium leading-4 text-secondary">Child Workflow</div>
+          {#key group.eventList.length}
+            <GraphWidget
+              {namespace}
+              workflowId={childWorkflowStartedEvent.attributes.workflowExecution
+                .workflowId}
+              runId={childWorkflowStartedEvent.attributes.workflowExecution
+                .runId}
+              viewportHeight={320}
+              class="surface-primary overflow-x-hidden border-t border-subtle"
+              onLoad={onDecode}
+            />
+          {/key}
+        </div>
+      {/if}
+    </div>
+  </foreignObject>
 </g>
 
 <style lang="postcss">

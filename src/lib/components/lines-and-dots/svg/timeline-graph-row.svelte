@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
+  import { cva } from 'class-variance-authority';
   import { onMount } from 'svelte';
 
   import { page } from '$app/state';
@@ -163,6 +164,23 @@
   const hoverWidth = $derived(
     multiEventHoverWidth || pendingHoverWidth || singleEventHoverWidth,
   );
+
+  const groupHover = cva(['h-full w-full rounded-full border-2'], {
+    variants: {
+      category: {
+        workflow: 'border-blue-700 bg-blue-800/80 ',
+        activity: 'border-purple-700 bg-purple-800/80 ',
+        'child-workflow': 'border-green-700 bg-green-800/80',
+        timer: 'border-yellow-700 bg-yellow-800/80',
+        signal: 'border-pink-700 bg-pink-800/80',
+        update: 'border-blue-700 bg-blue-800/80',
+        other: 'border-slate-700 bg-slate-800/80',
+        nexus: 'border-indigo-700 bg-indigo-800/80',
+        'local-activity': 'border-slate-700 bg-slate-800/80',
+        default: 'border-purple-700 bg-purple-900/80',
+      },
+    },
+  });
 </script>
 
 {#if hovering}
@@ -173,7 +191,9 @@
     height={radius * 3}
   >
     <div
-      class="h-full w-full rounded-full border-2 border-purple-600 bg-purple-500/80"
+      class={groupHover({
+        category: group ? group.category : 'default',
+      })}
     ></div>
   </foreignObject>
 {/if}
