@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount, type Snippet } from 'svelte';
+  import { type Snippet } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import { authUser } from '$lib/stores/auth-user';
   import type { Memo } from '$lib/types';
@@ -32,28 +32,24 @@
 
   let keyedValue = key && value?.[key] ? value[key] : value;
 
-  let decodeValuePromise = $state<Promise<string> | null>(null);
+  let decodeValuePromise = $state<Promise<string>>(decodePayloads(value));
 
-  onMount(() => {
-    decodeValuePromise = decodePayloads(value);
-  });
-
-  const decodePayloads = async (
+  async function decodePayloads(
     _value: PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo,
-  ) => {
+  ) {
     const settings = {
-      ...$page.data.settings,
+      ...page.data.settings,
       codec: {
-        ...$page.data.settings?.codec,
-        endpoint: getCodecEndpoint($page.data.settings),
-        passAccessToken: getCodecPassAccessToken($page.data.settings),
-        includeCredentials: getCodecIncludeCredentials($page.data.settings),
+        ...page.data.settings?.codec,
+        endpoint: getCodecEndpoint(page.data.settings),
+        passAccessToken: getCodecPassAccessToken(page.data.settings),
+        includeCredentials: getCodecIncludeCredentials(page.data.settings),
       },
     };
     try {
       const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
         _value,
-        $page.params.namespace,
+        page.params.namespace,
         settings,
         $authUser.accessToken,
       );
@@ -73,7 +69,7 @@
     } catch (e) {
       console.error('Could not decode payloads');
     }
-  };
+  }
 </script>
 
 {#await decodeValuePromise}
