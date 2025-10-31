@@ -94,9 +94,11 @@
           category: group ? group.category : 'default',
         })}
       >
-        <div class="flex h-full items-center gap-4 px-2">
+        <div
+          class="flex h-full flex-col items-start gap-1 p-2 text-base md:flex-row md:items-center md:gap-4"
+        >
           {#if status}
-            <WorkflowStatus {status} />
+            <WorkflowStatus {status} big />
           {/if}
           {title}
           {#if duration}
@@ -115,24 +117,24 @@
           >
         </div>
       </div>
-      <EventDetailsFull {group} event={group.initialEvent} />
-      {#if childWorkflowStartedEvent}
-        <div class="surface-primary p-4">
-          <div class="font-medium leading-4 text-secondary">Child Workflow</div>
-          {#key group.eventList.length}
-            <GraphWidget
-              {namespace}
-              workflowId={childWorkflowStartedEvent.attributes.workflowExecution
-                .workflowId}
-              runId={childWorkflowStartedEvent.attributes.workflowExecution
-                .runId}
-              viewportHeight={320}
-              class="surface-primary overflow-x-hidden border-t border-subtle"
-              onLoad={onDecode}
-            />
-          {/key}
-        </div>
-      {/if}
+      <EventDetailsFull {group} event={group.initialEvent}>
+        {#if childWorkflowStartedEvent}
+          <div class="surface-primary p-4">
+            {#key group.eventList.length}
+              <GraphWidget
+                {namespace}
+                workflowId={childWorkflowStartedEvent.attributes
+                  .workflowExecution.workflowId}
+                runId={childWorkflowStartedEvent.attributes.workflowExecution
+                  .runId}
+                viewportHeight={320}
+                class="surface-primary overflow-x-hidden border-t border-subtle"
+                onLoad={onDecode}
+              />
+            {/key}
+          </div>
+        {/if}
+      </EventDetailsFull>
     </div>
   </foreignObject>
 </g>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { cva } from 'class-variance-authority';
+  import type { Snippet } from 'svelte';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -19,7 +20,12 @@
   let {
     group = undefined,
     event = undefined,
-  }: { group?: EventGroup; event?: WorkflowEvent } = $props();
+    children = undefined,
+  }: {
+    group?: EventGroup;
+    event?: WorkflowEvent;
+    children?: Snippet;
+  } = $props();
 
   const pendingEvent = $derived(
     group?.pendingActivity || group?.pendingNexusOperation,
@@ -41,16 +47,16 @@
   const groupCategory = cva(['p-2 text-white'], {
     variants: {
       category: {
-        workflow: 'bg-blue-700 ',
-        activity: 'bg-purple-700 ',
+        workflow: 'bg-blue-600 ',
+        activity: 'bg-purple-600',
         'child-workflow': 'bg-green-700 ',
-        timer: 'bg-yellow-700 ',
+        timer: 'bg-yellow-600 ',
         signal: 'bg-pink-700 ',
-        update: 'bg-blue-700 ',
-        other: 'bg-slate-700',
-        nexus: 'bg-indigo-700',
-        'local-activity': 'bg-slate-700 ',
-        default: 'bg-purple-700 ',
+        update: 'bg-blue-600 ',
+        other: 'bg-slate-600',
+        nexus: 'bg-indigo-600',
+        'local-activity': 'bg-slate-600 ',
+        default: 'bg-purple-600 ',
       },
     },
   });
@@ -58,16 +64,16 @@
   const timeDot = cva(['h-3 w-3 rounded-full'], {
     variants: {
       category: {
-        workflow: 'bg-blue-300 ',
-        activity: 'bg-purple-300 ',
-        'child-workflow': 'bg-green-300 ',
-        timer: 'bg-yellow-300 ',
-        signal: 'bg-pink-300 ',
-        update: 'bg-blue-300 ',
-        other: 'bg-slate-300',
-        nexus: 'bg-indigo-300',
-        'local-activity': 'bg-slate-300 ',
-        default: 'bg-purple-300 ',
+        workflow: 'bg-blue-900 ',
+        activity: 'bg-purple-900 ',
+        'child-workflow': 'bg-green-900 ',
+        timer: 'bg-yellow-900 ',
+        signal: 'bg-pink-900 ',
+        update: 'bg-blue-900 ',
+        other: 'bg-slate-900',
+        nexus: 'bg-indigo-900',
+        'local-activity': 'bg-slate-900 ',
+        default: 'bg-purple-900 ',
       },
     },
   });
@@ -102,16 +108,17 @@
   {#if showEventGroup}
     <div class="flex flex-col gap-2 overflow-hidden">
       {@render inputAndResults()}
-      {@render eventCards()}
       {@render durationTimes()}
+      {@render eventCards()}
     </div>
   {:else if event}
     <EventCard {event} />
   {/if}
+  {@render children?.()}
 </div>
 
 {#snippet inputAndResults()}
-  <div class="flex flex-col gap-2 lg:flex-row">
+  <div class="mb-2 flex flex-col gap-2 lg:flex-row">
     {#if group.input !== undefined}
       <div class={'flex w-full flex-col'}>
         <div
@@ -172,7 +179,7 @@
 {/snippet}
 
 {#snippet durationTimes()}
-  <div class="my-2 flex flex-col gap-1">
+  <div class="flex flex-col gap-1">
     <div>
       <div>
         <div class="w-full border-t-2 border-white"></div>
@@ -198,7 +205,7 @@
 
           {#if index !== group.eventList.length - 1}
             <p
-              class="flex items-center gap-1 rounded bg-white/20 px-1.5 py-0.5 font-mono"
+              class="flex items-center gap-1 rounded bg-slate-900/40 px-1.5 py-0.5 font-mono"
             >
               <Icon name="clock" />
               {durationBetweenEvents(

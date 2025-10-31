@@ -75,7 +75,7 @@
 
   const eventContainer = cva(
     [
-      'flex flex-1 cursor-default flex-col gap-2 overflow-hidden rounded-t-md text-white shadow-md',
+      'flex flex-1 cursor-default flex-col gap-2 overflow-hidden rounded-t-md text-white shadow-md pb-2',
     ],
     {
       variants: {
@@ -133,8 +133,8 @@
       </p>
     </div>
   </div>
-  <div class="flex flex-col gap-1 p-2">
-    <div class="flex w-full flex-col gap-1">
+  <div class="flex flex-col gap-1 px-2">
+    <div class="flex w-full flex-col gap-0.5">
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
       {/if}
@@ -162,7 +162,7 @@
   {@const href = getEventLinkHref(link)}
   {@const value = href.split('workflows/')?.[1] || href}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-white/70">
+    <p class="text-sm text-white/70">
       {translate('nexus.link')}
     </p>
     <Copyable
@@ -178,7 +178,7 @@
 {#snippet eventNamespaceLink(link: ELink)}
   {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-white/70">
+    <p class="text-sm text-white/70">
       {translate('nexus.link-namespace')}
     </p>
     <Copyable
@@ -202,7 +202,7 @@
 
 {#snippet eventSummary(value: Payload)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-white/70">Summary</p>
+    <p class="text-sm text-white/70">Summary</p>
     <p class="whitespace-pre-line">
       <MetadataDecoder
         {value}
@@ -219,7 +219,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
-    <p class="mb-1 min-w-56 text-sm text-white/70">
+    <p class="mb-1 text-sm text-white/70">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -262,7 +262,7 @@
   </div>
   {#if stackTrace}
     <div>
-      <p class="mb-1 min-w-56 text-sm text-white/70">
+      <p class="mb-1 text-sm text-white/70">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock
@@ -278,7 +278,7 @@
 
 {#snippet link(key, value)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-white/70">
+    <p class="text-sm text-white/70">
       {format(key)}
     </p>
     <Copyable
@@ -298,7 +298,7 @@
 
 {#snippet details(key, value)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-white/70">
+    <p class="text-sm text-white/70">
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">
