@@ -78,7 +78,6 @@
   };
 
   const md = new MediaQuery('max-width:768px');
-  $inspect(md.current);
 </script>
 
 <Modal
