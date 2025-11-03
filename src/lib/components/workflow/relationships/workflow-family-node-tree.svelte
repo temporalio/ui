@@ -1,12 +1,11 @@
 <script lang="ts">
   import { cva } from 'class-variance-authority';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Icon from '$lib/holocene/icon';
   import type { RootNode } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
@@ -29,12 +28,12 @@
   export let onNodeClick: (node: RootNode, generation: number) => void;
   export let activeWorkflow: WorkflowExecution | undefined = undefined;
 
-  $: ({ workflow, run, namespace } = $page.params);
+  $: ({ workflow, run, namespace } = page.params);
   $: ({ workflow: fullWorkflow } = $workflowRun);
   $: workflowRelationships = getWorkflowRelationships(
     fullWorkflow,
     $fullEventHistory,
-    $namespaces,
+    page.data.namespace,
   );
   $: ({ first, next, previous } = workflowRelationships);
 
