@@ -22,6 +22,10 @@ export const Strings = {
     'Use my browser setting and ignore {{level}}-level setting.',
   'no-browser-override-description':
     'Use {{level}}-level setting, where available.',
+  'override-radio-group-description':
+    'Chose whether you want to override the {{level}} settings in this browser.',
+  'current-codec-endpoint-setting':
+    "This {{level}}'s current configured codec server endpoint is {{-endpoint}}",
   'codec-server-configured': 'Codec Server is configured',
   'codec-server-error': 'Codec Server could not connect',
   'codec-server-success': 'Codec Server succesfully converted content',

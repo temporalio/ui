@@ -52,6 +52,9 @@
   });
 
   const confirmDisabled = $derived(!!error || ($override && !endpoint));
+  const clusterOrNamespaceLevelSetting = $derived(
+    page?.data?.settings?.codec?.endpoint ?? '',
+  );
 
   const onCancel = () => {
     endpoint = $codecEndpoint;
@@ -75,6 +78,7 @@
   };
 
   const md = new MediaQuery('max-width:768px');
+  $inspect(md.current);
 </script>
 
 <Modal
@@ -86,7 +90,7 @@
   on:cancelModal={onCancel}
   on:confirmModal={onConfirm}
   large
-  {...md.current && { 'data-theme': 'dark' }}
+  data-theme={md.current ? 'dark' : undefined}
 >
   <h3 slot="title" data-testid="data-encoder-title">
     {translate('common.codec-server')}
@@ -110,7 +114,14 @@
         label={translate('data-encoder.no-browser-override-description', {
           level: namespaceOrCluster,
         })}
+        description={clusterOrNamespaceLevelSetting
+          ? translate('data-encoder.current-codec-endpoint-setting', {
+              level: namespaceOrCluster,
+              endpoint: clusterOrNamespaceLevelSetting,
+            })
+          : ''}
       />
+
       <RadioInput
         id="use-local-endpoint-radio"
         data-testid="use-local-endpoint-input"
