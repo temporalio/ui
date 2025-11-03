@@ -19,7 +19,6 @@
   import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
@@ -71,7 +70,7 @@
   );
   const workflowHasBeenReset = $derived(!!resetRunId);
   const workflowRelationships = $derived(
-    getWorkflowRelationships(workflow, $fullEventHistory, $namespaces),
+    getWorkflowRelationships(workflow, $fullEventHistory, page.data.namespace),
   );
   const workflowsHref = $derived(
     `${routeForWorkflows({
@@ -87,7 +86,7 @@
   const linkCount = $derived(outboundLinks + inboundLinks);
 </script>
 
-<div class="flex items-center justify-between pb-4">
+<div class="flex items-center justify-between">
   <div class="flex items-center gap-2">
     <Link
       href={workflowsHref}

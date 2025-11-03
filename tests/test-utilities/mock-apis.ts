@@ -68,6 +68,7 @@ export const mockGlobalApis = (page: Page) => {
 export const mockWorkflowsApis = (page: Page) => {
   return Promise.all([
     mockGlobalApis(page),
+    mockNamespaceApi(page),
     mockWorkflowsApi(page),
     mockSearchAttributesApi(page),
     mockWorkflowsCountApi(page),
@@ -82,6 +83,7 @@ export const mockSchedulesApis = (
 ) => {
   return Promise.all([
     mockGlobalApis(page),
+    mockNamespaceApis(page),
     mockSearchAttributesApi(page, customSearchAttributes),
     mockSchedulesApi(page, empty),
     mockWorkflowsCountApi(page, emptyWorkflowsCount),
@@ -109,6 +111,7 @@ export const mockWorkflowApis = (
 ) => {
   return Promise.all([
     mockNamespaceApis(page),
+    mockNamespaceApi(page),
     mockWorkflowApi(page, workflow),
     mockEventHistoryApi(page),
     mockTaskQueuesApi(page),

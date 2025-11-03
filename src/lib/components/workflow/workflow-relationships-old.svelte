@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import { fetchAllChildWorkflows } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
-  import { namespaces } from '$lib/stores/namespaces';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
 
@@ -13,13 +12,13 @@
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+  $: ({ namespace, workflow: workflowId, run: runId } = page.params);
   $: ({ workflow } = $workflowRun);
 
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $fullEventHistory,
-    $namespaces,
+    page.data.namespace,
   );
 
   $: ({
@@ -59,7 +58,7 @@
       <ChildWorkflowsTable
         {children}
         pendingChildren={$workflowRun.workflow.pendingChildren}
-        namespace={$page.params.namespace}
+        namespace={page.params.namespace}
       />
     {/if}
   {/await}

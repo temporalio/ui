@@ -33,9 +33,9 @@
   const handleFocusOut = (event: FocusEvent) => {
     if (
       maximized &&
-      (!(event.currentTarget instanceof Element) ||
-        !(event.relatedTarget instanceof Element) ||
-        !event.currentTarget.contains(event.relatedTarget))
+      event.currentTarget instanceof Element &&
+      event.relatedTarget instanceof Element &&
+      !event.currentTarget.contains(event.relatedTarget)
     ) {
       maximized = false;
     }
