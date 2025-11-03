@@ -119,19 +119,21 @@
       </div>
       <EventDetailsFull {group} event={group.initialEvent}>
         {#if childWorkflowStartedEvent}
-          <div class="surface-primary p-4">
-            {#key group.eventList.length}
-              <GraphWidget
-                {namespace}
-                workflowId={childWorkflowStartedEvent.attributes
-                  .workflowExecution.workflowId}
-                runId={childWorkflowStartedEvent.attributes.workflowExecution
-                  .runId}
-                viewportHeight={320}
-                class="surface-primary overflow-x-hidden border-t border-subtle"
-                onLoad={onDecode}
-              />
-            {/key}
+          <div class="p-4">
+            <div class="surface-primary">
+              {#key group.eventList.length}
+                <GraphWidget
+                  {namespace}
+                  workflowId={childWorkflowStartedEvent.attributes
+                    .workflowExecution.workflowId}
+                  runId={childWorkflowStartedEvent.attributes.workflowExecution
+                    .runId}
+                  viewportHeight={320}
+                  class="surface-primary overflow-x-hidden border-t border-subtle"
+                  onLoad={onDecode}
+                />
+              {/key}
+            </div>
           </div>
         {/if}
       </EventDetailsFull>

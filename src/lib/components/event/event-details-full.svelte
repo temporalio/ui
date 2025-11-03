@@ -98,8 +98,6 @@
   const emptyValue = $derived(
     group.isPending ? 'Results will appear upon completion' : 'null',
   );
-
-  $inspect('Group: ', group);
 </script>
 
 <div
@@ -120,7 +118,7 @@
 </div>
 
 {#snippet inputAndResults()}
-  <div class="mb-2 flex flex-col gap-2 lg:flex-row">
+  <div class="flex flex-col gap-2 lg:flex-row">
     {#if group.input !== undefined}
       <div class={'flex w-full flex-col'}>
         <div
@@ -143,27 +141,27 @@
         </PayloadDecoder>
       </div>
     {/if}
-    <!-- {#if group.result !== undefined} -->
-    <div class="flex w-full flex-col">
-      <div
-        class={eventTitle({
-          category: group ? group.category : event.category,
-        })}
-      >
-        <p class="text-base font-medium text-white/90">Result</p>
+    {#if group.result !== undefined}
+      <div class="flex w-full flex-col">
+        <div
+          class={eventTitle({
+            category: group ? group.category : event.category,
+          })}
+        >
+          <p class="text-base font-medium text-white/90">Result</p>
+        </div>
+        <PayloadDecoder value={group?.result} key="payloads">
+          {#snippet children(decodedValue)}
+            <CodeBlock
+              content={decodedValue ?? emptyValue}
+              maxHeight={320}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            />
+          {/snippet}
+        </PayloadDecoder>
       </div>
-      <PayloadDecoder value={group?.result} key="payloads">
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue ?? emptyValue}
-            maxHeight={320}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
-    </div>
-    <!-- {/if} -->
+    {/if}
   </div>
 {/snippet}
 
