@@ -39,7 +39,7 @@
   $: filterConditionalOption = conditionalOptions.find(
     (o) => o.value === $filter.conditional,
   );
-  $: filterConditionalOption, updateFilterConditional();
+  $: (filterConditionalOption, updateFilterConditional());
   $: isNullFilter = isNullConditional($filter.conditional);
   $: selectedOption = filterConditionalOption ?? conditionalOptions[0];
   $: selectedLabel = selectedOption?.label ?? selectedOption?.value;

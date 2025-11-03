@@ -2,7 +2,6 @@ import { createRequire } from 'node:module';
 
 import { DefaultLogger, Runtime, Worker } from '@temporalio/worker';
 
- 
 const logger = new DefaultLogger('ERROR', () => {});
 
 Runtime.install({ logger });

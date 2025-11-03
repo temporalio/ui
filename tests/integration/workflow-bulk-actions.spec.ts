@@ -124,9 +124,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
 
       const cancelQueryValue = page
         .getByTestId('batch-cancel-confirmation')
-        .getByTestId('batch-action-workflows-query')
-        ;
-
+        .getByTestId('batch-action-workflows-query');
       await expect(cancelQueryValue).toHaveText('WorkflowId="test"');
 
       await page
@@ -137,9 +135,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
 
       const terminateQueryValue = page
         .getByTestId('batch-terminate-confirmation')
-        .getByTestId('batch-action-workflows-query')
-        ;
-
+        .getByTestId('batch-action-workflows-query');
       await expect(terminateQueryValue).toHaveText('WorkflowId="test"');
     });
   });

@@ -23,10 +23,12 @@ This document outlines a **gradual, incremental approach** to enable strict mode
 ## Current State
 
 ### TypeScript Errors Breakdown
+
 - **Before strict mode**: 6 errors
 - **With strict mode**: 2167 errors (+2161)
 
 ### Error Categories
+
 1. **Strict Null Checks** (93% - ~2028 errors)
    - "Object is possibly 'null'"
    - "Type 'X | null' is not assignable to type 'X'"
@@ -50,14 +52,16 @@ This document outlines a **gradual, incremental approach** to enable strict mode
 **Goal:** Enable non-breaking strict flags
 
 #### Actions:
+
 1. Enable individual strict flags that have minimal impact:
+
    ```json
    {
      "compilerOptions": {
-       "alwaysStrict": true,           // Use strict mode (minimal impact)
-       "noImplicitThis": true,          // Explicit this types (few errors)
-       "strictBindCallApply": true,     // Stricter bind/call/apply (rare)
-       "strictFunctionTypes": true      // Function contravariance (moderate)
+       "alwaysStrict": true, // Use strict mode (minimal impact)
+       "noImplicitThis": true, // Explicit this types (few errors)
+       "strictBindCallApply": true, // Stricter bind/call/apply (rare)
+       "strictFunctionTypes": true // Function contravariance (moderate)
      }
    }
    ```
@@ -75,7 +79,9 @@ This document outlines a **gradual, incremental approach** to enable strict mode
 **Goal:** Add explicit types to eliminate implicit any
 
 #### Actions:
+
 1. Enable `noImplicitAny`:
+
    ```json
    {
      "compilerOptions": {
@@ -91,6 +97,7 @@ This document outlines a **gradual, incremental approach** to enable strict mode
    - `src/lib/components/` (~50 files)
 
 3. Common fixes:
+
    ```typescript
    // Before
    function process(data) { ... }
@@ -106,6 +113,7 @@ This document outlines a **gradual, incremental approach** to enable strict mode
 **Estimated Effort:** 3-5 days
 
 **Tools:**
+
 - VS Code: Hover over errors, use "Quick Fix" (Cmd+.)
 - `tsc --noEmit` for faster checking
 - Fix one directory at a time, commit frequently
@@ -119,6 +127,7 @@ This document outlines a **gradual, incremental approach** to enable strict mode
 This is the **largest** phase with ~2000 errors.
 
 #### Step 1: Enable strictNullChecks
+
 ```json
 {
   "compilerOptions": {
@@ -130,21 +139,25 @@ This is the **largest** phase with ~2000 errors.
 #### Step 2: Categorize and Prioritize
 
 **High Priority** (Fix First):
+
 - Core data flow: `src/lib/services/`
 - Critical stores: `src/lib/stores/auth-user.ts`, `src/lib/stores/workflow-*.ts`
 - Utilities with wide usage: `src/lib/utilities/format-*.ts`
 
 **Medium Priority** (Fix Second):
+
 - Components: `src/lib/components/`
 - Pages: `src/lib/pages/`
 
 **Low Priority** (Fix Last):
+
 - Internal utilities
 - Test helpers (if included)
 
 #### Step 3: Fix Patterns
 
 ##### Pattern 1: Add Null Checks
+
 ```typescript
 // Before
 function getUser(): User {
@@ -170,6 +183,7 @@ function getUser(): User {
 ```
 
 ##### Pattern 2: Optional Chaining
+
 ```typescript
 // Before
 const token = get(authUser).accessToken; // Error
@@ -179,6 +193,7 @@ const token = get(authUser)?.accessToken;
 ```
 
 ##### Pattern 3: Nullish Coalescing
+
 ```typescript
 // Before
 const name = user.name || 'Anonymous'; // Wrong for empty string
@@ -188,6 +203,7 @@ const name = user.name ?? 'Anonymous'; // Correct
 ```
 
 ##### Pattern 4: Type Guards
+
 ```typescript
 // Before
 function process(data: Data | null) {
@@ -202,6 +218,7 @@ function process(data: Data | null) {
 ```
 
 ##### Pattern 5: Non-Null Assertions (Use Sparingly!)
+
 ```typescript
 // Only when you're CERTAIN it's not null
 const value = possiblyNull!.property;
@@ -212,6 +229,7 @@ const value = possiblyNull.property;
 ```
 
 ##### Pattern 6: Fix Function Signatures
+
 ```typescript
 // Before
 function formatDate(date: Date) { ... }
@@ -232,18 +250,22 @@ if (workflow.endTime) {
 #### Step 4: Fix by File Type
 
 **Services** (`src/lib/services/`)
+
 - Focus on: `data-encoder.ts`, `auth-service.ts`
 - Pattern: Add null checks at boundaries (API responses, store access)
 
 **Stores** (`src/lib/stores/`)
+
 - Focus on: `auth-user.ts`, `persist-store.ts`
 - Pattern: Make store types explicitly nullable or provide defaults
 
 **Utilities** (`src/lib/utilities/`)
+
 - Focus on: High-usage utilities
 - Pattern: Defensive programming with null checks
 
 **Components** (`src/lib/components/`)
+
 - Focus on: Components that access stores or props
 - Pattern: Use optional chaining, provide fallback UI
 
@@ -251,13 +273,13 @@ if (workflow.endTime) {
 
 Create a tracking spreadsheet or use Jira:
 
-| Directory | Total Errors | Fixed | Remaining | Owner | Status |
-|-----------|--------------|-------|-----------|-------|--------|
-| services/ | 150 | 0 | 150 | - | Not Started |
-| stores/ | 80 | 0 | 80 | - | Not Started |
-| utilities/ | 200 | 0 | 200 | - | Not Started |
-| components/ | 1400 | 0 | 1400 | - | Not Started |
-| pages/ | 198 | 0 | 198 | - | Not Started |
+| Directory   | Total Errors | Fixed | Remaining | Owner | Status      |
+| ----------- | ------------ | ----- | --------- | ----- | ----------- |
+| services/   | 150          | 0     | 150       | -     | Not Started |
+| stores/     | 80           | 0     | 80        | -     | Not Started |
+| utilities/  | 200          | 0     | 200       | -     | Not Started |
+| components/ | 1400         | 0     | 1400      | -     | Not Started |
+| pages/      | 198          | 0     | 198       | -     | Not Started |
 
 **Estimated Effort:** 15-20 days (can be split across multiple developers)
 
@@ -270,7 +292,9 @@ Create a tracking spreadsheet or use Jira:
 **Goal:** Ensure class properties are initialized
 
 #### Actions:
+
 1. Enable `strictPropertyInitialization`:
+
    ```json
    {
      "compilerOptions": {
@@ -280,6 +304,7 @@ Create a tracking spreadsheet or use Jira:
    ```
 
 2. Fix class properties:
+
    ```typescript
    // Before
    class MyClass {
@@ -317,12 +342,14 @@ Create a tracking spreadsheet or use Jira:
 **Goal:** Replace individual flags with `"strict": true`
 
 #### Actions:
+
 1. Remove individual strict flags
 2. Enable umbrella flag:
+
    ```json
    {
      "compilerOptions": {
-       "strict": true  // Enables all strict checks
+       "strict": true // Enables all strict checks
      }
    }
    ```
@@ -338,10 +365,12 @@ Create a tracking spreadsheet or use Jira:
 ## Tools & Techniques
 
 ### VS Code Extensions
+
 - **Error Lens**: Shows TypeScript errors inline
 - **TypeScript Error Translator**: Makes error messages clearer
 
 ### TypeScript Commands
+
 ```bash
 # Fast type checking (no emit)
 npx tsc --noEmit
@@ -357,6 +386,7 @@ npx tsc --noEmit 2>&1 | grep "error TS" | wc -l
 ```
 
 ### Automated Fixes
+
 ```bash
 # Some errors can be auto-fixed by TypeScript
 # Use VS Code's "Fix All" command
@@ -364,6 +394,7 @@ npx tsc --noEmit 2>&1 | grep "error TS" | wc -l
 ```
 
 ### Git Strategy
+
 - Create feature branch: `feature/typescript-strict-mode`
 - Make small, incremental commits
 - Review PRs by directory/module
@@ -374,22 +405,27 @@ npx tsc --noEmit 2>&1 | grep "error TS" | wc -l
 ## Common Pitfalls & Solutions
 
 ### Pitfall 1: Overusing Non-Null Assertions (!)
+
 **Problem:** `value!` bypasses type checking
 **Solution:** Only use when you're 100% certain. Add runtime checks.
 
 ### Pitfall 2: Any as Escape Hatch
+
 **Problem:** Adding `: any` to silence errors
 **Solution:** Use `unknown` and narrow with type guards
 
 ### Pitfall 3: Fixing Symptoms Not Causes
+
 **Problem:** Adding optional chaining everywhere (`?.?.?.`)
 **Solution:** Fix data flow to prevent nulls at source
 
 ### Pitfall 4: Ignoring Test Errors
+
 **Problem:** Only fixing production code
 **Solution:** Fix test types too - they reveal real issues
 
 ### Pitfall 5: Not Testing After Fixes
+
 **Problem:** Type fixes that change runtime behavior
 **Solution:** Run tests after each batch of fixes
 
@@ -398,12 +434,14 @@ npx tsc --noEmit 2>&1 | grep "error TS" | wc -l
 ## ROI & Benefits
 
 ### Before Strict Mode
+
 - Runtime null reference errors
 - Difficult debugging
 - Implicit any hiding bugs
 - Less IDE assistance
 
 ### After Strict Mode
+
 - Compile-time error detection
 - Self-documenting code
 - Better refactoring confidence
@@ -413,15 +451,17 @@ npx tsc --noEmit 2>&1 | grep "error TS" | wc -l
 ### Example Bugs Caught by Strict Mode
 
 1. **Null Reference** (Found in our codebase):
+
    ```typescript
    // This will crash if user is null
-   get(authUser).accessToken
+   get(authUser).accessToken;
 
    // Strict mode forces:
-   get(authUser)?.accessToken ?? ''
+   get(authUser)?.accessToken ?? '';
    ```
 
 2. **Implicit Any** (Found in our codebase):
+
    ```typescript
    // Headers object allows any key
    headers['Authorization'] = token; // No type safety
@@ -458,14 +498,17 @@ Track these metrics to measure progress:
 ## Resources
 
 ### Official Docs
+
 - [TypeScript Handbook - Strictness](https://www.typescriptlang.org/docs/handbook/2/basic-types.html#strictness)
 - [TSConfig Reference - Strict](https://www.typescriptlang.org/tsconfig#strict)
 
 ### Guides
+
 - [Migrating to Strict Mode](https://www.typescriptlang.org/docs/handbook/migrating-from-javascript.html)
 - [Strict Mode Best Practices](https://blog.logrocket.com/typescript-strict-mode/)
 
 ### Tools
+
 - [TypeScript Error Translator](https://ts-error-translator.vercel.app/)
 - [TypeScript Playground](https://www.typescriptlang.org/play) - Test fixes
 
@@ -473,26 +516,28 @@ Track these metrics to measure progress:
 
 ## Timeline Summary
 
-| Phase | Duration | Effort | Parallelizable |
-|-------|----------|--------|----------------|
-| 1. Foundation | 1 week | 1-2 days | No |
-| 2. Implicit Any | 1-2 weeks | 3-5 days | Yes (by directory) |
-| 3. Null Checks | 3-4 weeks | 15-20 days | Yes (by directory) |
-| 4. Property Init | 1 week | 1-2 days | Yes (by file) |
-| 5. Enable Strict | 1 day | 1 hour | No |
-| **Total** | **6-8 weeks** | **~25 days** | **Multiple devs can work in parallel** |
+| Phase            | Duration      | Effort       | Parallelizable                         |
+| ---------------- | ------------- | ------------ | -------------------------------------- |
+| 1. Foundation    | 1 week        | 1-2 days     | No                                     |
+| 2. Implicit Any  | 1-2 weeks     | 3-5 days     | Yes (by directory)                     |
+| 3. Null Checks   | 3-4 weeks     | 15-20 days   | Yes (by directory)                     |
+| 4. Property Init | 1 week        | 1-2 days     | Yes (by file)                          |
+| 5. Enable Strict | 1 day         | 1 hour       | No                                     |
+| **Total**        | **6-8 weeks** | **~25 days** | **Multiple devs can work in parallel** |
 
 ---
 
 ## Recommendations
 
 ### Immediate Actions
+
 1. ✅ Keep strict mode disabled (DONE)
 2. ✅ Document this migration plan (DONE)
 3. Create Jira epic for "TypeScript Strict Mode Migration"
 4. Break into stories by phase
 
 ### Best Approach
+
 - **Don't rush** - Quality over speed
 - **Incremental** - Small PRs, frequent merges
 - **Parallel** - Multiple devs can work on different directories
@@ -500,6 +545,7 @@ Track these metrics to measure progress:
 - **Document** - Add comments explaining non-obvious fixes
 
 ### When to Start
+
 - **Not during crunch time** - Requires focus
 - **After ESLint migration complete** - Don't mix migrations
 - **When team has bandwidth** - 25% of sprint capacity for 6-8 weeks
