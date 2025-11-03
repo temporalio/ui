@@ -34,6 +34,7 @@ export default [
       vitest: pluginVitest,
     },
     rules: {
+      'no-undef': 'off', // TypeScript handles this better
       quotes: ['error', 'single', { avoidEscape: true }],
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -126,6 +127,7 @@ export default [
       vitest: pluginVitest,
     },
     rules: {
+      'no-undef': 'off', // TypeScript handles this better
       quotes: ['error', 'single', { avoidEscape: true }],
       '@typescript-eslint/no-unused-vars': [
         'warn',
