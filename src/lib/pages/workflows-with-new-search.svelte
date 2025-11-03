@@ -165,7 +165,7 @@
     workflows: WorkflowExecution[],
   ) => {
     pageSelected.set(checked);
-    if (allSelected) allSelected.set(false);
+    if ($allSelected) allSelected.set(false);
     if (checked) {
       selectedWorkflows.set([...workflows]);
     } else {

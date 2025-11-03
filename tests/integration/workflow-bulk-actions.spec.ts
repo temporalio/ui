@@ -122,12 +122,12 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.getByTestId('select-all-workflows').click();
       await page.getByTestId('bulk-cancel-button').click();
 
-      const cancelQueryValue = await page
+      const cancelQueryValue = page
         .getByTestId('batch-cancel-confirmation')
         .getByTestId('batch-action-workflows-query')
-        .innerText();
+        ;
 
-      expect(cancelQueryValue).toBe('WorkflowId="test"');
+      await expect(cancelQueryValue).toHaveText('WorkflowId="test"');
 
       await page
         .getByTestId('batch-cancel-confirmation')
@@ -135,12 +135,12 @@ test.describe('Batch and Bulk Workflow Actions', () => {
         .click();
       await page.getByTestId('bulk-terminate-button').click();
 
-      const terminateQueryValue = await page
+      const terminateQueryValue = page
         .getByTestId('batch-terminate-confirmation')
         .getByTestId('batch-action-workflows-query')
-        .innerText();
+        ;
 
-      expect(terminateQueryValue).toBe('WorkflowId="test"');
+      await expect(terminateQueryValue).toHaveText('WorkflowId="test"');
     });
   });
 });

@@ -168,7 +168,7 @@ export type AttributeGroup =
   | 'workflow'
   | 'searchAttributes';
 
-const attributeGroupings: Readonly<AttributeGroup[]> = [
+const attributeGroupings: readonly AttributeGroup[] = [
   'summary',
   'parent',
   'activity',

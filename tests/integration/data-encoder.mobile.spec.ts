@@ -25,11 +25,11 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await expect(dataEncoderStatusButton).not.toHaveClass('disabled');
     await dataEncoderStatusButton.click();
 
-    const dataEncoderTitle = await page
+    const dataEncoderTitle = page
       .getByTestId('data-encoder-title')
       .locator('visible=true')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+      ;
+    await expect(dataEncoderTitle).toHaveText('Codec Server');
 
     const dataEncoderConfirmButton = page
       .getByTestId('confirm-data-encoder-button')
@@ -73,11 +73,11 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await expect(dataEncoderStatusButton).not.toHaveClass('disabled');
     await dataEncoderStatusButton.click();
 
-    const dataEncoderTitle = await page
+    const dataEncoderTitle = page
       .getByTestId('data-encoder-title')
       .locator('visible=true')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+      ;
+    await expect(dataEncoderTitle).toHaveText('Codec Server');
 
     const dataEncoderConfirmButton = page
       .getByTestId('confirm-data-encoder-button')
@@ -228,11 +228,11 @@ test.describe('Data Encoder with Configuration Settings', () => {
       .locator('visible=true');
     await expect(dataEncoderStatusConfiguredButton).not.toHaveClass('disabled');
     await dataEncoderStatusConfiguredButton.click();
-    const dataEncoderTitle = await page
+    const dataEncoderTitle = page
       .getByTestId('data-encoder-title')
       .locator('visible=true')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+      ;
+    await expect(dataEncoderTitle).toHaveText('Codec Server');
 
     await expect(
       page.getByTestId('override-accordion').locator('visible=true'),

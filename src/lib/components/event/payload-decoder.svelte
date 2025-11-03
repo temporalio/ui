@@ -92,7 +92,6 @@
 
 {#snippet errorSnip(retry, error)}
   <div>{error}</div>
-
   <Button on:click={retry}>Retry Decoding</Button>
 {/snippet}
 

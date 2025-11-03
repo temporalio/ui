@@ -22,10 +22,10 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await expect(dataEncoderStatusButton).toBeEnabled();
     await dataEncoderStatusButton.click();
 
-    const dataEncoderTitle = await page
+    const dataEncoderTitle = page
       .getByTestId('data-encoder-title')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+      ;
+    await expect(dataEncoderTitle).toHaveText('Codec Server');
 
     const dataEncoderConfirmButton = page.getByTestId(
       'confirm-data-encoder-button',
@@ -62,10 +62,10 @@ test.describe('Data Encoder without Configuration Settings', () => {
     await expect(dataEncoderStatusButton).toBeEnabled();
     await dataEncoderStatusButton.click();
 
-    const dataEncoderTitle = await page
+    const dataEncoderTitle = page
       .getByTestId('data-encoder-title')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+      ;
+    await expect(dataEncoderTitle).toHaveText('Codec Server');
 
     const dataEncoderConfirmButton = page.getByTestId(
       'confirm-data-encoder-button',
@@ -203,10 +203,10 @@ test.describe('Data Encoder with Configuration Settings', () => {
     );
     await expect(dataEncoderStatusConfiguredButton).toBeEnabled();
     await dataEncoderStatusConfiguredButton.click();
-    const dataEncoderTitle = await page
+    const dataEncoderTitle = page
       .getByTestId('data-encoder-title')
-      .innerText();
-    expect(dataEncoderTitle).toBe('Codec Server');
+      ;
+    await expect(dataEncoderTitle).toHaveText('Codec Server');
 
     await expect(page.getByTestId('override-accordion')).toHaveText(
       /Use Cluster-level setting, where available/,

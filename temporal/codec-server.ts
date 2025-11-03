@@ -60,10 +60,10 @@ export async function createCodecServer(
     new Promise<Server>((resolve, reject) => {
       server = app.listen(port, () => {
         console.log(`✨ codec server listening on http://127.0.0.1:${port}`);
-        app.on('error', (error) => {
-          reject(error);
-        });
         resolve(server);
+      });
+      server.on('error', (error) => {
+        reject(error);
       });
     });
 
