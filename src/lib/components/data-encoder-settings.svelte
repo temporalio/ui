@@ -115,10 +115,7 @@
           level: namespaceOrCluster,
         })}
         description={clusterOrNamespaceLevelSetting
-          ? translate('data-encoder.current-codec-endpoint-setting', {
-              level: namespaceOrCluster,
-              endpoint: clusterOrNamespaceLevelSetting,
-            })
+          ? clusterOrNamespaceLevelSetting
           : ''}
       />
 
