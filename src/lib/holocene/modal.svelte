@@ -131,8 +131,11 @@
         <div></div>
       </slot>
       <div class="flex items-center justify-end space-x-2">
-        <Button variant="ghost" disabled={loading} on:click={closeModal}
-          >{cancelText}</Button
+        <Button
+          data-testid="cancel-modal-button"
+          variant="ghost"
+          disabled={loading}
+          on:click={closeModal}>{cancelText}</Button
         >
         {#if !hideConfirm}
           <Button

@@ -214,4 +214,8 @@ export const Strings = {
     'Unable to complete operation after {{attempts}} attempts.',
   'retry-support-message':
     'Please refresh the page or contact support if the problem persists.',
+  theme: 'Theme',
+  'slack-community': 'Slack Community',
+  'community-forum': 'Community Forum',
+  'change-log': 'Change Log',
 } as const;
