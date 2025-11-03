@@ -28,7 +28,6 @@
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { refresh } from '$lib/stores/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import { namespaceHasReportedProblemsSearchAttribute } from '$lib/utilities/get-namespace-capabilities';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -41,7 +40,8 @@
   const savedQueryParam = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
   const hasTaskFailureAttribute = $derived(
-    namespaceHasReportedProblemsSearchAttribute(namespace),
+    !!page.data.namespace.namespaceInfo?.capabilities
+      ?.reportedProblemsSearchAttribute,
   );
 
   const maxViewsReached = $derived(
