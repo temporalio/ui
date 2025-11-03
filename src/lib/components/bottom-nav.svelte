@@ -161,11 +161,13 @@
       <div
         class="flex aspect-square w-[32px] min-w-[32px] items-center justify-center"
       >
-        <img
-          src="/ziggy-full-face.png"
-          alt={translate('common.user-profile')}
-          class="h-[32px] w-[32px]"
-        />
+        <slot name="profile-picture">
+          <img
+            src="/ziggy-full-face.png"
+            alt={translate('common.user-profile')}
+            class="h-[32px] w-[32px]"
+          />
+        </slot>
       </div>
     {/if}
   </button>

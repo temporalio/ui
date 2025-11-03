@@ -267,11 +267,11 @@
   <MainContentContainer>
     <DataEncoderSettings />
     <TopNavigation>
-      <svelte:fragment slot="left">
+      {#snippet left()}
         {#if showNamespacePicker}
           <NamespacePicker {namespaceList} />
         {/if}
-      </svelte:fragment>
+      {/snippet}
       <UserMenu {logout} />
     </TopNavigation>
     <div
