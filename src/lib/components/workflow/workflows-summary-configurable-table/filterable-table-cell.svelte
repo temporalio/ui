@@ -62,11 +62,11 @@
 {#if shouldTruncate}
   <Tooltip text={value} top class="min-w-0">
     {#if href}
-      <Link {href} class="tracking-tightest cursor-help font-mono text-sm"
+      <Link {href} class="cursor-help font-mono text-sm tracking-tighter"
         >{displayValue}</Link
       >
     {:else}
-      <span class="tracking-tightest cursor-help font-mono text-sm"
+      <span class="cursor-help font-mono text-sm tracking-tighter"
         >{displayValue}</span
       >
     {/if}
