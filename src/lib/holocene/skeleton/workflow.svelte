@@ -2,7 +2,7 @@
   import Skeleton from './index.svelte';
 </script>
 
-<div class="flex flex-col gap-4 border-subtle px-4 pt-8 md:pt-20 xl:px-8">
+<div class="flex flex-col gap-4 border-subtle">
   <Skeleton class="h-4 w-32" />
   <div class="flex justify-between gap-4">
     <div class="flex w-full items-center gap-4">

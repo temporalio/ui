@@ -3,7 +3,6 @@
 
   import { page } from '$app/stores';
 
-  import { viewDataEncoderSettings } from '$lib/components/data-encoder-settings.svelte';
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
@@ -203,22 +202,11 @@
     />
     {stringifyWithBigInt(fullJson, null, 2)}
   </div>
+{:else if workflowError}
+  <WorkflowError error={workflowError} />
+{:else if !$workflowRun.workflow}
+  <SkeletonWorkflow />
 {:else}
-  <div
-    class="absolute bottom-0 left-0 right-0 {$viewDataEncoderSettings
-      ? 'top-[540px]'
-      : 'top-0'}
-   flex h-full flex-col"
-  >
-    {#if workflowError}
-      <WorkflowError error={workflowError} />
-    {:else if !$workflowRun.workflow}
-      <SkeletonWorkflow />
-    {:else}
-      <div class="px-4 pt-8 md:pt-20 xl:px-8">
-        <WorkflowHeader />
-      </div>
-      <slot />
-    {/if}
-  </div>
+  <WorkflowHeader />
+  <slot />
 {/if}

@@ -42,6 +42,7 @@ import dollarInvoice from './svg/dollar-invoice.svelte';
 import download from './svg/download.svelte';
 import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
+import exclamationOctagon from './svg/exclamation-octagon.svelte';
 import exit from './svg/exit.svelte';
 import expand from './svg/expand.svelte';
 import externalLink from './svg/external-link.svelte';
@@ -61,6 +62,7 @@ import flag from './svg/flag.svelte';
 import folders from './svg/folders.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
+import happyLappy from './svg/happy-lappy.svelte';
 import heartbeat from './svg/heartbeat.svelte';
 import hyphen from './svg/hyphen.svelte';
 import identities from './svg/identities.svelte';
@@ -70,6 +72,7 @@ import info from './svg/info.svelte';
 import json from './svg/json.svelte';
 import keyboard from './svg/keyboard.svelte';
 import labs from './svg/labs.svelte';
+import laptopCode from './svg/laptop-code.svelte';
 import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
 import linux from './svg/linux.svelte';
@@ -99,6 +102,7 @@ import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
+import shield from './svg/shield.svelte';
 import signal from './svg/signal.svelte';
 import sliders from './svg/sliders.svelte';
 import spinner from './svg/spinner.svelte';
@@ -178,6 +182,7 @@ export const icons = {
   'dollar-invoice': dollarInvoice,
   drained,
   error,
+  'exclamation-octagon': exclamationOctagon,
   exit,
   expand,
   'external-link': externalLink,
@@ -197,6 +202,7 @@ export const icons = {
   folders,
   github,
   graph,
+  'happy-lappy': happyLappy,
   heartbeat,
   hyphen,
   identities,
@@ -206,6 +212,7 @@ export const icons = {
   json,
   keyboard,
   labs,
+  'laptop-code': laptopCode,
   'lightning-bolt': lightningBolt,
   link,
   linux,
@@ -235,6 +242,7 @@ export const icons = {
   schedules,
   search,
   settings,
+  shield,
   signal,
   sliders,
   spinner,

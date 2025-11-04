@@ -71,7 +71,6 @@
           translate('workflows.scheduled-time'),
           formatDate(operation.scheduledTime, $timeFormat, {
             relative: $relativeTime,
-            relativeStrict: true,
           }),
         )}
       {/if}

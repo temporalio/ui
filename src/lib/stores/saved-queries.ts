@@ -1,6 +1,5 @@
-import type { ClassNameValue } from 'tailwind-merge';
-
 import type { IconName } from '$lib/holocene/icon';
+import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
 
 import { persistStore } from './persist-store';
 
@@ -11,7 +10,6 @@ export type SavedQuery = {
   icon?: IconName;
   count?: number;
   badge?: string;
-  class?: ClassNameValue;
   disabled?: boolean;
   active?: boolean;
   type?: string;
@@ -30,12 +28,30 @@ const getLastHour = () => {
   return lastHour.toISOString();
 };
 
+export const DEFAULT_SYSTEM_VIEW: SavedQuery = {
+  id: 'all',
+  name: 'All Workflows',
+  query: '',
+  icon: 'workflow',
+  type: 'system',
+};
+
+export const TASK_FAILURES_VIEW: SavedQuery = {
+  id: 'task-failures',
+  name: 'Task Failures',
+  query: TASK_FAILURES_QUERY,
+  icon: 'happy-lappy',
+  type: 'system',
+};
+
 export const systemWorkflowViews: SavedQuery[] = [
+  DEFAULT_SYSTEM_VIEW,
+  TASK_FAILURES_VIEW,
   {
-    id: 'all',
-    name: 'All Workflows',
-    query: '',
-    icon: 'workflow',
+    id: 'running',
+    name: 'Running',
+    query: '`ExecutionStatus`="Running"',
+    icon: 'heartbeat',
     type: 'system',
   },
   {
@@ -43,13 +59,6 @@ export const systemWorkflowViews: SavedQuery[] = [
     name: 'Parent Workflows',
     query: '`ParentWorkflowId` is null',
     icon: 'relationship',
-    type: 'system',
-  },
-  {
-    id: 'running',
-    name: 'Running',
-    query: '`ExecutionStatus`="Running"',
-    icon: 'heartbeat',
     type: 'system',
   },
   {

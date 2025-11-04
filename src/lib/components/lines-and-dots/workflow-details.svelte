@@ -137,7 +137,7 @@
   </DetailListLabel>
   <DetailListTextValue text={elapsedTime} />
 
-  {#if workflow?.workflowExecutionTimeout}
+  {#if workflow?.workflowExecutionTimeout && workflow?.workflowExecutionTimeout.toString() !== '0s'}
     <DetailListLabel>{translate('workflows.workflow-timeout')}</DetailListLabel>
     <DetailListTextValue
       text={formatDuration(workflow.workflowExecutionTimeout)}

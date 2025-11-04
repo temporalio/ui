@@ -116,9 +116,14 @@
           {/if}
           <p>
             {#if versionedCurrent}
-              {formatDate(deployment.createTime, $timeFormat, {
-                relative: $relativeTime,
-              })}
+              {formatDate(
+                deployment?.currentVersionSummary?.createTime ||
+                  deployment.createTime,
+                $timeFormat,
+                {
+                  relative: $relativeTime,
+                },
+              )}
             {:else}
               -
             {/if}

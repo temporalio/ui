@@ -23,6 +23,7 @@
     routeForEventHistory,
     routeForWorkerDeployment,
   } from '$lib/utilities/route-for';
+  import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
@@ -34,6 +35,12 @@
 
   const { label } = $derived(column);
   const namespace = $derived(page.params.namespace);
+  const isCustomKeywordOrTextAttribute = $derived(
+    isCustomSearchAttribute(label) &&
+      ($customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.KEYWORD ||
+        $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.TEXT) &&
+      typeof workflow.searchAttributes?.indexedFields?.[label] === 'string',
+  );
 
   let filterOrCopyButtonsVisible = $state(false);
   const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
@@ -59,7 +66,7 @@
   ];
 </script>
 
-{#if filterableLabels.includes(label)}
+{#if filterableLabels.includes(label) || isCustomKeywordOrTextAttribute}
   <td
     class="workflows-summary-table-body-cell filterable"
     data-testid="workflows-summary-table-body-cell"
@@ -145,6 +152,14 @@
         attribute="TemporalWorkflowVersioningBehavior"
         value={behavior && typeof behavior === 'string' ? behavior : ''}
       />
+    {:else if isCustomKeywordOrTextAttribute}
+      {@const content = workflow.searchAttributes?.indexedFields?.[label]}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute={label}
+        value={content}
+        type={$customSearchAttributes[label]}
+      />
     {/if}
   </td>
 {:else}
@@ -156,6 +171,7 @@
       <WorkflowStatus
         status={workflow.status}
         delayed={isWorkflowDelayed(workflow)}
+        taskFailure={isWorkflowTaskFailure(workflow)}
       />
     {:else if label === 'End'}
       {formatDate(workflow.endTime, $timeFormat, {
@@ -198,7 +214,7 @@
     {:else if label === 'Change Version'}
       {workflow.searchAttributes?.indexedFields?.TemporalChangeVersion}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
-      {@const content = workflow.searchAttributes.indexedFields[label]}
+      {@const content = workflow.searchAttributes?.indexedFields?.[label]}
       {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
         {formatDate(content, $timeFormat, {
           relative: $relativeTime,

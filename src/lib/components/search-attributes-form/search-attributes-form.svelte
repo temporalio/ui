@@ -18,6 +18,7 @@
     hideTainted?: boolean;
     hideDeleteButton?: boolean;
     hideCancelButton?: boolean;
+    disableTypeForExisting?: boolean;
   }
 
   let {
@@ -31,6 +32,7 @@
     hideTainted = false,
     hideDeleteButton = false,
     hideCancelButton = false,
+    disableTypeForExisting = false,
   }: Props = $props();
 </script>
 
@@ -47,6 +49,7 @@
     {hideTainted}
     {hideDeleteButton}
     {hideCancelButton}
+    {disableTypeForExisting}
   />
 {:catch error}
   <FormError

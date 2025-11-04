@@ -25,7 +25,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(pendingChildrenWorkflow),
         completedEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).hasChildren,
     ).toBe(true);
   });
@@ -35,24 +35,34 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(pendingChildrenWorkflow),
         childEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).hasChildren,
     ).toBe(true);
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(pendingChildrenWorkflow),
         childEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).children.length,
     ).toBe(15);
   });
 
-  it('parentNamespaceName should return undefined if parentNamespaceId does not match namespaces list', () => {
+  it('parentNamespaceName should return the namespace name', () => {
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(pendingChildrenWorkflow),
         childEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
+      ).parentNamespaceName,
+    ).toBe('my-namespace-name');
+  });
+
+  it('parentNamespaceName should return undefined if namespace name does not exist', () => {
+    expect(
+      getWorkflowRelationships(
+        toWorkflowExecution(pendingChildrenWorkflow),
+        childEvents,
+        { namespaceInfo: {} },
       ).parentNamespaceName,
     ).toBe(undefined);
   });
@@ -62,14 +72,14 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(runningWorkflow),
         childEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).hasChildren,
     ).toBe(true);
     expect(
       getWorkflowRelationships(
         toWorkflowExecution(runningWorkflow),
         childEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).children.length,
     ).toBe(15);
   });
@@ -79,19 +89,9 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(runningWorkflow),
         completedEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).hasChildren,
     ).toBe(false);
-  });
-
-  it('parentNamespaceName should return namespace name if parentNamespaceId does match namespaces list', () => {
-    expect(
-      getWorkflowRelationships(
-        toWorkflowExecution(runningWorkflow),
-        completedEvents,
-        namespaces.namespaces,
-      ).parentNamespaceName,
-    ).toBe('canary');
   });
 
   it('should return the firstExecutionRunId for first on a workflowExecutionStartedEvent', () => {
@@ -105,7 +105,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).first,
     ).toBe(firstExecutionRunId);
   });
@@ -123,7 +123,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflowCopy),
         continuedAsNewEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).first,
     ).toBe(firstExecutionRunId);
 
@@ -134,7 +134,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflowCopy),
         continuedAsNewEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).first,
     ).toBe(undefined);
   });
@@ -149,7 +149,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).previous,
     ).toBe(continuedExecutionRunId);
   });
@@ -165,7 +165,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).next,
     ).toBe(newExecutionRunId);
   });
@@ -181,7 +181,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(completedWorkflow),
         completedEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).next,
     ).toBe(newExecutionRunId);
   });
@@ -197,7 +197,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(timedOutWorkflow),
         timedOutEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).next,
     ).toBe(newExecutionRunId);
   });
@@ -213,7 +213,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(failedWorkflow),
         failedEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).next,
     ).toBe(newExecutionRunId);
   });
@@ -227,7 +227,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(scheduledWorkflow),
         completedEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).scheduleId,
     ).toBe(workflowScheduledId);
   });
@@ -237,7 +237,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         toWorkflowExecution(completedWorkflow),
         completedEvents,
-        namespaces.namespaces,
+        namespaces.namespaces[0],
       ).scheduleId,
     ).toBe('');
   });

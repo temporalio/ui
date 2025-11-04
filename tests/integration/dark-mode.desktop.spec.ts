@@ -9,43 +9,31 @@ test.describe('Dark Mode Dropdown', () => {
   test.beforeEach(async ({ page }) => {
     await mockWorkflowsApis(page);
     await page.goto('/');
+    await page.getByTestId('user-menu-trigger').click();
+    const menuButton = page.getByTestId('dark-mode-toggle-buttons');
+    await expect(menuButton).toBeVisible();
   });
 
   test('user can select System Default option via dropdown menu', async ({
     page,
   }) => {
-    const menuButton = page
-      .getByTestId('dark-mode-menu-button')
-      .locator('visible=true');
-    await expect(menuButton).toBeVisible();
-
-    await menuButton.click();
-    await page.getByRole('menuitem', { name: 'System Default' }).click();
-    await expect(menuButton).toHaveAccessibleName('System Default');
+    const systemModeButton = page.getByTestId('system-mode');
+    await expect(systemModeButton).toHaveAccessibleName('System Default');
+    await systemModeButton.click();
     await expect(page).toHaveLocalStorageItem(localStorageKey, 'system');
   });
 
   test('user can select Night option via dropdown menu', async ({ page }) => {
-    const menuButton = page
-      .getByTestId('dark-mode-menu-button')
-      .locator('visible=true');
-    await expect(menuButton).toBeVisible();
-
-    await menuButton.click();
-    await page.getByTestId('night-mode').click();
-    await expect(menuButton).toHaveAccessibleName('Night');
+    const nightModeButton = page.getByTestId('night-mode');
+    await expect(nightModeButton).toHaveAccessibleName('Night');
+    await nightModeButton.click();
     await expect(page).toHaveLocalStorageItem(localStorageKey, true);
   });
 
   test('user can select Day option via dropdown menu', async ({ page }) => {
-    const menuButton = page
-      .getByTestId('dark-mode-menu-button')
-      .locator('visible=true');
-    await expect(menuButton).toBeVisible();
-
-    await menuButton.click();
-    await page.getByTestId('day-mode').click();
-    await expect(menuButton).toHaveAccessibleName('Day');
+    const dayModeButton = page.getByTestId('day-mode');
+    await expect(dayModeButton).toHaveAccessibleName('Day');
+    await dayModeButton.click();
     await expect(page).toHaveLocalStorageItem(localStorageKey, false);
   });
 });
