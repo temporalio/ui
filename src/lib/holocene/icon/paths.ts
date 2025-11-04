@@ -42,6 +42,7 @@ import dollarInvoice from './svg/dollar-invoice.svelte';
 import download from './svg/download.svelte';
 import drained from './svg/drained.svelte';
 import error from './svg/error.svelte';
+import exclamationOctagon from './svg/exclamation-octagon.svelte';
 import exit from './svg/exit.svelte';
 import expand from './svg/expand.svelte';
 import externalLink from './svg/external-link.svelte';
@@ -61,6 +62,7 @@ import flag from './svg/flag.svelte';
 import folders from './svg/folders.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
+import happyLappy from './svg/happy-lappy.svelte';
 import heartbeat from './svg/heartbeat.svelte';
 import hyphen from './svg/hyphen.svelte';
 import identities from './svg/identities.svelte';
@@ -180,6 +182,7 @@ export const icons = {
   'dollar-invoice': dollarInvoice,
   drained,
   error,
+  'exclamation-octagon': exclamationOctagon,
   exit,
   expand,
   'external-link': externalLink,
@@ -199,6 +202,7 @@ export const icons = {
   folders,
   github,
   graph,
+  'happy-lappy': happyLappy,
   heartbeat,
   hyphen,
   identities,

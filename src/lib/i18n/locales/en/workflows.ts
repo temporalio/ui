@@ -252,11 +252,13 @@ export const Strings = {
   'no-headings-in-view': 'No columns in view',
   'archived-workflows': 'Archived Workflows',
   archival: 'Archival',
-  'workflow-query-empty-state-title': 'No Results',
-  'workflow-query-empty-state-preface':
-    'There are no results for the applied filters.',
-  'workflow-query-empty-state-postface':
-    'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
+  'workflow-query-empty-state-title': 'No Workflows Found',
+  'workflow-query-empty-state-description':
+    'Try adjusting or clearing filters to see more results',
+  'workflow-task-failures-query-empty-state-title':
+    'No Task Failures Found. Nice Work!',
+  'workflow-task-failures-query-empty-state-description':
+    'None of your Workflows currently match your task failure criteria',
   'workflow-query-error-state': 'There is an error with filtering Workflows.',
   'workflow-empty-state-title': 'No Workflows running in this Namespace',
   'workflow-empty-state-description':
@@ -312,6 +314,8 @@ export const Strings = {
   fairness: 'Fairness',
   'workflow-start-delay': 'Workflow Start Delay',
   delayed: 'Delayed',
+  'task-failure': 'Task Failure',
   'execution-start': 'Execution Start',
   'workflow-timeout': 'Workflow Timeout',
+  'custom-views': 'Custom Views',
 } as const;

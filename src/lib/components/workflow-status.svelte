@@ -28,6 +28,7 @@
   export let newCount: number | undefined = undefined;
   export let big = false;
   export let delayed = false;
+  export let taskFailure = false;
 
   const label: Record<Status, string> = {
     Running: translate('workflows.running'),
@@ -81,12 +82,18 @@
       },
     },
   );
+
+  $: tooltipText = delayed
+    ? translate('workflows.delayed')
+    : taskFailure
+      ? translate('workflows.task-failure')
+      : '';
 </script>
 
 <Tooltip
   topLeft
-  text={translate('workflows.delayed')}
-  hide={!delayed}
+  text={tooltipText}
+  hide={!delayed && !taskFailure}
   class="block"
 >
   <div
@@ -101,7 +108,7 @@
         workflowStatus({
           status,
         }),
-        (newCount || delayed) && 'rounded-r-none',
+        (newCount || delayed || taskFailure) && 'rounded-r-none',
         big && 'h-8 px-4',
       )}
     >
@@ -112,7 +119,7 @@
       {/if}
 
       {label[status]}
-      {#if status === 'Running' && !delayed}
+      {#if status === 'Running' && !delayed && !taskFailure}
         <HeartBeat {delay} />
       {/if}
     </span>
@@ -123,13 +130,31 @@
             status: 'Paused',
           }),
           'rounded-l-none',
-          newCount && 'rounded-r-none',
+          (newCount || taskFailure) && 'rounded-r-none',
           big && 'h-8 px-2',
         )}
       >
         <Icon name="clock" class={merge(!big && 'px-0.5')} />
       </span>
     {/if}
+    {#if taskFailure}
+      <span
+        class={merge(
+          workflowStatus({
+            status: 'Failed',
+          }),
+          'rounded-l-none',
+          newCount && 'rounded-r-none',
+          big && 'h-8 px-2',
+        )}
+      >
+        <Icon
+          name="exclamation-octagon"
+          class={merge(!big && 'px-0.5 text-red-900')}
+        />
+      </span>
+    {/if}
+
     {#if newCount}
       <span
         class={merge(

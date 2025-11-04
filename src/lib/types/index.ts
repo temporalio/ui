@@ -3,7 +3,14 @@ import type { google, temporal } from '@temporalio/proto';
 // api.workflowservice
 
 export type DescribeNamespaceResponse =
-  temporal.api.workflowservice.v1.IDescribeNamespaceResponse;
+  temporal.api.workflowservice.v1.IDescribeNamespaceResponse & {
+    // TODO: remove when TS SDK has been updated and includes reportedProblemsSearchAttribute
+    namespaceInfo?: temporal.api.namespace.v1.INamespaceInfo & {
+      capabilities?: temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
+        reportedProblemsSearchAttribute?: boolean;
+      };
+    };
+  };
 export type DescribeWorkflowExecutionResponse =
   temporal.api.workflowservice.v1.IDescribeWorkflowExecutionResponse;
 export type ListNamespacesResponse =
@@ -13,9 +20,7 @@ export type GetClusterInfoResponse =
 export type GetSystemInfoResponse =
   temporal.api.workflowservice.v1.IGetSystemInfoResponse;
 export type Capabilities =
-  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
-    nexus?: boolean;
-  };
+  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities;
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
