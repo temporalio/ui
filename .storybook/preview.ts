@@ -1,9 +1,6 @@
-import type { Preview } from '@storybook/svelte';
-
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
-
+import type { Preview } from '@storybook/svelte';
 import '../src/app.css';
-
 import i18next from 'i18next';
 
 import { i18nNamespaces } from '../src/lib/i18n';

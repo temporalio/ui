@@ -146,7 +146,7 @@ export const eventTypes = [
   'WorkflowPropertiesModified',
 ] as const;
 
-export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
+export const eventAttributeKeys: readonly EventAttributeKey[] = [
   'workflowExecutionStartedEventAttributes',
   'workflowExecutionCompletedEventAttributes',
   'workflowExecutionFailedEventAttributes',

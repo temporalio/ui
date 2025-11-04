@@ -22,7 +22,7 @@ test.describe('Workflows List with Counts', () => {
   });
 
   test.describe('Shows only result count', () => {
-    test('Counts of workflows ', async ({ page }) => {
+    test('Counts of workflows', async ({ page }) => {
       await page.waitForSelector('[data-testid="workflow-count"]');
       await expect(page.getByTestId('workflow-count')).toHaveText('31,230');
       await expect(page.getByTestId('workflow-status-Running')).toHaveText(

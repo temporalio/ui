@@ -2,7 +2,6 @@ import { createRequire } from 'node:module';
 
 import { DefaultLogger, Runtime, Worker } from '@temporalio/worker';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const logger = new DefaultLogger('ERROR', () => {});
 
 Runtime.install({ logger });

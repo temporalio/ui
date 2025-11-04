@@ -23,7 +23,7 @@
   const values = writable<string[]>(Array.isArray(chips) ? [...chips] : []);
   let displayValue = '';
 
-  $: chips, ($values = chips ?? []);
+  $: (chips, ($values = chips ?? []));
   $: invalid = $values.some((chip) => !validator(chip));
 
   let className = '';

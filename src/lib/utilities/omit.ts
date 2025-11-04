@@ -1,5 +1,4 @@
 type Omit = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
   <Source extends object, KeysToOmit extends string[]>(
     obj: Source,
     ...keys: KeysToOmit
