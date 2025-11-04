@@ -35,6 +35,9 @@
     return runId;
   };
 
+  const isRunId = attribute === 'RunId';
+  const displayValue = isRunId ? truncateRunId(value) : value;
+
   const onRowFilterClick = () => {
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
     const getOtherFilters = () =>
@@ -58,17 +61,23 @@
   };
 </script>
 
-<Tooltip text={value} top class="min-w-0">
-  {#if href}
-    <Link {href} class="cursor-help font-mono text-sm tracking-tighter"
-      >{truncateRunId(value)}</Link
-    >
-  {:else}
-    <span class="cursor-help font-mono text-sm tracking-tighter"
-      >{truncateRunId(value)}</span
-    >
-  {/if}
-</Tooltip>
+{#if isRunId}
+  <Tooltip text={value} top class="min-w-0">
+    {#if href}
+      <Link {href} class="tracking-tightest cursor-help font-mono text-sm"
+        >{displayValue}</Link
+      >
+    {:else}
+      <span class="tracking-tightest cursor-help font-mono text-sm"
+        >{displayValue}</span
+      >
+    {/if}
+  </Tooltip>
+{:else if href}
+  <Link {href}>{value}</Link>
+{:else}
+  {value}
+{/if}
 <FilterOrCopyButtons
   copyIconTitle={translate('common.copy-icon-title')}
   copySuccessIconTitle={translate('common.copy-success-icon-title')}
