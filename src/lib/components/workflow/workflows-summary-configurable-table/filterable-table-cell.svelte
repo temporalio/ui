@@ -29,12 +29,11 @@
   }: Props = $props();
 
   const truncateRunId = (runId: string): string => {
-    if (runId.length <= 12) return runId;
-    return `${runId.slice(0, 4)}....${runId.slice(-4)}`;
+    if (runId.length > 11) {
+      return `${runId.slice(0, 4)}....${runId.slice(-4)}`;
+    }
+    return runId;
   };
-
-  const shouldTruncate = attribute === 'RunId';
-  const displayValue = shouldTruncate ? truncateRunId(value) : value;
 
   const onRowFilterClick = () => {
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
@@ -59,23 +58,17 @@
   };
 </script>
 
-{#if shouldTruncate}
-  <Tooltip text={value} top class="min-w-0">
-    {#if href}
-      <Link {href} class="cursor-help font-mono text-sm tracking-tighter"
-        >{displayValue}</Link
-      >
-    {:else}
-      <span class="cursor-help font-mono text-sm tracking-tighter"
-        >{displayValue}</span
-      >
-    {/if}
-  </Tooltip>
-{:else if href}
-  <Link {href}>{value}</Link>
-{:else}
-  {value}
-{/if}
+<Tooltip text={value} top class="min-w-0">
+  {#if href}
+    <Link {href} class="cursor-help font-mono text-sm tracking-tighter"
+      >{truncateRunId(value)}</Link
+    >
+  {:else}
+    <span class="cursor-help font-mono text-sm tracking-tighter"
+      >{truncateRunId(value)}</span
+    >
+  {/if}
+</Tooltip>
 <FilterOrCopyButtons
   copyIconTitle={translate('common.copy-icon-title')}
   copySuccessIconTitle={translate('common.copy-success-icon-title')}
