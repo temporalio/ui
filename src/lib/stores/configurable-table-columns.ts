@@ -30,7 +30,6 @@ export type WorkflowHeaderLabel = (typeof WorkflowHeaderLabels)[number];
 
 // https://github.com/microsoft/TypeScript/issues/29729
 // https://stackoverflow.com/a/61048124
-// eslint-disable-next-line @typescript-eslint/ban-types
 type AnyWorkflowHeaderLabel = WorkflowHeaderLabel | (string & {});
 
 export type ConfigurableTableHeader = {

@@ -104,6 +104,7 @@ export default [
           },
         },
       ],
+      'svelte/no-navigation-without-resolve': 'warn',
     },
   },
   {
