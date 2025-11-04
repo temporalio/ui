@@ -30,7 +30,7 @@
 
   const truncateRunId = (runId: string): string => {
     if (runId.length <= 12) return runId;
-    return `${runId.slice(0, 4)}…${runId.slice(-4)}`;
+    return `${runId.slice(0, 4)}....${runId.slice(-4)}`;
   };
 
   const shouldTruncate = attribute === 'RunId';
@@ -60,11 +60,15 @@
 </script>
 
 {#if shouldTruncate}
-  <Tooltip text={value} top>
+  <Tooltip text={value} top class="min-w-0">
     {#if href}
-      <Link {href} class="cursor-help font-mono text-sm">{displayValue}</Link>
+      <Link {href} class="tracking-tightest cursor-help font-mono text-sm"
+        >{displayValue}</Link
+      >
     {:else}
-      <span class="cursor-help font-mono text-sm">{displayValue}</span>
+      <span class="tracking-tightest cursor-help font-mono text-sm"
+        >{displayValue}</span
+      >
     {/if}
   </Tooltip>
 {:else if href}
