@@ -13,6 +13,7 @@
 
   import PendingActivityCard from '../workflow/pending-activity/pending-activity-card.svelte';
   import PendingNexusOperationCard from '../workflow/pending-nexus-operation/pending-nexus-operation-card.svelte';
+  import WorkflowStatus from '../workflow-status.svelte';
 
   import EventCard from './event-card.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
@@ -21,10 +22,12 @@
     group = undefined,
     event = undefined,
     children = undefined,
+    headerActions = undefined,
   }: {
     group?: EventGroup;
     event?: WorkflowEvent;
     children?: Snippet;
+    headerActions?: Snippet;
   } = $props();
 
   const pendingEvent = $derived(
@@ -78,7 +81,7 @@
     },
   });
 
-  const eventTitle = cva(['p-2 rounded-t-lg'], {
+  const eventTitle = cva({
     variants: {
       category: {
         workflow: 'bg-blue-900 ',
@@ -95,11 +98,74 @@
     },
   });
 
+  const groupHeader = cva(
+    ['relative flex h-full items-center justify-between text-sm text-white'],
+    {
+      variants: {
+        category: {
+          workflow: 'bg-blue-800 ',
+          activity: 'bg-purple-800 ',
+          'child-workflow': 'bg-green-800 ',
+          timer: 'bg-yellow-800 ',
+          signal: 'bg-pink-800 ',
+          update: 'bg-blue-800 ',
+          other: 'bg-slate-800',
+          nexus: 'bg-indigo-800',
+          'local-activity': 'bg-slate-800 ',
+          default: 'bg-purple-900 ',
+        },
+      },
+    },
+  );
+
   const emptyValue = $derived(
     group.isPending ? 'Results will appear upon completion' : 'null',
   );
+  const duration = $derived(
+    formatDistanceAbbreviated({
+      start: group?.initialEvent?.eventTime,
+      end: group?.lastEvent?.eventTime,
+      includeMilliseconds: true,
+    }),
+  );
+  let status = $derived(group?.finalClassification || group?.classification);
+
+  $effect(() => {
+    if (group?.pendingActivity) {
+      if (group.pendingActivity.paused) {
+        status = translate('workflows.paused');
+      } else if (group.pendingActivity.attempt > 1) {
+        status = translate('events.event-classification.retrying');
+      } else {
+        status = translate('events.event-classification.pending');
+      }
+    }
+  });
 </script>
 
+<div
+  class={groupHeader({
+    category: group ? group.category : event.category,
+  })}
+>
+  <div
+    class="flex h-full flex-col items-start gap-1 p-2 text-base md:flex-row md:items-center md:gap-4"
+  >
+    {#if status}
+      <WorkflowStatus {status} big />
+    {/if}
+    {group.displayName}
+    {#if duration}
+      <div class="flex items-center gap-1">
+        <Icon name="clock" />
+        {duration}
+      </div>
+    {/if}
+  </div>
+  <div class="flex items-center gap-4 px-2">
+    {@render headerActions?.()}
+  </div>
+</div>
 <div
   class={groupCategory({
     category: group ? group.category : event.category,
@@ -108,8 +174,8 @@
   {#if showEventGroup}
     <div class="flex flex-col gap-2 overflow-hidden">
       {@render inputAndResults()}
-      {@render eventCards()}
       {@render durationTimes()}
+      {@render eventCards()}
     </div>
   {:else if event}
     <EventCard {event} />
