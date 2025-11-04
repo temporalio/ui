@@ -544,7 +544,8 @@
 })}
   <span
     class={merge(
-      'right-2 top-2 hidden items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-primary lg:static lg:ml-auto lg:flex',
+      'right-2 top-2 hidden items-center rounded-full px-2 py-1 text-xs font-medium text-primary lg:static lg:ml-auto lg:flex',
+      icon && 'gap-1.5 py-1 pl-2 pr-1',
       className,
     )}
     in:slide

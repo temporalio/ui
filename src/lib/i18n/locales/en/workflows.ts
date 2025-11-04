@@ -258,7 +258,7 @@ export const Strings = {
   'workflow-task-failures-query-empty-state-title':
     'No Task Failures Found. Nice Work!',
   'workflow-task-failures-query-empty-state-description':
-    'Your workflows are in great shape',
+    'None of your Workflows currently match your task failure criteria',
   'workflow-query-error-state': 'There is an error with filtering Workflows.',
   'workflow-empty-state-title': 'No Workflows running in this Namespace',
   'workflow-empty-state-description':
