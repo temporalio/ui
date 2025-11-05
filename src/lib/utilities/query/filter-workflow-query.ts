@@ -8,7 +8,12 @@ import {
   type SearchAttributeType,
 } from '$lib/types/workflows';
 
-import { isInConditional, isNullConditional, isStartsWith } from '../is';
+import {
+  isContains,
+  isInConditional,
+  isNullConditional,
+  isStartsWith,
+} from '../is';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
@@ -98,6 +103,14 @@ const toFilterQueryStatement = (
   }
 
   if (isStartsWith(conditional)) {
+    return `\`${queryKey}\` ${conditional} ${formatValue({
+      value,
+      type,
+      conditional,
+    })}`;
+  }
+
+  if (isContains(conditional)) {
     return `\`${queryKey}\` ${conditional} ${formatValue({
       value,
       type,
