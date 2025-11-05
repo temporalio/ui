@@ -199,7 +199,7 @@
         </PayloadDecoder>
       </div>
     {/if}
-    {#if group.category === 'activity' || group.category === 'nexus'}
+    {#if group?.category === 'activity' || group?.category === 'nexus'}
       <div class="flex w-full flex-col">
         <p class="text-base font-medium">Result</p>
         <PayloadDecoder value={group?.result} key="payloads">
