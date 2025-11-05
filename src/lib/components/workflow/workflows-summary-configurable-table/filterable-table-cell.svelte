@@ -30,13 +30,12 @@
 
   const truncateRunId = (runId: string): string => {
     if (runId.length > 11) {
-      return `${runId.slice(0, 4)}....${runId.slice(-4)}`;
+      return `${runId.slice(0, 4)}...${runId.slice(-4)}`;
     }
     return runId;
   };
 
   const isRunId = attribute === 'RunId';
-  const displayValue = isRunId ? truncateRunId(value) : value;
 
   const onRowFilterClick = () => {
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
@@ -63,15 +62,9 @@
 
 {#if isRunId}
   <Tooltip text={value} top class="min-w-0">
-    {#if href}
-      <Link {href} class="tracking-tightest cursor-help font-mono text-sm"
-        >{displayValue}</Link
-      >
-    {:else}
-      <span class="tracking-tightest cursor-help font-mono text-sm"
-        >{displayValue}</span
-      >
-    {/if}
+    <Link {href} class="tracking-tightest cursor-help text-sm"
+      >{truncateRunId(value)}</Link
+    >
   </Tooltip>
 {:else if href}
   <Link {href}>{value}</Link>
