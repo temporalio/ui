@@ -545,14 +545,14 @@
   <span
     class={merge(
       'right-2 top-2 hidden items-center rounded-full px-2 py-1 text-xs font-medium text-primary lg:static lg:ml-auto lg:flex',
-      icon && 'gap-1.5 py-1 pl-2 pr-1',
+      icon && 'gap-1.5 p-0.5 pl-2',
       className,
     )}
     in:slide
   >
     {content}
     {#if icon}
-      <span class={merge('rounded-full', iconClass)}>
+      <span class={merge('rounded-full p-0.5', iconClass)}>
         <Icon name={icon} class="p-0.5" />
       </span>
     {/if}
