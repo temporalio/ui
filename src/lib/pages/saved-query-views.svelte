@@ -331,7 +331,7 @@
       >
         {translate('workflows.custom-views')}
         {@render queryBadge({
-          className: 'surface-subtle font-mono',
+          className: 'font-mono',
           content: `${namespaceSavedQueries.length}/${MAX_SAVED_WORKFLOW_QUERIES}`,
         })}
       </p>
@@ -410,7 +410,7 @@
       on:click={() => setActiveQueryView(view)}
       class={merge(
         'flex w-full justify-start',
-        view.count > 0 && 'text-danger',
+        view.count > 0 && 'text-red-900 dark:text-red-300',
       )}
       active={view.active}
       disabled={view.disabled}
@@ -433,16 +433,19 @@
         >
         {#if view.badge}
           {@render queryBadge({
-            className: 'surface-information italic',
+            className: 'italic',
             content: view.badge,
           })}
         {/if}
         {#if view.count != undefined}
           {@render queryBadge({
-            className: `font-mono ${view.count > 0 ? 'surface-danger text-danger' : 'surface-information'}`,
+            className: `font-mono ${view.count > 0 ? 'bg-red-50 dark:bg-red-900 text-red-900 dark:text-white' : 'bg-slate-50 dark:bg-slate-600 text-blue-900 dark:text-white'}`,
             content: view.count,
             icon: view.count > 0 ? 'exclamation-octagon' : 'happy-lappy',
-            iconClass: view.count > 0 ? 'bg-red-200 text-red-900' : 'bg-subtle',
+            iconClass:
+              view.count > 0
+                ? 'bg-red-200 dark:bg-red-700 text-red-900 dark:text-white'
+                : 'surface-subtle',
           })}
         {/if}
       {/if}
@@ -544,7 +547,7 @@
 })}
   <span
     class={merge(
-      'right-2 top-2 hidden items-center rounded-full px-2 py-1 text-xs font-medium text-primary lg:static lg:ml-auto lg:flex',
+      'surface-subtle right-2 top-2 hidden items-center rounded-full px-2 py-1 text-xs font-medium lg:static lg:ml-auto lg:flex',
       icon && 'gap-1.5 p-0.5 pl-2',
       className,
     )}
