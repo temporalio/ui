@@ -102,7 +102,11 @@
     {/if}
   </td>
   <td class="">
-    <p class="truncate font-semibold md:text-base">Pending Activity</p>
+    <p
+      class="truncate font-semibold text-purple-600 md:text-base dark:text-purple-500"
+    >
+      Pending Activity
+    </p>
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex items-center gap-1">

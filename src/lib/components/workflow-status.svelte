@@ -97,10 +97,7 @@
   class="block"
 >
   <div
-    class={merge(
-      'relative flex items-center gap-0 text-center text-xs leading-4',
-      big && 'text-lg',
-    )}
+    class="relative flex items-center gap-0 text-center text-xs leading-4"
     data-testid={$$props['test-id']}
   >
     <span
@@ -109,7 +106,7 @@
           status,
         }),
         (newCount || delayed || taskFailure) && 'rounded-r-none',
-        big && 'h-8 px-4',
+        $$props.class || '',
       )}
     >
       {#if loading}
@@ -131,7 +128,7 @@
           }),
           'rounded-l-none',
           (newCount || taskFailure) && 'rounded-r-none',
-          big && 'h-8 px-2',
+          $$props.class || '',
         )}
       >
         <Icon name="clock" class={merge(!big && 'px-0.5')} />
@@ -145,7 +142,7 @@
           }),
           'rounded-l-none',
           newCount && 'rounded-r-none',
-          big && 'h-8 px-2',
+          $$props.class || '',
         )}
       >
         <Icon
@@ -156,13 +153,7 @@
     {/if}
 
     {#if newCount}
-      <span
-        class={merge(
-          'font-base surface-primary rounded-r-sm px-1 py-0.5',
-          big && 'px-2',
-        )}
-        in:fade
-      >
+      <span class="font-base surface-primary rounded-r-sm px-1 py-0.5" in:fade>
         {#if newCount > 0}+{/if}{newCount}
       </span>
     {/if}

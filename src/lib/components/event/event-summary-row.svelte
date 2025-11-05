@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
   import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
@@ -37,6 +38,8 @@
   } from '$lib/utilities/is-event-type';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
+
+  import { CategoryIcon } from '../lines-and-dots/constants';
 
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
@@ -205,6 +208,26 @@
       });
     }
   });
+
+  const eventTypeStyle = cva(
+    ['whitespace-nowrap font-semibold md:text-base flex items-center gap-0.5'],
+    {
+      variants: {
+        category: {
+          workflow: 'text-blue-700 dark:text-blue-400',
+          activity: 'text-purple-600 dark:text-purple-500',
+          'child-workflow': 'text-green-600 dark:text-green-400',
+          timer: 'text-yellow-600 dark:text-yellow-400',
+          signal: 'text-pink-600 dark:text-pink-400',
+          update: 'text-blue-600 dark:text-blue-400',
+          other: 'text-slate-700 dark:text-slate-300',
+          nexus: 'text-indigo-600 dark:text-indigo-400',
+          'local-activity': 'text-slate-700 dark:text-slate-300',
+          default: 'text-purple-600 dark:text-purple-500',
+        },
+      },
+    },
+  );
 </script>
 
 <tr
@@ -280,7 +303,8 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p class="whitespace-nowrap font-semibold md:text-base">
+    <p class={eventTypeStyle({ category: event.category })}>
+      <Icon name={CategoryIcon[event.category]} class="mr-1 inline" />
       {displayName}
     </p>
   </td>
@@ -323,14 +347,10 @@
         </Badge>
       {/if}
       {#if !primaryLocalAttribute && primaryAttribute?.key}
-        <EventDetailsRow {...primaryAttribute} {attributes} showKey={false} />
+        <EventDetailsRow {...primaryAttribute} {attributes} />
       {/if}
       {#if primaryLocalAttribute && primaryLocalAttribute.key}
-        <EventDetailsRow
-          {...primaryLocalAttribute}
-          {attributes}
-          showKey={false}
-        />
+        <EventDetailsRow {...primaryLocalAttribute} {attributes} />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
         <MetadataDecoder

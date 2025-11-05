@@ -100,7 +100,9 @@
   >
     <div class="flex">
       <div class="flex w-full items-center gap-2">
-        <p class="font-semibold md:text-base">
+        <p
+          class="font-semibold text-indigo-600 md:text-base dark:text-indigo-400"
+        >
           {translate('workflows.pending-nexus-operation')}
         </p>
         {#if event.attempt}

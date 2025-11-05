@@ -42,123 +42,115 @@
   );
 </script>
 
-<div
-  class="flex flex-1 cursor-default flex-col gap-2 overflow-hidden rounded-t-md border border-purple-800 bg-purple-800/50 text-white shadow-md"
->
-  <div
-    class="flex flex-wrap items-center justify-between gap-2 bg-purple-800 px-2 py-1"
-  >
-    <p class="text-base font-medium">Pending</p>
-    {#if showActivityCommands}
-      <ActivityCommands {activity} class="justify-end" />
+<div class="flex flex-1 flex-col gap-1 p-2">
+  {#if showActivityCommands}
+    <ActivityCommands {activity} class="justify-end" />
+  {/if}
+
+  <div class="flex w-full flex-col gap-1">
+    {@render detail(translate('workflows.activity-id'), activity.activityId)}
+    {#if activity.paused && activity.pauseInfo}
+      {@render detail(
+        translate('activities.paused-by'),
+        activity.pauseInfo?.manual?.identity || '',
+      )}
+      {@render detail(
+        translate('activities.paused-since'),
+        formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
+          relative: $relativeTime,
+        }),
+      )}
+      {@render detail(
+        translate('activities.pause-reason'),
+        activity.pauseInfo?.manual?.reason || '-',
+      )}
+    {/if}
+    {@render detail(translate('workflows.attempt'), attempts)}
+    {#if activity.scheduledTime}
+      {@const timeDifference = toTimeDifference({
+        date: activity.scheduledTime,
+        negativeDefault: '',
+      })}
+      {#if timeDifference}
+        {@render nextRetry(timeDifference)}
+      {/if}
+    {/if}
+    {#if activity.lastAttemptCompleteTime}
+      {@render detail(
+        translate('workflows.last-attempt-completed-time'),
+        formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
+          relative: $relativeTime,
+        }),
+      )}
+    {/if}
+    {#if activity.expirationTime}
+      {@render detail(
+        translate('workflows.retry-expiration'),
+        formatRetryExpiration(
+          activity.maximumAttempts,
+          formatDuration(
+            getDuration({
+              start: Date.now(),
+              end: activity.expirationTime,
+            }),
+          ),
+        ),
+      )}
+    {/if}
+    {#if activity.lastHeartbeatTime}
+      {@render detail(
+        translate('workflows.last-heartbeat'),
+        formatDate(activity.lastHeartbeatTime, $timeFormat, {
+          relative: $relativeTime,
+        }),
+      )}
+    {/if}
+    {#if activity.lastStartedTime}
+      {@render detail(
+        translate('workflows.last-started-time'),
+        formatDate(activity.lastStartedTime, $timeFormat, {
+          relative: $relativeTime,
+        }),
+      )}
+    {/if}
+    {#if activity.lastWorkerIdentity}
+      {@render detail(
+        translate('workflows.last-worker-identity'),
+        activity.lastWorkerIdentity,
+      )}
+    {/if}
+    {#if activity.priority}
+      {#if activity.priority.priorityKey}
+        {@render detail(
+          translate('workflows.priority'),
+          activity.priority.priorityKey,
+        )}
+      {/if}
+      {#if activity.priority.fairnessKey}
+        {@render detail(
+          translate('workflows.fairness'),
+          activity.priority.fairnessKey,
+        )}
+      {/if}
     {/if}
   </div>
-  <div class="flex flex-1 flex-col gap-1 p-2">
-    <div class="flex w-full flex-col gap-1">
-      {@render detail(translate('workflows.activity-id'), activity.activityId)}
-      {#if activity.paused && activity.pauseInfo}
-        {@render detail(
-          translate('activities.paused-by'),
-          activity.pauseInfo?.manual?.identity || '',
-        )}
-        {@render detail(
-          translate('activities.paused-since'),
-          formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
-            relative: $relativeTime,
-          }),
-        )}
-        {@render detail(
-          translate('activities.pause-reason'),
-          activity.pauseInfo?.manual?.reason || '-',
-        )}
+  <div class="flex w-full flex-col gap-1">
+    {#if failed}
+      {#if totalPending > 20}
+        {@render failuresAccordion()}
+      {:else}
+        {@render failuresCodeBlock()}
       {/if}
-      {@render detail(translate('workflows.attempt'), attempts)}
-      {#if activity.scheduledTime}
-        {@const timeDifference = toTimeDifference({
-          date: activity.scheduledTime,
-          negativeDefault: '',
-        })}
-        {#if timeDifference}
-          {@render nextRetry(timeDifference)}
-        {/if}
-      {/if}
-      {#if activity.lastAttemptCompleteTime}
-        {@render detail(
-          translate('workflows.last-attempt-completed-time'),
-          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
-            relative: $relativeTime,
-          }),
-        )}
-      {/if}
-      {#if activity.expirationTime}
-        {@render detail(
-          translate('workflows.retry-expiration'),
-          formatRetryExpiration(
-            activity.maximumAttempts,
-            formatDuration(
-              getDuration({
-                start: Date.now(),
-                end: activity.expirationTime,
-              }),
-            ),
-          ),
-        )}
-      {/if}
-      {#if activity.lastHeartbeatTime}
-        {@render detail(
-          translate('workflows.last-heartbeat'),
-          formatDate(activity.lastHeartbeatTime, $timeFormat, {
-            relative: $relativeTime,
-          }),
-        )}
-      {/if}
-      {#if activity.lastStartedTime}
-        {@render detail(
-          translate('workflows.last-started-time'),
-          formatDate(activity.lastStartedTime, $timeFormat, {
-            relative: $relativeTime,
-          }),
-        )}
-      {/if}
-      {#if activity.lastWorkerIdentity}
-        {@render detail(
-          translate('workflows.last-worker-identity'),
-          activity.lastWorkerIdentity,
-        )}
-      {/if}
-      {#if activity.priority}
-        {#if activity.priority.priorityKey}
-          {@render detail(
-            translate('workflows.priority'),
-            activity.priority.priorityKey,
-          )}
-        {/if}
-        {#if activity.priority.fairnessKey}
-          {@render detail(
-            translate('workflows.fairness'),
-            activity.priority.fairnessKey,
-          )}
-        {/if}
-      {/if}
-    </div>
-    <div class="flex w-full flex-col gap-1">
-      {#if failed}
-        {#if totalPending > 20}
-          {@render failuresAccordion()}
-        {:else}
-          {@render failuresCodeBlock()}
-        {/if}
-      {/if}
-      {#if activity.heartbeatDetails}
-        {@render heartbeat()}
-      {/if}
-    </div>
+    {/if}
+    {#if activity.heartbeatDetails}
+      {@render heartbeat()}
+    {/if}
   </div>
 </div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm">
+    <p class="text-sm text-white/70">
       {label}
     </p>
     <p class="w-full whitespace-pre-line">
@@ -246,7 +238,7 @@
 
 {#snippet nextRetry(timeDifference)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm">
+    <p class="text-sm text-white/70">
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">

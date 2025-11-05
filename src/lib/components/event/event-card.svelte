@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { cva } from 'class-variance-authority';
-
   import { page } from '$app/state';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -12,10 +10,7 @@
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
-  import {
-    format,
-    spaceBetweenCapitalLetters,
-  } from '$lib/utilities/format-camel-case';
+  import { format } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import {
@@ -24,7 +19,6 @@
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { routeForNamespace } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
@@ -33,11 +27,6 @@
 
   let { event }: { event: WorkflowEvent } = $props();
 
-  const displayName = $derived(
-    isLocalActivityMarkerEvent(event)
-      ? translate('events.category.local-activity')
-      : spaceBetweenCapitalLetters(event.name),
-  );
   const attributes = $derived(formatAttributes(event));
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
@@ -72,90 +61,30 @@
           (key === 'namespace' && page.params.namespace !== value)),
     ),
   );
-
-  const eventContainer = cva(
-    [
-      'flex flex-1 cursor-default flex-col gap-2 overflow-hidden rounded-t-md text-white shadow-md pb-2',
-    ],
-    {
-      variants: {
-        category: {
-          workflow: 'bg-blue-800 ',
-          activity: 'bg-purple-800 ',
-          'child-workflow': 'bg-green-800 ',
-          timer: 'bg-yellow-800 ',
-          signal: 'bg-pink-800 ',
-          update: 'bg-blue-800 ',
-          other: 'bg-slate-800',
-          nexus: 'bg-indigo-800',
-          'local-activity': 'bg-slate-800 ',
-          default: 'bg-purple-800 ',
-        },
-      },
-    },
-  );
-
-  const eventTitle = cva(
-    ['flex flex-wrap items-center justify-between gap-2 p-2'],
-    {
-      variants: {
-        category: {
-          workflow: 'bg-blue-900 ',
-          activity: 'bg-purple-900 ',
-          'child-workflow': 'bg-green-900 ',
-          timer: 'bg-yellow-900 ',
-          signal: 'bg-pink-900 ',
-          update: 'bg-blue-900 ',
-          other: 'bg-slate-900',
-          nexus: 'bg-indigo-900',
-          'local-activity': 'bg-slate-900 ',
-          default: 'bg-purple-900 ',
-        },
-      },
-    },
-  );
 </script>
 
-<div
-  class={eventContainer({
-    category: event.category,
-  })}
->
-  <div
-    class={eventTitle({
-      category: event.category,
-    })}
-  >
-    <div class="flex items-center gap-2 text-base">
-      <p class="font-mono">{event.id}</p>
-      <p class="font-medium">
-        {displayName}
-      </p>
-    </div>
-  </div>
-  <div class="flex flex-col gap-1 px-2">
-    <div class="flex w-full flex-col gap-0.5">
-      {#if event?.links?.length}
-        {@render eventLinks(event.links)}
-      {/if}
-      {#if event?.userMetadata?.summary}
-        {@render eventSummary(event.userMetadata.summary)}
-      {/if}
-      {#each detailFields as [key, value] (key)}
-        {@render details(key, value)}
-      {/each}
-      {#each linkFields as [key, value] (key)}
-        {@render link(key, value)}
-      {/each}
-    </div>
-    {#if payloadFields.length}
-      <div class="flex w-full flex-col gap-1">
-        {#each payloadFields as [key, value] (key)}
-          {@render payloads(key, value)}
-        {/each}
-      </div>
+<div class="flex flex-1 flex-col gap-1 p-2">
+  <div class="flex w-full flex-col gap-0.5">
+    {#if event?.links?.length}
+      {@render eventLinks(event.links)}
     {/if}
+    {#if event?.userMetadata?.summary}
+      {@render eventSummary(event.userMetadata.summary)}
+    {/if}
+    {#each detailFields as [key, value] (key)}
+      {@render details(key, value)}
+    {/each}
+    {#each linkFields as [key, value] (key)}
+      {@render link(key, value)}
+    {/each}
   </div>
+  {#if payloadFields.length}
+    <div class="flex w-full flex-col gap-1">
+      {#each payloadFields as [key, value] (key)}
+        {@render payloads(key, value)}
+      {/each}
+    </div>
+  {/if}
 </div>
 
 {#snippet eventLink(link: ELink)}

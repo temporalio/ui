@@ -120,9 +120,9 @@
       >
         <WorkflowStatus
           status={workflow?.status}
-          big
           delayed={isWorkflowDelayed(workflow)}
           taskFailure={isWorkflowTaskFailure(workflow)}
+          class="h-8 p-3 text-lg"
         />
         <div class="xl:hidden">
           <WorkflowActions
