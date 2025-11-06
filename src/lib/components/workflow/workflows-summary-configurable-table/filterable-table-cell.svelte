@@ -62,9 +62,7 @@
 
 {#if isRunId}
   <Tooltip text={value} top class="min-w-0">
-    <Link {href} class="tracking-tightest cursor-help text-sm"
-      >{truncateRunId(value)}</Link
-    >
+    <Link {href} class="cursor-help">{truncateRunId(value)}</Link>
   </Tooltip>
 {:else if href}
   <Link {href}>{value}</Link>
