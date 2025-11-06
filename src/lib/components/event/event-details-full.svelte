@@ -59,6 +59,7 @@
     },
   });
 
+  $inspect('group.finalClassification: ', group?.finalClassification);
   const title = $derived(
     group ? group.displayName : event ? event.eventType : '',
   );

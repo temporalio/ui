@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
+
   import { page } from '$app/state';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -77,15 +79,38 @@
           (key === 'namespace' && page.params.namespace !== value)),
     ),
   );
+
+  $inspect('event.classification: ', event.classification);
+  const eventCategory = cva(
+    ['flex flex-1 flex-col overflow-hidden rounded-t-lg pb-2'],
+    {
+      variants: {
+        classification: {
+          Failed: 'bg-red-800',
+          Canceled: 'bg-yellow-700',
+          TimedOut: 'bg-orange-700',
+          Completed: 'bg-green-700',
+          Terminated: 'bg-gray-300',
+          Scheduled: 'bg-slate-900/50',
+          Initiated: 'bg-slate-900/50',
+          Started: 'bg-slate-900/60',
+          Fired: 'bg-slate-900/70',
+          CancelRequested: 'bg-slate-900/50',
+        },
+      },
+    },
+  );
 </script>
 
 <div
-  class="flex flex-1 flex-col overflow-hidden rounded-t-lg bg-slate-900/50 pb-2"
+  class={eventCategory({
+    classification: event.classification,
+  })}
 >
   <div class="bg-slate-900/60 p-2 pb-1 text-left">
     <div class="flex flex-col items-center justify-between lg:flex-row">
       <div>
-        <p class="leading-3">
+        <p class="leading-tight">
           <span class="font-mono">{event.id}</span>
           <span class="font-medium">
             {event.name}
@@ -106,7 +131,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 gap-2 px-2 md:grid-cols-2">
+  <div class="grid grid-cols-1 gap-2 p-2 md:grid-cols-2 xl:grid-cols-1">
     {#if event?.links?.length}
       {@render eventLinks(event.links)}
     {/if}
@@ -132,7 +157,7 @@
 {#snippet eventLink(link: ELink)}
   {@const href = getEventLinkHref(link)}
   {@const value = href.split('workflows/')?.[1] || href}
-  <div class="leading-3">
+  <div class="leading-tight">
     <p class="text-sm text-white/70">
       {translate('nexus.link')}
     </p>
@@ -148,7 +173,7 @@
 
 {#snippet eventNamespaceLink(link: ELink)}
   {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
-  <div class="leading-3">
+  <div class="leading-tight">
     <p class="text-sm text-white/70">
       {translate('nexus.link-namespace')}
     </p>
@@ -172,7 +197,7 @@
 {/snippet}
 
 {#snippet eventSummary(value: Payload)}
-  <div class="leading-3">
+  <div class="leading-tight">
     <p class="text-sm text-white/70">Summary</p>
     <p class="whitespace-pre-line">
       <MetadataDecoder
@@ -190,7 +215,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   {#if stackTrace}
-    <div class="leading-3">
+    <div class="leading-tight">
       <p class="mb-1 text-sm text-white/70">
         {translate('workflows.call-stack-tab')}
       </p>
@@ -203,7 +228,7 @@
       />
     </div>
   {/if}
-  <div class="leading-3">
+  <div class="leading-tight">
     <p class="mb-1 text-sm text-white/70">
       {format(key)}
     </p>
@@ -248,7 +273,7 @@
 {/snippet}
 
 {#snippet link(key, value)}
-  <div class="leading-3">
+  <div class="leading-tight">
     <p class="text-sm text-white/70">
       {format(key)}
     </p>
@@ -268,7 +293,7 @@
 {/snippet}
 
 {#snippet details(key, value)}
-  <div class="leading-3">
+  <div class="leading-tight">
     <p class="text-sm text-white/70">
       {format(key)}
     </p>
