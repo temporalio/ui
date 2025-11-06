@@ -11,7 +11,10 @@
   $: isRunning = $workflowRun.workflow.isRunning;
 </script>
 
-<div class="flex flex-col gap-4 lg:flex-row" data-testid="input-and-result">
+<div
+  class="flex flex-1 flex-col gap-4 lg:flex-row"
+  data-testid="input-and-result"
+>
   <InputAndResultsPayload
     title={translate('workflows.input')}
     content={workflowEvents.input}

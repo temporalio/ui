@@ -66,7 +66,7 @@
         : translate('workflows.pause')}
     </Button>
   </Tooltip>
-  <Tooltip bottomLeft width={200} text="Update this Activity Options.">
+  <Tooltip bottom width={200} text="Update this Activity Options">
     <Button
       variant="secondary"
       size="xs"
@@ -76,7 +76,7 @@
       {translate('common.update')}
     </Button>
   </Tooltip>
-  <Tooltip bottom width={200} text="Reset this Activity.">
+  <Tooltip bottom width={200} text="Reset this Activity">
     <Button
       variant="secondary"
       size="xs"

@@ -80,22 +80,25 @@
     ),
   );
 
-  $inspect('event.classification: ', event.classification);
+  $inspect('classification: ', event.classification);
+
   const eventCategory = cva(
     ['flex flex-1 flex-col overflow-hidden rounded-t-lg pb-2'],
     {
       variants: {
         classification: {
           Failed: 'bg-red-800',
-          Canceled: 'bg-yellow-700',
+          Canceled: 'bg-slate-900/80',
           TimedOut: 'bg-orange-700',
           Completed: 'bg-green-700',
           Terminated: 'bg-gray-300',
           Scheduled: 'bg-slate-900/50',
           Initiated: 'bg-slate-900/50',
           Started: 'bg-slate-900/60',
-          Fired: 'bg-slate-900/70',
-          CancelRequested: 'bg-slate-900/50',
+          Fired: 'bg-slate-900/90',
+          Signaled: 'bg-slate-900/50',
+          CancelRequested: 'bg-slate-900/70',
+          Unspecified: 'bg-slate-900/60',
         },
       },
     },
@@ -131,7 +134,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 gap-2 p-2 md:grid-cols-2 xl:grid-cols-1">
+  <div class="grid grid-cols-1 gap-2 p-2 md:grid-cols-2">
     {#if event?.links?.length}
       {@render eventLinks(event.links)}
     {/if}

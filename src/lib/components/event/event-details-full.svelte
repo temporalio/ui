@@ -32,9 +32,7 @@
   const pendingEvent = $derived(
     group?.pendingActivity || group?.pendingNexusOperation,
   );
-  const showEventGroup = $derived(
-    group && (group.eventList.length > 1 || pendingEvent),
-  );
+  const showEventGroup = $derived(group || pendingEvent);
 
   const groupCategory = cva([''], {
     variants: {
@@ -59,7 +57,6 @@
     },
   });
 
-  $inspect('group.finalClassification: ', group?.finalClassification);
   const title = $derived(
     group ? group.displayName : event ? event.eventType : '',
   );
@@ -74,9 +71,7 @@
     }),
   );
   let status = $derived(group?.finalClassification || group?.classification);
-  const showHeader = $derived(
-    (group && group.eventList.length > 1) || pendingEvent,
-  );
+  const showHeader = $derived(group || pendingEvent);
 
   $effect(() => {
     if (group?.pendingActivity) {
@@ -118,7 +113,7 @@
     class="flex h-full items-center justify-between bg-slate-900/50 text-sm text-white"
   >
     <div
-      class="flex h-full flex-row flex-wrap items-start gap-2 py-1 pl-2 text-base md:items-center md:gap-4"
+      class="flex h-full flex-row flex-wrap items-start gap-2 py-2 pl-2 text-base md:items-center md:gap-4"
     >
       {#if status}
         <WorkflowStatus {status} class="h-6 p-2 text-base" />

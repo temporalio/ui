@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
   import type { Snippet } from 'svelte';
 
   import { page } from '$app/state';
@@ -40,14 +41,30 @@
       page.params.namespace,
     ) && isRunning,
   );
+
+  const pendingStatus = cva(
+    ['flex flex-1 flex-col overflow-hidden rounded-t-lg pb-2'],
+    {
+      variants: {
+        status: {
+          retrying: 'bg-red-800',
+          pending: 'bg-slate-900/50',
+        },
+      },
+    },
+  );
 </script>
 
-<div class="flex flex-1 flex-col overflow-hidden rounded-t-lg bg-slate-900/50">
-  <div class="bg-slate-900/60 p-2 pb-1 text-left">
+<div
+  class={pendingStatus({
+    status: activity.attempt > 1 ? 'retrying' : 'pending',
+  })}
+>
+  <div class="bg-slate-900/80 p-2 pb-1 text-left">
     <div class="flex flex-col items-center justify-between lg:flex-row">
       <div>
         <p class="leading-3">
-          <span class="font-medium"> Pending Activity </span>
+          <span class="font-medium">Pending Activity</span>
         </p>
       </div>
       {#if showActivityCommands}
@@ -174,7 +191,7 @@
 
 {#snippet heartbeat()}
   <div class="leading-3">
-    <p class="text-sm">
+    <p class="text-sm text-white/70">
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
@@ -196,7 +213,7 @@
   <div class="leading-3">
     <div class="flex flex-1 flex-col">
       {#if activity.lastFailure}
-        <p class="text-sm">
+        <p class="text-sm text-white/70">
           {translate('workflows.last-failure')}
         </p>
         {#key activity.attempt}
@@ -217,7 +234,7 @@
     </div>
     {#if activity.lastFailure?.stackTrace}
       <div>
-        <p class="text-sm">
+        <p class="text-sm text-white/70">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock
