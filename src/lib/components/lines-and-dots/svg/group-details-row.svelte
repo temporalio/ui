@@ -56,7 +56,7 @@
           >
         {/snippet}
         {#if childWorkflowStartedEvent}
-          <div class="py-2">
+          <div>
             <div class="surface-primary">
               {#key group.eventList.length}
                 <GraphWidget

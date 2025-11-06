@@ -42,12 +42,21 @@
   );
 </script>
 
-<div class="flex flex-1 flex-col gap-1 p-2">
-  {#if showActivityCommands}
-    <ActivityCommands {activity} class="justify-end" />
-  {/if}
+<div class="flex flex-1 flex-col overflow-hidden rounded-t-lg bg-slate-900/50">
+  <div class="bg-slate-900/60 p-2 pb-1 text-left">
+    <div class="flex flex-col items-center justify-between lg:flex-row">
+      <div>
+        <p class="leading-3">
+          <span class="font-medium"> Pending Activity </span>
+        </p>
+      </div>
+      {#if showActivityCommands}
+        <ActivityCommands {activity} class="justify-end" />
+      {/if}
+    </div>
+  </div>
 
-  <div class="flex w-full flex-col gap-1">
+  <div class="grid grid-cols-1 gap-2 px-2 py-1 md:grid-cols-2">
     {@render detail(translate('workflows.activity-id'), activity.activityId)}
     {#if activity.paused && activity.pauseInfo}
       {@render detail(
@@ -134,7 +143,7 @@
       {/if}
     {/if}
   </div>
-  <div class="flex w-full flex-col gap-1">
+  <div class="flex w-full flex-col gap-1 px-2">
     {#if failed}
       {#if totalPending > 20}
         {@render failuresAccordion()}

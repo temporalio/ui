@@ -1,11 +1,13 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
@@ -13,6 +15,7 @@
   import { format } from '$lib/utilities/format-camel-case';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
     displayLinkType,
     getCodeBlockValue,
@@ -25,7 +28,10 @@
   import MetadataDecoder from './metadata-decoder.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
-  let { event }: { event: WorkflowEvent } = $props();
+  let {
+    event,
+    nextEvent,
+  }: { event: WorkflowEvent; nextEvent?: WorkflowEvent } = $props();
 
   const attributes = $derived(formatAttributes(event));
   const fields = $derived(Object.entries(attributes));
@@ -43,6 +49,16 @@
       ([key, _value]) => displayLinkType(key, attributes) !== 'none',
     ),
   );
+
+  const durationBetweenEvents = (
+    eventA: WorkflowEvent,
+    eventB: WorkflowEvent,
+  ) =>
+    formatDistanceAbbreviated({
+      start: eventA?.eventTime,
+      end: eventB?.eventTime,
+      includeMilliseconds: true,
+    });
 
   const hiddenDetailFields = $derived.by(() => {
     if (event.category === 'activity')
@@ -63,8 +79,34 @@
   );
 </script>
 
-<div class="flex flex-1 flex-col gap-1 p-2">
-  <div class="flex w-full flex-col gap-0.5">
+<div
+  class="flex flex-1 flex-col overflow-hidden rounded-t-lg bg-slate-900/50 pb-2"
+>
+  <div class="bg-slate-900/60 p-2 pb-1 text-left">
+    <div class="flex flex-col items-center justify-between lg:flex-row">
+      <div>
+        <p class="leading-3">
+          <span class="font-mono">{event.id}</span>
+          <span class="font-medium">
+            {event.name}
+          </span>
+        </p>
+        <p class="text-xs text-white/70">
+          {formatDate(event.eventTime, $timeFormat, {
+            relative: $relativeTime,
+          })}
+        </p>
+      </div>
+      {#if nextEvent}
+        <Badge type="default" class="flex items-center gap-1">
+          <Icon name="clock" />
+          {durationBetweenEvents(event, nextEvent) || '0ms'}
+        </Badge>
+      {/if}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-2 px-2 md:grid-cols-2">
     {#if event?.links?.length}
       {@render eventLinks(event.links)}
     {/if}
@@ -79,7 +121,7 @@
     {/each}
   </div>
   {#if payloadFields.length}
-    <div class="flex w-full flex-col gap-1">
+    <div class="flex w-full flex-col gap-0.5 px-2">
       {#each payloadFields as [key, value] (key)}
         {@render payloads(key, value)}
       {/each}
@@ -90,7 +132,7 @@
 {#snippet eventLink(link: ELink)}
   {@const href = getEventLinkHref(link)}
   {@const value = href.split('workflows/')?.[1] || href}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">
       {translate('nexus.link')}
     </p>
@@ -106,7 +148,7 @@
 
 {#snippet eventNamespaceLink(link: ELink)}
   {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">
       {translate('nexus.link-namespace')}
     </p>
@@ -130,7 +172,7 @@
 {/snippet}
 
 {#snippet eventSummary(value: Payload)}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">Summary</p>
     <p class="whitespace-pre-line">
       <MetadataDecoder
@@ -148,7 +190,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   {#if stackTrace}
-    <div>
+    <div class="leading-3">
       <p class="mb-1 text-sm text-white/70">
         {translate('workflows.call-stack-tab')}
       </p>
@@ -161,8 +203,7 @@
       />
     </div>
   {/if}
-
-  <div>
+  <div class="leading-3">
     <p class="mb-1 text-sm text-white/70">
       {format(key)}
     </p>
@@ -207,7 +248,7 @@
 {/snippet}
 
 {#snippet link(key, value)}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">
       {format(key)}
     </p>
@@ -227,7 +268,7 @@
 {/snippet}
 
 {#snippet details(key, value)}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">
       {format(key)}
     </p>
