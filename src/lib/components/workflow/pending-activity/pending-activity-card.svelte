@@ -158,7 +158,7 @@
 </div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">
       {label}
     </p>
@@ -173,7 +173,7 @@
 {/snippet}
 
 {#snippet heartbeat()}
-  <div>
+  <div class="leading-3">
     <p class="text-sm">
       {translate('workflows.heartbeat-details')}
     </p>
@@ -193,7 +193,7 @@
 {/snippet}
 
 {#snippet failuresCodeBlock()}
-  <div class="flex flex-col gap-2">
+  <div class="leading-3">
     <div class="flex flex-1 flex-col">
       {#if activity.lastFailure}
         <p class="text-sm">
@@ -246,7 +246,7 @@
 {/snippet}
 
 {#snippet nextRetry(timeDifference)}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">
       {translate('workflows.next-retry')}
     </p>
