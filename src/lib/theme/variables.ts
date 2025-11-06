@@ -117,7 +117,7 @@ export const variables = {
     dark: 'black',
   },
   '--color-surface-code-block': {
-    light: 'slate.50',
+    light: 'code-white',
     dark: 'code-black',
   },
   // Interactive

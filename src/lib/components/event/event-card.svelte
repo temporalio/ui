@@ -147,6 +147,21 @@
 {#snippet payloads(key, value)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
+  {#if stackTrace}
+    <div>
+      <p class="mb-1 text-sm text-white/70">
+        {translate('workflows.call-stack-tab')}
+      </p>
+      <CodeBlock
+        content={stackTrace}
+        language="text"
+        maxHeight={320}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </div>
+  {/if}
+
   <div>
     <p class="mb-1 text-sm text-white/70">
       {format(key)}
@@ -189,20 +204,6 @@
       </PayloadDecoder>
     {/if}
   </div>
-  {#if stackTrace}
-    <div>
-      <p class="mb-1 text-sm text-white/70">
-        {translate('workflows.call-stack-tab')}
-      </p>
-      <CodeBlock
-        content={stackTrace}
-        language="text"
-        maxHeight={320}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
-    </div>
-  {/if}
 {/snippet}
 
 {#snippet link(key, value)}

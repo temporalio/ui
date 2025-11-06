@@ -5,6 +5,7 @@
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
+  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -110,8 +111,8 @@
     {/if}
   </div>
 </div>
-<header class="flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
+<header class="flex flex-col gap-3">
+  <div class="flex flex-col items-center justify-between gap-3 xl:flex-row">
     <div
       class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
     >
@@ -146,7 +147,7 @@
             content={workflowId}
             clickAllToCopy
             container-class="w-full"
-            class="overflow-hidden text-ellipsis text-left"
+            class="overflow-hidden text-ellipsis text-left leading-tight"
           />
         </h1>
       </div>
@@ -193,6 +194,7 @@
       </Alert>
     </div>
   {/if}
+  <InputAndResults />
   <Tabs>
     <TabList label="workflow detail">
       <Tab
