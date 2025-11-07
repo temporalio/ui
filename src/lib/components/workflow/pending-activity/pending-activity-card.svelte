@@ -142,6 +142,44 @@
           )}
         {/if}
       {/if}
+      {#if activity.activityOptions}
+        {@render detail(
+          translate('common.task-queue'),
+          activity.activityOptions.taskQueue.name,
+        )}
+        {@render detail(
+          translate('activities.start-to-close-timeout'),
+          formatDuration(activity.activityOptions.startToCloseTimeout),
+        )}
+        {@render detail(
+          translate('activities.schedule-to-close-timeout'),
+          formatDuration(activity.activityOptions.scheduleToCloseTimeout),
+        )}
+        {@render detail(
+          translate('activities.schedule-to-start-timeout'),
+          formatDuration(activity.activityOptions.scheduleToStartTimeout),
+        )}
+        {@render detail(
+          translate('activities.heartbeat-timeout'),
+          formatDuration(activity.activityOptions.heartbeatTimeout),
+        )}
+        {@render detail(
+          translate('activities.retry-policy-initial-interval'),
+          formatDuration(activity.activityOptions.retryPolicy.initialInterval),
+        )}
+        {@render detail(
+          translate('activities.retry-policy-backoff-coefficient'),
+          activity.activityOptions.retryPolicy.backoffCoefficient,
+        )}
+        {@render detail(
+          translate('activities.retry-policy-maximum-interval'),
+          formatDuration(activity.activityOptions.retryPolicy.maximumInterval),
+        )}
+        {@render detail(
+          translate('activities.retry-policy-maximum-attempts'),
+          activity.activityOptions.retryPolicy.maximumAttempts,
+        )}
+      {/if}
     </div>
     <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
@@ -159,7 +197,7 @@
 </div>
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flex items-start gap-4">
+  <div class="flex items-center gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {label}
     </p>

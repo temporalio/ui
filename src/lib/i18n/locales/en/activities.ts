@@ -16,4 +16,13 @@ export const Strings = {
   'unpause-all-activity-types': 'Unpause all {{type}} runs',
   'reset-heartbeat-details': 'Reset Heartbeat Details (optional)',
   'reset-success': 'Activity {{activityId}} has been reset successfully.',
+  'activity-options': 'Activity Options',
+  'start-to-close-timeout': 'Start to Close Timeout',
+  'schedule-to-start-timeout': 'Schedule to Start Timeout',
+  'schedule-to-close-timeout': 'Schedule to Close Timeout',
+  'heartbeat-timeout': 'Heartbeat Timeout',
+  'retry-policy-initial-interval': 'Retry Policy Initial Interval',
+  'retry-policy-backoff-coefficient': 'Retry Policy Backoff Coefficient',
+  'retry-policy-maximum-interval': 'Retry Policy Maximum Interval',
+  'retry-policy-maximum-attempts': 'Retry Policy Maximum Attempts',
 };
