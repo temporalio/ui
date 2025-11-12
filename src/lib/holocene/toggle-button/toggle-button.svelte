@@ -52,7 +52,7 @@
   {...$$restProps}
 >
   {#if $$restProps.leadingIcon}
-    <span class="hidden md:block"><slot /></span>
+    <span class="hidden lg:block"><slot /></span>
   {:else}
     <slot />
   {/if}

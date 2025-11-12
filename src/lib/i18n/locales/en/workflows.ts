@@ -80,6 +80,7 @@ export const Strings = {
   compact: 'Compact',
   json: 'JSON',
   download: 'Download',
+  'download-history': 'Download History',
   'workflow-actions': 'Workflow Actions',
   'more-actions': 'More Actions',
   'reset-disabled-unauthorized':
@@ -122,6 +123,7 @@ export const Strings = {
   'reset-success-alert-title': 'This Workflow has been reset',
   'reset-success-alert-description':
     'You can find the resulting Workflow Execution <1>here</1>.',
+  'timeline-tab': 'Timeline',
   'history-tab': 'History',
   'workflow-history': 'Workflow History',
   'workers-tab': 'Workers',

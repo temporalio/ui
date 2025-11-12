@@ -1,71 +1,47 @@
 <script lang="ts">
-  import { beforeNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
-  import EventSummary from '$lib/components/event/event-summary.svelte';
+  import { beforeNavigate } from '$app/navigation';
+  import { page } from '$app/state';
+
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
-  import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import { groupEvents } from '$lib/models/event-groups';
   import { clearActives } from '$lib/stores/active-events';
-  import {
-    eventFilterSort,
-    eventViewType,
-    minimizeEventView,
-  } from '$lib/stores/event-view';
-  import {
-    currentEventHistory,
-    filteredEventHistory,
-    pauseLiveUpdates,
-  } from '$lib/stores/events';
+  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import { currentEventHistory, pauseLiveUpdates } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
-  $: pendingActivities = workflow?.pendingActivities;
-  $: pendingNexusOperations = workflow?.pendingNexusOperations;
-  $: reverseSort = $eventFilterSort === 'descending';
-  $: compact = $eventViewType === 'compact';
+  let { children, title }: { children: Snippet; title: Snippet } = $props();
 
-  $: ascendingGroups = groupEvents(
-    $filteredEventHistory,
-    'ascending',
-    pendingActivities,
-    pendingNexusOperations,
+  const workflow = $derived($workflowRun.workflow);
+  const reverseSort = $derived($eventFilterSort === 'descending');
+  const compact = $derived($eventViewType === 'compact');
+  const historyTablePage = $derived(page.url.pathname.endsWith('history'));
+  const workflowTaskFailedError = $derived(
+    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
   );
-
-  $: groups = reverseSort ? [...ascendingGroups].reverse() : ascendingGroups;
-  $: history = reverseSort
-    ? [...$filteredEventHistory].reverse()
-    : $filteredEventHistory;
-
-  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-    $currentEventHistory,
-    'ascending',
-  );
-
-  $: $eventViewType, clearActives();
 
   beforeNavigate(() => {
     clearActives();
   });
 
-  $: {
+  $effect(() => {
+    eventViewType;
+    clearActives();
+  });
+
+  $effect(() => {
     if (!workflow.isRunning && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
-  }
-
-  let showDownloadPrompt = false;
+  });
 
   const onSort = () => {
     if (reverseSort) {
@@ -91,12 +67,12 @@
 </div>
 <div class="relative pb-24">
   <div
-    class="surface-background flex flex-wrap items-center justify-between gap-2 border-b border-subtle py-2 xl:gap-8"
-    class:sticky-header={!$minimizeEventView}
+    class={merge(
+      'surface-background sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 py-2 md:top-12 xl:gap-8',
+      !historyTablePage && 'border-b border-subtle',
+    )}
   >
-    <h2>
-      {translate('workflows.event-history')}
-    </h2>
+    {@render title()}
     <div class="flex items-center gap-2">
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
@@ -107,21 +83,7 @@
             size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
           >
         {/if}
-        <Tooltip
-          text={$minimizeEventView
-            ? 'Timeline and Event History are collapsed to minimized height'
-            : 'Timeline and Event History are expanded to full height'}
-          top
-        >
-          <ToggleButton
-            leadingIcon={$minimizeEventView ? 'minimize' : 'expand'}
-            data-testid="expandAll"
-            size="sm"
-            on:click={() => ($minimizeEventView = !$minimizeEventView)}
-            >{$minimizeEventView ? 'Minimized' : 'Expanded'}</ToggleButton
-          >
-        </Tooltip>
-        <EventTypeFilter {compact} minimized={$minimizeEventView} />
+        <EventTypeFilter {compact} />
         <ToggleButton
           disabled={!workflow.isRunning}
           leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
@@ -132,36 +94,33 @@
         >
           {$pauseLiveUpdates ? 'Unfreeze' : 'Freeze'}
         </ToggleButton>
-        <ToggleButton
-          data-testid="download"
-          leadingIcon="download"
-          size="sm"
-          on:click={() => (showDownloadPrompt = true)}
-        >
-          {translate('common.download')}
-        </ToggleButton>
       </ToggleButtons>
+      {#if historyTablePage}
+        <ToggleButtons>
+          <ToggleButton
+            active={$eventViewType === 'feed'}
+            data-testid="feed"
+            leadingIcon="feed"
+            size="sm"
+            on:click={() => ($eventViewType = 'feed')}>All</ToggleButton
+          >
+          <ToggleButton
+            active={compact}
+            data-testid="compact"
+            leadingIcon="compact"
+            size="sm"
+            on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
+          >
+          <ToggleButton
+            active={$eventViewType === 'json'}
+            data-testid="json"
+            leadingIcon="json"
+            size="sm"
+            on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
+          >
+        </ToggleButtons>
+      {/if}
     </div>
   </div>
-  <div class="flex w-full flex-col">
-    <TimelineGraph
-      {workflow}
-      {groups}
-      error={Boolean(workflowTaskFailedError)}
-      viewportHeight={$minimizeEventView ? 360 : undefined}
-    />
-    <EventSummary {groups} {history} minimized={$minimizeEventView} />
-  </div>
+  {@render children()}
 </div>
-<DownloadEventHistoryModal
-  bind:open={showDownloadPrompt}
-  {namespace}
-  workflowId={workflow.id}
-  runId={workflow.runId}
-/>
-
-<style lang="postcss">
-  .sticky-header {
-    @apply sticky top-0 z-30 md:top-12;
-  }
-</style>

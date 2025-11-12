@@ -35,10 +35,9 @@
   export let updating = false;
   export let loading = false;
   export let compact = false;
-  export let minimized = true;
   export let hoveredEventId: string | undefined = undefined;
 
-  $: showGraph = !minimized && !compact;
+  $: showGraph = !compact;
 
   $: initialItem = $fullEventHistory?.[0];
 
@@ -74,10 +73,7 @@
 </script>
 
 <div class="flex">
-  <div
-    class="pt-9"
-    style="max-height: {minimized ? 'calc(100vh - 200px)' : '20000px'}"
-  >
+  <div class="pt-9" style="max-height: 20000px;">
     {#if showGraph}
       <HistoryGraph {groups} history={paginatedHistory(items)} />
     {/if}
@@ -90,7 +86,7 @@
     {updating}
     items={filteredForStatus(items)}
     let:visibleItems
-    maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
+    maxHeight="20000px"
   >
     <TableHeaderRow slot="headers" class="!h-8">
       {#each columns as column}

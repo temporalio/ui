@@ -1,12 +1,12 @@
 <script lang="ts">
-  import EventSummary from '$lib/components/event/event-summary.svelte';
+  import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import { workflowHistoryInformation } from '$lib/runes/workflow-history-information.svelte';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { filteredEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
 
   const workflow = $derived($workflowRun.workflow);
-  const { groups, history } = $derived(
+  const { groups } = $derived(
     workflowHistoryInformation(
       workflow,
       $filteredEventHistory,
@@ -15,4 +15,4 @@
   );
 </script>
 
-<EventSummary {groups} {history} />
+<TimelineGraph {workflow} {groups} />

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fade, slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   import type {
     EventGroup,
@@ -28,9 +28,8 @@
   export let y = 0;
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
-  export let viewportHeight: number | undefined;
+  export let viewportHeight: number | undefined = undefined;
   export let readOnly = false;
-  export let error: boolean = false;
 
   const { height, gutter, radius } = TimelineConfig;
 
@@ -78,10 +77,10 @@
       class:invisible={!!$activeGroups.length}
     >
       <div class="flex w-full justify-between text-xs">
-        <p class="w-60 -translate-x-24 rotate-90" in:fade out:slide>
+        <p class="w-60 -translate-x-24 rotate-90" in:fade>
           {formatDate(startTime, $timeFormat)}
         </p>
-        <p class="w-60 translate-x-24 rotate-90" in:fade out:slide>
+        <p class="w-60 translate-x-24 rotate-90" in:fade>
           {formatDate(endTime, $timeFormat)}
         </p>
       </div>
@@ -93,7 +92,6 @@
       height={canvasHeight}
       width={canvasWidth}
       class="-mt-4"
-      class:error
     >
       <Line
         startPoint={[gutter, 0]}
@@ -134,9 +132,3 @@
     </svg>
   </EndTimeInterval>
 </div>
-
-<style lang="postcss">
-  .error {
-    @apply bg-danger;
-  }
-</style>

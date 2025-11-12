@@ -15,14 +15,18 @@
   class="flex flex-1 flex-col gap-4 lg:flex-row"
   data-testid="input-and-result"
 >
-  <InputAndResultsPayload
-    title={translate('workflows.input')}
-    content={workflowEvents.input}
-    {isRunning}
-  />
-  <InputAndResultsPayload
-    title={translate('workflows.result')}
-    content={workflowEvents.results}
-    {isRunning}
-  />
+  <div class="w-full lg:w-1/2">
+    <InputAndResultsPayload
+      title={translate('workflows.input')}
+      content={workflowEvents.input}
+      {isRunning}
+    />
+  </div>
+  <div class="w-full lg:w-1/2">
+    <InputAndResultsPayload
+      title={translate('workflows.result')}
+      content={workflowEvents.results}
+      {isRunning}
+    />
+  </div>
 </div>

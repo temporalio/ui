@@ -28,6 +28,8 @@
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowUpdateEnabled } from '$lib/utilities/workflow-update-enabled';
 
+  import DownloadEventHistoryModal from './workflow/download-event-history-modal.svelte';
+
   interface Props {
     workflow: WorkflowExecution;
     namespace: string;
@@ -45,6 +47,7 @@
   let resetConfirmationModalOpen = $state(false);
   let signalConfirmationModalOpen = $state(false);
   let updateConfirmationModalOpen = $state(false);
+  let showDownloadPrompt = $state(false);
 
   let coreUser = coreUserStore();
 
@@ -207,6 +210,21 @@
           >
             {translate('workflows.start-workflow-like-this-one')}
           </MenuItem>
+          <MenuDivider />
+          <MenuItem
+            on:click={() => (showDownloadPrompt = true)}
+            data-testid="download"
+          >
+            {translate('workflows.download-history')}
+          </MenuItem>
+        {:else}
+          <MenuDivider />
+          <MenuItem
+            on:click={() => (showDownloadPrompt = true)}
+            data-testid="download"
+          >
+            {translate('workflows.download-history')}
+          </MenuItem>
         {/if}
       </Menu>
     </MenuContainer>
@@ -253,6 +271,14 @@
             {translate('workflows.terminate-latest')}
           </MenuItem>
         {/if}
+        <MenuDivider />
+
+        <MenuItem
+          on:click={() => (showDownloadPrompt = true)}
+          data-testid="download"
+        >
+          {translate('workflows.download-history')}
+        </MenuItem>
       </Menu>
     </MenuContainer>
   {/if}
@@ -302,3 +328,10 @@
     bind:open={terminateConfirmationModalOpen}
   />
 {/if}
+
+<DownloadEventHistoryModal
+  bind:open={showDownloadPrompt}
+  {namespace}
+  workflowId={workflow.id}
+  runId={workflow.runId}
+/>

@@ -32,6 +32,7 @@
   import {
     routeForCallStack,
     routeForEventHistory,
+    routeForEventHistoryTable,
     routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
@@ -196,14 +197,27 @@
   <Tabs>
     <TabList label="workflow detail">
       <Tab
-        label={translate('workflows.history-tab')}
-        id="history-tab"
+        label={translate('workflows.timeline-tab')}
+        id="timeline-tab"
         href={routeForEventHistory({
           ...routeParameters,
         })}
         active={pathMatches(
           page.url.pathname,
           routeForEventHistory({
+            ...routeParameters,
+          }),
+        )}
+      />
+      <Tab
+        label={translate('workflows.history-tab')}
+        id="history-tab"
+        href={routeForEventHistoryTable({
+          ...routeParameters,
+        })}
+        active={pathMatches(
+          page.url.pathname,
+          routeForEventHistoryTable({
             ...routeParameters,
           }),
         )}

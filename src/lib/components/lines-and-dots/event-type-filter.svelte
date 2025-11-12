@@ -1,10 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { page } from '$app/stores';
-
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
@@ -18,41 +15,30 @@
   import { clearActiveGroups } from '$lib/stores/active-events';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
-  import { temporalVersion } from '$lib/stores/versions';
-  import { nexusEnabled } from '$lib/utilities/nexus-enabled';
-  import { isVersionNewer } from '$lib/utilities/version-check';
 
   import { CategoryIcon } from './constants';
 
-  export let compact = false;
-  export let minimized = true;
+  type Props = {
+    compact: boolean;
+  };
+  let { compact }: Props = $props();
 
   let open = writable(false);
 
-  $: defaultOptions = compact
-    ? compactEventTypeOptions.map((o) => o.value)
-    : allEventTypeOptions.map((o) => o.value);
+  const defaultOptions = $derived(
+    compact
+      ? compactEventTypeOptions.map((o) => o.value)
+      : allEventTypeOptions.map((o) => o.value),
+  );
 
-  $: options = [
+  const options = $derived([
     ...(compact ? compactEventTypeOptions : allEventTypeOptions).map((o) => ({
       ...o,
       label: translate(o.label),
       icon: CategoryIcon[o.value],
       description: translate(o.description),
     })),
-  ];
-
-  $: {
-    if (isVersionNewer('1.21.0', $temporalVersion)) {
-      options = options.filter(({ value }) => value !== 'update');
-    }
-  }
-
-  $: {
-    if (!nexusEnabled($page.data.systemInfo?.capabilities)) {
-      options = options.filter(({ value }) => value !== 'nexus');
-    }
-  }
+  ]);
 
   const onOptionClick = ({ value }) => {
     clearActiveGroups();
@@ -61,24 +47,23 @@
       : [...$eventTypeFilter, value];
   };
 
-  $: filterActive = $eventTypeFilter.length < defaultOptions.length;
+  const filterActive = $derived(
+    $eventTypeFilter.length < defaultOptions.length,
+  );
 </script>
 
 <MenuContainer {open}>
   <MenuButton controls="status-menu" size="sm">
-    <div
-      slot="leading"
-      class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
-      class:bg-interactive={filterActive}
+    <span class="hidden text-sm md:block"
+      >{translate('events.event-types')} · {filterActive || $eventStatusFilter
+        ? 'Filtered'
+        : 'All'}</span
     >
-      <Icon name="filter" class={filterActive && 'pt-0.5 text-white'} />
-    </div>
-    <span class="hidden text-sm md:block">{translate('common.filter')}</span>
   </MenuButton>
   <Menu
     id="event-type-menu"
     keepOpen
-    position={minimized ? 'top-right' : 'right'}
+    position="right"
     class="w-[220px] md:w-[360px]"
   >
     <MenuItem
