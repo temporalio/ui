@@ -15,5 +15,6 @@ export function getCoreContext() {
 }
 
 export function getIdentity() {
-  return getCoreContext().getUserIdentifier();
+  const email = getCoreContext().getUserIdentifier();
+  return email ? `${email} - webui` : 'webui';
 }
