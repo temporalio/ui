@@ -59,83 +59,75 @@ describe('formatDate', () => {
   });
 
   it('should format relative local time', () => {
-    expect(formatDate(date, 'local', { relative: true })).toContain('ago');
+    expect(formatDate(date, 'local', true)).toContain('ago');
     const currentDate = new Date();
     const futureDate = currentDate.setDate(currentDate.getDate() + 1);
-    expect(formatDate(futureDate, 'local', { relative: true })).toContain(
-      'from now',
-    );
+    expect(formatDate(futureDate, 'local', true)).toContain('from now');
   });
 
   it('should not format other timezones as relative', () => {
-    expect(formatDate(date, 'UTC', { relative: true })).toEqual(
-      '2022-04-13 UTC 16:29:35.63',
-    );
+    expect(formatDate(date, 'UTC', true)).toEqual('2022-04-13 UTC 16:29:35.63');
   });
 
   it('should format relative local time with a custom label', () => {
     expect(
-      formatDate(date, 'local', { relative: true, relativeLabel: 'custom' }),
+      formatDate(date, 'local', true, 'medium', { relativeLabel: 'custom' }),
     ).toContain('custom');
   });
 
   it('should format relative time with days instead of months for past dates if flexibleUnits is not enabled', () => {
     const currentDate = new Date();
     const pastDate = currentDate.setDate(currentDate.getDate() - 90);
-    let formattedDate = formatDate(pastDate, 'local', {
-      relative: true,
+    let formattedDate = formatDate(pastDate, 'local', true, 'medium', {
       flexibleUnits: true,
     });
     expect(formattedDate).toEqual('3 months ago');
 
-    formattedDate = formatDate(pastDate, 'local', { relative: true });
+    formattedDate = formatDate(pastDate, 'local', true);
     expect(formattedDate).toEqual('90 days ago');
   });
 
   it('should format relative time with days instead of months for future dates if flexibleUnits is not enabled', () => {
     const currentDate = new Date();
     const futureDate = currentDate.setDate(currentDate.getDate() + 90);
-    let formattedDate = formatDate(futureDate, 'local', {
-      relative: true,
+    let formattedDate = formatDate(futureDate, 'local', true, 'medium', {
       flexibleUnits: true,
     });
     expect(formattedDate).toEqual('3 months from now');
 
-    formattedDate = formatDate(futureDate, 'local', { relative: true });
+    formattedDate = formatDate(futureDate, 'local', true);
     expect(formattedDate).toEqual('90 days from now');
   });
 
   it('should not format relative time with days if less than a day for past dates even if flexibleUnits is enabled', () => {
     const currentDate = new Date();
     const pastDate = currentDate.setHours(currentDate.getHours() - 23);
-    let formattedDate = formatDate(pastDate, 'local', {
-      relative: true,
+    let formattedDate = formatDate(pastDate, 'local', true, 'medium', {
       flexibleUnits: true,
     });
     expect(formattedDate).toEqual('23 hours ago');
 
-    formattedDate = formatDate(pastDate, 'local', { relative: true });
+    formattedDate = formatDate(pastDate, 'local', true);
     expect(formattedDate).toEqual('23 hours ago');
   });
 
   it('should not format relative time with days if less than a day for future dates even if flexibleUnits is enabled', () => {
     const currentDate = new Date();
     const futureDate = currentDate.setHours(currentDate.getHours() + 23);
-    let formattedDate = formatDate(futureDate, 'local', {
-      relative: true,
+    let formattedDate = formatDate(futureDate, 'local', true, 'medium', {
       flexibleUnits: true,
     });
     expect(formattedDate).toEqual('23 hours from now');
 
-    formattedDate = formatDate(futureDate, 'local', { relative: true });
+    formattedDate = formatDate(futureDate, 'local', true);
     expect(formattedDate).toEqual('23 hours from now');
   });
 
   it('should shorten format for local and other timezones', () => {
-    expect(formatDate(date, 'local', { abbrFormat: true })).toEqual(
+    expect(formatDate(date, 'local', false, 'abbreviated')).toEqual(
       '2022-04-13 16:29:35 PM',
     );
-    expect(formatDate(date, 'utc', { abbrFormat: true })).toEqual(
+    expect(formatDate(date, 'utc', false, 'abbreviated')).toEqual(
       '2022-04-13 16:29:35 PM',
     );
   });
@@ -143,9 +135,9 @@ describe('formatDate', () => {
   it('should shorten format without seconds if there are none for local and other timezones', () => {
     const dateWithoutSeconds = '2022-04-13T16:29:00.630571Z';
     expect(
-      formatDate(dateWithoutSeconds, 'local', { abbrFormat: true }),
+      formatDate(dateWithoutSeconds, 'local', false, 'abbreviated'),
     ).toEqual('2022-04-13 16:29 PM');
-    expect(formatDate(dateWithoutSeconds, 'utc', { abbrFormat: true })).toEqual(
+    expect(formatDate(dateWithoutSeconds, 'utc', false, 'abbreviated')).toEqual(
       '2022-04-13 16:29 PM',
     );
   });

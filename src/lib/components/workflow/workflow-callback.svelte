@@ -28,16 +28,16 @@
     formatDate(
       callback.lastAttemptCompleteTime,
       $timeFormat,
+      $relativeTime,
       $timestampFormat,
-      { relative: $relativeTime },
     ),
   );
   const nextTime = $derived(
     formatDate(
       callback.nextAttemptScheduleTime,
       $timeFormat,
+      $relativeTime,
       $timestampFormat,
-      { relative: $relativeTime },
     ),
   );
   const failure = $derived(callback?.lastAttemptFailure?.message);

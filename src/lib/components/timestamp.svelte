@@ -16,13 +16,12 @@
 
   type T = $$Generic<keyof SvelteHTMLElements>;
   type DateTime = ValidTime | null | undefined;
-  type Options = Omit<FormatDateOptions, 'relative'>;
 
   export { timestamp };
 
   type Props = SvelteHTMLElements[T] & {
     dateTime: DateTime;
-    options?: Options;
+    options?: FormatDateOptions;
     as?: T;
     fallback?: string;
     leading?: Snippet<[]>;
@@ -39,11 +38,8 @@
   }: Props = $props();
 </script>
 
-{#snippet timestamp(dateTime: DateTime, options: Options)}
-  {formatDate(dateTime, $timeFormat, $timestampFormat, {
-    relative: $relativeTime,
-    ...options,
-  })}
+{#snippet timestamp(dateTime: DateTime, options: FormatDateOptions)}
+  {formatDate(dateTime, $timeFormat, $relativeTime, $timestampFormat, options)}
 {/snippet}
 
 {#if as}

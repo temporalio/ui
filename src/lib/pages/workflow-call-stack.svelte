@@ -23,10 +23,8 @@
     formatDate(
       $refresh ? new Date($refresh) : new Date(),
       $timeFormat,
+      $relativeTime,
       'abbreviated',
-      {
-        relative: $relativeTime,
-      },
     ),
   );
 

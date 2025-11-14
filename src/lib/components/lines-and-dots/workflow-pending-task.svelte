@@ -2,7 +2,11 @@
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timeFormat, timestampFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
   import { formatDate } from '$lib/utilities/format-date';
 
@@ -25,6 +29,7 @@
         >{formatDate(
           pendingTask.originalScheduledTime,
           $timeFormat,
+          $relativeTime,
           $timestampFormat,
         )}</Badge
       >
@@ -35,6 +40,7 @@
         >{formatDate(
           pendingTask.scheduledTime,
           $timeFormat,
+          $relativeTime,
           $timestampFormat,
         )}</Badge
       >
@@ -45,6 +51,7 @@
         >{formatDate(
           pendingTask.startedTime,
           $timeFormat,
+          $relativeTime,
           $timestampFormat,
         )}</Badge
       >

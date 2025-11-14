@@ -109,12 +109,12 @@ export const formatDateTimeRange = (
   return `${conditon.toLowerCase()} ${formatDate(
     start.replace(/"/g, ''),
     format,
+    relative,
     'abbreviated',
-    { relative },
   )} ${operator.toLowerCase()} ${formatDate(
     end.replace(/"/g, ''),
     format,
+    relative,
     'abbreviated',
-    { relative },
   )}`;
 };

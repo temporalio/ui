@@ -174,9 +174,7 @@
 
     if (isDateTimeFilter(filter)) {
       if (filter.customDate) return value.split('BETWEEN')[1];
-      return formatDate(value, $timeFormat, 'abbreviated', {
-        relative: true,
-      });
+      return formatDate(value, $timeFormat, true, 'abbreviated');
     }
 
     if (isTextFilter(filter)) {

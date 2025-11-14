@@ -8,9 +8,10 @@ type TimeFormatTypes = 'relative' | 'absolute';
 
 export const timestampFormats = {
   short: 'do MMM yyyy H:mm:ss.SS',
-  medium: 'yyyy-MM-dd HH:mm:ss.SS z',
+  medium: 'yyyy-MM-dd z HH:mm:ss.SS',
   long: 'MMMM do yyyy, hh:mm:ss.SS a z',
-  abbreviated: 'yyyy-MM-dd HH:mm:ss',
+  abbreviated: 'yyyy-MM-dd HH:mm:ss a',
+  abbreviatedWithoutSeconds: 'yyyy-MM-dd HH:mm a',
 } as const;
 
 export type TimestampFormat = keyof typeof timestampFormats;

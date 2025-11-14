@@ -21,9 +21,12 @@
     />
     <WorkflowDetail
       title={translate('deployments.rollout-started')}
-      content={formatDate(version.createTime, $timeFormat, $timestampFormat, {
-        relative: $relativeTime,
-      })}
+      content={formatDate(
+        version.createTime,
+        $timeFormat,
+        $relativeTime,
+        $timestampFormat,
+      )}
     />
   </div>
   <div class="flex w-full flex-col gap-2 lg:w-1/3 xl:w-1/4">

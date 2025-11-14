@@ -64,10 +64,8 @@
           formatDate(
             operation.lastAttemptCompleteTime,
             $timeFormat,
+            $relativeTime,
             $timestampFormat,
-            {
-              relative: $relativeTime,
-            },
           ),
         )}
       {/if}
@@ -80,9 +78,12 @@
       {#if operation.scheduledTime}
         {@render detail(
           translate('workflows.scheduled-time'),
-          formatDate(operation.scheduledTime, $timeFormat, $timestampFormat, {
-            relative: $relativeTime,
-          }),
+          formatDate(
+            operation.scheduledTime,
+            $timeFormat,
+            $relativeTime,
+            $timestampFormat,
+          ),
         )}
       {/if}
       {#if operation.scheduleToCloseTimeout}
@@ -135,9 +136,9 @@
       {formatDate(
         operation.nextAttemptScheduleTime,
         $timeFormat,
+        $relativeTime,
         $timestampFormat,
         {
-          relative: $relativeTime,
           relativeLabel: '',
         },
       )}

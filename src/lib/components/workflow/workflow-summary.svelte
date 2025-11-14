@@ -27,17 +27,15 @@
   $: startTimestamp = formatDate(
     workflow?.startTime,
     $timeFormat,
+    $relativeTime,
     $timestampFormat,
-    { relative: $relativeTime },
   );
 
   $: endTimestamp = formatDate(
     workflow?.endTime,
     $timeFormat,
+    $relativeTime,
     $timestampFormat,
-    {
-      relative: $relativeTime,
-    },
   );
 </script>
 

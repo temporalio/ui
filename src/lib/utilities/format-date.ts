@@ -18,7 +18,6 @@ import {
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
 export type FormatDateOptions = {
-  relative?: boolean;
   relativeLabel?: string;
   flexibleUnits?: boolean;
 };
@@ -26,6 +25,7 @@ export type FormatDateOptions = {
 export function formatDate(
   date: ValidTime | undefined | null,
   timeFormat: TimeFormat = 'UTC',
+  relative: boolean = false,
   timestampFormat: TimestampFormat = 'medium',
   options: FormatDateOptions = {},
 ): string {
@@ -39,14 +39,18 @@ export function formatDate(
     const currentDate = Date.now();
     const isFutureDate = new Date(date).getTime() - currentDate > 0;
     const {
-      relative = false,
       relativeLabel = isFutureDate ? 'from now' : 'ago',
       flexibleUnits = false,
     } = options;
 
     const parsed = parseJSON(new Date(date));
 
-    const format = timestampFormats[timestampFormat];
+    const format =
+      timestampFormat === 'abbreviated'
+        ? parsed.getSeconds()
+          ? timestampFormats.abbreviated
+          : timestampFormats.abbreviatedWithoutSeconds
+        : timestampFormats[timestampFormat];
 
     if (timeFormat === 'local') {
       if (relative)

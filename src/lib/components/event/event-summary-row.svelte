@@ -163,15 +163,21 @@
   );
 
   const eventTime = $derived(
-    formatDate(currentEvent?.eventTime, $timeFormat, $timestampFormat, {
-      relative: $relativeTime,
-    }),
+    formatDate(
+      currentEvent?.eventTime,
+      $timeFormat,
+      $relativeTime,
+      $timestampFormat,
+    ),
   );
 
   const abbrEventTime = $derived(
-    formatDate(currentEvent?.eventTime, $timeFormat, 'abbreviated', {
-      relative: $relativeTime,
-    }),
+    formatDate(
+      currentEvent?.eventTime,
+      $timeFormat,
+      $relativeTime,
+      'abbreviated',
+    ),
   );
 
   const onLinkClick = (event) => {
