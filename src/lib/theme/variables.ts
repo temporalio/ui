@@ -173,6 +173,7 @@ export const variables = {
     light: 'indigo.100',
     dark: 'slate.900',
   },
+  // Environment Surfaces
   '--color-surface-development': {
     light: 'green.700',
     dark: 'green.700',

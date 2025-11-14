@@ -77,7 +77,7 @@
   <div class="self-end">
     {@render bottom?.()}
     <div
-      class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-300"
+      class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-100"
     >
       <span class="sr-only">{translate('common.version')}</span>
       {version}
@@ -96,9 +96,5 @@
 
   .test {
     @apply surface-test;
-  }
-
-  .production {
-    @apply surface-black;
   }
 </style>

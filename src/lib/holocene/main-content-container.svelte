@@ -1,10 +1,21 @@
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  type Props = {
+    children: Snippet;
+    main: Snippet;
+    footer: Snippet;
+  };
+  let { children, main, footer }: Props = $props();
+</script>
+
 <div
   id="content-wrapper"
   class="relative h-screen w-max flex-auto overflow-auto"
 >
-  <slot />
+  {@render children()}
   <main id="content" class="pb-16 md:pb-0">
-    <slot name="main" />
+    {@render main()}
   </main>
-  <slot name="footer" />
+  {@render footer()}
 </div>

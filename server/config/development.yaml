@@ -61,3 +61,5 @@ codec:
   defaultErrorLink:
 forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
   - X-Forwarded-For
+environment:
+  name: test

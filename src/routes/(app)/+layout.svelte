@@ -4,6 +4,7 @@
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/state';
 
+  import BottomNavNamespaces from '$lib/components/bottom-nav-namespaces.svelte';
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
@@ -277,22 +278,33 @@
       {/snippet}
       <UserMenu {logout} />
     </TopNavigation>
-    <div
-      slot="main"
-      class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
-    >
-      <ErrorBoundary>
-        {@render children()}
-      </ErrorBoundary>
-    </div>
-    <BottomNavigation
-      slot="footer"
-      {linkList}
-      {namespaceList}
-      {isCloud}
-      {showNamespacePicker}
-    >
-      <UserMenuMobile {logout} />
-    </BottomNavigation>
+    {#snippet main()}
+      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+        <ErrorBoundary>
+          {@render children()}
+        </ErrorBoundary>
+      </div>
+    {/snippet}
+    {#snippet footer()}
+      <BottomNavigation
+        {linkList}
+        {namespaceList}
+        {isCloud}
+        {showNamespacePicker}
+        {environmentName}
+      >
+        <UserMenuMobile {logout} />
+        {#snippet namespacePicker({ open })}
+          <BottomNavNamespaces {open} {namespaceList} />
+        {/snippet}
+        {#snippet avatar()}
+          <img
+            src="/ziggy-full-face.png"
+            alt={translate('common.user-profile')}
+            class="h-[32px] w-[32px]"
+          />
+        {/snippet}
+      </BottomNavigation>
+    {/snippet}
   </MainContentContainer>
 </div>
