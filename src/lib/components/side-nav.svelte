@@ -10,9 +10,14 @@
     isCloud: boolean;
     linkList: NavLinkListItem[];
     environmentName?: string;
-    bottom?: Snippet;
+    bottomActions?: Snippet;
   };
-  let { isCloud = false, linkList, environmentName, bottom }: Props = $props();
+  let {
+    isCloud = false,
+    linkList,
+    environmentName,
+    bottomActions,
+  }: Props = $props();
 </script>
 
 <Navigation
@@ -36,7 +41,7 @@
       />
     {/if}
   {/each}
-  <svelte:fragment slot="bottom">
-    {@render bottom?.()}
-  </svelte:fragment>
+  {#snippet bottom()}
+    {@render bottomActions?.()}
+  {/snippet}
 </Navigation>
