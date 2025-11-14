@@ -20,7 +20,6 @@ import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 export type FormatDateOptions = {
   relative?: boolean;
   relativeLabel?: string;
-  abbrFormat?: boolean;
   flexibleUnits?: boolean;
 };
 
@@ -42,17 +41,12 @@ export function formatDate(
     const {
       relative = false,
       relativeLabel = isFutureDate ? 'from now' : 'ago',
-      abbrFormat = false,
       flexibleUnits = false,
     } = options;
 
     const parsed = parseJSON(new Date(date));
 
-    const format = abbrFormat
-      ? parsed.getSeconds()
-        ? 'yyyy-MM-dd HH:mm:ss a'
-        : 'yyyy-MM-dd HH:mm a'
-      : timestampFormats[timestampFormat];
+    const format = timestampFormats[timestampFormat];
 
     if (timeFormat === 'local') {
       if (relative)

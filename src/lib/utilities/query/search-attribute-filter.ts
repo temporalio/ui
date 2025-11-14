@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { searchAttributes } from '$lib/stores/search-attributes';
-import type { TimeFormat, TimestampFormat } from '$lib/stores/time-format';
+import type { TimeFormat } from '$lib/stores/time-format';
 import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 import { formatDate } from '$lib/utilities/format-date';
 
@@ -103,25 +103,18 @@ export function formatListFilterValue(value: string | null): string[] {
 export const formatDateTimeRange = (
   value: string,
   format: TimeFormat,
-  timestampFormat: TimestampFormat,
   relative: boolean,
 ) => {
   const [conditon, start, operator, end] = value.split(' ');
   return `${conditon.toLowerCase()} ${formatDate(
     start.replace(/"/g, ''),
     format,
-    timestampFormat,
-    {
-      relative,
-      abbrFormat: true,
-    },
+    'abbreviated',
+    { relative },
   )} ${operator.toLowerCase()} ${formatDate(
     end.replace(/"/g, ''),
     format,
-    timestampFormat,
-    {
-      relative,
-      abbrFormat: true,
-    },
+    'abbreviated',
+    { relative },
   )}`;
 };

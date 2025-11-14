@@ -10,11 +10,7 @@
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
   import { formatDate } from '$lib/utilities/format-date';
@@ -27,10 +23,9 @@
     formatDate(
       $refresh ? new Date($refresh) : new Date(),
       $timeFormat,
-      $timestampFormat,
+      'abbreviated',
       {
         relative: $relativeTime,
-        abbrFormat: true,
       },
     ),
   );

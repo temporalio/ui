@@ -53,9 +53,8 @@
     }),
   );
   let abbrEventTime = $derived(
-    formatDate(group?.eventTime, $timeFormat, $timestampFormat, {
+    formatDate(group?.eventTime, $timeFormat, 'abbreviated', {
       relative: $relativeTime,
-      abbrFormat: true,
     }),
   );
 

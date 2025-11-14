@@ -12,11 +12,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
+  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { isNullConditional, isStartsWith } from '$lib/utilities/is';
   import {
     formatDateTimeRange,
@@ -106,12 +102,7 @@
                 {String(value)}
               {:else if isDateTimeFilter(workflowFilter)}
                 {#if customDate}
-                  {formatDateTimeRange(
-                    value,
-                    $timeFormat,
-                    $timestampFormat,
-                    $relativeTime,
-                  )}
+                  {formatDateTimeRange(value, $timeFormat, $relativeTime)}
                 {:else}
                   {getDateTimeConditonal(conditional)}
                   <Timestamp dateTime={value} />

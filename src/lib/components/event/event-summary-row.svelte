@@ -169,9 +169,8 @@
   );
 
   const abbrEventTime = $derived(
-    formatDate(currentEvent?.eventTime, $timeFormat, $timestampFormat, {
+    formatDate(currentEvent?.eventTime, $timeFormat, 'abbreviated', {
       relative: $relativeTime,
-      abbrFormat: true,
     }),
   );
 
