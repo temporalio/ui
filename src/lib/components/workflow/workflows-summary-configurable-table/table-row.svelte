@@ -67,6 +67,7 @@
       {#if !workflowCreateDisabled($page)}
         <StartWorkflowButton
           {namespace}
+          runId={workflow.runId}
           workflowId={workflow.id}
           taskQueue={workflow.taskQueue}
           workflowType={workflow.name}
