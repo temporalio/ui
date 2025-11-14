@@ -59,6 +59,7 @@
   let messageType = '';
   let workflowStartDelay = '';
 
+  let initialRunId = '';
   let initialWorkflowId = '';
   let initialWorkflowType = '';
 
@@ -96,11 +97,16 @@
     workflowId = $page.url.searchParams.get('workflowId') || '';
     taskQueue = $page.url.searchParams.get('taskQueue') || '';
     workflowType = $page.url.searchParams.get('workflowType') || '';
+    initialRunId = $page.url.searchParams.get('runId') || '';
     initialWorkflowId = $page.url.searchParams.get('workflowId') || '';
     initialWorkflowType = $page.url.searchParams.get('workflowType') || '';
 
-    if (initialWorkflowId || initialWorkflowType) {
-      getInitialValues(initialWorkflowId, initialWorkflowType);
+    if (initialWorkflowId || initialWorkflowType || initialRunId) {
+      getInitialValues({
+        runId: initialRunId,
+        workflowId: initialWorkflowId,
+        workflowType: initialWorkflowType,
+      });
     }
   });
 
@@ -158,11 +164,20 @@
     }
   };
 
-  const getInitialValues = async (id: string, type: string) => {
+  const getInitialValues = async ({
+    runId,
+    workflowId,
+    workflowType,
+  }: {
+    runId: string;
+    workflowId: string;
+    workflowType: string;
+  }) => {
     const initialValues = await fetchInitialValuesForStartWorkflow({
       namespace,
-      workflowId: id,
-      workflowType: type,
+      runId,
+      workflowId,
+      workflowType,
     });
     input = initialValues.input;
     encoding.set(initialValues.encoding);
