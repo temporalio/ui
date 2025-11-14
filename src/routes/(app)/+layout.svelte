@@ -25,6 +25,7 @@
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
+  import { setValidEnvironmentName } from '$lib/utilities/environment-name';
   import {
     routeForArchivalWorkfows,
     routeForBatchOperations,
@@ -46,7 +47,9 @@
   let { children }: Props = $props();
 
   let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
-  let environmentName = $derived(page.data?.settings?.buildEnvironment?.name);
+  let environmentName = $derived(
+    setValidEnvironmentName(page.data?.settings?.buildEnvironment?.name),
+  );
 
   let activeNamespaceName = $derived(
     page.params?.namespace ?? $lastUsedNamespace,
