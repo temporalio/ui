@@ -45,6 +45,8 @@
   let { children }: Props = $props();
 
   let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
+  let environmentName = $derived(page.data?.settings?.buildEnvironment?.name);
+
   let activeNamespaceName = $derived(
     page.params?.namespace ?? $lastUsedNamespace,
   );
@@ -252,7 +254,7 @@
     position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud}>
+    <SideNavigation {linkList} {isCloud} {environmentName}>
       <NavigationItem
         link={page.data?.settings?.feedbackURL ||
           'https://github.com/temporalio/ui/issues/new/choose'}

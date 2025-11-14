@@ -57,6 +57,10 @@ type CodecResponse struct {
 	DefaultErrorLink    string
 }
 
+type Environment struct {
+	Name string
+}
+
 type SettingsResponse struct {
 	Auth                          *Auth
 	BannerText                    string
@@ -65,6 +69,7 @@ type SettingsResponse struct {
 	FeedbackURL                   string
 	NotifyOnNewVersion            bool
 	Codec                         *CodecResponse
+	Environment                   *Environment
 	Version                       string
 	DisableWriteActions           bool
 	WorkflowTerminateDisabled     bool
@@ -142,6 +147,9 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 				IncludeCredentials:  cfg.Codec.IncludeCredentials,
 				DefaultErrorMessage: cfg.Codec.DefaultErrorMessage,
 				DefaultErrorLink:    cfg.Codec.DefaultErrorLink,
+			},
+			Environment: &Environment{
+				Name: cfg.Environment.Name,
 			},
 			Version:                       version.UIVersion,
 			DisableWriteActions:           cfg.DisableWriteActions,
