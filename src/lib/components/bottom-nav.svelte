@@ -23,7 +23,7 @@
     children: Snippet;
     namespacePicker: Snippet<[{ open: boolean; closeMenu: () => void }]>;
     avatar: Snippet;
-    namespaceList: NamespaceListItem[];
+    namespaceList?: NamespaceListItem[];
     isCloud: boolean;
     linkList: NavLinkListItem[];
     showNamespacePicker?: boolean;
@@ -34,7 +34,7 @@
     children,
     namespacePicker,
     avatar,
-    namespaceList,
+    namespaceList = [],
     isCloud = false,
     linkList,
     showNamespacePicker = true,
