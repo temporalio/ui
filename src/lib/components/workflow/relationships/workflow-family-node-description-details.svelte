@@ -1,11 +1,10 @@
 <script lang="ts">
+  import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
@@ -72,21 +71,13 @@
         {#if isRootWorkflow}
           <p class="text-xs">{translate('common.start')}</p>
         {/if}
-        <p>
-          {formatDate(workflow?.startTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
-        </p>
+        <Timestamp as="p" dateTime={workflow?.startTime} />
       </div>
       <div class="leading-4">
         {#if isRootWorkflow}
           <p class="text-xs">{translate('common.end')}</p>
         {/if}
-        <p>
-          {formatDate(workflow?.endTime, $timeFormat, {
-            relative: $relativeTime,
-          }) || '-'}
-        </p>
+        <Timestamp as="p" dateTime={workflow?.endTime} fallback="-" />
       </div>
       <div class="leading-4">
         {#if isRootWorkflow}

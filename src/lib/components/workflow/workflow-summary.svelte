@@ -4,7 +4,11 @@
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import {
     workflowRun,
     workflowSummaryViewOpen,
@@ -19,6 +23,22 @@
     end: workflow?.endTime,
     includeMilliseconds: true,
   });
+
+  $: startTimestamp = formatDate(
+    workflow?.startTime,
+    $timeFormat,
+    $timestampFormat,
+    { relative: $relativeTime },
+  );
+
+  $: endTimestamp = formatDate(
+    workflow?.endTime,
+    $timeFormat,
+    $timestampFormat,
+    {
+      relative: $relativeTime,
+    },
+  );
 </script>
 
 <section>
@@ -80,30 +100,14 @@
         <div class="h-0.5 rounded-full bg-inverse"></div>
         <WorkflowDetail
           title={translate('common.start-time')}
-          tooltip={$relativeTime
-            ? formatDate(workflow?.startTime, $timeFormat, {
-                relative: false,
-              })
-            : formatDate(workflow?.startTime, $timeFormat, {
-                relative: true,
-              })}
-          content={formatDate(workflow?.startTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
+          tooltip={startTimestamp}
+          content={startTimestamp}
           textSize="sm"
         />
         <WorkflowDetail
           title={translate('common.close-time')}
-          tooltip={$relativeTime
-            ? formatDate(workflow?.endTime, $timeFormat, {
-                relative: false,
-              })
-            : formatDate(workflow?.endTime, $timeFormat, {
-                relative: true,
-              })}
-          content={formatDate(workflow?.endTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
+          tooltip={endTimestamp}
+          content={endTimestamp}
           textSize="sm"
         />
         {#if elapsedTime}

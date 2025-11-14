@@ -52,7 +52,11 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import {
     refresh,
     workflowCount,
@@ -72,7 +76,7 @@
   let refreshTime = $state(new Date());
 
   const refreshTimeFormatted = $derived(
-    formatDate(refreshTime, $timeFormat, {
+    formatDate(refreshTime, $timeFormat, $timestampFormat, {
       relative: $relativeTime,
     }),
   );

@@ -6,7 +6,11 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import {
@@ -100,34 +104,44 @@
 <DetailList aria-label="workflow details" rowCount={5}>
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
   <DetailListTextValue
-    text={formatDate(workflow?.startTime, $timeFormat, {
+    text={formatDate(workflow?.startTime, $timeFormat, $timestampFormat, {
       relative: $relativeTime,
     })}
-    tooltipText={formatDate(workflow?.startTime, $timeFormat, {
-      relative: !$relativeTime,
-    })}
+    tooltipText={formatDate(
+      workflow?.startTime,
+      $timeFormat,
+      $timestampFormat,
+      {
+        relative: !$relativeTime,
+      },
+    )}
   />
 
   {#if workflow?.startDelay}
     <DetailListLabel>{translate('workflows.execution-start')}</DetailListLabel>
     <DetailListTextValue
-      text={formatDate(workflow?.executionTime, $timeFormat, {
+      text={formatDate(workflow?.executionTime, $timeFormat, $timestampFormat, {
         relative: $relativeTime,
       })}
-      tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
-        relative: !$relativeTime,
-      })}
+      tooltipText={formatDate(
+        workflow?.executionTime,
+        $timeFormat,
+        $timestampFormat,
+        {
+          relative: !$relativeTime,
+        },
+      )}
     />
   {/if}
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
   <DetailListTextValue
     text={workflow?.endTime
-      ? formatDate(workflow?.endTime, $timeFormat, {
+      ? formatDate(workflow?.endTime, $timeFormat, $timestampFormat, {
           relative: $relativeTime,
         })
       : '-'}
-    tooltipText={formatDate(workflow?.endTime, $timeFormat, {
+    tooltipText={formatDate(workflow?.endTime, $timeFormat, $timestampFormat, {
       relative: !$relativeTime,
     })}
   />

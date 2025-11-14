@@ -5,7 +5,11 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { formatDate } from '$lib/utilities/format-date';
   import { omit } from '$lib/utilities/omit';
@@ -57,9 +61,14 @@
       {#if operation.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          formatDate(operation.lastAttemptCompleteTime, $timeFormat, {
-            relative: $relativeTime,
-          }),
+          formatDate(
+            operation.lastAttemptCompleteTime,
+            $timeFormat,
+            $timestampFormat,
+            {
+              relative: $relativeTime,
+            },
+          ),
         )}
       {/if}
       {#if operation.scheduledEventId}
@@ -71,7 +80,7 @@
       {#if operation.scheduledTime}
         {@render detail(
           translate('workflows.scheduled-time'),
-          formatDate(operation.scheduledTime, $timeFormat, {
+          formatDate(operation.scheduledTime, $timeFormat, $timestampFormat, {
             relative: $relativeTime,
           }),
         )}
@@ -123,10 +132,15 @@
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
-      {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
-        relative: $relativeTime,
-        relativeLabel: '',
-      })}
+      {formatDate(
+        operation.nextAttemptScheduleTime,
+        $timeFormat,
+        $timestampFormat,
+        {
+          relative: $relativeTime,
+          relativeLabel: '',
+        },
+      )}
       <strong>({timeDifference})</strong>
     </p>
   </div>

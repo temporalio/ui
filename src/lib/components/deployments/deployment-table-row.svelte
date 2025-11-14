@@ -1,12 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { WorkerDeploymentSummary } from '$lib/types/deployments';
-  import { formatDate } from '$lib/utilities/format-date';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForWorkerDeployment,
@@ -97,37 +96,23 @@
       <td class="truncate py-1 text-left">
         <div class="flex flex-col gap-1">
           {#if latestBuildId && latestNotDuplicate && deployment.latestVersionSummary?.createTime}
-            <p>
-              {formatDate(
-                deployment.latestVersionSummary.createTime,
-                $timeFormat,
-                {
-                  relative: $relativeTime,
-                },
-              )}
-            </p>
+            <Timestamp
+              as="p"
+              dateTime={deployment.latestVersionSummary.createTime}
+            />
           {/if}
           {#if rampingBuildId && rampingVersionDeployedTimestamp}
-            <p>
-              {formatDate(rampingVersionDeployedTimestamp, $timeFormat, {
-                relative: $relativeTime,
-              })}
-            </p>
+            <Timestamp as="p" dateTime={rampingVersionDeployedTimestamp} />
           {/if}
-          <p>
-            {#if versionedCurrent}
-              {formatDate(
-                deployment?.currentVersionSummary?.createTime ||
-                  deployment.createTime,
-                $timeFormat,
-                {
-                  relative: $relativeTime,
-                },
-              )}
-            {:else}
-              -
-            {/if}
-          </p>
+          {#if versionedCurrent}
+            <Timestamp
+              as="p"
+              dateTime={deployment?.currentVersionSummary?.createTime ||
+                deployment.createTime}
+            />
+          {:else}
+            <p>-</p>
+          {/if}
         </div>
       </td>
     {:else if label === translate('deployments.actions')}

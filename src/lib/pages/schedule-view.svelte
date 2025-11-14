@@ -14,6 +14,7 @@
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -40,12 +41,11 @@
   } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
   import { loading } from '$lib/stores/schedules';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { getIdentity } from '$lib/utilities/core-context';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import { formatDate, getUTCString } from '$lib/utilities/format-date';
+  import { getUTCString } from '$lib/utilities/format-date';
   import {
     routeForScheduleEdit,
     routeForSchedules,
@@ -291,21 +291,39 @@
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>
-        <p class="flex items-center gap-2 text-right text-sm">
+        <Timestamp
+          as="p"
+          class="flex items-center gap-2 text-right text-sm"
+          dateTime={schedule?.info?.createTime}
+        >
+          {#snippet leading()}
+            {translate('common.created')}
+          {/snippet}
+        </Timestamp>
+        <!-- <p class="flex items-center gap-2 text-right text-sm">
           {translate('common.created', {
             created: formatDate(schedule?.info?.createTime, $timeFormat, {
               relative: $relativeTime,
             }),
           })}
-        </p>
+        </p> -->
         {#if schedule?.info?.updateTime}
-          <p class="flex items-center gap-2 text-right text-sm">
+          <Timestamp
+            as="p"
+            class="flex items-center gap-2 text-right text-sm"
+            dateTime={schedule?.info?.updateTime}
+          >
+            {#snippet leading()}
+              {translate('common.last-updated')}
+            {/snippet}
+          </Timestamp>
+          <!-- <p class="flex items-center gap-2 text-right text-sm">
             {translate('common.last-updated', {
               updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
                 relative: $relativeTime,
               }),
             })}
-          </p>
+          </p> -->
         {/if}
       </div>
       <SplitButton

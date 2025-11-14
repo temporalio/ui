@@ -5,14 +5,18 @@
 
   import { page } from '$app/stores';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Chip from '$lib/holocene/chip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import { isNullConditional, isStartsWith } from '$lib/utilities/is';
   import {
     formatDateTimeRange,
@@ -102,13 +106,15 @@
                 {String(value)}
               {:else if isDateTimeFilter(workflowFilter)}
                 {#if customDate}
-                  {formatDateTimeRange(value, $timeFormat, $relativeTime)}
+                  {formatDateTimeRange(
+                    value,
+                    $timeFormat,
+                    $timestampFormat,
+                    $relativeTime,
+                  )}
                 {:else}
                   {getDateTimeConditonal(conditional)}
-                  {formatDate(value, $timeFormat, {
-                    relative: $relativeTime,
-                    abbrFormat: true,
-                  })}
+                  <Timestamp dateTime={value} />
                 {/if}
               {:else}
                 {isStartsWith(conditional)

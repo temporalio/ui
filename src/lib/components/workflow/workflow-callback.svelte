@@ -5,7 +5,11 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { CallbackState } from '$lib/types';
   import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
@@ -21,10 +25,20 @@
   }: { callback: Callback; link?: Link; children?: Snippet } = $props();
 
   const completedTime = $derived(
-    formatDate(callback.lastAttemptCompleteTime, $timeFormat),
+    formatDate(
+      callback.lastAttemptCompleteTime,
+      $timeFormat,
+      $timestampFormat,
+      { relative: $relativeTime },
+    ),
   );
   const nextTime = $derived(
-    formatDate(callback.nextAttemptScheduleTime, $timeFormat),
+    formatDate(
+      callback.nextAttemptScheduleTime,
+      $timeFormat,
+      $timestampFormat,
+      { relative: $relativeTime },
+    ),
   );
   const failure = $derived(callback?.lastAttemptFailure?.message);
   const blockedReason = $derived(callback?.blockedReason);

@@ -6,6 +6,18 @@ import { getLocalTimezone } from '$lib/utilities/format-date';
 
 type TimeFormatTypes = 'relative' | 'absolute';
 
+export const timestampFormats = {
+  short: 'do MMM yyyy H:mm:ss.SS',
+  medium: 'yyyy-MM-dd z HH:mm:ss.SS',
+  long: 'MMMM do yyyy hh:mm:ss.SS a z',
+} as const;
+
+export type TimestampFormat = keyof typeof timestampFormats;
+export const timestampFormat = persistStore<TimestampFormat>(
+  'timestampFormat',
+  'medium',
+);
+
 export const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
 export const timeFormat = persistStore('timeFormat', 'UTC' as TimeFormat);

@@ -9,23 +9,26 @@ import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some
 import {
   getTimezone,
   type TimeFormat,
+  type TimestampFormat,
+  timestampFormats,
   TimezoneOptions,
   Timezones,
 } from '$lib/stores/time-format';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
-const pattern = 'yyyy-MM-dd z HH:mm:ss.SS';
+export type FormatDateOptions = {
+  relative?: boolean;
+  relativeLabel?: string;
+  abbrFormat?: boolean;
+  flexibleUnits?: boolean;
+};
 
 export function formatDate(
   date: ValidTime | undefined | null,
   timeFormat: TimeFormat = 'UTC',
-  options: {
-    relative?: boolean;
-    relativeLabel?: string;
-    abbrFormat?: boolean;
-    flexibleUnits?: boolean;
-  } = {},
+  timestampFormat: TimestampFormat = 'medium',
+  options: FormatDateOptions = {},
 ): string {
   if (!date) return '';
 
@@ -49,7 +52,7 @@ export function formatDate(
       ? parsed.getSeconds()
         ? 'yyyy-MM-dd HH:mm:ss a'
         : 'yyyy-MM-dd HH:mm a'
-      : pattern;
+      : timestampFormats[timestampFormat];
 
     if (timeFormat === 'local') {
       if (relative)

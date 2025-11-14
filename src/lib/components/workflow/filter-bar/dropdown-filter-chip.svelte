@@ -33,6 +33,7 @@
     TIME_UNIT_OPTIONS,
     timeFormat,
     timeFormatType,
+    timestampFormat,
   } from '$lib/stores/time-format';
   import { formatDate, getSelectedTimezone } from '$lib/utilities/format-date';
   import { isInConditional, isNullConditional } from '$lib/utilities/is';
@@ -174,7 +175,7 @@
 
     if (isDateTimeFilter(filter)) {
       if (filter.customDate) return value.split('BETWEEN')[1];
-      return formatDate(value, $timeFormat, {
+      return formatDate(value, $timeFormat, $timestampFormat, {
         relative: true,
         abbrFormat: true,
       });
