@@ -22,6 +22,7 @@ type RouteParameters = {
   query?: string;
   search?: string;
   page?: string;
+  archival?: boolean;
 };
 
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
@@ -130,7 +131,7 @@ export const routeForWorkflowsWithQuery = ({
   });
 };
 
-export const routeForArchivalWorkfows = (
+export const routeForArchivalWorkflows = (
   parameters: NamespaceParameter,
 ): string => {
   return `${routeForNamespace(parameters)}/archival`;
@@ -174,10 +175,21 @@ export const routeForScheduleEdit = ({
   return `${routeForSchedules({ namespace })}/${sid}/edit`;
 };
 
+export const routeForArchivalEventHistory = ({
+  workflow,
+  run,
+  ...parameters
+}: WorkflowParameters): string => {
+  const wid = encodeURIForSvelte(workflow);
+  return `${routeForArchivalWorkflows(parameters)}/${wid}/${run}/history`;
+};
+
 export const routeForEventHistory = ({
   queryParams,
+  archival,
   ...parameters
-}: EventHistoryParameters): string => {
+}: EventHistoryParameters & { archival?: boolean }): string => {
+  if (archival) return toURL(routeForArchivalEventHistory(parameters));
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   return toURL(`${eventHistoryPath}`, queryParams);
 };

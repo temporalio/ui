@@ -25,7 +25,7 @@
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
-    routeForArchivalWorkfows,
+    routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForEventHistoryImport,
     routeForLoginPage,
@@ -75,7 +75,7 @@
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
-      archivalRoute: routeForArchivalWorkfows({ namespace }),
+      archivalRoute: routeForArchivalWorkflows({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
       historyImportRoute: routeForEventHistoryImport(),
