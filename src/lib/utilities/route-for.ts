@@ -1,6 +1,6 @@
 import { BROWSER } from 'esm-env';
 
-import { base } from '$app/paths';
+import { resolve } from '$app/paths';
 
 import type { EventView } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
@@ -60,33 +60,33 @@ export type AuthenticationParameters = {
 };
 
 export const routeForNamespaces = (): string => {
-  return `${base}/namespaces`;
+  return resolve('/namespaces', {});
 };
 
 export const routeForNexus = (): string => {
-  return `${base}/nexus`;
+  return resolve('/nexus', {});
 };
 
 export const routeForNexusEndpoint = (id: string): string => {
-  return `${base}/nexus/${id}`;
+  return resolve('/nexus/[id]', { id });
 };
 
 export const routeForNexusEndpointEdit = (id: string): string => {
-  return `${base}/nexus/${id}/edit`;
+  return resolve('/nexus/[id]/edit', { id });
 };
 
 export const routeForNexusEndpointCreate = (): string => {
-  return `${base}/nexus/create`;
+  return resolve('/nexus/create', {});
 };
 
 export const routeForNamespace = ({
   namespace,
 }: NamespaceParameter): string => {
-  return `${base}/namespaces/${namespace}`;
+  return resolve('/namespaces/[namespace]', { namespace });
 };
 
 export const routeForNamespaceSelector = () => {
-  return `${base}/select-namespace`;
+  return resolve('/select-namespace', {});
 };
 
 export const routeForWorkflows = (parameters: NamespaceParameter): string => {
@@ -199,7 +199,7 @@ export const routeForWorkerDeployments = ({
 }: {
   namespace: string;
 }) => {
-  return `${base}/namespaces/${namespace}/worker-deployments`;
+  return resolve('/namespaces/[namespace]/worker-deployments', { namespace });
 };
 
 export const routeForWorkerDeployment = ({
@@ -210,7 +210,10 @@ export const routeForWorkerDeployment = ({
   deployment: string;
 }) => {
   const deploymentName = encodeURIForSvelte(deployment);
-  return `${base}/namespaces/${namespace}/worker-deployments/${deploymentName}`;
+  return resolve('/namespaces/[namespace]/worker-deployments/[deployment]', {
+    namespace,
+    deployment: deploymentName,
+  });
 };
 
 export const routeForWorkerDeploymentVersion = ({
@@ -291,7 +294,7 @@ export const routeForAuthentication = (
 ): string => {
   const { settings, searchParams: currentSearchParams, originUrl } = parameters;
 
-  const login = new URL(`${base}/auth/sso`, settings.baseUrl);
+  const login = new URL(resolve('/auth/sso', {}), settings.baseUrl);
   let opts = settings.auth.options ?? [];
 
   opts = [...opts, 'returnUrl'];
@@ -313,7 +316,7 @@ export const routeForAuthentication = (
 
 export const routeForLoginPage = (error = '', isBrowser = BROWSER): string => {
   if (isBrowser) {
-    const login = new URL(`${base}/login`, window.location.origin);
+    const login = new URL(resolve('/login', {}), window.location.origin);
     login.searchParams.set('returnUrl', window.location.href);
     if (error) {
       login.searchParams.set('error', error);
@@ -321,7 +324,7 @@ export const routeForLoginPage = (error = '', isBrowser = BROWSER): string => {
     return login.toString();
   }
 
-  return `${base}/login`;
+  return resolve('/login', {});
 };
 
 export const routeForEventHistoryImport = (
@@ -329,9 +332,12 @@ export const routeForEventHistoryImport = (
   view?: EventView,
 ): string => {
   if (namespace && view) {
-    return `${base}/import/events/${namespace}/workflow/run/history/${view}`;
+    return resolve('/import/events/[namespace]/workflow/run/history/[view]', {
+      namespace,
+      view,
+    });
   }
-  return `${base}/import/events`;
+  return resolve('/import/events', {});
 };
 
 export const routeForBatchOperations = ({
@@ -339,7 +345,7 @@ export const routeForBatchOperations = ({
 }: {
   namespace: string;
 }) => {
-  return `${base}/namespaces/${namespace}/batch-operations`;
+  return resolve('/namespaces/[namespace]/batch-operations', { namespace });
 };
 
 export const routeForBatchOperation = ({
@@ -351,7 +357,10 @@ export const routeForBatchOperation = ({
 }) => {
   const jId = encodeURIForSvelte(jobId);
 
-  return `${base}/namespaces/${namespace}/batch-operations/${jId}`;
+  return resolve('/namespaces/[namespace]/batch-operations/[jobId]', {
+    namespace,
+    jobId: jId,
+  });
 };
 
 export const hasParameters =
