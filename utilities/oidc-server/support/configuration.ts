@@ -1,6 +1,4 @@
-/**
- * OIDC provider configuration.
- */
+// ⚠️  FOR LOCAL DEVELOPMENT AND TESTING ONLY - Contains hardcoded secrets
 const configuration: Record<string, unknown> = {
   conformIdTokenClaims: false,
   ttl: {
