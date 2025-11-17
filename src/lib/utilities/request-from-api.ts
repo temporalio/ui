@@ -109,7 +109,7 @@ export const requestFromAPI = async <T>(
     let response = await makeRequest();
     let { status, statusText } = response;
 
-    if (isBrowser && (status === 401 || status === 403)) {
+    if (isBrowser && status === 401) {
       const refreshed = await refreshTokens();
       if (refreshed) {
         options = withSecurityOptions(init.options, isBrowser);
