@@ -104,54 +104,42 @@
 <DetailList aria-label="workflow details" rowCount={5}>
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
   <DetailListTextValue
-    text={formatDate(
-      workflow?.startTime,
-      $timeFormat,
-      $relativeTime,
-      $timestampFormat,
-    )}
-    tooltipText={formatDate(
-      workflow?.startTime,
-      $timeFormat,
-      !$relativeTime,
-      $timestampFormat,
-    )}
+    text={formatDate(workflow?.startTime, $timeFormat, {
+      relative: $relativeTime,
+      format: $timestampFormat,
+    })}
+    tooltipText={formatDate(workflow?.startTime, $timeFormat, {
+      relative: !$relativeTime,
+      format: $timestampFormat,
+    })}
   />
 
   {#if workflow?.startDelay}
     <DetailListLabel>{translate('workflows.execution-start')}</DetailListLabel>
     <DetailListTextValue
-      text={formatDate(
-        workflow?.executionTime,
-        $timeFormat,
-        $relativeTime,
-        $timestampFormat,
-      )}
-      tooltipText={formatDate(
-        workflow?.executionTime,
-        $timeFormat,
-        !$relativeTime,
-        $timestampFormat,
-      )}
+      text={formatDate(workflow?.executionTime, $timeFormat, {
+        relative: $relativeTime,
+        format: $timestampFormat,
+      })}
+      tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
+        relative: !$relativeTime,
+        format: $timestampFormat,
+      })}
     />
   {/if}
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
   <DetailListTextValue
     text={workflow?.endTime
-      ? formatDate(
-          workflow?.endTime,
-          $timeFormat,
-          $relativeTime,
-          $timestampFormat,
-        )
+      ? formatDate(workflow?.endTime, $timeFormat, {
+          relative: $relativeTime,
+          format: $timestampFormat,
+        })
       : '-'}
-    tooltipText={formatDate(
-      workflow?.endTime,
-      $timeFormat,
-      !$relativeTime,
-      $timestampFormat,
-    )}
+    tooltipText={formatDate(workflow?.endTime, $timeFormat, {
+      relative: !$relativeTime,
+      format: $timestampFormat,
+    })}
   />
 
   <DetailListLabel>

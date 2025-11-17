@@ -48,11 +48,17 @@
   );
 
   let eventTime = $derived(
-    formatDate(group?.eventTime, $timeFormat, $relativeTime, $timestampFormat),
+    formatDate(group?.eventTime, $timeFormat, {
+      relative: $relativeTime,
+      format: $timestampFormat,
+    }),
   );
 
   let abbrEventTime = $derived(
-    formatDate(group?.eventTime, $timeFormat, $relativeTime, 'abbreviated'),
+    formatDate(group?.eventTime, $timeFormat, {
+      relative: $relativeTime,
+      format: 'abbreviated',
+    }),
   );
 
   const onLinkClick = (e: Event) => {

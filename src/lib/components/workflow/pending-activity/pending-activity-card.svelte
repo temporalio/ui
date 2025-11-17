@@ -69,12 +69,10 @@
         )}
         {@render detail(
           translate('activities.paused-since'),
-          formatDate(
-            activity.pauseInfo?.pauseTime,
-            $timeFormat,
-            $relativeTime,
-            $timestampFormat,
-          ),
+          formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
         )}
         {@render detail(
           translate('activities.pause-reason'),
@@ -94,12 +92,10 @@
       {#if activity.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          formatDate(
-            activity.lastAttemptCompleteTime,
-            $timeFormat,
-            $relativeTime,
-            $timestampFormat,
-          ),
+          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
         )}
       {/if}
       {#if activity.expirationTime}
@@ -119,23 +115,19 @@
       {#if activity.lastHeartbeatTime}
         {@render detail(
           translate('workflows.last-heartbeat'),
-          formatDate(
-            activity.lastHeartbeatTime,
-            $timeFormat,
-            $relativeTime,
-            $timestampFormat,
-          ),
+          formatDate(activity.lastHeartbeatTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
         )}
       {/if}
       {#if activity.lastStartedTime}
         {@render detail(
           translate('workflows.last-started-time'),
-          formatDate(
-            activity.lastStartedTime,
-            $timeFormat,
-            $relativeTime,
-            $timestampFormat,
-          ),
+          formatDate(activity.lastStartedTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
         )}
       {/if}
       {#if activity.lastWorkerIdentity}
@@ -268,15 +260,11 @@
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
-      {formatDate(
-        activity.scheduledTime,
-        $timeFormat,
-        $relativeTime,
-        $timestampFormat,
-        {
-          relativeLabel: '',
-        },
-      )}
+      {formatDate(activity.scheduledTime, $timeFormat, {
+        relative: $relativeTime,
+        format: $timestampFormat,
+        relativeLabel: '',
+      })}
       <strong>({timeDifference})</strong>
     </p>
   </div>

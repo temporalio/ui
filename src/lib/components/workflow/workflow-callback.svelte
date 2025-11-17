@@ -25,20 +25,16 @@
   }: { callback: Callback; link?: Link; children?: Snippet } = $props();
 
   const completedTime = $derived(
-    formatDate(
-      callback.lastAttemptCompleteTime,
-      $timeFormat,
-      $relativeTime,
-      $timestampFormat,
-    ),
+    formatDate(callback.lastAttemptCompleteTime, $timeFormat, {
+      relative: $relativeTime,
+      format: $timestampFormat,
+    }),
   );
   const nextTime = $derived(
-    formatDate(
-      callback.nextAttemptScheduleTime,
-      $timeFormat,
-      $relativeTime,
-      $timestampFormat,
-    ),
+    formatDate(callback.nextAttemptScheduleTime, $timeFormat, {
+      relative: $relativeTime,
+      format: $timestampFormat,
+    }),
   );
   const failure = $derived(callback?.lastAttemptFailure?.message);
   const blockedReason = $derived(callback?.blockedReason);

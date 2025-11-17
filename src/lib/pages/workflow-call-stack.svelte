@@ -20,12 +20,10 @@
   let stackTrace: Eventual<ParsedQuery> = $state();
 
   let refreshDate = $derived(
-    formatDate(
-      $refresh ? new Date($refresh) : new Date(),
-      $timeFormat,
-      $relativeTime,
-      'abbreviated',
-    ),
+    formatDate($refresh ? new Date($refresh) : new Date(), $timeFormat, {
+      relative: $relativeTime,
+      format: 'abbreviated',
+    }),
   );
 
   const getStackTrace = () =>

@@ -61,12 +61,10 @@
       {#if operation.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          formatDate(
-            operation.lastAttemptCompleteTime,
-            $timeFormat,
-            $relativeTime,
-            $timestampFormat,
-          ),
+          formatDate(operation.lastAttemptCompleteTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
         )}
       {/if}
       {#if operation.scheduledEventId}
@@ -78,12 +76,10 @@
       {#if operation.scheduledTime}
         {@render detail(
           translate('workflows.scheduled-time'),
-          formatDate(
-            operation.scheduledTime,
-            $timeFormat,
-            $relativeTime,
-            $timestampFormat,
-          ),
+          formatDate(operation.scheduledTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
         )}
       {/if}
       {#if operation.scheduleToCloseTimeout}
@@ -133,15 +129,11 @@
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
-      {formatDate(
-        operation.nextAttemptScheduleTime,
-        $timeFormat,
-        $relativeTime,
-        $timestampFormat,
-        {
-          relativeLabel: '',
-        },
-      )}
+      {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
+        relative: $relativeTime,
+        format: $timestampFormat,
+        relativeLabel: '',
+      })}
       <strong>({timeDifference})</strong>
     </p>
   </div>

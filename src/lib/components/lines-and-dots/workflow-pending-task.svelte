@@ -26,34 +26,28 @@
     <p class="flex items-center gap-4">
       {translate('workflows.original-scheduled-time')}
       <Badge
-        >{formatDate(
-          pendingTask.originalScheduledTime,
-          $timeFormat,
-          $relativeTime,
-          $timestampFormat,
-        )}</Badge
+        >{formatDate(pendingTask.originalScheduledTime, $timeFormat, {
+          relative: $relativeTime,
+          format: $timestampFormat,
+        })}</Badge
       >
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.scheduled-time')}
       <Badge
-        >{formatDate(
-          pendingTask.scheduledTime,
-          $timeFormat,
-          $relativeTime,
-          $timestampFormat,
-        )}</Badge
+        >{formatDate(pendingTask.scheduledTime, $timeFormat, {
+          relative: $relativeTime,
+          format: $timestampFormat,
+        })}</Badge
       >
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.started-time')}
       <Badge
-        >{formatDate(
-          pendingTask.startedTime,
-          $timeFormat,
-          $relativeTime,
-          $timestampFormat,
-        )}</Badge
+        >{formatDate(pendingTask.startedTime, $timeFormat, {
+          relative: $relativeTime,
+          format: $timestampFormat,
+        })}</Badge
       >
     </p>
   </div>

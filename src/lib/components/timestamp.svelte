@@ -7,6 +7,7 @@
     relativeTime,
     timeFormat,
     timestampFormat,
+    type TimestampFormat,
   } from '$lib/stores/time-format';
   import {
     formatDate,
@@ -25,6 +26,8 @@
     as?: T;
     fallback?: string;
     leading?: Snippet<[]>;
+    // only used to override the user's stored preference in certain cases
+    overrideTimestampFormat?: TimestampFormat;
   };
 
   let {
@@ -33,13 +36,18 @@
     as = undefined,
     class: className = undefined,
     fallback = undefined,
+    overrideTimestampFormat = undefined,
     leading,
     ...rest
   }: Props = $props();
 </script>
 
 {#snippet timestamp(dateTime: DateTime, options: FormatDateOptions)}
-  {formatDate(dateTime, $timeFormat, $relativeTime, $timestampFormat, options)}
+  {formatDate(dateTime, $timeFormat, {
+    relative: $relativeTime,
+    format: overrideTimestampFormat ?? $timestampFormat,
+    ...options,
+  })}
 {/snippet}
 
 {#if as}

@@ -76,7 +76,10 @@
   let refreshTime = $state(new Date());
 
   const refreshTimeFormatted = $derived(
-    formatDate(refreshTime, $timeFormat, $relativeTime, $timestampFormat),
+    formatDate(refreshTime, $timeFormat, {
+      relative: $relativeTime,
+      format: $timestampFormat,
+    }),
   );
 
   const availableColumns = $derived(

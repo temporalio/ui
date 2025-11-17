@@ -18,6 +18,8 @@ import {
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
 export type FormatDateOptions = {
+  format?: TimestampFormat;
+  relative?: boolean;
   relativeLabel?: string;
   flexibleUnits?: boolean;
 };
@@ -25,8 +27,6 @@ export type FormatDateOptions = {
 export function formatDate(
   date: ValidTime | undefined | null,
   timeFormat: TimeFormat = 'UTC',
-  relative: boolean = false,
-  timestampFormat: TimestampFormat = 'medium',
   options: FormatDateOptions = {},
 ): string {
   if (!date) return '';
@@ -39,18 +39,20 @@ export function formatDate(
     const currentDate = Date.now();
     const isFutureDate = new Date(date).getTime() - currentDate > 0;
     const {
+      relative = false,
       relativeLabel = isFutureDate ? 'from now' : 'ago',
       flexibleUnits = false,
+      format = 'medium',
     } = options;
 
     const parsed = parseJSON(new Date(date));
 
-    const format =
-      timestampFormat === 'abbreviated'
+    const timestampFormat =
+      format === 'abbreviated'
         ? parsed.getSeconds()
           ? timestampFormats.abbreviated
           : timestampFormats.abbreviatedWithoutSeconds
-        : timestampFormats[timestampFormat];
+        : timestampFormats[format];
 
     if (timeFormat === 'local') {
       if (relative)
@@ -62,10 +64,10 @@ export function formatDate(
               }),
           }) + ` ${relativeLabel}`
         );
-      return dateTz.format(parsed, format);
+      return dateTz.format(parsed, timestampFormat);
     }
     const timezone = getTimezone(timeFormat);
-    return dateTz.formatInTimeZone(parsed, timezone, format);
+    return dateTz.formatInTimeZone(parsed, timezone, timestampFormat);
   } catch (e) {
     console.error('Error formatting date:', e);
     return '';

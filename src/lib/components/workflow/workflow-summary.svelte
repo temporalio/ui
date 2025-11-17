@@ -24,19 +24,15 @@
     includeMilliseconds: true,
   });
 
-  $: startTimestamp = formatDate(
-    workflow?.startTime,
-    $timeFormat,
-    $relativeTime,
-    $timestampFormat,
-  );
+  $: startTimestamp = formatDate(workflow?.startTime, $timeFormat, {
+    relative: $relativeTime,
+    format: $timestampFormat,
+  });
 
-  $: endTimestamp = formatDate(
-    workflow?.endTime,
-    $timeFormat,
-    $relativeTime,
-    $timestampFormat,
-  );
+  $: endTimestamp = formatDate(workflow?.endTime, $timeFormat, {
+    relative: $relativeTime,
+    format: $timestampFormat,
+  });
 </script>
 
 <section>
