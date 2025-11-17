@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 
-import { base as basePath } from '$app/paths';
+import { resolve } from '$app/paths';
 import { page } from '$app/stores';
 
 import type {
@@ -72,9 +72,10 @@ export const base = (namespace?: string): string => {
     baseUrl = getApiOrigin();
   }
 
+  baseUrl = `${baseUrl}${resolve('', {})}`; // Append base path
+
   if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
 
-  baseUrl = `${baseUrl}${basePath}`;
   return baseUrl;
 };
 
