@@ -41,13 +41,7 @@ export type ScheduleParameters = Pick<
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
-  | 'namespace'
-  | 'workflow'
-  | 'run'
-  | 'eventId'
-  | 'view'
-  | 'queryParams'
-  | 'archival'
+  'namespace' | 'workflow' | 'run' | 'eventId' | 'view' | 'queryParams'
 >;
 export type EventParameters = Pick<
   RouteParameters,
@@ -194,7 +188,7 @@ export const routeForEventHistory = ({
   queryParams,
   archival,
   ...parameters
-}: EventHistoryParameters): string => {
+}: EventHistoryParameters & { archival?: boolean }): string => {
   if (archival) return toURL(routeForArchivalEventHistory(parameters));
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   return toURL(`${eventHistoryPath}`, queryParams);
