@@ -141,6 +141,18 @@ describe('formatDate', () => {
       '2022-04-13 16:29 PM',
     );
   });
+
+  it('supports different timestamps formats', () => {
+    expect(formatDate(date, 'utc', false, 'short')).toEqual(
+      '13th Apr 2022 16:29:35.63',
+    );
+    expect(formatDate(date, 'utc', false, 'medium')).toEqual(
+      '2022-04-13 UTC 16:29:35.63',
+    );
+    expect(formatDate(date, 'utc', false, 'long')).toEqual(
+      'April 13th 2022, 04:29:35.63 PM UTC',
+    );
+  });
 });
 
 describe('isValidDate', () => {
