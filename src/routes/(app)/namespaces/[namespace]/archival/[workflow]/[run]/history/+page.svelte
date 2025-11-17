@@ -2,6 +2,7 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
   import Link from '$lib/holocene/link.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -12,11 +13,16 @@
 
   let { data }: { data: PageData } = $props();
 
+  const workflowId = $derived(page.params.workflow);
   const workflowsHref = $derived(
     routeForArchivalWorkflows({ namespace: page.params.namespace }),
   );
 </script>
 
+<PageTitle
+  title={`${translate('workflows.archival')} | ${workflowId}`}
+  url={page.url.href}
+/>
 <div class="flex items-center justify-between">
   <div class="flex items-center gap-2">
     <Link
