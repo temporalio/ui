@@ -248,16 +248,12 @@
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
-    {#if shouldDisplayAsTime(key)}
-      <Timestamp
-        as="p"
-        class="whitespace-pre-line break-all"
-        dateTime={value}
-      />
-    {:else}
-      <p class="whitespace-pre-line break-all">
+    <p class="whitespace-pre-line break-all">
+      {#if shouldDisplayAsTime(key)}
+        <Timestamp dateTime={value} />
+      {:else}
         {value}
-      </p>
-    {/if}
+      {/if}
+    </p>
   </div>
 {/snippet}
