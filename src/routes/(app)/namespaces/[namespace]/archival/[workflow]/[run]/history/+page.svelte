@@ -1,6 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import type { PageData } from './$types';
+
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -8,8 +10,6 @@
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { routeForArchivalWorkflows } from '$lib/utilities/route-for';
-
-  import type { PageData } from '../$types';
 
   let { data }: { data: PageData } = $props();
 
