@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { type Unsubscriber, writable } from 'svelte/store';
+
   import { onDestroy, onMount } from 'svelte';
 
   import Timestamp from '$lib/components/timestamp.svelte';
@@ -32,6 +34,7 @@
   export let position: 'left' | 'right' = 'right';
   export let size: ButtonStyles['size'] = 'md';
 
+  const open = writable(false);
   const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
@@ -44,6 +47,7 @@
   let search = '';
   let intervalId: number | undefined = undefined;
   let currentDate = new Date().setMilliseconds(0);
+  let openUnsubscriber: Unsubscriber | undefined;
 
   $: filteredOptions = !search
     ? TimezoneOptions
@@ -78,23 +82,30 @@
     Timezones[$timeFormat]?.label ??
     capitalize($timeFormat);
 
+  openUnsubscriber = open.subscribe((isOpen) => {
+    if (isOpen) {
+      currentDate = new Date().setMilliseconds(0);
+      intervalId = window.setInterval(() => {
+        currentDate = new Date().setMilliseconds(0);
+      }, 1000);
+    } else {
+      window.clearInterval(intervalId);
+    }
+  });
+
   onMount(() => {
     if (String($timeFormat) === 'relative') {
       $timeFormat = 'local';
       $relativeTime = true;
     }
-
-    intervalId = window.setInterval(() => {
-      currentDate = new Date().setMilliseconds(0);
-    }, 1000);
   });
 
   onDestroy(() => {
-    window.clearInterval(intervalId);
+    openUnsubscriber?.();
   });
 </script>
 
-<MenuContainer class="max-md:w-full max-md:justify-items-end">
+<MenuContainer {open} class="max-md:w-full max-md:justify-items-end">
   <MenuButton
     label={translate('common.timezone', { timezone })}
     controls="timezones-menu"
@@ -149,7 +160,7 @@
       </div>
 
       {#if !$relativeTime}
-        <div class="m-4 flex justify-between gap-2">
+        <div class="m-4 flex items-center justify-between gap-2">
           <div>
             <p class="font-medium">Timestamp Format</p>
             <Timestamp
