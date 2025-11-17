@@ -187,7 +187,6 @@ export const routeForArchivalEventHistory = ({
   ...parameters
 }: WorkflowParameters): string => {
   const wid = encodeURIForSvelte(workflow);
-
   return `${routeForArchivalWorkflows(parameters)}/${wid}/${run}/history`;
 };
 

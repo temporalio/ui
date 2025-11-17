@@ -77,6 +77,16 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def/history');
   });
 
+  it('should route to "archival.events" history page', () => {
+    const path = routeForEventHistory({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+      archival: true,
+    });
+    expect(path).toBe('/namespaces/default/archival/abc/def/history');
+  });
+
   it('should route to pending activities', () => {
     const path = routeForPendingActivities({
       namespace: 'default',
