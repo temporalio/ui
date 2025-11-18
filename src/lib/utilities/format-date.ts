@@ -44,7 +44,7 @@ export const timestampFormats: Record<
     minute: 'numeric',
     second: 'numeric',
     hour12: false,
-    hourCycle: 'h24',
+    hourCycle: 'h23',
     timeZoneName: 'short',
     fractionalSecondDigits: 2,
   },
