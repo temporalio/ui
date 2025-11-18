@@ -8,6 +8,7 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import { authUser } from '$lib/stores/auth-user';
+  import ziggy from '$lib/vendor/ziggy-full-face.png';
 
   import Icon from './icon/icon.svelte';
   import MenuDivider from './menu/menu-divider.svelte';
@@ -48,7 +49,7 @@
       </div>
     {:else}
       <img
-        src="/ziggy-full-face.png"
+        src={ziggy}
         alt={translate('common.user-profile')}
         class="h-[24px] w-[24px]"
       />

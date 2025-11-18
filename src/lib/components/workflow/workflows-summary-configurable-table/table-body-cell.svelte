@@ -30,8 +30,9 @@
   type Props = {
     column: ConfigurableTableHeader;
     workflow: WorkflowExecution;
+    archival?: boolean;
   };
-  let { column, workflow }: Props = $props();
+  let { column, workflow, archival = false }: Props = $props();
 
   const { label } = $derived(column);
   const namespace = $derived(page.params.namespace);
@@ -86,6 +87,7 @@
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
+          archival,
         })}
       />
     {:else if label === 'Workflow ID'}
@@ -97,6 +99,7 @@
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
+          archival,
         })}
       />
     {:else if label === 'Run ID'}
@@ -108,6 +111,7 @@
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
+          archival,
         })}
       />
     {:else if label === 'Deployment'}

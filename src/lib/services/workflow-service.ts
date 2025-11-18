@@ -656,10 +656,12 @@ export async function startWorkflow({
 
 export const fetchInitialValuesForStartWorkflow = async ({
   namespace,
+  runId,
   workflowType,
   workflowId,
 }: {
   namespace: string;
+  runId?: string;
   workflowType?: string;
   workflowId?: string;
 }): Promise<{
@@ -682,15 +684,18 @@ export const fetchInitialValuesForStartWorkflow = async ({
     details: '',
   };
   try {
-    let query = '';
-    if (workflowType && workflowId) {
-      query = `WorkflowType = "${workflowType}" AND WorkflowId = "${workflowId}"`;
-    } else if (workflowType) {
-      query = `WorkflowType = "${workflowType}"`;
-    } else if (workflowId) {
-      query = `WorkflowId = "${workflowId}"`;
+    const searchParams = [];
+    if (runId) {
+      searchParams.push(`RunId = "${runId}"`);
+    }
+    if (workflowType) {
+      searchParams.push(`WorkflowType = "${workflowType}"`);
+    }
+    if (workflowId) {
+      searchParams.push(`WorkflowId = "${workflowId}"`);
     }
 
+    const query = searchParams.join(' AND ');
     const route = routeForApi('workflows', { namespace });
     const workflows = await requestFromAPI<ListWorkflowExecutionsResponse>(
       route,

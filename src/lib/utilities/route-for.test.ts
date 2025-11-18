@@ -6,7 +6,7 @@ import {
   isEventParameters,
   isNamespaceParameter,
   isWorkflowParameters,
-  routeForArchivalWorkfows,
+  routeForArchivalWorkflows,
   routeForAuthentication,
   routeForCallStack,
   routeForEventHistory,
@@ -55,7 +55,7 @@ describe('routeFor', () => {
   });
 
   it('should route to archival workflows', () => {
-    const path = routeForArchivalWorkfows({ namespace: 'default' });
+    const path = routeForArchivalWorkflows({ namespace: 'default' });
     expect(path).toBe('/namespaces/default/archival');
   });
 
@@ -75,6 +75,16 @@ describe('routeFor', () => {
       run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/history');
+  });
+
+  it('should route to "archival.events" history page', () => {
+    const path = routeForEventHistory({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+      archival: true,
+    });
+    expect(path).toBe('/namespaces/default/archival/abc/def/history');
   });
 
   it('should route to pending activities', () => {

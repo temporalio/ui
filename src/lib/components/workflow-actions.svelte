@@ -202,6 +202,7 @@
                 routeForWorkflowStart({
                   namespace,
                   workflowId: workflow.id,
+                  runId: workflow.runId,
                   taskQueue: workflow.taskQueue,
                   workflowType: workflow.name,
                 }),
@@ -252,6 +253,7 @@
               routeForWorkflowStart({
                 namespace,
                 workflowId: workflow.id,
+                runId: workflow.runId,
                 taskQueue: workflow.taskQueue,
                 workflowType: workflow.name,
               }),
