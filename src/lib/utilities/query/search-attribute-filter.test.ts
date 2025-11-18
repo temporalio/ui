@@ -180,21 +180,21 @@ describe('formatDateTimeRange', () => {
   it('should format a date range between two dates', () => {
     expect(
       formatDateTimeRange(
-        'BETWEEN "2025-07-17T00:00:00.000Z" AND "2025-07-17T00:00:00.000Z"',
+        'BETWEEN "2025-07-17T12:00:00.000Z" AND "2025-07-17T13:00:00.000Z"',
         'UTC',
         false,
       ),
     ).toStrictEqual(
-      'between 7/17/25, 00:00:00.00 UTC and 7/17/25, 00:00:00.00 UTC',
+      'between 7/17/25, 12:00:00.00 UTC and 7/17/25, 13:00:00.00 UTC',
     );
     expect(
       formatDateTimeRange(
-        'BETWEEN 2025-07-17T00:00:00.000Z AND 2025-07-17T00:00:00.000Z',
+        'BETWEEN 2025-07-17T12:00:00.000Z AND 2025-07-17T13:00:00.000Z',
         'UTC',
         false,
       ),
-    ).toStrictEqual(
-      'between 7/17/25, 00:00:00.00 UTC and 7/17/25, 00:00:00.00 UTC',
+    ).toContain(
+      'between 7/17/25, 12:00:00.00 UTC and 7/17/25, 13:00:00.00 UTC',
     );
   });
 

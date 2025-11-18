@@ -33,7 +33,6 @@ export const timestampFormats: Record<
     minute: 'numeric',
     second: 'numeric',
     hour12: false,
-    hourCycle: 'h23',
     fractionalSecondDigits: 2,
     timeZoneName: 'short',
   },
