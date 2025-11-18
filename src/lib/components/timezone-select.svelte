@@ -149,7 +149,9 @@
     </div>
 
     {#if !$relativeTime}
-      <div class="m-4 flex items-center justify-between gap-2">
+      <div
+        class="m-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+      >
         <div>
           <p class="font-medium">Timestamp Format</p>
           <Timestamp

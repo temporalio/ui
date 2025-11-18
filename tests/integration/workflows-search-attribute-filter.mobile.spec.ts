@@ -61,7 +61,9 @@ test('it should update the datetime filter based on the selected timezone', asyn
     .toBe('`CloseTime`>="2025-12-25T12:00:00.000Z"');
 
   await expect(
-    page.getByRole('button', { name: 'CloseTime >= 2025-12-25 04:00' }),
+    page.getByRole('button', {
+      name: 'CloseTime >= 12/25/25, 04:00:00.00 PST',
+    }),
   ).toBeVisible();
   let query = await page.getByTestId('manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
