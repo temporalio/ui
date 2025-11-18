@@ -33,29 +33,29 @@ describe('formatDate', () => {
   });
 
   it('should default to UTC', () => {
-    expect(formatDate(date)).toEqual('2022-04-13 UTC 16:29:35.63');
+    expect(formatDate(date)).toEqual('Apr 13, 2022, 16:29:35.63 UTC');
   });
 
   it('should format other timezones', () => {
     expect(formatDate(date, 'Greenwich Mean Time')).toEqual(
-      '2022-04-13 GMT 16:29:35.63',
+      'Apr 13, 2022, 16:29:35.63 GMT',
     );
     expect(formatDate(date, 'Central Standard Time')).toEqual(
-      '2022-04-13 CDT 11:29:35.63',
+      'Apr 13, 2022, 11:29:35.63 CDT',
     );
     expect(formatDate(date, 'Pacific Daylight Time')).toEqual(
-      '2022-04-13 PDT 09:29:35.63',
+      'Apr 13, 2022, 09:29:35.63 PDT',
     );
   });
 
   it('should format already formatted strings', () => {
     expect(formatDate('2022-04-13 UTC 16:29:35.63')).toEqual(
-      '2022-04-13 UTC 16:29:35.63',
+      'Apr 13, 2022, 16:29:35.63 UTC',
     );
   });
 
   it('should format local time', () => {
-    expect(formatDate(date, 'local')).toEqual('2022-04-13 UTC 16:29:35.63');
+    expect(formatDate(date, 'local')).toEqual('Apr 13, 2022, 16:29:35.63 UTC');
   });
 
   it('should format relative local time', () => {
@@ -69,7 +69,7 @@ describe('formatDate', () => {
 
   it('should not format other timezones as relative', () => {
     expect(formatDate(date, 'UTC', { relative: true })).toEqual(
-      '2022-04-13 UTC 16:29:35.63',
+      'Apr 13, 2022, 16:29:35.63 UTC',
     );
   });
 
@@ -131,34 +131,15 @@ describe('formatDate', () => {
     expect(formattedDate).toEqual('23 hours from now');
   });
 
-  it('should shorten format for local and other timezones', () => {
-    expect(formatDate(date, 'local', { format: 'abbreviated' })).toEqual(
-      '2022-04-13 16:29:35 PM',
-    );
-    expect(formatDate(date, 'utc', { format: 'abbreviated' })).toEqual(
-      '2022-04-13 16:29:35 PM',
-    );
-  });
-
-  it('should shorten format without seconds if there are none for local and other timezones', () => {
-    const dateWithoutSeconds = '2022-04-13T16:29:00.630571Z';
-    expect(
-      formatDate(dateWithoutSeconds, 'local', { format: 'abbreviated' }),
-    ).toEqual('2022-04-13 16:29 PM');
-    expect(
-      formatDate(dateWithoutSeconds, 'utc', { format: 'abbreviated' }),
-    ).toEqual('2022-04-13 16:29 PM');
-  });
-
   it('supports different timestamps formats', () => {
     expect(formatDate(date, 'utc', { format: 'short' })).toEqual(
-      '13th Apr 2022 16:29:35.63',
+      '4/13/22, 16:29:35.63 UTC',
     );
     expect(formatDate(date, 'utc', { format: 'medium' })).toEqual(
-      '2022-04-13 UTC 16:29:35.63',
+      'Apr 13, 2022, 16:29:35.63 UTC',
     );
     expect(formatDate(date, 'utc', { format: 'long' })).toEqual(
-      'April 13th 2022, 04:29:35.63 PM UTC',
+      'April 13, 2022 at 4:29:35.63 PM UTC',
     );
   });
 });

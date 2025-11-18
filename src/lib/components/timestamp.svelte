@@ -7,11 +7,11 @@
     relativeTime,
     timeFormat,
     timestampFormat,
-    type TimestampFormat,
   } from '$lib/stores/time-format';
   import {
     formatDate,
     type FormatDateOptions,
+    type TimestampFormat,
   } from '$lib/utilities/format-date';
   import type { ValidTime } from '$lib/utilities/format-time';
 

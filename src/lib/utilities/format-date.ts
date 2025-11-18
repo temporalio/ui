@@ -4,13 +4,10 @@ import {
   parseISO,
   parseJSON,
 } from 'date-fns';
-import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import {
   getTimezone,
   type TimeFormat,
-  type TimestampFormat,
-  timestampFormats,
   TimezoneOptions,
   Timezones,
 } from '$lib/stores/time-format';
@@ -23,6 +20,48 @@ export type FormatDateOptions = {
   relativeLabel?: string;
   flexibleUnits?: boolean;
 };
+
+export const timestampFormats: Record<
+  string,
+  Partial<Intl.DateTimeFormatOptions>
+> = {
+  short: {
+    year: '2-digit',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false,
+    fractionalSecondDigits: 2,
+    timeZoneName: 'short',
+  },
+  medium: {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false,
+    hourCycle: 'h12',
+    timeZoneName: 'short',
+    fractionalSecondDigits: 2,
+  },
+  long: {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true,
+    timeZoneName: 'short',
+    fractionalSecondDigits: 2,
+  },
+} as const;
+
+export type TimestampFormat = keyof typeof timestampFormats;
 
 export function formatDate(
   date: ValidTime | undefined | null,
@@ -47,15 +86,8 @@ export function formatDate(
 
     const parsed = parseJSON(new Date(date));
 
-    const timestampFormat =
-      format === 'abbreviated'
-        ? parsed.getSeconds()
-          ? timestampFormats.abbreviated
-          : timestampFormats.abbreviatedWithoutSeconds
-        : timestampFormats[format];
-
     if (timeFormat === 'local') {
-      if (relative)
+      if (relative) {
         return (
           formatDistanceToNowStrict(parsed, {
             ...(!flexibleUnits &&
@@ -64,10 +96,19 @@ export function formatDate(
               }),
           }) + ` ${relativeLabel}`
         );
-      return dateTz.format(parsed, timestampFormat);
+      }
+
+      return new Intl.DateTimeFormat(
+        undefined,
+        timestampFormats[format],
+      ).format(parsed);
     }
-    const timezone = getTimezone(timeFormat);
-    return dateTz.formatInTimeZone(parsed, timezone, timestampFormat);
+
+    const timeZone = getTimezone(timeFormat);
+    return new Intl.DateTimeFormat(undefined, {
+      ...timestampFormats[format],
+      timeZone,
+    }).format(parsed);
   } catch (e) {
     console.error('Error formatting date:', e);
     return '';

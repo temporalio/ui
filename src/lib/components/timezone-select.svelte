@@ -24,12 +24,15 @@
     timeFormat,
     type TimeFormatOptions,
     timestampFormat,
-    type TimestampFormat,
     TimezoneOptions,
     Timezones,
   } from '$lib/stores/time-format';
   import { capitalize } from '$lib/utilities/format-camel-case';
-  import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
+  import {
+    formatUTCOffset,
+    getLocalTime,
+    type TimestampFormat,
+  } from '$lib/utilities/format-date';
 
   export let position: 'left' | 'right' = 'right';
   export let size: ButtonStyles['size'] = 'md';
@@ -134,6 +137,49 @@
 
     <MenuDivider />
 
+    <div class="m-4">
+      <ToggleSwitch
+        label={translate('common.relative')}
+        id="relative-toggle"
+        bind:checked={$relativeTime}
+        labelPosition="left"
+        on:change={handleRelativeToggle}
+        data-testid="timezones-relative-toggle"
+      />
+    </div>
+
+    {#if !$relativeTime}
+      <div class="m-4 flex items-center justify-between gap-2">
+        <div>
+          <p class="font-medium">Timestamp Format</p>
+          <Timestamp
+            as="p"
+            class="text-xs text-secondary"
+            dateTime={currentDate}
+          />
+        </div>
+        <ToggleButtons>
+          <ToggleButton
+            size="xs"
+            active={$timestampFormat === 'short'}
+            on:click={() => setTimestampFormat('short')}>Short</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
+            active={$timestampFormat === 'medium'}
+            on:click={() => setTimestampFormat('medium')}>Default</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
+            active={$timestampFormat === 'long'}
+            on:click={() => setTimestampFormat('long')}>Long</ToggleButton
+          >
+        </ToggleButtons>
+      </div>
+    {/if}
+
+    <MenuDivider />
+
     {#if !search}
       {#each QuickTimezoneOptions as { value, label }}
         <MenuItem
@@ -145,50 +191,6 @@
           {label}
         </MenuItem>
       {/each}
-
-      <MenuDivider />
-
-      <div class="m-4">
-        <ToggleSwitch
-          label={translate('common.relative')}
-          id="relative-toggle"
-          bind:checked={$relativeTime}
-          labelPosition="left"
-          on:change={handleRelativeToggle}
-          data-testid="timezones-relative-toggle"
-        />
-      </div>
-
-      {#if !$relativeTime}
-        <div class="m-4 flex items-center justify-between gap-2">
-          <div>
-            <p class="font-medium">Timestamp Format</p>
-            <Timestamp
-              as="p"
-              class="text-xs text-secondary"
-              dateTime={currentDate}
-            />
-          </div>
-          <ToggleButtons>
-            <ToggleButton
-              size="xs"
-              active={$timestampFormat === 'short'}
-              on:click={() => setTimestampFormat('short')}>Short</ToggleButton
-            >
-            <ToggleButton
-              size="xs"
-              active={$timestampFormat === 'medium'}
-              on:click={() => setTimestampFormat('medium')}
-              >Default</ToggleButton
-            >
-            <ToggleButton
-              size="xs"
-              active={$timestampFormat === 'long'}
-              on:click={() => setTimestampFormat('long')}>Long</ToggleButton
-            >
-          </ToggleButtons>
-        </div>
-      {/if}
 
       <MenuDivider />
     {/if}

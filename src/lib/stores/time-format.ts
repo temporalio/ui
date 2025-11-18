@@ -2,19 +2,13 @@ import { startOfDay } from 'date-fns';
 import * as dateTz from 'date-fns-tz';
 
 import { persistStore } from '$lib/stores/persist-store';
-import { getLocalTimezone } from '$lib/utilities/format-date';
+import {
+  getLocalTimezone,
+  type TimestampFormat,
+} from '$lib/utilities/format-date';
 
 type TimeFormatTypes = 'relative' | 'absolute';
 
-export const timestampFormats = {
-  short: 'do MMM yyyy H:mm:ss.SS',
-  medium: 'yyyy-MM-dd z HH:mm:ss.SS',
-  long: 'MMMM do yyyy, hh:mm:ss.SS a z',
-  abbreviated: 'yyyy-MM-dd HH:mm:ss a',
-  abbreviatedWithoutSeconds: 'yyyy-MM-dd HH:mm a',
-} as const;
-
-export type TimestampFormat = keyof typeof timestampFormats;
 export const timestampFormat = persistStore<TimestampFormat>(
   'timestampFormat',
   'medium',

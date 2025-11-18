@@ -22,7 +22,7 @@
   let refreshDate = $derived(
     formatDate($refresh ? new Date($refresh) : new Date(), $timeFormat, {
       relative: $relativeTime,
-      format: 'abbreviated',
+      format: 'short',
     }),
   );
 
