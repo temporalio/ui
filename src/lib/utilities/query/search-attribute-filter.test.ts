@@ -30,6 +30,7 @@ const store = writable<SearchAttributes>({
   CustomC: 'String',
 });
 
+// force GH action runners to use en-US and 12-hour clocks starting at 0:00
 const DateTimeFormat = Intl.DateTimeFormat;
 vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
   (_, options) =>

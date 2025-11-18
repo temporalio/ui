@@ -62,7 +62,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await expect(
     page.getByRole('button', {
-      name: 'CloseTime >= 12/25/25, 04:00:00.00 PST',
+      name: 'CloseTime >= 12/25/25, 4:00:00.00 AM PST',
     }),
   ).toBeVisible();
   let query = await page.getByTestId('manual-search-input').inputValue();
