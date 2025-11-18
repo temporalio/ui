@@ -182,14 +182,20 @@ describe('formatDateTimeRange', () => {
       formatDateTimeRange(
         'BETWEEN "2025-07-17T00:00:00.000Z" AND "2025-07-17T00:00:00.000Z"',
         'UTC',
+        false,
       ),
-    ).toStrictEqual('between 2025-07-17 00:00 AM and 2025-07-17 00:00 AM');
+    ).toStrictEqual(
+      'between 7/17/25, 00:00:00.00 UTC and 7/17/25, 00:00:00.00 UTC',
+    );
     expect(
       formatDateTimeRange(
         'BETWEEN 2025-07-17T00:00:00.000Z AND 2025-07-17T00:00:00.000Z',
         'UTC',
+        false,
       ),
-    ).toStrictEqual('between 2025-07-17 00:00 AM and 2025-07-17 00:00 AM');
+    ).toStrictEqual(
+      'between 7/17/25, 00:00:00.00 UTC and 7/17/25, 00:00:00.00 UTC',
+    );
   });
 
   it('should format a date range between two dates with a different time format', () => {
@@ -197,7 +203,10 @@ describe('formatDateTimeRange', () => {
       formatDateTimeRange(
         'BETWEEN "2025-07-17T00:00:00.000Z" AND "2025-07-17T00:00:00.000Z"',
         'Pacific Daylight Time',
+        false,
       ),
-    ).toStrictEqual('between 2025-07-16 17:00 PM and 2025-07-16 17:00 PM');
+    ).toStrictEqual(
+      'between 7/16/25, 17:00:00.00 PDT and 7/16/25, 17:00:00.00 PDT',
+    );
   });
 });
