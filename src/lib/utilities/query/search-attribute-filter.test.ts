@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { SearchAttributes } from '$lib/types/workflows';
 
@@ -29,6 +29,12 @@ const store = writable<SearchAttributes>({
   CustomB: 'Double',
   CustomC: 'String',
 });
+
+const DateTimeFormat = Intl.DateTimeFormat;
+vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
+  (_, options) =>
+    new DateTimeFormat('en-US', { ...options, hour12: true, hourCycle: 'h11' }),
+);
 
 describe('isStatusFilter', () => {
   it('should return true if the attribute is ExecutionStatus', () => {
@@ -185,7 +191,7 @@ describe('formatDateTimeRange', () => {
         false,
       ),
     ).toStrictEqual(
-      'between 7/17/25, 12:00:00.00 UTC and 7/17/25, 13:00:00.00 UTC',
+      'between 7/17/25, 12:00:00.00 PM UTC and 7/17/25, 1:00:00.00 PM UTC',
     );
     expect(
       formatDateTimeRange(
@@ -194,7 +200,7 @@ describe('formatDateTimeRange', () => {
         false,
       ),
     ).toContain(
-      'between 7/17/25, 12:00:00.00 UTC and 7/17/25, 13:00:00.00 UTC',
+      'between 7/17/25, 12:00:00.00 PM UTC and 7/17/25, 1:00:00.00 PM UTC',
     );
   });
 
@@ -206,7 +212,7 @@ describe('formatDateTimeRange', () => {
         false,
       ),
     ).toStrictEqual(
-      'between 7/16/25, 17:00:00.00 PDT and 7/16/25, 17:00:00.00 PDT',
+      'between 7/16/25, 5:00:00.00 PM PDT and 7/16/25, 5:00:00.00 PM PDT',
     );
   });
 });

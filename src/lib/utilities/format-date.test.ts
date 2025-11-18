@@ -9,6 +9,12 @@ import {
   isValidDate,
 } from './format-date';
 
+const DateTimeFormat = Intl.DateTimeFormat;
+vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
+  (_, options) =>
+    new DateTimeFormat('en-US', { ...options, hour12: true, hourCycle: 'h11' }),
+);
+
 describe('formatDate', () => {
   const date = '2022-04-13T16:29:35.630571Z';
 
@@ -33,29 +39,31 @@ describe('formatDate', () => {
   });
 
   it('should default to UTC', () => {
-    expect(formatDate(date)).toEqual('Apr 13, 2022, 16:29:35.63 UTC');
+    expect(formatDate(date)).toEqual('Apr 13, 2022, 4:29:35.63 PM UTC');
   });
 
   it('should format other timezones', () => {
     expect(formatDate(date, 'Greenwich Mean Time')).toEqual(
-      'Apr 13, 2022, 16:29:35.63 GMT',
+      'Apr 13, 2022, 4:29:35.63 PM GMT',
     );
     expect(formatDate(date, 'Central Standard Time')).toEqual(
-      'Apr 13, 2022, 11:29:35.63 CDT',
+      'Apr 13, 2022, 11:29:35.63 AM CDT',
     );
     expect(formatDate(date, 'Pacific Daylight Time')).toEqual(
-      'Apr 13, 2022, 09:29:35.63 PDT',
+      'Apr 13, 2022, 9:29:35.63 AM PDT',
     );
   });
 
   it('should format already formatted strings', () => {
-    expect(formatDate('2022-04-13 UTC 16:29:35.63')).toEqual(
-      'Apr 13, 2022, 16:29:35.63 UTC',
+    expect(formatDate('2022-04-13 UTC 4:29:35.63 PM')).toEqual(
+      'Apr 13, 2022, 4:29:35.63 PM UTC',
     );
   });
 
   it('should format local time', () => {
-    expect(formatDate(date, 'local')).toEqual('Apr 13, 2022, 16:29:35.63 UTC');
+    expect(formatDate(date, 'local')).toEqual(
+      'Apr 13, 2022, 4:29:35.63 PM UTC',
+    );
   });
 
   it('should format relative local time', () => {
@@ -69,7 +77,7 @@ describe('formatDate', () => {
 
   it('should not format other timezones as relative', () => {
     expect(formatDate(date, 'UTC', { relative: true })).toEqual(
-      'Apr 13, 2022, 16:29:35.63 UTC',
+      'Apr 13, 2022, 4:29:35.63 PM UTC',
     );
   });
 
@@ -133,10 +141,10 @@ describe('formatDate', () => {
 
   it('supports different timestamps formats', () => {
     expect(formatDate(date, 'utc', { format: 'short' })).toEqual(
-      '4/13/22, 16:29:35.63 UTC',
+      '4/13/22, 4:29:35.63 PM UTC',
     );
     expect(formatDate(date, 'utc', { format: 'medium' })).toEqual(
-      'Apr 13, 2022, 16:29:35.63 UTC',
+      'Apr 13, 2022, 4:29:35.63 PM UTC',
     );
     expect(formatDate(date, 'utc', { format: 'long' })).toEqual(
       'April 13, 2022 at 4:29:35.63 PM UTC',
