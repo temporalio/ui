@@ -1,12 +1,11 @@
 <script lang="ts">
   import Panel from '$lib/components/panel.svelte';
+  import Timestamp from '$lib/components/timestamp.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForEventHistory,
     routeForWorkflowsWithQuery,
@@ -63,11 +62,7 @@
           </Link>
         </div>
         <div class="ml-auto">
-          <p>
-            {formatDate(run.actualTime, $timeFormat, {
-              relative: $relativeTime,
-            })}
-          </p>
+          <Timestamp as="p" dateTime={run.actualTime} />
         </div>
       </div>
     {:catch}
@@ -77,11 +72,7 @@
           {run.startWorkflowResult.workflowId}
         </div>
         <div class="ml-auto">
-          <p>
-            {formatDate(run.actualTime, $timeFormat, {
-              relative: $relativeTime,
-            })}
-          </p>
+          <Timestamp as="p" dateTime={run.actualTime} />
         </div>
       </div>
     {/await}

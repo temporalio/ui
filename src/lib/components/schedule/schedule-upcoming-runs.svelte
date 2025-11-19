@@ -1,25 +1,23 @@
 <script lang="ts">
   import Panel from '$lib/components/panel.svelte';
+  import Timestamp from '$lib/components/timestamp.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
 
-  import type { Timestamp } from '$types';
+  import type { Timestamp as ITimestamp } from '$types';
 
-  export let futureRuns: Timestamp[] = [];
+  export let futureRuns: ITimestamp[] = [];
 </script>
 
 <Panel class="w-full">
   <h2 class="mb-4">{translate('schedules.upcoming-runs')}</h2>
   {#each futureRuns.slice(0, 5) as run}
     <div class="row">
-      <p>
-        {formatDate(run, $timeFormat, {
-          relative: $relativeTime,
-          relativeLabel: translate('common.from-now'),
-        })}
-      </p>
+      <Timestamp
+        as="p"
+        dateTime={run}
+        options={{ relativeLabel: translate('common.from-now') }}
+      />
     </div>
   {:else}
     <EmptyState

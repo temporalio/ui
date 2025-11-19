@@ -3,9 +3,17 @@ import { enUS } from 'date-fns/locale';
 import * as dateTz from 'date-fns-tz';
 
 import { persistStore } from '$lib/stores/persist-store';
-import { getLocalTimezone } from '$lib/utilities/format-date';
+import {
+  getLocalTimezone,
+  type TimestampFormat,
+} from '$lib/utilities/format-date';
 
 type TimeFormatTypes = 'relative' | 'absolute';
+
+export const timestampFormat = persistStore<TimestampFormat>(
+  'timestampFormat',
+  'medium',
+);
 
 export const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 

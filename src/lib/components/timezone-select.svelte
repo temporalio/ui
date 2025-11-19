@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { type Unsubscriber, writable } from 'svelte/store';
 
+  import { onDestroy, onMount } from 'svelte';
+
+  import Timestamp from '$lib/components/timestamp.svelte';
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -11,6 +14,8 @@
     MenuDivider,
     MenuItem,
   } from '$lib/holocene/menu';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -18,14 +23,20 @@
     relativeTime,
     timeFormat,
     type TimeFormatOptions,
+    timestampFormat,
     TimezoneOptions,
     Timezones,
   } from '$lib/stores/time-format';
-  import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
+  import {
+    formatUTCOffset,
+    getLocalTime,
+    type TimestampFormat,
+  } from '$lib/utilities/format-date';
 
   export let position: 'left' | 'right' = 'right';
   export let size: ButtonStyles['size'] = 'md';
 
+  const open = writable(false);
   const localTime = getLocalTime();
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
@@ -36,6 +47,9 @@
   ];
 
   let search = '';
+  let intervalId: number | undefined = undefined;
+  let currentDate = new Date().setMilliseconds(0);
+  let openUnsubscriber: Unsubscriber | undefined;
 
   $: filteredOptions = !search
     ? TimezoneOptions
@@ -62,7 +76,22 @@
     }
   };
 
+  const setTimestampFormat = (format: TimestampFormat) => {
+    $timestampFormat = format;
+  };
+
   $: timezone = Timezones[$timeFormat]?.abbr ?? $timeFormat;
+
+  openUnsubscriber = open.subscribe((isOpen) => {
+    if (isOpen) {
+      currentDate = new Date().setMilliseconds(0);
+      intervalId = window.setInterval(() => {
+        currentDate = new Date().setMilliseconds(0);
+      }, 1000);
+    } else {
+      window.clearInterval(intervalId);
+    }
+  });
 
   onMount(() => {
     if (String($timeFormat) === 'relative') {
@@ -70,9 +99,13 @@
       $relativeTime = true;
     }
   });
+
+  onDestroy(() => {
+    openUnsubscriber?.();
+  });
 </script>
 
-<MenuContainer class="max-md:w-full max-md:justify-items-end">
+<MenuContainer {open} class="max-md:w-full max-md:justify-items-end">
   <MenuButton
     label={translate('common.timezone', { timezone })}
     controls="timezones-menu"
@@ -87,7 +120,7 @@
   <Menu
     id="timezones-menu"
     {position}
-    class="w-[10rem] sm:w-[20rem] md:w-[26rem]"
+    class="w-[10rem] sm:w-[20rem] md:w-[28rem]"
   >
     <Input
       label={translate('common.search')}
@@ -98,6 +131,51 @@
       icon="search"
       placeholder={translate('common.search')}
     />
+
+    <MenuDivider />
+
+    <div class="m-4">
+      <ToggleSwitch
+        label={translate('common.relative')}
+        id="relative-toggle"
+        bind:checked={$relativeTime}
+        labelPosition="left"
+        on:change={handleRelativeToggle}
+        data-testid="timezones-relative-toggle"
+      />
+    </div>
+
+    {#if !$relativeTime}
+      <div
+        class="m-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+      >
+        <div>
+          <p class="font-medium">Timestamp Format</p>
+          <Timestamp
+            as="p"
+            class="text-xs text-secondary"
+            dateTime={currentDate}
+          />
+        </div>
+        <ToggleButtons>
+          <ToggleButton
+            size="xs"
+            active={$timestampFormat === 'short'}
+            on:click={() => setTimestampFormat('short')}>Short</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
+            active={$timestampFormat === 'medium'}
+            on:click={() => setTimestampFormat('medium')}>Default</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
+            active={$timestampFormat === 'long'}
+            on:click={() => setTimestampFormat('long')}>Long</ToggleButton
+          >
+        </ToggleButtons>
+      </div>
+    {/if}
 
     <MenuDivider />
 
@@ -112,17 +190,6 @@
           {label}
         </MenuItem>
       {/each}
-
-      <div class="mx-2 my-4">
-        <ToggleSwitch
-          label={translate('common.relative')}
-          id="relative-toggle"
-          bind:checked={$relativeTime}
-          labelPosition="left"
-          on:change={handleRelativeToggle}
-          data-testid="timezones-relative-toggle"
-        />
-      </div>
 
       <MenuDivider />
     {/if}

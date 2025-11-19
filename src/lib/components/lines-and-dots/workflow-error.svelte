@@ -1,10 +1,10 @@
 <script lang="ts">
+  import Timestamp from '$lib/components/timestamp.svelte';
   import AccordionGroup from '$lib/holocene/accordion/accordion-group.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
   import type {
     WorkflowTaskFailedEvent,
@@ -12,7 +12,6 @@
   } from '$lib/types/events';
   import type { WorkflowTaskFailedCause } from '$lib/types/workflows';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     getErrorCause,
     isFailedTaskEvent,
@@ -67,9 +66,7 @@
             >{spaceBetweenCapitalLetters(error?.name)}</span
           >
         </div>
-        {formatDate(error?.eventTime, $timeFormat, {
-          relative: $relativeTime,
-        })}
+        <Timestamp dateTime={error?.eventTime} />
       </div>
       <div class="flex flex-col gap-2 bg-primary p-4">
         {#if timeoutType}
