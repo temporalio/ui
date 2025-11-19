@@ -8,7 +8,6 @@ import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some
 
 import {
   getTimezone,
-  type TimeFormat,
   TimezoneOptions,
   Timezones,
 } from '$lib/stores/time-format';
@@ -19,7 +18,7 @@ const pattern = 'yyyy-MM-dd z HH:mm:ss.SS';
 
 export function formatDate(
   date: ValidTime | undefined | null,
-  timeFormat: TimeFormat = 'UTC',
+  timeFormat: string = 'UTC',
   options: {
     relative?: boolean;
     relativeLabel?: string;
@@ -103,7 +102,7 @@ export function getLocalTime(): string {
     : localTimezone;
 }
 
-export function getSelectedTimezone(timeFormat: TimeFormat): string {
+export function getSelectedTimezone(timeFormat: string): string {
   if (timeFormat === 'local') return getLocalTime();
 
   const selectedTimezone = Timezones[timeFormat];

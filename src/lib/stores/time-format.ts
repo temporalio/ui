@@ -1,4 +1,5 @@
 import { startOfDay } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 import * as dateTz from 'date-fns-tz';
 
 import { persistStore } from '$lib/stores/persist-store';
@@ -8,7 +9,7 @@ type TimeFormatTypes = 'relative' | 'absolute';
 
 export const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
-export const timeFormat = persistStore('timeFormat', 'UTC' as TimeFormat);
+export const timeFormat = persistStore('timeFormat', 'UTC');
 export const timeFormatType = persistStore(
   'timeFormatType',
   'relative' as TimeFormatTypes,
@@ -31,50 +32,51 @@ export const endHour = persistStore('endHour', '');
 export const endMinute = persistStore('endMinute', '');
 export const endSecond = persistStore('endSecond', '');
 
-export type TimeFormat = keyof typeof Timezones | 'UTC' | 'local';
+type TimezoneInfo = {
+  abbr: string;
+  offset: number;
+  zones: string[];
+};
 
 type TimeFormatOption = {
   label: string;
-  value: TimeFormat;
-  abbr?: string;
-  offset?: number;
-  zones?: string[];
-};
+  value: string;
+} & Partial<TimezoneInfo>;
 
 export type TimeFormatOptions = TimeFormatOption[];
 
-// Use this snippet to generate the Timezones object
-// import { enUS } from 'date-fns/locale';
-// import { utcToZonedTime, getTimezoneOffset, format } from 'date-fns-tz';
-// const generateTimezoneOptions = () => {
-//   const timeZones = Intl.supportedValuesOf('timeZone');
-//   return timeZones.reduce((acc, timeZone) => {
-//     const zonedTime = utcToZonedTime(new Date(), timeZone);
-//     const zoneString = format(zonedTime, 'zzzz', {
-//       timeZone,
-//       locale: enUS,
-//     });
-//     if (acc[zoneString]) {
-//       acc[zoneString].zones.push(timeZone);
-//     } else {
-//       const zoneAbbr = format(zonedTime, 'z', {
-//         timeZone,
-//         locale: enUS,
-//       });
-//       const offset = Math.floor(
-//         (getTimezoneOffset(timeZone) / (1000 * 60 * 60)) % 24,
-//       );
-//       acc[zoneString] = {
-//         abbr: zoneAbbr,
-//         offset,
-//         zones: [timeZone],
-//       };
-//     }
-//     return acc;
-//   }, {});
-// };
+const getGroupedTimezones = (): {
+  [key: string]: TimezoneInfo;
+} => {
+  return Intl.supportedValuesOf('timeZone').reduce((acc, timeZone) => {
+    const zonedTime = dateTz.utcToZonedTime(new Date(), timeZone);
+    const zoneString = dateTz.format(zonedTime, 'zzzz', {
+      timeZone,
+      locale: enUS,
+    });
+    if (acc[zoneString]) {
+      acc[zoneString].zones.push(timeZone);
+    } else {
+      const zoneAbbr = dateTz.format(zonedTime, 'z', {
+        timeZone,
+        locale: enUS,
+      });
+      const offset = Math.floor(
+        (dateTz.getTimezoneOffset(timeZone) / (1000 * 60 * 60)) % 24,
+      );
+      acc[zoneString] = {
+        abbr: zoneAbbr,
+        offset,
+        zones: [timeZone],
+      };
+    }
+    return acc;
+  }, {});
+};
 
-export const Timezones = {
+export const Timezones = getGroupedTimezones();
+
+const DEPRECATED_TIMEZONES = {
   'Greenwich Mean Time': {
     abbr: 'GMT',
     offset: 0,
@@ -1172,8 +1174,7 @@ export const Timezones = {
 } as const;
 
 export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .map(([key, value]: [TimeFormat, any]) => ({
+  .map(([key, value]: [string, TimezoneInfo]) => ({
     label: key,
     value: key,
     ...value,
@@ -1184,7 +1185,7 @@ export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
     return 0;
   });
 
-export const getTimezone = (timeFormat: TimeFormat): string => {
+export const getTimezone = (timeFormat: string): string => {
   if (timeFormat === 'local') return getLocalTimezone();
   return Timezones[timeFormat]?.zones[0] ?? timeFormat;
 };
@@ -1194,7 +1195,7 @@ export const formatOffset = (offset: number) => {
   return offset >= 0 ? `+${formattedOffset}:00` : `-${formattedOffset}:00`;
 };
 
-export const getUTCOffset = (timeFormat: TimeFormat): string => {
+export const getUTCOffset = (timeFormat: string): string => {
   let offset: number | undefined = Timezones[timeFormat]?.offset;
 
   if (offset === undefined) {

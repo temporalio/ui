@@ -15,13 +15,11 @@
   import { translate } from '$lib/i18n/translate';
   import {
     relativeTime,
-    type TimeFormat,
     timeFormat,
     type TimeFormatOptions,
     TimezoneOptions,
     Timezones,
   } from '$lib/stores/time-format';
-  import { capitalize } from '$lib/utilities/format-camel-case';
   import { formatUTCOffset, getLocalTime } from '$lib/utilities/format-date';
 
   export let position: 'left' | 'right' = 'right';
@@ -49,7 +47,7 @@
         );
       });
 
-  const selectTimezone = (value: TimeFormat) => {
+  const selectTimezone = (value: string) => {
     if ($relativeTime && value !== 'local') $relativeTime = false;
     $timeFormat = value;
     search = '';
@@ -62,10 +60,7 @@
     }
   };
 
-  $: timezone =
-    Timezones[$timeFormat]?.abbr ??
-    Timezones[$timeFormat]?.label ??
-    capitalize($timeFormat);
+  $: timezone = Timezones[$timeFormat]?.abbr ?? $timeFormat;
 
   onMount(() => {
     if (String($timeFormat) === 'relative') {

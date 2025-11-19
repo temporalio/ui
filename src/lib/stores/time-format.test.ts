@@ -8,7 +8,6 @@ import {
   getUTCOffset,
   relativeTime,
   timeFormat,
-  type TimeFormat,
   Timezones,
 } from './time-format';
 
@@ -54,7 +53,7 @@ describe('formatOffset', () => {
 describe('getUTCOffset', () => {
   test('should return a formatted UTC offset for all Timezone options', () => {
     Object.entries(Timezones).forEach(([format, { offset }]) => {
-      expect(getUTCOffset(format as TimeFormat)).toBe(formatOffset(offset));
+      expect(getUTCOffset(format)).toBe(formatOffset(offset));
     });
   });
 
@@ -63,6 +62,6 @@ describe('getUTCOffset', () => {
   });
 
   test('should return a formatted UTC offset for a timezone', () => {
-    expect(getUTCOffset('America/Phoenix' as TimeFormat)).toBe('-07:00');
+    expect(getUTCOffset('America/Phoenix')).toBe('-07:00');
   });
 });
