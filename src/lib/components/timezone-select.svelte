@@ -14,6 +14,7 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    BASE_TIME_FORMAT_OPTIONS,
     relativeTime,
     timeFormat,
     type TimeFormatOptions,
@@ -29,9 +30,9 @@
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
       label: translate('common.utc'),
-      value: 'UTC',
+      value: BASE_TIME_FORMAT_OPTIONS.UTC,
     },
-    { label: translate('common.local'), value: 'local' },
+    { label: translate('common.local'), value: BASE_TIME_FORMAT_OPTIONS.LOCAL },
   ];
 
   let search = '';
@@ -48,15 +49,16 @@
       });
 
   const selectTimezone = (value: string) => {
-    if ($relativeTime && value !== 'local') $relativeTime = false;
+    if ($relativeTime && value !== BASE_TIME_FORMAT_OPTIONS.LOCAL)
+      $relativeTime = false;
     $timeFormat = value;
     search = '';
   };
 
   const handleRelativeToggle = (e: Event) => {
     const target = e.target as HTMLInputElement;
-    if (target.checked && $timeFormat !== 'local') {
-      $timeFormat = 'local';
+    if (target.checked && $timeFormat !== BASE_TIME_FORMAT_OPTIONS.LOCAL) {
+      $timeFormat = BASE_TIME_FORMAT_OPTIONS.LOCAL;
     }
   };
 
@@ -64,7 +66,7 @@
 
   onMount(() => {
     if (String($timeFormat) === 'relative') {
-      $timeFormat = 'local';
+      $timeFormat = BASE_TIME_FORMAT_OPTIONS.LOCAL;
       $relativeTime = true;
     }
   });
@@ -105,7 +107,7 @@
           on:click={() => selectTimezone(value)}
           data-testid={`timezones-${value}`}
           selected={value === $timeFormat}
-          description={value === 'local' && localTime}
+          description={value === BASE_TIME_FORMAT_OPTIONS.LOCAL && localTime}
         >
           {label}
         </MenuItem>

@@ -7,6 +7,7 @@ import {
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import {
+  BASE_TIME_FORMAT_OPTIONS,
   getTimezone,
   TimezoneOptions,
   Timezones,
@@ -50,7 +51,7 @@ export function formatDate(
         : 'yyyy-MM-dd HH:mm a'
       : pattern;
 
-    if (timeFormat === 'local') {
+    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
       if (relative)
         return (
           formatDistanceToNowStrict(parsed, {
@@ -103,7 +104,7 @@ export function getLocalTime(): string {
 }
 
 export function getSelectedTimezone(timeFormat: string): string {
-  if (timeFormat === 'local') return getLocalTime();
+  if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) return getLocalTime();
 
   const selectedTimezone = Timezones[timeFormat];
   if (selectedTimezone) return `${timeFormat} (${selectedTimezone.abbr})`;
