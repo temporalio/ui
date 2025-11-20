@@ -26,7 +26,6 @@
   export let count: number | undefined = undefined;
   export let loading = false;
   export let newCount: number | undefined = undefined;
-  export let big = false;
   export let delayed = false;
   export let taskFailure = false;
 
@@ -128,10 +127,11 @@
           }),
           'rounded-l-none',
           (newCount || taskFailure) && 'rounded-r-none',
+          '[&:not(.text-lg)_svg]:px-0.5',
           $$props.class || '',
         )}
       >
-        <Icon name="clock" class={merge(!big && 'px-0.5')} />
+        <Icon name="clock" />
       </span>
     {/if}
     {#if taskFailure}
@@ -141,10 +141,11 @@
           'bg-red-200 text-red-900 dark:bg-red-700 dark:text-white',
           'rounded-l-none',
           newCount && 'rounded-r-none',
+          '[&:not(.text-lg)_svg]:px-0.5',
           $$props.class || '',
         )}
       >
-        <Icon name="exclamation-octagon" class={merge(!big && 'px-0.5')} />
+        <Icon name="exclamation-octagon" />
       </span>
     {/if}
 

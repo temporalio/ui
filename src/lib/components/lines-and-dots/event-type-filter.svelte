@@ -53,7 +53,7 @@
 </script>
 
 <MenuContainer {open}>
-  <MenuButton controls="status-menu" size="sm">
+  <MenuButton controls="status-menu" size="sm" leadingIcon="filter">
     <span class="hidden text-sm md:block"
       >{translate('events.event-types')} · {filterActive || $eventStatusFilter
         ? 'Filtered'

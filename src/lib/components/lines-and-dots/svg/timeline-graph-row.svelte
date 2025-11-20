@@ -157,7 +157,7 @@
     points.length >= 2 && points[points.length - 1] - points[0] + radius * 3,
   );
   const pendingHoverWidth = $derived(
-    pendingActivity && canvasWidth - points[0] - radius * 1.5,
+    group.isPending && canvasWidth - points[0] - radius * 1.5,
   );
   const singleEventHoverWidth = $derived(radius * 3);
 

@@ -102,7 +102,7 @@
     {#if showEventGroup}
       {@render eventCards()}
     {:else if event}
-      <EventCard {event} />
+      <EventCard {event} class="rounded-t-none" />
     {/if}
     {@render children?.()}
   </div>

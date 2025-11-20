@@ -279,11 +279,11 @@
       >
         <Badge
           type={activitiesCanceled ? 'warning' : 'primary'}
-          class="px-2 py-0"
+          class="py-0 {activitiesCanceled ? 'px-1' : 'px-2'}"
         >
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-0.5">
             {#if activitiesCanceled}
-              <Icon name="canceled" />
+              <Icon name="canceled" class="py-0.5" />
             {/if}
             {workflow?.pendingActivities?.length}
           </div>

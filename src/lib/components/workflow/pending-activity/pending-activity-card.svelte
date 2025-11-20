@@ -56,9 +56,9 @@
 </script>
 
 <div
-  class={pendingStatus({
+  class="{pendingStatus({
     status: activity.attempt > 1 ? 'retrying' : 'pending',
-  })}
+  })} text-white"
 >
   <div class="bg-slate-900/80 p-2 pb-1 text-left">
     <div class="flex flex-col items-center justify-between lg:flex-row">
@@ -286,7 +286,7 @@
       )}
     </Badge>
     {#if activity.maximumAttempts}
-      <p class="ml-1 text-sm text-secondary">
+      <p class="ml-1 text-sm">
         {formatAttemptsLeft(activity.maximumAttempts, activity.attempt)} remaining
       </p>
     {/if}

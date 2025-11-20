@@ -1,5 +1,6 @@
 <script lang="ts">
   import { cva } from 'class-variance-authority';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -30,10 +31,13 @@
   import MetadataDecoder from './metadata-decoder.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
-  let {
-    event,
-    nextEvent,
-  }: { event: WorkflowEvent; nextEvent?: WorkflowEvent } = $props();
+  interface Props {
+    event: WorkflowEvent;
+    nextEvent?: WorkflowEvent;
+    class?: ClassNameValue;
+  }
+
+  let { event, nextEvent, class: className = '' }: Props = $props();
 
   const attributes = $derived(formatAttributes(event));
   const fields = $derived(Object.entries(attributes));
@@ -106,9 +110,12 @@
 </script>
 
 <div
-  class={eventCategory({
-    classification: event.classification,
-  })}
+  class={merge(
+    eventCategory({
+      classification: event.classification,
+    }),
+    className,
+  )}
 >
   <div class="bg-slate-900/60 p-2 pb-1 text-left">
     <div class="flex flex-col items-center justify-between lg:flex-row">

@@ -8,6 +8,7 @@
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import UpdateConfirmationModal from '$lib/components/workflow/client-actions/update-confirmation-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
@@ -196,36 +197,12 @@
         {/each}
         {#if !workflowCreateDisabled($page)}
           <MenuDivider />
-          <MenuItem
-            on:click={() =>
-              goto(
-                routeForWorkflowStart({
-                  namespace,
-                  workflowId: workflow.id,
-                  runId: workflow.runId,
-                  taskQueue: workflow.taskQueue,
-                  workflowType: workflow.name,
-                }),
-              )}
-            data-testid="start-workflow-button"
-          >
-            {translate('workflows.start-workflow-like-this-one')}
-          </MenuItem>
+          {@render startWorkflowMenuItem()}
           <MenuDivider />
-          <MenuItem
-            on:click={() => (showDownloadPrompt = true)}
-            data-testid="download"
-          >
-            {translate('workflows.download-history')}
-          </MenuItem>
+          {@render downloadMenuItem()}
         {:else}
           <MenuDivider />
-          <MenuItem
-            on:click={() => (showDownloadPrompt = true)}
-            data-testid="download"
-          >
-            {translate('workflows.download-history')}
-          </MenuItem>
+          {@render downloadMenuItem()}
         {/if}
       </Menu>
     </MenuContainer>
@@ -247,22 +224,7 @@
         {translate('workflows.more-actions')}
       </MenuButton>
       <Menu id="workflow-actions" position="right" class="w-[16rem]">
-        <MenuItem
-          on:click={() =>
-            goto(
-              routeForWorkflowStart({
-                namespace,
-                workflowId: workflow.id,
-                runId: workflow.runId,
-                taskQueue: workflow.taskQueue,
-                workflowType: workflow.name,
-              }),
-            )}
-          disabled={workflowCreateDisabled($page)}
-          data-testid="start-workflow-button"
-        >
-          {translate('workflows.start-workflow-like-this-one')}
-        </MenuItem>
+        {@render startWorkflowMenuItem()}
         {#if terminateEnabled && next}
           <MenuDivider />
           <MenuItem
@@ -275,12 +237,7 @@
         {/if}
         <MenuDivider />
 
-        <MenuItem
-          on:click={() => (showDownloadPrompt = true)}
-          data-testid="download"
-        >
-          {translate('workflows.download-history')}
-        </MenuItem>
+        {@render downloadMenuItem()}
       </Menu>
     </MenuContainer>
   {/if}
@@ -337,3 +294,34 @@
   workflowId={workflow.id}
   runId={workflow.runId}
 />
+
+{#snippet startWorkflowMenuItem()}
+  <MenuItem
+    on:click={() =>
+      goto(
+        routeForWorkflowStart({
+          namespace,
+          workflowId: workflow.id,
+          runId: workflow.runId,
+          taskQueue: workflow.taskQueue,
+          workflowType: workflow.name,
+        }),
+      )}
+    disabled={workflowCreateDisabled($page)}
+    data-testid="start-workflow-button"
+  >
+    <span class="flex w-full items-center justify-between gap-2">
+      {translate('workflows.start-workflow-like-this-one')}
+      <Icon name="lightning-bolt" />
+    </span>
+  </MenuItem>
+{/snippet}
+
+{#snippet downloadMenuItem()}
+  <MenuItem on:click={() => (showDownloadPrompt = true)} data-testid="download">
+    <span class="flex w-full items-center justify-between gap-2">
+      {translate('workflows.download-history')}
+      <Icon name="download" />
+    </span>
+  </MenuItem>
+{/snippet}
