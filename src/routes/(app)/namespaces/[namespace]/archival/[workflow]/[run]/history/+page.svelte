@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
@@ -11,16 +11,14 @@
   import { groupEvents } from '$lib/models/event-groups';
   import { routeForArchivalWorkflows } from '$lib/utilities/route-for';
 
-  let { data }: { data: PageData } = $props();
+  let { data, params }: PageProps = $props();
 
-  const workflowId = $derived(page.params.workflow);
-  const workflowsHref = $derived(
-    routeForArchivalWorkflows({ namespace: page.params.namespace }),
-  );
+  const { namespace, workflow } = $derived(params);
+  const workflowsHref = $derived(routeForArchivalWorkflows({ namespace }));
 </script>
 
 <PageTitle
-  title={`${translate('workflows.archival')} | ${workflowId}`}
+  title="{translate('workflows.archival')} | {workflow}"
   url={page.url.href}
 />
 <div class="flex items-center justify-between">
@@ -36,7 +34,7 @@
 </div>
 
 <h1>
-  {page.params.workflow}
+  {workflow}
 </h1>
 {#await data.fetchHistory}
   <SkeletonWorkflow />

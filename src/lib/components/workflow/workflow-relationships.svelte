@@ -5,8 +5,6 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { page } from '$app/stores';
-
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -22,7 +20,8 @@
 
   const MAX_UPPER_LIMIT = 5000;
 
-  $: ({ namespace } = $page.params);
+  export let namespace: string;
+
   $: ({ workflow } = $workflowRun);
 
   let initialWorkflow: WorkflowExecution | undefined = undefined;

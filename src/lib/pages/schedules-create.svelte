@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
   import { submitCreateSchedule } from '$lib/stores/schedules';
   import type {
@@ -12,7 +10,11 @@
   } from '$lib/types/schedule';
   import { getIdentity } from '$lib/utilities/core-context';
 
-  let { namespace } = $page.params;
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
 
   const identity = getIdentity();
 

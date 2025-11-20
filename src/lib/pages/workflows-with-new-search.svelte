@@ -68,8 +68,13 @@
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
+
   const query = $derived(page.url.searchParams.get('query'));
-  const namespace = $derived(page.params.namespace);
   const perPage = $derived(page.url.searchParams.get('per-page'));
   const searchParams = $derived(page.url.searchParams.toString());
 
@@ -90,7 +95,7 @@
   );
 
   onMount(() => {
-    $lastUsedNamespace = page.params.namespace;
+    $lastUsedNamespace = namespace;
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query, $searchAttributes);
@@ -248,7 +253,7 @@
         </p>
       </div>
       <WorkflowCountRefresh count={$workflowCount.newCount} />
-      <WorkflowCounts bind:refreshTime />
+      <WorkflowCounts bind:refreshTime {namespace} />
     </div>
     {#if $$slots['header-actions'] || workflowStartEnabled}
       <div class="flex items-center gap-4">
@@ -267,7 +272,7 @@
 
 <FilterBar />
 <div class="flex overflow-auto">
-  <SavedQueryViews />
+  <SavedQueryViews {namespace} />
   <div
     class={merge(
       'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
@@ -276,6 +281,7 @@
   >
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
+      {namespace}
     >
       <slot name="cloud" slot="cloud" />
     </WorkflowsSummaryConfigurableTable>

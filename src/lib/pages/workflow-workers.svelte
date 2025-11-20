@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import WorkerTable from '$lib/components/worker-table.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -9,8 +7,7 @@
 
   export let taskQueue: string;
   export let workers: TaskQueueResponse;
-
-  $: ({ namespace } = $page.params);
+  export let namespace: string;
 </script>
 
 <section class="flex flex-col gap-4">

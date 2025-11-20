@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -12,6 +11,7 @@
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { routeForNexusEndpoint } from '$lib/utilities/route-for';
 
+  export let id: string;
   export let endpoint: NexusEndpoint;
   export let targetNamespaceList: { namespace: string }[] = [];
   export let callerNamespaceList: { namespace: string }[] = [];
@@ -29,7 +29,7 @@
 
 <div class="flex flex-col gap-8">
   <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
+    <Link href={routeForNexusEndpoint(id)} icon="chevron-left">
       {translate('nexus.back-to-endpoint')}
     </Link>
   </div>
@@ -60,7 +60,7 @@
       <Button
         class="max-sm:hidden"
         variant="ghost"
-        on:click={() => goto(routeForNexusEndpoint($page.params.id))}
+        on:click={() => goto(routeForNexusEndpoint(id))}
         >{translate('common.cancel')}</Button
       >
     </div>
@@ -73,7 +73,7 @@
     <Button
       class="w-full sm:hidden"
       variant="ghost"
-      on:click={() => goto(routeForNexusEndpoint($page.params.id))}
+      on:click={() => goto(routeForNexusEndpoint(id))}
       >{translate('common.cancel')}</Button
     >
   </div>

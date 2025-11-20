@@ -1,6 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
+
+  import type { PageProps } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -18,14 +20,13 @@
     routeForNexusEndpoint,
   } from '$lib/utilities/route-for';
 
-  import type { LayoutData } from '../$types';
+  let { data, params }: PageProps = $props();
 
-  export let data: LayoutData;
+  const { endpoint } = $derived(data);
+  const { id } = $derived(params);
 
-  $: ({ endpoint } = data);
-
-  let error: NetworkError | undefined = undefined;
-  let loading = false;
+  let error: NetworkError | undefined = $state();
+  let loading = $state(false);
 
   const onUpdate = async () => {
     error = undefined;
@@ -68,14 +69,16 @@
     }
   };
 
-  $: targetNamespaceList = $namespaces.map((namespace) => ({
-    namespace: namespace.namespaceInfo.name,
-  }));
+  const targetNamespaceList = $derived(
+    $namespaces.map((namespace) => ({
+      namespace: namespace.namespaceInfo.name,
+    })),
+  );
 </script>
 
 <PageTitle
-  title={`Edit ${translate('nexus.nexus-endpoint', { id: $page.params.id })}`}
-  url={$page.url.href}
+  title="Edit {translate('nexus.nexus-endpoint', { id })}"
+  url={page.url.href}
 />
 <NexusEditEndpoint
   {endpoint}
@@ -84,4 +87,5 @@
   {onUpdate}
   {onDelete}
   {error}
+  {...params}
 />

@@ -5,7 +5,8 @@
   import { fetchScheduleCount } from '$lib/services/workflow-counts';
   import { schedulesCount } from '$lib/stores/schedules';
 
-  $: namespace = $page.params.namespace;
+  export let namespace: string;
+
   $: query = $page.url.searchParams.get('query');
 
   const fetchCounts = async () => {

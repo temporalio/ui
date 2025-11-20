@@ -12,7 +12,12 @@
   import { DEFAULT_WORKFLOWS_COLUMNS } from '$lib/stores/configurable-table-columns';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
 
-  const namespace = $derived(page.params.namespace);
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
+
   const query = $derived(page.url.searchParams.get('query'));
 
   const onFetch = $derived(() =>

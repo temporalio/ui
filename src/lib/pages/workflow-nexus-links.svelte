@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -22,7 +20,13 @@
   } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  const { namespace, workflow: workflowId, run } = $derived(page.params);
+  interface Props {
+    namespace: string;
+    workflow: string;
+    run: string;
+  }
+
+  let { namespace, workflow: workflowId, run }: Props = $props();
   const { workflow } = $derived($workflowRun);
   const pendingActivities = $derived(workflow?.pendingActivities);
   const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);

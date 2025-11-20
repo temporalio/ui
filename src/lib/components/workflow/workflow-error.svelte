@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowsSearchParams } from '$lib/stores/workflows';
@@ -8,8 +6,7 @@
   import { routeForWorkflows } from '$lib/utilities/route-for';
 
   export let error: NetworkError;
-
-  $: ({ namespace } = $page.params);
+  export let namespace: string;
 
   $: title =
     error.statusCode === 404

@@ -4,7 +4,6 @@
   import { addDays, addHours, startOfDay } from 'date-fns';
 
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
@@ -54,8 +53,9 @@
 
   import type { DescribeScheduleResponse } from '$types';
 
-  let namespace = $page.params.namespace;
-  let scheduleId = $page.params.schedule;
+  export let namespace: string;
+  export let scheduleId: string;
+
   let workflowQuery = `TemporalScheduledById="${scheduleId}"`;
 
   const identity = getIdentity();
@@ -393,7 +393,7 @@
             {/if}
           </Button>
         </div>
-        <WorkflowCounts staticQuery={workflowQuery} />
+        <WorkflowCounts staticQuery={workflowQuery} {namespace} />
       </div>
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">

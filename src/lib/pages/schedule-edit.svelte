@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
@@ -16,15 +14,19 @@
   import { getIdentity } from '$lib/utilities/core-context';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
-  let namespace = $page.params.namespace;
-  let scheduleId = $page.params.schedule;
+  interface Props {
+    namespace: string;
+    schedule: string;
+  }
+
+  let { namespace, schedule: scheduleId }: Props = $props();
 
   const identity = getIdentity();
   const parameters = {
     namespace,
     scheduleId: decodeURIForSvelte(scheduleId),
   };
-  let scheduleFetch = fetchSchedule(parameters);
+  const scheduleFetch = fetchSchedule(parameters);
 
   const handleEdit = (
     preset: SchedulePreset,

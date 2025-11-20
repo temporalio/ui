@@ -12,7 +12,11 @@
   import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  const { namespace } = $derived(page.params);
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
   const { workflow } = $derived($workflowRun);
 
   const currentDetails = $derived($workflowRun?.metadata?.currentDetails || '');

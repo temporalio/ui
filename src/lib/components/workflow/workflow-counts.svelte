@@ -25,13 +25,17 @@
   import WorkflowCountStatus from '../workflow-status.svelte';
 
   type Props = {
+    namespace: string;
     staticQuery?: string;
     refreshTime?: Date;
   };
-  let { staticQuery = '', refreshTime = $bindable() }: Props = $props();
+  let {
+    namespace,
+    staticQuery = '',
+    refreshTime = $bindable(),
+  }: Props = $props();
 
   const queryParam = $derived(page.url.searchParams.get('query'));
-  const namespace = $derived(page.params.namespace);
   const query = $derived(staticQuery || queryParam);
   const perPage = $derived(page.url.searchParams.get('per-page'));
 

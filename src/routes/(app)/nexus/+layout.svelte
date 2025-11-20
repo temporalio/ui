@@ -1,13 +1,9 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import type { LayoutProps } from './$types';
 
   import NexusGuard from '$lib/components/nexus-guard.svelte';
 
-  interface Props {
-    children: Snippet;
-  }
-
-  let { children }: Props = $props();
+  let { children }: LayoutProps = $props();
 </script>
 
 <NexusGuard>

@@ -6,7 +6,11 @@
   import { listBatchOperations } from '$lib/services/batch-service';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
 
-  export let namespace: string;
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
 </script>
 
 <h1>{translate('batch.list-page-title')}</h1>

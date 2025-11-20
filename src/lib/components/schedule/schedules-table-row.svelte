@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -16,10 +14,9 @@
 
   import type { ScheduleActionResult, ScheduleListEntry } from '$types';
 
-  let { namespace } = $page.params;
-
   export let schedule: ScheduleListEntry;
   export let columns: ConfigurableTableHeader[];
+  export let namespace: string;
 
   $: spec = schedule?.info?.spec;
   $: timezoneName = spec?.timezoneName || 'UTC';

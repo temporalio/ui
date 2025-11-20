@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -13,7 +13,7 @@
   import { routeForNamespace } from '$lib/utilities/route-for';
 </script>
 
-<PageTitle title="Namespaces" url={$page.url.href} />
+<PageTitle title="Namespaces" url={page.url.href} />
 <h1 data-testid="namespace-selector-title" class="mb-8">
   {translate('common.namespaces')}
 </h1>
