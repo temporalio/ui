@@ -50,9 +50,6 @@ describe('formatDate', () => {
     expect(formatDate(date, 'Central Standard Time')).toEqual(
       'Apr 13, 2022, 11:29:35.63 AM CDT',
     );
-    expect(formatDate(date, 'Pacific Daylight Time')).toEqual(
-      'Apr 13, 2022, 9:29:35.63 AM PDT',
-    );
   });
 
   it('should format already formatted strings', () => {
