@@ -2,6 +2,7 @@
   import { writable } from 'svelte/store';
 
   import { addDays, addHours, startOfDay } from 'date-fns';
+  import { onDestroy } from 'svelte';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -75,6 +76,9 @@
   let error = '';
   let scheduleUpdating = false;
   let overlapPolicy = writable<OverlapPolicy>('Unspecified');
+  let deleteTimeout: ReturnType<typeof setTimeout>;
+  let triggerTimeout: ReturnType<typeof setTimeout>;
+  let backfillTimeout: ReturnType<typeof setTimeout>;
   let policies: { label: string; description: string; value: OverlapPolicy }[] =
     [
       {
@@ -124,7 +128,8 @@
       $loading = true;
       await deleteSchedule({ identity, namespace, scheduleId });
       deleteConfirmationModalOpen = false;
-      setTimeout(() => {
+      clearTimeout(deleteTimeout);
+      deleteTimeout = setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
@@ -169,7 +174,8 @@
       scheduleId,
       overlapPolicy: $overlapPolicy,
     });
-    setTimeout(() => {
+    clearTimeout(triggerTimeout);
+    triggerTimeout = setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
       closeTriggerModal();
       scheduleUpdating = false;
@@ -245,7 +251,8 @@
       startTime,
       endTime,
     });
-    setTimeout(() => {
+    clearTimeout(backfillTimeout);
+    backfillTimeout = setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
       closeBackfillModal();
       scheduleUpdating = false;
@@ -255,6 +262,12 @@
   const resetReason = () => {
     reason = '';
   };
+
+  onDestroy(() => {
+    clearTimeout(deleteTimeout);
+    clearTimeout(triggerTimeout);
+    clearTimeout(backfillTimeout);
+  });
 </script>
 
 {#await scheduleFetch}
