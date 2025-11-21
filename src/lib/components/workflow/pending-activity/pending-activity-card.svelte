@@ -12,7 +12,11 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
@@ -67,6 +71,7 @@
           translate('activities.paused-since'),
           formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
             relative: $relativeTime,
+            format: $timestampFormat,
           }),
         )}
         {@render detail(
@@ -89,6 +94,7 @@
           translate('workflows.last-attempt-completed-time'),
           formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
             relative: $relativeTime,
+            format: $timestampFormat,
           }),
         )}
       {/if}
@@ -111,6 +117,7 @@
           translate('workflows.last-heartbeat'),
           formatDate(activity.lastHeartbeatTime, $timeFormat, {
             relative: $relativeTime,
+            format: $timestampFormat,
           }),
         )}
       {/if}
@@ -119,6 +126,7 @@
           translate('workflows.last-started-time'),
           formatDate(activity.lastStartedTime, $timeFormat, {
             relative: $relativeTime,
+            format: $timestampFormat,
           }),
         )}
       {/if}
@@ -254,6 +262,7 @@
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
       {formatDate(activity.scheduledTime, $timeFormat, {
         relative: $relativeTime,
+        format: $timestampFormat,
         relativeLabel: '',
       })}
       <strong>({timeDifference})</strong>

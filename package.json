@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.43.0",
+  "version": "2.43.3",
   "engines": {
     "pnpm": ">=8.6.0",
     "node": ">=18.15.0"
@@ -144,7 +144,7 @@
     "@temporalio/activity": "1.12.1",
     "@temporalio/client": "1.12.1",
     "@temporalio/common": "1.12.1",
-    "@temporalio/proto": "1.13.1",
+    "@temporalio/proto": "1.13.2",
     "@temporalio/testing": "1.12.1",
     "@temporalio/worker": "1.12.1",
     "@temporalio/workflow": "1.12.1",

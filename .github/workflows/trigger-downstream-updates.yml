@@ -16,6 +16,9 @@ on:
         required: false
         default: ''
 
+permissions:
+  contents: read
+
 jobs:
   trigger-updates:
     runs-on: ubuntu-latest

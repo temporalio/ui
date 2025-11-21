@@ -1,6 +1,7 @@
 <script lang="ts">
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
   import { useDarkMode } from '$lib/utilities/dark-mode';
@@ -50,7 +51,10 @@
   const templatedContent = $derived(replaceTemplate(content));
   const previewTheme = $derived($useDarkMode ? 'dark' : 'light');
   const previewPath = $derived(
-    `/render?content=${encodeURIComponent(templatedContent)}&theme=${previewTheme}&overrideTheme=${overrideTheme}`,
+    resolve(
+      `/render?content=${encodeURIComponent(templatedContent)}&theme=${previewTheme}&overrideTheme=${overrideTheme}`,
+      {},
+    ),
   );
 </script>
 

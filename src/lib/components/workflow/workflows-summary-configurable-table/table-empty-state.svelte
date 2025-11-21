@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/state';
 
   import Alert from '$lib/holocene/alert.svelte';
@@ -12,6 +14,12 @@
 
   import NoWorkflowTaskFailures from './empty-states/no-workflow-task-failures.svelte';
   import NoWorkflows from './empty-states/no-workflows.svelte';
+
+  interface Props {
+    cloud?: Snippet;
+  }
+
+  let { cloud }: Props = $props();
 
   let query = $derived(page.url.searchParams.get('query'));
 
@@ -42,18 +50,26 @@
   >
     <div class="text-center">
       <h2>
-        {hasTaskFailuresQuery
-          ? translate(
-              'workflows.workflow-task-failures-query-empty-state-title',
-            )
-          : translate('workflows.workflow-query-empty-state-title')}
+        {#if $workflowError}
+          {translate('workflows.workflow-query-error-state')}
+        {:else}
+          {hasTaskFailuresQuery
+            ? translate(
+                'workflows.workflow-task-failures-query-empty-state-title',
+              )
+            : translate('workflows.workflow-query-empty-state-title')}
+        {/if}
       </h2>
       <p class="text-secondary">
-        {hasTaskFailuresQuery
-          ? translate(
-              'workflows.workflow-task-failures-query-empty-state-description',
-            )
-          : translate('workflows.workflow-query-empty-state-description')}
+        {#if $workflowError}
+          {$workflowError}
+        {:else}
+          {hasTaskFailuresQuery
+            ? translate(
+                'workflows.workflow-task-failures-query-empty-state-description',
+              )
+            : translate('workflows.workflow-query-empty-state-description')}
+        {/if}
       </p>
       {#if hasTaskFailuresQuery}
         <NoWorkflowTaskFailures class="m-auto mt-8 text-subtle" />
@@ -77,13 +93,13 @@
         <Alert
           intent="warning"
           icon="warning"
-          title={translate('workflows.workflow-query-error-state')}
+          title={translate('common.error-occurred')}
           style="overflow-wrap: anywhere"
         >
           {$workflowError}
         </Alert>
       {:else}
-        <slot name="cloud" />
+        {@render cloud?.()}
         <p>
           {translate('workflows.workflow-empty-state-description')}
           <Link newTab href="https://github.com/temporalio"

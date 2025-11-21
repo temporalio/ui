@@ -1,7 +1,7 @@
 FROM golang:1.24-alpine3.22 AS server-builder
 
-RUN apk upgrade --no-cache
-RUN apk add --no-cache \
+RUN apk upgrade --no-cache && \
+    apk add --no-cache \
     make \
     git \
     curl
@@ -15,20 +15,16 @@ COPY . ./
 
 RUN make build-server
 
-##### Dockerize builder #####
-
 FROM golang:1.24-alpine3.22 AS dockerize-builder
 
 ARG DOCKERIZE_VERSION=v0.9.2
-RUN go install github.com/jwilder/dockerize@${DOCKERIZE_VERSION}
-RUN cp $(which dockerize) /usr/local/bin/dockerize
-
-##### UI server #####
+RUN go install github.com/jwilder/dockerize@${DOCKERIZE_VERSION} && \
+    cp $(which dockerize) /usr/local/bin/dockerize
 
 FROM alpine:3.22 AS ui-server
 
-RUN apk upgrade --no-cache
-RUN apk add --no-cache \
+RUN apk upgrade --no-cache && \
+    apk add --no-cache \
     ca-certificates \
     tzdata \
     bash \
@@ -42,16 +38,16 @@ ARG TEMPORAL_CLOUD_UI="false"
 
 WORKDIR /home/ui-server
 
-RUN addgroup -g 1000 temporal
-RUN adduser -u 1000 -G temporal -D temporal
-RUN mkdir ./config
+RUN addgroup -g 1000 temporal && \
+    adduser -u 1000 -G temporal -D temporal && \
+    mkdir ./config
 
-COPY --from=server-builder /home/server-builder/ui-server ./
-COPY config/docker.yaml ./config/docker.yaml
-COPY docker/start-ui-server.sh ./start-ui-server.sh
+COPY --chown=temporal:temporal --from=server-builder /home/server-builder/ui-server ./
+COPY --chown=temporal:temporal config/docker.yaml ./config/docker.yaml
+COPY --chown=temporal:temporal docker/start-ui-server.sh ./start-ui-server.sh
 
-RUN chown temporal:temporal /home/ui-server -R
+USER temporal
 
 EXPOSE 8080
-ENTRYPOINT ["./start-ui-server.sh"]
 ENV TEMPORAL_CLOUD_UI=$TEMPORAL_CLOUD_UI
+ENTRYPOINT ["./start-ui-server.sh"]

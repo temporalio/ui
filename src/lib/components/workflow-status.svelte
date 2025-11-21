@@ -140,18 +140,14 @@
     {#if taskFailure}
       <span
         class={merge(
-          workflowStatus({
-            status: 'Failed',
-          }),
+          workflowStatus(),
+          'bg-red-200 text-red-900 dark:bg-red-700 dark:text-white',
           'rounded-l-none',
           newCount && 'rounded-r-none',
           big && 'h-8 px-2',
         )}
       >
-        <Icon
-          name="exclamation-octagon"
-          class={merge(!big && 'px-0.5 text-red-900')}
-        />
+        <Icon name="exclamation-octagon" class={merge(!big && 'px-0.5')} />
       </span>
     {/if}
 

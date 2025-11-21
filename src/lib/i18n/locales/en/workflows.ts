@@ -66,6 +66,7 @@ export const Strings = {
   'select-all-trailing': ' matching your query',
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
+  'back-to-archived-workflows': 'Back to Archived Workflows',
   input: 'Input',
   result: 'Result',
   'initial-input': 'Initial Input',
@@ -251,6 +252,7 @@ export const Strings = {
   'all-headings-in-view': 'All available columns are in view',
   'no-headings-in-view': 'No columns in view',
   'archived-workflows': 'Archived Workflows',
+  'archived-workflow-history': 'Archived Workflow History',
   archival: 'Archival',
   'workflow-query-empty-state-title': 'No Workflows Found',
   'workflow-query-empty-state-description':
@@ -259,7 +261,7 @@ export const Strings = {
     'No Task Failures Found. Nice Work!',
   'workflow-task-failures-query-empty-state-description':
     'None of your Workflows currently match your task failure criteria',
-  'workflow-query-error-state': 'There is an error with filtering Workflows.',
+  'workflow-query-error-state': 'Error Filtering Workflows',
   'workflow-empty-state-title': 'No Workflows running in this Namespace',
   'workflow-empty-state-description':
     'You can populate the Web UI with sample Workflows. You can find a complete list of executable code samples at',
