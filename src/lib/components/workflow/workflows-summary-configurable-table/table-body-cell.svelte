@@ -120,10 +120,12 @@
         {filterOrCopyButtonsVisible}
         attribute="TemporalWorkerDeployment"
         value={deployment && typeof deployment === 'string' ? deployment : ''}
-        href={routeForWorkerDeployment({
-          namespace,
-          deployment,
-        })}
+        href={deployment
+          ? routeForWorkerDeployment({
+              namespace,
+              deployment,
+            })
+          : undefined}
       />
     {:else if label === 'Deployment Version'}
       {@const version =
