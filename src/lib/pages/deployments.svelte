@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -11,9 +9,13 @@
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
-  let error = $state('');
+  interface Props {
+    namespace: string;
+  }
 
-  const namespace = $derived(page.params.namespace);
+  let { namespace }: Props = $props();
+
+  let error = $state('');
 
   const onFetch = $derived.by(() => {
     return () => {

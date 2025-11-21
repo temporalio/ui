@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
@@ -11,7 +11,7 @@
 
   import ArchivalTable from './_archival-table.svelte';
 
-  let { data }: { data: PageData } = $props();
+  let { data, params }: PageProps = $props();
 
   const {
     namespace: {
@@ -37,7 +37,7 @@
     >
   {/if}
   <WorkflowAdvancedSearch />
-  <ArchivalTable />
+  <ArchivalTable {...params} />
 {:else if archivalEnabled}
   <h1 data-testid="visibility-disabled-title">
     {translate('workflows.visibility-disabled-archival')}

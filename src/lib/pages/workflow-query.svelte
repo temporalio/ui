@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import PayloadInput from '$lib/components/payload-input.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -25,7 +25,9 @@
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  const { namespace, workflow: workflowId, run: runId } = $page.params;
+  export let namespace: string;
+  export let workflowId: string;
+  export let runId: string;
 
   const params = {
     id: workflowId,
@@ -74,7 +76,7 @@
   });
 
   const fetchCurrentDetails = async () => {
-    const { settings } = $page.data;
+    const { settings } = page.data;
     const metadata = await getWorkflowMetadata(
       {
         namespace,
@@ -120,7 +122,7 @@
         queryType,
         queryArgs: payloads ? { payloads } : null,
       },
-      $page.data?.settings,
+      page.data?.settings,
       $authUser?.accessToken,
     ).finally(() => {
       reset();

@@ -15,8 +15,13 @@
   import type { Eventual } from '$lib/types/global';
   import { formatDate } from '$lib/utilities/format-date';
 
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
+
   let { workflow, workers } = $derived($workflowRun);
-  const namespace = $derived(page.params.namespace);
   let stackTrace: Eventual<ParsedQuery> = $state();
 
   let refreshDate = $derived(

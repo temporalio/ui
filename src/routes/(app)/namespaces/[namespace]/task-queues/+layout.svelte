@@ -1,11 +1,9 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import type { LayoutProps } from './$types';
 
   import { translate } from '$lib/i18n/translate';
-  interface Props {
-    children: Snippet;
-  }
-  let { children }: Props = $props();
+
+  let { children }: LayoutProps = $props();
 </script>
 
 <p class="relative flex items-center gap-4" data-testid="task-queue-title">

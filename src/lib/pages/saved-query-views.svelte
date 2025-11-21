@@ -31,6 +31,12 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
+
   let activeQueryView: SavedQuery | undefined = $state();
   let saveViewModalOpen = $state(false);
   let editViewModalOpen = $state(false);
@@ -38,7 +44,6 @@
 
   const query = $derived(page.url.searchParams.get('query') || '');
   const savedQueryParam = page.url.searchParams.get('savedQuery');
-  const namespace = $derived(page.params.namespace);
   const hasTaskFailureAttribute = $derived(
     !!page.data.namespace.namespaceInfo?.capabilities
       ?.reportedProblemsSearchAttribute,
