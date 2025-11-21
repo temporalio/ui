@@ -33,7 +33,7 @@
         testId="schedule-calendar"
         language="json"
         content={stringifyWithBigInt(frequency, null, 2)}
-        {...frequency.length > 1 ? { maxHeight: 300 } : {}}
+        {...frequency.length > 1 ? { maxHeight: 600 } : {}}
       />
     </div>
   </div>
