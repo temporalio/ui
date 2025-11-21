@@ -205,7 +205,7 @@
     "stylelint": "^15.10.3",
     "stylelint-config-recommended": "^13.0.0",
     "stylelint-config-standard": "^34.0.0",
-    "svelte": "^5.37.1",
+    "svelte": "5.37.1",
     "svelte-check": "^4.3.4",
     "svelte-eslint-parser": "^0.43.0",
     "svelte-highlight": "^7.8.2",
