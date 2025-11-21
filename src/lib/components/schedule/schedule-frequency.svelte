@@ -27,16 +27,14 @@
   <div class={twMerge('flex flex-col', className)}>
     <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
     <div class="flex flex-col gap-2">
-      {#each frequency as content}
-        <CodeBlock
-          copyable
-          {inline}
-          testId="schedule-calendar"
-          language="json"
-          content={stringifyWithBigInt(content)}
-          {...frequency.length > 1 ? { maxHeight: 300 } : {}}
-        />
-      {/each}
+      <CodeBlock
+        copyable
+        {inline}
+        testId="schedule-calendar"
+        language="json"
+        content={stringifyWithBigInt(frequency, null, 2)}
+        {...frequency.length > 1 ? { maxHeight: 300 } : {}}
+      />
     </div>
   </div>
 {/key}

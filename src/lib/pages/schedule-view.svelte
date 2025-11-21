@@ -310,16 +310,9 @@
           dateTime={schedule?.info?.createTime}
         >
           {#snippet leading()}
-            {translate('common.created')}
+            Created
           {/snippet}
         </Timestamp>
-        <!-- <p class="flex items-center gap-2 text-right text-sm">
-          {translate('common.created', {
-            created: formatDate(schedule?.info?.createTime, $timeFormat, {
-              relative: $relativeTime,
-            }),
-          })}
-        </p> -->
         {#if schedule?.info?.updateTime}
           <Timestamp
             as="p"
@@ -327,16 +320,9 @@
             dateTime={schedule?.info?.updateTime}
           >
             {#snippet leading()}
-              {translate('common.last-updated')}
+              Last Updated
             {/snippet}
           </Timestamp>
-          <!-- <p class="flex items-center gap-2 text-right text-sm">
-            {translate('common.last-updated', {
-              updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
-                relative: $relativeTime,
-              }),
-            })}
-          </p> -->
         {/if}
       </div>
       <SplitButton
