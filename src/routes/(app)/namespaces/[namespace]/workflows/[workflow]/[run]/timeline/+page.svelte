@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import TimelineAndHistoryToggle from '$lib/components/lines-and-dots/timeline-and-history-toggle.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
@@ -15,9 +16,7 @@
 />
 <WorkflowHistoryLayout>
   {#snippet title()}
-    <h3>
-      {translate('workflows.timeline-tab')}
-    </h3>
+    <TimelineAndHistoryToggle />
   {/snippet}
 
   <WorkflowTimeline />

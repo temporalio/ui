@@ -197,8 +197,8 @@
   <Tabs>
     <TabList label="workflow detail">
       <Tab
-        label={translate('workflows.timeline-tab')}
-        id="timeline-tab"
+        label={translate('workflows.history-tab')}
+        id="history-tab"
         href={routeForEventHistory({
           ...routeParameters,
         })}
@@ -207,20 +207,13 @@
           routeForEventHistory({
             ...routeParameters,
           }),
-        )}
-      />
-      <Tab
-        label={translate('workflows.history-tab')}
-        id="history-tab"
-        href={routeForEventHistoryTable({
-          ...routeParameters,
-        })}
-        active={pathMatches(
-          page.url.pathname,
-          routeForEventHistoryTable({
-            ...routeParameters,
-          }),
-        )}
+        ) ||
+          pathMatches(
+            page.url.pathname,
+            routeForEventHistoryTable({
+              ...routeParameters,
+            }),
+          )}
       >
         <Badge type="primary" class="px-2 py-0">
           {workflow.historyEvents}
