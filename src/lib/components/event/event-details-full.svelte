@@ -39,7 +39,7 @@
       category: {
         workflow: 'bg-blue-600 text-white',
         activity: 'bg-purple-600 text-white',
-        'child-workflow': 'bg-[#67e4f9] text-slate-900',
+        'child-workflow': 'bg-cyan-600  text-slate-900',
         timer: 'bg-yellow-600 text-white',
         signal: 'bg-pink-700 text-white',
         update: 'bg-blue-600 text-white',

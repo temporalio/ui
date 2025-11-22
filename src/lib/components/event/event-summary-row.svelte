@@ -216,7 +216,7 @@
         category: {
           workflow: 'text-blue-700 dark:text-blue-400',
           activity: 'text-purple-600 dark:text-purple-500',
-          'child-workflow': 'text-[#67e4f9]',
+          'child-workflow': 'text-cyan-600',
           timer: 'text-yellow-600 dark:text-yellow-400',
           signal: 'text-pink-600 dark:text-pink-400',
           update: 'text-blue-600 dark:text-blue-400',

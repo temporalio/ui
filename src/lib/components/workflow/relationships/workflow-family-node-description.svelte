@@ -92,7 +92,7 @@
   }
 
   .Failed {
-    background-color: #f55;
+    background-color: #ff4418;
   }
 
   .Terminated {

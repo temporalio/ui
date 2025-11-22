@@ -88,7 +88,7 @@
   }
 
   .child-workflow {
-    stroke: #67e4f9;
+    stroke: theme('colors.cyan.600');
   }
 
   .Completed {
@@ -97,7 +97,7 @@
 
   .Failed,
   .Terminated {
-    stroke: #f55;
+    stroke: #c71607;
   }
 
   .Signaled {

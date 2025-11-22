@@ -170,7 +170,7 @@
       category: {
         workflow: 'border-blue-700 bg-blue-800/80 ',
         activity: 'border-purple-700 bg-purple-800/80 ',
-        'child-workflow': 'border-[#67e4f9] bg-[#67e4f9]/80 ',
+        'child-workflow': 'border-cyan-600  bg-cyan-600/80 ',
         timer: 'border-yellow-700 bg-yellow-800/80',
         signal: 'border-pink-700 bg-pink-800/80',
         update: 'border-blue-700 bg-blue-800/80',

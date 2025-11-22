@@ -92,17 +92,17 @@
       variants: {
         classification: {
           Failed: 'bg-red-800',
-          Canceled: 'bg-slate-900/80',
+          Canceled: 'bg-orange-900/80',
           TimedOut: 'bg-orange-700',
           Completed: 'bg-green-700',
           Terminated: 'bg-gray-300',
-          Scheduled: 'bg-slate-900/50',
-          Initiated: 'bg-slate-900/50',
-          Started: 'bg-slate-900/60',
-          Fired: 'bg-slate-900/90',
-          Signaled: 'bg-slate-900/50',
-          CancelRequested: 'bg-slate-900/70',
-          Unspecified: 'bg-slate-900/60',
+          Scheduled: 'bg-orange-900/50',
+          Initiated: 'bg-orange-900/50',
+          Started: 'bg-orange-900/60',
+          Fired: 'bg-orange-900/90',
+          Signaled: 'bg-orange-900/50',
+          CancelRequested: 'bg-orange-900/70',
+          Unspecified: 'bg-orange-900/60',
         },
       },
     },
@@ -296,7 +296,7 @@
         value={String(value)}
         {attributes}
         type={displayLinkType(key, attributes)}
-        class="whitespace-pre-line !text-white"
+        class="whitespace-pre-line break-all !text-white"
       />
     </Copyable>
   </div>

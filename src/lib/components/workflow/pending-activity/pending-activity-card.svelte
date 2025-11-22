@@ -62,11 +62,7 @@
 >
   <div class="bg-slate-900/80 p-2 pb-1 text-left">
     <div class="flex flex-col items-center justify-between lg:flex-row">
-      <div>
-        <p class="leading-3">
-          <span class="font-medium">Pending Activity</span>
-        </p>
-      </div>
+      <p class="font-medium leading-tight">Pending Activity</p>
       {#if showActivityCommands}
         <ActivityCommands {activity} class="justify-end" />
       {/if}

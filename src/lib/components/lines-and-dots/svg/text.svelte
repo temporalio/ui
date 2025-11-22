@@ -101,7 +101,7 @@
   }
 
   text.child-workflow {
-    fill: #67e4f9;
+    fill: theme('colors.cyan.600');
   }
 
   text.workflow {
@@ -109,7 +109,7 @@
   }
 
   text.Failed {
-    fill: #f55;
+    fill: #ff4418;
   }
 
   text.none {
