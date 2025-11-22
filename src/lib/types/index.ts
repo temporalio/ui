@@ -40,6 +40,8 @@ export type UpdateScheduleRequest =
   temporal.api.workflowservice.v1.IUpdateScheduleRequest;
 export type StartBatchOperationRequest =
   temporal.api.workflowservice.v1.IStartBatchOperationRequest;
+export type CancelWorkflowRequest =
+  temporal.api.workflowservice.v1.IRequestCancelWorkflowExecutionRequest;
 export type ResetWorkflowRequest =
   temporal.api.workflowservice.v1.IResetWorkflowExecutionRequest;
 export type UpdateWorkflowRequest =
