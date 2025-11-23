@@ -8,13 +8,12 @@ import {
   getUTCOffset,
   relativeTime,
   timeFormat,
-  type TimeFormat,
   Timezones,
 } from './time-format';
 
 describe('time format store', () => {
-  test('should return UTC as the default timeFormat', () => {
-    expect(get(timeFormat)).toBe('UTC');
+  test('should return local as the default timeFormat', () => {
+    expect(get(timeFormat)).toBe('local');
   });
   test('should return false as the default for relativeTime', () => {
     expect(get(relativeTime)).toBe(false);
@@ -23,7 +22,7 @@ describe('time format store', () => {
 
 describe('getTimezone', () => {
   test('should return the first zone for the specified time format in the Timezones object', () => {
-    expect(getTimezone('Pacific Daylight Time')).toBe('America/Los_Angeles');
+    expect(getTimezone('Central Standard Time')).toBe('America/Bahia_Banderas');
     expect(getTimezone('Greenwich Mean Time')).toBe('Africa/Abidjan');
   });
 
@@ -54,7 +53,7 @@ describe('formatOffset', () => {
 describe('getUTCOffset', () => {
   test('should return a formatted UTC offset for all Timezone options', () => {
     Object.entries(Timezones).forEach(([format, { offset }]) => {
-      expect(getUTCOffset(format as TimeFormat)).toBe(formatOffset(offset));
+      expect(getUTCOffset(format)).toBe(formatOffset(offset));
     });
   });
 
@@ -63,6 +62,6 @@ describe('getUTCOffset', () => {
   });
 
   test('should return a formatted UTC offset for a timezone', () => {
-    expect(getUTCOffset('America/Phoenix' as TimeFormat)).toBe('-07:00');
+    expect(getUTCOffset('America/Phoenix')).toBe('-07:00');
   });
 });

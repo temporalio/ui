@@ -6,8 +6,8 @@ import {
 } from 'date-fns';
 
 import {
+  BASE_TIME_FORMAT_OPTIONS,
   getTimezone,
-  type TimeFormat,
   TimezoneOptions,
   Timezones,
 } from '$lib/stores/time-format';
@@ -61,7 +61,7 @@ export type TimestampFormat = keyof typeof timestampFormats;
 
 export function formatDate(
   date: ValidTime | undefined | null,
-  timeFormat: TimeFormat = 'UTC',
+  timeFormat: string = BASE_TIME_FORMAT_OPTIONS.UTC,
   options: FormatDateOptions = {},
 ): string {
   if (!date) return '';
@@ -82,7 +82,7 @@ export function formatDate(
 
     const parsed = parseJSON(new Date(date));
 
-    if (timeFormat === 'local') {
+    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
       if (relative) {
         return (
           formatDistanceToNowStrict(parsed, {
@@ -143,8 +143,8 @@ export function getLocalTime(): string {
     : localTimezone;
 }
 
-export function getSelectedTimezone(timeFormat: TimeFormat): string {
-  if (timeFormat === 'local') return getLocalTime();
+export function getSelectedTimezone(timeFormat: string): string {
+  if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) return getLocalTime();
 
   const selectedTimezone = Timezones[timeFormat];
   if (selectedTimezone) return `${timeFormat} (${selectedTimezone.abbr})`;
