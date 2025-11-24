@@ -70,13 +70,6 @@
 
   const typeValues = getSupportedTypes().map((type) => type.value);
 
-  // Mark initial attributes as non-deletable
-  const attributesWithDeletableFlag: SearchAttributeDefinition[] =
-    initialAttributes.map((attr) => ({
-      ...attr,
-      isDeletable: false,
-    }));
-
   const {
     form: formData,
     errors,
@@ -86,7 +79,7 @@
     tainted,
     reset,
   } = superForm<{ attributes: SearchAttributeDefinition[] }>(
-    { attributes: attributesWithDeletableFlag },
+    { attributes: initialAttributes },
     {
       SPA: true,
       dataType: 'json',

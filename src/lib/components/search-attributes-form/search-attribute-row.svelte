@@ -17,7 +17,7 @@
     submitting: boolean;
     error?: string;
     disableTypeForExisting?: boolean;
-    isDeletable: boolean;
+    isDeletable?: boolean;
     onRemove: () => void;
     onNameChange: (value: string) => void;
     onTypeChange: (value: string) => void;
@@ -31,7 +31,7 @@
     submitting,
     error,
     disableTypeForExisting = false,
-    isDeletable,
+    isDeletable = true,
     onRemove,
     onNameChange,
     onTypeChange,
