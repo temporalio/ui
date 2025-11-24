@@ -20,9 +20,17 @@
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 1500));
     return [
-      { name: 'CustomerId', type: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
-      { name: 'Amount', type: SEARCH_ATTRIBUTE_TYPE.DOUBLE },
-      { name: 'ProcessedAt', type: SEARCH_ATTRIBUTE_TYPE.DATETIME },
+      {
+        name: 'CustomerId',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        isExisting: true,
+      },
+      { name: 'Amount', type: SEARCH_ATTRIBUTE_TYPE.DOUBLE, isExisting: true },
+      {
+        name: 'ProcessedAt',
+        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+        isExisting: true,
+      },
     ];
   }
 

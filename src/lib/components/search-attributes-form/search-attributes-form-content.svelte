@@ -53,6 +53,7 @@
               .string()
               .min(1, translate('search-attributes.validation-name-required')),
             type: z.enum(typeValues as [string, ...string[]]),
+            isExisting: z.boolean().optional().default(false),
           }),
         )
         .refine(
@@ -69,6 +70,13 @@
 
   const typeValues = getSupportedTypes().map((type) => type.value);
 
+  // Mark all initial attributes as existing to prevent deletion
+  const attributesWithExistingFlag: SearchAttributeDefinition[] =
+    initialAttributes.map((attr) => ({
+      ...attr,
+      isExisting: true,
+    }));
+
   const {
     form: formData,
     errors,
@@ -77,8 +85,8 @@
     enhance,
     tainted,
     reset,
-  } = superForm(
-    { attributes: initialAttributes },
+  } = superForm<{ attributes: SearchAttributeDefinition[] }>(
+    { attributes: attributesWithExistingFlag },
     {
       SPA: true,
       dataType: 'json',
@@ -149,16 +157,16 @@
             <div class="w-8"></div>
           </div>
 
-          {#each $formData.attributes as attribute, index}
+          {#each $formData.attributes as _, index}
             <SearchAttributeRow
-              name={attribute.name}
-              type={attribute.type}
+              name={$formData.attributes[index].name}
+              type={$formData.attributes[index].type}
               {index}
               {supportedTypes}
               submitting={$submitting}
               error={$errors?.attributes?.[index]?.['name']?.[0]}
               {disableTypeForExisting}
-              isExisting={attribute.isExisting}
+              isExisting={$formData.attributes[index].isExisting ?? false}
               onRemove={() => removeAttribute(index)}
               onNameChange={(value) => {
                 $formData.attributes[index].name = value;
