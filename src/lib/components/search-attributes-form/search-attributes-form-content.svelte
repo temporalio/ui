@@ -53,7 +53,7 @@
               .string()
               .min(1, translate('search-attributes.validation-name-required')),
             type: z.enum(typeValues as [string, ...string[]]),
-            isExisting: z.boolean().optional().default(false),
+            isDeletable: z.boolean().optional().default(true),
           }),
         )
         .refine(
@@ -70,11 +70,11 @@
 
   const typeValues = getSupportedTypes().map((type) => type.value);
 
-  // Mark all initial attributes as existing to prevent deletion
-  const attributesWithExistingFlag: SearchAttributeDefinition[] =
+  // Mark initial attributes as non-deletable
+  const attributesWithDeletableFlag: SearchAttributeDefinition[] =
     initialAttributes.map((attr) => ({
       ...attr,
-      isExisting: true,
+      isDeletable: false,
     }));
 
   const {
@@ -86,7 +86,7 @@
     tainted,
     reset,
   } = superForm<{ attributes: SearchAttributeDefinition[] }>(
-    { attributes: attributesWithExistingFlag },
+    { attributes: attributesWithDeletableFlag },
     {
       SPA: true,
       dataType: 'json',
@@ -115,7 +115,7 @@
   const addAttribute = () => {
     $formData.attributes = [
       ...$formData.attributes,
-      { name: '', type: defaultType, isExisting: false },
+      { name: '', type: defaultType, isDeletable: true },
     ];
   };
 
@@ -166,7 +166,7 @@
               submitting={$submitting}
               error={$errors?.attributes?.[index]?.['name']?.[0]}
               {disableTypeForExisting}
-              isExisting={$formData.attributes[index].isExisting ?? false}
+              isDeletable={$formData.attributes[index].isDeletable ?? true}
               onRemove={() => removeAttribute(index)}
               onNameChange={(value) => {
                 $formData.attributes[index].name = value;

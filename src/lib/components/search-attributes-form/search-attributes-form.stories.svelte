@@ -23,13 +23,17 @@
       {
         name: 'CustomerId',
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-        isExisting: true,
+        isDeletable: false,
       },
-      { name: 'Amount', type: SEARCH_ATTRIBUTE_TYPE.DOUBLE, isExisting: true },
+      {
+        name: 'Amount',
+        type: SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+        isDeletable: false,
+      },
       {
         name: 'ProcessedAt',
         type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-        isExisting: true,
+        isDeletable: false,
       },
     ];
   }

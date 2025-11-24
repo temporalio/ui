@@ -17,7 +17,7 @@
     submitting: boolean;
     error?: string;
     disableTypeForExisting?: boolean;
-    isExisting: boolean;
+    isDeletable: boolean;
     onRemove: () => void;
     onNameChange: (value: string) => void;
     onTypeChange: (value: string) => void;
@@ -31,17 +31,17 @@
     submitting,
     error,
     disableTypeForExisting = false,
-    isExisting,
+    isDeletable,
     onRemove,
     onNameChange,
     onTypeChange,
   }: Props = $props();
 
   const isTypeDisabled = $derived(
-    submitting || (disableTypeForExisting && isExisting),
+    submitting || (disableTypeForExisting && !isDeletable),
   );
 
-  const isDeleteDisabled = $derived(submitting || isExisting);
+  const isDeleteDisabled = $derived(submitting || !isDeletable);
 
   const hasError = $derived(!!error);
 
