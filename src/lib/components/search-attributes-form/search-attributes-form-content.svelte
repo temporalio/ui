@@ -53,7 +53,6 @@
               .string()
               .min(1, translate('search-attributes.validation-name-required')),
             type: z.enum(typeValues as [string, ...string[]]),
-            isExisting: z.boolean().optional(),
           }),
         )
         .refine(
