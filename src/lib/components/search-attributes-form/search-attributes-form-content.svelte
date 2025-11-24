@@ -23,7 +23,6 @@
     onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
     onCancel?: () => void;
     hideTainted?: boolean;
-    hideDeleteButton?: boolean;
     hideCancelButton?: boolean;
     disableTypeForExisting?: boolean;
     getSupportedTypes: () => SearchAttributeTypeOption[];
@@ -36,7 +35,6 @@
     onSuccess = () => {},
     onCancel,
     hideTainted = false,
-    hideDeleteButton = false,
     hideCancelButton = false,
     disableTypeForExisting = false,
     getSupportedTypes,
@@ -55,6 +53,7 @@
               .string()
               .min(1, translate('search-attributes.validation-name-required')),
             type: z.enum(typeValues as [string, ...string[]]),
+            isExisting: z.boolean().optional(),
           }),
         )
         .refine(
@@ -109,7 +108,7 @@
   const addAttribute = () => {
     $formData.attributes = [
       ...$formData.attributes,
-      { name: '', type: defaultType },
+      { name: '', type: defaultType, isExisting: false },
     ];
   };
 
@@ -129,11 +128,6 @@
   );
 
   const disabled = $derived($submitting || taintedCount === 0);
-
-  // Track initial attribute names to identify existing attributes
-  const initialAttributeNames = $derived(
-    new Set(initialAttributes.map((attr) => attr.name)),
-  );
 </script>
 
 <Card class={className}>
@@ -146,17 +140,14 @@
           <h3 class="text-lg font-medium">Search Attributes</h3>
         </div>
 
-        <div class="space-y-3 border-b border-b-subtle pb-3">
+        <div class="space-y-3 pb-3">
           <div
-            class="grid gap-3 border-b border-b-subtle pb-2 text-sm font-medium"
-            class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
-            class:grid-cols-[1fr,200px]={hideDeleteButton}
+            class="grid grid-cols-[1fr,200px,auto] gap-3 text-sm font-medium"
+            class:hidden={$formData.attributes.length === 0}
           >
             <div>{translate('search-attributes.column-attribute')}</div>
             <div>{translate('search-attributes.column-type')}</div>
-            {#if !hideDeleteButton}
-              <div class="w-8"></div>
-            {/if}
+            <div class="w-8"></div>
           </div>
 
           {#each $formData.attributes as attribute, index}
@@ -167,9 +158,8 @@
               {supportedTypes}
               submitting={$submitting}
               error={$errors?.attributes?.[index]?.['name']?.[0]}
-              {hideDeleteButton}
               {disableTypeForExisting}
-              {initialAttributeNames}
+              isExisting={attribute.isExisting}
               onRemove={() => removeAttribute(index)}
               onNameChange={(value) => {
                 $formData.attributes[index].name = value;
@@ -181,6 +171,17 @@
           {/each}
         </div>
       </div>
+
+      <Button
+        variant="secondary"
+        size="sm"
+        on:click={addAttribute}
+        disabled={$submitting}
+        type="button"
+        leadingIcon="add"
+      >
+        {translate('search-attributes.add-attribute-button')}
+      </Button>
     </div>
 
     <div class="p-4 pt-0">
@@ -201,17 +202,6 @@
             {translate('common.cancel')}
           </Button>
         {/if}
-
-        <Button
-          variant="ghost"
-          size="sm"
-          on:click={addAttribute}
-          disabled={$submitting}
-          type="button"
-          leadingIcon="add"
-        >
-          {translate('search-attributes.add-attribute-button')}
-        </Button>
       </div>
     </div>
   </form>

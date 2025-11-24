@@ -1,6 +1,7 @@
 export interface SearchAttributeDefinition {
   name?: string;
   type?: string;
+  isExisting?: boolean;
 }
 
 export interface SearchAttributeTypeOption {

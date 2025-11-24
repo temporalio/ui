@@ -16,7 +16,6 @@
     onRetry?: () => void;
     getSupportedTypes: () => { label: string; value: string }[];
     hideTainted?: boolean;
-    hideDeleteButton?: boolean;
     hideCancelButton?: boolean;
     disableTypeForExisting?: boolean;
   }
@@ -30,7 +29,6 @@
     onRetry,
     getSupportedTypes,
     hideTainted = false,
-    hideDeleteButton = false,
     hideCancelButton = false,
     disableTypeForExisting = false,
   }: Props = $props();
@@ -47,7 +45,6 @@
     {onCancel}
     {getSupportedTypes}
     {hideTainted}
-    {hideDeleteButton}
     {hideCancelButton}
     {disableTypeForExisting}
   />
