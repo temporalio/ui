@@ -29,7 +29,9 @@
   let namespaceList = $derived(
     $namespaces.map((namespace: Namespace) => {
       return {
-        namespace: namespace.namespaceInfo.name,
+        //
+        namespace: namespace?.namespaceInfo.name,
+        //
         onClick: navigateToNamespace,
       };
     }),
