@@ -78,7 +78,7 @@
     enhance,
     tainted,
     reset,
-  } = superForm<{ attributes: SearchAttributeDefinition[] }>(
+  } = superForm(
     { attributes: initialAttributes },
     {
       SPA: true,
