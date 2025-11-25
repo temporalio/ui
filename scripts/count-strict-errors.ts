@@ -90,10 +90,10 @@ try {
     errorsByFile,
   };
 
-  console.log(JSON.stringify(resultData));
+  process.stdout.write(JSON.stringify(resultData) + '\n');
   process.exit(0);
 } catch (error) {
-  console.error('Failed to run svelte-check:', error);
+  process.stderr.write(`Failed to run svelte-check: ${error}\n`);
 
   const errorResult: StrictErrorResult = {
     success: false,
@@ -101,6 +101,6 @@ try {
     errorsByFile: {},
   };
 
-  console.log(JSON.stringify(errorResult));
+  process.stdout.write(JSON.stringify(errorResult) + '\n');
   process.exit(0);
 }

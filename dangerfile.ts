@@ -48,9 +48,31 @@ async function checkStrictModeErrors() {
       maxBuffer: 10 * 1024 * 1024,
     });
 
-    const result: StrictErrorResult = JSON.parse(output);
+    if (!output || output.trim().length === 0) {
+      console.error('Script produced no output');
+      return;
+    }
 
-    if (!result.success) return;
+    // Extract the last line which should be the JSON output
+    const lines = output.trim().split('\n');
+    const jsonLine = lines[lines.length - 1];
+
+    let result: StrictErrorResult;
+    try {
+      result = JSON.parse(jsonLine);
+    } catch (parseError) {
+      console.error('Failed to parse JSON output:', jsonLine.substring(0, 200));
+      console.error('Full output:', output.substring(0, 500));
+      warn(
+        '⚠️ Failed to parse strict mode check results. Check CI logs for details.',
+      );
+      return;
+    }
+
+    if (!result.success) {
+      console.error('Script reported failure');
+      return;
+    }
 
     const changedFiles = new Set([
       ...danger.git.modified_files,
@@ -105,9 +127,11 @@ async function checkStrictModeErrors() {
       warn(warningMessage);
     }
   } catch (error) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    warn((error as unknown as any).toString());
     console.error('Error checking strict mode errors:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    warn(
+      `⚠️ Strict mode check failed: ${errorMessage.split('\n')[0]}. Check CI logs for details.`,
+    );
   }
 }
 
