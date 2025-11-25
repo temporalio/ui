@@ -98,6 +98,7 @@ async function checkStrictModeErrors() {
         100
       ).toFixed(1);
 
+      // Summary warning
       let warningMessage = '## 📊 TypeScript Strict Mode Errors\n\n';
       warningMessage += `This PR touches **${Object.keys(relevantErrors).length}** file(s) with strict mode errors `;
       warningMessage += `(${relevantErrorCount} total errors across these files, `;
@@ -105,24 +106,14 @@ async function checkStrictModeErrors() {
       warningMessage +=
         'Fixing these would help move the project toward full strict mode compliance!\n\n';
 
-      warningMessage +=
-        '<details>\n<summary>View all errors by file</summary>\n\n';
+      warn(warningMessage);
 
+      // Individual warnings for each error with file and line
       for (const [filename, errors] of Object.entries(relevantErrors)) {
-        warningMessage += `\n### ${filename}\n`;
-        warningMessage += `**${errors.length} error${errors.length > 1 ? 's' : ''}**\n\n`;
-
         for (const error of errors) {
-          const location = `Line ${error.start.line}:${error.start.character}`;
-          // Create a GitHub link to the specific line in the PR
-          const fileLink = `https://github.com/${danger.github.thisPR.owner}/${danger.github.thisPR.repo}/blob/${danger.github.pr.head.sha}/${filename}#L${error.start.line}`;
-          warningMessage += `- [${location}](${fileLink}): ${error.message}\n`;
+          warn(error.message, filename, error.start.line);
         }
       }
-
-      warningMessage += '\n</details>';
-
-      warn(warningMessage);
     }
   } catch (error) {
     console.error('Error checking strict mode errors:', error);

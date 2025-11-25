@@ -33,6 +33,6 @@ jobs:
           repositories: ui
 
       - name: Run Danger
-        run: pnpm exec danger ci
+        run: pnpm exec danger ci --failOnErrors --ignoreOutOfDiffComments
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
