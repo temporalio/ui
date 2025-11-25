@@ -45,7 +45,7 @@ async function checkStrictModeErrors() {
       encoding: 'utf8',
       cwd: process.cwd(),
       timeout: 5 * 60 * 1000,
-      maxBuffer: 10 * 1024 * 1024,
+      maxBuffer: 50 * 1024 * 1024,
     });
 
     if (!output || output.trim().length === 0) {
