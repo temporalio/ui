@@ -104,14 +104,14 @@ async function checkStrictModeErrors() {
       warningMessage += `(${relevantErrorCount} total errors across these files, `;
       warningMessage += `${percentageInPR}% of ${result.totalErrors} project-wide errors).\n\n`;
       warningMessage +=
-        'Fixing these would help move the project toward full strict mode compliance!\n\n';
+        'Fixing these would help move the project toward full strict mode compliance!';
 
       warn(warningMessage);
 
-      // Individual warnings for each error with file and line
+      // Individual warnings for each error
       for (const [filename, errors] of Object.entries(relevantErrors)) {
         for (const error of errors) {
-          warn(error.message, filename, error.start.line);
+          warn(`${error.message}`, filename, error.start.line);
         }
       }
     }
