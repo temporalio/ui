@@ -25,7 +25,7 @@
       });
     }
   };
-
+  // Lets test if danger works
   let namespaceList = $derived(
     $namespaces.map((namespace: Namespace) => {
       return {
