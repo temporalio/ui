@@ -76,35 +76,37 @@ async function checkStrictModeErrors() {
         100
       ).toFixed(1);
 
-      let message = '## 📊 TypeScript Strict Mode Errors\n\n';
-      message += `This PR touches **${relevantErrorCount}** file(s) with strict mode errors `;
-      message += `(${percentageInPR}% of ${result.totalErrors} total project errors).\n\n`;
-      message +=
+      let warningMessage = '## 📊 TypeScript Strict Mode Errors\n\n';
+      warningMessage += `This PR touches **${relevantErrorCount}** file(s) with strict mode errors `;
+      warningMessage += `(${percentageInPR}% of ${result.totalErrors} total project errors).\n\n`;
+      warningMessage +=
         'Fixing these would help move the project toward full strict mode compliance!\n\n';
 
-      message += `<details>\n<summary>View errors by file (${Object.keys(relevantErrors).length} files)</summary>\n\n`;
+      warningMessage += `<details>\n<summary>View errors by file (${Object.keys(relevantErrors).length} files)</summary>\n\n`;
 
       for (const [filename, errors] of Object.entries(relevantErrors)) {
-        message += `\n**${filename}** (${errors.length} error${errors.length > 1 ? 's' : ''})\n`;
+        warningMessage += `\n**${filename}** (${errors.length} error${errors.length > 1 ? 's' : ''})\n`;
 
         const displayErrors = errors.slice(0, 5);
         for (const error of displayErrors) {
           const location = `Line ${error.start.line}:${error.start.character}`;
-          message += `- ${location}: ${error.message.split('\n')[0]}\n`;
+          warningMessage += `- ${location}: ${error.message.split('\n')[0]}\n`;
         }
 
         if (errors.length > 5) {
-          message += `- _(${errors.length - 5} more errors in this file)_\n`;
+          warningMessage += `- _(${errors.length - 5} more errors in this file)_\n`;
         }
       }
 
-      message += '\n</details>';
+      warningMessage += '\n</details>';
 
-      warn(message);
+      warn(warningMessage);
     }
   } catch (error) {
     console.error('Error checking strict mode errors:', error);
   }
 }
 
-await checkStrictModeErrors();
+(async () => {
+  await checkStrictModeErrors();
+})();
