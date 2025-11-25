@@ -124,12 +124,38 @@ async function checkStrictModeErrors() {
 
       warn(warningMessage);
 
-      // Add inline annotations for better visibility
+      // Add inline annotations for better visibility (only on modified lines)
       for (const [filename, errors] of Object.entries(relevantErrors)) {
-        // Limit annotations to avoid overwhelming the PR
-        const annotationErrors = errors.slice(0, 10);
-        for (const error of annotationErrors) {
-          warn(error.message, filename, error.start.line);
+        try {
+          const diff = await danger.git.structuredDiffForFile(filename);
+          if (!diff) continue;
+
+          // Extract line numbers that were actually modified in this PR
+          const modifiedLines = new Set<number>();
+          diff.chunks.forEach((chunk) => {
+            chunk.changes.forEach((change) => {
+              if (change.type === 'add' || change.type === 'normal') {
+                const lineNum = change.ln || change.ln2;
+                if (lineNum) modifiedLines.add(lineNum);
+              }
+            });
+          });
+
+          // Only annotate errors on lines that were actually modified
+          const annotatableErrors = errors.filter((error) =>
+            modifiedLines.has(error.start.line),
+          );
+
+          console.log(
+            `File: ${filename}, Modified lines: ${modifiedLines.size}, Annotatable errors: ${annotatableErrors.length}`,
+          );
+
+          // Limit to 5 annotations per file to avoid spam
+          for (const error of annotatableErrors.slice(0, 5)) {
+            warn(error.message, filename, error.start.line);
+          }
+        } catch (diffError) {
+          console.error(`Failed to get diff for ${filename}:`, diffError);
         }
       }
     }
