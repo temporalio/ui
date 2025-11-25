@@ -77,6 +77,8 @@ async function checkStrictModeErrors() {
       ...danger.git.created_files,
     ]);
 
+    console.log('Changed files in PR:', Array.from(changedFiles));
+
     const relevantErrors: Record<string, StrictError[]> = {};
     let relevantErrorCount = 0;
 
@@ -110,7 +112,14 @@ async function checkStrictModeErrors() {
 
       // Individual warnings for each error
       for (const [filename, errors] of Object.entries(relevantErrors)) {
+        console.log(
+          `\n=== Processing ${errors.length} errors for file: ${filename} ===`,
+          changedFiles,
+        );
         for (const error of errors) {
+          console.log(
+            `  warn("${error.message.substring(0, 60)}...", "${filename}", ${error.start.line})`,
+          );
           warn(`${error.message}`, filename, error.start.line);
         }
       }
