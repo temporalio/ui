@@ -1,5 +1,6 @@
 import { execSync } from 'child_process';
 
+import { message } from 'danger';
 import { danger, fail, schedule, warn } from 'danger';
 
 const pr = danger.github.pr;
@@ -38,6 +39,7 @@ interface StrictErrorResult {
 }
 
 async function checkStrictModeErrors() {
+  message("We're getting some strict mode magic goin");
   try {
     const output = execSync('pnpm dlx esno scripts/count-strict-errors.ts', {
       encoding: 'utf8',
@@ -103,6 +105,8 @@ async function checkStrictModeErrors() {
       warn(warningMessage);
     }
   } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    warn((error as unknown as any).toString());
     console.error('Error checking strict mode errors:', error);
   }
 }
