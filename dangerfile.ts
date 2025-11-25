@@ -1,6 +1,5 @@
 import { execSync } from 'child_process';
 
-import { message } from 'danger';
 import { danger, fail, schedule, warn } from 'danger';
 
 const pr = danger.github.pr;
@@ -35,7 +34,6 @@ interface StrictErrorResult {
 }
 
 async function checkStrictModeErrors() {
-  message("We're getting some strict mode magic goin");
   try {
     const tmpFile = `/tmp/strict-errors-${Date.now()}.json`;
 
@@ -50,6 +48,11 @@ async function checkStrictModeErrors() {
     const output = fs.readFileSync(tmpFile, 'utf8');
     fs.unlinkSync(tmpFile);
 
+    console.log('=== RAW OUTPUT START ===');
+    console.log(output);
+    console.log('=== RAW OUTPUT END ===');
+    console.log(`Output length: ${output.length} bytes`);
+
     if (!output || output.trim().length === 0) {
       console.error('Script produced no output');
       return;
@@ -57,14 +60,19 @@ async function checkStrictModeErrors() {
 
     // Extract the last line which should be the JSON output
     const lines = output.trim().split('\n');
+    console.log(`Total lines: ${lines.length}`);
     const jsonLine = lines[lines.length - 1];
+    console.log(`Last line length: ${jsonLine.length} bytes`);
 
     let result: StrictErrorResult;
     try {
       result = JSON.parse(jsonLine);
+      console.log('✅ JSON parsed successfully');
     } catch (parseError) {
-      console.error('Failed to parse JSON output:', jsonLine.substring(0, 200));
-      console.error('Output length:', output.length);
+      console.error('❌ Failed to parse JSON');
+      console.error(`Parse error: ${parseError}`);
+      console.error(jsonLine);
+
       warn(
         '⚠️ Failed to parse strict mode check results. Check CI logs for details.',
       );
