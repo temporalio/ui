@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 
-import { danger, fail, warn } from 'danger';
+import { danger, fail, schedule, warn } from 'danger';
 
 const pr = danger.github.pr;
 const modified = danger.git.modified_files;
@@ -107,6 +107,4 @@ async function checkStrictModeErrors() {
   }
 }
 
-(async () => {
-  await checkStrictModeErrors();
-})();
+schedule(checkStrictModeErrors());
