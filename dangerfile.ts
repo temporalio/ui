@@ -48,31 +48,19 @@ async function checkStrictModeErrors() {
     const output = fs.readFileSync(tmpFile, 'utf8');
     fs.unlinkSync(tmpFile);
 
-    console.log('=== RAW OUTPUT START ===');
-    console.log(output);
-    console.log('=== RAW OUTPUT END ===');
-    console.log(`Output length: ${output.length} bytes`);
-
     if (!output || output.trim().length === 0) {
       console.error('Script produced no output');
       return;
     }
 
-    // Extract the last line which should be the JSON output
     const lines = output.trim().split('\n');
-    console.log(`Total lines: ${lines.length}`);
     const jsonLine = lines[lines.length - 1];
-    console.log(`Last line length: ${jsonLine.length} bytes`);
 
     let result: StrictErrorResult;
     try {
       result = JSON.parse(jsonLine);
-      console.log('✅ JSON parsed successfully');
     } catch (parseError) {
-      console.error('❌ Failed to parse JSON');
-      console.error(`Parse error: ${parseError}`);
-      console.error(jsonLine);
-
+      console.error('Failed to parse strict mode check results');
       warn(
         '⚠️ Failed to parse strict mode check results. Check CI logs for details.',
       );
@@ -135,6 +123,15 @@ async function checkStrictModeErrors() {
       warningMessage += '\n</details>';
 
       warn(warningMessage);
+
+      // Add inline annotations for better visibility
+      for (const [filename, errors] of Object.entries(relevantErrors)) {
+        // Limit annotations to avoid overwhelming the PR
+        const annotationErrors = errors.slice(0, 10);
+        for (const error of annotationErrors) {
+          warn(error.message, filename, error.start.line);
+        }
+      }
     }
   } catch (error) {
     console.error('Error checking strict mode errors:', error);
