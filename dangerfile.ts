@@ -106,21 +106,78 @@ async function checkStrictModeErrors() {
       warningMessage += `(${relevantErrorCount} total errors across these files, `;
       warningMessage += `${percentageInPR}% of ${result.totalErrors} project-wide errors).\n\n`;
       warningMessage +=
-        'Fixing these would help move the project toward full strict mode compliance!';
+        'Fixing these would help move the project toward full strict mode compliance!\n\n';
+
+      warningMessage +=
+        '<details>\n<summary>View all errors by file</summary>\n\n';
+
+      for (const [filename, errors] of Object.entries(relevantErrors)) {
+        warningMessage += `\n### ${filename}\n`;
+        warningMessage += `**${errors.length} error${errors.length > 1 ? 's' : ''}**\n\n`;
+
+        for (const error of errors) {
+          const location = `Line ${error.start.line}:${error.start.character}`;
+          warningMessage += `- ${location}: ${error.message}\n`;
+        }
+      }
+
+      warningMessage += '\n</details>';
 
       warn(warningMessage);
 
-      // Individual warnings for each error
+      // Individual warnings for each error - but only for lines in the diff
       for (const [filename, errors] of Object.entries(relevantErrors)) {
         console.log(
           `\n=== Processing ${errors.length} errors for file: ${filename} ===`,
-          changedFiles,
         );
-        for (const error of errors) {
+
+        // Get the diff to find which lines are actually in the PR
+        const diff = await danger.git.diffForFile(filename);
+        if (!diff) {
           console.log(
-            `  warn("${error.message.substring(0, 60)}...", "${filename}", ${error.start.line})`,
+            `  No diff found for ${filename}, skipping inline comments`,
           );
-          warn(`${error.message}`, filename, error.start.line);
+          continue;
+        }
+
+        // Parse the diff to find line numbers that are in hunks
+        const linesInDiff = new Set<number>();
+        const diffLines = diff.diff.split('\n');
+
+        let currentLine = 0;
+        for (const line of diffLines) {
+          // Hunk header format: @@ -old_start,old_count +new_start,new_count @@
+          const hunkMatch = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+          if (hunkMatch) {
+            currentLine = parseInt(hunkMatch[1], 10);
+            continue;
+          }
+
+          // Lines starting with + or space are in the new version
+          if (line.startsWith('+') || line.startsWith(' ')) {
+            linesInDiff.add(currentLine);
+            currentLine++;
+          }
+          // Lines starting with - are only in old version, don't increment
+        }
+
+        console.log(
+          `  Lines in diff: ${Array.from(linesInDiff)
+            .sort((a, b) => a - b)
+            .join(', ')}`,
+        );
+
+        for (const error of errors) {
+          if (linesInDiff.has(error.start.line)) {
+            console.log(
+              `  ✓ warn("${error.message.substring(0, 60)}...", "${filename}", ${error.start.line})`,
+            );
+            warn(`${error.message}`, filename, error.start.line);
+          } else {
+            console.log(
+              `  ✗ Skipping line ${error.start.line} (not in diff): ${error.message.substring(0, 60)}...`,
+            );
+          }
         }
       }
     }
