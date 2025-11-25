@@ -99,24 +99,22 @@ async function checkStrictModeErrors() {
       ).toFixed(1);
 
       let warningMessage = '## 📊 TypeScript Strict Mode Errors\n\n';
-      warningMessage += `This PR touches **${relevantErrorCount}** file(s) with strict mode errors `;
-      warningMessage += `(${percentageInPR}% of ${result.totalErrors} total project errors).\n\n`;
+      warningMessage += `This PR touches **${Object.keys(relevantErrors).length}** file(s) with strict mode errors `;
+      warningMessage += `(${relevantErrorCount} total errors across these files, `;
+      warningMessage += `${percentageInPR}% of ${result.totalErrors} project-wide errors).\n\n`;
       warningMessage +=
         'Fixing these would help move the project toward full strict mode compliance!\n\n';
 
-      warningMessage += `<details>\n<summary>View errors by file (${Object.keys(relevantErrors).length} files)</summary>\n\n`;
+      warningMessage +=
+        '<details>\n<summary>View all errors by file</summary>\n\n';
 
       for (const [filename, errors] of Object.entries(relevantErrors)) {
-        warningMessage += `\n**${filename}** (${errors.length} error${errors.length > 1 ? 's' : ''})\n`;
+        warningMessage += `\n### ${filename}\n`;
+        warningMessage += `**${errors.length} error${errors.length > 1 ? 's' : ''}**\n\n`;
 
-        const displayErrors = errors.slice(0, 5);
-        for (const error of displayErrors) {
+        for (const error of errors) {
           const location = `Line ${error.start.line}:${error.start.character}`;
-          warningMessage += `- ${location}: ${error.message.split('\n')[0]}\n`;
-        }
-
-        if (errors.length > 5) {
-          warningMessage += `- _(${errors.length - 5} more errors in this file)_\n`;
+          warningMessage += `- ${location}: ${error.message}\n`;
         }
       }
 
@@ -124,38 +122,11 @@ async function checkStrictModeErrors() {
 
       warn(warningMessage);
 
-      // Add inline annotations for better visibility (only on modified lines)
+      // Add inline annotations - Danger will automatically filter out lines not in the diff
       for (const [filename, errors] of Object.entries(relevantErrors)) {
-        try {
-          const diff = await danger.git.structuredDiffForFile(filename);
-          if (!diff) continue;
-
-          // Extract line numbers that were actually modified in this PR
-          const modifiedLines = new Set<number>();
-          diff.chunks.forEach((chunk) => {
-            chunk.changes.forEach((change) => {
-              if (change.type === 'add' || change.type === 'normal') {
-                const lineNum = change.ln || change.ln2;
-                if (lineNum) modifiedLines.add(lineNum);
-              }
-            });
-          });
-
-          // Only annotate errors on lines that were actually modified
-          const annotatableErrors = errors.filter((error) =>
-            modifiedLines.has(error.start.line),
-          );
-
-          console.log(
-            `File: ${filename}, Modified lines: ${modifiedLines.size}, Annotatable errors: ${annotatableErrors.length}`,
-          );
-
-          // Limit to 5 annotations per file to avoid spam
-          for (const error of annotatableErrors.slice(0, 5)) {
-            warn(error.message, filename, error.start.line);
-          }
-        } catch (diffError) {
-          console.error(`Failed to get diff for ${filename}:`, diffError);
+        // Limit to 10 annotations per file to avoid spam
+        for (const error of errors.slice(0, 10)) {
+          warn(error.message, filename, error.start.line);
         }
       }
     }
