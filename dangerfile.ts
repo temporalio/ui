@@ -23,13 +23,9 @@ if (totalChanges > bigPRThreshold) {
 }
 
 interface StrictError {
-  type: 'ERROR';
   filename: string;
   start: { line: number; character: number };
-  end: { line: number; character: number };
   message: string;
-  code?: string;
-  source?: string;
 }
 
 interface StrictErrorResult {
@@ -41,12 +37,18 @@ interface StrictErrorResult {
 async function checkStrictModeErrors() {
   message("We're getting some strict mode magic goin");
   try {
-    const output = execSync('pnpm dlx esno scripts/count-strict-errors.ts', {
+    const tmpFile = `/tmp/strict-errors-${Date.now()}.json`;
+
+    execSync(`pnpm dlx esno scripts/count-strict-errors.ts > ${tmpFile}`, {
       encoding: 'utf8',
       cwd: process.cwd(),
       timeout: 5 * 60 * 1000,
-      maxBuffer: 50 * 1024 * 1024,
+      shell: '/bin/bash',
     });
+
+    const fs = await import('fs');
+    const output = fs.readFileSync(tmpFile, 'utf8');
+    fs.unlinkSync(tmpFile);
 
     if (!output || output.trim().length === 0) {
       console.error('Script produced no output');
@@ -62,7 +64,7 @@ async function checkStrictModeErrors() {
       result = JSON.parse(jsonLine);
     } catch (parseError) {
       console.error('Failed to parse JSON output:', jsonLine.substring(0, 200));
-      console.error('Full output:', output.substring(0, 500));
+      console.error('Output length:', output.length);
       warn(
         '⚠️ Failed to parse strict mode check results. Check CI logs for details.',
       );

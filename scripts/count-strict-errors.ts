@@ -7,13 +7,9 @@ const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
 interface StrictError {
-  type: 'ERROR';
   filename: string;
   start: { line: number; character: number };
-  end: { line: number; character: number };
   message: string;
-  code?: string;
-  source?: string;
 }
 
 interface StrictErrorResult {
@@ -63,13 +59,9 @@ try {
 
       if (data.type === 'ERROR') {
         const error: StrictError = {
-          type: 'ERROR',
           filename: data.filename,
           start: data.start,
-          end: data.end,
-          message: data.message,
-          code: data.code,
-          source: data.source,
+          message: data.message.split('\n')[0], // Only first line
         };
 
         if (!errorsByFile[error.filename]) {
