@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 
-import { danger, fail, message, warn } from 'danger';
+import { danger, fail, warn } from 'danger';
 
 const pr = danger.github.pr;
 const modified = danger.git.modified_files;
@@ -20,8 +20,6 @@ if (totalChanges > bigPRThreshold) {
     `This PR has ${totalChanges} changed files. Consider breaking it into smaller PRs for easier review.`,
   );
 }
-
-message("Hey we're using a dangerfile");
 
 interface StrictError {
   type: 'ERROR';
