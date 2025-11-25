@@ -114,21 +114,15 @@ async function checkStrictModeErrors() {
 
         for (const error of errors) {
           const location = `Line ${error.start.line}:${error.start.character}`;
-          warningMessage += `- ${location}: ${error.message}\n`;
+          // Create a GitHub link to the specific line in the PR
+          const fileLink = `https://github.com/${danger.github.thisPR.owner}/${danger.github.thisPR.repo}/blob/${danger.github.pr.head.sha}/${filename}#L${error.start.line}`;
+          warningMessage += `- [${location}](${fileLink}): ${error.message}\n`;
         }
       }
 
       warningMessage += '\n</details>';
 
       warn(warningMessage);
-
-      // Add inline annotations - Danger will automatically filter out lines not in the diff
-      for (const [filename, errors] of Object.entries(relevantErrors)) {
-        // Limit to 10 annotations per file to avoid spam
-        for (const error of errors.slice(0, 10)) {
-          warn(error.message, filename, error.start.line);
-        }
-      }
     }
   } catch (error) {
     console.error('Error checking strict mode errors:', error);
