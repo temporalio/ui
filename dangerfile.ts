@@ -131,34 +131,27 @@ async function checkStrictModeErrors() {
           `\n=== Processing ${errors.length} errors for file: ${filename} ===`,
         );
 
-        // Get the diff to find which lines are actually in the PR
-        const diff = await danger.git.diffForFile(filename);
-        if (!diff) {
+        // Use structuredDiffForFile to get accurate line information
+        const structuredDiff = await danger.git.structuredDiffForFile(filename);
+        if (!structuredDiff) {
           console.log(
-            `  No diff found for ${filename}, skipping inline comments`,
+            `  No structured diff found for ${filename}, skipping inline comments`,
           );
           continue;
         }
 
-        // Parse the diff to find line numbers that are in hunks
+        // Collect all line numbers that appear in the diff
         const linesInDiff = new Set<number>();
-        const diffLines = diff.diff.split('\n');
-
-        let currentLine = 0;
-        for (const line of diffLines) {
-          // Hunk header format: @@ -old_start,old_count +new_start,new_count @@
-          const hunkMatch = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
-          if (hunkMatch) {
-            currentLine = parseInt(hunkMatch[1], 10);
-            continue;
+        for (const chunk of structuredDiff.chunks) {
+          for (const change of chunk.changes) {
+            // For added lines, use ln2 (new file line number)
+            // For unchanged context lines, also use ln2
+            if (change.type === 'add' && change.ln2) {
+              linesInDiff.add(change.ln2);
+            } else if (change.type === 'normal' && change.ln2) {
+              linesInDiff.add(change.ln2);
+            }
           }
-
-          // Lines starting with + or space are in the new version
-          if (line.startsWith('+') || line.startsWith(' ')) {
-            linesInDiff.add(currentLine);
-            currentLine++;
-          }
-          // Lines starting with - are only in old version, don't increment
         }
 
         console.log(
