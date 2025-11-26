@@ -158,7 +158,7 @@ export const outOfBounds = (
  * Creates a Svelte store for viewing pages of a larger data set.
  */
 export const pagination = <T>(
-  items: Readonly<T[]> = [],
+  items: readonly T[] = [],
   perPage: number | string = defaultItemsPerPage,
   currentPage: string | number = 0,
 ): PaginationStore<T> => {

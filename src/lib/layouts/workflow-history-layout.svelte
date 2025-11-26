@@ -53,7 +53,7 @@
     'ascending',
   );
 
-  $: $eventViewType, clearActives();
+  $: ($eventViewType, clearActives());
 
   beforeNavigate(() => {
     clearActives();
