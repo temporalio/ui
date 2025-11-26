@@ -145,14 +145,41 @@ async function checkStrictModeErrors() {
         console.log(`  Analyzing ${structuredDiff.chunks.length} chunks...`);
 
         for (const chunk of structuredDiff.chunks) {
-          console.log(`  Chunk content: ${chunk.content}`);
+          console.log(`  Chunk: ${chunk.content}`);
+
+          // Parse the chunk header to get the starting line number
+          // Format: @@ -old_start,old_count +new_start,new_count @@
+          const match = chunk.content.match(
+            /@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/,
+          );
+          if (!match) {
+            console.log('  Could not parse chunk header, skipping');
+            continue;
+          }
+
+          let currentNewLine = parseInt(match[1], 10);
+          console.log(`  Starting at new line: ${currentNewLine}`);
+
           for (const change of chunk.changes) {
-            console.log(
-              `    Line ${change.ln || 'N/A'}/${change.ln2 || 'N/A'} type=${change.type} content="${change.content.substring(0, 50)}"`,
-            );
-            // Include all lines that exist in the new version (add, normal, and del with ln2)
-            if (change.ln2) {
-              linesInDiff.add(change.ln2);
+            if (change.type === 'add') {
+              // Added lines exist in the new file at currentNewLine
+              console.log(
+                `    Line ${currentNewLine} (add): ${change.content.substring(0, 50)}`,
+              );
+              linesInDiff.add(currentNewLine);
+              currentNewLine++;
+            } else if (change.type === 'del') {
+              // Deleted lines don't exist in new file, don't add or increment
+              console.log(
+                `    (del - not in new file): ${change.content.substring(0, 50)}`,
+              );
+            } else if (change.type === 'normal') {
+              // Context lines exist in new file at currentNewLine
+              console.log(
+                `    Line ${currentNewLine} (normal): ${change.content.substring(0, 50)}`,
+              );
+              linesInDiff.add(currentNewLine);
+              currentNewLine++;
             }
           }
         }
