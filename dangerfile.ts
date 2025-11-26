@@ -142,13 +142,16 @@ async function checkStrictModeErrors() {
 
         // Collect all line numbers that appear in the diff
         const linesInDiff = new Set<number>();
+        console.log(`  Analyzing ${structuredDiff.chunks.length} chunks...`);
+
         for (const chunk of structuredDiff.chunks) {
+          console.log(`  Chunk content: ${chunk.content}`);
           for (const change of chunk.changes) {
-            // For added lines, use ln2 (new file line number)
-            // For unchanged context lines, also use ln2
-            if (change.type === 'add' && change.ln2) {
-              linesInDiff.add(change.ln2);
-            } else if (change.type === 'normal' && change.ln2) {
+            console.log(
+              `    Line ${change.ln || 'N/A'}/${change.ln2 || 'N/A'} type=${change.type} content="${change.content.substring(0, 50)}"`,
+            );
+            // Include all lines that exist in the new version (add, normal, and del with ln2)
+            if (change.ln2) {
               linesInDiff.add(change.ln2);
             }
           }
