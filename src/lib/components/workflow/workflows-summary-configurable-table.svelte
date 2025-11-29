@@ -22,8 +22,8 @@
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
 
   export let onClickConfigure: () => void;
+  export let namespace: string;
 
-  $: ({ namespace } = $page.params);
   $: columns = $configurableTableColumns?.[namespace]?.workflows ?? [];
   $: query = $page.url.searchParams.get('query');
 

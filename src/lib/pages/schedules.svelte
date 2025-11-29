@@ -38,6 +38,8 @@
   import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  export let namespace: string;
+
   let refresh = Date.now();
   let coreUser = coreUserStore();
   let customizationDrawerOpen = false;
@@ -47,7 +49,6 @@
     customizationDrawerOpen = true;
   };
 
-  $: namespace = $page.params.namespace;
   $: columns = $configurableTableColumns?.[namespace]?.schedules ?? [];
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
   $: searchAttributeOptions = Object.entries({
@@ -104,7 +105,7 @@
     <div class="flex flex-col gap-4" slot="header" let:visibleItems>
       {@const showActions = visibleItems.length || query}
       <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-        <SchedulesCount />
+        <SchedulesCount {namespace} />
       </h1>
       <div class="flex flex-col justify-between gap-2 md:flex-row">
         {#if showActions}
@@ -134,7 +135,7 @@
       {/each}
     </tr>
     {#each visibleItems as schedule}
-      <SchedulesTableRow {schedule} {columns} />
+      <SchedulesTableRow {schedule} {columns} {namespace} />
     {/each}
 
     <svelte:fragment slot="empty">

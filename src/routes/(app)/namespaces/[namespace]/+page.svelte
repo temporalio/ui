@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
@@ -18,7 +18,7 @@
   import { temporalVersion, uiVersion } from '$lib/stores/versions';
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
 
-  export let data: PageData;
+  let { data }: PageProps = $props();
 
   enum ArchivalState {
     ARCHIVAL_STATE_UNSPECIFIED = 0,
@@ -47,7 +47,7 @@
     return bool ? translate('common.disabled') : translate('common.enabled');
   };
 
-  $: ({ namespace, clusters } = data);
+  const { namespace, clusters } = $derived(data);
 
   onMount(() => {
     $lastUsedNamespace = namespace?.namespaceInfo?.name;
@@ -58,7 +58,7 @@
   title={`${translate('namespaces.namespace')} | ${
     namespace?.namespaceInfo?.name
   }`}
-  url={$page.url.href}
+  url={page.url.href}
 />
 <h1 data-testid="namespace-title">
   {translate('namespaces.namespace')}: {namespace?.namespaceInfo?.name}

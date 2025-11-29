@@ -203,7 +203,7 @@
     {stringifyWithBigInt(fullJson, null, 2)}
   </div>
 {:else if workflowError}
-  <WorkflowError error={workflowError} />
+  <WorkflowError error={workflowError} {namespace} />
 {:else if !$workflowRun.workflow}
   <SkeletonWorkflow />
 {:else}

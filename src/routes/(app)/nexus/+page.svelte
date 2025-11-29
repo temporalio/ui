@@ -1,15 +1,16 @@
 <script lang="ts">
+  import { page } from '$app/state';
+
+  import type { PageProps } from './$types';
+
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEndpoints from '$lib/pages/nexus-endpoints.svelte';
-  import { page } from '$lib/svelte-mocks/app/stores';
 
-  import type { PageData } from '../$types';
+  let { data }: PageProps = $props();
 
-  export let data: PageData;
-
-  $: ({ endpoints } = data);
+  let { endpoints } = $derived(data);
 </script>
 
-<PageTitle title={translate('nexus.endpoints')} url={$page.url.href} />
+<PageTitle title={translate('nexus.endpoints')} url={page.url.href} />
 <NexusEndpoints {endpoints} />

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
-
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/state';
+
+  import type { LayoutProps } from './$types';
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
@@ -38,19 +38,15 @@
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  interface Props {
-    children: Snippet;
-  }
+  let { children, params }: LayoutProps = $props();
 
-  let { children }: Props = $props();
+  const { namespace } = $derived(params);
 
   let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
-  let activeNamespaceName = $derived(
-    page.params?.namespace ?? $lastUsedNamespace,
-  );
+  let activeNamespaceName = $derived(namespace ?? $lastUsedNamespace);
   let namespaceNames = $derived(
     isCloud
-      ? [page.params.namespace]
+      ? [namespace]
       : $namespaces.map(
           (namespace: Namespace) => namespace?.namespaceInfo?.name,
         ),

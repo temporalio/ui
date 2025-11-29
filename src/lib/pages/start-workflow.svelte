@@ -45,7 +45,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
-  $: ({ namespace } = $page.params);
+  export let namespace: string;
 
   const identity = getIdentity();
 

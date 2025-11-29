@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -15,15 +13,20 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
-  const namespace = $derived(page.params.namespace);
-  const deploymentName = $derived(page.params.deployment);
+  interface Props {
+    namespace: string;
+    deployment: string;
+  }
+
+  let { namespace, deployment: deploymentName }: Props = $props();
+
   const parameters = $derived({
     namespace,
     deploymentName: decodeURIForSvelte(deploymentName),
   });
   const workflowHref = $derived(
     routeForWorkflowsWithQuery({
-      namespace: page.params.namespace,
+      namespace,
       query: `TemporalWorkerDeployment="${deploymentName}"`,
     }),
   );

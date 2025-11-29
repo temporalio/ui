@@ -1,6 +1,5 @@
 <script lang="ts">
   import { beforeNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
@@ -29,7 +28,8 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  $: ({ namespace } = $page.params);
+  export let namespace: string;
+
   $: ({ workflow } = $workflowRun);
   $: pendingActivities = workflow?.pendingActivities;
   $: pendingNexusOperations = workflow?.pendingNexusOperations;
