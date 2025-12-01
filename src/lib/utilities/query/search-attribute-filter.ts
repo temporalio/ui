@@ -111,10 +111,10 @@ export const formatDateTimeRange = (
     format,
     {
       relative,
-      abbrFormat: true,
+      format: 'short',
     },
   )} ${operator.toLowerCase()} ${formatDate(end.replace(/"/g, ''), format, {
     relative,
-    abbrFormat: true,
+    format: 'short',
   })}`;
 };

@@ -12,7 +12,11 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
@@ -156,17 +160,110 @@
       {/if}
     {/if}
   </div>
-  <div class="flex w-full flex-col gap-1 px-2">
-    {#if failed}
-      {#if totalPending > 20}
-        {@render failuresAccordion()}
-      {:else}
-        {@render failuresCodeBlock()}
+  <div class="flex flex-1 flex-col gap-4 xl:flex-row">
+    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+      {@render detail(translate('workflows.activity-id'), activity.activityId)}
+      {#if activity.paused && activity.pauseInfo}
+        {@render detail(
+          translate('activities.paused-by'),
+          activity.pauseInfo?.manual?.identity || '',
+        )}
+        {@render detail(
+          translate('activities.paused-since'),
+          formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
+        )}
+        {@render detail(
+          translate('activities.pause-reason'),
+          activity.pauseInfo?.manual?.reason || '-',
+        )}
       {/if}
-    {/if}
-    {#if activity.heartbeatDetails}
-      {@render heartbeat()}
-    {/if}
+      {@render detail(translate('workflows.attempt'), attempts)}
+      {#if activity.scheduledTime}
+        {@const timeDifference = toTimeDifference({
+          date: activity.scheduledTime,
+          negativeDefault: '',
+        })}
+        {#if timeDifference}
+          {@render nextRetry(timeDifference)}
+        {/if}
+      {/if}
+      {#if activity.lastAttemptCompleteTime}
+        {@render detail(
+          translate('workflows.last-attempt-completed-time'),
+          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
+        )}
+      {/if}
+      {#if activity.expirationTime}
+        {@render detail(
+          translate('workflows.retry-expiration'),
+          formatRetryExpiration(
+            activity.maximumAttempts,
+            formatDuration(
+              getDuration({
+                start: Date.now(),
+                end: activity.expirationTime,
+              }),
+            ),
+          ),
+        )}
+      {/if}
+      {#if activity.lastHeartbeatTime}
+        {@render detail(
+          translate('workflows.last-heartbeat'),
+          formatDate(activity.lastHeartbeatTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
+        )}
+      {/if}
+      {#if activity.lastStartedTime}
+        {@render detail(
+          translate('workflows.last-started-time'),
+          formatDate(activity.lastStartedTime, $timeFormat, {
+            relative: $relativeTime,
+            format: $timestampFormat,
+          }),
+        )}
+      {/if}
+      {#if activity.lastWorkerIdentity}
+        {@render detail(
+          translate('workflows.last-worker-identity'),
+          activity.lastWorkerIdentity,
+        )}
+      {/if}
+      {#if activity.priority}
+        {#if activity.priority.priorityKey}
+          {@render detail(
+            translate('workflows.priority'),
+            activity.priority.priorityKey,
+          )}
+        {/if}
+        {#if activity.priority.fairnessKey}
+          {@render detail(
+            translate('workflows.fairness'),
+            activity.priority.fairnessKey,
+          )}
+        {/if}
+      {/if}
+    </div>
+    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
+      {#if failed}
+        {#if totalPending > 20}
+          {@render failuresAccordion()}
+        {:else}
+          {@render failuresCodeBlock()}
+        {/if}
+      {/if}
+      {#if activity.heartbeatDetails}
+        {@render heartbeat()}
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -266,6 +363,7 @@
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
       {formatDate(activity.scheduledTime, $timeFormat, {
         relative: $relativeTime,
+        format: $timestampFormat,
         relativeLabel: '',
       })}
       <strong>({timeDifference})</strong>

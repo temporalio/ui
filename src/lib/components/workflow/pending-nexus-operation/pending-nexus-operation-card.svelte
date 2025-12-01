@@ -5,7 +5,11 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { formatDate } from '$lib/utilities/format-date';
   import { omit } from '$lib/utilities/omit';
@@ -121,6 +125,7 @@
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
       {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
         relative: $relativeTime,
+        format: $timestampFormat,
         relativeLabel: '',
       })}
       <strong>({timeDifference})</strong>

@@ -176,7 +176,7 @@
       if (filter.customDate) return value.split('BETWEEN')[1];
       return formatDate(value, $timeFormat, {
         relative: true,
-        abbrFormat: true,
+        format: 'short',
       });
     }
 

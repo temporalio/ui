@@ -10,13 +10,11 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import { format } from '$lib/utilities/format-camel-case';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
@@ -26,6 +24,8 @@
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import { routeForNamespace } from '$lib/utilities/route-for';
+
+  import Timestamp from '../timestamp.svelte';
 
   import EventDetailsLink from './event-details-link.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
@@ -127,9 +127,7 @@
           </span>
         </p>
         <p class="text-xs text-white/70">
-          {formatDate(event.eventTime, $timeFormat, {
-            relative: $relativeTime,
-          })}
+          <Timestamp dateTime={event.eventTime} />
         </p>
       </div>
       {#if nextEvent}
@@ -308,7 +306,11 @@
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">
-      {shouldDisplayAsTime(key) ? formatDate(value, $timeFormat) : value}
+      {#if shouldDisplayAsTime(key)}
+        <Timestamp dateTime={value} />
+      {:else}
+        {value}
+      {/if}
     </p>
   </div>
 {/snippet}
