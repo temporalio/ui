@@ -8,7 +8,11 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { PendingNexusOperation } from '$lib/types/events';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
@@ -46,12 +50,14 @@
   let eventTime = $derived(
     formatDate(group?.eventTime, $timeFormat, {
       relative: $relativeTime,
+      format: $timestampFormat,
     }),
   );
+
   let abbrEventTime = $derived(
     formatDate(group?.eventTime, $timeFormat, {
       relative: $relativeTime,
-      abbrFormat: true,
+      format: 'short',
     }),
   );
 

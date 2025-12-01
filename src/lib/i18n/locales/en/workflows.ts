@@ -66,6 +66,7 @@ export const Strings = {
   'select-all-trailing': ' matching your query',
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
+  'back-to-archived-workflows': 'Back to Archived Workflows',
   input: 'Input',
   result: 'Result',
   'initial-input': 'Initial Input',
@@ -251,6 +252,7 @@ export const Strings = {
   'all-headings-in-view': 'All available columns are in view',
   'no-headings-in-view': 'No columns in view',
   'archived-workflows': 'Archived Workflows',
+  'archived-workflow-history': 'Archived Workflow History',
   archival: 'Archival',
   'workflow-query-empty-state-title': 'No Workflows Found',
   'workflow-query-empty-state-description':

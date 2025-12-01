@@ -4,6 +4,7 @@
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -11,7 +12,7 @@
   import { translate } from '$lib/i18n/translate';
   import { navOpen } from '$lib/stores/nav-open';
 
-  interface Props extends HTMLAttributes<HTMLElement> {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     isCloud: boolean;
     environmentName?: string;
     children?: Snippet;
@@ -22,7 +23,7 @@
     environmentName = '',
     children,
     bottom,
-    ...rest
+    ...restProps
   }: Props = $props();
 
   const toggle = () => ($navOpen = !$navOpen);
@@ -43,12 +44,12 @@
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
   data-testid="navigation-header"
-  {...rest}
+  {...restProps}
 >
   <div
     class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
   >
-    <a href="/" class="flex w-fit items-center gap-1 text-nowrap">
+    <a href={resolve('', {})} class="flex w-fit items-center gap-1 text-nowrap">
       <Logo height={24} width={24} class="m-1" />
       <div>
         <p class="text-base font-medium group-data-[nav=closed]:hidden">

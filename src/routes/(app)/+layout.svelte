@@ -27,7 +27,7 @@
   import DarkMode from '$lib/utilities/dark-mode';
   import { setValidEnvironmentName } from '$lib/utilities/environment-name';
   import {
-    routeForArchivalWorkfows,
+    routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForEventHistoryImport,
     routeForLoginPage,
@@ -37,6 +37,7 @@
     routeForWorkerDeployments,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
+  import ziggy from '$lib/vendor/ziggy-full-face.png';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
@@ -81,7 +82,7 @@
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
-      archivalRoute: routeForArchivalWorkfows({ namespace }),
+      archivalRoute: routeForArchivalWorkflows({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
       historyImportRoute: routeForEventHistoryImport(),
@@ -302,7 +303,7 @@
         {/snippet}
         {#snippet avatar()}
           <img
-            src="/ziggy-full-face.png"
+            src={ziggy}
             alt={translate('common.user-profile')}
             class="h-[32px] w-[32px]"
           />

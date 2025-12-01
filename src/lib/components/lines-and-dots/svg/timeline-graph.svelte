@@ -77,10 +77,10 @@
     >
       <div class="flex w-full justify-between text-xs">
         <p class="w-60 -translate-x-24 rotate-90">
-          {formatDate(startTime, $timeFormat)}
+          {formatDate(startTime, $timeFormat, { format: 'short' })}
         </p>
         <p class="w-60 translate-x-24 rotate-90">
-          {formatDate(endTime, $timeFormat)}
+          {formatDate(endTime, $timeFormat, { format: 'short' })}
         </p>
       </div>
     </div>
