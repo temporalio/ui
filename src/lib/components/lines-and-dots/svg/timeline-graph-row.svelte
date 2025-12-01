@@ -162,7 +162,7 @@
   const singleEventHoverWidth = $derived(radius * 3);
 
   const hoverWidth = $derived(
-    multiEventHoverWidth || pendingHoverWidth || singleEventHoverWidth,
+    pendingHoverWidth || multiEventHoverWidth || singleEventHoverWidth,
   );
 
   const groupHover = cva(['h-full w-full rounded-full border-2'], {

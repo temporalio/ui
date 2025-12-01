@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
   import type { Snippet } from 'svelte';
 
   import Badge from '$lib/holocene/badge.svelte';
@@ -19,17 +20,35 @@
   let { operation }: { operation: PendingNexusOperation } = $props();
 
   const failed = $derived(operation.attempt > 1);
+
+  const pendingStatus = cva(
+    ['flex flex-1 flex-col overflow-hidden rounded-t-lg pb-2 text-white'],
+    {
+      variants: {
+        status: {
+          retrying: 'bg-red-800',
+          pending: 'bg-slate-900/50',
+        },
+      },
+    },
+  );
 </script>
 
-<div class="flex-1">
-  <div class="flex flex-wrap items-center space-x-3">
-    <Badge>{operation.state}</Badge>
-    <h4>{translate('workflows.pending-nexus-operation')}</h4>
+<div
+  class={pendingStatus({
+    status: operation.attempt > 1 ? 'retrying' : 'pending',
+  })}
+>
+  <div class="bg-slate-900/80 p-2 text-left">
+    <div class="flex flex-col items-center justify-between lg:flex-row">
+      <Badge>{operation.state}</Badge>
+      <p class="font-medium leading-tight">
+        {translate('workflows.pending-nexus-operation')}
+      </p>
+    </div>
   </div>
-</div>
 
-<div class="flex flex-1 flex-col gap-4 xl:flex-row">
-  <div class="flex w-full flex-col gap-1 xl:w-1/2">
+  <div class="grid grid-cols-1 gap-0.5 p-2 md:grid-cols-2 xl:grid-cols-1">
     {#if operation.endpoint}
       {@render detail(translate('nexus.endpoint'), operation.endpoint)}
     {/if}
@@ -84,7 +103,7 @@
       )}
     {/if}
   </div>
-  <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
+  <div class="flex w-full flex-col gap-4 p-2">
     {#if failed}
       {@render failures()}
     {/if}
@@ -118,7 +137,7 @@
 </div>
 
 {#snippet nextRetry(timeDifference)}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">
       {translate('workflows.next-retry')}
     </p>
@@ -134,7 +153,7 @@
 {/snippet}
 
 {#snippet detail(label: string, value: string | number | Snippet)}
-  <div class="flex items-start gap-4">
+  <div class="leading-3">
     <p class="text-sm text-white/70">
       {label}
     </p>

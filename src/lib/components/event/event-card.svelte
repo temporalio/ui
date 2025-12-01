@@ -139,7 +139,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 gap-2 p-2 md:grid-cols-2">
+  <div class="grid grid-cols-1 gap-0.5 p-2 md:grid-cols-2 xl:grid-cols-1">
     {#if event?.links?.length}
       {@render eventLinks(event.links)}
     {/if}
