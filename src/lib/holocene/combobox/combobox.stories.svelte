@@ -59,8 +59,8 @@
   <Combobox
     id={context.id}
     data-testid={context.id}
-    on:change={action('change')}
-    on:filter={action('filter')}
+    onchange={action('change')}
+    onfilter={action('filter')}
     {...args}
   />
 </Template>
@@ -229,8 +229,8 @@
     <Combobox
       id={context.id}
       data-testid={context.id}
-      on:change={action('change')}
-      on:filter={action('filter')}
+      onchange={action('change')}
+      onfilter={action('filter')}
       leadingIcon="search"
       options={[
         'English',

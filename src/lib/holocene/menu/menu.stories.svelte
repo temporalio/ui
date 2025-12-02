@@ -2,12 +2,13 @@
   import type { Meta } from '@storybook/svelte';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import {
-    Menu,
-    MenuButton,
-    MenuContainer,
-    MenuItem,
-  } from '$lib/holocene/menu';
+
+  import MenuButton, {
+    type Props as MenuButtonProps,
+  } from './menu-button.svelte';
+  import MenuContainer from './menu-container.svelte';
+  import MenuItem from './menu-item.svelte';
+  import Menu, { type Props as MenuProps } from './menu.svelte';
 
   export const meta = {
     title: 'Menu',
@@ -40,7 +41,7 @@
         },
       },
     },
-  } satisfies Meta<MenuButton | Menu>;
+  } satisfies Meta<Pick<MenuButtonProps, 'variant'> | MenuProps>;
 </script>
 
 <script lang="ts">
@@ -58,21 +59,21 @@
         Menu
       </MenuButton>
       <Menu id={context.id} class="w-64" {...args}>
-        <MenuItem href="https://temporal.io" newTab on:click={action('click')}>
+        <MenuItem href="https://temporal.io" newTab onclick={action('click')}>
           Link
         </MenuItem>
         <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>
-        <MenuItem on:click={action('click')} selected>Selected</MenuItem>
+        <MenuItem onclick={action('click')} selected>Selected</MenuItem>
         <MenuItem
-          on:click={action('click')}
+          onclick={action('click')}
           description="Selected description"
           selected>Selected With Description</MenuItem
         >
-        <MenuItem on:click={action('click')}>Standard</MenuItem>
-        <MenuItem on:click={action('click')} description="Standard description"
+        <MenuItem onclick={action('click')}>Standard</MenuItem>
+        <MenuItem onclick={action('click')} description="Standard description"
           >Standard With Description</MenuItem
         >
-        <MenuItem on:click={action('click')} destructive>Destructive</MenuItem>
+        <MenuItem onclick={action('click')} destructive>Destructive</MenuItem>
       </Menu>
     </MenuContainer>
   </div>

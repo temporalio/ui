@@ -104,7 +104,7 @@
           <Option {value} {description}>{value}</Option>
         {/each}
         <Option
-          on:click={handleCustom}
+          onclick={handleCustom}
           value="custom"
           description="Input Signal name">Custom</Option
         >

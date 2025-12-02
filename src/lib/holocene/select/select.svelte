@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const SELECT_CONTEXT = 'select-context';
 
   type ExtendedSelectOption<T> = {
@@ -23,7 +23,12 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { writable, type Writable } from 'svelte/store';
 
-  import { type ComponentProps, onMount, setContext } from 'svelte';
+  import {
+    type ComponentProps,
+    onMount,
+    setContext,
+    type Snippet,
+  } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
@@ -34,9 +39,10 @@
 
   type T = $$Generic;
 
-  type $$Props = HTMLInputAttributes & {
+  interface Props extends HTMLInputAttributes {
     label: string;
     id: string;
+    children: Snippet;
     labelHidden?: boolean;
     value?: T;
     placeholder?: string;
@@ -45,31 +51,37 @@
     leadingIcon?: IconName;
     onChange?: (value: T) => void;
     'data-testid'?: string;
-    menuButtonClass?: string;
-    menuClass?: string;
+    menuButtonClass?: ClassNameValue;
+    menuClass?: ClassNameValue;
     variant?: ButtonStyles['variant'];
     required?: boolean;
     valid?: boolean;
     error?: string;
-    position?: ComponentProps<Menu>['position'];
-  };
+    position?: ComponentProps<typeof Menu>['position'];
+    leading?: Snippet;
+  }
 
-  export let label: string;
-  export let labelHidden = false;
-  export let id: string;
-  export let value: T = undefined;
-  export let placeholder = '';
-  export let disabled = false;
-  export let loading = false;
-  export let leadingIcon: IconName = null;
-  export let onChange: (value: T) => void = () => {};
-  export let menuButtonClass: ClassNameValue = undefined;
-  export let menuClass: string | undefined = undefined;
-  export let variant: ButtonStyles['variant'] = 'secondary';
-  export let required = false;
-  export let error = '';
-  export let valid = true;
-  export let position: ComponentProps<Menu>['position'] = undefined;
+  let {
+    label,
+    id,
+    labelHidden = false,
+    value = $bindable(undefined),
+    placeholder = '',
+    disabled = false,
+    loading = false,
+    leadingIcon = null,
+    onChange = () => {},
+    menuButtonClass = undefined,
+    menuClass = undefined,
+    variant = 'secondary',
+    required = false,
+    error = '',
+    valid = true,
+    position = undefined,
+    leading: leadingProp,
+    children,
+    ...rest
+  }: Props = $props();
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
@@ -77,11 +89,11 @@
   const labelCtx = writable<string>(value?.toString());
   const open = writable<boolean>(false);
 
-  $: value, updateContext();
+  $effect(() => updateContext(value));
 
-  function updateContext() {
-    $valueCtx = value;
-    $labelCtx = getLabelFromOptions(value);
+  function updateContext(v: T) {
+    $valueCtx = v;
+    $labelCtx = getLabelFromOptions(v);
   }
 
   const handleChange = (newValue: T) => {
@@ -123,16 +135,18 @@
         disabled={disabled || loading}
         controls="{id}-select"
         {variant}
-        data-testid={`${$$restProps['data-testid'] ?? id}-button`}
+        data-testid="{rest['data-testid'] ?? id}-button"
         data-track-name="select"
         data-track-intent="select"
         data-track-text={label}
       >
-        <slot name="leading" slot="leading">
+        {#snippet leading()}
           {#if leadingIcon}
             <Icon name={leadingIcon} />
+          {:else if leadingProp}
+            {@render leadingProp()}
           {/if}
-        </slot>
+        {/snippet}
         <input
           {id}
           value={!value && placeholder !== '' ? placeholder : $labelCtx}
@@ -141,18 +155,20 @@
           class:disabled
           {required}
           aria-required={required}
-          {...$$restProps}
+          {...rest}
         />
-        {#if disabled}
-          <Icon slot="trailing" name="lock" />
-        {:else if loading}
-          <Icon name="spinner" class="animate-spin" />
-        {/if}
+        {#snippet trailing()}
+          {#if disabled}
+            <Icon name="lock" />
+          {:else if loading}
+            <Icon name="spinner" class="animate-spin" />
+          {/if}
+        {/snippet}
       </MenuButton>
     {/key}
   </div>
   <Menu role="listbox" id="{id}-select" class={menuClass} {position}>
-    <slot />
+    {@render children()}
   </Menu>
 
   {#if error && !valid}

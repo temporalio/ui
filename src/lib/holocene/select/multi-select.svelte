@@ -81,7 +81,7 @@
       )}
       <MenuItem
         data-testid={option.label}
-        on:click={() => {
+        onclick={() => {
           onOptionClick(option);
         }}
       >
@@ -103,13 +103,13 @@
     <MenuDivider />
     <MenuItem
       data-testid="multiselect-select-all"
-      on:click={onSelectAllOptionClick}
+      onclick={onSelectAllOptionClick}
     >
       {selectAllLabel}
     </MenuItem>
     <MenuItem
       data-testid="multiselect-remove-all"
-      on:click={onRemoveAllOptionClick}
+      onclick={onRemoveAllOptionClick}
     >
       {clearAllLabel}
     </MenuItem>

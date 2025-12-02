@@ -103,7 +103,7 @@
             status === 'All')}
         <MenuItem
           data-testid={`status-dropdown-filter-chip-${status}`}
-          on:click={() => handleStatusSelect(status)}
+          onclick={() => handleStatusSelect(status)}
         >
           <Checkbox
             on:click={() => handleStatusSelect(status)}

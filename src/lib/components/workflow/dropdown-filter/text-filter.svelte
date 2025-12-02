@@ -42,8 +42,7 @@
     updateQueryParamsFromFilter($page.url, $workflowFilters, true);
   };
 
-  function handleShowInput(event: CustomEvent<{ open: boolean }>) {
-    const { open } = event.detail;
+  function handleShowInput(open: boolean) {
     if (open && idFilter?.value) {
       value = idFilter.value;
     } else if (open && !idFilter && value) {
@@ -62,7 +61,7 @@
     data-testid="{attributeToId[attribute]}-filter-button"
     variant="table-header"
     controls="{attributeToId[attribute]}-filter-menu"
-    on:click={handleShowInput}
+    onclick={handleShowInput}
   >
     {attributeToHumanReadable[attribute]}
     <Icon name="filter" slot="trailing" />

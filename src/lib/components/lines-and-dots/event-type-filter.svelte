@@ -83,7 +83,7 @@
   >
     <MenuItem
       data-testid={translate('common.all')}
-      on:click={() => {
+      onclick={() => {
         $eventTypeFilter = defaultOptions;
         $eventStatusFilter = false;
       }}
@@ -106,7 +106,7 @@
       <MenuItem
         data-testid={translate('common.pending-and-failed')}
         description={translate('common.pending-and-failed-description')}
-        on:click={() => {
+        onclick={() => {
           $eventTypeFilter = defaultOptions;
           $eventStatusFilter = !$eventStatusFilter;
         }}
@@ -128,7 +128,7 @@
     {/if}
     <MenuItem
       data-testid={translate('common.none')}
-      on:click={() => {
+      onclick={() => {
         $eventTypeFilter = [];
         $eventStatusFilter = false;
       }}
@@ -151,7 +151,7 @@
       <MenuItem
         data-testid={option.label}
         description={option.description}
-        on:click={() => {
+        onclick={() => {
           onOptionClick(option);
         }}
         class="items-start"
