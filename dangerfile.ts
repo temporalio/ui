@@ -34,6 +34,8 @@ interface StrictErrorResult {
 }
 
 async function checkStrictModeErrors() {
+  const DEBUG = false; // Set to true to enable detailed logging
+
   try {
     const tmpFile = `/tmp/strict-errors-${Date.now()}.json`;
 
@@ -77,8 +79,11 @@ async function checkStrictModeErrors() {
       ...danger.git.created_files,
     ]);
 
-    console.log('Changed files in PR:', Array.from(changedFiles));
+    if (DEBUG) {
+      console.log('Changed files in PR:', Array.from(changedFiles));
+    }
 
+    // Find errors in files that were changed in this PR
     const relevantErrors: Record<string, StrictError[]> = {};
     let relevantErrorCount = 0;
 
@@ -94,113 +99,90 @@ async function checkStrictModeErrors() {
       }
     }
 
-    if (relevantErrorCount > 0) {
-      const percentageInPR = (
-        (relevantErrorCount / result.totalErrors) *
-        100
-      ).toFixed(1);
+    if (relevantErrorCount === 0) {
+      return;
+    }
 
-      // Summary warning
-      let warningMessage = '## 📊 TypeScript Strict Mode Errors\n\n';
-      warningMessage += `This PR touches **${Object.keys(relevantErrors).length}** file(s) with strict mode errors `;
-      warningMessage += `(${relevantErrorCount} total errors across these files, `;
-      warningMessage += `${percentageInPR}% of ${result.totalErrors} project-wide errors).\n\n`;
-      warningMessage +=
-        'Fixing these would help move the project toward full strict mode compliance!\n\n';
+    const percentageInPR = (
+      (relevantErrorCount / result.totalErrors) *
+      100
+    ).toFixed(1);
 
-      warningMessage +=
-        '<details>\n<summary>View all errors by file</summary>\n\n';
+    // Post summary warning with all errors
+    let warningMessage = '## 📊 TypeScript Strict Mode Errors\n\n';
+    warningMessage += `This PR touches **${Object.keys(relevantErrors).length}** file(s) with strict mode errors `;
+    warningMessage += `(${relevantErrorCount} total errors across these files, `;
+    warningMessage += `${percentageInPR}% of ${result.totalErrors} project-wide errors).\n\n`;
+    warningMessage +=
+      'Fixing these would help move the project toward full strict mode compliance!\n\n';
 
-      for (const [filename, errors] of Object.entries(relevantErrors)) {
-        warningMessage += `\n### ${filename}\n`;
-        warningMessage += `**${errors.length} error${errors.length > 1 ? 's' : ''}**\n\n`;
+    warningMessage +=
+      '<details>\n<summary>View all errors by file</summary>\n\n';
 
-        for (const error of errors) {
-          const location = `Line ${error.start.line}:${error.start.character}`;
-          warningMessage += `- ${location}: ${error.message}\n`;
+    for (const [filename, errors] of Object.entries(relevantErrors)) {
+      warningMessage += `\n### ${filename}\n`;
+      warningMessage += `**${errors.length} error${errors.length > 1 ? 's' : ''}**\n\n`;
+
+      for (const error of errors) {
+        const location = `Line ${error.start.line}:${error.start.character}`;
+        warningMessage += `- ${location}: ${error.message}\n`;
+      }
+    }
+
+    warningMessage += '\n</details>';
+
+    warn(warningMessage);
+
+    // Post individual warnings for errors on lines in the diff
+    for (const [filename, errors] of Object.entries(relevantErrors)) {
+      if (DEBUG) {
+        console.log(`Processing ${errors.length} errors for file: ${filename}`);
+      }
+
+      const structuredDiff = await danger.git.structuredDiffForFile(filename);
+      if (!structuredDiff) {
+        if (DEBUG) {
+          console.log(`No structured diff found for ${filename}`);
+        }
+        continue;
+      }
+
+      // Calculate which line numbers exist in the new version of the file
+      const linesInDiff = new Set<number>();
+
+      for (const chunk of structuredDiff.chunks) {
+        // Parse chunk header: @@ -old_start,old_count +new_start,new_count @@
+        const match = chunk.content.match(
+          /@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/,
+        );
+        if (!match) continue;
+
+        let currentNewLine = parseInt(match[1], 10);
+
+        for (const change of chunk.changes) {
+          if (change.type === 'add' || change.type === 'normal') {
+            linesInDiff.add(currentNewLine);
+            currentNewLine++;
+          }
+          // Deleted lines don't exist in the new file, so skip them
         }
       }
 
-      warningMessage += '\n</details>';
-
-      warn(warningMessage);
-
-      // Individual warnings for each error - but only for lines in the diff
-      for (const [filename, errors] of Object.entries(relevantErrors)) {
+      if (DEBUG) {
         console.log(
-          `\n=== Processing ${errors.length} errors for file: ${filename} ===`,
-        );
-
-        // Use structuredDiffForFile to get accurate line information
-        const structuredDiff = await danger.git.structuredDiffForFile(filename);
-        if (!structuredDiff) {
-          console.log(
-            `  No structured diff found for ${filename}, skipping inline comments`,
-          );
-          continue;
-        }
-
-        // Collect all line numbers that appear in the diff
-        const linesInDiff = new Set<number>();
-        console.log(`  Analyzing ${structuredDiff.chunks.length} chunks...`);
-
-        for (const chunk of structuredDiff.chunks) {
-          console.log(`  Chunk: ${chunk.content}`);
-
-          // Parse the chunk header to get the starting line number
-          // Format: @@ -old_start,old_count +new_start,new_count @@
-          const match = chunk.content.match(
-            /@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/,
-          );
-          if (!match) {
-            console.log('  Could not parse chunk header, skipping');
-            continue;
-          }
-
-          let currentNewLine = parseInt(match[1], 10);
-          console.log(`  Starting at new line: ${currentNewLine}`);
-
-          for (const change of chunk.changes) {
-            if (change.type === 'add') {
-              // Added lines exist in the new file at currentNewLine
-              console.log(
-                `    Line ${currentNewLine} (add): ${change.content.substring(0, 50)}`,
-              );
-              linesInDiff.add(currentNewLine);
-              currentNewLine++;
-            } else if (change.type === 'del') {
-              // Deleted lines don't exist in new file, don't add or increment
-              console.log(
-                `    (del - not in new file): ${change.content.substring(0, 50)}`,
-              );
-            } else if (change.type === 'normal') {
-              // Context lines exist in new file at currentNewLine
-              console.log(
-                `    Line ${currentNewLine} (normal): ${change.content.substring(0, 50)}`,
-              );
-              linesInDiff.add(currentNewLine);
-              currentNewLine++;
-            }
-          }
-        }
-
-        console.log(
-          `  Lines in diff: ${Array.from(linesInDiff)
+          `Lines in diff: ${Array.from(linesInDiff)
             .sort((a, b) => a - b)
             .join(', ')}`,
         );
+      }
 
-        for (const error of errors) {
-          if (linesInDiff.has(error.start.line)) {
-            console.log(
-              `  ✓ warn("${error.message.substring(0, 60)}...", "${filename}", ${error.start.line})`,
-            );
-            warn(`${error.message}`, filename, error.start.line);
-          } else {
-            console.log(
-              `  ✗ Skipping line ${error.start.line} (not in diff): ${error.message.substring(0, 60)}...`,
-            );
+      // Post warnings for errors on lines that are in the diff
+      for (const error of errors) {
+        if (linesInDiff.has(error.start.line)) {
+          if (DEBUG) {
+            console.log(`Posting warning for ${filename}:${error.start.line}`);
           }
+          warn(error.message, filename, error.start.line);
         }
       }
     }
