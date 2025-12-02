@@ -23,7 +23,8 @@ export const getEventBillableActions = (
 ): number => {
   try {
     if (isWorkflowExecutionStartedEvent(event)) {
-      // Charge 2 additional for scheduled workflows if first run
+      // Charge 2 additional for scheduled workflows if first run and not a retry
+      const attempt = event.attributes?.attempt || 1;
       const firstRunId = event.attributes?.firstExecutionRunId;
       const currentRunId = event.attributes?.originalExecutionRunId;
       const isFirstRun = firstRunId === currentRunId;
@@ -31,6 +32,7 @@ export const getEventBillableActions = (
         isFirstRun &&
         event.attributes?.searchAttributes?.indexedFields
           ?.TemporalScheduledById;
+      if (attempt > 1) return 0;
       if (isScheduledFirstRun) return 3;
       return 1;
     }
