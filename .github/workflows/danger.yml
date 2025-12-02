@@ -1,0 +1,38 @@
+name: Danger
+
+on:
+  pull_request:
+    branches: [main, 'codefreeze-*']
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  danger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node and Dependencies
+        uses: ./.github/actions/setup-node
+
+      - name: Generate token for Danger
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private-key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+          owner: temporalio
+          repositories: ui
+
+      - name: Run Danger
+        run: pnpm exec danger ci --failOnErrors
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
