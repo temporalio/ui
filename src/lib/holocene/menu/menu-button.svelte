@@ -53,7 +53,7 @@
         newState = !previousState;
       }
 
-      onclick(newState);
+      onclick?.(newState);
       return newState;
     });
   };
