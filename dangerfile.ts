@@ -109,27 +109,17 @@ async function checkStrictModeErrors() {
     ).toFixed(1);
 
     // Post summary warning with all errors
-    let warningMessage = '## 📊 TypeScript Strict Mode Errors\n\n';
-    warningMessage += `This PR touches **${Object.keys(relevantErrors).length}** file(s) with strict mode errors `;
-    warningMessage += `(${relevantErrorCount} total errors across these files, `;
-    warningMessage += `${percentageInPR}% of ${result.totalErrors} project-wide errors).\n\n`;
-    warningMessage +=
-      'Fixing these would help move the project toward full strict mode compliance!\n\n';
-
-    warningMessage +=
-      '<details>\n<summary>View all errors by file</summary>\n\n';
+    let warningMessage = `📊 **Strict Mode**: ${relevantErrorCount} error${relevantErrorCount > 1 ? 's' : ''} in ${Object.keys(relevantErrors).length} file${Object.keys(relevantErrors).length > 1 ? 's' : ''} (${percentageInPR}% of ${result.totalErrors} total)\n\n`;
 
     for (const [filename, errors] of Object.entries(relevantErrors)) {
-      warningMessage += `\n### ${filename}\n`;
-      warningMessage += `**${errors.length} error${errors.length > 1 ? 's' : ''}**\n\n`;
+      warningMessage += `<details>\n<summary><strong>${filename}</strong> (${errors.length})</summary>\n\n`;
 
       for (const error of errors) {
-        const location = `Line ${error.start.line}:${error.start.character}`;
-        warningMessage += `- ${location}: ${error.message}\n`;
+        warningMessage += `- L${error.start.line}:${error.start.character}: ${error.message}\n`;
       }
-    }
 
-    warningMessage += '\n</details>';
+      warningMessage += '\n</details>\n\n';
+    }
 
     warn(warningMessage);
 
