@@ -130,46 +130,49 @@
   const disabled = $derived($submitting || taintedCount === 0);
 </script>
 
-<Card class={className}>
+<Card class="p-5 {className}">
   <form use:enhance>
-    <div class="p-4">
-      <div class="space-y-4">
-        <Message value={$message} />
+    <div class="space-y-4">
+      <Message value={$message} />
 
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-medium">Search Attributes</h3>
+      <div>
+        <h2 class="text-lg font-semibold">
+          {translate('search-attributes.title')}
+        </h2>
+        <p class="text-sm text-secondary">
+          {translate('search-attributes.description')}
+        </p>
+      </div>
+
+      <div class="space-y-3 pb-3">
+        <div
+          class="grid grid-cols-[1fr,200px,auto] gap-3 text-sm font-medium"
+          class:hidden={$formData.attributes.length === 0}
+        >
+          <div>{translate('search-attributes.column-attribute')}</div>
+          <div>{translate('search-attributes.column-type')}</div>
+          <div class="w-8"></div>
         </div>
 
-        <div class="space-y-3 pb-3">
-          <div
-            class="grid grid-cols-[1fr,200px,auto] gap-3 text-sm font-medium"
-            class:hidden={$formData.attributes.length === 0}
-          >
-            <div>{translate('search-attributes.column-attribute')}</div>
-            <div>{translate('search-attributes.column-type')}</div>
-            <div class="w-8"></div>
-          </div>
-
-          {#each $formData.attributes as _, index}
-            <SearchAttributeRow
-              name={$formData.attributes[index].name}
-              type={$formData.attributes[index].type}
-              {index}
-              {supportedTypes}
-              submitting={$submitting}
-              error={$errors?.attributes?.[index]?.['name']?.[0]}
-              {disableTypeForExisting}
-              isDeletable={$formData.attributes[index].isDeletable ?? true}
-              onRemove={() => removeAttribute(index)}
-              onNameChange={(value) => {
-                $formData.attributes[index].name = value;
-              }}
-              onTypeChange={(value) => {
-                $formData.attributes[index].type = value;
-              }}
-            />
-          {/each}
-        </div>
+        {#each $formData.attributes as _, index}
+          <SearchAttributeRow
+            name={$formData.attributes[index].name}
+            type={$formData.attributes[index].type}
+            {index}
+            {supportedTypes}
+            submitting={$submitting}
+            error={$errors?.attributes?.[index]?.['name']?.[0]}
+            {disableTypeForExisting}
+            isDeletable={$formData.attributes[index].isDeletable ?? true}
+            onRemove={() => removeAttribute(index)}
+            onNameChange={(value) => {
+              $formData.attributes[index].name = value;
+            }}
+            onTypeChange={(value) => {
+              $formData.attributes[index].type = value;
+            }}
+          />
+        {/each}
       </div>
 
       <Button
@@ -182,9 +185,7 @@
       >
         {translate('search-attributes.add-attribute-button')}
       </Button>
-    </div>
 
-    <div class="p-4 pt-0">
       <div class="flex gap-3">
         <Button size="sm" type="submit" {disabled} loading={$submitting}>
           <TaintedBadge show={!hideTainted} count={taintedCount} />
