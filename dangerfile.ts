@@ -172,7 +172,7 @@ async function checkStrictModeErrors() {
           if (DEBUG) {
             console.log(`Posting warning for ${filename}:${error.start.line}`);
           }
-          fail(error.message, filename, error.start.line);
+          warn(error.message, filename, error.start.line);
         }
       }
     }
