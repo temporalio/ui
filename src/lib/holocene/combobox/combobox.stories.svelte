@@ -60,7 +60,6 @@
     id={context.id}
     data-testid={context.id}
     onchange={action('change')}
-    onfilter={action('filter')}
     {...args}
   />
 </Template>
@@ -230,7 +229,6 @@
       id={context.id}
       data-testid={context.id}
       onchange={action('change')}
-      onfilter={action('filter')}
       leadingIcon="search"
       options={[
         'English',

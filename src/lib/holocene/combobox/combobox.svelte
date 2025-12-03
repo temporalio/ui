@@ -92,7 +92,6 @@
     optionClass?: string;
     action?: Snippet;
     onchange?: (value: string | T) => void;
-    onfilter?: (value: string) => void;
     onclose?: (selected: string | T) => void;
     oninput?: (value: string) => void;
   }
@@ -177,7 +176,6 @@
     optionClass = '',
     onchange,
     onclose,
-    onfilter,
     oninput,
     'data-testid': testId = id,
     ...rest
@@ -285,7 +283,7 @@
     }
   }
 
-  function getSelectedOption(options: (string | T)[]): string | T {
+  function getSelectedOption(options: (string | T)[]) {
     return options.find((option) => {
       if (isStringOption(option)) {
         return option === value;
@@ -331,7 +329,7 @@
 
   const handleSelectOption = (option: string | T) => {
     setValue(option);
-    onchange(option);
+    onchange?.(option);
     if (!multiselect) {
       resetValueAndOptions();
     }
@@ -409,8 +407,6 @@
   };
 
   function filterOptions(value: string, options: (T | string)[]) {
-    onfilter?.(displayValue);
-
     return options.filter((option) => {
       if (isStringOption(option)) {
         return option.toLowerCase().includes(value.toLowerCase());
