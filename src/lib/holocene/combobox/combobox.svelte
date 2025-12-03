@@ -183,15 +183,18 @@
     ...rest
   }: Props = $props();
 
-  let displayValue: string = $state('');
   // Filter value and display value are close but different in a few cases
   // primary difference is when opening a select box display value is filled
   // and filter value should be blank
   let filterValue: string = $state('');
-  let selectedOption: string | T = $state();
   let menuElement: HTMLUListElement | null = $state(null);
   let inputElement: HTMLInputElement | null = $state(null);
-  let list: (string | T)[] = $state([]);
+
+  const selectedOption = $derived(getSelectedOption(options));
+  let list = $derived(filterOptions(filterValue, options));
+  let displayValue = $derived(
+    !multiselect ? getDisplayValue(selectedOption) : undefined,
+  );
 
   // We need this piece of code to focus the element when externally modifying the
   // open store. Specifically we use this behaviour in bottom nav to focus the combobox
@@ -203,11 +206,6 @@
     }
   });
 
-  // We want this to react to external changes to the options prop to support async use cases
-  $effect(() => {
-    list = filterOptions(filterValue, options);
-  });
-
   $effect(() => {
     if (inputElement && displayValue) {
       if (displayValue.length < minSize) {
@@ -217,22 +215,6 @@
       } else {
         inputElement.size = displayValue.length;
       }
-    }
-  });
-
-  $effect(() => {
-    if (!multiselect) {
-      selectedOption = options.find((option) => {
-        if (isStringOption(option)) {
-          return option === value;
-        }
-
-        if (isObjectOption(option) && canRenderCustomOption(option)) {
-          return option[optionValueKey] === value;
-        }
-      });
-
-      displayValue = getDisplayValue(selectedOption);
     }
   });
 
@@ -285,7 +267,7 @@
     );
   };
 
-  const getDisplayValue = (option: string | T | undefined): string => {
+  function getDisplayValue(option: string | T | undefined): string {
     if (!option) {
       if (isArrayValue(value)) {
         return '';
@@ -301,7 +283,19 @@
     if (isObjectOption(option) && canRenderCustomOption(option)) {
       return String(option[optionLabelKey]);
     }
-  };
+  }
+
+  function getSelectedOption(options: (string | T)[]): string | T {
+    return options.find((option) => {
+      if (isStringOption(option)) {
+        return option === value;
+      }
+
+      if (isObjectOption(option) && canRenderCustomOption(option)) {
+        return option[optionValueKey] === value;
+      }
+    });
+  }
 
   /**
    * Given an option that could be an object of type T set internal value in the component to string/string[]
