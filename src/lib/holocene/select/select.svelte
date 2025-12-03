@@ -42,7 +42,7 @@
   interface Props extends HTMLInputAttributes {
     label: string;
     id: string;
-    children: Snippet;
+    children?: Snippet;
     labelHidden?: boolean;
     value?: T;
     placeholder?: string;
@@ -167,9 +167,11 @@
       </MenuButton>
     {/key}
   </div>
-  <Menu role="listbox" id="{id}-select" class={menuClass} {position}>
-    {@render children()}
-  </Menu>
+  {#if children}
+    <Menu role="listbox" id="{id}-select" class={menuClass} {position}>
+      {@render children()}
+    </Menu>
+  {/if}
 
   {#if error && !valid}
     <span class="text-xs text-danger">{error}</span>
