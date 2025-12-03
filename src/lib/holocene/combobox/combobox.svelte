@@ -411,11 +411,11 @@
     // Reactive statement at top makes this work, not my favorite tho
     displayValue = event.currentTarget.value;
     filterValue = displayValue;
-    oninput(displayValue);
+    oninput?.(displayValue);
   };
 
   function filterOptions(value: string, options: (T | string)[]) {
-    onfilter(displayValue);
+    onfilter?.(displayValue);
 
     return options.filter((option) => {
       if (isStringOption(option)) {

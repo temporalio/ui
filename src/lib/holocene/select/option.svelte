@@ -66,7 +66,7 @@
 
   const handleOptionClick = () => {
     handleChange(_value as T);
-    onclick(_value as T);
+    onclick?.(_value as T);
   };
 </script>
 
