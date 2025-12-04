@@ -61,7 +61,7 @@
     group ? group.displayName : event ? event.eventType : '',
   );
   const emptyValue = $derived(
-    group.isPending ? 'Results will appear upon completion' : 'null',
+    group?.isPending ? 'Results will appear upon completion' : 'null',
   );
   const duration = $derived(
     formatDistanceAbbreviated({
