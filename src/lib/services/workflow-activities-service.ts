@@ -1,6 +1,3 @@
-import { get } from 'svelte/store';
-
-import { authUser } from '$lib/stores/auth-user';
 import type {
   ActivityPauseRequest,
   ActivityPauseResponse,
@@ -77,18 +74,13 @@ export const completeActivityTask = async ({
   });
 };
 
-const getIdentity = () => {
-  const email = get(authUser)?.email;
-  const identity = email ? `From the Web UI by ${email}` : 'From the Web UI';
-  return identity;
-};
-
 export const pauseActivity = async ({
   namespace,
   execution,
   id,
   reason,
   type,
+  identity,
 }: ActivityPauseRequest & {
   reason?: string;
 }): Promise<ActivityPauseResponse> => {
@@ -102,9 +94,9 @@ export const pauseActivity = async ({
       body: stringifyWithBigInt({
         execution,
         reason,
-        identity: getIdentity(),
         id,
         type,
+        ...(identity && { identity }),
       }),
     },
   });
@@ -115,6 +107,7 @@ export const unpauseActivity = async ({
   execution,
   id,
   type,
+  identity,
 }: ActivityUnpauseRequest): Promise<ActivityUnpauseResponse> => {
   const route = routeForApi('activity.unpause', {
     namespace,
@@ -125,9 +118,9 @@ export const unpauseActivity = async ({
       method: 'POST',
       body: stringifyWithBigInt({
         execution,
-        identity: getIdentity(),
         id,
         type,
+        ...(identity && { identity }),
       }),
     },
   });
@@ -139,6 +132,7 @@ export const resetActivity = async ({
   id,
   type,
   resetHeartbeat,
+  identity,
 }: ActivityResetRequest): Promise<ActivityResetResponse> => {
   const route = routeForApi('activity.reset', {
     namespace,
@@ -149,10 +143,10 @@ export const resetActivity = async ({
       method: 'POST',
       body: stringifyWithBigInt({
         execution,
-        identity: getIdentity(),
         id,
         type,
         resetHeartbeat,
+        ...(identity && { identity }),
       }),
     },
   });
@@ -164,6 +158,7 @@ export const updateActivityOptions = async ({
   id,
   type,
   activityOptions,
+  identity,
 }: ActivityUpdateOptionsRequest): Promise<ActivityUpdateOptionsResponse> => {
   const route = routeForApi('activity.update-options', {
     namespace,
@@ -176,11 +171,11 @@ export const updateActivityOptions = async ({
       method: 'POST',
       body: stringifyWithBigInt({
         execution,
-        identity: getIdentity(),
         id,
         type,
         activityOptions,
         updateMask: fullMask,
+        ...(identity && { identity }),
       }),
     },
   });
