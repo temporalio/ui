@@ -106,8 +106,8 @@
 
   .Failed,
   .Terminated {
-    stroke: #c71607;
-    fill: #f55;
+    stroke: #ff4418;
+    fill: #c71607;
   }
 
   .TimedOut {

@@ -32,6 +32,7 @@
   import {
     routeForCallStack,
     routeForEventHistory,
+    routeForEventHistoryTable,
     routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
@@ -110,8 +111,8 @@
     {/if}
   </div>
 </div>
-<header class="flex flex-col gap-4">
-  <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
+<header class="flex flex-col gap-3">
+  <div class="flex flex-col items-center justify-between gap-3 xl:flex-row">
     <div
       class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
     >
@@ -120,9 +121,9 @@
       >
         <WorkflowStatus
           status={workflow?.status}
-          big
           delayed={isWorkflowDelayed(workflow)}
           taskFailure={isWorkflowTaskFailure(workflow)}
+          class="h-8 p-3 text-lg"
         />
         <div class="xl:hidden">
           <WorkflowActions
@@ -146,7 +147,7 @@
             content={workflowId}
             clickAllToCopy
             container-class="w-full"
-            class="overflow-hidden text-ellipsis text-left"
+            class="overflow-hidden text-ellipsis text-left leading-tight"
           />
         </h1>
       </div>
@@ -206,7 +207,13 @@
           routeForEventHistory({
             ...routeParameters,
           }),
-        )}
+        ) ||
+          pathMatches(
+            page.url.pathname,
+            routeForEventHistoryTable({
+              ...routeParameters,
+            }),
+          )}
       >
         <Badge type="primary" class="px-2 py-0">
           {workflow.historyEvents}
@@ -265,11 +272,11 @@
       >
         <Badge
           type={activitiesCanceled ? 'warning' : 'primary'}
-          class="px-2 py-0"
+          class="py-0 {activitiesCanceled ? 'px-1' : 'px-2'}"
         >
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-0.5">
             {#if activitiesCanceled}
-              <Icon name="canceled" />
+              <Icon name="canceled" class="py-0.5" />
             {/if}
             {workflow?.pendingActivities?.length}
           </div>

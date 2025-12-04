@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
+  import { cva } from 'class-variance-authority';
   import { onMount } from 'svelte';
 
   import { page } from '$app/state';
@@ -30,23 +31,35 @@
   import Line from './line.svelte';
   import Text from './text.svelte';
 
-  export let y = 0;
-  export let group: EventGroup;
-  export let activeGroups: string[] = [];
-  export let startTime: string | Timestamp;
-  export let endTime: string | Date;
-  export let canvasWidth: number;
-  export let active = true;
-  export let readOnly = false;
+  type Props = {
+    y: number;
+    group: EventGroup;
+    startTime: string | Timestamp;
+    endTime: string | Date;
+    canvasWidth: number;
+    readOnly: boolean;
+  };
+
+  let {
+    y = 0,
+    group,
+    startTime,
+    endTime,
+    canvasWidth,
+    readOnly = false,
+  }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
 
-  $: timelineWidth = canvasWidth - 2 * gutter;
-  $: active = !activeGroups.length || activeGroups.includes(group.id);
-  $: pendingActivity = group?.pendingActivity;
-  $: pauseTime = pendingActivity && pendingActivity.pauseInfo?.pauseTime;
+  let hovering = $state(false);
 
-  let decodedLocalActivity: SummaryAttribute | undefined;
+  const timelineWidth = $derived(canvasWidth - 2 * gutter);
+  const pendingActivity = $derived(group?.pendingActivity);
+  const pauseTime = $derived(
+    pendingActivity && pendingActivity.pauseInfo?.pauseTime,
+  );
+
+  let decodedLocalActivity: SummaryAttribute | undefined = $state(undefined);
 
   onMount(async () => {
     const localActivityEvent = getLocalActivityMarkerEvent(group);
@@ -113,25 +126,84 @@
     return { points, textAnchor, textIndex, textPosition, backdrop };
   };
 
-  $: ({ points, textAnchor, textIndex, textPosition, backdrop } =
-    getDistancePointsAndPositions(endTime, timelineWidth, y));
+  const { points, textAnchor, textIndex, textPosition, backdrop } = $derived(
+    getDistancePointsAndPositions(endTime, timelineWidth, y),
+  );
 
   const onClick = () => {
     if (readOnly) return;
     setActiveGroup(group);
   };
 
-  $: activityTaskScheduled = group.eventList.find(isActivityTaskStartedEvent);
-  $: retried =
-    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1;
-  $: pendingLine = group.isPending || !!pauseTime;
+  const onMouseEnter = () => {
+    if (readOnly) return;
+    hovering = true;
+  };
+
+  const onMouseLeave = () => {
+    if (readOnly) return;
+    hovering = false;
+  };
+
+  const activityTaskScheduled = $derived(
+    group.eventList.find(isActivityTaskStartedEvent),
+  );
+  const retried = $derived(
+    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1,
+  );
+  const pendingLine = $derived(group.isPending || !!pauseTime);
+
+  const multiEventHoverWidth = $derived(
+    points.length >= 2 && points[points.length - 1] - points[0] + radius * 3,
+  );
+  const pendingHoverWidth = $derived(
+    group.isPending && canvasWidth - points[0] - radius * 1.5,
+  );
+  const singleEventHoverWidth = $derived(radius * 3);
+
+  const hoverWidth = $derived(
+    pendingHoverWidth || multiEventHoverWidth || singleEventHoverWidth,
+  );
+
+  const groupHover = cva(['h-full w-full rounded-full border-2'], {
+    variants: {
+      category: {
+        workflow: 'border-blue-700 bg-blue-800/80 ',
+        activity: 'border-purple-700 bg-purple-800/80 ',
+        'child-workflow': 'border-cyan-600  bg-cyan-600/80 ',
+        timer: 'border-yellow-700 bg-yellow-800/80',
+        signal: 'border-pink-700 bg-pink-800/80',
+        update: 'border-blue-700 bg-blue-800/80',
+        other: 'border-slate-700 bg-slate-800/80',
+        nexus: 'border-indigo-700 bg-indigo-800/80',
+        'local-activity': 'border-slate-700 bg-slate-800/80',
+        default: 'border-purple-700 bg-purple-900/80',
+      },
+    },
+  });
 </script>
 
+{#if hovering}
+  <foreignObject
+    x={points[0] - radius * 1.5}
+    y={y - radius * 1.5}
+    width={hoverWidth}
+    height={radius * 3}
+  >
+    <div
+      class={groupHover({
+        category: group ? group.category : 'default',
+      })}
+    ></div>
+  </foreignObject>
+{/if}
 <g
   role="button"
   tabindex="0"
-  on:click={onClick}
-  on:keypress={onClick}
+  onclick={onClick}
+  onkeypress={onClick}
+  onmouseenter={onMouseEnter}
+  onmouseleave={onMouseLeave}
   class="relative cursor-pointer"
   {height}
 >

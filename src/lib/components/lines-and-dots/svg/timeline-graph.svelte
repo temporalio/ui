@@ -26,9 +26,8 @@
   export let y = 0;
   export let workflow: WorkflowExecution;
   export let groups: EventGroups;
-  export let viewportHeight: number | undefined;
+  export let viewportHeight: number | undefined = undefined;
   export let readOnly = false;
-  export let error: boolean = false;
 
   const { height, gutter, radius } = TimelineConfig;
 
@@ -91,7 +90,6 @@
       height={canvasHeight}
       width={canvasWidth}
       class="-mt-4"
-      class:error
     >
       <Line
         startPoint={[gutter, 0]}
@@ -118,7 +116,6 @@
             <TimelineGraphRow
               {y}
               {group}
-              activeGroups={$activeGroups}
               {canvasWidth}
               {startTime}
               {endTime}
@@ -133,9 +130,3 @@
     </svg>
   </EndTimeInterval>
 </div>
-
-<style lang="postcss">
-  .error {
-    @apply bg-danger;
-  }
-</style>

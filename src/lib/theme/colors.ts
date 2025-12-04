@@ -151,11 +151,12 @@ export const colors = {
   'space-black': '#141414',
   'off-black': palette['slate'][950],
   'code-black': '#292D3E',
+  'code-white': '#F5F7FF',
   current: 'currentColor',
   transparent: 'transparent',
   mint: '#59FDA0',
   ...palette,
 } as const satisfies Record<
   string,
-  HexColor | 'transparent' | 'currentColor' | Shades
+  HexColor | RGBA | 'transparent' | 'currentColor' | Shades
 >;

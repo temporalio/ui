@@ -26,7 +26,6 @@
   export let count: number | undefined = undefined;
   export let loading = false;
   export let newCount: number | undefined = undefined;
-  export let big = false;
   export let delayed = false;
   export let taskFailure = false;
 
@@ -64,7 +63,7 @@
           Completed: 'bg-green-200',
           Failed: 'bg-red-200',
           ContinuedAsNew: 'bg-purple-200',
-          Canceled: 'bg-slate-100',
+          Canceled: 'bg-yellow-200',
           Terminated: 'bg-yellow-200',
           Paused: 'bg-yellow-200',
           Unspecified: 'bg-slate-100',
@@ -73,7 +72,7 @@
           Open: 'bg-green-200',
           New: 'bg-blue-300',
           Initiated: 'bg-blue-300',
-          Fired: 'bg-pink-200',
+          Fired: 'bg-orange-200',
           CancelRequested: 'bg-yellow-200',
           Signaled: 'bg-pink-200',
           Pending: 'bg-purple-200',
@@ -97,10 +96,7 @@
   class="block"
 >
   <div
-    class={merge(
-      'relative flex items-center gap-0 text-center text-xs leading-4',
-      big && 'text-lg',
-    )}
+    class="relative flex items-center gap-0 text-center text-xs leading-4"
     data-testid={$$props['test-id']}
   >
     <span
@@ -109,7 +105,7 @@
           status,
         }),
         (newCount || delayed || taskFailure) && 'rounded-r-none',
-        big && 'h-8 px-4',
+        $$props.class || '',
       )}
     >
       {#if loading}
@@ -131,10 +127,11 @@
           }),
           'rounded-l-none',
           (newCount || taskFailure) && 'rounded-r-none',
-          big && 'h-8 px-2',
+          '[&:not(.text-lg)_svg]:px-0.5',
+          $$props.class || '',
         )}
       >
-        <Icon name="clock" class={merge(!big && 'px-0.5')} />
+        <Icon name="clock" />
       </span>
     {/if}
     {#if taskFailure}
@@ -144,21 +141,16 @@
           'bg-red-200 text-red-900 dark:bg-red-700 dark:text-white',
           'rounded-l-none',
           newCount && 'rounded-r-none',
-          big && 'h-8 px-2',
+          '[&:not(.text-lg)_svg]:px-0.5',
+          $$props.class || '',
         )}
       >
-        <Icon name="exclamation-octagon" class={merge(!big && 'px-0.5')} />
+        <Icon name="exclamation-octagon" />
       </span>
     {/if}
 
     {#if newCount}
-      <span
-        class={merge(
-          'font-base surface-primary rounded-r-sm px-1 py-0.5',
-          big && 'px-2',
-        )}
-        in:fade
-      >
+      <span class="font-base surface-primary rounded-r-sm px-1 py-0.5" in:fade>
         {#if newCount > 0}+{/if}{newCount}
       </span>
     {/if}

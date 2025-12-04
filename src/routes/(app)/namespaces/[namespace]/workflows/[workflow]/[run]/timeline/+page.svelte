@@ -5,7 +5,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
-  import WorkflowHistory from '$lib/pages/workflow-history.svelte';
+  import WorkflowTimeline from '$lib/pages/workflow-timeline.svelte';
 
   const workflow = $derived(page.params.workflow);
 </script>
@@ -18,5 +18,6 @@
   {#snippet title()}
     <TimelineAndHistoryToggle />
   {/snippet}
-  <WorkflowHistory />
+
+  <WorkflowTimeline />
 </WorkflowHistoryLayout>

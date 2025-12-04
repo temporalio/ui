@@ -249,7 +249,7 @@ export const getCategoryColor = (type: EventTypeCategory): string => {
     case 'workflow':
       return '#059669';
     case 'child-workflow':
-      return '#67e4f9';
+      return '#0899b2';
     case 'update':
       return '#FF9B70';
     case 'nexus':

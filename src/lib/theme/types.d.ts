@@ -2,6 +2,7 @@ type PaletteColor = import('./colors').PaletteColor;
 type Palette = import('./colors').Palette;
 
 type RGB = `${number} ${number} ${number}`;
+type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
 type HexColor = `#${string}`;
 
 type CSSVariable = `--${string}`;

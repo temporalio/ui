@@ -1,46 +1,53 @@
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
+
   import { page } from '$app/state';
 
-  import Timestamp from '$lib/components/timestamp.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
-  import {
-    format,
-    spaceBetweenCapitalLetters,
-  } from '$lib/utilities/format-camel-case';
+  import { format } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
     displayLinkType,
     getCodeBlockValue,
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { routeForNamespace } from '$lib/utilities/route-for';
+
+  import Timestamp from '../timestamp.svelte';
 
   import EventDetailsLink from './event-details-link.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
-  let { event }: { event: WorkflowEvent } = $props();
+  interface Props {
+    event: WorkflowEvent;
+    nextEvent?: WorkflowEvent;
+    class?: ClassNameValue;
+  }
 
-  const displayName = $derived(
-    isLocalActivityMarkerEvent(event)
-      ? translate('events.category.local-activity')
-      : spaceBetweenCapitalLetters(event.name),
-  );
+  let { event, nextEvent, class: className = '' }: Props = $props();
+
   const attributes = $derived(formatAttributes(event));
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
     fields.filter(
-      ([_key, value]) =>
-        typeof value === 'object' && Object.keys(value).length > 0,
+      ([key, value]) =>
+        typeof value === 'object' &&
+        Object.keys(value).length > 0 &&
+        key !== 'input' &&
+        key !== 'result',
     ),
   );
   const linkFields = $derived(
@@ -48,6 +55,16 @@
       ([key, _value]) => displayLinkType(key, attributes) !== 'none',
     ),
   );
+
+  const durationBetweenEvents = (
+    eventA: WorkflowEvent,
+    eventB: WorkflowEvent,
+  ) =>
+    formatDistanceAbbreviated({
+      start: eventA?.eventTime,
+      end: eventB?.eventTime,
+      includeMilliseconds: true,
+    });
 
   const hiddenDetailFields = $derived.by(() => {
     if (event.category === 'activity')
@@ -66,50 +83,88 @@
           (key === 'namespace' && page.params.namespace !== value)),
     ),
   );
+
+  const eventCategory = cva(
+    ['flex flex-1 flex-col overflow-hidden rounded-t-lg pb-2'],
+    {
+      variants: {
+        classification: {
+          Failed: 'bg-red-800',
+          Canceled: 'bg-orange-900/80',
+          TimedOut: 'bg-orange-700',
+          Completed: 'bg-green-700',
+          Terminated: 'bg-gray-300',
+          Scheduled: 'bg-orange-900/50',
+          Initiated: 'bg-orange-900/50',
+          Started: 'bg-orange-900/60',
+          Fired: 'bg-orange-900/90',
+          Signaled: 'bg-orange-900/50',
+          CancelRequested: 'bg-orange-900/70',
+          Unspecified: 'bg-orange-900/60',
+        },
+      },
+    },
+  );
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class={merge(
+    eventCategory({
+      classification: event.classification,
+    }),
+    className,
+  )}
 >
-  <div class="flex flex-wrap items-center justify-between gap-2">
-    <div class="flex items-center gap-2 text-base">
-      <p class="font-mono">{event.id}</p>
-      <p class="font-medium">
-        {displayName}
-      </p>
-    </div>
-    <Timestamp as="p" class="text-sm" dateTime={event.eventTime} />
-  </div>
-  <div class="flex flex-col gap-1 xl:flex-row">
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
-      {#if event?.links?.length}
-        {@render eventLinks(event.links)}
-      {/if}
-      {#if event?.userMetadata?.summary}
-        {@render eventSummary(event.userMetadata.summary)}
-      {/if}
-      {#each detailFields as [key, value] (key)}
-        {@render details(key, value)}
-      {/each}
-      {#each linkFields as [key, value] (key)}
-        {@render link(key, value)}
-      {/each}
-    </div>
-    {#if payloadFields.length}
-      <div class="flex w-full flex-col gap-1 xl:w-1/2">
-        {#each payloadFields as [key, value] (key)}
-          {@render payloads(key, value)}
-        {/each}
+  <div class="bg-slate-900/60 p-2 pb-1 text-left">
+    <div class="flex flex-col items-center justify-between lg:flex-row">
+      <div>
+        <p class="leading-tight">
+          <span class="font-mono">{event.id}</span>
+          <span class="font-medium">
+            {event.name}
+          </span>
+        </p>
+        <p class="text-xs text-white/70">
+          <Timestamp dateTime={event.eventTime} />
+        </p>
       </div>
-    {/if}
+      {#if nextEvent}
+        <Badge type="default" class="flex items-center gap-1">
+          <Icon name="clock" />
+          {durationBetweenEvents(event, nextEvent) || '0ms'}
+        </Badge>
+      {/if}
+    </div>
   </div>
+
+  <div class="grid grid-cols-1 gap-0.5 p-2 md:grid-cols-2 xl:grid-cols-1">
+    {#if event?.links?.length}
+      {@render eventLinks(event.links)}
+    {/if}
+    {#if event?.userMetadata?.summary}
+      {@render eventSummary(event.userMetadata.summary)}
+    {/if}
+    {#each detailFields as [key, value] (key)}
+      {@render details(key, value)}
+    {/each}
+    {#each linkFields as [key, value] (key)}
+      {@render link(key, value)}
+    {/each}
+  </div>
+  {#if payloadFields.length}
+    <div class="flex w-full flex-col gap-0.5 px-2">
+      {#each payloadFields as [key, value] (key)}
+        {@render payloads(key, value)}
+      {/each}
+    </div>
+  {/if}
 </div>
 
 {#snippet eventLink(link: ELink)}
   {@const href = getEventLinkHref(link)}
   {@const value = href.split('workflows/')?.[1] || href}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div class="leading-tight">
+    <p class="text-sm text-white/70">
       {translate('nexus.link')}
     </p>
     <Copyable
@@ -117,15 +172,15 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={value}
     >
-      <Link {href} class="whitespace-pre-line">{value}</Link>
+      <Link {href} class="whitespace-pre-line !text-white">{value}</Link>
     </Copyable>
   </div>
 {/snippet}
 
 {#snippet eventNamespaceLink(link: ELink)}
   {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div class="leading-tight">
+    <p class="text-sm text-white/70">
       {translate('nexus.link-namespace')}
     </p>
     <Copyable
@@ -133,7 +188,7 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       content={link.workflowEvent.namespace}
     >
-      <Link {href} class="whitespace-pre-line"
+      <Link {href} class="whitespace-pre-line !text-white"
         >{link.workflowEvent.namespace}</Link
       >
     </Copyable>
@@ -148,8 +203,8 @@
 {/snippet}
 
 {#snippet eventSummary(value: Payload)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">Summary</p>
+  <div class="leading-tight">
+    <p class="text-sm text-white/70">Summary</p>
     <p class="whitespace-pre-line">
       <MetadataDecoder
         {value}
@@ -165,8 +220,22 @@
 {#snippet payloads(key, value)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
-  <div>
-    <p class="mb-1 min-w-56 text-sm text-secondary/80">
+  {#if stackTrace}
+    <div class="leading-tight">
+      <p class="mb-1 text-sm text-white/70">
+        {translate('workflows.call-stack-tab')}
+      </p>
+      <CodeBlock
+        content={stackTrace}
+        language="text"
+        maxHeight={320}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
+    </div>
+  {/if}
+  <div class="leading-tight">
+    <p class="mb-1 text-sm text-white/70">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -174,7 +243,7 @@
         {#snippet children(decodedValue)}
           <CodeBlock
             content={decodedValue}
-            maxHeight={384}
+            maxHeight={320}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -188,7 +257,7 @@
         {#snippet children(decodedValue)}
           <CodeBlock
             content={decodedValue}
-            maxHeight={384}
+            maxHeight={320}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -199,7 +268,7 @@
         {#snippet children(decodedValue)}
           <CodeBlock
             content={decodedValue}
-            maxHeight={384}
+            maxHeight={320}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -207,25 +276,11 @@
       </PayloadDecoder>
     {/if}
   </div>
-  {#if stackTrace}
-    <div>
-      <p class="mb-1 min-w-56 text-sm text-secondary/80">
-        {translate('workflows.call-stack-tab')}
-      </p>
-      <CodeBlock
-        content={stackTrace}
-        language="text"
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
-    </div>
-  {/if}
 {/snippet}
 
 {#snippet link(key, value)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div class="leading-tight">
+    <p class="text-sm text-white/70">
       {format(key)}
     </p>
     <Copyable
@@ -237,15 +292,15 @@
         value={String(value)}
         {attributes}
         type={displayLinkType(key, attributes)}
-        class="whitespace-pre-line"
+        class="whitespace-pre-line break-all !text-white"
       />
     </Copyable>
   </div>
 {/snippet}
 
 {#snippet details(key, value)}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+  <div class="leading-tight">
+    <p class="text-sm text-white/70">
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">
