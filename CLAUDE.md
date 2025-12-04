@@ -1,82 +1,115 @@
-# Claude AI Assistant Rules for Temporal UI
+# Temporal UI - Contributing Guide
 
-SvelteKit + Svelte 5 + TypeScript + TailwindCSS + Holocene design system
+**Stack**: SvelteKit + Svelte 5 + TypeScript + TailwindCSS + Holocene design system
 
-## Commands
+## 🚨 CRITICAL: After Every Change
 
 ```bash
-pnpm lint              # Run all linters
-pnpm check             # TypeScript type checking
-pnpm test -- --run              # Run unit tests
+pnpm lint              # MUST PASS - fixes formatting, eslint, stylelint
+pnpm check             # MUST PASS - TypeScript type checking
 ```
 
-## Svelte 5 Patterns
+## 🎯 Key Patterns
+
+### Svelte 5 Runes (NO class components)
 
 ```typescript
-// Props
-let { class: className = '', adapter }: Props = $props();
-
-// State
-let count = $state(0);
-
-// Computed
-const doubled = $derived(count * 2);
-
-// Effects
+let { class: className = '', ...props }: Props = $props(); // Props
+let count = $state(0); // State
+const doubled = $derived(count * 2); // Computed
 $effect(() => {
-  console.log('Count:', count);
-  return () => cleanup();
-});
-
-// SuperForms
-const { form, errors, enhance } = $derived(
-  superForm(data, {
-    SPA: true,
-    validators: zodClient(schema),
-    onUpdate: async ({ form }) => {
-      /* handle submit */
-    },
-  }),
-);
+  /* use sparingly - team dislikes */
+}); // Effects
 ```
 
-## Import Order
+### Component Structure
 
-1. Node.js built-ins
-2. External libraries (with `svelte/**` first)
-3. SvelteKit imports (`$app/**`, `$types`)
-4. Internal imports (`$lib/**`)
-5. Component imports (`$components/**/*.svelte`)
-6. Relative imports (`./`, `../`)
+```
+component-name/
+├── index.svelte          # Main component
+├── {name}.ts             # Pure functions, types
+└── {name}.svelte.ts      # Svelte lifecycle functions
+```
 
-## Workflow
+### Import Order (STRICT - linter enforces)
 
-1. **Always run linting**: Execute `pnpm lint` after making changes
-2. **Type checking**: Run `pnpm check` to verify TypeScript compliance
-3. **Test execution**: Run appropriate test suites based on changes
-4. **Follow patterns**: Use existing component patterns and utility functions
-5. **Design system**: Prefer Holocene components over custom implementations
-6. **Accessibility**: Ensure proper ARIA attributes and semantic HTML
+1. Node built-ins
+2. External (`svelte/**` first)
+3. SvelteKit (`$app/**`, `$types`)
+4. Internal (`$lib/**`)
+5. Components (`*.svelte`)
+6. Relative (`./`, `../`)
 
-## Code Generation
+## ⚡ Development Commands
 
-- **No comments**: Don't add code comments unless explicitly requested
-- **Type safety**: Always provide proper TypeScript types
-- **Component reuse**: Leverage existing components and utilities
-- **Test coverage**: Write tests for new utilities and business logic
-- **Import organization**: Follow the established import order
+```bash
+# Development
+pnpm dev               # Start dev server (default)
+pnpm dev:temporal-cli  # With Temporal CLI
 
-## Error Handling
+# Testing
+pnpm test -- --run     # Unit tests
+pnpm test:e2e         # E2E tests (if UI changed)
+pnpm stories:dev      # Storybook for components
 
-- **Validation**: Use Zod for runtime type validation
-- **Error boundaries**: Implement proper error boundaries for components
-- **Network errors**: Handle API failures gracefully
-- **User feedback**: Provide clear error messages and loading states
+# Auto-fix most issues
+pnpm format
+```
 
-## Naming
+## 📝 Code Style
 
-- **Files**: kebab-case (`workflow-status.svelte`)
-- **Components**: PascalCase in imports, kebab-case for files
-- **Functions**: camelCase
-- **Types**: PascalCase
-- **Use** `import type` for type-only imports
+### MUST Follow
+
+- **NO `any` types** - use proper types or generics
+- **NO nested if/else** - use guard statements with early returns
+- **NO comments** unless explicitly requested
+- **USE Holocene components** - check `src/lib/holocene/` first
+- **USE functional patterns** - pure functions, immutable data
+
+### Naming
+
+- Files: `kebab-case.svelte`
+- Components: `PascalCase` in imports
+- Functions: `camelCase`
+- Types: `PascalCase`
+- CSS: Tailwind utilities first
+
+## 🏗️ Project Structure
+
+```
+src/
+├── routes/(app)/         # Main app routes
+│   └── _components/      # Route-specific components
+├── lib/
+│   ├── holocene/        # Design system (USE THESE!)
+│   ├── components/      # Shared components
+│   ├── services/        # API calls
+│   └── utilities/       # Helpers
+```
+
+## ✅ PR Checklist
+
+- [ ] `pnpm lint` passes
+- [ ] `pnpm check` passes
+- [ ] Manual testing completed
+- [ ] Responsive design verified
+- [ ] Used Holocene components where available
+- [ ] No hardcoded strings (use i18n)
+- [ ] Follows functional patterns (guard statements, no nested if/else)
+
+## 🔗 References
+
+- [Holocene Components](src/lib/holocene/) - Design system
+- [Component Examples](src/lib/holocene/**/*.stories.svelte) - Storybook stories
+- [Route Patterns](<src/routes/(app)/namespaces/>) - Route organization
+- [Form Patterns](<src/routes/(app)/namespaces/[namespace]/settings/>) - SuperForms with Zod
+
+## 🚫 Common Mistakes
+
+1. Using `any` type → Use proper types
+2. Creating custom components → Check Holocene first
+3. Nested if/else → Use early returns
+4. Forgetting to lint → Always run `pnpm lint`
+5. Wrong import order → Follow the strict order
+6. Adding comments → Code should be self-documenting
+7. Using `$effect` → Team prefers `$derived`
