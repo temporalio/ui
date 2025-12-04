@@ -1,12 +1,4 @@
-<script lang="ts" context="module">
-  import type { HTMLAttributes } from 'svelte/elements';
-  import { writable, type Writable } from 'svelte/store';
-
-  import { createEventDispatcher, setContext } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
-
-  import { clickoutside } from '$lib/holocene/outside-click';
-
+<script lang="ts" module>
   export const MENU_CONTEXT = 'menu-context';
 
   export type MenuContext = {
@@ -17,22 +9,36 @@
 </script>
 
 <script lang="ts">
-  interface $$Props extends HTMLAttributes<HTMLUListElement> {
+  import type { HTMLAttributes } from 'svelte/elements';
+  import { writable, type Writable } from 'svelte/store';
+
+  import { setContext, type Snippet } from 'svelte';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
+
+  import { clickoutside } from '$lib/holocene/outside-click';
+
+  interface Props
+    extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
     open?: Writable<boolean>;
-    class?: string;
+    class?: ClassNameValue;
+    onclose?: () => void;
+    children: Snippet<[boolean]>;
   }
 
-  let className = '';
-  export { className as class };
-  export let open: Writable<boolean> = writable(false);
+  const {
+    open = writable(false),
+    class: className,
+    children,
+    onclose,
+    ...rest
+  }: Props = $props();
 
   const keepOpen = writable(false);
   const menuElement: Writable<HTMLUListElement> = writable(null);
-  const dispatch = createEventDispatcher<{ close: undefined }>();
 
   const closeMenu = () => {
     if ($open) {
-      dispatch('close');
+      onclose?.();
       $open = false;
     }
   };
@@ -47,7 +53,7 @@
 <div
   use:clickoutside={closeMenu}
   class={merge('relative', className)}
-  {...$$restProps}
+  {...rest}
 >
-  <slot {open} />
+  {@render children($open)}
 </div>

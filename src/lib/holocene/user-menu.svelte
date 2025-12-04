@@ -63,7 +63,7 @@
           <p>{$authUser?.email}</p>
         </div>
       </MenuItem>
-      <MenuItem on:click={logout}>
+      <MenuItem onclick={logout}>
         <div class="flex items-center justify-start gap-4">
           <Icon name="logout" />
           {translate('common.log-out')}

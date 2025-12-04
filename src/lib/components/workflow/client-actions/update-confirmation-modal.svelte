@@ -121,7 +121,7 @@
         {#each updateDefinitions as { name: value, description = '' }}
           <Option {value} {description}>{value}</Option>
         {/each}
-        <Option on:click={handleCustom} value="custom">Custom</Option>
+        <Option onclick={handleCustom} value="custom">Custom</Option>
       </Select>
     {:else}
       <div class="flex w-full items-end justify-between gap-2">

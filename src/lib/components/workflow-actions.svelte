@@ -182,7 +182,7 @@
             <MenuDivider />
           {/if}
           <MenuItem
-            on:click={onClick}
+            onclick={onClick}
             {destructive}
             disabled={!enabled}
             data-testid={testId}
@@ -194,7 +194,7 @@
         {#if !workflowCreateDisabled($page)}
           <MenuDivider />
           <MenuItem
-            on:click={() =>
+            onclick={() =>
               goto(
                 routeForWorkflowStart({
                   namespace,
@@ -230,7 +230,7 @@
       </MenuButton>
       <Menu id="workflow-actions" position="right" class="w-[16rem]">
         <MenuItem
-          on:click={() =>
+          onclick={() =>
             goto(
               routeForWorkflowStart({
                 namespace,
@@ -248,7 +248,7 @@
         {#if terminateEnabled && next}
           <MenuDivider />
           <MenuItem
-            on:click={() => (terminateConfirmationModalOpen = true)}
+            onclick={() => (terminateConfirmationModalOpen = true)}
             data-testid="terminate-button"
             destructive
           >

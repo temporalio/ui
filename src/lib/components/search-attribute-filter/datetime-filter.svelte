@@ -188,7 +188,7 @@
           </div>
         </MenuItem>
       {:else}
-        <MenuItem on:click={() => ($timeFormatType = 'relative')}>
+        <MenuItem onclick={() => ($timeFormatType = 'relative')}>
           <div class="flex flex-col">
             <RadioInput
               label={translate('common.relative')}
@@ -223,7 +223,7 @@
           </div>
         </MenuItem>
         <MenuDivider />
-        <MenuItem on:click={() => ($timeFormatType = 'absolute')}>
+        <MenuItem onclick={() => ($timeFormatType = 'absolute')}>
           <div class="flex flex-col gap-2">
             <RadioInput
               label={translate('common.absolute')}

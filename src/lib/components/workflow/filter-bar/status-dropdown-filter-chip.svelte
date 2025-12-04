@@ -103,15 +103,16 @@
             status === 'All')}
         <MenuItem
           data-testid={`status-dropdown-filter-chip-${status}`}
-          on:click={() => handleStatusSelect(status)}
+          onclick={() => handleStatusSelect(status)}
         >
-          <Checkbox
-            on:click={() => handleStatusSelect(status)}
-            slot="leading"
-            {checked}
-            label={status}
-            labelHidden
-          />
+          {#snippet leading()}
+            <Checkbox
+              on:change={() => handleStatusSelect(status)}
+              {checked}
+              label={status}
+              labelHidden
+            />
+          {/snippet}
           {#if status === 'All'}
             <Translate key="workflows.all-statuses" />
           {:else}

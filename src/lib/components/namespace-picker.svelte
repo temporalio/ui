@@ -16,10 +16,7 @@
   );
   $: href = routeForNamespace({ namespace });
 
-  const handleNamespaceSelect = (
-    event: CustomEvent<{ value: NamespaceListItem }>,
-  ) => {
-    const namespaceListItem = event.detail.value;
+  const handleNamespaceSelect = (namespaceListItem: NamespaceListItem) => {
     $lastUsedNamespace = namespaceListItem.namespace;
     namespaceListItem?.onClick(namespaceListItem.namespace);
   };
@@ -34,7 +31,7 @@
   leadingIcon="namespace-switcher"
   options={namespaceList}
   optionValueKey="namespace"
-  on:change={handleNamespaceSelect}
+  onchange={handleNamespaceSelect}
   minSize={32}
   actionTooltip={translate('namespaces.go-to-namespace')}
   {href}

@@ -337,13 +337,13 @@
       >
         <MenuItem
           data-testid="trigger-schedule"
-          on:click={() => (triggerConfirmationModalOpen = true)}
+          onclick={() => (triggerConfirmationModalOpen = true)}
         >
           {translate('schedules.trigger')}
         </MenuItem>
         <MenuItem
           data-testid="backfill-schedule"
-          on:click={() => (backfillConfirmationModalOpen = true)}
+          onclick={() => (backfillConfirmationModalOpen = true)}
         >
           {translate('schedules.backfill')}
         </MenuItem>
@@ -356,7 +356,7 @@
         <MenuItem
           data-testid="delete-schedule"
           destructive
-          on:click={() => (deleteConfirmationModalOpen = true)}
+          onclick={() => (deleteConfirmationModalOpen = true)}
         >
           {translate('common.delete')}
         </MenuItem>
