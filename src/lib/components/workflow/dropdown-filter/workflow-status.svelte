@@ -97,15 +97,16 @@
   <Menu keepOpen id="execution-status-filter">
     {#each workflowStatusFilters as status}
       <MenuItem onclick={() => onStatusClick(status)}>
-        <Checkbox
-          slot="leading"
-          label={status}
-          labelHidden
-          tabindex={-1}
-          on:click={() => onStatusClick(status)}
-          checked={statusFilters.some((filter) => filter.value === status) ||
-            (!statusFilters.length && status === 'All')}
-        />
+        {#snippet leading()}
+          <Checkbox
+            label={status}
+            labelHidden
+            tabindex={-1}
+            on:click={() => onStatusClick(status)}
+            checked={statusFilters.some((filter) => filter.value === status) ||
+              (!statusFilters.length && status === 'All')}
+          />
+        {/snippet}
         {#if status === 'All'}
           <Translate key="workflows.all-statuses" />
         {:else}

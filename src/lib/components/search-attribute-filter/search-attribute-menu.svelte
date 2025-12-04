@@ -64,11 +64,11 @@
     onclick={() => (searchAttributeValue = '')}
     class="text-nowrap"
   >
-    <svelte:fragment slot="leading">
+    {#snippet leading()}
       {#if !$filter.attribute}
         <Icon name="add" />
       {/if}
-    </svelte:fragment>
+    {/snippet}
     {$filter.attribute || 'Search Attribute'}
   </MenuButton>
   <Menu id="search-attribute-menu" keepOpen>

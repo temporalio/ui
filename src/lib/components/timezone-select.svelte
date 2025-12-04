@@ -117,7 +117,9 @@
     {size}
     data-testid="timezones-menu-button"
   >
-    <Icon slot="leading" name="clock" />
+    {#snippet leading()}
+      <Icon name="clock" />
+    {/snippet}
     {timezone}
   </MenuButton>
   <Menu

@@ -55,7 +55,9 @@
   <div class="flex items-center justify-center">
     <MenuContainer>
       <MenuButton hasIndicator variant={args.variant} controls={context.id}>
-        <Icon slot="leading" name="temporal-logo" />
+        {#snippet leading()}
+          <Icon name="temporal-logo" />
+        {/snippet}
         Menu
       </MenuButton>
       <Menu id={context.id} class="w-64" {...args}>

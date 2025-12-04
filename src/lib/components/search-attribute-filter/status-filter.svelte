@@ -104,13 +104,14 @@
           onStatusClick(status);
         }}
       >
-        <Checkbox
-          on:click={() => onStatusClick(status)}
-          slot="leading"
-          {checked}
-          label={status}
-          labelHidden
-        />
+        {#snippet leading()}
+          <Checkbox
+            on:click={() => onStatusClick(status)}
+            {checked}
+            label={status}
+            labelHidden
+          />
+        {/snippet}
         {#if status === 'All'}
           <Translate key="workflows.all-statuses" />
         {:else}

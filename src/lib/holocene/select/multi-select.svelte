@@ -85,13 +85,14 @@
           onOptionClick(option);
         }}
       >
-        <Checkbox
-          on:click={() => onOptionClick(option)}
-          slot="leading"
-          {checked}
-          label={option.label}
-          labelHidden
-        />
+        {#snippet leading()}
+          <Checkbox
+            on:click={() => onOptionClick(option)}
+            {checked}
+            label={option.label}
+            labelHidden
+          />
+        {/snippet}
         <div class="flex items-center gap-2">
           {#if option.icon}
             <Icon slot="trailing" name={option.icon} />
