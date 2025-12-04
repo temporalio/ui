@@ -95,7 +95,7 @@
         {/snippet}
         <div class="flex items-center gap-2">
           {#if option.icon}
-            <Icon slot="trailing" name={option.icon} />
+            <Icon name={option.icon} />
           {/if}
           {option.label}
         </div>

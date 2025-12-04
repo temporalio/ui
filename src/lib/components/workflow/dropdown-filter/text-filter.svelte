@@ -64,7 +64,9 @@
     onclick={handleShowInput}
   >
     {attributeToHumanReadable[attribute]}
-    <Icon name="filter" slot="trailing" />
+    {#snippet trailing()}
+      <Icon name="filter" />
+    {/snippet}
   </MenuButton>
   <Menu keepOpen id="{attributeToId[attribute]}-filter-menu" class="w-[500px]">
     <Input

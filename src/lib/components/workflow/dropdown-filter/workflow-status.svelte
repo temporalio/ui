@@ -92,7 +92,9 @@
     controls="execution-status-filter"
   >
     {translate('common.status')}
-    <Icon name="filter" slot="trailing" />
+    {#snippet trailing()}
+      <Icon name="filter" />
+    {/snippet}
   </MenuButton>
   <Menu keepOpen id="execution-status-filter">
     {#each workflowStatusFilters as status}
