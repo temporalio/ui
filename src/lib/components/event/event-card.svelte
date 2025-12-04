@@ -84,8 +84,6 @@
     ),
   );
 
-  $inspect('classification: ', event.classification);
-
   const eventCategory = cva(
     ['flex flex-1 flex-col overflow-hidden rounded-t-lg pb-2'],
     {
