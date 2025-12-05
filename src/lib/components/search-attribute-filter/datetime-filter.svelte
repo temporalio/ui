@@ -32,7 +32,6 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  // Local state for date/time values (not global stores)
   let localStartDate = startOfDay(new Date());
   let localStartHour = '';
   let localStartMinute = '';

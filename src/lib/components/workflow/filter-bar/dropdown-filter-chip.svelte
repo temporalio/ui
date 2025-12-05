@@ -19,17 +19,9 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import {
-    endDate,
-    endHour,
-    endMinute,
-    endSecond,
     getTimezone,
     relativeTimeDuration,
     relativeTimeUnit,
-    startDate,
-    startHour,
-    startMinute,
-    startSecond,
     TIME_UNIT_OPTIONS,
     timeFormat,
     timeFormatType,
@@ -66,6 +58,17 @@
 
   const open = writable(false);
   let localFilter = $state({ ...filter });
+
+  // Local state for date/time values (not global stores)
+  let localStartDate = startOfDay(new Date());
+  let localStartHour = '';
+  let localStartMinute = '';
+  let localStartSecond = '';
+
+  let localEndDate = startOfDay(new Date());
+  let localEndHour = '';
+  let localEndMinute = '';
+  let localEndSecond = '';
 
   const controlsId = $derived(
     `dropdown-filter-chip-${filter.attribute}-${index}`,
@@ -205,17 +208,17 @@
   }
 
   const onStartDateChange = (d: CustomEvent) => {
-    $startDate = startOfDay(d.detail);
-    $startHour = '';
-    $startMinute = '';
-    $startSecond = '';
+    localStartDate = startOfDay(d.detail);
+    localStartHour = '';
+    localStartMinute = '';
+    localStartSecond = '';
   };
 
   const onEndDateChange = (d: CustomEvent) => {
-    $endDate = startOfDay(d.detail);
-    $endHour = '';
-    $endMinute = '';
-    $endSecond = '';
+    localEndDate = startOfDay(d.detail);
+    localEndHour = '';
+    localEndMinute = '';
+    localEndSecond = '';
   };
 
   const applyTimeChanges = (
@@ -239,15 +242,15 @@
       );
       localFilter.customDate = false;
     } else {
-      let startDateWithTime = applyTimeChanges($startDate, {
-        hour: $startHour,
-        minute: $startMinute,
-        second: $startSecond,
+      let startDateWithTime = applyTimeChanges(localStartDate, {
+        hour: localStartHour,
+        minute: localStartMinute,
+        second: localStartSecond,
       });
-      let endDateWithTime = applyTimeChanges($endDate, {
-        hour: $endHour,
-        minute: $endMinute,
-        second: $endSecond,
+      let endDateWithTime = applyTimeChanges(localEndDate, {
+        hour: localEndHour,
+        minute: localEndMinute,
+        second: localEndSecond,
       });
 
       const timezone = getTimezone($timeFormat);
@@ -342,15 +345,15 @@
                 <DatePicker
                   label={translate('common.start')}
                   on:datechange={onStartDateChange}
-                  selected={new Date($startDate)}
+                  selected={new Date(localStartDate)}
                   todayLabel={translate('common.today')}
                   closeLabel={translate('common.close')}
                   clearLabel={translate('common.clear-input-button-label')}
                 />
                 <TimePicker
-                  bind:hour={$startHour}
-                  bind:minute={$startMinute}
-                  bind:second={$startSecond}
+                  bind:hour={localStartHour}
+                  bind:minute={localStartMinute}
+                  bind:second={localStartSecond}
                   twelveHourClock={false}
                 />
               </div>
@@ -358,15 +361,15 @@
                 <DatePicker
                   label={translate('common.end')}
                   on:datechange={onEndDateChange}
-                  selected={new Date($endDate)}
+                  selected={new Date(localEndDate)}
                   todayLabel={translate('common.today')}
                   closeLabel={translate('common.close')}
                   clearLabel={translate('common.clear-input-button-label')}
                 />
                 <TimePicker
-                  bind:hour={$endHour}
-                  bind:minute={$endMinute}
-                  bind:second={$endSecond}
+                  bind:hour={localEndHour}
+                  bind:minute={localEndMinute}
+                  bind:second={localEndSecond}
                   twelveHourClock={false}
                 />
               </div>
@@ -420,16 +423,16 @@
                     label={''}
                     labelHidden
                     on:datechange={onStartDateChange}
-                    selected={new Date($startDate)}
+                    selected={new Date(localStartDate)}
                     todayLabel={translate('common.today')}
                     closeLabel={translate('common.close')}
                     clearLabel={translate('common.clear-input-button-label')}
                     disabled={$timeFormatType !== 'absolute' || isNullFilter}
                   />
                   <TimePicker
-                    bind:hour={$startHour}
-                    bind:minute={$startMinute}
-                    bind:second={$startSecond}
+                    bind:hour={localStartHour}
+                    bind:minute={localStartMinute}
+                    bind:second={localStartSecond}
                     twelveHourClock={false}
                     disabled={$timeFormatType !== 'absolute'}
                   />
