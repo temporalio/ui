@@ -23,7 +23,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { writable, type Writable } from 'svelte/store';
 
-  import { onMount, setContext } from 'svelte';
+  import { type ComponentProps, onMount, setContext } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
@@ -51,7 +51,7 @@
     required?: boolean;
     valid?: boolean;
     error?: string;
-    position?: 'left' | 'right';
+    position?: ComponentProps<Menu>['position'];
   };
 
   export let label: string;
@@ -69,7 +69,7 @@
   export let required = false;
   export let error = '';
   export let valid = true;
-  export let position: 'left' | 'right' | undefined = undefined;
+  export let position: ComponentProps<Menu>['position'] = undefined;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);

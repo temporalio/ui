@@ -15,9 +15,7 @@ export const Strings = {
   'batch-terminate-modal-title': 'Terminate Workflows',
   'batch-cancel-modal-title': 'Cancel Workflows',
   'batch-reset-modal-title': 'Reset Workflows',
-  'workflow-action-reason-placeholder': '{{action}} from the Web UI',
-  'workflow-action-reason-placeholder_one':
-    '{{action}} from the Web UI by {{identity}}',
+  'workflow-action-reason-placeholder': '{{action}} by {{identity}}',
   'batch-operation-confirmation-all':
     'Are you sure you want to {{action}} all workflows matching the following query? This action cannot be undone.',
   'batch-operation-count-disclaimer':
@@ -66,6 +64,7 @@ export const Strings = {
   'select-all-trailing': ' matching your query',
   'request-cancellation': 'Request Cancellation',
   'back-to-workflows': 'Back to Workflows',
+  'back-to-archived-workflows': 'Back to Archived Workflows',
   input: 'Input',
   result: 'Result',
   'initial-input': 'Initial Input',
@@ -251,13 +250,16 @@ export const Strings = {
   'all-headings-in-view': 'All available columns are in view',
   'no-headings-in-view': 'No columns in view',
   'archived-workflows': 'Archived Workflows',
+  'archived-workflow-history': 'Archived Workflow History',
   archival: 'Archival',
-  'workflow-query-empty-state-title': 'No Results',
-  'workflow-query-empty-state-preface':
-    'There are no results for the applied filters.',
-  'workflow-query-empty-state-postface':
-    'Try adjusting or clearing the filters to see the Workflows running on this Namespace.',
-  'workflow-query-error-state': 'There is an error with filtering Workflows.',
+  'workflow-query-empty-state-title': 'No Workflows Found',
+  'workflow-query-empty-state-description':
+    'Try adjusting or clearing filters to see more results',
+  'workflow-task-failures-query-empty-state-title':
+    'No Task Failures Found. Nice Work!',
+  'workflow-task-failures-query-empty-state-description':
+    'None of your Workflows currently match your task failure criteria',
+  'workflow-query-error-state': 'Error Filtering Workflows',
   'workflow-empty-state-title': 'No Workflows running in this Namespace',
   'workflow-empty-state-description':
     'You can populate the Web UI with sample Workflows. You can find a complete list of executable code samples at',
@@ -275,8 +277,7 @@ export const Strings = {
   'advanced-search': 'Advanced Search',
   'time-range': 'Time Range',
   'pending-activities-link': 'Show all Pending Activities',
-  'duration-filter-placeholder':
-    'e.g. "2h45m", "hh:mm:ss", or "1000" nanoseconds',
+  'duration-filter-placeholder': 'e.g. 2h45m, hh:mm:ss, or 1000 ns',
   'start-workflow': 'Start Workflow',
   'start-workflow-like-this-one': 'Start Workflow Like This One',
   'custom-search-attribute': 'Custom Search Attribute',
@@ -313,5 +314,8 @@ export const Strings = {
   fairness: 'Fairness',
   'workflow-start-delay': 'Workflow Start Delay',
   delayed: 'Delayed',
+  'task-failure': 'Task Failure',
   'execution-start': 'Execution Start',
+  'workflow-timeout': 'Workflow Timeout',
+  'custom-views': 'Custom Views',
 } as const;

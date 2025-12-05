@@ -2,7 +2,11 @@
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
   import { formatDate } from '$lib/utilities/format-date';
 
@@ -21,16 +25,30 @@
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.original-scheduled-time')}
-      <Badge>{formatDate(pendingTask.originalScheduledTime, $timeFormat)}</Badge
+      <Badge
+        >{formatDate(pendingTask.originalScheduledTime, $timeFormat, {
+          relative: $relativeTime,
+          format: $timestampFormat,
+        })}</Badge
       >
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.scheduled-time')}
-      <Badge>{formatDate(pendingTask.scheduledTime, $timeFormat)}</Badge>
+      <Badge
+        >{formatDate(pendingTask.scheduledTime, $timeFormat, {
+          relative: $relativeTime,
+          format: $timestampFormat,
+        })}</Badge
+      >
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.started-time')}
-      <Badge>{formatDate(pendingTask.startedTime, $timeFormat)}</Badge>
+      <Badge
+        >{formatDate(pendingTask.startedTime, $timeFormat, {
+          relative: $relativeTime,
+          format: $timestampFormat,
+        })}</Badge
+      >
     </p>
   </div>
 </Accordion>

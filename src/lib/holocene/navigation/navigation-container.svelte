@@ -1,18 +1,25 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { page } from '$app/stores';
+  import { resolve } from '$app/paths';
+  import { page } from '$app/state';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
   import { navOpen } from '$lib/stores/nav-open';
 
-  export let isCloud = false;
+  interface Props extends HTMLAttributes<HTMLDivElement> {
+    isCloud?: boolean;
+  }
+
+  let { isCloud = false, ...restProps }: Props = $props();
 
   const toggle = () => ($navOpen = !$navOpen);
 
-  $: version = $page.data?.settings?.version ?? '';
+  let version = $derived(page.data?.settings?.version ?? '');
 </script>
 
 <nav
@@ -25,12 +32,12 @@
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
   data-testid="navigation-header"
-  {...$$restProps}
+  {...restProps}
 >
   <div
     class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
   >
-    <a href="/" class="flex w-fit items-center gap-1 text-nowrap">
+    <a href={resolve('', {})} class="flex w-fit items-center gap-1 text-nowrap">
       <Logo height={24} width={24} class="m-1" />
       <p class="text-base font-medium group-data-[nav=closed]:hidden">
         {isCloud ? 'Cloud' : 'Self-Hosted'}
@@ -41,7 +48,7 @@
       class="mx-2 flex items-center justify-center opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 group-data-[nav=closed]:p-2 {isCloud
         ? 'focus-visible:ring-success'
         : 'focus-visible:ring-primary/70'}"
-      on:click={toggle}
+      onclick={toggle}
     >
       <Icon name="chevron-right" />
     </button>

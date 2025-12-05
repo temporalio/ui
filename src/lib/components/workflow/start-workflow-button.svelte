@@ -8,12 +8,14 @@
 
   export let namespace: string;
   export let workflowId: string;
+  export let runId: string;
   export let taskQueue: string;
   export let workflowType: string;
 
   $: href = routeForWorkflowStart({
     namespace,
     workflowId,
+    runId,
     taskQueue,
     workflowType,
   });

@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { superForm } from 'sveltekit-superforms';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { z } from 'zod/v3';
+
   import Message from '$lib/components/form/message.svelte';
   import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -11,48 +15,119 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import type { CodecServerAdapter, CodecServerFormData } from './types';
-
-  import { createFormConfig, createFormHandlers } from './config.svelte';
+  import type { CodecServerFormData } from './types';
 
   interface Props {
     class?: string;
-    adapter: CodecServerAdapter;
     initialData: CodecServerFormData;
+    onSave: (data: CodecServerFormData) => Promise<void>;
+    onSuccess?: (data: CodecServerFormData) => void;
+    onCancel?: () => void;
+    hideTainted?: boolean;
+    hideCancelButton?: boolean;
   }
 
-  let { class: className = '', adapter, initialData }: Props = $props();
-
-  const { superFormInstance } = $derived(
-    createFormConfig(adapter, initialData, () => showCustomSection),
-  );
-
-  const {
-    form,
-    errors,
-    submitting,
-    message,
-    enhance,
-    tainted,
-    isTainted,
-    reset,
-  } = $derived(superFormInstance);
-
-  const { handleCancel } = $derived(createFormHandlers(adapter, reset));
-
-  const taintedCount = $derived(
-    Object.values($tainted || {}).filter((value) => value === true).length,
-  );
+  let {
+    class: className = '',
+    initialData,
+    onSave,
+    onSuccess = () => {},
+    onCancel,
+    hideTainted = false,
+    hideCancelButton = false,
+  }: Props = $props();
 
   // Show custom section if there are existing values
   let showCustomSection = $state(
     !!(initialData.customMessage || initialData.customLink),
   );
+
+  const codecServerSchema = z.object({
+    endpoint: z
+      .string()
+      .refine((val) => val === '' || z.string().url().safeParse(val).success, {
+        message: translate('codec-server.validation-endpoint-url'),
+      }),
+    passUserAccessToken: z.boolean(),
+    includeCrossOriginCredentials: z.boolean(),
+    customMessage: z.string().optional(),
+    customLink: z
+      .string()
+      .refine((val) => val === '' || z.string().url().safeParse(val).success, {
+        message: translate('codec-server.validation-custom-link-url'),
+      })
+      .optional(),
+  });
+
+  const formInstance = superForm(
+    {
+      endpoint: initialData.endpoint || '',
+      passUserAccessToken: initialData.passUserAccessToken || false,
+      includeCrossOriginCredentials:
+        initialData.includeCrossOriginCredentials || false,
+      customMessage: initialData.customMessage || '',
+      customLink: initialData.customLink || '',
+    },
+    {
+      SPA: true,
+      dataType: 'json',
+      resetForm: false,
+      validators: zodClient(codecServerSchema),
+      onUpdate: async ({ form }) => {
+        if (!form.valid) return;
+
+        try {
+          const dataToSave = {
+            ...form.data,
+            customMessage: showCustomSection ? form.data.customMessage : '',
+            customLink: showCustomSection ? form.data.customLink : '',
+          };
+          await onSave(dataToSave);
+          onSuccess(dataToSave);
+          return { type: 'success' };
+        } catch (error) {
+          return {
+            type: 'error',
+            error: {
+              message:
+                error.message || 'Failed to save codec server configuration',
+            },
+          };
+        }
+      },
+    },
+  );
+
+  const { form, errors, submitting, message, enhance, tainted, reset } =
+    formInstance;
+
+  const handleCancel = () => {
+    reset();
+    onCancel?.();
+  };
+
+  const taintedCount = $derived(
+    $tainted
+      ? Object.values($tainted).filter((value) => value === true).length
+      : 0,
+  );
+
+  const disabled = $derived($submitting || taintedCount === 0);
 </script>
 
-<div class="space-y-6 {className}">
-  <form use:enhance class="space-y-6">
-    <Card class="space-y-6">
+<Card class="p-5 {className}">
+  <form use:enhance>
+    <div class="space-y-6">
+      <Message value={$message} />
+
+      <!-- Title and Description -->
+      <div>
+        <h2 class="text-lg font-semibold">{translate('codec-server.title')}</h2>
+        <p class="text-sm text-secondary">
+          {translate('codec-server.description')}
+        </p>
+      </div>
+
       <!-- Info Alert -->
       <Alert intent="info" class="text-sm">
         <Icon name="info" slot="icon" />
@@ -61,7 +136,7 @@
 
       <!-- Endpoint Input -->
       <div class="space-y-2">
-        <p class="text-gray-700 text-sm">
+        <p class="text-sm text-secondary">
           {translate('codec-server.endpoint-description-prefix')}
           <Link
             href="https://docs.temporal.io/dataconversion#codec-server"
@@ -104,24 +179,11 @@
       </div>
 
       <!-- Custom Message and Link Section -->
-      <div class="space-y-4">
-        <p class="text-gray-600 text-sm">
-          {translate('codec-server.custom-section-description')}
-        </p>
-
-        {#if !showCustomSection}
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            on:click={() => (showCustomSection = true)}
-          >
-            <Icon name="add" class="h-4 w-4" />
-            {translate('codec-server.add-custom-button')}
-          </Button>
-        {/if}
-
-        {#if showCustomSection}
+      {#if showCustomSection}
+        <div class="space-y-4">
+          <p class="text-sm text-secondary">
+            {translate('codec-server.custom-section-description')}
+          </p>
           <div class="space-y-4">
             <div>
               <Textarea
@@ -148,7 +210,7 @@
                 hintText={$errors.customLink?.[0]}
                 disabled={$submitting}
               />
-              <p class="text-gray-600 mt-1 text-sm">
+              <p class="text-sm text-secondary">
                 {translate('codec-server.custom-link-description')}
               </p>
             </div>
@@ -160,6 +222,8 @@
                 size="sm"
                 on:click={() => {
                   showCustomSection = false;
+                  $form.customMessage = '';
+                  $form.customLink = '';
                 }}
               >
                 <Icon name="trash" class="h-4 w-4" />
@@ -167,37 +231,46 @@
               </Button>
             </div>
           </div>
-        {/if}
-      </div>
-    </Card>
+        </div>
+      {/if}
 
-    <Message
-      value={$message}
-      errors={$errors._errors}
-      errorsTitle={translate('codec-server.validation-error-title')}
-    />
+      {#if !showCustomSection}
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          on:click={() => (showCustomSection = true)}
+          disabled={$submitting}
+          leadingIcon="add"
+        >
+          {translate('codec-server.add-custom-button')}
+        </Button>
+      {/if}
+    </div>
 
     <div class="flex gap-3">
       <Button
         type="submit"
+        size="sm"
         variant="primary"
-        disabled={$submitting}
-        class="relative"
+        {disabled}
+        loading={$submitting}
       >
-        {$submitting
-          ? translate('codec-server.saving-button')
-          : translate('codec-server.save-button')}
-        <TaintedBadge show={isTainted($tainted)} count={taintedCount} />
+        <TaintedBadge show={!hideTainted} count={taintedCount} />
+        {translate('codec-server.save-button')}
       </Button>
 
-      <Button
-        type="button"
-        variant="secondary"
-        on:click={handleCancel}
-        disabled={$submitting}
-      >
-        {translate('codec-server.cancel-button')}
-      </Button>
+      {#if !hideCancelButton}
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          on:click={handleCancel}
+          disabled={$submitting}
+        >
+          {translate('common.cancel')}
+        </Button>
+      {/if}
     </div>
   </form>
-</div>
+</Card>

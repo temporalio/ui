@@ -1,13 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     routeForEventHistory,
     routeForSchedule,
@@ -23,8 +22,6 @@
   export let columns: ConfigurableTableHeader[];
 
   $: spec = schedule?.info?.spec;
-  $: calendar = spec?.structuredCalendar?.[0];
-  $: interval = spec?.interval?.[0];
   $: timezoneName = spec?.timezoneName || 'UTC';
   $: searchAttributes = schedule?.searchAttributes ?? {};
   $: decodedAttributes = decodePayloadAttributes({ searchAttributes });
@@ -47,7 +44,7 @@
   });
 </script>
 
-<tr>
+<tr class="max-h-32">
   {#each columns as { label } (label)}
     {#if label === translate('common.status')}
       <td class="cell">
@@ -73,28 +70,31 @@
                 workflow: run?.startWorkflowResult?.workflowId,
                 run: run?.startWorkflowResult?.runId,
               })}
-              >{formatDate(run?.actualTime, $timeFormat, {
-                relative: $relativeTime,
-              })}</Link
             >
+              <Timestamp dateTime={run.actualTime} />
+            </Link>
           </p>
         {/each}
       </td>
     {:else if label === translate('schedules.upcoming-runs')}
       <td class="cell truncate">
         {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
-          <div>
-            {formatDate(run, $timeFormat, {
-              relative: $relativeTime,
-              relativeLabel: translate('common.from-now'),
-            })}
-          </div>
+          <Timestamp
+            as="div"
+            dateTime={run}
+            options={{ relativeLabel: translate('common.from-now') }}
+          />
         {/each}
       </td>
     {:else if label === translate('schedules.schedule-spec')}
       <td class="cell">
         <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
-        <ScheduleBasicFrequency {calendar} {interval} />
+        <ScheduleBasicFrequency
+          frequency={[
+            ...(spec?.structuredCalendar ?? []),
+            ...(spec?.interval ?? []),
+          ]}
+        />
       </td>
     {:else}
       <td class="cell">

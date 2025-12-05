@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -8,9 +9,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
     formatRetryExpiration,
@@ -73,13 +72,7 @@
                     <h4 class="pending-activity-detail-header">
                       {translate('workflows.last-heartbeat')}
                     </h4>
-                    {formatDate(
-                      pendingActivity.lastHeartbeatTime,
-                      $timeFormat,
-                      {
-                        relative: $relativeTime,
-                      },
-                    )}
+                    <Timestamp dateTime={pendingActivity.lastHeartbeatTime} />
                   </div>
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">

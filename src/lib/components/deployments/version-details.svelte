@@ -1,6 +1,10 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { WorkerDeploymentVersionInfo } from '$lib/types/deployments';
   import { formatDate } from '$lib/utilities/format-date';
 
@@ -19,6 +23,7 @@
       title={translate('deployments.rollout-started')}
       content={formatDate(version.createTime, $timeFormat, {
         relative: $relativeTime,
+        format: $timestampFormat,
       })}
     />
   </div>

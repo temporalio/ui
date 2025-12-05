@@ -8,7 +8,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
-    routeForArchivalWorkfows,
+    routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForEventHistoryImport,
     routeForNamespaces,
@@ -142,7 +142,7 @@
         icon: 'archives',
         category: 'Navigation',
         action: () => {
-          goto(routeForArchivalWorkfows({ namespace }));
+          goto(routeForArchivalWorkflows({ namespace }));
           close();
         },
       },

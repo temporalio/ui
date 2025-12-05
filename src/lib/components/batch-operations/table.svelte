@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -6,12 +7,10 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type {
     BatchOperationInfo,
     BatchOperationState,
   } from '$lib/types/batch';
-  import { formatDate } from '$lib/utilities/format-date';
   import { routeForBatchOperation } from '$lib/utilities/route-for';
 
   export let namespace: string;
@@ -46,16 +45,8 @@
         ><Link href={routeForBatchOperation({ namespace, jobId })}>{jobId}</Link
         ></td
       >
-      <td class="max-sm:hidden"
-        >{formatDate(startTime, $timeFormat, {
-          relative: $relativeTime,
-        })}</td
-      >
-      <td class="max-sm:hidden"
-        >{formatDate(closeTime, $timeFormat, {
-          relative: $relativeTime,
-        })}</td
-      >
+      <Timestamp as="td" class="max-sm:hidden" dateTime={startTime} />
+      <Timestamp as="td" class="max-sm:hidden" dateTime={closeTime} />
     </TableRow>
   {:else}
     <TableRow>

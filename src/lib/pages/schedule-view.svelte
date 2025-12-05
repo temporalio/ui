@@ -2,6 +2,7 @@
   import { writable } from 'svelte/store';
 
   import { addDays, addHours, startOfDay } from 'date-fns';
+  import { onDestroy } from 'svelte';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -14,6 +15,7 @@
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -40,12 +42,11 @@
   } from '$lib/services/schedule-service';
   import { coreUserStore } from '$lib/stores/core-user';
   import { loading } from '$lib/stores/schedules';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { getIdentity } from '$lib/utilities/core-context';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import { formatDate, getUTCString } from '$lib/utilities/format-date';
+  import { getUTCString } from '$lib/utilities/format-date';
   import {
     routeForScheduleEdit,
     routeForSchedules,
@@ -75,6 +76,9 @@
   let error = '';
   let scheduleUpdating = false;
   let overlapPolicy = writable<OverlapPolicy>('Unspecified');
+  let deleteTimeout: ReturnType<typeof setTimeout>;
+  let triggerTimeout: ReturnType<typeof setTimeout>;
+  let backfillTimeout: ReturnType<typeof setTimeout>;
   let policies: { label: string; description: string; value: OverlapPolicy }[] =
     [
       {
@@ -124,7 +128,8 @@
       $loading = true;
       await deleteSchedule({ identity, namespace, scheduleId });
       deleteConfirmationModalOpen = false;
-      setTimeout(() => {
+      clearTimeout(deleteTimeout);
+      deleteTimeout = setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
@@ -169,7 +174,8 @@
       scheduleId,
       overlapPolicy: $overlapPolicy,
     });
-    setTimeout(() => {
+    clearTimeout(triggerTimeout);
+    triggerTimeout = setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
       closeTriggerModal();
       scheduleUpdating = false;
@@ -245,7 +251,8 @@
       startTime,
       endTime,
     });
-    setTimeout(() => {
+    clearTimeout(backfillTimeout);
+    backfillTimeout = setTimeout(() => {
       scheduleFetch = fetchSchedule(parameters);
       closeBackfillModal();
       scheduleUpdating = false;
@@ -255,6 +262,12 @@
   const resetReason = () => {
     reason = '';
   };
+
+  onDestroy(() => {
+    clearTimeout(deleteTimeout);
+    clearTimeout(triggerTimeout);
+    clearTimeout(backfillTimeout);
+  });
 </script>
 
 {#await scheduleFetch}
@@ -271,7 +284,7 @@
   <Loading />
 {:then schedule}
   {#if $loading}
-    <Loading title={translate('schedules.deleting')} class="my-2" />
+    <Loading class="my-2" />
   {:else}
     <header class="flex flex-row flex-wrap justify-between gap-4">
       <div class="relative flex flex-col">
@@ -291,21 +304,25 @@
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>
-        <p class="flex items-center gap-2 text-right text-sm">
-          {translate('common.created', {
-            created: formatDate(schedule?.info?.createTime, $timeFormat, {
-              relative: $relativeTime,
-            }),
-          })}
-        </p>
+        <Timestamp
+          as="p"
+          class="flex items-center gap-2 text-right text-sm"
+          dateTime={schedule?.info?.createTime}
+        >
+          {#snippet leading()}
+            Created
+          {/snippet}
+        </Timestamp>
         {#if schedule?.info?.updateTime}
-          <p class="flex items-center gap-2 text-right text-sm">
-            {translate('common.last-updated', {
-              updated: formatDate(schedule?.info?.updateTime, $timeFormat, {
-                relative: $relativeTime,
-              }),
-            })}
-          </p>
+          <Timestamp
+            as="p"
+            class="flex items-center gap-2 text-right text-sm"
+            dateTime={schedule?.info?.updateTime}
+          >
+            {#snippet leading()}
+              Last Updated
+            {/snippet}
+          </Timestamp>
         {/if}
       </div>
       <SplitButton
@@ -402,8 +419,10 @@
             input={schedule?.schedule?.action?.startWorkflow?.input}
           />
           <ScheduleFrequencyPanel
-            calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
-            interval={schedule?.schedule?.spec?.interval?.[0]}
+            frequency={[
+              ...(schedule?.schedule?.spec?.structuredCalendar ?? []),
+              ...(schedule?.schedule?.spec?.interval ?? []),
+            ]}
             timezoneName={schedule?.schedule?.spec?.timezoneName}
           />
         </div>

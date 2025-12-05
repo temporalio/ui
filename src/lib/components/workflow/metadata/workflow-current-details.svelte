@@ -3,15 +3,14 @@
 
   import { page } from '$app/state';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { formatDate } from '$lib/utilities/format-date';
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
@@ -81,11 +80,11 @@
           </Button>
         </div>
         {#if lastFetched}
-          <p class="text-xs text-secondary">
-            {formatDate(lastFetched, $timeFormat, {
-              relative: $relativeTime,
-            })}
-          </p>
+          <Timestamp
+            as="p"
+            class="text-xs text-secondary"
+            dateTime={lastFetched}
+          />
         {/if}
       </div>
     </div>

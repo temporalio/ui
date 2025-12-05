@@ -25,7 +25,7 @@
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
-    routeForArchivalWorkfows,
+    routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForEventHistoryImport,
     routeForLoginPage,
@@ -75,7 +75,7 @@
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
-      archivalRoute: routeForArchivalWorkfows({ namespace }),
+      archivalRoute: routeForArchivalWorkflows({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
       historyImportRoute: routeForEventHistoryImport(),
@@ -265,13 +265,13 @@
     </SideNavigation>
   </div>
   <MainContentContainer>
-    <DataEncoderSettings class="hidden md:flex" />
+    <DataEncoderSettings />
     <TopNavigation>
-      <svelte:fragment slot="left">
+      {#snippet left()}
         {#if showNamespacePicker}
           <NamespacePicker {namespaceList} />
         {/if}
-      </svelte:fragment>
+      {/snippet}
       <UserMenu {logout} />
     </TopNavigation>
     <div

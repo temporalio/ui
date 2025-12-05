@@ -128,11 +128,11 @@
       'menu-item',
       'm-1 px-3 py-2',
       'flex items-center gap-2',
+      centered ? 'justify-center' : 'justify-between',
       className,
     )}
     class:disabled
     class:hoverable
-    class:justify-center={centered}
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -142,7 +142,12 @@
     on:keydown|stopPropagation={handleKeydown}
     {...$$restProps}
   >
-    <slot />
+    <div>
+      <slot />
+    </div>
+    {#if newTab}
+      <Icon height={20} width={20} name="external-link" slot="trailing" />
+    {/if}
   </a>
 {:else}
   <li
@@ -187,7 +192,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply cursor-pointer border border-transparent text-sm font-medium focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+    @apply cursor-pointer border border-transparent text-sm focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
 
     &.hoverable {
       @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;

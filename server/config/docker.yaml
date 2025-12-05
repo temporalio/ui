@@ -45,6 +45,9 @@ tls:
   keyData: {{ env "TEMPORAL_TLS_KEY_DATA" | default "" }}
   enableHostVerification: {{ env "TEMPORAL_TLS_ENABLE_HOST_VERIFICATION" | default "false" }}
   serverName: {{ env "TEMPORAL_TLS_SERVER_NAME" | default "" }}
+uiServerTLS:
+  certFile: {{ env "TEMPORAL_UI_SERVER_TLS_CERT" | default "" }}
+  keyFile: {{ env "TEMPORAL_UI_SERVER_TLS_KEY" | default "" }}
 auth:
   enabled: {{ env "TEMPORAL_AUTH_ENABLED" | default "false" }}
   providers:

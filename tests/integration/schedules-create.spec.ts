@@ -30,7 +30,7 @@ test.describe('Creates Schedule Successfully', () => {
     await expect(createButton).toBeEnabled();
     await createButton.click();
 
-    await expect(page.getByText('Creating Schedule...')).toBeVisible();
+    await expect(page.getByTestId('loading')).toBeVisible();
   });
 
   test('fills out schedule with custom search attributes and submits', async ({
@@ -84,6 +84,6 @@ test.describe('Creates Schedule Successfully', () => {
     await expect(createButton).toBeEnabled();
     await createButton.click();
 
-    await expect(page.getByText('Creating Schedule...')).toBeVisible();
+    await expect(page.getByTestId('loading')).toBeVisible();
   });
 });

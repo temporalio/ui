@@ -6,10 +6,17 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
-  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import {
+    formatDistanceAbbreviated,
+    formatDuration,
+  } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
   import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
@@ -99,9 +106,11 @@
   <DetailListTextValue
     text={formatDate(workflow?.startTime, $timeFormat, {
       relative: $relativeTime,
+      format: $timestampFormat,
     })}
     tooltipText={formatDate(workflow?.startTime, $timeFormat, {
       relative: !$relativeTime,
+      format: $timestampFormat,
     })}
   />
 
@@ -110,9 +119,11 @@
     <DetailListTextValue
       text={formatDate(workflow?.executionTime, $timeFormat, {
         relative: $relativeTime,
+        format: $timestampFormat,
       })}
       tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
         relative: !$relativeTime,
+        format: $timestampFormat,
       })}
     />
   {/if}
@@ -122,10 +133,12 @@
     text={workflow?.endTime
       ? formatDate(workflow?.endTime, $timeFormat, {
           relative: $relativeTime,
+          format: $timestampFormat,
         })
       : '-'}
     tooltipText={formatDate(workflow?.endTime, $timeFormat, {
       relative: !$relativeTime,
+      format: $timestampFormat,
     })}
   />
 
@@ -133,6 +146,14 @@
     {translate('common.duration')}
   </DetailListLabel>
   <DetailListTextValue text={elapsedTime} />
+
+  {#if workflow?.workflowExecutionTimeout && workflow?.workflowExecutionTimeout.toString() !== '0s'}
+    <DetailListLabel>{translate('workflows.workflow-timeout')}</DetailListLabel>
+    <DetailListTextValue
+      text={formatDuration(workflow.workflowExecutionTimeout)}
+      tooltipText={formatDuration(workflow.workflowExecutionTimeout)}
+    />
+  {/if}
 
   <DetailListColumn>
     <DetailListLabel>{translate('common.run-id')}</DetailListLabel>

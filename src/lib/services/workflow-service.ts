@@ -22,6 +22,7 @@ import {
   workflowError,
 } from '$lib/stores/workflows';
 import {
+  type CancelWorkflowRequest,
   ResetReapplyExcludeType,
   ResetReapplyType,
   type ResetWorkflowRequest,
@@ -88,6 +89,7 @@ export type CombinedWorkflowExecutionsResponse = {
 type CancelWorkflowOptions = {
   namespace: string;
   workflow: WorkflowExecution;
+  identity?: string;
 };
 
 type SignalWorkflowOptions = {
@@ -97,6 +99,7 @@ type SignalWorkflowOptions = {
   input: string;
   encoding: PayloadInputEncoding;
   messageType: string;
+  identity?: string;
 };
 
 type UpdateWorkflowOptions = {
@@ -329,9 +332,23 @@ export async function terminateWorkflow({
 }
 
 export async function cancelWorkflow(
-  { namespace, workflow: { id: workflowId, runId } }: CancelWorkflowOptions,
+  {
+    namespace,
+    workflow: { id: workflowId, runId },
+    identity,
+  }: CancelWorkflowOptions,
   request = fetch,
 ) {
+  const body: CancelWorkflowRequest = {
+    namespace,
+    workflowExecution: {
+      workflowId,
+      runId,
+    },
+    requestId: crypto.randomUUID(),
+    ...(identity && { identity }),
+  };
+
   const route = routeForApi('workflow.cancel', {
     namespace,
     workflowId,
@@ -342,6 +359,7 @@ export async function cancelWorkflow(
     notifyOnError: false,
     options: {
       method: 'POST',
+      body: stringifyWithBigInt(body),
     },
     params: {
       'execution.runId': runId,
@@ -356,6 +374,7 @@ export async function signalWorkflow({
   input,
   encoding,
   messageType,
+  identity,
 }: SignalWorkflowOptions) {
   const route = routeForApi('workflow.signal', {
     namespace,
@@ -366,26 +385,25 @@ export async function signalWorkflow({
   const settings = get(page).data.settings;
   const version = settings?.version ?? '';
   const newVersion = isVersionNewer(version, '2.22');
-  const body = newVersion
-    ? {
-        signalName: name,
-        workflowExecution: {
-          workflowId,
-          runId,
-        },
-        input: {
-          payloads,
-        },
-      }
-    : {
-        signalName: name,
-        input: {
-          payloads,
-        },
-        params: {
-          'execution.runId': runId,
-        },
-      };
+  const body = {
+    signalName: name,
+    input: {
+      payloads,
+    },
+    ...(identity && { identity }),
+    ...(newVersion
+      ? {
+          workflowExecution: {
+            workflowId,
+            runId,
+          },
+        }
+      : {
+          params: {
+            'execution.runId': runId,
+          },
+        }),
+  };
 
   return requestFromAPI(route, {
     notifyOnError: false,
@@ -469,6 +487,7 @@ export async function resetWorkflow({
     workflowTaskFinishEventId: eventId,
     requestId: crypto.randomUUID(),
     reason: formattedReason,
+    ...(identity && { identity }),
   };
 
   if (get(isCloud) || minimumVersionRequired('1.24.0', get(temporalVersion))) {
@@ -656,10 +675,12 @@ export async function startWorkflow({
 
 export const fetchInitialValuesForStartWorkflow = async ({
   namespace,
+  runId,
   workflowType,
   workflowId,
 }: {
   namespace: string;
+  runId?: string;
   workflowType?: string;
   workflowId?: string;
 }): Promise<{
@@ -682,15 +703,18 @@ export const fetchInitialValuesForStartWorkflow = async ({
     details: '',
   };
   try {
-    let query = '';
-    if (workflowType && workflowId) {
-      query = `WorkflowType = "${workflowType}" AND WorkflowId = "${workflowId}"`;
-    } else if (workflowType) {
-      query = `WorkflowType = "${workflowType}"`;
-    } else if (workflowId) {
-      query = `WorkflowId = "${workflowId}"`;
+    const searchParams = [];
+    if (runId) {
+      searchParams.push(`RunId = "${runId}"`);
+    }
+    if (workflowType) {
+      searchParams.push(`WorkflowType = "${workflowType}"`);
+    }
+    if (workflowId) {
+      searchParams.push(`WorkflowId = "${workflowId}"`);
     }
 
+    const query = searchParams.join(' AND ');
     const route = routeForApi('workflows', { namespace });
     const workflows = await requestFromAPI<ListWorkflowExecutionsResponse>(
       route,

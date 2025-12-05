@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
@@ -9,31 +10,37 @@
     isCustomSearchAttribute,
     workflowIncludesSearchAttribute,
   } from '$lib/stores/search-attributes';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowExecution,
   } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatDistance } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForEventHistory,
     routeForWorkerDeployment,
   } from '$lib/utilities/route-for';
+  import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
   type Props = {
     column: ConfigurableTableHeader;
     workflow: WorkflowExecution;
+    archival?: boolean;
   };
-  let { column, workflow }: Props = $props();
+  let { column, workflow, archival = false }: Props = $props();
 
   const { label } = $derived(column);
   const namespace = $derived(page.params.namespace);
+  const isCustomKeywordOrTextAttribute = $derived(
+    isCustomSearchAttribute(label) &&
+      ($customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.KEYWORD ||
+        $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.TEXT) &&
+      typeof workflow.searchAttributes?.indexedFields?.[label] === 'string',
+  );
 
   let filterOrCopyButtonsVisible = $state(false);
   const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
@@ -59,7 +66,7 @@
   ];
 </script>
 
-{#if filterableLabels.includes(label)}
+{#if filterableLabels.includes(label) || isCustomKeywordOrTextAttribute}
   <td
     class="workflows-summary-table-body-cell filterable"
     data-testid="workflows-summary-table-body-cell"
@@ -79,6 +86,7 @@
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
+          archival,
         })}
       />
     {:else if label === 'Workflow ID'}
@@ -90,6 +98,7 @@
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
+          archival,
         })}
       />
     {:else if label === 'Run ID'}
@@ -101,6 +110,7 @@
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
+          archival,
         })}
       />
     {:else if label === 'Deployment'}
@@ -110,10 +120,12 @@
         {filterOrCopyButtonsVisible}
         attribute="TemporalWorkerDeployment"
         value={deployment && typeof deployment === 'string' ? deployment : ''}
-        href={routeForWorkerDeployment({
-          namespace,
-          deployment,
-        })}
+        href={deployment
+          ? routeForWorkerDeployment({
+              namespace,
+              deployment,
+            })
+          : undefined}
       />
     {:else if label === 'Deployment Version'}
       {@const version =
@@ -145,6 +157,14 @@
         attribute="TemporalWorkflowVersioningBehavior"
         value={behavior && typeof behavior === 'string' ? behavior : ''}
       />
+    {:else if isCustomKeywordOrTextAttribute}
+      {@const content = workflow.searchAttributes?.indexedFields?.[label]}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute={label}
+        value={content}
+        type={$customSearchAttributes[label]}
+      />
     {/if}
   </td>
 {:else}
@@ -156,15 +176,12 @@
       <WorkflowStatus
         status={workflow.status}
         delayed={isWorkflowDelayed(workflow)}
+        taskFailure={isWorkflowTaskFailure(workflow)}
       />
     {:else if label === 'End'}
-      {formatDate(workflow.endTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
+      <Timestamp dateTime={workflow.endTime} />
     {:else if label === 'Start'}
-      {formatDate(workflow.startTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
+      <Timestamp dateTime={workflow.startTime} />
     {:else if label === 'Task Queue'}
       {workflow.taskQueue}
     {:else if label === 'Parent Namespace'}
@@ -176,9 +193,7 @@
         ? workflow.stateTransitionCount
         : ''}
     {:else if label === 'Execution Time'}
-      {formatDate(workflow.executionTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
+      <Timestamp dateTime={workflow.executionTime} />
     {:else if label === 'Execution Duration'}
       {formatDistance({
         start: workflow.startTime,
@@ -192,17 +207,15 @@
     {:else if label === 'Scheduled Start Time'}
       {@const content =
         workflow.searchAttributes?.indexedFields?.TemporalScheduledStartTime}
-      {content && typeof content === 'string'
-        ? formatDate(content, $timeFormat, { relative: $relativeTime })
-        : ''}
+      {#if content && typeof content === 'string'}
+        <Timestamp dateTime={content} />
+      {/if}
     {:else if label === 'Change Version'}
       {workflow.searchAttributes?.indexedFields?.TemporalChangeVersion}
     {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
-      {@const content = workflow.searchAttributes.indexedFields[label]}
+      {@const content = workflow.searchAttributes?.indexedFields?.[label]}
       {#if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.DATETIME && typeof content === 'string'}
-        {formatDate(content, $timeFormat, {
-          relative: $relativeTime,
-        })}
+        <Timestamp dateTime={content} />
       {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
         <Badge>{content}</Badge>
       {:else}

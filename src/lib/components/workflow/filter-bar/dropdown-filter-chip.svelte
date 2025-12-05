@@ -40,6 +40,7 @@
     formatListFilterValue,
     isBooleanFilter,
     isDateTimeFilter,
+    isDurationFilter,
     isListFilter,
     isNumberFilter,
     isStatusFilter,
@@ -175,7 +176,7 @@
       if (filter.customDate) return value.split('BETWEEN')[1];
       return formatDate(value, $timeFormat, {
         relative: true,
-        abbrFormat: true,
+        format: 'short',
       });
     }
 
@@ -449,10 +450,10 @@
             <Input
               id={`${controlsId}-number`}
               label="Value"
-              type="number"
-              placeholder="Enter number..."
+              placeholder={isDurationFilter(localFilter)
+                ? translate('workflows.duration-filter-placeholder')
+                : translate('common.number-input-placeholder')}
               disabled={isNullFilter}
-              step="any"
               bind:value={localFilter.value}
             />
           </div>
