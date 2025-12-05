@@ -28,7 +28,9 @@
         <WorkerInfo {worker} />
       {/each}
     {/if}
-  {:catch error}
-    <p class="text-red-600">Error loading workers: {error.message}</p>
+  {:catch _}
+    {#await getPollers({ queue: taskQueue, namespace }) then workers}
+      <WorkerTable {workers} />
+    {/await}
   {/await}
 </section>

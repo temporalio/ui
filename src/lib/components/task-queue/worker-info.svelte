@@ -25,12 +25,6 @@
   const { namespace } = $derived(page.params);
   const heartbeat = $derived(worker.workerHeartbeat);
   const status = $derived(fromScreamingEnum(heartbeat.status, 'WorkerStatus'));
-  const totalAvailableSlots = $derived(
-    (heartbeat.workflowTaskSlotsInfo?.currentAvailableSlots ?? 0) +
-      (heartbeat.activityTaskSlotsInfo?.currentAvailableSlots ?? 0) +
-      (heartbeat.nexusTaskSlotsInfo?.currentAvailableSlots ?? 0) +
-      (heartbeat.localActivitySlotsInfo?.currentAvailableSlots ?? 0),
-  );
 
   const totalProcessedTasks = $derived(
     (heartbeat.workflowTaskSlotsInfo?.totalProcessedTasks ?? 0) +
@@ -51,27 +45,13 @@
     heartbeat?.currentStickyCacheSize ?? 0,
   );
 
-  const capacityPercent = $derived(
-    totalAvailableSlots > 0
-      ? Math.round(
-          (totalAvailableSlots /
-            (totalAvailableSlots +
-              (heartbeat.workflowTaskSlotsInfo?.currentUsedSlots ?? 0) +
-              (heartbeat.activityTaskSlotsInfo?.currentUsedSlots ?? 0) +
-              (heartbeat.nexusTaskSlotsInfo?.currentUsedSlots ?? 0) +
-              (heartbeat.localActivitySlotsInfo?.currentUsedSlots ?? 0))) *
-            100,
-        )
-      : 0,
-  );
-
   const isRunning = $derived(status === 'Running');
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="grid grid-cols-4 gap-4">
+  <div class="grid grid-cols-2 gap-4">
     <Card>
-      <div class="text-xs uppercase tracking-wide text-secondary">
+      <div class="text-sm uppercase tracking-wide text-secondary">
         Active Workers
       </div>
       <div class="mt-1 text-3xl font-semibold">1</div>
@@ -88,32 +68,12 @@
     </Card>
 
     <Card>
-      <div class="text-xs uppercase tracking-wide text-secondary">
+      <div class="text-sm uppercase tracking-wide text-secondary">
         Total Processed Tasks
       </div>
       <div class="mt-1 text-3xl font-semibold">{totalProcessedTasks}</div>
       <div class="mt-1 text-sm text-secondary">
         {workflowProcessedTasks} workflow · {activityProcessedTasks} activity
-      </div>
-    </Card>
-
-    <Card>
-      <div class="text-xs uppercase tracking-wide text-secondary">
-        Available Slots
-      </div>
-      <div class="mt-1 text-3xl font-semibold">{totalAvailableSlots}</div>
-      <div class="mt-1 text-sm text-success">
-        {capacityPercent}% capacity free
-      </div>
-    </Card>
-
-    <Card>
-      <div class="text-xs uppercase tracking-wide text-secondary">
-        Sticky Cache Hit
-      </div>
-      <div class="mt-1 text-3xl font-semibold">{totalStickyCacheHit}</div>
-      <div class="mt-1 text-sm text-secondary">
-        {currentStickyCacheSize} cached workflows
       </div>
     </Card>
   </div>
@@ -281,6 +241,32 @@
   </Card>
 {/snippet}
 
+{#snippet timestamps()}
+  <Card>
+    <div class="flex flex-col gap-3">
+      <div class="text-sm">
+        <div class="uppercase tracking-wide text-secondary">Start Time</div>
+        <Timestamp
+          dateTime={heartbeat.startTime}
+          as="div"
+          class="font-mono text-xs"
+        />
+      </div>
+      <div class="text-sm">
+        <div class="uppercase tracking-wide text-secondary">Last Heartbeat</div>
+        <Timestamp
+          dateTime={heartbeat.heartbeatTime}
+          as="div"
+          class="font-mono text-xs"
+        />
+        <div class="text-xs text-orange-400">
+          ~{heartbeat.elapsedSinceLastHeartbeat} ago
+        </div>
+      </div>
+    </div>
+  </Card>
+{/snippet}
+
 {#snippet hostInfo()}
   <Card>
     <div class="mb-3 flex items-center gap-2">
@@ -339,7 +325,7 @@
   <Card>
     <div class="mb-3 flex items-center gap-2">
       <Icon name="usage" class="text-secondary" />
-      <h3 class="text-sm font-medium">Usage</h3>
+      <h3 class="text-sm font-medium">Host Usage</h3>
     </div>
     <div class="grid grid-cols-2 gap-4">
       <Card class="surface-secondary">
@@ -391,36 +377,6 @@
           </p>
         </div>
       </Card>
-    </div>
-  </Card>
-{/snippet}
-
-{#snippet timestamps()}
-  <Card>
-    <div class="mb-3 flex items-center gap-2">
-      <Icon name="clock" class="text-secondary" />
-      <h3 class="text-sm font-medium">Timestamps</h3>
-    </div>
-    <div class="flex flex-col gap-3">
-      <div class="text-sm">
-        <div class="text-xs uppercase text-secondary">Start Time</div>
-        <Timestamp
-          dateTime={heartbeat.startTime}
-          as="div"
-          class="font-mono text-xs"
-        />
-      </div>
-      <div class="text-sm">
-        <div class="text-xs uppercase text-secondary">Last Heartbeat</div>
-        <Timestamp
-          dateTime={heartbeat.heartbeatTime}
-          as="div"
-          class="font-mono text-xs"
-        />
-        <div class="text-xs text-orange-400">
-          ~{heartbeat.elapsedSinceLastHeartbeat} ago
-        </div>
-      </div>
     </div>
   </Card>
 {/snippet}
