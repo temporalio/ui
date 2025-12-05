@@ -1,4 +1,4 @@
-import type { Timestamp } from '@temporalio/common';
+import type { Duration, Timestamp } from '@temporalio/common';
 
 import type { WorkerDeploymentVersion } from '$lib/types/deployments';
 import type { NamespaceScopedRequest } from '$lib/types/global';
@@ -54,7 +54,7 @@ export type WorkerHeartbeat = {
   status: string;
   startTime: Timestamp;
   heartbeatTime: Timestamp;
-  elapsedSinceLastHeartbeat: Timestamp;
+  elapsedSinceLastHeartbeat: Duration;
   workflowTaskSlotsInfo: WorkerSlotsInfo;
   activityTaskSlotsInfo: WorkerSlotsInfo;
   nexusTaskSlotsInfo: WorkerSlotsInfo;
@@ -91,14 +91,14 @@ export type DescribeWorkerResponse = {
   }[];
 };
 
-export async function listWorkers(
+export async function listWorkersForTaskQueue(
   parameters: ListWorkersRequest,
   request = fetch,
 ): Promise<ListWorkersResponse> {
   const route = routeForApi('workers', parameters);
   const response = await requestFromAPI<ListWorkersResponse>(route, {
     request,
-    params: { taskQueue: parameters.queue },
+    params: { query: `TaskQueue="${parameters.queue}"` },
   });
   return response;
 }

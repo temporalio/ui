@@ -1,28 +1,31 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
+  import WorkerInfo from '$lib/components/task-queue/worker-info.svelte';
   import WorkerTable from '$lib/components/worker-table.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import type { TaskQueueResponse } from '$lib/types';
-  import { routeForTaskQueue } from '$lib/utilities/route-for';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import { getPollers } from '$lib/services/pollers-service';
+  import { listWorkersForTaskQueue } from '$lib/services/worker-service';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
-  export let taskQueue: string;
-  export let workers: TaskQueueResponse;
-
-  $: ({ namespace } = $page.params);
+  const { namespace } = $derived(page.params);
+  const taskQueue = $derived($workflowRun.workflow.taskQueue);
 </script>
 
 <section class="flex flex-col gap-4">
-  <WorkerTable {workers}>
-    <p data-testid="task-queue-name">
-      {translate('common.task-queue')}:
-      <Link
-        href={routeForTaskQueue({
-          namespace,
-          queue: taskQueue,
-        })}>{taskQueue}</Link
-      >
-    </p>
-  </WorkerTable>
+  {#await listWorkersForTaskQueue({ queue: taskQueue, namespace })}
+    <Skeleton />
+  {:then response}
+    {#if !response?.workersInfo}
+      {#await getPollers({ queue: taskQueue, namespace }) then workers}
+        <WorkerTable {workers} />
+      {/await}
+    {:else}
+      {#each response.workersInfo as worker}
+        <WorkerInfo {worker} />
+      {/each}
+    {/if}
+  {:catch error}
+    <p class="text-red-600">Error loading workers: {error.message}</p>
+  {/await}
 </section>
