@@ -13,6 +13,7 @@
   import { toaster } from '$lib/stores/toaster';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
   export let open: boolean;
@@ -34,6 +35,8 @@
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
   let messageType = '';
 
+  const identity = getIdentity();
+
   const hideSignalModal = () => {
     open = false;
     name = '';
@@ -54,6 +57,7 @@
         encoding: $encoding,
         messageType,
         name,
+        identity,
       });
       $refresh = Date.now();
       toaster.push({

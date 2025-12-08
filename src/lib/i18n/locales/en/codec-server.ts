@@ -1,6 +1,8 @@
 export const Namespace = 'codec-server';
 
 export const Strings = {
+  title: 'Codec Server',
+  description: 'Decode your data remotely through endpoints.',
   'info-message':
     'Users can use this Namespace-level codec server endpoint or override it in their browser with another endpoint.',
   'endpoint-description-prefix': 'Enter a ',
