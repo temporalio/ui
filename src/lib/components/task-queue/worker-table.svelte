@@ -14,8 +14,9 @@
 
   const columns = $derived([
     { label: translate('workers.status') },
-    { label: translate('workers.identity') },
     { label: translate('workers.instance') },
+    { label: translate('workers.identity') },
+    { label: translate('workers.host-name') },
     { label: translate('workers.workflow-task-slots') },
     { label: translate('workers.activity-task-slots') },
     { label: translate('workers.nexus-task-slots') },

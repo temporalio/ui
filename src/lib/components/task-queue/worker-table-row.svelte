@@ -13,9 +13,10 @@
     worker: WorkerInfo;
     namespace: string;
     columns: { label: string }[];
+    filterable?: boolean;
   };
 
-  let { columns, worker, namespace }: Props = $props();
+  let { columns, worker, namespace, filterable = false }: Props = $props();
   const status = $derived(
     toWorkerStatusReadable(worker.workerHeartbeat.status),
   );
@@ -25,11 +26,22 @@
 <tr>
   {#each columns as { label } (label)}
     {#if label === translate('workers.identity')}
-      <td>{worker.workerHeartbeat.workerIdentity}</td>
+      <WorkerTableCell
+        attribute="WorkerIdentity"
+        value={worker.workerHeartbeat.workerIdentity}
+        {filterable}
+      />
     {:else if label === translate('workers.task-queue')}
       <WorkerTableCell
         attribute="TaskQueue"
         value={worker.workerHeartbeat.taskQueue}
+        {filterable}
+      />
+    {:else if label === translate('workers.host-name')}
+      <WorkerTableCell
+        attribute="HostName"
+        value={worker.workerHeartbeat.hostInfo.hostName}
+        {filterable}
       />
     {:else if label === translate('workers.instance')}
       <WorkerTableCell
@@ -39,9 +51,10 @@
           namespace,
           workerInstanceKey: worker.workerHeartbeat.workerInstanceKey,
         })}
+        {filterable}
       />
     {:else if label === translate('workers.status')}
-      <WorkerTableCell attribute="Status" value={status}>
+      <td>
         <Badge
           type={isRunning ? 'success' : 'danger'}
           class="flex items-center gap-1"
@@ -52,11 +65,12 @@
           {/if}
           {status}
         </Badge>
-      </WorkerTableCell>
+      </td>
     {:else if label === translate('workers.sdk')}
       <WorkerTableCell
         attribute="SdkName"
         value={worker.workerHeartbeat.sdkName}
+        {filterable}
       >
         <SdkLogo
           sdk={worker.workerHeartbeat.sdkName.split('-')[1]}

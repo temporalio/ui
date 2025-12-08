@@ -13,9 +13,10 @@
 
   const columns = $derived([
     { label: translate('workers.status') },
+    { label: translate('workers.instance') },
     { label: translate('workers.task-queue') },
     { label: translate('workers.identity') },
-    { label: translate('workers.instance') },
+    { label: translate('workers.host-name') },
     { label: translate('workers.workflow-task-slots') },
     { label: translate('workers.activity-task-slots') },
     { label: translate('workers.nexus-task-slots') },
@@ -25,30 +26,32 @@
   const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));
 </script>
 
-<PaginatedTable
-  let:visibleItems
-  {onFetch}
-  aria-label={translate('workers.workers')}
-  pageSizeSelectLabel={translate('common.per-page')}
-  nextButtonLabel={translate('common.next')}
-  previousButtonLabel={translate('common.previous')}
-  emptyStateMessage={translate('workers.empty-state-title')}
-  errorMessage={translate('workers.error-message-fetching')}
->
-  <caption class="sr-only" slot="caption"
-    >{translate('workers.workers')}</caption
+{#key query}
+  <PaginatedTable
+    let:visibleItems
+    {onFetch}
+    aria-label={translate('workers.workers')}
+    pageSizeSelectLabel={translate('common.per-page')}
+    nextButtonLabel={translate('common.next')}
+    previousButtonLabel={translate('common.previous')}
+    emptyStateMessage={translate('workers.empty-state-title')}
+    errorMessage={translate('workers.error-message-fetching')}
   >
+    <caption class="sr-only" slot="caption"
+      >{translate('workers.workers')}</caption
+    >
 
-  <tr slot="headers" class="text-left">
-    {#each columns as { label }}
-      <th>{label}</th>
+    <tr slot="headers" class="text-left">
+      {#each columns as { label }}
+        <th>{label}</th>
+      {/each}
+    </tr>
+    {#each visibleItems as worker}
+      <WorkerTableRow {worker} {columns} {namespace} filterable />
     {/each}
-  </tr>
-  {#each visibleItems as worker}
-    <WorkerTableRow {worker} {columns} {namespace} />
-  {/each}
 
-  <svelte:fragment slot="empty">
-    <EmptyState title={translate('workers.empty-state-title')}></EmptyState>
-  </svelte:fragment>
-</PaginatedTable>
+    <svelte:fragment slot="empty">
+      <EmptyState title={translate('workers.empty-state-title')}></EmptyState>
+    </svelte:fragment>
+  </PaginatedTable>
+{/key}

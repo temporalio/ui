@@ -11,11 +11,17 @@
   type Props = {
     attribute?: string;
     value: string;
+    filterable?: boolean;
     href?: string;
     children?: Snippet;
   };
-  let { attribute, value, href, children }: Props = $props();
-
+  let {
+    attribute,
+    value,
+    filterable = false,
+    href,
+    children,
+  }: Props = $props();
   const query = $derived(page.url.searchParams.get('query') || '');
 
   const onRowFilterClick = () => {
@@ -82,6 +88,7 @@
     show={filterOrCopyButtonsVisible}
     content={value}
     onFilter={onRowFilterClick}
+    {filterable}
     filtered={query.includes(`${attribute}=`)}
   />
 </td>
