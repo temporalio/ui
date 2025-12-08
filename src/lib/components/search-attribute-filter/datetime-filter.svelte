@@ -1,7 +1,7 @@
 <script lang="ts">
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -17,9 +17,17 @@
   import { translate } from '$lib/i18n/translate';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import {
+    endDate,
+    endHour,
+    endMinute,
+    endSecond,
     getTimezone,
     relativeTimeDuration,
     relativeTimeUnit,
+    startDate,
+    startHour,
+    startMinute,
+    startSecond,
     TIME_UNIT_OPTIONS,
     timeFormat,
     timeFormatType,
@@ -32,6 +40,7 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
+  // Local state for date/time values - initialized from global stores on mount
   let localStartDate = startOfDay(new Date());
   let localStartHour = '';
   let localStartMinute = '';
@@ -41,6 +50,19 @@
   let localEndHour = '';
   let localEndMinute = '';
   let localEndSecond = '';
+
+  // Initialize local state from global stores to get "last used" defaults
+  onMount(() => {
+    startDate.subscribe((value) => (localStartDate = value))();
+    startHour.subscribe((value) => (localStartHour = value))();
+    startMinute.subscribe((value) => (localStartMinute = value))();
+    startSecond.subscribe((value) => (localStartSecond = value))();
+
+    endDate.subscribe((value) => (localEndDate = value))();
+    endHour.subscribe((value) => (localEndHour = value))();
+    endMinute.subscribe((value) => (localEndMinute = value))();
+    endSecond.subscribe((value) => (localEndSecond = value))();
+  });
 
   $: isTimeRange = $filter.conditional === 'BETWEEN';
   $: selectedTime = getSelectedTimezone($timeFormat);
@@ -117,6 +139,17 @@
       } else {
         $filter.customDate = false;
       }
+
+      // Update global stores so next filter gets these as defaults
+      startDate.set(localStartDate);
+      startHour.set(localStartHour);
+      startMinute.set(localStartMinute);
+      startSecond.set(localStartSecond);
+
+      endDate.set(localEndDate);
+      endHour.set(localEndHour);
+      endMinute.set(localEndMinute);
+      endSecond.set(localEndSecond);
     }
 
     handleSubmit();
