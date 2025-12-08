@@ -202,7 +202,13 @@ export const routeForEventHistoryEvent = ({
   return `${routeForWorkflow(parameters)}/history/events/${eventId || requestId}`;
 };
 
-export const routeForWorkers = (parameters: WorkflowParameters): string => {
+export const routeForWorkers = (parameters: NamespaceParameter): string => {
+  return `${routeForNamespace({ namespace: parameters.namespace })}/workers`;
+};
+
+export const routeForWorkflowWorkers = (
+  parameters: WorkflowParameters,
+): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
 
@@ -212,6 +218,20 @@ export const routeForWorkerDeployments = ({
   namespace: string;
 }) => {
   return resolve('/namespaces/[namespace]/worker-deployments', { namespace });
+};
+
+export const routeForWorkerInstance = ({
+  namespace,
+  workerInstanceKey,
+}: {
+  namespace: string;
+  workerInstanceKey: string;
+}) => {
+  const workerInstanceKeyEncoded = encodeURIForSvelte(workerInstanceKey);
+  return resolve('/namespaces/[namespace]/workers/[workerInstanceKey]', {
+    namespace,
+    workerInstanceKey: workerInstanceKeyEncoded,
+  });
 };
 
 export const routeForWorkerDeployment = ({

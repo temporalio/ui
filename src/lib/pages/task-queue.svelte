@@ -1,13 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import WorkerInfo from '$lib/components/task-queue/worker-info.svelte';
-  import WorkerTable from '$lib/components/worker-table.svelte';
-  import Skeleton from '$lib/holocene/skeleton/index.svelte';
-  import { getPollers } from '$lib/services/pollers-service';
-  import { listWorkersForTaskQueue } from '$lib/services/worker-service';
+  import TaskQueueWorkerInsights from '$lib/components/task-queue/worker-insights.svelte';
 
-  const { queue: taskQueue, namespace } = $derived(page.params);
+  const { queue: taskQueue } = $derived(page.params);
 </script>
 
 <section class="flex flex-col gap-4">
@@ -15,22 +11,5 @@
   <h2 data-testid="task-queue-name">
     {taskQueue}
   </h2>
-
-  {#await listWorkersForTaskQueue({ queue: taskQueue, namespace })}
-    <Skeleton />
-  {:then response}
-    {#if !response?.workersInfo}
-      {#await getPollers({ queue: taskQueue, namespace }) then workers}
-        <WorkerTable {workers} />
-      {/await}
-    {:else}
-      {#each response.workersInfo as worker}
-        <WorkerInfo {worker} />
-      {/each}
-    {/if}
-  {:catch _}
-    {#await getPollers({ queue: taskQueue, namespace }) then workers}
-      <WorkerTable {workers} />
-    {/await}
-  {/await}
+  <TaskQueueWorkerInsights />
 </section>

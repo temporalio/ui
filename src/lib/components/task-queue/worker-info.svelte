@@ -12,7 +12,7 @@
     type WorkerSlotsInfo,
   } from '$lib/services/worker-service';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
-  import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
+  import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
   import SdkLogo from '../lines-and-dots/sdk-logo.svelte';
 
@@ -24,60 +24,16 @@
 
   const { namespace } = $derived(page.params);
   const heartbeat = $derived(worker.workerHeartbeat);
-  const status = $derived(fromScreamingEnum(heartbeat.status, 'WorkerStatus'));
-
-  const totalProcessedTasks = $derived(
-    (heartbeat.workflowTaskSlotsInfo?.totalProcessedTasks ?? 0) +
-      (heartbeat.activityTaskSlotsInfo?.totalProcessedTasks ?? 0) +
-      (heartbeat.nexusTaskSlotsInfo?.totalProcessedTasks ?? 0) +
-      (heartbeat.localActivitySlotsInfo?.totalProcessedTasks ?? 0),
-  );
-
-  const workflowProcessedTasks = $derived(
-    heartbeat.workflowTaskSlotsInfo?.totalProcessedTasks ?? 0,
-  );
-  const activityProcessedTasks = $derived(
-    heartbeat.activityTaskSlotsInfo?.totalProcessedTasks ?? 0,
-  );
+  const status = $derived(toWorkerStatusReadable(heartbeat.status));
 
   const totalStickyCacheHit = $derived(heartbeat?.totalStickyCacheHit ?? 0);
   const currentStickyCacheSize = $derived(
     heartbeat?.currentStickyCacheSize ?? 0,
   );
-
   const isRunning = $derived(status === 'Running');
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="grid grid-cols-2 gap-4">
-    <Card>
-      <div class="text-sm uppercase tracking-wide text-secondary">
-        Active Workers
-      </div>
-      <div class="mt-1 text-3xl font-semibold">1</div>
-      <div class="mt-1 flex items-center gap-1.5">
-        <span
-          class="inline-block h-2 w-2 rounded-full {isRunning
-            ? 'bg-green-500'
-            : 'bg-gray-400'}"
-        ></span>
-        <span class="text-sm {isRunning ? 'text-success' : 'text-secondary'}">
-          {status}
-        </span>
-      </div>
-    </Card>
-
-    <Card>
-      <div class="text-sm uppercase tracking-wide text-secondary">
-        Total Processed Tasks
-      </div>
-      <div class="mt-1 text-3xl font-semibold">{totalProcessedTasks}</div>
-      <div class="mt-1 text-sm text-secondary">
-        {workflowProcessedTasks} workflow · {activityProcessedTasks} activity
-      </div>
-    </Card>
-  </div>
-
   <div class="flex flex-col gap-4 lg:flex-row">
     <div class="flex flex-1 flex-col gap-4">
       <Card class="flex flex-col gap-4">

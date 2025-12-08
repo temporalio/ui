@@ -52,11 +52,11 @@
 
 <style lang="postcss">
   .copy-or-filter {
-    @apply absolute bottom-0 right-0 top-0 inline-flex gap-2 px-2;
+    @apply absolute bottom-0 right-0 top-0 inline-flex gap-1 px-1;
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:surface-inverse;
+    @apply surface-primary relative top-[40%] h-7 w-7 translate-y-[-40%] rounded-full p-0.5 text-primary hover:surface-inverse;
   }
 
   .filtered {

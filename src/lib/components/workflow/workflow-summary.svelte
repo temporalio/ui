@@ -15,7 +15,7 @@
   } from '$lib/stores/workflow-run';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { routeForWorkers } from '$lib/utilities/route-for';
+  import { routeForWorkflowWorkers } from '$lib/utilities/route-for';
 
   $: ({ workflow } = $workflowRun);
   $: elapsedTime = formatDistanceAbbreviated({
@@ -73,7 +73,7 @@
         <div class="h-0.5 rounded-full bg-inverse"></div>
         <WorkflowDetail
           content={workflow?.taskQueue}
-          href={routeForWorkers({
+          href={routeForWorkflowWorkers({
             namespace: $page.params.namespace,
             workflow: workflow?.id,
             run: workflow?.runId,

@@ -1,7 +1,9 @@
 export const Namespace = 'workers' as const;
 
 export const Strings = {
+  worker: 'Worker',
   workers: 'Workers',
+  'back-to-workers': 'Back to Workers',
   version: 'Version',
   versioning: 'Versioning',
   retirability: 'Retirability',
@@ -10,6 +12,16 @@ export const Strings = {
   'redirect-rules': 'Redirect Rules',
   default: 'Default',
   overall: 'Overall',
+  identity: 'Identity',
+  instance: 'Instance',
+  'task-queue': 'Task Queue',
+  status: 'Status',
+  sdk: 'SDK',
+  'workflow-task-slots': 'Workflow Task Slots',
+  'activity-task-slots': 'Activity Task Slots',
+  'nexus-task-slots': 'Nexus Task Slots',
+  'empty-state-title': 'No Workers Found',
+  'error-message-fetching': 'An error occurred while fetching workers.',
   'compatible-build-ids': 'Compatible Build IDs',
   'version-sets': 'Version Sets',
   'no-version-sets-found': 'No Version Sets found',
