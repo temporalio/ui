@@ -3,6 +3,7 @@
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
+  import { onMount } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -19,9 +20,17 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import {
+    endDate,
+    endHour,
+    endMinute,
+    endSecond,
     getTimezone,
     relativeTimeDuration,
     relativeTimeUnit,
+    startDate,
+    startHour,
+    startMinute,
+    startSecond,
     TIME_UNIT_OPTIONS,
     timeFormat,
     timeFormatType,
@@ -59,7 +68,7 @@
   const open = writable(false);
   let localFilter = $state({ ...filter });
 
-  // Local state for date/time values (not global stores)
+  // Local state for date/time values - initialized from global stores on mount
   let localStartDate = startOfDay(new Date());
   let localStartHour = '';
   let localStartMinute = '';
@@ -69,6 +78,19 @@
   let localEndHour = '';
   let localEndMinute = '';
   let localEndSecond = '';
+
+  // Initialize local state from global stores to get "last used" defaults
+  onMount(() => {
+    startDate.subscribe((value) => (localStartDate = value))();
+    startHour.subscribe((value) => (localStartHour = value))();
+    startMinute.subscribe((value) => (localStartMinute = value))();
+    startSecond.subscribe((value) => (localStartSecond = value))();
+
+    endDate.subscribe((value) => (localEndDate = value))();
+    endHour.subscribe((value) => (localEndHour = value))();
+    endMinute.subscribe((value) => (localEndMinute = value))();
+    endSecond.subscribe((value) => (localEndSecond = value))();
+  });
 
   const controlsId = $derived(
     `dropdown-filter-chip-${filter.attribute}-${index}`,
@@ -276,6 +298,17 @@
       } else {
         localFilter.customDate = false;
       }
+
+      // Update global stores so next filter gets these as defaults
+      startDate.set(localStartDate);
+      startHour.set(localStartHour);
+      startMinute.set(localStartMinute);
+      startSecond.set(localStartSecond);
+
+      endDate.set(localEndDate);
+      endHour.set(localEndHour);
+      endMinute.set(localEndMinute);
+      endSecond.set(localEndSecond);
     }
   };
 
