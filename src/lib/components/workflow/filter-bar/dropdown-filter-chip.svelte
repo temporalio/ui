@@ -81,15 +81,15 @@
 
   // Initialize local state from global stores to get "last used" defaults
   onMount(() => {
-    localStartDate = get(startDate);
-    localStartHour = get(startHour);
-    localStartMinute = get(startMinute);
-    localStartSecond = get(startSecond);
+    localStartDate = get(startDate) ?? startOfDay(new Date());
+    localStartHour = get(startHour) ?? '';
+    localStartMinute = get(startMinute) ?? '';
+    localStartSecond = get(startSecond) ?? '';
 
-    localEndDate = get(endDate);
-    localEndHour = get(endHour);
-    localEndMinute = get(endMinute);
-    localEndSecond = get(endSecond);
+    localEndDate = get(endDate) ?? startOfDay(new Date());
+    localEndHour = get(endHour) ?? '';
+    localEndMinute = get(endMinute) ?? '';
+    localEndSecond = get(endSecond) ?? '';
   });
 
   const controlsId = $derived(
