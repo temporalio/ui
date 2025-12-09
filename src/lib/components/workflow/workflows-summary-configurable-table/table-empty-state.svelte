@@ -33,10 +33,6 @@
   ];
 </script>
 
-<svelte:head>
-  <link rel="preload" as="image" href={noResultsImages} />
-</svelte:head>
-
 {#if query}
   <div
     class="flex h-full w-full flex-col items-center justify-center p-4"
