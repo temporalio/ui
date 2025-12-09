@@ -16,27 +16,23 @@
 
   $: ({ workflow, namespace } = $page.params);
 
-  $: executionLink = routeForEventHistory({
-    namespace,
-    workflow,
-    run: value,
-  });
-  $: taskQueueLink = routeForTaskQueue({ namespace, queue: value });
-  $: childWorkflowLink = routeForEventHistory({
-    namespace,
-    workflow: attributes.workflowExecutionWorkflowId,
-    run: attributes.workflowExecutionRunId,
-  });
-  $: nexusEndpointLink = routeForNexusEndpoint(value);
+  function getHref(ns, wf, attrs, val, linkType) {
+    if (linkType === 'execution') {
+      return routeForEventHistory({ namespace: ns, workflow: wf, run: val });
+    } else if (linkType === 'task-queue') {
+      routeForTaskQueue({ namespace: ns, queue: val });
+    } else if (linkType === 'child-workflow') {
+      routeForEventHistory({
+        namespace: ns,
+        workflow: attributes.workflowExecutionWorkflowId,
+        run: attributes.workflowExecutionRunId,
+      });
+    } else if (linkType === 'nexus-endpoint') {
+      routeForNexusEndpoint(val);
+    }
+  }
 
-  $: hrefs = {
-    execution: executionLink,
-    'task-queue': taskQueueLink,
-    'child-workflow': childWorkflowLink,
-    'nexus-endpoint': nexusEndpointLink,
-  } as Record<Exclude<EventLinkType, 'none'>, string>;
-
-  $: href = hrefs[type];
+  $: href = getHref(namespace, workflow, attributes, value, type);
 </script>
 
 <Link class={$$restProps.class} {href}>
