@@ -7,10 +7,8 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
-  import { useDarkMode } from '$lib/utilities/dark-mode';
   import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
-  import emptyImageDark from '$lib/vendor/empty-state-dark_2x.png';
-  import emptyImageLight from '$lib/vendor/empty-state-light_2x.png';
+  import noResultsImages from '$lib/vendor/empty-state.svg';
 
   import NoWorkflowTaskFailures from './empty-states/no-workflow-task-failures.svelte';
   import NoWorkflows from './empty-states/no-workflows.svelte';
@@ -23,9 +21,6 @@
 
   let query = $derived(page.url.searchParams.get('query'));
 
-  let noResultsImages = $derived(
-    $useDarkMode ? emptyImageDark : emptyImageLight,
-  );
   let hasTaskFailuresQuery = $derived(query === TASK_FAILURES_QUERY);
 
   const samples = [
@@ -39,8 +34,7 @@
 </script>
 
 <svelte:head>
-  <link rel="preload" as="image" href={emptyImageDark} />
-  <link rel="preload" as="image" href={emptyImageLight} />
+  <link rel="preload" as="image" href={noResultsImages} />
 </svelte:head>
 
 {#if query}
@@ -80,7 +74,7 @@
   </div>
 {:else}
   <div
-    class="w-full overflow-hidden xl:flex xl:h-full xl:flex-row"
+    class="h-full w-full overflow-hidden xl:flex xl:flex-row"
     aria-live="polite"
   >
     <div
@@ -119,15 +113,11 @@
         </ul>
       {/if}
     </div>
-    <div
-      class="bg-[#DDD6FE] bg-contain bg-no-repeat xl:flex xl:h-full xl:max-w-[1050px] xl:flex-1 xl:items-stretch xl:justify-center"
-      style="background-image: url({noResultsImages});"
-    >
-      <img
-        src={noResultsImages}
-        alt=""
-        class="max-h-full max-w-full object-contain xl:hidden"
-      />
+    <div class="flex h-full flex-col xl:max-w-[1050px] xl:flex-1">
+      <div class="bg-off-white dark:bg-[#0f1725]">
+        <img src={noResultsImages} alt="" class="w-full" />
+      </div>
+      <div class="flex-1 bg-[#818cf8]"></div>
     </div>
   </div>
 {/if}
