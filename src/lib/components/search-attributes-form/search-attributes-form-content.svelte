@@ -23,7 +23,6 @@
     onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
     onCancel?: () => void;
     hideTainted?: boolean;
-    hideDeleteButton?: boolean;
     hideCancelButton?: boolean;
     disableTypeForExisting?: boolean;
     getSupportedTypes: () => SearchAttributeTypeOption[];
@@ -36,7 +35,6 @@
     onSuccess = () => {},
     onCancel,
     hideTainted = false,
-    hideDeleteButton = false,
     hideCancelButton = false,
     disableTypeForExisting = false,
     getSupportedTypes,
@@ -55,6 +53,7 @@
               .string()
               .min(1, translate('search-attributes.validation-name-required')),
             type: z.enum(typeValues as [string, ...string[]]),
+            isDeletable: z.boolean().optional().default(true),
           }),
         )
         .refine(
@@ -109,7 +108,7 @@
   const addAttribute = () => {
     $formData.attributes = [
       ...$formData.attributes,
-      { name: '', type: defaultType },
+      { name: '', type: defaultType, isDeletable: true },
     ];
   };
 
@@ -129,61 +128,64 @@
   );
 
   const disabled = $derived($submitting || taintedCount === 0);
-
-  // Track initial attribute names to identify existing attributes
-  const initialAttributeNames = $derived(
-    new Set(initialAttributes.map((attr) => attr.name)),
-  );
 </script>
 
-<Card class={className}>
+<Card class="p-5 {className}">
   <form use:enhance>
-    <div class="p-4">
-      <div class="space-y-4">
-        <Message value={$message} />
+    <div class="space-y-4">
+      <Message value={$message} />
 
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-medium">Search Attributes</h3>
-        </div>
-
-        <div class="space-y-3 border-b border-b-subtle pb-3">
-          <div
-            class="grid gap-3 border-b border-b-subtle pb-2 text-sm font-medium"
-            class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
-            class:grid-cols-[1fr,200px]={hideDeleteButton}
-          >
-            <div>{translate('search-attributes.column-attribute')}</div>
-            <div>{translate('search-attributes.column-type')}</div>
-            {#if !hideDeleteButton}
-              <div class="w-8"></div>
-            {/if}
-          </div>
-
-          {#each $formData.attributes as attribute, index}
-            <SearchAttributeRow
-              name={attribute.name}
-              type={attribute.type}
-              {index}
-              {supportedTypes}
-              submitting={$submitting}
-              error={$errors?.attributes?.[index]?.['name']?.[0]}
-              {hideDeleteButton}
-              {disableTypeForExisting}
-              {initialAttributeNames}
-              onRemove={() => removeAttribute(index)}
-              onNameChange={(value) => {
-                $formData.attributes[index].name = value;
-              }}
-              onTypeChange={(value) => {
-                $formData.attributes[index].type = value;
-              }}
-            />
-          {/each}
-        </div>
+      <div>
+        <h2 class="text-lg font-semibold">
+          {translate('search-attributes.title')}
+        </h2>
+        <p class="text-sm text-secondary">
+          {translate('search-attributes.description')}
+        </p>
       </div>
-    </div>
 
-    <div class="p-4 pt-0">
+      <div class="space-y-3 pb-3">
+        <div
+          class="grid grid-cols-[1fr,200px,auto] gap-3 text-sm font-medium"
+          class:hidden={$formData.attributes.length === 0}
+        >
+          <div>{translate('search-attributes.column-attribute')}</div>
+          <div>{translate('search-attributes.column-type')}</div>
+          <div class="w-8"></div>
+        </div>
+
+        {#each $formData.attributes as _, index}
+          <SearchAttributeRow
+            name={$formData.attributes[index].name}
+            type={$formData.attributes[index].type}
+            {index}
+            {supportedTypes}
+            submitting={$submitting}
+            error={$errors?.attributes?.[index]?.['name']?.[0]}
+            {disableTypeForExisting}
+            isDeletable={$formData.attributes[index].isDeletable ?? true}
+            onRemove={() => removeAttribute(index)}
+            onNameChange={(value) => {
+              $formData.attributes[index].name = value;
+            }}
+            onTypeChange={(value) => {
+              $formData.attributes[index].type = value;
+            }}
+          />
+        {/each}
+      </div>
+
+      <Button
+        variant="secondary"
+        size="sm"
+        on:click={addAttribute}
+        disabled={$submitting}
+        type="button"
+        leadingIcon="add"
+      >
+        {translate('search-attributes.add-attribute-button')}
+      </Button>
+
       <div class="flex gap-3">
         <Button size="sm" type="submit" {disabled} loading={$submitting}>
           <TaintedBadge show={!hideTainted} count={taintedCount} />
@@ -201,17 +203,6 @@
             {translate('common.cancel')}
           </Button>
         {/if}
-
-        <Button
-          variant="ghost"
-          size="sm"
-          on:click={addAttribute}
-          disabled={$submitting}
-          type="button"
-          leadingIcon="add"
-        >
-          {translate('search-attributes.add-attribute-button')}
-        </Button>
       </div>
     </div>
   </form>
