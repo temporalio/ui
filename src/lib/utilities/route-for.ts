@@ -69,11 +69,13 @@ export const routeForNexus = (): string => {
 };
 
 export const routeForNexusEndpoint = (id: string): string => {
-  return resolve('/nexus/[id]', { id });
+  const nexusId = encodeURIForSvelte(id);
+  return resolve('/nexus/[id]', { id: nexusId });
 };
 
 export const routeForNexusEndpointEdit = (id: string): string => {
-  return resolve('/nexus/[id]/edit', { id });
+  const nexusId = encodeURIForSvelte(id);
+  return resolve('/nexus/[id]/edit', { id: nexusId });
 };
 
 export const routeForNexusEndpointCreate = (): string => {
