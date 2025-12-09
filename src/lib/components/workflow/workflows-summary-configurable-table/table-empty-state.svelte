@@ -109,7 +109,7 @@
         </ul>
       {/if}
     </div>
-    <div class="flex h-full flex-col xl:max-w-[1050px] xl:flex-1">
+    <div class="flex h-full flex-col">
       <div class="bg-off-white dark:bg-[#0f1725]">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
