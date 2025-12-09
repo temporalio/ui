@@ -68,13 +68,13 @@
     {#each sortOptions as { option, label }}
       <MenuItem
         selected={$eventFilterSort === option}
-        on:click={() => onSortOptionClick(option)}>{label}</MenuItem
+        onclick={() => onSortOptionClick(option)}>{label}</MenuItem
       >
     {/each}
     <MenuDivider />
     <MenuItem
       selected={$eventShowElapsed === 'true'}
-      on:click={onShowElapsedClick}
+      onclick={onShowElapsedClick}
       >{translate('events.show-elapsed-time')}</MenuItem
     >
   </Menu>

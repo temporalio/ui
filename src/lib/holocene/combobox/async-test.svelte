@@ -14,9 +14,9 @@
 
   export let id = '';
 
-  function input(stuff: CustomEvent) {
+  function input(v: string) {
     loading = true;
-    value = stuff.detail;
+    value = v;
     console.log(value);
     options = syncOptions;
 
@@ -50,8 +50,8 @@
 <Combobox
   bind:value
   {options}
-  on:input={input}
-  on:change={(newVal) => {
+  oninput={input}
+  onchange={(newVal) => {
     console.log('change', newVal);
   }}
   {loading}

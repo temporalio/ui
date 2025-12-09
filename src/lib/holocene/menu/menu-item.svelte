@@ -1,67 +1,75 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const MENU_ITEM_SELECTORS =
     'input, li[role="option"]:not([aria-disabled="true"]), li[role="menuitem"]:not([aria-disabled="true"])';
 </script>
 
 <script lang="ts">
-  import type { HTMLAnchorAttributes, HTMLLiAttributes } from 'svelte/elements';
+  import type {
+    HTMLAnchorAttributes,
+    HTMLLiAttributes,
+    KeyboardEventHandler,
+  } from 'svelte/elements';
 
-  import { createEventDispatcher, getContext } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
+  import { getContext, type Snippet } from 'svelte';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
-  type ExtendedLIEvent = KeyboardEvent & {
-    currentTarget: EventTarget & HTMLLIElement;
-  };
-
-  type ExtendedAnchorEvent = KeyboardEvent & {
-    currentTarget: EventTarget & HTMLAnchorElement;
-  };
-
-  type BaseProps = {
+  export interface BaseProps {
     selected?: boolean;
     destructive?: boolean;
     disabled?: boolean;
     description?: string;
     centered?: boolean;
-    class?: string;
-    'data-testid'?: string;
+    class?: ClassNameValue;
     hoverable?: boolean;
-  };
+    onclick?: () => void;
+    children?: Snippet;
+    leading?: Snippet;
+    trailing?: Snippet;
+  }
 
-  type MenuItemWithoutHrefProps = BaseProps &
-    HTMLLiAttributes & {
-      href?: never;
-      newTab?: never;
-    };
+  export interface MenuItemWithoutHrefProps
+    extends BaseProps,
+      Omit<HTMLLiAttributes, 'class' | 'onclick'> {
+    href?: never;
+    newTab?: never;
+  }
 
-  type MenuItemWithHrefProps = BaseProps &
-    HTMLAnchorAttributes & {
-      href: string;
-      newTab?: boolean;
-    };
+  interface MenuItemWithHrefProps
+    extends BaseProps,
+      Omit<HTMLAnchorAttributes, 'class' | 'onclick'> {
+    href: string;
+    newTab?: boolean;
+  }
 
-  type $$Props = MenuItemWithoutHrefProps | MenuItemWithHrefProps;
+  type Props = MenuItemWithoutHrefProps | MenuItemWithHrefProps;
 
-  let className = '';
-  export { className as class };
-  export let selected = undefined;
-  export let destructive = false;
-  export let disabled = false;
-  export let href = null;
-  export let description: string = null;
-  export let centered = false;
-  export let hoverable = true;
-  export let newTab = false;
+  const {
+    class: className,
+    selected,
+    destructive = false,
+    disabled = false,
+    href = null,
+    description = null,
+    centered = false,
+    hoverable = true,
+    newTab = false,
+    onclick,
+    children,
+    leading,
+    trailing,
+    ...rest
+  }: Props = $props();
 
   const { keepOpen, open } = getContext<MenuContext>(MENU_CONTEXT);
 
-  const dispatch = createEventDispatcher<{ click: undefined }>();
-
-  const handleKeydown = (event: ExtendedLIEvent | ExtendedAnchorEvent) => {
+  const handleKeydown: KeyboardEventHandler<
+    HTMLLIElement | HTMLAnchorElement
+  > = (event) => {
+    event.stopPropagation();
     switch (event.key) {
       case 'Escape':
         $open = false;
@@ -76,7 +84,7 @@
         break;
       case ' ':
       case 'Enter':
-        dispatch('click');
+        onclick?.();
         if (!$keepOpen) $open = false;
         break;
       default:
@@ -114,7 +122,7 @@
 
   const handleClick = () => {
     if (!$keepOpen) $open = false;
-    dispatch('click');
+    onclick?.();
   };
 </script>
 
@@ -139,14 +147,14 @@
     data-track-name="menuitem"
     data-track-intent="navigate"
     data-track-text="*textContent*"
-    on:keydown|stopPropagation={handleKeydown}
-    {...$$restProps}
+    onkeydown={handleKeydown}
+    {...rest as HTMLAnchorAttributes}
   >
     <div>
-      <slot />
+      {@render children?.()}
     </div>
     {#if newTab}
-      <Icon height={20} width={20} name="external-link" slot="trailing" />
+      <Icon height={20} width={20} name="external-link" />
     {/if}
   </a>
 {:else}
@@ -168,14 +176,14 @@
     data-track-name="menuitem"
     data-track-intent="action"
     data-track-text="*textContent*"
-    on:click={handleClick}
-    on:keydown|stopPropagation={handleKeydown}
-    {...$$restProps}
+    onkeydown={handleKeydown}
+    onclick={handleClick}
+    {...rest as HTMLLiAttributes}
   >
-    <slot name="leading" />
+    {@render leading?.()}
     <div class="grow">
       <div class:centered class="menu-item-wrapper">
-        <slot />
+        {@render children?.()}
         {#if selected}
           <Icon name="checkmark" class="shrink-0" />
         {/if}
@@ -186,7 +194,7 @@
         </div>
       {/if}
     </div>
-    <slot name="trailing" />
+    {@render trailing?.()}
   </li>
 {/if}
 
