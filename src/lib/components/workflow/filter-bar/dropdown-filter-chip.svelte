@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
+  import { get, writable } from 'svelte/store';
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
@@ -81,15 +81,15 @@
 
   // Initialize local state from global stores to get "last used" defaults
   onMount(() => {
-    startDate.subscribe((value) => (localStartDate = value))();
-    startHour.subscribe((value) => (localStartHour = value))();
-    startMinute.subscribe((value) => (localStartMinute = value))();
-    startSecond.subscribe((value) => (localStartSecond = value))();
+    localStartDate = get(startDate);
+    localStartHour = get(startHour);
+    localStartMinute = get(startMinute);
+    localStartSecond = get(startSecond);
 
-    endDate.subscribe((value) => (localEndDate = value))();
-    endHour.subscribe((value) => (localEndHour = value))();
-    endMinute.subscribe((value) => (localEndMinute = value))();
-    endSecond.subscribe((value) => (localEndSecond = value))();
+    localEndDate = get(endDate);
+    localEndHour = get(endHour);
+    localEndMinute = get(endMinute);
+    localEndSecond = get(endSecond);
   });
 
   const controlsId = $derived(

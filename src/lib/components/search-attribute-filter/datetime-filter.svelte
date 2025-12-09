@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { get } from 'svelte/store';
+
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
   import { getContext, onMount } from 'svelte';
@@ -53,15 +55,15 @@
 
   // Initialize local state from global stores to get "last used" defaults
   onMount(() => {
-    startDate.subscribe((value) => (localStartDate = value))();
-    startHour.subscribe((value) => (localStartHour = value))();
-    startMinute.subscribe((value) => (localStartMinute = value))();
-    startSecond.subscribe((value) => (localStartSecond = value))();
+    localStartDate = get(startDate);
+    localStartHour = get(startHour);
+    localStartMinute = get(startMinute);
+    localStartSecond = get(startSecond);
 
-    endDate.subscribe((value) => (localEndDate = value))();
-    endHour.subscribe((value) => (localEndHour = value))();
-    endMinute.subscribe((value) => (localEndMinute = value))();
-    endSecond.subscribe((value) => (localEndSecond = value))();
+    localEndDate = get(endDate);
+    localEndHour = get(endHour);
+    localEndMinute = get(endMinute);
+    localEndSecond = get(endSecond);
   });
 
   $: isTimeRange = $filter.conditional === 'BETWEEN';
