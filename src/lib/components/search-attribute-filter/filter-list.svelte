@@ -13,6 +13,12 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { isWorkflowStatusType } from '$lib/models/workflow-status';
   import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
+  import {
+    isContains,
+    isNullConditional,
+    isStartsWith,
+  } from '$lib/utilities/is';
   import { isNullConditional, isStartsWith } from '$lib/utilities/is';
   import {
     formatDateTimeRange,
@@ -110,7 +116,9 @@
               {:else}
                 {isStartsWith(conditional)
                   ? translate('common.starts-with').toLocaleLowerCase()
-                  : conditional}
+                  : isContains(conditional)
+                    ? translate('common.contains').toLocaleLowerCase()
+                    : conditional}
                 {isTextFilter(workflowFilter) ? `"${value}"` : value}
               {/if}
             </span>
