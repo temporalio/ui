@@ -51,8 +51,13 @@
   let localEndMinute = $state('');
   let localEndSecond = $state('');
 
+  const error = (x: string) => {
+    if (x) return isNaN(Number(x)) || isNaN(parseFloat(x));
+    return false;
+  };
+
   const isTimeRange = $derived($filter.conditional === 'BETWEEN');
-  const selectedTime = $derived(getSelectedTimezone($timeFormat));
+  const selectedTime = $derived(getSelectedTimezone($timeFormat ?? 'UTC'));
 
   const useBetweenDateTimeQuery = $derived(
     isTimeRange || !$supportsAdvancedVisibility,
@@ -137,11 +142,6 @@
     }
 
     handleSubmit();
-  };
-
-  const error = (x: string) => {
-    if (x) return isNaN(Number(x)) || isNaN(parseFloat(x));
-    return false;
   };
 </script>
 
