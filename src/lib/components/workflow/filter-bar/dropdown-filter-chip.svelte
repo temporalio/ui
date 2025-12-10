@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { get, writable } from 'svelte/store';
+  import { writable } from 'svelte/store';
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
-  import { onMount } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -68,29 +67,16 @@
   const open = writable(false);
   let localFilter = $state({ ...filter });
 
-  // Local state for date/time values - initialized from global stores on mount
-  let localStartDate = startOfDay(new Date());
-  let localStartHour = '';
-  let localStartMinute = '';
-  let localStartSecond = '';
+  // Local state for date/time values - defaults to today
+  let localStartDate = $state(startOfDay(new Date()));
+  let localStartHour = $state('');
+  let localStartMinute = $state('');
+  let localStartSecond = $state('');
 
-  let localEndDate = startOfDay(new Date());
-  let localEndHour = '';
-  let localEndMinute = '';
-  let localEndSecond = '';
-
-  // Initialize local state from global stores to get "last used" defaults
-  onMount(() => {
-    localStartDate = get(startDate) ?? startOfDay(new Date());
-    localStartHour = get(startHour) ?? '';
-    localStartMinute = get(startMinute) ?? '';
-    localStartSecond = get(startSecond) ?? '';
-
-    localEndDate = get(endDate) ?? startOfDay(new Date());
-    localEndHour = get(endHour) ?? '';
-    localEndMinute = get(endMinute) ?? '';
-    localEndSecond = get(endSecond) ?? '';
-  });
+  let localEndDate = $state(startOfDay(new Date()));
+  let localEndHour = $state('');
+  let localEndMinute = $state('');
+  let localEndSecond = $state('');
 
   const controlsId = $derived(
     `dropdown-filter-chip-${filter.attribute}-${index}`,
@@ -231,16 +217,10 @@
 
   const onStartDateChange = (d: CustomEvent) => {
     localStartDate = startOfDay(d.detail);
-    localStartHour = '';
-    localStartMinute = '';
-    localStartSecond = '';
   };
 
   const onEndDateChange = (d: CustomEvent) => {
     localEndDate = startOfDay(d.detail);
-    localEndHour = '';
-    localEndMinute = '';
-    localEndSecond = '';
   };
 
   const applyTimeChanges = (
@@ -275,7 +255,7 @@
         second: localEndSecond,
       });
 
-      const timezone = getTimezone($timeFormat);
+      const timezone = getTimezone($timeFormat ?? 'UTC');
       const formattedStartTime = zonedTimeToUtc(
         startDateWithTime,
         timezone,
