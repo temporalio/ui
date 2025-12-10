@@ -16,19 +16,27 @@
 
   $: ({ workflow, namespace } = $page.params);
 
-  function getHref(ns, wf, attrs, val, linkType) {
+  function getHref(
+    ns: string,
+    wf: string,
+    attrs: CombinedAttributes,
+    val: string,
+    linkType: EventLinkType,
+  ): string {
     if (linkType === 'execution') {
       return routeForEventHistory({ namespace: ns, workflow: wf, run: val });
     } else if (linkType === 'task-queue') {
-      routeForTaskQueue({ namespace: ns, queue: val });
+      return routeForTaskQueue({ namespace: ns, queue: val });
     } else if (linkType === 'child-workflow') {
-      routeForEventHistory({
+      return routeForEventHistory({
         namespace: ns,
-        workflow: attributes.workflowExecutionWorkflowId,
-        run: attributes.workflowExecutionRunId,
+        workflow: attrs.workflowExecutionWorkflowId,
+        run: attrs.workflowExecutionRunId,
       });
     } else if (linkType === 'nexus-endpoint') {
-      routeForNexusEndpoint(val);
+      return routeForNexusEndpoint(val);
+    } else {
+      return '';
     }
   }
 
