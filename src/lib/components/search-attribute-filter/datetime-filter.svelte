@@ -51,14 +51,17 @@
   let localEndMinute = $state('');
   let localEndSecond = $state('');
 
-  $: isTimeRange = $filter.conditional === 'BETWEEN';
-  $: selectedTime = getSelectedTimezone($timeFormat);
+  const isTimeRange = $derived($filter.conditional === 'BETWEEN');
+  const selectedTime = $derived(getSelectedTimezone($timeFormat));
 
-  $: useBetweenDateTimeQuery = isTimeRange || !$supportsAdvancedVisibility;
-  $: disabled =
+  const useBetweenDateTimeQuery = $derived(
+    isTimeRange || !$supportsAdvancedVisibility,
+  );
+  const disabled = $derived(
     $timeFormatType === 'relative' &&
-    !useBetweenDateTimeQuery &&
-    (!$relativeTimeDuration || error($relativeTimeDuration));
+      !useBetweenDateTimeQuery &&
+      (!$relativeTimeDuration || error($relativeTimeDuration)),
+  );
 
   const onStartDateChange = (d: CustomEvent) => {
     localStartDate = startOfDay(d.detail);
