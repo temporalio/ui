@@ -2,10 +2,11 @@
   import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -14,20 +15,35 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
-  import ziggy from '$lib/vendor/ziggy-full-face.png';
 
   import BottomNavLinks from './bottom-nav-links.svelte';
-  import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
   import BottomNavSettings from './bottom-nav-settings.svelte';
 
-  export let namespaceList: NamespaceListItem[] | undefined = [];
-  export let linkList: NavLinkListItem[];
-  export let isCloud = false;
-  export let showNamespacePicker = true;
+  type Props = {
+    children: Snippet;
+    namespacePicker: Snippet<[{ open: boolean; closeMenu: () => void }]>;
+    avatar: Snippet;
+    namespaceList?: NamespaceListItem[];
+    isCloud: boolean;
+    linkList: NavLinkListItem[];
+    showNamespacePicker?: boolean;
+    environmentName?: string;
+  };
 
-  let viewLinks = false;
+  let {
+    children,
+    namespacePicker,
+    avatar,
+    namespaceList = [],
+    isCloud = false,
+    linkList,
+    showNamespacePicker = true,
+    environmentName,
+  }: Props = $props();
+
+  let viewLinks = $state(false);
   let viewNamespaces = writable(false);
-  let viewSettings = false;
+  let viewSettings = $state(false);
 
   function escapeHandler(e: KeyboardEvent) {
     if (
@@ -42,10 +58,13 @@
     closeMenu();
   });
 
-  $: namespace = $page.params.namespace || $lastUsedNamespace;
-  $: namespaceExists = namespaceList.some(
-    (namespaceListItem) => namespaceListItem.namespace === namespace,
+  const namespace = $derived(page.params.namespace || $lastUsedNamespace);
+  const namespaceExists = $derived(
+    namespaceList.some(
+      (namespaceListItem) => namespaceListItem.namespace === namespace,
+    ),
   );
+  const menuIsOpen = $derived(viewLinks || $viewNamespaces || viewSettings);
 
   const onLinksClick = () => {
     viewLinks = !viewLinks;
@@ -71,8 +90,6 @@
     viewSettings = false;
   }
 
-  $: menuIsOpen = viewLinks || $viewNamespaces || viewSettings;
-
   const truncateNamespace = (namespace: string) => {
     if (namespace.length > 16) {
       return `${namespace.slice(0, 8)}...${namespace.slice(-8)}`;
@@ -97,11 +114,9 @@
     out:slide={{ duration: 200, delay: 0 }}
   >
     <BottomNavLinks open={viewLinks} {linkList} />
-    <slot name="nsPicker" open={$viewNamespaces} {closeMenu}>
-      <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
-    </slot>
+    {@render namespacePicker({ open: $viewNamespaces, closeMenu })}
     <BottomNavSettings open={viewSettings}>
-      <slot />
+      {@render children?.()}
     </BottomNavSettings>
   </div>
 {/if}
@@ -111,7 +126,7 @@
     'focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70 focus-visible:[&_button]:outline-none focus-visible:[&_button]:ring-2 focus-visible:[&_button]:ring-primary/70',
     isCloud
       ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-off-white focus-visible:[&_a]:ring-success focus-visible:[&_button]:ring-success'
-      : 'surface-black border-t border-subtle',
+      : environmentName || 'surface-black border-t border-subtle',
   )}
   data-testid="top-nav"
   aria-label={translate('common.main')}
@@ -121,7 +136,7 @@
     data-testid="nav-menu-button"
     class:active-shadow={viewLinks}
     type="button"
-    on:click={onLinksClick}
+    onclick={onLinksClick}
   >
     {#if viewLinks}
       <Icon name="close" height={32} width={32} />
@@ -154,7 +169,7 @@
     data-testid="nav-profile-button"
     class:active-shadow={viewSettings}
     type="button"
-    on:click={onSettingsClick}
+    onclick={onSettingsClick}
   >
     {#if viewSettings}
       <Icon name="close" height={32} width={32} />
@@ -162,13 +177,7 @@
       <div
         class="flex aspect-square w-[32px] min-w-[32px] items-center justify-center"
       >
-        <slot name="profile-picture">
-          <img
-            src={ziggy}
-            alt={translate('common.user-profile')}
-            class="h-[32px] w-[32px]"
-          />
-        </slot>
+        {@render avatar()}
       </div>
     {/if}
   </button>
@@ -181,5 +190,17 @@
 
   .nav-button {
     @apply relative select-none p-1 text-center align-middle text-xs font-medium uppercase transition-all;
+  }
+
+  .development {
+    @apply surface-development border-t border-subtle;
+  }
+
+  .staging {
+    @apply surface-staging border-t border-subtle;
+  }
+
+  .test {
+    @apply surface-test border-t border-subtle;
   }
 </style>

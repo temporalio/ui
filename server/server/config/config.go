@@ -51,6 +51,7 @@ type (
 		// How often to reload the config
 		RefreshInterval     time.Duration `yaml:"refreshInterval"`
 		Codec               Codec         `yaml:"codec"`
+		Environment				 Environment   `yaml:"environment"`
 		DisableWriteActions bool          `yaml:"disableWriteActions"`
 		// Discrete configuration for Workflow Actions in the UI
 		WorkflowTerminateDisabled bool `yaml:"workflowTerminateDisabled"`
@@ -134,6 +135,10 @@ type (
 		IncludeCredentials  bool   `yaml:"includeCredentials"`
 		DefaultErrorMessage string `yaml:"defaultErrorMessage"`
 		DefaultErrorLink    string `yaml:"defaultErrorLink"`
+	}
+
+	Environment struct {
+		Name string `yaml:"name"`
 	}
 
 	Filesystem struct {
