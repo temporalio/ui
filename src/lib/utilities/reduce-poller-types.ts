@@ -1,13 +1,8 @@
 import type {
-  Poller,
   PollerWithTaskQueueTypes,
   TaskQueueType,
 } from '$lib/services/pollers-service';
 import type { PollerInfo, TaskQueueResponse } from '$lib/types';
-
-type PollersData = {
-  [key: string]: Poller;
-};
 
 export const reducePollerTypes = ({
   activityPollers,
@@ -18,102 +13,55 @@ export const reducePollerTypes = ({
   nexusPollers: TaskQueueResponse;
   workflowPollers: TaskQueueResponse;
 }): TaskQueueResponse => {
-  if (!workflowPollers?.pollers) workflowPollers.pollers = [];
-  if (!activityPollers?.pollers) activityPollers.pollers = [];
-  if (!nexusPollers?.pollers) nexusPollers.pollers = [];
+  const workflowPollersList = workflowPollers?.pollers ?? [];
+  const activityPollersList = activityPollers?.pollers ?? [];
+  const nexusPollersList = nexusPollers?.pollers ?? [];
 
-  activityPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
-    poller.taskQueueTypes = ['ACTIVITY'];
-  });
+  const pollerMap = new Map<
+    string,
+    {
+      poller: PollerInfo;
+      taskQueueTypes: TaskQueueType[];
+    }
+  >();
 
-  workflowPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
-    poller.taskQueueTypes = ['WORKFLOW'];
-  });
-
-  nexusPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
-    poller.taskQueueTypes = ['NEXUS'];
-  });
-
-  const r =
-    (type: TaskQueueType) => (pollers: PollersData, poller: PollerInfo) => {
-      const currentPoller: Poller = pollers[poller.identity] || {
-        lastAccessTime: undefined,
-        taskQueueTypes: [],
-      };
-
-      pollers[poller.identity] = {
-        lastAccessTime:
-          !currentPoller.lastAccessTime ||
-          currentPoller.lastAccessTime < poller.lastAccessTime
-            ? poller.lastAccessTime
-            : currentPoller.lastAccessTime,
-        taskQueueTypes: currentPoller.taskQueueTypes.concat([type]),
-      };
-
-      return pollers;
-    };
-
-  activityPollers.pollers.filter((pollerA: PollerWithTaskQueueTypes) =>
-    workflowPollers.pollers.some((pollerW: PollerWithTaskQueueTypes) => {
-      if (pollerA.identity === pollerW.identity) {
-        pollerA.taskQueueTypes = [
-          ...pollerW.taskQueueTypes,
-          ...pollerA.taskQueueTypes,
-        ];
-        return pollerA;
+  const addPoller = (poller: PollerInfo, type: TaskQueueType) => {
+    if (poller.identity) {
+      const existing = pollerMap.get(poller.identity);
+      if (existing) {
+        existing.taskQueueTypes.push(type);
+        if (poller?.lastAccessTime > existing?.poller?.lastAccessTime) {
+          existing.poller = poller;
+        }
+      } else {
+        pollerMap.set(poller.identity, {
+          poller,
+          taskQueueTypes: [type],
+        });
       }
-    }),
-  );
+    }
+  };
 
-  activityPollers.pollers.filter((pollerA: PollerWithTaskQueueTypes) =>
-    nexusPollers.pollers.some((pollerN: PollerWithTaskQueueTypes) => {
-      if (pollerN.identity === pollerA.identity) {
-        pollerA.taskQueueTypes = [
-          ...pollerA.taskQueueTypes,
-          ...pollerN.taskQueueTypes,
-        ];
-        return pollerA;
-      }
-    }),
-  );
+  workflowPollersList.forEach((poller) => addPoller(poller, 'WORKFLOW'));
+  activityPollersList.forEach((poller) => addPoller(poller, 'ACTIVITY'));
+  nexusPollersList.forEach((poller) => addPoller(poller, 'NEXUS'));
 
-  nexusPollers.pollers.filter((pollerN: PollerWithTaskQueueTypes) =>
-    workflowPollers.pollers.some((pollerW: PollerWithTaskQueueTypes) => {
-      if (pollerN.identity === pollerW.identity) {
-        pollerN.taskQueueTypes = [
-          ...pollerW.taskQueueTypes,
-          ...pollerN.taskQueueTypes,
-        ];
-        return pollerN;
-      }
-    }),
-  );
+  const pollers: PollerWithTaskQueueTypes[] = Array.from(
+    pollerMap.values(),
+  ).map(({ poller, taskQueueTypes }) => ({
+    ...poller,
+    taskQueueTypes,
+  }));
 
-  activityPollers.pollers?.reduce(
-    r('ACTIVITY'),
-    nexusPollers.pollers?.reduce(
-      r('NEXUS'),
-      workflowPollers.pollers.reduce(r('WORKFLOW'), {}),
-    ),
-  );
+  const versioningInfo =
+    activityPollers?.versioningInfo ??
+    workflowPollers?.versioningInfo ??
+    nexusPollers?.versioningInfo;
 
-  const pollers = activityPollers.pollers.length
-    ? activityPollers.pollers
-    : !nexusPollers.pollers.length
-      ? workflowPollers.pollers
-      : nexusPollers.pollers;
-
-  const taskQueueStatus = activityPollers.pollers.length
-    ? nexusPollers.taskQueueStatus
-    : !nexusPollers.pollers.length
-      ? workflowPollers.taskQueueStatus
-      : nexusPollers.taskQueueStatus;
-
-  const versioningInfo = activityPollers.pollers.length
-    ? nexusPollers.versioningInfo
-    : !nexusPollers.pollers.length
-      ? workflowPollers.versioningInfo
-      : nexusPollers.versioningInfo;
+  const taskQueueStatus =
+    activityPollers?.taskQueueStatus ??
+    workflowPollers?.taskQueueStatus ??
+    nexusPollers?.taskQueueStatus;
 
   return {
     pollers,
