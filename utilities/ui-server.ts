@@ -1,7 +1,7 @@
 import { join } from 'path';
 
 import waitForPort from 'wait-port';
-import { $ } from 'zx';
+import { $, ProcessPromise } from 'zx';
 
 export type UIServer = {
   shutdown: () => Promise<number | null>;
@@ -14,11 +14,11 @@ export const getUIServer = (): UIServer => {
   return uiServer;
 };
 
-type Environemt = 'development' | 'e2e';
+type Environment = 'development' | 'e2e';
 
-const portForEnv = (env: Environemt) => {
+const portForEnv = (env: Environment): number => {
   if (env === 'development') return 8081;
-  if (env === 'e2e') return 8080;
+  return 8080;
 };
 
 export const createUIServer = async (
@@ -27,11 +27,10 @@ export const createUIServer = async (
 ) => {
   $.cwd = join(process.cwd(), 'server');
 
-  // Check for verbose mode via env var or options
   const verbose = options?.verbose ?? process.env.UI_SERVER_VERBOSE === 'true';
   const hotReload = process.env.UI_SERVER_HOT_RELOAD === 'true';
 
-  let uiServerProcess: ReturnType<typeof $>;
+  let uiServerProcess: ProcessPromise;
 
   if (hotReload) {
     // Install Air if not already available
