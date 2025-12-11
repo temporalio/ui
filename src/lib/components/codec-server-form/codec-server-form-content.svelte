@@ -248,7 +248,7 @@
       {/if}
     </div>
 
-    <div class="flex gap-3">
+    <div class="mt-4 flex gap-3">
       <Button
         type="submit"
         size="sm"
