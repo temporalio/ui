@@ -14,9 +14,9 @@ export const getUIServer = (): UIServer => {
   return uiServer;
 };
 
-type Environemt = 'development' | 'e2e';
+type Environment = 'development' | 'e2e';
 
-const portForEnv = (env: Environemt): number => {
+const portForEnv = (env: Environment): number => {
   if (env === 'development') return 8081;
   return 8080;
 };
