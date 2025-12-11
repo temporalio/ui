@@ -86,11 +86,14 @@
           onSuccess(dataToSave);
           return { type: 'success' };
         } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Failed to save codec server configuration';
           return {
             type: 'error',
             error: {
-              message:
-                error.message || 'Failed to save codec server configuration',
+              message: errorMessage,
             },
           };
         }
@@ -248,7 +251,7 @@
       {/if}
     </div>
 
-    <div class="flex gap-3">
+    <div class="mt-4 flex gap-3">
       <Button
         type="submit"
         size="sm"
