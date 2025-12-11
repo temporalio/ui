@@ -26,17 +26,19 @@ export const reducePollerTypes = ({
   >();
 
   const addPoller = (poller: PollerInfo, type: TaskQueueType) => {
-    const existing = pollerMap.get(poller.identity);
-    if (existing) {
-      existing.taskQueueTypes.push(type);
-      if (poller.lastAccessTime > existing.poller.lastAccessTime) {
-        existing.poller = poller;
+    if (poller.identity) {
+      const existing = pollerMap.get(poller.identity);
+      if (existing) {
+        existing.taskQueueTypes.push(type);
+        if (poller?.lastAccessTime > existing?.poller?.lastAccessTime) {
+          existing.poller = poller;
+        }
+      } else {
+        pollerMap.set(poller.identity, {
+          poller,
+          taskQueueTypes: [type],
+        });
       }
-    } else {
-      pollerMap.set(poller.identity, {
-        poller,
-        taskQueueTypes: [type],
-      });
     }
   };
 
