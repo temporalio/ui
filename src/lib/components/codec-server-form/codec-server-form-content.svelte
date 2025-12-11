@@ -86,11 +86,14 @@
           onSuccess(dataToSave);
           return { type: 'success' };
         } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Failed to save codec server configuration';
           return {
             type: 'error',
             error: {
-              message:
-                error.message || 'Failed to save codec server configuration',
+              message: errorMessage,
             },
           };
         }
