@@ -17,15 +17,17 @@
 </script>
 
 <g>
-  <circle
+  <rect
     class="dot {category} {classification}"
     stroke-width={strokeWidth}
-    cx={x}
-    cy={y}
-    {r}
+    x={x - r}
+    y={y - r}
+    width={r * 2}
+    height={r * 2}
+    rx={r * 0.3}
   >
     <slot />
-  </circle>
+  </rect>
   {#if icon}
     <Icon
       name={icon}
@@ -106,8 +108,8 @@
 
   .Failed,
   .Terminated {
-    stroke: #ff4418;
-    fill: #c71607;
+    stroke: #c71607;
+    fill: #f55;
   }
 
   .TimedOut {
