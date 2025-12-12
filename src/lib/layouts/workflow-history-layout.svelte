@@ -3,21 +3,25 @@
 
   import { beforeNavigate } from '$app/navigation';
 
+  import { CategoryIcon } from '$lib/components/lines-and-dots/constants';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import TimelineAndHistoryToggle from '$lib/components/lines-and-dots/timeline-and-history-toggle.svelte';
+  import HistoryViewToggle from '$lib/components/lines-and-dots/history-view-toggle.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import WorkflowHistory from '$lib/pages/workflow-history.svelte';
   import WorkflowMemo from '$lib/pages/workflow-memo.svelte';
   import WorkflowSearchAttributes from '$lib/pages/workflow-search-attributes.svelte';
   import WorkflowTimeline from '$lib/pages/workflow-timeline.svelte';
   import WorkflowUserMetadata from '$lib/pages/workflow-user-metadata.svelte';
+  import WorkflowWorkers from '$lib/pages/workflow-workers.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import {
     eventFilterSort,
@@ -36,6 +40,7 @@
   const historyView = $derived($historyViewType === 'history');
   const jsonView = $derived($historyViewType === 'json');
   const relationshipView = $derived($historyViewType === 'relationship');
+  const workersView = $derived($historyViewType === 'workers');
 
   const workflowTaskFailedError = $derived(
     getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
@@ -84,8 +89,69 @@
       !historyView && 'border-b border-subtle',
     )}
   >
-    <TimelineAndHistoryToggle />
+    <HistoryViewToggle />
     <div class="flex items-center gap-2">
+      <Tooltip class="ml-1" left>
+        <div slot="content" class="space-y-2 bg-primary p-2">
+          <div class="text-xs font-semibold text-primary">Event Categories</div>
+          <div class="space-y-1.5 text-xs">
+            <div
+              class="flex items-center gap-2 text-blue-700 dark:text-blue-400"
+            >
+              <Icon name={CategoryIcon.workflow} />
+              <span>Workflow</span>
+            </div>
+            <div
+              class="flex items-center gap-2 text-purple-600 dark:text-purple-500"
+            >
+              <Icon name={CategoryIcon.activity} />
+              <span>Activity</span>
+            </div>
+            <div class="flex items-center gap-2 text-cyan-600">
+              <Icon name={CategoryIcon['child-workflow']} />
+              <span>Child Workflow</span>
+            </div>
+            <div
+              class="flex items-center gap-2 text-yellow-600 dark:text-yellow-400"
+            >
+              <Icon name={CategoryIcon.timer} />
+              <span>Timer</span>
+            </div>
+            <div
+              class="flex items-center gap-2 text-pink-600 dark:text-pink-400"
+            >
+              <Icon name={CategoryIcon.signal} />
+              <span>Signal</span>
+            </div>
+            <div
+              class="flex items-center gap-2 text-blue-600 dark:text-blue-400"
+            >
+              <Icon name={CategoryIcon.update} />
+              <span>Update</span>
+            </div>
+            <div
+              class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400"
+            >
+              <Icon name={CategoryIcon.nexus} />
+              <span>Nexus</span>
+            </div>
+            <div
+              class="flex items-center gap-2 text-slate-700 dark:text-slate-300"
+            >
+              <Icon name={CategoryIcon['local-activity']} />
+              <span>Local Activity</span>
+            </div>
+            <div
+              class="flex items-center gap-2 text-slate-700 dark:text-slate-300"
+            >
+              <Icon name={CategoryIcon.other} />
+              <span>Other</span>
+            </div>
+          </div>
+        </div>
+        <Icon name="info" class="text-secondary hover:text-brand" />
+      </Tooltip>
+
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
           <ToggleButton
@@ -126,5 +192,10 @@
     <WorkflowHistoryJson />
   {:else if relationshipView}
     <WorkflowRelationships />
+  {:else if workersView}
+    <WorkflowWorkers
+      taskQueue={workflow.taskQueue}
+      workers={$workflowRun.workers}
+    />
   {/if}
 </div>

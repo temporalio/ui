@@ -157,7 +157,8 @@ export type HistoryView =
   | 'compact'
   | 'history'
   | 'json'
-  | 'relationship';
+  | 'relationship'
+  | 'workers';
 export type EventView = 'compact' | 'feed' | 'json';
 export type TaskQueueView = 'workers' | 'versioning';
 

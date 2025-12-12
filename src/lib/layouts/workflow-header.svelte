@@ -8,16 +8,10 @@
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import TabList from '$lib/holocene/tab/tab-list.svelte';
-  import Tab from '$lib/holocene/tab/tab.svelte';
-  import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
-  import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
+  // import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -25,18 +19,11 @@
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import {
-    getWorkflowNexusLinksFromHistory,
+    // getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
   } from '$lib/utilities/get-workflow-relationships';
-  import { pathMatches } from '$lib/utilities/path-matches';
   import {
-    routeForCallStack,
     routeForEventHistory,
-    routeForNexusLinks,
-    routeForPendingActivities,
-    routeForRelationships,
-    routeForWorkers,
-    routeForWorkflowQuery,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
@@ -47,7 +34,7 @@
     run: runId,
     id: eventId,
   } = $derived(page.params);
-  const { workflow, workers } = $derived($workflowRun);
+  const { workflow } = $derived($workflowRun);
   const routeParameters = $derived({
     namespace,
     workflow: workflowId,
@@ -55,9 +42,9 @@
   });
 
   const isRunning = $derived(workflow?.isRunning);
-  const activitiesCanceled = $derived(
-    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
-  );
+  // const activitiesCanceled = $derived(
+  //   ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
+  // );
   const cancelInProgress = $derived(
     isCancelInProgress(workflow?.status, $fullEventHistory),
   );
@@ -74,13 +61,13 @@
       namespace,
     })}?${$workflowsSearchParams}`,
   );
-  const outboundLinks = $derived(
-    getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
-  );
-  const inboundLinks = $derived(
-    getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
-  );
-  const linkCount = $derived(outboundLinks + inboundLinks);
+  // const outboundLinks = $derived(
+  //   getWorkflowNexusLinksFromHistory($fullEventHistory)?.length || 0,
+  // );
+  // const inboundLinks = $derived(
+  //   getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
+  // );
+  // const linkCount = $derived(outboundLinks + inboundLinks);
 </script>
 
 <div class="flex items-center justify-between">
@@ -135,7 +122,7 @@
       <div class="flex flex-col flex-wrap gap-0">
         <h1
           data-testid="workflow-id-heading"
-          class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+          class="gap-0 overflow-hidden text-xl"
         >
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
@@ -190,7 +177,7 @@
       </Alert>
     </div>
   {/if}
-  <Tabs>
+  <!-- <Tabs>
     <TabList label="workflow detail">
       <Tab
         label={translate('workflows.history-tab')}
@@ -297,5 +284,5 @@
         )}
       />
     </TabList>
-  </Tabs>
+  </Tabs> -->
 </header>
