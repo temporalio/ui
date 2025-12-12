@@ -32,16 +32,12 @@
   import {
     routeForCallStack,
     routeForEventHistory,
-    routeForEventHistoryTable,
     routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
-    routeForUserMetadata,
     routeForWorkers,
-    routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
-    routeForWorkflowSearchAttributes,
   } from '$lib/utilities/route-for';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
@@ -210,7 +206,7 @@
         ) ||
           pathMatches(
             page.url.pathname,
-            routeForEventHistoryTable({
+            routeForEventHistory({
               ...routeParameters,
             }),
           )}
@@ -298,33 +294,6 @@
         active={pathMatches(
           page.url.pathname,
           routeForWorkflowQuery(routeParameters),
-        )}
-      />
-      <Tab
-        label={translate('workflows.user-metadata-tab')}
-        id="user-metadata-tab"
-        href={routeForUserMetadata(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForUserMetadata(routeParameters),
-        )}
-      />
-      <Tab
-        label={translate('workflows.search-attributes-tab')}
-        id="search-attributes-tab"
-        href={routeForWorkflowSearchAttributes(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForWorkflowSearchAttributes(routeParameters),
-        )}
-      />
-      <Tab
-        label={translate('workflows.memo-tab')}
-        id="memo-tab"
-        href={routeForWorkflowMemo(routeParameters)}
-        active={pathMatches(
-          page.url.pathname,
-          routeForWorkflowMemo(routeParameters),
         )}
       />
     </TabList>

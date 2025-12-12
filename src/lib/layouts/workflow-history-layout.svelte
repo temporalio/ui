@@ -1,29 +1,42 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
-  import { page } from '$app/state';
 
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
+  import TimelineAndHistoryToggle from '$lib/components/lines-and-dots/timeline-and-history-toggle.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
+  import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import WorkflowHistory from '$lib/pages/workflow-history.svelte';
+  import WorkflowMemo from '$lib/pages/workflow-memo.svelte';
+  import WorkflowSearchAttributes from '$lib/pages/workflow-search-attributes.svelte';
+  import WorkflowTimeline from '$lib/pages/workflow-timeline.svelte';
+  import WorkflowUserMetadata from '$lib/pages/workflow-user-metadata.svelte';
   import { clearActives } from '$lib/stores/active-events';
-  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
+  import {
+    eventFilterSort,
+    eventViewType,
+    historyViewType,
+  } from '$lib/stores/event-view';
   import { currentEventHistory, pauseLiveUpdates } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  let { children, title }: { children: Snippet; title: Snippet } = $props();
-
   const workflow = $derived($workflowRun.workflow);
   const reverseSort = $derived($eventFilterSort === 'descending');
-  const compact = $derived($eventViewType === 'compact');
-  const historyTablePage = $derived(page.url.pathname.endsWith('history'));
+  const summaryView = $derived($historyViewType === 'summary');
+  const timelineView = $derived($historyViewType === 'timeline');
+  const compactView = $derived($historyViewType === 'compact');
+  const historyView = $derived($historyViewType === 'history');
+  const jsonView = $derived($historyViewType === 'json');
+  const relationshipView = $derived($historyViewType === 'relationship');
+
   const workflowTaskFailedError = $derived(
     getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
   );
@@ -53,7 +66,6 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <InputAndResults />
   <WorkflowCallStackError />
   {#if workflowTaskFailedError}
     <WorkflowError
@@ -69,10 +81,10 @@
   <div
     class={merge(
       'surface-background sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 py-2 md:top-12 xl:gap-8',
-      !historyTablePage && 'border-b border-subtle',
+      !historyView && 'border-b border-subtle',
     )}
   >
-    {@render title()}
+    <TimelineAndHistoryToggle />
     <div class="flex items-center gap-2">
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
@@ -83,7 +95,7 @@
             size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
           >
         {/if}
-        <EventTypeFilter {compact} />
+        <EventTypeFilter compact={compactView} />
         <ToggleButton
           disabled={!workflow.isRunning}
           leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
@@ -95,32 +107,24 @@
           {$pauseLiveUpdates ? 'Unfreeze' : 'Freeze'}
         </ToggleButton>
       </ToggleButtons>
-      {#if historyTablePage}
-        <ToggleButtons>
-          <ToggleButton
-            active={$eventViewType === 'feed'}
-            data-testid="feed"
-            leadingIcon="feed"
-            size="sm"
-            on:click={() => ($eventViewType = 'feed')}>All</ToggleButton
-          >
-          <ToggleButton
-            active={compact}
-            data-testid="compact"
-            leadingIcon="compact"
-            size="sm"
-            on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
-          >
-          <ToggleButton
-            active={$eventViewType === 'json'}
-            data-testid="json"
-            leadingIcon="json"
-            size="sm"
-            on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
-          >
-        </ToggleButtons>
-      {/if}
     </div>
   </div>
-  {@render children()}
+  {#if summaryView}
+    <div class="mt-4 flex flex-col gap-4">
+      <InputAndResults />
+      <WorkflowUserMetadata />
+      <WorkflowSearchAttributes />
+      <WorkflowMemo />
+    </div>
+  {:else if timelineView}
+    <WorkflowTimeline />
+  {:else if compactView}
+    <WorkflowHistory />
+  {:else if historyView}
+    <WorkflowHistory />
+  {:else if jsonView}
+    <WorkflowHistoryJson />
+  {:else if relationshipView}
+    <WorkflowRelationships />
+  {/if}
 </div>

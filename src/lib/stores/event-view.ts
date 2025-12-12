@@ -1,5 +1,5 @@
 import { persistStore } from '$lib/stores/persist-store';
-import type { EventView } from '$lib/types/events';
+import type { EventView, HistoryView } from '$lib/types/events';
 import type { BooleanString } from '$lib/types/global';
 
 export type EventSortOrder = 'ascending' | 'descending';
@@ -14,6 +14,11 @@ export const autoRefreshWorkflow = persistStore<'on' | 'off'>(
 );
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
+export const historyViewType = persistStore<HistoryView>(
+  'historyView',
+  'timeline',
+  true,
+);
 
 export const eventFilterSort = persistStore<EventSortOrder>(
   'eventFilterSort',

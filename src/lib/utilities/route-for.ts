@@ -190,16 +190,6 @@ export const routeForEventHistory = ({
   ...parameters
 }: EventHistoryParameters & { archival?: boolean }): string => {
   if (archival) return toURL(routeForArchivalEventHistory(parameters));
-  const eventHistoryPath = `${routeForWorkflow(parameters)}/timeline`;
-  return toURL(`${eventHistoryPath}`, queryParams);
-};
-
-export const routeForEventHistoryTable = ({
-  queryParams,
-  archival,
-  ...parameters
-}: EventHistoryParameters & { archival?: boolean }): string => {
-  if (archival) return toURL(routeForArchivalEventHistory(parameters));
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   return toURL(`${eventHistoryPath}`, queryParams);
 };
