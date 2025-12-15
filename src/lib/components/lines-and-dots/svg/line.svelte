@@ -49,7 +49,7 @@
     cursor: pointer;
     opacity: 1;
     outline: none;
-    stroke: #444ce7;
+    stroke: currentColor;
   }
 
   .none {
@@ -88,16 +88,20 @@
   }
 
   .child-workflow {
-    stroke: #67e4f9;
+    stroke: theme('colors.cyan.600');
   }
 
   .Completed {
     stroke: #1ff1a5;
   }
 
+  .ContinuedAsNew {
+    stroke: #e2d6fe;
+  }
+
   .Failed,
   .Terminated {
-    stroke: #f55;
+    stroke: #c71607;
   }
 
   .Signaled {

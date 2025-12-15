@@ -15,7 +15,7 @@
 <style lang="postcss">
   .Failed,
   .Terminated {
-    stroke: #f55;
+    stroke: #ff4418;
     stroke-width: 3;
   }
 
@@ -41,6 +41,6 @@
   }
 
   .retry {
-    stroke: #f55;
+    stroke: #c71607;
   }
 </style>

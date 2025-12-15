@@ -11,7 +11,7 @@
 
 <div class="flex h-full flex-1 flex-col bg-primary">
   <div>
-    <div class="surface-information w-full px-6 py-2">
+    <div class="surface-secondary w-full px-6 py-2">
       <h3 data-testid="user-metadata-summary-heading">
         {translate('workflows.summary')}
       </h3>
@@ -27,7 +27,7 @@
     {/if}
   </div>
   <div>
-    <div class="surface-information w-full px-6 py-2">
+    <div class="surface-secondary w-full px-6 py-2">
       <h3 data-testid="user-metadata-summary-heading">
         {translate('workflows.details')}
       </h3>
@@ -43,7 +43,7 @@
     {/if}
   </div>
   <div>
-    <div class="surface-information w-full px-6 py-2">
+    <div class="surface-secondary w-full px-6 py-2">
       <h3 data-testid="user-metadata-summary-heading">Events with Metadata</h3>
     </div>
     <div class="py-6">

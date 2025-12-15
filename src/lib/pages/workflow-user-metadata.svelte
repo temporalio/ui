@@ -3,7 +3,7 @@
   import WorkflowSummaryAndDetails from '$lib/components/workflow/metadata/workflow-summary-and-details.svelte';
 </script>
 
-<div class="flex flex-col bg-primary lg:flex-row">
+<div class="grid grid-cols-1 border border-subtle bg-primary lg:grid-cols-2">
   <WorkflowSummaryAndDetails />
   <WorkflowCurrentDetails />
 </div>

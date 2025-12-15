@@ -57,7 +57,7 @@
   >
     <Button
       variant="secondary"
-      size="sm"
+      size="xs"
       leadingIcon={activity.paused ? 'play' : 'pause'}
       on:click={onPause}
     >
@@ -66,20 +66,20 @@
         : translate('workflows.pause')}
     </Button>
   </Tooltip>
-  <Tooltip bottomLeft width={200} text="Update this Activity Options.">
+  <Tooltip bottom width={200} text="Update this Activity Options">
     <Button
       variant="secondary"
-      size="sm"
+      size="xs"
       leadingIcon="pencil"
       on:click={onUpdate}
     >
       {translate('common.update')}
     </Button>
   </Tooltip>
-  <Tooltip bottom width={200} text="Reset this Activity.">
+  <Tooltip bottom width={200} text="Reset this Activity">
     <Button
       variant="secondary"
-      size="sm"
+      size="xs"
       leadingIcon="retry"
       on:click={onReset}
     >

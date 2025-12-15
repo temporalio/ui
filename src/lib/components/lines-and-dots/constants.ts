@@ -29,9 +29,9 @@ export type GraphConfig = {
 const baseRadius = 6;
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 5,
+  height: baseRadius * 4,
   gutter: baseRadius * 8,
-  radius: baseRadius * 2,
+  radius: baseRadius * 1.5,
   fontSizeRatio: baseRadius * 4,
 };
 
@@ -249,7 +249,7 @@ export const getCategoryColor = (type: EventTypeCategory): string => {
     case 'workflow':
       return '#059669';
     case 'child-workflow':
-      return '#67e4f9';
+      return '#0899b2';
     case 'update':
       return '#FF9B70';
     case 'nexus':

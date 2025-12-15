@@ -151,6 +151,14 @@ export type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
 
+export type HistoryView =
+  | 'summary'
+  | 'timeline'
+  | 'compact'
+  | 'history'
+  | 'json'
+  | 'relationship'
+  | 'workers';
 export type EventView = 'compact' | 'feed' | 'json';
 export type TaskQueueView = 'workers' | 'versioning';
 

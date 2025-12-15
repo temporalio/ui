@@ -100,6 +100,12 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get finalClassification() {
       return getLastEvent(this).classification;
     },
+    get input() {
+      return this.initialEvent.attributes?.input;
+    },
+    get result() {
+      return this.lastEvent.attributes?.result;
+    },
     get isPending() {
       return (
         !!this.pendingActivity ||
