@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Timestamp } from '$lib/types';
+  import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { TimelineConfig } from '../constants';
@@ -11,6 +12,7 @@
   export let timelineHeight = 1000;
   export let startTime: string | Timestamp;
   export let duration: number;
+  export let workflow: WorkflowExecution;
 
   const { radius } = TimelineConfig;
   const ticks = 20;
@@ -23,6 +25,7 @@
   strokeWidth={radius / 2}
   startPoint={[x1, timelineHeight]}
   endPoint={[x1 + distance, timelineHeight]}
+  classification={workflow.status}
 />
 {#each Array(ticks) as _, i}
   {@const tickX = x1 + i * tickDistance}
@@ -32,6 +35,7 @@
       strokeWidth={0.5}
       startPoint={[tickX, 0]}
       endPoint={[tickX, timelineHeight]}
+      strokeDasharray="2"
     />
   {/if}
   {#if i !== 0}

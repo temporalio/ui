@@ -82,7 +82,7 @@
     <WorkflowCallbacks callbacks={workflow.callbacks} />
   {/if}
 </div>
-<div class="relative pb-24">
+<div class="relative pb-8">
   <div
     class={merge(
       'surface-background sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 py-2 md:top-12 xl:gap-8',

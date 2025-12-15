@@ -49,7 +49,7 @@
     cursor: pointer;
     opacity: 1;
     outline: none;
-    stroke: #444ce7;
+    stroke: currentColor;
   }
 
   .none {
@@ -93,6 +93,10 @@
 
   .Completed {
     stroke: #1ff1a5;
+  }
+
+  .ContinuedAsNew {
+    stroke: #e2d6fe;
   }
 
   .Failed,

@@ -59,7 +59,7 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <div class="flex h-full flex-1 flex-col border-l border-subtle">
-  <div class="surface-information w-full px-6 py-2">
+  <div class="surface-secondary w-full px-6 py-2">
     <div class="flex items-center justify-between">
       <h3>{translate('workflows.current-details')}</h3>
       <div class="flex flex-row items-center gap-2 lg:flex-col xl:flex-row">
@@ -89,13 +89,9 @@
       </div>
     </div>
   </div>
-  <div class="surface-background h-full">
+  <div class="surface-primary h-full">
     {#key currentDetails}
-      <Markdown
-        class="p-3"
-        overrideTheme="background"
-        content={currentDetails}
-      />
+      <Markdown class="p-3" overrideTheme="primary" content={currentDetails} />
     {/key}
   </div>
 </div>

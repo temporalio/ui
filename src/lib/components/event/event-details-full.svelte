@@ -20,11 +20,13 @@
   let {
     group = undefined,
     event = undefined,
+    height = undefined,
     children = undefined,
     headerActions = undefined,
   }: {
     group?: EventGroup;
     event?: WorkflowEvent;
+    height?: number;
     children?: Snippet;
     headerActions?: Snippet;
   } = $props();
@@ -34,7 +36,7 @@
   );
   const showEventGroup = $derived(group || pendingEvent);
 
-  const groupCategory = cva([''], {
+  const groupCategory = cva(['overflow-auto'], {
     variants: {
       category: {
         workflow: 'bg-blue-600 text-white',
@@ -62,6 +64,11 @@
   );
   const emptyValue = $derived(
     group?.isPending ? 'Results will appear upon completion' : 'null',
+  );
+  const hasInputOrResult = $derived(
+    group?.input !== undefined ||
+      group?.category === 'activity' ||
+      group?.category === 'nexus',
   );
   const duration = $derived(
     formatDistanceAbbreviated({
@@ -93,6 +100,9 @@
       ? group.finalClassification || group.classification
       : event.classification,
   })}
+  style="{height ? `min-height: ${height - 20}px;` : ''} {!height
+    ? 'max-height: 360px;'
+    : ''}"
 >
   {#if showHeader}
     {@render header()}
@@ -101,7 +111,8 @@
     {@render inputAndResults()}
     {#if showEventGroup}
       {@render eventCards()}
-    {:else if event}
+    {/if}
+    {#if event && !hasInputOrResult}
       <EventCard {event} class="rounded-t-none" />
     {/if}
     {@render children?.()}
@@ -113,20 +124,24 @@
     class="flex h-full items-center justify-between bg-slate-900/50 text-sm text-white"
   >
     <div
-      class="flex h-full flex-row flex-wrap items-start gap-2 py-2 pl-2 text-base md:items-center md:gap-4"
+      class="flex h-full w-full flex-row flex-wrap items-start justify-between gap-2 px-2 py-2 text-sm md:items-center md:gap-4"
     >
-      {#if status}
-        <WorkflowStatus {status} class="h-6 p-2 text-base" />
-      {/if}
-      {#if group?.pendingActivity?.attempt}
-        <div class="flex items-center gap-1">
-          <Icon name="retry" />
-          {group.pendingActivity.attempt}
+      <div class="flex items-center gap-2">
+        {#if status}
+          <WorkflowStatus {status} class="h-6 p-2" />
+        {/if}
+        {#if group?.pendingActivity?.attempt}
+          <div class="flex items-center gap-1">
+            <Icon name="retry" />
+            {group.pendingActivity.attempt}
+          </div>
+        {/if}
+        <div class="flex flex-wrap">
+          {title}
         </div>
-      {/if}
-      {title}
+      </div>
       {#if duration}
-        <Badge type="default" class="flex items-center gap-1">
+        <Badge type="default" class="flex items-center gap-1 text-xs">
           <Icon name="clock" />
           {duration}
         </Badge>
@@ -139,8 +154,29 @@
 {/snippet}
 
 {#snippet inputAndResults()}
-  {#if group?.input !== undefined || group?.category === 'activity' || group?.category === 'nexus'}
-    <div class="flex flex-col items-start gap-2 lg:flex-row">
+  {#if hasInputOrResult}
+    <div class="flex {!height ? 'flex-row' : 'flex-col'} items-start gap-2">
+      {#if (group?.category === 'activity' || group?.category === 'nexus') && !group.isPending}
+        <div class="flex w-full flex-col">
+          <p
+            class="rounded-t-lg bg-slate-900/60 px-2 py-1 text-base font-medium text-white"
+          >
+            Result
+          </p>
+          <PayloadDecoder value={group?.result} key="payloads">
+            {#snippet children(decodedValue)}
+              <CodeBlock
+                content={decodedValue ?? emptyValue}
+                maxHeight={height ? height / 2 : 240}
+                copyIconTitle={translate('common.copy-icon-title')}
+                copySuccessIconTitle={translate(
+                  'common.copy-success-icon-title',
+                )}
+              />
+            {/snippet}
+          </PayloadDecoder>
+        </div>
+      {/if}
       {#if group?.input !== undefined}
         <div class="flex w-full flex-col">
           <p
@@ -152,29 +188,8 @@
             {#snippet children(decodedValue)}
               <CodeBlock
                 content={decodedValue}
-                maxHeight={320}
+                maxHeight={height ? height / 2 : 240}
                 class="grow"
-                copyIconTitle={translate('common.copy-icon-title')}
-                copySuccessIconTitle={translate(
-                  'common.copy-success-icon-title',
-                )}
-              />
-            {/snippet}
-          </PayloadDecoder>
-        </div>
-      {/if}
-      {#if group?.category === 'activity' || group?.category === 'nexus'}
-        <div class="flex w-full flex-col">
-          <p
-            class="rounded-t-lg bg-slate-900/60 px-2 py-1 text-base font-medium text-white"
-          >
-            Result
-          </p>
-          <PayloadDecoder value={group?.result} key="payloads">
-            {#snippet children(decodedValue)}
-              <CodeBlock
-                content={decodedValue ?? emptyValue}
-                maxHeight={320}
                 copyIconTitle={translate('common.copy-icon-title')}
                 copySuccessIconTitle={translate(
                   'common.copy-success-icon-title',
@@ -190,9 +205,9 @@
 
 {#snippet eventCards()}
   <div class="flex flex-col gap-1 overflow-hidden text-white xl:flex-row">
-    {#each group.eventList as groupEvent, index}
+    <!-- {#each group.eventList as groupEvent, index}
       <EventCard event={groupEvent} nextEvent={group.eventList[index + 1]} />
-    {/each}
+    {/each} -->
     {#if group?.pendingActivity}
       <PendingActivityCard activity={group.pendingActivity} />
     {:else if group?.pendingNexusOperation}
