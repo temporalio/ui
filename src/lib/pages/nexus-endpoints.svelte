@@ -1,7 +1,8 @@
 <script lang="ts">
   import debounce from 'just-debounce';
+  import type { Snippet } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -27,33 +28,41 @@
   } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  export let endpoints: NexusEndpoint[] = [];
-  export let searchPlaceholder = translate('common.search');
-  export let createDisabled = false;
-  export let showProjectColumn = false;
-  export let getProjectForEndpoint:
-    | ((endpoint: NexusEndpoint) => string | undefined)
-    | undefined = undefined;
+  let {
+    endpoints = [],
+    searchPlaceholder = translate('common.search'),
+    createDisabled = false,
+    headerColumns,
+    rowColumns,
+    children,
+  }: {
+    endpoints: NexusEndpoint[];
+    searchPlaceholder?: string;
+    createDisabled?: boolean;
+    headerColumns?: Snippet;
+    rowColumns?: Snippet<[NexusEndpoint]>;
+    children?: Snippet;
+  } = $props();
 
-  let search = '';
-  $: searchParam = $page.url.searchParams.get('search') || '';
+  let search = $state('');
+  let searchParam = $derived(page.url.searchParams.get('search') || '');
 
   const searchParamUpdate = debounce((value) => {
     updateQueryParameters({
       parameter: 'search',
       value,
-      url: $page.url,
+      url: page.url,
     });
   }, 350);
 
-  $: {
+  $effect(() => {
     searchParamUpdate(search);
-  }
+  });
 </script>
 
 {#if !endpoints?.length && !searchParam}
   <NexusEmptyState {createDisabled}>
-    <slot />
+    {@render children?.()}
   </NexusEmptyState>
 {:else}
   <div class="mb-8 flex items-center justify-between">
@@ -85,23 +94,25 @@
           {translate('nexus.endpoints')}
         </caption>
         <TableHeaderRow slot="headers">
-          <th class={showProjectColumn ? 'w-1/5' : 'w-1/4'}>Name</th>
-          <th class={showProjectColumn ? 'w-1/4' : 'w-1/3'}>Used By</th>
-          {#if showProjectColumn}
-            <th class="w-1/5">Project</th>
-          {/if}
-          <th class="w-1/5">Last Updated</th>
-          <th class="w-1/5">Created On</th>
+          <th>Name</th>
+          <th>Used By</th>
+          {@render headerColumns?.()}
+          <th>Last Updated</th>
+          <th>Created On</th>
         </TableHeaderRow>
         {#each endpoints as endpoint}
           <TableRow>
             <td class="px-2">
-              <Link
-                href={routeForNexusEndpoint(endpoint.id)}
-                class="table-link"
-              >
-                {endpoint.spec.name}
-              </Link>
+              {#if endpoint.id && endpoint.spec?.name}
+                <Link
+                  href={routeForNexusEndpoint(endpoint.id)}
+                  class="table-link"
+                >
+                  {endpoint.spec.name}
+                </Link>
+              {:else}
+                <span class="text-secondary">—</span>
+              {/if}
             </td>
 
             <td class="px-2">
@@ -147,20 +158,7 @@
               {/if}
             </td>
 
-            {#if showProjectColumn}
-              <td class="px-2">
-                {#if getProjectForEndpoint}
-                  {@const project = getProjectForEndpoint(endpoint)}
-                  {#if project}
-                    <span>{project}</span>
-                  {:else}
-                    <span class="text-secondary">—</span>
-                  {/if}
-                {:else}
-                  <span class="text-secondary">—</span>
-                {/if}
-              </td>
-            {/if}
+            {@render rowColumns?.(endpoint)}
 
             <td class="px-2">
               {#if endpoint.lastModifiedTime}
