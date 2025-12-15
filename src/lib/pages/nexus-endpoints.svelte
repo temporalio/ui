@@ -4,16 +4,24 @@
   import { page } from '$app/stores';
 
   import Timestamp from '$lib/components/timestamp.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import {
+    Menu,
+    MenuButton,
+    MenuContainer,
+    MenuItem,
+  } from '$lib/holocene/menu';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEmptyState from '$lib/pages/nexus-empty-state.svelte';
   import type { NexusEndpoint } from '$lib/types/nexus';
-  import { pluralize } from '$lib/utilities/pluralize';
   import {
+    routeForNamespace,
     routeForNexusEndpoint,
     routeForNexusEndpointCreate,
   } from '$lib/utilities/route-for';
@@ -22,6 +30,10 @@
   export let endpoints: NexusEndpoint[] = [];
   export let searchPlaceholder = translate('common.search');
   export let createDisabled = false;
+  export let showProjectColumn = false;
+  export let getProjectForEndpoint:
+    | ((endpoint: NexusEndpoint) => string | undefined)
+    | undefined = undefined;
 
   let search = '';
   $: searchParam = $page.url.searchParams.get('search') || '';
@@ -56,66 +68,118 @@
     >
   </div>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-col justify-between lg:flex-row">
-      <Input
-        id="endpoint-search"
-        bind:value={search}
-        icon="search"
-        label={searchPlaceholder}
-        labelHidden
-        autoFocus
-        type="search"
-        placeholder={searchPlaceholder}
-        class="w-full lg:w-1/2"
-      />
-    </div>
+    <Input
+      id="endpoint-search"
+      bind:value={search}
+      icon="search"
+      label={searchPlaceholder}
+      labelHidden
+      autoFocus
+      type="search"
+      placeholder={searchPlaceholder}
+      class="w-full"
+    />
     {#if endpoints.length}
-      <div
-        class="grid grid-cols-1 gap-4 pr-8 md:grid-cols-2 md:pr-24 lg:grid-cols-3 xl:grid-cols-4 xl:pr-48"
-      >
+      <Table class="w-full" bordered>
+        <caption class="sr-only" slot="caption">
+          {translate('nexus.endpoints')}
+        </caption>
+        <TableHeaderRow slot="headers">
+          <th class={showProjectColumn ? 'w-1/5' : 'w-1/4'}>Name</th>
+          <th class={showProjectColumn ? 'w-1/4' : 'w-1/3'}>Used By</th>
+          {#if showProjectColumn}
+            <th class="w-1/5">Project</th>
+          {/if}
+          <th class="w-1/5">Last Updated</th>
+          <th class="w-1/5">Created On</th>
+        </TableHeaderRow>
         {#each endpoints as endpoint}
-          <Link href={routeForNexusEndpoint(endpoint.id)} role="button">
-            <div
-              class="transition:colors flex cursor-pointer flex-col gap-1 p-4 duration-200 ease-in-out"
-            >
-              <h3 class="break-all">
+          <TableRow>
+            <td class="px-2">
+              <Link
+                href={routeForNexusEndpoint(endpoint.id)}
+                class="table-link"
+              >
                 {endpoint.spec.name}
-              </h3>
+              </Link>
+            </td>
+
+            <td class="px-2">
+              {#if !endpoint.spec?.allowedCallerNamespaces?.length}
+                <span class="text-sm text-secondary">0 Namespaces</span>
+              {:else if endpoint.spec.allowedCallerNamespaces.length === 1}
+                <Link
+                  href={routeForNamespace({
+                    namespace: endpoint.spec.allowedCallerNamespaces[0],
+                  })}
+                  class="table-link"
+                >
+                  {endpoint.spec.allowedCallerNamespaces[0]}
+                </Link>
+              {:else}
+                <div class="flex items-center gap-1">
+                  <Link
+                    href={routeForNamespace({
+                      namespace: endpoint.spec.allowedCallerNamespaces[0],
+                    })}
+                    class="table-link"
+                  >
+                    {endpoint.spec.allowedCallerNamespaces[0]}
+                  </Link>
+                  <MenuContainer>
+                    <MenuButton
+                      controls="namespaces-menu-{endpoint.id}"
+                      hasIndicator
+                      variant="ghost"
+                      size="xs"
+                      label="+{endpoint.spec.allowedCallerNamespaces.length -
+                        1}"
+                    />
+                    <Menu id="namespaces-menu-{endpoint.id}">
+                      {#each endpoint.spec.allowedCallerNamespaces.slice(1) as namespace}
+                        <MenuItem href={routeForNamespace({ namespace })}>
+                          {namespace}
+                        </MenuItem>
+                      {/each}
+                    </Menu>
+                  </MenuContainer>
+                </div>
+              {/if}
+            </td>
+
+            {#if showProjectColumn}
+              <td class="px-2">
+                {#if getProjectForEndpoint}
+                  {@const project = getProjectForEndpoint(endpoint)}
+                  {#if project}
+                    <span>{project}</span>
+                  {:else}
+                    <span class="text-secondary">—</span>
+                  {/if}
+                {:else}
+                  <span class="text-secondary">—</span>
+                {/if}
+              </td>
+            {/if}
+
+            <td class="px-2">
               {#if endpoint.lastModifiedTime}
-                <Timestamp
-                  as="p"
-                  class="text-xs text-secondary"
-                  dateTime={endpoint.lastModifiedTime}
-                >
-                  {#snippet leading()}
-                    Last Update
-                  {/snippet}
-                </Timestamp>
+                <Timestamp dateTime={endpoint.lastModifiedTime} relative />
+              {:else}
+                <span class="text-secondary">—</span>
               {/if}
+            </td>
+
+            <td class="px-2">
               {#if endpoint.createdTime}
-                <Timestamp
-                  as="p"
-                  class="text-xs text-secondary"
-                  dateTime={endpoint.createdTime}
-                >
-                  {#snippet leading()}
-                    Created On
-                  {/snippet}
-                </Timestamp>
+                <Timestamp dateTime={endpoint.createdTime} relative={false} />
+              {:else}
+                <span class="text-secondary">—</span>
               {/if}
-              {#if endpoint.spec?.allowedCallerNamespaces}
-                <Badge type="primary" class="px-2 py-1"
-                  >{endpoint.spec?.allowedCallerNamespaces.length}
-                  {pluralize(
-                    translate('namespaces.namespace'),
-                    endpoint.spec?.allowedCallerNamespaces.length,
-                  )}</Badge
-                >
-              {/if}
-            </div>
-          </Link>
+            </td>
+          </TableRow>
         {/each}
-      </div>
+      </Table>
     {:else}
       <div class="flex w-full justify-center">
         <EmptyState title={translate('nexus.empty-state')} />
