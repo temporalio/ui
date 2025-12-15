@@ -79,7 +79,7 @@ export const getEventBillableActions = (
 
     if (isWorkflowTaskFailedEventDueToReset(event)) return 1;
 
-    if (isStartChildWorkflowExecutionInitiatedEvent(event)) return 2;
+    if (isStartChildWorkflowExecutionInitiatedEvent(event)) return 1;
 
     if (isActivityTaskStartedEvent(event)) {
       const attempts = event.attributes?.attempt || 1;
