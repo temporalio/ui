@@ -53,7 +53,7 @@
 {#if as}
   <svelte:element this={as} class={className} {...rest}>
     {#if leading}
-      {@render leading()}&nbsp;
+      {@render leading()}
     {/if}
     {#if dateTime}
       {@render timestamp(dateTime, options)}

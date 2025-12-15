@@ -98,7 +98,7 @@
     variant="secondary"
     data-testid="add-filter-button"
     disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
-    on:click={() => (searchAttributeValue = '')}
+    onclick={() => (searchAttributeValue = '')}
     class="text-nowrap"
     size="xs"
   >
@@ -108,7 +108,7 @@
     <MenuItem
       class="p-0"
       hoverable={false}
-      on:click={() => {
+      onclick={() => {
         document.getElementById('filter-search')?.focus();
       }}
     >
@@ -127,7 +127,7 @@
 
     {#each filteredOptions as { value, label, type }}
       <MenuItem
-        on:click={() => {
+        onclick={() => {
           handleNewQuery(value, type);
         }}
         disabled={value === 'ExecutionStatus' &&

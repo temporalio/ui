@@ -125,7 +125,7 @@
         id="time-range-filter"
         label={translate('common.time-range')}
         bind:value={parameters.timeRange}
-        on:change={handleParameterChange}
+        onchange={handleParameterChange}
       >
         <Option value={null}>All</Option>
         {#if parameters.timeRange && !durations.includes(parameters.timeRange)}
@@ -139,7 +139,7 @@
         id="execution-status-filter"
         label={translate('common.status')}
         bind:value={parameters.executionStatus}
-        on:change={handleParameterChange}
+        onchange={handleParameterChange}
       >
         {#each Object.entries(statuses) as [label, value] (label)}
           <Option {value}>{label}</Option>

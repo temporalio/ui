@@ -114,7 +114,9 @@
     {size}
     data-testid="timezones-menu-button"
   >
-    <Icon slot="leading" name="clock" />
+    {#snippet leading()}
+      <Icon name="clock" />
+    {/snippet}
     {timezone}
   </MenuButton>
   <Menu
@@ -182,7 +184,7 @@
     {#if !search}
       {#each QuickTimezoneOptions as { value, label }}
         <MenuItem
-          on:click={() => selectTimezone(value)}
+          onclick={() => selectTimezone(value)}
           data-testid={`timezones-${value}`}
           selected={value === $timeFormat}
           description={value === BASE_TIME_FORMAT_OPTIONS.LOCAL && localTime}
@@ -197,7 +199,7 @@
     {#each filteredOptions as { value, label, offset, abbr }}
       <MenuItem
         selected={value === $timeFormat}
-        on:click={() => selectTimezone(value)}
+        onclick={() => selectTimezone(value)}
         description={formatUTCOffset(offset, translate('common.utc'))}
       >
         {label} ({abbr})

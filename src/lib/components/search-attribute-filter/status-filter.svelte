@@ -84,10 +84,10 @@
   };
 </script>
 
-<MenuContainer {open} on:close={resetFilter}>
+<MenuContainer {open} onclose={resetFilter}>
   <MenuButton
     controls="status-menu"
-    on:click={() => {
+    onclick={() => {
       if ($open) resetFilter();
     }}
   >
@@ -100,17 +100,18 @@
         (!statusFilters.length && status === 'All')}
       <MenuItem
         data-testid={status}
-        on:click={() => {
+        onclick={() => {
           onStatusClick(status);
         }}
       >
-        <Checkbox
-          on:click={() => onStatusClick(status)}
-          slot="leading"
-          {checked}
-          label={status}
-          labelHidden
-        />
+        {#snippet leading()}
+          <Checkbox
+            on:click={() => onStatusClick(status)}
+            {checked}
+            label={status}
+            labelHidden
+          />
+        {/snippet}
         {#if status === 'All'}
           <Translate key="workflows.all-statuses" />
         {:else}
