@@ -1,10 +1,17 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
 
-  export let label: string;
+  interface Props {
+    label: string;
+    children?: Snippet;
+  }
+
+  const { label, children }: Props = $props();
 </script>
 
 <MenuItem disabled>
   {label}
 </MenuItem>
-<slot />
+{@render children?.()}

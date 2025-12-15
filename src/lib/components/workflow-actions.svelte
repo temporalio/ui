@@ -186,7 +186,7 @@
             <MenuDivider />
           {/if}
           <MenuItem
-            on:click={onClick}
+            onclick={onClick}
             {destructive}
             disabled={!enabled}
             data-testid={testId}
@@ -228,7 +228,7 @@
         {#if terminateEnabled && next}
           <MenuDivider />
           <MenuItem
-            on:click={() => (terminateConfirmationModalOpen = true)}
+            onclick={() => (terminateConfirmationModalOpen = true)}
             data-testid="terminate-button"
             destructive
           >
@@ -297,7 +297,7 @@
 
 {#snippet startWorkflowMenuItem()}
   <MenuItem
-    on:click={() =>
+    onclick={() =>
       goto(
         routeForWorkflowStart({
           namespace,
@@ -318,7 +318,7 @@
 {/snippet}
 
 {#snippet downloadMenuItem()}
-  <MenuItem on:click={() => (showDownloadPrompt = true)} data-testid="download">
+  <MenuItem onclick={() => (showDownloadPrompt = true)} data-testid="download">
     <span class="flex w-full items-center justify-between gap-2">
       {translate('workflows.download-history')}
       <Icon name="download" />
