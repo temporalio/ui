@@ -318,4 +318,5 @@ export const Strings = {
   'execution-start': 'Execution Start',
   'workflow-timeout': 'Workflow Timeout',
   'custom-views': 'Custom Views',
+  'scheduled-by': 'Scheduled By',
 } as const;
