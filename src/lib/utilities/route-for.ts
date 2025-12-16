@@ -94,6 +94,18 @@ export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
 };
 
+export const routeForStandaloneActivities = (
+  parameters: NamespaceParameter,
+): string => {
+  return `${routeForNamespace(parameters)}/standalone-activities`;
+};
+
+export const routeForStartStandaloneActivity = (
+  parameters: NamespaceParameter,
+): string => {
+  return `${routeForStandaloneActivities(parameters)}/start`;
+};
+
 type StartWorkflowParameters = NamespaceParameter &
   Partial<{
     workflowId: string;

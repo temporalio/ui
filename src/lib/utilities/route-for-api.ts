@@ -19,6 +19,8 @@ import type {
   SchedulesAPIRoutePath,
   SearchAttributesRouteParameters,
   SearchAttributesRoutePath,
+  StandaloneActivitiesAPIRoutePath,
+  StandaloneActivitiesParameters,
   TaskQueueAPIRoutePath,
   TaskQueueRouteParameters,
   WorkerAPIRoutePath,
@@ -170,11 +172,18 @@ export function pathForApi(
     'worker-deployments': `/namespaces/${parameters.namespace}/worker-deployments`,
     'worker-deployment': `/namespaces/${parameters.namespace}/worker-deployments/${parameters.deploymentName}`,
     'worker-deployment-version': `/namespaces/${parameters.namespace}/worker-deployment-versions/${parameters.version}`,
+    'standalone-activities': `/namespaces/${parameters.namespace}/standalone-activities`,
+    'standalone-activities.start': `/namespaces/${parameters.namespace}/activities/${parameters.activityId}`,
   };
 
   return getPath(routes[route]);
 }
 
+export function routeForApi(
+  route: StandaloneActivitiesAPIRoutePath,
+  parameters: StandaloneActivitiesParameters,
+  shouldEncode?: boolean,
+): string;
 export function routeForApi(
   route: WorkflowsAPIRoutePath,
   parameters: WorkflowListRouteParameters,
