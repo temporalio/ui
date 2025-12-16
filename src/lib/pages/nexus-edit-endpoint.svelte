@@ -1,16 +1,13 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusForm from '$lib/pages/nexus-form.svelte';
   import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
-  import { routeForNexusEndpoint } from '$lib/utilities/route-for';
 
   export let endpoint: NexusEndpoint;
   export let targetNamespaceList: { namespace: string }[] = [];
@@ -22,17 +19,13 @@
   export let isCloud = false;
   export let nameRegexPattern: RegExp = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/;
   export let nameHintText = translate('nexus.endpoint-name-hint-with-dash');
+  export let cancelHref = '/nexus';
 
   let deleteConfirmationModalOpen = false;
   let confirmDeleteInput = '';
 </script>
 
 <div class="flex flex-col gap-8">
-  <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
-      {translate('nexus.back-to-endpoint')}
-    </Link>
-  </div>
   <div class="flex flex-col gap-1">
     <h1 data-testid="namespace-selector-title">
       {endpoint.spec.name}
@@ -60,8 +53,7 @@
       <Button
         class="max-sm:hidden"
         variant="ghost"
-        on:click={() => goto(routeForNexusEndpoint($page.params.id))}
-        >{translate('common.cancel')}</Button
+        on:click={() => goto(cancelHref)}>{translate('common.cancel')}</Button
       >
     </div>
     <Button
@@ -73,8 +65,7 @@
     <Button
       class="w-full sm:hidden"
       variant="ghost"
-      on:click={() => goto(routeForNexusEndpoint($page.params.id))}
-      >{translate('common.cancel')}</Button
+      on:click={() => goto(cancelHref)}>{translate('common.cancel')}</Button
     >
   </div>
 </div>

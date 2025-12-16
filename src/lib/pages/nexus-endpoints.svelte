@@ -24,7 +24,6 @@
   import {
     routeForNamespace,
     routeForNexusEndpoint,
-    routeForNexusEndpointCreate,
   } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -41,7 +40,7 @@
     endpoints = [],
     searchPlaceholder = translate('common.search'),
     createDisabled = false,
-    createHref,
+    createHref = '/nexus/create',
     headerColumns,
     rowColumns,
   }: Props = $props();
@@ -69,10 +68,7 @@
     <h1 data-testid="namespace-selector-title">
       {translate('nexus.endpoints')}
     </h1>
-    <Button
-      disabled={createDisabled}
-      variant="primary"
-      href={routeForNexusEndpointCreate()}
+    <Button disabled={createDisabled} variant="primary" href={createHref}
       >{translate('nexus.create-endpoint')}</Button
     >
   </div>

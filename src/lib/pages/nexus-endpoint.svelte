@@ -9,7 +9,6 @@
   import type { NexusEndpoint as Endpoint } from '$lib/types/nexus';
   import {
     routeForNamespace,
-    routeForNexus,
     routeForNexusEndpointEdit,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
@@ -17,22 +16,15 @@
   let {
     endpoint,
     editDisabled = false,
-    backHref = routeForNexus(),
     taskQueueStatus,
   }: {
     endpoint: Endpoint;
-    backHref?: string;
     editDisabled?: boolean;
     taskQueueStatus?: Snippet;
   } = $props();
 </script>
 
 <div class="flex flex-col gap-8">
-  <div class="relative flex flex-col gap-4 text-sm">
-    <Link href={backHref} icon="chevron-left">
-      {translate('nexus.back-to-endpoints')}
-    </Link>
-  </div>
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between">
       <h1 data-testid="namespace-selector-title">

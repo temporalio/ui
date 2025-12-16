@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusCreateEndpoint from '$lib/pages/nexus-create-endpoint.svelte';
   import { endpointForm } from '$lib/pages/nexus-form.svelte';
@@ -44,4 +45,9 @@
 </script>
 
 <PageTitle title={translate('nexus.create-endpoint')} url={$page.url.href} />
-<NexusCreateEndpoint {onCreate} {targetNamespaceList} {error} {loading} />
+<div class="flex flex-col gap-4">
+  <Link href={routeForNexus()} icon="chevron-left">
+    {translate('nexus.back-to-endpoints')}
+  </Link>
+  <NexusCreateEndpoint {onCreate} {targetNamespaceList} {error} {loading} />
+</div>
