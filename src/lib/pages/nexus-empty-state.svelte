@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
-
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -11,13 +9,11 @@
   type Props = {
     createDisabled?: boolean;
     createHref?: string;
-    children?: Snippet;
   };
 
   let {
     createDisabled = false,
     createHref = routeForNexusEndpointCreate(),
-    children,
   }: Props = $props();
 </script>
 
@@ -65,7 +61,6 @@
           > are often registered in the same Worker as the underlying Temporal primitives
           they abstract.
         </p>
-        {@render children?.()}
         <Button disabled={createDisabled} variant="primary" href={createHref}
           >{translate('nexus.create-endpoint')}</Button
         >

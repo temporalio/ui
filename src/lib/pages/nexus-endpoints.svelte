@@ -32,18 +32,18 @@
     endpoints: NexusEndpoint[];
     searchPlaceholder?: string;
     createDisabled?: boolean;
+    createHref?: string;
     headerColumns?: Snippet;
     rowColumns?: Snippet<[NexusEndpoint]>;
-    children?: Snippet;
   };
 
   let {
     endpoints = [],
     searchPlaceholder = translate('common.search'),
     createDisabled = false,
+    createHref,
     headerColumns,
     rowColumns,
-    children,
   }: Props = $props();
 
   let search = $state('');
@@ -63,9 +63,7 @@
 </script>
 
 {#if !endpoints?.length && !searchParam}
-  <NexusEmptyState {createDisabled}>
-    {@render children?.()}
-  </NexusEmptyState>
+  <NexusEmptyState {createDisabled} {createHref} />
 {:else}
   <div class="mb-8 flex items-center justify-between">
     <h1 data-testid="namespace-selector-title">
