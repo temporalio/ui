@@ -28,6 +28,15 @@
   } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
+  type Props = {
+    endpoints: NexusEndpoint[];
+    searchPlaceholder?: string;
+    createDisabled?: boolean;
+    headerColumns?: Snippet;
+    rowColumns?: Snippet<[NexusEndpoint]>;
+    children?: Snippet;
+  };
+
   let {
     endpoints = [],
     searchPlaceholder = translate('common.search'),
@@ -35,14 +44,7 @@
     headerColumns,
     rowColumns,
     children,
-  }: {
-    endpoints: NexusEndpoint[];
-    searchPlaceholder?: string;
-    createDisabled?: boolean;
-    headerColumns?: Snippet;
-    rowColumns?: Snippet<[NexusEndpoint]>;
-    children?: Snippet;
-  } = $props();
+  }: Props = $props();
 
   let search = $state('');
   let searchParam = $derived(page.url.searchParams.get('search') || '');
