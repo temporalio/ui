@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -6,7 +8,17 @@
   import { routeForNexusEndpointCreate } from '$lib/utilities/route-for';
   import andromeda from '$lib/vendor/andromeda.png';
 
-  export let createDisabled = false;
+  type Props = {
+    createDisabled?: boolean;
+    createHref?: string;
+    children?: Snippet;
+  };
+
+  let {
+    createDisabled = false,
+    createHref = routeForNexusEndpointCreate(),
+    children,
+  }: Props = $props();
 </script>
 
 <div class="flex min-h-screen flex-col gap-8 p-10">
@@ -53,11 +65,8 @@
           > are often registered in the same Worker as the underlying Temporal primitives
           they abstract.
         </p>
-        <slot />
-        <Button
-          disabled={createDisabled}
-          variant="primary"
-          href={routeForNexusEndpointCreate()}
+        {@render children?.()}
+        <Button disabled={createDisabled} variant="primary" href={createHref}
           >{translate('nexus.create-endpoint')}</Button
         >
       </div>
