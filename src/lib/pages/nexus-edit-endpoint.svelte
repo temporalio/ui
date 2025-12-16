@@ -28,7 +28,7 @@
 <div class="flex flex-col gap-8">
   <div class="flex flex-col gap-1">
     <h1 data-testid="namespace-selector-title">
-      {endpoint.spec.name}
+      {endpoint.spec?.name || ''}
     </h1>
   </div>
   <NexusForm
@@ -78,18 +78,18 @@
   cancelText={translate('common.cancel')}
   on:confirmModal={onDelete}
   on:cancelModal={() => (deleteConfirmationModalOpen = false)}
-  confirmDisabled={confirmDeleteInput !== endpoint.spec.name}
+  confirmDisabled={confirmDeleteInput !== endpoint.spec?.name}
 >
   <h3 slot="title">{translate('nexus.delete-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     <p>
       {translate('nexus.delete-modal-confirmation-preface')}
-      <strong class="select-all">{endpoint.spec.name}</strong>?
+      <strong class="select-all">{endpoint.spec?.name || ''}</strong>?
       {translate('nexus.delete-modal-confirmation-postface')}
     </p>
     <p>
       {translate('nexus.type-confirm-preface')}
-      <strong class="select-all">{endpoint.spec.name}</strong>
+      <strong class="select-all">{endpoint.spec?.name || ''}</strong>
       {translate('nexus.type-confirm-postface')}
     </p>
     <Input

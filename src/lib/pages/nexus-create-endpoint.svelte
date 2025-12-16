@@ -17,9 +17,9 @@
   export let cancelHref = '/nexus';
 
   $: createDisabled =
-    $endpointForm.spec.name === '' ||
-    $endpointForm.spec.target.worker.namespace === '' ||
-    $endpointForm.spec.target.worker.taskQueue === '';
+    !$endpointForm.spec?.name ||
+    !$endpointForm.spec?.target?.worker?.namespace ||
+    !$endpointForm.spec?.target?.worker?.taskQueue;
 </script>
 
 <div class="flex w-full flex-col gap-8">

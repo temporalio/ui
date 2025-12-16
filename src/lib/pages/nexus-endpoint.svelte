@@ -28,7 +28,7 @@
   <div class="flex flex-col gap-1">
     <div class="flex items-center justify-between">
       <h1 data-testid="namespace-selector-title">
-        {endpoint.spec.name}
+        {endpoint.spec?.name || ''}
       </h1>
       <Button
         href={routeForNexusEndpointEdit(endpoint.id)}
@@ -44,10 +44,10 @@
         <span class="font-medium">Namespace</span>
         <Link
           href={routeForNamespace({
-            namespace: endpoint.spec.target.worker.namespace,
+            namespace: endpoint.spec?.target?.worker?.namespace || '',
           })}
         >
-          <i>{endpoint.spec.target.worker.namespace}</i>
+          <i>{endpoint.spec?.target?.worker?.namespace || ''}</i>
         </Link>
       </div>
       <div class="flex items-center gap-2">
@@ -55,15 +55,15 @@
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={endpoint.spec.target.worker.taskQueue}
+          content={endpoint.spec?.target?.worker?.taskQueue || ''}
         >
           <Link
             href={routeForTaskQueue({
-              namespace: endpoint.spec.target.worker.namespace,
-              queue: endpoint.spec.target.worker.taskQueue,
+              namespace: endpoint.spec?.target?.worker?.namespace || '',
+              queue: endpoint.spec?.target?.worker?.taskQueue || '',
             })}
           >
-            <i>{endpoint.spec.target.worker.taskQueue}</i>
+            <i>{endpoint.spec?.target?.worker?.taskQueue || ''}</i>
           </Link>
         </Copyable>
       </div>
