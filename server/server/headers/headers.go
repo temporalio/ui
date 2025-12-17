@@ -34,6 +34,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const hostHdr = "Host"
+
 func WithForwardHeaders(headers []string) api.Middleware {
 	return func(c echo.Context) runtime.ServeMuxOption {
 		return runtime.WithMetadata(handleForwardHeaders(c, headers))
@@ -44,6 +46,18 @@ func handleForwardHeaders(c echo.Context, headers []string) func(context.Context
 	return func(ctx context.Context, req *http.Request) metadata.MD {
 		md := metadata.MD{}
 		for _, header := range headers {
+
+			// For incoming requests, go strips the `Host` header and put it in req.Host
+			if header == hostHdr {
+				// First use the header value, if not found, use req.Host
+				headerValue := c.Request().Header.Get(hostHdr)
+				if headerValue == "" {
+					headerValue = c.Request().Host
+				}
+				md.Append(header, headerValue)
+				continue
+			}
+
 			headerValue := c.Request().Header.Get(header)
 			if headerValue != "" {
 				if len(header) > 4 && header[len(header)-4:] == "-bin" {

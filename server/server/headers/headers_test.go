@@ -76,12 +76,14 @@ func TestHandleForwardHeaders(t *testing.T) {
 	tests := []struct {
 		name             string
 		headers          []string
+		req              *http.Request
 		requestHeaders   map[string]string
 		expectedMetadata map[string][]string
 	}{
 		{
 			name:    "forward regular headers",
 			headers: []string{"X-Custom-Header", "Authorization"},
+			req:     httptest.NewRequest(http.MethodGet, "/", nil),
 			requestHeaders: map[string]string{
 				"X-Custom-Header": "custom-value",
 				"Authorization":   "Bearer token",
@@ -94,6 +96,7 @@ func TestHandleForwardHeaders(t *testing.T) {
 		{
 			name:    "forward binary header in base64 encoding with padding",
 			headers: []string{"X-Binary-Header-bin"},
+			req:     httptest.NewRequest(http.MethodGet, "/", nil),
 			requestHeaders: map[string]string{
 				"X-Binary-Header-bin": "YmluYXJ5IGRhdGE=",
 			},
@@ -104,6 +107,7 @@ func TestHandleForwardHeaders(t *testing.T) {
 		{
 			name:    "forward binary header in base64 encoding without padding",
 			headers: []string{"X-Data-bin"},
+			req:     httptest.NewRequest(http.MethodGet, "/", nil),
 			requestHeaders: map[string]string{
 				"X-Data-bin": "YmluYXJ5IGRhdGE=",
 			},
@@ -114,6 +118,7 @@ func TestHandleForwardHeaders(t *testing.T) {
 		{
 			name:    "mixed regular and binary headers",
 			headers: []string{"X-Regular", "X-Binary-bin"},
+			req:     httptest.NewRequest(http.MethodGet, "/", nil),
 			requestHeaders: map[string]string{
 				"X-Regular":    "regular-value",
 				"X-Binary-bin": "YmluYXJ5LXZhbHVl=",
@@ -126,6 +131,7 @@ func TestHandleForwardHeaders(t *testing.T) {
 		{
 			name:    "skip empty headers",
 			headers: []string{"X-Present", "X-Missing"},
+			req:     httptest.NewRequest(http.MethodGet, "/", nil),
 			requestHeaders: map[string]string{
 				"X-Present": "present-value",
 			},
@@ -136,22 +142,40 @@ func TestHandleForwardHeaders(t *testing.T) {
 		{
 			name:    "skip invalid base64 in binary header",
 			headers: []string{"X-Invalid-bin"},
+			req:     httptest.NewRequest(http.MethodGet, "/", nil),
 			requestHeaders: map[string]string{
 				"X-Invalid-bin": "not-valid-base64!!!",
 			},
 			expectedMetadata: map[string][]string{},
+		},
+		{
+			name:           "forward the host header",
+			headers:        []string{"Host"},
+			req:            &http.Request{Host: "host-from-req", Header: http.Header{}},
+			requestHeaders: map[string]string{},
+			expectedMetadata: map[string][]string{
+				"Host": {"host-from-req"},
+			},
+		},
+		{
+			name:           "prioritize the host in header if available",
+			headers:        []string{"Host"},
+			req:            &http.Request{Host: "host-from-req", Header: http.Header{}},
+			requestHeaders: map[string]string{"Host": "host-from-header"},
+			expectedMetadata: map[string][]string{
+				"Host": {"host-from-header"},
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := echo.New()
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
 			for k, v := range tt.requestHeaders {
-				req.Header.Set(k, v)
+				tt.req.Header.Set(k, v)
 			}
 			rec := httptest.NewRecorder()
-			c := e.NewContext(req, rec)
+			c := e.NewContext(tt.req, rec)
 
 			handle := handleForwardHeaders(c, tt.headers)
 			var actualMetadata metadata.MD = handle(nil, nil)
