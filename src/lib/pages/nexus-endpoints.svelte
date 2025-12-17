@@ -18,8 +18,8 @@
     searchPlaceholder?: string;
     createDisabled?: boolean;
     createHref?: string;
-    headers: Snippet;
-    columns: Snippet<[NexusEndpoint]>;
+    headers?: Snippet;
+    columns?: Snippet<[NexusEndpoint]>;
   };
 
   let {
@@ -75,9 +75,9 @@
         <caption class="sr-only" slot="caption">
           {translate('nexus.endpoints')}
         </caption>
-        {@render headers()}
+        {@render headers?.()}
         {#each endpoints as endpoint}
-          {@render columns(endpoint)}
+          {@render columns?.(endpoint)}
         {/each}
       </Table>
     {:else}
