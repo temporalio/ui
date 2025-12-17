@@ -6,20 +6,37 @@
   import NexusForm, { endpointForm } from '$lib/pages/nexus-form.svelte';
   import type { NetworkError } from '$lib/types/global';
 
-  export let onCreate: () => void;
-  export let targetNamespaceList: { namespace: string }[] = [];
-  export let callerNamespaceList: { namespace: string }[] = [];
-  export let error: NetworkError | undefined = undefined;
-  export let loading = false;
-  export let isCloud = false;
-  export let nameRegexPattern: RegExp = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/;
-  export let nameHintText = translate('nexus.endpoint-name-hint-with-dash');
-  export let cancelHref = '/nexus';
+  type Props = {
+    onCreate: () => void;
+    targetNamespaceList?: { namespace: string }[];
+    callerNamespaceList?: { namespace: string }[];
+    error?: NetworkError | undefined;
+    loading?: boolean;
+    isCloud?: boolean;
+    nameRegexPattern?: RegExp;
+    nameHintText?: string;
+    cancelHref?: string;
+    projectId?: string;
+  };
 
-  $: createDisabled =
+  let {
+    onCreate,
+    targetNamespaceList = [],
+    callerNamespaceList = [],
+    error = undefined,
+    loading = false,
+    isCloud = false,
+    nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
+    nameHintText = translate('nexus.endpoint-name-hint-with-dash'),
+    cancelHref = '/nexus',
+    projectId: _projectId = undefined,
+  }: Props = $props();
+
+  const createDisabled = $derived(
     !$endpointForm.spec?.name ||
-    !$endpointForm.spec?.target?.worker?.namespace ||
-    !$endpointForm.spec?.target?.worker?.taskQueue;
+      !$endpointForm.spec?.target?.worker?.namespace ||
+      !$endpointForm.spec?.target?.worker?.taskQueue,
+  );
 </script>
 
 <div class="flex w-full flex-col gap-8">

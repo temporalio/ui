@@ -30,7 +30,7 @@ export const fetchNexusEndpoint = async (
 };
 
 export const createNexusEndpoint = async (
-  body: Partial<NexusEndpoint>,
+  body: Partial<NexusEndpoint> & { projectId?: string },
   request = fetch,
 ): Promise<NexusEndpoint> => {
   const route = routeForApi('nexus-endpoints');
