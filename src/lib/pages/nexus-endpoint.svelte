@@ -31,8 +31,9 @@
         {endpoint.spec?.name || ''}
       </h1>
       <Button
-        href={routeForNexusEndpointEdit(endpoint.id)}
-        disabled={editDisabled}>{translate('common.edit')}</Button
+        href={endpoint.id ? routeForNexusEndpointEdit(endpoint.id) : '#'}
+        disabled={editDisabled || !endpoint.id}
+        >{translate('common.edit')}</Button
       >
     </div>
     <p>UUID: {endpoint.id}</p>

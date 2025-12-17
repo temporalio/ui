@@ -4,27 +4,15 @@
 
   import { page } from '$app/state';
 
-  import Timestamp from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import {
-    Menu,
-    MenuButton,
-    MenuContainer,
-    MenuItem,
-  } from '$lib/holocene/menu';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEmptyState from '$lib/pages/nexus-empty-state.svelte';
   import type { NexusEndpoint } from '$lib/types/nexus';
-  import {
-    routeForNamespace,
-    routeForNexusEndpoint,
-  } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   type Props = {
@@ -32,8 +20,8 @@
     searchPlaceholder?: string;
     createDisabled?: boolean;
     createHref?: string;
-    headerColumns?: Snippet;
-    rowColumns?: Snippet<[NexusEndpoint]>;
+    headers: Snippet;
+    columns: Snippet<[NexusEndpoint]>;
   };
 
   let {
@@ -41,8 +29,8 @@
     searchPlaceholder = translate('common.search'),
     createDisabled = false,
     createHref = '/nexus/create',
-    headerColumns,
-    rowColumns,
+    headers,
+    columns,
   }: Props = $props();
 
   let search = $state('');
@@ -90,87 +78,11 @@
           {translate('nexus.endpoints')}
         </caption>
         <TableHeaderRow slot="headers">
-          <th>Name</th>
-          <th>Used By</th>
-          {@render headerColumns?.()}
-          <th>Last Updated</th>
-          <th>Created On</th>
+          {@render headers()}
         </TableHeaderRow>
         {#each endpoints as endpoint}
           <TableRow>
-            <td class="px-2">
-              {#if endpoint.id && endpoint.spec?.name}
-                <Link
-                  href={routeForNexusEndpoint(endpoint.id)}
-                  class="table-link"
-                >
-                  {endpoint.spec.name}
-                </Link>
-              {:else}
-                <span class="text-secondary">—</span>
-              {/if}
-            </td>
-
-            <td class="px-2">
-              {#if !endpoint.spec?.allowedCallerNamespaces?.length}
-                <span class="text-sm text-secondary">0 Namespaces</span>
-              {:else if endpoint.spec.allowedCallerNamespaces.length === 1}
-                <Link
-                  href={routeForNamespace({
-                    namespace: endpoint.spec.allowedCallerNamespaces[0],
-                  })}
-                  class="table-link"
-                >
-                  {endpoint.spec.allowedCallerNamespaces[0]}
-                </Link>
-              {:else}
-                <div class="flex items-center gap-1">
-                  <Link
-                    href={routeForNamespace({
-                      namespace: endpoint.spec.allowedCallerNamespaces[0],
-                    })}
-                    class="table-link"
-                  >
-                    {endpoint.spec.allowedCallerNamespaces[0]}
-                  </Link>
-                  <MenuContainer>
-                    <MenuButton
-                      controls="namespaces-menu-{endpoint.id}"
-                      hasIndicator
-                      variant="ghost"
-                      size="xs"
-                      label="+{endpoint.spec.allowedCallerNamespaces.length -
-                        1}"
-                    />
-                    <Menu id="namespaces-menu-{endpoint.id}">
-                      {#each endpoint.spec.allowedCallerNamespaces.slice(1) as namespace}
-                        <MenuItem href={routeForNamespace({ namespace })}>
-                          {namespace}
-                        </MenuItem>
-                      {/each}
-                    </Menu>
-                  </MenuContainer>
-                </div>
-              {/if}
-            </td>
-
-            {@render rowColumns?.(endpoint)}
-
-            <td class="px-2">
-              {#if endpoint.lastModifiedTime}
-                <Timestamp dateTime={endpoint.lastModifiedTime} relative />
-              {:else}
-                <span class="text-secondary">—</span>
-              {/if}
-            </td>
-
-            <td class="px-2">
-              {#if endpoint.createdTime}
-                <Timestamp dateTime={endpoint.createdTime} relative={false} />
-              {:else}
-                <span class="text-secondary">—</span>
-              {/if}
-            </td>
+            {@render columns(endpoint)}
           </TableRow>
         {/each}
       </Table>

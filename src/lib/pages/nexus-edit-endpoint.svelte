@@ -9,20 +9,36 @@
   import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
-  export let endpoint: NexusEndpoint;
-  export let targetNamespaceList: { namespace: string }[] = [];
-  export let callerNamespaceList: { namespace: string }[] = [];
-  export let onUpdate: () => void;
-  export let onDelete: () => void;
-  export let error: NetworkError | undefined = undefined;
-  export let loading = false;
-  export let isCloud = false;
-  export let nameRegexPattern: RegExp = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/;
-  export let nameHintText = translate('nexus.endpoint-name-hint-with-dash');
-  export let cancelHref = '/nexus';
+  type Props = {
+    endpoint: NexusEndpoint;
+    targetNamespaceList?: { namespace: string }[];
+    callerNamespaceList?: { namespace: string }[];
+    onUpdate: () => void;
+    onDelete: () => void;
+    error?: NetworkError;
+    loading?: boolean;
+    isCloud?: boolean;
+    nameRegexPattern?: RegExp;
+    nameHintText?: string;
+    cancelHref?: string;
+  };
 
-  let deleteConfirmationModalOpen = false;
-  let confirmDeleteInput = '';
+  let {
+    endpoint,
+    targetNamespaceList = [],
+    callerNamespaceList = [],
+    onUpdate,
+    onDelete,
+    error = undefined,
+    loading = false,
+    isCloud = false,
+    nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
+    nameHintText = translate('nexus.endpoint-name-hint-with-dash'),
+    cancelHref = '/nexus',
+  }: Props = $props();
+
+  let deleteConfirmationModalOpen = $state(false);
+  let confirmDeleteInput = $state('');
 </script>
 
 <div class="flex flex-col gap-8">
