@@ -47,7 +47,7 @@ func handleForwardHeaders(c echo.Context, headers []string) func(context.Context
 		md := metadata.MD{}
 		for _, header := range headers {
 
-			// For incoming requests, go strips the `Host` header and put it in req.Host
+			// For incoming requests, go strips the `Host` header and puts it in req.Host
 			if header == hostHdr {
 				// First use the header value, if not found, use req.Host
 				headerValue := c.Request().Header.Get(hostHdr)
