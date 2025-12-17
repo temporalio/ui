@@ -16,9 +16,8 @@
     supportedTypes: SearchAttributeTypeOption[];
     submitting: boolean;
     error?: string;
-    hideDeleteButton?: boolean;
     disableTypeForExisting?: boolean;
-    initialAttributeNames: Set<string>;
+    isDeletable?: boolean;
     onRemove: () => void;
     onNameChange: (value: string) => void;
     onTypeChange: (value: string) => void;
@@ -31,18 +30,18 @@
     supportedTypes,
     submitting,
     error,
-    hideDeleteButton = false,
     disableTypeForExisting = false,
-    initialAttributeNames,
+    isDeletable = true,
     onRemove,
     onNameChange,
     onTypeChange,
   }: Props = $props();
 
   const isTypeDisabled = $derived(
-    submitting ||
-      (disableTypeForExisting && name && initialAttributeNames.has(name)),
+    submitting || (disableTypeForExisting && !isDeletable),
   );
+
+  const isDeleteDisabled = $derived(submitting || !isDeletable);
 
   const hasError = $derived(!!error);
 
@@ -51,11 +50,7 @@
   };
 </script>
 
-<div
-  class="grid gap-3"
-  class:grid-cols-[1fr,200px,auto]={!hideDeleteButton}
-  class:grid-cols-[1fr,200px]={hideDeleteButton}
->
+<div class="grid grid-cols-[1fr,200px,auto] gap-3">
   <Input
     id={`attribute-name-${index}`}
     value={name}
@@ -84,16 +79,14 @@
     {/each}
   </Select>
 
-  {#if !hideDeleteButton}
-    <Button
-      variant="ghost"
-      size="xs"
-      on:click={onRemove}
-      disabled={submitting}
-      type="button"
-      leadingIcon="trash"
-    />
-  {/if}
+  <Button
+    variant="ghost"
+    size="xs"
+    on:click={onRemove}
+    disabled={isDeleteDisabled}
+    type="button"
+    leadingIcon="trash"
+  />
 </div>
 
 {#if error}

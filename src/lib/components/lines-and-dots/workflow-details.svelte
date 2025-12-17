@@ -21,6 +21,7 @@
   import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
   import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import {
+    routeForSchedule,
     routeForTaskQueue,
     routeForWorkerDeployment,
     routeForWorkflow,
@@ -47,6 +48,10 @@
 
   let latestRunId = $state<string | undefined>(undefined);
 
+  const parent = $derived(workflow?.parent);
+  const scheduleId = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalScheduledById'],
+  );
   const { namespace } = $derived(page.params);
   const elapsedTime = $derived(
     formatDistanceAbbreviated({
@@ -225,15 +230,25 @@
   {/if}
 
   <DetailListColumn>
-    {#if workflow?.parent}
+    {#if scheduleId}
+      <DetailListLabel>{translate('workflows.scheduled-by')}</DetailListLabel>
+      <DetailListLinkValue
+        text={scheduleId}
+        href={routeForSchedule({
+          namespace,
+          scheduleId,
+        })}
+      />
+    {/if}
+    {#if parent}
       <DetailListLabel>{translate('workflows.parent-workflow')}</DetailListLabel
       >
       <DetailListLinkValue
-        text={workflow?.parent?.workflowId}
+        text={parent?.workflowId}
         href={routeForWorkflow({
           namespace,
-          workflow: workflow?.parent?.workflowId,
-          run: workflow?.parent?.runId,
+          workflow: parent?.workflowId,
+          run: parent?.runId,
         })}
       />
     {/if}
@@ -250,7 +265,9 @@
         })}
       />
     {/if}
+  </DetailListColumn>
 
+  <DetailListColumn>
     <DetailListLabel>{translate('common.history-size-bytes')}</DetailListLabel>
     <DetailListTextValue text={workflow?.historySizeBytes} />
 

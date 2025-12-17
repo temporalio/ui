@@ -6,6 +6,7 @@
   import { cancelWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
   export let open: boolean;
@@ -16,6 +17,8 @@
   let loading: boolean;
   let error: string = '';
 
+  const identity = getIdentity();
+
   const cancel = async () => {
     error = '';
     loading = true;
@@ -23,6 +26,7 @@
       await cancelWorkflow({
         namespace,
         workflow,
+        identity,
       });
       open = false;
       $refresh = Date.now();

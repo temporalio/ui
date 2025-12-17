@@ -86,11 +86,14 @@
           onSuccess(dataToSave);
           return { type: 'success' };
         } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Failed to save codec server configuration';
           return {
             type: 'error',
             error: {
-              message:
-                error.message || 'Failed to save codec server configuration',
+              message: errorMessage,
             },
           };
         }
@@ -115,16 +118,16 @@
   const disabled = $derived($submitting || taintedCount === 0);
 </script>
 
-<Card class={className}>
+<Card class="p-5 {className}">
   <form use:enhance>
-    <div class="space-y-6 p-4">
+    <div class="space-y-6">
       <Message value={$message} />
 
       <!-- Title and Description -->
       <div>
-        <h3 class="text-lg font-medium">Codec Server</h3>
-        <p class="text-gray-600 mt-1">
-          Decode your data remotely through endpoints.
+        <h2 class="text-lg font-semibold">{translate('codec-server.title')}</h2>
+        <p class="text-sm text-secondary">
+          {translate('codec-server.description')}
         </p>
       </div>
 
@@ -136,7 +139,7 @@
 
       <!-- Endpoint Input -->
       <div class="space-y-2">
-        <p class="text-gray-700 text-sm">
+        <p class="text-sm text-secondary">
           {translate('codec-server.endpoint-description-prefix')}
           <Link
             href="https://docs.temporal.io/dataconversion#codec-server"
@@ -181,7 +184,7 @@
       <!-- Custom Message and Link Section -->
       {#if showCustomSection}
         <div class="space-y-4">
-          <p class="text-gray-600 text-sm">
+          <p class="text-sm text-secondary">
             {translate('codec-server.custom-section-description')}
           </p>
           <div class="space-y-4">
@@ -210,7 +213,7 @@
                 hintText={$errors.customLink?.[0]}
                 disabled={$submitting}
               />
-              <p class="text-gray-600 mt-1 text-sm">
+              <p class="text-sm text-secondary">
                 {translate('codec-server.custom-link-description')}
               </p>
             </div>
@@ -248,31 +251,29 @@
       {/if}
     </div>
 
-    <div class="p-4">
-      <div class="flex gap-3">
-        <Button
-          type="submit"
-          size="sm"
-          variant="primary"
-          {disabled}
-          loading={$submitting}
-        >
-          <TaintedBadge show={!hideTainted} count={taintedCount} />
-          {translate('codec-server.save-button')}
-        </Button>
+    <div class="mt-4 flex gap-3">
+      <Button
+        type="submit"
+        size="sm"
+        variant="primary"
+        {disabled}
+        loading={$submitting}
+      >
+        <TaintedBadge show={!hideTainted} count={taintedCount} />
+        {translate('codec-server.save-button')}
+      </Button>
 
-        {#if !hideCancelButton}
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            on:click={handleCancel}
-            disabled={$submitting}
-          >
-            {translate('common.cancel')}
-          </Button>
-        {/if}
-      </div>
+      {#if !hideCancelButton}
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          on:click={handleCancel}
+          disabled={$submitting}
+        >
+          {translate('common.cancel')}
+        </Button>
+      {/if}
     </div>
   </form>
 </Card>
