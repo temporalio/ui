@@ -7,8 +7,6 @@
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEmptyState from '$lib/pages/nexus-empty-state.svelte';
@@ -77,13 +75,9 @@
         <caption class="sr-only" slot="caption">
           {translate('nexus.endpoints')}
         </caption>
-        <TableHeaderRow slot="headers">
-          {@render headers()}
-        </TableHeaderRow>
+        {@render headers()}
         {#each endpoints as endpoint}
-          <TableRow>
-            {@render columns(endpoint)}
-          </TableRow>
+          {@render columns(endpoint)}
         {/each}
       </Table>
     {:else}
