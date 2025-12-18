@@ -60,6 +60,7 @@
   on:click
   role="button"
   tabindex="0"
+  type={href ? undefined : 'button'}
   {...$$restProps}
 >
   <Tooltip hide={!tooltip} text={tooltip} top>

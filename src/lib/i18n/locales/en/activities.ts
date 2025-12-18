@@ -16,4 +16,6 @@ export const Strings = {
   'unpause-all-activity-types': 'Unpause all {{type}} runs',
   'reset-heartbeat-details': 'Reset Heartbeat Details (optional)',
   'reset-success': 'Activity {{activityId}} has been reset successfully.',
+  'standalone-activities': 'Standalone Activities',
+  'start-standalone-activity': 'Start Standalone Activity',
 };
