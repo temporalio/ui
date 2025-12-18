@@ -101,6 +101,7 @@ import robot from './svg/robot.svelte';
 import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
+import server from './svg/server.svelte';
 import settings from './svg/settings.svelte';
 import shield from './svg/shield.svelte';
 import signal from './svg/signal.svelte';
@@ -241,6 +242,7 @@ export const icons = {
   'rocket-ship': rocketShip,
   schedules,
   search,
+  server,
   settings,
   shield,
   signal,
