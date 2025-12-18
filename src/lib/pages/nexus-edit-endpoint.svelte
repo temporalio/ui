@@ -60,9 +60,7 @@
   <div
     class="flex w-full flex-row items-center justify-between gap-4 max-sm:flex-col xl:w-1/2"
   >
-    <div
-      class="items-centeritems-center flex w-full flex-row gap-4 max-sm:flex-col"
-    >
+    <div class="flex w-full flex-row items-center gap-4 max-sm:flex-col">
       <Button class="max-sm:w-full" on:click={onUpdate} {loading}
         >{translate('common.save')}</Button
       >

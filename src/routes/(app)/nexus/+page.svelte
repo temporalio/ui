@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import PageTitle from '$lib/components/page-title.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -6,7 +8,6 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEndpoints from '$lib/pages/nexus-endpoints.svelte';
-  import { page } from '$lib/svelte-mocks/app/stores';
   import { routeForNexusEndpoint } from '$lib/utilities/route-for';
 
   import type { PageData } from '../$types';
