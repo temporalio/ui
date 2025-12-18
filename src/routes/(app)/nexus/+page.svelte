@@ -11,9 +11,9 @@
 
   import type { PageData } from '../$types';
 
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
 
-  $: ({ endpoints } = data);
+  const { endpoints } = $derived(data);
 </script>
 
 <PageTitle title={translate('nexus.endpoints')} url={$page.url.href} />
