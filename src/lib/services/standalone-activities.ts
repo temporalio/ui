@@ -79,9 +79,9 @@ const toStartActivityExecutionRequest = async (
   return {
     identity: activityFormData.identity,
     namespace: activityFormData.namespace,
-    activityId: activityFormData.id,
+    activityId: activityFormData.activityId,
     requestId: crypto.randomUUID(),
-    activityType: { name: activityFormData.type },
+    activityType: { name: activityFormData.activityType },
     taskQueue: { name: activityFormData.taskQueue },
     input: { payloads: inputPayloads },
     userMetadata: {
@@ -103,7 +103,7 @@ const toStartActivityExecutionRequest = async (
 export const startStandaloneActivity = async (
   activity: StandaloneActivityFormData,
 ) => {
-  const { id: activityId, namespace } = activity;
+  const { activityId, namespace } = activity;
 
   const route = routeForApi('standalone-activities.start', {
     namespace,

@@ -4,12 +4,12 @@ import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 export interface StandaloneActivityFormData {
   identity: string;
   namespace: string;
-  id: string;
+  activityId: string;
   taskQueue: string;
-  type: string;
+  activityType: string;
   startToCloseTimeout: string;
-  scheduleToCloseTimeout: string;
-  scheduleToStartTimeout: string;
+  scheduleToCloseTimeout?: string;
+  scheduleToStartTimeout?: string;
   input?: string;
   encoding?: PayloadInputEncoding;
   messageType?: string;

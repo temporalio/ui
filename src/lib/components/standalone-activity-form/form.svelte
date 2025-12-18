@@ -7,6 +7,8 @@
   import { twMerge } from 'tailwind-merge';
   import z from 'zod/v3';
 
+  import { page } from '$app/state';
+
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
@@ -21,6 +23,7 @@
   import { startStandaloneActivity } from '$lib/services/standalone-activities';
   import { getIdentity } from '$lib/utilities/core-context';
 
+  import type { StandaloneActivityFormData } from './types';
   import Message from '../form/message.svelte';
   import PayloadInputWithEncoding from '../payload-input-with-encoding.svelte';
   import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
@@ -31,13 +34,27 @@
 
   const { namespace }: Props = $props();
 
+  const formDefaults = $derived<StandaloneActivityFormData>({
+    namespace,
+    identity: getIdentity(),
+    activityId: page.url.searchParams.get('activityId') ?? '',
+    activityType: page.url.searchParams.get('activityType') ?? '',
+    taskQueue: page.url.searchParams.get('taskQueue') ?? '',
+    startToCloseTimeout: page.url.searchParams.get('startToCloseTimeout') ?? '',
+  });
+
+  // https://svelte.dev/docs/svelte/compiler-warnings#state_referenced_locally
+  const getFormDefaults = () => formDefaults;
+
   const schema = z
     .object({
       identity: z.string(),
       namespace: z.string(),
-      id: z.string().min(1, { message: 'Activity ID is required.' }),
+      activityId: z.string().min(1, { message: 'Activity ID is required.' }),
       taskQueue: z.string().min(1, { message: 'Task Queue is required.' }),
-      type: z.string().min(1, { message: 'Activity Type is required.' }),
+      activityType: z
+        .string()
+        .min(1, { message: 'Activity Type is required.' }),
       input: z.string().optional(),
       startToCloseTimeout: z.string().optional(),
       scheduleToCloseTimeout: z.string().optional(),
@@ -77,25 +94,21 @@
 
   const { form, enhance, errors, message } = superForm(
     {
-      identity: getIdentity(),
-      namespace,
-      id: '',
-      taskQueue: '',
-      type: '',
+      ...getFormDefaults(),
       input: '',
       encoding: '',
       messageType: '',
-      startToCloseTimeout: '',
       scheduleToCloseTimeout: '',
+      scheduleToStartTimeout: '',
       searchAttributes: [],
       summary: '',
       details: '',
-      scheduleToStartTimeout: '',
     },
     {
       SPA: true,
       dataType: 'json',
       resetForm: false,
+      invalidateAll: false,
       validators: zodClient(schema),
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
@@ -113,6 +126,8 @@
     },
   );
 
+  $inspect($form);
+
   const encoding = writable<PayloadInputEncoding>('json/plain');
   let advancedOptionsVisible = $state(false);
 
@@ -125,7 +140,7 @@
   });
 
   const generateRandomId = () => {
-    $form.id = crypto.randomUUID();
+    $form.activityId = crypto.randomUUID();
   };
 </script>
 
@@ -137,9 +152,9 @@
     label="Activity ID"
     required
     id="activityId"
-    bind:value={$form.id}
-    error={!!$errors?.id}
-    hintText={$errors?.id?.[0]}
+    bind:value={$form.activityId}
+    error={!!$errors?.activityId}
+    hintText={$errors?.activityId?.[0]}
   >
     <Button
       class="ml-2.5"
@@ -162,9 +177,9 @@
     id="activityType"
     required
     label="Activity Type"
-    bind:value={$form.type}
-    error={!!$errors.type}
-    hintText={$errors.type?.[0]}
+    bind:value={$form.activityType}
+    error={!!$errors.activityType}
+    hintText={$errors.activityType?.[0]}
   />
 
   <PayloadInputWithEncoding

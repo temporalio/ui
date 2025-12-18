@@ -39,6 +39,10 @@
     HOURS,
   ];
 
+  export const parseDuration = (duration: string): string => {
+    return duration.split('s')[0] ?? '';
+  };
+
   type ExtractLabel<T> = T extends { label: infer K }[] ? K : never;
 </script>
 
@@ -84,7 +88,7 @@
     class: className = '',
   }: Props = $props();
 
-  let rawValue: string = $state('');
+  let rawValue = $state(parseDuration(value));
   let unit = $state(initialUnit);
 
   const convert = (durationValue: string, durationUnit: string) => {
