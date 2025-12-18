@@ -20,7 +20,7 @@
 <PageTitle title={translate('nexus.endpoints')} url={page.url.href} />
 <NexusEndpoints {endpoints}>
   {#snippet headers()}
-    <TableHeaderRow slot="headers">
+    <TableHeaderRow>
       <th>Name</th>
       <th>Last Updated</th>
       <th>Created On</th>
