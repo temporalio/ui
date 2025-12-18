@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEditEndpoint from '$lib/pages/nexus-edit-endpoint.svelte';
   import { endpointForm } from '$lib/pages/nexus-form.svelte';
@@ -77,11 +78,17 @@
   title={`Edit ${translate('nexus.nexus-endpoint', { id: $page.params.id })}`}
   url={$page.url.href}
 />
-<NexusEditEndpoint
-  {endpoint}
-  {loading}
-  {targetNamespaceList}
-  {onUpdate}
-  {onDelete}
-  {error}
-/>
+<div class="flex flex-col gap-4">
+  <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
+    {translate('nexus.back-to-endpoint')}
+  </Link>
+  <NexusEditEndpoint
+    {endpoint}
+    {loading}
+    {targetNamespaceList}
+    {onUpdate}
+    {onDelete}
+    {error}
+    cancelHref={routeForNexusEndpoint($page.params.id)}
+  />
+</div>
