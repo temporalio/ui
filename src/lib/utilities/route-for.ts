@@ -97,7 +97,7 @@ export const routeForWorkflows = (parameters: NamespaceParameter): string => {
 export const routeForStandaloneActivities = (
   parameters: NamespaceParameter,
 ): string => {
-  return `${routeForNamespace(parameters)}/standalone-activities`;
+  return `${routeForNamespace(parameters)}/activities`;
 };
 
 export const routeForStartStandaloneActivity = (

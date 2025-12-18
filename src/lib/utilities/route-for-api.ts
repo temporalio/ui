@@ -21,6 +21,8 @@ import type {
   SearchAttributesRoutePath,
   StandaloneActivitiesAPIRoutePath,
   StandaloneActivitiesParameters,
+  StartStandaloneActivityAPIRoutePath,
+  StartStandaloneActivityParameters,
   TaskQueueAPIRoutePath,
   TaskQueueRouteParameters,
   WorkerAPIRoutePath,
@@ -182,6 +184,11 @@ export function pathForApi(
 export function routeForApi(
   route: StandaloneActivitiesAPIRoutePath,
   parameters: StandaloneActivitiesParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: StartStandaloneActivityAPIRoutePath,
+  parameters: StartStandaloneActivityParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(

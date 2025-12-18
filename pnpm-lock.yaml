@@ -165,8 +165,8 @@ devDependencies:
     specifier: ^8.6.11
     version: 8.6.11(react@18.2.0)(storybook@8.6.11)
   '@storybook/addon-svelte-csf':
-    specifier: ^5.0.0-next.23
-    version: 5.0.0-next.27(@storybook/svelte@8.6.11)(@sveltejs/vite-plugin-svelte@5.0.3)(storybook@8.6.11)(svelte@5.25.5)(vite@6.4.1)
+    specifier: ^5.0.10
+    version: 5.0.10(@storybook/svelte@8.6.11)(@sveltejs/vite-plugin-svelte@5.0.3)(storybook@8.6.11)(svelte@5.25.5)(vite@6.4.1)
   '@storybook/addon-themes':
     specifier: ^8.6.11
     version: 8.6.11(storybook@8.6.11)
@@ -3442,14 +3442,14 @@ packages:
       ts-dedent: 2.2.0
     dev: true
 
-  /@storybook/addon-svelte-csf@5.0.0-next.27(@storybook/svelte@8.6.11)(@sveltejs/vite-plugin-svelte@5.0.3)(storybook@8.6.11)(svelte@5.25.5)(vite@6.4.1):
-    resolution: {integrity: sha512-iWEg084pWy2m9Z7jLDg+zXS8cjA2eRBrLe127KV9P1RYtyYzh45ALN72wVNoHmWzLNQl2CAh0ggTCKjMHHEjRg==}
+  /@storybook/addon-svelte-csf@5.0.10(@storybook/svelte@8.6.11)(@sveltejs/vite-plugin-svelte@5.0.3)(storybook@8.6.11)(svelte@5.25.5)(vite@6.4.1):
+    resolution: {integrity: sha512-poSvTS7VdaQ42ZoqW5e4+2Hv1iLO0mekH9fwn/QuBNse48R4WlTyR8XFbHRTfatl9gdc9ZYC4uWzazrmV6zGIA==}
     peerDependencies:
-      '@storybook/svelte': ^0.0.0-0 || ^8.2.0 || ^9.0.0-0
-      '@sveltejs/vite-plugin-svelte': ^4.0.0 || ^5.0.0
-      storybook: ^0.0.0-0 || ^8.2.0 || ^9.0.0-0
+      '@storybook/svelte': ^0.0.0-0 || ^8.2.0 || ^9.0.0 || ^9.1.0-0 || ^10.0.0-0
+      '@sveltejs/vite-plugin-svelte': ^4.0.0 || ^5.0.0 || ^6.0.0
+      storybook: ^0.0.0-0 || ^8.2.0 || ^9.0.0 || ^9.1.0-0 || ^10.0.0-0
       svelte: ^5.0.0
-      vite: ^5.0.0 || ^6.0.0
+      vite: ^5.0.0 || ^6.0.0 || ^7.0.0
     dependencies:
       '@storybook/csf': 0.1.13
       '@storybook/svelte': 8.6.11(storybook@8.6.11)(svelte@5.25.5)

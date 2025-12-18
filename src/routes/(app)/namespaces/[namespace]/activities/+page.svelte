@@ -4,6 +4,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getActivityExecutions } from '$lib/services/standalone-activities';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
@@ -19,3 +20,7 @@
     {translate('activities.start-standalone-activity')}
   </Button>
 </div>
+
+{#await getActivityExecutions(namespace) then executions}
+  {JSON.stringify(executions, null, 2)}
+{/await}
