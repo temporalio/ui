@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
@@ -17,7 +17,7 @@
   const { endpoints } = $derived(data);
 </script>
 
-<PageTitle title={translate('nexus.endpoints')} url={$page.url.href} />
+<PageTitle title={translate('nexus.endpoints')} url={page.url.href} />
 <NexusEndpoints {endpoints}>
   {#snippet headers()}
     <TableHeaderRow slot="headers">
