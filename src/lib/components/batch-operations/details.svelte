@@ -30,7 +30,7 @@
   </div>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">{translate('common.close-time')}</p>
-    <Timestamp as="p" class="col-span-8" dateTime={operation.startTime} />
+    <Timestamp as="p" class="col-span-8" dateTime={operation.closeTime} />
   </div>
   <div class="batch-operation-detail">
     <p class="batch-operation-key">

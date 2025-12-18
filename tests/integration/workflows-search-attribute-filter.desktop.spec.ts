@@ -67,6 +67,8 @@ test('it should update the datetime filter based on the selected timezone', asyn
     }),
   ).toBeVisible();
 
+  await page.getByTestId('toggle-manual-query').click();
+
   query = await page.getByTestId('manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 });

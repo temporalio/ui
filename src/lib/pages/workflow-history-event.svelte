@@ -67,7 +67,9 @@
       (e) =>
         e.id === eventId ||
         e.id ===
-          workflow.workflowExtendedInfo?.requestIdInfos?.[eventId]?.eventId,
+          String(
+            workflow.workflowExtendedInfo?.requestIdInfos?.[eventId]?.eventId,
+          ),
     ),
   );
 

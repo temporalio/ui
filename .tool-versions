@@ -1,1 +1,3 @@
-pnpm 8.15.7
+pnpm 10.10.0
+nodejs 22.14.0
+golang 1.24.11

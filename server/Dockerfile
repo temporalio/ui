@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine3.22 AS server-builder
+FROM golang:1.24.11-alpine3.22 AS server-builder
 
 RUN apk upgrade --no-cache && \
     apk add --no-cache \
@@ -15,7 +15,7 @@ COPY . ./
 
 RUN make build-server
 
-FROM golang:1.24-alpine3.22 AS dockerize-builder
+FROM golang:1.24.11-alpine3.22 AS dockerize-builder
 
 ARG DOCKERIZE_VERSION=v0.9.2
 RUN go install github.com/jwilder/dockerize@${DOCKERIZE_VERSION} && \
