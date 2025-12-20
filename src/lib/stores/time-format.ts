@@ -89,9 +89,31 @@ const getGroupedTimezones = (): {
 
 export const Timezones = getGroupedTimezones();
 
+export const getAdjustedTimeformat = (value: string, timezones = Timezones) => {
+  const descriptors = ['Summer', 'Standard', 'Daylight'];
+  const currentDescriptorIndex = descriptors.findIndex((descriptor) =>
+    new RegExp(`\\b${descriptor}\\b`, 'i').test(value),
+  );
+
+  if (currentDescriptorIndex === -1) return;
+  const currentDescriptor = descriptors.splice(currentDescriptorIndex, 1)[0];
+  for (let i = 0; i < descriptors.length; i++) {
+    const adjustedValue = value.replace(
+      new RegExp(`\\b${currentDescriptor}\\b`, 'i'),
+      descriptors[i],
+    );
+    if (timezones[adjustedValue]) return adjustedValue;
+  }
+};
+
 timeFormat.subscribe((value) => {
   if (Object.values(BASE_TIME_FORMAT_OPTIONS).includes(value)) return;
-  if (!Timezones[value]) timeFormat.set(DEFAULT_TIME_FORMAT);
+  if (!Timezones[value]) {
+    const adjustedTimeformat = getAdjustedTimeformat(value);
+    timeFormat.set(
+      adjustedTimeformat ? adjustedTimeformat : DEFAULT_TIME_FORMAT,
+    );
+  }
 });
 
 export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)

@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest';
 
 import {
   formatOffset,
+  getAdjustedTimeformat,
   getTimezone,
   getUTCOffset,
   relativeTime,
@@ -63,5 +64,37 @@ describe('getUTCOffset', () => {
 
   test('should return a formatted UTC offset for a timezone', () => {
     expect(getUTCOffset('America/Phoenix')).toBe('-07:00');
+  });
+});
+
+describe('getAdjustedTimeformat', () => {
+  test('should replace daylight with standard and vice versa', () => {
+    expect(
+      getAdjustedTimeformat('Mountain Daylight Time', {
+        'Mountain Standard Time': { abbr: 'MST', offset: -7, zones: [] },
+      }),
+    ).toBe('Mountain Standard Time');
+    expect(
+      getAdjustedTimeformat('Mountain Standard Time', {
+        'Mountain Daylight Time': { abbr: 'MDT', offset: -7, zones: [] },
+      }),
+    ).toBe('Mountain Daylight Time');
+  });
+
+  test('should replace standard with summer and vice versa', () => {
+    expect(
+      getAdjustedTimeformat('Central European Summer Time', {
+        'Central European Standard Time': {
+          abbr: 'GMT+1',
+          offset: 1,
+          zones: [],
+        },
+      }),
+    ).toBe('Central European Standard Time');
+    expect(
+      getAdjustedTimeformat('Central European Standard Time', {
+        'Central European Summer Time': { abbr: 'GMT+2', offset: 2, zones: [] },
+      }),
+    ).toBe('Central European Summer Time');
   });
 });
