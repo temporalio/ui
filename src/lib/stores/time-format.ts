@@ -58,33 +58,36 @@ type TimeFormatOption = {
 
 export type TimeFormatOptions = TimeFormatOption[];
 
-const getGroupedTimezones = (): {
-  [key: string]: TimezoneInfo;
-} => {
-  return Intl.supportedValuesOf('timeZone').reduce((acc, timeZone) => {
-    const zonedTime = dateTz.utcToZonedTime(new Date(), timeZone);
-    const zoneString = dateTz.format(zonedTime, 'zzzz', {
-      timeZone,
-      locale: enUS,
-    });
-    if (acc[zoneString]) {
-      acc[zoneString].zones.push(timeZone);
-    } else {
-      const zoneAbbr = dateTz.format(zonedTime, 'z', {
+type GroupedTimezones = { [key: string]: TimezoneInfo };
+
+const getGroupedTimezones = (): GroupedTimezones => {
+  return Intl.supportedValuesOf('timeZone').reduce(
+    (acc: GroupedTimezones, timeZone: string) => {
+      const zonedTime = dateTz.utcToZonedTime(new Date(), timeZone);
+      const zoneString = dateTz.format(zonedTime, 'zzzz', {
         timeZone,
         locale: enUS,
       });
-      const offset = Math.floor(
-        (dateTz.getTimezoneOffset(timeZone) / (1000 * 60 * 60)) % 24,
-      );
-      acc[zoneString] = {
-        abbr: zoneAbbr,
-        offset,
-        zones: [timeZone],
-      };
-    }
-    return acc;
-  }, {});
+      if (acc[zoneString]) {
+        acc[zoneString].zones.push(timeZone);
+      } else {
+        const zoneAbbr = dateTz.format(zonedTime, 'z', {
+          timeZone,
+          locale: enUS,
+        });
+        const offset = Math.floor(
+          (dateTz.getTimezoneOffset(timeZone) / (1000 * 60 * 60)) % 24,
+        );
+        acc[zoneString] = {
+          abbr: zoneAbbr,
+          offset,
+          zones: [timeZone],
+        };
+      }
+      return acc;
+    },
+    {},
+  );
 };
 
 export const Timezones = getGroupedTimezones();
@@ -107,6 +110,7 @@ export const getAdjustedTimeformat = (value: string, timezones = Timezones) => {
 };
 
 timeFormat.subscribe((value) => {
+  if (value === null) return;
   if (Object.values(BASE_TIME_FORMAT_OPTIONS).includes(value)) return;
   if (!Timezones[value]) {
     const adjustedTimeformat = getAdjustedTimeformat(value);

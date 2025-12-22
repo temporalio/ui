@@ -80,7 +80,7 @@
     $timestampFormat = format;
   };
 
-  $: timezone = Timezones[$timeFormat]?.abbr ?? $timeFormat;
+  $: timezone = Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat;
 
   openUnsubscriber = open.subscribe((isOpen) => {
     if (isOpen) {
@@ -185,9 +185,11 @@
       {#each QuickTimezoneOptions as { value, label }}
         <MenuItem
           onclick={() => selectTimezone(value)}
-          data-testid={`timezones-${value}`}
+          data-testid="timezones-{value}"
           selected={value === $timeFormat}
-          description={value === BASE_TIME_FORMAT_OPTIONS.LOCAL && localTime}
+          description={value === BASE_TIME_FORMAT_OPTIONS.LOCAL
+            ? localTime
+            : undefined}
         >
           {label}
         </MenuItem>
