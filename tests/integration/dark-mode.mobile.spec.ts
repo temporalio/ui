@@ -16,38 +16,23 @@ test.describe('Dark Mode Dropdown on Mobile', () => {
   test('user can select System Default option via dropdown menu', async ({
     page,
   }) => {
-    const button = page
-      .getByTestId('dark-mode-menu-button')
-      .locator('visible=true');
-    await expect(button).toBeVisible();
-
-    await button.click();
-    await page.getByRole('menuitem', { name: 'System Default' }).click();
-    await expect(button).toHaveAccessibleName('System Default');
+    const systemModeButton = page.getByTestId('system-mode');
+    await expect(systemModeButton).toHaveAccessibleName('System Default');
+    await systemModeButton.click();
     await expect(page).toHaveLocalStorageItem(localStorageKey, 'system');
   });
 
   test('user can select Night option via dropdown menu', async ({ page }) => {
-    const button = page
-      .getByTestId('dark-mode-menu-button')
-      .locator('visible=true');
-    await expect(button).toBeVisible();
-
-    await button.click();
-    await page.getByRole('menuitem', { name: 'Night' }).click();
-    await expect(button).toHaveAccessibleName('Night');
+    const nightModeButton = page.getByTestId('night-mode');
+    await expect(nightModeButton).toHaveAccessibleName('Night');
+    await nightModeButton.click();
     await expect(page).toHaveLocalStorageItem(localStorageKey, true);
   });
 
   test('user can select Day option via dropdown menu', async ({ page }) => {
-    const button = page
-      .getByTestId('dark-mode-menu-button')
-      .locator('visible=true');
-    await expect(button).toBeVisible();
-
-    await button.click();
-    await page.getByRole('menuitem', { name: 'Day' }).click();
-    await expect(button).toHaveAccessibleName('Day');
+    const dayModeButton = page.getByTestId('day-mode');
+    await expect(dayModeButton).toHaveAccessibleName('Day');
+    await dayModeButton.click();
     await expect(page).toHaveLocalStorageItem(localStorageKey, false);
   });
 });

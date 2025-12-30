@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
   mockGlobalApis,
+  mockNamespaceApi,
   mockSearchAttributesApi,
   mockSettingsApi,
   mockTaskQueuesApi,
@@ -11,6 +12,7 @@ test.describe('Start a Workflow', () => {
   const startWorkflowUrl = '/namespaces/default/workflows/start-workflow';
   test.beforeEach(async ({ page }) => {
     await mockGlobalApis(page);
+    await mockNamespaceApi(page);
   });
 
   test.describe('Start a Workflow - Disabled', () => {

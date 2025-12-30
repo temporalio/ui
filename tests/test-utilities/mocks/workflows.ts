@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export const WORKFLOWS_API = '**/api/v1/namespaces/*/workflows**';
+export const WORKFLOWS_API = /\/api\/v1\/namespaces\/[^/]+\/workflows/;
 
 const mockWorkflow = {
   execution: {

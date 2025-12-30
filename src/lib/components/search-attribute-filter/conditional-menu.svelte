@@ -70,7 +70,7 @@
   <Menu id="conditional-menu" class="whitespace-nowrap">
     {#each conditionalOptions as { value, label }}
       <MenuItem
-        on:click={() => {
+        onclick={() => {
           $filter.conditional = value;
           $focusedElementId = inputId;
           if (isNullConditional(value)) handleNullFilter();

@@ -14,6 +14,7 @@
   import { refresh } from '$lib/stores/workflow-run';
   import type { ActivityOptions } from '$lib/types';
   import type { PendingActivity } from '$lib/types/events';
+  import { getIdentity } from '$lib/utilities/core-context';
   import {
     formatSecondsAbbreviated,
     fromDurationToNumber,
@@ -80,6 +81,8 @@
     },
   }) as unknown as ActivityOptions;
 
+  const identity = getIdentity();
+
   const closeCustomizationDrawer = () => {
     open = false;
   };
@@ -94,6 +97,7 @@
         id: includeType ? undefined : id,
         type: includeType ? type : undefined,
         activityOptions,
+        identity,
       });
       $refresh = Date.now();
       toaster.push({

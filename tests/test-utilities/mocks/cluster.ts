@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 import type { GetClusterInfoResponse as Cluster } from '$src/lib/types';
 
-export const CLUSTER_API = '**/api/v1/cluster-info?';
+export const CLUSTER_API = /\/api\/v1\/cluster-info(\?.*)?$/;
 
 const MOCK_CLUSTER: Cluster = {
   supportedClients: {

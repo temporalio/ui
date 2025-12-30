@@ -2,7 +2,7 @@
   import { action } from '@storybook/addon-actions';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
-  import { z } from 'zod';
+  import { z } from 'zod/v3';
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';

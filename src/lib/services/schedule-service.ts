@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import { translate } from '$lib/i18n/translate';
 import type {
   CreateScheduleRequest,
@@ -138,7 +136,7 @@ export async function createSchedule({
       options: {
         method: 'POST',
         body: stringifyWithBigInt({
-          request_id: uuidv4(),
+          request_id: crypto.randomUUID(),
           ...body,
           ...(identity && { identity }),
         }),
@@ -179,7 +177,7 @@ export async function editSchedule({
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
-        request_id: uuidv4(),
+        request_id: crypto.randomUUID(),
         ...body,
         ...(identity && { identity }),
       }),
@@ -218,7 +216,7 @@ export async function pauseSchedule({
       method: 'POST',
       body: stringifyWithBigInt({
         ...options,
-        request_id: uuidv4(),
+        request_id: crypto.randomUUID(),
         ...(identity && { identity }),
       }),
     },
@@ -254,7 +252,7 @@ export async function unpauseSchedule({
       method: 'POST',
       body: stringifyWithBigInt({
         ...options,
-        request_id: uuidv4(),
+        request_id: crypto.randomUUID(),
         ...(identity && { identity }),
       }),
     },
@@ -291,7 +289,7 @@ export async function triggerImmediately({
       method: 'POST',
       body: stringifyWithBigInt({
         ...options,
-        request_id: uuidv4(),
+        request_id: crypto.randomUUID(),
         ...(identity && { identity }),
       }),
     },
@@ -332,7 +330,7 @@ export async function backfillRequest({
       method: 'POST',
       body: stringifyWithBigInt({
         ...options,
-        request_id: uuidv4(),
+        request_id: crypto.randomUUID(),
         ...(identity && { identity }),
       }),
     },

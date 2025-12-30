@@ -109,7 +109,7 @@
   }
 
   text.Failed {
-    fill: #ff4518;
+    fill: #f55;
   }
 
   text.none {

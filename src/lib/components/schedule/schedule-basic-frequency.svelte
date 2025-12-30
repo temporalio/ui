@@ -1,27 +1,28 @@
 <script lang="ts">
+  import { type ClassNameValue, twMerge } from 'tailwind-merge';
+
   import type { StructuredCalendar } from '$lib/types/schedule';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import type { IntervalSpec } from '$types';
 
-  export let calendar: StructuredCalendar | undefined = undefined;
-  export let interval: IntervalSpec | undefined = undefined;
+  interface Props {
+    class?: ClassNameValue;
+    frequency: (StructuredCalendar | IntervalSpec)[];
+  }
+
+  let { class: className = '', frequency }: Props = $props();
 </script>
 
-{#key [calendar, interval]}
-  <div class="frequency {$$props.class}">
-    <code
-      ><pre>{stringifyWithBigInt(
-          calendar || interval,
-          undefined,
-          2,
-        )}</pre></code
-    >
+{#key frequency}
+  <div
+    class={twMerge(
+      'flex h-auto max-h-32 flex-col overflow-auto border border-subtle bg-primary px-2 py-2 font-mono text-sm',
+      className,
+    )}
+  >
+    {#each frequency as content}
+      <code><pre>{stringifyWithBigInt(content, undefined, 2)}</pre></code>
+    {/each}
   </div>
 {/key}
-
-<style lang="postcss">
-  .frequency {
-    @apply flex h-auto max-h-32 flex-col overflow-auto border border-subtle bg-primary px-2 py-2 font-mono text-sm;
-  }
-</style>

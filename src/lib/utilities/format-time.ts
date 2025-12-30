@@ -1,4 +1,5 @@
 import {
+  differenceInDays,
   formatDuration as durationToString,
   getMilliseconds as getSecondAsMilliseconds,
   intervalToDuration,
@@ -78,9 +79,11 @@ function formatDistanceToSingleLetters(distance: string) {
 export function getDuration({
   start,
   end,
+  flexibleUnits = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
+  flexibleUnits?: boolean;
 }): Duration | null {
   if (!start || !end) return null;
 
@@ -96,8 +99,17 @@ export function getDuration({
     const parsedStart = parseJSON(start);
     const parsedEnd = parseJSON(end);
 
-    const distance = intervalToDuration({ start: parsedStart, end: parsedEnd });
-    return distance;
+    const duration = intervalToDuration({ start: parsedStart, end: parsedEnd });
+    return flexibleUnits
+      ? duration
+      : {
+          years: 0,
+          months: 0,
+          days: differenceInDays(parsedEnd, parsedStart),
+          hours: duration.hours,
+          minutes: duration.minutes,
+          seconds: duration.seconds,
+        };
   } catch {
     return null;
   }
@@ -137,13 +149,15 @@ export function formatDistance({
   end,
   includeMilliseconds = false,
   includeMillisecondsForUnderSecond = false,
+  flexibleUnits = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
   includeMilliseconds?: boolean;
   includeMillisecondsForUnderSecond?: boolean;
+  flexibleUnits?: boolean;
 }): string {
-  const duration = getDuration({ start, end });
+  const duration = getDuration({ start, end, flexibleUnits });
   const distance = formatDuration(duration);
   const msDuration = getMillisecondDuration({ start, end });
 
@@ -161,13 +175,15 @@ export function formatDistanceAbbreviated({
   end,
   includeMilliseconds = false,
   includeMillisecondsForUnderSecond = false,
+  flexibleUnits = false,
 }: {
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
   includeMilliseconds?: boolean;
   includeMillisecondsForUnderSecond?: boolean;
+  flexibleUnits?: boolean;
 }): string {
-  const duration = getDuration({ start, end });
+  const duration = getDuration({ start, end, flexibleUnits });
   const distance = formatDuration(duration, ' ');
   const formattedDistance = formatDistanceToSingleLetters(distance);
   const msDuration = getMillisecondDuration({ start, end });

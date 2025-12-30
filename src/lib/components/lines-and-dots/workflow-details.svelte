@@ -6,14 +6,22 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
-  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import {
+    formatDistanceAbbreviated,
+    formatDuration,
+  } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
   import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import {
+    routeForSchedule,
     routeForTaskQueue,
     routeForWorkerDeployment,
     routeForWorkflow,
@@ -40,6 +48,10 @@
 
   let latestRunId = $state<string | undefined>(undefined);
 
+  const parent = $derived(workflow?.parent);
+  const scheduleId = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalScheduledById'],
+  );
   const { namespace } = $derived(page.params);
   const elapsedTime = $derived(
     formatDistanceAbbreviated({
@@ -99,9 +111,11 @@
   <DetailListTextValue
     text={formatDate(workflow?.startTime, $timeFormat, {
       relative: $relativeTime,
+      format: $timestampFormat,
     })}
     tooltipText={formatDate(workflow?.startTime, $timeFormat, {
       relative: !$relativeTime,
+      format: $timestampFormat,
     })}
   />
 
@@ -110,9 +124,11 @@
     <DetailListTextValue
       text={formatDate(workflow?.executionTime, $timeFormat, {
         relative: $relativeTime,
+        format: $timestampFormat,
       })}
       tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
         relative: !$relativeTime,
+        format: $timestampFormat,
       })}
     />
   {/if}
@@ -122,10 +138,12 @@
     text={workflow?.endTime
       ? formatDate(workflow?.endTime, $timeFormat, {
           relative: $relativeTime,
+          format: $timestampFormat,
         })
       : '-'}
     tooltipText={formatDate(workflow?.endTime, $timeFormat, {
       relative: !$relativeTime,
+      format: $timestampFormat,
     })}
   />
 
@@ -133,6 +151,14 @@
     {translate('common.duration')}
   </DetailListLabel>
   <DetailListTextValue text={elapsedTime} />
+
+  {#if workflow?.workflowExecutionTimeout && workflow?.workflowExecutionTimeout.toString() !== '0s'}
+    <DetailListLabel>{translate('workflows.workflow-timeout')}</DetailListLabel>
+    <DetailListTextValue
+      text={formatDuration(workflow.workflowExecutionTimeout)}
+      tooltipText={formatDuration(workflow.workflowExecutionTimeout)}
+    />
+  {/if}
 
   <DetailListColumn>
     <DetailListLabel>{translate('common.run-id')}</DetailListLabel>
@@ -204,15 +230,25 @@
   {/if}
 
   <DetailListColumn>
-    {#if workflow?.parent}
+    {#if scheduleId}
+      <DetailListLabel>{translate('workflows.scheduled-by')}</DetailListLabel>
+      <DetailListLinkValue
+        text={scheduleId}
+        href={routeForSchedule({
+          namespace,
+          scheduleId,
+        })}
+      />
+    {/if}
+    {#if parent}
       <DetailListLabel>{translate('workflows.parent-workflow')}</DetailListLabel
       >
       <DetailListLinkValue
-        text={workflow?.parent?.workflowId}
+        text={parent?.workflowId}
         href={routeForWorkflow({
           namespace,
-          workflow: workflow?.parent?.workflowId,
-          run: workflow?.parent?.runId,
+          workflow: parent?.workflowId,
+          run: parent?.runId,
         })}
       />
     {/if}
@@ -229,7 +265,9 @@
         })}
       />
     {/if}
+  </DetailListColumn>
 
+  <DetailListColumn>
     <DetailListLabel>{translate('common.history-size-bytes')}</DetailListLabel>
     <DetailListTextValue text={workflow?.historySizeBytes} />
 

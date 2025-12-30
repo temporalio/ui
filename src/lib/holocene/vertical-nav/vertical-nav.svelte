@@ -210,7 +210,7 @@
     style:transform={activeBackgroundStyles.transform}
     style:height={activeBackgroundStyles.height}
     style:opacity={activeBackgroundStyles.opacity}
-    class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-active transition-all ${ACTIVE_TRANSITION_DURATION} ease-out`}
+    class={`pointer-events-none absolute left-0 w-full bg-interactive-secondary-active transition-all ${ACTIVE_TRANSITION_DURATION} ease-out`}
     aria-hidden="true"
   ></div>
 
@@ -220,7 +220,7 @@
       style:transform={hoverBackgroundStyles.transform}
       style:height={hoverBackgroundStyles.height}
       style:opacity={showHoverOpacity ? '1' : '0'}
-      class={`pointer-events-none absolute left-0 w-full rounded-md bg-interactive-secondary-hover ${
+      class={`pointer-events-none absolute left-0 w-full bg-interactive-secondary-hover ${
         enableTransitions
           ? `transition-all ${HOVER_TRANSITION_DURATION} ease-out`
           : `transition-opacity ${HOVER_TRANSITION_DURATION} ease-in`

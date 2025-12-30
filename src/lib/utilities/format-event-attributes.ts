@@ -1,9 +1,6 @@
-import { get } from 'svelte/store';
-
 import type { I18nKey } from '$lib/i18n';
 import { translate } from '$lib/i18n/translate';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import { relativeTime, timeFormat } from '$lib/stores/time-format';
 import type {
   EventAttribute,
   EventAttributeKey,
@@ -147,9 +144,7 @@ export const formatPendingAttributes = (
   for (const [key, value] of sortedEntries) {
     const shouldDisplay = shouldDisplayPendingAttribute(key);
     const formattedValue = key.toLowerCase().includes('time')
-      ? formatDate(String(value), get(timeFormat), {
-          relative: get(relativeTime),
-        })
+      ? formatDate(String(value))
       : value;
     if (shouldDisplay) attributes[key] = formattedValue;
     formatNestedAttributes(attributes, key);

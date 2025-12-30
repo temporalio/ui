@@ -91,8 +91,10 @@
     {#if schedule}
       <TabPanel id="existing-panel" tabId="existing-tab" class="w-full">
         <ScheduleFrequency
-          calendar={schedule?.spec?.structuredCalendar?.[0]}
-          interval={schedule?.spec?.interval?.[0]}
+          frequency={[
+            ...(schedule?.spec?.structuredCalendar ?? []),
+            ...(schedule?.spec?.interval ?? []),
+          ]}
           timezoneName={schedule?.spec?.timezoneName}
         />
       </TabPanel>

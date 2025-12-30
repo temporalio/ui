@@ -1,8 +1,6 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import { v4 as uuid } from 'uuid';
-
   import { page } from '$app/stores';
 
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
@@ -38,7 +36,7 @@
   let success;
 
   let name = '';
-  let updateId = uuid();
+  let updateId = crypto.randomUUID();
   let input = '';
   let customUpdate = false;
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
@@ -71,7 +69,7 @@
 
       failure = result?.outcome?.failure;
       success = result?.outcome?.success || !failure;
-      updateId = uuid();
+      updateId = crypto.randomUUID();
 
       if (success) {
         toaster.push({
@@ -123,7 +121,7 @@
         {#each updateDefinitions as { name: value, description = '' }}
           <Option {value} {description}>{value}</Option>
         {/each}
-        <Option on:click={handleCustom} value="custom">Custom</Option>
+        <Option onclick={handleCustom} value="custom">Custom</Option>
       </Select>
     {:else}
       <div class="flex w-full items-end justify-between gap-2">

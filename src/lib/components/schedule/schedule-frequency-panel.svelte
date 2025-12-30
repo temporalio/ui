@@ -7,14 +7,17 @@
 
   import type { IntervalSpec } from '$types';
 
-  export let calendar: StructuredCalendar | undefined = undefined;
-  export let interval: IntervalSpec | undefined = undefined;
-  export let timezoneName: string = 'UTC';
+  interface Props {
+    frequency: (StructuredCalendar | IntervalSpec)[];
+    timezoneName?: string;
+  }
+
+  let { frequency, timezoneName = 'UTC' }: Props = $props();
 </script>
 
 <Panel>
   <h2 class="mb-4">{translate('schedules.schedule-spec')}</h2>
   <div class="pr-2">
-    <ScheduleFrequency {calendar} {interval} {timezoneName} class="text-base" />
+    <ScheduleFrequency {frequency} {timezoneName} class="text-base" />
   </div>
 </Panel>

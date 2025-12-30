@@ -41,8 +41,10 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       page,
     }) => {
       await page.locator('#search-attribute-filter-button').click();
-      await page.getByTestId('manual-search-toggle').click();
-      await page.locator('#manual-search').fill('ExecutionStatus="Running"');
+      await page.getByTestId('toggle-manual-query').click();
+      await page
+        .getByTestId('manual-search-input')
+        .fill('ExecutionStatus="Running"');
       await page.getByTestId('manual-search-button').click();
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
@@ -82,8 +84,10 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       page,
     }) => {
       await page.locator('#search-attribute-filter-button').click();
-      await page.getByTestId('manual-search-toggle').click();
-      await page.locator('#manual-search').fill('ExecutionStatus="Running"');
+      await page.getByTestId('toggle-manual-query').click();
+      await page
+        .getByTestId('manual-search-input')
+        .fill('ExecutionStatus="Running"');
       await page.getByTestId('manual-search-button').click();
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');

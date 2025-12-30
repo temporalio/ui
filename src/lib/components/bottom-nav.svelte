@@ -14,6 +14,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
+  import ziggy from '$lib/vendor/ziggy-full-face.png';
 
   import BottomNavLinks from './bottom-nav-links.svelte';
   import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
@@ -161,7 +162,13 @@
       <div
         class="flex aspect-square w-[32px] min-w-[32px] items-center justify-center"
       >
-        <Icon name="astronaut" height={24} width={24} />
+        <slot name="profile-picture">
+          <img
+            src={ziggy}
+            alt={translate('common.user-profile')}
+            class="h-[32px] w-[32px]"
+          />
+        </slot>
       </div>
     {/if}
   </button>

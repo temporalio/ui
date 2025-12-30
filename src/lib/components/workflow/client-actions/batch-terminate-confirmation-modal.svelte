@@ -2,7 +2,6 @@
   import { writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
-  import { v4 } from 'uuid';
 
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -28,7 +27,7 @@
   const reasonPlaceholder = getPlaceholder(Action.Terminate, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
-  let jobIdPlaceholder = v4();
+  let jobIdPlaceholder = crypto.randomUUID();
   let error = '';
 
   const { allSelected, terminableWorkflows } =
@@ -38,7 +37,7 @@
     $reason = '';
     $jobId = '';
     $jobIdValid = true;
-    jobIdPlaceholder = v4();
+    jobIdPlaceholder = crypto.randomUUID();
   };
 
   $: if (open) resetForm();

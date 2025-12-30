@@ -1,27 +1,41 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { type TextFilterAttributes } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+  import {
+    SEARCH_ATTRIBUTE_TYPE,
+    type SearchAttributeType,
+  } from '$lib/types/workflows';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   type Props = {
-    attribute: TextFilterAttributes;
+    attribute: string;
     filterOrCopyButtonsVisible: boolean;
     value: string;
     href?: string;
+    type?: SearchAttributeType;
   };
   let {
     attribute,
     filterOrCopyButtonsVisible = false,
     value,
     href,
+    type = SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   }: Props = $props();
+
+  const truncateRunId = (runId: string): string => {
+    if (runId.length > 11) {
+      return `${runId.slice(0, 4)}...${runId.slice(-4)}`;
+    }
+    return runId;
+  };
+
+  const isRunId = attribute === 'RunId';
 
   const onRowFilterClick = () => {
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
@@ -31,7 +45,7 @@
     if (!filter || filter.value !== value) {
       const newFilter: SearchAttributeFilter = {
         attribute,
-        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+        type,
         value,
         conditional: '=',
         operator: '',
@@ -42,11 +56,15 @@
       $workflowFilters = [...getOtherFilters()];
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters);
+    updateQueryParamsFromFilter(page.url, $workflowFilters);
   };
 </script>
 
-{#if href}
+{#if isRunId}
+  <Tooltip text={value} top class="min-w-0">
+    <Link {href} class="cursor-help">{truncateRunId(value)}</Link>
+  </Tooltip>
+{:else if href}
   <Link {href}>{value}</Link>
 {:else}
   {value}

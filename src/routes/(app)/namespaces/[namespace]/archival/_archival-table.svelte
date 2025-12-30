@@ -40,7 +40,7 @@
     {#each visibleItems as workflow}
       <tr data-testid="workflows-summary-configurable-table-row" class="dense">
         {#each columns as column}
-          <TableBodyCell {workflow} {column} />
+          <TableBodyCell {workflow} {column} archival />
         {/each}
       </tr>
     {/each}

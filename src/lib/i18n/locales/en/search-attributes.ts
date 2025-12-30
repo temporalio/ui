@@ -2,6 +2,8 @@ export const Namespace = 'search-attributes' as const;
 
 export const Strings = {
   // Component headers and labels
+  title: 'Search Attributes',
+  description: 'Define custom search attributes for workflow queries.',
   'column-attribute': 'Attribute',
   'column-type': 'Type',
   'attribute-label': 'Attribute {{index}}',

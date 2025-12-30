@@ -6,11 +6,10 @@ import {
 } from '$src/lib/types/workflows';
 
 export const SEARCH_ATTRIBUTES_API =
-  '**/api/v1/namespaces/*/search-attributes?';
+  /\/api\/v1\/namespaces\/[^/]+\/search-attributes\?/;
 
 const MOCK_SEARCH_ATTRIBUTES: SearchAttributesResponse = {
   systemAttributes: {
-    BatcherNamespace: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     BatcherUser: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     BinaryChecksums: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,

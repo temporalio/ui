@@ -89,15 +89,15 @@ export function getFocusedElementId(filter: SearchAttributeFilter) {
   return '';
 }
 
-export function formatListFilterValue(value: string): string[] {
+export function formatListFilterValue(value: string | null): string[] {
+  if (!value) return [];
   if (value.startsWith('(') && value.endsWith(')')) {
     return value
       .slice(1, -1)
       .split(',')
       .map((v) => v.trim().slice(1, -1));
   }
-  if (value) return [value];
-  return [];
+  return [value];
 }
 
 export const formatDateTimeRange = (
@@ -111,10 +111,10 @@ export const formatDateTimeRange = (
     format,
     {
       relative,
-      abbrFormat: true,
+      format: 'short',
     },
   )} ${operator.toLowerCase()} ${formatDate(end.replace(/"/g, ''), format, {
     relative,
-    abbrFormat: true,
+    format: 'short',
   })}`;
 };

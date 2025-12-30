@@ -80,7 +80,7 @@
   }
 
   .Completed {
-    background-color: #00f37e;
+    background-color: #1ff1a5;
   }
 
   .Fired {
@@ -92,7 +92,7 @@
   }
 
   .Failed {
-    background-color: #ff4518;
+    background-color: #f55;
   }
 
   .Terminated {

@@ -1,10 +1,9 @@
 import {
-  formatDistanceToNow,
+  differenceInHours,
   formatDistanceToNowStrict,
   parseISO,
   parseJSON,
 } from 'date-fns';
-import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import {
   getTimezone,
@@ -15,17 +14,55 @@ import {
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
-const pattern = 'yyyy-MM-dd z HH:mm:ss.SS';
+export type FormatDateOptions = {
+  format?: TimestampFormat;
+  relative?: boolean;
+  relativeLabel?: string;
+  flexibleUnits?: boolean;
+};
+
+export const timestampFormats: Record<
+  string,
+  Partial<Intl.DateTimeFormatOptions>
+> = {
+  short: {
+    year: '2-digit',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    fractionalSecondDigits: 2,
+    timeZoneName: 'short',
+  },
+  medium: {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZoneName: 'short',
+    fractionalSecondDigits: 2,
+  },
+  long: {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    timeZoneName: 'short',
+    fractionalSecondDigits: 2,
+  },
+} as const;
+
+export type TimestampFormat = keyof typeof timestampFormats;
 
 export function formatDate(
   date: ValidTime | undefined | null,
   timeFormat: TimeFormat = 'UTC',
-  options: {
-    relative?: boolean;
-    relativeLabel?: string;
-    relativeStrict?: boolean;
-    abbrFormat?: boolean;
-  } = {},
+  options: FormatDateOptions = {},
 ): string {
   if (!date) return '';
 
@@ -34,31 +71,40 @@ export function formatDate(
       date = timestampToDate(date);
     }
 
-    const isFutureDate = new Date(date).getTime() - Date.now() > 0;
+    const currentDate = Date.now();
+    const isFutureDate = new Date(date).getTime() - currentDate > 0;
     const {
       relative = false,
       relativeLabel = isFutureDate ? 'from now' : 'ago',
-      relativeStrict = false,
-      abbrFormat = false,
+      flexibleUnits = false,
+      format = 'medium',
     } = options;
 
     const parsed = parseJSON(new Date(date));
 
-    const format = abbrFormat
-      ? parsed.getSeconds()
-        ? 'yyyy-MM-dd HH:mm:ss a'
-        : 'yyyy-MM-dd HH:mm a'
-      : pattern;
-
     if (timeFormat === 'local') {
-      if (relative)
-        return relativeStrict
-          ? formatDistanceToNowStrict(parsed) + ` ${relativeLabel}`
-          : formatDistanceToNow(parsed) + ` ${relativeLabel}`;
-      return dateTz.format(parsed, format);
+      if (relative) {
+        return (
+          formatDistanceToNowStrict(parsed, {
+            ...(!flexibleUnits &&
+              Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
+                unit: 'day',
+              }),
+          }) + ` ${relativeLabel}`
+        );
+      }
+
+      return new Intl.DateTimeFormat(
+        undefined,
+        timestampFormats[format],
+      ).format(parsed);
     }
-    const timezone = getTimezone(timeFormat);
-    return dateTz.formatInTimeZone(parsed, timezone, format);
+
+    const timeZone = getTimezone(timeFormat);
+    return new Intl.DateTimeFormat(undefined, {
+      ...timestampFormats[format],
+      timeZone,
+    }).format(parsed);
   } catch (e) {
     console.error('Error formatting date:', e);
     return '';

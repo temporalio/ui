@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { v4 as uuid } from 'uuid';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import FileInput from '$lib/holocene/file-input.svelte';
@@ -8,7 +7,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let id = uuid();
+  export let id: string = crypto.randomUUID();
   export let error = false;
   export let input: string;
   export let label = translate('workflows.signal-payload-input-label');

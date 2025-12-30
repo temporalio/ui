@@ -55,9 +55,9 @@ export type BatchOperation = {
   state: BatchOperationState;
   startTime: string;
   closeTime: string;
-  totalOperationCount: number;
-  completeOperationCount: number;
-  failureOperationCount: number;
+  totalOperationCount?: number;
+  completeOperationCount?: number;
+  failureOperationCount?: number;
   identity: string;
   reason: string;
 };

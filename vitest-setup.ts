@@ -25,6 +25,12 @@ const BroadcastChannelMock = vi.fn(() => ({
 
 vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
 
+const cryptoMock = {
+  randomUUID: () => 'test-uuid-' + Math.random().toString(36).substring(2, 9),
+};
+
+vi.stubGlobal('crypto', cryptoMock);
+
 vi.mock('esm-env', () => {
   const BROWSER = true;
   const DEV = false;

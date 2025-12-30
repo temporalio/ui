@@ -12,15 +12,14 @@
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { type PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { TaskQueueResponse } from '$lib/types';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
-  import { formatDate } from '$lib/utilities/format-date';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
   import DeploymentStatus from './deployments/deployment-status.svelte';
   import PollerIcon from './poller-icon.svelte';
+  import Timestamp from './timestamp.svelte';
 
   type Props = {
     workers: TaskQueueResponse;
@@ -149,11 +148,12 @@
           </Link>
         {/if}
       </td>
-      <td class="hidden md:table-cell" data-testid="worker-last-access-time">
-        {formatDate(poller.lastAccessTime, $timeFormat, {
-          relative: $relativeTime,
-        })}
-      </td>
+      <Timestamp
+        as="td"
+        dateTime={poller.lastAccessTime}
+        class="hidden md:table-cell"
+        data-testid="worker-last-access-time"
+      />
       <td data-testid="workflow-poller">
         <div class="flex items-center justify-center">
           <PollerIcon

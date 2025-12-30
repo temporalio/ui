@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export const NAMESPACE_API = '**/api/v1/namespaces/*?';
+export const NAMESPACE_API = /\/api\/v1\/namespaces\/[^/]+(\?.*)?$/;
 
 const MOCK_ARCHIVED_NAMESPACE = {
   namespaceInfo: {

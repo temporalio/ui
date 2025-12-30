@@ -85,6 +85,9 @@ const setBodySpec = (
   }
 };
 
+let createTimeout: ReturnType<typeof setTimeout>;
+let editTimeout: ReturnType<typeof setTimeout>;
+
 export const submitCreateSchedule = async ({
   action,
   spec,
@@ -165,7 +168,8 @@ export const submitCreateSchedule = async ({
     error.set(err);
     loading.set(false);
   } else {
-    setTimeout(() => {
+    clearTimeout(createTimeout);
+    createTimeout = setTimeout(() => {
       error.set('');
       loading.set(false);
       goto(routeForSchedules({ namespace }));
@@ -259,7 +263,8 @@ export const submitEditSchedule = async (
     error.set(err);
     loading.set(false);
   } else {
-    setTimeout(() => {
+    clearTimeout(editTimeout);
+    editTimeout = setTimeout(() => {
       goto(routeForSchedule({ namespace, scheduleId: name }));
       error.set('');
       loading.set(false);

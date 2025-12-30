@@ -19,7 +19,11 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { authUser } from '$lib/stores/auth-user';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -161,13 +165,14 @@
   const eventTime = $derived(
     formatDate(currentEvent?.eventTime, $timeFormat, {
       relative: $relativeTime,
+      format: $timestampFormat,
     }),
   );
 
   const abbrEventTime = $derived(
     formatDate(currentEvent?.eventTime, $timeFormat, {
       relative: $relativeTime,
-      abbrFormat: true,
+      format: 'short',
     }),
   );
 
@@ -382,7 +387,10 @@
   {/if}
 </tr>
 {#if expanded}
-  <tr class="w-full text-sm no-underline">
+  <tr
+    class="w-full text-sm no-underline"
+    data-testid="event-summary-row-expanded"
+  >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} event={currentEvent} />
     </td>

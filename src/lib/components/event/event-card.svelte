@@ -1,11 +1,11 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
@@ -14,7 +14,6 @@
     format,
     spaceBetweenCapitalLetters,
   } from '$lib/utilities/format-camel-case';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import {
     displayLinkType,
@@ -79,11 +78,7 @@
         {displayName}
       </p>
     </div>
-    <p class="text-sm">
-      {formatDate(event.eventTime, $timeFormat, {
-        relative: $relativeTime,
-      })}
-    </p>
+    <Timestamp as="p" class="text-sm" dateTime={event.eventTime} />
   </div>
   <div class="flex flex-col gap-1 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
@@ -254,7 +249,11 @@
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">
-      {shouldDisplayAsTime(key) ? formatDate(value, $timeFormat) : value}
+      {#if shouldDisplayAsTime(key)}
+        <Timestamp dateTime={value} />
+      {:else}
+        {value}
+      {/if}
     </p>
   </div>
 {/snippet}

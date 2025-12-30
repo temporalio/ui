@@ -6,12 +6,8 @@
   export const meta = {
     title: 'Loading',
     component: Loading,
-    args: {
-      title: 'Loading...',
-    },
-    argTypes: {
-      title: { control: 'text' },
-    },
+    args: {},
+    argTypes: {},
   } satisfies Meta<Loading>;
 </script>
 
@@ -24,3 +20,7 @@
 </Template>
 
 <Story name="Default" />
+
+<Story name="Change size of loader">
+  <Loading class="w-fit scale-[.70]"></Loading>
+</Story>

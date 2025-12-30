@@ -81,7 +81,7 @@
     data-track-intent="navigate"
     data-track-text={label}
     class={merge(
-      'group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+      'group relative flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
       isActive && 'text-primary',
       !isActive && 'text-secondary hover:text-primary',

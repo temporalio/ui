@@ -68,17 +68,14 @@ type WorkflowRelationships = {
 export const getWorkflowRelationships = (
   workflow: WorkflowExecution | null,
   fullEventHistory: WorkflowEvents,
-  namespaces: DescribeNamespaceResponse[],
+  namespace: DescribeNamespaceResponse,
 ): WorkflowRelationships => {
   const children = fullEventHistory.filter((event) =>
     isChildWorkflowClosedEvent(event),
   ) as ChildWorkflowClosedEvent[];
   const hasChildren = !!workflow?.pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
-
-  const parentNamespaceName = namespaces?.find((namespace) => {
-    return namespace.namespaceInfo.id === workflow.parentNamespaceId;
-  })?.namespaceInfo?.name;
+  const parentNamespaceName = namespace.namespaceInfo?.name;
 
   const workflowExecutionStartedEvent = fullEventHistory.find(
     isWorkflowExecutionStartedEvent,

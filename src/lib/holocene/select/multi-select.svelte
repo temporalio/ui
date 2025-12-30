@@ -81,20 +81,21 @@
       )}
       <MenuItem
         data-testid={option.label}
-        on:click={() => {
+        onclick={() => {
           onOptionClick(option);
         }}
       >
-        <Checkbox
-          on:click={() => onOptionClick(option)}
-          slot="leading"
-          {checked}
-          label={option.label}
-          labelHidden
-        />
+        {#snippet leading()}
+          <Checkbox
+            on:click={() => onOptionClick(option)}
+            {checked}
+            label={option.label}
+            labelHidden
+          />
+        {/snippet}
         <div class="flex items-center gap-2">
           {#if option.icon}
-            <Icon slot="trailing" name={option.icon} />
+            <Icon name={option.icon} />
           {/if}
           {option.label}
         </div>
@@ -103,13 +104,13 @@
     <MenuDivider />
     <MenuItem
       data-testid="multiselect-select-all"
-      on:click={onSelectAllOptionClick}
+      onclick={onSelectAllOptionClick}
     >
       {selectAllLabel}
     </MenuItem>
     <MenuItem
       data-testid="multiselect-remove-all"
-      on:click={onRemoveAllOptionClick}
+      onclick={onRemoveAllOptionClick}
     >
       {clearAllLabel}
     </MenuItem>

@@ -225,26 +225,25 @@
       {:else}
         <div class="flex w-full flex-wrap">
           <div class="flex w-1/2 flex-col border-b border-subtle">
-            <MenuItem on:click={() => onChange('All Time')}
+            <MenuItem onclick={() => onChange('All Time')}
               >{translate('common.all-time')}</MenuItem
             >
           </div>
           <div class="flex w-1/2 flex-col border-b border-subtle">
-            <MenuItem on:click={() => onChange('Custom')}
+            <MenuItem onclick={() => onChange('Custom')}
               >{translate('common.custom')}</MenuItem
             >
           </div>
           {#each columnOrderedDurations as duration}
             <div class="flex w-1/2 flex-col justify-center">
-              <MenuItem on:click={() => onChange(duration)}>{duration}</MenuItem
-              >
+              <MenuItem onclick={() => onChange(duration)}>{duration}</MenuItem>
             </div>
           {/each}
           <div class="flex w-full flex-wrap">
             <div class="flex w-1/2 flex-col border-t border-subtle">
               <MenuItem
                 selected={timeField === 'StartTime'}
-                on:click={() => onTimeFieldChange('StartTime')}
+                onclick={() => onTimeFieldChange('StartTime')}
               >
                 {translate('common.start-time')}
               </MenuItem>
@@ -252,7 +251,7 @@
             <div class="flex w-1/2 flex-col border-t border-subtle">
               <MenuItem
                 selected={timeField === 'CloseTime'}
-                on:click={() => onTimeFieldChange('CloseTime')}
+                onclick={() => onTimeFieldChange('CloseTime')}
               >
                 {translate('common.end-time')}
               </MenuItem>

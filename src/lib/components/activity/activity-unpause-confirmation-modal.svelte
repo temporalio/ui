@@ -7,6 +7,7 @@
   import { unpauseActivity } from '$lib/services/workflow-activities-service';
   import { refresh } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
+  import { getIdentity } from '$lib/utilities/core-context';
 
   type Props = {
     open: boolean;
@@ -22,6 +23,8 @@
   let loading = $state(false);
   let includeType = $state(false);
 
+  const identity = getIdentity();
+
   const hideModal = () => {
     open = false;
     includeType = false;
@@ -33,6 +36,7 @@
       execution,
       id: includeType ? undefined : id,
       type: includeType ? type : undefined,
+      identity,
     });
     $refresh = Date.now();
     hideModal();

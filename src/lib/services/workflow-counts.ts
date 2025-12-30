@@ -1,6 +1,7 @@
 import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
 
 export const fetchWorkflowCount = async (
   namespace: string,
@@ -22,6 +23,24 @@ export const fetchWorkflowCount = async (
   }
 
   return { count };
+};
+
+export const fetchWorkflowTaskFailures = async (
+  namespace: string,
+  request = fetch,
+): Promise<number> => {
+  try {
+    const countRoute = routeForApi('workflows.count', { namespace });
+    const result = await requestFromAPI<{ count: string }>(countRoute, {
+      params: { query: TASK_FAILURES_QUERY },
+      onError: () => {},
+      handleError: () => {},
+      request,
+    });
+    return parseInt(result?.count || '0');
+  } catch (e) {
+    // Don't fail the workflows call due to count
+  }
 };
 
 type WorkflowCountByExecutionStatusOptions = {

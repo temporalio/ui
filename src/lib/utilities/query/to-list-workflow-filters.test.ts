@@ -360,7 +360,7 @@ describe('toListWorkflowFilters', () => {
       {
         attribute: 'StartTime',
         type: 'Datetime',
-        conditional: '',
+        conditional: 'BETWEEN',
         operator: '',
         parenthesis: '',
         value:
@@ -417,7 +417,7 @@ describe('toListWorkflowFilters', () => {
       {
         attribute: 'StartTime',
         type: 'Datetime',
-        conditional: '',
+        conditional: 'BETWEEN',
         operator: '',
         parenthesis: '',
         value:

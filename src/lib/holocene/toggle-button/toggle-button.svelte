@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/stores';
@@ -34,7 +35,7 @@
   export let href = null;
   export let base = href;
   export let active = false;
-  export let variant: Button['variant'] = 'secondary';
+  export let variant: ComponentProps<Button>['variant'] = 'secondary';
 </script>
 
 <Button

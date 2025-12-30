@@ -1,6 +1,7 @@
 <script lang="ts">
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { formatDuration } from '$lib/utilities/format-time';
 
   import ScheduleNotes from './schedule-notes.svelte';
 
@@ -42,6 +43,34 @@
       {translate('schedules.overlap-policy')}
       <span>{policies?.overlapPolicy ?? translate('common.none')} </span>
     </li>
+    <li>
+      {translate('schedules.catchup-window')}
+      <span
+        >{policies?.catchupWindow != null
+          ? formatDuration(policies.catchupWindow.toString())
+          : translate('common.none')}
+      </span>
+    </li>
+    {#if policies?.pauseOnFailure != null}
+      <li>
+        {translate('schedules.pause-on-failure')}
+        <span
+          >{policies.pauseOnFailure
+            ? translate('common.true')
+            : translate('common.false')}</span
+        >
+      </li>
+    {/if}
+    {#if policies?.keepOriginalWorkflowId != null}
+      <li>
+        {translate('schedules.keep-original-workflow-id')}
+        <span
+          >{policies.keepOriginalWorkflowId
+            ? translate('common.true')
+            : translate('common.false')}</span
+        >
+      </li>
+    {/if}
   </ul>
 </Accordion>
 

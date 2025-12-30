@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -10,9 +11,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEmptyState from '$lib/pages/nexus-empty-state.svelte';
-  import { timeFormat } from '$lib/stores/time-format';
   import type { NexusEndpoint } from '$lib/types/nexus';
-  import { formatDate } from '$lib/utilities/format-date';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForNexusEndpoint,
@@ -83,17 +82,26 @@
                 {endpoint.spec.name}
               </h3>
               {#if endpoint.lastModifiedTime}
-                <p class="text-xs text-secondary">
-                  Last update {formatDate(
-                    endpoint.lastModifiedTime,
-                    $timeFormat,
-                  )}
-                </p>
+                <Timestamp
+                  as="p"
+                  class="text-xs text-secondary"
+                  dateTime={endpoint.lastModifiedTime}
+                >
+                  {#snippet leading()}
+                    Last Update
+                  {/snippet}
+                </Timestamp>
               {/if}
               {#if endpoint.createdTime}
-                <p class="text-xs text-secondary">
-                  Created on {formatDate(endpoint.createdTime, $timeFormat)}
-                </p>
+                <Timestamp
+                  as="p"
+                  class="text-xs text-secondary"
+                  dateTime={endpoint.createdTime}
+                >
+                  {#snippet leading()}
+                    Created On
+                  {/snippet}
+                </Timestamp>
               {/if}
               {#if endpoint.spec?.allowedCallerNamespaces}
                 <Badge type="primary" class="px-2 py-1"

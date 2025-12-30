@@ -56,7 +56,10 @@ export type CountWorkflowExecutionsResponse = {
 
 export type WorkflowExecutionConfig = Replace<
   import('$lib/types').WorkflowExecutionConfig,
-  { defaultWorkflowTaskTimeout: Duration }
+  {
+    defaultWorkflowTaskTimeout: Duration;
+    workflowExecutionTimeout?: Duration;
+  }
 >;
 
 export type WorkflowInteractionDefinition = {
@@ -180,6 +183,7 @@ export type WorkflowExecution = {
   url: string;
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;
+  workflowExecutionTimeout?: Duration;
   canBeTerminated: boolean;
   callbacks: Callback[];
   versioningInfo?: VersioningInfo;
@@ -223,4 +227,5 @@ export type WorkflowTaskFailedCause =
   | 'PendingSignalsLimitExceeded'
   | 'PendingRequestCancelLimitExceeded'
   | 'BadUpdateWorkflowExecutionMessage'
-  | 'UnhandledUpdate';
+  | 'UnhandledUpdate'
+  | 'WorkflowTaskTimedOut';

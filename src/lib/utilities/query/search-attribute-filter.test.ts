@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { SearchAttributes } from '$lib/types/workflows';
 
@@ -29,6 +29,13 @@ const store = writable<SearchAttributes>({
   CustomB: 'Double',
   CustomC: 'String',
 });
+
+// force GH action runners to use en-US and 12-hour clocks starting at 0:00
+const DateTimeFormat = Intl.DateTimeFormat;
+vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
+  (_, options) =>
+    new DateTimeFormat('en-US', { ...options, hour12: true, hourCycle: 'h11' }),
+);
 
 describe('isStatusFilter', () => {
   it('should return true if the attribute is ExecutionStatus', () => {
@@ -180,18 +187,22 @@ describe('formatDateTimeRange', () => {
   it('should format a date range between two dates', () => {
     expect(
       formatDateTimeRange(
-        'BETWEEN "2025-07-17T00:00:00.000Z" AND "2025-07-17T00:00:00.000Z"',
+        'BETWEEN "2025-07-17T12:00:00.000Z" AND "2025-07-17T13:00:00.000Z"',
         'UTC',
         false,
       ),
-    ).toStrictEqual('between 2025-07-17 00:00 AM and 2025-07-17 00:00 AM');
+    ).toStrictEqual(
+      'between 7/17/25, 12:00:00.00 PM UTC and 7/17/25, 1:00:00.00 PM UTC',
+    );
     expect(
       formatDateTimeRange(
-        'BETWEEN 2025-07-17T00:00:00.000Z AND 2025-07-17T00:00:00.000Z',
+        'BETWEEN 2025-07-17T12:00:00.000Z AND 2025-07-17T13:00:00.000Z',
         'UTC',
         false,
       ),
-    ).toStrictEqual('between 2025-07-17 00:00 AM and 2025-07-17 00:00 AM');
+    ).toContain(
+      'between 7/17/25, 12:00:00.00 PM UTC and 7/17/25, 1:00:00.00 PM UTC',
+    );
   });
 
   it('should format a date range between two dates with a different time format', () => {
@@ -201,6 +212,8 @@ describe('formatDateTimeRange', () => {
         'Pacific Daylight Time',
         false,
       ),
-    ).toStrictEqual('between 2025-07-16 17:00 PM and 2025-07-16 17:00 PM');
+    ).toStrictEqual(
+      'between 7/16/25, 5:00:00.00 PM PDT and 7/16/25, 5:00:00.00 PM PDT',
+    );
   });
 });

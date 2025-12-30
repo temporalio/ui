@@ -433,10 +433,11 @@ export const mockContinuedAsNewEventHistory = {
   archived: false,
 };
 
-export const EVENT_HISTORY_API = '**/api/v1/namespaces/*/workflows/*/history?*';
+export const EVENT_HISTORY_API =
+  /\/api\/v1\/namespaces\/[^/]+\/workflows\/[^/]+\/history\?.*$/;
 
 export const EVENT_HISTORY_API_REVERSE =
-  '**/api/v1/namespaces/*/workflows/*/history-reverse?*';
+  /\/api\/v1\/namespaces\/[^/]+\/workflows\/[^/]+\/history-reverse\?.*$/;
 
 export const mockEventHistoryApi = (
   page: Page,

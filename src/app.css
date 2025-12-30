@@ -7,6 +7,12 @@
 @import 'tailwindcss/utilities';
 
 @layer base {
+  :root {
+    --panel-collapsed-w: 60px;
+    --panel-expanded-w: 240px;
+    --panel-h: 73dvh;
+  }
+
   *,
   html,
   body {

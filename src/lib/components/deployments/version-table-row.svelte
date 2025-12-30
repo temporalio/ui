@@ -1,17 +1,16 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
   import {
     isVersionSummaryNew,
     type RoutingConfig,
     type VersionSummary,
   } from '$lib/types/deployments';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     getBuildIdFromVersion,
     getDeploymentFromVersion,
@@ -105,22 +104,18 @@
         <div class="flex items-center gap-2">
           <DeploymentStatus {status} label={statusLabel} />
           {#if isCurrent && isVersionSummaryNew(version) && version?.currentSinceTime}
-            Since {formatDate(version?.currentSinceTime, $timeFormat, {
-              relative: $relativeTime,
-            })}
+            Since <Timestamp dateTime={version.currentSinceTime} />
           {:else if isRamping && isVersionSummaryNew(version) && version?.rampingSinceTime}
-            Since {formatDate(version?.rampingSinceTime, $timeFormat, {
-              relative: $relativeTime,
-            })}
+            Since <Timestamp dateTime={version.rampingSinceTime} />
           {/if}
         </div>
       </td>
     {:else if label === translate('deployments.deployed')}
-      <td class="whitespace-pre-line break-words text-left"
-        >{formatDate(version?.createTime, $timeFormat, {
-          relative: $relativeTime,
-        })}</td
-      >
+      <Timestamp
+        as="td"
+        class="whitespace-pre-line break-words text-left"
+        dateTime={version?.createTime}
+      />
     {:else if label === translate('deployments.actions')}
       <td class="w-24 whitespace-pre-line break-words">
         <Link

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -13,7 +15,7 @@
   export { className as class };
   export let attributesToAdd: SAInput[] = [];
   export let buttonCopy = translate('workflows.add-search-attribute');
-  export let variant: Button['variant'] = 'ghost';
+  export let variant: ComponentProps<Button>['variant'] = 'ghost';
 
   const addSearchAttribute = () => {
     attributesToAdd = [

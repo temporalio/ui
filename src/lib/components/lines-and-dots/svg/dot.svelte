@@ -91,7 +91,7 @@
 
   .Completed {
     stroke: #00964e;
-    fill: #00f37e;
+    fill: #1ff1a5;
   }
 
   .Fired {
@@ -107,7 +107,7 @@
   .Failed,
   .Terminated {
     stroke: #c71607;
-    fill: #ff4518;
+    fill: #f55;
   }
 
   .TimedOut {
