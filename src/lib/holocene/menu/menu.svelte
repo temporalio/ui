@@ -110,32 +110,68 @@
     node: HTMLElement,
     target: HTMLElement | string = document.body,
   ) => {
-    calculatePosition(node, node.previousElementSibling);
+    const anchor = node.previousElementSibling;
+    const container = document.getElementById(containerId);
+    const updatePosition = () => {
+      calculatePosition(node, anchor, container);
+    };
+    updatePosition();
     const targetElement =
       typeof target === 'string' ? document.querySelector(target) : target;
     if (targetElement) targetElement.appendChild(node);
+
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+    container?.addEventListener('scroll', updatePosition);
+
     return {
       destroy() {
+        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener('scroll', updatePosition, true);
+        container?.removeEventListener('scroll', updatePosition);
         if (node.parentNode) node.parentNode.removeChild(node);
       },
     };
   };
 
-  const calculatePosition = (menu: HTMLElement, anchor: Element) => {
+  const calculatePosition = (
+    menu: HTMLElement,
+    anchor: Element,
+    container: HTMLElement | null,
+  ) => {
     if (!menu || !anchor) return;
+
+    if (!anchor.checkVisibility()) {
+      $open = false;
+      return;
+    }
 
     const rect = anchor.getBoundingClientRect();
     const menuWidth = menu?.offsetWidth;
     const menuHeight = menu?.offsetHeight;
 
     // Use container bounds if provided, otherwise use window bounds
-    const container = document.getElementById(containerId);
     const containerRect = container?.getBoundingClientRect() || {
       left: 0,
       right: window.innerWidth,
       top: 0,
       bottom: window.innerHeight,
     };
+
+    // Check if anchor is visible within the container
+    if (container) {
+      const isVisible = !(
+        rect.bottom < containerRect.top ||
+        rect.top > containerRect.bottom ||
+        rect.right < containerRect.left ||
+        rect.left > containerRect.right
+      );
+
+      if (!isVisible) {
+        $open = false;
+        return;
+      }
+    }
 
     let top = rect.bottom + window.scrollY;
     let left =
