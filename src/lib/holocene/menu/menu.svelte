@@ -4,7 +4,6 @@
   const menuStyles = cva(
     [
       'surface-primary',
-      'absolute',
       'z-20',
       'mt-1',
       'min-w-fit',
@@ -14,7 +13,6 @@
       'border-subtle',
       'text-primary',
       'shadow',
-      'w-full',
       'transition-all',
       'duration-100',
       'ease-out',
@@ -22,10 +20,13 @@
     {
       variants: {
         position: {
+          auto: 'fixed',
+          top: 'absolute',
+          bottom: 'absolute',
+        },
+        align: {
           left: 'left-0 origin-top-left',
           right: 'right-0 origin-top-right',
-          'top-left': 'left-0 origin-top-left',
-          'top-right': 'right-0 origin-top-right',
         },
         state: {
           open: 'visible scale-100 opacity-100',
@@ -50,26 +51,29 @@
     extends Omit<HTMLAttributes<HTMLUListElement>, 'class'> {
     id: string;
     keepOpen?: boolean;
-    position?: 'left' | 'right' | 'top-left' | 'top-right';
+    position?: 'auto' | 'top' | 'bottom';
+    align?: 'left' | 'right';
     menuElement?: HTMLUListElement;
     maxHeight?: string;
     class?: ClassNameValue;
+    containerId?: string;
   }
 
   let {
     class: className = '',
     id,
     keepOpen = false,
-    position = 'left',
+    position = 'auto',
+    align = 'left',
     menuElement = $bindable(null),
     maxHeight = 'max-h-[20rem]',
     children,
+    containerId,
     ...rest
   }: Props = $props();
 
   let height = $state(0);
-  let menuX = $state(0);
-  let menuY = $state(0);
+  let menuPosition = $state({ top: 0, left: 0 });
 
   const {
     keepOpen: keepOpenCtx,
@@ -99,14 +103,14 @@
   };
 
   const styles = $derived(
-    menuStyles({ position, state: $open ? 'open' : 'closed' }),
+    menuStyles({ align, position, state: $open ? 'open' : 'closed' }),
   );
 
   const portal = (
     node: HTMLElement,
     target: HTMLElement | string = document.body,
   ) => {
-    positionMenuFrom(node, node.previousElementSibling);
+    calculatePosition(node, node.previousElementSibling);
     const targetElement =
       typeof target === 'string' ? document.querySelector(target) : target;
     if (targetElement) targetElement.appendChild(node);
@@ -117,21 +121,53 @@
     };
   };
 
-  const positionMenuFrom = (menuElement: HTMLElement, menuButton: Element) => {
-    if (!menuElement || !menuButton) return;
-    const button = menuButton.getBoundingClientRect();
-    const menu = menuElement.getBoundingClientRect();
-    if (position === 'right' || position === 'top-right') {
-      menuX = Math.round(button.right) - menu.width;
-    }
-    if (position === 'left' || position === 'top-left') {
-      menuX = Math.round(button.left);
+  const calculatePosition = (menu: HTMLElement, anchor: Element) => {
+    if (!menu || !anchor) return;
+
+    const rect = anchor.getBoundingClientRect();
+    const menuWidth = menu?.offsetWidth;
+    const menuHeight = menu?.offsetHeight;
+
+    // Use container bounds if provided, otherwise use window bounds
+    const container = document.getElementById(containerId);
+    const containerRect = container?.getBoundingClientRect() || {
+      left: 0,
+      right: window.innerWidth,
+      top: 0,
+      bottom: window.innerHeight,
+    };
+
+    let top = rect.bottom + window.scrollY;
+    let left =
+      align === 'right'
+        ? rect.right + window.scrollX - menuWidth
+        : rect.left + window.scrollX;
+
+    if (position === 'top') {
+      top = rect.top + window.scrollY - menuHeight - 8;
+    } else if (position === 'auto') {
+      // Avoid right edge
+      if (left + menuWidth > containerRect.right + window.scrollX) {
+        left = containerRect.right + window.scrollX - menuWidth - 8;
+      }
+
+      // Avoid left edge
+      if (left < containerRect.left + window.scrollX) {
+        left = containerRect.left + window.scrollX + 8;
+      }
+
+      // Avoid bottom edge
+      if (top + menuHeight > containerRect.bottom + window.scrollY) {
+        top = rect.top + window.scrollY - menuHeight - 8;
+      }
+
+      // Avoid top edge
+      if (top < containerRect.top + window.scrollY) {
+        top = containerRect.top + window.scrollY + 8;
+      }
     }
 
-    menuY = Math.round(button.top + button.height);
-    if (position === 'top-right' || position === 'top-left') {
-      menuY = menuY - menu.height - button.height;
-    }
+    menuPosition = { top, left };
   };
 </script>
 
@@ -142,7 +178,7 @@
     class={merge(styles, maxHeight, className)}
     aria-labelledby={id}
     tabindex={-1}
-    style={`top: ${menuY}px; left: ${menuX}px;`}
+    style="top: {menuPosition.top}px; left: {menuPosition.left}px;"
     {id}
     bind:this={menuElement}
     bind:clientHeight={height}
