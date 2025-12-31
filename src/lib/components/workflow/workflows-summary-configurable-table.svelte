@@ -4,6 +4,10 @@
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { MenuItem } from '$lib/holocene/menu';
+  import MenuButton from '$lib/holocene/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
+  import Menu from '$lib/holocene/menu/menu.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -77,6 +81,7 @@
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
     maxHeight="var(--panel-h)"
+    id="workflows-summary-configurable-table"
   >
     <caption class="sr-only" slot="caption">
       {translate('common.workflows')}
@@ -91,6 +96,7 @@
       {#each columns as column}
         <TableHeaderCell {column} />
       {/each}
+      <th></th>
     </TableHeaderRow>
     {#each visibleItems as workflow}
       <TableRow
@@ -101,6 +107,26 @@
         {#each columns as column}
           <TableBodyCell {workflow} {column} />
         {/each}
+        <!-- DO NOT MERGE -->
+        <MenuContainer>
+          <MenuButton
+            class="w-10 rounded-full"
+            variant="ghost"
+            controls="actions-menu"
+          >
+            <Icon name="vertical-ellipsis" />
+          </MenuButton>
+          <Menu
+            class="w-40"
+            id="actions-menu"
+            containerId="workflows-summary-configurable-table-container"
+          >
+            <MenuItem>Example Action 1</MenuItem>
+            <MenuItem>Example Action 2</MenuItem>
+            <MenuItem>Example Action 3</MenuItem>
+            <MenuItem destructive>Example Action 4</MenuItem>
+          </Menu>
+        </MenuContainer>
       </TableRow>
       {#if childrenActive(workflow)}
         {#each childrenActive(workflow).children as child}
