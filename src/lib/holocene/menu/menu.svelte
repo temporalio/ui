@@ -93,6 +93,9 @@
     menuElement ? getFocusableElements(menuElement) : [],
   );
   const lastMenuItem = $derived(menuItems[menuItems.length - 1]);
+  const container = $derived(
+    containerId ? document.getElementById(containerId) : null,
+  );
 
   const handleFocusOut = (e: FocusEvent) => {
     if (!$keepOpenCtx && e.target === lastMenuItem) $open = false;
@@ -111,27 +114,63 @@
     target: HTMLElement | string = document.body,
   ) => {
     const anchor = node.previousElementSibling;
-    const container = document.getElementById(containerId);
-    const updatePosition = () => {
-      calculatePosition(node, anchor, container);
-    };
-    updatePosition();
+
+    calculatePosition(node, anchor, container);
+
     const targetElement =
       typeof target === 'string' ? document.querySelector(target) : target;
     if (targetElement) targetElement.appendChild(node);
 
+    let rafId: number;
+    let lastUpdateTime = 0;
+    const updatePosition = () => {
+      const now = performance.now();
+      if (now - lastUpdateTime < 16) return; // ~60fps throttling
+
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (!$open) return;
+        calculatePosition(node, anchor, container);
+        lastUpdateTime = now;
+      });
+    };
+
+    const options = { passive: true };
     window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition, true);
-    container?.addEventListener('scroll', updatePosition);
+    window.addEventListener('scroll', updatePosition, {
+      ...options,
+      capture: true,
+    });
+    container?.addEventListener('scroll', updatePosition, options);
 
     return {
       destroy() {
+        if (rafId) cancelAnimationFrame(rafId);
         window.removeEventListener('resize', updatePosition);
-        window.removeEventListener('scroll', updatePosition, true);
+        window.removeEventListener('scroll', updatePosition, { capture: true });
         container?.removeEventListener('scroll', updatePosition);
         if (node.parentNode) node.parentNode.removeChild(node);
       },
     };
+  };
+
+  const isAnchorVisible = (
+    anchor: Element,
+    container: HTMLElement | null,
+  ): boolean => {
+    if (!anchor?.checkVisibility()) return false;
+
+    if (!container) return true;
+    const rect = anchor.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    // Check if anchor is visible within the container
+    return !(
+      rect.bottom < containerRect.top ||
+      rect.top > containerRect.bottom ||
+      rect.right < containerRect.left ||
+      rect.left > containerRect.right
+    );
   };
 
   const calculatePosition = (
@@ -141,37 +180,21 @@
   ) => {
     if (!menu || !anchor) return;
 
-    if (!anchor.checkVisibility()) {
+    if (!isAnchorVisible(anchor, container)) {
       $open = false;
       return;
     }
 
     const rect = anchor.getBoundingClientRect();
-    const menuWidth = menu?.offsetWidth;
-    const menuHeight = menu?.offsetHeight;
+    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menu;
 
     // Use container bounds if provided, otherwise use window bounds
-    const containerRect = container?.getBoundingClientRect() || {
+    const containerRect = container?.getBoundingClientRect() ?? {
       left: 0,
       right: window.innerWidth,
       top: 0,
       bottom: window.innerHeight,
     };
-
-    // Check if anchor is visible within the container
-    if (container) {
-      const isVisible = !(
-        rect.bottom < containerRect.top ||
-        rect.top > containerRect.bottom ||
-        rect.right < containerRect.left ||
-        rect.left > containerRect.right
-      );
-
-      if (!isVisible) {
-        $open = false;
-        return;
-      }
-    }
 
     let top = rect.bottom + window.scrollY;
     let left =
