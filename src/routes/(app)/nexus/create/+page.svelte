@@ -33,7 +33,7 @@
           input: JSON.stringify(body.spec.descriptionString),
           encoding: 'json/plain',
         });
-        body.spec.description = payloads[0];
+        body.spec.description = payloads?.[0];
 
         delete body.spec.allowedCallerNamespaces;
         delete body.spec.descriptionString;
@@ -55,7 +55,7 @@
 
   const targetNamespaceList = $derived(
     $namespaces.map((namespace) => ({
-      namespace: namespace.namespaceInfo.name,
+      namespace: namespace.namespaceInfo?.name ?? '',
     })),
   );
 </script>

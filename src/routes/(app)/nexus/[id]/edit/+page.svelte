@@ -21,12 +21,12 @@
 
   import type { LayoutData } from '../$types';
 
-  export let data: LayoutData;
+  let { data }: { data: LayoutData } = $props();
 
-  $: ({ endpoint } = data);
+  const { endpoint } = $derived(data);
 
-  let error: NetworkError | undefined = undefined;
-  let loading = false;
+  let error = $state<NetworkError | undefined>(undefined);
+  let loading = $state(false);
 
   const onUpdate = async () => {
     if (!endpoint) return;
@@ -42,7 +42,7 @@
         input: JSON.stringify(body.spec.descriptionString),
         encoding: 'json/plain',
       });
-      body.spec.description = payloads[0];
+      body.spec.description = payloads?.[0];
 
       delete body.spec.allowedCallerNamespaces;
       delete body.spec.descriptionString;
@@ -75,9 +75,11 @@
     }
   };
 
-  $: targetNamespaceList = $namespaces.map((namespace) => ({
-    namespace: namespace.namespaceInfo.name,
-  }));
+  const targetNamespaceList = $derived(
+    $namespaces.map((namespace) => ({
+      namespace: namespace.namespaceInfo?.name ?? '',
+    })),
+  );
 </script>
 
 <PageTitle

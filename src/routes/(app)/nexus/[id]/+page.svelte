@@ -19,13 +19,15 @@
   title={translate('nexus.nexus-endpoint', { id: $page.params.id })}
   url={$page.url.href}
 />
-<div class="flex flex-col gap-4">
-  <Link href={routeForNexus()} icon="chevron-left">
-    {translate('nexus.back-to-endpoints')}
-  </Link>
-  <NexusEndpoint {endpoint}>
-    {#snippet taskQueueStatus()}
-      <TaskQueueStatus {endpoint} />
-    {/snippet}
-  </NexusEndpoint>
-</div>
+{#if endpoint}
+  <div class="flex flex-col gap-4">
+    <Link href={routeForNexus()} icon="chevron-left">
+      {translate('nexus.back-to-endpoints')}
+    </Link>
+    <NexusEndpoint {endpoint}>
+      {#snippet taskQueueStatus()}
+        <TaskQueueStatus {endpoint} />
+      {/snippet}
+    </NexusEndpoint>
+  </div>
+{/if}
