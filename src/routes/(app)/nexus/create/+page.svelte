@@ -27,14 +27,17 @@
       const body: Partial<NexusEndpoint> & { projectId?: string } = {
         ...$endpointForm,
       };
-      const payloads = await encodePayloads({
-        input: JSON.stringify(body.spec.descriptionString),
-        encoding: 'json/plain',
-      });
-      body.spec.description = payloads[0];
 
-      delete body.spec.allowedCallerNamespaces;
-      delete body.spec.descriptionString;
+      if (body.spec) {
+        const payloads = await encodePayloads({
+          input: JSON.stringify(body.spec.descriptionString),
+          encoding: 'json/plain',
+        });
+        body.spec.description = payloads[0];
+
+        delete body.spec.allowedCallerNamespaces;
+        delete body.spec.descriptionString;
+      }
 
       if (projectId) {
         body.projectId = projectId;
