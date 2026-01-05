@@ -404,11 +404,8 @@ test.describe('Workflow actions for a Running Workflow', () => {
       ).toBeEnabled();
 
       await expect(
-        page
-          .locator('#workflow-actions')
-          .locator('visible=true')
-          .getByText('Terminate'),
-      ).toBeDisabled();
+        page.getByTestId('terminate-button').first(),
+      ).toHaveAttribute('aria-disabled', 'true');
 
       await expect(page.getByRole('menuitem', { name: 'Reset' })).toBeEnabled();
     });
@@ -426,12 +423,10 @@ test.describe('Workflow actions for a Running Workflow', () => {
 
       await page.getByRole('button', { name: 'More Actions' }).click();
 
-      await expect(
-        page
-          .locator('#workflow-actions')
-          .locator('visible=true')
-          .getByText('Send a Signal'),
-      ).toBeDisabled();
+      await expect(page.getByTestId('signal-button').first()).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
 
       await expect(
         page.getByRole('menuitem', { name: 'Terminate' }),

@@ -40,7 +40,7 @@
   let { workflow, run, namespace } = $derived($page.params);
   let href = $derived(
     routeForEventHistoryEvent({
-      eventId: event.scheduledEventId,
+      eventId: String(event.scheduledEventId),
       namespace,
       workflow,
       run,

@@ -104,14 +104,14 @@
         placeholder="Select a signal"
         required
       >
-        {#each signalDefinitions as { name: value, description = '' }}
-          <Option {value} {description}>{value}</Option>
-        {/each}
         <Option
           onclick={handleCustom}
           value="custom"
           description="Input Signal name">Custom</Option
         >
+        {#each signalDefinitions as { name: value, description = '' }}
+          <Option {value} {description}>{value}</Option>
+        {/each}
       </Select>
     {:else}
       <Input
