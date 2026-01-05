@@ -1,6 +1,7 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { Payload } from '$lib/types';
   import type { PotentiallyDecodable } from '$lib/utilities/decode-payload';
   import {
@@ -13,10 +14,11 @@
   type Props = {
     title: string;
     content: string;
-    isRunning: boolean;
   };
-  let { title, content = '', isRunning = false }: Props = $props();
+  let { title, content = '' }: Props = $props();
   let inline = $state(false);
+
+  const isRunning = $derived($workflowRun?.workflow?.isRunning ?? false);
 
   const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {
