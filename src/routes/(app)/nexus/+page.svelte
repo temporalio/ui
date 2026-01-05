@@ -28,7 +28,7 @@
   {/snippet}
   {#snippet columns(endpoint)}
     <TableRow>
-      <td class="px-2">
+      <td>
         {#if endpoint.id && endpoint.spec?.name}
           <Link href={routeForNexusEndpoint(endpoint.id)} class="table-link">
             {endpoint.spec.name}
@@ -37,14 +37,14 @@
           <span class="text-secondary">—</span>
         {/if}
       </td>
-      <td class="px-2">
+      <td>
         {#if endpoint.lastModifiedTime}
           <Timestamp dateTime={endpoint.lastModifiedTime} relative />
         {:else}
           <span class="text-secondary">—</span>
         {/if}
       </td>
-      <td class="px-2">
+      <td>
         {#if endpoint.createdTime}
           <Timestamp dateTime={endpoint.createdTime} relative={false} />
         {:else}

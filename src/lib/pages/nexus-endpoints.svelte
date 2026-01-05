@@ -71,11 +71,12 @@
       class="w-full"
     />
     {#if endpoints.length}
-      <Table class="w-full" bordered>
-        <caption class="sr-only" slot="caption">
-          {translate('nexus.endpoints')}
-        </caption>
-        {@render headers?.()}
+      <Table class="w-full" bordered {headers}>
+        {#snippet caption()}
+          <caption class="sr-only">
+            {translate('nexus.endpoints')}
+          </caption>
+        {/snippet}
         {#each endpoints as endpoint}
           {@render columns?.(endpoint)}
         {/each}

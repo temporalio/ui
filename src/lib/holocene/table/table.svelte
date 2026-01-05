@@ -1,23 +1,32 @@
 <script lang="ts">
   import type { HTMLTableAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
-  interface $$Props extends HTMLTableAttributes {
+  interface Props extends HTMLTableAttributes {
     updating?: boolean;
     class?: string;
     'data-testid'?: string;
     fixed?: boolean;
     bordered?: boolean;
+    caption?: Snippet;
+    headers?: Snippet;
+    children?: Snippet;
   }
 
-  let className = '';
-  export { className as class };
-  export let updating = false;
-  export let fixed = false;
-  export let bordered = true;
+  let {
+    class: className = '',
+    updating = false,
+    fixed = false,
+    bordered = true,
+    caption,
+    headers,
+    children,
+    ...restProps
+  }: Props = $props();
 </script>
 
 <table
@@ -27,17 +36,17 @@
     className,
   )}
   class:bordered
-  {...$$restProps}
+  {...restProps}
 >
-  <slot name="caption" />
+  {@render caption?.()}
   <thead class="holocene-table-header">
-    <slot name="headers" />
+    {@render headers?.()}
     {#if updating}
       <ProgressBar />
     {/if}
   </thead>
   <tbody class="holocene-table-body">
-    <slot />
+    {@render children?.()}
   </tbody>
 </table>
 
