@@ -29,6 +29,8 @@
   let loading = false;
 
   const onUpdate = async () => {
+    if (!endpoint) return;
+
     error = undefined;
     loading = true;
     const body = { ...$endpointForm };
@@ -58,6 +60,8 @@
   };
 
   const onDelete = async () => {
+    if (!endpoint) return;
+
     error = undefined;
     loading = true;
     try {
@@ -80,17 +84,19 @@
   title={`Edit ${translate('nexus.nexus-endpoint', { id: $page.params.id })}`}
   url={$page.url.href}
 />
-<div class="flex flex-col gap-4">
-  <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
-    {translate('nexus.back-to-endpoint')}
-  </Link>
-  <NexusEditEndpoint
-    {endpoint}
-    {loading}
-    {targetNamespaceList}
-    {onUpdate}
-    {onDelete}
-    {error}
-    cancelHref={routeForNexusEndpoint($page.params.id)}
-  />
-</div>
+{#if endpoint}
+  <div class="flex flex-col gap-4">
+    <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
+      {translate('nexus.back-to-endpoint')}
+    </Link>
+    <NexusEditEndpoint
+      {endpoint}
+      {loading}
+      {targetNamespaceList}
+      {onUpdate}
+      {onDelete}
+      {error}
+      cancelHref={routeForNexusEndpoint($page.params.id)}
+    />
+  </div>
+{/if}
