@@ -63,6 +63,7 @@
     'Versioning Behavior',
     'Deployment Version',
     'Build ID',
+    'Scheduled By ID',
   ];
 </script>
 
@@ -164,6 +165,14 @@
         attribute={label}
         value={content}
         type={$customSearchAttributes[label]}
+      />
+    {:else if label === 'Scheduled By ID'}
+      {@const scheduleId =
+        workflow.searchAttributes?.indexedFields?.TemporalScheduledById}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="TemporalScheduledById"
+        value={scheduleId && typeof scheduleId === 'string' ? scheduleId : ''}
       />
     {/if}
   </td>

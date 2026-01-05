@@ -15,6 +15,7 @@
 </script>
 
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { getContext, onDestroy, onMount } from 'svelte';
 
   import MenuItem, {
@@ -30,6 +31,7 @@
 
   interface Props extends Omit<MenuItemWithoutHrefProps, 'value' | 'onclick'> {
     value: T;
+    children: Snippet;
     onclick?: (value: T) => void;
   }
 
