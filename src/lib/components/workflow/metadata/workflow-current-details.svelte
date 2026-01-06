@@ -21,7 +21,7 @@
   let lastFetched = $state<Date | null>(null);
 
   const fetchCurrentDetails = async () => {
-    if (loading) return;
+    if (!workflow || loading) return;
     loading = true;
     try {
       const { settings } = page.data;
@@ -34,7 +34,7 @@
           },
         },
         settings,
-        $authUser?.accessToken,
+        $authUser?.accessToken ?? '',
       );
       $workflowRun.metadata = metadata;
       lastFetched = new Date();
@@ -48,7 +48,8 @@
   onMount(() => {
     fetchCurrentDetails();
   });
-  const handleKeydown = (event) => {
+
+  const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'r' || event.key === 'R') {
       event.preventDefault();
       fetchCurrentDetails();
