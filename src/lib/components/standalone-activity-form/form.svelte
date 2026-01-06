@@ -37,10 +37,13 @@
   const formDefaults = $derived<StandaloneActivityFormData>({
     namespace,
     identity: getIdentity(),
+    encoding: 'json/plain',
     activityId: page.url.searchParams.get('activityId') ?? '',
     activityType: page.url.searchParams.get('activityType') ?? '',
     taskQueue: page.url.searchParams.get('taskQueue') ?? '',
     startToCloseTimeout: page.url.searchParams.get('startToCloseTimeout') ?? '',
+    scheduleToCloseTimeout:
+      page.url.searchParams.get('scheduleToCloseTimeout') ?? '',
   });
 
   // https://svelte.dev/docs/svelte/compiler-warnings#state_referenced_locally
@@ -96,9 +99,7 @@
     {
       ...getFormDefaults(),
       input: '',
-      encoding: '',
       messageType: '',
-      scheduleToCloseTimeout: '',
       scheduleToStartTimeout: '',
       searchAttributes: [],
       summary: '',
@@ -125,8 +126,6 @@
       },
     },
   );
-
-  $inspect($form);
 
   const encoding = writable<PayloadInputEncoding>('json/plain');
   let advancedOptionsVisible = $state(false);

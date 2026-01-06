@@ -105,7 +105,7 @@ export const startStandaloneActivity = async (
 ) => {
   const { activityId, namespace } = activity;
 
-  const route = routeForApi('standalone-activities.start', {
+  const route = routeForApi('standalone-activity', {
     namespace,
     activityId,
   });
@@ -123,6 +123,15 @@ export const startStandaloneActivity = async (
 
 export const getActivityExecutions = (namespace: string) => {
   const route = routeForApi('standalone-activities', { namespace });
+
+  return requestFromAPI(route);
+};
+
+export const getActivityExecution = (namespace: string, activityId: string) => {
+  const route = routeForApi('standalone-activity', {
+    namespace,
+    activityId,
+  });
 
   return requestFromAPI(route);
 };

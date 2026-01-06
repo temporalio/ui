@@ -60,6 +60,14 @@ export type AuthenticationParameters = {
   originUrl?: string;
 };
 
+export interface StartActivityExecutionQueryParams {
+  activityId: string;
+  activityType: string;
+  taskQueue: string;
+  startToCloseTimeout: string;
+  scheduleToCloseTimeout: string;
+}
+
 export const routeForNamespaces = (): string => {
   return resolve('/namespaces', {});
 };
@@ -101,9 +109,16 @@ export const routeForStandaloneActivities = (
 };
 
 export const routeForStartStandaloneActivity = (
-  parameters: NamespaceParameter,
+  parameters: NamespaceParameter & Partial<StartActivityExecutionQueryParams>,
 ): string => {
-  return `${routeForStandaloneActivities(parameters)}/start`;
+  const params = {
+    activityId: parameters.activityId ?? '',
+    activityType: parameters.activityType ?? '',
+    scheduleToCloseTimeout: parameters.scheduleToCloseTimeout ?? '',
+    startToCloseTimeout: parameters.startToCloseTimeout ?? '',
+    taskQueue: parameters.taskQueue ?? '',
+  };
+  return toURL(`${routeForStandaloneActivities(parameters)}/start`, params);
 };
 
 type StartWorkflowParameters = NamespaceParameter &
