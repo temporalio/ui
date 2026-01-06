@@ -14,7 +14,7 @@
     status?: string;
     fontSize?: string;
     fontWeight?: string | number;
-    textAnchor?: 'start' | 'middle' | 'end';
+    textAnchor?: string;
     backdrop?: boolean;
     backdropHeight?: number;
     icon?: IconName;
