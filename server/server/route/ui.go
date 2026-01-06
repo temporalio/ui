@@ -140,7 +140,7 @@ const pageTemplate = `
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style nonce="{{.Nonce}}">
-			{{.CSS}}
+		{{.CSS}}
 	</style>
 </head>
 <body class="prose" {{if .Theme}}data-theme="{{.Theme}}"{{end}}>
@@ -174,12 +174,12 @@ func SetRenderRoute(e *echo.Echo) {
 			Content template.HTML
 			Nonce   string
 			Theme   string
-			CSS     string
+			CSS     template.CSS
 		}{
 			Content: template.HTML(renderedHTML),
 			Nonce:   nonce,
 			Theme:   finalTheme,
-			CSS: `*,
+			CSS: template.CSS(`*,
 		body {
 			margin: 0;
 			padding: 0;
@@ -314,42 +314,42 @@ func SetRenderRoute(e *echo.Echo) {
 			
 		body[data-theme='dark'] a {
 				color: #8098f9;
-			}
+		}
 				
-			body[data-theme='light-background'] {
-  background-color: #f8fafc;
-  color: #121416;
-  }
+		body[data-theme='light-background'] {
+			background-color: #f8fafc;
+			color: #121416;
+		}
 
-  body[data-theme='light-background']a {
-    color: #444ce7;
-  }
+		body[data-theme='light-background'] a {
+			color: #444ce7;
+		}
 
-body[data-theme='dark-background'] {
-  background-color: #141414;
-  color: #f8fafc;
-  }
- body[data-theme='dark-background'] a {
-    color: #8098f9;
-  }
+		body[data-theme='dark-background'] {
+			background-color: #141414;
+			color: #f8fafc;
+		}
+		body[data-theme='dark-background'] a {
+			color: #8098f9;
+		}
 
-body[data-theme='light-primary'] {
-  background-color: #fff;
-  color: #121416;
-  }
-  body[data-theme='light-primary']a {
-    color: #444ce7;
-  }
+		body[data-theme='light-primary'] {
+			background-color: #fff;
+			color: #121416;
+		}
+		body[data-theme='light-primary'] a {
+			color: #444ce7;
+		}
 
-body[data-theme='dark-primary'] {
-  background-color: #000;
-  color: #f8fafc;
-  }
+		body[data-theme='dark-primary'] {
+			background-color: #000;
+			color: #f8fafc;
+		}
 
-  body[data-theme='dark-primary']a {
-    color: #8098f9;
-  }
-`,
+		body[data-theme='dark-primary'] a {
+			color: #8098f9;
+		}
+	`),
 		}
 
 		// Set headers
