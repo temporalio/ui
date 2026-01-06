@@ -201,7 +201,7 @@ export const getNextDistanceAndOffset = (
   }
 
   let diff = 0;
-  if (nextEvent) {
+  if (nextEvent && isEvent(event)) {
     diff = parseInt(nextEvent.id) - parseInt(event.id);
   } else if (group.isPending && isEvent(event)) {
     diff = history.length - parseInt(event.id) + 2;
