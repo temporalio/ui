@@ -306,6 +306,7 @@ export const Strings = {
   'estimated-billable-actions': 'Estimated Billable Actions',
   'billable-actions-disclaimer':
     'This is an estimated count and does not capture all Billable Actions. View documentation for more details.',
+  'pending-activity': 'Pending Activity',
   'pending-nexus-operation': 'Pending Nexus Operation',
   'schedule-event-id': 'Scheduled Event ID',
   'schedule-to-close-timeout': 'Schedule to Close Timeout',
