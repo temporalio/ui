@@ -21,4 +21,4 @@ server/ui/assets
 /audits
 go.work
 go.work.sum
-.claude
+.claude/settings.local.json
