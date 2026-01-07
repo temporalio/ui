@@ -477,7 +477,7 @@
           {#if displayChips}
             {#each value.slice(0, chipLimit) as v}
               <Chip
-                on:remove={() => removeOption(v)}
+                onremove={() => removeOption(v)}
                 removeButtonLabel={removeChipLabel}>{v}</Chip
               >
             {/each}

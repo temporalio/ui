@@ -1,19 +1,32 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  export let intent: 'warning' | 'default' = 'default';
-  export let button = false;
-  export let removeButtonLabel: string;
-  export let disabled = false;
+  interface Props {
+    intent?: 'warning' | 'default';
+    button?: boolean;
+    removeButtonLabel: string;
+    disabled?: boolean;
+    onclick?: () => void;
+    onremove?: () => void;
+    children?: Snippet;
+  }
 
-  const dispatch = createEventDispatcher();
+  let {
+    intent = 'default',
+    button = false,
+    removeButtonLabel,
+    disabled = false,
+    onclick,
+    onremove,
+    children,
+  }: Props = $props();
 
   const handleRemove = (e: Event) => {
     e.preventDefault();
-    dispatch('remove');
+    onremove?.();
   };
 </script>
 
@@ -24,20 +37,20 @@
       data-track-name="chip"
       data-track-intent="action"
       data-track-text="*textContent*"
-      on:click
+      {onclick}
     >
-      <slot />
+      {@render children?.()}
     </button>
   {:else}
-    <slot />
+    {@render children?.()}
   {/if}
   <button
     aria-label={removeButtonLabel}
-    class:hidden={disabled}
+    class={disabled ? 'hidden' : ''}
     data-track-name="chip"
     data-track-intent="remove"
     data-track-text={removeButtonLabel}
-    on:click={handleRemove}
+    onclick={handleRemove}
   >
     <Icon name="close" />
   </button>
