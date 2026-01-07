@@ -425,7 +425,7 @@ The `class:` directive still works but consider using conditional expressions:
 <div class={`${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}`}>
 ```
 
-### 12. App State
+### 13. App State
 
 **Before:**
 
