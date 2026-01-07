@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import Chip from '$lib/holocene/chip.svelte';
 
@@ -22,7 +23,7 @@
         },
       },
     },
-  } satisfies Meta<Chip>;
+  } satisfies Meta<ComponentProps<typeof Chip>>;
 </script>
 
 <script lang="ts">

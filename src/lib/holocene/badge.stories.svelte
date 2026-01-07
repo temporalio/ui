@@ -1,5 +1,6 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import Badge, { badgeTypes } from './badge.svelte';
 
@@ -19,7 +20,9 @@
     parameters: {
       controls: { exclude: ['type', 'badgeTypes', 'class'] },
     },
-  } satisfies Meta<Badge['$$prop_def'] & { label?: string; count?: number }>;
+  } satisfies Meta<
+    ComponentProps<typeof Badge> & { label?: string; count?: number }
+  >;
 </script>
 
 <script lang="ts">
