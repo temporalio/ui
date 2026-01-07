@@ -60,7 +60,7 @@ export const getPendingNexusOperation = (
 export const getGroupForEventOrPendingEvent = (
   groups: EventGroup[],
   event: WorkflowEventWithPending,
-) => {
+): EventGroup | undefined => {
   return groups.find((g) => {
     if (isEvent(event)) {
       return g.eventIds.has(event.id);
