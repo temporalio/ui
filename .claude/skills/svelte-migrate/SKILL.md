@@ -425,6 +425,20 @@ The `class:` directive still works but consider using conditional expressions:
 <div class={`${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}`}>
 ```
 
+### 12. App State
+
+**Before:**
+
+```svelte
+import {page} from '$app/stores'
+```
+
+**After:**
+
+```svelte
+import {page} from '$app/state'
+```
+
 ## Workflow
 
 1. Read the file to understand its current structure
@@ -444,7 +458,7 @@ The `class:` directive still works but consider using conditional expressions:
 ## Important Notes
 
 - Keep `onMount` and `onDestroy` - they're still valid
-- `context="module"` scripts remain unchanged
+- `context="module"` scripts are now `<script module>`
 - CSS/styles don't change
 - `{#if}`, `{#each}`, `{#await}` blocks remain unchanged
 - `bind:` directives on elements remain unchanged
