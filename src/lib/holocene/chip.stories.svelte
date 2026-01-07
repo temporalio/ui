@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import Chip from '$lib/holocene/chip.svelte';
@@ -31,7 +31,7 @@
 </script>
 
 <Template let:args>
-  <Chip {...args} on:remove={action('remove')} on:click={action('click')}>
+  <Chip {...args} onremove={action('remove')} onclick={action('click')}>
     ross.edfort@temporal.io
   </Chip>
 </Template>
