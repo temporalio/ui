@@ -19,7 +19,7 @@
     }
   };
 
-  $: namespace, fetchCounts();
+  $: namespace, query, fetchCounts();
 </script>
 
 <div class="flex flex-wrap items-center gap-2">

@@ -84,6 +84,32 @@
   };
 </script>
 
+<div class="flex flex-col gap-4">
+  <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
+    <SchedulesCount />
+  </h1>
+  <div class="flex flex-col justify-between gap-2 md:flex-row">
+    {#if Number($schedulesCount) > 0 || query}
+      <SearchAttributeFilter
+        bind:filters={$scheduleFilters}
+        {searchAttributeOptions}
+        refresh={() => {
+          refresh = Date.now();
+        }}
+      />
+      {#if !createDisabled}
+        <Button
+          data-testid="create-schedule"
+          href={routeForScheduleCreate({ namespace })}
+          disabled={!writeActionsAreAllowed()}
+        >
+          {translate('schedules.create')}
+        </Button>
+      {/if}
+    {/if}
+  </div>
+</div>
+
 {#key [namespace, query, refresh]}
   <PaginatedTable
     let:visibleItems
@@ -100,34 +126,6 @@
     <caption class="sr-only" slot="caption"
       >{translate('common.schedules')}</caption
     >
-
-    <div class="flex flex-col gap-4" slot="header" let:visibleItems>
-      {@const showActions = visibleItems.length || query}
-      <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-        <SchedulesCount />
-      </h1>
-      <div class="flex flex-col justify-between gap-2 md:flex-row">
-        {#if showActions}
-          <SearchAttributeFilter
-            bind:filters={$scheduleFilters}
-            {searchAttributeOptions}
-            refresh={() => {
-              refresh = Date.now();
-            }}
-          />
-          {#if !createDisabled}
-            <Button
-              data-testid="create-schedule"
-              href={routeForScheduleCreate({ namespace })}
-              disabled={!writeActionsAreAllowed()}
-            >
-              {translate('schedules.create')}
-            </Button>
-          {/if}
-        {/if}
-      </div>
-    </div>
-
     <tr slot="headers" class="text-left">
       {#each columns as { label }}
         <th>{label}</th>
