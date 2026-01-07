@@ -226,7 +226,10 @@
   </Card>
 
   {#if advancedOptionsVisible}
-    <Card class="space-y-4">
+    <Card
+      class="space-y-4"
+      data-testid="start-standalone-activity-add-search-attributes"
+    >
       <div class="space-y-2">
         <p class="text-base font-medium">Custom Search Attributes</p>
         <p class="text-secondary">
@@ -237,7 +240,10 @@
       <AddSearchAttributes bind:attributesToAdd={$form.searchAttributes} />
     </Card>
 
-    <Card class="space-y-4">
+    <Card
+      class="space-y-4"
+      data-testid="start-standalone-activity-add-metadata"
+    >
       <div class="space-y-2">
         <p class="text-base font-medium">User Metadata</p>
         <p class="text-secondary">
@@ -261,12 +267,13 @@
       type="button"
       variant="ghost"
       trailingIcon={advancedOptionsVisible ? 'chevron-up' : 'chevron-down'}
+      data-testid="start-standalone-activity-more-options"
       on:click={() => (advancedOptionsVisible = !advancedOptionsVisible)}
     >
       {translate('common.more-options')}
     </Button>
 
-    <Button type="submit">
+    <Button data-testid="start-standalone-activity-submit-button" type="submit">
       {translate('activities.start-standalone-activity')}
     </Button>
   </div>

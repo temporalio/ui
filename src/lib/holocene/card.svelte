@@ -1,13 +1,15 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import type { Snippet } from 'svelte';
-  import { twMerge } from 'tailwind-merge';
+  import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
-  type Props = {
-    class?: string;
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class'> {
+    class?: ClassNameValue;
     children?: Snippet;
-  };
+  }
 
-  let { class: className = '', children }: Props = $props();
+  let { class: className = '', children, ...rest }: Props = $props();
 </script>
 
 <div
@@ -18,6 +20,7 @@
     'p-4',
     className,
   )}
+  {...rest}
 >
   {@render children?.()}
 </div>
