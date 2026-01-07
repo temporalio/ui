@@ -221,9 +221,12 @@ export type Payloads = temporal.api.common.v1.IPayloads;
 export type WorkflowExecutionInput = temporal.api.common.v1.IWorkflowExecution;
 export type Memo = temporal.api.common.v1.IMemo;
 export type Header = temporal.api.common.v1.IHeader;
+export type ActivityType = temporal.api.common.v1.IActivityType;
+export type RetryPolicy = temporal.api.common.v1.IRetryPolicy;
 
 // api.taskqueue
 
+export type TaskQueue = temporal.api.taskqueue.v1.ITaskQueue;
 export type TaskQueueRequest =
   temporal.api.workflowservice.v1.IDescribeTaskQueueRequest;
 export type TaskQueueResponse =
@@ -274,6 +277,7 @@ export type Failure = temporal.api.failure.v1.IFailure;
 // google
 
 export type Timestamp = google.protobuf.ITimestamp;
+export type Duration = google.protobuf.IDuration;
 
 // extra APIs
 export type SettingsResponse = {
@@ -303,3 +307,5 @@ export type SettingsResponse = {
   FeedbackURL: string;
   Version: string;
 };
+
+export type UserMetadata = temporal.api.sdk.v1.IUserMetadata;

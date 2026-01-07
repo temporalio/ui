@@ -54,6 +54,8 @@ export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
 export type WorkerDeploymentAPIRoutePath = 'worker-deployment';
 export type WorkerDeploymentVersionAPIRoutePath = 'worker-deployment-version';
+export type StandaloneActivitiesAPIRoutePath = 'standalone-activities';
+export type StandaloneActivityAPIRoutePath = 'standalone-activity';
 
 export type APIRoutePath =
   | ParameterlessAPIRoutePath
@@ -73,7 +75,9 @@ export type APIRoutePath =
   | NexusAPIRoutePath
   | WorkerDeploymentsAPIRoutePath
   | WorkerDeploymentAPIRoutePath
-  | WorkerDeploymentVersionAPIRoutePath;
+  | WorkerDeploymentVersionAPIRoutePath
+  | StandaloneActivityAPIRoutePath
+  | StandaloneActivitiesAPIRoutePath;
 
 export type APIRouteParameters = {
   namespace: string;
@@ -92,6 +96,14 @@ export type APIRouteParameters = {
   version: string;
 };
 
+export type StandaloneActivitiesParameters = Pick<
+  APIRouteParameters,
+  'namespace'
+>;
+export type StandaloneActivityParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'activityId'
+>;
 export type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 export type NamespaceRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 export type ScheduleListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
