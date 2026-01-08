@@ -41,9 +41,9 @@ test('it should update the datetime filter based on the selected timezone', asyn
     .locator('#timezones-menu')
     .locator('visible=true')
     .getByPlaceholder('Search')
-    .fill('PDT');
+    .fill('CST');
   await page
-    .getByText('Pacific Daylight Time (PDT) UTC-07:00')
+    .getByText('Central Standard Time (CST)')
     .locator('visible=true')
     .click();
 
@@ -62,7 +62,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await expect(
     page.getByRole('button', {
-      name: 'CloseTime >= 12/25/25, 4:00:00.00 AM PST',
+      name: 'CloseTime >= 12/25/25, 6:00:00.00 AM CST',
     }),
   ).toBeVisible();
   let query = await page.getByTestId('manual-search-input').inputValue();
@@ -78,9 +78,9 @@ test('it should update the datetime filter based on the selected timezone', asyn
     .locator('#timezones-menu')
     .locator('visible=true')
     .getByPlaceholder('Search')
-    .fill('MDT');
+    .fill('Greenwich Mean Time');
   await page
-    .getByText('Mountain Daylight Time (MDT) UTC-06:00')
+    .getByText('Greenwich Mean Time (GMT)')
     .locator('visible=true')
     .click();
 
