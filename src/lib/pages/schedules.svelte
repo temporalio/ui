@@ -29,6 +29,7 @@
   import {
     customSearchAttributes,
     scheduleSearchAttributes,
+    type SearchAttributeOption,
   } from '$lib/stores/search-attributes';
   import { temporalVersion } from '$lib/stores/versions';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
@@ -63,7 +64,7 @@
         label: key,
         value: key,
         type: value,
-      };
+      } as SearchAttributeOption;
     }),
   );
   const query = $derived(page.url.searchParams.get('query'));
