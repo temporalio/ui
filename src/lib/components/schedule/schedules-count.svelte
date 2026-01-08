@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import { translate } from '$lib/i18n/translate';
   import { fetchScheduleCount } from '$lib/services/workflow-counts';
   import { schedulesCount } from '$lib/stores/schedules';
 
-  $: namespace = $page.params.namespace;
-  $: query = $page.url.searchParams.get('query');
+  const { namespace } = $derived(page.params);
+  const query = $derived(page.url.searchParams.get('query'));
 
   const fetchCounts = async () => {
     try {
@@ -19,7 +19,9 @@
     }
   };
 
-  $: namespace, query, fetchCounts();
+  $effect(() => {
+    fetchCounts();
+  });
 </script>
 
 <div class="flex flex-wrap items-center gap-2">

@@ -383,7 +383,33 @@ After:
 </script>
 ```
 
-Note: `onMount` and `onDestroy` remain valid and preferred for mount/unmount logic.
+**IMPORTANT: `onMount` and `onDestroy` remain valid and should be preserved!**
+
+- Use `onMount` for initialization logic that should only run once when the component first mounts
+- Use `$effect` for reactive side effects that should re-run when dependencies change
+- Never convert `onMount` to `$effect` unless the logic genuinely needs to be reactive
+
+**Examples:**
+
+Keep as `onMount`:
+
+```svelte
+// ✅ One-time initialization - keep as onMount
+onMount(() => {
+  if (query) {
+    $filters = toListWorkflowFilters(query, $searchAttributes);
+  }
+});
+```
+
+Convert to `$effect`:
+
+```svelte
+// ✅ Reactive side effect - convert to $effect
+$effect(() => {
+  document.title = `Count: ${count}`; // re-runs when count changes
+});
+```
 
 ### 11. Dynamic Components: `<svelte:component>` → direct usage
 

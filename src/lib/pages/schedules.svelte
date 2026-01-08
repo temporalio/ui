@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
 
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
@@ -38,36 +38,40 @@
   import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  let refresh = Date.now();
-  let coreUser = coreUserStore();
-  let customizationDrawerOpen = false;
-  let error = '';
+  const coreUser = coreUserStore();
+  let refresh = $state(Date.now());
+  let customizationDrawerOpen = $state(false);
+  let error = $state('');
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
 
-  $: namespace = $page.params.namespace;
-  $: columns = $configurableTableColumns?.[namespace]?.schedules ?? [];
-  $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
-  $: searchAttributeOptions = Object.entries({
-    ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
-      ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  const { namespace } = $derived(page.params);
+  const columns = $derived(
+    $configurableTableColumns?.[namespace]?.schedules ?? [],
+  );
+  const createDisabled = $derived($coreUser.namespaceWriteDisabled(namespace));
+  const searchAttributeOptions = $derived(
+    Object.entries({
+      ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
+        ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      }),
+      ...$customSearchAttributes,
+    }).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
     }),
-    ...$customSearchAttributes,
-  }).map(([key, value]) => {
-    return {
-      label: key,
-      value: key,
-      type: value,
-    };
-  });
-  $: query = $page.url.searchParams.get('query');
-  $: onFetch = () => {
+  );
+  const query = $derived(page.url.searchParams.get('query'));
+  const onFetch = $derived(() => {
     error = '';
     return fetchPaginatedSchedules(namespace, query, onError);
-  };
-  $: availableColumns = availableScheduleColumns(namespace);
+  });
+  const availableColumns = $derived(availableScheduleColumns(namespace));
 
   onMount(() => {
     if (query) {
