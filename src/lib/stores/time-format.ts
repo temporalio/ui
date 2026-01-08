@@ -120,7 +120,6 @@ const getValidatedTimeFormat = () => {
     isValidated = true;
 
     const value = get(persistedTimeFormat);
-    if (value === null) return;
     if (Object.values(BASE_TIME_FORMAT_OPTIONS).includes(value)) return;
     if (!Timezones[value]) {
       const adjustedTimeformat = getAdjustedTimeformat(value);
@@ -129,7 +128,7 @@ const getValidatedTimeFormat = () => {
   };
 
   return {
-    subscribe: (run: Subscriber<string | null>, invalidate?: () => void) => {
+    subscribe: (run: Subscriber<string>, invalidate?: () => void) => {
       validate();
       return subscribe(run, invalidate);
     },
