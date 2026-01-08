@@ -117,7 +117,7 @@
           removeButtonLabel={typeof removeChipButtonLabel === 'string'
             ? removeChipButtonLabel
             : removeChipButtonLabel(chip)}
-          on:remove={() => removeChip(i)}
+          onremove={() => removeChip(i)}
           intent={valid ? 'default' : 'warning'}
           {disabled}>{chip}</Chip
         >
@@ -178,7 +178,7 @@
           removeButtonLabel={typeof removeChipButtonLabel === 'string'
             ? removeChipButtonLabel
             : removeChipButtonLabel(chip)}
-          on:remove={() => removeChip(i)}
+          onremove={() => removeChip(i)}
           intent={valid ? 'default' : 'warning'}
           {disabled}>{chip}</Chip
         >

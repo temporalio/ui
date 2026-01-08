@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
@@ -6,26 +8,46 @@
 
   import Line from './line.svelte';
 
-  export let point: [number, number] = [0, 0];
-  export let category: string | undefined = undefined;
-  export let status: string | undefined = 'none';
-  export let fontSize = '13px';
-  export let fontWeight = '400';
-  export let textAnchor = 'start';
-  export let backdrop = false;
-  export let backdropHeight = 0;
-  export let icon: IconName | undefined = undefined;
-  export let config: GraphConfig | undefined = undefined;
-  export let label = false;
+  type Props = {
+    point?: [number, number];
+    category?: string;
+    status?: string;
+    fontSize?: string;
+    fontWeight?: string | number;
+    textAnchor?: string;
+    backdrop?: boolean;
+    backdropHeight?: number;
+    icon?: IconName;
+    config?: GraphConfig;
+    label?: boolean;
+    children?: Snippet;
+  };
 
-  $: [x, y] = point;
+  let {
+    point = [0, 0],
+    category = undefined,
+    status = 'none',
+    fontSize = '13px',
+    fontWeight = '400',
+    textAnchor = 'start',
+    backdrop = false,
+    backdropHeight = 0,
+    icon = undefined,
+    config = undefined,
+    label = false,
+    children,
+  }: Props = $props();
 
-  let textElement: SVGTextElement;
+  const [x, y] = $derived(point);
 
-  $: showIcon = icon && config;
-  $: textWidth = textElement?.getBBox()?.width || 0;
-  $: backdropWidth = showIcon ? textWidth + 36 : textWidth + 12;
-  $: textX = showIcon && textAnchor === 'start' ? x + config.radius * 2 : x;
+  let textElement: SVGTextElement = $state();
+
+  const showIcon = $derived(icon && config);
+  const textWidth = $derived(textElement?.getBBox()?.width || 0);
+  const backdropWidth = $derived(showIcon ? textWidth + 36 : textWidth + 12);
+  const textX = $derived(
+    showIcon && textAnchor === 'start' ? x + config.radius * 2 : x,
+  );
 </script>
 
 {#if backdrop}
@@ -56,7 +78,7 @@
     font-weight={fontWeight}
     text-anchor={textAnchor}
   >
-    <slot />
+    {@render children?.()}
   </text>
 {/key}
 
@@ -101,7 +123,7 @@
   }
 
   text.child-workflow {
-    fill: #67e4f9;
+    fill: theme('colors.cyan.600');
   }
 
   text.workflow {
@@ -109,7 +131,7 @@
   }
 
   text.Failed {
-    fill: #f55;
+    fill: #ff4418;
   }
 
   text.none {

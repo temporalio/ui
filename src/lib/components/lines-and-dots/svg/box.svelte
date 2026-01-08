@@ -1,21 +1,35 @@
 <script lang="ts">
-  export let point: [number, number];
-  export let width: number;
-  export let height: number;
-  export let classification: string | undefined = undefined;
-  export let fill = '#141414';
+  import type { Snippet } from 'svelte';
 
-  $: [x, y] = point;
+  type Props = {
+    point: [number, number];
+    width: number;
+    height: number;
+    classification?: string;
+    fill?: string;
+    children?: Snippet;
+  };
+
+  let {
+    point,
+    width,
+    height,
+    classification = undefined,
+    fill = '#141414',
+    children,
+  }: Props = $props();
+
+  const [x, y] = $derived(point);
 </script>
 
 <rect {x} {y} {width} {height} class={classification} {fill}>
-  <slot />
+  {@render children?.()}
 </rect>
 
 <style lang="postcss">
   .Failed,
   .Terminated {
-    stroke: #f55;
+    stroke: #ff4418;
     stroke-width: 3;
   }
 
@@ -41,6 +55,6 @@
   }
 
   .retry {
-    stroke: #f55;
+    stroke: #c71607;
   }
 </style>
