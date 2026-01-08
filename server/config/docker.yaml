@@ -71,7 +71,8 @@ codec:
   includeCredentials: {{ env "TEMPORAL_CODEC_INCLUDE_CREDENTIALS" | default "false" }}
   defaultErrorMessage: {{ env "TEMPORAL_CODEC_DEFAULT_ERROR_MESSAGE" | default "" }}
   defaultErrorLink: {{ env "TEMPORAL_CODEC_DEFAULT_ERROR_LINK" | default "" }}
-
+environment:
+  name: {{ env "TEMPORAL_ENVIRONMENT_NAME" | default "" }}
 forwardHeaders:
 {{- if env "TEMPORAL_FORWARD_HEADERS" }}
 {{- range env "TEMPORAL_FORWARD_HEADERS" | split "," }}
