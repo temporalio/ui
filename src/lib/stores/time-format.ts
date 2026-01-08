@@ -1,3 +1,5 @@
+import { get, type Subscriber } from 'svelte/store';
+
 import { startOfDay } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import * as dateTz from 'date-fns-tz';
@@ -22,7 +24,7 @@ export const BASE_TIME_FORMAT_OPTIONS = {
   UTC: 'UTC',
 };
 const DEFAULT_TIME_FORMAT = BASE_TIME_FORMAT_OPTIONS.LOCAL;
-export const timeFormat = persistStore('timeFormat', DEFAULT_TIME_FORMAT);
+const persistedTimeFormat = persistStore('timeFormat', DEFAULT_TIME_FORMAT);
 export const timeFormatType = persistStore(
   'timeFormatType',
   'relative' as TimeFormatTypes,
@@ -109,16 +111,33 @@ export const getAdjustedTimeformat = (value: string, timezones = Timezones) => {
   }
 };
 
-timeFormat.subscribe((value) => {
-  if (value === null) return;
-  if (Object.values(BASE_TIME_FORMAT_OPTIONS).includes(value)) return;
-  if (!Timezones[value]) {
-    const adjustedTimeformat = getAdjustedTimeformat(value);
-    timeFormat.set(
-      adjustedTimeformat ? adjustedTimeformat : DEFAULT_TIME_FORMAT,
-    );
-  }
-});
+const getValidatedTimeFormat = () => {
+  const { subscribe, ...rest } = persistedTimeFormat;
+  let isValidated = false;
+
+  const validate = () => {
+    if (isValidated) return;
+    isValidated = true;
+
+    const value = get(persistedTimeFormat);
+    if (value === null) return;
+    if (Object.values(BASE_TIME_FORMAT_OPTIONS).includes(value)) return;
+    if (!Timezones[value]) {
+      const adjustedTimeformat = getAdjustedTimeformat(value);
+      persistedTimeFormat.set(adjustedTimeformat || DEFAULT_TIME_FORMAT);
+    }
+  };
+
+  return {
+    subscribe: (run: Subscriber<string | null>, invalidate?: () => void) => {
+      validate();
+      return subscribe(run, invalidate);
+    },
+    ...rest,
+  };
+};
+
+export const timeFormat = getValidatedTimeFormat();
 
 export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
   .map(([key, value]: [string, TimezoneInfo]) => ({
