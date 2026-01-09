@@ -60,6 +60,7 @@ const conditionals = [
   'is',
   'is not',
   'in',
+  'not in',
 ] as const;
 
 const joins = ['and', 'or'] as const;
@@ -189,5 +190,5 @@ export const isStartsWith = (x: unknown) => {
 export const isInConditional = (x: unknown) => {
   if (!isString(x)) return false;
 
-  return x.toLocaleLowerCase() === 'in';
+  return ['in', 'not in'].includes(x.toLocaleLowerCase());
 };
