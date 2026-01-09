@@ -37,6 +37,11 @@
   );
   $: ({ first, next, previous } = workflowRelationships);
 
+  const getSubtreeSize = (node: RootNode): number => {
+    if (!node.children || node.children.length === 0) return 1;
+    return node.children.reduce((sum, child) => sum + getSubtreeSize(child), 0);
+  };
+
   const getPositions = (
     width: number,
     height: number,
@@ -56,11 +61,29 @@
   $: ({ x, y, radius } = getPositions(width, height, rootX, rootY));
 
   $: getPosition = (index: number) => {
-    const childY = y + 4 * radius;
+    const childY = y + 6 * radius;
 
     const getX = () => {
       const numberOfSiblings = root.children?.length;
       if (numberOfSiblings === 1) return x;
+
+      if (expandAll) {
+        const baseSpacing = (radius * 3) / zoomLevel;
+        const subtreeSizes = root.children.map(getSubtreeSize);
+        const totalSize = subtreeSizes.reduce((a, b) => a + b, 0);
+        const totalWidth = totalSize * baseSpacing;
+        const startX = x - totalWidth / 2;
+
+        let cumulativeWidth = 0;
+        for (let i = 0; i < index; i++) {
+          cumulativeWidth += subtreeSizes[i] * baseSpacing;
+        }
+
+        return (
+          startX + cumulativeWidth + (subtreeSizes[index] * baseSpacing) / 2
+        );
+      }
+
       const expandFactor = (radius * 6) / zoomLevel;
       if (numberOfSiblings % 2 === 0) {
         return (
@@ -168,7 +191,7 @@
         x1={childX}
         y1={childY}
         x2={childX}
-        y2={childY + 2.5 * radius}
+        y2={childY + 4.5 * radius}
         class="stroke-2 duration-300 ease-in-out {isActive(child)
           ? 'stroke-indigo-700'
           : 'stroke-slate-100 dark:stroke-slate-800'}"
@@ -409,7 +432,7 @@
         x1={x}
         y1={y}
         x2={x}
-        y2={y + 2.5 * radius}
+        y2={y + 4.5 * radius}
         class="stroke-2 transition-all duration-300 ease-in-out {isActive(root)
           ? 'stroke-indigo-700'
           : 'stroke-slate-100 dark:stroke-slate-800'}"
