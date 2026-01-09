@@ -58,6 +58,11 @@
   const pauseTime = $derived(
     pendingActivity && pendingActivity.pauseInfo?.pauseTime,
   );
+  const noHeartbeatAfterRetryAttempt = $derived(
+    pendingActivity &&
+      pendingActivity.attempt > 1 &&
+      pendingActivity?.lastStartedTime > pendingActivity?.lastHeartbeatTime,
+  );
 
   let decodedLocalActivity: SummaryAttribute | undefined = $state(undefined);
 
@@ -242,7 +247,7 @@
         startPoint={[x, y]}
         endPoint={[canvasWidth - gutter, y]}
         category={pendingActivity
-          ? pendingActivity.attempt > 1
+          ? noHeartbeatAfterRetryAttempt
             ? 'retry'
             : 'pending'
           : group.category}
