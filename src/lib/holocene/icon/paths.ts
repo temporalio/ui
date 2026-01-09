@@ -65,11 +65,13 @@ import graph from './svg/graph.svelte';
 import happyLappy from './svg/happy-lappy.svelte';
 import heartbeat from './svg/heartbeat.svelte';
 import hyphen from './svg/hyphen.svelte';
+import identitiesIcon from './svg/identities-icon.svelte';
 import identities from './svg/identities.svelte';
 import importIcon from './svg/import.svelte';
 import inactive from './svg/inactive.svelte';
 import info from './svg/info.svelte';
 import json from './svg/json.svelte';
+import key from './svg/key.svelte';
 import keyboard from './svg/keyboard.svelte';
 import labs from './svg/labs.svelte';
 import laptopCode from './svg/laptop-code.svelte';
@@ -93,6 +95,7 @@ import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import play from './svg/play.svelte';
+import push from './svg/push.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -207,11 +210,13 @@ export const icons = {
   heartbeat,
   hyphen,
   identities,
+  'identities-icon': identitiesIcon,
   inactive,
   import: importIcon,
   info,
   json,
   keyboard,
+  key,
   labs,
   'laptop-code': laptopCode,
   'lightning-bolt': lightningBolt,
@@ -234,6 +239,7 @@ export const icons = {
   pencil,
   'pin-filled': pinFilled,
   pin,
+  push,
   regions,
   relationship,
   retention,
