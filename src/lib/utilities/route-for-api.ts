@@ -117,6 +117,7 @@ const encode = (
       endpointId: '',
       deploymentName: '',
       version: '',
+      workerInstanceKey: '',
     },
   );
 };

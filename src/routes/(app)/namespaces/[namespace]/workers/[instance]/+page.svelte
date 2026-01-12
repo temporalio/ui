@@ -19,10 +19,10 @@
     <div class="flex items-center gap-2">
       <Link
         href={routeForWorkers({ namespace })}
-        data-testid="back-to-workers"
+        data-testid="view-all-workers"
         icon="chevron-left"
       >
-        {translate('workers.back-to-workers')}
+        {translate('workers.view-all-workers')}
       </Link>
     </div>
   </div>

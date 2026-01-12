@@ -100,7 +100,18 @@ export const toCallbackStateReadable = (
   return fromScreamingEnum(state, 'CallbackState');
 };
 
-export const toWorkerStatusReadable = (state?: WorkerStatus): string => {
-  if (!state) return 'Unknown';
-  return fromScreamingEnum(state, 'WorkerStatus') as unknown as string;
+export type ReadableWorkerStatus =
+  | 'Unspecified'
+  | 'Running'
+  | 'Shutting Down'
+  | 'Shutdown';
+
+export const toWorkerStatusReadable = (
+  state?: WorkerStatus,
+): ReadableWorkerStatus => {
+  if (!state) return 'Unspecified';
+  return fromScreamingEnum(
+    state,
+    'WorkerStatus',
+  ) as unknown as ReadableWorkerStatus;
 };

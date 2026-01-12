@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
   import { translate } from '$lib/i18n/translate';
   import { type WorkerInfo } from '$lib/services/worker-service';
   import { routeForWorkerInstance } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
   import SdkLogo from '../lines-and-dots/sdk-logo.svelte';
+  import WorkerStatus from '../workers/worker-status.svelte';
 
   import WorkerTableCell from './worker-table-cell.svelte';
 
@@ -20,7 +20,6 @@
   const status = $derived(
     toWorkerStatusReadable(worker.workerHeartbeat.status),
   );
-  const isRunning = $derived(status === 'Running');
 </script>
 
 <tr>
@@ -55,16 +54,7 @@
       />
     {:else if label === translate('workers.status')}
       <td>
-        <Badge
-          type={isRunning ? 'success' : 'danger'}
-          class="flex items-center gap-1"
-        >
-          {#if isRunning}
-            <span class="inline-block h-1.5 w-1.5 rounded-full bg-green-600"
-            ></span>
-          {/if}
-          {status}
-        </Badge>
+        <WorkerStatus {status} />
       </td>
     {:else if label === translate('workers.sdk')}
       <WorkerTableCell
