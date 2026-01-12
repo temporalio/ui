@@ -21,7 +21,7 @@
   let lastFetched = $state<Date | null>(null);
 
   const fetchCurrentDetails = async () => {
-    if (loading) return;
+    if (!workflow || loading) return;
     loading = true;
     try {
       const { settings } = page.data;
@@ -34,7 +34,7 @@
           },
         },
         settings,
-        $authUser?.accessToken,
+        $authUser?.accessToken ?? '',
       );
       $workflowRun.metadata = metadata;
       lastFetched = new Date();
@@ -48,7 +48,8 @@
   onMount(() => {
     fetchCurrentDetails();
   });
-  const handleKeydown = (event) => {
+
+  const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'r' || event.key === 'R') {
       event.preventDefault();
       fetchCurrentDetails();
@@ -58,7 +59,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="flex h-full flex-1 flex-col border-l border-subtle">
+<div class="flex flex-1 flex-col border-l border-subtle">
   <div class="surface-information w-full px-6 py-2">
     <div class="flex items-center justify-between">
       <h3>{translate('workflows.current-details')}</h3>
@@ -89,13 +90,7 @@
       </div>
     </div>
   </div>
-  <div class="surface-background h-full">
-    {#key currentDetails}
-      <Markdown
-        class="p-3"
-        overrideTheme="background"
-        content={currentDetails}
-      />
-    {/key}
-  </div>
+  {#key currentDetails}
+    <Markdown class="p-3" overrideTheme="primary" content={currentDetails} />
+  {/key}
 </div>

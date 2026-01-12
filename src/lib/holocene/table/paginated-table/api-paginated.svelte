@@ -181,8 +181,6 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<slot name="header" visibleItems={$store.visibleItems} />
-
 <PaginatedTable
   loading={$store.loading}
   updating={$store.updating}
