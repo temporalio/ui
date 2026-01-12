@@ -209,11 +209,11 @@ describe('formatDateTimeRange', () => {
     expect(
       formatDateTimeRange(
         'BETWEEN "2025-07-17T00:00:00.000Z" AND "2025-07-17T00:00:00.000Z"',
-        'Pacific Daylight Time',
+        'Greenwich Mean Time',
         false,
       ),
     ).toStrictEqual(
-      'between 7/16/25, 5:00:00.00 PM PDT and 7/16/25, 5:00:00.00 PM PDT',
+      'between 7/17/25, 12:00:00.00 AM GMT and 7/17/25, 12:00:00.00 AM GMT',
     );
   });
 });

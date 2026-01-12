@@ -6,7 +6,15 @@
   import { routeForNexusEndpointCreate } from '$lib/utilities/route-for';
   import andromeda from '$lib/vendor/andromeda.png';
 
-  export let createDisabled = false;
+  type Props = {
+    createDisabled?: boolean;
+    createHref?: string;
+  };
+
+  let {
+    createDisabled = false,
+    createHref = routeForNexusEndpointCreate(),
+  }: Props = $props();
 </script>
 
 <div class="flex min-h-screen flex-col gap-8 p-10">
@@ -53,11 +61,7 @@
           > are often registered in the same Worker as the underlying Temporal primitives
           they abstract.
         </p>
-        <slot />
-        <Button
-          disabled={createDisabled}
-          variant="primary"
-          href={routeForNexusEndpointCreate()}
+        <Button disabled={createDisabled} variant="primary" href={createHref}
           >{translate('nexus.create-endpoint')}</Button
         >
       </div>

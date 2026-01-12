@@ -18,6 +18,9 @@
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
+  import { eventTypeStyle } from './event-styles';
+  import { CategoryIcon } from '../lines-and-dots/constants';
+
   import EventDetailsFull from './event-details-full.svelte';
 
   interface Props {
@@ -40,7 +43,7 @@
   let { workflow, run, namespace } = $derived($page.params);
   let href = $derived(
     routeForEventHistoryEvent({
-      eventId: event.scheduledEventId,
+      eventId: String(event.scheduledEventId),
       namespace,
       workflow,
       run,
@@ -106,7 +109,11 @@
   >
     <div class="flex">
       <div class="flex w-full items-center gap-2">
-        <p class="font-semibold md:text-base">
+        <p class={eventTypeStyle({ category: 'nexus' })}>
+          <Icon
+            name={CategoryIcon['nexus']}
+            class="mr-1 inline animate-pulse"
+          />
           {translate('workflows.pending-nexus-operation')}
         </p>
         {#if event.attempt}

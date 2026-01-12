@@ -19,15 +19,14 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    BASE_TIME_FORMAT_OPTIONS,
     relativeTime,
-    type TimeFormat,
     timeFormat,
     type TimeFormatOptions,
     timestampFormat,
     TimezoneOptions,
     Timezones,
   } from '$lib/stores/time-format';
-  import { capitalize } from '$lib/utilities/format-camel-case';
   import {
     formatUTCOffset,
     getLocalTime,
@@ -42,9 +41,9 @@
   const QuickTimezoneOptions: TimeFormatOptions = [
     {
       label: translate('common.utc'),
-      value: 'UTC',
+      value: BASE_TIME_FORMAT_OPTIONS.UTC,
     },
-    { label: translate('common.local'), value: 'local' },
+    { label: translate('common.local'), value: BASE_TIME_FORMAT_OPTIONS.LOCAL },
   ];
 
   let search = '';
@@ -63,16 +62,17 @@
         );
       });
 
-  const selectTimezone = (value: TimeFormat) => {
-    if ($relativeTime && value !== 'local') $relativeTime = false;
+  const selectTimezone = (value: string) => {
+    if ($relativeTime && value !== BASE_TIME_FORMAT_OPTIONS.LOCAL)
+      $relativeTime = false;
     $timeFormat = value;
     search = '';
   };
 
   const handleRelativeToggle = (e: Event) => {
     const target = e.target as HTMLInputElement;
-    if (target.checked && $timeFormat !== 'local') {
-      $timeFormat = 'local';
+    if (target.checked && $timeFormat !== BASE_TIME_FORMAT_OPTIONS.LOCAL) {
+      $timeFormat = BASE_TIME_FORMAT_OPTIONS.LOCAL;
     }
   };
 
@@ -80,10 +80,7 @@
     $timestampFormat = format;
   };
 
-  $: timezone =
-    Timezones[$timeFormat]?.abbr ??
-    Timezones[$timeFormat]?.label ??
-    capitalize($timeFormat);
+  $: timezone = Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat;
 
   openUnsubscriber = open.subscribe((isOpen) => {
     if (isOpen) {
@@ -98,7 +95,7 @@
 
   onMount(() => {
     if (String($timeFormat) === 'relative') {
-      $timeFormat = 'local';
+      $timeFormat = BASE_TIME_FORMAT_OPTIONS.LOCAL;
       $relativeTime = true;
     }
   });
@@ -117,7 +114,9 @@
     {size}
     data-testid="timezones-menu-button"
   >
-    <Icon slot="leading" name="clock" />
+    {#snippet leading()}
+      <Icon name="clock" />
+    {/snippet}
     {timezone}
   </MenuButton>
   <Menu
@@ -185,10 +184,12 @@
     {#if !search}
       {#each QuickTimezoneOptions as { value, label }}
         <MenuItem
-          on:click={() => selectTimezone(value)}
-          data-testid={`timezones-${value}`}
+          onclick={() => selectTimezone(value)}
+          data-testid="timezones-{value}"
           selected={value === $timeFormat}
-          description={value === 'local' && localTime}
+          description={value === BASE_TIME_FORMAT_OPTIONS.LOCAL
+            ? localTime
+            : undefined}
         >
           {label}
         </MenuItem>
@@ -200,7 +201,7 @@
     {#each filteredOptions as { value, label, offset, abbr }}
       <MenuItem
         selected={value === $timeFormat}
-        on:click={() => selectTimezone(value)}
+        onclick={() => selectTimezone(value)}
         description={formatUTCOffset(offset, translate('common.utc'))}
       >
         {label} ({abbr})

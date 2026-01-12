@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEditEndpoint from '$lib/pages/nexus-edit-endpoint.svelte';
   import { endpointForm } from '$lib/pages/nexus-form.svelte';
@@ -20,28 +21,32 @@
 
   import type { LayoutData } from '../$types';
 
-  export let data: LayoutData;
+  let { data }: { data: LayoutData } = $props();
 
-  $: ({ endpoint } = data);
+  const { endpoint } = $derived(data);
 
-  let error: NetworkError | undefined = undefined;
-  let loading = false;
+  let error = $state<NetworkError | undefined>(undefined);
+  let loading = $state(false);
 
   const onUpdate = async () => {
+    if (!endpoint) return;
+
     error = undefined;
     loading = true;
     const body = { ...$endpointForm };
     body.id = endpoint.id;
     body.version = endpoint.version;
 
-    const payloads = await encodePayloads({
-      input: JSON.stringify(body.spec.descriptionString),
-      encoding: 'json/plain',
-    });
-    body.spec.description = payloads[0];
+    if (body.spec) {
+      const payloads = await encodePayloads({
+        input: JSON.stringify(body.spec.descriptionString),
+        encoding: 'json/plain',
+      });
+      body.spec.description = payloads?.[0];
 
-    delete body.spec.allowedCallerNamespaces;
-    delete body.spec.descriptionString;
+      delete body.spec.allowedCallerNamespaces;
+      delete body.spec.descriptionString;
+    }
 
     try {
       await updateNexusEndpoint(endpoint.id, body);
@@ -55,6 +60,8 @@
   };
 
   const onDelete = async () => {
+    if (!endpoint) return;
+
     error = undefined;
     loading = true;
     try {
@@ -68,20 +75,30 @@
     }
   };
 
-  $: targetNamespaceList = $namespaces.map((namespace) => ({
-    namespace: namespace.namespaceInfo.name,
-  }));
+  const targetNamespaceList = $derived(
+    $namespaces.map((namespace) => ({
+      namespace: namespace.namespaceInfo?.name ?? '',
+    })),
+  );
 </script>
 
 <PageTitle
   title={`Edit ${translate('nexus.nexus-endpoint', { id: $page.params.id })}`}
   url={$page.url.href}
 />
-<NexusEditEndpoint
-  {endpoint}
-  {loading}
-  {targetNamespaceList}
-  {onUpdate}
-  {onDelete}
-  {error}
-/>
+{#if endpoint}
+  <div class="flex flex-col gap-4">
+    <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
+      {translate('nexus.back-to-endpoint')}
+    </Link>
+    <NexusEditEndpoint
+      {endpoint}
+      {loading}
+      {targetNamespaceList}
+      {onUpdate}
+      {onDelete}
+      {error}
+      cancelHref={routeForNexusEndpoint($page.params.id)}
+    />
+  </div>
+{/if}

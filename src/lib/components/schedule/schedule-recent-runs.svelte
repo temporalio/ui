@@ -40,6 +40,7 @@
         namespace,
         query: workflowQuery,
       })}
+      icon="filter"
     >
       {translate('common.view-all-runs')}
     </Link>

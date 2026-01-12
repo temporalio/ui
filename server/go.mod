@@ -1,6 +1,6 @@
 module github.com/temporalio/ui-server/v2
 
-go 1.24.0
+go 1.24.11
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
