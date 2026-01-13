@@ -1,10 +1,31 @@
+// =============================================================================
 // ⚠️  FOR LOCAL DEVELOPMENT AND TESTING ONLY - Contains hardcoded secrets
+// =============================================================================
+// This OIDC server is used with `pnpm dev:with-auth` for local testing.
+// These TTL values should be kept in sync with server/config/with-auth.yaml.
+//
+// Testing Scenarios:
+//   1. Token Refresh: AccessToken/IdToken TTL (60s) < maxSessionDuration (2m)
+//      This forces the UI to refresh tokens before the session expires.
+//   2. Session Expiry: Session TTL (120s) matches maxSessionDuration (2m).
+//      When the session expires, the user must re-enter credentials here.
+//   3. Long Sessions: Increase Session TTL and maxSessionDuration together.
+//      RefreshToken TTL (1 day) allows long-lived sessions with short tokens.
+//
+// Key relationships:
+//   - AccessToken TTL < maxSessionDuration: Enables token refresh testing
+//   - Session TTL = maxSessionDuration: Forces re-auth at OIDC on session end
+//   - RefreshToken TTL > Session TTL: Allows refresh within session lifetime
+// =============================================================================
 const configuration: Record<string, unknown> = {
   conformIdTokenClaims: false,
   ttl: {
-    AccessToken: 60, // 1 minute for testing
-    IdToken: 60, // 1 minute for testing
-    RefreshToken: 60 * 60 * 24, // 1 day
+    AccessToken: 60, // 1 minute - forces refresh before session expires
+    IdToken: 60, // 1 minute - same as access token
+    RefreshToken: 60 * 60 * 24, // 1 day - allows refresh throughout session
+    Session: 120, // 2 minutes - matches maxSessionDuration in with-auth.yaml
+    Interaction: 120, // 2 minutes - OIDC interaction timeout
+    Grant: 120, // 2 minutes - OIDC grant timeout
   },
   scopes: ['openid', 'profile', 'email', 'offline_access'],
   issueRefreshToken: async () => {
