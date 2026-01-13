@@ -60,7 +60,7 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
 export const requestFromAPI = async <T>(
   endpoint: toURLParams[0],
   init: RequestFromAPIOptions = {},
-): Promise<T> => {
+): Promise<T | undefined> => {
   const {
     params = {},
     request = fetch,
@@ -149,11 +149,11 @@ export const requestFromAPI = async <T>(
 };
 
 const withSecurityOptions = (
-  options: RequestInit,
+  options: RequestInit | undefined,
   isBrowser = BROWSER,
 ): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
-  opts.headers = withCsrf(options?.headers, isBrowser);
+  opts.headers = withCsrf(opts.headers, isBrowser);
   return opts;
 };
 
@@ -161,20 +161,21 @@ const withAuth = async (
   options: RequestInit,
   isBrowser = BROWSER,
 ): Promise<RequestInit> => {
-  if (globalThis?.AccessToken) {
-    options.headers = await withBearerToken(
-      options?.headers,
-      globalThis.AccessToken,
-      isBrowser,
-    );
+  const headers: Record<string, string> =
+    (options.headers as Record<string, string>) ?? {};
+
+  if ((globalThis as Record<string, unknown>)?.AccessToken) {
+    const accessToken = (globalThis as Record<string, unknown>)
+      .AccessToken as () => Promise<string>;
+    options.headers = await withBearerToken(headers, accessToken, isBrowser);
   } else if (getAuthUser().accessToken) {
     options.headers = await withBearerToken(
-      options?.headers,
+      headers,
       async () => getAuthUser().accessToken,
       isBrowser,
     );
     options.headers = withIdToken(
-      options?.headers,
+      options.headers as Record<string, string>,
       getAuthUser().idToken,
       isBrowser,
     );
@@ -184,13 +185,10 @@ const withAuth = async (
 };
 
 const withBearerToken = async (
-  headers: HeadersInit,
+  headers: Record<string, string>,
   accessToken: () => Promise<string>,
   isBrowser = BROWSER,
-): Promise<HeadersInit> => {
-  // At this point in the code path, headers will always be set.
-  /* c8 ignore next */
-  if (!headers) headers = {};
+): Promise<Record<string, string>> => {
   if (!isBrowser) return headers;
 
   try {
@@ -207,10 +205,10 @@ const withBearerToken = async (
 };
 
 const withIdToken = (
-  headers: HeadersInit = {},
+  headers: Record<string, string>,
   idToken: string,
   isBrowser = BROWSER,
-): HeadersInit => {
+): Record<string, string> => {
   if (!isBrowser) return headers;
 
   if (idToken) {
@@ -220,24 +218,27 @@ const withIdToken = (
   return headers;
 };
 
-const withCsrf = (headers: HeadersInit, isBrowser = BROWSER): HeadersInit => {
-  if (!headers) headers = {};
-  headers['Caller-Type'] = 'operator';
-  if (!isBrowser) return headers;
+const withCsrf = (
+  headers: HeadersInit | undefined,
+  isBrowser = BROWSER,
+): Record<string, string> => {
+  const h: Record<string, string> = (headers as Record<string, string>) ?? {};
+  h['Caller-Type'] = 'operator';
+  if (!isBrowser) return h;
 
   const csrfCookie = '_csrf=';
   const csrfHeader = 'X-CSRF-TOKEN';
   try {
     const cookies = document.cookie.split(';');
     let csrf = cookies.find((c) => c.includes(csrfCookie));
-    if (csrf && !headers[csrfHeader]) {
+    if (csrf && !h[csrfHeader]) {
       csrf = csrf.trim().slice(csrfCookie.length);
-      headers[csrfHeader] = csrf;
+      h[csrfHeader] = csrf;
     }
     /* c8 ignore next 4 */
   } catch (error) {
     console.error(error);
   }
 
-  return headers;
+  return h;
 };
