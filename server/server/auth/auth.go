@@ -25,6 +25,7 @@
 package auth
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -36,7 +37,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/labstack/echo/v4"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
@@ -45,6 +46,16 @@ const (
 	AuthorizationExtrasHeader = "authorization-extras"
 	cookieLen                 = 4000
 )
+
+var tokenVerifier *oidc.IDTokenVerifier
+
+func SetVerifier(v *oidc.IDTokenVerifier) {
+	tokenVerifier = v
+}
+
+func stripBearerPrefix(token string) string {
+	return strings.TrimPrefix(token, "Bearer ")
+}
 
 func SetUser(c echo.Context, user *User) error {
 	if user.OAuth2Token == nil {
@@ -105,42 +116,24 @@ func SetUser(c echo.Context, user *User) error {
 	return nil
 }
 
-func validateJWTExpiration(tokenString string) error {
-	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
-
+func validateJWT(ctx context.Context, tokenString string) error {
 	if tokenString == "" {
 		log.Println("[JWT Validation] Token is empty, skipping validation")
 		return nil
 	}
 
-	parser := jwt.NewParser(jwt.WithoutClaimsValidation())
-	token, _, err := parser.ParseUnverified(tokenString, jwt.MapClaims{})
+	if tokenVerifier == nil {
+		log.Println("[JWT Validation] No verifier configured, skipping validation")
+		return nil
+	}
+
+	_, err := tokenVerifier.Verify(ctx, tokenString)
 	if err != nil {
-		log.Printf("[JWT Validation] Failed to parse JWT: %v, skipping validation", err)
-		return nil
+		log.Printf("[JWT Validation] Token verification failed: %v", err)
+		return errors.New("token invalid or expired")
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		log.Println("[JWT Validation] Failed to extract claims, skipping validation")
-		return nil
-	}
-
-	exp, ok := claims["exp"].(float64)
-	if !ok {
-		log.Println("[JWT Validation] No exp claim found, skipping validation")
-		return nil
-	}
-
-	expirationTime := time.Unix(int64(exp), 0)
-	now := time.Now()
-
-	if now.After(expirationTime) {
-		log.Printf("[JWT Validation] Token expired at %v (current time: %v)", expirationTime, now)
-		return errors.New("token expired")
-	}
-
-	log.Printf("[JWT Validation] Token valid, expires at %v (time remaining: %v)", expirationTime, expirationTime.Sub(now))
+	log.Println("[JWT Validation] Token verified successfully")
 	return nil
 }
 
@@ -166,14 +159,15 @@ func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProvider
 	// The Authorization-Extras header contains the ID token (JWT) that we should validate
 	// The Authorization header contains the access token (opaque string)
 	idToken := c.Request().Header.Get(AuthorizationExtrasHeader)
+	ctx := c.Request().Context()
 	if idToken != "" {
 		log.Println("[Auth] Validating ID token from Authorization-Extras header")
-		if err := validateJWTExpiration(idToken); err != nil {
+		if err := validateJWT(ctx, idToken); err != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid ID token: %v", err))
 		}
 	} else {
 		log.Println("[Auth] No Authorization-Extras header, validating Authorization header")
-		if err := validateJWTExpiration(token); err != nil {
+		if err := validateJWT(ctx, stripBearerPrefix(token)); err != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid token: %v", err))
 		}
 	}

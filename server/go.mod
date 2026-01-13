@@ -5,7 +5,6 @@ go 1.24.11
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/coreos/go-oidc/v3 v3.11.0
-	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/gomarkdown/markdown v0.0.0-20240729212818-a2a9c4f76ef5
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0

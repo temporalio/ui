@@ -95,6 +95,10 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 		log.Fatal(err)
 	}
 
+	oidcConfig := &oidc.Config{ClientID: providerCfg.ClientID}
+	verifier := provider.Verifier(oidcConfig)
+	auth.SetVerifier(verifier)
+
 	oauthCfg := oauth2.Config{
 		ClientID:     providerCfg.ClientID,
 		ClientSecret: providerCfg.ClientSecret,
