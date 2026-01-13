@@ -29,6 +29,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -39,6 +40,34 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 )
+
+// validateReturnURL checks that the returnURL is either a relative path, same-host,
+// or belongs to one of the configured CORS allowed origins.
+func validateReturnURL(returnURL string, allowedOrigins []string, requestHost string) error {
+	if returnURL == "" {
+		return nil
+	}
+
+	u, err := url.Parse(returnURL)
+	if err != nil {
+		return fmt.Errorf("invalid returnUrl: %w", err)
+	}
+
+	// Allow relative URLs (no host) or same-host redirects
+	if u.Host == "" || u.Host == requestHost {
+		return nil
+	}
+
+	// Allow redirects to configured CORS origins
+	returnOrigin := fmt.Sprintf("%s://%s", u.Scheme, u.Host)
+	for _, origin := range allowedOrigins {
+		if returnOrigin == origin {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("returnUrl host %s not in allowed origins", u.Host)
+}
 
 // SetAuthRoutes sets routes used by auth
 func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) {
@@ -75,21 +104,21 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	}
 
 	api := e.Group("/auth")
-	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options))
+	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
 	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider))
 	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider)) // compatibility with UI v1
 	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider))
 }
 
-func authenticate(config *oauth2.Config, options map[string]interface{}) func(echo.Context) error {
+func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string) func(echo.Context) error {
 	return func(c echo.Context) error {
 		state, err := randString()
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
-		nonce, err := randNonce(c)
+		nonce, err := randNonce(c, allowedOrigins)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		setCallbackCookie(c, "state", state)
 		setCallbackCookie(c, "nonce", nonce)
@@ -227,22 +256,16 @@ func randString() (string, error) {
 	return base64.RawURLEncoding.EncodeToString(b), nil
 }
 
-func randNonce(c echo.Context) (string, error) {
+func randNonce(c echo.Context, allowedOrigins []string) (string, error) {
 	v, err := randString()
 	if err != nil {
 		return "", err
 	}
 
 	returnURL := c.QueryParam("returnUrl")
-	// u, err := url.Parse(returnURL)
-	// if err != nil {
-	// 	return "", fmt.Errorf("invalid returnUrl: %w", err)
-	// }
-
-	// Reject redirects to other hosts, our use case only needs to handle local redirects.
-	// if u.Host != "" && u.Host != c.Request().Host {
-	// 	return "", fmt.Errorf("invalid returnUrl: does not match expected host %s", c.Request().Host)
-	// }
+	if err := validateReturnURL(returnURL, allowedOrigins, c.Request().Host); err != nil {
+		return "", err
+	}
 
 	n := &Nonce{
 		Nonce:     v,
