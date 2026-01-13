@@ -16,8 +16,8 @@
 </div>
 <% } %>
 <form autocomplete="off" action="/interaction/<%= uid %>/login" method="post" class="space-y-4">
-  <input required type="text" name="login" placeholder="Enter any login" class="block w-full border border-gray-300 rounded px-3 py-2" <% if (!params.login_hint) { %>autofocus="on"<% } else { %> value="<%= params.login_hint %>" <% } %>>
-  <input required type="password" name="password" placeholder="and password" class="block w-full border border-gray-300 rounded px-3 py-2" <% if (params.login_hint) { %>autofocus="on"<% } %>>
+  <input required type="email" name="login" placeholder="Enter your email" class="block w-full border border-gray-300 rounded px-3 py-2" <% if (!params.login_hint) { %>autofocus="on"<% } else { %> value="<%= params.login_hint %>" <% } %>>
+  <input required type="password" name="password" placeholder="Any password" class="block w-full border border-gray-300 rounded px-3 py-2" <% if (params.login_hint) { %>autofocus="on"<% } %>>
 
   <button type="submit" class="w-full bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700">Sign in</button>
 </form>

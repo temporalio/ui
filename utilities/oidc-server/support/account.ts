@@ -77,11 +77,20 @@ export default class Account {
   }
 
   /**
-   * Finds or creates an account by login identifier.
+   * Finds or creates an account by login identifier (email).
+   * Uses the email as the username and derives the name from the email prefix.
    */
   public static async findByLogin(login: string): Promise<Account> {
     if (!Account.logins.has(login)) {
-      Account.logins.set(login, new Account(login));
+      const emailPrefix = login.split('@')[0] ?? login;
+      const profile = {
+        email: login,
+        email_verified: true,
+        name: emailPrefix,
+        given_name: emailPrefix,
+        family_name: '',
+      };
+      Account.logins.set(login, new Account(login, profile));
     }
     return Account.logins.get(login)!;
   }
