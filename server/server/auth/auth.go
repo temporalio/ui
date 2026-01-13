@@ -45,6 +45,7 @@ import (
 const (
 	AuthorizationExtrasHeader = "authorization-extras"
 	cookieLen                 = 4000
+	sessionStartCookie        = "session_start"
 )
 
 var tokenVerifier *oidc.IDTokenVerifier
@@ -135,7 +136,52 @@ func SetUser(c echo.Context, user *User) error {
 	return nil
 }
 
+// SetSessionStart sets a cookie with the current timestamp to track when the session began.
+// This should only be called on initial login, NOT on token refresh.
+func SetSessionStart(c echo.Context, maxSessionDuration time.Duration) {
+	if maxSessionDuration <= 0 {
+		return
+	}
+
+	cookie := &http.Cookie{
+		Name:     sessionStartCookie,
+		Value:    strconv.FormatInt(time.Now().Unix(), 10),
+		MaxAge:   int(maxSessionDuration.Seconds()),
+		Secure:   c.Request().TLS != nil,
+		HttpOnly: true,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+	}
+	c.SetCookie(cookie)
+}
+
+// validateSessionDuration checks if the session has exceeded the configured max duration.
+func validateSessionDuration(c echo.Context, maxSessionDuration time.Duration) error {
+	if maxSessionDuration <= 0 {
+		return nil
+	}
+
+	cookie, err := c.Request().Cookie(sessionStartCookie)
+	if err != nil {
+		return errors.New("session expired: missing session start")
+	}
+
+	startTime, err := strconv.ParseInt(cookie.Value, 10, 64)
+	if err != nil {
+		return errors.New("session expired: invalid session start")
+	}
+
+	sessionAge := time.Since(time.Unix(startTime, 0))
+	if sessionAge > maxSessionDuration {
+		return fmt.Errorf("session expired: exceeded max duration of %v", maxSessionDuration)
+	}
+
+	return nil
+}
+
 func validateJWT(ctx context.Context, tokenString string) error {
+	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+
 	if tokenString == "" {
 		log.Println("[JWT Validation] Token is empty, skipping validation")
 		return nil
@@ -173,6 +219,11 @@ func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProvider
 	token := c.Request().Header.Get(echo.HeaderAuthorization)
 	if token == "" {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	// Check if session has exceeded max duration (if configured)
+	if err := validateSessionDuration(c, cfg.Auth.MaxSessionDuration); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
 	// The Authorization-Extras header contains the ID token (JWT) that we should validate
