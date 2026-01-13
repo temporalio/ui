@@ -171,12 +171,12 @@ const withAuth = async (
   } else if (getAuthUser().accessToken) {
     options.headers = await withBearerToken(
       headers,
-      async () => getAuthUser().accessToken,
+      async () => getAuthUser().accessToken ?? '',
       isBrowser,
     );
     options.headers = withIdToken(
       options.headers as Record<string, string>,
-      getAuthUser().idToken,
+      getAuthUser().idToken ?? '',
       isBrowser,
     );
   }
