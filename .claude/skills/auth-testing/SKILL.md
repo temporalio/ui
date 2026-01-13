@@ -74,6 +74,39 @@ ttl: {
 }
 ```
 
+## Max Session Duration
+
+The `maxSessionDuration` config enforces a hard limit on how long a user can stay logged in, independent of token expiry.
+
+### How it works
+
+1. **On login**: Server sets `session_start` cookie with current timestamp
+2. **On each request**: Server validates session age against `maxSessionDuration`
+3. **On expiry**: Server returns 401, UI redirects to SSO login
+
+### Config location
+
+```yaml
+# server/config/with-auth.yaml
+auth:
+  enabled: true
+  maxSessionDuration: 2m # Duration string (e.g., 30m, 1h, 24h)
+  # Set to 0 or omit to disable
+```
+
+### Difference from token expiry
+
+| Mechanism          | Controls                 | Behavior on expiry                 |
+| ------------------ | ------------------------ | ---------------------------------- |
+| Token TTL          | How often tokens refresh | Silent refresh via `/auth/refresh` |
+| maxSessionDuration | Total session lifetime   | Full re-authentication required    |
+
+### Use cases
+
+- **Security compliance**: Force re-auth every N hours regardless of activity
+- **Testing**: Set short duration (2m) to quickly test session expiry flow
+- **Production**: Set longer duration (8h, 24h) based on security requirements
+
 ## Key Relationships
 
 ```
