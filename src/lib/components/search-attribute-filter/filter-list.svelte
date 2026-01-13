@@ -78,8 +78,8 @@
           removeButtonLabel={translate('workflows.remove-filter-label', {
             attribute,
           })}
-          on:remove={() => removeQuery(i)}
-          on:click={() => {
+          onremove={() => removeQuery(i)}
+          onclick={() => {
             $activeQueryIndex = i;
             $filter = { ...workflowFilter };
           }}

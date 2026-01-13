@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
@@ -6,26 +8,41 @@
 
   const { radius } = HistoryConfig;
 
-  export let point: [number, number];
-  export let category: string | undefined = undefined;
-  export let classification: string | undefined = undefined;
-  export let r = radius;
-  export let icon: IconName | undefined = undefined;
-  export let strokeWidth = 2;
+  type Props = {
+    point: [number, number];
+    category?: string;
+    classification?: string;
+    r?: number;
+    icon?: IconName;
+    strokeWidth?: number;
+    children?: Snippet;
+  };
 
-  $: [x, y] = point;
+  let {
+    point,
+    category = undefined,
+    classification = undefined,
+    r = radius,
+    icon = undefined,
+    strokeWidth = 2,
+    children,
+  }: Props = $props();
+
+  const [x, y] = $derived(point);
 </script>
 
 <g>
-  <circle
+  <rect
     class="dot {category} {classification}"
     stroke-width={strokeWidth}
-    cx={x}
-    cy={y}
-    {r}
+    x={x - r}
+    y={y - r}
+    width={r * 2}
+    height={r * 2}
+    rx={r * 0.3}
   >
-    <slot />
-  </circle>
+    {@render children?.()}
+  </rect>
   {#if icon}
     <Icon
       name={icon}

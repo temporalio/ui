@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
 
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
@@ -29,6 +29,7 @@
   import {
     customSearchAttributes,
     scheduleSearchAttributes,
+    type SearchAttributeOption,
   } from '$lib/stores/search-attributes';
   import { temporalVersion } from '$lib/stores/versions';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
@@ -38,36 +39,40 @@
   import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  let refresh = Date.now();
-  let coreUser = coreUserStore();
-  let customizationDrawerOpen = false;
-  let error = '';
+  const coreUser = coreUserStore();
+  let refresh = $state(Date.now());
+  let customizationDrawerOpen = $state(false);
+  let error = $state('');
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
 
-  $: namespace = $page.params.namespace;
-  $: columns = $configurableTableColumns?.[namespace]?.schedules ?? [];
-  $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
-  $: searchAttributeOptions = Object.entries({
-    ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
-      ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  const { namespace } = $derived(page.params);
+  const columns = $derived(
+    $configurableTableColumns?.[namespace]?.schedules ?? [],
+  );
+  const createDisabled = $derived($coreUser.namespaceWriteDisabled(namespace));
+  const searchAttributeOptions = $derived(
+    Object.entries({
+      ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
+        ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      }),
+      ...$customSearchAttributes,
+    }).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      } as SearchAttributeOption;
     }),
-    ...$customSearchAttributes,
-  }).map(([key, value]) => {
-    return {
-      label: key,
-      value: key,
-      type: value,
-    };
-  });
-  $: query = $page.url.searchParams.get('query');
-  $: onFetch = () => {
+  );
+  const query = $derived(page.url.searchParams.get('query'));
+  const onFetch = $derived(() => {
     error = '';
     return fetchPaginatedSchedules(namespace, query, onError);
-  };
-  $: availableColumns = availableScheduleColumns(namespace);
+  });
+  const availableColumns = $derived(availableScheduleColumns(namespace));
 
   onMount(() => {
     if (query) {
@@ -83,6 +88,32 @@
     error = err?.body?.message || translate('schedules.error-message-fetching');
   };
 </script>
+
+<div class="flex flex-col gap-4">
+  <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
+    <SchedulesCount />
+  </h1>
+  <div class="flex flex-col justify-between gap-2 md:flex-row">
+    {#if Number($schedulesCount) > 0 || query}
+      <SearchAttributeFilter
+        bind:filters={$scheduleFilters}
+        {searchAttributeOptions}
+        refresh={() => {
+          refresh = Date.now();
+        }}
+      />
+      {#if !createDisabled}
+        <Button
+          data-testid="create-schedule"
+          href={routeForScheduleCreate({ namespace })}
+          disabled={!writeActionsAreAllowed()}
+        >
+          {translate('schedules.create')}
+        </Button>
+      {/if}
+    {/if}
+  </div>
+</div>
 
 {#key [namespace, query, refresh]}
   <PaginatedTable
@@ -100,34 +131,6 @@
     <caption class="sr-only" slot="caption"
       >{translate('common.schedules')}</caption
     >
-
-    <div class="flex flex-col gap-4" slot="header" let:visibleItems>
-      {@const showActions = visibleItems.length || query}
-      <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-        <SchedulesCount />
-      </h1>
-      <div class="flex flex-col justify-between gap-2 md:flex-row">
-        {#if showActions}
-          <SearchAttributeFilter
-            bind:filters={$scheduleFilters}
-            {searchAttributeOptions}
-            refresh={() => {
-              refresh = Date.now();
-            }}
-          />
-          {#if !createDisabled}
-            <Button
-              data-testid="create-schedule"
-              href={routeForScheduleCreate({ namespace })}
-              disabled={!writeActionsAreAllowed()}
-            >
-              {translate('schedules.create')}
-            </Button>
-          {/if}
-        {/if}
-      </div>
-    </div>
-
     <tr slot="headers" class="text-left">
       {#each columns as { label }}
         <th>{label}</th>

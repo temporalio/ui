@@ -49,9 +49,7 @@
         </p>
       </a>
 
-      {#if showSubtitle}
-        <slot name="subtitle" />
-      {:else}
+      {#if !showSubtitle}
         <button
           title={$navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
           class="mx-2 flex items-center justify-center opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 group-data-[nav=closed]:p-2"
@@ -61,6 +59,8 @@
         </button>
       {/if}
     </div>
+
+    <slot name="subtitle" />
 
     <div role="list">
       <slot />

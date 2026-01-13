@@ -6,17 +6,26 @@
 
   import Line from './line.svelte';
 
-  export let x1 = 0;
-  export let x2 = 1000;
-  export let timelineHeight = 1000;
-  export let startTime: string | Timestamp;
-  export let duration: number;
+  type Props = {
+    x1: number;
+    x2: number;
+    timelineHeight: number;
+    startTime: string | Timestamp;
+    duration: number;
+  };
+  let {
+    x1 = 0,
+    x2 = 1000,
+    timelineHeight = 1000,
+    startTime,
+    duration,
+  }: Props = $props();
 
   const { radius } = TimelineConfig;
   const ticks = 20;
 
-  $: distance = x2 - x1;
-  $: tickDistance = distance / ticks;
+  const distance = $derived(x2 - x1);
+  const tickDistance = $derived(distance / ticks);
 </script>
 
 <Line
@@ -32,6 +41,7 @@
       strokeWidth={0.5}
       startPoint={[tickX, 0]}
       endPoint={[tickX, timelineHeight]}
+      strokeDasharray="2"
     />
   {/if}
   {#if i !== 0}
@@ -40,7 +50,7 @@
       font-size="12"
       transform="rotate(90, {tickX}, {tickY})"
       x={tickX - radius}
-      y={tickY}
+      y={tickY + 3}
     >
       {formatDistanceAbbreviated({
         start: startTime,
