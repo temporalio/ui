@@ -15,9 +15,17 @@
   interface Props extends HTMLAttributes<HTMLDivElement> {
     isCloud?: boolean;
     subtitle?: Snippet;
+    children?: Snippet;
+    bottom?: Snippet;
   }
 
-  let { isCloud = false, subtitle, ...restProps }: Props = $props();
+  let {
+    isCloud = false,
+    subtitle,
+    children,
+    bottom,
+    ...restProps
+  }: Props = $props();
 
   const toggle = () => ($navOpen = !$navOpen);
 
@@ -57,11 +65,15 @@
             <Icon name="push" class="h-6 w-6" />
           </button>
         </div>
-        <slot />
+        {#if children}
+          {@render children()}
+        {/if}
       </div>
 
       <div class="self-end">
-        <slot name="bottom" />
+        {#if bottom}
+          {@render bottom()}
+        {/if}
         <div
           class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-300"
         >
@@ -95,10 +107,14 @@
       </button>
     </div>
     <div role="list">
-      <slot />
+      {#if children}
+        {@render children()}
+      {/if}
     </div>
     <div class="self-end">
-      <slot name="bottom" />
+      {#if bottom}
+        {@render bottom()}
+      {/if}
       <div
         class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-300"
       >
