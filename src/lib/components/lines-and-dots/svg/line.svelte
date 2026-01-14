@@ -1,20 +1,39 @@
 <script lang="ts">
-  export let startPoint = [0, 1000];
-  export let endPoint = [0, 1000];
-  export let status: string | undefined = undefined;
-  export let category: string | undefined = undefined;
-  export let classification: string | undefined = undefined;
-  export let scheduling = false;
-  export let pending = false;
-  export let paused = false;
-  export let retried = false;
-  export let strokeWidth: number = 2;
-  export let strokeDasharray = 'none';
-  export let delayed = false;
+  type Props = {
+    startPoint?: [number, number];
+    endPoint?: [number, number];
+    status?: string;
+    category?: string;
+    classification?: string;
+    scheduling?: boolean;
+    pending?: boolean;
+    paused?: boolean;
+    retried?: boolean;
+    strokeWidth?: number;
+    strokeDasharray?: string;
+    delayed?: boolean;
+  };
 
-  $: [x1, y1] = startPoint;
-  $: [x2, y2] = endPoint;
-  $: completedWithRetries = retried && classification === 'Completed';
+  let {
+    startPoint = [0, 1000],
+    endPoint = [0, 1000],
+    status = undefined,
+    category = undefined,
+    classification = undefined,
+    scheduling = false,
+    pending = false,
+    paused = false,
+    retried = false,
+    strokeWidth = 2,
+    strokeDasharray = 'none',
+    delayed = false,
+  }: Props = $props();
+
+  const [x1, y1] = $derived(startPoint);
+  const [x2, y2] = $derived(endPoint);
+  const completedWithRetries = $derived(
+    retried && classification === 'Completed',
+  );
 </script>
 
 {#if completedWithRetries}
@@ -49,7 +68,7 @@
     cursor: pointer;
     opacity: 1;
     outline: none;
-    stroke: #444ce7;
+    stroke: currentColor;
   }
 
   .none {
@@ -88,7 +107,7 @@
   }
 
   .child-workflow {
-    stroke: #67e4f9;
+    stroke: theme('colors.cyan.600');
   }
 
   .Completed {
@@ -97,7 +116,7 @@
 
   .Failed,
   .Terminated {
-    stroke: #f55;
+    stroke: #c71607;
   }
 
   .Signaled {

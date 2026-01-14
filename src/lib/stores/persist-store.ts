@@ -11,9 +11,9 @@ import {
 
 export function persistStore<T>(
   name: string,
-  initialValue: T | (() => T) | null = null,
+  initialValue: T | (() => T),
   broadcastToAll = false,
-): Pick<Writable<T | null>, 'subscribe' | 'set' | 'update'> {
+): Pick<Writable<T>, 'subscribe' | 'set' | 'update'> {
   let initialStoreValue = isFunction<() => T>(initialValue)
     ? initialValue()
     : initialValue;
@@ -27,7 +27,7 @@ export function persistStore<T>(
         );
       }
     } catch (_err) {
-      initialStoreValue = null;
+      // Keep the original initialStoreValue if localStorage parsing fails
     }
   }
 

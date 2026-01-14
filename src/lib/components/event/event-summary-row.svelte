@@ -42,6 +42,9 @@
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
+  import { eventTypeStyle } from './event-styles';
+  import { CategoryIcon } from '../lines-and-dots/constants';
+
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
@@ -285,7 +288,8 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p class="whitespace-nowrap font-semibold md:text-base">
+    <p class={eventTypeStyle({ category: event.category })}>
+      <Icon name={CategoryIcon[event.category]} class="mr-1 inline" />
       {displayName}
     </p>
   </td>
