@@ -12,6 +12,7 @@ import astronaut from './svg/astronaut.svelte';
 import batchOperation from './svg/batch-operation.svelte';
 import book from './svg/book-sparkles.svelte';
 import bookmark from './svg/bookmark.svelte';
+import buildings from './svg/buildings.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import calendar from './svg/calendar.svelte';
 import canceled from './svg/canceled.svelte';
@@ -36,6 +37,7 @@ import converterDown from './svg/converter-down.svelte';
 import converterUp from './svg/converter-up.svelte';
 import copy from './svg/copy.svelte';
 import creditCard from './svg/credit-card.svelte';
+import cube from './svg/cube.svelte';
 import descending from './svg/descending.svelte';
 import dollarBadge from './svg/dollar-badge.svelte';
 import dollarInvoice from './svg/dollar-invoice.svelte';
@@ -65,7 +67,6 @@ import graph from './svg/graph.svelte';
 import happyLappy from './svg/happy-lappy.svelte';
 import heartbeat from './svg/heartbeat.svelte';
 import hyphen from './svg/hyphen.svelte';
-import identitiesIcon from './svg/identities-icon.svelte';
 import identities from './svg/identities.svelte';
 import importIcon from './svg/import.svelte';
 import inactive from './svg/inactive.svelte';
@@ -156,6 +157,7 @@ export const icons = {
   'batch-operation': batchOperation,
   book,
   bookmark,
+  buildings,
   'calendar-plus': calendarPlus,
   calendar,
   canceled,
@@ -180,6 +182,7 @@ export const icons = {
   'converter-up': converterUp,
   copy,
   'credit-card': creditCard,
+  cube,
   descending,
   download,
   'dollar-badge': dollarBadge,
@@ -210,7 +213,6 @@ export const icons = {
   heartbeat,
   hyphen,
   identities,
-  'identities-icon': identitiesIcon,
   inactive,
   import: importIcon,
   info,
