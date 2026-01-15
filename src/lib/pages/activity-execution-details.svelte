@@ -1,18 +1,66 @@
 <script lang="ts">
   import ActivityExecutionInputAndOutcome from '$lib/components/activity-execution/activity-execution-input-and-outcome.svelte';
   import {
-    ActivityExecutionAttemptsDetail,
-    ActivityExecutionDetail,
-    // ActivityExecutionSnippetDetail,
-    ActivityExecutionTimestampDetail,
-  } from '$lib/components/activity-execution/details';
-  import DetailList from '$lib/components/detail-list/detail-list.svelte';
+    DetailList,
+    DetailListLabel,
+    DetailListLinkValue,
+    DetailListTextValue,
+    DetailListTimestampValue,
+  } from '$lib/components/detail-list';
+  import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
+  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { Failure } from '$lib/types';
   import { activityExecution } from '$lib/utilities/activity-execution-poller.svelte';
+  import {
+    formatAttemptsLeft,
+    formatMaximumAttempts,
+  } from '$lib/utilities/format-event-attributes';
+  import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { fromSeconds } from '$lib/utilities/to-duration';
+
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
+
+  const isClosed = $derived(
+    $activityExecution.info.status !== 'ACTIVITY_EXECUTION_STATUS_RUNNING',
+  );
+
+  const isRetrying = $derived(
+    $activityExecution.info.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING' &&
+      $activityExecution.info.attempt > 1,
+  );
 </script>
+
+{#snippet activityExecutionAttemptsBadge(
+  attempt: number,
+  maximumAttempts: number | undefined,
+  lastFailure: Failure,
+)}
+  {@const failed = attempt > 1 && !!lastFailure}
+  {@const badgeType = failed ? 'danger' : 'default'}
+
+  <DetailListLabel>Attempt</DetailListLabel>
+  <DetailListValue>
+    <Badge type={badgeType} class="flex items-center gap-2">
+      <Icon name="retry" class={failed ? 'text-red-400' : ''} />
+      <span>{attempt} of {formatMaximumAttempts(maximumAttempts)}</span>
+    </Badge>
+
+    {#if maximumAttempts && !isClosed}
+      <p class="ml-1 text-secondary">
+        {formatAttemptsLeft(maximumAttempts, attempt)} remaining
+      </p>
+    {/if}
+  </DetailListValue>
+{/snippet}
 
 {#if $activityExecution}
   <ActivityExecutionInputAndOutcome
@@ -30,135 +78,188 @@
     </div>
     <div class="grid grid-cols-2 gap-4">
       <div class="space-y-2">
-        <h6 class="underline underline-offset-4">Identity</h6>
+        <h6 class="col-span-2 underline underline-offset-4">Identity</h6>
         <DetailList
           rowCount={3}
           aria-label="Activity Execution Identity Details"
         >
-          <ActivityExecutionDetail
-            label="Activity ID"
-            value={$activityExecution.info.activityId}
+          <DetailListLabel>Activity ID</DetailListLabel>
+          <DetailListTextValue text={$activityExecution.info.activityId} />
+          <DetailListLabel>Activity Type</DetailListLabel>
+          <DetailListTextValue
+            text={$activityExecution.info.activityType.name}
           />
-          <ActivityExecutionDetail
-            label="Activity Type"
-            value={$activityExecution.info.activityType.name}
-          />
-          <ActivityExecutionDetail
-            label="Run ID"
-            value={$activityExecution.info.runId}
-          />
+          <DetailListLabel>Run ID</DetailListLabel>
+          <DetailListTextValue copyable text={$activityExecution.info.runId} />
         </DetailList>
-        <h6 class="underline underline-offset-4">Current State</h6>
-        <DetailList rowCount={2} aria-label="Activity Execution Status Details">
-          <ActivityExecutionDetail
-            label="Run State"
-            value={$activityExecution.info.runState}
-          />
-          <ActivityExecutionAttemptsDetail
-            attempt={$activityExecution.info.attempt}
-            maximumAttempts={$activityExecution.info.retryPolicy
-              ?.maximumAttempts}
-            lastFailure={$activityExecution.info.lastFailure}
-          />
-        </DetailList>
-        <h6 class="underline underline-offset-4">Timing & Progress</h6>
+        {#if !isClosed}
+          <h6 class="underline underline-offset-4">Current State</h6>
+          <DetailList
+            rowCount={2}
+            aria-label="Activity Execution Status Details"
+          >
+            <DetailListLabel>Run State</DetailListLabel>
+            <DetailListTextValue text={$activityExecution.info.runState} />
+            {@render activityExecutionAttemptsBadge(
+              $activityExecution.info.attempt,
+              $activityExecution.info.retryPolicy?.maximumAttempts,
+              $activityExecution.info.lastFailure,
+            )}
+          </DetailList>
+        {/if}
+        <h6 class="underline underline-offset-4">Timing and Progress</h6>
         <DetailList
-          rowCount={4}
+          rowCount={isClosed ? 4 : 2}
           aria-label="Activity Execution Timing and Progress Details"
         >
-          <ActivityExecutionTimestampDetail
-            label="Schedule Time"
-            value={$activityExecution.info.scheduleTime}
+          <DetailListLabel>Schedule Time</DetailListLabel>
+          <DetailListTimestampValue
+            timestamp={$activityExecution.info.scheduleTime}
           />
-          <ActivityExecutionTimestampDetail
-            label="Last Started Time"
-            value={$activityExecution.info.lastStartedTime}
+          <DetailListLabel>Last Started Time</DetailListLabel>
+          <DetailListTimestampValue
+            timestamp={$activityExecution.info.lastStartedTime}
           />
-          <ActivityExecutionDetail
-            label="Execution Duration"
-            value={$activityExecution.info.executionDuration}
-          />
-          <ActivityExecutionTimestampDetail
-            label="Close Time"
-            value={$activityExecution.info.closeTime}
-          />
+          {#if isClosed}
+            <DetailListLabel>Execution Duration</DetailListLabel>
+            <DetailListTextValue
+              text={fromSeconds($activityExecution.info.executionDuration)}
+            />
+            <DetailListLabel>Close Time</DetailListLabel>
+            <DetailListTimestampValue
+              timestamp={$activityExecution.info.lastStartedTime}
+            />
+          {/if}
         </DetailList>
-        <h6 class="underline underline-offset-4">Health</h6>
-        <DetailList rowCount={3} aria-label="Activity Execution Health Details">
-          <ActivityExecutionTimestampDetail
-            label="Last Heartbeat"
-            value={$activityExecution.info.lastHeartbeatTime}
-          />
-          <ActivityExecutionDetail
-            label="Heartbeat Timeout"
-            value={$activityExecution.info.heartbeatTimeout}
-          />
-          <ActivityExecutionDetail label="Heartbeat Details" value="TBD" />
-        </DetailList>
-        <h6 class="underline underline-offset-4">Retry State</h6>
-        <DetailList rowCount={4} aria-label="Activity Execution Retry State">
-          <ActivityExecutionDetail
-            label="Current Retry Interval"
-            value={$activityExecution.info.currentRetryInterval}
-          />
-          <ActivityExecutionTimestampDetail
-            label="Next Attempt Scheduled Time"
-            value="TBD"
-          />
-          <ActivityExecutionTimestampDetail
-            label="Last Attempt Completed Time"
-            value={$activityExecution.info.lastAttemptCompleteTime}
-          />
-          <ActivityExecutionDetail label="Retry Policy" value="TBD" />
-        </DetailList>
+        {#if !isClosed}
+          <h6 class="underline underline-offset-4">Health</h6>
+          <DetailList
+            rowCount={2}
+            aria-label="Activity Execution Health Details"
+          >
+            <DetailListLabel>Last Heartbeat</DetailListLabel>
+            <DetailListTimestampValue
+              timestamp={$activityExecution.info.lastHeartbeatTime}
+            />
+            <DetailListLabel>Heartbeat Timeout</DetailListLabel>
+            <DetailListTextValue
+              text={fromSeconds($activityExecution.info.heartbeatTimeout)}
+            />
+          </DetailList>
+        {/if}
+        {#if isRetrying}
+          <h6 class="underline underline-offset-4">Retry State</h6>
+          <DetailList rowCount={3} aria-label="Activity Execution Retry State">
+            <DetailListLabel>Current Retry Interval</DetailListLabel>
+            <DetailListTextValue
+              text={fromSeconds($activityExecution.info.currentRetryInterval)}
+            />
+
+            <DetailListLabel>Last Attempted Complete Time</DetailListLabel>
+            <DetailListTimestampValue
+              timestamp={$activityExecution.info.lastAttemptCompleteTime}
+            />
+
+            <DetailListLabel>Next Attempt Scheduled Time</DetailListLabel>
+            <DetailListTimestampValue
+              timestamp={$activityExecution.info.nextAttemptScheduleTime}
+            />
+          </DetailList>
+        {/if}
 
         <h6 class="underline underline-offset-4">Timeout Configuration</h6>
         <DetailList
           rowCount={3}
           aria-label="Activity Execution Timeout Details"
         >
-          <ActivityExecutionDetail
-            label="Schedule to Start Timeout"
-            value={fromSeconds($activityExecution.info.scheduleToStartTimeout)}
+          <DetailListLabel>Schedule to Start Timeout</DetailListLabel>
+          <DetailListTextValue
+            text={fromSeconds($activityExecution.info.scheduleToStartTimeout)}
           />
-          <ActivityExecutionDetail
-            label="Schedule to Close Timeout"
-            value={fromSeconds($activityExecution.info.scheduleToCloseTimeout)}
+          <DetailListLabel>Schedule to Close Timeout</DetailListLabel>
+          <DetailListTextValue
+            text={fromSeconds($activityExecution.info.scheduleToCloseTimeout)}
           />
-          <ActivityExecutionDetail
-            label="Start to Close Timeout"
-            value={fromSeconds($activityExecution.info.startToCloseTimeout)}
+          <DetailListLabel>Start to Close Timeout</DetailListLabel>
+          <DetailListTextValue
+            text={fromSeconds($activityExecution.info.startToCloseTimeout)}
           />
         </DetailList>
         <h6 class="underline underline-offset-4">Worker</h6>
-        <DetailList rowCount={4} aria-label="Activity Execution Worker Details">
-          <ActivityExecutionDetail
-            label="Task Queue"
-            value={$activityExecution.info.taskQueue}
+        <DetailList rowCount={2} aria-label="Activity Execution Worker Details">
+          <DetailListLabel>Task Queue</DetailListLabel>
+          <DetailListLinkValue
+            href={routeForTaskQueue({
+              namespace,
+              queue: $activityExecution.info.taskQueue,
+            })}
+            text={$activityExecution.info.taskQueue}
           />
-          <ActivityExecutionDetail
-            label="Last Worker Identity"
-            value={$activityExecution.info.lastWorkerIdentity}
+
+          <DetailListLabel>Last Worker Identity</DetailListLabel>
+          <DetailListTextValue
+            text={$activityExecution.info.lastWorkerIdentity}
           />
-          <ActivityExecutionDetail
-            label="Last Deployment Version"
-            value="TBD"
-          />
-          <ActivityExecutionDetail label="Priority" value="TBD" />
         </DetailList>
       </div>
-      {#if $activityExecution.info.lastFailure}
-        <div class="space-y-2">
-          <p class="font-medium text-secondary">Last Failure</p>
-          <CodeBlock
-            content={JSON.stringify(
-              $activityExecution.info.lastFailure,
-              null,
-              2,
-            )}
-          />
-        </div>
-      {/if}
+      <div class="space-y-2">
+        {#if $activityExecution.info.lastFailure}
+          <div class="space-y-2">
+            <p class="font-medium text-secondary">Last Failure</p>
+            <CodeBlock
+              content={JSON.stringify(
+                $activityExecution.info.lastFailure,
+                null,
+                2,
+              )}
+            />
+          </div>
+        {/if}
+        {#if $activityExecution.info.retryPolicy}
+          <div class="space-y-2">
+            <p class="font-medium text-secondary">Retry Policy</p>
+            <CodeBlock
+              content={JSON.stringify(
+                $activityExecution.info.retryPolicy,
+                null,
+                2,
+              )}
+            />
+          </div>
+        {/if}
+        {#if $activityExecution.info.heartbeatDetails}
+          <div class="space-y-2">
+            <p class="font-medium text-secondary">Heartbeat Details</p>
+            <PayloadDecoder value={$activityExecution.info.heartbeatDetails}>
+              {#snippet children(content)}
+                <CodeBlock {content} />
+              {/snippet}
+            </PayloadDecoder>
+          </div>
+        {/if}
+        {#if $activityExecution.info.header}
+          <div class="space-y-2">
+            <p class="font-medium text-secondary">Header</p>
+            <PayloadDecoder value={$activityExecution.info.header.fields}>
+              {#snippet children(content)}
+                <CodeBlock {content} />
+              {/snippet}
+            </PayloadDecoder>
+          </div>
+        {/if}
+        {#if $activityExecution.info.priority}
+          <div class="space-y-2">
+            <p class="font-medium text-secondary">Priority</p>
+            <CodeBlock
+              content={JSON.stringify(
+                $activityExecution.info.priority,
+                null,
+                2,
+              )}
+            />
+          </div>
+        {/if}
+      </div>
     </div>
   </Card>
 {/if}

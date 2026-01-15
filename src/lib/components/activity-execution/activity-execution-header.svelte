@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
     DetailList,
     DetailListColumn,
     DetailListLabel,
+    DetailListLinkValue,
     DetailListTextValue,
     DetailListTimestampValue,
   } from '../detail-list';
@@ -14,9 +16,10 @@
 
   interface Props {
     activityExecutionInfo: ActivityExecutionInfo;
+    namespace: string;
   }
 
-  let { activityExecutionInfo }: Props = $props();
+  let { activityExecutionInfo, namespace }: Props = $props();
 </script>
 
 <div class="space-y-2">
@@ -49,7 +52,13 @@
       <DetailListLabel>Activity Type</DetailListLabel>
       <DetailListTextValue text={activityExecutionInfo.activityType.name} />
       <DetailListLabel>Task Queue</DetailListLabel>
-      <DetailListTextValue text={activityExecutionInfo.taskQueue} />
+      <DetailListLinkValue
+        href={routeForTaskQueue({
+          namespace,
+          queue: activityExecutionInfo.taskQueue,
+        })}
+        text={activityExecutionInfo.taskQueue}
+      />
     </DetailListColumn>
   </DetailList>
 </div>

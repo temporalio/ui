@@ -1,7 +1,9 @@
 import type {
   ActivityType,
   Failure,
+  Header,
   Payloads,
+  Priority,
   RetryPolicy,
   SearchAttribute,
   UserMetadata,
@@ -60,6 +62,7 @@ export interface ActivityExecutionInfo {
   scheduleToStartTimeout: string;
   startToCloseTimeout: string;
   lastHeartbeatTime: string;
+  heartbeatDetails?: Payloads;
   heartbeatTimeout: string;
   retryPolicy: RetryPolicy;
   lastStartedTime: string;
@@ -69,11 +72,14 @@ export interface ActivityExecutionInfo {
   closeTime: string;
   lastWorkerIdentity: string;
   lastAttemptCompleteTime: string;
+  nextAttemptScheduleTime: string;
   stateTransitionCount: string;
   currentRetryInterval: string;
   searchAttributes: SearchAttribute;
   userMetadata: UserMetadata;
   lastFailure?: Failure;
+  header?: Header;
+  priority?: Priority;
 }
 
 export interface ActivityExecution {

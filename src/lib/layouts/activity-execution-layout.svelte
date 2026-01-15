@@ -46,7 +46,10 @@
 
 {#if activityExecution}
   <div class="flex flex-col gap-4">
-    <ActivityExecutionHeader activityExecutionInfo={activityExecution.info} />
+    <ActivityExecutionHeader
+      {namespace}
+      activityExecutionInfo={activityExecution.info}
+    />
 
     <Tabs>
       <TabList label="Activity Execution Tabs">
