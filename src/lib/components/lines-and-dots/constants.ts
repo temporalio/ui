@@ -29,9 +29,9 @@ export type GraphConfig = {
 const baseRadius = 6;
 
 export const TimelineConfig: GraphConfig = {
-  height: baseRadius * 5,
+  height: baseRadius * 4,
   gutter: baseRadius * 8,
-  radius: baseRadius * 2,
+  radius: baseRadius * 1.5,
   fontSizeRatio: baseRadius * 4,
 };
 
@@ -123,7 +123,7 @@ export const isMiddleEvent = (
   return ids.indexOf(event.id) === 1 && group.eventList.length === 3;
 };
 
-const pairIsConsecutive = (x: string, y: string) => {
+const pairIsConsecutive = (x: string, y: string): boolean => {
   return parseInt(x) === parseInt(y) - 1;
 };
 
@@ -136,6 +136,7 @@ const isConsecutiveGroup = (group: EventGroup): boolean => {
       pairIsConsecutive(ids[0], ids[1]) && pairIsConsecutive(ids[1], ids[2])
     );
   }
+  return false;
 };
 
 const getOpenGroups = (
@@ -143,6 +144,7 @@ const getOpenGroups = (
   groups: EventGroups,
 ): number => {
   const group = getGroupForEventOrPendingEvent(groups, event);
+  if (!group) return 0;
   if (group.level !== undefined) return group.level;
 
   const pendingGroups = groups
@@ -186,8 +188,10 @@ export const getNextDistanceAndOffset = (
     return { nextDistance, offset };
   }
 
-  const currentIndex = isEvent(event) && group.eventList.indexOf(event);
-  const nextEvent = isEvent(event) && group.eventList[currentIndex + 1];
+  const currentIndex = isEvent(event) ? group.eventList.indexOf(event) : -1;
+  const nextEvent = isEvent(event)
+    ? group.eventList[currentIndex + 1]
+    : undefined;
   if (!isEvent(event) || event.category !== 'workflow') {
     offset = getOpenGroups(event, groups);
   }
@@ -197,7 +201,7 @@ export const getNextDistanceAndOffset = (
   }
 
   let diff = 0;
-  if (nextEvent) {
+  if (nextEvent && isEvent(event)) {
     diff = parseInt(nextEvent.id) - parseInt(event.id);
   } else if (group.isPending && isEvent(event)) {
     diff = history.length - parseInt(event.id) + 2;

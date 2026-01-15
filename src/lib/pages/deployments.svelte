@@ -39,57 +39,54 @@
   ];
 </script>
 
-<div class="flex flex-col gap-4">
-  {#key [namespace]}
-    <PaginatedTable
-      let:visibleItems
-      {onFetch}
-      {onError}
-      aria-label={translate('deployments.deployments')}
-      pageSizeSelectLabel={translate('common.per-page')}
-      nextButtonLabel={translate('common.next')}
-      previousButtonLabel={translate('common.previous')}
-      emptyStateMessage={translate('deployments.empty-state-title')}
-      errorMessage={translate('deployments.error-message-fetching')}
-    >
-      <caption class="sr-only" slot="caption"
-        >{translate('deployments.deployments')}</caption
-      >
-      <div class="flex flex-col gap-4" slot="header">
-        <div class="flex flex-wrap items-center gap-2">
-          <h1>
-            {translate('deployments.worker-deployments')}
-          </h1>
-          <Badge class="shrink-0">Public Preview</Badge>
-        </div>
-      </div>
-      <tr slot="headers" class="text-left">
-        {#each columns as { label }}
-          <th>{label}</th>
-        {/each}
-      </tr>
-      {#each visibleItems as deployment}
-        <DeploymentTableRow {deployment} {columns} />
-      {/each}
-
-      <svelte:fragment slot="empty">
-        <EmptyState
-          title={translate('deployments.empty-state-title')}
-          class="px-4"
-        >
-          <p class="text-center">
-            Enable Worker Deployments to manage your workers more effectively. <Link
-              href="https://docs.temporal.io/worker-deployments"
-              newTab>Learn more</Link
-            >.
-          </p>
-          {#if error}
-            <Alert intent="warning" icon="warning" class="px-12">
-              {error}
-            </Alert>
-          {/if}
-        </EmptyState>
-      </svelte:fragment>
-    </PaginatedTable>
-  {/key}
+<div class="flex flex-wrap items-center gap-2">
+  <h1>
+    {translate('deployments.worker-deployments')}
+  </h1>
+  <Badge class="shrink-0">Public Preview</Badge>
 </div>
+
+{#key [namespace]}
+  <PaginatedTable
+    let:visibleItems
+    {onFetch}
+    {onError}
+    aria-label={translate('deployments.deployments')}
+    pageSizeSelectLabel={translate('common.per-page')}
+    nextButtonLabel={translate('common.next')}
+    previousButtonLabel={translate('common.previous')}
+    emptyStateMessage={translate('deployments.empty-state-title')}
+    errorMessage={translate('deployments.error-message-fetching')}
+  >
+    <caption class="sr-only" slot="caption"
+      >{translate('deployments.deployments')}</caption
+    >
+    <tr slot="headers" class="text-left">
+      {#each columns as { label }}
+        <th>{label}</th>
+      {/each}
+    </tr>
+    {#each visibleItems as deployment}
+      <DeploymentTableRow {deployment} {columns} />
+    {/each}
+
+    <svelte:fragment slot="empty">
+      <EmptyState
+        title={translate('deployments.empty-state-title')}
+        class="px-4"
+      >
+        <p class="text-center">
+          Enable Worker Deployments to manage your workers more effectively. <Link
+            href="https://docs.temporal.io/worker-deployments"
+            newTab>Learn more</Link
+          >.
+        </p>
+        {#if error}
+          <Alert intent="warning" icon="warning" class="px-12">
+            {error}
+          </Alert>
+        {/if}
+      </EmptyState>
+    </svelte:fragment>
+  </PaginatedTable>
+{/key}

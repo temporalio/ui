@@ -20,6 +20,9 @@
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
+  import { eventTypeStyle } from './event-styles';
+  import { CategoryIcon } from '../lines-and-dots/constants';
+
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
 
@@ -109,7 +112,10 @@
     {/if}
   </td>
   <td class="">
-    <p class="truncate font-semibold md:text-base">Pending Activity</p>
+    <p class={eventTypeStyle({ category: 'activity' })}>
+      <Icon name={CategoryIcon['activity']} class="mr-1 inline animate-pulse" />
+      {translate('workflows.pending-activity')}
+    </p>
   </td>
   <td class="w-full overflow-hidden text-right font-normal xl:text-left">
     <div class="flex items-center gap-1">
