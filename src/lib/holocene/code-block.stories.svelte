@@ -366,3 +366,28 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
     copyable: false,
   }}
 />
+
+<Story name="Test page scrolling">
+  <div>
+    <h1>content aaa</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <CodeBlock copyable language="json" content={largeJson} maxHeight={300} />
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content</h1>
+    <h1>content zzz</h1>
+  </div>
+</Story>
