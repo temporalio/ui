@@ -1,4 +1,7 @@
-import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
+import type {
+  CountSchedulesResponse,
+  CountWorkflowExecutionsResponse,
+} from '$lib/types/workflows';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
@@ -73,23 +76,12 @@ export const fetchScheduleCount = async ({
   namespace: string;
   query?: string;
 }): Promise<string> => {
-  const scheduleFixedQuery =
-    'TemporalNamespaceDivision="TemporalScheduler" AND ExecutionStatus="Running"';
-
-  const fullQuery = query
-    ? `${scheduleFixedQuery} AND ${query}`
-    : scheduleFixedQuery;
-  const countRoute = routeForApi('workflows.count', {
+  const countRoute = routeForApi('schedules.count', {
     namespace,
   });
-  const { count } = await requestFromAPI<CountWorkflowExecutionsResponse>(
-    countRoute,
-    {
-      params: {
-        query: fullQuery,
-      },
-      notifyOnError: false,
-    },
-  );
+  const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
+    params: query ? { query } : {},
+    notifyOnError: false,
+  });
   return count ?? '0';
 };

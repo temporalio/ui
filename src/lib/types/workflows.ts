@@ -54,6 +54,11 @@ export type CountWorkflowExecutionsResponse = {
   groups?: { count: string; groupValues: Payloads }[];
 };
 
+export type CountSchedulesResponse = {
+  count?: string;
+  groups?: { count: string; groupValues: Payloads }[];
+};
+
 export type WorkflowExecutionConfig = Replace<
   import('$lib/types').WorkflowExecutionConfig,
   {

@@ -44,7 +44,7 @@ export type ParameterlessAPIRoutePath =
   | 'nexus-endpoints'
   | 'namespaces';
 export type WorkerAPIRoutePath = 'worker-task-reachability';
-export type SchedulesAPIRoutePath = 'schedules';
+export type SchedulesAPIRoutePath = 'schedules' | 'schedules.count';
 export type ScheduleAPIRoutePath =
   | 'schedule'
   | 'schedule.patch'
