@@ -32,8 +32,8 @@ test('it should update the datetime filter based on the selected timezone', asyn
   page,
 }) => {
   await page.getByTestId('timezones-menu-button').click();
-  await page.getByTestId('top-nav').getByPlaceholder('Search').fill('PDT');
-  await page.getByText('Pacific Daylight Time (PDT) UTC-07:00').click();
+  await page.getByTestId('top-nav').getByPlaceholder('Search').fill('CST');
+  await page.getByText('Central Standard Time (CST)').click();
 
   await page.getByTestId('toggle-manual-query').click();
   await page
@@ -48,7 +48,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await expect(
     page.getByRole('button', {
-      name: 'CloseTime >= 12/25/25, 4:00:00.00 AM PST',
+      name: 'CloseTime >= 12/25/25, 6:00:00.00 AM CST',
     }),
   ).toBeVisible();
 
@@ -58,12 +58,15 @@ test('it should update the datetime filter based on the selected timezone', asyn
   expect(getDatetime(query)).toMatch(validDatetime);
 
   await page.getByTestId('timezones-menu-button').click();
-  await page.getByTestId('top-nav').getByPlaceholder('Search').fill('MDT');
-  await page.getByText('Mountain Daylight Time (MDT) UTC-06:00').click();
+  await page
+    .getByTestId('top-nav')
+    .getByPlaceholder('Search')
+    .fill('Greenwich Mean Time');
+  await page.getByText('Greenwich Mean Time (GMT)').click();
 
   await expect(
     page.getByRole('button', {
-      name: 'CloseTime >= 12/25/25, 5:00:00.00 AM MST',
+      name: 'CloseTime >= 12/25/25, 12:00:00.00 PM GMT',
     }),
   ).toBeVisible();
 

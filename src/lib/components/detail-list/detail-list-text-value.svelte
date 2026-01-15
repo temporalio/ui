@@ -37,7 +37,7 @@
       {#if iconName}
         <Icon name={iconName} class="shrink-0" />
       {/if}
-      {text}
+      <span class="truncate">{text}</span>
     </div>
   {/if}
 {/snippet}

@@ -72,24 +72,29 @@ export const tokenize = (string: string): Tokens => {
       }
     }
 
-    // Conditional can be up to three characters long (!==)
-    const midConditional = `${string[cursor]}${string[cursor + 1]}`;
-    const maxConditional = `${string[cursor]}${string[cursor + 1]}${
-      string[cursor + 2]
-    }`;
+    // Check for conditionals that are two, three or six characters long (e.g. not in)
+    const minConditional = string.slice(cursor, cursor + 2);
+    const midConditional = string.slice(cursor, cursor + 3);
+    const maxConditional = string.slice(cursor, cursor + 6);
+
     if (isConditional(maxConditional)) {
       buffer += maxConditional;
+      addBufferToTokens();
+      cursor += 6;
+      continue;
+    } else if (isConditional(midConditional)) {
+      buffer += midConditional;
       addBufferToTokens();
       cursor += 3;
       continue;
     } else if (
-      isConditional(midConditional) &&
+      isConditional(minConditional) &&
       (isSpace(string[cursor + 2]) ||
         isQuote(string[cursor + 2]) ||
         isParenthesis(string[cursor + 2]))
     ) {
       // To prevent false positives like "inspect" being a "in" conditional, check for space, quote, or parenthesis after the midConditional
-      buffer += midConditional;
+      buffer += minConditional;
       addBufferToTokens();
       cursor += 2;
       continue;
