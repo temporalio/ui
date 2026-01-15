@@ -22,7 +22,7 @@
   let badgeType: BadgeType = $derived(failed ? 'danger' : 'default');
 </script>
 
-<DetailListLabel class="font-medium text-secondary">Attempt</DetailListLabel>
+<DetailListLabel>Attempt</DetailListLabel>
 <DetailListValue>
   <Badge type={badgeType} class="flex items-center gap-2">
     <Icon name="retry" class={failed ? 'text-red-400' : ''} />

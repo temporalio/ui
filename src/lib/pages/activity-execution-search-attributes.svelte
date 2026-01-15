@@ -7,7 +7,7 @@
   const searchAttributes = $derived($activityExecution.info.searchAttributes);
 </script>
 
-<div class="mt-4 flex flex-col gap-2">
+<div class="flex flex-col gap-2">
   {#if searchAttributes}
     <PayloadDecoder
       value={{ searchAttributes: searchAttributes }}

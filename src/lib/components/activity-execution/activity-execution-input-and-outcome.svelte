@@ -14,7 +14,7 @@
   let { input, outcome }: Props = $props();
 </script>
 
-<div class="grid w-full grid-cols-2 gap-4 py-4 max-md:grid-cols-1">
+<div class="grid w-full grid-cols-2 gap-4 max-md:grid-cols-1">
   <div class="flex flex-col gap-2">
     <h5>Input</h5>
     <PayloadDecoder value={input}>

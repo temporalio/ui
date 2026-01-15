@@ -161,9 +161,6 @@
   const generateRandomId = () => {
     $form.activityId = crypto.randomUUID();
   };
-
-  $inspect($form.searchAttributes);
-  $inspect($errors);
 </script>
 
 <form class="max-w-[45rem] space-y-4" use:enhance novalidate>

@@ -21,7 +21,7 @@
   />
   <Card class="space-y-4">
     <div class="flex items-center justify-between">
-      <h5>{$activityExecution.info.activityType.name}</h5>
+      <h4>{$activityExecution.info.activityType.name}</h4>
       <div class="flex items-center gap-2">
         <Button leadingIcon="pause">Pause</Button>
         <Button leadingIcon="pencil">Update</Button>
@@ -147,12 +147,18 @@
           <ActivityExecutionDetail label="Priority" value="TBD" />
         </DetailList>
       </div>
-      <div class="space-y-2">
-        <p class="font-medium text-secondary">Last Failure</p>
-        <CodeBlock
-          content={JSON.stringify($activityExecution.info.lastFailure, null, 2)}
-        />
-      </div>
+      {#if $activityExecution.info.lastFailure}
+        <div class="space-y-2">
+          <p class="font-medium text-secondary">Last Failure</p>
+          <CodeBlock
+            content={JSON.stringify(
+              $activityExecution.info.lastFailure,
+              null,
+              2,
+            )}
+          />
+        </div>
+      {/if}
     </div>
   </Card>
 {/if}

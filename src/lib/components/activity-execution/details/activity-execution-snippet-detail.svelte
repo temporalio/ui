@@ -15,7 +15,7 @@
   let { label, value, inline = false }: Props = $props();
 </script>
 
-<DetailListLabel class="font-medium text-secondary">{label}</DetailListLabel>
+<DetailListLabel>{label}</DetailListLabel>
 <DetailListValue>
   <CodeBlock {inline} content={JSON.stringify(value, undefined, 2)} />
 </DetailListValue>

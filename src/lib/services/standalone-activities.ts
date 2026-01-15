@@ -92,6 +92,13 @@ const toStartActivityExecutionRequest = async (
     };
   }
 
+  console.table({
+    summary: activityFormData.summary,
+    details: activityFormData.details,
+    summaryPayload,
+    detailsPayload,
+  });
+
   return {
     identity: activityFormData.identity,
     namespace: activityFormData.namespace,

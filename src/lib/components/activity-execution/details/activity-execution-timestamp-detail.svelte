@@ -12,5 +12,5 @@
   let { label, value }: Props = $props();
 </script>
 
-<DetailListLabel class="font-medium text-secondary">{label}</DetailListLabel>
+<DetailListLabel>{label}</DetailListLabel>
 <DetailListTimestampValue timestamp={value} />
