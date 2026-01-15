@@ -191,3 +191,11 @@ export const isInConditional = (x: unknown) => {
 
   return x.toLocaleLowerCase() === 'in';
 };
+
+export const isEmptyObject = (obj: unknown) => {
+  if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
+    return false;
+  }
+
+  return Object.keys(obj).length === 0;
+};

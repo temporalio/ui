@@ -1,5 +1,5 @@
 <script lang="ts">
-  import StandaloneActivityForm from '$lib/components/standalone-activity-form/form.svelte';
+  import StandaloneActivityForm from '$lib/components/activity-execution-form/form.svelte';
   import { translate } from '$lib/i18n/translate';
 
   interface Props {

@@ -15,17 +15,25 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     encodings,
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
   import { startStandaloneActivity } from '$lib/services/standalone-activities';
+  import { toaster } from '$lib/stores/toaster';
+  import {
+    activityIDConflictPolicyOptions,
+    activityIDReusePolicyOptions,
+  } from '$lib/types/activity-execution';
   import { getIdentity } from '$lib/utilities/core-context';
 
   import type { StandaloneActivityFormData } from './types';
   import Message from '../form/message.svelte';
   import PayloadInputWithEncoding from '../payload-input-with-encoding.svelte';
+  import RetryPolicyInput from '../retry-policy-input.svelte';
   import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
 
   interface Props {
@@ -65,18 +73,19 @@
       messageType: z.string().optional(),
       searchAttributes: z
         .array(
-          z.object({ label: z.string(), value: z.string(), type: z.string() }),
+          z.object({ label: z.string(), value: z.any(), type: z.string() }),
         )
         .optional(),
       summary: z.string().optional(),
       details: z.string().optional(),
       scheduleToStartTimeout: z.string().optional(),
-      heartbeatTimeout: z.number().optional(),
-      retryPolicy: z
-        .object({
-          stuff: z.string(),
-        })
-        .optional(),
+      heartbeatTimeout: z.string().optional(),
+      initialInterval: z.string().optional(),
+      backoffCoefficient: z.number().optional().nullable(),
+      maximumInterval: z.string().optional(),
+      maximumAttempts: z.number().optional().nullable(),
+      idReusePolicy: z.string().optional(),
+      idConflictPolicy: z.string().optional(),
     })
     .superRefine((data, context) => {
       if (!data.startToCloseTimeout && !data.scheduleToCloseTimeout) {
@@ -104,6 +113,13 @@
       searchAttributes: [],
       summary: '',
       details: '',
+      heartbeatTimeout: '',
+      initialInterval: '',
+      backoffCoefficient: undefined,
+      maximumInterval: '',
+      maximumAttempts: undefined,
+      idReusePolicy: '',
+      idConflictPolicy: '',
     },
     {
       SPA: true,
@@ -116,6 +132,10 @@
 
         try {
           startStandaloneActivity(form.data);
+          toaster.push({
+            variant: 'success',
+            message: 'Activity execution started.',
+          });
           return { type: 'success' };
         } catch (error) {
           console.error(error);
@@ -141,6 +161,9 @@
   const generateRandomId = () => {
     $form.activityId = crypto.randomUUID();
   };
+
+  $inspect($form.searchAttributes);
+  $inspect($errors);
 </script>
 
 <form class="max-w-[45rem] space-y-4" use:enhance novalidate>
@@ -193,7 +216,7 @@
       $errors.startToCloseTimeout ? 'border-danger' : '',
     )}
   >
-    <p class="text-base font-medium">Activity Timeouts</p>
+    <h5>Activity Timeouts</h5>
 
     <DurationInput
       id="startToCloseTimeout"
@@ -231,7 +254,7 @@
       data-testid="start-standalone-activity-add-search-attributes"
     >
       <div class="space-y-2">
-        <p class="text-base font-medium">Custom Search Attributes</p>
+        <h5>Custom Search Attributes</h5>
         <p class="text-secondary">
           Indexed fields used in a List Filter to filter a list of Standalone
           Activities.
@@ -245,7 +268,7 @@
       data-testid="start-standalone-activity-add-metadata"
     >
       <div class="space-y-2">
-        <p class="text-base font-medium">User Metadata</p>
+        <h5>User Metadata</h5>
         <p class="text-secondary">
           Add context to Standalone Activities to help identify and understand
           its operations.
@@ -259,6 +282,49 @@
         <Label label={translate('workflows.details')} for="details" />
         <MarkdownEditor bind:content={$form.details} />
       </div>
+    </Card>
+
+    <Card class="space-y-4">
+      <h5>Retry Policy</h5>
+      <RetryPolicyInput
+        bind:initialInterval={$form.initialInterval}
+        bind:backoffCoefficient={$form.backoffCoefficient}
+        bind:maximumInterval={$form.maximumInterval}
+        bind:maximumAttempts={$form.maximumAttempts}
+      />
+    </Card>
+
+    <Card>
+      <DurationInput
+        id="heartbeatTimeout"
+        label="Heartbeat Timeout"
+        hintText="Maximum permitted time between successful worker heartbeats."
+        bind:value={$form.heartbeatTimeout}
+      />
+    </Card>
+
+    <Card class="space-y-4">
+      <h5>Activity ID Policies</h5>
+
+      <Select
+        label="ID Reuse Policy"
+        id="start-standalone-activity-id-reuse-policy-select"
+        bind:value={$form.idReusePolicy}
+      >
+        {#each activityIDReusePolicyOptions as option}
+          <Option value={option}>{option}</Option>
+        {/each}
+      </Select>
+
+      <Select
+        label="ID Conflict Policy"
+        id="start-standalone-activity-id-conflict-policy-select"
+        bind:value={$form.idConflictPolicy}
+      >
+        {#each activityIDConflictPolicyOptions as option}
+          <Option value={option}>{option}</Option>
+        {/each}
+      </Select>
     </Card>
   {/if}
 

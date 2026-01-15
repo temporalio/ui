@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -11,23 +12,34 @@
     text: string;
     tooltipText?: string;
     isBadge?: boolean;
+    badgeType?: BadgeType;
     iconName?: IconName | undefined;
   }
 
-  let { copyable, copyableText, text, tooltipText, isBadge, iconName }: Props =
-    $props();
+  let {
+    copyable,
+    copyableText,
+    text,
+    tooltipText,
+    iconName,
+    isBadge = false,
+    badgeType = 'default',
+  }: Props = $props();
 </script>
 
 {#snippet content()}
-  <div
-    class="flex select-all items-center gap-1 truncate rounded-sm"
-    class:surface-subtle={isBadge}
-  >
-    {#if iconName}
-      <Icon name={iconName} class="shrink-0" />
-    {/if}
-    {text}
-  </div>
+  {#if isBadge}
+    <Badge type={badgeType}>
+      {text}
+    </Badge>
+  {:else}
+    <div class="flex select-all items-center gap-1 truncate rounded-sm">
+      {#if iconName}
+        <Icon name={iconName} class="shrink-0" />
+      {/if}
+      {text}
+    </div>
+  {/if}
 {/snippet}
 
 <DetailListValue {copyable} {copyableText}>

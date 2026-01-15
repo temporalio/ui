@@ -16,4 +16,9 @@ export interface StandaloneActivityFormData {
   searchAttributes?: SearchAttributeInput[];
   summary?: string;
   details?: string;
+  // retry policy
+  initialInterval?: string;
+  backoffCoefficient?: string;
+  maximumInterval?: string;
+  maximumAttempts?: string;
 }
