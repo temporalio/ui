@@ -23,12 +23,14 @@
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
   import { startStandaloneActivity } from '$lib/services/standalone-activities';
+  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import {
     activityIDConflictPolicyOptions,
     activityIDReusePolicyOptions,
   } from '$lib/types/activity-execution';
   import { getIdentity } from '$lib/utilities/core-context';
+  import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
 
   import type { StandaloneActivityFormData } from './types';
   import Message from '../form/message.svelte';
@@ -57,6 +59,8 @@
   // https://svelte.dev/docs/svelte/compiler-warnings#state_referenced_locally
   const getFormDefaults = () => formDefaults;
 
+  let searchAttributes = $state<SearchAttributeInput[]>([]);
+
   const schema = z
     .object({
       identity: z.string(),
@@ -71,11 +75,6 @@
       scheduleToCloseTimeout: z.string().optional(),
       encoding: z.enum(encodings).optional(),
       messageType: z.string().optional(),
-      searchAttributes: z
-        .array(
-          z.object({ label: z.string(), value: z.any(), type: z.string() }),
-        )
-        .optional(),
       summary: z.string().optional(),
       details: z.string().optional(),
       scheduleToStartTimeout: z.string().optional(),
@@ -110,7 +109,6 @@
       input: '',
       messageType: '',
       scheduleToStartTimeout: '',
-      searchAttributes: [],
       summary: '',
       details: '',
       heartbeatTimeout: '',
@@ -131,10 +129,14 @@
         if (!form.valid) return;
 
         try {
-          startStandaloneActivity(form.data);
+          startStandaloneActivity({ ...form.data, searchAttributes });
           toaster.push({
             variant: 'success',
             message: 'Activity execution started.',
+            link: routeForStandaloneActivityDetails({
+              namespace,
+              activityId: form.data.activityId,
+            }),
           });
           return { type: 'success' };
         } catch (error) {
@@ -257,7 +259,10 @@
           Activities.
         </p>
       </div>
-      <AddSearchAttributes bind:attributesToAdd={$form.searchAttributes} />
+      <AddSearchAttributes
+        variant="secondary"
+        bind:attributesToAdd={searchAttributes}
+      />
     </Card>
 
     <Card

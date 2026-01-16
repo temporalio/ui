@@ -22,10 +22,10 @@
 
   type Props = {
     workers: TaskQueueResponse;
-    searchAttributes: Record<string, string>;
+    searchAttributes?: Record<string, string>;
     children?: Snippet;
   };
-  let { workers, searchAttributes, children }: Props = $props();
+  let { workers, searchAttributes = {}, children }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const {

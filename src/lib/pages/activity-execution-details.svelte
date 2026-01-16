@@ -21,6 +21,7 @@
     formatMaximumAttempts,
   } from '$lib/utilities/format-event-attributes';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
+  import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
   interface Props {
@@ -99,7 +100,9 @@
             aria-label="Activity Execution Status Details"
           >
             <DetailListLabel>Run State</DetailListLabel>
-            <DetailListTextValue text={$activityExecution.info.runState} />
+            <DetailListTextValue
+              text={fromScreamingEnum($activityExecution.info.runState, '')}
+            />
             {@render activityExecutionAttemptsBadge(
               $activityExecution.info.attempt,
               $activityExecution.info.retryPolicy?.maximumAttempts,

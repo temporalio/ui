@@ -639,13 +639,6 @@ export async function startWorkflow({
     console.error('Could not encode summary or details for starting workflow');
   }
 
-  console.table({
-    summary,
-    details,
-    summaryPayload,
-    detailsPayload,
-  });
-
   const body = stringifyWithBigInt({
     workflowId,
     taskQueue: {

@@ -4,10 +4,13 @@ import type {
   Header,
   Payloads,
   Priority,
-  RetryPolicy,
   SearchAttribute,
+  TaskQueue,
   UserMetadata,
 } from '.';
+import type { WorkflowSearchAttributes } from './workflows';
+
+// TODO: Use @temporalio/proto once updated
 
 export type ActivityExecutionStatus =
   | 'ACTIVITY_EXECUTION_STATUS_UNSPECIFIED'
@@ -51,6 +54,13 @@ export type ActivityExecutionOutcome =
       failure: Failure;
     };
 
+interface RetryPolicy {
+  initialInterval: string;
+  backoffCoefficient: number;
+  maximumInterval: string;
+  maximumAttempts: number;
+}
+
 export interface ActivityExecutionInfo {
   activityId: string;
   runId: string;
@@ -67,7 +77,7 @@ export interface ActivityExecutionInfo {
   retryPolicy: RetryPolicy;
   lastStartedTime: string;
   attempt: number;
-  executionDuration: string;
+  executionDuration?: string;
   scheduleTime: string;
   closeTime: string;
   lastWorkerIdentity: string;
@@ -75,7 +85,7 @@ export interface ActivityExecutionInfo {
   nextAttemptScheduleTime: string;
   stateTransitionCount: string;
   currentRetryInterval: string;
-  searchAttributes: SearchAttribute;
+  searchAttributes: WorkflowSearchAttributes;
   userMetadata: UserMetadata;
   lastFailure?: Failure;
   header?: Header;
@@ -88,4 +98,20 @@ export interface ActivityExecution {
   input?: Payloads;
   outcome?: ActivityExecutionOutcome;
   longPollToken?: string;
+}
+
+export interface StartActivityExecutionRequest {
+  namespace: string;
+  identity: string;
+  requestId: string;
+  activityId: string;
+  activityType: ActivityType;
+  taskQueue: TaskQueue;
+  startToCloseTimeout: string;
+  scheduleToCloseTimeout: string;
+  scheduleToStartTimeout: string;
+  input?: Payloads;
+  userMetadata?: UserMetadata;
+  retryPolicy?: RetryPolicy;
+  searchAttributes?: SearchAttribute;
 }

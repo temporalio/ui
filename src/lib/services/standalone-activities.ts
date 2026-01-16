@@ -1,37 +1,15 @@
 import type { StandaloneActivityFormData } from '$lib/components/activity-execution-form/types';
+import type { Payload, SearchAttribute } from '$lib/types';
 import type {
-  ActivityType,
-  Payload,
-  Payloads,
-  RetryPolicy,
-  SearchAttribute,
-  TaskQueue,
-  UserMetadata,
-} from '$lib/types';
-import type { ActivityExecution } from '$lib/types/activity-execution';
+  ActivityExecution,
+  StartActivityExecutionRequest,
+} from '$lib/types/activity-execution';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { setSearchAttributes } from './workflow-service';
-
-// TODO: Use @temporalio/proto once updated
-type StartActivityExecutionRequest = {
-  namespace: string;
-  identity: string;
-  requestId: string;
-  activityId: string;
-  activityType: ActivityType;
-  taskQueue: TaskQueue;
-  startToCloseTimeout: string;
-  scheduleToCloseTimeout: string;
-  scheduleToStartTimeout: string;
-  input?: Payloads;
-  userMetadata?: UserMetadata;
-  retryPolicy?: RetryPolicy;
-  searchAttributes?: SearchAttribute;
-};
 
 const toStartActivityExecutionRequest = async (
   activityFormData: StandaloneActivityFormData,
@@ -91,13 +69,6 @@ const toStartActivityExecutionRequest = async (
       },
     };
   }
-
-  console.table({
-    summary: activityFormData.summary,
-    details: activityFormData.details,
-    summaryPayload,
-    detailsPayload,
-  });
 
   return {
     identity: activityFormData.identity,
