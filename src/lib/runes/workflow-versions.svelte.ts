@@ -14,7 +14,7 @@ type PollersWithVersions = {
 };
 
 export function getWorkflowPollersWithVersions(
-  searchAttributes: Record<string, string>,
+  searchAttributes: Record<string, string> = {},
   workers: TaskQueueResponse,
 ): PollersWithVersions {
   const workflowDeploymentName = $derived(
