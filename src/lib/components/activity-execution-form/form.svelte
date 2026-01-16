@@ -131,6 +131,7 @@
         try {
           startStandaloneActivity({ ...form.data, searchAttributes });
           toaster.push({
+            duration: 5000,
             variant: 'success',
             message: 'Activity execution started.',
             link: routeForStandaloneActivityDetails({
