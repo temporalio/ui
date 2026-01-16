@@ -70,7 +70,9 @@ type (
 		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
-		HideLogs       bool     `yaml:"hideLogs"`
+		// Static headers to always forward to Temporal gRPC backend
+		StaticHeaders map[string]string `yaml:"staticHeaders"`
+		HideLogs      bool              `yaml:"hideLogs"`
 		// TLS configuration options to start UI Server in TLS mode
 		UIServerTLS UIServerTLS `yaml:"uiServerTLS"`
 	}
