@@ -29,6 +29,7 @@ import circleCheck from './svg/circle-check.svelte';
 import cirlceQuestion from './svg/circle-question.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
+import collapse from './svg/collapse.svelte';
 import cometSolid from './svg/comet-solid.svelte';
 import comet from './svg/comet.svelte';
 import compact from './svg/compact.svelte';
@@ -95,7 +96,6 @@ import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import play from './svg/play.svelte';
-import push from './svg/push.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -173,6 +173,7 @@ export const icons = {
   'circle-question': cirlceQuestion,
   clock,
   close,
+  collapse,
   'comet-solid': cometSolid,
   comet,
   compact,
@@ -239,7 +240,6 @@ export const icons = {
   pencil,
   'pin-filled': pinFilled,
   pin,
-  push,
   regions,
   relationship,
   retention,

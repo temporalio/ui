@@ -21,7 +21,7 @@
   class="flex-col items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
 >
   <div role="list">
-    <div class="flex items-center justify-between pb-4">
+    <div class="align-center flex items-center justify-between pb-4">
       <div
         class="text-xs font-medium text-indigo-100 group-data-[nav=closed]:hidden"
       >
@@ -35,7 +35,7 @@
         class="flex items-center justify-center"
         onclick={ontoggle}
       >
-        <Icon name="push" class="h-6 w-6" />
+        <Icon name="collapse" class="h-6 w-6" />
       </button>
     </div>
     {#if children}
