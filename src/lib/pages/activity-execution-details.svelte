@@ -10,7 +10,6 @@
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -69,14 +68,7 @@
     outcome={$activityExecution.outcome}
   />
   <Card class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h4>{$activityExecution.info.activityType.name}</h4>
-      <div class="flex items-center gap-2">
-        <Button leadingIcon="pause">Pause</Button>
-        <Button leadingIcon="pencil">Update</Button>
-        <Button leadingIcon="retry">Reset</Button>
-      </div>
-    </div>
+    <h4>{$activityExecution.info.activityType.name}</h4>
     <div class="grid grid-cols-2 gap-4">
       <div class="space-y-2">
         <h6 class="col-span-2 underline underline-offset-4">Identity</h6>
