@@ -18,24 +18,32 @@ export class ActivityExecutionPoller {
   private runId: string;
   private token: string;
   private onUpdate: (activityExecution: ActivityExecution) => void;
+  private onError: (error: Error) => void;
 
   constructor(
     namespace: string,
     activityId: string,
     abortController: AbortController,
     onUpdate: (activityExecution: ActivityExecution) => void,
+    onError: (error: Error) => void,
   ) {
     this.namespace = namespace;
     this.activityId = activityId;
     this.abortController = abortController;
     this.onUpdate = onUpdate;
+    this.onError = onError;
   }
 
   async start() {
-    const activityExecution = await getActivityExecution(
-      this.namespace,
-      this.activityId,
-    );
+    let activityExecution: ActivityExecution | undefined = undefined;
+    try {
+      activityExecution = await getActivityExecution(
+        this.namespace,
+        this.activityId,
+      );
+    } catch (error) {
+      this.onError(error);
+    }
 
     this.onUpdate(activityExecution);
 
@@ -57,9 +65,8 @@ export class ActivityExecutionPoller {
             this.onUpdate(polledActivityExecution);
           }
         } catch (error) {
-          if (error instanceof Error && error.name === 'AbortError') break;
-          console.error('Polling error:', error);
-          await new Promise((r) => setTimeout(r, 1000));
+          this.onError(error);
+          break;
         }
       }
     }

@@ -3,6 +3,7 @@
 
   import { page } from '$app/state';
 
+  import ErrorComponent from '$lib/holocene/error.svelte';
   import ActivityExecutionLayout from '$lib/layouts/activity-execution-layout.svelte';
   import {
     activityExecution,
@@ -11,6 +12,7 @@
 
   const namespace = $derived(page.params.namespace);
   const activityId = $derived(page.params.activityId);
+  let error = $state<Error | undefined>();
 
   const activityPollerAbortController = new AbortController();
   const poller = $derived(
@@ -20,6 +22,9 @@
       activityPollerAbortController,
       (execution) => {
         $activityExecution = execution;
+      },
+      (e) => {
+        error = e;
       },
     ),
   );
@@ -35,10 +40,14 @@
   let { children } = $props();
 </script>
 
-<ActivityExecutionLayout
-  activityExecution={$activityExecution}
-  {namespace}
-  {activityId}
->
-  {@render children()}
-</ActivityExecutionLayout>
+{#if error}
+  <ErrorComponent {error} />
+{:else}
+  <ActivityExecutionLayout
+    activityExecution={$activityExecution}
+    {namespace}
+    {activityId}
+  >
+    {@render children()}
+  </ActivityExecutionLayout>
+{/if}
