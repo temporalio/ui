@@ -228,8 +228,8 @@
 
 <header class="flex flex-col gap-2">
   <div class="flex flex-col justify-between gap-2 md:flex-row">
-    <div class="flex flex-row flex-wrap items-start gap-2">
-      <div>
+    <div class="flex flex-col gap-2">
+      <div class="flex flex-row items-center gap-1">
         <h1 class="flex items-center gap-2 leading-7" data-cy="workflows-title">
           {#if $supportsAdvancedVisibility}
             <span data-testid="workflow-count"
@@ -243,12 +243,12 @@
             <Translate key="workflows.recent-workflows" />
           {/if}
         </h1>
-        <p class="text-xs text-secondary">
-          {refreshTimeFormatted}
-        </p>
+        <WorkflowCountRefresh count={$workflowCount.newCount} />
+        <WorkflowCounts bind:refreshTime />
       </div>
-      <WorkflowCountRefresh count={$workflowCount.newCount} />
-      <WorkflowCounts bind:refreshTime />
+      <p class="text-xs text-secondary">
+        {refreshTimeFormatted}
+      </p>
     </div>
     {#if $$slots['header-actions'] || workflowStartEnabled}
       <div class="flex items-center gap-4">
