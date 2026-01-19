@@ -82,22 +82,22 @@ export function formatDate(
 
     const parsed = parseJSON(new Date(date));
 
+    if (relative) {
+      return (
+        formatDistanceToNowStrict(parsed, {
+          ...(!flexibleUnits &&
+            Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
+              unit: 'day',
+            }),
+        }) + ` ${relativeLabel}`
+      );
+    }
+
     if (format === 'iso') {
       return parsed.toISOString();
     }
 
     if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
-      if (relative) {
-        return (
-          formatDistanceToNowStrict(parsed, {
-            ...(!flexibleUnits &&
-              Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
-                unit: 'day',
-              }),
-          }) + ` ${relativeLabel}`
-        );
-      }
-
       return new Intl.DateTimeFormat(
         undefined,
         timestampFormats[format],
