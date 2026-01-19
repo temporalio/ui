@@ -98,7 +98,7 @@
   });
 
   $effect(() => {
-    $workflowsQuery = query;
+    $workflowsQuery = query ?? '';
   });
 
   $effect(() => {
