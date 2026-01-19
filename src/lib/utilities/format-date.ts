@@ -82,6 +82,10 @@ export function formatDate(
 
     const parsed = parseJSON(new Date(date));
 
+    if (format === 'iso') {
+      return parsed.toISOString();
+    }
+
     if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
       if (relative) {
         return (
