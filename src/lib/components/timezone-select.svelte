@@ -162,6 +162,11 @@
         <ToggleButtons>
           <ToggleButton
             size="xs"
+            active={$timestampFormat === 'iso'}
+            on:click={() => setTimestampFormat('iso')}>ISO</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
             active={$timestampFormat === 'short'}
             on:click={() => setTimestampFormat('short')}>Short</ToggleButton
           >

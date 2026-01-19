@@ -57,7 +57,7 @@ export const timestampFormats: Record<
   },
 } as const;
 
-export type TimestampFormat = keyof typeof timestampFormats;
+export type TimestampFormat = keyof typeof timestampFormats | 'iso';
 
 export function formatDate(
   date: ValidTime | undefined | null,

@@ -147,6 +147,9 @@ describe('formatDate', () => {
     expect(formatDate(date, 'utc', { format: 'long' })).toEqual(
       'April 13, 2022 at 4:29:35.63 PM UTC',
     );
+    expect(formatDate(date, 'utc', { format: 'iso' })).toEqual(
+      '2022-04-13T16:29:35.630Z',
+    );
   });
 });
 
