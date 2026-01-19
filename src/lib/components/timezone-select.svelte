@@ -123,6 +123,7 @@
     id="timezones-menu"
     {position}
     class="w-[10rem] sm:w-[20rem] md:w-[28rem]"
+    maxHeight=""
   >
     <Input
       label={translate('common.search')}
@@ -186,33 +187,33 @@
 
     <MenuDivider />
 
-    {#if !search}
-      {#each QuickTimezoneOptions as { value, label }}
+    <div class="max-h-[16rem] overflow-auto overscroll-contain">
+      {#if !search}
+        {#each QuickTimezoneOptions as { value, label }}
+          <MenuItem
+            onclick={() => selectTimezone(value)}
+            data-testid="timezones-{value}"
+            selected={value === $timeFormat}
+            description={value === BASE_TIME_FORMAT_OPTIONS.LOCAL
+              ? localTime
+              : undefined}
+          >
+            {label}
+          </MenuItem>
+        {/each}
+      {/if}
+
+      {#each filteredOptions as { value, label, offset, abbr }}
         <MenuItem
-          onclick={() => selectTimezone(value)}
-          data-testid="timezones-{value}"
           selected={value === $timeFormat}
-          description={value === BASE_TIME_FORMAT_OPTIONS.LOCAL
-            ? localTime
-            : undefined}
+          onclick={() => selectTimezone(value)}
+          description={formatUTCOffset(offset, translate('common.utc'))}
         >
-          {label}
+          {label} ({abbr})
         </MenuItem>
+      {:else}
+        <MenuItem disabled>{translate('common.no-results')}</MenuItem>
       {/each}
-
-      <MenuDivider />
-    {/if}
-
-    {#each filteredOptions as { value, label, offset, abbr }}
-      <MenuItem
-        selected={value === $timeFormat}
-        onclick={() => selectTimezone(value)}
-        description={formatUTCOffset(offset, translate('common.utc'))}
-      >
-        {label} ({abbr})
-      </MenuItem>
-    {:else}
-      <MenuItem disabled>{translate('common.no-results')}</MenuItem>
-    {/each}
+    </div>
   </Menu>
 </MenuContainer>
