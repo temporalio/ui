@@ -7,6 +7,7 @@ import {
   getAdjustedTimeformat,
   getTimezone,
   getUTCOffset,
+  hourFormat,
   relativeTime,
   timeFormat,
   Timezones,
@@ -18,6 +19,9 @@ describe('time format store', () => {
   });
   test('should return false as the default for relativeTime', () => {
     expect(get(relativeTime)).toBe(false);
+  });
+  test('should return system as the default for hourFormat', () => {
+    expect(get(hourFormat)).toBe('system');
   });
 });
 

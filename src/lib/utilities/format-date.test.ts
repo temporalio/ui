@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { hourFormat } from '$lib/stores/time-format';
+
 import {
   formatDate,
   formatUTCOffset,
@@ -11,10 +13,15 @@ import {
 
 // // force GH action runners to use en-US and 12-hour clocks starting at 0:00
 const DateTimeFormat = Intl.DateTimeFormat;
-vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
-  (_, options) =>
-    new DateTimeFormat('en-US', { ...options, hour12: true, hourCycle: 'h11' }),
-);
+vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation((_, options) => {
+  // Respect explicit hour12 setting, otherwise default to 12-hour format
+  const hour12 = options?.hour12 !== undefined ? options.hour12 : true;
+  return new DateTimeFormat('en-US', {
+    ...options,
+    hour12,
+    hourCycle: hour12 ? 'h11' : 'h23',
+  });
+});
 
 describe('formatDate', () => {
   const date = '2022-04-13T16:29:35.630571Z';
@@ -147,6 +154,29 @@ describe('formatDate', () => {
     expect(formatDate(date, 'utc', { format: 'long' })).toEqual(
       'April 13, 2022 at 4:29:35.63 PM UTC',
     );
+  });
+
+  it('should respect hourFormat preference when set to 12', () => {
+    hourFormat.set('12');
+    const result = formatDate(date);
+    expect(result).toContain('PM');
+    hourFormat.set('system'); // reset
+  });
+
+  it('should respect hourFormat preference when set to 24', () => {
+    hourFormat.set('24');
+    const result = formatDate(date);
+    expect(result).toContain('16:29');
+    expect(result).not.toContain('PM');
+    expect(result).not.toContain('AM');
+    hourFormat.set('system'); // reset
+  });
+
+  it('should use system default when hourFormat is set to system', () => {
+    hourFormat.set('system');
+    const result = formatDate(date);
+    // system is mocked to be 12 hour format
+    expect(result).toContain('PM');
   });
 });
 
