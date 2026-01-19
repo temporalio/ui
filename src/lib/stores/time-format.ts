@@ -17,6 +17,11 @@ export const timestampFormat = persistStore<TimestampFormat>(
   'medium',
 );
 
+export const hourFormat = persistStore<'12' | '24' | 'system'>(
+  'hourFormat',
+  'system',
+);
+
 export const TIME_UNIT_OPTIONS = ['minutes', 'hours', 'days'];
 
 export const BASE_TIME_FORMAT_OPTIONS = {

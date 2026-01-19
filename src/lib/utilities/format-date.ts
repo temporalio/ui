@@ -1,3 +1,5 @@
+import { get } from 'svelte/store';
+
 import {
   differenceInHours,
   formatDistanceToNowStrict,
@@ -8,6 +10,7 @@ import {
 import {
   BASE_TIME_FORMAT_OPTIONS,
   getTimezone,
+  hourFormat,
   TimezoneOptions,
   Timezones,
 } from '$lib/stores/time-format';
@@ -82,6 +85,14 @@ export function formatDate(
 
     const parsed = parseJSON(new Date(date));
 
+    let use12HourFormat: boolean | undefined = undefined; // default to system setting
+
+    if (get(hourFormat) === '12') {
+      use12HourFormat = true;
+    } else if (get(hourFormat) === '24') {
+      use12HourFormat = false;
+    }
+
     if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
       if (relative) {
         return (
@@ -94,16 +105,17 @@ export function formatDate(
         );
       }
 
-      return new Intl.DateTimeFormat(
-        undefined,
-        timestampFormats[format],
-      ).format(parsed);
+      return new Intl.DateTimeFormat(undefined, {
+        ...timestampFormats[format],
+        hour12: use12HourFormat,
+      }).format(parsed);
     }
 
     const timeZone = getTimezone(timeFormat);
     return new Intl.DateTimeFormat(undefined, {
       ...timestampFormats[format],
       timeZone,
+      hour12: use12HourFormat,
     }).format(parsed);
   } catch (e) {
     console.error('Error formatting date:', e);

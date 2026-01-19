@@ -20,6 +20,7 @@
   import { translate } from '$lib/i18n/translate';
   import {
     BASE_TIME_FORMAT_OPTIONS,
+    hourFormat,
     relativeTime,
     timeFormat,
     type TimeFormatOptions,
@@ -175,6 +176,40 @@
             active={$timestampFormat === 'long'}
             on:click={() => setTimestampFormat('long')}>Long</ToggleButton
           >
+        </ToggleButtons>
+      </div>
+
+      <div
+        class="mx-4 mt-2 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+      >
+        <div>
+          <p class="font-medium">Hour Format</p>
+        </div>
+        <ToggleButtons>
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === 'system'}
+            on:click={() => ($hourFormat = 'system')}
+            data-testid="hour-format-system"
+          >
+            System
+          </ToggleButton>
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === '12'}
+            on:click={() => ($hourFormat = '12')}
+            data-testid="hour-format-12"
+          >
+            12h
+          </ToggleButton>
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === '24'}
+            on:click={() => ($hourFormat = '24')}
+            data-testid="hour-format-24"
+          >
+            24h
+          </ToggleButton>
         </ToggleButtons>
       </div>
     {/if}
