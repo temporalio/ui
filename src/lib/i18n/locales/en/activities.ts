@@ -69,4 +69,5 @@ export const Strings = {
   'select-all-activities': 'Select all activities',
   'select-activity': 'Select activity {{activity}}',
   'back-to-activities': 'Back to Activities',
+  'start-activity-like-this-one': 'Start Activity Like This One',
 };

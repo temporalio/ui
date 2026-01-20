@@ -47,12 +47,13 @@
       {translate('activities.standalone-activities')}
     </caption>
     <TableHeaderRow slot="headers">
+      <th></th>
       {#each columns as column}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
     {#each visibleItems as activity}
-      <TableRow>
+      <TableRow {activity}>
         {#each columns as column}
           <TableBodyCell {activity} {column} />
         {/each}
