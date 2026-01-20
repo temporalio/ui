@@ -81,7 +81,10 @@ describe('getWorkflowPollersWithVersions', () => {
         buildId: 'build-123',
       });
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.pollers).toHaveLength(1);
       expect(result.pollers[0]).toBe(matchingPoller);
@@ -108,7 +111,10 @@ describe('getWorkflowPollersWithVersions', () => {
         buildId: 'build-123',
       });
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.pollers).toHaveLength(1);
       expect(result.pollers[0]).toBe(pollerWithCapabilities);
@@ -134,7 +140,10 @@ describe('getWorkflowPollersWithVersions', () => {
         { deploymentName: 'deployment-v2', buildId: 'build-456' },
       );
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.pollers).toHaveLength(2);
       expect(result.pollers).toContain(workflowPoller);
@@ -158,7 +167,10 @@ describe('getWorkflowPollersWithVersions', () => {
 
       const workers = createMockWorkers([poller1, poller2]);
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.pollers).toHaveLength(2);
       expect(result.pollers).toContain(poller1);
@@ -174,7 +186,10 @@ describe('getWorkflowPollersWithVersions', () => {
       const poller = createMockPoller('deployment-v1', 'build-123');
       const workers = createMockWorkers([poller]);
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.pollers).toHaveLength(1);
       expect(result.currentDeployment).toBeUndefined();
@@ -189,7 +204,10 @@ describe('getWorkflowPollersWithVersions', () => {
       );
       const workers = createMockWorkers([]);
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.pollers).toHaveLength(0);
     });
@@ -202,7 +220,10 @@ describe('getWorkflowPollersWithVersions', () => {
       );
       const workers = undefined as unknown as TaskQueueResponse;
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.pollers).toHaveLength(0);
       expect(result.currentDeployment).toBeUndefined();
@@ -218,7 +239,10 @@ describe('getWorkflowPollersWithVersions', () => {
       );
       const workers = createMockWorkers([]);
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result).toBeDefined();
     });
@@ -237,7 +261,10 @@ describe('getWorkflowPollersWithVersions', () => {
       const workers = createMockWorkers([problematicPoller, normalPoller]);
 
       expect(() => {
-        const result = getWorkflowPollersWithVersions(workflow, workers);
+        const result = getWorkflowPollersWithVersions(
+          workflow.searchAttributes.indexedFields,
+          workers,
+        );
         expect(result.pollers).toBeDefined();
       }).not.toThrow();
     });
@@ -254,7 +281,10 @@ describe('getWorkflowPollersWithVersions', () => {
 
       const workers = createMockWorkers([incompletePoller]);
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.pollers).toHaveLength(0);
     });
@@ -274,7 +304,10 @@ describe('getWorkflowPollersWithVersions', () => {
         { deploymentName: 'ramping-deployment', buildId: 'v2' },
       );
 
-      const result = getWorkflowPollersWithVersions(workflow, workers);
+      const result = getWorkflowPollersWithVersions(
+        workflow.searchAttributes.indexedFields,
+        workers,
+      );
 
       expect(result.currentDeployment).toBe('current-deployment');
       expect(result.currentBuildId).toBe('v1');

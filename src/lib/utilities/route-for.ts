@@ -121,6 +121,38 @@ export const routeForStartStandaloneActivity = (
   return toURL(`${routeForStandaloneActivities(parameters)}/start`, params);
 };
 
+const routeForStandaloneActivityBase = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return resolve(`${routeForStandaloneActivities(parameters)}/[activityId]`, {
+    activityId: parameters.activityId,
+  });
+};
+
+export const routeForStandaloneActivityDetails = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return `${routeForStandaloneActivityBase(parameters)}/details`;
+};
+
+export const routeForStandaloneActivityWorkers = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return `${routeForStandaloneActivityBase(parameters)}/workers`;
+};
+
+export const routeForStandaloneActivitySearchAttributes = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return `${routeForStandaloneActivityBase(parameters)}/search-attributes`;
+};
+
+export const routeForStandaloneActivityMetadata = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return `${routeForStandaloneActivityBase(parameters)}/metadata`;
+};
+
 type StartWorkflowParameters = NamespaceParameter &
   Partial<{
     workflowId: string;
