@@ -46,19 +46,13 @@
     <caption class="sr-only" slot="caption">
       {translate('activities.standalone-activities')}
     </caption>
-    <TableHeaderRow
-      columnsCount={columns.length}
-      empty={visibleItems.length === 0}
-      slot="headers"
-      let:visibleItems
-      activities={visibleItems}
-    >
+    <TableHeaderRow slot="headers">
       {#each columns as column}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
     {#each visibleItems as activity}
-      <TableRow {activity}>
+      <TableRow>
         {#each columns as column}
           <TableBodyCell {activity} {column} />
         {/each}
