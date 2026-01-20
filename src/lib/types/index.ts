@@ -286,6 +286,7 @@ export type SettingsResponse = {
     DefaultErrorMessage?: string;
     DefaultErrorLink?: string;
   };
+  Environment: { Name: string };
   DefaultNamespace: string;
   DisableWriteActions: boolean;
   WorkflowTerminateDisabled: boolean;

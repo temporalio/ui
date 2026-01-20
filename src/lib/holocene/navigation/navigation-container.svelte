@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { resolve } from '$app/paths';
@@ -12,14 +13,25 @@
   import { navOpen } from '$lib/stores/nav-open';
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
-    isCloud?: boolean;
+    isCloud: boolean;
+    environmentName?: string;
+    children?: Snippet;
+    bottom?: Snippet;
   }
-
-  let { isCloud = false, ...restProps }: Props = $props();
+  let {
+    isCloud = false,
+    environmentName = '',
+    children,
+    bottom,
+    ...restProps
+  }: Props = $props();
 
   const toggle = () => ($navOpen = !$navOpen);
 
-  let version = $derived(page.data?.settings?.version ?? '');
+  const version = $derived(page.data?.settings?.version ?? '');
+  const showEnvironmentName = $derived(
+    !isCloud && environmentName && environmentName.trim().length > 0,
+  );
 </script>
 
 <nav
@@ -28,7 +40,7 @@
     'focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-primary/70 focus-visible:[&_a]:outline-none focus-visible:[&_a]:ring-2 focus-visible:[&_a]:ring-primary/70',
     isCloud
       ? 'bg-gradient-to-b from-indigo-600 to-indigo-950 text-off-white focus-visible:[&_[role=button]]:outline-none focus-visible:[&_[role=button]]:ring-2 focus-visible:[&_[role=button]]:ring-success focus-visible:[&_a]:ring-success'
-      : 'surface-black',
+      : environmentName || 'surface-black',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
   data-testid="navigation-header"
@@ -39,9 +51,16 @@
   >
     <a href={resolve('', {})} class="flex w-fit items-center gap-1 text-nowrap">
       <Logo height={24} width={24} class="m-1" />
-      <p class="text-base font-medium group-data-[nav=closed]:hidden">
-        {isCloud ? 'Cloud' : 'Self-Hosted'}
-      </p>
+      <div>
+        <p class="text-base font-medium group-data-[nav=closed]:hidden">
+          {isCloud ? 'Cloud' : 'Self-Hosted'}
+        </p>
+        {#if showEnvironmentName}
+          <p class="font-mono text-xs group-data-[nav=closed]:hidden">
+            {environmentName.toUpperCase()}
+          </p>
+        {/if}
+      </div>
     </a>
     <button
       title={$navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
@@ -54,15 +73,29 @@
     </button>
   </div>
   <div role="list">
-    <slot />
+    {@render children?.()}
   </div>
   <div class="self-end">
-    <slot name="bottom" />
+    {@render bottom?.()}
     <div
-      class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-300"
+      class="self-center justify-self-center py-3 text-center text-[0.6rem] text-slate-100"
     >
       <span class="sr-only">{translate('common.version')}</span>
       {version}
     </div>
   </div>
 </nav>
+
+<style lang="postcss">
+  .development {
+    @apply surface-development;
+  }
+
+  .staging {
+    @apply surface-staging;
+  }
+
+  .test {
+    @apply surface-test;
+  }
+</style>

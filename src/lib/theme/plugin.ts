@@ -162,6 +162,18 @@ const temporal = plugin(
         backgroundColor: css('--color-surface-black'),
         color: css('--color-text-white'),
       },
+      '.surface-development': {
+        backgroundColor: css('--color-surface-development'),
+        color: css('--color-text-white'),
+      },
+      '.surface-test': {
+        backgroundColor: css('--color-surface-test'),
+        color: css('--color-text-white'),
+      },
+      '.surface-staging': {
+        backgroundColor: css('--color-surface-staging'),
+        color: css('--color-text-white'),
+      },
     });
   },
   {

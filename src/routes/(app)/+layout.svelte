@@ -4,6 +4,7 @@
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/state';
 
+  import BottomNavNamespaces from '$lib/components/bottom-nav-namespaces.svelte';
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
@@ -24,6 +25,7 @@
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
+  import { setValidEnvironmentName } from '$lib/utilities/environment-name';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
@@ -35,6 +37,7 @@
     routeForWorkerDeployments,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
+  import ziggy from '$lib/vendor/ziggy-full-face.png';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
@@ -45,6 +48,10 @@
   let { children }: Props = $props();
 
   let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
+  let environmentName = $derived(
+    setValidEnvironmentName(page.data?.settings?.buildEnvironment?.name),
+  );
+
   let activeNamespaceName = $derived(
     page.params?.namespace ?? $lastUsedNamespace,
   );
@@ -252,16 +259,17 @@
     position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud}>
-      <NavigationItem
-        link={page.data?.settings?.feedbackURL ||
-          'https://github.com/temporalio/ui/issues/new/choose'}
-        label={translate('common.feedback')}
-        icon="feedback"
-        tooltip={translate('common.feedback')}
-        external
-        slot="bottom"
-      />
+    <SideNavigation {linkList} {isCloud} {environmentName}>
+      {#snippet bottomActions()}
+        <NavigationItem
+          link={page.data?.settings?.feedbackURL ||
+            'https://github.com/temporalio/ui/issues/new/choose'}
+          label={translate('common.feedback')}
+          icon="feedback"
+          tooltip={translate('common.feedback')}
+          external
+        />
+      {/snippet}
     </SideNavigation>
   </div>
   <MainContentContainer>
@@ -274,22 +282,33 @@
       {/snippet}
       <UserMenu {logout} />
     </TopNavigation>
-    <div
-      slot="main"
-      class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
-    >
-      <ErrorBoundary>
-        {@render children()}
-      </ErrorBoundary>
-    </div>
-    <BottomNavigation
-      slot="footer"
-      {linkList}
-      {namespaceList}
-      {isCloud}
-      {showNamespacePicker}
-    >
-      <UserMenuMobile {logout} />
-    </BottomNavigation>
+    {#snippet main()}
+      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+        <ErrorBoundary>
+          {@render children()}
+        </ErrorBoundary>
+      </div>
+    {/snippet}
+    {#snippet footer()}
+      <BottomNavigation
+        {linkList}
+        {namespaceList}
+        {isCloud}
+        {showNamespacePicker}
+        {environmentName}
+      >
+        <UserMenuMobile {logout} />
+        {#snippet namespacePicker({ open })}
+          <BottomNavNamespaces {open} {namespaceList} />
+        {/snippet}
+        {#snippet avatar()}
+          <img
+            src={ziggy}
+            alt={translate('common.user-profile')}
+            class="h-[32px] w-[32px]"
+          />
+        {/snippet}
+      </BottomNavigation>
+    {/snippet}
   </MainContentContainer>
 </div>
