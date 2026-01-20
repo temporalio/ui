@@ -15,7 +15,7 @@
   import { translate } from '$lib/i18n/translate';
   import { activityRefresh } from '$lib/stores/activities';
   import { activityFilters } from '$lib/stores/filters';
-  import { savedActivityNavOpen } from '$lib/stores/nav-open';
+  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     DEFAULT_ACTIVITY_SYSTEM_VIEW,
@@ -226,7 +226,7 @@
   };
 
   const onQueryBtnEnter = (e: MouseEvent, name: string) => {
-    if ($savedActivityNavOpen) return;
+    if ($savedQueryNavOpen) return;
     const el = e.currentTarget as HTMLElement;
     tooltipText = name;
     positionTooltipFrom(el);
@@ -247,7 +247,7 @@
 <div
   class={merge(
     'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
-    $savedActivityNavOpen
+    $savedQueryNavOpen
       ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
       : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
   )}
@@ -259,10 +259,10 @@
     <div
       class={merge(
         'flex w-full items-center justify-between',
-        $savedActivityNavOpen ? 'lg:justify-between' : 'lg:justify-center',
+        $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
       )}
     >
-      {#if $savedActivityNavOpen}
+      {#if $savedQueryNavOpen}
         <p
           class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
           in:slide
@@ -273,13 +273,13 @@
       <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
       <button
         class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
-        aria-label={$savedActivityNavOpen
+        aria-label={$savedQueryNavOpen
           ? 'Collapse saved views'
           : 'Expand saved views'}
-        title={$savedActivityNavOpen ? 'Collapse' : 'Expand'}
-        onclick={() => ($savedActivityNavOpen = !$savedActivityNavOpen)}
+        title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
+        onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
       >
-        <Icon name={$savedActivityNavOpen ? 'chevron-left' : 'chevron-right'} />
+        <Icon name={$savedQueryNavOpen ? 'chevron-left' : 'chevron-right'} />
       </button>
     </div>
   </div>
@@ -296,7 +296,7 @@
       </div>
     </div>
 
-    {#if $savedActivityNavOpen}
+    {#if $savedQueryNavOpen}
       <p
         class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
         in:slide
@@ -337,7 +337,7 @@
       <p
         class={merge(
           ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
-          !$savedActivityNavOpen && 'lg:pl-1 lg:text-center',
+          !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
         )}
       >
         No Views
@@ -383,11 +383,11 @@
         name={view.icon || 'bookmark'}
         class={merge(
           'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-          $savedActivityNavOpen ? 'lg:hidden' : '',
+          $savedQueryNavOpen ? 'lg:hidden' : '',
         )}
       />
 
-      {#if $savedActivityNavOpen}
+      {#if $savedQueryNavOpen}
         <span
           class="hidden truncate text-left text-sm font-normal lg:inline-block"
           in:slide>{view.name}</span
@@ -406,7 +406,7 @@
         in:slide
         class={merge(
           'flex flex-col items-center gap-1 pt-0.5 transition-all',
-          $savedActivityNavOpen && 'lg:flex-row',
+          $savedQueryNavOpen && 'lg:flex-row',
         )}
       >
         {#if view.id === activeQueryView?.id && view.query !== query}
@@ -439,7 +439,7 @@
           variant="ghost"
           data-testid="share-view-button"
           on:click={handleCopy}
-          ><span class={merge('hidden', $savedActivityNavOpen && 'lg:inline')}
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
             >Share</span
           ></Button
         >
@@ -461,9 +461,9 @@
           ><span
             class={merge(
               'inline lg:hidden',
-              !$savedActivityNavOpen && 'lg:inline',
+              !$savedQueryNavOpen && 'lg:inline',
             )}>New</span
-          ><span class={merge('hidden', $savedActivityNavOpen && 'lg:inline')}
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
             >Save as New</span
           ></Button
         >

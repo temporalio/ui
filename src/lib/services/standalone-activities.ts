@@ -8,7 +8,6 @@ import type {
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
 import { encodePayloads } from '$lib/utilities/encode-payload';
-import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
   type ErrorCallback,
@@ -28,12 +27,6 @@ export type PaginatedActivitiesPromise = (
   token?: string,
 ) => Promise<{ items: ActivityExecutionInfo[]; nextPageToken: string }>;
 
-let hideActivityQueryErrors = false;
-
-export const setHideActivityQueryErrors = (hide: boolean) => {
-  hideActivityQueryErrors = hide;
-};
-
 export const fetchPaginatedActivities = async (
   namespace: string,
   query: string = '',
@@ -43,19 +36,13 @@ export const fetchPaginatedActivities = async (
     activityError.set('');
 
     const onError: ErrorCallback = (err) => {
-      handleUnauthorizedOrForbiddenError(err);
-
-      if (hideActivityQueryErrors) {
-        activityError.set(translate('activities.activities-error-querying'));
-      } else {
-        activityError.set(
-          err?.body?.message ||
-            translate('activities.activities-error-querying'),
-        );
-      }
+      activityError.set(
+        err?.body?.message || translate('activities.activities-error-querying'),
+      );
     };
 
     const route = routeForApi('standalone-activities', { namespace });
+
     return requestFromAPI<ListActivitiesResponse>(route, {
       params: {
         pageSize: String(pageSize),
@@ -65,7 +52,8 @@ export const fetchPaginatedActivities = async (
       request,
       onError,
       handleError: onError,
-    }).then(({ executions = [], nextPageToken = '' }) => {
+    }).then((response) => {
+      const { executions = [], nextPageToken = '' } = response || {};
       return {
         items: executions,
         nextPageToken: nextPageToken ? String(nextPageToken) : '',

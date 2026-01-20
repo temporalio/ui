@@ -19,6 +19,7 @@ export const Strings = {
   'standalone-activities': 'Standalone Activities',
   'start-standalone-activity': 'Start Standalone Activity',
   'activities-error-querying': 'Error querying activities',
+  'activity-query-error-state': 'Error Filtering Activities',
   'activities-plural_one': 'Activity',
   'activities-plural_other': 'Activities',
   'all-activities': 'All Activities',

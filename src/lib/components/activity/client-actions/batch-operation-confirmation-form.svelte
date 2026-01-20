@@ -1,6 +1,7 @@
 <script lang="ts">
   import { derived, type Readable } from 'svelte/store';
 
+  import type { Snippet } from 'svelte';
   import { getContext } from 'svelte';
 
   import Input from '$lib/holocene/input/input.svelte';
@@ -13,12 +14,25 @@
   } from '$lib/pages/activities-with-search.svelte';
   import { activitiesQuery } from '$lib/stores/activities';
 
-  export let action: Action;
-  export let reason: string;
-  export let jobId: string;
-  export let reasonPlaceholder: string;
-  export let jobIdPlaceholder: string;
-  export let jobIdValid: boolean;
+  interface Props {
+    action: Action;
+    reason: string;
+    jobId: string;
+    reasonPlaceholder: string;
+    jobIdPlaceholder: string;
+    jobIdValid: boolean;
+    children?: Snippet;
+  }
+
+  let {
+    action,
+    reason = $bindable(),
+    jobId = $bindable(),
+    reasonPlaceholder,
+    jobIdPlaceholder,
+    jobIdValid = $bindable(),
+    children,
+  }: Props = $props();
 
   const {
     allSelected,
@@ -28,9 +42,6 @@
   } = getContext<ActivityBatchOperationContext>(
     ACTIVITY_BATCH_OPERATION_CONTEXT,
   );
-
-  $: actionText = getActionText(action);
-  $: operableActivitiesCount = getOperableActivitiesCount(action);
 
   const getActionText = (action: Action): string => {
     switch (action) {
@@ -59,8 +70,13 @@
     );
   };
 
-  const handleJobIdChange = (event: Event & { target: HTMLInputElement }) => {
-    jobIdValid = /^[\w.~-]*$/.test(event.target.value);
+  const actionText = $derived(getActionText(action));
+  const operableActivitiesCount = $derived(getOperableActivitiesCount(action));
+
+  const handleJobIdChange = (
+    event: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ) => {
+    jobIdValid = /^[\w.~-]*$/.test(event.currentTarget.value);
   };
 </script>
 
@@ -120,5 +136,5 @@
     on:input={handleJobIdChange}
     valid={jobIdValid}
   />
-  <slot />
+  {@render children?.()}
 </div>

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
-
   import { getContext } from 'svelte';
 
   import Modal from '$lib/holocene/modal.svelte';
@@ -20,34 +18,41 @@
 
   import BatchOperationConfirmationModalBody from './batch-operation-confirmation-form.svelte';
 
-  export let namespace: string;
-  export let open: boolean;
+  interface Props {
+    namespace: string;
+    open: boolean;
+  }
+
+  let { namespace, open = $bindable() }: Props = $props();
+
   const identity = getIdentity();
-  const reason = writable('');
   const reasonPlaceholder = getPlaceholder(Action.Terminate, identity);
-  const jobId = writable('');
-  const jobIdValid = writable(true);
-  let jobIdPlaceholder = crypto.randomUUID();
-  let error = '';
+  let reason = $state('');
+  let jobId = $state('');
+  let jobIdValid = $state(true);
+  let jobIdPlaceholder = $state(crypto.randomUUID());
+  let error = $state('');
 
   const { allSelected, terminableActivities } =
     getContext<ActivityBatchOperationContext>(ACTIVITY_BATCH_OPERATION_CONTEXT);
 
   const resetForm = () => {
-    $reason = '';
-    $jobId = '';
-    $jobIdValid = true;
+    reason = '';
+    jobId = '';
+    jobIdValid = true;
     jobIdPlaceholder = crypto.randomUUID();
   };
 
-  $: if (open) resetForm();
+  $effect(() => {
+    if (open) resetForm();
+  });
 
   const terminateActivities = async () => {
     error = '';
     const options = {
       namespace,
-      reason: $reason ? `${$reason} ${reasonPlaceholder}` : reasonPlaceholder,
-      jobId: $jobId || jobIdPlaceholder,
+      reason: reason ? `${reason} ${reasonPlaceholder}` : reasonPlaceholder,
+      jobId: jobId || jobIdPlaceholder,
       ...($allSelected
         ? { query: $activitiesQuery }
         : { activities: $terminableActivities }),
@@ -84,9 +89,9 @@
   </h3>
   <svelte:fragment slot="content">
     <BatchOperationConfirmationModalBody
-      bind:reason={$reason}
-      bind:jobId={$jobId}
-      bind:jobIdValid={$jobIdValid}
+      bind:reason
+      bind:jobId
+      bind:jobIdValid
       {jobIdPlaceholder}
       {reasonPlaceholder}
       action={Action.Terminate}

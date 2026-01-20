@@ -1,9 +1,13 @@
 <script lang="ts">
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
 
-  export let column: ConfigurableTableHeader;
+  interface Props {
+    column: ConfigurableTableHeader;
+  }
 
-  $: ({ label } = column);
+  let { column }: Props = $props();
+
+  const label = $derived(column.label);
 </script>
 
 <th data-testid="activities-summary-table-header-cell-{label}">

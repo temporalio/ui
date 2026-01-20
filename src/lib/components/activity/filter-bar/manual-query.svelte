@@ -62,7 +62,7 @@
 <div class="w-full border border-t-0 border-subtle" in:fade>
   <form onsubmit={onSearch} class="flex gap-0" transition:slide role="search">
     <Input
-      id="activity-query"
+      id="query"
       type="search"
       label={translate('workflows.search-placeholder')}
       labelHidden

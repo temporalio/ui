@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import TableEmptyState from '$lib/components/activity/activities-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -16,13 +16,19 @@
   import TableHeaderRow from './activities-summary-configurable-table/table-header-row.svelte';
   import TableRow from './activities-summary-configurable-table/table-row.svelte';
 
-  export let onClickConfigure: () => void;
+  interface Props {
+    onClickConfigure: () => void;
+  }
 
-  $: ({ namespace } = $page.params);
-  $: columns = $configurableTableColumns?.[namespace]?.activities ?? [];
-  $: query = $page.url.searchParams.get('query');
+  let { onClickConfigure }: Props = $props();
 
-  $: onFetch = () => fetchPaginatedActivities(namespace, query);
+  const namespace = $derived(page.params.namespace);
+  const columns = $derived(
+    $configurableTableColumns?.[namespace]?.activities ?? [],
+  );
+  const query = $derived(page.url.searchParams.get('query'));
+
+  const onFetch = $derived(() => fetchPaginatedActivities(namespace, query));
 </script>
 
 {#key [namespace, query, $activityRefresh]}
@@ -64,7 +70,7 @@
     <svelte:fragment slot="actions-end-additional">
       <Tooltip text="Configure Columns" top>
         <Button
-          on:click={onClickConfigure}
+          onclick={onClickConfigure}
           data-testid="activities-summary-table-configuration-button"
           size="xs"
           variant="ghost"

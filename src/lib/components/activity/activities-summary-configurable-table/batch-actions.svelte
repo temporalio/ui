@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -16,7 +16,11 @@
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
 
-  export let activities: ActivityExecutionInfo[];
+  interface Props {
+    activities: ActivityExecutionInfo[];
+  }
+
+  let { activities }: Props = $props();
 
   const {
     selectedActivities,
@@ -30,22 +34,19 @@
   );
 
   let coreUser = coreUserStore();
-  let selectedActivitiesCount: number;
 
-  $: {
-    selectedActivitiesCount = $selectedActivities?.length ?? 0;
-  }
+  const selectedActivitiesCount = $derived($selectedActivities?.length ?? 0);
 
-  $: terminateEnabled = workflowTerminateEnabled(
-    $page.data.settings,
-    $coreUser,
-    $page.params.namespace,
+  const terminateEnabled = $derived(
+    workflowTerminateEnabled(
+      page.data.settings,
+      $coreUser,
+      page.params.namespace,
+    ),
   );
 
-  $: cancelEnabled = workflowCancelEnabled(
-    $page.data.settings,
-    $coreUser,
-    $page.params.namespace,
+  const cancelEnabled = $derived(
+    workflowCancelEnabled(page.data.settings, $coreUser, page.params.namespace),
   );
 </script>
 
@@ -65,7 +66,7 @@
       ({translate('activities.select-all-leading')}
       <button
         data-testid="select-all-activities"
-        on:click={() => handleSelectAll(activities)}
+        onclick={() => handleSelectAll(activities)}
         class="cursor-pointer underline"
         ><Translate
           key="activities.select-all"
@@ -84,7 +85,7 @@
       class="focus-visible:border-table"
       data-testid="activity-bulk-cancel-button"
       disabled={!$cancelableActivities.length}
-      on:click={openBatchCancelConfirmationModal}
+      onclick={openBatchCancelConfirmationModal}
       >{translate('workflows.request-cancellation')}</Button
     >
   {/if}
@@ -94,7 +95,7 @@
       variant="destructive"
       class="focus-visible:border-table"
       data-testid="activity-bulk-terminate-button"
-      on:click={openBatchTerminateConfirmationModal}
+      onclick={openBatchTerminateConfirmationModal}
       >{translate('workflows.terminate')}</Button
     >
   {/if}

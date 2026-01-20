@@ -2,7 +2,11 @@
   import Button from '$lib/holocene/button.svelte';
   import { activityRefresh } from '$lib/stores/activities';
 
-  export let count = 0;
+  interface Props {
+    count?: number;
+  }
+
+  let { count = 0 }: Props = $props();
 </script>
 
 <Button

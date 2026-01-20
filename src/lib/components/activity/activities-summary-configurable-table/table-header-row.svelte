@@ -12,9 +12,13 @@
 
   import BatchActions from './batch-actions.svelte';
 
-  export let activities: ActivityExecutionInfo[];
-  export let empty: boolean;
-  export let columnsCount: number;
+  interface Props {
+    activities: ActivityExecutionInfo[];
+    empty: boolean;
+    columnsCount: number;
+  }
+
+  let { activities, empty, columnsCount }: Props = $props();
 
   const {
     handleSelectPage,
@@ -25,15 +29,18 @@
     ACTIVITY_BATCH_OPERATION_CONTEXT,
   );
 
-  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
+  const handleCheckboxChange = (
+    event: CustomEvent<{ checked: boolean }>,
+  ): void => {
     const { checked } = event.detail;
     handleSelectPage(checked, activities);
   };
 
-  $: indeterminate =
+  const indeterminate = $derived(
     $selectedActivities.length > 0 &&
-    $selectedActivities.length < activities.length;
-  $: label = translate('activities.select-all-activities');
+      $selectedActivities.length < activities.length,
+  );
+  const label = $derived(translate('activities.select-all-activities'));
 </script>
 
 <tr>

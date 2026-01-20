@@ -10,15 +10,21 @@
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
 
-  export let activity: ActivityExecutionInfo | undefined = undefined;
-  export let empty = false;
+  interface Props {
+    activity?: ActivityExecutionInfo;
+    empty?: boolean;
+  }
+
+  let { activity = undefined, empty = false }: Props = $props();
 
   const { allSelected, selectedActivities } =
     getContext<ActivityBatchOperationContext>(ACTIVITY_BATCH_OPERATION_CONTEXT);
 
-  $: label = translate('activities.select-activity', {
-    activity: activity?.activityId,
-  });
+  const label = $derived(
+    translate('activities.select-activity', {
+      activity: activity?.activityId,
+    }),
+  );
 </script>
 
 <tr
