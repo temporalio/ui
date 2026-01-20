@@ -85,7 +85,7 @@
       class="focus-visible:border-table"
       data-testid="activity-bulk-cancel-button"
       disabled={!$cancelableActivities.length}
-      onclick={openBatchCancelConfirmationModal}
+      on:click={openBatchCancelConfirmationModal}
       >{translate('workflows.request-cancellation')}</Button
     >
   {/if}
@@ -95,7 +95,7 @@
       variant="destructive"
       class="focus-visible:border-table"
       data-testid="activity-bulk-terminate-button"
-      onclick={openBatchTerminateConfirmationModal}
+      on:click={openBatchTerminateConfirmationModal}
       >{translate('workflows.terminate')}</Button
     >
   {/if}
