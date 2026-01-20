@@ -1,9 +1,12 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   interface Props {
     empty?: boolean;
+    children?: Snippet;
   }
 
-  let { empty = false }: Props = $props();
+  let { empty = false, children }: Props = $props();
 </script>
 
 <tr
@@ -11,6 +14,5 @@
   class:empty
   class="dense"
 >
-  <td></td>
-  <slot />
+  {@render children?.()}
 </tr>
