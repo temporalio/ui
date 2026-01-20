@@ -176,6 +176,7 @@ export function pathForApi(
     'worker-deployment-version': `/namespaces/${parameters.namespace}/worker-deployment-versions/${parameters.version}`,
     'standalone-activity': `/namespaces/${parameters.namespace}/activities/${parameters.activityId}`,
     'standalone-activities': `/namespaces/${parameters.namespace}/activities`,
+    'standalone-activities.count': `/namespaces/${parameters.namespace}/activity-count`,
   };
 
   return getPath(routes[route]);

@@ -2,8 +2,10 @@
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
-  import ActivityExecutions from '$lib/pages/activity-executions.svelte';
+  import ActivitiesWithSearch from '$lib/pages/activities-with-search.svelte';
+  import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
 </script>
@@ -13,4 +15,10 @@
   url={page.url.href}
 />
 
-<ActivityExecutions {namespace} />
+<ActivitiesWithSearch>
+  {#snippet headerActions()}
+    <Button href={routeForStartStandaloneActivity({ namespace })}>
+      {translate('activities.start-standalone-activity')}
+    </Button>
+  {/snippet}
+</ActivitiesWithSearch>

@@ -152,3 +152,52 @@ export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
         return indexA - indexB;
       });
   });
+
+export const activitySearchAttributeOptions: SearchAttributeOption[] = [
+  {
+    label: 'ExecutionStatus',
+    value: 'ExecutionStatus',
+    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  },
+  {
+    label: 'ActivityId',
+    value: 'ActivityId',
+    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  },
+  {
+    label: 'ActivityType',
+    value: 'ActivityType',
+    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  },
+  { label: 'RunId', value: 'RunId', type: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
+  {
+    label: 'TaskQueue',
+    value: 'TaskQueue',
+    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  },
+  {
+    label: 'StartTime',
+    value: 'StartTime',
+    type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  },
+  {
+    label: 'ExecutionTime',
+    value: 'ExecutionTime',
+    type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  },
+  {
+    label: 'CloseTime',
+    value: 'CloseTime',
+    type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  },
+  {
+    label: 'ExecutionDuration',
+    value: 'ExecutionDuration',
+    type: SEARCH_ATTRIBUTE_TYPE.INT,
+  },
+  {
+    label: 'StateTransitionCount',
+    value: 'StateTransitionCount',
+    type: SEARCH_ATTRIBUTE_TYPE.INT,
+  },
+];

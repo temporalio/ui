@@ -21,16 +21,17 @@ An array of custom `Units` can be passed if more options are needed. A `Unit` is
 
 ```svelte
 <script lang="ts">
-  import DurationInput, { type Units } from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput, {
+    type Units,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
 
   const customUnits: Units<'day(s)' | 'week(s)'> = [
-    { label: 'day(s)', convert: (n) => (n * 60 * 60 * 24) },
-    { label: 'week(s)', convert: (n) => (n * 60 * 60 * 24 * 7) }
+    { label: 'day(s)', convert: (n) => n * 60 * 60 * 24 },
+    { label: 'week(s)', convert: (n) => n * 60 * 60 * 24 * 7 },
   ];
 
   let duration = $state('');
 </script>
-
 
 <DurationInput
   label="Duration"
@@ -42,7 +43,6 @@ An array of custom `Units` can be passed if more options are needed. A `Unit` is
 ```
 
 The `<DurationInput />` Props interface is generic, such that the type of the `initialUnit` prop can be inferred based on the array of `Units` passed in:
-
 
 ```svelte
 <script lang="ts">

@@ -84,3 +84,45 @@ export const savedWorkflowQueries = persistStore<Record<string, SavedQuery[]>>(
   {},
   true,
 );
+
+// Activity-specific saved queries
+export const DEFAULT_ACTIVITY_SYSTEM_VIEW: SavedQuery = {
+  id: 'all',
+  name: 'All Activities',
+  query: '',
+  icon: 'activity',
+  type: 'system',
+};
+
+export const systemActivityViews: SavedQuery[] = [
+  DEFAULT_ACTIVITY_SYSTEM_VIEW,
+  {
+    id: 'running',
+    name: 'Running',
+    query: '`ExecutionStatus`="Running"',
+    icon: 'heartbeat',
+    type: 'system',
+  },
+  {
+    id: 'completed',
+    name: 'Completed',
+    query: '`ExecutionStatus`="Completed"',
+    icon: 'circle-check',
+    type: 'system',
+  },
+  {
+    id: 'failed',
+    name: 'Failed',
+    query: '`ExecutionStatus`="Failed"',
+    icon: 'error',
+    type: 'system',
+  },
+];
+
+export const MAX_SAVED_ACTIVITY_QUERIES = 20;
+
+export const savedActivityQueries = persistStore<Record<string, SavedQuery[]>>(
+  'saved-activity-queries',
+  {},
+  true,
+);
