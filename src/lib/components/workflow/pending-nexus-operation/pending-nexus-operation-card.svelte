@@ -88,6 +88,18 @@
           operation.scheduleToCloseTimeout as string,
         )}
       {/if}
+      {#if operation.scheduleToStartTimeout}
+        {@render detail(
+          translate('workflows.schedule-to-start-timeout'),
+          operation.scheduleToCloseTimeout as string,
+        )}
+      {/if}
+      {#if operation.startToCloseTimeout}
+        {@render detail(
+          translate('workflows.start-to-close-timeout'),
+          operation.startToCloseTimeout as string,
+        )}
+      {/if}
     </div>
     <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
