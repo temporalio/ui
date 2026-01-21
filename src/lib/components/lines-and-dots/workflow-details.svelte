@@ -3,6 +3,7 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
@@ -109,10 +110,7 @@
 <DetailList aria-label="workflow details" rowCount={5}>
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
   <DetailListTextValue
-    text={formatDate(workflow?.startTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    })}
+    text={timestamp(workflow?.startTime)}
     tooltipText={formatDate(workflow?.startTime, $timeFormat, {
       relative: !$relativeTime,
       format: $timestampFormat,
@@ -122,10 +120,7 @@
   {#if workflow?.startDelay}
     <DetailListLabel>{translate('workflows.execution-start')}</DetailListLabel>
     <DetailListTextValue
-      text={formatDate(workflow?.executionTime, $timeFormat, {
-        relative: $relativeTime,
-        format: $timestampFormat,
-      })}
+      text={timestamp(workflow?.executionTime)}
       tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
         relative: !$relativeTime,
         format: $timestampFormat,
@@ -135,12 +130,7 @@
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
   <DetailListTextValue
-    text={workflow?.endTime
-      ? formatDate(workflow?.endTime, $timeFormat, {
-          relative: $relativeTime,
-          format: $timestampFormat,
-        })
-      : '-'}
+    text={workflow?.endTime ? timestamp(workflow?.endTime) : '-'}
     tooltipText={formatDate(workflow?.endTime, $timeFormat, {
       relative: !$relativeTime,
       format: $timestampFormat,

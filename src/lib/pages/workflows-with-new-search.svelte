@@ -46,6 +46,7 @@
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import SavedQueryViews from '$lib/pages/saved-query-views.svelte';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
@@ -53,17 +54,11 @@
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
-  import {
     refresh,
     workflowCount,
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
-  import { formatDate } from '$lib/utilities/format-date';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
@@ -75,12 +70,7 @@
 
   let refreshTime = $state(new Date());
 
-  const refreshTimeFormatted = $derived(
-    formatDate(refreshTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    }),
-  );
+  const refreshTimeFormatted = $derived(timestamp(refreshTime));
 
   const availableColumns = $derived(
     availableWorkflowSystemSearchAttributeColumns(

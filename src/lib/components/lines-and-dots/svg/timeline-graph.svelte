@@ -3,14 +3,13 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { activeGroupHeight, activeGroups } from '$lib/stores/active-events';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
-  import { timeFormat } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
-  import { formatDate } from '$lib/utilities/format-date';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
   import { TimelineConfig } from '../constants';
@@ -77,10 +76,10 @@
     >
       <div class="flex w-full justify-between text-xs">
         <p class="w-60 -translate-x-24 rotate-90">
-          {formatDate(startTime, $timeFormat, { format: 'short' })}
+          {timestamp(startTime, 'short')}
         </p>
         <p class="w-60 translate-x-24 rotate-90">
-          {formatDate(endTime, $timeFormat, { format: 'short' })}
+          {timestamp(endTime, 'short')}
         </p>
       </div>
     </div>
