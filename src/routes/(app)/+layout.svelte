@@ -253,15 +253,16 @@
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud}>
-      <NavigationItem
-        link={page.data?.settings?.feedbackURL ||
-          'https://github.com/temporalio/ui/issues/new/choose'}
-        label={translate('common.feedback')}
-        icon="feedback"
-        tooltip={translate('common.feedback')}
-        external
-        slot="bottom"
-      />
+      {#snippet bottom()}
+        <NavigationItem
+          link={page.data?.settings?.feedbackURL ||
+            'https://github.com/temporalio/ui/issues/new/choose'}
+          label={translate('common.feedback')}
+          icon="feedback"
+          tooltip={translate('common.feedback')}
+          external
+        />
+      {/snippet}
     </SideNavigation>
   </div>
   <MainContentContainer>

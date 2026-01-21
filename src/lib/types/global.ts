@@ -145,15 +145,19 @@ export type BooleanString = 'true' | 'false';
 
 export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
-export type NavLinkListItem = {
-  href: string;
-  icon: IconName;
-  label: string;
-  tooltip?: string;
-  external?: boolean;
-  divider?: boolean;
-  enabled?: boolean;
-  hidden?: boolean;
-  animate?: boolean;
-  isActive?: (path: string) => boolean;
-};
+export type NavLinkListItem =
+  | {
+      href: string;
+      icon: IconName;
+      label: string;
+      tooltip?: string;
+      external?: boolean;
+      divider?: boolean;
+      enabled?: boolean;
+      hidden?: boolean;
+      animate?: boolean;
+      isActive?: (path: string) => boolean;
+    }
+  | {
+      divider: true;
+    };
