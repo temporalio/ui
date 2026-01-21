@@ -21,6 +21,8 @@
     nameRegexPattern?: RegExp;
     nameHintText?: string;
     cancelHref?: string;
+    successHref?: string;
+    deleteSuccessHref?: string;
   };
 
   let {
@@ -35,6 +37,8 @@
     nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
     nameHintText = translate('nexus.endpoint-name-hint-with-dash'),
     cancelHref = '/nexus',
+    successHref: _successHref = undefined,
+    deleteSuccessHref: _deleteSuccessHref = undefined,
   }: Props = $props();
 
   let deleteConfirmationModalOpen = $state(false);

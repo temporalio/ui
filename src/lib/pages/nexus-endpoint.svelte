@@ -17,10 +17,12 @@
     endpoint,
     editDisabled = false,
     taskQueueStatus,
+    editHref,
   }: {
     endpoint: Endpoint;
     editDisabled?: boolean;
     taskQueueStatus?: Snippet;
+    editHref?: string;
   } = $props();
 </script>
 
@@ -31,7 +33,7 @@
         {endpoint.spec?.name || ''}
       </h1>
       <Button
-        href={routeForNexusEndpointEdit(endpoint.id!)}
+        href={editHref ?? routeForNexusEndpointEdit(endpoint.id!)}
         disabled={editDisabled}>{translate('common.edit')}</Button
       >
     </div>
