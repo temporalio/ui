@@ -7,14 +7,9 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import type { PendingNexusOperation } from '$lib/types/events';
-  import { formatDate } from '$lib/utilities/format-date';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -50,19 +45,9 @@
     }),
   );
 
-  let eventTime = $derived(
-    formatDate(group?.eventTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    }),
-  );
+  let eventTime = $derived(timestamp(group?.eventTime));
 
-  let abbrEventTime = $derived(
-    formatDate(group?.eventTime, $timeFormat, {
-      relative: $relativeTime,
-      format: 'short',
-    }),
-  );
+  let abbrEventTime = $derived(timestamp(group?.eventTime, 'short'));
 
   const onLinkClick = (e: Event) => {
     e.stopPropagation();

@@ -17,17 +17,12 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { authUser } from '$lib/stores/auth-user';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
@@ -165,19 +160,9 @@
       !currentEvent?.userMetadata?.summary,
   );
 
-  const eventTime = $derived(
-    formatDate(currentEvent?.eventTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    }),
-  );
+  const eventTime = $derived(timestamp(currentEvent?.eventTime));
 
-  const abbrEventTime = $derived(
-    formatDate(currentEvent?.eventTime, $timeFormat, {
-      relative: $relativeTime,
-      format: 'short',
-    }),
-  );
+  const abbrEventTime = $derived(timestamp(currentEvent?.eventTime, 'short'));
 
   const onLinkClick = (event) => {
     expanded = !expanded;
