@@ -4,12 +4,16 @@
   import { page } from '$app/state';
 
   import ActivityExecutionHeader from '$lib/components/activity-execution/activity-execution-header.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import { activitiesSearchParams } from '$lib/stores/activities';
   import type { ActivityExecution } from '$lib/types/activity-execution';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
+    routeForStandaloneActivities,
     routeForStandaloneActivityDetails,
     routeForStandaloneActivityMetadata,
     routeForStandaloneActivitySearchAttributes,
@@ -42,10 +46,23 @@
   const metadataRoute = $derived(
     routeForStandaloneActivityMetadata(routeParameters),
   );
+
+  const activitiesHref = $derived(
+    `${routeForStandaloneActivities({ namespace })}?${$activitiesSearchParams}`,
+  );
 </script>
 
 {#if activityExecution}
   <div class="flex flex-col gap-4">
+    <div class="flex items-center gap-2">
+      <Link
+        href={activitiesHref}
+        data-testid="back-to-activities"
+        icon="chevron-left"
+      >
+        {translate('activities.back-to-activities')}
+      </Link>
+    </div>
     <ActivityExecutionHeader
       {namespace}
       activityExecutionInfo={activityExecution.info}

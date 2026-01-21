@@ -1,15 +1,66 @@
 import type { StandaloneActivityFormData } from '$lib/components/activity-execution-form/types';
+import { translate } from '$lib/i18n/translate';
+import { activityError } from '$lib/stores/activities';
 import type { Payload, SearchAttribute } from '$lib/types';
 import type {
   ActivityExecution,
+  ActivityExecutionInfo,
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-import { requestFromAPI } from '$lib/utilities/request-from-api';
+import {
+  type ErrorCallback,
+  requestFromAPI,
+} from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { setSearchAttributes } from './workflow-service';
+
+export type ListActivitiesResponse = {
+  executions: ActivityExecutionInfo[];
+  nextPageToken: string;
+};
+
+export type PaginatedActivitiesPromise = (
+  pageSize?: number,
+  token?: string,
+) => Promise<{ items: ActivityExecutionInfo[]; nextPageToken: string }>;
+
+export const fetchPaginatedActivities = async (
+  namespace: string,
+  query: string = '',
+  request = fetch,
+): Promise<PaginatedActivitiesPromise> => {
+  return (pageSize = 100, token = '') => {
+    activityError.set('');
+
+    const onError: ErrorCallback = (err) => {
+      activityError.set(
+        err?.body?.message || translate('activities.activities-error-querying'),
+      );
+    };
+
+    const route = routeForApi('standalone-activities', { namespace });
+
+    return requestFromAPI<ListActivitiesResponse>(route, {
+      params: {
+        pageSize: String(pageSize),
+        nextPageToken: token,
+        ...(query ? { query } : {}),
+      },
+      request,
+      onError,
+      handleError: onError,
+    }).then((response) => {
+      const { executions = [], nextPageToken = '' } = response || {};
+      return {
+        items: executions,
+        nextPageToken: nextPageToken ? String(nextPageToken) : '',
+      };
+    });
+  };
+};
 
 const toStartActivityExecutionRequest = async (
   activityFormData: StandaloneActivityFormData,

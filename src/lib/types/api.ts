@@ -54,7 +54,9 @@ export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
 export type WorkerDeploymentAPIRoutePath = 'worker-deployment';
 export type WorkerDeploymentVersionAPIRoutePath = 'worker-deployment-version';
-export type StandaloneActivitiesAPIRoutePath = 'standalone-activities';
+export type StandaloneActivitiesAPIRoutePath =
+  | 'standalone-activities'
+  | 'standalone-activities.count';
 export type StandaloneActivityAPIRoutePath = 'standalone-activity';
 
 export type APIRoutePath =
