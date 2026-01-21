@@ -23,6 +23,7 @@
 package route
 
 import (
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -37,6 +38,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/rpc"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 )
@@ -46,15 +48,17 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	ctx := context.Background()
 	serverCfg, err := cfgProvider.GetConfig()
 	if err != nil {
-		fmt.Printf("unable to get auth config: %s\n", err)
+		log.Printf("unable to get auth config: %s\n", err)
+		return
 	}
 
 	if !serverCfg.Auth.Enabled {
 		return
 	}
 
-	if len(serverCfg.Auth.Providers) == 0 {
-		log.Fatal(`auth providers configuration is empty. Configure an auth provider or disable auth`)
+	err = validateAuthConfig(&serverCfg.Auth)
+	if err != nil {
+		log.Fatalf("invalid auth config: %s\n", err)
 	}
 
 	providerCfg := serverCfg.Auth.Providers[0] // only single provider is currently supported
@@ -62,6 +66,22 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	if len(providerCfg.IssuerUrl) > 0 {
 		ctx = oidc.InsecureIssuerURLContext(ctx, providerCfg.IssuerUrl)
 	}
+
+	// Configure HTTP client (with timeout) and optional custom CA if provided via caFile or caData
+	httpClient := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+	if providerCfg.CaFile != "" || providerCfg.CaData != "" {
+		caCertPool, err := rpc.LoadCACert(providerCfg.CaFile, providerCfg.CaData)
+		if err != nil {
+			log.Fatalf("Unable to load auth CA certificate: %s\n", err)
+		}
+		httpClient.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{RootCAs: caCertPool},
+		}
+	}
+	ctx = oidc.ClientContext(ctx, httpClient)
+
 	provider, err := oidc.NewProvider(ctx, providerCfg.ProviderURL)
 	if err != nil {
 		log.Fatal(err)
@@ -230,4 +250,17 @@ func nonceFromString(nonce string) (*Nonce, error) {
 type Nonce struct {
 	Nonce     string `json:"nonce"`
 	ReturnURL string `json:"return_url"`
+}
+
+func validateAuthConfig(cfg *config.Auth) error {
+	if len(cfg.Providers) == 0 {
+		return fmt.Errorf(`auth providers configuration is empty. Configure an auth provider or disable auth`)
+	}
+	for _, providerCfg := range cfg.Providers {
+		if providerCfg.CaFile != "" && providerCfg.CaData != "" {
+			return fmt.Errorf("cannot specify Auth CA file and CA data at the same time")
+		}
+	}
+
+	return nil
 }
