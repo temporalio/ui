@@ -25,15 +25,15 @@ export type TimestampOptions = {
  * @example
  * ```svelte
  * <script>
- *   import { $timestamp } from '$lib/runes/timestamp.svelte';
+ *   import { timestamp } from '$lib/runes/timestamp.svelte';
  *   let date = '2024-01-20T10:30:00Z';
  * </script>
  *
- * <p>{$timestamp(date)}</p>
- * <p>{$timestamp(date, 'short')}</p>
+ * <p>{timestamp(date)}</p>
+ * <p>{timestamp(date, 'short')}</p>
  * ```
  */
-export function $timestamp(
+export function timestamp(
   date: ValidTime | undefined | null,
   overrideFormat?: TimestampFormat,
 ): string {
