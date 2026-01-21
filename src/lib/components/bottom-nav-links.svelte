@@ -13,15 +13,16 @@
     {#each linkList as item}
       {#if item.divider}
         <hr class="border-subtle" />
+      {:else}
+        <NavigationItem
+          link={item.href}
+          label={item.label}
+          icon={item.icon}
+          tooltip={item.tooltip || item.label}
+          external={item?.external}
+          animate={item?.animate}
+        />
       {/if}
-      <NavigationItem
-        link={item.href}
-        label={item.label}
-        icon={item.icon}
-        tooltip={item.tooltip || item.label}
-        external={item?.external}
-        animate={item?.animate}
-      />
     {/each}
   </div>
 {/if}
