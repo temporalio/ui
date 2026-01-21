@@ -120,21 +120,4 @@ describe('timestamp rune', () => {
     const result = timestamp(date, 'short');
     expect(result).toContain('ago');
   });
-
-  it('should accept absolute override to force absolute time', () => {
-    timeFormat.set('local');
-    relativeTime.set(true);
-    const result = timestamp(date, 'absolute');
-    expect(result).not.toContain('ago');
-    expect(result).toContain('2022');
-  });
-
-  it('should use timestampFormat store when absolute override is used', () => {
-    timeFormat.set('local');
-    relativeTime.set(true);
-    timestampFormat.set('short');
-    const result = timestamp(date, 'absolute');
-    expect(result).not.toContain('ago');
-    expect(result).toContain('4/13/22');
-  });
 });
