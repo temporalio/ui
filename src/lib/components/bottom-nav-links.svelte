@@ -11,9 +11,9 @@
     class="flex h-full flex-col-reverse justify-start gap-6 overflow-auto px-4 py-8"
   >
     {#each linkList as item}
-      {#if item.divider}
+      {#if 'divider' in item && item.divider}
         <hr class="border-subtle" />
-      {:else}
+      {:else if 'href' in item}
         <NavigationItem
           link={item.href}
           label={item.label}

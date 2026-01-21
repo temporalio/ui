@@ -18,9 +18,9 @@
 <Navigation {isCloud} {bottom} aria-label={translate('common.primary')}>
   {#snippet children()}
     {#each linkList as item}
-      {#if item.divider}
+      {#if 'divider' in item && item.divider}
         <hr class="-mx-4 my-4 border-subtle" />
-      {:else if !item.hidden}
+      {:else if 'href' in item && !item.hidden}
         <NavigationItem
           link={item.href}
           label={item.label}
