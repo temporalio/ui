@@ -7,19 +7,13 @@ import {
 } from '$lib/stores/time-format';
 import type { TimestampFormat } from '$lib/utilities/format-date';
 import { formatDate } from '$lib/utilities/format-date';
-import type { ValidTime } from '$lib/utilities/format-time';
-
-export type TimestampOptions = {
-  relative?: boolean;
-  relativeLabel?: string;
-};
+import { isFutureDate, type ValidTime } from '$lib/utilities/format-time';
 
 /**
  * Reactive date formatter that automatically uses the user's time format preferences.
  *
  * @param date - The date to format
  * @param overrideFormat - Optional format override ('short' | 'medium' | 'long')
- * @param options - Optional additional options (relative, relativeLabel)
  * @returns Formatted date string that reactively updates when time format preferences change
  *
  * @example
@@ -39,11 +33,14 @@ export function timestamp(
 ): string {
   const formattedDate = $derived.by(() => {
     const format = overrideFormat ?? get(timestampFormat);
+    const relative = get(relativeTime);
+    const relativeLabel =
+      date && relative && isFutureDate(date) ? 'from now' : 'ago';
 
     return formatDate(date, get(timeFormat), {
-      relative: get(relativeTime),
+      relative,
       format,
-      relativeLabel: get(relativeTime) ? 'ago' : '',
+      relativeLabel,
     });
   });
 

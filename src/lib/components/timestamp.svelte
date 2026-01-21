@@ -3,26 +3,17 @@
 
   import type { Snippet } from 'svelte';
 
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
-  import {
-    formatDate,
-    type FormatDateOptions,
-    type TimestampFormat,
-  } from '$lib/utilities/format-date';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
+  import type { TimestampFormat } from '$lib/utilities/format-date';
   import type { ValidTime } from '$lib/utilities/format-time';
 
   type T = $$Generic<keyof SvelteHTMLElements>;
   type DateTime = ValidTime | null | undefined;
 
-  export { timestamp };
+  export { timestampSnippet as timestamp };
 
   type Props = SvelteHTMLElements[T] & {
     dateTime: DateTime;
-    options?: FormatDateOptions;
     as?: T;
     fallback?: string;
     leading?: Snippet<[]>;
@@ -32,7 +23,6 @@
 
   let {
     dateTime,
-    options = {},
     as = undefined,
     class: className = undefined,
     fallback = undefined,
@@ -42,12 +32,8 @@
   }: Props = $props();
 </script>
 
-{#snippet timestamp(dateTime: DateTime, options: FormatDateOptions)}
-  {formatDate(dateTime, $timeFormat, {
-    relative: $relativeTime,
-    format: overrideTimestampFormat ?? $timestampFormat,
-    ...options,
-  })}
+{#snippet timestampSnippet(dateTime: DateTime)}
+  {timestamp(dateTime, overrideTimestampFormat)}
 {/snippet}
 
 {#if as}
@@ -56,11 +42,11 @@
       {@render leading()}
     {/if}
     {#if dateTime}
-      {@render timestamp(dateTime, options)}
+      {@render timestampSnippet(dateTime)}
     {:else if fallback}
       {fallback}
     {/if}
   </svelte:element>
 {:else}
-  {@render timestamp(dateTime, options)}
+  {@render timestampSnippet(dateTime)}
 {/if}

@@ -96,8 +96,6 @@ describe('timestamp rune', () => {
       currentDate.getTime() + 24 * 60 * 60 * 1000,
     ).toISOString();
     const result = timestamp(futureDate);
-    // Note: Currently shows "ago" for all relative times (future dates use negative values)
-    // This simplified behavior was intentional per user decision
-    expect(result).toContain('ago');
+    expect(result).toContain('from now');
   });
 });

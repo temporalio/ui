@@ -32,6 +32,24 @@ export function isTimestamp(arg: unknown): arg is Timestamp {
   return false;
 }
 
+/**
+ * Determines if a given date/time value represents a future moment.
+ * Handles ValidTime types including strings, numbers, Dates, and Timestamp objects.
+ *
+ * @param time - The time value to check (can be a string, Date, or Timestamp)
+ * @returns true if the time is in the future, false otherwise (including null/undefined)
+ */
+export function isFutureDate(time: ValidTime | undefined | null): boolean {
+  if (!time) return false;
+
+  try {
+    const date = isTimestamp(time) ? timestampToDate(time) : new Date(time);
+    return date > new Date();
+  } catch {
+    return false;
+  }
+}
+
 export function formatDuration(
   duration: Duration | string,
   delimiter = ', ',
