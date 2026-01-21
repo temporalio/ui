@@ -5,6 +5,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import {
     relativeTime,
     timeFormat,
@@ -61,10 +62,7 @@
       {#if operation.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          formatDate(operation.lastAttemptCompleteTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          timestamp(operation.lastAttemptCompleteTime),
         )}
       {/if}
       {#if operation.scheduledEventId}
@@ -76,10 +74,7 @@
       {#if operation.scheduledTime}
         {@render detail(
           translate('workflows.scheduled-time'),
-          formatDate(operation.scheduledTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          timestamp(operation.scheduledTime),
         )}
       {/if}
       {#if operation.scheduleToCloseTimeout}

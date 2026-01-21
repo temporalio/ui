@@ -5,15 +5,10 @@
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import type { CallbackState } from '$lib/types';
   import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
-  import { formatDate } from '$lib/utilities/format-date';
   import { routeForNamespace } from '$lib/utilities/route-for';
 
   import EventLink from '../event/event-link.svelte';
@@ -24,18 +19,8 @@
     children,
   }: { callback: Callback; link?: Link; children?: Snippet } = $props();
 
-  const completedTime = $derived(
-    formatDate(callback.lastAttemptCompleteTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    }),
-  );
-  const nextTime = $derived(
-    formatDate(callback.nextAttemptScheduleTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    }),
-  );
+  const completedTime = $derived(timestamp(callback.lastAttemptCompleteTime));
+  const nextTime = $derived(timestamp(callback.nextAttemptScheduleTime));
   const failure = $derived(callback?.lastAttemptFailure?.message);
   const blockedReason = $derived(callback?.blockedReason);
   const callbackUrl = $derived(callback?.callback?.nexus?.url);

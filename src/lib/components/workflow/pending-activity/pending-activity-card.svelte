@@ -11,6 +11,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import {
     relativeTime,
@@ -69,10 +70,7 @@
         )}
         {@render detail(
           translate('activities.paused-since'),
-          formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          timestamp(activity.pauseInfo?.pauseTime),
         )}
         {@render detail(
           translate('activities.pause-reason'),
@@ -92,10 +90,7 @@
       {#if activity.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          timestamp(activity.lastAttemptCompleteTime),
         )}
       {/if}
       {#if activity.expirationTime}
@@ -115,19 +110,13 @@
       {#if activity.lastHeartbeatTime}
         {@render detail(
           translate('workflows.last-heartbeat'),
-          formatDate(activity.lastHeartbeatTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          timestamp(activity.lastHeartbeatTime),
         )}
       {/if}
       {#if activity.lastStartedTime}
         {@render detail(
           translate('workflows.last-started-time'),
-          formatDate(activity.lastStartedTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          timestamp(activity.lastStartedTime),
         )}
       {/if}
       {#if activity.lastWorkerIdentity}

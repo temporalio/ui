@@ -7,23 +7,19 @@
   import Link from '$lib/holocene/link.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
-  import { relativeTime, timeFormat } from '$lib/stores/time-format';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
-  import { formatDate } from '$lib/utilities/format-date';
 
   let { workflow, workers } = $derived($workflowRun);
   const namespace = $derived(page.params.namespace);
   let stackTrace: Eventual<ParsedQuery> = $state();
 
   let refreshDate = $derived(
-    formatDate($refresh ? new Date($refresh) : new Date(), $timeFormat, {
-      relative: $relativeTime,
-      format: 'short',
-    }),
+    timestamp($refresh ? new Date($refresh) : new Date(), 'short'),
   );
 
   const getStackTrace = () =>
