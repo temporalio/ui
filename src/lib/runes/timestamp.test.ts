@@ -98,4 +98,26 @@ describe('timestamp rune', () => {
     const result = timestamp(futureDate);
     expect(result).toContain('from now');
   });
+
+  it('should accept relative override to force relative time', () => {
+    timeFormat.set('local');
+    relativeTime.set(false);
+    const result = timestamp(date, 'relative');
+    expect(result).toContain('ago');
+  });
+
+  it('should use timestampFormat store when relative override is used', () => {
+    timeFormat.set('local');
+    relativeTime.set(false);
+    timestampFormat.set('medium');
+    const result = timestamp(date, 'relative');
+    expect(result).toContain('ago');
+  });
+
+  it('should respect relativeTime store when using short/medium/long override', () => {
+    timeFormat.set('local');
+    relativeTime.set(true);
+    const result = timestamp(date, 'short');
+    expect(result).toContain('ago');
+  });
 });
