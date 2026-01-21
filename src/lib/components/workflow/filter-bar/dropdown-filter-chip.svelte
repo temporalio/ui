@@ -18,6 +18,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { timestamp } from '$lib/runes/timestamp.svelte';
   import {
     endDate,
     endHour,
@@ -34,7 +35,7 @@
     timeFormat,
     timeFormatType,
   } from '$lib/stores/time-format';
-  import { formatDate, getSelectedTimezone } from '$lib/utilities/format-date';
+  import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { isInConditional, isNullConditional } from '$lib/utilities/is';
   import {
     formatListFilterValue,
@@ -185,10 +186,7 @@
 
     if (isDateTimeFilter(filter)) {
       if (filter.customDate) return value.split('BETWEEN')[1];
-      return formatDate(value, $timeFormat, {
-        relative: true,
-        format: 'short',
-      });
+      return timestamp(value, 'relative');
     }
 
     if (isTextFilter(filter)) {

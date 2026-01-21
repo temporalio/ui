@@ -9,13 +9,16 @@ import type { TimestampFormat } from '$lib/utilities/format-date';
 import { formatDate } from '$lib/utilities/format-date';
 import { isFutureDate, type ValidTime } from '$lib/utilities/format-time';
 
-type TimestampOverride = TimestampFormat | 'relative';
+type TimestampOverride = TimestampFormat | 'relative' | 'absolute';
 
 /**
  * Reactive date formatter that automatically uses the user's time format preferences.
  *
  * @param date - The date to format
- * @param override - Optional override: 'relative' forces relative time, 'short'/'medium'/'long' overrides format
+ * @param override - Optional override:
+ *   - 'relative': forces relative time (e.g., "5 days ago")
+ *   - 'absolute': forces absolute time (e.g., "Jan 20, 2024")
+ *   - 'short'/'medium'/'long': overrides format while respecting relative time setting
  * @returns Formatted date string that reactively updates when time format preferences change
  *
  * @example
@@ -28,6 +31,7 @@ type TimestampOverride = TimestampFormat | 'relative';
  * <p>{timestamp(date)}</p>
  * <p>{timestamp(date, 'short')}</p>
  * <p>{timestamp(date, 'relative')}</p>
+ * <p>{timestamp(date, 'absolute')}</p>
  * ```
  */
 export function timestamp(
@@ -36,10 +40,16 @@ export function timestamp(
 ): string {
   const formattedDate = $derived.by(() => {
     const isRelativeOverride = override === 'relative';
-    const format = isRelativeOverride
-      ? get(timestampFormat)
-      : (override ?? get(timestampFormat));
-    const relative = isRelativeOverride ? true : get(relativeTime);
+    const isAbsoluteOverride = override === 'absolute';
+    const format =
+      isRelativeOverride || isAbsoluteOverride
+        ? get(timestampFormat)
+        : (override ?? get(timestampFormat));
+    const relative = isRelativeOverride
+      ? true
+      : isAbsoluteOverride
+        ? false
+        : get(relativeTime);
     const relativeLabel =
       date && relative && isFutureDate(date) ? 'from now' : 'ago';
 

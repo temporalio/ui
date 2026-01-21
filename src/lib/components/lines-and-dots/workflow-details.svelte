@@ -7,13 +7,8 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
+  import { relativeTime } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     formatDistanceAbbreviated,
     formatDuration,
@@ -111,30 +106,30 @@
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
   <DetailListTextValue
     text={timestamp(workflow?.startTime)}
-    tooltipText={formatDate(workflow?.startTime, $timeFormat, {
-      relative: !$relativeTime,
-      format: $timestampFormat,
-    })}
+    tooltipText={timestamp(
+      workflow?.startTime,
+      $relativeTime ? 'absolute' : 'relative',
+    )}
   />
 
   {#if workflow?.startDelay}
     <DetailListLabel>{translate('workflows.execution-start')}</DetailListLabel>
     <DetailListTextValue
       text={timestamp(workflow?.executionTime)}
-      tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
-        relative: !$relativeTime,
-        format: $timestampFormat,
-      })}
+      tooltipText={timestamp(
+        workflow?.executionTime,
+        $relativeTime ? 'absolute' : 'relative',
+      )}
     />
   {/if}
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
   <DetailListTextValue
     text={workflow?.endTime ? timestamp(workflow?.endTime) : '-'}
-    tooltipText={formatDate(workflow?.endTime, $timeFormat, {
-      relative: !$relativeTime,
-      format: $timestampFormat,
-    })}
+    tooltipText={timestamp(
+      workflow?.endTime,
+      $relativeTime ? 'absolute' : 'relative',
+    )}
   />
 
   <DetailListLabel>
