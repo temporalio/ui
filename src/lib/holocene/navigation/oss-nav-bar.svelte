@@ -25,36 +25,20 @@
 >
   <a href={resolve('', {})} class="flex w-fit items-center gap-1 text-nowrap">
     <Logo height={24} width={24} class="m-1" />
-    <p class="text-base font-medium group-data-[nav=closed]:hidden">
-      'Self-Hosted'
-    </p>
+    {#if subtitle}
+      <p class="text-base font-medium group-data-[nav=closed]:hidden">
+        {@render subtitle()}
+      </p>
+    {/if}
   </a>
-  {#if !subtitle}
-    <button
-      title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-      class="mx-2 flex items-center justify-center opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 group-data-[nav=closed]:p-2"
-      onclick={ontoggle}
-    >
-      <Icon name="chevron-right" />
-    </button>
-  {/if}
-</div>
-{#if subtitle}
-  <div
-    class="flex items-center justify-between pb-4 group-data-[nav=closed]:hidden"
+  <button
+    title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
+    class="mx-2 flex items-center justify-center opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 group-data-[nav=closed]:p-2"
+    onclick={ontoggle}
   >
-    <div class="text-xs font-medium text-subtle">
-      {@render subtitle()}
-    </div>
-    <button
-      title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-      class="mx-2 flex items-center justify-center opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180"
-      onclick={ontoggle}
-    >
-      <Icon name="chevron-right" />
-    </button>
-  </div>
-{/if}
+    <Icon name="chevron-right" />
+  </button>
+</div>
 <div role="list">
   {#if children}
     {@render children()}
