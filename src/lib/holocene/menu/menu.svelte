@@ -57,7 +57,7 @@
     id: string;
     keepOpen?: boolean;
     position?: 'left' | 'right' | 'top-left' | 'top-right';
-    menuElement?: HTMLUListElement;
+    menuElement?: HTMLUListElement | null;
     maxHeight?: string;
     class?: ClassNameValue;
     usePortal?: boolean;

@@ -4,7 +4,7 @@
   export type MenuContext = {
     open: Writable<boolean>;
     keepOpen: Writable<boolean>;
-    menuElement: Writable<HTMLUListElement>;
+    menuElement: Writable<HTMLUListElement | null>;
   };
 </script>
 
@@ -34,7 +34,7 @@
   }: Props = $props();
 
   const keepOpen = writable(false);
-  const menuElement: Writable<HTMLUListElement> = writable(null);
+  const menuElement: Writable<HTMLUListElement | null> = writable(null);
 
   const closeMenu = () => {
     if ($open) {
