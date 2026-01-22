@@ -3,11 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   formatDate,
   formatUTCOffset,
-  getLocalTime,
   getSelectedTimezone,
   getUTCString,
   isValidDate,
 } from './format-date';
+import { getLocalTime } from './timezone';
 
 // // force GH action runners to use en-US and 12-hour clocks starting at 0:00
 const DateTimeFormat = Intl.DateTimeFormat;

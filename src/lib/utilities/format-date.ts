@@ -7,10 +7,10 @@ import {
 
 import {
   BASE_TIME_FORMAT_OPTIONS,
+  getLocalTime,
   getTimezone,
-  TimezoneOptions,
   Timezones,
-} from '$lib/stores/time-format';
+} from '$lib/utilities/timezone';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
@@ -127,20 +127,6 @@ export function formatUTCOffset(
     absoluteValue > 9 ? `${absoluteValue}:00` : `0${absoluteValue}:00`;
   if (offset > 0) return `${utc}+${formattedOffset}`;
   if (offset < 0) return `${utc}-${formattedOffset}`;
-}
-
-export function getLocalTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
-export function getLocalTime(): string {
-  const localTimezone = getLocalTimezone();
-  const localOption = TimezoneOptions.find(({ zones }) =>
-    zones?.includes(localTimezone),
-  );
-  return localOption
-    ? `${localOption.label} (${localOption.abbr})`
-    : localTimezone;
 }
 
 export function getSelectedTimezone(timeFormat: string): string {
