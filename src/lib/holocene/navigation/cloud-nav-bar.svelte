@@ -7,7 +7,7 @@
   interface Props {
     version: string;
     navOpen: boolean;
-    subtitle?: Snippet;
+    subtitle?: string;
     children?: Snippet;
     bottom?: Snippet;
     ontoggle: () => void;
@@ -22,13 +22,13 @@
 >
   <div role="list">
     <div class="align-center flex items-center justify-between pb-4">
-      <div
-        class="text-xs font-medium text-indigo-100 group-data-[nav=closed]:hidden"
-      >
-        {#if subtitle}
-          {@render subtitle()}
-        {/if}
-      </div>
+      {#if subtitle}
+        <div
+          class="text-xs font-medium text-indigo-100 group-data-[nav=closed]:hidden"
+        >
+          {subtitle}
+        </div>
+      {/if}
 
       <button
         title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}

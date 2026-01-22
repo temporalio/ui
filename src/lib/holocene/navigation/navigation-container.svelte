@@ -13,7 +13,7 @@
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     isCloud?: boolean;
-    subtitle?: Snippet;
+    subtitle?: string;
     children?: Snippet;
     bottom?: Snippet;
   }
@@ -43,7 +43,7 @@
   data-testid="navigation-header"
   {...restProps}
 >
-  {#if isCloud && subtitle}
+  {#if isCloud}
     <CloudNavBar
       {version}
       navOpen={$navOpen}

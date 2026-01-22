@@ -10,7 +10,7 @@
   interface Props {
     version: string;
     navOpen: boolean;
-    subtitle?: Snippet;
+    subtitle?: string;
     children?: Snippet;
     bottom?: Snippet;
     ontoggle: () => void;
@@ -25,11 +25,10 @@
 >
   <a href={resolve('', {})} class="flex w-fit items-center gap-1 text-nowrap">
     <Logo height={24} width={24} class="m-1" />
-    {#if subtitle}
-      <p class="text-base font-medium group-data-[nav=closed]:hidden">
-        {@render subtitle()}
-      </p>
-    {/if}
+
+    <p class="text-base font-medium group-data-[nav=closed]:hidden">
+      {subtitle || 'Self-Hosted'}
+    </p>
   </a>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
