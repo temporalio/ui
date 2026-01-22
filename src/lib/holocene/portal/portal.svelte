@@ -1,6 +1,7 @@
 <script lang="ts">
   import { scale } from 'svelte/transition';
 
+  import { untrack } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { portal } from './portal-action';
@@ -118,7 +119,7 @@
   $effect(() => {
     if (!shouldShowPortal || !portalElement || !anchorElement) return;
 
-    updatePosition();
+    untrack(() => updatePosition());
 
     const resizeObserver = new ResizeObserver(() => {
       scheduleUpdate();
