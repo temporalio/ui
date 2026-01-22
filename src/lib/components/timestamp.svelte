@@ -33,7 +33,10 @@
 </script>
 
 {#snippet timestampSnippet(dateTime: DateTime)}
-  {$timestamp(dateTime, overrideTimestampFormat)}
+  {$timestamp(
+    dateTime,
+    overrideTimestampFormat ? { format: overrideTimestampFormat } : undefined,
+  )}
 {/snippet}
 
 {#if as}

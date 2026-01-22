@@ -34,13 +34,13 @@ describe('timestamp rune', () => {
   });
 
   it('should accept format override for short', () => {
-    const result = get(timestamp)(date, 'short');
+    const result = get(timestamp)(date, { format: 'short' });
     expect(result).toContain('4/13/22');
     expect(result).toContain('4:29:35');
   });
 
   it('should accept format override for long', () => {
-    const result = get(timestamp)(date, 'long');
+    const result = get(timestamp)(date, { format: 'long' });
     expect(result).toContain('April 13, 2022');
     expect(result).toContain('4:29:35');
   });
@@ -73,7 +73,7 @@ describe('timestamp rune', () => {
 
   it('should allow format override to take precedence over store', () => {
     timestampFormat.set('long');
-    const result = get(timestamp)(date, 'short');
+    const result = get(timestamp)(date, { format: 'short' });
     expect(result).toContain('4/13/22');
     expect(result).not.toContain('April');
   });
@@ -104,7 +104,7 @@ describe('timestamp rune', () => {
   it('should accept relative override to force relative time', () => {
     timeFormat.set('local');
     relativeTime.set(false);
-    const result = get(timestamp)(date, 'relative');
+    const result = get(timestamp)(date, { format: 'relative' });
     expect(result).toContain('ago');
   });
 
@@ -112,14 +112,14 @@ describe('timestamp rune', () => {
     timeFormat.set('local');
     relativeTime.set(false);
     timestampFormat.set('medium');
-    const result = get(timestamp)(date, 'relative');
+    const result = get(timestamp)(date, { format: 'relative' });
     expect(result).toContain('ago');
   });
 
   it('should respect relativeTime store when using short/medium/long override', () => {
     timeFormat.set('local');
     relativeTime.set(true);
-    const result = get(timestamp)(date, 'short');
+    const result = get(timestamp)(date, { format: 'short' });
     expect(result).toContain('ago');
   });
 });

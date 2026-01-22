@@ -9,7 +9,10 @@ import type { TimestampFormat } from '$lib/utilities/format-date';
 import { formatDate } from '$lib/utilities/format-date';
 import { isFutureDate, type ValidTime } from '$lib/utilities/format-time';
 
-type TimestampOverride = TimestampFormat | 'relative';
+type TimestampOptions = {
+  format?: TimestampFormat | 'relative';
+  relativeLabel?: string;
+};
 
 /**
  * Reactive timestamp formatter that automatically uses the user's time format preferences.
@@ -22,7 +25,8 @@ type TimestampOverride = TimestampFormat | 'relative';
  * </script>
  *
  * <p>{$timestamp(activity.startTime)}</p>
- * <p>{$timestamp(date, 'short')}</p>
+ * <p>{$timestamp(date, { format: 'short' })}</p>
+ * <p>{$timestamp(date, { format: 'relative', relativeLabel: '' })}</p>
  * ```
  */
 export const timestamp = derived(
@@ -30,15 +34,19 @@ export const timestamp = derived(
   ([$timeFormat, $relativeTime, $timestampFormat]) => {
     return (
       date: ValidTime | undefined | null,
-      override?: TimestampOverride,
+      options?: TimestampOptions,
     ): string => {
-      const isRelativeOverride = override === 'relative';
+      const isRelativeOverride = options?.format === 'relative';
       const format = isRelativeOverride
         ? $timestampFormat
-        : (override ?? $timestampFormat);
+        : (options?.format ?? $timestampFormat);
       const relative = isRelativeOverride ? true : $relativeTime;
       const relativeLabel =
-        date && relative && isFutureDate(date) ? 'from now' : 'ago';
+        options?.relativeLabel !== undefined
+          ? options.relativeLabel
+          : date && relative && isFutureDate(date)
+            ? 'from now'
+            : 'ago';
 
       return formatDate(date, $timeFormat, {
         relative,

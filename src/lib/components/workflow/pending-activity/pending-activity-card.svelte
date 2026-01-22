@@ -13,15 +13,9 @@
   import { translate } from '$lib/i18n/translate';
   import { timestamp } from '$lib/runes/timestamp.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -249,11 +243,7 @@
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
-      {formatDate(activity.scheduledTime, $timeFormat, {
-        relative: $relativeTime,
-        format: $timestampFormat,
-        relativeLabel: '',
-      })}
+      {$timestamp(activity.scheduledTime, { relativeLabel: '' })}
       <strong>({timeDifference})</strong>
     </p>
   </div>

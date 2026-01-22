@@ -50,7 +50,9 @@
 
   let eventTime = $derived($timestamp(group?.eventTime));
 
-  let abbrEventTime = $derived($timestamp(group?.eventTime, 'short'));
+  let abbrEventTime = $derived(
+    $timestamp(group?.eventTime, { format: 'short' }),
+  );
 
   const onLinkClick = (e: Event) => {
     e.stopPropagation();

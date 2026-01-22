@@ -6,13 +6,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { timestamp } from '$lib/runes/timestamp.svelte';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import type { PendingNexusOperation } from '$lib/types/events';
-  import { formatDate } from '$lib/utilities/format-date';
   import { omit } from '$lib/utilities/omit';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
@@ -136,11 +130,7 @@
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
-      {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
-        relative: $relativeTime,
-        format: $timestampFormat,
-        relativeLabel: '',
-      })}
+      {$timestamp(operation.nextAttemptScheduleTime, { relativeLabel: '' })}
       <strong>({timeDifference})</strong>
     </p>
   </div>
