@@ -202,6 +202,14 @@ export const routeForEventHistoryEvent = ({
   return `${routeForWorkflow(parameters)}/history/events/${eventId || requestId}`;
 };
 
+export const routeForTimeline = (
+  parameters: WorkflowParameters,
+  queryParams?: Record<string, string>,
+): string => {
+  const path = `${routeForWorkflow(parameters)}/timeline`;
+  return toURL(path, queryParams);
+};
+
 export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
