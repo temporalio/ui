@@ -185,7 +185,7 @@
 
     if (isDateTimeFilter(filter)) {
       if (filter.customDate) return value.split('BETWEEN')[1];
-      return $timestamp(value, { format: 'relative' });
+      return $timestamp(value, { format: 'short' });
     }
 
     if (isTextFilter(filter)) {
