@@ -46,13 +46,13 @@
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import SavedQueryViews from '$lib/pages/saved-query-views.svelte';
-  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { searchAttributes } from '$lib/stores/search-attributes';
+  import { timestamp } from '$lib/stores/timestamp';
   import {
     refresh,
     workflowCount,

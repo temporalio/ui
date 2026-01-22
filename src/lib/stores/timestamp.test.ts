@@ -8,7 +8,7 @@ import {
   timestampFormat,
 } from '$lib/stores/time-format';
 
-import { timestamp } from './timestamp.svelte';
+import { timestamp } from './timestamp';
 
 // Force GH action runners to use en-US and 12-hour clocks starting at 0:00
 const DateTimeFormat = Intl.DateTimeFormat;
@@ -17,7 +17,7 @@ vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
     new DateTimeFormat('en-US', { ...options, hour12: true, hourCycle: 'h11' }),
 );
 
-describe('timestamp rune', () => {
+describe('timestamp', () => {
   const date = '2022-04-13T16:29:35.630571Z';
 
   beforeEach(() => {

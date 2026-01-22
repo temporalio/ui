@@ -3,11 +3,11 @@
     EventGroup,
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
-  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { activeGroupHeight, activeGroups } from '$lib/stores/active-events';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
+  import { timestamp } from '$lib/stores/timestamp';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';

@@ -21,7 +21,7 @@ type TimestampOptions = {
  * @example
  * ```svelte
  * <script>
- *   import { timestamp } from '$lib/runes/timestamp.svelte';
+ *   import { timestamp } from '$lib/stores/timestamp';
  * </script>
  *
  * <p>{$timestamp(activity.startTime)}</p>

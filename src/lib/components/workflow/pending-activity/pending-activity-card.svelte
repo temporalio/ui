@@ -11,8 +11,8 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
+  import { timestamp } from '$lib/stores/timestamp';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';

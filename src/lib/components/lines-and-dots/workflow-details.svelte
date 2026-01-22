@@ -3,7 +3,6 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
@@ -12,6 +11,7 @@
     timeFormat,
     timestampFormat,
   } from '$lib/stores/time-format';
+  import { timestamp } from '$lib/stores/timestamp';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import {

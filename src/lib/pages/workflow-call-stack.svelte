@@ -7,10 +7,10 @@
   import Link from '$lib/holocene/link.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timestamp } from '$lib/runes/timestamp.svelte';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
+  import { timestamp } from '$lib/stores/timestamp';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
 

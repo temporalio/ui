@@ -3,7 +3,7 @@
 
   import type { Snippet } from 'svelte';
 
-  import { timestamp } from '$lib/runes/timestamp.svelte';
+  import { timestamp } from '$lib/stores/timestamp';
   import type { TimestampFormat } from '$lib/utilities/format-date';
   import type { ValidTime } from '$lib/utilities/format-time';
 

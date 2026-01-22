@@ -9,8 +9,8 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { timestamp } from '$lib/runes/timestamp.svelte';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { timestamp } from '$lib/stores/timestamp';
   import type { PendingActivity } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
