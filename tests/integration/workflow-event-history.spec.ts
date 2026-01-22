@@ -17,13 +17,13 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
       '09db15_Running Click to copy content',
     );
+    await expect(page.getByTestId('timeline-tab')).toBeVisible();
     await expect(page.getByTestId('history-tab')).toBeVisible();
     await expect(page.getByTestId('workers-tab')).toBeVisible();
     await expect(page.getByTestId('relationships-tab')).toBeVisible();
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('input-and-result')).toBeVisible();
     await expect(page.getByTestId('feed')).toBeVisible();
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();
@@ -60,27 +60,24 @@ test.describe('Workflow History', () => {
       '09db15_Running Click to copy content',
     );
 
+    await expect(page.getByTestId('timeline-tab')).toBeVisible();
     await expect(page.getByTestId('history-tab')).toBeVisible();
     await expect(page.getByTestId('workers-tab')).toBeVisible();
     await expect(page.getByTestId('relationships-tab')).toBeVisible();
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('input-and-result')).toBeHidden();
-    await expect(page.getByTestId('feed')).toBeHidden();
-    await expect(page.getByTestId('compact')).toBeHidden();
-    await expect(page.getByTestId('json')).toBeHidden();
     await expect(page.getByTestId('event-summary-log')).toBeVisible();
 
     await page.getByTestId('history-tab').click();
 
+    await expect(page.getByTestId('timeline-tab')).toBeVisible();
     await expect(page.getByTestId('history-tab')).toBeVisible();
     await expect(page.getByTestId('workers-tab')).toBeVisible();
     await expect(page.getByTestId('relationships-tab')).toBeVisible();
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
-    await expect(page.getByTestId('input-and-result')).toBeVisible();
     await expect(page.getByTestId('feed')).toBeVisible();
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();
