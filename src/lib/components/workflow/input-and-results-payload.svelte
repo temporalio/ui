@@ -47,9 +47,9 @@
 </script>
 
 <div class="flex w-full grow flex-col gap-2">
-  <h2 class="flex items-center gap-2">
+  <h3 class="flex items-center gap-2 text-xs text-secondary">
     {title}
-  </h2>
+  </h3>
   {#if content}
     {#key $minimizeEventView}
       {#if payloadsSize > 0}
@@ -63,7 +63,8 @@
                   copySuccessIconTitle={translate(
                     'common.copy-success-icon-title',
                   )}
-                  maxHeight={300}
+                  minHeight={120}
+                  maxHeight={120}
                 />
               {/each}
             {:else}
@@ -73,7 +74,8 @@
                 copySuccessIconTitle={translate(
                   'common.copy-success-icon-title',
                 )}
-                maxHeight={300}
+                minHeight={120}
+                maxHeight={120}
               />
             {/if}
           {/snippet}
@@ -85,7 +87,8 @@
               content={decodedValue}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              maxHeight={300}
+              minHeight={120}
+              maxHeight={120}
             />
           {/snippet}
         </PayloadDecoder>
@@ -96,7 +99,8 @@
       content={isRunning ? 'Results will appear upon completion.' : 'null'}
       language="text"
       copyable={false}
-      maxHeight={300}
+      minHeight={120}
+      maxHeight={120}
     />
   {/if}
 </div>
