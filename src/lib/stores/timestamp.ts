@@ -5,9 +5,12 @@ import {
   timeFormat,
   timestampFormat,
 } from '$lib/stores/time-format';
-import type { TimestampFormat } from '$lib/utilities/format-date';
-import { formatDate } from '$lib/utilities/format-date';
-import { isFutureDate, type ValidTime } from '$lib/utilities/format-time';
+import {
+  formatDate,
+  isFuture,
+  type TimestampFormat,
+  type ValidTime,
+} from '$lib/utilities/format-date';
 
 type TimestampOptions = {
   format?: TimestampFormat | 'relative';
@@ -44,7 +47,7 @@ export const timestamp = derived(
       const relativeLabel =
         options?.relativeLabel !== undefined
           ? options.relativeLabel
-          : date && relative && isFutureDate(date)
+          : date && relative && isFuture(date)
             ? 'from now'
             : 'ago';
 
