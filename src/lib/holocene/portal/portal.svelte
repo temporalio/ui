@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { scale } from 'svelte/transition';
+
   import { twMerge as merge } from 'tailwind-merge';
 
   import { portal } from './portal-action';
@@ -28,18 +30,6 @@
 
   const shouldShowPortal = $derived(
     open && anchorElement && (!hideWhenInvisible || isVisible),
-  );
-
-  const styles = $derived(
-    merge(
-      [
-        'transition-[opacity,transform]',
-        'duration-100',
-        'ease-out',
-        open ? 'visible scale-100 opacity-100' : 'invisible scale-95 opacity-0',
-      ],
-      className,
-    ),
   );
 
   $effect(() => {
@@ -174,7 +164,10 @@
     style:transform="translate({positionX}px, {positionY}px)"
     style:will-change="transform"
   >
-    <div class={styles}>
+    <div
+      class={merge(className)}
+      transition:scale={{ duration: 100, start: 0.95, opacity: 0 }}
+    >
       {@render children()}
     </div>
   </div>
