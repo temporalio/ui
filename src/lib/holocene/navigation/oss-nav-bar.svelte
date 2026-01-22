@@ -10,12 +10,14 @@
   interface Props {
     version: string;
     navOpen: boolean;
+    subtitle?: string;
     children?: Snippet;
     bottom?: Snippet;
     ontoggle: () => void;
   }
 
-  let { version, navOpen, children, bottom, ontoggle }: Props = $props();
+  let { version, navOpen, subtitle, children, bottom, ontoggle }: Props =
+    $props();
 </script>
 
 <div
@@ -23,8 +25,9 @@
 >
   <a href={resolve('', {})} class="flex w-fit items-center gap-1 text-nowrap">
     <Logo height={24} width={24} class="m-1" />
+
     <p class="text-base font-medium group-data-[nav=closed]:hidden">
-      'Self-Hosted'
+      {subtitle || 'Self-Hosted'}
     </p>
   </a>
   <button

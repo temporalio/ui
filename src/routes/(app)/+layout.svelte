@@ -155,9 +155,11 @@
         },
       },
       {
+        divider: true,
+      },
+      {
         href: archivalRoute,
         icon: 'archives',
-        divider: true,
         label: translate('common.archive'),
         isActive: (path) => path.includes(archivalRoute),
       },
