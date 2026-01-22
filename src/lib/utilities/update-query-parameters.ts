@@ -31,6 +31,7 @@ export const updateQueryParameters = async ({
   const params = {};
   let replaced = false;
 
+  console.log('Updating query parameter:');
   url.searchParams.forEach((value, key) => {
     if (key !== parameter) {
       params[key] = value;
