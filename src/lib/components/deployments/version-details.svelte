@@ -16,7 +16,7 @@
     />
     <WorkflowDetail
       title={translate('deployments.rollout-started')}
-      content={timestamp(version.createTime)}
+      content={$timestamp(version.createTime)}
     />
   </div>
   <div class="flex w-full flex-col gap-2 lg:w-1/3 xl:w-1/4">

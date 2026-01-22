@@ -76,10 +76,10 @@
     >
       <div class="flex w-full justify-between text-xs">
         <p class="w-60 -translate-x-24 rotate-90">
-          {timestamp(startTime, 'short')}
+          {$timestamp(startTime, 'short')}
         </p>
         <p class="w-60 translate-x-24 rotate-90">
-          {timestamp(endTime, 'short')}
+          {$timestamp(endTime, 'short')}
         </p>
       </div>
     </div>

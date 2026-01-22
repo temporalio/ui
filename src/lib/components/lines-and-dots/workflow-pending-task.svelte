@@ -20,15 +20,15 @@
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.original-scheduled-time')}
-      <Badge>{timestamp(pendingTask.originalScheduledTime)}</Badge>
+      <Badge>{$timestamp(pendingTask.originalScheduledTime)}</Badge>
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.scheduled-time')}
-      <Badge>{timestamp(pendingTask.scheduledTime)}</Badge>
+      <Badge>{$timestamp(pendingTask.scheduledTime)}</Badge>
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.started-time')}
-      <Badge>{timestamp(pendingTask.startedTime)}</Badge>
+      <Badge>{$timestamp(pendingTask.startedTime)}</Badge>
     </p>
   </div>
 </Accordion>

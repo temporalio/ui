@@ -19,8 +19,8 @@
     children,
   }: { callback: Callback; link?: Link; children?: Snippet } = $props();
 
-  const completedTime = $derived(timestamp(callback.lastAttemptCompleteTime));
-  const nextTime = $derived(timestamp(callback.nextAttemptScheduleTime));
+  const completedTime = $derived($timestamp(callback.lastAttemptCompleteTime));
+  const nextTime = $derived($timestamp(callback.nextAttemptScheduleTime));
   const failure = $derived(callback?.lastAttemptFailure?.message);
   const blockedReason = $derived(callback?.blockedReason);
   const callbackUrl = $derived(callback?.callback?.nexus?.url);

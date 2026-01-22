@@ -19,9 +19,9 @@
     includeMilliseconds: true,
   });
 
-  $: startTimestamp = timestamp(workflow?.startTime);
+  $: startTimestamp = $timestamp(workflow?.startTime);
 
-  $: endTimestamp = timestamp(workflow?.endTime);
+  $: endTimestamp = $timestamp(workflow?.endTime);
 </script>
 
 <section>

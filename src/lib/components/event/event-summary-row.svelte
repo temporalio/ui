@@ -160,9 +160,9 @@
       !currentEvent?.userMetadata?.summary,
   );
 
-  const eventTime = $derived(timestamp(currentEvent?.eventTime));
+  const eventTime = $derived($timestamp(currentEvent?.eventTime));
 
-  const abbrEventTime = $derived(timestamp(currentEvent?.eventTime, 'short'));
+  const abbrEventTime = $derived($timestamp(currentEvent?.eventTime, 'short'));
 
   const onLinkClick = (event) => {
     expanded = !expanded;

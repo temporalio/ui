@@ -62,7 +62,7 @@
       {#if operation.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          timestamp(operation.lastAttemptCompleteTime),
+          $timestamp(operation.lastAttemptCompleteTime),
         )}
       {/if}
       {#if operation.scheduledEventId}
@@ -74,7 +74,7 @@
       {#if operation.scheduledTime}
         {@render detail(
           translate('workflows.scheduled-time'),
-          timestamp(operation.scheduledTime),
+          $timestamp(operation.scheduledTime),
         )}
       {/if}
       {#if operation.scheduleToCloseTimeout}

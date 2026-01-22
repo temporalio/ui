@@ -19,7 +19,7 @@
   let stackTrace: Eventual<ParsedQuery> = $state();
 
   let refreshDate = $derived(
-    timestamp($refresh ? new Date($refresh) : new Date(), 'short'),
+    $timestamp($refresh ? new Date($refresh) : new Date(), 'short'),
   );
 
   const getStackTrace = () =>

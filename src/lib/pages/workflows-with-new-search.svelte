@@ -70,7 +70,7 @@
 
   let refreshTime = $state(new Date());
 
-  const refreshTimeFormatted = $derived(timestamp(refreshTime));
+  const refreshTimeFormatted = $derived($timestamp(refreshTime));
 
   const availableColumns = $derived(
     availableWorkflowSystemSearchAttributeColumns(

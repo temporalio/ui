@@ -70,7 +70,7 @@
         )}
         {@render detail(
           translate('activities.paused-since'),
-          timestamp(activity.pauseInfo?.pauseTime),
+          $timestamp(activity.pauseInfo?.pauseTime),
         )}
         {@render detail(
           translate('activities.pause-reason'),
@@ -90,7 +90,7 @@
       {#if activity.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          timestamp(activity.lastAttemptCompleteTime),
+          $timestamp(activity.lastAttemptCompleteTime),
         )}
       {/if}
       {#if activity.expirationTime}
@@ -110,13 +110,13 @@
       {#if activity.lastHeartbeatTime}
         {@render detail(
           translate('workflows.last-heartbeat'),
-          timestamp(activity.lastHeartbeatTime),
+          $timestamp(activity.lastHeartbeatTime),
         )}
       {/if}
       {#if activity.lastStartedTime}
         {@render detail(
           translate('workflows.last-started-time'),
-          timestamp(activity.lastStartedTime),
+          $timestamp(activity.lastStartedTime),
         )}
       {/if}
       {#if activity.lastWorkerIdentity}

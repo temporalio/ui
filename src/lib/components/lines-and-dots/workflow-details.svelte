@@ -110,7 +110,7 @@
 <DetailList aria-label="workflow details" rowCount={5}>
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
   <DetailListTextValue
-    text={timestamp(workflow?.startTime)}
+    text={$timestamp(workflow?.startTime)}
     tooltipText={formatDate(workflow?.startTime, $timeFormat, {
       relative: !$relativeTime,
       format: $timestampFormat,
@@ -120,7 +120,7 @@
   {#if workflow?.startDelay}
     <DetailListLabel>{translate('workflows.execution-start')}</DetailListLabel>
     <DetailListTextValue
-      text={timestamp(workflow?.executionTime)}
+      text={$timestamp(workflow?.executionTime)}
       tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
         relative: !$relativeTime,
         format: $timestampFormat,
@@ -130,7 +130,7 @@
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
   <DetailListTextValue
-    text={workflow?.endTime ? timestamp(workflow?.endTime) : '-'}
+    text={workflow?.endTime ? $timestamp(workflow?.endTime) : '-'}
     tooltipText={formatDate(workflow?.endTime, $timeFormat, {
       relative: !$relativeTime,
       format: $timestampFormat,
