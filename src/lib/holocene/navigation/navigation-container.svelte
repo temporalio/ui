@@ -56,6 +56,7 @@
     <OSSNavBar
       {version}
       navOpen={$navOpen}
+      {subtitle}
       {children}
       {bottom}
       ontoggle={toggle}
