@@ -116,6 +116,26 @@
     };
   });
 
+  function getScrollableAncestors(
+    element: HTMLElement,
+  ): (HTMLElement | Window | Document)[] {
+    const ancestors: (HTMLElement | Window | Document)[] = [window, document];
+    let parent = element.parentElement;
+
+    while (parent) {
+      const { overflow, overflowX, overflowY } =
+        window.getComputedStyle(parent);
+      const isScrollable = [overflow, overflowX, overflowY].some(
+        (val) => val === 'auto' || val === 'scroll' || val === 'overlay',
+      );
+
+      if (isScrollable) ancestors.push(parent);
+      parent = parent.parentElement;
+    }
+
+    return ancestors;
+  }
+
   $effect(() => {
     if (!shouldShowPortal || !portalElement || !anchorElement) return;
 
@@ -127,19 +147,13 @@
 
     resizeObserver.observe(portalElement);
     resizeObserver.observe(anchorElement);
-    if (scrollContainerElement !== window) {
-      resizeObserver.observe(scrollContainerElement as HTMLElement);
-    }
+
+    const scrollableAncestors = getScrollableAncestors(anchorElement);
+    scrollableAncestors.forEach((ancestor) => {
+      ancestor.addEventListener('scroll', scheduleUpdate, { passive: true });
+    });
 
     window.addEventListener('resize', scheduleUpdate, { passive: true });
-
-    if (scrollContainerElement === window) {
-      window.addEventListener('scroll', scheduleUpdate, { passive: true });
-    } else {
-      scrollContainerElement.addEventListener('scroll', scheduleUpdate, {
-        passive: true,
-      });
-    }
 
     return () => {
       if (rafId !== null) {
@@ -147,12 +161,10 @@
         rafId = null;
       }
       resizeObserver.disconnect();
+      scrollableAncestors.forEach((ancestor) => {
+        ancestor.removeEventListener('scroll', scheduleUpdate);
+      });
       window.removeEventListener('resize', scheduleUpdate);
-      if (scrollContainerElement === window) {
-        window.removeEventListener('scroll', scheduleUpdate);
-      } else {
-        scrollContainerElement.removeEventListener('scroll', scheduleUpdate);
-      }
     };
   });
 </script>
