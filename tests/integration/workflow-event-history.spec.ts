@@ -24,6 +24,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
+    await expect(page.getByTestId('input-and-result')).toBeVisible();
     await expect(page.getByTestId('feed')).toBeVisible();
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();
@@ -78,6 +79,7 @@ test.describe('Workflow History', () => {
     await expect(page.getByTestId('pending-activities-tab')).toBeVisible();
     await expect(page.getByTestId('call-stack-tab')).toBeVisible();
     await expect(page.getByTestId('queries-tab')).toBeVisible();
+    await expect(page.getByTestId('input-and-result')).toBeVisible();
     await expect(page.getByTestId('feed')).toBeVisible();
     await expect(page.getByTestId('compact')).toBeVisible();
     await expect(page.getByTestId('json')).toBeVisible();

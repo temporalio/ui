@@ -5,6 +5,7 @@
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
+  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
@@ -108,6 +109,7 @@
   };
 </script>
 
+<InputAndResults />
 <div class="relative pb-24">
   <div
     class="surface-background sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b border-subtle md:top-12 xl:gap-8"
