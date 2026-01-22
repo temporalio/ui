@@ -5,7 +5,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForTimeline } from '$lib/utilities/route-for';
 
   export let workflow: string;
   export let namespace: string;
@@ -28,7 +28,7 @@
     <td class="w-1/3">
       {#if first}
         <Link
-          href={routeForEventHistory({
+          href={routeForTimeline({
             namespace,
             workflow: workflow,
             run: first,
@@ -46,7 +46,7 @@
     <td class="w-1/3">
       {#if previous}
         <Link
-          href={routeForEventHistory({
+          href={routeForTimeline({
             namespace,
             workflow: workflow,
             run: previous,
@@ -64,7 +64,7 @@
     <td class="w-1/3">
       {#if next}
         <Link
-          href={routeForEventHistory({
+          href={routeForTimeline({
             namespace,
             workflow: workflow,
             run: next,

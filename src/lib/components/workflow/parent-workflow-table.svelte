@@ -6,7 +6,7 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForTimeline } from '$lib/utilities/route-for';
 
   export let parent: WorkflowIdentifier;
   export let parentNamespaceName: string | undefined;
@@ -24,7 +24,7 @@
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>
       <Link
-        href={routeForEventHistory({
+        href={routeForTimeline({
           namespace: parentNamespaceName ?? namespace,
           workflow: parent.workflowId,
           run: parent.runId,
@@ -40,7 +40,7 @@
     </td>
     <td>
       <Link
-        href={routeForEventHistory({
+        href={routeForTimeline({
           namespace: parentNamespaceName ?? namespace,
           workflow: parent.workflowId,
           run: parent.runId,

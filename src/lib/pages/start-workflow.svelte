@@ -37,8 +37,8 @@
   } from '$lib/utilities/format-time';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
-    routeForEventHistory,
     routeForTaskQueue,
+    routeForTimeline,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -130,7 +130,7 @@
         variant: 'success',
         duration: 5000,
         message: translate('workflows.start-workflow-success'),
-        link: routeForEventHistory({
+        link: routeForTimeline({
           namespace,
           workflow: workflowId,
           run: runId,
@@ -399,7 +399,7 @@
         {#if errorWorkflowDetails.workflowId && errorWorkflowDetails.runId}
           <div class="mt-2">
             <Link
-              href={routeForEventHistory({
+              href={routeForTimeline({
                 namespace,
                 workflow: errorWorkflowDetails.workflowId,
                 run: errorWorkflowDetails.runId,

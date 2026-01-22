@@ -20,6 +20,7 @@
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForEventHistory,
+    routeForTimeline,
     routeForWorkerDeployment,
   } from '$lib/utilities/route-for';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
@@ -83,36 +84,54 @@
         {filterOrCopyButtonsVisible}
         attribute="WorkflowType"
         value={workflow.name}
-        href={routeForEventHistory({
-          namespace,
-          workflow: workflow.id,
-          run: workflow.runId,
-          archival,
-        })}
+        href={archival
+          ? routeForEventHistory({
+              namespace,
+              workflow: workflow.id,
+              run: workflow.runId,
+              archival,
+            })
+          : routeForTimeline({
+              namespace,
+              workflow: workflow.id,
+              run: workflow.runId,
+            })}
       />
     {:else if label === 'Workflow ID'}
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="WorkflowId"
         value={workflow.id}
-        href={routeForEventHistory({
-          namespace,
-          workflow: workflow.id,
-          run: workflow.runId,
-          archival,
-        })}
+        href={archival
+          ? routeForEventHistory({
+              namespace,
+              workflow: workflow.id,
+              run: workflow.runId,
+              archival,
+            })
+          : routeForTimeline({
+              namespace,
+              workflow: workflow.id,
+              run: workflow.runId,
+            })}
       />
     {:else if label === 'Run ID'}
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="RunId"
         value={workflow.runId}
-        href={routeForEventHistory({
-          namespace,
-          workflow: workflow.id,
-          run: workflow.runId,
-          archival,
-        })}
+        href={archival
+          ? routeForEventHistory({
+              namespace,
+              workflow: workflow.id,
+              run: workflow.runId,
+              archival,
+            })
+          : routeForTimeline({
+              namespace,
+              workflow: workflow.id,
+              run: workflow.runId,
+            })}
       />
     {:else if label === 'Deployment'}
       {@const deployment =

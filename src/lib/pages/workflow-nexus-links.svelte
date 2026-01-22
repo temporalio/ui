@@ -16,9 +16,9 @@
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import { isNexusOperationScheduledEvent } from '$lib/utilities/is-event-type';
   import {
-    routeForEventHistory,
     routeForEventHistoryEvent,
     routeForNamespace,
+    routeForTimeline,
   } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
@@ -77,7 +77,7 @@
           <td class="break-all text-left" data-testid="link-event">
             {#if link?.workflowEvent}
               <Link
-                href={routeForEventHistory({
+                href={routeForTimeline({
                   namespace: link.workflowEvent.namespace,
                   workflow: link.workflowEvent.workflowId,
                   run: link.workflowEvent.runId,
@@ -162,7 +162,7 @@
           <td class="break-all text-left" data-testid="link-href">
             {#if link?.workflowEvent}
               <Link
-                href={routeForEventHistory({
+                href={routeForTimeline({
                   namespace: link.workflowEvent.namespace,
                   workflow: link.workflowEvent.workflowId,
                   run: link.workflowEvent.runId,

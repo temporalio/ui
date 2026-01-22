@@ -7,7 +7,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForTimeline } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '../workflow-status.svelte';
 
@@ -67,7 +67,7 @@
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link
-            href={routeForEventHistory({
+            href={routeForTimeline({
               namespace: child.namespace,
               workflow: child.workflowId,
               run: child.runId,
@@ -78,7 +78,7 @@
         </td>
         <td class="hover:text-blue-700 hover:underline">
           <Link
-            href={routeForEventHistory({
+            href={routeForTimeline({
               namespace: child.namespace,
               workflow: child.workflowId,
               run: child.runId,
