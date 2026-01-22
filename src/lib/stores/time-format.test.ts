@@ -7,10 +7,10 @@ import {
   getAdjustedTimeformat,
   getTimezone,
   getUTCOffset,
-  relativeTime,
-  timeFormat,
   Timezones,
-} from './time-format';
+} from '$lib/utilities/timezone';
+
+import { relativeTime, timeFormat } from './time-format';
 
 describe('time format store', () => {
   test('should return local as the default timeFormat', () => {

@@ -7,7 +7,6 @@ import {
 } from '$lib/stores/time-format';
 import {
   formatDate,
-  isFuture,
   type TimestampFormat,
   type ValidTime,
 } from '$lib/utilities/format-date';
@@ -40,16 +39,12 @@ export const timestamp = derived(
       options?: TimestampOptions,
     ): string => {
       const isRelativeOverride = options?.format === 'relative';
+
       const format = isRelativeOverride
         ? $timestampFormat
         : (options?.format ?? $timestampFormat);
       const relative = isRelativeOverride ? true : $relativeTime;
-      const relativeLabel =
-        options?.relativeLabel !== undefined
-          ? options.relativeLabel
-          : date && relative && isFuture(date)
-            ? 'from now'
-            : 'ago';
+      const relativeLabel = options?.relativeLabel ?? undefined;
 
       return formatDate(date, $timeFormat, {
         relative,
