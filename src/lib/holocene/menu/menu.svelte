@@ -63,7 +63,7 @@
     usePortal?: boolean;
     scrollContainer?: string;
     flipOnCollision?: boolean;
-    hideWhenInvisible?: boolean;
+    hideWhenAnchorHidden?: boolean;
   }
 
   let {
@@ -76,7 +76,7 @@
     usePortal = false,
     scrollContainer,
     flipOnCollision = undefined,
-    hideWhenInvisible = undefined,
+    hideWhenAnchorHidden = undefined,
     children,
     ...rest
   }: Props = $props();
@@ -137,7 +137,7 @@
     open={$open}
     position={portalPosition}
     {flipOnCollision}
-    {hideWhenInvisible}
+    {hideWhenAnchorHidden}
     {scrollContainer}
   >
     <ul

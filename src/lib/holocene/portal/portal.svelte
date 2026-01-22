@@ -13,7 +13,7 @@
     position = 'bottom',
     offset = {},
     target = document.body,
-    hideWhenInvisible = true,
+    hideWhenAnchorHidden = true,
     scrollContainer = window,
     flipOnCollision = true,
     class: className = '',
@@ -29,7 +29,7 @@
   let rafId = $state<number | null>(null);
 
   const shouldShowPortal = $derived(
-    open && anchorElement && (!hideWhenInvisible || isVisible),
+    open && anchorElement && (!hideWhenAnchorHidden || isVisible),
   );
 
   $effect(() => {
@@ -89,7 +89,7 @@
   }
 
   $effect(() => {
-    if (!anchorElement || !hideWhenInvisible) {
+    if (!anchorElement || !hideWhenAnchorHidden) {
       isVisible = true;
       return;
     }

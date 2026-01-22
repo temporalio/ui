@@ -8,7 +8,7 @@
     component: Portal,
     args: {
       position: 'bottom',
-      hideWhenInvisible: true,
+      hideWhenAnchorHidden: true,
       flipOnCollision: true,
       open: true,
       offset: { x: 0, y: 0 },
@@ -32,8 +32,8 @@
         name: 'Open',
         control: 'boolean',
       },
-      hideWhenInvisible: {
-        name: 'Hide When Invisible',
+      hideWhenAnchorHidden: {
+        name: 'Hide When Anchor Hidden',
         control: 'boolean',
       },
       flipOnCollision: {
@@ -206,7 +206,7 @@
           open={args.open}
           position={args.position}
           scrollContainer="combined-container"
-          hideWhenInvisible={args.hideWhenInvisible}
+          hideWhenAnchorHidden={args.hideWhenAnchorHidden}
           flipOnCollision={args.flipOnCollision}
           offset={args.offset}
         >

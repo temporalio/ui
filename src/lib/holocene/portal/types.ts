@@ -22,7 +22,7 @@ export interface PortalProps {
   position?: PortalPosition;
   offset?: PortalOffset;
   target?: HTMLElement | string;
-  hideWhenInvisible?: boolean;
+  hideWhenAnchorHidden?: boolean;
   scrollContainer?: HTMLElement | Window | string;
   flipOnCollision?: boolean;
   class?: ClassNameValue;
