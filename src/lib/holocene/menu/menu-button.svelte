@@ -100,6 +100,7 @@
   {variant}
   class={merge(className)}
   {size}
+  active={$open}
   disableTracking={true}
   {...rest}
 >

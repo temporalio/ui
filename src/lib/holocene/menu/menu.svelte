@@ -1,20 +1,24 @@
 <script lang="ts" module>
   import { cva } from 'class-variance-authority';
 
+  const sharedMenuStyles = [
+    'surface-primary',
+    'min-w-fit',
+    'list-none',
+    'overflow-auto',
+    'border',
+    'border-subtle',
+    'text-primary',
+    'shadow',
+    'w-full',
+  ];
+
   const menuStyles = cva(
     [
-      'surface-primary',
+      ...sharedMenuStyles,
       'absolute',
       'z-20',
       'mt-1',
-      'min-w-fit',
-      'list-none',
-      'overflow-auto',
-      'border',
-      'border-subtle',
-      'text-primary',
-      'shadow',
-      'w-full',
       'transition-all',
       'duration-100',
       'ease-out',
@@ -42,6 +46,8 @@
   import { getContext } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
+  import Portal from '$lib/holocene/portal/portal.svelte';
+  import type { PortalPosition } from '$lib/holocene/portal/types';
   import { getFocusableElements } from '$lib/utilities/focus-trap';
 
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
@@ -54,6 +60,10 @@
     menuElement?: HTMLUListElement;
     maxHeight?: string;
     class?: ClassNameValue;
+    usePortal?: boolean;
+    scrollContainer?: string;
+    flipOnCollision?: boolean;
+    hideWhenInvisible?: boolean;
   }
 
   let {
@@ -63,11 +73,16 @@
     position = 'left',
     menuElement = $bindable(null),
     maxHeight = 'max-h-[20rem]',
+    usePortal = false,
+    scrollContainer,
+    flipOnCollision = undefined,
+    hideWhenInvisible = undefined,
     children,
     ...rest
   }: Props = $props();
 
   let height = $state(0);
+  let anchorElement = $state<HTMLElement | null>(null);
 
   const {
     keepOpen: keepOpenCtx,
@@ -81,6 +96,21 @@
 
   $effect(() => {
     $menuElementCtx = menuElement;
+  });
+
+  $effect(() => {
+    if (usePortal && id) {
+      anchorElement = document.querySelector(
+        `[aria-controls="${id}"]`,
+      ) as HTMLElement | null;
+    }
+  });
+
+  const portalPosition: PortalPosition | undefined = $derived.by(() => {
+    if (!usePortal) return undefined;
+    if (position.includes('top')) return position;
+
+    return position === 'left' ? 'bottom-left' : 'bottom-right';
   });
 
   const menuItems = $derived(
@@ -101,20 +131,46 @@
   );
 </script>
 
-<ul
-  role="menu"
-  class={merge(styles, maxHeight, className)}
-  aria-labelledby={id}
-  tabindex={-1}
-  style={position === 'top-right' || position === 'top-left'
-    ? `top: -${height + 16}px;`
-    : ''}
-  {id}
-  bind:this={menuElement}
-  bind:clientHeight={height}
-  onfocusout={handleFocusOut}
-  onclick={handleClick}
-  {...rest}
->
-  {@render children?.()}
-</ul>
+{#if usePortal && anchorElement}
+  <Portal
+    anchor={anchorElement}
+    open={$open}
+    position={portalPosition}
+    {flipOnCollision}
+    {hideWhenInvisible}
+    {scrollContainer}
+  >
+    <ul
+      role="menu"
+      class={merge(sharedMenuStyles, maxHeight, className)}
+      aria-labelledby={id}
+      tabindex={-1}
+      {id}
+      bind:this={menuElement}
+      bind:clientHeight={height}
+      onfocusout={handleFocusOut}
+      onclick={handleClick}
+      {...rest}
+    >
+      {@render children?.()}
+    </ul>
+  </Portal>
+{:else}
+  <ul
+    role="menu"
+    class={merge(styles, maxHeight, className)}
+    aria-labelledby={id}
+    tabindex={-1}
+    style={position === 'top-right' || position === 'top-left'
+      ? `top: -${height + 16}px;`
+      : ''}
+    {id}
+    bind:this={menuElement}
+    bind:clientHeight={height}
+    onfocusout={handleFocusOut}
+    onclick={handleClick}
+    {...rest}
+  >
+    {@render children?.()}
+  </ul>
+{/if}
