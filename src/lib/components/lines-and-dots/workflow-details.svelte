@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
@@ -11,7 +12,6 @@
     timeFormat,
     timestampFormat,
   } from '$lib/stores/time-format';
-  import { timestamp } from '$lib/stores/timestamp';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDate } from '$lib/utilities/format-date';
   import {

@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timestamp } from '$lib/stores/timestamp';
   import type { CallbackState } from '$lib/types';
   import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';

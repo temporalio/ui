@@ -4,6 +4,7 @@
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -32,7 +33,6 @@
     timeFormat,
     timeFormatType,
   } from '$lib/stores/time-format';
-  import { timestamp } from '$lib/stores/timestamp';
   import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { isInConditional, isNullConditional } from '$lib/utilities/is';
   import {

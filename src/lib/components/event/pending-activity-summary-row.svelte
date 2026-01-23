@@ -3,6 +3,7 @@
 
   import { page } from '$app/stores';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -10,7 +11,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { timestamp } from '$lib/stores/timestamp';
   import type { PendingActivity } from '$lib/types/events';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';

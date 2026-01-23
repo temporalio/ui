@@ -32,6 +32,7 @@
 
   import { page } from '$app/state';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
@@ -52,7 +53,6 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import { timestamp } from '$lib/stores/timestamp';
   import {
     refresh,
     workflowCount,

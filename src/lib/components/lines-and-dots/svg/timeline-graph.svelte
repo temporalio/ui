@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import type {
     EventGroup,
     EventGroups,
@@ -7,7 +8,6 @@
   import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
-  import { timestamp } from '$lib/stores/timestamp';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';

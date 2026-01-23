@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timestamp } from '$lib/stores/timestamp';
   import type { WorkerDeploymentVersionInfo } from '$lib/types/deployments';
 
   import WorkflowDetail from '../lines-and-dots/workflow-detail.svelte';

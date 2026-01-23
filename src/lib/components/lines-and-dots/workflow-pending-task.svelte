@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timestamp } from '$lib/stores/timestamp';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
 
   export let pendingTask: PendingWorkflowTaskInfo | undefined = undefined;

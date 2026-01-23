@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { timestamp } from '$lib/stores/timestamp';
   import {
     workflowRun,
     workflowSummaryViewOpen,

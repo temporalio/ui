@@ -4,6 +4,7 @@
 
   import { page } from '$app/state';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -19,7 +20,6 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { authUser } from '$lib/stores/auth-user';
-  import { timestamp } from '$lib/stores/timestamp';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';

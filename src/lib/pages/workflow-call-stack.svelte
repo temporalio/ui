@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
@@ -10,7 +11,6 @@
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import { authUser } from '$lib/stores/auth-user';
-  import { timestamp } from '$lib/stores/timestamp';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
 
