@@ -13,6 +13,7 @@
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
@@ -23,10 +24,7 @@
   } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type {
-    EventTypeCategory,
-    IterableEventWithPending,
-  } from '$lib/types/events';
+  import type { IterableEventWithPending } from '$lib/types/events';
   import {
     parseEventFilterParams,
     updateEventFilterParams,
@@ -60,9 +58,7 @@
     : $filteredEventHistory;
 
   $: $eventCategoryFilter = $page.url?.searchParams?.get('category')
-    ? ($page.url?.searchParams
-        ?.get('category')
-        .split(',') as EventTypeCategory[])
+    ? $page.url?.searchParams?.get('category').split(',').filter(isCategoryType)
     : undefined;
 
   $: items = (
