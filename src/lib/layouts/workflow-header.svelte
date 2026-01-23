@@ -245,7 +245,10 @@
       <Tab
         label={translate('workflows.timeline-tab')}
         id="timeline-tab"
-        href={routeForTimeline(routeParameters, sharedFilterParams)}
+        href={routeForTimeline({
+          ...routeParameters,
+          queryParams: sharedFilterParams,
+        })}
         active={pathMatches(
           page.url.pathname,
           routeForTimeline(routeParameters),
