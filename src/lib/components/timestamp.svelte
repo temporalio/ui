@@ -2,6 +2,7 @@
   import { derived } from 'svelte/store';
 
   import {
+    hourFormat,
     relativeTime,
     timeFormat,
     timestampFormat,
@@ -13,21 +14,22 @@
   } from '$lib/utilities/format-date';
 
   export const timestamp = derived(
-    [timeFormat, relativeTime, timestampFormat],
-    ([$timeFormat, $relativeTime, $timestampFormat]) => {
+    [timeFormat, relativeTime, timestampFormat, hourFormat],
+    ([$timeFormat, $relativeTime, $timestampFormat, $hourFormat]) => {
       return (
         date: ValidTime | undefined | null,
         options: FormatDateOptions = {},
       ): string => {
         const format = options?.format ?? $timestampFormat;
+        const hourFormat = options?.hourFormat ?? $hourFormat;
         const relative = options?.relative ?? $relativeTime;
         const relativeLabel = options?.relativeLabel;
 
         return formatDate(date, $timeFormat, {
-          ...options,
           relative,
           format,
           relativeLabel,
+          hourFormat,
         });
       };
     },

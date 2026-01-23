@@ -16,11 +16,14 @@ import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
 export type { ValidTime };
 
+export type HourFormat = 'system' | '12' | '24';
+
 export type FormatDateOptions = {
   format?: TimestampFormat;
   relative?: boolean;
   relativeLabel?: string;
   flexibleUnits?: boolean;
+  hourFormat?: HourFormat;
 };
 
 export const timestampFormats: Record<
@@ -96,11 +99,20 @@ export function formatDate(
       relativeLabel = isFuture(date) ? 'from now' : 'ago',
       flexibleUnits = false,
       format = 'medium',
+      hourFormat = 'system',
     } = options;
 
     const currentDate = Date.now();
 
     const parsed = parseJSON(new Date(date));
+
+    const hour12 =
+      hourFormat === 'system' ? undefined : hourFormat === '12' ? true : false;
+
+    const formatOptions = {
+      ...timestampFormats[format],
+      ...(hour12 !== undefined && { hour12 }),
+    };
 
     if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
       if (relative) {
@@ -114,15 +126,12 @@ export function formatDate(
         );
       }
 
-      return new Intl.DateTimeFormat(
-        undefined,
-        timestampFormats[format],
-      ).format(parsed);
+      return new Intl.DateTimeFormat(undefined, formatOptions).format(parsed);
     }
 
     const timeZone = getTimezone(timeFormat);
     return new Intl.DateTimeFormat(undefined, {
-      ...timestampFormats[format],
+      ...formatOptions,
       timeZone,
     }).format(parsed);
   } catch (e) {
