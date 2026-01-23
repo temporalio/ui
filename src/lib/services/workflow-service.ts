@@ -23,10 +23,12 @@ import {
 } from '$lib/stores/workflows';
 import {
   type CancelWorkflowRequest,
+  type PauseWorkflowRequest,
   ResetReapplyExcludeType,
   ResetReapplyType,
   type ResetWorkflowRequest,
   type SearchAttribute,
+  type UnpauseWorkflowRequest,
   type UpdateWorkflowResponse,
 } from '$lib/types';
 import type {
@@ -527,6 +529,95 @@ export async function resetWorkflow({
   }
 
   return requestFromAPI<{ runId: string }>(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+    params: {
+      'execution.runId': runId,
+    },
+  });
+}
+
+type PauseWorkflowOptions = {
+  namespace: string;
+  workflow: WorkflowExecution;
+  identity?: string;
+  reason: string;
+};
+
+export async function pauseWorkflow(
+  {
+    namespace,
+    workflow: { id: workflowId, runId },
+    reason,
+    identity,
+  }: PauseWorkflowOptions,
+  request = fetch,
+) {
+  const formattedReason = formatReason({
+    action: Action.Pause,
+    reason,
+    identity,
+  });
+  const body: PauseWorkflowRequest = {
+    namespace,
+    workflowId,
+    runId,
+    reason: formattedReason,
+    requestId: crypto.randomUUID(),
+    ...(identity && { identity }),
+  };
+
+  const route = routeForApi('workflow.pause', {
+    namespace,
+    workflowId,
+  });
+
+  return requestFromAPI(route, {
+    request,
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+    params: {
+      'execution.runId': runId,
+    },
+  });
+}
+
+export async function unpauseWorkflow(
+  {
+    namespace,
+    workflow: { id: workflowId, runId },
+    reason,
+    identity,
+  }: PauseWorkflowOptions,
+  request = fetch,
+) {
+  const formattedReason = formatReason({
+    action: Action.Unpause,
+    reason,
+    identity,
+  });
+  const body: UnpauseWorkflowRequest = {
+    namespace,
+    workflowId,
+    runId,
+    reason: formattedReason,
+    requestId: crypto.randomUUID(),
+    ...(identity && { identity }),
+  };
+
+  const route = routeForApi('workflow.unpause', {
+    namespace,
+    workflowId,
+  });
+
+  return requestFromAPI(route, {
+    request,
     notifyOnError: false,
     options: {
       method: 'POST',

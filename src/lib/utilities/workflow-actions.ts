@@ -17,6 +17,12 @@ export const getPlaceholder = (action: Action, identity: string): string => {
     case Action.Terminate:
       translatedAction = translate('workflows.terminated');
       break;
+    case Action.Pause:
+      translatedAction = translate('workflows.paused');
+      break;
+    case Action.Unpause:
+      translatedAction = translate('workflows.unpaused');
+      break;
     default:
       unhandledAction(action);
   }

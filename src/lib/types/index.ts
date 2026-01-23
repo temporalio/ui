@@ -4,10 +4,10 @@ import type { google, temporal } from '@temporalio/proto';
 
 export type DescribeNamespaceResponse =
   temporal.api.workflowservice.v1.IDescribeNamespaceResponse & {
-    // TODO: remove when TS SDK has been updated and includes reportedProblemsSearchAttribute
+    // TODO: remove when TS SDK has been updated and includes workflowPause
     namespaceInfo?: temporal.api.namespace.v1.INamespaceInfo & {
       capabilities?: temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
-        reportedProblemsSearchAttribute?: boolean;
+        workflowPause?: boolean;
       };
     };
   };
@@ -52,6 +52,21 @@ export type PendingWorkflowTaskInfo =
   temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
 export type WorkflowExtendedInfo =
   temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo;
+// TODO: remove when TS SDK has been updated and includes PauseWorkflowExecutionRequest and UnpauseWorkflowExecutionRequest
+type PauseOrUnpauseWorkflowRequest = {
+  namespace: string;
+  workflowId: string;
+  runId?: string;
+  identity?: string;
+  reason?: string;
+  requestId?: string;
+};
+export type PauseWorkflowRequest =
+  // temporal.api.workflowservice.v1.IPauseWorkflowExecutionRequest;
+  PauseOrUnpauseWorkflowRequest;
+export type UnpauseWorkflowRequest =
+  // temporal.api.workflowservice.v1.IUnpauseWorkflowExecutionRequest;
+  PauseOrUnpauseWorkflowRequest;
 
 // api.history
 

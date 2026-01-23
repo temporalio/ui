@@ -102,6 +102,7 @@ export type WorkflowStatus =
   | 'ContinuedAsNew'
   | 'Canceled'
   | 'Terminated'
+  | 'Paused'
   | null;
 
 export type WorkflowType = string | null;

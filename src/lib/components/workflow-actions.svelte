@@ -1,11 +1,13 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
+  import PauseConfirmationModal from '$lib/components/workflow/client-actions/pause-confirmation-modal.svelte';
   import ResetConfirmationModal from '$lib/components/workflow/client-actions/reset-confirmation-modal.svelte';
   import SignalConfirmationModal from '$lib/components/workflow/client-actions/signal-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
+  import UnpauseConfirmationModal from '$lib/components/workflow/client-actions/unpause-confirmation-modal.svelte';
   import UpdateConfirmationModal from '$lib/components/workflow/client-actions/update-confirmation-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
@@ -45,28 +47,31 @@
   let resetConfirmationModalOpen = $state(false);
   let signalConfirmationModalOpen = $state(false);
   let updateConfirmationModalOpen = $state(false);
+  let pauseConfirmationModalOpen = $state(false);
 
   let coreUser = coreUserStore();
 
   let cancelEnabled = $derived(
-    workflowCancelEnabled($page.data.settings, $coreUser, namespace),
+    workflowCancelEnabled(page.data.settings, $coreUser, namespace),
   );
 
   let signalEnabled = $derived(
-    workflowSignalEnabled($page.data.settings, $coreUser, namespace),
+    workflowSignalEnabled(page.data.settings, $coreUser, namespace),
   );
 
   let updateEnabled = $derived(
-    workflowUpdateEnabled($page.data.settings, $coreUser, namespace),
+    workflowUpdateEnabled(page.data.settings, $coreUser, namespace),
   );
 
   let terminateEnabled = $derived(
-    workflowTerminateEnabled($page.data.settings, $coreUser, namespace),
+    workflowTerminateEnabled(page.data.settings, $coreUser, namespace),
   );
 
   let resetAuthorized = $derived(
-    workflowResetEnabled($page.data.settings, $coreUser, namespace),
+    workflowResetEnabled(page.data.settings, $coreUser, namespace),
   );
+
+  let workflowPaused = $derived(workflow.status === 'Paused');
 
   // https://github.com/temporalio/temporal/releases/tag/v1.27.1
   let canResetWithPendingChildWorkflows = $derived(
@@ -82,6 +87,10 @@
   );
   let actionsDisabled = $derived(
     !resetEnabled && !signalEnabled && !terminateEnabled,
+  );
+
+  const pauseEnabled = $derived(
+    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause,
   );
 
   const getResetDescription = ({
@@ -120,6 +129,13 @@
     description?: string;
   }[] = $derived([
     {
+      label: translate('workflows.request-cancellation'),
+      onClick: () => (cancelConfirmationModalOpen = true),
+      testId: 'request-cancellation-button',
+      enabled: cancelEnabled || !cancelInProgress,
+      description: '',
+    },
+    {
       label: translate('workflows.reset'),
       onClick: () => (resetConfirmationModalOpen = true),
       testId: 'reset-button',
@@ -153,111 +169,106 @@
   ]);
 </script>
 
+{#snippet pauseButton()}
+  <Button
+    on:click={() => (pauseConfirmationModalOpen = true)}
+    disabled={!pauseEnabled}
+    size="sm"
+  >
+    {#if workflowPaused}
+      {translate('workflows.unpause-workflow')}
+    {:else}
+      {translate('workflows.pause-workflow')}
+    {/if}
+  </Button>
+{/snippet}
+
+{#snippet resetButton()}
+  <Button
+    on:click={() => (resetConfirmationModalOpen = true)}
+    disabled={!resetEnabled}
+    size="sm"
+  >
+    {translate('workflows.reset')}
+  </Button>
+{/snippet}
+
+{#snippet startWorkflow()}
+  <MenuItem
+    onclick={() =>
+      goto(
+        routeForWorkflowStart({
+          namespace,
+          workflowId: workflow.id,
+          runId: workflow.runId,
+          taskQueue: workflow.taskQueue,
+          workflowType: workflow.name,
+        }),
+      )}
+    disabled={workflowCreateDisabled(page)}
+    data-testid="start-workflow-button"
+  >
+    {translate('workflows.start-workflow-like-this-one')}
+  </MenuItem>
+{/snippet}
+
+{#snippet runningWorkflowActions()}
+  {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
+    {#if destructive}
+      <MenuDivider />
+    {/if}
+    <MenuItem
+      onclick={onClick}
+      {destructive}
+      disabled={!enabled}
+      data-testid={testId}
+      {description}
+    >
+      {label}
+    </MenuItem>
+  {/each}
+  <MenuDivider />
+  {@render startWorkflow()}
+{/snippet}
+
+{#snippet worklfowActions()}
+  {@render startWorkflow()}
+  {#if terminateEnabled && next}
+    <MenuDivider />
+    <MenuItem
+      onclick={() => (terminateConfirmationModalOpen = true)}
+      data-testid="terminate-button"
+      destructive
+    >
+      {translate('workflows.terminate-latest')}
+    </MenuItem>
+  {/if}
+{/snippet}
+
 <div class="flex items-center gap-2">
   {#if isRunning}
-    <Button
-      on:click={() => (cancelConfirmationModalOpen = true)}
-      disabled={!cancelEnabled || cancelInProgress}
-      size="sm"
-    >
-      {translate('workflows.request-cancellation')}
-    </Button>
-    <MenuContainer>
-      <MenuButton
-        disabled={actionsDisabled}
-        hasIndicator
-        controls="workflow-actions"
-        variant="secondary"
-        size="sm"
-      >
-        {translate('workflows.more-actions')}
-      </MenuButton>
-      <Menu
-        id="workflow-actions"
-        position="right"
-        class="w-[16rem] md:w-[24rem]"
-      >
-        {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
-          {#if destructive}
-            <MenuDivider />
-          {/if}
-          <MenuItem
-            onclick={onClick}
-            {destructive}
-            disabled={!enabled}
-            data-testid={testId}
-            {description}
-          >
-            {label}
-          </MenuItem>
-        {/each}
-        {#if !workflowCreateDisabled($page)}
-          <MenuDivider />
-          <MenuItem
-            onclick={() =>
-              goto(
-                routeForWorkflowStart({
-                  namespace,
-                  workflowId: workflow.id,
-                  runId: workflow.runId,
-                  taskQueue: workflow.taskQueue,
-                  workflowType: workflow.name,
-                }),
-              )}
-            data-testid="start-workflow-button"
-          >
-            {translate('workflows.start-workflow-like-this-one')}
-          </MenuItem>
-        {/if}
-      </Menu>
-    </MenuContainer>
+    {@render pauseButton()}
   {:else}
-    <Button
-      on:click={() => (resetConfirmationModalOpen = true)}
-      disabled={!resetEnabled}
+    {@render resetButton()}
+  {/if}
+  <MenuContainer>
+    <MenuButton
+      disabled={actionsDisabled}
+      hasIndicator
+      controls="workflow-actions"
+      variant="secondary"
       size="sm"
     >
-      {translate('workflows.reset')}
-    </Button>
-    <MenuContainer>
-      <MenuButton
-        hasIndicator
-        controls="workflow-actions"
-        variant="secondary"
-        size="sm"
-      >
-        {translate('workflows.more-actions')}
-      </MenuButton>
-      <Menu id="workflow-actions" position="right" class="w-[16rem]">
-        <MenuItem
-          onclick={() =>
-            goto(
-              routeForWorkflowStart({
-                namespace,
-                workflowId: workflow.id,
-                runId: workflow.runId,
-                taskQueue: workflow.taskQueue,
-                workflowType: workflow.name,
-              }),
-            )}
-          disabled={workflowCreateDisabled($page)}
-          data-testid="start-workflow-button"
-        >
-          {translate('workflows.start-workflow-like-this-one')}
-        </MenuItem>
-        {#if terminateEnabled && next}
-          <MenuDivider />
-          <MenuItem
-            onclick={() => (terminateConfirmationModalOpen = true)}
-            data-testid="terminate-button"
-            destructive
-          >
-            {translate('workflows.terminate-latest')}
-          </MenuItem>
-        {/if}
-      </Menu>
-    </MenuContainer>
-  {/if}
+      {translate('workflows.more-actions')}
+    </MenuButton>
+    <Menu id="workflow-actions" position="right" class="w-[16rem] md:w-[24rem]">
+      {#if isRunning}
+        {@render runningWorkflowActions()}
+      {:else}
+        {@render worklfowActions()}
+      {/if}
+    </Menu>
+  </MenuContainer>
 </div>
 
 {#if resetEnabled}
@@ -303,4 +314,22 @@
     {first}
     bind:open={terminateConfirmationModalOpen}
   />
+{/if}
+
+{#if pauseEnabled}
+  {#if workflowPaused}
+    <UnpauseConfirmationModal
+      {refresh}
+      {workflow}
+      {namespace}
+      bind:open={pauseConfirmationModalOpen}
+    />
+  {:else}
+    <PauseConfirmationModal
+      {refresh}
+      {workflow}
+      {namespace}
+      bind:open={pauseConfirmationModalOpen}
+    />
+  {/if}
 {/if}

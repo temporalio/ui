@@ -152,6 +152,8 @@ export function pathForApi(
     'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/signal/${parameters.signalName}`,
     'workflow.update': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/update/${parameters.updateName}`,
     'workflow.reset': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/reset`,
+    'workflow.pause': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/pause`,
+    'workflow.unpause': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/unpause`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
     'workflows.archived': `/namespaces/${parameters?.namespace}/archived-workflows`,
