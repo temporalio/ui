@@ -157,16 +157,9 @@
 
     {#if !$relativeTime}
       <div
-        class="m-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+        class="mx-4 mb-2 mt-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
       >
-        <div>
-          <p class="font-medium">Timestamp Format</p>
-          <Timestamp
-            as="p"
-            class="text-xs text-secondary"
-            dateTime={currentDate}
-          />
-        </div>
+        <p class="font-medium">Timestamp Format</p>
         <ToggleButtons>
           <ToggleButton
             size="xs"
@@ -187,7 +180,7 @@
       </div>
 
       <div
-        class="m-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+        class="mx-4 mb-2 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
       >
         <p class="font-medium">Hour Format</p>
         <ToggleButtons>
@@ -207,6 +200,14 @@
             on:click={() => setHourFormat('24')}>24-hour</ToggleButton
           >
         </ToggleButtons>
+      </div>
+
+      <div class="mx-4 mb-4 mt-3">
+        <Timestamp
+          as="p"
+          class="text-xs text-secondary"
+          dateTime={currentDate}
+        />
       </div>
     {/if}
 
