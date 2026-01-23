@@ -24,7 +24,9 @@
   class="flex h-full flex-col justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
 >
   <div role="list">
-    <div class="align-center flex items-center justify-between pb-4">
+    <div
+      class="align-center flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col"
+    >
       <a
         href={resolve('', {})}
         class="flex w-fit items-center gap-1 text-nowrap"
