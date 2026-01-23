@@ -27,7 +27,7 @@ describe('timestamp', () => {
 
   it('should accept format override for short', () => {
     const result = get(timestamp)(date, { format: 'short' });
-    expect(result).toMatch(/\d{2}[-/]\d{2}[-/]\d{2}/); // Matches date formats like 22-04-13 or 4/13/22
+    expect(result).toMatch(/\d{1,2}[-/]\d{1,2}[-/]\d{2}/); // Matches date formats like 22-04-13 or 4/13/22
     expect(result).toContain('4:29:35');
   });
 
@@ -60,13 +60,13 @@ describe('timestamp', () => {
   it('should respect timestampFormat store', () => {
     timestampFormat.set('short');
     const result = get(timestamp)(date);
-    expect(result).toMatch(/\d{2}[-/]\d{2}[-/]\d{2}/); // Matches date formats like 22-04-13 or 4/13/22
+    expect(result).toMatch(/\d{1,2}[-/]\d{1,2}[-/]\d{2}/); // Matches date formats like 22-04-13 or 4/13/22
   });
 
   it('should allow format override to take precedence over store', () => {
     timestampFormat.set('long');
     const result = get(timestamp)(date, { format: 'short' });
-    expect(result).toMatch(/\d{2}[-/]\d{2}[-/]\d{2}/); // Short format
+    expect(result).toMatch(/\d{1,2}[-/]\d{1,2}[-/]\d{2}/); // Short format
     expect(result).not.toContain('April'); // Long format uses full month name
   });
 
