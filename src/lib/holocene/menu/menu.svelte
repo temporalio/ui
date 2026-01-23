@@ -62,8 +62,6 @@
     class?: ClassNameValue;
     usePortal?: boolean;
     scrollContainer?: string;
-    flipOnCollision?: boolean;
-    hideWhenAnchorHidden?: boolean;
   }
 
   let {
@@ -75,8 +73,6 @@
     maxHeight = 'max-h-[20rem]',
     usePortal = false,
     scrollContainer,
-    flipOnCollision = undefined,
-    hideWhenAnchorHidden = undefined,
     children,
     ...rest
   }: Props = $props();
@@ -131,39 +127,13 @@
   );
 </script>
 
-{#if usePortal && anchorElement}
-  <Portal
-    anchor={anchorElement}
-    open={$open}
-    position={portalPosition}
-    {flipOnCollision}
-    {hideWhenAnchorHidden}
-    {scrollContainer}
-  >
-    <ul
-      role="menu"
-      class={merge(sharedMenuStyles, maxHeight, className)}
-      aria-labelledby={id}
-      tabindex={-1}
-      {id}
-      bind:this={menuElement}
-      bind:clientHeight={height}
-      onfocusout={handleFocusOut}
-      onclick={handleClick}
-      {...rest}
-    >
-      {@render children?.()}
-    </ul>
-  </Portal>
-{:else}
+{#snippet menu({ _class, style }: { _class?: string; style?: string })}
   <ul
     role="menu"
-    class={merge(styles, maxHeight, className)}
+    class={_class}
     aria-labelledby={id}
     tabindex={-1}
-    style={position === 'top-right' || position === 'top-left'
-      ? `top: -${height + 16}px;`
-      : ''}
+    {style}
     {id}
     bind:this={menuElement}
     bind:clientHeight={height}
@@ -173,4 +143,23 @@
   >
     {@render children?.()}
   </ul>
+{/snippet}
+
+{#if usePortal && anchorElement}
+  <Portal
+    anchor={anchorElement}
+    open={$open}
+    position={portalPosition}
+    {scrollContainer}
+  >
+    {@render menu({ _class: merge(sharedMenuStyles, maxHeight, className) })}
+  </Portal>
+{:else}
+  {@render menu({
+    _class: merge(styles, maxHeight, className),
+    style:
+      position === 'top-right' || position === 'top-left'
+        ? `top: -${height + 16}px;`
+        : undefined,
+  })}
 {/if}
