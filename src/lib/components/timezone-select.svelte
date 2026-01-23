@@ -176,6 +176,11 @@
             active={$timestampFormat === 'long'}
             on:click={() => setTimestampFormat('long')}>Long</ToggleButton
           >
+          <ToggleButton
+            size="xs"
+            active={$timestampFormat === 'iso'}
+            on:click={() => setTimestampFormat('iso')}>ISO</ToggleButton
+          >
         </ToggleButtons>
       </div>
 
@@ -187,16 +192,19 @@
           <ToggleButton
             size="xs"
             active={$hourFormat === 'system'}
+            disabled={$timestampFormat === 'iso'}
             on:click={() => setHourFormat('system')}>System</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '12'}
+            disabled={$timestampFormat === 'iso'}
             on:click={() => setHourFormat('12')}>12-hour</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '24'}
+            disabled={$timestampFormat === 'iso'}
             on:click={() => setHourFormat('24')}>24-hour</ToggleButton
           >
         </ToggleButtons>
