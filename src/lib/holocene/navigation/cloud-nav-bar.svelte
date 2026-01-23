@@ -43,10 +43,10 @@
 
       <button
         title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-        class="flex items-center justify-center"
+        class="flex items-center justify-center p-1"
         onclick={ontoggle}
       >
-        <Icon name="collapse" class="h-6 w-6" />
+        <Icon name="collapse" class="h-6 w-6 pl-2" />
       </button>
     </div>
     {#if children}
