@@ -96,7 +96,7 @@ describe('timestamp', () => {
   it('should accept relative override to force relative time', () => {
     timeFormat.set('local');
     relativeTime.set(false);
-    const result = get(timestamp)(date, { format: 'relative' });
+    const result = get(timestamp)(date, { relative: true });
     expect(result).toContain('ago');
   });
 
@@ -104,7 +104,7 @@ describe('timestamp', () => {
     timeFormat.set('local');
     relativeTime.set(false);
     timestampFormat.set('medium');
-    const result = get(timestamp)(date, { format: 'relative' });
+    const result = get(timestamp)(date, { relative: true });
     expect(result).toContain('ago');
   });
 

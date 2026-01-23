@@ -8,31 +8,23 @@
   } from '$lib/stores/time-format';
   import {
     formatDate,
-    type TimestampFormat,
+    type FormatDateOptions,
     type ValidTime,
   } from '$lib/utilities/format-date';
-
-  type TimestampOptions = {
-    format?: TimestampFormat | 'relative';
-    relativeLabel?: string;
-  };
 
   export const timestamp = derived(
     [timeFormat, relativeTime, timestampFormat],
     ([$timeFormat, $relativeTime, $timestampFormat]) => {
       return (
         date: ValidTime | undefined | null,
-        options?: TimestampOptions,
+        options: FormatDateOptions = {},
       ): string => {
-        const isRelativeOverride = options?.format === 'relative';
-
-        const format = isRelativeOverride
-          ? $timestampFormat
-          : (options?.format ?? $timestampFormat);
-        const relative = isRelativeOverride ? true : $relativeTime;
-        const relativeLabel = options?.relativeLabel ?? undefined;
+        const format = options?.format ?? $timestampFormat;
+        const relative = options?.relative ?? $relativeTime;
+        const relativeLabel = options?.relativeLabel;
 
         return formatDate(date, $timeFormat, {
+          ...options,
           relative,
           format,
           relativeLabel,
@@ -48,17 +40,15 @@
   import type { Snippet } from 'svelte';
 
   type T = $$Generic<keyof SvelteHTMLElements>;
-  type DateTime = ValidTime | null | undefined;
 
   export { timestampSnippet as timestamp };
 
   type Props = SvelteHTMLElements[T] & {
-    dateTime: DateTime;
+    dateTime: ValidTime | null | undefined;
     as?: T;
     fallback?: string;
     leading?: Snippet<[]>;
-    // only used to override the user's stored preference in certain cases
-    overrideTimestampFormat?: TimestampFormat;
+    options?: FormatDateOptions; // overrides the user's stored preference
   };
 
   let {
@@ -66,17 +56,14 @@
     as = undefined,
     class: className = undefined,
     fallback = undefined,
-    overrideTimestampFormat = undefined,
+    options = undefined,
     leading,
     ...rest
   }: Props = $props();
 </script>
 
-{#snippet timestampSnippet(dateTime: DateTime)}
-  {$timestamp(
-    dateTime,
-    overrideTimestampFormat ? { format: overrideTimestampFormat } : undefined,
-  )}
+{#snippet timestampSnippet(dateTime: ValidTime | null | undefined)}
+  {$timestamp(dateTime, options)}
 {/snippet}
 
 {#if as}
