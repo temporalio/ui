@@ -19,12 +19,14 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    hourFormat,
     relativeTime,
     timeFormat,
     timestampFormat,
   } from '$lib/stores/time-format';
   import {
     formatUTCOffset,
+    type HourFormat,
     type TimestampFormat,
   } from '$lib/utilities/format-date';
   import {
@@ -80,6 +82,10 @@
 
   const setTimestampFormat = (format: TimestampFormat) => {
     $timestampFormat = format;
+  };
+
+  const setHourFormat = (format: HourFormat) => {
+    $hourFormat = format;
   };
 
   $: timezone = Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat;
@@ -176,6 +182,29 @@
             size="xs"
             active={$timestampFormat === 'long'}
             on:click={() => setTimestampFormat('long')}>Long</ToggleButton
+          >
+        </ToggleButtons>
+      </div>
+
+      <div
+        class="m-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+      >
+        <p class="font-medium">Hour Format</p>
+        <ToggleButtons>
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === 'system'}
+            on:click={() => setHourFormat('system')}>System</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === '12'}
+            on:click={() => setHourFormat('12')}>12-hour</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === '24'}
+            on:click={() => setHourFormat('24')}>24-hour</ToggleButton
           >
         </ToggleButtons>
       </div>
