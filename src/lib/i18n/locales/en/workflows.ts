@@ -125,6 +125,7 @@ export const Strings = {
   'reset-success-alert-description':
     'You can find the resulting Workflow Execution <1>here</1>.',
   'workflow-paused': 'This Workflow is Paused',
+  'workflow-paused-reason': 'Reason this Workflow is paused',
   'workflow-paused-description':
     'This Workflow is Paused, which means the worker will no longer process tasks on this Workflow. There are still some events that will continue to run:',
   'workflow-pause-description':
