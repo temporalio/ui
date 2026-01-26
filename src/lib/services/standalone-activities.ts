@@ -227,3 +227,56 @@ export const pollActivityExecution = (
 
   return requestFromAPI(route, { params, signal });
 };
+
+export const cancelActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.cancel', {
+    namespace,
+    activityId,
+  });
+
+  const body = {
+    namespace,
+    activityId,
+    runId,
+    requestId: crypto.randomUUID(),
+    ...(identity && { identity }),
+  };
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
+    },
+  });
+};
+
+export const terminateActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  reason?: string,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.terminate', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        runId,
+        reason: reason || '',
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};

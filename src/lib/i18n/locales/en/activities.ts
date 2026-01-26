@@ -70,4 +70,15 @@ export const Strings = {
   'select-activity': 'Select activity {{activity}}',
   'back-to-activities': 'Back to Activities',
   'start-activity-like-this-one': 'Start Activity Like This One',
+  'request-cancellation': 'Request Cancellation',
+  terminate: 'Terminate',
+  'cancel-modal-title': 'Cancel Activity Execution',
+  'cancel-modal-confirmation':
+    'Are you sure you want to cancel this activity execution?',
+  'cancel-success': 'Activity execution cancellation requested.',
+  'terminate-modal-title': 'Terminate Activity Execution',
+  'terminate-modal-confirmation':
+    'Are you sure you want to terminate this activity execution? This action cannot be undone.',
+  'terminate-success': 'Activity execution terminated.',
+  'activity-execution-actions': 'Activity Execution Actions',
 };

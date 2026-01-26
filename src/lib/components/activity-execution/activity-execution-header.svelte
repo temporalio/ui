@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import type { ActivityExecutionPoller } from '$lib/utilities/activity-execution-poller.svelte';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
@@ -12,14 +13,16 @@
     DetailListTimestampValue,
   } from '../detail-list';
 
+  import ActivityExecutionActions from './activity-execution-actions.svelte';
   import ActivityExecutionStatus from './activity-execution-status.svelte';
 
   interface Props {
     activityExecutionInfo: ActivityExecutionInfo;
     namespace: string;
+    poller: ActivityExecutionPoller;
   }
 
-  let { activityExecutionInfo, namespace }: Props = $props();
+  let { activityExecutionInfo, namespace, poller }: Props = $props();
 </script>
 
 <div class="space-y-2">
@@ -28,6 +31,7 @@
       <ActivityExecutionStatus status={activityExecutionInfo.status} />
       <h1>{activityExecutionInfo.activityType.name}</h1>
     </div>
+    <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
   <DetailList aria-label="activity execution details" rowCount={4}>
     <DetailListColumn>
