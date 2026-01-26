@@ -19,19 +19,21 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    BASE_TIME_FORMAT_OPTIONS,
     relativeTime,
     timeFormat,
-    type TimeFormatOptions,
     timestampFormat,
-    TimezoneOptions,
-    Timezones,
   } from '$lib/stores/time-format';
   import {
     formatUTCOffset,
-    getLocalTime,
     type TimestampFormat,
   } from '$lib/utilities/format-date';
+  import {
+    BASE_TIME_FORMAT_OPTIONS,
+    getLocalTime,
+    type TimeFormatOptions,
+    TimezoneOptions,
+    Timezones,
+  } from '$lib/utilities/timezone';
 
   export let position: 'left' | 'right' = 'right';
   export let size: ButtonStyles['size'] = 'md';

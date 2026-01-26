@@ -5,6 +5,7 @@
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -12,15 +13,9 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { coreUserStore } from '$lib/stores/core-user';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { activityCommandsEnabled } from '$lib/utilities/activity-commands-enabled';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -69,10 +64,7 @@
         )}
         {@render detail(
           translate('activities.paused-since'),
-          formatDate(activity.pauseInfo?.pauseTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          $timestamp(activity.pauseInfo?.pauseTime),
         )}
         {@render detail(
           translate('activities.pause-reason'),
@@ -92,10 +84,7 @@
       {#if activity.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          formatDate(activity.lastAttemptCompleteTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          $timestamp(activity.lastAttemptCompleteTime),
         )}
       {/if}
       {#if activity.expirationTime}
@@ -115,19 +104,13 @@
       {#if activity.lastHeartbeatTime}
         {@render detail(
           translate('workflows.last-heartbeat'),
-          formatDate(activity.lastHeartbeatTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          $timestamp(activity.lastHeartbeatTime),
         )}
       {/if}
       {#if activity.lastStartedTime}
         {@render detail(
           translate('workflows.last-started-time'),
-          formatDate(activity.lastStartedTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          $timestamp(activity.lastStartedTime),
         )}
       {/if}
       {#if activity.lastWorkerIdentity}
@@ -260,11 +243,7 @@
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
-      {formatDate(activity.scheduledTime, $timeFormat, {
-        relative: $relativeTime,
-        format: $timestampFormat,
-        relativeLabel: '',
-      })}
+      {$timestamp(activity.scheduledTime, { relativeLabel: '' })}
       <strong>({timeDifference})</strong>
     </p>
   </div>

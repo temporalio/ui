@@ -16,6 +16,7 @@
     nameRegexPattern?: RegExp;
     nameHintText?: string;
     cancelHref?: string;
+    successHref?: string;
     projectId?: string;
   };
 
@@ -29,6 +30,7 @@
     nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
     nameHintText = translate('nexus.endpoint-name-hint-with-dash'),
     cancelHref = '/nexus',
+    successHref: _successHref = undefined,
     projectId: _projectId = undefined,
   }: Props = $props();
 

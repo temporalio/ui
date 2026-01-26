@@ -79,11 +79,7 @@
     {:else if label === translate('schedules.upcoming-runs')}
       <td class="cell truncate">
         {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
-          <Timestamp
-            as="div"
-            dateTime={run}
-            options={{ relativeLabel: translate('common.from-now') }}
-          />
+          <Timestamp as="div" dateTime={run} />
         {/each}
       </td>
     {:else if label === translate('schedules.schedule-spec')}

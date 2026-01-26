@@ -310,6 +310,8 @@ export const Strings = {
   'pending-nexus-operation': 'Pending Nexus Operation',
   'schedule-event-id': 'Scheduled Event ID',
   'schedule-to-close-timeout': 'Schedule to Close Timeout',
+  'schedule-to-start-timeout': 'Schedule to Start Timeout',
+  'start-to-close-timeout': 'Start to Close Timeout',
   'related-events': 'Related Events',
   priority: 'Priority',
   fairness: 'Fairness',
