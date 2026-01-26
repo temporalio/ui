@@ -9,7 +9,7 @@
   import { navOpen } from '$lib/stores/nav-open';
 
   import CloudNavBar from './cloud-nav-bar.svelte';
-  // import OSSNavBar from './oss-nav-bar.svelte';
+  import OSSNavBar from './oss-nav-bar.svelte';
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     isCloud?: boolean;
@@ -43,15 +43,7 @@
   data-testid="navigation-header"
   {...restProps}
 >
-  <CloudNavBar
-    {version}
-    navOpen={$navOpen}
-    {subtitle}
-    {children}
-    {bottom}
-    ontoggle={toggle}
-  />
-  <!-- {#if isCloud}
+  {#if isCloud}
     <CloudNavBar
       {version}
       navOpen={$navOpen}
@@ -69,5 +61,5 @@
       {bottom}
       ontoggle={toggle}
     />
-  {/if} -->
+  {/if}
 </nav>
