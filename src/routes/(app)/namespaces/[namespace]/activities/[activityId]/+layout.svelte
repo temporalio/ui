@@ -34,7 +34,7 @@
   });
 
   onDestroy(() => {
-    activityPollerAbortController.abort();
+    poller.abort();
   });
 
   let { children } = $props();
@@ -44,6 +44,7 @@
   <ErrorComponent {error} />
 {:else}
   <ActivityExecutionLayout
+    {poller}
     activityExecution={$activityExecution}
     {namespace}
     {activityId}

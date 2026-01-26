@@ -177,6 +177,8 @@ export function pathForApi(
     'standalone-activity': `/namespaces/${parameters.namespace}/activities/${parameters.activityId}`,
     'standalone-activities': `/namespaces/${parameters.namespace}/activities`,
     'standalone-activities.count': `/namespaces/${parameters.namespace}/activity-count`,
+    'standalone-activity.cancel': `/namespaces/${parameters.namespace}/activities/${parameters.activityId}/cancel`,
+    'standalone-activity.terminate': `/namespaces/${parameters.namespace}/activities/${parameters.activityId}/terminate`,
   };
 
   return getPath(routes[route]);

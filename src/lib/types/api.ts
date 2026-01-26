@@ -57,7 +57,10 @@ export type WorkerDeploymentVersionAPIRoutePath = 'worker-deployment-version';
 export type StandaloneActivitiesAPIRoutePath =
   | 'standalone-activities'
   | 'standalone-activities.count';
-export type StandaloneActivityAPIRoutePath = 'standalone-activity';
+export type StandaloneActivityAPIRoutePath =
+  | 'standalone-activity'
+  | 'standalone-activity.cancel'
+  | 'standalone-activity.terminate';
 
 export type APIRoutePath =
   | ParameterlessAPIRoutePath

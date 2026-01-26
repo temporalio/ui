@@ -71,4 +71,8 @@ export class ActivityExecutionPoller {
       }
     }
   }
+
+  abort() {
+    this.abortController.abort();
+  }
 }

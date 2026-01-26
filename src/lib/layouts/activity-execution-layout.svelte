@@ -11,6 +11,7 @@
   import { translate } from '$lib/i18n/translate';
   import { activitiesSearchParams } from '$lib/stores/activities';
   import type { ActivityExecution } from '$lib/types/activity-execution';
+  import type { ActivityExecutionPoller } from '$lib/utilities/activity-execution-poller.svelte';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForStandaloneActivities,
@@ -25,9 +26,11 @@
     namespace: string;
     activityId: string;
     children: Snippet;
+    poller: ActivityExecutionPoller;
   }
 
-  let { activityExecution, children, namespace, activityId }: Props = $props();
+  let { activityExecution, children, namespace, activityId, poller }: Props =
+    $props();
 
   const routeParameters = $derived({ namespace, activityId });
 
@@ -65,6 +68,7 @@
     </div>
     <ActivityExecutionHeader
       {namespace}
+      {poller}
       activityExecutionInfo={activityExecution.info}
     />
 
