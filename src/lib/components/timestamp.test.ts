@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  hourFormat,
   relativeTime,
   timeFormat,
   timestampFormat,
@@ -17,6 +18,7 @@ describe('timestamp', () => {
     timeFormat.set('UTC');
     relativeTime.set(false);
     timestampFormat.set('medium');
+    hourFormat.set('system');
   });
 
   it('should format date with default settings', () => {
@@ -113,5 +115,19 @@ describe('timestamp', () => {
     relativeTime.set(true);
     const result = get(timestamp)(date, { format: 'short' });
     expect(result).toContain('ago');
+  });
+
+  it('should respect hourFormat store', () => {
+    hourFormat.set('24');
+    const result = get(timestamp)(date);
+    expect(result).not.toContain('PM');
+    expect(result).toContain('16:29:35');
+  });
+
+  it('should use 12-hour format when hourFormat is set to 12', () => {
+    hourFormat.set('12');
+    const result = get(timestamp)(date);
+    expect(result).toContain('4:29:35');
+    expect(result).not.toContain('16:29:35'); // Should not be 24-hour format
   });
 });

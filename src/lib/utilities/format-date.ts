@@ -16,11 +16,14 @@ import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 
 export type { ValidTime };
 
+export type HourFormat = 'system' | '12' | '24';
+
 export type FormatDateOptions = {
   format?: TimestampFormat;
   relative?: boolean;
   relativeLabel?: string;
   flexibleUnits?: boolean;
+  hourFormat?: HourFormat;
 };
 
 export const timestampFormats: Record<
@@ -57,6 +60,7 @@ export const timestampFormats: Record<
     timeZoneName: 'short',
     fractionalSecondDigits: 2,
   },
+  iso: {},
 } as const;
 
 export type TimestampFormat = keyof typeof timestampFormats;
@@ -96,33 +100,45 @@ export function formatDate(
       relativeLabel = isFuture(date) ? 'from now' : 'ago',
       flexibleUnits = false,
       format = 'medium',
+      hourFormat = 'system',
     } = options;
 
     const currentDate = Date.now();
 
     const parsed = parseJSON(new Date(date));
 
-    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
-      if (relative) {
-        return (
-          formatDistanceToNowStrict(parsed, {
-            ...(!flexibleUnits &&
-              Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
-                unit: 'day',
-              }),
-          }) + ` ${relativeLabel}`
-        );
-      }
+    // Handle relative time first (takes precedence over format)
+    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL && relative) {
+      return (
+        formatDistanceToNowStrict(parsed, {
+          ...(!flexibleUnits &&
+            Math.abs(differenceInHours(currentDate, parsed)) > 24 && {
+              unit: 'day',
+            }),
+        }) + ` ${relativeLabel}`
+      );
+    }
 
-      return new Intl.DateTimeFormat(
-        undefined,
-        timestampFormats[format],
-      ).format(parsed);
+    // Handle ISO format
+    if (format === 'iso') {
+      return parsed.toISOString();
+    }
+
+    const hour12 =
+      hourFormat === 'system' ? undefined : hourFormat === '12' ? true : false;
+
+    const formatOptions = {
+      ...timestampFormats[format],
+      ...(hour12 !== undefined && { hour12 }),
+    };
+
+    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
+      return new Intl.DateTimeFormat(undefined, formatOptions).format(parsed);
     }
 
     const timeZone = getTimezone(timeFormat);
     return new Intl.DateTimeFormat(undefined, {
-      ...timestampFormats[format],
+      ...formatOptions,
       timeZone,
     }).format(parsed);
   } catch (e) {
