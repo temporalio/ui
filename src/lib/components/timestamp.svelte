@@ -1,7 +1,5 @@
-<script lang="ts">
-  import type { SvelteHTMLElements } from 'svelte/elements';
-
-  import type { Snippet } from 'svelte';
+<script lang="ts" module>
+  import { derived } from 'svelte/store';
 
   import {
     relativeTime,
@@ -11,43 +9,61 @@
   import {
     formatDate,
     type FormatDateOptions,
-    type TimestampFormat,
+    type ValidTime,
   } from '$lib/utilities/format-date';
-  import type { ValidTime } from '$lib/utilities/format-time';
+
+  export const timestamp = derived(
+    [timeFormat, relativeTime, timestampFormat],
+    ([$timeFormat, $relativeTime, $timestampFormat]) => {
+      return (
+        date: ValidTime | undefined | null,
+        options: FormatDateOptions = {},
+      ): string => {
+        const format = options?.format ?? $timestampFormat;
+        const relative = options?.relative ?? $relativeTime;
+        const relativeLabel = options?.relativeLabel;
+
+        return formatDate(date, $timeFormat, {
+          ...options,
+          relative,
+          format,
+          relativeLabel,
+        });
+      };
+    },
+  );
+</script>
+
+<script lang="ts">
+  import type { SvelteHTMLElements } from 'svelte/elements';
+
+  import type { Snippet } from 'svelte';
 
   type T = $$Generic<keyof SvelteHTMLElements>;
-  type DateTime = ValidTime | null | undefined;
 
-  export { timestamp };
+  export { timestampSnippet as timestamp };
 
   type Props = SvelteHTMLElements[T] & {
-    dateTime: DateTime;
-    options?: FormatDateOptions;
+    dateTime: ValidTime | null | undefined;
     as?: T;
     fallback?: string;
     leading?: Snippet<[]>;
-    // only used to override the user's stored preference in certain cases
-    overrideTimestampFormat?: TimestampFormat;
+    options?: FormatDateOptions; // overrides the user's stored preference
   };
 
   let {
     dateTime,
-    options = {},
     as = undefined,
     class: className = undefined,
     fallback = undefined,
-    overrideTimestampFormat = undefined,
+    options = undefined,
     leading,
     ...rest
   }: Props = $props();
 </script>
 
-{#snippet timestamp(dateTime: DateTime, options: FormatDateOptions)}
-  {formatDate(dateTime, $timeFormat, {
-    relative: $relativeTime,
-    format: overrideTimestampFormat ?? $timestampFormat,
-    ...options,
-  })}
+{#snippet timestampSnippet(dateTime: ValidTime | null | undefined)}
+  {$timestamp(dateTime, options)}
 {/snippet}
 
 {#if as}
@@ -56,11 +72,11 @@
       {@render leading()}
     {/if}
     {#if dateTime}
-      {@render timestamp(dateTime, options)}
+      {@render timestampSnippet(dateTime)}
     {:else if fallback}
       {fallback}
     {/if}
   </svelte:element>
 {:else}
-  {@render timestamp(dateTime, options)}
+  {@render timestampSnippet(dateTime)}
 {/if}

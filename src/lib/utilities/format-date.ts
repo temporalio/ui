@@ -7,12 +7,14 @@ import {
 
 import {
   BASE_TIME_FORMAT_OPTIONS,
+  getLocalTime,
   getTimezone,
-  TimezoneOptions,
   Timezones,
-} from '$lib/stores/time-format';
+} from '$lib/utilities/timezone';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
+
+export type { ValidTime };
 
 export type FormatDateOptions = {
   format?: TimestampFormat;
@@ -59,6 +61,24 @@ export const timestampFormats: Record<
 
 export type TimestampFormat = keyof typeof timestampFormats;
 
+/**
+ * Determines if a given date/time value represents a future moment.
+ * Handles ValidTime types including strings, numbers, Dates, and Timestamp objects.
+ *
+ * @param time - The time value to check (can be a string, Date, or Timestamp)
+ * @returns true if the time is in the future, false otherwise (including null/undefined)
+ */
+export function isFuture(time: ValidTime | undefined | null): boolean {
+  if (!time) return false;
+
+  try {
+    const date = isTimestamp(time) ? timestampToDate(time) : new Date(time);
+    return date > new Date();
+  } catch {
+    return false;
+  }
+}
+
 export function formatDate(
   date: ValidTime | undefined | null,
   timeFormat: string = BASE_TIME_FORMAT_OPTIONS.UTC,
@@ -71,14 +91,14 @@ export function formatDate(
       date = timestampToDate(date);
     }
 
-    const currentDate = Date.now();
-    const isFutureDate = new Date(date).getTime() - currentDate > 0;
     const {
       relative = false,
-      relativeLabel = isFutureDate ? 'from now' : 'ago',
+      relativeLabel = isFuture(date) ? 'from now' : 'ago',
       flexibleUnits = false,
       format = 'medium',
     } = options;
+
+    const currentDate = Date.now();
 
     const parsed = parseJSON(new Date(date));
 
@@ -127,20 +147,6 @@ export function formatUTCOffset(
     absoluteValue > 9 ? `${absoluteValue}:00` : `0${absoluteValue}:00`;
   if (offset > 0) return `${utc}+${formattedOffset}`;
   if (offset < 0) return `${utc}-${formattedOffset}`;
-}
-
-export function getLocalTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
-export function getLocalTime(): string {
-  const localTimezone = getLocalTimezone();
-  const localOption = TimezoneOptions.find(({ zones }) =>
-    zones?.includes(localTimezone),
-  );
-  return localOption
-    ? `${localOption.label} (${localOption.abbr})`
-    : localTimezone;
 }
 
 export function getSelectedTimezone(timeFormat: string): string {
