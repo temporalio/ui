@@ -5,7 +5,10 @@ function unhandledAction(action: never) {
   console.error('Unhandled action:', action);
 }
 
-export const getPlaceholder = (action: Action, identity: string): string => {
+export const getPlaceholder = (
+  action: Action,
+  identity: string | undefined,
+): string => {
   let translatedAction: string;
   switch (action) {
     case Action.Cancel:
@@ -29,7 +32,7 @@ export const getPlaceholder = (action: Action, identity: string): string => {
 
   return translate('workflows.workflow-action-reason-placeholder', {
     action: translatedAction,
-    identity,
+    identity: identity || translate('common.unknown'),
   });
 };
 
@@ -40,7 +43,7 @@ export const formatReason = ({
 }: {
   action: Action;
   reason: string;
-  identity: string;
+  identity: string | undefined;
 }) => {
   const placeholder = getPlaceholder(action, identity);
   return reason ? [reason.trim(), placeholder].join(' ') : placeholder;

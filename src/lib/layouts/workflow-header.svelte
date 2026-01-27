@@ -59,15 +59,23 @@
 
   const isRunning = $derived(workflow?.isRunning);
   const activitiesCanceled = $derived(
-    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
+    Boolean(
+      workflow?.status &&
+        ['Terminated', 'TimedOut', 'Canceled'].includes(workflow.status),
+    ),
   );
   const cancelInProgress = $derived(
-    isCancelInProgress(workflow?.status, $fullEventHistory),
+    Boolean(
+      workflow?.status &&
+        isCancelInProgress(workflow.status, $fullEventHistory),
+    ),
   );
   const workflowPaused = $derived(workflow?.status === 'Paused');
   const resetRunId = $derived(
-    workflow.workflowExtendedInfo?.resetRunId ||
-      $resetWorkflows[workflow?.runId],
+    workflow
+      ? workflow.workflowExtendedInfo?.resetRunId ||
+          $resetWorkflows[workflow.runId]
+      : undefined,
   );
   const workflowHasBeenReset = $derived(!!resetRunId);
   const workflowRelationships = $derived(

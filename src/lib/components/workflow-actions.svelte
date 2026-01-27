@@ -20,6 +20,7 @@
   import { resetEvents } from '$lib/stores/events';
   import { temporalVersion } from '$lib/stores/versions';
   import { refresh } from '$lib/stores/workflow-run';
+  import type { WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
@@ -97,6 +98,10 @@
     resetAuthorized,
     canResetWithPendingChildWorkflows,
     resetEvents,
+  }: {
+    resetAuthorized: boolean;
+    canResetWithPendingChildWorkflows: boolean;
+    resetEvents: WorkflowEvent[];
   }) => {
     if (!resetAuthorized) {
       return translate('workflows.reset-disabled-unauthorized');

@@ -48,9 +48,10 @@
         message: translate('workflows.unpause-success'),
       });
     } catch (err: unknown) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     } finally {
       loading = false;
     }
