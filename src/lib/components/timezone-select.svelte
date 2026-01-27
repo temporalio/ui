@@ -191,7 +191,7 @@
             disabled={hourFormatDisabled}
             on:click={() => setHourFormat('system')}
           >
-            <Icon name="system-window" />
+            System
           </ToggleButton>
           <ToggleButton
             size="xs"
