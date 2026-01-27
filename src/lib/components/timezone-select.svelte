@@ -82,6 +82,8 @@
   };
 
   $: timezone = Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat;
+  $: hourFormatDisabled = $timestampFormat === 'iso' || $relativeTime;
+  $: timezoneSelectionDisabled = $relativeTime || $timestampFormat === 'iso';
 
   openUnsubscriber = open.subscribe((isOpen) => {
     if (isOpen) {
@@ -186,7 +188,7 @@
           <ToggleButton
             size="xs"
             active={$hourFormat === 'system'}
-            disabled={$timestampFormat === 'iso' || $relativeTime}
+            disabled={hourFormatDisabled}
             on:click={() => setHourFormat('system')}
           >
             <Icon name="system-window" />
@@ -194,13 +196,13 @@
           <ToggleButton
             size="xs"
             active={$hourFormat === '12'}
-            disabled={$timestampFormat === 'iso' || $relativeTime}
+            disabled={hourFormatDisabled}
             on:click={() => setHourFormat('12')}>12h</ToggleButton
           >
           <ToggleButton
             size="xs"
             active={$hourFormat === '24'}
-            disabled={$timestampFormat === 'iso' || $relativeTime}
+            disabled={hourFormatDisabled}
             on:click={() => setHourFormat('24')}>24h</ToggleButton
           >
         </ToggleButtons>
@@ -220,7 +222,7 @@
         bind:value={search}
         icon="search"
         placeholder={translate('common.search')}
-        disabled={$relativeTime || $timestampFormat === 'iso'}
+        disabled={timezoneSelectionDisabled}
       />
     </div>
 
@@ -233,7 +235,7 @@
             onclick={() => selectTimezone(value)}
             data-testid="timezones-{value}"
             selected={value === $timeFormat}
-            disabled={$relativeTime || $timestampFormat === 'iso'}
+            disabled={timezoneSelectionDisabled}
             description={value === BASE_TIME_FORMAT_OPTIONS.LOCAL
               ? localTime
               : undefined}
@@ -247,7 +249,7 @@
         <MenuItem
           selected={value === $timeFormat}
           onclick={() => selectTimezone(value)}
-          disabled={$relativeTime || $timestampFormat === 'iso'}
+          disabled={timezoneSelectionDisabled}
           description={formatUTCOffset(offset, translate('common.utc'))}
         >
           {label} ({abbr})
