@@ -221,7 +221,7 @@
         fullRoute: routeForBatchOperations({ namespace }),
       },
       {
-        subPath: 'standalone-activities',
+        subPath: 'activities',
         fullRoute: routeForStandaloneActivities({ namespace }),
       },
       {

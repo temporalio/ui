@@ -81,4 +81,10 @@ export const Strings = {
     'Are you sure you want to terminate this activity execution? This action cannot be undone.',
   'terminate-success': 'Activity execution terminated.',
   'activity-execution-actions': 'Activity Execution Actions',
+  'standalone-activities-disabled':
+    'Standalone Activities are disabled for this Namespace.',
+  'standalone-activities-enablement':
+    'If you want to enable Standalone Activities globally, please ensure the following values are set in Dynamic Config.',
+  'standalone-activities-enablement-per-namespace':
+    'If you want to enable Standalone Activities for this namespace only, include the following',
 };
