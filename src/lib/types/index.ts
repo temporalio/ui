@@ -4,10 +4,10 @@ import type { google, temporal } from '@temporalio/proto';
 
 export type DescribeNamespaceResponse =
   temporal.api.workflowservice.v1.IDescribeNamespaceResponse & {
-    // TODO: remove when TS SDK has been updated and includes reportedProblemsSearchAttribute
+    // TODO: remove when TS SDK has been updated and includes standaloneActivities
     namespaceInfo?: temporal.api.namespace.v1.INamespaceInfo & {
       capabilities?: temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
-        reportedProblemsSearchAttribute?: boolean;
+        standaloneActivities?: boolean;
       };
     };
   };
