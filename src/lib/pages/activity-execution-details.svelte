@@ -71,20 +71,6 @@
     <h4>{$activityExecution.info.activityType.name}</h4>
     <div class="grid grid-cols-2 gap-4">
       <div class="space-y-2">
-        <h6 class="col-span-2 underline underline-offset-4">Identity</h6>
-        <DetailList
-          rowCount={3}
-          aria-label="Activity Execution Identity Details"
-        >
-          <DetailListLabel>Activity ID</DetailListLabel>
-          <DetailListTextValue text={$activityExecution.info.activityId} />
-          <DetailListLabel>Activity Type</DetailListLabel>
-          <DetailListTextValue
-            text={$activityExecution.info.activityType.name}
-          />
-          <DetailListLabel>Run ID</DetailListLabel>
-          <DetailListTextValue copyable text={$activityExecution.info.runId} />
-        </DetailList>
         {#if !isClosed}
           <h6 class="underline underline-offset-4">Current State</h6>
           <DetailList

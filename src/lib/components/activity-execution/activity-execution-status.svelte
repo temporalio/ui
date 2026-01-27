@@ -1,19 +1,5 @@
 <script lang="ts" module>
-  import type { BadgeType } from '$lib/holocene/badge.svelte';
   import type { ActivityExecutionStatus } from '$lib/types/activity-execution';
-
-  export const activityStatusToBadgeType: Record<
-    ActivityExecutionStatus,
-    BadgeType
-  > = {
-    ACTIVITY_EXECUTION_STATUS_RUNNING: 'primary',
-    ACTIVITY_EXECUTION_STATUS_COMPLETED: 'success',
-    ACTIVITY_EXECUTION_STATUS_CANCELED: 'warning',
-    ACTIVITY_EXECUTION_STATUS_FAILED: 'danger',
-    ACTIVITY_EXECUTION_STATUS_TERMINATED: 'warning',
-    ACTIVITY_EXECUTION_STATUS_TIMED_OUT: 'warning',
-    ACTIVITY_EXECUTION_STATUS_UNSPECIFIED: 'default',
-  };
 
   export const activityStatusToLabel: Record<ActivityExecutionStatus, string> =
     {
@@ -28,8 +14,29 @@
 </script>
 
 <script lang="ts">
+  import { cva } from 'class-variance-authority';
+  import { twMerge } from 'tailwind-merge';
+
   import HeartbeatIndicator from '$lib/components/heart-beat-indicator.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+
+  const activityStatus = cva(
+    [
+      'flex items-center rounded-sm px-4 py-0.5 whitespace-nowrap text-black gap-1 font-medium text-lg',
+    ],
+    {
+      variants: {
+        status: {
+          ACTIVITY_EXECUTION_STATUS_RUNNING: 'bg-blue-300',
+          ACTIVITY_EXECUTION_STATUS_TIMED_OUT: 'bg-orange-200',
+          ACTIVITY_EXECUTION_STATUS_COMPLETED: 'bg-green-200',
+          ACTIVITY_EXECUTION_STATUS_FAILED: 'bg-red-200',
+          ACTIVITY_EXECUTION_STATUS_CANCELED: 'bg-slate-100',
+          ACTIVITY_EXECUTION_STATUS_TERMINATED: 'bg-yellow-200',
+          ACTIVITY_EXECUTION_STATUS_UNSPECIFIED: 'bg-slate-100',
+        },
+      },
+    },
+  );
 
   interface Props {
     status: ActivityExecutionStatus;
@@ -38,9 +45,9 @@
   let { status }: Props = $props();
 </script>
 
-<Badge class="flex items-center gap-1" type={activityStatusToBadgeType[status]}>
+<div class={twMerge(activityStatus({ status }))}>
   {activityStatusToLabel[status]}
   {#if status === 'ACTIVITY_EXECUTION_STATUS_RUNNING'}
     <HeartbeatIndicator />
   {/if}
-</Badge>
+</div>

@@ -60,6 +60,7 @@ export class ActivityExecutionPoller {
             this.token,
             this.abortController.signal,
           );
+
           if (!isEmptyObject(polledActivityExecution)) {
             this.token = polledActivityExecution.longPollToken;
             this.onUpdate(polledActivityExecution);

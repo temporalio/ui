@@ -225,7 +225,7 @@ export const pollActivityExecution = (
     longPollToken: token,
   });
 
-  return requestFromAPI(route, { params, signal });
+  return requestFromAPI(route, { params, options: { signal } });
 };
 
 export const cancelActivityExecution = async (
