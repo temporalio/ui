@@ -133,13 +133,17 @@
     destructive?: boolean;
     description?: string;
   }[] = $derived([
-    {
-      label: translate('workflows.request-cancellation'),
-      onClick: () => (cancelConfirmationModalOpen = true),
-      testId: 'request-cancellation-button',
-      enabled: cancelEnabled || !cancelInProgress,
-      description: '',
-    },
+    ...(pauseEnabled
+      ? [
+          {
+            label: translate('workflows.request-cancellation'),
+            onClick: () => (cancelConfirmationModalOpen = true),
+            testId: 'request-cancellation-button',
+            enabled: cancelEnabled || !cancelInProgress,
+            description: '',
+          },
+        ]
+      : []),
     {
       label: translate('workflows.reset'),
       onClick: () => (resetConfirmationModalOpen = true),
@@ -185,6 +189,16 @@
     {:else}
       {translate('workflows.pause-workflow')}
     {/if}
+  </Button>
+{/snippet}
+
+{#snippet requestCancellationButton()}
+  <Button
+    on:click={() => (cancelConfirmationModalOpen = true)}
+    disabled={!cancelEnabled || cancelInProgress}
+    size="sm"
+  >
+    {translate('workflows.request-cancellation')}
   </Button>
 {/snippet}
 
@@ -252,7 +266,11 @@
 
 <div class="flex items-center gap-2">
   {#if isRunning}
-    {@render pauseButton()}
+    {#if pauseEnabled}
+      {@render pauseButton()}
+    {:else}
+      {@render requestCancellationButton()}
+    {/if}
   {:else}
     {@render resetButton()}
   {/if}
