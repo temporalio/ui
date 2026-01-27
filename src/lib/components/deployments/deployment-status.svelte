@@ -45,7 +45,7 @@
   );
 </script>
 
-<Tooltip text={tooltip[status]} top width={250}>
+<Tooltip text={tooltip[status]} topLeft width={250}>
   <p class={deploymentStatus({ status })}>
     <Icon name={icon[status]} />{label}
   </p>
