@@ -4,11 +4,13 @@
   import { page } from '$app/state';
 
   import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getActivityPollers } from '$lib/services/pollers-service';
   import { activitiesSearchParams } from '$lib/stores/activities';
   import type { ActivityExecution } from '$lib/types/activity-execution';
   import { pathMatches } from '$lib/utilities/path-matches';
@@ -52,6 +54,12 @@
 
   const activitiesHref = $derived(
     `${routeForStandaloneActivities({ namespace })}?${$activitiesSearchParams}`,
+  );
+
+  // activityExecution.info.taskQueue is intentional here, when the poller resolves, the reference to
+  // activityExecution is updated, causing the $derived to re-run and the #await block to re-trigger.
+  const getPollersRequest = $derived(
+    getActivityPollers({ queue: activityExecution.info.taskQueue, namespace }),
   );
 </script>
 
@@ -102,6 +110,18 @@
         />
       </TabList>
     </Tabs>
+    {#await getPollersRequest then response}
+      {#if !response.pollers && activityExecution.info.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING'}
+        <Alert
+          intent="error"
+          title={translate('workflows.workflow-error-no-workers-title')}
+        >
+          {translate('workflows.workflow-error-no-workers-description', {
+            taskQueue: activityExecution.info.taskQueue,
+          })}
+        </Alert>
+      {/if}
+    {/await}
     {@render children()}
   </div>
 {/if}

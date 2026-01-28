@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { twMerge } from 'tailwind-merge';
@@ -9,11 +9,13 @@
 
   import { page } from '$app/state';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
@@ -22,6 +24,7 @@
     encodings,
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
+  import { getActivityPollers } from '$lib/services/pollers-service';
   import { startStandaloneActivity } from '$lib/services/standalone-activities';
   import type { SearchAttributeInput } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
@@ -30,7 +33,10 @@
     activityIDReusePolicyOptions,
   } from '$lib/types/activity-execution';
   import { getIdentity } from '$lib/utilities/core-context';
-  import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
+  import {
+    routeForStandaloneActivityDetails,
+    routeForTaskQueue,
+  } from '$lib/utilities/route-for';
 
   import type { StandaloneActivityFormData } from './types';
   import Message from '../../form/message.svelte';
@@ -43,6 +49,7 @@
   }
 
   const { namespace }: Props = $props();
+  const taskQueueParam = page.url.searchParams.get('taskQueue') ?? '';
 
   const formDefaults = $derived<StandaloneActivityFormData>({
     namespace,
@@ -50,7 +57,7 @@
     encoding: 'json/plain',
     activityId: page.url.searchParams.get('activityId') ?? '',
     activityType: page.url.searchParams.get('activityType') ?? '',
-    taskQueue: page.url.searchParams.get('taskQueue') ?? '',
+    taskQueue: taskQueueParam,
     startToCloseTimeout: page.url.searchParams.get('startToCloseTimeout') ?? '',
     scheduleToCloseTimeout:
       page.url.searchParams.get('scheduleToCloseTimeout') ?? '',
@@ -60,6 +67,7 @@
   const getFormDefaults = () => formDefaults;
 
   let searchAttributes = $state<SearchAttributeInput[]>([]);
+  let taskQueueActive = $state<boolean | null>(null);
 
   const schema = z
     .object({
@@ -159,12 +167,27 @@
     $form.encoding = e;
   });
 
+  onMount(() => {
+    checkTaskQueue(taskQueueParam);
+  });
+
   onDestroy(() => {
     unsubscribe?.();
   });
 
   const generateRandomId = () => {
     $form.activityId = crypto.randomUUID();
+  };
+
+  const checkTaskQueue = async (queue: string) => {
+    if (!queue) return;
+    taskQueueActive = null;
+    const response = await getActivityPollers({ namespace, queue });
+    if (response.pollers && response.pollers.length > 0) {
+      taskQueueActive = true;
+    } else {
+      taskQueueActive = false;
+    }
   };
 </script>
 
@@ -197,7 +220,25 @@
     bind:value={$form.taskQueue}
     error={!!$errors.taskQueue}
     hintText={$errors.taskQueue?.[0]}
+    on:blur={() => checkTaskQueue($form.taskQueue)}
   />
+  {#if taskQueueActive !== null}
+    <Alert
+      intent={taskQueueActive ? 'success' : 'error'}
+      title={taskQueueActive
+        ? 'Task Queue is active'
+        : 'Task Queue is inactive'}
+    >
+      <div class="flex w-full items-center justify-between">
+        <Link
+          href={routeForTaskQueue({ namespace, queue: $form.taskQueue })}
+          newTab
+        >
+          View Task Queue
+        </Link>
+      </div>
+    </Alert>
+  {/if}
   <Input
     id="activityType"
     required

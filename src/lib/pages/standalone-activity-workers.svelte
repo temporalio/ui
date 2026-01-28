@@ -12,10 +12,9 @@
   let { namespace }: Props = $props();
 
   const searchAttributes = $derived($activityExecution.info.searchAttributes);
+  const queue = $derived($activityExecution.info.taskQueue);
 
-  const getPollersRequest = $derived(
-    getPollers({ queue: $activityExecution.info.taskQueue, namespace }),
-  );
+  const getPollersRequest = getPollers({ queue, namespace });
 
   const decodedSearchAttributes = $derived.by(() => {
     if (isEmptyObject(searchAttributes)) return {};
