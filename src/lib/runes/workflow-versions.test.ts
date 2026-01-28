@@ -182,14 +182,10 @@ describe('getWorkflowPollersWithVersions', () => {
 
   describe('Edge cases', () => {
     it('should handle workflow without search attributes', () => {
-      const workflow = {} as WorkflowExecution;
       const poller = createMockPoller('deployment-v1', 'build-123');
       const workers = createMockWorkers([poller]);
 
-      const result = getWorkflowPollersWithVersions(
-        workflow.searchAttributes.indexedFields,
-        workers,
-      );
+      const result = getWorkflowPollersWithVersions(undefined, workers);
 
       expect(result.pollers).toHaveLength(1);
       expect(result.currentDeployment).toBeUndefined();
