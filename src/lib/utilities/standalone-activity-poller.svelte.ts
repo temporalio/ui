@@ -61,11 +61,18 @@ export class StandaloneActivityPoller {
             this.abortController.signal,
           );
 
-          if (!isEmptyObject(polledActivityExecution)) {
+          if (
+            polledActivityExecution &&
+            !isEmptyObject(polledActivityExecution)
+          ) {
             this.token = polledActivityExecution.longPollToken;
             this.onUpdate(polledActivityExecution);
           }
         } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            return;
+          }
+
           this.onError(error);
           break;
         }

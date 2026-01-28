@@ -226,7 +226,11 @@ export const pollActivityExecution = (
     longPollToken: token,
   });
 
-  return requestFromAPI(route, { params, options: { signal } });
+  return requestFromAPI(route, {
+    params,
+    notifyOnError: false,
+    options: { signal },
+  });
 };
 
 export const cancelActivityExecution = async (
