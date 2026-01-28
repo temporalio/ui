@@ -148,7 +148,7 @@
         bind:value={$timeFormat}
         label={translate('common.time-format')}
       >
-        <Option value={'relative'}>{translate('common.relative')}</Option>
+        <Option value="relative">{translate('common.relative')}</Option>
         <Option value={BASE_TIME_FORMAT_OPTIONS.UTC}
           >{translate('common.utc')}</Option
         >

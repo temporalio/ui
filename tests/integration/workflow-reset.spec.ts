@@ -13,9 +13,11 @@ test.describe('Workflow Reset Modal Shown', () => {
     },
   } = mockCompletedWorkflow;
   const workflowUrl = `/namespaces/default/workflows/${workflowId}/${runId}`;
+
   test.beforeEach(async ({ page }) => {
     await mockWorkflowApis(page, mockResetWorkflow);
   });
+
   test('shows reset alert if workflow was reset', async ({ page }) => {
     await page.goto(workflowUrl);
 
@@ -31,9 +33,11 @@ test.describe('Workflow Reset Modal Not Shown', () => {
     },
   } = mockCompletedWorkflow;
   const workflowUrl = `/namespaces/default/workflows/${workflowId}/${runId}`;
+
   test.beforeEach(async ({ page }) => {
     await mockWorkflowApis(page, mockCompletedWorkflow);
   });
+
   test('does not show reset alert if workflow was not reset', async ({
     page,
   }) => {

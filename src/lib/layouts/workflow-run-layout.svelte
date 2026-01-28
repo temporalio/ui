@@ -163,7 +163,7 @@
     refreshInterval = null;
   };
 
-  $: runId, clearWorkflowData();
+  $: (runId, clearWorkflowData());
 
   $: getWorkflowAndEventHistory(namespace, workflowId, runId);
   $: getOnlyWorkflowWithPendingActivities($refresh, $pauseLiveUpdates);

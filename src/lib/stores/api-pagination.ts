@@ -150,13 +150,13 @@ export function createPaginationStore<T>(
       };
       store.hasPrevious = false;
     } else {
-      (store.index = currentIndex + 1),
-        (store.indexData[store.index] = {
-          nextToken,
-          start: store.indexData[currentIndex].end + 1,
-          end: store.indexData[currentIndex].end + items.length,
-          items,
-        });
+      store.index = currentIndex + 1;
+      store.indexData[store.index] = {
+        nextToken,
+        start: store.indexData[currentIndex].end + 1,
+        end: store.indexData[currentIndex].end + items.length,
+        items,
+      };
       store.hasPrevious = true;
     }
 
