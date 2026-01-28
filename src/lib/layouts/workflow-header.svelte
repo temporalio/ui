@@ -59,14 +59,23 @@
 
   const isRunning = $derived(workflow?.isRunning);
   const activitiesCanceled = $derived(
-    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
+    Boolean(
+      workflow?.status &&
+        ['Terminated', 'TimedOut', 'Canceled'].includes(workflow.status),
+    ),
   );
   const cancelInProgress = $derived(
-    isCancelInProgress(workflow?.status, $fullEventHistory),
+    Boolean(
+      workflow?.status &&
+        isCancelInProgress(workflow.status, $fullEventHistory),
+    ),
   );
+  const workflowPaused = $derived(workflow?.status === 'Paused');
   const resetRunId = $derived(
-    workflow.workflowExtendedInfo?.resetRunId ||
-      $resetWorkflows[workflow?.runId],
+    workflow
+      ? workflow.workflowExtendedInfo?.resetRunId ||
+          $resetWorkflows[workflow.runId]
+      : undefined,
   );
   const workflowHasBeenReset = $derived(!!resetRunId);
   const workflowRelationships = $derived(
@@ -170,8 +179,32 @@
         icon="info"
         intent="info"
         title={translate('workflows.cancel-request-sent')}
+        class="max-w-screen-lg xl:w-2/3"
       >
         {translate('workflows.cancel-request-sent-description')}
+      </Alert>
+    </div>
+  {/if}
+  {#if workflowPaused}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        title={translate('workflows.workflow-paused')}
+        class="max-w-screen-lg xl:w-2/3"
+      >
+        <div class="mt-2 flex flex-col gap-2">
+          <p>{translate('workflows.workflow-paused-description')}</p>
+          <ul class="list-disc pl-6">
+            <li>{translate('workflows.workflow-pause-description-item-1')}</li>
+            <li>{translate('workflows.workflow-pause-description-item-2')}</li>
+            <li>{translate('workflows.workflow-pause-description-item-3')}</li>
+          </ul>
+          {#if workflow?.pauseInfo?.reason}
+            <p>{translate('workflows.workflow-paused-reason')}</p>
+            <p class="text-secondary">{workflow.pauseInfo.reason}</p>
+          {/if}
+        </div>
       </Alert>
     </div>
   {/if}

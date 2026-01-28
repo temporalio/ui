@@ -76,7 +76,7 @@
     <Checkbox
       bind:checked={includeType}
       label={translate('activities.pause-all-activity-types', {
-        type,
+        type: type ?? '',
       })}
     />
   </div>

@@ -10,6 +10,8 @@ export type WorkflowAPIRoutePath =
   | 'workflow.terminate'
   | 'workflow.cancel'
   | 'workflow.reset'
+  | 'workflow.pause'
+  | 'workflow.unpause'
   | 'events.raw'
   | 'events.ascending'
   | 'events.descending';
