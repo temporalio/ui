@@ -72,11 +72,11 @@
         {translate('deployments.deployments')}
       </caption>
       <tr slot="headers">
-        {#each columns as { label }}
+        {#each columns as { label } (label)}
           <th>{label}</th>
         {/each}
       </tr>
-      {#each visibleItems as version}
+      {#each visibleItems as version, index (index)}
         <VersionTableRow
           routingConfig={deployment.workerDeploymentInfo.routingConfig}
           {version}

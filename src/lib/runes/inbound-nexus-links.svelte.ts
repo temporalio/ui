@@ -18,7 +18,7 @@ export const getInboundNexusLinkEvents = (history: WorkflowEvent[]) => {
     ]);
 
     return matchingEvents.filter(getInboundLinkForEvent);
-  } catch (error) {
+  } catch {
     return [];
   }
 };

@@ -22,7 +22,7 @@
     try {
       JSON.parse(value);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   };

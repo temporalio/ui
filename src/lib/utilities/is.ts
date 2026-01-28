@@ -13,7 +13,7 @@ type Parenthesis = (typeof parenthesis)[number];
 type EndParenthesis = ')';
 type Join = (typeof joins)[number];
 
-const executionStatuses: Readonly<WorkflowStatus[]> = [
+const executionStatuses: readonly WorkflowStatus[] = [
   'Running',
   'TimedOut',
   'Completed',

@@ -32,15 +32,13 @@
   }
 
   export interface MenuItemWithoutHrefProps
-    extends BaseProps,
-      Omit<HTMLLiAttributes, 'class' | 'onclick'> {
+    extends BaseProps, Omit<HTMLLiAttributes, 'class' | 'onclick'> {
     href?: never;
     newTab?: never;
   }
 
   interface MenuItemWithHrefProps
-    extends BaseProps,
-      Omit<HTMLAnchorAttributes, 'class' | 'onclick'> {
+    extends BaseProps, Omit<HTMLAnchorAttributes, 'class' | 'onclick'> {
     href: string;
     newTab?: boolean;
   }

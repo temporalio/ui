@@ -37,6 +37,7 @@ test.describe('Workflow Reset Modal Shown', () => {
       await expect(page.getByText('rainbow-statuses-09db15')).toBeVisible();
     });
   });
+
   test('Shows User Metadata when Present', async ({ page }) => {
     await page.goto(`${workflowUrl}`);
 

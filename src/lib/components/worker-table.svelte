@@ -119,7 +119,7 @@
       {translate('workflows.nexus-handler')}
     </th>
   </TableHeaderRow>
-  {#each pollers as poller}
+  {#each pollers as poller, index (index)}
     {@const deployment = getPollerDeploymentName(poller)}
     {@const buildId = getPollerBuildId(poller)}
     {@const status = getPollerStatus(poller)}

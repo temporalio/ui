@@ -29,7 +29,7 @@
 
 <div class="container">
   <div class="row">
-    {#each weekDays as day}
+    {#each weekDays as day (day.value)}
       <p class="cell">{day.label.slice(0, 2)}</p>
     {/each}
   </div>

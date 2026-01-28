@@ -109,7 +109,7 @@
           value="custom"
           description="Input Signal name">Custom</Option
         >
-        {#each signalDefinitions as { name: value, description = '' }}
+        {#each signalDefinitions as { name: value, description = '' } (value)}
           <Option {value} {description}>{value}</Option>
         {/each}
       </Select>

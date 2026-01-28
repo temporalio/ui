@@ -61,7 +61,7 @@ async function checkStrictModeErrors() {
     let result: StrictErrorResult;
     try {
       result = JSON.parse(jsonLine);
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse strict mode check results');
       warn(
         '⚠️ Failed to parse strict mode check results. Check CI logs for details.',

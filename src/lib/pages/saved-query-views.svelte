@@ -310,7 +310,7 @@
   <div class="space-y-2 p-1.5">
     <div class="pb-2 text-center">
       <div class="space-y-1">
-        {#each systemWorkflowViews as view}
+        {#each systemWorkflowViews as view (view.id)}
           {#if view.id !== TASK_FAILURES_VIEW.id || hasTaskFailureAttribute}
             {@render queryButton({
               ...view,
@@ -346,7 +346,7 @@
     {#if namespaceSavedQueries.length > 0}
       <div class="text-center">
         <div class="space-y-1">
-          {#each namespaceSavedQueries as savedQuery}
+          {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
             {@render queryButton({
               ...savedQuery,
               active: savedQuery.id === activeQueryView?.id,

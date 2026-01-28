@@ -48,7 +48,7 @@
   {#if children}
     {@render children()}
   {:else}
-    {#each options.map((o) => o.toString()) as option}
+    {#each options.map((o) => o.toString()) as option, index (index)}
       <Option value={option} />
     {/each}
   {/if}

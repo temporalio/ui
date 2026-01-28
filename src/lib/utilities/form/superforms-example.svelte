@@ -267,7 +267,7 @@
         <div class="rounded border border-red-300 bg-red-100 p-3 text-red-700">
           <p class="font-medium">Please fix the following errors:</p>
           <ul class="mt-2 list-inside list-disc">
-            {#each $passwordAllErrors as error}
+            {#each $passwordAllErrors as error, index (index)}
               <li>{error.messages.join(', ')}</li>
             {/each}
           </ul>

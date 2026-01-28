@@ -129,7 +129,7 @@
         {#if parameters.timeRange && !durations.includes(parameters.timeRange)}
           <Option value={parameters.timeRange}>{parameters.timeRange}</Option>
         {/if}
-        {#each durations as value}
+        {#each durations as value (value)}
           <Option {value}>{value}</Option>
         {/each}
       </Select>
@@ -148,7 +148,7 @@
         bind:value={$timeFormat}
         label={translate('common.time-format')}
       >
-        <Option value={'relative'}>{translate('common.relative')}</Option>
+        <Option value="relative">{translate('common.relative')}</Option>
         <Option value={BASE_TIME_FORMAT_OPTIONS.UTC}
           >{translate('common.utc')}</Option
         >

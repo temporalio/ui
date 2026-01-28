@@ -34,7 +34,7 @@
 </script>
 
 <div class="flex flex-col gap-4 {className}">
-  {#each attributes as attribute}
+  {#each attributes as attribute, index (index)}
     <SearchAttributeInput {attributes} bind:attribute {onRemove} />
   {/each}
   <Button

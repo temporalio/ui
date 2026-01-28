@@ -31,7 +31,7 @@
       } else {
         goto(routeForNamespaceSelector());
       }
-    } catch (e) {
+    } catch {
       goto(routeForNamespaceSelector());
     }
   });

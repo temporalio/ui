@@ -63,8 +63,10 @@
 
   type T = $$Generic;
 
-  interface BaseProps
-    extends Omit<HTMLInputAttributes, 'onchange' | 'oninput' | 'onclose'> {
+  interface BaseProps extends Omit<
+    HTMLInputAttributes,
+    'onchange' | 'oninput' | 'onclose'
+  > {
     id: string;
     label: string;
     noResultsText: string;
@@ -475,7 +477,7 @@
       >
         {#if multiselect && isArrayValue(value) && value.length > 0}
           {#if displayChips}
-            {#each value.slice(0, chipLimit) as v}
+            {#each value.slice(0, chipLimit) as v, index (index)}
               <Chip
                 onremove={() => removeOption(v)}
                 removeButtonLabel={removeChipLabel}>{v}</Chip
@@ -600,7 +602,7 @@
       <MenuDivider />
     {/if}
 
-    {#each list as option}
+    {#each list as option, index (index)}
       <ComboboxOption
         onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}

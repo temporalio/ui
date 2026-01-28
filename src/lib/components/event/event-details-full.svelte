@@ -27,7 +27,7 @@
     {:else if group?.pendingNexusOperation}
       <PendingNexusOperationCard operation={group.pendingNexusOperation} />
     {/if}
-    {#each group.eventList as groupEvent}
+    {#each group.eventList as groupEvent (groupEvent.id)}
       <EventCard event={groupEvent} />
     {/each}
   </div>

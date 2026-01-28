@@ -10,6 +10,7 @@ import {
 
 test.describe('Start a Workflow', () => {
   const startWorkflowUrl = '/namespaces/default/workflows/start-workflow';
+
   test.beforeEach(async ({ page }) => {
     await mockGlobalApis(page);
     await mockNamespaceApi(page);

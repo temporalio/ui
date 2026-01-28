@@ -21,7 +21,7 @@
     </div>
 
     <!-- Skeleton rows for loading state -->
-    {#each Array.from({ length: 3 }) as _}
+    {#each Array.from({ length: 3 }) as _, index (index)}
       <div class="grid grid-cols-[1fr_140px_40px] items-start gap-3">
         <Skeleton class="h-10 w-full rounded" />
         <Skeleton class="h-10 w-full rounded" />

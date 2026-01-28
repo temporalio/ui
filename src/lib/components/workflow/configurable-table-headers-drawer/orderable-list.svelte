@@ -65,7 +65,7 @@
     <svelte:fragment slot="heading">
       Available Columns <span class="font-normal">(not in view)</span>
     </svelte:fragment>
-    {#each $availableColumns as { label }}
+    {#each $availableColumns as { label }, index (index)}
       <OrderableListItem
         static
         on:addItem={() => addColumn(label, namespace, table)}
@@ -86,7 +86,7 @@
       {translate('events.custom-search-attributes')}
       <span class="font-normal">(not in view)</span>
     </svelte:fragment>
-    {#each $availableCustomColumns as { label }}
+    {#each $availableCustomColumns as { label }, index (index)}
       <OrderableListItem
         static
         on:addItem={() => addColumn(label, namespace, table)}

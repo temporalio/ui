@@ -489,7 +489,7 @@
           name="trigger-event-id"
           class="h-auto overflow-auto"
         >
-          {#each policies as policy}
+          {#each policies as policy, index (index)}
             <RadioInput
               id={policy.value}
               value={policy.value}
@@ -566,7 +566,7 @@
             name="backfill-event-id"
             class="h-auto overflow-auto"
           >
-            {#each policies.slice(0, viewMoreBackfillOptions ? policies.length : 3) as policy}
+            {#each policies.slice(0, viewMoreBackfillOptions ? policies.length : 3) as policy, index (index)}
               <RadioInput
                 id={policy.value}
                 value={policy.value}

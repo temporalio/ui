@@ -125,7 +125,7 @@
     </MenuItem>
     <hr class="border-subtle" />
 
-    {#each filteredOptions as { value, label, type }}
+    {#each filteredOptions as { value, label, type }, index (index)}
       <MenuItem
         onclick={() => {
           handleNewQuery(value, type);

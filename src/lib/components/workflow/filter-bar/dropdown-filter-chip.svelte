@@ -304,7 +304,7 @@
 
 {#snippet conditionalButtons(options: { value: string; label: string }[])}
   <ToggleButtons>
-    {#each options as option}
+    {#each options as option, index (index)}
       <ToggleButton
         variant="secondary"
         active={localFilter.conditional === option.value}
@@ -411,7 +411,7 @@
                     labelHidden
                     disabled={$timeFormatType !== 'relative' || isNullFilter}
                   >
-                    {#each TIME_UNIT_OPTIONS as unit}
+                    {#each TIME_UNIT_OPTIONS as unit (unit)}
                       <Option value={unit}
                         >{unit} {translate('common.ago')}</Option
                       >
@@ -430,7 +430,7 @@
                 />
                 <div class="ml-6 flex flex-col gap-2">
                   <DatePicker
-                    label={''}
+                    label=""
                     labelHidden
                     on:datechange={onStartDateChange}
                     selected={new Date(localStartDate)}
