@@ -146,7 +146,7 @@ export const getWorkflowNexusLinksFromHistory = (
     }
 
     return Array.from(links);
-  } catch (error) {
+  } catch {
     return [];
   }
 };

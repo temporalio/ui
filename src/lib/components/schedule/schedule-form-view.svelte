@@ -163,7 +163,7 @@
       JSON.parse(value);
       errors['input'] = false;
       return true;
-    } catch (e) {
+    } catch {
       errors['input'] = true;
       return false;
     }

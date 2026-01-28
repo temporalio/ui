@@ -167,7 +167,7 @@ export const fetchPartialRawEvents = async ({
     );
 
     return response.history.events;
-  } catch (e) {
+  } catch {
     return [];
   }
 };

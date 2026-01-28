@@ -17,7 +17,7 @@
         try {
           const result = reader?.result?.toString() ?? '';
           onUpload(result);
-        } catch (e) {
+        } catch {
           toaster.push({
             variant: 'error',
             message: translate('common.upload-error'),
