@@ -41,6 +41,7 @@ export type ConfigurableTableHeader = {
 export const TABLE_TYPE = {
   WORKFLOWS: 'workflows',
   SCHEDULES: 'schedules',
+  ACTIVITIES: 'activities',
 } as const;
 
 type Keys = keyof typeof TABLE_TYPE;
@@ -123,6 +124,37 @@ const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Schedule Spec' },
 ];
 
+export const ActivityHeaderLabels = [
+  'Activity ID',
+  'Run ID',
+  'Activity Type',
+  'Task Queue',
+  'Start Time',
+  'Execution Time',
+  'Close Time',
+  'Status',
+  'Execution Duration',
+  'State Transitions',
+] as const;
+
+export type ActivityHeaderLabel = (typeof ActivityHeaderLabels)[number];
+
+export const DEFAULT_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Status' },
+  { label: 'Activity ID' },
+  { label: 'Activity Type' },
+  { label: 'Task Queue' },
+  { label: 'Start Time' },
+  { label: 'Close Time' },
+];
+
+const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Run ID' },
+  { label: 'Execution Time' },
+  { label: 'Execution Duration' },
+  { label: 'State Transitions' },
+];
+
 export const persistedWorkflowTableColumns = persistStore<State>(
   'namespace-workflow-table-columns',
   {},
@@ -133,18 +165,25 @@ export const persistedSchedulesTableColumns = persistStore<State>(
   {},
 );
 
+export const persistedActivitiesTableColumns = persistStore<State>(
+  'namespace-activities-table-columns',
+  {},
+);
+
 export const configurableTableColumns: Readable<TableColumns> = derived(
   [
     namespaces,
     page,
     persistedWorkflowTableColumns,
     persistedSchedulesTableColumns,
+    persistedActivitiesTableColumns,
   ],
   ([
     $namespaces,
     $page,
     $persistedWorkflowTableColumns,
     $persistedSchedulesTableColumns,
+    $persistedActivitiesTableColumns,
   ]) => {
     const state: TableColumns = {};
     const useOrAddDefaultTableColumnsToNamespace = (
@@ -170,6 +209,11 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
         $persistedSchedulesTableColumns,
         namespace,
         DEFAULT_SCHEDULES_COLUMNS,
+      ),
+      activities: useOrAddDefaultTableColumnsToNamespace(
+        $persistedActivitiesTableColumns,
+        namespace,
+        DEFAULT_ACTIVITIES_COLUMNS,
       ),
     });
 
@@ -224,6 +268,21 @@ export const availableScheduleColumns: (
     ),
   );
 
+export const availableActivityColumns: (
+  namespace: string,
+) => Readable<ConfigurableTableHeader[]> = (namespace) =>
+  derived(configurableTableColumns, ($configurableTableColumns) =>
+    [
+      ...DEFAULT_ACTIVITIES_COLUMNS,
+      ...DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS,
+    ].filter(
+      (header) =>
+        !$configurableTableColumns[namespace]?.activities?.some(
+          (column) => column.label === header.label,
+        ),
+    ),
+  );
+
 export const availableCustomSearchAttributeColumns: (
   namespace: string,
   table?: ConfigurableTableType,
@@ -252,6 +311,8 @@ const getDefaultColumns = (table: ConfigurableTableType) => {
       return DEFAULT_WORKFLOWS_COLUMNS;
     case TABLE_TYPE.SCHEDULES:
       return DEFAULT_SCHEDULES_COLUMNS;
+    case TABLE_TYPE.ACTIVITIES:
+      return DEFAULT_ACTIVITIES_COLUMNS;
   }
 };
 
@@ -299,6 +360,8 @@ const getPersistedColumns = (table: ConfigurableTableType): Writable<State> => {
       return persistedWorkflowTableColumns;
     case TABLE_TYPE.SCHEDULES:
       return persistedSchedulesTableColumns;
+    case TABLE_TYPE.ACTIVITIES:
+      return persistedActivitiesTableColumns;
   }
 };
 

@@ -60,6 +60,14 @@ export type AuthenticationParameters = {
   originUrl?: string;
 };
 
+export interface StartActivityExecutionQueryParams {
+  activityId: string;
+  activityType: string;
+  taskQueue: string;
+  startToCloseTimeout: string;
+  scheduleToCloseTimeout: string;
+}
+
 export const routeForNamespaces = (): string => {
   return resolve('/namespaces', {});
 };
@@ -92,6 +100,67 @@ export const routeForNamespaceSelector = () => {
 
 export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
+};
+
+export const routeForStandaloneActivities = (
+  parameters: NamespaceParameter,
+): string => {
+  return `${routeForNamespace(parameters)}/activities`;
+};
+
+export const routeForStandaloneActivitiesWithQuery = (
+  parameters: NamespaceParameter,
+  queryString: string,
+): string => {
+  const params = new URLSearchParams();
+  params.set('query', queryString);
+
+  return toURL(routeForStandaloneActivities(parameters), params);
+};
+
+export const routeForStartStandaloneActivity = (
+  parameters: NamespaceParameter & Partial<StartActivityExecutionQueryParams>,
+): string => {
+  const params = {
+    activityId: parameters.activityId ?? '',
+    activityType: parameters.activityType ?? '',
+    scheduleToCloseTimeout: parameters.scheduleToCloseTimeout ?? '',
+    startToCloseTimeout: parameters.startToCloseTimeout ?? '',
+    taskQueue: parameters.taskQueue ?? '',
+  };
+  return toURL(`${routeForStandaloneActivities(parameters)}/start`, params);
+};
+
+const routeForStandaloneActivityBase = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return resolve(`${routeForStandaloneActivities(parameters)}/[activityId]`, {
+    activityId: parameters.activityId,
+  });
+};
+
+export const routeForStandaloneActivityDetails = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return `${routeForStandaloneActivityBase(parameters)}/details`;
+};
+
+export const routeForStandaloneActivityWorkers = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return `${routeForStandaloneActivityBase(parameters)}/workers`;
+};
+
+export const routeForStandaloneActivitySearchAttributes = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return `${routeForStandaloneActivityBase(parameters)}/search-attributes`;
+};
+
+export const routeForStandaloneActivityMetadata = (
+  parameters: NamespaceParameter & { activityId: string },
+) => {
+  return `${routeForStandaloneActivityBase(parameters)}/metadata`;
 };
 
 type StartWorkflowParameters = NamespaceParameter &

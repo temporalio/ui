@@ -1,0 +1,67 @@
+import { Meta } from '@storybook/blocks';
+
+import DurationInput from './duration-input.stories.svelte';
+
+<Meta of={DurationInput} />
+
+# Duration Input
+
+`<DurationInput />` allows specifying a Duration in seconds (eg: `"10s"`) while allowing input in varying units.
+
+By default, `<DurationInput />` includes the following Unit options:
+
+- millisecond(s)
+- second(s)
+- minute(s)
+- hour(s)
+
+When entering a value with "millisecond(s)" selected, the value will be converted to a `Duration`, eg. `1000` will be converted to `"1s"`.
+
+An array of custom `Units` can be passed if more options are needed. A `Unit` is described by a `label`, and a `convert` function, with the type signature: `(n: number) => number`. The job of the `convert` function is to convert the value in the selected unit to seconds.
+
+```svelte
+<script lang="ts">
+  import DurationInput, {
+    type Units,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
+
+  const customUnits: Units<'day(s)' | 'week(s)'> = [
+    { label: 'day(s)', convert: (n) => n * 60 * 60 * 24 },
+    { label: 'week(s)', convert: (n) => n * 60 * 60 * 24 * 7 },
+  ];
+
+  let duration = $state('');
+</script>
+
+<DurationInput
+  label="Duration"
+  id="duration"
+  bind:value={duration}
+  units={customUnits}
+  initialUnit="day(s)"
+/>
+```
+
+The `<DurationInput />` Props interface is generic, such that the type of the `initialUnit` prop can be inferred based on the array of `Units` passed in:
+
+```svelte
+<script lang="ts">
+  import DurationInput, { type Units } from '$lib/holocene/duration-input/duration-input.svelte';
+
+  const customUnits: Units<'day(s)' | 'week(s)'> = [
+    { label: 'day(s)', convert: (n) => (n * 60 * 60 * 24) },
+    { label: 'week(s)', convert: (n) => (n * 60 * 60 * 24 * 7) }
+  ];
+
+  let duration = $state('');
+</script>
+
+
+<DurationInput
+  label="Duration"
+  id="duration"
+  bind:value={duration}
+  units={customUnits}
+  initialUnit="second(s)" <!-- will error because "second(s)" is not included in customUnits -->
+/>
+```

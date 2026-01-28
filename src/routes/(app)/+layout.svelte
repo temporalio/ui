@@ -32,6 +32,7 @@
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
+    routeForStandaloneActivities,
     routeForWorkerDeployments,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -72,6 +73,7 @@
   const getRoutes = (namespace: string) => {
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
+      standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
@@ -85,6 +87,7 @@
   const getLinkList = (
     {
       workflowsRoute,
+      standaloneActivitiesRoute,
       schedulesRoute,
       batchOperationsRoute,
       workerDeploymentsRoute,
@@ -94,6 +97,7 @@
       historyImportRoute,
     }: {
       workflowsRoute: string;
+      standaloneActivitiesRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
       workerDeploymentsRoute: string;
@@ -115,6 +119,7 @@
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
           !path.includes(workerDeploymentsRoute) &&
+          !path.includes(standaloneActivitiesRoute) &&
           !path.includes(archivalRoute),
       },
       {
@@ -122,6 +127,12 @@
         icon: 'workflow',
         label: translate('common.workflows'),
         isActive: (path) => path.includes(workflowsRoute),
+      },
+      {
+        href: standaloneActivitiesRoute,
+        icon: 'activity',
+        label: translate('standalone-activities.standalone-activities'),
+        isActive: (path) => path.includes(standaloneActivitiesRoute),
       },
       {
         href: schedulesRoute,
@@ -186,6 +197,7 @@
     batchOperationsRoute,
     workerDeploymentsRoute,
     archivalRoute,
+    standaloneActivitiesRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
@@ -194,6 +206,7 @@
       workerDeploymentsRoute,
       batchOperationsRoute,
       archivalRoute,
+      standaloneActivitiesRoute,
     ].some((route) => page.url.href.includes(route)),
   );
 
@@ -206,6 +219,10 @@
       {
         subPath: 'batch-operations',
         fullRoute: routeForBatchOperations({ namespace }),
+      },
+      {
+        subPath: 'activities',
+        fullRoute: routeForStandaloneActivities({ namespace }),
       },
       {
         subPath: 'worker-deployments',

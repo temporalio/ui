@@ -27,10 +27,7 @@ export async function getPollers(
     params: { taskQueueType: '1' },
   });
 
-  const activityPollers = await requestFromAPI<TaskQueueResponse>(route, {
-    request,
-    params: { taskQueueType: '2' },
-  });
+  const activityPollers = await getActivityPollers(parameters, request);
 
   const nexusPollers = await requestFromAPI<TaskQueueResponse>(route, {
     request,
@@ -38,4 +35,16 @@ export async function getPollers(
   });
 
   return reducePollerTypes({ activityPollers, nexusPollers, workflowPollers });
+}
+
+export async function getActivityPollers(
+  parameters: GetAllPollersRequest,
+  request = fetch,
+): Promise<TaskQueueResponse> {
+  const route = routeForApi('task-queue', parameters);
+
+  return requestFromAPI<TaskQueueResponse>(route, {
+    request,
+    params: { taskQueueType: '2' },
+  });
 }
