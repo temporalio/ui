@@ -26,13 +26,13 @@
 <Template let:args let:context>
   <Table class="w-full" updating={args.updating} data-testid={context.id}>
     <tr slot="headers">
-      {#each Array(args.columns) as _, index}
+      {#each Array(args.columns) as _, index (index)}
         <th>Heading {index + 1}</th>
       {/each}
     </tr>
-    {#each Array(args.rows) as _}
+    {#each Array(args.rows) as _, index (index)}
       <tr>
-        {#each Array(args.columns) as _, colIdx}
+        {#each Array(args.columns) as _, colIdx (colIdx)}
           <td>Cell {colIdx + 1}</td>
         {/each}
       </tr>

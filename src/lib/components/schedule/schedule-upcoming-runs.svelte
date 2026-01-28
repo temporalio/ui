@@ -11,7 +11,7 @@
 
 <Panel class="w-full">
   <h2 class="mb-4">{translate('schedules.upcoming-runs')}</h2>
-  {#each futureRuns.slice(0, 5) as run}
+  {#each futureRuns.slice(0, 5) as run, index (index)}
     <div class="row">
       <Timestamp as="p" dateTime={run} />
     </div>

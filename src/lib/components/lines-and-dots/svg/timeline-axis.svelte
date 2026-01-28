@@ -33,7 +33,7 @@
   startPoint={[x1, timelineHeight]}
   endPoint={[x1 + distance, timelineHeight]}
 />
-{#each Array(ticks) as _, i}
+{#each Array(ticks) as _, i (i)}
   {@const tickX = x1 + i * tickDistance}
   {@const tickY = timelineHeight + radius * 2}
   {#if i !== 0}

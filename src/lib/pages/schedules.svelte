@@ -132,11 +132,11 @@
       >{translate('common.schedules')}</caption
     >
     <tr slot="headers" class="text-left">
-      {#each columns as { label }}
+      {#each columns as { label } (label)}
         <th>{label}</th>
       {/each}
     </tr>
-    {#each visibleItems as schedule}
+    {#each visibleItems as schedule (schedule.scheduleId)}
       <SchedulesTableRow {schedule} {columns} />
     {/each}
 

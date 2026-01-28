@@ -62,7 +62,7 @@
       </td>
     {:else if label === translate('schedules.recent-runs')}
       <td class="cell truncate">
-        {#each sortRecentActions(schedule?.info?.recentActions) as run}
+        {#each sortRecentActions(schedule?.info?.recentActions) as run, index (index)}
           <p>
             <Link
               href={routeForEventHistory({
@@ -78,7 +78,7 @@
       </td>
     {:else if label === translate('schedules.upcoming-runs')}
       <td class="cell truncate">
-        {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
+        {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run, index (index)}
           <Timestamp as="div" dateTime={run} />
         {/each}
       </td>

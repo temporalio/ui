@@ -21,7 +21,7 @@
 <!-- Form-level validation errors -->
 {#if errors && errors.length > 0}
   <Alert intent="error" title={errorsTitle}>
-    {#each errors as error}
+    {#each errors as error, index (index)}
       <p>{error}</p>
     {/each}
   </Alert>

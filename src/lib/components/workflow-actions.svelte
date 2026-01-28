@@ -177,7 +177,7 @@
         position="right"
         class="w-[16rem] md:w-[24rem]"
       >
-        {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
+        {#each workflowActions as { onClick, destructive, label, enabled, testId, description } (label)}
           {#if destructive}
             <MenuDivider />
           {/if}

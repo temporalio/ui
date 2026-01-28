@@ -65,7 +65,7 @@
     <span class="max-md:hidden">{translate('common.date-and-time')}</span>
   </MenuButton>
   <Menu class="w-80" id="event-date-filter-menu">
-    {#each sortOptions as { option, label }}
+    {#each sortOptions as { option, label } (option)}
       <MenuItem
         selected={$eventFilterSort === option}
         onclick={() => onSortOptionClick(option)}>{label}</MenuItem

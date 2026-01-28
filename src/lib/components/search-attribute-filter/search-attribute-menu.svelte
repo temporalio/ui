@@ -92,7 +92,7 @@
     </MenuItem>
     <hr class="border-subtle" />
 
-    {#each filteredOptions as { value, label, type }}
+    {#each filteredOptions as { value, label, type } (value)}
       {@const disabled = isOptionDisabled(value, filters)}
       <MenuItem
         onclick={() => {

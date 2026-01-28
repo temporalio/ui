@@ -33,13 +33,13 @@
     emptyStateMessage={translate('workflows.empty-state-title')}
   >
     <tr slot="headers">
-      {#each columns as column}
+      {#each columns as column (column.label)}
         <TableHeaderCell {column} />
       {/each}
     </tr>
-    {#each visibleItems as workflow}
+    {#each visibleItems as workflow (workflow.id + workflow.runId)}
       <tr data-testid="workflows-summary-configurable-table-row" class="dense">
-        {#each columns as column}
+        {#each columns as column (column.label)}
           <TableBodyCell {workflow} {column} archival />
         {/each}
       </tr>

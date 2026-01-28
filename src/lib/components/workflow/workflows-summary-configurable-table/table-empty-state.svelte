@@ -97,7 +97,7 @@
           >.
         </p>
         <ul class="flex flex-col gap-2">
-          {#each samples as sample}
+          {#each samples as sample, index (index)}
             <li>
               <Link
                 icon="github"

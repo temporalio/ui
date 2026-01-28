@@ -68,7 +68,7 @@
     {selectedLabel}
   </MenuButton>
   <Menu id="conditional-menu" class="whitespace-nowrap">
-    {#each conditionalOptions as { value, label }}
+    {#each conditionalOptions as { value, label } (value)}
       <MenuItem
         onclick={() => {
           $filter.conditional = value;

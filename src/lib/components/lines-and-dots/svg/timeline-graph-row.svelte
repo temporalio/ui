@@ -220,7 +220,7 @@
       pointer-events="all"
     />
   {/if}
-  {#each points as x, index}
+  {#each points as x, index (index)}
     {@const nextPoint = points[index + 1]}
     {@const showText = textIndex === index}
     {#if nextPoint}

@@ -62,11 +62,11 @@
       >{translate('deployments.deployments')}</caption
     >
     <tr slot="headers" class="text-left">
-      {#each columns as { label }}
+      {#each columns as { label } (label)}
         <th>{label}</th>
       {/each}
     </tr>
-    {#each visibleItems as deployment}
+    {#each visibleItems as deployment, index (index)}
       <DeploymentTableRow {deployment} {columns} />
     {/each}
 

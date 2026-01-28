@@ -21,7 +21,7 @@
 </script>
 
 <div class="flex flex-wrap gap-4 text-center">
-  {#each monthNames as { label, value }}
+  {#each monthNames as { label, value } (value)}
     {@const active = months.includes(value)}
     <Button
       variant="secondary"

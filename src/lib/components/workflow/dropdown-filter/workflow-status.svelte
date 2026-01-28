@@ -97,7 +97,7 @@
     {/snippet}
   </MenuButton>
   <Menu keepOpen id="execution-status-filter">
-    {#each workflowStatusFilters as status}
+    {#each workflowStatusFilters as status (status)}
       <MenuItem onclick={() => onStatusClick(status)}>
         {#snippet leading()}
           <Checkbox

@@ -234,7 +234,7 @@
               >{translate('common.custom')}</MenuItem
             >
           </div>
-          {#each columnOrderedDurations as duration}
+          {#each columnOrderedDurations as duration, index (index)}
             <div class="flex w-1/2 flex-col justify-center">
               <MenuItem onclick={() => onChange(duration)}>{duration}</MenuItem>
             </div>

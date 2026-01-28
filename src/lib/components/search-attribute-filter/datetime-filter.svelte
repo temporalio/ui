@@ -233,7 +233,7 @@
                 labelHidden
                 disabled={$timeFormatType !== 'relative'}
               >
-                {#each TIME_UNIT_OPTIONS as unit}
+                {#each TIME_UNIT_OPTIONS as unit (unit)}
                   <Option value={unit}>{unit} {translate('common.ago')}</Option>
                 {/each}
               </Select>

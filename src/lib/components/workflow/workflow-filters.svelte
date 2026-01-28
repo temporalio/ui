@@ -129,7 +129,7 @@
         {#if parameters.timeRange && !durations.includes(parameters.timeRange)}
           <Option value={parameters.timeRange}>{parameters.timeRange}</Option>
         {/if}
-        {#each durations as value}
+        {#each durations as value (value)}
           <Option {value}>{value}</Option>
         {/each}
       </Select>

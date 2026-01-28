@@ -56,7 +56,7 @@
         <PayloadDecoder value={parsedContent} key="payloads">
           {#snippet children(decodedValue)}
             {#if payloadsSize > 1}
-              {#each parsePayloads(decodedValue) as decodedContent}
+              {#each parsePayloads(decodedValue) as decodedContent, index (index)}
                 <CodeBlock
                   content={stringifyWithBigInt(decodedContent)}
                   copyIconTitle={translate('common.copy-icon-title')}

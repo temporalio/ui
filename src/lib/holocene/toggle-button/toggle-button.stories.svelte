@@ -58,7 +58,7 @@
 
 <Template let:args>
   <ToggleButtons>
-    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index}
+    {#each ['John', 'Paul', 'George', 'Ringo'] as name, index (index)}
       <ToggleButton
         {...args}
         data-testid={`toggle-button-${index}`}

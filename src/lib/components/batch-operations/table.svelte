@@ -34,7 +34,7 @@
     <th class="max-sm:hidden lg:w-56">{translate('common.start-time')}</th>
     <th class="max-sm:hidden lg:w-56">{translate('common.close-time')}</th>
   </TableHeaderRow>
-  {#each operations as { state, jobId, startTime, closeTime }}
+  {#each operations as { state, jobId, startTime, closeTime }, index (index)}
     <TableRow>
       <td>
         <Badge type={jobStateToBadgeType[state]}>

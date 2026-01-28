@@ -93,7 +93,7 @@
     maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
   >
     <TableHeaderRow slot="headers" class="!h-8">
-      {#each columns as column}
+      {#each columns as column, index (index)}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>

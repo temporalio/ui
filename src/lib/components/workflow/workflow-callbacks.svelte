@@ -21,7 +21,7 @@
         </p>
         {#if open}
           <div class="flex flex-col gap-2">
-            {#each callbacks.slice(1) as callback}
+            {#each callbacks.slice(1) as callback, index (index)}
               <WorkflowCallback {callback} />
             {/each}
           </div>
