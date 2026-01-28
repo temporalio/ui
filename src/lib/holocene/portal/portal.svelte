@@ -33,7 +33,7 @@
     open && anchorElement && (!hideWhenAnchorHidden || isVisible),
   );
 
-  $effect(() => {
+  $effect(function resolveAnchorElement() {
     if (typeof anchor === 'string') {
       anchorElement = document.getElementById(anchor) as HTMLElement | null;
     } else {
@@ -41,7 +41,7 @@
     }
   });
 
-  $effect(() => {
+  $effect(function resolveScrollContainerElement() {
     if (typeof scrollContainer === 'string') {
       const element = document.getElementById(
         scrollContainer,
@@ -50,6 +50,33 @@
     } else {
       scrollContainerElement = scrollContainer;
     }
+  });
+
+  $effect(function updateAnchorVisibility() {
+    if (!anchorElement || !hideWhenAnchorHidden) {
+      isVisible = true;
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        isVisible = entry.isIntersecting;
+      },
+      {
+        threshold: 0,
+        root:
+          scrollContainerElement !== window
+            ? (scrollContainerElement as HTMLElement)
+            : null,
+      },
+    );
+
+    observer.observe(anchorElement);
+
+    return () => {
+      observer.disconnect();
+    };
   });
 
   function updatePosition() {
@@ -89,33 +116,6 @@
     });
   }
 
-  $effect(() => {
-    if (!anchorElement || !hideWhenAnchorHidden) {
-      isVisible = true;
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        isVisible = entry.isIntersecting;
-      },
-      {
-        threshold: 0,
-        root:
-          scrollContainerElement !== window
-            ? (scrollContainerElement as HTMLElement)
-            : null,
-      },
-    );
-
-    observer.observe(anchorElement);
-
-    return () => {
-      observer.disconnect();
-    };
-  });
-
   function getScrollableAncestors(
     element: HTMLElement,
   ): (HTMLElement | Window | Document)[] {
@@ -136,7 +136,7 @@
     return ancestors;
   }
 
-  $effect(() => {
+  $effect(function setupPositioning() {
     if (!shouldShowPortal || !portalElement || !anchorElement) return;
 
     untrack(() => updatePosition());
