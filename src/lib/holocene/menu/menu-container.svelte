@@ -44,9 +44,9 @@
   };
 
   setContext<MenuContext>(MENU_CONTEXT, {
-    open,
-    keepOpen,
-    menuElement,
+    open: open,
+    keepOpen: keepOpen,
+    menuElement: menuElement,
   });
 </script>
 

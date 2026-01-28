@@ -1,14 +1,9 @@
 <script lang="ts">
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
-  import { formatDate } from '$lib/utilities/format-date';
 
   export let pendingTask: PendingWorkflowTaskInfo | undefined = undefined;
 </script>
@@ -25,30 +20,15 @@
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.original-scheduled-time')}
-      <Badge
-        >{formatDate(pendingTask.originalScheduledTime, $timeFormat, {
-          relative: $relativeTime,
-          format: $timestampFormat,
-        })}</Badge
-      >
+      <Badge>{$timestamp(pendingTask.originalScheduledTime)}</Badge>
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.scheduled-time')}
-      <Badge
-        >{formatDate(pendingTask.scheduledTime, $timeFormat, {
-          relative: $relativeTime,
-          format: $timestampFormat,
-        })}</Badge
-      >
+      <Badge>{$timestamp(pendingTask.scheduledTime)}</Badge>
     </p>
     <p class="flex items-center gap-4">
       {translate('workflows.started-time')}
-      <Badge
-        >{formatDate(pendingTask.startedTime, $timeFormat, {
-          relative: $relativeTime,
-          format: $timestampFormat,
-        })}</Badge
-      >
+      <Badge>{$timestamp(pendingTask.startedTime)}</Badge>
     </p>
   </div>
 </Accordion>
