@@ -42,7 +42,7 @@
       open = false;
       toaster.push({
         id: 'activity-terminate-success-toast',
-        message: translate('activities.terminate-success'),
+        message: translate('standalone-activities.terminate-success'),
       });
       onConfirm();
     } catch (err: unknown) {
@@ -58,7 +58,7 @@
 <Modal
   id="terminate-confirmation-modal"
   data-testid="terminate-confirmation-modal"
-  confirmText={translate('activities.terminate')}
+  confirmText={translate('standalone-activities.terminate')}
   cancelText={translate('common.cancel')}
   bind:error
   bind:open
@@ -66,10 +66,12 @@
   confirmType="destructive"
   on:confirmModal={terminate}
 >
-  <h3 slot="title">{translate('activities.terminate-modal-title')}</h3>
+  <h3 slot="title">
+    {translate('standalone-activities.terminate-modal-title')}
+  </h3>
   <div class="space-y-2" slot="content">
     <p>
-      {translate('activities.terminate-modal-confirmation')}
+      {translate('standalone-activities.terminate-modal-confirmation')}
     </p>
 
     <Input

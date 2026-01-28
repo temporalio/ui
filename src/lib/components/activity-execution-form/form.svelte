@@ -65,11 +65,15 @@
     .object({
       identity: z.string(),
       namespace: z.string(),
-      activityId: z.string().min(1, { message: 'Activity ID is required.' }),
-      taskQueue: z.string().min(1, { message: 'Task Queue is required.' }),
-      activityType: z
-        .string()
-        .min(1, { message: 'Activity Type is required.' }),
+      activityId: z.string().min(1, {
+        message: translate('standalone-activities.form-activity-id-required'),
+      }),
+      taskQueue: z.string().min(1, {
+        message: translate('standalone-activities.form-task-queue-required'),
+      }),
+      activityType: z.string().min(1, {
+        message: translate('standalone-activities.form-activity-type-required'),
+      }),
       input: z.string().optional(),
       startToCloseTimeout: z.string().optional(),
       scheduleToCloseTimeout: z.string().optional(),
@@ -91,14 +95,12 @@
         context.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['startToCloseTimeout'],
-          message:
-            'Either "Start to Close Timeout" or "Schedule to Close Timeout" is required.',
+          message: translate('standalone-activities.form-timeout-required'),
         });
         context.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['scheduleToCloseTimeout'],
-          message:
-            'Either "Start to Close Timeout" or "Schedule to Close Timeout" is required.',
+          message: translate('standalone-activities.form-timeout-required'),
         });
       }
     });
@@ -133,7 +135,7 @@
           toaster.push({
             duration: 5000,
             variant: 'success',
-            message: 'Activity execution started.',
+            message: translate('standalone-activities.form-activity-started'),
             link: routeForStandaloneActivityDetails({
               namespace,
               activityId: form.data.activityId,
@@ -171,7 +173,7 @@
 
   <Input
     class="grow"
-    label="Activity ID"
+    label={translate('standalone-activities.form-activity-id-label')}
     required
     id="activityId"
     bind:value={$form.activityId}
@@ -183,14 +185,15 @@
       variant="secondary"
       slot="after-input"
       on:click={generateRandomId}
-      leadingIcon="retry">Random UUID</Button
+      leadingIcon="retry"
+      >{translate('standalone-activities.form-random-uuid')}</Button
     >
   </Input>
 
   <Input
     id="taskQueue"
     required
-    label="Task Queue"
+    label={translate('standalone-activities.form-task-queue-label')}
     bind:value={$form.taskQueue}
     error={!!$errors.taskQueue}
     hintText={$errors.taskQueue?.[0]}
@@ -198,7 +201,7 @@
   <Input
     id="activityType"
     required
-    label="Activity Type"
+    label={translate('standalone-activities.form-activity-type-label')}
     bind:value={$form.activityType}
     error={!!$errors.activityType}
     hintText={$errors.activityType?.[0]}
@@ -216,28 +219,40 @@
       $errors.startToCloseTimeout ? 'border-danger' : '',
     )}
   >
-    <h5>Activity Timeouts</h5>
+    <h5>{translate('standalone-activities.form-timeouts-heading')}</h5>
 
     <DurationInput
       id="startToCloseTimeout"
-      label="Start to Close Timeout"
+      label={translate(
+        'standalone-activities.form-start-to-close-timeout-label',
+      )}
       required={!$form.scheduleToCloseTimeout}
-      hintText="Maximum time an activity is allowed to execute after being picked up by a worker."
+      hintText={translate(
+        'standalone-activities.form-start-to-close-timeout-hint',
+      )}
       bind:value={$form.startToCloseTimeout}
     />
 
     <DurationInput
       id="scheduleToCloseTimeout"
-      label="Schedule to Close Timeout"
+      label={translate(
+        'standalone-activities.form-schedule-to-close-timeout-label',
+      )}
       required={!$form.startToCloseTimeout}
-      hintText="How long the caller is willing to wait for an activity completion."
+      hintText={translate(
+        'standalone-activities.form-schedule-to-close-timeout-hint',
+      )}
       bind:value={$form.scheduleToCloseTimeout}
     />
 
     <DurationInput
       id="scheduleToStartTimeout"
-      label="Schedule to Start Timeout"
-      hintText={'Limits time an activity task can stay in a task queue before a worker picks it up. Defaults to "Schedule to Close Timeout" if not specified.'}
+      label={translate(
+        'standalone-activities.form-schedule-to-start-timeout-label',
+      )}
+      hintText={translate(
+        'standalone-activities.form-schedule-to-start-timeout-hint',
+      )}
       bind:value={$form.scheduleToStartTimeout}
     />
 
@@ -254,10 +269,13 @@
       data-testid="start-standalone-activity-add-search-attributes"
     >
       <div class="space-y-2">
-        <h5>Custom Search Attributes</h5>
+        <h5>
+          {translate('standalone-activities.form-search-attributes-heading')}
+        </h5>
         <p class="text-secondary">
-          Indexed fields used in a List Filter to filter a list of Standalone
-          Activities.
+          {translate(
+            'standalone-activities.form-search-attributes-description',
+          )}
         </p>
       </div>
       <AddSearchAttributes
@@ -271,10 +289,9 @@
       data-testid="start-standalone-activity-add-metadata"
     >
       <div class="space-y-2">
-        <h5>User Metadata</h5>
+        <h5>{translate('standalone-activities.form-user-metadata-heading')}</h5>
         <p class="text-secondary">
-          Add context to Standalone Activities to help identify and understand
-          its operations.
+          {translate('standalone-activities.form-user-metadata-description')}
         </p>
       </div>
       <div class="space-y-2">
@@ -288,7 +305,7 @@
     </Card>
 
     <Card class="space-y-4">
-      <h5>Retry Policy</h5>
+      <h5>{translate('standalone-activities.form-retry-policy-heading')}</h5>
       <RetryPolicyInput
         bind:initialInterval={$form.initialInterval}
         bind:backoffCoefficient={$form.backoffCoefficient}
@@ -300,17 +317,19 @@
     <Card>
       <DurationInput
         id="heartbeatTimeout"
-        label="Heartbeat Timeout"
-        hintText="Maximum permitted time between successful worker heartbeats."
+        label={translate('standalone-activities.form-heartbeat-timeout-label')}
+        hintText={translate(
+          'standalone-activities.form-heartbeat-timeout-hint',
+        )}
         bind:value={$form.heartbeatTimeout}
       />
     </Card>
 
     <Card class="space-y-4">
-      <h5>Activity ID Policies</h5>
+      <h5>{translate('standalone-activities.form-id-policies-heading')}</h5>
 
       <Select
-        label="ID Reuse Policy"
+        label={translate('standalone-activities.form-id-reuse-policy-label')}
         id="start-standalone-activity-id-reuse-policy-select"
         bind:value={$form.idReusePolicy}
       >
@@ -320,7 +339,7 @@
       </Select>
 
       <Select
-        label="ID Conflict Policy"
+        label={translate('standalone-activities.form-id-conflict-policy-label')}
         id="start-standalone-activity-id-conflict-policy-select"
         bind:value={$form.idConflictPolicy}
       >
@@ -343,7 +362,7 @@
     </Button>
 
     <Button data-testid="start-standalone-activity-submit-button" type="submit">
-      {translate('activities.start-standalone-activity')}
+      {translate('standalone-activities.start-standalone-activity')}
     </Button>
   </div>
 </form>

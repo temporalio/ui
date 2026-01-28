@@ -63,7 +63,7 @@
         data-testid="back-to-activities"
         icon="chevron-left"
       >
-        {translate('activities.back-to-activities')}
+        {translate('standalone-activities.back-to-activities')}
       </Link>
     </div>
     <ActivityExecutionHeader
@@ -73,27 +73,29 @@
     />
 
     <Tabs>
-      <TabList label="Activity Execution Tabs">
+      <TabList label={translate('standalone-activities.layout-tabs-label')}>
         <Tab
-          label="Details"
+          label={translate('standalone-activities.layout-details-tab')}
           id="activity-execution-details-tab"
           href={detailsRoute}
           active={pathMatches(page.url.pathname, detailsRoute)}
         />
         <Tab
-          label="Workers"
+          label={translate('standalone-activities.layout-workers-tab')}
           id="activity-execution-workers-tab"
           href={workersRoute}
           active={pathMatches(page.url.pathname, workersRoute)}
         />
         <Tab
-          label="Search Attributes"
+          label={translate(
+            'standalone-activities.layout-search-attributes-tab',
+          )}
           id="activity-execution-search-attributes-tab"
           href={searchAttributesRoute}
           active={pathMatches(page.url.pathname, searchAttributesRoute)}
         />
         <Tab
-          label="User Metadata"
+          label={translate('standalone-activities.layout-user-metadata-tab')}
           id="activity-execution-metadata-tab"
           href={metadataRoute}
           active={pathMatches(page.url.pathname, metadataRoute)}

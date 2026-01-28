@@ -9,7 +9,9 @@
 </script>
 
 <PageTitle
-  title="{translate('activities.start-standalone-activity')} | {namespace}"
+  title="{translate(
+    'standalone-activities.start-standalone-activity',
+  )} | {namespace}"
   url={page.url.href}
 />
 

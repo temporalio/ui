@@ -37,7 +37,8 @@ export const fetchPaginatedActivities = async (
 
     const onError: ErrorCallback = (err) => {
       activityError.set(
-        err?.body?.message || translate('activities.activities-error-querying'),
+        err?.body?.message ||
+          translate('standalone-activities.activities-error-querying'),
       );
     };
 

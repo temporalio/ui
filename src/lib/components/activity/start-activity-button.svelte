@@ -36,7 +36,10 @@
   );
 </script>
 
-<Tooltip text={translate('activities.start-activity-like-this-one')} topLeft>
+<Tooltip
+  text={translate('standalone-activities.start-activity-like-this-one')}
+  topLeft
+>
   <Button
     size="xs"
     variant="ghost"

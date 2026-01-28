@@ -23,9 +23,9 @@
       data-testid="back-to-activities"
       icon="chevron-left"
     >
-      {translate('activities.back-to-activities')}
+      {translate('standalone-activities.back-to-activities')}
     </Link>
   </div>
-  <h1>{translate('activities.start-standalone-activity')}</h1>
+  <h1>{translate('standalone-activities.start-standalone-activity')}</h1>
   <StandaloneActivityForm {namespace} />
 </div>

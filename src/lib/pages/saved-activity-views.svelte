@@ -301,7 +301,7 @@
         class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
         in:slide
       >
-        {translate('activities.custom-views')}
+        {translate('standalone-activities.custom-views')}
         {@render queryBadge({
           className: 'font-mono',
           content: `${namespaceSavedQueries.length}/${MAX_SAVED_ACTIVITY_QUERIES}`,

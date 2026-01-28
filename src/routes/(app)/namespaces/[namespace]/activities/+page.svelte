@@ -11,14 +11,16 @@
 </script>
 
 <PageTitle
-  title="{translate('activities.standalone-activities')} | {namespace}"
+  title="{translate(
+    'standalone-activities.standalone-activities',
+  )} | {namespace}"
   url={page.url.href}
 />
 
 <ActivitiesWithSearch>
   {#snippet headerActions()}
     <Button href={routeForStartStandaloneActivity({ namespace })}>
-      {translate('activities.start-standalone-activity')}
+      {translate('standalone-activities.start-standalone-activity')}
     </Button>
   {/snippet}
 </ActivitiesWithSearch>

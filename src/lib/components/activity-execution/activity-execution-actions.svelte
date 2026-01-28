@@ -40,7 +40,7 @@
     disabled={!isRunning}
     size="sm"
   >
-    {translate('activities.request-cancellation')}
+    {translate('standalone-activities.request-cancellation')}
   </Button>
   <MenuContainer>
     <MenuButton
@@ -58,7 +58,7 @@
         disabled={!isRunning}
         data-testid="terminate-button"
       >
-        {translate('activities.terminate')}
+        {translate('standalone-activities.terminate')}
       </MenuItem>
       <MenuDivider />
       <MenuItem
@@ -76,7 +76,7 @@
           )}
         data-testid="start-activity-button"
       >
-        {translate('activities.start-activity-like-this-one')}
+        {translate('standalone-activities.start-activity-like-this-one')}
       </MenuItem>
     </Menu>
   </MenuContainer>

@@ -36,15 +36,15 @@
     total={$activityCount.count}
     {onFetch}
     let:visibleItems
-    aria-label={translate('activities.standalone-activities')}
+    aria-label={translate('standalone-activities.standalone-activities')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
-    emptyStateMessage={translate('activities.empty-state-title')}
+    emptyStateMessage={translate('standalone-activities.empty-state-title')}
     maxHeight="var(--panel-h)"
   >
     <caption class="sr-only" slot="caption">
-      {translate('activities.standalone-activities')}
+      {translate('standalone-activities.standalone-activities')}
     </caption>
     <TableHeaderRow slot="headers">
       <th></th>

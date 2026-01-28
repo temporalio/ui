@@ -39,7 +39,7 @@
       open = false;
       toaster.push({
         id: 'activity-cancellation-success-toast',
-        message: translate('activities.cancel-success'),
+        message: translate('standalone-activities.cancel-success'),
       });
       onConfirm();
     } catch (err: unknown) {
@@ -63,10 +63,10 @@
   confirmType="destructive"
   on:confirmModal={cancel}
 >
-  <h3 slot="title">{translate('activities.cancel-modal-title')}</h3>
+  <h3 slot="title">{translate('standalone-activities.cancel-modal-title')}</h3>
   <svelte:fragment slot="content">
     <p>
-      {translate('activities.cancel-modal-confirmation')}
+      {translate('standalone-activities.cancel-modal-confirmation')}
     </p>
   </svelte:fragment>
 </Modal>

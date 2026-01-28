@@ -82,20 +82,17 @@
   <div class="flex flex-col justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
-        <h1
-          class="flex items-center gap-2 leading-7"
-          data-cy="activities-title"
-        >
+        <h1 class="flex items-center gap-2 leading-7">
           {#if $supportsAdvancedVisibility}
             <span data-testid="activity-count"
               >{$activityCount.count.toLocaleString()}</span
             >
             <Translate
-              key="activities.activities-plural"
+              key="standalone-activities.activities-plural"
               count={$activityCount.count}
             />
           {:else}
-            <Translate key="activities.recent-activities" />
+            <Translate key="standalone-activities.recent-activities" />
           {/if}
         </h1>
         <p class="text-xs text-secondary">
@@ -132,5 +129,5 @@
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.ACTIVITIES}
   type={translate('common.columns')}
-  title={translate('activities.activities-table')}
+  title={translate('standalone-activities.activities-table')}
 />

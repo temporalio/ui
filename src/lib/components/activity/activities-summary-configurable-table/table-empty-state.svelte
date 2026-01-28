@@ -18,16 +18,16 @@
     <div class="text-center">
       <h2>
         {#if $activityError}
-          {translate('activities.activity-query-error-state')}
+          {translate('standalone-activities.activity-query-error-state')}
         {:else}
-          {translate('activities.empty-state-title')}
+          {translate('standalone-activities.empty-state-title')}
         {/if}
       </h2>
       <p class="text-secondary">
         {#if $activityError}
           {$activityError}
         {:else}
-          {translate('activities.empty-state-description')}
+          {translate('standalone-activities.empty-state-description')}
         {/if}
       </p>
       <NoWorkflows class="m-auto mt-8 text-subtle" />
@@ -42,7 +42,7 @@
       class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
     >
       <h2>
-        {translate('activities.empty-state-title')}
+        {translate('standalone-activities.empty-state-title')}
       </h2>
       {#if $activityError}
         <Alert
@@ -55,7 +55,7 @@
         </Alert>
       {:else}
         <p>
-          {translate('activities.empty-state-description')}
+          {translate('standalone-activities.empty-state-description')}
         </p>
       {/if}
     </div>

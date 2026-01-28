@@ -131,7 +131,7 @@
       {
         href: standaloneActivitiesRoute,
         icon: 'activity',
-        label: translate('activities.standalone-activities'),
+        label: translate('standalone-activities.standalone-activities'),
         isActive: (path) => path.includes(standaloneActivitiesRoute),
       },
       {
