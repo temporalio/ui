@@ -148,6 +148,7 @@ export default [
       'server/**',
       '**/error-boundary.svelte',
       '.svelte-kit/**',
+      '.vercel/**',
       'dist/**',
       'build/**',
       'node_modules/**',
