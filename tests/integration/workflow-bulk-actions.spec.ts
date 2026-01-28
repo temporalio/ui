@@ -20,7 +20,7 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.goto('/namespaces/default/workflows');
 
       await waitForWorkflowsApis(page);
-      await page.waitForSelector('[data-testid="workflow-count"]');
+      await page.getByTestId('workflow-count').waitFor();
     });
 
     test('allows running workflows to be terminated by ID without a reason', async ({
