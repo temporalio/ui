@@ -11,7 +11,7 @@ import { isEmptyObject } from './is';
 export const activityExecution: Writable<ActivityExecution | undefined> =
   writable();
 
-export class ActivityExecutionPoller {
+export class StandaloneActivityPoller {
   private abortController: AbortController;
   private namespace: string;
   private activityId: string;

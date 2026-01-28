@@ -2,11 +2,11 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import type { ActivityExecutionPoller } from '$lib/utilities/activity-execution-poller.svelte';
   import {
     routeForStandaloneActivitiesWithQuery,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
+  import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
@@ -18,13 +18,13 @@
     DetailListTimestampValue,
   } from '../detail-list';
 
-  import ActivityExecutionActions from './activity-execution-actions.svelte';
-  import ActivityExecutionStatus from './activity-execution-status.svelte';
+  import ActivityExecutionActions from './activity-actions.svelte';
+  import ActivityExecutionStatus from './activity-status.svelte';
 
   interface Props {
     activityExecutionInfo: ActivityExecutionInfo;
     namespace: string;
-    poller: ActivityExecutionPoller;
+    poller: StandaloneActivityPoller;
   }
 
   let { activityExecutionInfo, namespace, poller }: Props = $props();

@@ -2,7 +2,7 @@
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import ActivityExecutionSearchAttributes from '$lib/pages/activity-execution-search-attributes.svelte';
+  import ActivityExecutionSearchAttributes from '$lib/pages/standalone-activity-search-attributes.svelte';
 
   const activityId = $derived(page.params.activityId);
 </script>

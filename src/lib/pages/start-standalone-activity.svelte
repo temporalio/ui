@@ -1,5 +1,5 @@
 <script lang="ts">
-  import StandaloneActivityForm from '$lib/components/activity-execution-form/form.svelte';
+  import StandaloneActivityForm from '$lib/components/standalone-activities/start-standalone-activity-form/form.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { activitiesSearchParams } from '$lib/stores/activities';

@@ -2,8 +2,8 @@
   import UserMetadata from '$lib/components/user-metadata.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import type { UserMetadata as IUserMetadata } from '$lib/types';
-  import { activityExecution } from '$lib/utilities/activity-execution-poller.svelte';
   import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
+  import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   const decodeMetadata = async (userMetadata: IUserMetadata) => {
     const metadata = {

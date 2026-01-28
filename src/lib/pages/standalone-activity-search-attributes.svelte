@@ -2,7 +2,7 @@
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { activityExecution } from '$lib/utilities/activity-execution-poller.svelte';
+  import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   const searchAttributes = $derived($activityExecution.info.searchAttributes);
 </script>

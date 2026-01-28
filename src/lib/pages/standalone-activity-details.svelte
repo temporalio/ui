@@ -1,5 +1,4 @@
 <script lang="ts">
-  import ActivityExecutionInputAndOutcome from '$lib/components/activity-execution/activity-execution-input-and-outcome.svelte';
   import {
     DetailList,
     DetailListLabel,
@@ -9,18 +8,19 @@
   } from '$lib/components/detail-list';
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { Failure } from '$lib/types';
-  import { activityExecution } from '$lib/utilities/activity-execution-poller.svelte';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
   } from '$lib/utilities/format-event-attributes';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
+  import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
   interface Props {

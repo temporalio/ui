@@ -33,10 +33,10 @@
   import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
 
   import type { StandaloneActivityFormData } from './types';
-  import Message from '../form/message.svelte';
-  import PayloadInputWithEncoding from '../payload-input-with-encoding.svelte';
-  import RetryPolicyInput from '../retry-policy-input.svelte';
-  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
+  import Message from '../../form/message.svelte';
+  import PayloadInputWithEncoding from '../../payload-input-with-encoding.svelte';
+  import RetryPolicyInput from '../../retry-policy-input.svelte';
+  import AddSearchAttributes from '../../workflow/add-search-attributes.svelte';
 
   interface Props {
     namespace: string;

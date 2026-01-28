@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import StartActivityButton from '$lib/components/activity/start-activity-button.svelte';
+  import StartActivityButton from '$lib/components/standalone-activities/start-activity-button.svelte';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
 
   interface Props {

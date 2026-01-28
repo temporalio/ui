@@ -5,14 +5,14 @@
 
   import { page } from '$app/state';
 
-  import ActivitiesSummaryConfigurableTable from '$lib/components/activity/activities-summary-configurable-table.svelte';
-  import ActivityCountRefresh from '$lib/components/activity/activity-count-refresh.svelte';
-  import ActivityCounts from '$lib/components/activity/activity-counts.svelte';
-  import FilterBar from '$lib/components/activity/filter-bar/index.svelte';
+  import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
+  import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
+  import ActivityCountRefresh from '$lib/components/standalone-activities/activity-count-refresh.svelte';
+  import ActivityCounts from '$lib/components/standalone-activities/activity-counts.svelte';
+  import SavedActivityViews from '$lib/components/standalone-activities/saved-views.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
-  import SavedActivityViews from '$lib/pages/saved-activity-views.svelte';
   import {
     activitiesQuery,
     activitiesSearchParams,
