@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import TableEmptyState from '$lib/components/activity/activities-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
@@ -12,6 +11,7 @@
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
 
   import TableBodyCell from './activities-summary-configurable-table/table-body-cell.svelte';
+  import TableEmptyState from './activities-summary-configurable-table/table-empty-state.svelte';
   import TableHeaderCell from './activities-summary-configurable-table/table-header-cell.svelte';
   import TableHeaderRow from './activities-summary-configurable-table/table-header-row.svelte';
   import TableRow from './activities-summary-configurable-table/table-row.svelte';
@@ -36,15 +36,15 @@
     total={$activityCount.count}
     {onFetch}
     let:visibleItems
-    aria-label={translate('activities.standalone-activities')}
+    aria-label={translate('standalone-activities.standalone-activities')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
-    emptyStateMessage={translate('activities.empty-state-title')}
+    emptyStateMessage={translate('standalone-activities.empty-state-title')}
     maxHeight="var(--panel-h)"
   >
     <caption class="sr-only" slot="caption">
-      {translate('activities.standalone-activities')}
+      {translate('standalone-activities.standalone-activities')}
     </caption>
     <TableHeaderRow slot="headers">
       <th></th>

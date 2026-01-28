@@ -1,9 +1,9 @@
 <script lang="ts">
   import WorkerTable from '$lib/components/worker-table.svelte';
   import { getPollers } from '$lib/services/pollers-service';
-  import { activityExecution } from '$lib/utilities/activity-execution-poller.svelte';
   import { decodePayload } from '$lib/utilities/decode-payload';
   import { isEmptyObject } from '$lib/utilities/is';
+  import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   interface Props {
     namespace: string;

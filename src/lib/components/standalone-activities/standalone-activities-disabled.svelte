@@ -24,14 +24,16 @@ activity.enableStandalone:
 
 <h1>Standalone Activities</h1>
 <Alert
-  title={translate('activities.standalone-activities-disabled')}
+  title={translate('standalone-activities.standalone-activities-disabled')}
   intent="info"
 />
 <div class="flex max-w-4xl flex-col gap-2">
-  <p>{translate('activities.standalone-activities-enablement')}</p>
+  <p>{translate('standalone-activities.standalone-activities-enablement')}</p>
   <CodeBlock copyable content={configValues} />
   <p>
-    {translate('activities.standalone-activities-enablement-per-namespace')}
+    {translate(
+      'standalone-activities.standalone-activities-enablement-per-namespace',
+    )}
   </p>
   <CodeBlock copyable content={configValuesPerNamespace} />
 </div>

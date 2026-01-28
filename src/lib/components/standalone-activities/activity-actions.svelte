@@ -8,8 +8,8 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import type { ActivityExecutionPoller } from '$lib/utilities/activity-execution-poller.svelte';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
+  import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
 
   import CancelConfirmationModal from './cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from './terminate-confirmation-modal.svelte';
@@ -17,7 +17,7 @@
   interface Props {
     activityExecutionInfo: ActivityExecutionInfo;
     namespace: string;
-    poller: ActivityExecutionPoller;
+    poller: StandaloneActivityPoller;
   }
 
   let { activityExecutionInfo, namespace, poller }: Props = $props();
@@ -40,7 +40,7 @@
     disabled={!isRunning}
     size="sm"
   >
-    {translate('activities.request-cancellation')}
+    {translate('standalone-activities.request-cancellation')}
   </Button>
   <MenuContainer>
     <MenuButton
@@ -58,7 +58,7 @@
         disabled={!isRunning}
         data-testid="terminate-button"
       >
-        {translate('activities.terminate')}
+        {translate('standalone-activities.terminate')}
       </MenuItem>
       <MenuDivider />
       <MenuItem
@@ -76,7 +76,7 @@
           )}
         data-testid="start-activity-button"
       >
-        {translate('activities.start-activity-like-this-one')}
+        {translate('standalone-activities.start-activity-like-this-one')}
       </MenuItem>
     </Menu>
   </MenuContainer>

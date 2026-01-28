@@ -11,7 +11,7 @@ import { isEmptyObject } from './is';
 export const activityExecution: Writable<ActivityExecution | undefined> =
   writable();
 
-export class ActivityExecutionPoller {
+export class StandaloneActivityPoller {
   private abortController: AbortController;
   private namespace: string;
   private activityId: string;
@@ -60,11 +60,19 @@ export class ActivityExecutionPoller {
             this.token,
             this.abortController.signal,
           );
-          if (!isEmptyObject(polledActivityExecution)) {
+
+          if (
+            polledActivityExecution &&
+            !isEmptyObject(polledActivityExecution)
+          ) {
             this.token = polledActivityExecution.longPollToken;
             this.onUpdate(polledActivityExecution);
           }
         } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            return;
+          }
+
           this.onError(error);
           break;
         }

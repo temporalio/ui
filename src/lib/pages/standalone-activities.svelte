@@ -5,14 +5,14 @@
 
   import { page } from '$app/state';
 
-  import ActivitiesSummaryConfigurableTable from '$lib/components/activity/activities-summary-configurable-table.svelte';
-  import ActivityCountRefresh from '$lib/components/activity/activity-count-refresh.svelte';
-  import ActivityCounts from '$lib/components/activity/activity-counts.svelte';
-  import FilterBar from '$lib/components/activity/filter-bar/index.svelte';
+  import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
+  import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
+  import ActivityCountRefresh from '$lib/components/standalone-activities/activity-count-refresh.svelte';
+  import ActivityCounts from '$lib/components/standalone-activities/activity-counts.svelte';
+  import SavedActivityViews from '$lib/components/standalone-activities/saved-views.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
-  import SavedActivityViews from '$lib/pages/saved-activity-views.svelte';
   import {
     activitiesQuery,
     activitiesSearchParams,
@@ -82,20 +82,17 @@
   <div class="flex flex-col justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
-        <h1
-          class="flex items-center gap-2 leading-7"
-          data-cy="activities-title"
-        >
+        <h1 class="flex items-center gap-2 leading-7">
           {#if $supportsAdvancedVisibility}
             <span data-testid="activity-count"
               >{$activityCount.count.toLocaleString()}</span
             >
             <Translate
-              key="activities.activities-plural"
+              key="standalone-activities.activities-plural"
               count={$activityCount.count}
             />
           {:else}
-            <Translate key="activities.recent-activities" />
+            <Translate key="standalone-activities.recent-activities" />
           {/if}
         </h1>
         <p class="text-xs text-secondary">
@@ -132,5 +129,5 @@
   bind:open={customizationDrawerOpen}
   table={TABLE_TYPE.ACTIVITIES}
   type={translate('common.columns')}
-  title={translate('activities.activities-table')}
+  title={translate('standalone-activities.activities-table')}
 />

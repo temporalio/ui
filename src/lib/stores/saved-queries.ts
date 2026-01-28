@@ -88,7 +88,7 @@ export const savedWorkflowQueries = persistStore<Record<string, SavedQuery[]>>(
 // Activity-specific saved queries
 export const DEFAULT_ACTIVITY_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
-  name: 'All Activities',
+  name: 'All',
   query: '',
   icon: 'activity',
   type: 'system',

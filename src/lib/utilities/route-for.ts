@@ -108,6 +108,16 @@ export const routeForStandaloneActivities = (
   return `${routeForNamespace(parameters)}/activities`;
 };
 
+export const routeForStandaloneActivitiesWithQuery = (
+  parameters: NamespaceParameter,
+  queryString: string,
+): string => {
+  const params = new URLSearchParams();
+  params.set('query', queryString);
+
+  return toURL(routeForStandaloneActivities(parameters), params);
+};
+
 export const routeForStartStandaloneActivity = (
   parameters: NamespaceParameter & Partial<StartActivityExecutionQueryParams>,
 ): string => {

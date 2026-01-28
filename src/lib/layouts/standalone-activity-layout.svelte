@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import ActivityExecutionHeader from '$lib/components/activity-execution/activity-execution-header.svelte';
+  import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
@@ -11,7 +11,6 @@
   import { translate } from '$lib/i18n/translate';
   import { activitiesSearchParams } from '$lib/stores/activities';
   import type { ActivityExecution } from '$lib/types/activity-execution';
-  import type { ActivityExecutionPoller } from '$lib/utilities/activity-execution-poller.svelte';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForStandaloneActivities,
@@ -20,13 +19,14 @@
     routeForStandaloneActivitySearchAttributes,
     routeForStandaloneActivityWorkers,
   } from '$lib/utilities/route-for';
+  import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
 
   interface Props {
     activityExecution: ActivityExecution;
     namespace: string;
     activityId: string;
     children: Snippet;
-    poller: ActivityExecutionPoller;
+    poller: StandaloneActivityPoller;
   }
 
   let { activityExecution, children, namespace, activityId, poller }: Props =
@@ -63,7 +63,7 @@
         data-testid="back-to-activities"
         icon="chevron-left"
       >
-        {translate('activities.back-to-activities')}
+        {translate('standalone-activities.back-to-activities')}
       </Link>
     </div>
     <ActivityExecutionHeader
@@ -73,27 +73,29 @@
     />
 
     <Tabs>
-      <TabList label="Activity Execution Tabs">
+      <TabList label={translate('standalone-activities.layout-tabs-label')}>
         <Tab
-          label="Details"
+          label={translate('standalone-activities.layout-details-tab')}
           id="activity-execution-details-tab"
           href={detailsRoute}
           active={pathMatches(page.url.pathname, detailsRoute)}
         />
         <Tab
-          label="Workers"
+          label={translate('standalone-activities.layout-workers-tab')}
           id="activity-execution-workers-tab"
           href={workersRoute}
           active={pathMatches(page.url.pathname, workersRoute)}
         />
         <Tab
-          label="Search Attributes"
+          label={translate(
+            'standalone-activities.layout-search-attributes-tab',
+          )}
           id="activity-execution-search-attributes-tab"
           href={searchAttributesRoute}
           active={pathMatches(page.url.pathname, searchAttributesRoute)}
         />
         <Tab
-          label="User Metadata"
+          label={translate('standalone-activities.layout-user-metadata-tab')}
           id="activity-execution-metadata-tab"
           href={metadataRoute}
           active={pathMatches(page.url.pathname, metadataRoute)}

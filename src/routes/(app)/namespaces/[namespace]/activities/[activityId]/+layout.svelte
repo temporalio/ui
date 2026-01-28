@@ -4,11 +4,11 @@
   import { page } from '$app/state';
 
   import ErrorComponent from '$lib/holocene/error.svelte';
-  import ActivityExecutionLayout from '$lib/layouts/activity-execution-layout.svelte';
+  import StandaloneActivityLayout from '$lib/layouts/standalone-activity-layout.svelte';
   import {
     activityExecution,
-    ActivityExecutionPoller,
-  } from '$lib/utilities/activity-execution-poller.svelte';
+    StandaloneActivityPoller,
+  } from '$lib/utilities/standalone-activity-poller.svelte';
 
   const namespace = $derived(page.params.namespace);
   const activityId = $derived(page.params.activityId);
@@ -16,7 +16,7 @@
 
   const activityPollerAbortController = new AbortController();
   const poller = $derived(
-    new ActivityExecutionPoller(
+    new StandaloneActivityPoller(
       namespace,
       activityId,
       activityPollerAbortController,
@@ -43,12 +43,12 @@
 {#if error}
   <ErrorComponent {error} />
 {:else}
-  <ActivityExecutionLayout
+  <StandaloneActivityLayout
     {poller}
     activityExecution={$activityExecution}
     {namespace}
     {activityId}
   >
     {@render children()}
-  </ActivityExecutionLayout>
+  </StandaloneActivityLayout>
 {/if}

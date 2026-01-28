@@ -3,8 +3,8 @@
 
   import { page } from '$app/state';
 
-  import StandaloneActivitiesDisabled from '$lib/components/activity-execution/standalone-activities-disabled.svelte';
-  import StandaloneActivitiesGuard from '$lib/components/activity-execution/standalone-activities-guard.svelte';
+  import StandaloneActivitiesDisabled from '$lib/components/standalone-activities/standalone-activities-disabled.svelte';
+  import StandaloneActivitiesGuard from '$lib/components/standalone-activities/standalone-activities-guard.svelte';
 
   interface Props {
     children: Snippet;

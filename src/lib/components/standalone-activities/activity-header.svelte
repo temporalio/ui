@@ -1,7 +1,12 @@
 <script lang="ts">
+  import Copyable from '$lib/holocene/copyable/index.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import type { ActivityExecutionPoller } from '$lib/utilities/activity-execution-poller.svelte';
-  import { routeForTaskQueue } from '$lib/utilities/route-for';
+  import {
+    routeForStandaloneActivitiesWithQuery,
+    routeForTaskQueue,
+  } from '$lib/utilities/route-for';
+  import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
@@ -13,23 +18,40 @@
     DetailListTimestampValue,
   } from '../detail-list';
 
-  import ActivityExecutionActions from './activity-execution-actions.svelte';
-  import ActivityExecutionStatus from './activity-execution-status.svelte';
+  import ActivityExecutionActions from './activity-actions.svelte';
+  import ActivityExecutionStatus from './activity-status.svelte';
 
   interface Props {
     activityExecutionInfo: ActivityExecutionInfo;
     namespace: string;
-    poller: ActivityExecutionPoller;
+    poller: StandaloneActivityPoller;
   }
 
   let { activityExecutionInfo, namespace, poller }: Props = $props();
+
+  const activityType = $derived(activityExecutionInfo.activityType.name);
+  const activityTypeFilterLink = $derived(
+    routeForStandaloneActivitiesWithQuery(
+      { namespace },
+      `ActivityType="${activityType}"`,
+    ),
+  );
 </script>
 
 <div class="space-y-2">
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-2">
       <ActivityExecutionStatus status={activityExecutionInfo.status} />
-      <h1>{activityExecutionInfo.activityType.name}</h1>
+      <div class="text-2xl font-medium">
+        <Copyable
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          content={activityExecutionInfo.activityId}
+          clickAllToCopy
+          container-class="w-full"
+          class="overflow-hidden text-ellipsis text-left"
+        />
+      </div>
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
@@ -54,7 +76,12 @@
       <DetailListLabel>Run ID</DetailListLabel>
       <DetailListTextValue copyable text={activityExecutionInfo.runId} />
       <DetailListLabel>Activity Type</DetailListLabel>
-      <DetailListTextValue text={activityExecutionInfo.activityType.name} />
+      <DetailListLinkValue
+        copyable
+        iconName="filter"
+        text={activityType}
+        href={activityTypeFilterLink}
+      />
       <DetailListLabel>Task Queue</DetailListLabel>
       <DetailListLinkValue
         href={routeForTaskQueue({

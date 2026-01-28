@@ -1,7 +1,8 @@
 <script lang="ts">
+  import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { cancelActivityExecution } from '$lib/services/standalone-activities';
+  import { terminateActivityExecution } from '$lib/services/standalone-activities';
   import { toaster } from '$lib/stores/toaster';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import { getIdentity } from '$lib/utilities/core-context';
@@ -23,23 +24,25 @@
 
   let loading = $state(false);
   let error = $state('');
+  let reason = $state('');
 
   const identity = getIdentity();
 
-  const cancel = async () => {
+  const terminate = async () => {
     error = '';
     loading = true;
     try {
-      await cancelActivityExecution(
+      await terminateActivityExecution(
         namespace,
         activityExecutionInfo.activityId,
         activityExecutionInfo.runId,
+        reason,
         identity,
       );
       open = false;
       toaster.push({
-        id: 'activity-cancellation-success-toast',
-        message: translate('activities.cancel-success'),
+        id: 'activity-terminate-success-toast',
+        message: translate('standalone-activities.terminate-success'),
       });
       onConfirm();
     } catch (err: unknown) {
@@ -53,20 +56,30 @@
 </script>
 
 <Modal
-  id="cancel-confirmation-modal"
-  data-testid="cancel-confirmation-modal"
-  confirmText={translate('common.confirm')}
+  id="terminate-confirmation-modal"
+  data-testid="terminate-confirmation-modal"
+  confirmText={translate('standalone-activities.terminate')}
   cancelText={translate('common.cancel')}
   bind:error
   bind:open
   {loading}
   confirmType="destructive"
-  on:confirmModal={cancel}
+  on:confirmModal={terminate}
 >
-  <h3 slot="title">{translate('activities.cancel-modal-title')}</h3>
-  <svelte:fragment slot="content">
+  <h3 slot="title">
+    {translate('standalone-activities.terminate-modal-title')}
+  </h3>
+  <div class="space-y-2" slot="content">
     <p>
-      {translate('activities.cancel-modal-confirmation')}
+      {translate('standalone-activities.terminate-modal-confirmation')}
     </p>
-  </svelte:fragment>
+
+    <Input
+      id="terminate-activity-execution-reason"
+      label={translate('common.reason-placeholder')}
+      labelHidden
+      bind:value={reason}
+      placeholder={translate('common.reason-placeholder')}
+    />
+  </div>
 </Modal>

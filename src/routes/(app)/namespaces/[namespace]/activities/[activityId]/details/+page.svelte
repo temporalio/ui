@@ -2,7 +2,7 @@
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import ActivityExecution from '$lib/pages/activity-execution-details.svelte';
+  import StandaloneActivityDetails from '$lib/pages/standalone-activity-details.svelte';
 
   const namespace = $derived(page.params.namespace);
   const activityId = $derived(page.params.activityId);
@@ -13,4 +13,4 @@
   url={page.url.href}
 />
 
-<ActivityExecution {namespace} />
+<StandaloneActivityDetails {namespace} />

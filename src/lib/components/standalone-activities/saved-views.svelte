@@ -7,8 +7,8 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import EditViewModal from '$lib/components/activity/filter-bar/edit-view-modal.svelte';
-  import SaveViewModal from '$lib/components/activity/filter-bar/save-view-modal.svelte';
+  import EditViewModal from '$lib/components/standalone-activities/activities-summary-filter-bar/edit-view-modal.svelte';
+  import SaveViewModal from '$lib/components/standalone-activities/activities-summary-filter-bar/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -301,7 +301,7 @@
         class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
         in:slide
       >
-        {translate('activities.custom-views')}
+        {translate('standalone-activities.custom-views')}
         {@render queryBadge({
           className: 'font-mono',
           content: `${namespaceSavedQueries.length}/${MAX_SAVED_ACTIVITY_QUERIES}`,

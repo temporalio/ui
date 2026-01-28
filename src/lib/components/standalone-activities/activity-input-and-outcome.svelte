@@ -17,7 +17,7 @@
 <div class="grid w-full grid-cols-2 gap-4 max-md:grid-cols-1">
   <div class="flex flex-col gap-2">
     <h5>Input</h5>
-    <PayloadDecoder value={input}>
+    <PayloadDecoder value={input} key="payloads">
       {#snippet children(decodedValue)}
         <CodeBlock content={decodedValue} />
       {/snippet}
@@ -28,7 +28,7 @@
     {#if has(outcome, 'failure')}
       <CodeBlock content={JSON.stringify(outcome.failure, null, 2)} />
     {:else if has(outcome, 'result')}
-      <PayloadDecoder value={outcome.result}>
+      <PayloadDecoder value={outcome.result} key="payloads">
         {#snippet children(decodedValue)}
           <CodeBlock content={decodedValue} />
         {/snippet}

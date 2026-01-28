@@ -1,4 +1,4 @@
-import type { StandaloneActivityFormData } from '$lib/components/activity-execution-form/types';
+import type { StandaloneActivityFormData } from '$lib/components/standalone-activities/start-standalone-activity-form/types';
 import { translate } from '$lib/i18n/translate';
 import { activityError } from '$lib/stores/activities';
 import type { Payload, SearchAttribute } from '$lib/types';
@@ -37,7 +37,8 @@ export const fetchPaginatedActivities = async (
 
     const onError: ErrorCallback = (err) => {
       activityError.set(
-        err?.body?.message || translate('activities.activities-error-querying'),
+        err?.body?.message ||
+          translate('standalone-activities.activities-error-querying'),
       );
     };
 
@@ -225,7 +226,11 @@ export const pollActivityExecution = (
     longPollToken: token,
   });
 
-  return requestFromAPI(route, { params, signal });
+  return requestFromAPI(route, {
+    params,
+    notifyOnError: false,
+    options: { signal },
+  });
 };
 
 export const cancelActivityExecution = async (
