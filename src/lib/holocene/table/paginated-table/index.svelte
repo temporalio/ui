@@ -38,10 +38,11 @@
     'surface-primary min-h-[154px] grow overflow-auto border border-subtle',
     className,
   )}
+  id="{$$restProps['id']}-container"
   bind:this={tableContainer}
   style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`};
 
- --table-header-h: 2.25rem;"
+  --table-header-h: 2.25rem;"
 >
   {#if loading}
     {#if $$slots.loading}
