@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { on } from 'svelte/events';
   import { scale } from 'svelte/transition';
 
   import { untrack } from 'svelte';
@@ -149,11 +150,13 @@
     resizeObserver.observe(anchorElement);
 
     const scrollableAncestors = getScrollableAncestors(anchorElement);
-    scrollableAncestors.forEach((ancestor) => {
-      ancestor.addEventListener('scroll', scheduleUpdate, { passive: true });
-    });
+    const scrollCleanups = scrollableAncestors.map((ancestor) =>
+      on(ancestor, 'scroll', scheduleUpdate, { passive: true }),
+    );
 
-    window.addEventListener('resize', scheduleUpdate, { passive: true });
+    const resizeCleanup = on(window, 'resize', scheduleUpdate, {
+      passive: true,
+    });
 
     return () => {
       if (rafId !== null) {
@@ -161,10 +164,8 @@
         rafId = null;
       }
       resizeObserver.disconnect();
-      scrollableAncestors.forEach((ancestor) => {
-        ancestor.removeEventListener('scroll', scheduleUpdate);
-      });
-      window.removeEventListener('resize', scheduleUpdate);
+      scrollCleanups.forEach((cleanup) => cleanup());
+      resizeCleanup();
     };
   });
 </script>
