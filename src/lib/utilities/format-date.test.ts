@@ -10,11 +10,17 @@ import {
 import { getLocalTime } from './timezone';
 
 // // force GH action runners to use en-US and 12-hour clocks starting at 0:00
+// but respect explicit hour12 option when provided
 const DateTimeFormat = Intl.DateTimeFormat;
-vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation(
-  (_, options) =>
-    new DateTimeFormat('en-US', { ...options, hour12: true, hourCycle: 'h11' }),
-);
+vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation((_, options) => {
+  const hour12 = options?.hour12 !== undefined ? options.hour12 : true;
+  const hourCycle = options?.hour12 !== undefined ? undefined : 'h11';
+  return new DateTimeFormat('en-US', {
+    ...options,
+    hour12,
+    ...(hourCycle && { hourCycle }),
+  });
+});
 
 describe('formatDate', () => {
   const date = '2022-04-13T16:29:35.630571Z';
@@ -147,6 +153,84 @@ describe('formatDate', () => {
     expect(formatDate(date, 'utc', { format: 'long' })).toEqual(
       'April 13, 2022 at 4:29:35.63 PM UTC',
     );
+  });
+
+  describe('hourFormat option', () => {
+    it('should use 24-hour format when hourFormat is "24"', () => {
+      const result = formatDate(date, 'UTC', { hourFormat: '24' });
+      expect(result).toContain('16:29:35');
+      expect(result).not.toContain('PM');
+      expect(result).not.toContain('AM');
+    });
+
+    it('should use 12-hour format when hourFormat is "12"', () => {
+      const result = formatDate(date, 'UTC', { hourFormat: '12' });
+      expect(result).toContain('4:29:35');
+      expect(result).toContain('PM');
+    });
+
+    it('should use system default when hourFormat is "system"', () => {
+      const result = formatDate(date, 'UTC', { hourFormat: 'system' });
+      // System default is mocked to be 12-hour format
+      expect(result).toContain('4:29:35');
+      expect(result).toContain('PM');
+    });
+
+    it('should default to system format when hourFormat is not specified', () => {
+      const result = formatDate(date, 'UTC');
+      // System default is mocked to be 12-hour format
+      expect(result).toContain('4:29:35');
+      expect(result).toContain('PM');
+    });
+
+    it('should work with 24-hour format in different timezones', () => {
+      const result = formatDate(date, 'Central Standard Time', {
+        hourFormat: '24',
+      });
+      expect(result).toContain('11:29:35');
+      expect(result).not.toContain('AM');
+      expect(result).not.toContain('PM');
+    });
+
+    it('should work with 12-hour format in different timezones', () => {
+      const result = formatDate(date, 'Central Standard Time', {
+        hourFormat: '12',
+      });
+      expect(result).toContain('11:29:35');
+      expect(result).toContain('AM');
+    });
+
+    it('should work with different timestamp formats', () => {
+      expect(
+        formatDate(date, 'UTC', { format: 'short', hourFormat: '24' }),
+      ).toContain('16:29:35');
+      expect(
+        formatDate(date, 'UTC', { format: 'long', hourFormat: '24' }),
+      ).toContain('16:29:35');
+    });
+
+    it('should not affect relative time formatting', () => {
+      const result = formatDate(date, 'local', {
+        relative: true,
+        hourFormat: '24',
+      });
+      expect(result).toContain('ago');
+      expect(result).not.toContain(':');
+    });
+
+    it('should handle midnight correctly in 24-hour format', () => {
+      const midnight = '2022-04-13T00:00:00.000Z';
+      const result = formatDate(midnight, 'UTC', { hourFormat: '24' });
+      expect(result).toContain('0:00:00');
+      expect(result).not.toContain('12:00:00');
+    });
+
+    it('should handle noon correctly in 24-hour format', () => {
+      const noon = '2022-04-13T12:00:00.000Z';
+      const result = formatDate(noon, 'UTC', { hourFormat: '24' });
+      expect(result).toContain('12:00:00');
+      expect(result).not.toContain('PM');
+    });
   });
 });
 

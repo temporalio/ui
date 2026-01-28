@@ -43,10 +43,10 @@
 
       <button
         title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-        class="flex items-center justify-center p-1"
+        class="mx-2 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=closed]:p-2"
         onclick={ontoggle}
       >
-        <Icon name="collapse" class="h-6 w-6 pl-2" />
+        <Icon name="collapse" height={20} width={20} />
       </button>
     </div>
     {#if children}

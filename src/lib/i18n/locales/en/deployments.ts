@@ -41,4 +41,13 @@ export const Strings = {
   'rollout-id': 'Rollout ID',
   actions: 'Actions',
   unversioned: 'No Current Version',
+  'status-tooltip-inactive':
+    'The version has polled the server but has not been designated as a current or ramping version.',
+  'status-tooltip-current': 'The currently active version.',
+  'status-tooltip-ramping':
+    'An active version that is configured to share a specific percentage of workflows with the "Current" version.',
+  'status-tooltip-draining':
+    'The version is no longer "Current" or "Ramping", but it still has open pinned workflows running on it.',
+  'status-tooltip-drained':
+    'All pinned workflows that were running on this version are closed.',
 } as const;

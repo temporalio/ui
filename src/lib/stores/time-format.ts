@@ -3,7 +3,7 @@ import { get, type Subscriber } from 'svelte/store';
 import { startOfDay } from 'date-fns';
 
 import { persistStore } from '$lib/stores/persist-store';
-import { type TimestampFormat } from '$lib/utilities/format-date';
+import type { HourFormat, TimestampFormat } from '$lib/utilities/format-date';
 import {
   BASE_TIME_FORMAT_OPTIONS,
   getAdjustedTimeformat,
@@ -17,6 +17,8 @@ export const timestampFormat = persistStore<TimestampFormat>(
   'timestampFormat',
   'medium',
 );
+
+export const hourFormat = persistStore<HourFormat>('hourFormat', 'system');
 
 const DEFAULT_TIME_FORMAT = BASE_TIME_FORMAT_OPTIONS.LOCAL;
 const persistedTimeFormat = persistStore('timeFormat', DEFAULT_TIME_FORMAT);
