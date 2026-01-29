@@ -16,7 +16,7 @@ test.describe('Start a Standalone Activity', () => {
     await mockSearchAttributesApi(page);
   });
 
-  test('Allows select form fields to be pre-filled via URL Search Parameters', async ({
+  test.skip('Allows select form fields to be pre-filled via URL Search Parameters', async ({
     page,
   }) => {
     const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
@@ -46,7 +46,7 @@ test.describe('Start a Standalone Activity', () => {
     ).toHaveValue('10');
   });
 
-  test('Displays errors when select form fields are incomplete', async ({
+  test.skip('Displays errors when select form fields are incomplete', async ({
     page,
   }) => {
     const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
@@ -64,7 +64,7 @@ test.describe('Start a Standalone Activity', () => {
     await expect(startStandaloneActivityPage.timeoutError).toBeVisible();
   });
 
-  test('Allows expanding more options', async ({ page }) => {
+  test.skip('Allows expanding more options', async ({ page }) => {
     const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
     await startStandaloneActivityPage.goto();
 

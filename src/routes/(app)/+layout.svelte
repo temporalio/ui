@@ -128,12 +128,13 @@
         label: translate('common.workflows'),
         isActive: (path) => path.includes(workflowsRoute),
       },
-      {
-        href: standaloneActivitiesRoute,
-        icon: 'activity',
-        label: translate('standalone-activities.standalone-activities'),
-        isActive: (path) => path.includes(standaloneActivitiesRoute),
-      },
+      // Uncomment this when Standalone Activities is ready to release
+      // {
+      //   href: standaloneActivitiesRoute,
+      //   icon: 'activity',
+      //   label: translate('standalone-activities.standalone-activities'),
+      //   isActive: (path) => path.includes(standaloneActivitiesRoute),
+      // },
       {
         href: schedulesRoute,
         icon: 'schedules',
