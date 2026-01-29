@@ -25,14 +25,19 @@
 package auth
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"unicode/utf8"
 
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/labstack/echo/v4"
 	"github.com/temporalio/ui-server/v2/server/config"
 )
@@ -41,6 +46,16 @@ const (
 	AuthorizationExtrasHeader = "authorization-extras"
 	cookieLen                 = 4000
 )
+
+var tokenVerifier *oidc.IDTokenVerifier
+
+func SetVerifier(v *oidc.IDTokenVerifier) {
+	tokenVerifier = v
+}
+
+func stripBearerPrefix(token string) string {
+	return strings.TrimPrefix(token, "Bearer ")
+}
 
 func SetUser(c echo.Context, user *User) error {
 	if user.OAuth2Token == nil {
@@ -82,6 +97,43 @@ func SetUser(c echo.Context, user *User) error {
 		c.SetCookie(cookie)
 	}
 
+	if rt := user.OAuth2Token.RefreshToken; rt != "" {
+		log.Printf("[Auth] Setting refresh token cookie (length: %d)", len(rt))
+		refreshCookie := &http.Cookie{
+			Name:     "refresh",
+			Value:    rt,
+			MaxAge:   int((30 * 24 * time.Hour).Seconds()),
+			Secure:   c.Request().TLS != nil,
+			HttpOnly: true,
+			Path:     "/",
+			SameSite: http.SameSiteStrictMode,
+		}
+		c.SetCookie(refreshCookie)
+	} else {
+		log.Println("[Auth] No refresh token received from OAuth provider")
+	}
+
+	return nil
+}
+
+func validateJWT(ctx context.Context, tokenString string) error {
+	if tokenString == "" {
+		log.Println("[JWT Validation] Token is empty, skipping validation")
+		return nil
+	}
+
+	if tokenVerifier == nil {
+		log.Println("[JWT Validation] No verifier configured, skipping validation")
+		return nil
+	}
+
+	_, err := tokenVerifier.Verify(ctx, tokenString)
+	if err != nil {
+		log.Printf("[JWT Validation] Token verification failed: %v", err)
+		return errors.New("token invalid or expired")
+	}
+
+	log.Println("[JWT Validation] Token verified successfully")
 	return nil
 }
 
@@ -104,9 +156,24 @@ func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProvider
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 	}
 
+	// The Authorization-Extras header contains the ID token (JWT) that we should validate
+	// The Authorization header contains the access token (opaque string)
+	idToken := c.Request().Header.Get(AuthorizationExtrasHeader)
+	ctx := c.Request().Context()
+	if idToken != "" {
+		log.Println("[Auth] Validating ID token from Authorization-Extras header")
+		if err := validateJWT(ctx, idToken); err != nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid ID token: %v", err))
+		}
+	} else {
+		log.Println("[Auth] No Authorization-Extras header, validating Authorization header")
+		if err := validateJWT(ctx, stripBearerPrefix(token)); err != nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid token: %v", err))
+		}
+	}
+
 	// Handle token swapping for OIDC providers that require ID token as Bearer
 	if len(cfg.Auth.Providers) > 0 && cfg.Auth.Providers[0].UseIDTokenAsBearer {
-		idToken := c.Request().Header.Get(AuthorizationExtrasHeader)
 		if idToken != "" {
 			// Replace the Authorization header with ID token
 			c.Request().Header.Set(echo.HeaderAuthorization, "Bearer "+idToken)
