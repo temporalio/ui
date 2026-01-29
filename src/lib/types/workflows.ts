@@ -3,7 +3,6 @@ import type {
   Payloads,
   PendingWorkflowTaskInfo,
   Priority,
-  WorkflowExecutionPauseInfo,
   WorkflowExecutionStatus,
   WorkflowExtendedInfo,
   WorkflowVersionTimpstamp,
@@ -184,12 +183,12 @@ export type WorkflowExecution = {
   parent?: WorkflowIdentifier;
   url: string;
   isRunning: boolean;
+  isPaused: boolean;
   defaultWorkflowTaskTimeout: Duration;
   workflowExecutionTimeout?: Duration;
   canBeTerminated: boolean;
   callbacks: Callback[];
   versioningInfo?: VersioningInfo;
-  pauseInfo?: WorkflowExecutionPauseInfo;
   priority?: Priority;
   summary?: Payload;
   details?: Payload;

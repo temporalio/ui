@@ -50,8 +50,18 @@ export type UpdateWorkflowResponse =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionResponse;
 export type PendingWorkflowTaskInfo =
   temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
+// TODO: remove when TS SDK has been updated and includes WorkflowExecutionPauseInfo
+type WorkflowExecutionPauseInfo =
+  // temporal.api.workflow.v1.IWorkflowExecutionPauseInfo;
+  {
+    identity?: string;
+    pausedTime: google.protobuf.ITimestamp;
+    reason?: string;
+  };
 export type WorkflowExtendedInfo =
-  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo;
+  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo & {
+    pauseInfo?: WorkflowExecutionPauseInfo;
+  };
 // TODO: remove when TS SDK has been updated and includes PauseWorkflowExecutionRequest and UnpauseWorkflowExecutionRequest
 type PauseOrUnpauseWorkflowRequest = {
   namespace: string;
@@ -229,14 +239,6 @@ export type WorkflowVersionTimpstamp =
   temporal.api.common.v1.IWorkerVersionStamp;
 export type SearchAttribute = temporal.api.common.v1.ISearchAttributes;
 export type Priority = temporal.api.common.v1.IPriority;
-// TODO: remove when TS SDK has been updated and includes WorkflowExecutionPauseInfo
-export type WorkflowExecutionPauseInfo =
-  // temporal.api.workflow.v1.IWorkflowExecutionPauseInfo;
-  {
-    identity?: string;
-    pausedTime: google.protobuf.ITimestamp;
-    reason?: string;
-  };
 
 // api response
 export type Payload = temporal.api.common.v1.IPayload;

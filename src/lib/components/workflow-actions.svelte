@@ -36,12 +36,20 @@
     namespace: string;
     cancelInProgress: boolean;
     isRunning: boolean;
+    isPaused: boolean;
     first?: string;
     next?: string;
   }
 
-  let { workflow, namespace, cancelInProgress, isRunning, first, next }: Props =
-    $props();
+  let {
+    workflow,
+    namespace,
+    cancelInProgress,
+    isRunning,
+    isPaused,
+    first,
+    next,
+  }: Props = $props();
 
   let cancelConfirmationModalOpen = $state(false);
   let terminateConfirmationModalOpen = $state(false);
@@ -71,8 +79,6 @@
   let resetAuthorized = $derived(
     workflowResetEnabled(page.data.settings, $coreUser, namespace),
   );
-
-  let workflowPaused = $derived(workflow.status === 'Paused');
 
   // https://github.com/temporalio/temporal/releases/tag/v1.27.1
   let canResetWithPendingChildWorkflows = $derived(
@@ -184,7 +190,7 @@
     disabled={!pauseEnabled}
     size="sm"
   >
-    {#if workflowPaused}
+    {#if isPaused}
       {translate('workflows.unpause-workflow')}
     {:else}
       {translate('workflows.pause-workflow')}
@@ -265,7 +271,7 @@
 {/snippet}
 
 <div class="flex items-center gap-2">
-  {#if isRunning}
+  {#if isRunning || (isPaused && pauseEnabled)}
     {#if pauseEnabled}
       {@render pauseButton()}
     {:else}
@@ -340,7 +346,7 @@
 {/if}
 
 {#if pauseEnabled}
-  {#if workflowPaused}
+  {#if isPaused}
     <UnpauseConfirmationModal
       {refresh}
       {workflow}

@@ -20,10 +20,16 @@
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
+  import {
+    relativeTime,
+    timeFormat,
+    timestampFormat,
+  } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { formatDate } from '$lib/utilities/format-date';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
@@ -70,7 +76,7 @@
         isCancelInProgress(workflow.status, $fullEventHistory),
     ),
   );
-  const workflowPaused = $derived(workflow?.status === 'Paused');
+  const isPaused = $derived(workflow?.isPaused);
   const resetRunId = $derived(
     workflow
       ? workflow.workflowExtendedInfo?.resetRunId ||
@@ -136,6 +142,7 @@
         <div class="xl:hidden">
           <WorkflowActions
             {isRunning}
+            {isPaused}
             {cancelInProgress}
             {workflow}
             {namespace}
@@ -163,6 +170,7 @@
     <div class="max-xl:hidden">
       <WorkflowActions
         {isRunning}
+        {isPaused}
         {cancelInProgress}
         {workflow}
         {namespace}
@@ -185,7 +193,7 @@
       </Alert>
     </div>
   {/if}
-  {#if workflowPaused}
+  {#if isPaused}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
         icon="info"
@@ -200,9 +208,15 @@
             <li>{translate('workflows.workflow-pause-description-item-2')}</li>
             <li>{translate('workflows.workflow-pause-description-item-3')}</li>
           </ul>
-          {#if workflow?.pauseInfo?.reason}
+          {#if workflow?.workflowExtendedInfo?.pauseInfo?.reason}
             <p>{translate('workflows.workflow-paused-reason')}</p>
-            <p class="text-secondary">{workflow.pauseInfo.reason}</p>
+            <p class="text-secondary">
+              {workflow.workflowExtendedInfo.pauseInfo.reason} • {formatDate(
+                workflow.workflowExtendedInfo.pauseInfo.pausedTime,
+                $timeFormat,
+                { relative: $relativeTime, format: $timestampFormat },
+              )}
+            </p>
           {/if}
         </div>
       </Alert>
