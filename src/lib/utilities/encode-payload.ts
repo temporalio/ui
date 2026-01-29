@@ -1,9 +1,9 @@
 import { get } from 'svelte/store';
 
-import type { PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
+import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
 import { encodePayloadsWithCodec } from '$lib/services/data-encoder';
 import { dataEncoder } from '$lib/stores/data-encoder';
-import type { Payloads } from '$lib/types';
+import type { Payload } from '$lib/types';
 import { btoa } from '$lib/utilities/btoa';
 import {
   parseWithBigInt,
@@ -57,7 +57,7 @@ export const encodePayloads = async ({
   encoding,
   messageType = '',
   encodeWithCodec = true,
-}: EncodePayloads): Promise<Payloads> => {
+}: EncodePayloads): Promise<Payload[]> => {
   let payloads = null;
 
   if (input) {

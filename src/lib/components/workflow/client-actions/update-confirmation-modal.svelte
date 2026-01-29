@@ -4,7 +4,6 @@
   import { page } from '$app/stores';
 
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
-  import { type PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
   import PayloadInput from '$lib/components/payload-input.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -14,6 +13,7 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { type PayloadInputEncoding } from '$lib/models/payload-encoding';
   import { updateWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
   import { workflowRun } from '$lib/stores/workflow-run';

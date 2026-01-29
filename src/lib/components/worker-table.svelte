@@ -12,7 +12,6 @@
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { type PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
-  import { workflowRun } from '$lib/stores/workflow-run';
   import type { TaskQueueResponse } from '$lib/types';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
@@ -23,12 +22,12 @@
 
   type Props = {
     workers: TaskQueueResponse;
+    searchAttributes?: Record<string, string>;
     children?: Snippet;
   };
-  let { workers, children }: Props = $props();
+  let { workers, searchAttributes = {}, children }: Props = $props();
 
   const { namespace } = $derived(page.params);
-  const { workflow } = $derived($workflowRun);
   const {
     pollers,
     pinned,
@@ -37,7 +36,7 @@
     currentDeployment,
     rampingBuildId,
     rampingDeployment,
-  } = $derived(getWorkflowPollersWithVersions(workflow, workers));
+  } = $derived(getWorkflowPollersWithVersions(searchAttributes, workers));
 
   const getPollerDeploymentName = (poller: PollerWithTaskQueueTypes) => {
     const deployment =

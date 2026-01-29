@@ -1,19 +1,12 @@
-<script context="module" lang="ts">
-  const encoding = ['json/plain', 'json/protobuf'] as const;
-  export type PayloadInputEncoding = (typeof encoding)[number];
-  export const isPayloadInputEncodingType = (
-    x: unknown,
-  ): x is PayloadInputEncoding => encoding.includes(x as PayloadInputEncoding);
-</script>
-
 <script lang="ts">
-  import { type Writable } from 'svelte/store';
+  import type { Writable } from 'svelte/store';
 
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
 
   import PayloadInput from './payload-input.svelte';
 
@@ -44,7 +37,7 @@
         <div class="flex w-full flex-col gap-2">
           <RadioGroup
             description={translate('workflows.encoding')}
-            bind:group={encoding}
+            group={encoding}
             name="encoding"
           >
             <RadioInput id="json/plain" value="json/plain" label="json/plain" />

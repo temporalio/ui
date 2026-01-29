@@ -1,13 +1,26 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
 
-  type Props = {
-    class?: string;
+  import type { Snippet } from 'svelte';
+  import { type ClassNameValue, twMerge } from 'tailwind-merge';
+
+  interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'class'> {
+    class?: ClassNameValue;
     children?: Snippet;
-  };
-  let { class: className = '', children }: Props = $props();
+  }
+
+  let { class: className = '', children, ...rest }: Props = $props();
 </script>
 
-<div class="surface-primary border border-subtle p-4 {className}">
+<div
+  class={twMerge(
+    'surface-primary',
+    'border',
+    'border-subtle',
+    'p-4',
+    className,
+  )}
+  {...rest}
+>
   {@render children?.()}
 </div>

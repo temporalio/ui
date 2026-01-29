@@ -1,0 +1,88 @@
+export const Namespace = 'standalone-activities' as const;
+
+export const Strings = {
+  'standalone-activities': 'Standalone Activities',
+  'start-standalone-activity': 'Start Standalone Activity',
+  'activities-error-querying': 'Error querying activities',
+  'activity-query-error-state': 'Error Filtering Activities',
+  'activities-plural_one': 'Standalone Activity',
+  'activities-plural_other': 'Standalone Activities',
+  'all-activities': 'All',
+  'running-activities': 'Running',
+  'completed-activities': 'Completed',
+  'failed-activities': 'Failed',
+  'canceled-activities': 'Canceled',
+  'terminated-activities': 'Terminated',
+  'timed-out-activities': 'Timed Out',
+  'empty-state-title': 'No Activities Found',
+  'empty-state-description': 'No activities match the current filters.',
+  'custom-views': 'Custom Views',
+  'recent-activities': 'Recent Standalone Activities',
+  'activity-id': 'Activity ID',
+  'run-id': 'Run ID',
+  'activity-type': 'Activity Type',
+  'task-queue': 'Task Queue',
+  'start-time': 'Start Time',
+  'execution-time': 'Execution Time',
+  'close-time': 'Close Time',
+  'execution-duration': 'Execution Duration',
+  'state-transitions': 'State Transitions',
+  'activities-table': 'Standalone Activities Table',
+  'back-to-activities': 'Back to Standalone Activities',
+  'start-activity-like-this-one': 'Start Standalone Activity Like This One',
+  'request-cancellation': 'Request Cancellation',
+  terminate: 'Terminate',
+  'cancel-modal-title': 'Cancel Standalone Activity',
+  'cancel-modal-confirmation':
+    'Are you sure you want to cancel this standalone activity?',
+  'cancel-success': 'Standalone Activity cancellation requested.',
+  'terminate-modal-title': 'Terminate Standalone Activity',
+  'terminate-modal-confirmation':
+    'Are you sure you want to terminate this standalone activity? This action cannot be undone.',
+  'terminate-success': 'Standalone Activity terminated.',
+  'activity-execution-actions': 'Standalone Activity Actions',
+  'standalone-activities-disabled':
+    'Standalone Activities are disabled for this Namespace.',
+  'standalone-activities-enablement':
+    'If you want to enable Standalone Activities globally, please ensure the following values are set in Dynamic Config.',
+  'standalone-activities-enablement-per-namespace':
+    'If you want to enable Standalone Activities for this namespace only, include the following',
+  'form-activity-id-label': 'Activity ID',
+  'form-activity-id-required': 'Activity ID is required.',
+  'form-task-queue-label': 'Task Queue',
+  'form-task-queue-required': 'Task Queue is required.',
+  'form-activity-type-label': 'Activity Type',
+  'form-activity-type-required': 'Activity Type is required.',
+  'form-random-uuid': 'Random UUID',
+  'form-timeouts-heading': 'Activity Timeouts',
+  'form-start-to-close-timeout-label': 'Start to Close Timeout',
+  'form-start-to-close-timeout-hint':
+    'Maximum time an activity is allowed to execute after being picked up by a worker.',
+  'form-schedule-to-close-timeout-label': 'Schedule to Close Timeout',
+  'form-schedule-to-close-timeout-hint':
+    'How long the caller is willing to wait for an activity completion.',
+  'form-schedule-to-start-timeout-label': 'Schedule to Start Timeout',
+  'form-schedule-to-start-timeout-hint':
+    'Limits time an activity task can stay in a task queue before a worker picks it up. Defaults to "Schedule to Close Timeout" if not specified.',
+  'form-timeout-required':
+    'Either "Start to Close Timeout" or "Schedule to Close Timeout" is required.',
+  'form-search-attributes-heading': 'Custom Search Attributes',
+  'form-search-attributes-description':
+    'Indexed fields used in a List Filter to filter a list of Standalone Activities.',
+  'form-user-metadata-heading': 'User Metadata',
+  'form-user-metadata-description':
+    'Add context to Standalone Activities to help identify and understand its operations.',
+  'form-retry-policy-heading': 'Retry Policy',
+  'form-heartbeat-timeout-label': 'Heartbeat Timeout',
+  'form-heartbeat-timeout-hint':
+    'Maximum permitted time between successful worker heartbeats.',
+  'form-id-policies-heading': 'Activity ID Policies',
+  'form-id-reuse-policy-label': 'ID Reuse Policy',
+  'form-id-conflict-policy-label': 'ID Conflict Policy',
+  'form-activity-started': 'Activity execution started.',
+  'layout-tabs-label': 'Activity Execution Tabs',
+  'layout-details-tab': 'Details',
+  'layout-workers-tab': 'Workers',
+  'layout-search-attributes-tab': 'Search Attributes',
+  'layout-user-metadata-tab': 'User Metadata',
+} as const;
