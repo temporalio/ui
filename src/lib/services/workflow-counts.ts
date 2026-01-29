@@ -2,6 +2,7 @@ import type {
   CountSchedulesResponse,
   CountWorkflowExecutionsResponse,
 } from '$lib/types/workflows';
+import { isNotImplemented } from '$lib/utilities/handle-error';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
@@ -69,6 +70,27 @@ export const fetchWorkflowCountByExecutionStatus = async ({
   return { count: count ?? '0', groups };
 };
 
+// Uses the API in a private/unsupported way that will stop working in a future server release.
+const fetchScheduleCountLegacy = async (
+  namespace: string,
+  query?: string,
+): Promise<string> => {
+  const scheduleFixedQuery =
+    'TemporalNamespaceDivision="TemporalScheduler" AND ExecutionStatus="Running"';
+  const fullQuery = query
+    ? `${scheduleFixedQuery} AND ${query}`
+    : scheduleFixedQuery;
+  const countRoute = routeForApi('workflows.count', { namespace });
+  const { count } = await requestFromAPI<CountWorkflowExecutionsResponse>(
+    countRoute,
+    {
+      params: { query: fullQuery },
+      notifyOnError: false,
+    },
+  );
+  return count ?? '0';
+};
+
 export const fetchScheduleCount = async ({
   namespace,
   query,
@@ -76,12 +98,17 @@ export const fetchScheduleCount = async ({
   namespace: string;
   query?: string;
 }): Promise<string> => {
-  const countRoute = routeForApi('schedules.count', {
-    namespace,
-  });
-  const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
-    params: query ? { query } : {},
-    notifyOnError: false,
-  });
-  return count ?? '0';
+  try {
+    const countRoute = routeForApi('schedules.count', { namespace });
+    const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
+      params: query ? { query } : {},
+      notifyOnError: false,
+    });
+    return count ?? '0';
+  } catch (error: unknown) {
+    if (isNotImplemented(error)) {
+      return fetchScheduleCountLegacy(namespace, query);
+    }
+    throw error;
+  }
 };
