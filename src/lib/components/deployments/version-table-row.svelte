@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import Timestamp from '$lib/components/timestamp.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
@@ -97,7 +98,20 @@
   {#each columns as { label } (label)}
     {#if label === translate('deployments.build-id')}
       <td class="text-left">
-        {versionBuildId}
+        <Copyable
+          content={versionBuildId}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        >
+          <Link
+            href={routeForWorkflowsWithQuery({
+              namespace: $page.params.namespace,
+              query: `TemporalWorkerDeploymentVersion="${getDeploymentVersionFromStruct(version)}"`,
+            })}
+          >
+            {versionBuildId}
+          </Link>
+        </Copyable>
       </td>
     {:else if label === translate('deployments.status')}
       <td class="text-left">

@@ -38,9 +38,7 @@
   ];
 </script>
 
-<header
-  class="flex flex-row flex-wrap justify-between gap-8 border-b border-subtle px-4 pb-4 pt-8 md:pt-20 xl:px-8"
->
+<header class="flex flex-row flex-wrap justify-between gap-8">
   <div class="relative flex w-full flex-col gap-4">
     <div class="flex items-center gap-2">
       <Link href={routeForWorkerDeployments({ namespace })} icon="chevron-left">
@@ -57,7 +55,7 @@
     </div>
   </div>
 </header>
-<div class="p-8">
+<div>
   {#await deploymentFetch}
     <SkeletonTable rows={15} />
   {:then deployment}

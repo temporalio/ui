@@ -5,6 +5,7 @@
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -20,16 +21,10 @@
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
@@ -211,10 +206,8 @@
           {#if workflow?.workflowExtendedInfo?.pauseInfo?.reason}
             <p>{translate('workflows.workflow-paused-reason')}</p>
             <p class="text-secondary">
-              {workflow.workflowExtendedInfo.pauseInfo.reason} • {formatDate(
+              {workflow.workflowExtendedInfo.pauseInfo.reason} • {$timestamp(
                 workflow.workflowExtendedInfo.pauseInfo.pausedTime,
-                $timeFormat,
-                { relative: $relativeTime, format: $timestampFormat },
               )}
             </p>
           {/if}

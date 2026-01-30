@@ -19,19 +19,23 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    BASE_TIME_FORMAT_OPTIONS,
+    hourFormat,
     relativeTime,
     timeFormat,
-    type TimeFormatOptions,
     timestampFormat,
-    TimezoneOptions,
-    Timezones,
   } from '$lib/stores/time-format';
   import {
     formatUTCOffset,
-    getLocalTime,
+    type HourFormat,
     type TimestampFormat,
   } from '$lib/utilities/format-date';
+  import {
+    BASE_TIME_FORMAT_OPTIONS,
+    getLocalTime,
+    type TimeFormatOptions,
+    TimezoneOptions,
+    Timezones,
+  } from '$lib/utilities/timezone';
 
   export let position: 'left' | 'right' = 'right';
   export let size: ButtonStyles['size'] = 'md';
@@ -78,6 +82,10 @@
 
   const setTimestampFormat = (format: TimestampFormat) => {
     $timestampFormat = format;
+  };
+
+  const setHourFormat = (format: HourFormat) => {
+    $hourFormat = format;
   };
 
   $: timezone = Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat;
@@ -149,16 +157,9 @@
 
     {#if !$relativeTime}
       <div
-        class="m-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+        class="mx-4 mb-2 mt-4 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
       >
-        <div>
-          <p class="font-medium">Timestamp Format</p>
-          <Timestamp
-            as="p"
-            class="text-xs text-secondary"
-            dateTime={currentDate}
-          />
-        </div>
+        <p class="font-medium">Timestamp Format</p>
         <ToggleButtons>
           <ToggleButton
             size="xs"
@@ -175,7 +176,46 @@
             active={$timestampFormat === 'long'}
             on:click={() => setTimestampFormat('long')}>Long</ToggleButton
           >
+          <ToggleButton
+            size="xs"
+            active={$timestampFormat === 'iso'}
+            on:click={() => setTimestampFormat('iso')}>ISO</ToggleButton
+          >
         </ToggleButtons>
+      </div>
+
+      <div
+        class="mx-4 mb-2 flex gap-2 max-md:flex-col md:flex-row md:items-center md:justify-between"
+      >
+        <p class="font-medium">Hour Format</p>
+        <ToggleButtons>
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === 'system'}
+            disabled={$timestampFormat === 'iso'}
+            on:click={() => setHourFormat('system')}>System</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === '12'}
+            disabled={$timestampFormat === 'iso'}
+            on:click={() => setHourFormat('12')}>12-hour</ToggleButton
+          >
+          <ToggleButton
+            size="xs"
+            active={$hourFormat === '24'}
+            disabled={$timestampFormat === 'iso'}
+            on:click={() => setHourFormat('24')}>24-hour</ToggleButton
+          >
+        </ToggleButtons>
+      </div>
+
+      <div class="mx-4 mb-4 mt-3">
+        <Timestamp
+          as="p"
+          class="text-xs text-secondary"
+          dateTime={currentDate}
+        />
       </div>
     {/if}
 
