@@ -95,6 +95,8 @@ export const Strings = {
     'Signaling workflows is not enabled, please contact your administrator for assistance.',
   'update-disabled':
     'Updating workflows is not enabled, please contact your administrator for assistance.',
+  'update-disabled-on-pause':
+    'Cannot update workflow while the workflow is paused.',
   'terminate-disabled':
     'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
   'terminate-success': 'Workflow terminated.',

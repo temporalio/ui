@@ -21,6 +21,7 @@
   import { temporalVersion } from '$lib/stores/versions';
   import type { WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
@@ -95,8 +96,10 @@
     !resetEnabled && !signalEnabled && !terminateEnabled,
   );
 
+  const isDelayed = $derived(isWorkflowDelayed(workflow));
   const pauseEnabled = $derived(
-    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause,
+    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause &&
+      !isDelayed,
   );
 
   const getResetDescription = ({
@@ -167,8 +170,12 @@
       label: translate('workflows.update'),
       onClick: () => (updateConfirmationModalOpen = true),
       testId: 'update-button',
-      enabled: updateEnabled,
-      description: updateEnabled ? '' : translate('workflows.update-disabled'),
+      enabled: updateEnabled && !isPaused,
+      description: updateEnabled
+        ? isPaused
+          ? translate('workflows.update-disabled-on-pause')
+          : ''
+        : translate('workflows.update-disabled'),
     },
     {
       label: translate('workflows.terminate'),
@@ -290,7 +297,7 @@
       {translate('workflows.more-actions')}
     </MenuButton>
     <Menu id="workflow-actions" position="right" class="w-[16rem] md:w-[24rem]">
-      {#if isRunning}
+      {#if isRunning || isPaused}
         {@render runningWorkflowActions()}
       {:else}
         {@render worklfowActions()}
