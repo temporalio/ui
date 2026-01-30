@@ -20,7 +20,7 @@
     overrideRemoteCodecConfiguration,
     passAccessToken,
   } from '$lib/stores/data-encoder-config';
-  import { refresh } from '$lib/stores/workflow-run';
+  import { triggerRefresh } from '$lib/stores/workflow-run';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
   import { trimTrailingSlash } from '$lib/utilities/trim-trailing-slash';
 
@@ -72,9 +72,7 @@
     $viewDataEncoderSettings = false;
     $overrideRemoteCodecConfiguration = $override;
 
-    if (page.url.pathname.endsWith('history')) {
-      $refresh = Date.now();
-    }
+    if (page.url.pathname.endsWith('history')) triggerRefresh();
   };
 
   const md = new MediaQuery('max-width:768px');

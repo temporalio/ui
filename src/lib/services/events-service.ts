@@ -3,7 +3,7 @@ import throttle from 'just-throttle';
 import { toEventHistory } from '$lib/models/event-history';
 import type { EventSortOrder } from '$lib/stores/event-view';
 import { fullEventHistory } from '$lib/stores/events';
-import { refresh } from '$lib/stores/workflow-run';
+import { triggerRefresh } from '$lib/stores/workflow-run';
 import type { WorkflowAPIRoutePath } from '$lib/types/api';
 import type {
   CommonHistoryEvent,
@@ -16,7 +16,6 @@ import type {
   NamespaceScopedRequest,
   NextPageToken,
   PaginationCallbacks,
-  Settings,
 } from '$lib/types/global';
 import { isSortOrder } from '$lib/utilities/is';
 import { paginated } from '$lib/utilities/paginated';
@@ -33,11 +32,6 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     historySize?: string;
     maximumPageSize?: string;
   };
-
-export type FetchEventsParametersWithSettings = FetchEventsParameters & {
-  settings: Settings;
-  accessToken: string;
-};
 
 export const getEndpointForRawHistory = ({
   namespace,
@@ -90,7 +84,7 @@ export const fetchRawEvents = async ({
 };
 
 export const throttleRefresh = throttle(() => {
-  refresh.set(Date.now());
+  triggerRefresh();
 }, 5000);
 
 export const fetchAllEvents = async ({
@@ -120,7 +114,7 @@ export const fetchAllEvents = async ({
 
   const onComplete = () => {
     if (!signal) return;
-    refresh.set(Date.now());
+    triggerRefresh();
   };
 
   const endpoint = getEndpointForSortOrder(sort);

@@ -114,6 +114,7 @@ export const toWorkflowExecution = (
     response.workflowExecutionInfo.status,
   );
   const isRunning = status === 'Running';
+  const isPaused = status === 'Paused';
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const historySizeBytes = response.workflowExecutionInfo.historySizeBytes;
   const url = `/workflows/${id}/${runId}`;
@@ -182,6 +183,7 @@ export const toWorkflowExecution = (
     parent,
     stateTransitionCount,
     isRunning,
+    isPaused,
     defaultWorkflowTaskTimeout,
     workflowExecutionTimeout,
     workflowExtendedInfo,
