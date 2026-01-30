@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
-
   import Modal from '$lib/holocene/modal.svelte';
   import Textarea from '$lib/holocene/textarea.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
   import { pauseWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
+  import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -14,10 +14,9 @@
     open: boolean;
     workflow: WorkflowExecution;
     namespace: string;
-    refresh: Writable<number>;
   }
 
-  let { open = $bindable(), workflow, namespace, refresh }: Props = $props();
+  let { open = $bindable(), workflow, namespace }: Props = $props();
 
   let reason: string = $state('');
   let error: string = $state('');
@@ -42,7 +41,7 @@
       });
       open = false;
       reason = '';
-      $refresh = Date.now();
+      triggerRefresh(Action.Pause);
       toaster.push({
         id: 'workflow-pause-success-toast',
         message: translate('workflows.pause-success'),

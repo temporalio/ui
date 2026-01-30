@@ -6,7 +6,7 @@
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { pauseActivity } from '$lib/services/workflow-activities-service';
-  import { refresh } from '$lib/stores/workflow-run';
+  import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { getIdentity } from '$lib/utilities/core-context';
 
@@ -42,7 +42,7 @@
       type: includeType ? type : undefined,
       identity,
     });
-    $refresh = Date.now();
+    triggerRefresh();
     hideModal();
   };
 </script>

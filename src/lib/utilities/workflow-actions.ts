@@ -26,6 +26,9 @@ export const getPlaceholder = (
     case Action.Unpause:
       translatedAction = translate('workflows.unpaused');
       break;
+    case Action.Signal:
+      translatedAction = translate('workflows.signaled');
+      break;
     default:
       unhandledAction(action);
   }

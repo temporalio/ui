@@ -53,6 +53,7 @@ export const Strings = {
   unpause: 'Unpause',
   paused: 'Paused',
   unpaused: 'Unpaused',
+  signaled: 'Signaled',
   reset: 'Reset',
   signal: 'Send a Signal',
   update: 'Send an Update',

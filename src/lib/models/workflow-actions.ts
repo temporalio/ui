@@ -4,4 +4,5 @@ export enum Action {
   Terminate,
   Pause,
   Unpause,
+  Signal,
 }

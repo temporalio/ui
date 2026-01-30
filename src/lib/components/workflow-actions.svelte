@@ -19,7 +19,6 @@
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
   import { temporalVersion } from '$lib/stores/versions';
-  import { refresh } from '$lib/stores/workflow-run';
   import type { WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
@@ -302,7 +301,6 @@
 
 {#if resetEnabled}
   <ResetConfirmationModal
-    {refresh}
     {workflow}
     {namespace}
     bind:open={resetConfirmationModalOpen}
@@ -311,7 +309,6 @@
 
 {#if signalEnabled}
   <SignalConfirmationModal
-    {refresh}
     {workflow}
     {namespace}
     bind:open={signalConfirmationModalOpen}
@@ -328,7 +325,6 @@
 
 {#if cancelEnabled}
   <CancelConfirmationModal
-    {refresh}
     {workflow}
     {namespace}
     bind:open={cancelConfirmationModalOpen}
@@ -337,7 +333,6 @@
 
 {#if terminateEnabled}
   <TerminateConfirmationModal
-    {refresh}
     {workflow}
     {namespace}
     {first}
@@ -348,14 +343,12 @@
 {#if pauseEnabled}
   {#if isPaused}
     <UnpauseConfirmationModal
-      {refresh}
       {workflow}
       {namespace}
       bind:open={pauseConfirmationModalOpen}
     />
   {:else}
     <PauseConfirmationModal
-      {refresh}
       {workflow}
       {namespace}
       bind:open={pauseConfirmationModalOpen}
