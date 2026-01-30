@@ -43,7 +43,10 @@ export type ParameterlessAPIRoutePath =
   | 'user'
   | 'nexus-endpoints'
   | 'namespaces';
-export type WorkerAPIRoutePath = 'worker-task-reachability';
+export type WorkerAPIRoutePath =
+  | 'worker-task-reachability'
+  | 'workers'
+  | 'worker';
 export type SchedulesAPIRoutePath = 'schedules';
 export type ScheduleAPIRoutePath =
   | 'schedule'
@@ -90,6 +93,7 @@ export type APIRouteParameters = {
   endpointId: string;
   deploymentName: string;
   version: string;
+  workerInstanceKey: string;
 };
 
 export type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
@@ -138,6 +142,11 @@ export type BatchRouteParameters = Pick<
 export type TaskQueueRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'queue'
+>;
+
+export type WorkerRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'queue' | 'workerInstanceKey'
 >;
 
 export type ValidWorkflowEndpoints = WorkflowsAPIRoutePath;
