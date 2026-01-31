@@ -93,11 +93,17 @@ func buildCLI() *cli.App {
 					return cli.Exit(err, 1)
 				}
 
+				middlewares := []api.Middleware{
+					headers.WithForwardHeaders(cfg.ForwardHeaders),
+				}
+
+				if len(cfg.StaticHeaders) > 0 {
+					middlewares = append(middlewares, headers.WithStaticHeaders(cfg.StaticHeaders))
+				}
+
 				opts := []server_options.ServerOption{
 					server_options.WithConfigProvider(cfgProvider),
-					server_options.WithAPIMiddleware([]api.Middleware{
-						headers.WithForwardHeaders(cfg.ForwardHeaders),
-					}),
+					server_options.WithAPIMiddleware(middlewares),
 				}
 
 				s := server.NewServer(opts...)
