@@ -111,11 +111,11 @@
 <div class={twMerge('flex flex-col gap-1', className)}>
   <Label {required} {label} for={id} />
   <div
-    class="flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50"
+    class="surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50"
   >
     <input
       {id}
-      class="flex h-full grow border-r border-subtle p-2 focus-visible:outline-none"
+      class="flex h-full grow border-r border-subtle bg-transparent p-2 focus-visible:outline-none"
       type="number"
       bind:value={rawValue}
       oninput={handleNumberInput}
