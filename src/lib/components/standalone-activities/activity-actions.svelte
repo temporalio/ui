@@ -30,7 +30,9 @@
   );
 
   const onConfirmCancelOrTerminate = () => {
-    poller.abort();
+    poller.fetchOnce().then(() => {
+      poller.abort();
+    });
   };
 </script>
 

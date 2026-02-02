@@ -80,6 +80,14 @@ export class StandaloneActivityPoller {
     }
   }
 
+  async fetchOnce() {
+    const activityExecution = await getActivityExecution(
+      this.namespace,
+      this.activityId,
+    );
+    this.onUpdate(activityExecution);
+  }
+
   abort() {
     this.abortController.abort();
   }
