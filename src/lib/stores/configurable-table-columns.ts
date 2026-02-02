@@ -4,7 +4,6 @@ import { page } from '$app/stores';
 
 import type { Settings } from '$lib/types/global';
 
-import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 
@@ -134,19 +133,12 @@ export const persistedSchedulesTableColumns = persistStore<State>(
 );
 
 export const configurableTableColumns: Readable<TableColumns> = derived(
-  [
-    namespaces,
-    page,
-    persistedWorkflowTableColumns,
-    persistedSchedulesTableColumns,
-  ],
+  [page, persistedWorkflowTableColumns, persistedSchedulesTableColumns],
   ([
-    $namespaces,
     $page,
     $persistedWorkflowTableColumns,
     $persistedSchedulesTableColumns,
   ]) => {
-    const state: TableColumns = {};
     const useOrAddDefaultTableColumnsToNamespace = (
       columns: State,
       namespace: string,
@@ -173,24 +165,10 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
       ),
     });
 
-    const namespaceColumns =
-      $namespaces?.reduce(
-        (namespaceToColumnsMap, { namespaceInfo: { name } }): TableColumns => {
-          return {
-            ...namespaceToColumnsMap,
-            [name]: getTableColumns(name),
-          };
-        },
-        state,
-      ) ?? {};
     const { namespace: currentNamespace } = $page.params;
-
-    return namespaceColumns[currentNamespace]
-      ? namespaceColumns
-      : {
-          ...namespaceColumns,
-          [currentNamespace]: getTableColumns(currentNamespace),
-        };
+    return {
+      [currentNamespace]: getTableColumns(currentNamespace),
+    };
   },
 );
 
