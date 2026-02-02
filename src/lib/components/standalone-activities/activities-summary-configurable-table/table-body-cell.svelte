@@ -38,7 +38,7 @@
 
 {#if filterableLabels.includes(label)}
   <td
-    class="activities-summary-table-body-cell filterable"
+    class="relative h-8 whitespace-nowrap pr-24"
     data-testid="activities-summary-table-body-cell"
     onmouseover={showFilterOrCopy}
     onfocus={showFilterOrCopy}
@@ -73,7 +73,7 @@
   </td>
 {:else}
   <td
-    class="activities-summary-table-body-cell"
+    class="h-8 whitespace-nowrap"
     data-testid="activities-summary-table-body-cell"
   >
     {#if label === 'Status'}
@@ -99,13 +99,3 @@
     {/if}
   </td>
 {/if}
-
-<style lang="postcss">
-  .activities-summary-table-body-cell {
-    @apply h-8 whitespace-nowrap;
-
-    &.filterable {
-      @apply relative pr-24;
-    }
-  }
-</style>
