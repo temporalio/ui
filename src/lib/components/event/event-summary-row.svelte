@@ -220,7 +220,7 @@
   {#if isEventGroup(event)}
     <td class="font-mono">
       <div class="flex items-center gap-0.5">
-        {#each event.eventList as groupEvent (groupEvent.id)}
+        {#each event.eventList as groupEvent}
           <Link
             data-testid="link"
             href={routeForEventHistoryEvent({

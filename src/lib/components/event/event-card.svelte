@@ -141,7 +141,7 @@
 {/snippet}
 
 {#snippet eventLinks(links: ELink[])}
-  {#each links as link, index (index)}
+  {#each links as link}
     {@render eventLink(link)}
     {@render eventNamespaceLink(link)}
   {/each}

@@ -304,7 +304,7 @@
 
 {#snippet conditionalButtons(options: { value: string; label: string }[])}
   <ToggleButtons>
-    {#each options as option, index (index)}
+    {#each options as option}
       <ToggleButton
         variant="secondary"
         active={localFilter.conditional === option.value}

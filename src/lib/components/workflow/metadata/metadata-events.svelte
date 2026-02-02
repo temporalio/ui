@@ -22,7 +22,7 @@
   </div>
 {/if}
 <div class="flex flex-col gap-2">
-  {#each metadataGroups as group (group.id)}
+  {#each metadataGroups as group}
     <div
       class="flex items-center justify-between gap-4 border-b border-subtle px-3 pb-1 text-lg"
     >

@@ -67,7 +67,7 @@
       height={canvasHeight}
       width={canvasWidth}
     >
-      {#each history as event, index (index)}
+      {#each history as event, index}
         {@const group = getGroupForEventOrPendingEvent(allGroups, event)}
         <HistoryGraphRowVisual
           {event}

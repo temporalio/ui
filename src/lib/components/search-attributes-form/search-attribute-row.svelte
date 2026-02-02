@@ -74,7 +74,7 @@
     placeholder={translate('search-attributes.select-type-placeholder')}
     onChange={onTypeChange}
   >
-    {#each supportedTypes as type (type.value)}
+    {#each supportedTypes as type}
       <Option value={type.value}>{type.label}</Option>
     {/each}
   </Select>

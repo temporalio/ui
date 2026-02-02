@@ -151,7 +151,7 @@
           data-testid="query-select"
           required
         >
-          {#each queryTypes as { name: value, description = '' }, index (index)}
+          {#each queryTypes as { name: value, description = '' }}
             <Option {value} {description}>{value}</Option>
           {/each}
         </Select>

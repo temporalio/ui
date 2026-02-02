@@ -57,7 +57,7 @@
       <th>{translate('workflows.child-id')}</th>
       <th>{translate('workflows.child-run-id')}</th>
     </TableHeaderRow>
-    {#each visibleItems as child, index (index)}
+    {#each visibleItems as child}
       <TableRow>
         <td class="max-md:hidden">
           <WorkflowStatus status={child.status} />

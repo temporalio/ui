@@ -50,7 +50,7 @@
     {#if children}
       {@render children()}
     {:else}
-      {#each options as option, index (index)}
+      {#each options as option}
         <Option value={option} />
       {/each}
     {/if}

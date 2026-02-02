@@ -247,7 +247,7 @@
         <th>{translate('common.key')}</th>
         <th>{translate('common.type')}</th>
       </TableHeaderRow>
-      {#each Object.entries($searchAttributes) as [key, type] (key)}
+      {#each Object.entries($searchAttributes) as [key, type]}
         <TableRow>
           <td>{key}</td>
           <td>{type}</td>

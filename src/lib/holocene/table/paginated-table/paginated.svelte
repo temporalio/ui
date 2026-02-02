@@ -111,7 +111,7 @@
   </svelte:fragment>
 
   <div class="hidden items-center gap-2 md:flex" slot="actions-center">
-    {#each $store.pageShortcuts as page, index (index)}
+    {#each $store.pageShortcuts as page}
       {#if isNaN(page)}
         <span class="text-primary">...</span>
       {:else}

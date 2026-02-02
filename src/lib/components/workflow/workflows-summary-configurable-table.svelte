@@ -98,7 +98,7 @@
       let:visibleItems
       workflows={visibleItems}
     >
-      {#each columns as column, index (index)}
+      {#each columns as column}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
@@ -108,14 +108,14 @@
         {viewChildren}
         childCount={childrenActive(workflow)?.children.length}
       >
-        {#each columns as column, index (index)}
+        {#each columns as column}
           <TableBodyCell {workflow} {column} />
         {/each}
       </TableRow>
       {#if childrenActive(workflow)}
-        {#each childrenActive(workflow).children as child (child.id)}
+        {#each childrenActive(workflow).children as child}
           <TableRow workflow={child} child>
-            {#each columns as column, index (index)}
+            {#each columns as column}
               <TableBodyCell workflow={child} {column} />
             {/each}
           </TableRow>

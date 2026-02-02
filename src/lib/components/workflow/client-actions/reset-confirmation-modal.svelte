@@ -97,7 +97,7 @@
         bind:value={$eventId}
         id="reset-event-id"
       >
-        {#each $resetEvents as event (event.id)}
+        {#each $resetEvents as event}
           <Option value={event.id}>{event.id} - {event.eventType}</Option>
         {/each}
       </Select>

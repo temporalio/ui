@@ -12,7 +12,7 @@
   export let openRuns: Map<number, string>;
 </script>
 
-{#each root?.children as child, index (index)}
+{#each root?.children as child}
   <WorkflowFamilyNodeDescription
     root={child}
     {expandAll}

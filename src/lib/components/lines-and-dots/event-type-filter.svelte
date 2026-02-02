@@ -151,7 +151,7 @@
       {translate('common.none')}
     </MenuItem>
     <MenuDivider />
-    {#each options as option (option.value)}
+    {#each options as option}
       <MenuItem
         data-testid={option.label}
         description={option.description}

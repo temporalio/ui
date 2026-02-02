@@ -130,7 +130,7 @@
       : 'stroke-slate-100 dark:stroke-slate-800'}"
   />
 {/if}
-{#each root?.children as child, index (index)}
+{#each root?.children as child, index}
   {@const { childX, childY } = getPosition(index)}
   {#if child.children.length && isExpanded(child)}
     <svelte:self

@@ -222,7 +222,7 @@
     <MenuDivider />
 
     {#if !search}
-      {#each QuickTimezoneOptions as { value, label }, index (index)}
+      {#each QuickTimezoneOptions as { value, label }}
         <MenuItem
           onclick={() => selectTimezone(value)}
           data-testid="timezones-{value}"
@@ -238,7 +238,7 @@
       <MenuDivider />
     {/if}
 
-    {#each filteredOptions as { value, label, offset, abbr }, index (index)}
+    {#each filteredOptions as { value, label, offset, abbr }}
       <MenuItem
         selected={value === $timeFormat}
         onclick={() => selectTimezone(value)}

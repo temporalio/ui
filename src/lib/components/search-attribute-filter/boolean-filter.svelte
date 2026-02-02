@@ -36,7 +36,7 @@
     {selectedLabel}
   </MenuButton>
   <Menu id="boolean-filter-menu">
-    {#each options as { value, label } (value)}
+    {#each options as { value, label }}
       <MenuItem
         onclick={() => {
           if (isNullConditional(value)) {

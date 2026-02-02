@@ -57,7 +57,7 @@
         bind:value={_label}
         onChange={handleAttributeChange}
       >
-        {#each $customSearchAttributeOptions as { value, label, type }, index (index)}
+        {#each $customSearchAttributeOptions as { value, label, type }}
           <Option disabled={isDisabled(value)} {value} description={type}
             >{label}</Option
           >

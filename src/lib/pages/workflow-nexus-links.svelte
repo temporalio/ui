@@ -64,7 +64,7 @@
         <th>{translate('nexus.caller-namespace')}</th>
         <th>{translate('nexus.handler-event')}</th>
       </TableHeaderRow>
-      {#each inboundLinkEvents as event (event.id)}
+      {#each inboundLinkEvents as event}
         {@const link = getInboundLinkForEvent(event)}
         <TableRow data-testid="worker-row">
           <td class="break-all text-left" data-testid="caller-event">
@@ -125,7 +125,7 @@
         <th>{translate('nexus.handler-workflow')}</th>
         <th>{translate('nexus.handler-event')}</th>
       </TableHeaderRow>
-      {#each nexusGroups as group (group.id)}
+      {#each nexusGroups as group}
         {@const link = group.links?.[0]}
         {@const scheduledEvent = group.eventList.find((e) =>
           isNexusOperationScheduledEvent(e),

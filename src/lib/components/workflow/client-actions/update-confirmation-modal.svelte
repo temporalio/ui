@@ -118,7 +118,7 @@
         placeholder="Select an Update"
         required
       >
-        {#each updateDefinitions as { name: value, description = '' } (value)}
+        {#each updateDefinitions as { name: value, description = '' }}
           <Option {value} {description}>{value}</Option>
         {/each}
         <Option onclick={handleCustom} value="custom">Custom</Option>

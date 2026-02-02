@@ -477,7 +477,7 @@
       >
         {#if multiselect && isArrayValue(value) && value.length > 0}
           {#if displayChips}
-            {#each value.slice(0, chipLimit) as v, index (index)}
+            {#each value.slice(0, chipLimit) as v}
               <Chip
                 onremove={() => removeOption(v)}
                 removeButtonLabel={removeChipLabel}>{v}</Chip
@@ -602,7 +602,7 @@
       <MenuDivider />
     {/if}
 
-    {#each list as option, index (index)}
+    {#each list as option}
       <ComboboxOption
         onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}

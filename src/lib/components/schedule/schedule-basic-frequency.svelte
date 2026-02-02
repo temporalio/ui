@@ -21,7 +21,7 @@
       className,
     )}
   >
-    {#each frequency as content, index (index)}
+    {#each frequency as content}
       <code><pre>{stringifyWithBigInt(content, undefined, 2)}</pre></code>
     {/each}
   </div>
