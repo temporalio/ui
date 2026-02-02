@@ -59,7 +59,11 @@
   onMount(() => {
     $lastUsedNamespace = page.params.namespace;
     if (query) {
-      $activityFilters = toListWorkflowFilters(query, $searchAttributes);
+      $activityFilters = toListWorkflowFilters(query, {
+        ...$searchAttributes,
+        ActivityType: 'Keyword',
+        ActivityId: 'Keyword',
+      });
     }
   });
 
