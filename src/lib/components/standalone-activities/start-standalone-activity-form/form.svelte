@@ -37,6 +37,7 @@
     routeForStandaloneActivityDetails,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
+  import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
   import type { StandaloneActivityFormData } from './types';
   import Message from '../../form/message.svelte';
@@ -375,7 +376,9 @@
         bind:value={$form.idReusePolicy}
       >
         {#each activityIDReusePolicyOptions as option}
-          <Option value={option}>{option}</Option>
+          <Option value={option}
+            >{fromScreamingEnum(option, 'ActivityIdReusePolicy')}</Option
+          >
         {/each}
       </Select>
 
@@ -385,7 +388,9 @@
         bind:value={$form.idConflictPolicy}
       >
         {#each activityIDConflictPolicyOptions as option}
-          <Option value={option}>{option}</Option>
+          <Option value={option}
+            >{fromScreamingEnum(option, 'ActivityIdConflictPolicy')}</Option
+          >
         {/each}
       </Select>
     </Card>
