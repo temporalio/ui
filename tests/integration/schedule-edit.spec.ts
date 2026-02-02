@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-import { mockScheduleApi, mockSchedulesApis } from '~/test-utilities/mock-apis';
+import {
+  mockScheduleApi,
+  mockSchedulesApis,
+  SCHEDULES_COUNT_API,
+} from '~/test-utilities/mock-apis';
 
 const schedulesUrl = '/namespaces/default/schedules';
 const scheduleEditUrl = '/namespaces/default/schedules/test-schedule/edit';
@@ -13,6 +17,8 @@ test.describe('Schedules List with schedules', () => {
 
   test('selects schedule and edits', async ({ page }) => {
     await page.goto(schedulesUrl);
+
+    await page.waitForResponse(SCHEDULES_COUNT_API);
 
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeEnabled();
