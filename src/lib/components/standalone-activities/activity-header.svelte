@@ -66,10 +66,15 @@
         timestamp={activityExecutionInfo.lastStartedTime}
       />
       <DetailListLabel>Close Time</DetailListLabel>
-      <DetailListTimestampValue timestamp={activityExecutionInfo.closeTime} />
+      <DetailListTimestampValue
+        timestamp={activityExecutionInfo.closeTime}
+        fallback="-"
+      />
       <DetailListLabel>Duration</DetailListLabel>
       <DetailListTextValue
-        text={fromSeconds(activityExecutionInfo.executionDuration)}
+        text={activityExecutionInfo.executionDuration
+          ? fromSeconds(activityExecutionInfo.executionDuration)
+          : '-'}
       />
     </DetailListColumn>
     <DetailListColumn>

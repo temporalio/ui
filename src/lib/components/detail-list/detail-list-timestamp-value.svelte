@@ -2,32 +2,26 @@
   import type { Snippet } from 'svelte';
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
+  import { relativeTime } from '$lib/stores/time-format';
   import type { ValidTime } from '$lib/utilities/format-time';
+
+  import { timestamp } from '../timestamp.svelte';
 
   import DetailListValue from './detail-list-value.svelte';
 
   interface Props {
     timestamp: ValidTime | undefined | null;
     children?: Snippet;
+    fallback?: string;
   }
 
-  let { timestamp, children }: Props = $props();
+  let { timestamp: t, children, fallback }: Props = $props();
 
   let formattedTimestamp = $derived(
-    formatDate(timestamp, $timeFormat, {
-      format: $timestampFormat,
-      relative: false,
-    }),
+    t ? $timestamp(t) : fallback ? fallback : '',
   );
-
   let relativeTimestamp = $derived(
-    formatDate(timestamp, $timeFormat, { relative: true }),
+    t ? $timestamp(t, { relative: true }) : fallback ? fallback : '',
   );
 </script>
 
@@ -39,6 +33,7 @@
 
 <DetailListValue>
   <Tooltip
+    hide={!t}
     text={$relativeTime ? formattedTimestamp : relativeTimestamp}
     top
     class="min-w-0"
