@@ -26,7 +26,7 @@
   import { activityFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
-  import { searchAttributes } from '$lib/stores/search-attributes';
+  import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
   import {
     relativeTime,
     timeFormat,
@@ -59,11 +59,10 @@
   onMount(() => {
     $lastUsedNamespace = page.params.namespace;
     if (query) {
-      $activityFilters = toListWorkflowFilters(query, {
-        ...$searchAttributes,
-        ActivityType: 'Keyword',
-        ActivityId: 'Keyword',
-      });
+      $activityFilters = toListWorkflowFilters(
+        query,
+        $activityExecutionSearchAttributes,
+      );
     }
   });
 

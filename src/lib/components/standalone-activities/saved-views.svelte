@@ -24,7 +24,7 @@
     type SavedQuery,
     systemActivityViews,
   } from '$lib/stores/saved-queries';
-  import { searchAttributes } from '$lib/stores/search-attributes';
+  import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -131,7 +131,10 @@
     pendingQueryTarget = view.query || '';
 
     if (view.query) {
-      $activityFilters = toListWorkflowFilters(view.query, $searchAttributes);
+      $activityFilters = toListWorkflowFilters(
+        view.query,
+        $activityExecutionSearchAttributes,
+      );
     }
 
     updateQueryParameters({

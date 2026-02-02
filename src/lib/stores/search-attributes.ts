@@ -33,6 +33,14 @@ export const scheduleSearchAttributes: Readable<SearchAttributes> = derived(
   }),
 );
 
+export const activityExecutionSearchAttributes: Readable<SearchAttributes> =
+  derived(allSearchAttributes, ($allSearchAttributes) => ({
+    ...$allSearchAttributes.customAttributes,
+    ...$allSearchAttributes.systemAttributes,
+    ActivityId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ActivityType: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  }));
+
 export const internalSearchAttributes: Readable<SearchAttributes> = derived(
   [allSearchAttributes],
   ([$allSearchAttributes]) => $allSearchAttributes.systemAttributes,
