@@ -27,7 +27,7 @@
           const result = reader?.result?.toString() ?? '';
           rawEvents = parseWithBigInt(result);
           fileLoaded = true;
-        } catch (e) {
+        } catch {
           toaster.push({
             variant: 'error',
             message: translate('events.event-history-load-error'),

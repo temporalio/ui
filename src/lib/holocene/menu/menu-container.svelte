@@ -17,8 +17,10 @@
 
   import { clickoutside } from '$lib/holocene/outside-click';
 
-  interface Props
-    extends Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+  interface Props extends Omit<
+    HTMLAttributes<HTMLDivElement>,
+    'class' | 'children'
+  > {
     open?: Writable<boolean>;
     class?: ClassNameValue;
     onclose?: () => void;

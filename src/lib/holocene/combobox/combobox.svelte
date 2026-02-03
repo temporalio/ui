@@ -63,8 +63,10 @@
 
   type T = $$Generic;
 
-  interface BaseProps
-    extends Omit<HTMLInputAttributes, 'onchange' | 'oninput' | 'onclose'> {
+  interface BaseProps extends Omit<
+    HTMLInputAttributes,
+    'onchange' | 'oninput' | 'onclose'
+  > {
     id: string;
     label: string;
     noResultsText: string;

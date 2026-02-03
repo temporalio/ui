@@ -143,7 +143,7 @@ export async function getQuery(
         }
       }
       return data;
-    } catch (e) {
+    } catch {
       if (typeof data !== 'string') {
         return stringifyWithBigInt(data);
       }

@@ -19,7 +19,7 @@ export function base64DecodeUnicode(str: string): string {
 function base64DecodeUnicodeFallback(str: string): string {
   try {
     return stringifyWithBigInt(parseWithBigInt(window.atob(str)));
-  } catch (e) {
+  } catch {
     return str;
   }
 }
@@ -28,7 +28,7 @@ export const atob = (str: string, isBrowser = BROWSER): string => {
   if (!isBrowser) return str;
   try {
     return base64DecodeUnicode(str);
-  } catch (e) {
+  } catch {
     return base64DecodeUnicodeFallback(str);
   }
 };

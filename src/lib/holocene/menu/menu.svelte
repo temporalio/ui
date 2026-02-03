@@ -52,8 +52,10 @@
 
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
-  export interface Props
-    extends Omit<HTMLAttributes<HTMLUListElement>, 'class'> {
+  export interface Props extends Omit<
+    HTMLAttributes<HTMLUListElement>,
+    'class'
+  > {
     id: string;
     keepOpen?: boolean;
     position?: 'left' | 'right' | 'top-left' | 'top-right';

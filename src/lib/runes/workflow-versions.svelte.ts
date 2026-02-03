@@ -97,7 +97,7 @@ export function getWorkflowPollersWithVersions(
         );
       }
       return workers?.pollers ?? [];
-    } catch (error) {
+    } catch {
       return workers?.pollers ?? [];
     }
   });

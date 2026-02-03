@@ -108,7 +108,7 @@
           })
         : Promise.resolve(null);
       payloads = await encodePayloadResult;
-    } catch (e) {
+    } catch {
       reset();
       return;
     }

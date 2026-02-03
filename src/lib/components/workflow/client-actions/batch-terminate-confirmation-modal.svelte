@@ -75,7 +75,7 @@
   data-testid="batch-terminate-confirmation"
   confirmType="destructive"
   cancelText={translate('common.cancel')}
-  confirmDisabled={!jobIdValid}
+  confirmDisabled={!$jobIdValid}
   confirmText={translate('workflows.terminate')}
   on:confirmModal={terminateWorkflows}
 >

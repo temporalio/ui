@@ -17,7 +17,7 @@
           queue: targetTaskQueue,
         });
         pollerCount = pollers.length;
-      } catch (error) {
+      } catch {
         pollerCount = undefined;
       }
     }

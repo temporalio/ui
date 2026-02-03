@@ -81,7 +81,7 @@
   {#if endpoint.spec?.allowedCallerNamespaces}
     <h2>Allowed Caller Namespaces</h2>
     <div class="flex flex-wrap items-center gap-4">
-      {#each endpoint.spec?.allowedCallerNamespaces as namespace}
+      {#each endpoint.spec?.allowedCallerNamespaces as namespace (namespace)}
         <Link href={routeForNamespace({ namespace })}>{namespace}</Link>
       {/each}
     </div>

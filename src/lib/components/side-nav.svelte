@@ -16,21 +16,19 @@
 </script>
 
 <Navigation {isCloud} {bottom} aria-label={translate('common.primary')}>
-  {#snippet children()}
-    {#each linkList as item}
-      {#if 'divider' in item && item.divider}
-        <hr class="-mx-4 my-4 border-subtle" />
-      {:else if 'href' in item && !item.hidden}
-        <NavigationItem
-          link={item.href}
-          label={item.label}
-          icon={item.icon}
-          tooltip={item?.tooltip || item.label}
-          external={item?.external}
-          animate={item?.animate}
-          isActive={item.isActive}
-        />
-      {/if}
-    {/each}
-  {/snippet}
+  {#each linkList as item}
+    {#if 'divider' in item && item.divider}
+      <hr class="-mx-4 my-4 border-subtle" />
+    {:else if 'href' in item && !item.hidden}
+      <NavigationItem
+        link={item.href}
+        label={item.label}
+        icon={item.icon}
+        tooltip={item?.tooltip || item.label}
+        external={item?.external}
+        animate={item?.animate}
+        isActive={item.isActive}
+      />
+    {/if}
+  {/each}
 </Navigation>

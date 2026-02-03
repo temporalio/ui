@@ -33,7 +33,7 @@
       <TableHeaderRow slot="headers">
         <th>{translate('common.name')}</th>
       </TableHeaderRow>
-      {#each visibleItems as namespace}
+      {#each visibleItems as namespace (namespace.namespaceInfo.name)}
         <TableRow>
           <td>
             <Link

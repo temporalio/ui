@@ -28,10 +28,12 @@
         ]
       }
     ],
-    "function-no-unknown": [
+    "declaration-property-value-no-unknown": [
       true,
       {
-        "ignoreFunctions": ["theme"]
+        "ignoreProperties": {
+          "/^(stroke|fill|color|background|border)/": ["/theme\\(/"]
+        }
       }
     ],
     "custom-property-pattern": null,

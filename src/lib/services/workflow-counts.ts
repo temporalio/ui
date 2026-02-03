@@ -18,7 +18,7 @@ export const fetchWorkflowCount = async (
       request,
     });
     count = parseInt(result?.count || '0');
-  } catch (e) {
+  } catch {
     // Don't fail the workflows call due to count
   }
 
@@ -38,7 +38,7 @@ export const fetchWorkflowTaskFailures = async (
       request,
     });
     return parseInt(result?.count || '0');
-  } catch (e) {
+  } catch {
     // Don't fail the workflows call due to count
   }
 };

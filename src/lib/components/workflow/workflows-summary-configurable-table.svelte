@@ -47,7 +47,7 @@
     childrenIds = [];
   };
 
-  $: $refresh, query, clearChildren();
+  $: ($refresh, query, clearChildren());
 
   const viewChildren = async (workflow: WorkflowExecution) => {
     if (childrenActive(workflow)) {
@@ -102,7 +102,7 @@
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
-    {#each visibleItems as workflow}
+    {#each visibleItems as workflow (workflow.id + workflow.runId)}
       <TableRow
         {workflow}
         {viewChildren}
