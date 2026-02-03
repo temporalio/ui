@@ -8,6 +8,10 @@ export const WORKFLOW_RESET_API =
   /\/api\/v1\/namespaces\/[^/]+\/workflows\/[^/]+\/reset/;
 export const WORKFLOW_TERMINATE_API =
   /\/api\/v1\/namespaces\/[^/]+\/workflows\/[^/]+\/terminate/;
+export const WORKFLOW_PAUSE_API =
+  /\/api\/v1\/namespaces\/[^/]+\/workflows\/[^/]+\/pause/;
+export const WORKFLOW_UNPAUSE_API =
+  /\/api\/v1\/namespaces\/[^/]+\/workflows\/[^/]+\/unpause/;
 
 export const mockWorkflow = {
   executionConfig: {
@@ -268,6 +272,41 @@ export const mockResetWorkflow: WorkflowExecutionAPIResponse = {
   },
 } satisfies WorkflowExecutionAPIResponse;
 
+export const mockRunningWorkflow: WorkflowExecutionAPIResponse = {
+  ...mockWorkflow,
+  workflowExecutionInfo: {
+    ...mockWorkflow.workflowExecutionInfo,
+    status: 'Running',
+    closeTime: null,
+  },
+};
+
+export const mockPausedWorkflow: WorkflowExecutionAPIResponse = {
+  ...mockRunningWorkflow,
+  workflowExecutionInfo: {
+    ...mockRunningWorkflow.workflowExecutionInfo,
+    status: 'Paused',
+  },
+  workflowExtendedInfo: {
+    pauseInfo: {
+      identity: 'test-user',
+      reason: 'Testing pause functionality',
+      pausedTime: {
+        seconds: '1705315200',
+        nanos: 0,
+      },
+    },
+  },
+};
+
+export const mockDelayedWorkflow: WorkflowExecutionAPIResponse = {
+  ...mockRunningWorkflow,
+  workflowExecutionInfo: {
+    ...mockRunningWorkflow.workflowExecutionInfo,
+    executionTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  },
+};
+
 export const mockWorkflowApi = (
   page: Page,
   workflow: WorkflowExecutionAPIResponse = mockWorkflow,
@@ -285,5 +324,20 @@ export const mockWorkflowResetApi = (page: Page) => {
       json: {},
     });
   });
-  return;
+};
+
+export const mockWorkflowPauseApi = (page: Page) => {
+  return page.route(WORKFLOW_PAUSE_API, (route) => {
+    return route.fulfill({
+      json: {},
+    });
+  });
+};
+
+export const mockWorkflowUnpauseApi = (page: Page) => {
+  return page.route(WORKFLOW_UNPAUSE_API, (route) => {
+    return route.fulfill({
+      json: {},
+    });
+  });
 };
