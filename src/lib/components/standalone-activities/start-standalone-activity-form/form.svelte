@@ -64,8 +64,6 @@
       page.url.searchParams.get('scheduleToCloseTimeout') ?? '',
   });
 
-  // https://svelte.dev/docs/svelte/compiler-warnings#state_referenced_locally
-  const getFormDefaults = () => formDefaults;
   const encoding = writable<PayloadInputEncoding>('json/plain');
 
   let searchAttributes = $state<SearchAttributeInput[]>([]);
@@ -118,7 +116,7 @@
 
   const { form, enhance, errors, message } = superForm(
     {
-      ...getFormDefaults(),
+      ...formDefaults,
       input: '',
       messageType: '',
       scheduleToStartTimeout: '',

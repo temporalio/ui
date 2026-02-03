@@ -4,7 +4,7 @@
   import { translate } from '$lib/i18n/translate';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
-  const searchAttributes = $derived($activityExecution.info.searchAttributes);
+  const searchAttributes = $derived($activityExecution?.info?.searchAttributes);
 </script>
 
 <div class="flex flex-col gap-2">

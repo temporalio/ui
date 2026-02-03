@@ -11,8 +11,8 @@
 
   let { namespace }: Props = $props();
 
-  const searchAttributes = $derived($activityExecution.info.searchAttributes);
-  const queue = $derived($activityExecution.info.taskQueue);
+  const searchAttributes = $derived($activityExecution?.info?.searchAttributes);
+  const queue = $derived($activityExecution?.info?.taskQueue);
 
   const getPollersRequest = getPollers({ queue, namespace });
 

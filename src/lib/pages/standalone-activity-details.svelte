@@ -30,12 +30,12 @@
   let { namespace }: Props = $props();
 
   const isClosed = $derived(
-    $activityExecution.info.status !== 'ACTIVITY_EXECUTION_STATUS_RUNNING',
+    $activityExecution?.info?.status !== 'ACTIVITY_EXECUTION_STATUS_RUNNING',
   );
 
   const isRetrying = $derived(
-    $activityExecution.info.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING' &&
-      $activityExecution.info.attempt > 1,
+    $activityExecution?.info?.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING' &&
+      $activityExecution?.info?.attempt > 1,
   );
 </script>
 

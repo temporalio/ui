@@ -30,7 +30,7 @@
   };
 </script>
 
-{#await decodeMetadata($activityExecution.info.userMetadata) then { summary, details }}
+{#await decodeMetadata($activityExecution?.info?.userMetadata) then { summary, details }}
   <UserMetadata {summary} {details} />
 {:catch error}
   <Alert intent="error" title="Error decoding User Metadata">
