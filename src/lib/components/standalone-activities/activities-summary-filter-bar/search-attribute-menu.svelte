@@ -34,7 +34,7 @@
 
   let { options }: { options: SearchAttributeOption[] } = $props();
 
-  const query = $derived(page.url.searchParams.get('query'));
+  const query = $derived(page.url.searchParams.get('query') ?? '');
   let searchAttributeValue = $state('');
 
   const { filter, activeQueryIndex, handleSubmit } =
@@ -100,7 +100,7 @@
     leadingIcon="add"
     variant="secondary"
     data-testid="add-filter-button"
-    disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
+    disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
     onclick={() => (searchAttributeValue = '')}
     class="text-nowrap"
     size="xs"

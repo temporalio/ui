@@ -8,17 +8,29 @@ export interface StandaloneActivityFormData {
   taskQueue: string;
   activityType: string;
   startToCloseTimeout: string;
-  scheduleToCloseTimeout?: string;
-  scheduleToStartTimeout?: string;
-  input?: string;
-  encoding?: PayloadInputEncoding;
-  messageType?: string;
-  searchAttributes?: SearchAttributeInput[];
-  summary?: string;
-  details?: string;
+  scheduleToCloseTimeout: string;
+  scheduleToStartTimeout: string;
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
+  searchAttributes: SearchAttributeInput[];
+  summary: string;
+  details: string;
   // retry policy
-  initialInterval?: string;
-  backoffCoefficient?: string;
-  maximumInterval?: string;
-  maximumAttempts?: string;
+  initialInterval: string;
+  backoffCoefficient: string;
+  maximumInterval: string;
+  maximumAttempts: string;
 }
+
+export type StandaloneActivityFormDefaults = Pick<
+  StandaloneActivityFormData,
+  | 'identity'
+  | 'namespace'
+  | 'encoding'
+  | 'activityId'
+  | 'activityType'
+  | 'taskQueue'
+  | 'startToCloseTimeout'
+  | 'scheduleToCloseTimeout'
+>;

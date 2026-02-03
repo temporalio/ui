@@ -26,7 +26,7 @@
   const columns = $derived(
     $configurableTableColumns?.[namespace]?.activities ?? [],
   );
-  const query = $derived(page.url.searchParams.get('query'));
+  const query = $derived(page.url.searchParams.get('query') ?? '');
 
   const onFetch = $derived(() => fetchPaginatedActivities(namespace, query));
 </script>

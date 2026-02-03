@@ -16,7 +16,7 @@
 
   let manualSearchString = $state('');
 
-  const query = $derived(page.url.searchParams.get('query'));
+  const query = $derived(page.url.searchParams.get('query') ?? '');
 
   function setManualString(query: string) {
     manualSearchString = query;

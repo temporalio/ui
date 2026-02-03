@@ -7,11 +7,11 @@
 
   export interface ActivityFilterContext {
     filter: Writable<SearchAttributeFilter>;
-    activeQueryIndex: Writable<number>;
+    activeQueryIndex: Writable<number | null>;
     handleSubmit: () => void;
     focusedElementId: Writable<string>;
     resetFilter: () => void;
-    chipOpenIndex: Writable<number>;
+    chipOpenIndex: Writable<number | null>;
   }
 </script>
 
@@ -27,9 +27,9 @@
   import ActivitySearchAttributeMenu from './search-attribute-menu.svelte';
 
   const filter = writable<SearchAttributeFilter>(emptyFilter());
-  const activeQueryIndex = writable<number>(null);
+  const activeQueryIndex = writable<number | null>(null);
   const focusedElementId = writable<string>('');
-  const chipOpenIndex = writable<number>(null);
+  const chipOpenIndex = writable<number | null>(null);
 
   const options = activitySearchAttributeOptions;
 

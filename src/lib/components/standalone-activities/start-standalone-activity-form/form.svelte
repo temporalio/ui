@@ -39,7 +39,7 @@
   } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  import type { StandaloneActivityFormData } from './types';
+  import type { StandaloneActivityFormDefaults } from './types';
   import Message from '../../form/message.svelte';
   import PayloadInputWithEncoding from '../../payload-input-with-encoding.svelte';
   import RetryPolicyInput from '../../retry-policy-input.svelte';
@@ -52,7 +52,7 @@
   const { namespace }: Props = $props();
   const taskQueueParam = page.url.searchParams.get('taskQueue') ?? '';
 
-  const formDefaults = $derived<StandaloneActivityFormData>({
+  const formDefaults = $derived<StandaloneActivityFormDefaults>({
     namespace,
     identity: getIdentity(),
     encoding: 'json/plain',
@@ -66,9 +66,11 @@
 
   // https://svelte.dev/docs/svelte/compiler-warnings#state_referenced_locally
   const getFormDefaults = () => formDefaults;
+  const encoding = writable<PayloadInputEncoding>('json/plain');
 
   let searchAttributes = $state<SearchAttributeInput[]>([]);
   let taskQueueActive = $state<boolean | null>(null);
+  let advancedOptionsVisible = $state(false);
 
   const schema = z
     .object({
@@ -140,7 +142,10 @@
         if (!form.valid) return;
 
         try {
-          startStandaloneActivity({ ...form.data, searchAttributes });
+          startStandaloneActivity({
+            ...form.data,
+            searchAttributes,
+          });
           toaster.push({
             duration: 5000,
             variant: 'success',
@@ -160,9 +165,6 @@
       },
     },
   );
-
-  const encoding = writable<PayloadInputEncoding>('json/plain');
-  let advancedOptionsVisible = $state(false);
 
   const unsubscribe = encoding.subscribe((e) => {
     $form.encoding = e;
