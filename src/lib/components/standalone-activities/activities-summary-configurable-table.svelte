@@ -41,7 +41,6 @@
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('standalone-activities.empty-state-title')}
-    maxHeight="var(--panel-h)"
   >
     <caption class="sr-only" slot="caption">
       {translate('standalone-activities.standalone-activities')}
