@@ -10,6 +10,7 @@
   import ActivityCountRefresh from '$lib/components/standalone-activities/activity-count-refresh.svelte';
   import ActivityCounts from '$lib/components/standalone-activities/activity-counts.svelte';
   import SavedActivityViews from '$lib/components/standalone-activities/saved-views.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
@@ -27,12 +28,6 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   interface Props {
@@ -47,13 +42,7 @@
 
   let refreshTime = $state(new Date());
 
-  const refreshTimeFormatted = $derived(
-    formatDate(refreshTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    }),
-  );
-
+  const refreshTimeFormatted = $derived($timestamp(refreshTime));
   const availableColumns = $derived(availableActivityColumns(namespace));
 
   onMount(() => {
