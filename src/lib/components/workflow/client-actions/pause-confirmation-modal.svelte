@@ -57,8 +57,8 @@
 </script>
 
 <Modal
-  id="pause-confirmation-modal"
-  data-testid="pause-confirmation-modal"
+  id="workflow-pause-confirmation-modal"
+  data-testid="workflow-pause-confirmation-modal"
   bind:error
   bind:open
   {loading}
@@ -80,6 +80,7 @@
       class="mt-4"
       placeholder={translate('common.reason-placeholder')}
       label={translate('common.reason')}
+      labelHidden
       bind:value={reason}
     />
   </div>

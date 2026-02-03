@@ -97,6 +97,7 @@
         label={translate('workflows.reset-event-radio-group-description')}
         bind:value={$eventId}
         id="reset-event-id"
+        required
       >
         {#each $resetEvents as event}
           <Option value={event.id}>{event.id} - {event.eventType}</Option>
@@ -128,6 +129,8 @@
         id="reset-reason"
         bind:value={reason}
         label={translate('common.reason')}
+        labelHidden
+        placeholder={translate('common.reason-placeholder')}
       />
     </div>
   </svelte:fragment>

@@ -26,6 +26,7 @@
   import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
+  import { workflowPauseEnabled } from '$lib/utilities/workflow-pause-enabled';
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
@@ -97,9 +98,11 @@
   );
 
   const isDelayed = $derived(isWorkflowDelayed(workflow));
+  const pauseAuthorized = $derived(
+    workflowPauseEnabled(page.data.settings, $coreUser, namespace),
+  );
   const pauseEnabled = $derived(
-    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause &&
-      !isDelayed,
+    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause,
   );
 
   const getResetDescription = ({
@@ -193,7 +196,7 @@
 {#snippet pauseButton()}
   <Button
     on:click={() => (pauseConfirmationModalOpen = true)}
-    disabled={!pauseEnabled}
+    disabled={!pauseAuthorized || isDelayed}
     size="sm"
   >
     {#if isPaused}

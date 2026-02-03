@@ -130,7 +130,7 @@ export const Strings = {
   'workflow-paused': 'This Workflow is Paused',
   'workflow-paused-reason': 'Reason this Workflow is paused',
   'workflow-paused-description':
-    'This Workflow is Paused, which means the worker will no longer process tasks on this Workflow. There are still some events that will continue to run:',
+    'The worker will no longer process tasks on this Workflow. There are still some events that will continue to run:',
   'workflow-pause-description':
     'Pausing a Workflow means the Worker will no longer process tasks on this Workflow. Some events that will continue to run: ',
   'workflow-pause-description-item-1':

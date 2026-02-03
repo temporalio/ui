@@ -195,6 +195,7 @@
         intent="info"
         title={translate('workflows.workflow-paused')}
         class="max-w-screen-lg xl:w-2/3"
+        data-testid="workflow-paused-alert"
       >
         <div class="mt-2 flex flex-col gap-2">
           <p>{translate('workflows.workflow-paused-description')}</p>
@@ -204,12 +205,14 @@
             <li>{translate('workflows.workflow-pause-description-item-3')}</li>
           </ul>
           {#if workflow?.workflowExtendedInfo?.pauseInfo?.reason}
-            <p>{translate('workflows.workflow-paused-reason')}</p>
-            <p class="text-secondary">
-              {workflow.workflowExtendedInfo.pauseInfo.reason} • {$timestamp(
-                workflow.workflowExtendedInfo.pauseInfo.pausedTime,
-              )}
-            </p>
+            <div>
+              <p>{translate('workflows.workflow-paused-reason')}</p>
+              <p class="text-secondary">
+                {workflow.workflowExtendedInfo.pauseInfo.reason} • {$timestamp(
+                  workflow.workflowExtendedInfo.pauseInfo.pausedTime,
+                )}
+              </p>
+            </div>
           {/if}
         </div>
       </Alert>
