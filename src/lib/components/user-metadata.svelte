@@ -1,12 +1,13 @@
 <script lang="ts">
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
-  import MetadataEvents from './metadata-events.svelte';
+  interface Props {
+    summary: string;
+    details: string;
+  }
 
-  const summary = $derived($workflowRun?.userMetadata?.summary);
-  const details = $derived($workflowRun?.userMetadata?.details);
+  let { summary, details }: Props = $props();
 </script>
 
 <div class="flex h-full flex-1 flex-col bg-primary">
@@ -41,13 +42,5 @@
         </p>
       </div>
     {/if}
-  </div>
-  <div>
-    <div class="surface-information w-full px-6 py-2">
-      <h3 data-testid="user-metadata-summary-heading">Events with Metadata</h3>
-    </div>
-    <div class="py-6">
-      <MetadataEvents />
-    </div>
   </div>
 </div>

@@ -294,8 +294,10 @@
         )}
       >
         <Badge type="primary" class="px-2 py-0">
-          {getWorkflowPollersWithVersions(workflow, workers)?.pollers?.length ||
-            0}
+          {getWorkflowPollersWithVersions(
+            workflow.searchAttributes.indexedFields,
+            workers,
+          )?.pollers?.length || 0}
         </Badge>
       </Tab>
       <Tab

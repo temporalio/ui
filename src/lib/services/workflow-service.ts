@@ -2,11 +2,11 @@ import { get } from 'svelte/store';
 
 import { page } from '$app/stores';
 
+import { translate } from '$lib/i18n/translate';
 import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
-} from '$lib/components/payload-input-with-encoding.svelte';
-import { translate } from '$lib/i18n/translate';
+} from '$lib/models/payload-encoding';
 import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
