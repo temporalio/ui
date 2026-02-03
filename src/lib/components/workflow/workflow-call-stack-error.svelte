@@ -5,8 +5,9 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({ workflow, workers } = $workflowRun);
-  $: runningWithNoWorkers = workflow?.isRunning && !workers?.pollers?.length;
+  $: ({ workflow, workers, workersLoaded } = $workflowRun);
+  $: runningWithNoWorkers =
+    workersLoaded && workflow?.isRunning && !workers?.pollers?.length;
 </script>
 
 {#if runningWithNoWorkers}

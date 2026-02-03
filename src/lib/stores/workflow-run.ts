@@ -9,6 +9,7 @@ export const refresh = writable(0);
 export type WorkflowRunWithWorkers = {
   workflow: WorkflowExecution | null;
   workers: TaskQueueResponse;
+  workersLoaded: boolean;
   metadata: WorkflowMetadata;
   userMetadata: {
     summary: string;
@@ -19,6 +20,7 @@ export type WorkflowRunWithWorkers = {
 export const initialWorkflowRun: WorkflowRunWithWorkers = {
   workflow: null,
   workers: { pollers: [], taskQueueStatus: null },
+  workersLoaded: false,
   metadata: undefined,
   userMetadata: {
     summary: '',

@@ -97,7 +97,7 @@
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
 
-    $workflowRun = { ...$workflowRun, workflow, workers };
+    $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
     workflowRunController = new AbortController();
 
