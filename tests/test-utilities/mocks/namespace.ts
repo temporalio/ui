@@ -43,6 +43,9 @@ const MOCK_DEFAULT_NAMESPACE = {
     data: {},
     id: 'bbe0d4ea-c682-4c5a-bc4b-fadb8e8c8bfe',
     supportsSchedules: true,
+    capabilities: {
+      standaloneActivities: true,
+    },
   },
   config: {
     workflowExecutionRetentionTtl: '86400s',
