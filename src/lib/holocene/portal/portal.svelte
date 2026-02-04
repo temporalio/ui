@@ -117,10 +117,8 @@
     });
   }
 
-  function getScrollableAncestors(
-    element: HTMLElement,
-  ): (HTMLElement | Window | Document)[] {
-    const ancestors: (HTMLElement | Window | Document)[] = [window, document];
+  function getScrollableAncestors(element: HTMLElement): Set<EventTarget> {
+    const ancestors = new Set<EventTarget>([document]);
     let parent = element.parentElement;
 
     while (parent) {
@@ -130,7 +128,7 @@
         (val) => val === 'auto' || val === 'scroll' || val === 'overlay',
       );
 
-      if (isScrollable) ancestors.push(parent);
+      if (isScrollable) ancestors.add(parent);
       parent = parent.parentElement;
     }
 
@@ -150,8 +148,16 @@
     resizeObserver.observe(anchorElement);
 
     const scrollableAncestors = getScrollableAncestors(anchorElement);
-    const scrollCleanups = scrollableAncestors.map((ancestor) =>
-      on(ancestor, 'scroll', scheduleUpdate, { passive: true }),
+
+    const scrollCleanup = on(
+      document,
+      'scroll',
+      (event) => {
+        if (event.target && scrollableAncestors.has(event.target)) {
+          scheduleUpdate();
+        }
+      },
+      { passive: true, capture: true },
     );
 
     const resizeCleanup = on(window, 'resize', scheduleUpdate, {
@@ -164,7 +170,7 @@
         rafId = null;
       }
       resizeObserver.disconnect();
-      scrollCleanups.forEach((cleanup) => cleanup());
+      scrollCleanup();
       resizeCleanup();
     };
   });
