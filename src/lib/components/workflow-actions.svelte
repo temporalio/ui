@@ -93,9 +93,8 @@
       canResetWithPendingChildWorkflows &&
       $resetEvents.length > 0,
   );
-  let actionsDisabled = $derived(
-    !resetEnabled && !signalEnabled && !terminateEnabled,
-  );
+
+  let startWorkflowDisabled = $derived(workflowCreateDisabled(page));
 
   const isDelayed = $derived(isWorkflowDelayed(workflow));
   const pauseAuthorized = $derived(
@@ -191,6 +190,13 @@
         : translate('workflows.terminate-disabled'),
     },
   ]);
+
+  let actionsDisabled = $derived(
+    isRunning || isPaused
+      ? workflowActions.every((action) => !action.enabled) &&
+          startWorkflowDisabled
+      : !terminateEnabled && startWorkflowDisabled,
+  );
 </script>
 
 {#snippet pauseButton()}
@@ -239,7 +245,7 @@
           workflowType: workflow.name,
         }),
       )}
-    disabled={workflowCreateDisabled(page)}
+    disabled={startWorkflowDisabled}
     data-testid="start-workflow-button"
   >
     {translate('workflows.start-workflow-like-this-one')}
