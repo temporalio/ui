@@ -1,6 +1,6 @@
-# Testing Token Refresh Flow
+# Testing Authentication Features
 
-The UI now implements automatic OAuth2 token refresh to prevent session interruptions when access tokens expire.
+The UI implements automatic OAuth2 token refresh and configurable session duration to provide secure, uninterrupted user sessions.
 
 ## Quick Test
 
