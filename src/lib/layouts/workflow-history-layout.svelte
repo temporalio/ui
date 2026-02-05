@@ -69,7 +69,7 @@
   });
 
   $effect(() => {
-    if (!workflow.isRunning && $pauseLiveUpdates) {
+    if (!workflow?.isRunning && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
   });
@@ -143,7 +143,7 @@
         </Tooltip>
         <EventTypeFilter {compact} minimized={$minimizeEventView} />
         <ToggleButton
-          disabled={!workflow.isRunning}
+          disabled={!workflow?.isRunning}
           data-testid="pause"
           class="border-l-0"
           size="sm"
@@ -151,11 +151,11 @@
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates ||
-            !workflow.isRunning
+            !workflow?.isRunning
               ? 'bg-slate-300'
               : 'bg-green-600'}"
           ></span>
-          {$pauseLiveUpdates || !workflow.isRunning
+          {$pauseLiveUpdates || !workflow?.isRunning
             ? translate('workflows.auto-refresh-off')
             : translate('workflows.auto-refresh-on')}
         </ToggleButton>
@@ -183,6 +183,6 @@
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
   {namespace}
-  workflowId={workflow.id}
-  runId={workflow.runId}
+  workflowId={workflow?.id}
+  runId={workflow?.runId}
 />
