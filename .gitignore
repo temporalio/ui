@@ -21,5 +21,7 @@ server/ui/assets
 /audits
 go.work
 go.work.sum
-.claude/*
-!.claude/skills/
+
+# Claude Code local settings
+.serena/cache
+.claude/settings.local.json

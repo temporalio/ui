@@ -1,25 +1,43 @@
+// =============================================================================
 // ⚠️  FOR LOCAL DEVELOPMENT AND TESTING ONLY - Contains hardcoded secrets
-
-/**
- * Token Lifetime Configuration (for testing)
- *
- * These values are intentionally SHORT for testing refresh token flows.
- * In production, your OIDC provider will determine these lifetimes.
- *
- * Current settings:
- * - Access Token: 60 seconds (forces refresh on every test)
- * - ID Token: 60 seconds
- * - Refresh Token: 86400 seconds (24 hours)
- *
- * The Go server's refresh cookie MaxAge will automatically match
- * the RefreshToken TTL from the IdP.
- */
+// =============================================================================
+//
+// Token Lifetime Configuration (for testing)
+//
+// These values are intentionally SHORT for testing refresh token flows.
+// In production, your OIDC provider will determine these lifetimes.
+//
+// Current settings:
+// - Access Token: 60 seconds (forces refresh on every test)
+// - ID Token: 60 seconds
+// - Refresh Token: 86400 seconds (24 hours)
+// - Session: 120 seconds (2 minutes) - matches maxSessionDuration in with-auth.yaml
+//
+// The Go server's refresh cookie MaxAge will automatically match
+// the RefreshToken TTL from the IdP.
+//
+// Testing Scenarios:
+//   1. Token Refresh: AccessToken/IdToken TTL (60s) < maxSessionDuration (2m)
+//      This forces the UI to refresh tokens before the session expires.
+//   2. Session Expiry: Session TTL (120s) matches maxSessionDuration (2m).
+//      When the session expires, the user must re-enter credentials here.
+//   3. Long Sessions: Increase Session TTL and maxSessionDuration together.
+//      RefreshToken TTL (1 day) allows long-lived sessions with short tokens.
+//
+// Key relationships:
+//   - AccessToken TTL < maxSessionDuration: Enables token refresh testing
+//   - Session TTL = maxSessionDuration: Forces re-auth at OIDC on session end
+//   - RefreshToken TTL > Session TTL: Allows refresh within session lifetime
+// =============================================================================
 const configuration: Record<string, unknown> = {
   conformIdTokenClaims: false,
   ttl: {
-    AccessToken: 60, // 1 minute for testing
-    IdToken: 60, // 1 minute for testing
-    RefreshToken: 60 * 60 * 24, // 1 day
+    AccessToken: 60, // 1 minute - forces refresh before session expires
+    IdToken: 60, // 1 minute - same as access token
+    RefreshToken: 60 * 60 * 24, // 1 day - allows refresh throughout session
+    Session: 120, // 2 minutes - matches maxSessionDuration in with-auth.yaml
+    Interaction: 120, // 2 minutes - OIDC interaction timeout
+    Grant: 120, // 2 minutes - OIDC grant timeout
   },
   scopes: ['openid', 'profile', 'email', 'offline_access'],
   issueRefreshToken: async () => {

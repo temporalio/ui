@@ -21,8 +21,24 @@ batchActionsDisabled: false
 startWorkflowDisabled: false
 hideWorkflowQueryErrors: false
 refreshWorkflowCountsDisabled: false
+# =============================================================================
+# Auth Testing Configuration
+# =============================================================================
+# This configuration is used with `pnpm dev:with-auth` for local testing.
+# The OIDC server settings in utilities/oidc-server/support/configuration.ts
+# should be kept in sync with these values for consistent testing.
+#
+# Testing Scenarios:
+#   1. Token Refresh: Set maxSessionDuration > AccessToken TTL (60s in OIDC config)
+#      This forces refresh before session expiry. Current: 2m session, 1m tokens.
+#   2. Session Expiry: Wait for maxSessionDuration to elapse. User will be
+#      redirected to login and must re-authenticate at the OIDC provider.
+#   3. No Session Limit: Set maxSessionDuration to 0 or remove it entirely.
+#      Tokens will refresh indefinitely until the OIDC refresh token expires.
+# =============================================================================
 auth:
   enabled: true
+  maxSessionDuration: 2m # Max time before forced re-login (0 = unlimited)
   providers:
     - label: Dummy OIDC
       type: oidc # for futureproofing; only oidc is supported today
