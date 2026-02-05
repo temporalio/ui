@@ -3,15 +3,16 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    isPayloadInputEncodingType,
+    type PayloadInputEncoding,
+  } from '$lib/models/payload-encoding';
   import type { Payloads } from '$lib/types';
   import { atob } from '$lib/utilities/atob';
   import { getSinglePayload } from '$lib/utilities/encode-payload';
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
-  import PayloadInputWithEncoding, {
-    isPayloadInputEncodingType,
-    type PayloadInputEncoding,
-  } from '../payload-input-with-encoding.svelte';
+  import PayloadInputWithEncoding from '../payload-input-with-encoding.svelte';
 
   export let input: string;
   export let editInput: boolean;

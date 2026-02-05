@@ -1,17 +1,12 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import type { PendingNexusOperation } from '$lib/types/events';
-  import { formatDate } from '$lib/utilities/format-date';
   import { omit } from '$lib/utilities/omit';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
@@ -61,10 +56,7 @@
       {#if operation.lastAttemptCompleteTime}
         {@render detail(
           translate('workflows.last-attempt-completed-time'),
-          formatDate(operation.lastAttemptCompleteTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          $timestamp(operation.lastAttemptCompleteTime),
         )}
       {/if}
       {#if operation.scheduledEventId}
@@ -76,16 +68,25 @@
       {#if operation.scheduledTime}
         {@render detail(
           translate('workflows.scheduled-time'),
-          formatDate(operation.scheduledTime, $timeFormat, {
-            relative: $relativeTime,
-            format: $timestampFormat,
-          }),
+          $timestamp(operation.scheduledTime),
         )}
       {/if}
       {#if operation.scheduleToCloseTimeout}
         {@render detail(
           translate('workflows.schedule-to-close-timeout'),
           operation.scheduleToCloseTimeout as string,
+        )}
+      {/if}
+      {#if operation.scheduleToStartTimeout}
+        {@render detail(
+          translate('workflows.schedule-to-start-timeout'),
+          operation.scheduleToCloseTimeout as string,
+        )}
+      {/if}
+      {#if operation.startToCloseTimeout}
+        {@render detail(
+          translate('workflows.start-to-close-timeout'),
+          operation.startToCloseTimeout as string,
         )}
       {/if}
     </div>
@@ -129,11 +130,7 @@
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
-      {formatDate(operation.nextAttemptScheduleTime, $timeFormat, {
-        relative: $relativeTime,
-        format: $timestampFormat,
-        relativeLabel: '',
-      })}
+      {$timestamp(operation.nextAttemptScheduleTime, { relativeLabel: '' })}
       <strong>({timeDifference})</strong>
     </p>
   </div>

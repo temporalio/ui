@@ -25,8 +25,8 @@
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { workflowFilters } from '$lib/stores/filters';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
-  import { getLocalTime } from '$lib/utilities/format-date';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { getLocalTime } from '$lib/utilities/timezone';
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
 
   const localTime = getLocalTime() || translate('common.local');

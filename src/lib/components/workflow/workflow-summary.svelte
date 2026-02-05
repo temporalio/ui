@@ -1,19 +1,14 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
-  import {
     workflowRun,
     workflowSummaryViewOpen,
   } from '$lib/stores/workflow-run';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { routeForWorkers } from '$lib/utilities/route-for';
 
@@ -24,15 +19,9 @@
     includeMilliseconds: true,
   });
 
-  $: startTimestamp = formatDate(workflow?.startTime, $timeFormat, {
-    relative: $relativeTime,
-    format: $timestampFormat,
-  });
+  $: startTimestamp = $timestamp(workflow?.startTime);
 
-  $: endTimestamp = formatDate(workflow?.endTime, $timeFormat, {
-    relative: $relativeTime,
-    format: $timestampFormat,
-  });
+  $: endTimestamp = $timestamp(workflow?.endTime);
 </script>
 
 <section>

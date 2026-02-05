@@ -33,8 +33,8 @@
     count = 0,
     disabled = false,
     hasIndicator = false,
-    id = null,
-    label = null,
+    id = undefined,
+    label = undefined,
     variant = 'secondary',
     size = 'md',
     onclick,
@@ -78,7 +78,7 @@
 
   const focusFirstMenuItem = () => {
     const focusable: (HTMLInputElement | HTMLLIElement)[] = Array.from(
-      $menuElement.querySelectorAll(MENU_ITEM_SELECTORS),
+      $menuElement?.querySelectorAll(MENU_ITEM_SELECTORS) ?? [],
     );
 
     if (focusable && focusable[0]) {
@@ -100,6 +100,7 @@
   {variant}
   class={merge(className)}
   {size}
+  active={$open}
   disableTracking={true}
   {...rest}
 >

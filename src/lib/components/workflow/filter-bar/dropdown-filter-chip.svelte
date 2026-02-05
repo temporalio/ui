@@ -4,6 +4,7 @@
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -23,18 +24,16 @@
     endHour,
     endMinute,
     endSecond,
-    getTimezone,
     relativeTimeDuration,
     relativeTimeUnit,
     startDate,
     startHour,
     startMinute,
     startSecond,
-    TIME_UNIT_OPTIONS,
     timeFormat,
     timeFormatType,
   } from '$lib/stores/time-format';
-  import { formatDate, getSelectedTimezone } from '$lib/utilities/format-date';
+  import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { isInConditional, isNullConditional } from '$lib/utilities/is';
   import {
     formatListFilterValue,
@@ -46,6 +45,7 @@
     isStatusFilter,
     isTextFilter,
   } from '$lib/utilities/query/search-attribute-filter';
+  import { getTimezone, TIME_UNIT_OPTIONS } from '$lib/utilities/timezone';
   import { toDate } from '$lib/utilities/to-duration';
 
   type Props = {
@@ -185,10 +185,7 @@
 
     if (isDateTimeFilter(filter)) {
       if (filter.customDate) return value.split('BETWEEN')[1];
-      return formatDate(value, $timeFormat, {
-        relative: true,
-        format: 'short',
-      });
+      return $timestamp(value, { format: 'short' });
     }
 
     if (isTextFilter(filter)) {
