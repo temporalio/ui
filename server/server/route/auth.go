@@ -30,6 +30,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -112,6 +113,7 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider))
 	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider)) // compatibility with UI v1
 	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider))
+	api.GET("/logout", logout())
 }
 
 func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string) func(echo.Context) error {
@@ -186,9 +188,16 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 // and optionally a new ID token. It resets the cookies using auth.SetUser and returns 200.
 func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider) func(echo.Context) error {
 	return func(c echo.Context) error {
+		startTime := time.Now()
+		clientIP := c.RealIP()
+
+		log.Printf("token_refresh_attempt ip=%s", clientIP)
+
 		// Read refresh cookie
 		refreshCookie, err := c.Request().Cookie("refresh")
 		if err != nil || refreshCookie.Value == "" {
+			duration := time.Since(startTime).Milliseconds()
+			log.Printf("token_refresh_failed reason=missing_refresh_token ip=%s duration_ms=%d", clientIP, duration)
 			return echo.NewHTTPError(http.StatusUnauthorized, "missing refresh token")
 		}
 
@@ -196,8 +205,12 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 		ts := oauthCfg.TokenSource(ctx, &oauth2.Token{RefreshToken: refreshCookie.Value})
 		newTok, err := ts.Token()
 		if err != nil {
+			duration := time.Since(startTime).Milliseconds()
+			log.Printf("token_refresh_failed reason=token_exchange_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
 			return echo.NewHTTPError(http.StatusUnauthorized, "unable to refresh token: "+err.Error())
 		}
+
+		log.Printf("token_exchange_success ip=%s expiry=%s", clientIP, newTok.Expiry.Format(time.RFC3339))
 
 		var user auth.User
 		user.OAuth2Token = newTok
@@ -213,18 +226,59 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 				_ = idTok.Claims(&claims)
 				user.IDToken = &auth.IDToken{RawToken: raw, Claims: &claims}
 			} else {
-				// If verification fails, do not include ID token
+				log.Printf("id_token_verification_failed ip=%s error=%q", clientIP, verr.Error())
 				user.IDToken = nil
 			}
 		}
 
 		if err := auth.SetUser(c, &user); err != nil {
+			duration := time.Since(startTime).Milliseconds()
+			log.Printf("token_refresh_failed reason=set_user_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set refreshed user: "+err.Error())
 		}
+
+		duration := time.Since(startTime).Milliseconds()
+		log.Printf("token_refresh_complete ip=%s duration_ms=%d", clientIP, duration)
 
 		// Respond OK. UI can read the short-lived 'user*' cookie to pick up tokens.
 		return c.NoContent(http.StatusOK)
 	}
+}
+
+// logout clears authentication cookies and redirects to root
+func logout() func(echo.Context) error {
+	return func(c echo.Context) error {
+		log.Printf("[Auth] User logout initiated from %s", c.RealIP())
+
+		// Clear refresh token cookie
+		clearCookie(c, "refresh")
+		log.Printf("[Auth] Cleared refresh token cookie")
+
+		// Clear user data cookies (user0, user1, etc.)
+		// We don't know how many chunks exist, so clear up to 10
+		for i := 0; i < 10; i++ {
+			cookieName := "user" + strconv.Itoa(i)
+			clearCookie(c, cookieName)
+		}
+		log.Printf("[Auth] Cleared user data cookies")
+
+		// Redirect to root (or login page)
+		return c.Redirect(http.StatusSeeOther, "/")
+	}
+}
+
+// clearCookie sets a cookie with MaxAge=-1 to delete it
+func clearCookie(c echo.Context, name string) {
+	cookie := &http.Cookie{
+		Name:     name,
+		Value:    "",
+		MaxAge:   -1, // Instructs browser to delete cookie
+		Path:     "/",
+		Secure:   c.Request().TLS != nil,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+	c.SetCookie(cookie)
 }
 
 func setCallbackCookie(c echo.Context, name, value string) {

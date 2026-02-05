@@ -13,8 +13,12 @@ export const refreshTokens = async (): Promise<boolean> => {
   if (!BROWSER) return false;
 
   if (refreshPromise) {
+    console.debug('[Auth] Reusing existing token refresh promise');
     return refreshPromise;
   }
+
+  const startTime = performance.now();
+  console.info('[Auth] Initiating token refresh...');
 
   refreshPromise = (async () => {
     try {
@@ -24,8 +28,9 @@ export const refreshTokens = async (): Promise<boolean> => {
       });
 
       if (!res.ok) {
+        const duration = performance.now() - startTime;
         console.warn(
-          `[Auth] Token refresh failed with status ${res.status}: ${res.statusText}`,
+          `[Auth] Token refresh failed with status ${res.status}: ${res.statusText} (duration: ${duration.toFixed(2)}ms)`,
         );
         return false;
       }
@@ -34,14 +39,27 @@ export const refreshTokens = async (): Promise<boolean> => {
       if (user?.accessToken) {
         setAuthUser(user);
         cleanAuthUserCookie(true);
-        console.info('[Auth] Token refresh successful');
+        const duration = performance.now() - startTime;
+        const expiryTime = user.expiresAt
+          ? new Date(user.expiresAt).toISOString()
+          : 'unknown';
+        console.info(
+          `[Auth] Token refresh successful (duration: ${duration.toFixed(2)}ms, expires: ${expiryTime})`,
+        );
         return true;
       }
 
-      console.warn('[Auth] Token refresh returned no access token');
+      const duration = performance.now() - startTime;
+      console.warn(
+        `[Auth] Token refresh returned no access token (duration: ${duration.toFixed(2)}ms)`,
+      );
       return false;
     } catch (error) {
-      console.error('[Auth] Token refresh network error:', error);
+      const duration = performance.now() - startTime;
+      console.error(
+        `[Auth] Token refresh network error (duration: ${duration.toFixed(2)}ms):`,
+        error,
+      );
       return false;
     } finally {
       refreshPromise = null;

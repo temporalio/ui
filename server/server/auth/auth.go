@@ -99,10 +99,29 @@ func SetUser(c echo.Context, user *User) error {
 
 	if rt := user.OAuth2Token.RefreshToken; rt != "" {
 		log.Printf("[Auth] Setting refresh token cookie (length: %d)", len(rt))
+
+		// Calculate MaxAge from OAuth2 token expiry
+		var refreshMaxAge int
+		if user.OAuth2Token.Expiry.IsZero() {
+			// Fallback: if IdP doesn't provide expiry, use 7 days
+			refreshMaxAge = int((7 * 24 * time.Hour).Seconds())
+			log.Printf("[Auth] Warning: No refresh token expiry from IdP, using 7-day default")
+		} else {
+			// Use IdP's expiry, capped at 30 days for safety
+			maxAge := time.Until(user.OAuth2Token.Expiry)
+			if maxAge > 30*24*time.Hour {
+				maxAge = 30 * 24 * time.Hour
+				log.Printf("[Auth] Warning: IdP refresh token expiry > 30 days, capping at 30 days")
+			}
+			refreshMaxAge = int(maxAge.Seconds())
+			log.Printf("[Auth] Setting refresh cookie MaxAge to %d seconds (%.1f days) from IdP",
+				refreshMaxAge, maxAge.Hours()/24)
+		}
+
 		refreshCookie := &http.Cookie{
 			Name:     "refresh",
 			Value:    rt,
-			MaxAge:   int((30 * 24 * time.Hour).Seconds()),
+			MaxAge:   refreshMaxAge,
 			Secure:   c.Request().TLS != nil,
 			HttpOnly: true,
 			Path:     "/",

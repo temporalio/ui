@@ -1,4 +1,19 @@
 // ⚠️  FOR LOCAL DEVELOPMENT AND TESTING ONLY - Contains hardcoded secrets
+
+/**
+ * Token Lifetime Configuration (for testing)
+ *
+ * These values are intentionally SHORT for testing refresh token flows.
+ * In production, your OIDC provider will determine these lifetimes.
+ *
+ * Current settings:
+ * - Access Token: 60 seconds (forces refresh on every test)
+ * - ID Token: 60 seconds
+ * - Refresh Token: 86400 seconds (24 hours)
+ *
+ * The Go server's refresh cookie MaxAge will automatically match
+ * the RefreshToken TTL from the IdP.
+ */
 const configuration: Record<string, unknown> = {
   conformIdTokenClaims: false,
   ttl: {
