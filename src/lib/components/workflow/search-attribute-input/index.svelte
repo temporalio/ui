@@ -20,6 +20,7 @@
 
   export let attribute: SearchAttributeInput;
   export let onRemove: (attribute: string) => void;
+  export let id: number;
 
   let label: SelectOptionValue;
   let _label = attribute.label || (label && label.toString());
@@ -50,7 +51,7 @@
   <div class="flex min-w-fit justify-between gap-2 sm:gap-4">
     <div class="grow [&_button]:w-full">
       <Select
-        id="search-attribute"
+        id="search-attribute-{id}"
         data-testid="search-attribute-select"
         label={translate('workflows.custom-search-attribute')}
         placeholder={translate('workflows.select-attribute')}
@@ -74,7 +75,7 @@
   {#if attribute.type === SEARCH_ATTRIBUTE_TYPE.BOOL}
     <Select
       label={translate('common.value')}
-      id="attribute-value"
+      id="attribute-value-{id}"
       bind:value={attribute.value}
     >
       <Option value={true}>{translate('common.true')}</Option>
@@ -86,7 +87,7 @@
     <div>
       <NumberInput
         label={translate('common.value')}
-        id="attribute-value"
+        id="attribute-value-{id}"
         valid={attribute.value < Number.MAX_SAFE_INTEGER}
         hintText="Number is too large"
         bind:value={attribute.value}
@@ -96,7 +97,7 @@
   {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST}
     <ChipInput
       label={translate('common.value')}
-      id="attribute-value"
+      id="attribute-value-{id}"
       bind:chips={attribute.value}
       class="w-full"
       removeChipButtonLabel={(chip) =>
@@ -106,14 +107,14 @@
     <Input
       label={translate('common.value')}
       data-testid="custom-search-attribute-value"
-      id="attribute-value"
+      id="attribute-value-{id}"
       class="grow"
       bind:value={attribute.value}
     />
   {:else}
     <Input
       label={translate('common.value')}
-      id="attribute-value"
+      id="attribute-value-{id}"
       class="grow"
       placeholder={translate('workflows.unsupported-attribute')}
       error

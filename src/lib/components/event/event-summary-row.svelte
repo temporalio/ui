@@ -4,6 +4,7 @@
 
   import { page } from '$app/state';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -19,15 +20,9 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { authUser } from '$lib/stores/auth-user';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
@@ -165,18 +160,10 @@
       !currentEvent?.userMetadata?.summary,
   );
 
-  const eventTime = $derived(
-    formatDate(currentEvent?.eventTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    }),
-  );
+  const eventTime = $derived($timestamp(currentEvent?.eventTime));
 
   const abbrEventTime = $derived(
-    formatDate(currentEvent?.eventTime, $timeFormat, {
-      relative: $relativeTime,
-      format: 'short',
-    }),
+    $timestamp(currentEvent?.eventTime, { format: 'short' }),
   );
 
   const onLinkClick = (event) => {

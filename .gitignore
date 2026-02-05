@@ -23,4 +23,8 @@ go.work
 go.work.sum
 .claude/*
 !.claude/skills/
+<<<<<<< HEAD
 .omc
+=======
+.sisyphus/*
+>>>>>>> main

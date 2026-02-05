@@ -21,18 +21,17 @@
     endHour,
     endMinute,
     endSecond,
-    getTimezone,
     relativeTimeDuration,
     relativeTimeUnit,
     startDate,
     startHour,
     startMinute,
     startSecond,
-    TIME_UNIT_OPTIONS,
     timeFormat,
     timeFormatType,
   } from '$lib/stores/time-format';
   import { getSelectedTimezone } from '$lib/utilities/format-date';
+  import { getTimezone, TIME_UNIT_OPTIONS } from '$lib/utilities/timezone';
   import { toDate } from '$lib/utilities/to-duration';
 
   import ConditionalMenu from './conditional-menu.svelte';

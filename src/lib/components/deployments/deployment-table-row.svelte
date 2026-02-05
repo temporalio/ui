@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import Timestamp from '$lib/components/timestamp.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
@@ -47,20 +48,41 @@
 <tr>
   {#each columns as { label } (label)}
     {#if label === translate('deployments.name')}
-      <td class="py-1 text-left"
-        ><Link
-          href={routeForWorkerDeployment({
-            namespace: $page.params.namespace,
-            deployment: deployment.name,
-          })}>{deployment.name}</Link
-        ></td
-      >
+      <td class="py-1 text-left">
+        <Copyable
+          content={deployment.name}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        >
+          <Link
+            href={routeForWorkerDeployment({
+              namespace: $page.params.namespace,
+              deployment: deployment.name,
+            })}>{deployment.name}</Link
+          >
+        </Copyable>
+      </td>
     {:else if label === translate('deployments.build-id')}
       <td class="whitespace-pre-line break-words py-1 text-left">
         <div class="flex flex-col gap-1">
           {#if latestBuildId && latestNotDuplicate}
             <div class="flex items-center gap-2">
-              {latestBuildId}
+              <Copyable
+                content={latestBuildId}
+                copyIconTitle={translate('common.copy-icon-title')}
+                copySuccessIconTitle={translate(
+                  'common.copy-success-icon-title',
+                )}
+              >
+                <Link
+                  href={routeForWorkflowsWithQuery({
+                    namespace: $page.params.namespace,
+                    query: `TemporalWorkerDeploymentVersion="${deployment.name}:${latestBuildId}"`,
+                  })}
+                >
+                  {latestBuildId}
+                </Link>
+              </Copyable>
               <DeploymentStatus
                 status="Latest"
                 label={translate('deployments.latest')}
@@ -69,7 +91,22 @@
           {/if}
           {#if rampingBuildId}
             <div class="flex items-center gap-2">
-              {rampingBuildId}
+              <Copyable
+                content={rampingBuildId}
+                copyIconTitle={translate('common.copy-icon-title')}
+                copySuccessIconTitle={translate(
+                  'common.copy-success-icon-title',
+                )}
+              >
+                <Link
+                  href={routeForWorkflowsWithQuery({
+                    namespace: $page.params.namespace,
+                    query: `TemporalWorkerDeploymentVersion="${deployment.name}:${rampingBuildId}"`,
+                  })}
+                >
+                  {rampingBuildId}
+                </Link>
+              </Copyable>
               {#if deployment?.routingConfig?.rampingVersionPercentage}
                 <DeploymentStatus
                   status="Ramping"
@@ -82,7 +119,26 @@
             </div>
           {/if}
           <div class="flex items-center gap-2">
-            {currentLabel}
+            {#if versionedCurrent}
+              <Copyable
+                content={currentBuildId}
+                copyIconTitle={translate('common.copy-icon-title')}
+                copySuccessIconTitle={translate(
+                  'common.copy-success-icon-title',
+                )}
+              >
+                <Link
+                  href={routeForWorkflowsWithQuery({
+                    namespace: $page.params.namespace,
+                    query: `TemporalWorkerDeploymentVersion="${deployment.name}:${currentBuildId}"`,
+                  })}
+                >
+                  {currentLabel}
+                </Link>
+              </Copyable>
+            {:else}
+              {currentLabel}
+            {/if}
             {#if versionedCurrent}
               <DeploymentStatus
                 status="Current"

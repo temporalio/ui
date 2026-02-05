@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -8,13 +9,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import type { PendingNexusOperation } from '$lib/types/events';
-  import { formatDate } from '$lib/utilities/format-date';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -50,18 +45,10 @@
     }),
   );
 
-  let eventTime = $derived(
-    formatDate(group?.eventTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    }),
-  );
+  let eventTime = $derived($timestamp(group?.eventTime));
 
   let abbrEventTime = $derived(
-    formatDate(group?.eventTime, $timeFormat, {
-      relative: $relativeTime,
-      format: 'short',
-    }),
+    $timestamp(group?.eventTime, { format: 'short' }),
   );
 
   const onLinkClick = (e: Event) => {

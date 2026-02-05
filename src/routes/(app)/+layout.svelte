@@ -32,6 +32,7 @@
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
+    routeForStandaloneActivities,
     routeForWorkerDeployments,
     routeForWorkers,
     routeForWorkflows,
@@ -73,9 +74,11 @@
   const getRoutes = (namespace: string) => {
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
+      standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
       workersRoute: routeForWorkers({ namespace }),
+      workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
       archivalRoute: routeForArchivalWorkflows({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
@@ -86,18 +89,22 @@
   const getLinkList = (
     {
       workflowsRoute,
+      standaloneActivitiesRoute,
       schedulesRoute,
       batchOperationsRoute,
       workersRoute,
+      workerDeploymentsRoute,
       archivalRoute,
       namespacesRoute,
       nexusRoute,
       historyImportRoute,
     }: {
       workflowsRoute: string;
+      standaloneActivitiesRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
       workersRoute: string;
+      workerDeploymentsRoute: string;
       archivalRoute: string;
       namespacesRoute: string;
       nexusRoute: string;
@@ -116,6 +123,8 @@
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
           !path.includes(workersRoute) &&
+          !path.includes(workerDeploymentsRoute) &&
+          !path.includes(standaloneActivitiesRoute) &&
           !path.includes(archivalRoute),
       },
       {
@@ -124,6 +133,13 @@
         label: translate('common.workflows'),
         isActive: (path) => path.includes(workflowsRoute),
       },
+      // Uncomment this when Standalone Activities is ready to release
+      // {
+      //   href: standaloneActivitiesRoute,
+      //   icon: 'activity',
+      //   label: translate('standalone-activities.standalone-activities'),
+      //   isActive: (path) => path.includes(standaloneActivitiesRoute),
+      // },
       {
         href: schedulesRoute,
         icon: 'schedules',
@@ -143,7 +159,8 @@
         icon: 'merge',
         label: translate('deployments.deployments'),
         tooltip: translate('deployments.worker-deployments'),
-        isActive: (path) => path.includes(workersRoute),
+        isActive: (path) =>
+          path.includes(workersRoute) || path.includes(workerDeploymentsRoute),
       },
       {
         href: nexusRoute,
@@ -156,9 +173,11 @@
         },
       },
       {
+        divider: true,
+      },
+      {
         href: archivalRoute,
         icon: 'archives',
-        divider: true,
         label: translate('common.archive'),
         isActive: (path) => path.includes(archivalRoute),
       },
@@ -184,15 +203,19 @@
     schedulesRoute,
     batchOperationsRoute,
     workersRoute,
+    workerDeploymentsRoute,
     archivalRoute,
+    standaloneActivitiesRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
       workflowsRoute,
       schedulesRoute,
       workersRoute,
+      workerDeploymentsRoute,
       batchOperationsRoute,
       archivalRoute,
+      standaloneActivitiesRoute,
     ].some((route) => page.url.href.includes(route)),
   );
 
@@ -205,6 +228,14 @@
       {
         subPath: 'batch-operations',
         fullRoute: routeForBatchOperations({ namespace }),
+      },
+      {
+        subPath: 'activities',
+        fullRoute: routeForStandaloneActivities({ namespace }),
+      },
+      {
+        subPath: 'workers',
+        fullRoute: routeForWorkers({ namespace }),
       },
     ];
 
@@ -219,9 +250,9 @@
       return routeForWorkers({ namespace });
     }
 
-    // Handle worker-deployments page
-    if (page.url.pathname.includes('worker-deployments')) {
-      return routeForWorkerDeployments({ namespace });
+    // Handle workers page
+    if (page.url.pathname.includes('workers')) {
+      return routeForWorkers({ namespace });
     }
 
     return routeForWorkflows({ namespace });
@@ -260,15 +291,16 @@
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud}>
-      <NavigationItem
-        link={page.data?.settings?.feedbackURL ||
-          'https://github.com/temporalio/ui/issues/new/choose'}
-        label={translate('common.feedback')}
-        icon="feedback"
-        tooltip={translate('common.feedback')}
-        external
-        slot="bottom"
-      />
+      {#snippet bottom()}
+        <NavigationItem
+          link={page.data?.settings?.feedbackURL ||
+            'https://github.com/temporalio/ui/issues/new/choose'}
+          label={translate('common.feedback')}
+          icon="feedback"
+          tooltip={translate('common.feedback')}
+          external
+        />
+      {/snippet}
     </SideNavigation>
   </div>
   <MainContentContainer>

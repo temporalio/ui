@@ -1,12 +1,7 @@
 <script lang="ts">
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
   import type { WorkerDeploymentVersionInfo } from '$lib/types/deployments';
-  import { formatDate } from '$lib/utilities/format-date';
 
   import WorkflowDetail from '../lines-and-dots/workflow-detail.svelte';
 
@@ -21,10 +16,7 @@
     />
     <WorkflowDetail
       title={translate('deployments.rollout-started')}
-      content={formatDate(version.createTime, $timeFormat, {
-        relative: $relativeTime,
-        format: $timestampFormat,
-      })}
+      content={$timestamp(version.createTime)}
     />
   </div>
   <div class="flex w-full flex-col gap-2 lg:w-1/3 xl:w-1/4">

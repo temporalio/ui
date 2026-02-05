@@ -2,7 +2,6 @@
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -27,7 +26,6 @@
     <h1 class="leading-7" data-cy="workers-title">
       {pageTitle}
     </h1>
-    <Badge class="shrink-0">Public Preview</Badge>
   </div>
   <Tabs>
     <TabList label={translate('workers.worker-views')}>
@@ -47,4 +45,4 @@
   </Tabs>
 </header>
 
-<WorkerDeployments hideHeader />
+<WorkerDeployments />

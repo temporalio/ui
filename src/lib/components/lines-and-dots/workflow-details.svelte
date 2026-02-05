@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
@@ -109,10 +110,7 @@
 <DetailList aria-label="workflow details" rowCount={5}>
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
   <DetailListTextValue
-    text={formatDate(workflow?.startTime, $timeFormat, {
-      relative: $relativeTime,
-      format: $timestampFormat,
-    })}
+    text={$timestamp(workflow?.startTime)}
     tooltipText={formatDate(workflow?.startTime, $timeFormat, {
       relative: !$relativeTime,
       format: $timestampFormat,
@@ -122,10 +120,7 @@
   {#if workflow?.startDelay}
     <DetailListLabel>{translate('workflows.execution-start')}</DetailListLabel>
     <DetailListTextValue
-      text={formatDate(workflow?.executionTime, $timeFormat, {
-        relative: $relativeTime,
-        format: $timestampFormat,
-      })}
+      text={$timestamp(workflow?.executionTime)}
       tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
         relative: !$relativeTime,
         format: $timestampFormat,
@@ -135,12 +130,7 @@
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
   <DetailListTextValue
-    text={workflow?.endTime
-      ? formatDate(workflow?.endTime, $timeFormat, {
-          relative: $relativeTime,
-          format: $timestampFormat,
-        })
-      : '-'}
+    text={workflow?.endTime ? $timestamp(workflow?.endTime) : '-'}
     tooltipText={formatDate(workflow?.endTime, $timeFormat, {
       relative: !$relativeTime,
       format: $timestampFormat,
@@ -206,6 +196,8 @@
     <DetailListColumn>
       <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
       <DetailListLinkValue
+        copyable
+        copyableText={deployment}
         text={deployment}
         href={routeForWorkerDeployment({
           namespace,
@@ -217,14 +209,34 @@
         <DetailListLabel>
           {translate('deployments.build-id')}
         </DetailListLabel>
-        <DetailListTextValue text={versioningBuildId} />
+        <DetailListLinkValue
+          copyable
+          copyableText={versioningBuildId}
+          text={versioningBuildId}
+          href={deploymentVersion
+            ? routeForWorkflowsWithQuery({
+                namespace,
+                query: `TemporalWorkerDeploymentVersion="${deploymentVersion}"`,
+              })
+            : undefined}
+          iconName={deploymentVersion ? 'filter' : undefined}
+        />
       {/if}
 
       {#if versioningBehavior}
         <DetailListLabel>
           {translate('deployments.versioning-behavior')}
         </DetailListLabel>
-        <DetailListTextValue text={versioningBehavior} />
+        <DetailListLinkValue
+          copyable
+          copyableText={versioningBehavior}
+          text={versioningBehavior}
+          href={routeForWorkflowsWithQuery({
+            namespace,
+            query: `TemporalWorkflowVersioningBehavior="${versioningBehavior}"`,
+          })}
+          iconName="filter"
+        />
       {/if}
     </DetailListColumn>
   {/if}
