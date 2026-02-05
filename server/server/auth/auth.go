@@ -183,13 +183,13 @@ func validateJWT(ctx context.Context, tokenString string) error {
 	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 
 	if tokenString == "" {
-		log.Println("[JWT Validation] Token is empty, skipping validation")
-		return nil
+		log.Println("[JWT Validation] Token is empty after stripping Bearer prefix")
+		return errors.New("token is empty")
 	}
 
 	if tokenVerifier == nil {
-		log.Println("[JWT Validation] No verifier configured, skipping validation")
-		return nil
+		log.Println("[JWT Validation] CRITICAL: No verifier configured but validation was requested")
+		return errors.New("authentication verifier not initialized")
 	}
 
 	_, err := tokenVerifier.Verify(ctx, tokenString)

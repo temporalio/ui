@@ -137,7 +137,7 @@ func TestValidateAuthHeaderExists(t *testing.T) {
 			name:          "auth enabled - with auth header",
 			authEnabled:   true,
 			authHeader:    "Bearer access-token",
-			expectedError: false,
+			expectedError: true, // No verifier configured, should fail
 		},
 		{
 			name:               "useIDTokenAsBearer disabled - headers unchanged",
@@ -146,7 +146,7 @@ func TestValidateAuthHeaderExists(t *testing.T) {
 			authHeader:         "Bearer access-token",
 			authExtrasHeader:   "id-token",
 			expectedAuthHeader: "Bearer access-token",
-			expectedError:      false,
+			expectedError:      true, // No verifier configured, should fail
 		},
 		{
 			name:               "useIDTokenAsBearer enabled - swap tokens",
@@ -155,7 +155,7 @@ func TestValidateAuthHeaderExists(t *testing.T) {
 			authHeader:         "Bearer access-token",
 			authExtrasHeader:   "id-token",
 			expectedAuthHeader: "Bearer id-token",
-			expectedError:      false,
+			expectedError:      true, // No verifier configured, should fail
 		},
 		{
 			name:               "useIDTokenAsBearer enabled - no extras header",
@@ -164,7 +164,7 @@ func TestValidateAuthHeaderExists(t *testing.T) {
 			authHeader:         "Bearer access-token",
 			authExtrasHeader:   "",
 			expectedAuthHeader: "Bearer access-token",
-			expectedError:      false,
+			expectedError:      true, // No verifier configured, should fail
 		},
 	}
 
