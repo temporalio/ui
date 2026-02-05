@@ -1,9 +1,16 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
 
-  import PageTitle from '$lib/components/page-title.svelte';
-  import WorkerDeployments from '$lib/pages/deployments.svelte';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/state';
+
+  const { namespace } = $derived(page.params);
+
+  onMount(() => {
+    const queryString = page.url.searchParams.toString();
+    const redirectUrl = `/namespaces/${namespace}/workers?view=deployments${queryString ? `&${queryString}` : ''}`;
+    goto(redirectUrl, { replaceState: true });
+  });
 </script>
 
-<PageTitle title="Deployments" url={$page.url.href} />
-<WorkerDeployments />
+<p>Redirecting...</p>

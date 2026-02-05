@@ -32,7 +32,7 @@
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
-    routeForWorkerDeployments,
+    routeForWorkers,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
@@ -74,7 +74,7 @@
       workflowsRoute: routeForWorkflows({ namespace }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
-      workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
+      workersRoute: routeForWorkers({ namespace }),
       archivalRoute: routeForArchivalWorkflows({ namespace }),
       namespacesRoute: routeForNamespaces(),
       nexusRoute: routeForNexus(),
@@ -87,7 +87,7 @@
       workflowsRoute,
       schedulesRoute,
       batchOperationsRoute,
-      workerDeploymentsRoute,
+      workersRoute,
       archivalRoute,
       namespacesRoute,
       nexusRoute,
@@ -96,7 +96,7 @@
       workflowsRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
-      workerDeploymentsRoute: string;
+      workersRoute: string;
       archivalRoute: string;
       namespacesRoute: string;
       nexusRoute: string;
@@ -114,7 +114,7 @@
           !path.includes(workflowsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
-          !path.includes(workerDeploymentsRoute) &&
+          !path.includes(workersRoute) &&
           !path.includes(archivalRoute),
       },
       {
@@ -138,11 +138,11 @@
         isActive: (path) => path.includes(batchOperationsRoute),
       },
       {
-        href: workerDeploymentsRoute,
+        href: workersRoute,
         icon: 'merge',
         label: translate('deployments.deployments'),
         tooltip: translate('deployments.worker-deployments'),
-        isActive: (path) => path.includes(workerDeploymentsRoute),
+        isActive: (path) => path.includes(workersRoute),
       },
       {
         href: nexusRoute,
@@ -182,14 +182,14 @@
     workflowsRoute,
     schedulesRoute,
     batchOperationsRoute,
-    workerDeploymentsRoute,
+    workersRoute,
     archivalRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
       workflowsRoute,
       schedulesRoute,
-      workerDeploymentsRoute,
+      workersRoute,
       batchOperationsRoute,
       archivalRoute,
     ].some((route) => page.url.href.includes(route)),
@@ -205,16 +205,24 @@
         subPath: 'batch-operations',
         fullRoute: routeForBatchOperations({ namespace }),
       },
-      {
-        subPath: 'worker-deployments',
-        fullRoute: routeForWorkerDeployments({ namespace }),
-      },
     ];
 
     for (const { subPath, fullRoute } of namespacePages) {
       if (page.url.pathname.endsWith(subPath)) {
         return fullRoute;
       }
+    }
+
+    // Handle workers page with view query param preservation
+    if (page.url.pathname.endsWith('workers')) {
+      const view = page.url.searchParams.get('view');
+      const base = routeForWorkers({ namespace });
+      return view ? `${base}?view=${view}` : base;
+    }
+
+    // Handle legacy worker-deployments path during redirect
+    if (page.url.pathname.includes('worker-deployments')) {
+      return `${routeForWorkers({ namespace })}?view=deployments`;
     }
 
     return routeForWorkflows({ namespace });

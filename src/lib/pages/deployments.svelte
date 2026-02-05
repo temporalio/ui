@@ -11,6 +11,12 @@
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
+  interface Props {
+    hideHeader?: boolean;
+  }
+
+  let { hideHeader = false }: Props = $props();
+
   let error = $state('');
 
   const namespace = $derived(page.params.namespace);
@@ -39,12 +45,14 @@
   ];
 </script>
 
-<div class="flex flex-wrap items-center gap-2">
-  <h1>
-    {translate('deployments.worker-deployments')}
-  </h1>
-  <Badge class="shrink-0">Public Preview</Badge>
-</div>
+{#if !hideHeader}
+  <div class="flex flex-wrap items-center gap-2">
+    <h1>
+      {translate('deployments.worker-deployments')}
+    </h1>
+    <Badge class="shrink-0">Public Preview</Badge>
+  </div>
+{/if}
 
 {#key [namespace]}
   <PaginatedTable
