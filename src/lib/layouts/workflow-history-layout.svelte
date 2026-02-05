@@ -106,13 +106,17 @@
             leadingIcon={reverseSort ? 'descending' : 'ascending'}
             data-testid="zoom-in"
             on:click={onSort}
-            size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+            size="sm"
           >
+            {reverseSort
+              ? translate('common.descending')
+              : translate('common.ascending')}
+          </ToggleButton>
         {/if}
         <Tooltip
           text={$minimizeEventView
-            ? 'Timeline and Event History are collapsed to minimized height'
-            : 'Timeline and Event History are expanded to full height'}
+            ? translate('workflows.timeline-minimized')
+            : translate('workflows.timeline-expanded')}
           top
         >
           <ToggleButton
@@ -120,19 +124,29 @@
             data-testid="expandAll"
             size="sm"
             on:click={() => ($minimizeEventView = !$minimizeEventView)}
-            >{$minimizeEventView ? 'Minimized' : 'Expanded'}</ToggleButton
           >
+            {$minimizeEventView
+              ? translate('workflows.minimized')
+              : translate('workflows.expanded')}
+          </ToggleButton>
         </Tooltip>
         <EventTypeFilter {compact} minimized={$minimizeEventView} />
         <ToggleButton
           disabled={!workflow.isRunning}
-          leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
           data-testid="pause"
           class="border-l-0"
           size="sm"
           on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
         >
-          {$pauseLiveUpdates ? 'Unfreeze' : 'Freeze'}
+          <span
+            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates ||
+            !workflow.isRunning
+              ? 'bg-slate-300'
+              : 'bg-green-600'}"
+          ></span>
+          {$pauseLiveUpdates || !workflow.isRunning
+            ? translate('workflows.auto-refresh-off')
+            : translate('workflows.auto-refresh-on')}
         </ToggleButton>
         <ToggleButton
           data-testid="download"
