@@ -1,9 +1,11 @@
 import { nanoid } from 'nanoid';
+import type { AccountClaims, Account as OidcAccount } from 'oidc-provider';
 
 /**
  * Account model for oidc-provider interactions.
  */
-export default class Account {
+export default class Account implements OidcAccount {
+  [key: string]: unknown;
   public accountId: string;
   private profile?: Record<string, unknown>;
 
@@ -16,7 +18,7 @@ export default class Account {
   /**
    * Returns claims for the ID token or userinfo endpoint.
    */
-  public async claims(): Promise<Record<string, unknown>> {
+  public async claims(): Promise<AccountClaims> {
     if (this.profile) {
       return {
         sub: this.accountId,

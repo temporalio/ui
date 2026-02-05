@@ -78,10 +78,13 @@ export const requestFromAPI = async <T>(
     if (token) query.set('nextPageToken', token);
   } else {
     const nextPageToken = token ? { next_page_token: token } : {};
-    query = new URLSearchParams({
-      ...params,
-      ...nextPageToken,
-    });
+    // Filter out undefined values before passing to URLSearchParams
+    const paramsWithoutUndefined = Object.fromEntries(
+      Object.entries({ ...params, ...nextPageToken }).filter(
+        ([_, v]) => v !== undefined,
+      ),
+    ) as Record<string, string>;
+    query = new URLSearchParams(paramsWithoutUndefined);
   }
   const url = toURL(endpoint, query);
 

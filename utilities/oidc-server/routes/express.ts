@@ -85,7 +85,7 @@ export default function registerRoutes(
                 : undefined,
               dbg: {
                 params: debug(params as Record<string, unknown>),
-                prompt: debug(prompt as Record<string, unknown>),
+                prompt: debug(prompt as unknown as Record<string, unknown>),
               },
             });
           case 'consent':
@@ -100,7 +100,7 @@ export default function registerRoutes(
                 : undefined,
               dbg: {
                 params: debug(params as Record<string, unknown>),
-                prompt: debug(prompt as Record<string, unknown>),
+                prompt: debug(prompt as unknown as Record<string, unknown>),
               },
             });
           default:

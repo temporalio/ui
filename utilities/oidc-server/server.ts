@@ -2,7 +2,7 @@ import type { Server as HttpServer } from 'http';
 
 import express, { type Application } from 'express';
 import helmet, { contentSecurityPolicy } from 'helmet';
-import Provider from 'oidc-provider';
+import Provider, { type Account, type Configuration } from 'oidc-provider';
 
 /**
  * Options for configuring the OIDCServer.
@@ -11,19 +11,13 @@ export interface OIDCServerOptions {
   issuer: string;
   port: number;
   viewsPath: string;
-  providerConfiguration: Record<string, unknown> & {
-    findAccount?: (
-      ctx: unknown,
-      id: string,
-      token?: unknown,
-    ) => Promise<unknown>;
-  };
+  providerConfiguration: Partial<Configuration>;
   accountModel: {
     findAccount: (
       ctx: unknown,
       id: string,
       token?: unknown,
-    ) => Promise<unknown>;
+    ) => Promise<Account>;
   };
   routes: (app: Application, provider: Provider) => void;
 }
@@ -39,19 +33,13 @@ export default class OIDCServer {
   private issuer: string;
   private port: number;
   private viewsPath: string;
-  private providerConfiguration: Record<string, unknown> & {
-    findAccount?: (
-      ctx: unknown,
-      id: string,
-      token?: unknown,
-    ) => Promise<unknown>;
-  };
+  private providerConfiguration: Partial<Configuration>;
   private accountModel: {
     findAccount: (
       ctx: unknown,
       id: string,
       token?: unknown,
-    ) => Promise<unknown>;
+    ) => Promise<Account>;
   };
   private routes: (app: Application, provider: Provider) => void;
 

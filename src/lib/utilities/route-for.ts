@@ -127,7 +127,7 @@ export const routeForWorkflowsWithQuery = ({
   }
 
   return toURL(routeForWorkflows({ namespace }), {
-    query,
+    query: query ?? '',
     ...(page && { page }),
   });
 };
