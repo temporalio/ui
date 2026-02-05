@@ -37,7 +37,7 @@ This document tracks pre-existing security issues that are **out of scope** for 
 5. **No Token Rotation**
    - **Issue**: Refresh tokens are reused (no single-use rotation)
    - **Fix**: Requires server-side session storage for reuse detection
-   - **Effort**: Included in BFF refactor with Redis
+   - **Effort**: Included in BFF refactor
 
 ### Medium
 
@@ -48,21 +48,16 @@ This document tracks pre-existing security issues that are **out of scope** for 
 
 ## Recommended Refactor Path
 
-See `.omc/plans/refresh-token-security-roadmap.md` for detailed options:
+See `SECURITY_REFACTOR_PLAN.md` for detailed implementation guide:
 
-- **Option B (Recommended)**: Hybrid approach with server-side session storage
+- **Option B (Recommended)**: BFF pattern with server-side session storage
 
   - Effort: 5-7 days
-  - Benefits: Addresses all critical issues without Redis
-  - Path to Option C: Can add Redis later if scaling requires
-
-- **Option C (Long-term)**: Full BFF + Redis
-  - Effort: 8-12 days
-  - Benefits: Production-grade, horizontal scaling, instant revocation
-  - When to do: After product-market fit or scaling needs arise
+  - Benefits: Addresses all critical issues, no external dependencies
+  - Scaling: Use sticky sessions or file-based storage for multi-instance deployments
 
 ## References
 
-- Full analysis: `.omc/plans/refresh-token-security-roadmap.md`
-- OAuth2 BFF research: `.omc/research/oauth2-bff-refresh-tokens-research.md`
+- Implementation guide: `SECURITY_REFACTOR_PLAN.md`
+- Authentication docs: `AUTHENTICATION.md`
 - RFC 9700: https://datatracker.ietf.org/doc/rfc9700/
