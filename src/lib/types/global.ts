@@ -96,6 +96,7 @@ export type Settings = {
   workflowSignalDisabled: boolean;
   workflowUpdateDisabled: boolean;
   workflowResetDisabled: boolean;
+  workflowPauseDisabled: boolean;
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
   activityCommandsDisabled: boolean;

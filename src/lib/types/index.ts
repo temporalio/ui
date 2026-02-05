@@ -323,6 +323,7 @@ export type SettingsResponse = {
   WorkflowSignalDisabled: boolean;
   WorkflowUpdateDisabled: boolean;
   WorkflowResetDisabled: boolean;
+  WorkflowPauseDisabled: boolean;
   BatchActionsDisabled: boolean;
   StartWorkflowDisabled: boolean;
   HideWorkflowQueryErrors: boolean;
