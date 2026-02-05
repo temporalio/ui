@@ -2,7 +2,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
@@ -31,43 +31,50 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
-  $: pendingActivities = workflow?.pendingActivities;
-  $: pendingNexusOperations = workflow?.pendingNexusOperations;
-  $: reverseSort = $eventFilterSort === 'descending';
-  $: compact = $eventViewType === 'compact';
+  const { namespace } = $derived(page.params);
+  const { workflow } = $derived($workflowRun);
+  const pendingActivities = $derived(workflow?.pendingActivities);
+  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
-  $: ascendingGroups = groupEvents(
-    $filteredEventHistory,
-    'ascending',
-    pendingActivities,
-    pendingNexusOperations,
+  let reverseSort = $derived($eventFilterSort === 'descending');
+  let compact = $derived($eventViewType === 'compact');
+
+  let ascendingGroups = $derived(
+    groupEvents(
+      $filteredEventHistory,
+      'ascending',
+      pendingActivities,
+      pendingNexusOperations,
+    ),
   );
 
-  $: groups = reverseSort ? [...ascendingGroups].reverse() : ascendingGroups;
-  $: history = reverseSort
-    ? [...$filteredEventHistory].reverse()
-    : $filteredEventHistory;
-
-  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-    $currentEventHistory,
-    'ascending',
+  let groups = $derived(
+    reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
+  );
+  let history = $derived(
+    reverseSort ? [...$filteredEventHistory].reverse() : $filteredEventHistory,
   );
 
-  $: $eventViewType, clearActives();
+  const workflowTaskFailedError = $derived(
+    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
+  );
+
+  $effect(() => {
+    $eventViewType;
+    clearActives();
+  });
 
   beforeNavigate(() => {
     clearActives();
   });
 
-  $: {
+  $effect(() => {
     if (!workflow.isRunning && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
-  }
+  });
 
-  let showDownloadPrompt = false;
+  let showDownloadPrompt = $state(false);
 
   const onSort = () => {
     if (reverseSort) {
