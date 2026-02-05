@@ -39,9 +39,9 @@
   $: showJson = $page.url.searchParams.has('json');
   $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
 
-  let workflowError: NetworkError;
+  let workflowError: NetworkError | null = null;
   let workflowRunController: AbortController;
-  let refreshInterval;
+  let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
   const { copy, copied } = copyToClipboard();
 
@@ -89,6 +89,10 @@
 
     if (error) {
       workflowError = error;
+      return;
+    }
+
+    if (!workflow) {
       return;
     }
 

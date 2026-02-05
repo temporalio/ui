@@ -18,7 +18,7 @@
       title={translate('workflows.workflow-error-no-workers-title')}
     >
       {translate('workflows.workflow-error-no-workers-description', {
-        taskQueue: workflow?.taskQueue,
+        taskQueue: workflow?.taskQueue ?? '',
       })}
     </Alert>
   </div>

@@ -10,7 +10,7 @@ export type WorkflowRunWithWorkers = {
   workflow: WorkflowExecution | null;
   workers: TaskQueueResponse;
   workersLoaded: boolean;
-  metadata: WorkflowMetadata;
+  metadata: WorkflowMetadata | null;
   userMetadata: {
     summary: string;
     details: string;
@@ -21,7 +21,7 @@ export const initialWorkflowRun: WorkflowRunWithWorkers = {
   workflow: null,
   workers: { pollers: [], taskQueueStatus: null },
   workersLoaded: false,
-  metadata: undefined,
+  metadata: null,
   userMetadata: {
     summary: '',
     details: '',
