@@ -1,16 +1,50 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
+
+  import PageTitle from '$lib/components/page-title.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import TabList from '$lib/holocene/tab/tab-list.svelte';
+  import Tab from '$lib/holocene/tab/tab.svelte';
+  import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import WorkerDeployments from '$lib/pages/deployments.svelte';
+  import {
+    routeForWorkerDeployments,
+    routeForWorkers,
+  } from '$lib/utilities/route-for';
 
   const { namespace } = $derived(page.params);
 
-  onMount(() => {
-    const queryString = page.url.searchParams.toString();
-    const redirectUrl = `/namespaces/${namespace}/workers?view=deployments${queryString ? `&${queryString}` : ''}`;
-    goto(redirectUrl, { replaceState: true });
-  });
+  const workersHref = $derived(routeForWorkers({ namespace }));
+  const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
+
+  const pageTitle = $derived(translate('deployments.worker-deployments'));
 </script>
 
-<p>Redirecting...</p>
+<PageTitle title={pageTitle} url={page.url.href} />
+<header class="flex flex-col gap-2">
+  <div class="flex flex-wrap items-center gap-2">
+    <h1 class="leading-7" data-cy="workers-title">
+      {pageTitle}
+    </h1>
+    <Badge class="shrink-0">Public Preview</Badge>
+  </div>
+  <Tabs>
+    <TabList label={translate('workers.worker-views')}>
+      <Tab
+        label={translate('workers.workers')}
+        id="workers-tab"
+        href={workersHref}
+        active={false}
+      />
+      <Tab
+        label={translate('deployments.deployments')}
+        id="deployments-tab"
+        href={deploymentsHref}
+        active={true}
+      />
+    </TabList>
+  </Tabs>
+</header>
+
+<WorkerDeployments hideHeader />

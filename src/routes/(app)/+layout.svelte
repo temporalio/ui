@@ -32,6 +32,7 @@
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
+    routeForWorkerDeployments,
     routeForWorkers,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
@@ -213,16 +214,14 @@
       }
     }
 
-    // Handle workers page with view query param preservation
+    // Handle workers page
     if (page.url.pathname.endsWith('workers')) {
-      const view = page.url.searchParams.get('view');
-      const base = routeForWorkers({ namespace });
-      return view ? `${base}?view=${view}` : base;
+      return routeForWorkers({ namespace });
     }
 
-    // Handle legacy worker-deployments path during redirect
+    // Handle worker-deployments page
     if (page.url.pathname.includes('worker-deployments')) {
-      return `${routeForWorkers({ namespace })}?view=deployments`;
+      return routeForWorkerDeployments({ namespace });
     }
 
     return routeForWorkflows({ namespace });
