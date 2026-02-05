@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/stores';
 
@@ -93,8 +95,10 @@
 </div>
 <div class="relative pb-24">
   <div
-    class="surface-background flex flex-wrap items-center justify-between gap-2 border-b border-subtle py-2 xl:gap-8"
-    class:sticky-header={!$minimizeEventView}
+    class={merge(
+      'surface-background flex flex-wrap items-center justify-between gap-2 border-b border-subtle py-2 xl:gap-8',
+      !$minimizeEventView && 'sticky top-0 z-30 md:top-12',
+    )}
   >
     <h2>
       {translate('workflows.event-history')}
@@ -175,9 +179,3 @@
   workflowId={workflow.id}
   runId={workflow.runId}
 />
-
-<style lang="postcss">
-  .sticky-header {
-    @apply sticky top-0 z-30 md:top-12;
-  }
-</style>
