@@ -128,7 +128,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 			}
 		}
 		route.SetUIRoutes(e, cfg.PublicPath, assets)
-		route.SetRenderRoute(e)
+		route.SetRenderRoute(e, cfg.PublicPath)
 	}
 
 	s := &Server{
