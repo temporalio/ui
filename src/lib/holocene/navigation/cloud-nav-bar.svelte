@@ -4,6 +4,7 @@
   import { resolve } from '$app/paths';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
 
   interface Props {
@@ -30,12 +31,15 @@
         href={resolve('', {})}
         class="flex w-fit items-center gap-1 text-nowrap"
       >
+        <Logo height={24} width={24} class="m-1" />
         {#if subtitle}
-          <div
-            class="text-xs font-medium text-indigo-100 group-data-[nav=closed]:hidden"
+          <p
+            class="{subtitle === 'Cloud'
+              ? 'text-base'
+              : 'text-xs'} font-medium text-indigo-100 group-data-[nav=closed]:hidden"
           >
             {subtitle}
-          </div>
+          </p>
         {/if}
       </a>
 
