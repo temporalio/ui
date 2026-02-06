@@ -7,7 +7,7 @@ import type { NetworkError } from '$lib/types/global';
 import { has } from './has';
 import { isNetworkError } from './is-network-error';
 import type { APIErrorResponse, TemporalAPIError } from './request-from-api';
-import { routeForSsoRedirect } from './route-for';
+import { routeForLoginPage } from './route-for';
 
 interface NetworkErrorWithReport extends NetworkError {
   report?: boolean;
@@ -34,11 +34,11 @@ export const handleError = (
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForSsoRedirect());
+    window.location.assign(routeForLoginPage());
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForSsoRedirect());
+    window.location.assign(routeForLoginPage());
   }
 
   if (isNetworkError(error)) {
@@ -58,12 +58,12 @@ export const handleUnauthorizedOrForbiddenError = (
   isBrowser = BROWSER,
 ): void => {
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForSsoRedirect());
+    window.location.assign(routeForLoginPage());
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForSsoRedirect());
+    window.location.assign(routeForLoginPage());
     return;
   }
 };

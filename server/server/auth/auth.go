@@ -226,19 +226,22 @@ func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProvider
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
-	// The Authorization-Extras header contains the ID token (JWT) that we should validate
-	// The Authorization header contains the access token (opaque string)
+	// Validate JWT tokens only when OIDC verifier is configured.
+	// This preserves backward compatibility for deployments that use
+	// non-OIDC auth (e.g., custom auth proxy, access token callback).
 	idToken := c.Request().Header.Get(AuthorizationExtrasHeader)
-	ctx := c.Request().Context()
-	if idToken != "" {
-		log.Println("[Auth] Validating ID token from Authorization-Extras header")
-		if err := validateJWT(ctx, idToken); err != nil {
-			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid ID token: %v", err))
-		}
-	} else {
-		log.Println("[Auth] No Authorization-Extras header, validating Authorization header")
-		if err := validateJWT(ctx, stripBearerPrefix(token)); err != nil {
-			return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid token: %v", err))
+	if tokenVerifier != nil {
+		ctx := c.Request().Context()
+		if idToken != "" {
+			log.Println("[Auth] Validating ID token from Authorization-Extras header")
+			if err := validateJWT(ctx, idToken); err != nil {
+				return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid ID token: %v", err))
+			}
+		} else {
+			log.Println("[Auth] No Authorization-Extras header, validating Authorization header")
+			if err := validateJWT(ctx, stripBearerPrefix(token)); err != nil {
+				return echo.NewHTTPError(http.StatusUnauthorized, fmt.Sprintf("invalid token: %v", err))
+			}
 		}
 	}
 

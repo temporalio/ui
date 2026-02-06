@@ -60,7 +60,7 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
 export const requestFromAPI = async <T>(
   endpoint: toURLParams[0],
   init: RequestFromAPIOptions = {},
-): Promise<T | undefined> => {
+): Promise<T> => {
   const {
     params = {},
     request = fetch,

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { handleError } from './handle-error';
-import { routeForSsoRedirect } from './route-for';
+import { routeForLoginPage } from './route-for';
 
 const realLocation = window.location.assign;
 const fakeLocation = {
@@ -28,7 +28,7 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForSsoRedirect());
+    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
   it('should redirect if it is an unauthorized error with statusCode', () => {
@@ -39,7 +39,7 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForSsoRedirect());
+    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
   it('should redirect if it is a forbidden error with status', () => {
@@ -50,7 +50,7 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForSsoRedirect());
+    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
   it('should redirect if it is a forbidden error with statusCode', () => {
@@ -61,7 +61,7 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForSsoRedirect());
+    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
   it('should not redirect if not 401/403', () => {
