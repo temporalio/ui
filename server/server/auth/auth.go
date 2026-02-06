@@ -100,7 +100,27 @@ func SetUser(c echo.Context, user *User) error {
 	if rt := user.OAuth2Token.RefreshToken; rt != "" {
 		log.Println("[Auth] Setting refresh token cookie")
 
-		refreshMaxAge := int((30 * 24 * time.Hour).Seconds())
+		// Calculate MaxAge from OAuth2 token expiry.
+		// IMPORTANT: When a refresh token is issued, oauth2.Token.Expiry typically
+		// reflects the refresh token's lifetime, not the access token's lifetime.
+		// This is standard behavior in OIDC flows with offline_access scope.
+		// See: https://pkg.go.dev/golang.org/x/oauth2#Token
+		var refreshMaxAge int
+		if user.OAuth2Token.Expiry.IsZero() {
+			// Fallback: if IdP doesn't provide expiry, use 7 days
+			refreshMaxAge = int((7 * 24 * time.Hour).Seconds())
+			log.Printf("[Auth] Warning: No refresh token expiry from IdP, using 7-day default")
+		} else {
+			// Use IdP's expiry, capped at 30 days for safety
+			maxAge := time.Until(user.OAuth2Token.Expiry)
+			if maxAge > 30*24*time.Hour {
+				maxAge = 30 * 24 * time.Hour
+				log.Printf("[Auth] Warning: IdP refresh token expiry > 30 days, capping at 30 days")
+			}
+			refreshMaxAge = int(maxAge.Seconds())
+			log.Printf("[Auth] Setting refresh cookie MaxAge to %d seconds (%.1f days) from IdP",
+				refreshMaxAge, maxAge.Hours()/24)
+		}
 
 		refreshCookie := &http.Cookie{
 			Name:     "refresh",
