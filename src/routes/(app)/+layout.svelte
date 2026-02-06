@@ -34,6 +34,7 @@
     routeForSchedules,
     routeForStandaloneActivities,
     routeForWorkerDeployments,
+    routeForWorkers,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
@@ -76,6 +77,7 @@
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
+      workersRoute: routeForWorkers({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
       archivalRoute: routeForArchivalWorkflows({ namespace }),
       namespacesRoute: routeForNamespaces(),
@@ -90,6 +92,7 @@
       standaloneActivitiesRoute,
       schedulesRoute,
       batchOperationsRoute,
+      workersRoute,
       workerDeploymentsRoute,
       archivalRoute,
       namespacesRoute,
@@ -100,6 +103,7 @@
       standaloneActivitiesRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
+      workersRoute: string;
       workerDeploymentsRoute: string;
       archivalRoute: string;
       namespacesRoute: string;
@@ -118,6 +122,7 @@
           !path.includes(workflowsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
+          !path.includes(workersRoute) &&
           !path.includes(workerDeploymentsRoute) &&
           !path.includes(standaloneActivitiesRoute) &&
           !path.includes(archivalRoute),
@@ -150,11 +155,12 @@
         isActive: (path) => path.includes(batchOperationsRoute),
       },
       {
-        href: workerDeploymentsRoute,
+        href: workersRoute,
         icon: 'merge',
         label: translate('deployments.deployments'),
         tooltip: translate('deployments.worker-deployments'),
-        isActive: (path) => path.includes(workerDeploymentsRoute),
+        isActive: (path) =>
+          path.includes(workersRoute) || path.includes(workerDeploymentsRoute),
       },
       {
         href: nexusRoute,
@@ -196,6 +202,7 @@
     workflowsRoute,
     schedulesRoute,
     batchOperationsRoute,
+    workersRoute,
     workerDeploymentsRoute,
     archivalRoute,
     standaloneActivitiesRoute,
@@ -204,6 +211,7 @@
     [
       workflowsRoute,
       schedulesRoute,
+      workersRoute,
       workerDeploymentsRoute,
       batchOperationsRoute,
       archivalRoute,
@@ -226,8 +234,8 @@
         fullRoute: routeForStandaloneActivities({ namespace }),
       },
       {
-        subPath: 'worker-deployments',
-        fullRoute: routeForWorkerDeployments({ namespace }),
+        subPath: 'workers',
+        fullRoute: routeForWorkers({ namespace }),
       },
     ];
 
@@ -235,6 +243,16 @@
       if (page.url.pathname.endsWith(subPath)) {
         return fullRoute;
       }
+    }
+
+    // Handle workers page
+    if (page.url.pathname.endsWith('workers')) {
+      return routeForWorkers({ namespace });
+    }
+
+    // Handle workers page
+    if (page.url.pathname.includes('workers')) {
+      return routeForWorkers({ namespace });
     }
 
     return routeForWorkflows({ namespace });

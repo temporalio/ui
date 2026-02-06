@@ -2,11 +2,11 @@
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import WorkerSearchTable from '$lib/components/workers/worker-search-table.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import WorkerDeployments from '$lib/pages/deployments.svelte';
   import {
     routeForWorkerDeployments,
     routeForWorkers,
@@ -17,7 +17,7 @@
   const workersHref = $derived(routeForWorkers({ namespace }));
   const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
 
-  const pageTitle = $derived(translate('deployments.worker-deployments'));
+  const pageTitle = $derived(translate('workers.workers'));
 </script>
 
 <PageTitle title={pageTitle} url={page.url.href} />
@@ -33,16 +33,16 @@
         label={translate('workers.workers')}
         id="workers-tab"
         href={workersHref}
-        active={false}
+        active={true}
       />
       <Tab
         label={translate('deployments.deployments')}
         id="deployments-tab"
         href={deploymentsHref}
-        active={true}
+        active={false}
       />
     </TabList>
   </Tabs>
 </header>
 
-<WorkerDeployments />
+<WorkerSearchTable {namespace} />

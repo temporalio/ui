@@ -1,17 +1,15 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import WorkerTable from '$lib/components/worker-table.svelte';
-  import { getPollers } from '$lib/services/pollers-service';
+  import TaskQueueWorkerInsights from '$lib/components/task-queue/worker-insights.svelte';
 
-  const { queue: taskQueue, namespace } = $derived(page.params);
+  const { queue: taskQueue } = $derived(page.params);
 </script>
 
-{#await getPollers({ queue: taskQueue, namespace }) then workers}
-  <section class="flex flex-col gap-4">
-    <h1 data-testid="task-queue-name">
-      {taskQueue}
-    </h1>
-    <WorkerTable {workers} />
-  </section>
-{/await}
+<section class="flex flex-col gap-4">
+  <h1 data-testid="task-queue-title">Task Queue</h1>
+  <h2 data-testid="task-queue-name">
+    {taskQueue}
+  </h2>
+  <TaskQueueWorkerInsights />
+</section>
