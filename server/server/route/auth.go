@@ -112,7 +112,7 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
 	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
 	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration)) // compatibility with UI v1
-	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider))
+	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
 	api.GET("/logout", logout())
 }
 
@@ -189,12 +189,17 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 
 // refreshTokens exchanges a refresh token (stored in an HttpOnly cookie) for a new access token
 // and optionally a new ID token. It resets the cookies using auth.SetUser and returns 200.
-func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider) func(echo.Context) error {
+func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
 	return func(c echo.Context) error {
 		startTime := time.Now()
 		clientIP := c.RealIP()
 
 		log.Printf("token_refresh_attempt ip=%s", clientIP)
+
+		if err := auth.ValidateSessionDuration(c, maxSessionDuration); err != nil {
+			log.Printf("token_refresh_denied reason=session_expired ip=%s", clientIP)
+			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		}
 
 		// Read refresh cookie
 		refreshCookie, err := c.Request().Cookie("refresh")
@@ -210,7 +215,7 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 		if err != nil {
 			duration := time.Since(startTime).Milliseconds()
 			log.Printf("token_refresh_failed reason=token_exchange_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
-			return echo.NewHTTPError(http.StatusUnauthorized, "unable to refresh token: "+err.Error())
+			return echo.NewHTTPError(http.StatusUnauthorized, "unable to refresh token")
 		}
 
 		log.Printf("token_exchange_success ip=%s expiry=%s", clientIP, newTok.Expiry.Format(time.RFC3339))

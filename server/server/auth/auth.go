@@ -69,12 +69,11 @@ func SetUser(c echo.Context, user *User) error {
 
 	if user.IDToken != nil {
 		userR.IDToken = user.IDToken.RawToken
-	}
-
-	if user.IDToken.Claims != nil {
-		userR.Name = user.IDToken.Claims.Name
-		userR.Email = user.IDToken.Claims.Email
-		userR.Picture = user.IDToken.Claims.Picture
+		if user.IDToken.Claims != nil {
+			userR.Name = user.IDToken.Claims.Name
+			userR.Email = user.IDToken.Claims.Email
+			userR.Picture = user.IDToken.Claims.Picture
+		}
 	}
 
 	b, err := json.Marshal(userR)
@@ -99,25 +98,9 @@ func SetUser(c echo.Context, user *User) error {
 	}
 
 	if rt := user.OAuth2Token.RefreshToken; rt != "" {
-		log.Printf("[Auth] Setting refresh token cookie (length: %d)", len(rt))
+		log.Println("[Auth] Setting refresh token cookie")
 
-		// Calculate MaxAge from OAuth2 token expiry
-		var refreshMaxAge int
-		if user.OAuth2Token.Expiry.IsZero() {
-			// Fallback: if IdP doesn't provide expiry, use 7 days
-			refreshMaxAge = int((7 * 24 * time.Hour).Seconds())
-			log.Printf("[Auth] Warning: No refresh token expiry from IdP, using 7-day default")
-		} else {
-			// Use IdP's expiry, capped at 30 days for safety
-			maxAge := time.Until(user.OAuth2Token.Expiry)
-			if maxAge > 30*24*time.Hour {
-				maxAge = 30 * 24 * time.Hour
-				log.Printf("[Auth] Warning: IdP refresh token expiry > 30 days, capping at 30 days")
-			}
-			refreshMaxAge = int(maxAge.Seconds())
-			log.Printf("[Auth] Setting refresh cookie MaxAge to %d seconds (%.1f days) from IdP",
-				refreshMaxAge, maxAge.Hours()/24)
-		}
+		refreshMaxAge := int((30 * 24 * time.Hour).Seconds())
 
 		refreshCookie := &http.Cookie{
 			Name:     "refresh",
@@ -155,8 +138,8 @@ func SetSessionStart(c echo.Context, maxSessionDuration time.Duration) {
 	c.SetCookie(cookie)
 }
 
-// validateSessionDuration checks if the session has exceeded the configured max duration.
-func validateSessionDuration(c echo.Context, maxSessionDuration time.Duration) error {
+// ValidateSessionDuration checks if the session has exceeded the configured max duration.
+func ValidateSessionDuration(c echo.Context, maxSessionDuration time.Duration) error {
 	if maxSessionDuration <= 0 {
 		return nil
 	}
@@ -222,7 +205,7 @@ func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProvider
 	}
 
 	// Check if session has exceeded max duration (if configured)
-	if err := validateSessionDuration(c, cfg.Auth.MaxSessionDuration); err != nil {
+	if err := ValidateSessionDuration(c, cfg.Auth.MaxSessionDuration); err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
