@@ -8,6 +8,7 @@
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
+  import { Action } from '$lib/models/workflow-actions';
   import {
     fetchAllEvents,
     throttleRefresh,
@@ -27,6 +28,7 @@
   import {
     initialWorkflowRun,
     refresh,
+    type RefreshAction,
     workflowRun,
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
@@ -133,10 +135,15 @@
   };
 
   const getOnlyWorkflowWithPendingActivities = async (
-    refresh: number,
+    refresh: RefreshAction,
     pause: boolean,
   ) => {
-    if (refresh && !pause && $workflowRun?.workflow?.isRunning) {
+    const shouldFetch =
+      refresh.timestamp &&
+      (refresh.action in Action ||
+        (!pause && $workflowRun?.workflow?.isRunning));
+
+    if (shouldFetch) {
       const { workflow, error } = await fetchWorkflow({
         namespace,
         workflowId,

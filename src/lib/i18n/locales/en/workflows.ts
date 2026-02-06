@@ -52,6 +52,8 @@ export const Strings = {
   pause: 'Pause',
   unpause: 'Unpause',
   paused: 'Paused',
+  unpaused: 'Unpaused',
+  signaled: 'Signaled',
   reset: 'Reset',
   signal: 'Send a Signal',
   update: 'Send an Update',
@@ -63,6 +65,8 @@ export const Strings = {
   'select-all': 'select all {{count, number}} workflows',
   'select-all-trailing': ' matching your query',
   'request-cancellation': 'Request Cancellation',
+  'pause-workflow': 'Pause Workflow',
+  'unpause-workflow': 'Unpause Workflow',
   'back-to-workflows': 'Back to Workflows',
   'back-to-archived-workflows': 'Back to Archived Workflows',
   input: 'Input',
@@ -91,6 +95,8 @@ export const Strings = {
     'Signaling workflows is not enabled, please contact your administrator for assistance.',
   'update-disabled':
     'Updating workflows is not enabled, please contact your administrator for assistance.',
+  'update-disabled-on-pause':
+    'Cannot update workflow while the workflow is paused.',
   'terminate-disabled':
     'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
   'terminate-success': 'Workflow terminated.',
@@ -121,6 +127,20 @@ export const Strings = {
   'reset-success-alert-title': 'This Workflow has been reset',
   'reset-success-alert-description':
     'You can find the resulting Workflow Execution <1>here</1>.',
+  'workflow-paused': 'This Workflow is Paused',
+  'workflow-paused-reason': 'Reason this Workflow is paused',
+  'workflow-paused-description':
+    'The worker will no longer process tasks on this Workflow. There are still some events that will continue to run:',
+  'workflow-pause-description':
+    'Pausing a Workflow means the Worker will no longer process tasks on this Workflow. Some events that will continue to run: ',
+  'workflow-pause-description-item-1':
+    'Inflight activities will successfully complete, retries will not be actioned. ',
+  'workflow-pause-description-item-2':
+    'Child Workflows will continue to execute independently of this Workflow.',
+  'workflow-pause-description-item-3':
+    'Signals will continue to be collected by the Temporal Server.',
+  'pause-success': 'Workflow paused',
+  'unpause-success': 'Workflow unpaused',
   'history-tab': 'History',
   'workflow-history': 'Workflow History',
   'workers-tab': 'Workers',

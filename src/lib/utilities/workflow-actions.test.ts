@@ -51,6 +51,12 @@ describe('formatReason', () => {
       expect(
         formatReason({ action: Action.Terminate, reason: 'Testing', identity }),
       ).toEqual('Testing Terminated by webui');
+      expect(
+        formatReason({ action: Action.Pause, reason: 'Testing', identity }),
+      ).toEqual('Testing Paused by webui');
+      expect(
+        formatReason({ action: Action.Unpause, reason: 'Testing', identity }),
+      ).toEqual('Testing Unpaused by webui');
     });
   });
 
@@ -65,6 +71,12 @@ describe('formatReason', () => {
     expect(
       formatReason({ action: Action.Terminate, reason, identity }),
     ).toEqual('Terminated by webui');
+    expect(formatReason({ action: Action.Pause, reason, identity })).toEqual(
+      'Paused by webui',
+    );
+    expect(formatReason({ action: Action.Unpause, reason, identity })).toEqual(
+      'Unpaused by webui',
+    );
   });
 
   describe('with an authorized user', () => {
@@ -93,6 +105,20 @@ describe('formatReason', () => {
           identity,
         }),
       ).toEqual('Testing Terminated by test@temporal.io - webui');
+      expect(
+        formatReason({
+          action: Action.Pause,
+          reason,
+          identity,
+        }),
+      ).toEqual('Testing Paused by test@temporal.io - webui');
+      expect(
+        formatReason({
+          action: Action.Unpause,
+          reason,
+          identity,
+        }),
+      ).toEqual('Testing Unpaused by test@temporal.io - webui');
     });
 
     it('should return the placeholder if there is no reason', () => {
@@ -119,6 +145,20 @@ describe('formatReason', () => {
           identity,
         }),
       ).toEqual('Terminated by test@temporal.io - webui');
+      expect(
+        formatReason({
+          action: Action.Pause,
+          reason,
+          identity,
+        }),
+      ).toEqual('Paused by test@temporal.io - webui');
+      expect(
+        formatReason({
+          action: Action.Unpause,
+          reason,
+          identity,
+        }),
+      ).toEqual('Unpaused by test@temporal.io - webui');
     });
   });
 });

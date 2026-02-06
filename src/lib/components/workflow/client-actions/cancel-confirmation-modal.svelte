@@ -3,8 +3,10 @@
 
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
   import { cancelWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
+  import { triggerRefresh as triggerWorkflowRunRefresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -12,12 +14,20 @@
   export let open: boolean;
   export let workflow: WorkflowExecution;
   export let namespace: string;
-  export let refresh: Writable<number>;
+  export let refresh: Writable<number> | undefined = undefined;
 
   let loading: boolean;
   let error: string = '';
 
   const identity = getIdentity();
+
+  const triggerRefresh = () => {
+    if (refresh) {
+      $refresh = Date.now();
+    } else {
+      triggerWorkflowRunRefresh(Action.Cancel);
+    }
+  };
 
   const cancel = async () => {
     error = '';
@@ -29,7 +39,7 @@
         identity,
       });
       open = false;
-      $refresh = Date.now();
+      triggerRefresh();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
         message: translate('workflows.cancel-success'),
