@@ -157,23 +157,6 @@ When developing new features that require API endpoints for the OSS version of T
 4. Coordinate with SDK team to implement missing gRPC methods
 5. Update adapters once endpoints are available
 
-## Authentication
-
-Temporal UI supports OAuth2/OIDC authentication with automatic token refresh and configurable session duration.
-
-**Quick Start:**
-```bash
-pnpm dev:with-auth  # Start with local OIDC server
-```
-
-See [AUTHENTICATION.md](./AUTHENTICATION.md) for complete documentation on:
-- Configuration and setup
-- Token refresh flow
-- Session duration management
-- Testing procedures
-- Security considerations
-- Troubleshooting
-
 ## Testing
 We use [Playwright](https://playwright.dev) to interactively test the Temporal UI.
 

@@ -34,11 +34,11 @@ export const handleError = (
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForLoginPage(error?.message));
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForLoginPage(error?.message));
   }
 
   if (isNetworkError(error)) {
@@ -57,13 +57,15 @@ export const handleUnauthorizedOrForbiddenError = (
   error: APIErrorResponse,
   isBrowser = BROWSER,
 ): void => {
+  const msg = `${error?.status} ${error?.body?.message}`;
+
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForLoginPage(msg));
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForLoginPage(msg));
     return;
   }
 };

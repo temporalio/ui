@@ -3,7 +3,6 @@ import { BROWSER } from 'esm-env';
 import { getAuthUser } from '$lib/stores/auth-user';
 import type { NetworkError } from '$lib/types/global';
 
-import { refreshTokens } from './auth-refresh';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
@@ -78,13 +77,10 @@ export const requestFromAPI = async <T>(
     if (token) query.set('nextPageToken', token);
   } else {
     const nextPageToken = token ? { next_page_token: token } : {};
-    // Filter out undefined values before passing to URLSearchParams
-    const paramsWithoutUndefined = Object.fromEntries(
-      Object.entries({ ...params, ...nextPageToken }).filter(
-        ([_, v]) => v !== undefined,
-      ),
-    ) as Record<string, string>;
-    query = new URLSearchParams(paramsWithoutUndefined);
+    query = new URLSearchParams({
+      ...params,
+      ...nextPageToken,
+    });
   }
   const url = toURL(endpoint, query);
 
@@ -97,36 +93,15 @@ export const requestFromAPI = async <T>(
     const queryIsTooLong = [...query.values()].some(
       (value) => value.length > MAX_QUERY_LENGTH,
     );
-
-    const makeRequest = async () =>
-      queryIsTooLong
-        ? new Response(
-            JSON.stringify({ message: 'Query string is too long' }),
-            {
-              status: 414,
-              statusText: 'URI Too Long',
-            },
-          )
-        : await request(url, options);
-
-    let response = await makeRequest();
-    let { status, statusText } = response;
-
-    if (isBrowser && status === 401) {
-      const refreshed = await refreshTokens();
-      if (refreshed) {
-        options = withSecurityOptions(init.options, isBrowser);
-        if (!endpoint.endsWith('api/v1/settings')) {
-          options = await withAuth(options, isBrowser);
-        }
-        response = await makeRequest();
-        status = response.status;
-        statusText = response.statusText;
-      }
-      // If refresh failed, let the error flow to handleError() which will redirect to login
-    }
-
+    const response = queryIsTooLong
+      ? new Response(JSON.stringify({ message: 'Query string is too long' }), {
+          status: 414,
+          statusText: 'URI Too Long',
+        })
+      : await request(url, options);
     const body = await response.json();
+
+    const { status, statusText } = response;
 
     if (!response.ok) {
       if (onError && isFunction(onError)) {
@@ -152,11 +127,11 @@ export const requestFromAPI = async <T>(
 };
 
 const withSecurityOptions = (
-  options: RequestInit | undefined,
+  options: RequestInit,
   isBrowser = BROWSER,
 ): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
-  opts.headers = withCsrf(opts.headers, isBrowser);
+  opts.headers = withCsrf(options?.headers, isBrowser);
   return opts;
 };
 
@@ -164,22 +139,21 @@ const withAuth = async (
   options: RequestInit,
   isBrowser = BROWSER,
 ): Promise<RequestInit> => {
-  const headers: Record<string, string> =
-    (options.headers as Record<string, string>) ?? {};
-
-  if ((globalThis as Record<string, unknown>)?.AccessToken) {
-    const accessToken = (globalThis as Record<string, unknown>)
-      .AccessToken as () => Promise<string>;
-    options.headers = await withBearerToken(headers, accessToken, isBrowser);
+  if (globalThis?.AccessToken) {
+    options.headers = await withBearerToken(
+      options?.headers,
+      globalThis.AccessToken,
+      isBrowser,
+    );
   } else if (getAuthUser().accessToken) {
     options.headers = await withBearerToken(
-      headers,
-      async () => getAuthUser().accessToken ?? '',
+      options?.headers,
+      async () => getAuthUser().accessToken,
       isBrowser,
     );
     options.headers = withIdToken(
-      options.headers as Record<string, string>,
-      getAuthUser().idToken ?? '',
+      options?.headers,
+      getAuthUser().idToken,
       isBrowser,
     );
   }
@@ -188,10 +162,13 @@ const withAuth = async (
 };
 
 const withBearerToken = async (
-  headers: Record<string, string>,
+  headers: HeadersInit,
   accessToken: () => Promise<string>,
   isBrowser = BROWSER,
-): Promise<Record<string, string>> => {
+): Promise<HeadersInit> => {
+  // At this point in the code path, headers will always be set.
+  /* c8 ignore next */
+  if (!headers) headers = {};
   if (!isBrowser) return headers;
 
   try {
@@ -208,10 +185,10 @@ const withBearerToken = async (
 };
 
 const withIdToken = (
-  headers: Record<string, string>,
+  headers: HeadersInit = {},
   idToken: string,
   isBrowser = BROWSER,
-): Record<string, string> => {
+): HeadersInit => {
   if (!isBrowser) return headers;
 
   if (idToken) {
@@ -221,27 +198,24 @@ const withIdToken = (
   return headers;
 };
 
-const withCsrf = (
-  headers: HeadersInit | undefined,
-  isBrowser = BROWSER,
-): Record<string, string> => {
-  const h: Record<string, string> = (headers as Record<string, string>) ?? {};
-  h['Caller-Type'] = 'operator';
-  if (!isBrowser) return h;
+const withCsrf = (headers: HeadersInit, isBrowser = BROWSER): HeadersInit => {
+  if (!headers) headers = {};
+  headers['Caller-Type'] = 'operator';
+  if (!isBrowser) return headers;
 
   const csrfCookie = '_csrf=';
   const csrfHeader = 'X-CSRF-TOKEN';
   try {
     const cookies = document.cookie.split(';');
     let csrf = cookies.find((c) => c.includes(csrfCookie));
-    if (csrf && !h[csrfHeader]) {
+    if (csrf && !headers[csrfHeader]) {
       csrf = csrf.trim().slice(csrfCookie.length);
-      h[csrfHeader] = csrf;
+      headers[csrfHeader] = csrf;
     }
     /* c8 ignore next 4 */
   } catch (error) {
     console.error(error);
   }
 
-  return h;
+  return headers;
 };
