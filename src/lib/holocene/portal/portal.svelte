@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { on } from 'svelte/events';
   import { scale } from 'svelte/transition';
 
   import { untrack } from 'svelte';
@@ -116,10 +117,8 @@
     });
   }
 
-  function getScrollableAncestors(
-    element: HTMLElement,
-  ): (HTMLElement | Window | Document)[] {
-    const ancestors: (HTMLElement | Window | Document)[] = [window, document];
+  function getScrollableAncestors(element: HTMLElement): Set<EventTarget> {
+    const ancestors = new Set<EventTarget>([document]);
     let parent = element.parentElement;
 
     while (parent) {
@@ -129,7 +128,7 @@
         (val) => val === 'auto' || val === 'scroll' || val === 'overlay',
       );
 
-      if (isScrollable) ancestors.push(parent);
+      if (isScrollable) ancestors.add(parent);
       parent = parent.parentElement;
     }
 
@@ -149,11 +148,21 @@
     resizeObserver.observe(anchorElement);
 
     const scrollableAncestors = getScrollableAncestors(anchorElement);
-    scrollableAncestors.forEach((ancestor) => {
-      ancestor.addEventListener('scroll', scheduleUpdate, { passive: true });
-    });
 
-    window.addEventListener('resize', scheduleUpdate, { passive: true });
+    const scrollCleanup = on(
+      document,
+      'scroll',
+      (event) => {
+        if (event.target && scrollableAncestors.has(event.target)) {
+          scheduleUpdate();
+        }
+      },
+      { passive: true, capture: true },
+    );
+
+    const resizeCleanup = on(window, 'resize', scheduleUpdate, {
+      passive: true,
+    });
 
     return () => {
       if (rafId !== null) {
@@ -161,10 +170,8 @@
         rafId = null;
       }
       resizeObserver.disconnect();
-      scrollableAncestors.forEach((ancestor) => {
-        ancestor.removeEventListener('scroll', scheduleUpdate);
-      });
-      window.removeEventListener('resize', scheduleUpdate);
+      scrollCleanup();
+      resizeCleanup();
     };
   });
 </script>
