@@ -262,6 +262,9 @@ func logout() func(echo.Context) error {
 		clearCookie(c, "refresh")
 		log.Printf("[Auth] Cleared refresh token cookie")
 
+		// Clear session start cookie
+		clearCookie(c, "session_start")
+
 		// Clear user data cookies (user0, user1, etc.)
 		// We don't know how many chunks exist, so clear up to 10
 		for i := 0; i < 10; i++ {

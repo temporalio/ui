@@ -5,7 +5,6 @@ import { resolve } from '$app/paths';
 import type { EventView } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
-import { getApiOrigin } from '$lib/utilities/get-api-origin';
 import { toURL } from '$lib/utilities/to-url';
 
 type RouteParameters = {
@@ -407,14 +406,6 @@ export const routeForLoginPage = (error = '', isBrowser = BROWSER): string => {
   }
 
   return resolve('/login', {});
-};
-
-export const routeForSsoRedirect = (isBrowser = BROWSER): string => {
-  const url = new URL(`${getApiOrigin()}/auth/sso`);
-  if (isBrowser) {
-    url.searchParams.set('returnUrl', window.location.href);
-  }
-  return url.toString();
 };
 
 export const routeForEventHistoryImport = (
