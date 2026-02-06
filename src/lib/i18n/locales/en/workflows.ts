@@ -322,4 +322,11 @@ export const Strings = {
   'workflow-timeout': 'Workflow Timeout',
   'custom-views': 'Custom Views',
   'scheduled-by': 'Scheduled By',
+  'auto-refresh-on': 'Auto Refresh On',
+  'auto-refresh-off': 'Auto Refresh Off',
+  minimized: 'Minimized',
+  expanded: 'Expanded',
+  'timeline-minimized':
+    'Timeline and Event History are collapsed to minimized height',
+  'timeline-expanded': 'Timeline and Event History are expanded to full height',
 } as const;
