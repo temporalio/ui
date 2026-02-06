@@ -21,22 +21,24 @@
 </script>
 
 <div
-  class="flex h-full flex-col justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
+  class="flex flex-col items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
 >
   <div role="list">
     <div
-      class="align-center flex items-center justify-between px-2 pb-4 group-data-[nav=closed]:flex-col"
+      class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col"
     >
       <a
         href={resolve('', {})}
-        class="flex w-fit items-center gap-1 text-nowrap"
+        class="flex w-fit items-center justify-center gap-2 text-nowrap"
       >
-        <Logo height={24} width={24} class="m-1" />
+        {#if subtitle === 'Cloud'}
+          <Logo height={24} width={24} class="m-1" />
+        {/if}
         {#if subtitle}
           <p
             class="{subtitle === 'Cloud'
               ? 'text-base'
-              : 'text-xs'} font-medium text-indigo-100 group-data-[nav=closed]:hidden"
+              : 'px-2 text-xs'} font-medium text-indigo-100 group-data-[nav=closed]:hidden"
           >
             {subtitle}
           </p>
