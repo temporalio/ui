@@ -113,13 +113,13 @@ func TestSetUser(t *testing.T) {
 
 func TestValidateAuthHeaderExists(t *testing.T) {
 	tests := []struct {
-		name               string
-		authEnabled        bool
-		useIDTokenAsBearer bool
-		authHeader         string
-		authExtrasHeader   string
-		expectedAuthHeader string
-		expectedError      bool
+		name                 string
+		authEnabled          bool
+		useIDTokenAsBearer   bool
+		authHeader           string
+		authExtrasHeader     string
+		expectedAuthHeader   string
+		expectedError        bool
 	}{
 		{
 			name:          "auth disabled - no validation",

@@ -31,7 +31,6 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
-	"path"
 	"regexp"
 	"strings"
 
@@ -141,7 +140,7 @@ const pageTemplate = `
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style nonce="{{.Nonce}}">
-			{{.CSS}}
+		{{.CSS}}
 	</style>
 </head>
 <body class="prose" {{if .Theme}}data-theme="{{.Theme}}"{{end}}>
@@ -152,13 +151,11 @@ const pageTemplate = `
 </html>
 `
 
-func SetRenderRoute(e *echo.Echo, publicPath string) {
-	renderPath := path.Join(publicPath, "render")
-
+func SetRenderRoute(e *echo.Echo) {
 	// Parse template once at startup
 	tmpl := template.Must(template.New("page").Parse(pageTemplate))
 
-	e.GET(renderPath, func(c echo.Context) error {
+	e.GET("/render", func(c echo.Context) error {
 		content := c.QueryParam("content")
 		theme := c.QueryParam("theme")
 		overrideTheme := c.QueryParam("overrideTheme")
@@ -311,14 +308,14 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 		}
 
 		body[data-theme='dark'] {
-			background-color: #141414;
+  		background-color: #141414;
 			color: #f8fafc;
 		}
-
+			
 		body[data-theme='dark'] a {
-			color: #8098f9;
+				color: #8098f9;
 		}
-
+				
 		body[data-theme='light-background'] {
 			background-color: #f8fafc;
 			color: #121416;
@@ -332,7 +329,6 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			background-color: #141414;
 			color: #f8fafc;
 		}
-
 		body[data-theme='dark-background'] a {
 			color: #8098f9;
 		}
@@ -341,7 +337,6 @@ func SetRenderRoute(e *echo.Echo, publicPath string) {
 			background-color: #fff;
 			color: #121416;
 		}
-
 		body[data-theme='light-primary'] a {
 			color: #444ce7;
 		}

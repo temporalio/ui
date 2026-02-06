@@ -8,21 +8,21 @@ export type UIServer = {
   ready: () => ReturnType<typeof waitForPort>;
 };
 
-export type ValidEnv = 'development' | 'e2e' | 'with-auth';
-
 let uiServer: UIServer;
 
 export const getUIServer = (): UIServer => {
   return uiServer;
 };
 
-const portForEnv = (env: ValidEnv) => {
+type Environemt = 'development' | 'e2e';
+
+const portForEnv = (env: Environemt) => {
+  if (env === 'development') return 8081;
   if (env === 'e2e') return 8080;
-  return 8081;
 };
 
 export const createUIServer = async (
-  env: ValidEnv = 'development',
+  env: 'development' | 'e2e' = 'development',
   options?: { verbose?: boolean },
 ) => {
   $.cwd = join(process.cwd(), 'server');
