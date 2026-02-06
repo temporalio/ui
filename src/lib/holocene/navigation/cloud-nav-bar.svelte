@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { resolve } from '$app/paths';
 
@@ -25,21 +26,26 @@
 >
   <div role="list">
     <div
-      class="align-center flex items-center justify-between px-2 pb-4 group-data-[nav=closed]:flex-col"
+      class="align-center flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col"
     >
       <a
         href={resolve('', {})}
         class="flex w-fit items-center gap-1 text-nowrap"
       >
-        <Logo height={24} width={24} class="m-1" />
+        <Logo
+          height={24}
+          width={24}
+          class={merge('m-1', subtitle !== 'Cloud' && 'hidden')}
+        />
         {#if subtitle}
-          <p
-            class="{subtitle === 'Cloud'
-              ? 'text-base'
-              : 'text-xs'} font-medium text-indigo-100 group-data-[nav=closed]:hidden"
+          <span
+            class={merge(
+              'font-medium text-indigo-100 group-data-[nav=closed]:hidden',
+              subtitle !== 'Cloud' && 'pl-2 text-xs',
+            )}
           >
             {subtitle}
-          </p>
+          </span>
         {/if}
       </a>
 
