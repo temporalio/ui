@@ -10,14 +10,20 @@
   interface Props {
     version: string;
     navOpen: boolean;
-    subtitle?: string;
+    isCloud?: boolean;
     children?: Snippet;
     bottom?: Snippet;
     ontoggle: () => void;
   }
 
-  let { version, navOpen, subtitle, children, bottom, ontoggle }: Props =
-    $props();
+  let {
+    version,
+    navOpen,
+    isCloud = false,
+    children,
+    bottom,
+    ontoggle,
+  }: Props = $props();
 </script>
 
 <div
@@ -25,14 +31,15 @@
 >
   <a href={resolve('', {})} class="flex w-fit items-center gap-1 text-nowrap">
     <Logo height={24} width={24} class="m-1" />
-
     <p class="text-base font-medium group-data-[nav=closed]:hidden">
-      {subtitle || 'Self-Hosted'}
+      {isCloud ? 'Cloud' : 'Self-Hosted'}
     </p>
   </a>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="mx-2 flex items-center justify-center opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 group-data-[nav=closed]:p-2"
+    class="mx-2 flex items-center justify-center opacity-0 transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 group-hover:opacity-100 group-focus:opacity-100 group-data-[nav=open]:rotate-180 group-data-[nav=closed]:p-2 {isCloud
+      ? 'focus-visible:ring-success'
+      : 'focus-visible:ring-primary/70'}"
     onclick={ontoggle}
   >
     <Icon name="chevron-right" />
