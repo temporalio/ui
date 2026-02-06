@@ -39,9 +39,9 @@
   $: showJson = $page.url.searchParams.has('json');
   $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
 
-  let workflowError: NetworkError;
+  let workflowError: NetworkError | null = null;
   let workflowRunController: AbortController;
-  let refreshInterval;
+  let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
   const { copy, copied } = copyToClipboard();
 
@@ -92,12 +92,16 @@
       return;
     }
 
+    if (!workflow) {
+      return;
+    }
+
     await decodeUserMetadata(workflow);
 
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
 
-    $workflowRun = { ...$workflowRun, workflow, workers };
+    $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
     workflowRunController = new AbortController();
 
