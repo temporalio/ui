@@ -1,0 +1,74 @@
+publicPath:
+port: 8081
+enableUi: true
+bannerText:
+cors:
+  cookieInsecure: false
+  allowOrigins:
+    - http://localhost:3000 # used at development by https://github.com/temporalio/ui
+refreshInterval: 1m
+defaultNamespace: default
+showTemporalSystemNamespace: false
+feedbackUrl:
+notifyOnNewVersion: true
+disableWriteActions: false
+workflowTerminateDisabled: false
+workflowCancelDisabled: false
+workflowSignalDisabled: false
+workflowUpdateDisabled: false
+workflowResetDisabled: false
+batchActionsDisabled: false
+startWorkflowDisabled: false
+hideWorkflowQueryErrors: false
+refreshWorkflowCountsDisabled: false
+# =============================================================================
+# Auth Testing Configuration
+# =============================================================================
+# This configuration is used with `pnpm dev:with-auth` for local testing.
+# The OIDC server settings in utilities/oidc-server/support/configuration.ts
+# should be kept in sync with these values for consistent testing.
+#
+# Testing Scenarios:
+#   1. Token Refresh: Set maxSessionDuration > AccessToken TTL (60s in OIDC config)
+#      This forces refresh before session expiry. Current: 2m session, 1m tokens.
+#   2. Session Expiry: Wait for maxSessionDuration to elapse. User will be
+#      redirected to login and must re-authenticate at the OIDC provider.
+#   3. No Session Limit: Set maxSessionDuration to 0 or remove it entirely.
+#      Tokens will refresh indefinitely until the OIDC refresh token expires.
+# =============================================================================
+auth:
+  enabled: true
+  maxSessionDuration: 2m # Max time before forced re-login (0 = unlimited)
+  providers:
+    - label: Dummy OIDC
+      type: oidc # for futureproofing; only oidc is supported today
+      providerUrl: http://localhost:8889
+      issuerUrl: "" # needed if the Issuer Url and the Provider Url are different
+      clientId: temporal-ui
+      clientSecret: temporal-secret
+      scopes:
+        - openid
+        - profile
+        - email
+        - offline_access
+      callbackUrl: http://localhost:8081/auth/sso/callback
+      options: # added as URL query params when redirecting to auth provider
+        audience: myorg-dev
+        organization: org_xxxxxxxxxxxx
+        invitation:
+tls:
+  caFile:
+  certFile:
+  keyFile:
+  caData:
+  certData:
+  keyData:
+  enableHostVerification: false
+  serverName:
+codec:
+  endpoint:
+  passAccessToken: false
+  includeCredentials: false
+forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
+  - X-Forwarded-For
+

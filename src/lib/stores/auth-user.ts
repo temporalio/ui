@@ -26,3 +26,23 @@ export const setAuthUser = (user: User) => {
 export const clearAuthUser = () => {
   authUser.set({});
 };
+
+/**
+ * Logs out the user by calling the backend logout endpoint
+ * and clearing local auth state.
+ */
+export async function logout(): Promise<void> {
+  try {
+    await fetch('/auth/logout', {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    console.info('[Auth] Logout successful, cookies cleared');
+  } catch (error) {
+    console.error('[Auth] Logout request failed:', error);
+  }
+
+  clearAuthUser();
+  window.location.href = '/';
+}
