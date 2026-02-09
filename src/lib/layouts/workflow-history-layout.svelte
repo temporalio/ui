@@ -125,18 +125,18 @@
 </script>
 
 <InputAndResults />
-<div class="relative pb-24">
+<div class="relative">
   <div
     class={merge(
       'surface-background flex flex-wrap items-center justify-between gap-2 border-b border-subtle py-2 xl:gap-8',
       !$minimizeEventView && 'sticky top-0 z-30 md:top-12',
     )}
   >
-    <div class="flex items-center gap-4">
+    <div class="items-bottom flex gap-4">
       <h2>
         {translate('workflows.history-tab')}
       </h2>
-      <TabButtons>
+      <TabButtons class="relative top-[2px]">
         <TabButton
           active={$eventViewType === 'feed'}
           data-testid="feed"
@@ -226,7 +226,7 @@
         <WorkflowHistoryJson />
       </div>
     {:else}
-      <div data-testid="event-summary-table">
+      <div data-testid="event-summary-table ">
         <EventSummaryTable {updating} {items} {groups} {compact} minimized />
       </div>
     {/if}
