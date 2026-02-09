@@ -22,7 +22,7 @@
 </script>
 
 <div
-  class="flex items-center justify-between px-2 pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
+  class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
 >
   <a
     href={resolve('', {})}
