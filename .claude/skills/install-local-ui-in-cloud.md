@@ -194,3 +194,17 @@ This replicates the `Generate temporalio/ui PR` GitHub Actions workflow which:
 3. Creates a cloud-ui PR with the updated package reference
 
 The local version gives immediate feedback without waiting for CI.
+
+## ⚠️ CRITICAL: Do NOT Commit cloud-ui Changes
+
+**IMPORTANT:** The changes made to `cloud-ui/package.json` and `cloud-ui/pnpm-lock.yaml` are for **local testing only**.
+
+**DO NOT:**
+
+- ❌ Commit changes in cloud-ui
+- ❌ Push changes in cloud-ui
+- ❌ Create PRs with these changes
+
+**Only commit and push changes in the UI repo!**
+
+The GitHub Actions workflow will create the proper cloud-ui PR automatically when it's available.
