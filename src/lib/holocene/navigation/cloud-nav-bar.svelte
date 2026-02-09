@@ -22,7 +22,7 @@
 </script>
 
 <div
-  class="flex h-full flex-col justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
+  class="flex min-h-full flex-col justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
 >
   <div role="list">
     <div
