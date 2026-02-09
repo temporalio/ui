@@ -90,4 +90,3 @@ func generateCertKeyPair(t *testing.T, commonName string) (certPEM, keyPEM []byt
 	keyPEM = pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
 	return certPEM, keyPEM
 }
-

@@ -131,6 +131,8 @@ export const fromSeconds = (
   seconds: string,
   { delimiter = ', ' } = {},
 ): string => {
+  if (!seconds) return '';
+
   const parsedSeconds = parseInt(seconds);
   const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
 

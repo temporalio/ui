@@ -62,15 +62,23 @@
     disableTracking?: boolean;
   };
 
+  // Prevent Svelte 5 event handler props - use on:click instead
+  type ForbiddenEventProps = {
+    onclick?: never;
+    onkeydown?: never;
+  };
+
   export type ButtonStyles = VariantProps<typeof buttonStyles>;
 
   export type ButtonWithoutHrefProps = BaseProps &
     ButtonStyles &
-    HTMLButtonAttributes;
+    Omit<HTMLButtonAttributes, 'onclick' | 'onkeydown'> &
+    ForbiddenEventProps;
 
   export type ButtonWithHrefProps = BaseProps &
     ButtonStyles &
-    HTMLAnchorAttributes & {
+    Omit<HTMLAnchorAttributes, 'onclick'> &
+    ForbiddenEventProps & {
       href: string;
       target?: HTMLAnchorAttributes['target'];
       disabled?: boolean;

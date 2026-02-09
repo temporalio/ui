@@ -1,17 +1,17 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import PayloadInputWithEncoding, {
-    type PayloadInputEncoding,
-  } from '$lib/components/payload-input-with-encoding.svelte';
+  import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
+  import { Action } from '$lib/models/workflow-actions';
   import { signalWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { triggerRefresh, workflowRun } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -19,7 +19,6 @@
   export let open: boolean;
   export let workflow: WorkflowExecution;
   export let namespace: string;
-  export let refresh: Writable<number>;
 
   $: ({ metadata } = $workflowRun);
   $: signalDefinitions = metadata?.definition?.signalDefinitions;
@@ -59,7 +58,7 @@
         name,
         identity,
       });
-      $refresh = Date.now();
+      triggerRefresh(Action.Signal);
       toaster.push({
         message: translate('workflows.signal-success'),
         id: 'workflow-signal-success-toast',
@@ -107,7 +106,7 @@
         <Option
           onclick={handleCustom}
           value="custom"
-          description="Input Signal name">Custom</Option
+          description="Input Signal name">{translate('common.custom')}</Option
         >
         {#each signalDefinitions as { name: value, description = '' }}
           <Option {value} {description}>{value}</Option>

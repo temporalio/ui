@@ -18,6 +18,7 @@ workflowCancelDisabled: false
 workflowSignalDisabled: false
 workflowUpdateDisabled: false
 workflowResetDisabled: false
+workflowPauseDisabled: false
 batchActionsDisabled: false
 startWorkflowDisabled: false
 hideWorkflowQueryErrors: false

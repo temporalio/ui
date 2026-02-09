@@ -64,7 +64,7 @@ func CORSMiddleware(config CORSConfig) echo.MiddlewareFunc {
 // handleStaticCORS handles standard CORS with predefined allowed origins
 func handleStaticCORS(c echo.Context, next echo.HandlerFunc, allowOrigins []string, config CORSConfig) error {
 	origin := c.Request().Header.Get("Origin")
-	
+
 	// Check if origin is in allowed list
 	allowed := false
 	for _, allowedOrigin := range allowOrigins {
@@ -89,7 +89,7 @@ func handleStaticCORS(c echo.Context, next echo.HandlerFunc, allowOrigins []stri
 // handleDynamicCORS handles unsafe allow all origins by using the request origin
 func handleDynamicCORS(c echo.Context, next echo.HandlerFunc, config CORSConfig) error {
 	origin := c.Request().Header.Get("Origin")
-	
+
 	// Only set CORS headers if origin is present
 	if origin != "" {
 		setCORSHeaders(c, origin, config)
@@ -106,14 +106,14 @@ func handleDynamicCORS(c echo.Context, next echo.HandlerFunc, config CORSConfig)
 // setCORSHeaders sets the appropriate CORS headers
 func setCORSHeaders(c echo.Context, origin string, config CORSConfig) {
 	c.Response().Header().Set("Access-Control-Allow-Origin", origin)
-	
+
 	if config.AllowCredentials {
 		c.Response().Header().Set("Access-Control-Allow-Credentials", "true")
 	}
-	
+
 	if len(config.AllowHeaders) > 0 {
 		c.Response().Header().Set("Access-Control-Allow-Headers", strings.Join(config.AllowHeaders, ", "))
 	}
-	
+
 	c.Response().Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 }

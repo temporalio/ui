@@ -102,6 +102,7 @@ export type WorkflowStatus =
   | 'ContinuedAsNew'
   | 'Canceled'
   | 'Terminated'
+  | 'Paused'
   | null;
 
 export type WorkflowType = string | null;
@@ -181,6 +182,7 @@ export type WorkflowExecution = {
   parent?: WorkflowIdentifier;
   url: string;
   isRunning: boolean;
+  isPaused: boolean;
   defaultWorkflowTaskTimeout: Duration;
   workflowExecutionTimeout?: Duration;
   canBeTerminated: boolean;

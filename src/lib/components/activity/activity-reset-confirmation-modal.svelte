@@ -6,7 +6,7 @@
   import { translate } from '$lib/i18n/translate';
   import { resetActivity } from '$lib/services/workflow-activities-service';
   import { toaster } from '$lib/stores/toaster';
-  import { refresh } from '$lib/stores/workflow-run';
+  import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
   import { getIdentity } from '$lib/utilities/core-context';
 
@@ -42,7 +42,7 @@
       type: includeType ? type : undefined,
       identity,
     });
-    $refresh = Date.now();
+    triggerRefresh();
     toaster.push({
       variant: 'success',
       message: translate('activities.reset-success', { activityId: id }),

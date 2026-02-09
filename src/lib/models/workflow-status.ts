@@ -4,6 +4,7 @@ export type WorkflowFilters = readonly (WorkflowStatus | 'All')[];
 
 export const workflowStatuses: readonly WorkflowStatus[] = [
   'Running',
+  'Paused',
   'TimedOut',
   'Completed',
   'Failed',

@@ -4,8 +4,10 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
   import { terminateWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
+  import { triggerRefresh as triggerWorkflowRunRefresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -13,7 +15,7 @@
   export let open: boolean;
   export let workflow: WorkflowExecution;
   export let namespace: string;
-  export let refresh: Writable<number>;
+  export let refresh: Writable<number> | undefined = undefined;
   export let first: string | undefined = undefined;
 
   let reason: string = '';
@@ -25,6 +27,14 @@
   const hideModal = () => {
     open = false;
     reason = '';
+  };
+
+  const triggerRefresh = () => {
+    if (refresh) {
+      $refresh = Date.now();
+    } else {
+      triggerWorkflowRunRefresh(Action.Terminate);
+    }
   };
 
   const terminate = async () => {
@@ -40,7 +50,7 @@
       });
       open = false;
       reason = '';
-      $refresh = Date.now();
+      triggerRefresh();
       toaster.push({
         id: 'workflow-termination-success-toast',
         message: translate('workflows.terminate-success'),

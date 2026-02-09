@@ -196,6 +196,8 @@
     <DetailListColumn>
       <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
       <DetailListLinkValue
+        copyable
+        copyableText={deployment}
         text={deployment}
         href={routeForWorkerDeployment({
           namespace,
@@ -207,14 +209,34 @@
         <DetailListLabel>
           {translate('deployments.build-id')}
         </DetailListLabel>
-        <DetailListTextValue text={versioningBuildId} />
+        <DetailListLinkValue
+          copyable
+          copyableText={versioningBuildId}
+          text={versioningBuildId}
+          href={deploymentVersion
+            ? routeForWorkflowsWithQuery({
+                namespace,
+                query: `TemporalWorkerDeploymentVersion="${deploymentVersion}"`,
+              })
+            : undefined}
+          iconName={deploymentVersion ? 'filter' : undefined}
+        />
       {/if}
 
       {#if versioningBehavior}
         <DetailListLabel>
           {translate('deployments.versioning-behavior')}
         </DetailListLabel>
-        <DetailListTextValue text={versioningBehavior} />
+        <DetailListLinkValue
+          copyable
+          copyableText={versioningBehavior}
+          text={versioningBehavior}
+          href={routeForWorkflowsWithQuery({
+            namespace,
+            query: `TemporalWorkflowVersioningBehavior="${versioningBehavior}"`,
+          })}
+          iconName="filter"
+        />
       {/if}
     </DetailListColumn>
   {/if}

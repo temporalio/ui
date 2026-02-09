@@ -133,6 +133,7 @@ export const Strings = {
   'copy-icon-title': 'Click to copy content',
   'copy-success-icon-title': 'Content copied to clipboard',
   'filter-workflows': 'Filter workflows',
+  'filter-activities': 'Filter activities',
   'event-category-filter-label': 'Open event category filter menu',
   'event-date-filter-label': 'Open event date filter menu',
   'date-time-menu-label': 'Open time format menu',

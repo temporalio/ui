@@ -28,6 +28,7 @@ const settings: Settings = {
   showTemporalSystemNamespace: false,
   batchActionsDisabled: false,
   workflowResetDisabled: false,
+  workflowPauseDisabled: false,
   workflowCancelDisabled: false,
   workflowSignalDisabled: false,
   workflowUpdateDisabled: false,

@@ -5,6 +5,7 @@
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -59,14 +60,23 @@
 
   const isRunning = $derived(workflow?.isRunning);
   const activitiesCanceled = $derived(
-    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
+    Boolean(
+      workflow?.status &&
+      ['Terminated', 'TimedOut', 'Canceled'].includes(workflow.status),
+    ),
   );
   const cancelInProgress = $derived(
-    isCancelInProgress(workflow?.status, $fullEventHistory),
+    Boolean(
+      workflow?.status &&
+      isCancelInProgress(workflow.status, $fullEventHistory),
+    ),
   );
+  const isPaused = $derived(workflow?.isPaused);
   const resetRunId = $derived(
-    workflow.workflowExtendedInfo?.resetRunId ||
-      $resetWorkflows[workflow?.runId],
+    workflow
+      ? workflow.workflowExtendedInfo?.resetRunId ||
+          $resetWorkflows[workflow.runId]
+      : undefined,
   );
   const workflowHasBeenReset = $derived(!!resetRunId);
   const workflowRelationships = $derived(
@@ -127,6 +137,7 @@
         <div class="xl:hidden">
           <WorkflowActions
             {isRunning}
+            {isPaused}
             {cancelInProgress}
             {workflow}
             {namespace}
@@ -154,6 +165,7 @@
     <div class="max-xl:hidden">
       <WorkflowActions
         {isRunning}
+        {isPaused}
         {cancelInProgress}
         {workflow}
         {namespace}
@@ -170,8 +182,39 @@
         icon="info"
         intent="info"
         title={translate('workflows.cancel-request-sent')}
+        class="max-w-screen-lg xl:w-2/3"
       >
         {translate('workflows.cancel-request-sent-description')}
+      </Alert>
+    </div>
+  {/if}
+  {#if isPaused}
+    <div in:fly={{ duration: 200, delay: 100 }}>
+      <Alert
+        icon="info"
+        intent="info"
+        title={translate('workflows.workflow-paused')}
+        class="max-w-screen-lg xl:w-2/3"
+        data-testid="workflow-paused-alert"
+      >
+        <div class="mt-2 flex flex-col gap-2">
+          <p>{translate('workflows.workflow-paused-description')}</p>
+          <ul class="list-disc pl-6">
+            <li>{translate('workflows.workflow-pause-description-item-1')}</li>
+            <li>{translate('workflows.workflow-pause-description-item-2')}</li>
+            <li>{translate('workflows.workflow-pause-description-item-3')}</li>
+          </ul>
+          {#if workflow?.workflowExtendedInfo?.pauseInfo?.reason}
+            <div>
+              <p>{translate('workflows.workflow-paused-reason')}</p>
+              <p class="text-secondary">
+                {workflow.workflowExtendedInfo.pauseInfo.reason} • {$timestamp(
+                  workflow.workflowExtendedInfo.pauseInfo.pausedTime,
+                )}
+              </p>
+            </div>
+          {/if}
+        </div>
       </Alert>
     </div>
   {/if}
@@ -182,6 +225,7 @@
         intent="info"
         data-testid="workflow-reset-alert"
         title={translate('workflows.reset-success-alert-title')}
+        class="max-w-screen-lg xl:w-2/3"
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
@@ -250,8 +294,10 @@
         )}
       >
         <Badge type="primary" class="px-2 py-0">
-          {getWorkflowPollersWithVersions(workflow, workers)?.pollers?.length ||
-            0}
+          {getWorkflowPollersWithVersions(
+            workflow.searchAttributes.indexedFields,
+            workers,
+          )?.pollers?.length || 0}
         </Badge>
       </Tab>
       <Tab

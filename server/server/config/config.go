@@ -58,6 +58,7 @@ type (
 		WorkflowSignalDisabled    bool `yaml:"workflowSignalDisabled"`
 		WorkflowUpdateDisabled    bool `yaml:"workflowUpdateDisabled"`
 		WorkflowResetDisabled     bool `yaml:"workflowResetDisabled"`
+		WorkflowPauseDisabled     bool `yaml:"workflowPauseDisabled"`
 		// Whether bulk/batch actions are enabled in the UI
 		BatchActionsDisabled bool `yaml:"batchActionsDisabled"`
 		// Whether start workflow is enabled in the UI
@@ -105,6 +106,10 @@ type (
 		Enabled bool `yaml:"enabled"`
 		// A list of auth providers. Currently enables only the first provider in the list.
 		Providers []AuthProvider `yaml:"providers"`
+		// MaxSessionDuration - optional maximum session duration. If set, users will be
+		// forced to re-login after this duration regardless of token validity.
+		// Example values: "8h", "24h", "168h" (1 week). If zero, no max duration is enforced.
+		MaxSessionDuration time.Duration `yaml:"maxSessionDuration"`
 	}
 
 	AuthProvider struct {

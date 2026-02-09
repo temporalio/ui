@@ -30,7 +30,11 @@ import {
 } from '$src/lib/types/workflows';
 
 export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
-export { mockNamespaceApi, NAMESPACE_API } from './mocks/namespace';
+export {
+  mockNamespaceApi,
+  mockNamespaceWithPauseCapability,
+  NAMESPACE_API,
+} from './mocks/namespace';
 export { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
 export { mockSettingsApi, SETTINGS_API } from './mocks/settings';
 export { mockSystemInfoApi } from './mocks/system-info';
@@ -41,7 +45,14 @@ export {
 } from './mocks/search-attributes';
 export { mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
 export { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
-export { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
+export {
+  mockWorkflowApi,
+  mockWorkflowPauseApi,
+  mockWorkflowUnpauseApi,
+  WORKFLOW_API,
+  WORKFLOW_PAUSE_API,
+  WORKFLOW_UNPAUSE_API,
+} from './mocks/workflow';
 export {
   mockWorkflowsCountApi,
   mockWorkflowsGroupByCountApi,

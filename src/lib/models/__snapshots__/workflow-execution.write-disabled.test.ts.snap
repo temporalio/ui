@@ -12,6 +12,7 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
   "historyEvents": "13",
   "historySizeBytes": undefined,
   "id": "temporal.fixture.cancelled.workflow.id",
+  "isPaused": false,
   "isRunning": false,
   "memo": {
     "fields": {},
@@ -66,6 +67,7 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
   "historyEvents": "18",
   "historySizeBytes": undefined,
   "id": "temporal.fixture.completed.workflow.id",
+  "isPaused": false,
   "isRunning": false,
   "memo": {
     "fields": {},
@@ -120,6 +122,7 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
   "historyEvents": "7",
   "historySizeBytes": undefined,
   "id": "temporal.fixture.failed.workflow.id",
+  "isPaused": false,
   "isRunning": false,
   "memo": {
     "fields": {},
@@ -167,6 +170,7 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
   "historyEvents": "13",
   "historySizeBytes": undefined,
   "id": "temporal.fixture.running.workflow.id",
+  "isPaused": false,
   "isRunning": true,
   "memo": {
     "fields": {},
@@ -247,6 +251,7 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
   "historyEvents": "30",
   "historySizeBytes": undefined,
   "id": "temporal.fixture.completed.workflow.id",
+  "isPaused": false,
   "isRunning": false,
   "memo": {
     "fields": {},
@@ -332,6 +337,7 @@ exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 
   "historyEvents": "18",
   "historySizeBytes": undefined,
   "id": "temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility",
+  "isPaused": false,
   "isRunning": false,
   "memo": {
     "fields": {},
@@ -393,6 +399,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historyEvents": "13",
     "historySizeBytes": undefined,
     "id": "temporal.fixture.cancelled.workflow.id",
+    "isPaused": false,
     "isRunning": false,
     "memo": {
       "fields": {},
@@ -441,6 +448,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historyEvents": "18",
     "historySizeBytes": undefined,
     "id": "temporal.fixture.completed.workflow.id",
+    "isPaused": false,
     "isRunning": false,
     "memo": {
       "fields": {},
@@ -489,6 +497,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historyEvents": "7",
     "historySizeBytes": undefined,
     "id": "temporal.fixture.failed.workflow.id",
+    "isPaused": false,
     "isRunning": false,
     "memo": {
       "fields": {},
@@ -533,6 +542,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historyEvents": "19",
     "historySizeBytes": undefined,
     "id": "temporal.fixture.running.workflow.id",
+    "isPaused": false,
     "isRunning": true,
     "memo": {
       "fields": {},
@@ -581,6 +591,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historyEvents": "42",
     "historySizeBytes": undefined,
     "id": "temporal.fixture.completed.workflow.id",
+    "isPaused": false,
     "isRunning": false,
     "memo": {
       "fields": {},
@@ -629,6 +640,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historyEvents": "30",
     "historySizeBytes": undefined,
     "id": "temporal.fixture.terminated.workflow.id",
+    "isPaused": false,
     "isRunning": false,
     "memo": {
       "fields": {},
@@ -677,6 +689,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "historyEvents": "18",
     "historySizeBytes": undefined,
     "id": "temporal.fixture.timed-out.workflow.id",
+    "isPaused": false,
     "isRunning": false,
     "memo": {
       "fields": {},

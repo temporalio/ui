@@ -1,7 +1,6 @@
 import type { PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
 import type { TaskQueueResponse } from '$lib/types';
 import { VersioningBehaviorEnum } from '$lib/types/deployments';
-import type { WorkflowExecution } from '$lib/types/workflows';
 import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
 
 type PollersWithVersions = {
@@ -15,28 +14,24 @@ type PollersWithVersions = {
 };
 
 export function getWorkflowPollersWithVersions(
-  workflow: WorkflowExecution,
+  searchAttributes: Record<string, string> = {},
   workers: TaskQueueResponse,
 ): PollersWithVersions {
   const workflowDeploymentName = $derived(
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
+    searchAttributes?.['TemporalWorkerDeployment'],
   );
 
   const workflowDeploymentVersion = $derived(
-    workflow?.searchAttributes?.indexedFields?.[
-      'TemporalWorkerDeploymentVersion'
-    ],
+    searchAttributes?.['TemporalWorkerDeploymentVersion'],
   );
 
   const workflowVersioningBuildId = $derived(
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerBuildId'] ??
+    searchAttributes?.['TemporalWorkerBuildId'] ??
       getBuildIdFromVersion(workflowDeploymentVersion),
   );
 
   const versioningBehavior = $derived(
-    workflow?.searchAttributes?.indexedFields?.[
-      'TemporalWorkflowVersioningBehavior'
-    ],
+    searchAttributes?.['TemporalWorkflowVersioningBehavior'],
   );
 
   const pinnedBehavior = $derived(
