@@ -1,4 +1,5 @@
 import type { Action } from 'svelte/action';
+import { on } from 'svelte/events';
 
 export const clickoutside: Action<Element, (event: MouseEvent) => void> = (
   node: Element,
@@ -14,11 +15,7 @@ export const clickoutside: Action<Element, (event: MouseEvent) => void> = (
     }
   };
 
-  document.addEventListener('click', handleClick, true);
+  const destroy = on(document, 'click', handleClick, { capture: true });
 
-  return {
-    destroy() {
-      document.removeEventListener('click', handleClick, true);
-    },
-  };
+  return { destroy };
 };

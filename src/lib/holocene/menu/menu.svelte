@@ -94,7 +94,7 @@
     $menuElementCtx = menuElement;
   });
 
-  $effect(() => {
+  $effect(function getAnchorElement() {
     if (usePortal && id) {
       anchorElement = document.querySelector(
         `[aria-controls="${id}"]`,
