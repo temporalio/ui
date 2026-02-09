@@ -33,14 +33,16 @@
       width={24}
       class={merge('m-1', subtitle !== 'Cloud' && 'hidden')}
     />
-    <h2
-      class={merge(
-        'font-secondary mb-0 hidden whitespace-nowrap font-medium text-white group-data-[nav=open]:block',
-        subtitle !== 'Cloud' ? 'text-2xl' : 'text-lg',
-      )}
-    >
-      {subtitle || ''}
-    </h2>
+    {#if subtitle}
+      <h2
+        class={merge(
+          'font-secondary mb-0 hidden whitespace-nowrap font-medium text-white group-data-[nav=open]:block',
+          subtitle !== 'Cloud' ? 'text-2xl' : 'text-lg',
+        )}
+      >
+        {subtitle}
+      </h2>
+    {/if}
   </a>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
