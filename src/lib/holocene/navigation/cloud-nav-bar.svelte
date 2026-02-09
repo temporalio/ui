@@ -26,7 +26,7 @@
 >
   <div role="list">
     <div
-      class="align-center flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col"
+      class="align-center flex items-center justify-between px-2 pb-4 group-data-[nav=closed]:flex-col"
     >
       <a
         href={resolve('', {})}
@@ -62,7 +62,7 @@
     {/if}
   </div>
 
-  <div class="self-end">
+  <div>
     {#if bottom}
       {@render bottom()}
     {/if}
