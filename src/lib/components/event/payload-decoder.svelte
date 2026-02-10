@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { onMount, type Snippet } from 'svelte';
+  import { type Snippet } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
+  import Button from '$lib/holocene/button.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import type { Memo } from '$lib/types';
   import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
@@ -23,33 +24,41 @@
     key?: string;
     onDecode?: (decodedValue: string) => void;
     children: Snippet<[decodedValue: string]>;
+    error?: Snippet<[retry: () => Promise<string>, err: unknown]>;
+    loading?: Snippet<[keyedVal: string]>;
   }
 
-  let { children, value, key = '', onDecode }: Props = $props();
+  let {
+    children,
+    value,
+    key = '',
+    onDecode,
+    error = errorSnip,
+    loading = loadingSnip,
+  }: Props = $props();
 
-  let keyedValue = key && value?.[key] ? value[key] : value;
-  let decodedValue = $state(stringifyWithBigInt(keyedValue));
+  let keyedValue = stringifyWithBigInt(
+    key && value?.[key] ? value[key] : value,
+  );
 
-  onMount(() => {
-    decodePayloads(value);
-  });
+  let decodeValuePromise = $state<Promise<string>>(decodePayloads(value));
 
-  const decodePayloads = async (
+  async function decodePayloads(
     _value: PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo,
-  ) => {
+  ) {
     const settings = {
-      ...$page.data.settings,
+      ...page.data.settings,
       codec: {
-        ...$page.data.settings?.codec,
-        endpoint: getCodecEndpoint($page.data.settings),
-        passAccessToken: getCodecPassAccessToken($page.data.settings),
-        includeCredentials: getCodecIncludeCredentials($page.data.settings),
+        ...page.data.settings?.codec,
+        endpoint: getCodecEndpoint(page.data.settings),
+        passAccessToken: getCodecPassAccessToken(page.data.settings),
+        includeCredentials: getCodecIncludeCredentials(page.data.settings),
       },
     };
     try {
       const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
         _value,
-        $page.params.namespace,
+        page.params.namespace,
         settings,
         $authUser.accessToken,
       );
@@ -61,14 +70,36 @@
       if (Array.isArray(finalValue) && finalValue.length === 1) {
         finalValue = finalValue[0];
       }
-      decodedValue = stringifyWithBigInt(finalValue);
+      let decodedValue = stringifyWithBigInt(finalValue);
       if (onDecode) {
         onDecode(decodedValue);
       }
+      return decodedValue;
     } catch (e) {
       console.error('Could not decode payloads');
+      // hmm before this just ate the error we want to throw this to get an error here
+      // but maybe this is leaking information to the users? But it also might be good
+      // to allow that? Think about this harder maybe ask app sec about if this is an okay
+      // design choice
+      throw e;
     }
-  };
+  }
 </script>
 
-{@render children(decodedValue)}
+{#snippet loadingSnip(val)}
+  {val}
+{/snippet}
+
+{#snippet errorSnip(retry, error)}
+  <div>{error}</div>
+
+  <Button on:click={retry}>Retry Decoding</Button>
+{/snippet}
+
+{#await decodeValuePromise}
+  {@render loading?.(keyedValue)}
+{:then decoded}
+  {@render children(decoded)}
+{:catch err}
+  {@render error?.(() => decodePayloads(value), err)}
+{/await}
