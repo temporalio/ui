@@ -254,7 +254,7 @@
       <Dot
         point={[x, y]}
         classification={group.lastEvent.classification}
-        icon={'retry'}
+        icon="retry"
         r={radius}
       />
     {/if}

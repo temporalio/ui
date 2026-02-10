@@ -62,13 +62,13 @@
   const activitiesCanceled = $derived(
     Boolean(
       workflow?.status &&
-        ['Terminated', 'TimedOut', 'Canceled'].includes(workflow.status),
+      ['Terminated', 'TimedOut', 'Canceled'].includes(workflow.status),
     ),
   );
   const cancelInProgress = $derived(
     Boolean(
       workflow?.status &&
-        isCancelInProgress(workflow.status, $fullEventHistory),
+      isCancelInProgress(workflow.status, $fullEventHistory),
     ),
   );
   const isPaused = $derived(workflow?.isPaused);

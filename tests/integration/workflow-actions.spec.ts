@@ -275,6 +275,7 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       expect(body.resetReapplyType).toBe(3);
     });
   });
+
   test.describe('Workflow Terminate', () => {
     test.beforeEach(async ({ page }) => {
       await mockWorkflowApis(page, mockCompletedWorkflow);

@@ -71,7 +71,7 @@ export async function fetchNamespaces(
       .map(toNamespaceDetails);
 
     namespaces.set(_namespaces);
-  } catch (e) {
+  } catch {
     namespaces.set([]);
   }
 }

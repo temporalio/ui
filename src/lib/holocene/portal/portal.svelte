@@ -135,8 +135,8 @@
     return ancestors;
   }
 
-  $effect(function setupPositioning() {
-    if (!shouldShowPortal || !portalElement || !anchorElement) return;
+  function setupPositioning(element: HTMLElement) {
+    if (!anchorElement) return;
 
     untrack(() => updatePosition());
 
@@ -144,7 +144,7 @@
       scheduleUpdate();
     });
 
-    resizeObserver.observe(portalElement);
+    resizeObserver.observe(element);
     resizeObserver.observe(anchorElement);
 
     const scrollableAncestors = getScrollableAncestors(anchorElement);
@@ -173,13 +173,14 @@
       scrollCleanup();
       resizeCleanup();
     };
-  });
+  }
 </script>
 
 {#if shouldShowPortal}
   <div
     bind:this={portalElement}
     use:portal={target}
+    {@attach setupPositioning}
     class="pointer-events-auto fixed left-0 top-0"
     style:transform="translate({positionX}px, {positionY}px)"
     style:will-change="transform"

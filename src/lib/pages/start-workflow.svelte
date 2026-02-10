@@ -224,7 +224,7 @@
     try {
       JSON.parse(input);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   };

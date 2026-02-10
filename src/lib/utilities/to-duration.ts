@@ -11,7 +11,7 @@ import { pluralize } from './pluralize';
 
 type DurationKey = keyof Duration;
 
-export const durationKeys: Readonly<DurationKey[]> = [
+export const durationKeys: readonly DurationKey[] = [
   'years',
   'months',
   'weeks',

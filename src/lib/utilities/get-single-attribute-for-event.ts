@@ -197,7 +197,7 @@ export const shouldDisplayChildWorkflowLink = (
 ): key is (typeof keysWithChildExecutionLinks)[number] => {
   const workflowLinkAttributesExist = Boolean(
     attributes?.workflowExecutionWorkflowId &&
-      attributes?.workflowExecutionRunId,
+    attributes?.workflowExecutionRunId,
   );
   for (const workflowKey of keysWithChildExecutionLinks) {
     if (key === workflowKey && workflowLinkAttributesExist) return true;

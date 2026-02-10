@@ -660,7 +660,7 @@ export async function fetchAllChildWorkflows(
     }
     const { workflows } = await fetchAllWorkflows(namespace, { query });
     return workflows;
-  } catch (e) {
+  } catch {
     return [];
   }
 }
@@ -703,7 +703,7 @@ export async function startWorkflow({
   if (input) {
     try {
       payloads = await encodePayloads({ input, encoding, messageType });
-    } catch (_) {
+    } catch {
       throw new Error('Could not encode input for starting workflow');
     }
   }
@@ -726,7 +726,7 @@ export async function startWorkflow({
         })
       )[0];
     }
-  } catch (e) {
+  } catch {
     console.error('Could not encode summary or details for starting workflow');
   }
 
@@ -876,7 +876,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
       summary,
       details,
     };
-  } catch (e) {
+  } catch {
     return emptyValues;
   }
 };

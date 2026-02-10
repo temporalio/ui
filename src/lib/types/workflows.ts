@@ -153,8 +153,7 @@ export type DecodedWorkflowSearchAttributes = {
   indexedFields?: Record<string, string>;
 };
 
-export interface MostRecentWOrkflowVersionStamp
-  extends WorkflowVersionTimpstamp {
+export interface MostRecentWOrkflowVersionStamp extends WorkflowVersionTimpstamp {
   useVersioning?: boolean;
 }
 

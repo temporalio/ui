@@ -253,7 +253,7 @@
 {/snippet}
 
 {#snippet runningWorkflowActions()}
-  {#each workflowActions as { onClick, destructive, label, enabled, testId, description }}
+  {#each workflowActions as { onClick, destructive, label, enabled, testId, description } (label)}
     {#if destructive}
       <MenuDivider />
     {/if}
