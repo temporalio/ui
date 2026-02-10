@@ -40,7 +40,9 @@
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
   const pendingActivities = $derived(workflow?.pendingActivities ?? []);
-  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations ?? []);
+  const pendingNexusOperations = $derived(
+    workflow?.pendingNexusOperations ?? [],
+  );
 
   $effect(() => {
     const urlParams = parseEventFilterParams(page.url);
