@@ -38,7 +38,7 @@
         class={merge(
           'font-secondary mb-0 hidden whitespace-nowrap font-medium text-white group-data-[nav=open]:block',
           subtitle === 'Cloud' ? 'text-2xl' : 'text-base',
-          subtitle === 'Cloud' ? '' : 'px-2',
+          subtitle !== 'Cloud' && 'px-2',
         )}
       >
         {subtitle}
