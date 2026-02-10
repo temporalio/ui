@@ -33,11 +33,18 @@
       width={24}
       class={merge('m-1', subtitle !== 'Cloud' && 'hidden')}
     />
-    {#if subtitle}
+    {#if subtitle === 'Cloud'}
       <h2
         class={merge(
-          'font-secondary mb-0 hidden whitespace-nowrap font-medium text-white group-data-[nav=open]:block',
-          subtitle !== 'Cloud' ? 'text-2xl' : 'text-lg',
+          'font-secondary mb-0 hidden whitespace-nowrap text-2xl font-medium text-white group-data-[nav=open]:block',
+        )}
+      >
+        {subtitle}
+      </h2>
+    {:else}
+      <h2
+        class={merge(
+          'font-secondary mb-0 hidden whitespace-nowrap px-2 text-sm text-white group-data-[nav=open]:block',
         )}
       >
         {subtitle}
@@ -66,5 +73,6 @@
   >
     <span class="sr-only">{translate('common.version')}</span>
     {version}
+    x
   </div>
 </div>
