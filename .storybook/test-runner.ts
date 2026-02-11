@@ -1,6 +1,6 @@
 import type { TestRunnerConfig } from '@storybook/test-runner';
 import { getStoryContext } from '@storybook/test-runner';
-import { injectAxe, checkA11y } from 'axe-playwright';
+import { checkA11y, injectAxe } from 'axe-playwright';
 
 const config: TestRunnerConfig = {
   async preVisit(page) {

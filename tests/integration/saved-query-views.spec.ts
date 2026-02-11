@@ -19,7 +19,7 @@ test.describe('Saved Query Views', () => {
 
     await page.goto('/namespaces/default/workflows');
     await waitForWorkflowsApis(page);
-    await page.waitForSelector('[data-testid="workflow-count"]');
+    await page.getByTestId('workflow-count').waitFor();
   });
 
   test('System saved queries', async ({ page }) => {

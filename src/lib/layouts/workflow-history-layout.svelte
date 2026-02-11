@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { twMerge as merge } from 'tailwind-merge';
+
   import { beforeNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
@@ -29,43 +31,50 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
-  $: pendingActivities = workflow?.pendingActivities;
-  $: pendingNexusOperations = workflow?.pendingNexusOperations;
-  $: reverseSort = $eventFilterSort === 'descending';
-  $: compact = $eventViewType === 'compact';
+  const { namespace } = $derived(page.params);
+  const { workflow } = $derived($workflowRun);
+  const pendingActivities = $derived(workflow?.pendingActivities);
+  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
-  $: ascendingGroups = groupEvents(
-    $filteredEventHistory,
-    'ascending',
-    pendingActivities,
-    pendingNexusOperations,
+  let reverseSort = $derived($eventFilterSort === 'descending');
+  let compact = $derived($eventViewType === 'compact');
+
+  let ascendingGroups = $derived(
+    groupEvents(
+      $filteredEventHistory,
+      'ascending',
+      pendingActivities,
+      pendingNexusOperations,
+    ),
   );
 
-  $: groups = reverseSort ? [...ascendingGroups].reverse() : ascendingGroups;
-  $: history = reverseSort
-    ? [...$filteredEventHistory].reverse()
-    : $filteredEventHistory;
-
-  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-    $currentEventHistory,
-    'ascending',
+  let groups = $derived(
+    reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
+  );
+  let history = $derived(
+    reverseSort ? [...$filteredEventHistory].reverse() : $filteredEventHistory,
   );
 
-  $: $eventViewType, clearActives();
+  const workflowTaskFailedError = $derived(
+    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
+  );
+
+  $effect(() => {
+    $eventViewType;
+    clearActives();
+  });
 
   beforeNavigate(() => {
     clearActives();
   });
 
-  $: {
-    if (!workflow.isRunning && $pauseLiveUpdates) {
+  $effect(() => {
+    if (!workflow?.isRunning && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
-  }
+  });
 
-  let showDownloadPrompt = false;
+  let showDownloadPrompt = $state(false);
 
   const onSort = () => {
     if (reverseSort) {
@@ -93,8 +102,10 @@
 </div>
 <div class="relative pb-24">
   <div
-    class="surface-background flex flex-wrap items-center justify-between gap-2 border-b border-subtle py-2 xl:gap-8"
-    class:sticky-header={!$minimizeEventView}
+    class={merge(
+      'surface-background flex flex-wrap items-center justify-between gap-2 border-b border-subtle py-2 xl:gap-8',
+      !$minimizeEventView && 'sticky top-0 z-30 md:top-12',
+    )}
   >
     <h2>
       {translate('workflows.event-history')}
@@ -106,13 +117,17 @@
             leadingIcon={reverseSort ? 'descending' : 'ascending'}
             data-testid="zoom-in"
             on:click={onSort}
-            size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+            size="sm"
           >
+            {reverseSort
+              ? translate('common.descending')
+              : translate('common.ascending')}
+          </ToggleButton>
         {/if}
         <Tooltip
           text={$minimizeEventView
-            ? 'Timeline and Event History are collapsed to minimized height'
-            : 'Timeline and Event History are expanded to full height'}
+            ? translate('workflows.timeline-minimized')
+            : translate('workflows.timeline-expanded')}
           top
         >
           <ToggleButton
@@ -120,19 +135,29 @@
             data-testid="expandAll"
             size="sm"
             on:click={() => ($minimizeEventView = !$minimizeEventView)}
-            >{$minimizeEventView ? 'Minimized' : 'Expanded'}</ToggleButton
           >
+            {$minimizeEventView
+              ? translate('workflows.minimized')
+              : translate('workflows.expanded')}
+          </ToggleButton>
         </Tooltip>
         <EventTypeFilter {compact} minimized={$minimizeEventView} />
         <ToggleButton
-          disabled={!workflow.isRunning}
-          leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
+          disabled={!workflow?.isRunning}
           data-testid="pause"
           class="border-l-0"
           size="sm"
           on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
         >
-          {$pauseLiveUpdates ? 'Unfreeze' : 'Freeze'}
+          <span
+            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates ||
+            !workflow?.isRunning
+              ? 'bg-slate-300'
+              : 'bg-green-600'}"
+          ></span>
+          {$pauseLiveUpdates || !workflow?.isRunning
+            ? translate('workflows.auto-refresh-off')
+            : translate('workflows.auto-refresh-on')}
         </ToggleButton>
         <ToggleButton
           data-testid="download"
@@ -158,12 +183,6 @@
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
   {namespace}
-  workflowId={workflow.id}
-  runId={workflow.runId}
+  workflowId={workflow?.id}
+  runId={workflow?.runId}
 />
-
-<style lang="postcss">
-  .sticky-header {
-    @apply sticky top-0 z-30 md:top-12;
-  }
-</style>

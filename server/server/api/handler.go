@@ -72,6 +72,7 @@ type SettingsResponse struct {
 	WorkflowSignalDisabled        bool
 	WorkflowUpdateDisabled        bool
 	WorkflowResetDisabled         bool
+	WorkflowPauseDisabled         bool
 	BatchActionsDisabled          bool
 	StartWorkflowDisabled         bool
 	HideWorkflowQueryErrors       bool
@@ -150,6 +151,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			WorkflowSignalDisabled:        cfg.WorkflowSignalDisabled,
 			WorkflowUpdateDisabled:        cfg.WorkflowUpdateDisabled,
 			WorkflowResetDisabled:         cfg.WorkflowResetDisabled,
+			WorkflowPauseDisabled:         cfg.WorkflowPauseDisabled,
 			BatchActionsDisabled:          cfg.BatchActionsDisabled,
 			StartWorkflowDisabled:         cfg.StartWorkflowDisabled,
 			HideWorkflowQueryErrors:       cfg.HideWorkflowQueryErrors,

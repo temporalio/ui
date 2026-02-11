@@ -13,7 +13,7 @@ type Parenthesis = (typeof parenthesis)[number];
 type EndParenthesis = ')';
 type Join = (typeof joins)[number];
 
-const executionStatuses: Readonly<WorkflowStatus[]> = [
+const executionStatuses: readonly WorkflowStatus[] = [
   'Running',
   'TimedOut',
   'Completed',
@@ -191,4 +191,12 @@ export const isInConditional = (x: unknown) => {
   if (!isString(x)) return false;
 
   return ['in', 'not in'].includes(x.toLocaleLowerCase());
+};
+
+export const isEmptyObject = (obj: unknown) => {
+  if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
+    return false;
+  }
+
+  return Object.keys(obj).length === 0;
 };

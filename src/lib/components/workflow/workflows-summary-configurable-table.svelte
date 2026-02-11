@@ -24,8 +24,18 @@
   export let onClickConfigure: () => void;
 
   $: ({ namespace } = $page.params);
-  $: columns = $configurableTableColumns?.[namespace]?.workflows ?? [];
+  $: baseColumns = $configurableTableColumns?.[namespace]?.workflows ?? [];
   $: query = $page.url.searchParams.get('query');
+
+  $: hasVersioningFilter =
+    query?.includes('TemporalWorkerDeploymentVersion') ?? false;
+  $: hasVersioningBehaviorColumn = baseColumns.some(
+    (col) => col.label === 'Versioning Behavior',
+  );
+  $: columns =
+    hasVersioningFilter && !hasVersioningBehaviorColumn
+      ? [...baseColumns, { label: 'Versioning Behavior' }]
+      : baseColumns;
 
   let childrenIds: {
     workflowId: string;
@@ -37,7 +47,7 @@
     childrenIds = [];
   };
 
-  $: $refresh, query, clearChildren();
+  $: ($refresh, query, clearChildren());
 
   const viewChildren = async (workflow: WorkflowExecution) => {
     if (childrenActive(workflow)) {
@@ -92,7 +102,7 @@
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
-    {#each visibleItems as workflow}
+    {#each visibleItems as workflow (workflow.id + workflow.runId)}
       <TableRow
         {workflow}
         {viewChildren}

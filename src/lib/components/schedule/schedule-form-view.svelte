@@ -14,6 +14,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
   import { error, loading } from '$lib/stores/schedules';
   import {
     customSearchAttributes,
@@ -30,8 +31,6 @@
     routeForSchedules,
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
-
-  import type { PayloadInputEncoding } from '../payload-input-with-encoding.svelte';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
   import SchedulesSearchAttributesInputs from './schedules-search-attributes-inputs.svelte';
@@ -163,7 +162,7 @@
       JSON.parse(value);
       errors['input'] = false;
       return true;
-    } catch (e) {
+    } catch {
       errors['input'] = true;
       return false;
     }

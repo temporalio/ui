@@ -7,11 +7,13 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
   import { resetWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { temporalVersion } from '$lib/stores/versions';
+  import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -20,7 +22,6 @@
   export let open: boolean;
   export let workflow: WorkflowExecution;
   export let namespace: string;
-  export let refresh: Writable<number>;
 
   let error = '';
   let loading = false;
@@ -62,7 +63,7 @@
           [workflow.runId]: response.runId,
         }));
       }
-      $refresh = Date.now();
+      triggerRefresh(Action.Reset);
       hideResetModal();
     } catch (err) {
       error = isNetworkError(err)
@@ -96,6 +97,7 @@
         label={translate('workflows.reset-event-radio-group-description')}
         bind:value={$eventId}
         id="reset-event-id"
+        required
       >
         {#each $resetEvents as event}
           <Option value={event.id}>{event.id} - {event.eventType}</Option>
@@ -127,6 +129,8 @@
         id="reset-reason"
         bind:value={reason}
         label={translate('common.reason')}
+        labelHidden
+        placeholder={translate('common.reason-placeholder')}
       />
     </div>
   </svelte:fragment>

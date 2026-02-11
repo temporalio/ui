@@ -37,7 +37,6 @@ const baseTheme = {
     // Ensure inner scroller reliably captures wheel/touchpad scroll,
     // especially on Firefox with mouse wheels.
     overflow: 'auto',
-    overscrollBehavior: 'contain',
   },
   '.cm-content': {
     caretColor: css('--color-text-primary'),

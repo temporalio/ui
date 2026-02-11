@@ -2,8 +2,9 @@ import type { WorkflowStatus } from '$lib/types/workflows';
 
 export type WorkflowFilters = readonly (WorkflowStatus | 'All')[];
 
-export const workflowStatuses: Readonly<WorkflowStatus[]> = [
+export const workflowStatuses: readonly WorkflowStatus[] = [
   'Running',
+  'Paused',
   'TimedOut',
   'Completed',
   'Failed',

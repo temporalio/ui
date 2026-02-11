@@ -40,9 +40,7 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
 
       await expect(
         page.getByRole('button', { name: 'More Actions' }),
-      ).toBeEnabled();
-
-      await expect(page.getByRole('button', { name: 'Reset' })).toBeDisabled();
+      ).toBeDisabled();
     });
 
     test('is disabled when reset is disabled via Settings API', async ({
@@ -277,6 +275,7 @@ test.describe('Workflow Actions for a Completed Workflow', () => {
       expect(body.resetReapplyType).toBe(3);
     });
   });
+
   test.describe('Workflow Terminate', () => {
     test.beforeEach(async ({ page }) => {
       await mockWorkflowApis(page, mockCompletedWorkflow);

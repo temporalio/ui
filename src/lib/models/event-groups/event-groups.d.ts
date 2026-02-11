@@ -9,11 +9,10 @@ import type { EventType } from '$lib/utilities/is-event-type';
 
 type EventId = EventType['id'];
 
-interface EventGroup
-  extends Pick<
-    WorkflowEvent,
-    'timestamp' | 'classification' | 'category' | 'eventTime' | 'attributes'
-  > {
+interface EventGroup extends Pick<
+  WorkflowEvent,
+  'timestamp' | 'classification' | 'category' | 'eventTime' | 'attributes'
+> {
   id: EventId;
   name: string;
   label: string;

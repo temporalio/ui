@@ -12,6 +12,7 @@ import astronaut from './svg/astronaut.svelte';
 import batchOperation from './svg/batch-operation.svelte';
 import book from './svg/book-sparkles.svelte';
 import bookmark from './svg/bookmark.svelte';
+import buildings from './svg/buildings.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import calendar from './svg/calendar.svelte';
 import canceled from './svg/canceled.svelte';
@@ -28,6 +29,7 @@ import circleCheck from './svg/circle-check.svelte';
 import cirlceQuestion from './svg/circle-question.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
+import collapse from './svg/collapse.svelte';
 import cometSolid from './svg/comet-solid.svelte';
 import comet from './svg/comet.svelte';
 import compact from './svg/compact.svelte';
@@ -70,6 +72,7 @@ import importIcon from './svg/import.svelte';
 import inactive from './svg/inactive.svelte';
 import info from './svg/info.svelte';
 import json from './svg/json.svelte';
+import key from './svg/key.svelte';
 import keyboard from './svg/keyboard.svelte';
 import labs from './svg/labs.svelte';
 import laptopCode from './svg/laptop-code.svelte';
@@ -153,6 +156,7 @@ export const icons = {
   'batch-operation': batchOperation,
   book,
   bookmark,
+  buildings,
   'calendar-plus': calendarPlus,
   calendar,
   canceled,
@@ -169,6 +173,7 @@ export const icons = {
   'circle-question': cirlceQuestion,
   clock,
   close,
+  collapse,
   'comet-solid': cometSolid,
   comet,
   compact,
@@ -212,6 +217,7 @@ export const icons = {
   info,
   json,
   keyboard,
+  key,
   labs,
   'laptop-code': laptopCode,
   'lightning-bolt': lightningBolt,

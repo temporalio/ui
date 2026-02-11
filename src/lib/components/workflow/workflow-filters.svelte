@@ -10,12 +10,10 @@
   import Option from '$lib/holocene/select/simple-option.svelte';
   import Select from '$lib/holocene/select/simple-select.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    BASE_TIME_FORMAT_OPTIONS,
-    timeFormat,
-  } from '$lib/stores/time-format';
+  import { timeFormat } from '$lib/stores/time-format';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { BASE_TIME_FORMAT_OPTIONS } from '$lib/utilities/timezone';
   import { durations } from '$lib/utilities/to-duration';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -150,7 +148,7 @@
         bind:value={$timeFormat}
         label={translate('common.time-format')}
       >
-        <Option value={'relative'}>{translate('common.relative')}</Option>
+        <Option value="relative">{translate('common.relative')}</Option>
         <Option value={BASE_TIME_FORMAT_OPTIONS.UTC}
           >{translate('common.utc')}</Option
         >

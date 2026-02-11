@@ -21,18 +21,17 @@
     endHour,
     endMinute,
     endSecond,
-    getTimezone,
     relativeTimeDuration,
     relativeTimeUnit,
     startDate,
     startHour,
     startMinute,
     startSecond,
-    TIME_UNIT_OPTIONS,
     timeFormat,
     timeFormatType,
   } from '$lib/stores/time-format';
   import { getSelectedTimezone } from '$lib/utilities/format-date';
+  import { getTimezone, TIME_UNIT_OPTIONS } from '$lib/utilities/timezone';
   import { toDate } from '$lib/utilities/to-duration';
 
   import ConditionalMenu from './conditional-menu.svelte';
@@ -234,7 +233,7 @@
                 labelHidden
                 disabled={$timeFormatType !== 'relative'}
               >
-                {#each TIME_UNIT_OPTIONS as unit}
+                {#each TIME_UNIT_OPTIONS as unit (unit)}
                   <Option value={unit}>{unit} {translate('common.ago')}</Option>
                 {/each}
               </Select>
@@ -253,7 +252,7 @@
             />
             <div class="ml-6 flex flex-col gap-2">
               <DatePicker
-                label={''}
+                label=""
                 labelHidden
                 on:datechange={onStartDateChange}
                 selected={new Date(localStartDate)}

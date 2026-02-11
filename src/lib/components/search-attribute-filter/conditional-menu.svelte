@@ -39,7 +39,7 @@
   $: filterConditionalOption = conditionalOptions.find(
     (o) => o.value === $filter.conditional,
   );
-  $: filterConditionalOption, updateFilterConditional();
+  $: (filterConditionalOption, updateFilterConditional());
   $: isNullFilter = isNullConditional($filter.conditional);
   $: selectedOption = filterConditionalOption ?? conditionalOptions[0];
   $: selectedLabel = selectedOption?.label ?? selectedOption?.value;
@@ -68,7 +68,7 @@
     {selectedLabel}
   </MenuButton>
   <Menu id="conditional-menu" class="whitespace-nowrap">
-    {#each conditionalOptions as { value, label }}
+    {#each conditionalOptions as { value, label } (value)}
       <MenuItem
         onclick={() => {
           $filter.conditional = value;

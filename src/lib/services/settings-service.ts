@@ -42,6 +42,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     workflowSignalDisabled: !!settingsResponse?.WorkflowSignalDisabled,
     workflowUpdateDisabled: !!settingsResponse?.WorkflowUpdateDisabled,
     workflowResetDisabled: !!settingsResponse?.WorkflowResetDisabled,
+    workflowPauseDisabled: !!settingsResponse?.WorkflowPauseDisabled,
     batchActionsDisabled: !!settingsResponse?.BatchActionsDisabled,
     startWorkflowDisabled: !!settingsResponse?.StartWorkflowDisabled,
     hideWorkflowQueryErrors: !!settingsResponse?.HideWorkflowQueryErrors,

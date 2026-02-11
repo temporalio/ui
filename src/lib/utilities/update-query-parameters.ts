@@ -1,6 +1,7 @@
 import { BROWSER } from 'esm-env';
 
 import { goto as navigateTo } from '$app/navigation';
+import { resolve } from '$app/paths';
 
 type UpdateQueryParams = {
   parameter: string;
@@ -62,7 +63,7 @@ export const updateQueryParameters = async ({
     const query = newQuery?.toString();
     const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
 
-    goto(newUrl, options);
+    goto(resolve(newUrl, {}), options);
   }
 
   return value;
@@ -110,6 +111,6 @@ export const updateMultipleQueryParameters = async ({
     const query = newQuery?.toString();
     const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
 
-    goto(newUrl, gotoOptions);
+    goto(resolve(newUrl, {}), gotoOptions);
   }
 };

@@ -11,7 +11,7 @@ import { pluralize } from './pluralize';
 
 type DurationKey = keyof Duration;
 
-export const durationKeys: Readonly<DurationKey[]> = [
+export const durationKeys: readonly DurationKey[] = [
   'years',
   'months',
   'weeks',
@@ -131,6 +131,8 @@ export const fromSeconds = (
   seconds: string,
   { delimiter = ', ' } = {},
 ): string => {
+  if (!seconds) return '';
+
   const parsedSeconds = parseInt(seconds);
   const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
 

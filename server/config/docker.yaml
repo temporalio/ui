@@ -19,6 +19,7 @@ workflowCancelDisabled: {{ env "TEMPORAL_WORKFLOW_CANCEL_DISABLED" | default "fa
 workflowSignalDisabled: {{ env "TEMPORAL_WORKFLOW_SIGNAL_DISABLED" | default "false" }}
 workflowUpdateDisabled: {{ env "TEMPORAL_WORKFLOW_UPDATE_DISABLED" | default "false" }}
 workflowResetDisabled: {{ env "TEMPORAL_WORKFLOW_RESET_DISABLED" | default "false" }}
+workflowPauseDisabled: {{ env "TEMPORAL_WORKFLOW_PAUSE_DISABLED" | default "false" }}
 batchActionsDisabled: {{ env "TEMPORAL_BATCH_ACTIONS_DISABLED" | default "false" }}
 startWorkflowDisabled: {{ env "TEMPORAL_START_WORKFLOW_DISABLED" | default "false" }}
 hideWorkflowQueryErrors: {{ env "TEMPORAL_HIDE_WORKFLOW_QUERY_ERRORS" | default "false" }} 

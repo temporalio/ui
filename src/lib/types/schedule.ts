@@ -1,4 +1,4 @@
-import type { PayloadInputEncoding } from '$lib/components/payload-input-with-encoding.svelte';
+import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
 import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 import type {
   CalendarSpec,

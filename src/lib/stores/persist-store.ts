@@ -26,7 +26,7 @@ export function persistStore<T>(
           window?.localStorage?.getItem(name) ?? '',
         );
       }
-    } catch (_err) {
+    } catch {
       // Keep the original initialStoreValue if localStorage parsing fails
     }
   }
@@ -39,7 +39,7 @@ export function persistStore<T>(
       broadcaster?.addEventListener('message', (event) => {
         set(event.data);
       });
-    } catch (e) {
+    } catch {
       console.error('Browser does not support BroadcastChannel');
     }
   }

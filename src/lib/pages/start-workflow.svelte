@@ -6,9 +6,7 @@
   import { page } from '$app/stores';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
-  import PayloadInputWithEncoding, {
-    type PayloadInputEncoding,
-  } from '$lib/components/payload-input-with-encoding.svelte';
+  import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -20,6 +18,7 @@
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
   import { getPollers } from '$lib/services/pollers-service';
   import {
     fetchInitialValuesForStartWorkflow,
@@ -225,7 +224,7 @@
     try {
       JSON.parse(input);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   };

@@ -17,10 +17,12 @@
     endpoint,
     editDisabled = false,
     taskQueueStatus,
+    editHref,
   }: {
     endpoint: Endpoint;
     editDisabled?: boolean;
     taskQueueStatus?: Snippet;
+    editHref?: string;
   } = $props();
 </script>
 
@@ -31,7 +33,7 @@
         {endpoint.spec?.name || ''}
       </h1>
       <Button
-        href={routeForNexusEndpointEdit(endpoint.id!)}
+        href={editHref ?? routeForNexusEndpointEdit(endpoint.id!)}
         disabled={editDisabled}>{translate('common.edit')}</Button
       >
     </div>
@@ -79,7 +81,7 @@
   {#if endpoint.spec?.allowedCallerNamespaces}
     <h2>Allowed Caller Namespaces</h2>
     <div class="flex flex-wrap items-center gap-4">
-      {#each endpoint.spec?.allowedCallerNamespaces as namespace}
+      {#each endpoint.spec?.allowedCallerNamespaces as namespace (namespace)}
         <Link href={routeForNamespace({ namespace })}>{namespace}</Link>
       {/each}
     </div>

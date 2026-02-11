@@ -42,8 +42,8 @@ test.describe('Schedules List with schedules', () => {
   test('Edits existing schedule', async ({ page }) => {
     await page.goto(scheduleEditUrl);
 
-    const heading = await page.locator('h1').innerText();
-    expect(heading).toBe('Edit Schedule');
+    const heading = page.locator('h1');
+    await expect(heading).toHaveText('Edit Schedule');
 
     const typeInput = page.getByTestId('schedule-type-input');
     await expect(typeInput).toBeVisible();

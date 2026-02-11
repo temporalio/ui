@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import type { PageData } from './$types';
 
@@ -48,6 +48,8 @@
   };
 
   $: ({ namespace, clusters } = data);
+  $: pauseEnabled =
+    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause;
 
   onMount(() => {
     $lastUsedNamespace = namespace?.namespaceInfo?.name;
@@ -58,7 +60,7 @@
   title={`${translate('namespaces.namespace')} | ${
     namespace?.namespaceInfo?.name
   }`}
-  url={$page.url.href}
+  url={page.url.href}
 />
 <h1 data-testid="namespace-title">
   {translate('namespaces.namespace')}: {namespace?.namespaceInfo?.name}
@@ -230,6 +232,18 @@
           ></td
         >
       </tr>
+      {#if pauseEnabled}
+        <tr>
+          <td>{translate('workflows.pause-workflow')}</td>
+          <td
+            ><Badge
+              class="px-1 py-0"
+              type={badgeTypeForBoolean($settings.workflowPauseDisabled)}
+              >{badgeTextForBoolean($settings.workflowPauseDisabled)}</Badge
+            ></td
+          >
+        </tr>
+      {/if}
     </Table>
   </article>
 </Card>

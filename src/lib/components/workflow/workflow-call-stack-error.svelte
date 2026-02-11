@@ -5,8 +5,9 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({ workflow, workers } = $workflowRun);
-  $: runningWithNoWorkers = workflow?.isRunning && !workers?.pollers?.length;
+  $: ({ workflow, workers, workersLoaded } = $workflowRun);
+  $: runningWithNoWorkers =
+    workersLoaded && workflow?.isRunning && !workers?.pollers?.length;
 </script>
 
 {#if runningWithNoWorkers}
@@ -17,7 +18,7 @@
       title={translate('workflows.workflow-error-no-workers-title')}
     >
       {translate('workflows.workflow-error-no-workers-description', {
-        taskQueue: workflow?.taskQueue,
+        taskQueue: workflow?.taskQueue ?? '',
       })}
     </Alert>
   </div>

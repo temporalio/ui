@@ -65,7 +65,7 @@
       if (onDecode) {
         onDecode(decodedValue);
       }
-    } catch (e) {
+    } catch {
       console.error('Could not decode payloads');
     }
   };

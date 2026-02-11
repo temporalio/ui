@@ -71,7 +71,7 @@ try {
         errorsByFile[error.filename].push(error);
         totalErrors++;
       }
-    } catch (parseError) {
+    } catch {
       continue;
     }
   }

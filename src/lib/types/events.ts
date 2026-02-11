@@ -1,4 +1,5 @@
 import type { Timestamp } from '@temporalio/common';
+import type { google } from '@temporalio/proto';
 
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { ActivityOptions, EventLink } from '$lib/types';
@@ -56,7 +57,10 @@ export type PendingActivityState =
   | 'CancelRequested';
 
 export type PendingChildren = import('$lib/types').PendingChildrenInfo;
-export type PendingNexusOperation = import('$lib/types').PendingNexusInfo;
+export type PendingNexusOperation = import('$lib/types').PendingNexusInfo & {
+  scheduleToStartTimeout: google.protobuf.IDuration | null;
+  startToCloseTimeout: google.protobuf.IDuration | null;
+};
 export type Callbacks = import('$lib/types').CallbackInfo[];
 
 export type EventRequestMetadata = {
@@ -268,12 +272,3 @@ export type NexusOperationCancelRequestedEvent =
   EventWithAttributes<'nexusOperationCancelRequestedEventAttributes'>;
 export type WorkflowPropertiesModifiedEvent =
   EventWithAttributes<'workflowPropertiesModifiedEventAttributes'>;
-
-export type FailActivityTaskRequest =
-  import('$lib/types').ActivityTaskFailedByIdRequest;
-export type FailActivityTaskResponse =
-  import('$lib/types').ActivityTaskFailedByIdResponse;
-export type CompleteActivityTaskRequest =
-  import('$lib/types').ActivityTaskCompletedByIdRequest;
-export type CompleteActivityTaskResponse =
-  import('$lib/types').ActivityTaskCompletedByIdResponse;
