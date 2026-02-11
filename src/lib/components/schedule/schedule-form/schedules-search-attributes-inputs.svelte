@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
@@ -6,10 +7,15 @@
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeInput } from '$lib/stores/search-attributes';
 
-  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
+  interface Props {
+    searchAttributesInput?: SearchAttributeInput[];
+    workflowSearchAttributesInput?: SearchAttributeInput[];
+  }
 
-  export let searchAttributesInput: SearchAttributeInput[] = [];
-  export let workflowSearchAttributesInput: SearchAttributeInput[] = [];
+  let {
+    searchAttributesInput = $bindable([]),
+    workflowSearchAttributesInput = $bindable([]),
+  }: Props = $props();
 </script>
 
 <Tabs>
