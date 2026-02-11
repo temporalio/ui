@@ -162,8 +162,6 @@ export function pathForApi(
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
     'workflows.archived': `/namespaces/${parameters?.namespace}/archived-workflows`,
     'workflows.count': `/namespaces/${parameters?.namespace}/workflow-count`,
-    'activity.complete': `/namespaces/${parameters?.namespace}/activities/complete-by-id`,
-    'activity.fail': `/namespaces/${parameters?.namespace}/activities/fail-by-id`,
     'activity.pause': `/namespaces/${parameters?.namespace}/activities-deprecated/pause`,
     'activity.unpause': `/namespaces/${parameters?.namespace}/activities-deprecated/unpause`,
     'activity.reset': `/namespaces/${parameters?.namespace}/activities-deprecated/reset`,
