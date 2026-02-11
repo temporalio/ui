@@ -10,6 +10,7 @@
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
+  import Banner from '$lib/holocene/banner/banner.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
@@ -295,6 +296,11 @@
       {/snippet}
       <UserMenu {logout} />
     </TopNavigation>
+    <Banner
+      id="settings-banner-text"
+      message={page.data?.settings?.bannerText}
+      dismissable
+    />
     <div
       slot="main"
       class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
