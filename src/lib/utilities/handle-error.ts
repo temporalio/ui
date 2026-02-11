@@ -78,6 +78,10 @@ export const isForbidden = (error: unknown): error is TemporalAPIError => {
   return hasStatusCode(error, 403);
 };
 
+export const isNotFound = (error: unknown): error is TemporalAPIError => {
+  return hasStatusCode(error, 404);
+};
+
 export const isNotImplemented = (error: unknown): error is TemporalAPIError => {
   return hasStatusCode(error, 501);
 };

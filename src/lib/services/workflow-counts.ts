@@ -2,7 +2,7 @@ import type {
   CountSchedulesResponse,
   CountWorkflowExecutionsResponse,
 } from '$lib/types/workflows';
-import { isNotImplemented } from '$lib/utilities/handle-error';
+import { isNotFound, isNotImplemented } from '$lib/utilities/handle-error';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
@@ -106,7 +106,7 @@ export const fetchScheduleCount = async ({
     });
     return count ?? '0';
   } catch (error: unknown) {
-    if (isNotImplemented(error)) {
+    if (isNotImplemented(error) || isNotFound(error)) {
       return fetchScheduleCountLegacy(namespace, query);
     }
     throw error;
