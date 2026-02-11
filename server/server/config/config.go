@@ -131,6 +131,10 @@ type (
 		Options map[string]interface{} `yaml:"options"`
 		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
 		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
+		// CaFile - optional custom CA bundle for contacting the auth provider
+		CaFile string `yaml:"caFile"`
+		// CaData - optional base64-encoded CA bundle for contacting the auth provider
+		CaData string `yaml:"caData"`
 	}
 
 	Codec struct {
