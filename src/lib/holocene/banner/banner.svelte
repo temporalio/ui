@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { cva, type VariantProps } from 'class-variance-authority';
 
   import { persistStore } from '$lib/stores/persist-store';
@@ -7,11 +7,12 @@
     'dismissed-banners',
     {},
   );
-  export type BannerType = VariantProps<typeof types>['type'];
+
+  type BannerType = VariantProps<typeof types>['type'];
 
   const type = {
-    default: 'bg-indigo-200 text-indigo-900',
-    danger: 'surface-danger',
+    error: 'bg-danger',
+    info: 'bg-information',
   };
   const types = cva(
     [
@@ -27,47 +28,42 @@
         type,
       },
       defaultVariants: {
-        type: 'default',
+        type: 'info',
       },
     },
   );
 </script>
 
 <script lang="ts">
-  import { twMerge as merge } from 'tailwind-merge';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
 
-  import type { IconName } from '../icon';
-
-  type BaseProps = {
+  interface Props {
     id: string;
     message: string;
-    dismissible?: boolean;
+    dismissable?: boolean;
+    dismissLabel?: string;
     icon?: IconName;
     type?: BannerType;
-    class?: string;
-  };
+    class?: ClassNameValue;
+  }
 
-  type DismissibleBanner = BaseProps & {
-    dismissable: true;
-    dismissLabel: string;
-  };
+  let {
+    class: className = '',
+    id,
+    message,
+    dismissable = false,
+    dismissLabel = translate('common.close'),
+    icon = null,
+    type = 'info',
+    ...rest
+  }: Props = $props();
 
-  type $$Props = BaseProps | DismissibleBanner;
-
-  export let id: string;
-  export let message: string;
-  export let dismissLabel: string = '';
-  export let dismissable = false;
-  export let icon: IconName = null;
-  export let type: BannerType = 'default';
-
-  let className = '';
-  export { className as class };
-
-  $: show = message && !$dismissedBanners[id];
+  let show = $derived(message && !$dismissedBanners[id]);
 
   const dismissBanner = () => {
     $dismissedBanners[id] = true;
@@ -75,7 +71,7 @@
 </script>
 
 {#if show}
-  <section class={merge(types({ type }), className)} {...$$restProps}>
+  <section class={merge(types({ type }), className)} {...rest}>
     <span class="flex items-center gap-2">
       {#if icon}
         <Icon name={icon} />
@@ -88,6 +84,7 @@
         leadingIcon="close"
         variant="ghost"
         size="xs"
+        class="rounded-full"
       >
         <span class="sr-only">{dismissLabel}</span>
       </Button>
