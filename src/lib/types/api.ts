@@ -23,8 +23,6 @@ export type WorkflowUpdateAPIRoutePath = 'workflow.update';
 export type WorkflowQueryAPIRoutePath = 'query';
 
 export type WorkflowActivitiesAPIRoutePath =
-  | 'activity.complete'
-  | 'activity.fail'
   | 'activity.pause'
   | 'activity.unpause'
   | 'activity.reset'

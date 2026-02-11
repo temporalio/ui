@@ -272,12 +272,3 @@ export type NexusOperationCancelRequestedEvent =
   EventWithAttributes<'nexusOperationCancelRequestedEventAttributes'>;
 export type WorkflowPropertiesModifiedEvent =
   EventWithAttributes<'workflowPropertiesModifiedEventAttributes'>;
-
-export type FailActivityTaskRequest =
-  import('$lib/types').ActivityTaskFailedByIdRequest;
-export type FailActivityTaskResponse =
-  import('$lib/types').ActivityTaskFailedByIdResponse;
-export type CompleteActivityTaskRequest =
-  import('$lib/types').ActivityTaskCompletedByIdRequest;
-export type CompleteActivityTaskResponse =
-  import('$lib/types').ActivityTaskCompletedByIdResponse;
