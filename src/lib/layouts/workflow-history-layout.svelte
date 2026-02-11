@@ -228,7 +228,7 @@
         <WorkflowHistoryJson />
       </div>
     {:else}
-      <div data-testid="event-summary-table ">
+      <div data-testid="event-summary-table">
         <EventSummaryTable {updating} {items} {groups} {compact} minimized />
       </div>
     {/if}
