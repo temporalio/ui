@@ -120,7 +120,7 @@
   );
 
   const handleConfirm = (form: ScheduleFormData) => {
-    const args: Partial<ScheduleParameters> = {
+    const formData: ScheduleFormData = {
       name: form.name.trimEnd(),
       workflowType: form.workflowType,
       workflowId: form.workflowId,
@@ -141,7 +141,7 @@
       workflowSearchAttributes: form.workflowSearchAttributes,
     };
 
-    onConfirm(preset, args, schedule);
+    onConfirm(preset, formData, schedule);
   };
 
   const onInput = () => {
