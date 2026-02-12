@@ -1,5 +1,6 @@
 import { z } from 'zod/v3';
 
+import { searchAttributesSchema } from '$lib/stores/search-attributes';
 import type { FullSchedule } from '$lib/types/schedule';
 import type { SearchAttributes } from '$lib/types/workflows';
 import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
@@ -41,8 +42,8 @@ export const scheduleFormSchema = z.object({
   phase: z.string(),
   cronString: z.string(),
   timezoneName: z.string(),
-  searchAttributes: z.any(),
-  workflowSearchAttributes: z.any(),
+  searchAttributes: searchAttributesSchema,
+  workflowSearchAttributes: searchAttributesSchema,
 });
 
 export type ScheduleFormData = z.infer<typeof scheduleFormSchema>;

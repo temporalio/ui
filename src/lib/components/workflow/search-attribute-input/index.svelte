@@ -9,23 +9,27 @@
   import {
     customSearchAttributeOptions,
     customSearchAttributes,
-    type SearchAttributeInput,
+    type SearchAttributeSchema,
+    type SearchAttributesSchema,
   } from '$lib/stores/search-attributes';
   import type { SelectOptionValue } from '$lib/types/global';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   import DatetimeInput from './datetime-input.svelte';
 
-  export let attributes: SearchAttributeInput[] = [];
+  interface Props {
+    attributes: SearchAttributesSchema;
+    attribute: SearchAttributeSchema;
+    onRemove: (attribute: string) => void;
+    id: number;
+  }
 
-  export let attribute: SearchAttributeInput;
-  export let onRemove: (attribute: string) => void;
-  export let id: number;
+  let { attributes, attribute = $bindable(), onRemove, id }: Props = $props();
 
-  let label: SelectOptionValue;
-  let _label = attribute.label || (label && label.toString());
+  let label = $state<SelectOptionValue | undefined>(undefined);
+  let _label = $derived(attribute.label || (label && label.toString()));
 
-  $: isDisabled = (value: string) => {
+  const isDisabled = (value: string) => {
     return !!attributes.find((a) => a.label === value);
   };
 
@@ -58,7 +62,7 @@
         bind:value={_label}
         onChange={handleAttributeChange}
       >
-        {#each $customSearchAttributeOptions as { value, label, type }}
+        {#each $customSearchAttributeOptions as { value, label, type } (label)}
           <Option disabled={isDisabled(value)} {value} description={type}
             >{label}</Option
           >

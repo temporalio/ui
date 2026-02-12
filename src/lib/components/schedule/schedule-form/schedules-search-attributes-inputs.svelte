@@ -5,16 +5,16 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+  import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
   interface Props {
-    searchAttributesInput?: SearchAttributeInput[];
-    workflowSearchAttributesInput?: SearchAttributeInput[];
+    scheduleSearchAttributes: SearchAttributesSchema;
+    workflowSearchAttributes: SearchAttributesSchema;
   }
 
   let {
-    searchAttributesInput = $bindable([]),
-    workflowSearchAttributesInput = $bindable([]),
+    scheduleSearchAttributes = $bindable([]),
+    workflowSearchAttributes = $bindable([]),
   }: Props = $props();
 </script>
 
@@ -46,7 +46,7 @@
       data-testid="schedule-panel"
     >
       <AddSearchAttributes
-        bind:attributesToAdd={searchAttributesInput}
+        bind:attributesToAdd={scheduleSearchAttributes}
         class="w-full"
       />
     </TabPanel>
@@ -58,7 +58,7 @@
       data-testid="workflows-panel"
     >
       <AddSearchAttributes
-        bind:attributesToAdd={workflowSearchAttributesInput}
+        bind:attributesToAdd={workflowSearchAttributes}
         class="w-full"
       />
     </TabPanel>

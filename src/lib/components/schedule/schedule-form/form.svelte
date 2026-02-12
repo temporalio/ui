@@ -3,7 +3,7 @@
   import { writable } from 'svelte/store';
 
   import { onDestroy } from 'svelte';
-  import { superForm } from 'sveltekit-superforms';
+  import { arrayProxy, superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
   import { page } from '$app/state';
@@ -89,22 +89,36 @@
     }),
   );
 
+  // initialValues is reactive but we only need its initial value
+  // svelte-ignore state_referenced_locally
+  const superform = superForm(initialValues, {
+    SPA: true,
+    dataType: 'json',
+    validators: zodClient(scheduleFormSchema),
+    resetForm: false,
+    onUpdate: async ({ form }) => {
+      console.log(form.errors);
+      if (!form.valid) return;
+      handleConfirm(form.data);
+    },
+  });
+
   const {
     form,
     errors: formErrors,
     constraints,
     enhance,
     submitting,
-  } = superForm(initialValues, {
-    SPA: true,
-    validators: zodClient(scheduleFormSchema),
-    resetForm: false,
-    onUpdate: async ({ form }) => {
-      console.log(form);
-      if (!form.valid) return;
-      handleConfirm(form.data);
-    },
-  });
+  } = superform;
+
+  const { values: scheduleSearchAttributes } = arrayProxy(
+    superform,
+    'searchAttributes',
+  );
+  const { values: workflowSearchAttributes } = arrayProxy(
+    superform,
+    'workflowSearchAttributes',
+  );
 
   const handleConfirm = (form: ScheduleFormData) => {
     const args: Partial<ScheduleParameters> = {
@@ -219,8 +233,8 @@
           timezoneName={$form.timezoneName}
         >
           <SchedulesSearchAttributesInputs
-            bind:searchAttributesInput={$form.searchAttributes}
-            bind:workflowSearchAttributesInput={$form.workflowSearchAttributes}
+            bind:scheduleSearchAttributes={$scheduleSearchAttributes}
+            bind:workflowSearchAttributes={$workflowSearchAttributes}
           />
           <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
             <Button

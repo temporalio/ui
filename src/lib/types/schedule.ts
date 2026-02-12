@@ -1,5 +1,5 @@
 import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
-import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 import type {
   CalendarSpec,
   DescribeScheduleResponse,
@@ -42,8 +42,8 @@ export type ScheduleActionParameters = {
   input: string;
   encoding: PayloadInputEncoding;
   messageType?: string;
-  searchAttributes: SearchAttributeInput[];
-  workflowSearchAttributes?: SearchAttributeInput[];
+  searchAttributes: SearchAttributesSchema;
+  workflowSearchAttributes?: SearchAttributesSchema;
 };
 
 export type ScheduleSpecParameters = {
@@ -55,8 +55,8 @@ export type ScheduleSpecParameters = {
   second: string;
   phase: string;
   cronString: string;
-  searchAttributes: SearchAttributeInput[];
-  workflowSearchAttributes?: SearchAttributeInput[];
+  searchAttributes: SearchAttributesSchema;
+  workflowSearchAttributes?: SearchAttributesSchema;
 };
 
 // For UI Only
