@@ -3,7 +3,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
-  import NexusForm, { endpointForm } from '$lib/pages/nexus-form.svelte';
+  import NexusForm from '$lib/pages/nexus-form.svelte';
   import type { NetworkError } from '$lib/types/global';
 
   type Props = {
@@ -34,15 +34,20 @@
     projectId: _projectId = undefined,
   }: Props = $props();
 
+  let formComponent: NexusForm;
+
   const createDisabled = $derived(
-    !$endpointForm.spec?.name ||
-      !$endpointForm.spec?.target?.worker?.namespace ||
-      !$endpointForm.spec?.target?.worker?.taskQueue,
+    !formComponent || !formComponent.isFormValid(),
   );
+
+  export function getFormData() {
+    return formComponent?.getFormData();
+  }
 </script>
 
 <div class="flex w-full flex-col gap-8">
   <NexusForm
+    bind:this={formComponent}
     {nameRegexPattern}
     {nameHintText}
     {error}

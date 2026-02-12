@@ -43,6 +43,11 @@
 
   let deleteConfirmationModalOpen = $state(false);
   let confirmDeleteInput = $state('');
+  let formComponent: NexusForm;
+
+  export function getFormData() {
+    return formComponent?.getFormData();
+  }
 </script>
 
 <div class="flex flex-col gap-8">
@@ -52,6 +57,7 @@
     </h1>
   </div>
   <NexusForm
+    bind:this={formComponent}
     {endpoint}
     {nameHintText}
     {nameRegexPattern}
