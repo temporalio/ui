@@ -1,3 +1,5 @@
+import { page } from '$app/state';
+
 import type {
   ActivityPauseRequest,
   ActivityPauseResponse,
@@ -12,11 +14,22 @@ import { isNotFound, isNotImplemented } from '$lib/utilities/handle-error';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 const requestWithActivityFallback = async <T>(
   route: string,
   init: Parameters<typeof requestFromAPI>[1],
 ): Promise<T> => {
+  const fallbackRoute = route.replace(
+    '/activities-deprecated/',
+    '/activities/',
+  );
+  const version = page.data?.settings?.version;
+
+  if (version && !minimumVersionRequired('2.45.3', version)) {
+    return requestFromAPI<T>(fallbackRoute, init);
+  }
+
   try {
     return await requestFromAPI<T>(route, {
       ...init,
@@ -24,10 +37,6 @@ const requestWithActivityFallback = async <T>(
     });
   } catch (error: unknown) {
     if (isNotImplemented(error) || isNotFound(error)) {
-      const fallbackRoute = route.replace(
-        '/activities-deprecated/',
-        '/activities/',
-      );
       return requestFromAPI<T>(fallbackRoute, init);
     }
 
