@@ -6,7 +6,6 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusCreateEndpoint from '$lib/pages/nexus-create-endpoint.svelte';
-  import { endpointForm } from '$lib/pages/nexus-form.svelte';
   import { createNexusEndpoint } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
   import type { NetworkError } from '$lib/types/global';
@@ -16,6 +15,7 @@
 
   let error = $state<NetworkError | undefined>(undefined);
   let loading = $state(false);
+  let createEndpointComponent: NexusCreateEndpoint;
 
   const projectId = $derived(
     page.url.searchParams.get('projectId') ?? undefined,
@@ -24,8 +24,9 @@
   const onCreate = async () => {
     loading = true;
     try {
+      const formData = createEndpointComponent.getFormData();
       const body: Partial<NexusEndpoint> & { projectId?: string } = {
-        ...$endpointForm,
+        ...formData,
       };
 
       if (body.spec) {
@@ -66,6 +67,7 @@
     {translate('nexus.back-to-endpoints')}
   </Link>
   <NexusCreateEndpoint
+    bind:this={createEndpointComponent}
     {onCreate}
     {targetNamespaceList}
     {error}

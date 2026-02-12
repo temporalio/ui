@@ -1,24 +1,7 @@
-<script context="module" lang="ts">
-  const emptyEndpoint = {
-    spec: {
-      name: '',
-      descriptionString: '',
-      target: {
-        worker: {
-          namespace: '',
-          taskQueue: '',
-        },
-      },
-      allowedCallerNamespaces: [],
-    },
-  };
-  export const endpointForm = writable<Partial<NexusEndpoint>>(emptyEndpoint);
-</script>
-
 <script lang="ts">
-  import { writable } from 'svelte/store';
-
-  import { onDestroy } from 'svelte';
+  import { superForm } from 'sveltekit-superforms';
+  import { zodClient } from 'sveltekit-superforms/adapters';
+  import { z } from 'zod/v3';
 
   import IsOssGuard from '$lib/components/is-oss-guard.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -29,74 +12,113 @@
   import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
-  export let endpoint: NexusEndpoint | undefined = undefined;
-  export let targetNamespaceList: { namespace: string }[] = [];
-  export let callerNamespaceList: { namespace: string }[] = [];
-  export let error: NetworkError | undefined = undefined;
-  export let nameDisabled = false;
-  export let isCloud = true;
-  export let nameHintText: string;
-  export let nameRegexPattern: RegExp;
-
-  let name = endpoint?.spec?.name || '';
-  let description = endpoint?.spec?.descriptionString || '';
-  let target = endpoint?.spec?.target?.worker?.namespace || '';
-  let taskQueue = endpoint?.spec?.target?.worker?.taskQueue || '';
-  let allowedCallerNamespaces = endpoint?.spec?.allowedCallerNamespaces || [];
-
-  const setFormStore = (
-    name: string,
-    descriptionString: string,
-    target: string,
-    taskQueue: string,
-    allowedCallerNamespaces: string[],
-  ) => {
-    $endpointForm = {
-      spec: {
-        name,
-        descriptionString,
-        target: {
-          worker: {
-            namespace: target,
-            taskQueue,
-          },
-        },
-        allowedCallerNamespaces,
-      },
-    };
+  type Props = {
+    endpoint?: NexusEndpoint;
+    targetNamespaceList?: { namespace: string }[];
+    callerNamespaceList?: { namespace: string }[];
+    error?: NetworkError;
+    nameDisabled?: boolean;
+    isCloud?: boolean;
+    nameHintText?: string;
+    nameRegexPattern?: RegExp;
   };
 
-  $: setFormStore(
-    name,
-    description,
-    target,
-    taskQueue,
-    allowedCallerNamespaces,
+  let {
+    endpoint = undefined,
+    targetNamespaceList = [],
+    callerNamespaceList = [],
+    error = undefined,
+    nameDisabled = false,
+    isCloud = true,
+    nameHintText = translate('nexus.endpoint-name-hint-with-dash'),
+    nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
+  }: Props = $props();
+
+  export type NexusFormData = {
+    name: string;
+    descriptionString: string;
+    targetNamespace: string;
+    taskQueue: string;
+    allowedCallerNamespaces: string[];
+  };
+
+  const createNexusSchema = (pattern: RegExp) =>
+    z.object({
+      name: z
+        .string()
+        .min(1, 'Name is required')
+        .refine((val) => pattern.test(val), {
+          message: 'Name must match the required pattern',
+        }),
+      descriptionString: z.string().optional().default(''),
+      targetNamespace: z.string().min(1, 'Target namespace is required'),
+      taskQueue: z.string().min(1, 'Task queue is required'),
+      allowedCallerNamespaces: z.array(z.string()).default([]),
+    });
+
+  const initialData: NexusFormData = {
+    name: endpoint?.spec?.name || '',
+    descriptionString: endpoint?.spec?.descriptionString || '',
+    targetNamespace: endpoint?.spec?.target?.worker?.namespace || '',
+    taskQueue: endpoint?.spec?.target?.worker?.taskQueue || '',
+    allowedCallerNamespaces: endpoint?.spec?.allowedCallerNamespaces || [],
+  };
+
+  const { form, errors, constraints } = $derived(
+    superForm(initialData, {
+      SPA: true,
+      validators: zodClient(createNexusSchema(nameRegexPattern)),
+      resetForm: false,
+      dataType: 'json',
+    }),
   );
 
-  $: callerNamespaces = callerNamespaceList.map((n) => ({
-    value: n.namespace,
-    label: n.namespace,
-  }));
+  const callerNamespaces = $derived(
+    callerNamespaceList.map((n) => ({
+      value: n.namespace,
+      label: n.namespace,
+    })),
+  );
 
-  onDestroy(() => {
-    $endpointForm = emptyEndpoint;
-  });
+  export function getFormData(): Partial<NexusEndpoint> {
+    return {
+      spec: {
+        name: $form.name,
+        descriptionString: $form.descriptionString,
+        target: {
+          worker: {
+            namespace: $form.targetNamespace,
+            taskQueue: $form.taskQueue,
+          },
+        },
+        allowedCallerNamespaces: $form.allowedCallerNamespaces,
+      },
+    };
+  }
 
-  $: validName = (name) => nameRegexPattern.test(name);
+  export function isFormValid(): boolean {
+    return (
+      !!$form.name &&
+      !!$form.targetNamespace &&
+      !!$form.taskQueue &&
+      nameRegexPattern.test($form.name)
+    );
+  }
 </script>
 
 <div class="flex w-full flex-col gap-4 xl:w-1/2">
   <Input
-    bind:value={name}
+    bind:value={$form.name}
     required
     disabled={nameDisabled}
-    error={!name || !validName(name)}
-    hintText={nameHintText}
+    error={!!$errors.name?.[0]}
+    hintText={$errors.name?.[0] || nameHintText}
     label={translate('nexus.endpoint-name')}
     id="name"
+    name="name"
     maxLength={255}
     placeholder={translate('nexus.endpoint-name-placeholder')}
+    {...$constraints.name}
   />
   <div class="flex flex-col gap-0">
     <p class="text-base text-primary">{translate('nexus.target')}</p>
@@ -107,11 +129,12 @@
   <Combobox
     label={translate('nexus.target-namespace')}
     noResultsText={translate('common.no-results')}
-    valid={!!target}
-    error="Please select a target Namespace."
-    bind:value={target}
+    valid={!$errors.targetNamespace}
+    error={$errors.targetNamespace?.[0] || 'Please select a target Namespace.'}
+    bind:value={$form.targetNamespace}
     required
     id="target-namespace"
+    name="targetNamespace"
     placeholder={translate('nexus.select-namespace')}
     leadingIcon="namespace-switcher"
     options={targetNamespaceList}
@@ -119,12 +142,15 @@
     minSize={32}
   />
   <Input
-    bind:value={taskQueue}
+    bind:value={$form.taskQueue}
     required
-    error={!taskQueue}
+    error={!!$errors.taskQueue?.[0]}
+    hintText={$errors.taskQueue?.[0]}
     label={translate('common.task-queue')}
     id="task-queue"
+    name="taskQueue"
     placeholder={translate('nexus.task-queue-placeholder')}
+    {...$constraints.taskQueue}
   />
   <IsOssGuard {isCloud}>
     <div class="flex flex-col gap-0">
@@ -135,15 +161,18 @@
     </div>
     <Combobox
       id="caller-namespace-filter-menu"
+      name="allowedCallerNamespaces"
       multiselect
       displayChips={false}
-      bind:value={allowedCallerNamespaces}
+      bind:value={$form.allowedCallerNamespaces}
       options={callerNamespaces}
       label={translate('nexus.allowed-caller-namespaces')}
       leadingIcon="search"
       noResultsText={translate('common.no-results')}
-      valid={!!allowedCallerNamespaces.length}
-      error="Please select at least one Namespace."
+      valid={!$errors.allowedCallerNamespaces}
+      error={typeof $errors.allowedCallerNamespaces?.[0] === 'string'
+        ? $errors.allowedCallerNamespaces[0]
+        : 'Please select at least one Namespace.'}
       placeholder={translate('nexus.select-namespaces')}
       optionValueKey="value"
       optionLabelKey="label"
@@ -151,7 +180,7 @@
   </IsOssGuard>
   <div class="flex flex-col gap-2">
     <p class="text-sm font-medium">Description</p>
-    <MarkdownEditor bind:content={description} />
+    <MarkdownEditor bind:content={$form.descriptionString} />
     <p class="text-xs text-secondary">Do not include sensitive data.</p>
   </div>
   <slot name="footer" />
