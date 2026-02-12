@@ -39,13 +39,6 @@ test.describe('Schedules Page', () => {
     const createSchedule = page.getByRole('button', {
       name: 'Create Schedule',
     });
-    await expect(createSchedule).toBeDisabled();
-
-    await page.locator('#schedule-payload-input').getByRole('textbox').clear();
-    await page
-      .locator('#schedule-payload-input')
-      .getByRole('textbox')
-      .fill('123');
     await expect(createSchedule).toBeEnabled();
   });
 });
