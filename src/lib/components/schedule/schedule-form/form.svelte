@@ -97,7 +97,6 @@
     validators: zodClient(scheduleFormSchema),
     resetForm: false,
     onUpdate: async ({ form }) => {
-      console.log(form.errors);
       if (!form.valid) return;
       handleConfirm(form.data);
     },
