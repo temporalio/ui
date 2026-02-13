@@ -14,7 +14,10 @@ import {
 } from '$lib/models/workflow-execution';
 import { isCloud } from '$lib/stores/advanced-visibility';
 import { authUser } from '$lib/stores/auth-user';
-import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+import type {
+  SearchAttributeInput,
+  SearchAttributesSchema,
+} from '$lib/stores/search-attributes';
 import { temporalVersion } from '$lib/stores/versions';
 import {
   canFetchChildWorkflows,
@@ -666,7 +669,7 @@ export async function fetchAllChildWorkflows(
 }
 
 export const setSearchAttributes = (
-  attributes: SearchAttributeInput[],
+  attributes: SearchAttributesSchema,
 ): SearchAttribute => {
   if (!attributes.length) return {};
 

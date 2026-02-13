@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
+  import ScheduleFormView from '$lib/components/schedule/schedule-form/form.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
   import { submitEditSchedule } from '$lib/stores/schedules';
@@ -16,15 +16,16 @@
   import { getIdentity } from '$lib/utilities/core-context';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
-  let namespace = $page.params.namespace;
-  let scheduleId = $page.params.schedule;
-
   const identity = getIdentity();
-  const parameters = {
-    namespace,
-    scheduleId: decodeURIForSvelte(scheduleId),
-  };
-  let scheduleFetch = fetchSchedule(parameters);
+
+  const scheduleFetch = $derived.by(() => {
+    const namespace = page.params.namespace;
+    const scheduleId = page.params.schedule;
+    return fetchSchedule({
+      namespace,
+      scheduleId: decodeURIForSvelte(scheduleId),
+    });
+  });
 
   const handleEdit = (
     preset: SchedulePreset,
@@ -53,7 +54,7 @@
     } = args;
     const action: ScheduleActionParameters = {
       identity,
-      namespace,
+      namespace: page.params.namespace,
       name,
       workflowType,
       workflowId,
@@ -79,7 +80,11 @@
       days,
     };
 
-    submitEditSchedule({ action, spec, presets }, schedule, scheduleId);
+    submitEditSchedule(
+      { action, spec, presets },
+      schedule,
+      page.params.schedule,
+    );
   };
 </script>
 
