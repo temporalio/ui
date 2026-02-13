@@ -19,7 +19,7 @@
   import { formatDistance } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
-    routeForEventHistory,
+    routeForTimeline,
     routeForWorkerDeployment,
   } from '$lib/utilities/route-for';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
@@ -83,7 +83,7 @@
         {filterOrCopyButtonsVisible}
         attribute="WorkflowType"
         value={workflow.name}
-        href={routeForEventHistory({
+        href={routeForTimeline({
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
@@ -95,7 +95,7 @@
         {filterOrCopyButtonsVisible}
         attribute="WorkflowId"
         value={workflow.id}
-        href={routeForEventHistory({
+        href={routeForTimeline({
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
@@ -107,7 +107,7 @@
         {filterOrCopyButtonsVisible}
         attribute="RunId"
         value={workflow.runId}
-        href={routeForEventHistory({
+        href={routeForTimeline({
           namespace,
           workflow: workflow.id,
           run: workflow.runId,

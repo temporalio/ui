@@ -281,6 +281,19 @@ export const routeForEventHistoryEvent = ({
   });
 };
 
+export const routeForTimeline = ({
+  queryParams,
+  archival,
+  ...parameters
+}: WorkflowParameters & {
+  queryParams?: Record<string, string>;
+  archival?: boolean;
+}): string => {
+  if (archival) return toURL(routeForArchivalEventHistory(parameters));
+  const path = `${routeForWorkflow(parameters)}/timeline`;
+  return toURL(path, queryParams);
+};
+
 export const routeForWorkers = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {

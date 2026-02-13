@@ -25,6 +25,7 @@
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { getSharedFilterParams } from '$lib/utilities/event-filter-params';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
@@ -36,6 +37,7 @@
     routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
+    routeForTimeline,
     routeForUserMetadata,
     routeForWorkers,
     routeForWorkflowMemo,
@@ -94,6 +96,7 @@
     getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
   );
   const linkCount = $derived(outboundLinks + inboundLinks);
+  const sharedFilterParams = $derived(getSharedFilterParams(page.url));
 </script>
 
 <div class="flex items-center justify-between">
@@ -240,10 +243,23 @@
   <Tabs>
     <TabList label="workflow detail">
       <Tab
+        label={translate('workflows.timeline-tab')}
+        id="timeline-tab"
+        href={routeForTimeline({
+          ...routeParameters,
+          queryParams: sharedFilterParams,
+        })}
+        active={pathMatches(
+          page.url.pathname,
+          routeForTimeline(routeParameters),
+        )}
+      />
+      <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
         href={routeForEventHistory({
           ...routeParameters,
+          queryParams: sharedFilterParams,
         })}
         active={pathMatches(
           page.url.pathname,

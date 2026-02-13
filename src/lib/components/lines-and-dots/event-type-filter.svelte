@@ -1,6 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
@@ -19,6 +20,7 @@
   import { eventViewType } from '$lib/stores/event-view';
   import { eventStatusFilter, eventTypeFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
+  import { updateEventFilterParams } from '$lib/utilities/event-filter-params';
   import { nexusEnabled } from '$lib/utilities/nexus-enabled';
   import { isVersionNewer } from '$lib/utilities/version-check';
 
@@ -56,9 +58,48 @@
 
   const onOptionClick = ({ value }) => {
     clearActiveGroups();
-    $eventTypeFilter = $eventTypeFilter.some((type) => type === value)
+    const newCategories = $eventTypeFilter.some((type) => type === value)
       ? $eventTypeFilter.filter((type) => type !== value)
       : [...$eventTypeFilter, value];
+    $eventTypeFilter = newCategories;
+    updateEventFilterParams(
+      $page.url,
+      {
+        categories:
+          newCategories.length === defaultOptions.length ? null : newCategories,
+      },
+      goto,
+    );
+  };
+
+  const onAllClick = () => {
+    $eventTypeFilter = defaultOptions;
+    $eventStatusFilter = false;
+    updateEventFilterParams(
+      $page.url,
+      { categories: null, statusFilter: false },
+      goto,
+    );
+  };
+
+  const onPendingClick = () => {
+    $eventTypeFilter = defaultOptions;
+    $eventStatusFilter = !$eventStatusFilter;
+    updateEventFilterParams(
+      $page.url,
+      { categories: null, statusFilter: !$eventStatusFilter },
+      goto,
+    );
+  };
+
+  const onNoneClick = () => {
+    $eventTypeFilter = [];
+    $eventStatusFilter = false;
+    updateEventFilterParams(
+      $page.url,
+      { categories: [], statusFilter: false },
+      goto,
+    );
   };
 
   $: filterActive = $eventTypeFilter.length < defaultOptions.length;
@@ -82,19 +123,10 @@
     position={minimized ? 'top-right' : 'right'}
     class="w-[220px] md:w-[360px]"
   >
-    <MenuItem
-      data-testid={translate('common.all')}
-      onclick={() => {
-        $eventTypeFilter = defaultOptions;
-        $eventStatusFilter = false;
-      }}
-    >
+    <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>
       {#snippet leading()}
         <Checkbox
-          on:change={() => {
-            $eventTypeFilter = defaultOptions;
-            $eventStatusFilter = false;
-          }}
+          on:change={onAllClick}
           checked={!$eventStatusFilter &&
             $eventTypeFilter.length === defaultOptions.length}
           label={translate('common.all')}
@@ -108,18 +140,12 @@
       <MenuItem
         data-testid={translate('common.pending-and-failed')}
         description={translate('common.pending-and-failed-description')}
-        onclick={() => {
-          $eventTypeFilter = defaultOptions;
-          $eventStatusFilter = !$eventStatusFilter;
-        }}
+        onclick={onPendingClick}
         class="items-start"
       >
         {#snippet leading()}
           <Checkbox
-            on:change={() => {
-              $eventTypeFilter = defaultOptions;
-              $eventStatusFilter = !$eventStatusFilter;
-            }}
+            on:change={onPendingClick}
             checked={$eventStatusFilter}
             label={translate('common.all')}
             labelHidden
@@ -129,19 +155,10 @@
         {translate('common.pending-and-failed')}
       </MenuItem>
     {/if}
-    <MenuItem
-      data-testid={translate('common.none')}
-      onclick={() => {
-        $eventTypeFilter = [];
-        $eventStatusFilter = false;
-      }}
-    >
+    <MenuItem data-testid={translate('common.none')} onclick={onNoneClick}>
       {#snippet leading()}
         <Checkbox
-          on:change={() => {
-            $eventTypeFilter = [];
-            $eventStatusFilter = false;
-          }}
+          on:change={onNoneClick}
           checked={!$eventStatusFilter && !$eventTypeFilter.length}
           label={translate('common.none')}
           labelHidden

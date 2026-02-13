@@ -1,22 +1,23 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { beforeNavigate } from '$app/navigation';
+  import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import EventSummary from '$lib/components/event/event-summary.svelte';
+  import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
-  import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
-  import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
+  import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
+  import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
+  import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
+  import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import {
     eventFilterSort,
@@ -24,20 +25,41 @@
     minimizeEventView,
   } from '$lib/stores/event-view';
   import {
-    currentEventHistory,
     filteredEventHistory,
+    fullEventHistory,
     pauseLiveUpdates,
   } from '$lib/stores/events';
+  import { eventCategoryFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+  import type { IterableEventWithPending } from '$lib/types/events';
+  import {
+    parseEventFilterParams,
+    updateEventFilterParams,
+  } from '$lib/utilities/event-filter-params';
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
-  const pendingActivities = $derived(workflow?.pendingActivities);
-  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
+  const pendingActivities = $derived(workflow?.pendingActivities ?? []);
+  const pendingNexusOperations = $derived(
+    workflow?.pendingNexusOperations ?? [],
+  );
+
+  $effect(() => {
+    const urlParams = parseEventFilterParams(page.url);
+    $eventFilterSort = urlParams.sort;
+    $pauseLiveUpdates = urlParams.frozen;
+  });
+
+  $effect(() => {
+    const category = page.url?.searchParams?.get('category');
+    $eventCategoryFilter = category
+      ? category.split(',').filter(isCategoryType)
+      : undefined;
+  });
 
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
+  let updating = $derived(!$fullEventHistory.length);
 
   let ascendingGroups = $derived(
     groupEvents(
@@ -55,8 +77,14 @@
     reverseSort ? [...$filteredEventHistory].reverse() : $filteredEventHistory,
   );
 
-  const workflowTaskFailedError = $derived(
-    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
+  let items = $derived(
+    (compact
+      ? groups
+      : reverseSort
+        ? [...pendingNexusOperations, ...pendingActivities, ...history]
+        : [...history, ...pendingActivities, ...pendingNexusOperations]) as
+      | EventGroups
+      | IterableEventWithPending[],
   );
 
   $effect(() => {
@@ -77,40 +105,64 @@
   let showDownloadPrompt = $state(false);
 
   const onSort = () => {
-    if (reverseSort) {
-      $eventFilterSort = 'ascending';
-    } else {
-      $eventFilterSort = 'descending';
-    }
+    const newSort = reverseSort ? 'ascending' : 'descending';
+    updateEventFilterParams(page.url, { sort: newSort }, goto);
+  };
+
+  const onFreezeToggle = () => {
+    updateEventFilterParams(page.url, { frozen: !$pauseLiveUpdates }, goto);
+  };
+
+  const onAllClick = () => {
+    $eventViewType = 'feed';
+  };
+
+  const onCompactClick = () => {
+    $eventViewType = 'compact';
+  };
+
+  const onJSONClick = () => {
+    $eventViewType = 'json';
   };
 </script>
 
-<div class="flex flex-col gap-0 pt-4">
-  <WorkflowCallStackError />
-  <div class="flex flex-col gap-2">
-    <InputAndResults />
-    {#if workflowTaskFailedError}
-      <WorkflowError
-        error={workflowTaskFailedError}
-        pendingTask={workflow?.pendingWorkflowTask}
-      />
-    {/if}
-    {#if workflow?.callbacks?.length}
-      <WorkflowCallbacks callbacks={workflow.callbacks} />
-    {/if}
-  </div>
-</div>
-<div class="relative pb-24">
+<InputAndResults />
+<div class="relative">
   <div
     class={merge(
       'surface-background flex flex-wrap items-center justify-between gap-2 border-b border-subtle py-2 xl:gap-8',
       !$minimizeEventView && 'sticky top-0 z-30 md:top-12',
     )}
   >
-    <h2>
-      {translate('workflows.event-history')}
-    </h2>
-    <div class="flex items-center gap-2">
+    <div class="items-bottom flex gap-4">
+      <h2>
+        {translate('workflows.history-tab')}
+      </h2>
+      <TabButtons class="relative top-[2px]">
+        <TabButton
+          active={$eventViewType === 'feed'}
+          data-testid="feed"
+          icon="feed"
+          class="h-10"
+          on:click={onAllClick}>All</TabButton
+        >
+        <TabButton
+          active={$eventViewType === 'compact'}
+          data-testid="compact"
+          icon="compact"
+          class="h-10"
+          on:click={onCompactClick}>Compact</TabButton
+        >
+        <TabButton
+          active={$eventViewType === 'json'}
+          data-testid="json"
+          icon="json"
+          class="h-10"
+          on:click={onJSONClick}>JSON</TabButton
+        >
+      </TabButtons>
+    </div>
+    <div class="flex items-center gap-2 pb-2">
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
           <ToggleButton
@@ -147,7 +199,7 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
-          on:click={() => ($pauseLiveUpdates = !$pauseLiveUpdates)}
+          on:click={onFreezeToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates ||
@@ -171,13 +223,15 @@
     </div>
   </div>
   <div class="flex w-full flex-col">
-    <TimelineGraph
-      {workflow}
-      {groups}
-      error={Boolean(workflowTaskFailedError)}
-      viewportHeight={$minimizeEventView ? 360 : undefined}
-    />
-    <EventSummary {groups} {history} minimized={$minimizeEventView} />
+    {#if $eventViewType === 'json'}
+      <div class="border-t border-subtle px-4">
+        <WorkflowHistoryJson />
+      </div>
+    {:else}
+      <div data-testid="event-summary-table">
+        <EventSummaryTable {updating} {items} {groups} {compact} minimized />
+      </div>
+    {/if}
   </div>
 </div>
 <DownloadEventHistoryModal
