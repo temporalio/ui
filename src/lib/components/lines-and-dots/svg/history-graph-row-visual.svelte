@@ -5,7 +5,10 @@
   } from '$lib/models/event-groups/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { eventFilterSort } from '$lib/stores/event-view';
-  import type { WorkflowEventWithPending } from '$lib/types/events';
+  import type {
+    EventTypeCategory,
+    WorkflowEventWithPending,
+  } from '$lib/types/events';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -58,7 +61,7 @@
       ? 'pending'
       : nextIsPending
         ? event?.category
-        : '';
+        : (undefined as EventTypeCategory | 'pending' | undefined);
   $: reverseSort = $eventFilterSort === 'descending';
 </script>
 
@@ -87,7 +90,7 @@
         y + zoomNextDistance + radius,
       ]}
       category={group?.pendingActivity
-        ? group.pendingActivity.attempt > 1
+        ? Number(group.pendingActivity.attempt) > 1
           ? 'retry'
           : 'pending'
         : category}

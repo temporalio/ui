@@ -1,10 +1,20 @@
 <script lang="ts">
+  import {
+    getCategoryStrokeColor,
+    getStatusStrokeColor,
+  } from '$lib/components/lines-and-dots/constants';
+  import type {
+    EventClassification,
+    EventTypeCategory,
+  } from '$lib/types/events';
+  import type { WorkflowStatus } from '$lib/types/workflows';
+
   type Props = {
     startPoint?: [number, number];
     endPoint?: [number, number];
-    status?: string;
-    category?: string;
-    classification?: string;
+    status?: WorkflowStatus | 'none';
+    category?: EventTypeCategory | 'pending' | 'retry';
+    classification?: EventClassification;
     scheduling?: boolean;
     pending?: boolean;
     paused?: boolean;
@@ -34,6 +44,25 @@
   const completedWithRetries = $derived(
     retried && classification === 'Completed',
   );
+
+  const strokeColor = $derived.by(() => {
+    let color = 'currentColor';
+    if (status) {
+      color = status === 'none' ? '#141414' : getStatusStrokeColor(status);
+    }
+    if (classification) {
+      color = getStatusStrokeColor(classification);
+    }
+    if (delayed && [classification, status].includes('Running')) {
+      color = getStatusStrokeColor('Delayed');
+    }
+
+    if (category) {
+      color = getCategoryStrokeColor(category);
+    }
+
+    return color;
+  });
 </script>
 
 {#if completedWithRetries}
@@ -45,15 +74,18 @@
   >
     <div
       class="h-full w-full"
-      style="background: linear-gradient(255deg, #1FF1A5 0%, #F55 100%);"
+      style="background: linear-gradient(255deg, {getStatusStrokeColor(
+        'Completed',
+      )} 0%, #F55 100%);"
     ></div>
   </foreignObject>
 {:else}
   <line
-    class="line {status} {category} {classification}"
+    class="line"
+    stroke={strokeColor}
+    class:none={status === 'none'}
     class:scheduling
     class:animate-line={pending && !paused}
-    class:delayed
     stroke-width={strokeWidth}
     stroke-dasharray={pending ? '3' : strokeDasharray}
     x1={Math.max(0, x1)}
@@ -68,79 +100,14 @@
     cursor: pointer;
     opacity: 1;
     outline: none;
-    stroke: currentColor;
   }
 
   .none {
-    stroke: #141414;
     opacity: 0.65;
   }
 
   .scheduling {
     opacity: 0.35;
-  }
-
-  .workflow,
-  .marker,
-  .command {
-    stroke: #ebebeb;
-  }
-
-  .timer {
-    stroke: #fbbf24;
-  }
-
-  .signal {
-    stroke: #d300d8;
-  }
-
-  .activity {
-    stroke: #a78bfa;
-  }
-
-  .pending {
-    stroke: #a78bfa;
-  }
-
-  .retry {
-    stroke: theme('colors.red.300');
-  }
-
-  .child-workflow {
-    stroke: theme('colors.cyan.600');
-  }
-
-  .Completed {
-    stroke: #1ff1a5;
-  }
-
-  .Failed,
-  .Terminated {
-    stroke: #c71607;
-  }
-
-  .Signaled {
-    stroke: #d300d8;
-  }
-
-  .Fired {
-    stroke: #f8a208;
-  }
-
-  .TimedOut {
-    stroke: #f97316;
-  }
-
-  .Canceled {
-    stroke: #fed64b;
-  }
-
-  .Running {
-    stroke: #3b82f6;
-
-    &.delayed {
-      stroke: #fbbf24;
-    }
   }
 
   .animate-line {

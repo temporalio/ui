@@ -211,55 +211,56 @@ export const getNextDistanceAndOffset = (
   return { nextDistance, offset };
 };
 
-export const getStatusColor = (
-  status: WorkflowStatus | EventClassification | 'Pending' | 'Retrying',
+export const getStatusStrokeColor = (
+  status: WorkflowStatus | EventClassification | 'Delayed',
 ): string => {
   switch (status) {
     case 'Completed':
-      return '#00f37e';
+      return '#1ff1a5';
     case 'Failed':
     case 'Terminated':
-      return '#ff4518';
+      return '#c71607';
     case 'Signaled':
       return '#d300d8';
     case 'Fired':
       return '#f8a208';
     case 'TimedOut':
-      return '#F97316';
+      return '#f97316';
     case 'Canceled':
       return '#fed64b';
     case 'Running':
       return '#3b82f6';
-    case 'Pending':
-      return '#a78bfa';
-    case 'Retrying':
-      return '#FF9B70';
+    case 'Delayed':
+      return '#fbbf24';
     default:
-      return '#ffffff';
+      return 'currentColor';
   }
 };
 
-export const getCategoryColor = (type: EventTypeCategory): string => {
-  switch (type) {
-    case 'other':
-    case 'local-activity':
-      return '#ebebeb';
+export const getCategoryStrokeColor = (
+  category: EventTypeCategory | 'pending' | 'retry' | 'marker' | 'command',
+): string => {
+  switch (category) {
     case 'timer':
       return '#fbbf24';
     case 'signal':
-      return '#ec4899';
+      return '#d300d8';
     case 'activity':
       return '#a78bfa';
     case 'workflow':
-      return '#059669';
+    case 'marker':
+    case 'command':
+      return '#ebebeb';
     case 'child-workflow':
-      return '#67e4f9';
+      return '#0899B2';
     case 'update':
       return '#FF9B70';
-    case 'nexus':
-      return '#3b82f6';
+    case 'pending':
+      return '#a78bfa';
+    case 'retry':
+      return '#FF9B70';
     default:
-      return '#ebebeb';
+      return 'currentColor';
   }
 };
 

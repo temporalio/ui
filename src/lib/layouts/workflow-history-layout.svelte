@@ -5,6 +5,7 @@
   import { page } from '$app/state';
 
   import EventSummary from '$lib/components/event/event-summary.svelte';
+  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
@@ -107,9 +108,12 @@
       !$minimizeEventView && 'sticky top-0 z-30 md:top-12',
     )}
   >
-    <h2>
-      {translate('workflows.event-history')}
-    </h2>
+    <div class="flex items-center gap-2">
+      <h2>
+        {translate('workflows.event-history')}
+      </h2>
+      <EventHistoryLegend />
+    </div>
     <div class="flex items-center gap-2">
       <ToggleButtons>
         {#if $eventViewType !== 'json'}
