@@ -46,18 +46,22 @@
   );
 
   const strokeColor = $derived.by(() => {
-    if (classification) {
-      if (delayed && classification === 'Running')
-        return getStatusStrokeColor('Delayed');
-      return getStatusStrokeColor(classification);
-    }
+    let color = 'currentColor';
     if (status) {
-      if (status === 'none') return '#141414';
-      return getStatusStrokeColor(status);
+      color = status === 'none' ? '#141414' : getStatusStrokeColor(status);
     }
-    if (category) return getCategoryStrokeColor(category);
+    if (classification) {
+      color = getStatusStrokeColor(classification);
+    }
+    if (delayed && [classification, status].includes('Running')) {
+      color = getStatusStrokeColor('Delayed');
+    }
 
-    return 'currentColor';
+    if (category) {
+      color = getCategoryStrokeColor(category);
+    }
+
+    return color;
   });
 </script>
 
@@ -78,10 +82,10 @@
 {:else}
   <line
     class="line"
+    stroke={strokeColor}
     class:none={status === 'none'}
     class:scheduling
     class:animate-line={pending && !paused}
-    stroke={strokeColor}
     stroke-width={strokeWidth}
     stroke-dasharray={pending ? '3' : strokeDasharray}
     x1={Math.max(0, x1)}
