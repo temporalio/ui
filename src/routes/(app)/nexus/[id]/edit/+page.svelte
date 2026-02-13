@@ -6,7 +6,6 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEditEndpoint from '$lib/pages/nexus-edit-endpoint.svelte';
-  import { endpointForm } from '$lib/pages/nexus-form.svelte';
   import {
     deleteNexusEndpoint,
     updateNexusEndpoint,
@@ -27,13 +26,15 @@
 
   let error = $state<NetworkError | undefined>(undefined);
   let loading = $state(false);
+  let editEndpointComponent: NexusEditEndpoint;
 
   const onUpdate = async () => {
     if (!endpoint) return;
 
     error = undefined;
     loading = true;
-    const body = { ...$endpointForm };
+    const formData = editEndpointComponent.getFormData();
+    const body = { ...formData };
     body.id = endpoint.id;
     body.version = endpoint.version;
 
@@ -92,6 +93,7 @@
       {translate('nexus.back-to-endpoint')}
     </Link>
     <NexusEditEndpoint
+      bind:this={editEndpointComponent}
       {endpoint}
       {loading}
       {targetNamespaceList}
