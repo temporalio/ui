@@ -9,11 +9,11 @@
     fallback?: Snippet;
   }
 
-  let { namespace, children, fallback }: Props = $props();
+  let { /* namespace, **/ children /* fallback **/ }: Props = $props();
 </script>
 
-{#if namespace.namespaceInfo?.capabilities?.standaloneActivities}
-  {@render children()}
-{:else if fallback}
+<!-- {#if namespace.namespaceInfo?.capabilities?.standaloneActivities} -->
+{@render children()}
+<!-- {:else if fallback}
   {@render fallback()}
-{/if}
+{/if} -->
