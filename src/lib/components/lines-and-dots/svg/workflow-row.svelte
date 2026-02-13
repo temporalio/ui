@@ -22,7 +22,7 @@
   <Line
     startPoint={[start, y]}
     endPoint={[end, y]}
-    classification={workflow.status}
+    status={workflow.status}
     strokeWidth={radius * 2}
     pending={workflow.isRunning}
     delayed={isWorkflowDelayed(workflow)}
