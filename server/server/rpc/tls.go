@@ -139,7 +139,7 @@ func CreateTLSConfig(address string, cfg *config.TLS) (*tls.Config, error) {
 	}
 
 	if configureCertPool {
-		caCertPool, err := loadCACert(cfg)
+		caCertPool, err := LoadCACert(cfg.CaFile, cfg.CaData)
 		if err != nil {
 			log.Fatalf("Unable to load server CA certificate")
 			return nil, err
@@ -171,9 +171,9 @@ func CreateTLSConfig(address string, cfg *config.TLS) (*tls.Config, error) {
 	return tlsConfig, nil
 }
 
-func loadCACert(cfg *config.TLS) (caPool *x509.CertPool, err error) {
-	pathOrUrl := cfg.CaFile
-	caData := cfg.CaData
+// LoadCACert loads a CA certificate bundle from a file path or HTTPS URL, or from base64-encoded data,
+// and returns a certificate pool containing the parsed certificates.
+func LoadCACert(pathOrUrl string, caData string) (caPool *x509.CertPool, err error) {
 
 	caPool = x509.NewCertPool()
 	var caBytes []byte
