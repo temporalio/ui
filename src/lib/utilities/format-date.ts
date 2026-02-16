@@ -108,7 +108,7 @@ export function formatDate(
     const parsed = parseJSON(new Date(date));
 
     // Handle relative time first (takes precedence over format)
-    if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL && relative) {
+    if (relative) {
       return (
         formatDistanceToNowStrict(parsed, {
           ...(!flexibleUnits &&
