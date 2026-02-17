@@ -36,9 +36,7 @@
 
   let formComponent: NexusForm;
 
-  const createDisabled = $derived(
-    !formComponent || !formComponent.isFormValid(),
-  );
+  const createDisabled = $derived(!formComponent?.isFormValid());
 
   export function getFormData() {
     return formComponent?.getFormData();

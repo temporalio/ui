@@ -29,7 +29,7 @@
   let editEndpointComponent: NexusEditEndpoint;
 
   const onUpdate = async () => {
-    if (!endpoint) return;
+    if (!endpoint?.id) return;
 
     error = undefined;
     loading = true;
@@ -61,7 +61,7 @@
   };
 
   const onDelete = async () => {
-    if (!endpoint) return;
+    if (!endpoint?.id) return;
 
     error = undefined;
     loading = true;
