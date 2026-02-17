@@ -59,7 +59,6 @@ type CodecResponse struct {
 
 type SettingsResponse struct {
 	Auth                          *Auth
-	BannerText                    string
 	DefaultNamespace              string
 	ShowTemporalSystemNamespace   bool
 	FeedbackURL                   string
@@ -132,7 +131,6 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 				Enabled: cfg.Auth.Enabled,
 				Options: options,
 			},
-			BannerText:                  cfg.BannerText,
 			DefaultNamespace:            cfg.DefaultNamespace,
 			ShowTemporalSystemNamespace: cfg.ShowTemporalSystemNamespace,
 			FeedbackURL:                 cfg.FeedbackURL,

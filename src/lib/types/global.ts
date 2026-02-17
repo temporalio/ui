@@ -76,7 +76,6 @@ export type Settings = {
     enabled: boolean;
     options: string[];
   };
-  bannerText: string;
   baseUrl: string;
   codec: {
     endpoint?: string;

@@ -6,7 +6,6 @@ temporalGrpcAddress: {{ env "TEMPORAL_ADDRESS" | default "127.0.0.1:7233" }}
 port: {{ env "TEMPORAL_UI_PORT" | default "8080" }}
 publicPath: {{ env "TEMPORAL_UI_PUBLIC_PATH" | default "" }}
 enableUi: {{ env "TEMPORAL_UI_ENABLED" | default "true" }}
-bannerText: {{ env "TEMPORAL_BANNER_TEXT" | default "" }}
 cloudUi: {{ env "TEMPORAL_CLOUD_UI" | default "false" }}
 defaultNamespace: {{ env "TEMPORAL_DEFAULT_NAMESPACE" | default "default" }}
 feedbackUrl: {{ env "TEMPORAL_FEEDBACK_URL" | default "" }}

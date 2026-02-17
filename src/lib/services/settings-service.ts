@@ -22,7 +22,6 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
       enabled: !!settingsResponse?.Auth?.Enabled,
       options: settingsResponse?.Auth?.Options,
     },
-    bannerText: settingsResponse?.BannerText,
     baseUrl: getApiOrigin(),
     codec: {
       endpoint: settingsResponse?.Codec?.Endpoint,
