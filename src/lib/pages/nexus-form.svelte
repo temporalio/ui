@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod/v3';
@@ -25,6 +26,7 @@
     submitButtonText?: string;
     cancelHref?: string;
     onSubmit?: (formData: NexusFormData) => void;
+    footer?: Snippet;
   };
 
   let {
@@ -39,6 +41,7 @@
     submitButtonText = translate('common.save'),
     cancelHref = undefined,
     onSubmit,
+    footer,
   }: Props = $props();
 
   export type NexusFormData = {
@@ -178,25 +181,30 @@
       {translate('nexus.description-hint')}
     </p>
   </div>
-  <div class="flex flex-row items-center gap-4 max-sm:flex-col">
-    <Button
-      type="submit"
-      disabled={$submitting}
-      class="max-sm:w-full"
-      data-testid="nexus-form-submit-button"
-    >
-      {submitButtonText}
-    </Button>
-    {#if cancelHref}
+  <div
+    class="flex w-full flex-row items-center justify-between gap-4 max-sm:flex-col xl:w-1/2"
+  >
+    <div class="flex flex-row items-center gap-4 max-sm:w-full max-sm:flex-col">
       <Button
-        variant="ghost"
-        href={cancelHref}
+        type="submit"
+        disabled={$submitting}
         class="max-sm:w-full"
-        data-testid="nexus-form-cancel-button"
+        data-testid="nexus-form-submit-button"
       >
-        {translate('common.cancel')}
+        {submitButtonText}
       </Button>
-    {/if}
+      {#if cancelHref}
+        <Button
+          variant="ghost"
+          href={cancelHref}
+          class="max-sm:hidden max-sm:w-full"
+          data-testid="nexus-form-cancel-button"
+        >
+          {translate('common.cancel')}
+        </Button>
+      {/if}
+    </div>
+    {@render footer?.()}
   </div>
 </form>
 <Alert title={error?.statusText} intent="error" hidden={!error}>
