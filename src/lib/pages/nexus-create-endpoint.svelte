@@ -34,7 +34,7 @@
     projectId: _projectId = undefined,
   }: Props = $props();
 
-  let formComponent: NexusForm;
+  let formComponent: NexusForm | undefined;
 
   const createDisabled = $derived(!formComponent?.isFormValid());
 
