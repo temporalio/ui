@@ -47,7 +47,6 @@
   </div>
   <NexusForm
     {endpoint}
-    {nameHintText}
     {nameRegexPattern}
     {targetNamespaceList}
     {callerNamespaceList}

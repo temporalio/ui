@@ -18,7 +18,7 @@
     targetNamespaceList: { namespace: string }[];
     callerNamespaceList: { namespace: string }[];
     nameRegexPattern: RegExp;
-    nameHintText: string;
+    nameHintText?: string;
     isCloud: boolean;
     cancelHref: string;
     submitButtonText: string;
@@ -33,7 +33,7 @@
     targetNamespaceList,
     callerNamespaceList,
     nameRegexPattern,
-    nameHintText,
+    nameHintText = undefined,
     isCloud,
     cancelHref,
     submitButtonText,
