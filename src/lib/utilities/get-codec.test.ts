@@ -22,7 +22,6 @@ const defaultSettings = {
   defaultNamespace: '',
   showTemporalSystemNamespace: false,
   feedbackURL: '',
-  notifyOnNewVersion: false,
   codec: {
     endpoint: '',
     passAccessToken: false,

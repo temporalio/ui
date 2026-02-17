@@ -329,7 +329,6 @@ export type SettingsResponse = {
   RefreshWorkflowCountsDisabled: boolean;
   ActivityCommandsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
-  NotifyOnNewVersion: boolean;
   FeedbackURL: string;
   Version: string;
 };

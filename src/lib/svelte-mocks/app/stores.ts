@@ -34,7 +34,6 @@ const settings: Settings = {
   workflowTerminateDisabled: false,
   hideWorkflowQueryErrors: false,
   activityCommandsDisabled: false,
-  notifyOnNewVersion: true,
   feedbackURL: '',
   runtimeEnvironment: {
     isCloud: false,

@@ -50,7 +50,6 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
-    notifyOnNewVersion: settingsResponse?.NotifyOnNewVersion,
     feedbackURL: settingsResponse?.FeedbackURL,
     runtimeEnvironment: {
       get isCloud() {
