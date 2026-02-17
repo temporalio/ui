@@ -45,16 +45,6 @@
       {endpoint.spec?.name || ''}
     </h1>
   </div>
-  {#snippet footer()}
-    <Button
-      variant="destructive"
-      class="max-sm:w-full"
-      on:click={() => (deleteConfirmationModalOpen = true)}
-      data-testid="delete-endpoint-button"
-    >
-      {translate('common.delete')}
-    </Button>
-  {/snippet}
   <NexusForm
     {endpoint}
     {nameHintText}
@@ -64,11 +54,23 @@
     {error}
     {isCloud}
     {cancelHref}
-    {footer}
     submitButtonText={translate('common.save')}
     onSubmit={onUpdate}
     nameDisabled
-  />
+  >
+    {#snippet footer()}
+      <div class="flex w-full grow justify-end">
+        <Button
+          variant="destructive"
+          class="max-sm:w-full"
+          on:click={() => (deleteConfirmationModalOpen = true)}
+          data-testid="delete-endpoint-button"
+        >
+          {translate('common.delete')}
+        </Button>
+      </div>
+    {/snippet}
+  </NexusForm>
 </div>
 <Modal
   id="delete-endpoint-modal"

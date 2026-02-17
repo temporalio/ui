@@ -15,32 +15,32 @@
   import type { NexusEndpoint } from '$lib/types/nexus';
 
   type Props = {
+    targetNamespaceList: { namespace: string }[];
+    callerNamespaceList: { namespace: string }[];
+    nameRegexPattern: RegExp;
+    nameHintText: string;
+    isCloud: boolean;
+    cancelHref: string;
+    submitButtonText: string;
+    onSubmit: (formData: NexusFormData) => void;
     endpoint?: NexusEndpoint;
-    targetNamespaceList?: { namespace: string }[];
-    callerNamespaceList?: { namespace: string }[];
     error?: NetworkError;
     nameDisabled?: boolean;
-    isCloud?: boolean;
-    nameHintText?: string;
-    nameRegexPattern?: RegExp;
-    submitButtonText?: string;
-    cancelHref?: string;
-    onSubmit?: (formData: NexusFormData) => void;
     footer?: Snippet;
   };
 
   let {
+    targetNamespaceList,
+    callerNamespaceList,
+    nameRegexPattern,
+    nameHintText,
+    isCloud,
+    cancelHref,
+    submitButtonText,
+    onSubmit,
     endpoint = undefined,
-    targetNamespaceList = [],
-    callerNamespaceList = [],
     error = undefined,
     nameDisabled = false,
-    isCloud = true,
-    nameHintText = translate('nexus.endpoint-name-hint'),
-    nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
-    submitButtonText = translate('common.save'),
-    cancelHref = undefined,
-    onSubmit,
     footer,
   }: Props = $props();
 
@@ -181,29 +181,25 @@
       {translate('nexus.description-hint')}
     </p>
   </div>
-  <div
-    class="flex w-full flex-row items-center justify-between gap-4 max-sm:flex-col xl:w-1/2"
-  >
-    <div class="flex flex-row items-center gap-4 max-sm:w-full max-sm:flex-col">
+  <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
+    <Button
+      type="submit"
+      disabled={$submitting}
+      class="max-sm:w-full"
+      data-testid="nexus-form-submit-button"
+    >
+      {submitButtonText}
+    </Button>
+    {#if cancelHref}
       <Button
-        type="submit"
-        disabled={$submitting}
+        variant="ghost"
+        href={cancelHref}
         class="max-sm:w-full"
-        data-testid="nexus-form-submit-button"
+        data-testid="nexus-form-cancel-button"
       >
-        {submitButtonText}
+        {translate('common.cancel')}
       </Button>
-      {#if cancelHref}
-        <Button
-          variant="ghost"
-          href={cancelHref}
-          class="max-sm:hidden max-sm:w-full"
-          data-testid="nexus-form-cancel-button"
-        >
-          {translate('common.cancel')}
-        </Button>
-      {/if}
-    </div>
+    {/if}
     {@render footer?.()}
   </div>
 </form>
