@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import NexusForm from '$lib/pages/nexus-form.svelte';
+  import NexusForm, { type NexusFormData } from '$lib/pages/nexus-form.svelte';
   import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
@@ -13,7 +11,7 @@
     endpoint: NexusEndpoint;
     targetNamespaceList?: { namespace: string }[];
     callerNamespaceList?: { namespace: string }[];
-    onUpdate: () => void;
+    onUpdate: (formData: NexusFormData) => void;
     onDelete: () => void;
     error?: NetworkError;
     loading?: boolean;
@@ -21,8 +19,6 @@
     nameRegexPattern?: RegExp;
     nameHintText?: string;
     cancelHref?: string;
-    successHref?: string;
-    deleteSuccessHref?: string;
   };
 
   let {
@@ -35,19 +31,12 @@
     loading = false,
     isCloud = false,
     nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
-    nameHintText = translate('nexus.endpoint-name-hint-with-dash'),
+    nameHintText = translate('nexus.endpoint-name-hint'),
     cancelHref = '/nexus',
-    successHref: _successHref = undefined,
-    deleteSuccessHref: _deleteSuccessHref = undefined,
   }: Props = $props();
 
   let deleteConfirmationModalOpen = $state(false);
   let confirmDeleteInput = $state('');
-  let formComponent: NexusForm;
-
-  export function getFormData() {
-    return formComponent?.getFormData();
-  }
 </script>
 
 <div class="flex flex-col gap-8">
@@ -57,7 +46,6 @@
     </h1>
   </div>
   <NexusForm
-    bind:this={formComponent}
     {endpoint}
     {nameHintText}
     {nameRegexPattern}
@@ -65,32 +53,19 @@
     {callerNamespaceList}
     {error}
     {isCloud}
+    {cancelHref}
+    submitButtonText={translate('common.save')}
+    onSubmit={onUpdate}
     nameDisabled
   />
-  <div
-    class="flex w-full flex-row items-center justify-between gap-4 max-sm:flex-col xl:w-1/2"
-  >
-    <div class="flex w-full flex-row items-center gap-4 max-sm:flex-col">
-      <Button class="max-sm:w-full" on:click={onUpdate} {loading}
-        >{translate('common.save')}</Button
-      >
-      <Button
-        class="max-sm:hidden"
-        variant="ghost"
-        on:click={() => goto(cancelHref)}>{translate('common.cancel')}</Button
-      >
-    </div>
+  <div class="flex w-full justify-end xl:w-1/2">
     <Button
-      class="max-sm:w-full"
       variant="destructive"
       on:click={() => (deleteConfirmationModalOpen = true)}
-      >{translate('common.delete')}</Button
+      data-testid="delete-endpoint-button"
     >
-    <Button
-      class="w-full sm:hidden"
-      variant="ghost"
-      on:click={() => goto(cancelHref)}>{translate('common.cancel')}</Button
-    >
+      {translate('common.delete')}
+    </Button>
   </div>
 </div>
 <Modal

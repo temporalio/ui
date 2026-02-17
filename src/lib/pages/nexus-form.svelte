@@ -5,6 +5,7 @@
 
   import IsOssGuard from '$lib/components/is-oss-guard.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
@@ -21,6 +22,9 @@
     isCloud?: boolean;
     nameHintText?: string;
     nameRegexPattern?: RegExp;
+    submitButtonText?: string;
+    cancelHref?: string;
+    onSubmit?: (formData: NexusFormData) => void;
   };
 
   let {
@@ -30,8 +34,11 @@
     error = undefined,
     nameDisabled = false,
     isCloud = true,
-    nameHintText = translate('nexus.endpoint-name-hint-with-dash'),
+    nameHintText = translate('nexus.endpoint-name-hint'),
     nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
+    submitButtonText = translate('common.save'),
+    cancelHref = undefined,
+    onSubmit,
   }: Props = $props();
 
   export type NexusFormData = {
@@ -46,13 +53,15 @@
     z.object({
       name: z
         .string()
-        .min(1, 'Name is required')
+        .min(1, translate('nexus.endpoint-name-hint'))
         .refine((val) => pattern.test(val), {
-          message: 'Name must match the required pattern',
+          message: translate('nexus.endpoint-name-hint'),
         }),
       descriptionString: z.string().optional().default(''),
-      targetNamespace: z.string().min(1, 'Target namespace is required'),
-      taskQueue: z.string().min(1, 'Task queue is required'),
+      targetNamespace: z
+        .string()
+        .min(1, translate('nexus.target-namespace-required')),
+      taskQueue: z.string().min(1, translate('nexus.task-queue-required')),
       allowedCallerNamespaces: z.array(z.string()).default([]),
     });
 
@@ -64,14 +73,20 @@
     allowedCallerNamespaces: endpoint?.spec?.allowedCallerNamespaces || [],
   };
 
-  const { form, errors, constraints } = $derived(
-    superForm(initialData, {
-      SPA: true,
-      validators: zodClient(createNexusSchema(nameRegexPattern)),
-      resetForm: false,
-      dataType: 'json',
-    }),
-  );
+  // initialData is reactive but we only need its initial value
+  // svelte-ignore state_referenced_locally
+  const superform = superForm(initialData, {
+    SPA: true,
+    validators: zodClient(createNexusSchema(nameRegexPattern)),
+    resetForm: false,
+    dataType: 'json',
+    onUpdate: async ({ form }) => {
+      if (!form.valid) return;
+      onSubmit?.(form.data);
+    },
+  });
+
+  const { form, errors, constraints, enhance, submitting } = superform;
 
   const callerNamespaces = $derived(
     callerNamespaceList.map((n) => ({
@@ -79,34 +94,9 @@
       label: n.namespace,
     })),
   );
-
-  export function getFormData(): Partial<NexusEndpoint> {
-    return {
-      spec: {
-        name: $form.name,
-        descriptionString: $form.descriptionString,
-        target: {
-          worker: {
-            namespace: $form.targetNamespace,
-            taskQueue: $form.taskQueue,
-          },
-        },
-        allowedCallerNamespaces: $form.allowedCallerNamespaces,
-      },
-    };
-  }
-
-  export function isFormValid(): boolean {
-    return (
-      !!$form.name &&
-      !!$form.targetNamespace &&
-      !!$form.taskQueue &&
-      nameRegexPattern.test($form.name)
-    );
-  }
 </script>
 
-<div class="flex w-full flex-col gap-4 xl:w-1/2">
+<form class="flex w-full flex-col gap-4 xl:w-1/2" use:enhance novalidate>
   <Input
     bind:value={$form.name}
     required
@@ -130,7 +120,8 @@
     label={translate('nexus.target-namespace')}
     noResultsText={translate('common.no-results')}
     valid={!$errors.targetNamespace}
-    error={$errors.targetNamespace?.[0] || 'Please select a target Namespace.'}
+    error={$errors.targetNamespace?.[0] ||
+      translate('nexus.target-namespace-required')}
     bind:value={$form.targetNamespace}
     required
     id="target-namespace"
@@ -172,19 +163,42 @@
       valid={!$errors.allowedCallerNamespaces}
       error={typeof $errors.allowedCallerNamespaces?.[0] === 'string'
         ? $errors.allowedCallerNamespaces[0]
-        : 'Please select at least one Namespace.'}
+        : translate('nexus.caller-namespace-required')}
       placeholder={translate('nexus.select-namespaces')}
       optionValueKey="value"
       optionLabelKey="label"
     />
   </IsOssGuard>
   <div class="flex flex-col gap-2">
-    <p class="text-sm font-medium">Description</p>
+    <p class="text-sm font-medium">
+      {translate('nexus.description-label')}
+    </p>
     <MarkdownEditor bind:content={$form.descriptionString} />
-    <p class="text-xs text-secondary">Do not include sensitive data.</p>
+    <p class="text-xs text-secondary">
+      {translate('nexus.description-hint')}
+    </p>
   </div>
-  <slot name="footer" />
-</div>
+  <div class="flex flex-row items-center gap-4 max-sm:flex-col">
+    <Button
+      type="submit"
+      disabled={$submitting}
+      class="max-sm:w-full"
+      data-testid="nexus-form-submit-button"
+    >
+      {submitButtonText}
+    </Button>
+    {#if cancelHref}
+      <Button
+        variant="ghost"
+        href={cancelHref}
+        class="max-sm:w-full"
+        data-testid="nexus-form-cancel-button"
+      >
+        {translate('common.cancel')}
+      </Button>
+    {/if}
+  </div>
+</form>
 <Alert title={error?.statusText} intent="error" hidden={!error}>
   {error?.message}
 </Alert>
