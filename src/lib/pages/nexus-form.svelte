@@ -54,7 +54,7 @@
     $endpointForm = {
       spec: {
         name,
-        descriptionString,
+        descriptionString: descriptionString.trim() || undefined,
         target: {
           worker: {
             namespace: target,
