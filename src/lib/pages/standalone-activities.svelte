@@ -32,11 +32,12 @@
 
   interface Props {
     headerActions?: Snippet;
+    releaseStageBadge?: Snippet;
   }
 
-  let { headerActions }: Props = $props();
+  let { headerActions, releaseStageBadge }: Props = $props();
 
-  const query = $derived(page.url.searchParams.get('query'));
+  const query = $derived(page.url.searchParams.get('query') ?? '');
   const namespace = $derived(page.params.namespace);
   const searchParams = $derived(page.url.searchParams.toString());
 
@@ -91,6 +92,7 @@
           {refreshTimeFormatted}
         </p>
       </div>
+      {@render releaseStageBadge?.()}
       <ActivityCountRefresh count={$activityCount.newCount} />
       <ActivityCounts bind:refreshTime />
     </div>
