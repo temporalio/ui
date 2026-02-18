@@ -189,6 +189,34 @@
 </Story>
 
 <Story
+  name="Allow Custom Value"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+    allowCustomValue: true,
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+    await userEvent.type(combobox, 'Spanish');
+  }}
+/>
+
+<Story
+  name="Multiselect Allow Custom Value"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+    multiselect: true,
+    value: [],
+    allowCustomValue: true,
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+    await userEvent.type(combobox, 'Spanish');
+  }}
+/>
+
+<Story
   name="Ghost Variant"
   args={{
     variant: 'ghost',

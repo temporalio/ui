@@ -42,6 +42,7 @@ export const Strings = {
   'no-allowed-caller-namespaces': 'No Allowed Caller Namespaces',
   'allowed-caller-namespaces-description':
     'Namespace(s) that are allowed to call this Endpoint.',
+  'allowed-caller-namespaces-error': 'Please select at least one Namespace.',
   'select-namespaces': 'Select Namespace(s)',
   'selected-namespaces_one': '{{count}} Namespace selected',
   'selected-namespaces_other': '{{count}} Namespaces selected',
