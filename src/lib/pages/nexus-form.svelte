@@ -49,7 +49,7 @@
     allowedCallerNamespaces: string[];
   };
 
-  const createNexusSchema = (pattern: RegExp) =>
+  const createNexusSchema = (pattern: RegExp, requireCallerNamespaces: boolean) =>
     z.object({
       name: z
         .string()
@@ -67,7 +67,11 @@
         .string()
         .min(1, translate('nexus.target-namespace-required')),
       taskQueue: z.string().min(1, translate('nexus.task-queue-required')),
-      allowedCallerNamespaces: z.array(z.string()).default([]),
+      allowedCallerNamespaces: requireCallerNamespaces
+        ? z
+            .array(z.string())
+            .min(1, translate('nexus.caller-namespace-required'))
+        : z.array(z.string()).default([]),
     });
 
   const initialData: NexusFormData = {
@@ -80,7 +84,7 @@
 
   const superform = superForm(initialData, {
     SPA: true,
-    validators: zodClient(createNexusSchema(nameRegexPattern)),
+    validators: zodClient(createNexusSchema(nameRegexPattern, isCloud)),
     resetForm: false,
     dataType: 'json',
     onUpdate: async ({ form }) => {
@@ -199,6 +203,7 @@
       multiselect
       displayChips={false}
       allowCustomValue
+      required
       bind:value={$form.allowedCallerNamespaces}
       options={callerNamespaces}
       label={translate('nexus.allowed-caller-namespaces')}

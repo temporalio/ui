@@ -13,11 +13,13 @@
   }
 
   interface EnabledProps extends BaseProps {
+    active?: boolean;
     selected?: boolean;
     disabled?: boolean;
   }
 
   interface DisabledProps extends BaseProps {
+    active?: never;
     disabled: true;
     selected?: never;
   }
@@ -25,6 +27,7 @@
   type Props = EnabledProps | DisabledProps;
 
   let {
+    active = false,
     selected = false,
     disabled = false,
     label,
@@ -41,6 +44,7 @@
   aria-selected={selected}
   aria-disabled={disabled}
   {onclick}
+  {active}
   {selected}
   {disabled}
   {leading}
