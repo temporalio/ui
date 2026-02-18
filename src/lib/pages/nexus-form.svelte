@@ -87,7 +87,8 @@
     },
   });
 
-  const { form, errors, constraints, enhance, submitting } = superform;
+  const { form, errors, constraints, enhance, submitting, tainted, isTainted } =
+    superform;
 
   const callerNamespaces = $derived(
     callerNamespaceList.map((n) => ({
@@ -182,7 +183,7 @@
   <div class="flex w-full flex-col items-center gap-4 sm:flex-row">
     <Button
       type="submit"
-      disabled={$submitting}
+      disabled={$submitting || (endpoint && !isTainted($tainted))}
       loading={$submitting}
       class="max-sm:w-full"
       data-testid="nexus-form-submit-button"
