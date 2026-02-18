@@ -58,10 +58,11 @@
     onSubmit={onUpdate}
     nameDisabled
   >
-    {#snippet footer()}
+    {#snippet footer({ submitting })}
       <div class="flex w-full grow justify-end">
         <Button
           variant="destructive"
+          disabled={submitting}
           class="max-sm:w-full"
           on:click={() => (deleteConfirmationModalOpen = true)}
           data-testid="delete-endpoint-button"

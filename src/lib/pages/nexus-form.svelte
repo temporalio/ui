@@ -26,7 +26,7 @@
     endpoint?: NexusEndpoint;
     error?: NetworkError;
     nameDisabled?: boolean;
-    footer?: Snippet;
+    footer?: Snippet<[{ submitting: boolean }]>;
   };
 
   let {
@@ -183,6 +183,7 @@
     <Button
       type="submit"
       disabled={$submitting}
+      loading={$submitting}
       class="max-sm:w-full"
       data-testid="nexus-form-submit-button"
     >
@@ -191,6 +192,7 @@
     {#if cancelHref}
       <Button
         variant="ghost"
+        disabled={$submitting}
         href={cancelHref}
         class="max-sm:w-full"
         data-testid="nexus-form-cancel-button"
@@ -198,7 +200,7 @@
         {translate('common.cancel')}
       </Button>
     {/if}
-    {@render footer?.()}
+    {@render footer?.({ submitting: $submitting })}
   </div>
 </form>
 <Alert title={error?.statusText} intent="error" hidden={!error}>
