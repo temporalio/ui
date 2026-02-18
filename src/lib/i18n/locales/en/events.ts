@@ -87,6 +87,7 @@ export const Strings = {
   },
   'decode-event-history': 'Decode Event History',
   encoded: 'Encoded',
+  'encoded-description': 'Compatible with SDK Workflow Replayers',
   decoded: 'Decoded',
   'decoded-description': 'Codec Server decoded and base64 encoded',
   readable: 'Human Readable',
