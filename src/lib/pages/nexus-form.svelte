@@ -58,7 +58,11 @@
         .refine((val) => pattern.test(val), {
           message: translate('nexus.endpoint-name-hint'),
         }),
-      descriptionString: z.string().optional().default(''),
+      descriptionString: z
+        .string()
+        .optional()
+        .default('')
+        .transform((val) => val.trim()),
       targetNamespace: z
         .string()
         .min(1, translate('nexus.target-namespace-required')),
@@ -194,6 +198,7 @@
       name="allowedCallerNamespaces"
       multiselect
       displayChips={false}
+      allowCustomValue
       bind:value={$form.allowedCallerNamespaces}
       options={callerNamespaces}
       label={translate('nexus.allowed-caller-namespaces')}
