@@ -13,6 +13,7 @@
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { routeForNexus } from '$lib/utilities/route-for';
+  import { toNexusEndpoint } from '$lib/utilities/to-nexus-endpoint';
 
   let error = $state<NetworkError | undefined>(undefined);
 
@@ -22,17 +23,8 @@
 
   const onCreate = async (formData: NexusFormData) => {
     try {
-      const body: Partial<NexusEndpoint> & { projectId?: string } = {
-        spec: {
-          name: formData.name,
-          target: {
-            worker: {
-              namespace: formData.targetNamespace,
-              taskQueue: formData.taskQueue,
-            },
-          },
-        },
-      };
+      const body: Partial<NexusEndpoint> & { projectId?: string } =
+        toNexusEndpoint(formData);
 
       if (formData.descriptionString) {
         const payloads = await encodePayloads({

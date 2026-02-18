@@ -33,7 +33,7 @@
     targetNamespaceList,
     callerNamespaceList,
     nameRegexPattern,
-    nameHintText = undefined,
+    nameHintText = translate('nexus.endpoint-name-hint'),
     isCloud,
     cancelHref,
     submitButtonText,

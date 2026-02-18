@@ -19,6 +19,7 @@
     routeForNexus,
     routeForNexusEndpoint,
   } from '$lib/utilities/route-for';
+  import { toNexusEndpoint } from '$lib/utilities/to-nexus-endpoint';
 
   import type { LayoutData } from '../$types';
 
@@ -37,17 +38,9 @@
 
     try {
       const body: Partial<NexusEndpoint> = {
+        ...toNexusEndpoint(formData),
         id: endpoint.id,
         version: endpoint.version,
-        spec: {
-          name: formData.name,
-          target: {
-            worker: {
-              namespace: formData.targetNamespace,
-              taskQueue: formData.taskQueue,
-            },
-          },
-        },
       };
 
       if (formData.descriptionString) {

@@ -17,6 +17,7 @@
     loading?: boolean;
     isCloud?: boolean;
     nameRegexPattern?: RegExp;
+    nameHintText?: string;
     cancelHref?: string;
   };
 
@@ -30,6 +31,7 @@
     loading = false,
     isCloud = false,
     nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
+    nameHintText = undefined,
     cancelHref = '/nexus',
   }: Props = $props();
 
@@ -46,6 +48,7 @@
   <NexusForm
     {endpoint}
     {nameRegexPattern}
+    {nameHintText}
     {targetNamespaceList}
     {callerNamespaceList}
     {error}

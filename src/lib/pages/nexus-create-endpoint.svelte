@@ -21,7 +21,7 @@
     error = undefined,
     isCloud = false,
     nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
-    nameHintText = translate('nexus.endpoint-name-hint'),
+    nameHintText = undefined,
     cancelHref = '/nexus',
   }: Props = $props();
 </script>
