@@ -11,8 +11,8 @@
     endpoint: NexusEndpoint;
     targetNamespaceList?: { namespace: string }[];
     callerNamespaceList?: { namespace: string }[];
-    onUpdate: (formData: NexusFormData) => void;
-    onDelete: () => void;
+    onUpdate: (formData: NexusFormData) => Promise<void>;
+    onDelete: () => Promise<void>;
     error?: NetworkError;
     loading?: boolean;
     isCloud?: boolean;

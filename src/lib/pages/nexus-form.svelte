@@ -22,7 +22,7 @@
     isCloud: boolean;
     cancelHref: string;
     submitButtonText: string;
-    onSubmit: (formData: NexusFormData) => void;
+    onSubmit: (formData: NexusFormData) => Promise<void>;
     endpoint?: NexusEndpoint;
     error?: NetworkError;
     nameDisabled?: boolean;
@@ -76,8 +76,6 @@
     allowedCallerNamespaces: endpoint?.spec?.allowedCallerNamespaces || [],
   };
 
-  // initialData is reactive but we only need its initial value
-  // svelte-ignore state_referenced_locally
   const superform = superForm(initialData, {
     SPA: true,
     validators: zodClient(createNexusSchema(nameRegexPattern)),
@@ -85,7 +83,7 @@
     dataType: 'json',
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
-      onSubmit?.(form.data);
+      await onSubmit?.(form.data);
     },
   });
 

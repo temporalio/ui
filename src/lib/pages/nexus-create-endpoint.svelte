@@ -4,7 +4,7 @@
   import type { NetworkError } from '$lib/types/global';
 
   type Props = {
-    onCreate: (formData: NexusFormData) => void;
+    onCreate: (formData: NexusFormData) => Promise<void>;
     targetNamespaceList?: { namespace: string }[];
     callerNamespaceList?: { namespace: string }[];
     error?: NetworkError | undefined;
