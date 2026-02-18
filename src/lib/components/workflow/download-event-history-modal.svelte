@@ -51,6 +51,7 @@
         data-testid="use-encoded-setting-input"
         value="encoded"
         label={translate('events.encoded')}
+        description={translate('events.encoded-description')}
       />
       <RadioInput
         id="use-decoded-setting"
