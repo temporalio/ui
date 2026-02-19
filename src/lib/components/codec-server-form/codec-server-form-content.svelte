@@ -125,7 +125,7 @@
 
       <!-- Title and Description -->
       <div>
-        <h2 class="text-lg font-semibold">{translate('codec-server.title')}</h2>
+        <h2 class="text-base font-medium">{translate('codec-server.title')}</h2>
         <p class="text-sm text-secondary">
           {translate('codec-server.description')}
         </p>
