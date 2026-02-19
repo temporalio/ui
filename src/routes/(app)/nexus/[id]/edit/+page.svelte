@@ -13,12 +13,11 @@
   } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
   import type { NexusEndpoint } from '$lib/types/nexus';
-  import { encodePayloads } from '$lib/utilities/encode-payload';
+  import { getNexusEndpoint } from '$lib/utilities/get-nexus-endpoint';
   import {
     routeForNexus,
     routeForNexusEndpoint,
   } from '$lib/utilities/route-for';
-  import { toNexusEndpoint } from '$lib/utilities/to-nexus-endpoint';
 
   import type { LayoutData } from '../$types';
 
@@ -35,18 +34,10 @@
 
     try {
       const body: Partial<NexusEndpoint> = {
-        ...toNexusEndpoint(formData),
+        ...(await getNexusEndpoint(formData)),
         id: endpoint.id,
         version: endpoint.version,
       };
-
-      if (formData.descriptionString) {
-        const payloads = await encodePayloads({
-          input: JSON.stringify(formData.descriptionString),
-          encoding: 'json/plain',
-        });
-        body.spec!.description = payloads?.[0];
-      }
 
       await updateNexusEndpoint(endpoint.id, body);
       await goto(routeForNexusEndpoint(endpoint.id), { invalidateAll: true });

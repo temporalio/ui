@@ -10,9 +10,8 @@
   import { createNexusEndpoint } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
   import type { NexusEndpoint } from '$lib/types/nexus';
-  import { encodePayloads } from '$lib/utilities/encode-payload';
+  import { getNexusEndpoint } from '$lib/utilities/get-nexus-endpoint';
   import { routeForNexus } from '$lib/utilities/route-for';
-  import { toNexusEndpoint } from '$lib/utilities/to-nexus-endpoint';
 
   const projectId = $derived(
     page.url.searchParams.get('projectId') ?? undefined,
@@ -21,15 +20,7 @@
   const onCreate = async (formData: NexusFormData) => {
     try {
       const body: Partial<NexusEndpoint> & { projectId?: string } =
-        toNexusEndpoint(formData);
-
-      if (formData.descriptionString) {
-        const payloads = await encodePayloads({
-          input: JSON.stringify(formData.descriptionString),
-          encoding: 'json/plain',
-        });
-        body.spec!.description = payloads?.[0];
-      }
+        await getNexusEndpoint(formData);
 
       if (projectId) {
         body.projectId = projectId;

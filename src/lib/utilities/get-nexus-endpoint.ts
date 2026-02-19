@@ -1,16 +1,17 @@
 import type { NexusFormData } from '$lib/pages/nexus-form.svelte';
 import type { NexusEndpoint } from '$lib/types/nexus';
+import { encodePayloads } from '$lib/utilities/encode-payload';
 
 /**
  * Transforms flat form data to nested NexusEndpoint structure
+ * Handles description encoding for both ui and cloud-ui
  */
-export function toNexusEndpoint(
+export async function getNexusEndpoint(
   formData: NexusFormData,
-): Partial<NexusEndpoint> {
-  return {
+): Promise<Partial<NexusEndpoint>> {
+  const endpoint: Partial<NexusEndpoint> = {
     spec: {
       name: formData.name,
-      // Note: description is handled separately via encodePayloads in the page components
       target: {
         worker: {
           namespace: formData.targetNamespace,
@@ -24,4 +25,17 @@ export function toNexusEndpoint(
           : undefined,
     },
   };
+
+  // Encode description if provided
+  if (formData.descriptionString) {
+    endpoint.spec!.descriptionDeprecated = formData.descriptionString;
+
+    const payloads = await encodePayloads({
+      input: JSON.stringify(formData.descriptionString),
+      encoding: 'json/plain',
+    });
+    endpoint.spec!.description = payloads?.[0];
+  }
+
+  return endpoint;
 }
