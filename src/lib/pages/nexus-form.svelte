@@ -4,14 +4,13 @@
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod/v3';
 
+  import Message from '$lib/components/form/message.svelte';
   import IsOssGuard from '$lib/components/is-oss-guard.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
   type Props = {
@@ -24,7 +23,6 @@
     submitButtonText: string;
     onSubmit: (formData: NexusFormData) => Promise<void>;
     endpoint?: NexusEndpoint;
-    error?: NetworkError;
     nameDisabled?: boolean;
     footer?: Snippet<[{ submitting: boolean }]>;
   };
@@ -39,7 +37,6 @@
     submitButtonText,
     onSubmit,
     endpoint = undefined,
-    error = undefined,
     nameDisabled = false,
     footer,
   }: Props = $props();
@@ -85,10 +82,55 @@
       if (!form.valid) return;
       await onSubmit?.(form.data);
     },
+    onError: ({ result }) => {
+      const error = result.error;
+      console.log('SuperForms error object:', error);
+      console.log(
+        'Error keys:',
+        error && typeof error === 'object' ? Object.keys(error) : 'N/A',
+      );
+
+      let errorMessage = 'An error occurred';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object') {
+        // Use type narrowing to access unknown properties safely
+        const errorObj = error as Record<string, unknown>;
+        const message =
+          typeof errorObj.message === 'string' ? errorObj.message : undefined;
+        const errorProp =
+          typeof errorObj.error === 'string' ? errorObj.error : undefined;
+        const statusText =
+          typeof errorObj.statusText === 'string'
+            ? errorObj.statusText
+            : undefined;
+        const body = errorObj.body;
+
+        errorMessage =
+          message ||
+          errorProp ||
+          statusText ||
+          (body && JSON.stringify(body)) ||
+          JSON.stringify(error);
+      }
+
+      message.set({ type: 'error', text: errorMessage });
+    },
   });
 
-  const { form, errors, constraints, enhance, submitting, tainted, isTainted } =
-    superform;
+  const {
+    form,
+    errors,
+    constraints,
+    enhance,
+    submitting,
+    tainted,
+    isTainted,
+    message,
+  } = superform;
 
   const callerNamespaces = $derived(
     callerNamespaceList.map((n) => ({
@@ -203,7 +245,5 @@
     {/if}
     {@render footer?.({ submitting: $submitting })}
   </div>
+  <Message value={$message} />
 </form>
-<Alert title={error?.statusText} intent="error" hidden={!error}>
-  {error?.message}
-</Alert>

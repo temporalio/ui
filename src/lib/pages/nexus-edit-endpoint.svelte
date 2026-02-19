@@ -4,7 +4,6 @@
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusForm, { type NexusFormData } from '$lib/pages/nexus-form.svelte';
-  import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
 
   type Props = {
@@ -13,7 +12,6 @@
     callerNamespaceList?: { namespace: string }[];
     onUpdate: (formData: NexusFormData) => Promise<void>;
     onDelete: () => Promise<void>;
-    error?: NetworkError;
     loading?: boolean;
     isCloud?: boolean;
     nameRegexPattern?: RegExp;
@@ -27,7 +25,6 @@
     callerNamespaceList = [],
     onUpdate,
     onDelete,
-    error = undefined,
     loading = false,
     isCloud = false,
     nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
@@ -51,7 +48,6 @@
     {nameHintText}
     {targetNamespaceList}
     {callerNamespaceList}
-    {error}
     {isCloud}
     {cancelHref}
     submitButtonText={translate('common.save')}

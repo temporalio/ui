@@ -10,14 +10,18 @@ export function toNexusEndpoint(
   return {
     spec: {
       name: formData.name,
-      descriptionString: formData.descriptionString,
+      // Note: description is handled separately via encodePayloads in the page components
       target: {
         worker: {
           namespace: formData.targetNamespace,
           taskQueue: formData.taskQueue,
         },
       },
-      allowedCallerNamespaces: formData.allowedCallerNamespaces,
+      // Only include allowedCallerNamespaces if provided (cloud-only feature)
+      allowedCallerNamespaces:
+        formData.allowedCallerNamespaces?.length > 0
+          ? formData.allowedCallerNamespaces
+          : undefined,
     },
   };
 }

@@ -12,7 +12,6 @@
     updateNexusEndpoint,
   } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
-  import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import {
@@ -27,13 +26,11 @@
 
   const { endpoint } = $derived(data);
 
-  let error = $state<NetworkError | undefined>(undefined);
   let loading = $state(false);
 
   const onUpdate = async (formData: NexusFormData) => {
     if (!endpoint?.id) return;
 
-    error = undefined;
     loading = true;
 
     try {
@@ -52,10 +49,10 @@
       }
 
       await updateNexusEndpoint(endpoint.id, body);
-      goto(routeForNexusEndpoint(endpoint.id), { invalidateAll: true });
+      await goto(routeForNexusEndpoint(endpoint.id), { invalidateAll: true });
     } catch (e: unknown) {
-      error = e as NetworkError;
       console.error('Error updating endpoint', e);
+      throw e;
     } finally {
       loading = false;
     }
@@ -64,14 +61,13 @@
   const onDelete = async () => {
     if (!endpoint?.id) return;
 
-    error = undefined;
     loading = true;
     try {
       await deleteNexusEndpoint(endpoint.id, String(endpoint.version));
-      goto(routeForNexus());
+      await goto(routeForNexus());
     } catch (e) {
-      error = e as NetworkError;
       console.error('Error deleting endpoint', e);
+      throw e;
     } finally {
       loading = false;
     }
@@ -98,7 +94,6 @@
       {targetNamespaceList}
       {onUpdate}
       {onDelete}
-      {error}
       {loading}
       cancelHref={routeForNexusEndpoint($page.params.id)}
     />

@@ -9,13 +9,10 @@
   import type { NexusFormData } from '$lib/pages/nexus-form.svelte';
   import { createNexusEndpoint } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
-  import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { routeForNexus } from '$lib/utilities/route-for';
   import { toNexusEndpoint } from '$lib/utilities/to-nexus-endpoint';
-
-  let error = $state<NetworkError | undefined>(undefined);
 
   const projectId = $derived(
     page.url.searchParams.get('projectId') ?? undefined,
@@ -39,10 +36,10 @@
       }
 
       await createNexusEndpoint(body);
-      goto(routeForNexus(), { invalidateAll: true });
+      await goto(routeForNexus(), { invalidateAll: true });
     } catch (e) {
-      error = e as NetworkError;
       console.error('Error creating endpoint', e);
+      throw e;
     }
   };
 
@@ -58,5 +55,5 @@
   <Link href={routeForNexus()} icon="chevron-left">
     {translate('nexus.back-to-endpoints')}
   </Link>
-  <NexusCreateEndpoint {onCreate} {targetNamespaceList} {error} />
+  <NexusCreateEndpoint {onCreate} {targetNamespaceList} />
 </div>
