@@ -140,7 +140,7 @@
         if (!form.valid) return;
 
         try {
-          startStandaloneActivity({
+          const { runId } = await startStandaloneActivity({
             ...form.data,
             searchAttributes,
           });
@@ -151,6 +151,7 @@
             link: routeForStandaloneActivityDetails({
               namespace,
               activityId: form.data.activityId,
+              runId,
             }),
           });
           return { type: 'success' };

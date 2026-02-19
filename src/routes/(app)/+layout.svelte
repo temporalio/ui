@@ -21,6 +21,7 @@
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
+  import { temporalVersion } from '$lib/stores/versions';
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
@@ -36,6 +37,7 @@
     routeForWorkerDeployments,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
+  import { minimumVersionRequired } from '$lib/utilities/version-check';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
@@ -128,13 +130,13 @@
         label: translate('common.workflows'),
         isActive: (path) => path.includes(workflowsRoute),
       },
-      // Uncomment this when Standalone Activities is ready to release
-      // {
-      //   href: standaloneActivitiesRoute,
-      //   icon: 'activity',
-      //   label: translate('standalone-activities.standalone-activities'),
-      //   isActive: (path) => path.includes(standaloneActivitiesRoute),
-      // },
+      {
+        href: standaloneActivitiesRoute,
+        icon: 'activity',
+        label: translate('standalone-activities.standalone-activities'),
+        isActive: (path) => path.includes(standaloneActivitiesRoute),
+        hidden: !minimumVersionRequired('1.30.0', $temporalVersion),
+      },
       {
         href: schedulesRoute,
         icon: 'schedules',

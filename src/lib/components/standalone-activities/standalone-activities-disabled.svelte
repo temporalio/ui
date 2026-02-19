@@ -3,11 +3,14 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import PageTitle from '../page-title.svelte';
+
   interface Props {
     namespace: string;
+    href: string;
   }
 
-  let { namespace }: Props = $props();
+  let { namespace, href }: Props = $props();
 
   const configValues = `history.enableTransitionHistory:
   - value: true
@@ -21,6 +24,13 @@ activity.enableStandalone:
     constraints:
       namespace: ${namespace}`);
 </script>
+
+<PageTitle
+  title="{translate(
+    'standalone-activities.standalone-activities',
+  )} | {namespace}"
+  url={href}
+/>
 
 <h1>Standalone Activities</h1>
 <Alert

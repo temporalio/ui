@@ -23,12 +23,14 @@ export class StandaloneActivityPoller {
   constructor(
     namespace: string,
     activityId: string,
+    runId: string,
     abortController: AbortController,
     onUpdate: (activityExecution: ActivityExecution) => void,
     onError: (error: Error) => void,
   ) {
     this.namespace = namespace;
     this.activityId = activityId;
+    this.runId = runId;
     this.abortController = abortController;
     this.onUpdate = onUpdate;
     this.onError = onError;
@@ -40,6 +42,7 @@ export class StandaloneActivityPoller {
       activityExecution = await getActivityExecution(
         this.namespace,
         this.activityId,
+        this.runId,
       );
     } catch (error) {
       this.onError(error);
@@ -48,7 +51,6 @@ export class StandaloneActivityPoller {
     this.onUpdate(activityExecution);
 
     if (activityExecution.info.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING') {
-      this.runId = activityExecution.runId;
       this.token = activityExecution.longPollToken;
 
       while (!this.abortController.signal.aborted) {
@@ -84,6 +86,7 @@ export class StandaloneActivityPoller {
     const activityExecution = await getActivityExecution(
       this.namespace,
       this.activityId,
+      this.runId,
     );
     this.onUpdate(activityExecution);
   }

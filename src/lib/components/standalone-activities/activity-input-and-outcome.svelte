@@ -24,7 +24,7 @@
     </PayloadDecoder>
   </div>
   <div class="flex flex-col gap-2">
-    <h5>Outcome</h5>
+    <h5>Result</h5>
     {#if has(outcome, 'failure')}
       <CodeBlock content={JSON.stringify(outcome.failure, null, 2)} />
     {:else if has(outcome, 'result')}

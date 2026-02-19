@@ -135,33 +135,37 @@ export const routeForStartStandaloneActivity = (
 };
 
 const routeForStandaloneActivityBase = (
-  parameters: NamespaceParameter & { activityId: string },
+  parameters: NamespaceParameter & { activityId: string; runId: string },
 ) => {
-  return resolve(`${routeForStandaloneActivities(parameters)}/[activityId]`, {
-    activityId: parameters.activityId,
-  });
+  return resolve(
+    `${routeForStandaloneActivities(parameters)}/[activityId]/[runId]`,
+    {
+      activityId: parameters.activityId,
+      runId: parameters.runId,
+    },
+  );
 };
 
 export const routeForStandaloneActivityDetails = (
-  parameters: NamespaceParameter & { activityId: string },
+  parameters: NamespaceParameter & { activityId: string; runId: string },
 ) => {
   return `${routeForStandaloneActivityBase(parameters)}/details`;
 };
 
 export const routeForStandaloneActivityWorkers = (
-  parameters: NamespaceParameter & { activityId: string },
+  parameters: NamespaceParameter & { activityId: string; runId: string },
 ) => {
   return `${routeForStandaloneActivityBase(parameters)}/workers`;
 };
 
 export const routeForStandaloneActivitySearchAttributes = (
-  parameters: NamespaceParameter & { activityId: string },
+  parameters: NamespaceParameter & { activityId: string; runId: string },
 ) => {
   return `${routeForStandaloneActivityBase(parameters)}/search-attributes`;
 };
 
 export const routeForStandaloneActivityMetadata = (
-  parameters: NamespaceParameter & { activityId: string },
+  parameters: NamespaceParameter & { activityId: string; runId: string },
 ) => {
   return `${routeForStandaloneActivityBase(parameters)}/metadata`;
 };
