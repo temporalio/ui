@@ -40,6 +40,12 @@ func WithForwardHeaders(headers []string) api.Middleware {
 	}
 }
 
+func WithStaticHeaders(headers map[string]string) api.Middleware {
+	return func(c echo.Context) runtime.ServeMuxOption {
+		return runtime.WithMetadata(handleStaticHeaders(headers))
+	}
+}
+
 func handleForwardHeaders(c echo.Context, headers []string) func(context.Context, *http.Request) metadata.MD {
 	return func(ctx context.Context, req *http.Request) metadata.MD {
 		md := metadata.MD{}
@@ -53,6 +59,26 @@ func handleForwardHeaders(c echo.Context, headers []string) func(context.Context
 					}
 				} else {
 					md.Append(header, headerValue)
+				}
+			}
+		}
+
+		return md
+	}
+}
+
+func handleStaticHeaders(headers map[string]string) func(context.Context, *http.Request) metadata.MD {
+	return func(ctx context.Context, req *http.Request) metadata.MD {
+		md := metadata.MD{}
+		for header, value := range headers {
+			if value != "" {
+				if len(header) > 4 && header[len(header)-4:] == "-bin" {
+					decoded, err := base64DecodeWithOrWithoutPadding(value)
+					if err == nil {
+						md.Set(header, string(decoded))
+					}
+				} else {
+					md.Append(header, value)
 				}
 			}
 		}

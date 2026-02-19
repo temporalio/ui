@@ -78,4 +78,12 @@ forwardHeaders:
 {{- end }}
 {{- end }}
 
+staticHeaders:
+{{- if env "TEMPORAL_SERVER_STATIC_HEADERS" }}
+{{- range $pair := env "TEMPORAL_SERVER_STATIC_HEADERS" | split "," }}
+{{- $kv := $pair | split "=" }}
+  {{$kv._0}}: {{$kv._1}}
+{{- end }}
+{{- end }}
+
 hideLogs: {{ env "TEMPORAL_HIDE_LOGS" | default "false" }}

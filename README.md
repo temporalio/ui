@@ -37,7 +37,7 @@ Once you have the prerequisites going, run the following:
 pnpm install
 ```
 
-Running `pnpm install` will attempt to download and install the most recent version of [Temporal CLI][] into `./bin/cli/temporal`. The development server will attempt to use use this version of this Temporal when starting up.
+Running `pnpm install` will attempt to download and install the most recent version of [Temporal CLI][] into `./bin/cli/temporal`. The development server will attempt to use this version of this Temporal when starting up.
 
 - If that port is already in use, the UI will fallback to trying to talk to whatever process is running on that port.
 - If you do not have a version of Temporal CLI at `./bin/cli/temporal`, the development server will look for a version of Temporal CLI in your path.

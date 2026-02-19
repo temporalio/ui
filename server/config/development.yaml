@@ -60,3 +60,5 @@ codec:
   defaultErrorLink:
 forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
   - X-Forwarded-For
+staticHeaders: # can be used to always pass static headers to Temporal gRPC frontend
+  # authorization: some-tkn

@@ -165,3 +165,83 @@ func TestHandleForwardHeaders(t *testing.T) {
 		})
 	}
 }
+
+func TestHandleStaticHeaders(t *testing.T) {
+	tests := []struct {
+		name             string
+		headers          map[string]string
+		expectedMetadata map[string][]string
+	}{
+		{
+			name: "static regular headers",
+			headers: map[string]string{
+				"authorization":   "Bearer static-token",
+				"x-custom-header": "static-value",
+			},
+			expectedMetadata: map[string][]string{
+				"authorization":   {"Bearer static-token"},
+				"x-custom-header": {"static-value"},
+			},
+		},
+		{
+			name: "static binary header in base64 encoding with padding",
+			headers: map[string]string{
+				"x-binary-header-bin": "YmluYXJ5IGRhdGE=",
+			},
+			expectedMetadata: map[string][]string{
+				"x-binary-header-bin": {"binary data"},
+			},
+		},
+		{
+			name: "static binary header in base64 encoding without padding",
+			headers: map[string]string{
+				"x-data-bin": "YmluYXJ5IGRhdGE",
+			},
+			expectedMetadata: map[string][]string{
+				"x-data-bin": {"binary data"},
+			},
+		},
+		{
+			name: "mixed regular and binary static headers",
+			headers: map[string]string{
+				"x-regular":    "regular-value",
+				"x-binary-bin": "YmluYXJ5LXZhbHVl",
+			},
+			expectedMetadata: map[string][]string{
+				"x-regular":    {"regular-value"},
+				"x-binary-bin": {"binary-value"},
+			},
+		},
+		{
+			name: "skip empty static headers",
+			headers: map[string]string{
+				"authorization":  "Bearer static-token",
+				"x-empty-header": "",
+			},
+			expectedMetadata: map[string][]string{
+				"authorization": {"Bearer static-token"},
+			},
+		},
+		{
+			name: "skip invalid base64 in static binary header",
+			headers: map[string]string{
+				"x-invalid-bin": "not-valid-base64!!!",
+			},
+			expectedMetadata: map[string][]string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			handle := handleStaticHeaders(tt.headers)
+			var actualMetadata metadata.MD = handle(nil, nil)
+
+			assert.Equal(t, len(tt.expectedMetadata), len(actualMetadata), "metadata length mismatch")
+
+			for expectedKey, expectedValues := range tt.expectedMetadata {
+				values := actualMetadata.Get(expectedKey)
+				assert.Equal(t, expectedValues, values, "metadata mismatch for key %s", expectedKey)
+			}
+		})
+	}
+}
