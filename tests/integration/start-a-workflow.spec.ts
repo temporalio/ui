@@ -39,7 +39,7 @@ test.describe('Start a Workflow', () => {
         '/namespaces/default/workflows/start-workflow',
       );
       await expect(page.getByTestId('start-workflow')).toHaveText(
-        'Start a Workflow',
+        'Start Workflow',
       );
       await expect(page.getByTestId('start-workflow-button')).toBeDisabled();
       await expect(page.locator('#workflowId')).toBeEnabled();
