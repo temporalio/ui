@@ -9,11 +9,9 @@ const defaultSettings = {
     Enabled: false,
     Options: null,
   },
-  BannerText: '',
   DefaultNamespace: '',
   ShowTemporalSystemNamespace: false,
   FeedbackURL: '',
-  NotifyOnNewVersion: false,
   Codec: {
     Endpoint: '',
     PassAccessToken: false,

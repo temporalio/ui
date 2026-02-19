@@ -1,7 +1,6 @@
 publicPath:
 port: 8081
 enableUi: true
-bannerText:
 cors:
   cookieInsecure: false
   allowOrigins:
@@ -11,7 +10,6 @@ refreshInterval: 1m
 defaultNamespace: default
 showTemporalSystemNamespace: false
 feedbackUrl:
-notifyOnNewVersion: true
 disableWriteActions: false
 workflowTerminateDisabled: false
 workflowCancelDisabled: false

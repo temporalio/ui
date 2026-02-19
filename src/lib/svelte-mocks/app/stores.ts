@@ -17,7 +17,6 @@ const settings: Settings = {
     options: null,
   },
   baseUrl: 'http://localhost:3000',
-  bannerText: '',
   codec: {
     endpoint: '',
     passAccessToken: false,
@@ -35,7 +34,6 @@ const settings: Settings = {
   workflowTerminateDisabled: false,
   hideWorkflowQueryErrors: false,
   activityCommandsDisabled: false,
-  notifyOnNewVersion: true,
   feedbackURL: '',
   runtimeEnvironment: {
     isCloud: false,

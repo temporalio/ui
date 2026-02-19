@@ -6,11 +6,9 @@ temporalGrpcAddress: {{ env "TEMPORAL_ADDRESS" | default "127.0.0.1:7233" }}
 port: {{ env "TEMPORAL_UI_PORT" | default "8080" }}
 publicPath: {{ env "TEMPORAL_UI_PUBLIC_PATH" | default "" }}
 enableUi: {{ env "TEMPORAL_UI_ENABLED" | default "true" }}
-bannerText: {{ env "TEMPORAL_BANNER_TEXT" | default "" }}
 cloudUi: {{ env "TEMPORAL_CLOUD_UI" | default "false" }}
 defaultNamespace: {{ env "TEMPORAL_DEFAULT_NAMESPACE" | default "default" }}
 feedbackUrl: {{ env "TEMPORAL_FEEDBACK_URL" | default "" }}
-notifyOnNewVersion: {{ env "TEMPORAL_NOTIFY_ON_NEW_VERSION" | default "true" }}
 refreshInterval: {{ env "TEMPORAL_CONFIG_REFRESH_INTERVAL" | default "0s" }}
 showTemporalSystemNamespace: {{ env "TEMPORAL_SHOW_TEMPORAL_SYSTEM_NAMESPACE" | default "false" }}
 disableWriteActions: {{ env "TEMPORAL_DISABLE_WRITE_ACTIONS" | default "false" }}

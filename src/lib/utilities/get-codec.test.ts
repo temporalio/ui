@@ -19,11 +19,9 @@ const defaultSettings = {
     enabled: false,
     options: null,
   },
-  bannerText: '',
   defaultNamespace: '',
   showTemporalSystemNamespace: false,
   feedbackURL: '',
-  notifyOnNewVersion: false,
   codec: {
     endpoint: '',
     passAccessToken: false,
