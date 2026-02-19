@@ -3,6 +3,7 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { WorkflowStatus } from '$lib/types/workflows';
 
   import type { GraphConfig } from '../constants';
 
@@ -11,7 +12,7 @@
   type Props = {
     point?: [number, number];
     category?: string;
-    status?: string;
+    status?: WorkflowStatus | 'none';
     fontSize?: string;
     fontWeight?: string | number;
     textAnchor?: string;
