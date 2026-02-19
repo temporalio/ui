@@ -1,14 +1,14 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
 
+  import type { LayoutProps } from './$types';
+
   import ErrorComponent from '$lib/holocene/error.svelte';
   import StandaloneActivityLayout from '$lib/layouts/standalone-activity-layout.svelte';
   import {
     activityExecution,
     StandaloneActivityPoller,
   } from '$lib/utilities/standalone-activity-poller.svelte';
-
-  import type { LayoutProps } from '../$types';
 
   let { params, children }: LayoutProps = $props();
 
