@@ -1,8 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
 
-  import { page } from '$app/state';
-
   import ErrorComponent from '$lib/holocene/error.svelte';
   import StandaloneActivityLayout from '$lib/layouts/standalone-activity-layout.svelte';
   import {
@@ -10,8 +8,14 @@
     StandaloneActivityPoller,
   } from '$lib/utilities/standalone-activity-poller.svelte';
 
-  const namespace = $derived(page.params.namespace);
-  const activityId = $derived(page.params.activityId);
+  import type { LayoutProps } from '../$types';
+
+  let { params, children }: LayoutProps = $props();
+
+  const namespace = $derived(params.namespace);
+  const activityId = $derived(params.activityId);
+  const runId = $derived(params.runId);
+
   let error = $state<Error | undefined>();
 
   const activityPollerAbortController = new AbortController();
@@ -19,6 +23,7 @@
     new StandaloneActivityPoller(
       namespace,
       activityId,
+      runId,
       activityPollerAbortController,
       (execution) => {
         $activityExecution = execution;
@@ -36,8 +41,6 @@
   onDestroy(() => {
     poller.abort();
   });
-
-  let { children } = $props();
 </script>
 
 {#if error}
@@ -48,6 +51,7 @@
     activityExecution={$activityExecution}
     {namespace}
     {activityId}
+    {runId}
   >
     {@render children()}
   </StandaloneActivityLayout>
