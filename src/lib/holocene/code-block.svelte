@@ -13,7 +13,7 @@
   } from '@codemirror/language';
   import { Compartment, EditorState, type Extension } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
-  import { onMount, type Snippet } from 'svelte';
+  import { onMount, type Snippet, untrack } from 'svelte';
   import { twMerge as merge, twMerge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
@@ -109,11 +109,14 @@
     return format(doc.toString(), language, inline);
   };
 
+  let isInternalUpdate = false;
+
   const replaceContent = (newContent: string) => {
     const doc = editorView?.state?.doc;
     if (!doc) return;
 
     if (doc.toString() !== newContent) {
+      isInternalUpdate = true;
       editorView?.dispatch({
         changes: {
           from: 0,
@@ -121,6 +124,7 @@
           insert: newContent,
         },
       });
+      isInternalUpdate = false;
     }
   };
 
@@ -182,7 +186,7 @@
       }),
       dispatch(transaction) {
         editorView.update([transaction]);
-        if (transaction.docChanged) {
+        if (transaction.docChanged && !isInternalUpdate) {
           onchange?.(getFormattedDoc());
         }
       },
@@ -212,20 +216,21 @@
     language;
     inline;
     editable;
-    editorView?.hasFocus;
 
-    const doc = editorView?.state?.doc;
-    if (!doc) return;
+    untrack(() => {
+      const doc = editorView?.state?.doc;
+      if (!doc) return;
 
-    const userIsEditing = editable && editorView?.hasFocus;
+      const userIsEditing = editable && editorView?.hasFocus;
 
-    if (!userIsEditing) {
-      const formattedContent = getFormattedContent();
-      if (doc.toString() !== formattedContent) {
-        replaceContent(formattedContent);
+      if (!userIsEditing) {
+        const formattedContent = getFormattedContent();
+        if (doc.toString() !== formattedContent) {
+          replaceContent(formattedContent);
+        }
+        ensureFullParse();
       }
-      ensureFullParse();
-    }
+    });
   });
 
   // handlers
