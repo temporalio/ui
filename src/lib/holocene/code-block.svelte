@@ -99,10 +99,6 @@
       ? formatJSON(contentToFormat, inlineFormat ? 0 : 2)
       : contentToFormat;
 
-  const getFormattedContent = () => {
-    return format(content, language, inline);
-  };
-
   const getFormattedDoc = () => {
     const doc = editorView?.state?.doc;
     if (!doc) return '';
@@ -177,7 +173,7 @@
     new EditorView({
       parent: editorElement,
       state: EditorState.create({
-        doc: getFormattedContent(),
+        doc: format(content, language, inline),
         extensions: [staticExtensions, compartment.of(dynamicExtensions)],
       }),
       dispatch(transaction) {
@@ -208,19 +204,13 @@
 
   // when content prop changes, update the document
   $effect(() => {
-    content;
-    language;
-    inline;
-    editable;
-    editorView?.hasFocus;
-
     const doc = editorView?.state?.doc;
     if (!doc) return;
 
     const userIsEditing = editable && editorView?.hasFocus;
 
     if (!userIsEditing) {
-      const formattedContent = getFormattedContent();
+      const formattedContent = format(content, language, inline);
       if (doc.toString() !== formattedContent) {
         replaceContent(formattedContent);
       }

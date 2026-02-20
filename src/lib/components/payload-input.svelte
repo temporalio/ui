@@ -28,7 +28,9 @@
   };
 
   const handleInputChange = (text: string): void => {
-    input = text;
+    if (text !== input) {
+      input = text;
+    }
   };
 
   const clearValues = () => {
