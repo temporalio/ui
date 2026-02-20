@@ -11,7 +11,6 @@
   } from '$lib/models/payload-encoding';
   import type { Payloads } from '$lib/types';
   import { atob } from '$lib/utilities/atob';
-  import { getSinglePayload } from '$lib/utilities/encode-payload';
 
   interface Props {
     input: string;
@@ -20,7 +19,6 @@
     messageType: string;
     payloads: Payloads;
     showEditActions?: boolean;
-    loading?: boolean;
   }
 
   let {
@@ -30,15 +28,15 @@
     messageType = $bindable(),
     payloads,
     showEditActions = false,
-    loading = $bindable(true),
   }: Props = $props();
 
   let initialInput = $state('');
   let initialEncoding = $state<PayloadInputEncoding>('json/plain');
   let initialMessageType = $state('');
+  let loading = $state(true);
 
   const setInitialInput = (decodedValue: string): void => {
-    initialInput = getSinglePayload(decodedValue);
+    initialInput = decodedValue;
     input = initialInput;
     const currentEncoding = atob(
       String(payloads?.payloads[0]?.metadata?.encoding ?? 'json/plain'),
@@ -66,7 +64,6 @@
       messageType = initialMessageType;
     } else {
       editInput = true;
-      input;
     }
   };
 </script>
