@@ -60,8 +60,12 @@
     cronString = '';
   };
 
+  let previousPreset = preset;
   $effect(() => {
-    clearSchedule();
+    if (preset !== previousPreset) {
+      clearSchedule();
+      previousPreset = preset;
+    }
   });
 </script>
 
