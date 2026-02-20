@@ -76,7 +76,7 @@
 
   const encoding: Writable<PayloadInputEncoding> = writable('json/plain');
 
-  let preset = $derived<SchedulePreset>(
+  let preset = $state<SchedulePreset>(
     page.params.schedule ? 'existing' : 'interval',
   );
 
