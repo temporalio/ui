@@ -26,7 +26,10 @@
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
     ...($prefixSearchEnabled && $filter.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD
-      ? [{ value: 'STARTS_WITH', label: translate('common.starts-with') }]
+      ? [
+          { value: 'STARTS_WITH', label: translate('common.starts-with') },
+          { value: 'CONTAINS', label: translate('common.contains') },
+        ]
       : []),
   ];
 </script>
