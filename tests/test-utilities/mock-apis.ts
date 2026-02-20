@@ -13,6 +13,7 @@ import {
 import { mockNamespaceApi } from './mocks/namespace';
 import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
 import { mockSchedulesApi } from './mocks/schedules';
+import { mockSchedulesCountApi } from './mocks/schedules-count';
 import { mockSearchAttributesApi } from './mocks/search-attributes';
 import { mockSettingsApi, SETTINGS_API } from './mocks/settings';
 import { mockSystemInfoApi } from './mocks/system-info';
@@ -30,7 +31,11 @@ import {
 } from '$src/lib/types/workflows';
 
 export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
-export { mockNamespaceApi, NAMESPACE_API } from './mocks/namespace';
+export {
+  mockNamespaceApi,
+  mockNamespaceWithPauseCapability,
+  NAMESPACE_API,
+} from './mocks/namespace';
 export { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
 export { mockSettingsApi, SETTINGS_API } from './mocks/settings';
 export { mockSystemInfoApi } from './mocks/system-info';
@@ -40,8 +45,19 @@ export {
   SEARCH_ATTRIBUTES_API,
 } from './mocks/search-attributes';
 export { mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
+export {
+  mockSchedulesCountApi,
+  SCHEDULES_COUNT_API,
+} from './mocks/schedules-count';
 export { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
-export { mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
+export {
+  mockWorkflowApi,
+  mockWorkflowPauseApi,
+  mockWorkflowUnpauseApi,
+  WORKFLOW_API,
+  WORKFLOW_PAUSE_API,
+  WORKFLOW_UNPAUSE_API,
+} from './mocks/workflow';
 export {
   mockWorkflowsCountApi,
   mockWorkflowsGroupByCountApi,
@@ -78,7 +94,7 @@ export const mockWorkflowsApis = (page: Page) => {
 export const mockSchedulesApis = (
   page: Page,
   empty = false,
-  emptyWorkflowsCount = false,
+  emptySchedulesCount = false,
   customSearchAttributes?: Partial<SearchAttributesResponse>,
 ) => {
   return Promise.all([
@@ -86,7 +102,7 @@ export const mockSchedulesApis = (
     mockNamespaceApis(page),
     mockSearchAttributesApi(page, customSearchAttributes),
     mockSchedulesApi(page, empty),
-    mockWorkflowsCountApi(page, emptyWorkflowsCount),
+    mockSchedulesCountApi(page, emptySchedulesCount),
   ]);
 };
 

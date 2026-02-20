@@ -10,6 +10,8 @@ export type WorkflowAPIRoutePath =
   | 'workflow.terminate'
   | 'workflow.cancel'
   | 'workflow.reset'
+  | 'workflow.pause'
+  | 'workflow.unpause'
   | 'events.raw'
   | 'events.ascending'
   | 'events.descending';
@@ -21,8 +23,6 @@ export type WorkflowUpdateAPIRoutePath = 'workflow.update';
 export type WorkflowQueryAPIRoutePath = 'query';
 
 export type WorkflowActivitiesAPIRoutePath =
-  | 'activity.complete'
-  | 'activity.fail'
   | 'activity.pause'
   | 'activity.unpause'
   | 'activity.reset'
@@ -47,7 +47,7 @@ export type WorkerAPIRoutePath =
   | 'worker-task-reachability'
   | 'workers'
   | 'worker';
-export type SchedulesAPIRoutePath = 'schedules';
+export type SchedulesAPIRoutePath = 'schedules' | 'schedules.count';
 export type ScheduleAPIRoutePath =
   | 'schedule'
   | 'schedule.patch'

@@ -1,21 +1,30 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
+  import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     customSearchAttributes,
-    type SearchAttributeInput as SAInput,
+    type SearchAttributesSchema,
   } from '$lib/stores/search-attributes';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   import SearchAttributeInput from './search-attribute-input/index.svelte';
 
-  let className = '';
-  export { className as class };
-  export let attributesToAdd: SAInput[] = [];
-  export let buttonCopy = translate('workflows.add-search-attribute');
-  export let variant: ComponentProps<Button>['variant'] = 'ghost';
+  interface Props {
+    class?: ClassNameValue;
+    attributesToAdd: SearchAttributesSchema;
+    buttonCopy?: string;
+    variant?: ComponentProps<Button>['variant'];
+  }
+
+  let {
+    class: className = '',
+    attributesToAdd = $bindable(),
+    buttonCopy = translate('workflows.add-search-attribute'),
+    variant = 'ghost',
+  }: Props = $props();
 
   const addSearchAttribute = () => {
     attributesToAdd = [
@@ -24,18 +33,22 @@
     ];
   };
 
-  $: searchAttributes = Object.keys($customSearchAttributes);
-
-  $: attributes = attributesToAdd;
+  const searchAttributes = $derived(Object.keys($customSearchAttributes));
+  const attributes = $derived(attributesToAdd);
 
   const onRemove = (attribute: string) => {
     attributesToAdd = attributesToAdd.filter((a) => a.label !== attribute);
   };
 </script>
 
-<div class="flex flex-col gap-4 {className}">
-  {#each attributes as attribute, id}
-    <SearchAttributeInput {id} {attributes} bind:attribute {onRemove} />
+<div class={twMerge('flex flex-col gap-4', className)}>
+  {#each attributes as attribute, id (`${attribute.label}-${id}`)}
+    <SearchAttributeInput
+      {id}
+      {attributes}
+      bind:attribute={attributesToAdd[id]}
+      {onRemove}
+    />
   {/each}
   <Button
     {variant}
@@ -44,12 +57,6 @@
     data-testid="add-search-attribute-button"
     on:click={addSearchAttribute}
     disabled={!searchAttributes.length ||
-      attributes.length === searchAttributes.length ||
-      attributes.filter(
-        (a) =>
-          a.value === '' ||
-          a.value === null ||
-          (Array.isArray(a.value) && a.value.length === 0),
-      ).length > 0}>{buttonCopy}</Button
+      attributes.length === searchAttributes.length}>{buttonCopy}</Button
   >
 </div>

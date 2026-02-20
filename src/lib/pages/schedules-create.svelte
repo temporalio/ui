@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
+  import ScheduleFormView from '$lib/components/schedule/schedule-form/form.svelte';
   import { submitCreateSchedule } from '$lib/stores/schedules';
   import type {
     ScheduleActionParameters,
@@ -11,8 +11,6 @@
     ScheduleSpecParameters,
   } from '$lib/types/schedule';
   import { getIdentity } from '$lib/utilities/core-context';
-
-  let { namespace } = $page.params;
 
   const identity = getIdentity();
 
@@ -43,7 +41,7 @@
 
     const action: ScheduleActionParameters = {
       identity,
-      namespace,
+      namespace: page.params.namespace,
       name,
       workflowType,
       workflowId,

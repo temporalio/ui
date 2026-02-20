@@ -17,7 +17,6 @@ const settings: Settings = {
     options: null,
   },
   baseUrl: 'http://localhost:3000',
-  bannerText: '',
   codec: {
     endpoint: '',
     passAccessToken: false,
@@ -28,13 +27,13 @@ const settings: Settings = {
   showTemporalSystemNamespace: false,
   batchActionsDisabled: false,
   workflowResetDisabled: false,
+  workflowPauseDisabled: false,
   workflowCancelDisabled: false,
   workflowSignalDisabled: false,
   workflowUpdateDisabled: false,
   workflowTerminateDisabled: false,
   hideWorkflowQueryErrors: false,
   activityCommandsDisabled: false,
-  notifyOnNewVersion: true,
   feedbackURL: '',
   runtimeEnvironment: {
     isCloud: false,

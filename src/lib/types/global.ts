@@ -76,7 +76,6 @@ export type Settings = {
     enabled: boolean;
     options: string[];
   };
-  bannerText: string;
   baseUrl: string;
   codec: {
     endpoint?: string;
@@ -96,11 +95,11 @@ export type Settings = {
   workflowSignalDisabled: boolean;
   workflowUpdateDisabled: boolean;
   workflowResetDisabled: boolean;
+  workflowPauseDisabled: boolean;
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
   activityCommandsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
-  notifyOnNewVersion: boolean;
   feedbackURL: string;
   runtimeEnvironment: {
     isCloud: boolean;

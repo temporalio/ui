@@ -78,7 +78,7 @@
         <svelte:fragment slot="headers">
           {@render headers?.()}
         </svelte:fragment>
-        {#each endpoints as endpoint}
+        {#each endpoints as endpoint (endpoint.id)}
           {@render columns?.(endpoint)}
         {/each}
       </Table>

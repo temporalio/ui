@@ -33,11 +33,10 @@
 
   type Override<T, NewT> = Omit<T, keyof NewT> & NewT;
 
-  interface BaseProps
-    extends Override<
-      HTMLAttributes<HTMLDivElement>,
-      { onchange?: (text: string) => void }
-    > {
+  interface BaseProps extends Override<
+    HTMLAttributes<HTMLDivElement>,
+    { onchange?: (text: string) => void }
+  > {
     content: string;
     language?: EditorLanguage;
     editable?: boolean;
@@ -55,11 +54,10 @@
     headerActions?: Snippet<[]>;
   }
 
-  interface PropsWithCopyable
-    extends Override<
-      BaseProps,
-      { copyable?: true; copyIconTitle?: string; copySuccessIconTitle?: string }
-    > {}
+  interface PropsWithCopyable extends Override<
+    BaseProps,
+    { copyable?: true; copyIconTitle?: string; copySuccessIconTitle?: string }
+  > {}
 
   export type Props = BaseProps | PropsWithCopyable;
 
@@ -100,10 +98,6 @@
     languageFormat === 'json'
       ? formatJSON(contentToFormat, inlineFormat ? 0 : 2)
       : contentToFormat;
-
-  const getFormattedContent = () => {
-    return format(content, language, inline);
-  };
 
   const getFormattedDoc = () => {
     const doc = editorView?.state?.doc;
@@ -179,7 +173,7 @@
     new EditorView({
       parent: editorElement,
       state: EditorState.create({
-        doc: getFormattedContent(),
+        doc: format(content, language, inline),
         extensions: [staticExtensions, compartment.of(dynamicExtensions)],
       }),
       dispatch(transaction) {
@@ -210,19 +204,13 @@
 
   // when content prop changes, update the document
   $effect(() => {
-    content;
-    language;
-    inline;
-    editable;
-    editorView?.hasFocus;
-
     const doc = editorView?.state?.doc;
     if (!doc) return;
 
     const userIsEditing = editable && editorView?.hasFocus;
 
     if (!userIsEditing) {
-      const formattedContent = getFormattedContent();
+      const formattedContent = format(content, language, inline);
       if (doc.toString() !== formattedContent) {
         replaceContent(formattedContent);
       }

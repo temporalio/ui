@@ -8,7 +8,7 @@ const JSONBigNative = JSONbig({
 export const parseWithBigInt = (content: string) => {
   try {
     return JSONBigNative.parse(content);
-  } catch (e) {
+  } catch {
     return JSON.parse(content);
   }
 };

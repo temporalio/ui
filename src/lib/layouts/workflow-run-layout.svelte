@@ -8,6 +8,7 @@
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
+  import { Action } from '$lib/models/workflow-actions';
   import {
     fetchAllEvents,
     throttleRefresh,
@@ -27,6 +28,7 @@
   import {
     initialWorkflowRun,
     refresh,
+    type RefreshAction,
     workflowRun,
   } from '$lib/stores/workflow-run';
   import type { NetworkError } from '$lib/types/global';
@@ -39,9 +41,9 @@
   $: showJson = $page.url.searchParams.has('json');
   $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
 
-  let workflowError: NetworkError;
+  let workflowError: NetworkError | null = null;
   let workflowRunController: AbortController;
-  let refreshInterval;
+  let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
   const { copy, copied } = copyToClipboard();
 
@@ -92,12 +94,16 @@
       return;
     }
 
+    if (!workflow) {
+      return;
+    }
+
     await decodeUserMetadata(workflow);
 
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
 
-    $workflowRun = { ...$workflowRun, workflow, workers };
+    $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
     workflowRunController = new AbortController();
 
@@ -129,10 +135,15 @@
   };
 
   const getOnlyWorkflowWithPendingActivities = async (
-    refresh: number,
+    refresh: RefreshAction,
     pause: boolean,
   ) => {
-    if (refresh && !pause && $workflowRun?.workflow?.isRunning) {
+    const shouldFetch =
+      refresh.timestamp &&
+      (refresh.action in Action ||
+        (!pause && $workflowRun?.workflow?.isRunning));
+
+    if (shouldFetch) {
       const { workflow, error } = await fetchWorkflow({
         namespace,
         workflowId,
@@ -163,7 +174,7 @@
     refreshInterval = null;
   };
 
-  $: runId, clearWorkflowData();
+  $: (runId, clearWorkflowData());
 
   $: getWorkflowAndEventHistory(namespace, workflowId, runId);
   $: getOnlyWorkflowWithPendingActivities($refresh, $pauseLiveUpdates);

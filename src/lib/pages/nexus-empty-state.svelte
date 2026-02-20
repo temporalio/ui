@@ -37,8 +37,8 @@
           > allows you to reliably connect Temporal Applications. It promotes a more
           modular architecture for sharing a subset of your team's capabilities with
           well-defined microservice contracts for other teams to use. Nexus was designed
-          with Durable Execution in mind and enables each team to have their own
-          Namespace for improved modularity, security, debugging, and fault isolation.
+          with Durable Execution in mind and enables each team to have their own Namespace
+          for improved modularity, security, debugging, and fault isolation.
         </p>
         <p>
           <Link href="https://docs.temporal.io/nexus/services" newTab

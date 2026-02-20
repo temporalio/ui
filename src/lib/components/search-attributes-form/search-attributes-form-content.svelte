@@ -136,7 +136,7 @@
       <Message value={$message} />
 
       <div>
-        <h2 class="text-lg font-semibold">
+        <h2 class="text-base font-medium">
           {translate('search-attributes.title')}
         </h2>
         <p class="text-sm text-secondary">

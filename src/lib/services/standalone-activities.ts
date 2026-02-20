@@ -22,6 +22,11 @@ export type ListActivitiesResponse = {
   nextPageToken: string;
 };
 
+export interface StartStandaloneActivityResponse {
+  runId: string;
+  started: boolean;
+}
+
 export type PaginatedActivitiesPromise = (
   pageSize?: number,
   token?: string,
@@ -163,7 +168,7 @@ const toStartActivityExecutionRequest = async (
 
 export const startStandaloneActivity = async (
   activity: StandaloneActivityFormData,
-) => {
+): Promise<StartStandaloneActivityResponse> => {
   const { activityId, namespace } = activity;
 
   const route = routeForApi('standalone-activity', {
@@ -191,6 +196,7 @@ export const getActivityExecutions = (namespace: string) => {
 export const getActivityExecution = (
   namespace: string,
   activityId: string,
+  runId: string,
 ): Promise<ActivityExecution> => {
   const route = routeForApi('standalone-activity', {
     namespace,
@@ -200,6 +206,7 @@ export const getActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'true',
     includeOutcome: 'true',
+    runId,
   });
 
   return requestFromAPI(route, {

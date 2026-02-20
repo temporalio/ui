@@ -19,11 +19,9 @@ const defaultSettings = {
     enabled: false,
     options: null,
   },
-  bannerText: '',
   defaultNamespace: '',
   showTemporalSystemNamespace: false,
   feedbackURL: '',
-  notifyOnNewVersion: false,
   codec: {
     endpoint: '',
     passAccessToken: false,
@@ -36,6 +34,7 @@ const defaultSettings = {
   workflowSignalDisabled: false,
   workflowUpdateDisabled: false,
   workflowResetDisabled: false,
+  workflowPauseDisabled: false,
   batchActionsDisabled: false,
 };
 

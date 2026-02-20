@@ -27,7 +27,7 @@
     <Logo height={24} width={24} class="m-1" />
 
     <p class="text-base font-medium group-data-[nav=closed]:hidden">
-      {subtitle || 'Self-Hosted'}
+      {subtitle || 'Web UI'}
     </p>
   </a>
   <button

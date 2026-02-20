@@ -1,15 +1,21 @@
 <script lang="ts">
+  import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+  import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
-  import AddSearchAttributes from '../workflow/add-search-attributes.svelte';
+  interface Props {
+    scheduleSearchAttributes: SearchAttributesSchema;
+    workflowSearchAttributes: SearchAttributesSchema;
+  }
 
-  export let searchAttributesInput: SearchAttributeInput[] = [];
-  export let workflowSearchAttributesInput: SearchAttributeInput[] = [];
+  let {
+    scheduleSearchAttributes = $bindable([]),
+    workflowSearchAttributes = $bindable([]),
+  }: Props = $props();
 </script>
 
 <Tabs>
@@ -40,7 +46,7 @@
       data-testid="schedule-panel"
     >
       <AddSearchAttributes
-        bind:attributesToAdd={searchAttributesInput}
+        bind:attributesToAdd={scheduleSearchAttributes}
         class="w-full"
       />
     </TabPanel>
@@ -52,7 +58,7 @@
       data-testid="workflows-panel"
     >
       <AddSearchAttributes
-        bind:attributesToAdd={workflowSearchAttributesInput}
+        bind:attributesToAdd={workflowSearchAttributes}
         class="w-full"
       />
     </TabPanel>

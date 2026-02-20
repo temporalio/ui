@@ -41,11 +41,9 @@ type (
 		EnableUI            bool   `yaml:"enableUi"`
 		CloudUI             bool   `yaml:"cloudUi"`
 		UIAssetPath         string `yaml:"uiAssetPath"`
-		BannerText          string `yaml:"bannerText"`
 		CORS                CORS   `yaml:"cors"`
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
-		NotifyOnNewVersion  bool   `yaml:"notifyOnNewVersion"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
 		// How often to reload the config
@@ -58,6 +56,7 @@ type (
 		WorkflowSignalDisabled    bool `yaml:"workflowSignalDisabled"`
 		WorkflowUpdateDisabled    bool `yaml:"workflowUpdateDisabled"`
 		WorkflowResetDisabled     bool `yaml:"workflowResetDisabled"`
+		WorkflowPauseDisabled     bool `yaml:"workflowPauseDisabled"`
 		// Whether bulk/batch actions are enabled in the UI
 		BatchActionsDisabled bool `yaml:"batchActionsDisabled"`
 		// Whether start workflow is enabled in the UI
@@ -105,6 +104,10 @@ type (
 		Enabled bool `yaml:"enabled"`
 		// A list of auth providers. Currently enables only the first provider in the list.
 		Providers []AuthProvider `yaml:"providers"`
+		// MaxSessionDuration - optional maximum session duration. If set, users will be
+		// forced to re-login after this duration regardless of token validity.
+		// Example values: "8h", "24h", "168h" (1 week). If zero, no max duration is enforced.
+		MaxSessionDuration time.Duration `yaml:"maxSessionDuration"`
 	}
 
 	AuthProvider struct {

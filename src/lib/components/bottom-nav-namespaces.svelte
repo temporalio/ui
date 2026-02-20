@@ -28,7 +28,7 @@
       bind:value={search}
     />
     <ul class="flex w-full flex-col gap-4 overflow-auto p-4 pt-2">
-      {#each namespaces as { namespace, onClick }}
+      {#each namespaces as { namespace, onClick } (namespace)}
         <li>
           <button
             class="namespace"

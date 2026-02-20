@@ -10,6 +10,7 @@ import {
 
 test.describe('Start a Workflow', () => {
   const startWorkflowUrl = '/namespaces/default/workflows/start-workflow';
+
   test.beforeEach(async ({ page }) => {
     await mockGlobalApis(page);
     await mockNamespaceApi(page);
@@ -38,7 +39,7 @@ test.describe('Start a Workflow', () => {
         '/namespaces/default/workflows/start-workflow',
       );
       await expect(page.getByTestId('start-workflow')).toHaveText(
-        'Start a Workflow',
+        'Start Workflow',
       );
       await expect(page.getByTestId('start-workflow-button')).toBeDisabled();
       await expect(page.locator('#workflowId')).toBeEnabled();

@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
+  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -9,25 +11,32 @@
   } from '$lib/models/payload-encoding';
   import type { Payloads } from '$lib/types';
   import { atob } from '$lib/utilities/atob';
-  import { getSinglePayload } from '$lib/utilities/encode-payload';
 
-  import PayloadDecoder from '../event/payload-decoder.svelte';
-  import PayloadInputWithEncoding from '../payload-input-with-encoding.svelte';
+  interface Props {
+    input: string;
+    editInput: boolean;
+    encoding: Writable<PayloadInputEncoding>;
+    messageType: string;
+    payloads: Payloads;
+    showEditActions?: boolean;
+  }
 
-  export let input: string;
-  export let editInput: boolean;
-  export let encoding: Writable<PayloadInputEncoding>;
-  export let messageType: string;
-  export let payloads: Payloads;
-  export let showEditActions: boolean = false;
+  let {
+    input = $bindable(),
+    editInput = $bindable(),
+    encoding,
+    messageType = $bindable(),
+    payloads,
+    showEditActions = false,
+  }: Props = $props();
 
-  let initialInput = '';
-  let initialEncoding: PayloadInputEncoding = 'json/plain';
-  let initialMessageType = '';
-  let loading = true;
+  let initialInput = $state('');
+  let initialEncoding = $state<PayloadInputEncoding>('json/plain');
+  let initialMessageType = $state('');
+  let loading = $state(true);
 
   const setInitialInput = (decodedValue: string): void => {
-    initialInput = getSinglePayload(decodedValue);
+    initialInput = decodedValue;
     input = initialInput;
     const currentEncoding = atob(
       String(payloads?.payloads[0]?.metadata?.encoding ?? 'json/plain'),
@@ -55,7 +64,6 @@
       messageType = initialMessageType;
     } else {
       editInput = true;
-      input;
     }
   };
 </script>
@@ -64,7 +72,7 @@
   <PayloadDecoder value={payloads} key="payloads" onDecode={setInitialInput}>
     <PayloadInputWithEncoding
       bind:input
-      bind:encoding
+      {encoding}
       bind:messageType
       bind:loading
       editing={editInput}

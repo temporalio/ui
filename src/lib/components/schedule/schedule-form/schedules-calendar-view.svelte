@@ -1,6 +1,12 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
 
+  import { page } from '$app/state';
+
+  import ScheduleDayOfMonthView from '$lib/components/schedule/schedule-day-of-month-view.svelte';
+  import ScheduleDayOfWeekView from '$lib/components/schedule/schedule-day-of-week-view.svelte';
+  import ScheduleFrequency from '$lib/components/schedule/schedule-frequency.svelte';
+  import SchedulesIntervalView from '$lib/components/schedule/schedules-interval-view.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
@@ -10,26 +16,37 @@
   import { translate } from '$lib/i18n/translate';
   import type { FullSchedule, SchedulePreset } from '$lib/types/schedule';
 
-  import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
-  import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
-  import ScheduleFrequency from './schedule-frequency.svelte';
-  import SchedulesIntervalView from './schedules-interval-view.svelte';
+  interface Props {
+    schedule?: FullSchedule | null;
+    daysOfWeek?: string[];
+    daysOfMonth?: number[];
+    months?: string[];
+    days?: string;
+    hour?: string;
+    minute?: string;
+    second?: string;
+    phase?: string;
+    cronString?: string;
+    timezoneName: string;
+    preset: SchedulePreset;
+    children?: Snippet;
+  }
 
-  let scheduleId = $page.params.schedule;
-
-  let preset: SchedulePreset = scheduleId ? 'existing' : 'interval';
-
-  export let schedule: FullSchedule | null = null;
-  export let daysOfWeek: string[];
-  export let daysOfMonth: number[];
-  export let months: string[];
-  export let days: string;
-  export let hour: string;
-  export let minute: string;
-  export let second: string;
-  export let phase: string;
-  export let cronString: string;
-  export let timezoneName: string;
+  let {
+    schedule = null,
+    daysOfWeek = $bindable([]),
+    daysOfMonth = $bindable([]),
+    months = $bindable([]),
+    days = $bindable(''),
+    hour = $bindable(''),
+    minute = $bindable(''),
+    second = $bindable(''),
+    phase = $bindable(''),
+    cronString = $bindable(''),
+    preset = $bindable(),
+    timezoneName,
+    children,
+  }: Props = $props();
 
   const clearSchedule = () => {
     daysOfWeek = [];
@@ -43,7 +60,13 @@
     cronString = '';
   };
 
-  $: clearSchedule();
+  let previousPreset = preset;
+  $effect(() => {
+    if (preset !== previousPreset) {
+      clearSchedule();
+      previousPreset = preset;
+    }
+  });
 </script>
 
 <Tabs class="mt-8 w-full">
@@ -140,7 +163,7 @@
         <CodeBlock
           inline
           language="text"
-          content={`┌───────────── minute (0 - 59) 
+          content={`┌───────────── minute (0 - 59)
 │ ┌───────────── hour (0 - 23)
 │ │ ┌───────────── day of the month (1 - 31)
 │ │ │ ┌───────────── month (1 - 12)
@@ -164,5 +187,5 @@
       </div>
     </TabPanel>
   </div>
-  <slot {preset} />
+  {@render children?.()}
 </Tabs>

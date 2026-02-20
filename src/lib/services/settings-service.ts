@@ -22,7 +22,6 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
       enabled: !!settingsResponse?.Auth?.Enabled,
       options: settingsResponse?.Auth?.Options,
     },
-    bannerText: settingsResponse?.BannerText,
     baseUrl: getApiOrigin(),
     codec: {
       endpoint: settingsResponse?.Codec?.Endpoint,
@@ -42,6 +41,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     workflowSignalDisabled: !!settingsResponse?.WorkflowSignalDisabled,
     workflowUpdateDisabled: !!settingsResponse?.WorkflowUpdateDisabled,
     workflowResetDisabled: !!settingsResponse?.WorkflowResetDisabled,
+    workflowPauseDisabled: !!settingsResponse?.WorkflowPauseDisabled,
     batchActionsDisabled: !!settingsResponse?.BatchActionsDisabled,
     startWorkflowDisabled: !!settingsResponse?.StartWorkflowDisabled,
     hideWorkflowQueryErrors: !!settingsResponse?.HideWorkflowQueryErrors,
@@ -50,7 +50,6 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
-    notifyOnNewVersion: settingsResponse?.NotifyOnNewVersion,
     feedbackURL: settingsResponse?.FeedbackURL,
     runtimeEnvironment: {
       get isCloud() {

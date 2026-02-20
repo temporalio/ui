@@ -55,6 +55,7 @@
         href={routeForStandaloneActivityDetails({
           namespace,
           activityId: activity.activityId,
+          runId: activity.runId,
         })}
       />
     {:else if label === 'Activity Type'}

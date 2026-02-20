@@ -1,3 +1,5 @@
+import { page } from '$app/state';
+
 import type {
   ActivityPauseRequest,
   ActivityPauseResponse,
@@ -8,70 +10,38 @@ import type {
   ActivityUpdateOptionsRequest,
   ActivityUpdateOptionsResponse,
 } from '$lib/types';
-import type {
-  CompleteActivityTaskRequest,
-  CompleteActivityTaskResponse,
-  FailActivityTaskRequest,
-  FailActivityTaskResponse,
-} from '$lib/types/events';
+import { isNotFound, isNotImplemented } from '$lib/utilities/handle-error';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-type WorkflowInformation = {
-  workflowId: string;
-  runId: string;
-  activityId: string;
-};
+const requestWithActivityFallback = async <T>(
+  route: string,
+  init: Parameters<typeof requestFromAPI>[1],
+): Promise<T> => {
+  const fallbackRoute = route.replace(
+    '/activities-deprecated/',
+    '/activities/',
+  );
+  const version = page.data?.settings?.version;
 
-export const failActivityTask = async ({
-  namespace,
-  workflowId,
-  runId,
-  activityId,
-  failure,
-  identity,
-  lastHeartbeatDetails,
-}: FailActivityTaskRequest &
-  WorkflowInformation): Promise<FailActivityTaskResponse> => {
-  const route = routeForApi('activity.fail', {
-    namespace,
-  });
-  return requestFromAPI<FailActivityTaskResponse>(route, {
-    notifyOnError: false,
-    options: {
-      body: stringifyWithBigInt({ failure, identity, lastHeartbeatDetails }),
-    },
-    params: {
-      workflowId,
-      runId,
-      activityId,
-    },
-  });
-};
+  if (version && !minimumVersionRequired('2.45.3', version)) {
+    return requestFromAPI<T>(fallbackRoute, init);
+  }
 
-export const completeActivityTask = async ({
-  namespace,
-  workflowId,
-  runId,
-  activityId,
-  identity,
-  result,
-}: CompleteActivityTaskRequest &
-  WorkflowInformation): Promise<CompleteActivityTaskResponse> => {
-  const route = routeForApi('activity.complete', {
-    namespace,
-  });
+  try {
+    return await requestFromAPI<T>(route, {
+      ...init,
+      notifyOnError: false,
+    });
+  } catch (error: unknown) {
+    if (isNotImplemented(error) || isNotFound(error)) {
+      return requestFromAPI<T>(fallbackRoute, init);
+    }
 
-  return requestFromAPI(route, {
-    notifyOnError: false,
-    options: { body: stringifyWithBigInt({ identity, result }) },
-    params: {
-      workflowId,
-      runId,
-      activityId,
-    },
-  });
+    throw error;
+  }
 };
 
 export const pauseActivity = async ({
@@ -88,7 +58,7 @@ export const pauseActivity = async ({
     namespace,
   });
 
-  return requestFromAPI(route, {
+  return requestWithActivityFallback(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
@@ -113,7 +83,7 @@ export const unpauseActivity = async ({
     namespace,
   });
 
-  return requestFromAPI(route, {
+  return requestWithActivityFallback(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
@@ -138,7 +108,7 @@ export const resetActivity = async ({
     namespace,
   });
 
-  return requestFromAPI(route, {
+  return requestWithActivityFallback(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
@@ -166,7 +136,7 @@ export const updateActivityOptions = async ({
 
   const fullMask =
     'taskQueue.name,scheduleToCloseTimeout,scheduleToStartTimeout,startToCloseTimeout,heartbeatTimeout,retryPolicy.initialInterval,retryPolicy.backoffCoefficient,retryPolicy.maximumInterval,retryPolicy.maximumAttempts';
-  return requestFromAPI(route, {
+  return requestWithActivityFallback(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({

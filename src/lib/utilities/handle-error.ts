@@ -34,11 +34,11 @@ export const handleError = (
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.message));
+    window.location.assign(routeForLoginPage());
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.message));
+    window.location.assign(routeForLoginPage());
   }
 
   if (isNetworkError(error)) {
@@ -57,15 +57,13 @@ export const handleUnauthorizedOrForbiddenError = (
   error: APIErrorResponse,
   isBrowser = BROWSER,
 ): void => {
-  const msg = `${error?.status} ${error?.body?.message}`;
-
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(msg));
+    window.location.assign(routeForLoginPage());
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(msg));
+    window.location.assign(routeForLoginPage());
     return;
   }
 };
@@ -76,6 +74,14 @@ export const isUnauthorized = (error: unknown): error is TemporalAPIError => {
 
 export const isForbidden = (error: unknown): error is TemporalAPIError => {
   return hasStatusCode(error, 403);
+};
+
+export const isNotFound = (error: unknown): error is TemporalAPIError => {
+  return hasStatusCode(error, 404);
+};
+
+export const isNotImplemented = (error: unknown): error is TemporalAPIError => {
+  return hasStatusCode(error, 501);
 };
 
 const hasStatusCode = (

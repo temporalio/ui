@@ -11,6 +11,7 @@
     hide?: boolean;
     width?: number;
     class?: string;
+    tooltipClass?: string;
     show?: boolean;
   };
 
@@ -68,6 +69,7 @@
   export let topLeft = false;
   export let hide: boolean | null = false;
   export let width: number | null = null;
+  export let tooltipClass = '';
   export let show = false;
 </script>
 
@@ -91,10 +93,15 @@
       class:topLeft
       style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
     >
-      <div class="inline-block rounded-md bg-slate-800 px-2 py-2">
-        <div class="flex gap-2 text-slate-50">
+      <div
+        class={merge(
+          'inline-block rounded-md bg-slate-800 px-2 py-2 text-slate-50',
+          tooltipClass,
+        )}
+      >
+        <div class="flex gap-2">
           <slot name="content">
-            {#if icon}<Icon name={icon} class="inline h-4 text-white" />{/if}
+            {#if icon}<Icon name={icon} class="inline h-4" />{/if}
             <span>{text}</span>
           </slot>
         </div>

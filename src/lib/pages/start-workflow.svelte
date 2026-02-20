@@ -224,7 +224,7 @@
     try {
       JSON.parse(input);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   };
@@ -252,7 +252,7 @@
     {translate('workflows.back-to-workflows')}
   </Link>
   <h1 class="mb-4 overflow-hidden" data-testid="start-workflow">
-    Start a Workflow
+    Start Workflow
   </h1>
   <Card class="flex w-full flex-col gap-4 xl:w-3/4 2xl:w-1/2">
     <div

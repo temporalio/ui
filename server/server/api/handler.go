@@ -59,11 +59,9 @@ type CodecResponse struct {
 
 type SettingsResponse struct {
 	Auth                          *Auth
-	BannerText                    string
 	DefaultNamespace              string
 	ShowTemporalSystemNamespace   bool
 	FeedbackURL                   string
-	NotifyOnNewVersion            bool
 	Codec                         *CodecResponse
 	Version                       string
 	DisableWriteActions           bool
@@ -72,6 +70,7 @@ type SettingsResponse struct {
 	WorkflowSignalDisabled        bool
 	WorkflowUpdateDisabled        bool
 	WorkflowResetDisabled         bool
+	WorkflowPauseDisabled         bool
 	BatchActionsDisabled          bool
 	StartWorkflowDisabled         bool
 	HideWorkflowQueryErrors       bool
@@ -131,11 +130,9 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 				Enabled: cfg.Auth.Enabled,
 				Options: options,
 			},
-			BannerText:                  cfg.BannerText,
 			DefaultNamespace:            cfg.DefaultNamespace,
 			ShowTemporalSystemNamespace: cfg.ShowTemporalSystemNamespace,
 			FeedbackURL:                 cfg.FeedbackURL,
-			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
 			Codec: &CodecResponse{
 				Endpoint:            cfg.Codec.Endpoint,
 				PassAccessToken:     cfg.Codec.PassAccessToken,
@@ -150,6 +147,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			WorkflowSignalDisabled:        cfg.WorkflowSignalDisabled,
 			WorkflowUpdateDisabled:        cfg.WorkflowUpdateDisabled,
 			WorkflowResetDisabled:         cfg.WorkflowResetDisabled,
+			WorkflowPauseDisabled:         cfg.WorkflowPauseDisabled,
 			BatchActionsDisabled:          cfg.BatchActionsDisabled,
 			StartWorkflowDisabled:         cfg.StartWorkflowDisabled,
 			HideWorkflowQueryErrors:       cfg.HideWorkflowQueryErrors,

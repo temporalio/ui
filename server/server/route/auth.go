@@ -30,6 +30,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -40,6 +41,34 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 )
+
+// validateReturnURL checks that the returnURL is either a relative path, same-host,
+// or belongs to one of the configured CORS allowed origins.
+func validateReturnURL(returnURL string, allowedOrigins []string, requestHost string) error {
+	if returnURL == "" {
+		return nil
+	}
+
+	u, err := url.Parse(returnURL)
+	if err != nil {
+		return fmt.Errorf("invalid returnUrl: %w", err)
+	}
+
+	// Allow relative URLs (no host) or same-host redirects
+	if u.Host == "" || u.Host == requestHost {
+		return nil
+	}
+
+	// Allow redirects to configured CORS origins
+	returnOrigin := fmt.Sprintf("%s://%s", u.Scheme, u.Host)
+	for _, origin := range allowedOrigins {
+		if returnOrigin == origin {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("returnUrl host %s not in allowed origins", u.Host)
+}
 
 // SetAuthRoutes sets routes used by auth
 func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) {
@@ -67,6 +96,10 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 		log.Fatal(err)
 	}
 
+	oidcConfig := &oidc.Config{ClientID: providerCfg.ClientID}
+	verifier := provider.Verifier(oidcConfig)
+	auth.SetVerifier(verifier)
+
 	oauthCfg := oauth2.Config{
 		ClientID:     providerCfg.ClientID,
 		ClientSecret: providerCfg.ClientSecret,
@@ -76,20 +109,22 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	}
 
 	api := e.Group("/auth")
-	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider)) // compatibility with UI v1
+	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
+	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
+	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration)) // compatibility with UI v1
+	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
+	api.GET("/logout", logout())
 }
 
-func authenticate(config *oauth2.Config, options map[string]interface{}) func(echo.Context) error {
+func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string) func(echo.Context) error {
 	return func(c echo.Context) error {
 		state, err := randString()
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
-		nonce, err := randNonce(c)
+		nonce, err := randNonce(c, allowedOrigins)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 		setCallbackCookie(c, "state", state)
 		setCallbackCookie(c, "nonce", nonce)
@@ -119,7 +154,7 @@ func authenticate(config *oauth2.Config, options map[string]interface{}) func(ec
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider) func(echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
 	return func(c echo.Context) error {
 		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
 		if err != nil {
@@ -130,6 +165,9 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set user: "+err.Error())
 		}
+
+		// Set session start time for max session duration enforcement
+		auth.SetSessionStart(c, maxSessionDuration)
 
 		nonceS, err := c.Request().Cookie("nonce")
 		if err != nil {
@@ -147,6 +185,111 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 
 		return c.Redirect(http.StatusSeeOther, returnUrl)
 	}
+}
+
+// refreshTokens exchanges a refresh token (stored in an HttpOnly cookie) for a new access token
+// and optionally a new ID token. It resets the cookies using auth.SetUser and returns 200.
+func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
+	return func(c echo.Context) error {
+		startTime := time.Now()
+		clientIP := c.RealIP()
+
+		log.Printf("token_refresh_attempt ip=%s", clientIP)
+
+		if err := auth.ValidateSessionDuration(c, maxSessionDuration); err != nil {
+			log.Printf("token_refresh_denied reason=session_expired ip=%s", clientIP)
+			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		}
+
+		// Read refresh cookie
+		refreshCookie, err := c.Request().Cookie("refresh")
+		if err != nil || refreshCookie.Value == "" {
+			duration := time.Since(startTime).Milliseconds()
+			log.Printf("token_refresh_failed reason=missing_refresh_token ip=%s duration_ms=%d", clientIP, duration)
+			return echo.NewHTTPError(http.StatusUnauthorized, "missing refresh token")
+		}
+
+		// Use the refresh token to obtain a new token set
+		ts := oauthCfg.TokenSource(ctx, &oauth2.Token{RefreshToken: refreshCookie.Value})
+		newTok, err := ts.Token()
+		if err != nil {
+			duration := time.Since(startTime).Milliseconds()
+			log.Printf("token_refresh_failed reason=token_exchange_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
+			return echo.NewHTTPError(http.StatusUnauthorized, "unable to refresh token")
+		}
+
+		log.Printf("token_exchange_success ip=%s expiry=%s", clientIP, newTok.Expiry.Format(time.RFC3339))
+
+		var user auth.User
+		user.OAuth2Token = newTok
+
+		// Try to capture a new ID token if provided and verify it
+		if raw, ok := newTok.Extra("id_token").(string); ok && raw != "" {
+			oidcConfig := &oidc.Config{ClientID: oauthCfg.ClientID}
+			verifier := provider.Verifier(oidcConfig)
+			idTok, verr := verifier.Verify(ctx, raw)
+			if verr == nil {
+				var claims auth.Claims
+				// If claims fail, we still proceed with tokens
+				_ = idTok.Claims(&claims)
+				user.IDToken = &auth.IDToken{RawToken: raw, Claims: &claims}
+			} else {
+				log.Printf("id_token_verification_failed ip=%s error=%q", clientIP, verr.Error())
+				user.IDToken = nil
+			}
+		}
+
+		if err := auth.SetUser(c, &user); err != nil {
+			duration := time.Since(startTime).Milliseconds()
+			log.Printf("token_refresh_failed reason=set_user_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
+			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set refreshed user: "+err.Error())
+		}
+
+		duration := time.Since(startTime).Milliseconds()
+		log.Printf("token_refresh_complete ip=%s duration_ms=%d", clientIP, duration)
+
+		// Respond OK. UI can read the short-lived 'user*' cookie to pick up tokens.
+		return c.NoContent(http.StatusOK)
+	}
+}
+
+// logout clears authentication cookies and redirects to root
+func logout() func(echo.Context) error {
+	return func(c echo.Context) error {
+		log.Printf("[Auth] User logout initiated from %s", c.RealIP())
+
+		// Clear refresh token cookie
+		clearCookie(c, "refresh")
+		log.Printf("[Auth] Cleared refresh token cookie")
+
+		// Clear session start cookie
+		clearCookie(c, "session_start")
+
+		// Clear user data cookies (user0, user1, etc.)
+		// We don't know how many chunks exist, so clear up to 10
+		for i := 0; i < 10; i++ {
+			cookieName := "user" + strconv.Itoa(i)
+			clearCookie(c, cookieName)
+		}
+		log.Printf("[Auth] Cleared user data cookies")
+
+		// Redirect to root (or login page)
+		return c.Redirect(http.StatusSeeOther, "/")
+	}
+}
+
+// clearCookie sets a cookie with MaxAge=-1 to delete it
+func clearCookie(c echo.Context, name string) {
+	cookie := &http.Cookie{
+		Name:     name,
+		Value:    "",
+		MaxAge:   -1, // Instructs browser to delete cookie
+		Path:     "/",
+		Secure:   c.Request().TLS != nil,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+	c.SetCookie(cookie)
 }
 
 func setCallbackCookie(c echo.Context, name, value string) {
@@ -182,21 +325,15 @@ func randString() (string, error) {
 	return base64.RawURLEncoding.EncodeToString(b), nil
 }
 
-func randNonce(c echo.Context) (string, error) {
+func randNonce(c echo.Context, allowedOrigins []string) (string, error) {
 	v, err := randString()
 	if err != nil {
 		return "", err
 	}
 
 	returnURL := c.QueryParam("returnUrl")
-	u, err := url.Parse(returnURL)
-	if err != nil {
-		return "", fmt.Errorf("invalid returnUrl: %w", err)
-	}
-
-	// Reject redirects to other hosts, our use case only needs to handle local redirects.
-	if u.Host != "" && u.Host != c.Request().Host {
-		return "", fmt.Errorf("invalid returnUrl: does not match expected host %s", c.Request().Host)
+	if err := validateReturnURL(returnURL, allowedOrigins, c.Request().Host); err != nil {
+		return "", err
 	}
 
 	n := &Nonce{

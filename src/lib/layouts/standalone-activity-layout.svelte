@@ -27,14 +27,21 @@
     activityExecution: ActivityExecution;
     namespace: string;
     activityId: string;
+    runId: string;
     children: Snippet;
     poller: StandaloneActivityPoller;
   }
 
-  let { activityExecution, children, namespace, activityId, poller }: Props =
-    $props();
+  let {
+    activityExecution,
+    children,
+    namespace,
+    activityId,
+    runId,
+    poller,
+  }: Props = $props();
 
-  const routeParameters = $derived({ namespace, activityId });
+  const routeParameters = $derived({ namespace, activityId, runId });
 
   const detailsRoute = $derived(
     routeForStandaloneActivityDetails(routeParameters),

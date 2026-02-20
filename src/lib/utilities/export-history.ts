@@ -50,7 +50,7 @@ const decodePayloads = async (
     );
 
     return decodePayloadAttributes(convertedAttributes, returnDataOnly);
-  } catch (e) {
+  } catch {
     return event;
   }
 };
@@ -103,7 +103,7 @@ export const exportHistory = async ({
       }
       download(decodedEvents, `${runId}/events.json`, 'text/plain');
     }
-  } catch (e) {
+  } catch {
     console.error('Could not download event history');
   }
 };

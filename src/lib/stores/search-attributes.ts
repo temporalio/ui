@@ -1,5 +1,7 @@
 import { derived, get, type Readable, writable } from 'svelte/store';
 
+import { z } from 'zod/v3';
+
 import {
   SEARCH_ATTRIBUTE_TYPE,
   type SearchAttributes,
@@ -121,6 +123,35 @@ export type SearchAttributeInput =
   | NumberSearchAttributeInput
   | StringSearchAttributeInput
   | ListSearchAttributeInput;
+
+export const searchAttributeSchema = z
+  .object({
+    value: z.any(),
+    label: z.string(),
+    type: z.enum([
+      SEARCH_ATTRIBUTE_TYPE.BOOL,
+      SEARCH_ATTRIBUTE_TYPE.INT,
+      SEARCH_ATTRIBUTE_TYPE.DOUBLE,
+      SEARCH_ATTRIBUTE_TYPE.TEXT,
+      SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST,
+      SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED,
+    ]),
+  })
+  .superRefine((data, context) => {
+    if (data.type && data.label && data.value === null) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['value'],
+        message: 'Search Attribute Value is required.',
+      });
+    }
+  });
+
+export type SearchAttributeSchema = z.infer<typeof searchAttributeSchema>;
+export const searchAttributesSchema = z.array(searchAttributeSchema);
+export type SearchAttributesSchema = z.infer<typeof searchAttributesSchema>;
 
 export const searchAttributeOptions: Readable<SearchAttributeOption[]> =
   derived([searchAttributes], ([$searchAttributes]) => {

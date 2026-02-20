@@ -54,6 +54,11 @@ export type CountWorkflowExecutionsResponse = {
   groups?: { count: string; groupValues: Payloads }[];
 };
 
+export type CountSchedulesResponse = {
+  count?: string;
+  groups?: { count: string; groupValues: Payloads }[];
+};
+
 export type WorkflowExecutionConfig = Replace<
   import('$lib/types').WorkflowExecutionConfig,
   {
@@ -102,6 +107,7 @@ export type WorkflowStatus =
   | 'ContinuedAsNew'
   | 'Canceled'
   | 'Terminated'
+  | 'Paused'
   | null;
 
 export type WorkflowType = string | null;
@@ -152,8 +158,7 @@ export type DecodedWorkflowSearchAttributes = {
   indexedFields?: Record<string, string>;
 };
 
-export interface MostRecentWOrkflowVersionStamp
-  extends WorkflowVersionTimpstamp {
+export interface MostRecentWOrkflowVersionStamp extends WorkflowVersionTimpstamp {
   useVersioning?: boolean;
 }
 
@@ -182,6 +187,7 @@ export type WorkflowExecution = {
   parent?: WorkflowIdentifier;
   url: string;
   isRunning: boolean;
+  isPaused: boolean;
   defaultWorkflowTaskTimeout: Duration;
   workflowExecutionTimeout?: Duration;
   canBeTerminated: boolean;

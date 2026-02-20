@@ -72,10 +72,56 @@ const MOCK_DEFAULT_NAMESPACE = {
   failoverHistory: [],
 };
 
+const MOCK_NAMESPACE_WITH_PAUSE_CAPABILITY = {
+  namespaceInfo: {
+    name: 'default',
+    state: 'Registered',
+    description: '',
+    ownerEmail: '',
+    data: {},
+    id: 'bbe0d4ea-c682-4c5a-bc4b-fadb8e8c8bfe',
+    supportsSchedules: true,
+    capabilities: {
+      workflowPause: true,
+    },
+  },
+  config: {
+    workflowExecutionRetentionTtl: '86400s',
+    badBinaries: {
+      binaries: {},
+    },
+    historyArchivalState: 'Disabled',
+    historyArchivalUri: '',
+    visibilityArchivalState: 'Disabled',
+    visibilityArchivalUri: '',
+    customSearchAttributeAliases: {},
+  },
+  replicationConfig: {
+    activeClusterName: 'active',
+    clusters: [
+      {
+        clusterName: 'active',
+      },
+    ],
+    state: 'Unspecified',
+  },
+  failoverVersion: '0',
+  isGlobalNamespace: false,
+  failoverHistory: [],
+};
+
 export const mockNamespaceApi = (page: Page, archived = false) => {
   return page.route(NAMESPACE_API, (route) => {
     route.fulfill({
       json: archived ? MOCK_ARCHIVED_NAMESPACE : MOCK_DEFAULT_NAMESPACE,
+    });
+  });
+};
+
+export const mockNamespaceWithPauseCapability = (page: Page) => {
+  return page.route(NAMESPACE_API, (route) => {
+    route.fulfill({
+      json: MOCK_NAMESPACE_WITH_PAUSE_CAPABILITY,
     });
   });
 };
