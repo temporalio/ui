@@ -6,14 +6,14 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEditEndpoint from '$lib/pages/nexus-edit-endpoint.svelte';
-  import { endpointForm } from '$lib/pages/nexus-form.svelte';
+  import type { NexusFormData } from '$lib/pages/nexus-form.svelte';
   import {
     deleteNexusEndpoint,
     updateNexusEndpoint,
   } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
-  import type { NetworkError } from '$lib/types/global';
-  import { encodePayloads } from '$lib/utilities/encode-payload';
+  import type { NexusEndpoint } from '$lib/types/nexus';
+  import { getNexusEndpoint } from '$lib/utilities/get-nexus-endpoint';
   import {
     routeForNexus,
     routeForNexusEndpoint,
@@ -25,51 +25,40 @@
 
   const { endpoint } = $derived(data);
 
-  let error = $state<NetworkError | undefined>(undefined);
   let loading = $state(false);
 
-  const onUpdate = async () => {
-    if (!endpoint) return;
+  const onUpdate = async (formData: NexusFormData) => {
+    if (!endpoint?.id) return;
 
-    error = undefined;
     loading = true;
-    const body = { ...$endpointForm };
-    body.id = endpoint.id;
-    body.version = endpoint.version;
-
-    if (body.spec) {
-      const payloads = await encodePayloads({
-        input: JSON.stringify(body.spec.descriptionString),
-        encoding: 'json/plain',
-      });
-      body.spec.description = payloads?.[0];
-
-      delete body.spec.allowedCallerNamespaces;
-      delete body.spec.descriptionString;
-    }
 
     try {
+      const body: Partial<NexusEndpoint> = {
+        ...(await getNexusEndpoint(formData)),
+        id: endpoint.id,
+        version: endpoint.version,
+      };
+
       await updateNexusEndpoint(endpoint.id, body);
-      goto(routeForNexusEndpoint(endpoint.id), { invalidateAll: true });
+      await goto(routeForNexusEndpoint(endpoint.id), { invalidateAll: true });
     } catch (e: unknown) {
-      error = e as NetworkError;
       console.error('Error updating endpoint', e);
+      throw e;
     } finally {
       loading = false;
     }
   };
 
   const onDelete = async () => {
-    if (!endpoint) return;
+    if (!endpoint?.id) return;
 
-    error = undefined;
     loading = true;
     try {
       await deleteNexusEndpoint(endpoint.id, String(endpoint.version));
-      goto(routeForNexus());
+      await goto(routeForNexus());
     } catch (e) {
-      error = e as NetworkError;
       console.error('Error deleting endpoint', e);
+      throw e;
     } finally {
       loading = false;
     }
@@ -93,11 +82,10 @@
     </Link>
     <NexusEditEndpoint
       {endpoint}
-      {loading}
       {targetNamespaceList}
       {onUpdate}
       {onDelete}
-      {error}
+      {loading}
       cancelHref={routeForNexusEndpoint($page.params.id)}
     />
   </div>
