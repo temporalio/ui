@@ -54,7 +54,7 @@
     $endpointForm = {
       spec: {
         name,
-        descriptionString,
+        descriptionString: descriptionString.trim() || undefined,
         target: {
           worker: {
             namespace: target,
@@ -137,13 +137,14 @@
       id="caller-namespace-filter-menu"
       multiselect
       displayChips={false}
+      allowCustomValue
       bind:value={allowedCallerNamespaces}
       options={callerNamespaces}
       label={translate('nexus.allowed-caller-namespaces')}
       leadingIcon="search"
       noResultsText={translate('common.no-results')}
       valid={!!allowedCallerNamespaces.length}
-      error="Please select at least one Namespace."
+      error={translate('nexus.allowed-caller-namespaces-error')}
       placeholder={translate('nexus.select-namespaces')}
       optionValueKey="value"
       optionLabelKey="label"
