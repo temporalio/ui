@@ -143,7 +143,7 @@
     "@storybook/test-runner": "^0.22.0",
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/adapter-vercel": "^4.0.0",
-    "@sveltejs/kit": "2.49.5",
+    "@sveltejs/kit": "2.52.2",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@temporalio/activity": "1.14.1",
     "@temporalio/client": "1.14.1",
