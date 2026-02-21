@@ -1,17 +1,15 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowWorkers from '$lib/pages/workflow-workers.svelte';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({ workflow: workflowId } = $page.params);
-  $: ({ workers, workflow } = $workflowRun);
+  const workflowId = $derived(page.params.workflow);
 </script>
 
 <PageTitle
   title={`${translate('workflows.workers-tab')} | ${workflowId}`}
-  url={$page.url.href}
+  url={page.url.href}
 />
-<WorkflowWorkers {workers} taskQueue={workflow?.taskQueue} />
+<WorkflowWorkers />

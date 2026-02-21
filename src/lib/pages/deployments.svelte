@@ -3,7 +3,6 @@
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
@@ -38,13 +37,6 @@
     },
   ];
 </script>
-
-<div class="flex flex-wrap items-center gap-2">
-  <h1>
-    {translate('deployments.worker-deployments')}
-  </h1>
-  <Badge class="shrink-0">Public Preview</Badge>
-</div>
 
 {#key [namespace]}
   <PaginatedTable

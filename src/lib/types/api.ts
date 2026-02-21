@@ -43,7 +43,10 @@ export type ParameterlessAPIRoutePath =
   | 'user'
   | 'nexus-endpoints'
   | 'namespaces';
-export type WorkerAPIRoutePath = 'worker-task-reachability';
+export type WorkerAPIRoutePath =
+  | 'worker-task-reachability'
+  | 'workers'
+  | 'worker';
 export type SchedulesAPIRoutePath = 'schedules' | 'schedules.count';
 export type ScheduleAPIRoutePath =
   | 'schedule'
@@ -99,6 +102,7 @@ export type APIRouteParameters = {
   endpointId: string;
   deploymentName: string;
   version: string;
+  workerInstanceKey: string;
 };
 
 export type StandaloneActivitiesParameters = Pick<

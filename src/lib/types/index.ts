@@ -78,6 +78,16 @@ export type PauseWorkflowRequest =
 export type UnpauseWorkflowRequest =
   // temporal.api.workflowservice.v1.IUnpauseWorkflowExecutionRequest;
   PauseOrUnpauseWorkflowRequest;
+export type ListTaskQueuePartitionsRequest =
+  temporal.api.workflowservice.v1.IListTaskQueuePartitionsRequest;
+export type ListWorkersRequest =
+  temporal.api.workflowservice.v1.IListWorkersRequest;
+export type ListWorkersResponse =
+  temporal.api.workflowservice.v1.IListWorkersResponse;
+export type DescribeWorkerRequest =
+  temporal.api.workflowservice.v1.IDescribeWorkerRequest;
+export type DescribeWorkerResponse =
+  temporal.api.workflowservice.v1.IDescribeWorkerResponse;
 
 // api.history
 
@@ -207,6 +217,7 @@ export type PendingNexusOperationState =
 export type CallbackState = temporal.api.enums.v1.CallbackState;
 export type VersioningBehavior = temporal.api.enums.v1.VersioningBehavior;
 export type EventType = temporal.api.enums.v1.EventType;
+export type WorkerStatus = temporal.api.enums.v1.WorkerStatus;
 
 // temporal.api.enums.v1.ResetReapplyExcludeType
 export enum ResetReapplyExcludeType {
@@ -299,6 +310,18 @@ export type EventLink = temporal.api.common.v1.ILink;
 
 // api.failure
 export type Failure = temporal.api.failure.v1.IFailure;
+
+// api.worker
+export type WorkerHostInfo = temporal.api.worker.v1.IWorkerHostInfo & {
+  workerGroupingKey?: string;
+};
+export type WorkerHeartbeat = temporal.api.worker.v1.IWorkerHeartbeat & {
+  hostInfo?: WorkerHostInfo;
+};
+export type WorkerPollerInfo = temporal.api.worker.v1.IWorkerPollerInfo;
+export type WorkerSlotsInfo = temporal.api.worker.v1.IWorkerSlotsInfo;
+export type WorkerInfo = temporal.api.worker.v1.IWorkerInfo;
+export type PluginInfo = temporal.api.worker.v1.PluginInfo;
 
 // google
 

@@ -286,6 +286,15 @@ export const routeForEventHistoryEvent = ({
 };
 
 export const routeForWorkers = (
+  parameters: NamespaceParameter,
+): ResolvedPathname => {
+  return resolve(
+    `${routeForNamespace({ namespace: parameters.namespace })}/workers`,
+    {},
+  );
+};
+
+export const routeForWorkflowWorkers = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
   return resolve(`${routeForWorkflow(parameters)}/workers`, {});
@@ -297,6 +306,20 @@ export const routeForWorkerDeployments = ({
   namespace: string;
 }): ResolvedPathname => {
   return resolve('/namespaces/[namespace]/worker-deployments', { namespace });
+};
+
+export const routeForWorkerInstance = ({
+  namespace,
+  workerInstanceKey,
+}: {
+  namespace: string;
+  workerInstanceKey: string;
+}) => {
+  const workerInstanceKeyEncoded = encodeURIForSvelte(workerInstanceKey);
+  return resolve('/namespaces/[namespace]/workers/[workerInstanceKey]', {
+    namespace,
+    workerInstanceKey: workerInstanceKeyEncoded,
+  });
 };
 
 export const routeForWorkerDeployment = ({
