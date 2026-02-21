@@ -161,11 +161,6 @@ export type TaskQueueRouteParameters = Pick<
   'namespace' | 'queue'
 >;
 
-export type WorkerRouteParameters = Pick<
-  APIRouteParameters,
-  'namespace' | 'queue' | 'workerInstanceKey'
->;
-
 export type ValidWorkflowEndpoints = WorkflowsAPIRoutePath;
 
 export type ValidWorkflowParameters =

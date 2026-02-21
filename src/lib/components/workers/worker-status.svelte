@@ -16,7 +16,6 @@
     Unspecified: 'Unspecified',
     Running: 'Running',
     'Shutting Down': 'Shutting Down',
-    Shutdown: 'Shutdown',
   };
 
   const workerStatus = cva(
@@ -29,7 +28,6 @@
           Unspecified: 'bg-slate-100',
           Running: 'bg-blue-300',
           'Shutting Down': 'bg-yellow-200',
-          Shutdown: 'bg-red-200',
         },
       },
     },

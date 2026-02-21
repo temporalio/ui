@@ -27,8 +27,5 @@ go.work.sum
 .claude/settings.local.json
 .claude/*
 !.claude/skills/
-<<<<<<< HEAD
 .omc
-=======
 .sisyphus/*
->>>>>>> main

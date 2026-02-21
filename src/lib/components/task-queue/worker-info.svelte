@@ -6,11 +6,11 @@
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import {
-    type WorkerInfo,
-    type WorkerPollerInfo,
-    type WorkerSlotsInfo,
-  } from '$lib/services/worker-service';
+  import type {
+    WorkerInfo,
+    WorkerPollerInfo,
+    WorkerSlotsInfo,
+  } from '$lib/types';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
@@ -129,7 +129,7 @@
 {#snippet taskSlotCard(
   title: string,
   slots: WorkerSlotsInfo,
-  poller: WorkerPollerInfo | null,
+  poller: WorkerPollerInfo,
 )}
   <Card>
     <div class="mb-4 flex items-center gap-2">

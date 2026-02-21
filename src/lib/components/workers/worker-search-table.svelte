@@ -11,7 +11,7 @@
 
   const query = $derived(page.url.searchParams.get('query') || '');
 
-  const columns = $derived([
+  const columns = [
     { label: translate('workers.status') },
     { label: translate('workers.instance') },
     { label: translate('workers.task-queue') },
@@ -21,7 +21,7 @@
     { label: translate('workers.activity-task-slots') },
     { label: translate('workers.nexus-task-slots') },
     { label: translate('workers.sdk') },
-  ]);
+  ];
 
   const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));
 </script>
@@ -42,11 +42,11 @@
     >
 
     <tr slot="headers" class="text-left">
-      {#each columns as { label }}
+      {#each columns as { label } (label)}
         <th>{label}</th>
       {/each}
     </tr>
-    {#each visibleItems as worker}
+    {#each visibleItems as worker, i (i)}
       <WorkerTableRow {worker} {columns} {namespace} filterable />
     {/each}
 

@@ -33,21 +33,14 @@
         clearParameters: [attribute],
       });
     } else {
-      if (query) {
-        const newQuery = `${query} AND ${attribute}="${value}"`;
-        updateQueryParameters({
-          parameter: 'query',
-          value: newQuery,
-          url: page.url,
-        });
-      } else {
-        const newQuery = `${attribute}="${value}"`;
-        updateQueryParameters({
-          parameter: 'query',
-          value: newQuery,
-          url: page.url,
-        });
-      }
+      const newQuery = query
+        ? `${query} AND ${attribute}="${value}"`
+        : `${attribute}="${value}"`;
+      updateQueryParameters({
+        parameter: 'query',
+        value: newQuery,
+        url: page.url,
+      });
     }
   };
 

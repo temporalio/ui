@@ -1,6 +1,6 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-  import { type WorkerInfo } from '$lib/services/worker-service';
+  import type { WorkerInfo } from '$lib/types';
   import { routeForWorkerInstance } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 

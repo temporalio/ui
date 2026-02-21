@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import { resolve } from '$app/paths';
 import { page } from '$app/stores';
 
+import type { DescribeWorkerRequest } from '$lib/types';
 import type {
   APIRouteParameters,
   APIRoutePath,
@@ -32,7 +33,6 @@ import type {
   WorkerDeploymentsAPIRoutePath,
   WorkerDeploymentVersionAPIRoutePath,
   WorkerDeploymentVersionRouteParameters,
-  WorkerRouteParameters,
   WorkflowActivitiesAPIRoutePath,
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
@@ -215,7 +215,7 @@ export function routeForApi(
 ): string;
 export function routeForApi(
   route: WorkerAPIRoutePath,
-  parameters: NamespaceRouteParameters | WorkerRouteParameters,
+  parameters: DescribeWorkerRequest,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(

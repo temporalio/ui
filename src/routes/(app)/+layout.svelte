@@ -247,16 +247,6 @@
       }
     }
 
-    // Handle workers page
-    if (page.url.pathname.endsWith('workers')) {
-      return routeForWorkers({ namespace });
-    }
-
-    // Handle workers page
-    if (page.url.pathname.includes('workers')) {
-      return routeForWorkers({ namespace });
-    }
-
     return routeForWorkflows({ namespace });
   }
 

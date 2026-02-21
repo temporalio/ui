@@ -100,11 +100,7 @@ export const toCallbackStateReadable = (
   return fromScreamingEnum(state, 'CallbackState');
 };
 
-export type ReadableWorkerStatus =
-  | 'Unspecified'
-  | 'Running'
-  | 'Shutting Down'
-  | 'Shutdown';
+export type ReadableWorkerStatus = 'Unspecified' | 'Running' | 'Shutting Down';
 
 export const toWorkerStatusReadable = (
   state?: WorkerStatus,

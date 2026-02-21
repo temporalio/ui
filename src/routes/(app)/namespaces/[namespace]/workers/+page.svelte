@@ -16,15 +16,13 @@
 
   const workersHref = $derived(routeForWorkers({ namespace }));
   const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
-
-  const pageTitle = $derived(translate('workers.workers'));
 </script>
 
-<PageTitle title={pageTitle} url={page.url.href} />
+<PageTitle title={translate('workers.workers')} url={page.url.href} />
 <header class="flex flex-col gap-2">
   <div class="flex flex-wrap items-center gap-2">
     <h1 class="leading-7" data-cy="workers-title">
-      {pageTitle}
+      {translate('workers.workers')}
     </h1>
   </div>
   <Tabs>

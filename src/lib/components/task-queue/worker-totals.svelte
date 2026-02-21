@@ -1,6 +1,6 @@
 <script lang="ts">
   import Card from '$lib/holocene/card.svelte';
-  import type { WorkerInfo } from '$lib/services/worker-service';
+  import type { WorkerInfo } from '$lib/types';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
   let { workersInfo }: { workersInfo: WorkerInfo[] } = $props();
