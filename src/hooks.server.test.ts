@@ -11,11 +11,15 @@ describe('hooks.server', () => {
       } as RequestEvent;
     };
 
-    const createMockResolve = (headers?: Record<string, string>) => {
+    const createMockResolve = (
+      headers?: Record<string, string>,
+      status = 200,
+    ) => {
       const responseHeaders = new Headers(headers);
       return vi.fn().mockResolvedValue(
         new Response('test', {
           headers: responseHeaders,
+          status,
         }),
       );
     };
@@ -85,6 +89,24 @@ describe('hooks.server', () => {
     it('should not set Cache-Control header for root path', async () => {
       const event = createMockEvent('/');
       const resolve = createMockResolve();
+
+      const response = await handle({ event, resolve });
+
+      expect(response.headers.get('Cache-Control')).toBeNull();
+    });
+
+    it('should not set Cache-Control header for error responses on immutable paths', async () => {
+      const event = createMockEvent('/_app/immutable/chunks/index.js');
+      const resolve = createMockResolve({}, 404);
+
+      const response = await handle({ event, resolve });
+
+      expect(response.headers.get('Cache-Control')).toBeNull();
+    });
+
+    it('should not set Cache-Control header for 500 responses on immutable paths', async () => {
+      const event = createMockEvent('/_app/immutable/chunks/index.js');
+      const resolve = createMockResolve({}, 500);
 
       const response = await handle({ event, resolve });
 
