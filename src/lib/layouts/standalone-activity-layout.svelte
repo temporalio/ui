@@ -79,9 +79,14 @@
 
   // activityExecution.info.taskQueue is intentional here, when the poller resolves, the reference to
   // activityExecution is updated, causing the $derived to re-run and the #await block to re-trigger.
-  const getPollersRequest = $derived(
-    getActivityPollers({ queue: $activityExecution.info.taskQueue, namespace }),
-  );
+  const getPollersRequest = $derived.by(() => {
+    if (!$activityExecution?.info?.taskQueue) return;
+
+    return getActivityPollers({
+      queue: $activityExecution.info.taskQueue,
+      namespace,
+    });
+  });
 
   onMount(async () => {
     poller.start();
@@ -140,18 +145,20 @@
         />
       </TabList>
     </Tabs>
-    {#await getPollersRequest then response}
-      {#if !response.pollers && $activityExecution.info.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING'}
-        <Alert
-          intent="error"
-          title={translate('workflows.workflow-error-no-workers-title')}
-        >
-          {translate('workflows.workflow-error-no-workers-description', {
-            taskQueue: $activityExecution.info.taskQueue,
-          })}
-        </Alert>
-      {/if}
-    {/await}
+    {#if getPollersRequest}
+      {#await getPollersRequest then response}
+        {#if !response.pollers && $activityExecution.info.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING'}
+          <Alert
+            intent="error"
+            title={translate('workflows.workflow-error-no-workers-title')}
+          >
+            {translate('workflows.workflow-error-no-workers-description', {
+              taskQueue: $activityExecution.info.taskQueue,
+            })}
+          </Alert>
+        {/if}
+      {/await}
+    {/if}
     {@render children()}
   </div>
 {:else if error}
