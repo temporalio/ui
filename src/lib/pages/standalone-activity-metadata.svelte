@@ -11,6 +11,8 @@
       details: '',
     };
 
+    if (!userMetadata) return metadata;
+
     const summary = await decodeSingleReadablePayloadWithCodec(
       userMetadata.summary,
     );
