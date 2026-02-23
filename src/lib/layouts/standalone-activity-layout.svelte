@@ -13,7 +13,6 @@
   import { translate } from '$lib/i18n/translate';
   import { getActivityPollers } from '$lib/services/pollers-service';
   import { activitiesSearchParams } from '$lib/stores/activities';
-  import type { ActivityExecution } from '$lib/types/activity-execution';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForStandaloneActivities,
@@ -28,7 +27,6 @@
   } from '$lib/utilities/standalone-activity-poller.svelte';
 
   interface Props {
-    activityExecution: ActivityExecution;
     namespace: string;
     activityId: string;
     runId: string;
