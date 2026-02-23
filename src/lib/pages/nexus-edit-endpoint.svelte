@@ -43,6 +43,7 @@
   <NexusForm
     {endpoint}
     {nameRegexPattern}
+    nameHintText=""
     {targetNamespaceList}
     {callerNamespaceList}
     {isCloud}
