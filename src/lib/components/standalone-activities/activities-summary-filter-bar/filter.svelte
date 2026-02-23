@@ -31,8 +31,6 @@
   const focusedElementId = writable<string>('');
   const chipOpenIndex = writable<number | null>(null);
 
-  const options = activitySearchAttributeOptions;
-
   afterNavigate(() => {
     chipOpenIndex.set(null);
   });
@@ -66,5 +64,5 @@
 
 <div class="flex shrink flex-wrap items-center justify-start gap-2">
   <ActivityDropdownFilterList />
-  <ActivitySearchAttributeMenu {options} />
+  <ActivitySearchAttributeMenu options={$activitySearchAttributeOptions} />
 </div>
