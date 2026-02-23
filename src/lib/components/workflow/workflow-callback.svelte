@@ -45,7 +45,7 @@
 <Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>
   <div class="flex flex-col gap-2 pt-2">
     {#if links.length}
-      {#each links as link (link.workflowEvent?.eventRef?.eventId || link.workflowEvent?.requestIdRef.requestId)}
+      {#each links as link, i (link.workflowEvent?.eventRef?.eventId || link.workflowEvent?.requestIdRef?.requestId || i)}
         <EventLink {link} />
         <EventLink
           {link}

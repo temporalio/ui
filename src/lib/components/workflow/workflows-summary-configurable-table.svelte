@@ -102,7 +102,7 @@
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
-    {#each visibleItems as workflow (workflow.id + workflow.runId)}
+    {#each visibleItems as workflow (`${workflow.id}:${workflow.runId}`)}
       <TableRow
         {workflow}
         {viewChildren}
@@ -113,7 +113,7 @@
         {/each}
       </TableRow>
       {#if childrenActive(workflow)}
-        {#each childrenActive(workflow).children as child}
+        {#each childrenActive(workflow).children as child (`${child.id}:${child.runId}`)}
           <TableRow workflow={child} child>
             {#each columns as column}
               <TableBodyCell workflow={child} {column} />
