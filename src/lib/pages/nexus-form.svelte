@@ -85,12 +85,6 @@
     },
     onError: ({ result }) => {
       const error = result.error;
-      console.log('SuperForms error object:', error);
-      console.log(
-        'Error keys:',
-        error && typeof error === 'object' ? Object.keys(error) : 'N/A',
-      );
-
       let errorMessage = 'An error occurred';
 
       if (error instanceof Error) {
