@@ -40,6 +40,7 @@
 
   onDestroy(() => {
     poller.abort();
+    $activityExecution = undefined;
   });
 </script>
 
