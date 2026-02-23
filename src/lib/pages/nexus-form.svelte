@@ -53,7 +53,8 @@
     z.object({
       name: z
         .string()
-        .min(1, translate('nexus.endpoint-name-hint'))
+        .min(3, translate('nexus.endpoint-name-hint'))
+        .max(200, translate('nexus.endpoint-name-hint'))
         .refine((val) => pattern.test(val), {
           message: translate('nexus.endpoint-name-hint'),
         }),
@@ -150,7 +151,7 @@
     label={translate('nexus.endpoint-name')}
     id="name"
     name="name"
-    maxLength={255}
+    maxLength={200}
     placeholder={translate('nexus.endpoint-name-placeholder')}
     {...$constraints.name}
   />
