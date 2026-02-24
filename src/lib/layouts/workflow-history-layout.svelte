@@ -211,7 +211,7 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {items} {groups} {compact} minimized />
+        <EventSummaryTable {updating} {items} {groups} {compact} />
       </div>
     {/if}
   </div>

@@ -87,7 +87,7 @@
     {updating}
     items={filteredForStatus(items)}
     let:visibleItems
-    maxHeight={minimized ? 'calc(100vh - 555px)' : '20000px'}
+    maxHeight="none"
   >
     <TableHeaderRow slot="headers" class="!h-8">
       {#each columns as column}
