@@ -12,7 +12,6 @@
   import TabButtons from '$lib/holocene/tab-buttons/tab-buttons.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
@@ -176,23 +175,6 @@
               : translate('common.ascending')}
           </ToggleButton>
         {/if}
-        <Tooltip
-          text={$minimizeEventView
-            ? translate('workflows.timeline-minimized')
-            : translate('workflows.timeline-expanded')}
-          top
-        >
-          <ToggleButton
-            leadingIcon={$minimizeEventView ? 'minimize' : 'expand'}
-            data-testid="expandAll"
-            size="sm"
-            on:click={() => ($minimizeEventView = !$minimizeEventView)}
-          >
-            {$minimizeEventView
-              ? translate('workflows.minimized')
-              : translate('workflows.expanded')}
-          </ToggleButton>
-        </Tooltip>
         <EventTypeFilter {compact} minimized={$minimizeEventView} />
         <ToggleButton
           disabled={!workflow?.isRunning}
