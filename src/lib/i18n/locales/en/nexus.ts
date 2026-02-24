@@ -24,6 +24,8 @@ export const Strings = {
     'Add a link to your repo or instructions to help other users in this account use this endpoint.',
   'description-placeholder':
     '//Provide a readme for users to use this endpoint',
+  'description-label': 'Description',
+  'description-hint': 'Do not include sensitive data.',
   handler: 'Handler',
   'delete-endpoint': 'Delete Endpoint',
   'delete-modal-title': 'Delete Nexus Endpoint?',
@@ -33,9 +35,10 @@ export const Strings = {
   'type-confirm-preface': 'Type ',
   'type-confirm-postface': 'to delete this endpoint.',
   'endpoint-name-hint':
-    'Endpoint name must start with A-Z, a-z or _ and can only contain A-Z, a-z, 0-9, or _',
-  'endpoint-name-hint-with-dash':
-    'Endpoint name must start with A-Z or a-z and can only contain A-Z, a-z, 0-9 or -',
+    'Name must start with a letter and can only contain letters, numbers, and dashes.',
+  'target-namespace-required': 'Please select a target Namespace.',
+  'task-queue-required': 'Please enter a Task Queue.',
+  'caller-namespace-required': 'Please select at least one Namespace.',
   'access-policy': 'Access Policy',
   'allowed-caller-namespaces': 'Allowed caller Namespaces',
   'allowed-caller-namespaces-description':

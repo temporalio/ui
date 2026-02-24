@@ -129,7 +129,6 @@ export const ActivityHeaderLabels = [
   'Activity Type',
   'Task Queue',
   'Start Time',
-  'Execution Time',
   'Close Time',
   'Status',
   'Execution Duration',
@@ -149,7 +148,6 @@ export const DEFAULT_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
 
 const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Run ID' },
-  { label: 'Execution Time' },
   { label: 'Execution Duration' },
   { label: 'State Transitions' },
 ];

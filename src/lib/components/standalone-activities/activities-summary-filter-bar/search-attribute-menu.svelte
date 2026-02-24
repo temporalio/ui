@@ -15,7 +15,7 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import { activityFilters } from '$lib/stores/filters';
-  import type { SearchAttributeOption } from '$lib/stores/search-attributes';
+  import { activitySearchAttributeOptions } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
@@ -31,8 +31,6 @@
     ACTIVITY_FILTER_CONTEXT,
     type ActivityFilterContext,
   } from './filter.svelte';
-
-  let { options }: { options: SearchAttributeOption[] } = $props();
 
   const query = $derived(page.url.searchParams.get('query') ?? '');
   let searchAttributeValue = $state('');
@@ -77,8 +75,8 @@
 
   const filteredOptions = $derived(
     !searchAttributeValue
-      ? options
-      : options.filter((option) =>
+      ? $activitySearchAttributeOptions
+      : $activitySearchAttributeOptions.filter((option) =>
           option.value
             .toLowerCase()
             .includes(searchAttributeValue.toLowerCase()),
@@ -128,7 +126,7 @@
     </MenuItem>
     <hr class="border-subtle" />
 
-    {#each filteredOptions as { value, label, type }}
+    {#each filteredOptions as { value, label, type } (value)}
       <MenuItem
         onclick={() => {
           handleNewQuery(value, type);

@@ -74,10 +74,7 @@
 </script>
 
 <div class="flex">
-  <div
-    class="pt-9"
-    style="max-height: {minimized ? 'calc(100vh - 200px)' : '20000px'}"
-  >
+  <div class="pt-9">
     {#if showGraph}
       <HistoryGraph {groups} history={paginatedHistory(items)} />
     {/if}
@@ -90,7 +87,7 @@
     {updating}
     items={filteredForStatus(items)}
     let:visibleItems
-    maxHeight={minimized ? 'calc(100vh - 200px)' : '20000px'}
+    maxHeight={minimized ? 'calc(100vh - 555px)' : '20000px'}
   >
     <TableHeaderRow slot="headers" class="!h-8">
       {#each columns as column}

@@ -20,7 +20,6 @@
 
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { activityFilters } from '$lib/stores/filters';
-  import { activitySearchAttributeOptions } from '$lib/stores/search-attributes';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import ActivityDropdownFilterList from './dropdown-filter-list.svelte';
@@ -30,8 +29,6 @@
   const activeQueryIndex = writable<number | null>(null);
   const focusedElementId = writable<string>('');
   const chipOpenIndex = writable<number | null>(null);
-
-  const options = activitySearchAttributeOptions;
 
   afterNavigate(() => {
     chipOpenIndex.set(null);
@@ -66,5 +63,5 @@
 
 <div class="flex shrink flex-wrap items-center justify-start gap-2">
   <ActivityDropdownFilterList />
-  <ActivitySearchAttributeMenu {options} />
+  <ActivitySearchAttributeMenu />
 </div>

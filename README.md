@@ -63,7 +63,7 @@ pnpm dev:temporal-cli
 
 ### Building the UI
 
-The Temporal UI can be built for local preview. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `pnpm` scripts. The resulting assets will be placed in `./dist`.
+The Temporal UI can be built for local preview. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `pnpm` scripts. The resulting assets will be placed in `./build` by default or the directory defined by the `BUILD_PATH` environment variable.
 
 > You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
 

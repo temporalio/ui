@@ -11,19 +11,25 @@
       details: '',
     };
 
-    const summary = await decodeSingleReadablePayloadWithCodec(
-      userMetadata.summary,
-    );
-    const details = await decodeSingleReadablePayloadWithCodec(
-      userMetadata.details,
-    );
+    if (!userMetadata) return metadata;
 
-    if (typeof summary === 'string') {
-      metadata.summary = summary;
+    if (userMetadata.summary) {
+      const summary = await decodeSingleReadablePayloadWithCodec(
+        userMetadata.summary,
+      );
+      if (typeof summary === 'string') {
+        metadata.summary = summary;
+      }
     }
 
-    if (typeof details === 'string') {
-      metadata.details = details;
+    if (userMetadata.details) {
+      const details = await decodeSingleReadablePayloadWithCodec(
+        userMetadata.details,
+      );
+
+      if (typeof details === 'string') {
+        metadata.details = details;
+      }
     }
 
     return metadata;
