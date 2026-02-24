@@ -20,7 +20,6 @@
 
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { activityFilters } from '$lib/stores/filters';
-  import { activitySearchAttributeOptions } from '$lib/stores/search-attributes';
   import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import ActivityDropdownFilterList from './dropdown-filter-list.svelte';
@@ -64,5 +63,5 @@
 
 <div class="flex shrink flex-wrap items-center justify-start gap-2">
   <ActivityDropdownFilterList />
-  <ActivitySearchAttributeMenu options={$activitySearchAttributeOptions} />
+  <ActivitySearchAttributeMenu />
 </div>
