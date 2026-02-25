@@ -5,9 +5,9 @@
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import { type EventLinkType } from '$lib/utilities/get-single-attribute-for-event';
   import {
-    routeForEventHistory,
     routeForNexusEndpoint,
     routeForTaskQueue,
+    routeForTimeline,
   } from '$lib/utilities/route-for';
 
   export let value: string;
@@ -24,11 +24,11 @@
     linkType: EventLinkType,
   ): string {
     if (linkType === 'execution') {
-      return routeForEventHistory({ namespace: ns, workflow: wf, run: val });
+      return routeForTimeline({ namespace: ns, workflow: wf, run: val });
     } else if (linkType === 'task-queue') {
       return routeForTaskQueue({ namespace: ns, queue: val });
     } else if (linkType === 'child-workflow') {
-      return routeForEventHistory({
+      return routeForTimeline({
         namespace: ns,
         workflow: attrs.workflowExecutionWorkflowId,
         run: attrs.workflowExecutionRunId,

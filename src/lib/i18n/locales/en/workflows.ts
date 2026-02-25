@@ -76,8 +76,6 @@ export const Strings = {
   'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',
-  'event-history-view': 'Event History View',
-  'event-history': 'Event History',
   history: 'History',
   'full-history': 'Full History',
   compact: 'Compact',

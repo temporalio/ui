@@ -276,7 +276,11 @@
   </td>
   <td class="truncate">
     <p class={eventTypeStyle({ category: event.category })}>
-      <Icon name={CategoryIcon[event.category]} class="mr-1 inline" />
+      <Icon
+        name={CategoryIcon[event.category].name}
+        title={CategoryIcon[event.category].title}
+        class="mr-1 inline"
+      />
       {displayName}
     </p>
   </td>

@@ -14,6 +14,8 @@
   } from '$lib/types/events';
   import type { WorkflowStatus } from '$lib/types/workflows';
 
+  let { eventTypesOnly = false } = $props();
+
   type Status =
     | WorkflowStatus
     | EventClassification
@@ -44,16 +46,7 @@
     { label: 'Retry', category: 'retry' },
   ] as const;
 
-  const eventTypes: { category: EventTypeCategory; label: string }[] = [
-    { category: 'activity', label: 'Activity' },
-    { category: 'child-workflow', label: 'Child Workflow' },
-    { category: 'signal', label: 'Signal' },
-    { category: 'timer', label: 'Timer' },
-    { category: 'update', label: 'Update' },
-    { category: 'nexus', label: 'Nexus' },
-    { category: 'workflow', label: 'Workflow' },
-    { category: 'other', label: 'Other' },
-  ];
+  const categories = Object.keys(CategoryIcon) as EventTypeCategory[];
 </script>
 
 {#snippet term(label: string)}
@@ -101,20 +94,15 @@
   </dd>
 {/snippet}
 
-{#snippet eventCategoryKey({
-  category,
-  label,
-}: {
-  category: EventTypeCategory;
-  label: string;
-})}
+{#snippet eventCategoryKey(category: EventTypeCategory)}
+  {@const { name, title } = CategoryIcon[category]}
   <dd
     class="mt-1 flex items-center gap-2 {eventCategoryColor({
       category,
     })}"
   >
-    <Icon name={CategoryIcon[category]} class="h-3.5 w-3.5 shrink-0" />
-    {label}
+    <Icon {name} class="h-3.5 w-3.5 shrink-0" />
+    {title}
   </dd>
 {/snippet}
 
@@ -127,19 +115,21 @@
     slot="content"
     class="flex gap-6 whitespace-normal p-2 text-xs max-sm:flex-col"
   >
-    <dl>
-      {@render term(translate('common.status'))}
-      {#each statuses as { status, label, style } (status)}
-        {@render statusKey({ label, status, style })}
-      {/each}
-      {#each pendingStatuses as status (status.label)}
-        {@render pendingStatusKey(status)}
-      {/each}
-    </dl>
+    {#if !eventTypesOnly}
+      <dl>
+        {@render term(translate('common.status'))}
+        {#each statuses as { status, label, style } (status)}
+          {@render statusKey({ label, status, style })}
+        {/each}
+        {#each pendingStatuses as status (status.label)}
+          {@render pendingStatusKey(status)}
+        {/each}
+      </dl>
+    {/if}
     <dl>
       {@render term(translate('events.event-types'))}
-      {#each eventTypes as { category, label } (category)}
-        {@render eventCategoryKey({ category, label })}
+      {#each categories as category (category)}
+        {@render eventCategoryKey(category)}
       {/each}
     </dl>
   </div>

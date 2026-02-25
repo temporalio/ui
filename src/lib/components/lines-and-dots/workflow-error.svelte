@@ -61,7 +61,10 @@
       <div class="flex items-center justify-between gap-2 bg-danger px-2 py-2">
         <div class="flex items-center gap-2">
           {error.id}
-          <Icon name={CategoryIcon[error.category]} />
+          <Icon
+            name={CategoryIcon[error.category].name}
+            title={CategoryIcon[error.category].title}
+          />
           <span class="font-semibold text-danger"
             >{spaceBetweenCapitalLetters(error?.name)}</span
           >

@@ -2,6 +2,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -27,7 +28,7 @@
   $: urlParams = parseEventFilterParams($page.url);
   $: {
     $eventFilterSort = urlParams.sort;
-    $pauseLiveUpdates = urlParams.frozen;
+    $pauseLiveUpdates = urlParams.refresh_off;
   }
 
   $: reverseSort = $eventFilterSort === 'descending';
@@ -46,7 +47,7 @@
   });
 
   $: {
-    if (!workflow.isRunning && $pauseLiveUpdates) {
+    if (!workflow?.isRunning && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
   }
@@ -58,8 +59,12 @@
     updateEventFilterParams($page.url, { sort: newSort }, goto);
   };
 
-  const onFreezeToggle = () => {
-    updateEventFilterParams($page.url, { frozen: !$pauseLiveUpdates }, goto);
+  const onAutoRefreshToggle = () => {
+    updateEventFilterParams(
+      $page.url,
+      { refresh_off: !$pauseLiveUpdates },
+      goto,
+    );
   };
 </script>
 
@@ -68,9 +73,12 @@
   <div
     class="surface-background sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-12 xl:gap-8"
   >
-    <h2>
-      {translate('workflows.timeline-tab')}
-    </h2>
+    <div class="flex items-center gap-2">
+      <h2>
+        {translate('workflows.timeline-tab')}
+      </h2>
+      <EventHistoryLegend />
+    </div>
     <div class="flex items-center gap-2">
       <ToggleButtons>
         <ToggleButton
@@ -81,14 +89,21 @@
         >
         <EventTypeFilter compact={false} minimized={false} />
         <ToggleButton
-          disabled={!workflow.isRunning}
-          leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
+          disabled={!workflow?.isRunning}
           data-testid="pause"
           class="border-l-0"
           size="sm"
-          on:click={onFreezeToggle}
+          on:click={onAutoRefreshToggle}
         >
-          {$pauseLiveUpdates ? 'Unfreeze' : 'Freeze'}
+          <span
+            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates ||
+            !workflow?.isRunning
+              ? 'bg-slate-300'
+              : 'bg-green-600'}"
+          ></span>
+          {$pauseLiveUpdates || !workflow?.isRunning
+            ? translate('workflows.auto-refresh-off')
+            : translate('workflows.auto-refresh-on')}
         </ToggleButton>
         <ToggleButton
           data-testid="download"

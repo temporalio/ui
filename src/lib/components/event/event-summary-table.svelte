@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
+  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -14,7 +15,6 @@
   import type {
     IterableEventWithPending,
     WorkflowEventWithPending,
-    // WorkflowEventWithPending,
   } from '$lib/types/events';
   import { getFailedOrPendingEvents } from '$lib/utilities/get-failed-or-pending';
   import {
@@ -87,11 +87,15 @@
     {updating}
     items={filteredForStatus(items)}
     let:visibleItems
-    maxHeight={minimized ? 'calc(100vh - 555px)' : '20000px'}
+    maxHeight="none"
   >
     <TableHeaderRow slot="headers" class="!h-8">
-      {#each columns as column}
-        <TableHeaderCell {column} />
+      {#each columns as column, i (`${column.label}:${i}`)}
+        <TableHeaderCell {column}>
+          {#if column.label === 'Event Type'}
+            <EventHistoryLegend eventTypesOnly />
+          {/if}
+        </TableHeaderCell>
       {/each}
     </TableHeaderRow>
     {#each visibleItems as event, index (iterableKey(event))}

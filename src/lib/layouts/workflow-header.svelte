@@ -112,7 +112,7 @@
     </Link>
     {#if eventId}
       <Link
-        href={routeForEventHistory({
+        href={routeForTimeline({
           ...routeParameters,
         })}
         data-testid="back-to-workflow-execution"
@@ -231,7 +231,7 @@
         class="max-w-screen-lg xl:w-2/3"
       >
         You can find the resulting Workflow Execution <Link
-          href={routeForEventHistory({
+          href={routeForTimeline({
             namespace,
             workflow: workflowId,
             run: resetRunId,

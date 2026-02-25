@@ -46,7 +46,7 @@
   $effect(() => {
     const urlParams = parseEventFilterParams(page.url);
     $eventFilterSort = urlParams.sort;
-    $pauseLiveUpdates = urlParams.frozen;
+    $pauseLiveUpdates = urlParams.refresh_off;
   });
 
   $effect(() => {
@@ -108,8 +108,12 @@
     updateEventFilterParams(page.url, { sort: newSort }, goto);
   };
 
-  const onFreezeToggle = () => {
-    updateEventFilterParams(page.url, { frozen: !$pauseLiveUpdates }, goto);
+  const onAutoRefreshToggle = () => {
+    updateEventFilterParams(
+      page.url,
+      { refresh_off: !$pauseLiveUpdates },
+      goto,
+    );
   };
 
   const onAllClick = () => {
@@ -181,7 +185,7 @@
           data-testid="pause"
           class="border-l-0"
           size="sm"
-          on:click={onFreezeToggle}
+          on:click={onAutoRefreshToggle}
         >
           <span
             class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates ||
@@ -211,7 +215,7 @@
       </div>
     {:else}
       <div data-testid="event-summary-table">
-        <EventSummaryTable {updating} {items} {groups} {compact} minimized />
+        <EventSummaryTable {updating} {items} {groups} {compact} />
       </div>
     {/if}
   </div>

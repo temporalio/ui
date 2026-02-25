@@ -300,8 +300,8 @@
       icon={pauseTime && index !== 0
         ? 'pause'
         : decodedLocalActivity
-          ? CategoryIcon['local-activity']
-          : CategoryIcon[group.category]}
+          ? CategoryIcon['local-activity'].name
+          : CategoryIcon[group.category].name}
       r={radius}
     />
   {/each}

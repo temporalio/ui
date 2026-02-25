@@ -50,14 +50,17 @@
     if (status) {
       color = status === 'none' ? '#141414' : getStatusStrokeColor(status);
     }
+    if (category) {
+      color = getCategoryStrokeColor(category);
+    }
     if (classification) {
       color = getStatusStrokeColor(classification);
     }
     if (delayed && [classification, status].includes('Running')) {
       color = getStatusStrokeColor('Delayed');
     }
-
-    if (category) {
+    if (category && ['pending', 'retry'].includes(category)) {
+      // these categories take precedence over classification
       color = getCategoryStrokeColor(category);
     }
 
