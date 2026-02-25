@@ -88,6 +88,7 @@
     items={filteredForStatus(items)}
     let:visibleItems
     maxHeight="none"
+    class="border-t-0"
   >
     <TableHeaderRow slot="headers" class="!h-8">
       {#each columns as column, i (`${column.label}:${i}`)}
