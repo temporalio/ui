@@ -214,6 +214,8 @@ export const getNextDistanceAndOffset = (
   return { nextDistance, offset };
 };
 
+export const DEFAULT_STROKE_COLOR = 'currentColor';
+
 export const getStatusStrokeColor = (
   status: WorkflowStatus | EventClassification | 'Delayed',
 ): string => {
@@ -236,7 +238,7 @@ export const getStatusStrokeColor = (
     case 'Delayed':
       return '#fbbf24';
     default:
-      return 'currentColor';
+      return DEFAULT_STROKE_COLOR;
   }
 };
 
@@ -263,7 +265,7 @@ export const getCategoryStrokeColor = (
     case 'retry':
       return '#FF9B70';
     default:
-      return 'currentColor';
+      return DEFAULT_STROKE_COLOR;
   }
 };
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    DEFAULT_STROKE_COLOR,
     getCategoryStrokeColor,
     getStatusStrokeColor,
   } from '$lib/components/lines-and-dots/constants';
@@ -46,15 +47,17 @@
   );
 
   const strokeColor = $derived.by(() => {
-    let color = 'currentColor';
+    let color = DEFAULT_STROKE_COLOR;
     if (status) {
       color = status === 'none' ? '#141414' : getStatusStrokeColor(status);
     }
     if (category) {
-      color = getCategoryStrokeColor(category);
+      const categoryColor = getCategoryStrokeColor(category);
+      if (categoryColor !== DEFAULT_STROKE_COLOR) color = categoryColor;
     }
     if (classification) {
-      color = getStatusStrokeColor(classification);
+      const statusColor = getStatusStrokeColor(classification);
+      if (statusColor !== DEFAULT_STROKE_COLOR) color = statusColor;
     }
     if (delayed && [classification, status].includes('Running')) {
       color = getStatusStrokeColor('Delayed');
