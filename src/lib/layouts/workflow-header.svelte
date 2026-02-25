@@ -112,7 +112,7 @@
     </Link>
     {#if eventId}
       <Link
-        href={routeForEventHistory({
+        href={routeForTimeline({
           ...routeParameters,
         })}
         data-testid="back-to-workflow-execution"
