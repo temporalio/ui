@@ -9,7 +9,7 @@ export const SHARED_FILTER_PARAMS = [
   'sort',
   'category',
   'status',
-  'frozen',
+  'refresh_off',
 ] as const;
 
 export function getSharedFilterParams(url: URL): Record<string, string> {
@@ -35,7 +35,7 @@ export function parseEventFilterParams(url: URL) {
       ? (categoryParam.split(',') as EventTypeCategory[])
       : null,
     statusFilter: url.searchParams.get('status') === 'pending',
-    frozen: url.searchParams.get('frozen') === 'true',
+    refresh_off: url.searchParams.get('refresh_off') === 'true',
   };
 }
 
@@ -43,7 +43,7 @@ type FilterUpdate = {
   sort?: EventSortOrder;
   categories?: EventTypeCategory[] | null;
   statusFilter?: boolean;
-  frozen?: boolean;
+  refresh_off?: boolean;
 };
 
 export function updateEventFilterParams(
@@ -77,10 +77,10 @@ export function updateEventFilterParams(
     });
   }
 
-  if (filters.frozen !== undefined) {
+  if (filters.refresh_off !== undefined) {
     parameters.push({
-      parameter: 'frozen',
-      value: filters.frozen ? 'true' : undefined,
+      parameter: 'refresh_off',
+      value: filters.refresh_off ? 'true' : undefined,
     });
   }
 

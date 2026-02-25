@@ -28,7 +28,7 @@
   $: urlParams = parseEventFilterParams($page.url);
   $: {
     $eventFilterSort = urlParams.sort;
-    $pauseLiveUpdates = urlParams.frozen;
+    $pauseLiveUpdates = urlParams.refresh_off;
   }
 
   $: reverseSort = $eventFilterSort === 'descending';
@@ -47,7 +47,7 @@
   });
 
   $: {
-    if (!workflow.isRunning && $pauseLiveUpdates) {
+    if (!workflow?.isRunning && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
   }
@@ -59,8 +59,12 @@
     updateEventFilterParams($page.url, { sort: newSort }, goto);
   };
 
-  const onFreezeToggle = () => {
-    updateEventFilterParams($page.url, { frozen: !$pauseLiveUpdates }, goto);
+  const onAutoRefreshToggle = () => {
+    updateEventFilterParams(
+      $page.url,
+      { refresh_off: !$pauseLiveUpdates },
+      goto,
+    );
   };
 </script>
 
@@ -85,14 +89,21 @@
         >
         <EventTypeFilter compact={false} minimized={false} />
         <ToggleButton
-          disabled={!workflow.isRunning}
-          leadingIcon={$pauseLiveUpdates ? 'play' : 'pause'}
+          disabled={!workflow?.isRunning}
           data-testid="pause"
           class="border-l-0"
           size="sm"
-          on:click={onFreezeToggle}
+          on:click={onAutoRefreshToggle}
         >
-          {$pauseLiveUpdates ? 'Unfreeze' : 'Freeze'}
+          <span
+            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates ||
+            !workflow?.isRunning
+              ? 'bg-slate-300'
+              : 'bg-green-600'}"
+          ></span>
+          {$pauseLiveUpdates || !workflow?.isRunning
+            ? translate('workflows.auto-refresh-off')
+            : translate('workflows.auto-refresh-on')}
         </ToggleButton>
         <ToggleButton
           data-testid="download"
