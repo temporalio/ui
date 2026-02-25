@@ -137,10 +137,12 @@ export const routeForStartStandaloneActivity = (
 const routeForStandaloneActivityBase = (
   parameters: NamespaceParameter & { activityId: string; runId: string },
 ) => {
+  const activityId = encodeURIForSvelte(parameters.activityId);
+
   return resolve(
     `${routeForStandaloneActivities(parameters)}/[activityId]/[runId]`,
     {
-      activityId: parameters.activityId,
+      activityId,
       runId: parameters.runId,
     },
   );
