@@ -16,6 +16,7 @@
       icon="warning"
       intent="warning"
       title={translate('workflows.workflow-error-no-workers-title')}
+      class="max-w-screen-lg xl:w-2/3"
     >
       {translate('workflows.workflow-error-no-workers-description', {
         taskQueue: workflow?.taskQueue ?? '',
