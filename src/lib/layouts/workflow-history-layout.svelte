@@ -153,7 +153,7 @@
   <div
     class={merge(
       'surface-background flex flex-wrap items-center justify-between gap-2 xl:gap-8',
-      !$minimizeEventView && 'sticky top-0 z-30 md:top-12 md:pt-2',
+      !$minimizeEventView && 'sticky top-0 z-10 md:top-12 md:pt-2',
     )}
   >
     <div class="items-bottom flex gap-4">
