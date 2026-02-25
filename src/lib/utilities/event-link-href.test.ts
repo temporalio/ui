@@ -57,7 +57,7 @@ describe('getEventLinkHref', () => {
     );
   });
 
-  it('should return event history route as fallback', () => {
+  it('should return timeline route as fallback', () => {
     const link = {
       workflowEvent: {
         namespace: 'test-ns',
@@ -68,7 +68,7 @@ describe('getEventLinkHref', () => {
 
     const result = getEventLinkHref(link);
     expect(result).toBe(
-      '/namespaces/test-ns/workflows/test-wf/test-run/history',
+      '/namespaces/test-ns/workflows/test-wf/test-run/timeline',
     );
   });
 

@@ -49,16 +49,19 @@ export const DetailsConfig: GraphConfig = {
   fontSizeRatio: baseRadius * 4,
 };
 
-export const CategoryIcon: Record<EventTypeCategory, IconName> = {
-  workflow: 'workflow',
-  signal: 'signal',
-  activity: 'activity',
-  nexus: 'nexus',
-  timer: 'retention',
-  'local-activity': 'feather',
-  'child-workflow': 'relationship',
-  update: 'update',
-  other: 'terminal',
+export const CategoryIcon: Record<
+  EventTypeCategory,
+  { name: IconName; title: string }
+> = {
+  workflow: { name: 'workflow', title: 'Workflow' },
+  signal: { name: 'signal', title: 'Signal' },
+  activity: { name: 'activity', title: 'Activity' },
+  nexus: { name: 'nexus', title: 'Nexus' },
+  timer: { name: 'retention', title: 'Timer' },
+  'local-activity': { name: 'feather', title: 'Local Activity' },
+  'child-workflow': { name: 'relationship', title: 'Child Workflow' },
+  update: { name: 'update', title: 'Update' },
+  other: { name: 'terminal', title: 'Other' },
 };
 
 export const timelineTextPosition = (

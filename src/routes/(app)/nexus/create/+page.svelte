@@ -6,50 +6,31 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusCreateEndpoint from '$lib/pages/nexus-create-endpoint.svelte';
-  import { endpointForm } from '$lib/pages/nexus-form.svelte';
+  import type { NexusFormData } from '$lib/pages/nexus-form.svelte';
   import { createNexusEndpoint } from '$lib/services/nexus-service';
   import { namespaces } from '$lib/stores/namespaces';
-  import type { NetworkError } from '$lib/types/global';
   import type { NexusEndpoint } from '$lib/types/nexus';
-  import { encodePayloads } from '$lib/utilities/encode-payload';
+  import { getNexusEndpoint } from '$lib/utilities/get-nexus-endpoint';
   import { routeForNexus } from '$lib/utilities/route-for';
-
-  let error = $state<NetworkError | undefined>(undefined);
-  let loading = $state(false);
 
   const projectId = $derived(
     page.url.searchParams.get('projectId') ?? undefined,
   );
 
-  const onCreate = async () => {
-    loading = true;
+  const onCreate = async (formData: NexusFormData) => {
     try {
-      const body: Partial<NexusEndpoint> & { projectId?: string } = {
-        ...$endpointForm,
-      };
-
-      if (body.spec) {
-        const payloads = await encodePayloads({
-          input: JSON.stringify(body.spec.descriptionString),
-          encoding: 'json/plain',
-        });
-        body.spec.description = payloads?.[0];
-
-        delete body.spec.allowedCallerNamespaces;
-        delete body.spec.descriptionString;
-      }
+      const body: Partial<NexusEndpoint> & { projectId?: string } =
+        await getNexusEndpoint(formData);
 
       if (projectId) {
         body.projectId = projectId;
       }
 
       await createNexusEndpoint(body);
-      goto(routeForNexus(), { invalidateAll: true });
+      await goto(routeForNexus(), { invalidateAll: true });
     } catch (e) {
-      error = e as NetworkError;
       console.error('Error creating endpoint', e);
-    } finally {
-      loading = false;
+      throw e;
     }
   };
 
@@ -65,11 +46,5 @@
   <Link href={routeForNexus()} icon="chevron-left">
     {translate('nexus.back-to-endpoints')}
   </Link>
-  <NexusCreateEndpoint
-    {onCreate}
-    {targetNamespaceList}
-    {error}
-    {loading}
-    {projectId}
-  />
+  <NexusCreateEndpoint {onCreate} {targetNamespaceList} />
 </div>

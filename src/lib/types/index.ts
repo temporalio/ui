@@ -3,15 +3,7 @@ import type { google, temporal } from '@temporalio/proto';
 // api.workflowservice
 
 export type DescribeNamespaceResponse =
-  temporal.api.workflowservice.v1.IDescribeNamespaceResponse & {
-    // TODO: remove when TS SDK has been updated and includes standaloneActivities and workflowPause
-    namespaceInfo?: temporal.api.namespace.v1.INamespaceInfo & {
-      capabilities?: temporal.api.namespace.v1.NamespaceInfo.ICapabilities & {
-        standaloneActivities?: boolean;
-        workflowPause?: boolean;
-      };
-    };
-  };
+  temporal.api.workflowservice.v1.IDescribeNamespaceResponse;
 export type DescribeWorkflowExecutionResponse =
   temporal.api.workflowservice.v1.IDescribeWorkflowExecutionResponse;
 export type ListNamespacesResponse =
@@ -51,33 +43,12 @@ export type UpdateWorkflowResponse =
   temporal.api.workflowservice.v1.IUpdateWorkflowExecutionResponse;
 export type PendingWorkflowTaskInfo =
   temporal.api.workflow.v1.IPendingWorkflowTaskInfo;
-// TODO: remove when TS SDK has been updated and includes WorkflowExecutionPauseInfo
-type WorkflowExecutionPauseInfo =
-  // temporal.api.workflow.v1.IWorkflowExecutionPauseInfo;
-  {
-    identity?: string;
-    pausedTime: google.protobuf.ITimestamp;
-    reason?: string;
-  };
 export type WorkflowExtendedInfo =
-  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo & {
-    pauseInfo?: WorkflowExecutionPauseInfo;
-  };
-// TODO: remove when TS SDK has been updated and includes PauseWorkflowExecutionRequest and UnpauseWorkflowExecutionRequest
-type PauseOrUnpauseWorkflowRequest = {
-  namespace: string;
-  workflowId: string;
-  runId?: string;
-  identity?: string;
-  reason?: string;
-  requestId?: string;
-};
+  temporal.api.workflow.v1.IWorkflowExecutionExtendedInfo;
 export type PauseWorkflowRequest =
-  // temporal.api.workflowservice.v1.IPauseWorkflowExecutionRequest;
-  PauseOrUnpauseWorkflowRequest;
+  temporal.api.workflowservice.v1.IPauseWorkflowExecutionRequest;
 export type UnpauseWorkflowRequest =
-  // temporal.api.workflowservice.v1.IUnpauseWorkflowExecutionRequest;
-  PauseOrUnpauseWorkflowRequest;
+  temporal.api.workflowservice.v1.IUnpauseWorkflowExecutionRequest;
 
 // api.history
 

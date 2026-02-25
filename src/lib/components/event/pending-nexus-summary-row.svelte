@@ -98,7 +98,8 @@
       <div class="flex w-full items-center gap-2">
         <p class={eventTypeStyle({ category: 'nexus' })}>
           <Icon
-            name={CategoryIcon['nexus']}
+            name={CategoryIcon['nexus'].name}
+            title={CategoryIcon['nexus'].title}
             class="mr-1 inline animate-pulse"
           />
           {translate('workflows.pending-nexus-operation')}

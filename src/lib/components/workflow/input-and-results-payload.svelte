@@ -47,9 +47,9 @@
 </script>
 
 <div class="flex w-full grow flex-col gap-2">
-  <h2 class="flex items-center gap-2">
+  <h3 class="flex items-center gap-2 text-xs text-secondary">
     {title}
-  </h2>
+  </h3>
   {#if content}
     {#key $minimizeEventView}
       {#if payloadsSize > 0}

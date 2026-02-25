@@ -100,7 +100,11 @@
   </td>
   <td class="">
     <p class={eventTypeStyle({ category: 'activity' })}>
-      <Icon name={CategoryIcon['activity']} class="mr-1 inline animate-pulse" />
+      <Icon
+        name={CategoryIcon['activity'].name}
+        title={CategoryIcon['activity'].title}
+        class="mr-1 inline animate-pulse"
+      />
       {translate('workflows.pending-activity')}
     </p>
   </td>

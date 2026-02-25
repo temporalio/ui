@@ -1,6 +1,6 @@
 import type { EventLink, EventType } from '$lib/types';
 
-import { routeForEventHistory, routeForEventHistoryEvent } from './route-for';
+import { routeForEventHistoryEvent, routeForTimeline } from './route-for';
 
 export const getEventLinkHref = (link: EventLink): string => {
   if (link.workflowEvent?.eventRef?.eventId) {
@@ -28,7 +28,7 @@ export const getEventLinkHref = (link: EventLink): string => {
       requestId: link.workflowEvent?.requestIdRef?.requestId,
     });
   } else {
-    return routeForEventHistory({
+    return routeForTimeline({
       namespace: link.workflowEvent.namespace,
       workflow: link.workflowEvent.workflowId,
       run: link.workflowEvent.runId,

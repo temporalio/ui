@@ -36,9 +36,8 @@ export const scheduleSearchAttributes: Readable<SearchAttributes> = derived(
 );
 
 export const activityExecutionSearchAttributes: Readable<SearchAttributes> =
-  derived(allSearchAttributes, ($allSearchAttributes) => ({
-    ...$allSearchAttributes.customAttributes,
-    ...$allSearchAttributes.systemAttributes,
+  derived(searchAttributes, ($searchAttributes) => ({
+    ...$searchAttributes,
     ActivityId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     ActivityType: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   }));
@@ -192,51 +191,59 @@ export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
       });
   });
 
-export const activitySearchAttributeOptions: SearchAttributeOption[] = [
-  {
-    label: 'ExecutionStatus',
-    value: 'ExecutionStatus',
-    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-  },
-  {
-    label: 'ActivityId',
-    value: 'ActivityId',
-    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-  },
-  {
-    label: 'ActivityType',
-    value: 'ActivityType',
-    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-  },
-  { label: 'RunId', value: 'RunId', type: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
-  {
-    label: 'TaskQueue',
-    value: 'TaskQueue',
-    type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-  },
-  {
-    label: 'StartTime',
-    value: 'StartTime',
-    type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-  },
-  {
-    label: 'ExecutionTime',
-    value: 'ExecutionTime',
-    type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-  },
-  {
-    label: 'CloseTime',
-    value: 'CloseTime',
-    type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-  },
-  {
-    label: 'ExecutionDuration',
-    value: 'ExecutionDuration',
-    type: SEARCH_ATTRIBUTE_TYPE.INT,
-  },
-  {
-    label: 'StateTransitionCount',
-    value: 'StateTransitionCount',
-    type: SEARCH_ATTRIBUTE_TYPE.INT,
-  },
-];
+export const activitySearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived(customSearchAttributeOptions, ($customSearchAttributeOptions) => {
+    return [
+      {
+        label: 'ExecutionStatus',
+        value: 'ExecutionStatus',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      },
+      {
+        label: 'ActivityId',
+        value: 'ActivityId',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      },
+      {
+        label: 'ActivityType',
+        value: 'ActivityType',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      },
+      { label: 'RunId', value: 'RunId', type: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
+      {
+        label: 'TaskQueue',
+        value: 'TaskQueue',
+        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      },
+      {
+        label: 'StartTime',
+        value: 'StartTime',
+        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      },
+      {
+        label: 'ExecutionTime',
+        value: 'ExecutionTime',
+        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      },
+      {
+        label: 'CloseTime',
+        value: 'CloseTime',
+        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      },
+      {
+        label: 'ExecutionDuration',
+        value: 'ExecutionDuration',
+        type: SEARCH_ATTRIBUTE_TYPE.INT,
+      },
+      {
+        label: 'StateTransitionCount',
+        value: 'StateTransitionCount',
+        type: SEARCH_ATTRIBUTE_TYPE.INT,
+      },
+      ...$customSearchAttributeOptions,
+    ].sort((a, b) => {
+      if (a.label < b.label) return -1;
+      if (a.label > b.label) return 1;
+      return 0;
+    });
+  });

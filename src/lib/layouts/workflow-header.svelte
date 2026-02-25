@@ -6,6 +6,7 @@
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -25,6 +26,7 @@
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { getSharedFilterParams } from '$lib/utilities/event-filter-params';
   import {
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
@@ -36,6 +38,7 @@
     routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
+    routeForTimeline,
     routeForUserMetadata,
     routeForWorkers,
     routeForWorkflowMemo,
@@ -94,6 +97,7 @@
     getInboundNexusLinkEvents($fullEventHistory)?.length || 0,
   );
   const linkCount = $derived(outboundLinks + inboundLinks);
+  const sharedFilterParams = $derived(getSharedFilterParams(page.url));
 </script>
 
 <div class="flex items-center justify-between">
@@ -109,7 +113,7 @@
     </Link>
     {#if eventId}
       <Link
-        href={routeForEventHistory({
+        href={routeForTimeline({
           ...routeParameters,
         })}
         data-testid="back-to-workflow-execution"
@@ -176,6 +180,7 @@
   </div>
   <CodecServerErrorBanner />
   <WorkflowDetails {workflow} next={workflowRelationships.next} />
+  <WorkflowCallStackError />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
@@ -228,7 +233,7 @@
         class="max-w-screen-lg xl:w-2/3"
       >
         You can find the resulting Workflow Execution <Link
-          href={routeForEventHistory({
+          href={routeForTimeline({
             namespace,
             workflow: workflowId,
             run: resetRunId,
@@ -240,10 +245,23 @@
   <Tabs>
     <TabList label="workflow detail">
       <Tab
+        label={translate('workflows.timeline-tab')}
+        id="timeline-tab"
+        href={routeForTimeline({
+          ...routeParameters,
+          queryParams: sharedFilterParams,
+        })}
+        active={pathMatches(
+          page.url.pathname,
+          routeForTimeline(routeParameters),
+        )}
+      />
+      <Tab
         label={translate('workflows.history-tab')}
         id="history-tab"
         href={routeForEventHistory({
           ...routeParameters,
+          queryParams: sharedFilterParams,
         })}
         active={pathMatches(
           page.url.pathname,

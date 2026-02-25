@@ -137,10 +137,12 @@ export const routeForStartStandaloneActivity = (
 const routeForStandaloneActivityBase = (
   parameters: NamespaceParameter & { activityId: string; runId: string },
 ) => {
+  const activityId = encodeURIForSvelte(parameters.activityId);
+
   return resolve(
     `${routeForStandaloneActivities(parameters)}/[activityId]/[runId]`,
     {
-      activityId: parameters.activityId,
+      activityId,
       runId: parameters.runId,
     },
   );
@@ -283,6 +285,19 @@ export const routeForEventHistoryEvent = ({
   return resolve(`${routeForWorkflow(parameters)}/history/events/[id]`, {
     id: eventId || requestId,
   });
+};
+
+export const routeForTimeline = ({
+  queryParams,
+  archival,
+  ...parameters
+}: WorkflowParameters & {
+  queryParams?: Record<string, string>;
+  archival?: boolean;
+}): string => {
+  if (archival) return toURL(routeForArchivalEventHistory(parameters));
+  const path = `${routeForWorkflow(parameters)}/timeline`;
+  return toURL(path, queryParams);
 };
 
 export const routeForWorkers = (

@@ -203,6 +203,9 @@ describe('shouldDisplayAttribute', () => {
     expect(shouldDisplayAttribute('type', '')).toBe(false);
     expect(shouldDisplayAttribute('suggestContinueAsNew', false)).toBe(false);
     expect(shouldDisplayAttribute('historySizeBytes', '0')).toBe(false);
+    expect(
+      shouldDisplayAttribute('targetWorkerDeploymentVersionChanged', false),
+    ).toBe(false);
   });
 
   it('should return false for certain attributes', () => {
