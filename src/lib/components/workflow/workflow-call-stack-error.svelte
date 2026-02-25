@@ -11,7 +11,7 @@
 </script>
 
 {#if runningWithNoWorkers}
-  <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
+  <div in:fly={{ duration: 200, delay: 100 }}>
     <Alert
       icon="warning"
       intent="warning"
