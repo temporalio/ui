@@ -2,6 +2,7 @@
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -68,9 +69,12 @@
   <div
     class="surface-background sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-12 xl:gap-8"
   >
-    <h2>
-      {translate('workflows.timeline-tab')}
-    </h2>
+    <div class="flex items-center gap-2">
+      <h2>
+        {translate('workflows.timeline-tab')}
+      </h2>
+      <EventHistoryLegend />
+    </div>
     <div class="flex items-center gap-2">
       <ToggleButtons>
         <ToggleButton

@@ -160,7 +160,6 @@ export const Strings = {
   'download-json': 'Download JSON',
   'download-event-history-json': 'Download Event History JSON',
   'skip-nav': 'Skip to Main Content',
-  timeline: 'Timeline',
   graph: 'Graph',
   'equal-to': 'Equal to',
   'not-equal-to': 'Not equal to',
