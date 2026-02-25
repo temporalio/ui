@@ -16,8 +16,8 @@
 
   let {
     copyable = false,
-    copyableText = undefined,
     text,
+    copyableText = text,
     href,
     isBadge = false,
     iconName = undefined,
