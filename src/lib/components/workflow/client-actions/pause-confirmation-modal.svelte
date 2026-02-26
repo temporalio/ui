@@ -43,7 +43,6 @@
       open = false;
       reason = '';
       triggerRefresh(Action.Pause);
-      $pauseLiveUpdates = true;
       toaster.push({
         id: 'workflow-pause-success-toast',
         message: translate('workflows.pause-success'),

@@ -75,6 +75,10 @@
     getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
   );
 
+  const isNotPending = $derived(
+    workflow && !workflow.isRunning && !workflow.isPaused,
+  );
+
   let groups = $derived(
     reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
   );
@@ -102,7 +106,7 @@
   });
 
   $effect(() => {
-    if (workflow && !workflow.isRunning && $pauseLiveUpdates) {
+    if (isNotPending && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
   });
@@ -195,19 +199,18 @@
         {/if}
         <EventTypeFilter {compact} minimized={$minimizeEventView} />
         <ToggleButton
-          disabled={!workflow?.isRunning}
+          disabled={isNotPending}
           data-testid="pause"
           class="border-l-0"
           size="sm"
           on:click={onAutoRefreshToggle}
         >
           <span
-            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates ||
-            !workflow?.isRunning
+            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
               ? 'bg-slate-300'
               : 'bg-green-600'}"
           ></span>
-          {$pauseLiveUpdates || !workflow?.isRunning
+          {$pauseLiveUpdates || isNotPending
             ? translate('workflows.auto-refresh-off')
             : translate('workflows.auto-refresh-on')}
         </ToggleButton>
