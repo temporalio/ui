@@ -261,6 +261,18 @@
   setCoreContext({
     getUserIdentifier: () => $authUser.email || '',
   });
+
+  let showTrackingPixel = $state(false);
+
+  $effect(() => {
+    if (
+      !page.data?.settings?.disableTrackingPixel &&
+      !sessionStorage.getItem('tracking-pixel-fired')
+    ) {
+      sessionStorage.setItem('tracking-pixel-fired', 'true');
+      showTrackingPixel = true;
+    }
+  });
 </script>
 
 <DarkMode />
@@ -316,3 +328,13 @@
     </BottomNavigation>
   </MainContentContainer>
 </div>
+{#if showTrackingPixel}
+  <img
+    src="https://wpt.tomwheeler.com/cgi-sys/cgiwrap/twheeler/wtp.cgi?srcid=temporal-web-ui"
+    alt=""
+    aria-hidden="true"
+    width="1"
+    height="1"
+    style="position:absolute;left:-9999px"
+  />
+{/if}
