@@ -59,7 +59,7 @@
   });
 
   $: {
-    if (!workflow?.isRunning && $pauseLiveUpdates) {
+    if (workflow && !workflow.isRunning && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
   }
