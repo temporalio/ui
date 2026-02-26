@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { onMount } from 'svelte';
 
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/state';
@@ -8,6 +7,7 @@
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
+  import SessionPixel from '$lib/components/session-pixel.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
@@ -262,20 +262,6 @@
   setCoreContext({
     getUserIdentifier: () => $authUser.email || '',
   });
-
-  const trackingPixelURL =
-    'https://wpt.tomwheeler.com/cgi-sys/cgiwrap/twheeler/wtp.cgi?srcid=temporal-web-ui';
-  let showTrackingPixel = $state(false);
-
-  onMount(() => {
-    if (
-      !page.data?.settings?.disableTrackingPixel &&
-      !sessionStorage.getItem('tracking-pixel-fired')
-    ) {
-      sessionStorage.setItem('tracking-pixel-fired', 'true');
-      showTrackingPixel = true;
-    }
-  });
 </script>
 
 <DarkMode />
@@ -331,13 +317,4 @@
     </BottomNavigation>
   </MainContentContainer>
 </div>
-{#if showTrackingPixel}
-  <img
-    src={trackingPixelURL}
-    alt=""
-    aria-hidden="true"
-    width="1"
-    height="1"
-    style="position:absolute;left:-9999px"
-  />
-{/if}
+<SessionPixel />
