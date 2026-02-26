@@ -61,7 +61,6 @@
     run: runId,
   });
 
-  const isRunning = $derived(workflow?.isRunning);
   const activitiesCanceled = $derived(
     Boolean(
       workflow?.status &&
@@ -140,8 +139,6 @@
         />
         <div class="xl:hidden">
           <WorkflowActions
-            {isRunning}
-            {isPaused}
             {cancelInProgress}
             {workflow}
             {namespace}
@@ -168,8 +165,6 @@
     </div>
     <div class="max-xl:hidden">
       <WorkflowActions
-        {isRunning}
-        {isPaused}
         {cancelInProgress}
         {workflow}
         {namespace}

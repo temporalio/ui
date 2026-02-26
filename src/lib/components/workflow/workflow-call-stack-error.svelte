@@ -6,8 +6,9 @@
   import { workflowRun } from '$lib/stores/workflow-run';
 
   $: ({ workflow, workers, workersLoaded } = $workflowRun);
+  $: isPending = workflow?.isRunning || workflow?.isPaused;
   $: runningWithNoWorkers =
-    workersLoaded && workflow?.isRunning && !workers?.pollers?.length;
+    workersLoaded && isPending && !workers?.pollers?.length;
 </script>
 
 {#if runningWithNoWorkers}

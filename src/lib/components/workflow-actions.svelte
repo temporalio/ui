@@ -36,21 +36,14 @@
     workflow: WorkflowExecution;
     namespace: string;
     cancelInProgress: boolean;
-    isRunning: boolean;
-    isPaused: boolean;
     first?: string;
     next?: string;
   }
 
-  let {
-    workflow,
-    namespace,
-    cancelInProgress,
-    isRunning,
-    isPaused,
-    first,
-    next,
-  }: Props = $props();
+  let { workflow, namespace, cancelInProgress, first, next }: Props = $props();
+
+  const isRunning = $derived(workflow?.isRunning);
+  const isPaused = $derived(workflow?.isPaused);
 
   let cancelConfirmationModalOpen = $state(false);
   let terminateConfirmationModalOpen = $state(false);
