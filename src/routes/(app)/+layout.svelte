@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { onMount } from 'svelte';
 
   import { afterNavigate, goto } from '$app/navigation';
   import { page, updated } from '$app/state';
@@ -264,7 +265,7 @@
 
   let showTrackingPixel = $state(false);
 
-  $effect(() => {
+  onMount(() => {
     if (
       !page.data?.settings?.disableTrackingPixel &&
       !sessionStorage.getItem('tracking-pixel-fired')
