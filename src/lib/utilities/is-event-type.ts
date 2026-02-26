@@ -151,7 +151,7 @@ export const eventAttributeKeys: readonly EventAttributeKey[] = [
   'workflowExecutionCompletedEventAttributes',
   'workflowExecutionFailedEventAttributes',
   'workflowExecutionTimedOutEventAttributes',
-  'workflowExecutionOptionsUpdatedEventAttributes' as unknown as EventAttributeKey,
+  'workflowExecutionOptionsUpdatedEventAttributes',
   'workflowTaskStartedEventAttributes',
   'workflowTaskScheduledEventAttributes',
   'workflowTaskCompletedEventAttributes',
@@ -199,10 +199,12 @@ export const eventAttributeKeys: readonly EventAttributeKey[] = [
   'nexusOperationCanceledEventAttributes',
   'nexusOperationTimedOutEventAttributes',
   'nexusOperationCancelRequestedEventAttributes',
-  'nexusOperationCancelRequestCompletedEventAttributes' as unknown as EventAttributeKey,
-  'nexusOperationCancelRequestFailedEventAttributes' as unknown as EventAttributeKey,
-  'workflowExecutionOptionsUpdatedEventAttributes' as unknown as EventAttributeKey,
+  'nexusOperationCancelRequestCompletedEventAttributes',
+  'nexusOperationCancelRequestFailedEventAttributes',
+  'workflowExecutionOptionsUpdatedEventAttributes',
   'workflowPropertiesModifiedEventAttributes',
+  'workflowExecutionPausedEventAttributes',
+  'workflowExecutionUnpausedEventAttributes',
 ] as const;
 
 export type ResetEventType = (typeof validResetEventTypes)[number];
