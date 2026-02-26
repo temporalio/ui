@@ -263,6 +263,8 @@
     getUserIdentifier: () => $authUser.email || '',
   });
 
+  const trackingPixelURL =
+    'https://wpt.tomwheeler.com/cgi-sys/cgiwrap/twheeler/wtp.cgi?srcid=temporal-web-ui';
   let showTrackingPixel = $state(false);
 
   onMount(() => {
@@ -331,7 +333,7 @@
 </div>
 {#if showTrackingPixel}
   <img
-    src="https://wpt.tomwheeler.com/cgi-sys/cgiwrap/twheeler/wtp.cgi?srcid=temporal-web-ui"
+    src={trackingPixelURL}
     alt=""
     aria-hidden="true"
     width="1"
