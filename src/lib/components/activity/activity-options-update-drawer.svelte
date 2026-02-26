@@ -9,6 +9,7 @@
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/activity-actions';
   import { updateActivityOptions } from '$lib/services/workflow-activities-service';
   import { toaster } from '$lib/stores/toaster';
   import { triggerRefresh } from '$lib/stores/workflow-run';
@@ -99,7 +100,7 @@
         activityOptions,
         identity,
       });
-      triggerRefresh();
+      triggerRefresh(Action.Update);
       toaster.push({
         variant: 'success',
         message: `Options for Activity ${id} have been updated.`,

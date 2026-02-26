@@ -5,6 +5,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
   import { pauseActivity } from '$lib/services/workflow-activities-service';
   import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
@@ -42,7 +43,7 @@
       type: includeType ? type : undefined,
       identity,
     });
-    triggerRefresh();
+    triggerRefresh(Action.Pause);
     hideModal();
   };
 </script>

@@ -31,6 +31,7 @@
   }: { activity: PendingActivity; totalPending?: number } = $props();
   const failed = $derived(activity.attempt > 1 && !!activity.lastFailure);
   const isRunning = $derived($workflowRun?.workflow?.isRunning);
+  const isPaused = $derived($workflowRun?.workflow?.isPaused);
 
   let coreUser = coreUserStore();
   let showActivityCommands = $derived(
@@ -38,7 +39,8 @@
       page.data.settings,
       $coreUser,
       page.params.namespace,
-    ) && isRunning,
+    ) &&
+      (isRunning || isPaused),
   );
 </script>
 

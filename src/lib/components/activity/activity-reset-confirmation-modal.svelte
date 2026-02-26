@@ -4,6 +4,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/workflow-actions';
   import { resetActivity } from '$lib/services/workflow-activities-service';
   import { toaster } from '$lib/stores/toaster';
   import { triggerRefresh } from '$lib/stores/workflow-run';
@@ -42,7 +43,7 @@
       type: includeType ? type : undefined,
       identity,
     });
-    triggerRefresh();
+    triggerRefresh(Action.Reset);
     toaster.push({
       variant: 'success',
       message: translate('activities.reset-success', { activityId: id }),

@@ -1,18 +1,21 @@
 import { writable } from 'svelte/store';
 
-import { Action } from '$lib/models/workflow-actions';
+import { Action as ActivityAction } from '$lib/models/activity-actions';
+import { Action as WorkflowAction } from '$lib/models/workflow-actions';
 import { persistStore } from '$lib/stores/persist-store';
 import type { TaskQueueResponse } from '$lib/types';
 import type { WorkflowExecution, WorkflowMetadata } from '$lib/types/workflows';
 
 export type RefreshAction = {
   timestamp: number;
-  action: Action | null;
+  action: WorkflowAction | ActivityAction | null;
 };
 
 export const refresh = writable<RefreshAction>({ timestamp: 0, action: null });
 
-export const triggerRefresh = (action: Action | null = null): void => {
+export const triggerRefresh = (
+  action: WorkflowAction | ActivityAction | null = null,
+): void => {
   refresh.set({ timestamp: Date.now(), action });
 };
 

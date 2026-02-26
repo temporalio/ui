@@ -4,6 +4,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { Action } from '$lib/models/activity-actions';
   import { unpauseActivity } from '$lib/services/workflow-activities-service';
   import { triggerRefresh } from '$lib/stores/workflow-run';
   import type { PendingActivity } from '$lib/types/events';
@@ -38,7 +39,7 @@
       type: includeType ? type : undefined,
       identity,
     });
-    triggerRefresh();
+    triggerRefresh(Action.Unpause);
     hideModal();
   };
 </script>
