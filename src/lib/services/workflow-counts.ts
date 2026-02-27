@@ -98,17 +98,18 @@ export const fetchScheduleCount = async ({
   namespace: string;
   query?: string;
 }): Promise<string> => {
-  try {
-    const countRoute = routeForApi('schedules.count', { namespace });
-    const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
-      params: query ? { query } : {},
-      notifyOnError: false,
-    });
-    return count ?? '0';
-  } catch (error: unknown) {
-    if (isNotImplemented(error) || isNotFound(error)) {
-      return fetchScheduleCountLegacy(namespace, query);
-    }
-    throw error;
-  }
+  return fetchScheduleCountLegacy(namespace, query);
+  // try {
+  //   const countRoute = routeForApi('schedules.count', { namespace });
+  //   const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
+  //     params: query ? { query } : {},
+  //     notifyOnError: false,
+  //   });
+  //   return count ?? '0';
+  // } catch (error: unknown) {
+  //   if (isNotImplemented(error) || isNotFound(error)) {
+  //     return fetchScheduleCountLegacy(namespace, query);
+  //   }
+  //   throw error;
+  // }
 };
