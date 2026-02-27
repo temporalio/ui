@@ -18,8 +18,8 @@
 
   let {
     copyable,
-    copyableText,
     text,
+    copyableText = text,
     tooltipText,
     iconName,
     isBadge = false,

@@ -13,7 +13,7 @@
 
   export let title: string;
   export let content: string = '';
-  export let isRunning: boolean = false;
+  export let isPending: boolean = false;
 
   const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {
@@ -93,7 +93,7 @@
     {/key}
   {:else}
     <CodeBlock
-      content={isRunning ? 'Results will appear upon completion.' : 'null'}
+      content={isPending ? 'Results will appear upon completion.' : 'null'}
       language="text"
       copyable={false}
       maxHeight={300}

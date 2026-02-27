@@ -33,7 +33,7 @@
     <svelte:fragment slot="heading">
       {type} <span class="font-normal">(in view)</span>
     </svelte:fragment>
-    {#each columnsInUse as { label }, index (label)}
+    {#each columnsInUse as { label }, index (`${label}:${index}`)}
       <OrderableListItem
         {index}
         {label}

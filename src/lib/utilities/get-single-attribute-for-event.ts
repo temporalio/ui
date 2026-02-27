@@ -49,6 +49,7 @@ export const shouldDisplayAsPlainText = (key: string): boolean => {
 const keysToOmitIfNoValue: Readonly<Set<string>> = new Set([
   'suggestContinueAsNew',
   'historySizeBytes',
+  'targetWorkerDeploymentVersionChanged',
 ]);
 
 export const shouldDisplayAttribute = (

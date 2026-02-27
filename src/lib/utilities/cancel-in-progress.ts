@@ -5,9 +5,9 @@ export const isCancelInProgress = (
   status: WorkflowStatus,
   eventHistory: WorkflowEvents,
 ) => {
-  const isRunning = status === 'Running';
+  const isPending = status === 'Running' || status === 'Paused';
   const workflowCancelRequested = eventHistory?.some(
     (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
   );
-  return isRunning && workflowCancelRequested;
+  return isPending && workflowCancelRequested;
 };

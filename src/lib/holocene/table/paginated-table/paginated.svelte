@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ClassNameValue } from 'tailwind-merge';
+
   import { page } from '$app/stores';
 
   import Button from '$lib/holocene/button.svelte';
@@ -29,6 +31,9 @@
   export let maxHeight = '';
   export let pageSizeOptions: string[] = options;
   export let fixed = false;
+
+  let className: ClassNameValue = '';
+  export { className as class };
 
   $: url = $page.url;
   $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
@@ -96,6 +101,7 @@
   visibleItems={$store.items}
   {fixed}
   {id}
+  class={className}
 >
   <slot name="caption" slot="caption" />
   <slot name="headers" slot="headers" visibleItems={$store.items} />

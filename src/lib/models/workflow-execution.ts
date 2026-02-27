@@ -189,7 +189,7 @@ export const toWorkflowExecution = (
     workflowExtendedInfo,
     startDelay,
     get canBeTerminated(): boolean {
-      return isRunning && writeActionsAreAllowed();
+      return (isRunning || isPaused) && writeActionsAreAllowed();
     },
   };
 };

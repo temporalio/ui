@@ -35,7 +35,7 @@
     if (pauseLiveUpdates) {
       clearInterval(endTimeInterval);
       endTimeInterval = null;
-    } else if (!endTimeInterval && workflow.isRunning) {
+    } else if (!endTimeInterval && (workflow.isRunning || workflow.isPaused)) {
       endTimeInterval = setInterval(() => {
         endTime = rightNow();
       }, 1000);

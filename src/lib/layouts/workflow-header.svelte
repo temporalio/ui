@@ -6,6 +6,7 @@
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -60,7 +61,6 @@
     run: runId,
   });
 
-  const isRunning = $derived(workflow?.isRunning);
   const activitiesCanceled = $derived(
     Boolean(
       workflow?.status &&
@@ -139,8 +139,6 @@
         />
         <div class="xl:hidden">
           <WorkflowActions
-            {isRunning}
-            {isPaused}
             {cancelInProgress}
             {workflow}
             {namespace}
@@ -167,8 +165,6 @@
     </div>
     <div class="max-xl:hidden">
       <WorkflowActions
-        {isRunning}
-        {isPaused}
         {cancelInProgress}
         {workflow}
         {namespace}
@@ -179,6 +175,7 @@
   </div>
   <CodecServerErrorBanner />
   <WorkflowDetails {workflow} next={workflowRelationships.next} />
+  <WorkflowCallStackError />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert

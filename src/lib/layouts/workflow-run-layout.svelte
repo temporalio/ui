@@ -140,8 +140,7 @@
   ) => {
     const shouldFetch =
       refresh.timestamp &&
-      (refresh.action in Action ||
-        (!pause && $workflowRun?.workflow?.isRunning));
+      (refresh.action || (!pause && $workflowRun?.workflow?.isRunning));
 
     if (shouldFetch) {
       const { workflow, error } = await fetchWorkflow({

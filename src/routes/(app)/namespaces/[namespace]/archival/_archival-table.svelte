@@ -37,7 +37,7 @@
         <TableHeaderCell {column} />
       {/each}
     </tr>
-    {#each visibleItems as workflow (workflow.id + workflow.runId)}
+    {#each visibleItems as workflow (`${workflow.id}:${workflow.runId}`)}
       <tr data-testid="workflows-summary-configurable-table-row" class="dense">
         {#each columns as column}
           <TableBodyCell {workflow} {column} archival />
