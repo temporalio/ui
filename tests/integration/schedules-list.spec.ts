@@ -22,7 +22,7 @@ test.describe('Schedules List with no schedules', () => {
     await expect(namespace).toHaveText('0 Schedules');
 
     const createButton = page.getByTestId('create-schedule');
-    await expect(createButton).toBeEnabled();
+    await expect(createButton.first()).toBeEnabled();
   });
 });
 

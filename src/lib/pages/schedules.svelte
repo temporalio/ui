@@ -87,14 +87,20 @@
   const onError = (err: APIErrorResponse) => {
     error = err?.body?.message || translate('schedules.error-message-fetching');
   };
+
+  const showFilters = $derived(Number($schedulesCount) > 0 || query);
 </script>
 
 <div class="flex flex-col gap-4">
   <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
     <SchedulesCount />
   </h1>
-  <div class="flex flex-col justify-between gap-2 md:flex-row">
-    {#if Number($schedulesCount) > 0 || query}
+  <div
+    class="flex flex-col gap-2 md:flex-row {showFilters
+      ? 'justify-between'
+      : 'justify-end'}"
+  >
+    {#if showFilters}
       <SearchAttributeFilter
         bind:filters={$scheduleFilters}
         {searchAttributeOptions}
@@ -102,15 +108,15 @@
           refresh = Date.now();
         }}
       />
-      {#if !createDisabled}
-        <Button
-          data-testid="create-schedule"
-          href={routeForScheduleCreate({ namespace })}
-          disabled={!writeActionsAreAllowed()}
-        >
-          {translate('schedules.create')}
-        </Button>
-      {/if}
+    {/if}
+    {#if !createDisabled}
+      <Button
+        data-testid="create-schedule"
+        href={routeForScheduleCreate({ namespace })}
+        disabled={!writeActionsAreAllowed()}
+      >
+        {translate('schedules.create')}
+      </Button>
     {/if}
   </div>
 </div>
