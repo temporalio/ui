@@ -22,9 +22,9 @@ test.describe('Schedules Page', () => {
       .locator('visible=true');
     await scheduleButton.click();
     await expect(page).toHaveURL(/schedules/);
-    const createScheduleButton = page.getByTestId('create-schedule').first();
-    await expect(createScheduleButton).toBeVisible();
-    await createScheduleButton.click();
+    const createScheduleButton = page.getByTestId('create-schedule');
+    await expect(createScheduleButton.first()).toBeVisible();
+    await createScheduleButton.first().click();
     await expect(page).toHaveURL(/create/);
 
     await page.getByTestId('schedule-name-input').fill('e2e-schedule-1');
