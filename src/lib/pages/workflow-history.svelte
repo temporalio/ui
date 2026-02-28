@@ -1,20 +1,20 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import { eventFilterSort } from '$lib/stores/event-view';
+  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
-  const { namespace, workflow, run } = $page.params;
+  const { namespace, workflow, run } = page.params;
 
   onMount(async () => {
     const queryParams = {
       sort: $eventFilterSort,
     };
 
-    goto(
+    gotoResolved(
       routeForEventHistory({
         queryParams,
         namespace,

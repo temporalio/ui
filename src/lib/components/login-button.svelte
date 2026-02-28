@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-
+  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import { routeForLoginPage } from '$lib/utilities/route-for';
 </script>
 
 <button
   class="login-button min-w-min"
-  on:click={() => goto(routeForLoginPage())}
+  on:click={() => gotoResolved(routeForLoginPage())}
 >
   Login
 </button>

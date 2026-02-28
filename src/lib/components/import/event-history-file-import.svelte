@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-
   import Button from '$lib/holocene/button.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -10,6 +8,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import type { HistoryEvent } from '$lib/types/events';
+  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';
 
@@ -48,7 +47,7 @@
       importEventGroups.set(eventGroups);
       fileLoaded = false;
       const path = routeForEventHistoryImport($lastUsedNamespace, 'feed');
-      goto(path);
+      gotoResolved(path);
     } catch (e) {
       console.error(e);
       toaster.push({

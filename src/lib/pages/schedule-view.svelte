@@ -4,7 +4,6 @@
   import { addDays, addHours, startOfDay } from 'date-fns';
   import { onDestroy } from 'svelte';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
@@ -47,6 +46,7 @@
   import { getIdentity } from '$lib/utilities/core-context';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { getUTCString } from '$lib/utilities/format-date';
+  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import {
     routeForScheduleEdit,
     routeForSchedules,
@@ -131,7 +131,7 @@
       clearTimeout(deleteTimeout);
       deleteTimeout = setTimeout(() => {
         $loading = false;
-        goto(routeForSchedules({ namespace }));
+        gotoResolved(routeForSchedules({ namespace }));
       }, 2000);
       reason = '';
     } catch (e) {

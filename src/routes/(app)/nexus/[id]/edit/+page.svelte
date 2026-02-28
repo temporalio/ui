@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -14,6 +13,7 @@
   import { namespaces } from '$lib/stores/namespaces';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { getNexusEndpoint } from '$lib/utilities/get-nexus-endpoint';
+  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import {
     routeForNexus,
     routeForNexusEndpoint,
@@ -40,7 +40,9 @@
       };
 
       await updateNexusEndpoint(endpoint.id, body);
-      await goto(routeForNexusEndpoint(endpoint.id), { invalidateAll: true });
+      await gotoResolved(routeForNexusEndpoint(endpoint.id), {
+        invalidateAll: true,
+      });
     } catch (e: unknown) {
       console.error('Error updating endpoint', e);
       throw e;
@@ -55,7 +57,7 @@
     loading = true;
     try {
       await deleteNexusEndpoint(endpoint.id, String(endpoint.version));
-      await goto(routeForNexus());
+      await gotoResolved(routeForNexus());
     } catch (e) {
       console.error('Error deleting endpoint', e);
       throw e;
@@ -72,12 +74,12 @@
 </script>
 
 <PageTitle
-  title={`Edit ${translate('nexus.nexus-endpoint', { id: $page.params.id })}`}
-  url={$page.url.href}
+  title={`Edit ${translate('nexus.nexus-endpoint', { id: page.params.id })}`}
+  url={page.url.href}
 />
 {#if endpoint}
   <div class="flex flex-col gap-4">
-    <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
+    <Link href={routeForNexusEndpoint(page.params.id)} icon="chevron-left">
       {translate('nexus.back-to-endpoint')}
     </Link>
     <NexusEditEndpoint
@@ -86,7 +88,7 @@
       {onUpdate}
       {onDelete}
       {loading}
-      cancelHref={routeForNexusEndpoint($page.params.id)}
+      cancelHref={routeForNexusEndpoint(page.params.id)}
     />
   </div>
 {/if}

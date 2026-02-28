@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
@@ -22,6 +21,7 @@
   import type { WorkflowEvent } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
@@ -229,7 +229,7 @@
 {#snippet startWorkflow()}
   <MenuItem
     onclick={() =>
-      goto(
+      gotoResolved(
         routeForWorkflowStart({
           namespace,
           workflowId: workflow.id,

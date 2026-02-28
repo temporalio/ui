@@ -80,7 +80,7 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     runId: 'run-1',
   };
 
-  const cases: [string, () => string][] = [
+  const cases: [string, () => string | undefined][] = [
     ['routeForNamespaces', () => routeForNamespaces()],
     ['routeForNexus', () => routeForNexus()],
     ['routeForNexusEndpoint', () => routeForNexusEndpoint('ep-1')],
@@ -205,6 +205,8 @@ describe('routeFor functions should resolve the base path exactly once', () => {
 
   it.each(cases)('%s should resolve the base path', (_name, fn) => {
     const result = fn();
+    expect(typeof result).toBe('string');
+    expect(result?.length).toBeGreaterThan(0);
     expect(result).toMatch(new RegExp(`${BASE_PATH}`));
     expect(result).not.toMatch(new RegExp(`${BASE_PATH}${BASE_PATH}`));
   });

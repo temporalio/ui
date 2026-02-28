@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
@@ -9,6 +8,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
+  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import { routeForWorkflows } from '$lib/utilities/route-for';
 
   import type { DescribeNamespaceResponse as Namespace } from '$types';
@@ -17,7 +17,7 @@
     const { authorized } = await fetchWorkflowForAuthorization(namespace);
     if (authorized) {
       $lastUsedNamespace = namespace;
-      goto(routeForWorkflows({ namespace }));
+      gotoResolved(routeForWorkflows({ namespace }));
     } else {
       toaster.push({
         variant: 'error',
