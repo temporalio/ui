@@ -1,7 +1,6 @@
 import { writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
-import { resolve } from '$app/paths';
 
 import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
@@ -173,7 +172,7 @@ export const submitCreateSchedule = async ({
     createTimeout = setTimeout(() => {
       error.set('');
       loading.set(false);
-      goto(resolve(routeForSchedules({ namespace }), {}));
+      goto(routeForSchedules({ namespace }));
     }, 2000);
   }
 };
@@ -266,7 +265,7 @@ export const submitEditSchedule = async (
   } else {
     clearTimeout(editTimeout);
     editTimeout = setTimeout(() => {
-      goto(resolve(routeForSchedule({ namespace, scheduleId: name }), {}));
+      goto(routeForSchedule({ namespace, scheduleId: name }));
       error.set('');
       loading.set(false);
     }, 2000);
