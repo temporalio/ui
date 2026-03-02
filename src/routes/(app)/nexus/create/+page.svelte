@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
@@ -10,7 +11,6 @@
   import { namespaces } from '$lib/stores/namespaces';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { getNexusEndpoint } from '$lib/utilities/get-nexus-endpoint';
-  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import { routeForNexus } from '$lib/utilities/route-for';
 
   const projectId = $derived(
@@ -27,7 +27,7 @@
       }
 
       await createNexusEndpoint(body);
-      await gotoResolved(routeForNexus(), { invalidateAll: true });
+      await goto(routeForNexus(), { invalidateAll: true });
     } catch (e) {
       console.error('Error creating endpoint', e);
       throw e;

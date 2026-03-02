@@ -25,7 +25,6 @@
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
-  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
@@ -67,7 +66,7 @@
         namespace,
         onClick: (namespace: string) => {
           $lastUsedNamespace = namespace;
-          gotoResolved(getHref(namespace));
+          goto(getHref(namespace));
         },
       };
     }),
@@ -245,7 +244,7 @@
 
   const logout = () => {
     clearAuthUser();
-    gotoResolved(routeForLoginPage());
+    goto(routeForLoginPage());
   };
 
   $effect(() => {

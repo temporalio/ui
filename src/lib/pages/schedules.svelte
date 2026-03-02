@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
@@ -32,7 +33,6 @@
   } from '$lib/stores/search-attributes';
   import { temporalVersion } from '$lib/stores/versions';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
-  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -173,8 +173,7 @@
           {#if !createDisabled}
             <Button
               data-testid="create-schedule"
-              on:click={() =>
-                gotoResolved(routeForScheduleCreate({ namespace }))}
+              on:click={() => goto(routeForScheduleCreate({ namespace }))}
               disabled={!writeActionsAreAllowed()}
             >
               {translate('schedules.create')}

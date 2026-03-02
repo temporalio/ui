@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
@@ -13,7 +14,6 @@
   import { namespaces } from '$lib/stores/namespaces';
   import type { NexusEndpoint } from '$lib/types/nexus';
   import { getNexusEndpoint } from '$lib/utilities/get-nexus-endpoint';
-  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import {
     routeForNexus,
     routeForNexusEndpoint,
@@ -40,7 +40,7 @@
       };
 
       await updateNexusEndpoint(endpoint.id, body);
-      await gotoResolved(routeForNexusEndpoint(endpoint.id), {
+      await goto(routeForNexusEndpoint(endpoint.id), {
         invalidateAll: true,
       });
     } catch (e: unknown) {
@@ -57,7 +57,7 @@
     loading = true;
     try {
       await deleteNexusEndpoint(endpoint.id, String(endpoint.version));
-      await gotoResolved(routeForNexus());
+      await goto(routeForNexus());
     } catch (e) {
       console.error('Error deleting endpoint', e);
       throw e;

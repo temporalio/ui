@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
@@ -54,7 +54,7 @@
         icon: 'play',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForWorkflowStart({ namespace }));
+          goto(routeForWorkflowStart({ namespace }));
           close();
         },
       },
@@ -65,7 +65,7 @@
         icon: 'add',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForScheduleCreate({ namespace }));
+          goto(routeForScheduleCreate({ namespace }));
           close();
         },
       },
@@ -76,7 +76,7 @@
         icon: 'workflow',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForWorkflows({ namespace }));
+          goto(routeForWorkflows({ namespace }));
           close();
         },
       },
@@ -87,7 +87,7 @@
         icon: 'schedules',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForSchedules({ namespace }));
+          goto(routeForSchedules({ namespace }));
           close();
         },
       },
@@ -98,7 +98,7 @@
         icon: 'batch-operation',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForBatchOperations({ namespace }));
+          goto(routeForBatchOperations({ namespace }));
           close();
         },
       },
@@ -109,7 +109,7 @@
         icon: 'namespace',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForNamespaces());
+          goto(routeForNamespaces());
           close();
         },
       },
@@ -120,7 +120,7 @@
         icon: 'merge',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForWorkerDeployments({ namespace }));
+          goto(routeForWorkerDeployments({ namespace }));
           close();
         },
       },
@@ -131,7 +131,7 @@
         icon: 'nexus',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForNexus());
+          goto(routeForNexus());
           close();
         },
       },
@@ -142,7 +142,7 @@
         icon: 'archives',
         category: 'Navigation',
         action: () => {
-          gotoResolved(routeForArchivalWorkflows({ namespace }));
+          goto(routeForArchivalWorkflows({ namespace }));
           close();
         },
       },
@@ -153,7 +153,7 @@
         icon: 'import',
         category: 'Actions',
         action: () => {
-          gotoResolved(routeForEventHistoryImport());
+          goto(routeForEventHistoryImport());
           close();
         },
       },

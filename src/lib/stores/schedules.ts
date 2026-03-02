@@ -1,5 +1,7 @@
 import { writable } from 'svelte/store';
 
+import { goto } from '$app/navigation';
+
 import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import { setSearchAttributes } from '$lib/services/workflow-service';
@@ -12,7 +14,6 @@ import type {
   ScheduleSpecParameters,
 } from '$lib/types/schedule';
 import { encodePayloads } from '$lib/utilities/encode-payload';
-import { gotoResolved } from '$lib/utilities/goto-resolved';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 import {
@@ -171,7 +172,7 @@ export const submitCreateSchedule = async ({
     createTimeout = setTimeout(() => {
       error.set('');
       loading.set(false);
-      gotoResolved(routeForSchedules({ namespace }));
+      goto(routeForSchedules({ namespace }));
     }, 2000);
   }
 };
@@ -264,7 +265,7 @@ export const submitEditSchedule = async (
   } else {
     clearTimeout(editTimeout);
     editTimeout = setTimeout(() => {
-      gotoResolved(routeForSchedule({ namespace, scheduleId: name }));
+      goto(routeForSchedule({ namespace, scheduleId: name }));
       error.set('');
       loading.set(false);
     }, 2000);

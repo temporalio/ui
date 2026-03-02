@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+
   import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
@@ -6,7 +8,6 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import { gotoResolved } from '$lib/utilities/goto-resolved';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
 
@@ -64,7 +65,7 @@
       <MenuDivider />
       <MenuItem
         onclick={() =>
-          gotoResolved(
+          goto(
             routeForStartStandaloneActivity({
               namespace,
               activityId: activityExecutionInfo.activityId,
