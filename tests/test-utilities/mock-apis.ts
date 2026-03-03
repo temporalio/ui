@@ -102,7 +102,7 @@ export const mockSchedulesApis = (
     mockNamespaceApis(page),
     mockSearchAttributesApi(page, customSearchAttributes),
     mockSchedulesApi(page, empty),
-    mockSchedulesCountApi(page, emptySchedulesCount),
+    mockWorkflowsCountApi(page, emptySchedulesCount),
   ]);
 };
 

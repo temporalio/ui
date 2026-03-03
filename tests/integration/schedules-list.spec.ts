@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
   mockSchedulesApis,
-  SCHEDULES_COUNT_API,
+  WORKFLOWS_COUNT_API,
 } from '~/test-utilities/mock-apis';
 
 const schedulesUrl = '/namespaces/default/schedules';
@@ -17,12 +17,12 @@ test.describe('Schedules List with no schedules', () => {
   }) => {
     await page.goto(schedulesUrl);
 
-    await page.waitForResponse(SCHEDULES_COUNT_API);
+    await page.waitForResponse(WORKFLOWS_COUNT_API);
     const namespace = page.locator('h1');
     await expect(namespace).toHaveText('0 Schedules');
 
     const createButton = page.getByTestId('create-schedule');
-    await expect(createButton).toBeEnabled();
+    await expect(createButton.first()).toBeEnabled();
   });
 });
 
@@ -36,7 +36,7 @@ test.describe('Schedules List with schedules', () => {
   }) => {
     await page.goto(schedulesUrl);
 
-    await page.waitForResponse(SCHEDULES_COUNT_API);
+    await page.waitForResponse(WORKFLOWS_COUNT_API);
     const namespace = page.locator('h1');
     await expect(namespace).toHaveText('15 Schedules');
 
