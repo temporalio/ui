@@ -28,3 +28,4 @@ go.work.sum
 .claude/*
 !.claude/skills/
 .sisyphus/*
+.omc
