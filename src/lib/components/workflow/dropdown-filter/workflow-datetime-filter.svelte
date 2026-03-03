@@ -21,7 +21,10 @@
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import {
+    generateFilterId,
+    type SearchAttributeFilter,
+  } from '$lib/models/search-attribute-filters';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { workflowFilters } from '$lib/stores/filters';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
@@ -82,6 +85,7 @@
       custom = true;
     } else {
       const filter: SearchAttributeFilter = {
+        id: generateFilterId(),
         attribute: timeField,
         type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
         value,
@@ -156,6 +160,7 @@
       : `> "${formatISO(startDateWithTime)}"`;
 
     const filter: SearchAttributeFilter = {
+      id: generateFilterId(),
       attribute: timeField,
       type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
       value: query,

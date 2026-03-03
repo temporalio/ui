@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import { generateFilterId } from '$lib/models/search-attribute-filters';
   import { fetchActivityCountByStatus } from '$lib/services/activity-counts';
   import { activityCount, activityRefresh } from '$lib/stores/activities';
   import { activityFilters } from '$lib/stores/filters';
@@ -49,6 +50,7 @@
 
     if (!statusExists) {
       const filter = {
+        id: generateFilterId(),
         attribute: 'ExecutionStatus',
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
         value: status,

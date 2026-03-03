@@ -477,7 +477,7 @@
       >
         {#if multiselect && isArrayValue(value) && value.length > 0}
           {#if displayChips}
-            {#each value.slice(0, chipLimit) as v}
+            {#each value.slice(0, chipLimit) as v (v)}
               <Chip
                 onremove={() => removeOption(v)}
                 removeButtonLabel={removeChipLabel}>{v}</Chip

@@ -70,7 +70,7 @@
 </script>
 
 <div class="flex flex-wrap gap-2" class:pt-2={visibleFilters.length}>
-  {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
+  {#each visibleFilters as workflowFilter, i (workflowFilter.id)}
     {@const { attribute, value, conditional, customDate } = workflowFilter}
     {#if attribute}
       <div in:fade data-testid="{workflowFilter.attribute}-{i}">

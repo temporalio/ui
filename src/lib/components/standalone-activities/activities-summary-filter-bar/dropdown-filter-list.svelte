@@ -89,7 +89,7 @@
 
 {#if visibleFilters.length > 0}
   <div class="flex flex-wrap items-center gap-2">
-    {#each visibleFilters as activityFilter, i (activityFilter.attribute + '-' + i)}
+    {#each visibleFilters as activityFilter, i (activityFilter.id)}
       {#if isStatusFilter(activityFilter) && i === firstExecutionStatusIndex}
         <StatusDropdownFilterChip
           filters={executionStatusFilters}

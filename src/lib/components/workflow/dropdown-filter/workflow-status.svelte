@@ -12,7 +12,10 @@
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
-  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import {
+    generateFilterId,
+    type SearchAttributeFilter,
+  } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
   import { workflowFilters } from '$lib/stores/filters';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
@@ -24,6 +27,7 @@
 
   function mapStatusToFilter(value: string): SearchAttributeFilter {
     return {
+      id: generateFilterId(),
       attribute: 'ExecutionStatus',
       type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
       value,

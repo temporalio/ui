@@ -86,7 +86,7 @@
 
 {#if visibleFilters.length > 0}
   <div class="flex flex-wrap items-center gap-2">
-    {#each visibleFilters as workflowFilter, i (workflowFilter.attribute + '-' + i)}
+    {#each visibleFilters as workflowFilter, i (workflowFilter.id)}
       {#if isStatusFilter(workflowFilter) && i === firstExecutionStatusIndex}
         <StatusDropdownFilterChip
           filters={executionStatusFilters}

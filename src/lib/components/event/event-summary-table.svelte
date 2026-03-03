@@ -91,7 +91,7 @@
     class="border-t-0"
   >
     <TableHeaderRow slot="headers" class="!h-8">
-      {#each columns as column, i (`${column.label}:${i}`)}
+      {#each columns as column (column.label)}
         <TableHeaderCell {column}>
           {#if column.label === 'Event Type'}
             <EventHistoryLegend eventTypesOnly />

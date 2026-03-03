@@ -5,7 +5,10 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
-  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import {
+    generateFilterId,
+    type SearchAttributeFilter,
+  } from '$lib/models/search-attribute-filters';
   import {
     attributeToHumanReadable,
     attributeToId,
@@ -27,6 +30,7 @@
     const { value } = e.target as HTMLInputElement;
     if (value) {
       const filter: SearchAttributeFilter = {
+        id: generateFilterId(),
         attribute,
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
         value,

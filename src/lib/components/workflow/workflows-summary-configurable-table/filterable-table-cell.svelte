@@ -5,7 +5,10 @@
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import {
+    generateFilterId,
+    type SearchAttributeFilter,
+  } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import {
     SEARCH_ATTRIBUTE_TYPE,
@@ -44,6 +47,7 @@
 
     if (!filter || filter.value !== value) {
       const newFilter: SearchAttributeFilter = {
+        id: generateFilterId(),
         attribute,
         type,
         value,

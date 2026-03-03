@@ -45,7 +45,7 @@
       {translate('common.view-all-runs')}
     </Link>
   </div>
-  {#each sortRecentRuns(recentRuns) as run, i (`${run?.startWorkflowResult?.workflowId ?? i}:${run?.startWorkflowResult?.runId ?? i + 1}`)}
+  {#each sortRecentRuns(recentRuns) as run, i (`${run?.startWorkflowResult?.workflowId ?? `_${i}`}:${run?.startWorkflowResult?.runId ?? `_${i}`}`)}
     {#await fetchWorkflowForSchedule({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
       <div class="row">
         <div class="w-28">

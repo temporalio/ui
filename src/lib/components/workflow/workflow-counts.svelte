@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import { generateFilterId } from '$lib/models/search-attribute-filters';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -53,6 +54,7 @@
 
     if (!statusExists) {
       const filter = {
+        id: generateFilterId(),
         attribute: 'ExecutionStatus',
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
         value: status,

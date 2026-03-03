@@ -1,6 +1,9 @@
 import debounce from 'just-debounce';
 
-import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+import {
+  generateFilterId,
+  type SearchAttributeFilter,
+} from '$lib/models/search-attribute-filters';
 import { currentPageKey } from '$lib/stores/pagination';
 import {
   type FilterParameters,
@@ -55,6 +58,7 @@ const isDatetimeStatement = is(SEARCH_ATTRIBUTE_TYPE.DATETIME);
 const isBoolStatement = is(SEARCH_ATTRIBUTE_TYPE.BOOL);
 
 export const emptyFilter = (): SearchAttributeFilter => ({
+  id: generateFilterId(),
   attribute: '',
   type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   value: '',

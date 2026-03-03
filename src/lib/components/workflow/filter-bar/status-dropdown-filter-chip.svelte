@@ -6,7 +6,10 @@
   import { Menu, MenuButton, MenuContainer } from '$lib/holocene/menu';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Translate from '$lib/i18n/translate.svelte';
-  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import {
+    generateFilterId,
+    type SearchAttributeFilter,
+  } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
 
   type Props = {
@@ -39,6 +42,7 @@
     if (localFilters.length === 1 && localFilters[0].value === '') {
       localFilters = [
         {
+          id: generateFilterId(),
           attribute: 'ExecutionStatus',
           operator: '',
           parenthesis: '',
@@ -51,6 +55,7 @@
       localFilters = [
         ...localFilters,
         {
+          id: generateFilterId(),
           attribute: 'ExecutionStatus',
           operator: '',
           parenthesis: localFilters.length ? ')' : '',
