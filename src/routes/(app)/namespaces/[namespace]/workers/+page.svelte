@@ -1,12 +1,21 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import WorkerSearchTable from '$lib/components/workers/worker-search-table.svelte';
+  import FilterBar from '$lib/components/shared-search-attribute-filter/filter-bar.svelte';
+  import WorkersTableWithSearch from '$lib/components/workers/workers-table/workers-table-with-search.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { workerFilters } from '$lib/stores/filters';
+  import {
+    workerSearchAttributeOptions,
+    workerSearchAttributes,
+  } from '$lib/stores/search-attributes';
+  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import {
     routeForWorkerDeployments,
     routeForWorkers,
@@ -16,6 +25,13 @@
 
   const workersHref = $derived(routeForWorkers({ namespace }));
   const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
+
+  onMount(() => {
+    const query = page.url.searchParams.get('query') ?? '';
+    if (query) {
+      $workerFilters = toListWorkflowFilters(query, $workerSearchAttributes);
+    }
+  });
 </script>
 
 <PageTitle title={translate('workers.workers')} url={page.url.href} />
@@ -43,4 +59,11 @@
   </Tabs>
 </header>
 
-<WorkerSearchTable {namespace} />
+<FilterBar
+  filters={workerFilters}
+  options={$workerSearchAttributeOptions}
+  id="worker"
+  statusAttribute="WorkerStatus"
+/>
+
+<WorkersTableWithSearch {namespace} />

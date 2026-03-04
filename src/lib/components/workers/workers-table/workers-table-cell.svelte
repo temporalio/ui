@@ -10,7 +10,8 @@
 
   interface Props {
     attribute?: string;
-    value: string;
+    copyable?: boolean;
+    value?: string;
     filterable?: boolean;
     href?: string;
     children?: Snippet;
@@ -18,6 +19,7 @@
 
   let {
     attribute,
+    copyable = true,
     value,
     filterable = false,
     href,
@@ -83,6 +85,7 @@
     show={filterOrCopyButtonsVisible}
     content={value}
     onFilter={onRowFilterClick}
+    {copyable}
     {filterable}
     filtered={query.includes(`${attribute}=`)}
   />

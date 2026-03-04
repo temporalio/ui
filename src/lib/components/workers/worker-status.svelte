@@ -2,20 +2,20 @@
   import { cva } from 'class-variance-authority';
 
   import HeartBeat from '$lib/components/heart-beat-indicator.svelte';
-  import type { ReadableWorkerStatus } from '$lib/utilities/screaming-enums';
+  import { translate } from '$lib/i18n/translate';
+  import type { WorkerStatus } from '$lib/models/worker-status';
 
   interface Props {
     delay?: number;
-    status?: ReadableWorkerStatus;
-    'test-id'?: string;
+    status?: WorkerStatus;
   }
 
-  let { delay = 0, status = 'Running', 'test-id': testId }: Props = $props();
+  let { delay = 0, status = 'Running' }: Props = $props();
 
-  const label: Record<ReadableWorkerStatus, string> = {
-    Unspecified: 'Unspecified',
-    Running: 'Running',
+  const label: Record<WorkerStatus, string> = {
+    Running: translate('workflows.running'),
     'Shutting Down': 'Shutting Down',
+    Unspecified: translate('events.event-classification.unspecified'),
   };
 
   const workerStatus = cva(
@@ -36,10 +36,7 @@
   const isRunning = $derived(status === 'Running');
 </script>
 
-<div
-  class="relative flex items-center gap-0 text-center text-xs leading-4"
-  data-testid={testId}
->
+<div class="relative flex items-center gap-0 text-center text-xs leading-4">
   <span class={workerStatus({ status })}>
     {label[status]}
     {#if isRunning}

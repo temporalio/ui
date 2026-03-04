@@ -305,7 +305,7 @@
     {/if}
 
     {#if sdk && sdkVersion}
-      <DetailListLabel>SDK</DetailListLabel>
+      <DetailListLabel>{translate('workflows.sdk')}</DetailListLabel>
       <DetailListValue>
         <SdkLogo {sdk} version={sdkVersion} />
       </DetailListValue>

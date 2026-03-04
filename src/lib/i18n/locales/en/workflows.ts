@@ -348,4 +348,5 @@ export const Strings = {
   'timeline-minimized':
     'Timeline and Event History are collapsed to minimized height',
   'timeline-expanded': 'Timeline and Event History are expanded to full height',
+  sdk: 'Workflow SDK',
 } as const;

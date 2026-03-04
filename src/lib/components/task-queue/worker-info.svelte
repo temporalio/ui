@@ -13,6 +13,7 @@
     WorkerSlotsInfo,
   } from '$lib/types';
   import { formatDurationAbbreviated } from '$lib/utilities/format-time';
+  import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
@@ -89,7 +90,7 @@
       <div class="flex flex-col">
         <span class="text-secondary">{translate('workers.sdk')}</span>
         <SdkLogo
-          sdk={heartbeat?.sdkName.split('-')[1]}
+          sdk={formatSDKName(heartbeat?.sdkName)}
           version={heartbeat?.sdkVersion}
         />
       </div>

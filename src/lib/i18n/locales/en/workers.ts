@@ -19,7 +19,7 @@ export const Strings = {
   instance: 'Instance',
   'task-queue': 'Task Queue',
   status: 'Status',
-  sdk: 'SDK',
+  sdk: 'Worker SDK',
   'empty-state-title': 'No Workers Found',
   'error-message-fetching': 'An error occurred while fetching workers.',
   'compatible-build-ids': 'Compatible Build IDs',

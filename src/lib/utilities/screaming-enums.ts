@@ -1,3 +1,4 @@
+import type { WorkerStatus as ReadableWorkerStatus } from '$lib/models/worker-status';
 import type {
   ArchivalState,
   CallbackState,
@@ -99,8 +100,6 @@ export const toCallbackStateReadable = (
   if (!state) return state;
   return fromScreamingEnum(state, 'CallbackState');
 };
-
-export type ReadableWorkerStatus = 'Unspecified' | 'Running' | 'Shutting Down';
 
 export const toWorkerStatusReadable = (
   state?: WorkerStatus,

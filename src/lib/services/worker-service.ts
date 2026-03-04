@@ -27,36 +27,11 @@ export const fetchPaginatedWorkers = async (
         query: parameters.query,
       },
     }).then(({ workersInfo, nextPageToken }) => {
-      if (!workersInfo) {
-        throw new Error('No workers info in response');
-      }
+      // if (!workersInfo) {
+      //   throw new Error('No workers info in response');
+      // }
       return {
-        items: workersInfo,
-        nextPageToken: nextPageToken ? String(nextPageToken) : '',
-      };
-    });
-  };
-};
-
-export const fetchPaginatedWorkersForTaskQueue = async (
-  parameters: ListWorkersRequest & { taskQueue: string },
-  request = fetch,
-): Promise<PaginatedWorkerListPromise> => {
-  return (pageSize = 100, token = '') => {
-    const route = routeForApi('workers', parameters);
-    return requestFromAPI<ListWorkersResponse>(route, {
-      request,
-      params: {
-        query: `TaskQueue="${parameters.taskQueue}"`,
-        maximumPageSize: String(pageSize),
-        nextPageToken: token,
-      },
-    }).then(({ workersInfo, nextPageToken }) => {
-      if (!workersInfo) {
-        throw new Error('No workers info in response');
-      }
-      return {
-        items: workersInfo,
+        items: workersInfo ?? [],
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });

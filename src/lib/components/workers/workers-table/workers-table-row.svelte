@@ -1,12 +1,12 @@
 <script lang="ts">
+  import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
+  import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import type { WorkerInfo } from '$lib/types';
+  import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { routeForWorkerInstance } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
-  import SdkLogo from '../lines-and-dots/sdk-logo.svelte';
-  import WorkerStatus from '../workers/worker-status.svelte';
-
-  import WorkerTableCell from './worker-table-cell.svelte';
+  import WorkersTableCell from './workers-table-cell.svelte';
 
   interface Props {
     worker: WorkerInfo;
@@ -24,7 +24,7 @@
   <td>
     <WorkerStatus {status} />
   </td>
-  <WorkerTableCell
+  <WorkersTableCell
     attribute="WorkerInstanceKey"
     value={worker.workerHeartbeat.workerInstanceKey}
     href={routeForWorkerInstance({
@@ -33,29 +33,25 @@
     })}
     {filterable}
   />
-  <WorkerTableCell
+  <WorkersTableCell
     attribute="TaskQueue"
     value={worker.workerHeartbeat.taskQueue}
     {filterable}
   />
-  <WorkerTableCell
+  <WorkersTableCell
     attribute="WorkerIdentity"
     value={worker.workerHeartbeat.workerIdentity}
     {filterable}
   />
-  <WorkerTableCell
+  <WorkersTableCell
     attribute="HostName"
     value={worker.workerHeartbeat.hostInfo.hostName}
     {filterable}
   />
-  <WorkerTableCell
-    attribute="SdkName"
-    value={worker.workerHeartbeat.sdkName}
-    {filterable}
-  >
+  <WorkersTableCell copyable={false}>
     <SdkLogo
-      sdk={worker.workerHeartbeat.sdkName.split('-')[1]}
+      sdk={formatSDKName(worker.workerHeartbeat.sdkName)}
       version={worker.workerHeartbeat.sdkVersion}
     />
-  </WorkerTableCell>
+  </WorkersTableCell>
 </tr>
