@@ -8,13 +8,14 @@
   import { translate } from '$lib/i18n/translate';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  type Props = {
+  interface Props {
     attribute?: string;
     value: string;
     filterable?: boolean;
     href?: string;
     children?: Snippet;
-  };
+  }
+
   let {
     attribute,
     value,
@@ -22,6 +23,7 @@
     href,
     children,
   }: Props = $props();
+
   const query = $derived(page.url.searchParams.get('query') || '');
 
   const onRowFilterClick = () => {

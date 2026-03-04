@@ -9,19 +9,22 @@
 
   import WorkerTableRow from './worker-table-row.svelte';
 
-  let { namespace, taskQueue } = $props();
+  interface Props {
+    namespace: string;
+    taskQueue: string;
+  }
+
+  let { namespace, taskQueue }: Props = $props();
   let error: string | null = $state(null);
 
-  const columns = $derived([
+  const columns = [
     { label: translate('workers.status') },
     { label: translate('workers.instance') },
+    { label: translate('workers.task-queue') },
     { label: translate('workers.identity') },
     { label: translate('workers.host-name') },
-    { label: translate('workers.workflow-task-slots') },
-    { label: translate('workers.activity-task-slots') },
-    { label: translate('workers.nexus-task-slots') },
     { label: translate('workers.sdk') },
-  ]);
+  ];
 
   const onFetch = $derived(() =>
     fetchPaginatedWorkersForTaskQueue({ namespace, taskQueue }),
@@ -44,17 +47,17 @@
     emptyStateMessage={translate('workers.empty-state-title')}
     errorMessage={translate('workers.error-message-fetching')}
   >
-    <caption class="sr-only" slot="caption"
-      >{translate('workers.workers')}</caption
-    >
+    <caption class="sr-only" slot="caption">
+      {translate('workers.workers')}
+    </caption>
 
     <tr slot="headers" class="text-left">
-      {#each columns as { label }}
+      {#each columns as { label } (label)}
         <th>{label}</th>
       {/each}
     </tr>
-    {#each visibleItems as worker}
-      <WorkerTableRow {worker} {columns} {namespace} />
+    {#each visibleItems as worker (worker.workerHeartbeat.workerInstanceKey)}
+      <WorkerTableRow {worker} {namespace} />
     {/each}
 
     <svelte:fragment slot="empty">

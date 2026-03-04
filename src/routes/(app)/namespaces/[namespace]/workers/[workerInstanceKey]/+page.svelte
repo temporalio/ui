@@ -3,6 +3,7 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import WorkerInfo from '$lib/components/task-queue/worker-info.svelte';
+  import Error from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { describeWorker } from '$lib/services/worker-service';
@@ -12,7 +13,10 @@
   const workerInstanceKey = $derived(page.params.instance);
 </script>
 
-<PageTitle title={`Workers | ${workerInstanceKey}`} url={page.url.href} />
+<PageTitle
+  title="{translate('workers.workers')} | {workerInstanceKey}"
+  url={page.url.href}
+/>
 
 <header class="flex flex-col gap-2">
   <div class="flex items-center justify-between">
@@ -30,5 +34,5 @@
 {#await describeWorker({ namespace, workerInstanceKey }) then data}
   <WorkerInfo worker={data.workerInfo} />
 {:catch error}
-  <p class="text-red-500">Error loading worker info: {error.message}</p>
+  <Error {error} status={error.statusCode} />
 {/await}

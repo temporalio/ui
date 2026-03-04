@@ -303,16 +303,13 @@ export const routeForTimeline = ({
 export const routeForWorkers = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {
-  return resolve(
-    `${routeForNamespace({ namespace: parameters.namespace })}/workers`,
-    {},
-  );
+  return `${routeForNamespace({ namespace: parameters.namespace })}/workers`;
 };
 
 export const routeForWorkflowWorkers = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/workers`, {});
+  return `${routeForWorkflow(parameters)}/workers`;
 };
 
 export const routeForWorkerDeployments = ({

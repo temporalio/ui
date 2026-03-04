@@ -1,7 +1,6 @@
 import type {
   DescribeWorkerRequest,
   DescribeWorkerResponse,
-  ListTaskQueuePartitionsRequest,
   ListWorkersRequest,
   ListWorkersResponse,
   WorkerInfo,
@@ -40,7 +39,7 @@ export const fetchPaginatedWorkers = async (
 };
 
 export const fetchPaginatedWorkersForTaskQueue = async (
-  parameters: ListTaskQueuePartitionsRequest,
+  parameters: ListWorkersRequest & { taskQueue: string },
   request = fetch,
 ): Promise<PaginatedWorkerListPromise> => {
   return (pageSize = 100, token = '') => {

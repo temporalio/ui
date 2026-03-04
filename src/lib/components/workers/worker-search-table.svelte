@@ -7,7 +7,11 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
 
-  let { namespace } = $props();
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
 
   const query = $derived(page.url.searchParams.get('query') || '');
 
@@ -17,9 +21,6 @@
     { label: translate('workers.task-queue') },
     { label: translate('workers.identity') },
     { label: translate('workers.host-name') },
-    { label: translate('workers.workflow-task-slots') },
-    { label: translate('workers.activity-task-slots') },
-    { label: translate('workers.nexus-task-slots') },
     { label: translate('workers.sdk') },
   ];
 
@@ -37,17 +38,17 @@
     emptyStateMessage={translate('workers.empty-state-title')}
     errorMessage={translate('workers.error-message-fetching')}
   >
-    <caption class="sr-only" slot="caption"
-      >{translate('workers.workers')}</caption
-    >
+    <caption class="sr-only" slot="caption">
+      {translate('workers.workers')}
+    </caption>
 
     <tr slot="headers" class="text-left">
       {#each columns as { label } (label)}
         <th>{label}</th>
       {/each}
     </tr>
-    {#each visibleItems as worker, i (i)}
-      <WorkerTableRow {worker} {columns} {namespace} filterable />
+    {#each visibleItems as worker (worker.workerHeartbeat.workerInstanceKey)}
+      <WorkerTableRow {worker} {namespace} filterable />
     {/each}
 
     <svelte:fragment slot="empty">
