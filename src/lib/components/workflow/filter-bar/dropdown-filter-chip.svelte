@@ -2,7 +2,7 @@
   import { writable } from 'svelte/store';
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
-  import { zonedTimeToUtc } from 'date-fns-tz';
+  import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -67,16 +67,56 @@
   const open = writable(false);
   let localFilter = $state({ ...filter });
 
-  // Local state for date/time values - defaults to today
-  let localStartDate = $state(startOfDay(new Date()));
-  let localStartHour = $state('');
-  let localStartMinute = $state('');
-  let localStartSecond = $state('');
+  function parseDateTimeFilter(isoString: string) {
+    const timezone = getTimezone($timeFormat ?? 'UTC');
+    const zoned = utcToZonedTime(new Date(isoString), timezone);
+    return {
+      date: startOfDay(zoned),
+      hour: String(zoned.getHours()),
+      minute: String(zoned.getMinutes()),
+      second: String(zoned.getSeconds()),
+    };
+  }
 
-  let localEndDate = $state(startOfDay(new Date()));
-  let localEndHour = $state('');
-  let localEndMinute = $state('');
-  let localEndSecond = $state('');
+  function getInitialStart() {
+    if (isDateTimeFilter(filter) && filter.value) {
+      if (filter.customDate && filter.value.includes('BETWEEN')) {
+        const matches = filter.value.match(/"([^"]+)"/g);
+        if (matches?.[0])
+          return parseDateTimeFilter(matches[0].replace(/"/g, ''));
+      } else if (!filter.customDate) {
+        return parseDateTimeFilter(filter.value);
+      }
+    }
+    return { date: startOfDay(new Date()), hour: '', minute: '', second: '' };
+  }
+
+  function getInitialEnd() {
+    if (
+      isDateTimeFilter(filter) &&
+      filter.value &&
+      filter.customDate &&
+      filter.value.includes('BETWEEN')
+    ) {
+      const matches = filter.value.match(/"([^"]+)"/g);
+      if (matches?.[1])
+        return parseDateTimeFilter(matches[1].replace(/"/g, ''));
+    }
+    return { date: startOfDay(new Date()), hour: '', minute: '', second: '' };
+  }
+
+  const initialStart = getInitialStart();
+  const initialEnd = getInitialEnd();
+
+  let localStartDate = $state(initialStart.date);
+  let localStartHour = $state(initialStart.hour);
+  let localStartMinute = $state(initialStart.minute);
+  let localStartSecond = $state(initialStart.second);
+
+  let localEndDate = $state(initialEnd.date);
+  let localEndHour = $state(initialEnd.hour);
+  let localEndMinute = $state(initialEnd.minute);
+  let localEndSecond = $state(initialEnd.second);
 
   const controlsId = $derived(
     `dropdown-filter-chip-${filter.attribute}-${index}`,
