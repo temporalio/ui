@@ -2,7 +2,7 @@
   import { writable } from 'svelte/store';
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
-  import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+  import { zonedTimeToUtc } from 'date-fns-tz';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -36,6 +36,10 @@
   import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { isInConditional, isNullConditional } from '$lib/utilities/is';
   import {
+    getInitialEnd,
+    getInitialStart,
+  } from '$lib/utilities/query/datetime-filter-parse';
+  import {
     formatListFilterValue,
     isBooleanFilter,
     isDateTimeFilter,
@@ -67,46 +71,9 @@
   const open = writable(false);
   let localFilter = $state({ ...filter });
 
-  function parseDateTimeFilter(isoString: string) {
-    const timezone = getTimezone($timeFormat ?? 'UTC');
-    const zoned = utcToZonedTime(new Date(isoString), timezone);
-    return {
-      date: startOfDay(zoned),
-      hour: String(zoned.getHours()),
-      minute: String(zoned.getMinutes()),
-      second: String(zoned.getSeconds()),
-    };
-  }
-
-  function getInitialStart() {
-    if (isDateTimeFilter(filter) && filter.value) {
-      if (filter.customDate && filter.value.includes('BETWEEN')) {
-        const matches = filter.value.match(/"([^"]+)"/g);
-        if (matches?.[0])
-          return parseDateTimeFilter(matches[0].replace(/"/g, ''));
-      } else if (!filter.customDate) {
-        return parseDateTimeFilter(filter.value);
-      }
-    }
-    return { date: startOfDay(new Date()), hour: '', minute: '', second: '' };
-  }
-
-  function getInitialEnd() {
-    if (
-      isDateTimeFilter(filter) &&
-      filter.value &&
-      filter.customDate &&
-      filter.value.includes('BETWEEN')
-    ) {
-      const matches = filter.value.match(/"([^"]+)"/g);
-      if (matches?.[1])
-        return parseDateTimeFilter(matches[1].replace(/"/g, ''));
-    }
-    return { date: startOfDay(new Date()), hour: '', minute: '', second: '' };
-  }
-
-  const initialStart = getInitialStart();
-  const initialEnd = getInitialEnd();
+  const timezone = getTimezone($timeFormat ?? 'UTC');
+  const initialStart = getInitialStart(filter, timezone);
+  const initialEnd = getInitialEnd(filter, timezone);
 
   let localStartDate = $state(initialStart.date);
   let localStartHour = $state(initialStart.hour);
