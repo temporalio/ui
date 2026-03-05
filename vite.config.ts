@@ -3,6 +3,7 @@ import path from 'path';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
+import { componentUsagePlugin } from './plugins/vite-plugin-component-usage';
 import { oidcServerPlugin } from './plugins/vite-plugin-oidc-server';
 import { temporalServer } from './plugins/vite-plugin-temporal-server';
 import { uiServerPlugin } from './plugins/vite-plugin-ui-server';
@@ -13,6 +14,7 @@ export default defineConfig({
     oidcServerPlugin(),
     temporalServer(),
     uiServerPlugin(),
+    componentUsagePlugin(),
   ],
   optimizeDeps: {
     include: ['date-fns', 'date-fns-tz'],
