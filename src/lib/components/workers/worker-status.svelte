@@ -14,7 +14,7 @@
 
   const label: Record<WorkerStatus, string> = {
     Running: translate('workflows.running'),
-    'Shutting Down': 'Shutting Down',
+    ShuttingDown: 'Shutting Down',
     Unspecified: translate('events.event-classification.unspecified'),
   };
 
@@ -27,7 +27,7 @@
         status: {
           Unspecified: 'bg-slate-100',
           Running: 'bg-blue-300',
-          'Shutting Down': 'bg-yellow-200',
+          ShuttingDown: 'bg-yellow-200',
         },
       },
     },

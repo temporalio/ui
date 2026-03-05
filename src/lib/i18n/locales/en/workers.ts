@@ -63,4 +63,5 @@ export const Strings = {
   diagnostics: 'Diagnostics',
   'poll-success-rate': 'Poll success rate',
   'rate-limit': 'Rate limit',
+  'troubleshooting-workers-link': 'Troubleshooting workers',
 } as const;

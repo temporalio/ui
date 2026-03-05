@@ -6,7 +6,6 @@
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -175,7 +174,6 @@
   </div>
   <CodecServerErrorBanner />
   <WorkflowDetails {workflow} next={workflowRelationships.next} />
-  <WorkflowCallStackError />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
