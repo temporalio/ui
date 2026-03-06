@@ -4,8 +4,7 @@ import { describe, expect, it } from 'vitest';
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 
 import {
-  getInitialEnd,
-  getInitialStart,
+  getInitialDateTimes,
   parseDateTimeFilter,
 } from './datetime-filter-parse';
 
@@ -53,23 +52,23 @@ describe('parseDateTimeFilter', () => {
   });
 });
 
-describe('getInitialStart', () => {
+describe('getInitialDateTimes - start', () => {
   it('returns empty defaults for a non-datetime filter', () => {
     const filter = makeFilter({ type: 'Keyword', attribute: 'WorkflowId' });
-    const result = getInitialStart(filter, 'UTC');
+    const { start } = getInitialDateTimes(filter, 'UTC');
 
-    expect(result.hour).toBe('');
-    expect(result.minute).toBe('');
-    expect(result.second).toBe('');
+    expect(start.hour).toBe('');
+    expect(start.minute).toBe('');
+    expect(start.second).toBe('');
   });
 
   it('returns empty defaults when filter value is empty', () => {
     const filter = makeFilter({ value: '' });
-    const result = getInitialStart(filter, 'UTC');
+    const { start } = getInitialDateTimes(filter, 'UTC');
 
-    expect(result.hour).toBe('');
-    expect(result.minute).toBe('');
-    expect(result.second).toBe('');
+    expect(start.hour).toBe('');
+    expect(start.minute).toBe('');
+    expect(start.second).toBe('');
   });
 
   it('parses a single datetime value', () => {
@@ -78,11 +77,11 @@ describe('getInitialStart', () => {
       conditional: '>=',
       customDate: false,
     });
-    const result = getInitialStart(filter, 'UTC');
+    const { start } = getInitialDateTimes(filter, 'UTC');
 
-    expect(result.hour).toBe('9');
-    expect(result.minute).toBe('15');
-    expect(result.second).toBe('0');
+    expect(start.hour).toBe('9');
+    expect(start.minute).toBe('15');
+    expect(start.second).toBe('0');
   });
 
   it('parses the start date from a BETWEEN value', () => {
@@ -92,11 +91,11 @@ describe('getInitialStart', () => {
       conditional: 'BETWEEN',
       customDate: true,
     });
-    const result = getInitialStart(filter, 'UTC');
+    const { start } = getInitialDateTimes(filter, 'UTC');
 
-    expect(result.hour).toBe('9');
-    expect(result.minute).toBe('0');
-    expect(result.second).toBe('0');
+    expect(start.hour).toBe('9');
+    expect(start.minute).toBe('0');
+    expect(start.second).toBe('0');
   });
 
   it('applies timezone conversion for single datetime', () => {
@@ -105,35 +104,35 @@ describe('getInitialStart', () => {
       conditional: '>=',
       customDate: false,
     });
-    const result = getInitialStart(filter, 'America/Chicago');
+    const { start } = getInitialDateTimes(filter, 'America/Chicago');
 
-    expect(result.hour).toBe('9');
-    expect(result.minute).toBe('0');
-    expect(result.second).toBe('0');
+    expect(start.hour).toBe('9');
+    expect(start.minute).toBe('0');
+    expect(start.second).toBe('0');
   });
 });
 
-describe('getInitialEnd', () => {
+describe('getInitialDateTimes - end', () => {
   it('returns empty defaults for a non-BETWEEN filter', () => {
     const filter = makeFilter({
       value: '2026-03-05T09:15:00.000Z',
       conditional: '>=',
       customDate: false,
     });
-    const result = getInitialEnd(filter, 'UTC');
+    const { end } = getInitialDateTimes(filter, 'UTC');
 
-    expect(result.hour).toBe('');
-    expect(result.minute).toBe('');
-    expect(result.second).toBe('');
+    expect(end.hour).toBe('');
+    expect(end.minute).toBe('');
+    expect(end.second).toBe('');
   });
 
   it('returns empty defaults for a non-datetime filter', () => {
     const filter = makeFilter({ type: 'Keyword', attribute: 'WorkflowId' });
-    const result = getInitialEnd(filter, 'UTC');
+    const { end } = getInitialDateTimes(filter, 'UTC');
 
-    expect(result.hour).toBe('');
-    expect(result.minute).toBe('');
-    expect(result.second).toBe('');
+    expect(end.hour).toBe('');
+    expect(end.minute).toBe('');
+    expect(end.second).toBe('');
   });
 
   it('parses the end date from a BETWEEN value', () => {
@@ -143,11 +142,11 @@ describe('getInitialEnd', () => {
       conditional: 'BETWEEN',
       customDate: true,
     });
-    const result = getInitialEnd(filter, 'UTC');
+    const { end } = getInitialDateTimes(filter, 'UTC');
 
-    expect(result.hour).toBe('17');
-    expect(result.minute).toBe('30');
-    expect(result.second).toBe('45');
+    expect(end.hour).toBe('17');
+    expect(end.minute).toBe('30');
+    expect(end.second).toBe('45');
   });
 
   it('applies timezone conversion for BETWEEN end date', () => {
@@ -157,10 +156,10 @@ describe('getInitialEnd', () => {
       conditional: 'BETWEEN',
       customDate: true,
     });
-    const result = getInitialEnd(filter, 'America/Chicago');
+    const { end } = getInitialDateTimes(filter, 'America/Chicago');
 
-    expect(result.hour).toBe('12');
-    expect(result.minute).toBe('0');
-    expect(result.second).toBe('0');
+    expect(end.hour).toBe('12');
+    expect(end.minute).toBe('0');
+    expect(end.second).toBe('0');
   });
 });

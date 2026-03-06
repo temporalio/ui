@@ -32,35 +32,33 @@ export function parseDateTimeFilter(
   };
 }
 
-export function getInitialStart(
-  filter: SearchAttributeFilter,
-  timezone: string,
-): DateTimeComponents {
-  if (isDateTimeFilter(filter) && filter.value) {
-    if (filter.customDate && filter.value.includes('BETWEEN')) {
-      const matches = filter.value.match(/"([^"]+)"/g);
-      if (matches?.[0])
-        return parseDateTimeFilter(matches[0].replace(/"/g, ''), timezone);
-    } else if (!filter.customDate) {
-      return parseDateTimeFilter(filter.value, timezone);
-    }
+function parseBetweenDates(value: string): [string, string] | null {
+  const matches = value.match(/"([^"]+)"/g);
+  if (matches?.[0] && matches?.[1]) {
+    return [matches[0].replace(/"/g, ''), matches[1].replace(/"/g, '')];
   }
-  return emptyDateTime();
+  return null;
 }
 
-export function getInitialEnd(
+export function getInitialDateTimes(
   filter: SearchAttributeFilter,
   timezone: string,
-): DateTimeComponents {
-  if (
-    isDateTimeFilter(filter) &&
-    filter.value &&
-    filter.customDate &&
-    filter.value.includes('BETWEEN')
-  ) {
-    const matches = filter.value.match(/"([^"]+)"/g);
-    if (matches?.[1])
-      return parseDateTimeFilter(matches[1].replace(/"/g, ''), timezone);
+): { start: DateTimeComponents; end: DateTimeComponents } {
+  if (isDateTimeFilter(filter) && filter.value) {
+    if (filter.customDate && filter.value.includes('BETWEEN')) {
+      const dates = parseBetweenDates(filter.value);
+      if (dates) {
+        return {
+          start: parseDateTimeFilter(dates[0], timezone),
+          end: parseDateTimeFilter(dates[1], timezone),
+        };
+      }
+    } else if (!filter.customDate) {
+      return {
+        start: parseDateTimeFilter(filter.value, timezone),
+        end: emptyDateTime(),
+      };
+    }
   }
-  return emptyDateTime();
+  return { start: emptyDateTime(), end: emptyDateTime() };
 }
