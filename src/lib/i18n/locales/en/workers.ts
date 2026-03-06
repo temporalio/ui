@@ -64,4 +64,8 @@ export const Strings = {
   'rate-limit': 'Rate limit',
   'troubleshooting-workers-link': 'Troubleshooting workers',
   poller: 'Poller',
+  'go-dependency-warning': 'Potential missing dependency',
+  'go-dependency-warning-description':
+    'This worker is not showing any usage. You may need to enable a dependency for the Go SDK in order to see this data.',
+  'go-dependency-warning-link': 'Learn more.',
 } as const;

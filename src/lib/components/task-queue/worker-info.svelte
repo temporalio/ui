@@ -11,10 +11,12 @@
   import Timestamp from '$lib/components/timestamp.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type {
     WorkerInfo,
@@ -39,6 +41,13 @@
   const totalStickyCacheMiss = $derived(heartbeat?.totalStickyCacheMiss ?? 0);
   const currentStickyCacheSize = $derived(
     heartbeat?.currentStickyCacheSize ?? 0,
+  );
+  const isGoSdk = $derived(heartbeat?.sdkName?.startsWith('temporal-go'));
+  const goDependencyPotentiallyMissing = $derived(
+    isGoSdk
+      ? !heartbeat?.hostInfo?.currentHostCpuUsage &&
+          !heartbeat?.hostInfo?.currentHostMemUsage
+      : false,
   );
 
   const cacheHitRate = $derived.by(() => {
@@ -220,6 +229,64 @@
   </Card>
 {/snippet}
 
+{#snippet goDependencyWarning()}
+  <Alert
+    class="max-w-96"
+    intent="warning"
+    title={translate('workers.go-dependency-warning')}
+  >
+    <p class="mb-1">{translate('workers.go-dependency-warning-description')}</p>
+    <!-- TODO: Add link when documentation is available -->
+    <!-- <Link icon="external-link" href="" newTab
+      >{translate('workers.go-dependency-warning-link')}</Link
+    > -->
+  </Alert>
+{/snippet}
+
+{#snippet hostUsage()}
+  <Card class="flex flex-col gap-2 border-t-0">
+    <div>
+      <div class="mb-1 flex items-center justify-between text-sm">
+        <span class="flex items-center gap-1 font-semibold">
+          <Icon name="microchip" class="h-3 w-3 text-secondary" />
+          {translate('workers.cpu-usage')}
+        </span>
+        <span>{heartbeat?.hostInfo?.currentHostCpuUsage.toFixed(0)}%</span>
+      </div>
+      <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
+        <div
+          class="absolute left-0 flex h-full items-center bg-indigo-600"
+          style="width:{Math.min(
+            heartbeat?.hostInfo?.currentHostCpuUsage,
+            100,
+          )}%;"
+        ></div>
+      </div>
+    </div>
+    <div>
+      <div class="mb-1 flex items-center justify-between text-sm">
+        <span class="flex items-center gap-1 font-semibold">
+          <Icon name="server" class="h-3 w-3 text-secondary" />
+          {translate('workers.memory-usage')}
+        </span>
+        <span>{heartbeat?.hostInfo?.currentHostMemUsage.toFixed(0)}%</span>
+      </div>
+      <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
+        <div
+          class="absolute left-0 flex h-full items-center bg-indigo-600"
+          style="width:{Math.min(
+            heartbeat?.hostInfo?.currentHostMemUsage,
+            100,
+          )}%;"
+        ></div>
+      </div>
+    </div>
+    {#if goDependencyPotentiallyMissing}
+      {@render goDependencyWarning()}
+    {/if}
+  </Card>
+{/snippet}
+
 {#snippet hostInfo()}
   <div>
     <Card>
@@ -239,44 +306,7 @@
         <dd class="select-all">{heartbeat?.hostInfo?.workerGroupingKey}</dd>
       </dl>
     </Card>
-    <Card class="flex flex-col gap-2 border-t-0">
-      <div>
-        <div class="mb-1 flex items-center justify-between text-sm">
-          <span class="flex items-center gap-1 font-semibold">
-            <Icon name="microchip" class="h-3 w-3 text-secondary" />
-            {translate('workers.cpu-usage')}
-          </span>
-          <span>{heartbeat?.hostInfo?.currentHostCpuUsage.toFixed(0)}%</span>
-        </div>
-        <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
-          <div
-            class="absolute left-0 flex h-full items-center bg-indigo-600"
-            style="width:{Math.min(
-              heartbeat?.hostInfo?.currentHostCpuUsage,
-              100,
-            )}%;"
-          ></div>
-        </div>
-      </div>
-      <div>
-        <div class="mb-1 flex items-center justify-between text-sm">
-          <span class="flex items-center gap-1 font-semibold">
-            <Icon name="server" class="h-3 w-3 text-secondary" />
-            {translate('workers.memory-usage')}
-          </span>
-          <span>{heartbeat?.hostInfo?.currentHostMemUsage.toFixed(0)}%</span>
-        </div>
-        <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
-          <div
-            class="absolute left-0 flex h-full items-center bg-indigo-600"
-            style="width:{Math.min(
-              heartbeat?.hostInfo?.currentHostMemUsage,
-              100,
-            )}%;"
-          ></div>
-        </div>
-      </div>
-    </Card>
+    {@render hostUsage()}
   </div>
 {/snippet}
 
