@@ -71,9 +71,9 @@
   const open = writable(false);
   let localFilter = $state({ ...filter });
 
-  const timezone = getTimezone($timeFormat ?? 'UTC');
-  const initialStart = getInitialStart(filter, timezone);
-  const initialEnd = getInitialEnd(filter, timezone);
+  const timezone = $derived(getTimezone($timeFormat ?? 'UTC'));
+  const initialStart = $derived(getInitialStart(filter, timezone));
+  const initialEnd = $derived(getInitialEnd(filter, timezone));
 
   let localStartDate = $state(initialStart.date);
   let localStartHour = $state(initialStart.hour);
