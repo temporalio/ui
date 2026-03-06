@@ -1,24 +1,29 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import DetailListColumn from '$lib/components/detail-list/detail-list-column.svelte';
+  import DetailListLabel from '$lib/components/detail-list/detail-list-label.svelte';
+  import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
+  import DetailListTextValue from '$lib/components/detail-list/detail-list-text-value.svelte';
+  import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
+  import DetailList from '$lib/components/detail-list/detail-list.svelte';
+  import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
+  import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type {
     WorkerInfo,
     WorkerPollerInfo,
     WorkerSlotsInfo,
   } from '$lib/types';
-  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
-
-  import SdkLogo from '../lines-and-dots/sdk-logo.svelte';
-  import WorkerStatus from '../workers/worker-status.svelte';
 
   type Props = {
     worker: WorkerInfo;
@@ -44,58 +49,68 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="flex flex-col gap-2">
-    <div class="flex items-center gap-3">
-      <WorkerStatus {status} />
-      <h2 class="text-lg font-semibold">{heartbeat?.workerIdentity}</h2>
-    </div>
+  <div
+    class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
+  >
+    <WorkerStatus {status} />
+    <h1
+      data-testid="worker-instance-key"
+      class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+    >
+      <Copyable
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={heartbeat?.workerInstanceKey}
+        clickAllToCopy
+        container-class="w-full"
+        class="overflow-hidden text-ellipsis text-left"
+      />
+    </h1>
+  </div>
 
-    <div class="flex flex-wrap gap-x-8 gap-y-2 text-sm">
-      <div class="flex flex-col">
-        <span class="text-secondary">{translate('common.task-queue')}</span>
-        <Link
-          href={routeForTaskQueue({
-            namespace,
-            queue: heartbeat?.taskQueue,
-          })}
-        >
-          {heartbeat?.taskQueue}
-        </Link>
-      </div>
-      <div class="flex flex-col">
-        <span class="text-secondary">{translate('common.start')}</span>
-        <Timestamp
-          dateTime={heartbeat?.startTime}
-          as="span"
-          class="font-mono text-xs"
-        />
-      </div>
-      <div class="flex flex-col">
-        <span class="text-secondary"
-          >{translate('workflows.last-heartbeat')}</span
-        >
-        <div>
-          <Timestamp
-            dateTime={heartbeat?.heartbeatTime}
-            as="span"
-            class="font-mono text-xs"
-          />
-          <span class="ml-1 text-information">
-            {formatDurationAbbreviated(
-              String(heartbeat?.elapsedSinceLastHeartbeat),
-            )} ago
-          </span>
-        </div>
-      </div>
-      <div class="flex flex-col">
-        <span class="text-secondary">{translate('workers.sdk')}</span>
+  <DetailList aria-label="worker details" rowCount={1}>
+    <DetailListColumn>
+      <DetailListLabel>{translate('workflows.last-heartbeat')}</DetailListLabel>
+      <DetailListTextValue
+        text={heartbeat?.heartbeatTime
+          ? $timestamp(heartbeat?.heartbeatTime)
+          : '-'}
+        tooltipText={$timestamp(heartbeat?.heartbeatTime, {
+          relative: true,
+        })}
+      />
+    </DetailListColumn>
+    <DetailListColumn>
+      <DetailListLabel>{translate('common.start')}</DetailListLabel>
+      <DetailListTextValue
+        text={heartbeat?.startTime ? $timestamp(heartbeat?.startTime) : '-'}
+        tooltipText={$timestamp(heartbeat?.startTime, {
+          relative: true,
+        })}
+      />
+    </DetailListColumn>
+
+    <DetailListColumn>
+      <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
+      <DetailListLinkValue
+        copyable
+        text={heartbeat?.taskQueue}
+        href={routeForTaskQueue({
+          namespace,
+          queue: heartbeat?.taskQueue,
+        })}
+      />
+    </DetailListColumn>
+    <DetailListColumn>
+      <DetailListLabel>{translate('workers.sdk')}</DetailListLabel>
+      <DetailListValue>
         <SdkLogo
           sdk={formatSDKName(heartbeat?.sdkName)}
           version={heartbeat?.sdkVersion}
         />
-      </div>
-    </div>
-  </div>
+      </DetailListValue>
+    </DetailListColumn>
+  </DetailList>
 
   <div class="flex flex-col gap-4 lg:flex-row">
     <div class="flex flex-1 flex-col gap-4">
@@ -123,7 +138,6 @@
 
     <div class="flex w-full flex-col gap-4 lg:w-fit">
       {@render hostInfo()}
-      {@render hostUsage()}
       {@render workflowCache()}
       {@render diagnostics()}
     </div>
@@ -143,12 +157,14 @@
 
     <div class="flex flex-wrap gap-x-32 gap-y-4">
       <div>
-        <div class="text-sm text-secondary">{translate('workers.slots')}</div>
-        <div class="flex items-baseline gap-4">
-          <p class="font-mono text-3xl font-semibold text-blue-500">
+        <div class="flex h-6 items-center text-sm text-secondary">
+          {translate('workers.slots')}
+        </div>
+        <div class="flex items-baseline gap-12">
+          <p class="font-mono text-2xl font-semibold text-brand">
             {slots.currentUsedSlots ?? 0}
           </p>
-          <p class="font-mono text-3xl font-semibold">
+          <p class="font-mono text-2xl font-semibold">
             {#if slots.currentAvailableSlots}
               {slots.currentAvailableSlots - slots.currentUsedSlots || 0}
             {:else}
@@ -156,7 +172,7 @@
             {/if}
           </p>
         </div>
-        <div class="flex gap-2 text-xs text-secondary">
+        <div class="flex gap-8 text-xs text-secondary">
           <p>{translate('workers.used')}</p>
           <p>
             {#if slots.currentAvailableSlots}
@@ -171,23 +187,23 @@
       </div>
 
       <div>
-        <div class="text-sm text-secondary">
+        <div class="flex h-6 items-center text-sm text-secondary">
           {translate('workers.tasks-processed')}
         </div>
-        <span class="font-mono text-3xl font-semibold">
+        <span class="font-mono text-2xl font-semibold">
           {(slots.totalProcessedTasks ?? 0).toLocaleString()}
         </span>
       </div>
 
       {#if poller}
         <div>
-          <div class="flex items-center gap-2 text-sm text-secondary">
-            Poller
+          <div class="flex h-6 items-center gap-2 text-sm text-secondary">
+            {translate('workers.poller')}
             <Badge type="ghost" class="text-xs">
               {poller.isAutoscaling ? 'Autoscaling' : 'Manual'}
             </Badge>
           </div>
-          <span class="font-mono text-3xl font-semibold">
+          <span class="font-mono text-2xl font-semibold">
             {poller.currentPollers ?? 0}
           </span>
           <div class="text-xs text-secondary">
@@ -205,86 +221,68 @@
 {/snippet}
 
 {#snippet hostInfo()}
-  <Card>
-    <h3 class="mb-3 text-base font-medium">{translate('workers.host-info')}</h3>
-    <div class="flex flex-col gap-2 text-sm">
-      <div class="flex items-start justify-between gap-2">
-        <span class="text-secondary">{translate('workers.host-name')}</span>
-        <span class="break-all text-right font-mono text-xs">
-          {heartbeat?.hostInfo?.hostName}
-        </span>
-      </div>
-      <div class="flex items-center justify-between gap-2">
-        <span class="text-secondary">{translate('workers.process-id')}</span>
-        <span class="font-mono text-xs">{heartbeat?.hostInfo?.processId}</span>
-      </div>
-      <div class="flex items-center justify-between gap-2">
-        <span class="text-secondary">{translate('workers.instance')}</span>
-        <span class="break-all text-right font-mono text-xs">
-          {heartbeat?.workerInstanceKey}
-        </span>
-      </div>
-      <div class="flex items-center justify-between gap-2">
-        <span class="text-secondary"
-          >{translate('workers.worker-grouping')}</span
-        >
-        <span class="break-all text-right font-mono text-xs">
-          {heartbeat?.hostInfo?.workerGroupingKey}
-        </span>
-      </div>
-    </div>
-  </Card>
-{/snippet}
+  <div>
+    <Card>
+      <h3 class="mb-4 text-base font-medium">
+        {translate('workers.host-info')}
+      </h3>
+      <dl>
+        <dt class="text-secondary">{translate('workers.host-name')}</dt>
+        <dd class="select-all">{heartbeat?.hostInfo?.hostName}</dd>
 
-{#snippet hostUsage()}
-  <Card>
-    <div class="mb-3 flex items-center justify-between">
-      <h3 class="text-base font-medium">{translate('workers.host-usage')}</h3>
-    </div>
-    <div class="flex flex-col gap-3">
+        <dt class="mt-2 text-secondary">{translate('workers.process-id')}</dt>
+        <dd class="select-all">{heartbeat?.hostInfo?.processId}</dd>
+
+        <dt class="mt-2 text-secondary">
+          {translate('workers.worker-grouping')}
+        </dt>
+        <dd class="select-all">{heartbeat?.hostInfo?.workerGroupingKey}</dd>
+      </dl>
+    </Card>
+    <Card class="flex flex-col gap-2 border-t-0">
       <div>
         <div class="mb-1 flex items-center justify-between text-sm">
-          <span class="flex items-center gap-1">
-            <Icon name="usage" class="h-3 w-3 text-secondary" />
+          <span class="flex items-center gap-1 font-semibold">
+            <Icon name="microchip" class="h-3 w-3 text-secondary" />
             {translate('workers.cpu-usage')}
           </span>
           <span>{heartbeat?.hostInfo?.currentHostCpuUsage.toFixed(0)}%</span>
         </div>
-        <div class="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-900">
+        <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
           <div
-            class="h-2 min-w-2 rounded-full bg-blue-500"
-            style="width: {Math.min(
+            class="absolute left-0 flex h-full items-center bg-indigo-600"
+            style="width:{Math.min(
               heartbeat?.hostInfo?.currentHostCpuUsage,
               100,
-            )}%"
+            )}%;"
           ></div>
         </div>
       </div>
       <div>
         <div class="mb-1 flex items-center justify-between text-sm">
-          <span class="flex items-center gap-1">
+          <span class="flex items-center gap-1 font-semibold">
             <Icon name="server" class="h-3 w-3 text-secondary" />
             {translate('workers.memory-usage')}
           </span>
           <span>{heartbeat?.hostInfo?.currentHostMemUsage.toFixed(0)}%</span>
         </div>
-        <div class="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-900">
+        <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
           <div
-            class="h-2 min-w-2 rounded-full bg-blue-500"
-            style="width: {Math.min(
+            class="absolute left-0 flex h-full items-center bg-indigo-600"
+            style="width:{Math.min(
               heartbeat?.hostInfo?.currentHostMemUsage,
               100,
-            )}%"
+            )}%;"
           ></div>
         </div>
       </div>
-    </div>
-  </Card>
+    </Card>
+  </div>
 {/snippet}
 
 {#snippet workflowCache()}
   <Card>
-    <h3 class="mb-3 text-base font-medium">
+    <h3 class="mb-4 text-base font-medium">
       {translate('workers.workflow-cache')}
     </h3>
     <div class="grid grid-cols-2 gap-4">
@@ -292,7 +290,7 @@
         <span class="font-mono text-2xl font-semibold">
           {currentStickyCacheSize.toLocaleString()}
         </span>
-        <div class="text-xs text-secondary">
+        <div class="text-sm text-secondary">
           {translate('workers.cache-size')}
         </div>
       </div>
@@ -300,16 +298,14 @@
         <span class="font-mono text-2xl font-semibold">
           {cacheHitRate}%
         </span>
-        <div class="text-xs text-secondary">
+        <div class="text-sm text-secondary">
           {translate('workers.cache-hits')}
         </div>
       </div>
     </div>
     <div class="mt-3">
-      <span class="font-mono text-2xl font-semibold">
-        {totalStickyCacheHit.toLocaleString()}
-      </span>
-      <div class="text-xs text-secondary">
+      <span class="font-mono text-2xl font-semibold"> - </span>
+      <div class="text-sm text-secondary">
         {translate('workers.active-thread-count')}
       </div>
     </div>
@@ -318,23 +314,19 @@
 
 {#snippet diagnostics()}
   <Card>
-    <h3 class="mb-3 text-base font-medium">
+    <h3 class="mb-4 text-base font-medium">
       {translate('workers.diagnostics')}
     </h3>
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <span class="font-mono text-2xl font-semibold">
-          {cacheHitRate}%
-        </span>
-        <div class="text-xs text-secondary">
+        <span class="font-mono text-2xl"> - % </span>
+        <div class="text-sm text-secondary">
           {translate('workers.poll-success-rate')}
         </div>
       </div>
       <div>
-        <span class="font-mono text-2xl font-semibold"
-          >{translate('common.none')}</span
-        >
-        <div class="text-xs text-secondary">
+        <span class="font-mono text-2xl">{translate('common.none')}</span>
+        <div class="text-sm text-secondary">
           {translate('workers.rate-limit')}
         </div>
       </div>

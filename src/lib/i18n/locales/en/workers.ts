@@ -45,7 +45,7 @@ export const Strings = {
   'local-activities': 'Local Activities',
   slots: 'Slots',
   used: 'Used',
-  'available-out-of': 'Available out of {count}',
+  'available-out-of': 'Available out of {{count}}',
   'none-available': 'None Available',
   'tasks-processed': 'Tasks Processed',
   'last-poll': 'Last Poll',
@@ -53,7 +53,6 @@ export const Strings = {
   'host-info': 'Host Info',
   'process-id': 'Process ID',
   'worker-grouping': 'Worker Grouping',
-  'host-usage': 'Host Usage',
   'cpu-usage': 'CPU Usage',
   'memory-usage': 'Memory Usage',
   'workflow-cache': 'Workflow Cache',
@@ -64,4 +63,5 @@ export const Strings = {
   'poll-success-rate': 'Poll success rate',
   'rate-limit': 'Rate limit',
   'troubleshooting-workers-link': 'Troubleshooting workers',
+  poller: 'Poller',
 } as const;

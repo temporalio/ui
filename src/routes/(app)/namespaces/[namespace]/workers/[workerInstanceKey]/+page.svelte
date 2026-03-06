@@ -10,7 +10,7 @@
   import { routeForWorkers } from '$lib/utilities/route-for';
 
   const namespace = $derived(page.params.namespace);
-  const workerInstanceKey = $derived(page.params.instance);
+  const workerInstanceKey = $derived(page.params.workerInstanceKey);
 </script>
 
 <PageTitle

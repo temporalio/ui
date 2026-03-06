@@ -83,6 +83,7 @@ import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import marker from './svg/marker.svelte';
 import merge from './svg/merge.svelte';
+import microchip from './svg/microchip.svelte';
 import microsoft from './svg/microsoft.svelte';
 import minimize from './svg/minimize.svelte';
 import moon from './svg/moon.svelte';
@@ -227,6 +228,7 @@ export const icons = {
   logout,
   marker,
   merge,
+  microchip,
   microsoft,
   minimize,
   moon,
