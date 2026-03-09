@@ -34,7 +34,7 @@
   });
 
   const isDisabled = (v: string) => {
-    return !!attributes.find((a) => a.label === v);
+    return label !== v && !!attributes.find((a) => a.label === v);
   };
 
   const getType = (attr: string) => $customSearchAttributes[attr];
