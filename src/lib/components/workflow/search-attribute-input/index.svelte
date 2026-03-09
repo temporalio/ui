@@ -79,6 +79,7 @@
     <Button
       variant="ghost"
       leadingIcon="close"
+      data-testid="search-attribute-close-button"
       class="mt-6 w-10 rounded-full sm:hidden"
       on:click={() => onRemove(label)}
     />
