@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -40,7 +40,9 @@
       };
 
       await updateNexusEndpoint(endpoint.id, body);
-      await goto(routeForNexusEndpoint(endpoint.id), { invalidateAll: true });
+      await goto(routeForNexusEndpoint(endpoint.id), {
+        invalidateAll: true,
+      });
     } catch (e: unknown) {
       console.error('Error updating endpoint', e);
       throw e;
@@ -72,12 +74,12 @@
 </script>
 
 <PageTitle
-  title={`Edit ${translate('nexus.nexus-endpoint', { id: $page.params.id })}`}
-  url={$page.url.href}
+  title={`Edit ${translate('nexus.nexus-endpoint', { id: page.params.id })}`}
+  url={page.url.href}
 />
 {#if endpoint}
   <div class="flex flex-col gap-4">
-    <Link href={routeForNexusEndpoint($page.params.id)} icon="chevron-left">
+    <Link href={routeForNexusEndpoint(page.params.id)} icon="chevron-left">
       {translate('nexus.back-to-endpoint')}
     </Link>
     <NexusEditEndpoint
@@ -86,7 +88,7 @@
       {onUpdate}
       {onDelete}
       {loading}
-      cancelHref={routeForNexusEndpoint($page.params.id)}
+      cancelHref={routeForNexusEndpoint(page.params.id)}
     />
   </div>
 {/if}

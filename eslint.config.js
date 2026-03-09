@@ -22,6 +22,7 @@ const sharedPlugins = {
 };
 
 const sharedRules = {
+  'svelte/no-navigation-without-resolve': 'off',
   'no-undef': 'off',
   quotes: ['error', 'single', { avoidEscape: true }],
   '@typescript-eslint/no-unused-vars': [
@@ -126,7 +127,6 @@ export default [
     rules: {
       ...sharedRules,
       'svelte/require-each-key': 'warn',
-      'svelte/no-navigation-without-resolve': 'warn',
       'svelte/no-reactive-reassign': 'warn',
       'svelte/no-reactive-functions': 'warn',
       'svelte/no-reactive-literals': 'warn',
