@@ -48,6 +48,18 @@
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
   let refreshInterval: ReturnType<typeof setTimeout>;
 
+  const allStatusGroups = $derived(
+    newStatusGroups.length > statusGroups.length
+      ? [
+          ...statusGroups,
+          // Add any statuses that don't exist in the current groups but have a new count
+          ...newStatusGroups
+            .filter((g) => !statusGroups.some((s) => s.status === g.status))
+            .map((g) => ({ status: g.status, count: 0 })),
+        ]
+      : statusGroups,
+  );
+
   let attempt = $state(1);
   let loading = $state(false);
 
@@ -170,7 +182,7 @@
 </script>
 
 <div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
-  {#each statusGroups as { count, status } (status)}
+  {#each allStatusGroups as { count, status } (status)}
     {#if !loading}
       <button onclick={() => onStatusClick(status)}>
         <WorkflowCountStatus
