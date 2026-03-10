@@ -33,6 +33,8 @@
 
   $effect(() => {
     const v = value;
+    // effect should only re-run when the local value state changes
+    // changes to attribute should not re-trigger the effect
     untrack(() => {
       attribute.value = v;
     });
