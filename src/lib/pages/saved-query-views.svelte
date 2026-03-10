@@ -9,6 +9,7 @@
 
   import EditViewModal from '$lib/components/workflow/filter-bar/edit-view-modal.svelte';
   import SaveViewModal from '$lib/components/workflow/filter-bar/save-view-modal.svelte';
+  import TaskFailuresCountRefresh from '$lib/components/workflow/task-failures-count-refresh.svelte';
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -502,6 +503,19 @@
             >Share</span
           ></Button
         >
+      </div>
+    {:else if activeQueryView?.id === view.id && view.id === TASK_FAILURES_VIEW.id && view.count > 0}
+      <div
+        in:slide
+        class={merge(
+          'flex flex-col items-center gap-1 pt-0.5 transition-all',
+          $savedQueryNavOpen && 'lg:flex-row',
+        )}
+      >
+        <TaskFailuresCountRefresh
+          count={taskFailureCount}
+          expanded={$savedQueryNavOpen}
+        />
       </div>
     {:else if unsavedQuery && view.id === 'unsaved'}
       <div
