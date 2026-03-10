@@ -14,7 +14,6 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchWorkflowTaskFailures } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -27,7 +26,7 @@
     TASK_FAILURES_VIEW,
   } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import { refresh } from '$lib/stores/workflows';
+  import { taskFailuresCount } from '$lib/stores/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -71,18 +70,8 @@
     active: true,
   });
   const unsavedQuery = $derived(query && activeQueryView?.id === 'unsaved');
-  let taskFailureCount = $state(0);
-
-  const setTaskFailureCount = () =>
-    fetchWorkflowTaskFailures(namespace).then(
-      (count) => (taskFailureCount = count),
-    );
 
   onMount(() => {
-    const interval = setInterval(() => {
-      if (hasTaskFailureAttribute) setTaskFailureCount();
-    }, 60000);
-
     if (savedQueryParam) {
       const queryToSave = {
         name: savedQueryParam,
@@ -112,10 +101,6 @@
     } else if (query) {
       activeQueryView = unsaveView;
     }
-
-    return () => {
-      clearInterval(interval);
-    };
   });
 
   $effect(() => {
@@ -142,11 +127,6 @@
     }
   });
 
-  $effect(() => {
-    $refresh;
-    if (hasTaskFailureAttribute) setTaskFailureCount();
-  });
-
   const setActiveQueryView = (view: SavedQuery) => {
     if (view.id === activeQueryView?.id) return;
     activeQueryView = view;
@@ -155,8 +135,6 @@
     if (view.query) {
       $workflowFilters = toListWorkflowFilters(view.query, $searchAttributes);
     }
-
-    if (view.id === TASK_FAILURES_VIEW.id) setTaskFailureCount();
 
     updateQueryParameters({
       url: page.url,
@@ -311,13 +289,13 @@
   <div class="space-y-2 p-1.5">
     <div class="pb-2 text-center">
       <div class="space-y-1">
-        {#each systemWorkflowViews as view}
+        {#each systemWorkflowViews as view (view.id)}
           {#if view.id !== TASK_FAILURES_VIEW.id || hasTaskFailureAttribute}
             {@render queryButton({
               ...view,
               active: query === view.query,
               ...(view.id === TASK_FAILURES_VIEW.id && {
-                count: taskFailureCount,
+                count: $taskFailuresCount,
               }),
             })}
           {/if}
@@ -513,7 +491,7 @@
         )}
       >
         <TaskFailuresCountRefresh
-          count={taskFailureCount}
+          count={$taskFailuresCount}
           expanded={$savedQueryNavOpen}
         />
       </div>

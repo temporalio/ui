@@ -4,12 +4,16 @@
   import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
-  import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
+  import {
+    fetchWorkflowCountByExecutionStatus,
+    fetchWorkflowTaskFailures,
+  } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     disableWorkflowCountsRefresh,
     refresh,
+    taskFailuresCount,
     workflowCount,
   } from '$lib/stores/workflows';
   import {
@@ -27,8 +31,13 @@
   type Props = {
     staticQuery?: string;
     refreshTime?: Date;
+    fetchTaskFailures?: boolean;
   };
-  let { staticQuery = '', refreshTime = $bindable() }: Props = $props();
+  let {
+    staticQuery = '',
+    refreshTime = $bindable(),
+    fetchTaskFailures = false,
+  }: Props = $props();
 
   const queryParam = $derived(page.url.searchParams.get('query'));
   const namespace = $derived(page.params.namespace);
@@ -41,6 +50,11 @@
 
   let attempt = $state(1);
   let loading = $state(false);
+
+  const hasTaskFailureAttribute = $derived(
+    !!page.data.namespace?.namespaceInfo?.capabilities
+      ?.reportedProblemsSearchAttribute,
+  );
 
   const initialIntervalSeconds = 60;
   const maxAttempts = 20;
@@ -80,15 +94,27 @@
     attempt = 1;
   };
 
-  const fetchInitialCounts = async () => {
-    loading = true;
-    try {
-      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
+  const fetchCounts = async () => {
+    const [{ count, groups }] = await Promise.all([
+      fetchWorkflowCountByExecutionStatus({
         namespace,
         query,
       }).catch((_e) => {
         return { count: '0', groups: [] };
-      });
+      }),
+      fetchTaskFailures && hasTaskFailureAttribute
+        ? fetchWorkflowTaskFailures(namespace).then(
+            (count) => ($taskFailuresCount = count ?? 0),
+          )
+        : Promise.resolve(),
+    ]);
+    return { count, groups };
+  };
+
+  const fetchInitialCounts = async () => {
+    loading = true;
+    try {
+      const { count, groups } = await fetchCounts();
       $workflowCount.count = parseInt(count);
       statusGroups = getStatusAndCountOfGroup(groups);
     } finally {
@@ -99,12 +125,7 @@
 
   const fetchNewCounts = async () => {
     try {
-      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
-        namespace,
-        query,
-      }).catch((_e) => {
-        return { count: '0', groups: [] };
-      });
+      const { count, groups } = await fetchCounts();
       $workflowCount.newCount = parseInt(count) - $workflowCount.count;
       newStatusGroups = getStatusAndCountOfGroup(groups);
     } finally {
