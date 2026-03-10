@@ -1,7 +1,16 @@
 import type { Handle } from '@sveltejs/kit';
 
+const ONE_YEAR = 31536000; // 365 days in seconds
+
 export const handle: Handle = async ({ event, resolve }) => {
   const response = await resolve(event, {});
+
+  if (response.ok && event.url.pathname.startsWith('/_app/immutable/')) {
+    response.headers.set(
+      'Cache-Control',
+      `public, max-age=${ONE_YEAR}, immutable`,
+    );
+  }
 
   return response;
 };
