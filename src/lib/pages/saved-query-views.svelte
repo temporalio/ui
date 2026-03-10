@@ -531,7 +531,7 @@
     )}
     in:slide
   >
-    {content}
+    <span class="max-w-16 truncate">{content}</span>
     {#if icon}
       <span class={merge('rounded-full p-0.5', iconClass)}>
         <Icon name={icon} class="p-0.5" />
