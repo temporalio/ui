@@ -10,7 +10,7 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { activityFilters } from '$lib/stores/filters';
   import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import {
@@ -74,7 +74,7 @@
 
     if (index === $activeQueryIndex) {
       $activeQueryIndex = null;
-      $filter = emptyFilter();
+      $filter = createFilter();
     } else if (index < $activeQueryIndex) {
       $activeQueryIndex -= 1;
     }
@@ -89,7 +89,7 @@
 
 {#if visibleFilters.length > 0}
   <div class="flex flex-wrap items-center gap-2">
-    {#each visibleFilters as activityFilter, i (activityFilter.attribute + '-' + i)}
+    {#each visibleFilters as activityFilter, i (activityFilter.id)}
       {#if isStatusFilter(activityFilter) && i === firstExecutionStatusIndex}
         <StatusDropdownFilterChip
           filters={executionStatusFilters}

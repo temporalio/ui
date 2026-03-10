@@ -73,7 +73,7 @@ describe('toListWorkflowFilters', () => {
         value: 'Hello = world',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with prefix search', () => {
@@ -88,7 +88,7 @@ describe('toListWorkflowFilters', () => {
         value: 'hello',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with custom attributes that have spaces', () => {
@@ -114,7 +114,7 @@ describe('toListWorkflowFilters', () => {
         value: 'Hello world',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with an executionStatus', () => {
@@ -129,7 +129,7 @@ describe('toListWorkflowFilters', () => {
         value: 'Completed',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with multiple executionStatuses', () => {
@@ -163,7 +163,7 @@ describe('toListWorkflowFilters', () => {
         value: 'Completed',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a workflowId', () => {
@@ -178,7 +178,7 @@ describe('toListWorkflowFilters', () => {
         value: 'Hello world',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a workflowType', () => {
@@ -193,7 +193,7 @@ describe('toListWorkflowFilters', () => {
         value: 'World',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a workflowId and workflowType', () => {
@@ -216,7 +216,7 @@ describe('toListWorkflowFilters', () => {
         value: 'World',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a startTime', () => {
@@ -234,7 +234,7 @@ describe('toListWorkflowFilters', () => {
         value: '2022-04-18T17:45:18-06:00',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a closeTime', () => {
@@ -252,7 +252,7 @@ describe('toListWorkflowFilters', () => {
         value: '2022-04-18T17:45:18-06:00',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a Bool type', () => {
@@ -267,7 +267,7 @@ describe('toListWorkflowFilters', () => {
         value: 'true',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a KeywordList type', () => {
@@ -282,7 +282,7 @@ describe('toListWorkflowFilters', () => {
         value: '("Hello", "World")',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a KeywordList type and other types', () => {
@@ -348,7 +348,7 @@ describe('toListWorkflowFilters', () => {
         value: '("Hello", "World")',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query BETWEEN two times', () => {
@@ -368,7 +368,7 @@ describe('toListWorkflowFilters', () => {
         customDate: true,
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a workflowType and startTime', () => {
@@ -394,7 +394,7 @@ describe('toListWorkflowFilters', () => {
         value: '2022-04-18T17:45:18-06:00',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a workflowId and BETWEEN two times', () => {
@@ -425,7 +425,7 @@ describe('toListWorkflowFilters', () => {
         customDate: true,
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with a workflowType and startTime and execution status', () => {
@@ -459,7 +459,7 @@ describe('toListWorkflowFilters', () => {
         value: 'Canceled',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with multiple executionStatuses and workflowType and startTime', () => {
@@ -510,7 +510,7 @@ describe('toListWorkflowFilters', () => {
         value: '2022-04-18T17:45:18-06:00',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should not throw if given an invalid start time', () => {
@@ -582,7 +582,7 @@ describe('combineDropdownFilters', () => {
     ];
 
     const result = combineDropdownFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'WorkflowId',
         type: 'Keyword',
@@ -623,7 +623,7 @@ describe('combineDropdownFilters', () => {
     ];
 
     const result = combineDropdownFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'WorkflowType',
         type: 'Keyword',
@@ -672,7 +672,7 @@ describe('combineDropdownFilters', () => {
     ];
 
     const result = combineDropdownFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -745,7 +745,7 @@ describe('combineDropdownFilters', () => {
     ];
 
     const result = combineDropdownFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -804,7 +804,7 @@ describe('combineFilters', () => {
     ];
 
     const result = combineFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'WorkflowType',
         type: 'Keyword',
@@ -837,7 +837,7 @@ describe('combineFilters', () => {
     ];
 
     const result = combineFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -870,7 +870,7 @@ describe('combineFilters', () => {
     ];
 
     const result = combineFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'WorkflowType',
         type: 'Keyword',
@@ -903,7 +903,7 @@ describe('combineFilters', () => {
     ];
 
     const result = combineFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'WorkflowId',
         type: 'Keyword',
@@ -952,7 +952,7 @@ describe('combineFilters', () => {
     ];
 
     const result = combineFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -1025,7 +1025,7 @@ describe('combineFilters', () => {
     ];
 
     const result = combineFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -1098,7 +1098,7 @@ describe('combineFilters', () => {
     ];
 
     const result = combineFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -1147,7 +1147,7 @@ describe('combineFilters', () => {
     ];
 
     const result = combineFilters(filters);
-    expect(result).toEqual([
+    expect(result).toMatchObject([
       {
         attribute: 'ExecutionStatus',
         type: 'Keyword',
@@ -1179,7 +1179,7 @@ describe('combineFilters', () => {
         value: null,
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with IS NOT NULL', () => {
@@ -1194,7 +1194,7 @@ describe('combineFilters', () => {
         value: null,
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with IS NULL and IS NOT NULL', () => {
@@ -1220,7 +1220,7 @@ describe('combineFilters', () => {
         value: null,
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 
   it('should parse a query with "is" and "is not" as a value', () => {
@@ -1246,6 +1246,6 @@ describe('combineFilters', () => {
         value: 'is not',
       },
     ];
-    expect(result).toEqual(expectedFilters);
+    expect(result).toMatchObject(expectedFilters);
   });
 });

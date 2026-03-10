@@ -25,7 +25,10 @@
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { workflowFilters } from '$lib/stores/filters';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
   import { getLocalTime } from '$lib/utilities/timezone';
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
 
@@ -81,14 +84,12 @@
     } else if (value === 'Custom') {
       custom = true;
     } else {
-      const filter: SearchAttributeFilter = {
+      const filter: SearchAttributeFilter = createFilter({
         attribute: timeField,
         type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
         value,
         conditional: '>',
-        operator: '',
-        parenthesis: '',
-      };
+      });
       $workflowFilters = [...getOtherFilters(), filter];
       custom = false;
     }
@@ -155,15 +156,13 @@
         )}"`
       : `> "${formatISO(startDateWithTime)}"`;
 
-    const filter: SearchAttributeFilter = {
+    const filter: SearchAttributeFilter = createFilter({
       attribute: timeField,
       type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
       value: query,
       conditional: '=',
-      operator: '',
-      parenthesis: '',
       customDate: true,
-    };
+    });
     $workflowFilters = [...getOtherFilters(), filter];
 
     updateQueryParamsFromFilter($page.url, $workflowFilters, true);

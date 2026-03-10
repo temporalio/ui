@@ -8,7 +8,7 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import DropdownFilterChip from './dropdown-filter-chip.svelte';
@@ -39,6 +39,7 @@
     next[index] = updatedFilter;
     $workflowFilters = next;
     updateQueryParamsFromFilter(page.url, $workflowFilters);
+    $chipOpenIndex = null;
   }
 
   function updateStatusFilters(
@@ -71,7 +72,7 @@
 
     if (index === $activeQueryIndex) {
       $activeQueryIndex = null;
-      $filter = emptyFilter();
+      $filter = createFilter();
     } else if (index < $activeQueryIndex) {
       $activeQueryIndex -= 1;
     }
@@ -86,7 +87,7 @@
 
 {#if visibleFilters.length > 0}
   <div class="flex flex-wrap items-center gap-2">
-    {#each visibleFilters as workflowFilter, i (workflowFilter.attribute + '-' + i)}
+    {#each visibleFilters as workflowFilter, i (workflowFilter.id)}
       {#if isStatusFilter(workflowFilter) && i === firstExecutionStatusIndex}
         <StatusDropdownFilterChip
           filters={executionStatusFilters}

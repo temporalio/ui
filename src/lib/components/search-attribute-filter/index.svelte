@@ -42,7 +42,7 @@
   } from '$lib/utilities/query/search-attribute-filter';
   import {
     combineFilters,
-    emptyFilter,
+    createFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -75,7 +75,7 @@
     actions,
   }: Props = $props();
 
-  const filter = writable<SearchAttributeFilter>(emptyFilter());
+  const filter = writable<SearchAttributeFilter>(createFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
 
@@ -122,7 +122,7 @@
     } else {
       filters = [...filters, $filter];
     }
-    filter.set(emptyFilter());
+    filter.set(createFilter());
     onSearch();
   }
 
@@ -151,7 +151,7 @@
 
   function resetFilter() {
     activeQueryIndex.set(null);
-    filter.set(emptyFilter());
+    filter.set(createFilter());
   }
 
   function handleKeyUp(event: KeyboardEvent) {

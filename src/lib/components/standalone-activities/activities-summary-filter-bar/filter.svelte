@@ -20,12 +20,12 @@
 
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { activityFilters } from '$lib/stores/filters';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import ActivityDropdownFilterList from './dropdown-filter-list.svelte';
   import ActivitySearchAttributeMenu from './search-attribute-menu.svelte';
 
-  const filter = writable<SearchAttributeFilter>(emptyFilter());
+  const filter = writable<SearchAttributeFilter>(createFilter());
   const activeQueryIndex = writable<number | null>(null);
   const focusedElementId = writable<string>('');
   const chipOpenIndex = writable<number | null>(null);
@@ -52,12 +52,12 @@
       $activityFilters = [...$activityFilters, $filter];
       chipOpenIndex.set(newIndex);
     }
-    filter.set(emptyFilter());
+    filter.set(createFilter());
   }
 
   function resetFilter() {
     activeQueryIndex.set(null);
-    filter.set(emptyFilter());
+    filter.set(createFilter());
   }
 </script>
 
