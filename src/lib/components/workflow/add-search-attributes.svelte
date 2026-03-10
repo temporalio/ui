@@ -34,7 +34,7 @@
   };
 
   const searchAttributes = $derived(Object.keys($customSearchAttributes));
-  const attributes = $derived(attributesToAdd);
+  const attributes = $derived([...attributesToAdd]);
 
   const onRemove = (attribute: string) => {
     attributesToAdd = attributesToAdd.filter((a) => a.label !== attribute);
