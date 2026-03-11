@@ -22,7 +22,7 @@
   } from '$lib/types/workflows';
   import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
   import {
-    emptyFilter,
+    createFilter,
     updateQueryParamsFromFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
@@ -62,12 +62,13 @@
 
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
-    filter.set({
-      ...emptyFilter(),
-      attribute: value,
-      conditional: getDefaultConditional(type),
-      type,
-    });
+    filter.set(
+      createFilter({
+        attribute: value,
+        conditional: getDefaultConditional(type),
+        type,
+      }),
+    );
     handleSubmit();
     $open = false;
   }
@@ -86,7 +87,7 @@
     $workflowFilters = [];
     updateQueryParamsFromFilter(page.url, $workflowFilters, true);
     $activeQueryIndex = null;
-    $filter = emptyFilter();
+    $filter = createFilter();
   }
 </script>
 

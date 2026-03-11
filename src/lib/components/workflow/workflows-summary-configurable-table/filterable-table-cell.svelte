@@ -11,7 +11,10 @@
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   type Props = {
     attribute: string;
@@ -43,14 +46,12 @@
       $workflowFilters.filter((f) => f.attribute !== attribute);
 
     if (!filter || filter.value !== value) {
-      const newFilter: SearchAttributeFilter = {
+      const newFilter: SearchAttributeFilter = createFilter({
         attribute,
         type,
         value,
         conditional: '=',
-        operator: '',
-        parenthesis: '',
-      };
+      });
       $workflowFilters = [...getOtherFilters(), newFilter];
     } else {
       $workflowFilters = [...getOtherFilters()];

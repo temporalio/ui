@@ -14,7 +14,10 @@
     getActivityStatusAndCountOfGroup,
   } from '$lib/utilities/get-activity-status-and-count';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
-  import { combineFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    combineFilters,
+    createFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
   import { getExponentialBackoff } from '$lib/utilities/refresh-rate';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -48,14 +51,12 @@
     );
 
     if (!statusExists) {
-      const filter = {
+      const filter = createFilter({
         attribute: 'ExecutionStatus',
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
         value: status,
-        operator: '',
         conditional: '=',
-        parenthesis: '',
-      };
+      });
       $activityFilters = [...$activityFilters, filter];
       const searchQuery = toListWorkflowQueryFromFilters(
         combineFilters($activityFilters),

@@ -19,7 +19,7 @@
     type SearchAttributeType,
   } from '$lib/types/workflows';
   import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
@@ -41,7 +41,7 @@
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
     const conditional = type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST ? 'in' : '=';
-    filter.set({ ...emptyFilter(), attribute: value, conditional, type });
+    filter.set(createFilter({ attribute: value, conditional, type }));
     $focusedElementId = getFocusedElementId($filter);
   }
 

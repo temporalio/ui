@@ -13,7 +13,10 @@
   } from '$lib/models/workflow-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   let value = '';
   export let attribute: TextFilterAttributes;
@@ -26,14 +29,12 @@
   const onInput = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
     if (value) {
-      const filter: SearchAttributeFilter = {
+      const filter: SearchAttributeFilter = createFilter({
         attribute,
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
         value,
         conditional: '=',
-        operator: '',
-        parenthesis: '',
-      };
+      });
       $workflowFilters = [...getOtherFilters(), filter];
     } else {
       $workflowFilters = [...getOtherFilters()];

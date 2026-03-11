@@ -4,6 +4,7 @@ import type {
 } from '$lib/types/workflows';
 
 export type SearchAttributeFilter = {
+  id: string;
   attribute: Extract<keyof SearchAttributes, string>;
   type: SearchAttributeType;
   value: string;

@@ -8,6 +8,7 @@
   import Translate from '$lib/i18n/translate.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowStatusFilters } from '$lib/models/workflow-status';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   type Props = {
     filters: SearchAttributeFilter[];
@@ -38,26 +39,23 @@
 
     if (localFilters.length === 1 && localFilters[0].value === '') {
       localFilters = [
-        {
+        createFilter({
           attribute: 'ExecutionStatus',
-          operator: '',
-          parenthesis: '',
           type: 'Keyword',
           value: status,
           conditional: '=',
-        },
+        }),
       ];
     } else {
       localFilters = [
         ...localFilters,
-        {
+        createFilter({
           attribute: 'ExecutionStatus',
-          operator: '',
           parenthesis: localFilters.length ? ')' : '',
           type: 'Keyword',
           value: status,
           conditional: '=',
-        },
+        }),
       ];
     }
 
