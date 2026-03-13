@@ -31,6 +31,10 @@
   $: tableOffset = tableContainer?.offsetTop
     ? tableContainer.offsetTop + 32
     : 0;
+
+  export function scrollToTop() {
+    tableContainer?.scrollTo({ top: 0, behavior: 'instant' });
+  }
 </script>
 
 <div

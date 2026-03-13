@@ -20,7 +20,7 @@
 
   type Item = $$Generic;
 
-  export let id: string = null;
+  export let id: string | null = null;
   export let items: Item[];
   export let loading = false;
   export let updating = false;
@@ -34,6 +34,8 @@
 
   let className: ClassNameValue = '';
   export { className as class };
+
+  let paginatedTable: PaginatedTable<Item>;
 
   $: url = $page.url;
   $: perPageParam = url.searchParams.get(perPageKey) ?? pageSizeOptions[0];
@@ -86,6 +88,7 @@
       value: page,
       url,
     });
+    paginatedTable?.scrollToTop();
   };
 
   $: {
@@ -95,6 +98,7 @@
 </script>
 
 <PaginatedTable
+  bind:this={paginatedTable}
   {loading}
   {updating}
   {maxHeight}
