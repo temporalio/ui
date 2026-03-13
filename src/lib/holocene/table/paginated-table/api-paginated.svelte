@@ -25,15 +25,16 @@
 
   import PaginatedTable from './index.svelte';
 
+  type KeyboardHandler = ((event: KeyboardEvent) => void) | undefined;
   type T = $$Generic;
   type $$Props = HTMLAttributes<HTMLDivElement> & {
     id?: string;
     maxHeight?: string;
-    onError?: (error: Error | unknown) => void | undefined;
+    onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
-    onShiftUp?: (event: KeyboardEvent) => void | undefined;
-    onShiftDown?: (event: KeyboardEvent) => void | undefined;
-    onSpace?: (event: KeyboardEvent) => void | undefined;
+    onShiftUp?: KeyboardHandler;
+    onShiftDown?: KeyboardHandler;
+    onSpace?: KeyboardHandler;
     total?: string | number;
     pageSizeSelectLabel: string;
     emptyStateTitle?: string;
@@ -46,14 +47,13 @@
     pageSizeOptions?: string[];
   };
 
-  export let id: string = null;
+  export let id: string | null = null;
   export let maxHeight = '';
-  export let onError: (error: Error) => void | undefined = undefined;
+  export let onError: ((error: Error) => void) | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest<T>>;
-  export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
-  export let onShiftDown: (event: KeyboardEvent) => void | undefined =
-    undefined;
-  export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
+  export let onShiftUp: KeyboardHandler = undefined;
+  export let onShiftDown: KeyboardHandler = undefined;
+  export let onSpace: KeyboardHandler = undefined;
 
   export let total: string | number = '';
   export let pageSizeSelectLabel: string;
@@ -71,7 +71,7 @@
     pageSizeOptions,
     pageSizeOptions[0],
   );
-  let error: Error;
+  let error: Error | undefined;
   let paginatedTable: PaginatedTable<T>;
 
   function clearError() {
@@ -100,7 +100,7 @@
       const items = response[itemsKeyname] || [];
       store.nextPageWithItems(nextPageToken, items);
     } catch (err) {
-      error = err;
+      error = err as Error;
       if (onError) onError(error);
     }
   }
