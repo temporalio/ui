@@ -94,7 +94,6 @@ export const createTemporalServer = async ({
     { flag: 'frontend.workerVersioningDataAPIs', value: 'true' },
     { flag: 'frontend.workerVersioningWorkflowAPIs', value: 'true' },
     { flag: 'worker.buildIdScavengerEnabled', value: 'true' },
-    { flag: 'system.enableNexus', value: 'true' },
   ].forEach(({ flag, value }) => {
     flags.push('--dynamic-config-value');
     flags.push(`${flag}=${value}`);
