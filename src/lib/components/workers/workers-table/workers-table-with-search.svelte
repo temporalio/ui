@@ -15,6 +15,6 @@
   const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));
 </script>
 
-{#key query}
+{#key [namespace, query]}
   <WorkersTable {namespace} {onFetch} filterable />
 {/key}

@@ -158,9 +158,9 @@
       },
       {
         href: workersRoute,
-        icon: 'merge',
-        label: translate('deployments.deployments'),
-        tooltip: translate('deployments.worker-deployments'),
+        icon: 'workers',
+        label: translate('workers.workers'),
+        tooltip: translate('workers.workers'),
         isActive: (path) =>
           path.includes(workersRoute) || path.includes(workerDeploymentsRoute),
       },

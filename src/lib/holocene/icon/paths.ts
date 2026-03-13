@@ -138,6 +138,7 @@ import usage from './svg/usage.svelte';
 import userGroup from './svg/user-group.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
+import workers from './svg/workers.svelte';
 import workflow from './svg/workflow.svelte';
 import xmarkFilled from './svg/xmark-filled.svelte';
 import xmarkSquare from './svg/xmark-square.svelte';
@@ -284,6 +285,7 @@ export const icons = {
   'vertical-ellipsis': verticalEllipsis,
   warning,
   'system-window': systemWindow,
+  workers,
   workflow,
   'xmark-filled': xmarkFilled,
   'xmark-square': xmarkSquare,
