@@ -54,13 +54,22 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 const isDatetimeStatement = is(SEARCH_ATTRIBUTE_TYPE.DATETIME);
 const isBoolStatement = is(SEARCH_ATTRIBUTE_TYPE.BOOL);
 
-export const emptyFilter = (): SearchAttributeFilter => ({
+const defaultFilter: SearchAttributeFilter = {
+  id: '',
   attribute: '',
   type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   value: '',
   operator: '',
   parenthesis: '',
   conditional: '',
+};
+
+export const createFilter = (
+  overrides: Partial<SearchAttributeFilter> = {},
+): SearchAttributeFilter => ({
+  ...defaultFilter,
+  id: crypto.randomUUID(),
+  ...overrides,
 });
 
 const DefaultAttributes: SearchAttributes = {
@@ -78,7 +87,7 @@ export const toListWorkflowFilters = (
 ): SearchAttributeFilter[] => {
   const tokens = tokenize(query);
   const filters: SearchAttributeFilter[] = [];
-  let filter = emptyFilter();
+  let filter = createFilter();
 
   if (!query) {
     return [];
@@ -143,12 +152,12 @@ export const toListWorkflowFilters = (
       if (isJoin(token) && !isBetween(getTwoBehind(tokens, index))) {
         filter.operator = token;
         filters.push(filter);
-        filter = emptyFilter();
+        filter = createFilter();
       }
 
       if (index === tokens.length - 1) {
         filters.push(filter);
-        filter = emptyFilter();
+        filter = createFilter();
       }
     });
 

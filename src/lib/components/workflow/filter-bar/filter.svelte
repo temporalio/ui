@@ -23,9 +23,9 @@
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
-  const filter = writable<SearchAttributeFilter>(emptyFilter());
+  const filter = writable<SearchAttributeFilter>(createFilter());
   const activeQueryIndex = writable<number>(null);
   const focusedElementId = writable<string>('');
   const chipOpenIndex = writable<number>(null);
@@ -54,12 +54,12 @@
       $workflowFilters = [...$workflowFilters, $filter];
       chipOpenIndex.set(newIndex);
     }
-    filter.set(emptyFilter());
+    filter.set(createFilter());
   }
 
   function resetFilter() {
     activeQueryIndex.set(null);
-    filter.set(emptyFilter());
+    filter.set(createFilter());
   }
 </script>
 

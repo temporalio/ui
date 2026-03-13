@@ -9,7 +9,7 @@
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import type { StatusAttribute } from './types.ts';
@@ -86,7 +86,7 @@
 
     if (index === $activeQueryIndex) {
       $activeQueryIndex = null;
-      $filter = emptyFilter();
+      $filter = createFilter();
     } else if (index < $activeQueryIndex) {
       $activeQueryIndex -= 1;
     }
@@ -101,7 +101,7 @@
 
 {#if visibleFilters.length > 0}
   <div class="flex flex-wrap items-center gap-2">
-    {#each visibleFilters as filterItem, i (filterItem.attribute + '-' + i)}
+    {#each visibleFilters as filterItem, i (filterItem.id)}
       {#if statusAttribute && isStatusFilter(filterItem) && i === firstExecutionStatusIndex}
         <StatusFilterChip
           attribute={statusAttribute}

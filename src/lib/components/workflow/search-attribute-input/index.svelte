@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   import Button from '$lib/holocene/button.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -12,7 +14,6 @@
     type SearchAttributeSchema,
     type SearchAttributesSchema,
   } from '$lib/stores/search-attributes';
-  import type { SelectOptionValue } from '$lib/types/global';
   import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
 
   import DatetimeInput from './datetime-input.svelte';
@@ -26,26 +27,39 @@
 
   let { attributes, attribute = $bindable(), onRemove, id }: Props = $props();
 
-  let label = $state<SelectOptionValue | undefined>(undefined);
-  let _label = $derived(attribute.label || (label && label.toString()));
+  let type = $state(attribute.type);
+  let value = $state(attribute.value);
+  let label = $state(attribute.label);
 
-  const isDisabled = (value: string) => {
-    return !!attributes.find((a) => a.label === value);
+  $effect(() => {
+    const v = value;
+    // effect should only re-run when the local value state changes
+    // changes to attribute should not re-trigger the effect
+    untrack(() => {
+      attribute.value = v;
+    });
+  });
+
+  const isDisabled = (v: string) => {
+    return label !== v && !!attributes.find((a) => a.label === v);
   };
 
   const getType = (attr: string) => $customSearchAttributes[attr];
 
   const handleAttributeChange = (attr: string) => {
-    attribute.label = attr;
-    const type = getType(attr);
+    const previousType = type;
+    const newType = getType(attr);
 
-    if (type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST) {
-      attribute.value = [];
-    } else if (attribute.type !== type) {
-      attribute.value = null;
+    label = attr;
+    type = newType;
+
+    if (newType === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST) {
+      value = [];
+    } else if (previousType !== newType) {
+      value = null;
     }
 
-    attribute.type = type;
+    attribute = { label, value, type };
   };
 </script>
 
@@ -59,7 +73,7 @@
         data-testid="search-attribute-select"
         label={translate('workflows.custom-search-attribute')}
         placeholder={translate('workflows.select-attribute')}
-        bind:value={_label}
+        bind:value={label}
         onChange={handleAttributeChange}
       >
         {#each $customSearchAttributeOptions as { value, label, type } (value)}
@@ -72,48 +86,49 @@
     <Button
       variant="ghost"
       leadingIcon="close"
+      data-testid="search-attribute-close-button"
       class="mt-6 w-10 rounded-full sm:hidden"
-      on:click={() => onRemove(attribute.label)}
+      on:click={() => onRemove(label)}
     />
   </div>
-  {#if attribute.type === SEARCH_ATTRIBUTE_TYPE.BOOL}
+  {#if type === SEARCH_ATTRIBUTE_TYPE.BOOL}
     <Select
       label={translate('common.value')}
       id="attribute-value-{id}"
-      bind:value={attribute.value}
+      bind:value
     >
       <Option value={true}>{translate('common.true')}</Option>
       <Option value={false}>{translate('common.false')}</Option>
     </Select>
-  {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
-    <DatetimeInput bind:value={attribute.value} />
-  {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.INT || attribute.type === SEARCH_ATTRIBUTE_TYPE.DOUBLE}
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
+    <DatetimeInput bind:value />
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.INT || type === SEARCH_ATTRIBUTE_TYPE.DOUBLE}
     <div>
       <NumberInput
         label={translate('common.value')}
         id="attribute-value-{id}"
-        valid={attribute.value < Number.MAX_SAFE_INTEGER}
+        valid={value < Number.MAX_SAFE_INTEGER}
         hintText="Number is too large"
-        bind:value={attribute.value}
+        bind:value
         max={Number.MAX_SAFE_INTEGER}
       />
     </div>
-  {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST}
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST}
     <ChipInput
       label={translate('common.value')}
       id="attribute-value-{id}"
-      bind:chips={attribute.value}
+      bind:chips={value}
       class="w-full"
       removeChipButtonLabel={(chip) =>
         translate('workflows.remove-keyword-label', { keyword: chip })}
     />
-  {:else if attribute.type === SEARCH_ATTRIBUTE_TYPE.TEXT || attribute.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD || attribute.type === SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED}
+  {:else if type === SEARCH_ATTRIBUTE_TYPE.TEXT || type === SEARCH_ATTRIBUTE_TYPE.KEYWORD || type === SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED}
     <Input
       label={translate('common.value')}
       data-testid="custom-search-attribute-value"
       id="attribute-value-{id}"
       class="grow"
-      bind:value={attribute.value}
+      bind:value
     />
   {:else}
     <Input
@@ -131,6 +146,6 @@
     leadingIcon="close"
     data-testid="search-attribute-close-button"
     class="mt-6 w-10 rounded-full max-sm:hidden"
-    on:click={() => onRemove(attribute.label)}
+    on:click={() => onRemove(label)}
   />
 </div>

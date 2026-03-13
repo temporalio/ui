@@ -39,16 +39,16 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  // Local state for date/time values - defaults to today
-  let localStartDate = $state(startOfDay(new Date()));
-  let localStartHour = $state('');
-  let localStartMinute = $state('');
-  let localStartSecond = $state('');
+  // Local state for date/time values - initialize from stores to preserve previous values
+  let localStartDate = $state($startDate ?? startOfDay(new Date()));
+  let localStartHour = $state($startHour ?? '');
+  let localStartMinute = $state($startMinute ?? '');
+  let localStartSecond = $state($startSecond ?? '');
 
-  let localEndDate = $state(startOfDay(new Date()));
-  let localEndHour = $state('');
-  let localEndMinute = $state('');
-  let localEndSecond = $state('');
+  let localEndDate = $state($endDate ?? startOfDay(new Date()));
+  let localEndHour = $state($endHour ?? '');
+  let localEndMinute = $state($endMinute ?? '');
+  let localEndSecond = $state($endSecond ?? '');
 
   const error = (x: string) => {
     if (x) return isNaN(Number(x)) || isNaN(parseFloat(x));

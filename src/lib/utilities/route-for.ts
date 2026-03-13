@@ -102,19 +102,19 @@ export const routeForNamespaceSelector = (): ResolvedPathname => {
 export const routeForWorkflows = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {
-  return resolve(`${routeForNamespace(parameters)}/workflows`, {});
+  return `${routeForNamespace(parameters)}/workflows`;
 };
 
 export const routeForStandaloneActivities = (
   parameters: NamespaceParameter,
-): string => {
+): ResolvedPathname => {
   return `${routeForNamespace(parameters)}/activities`;
 };
 
 export const routeForStandaloneActivitiesWithQuery = (
   parameters: NamespaceParameter,
   queryString: string,
-): string => {
+): ResolvedPathname => {
   const params = new URLSearchParams();
   params.set('query', queryString);
 
@@ -123,7 +123,7 @@ export const routeForStandaloneActivitiesWithQuery = (
 
 export const routeForStartStandaloneActivity = (
   parameters: NamespaceParameter & Partial<StartActivityExecutionQueryParams>,
-): string => {
+): ResolvedPathname => {
   const params = {
     activityId: parameters.activityId ?? '',
     activityType: parameters.activityType ?? '',
@@ -136,39 +136,33 @@ export const routeForStartStandaloneActivity = (
 
 const routeForStandaloneActivityBase = (
   parameters: NamespaceParameter & { activityId: string; runId: string },
-) => {
+): ResolvedPathname => {
   const activityId = encodeURIForSvelte(parameters.activityId);
 
-  return resolve(
-    `${routeForStandaloneActivities(parameters)}/[activityId]/[runId]`,
-    {
-      activityId,
-      runId: parameters.runId,
-    },
-  );
+  return `${routeForStandaloneActivities(parameters)}/${activityId}/${parameters.runId}`;
 };
 
 export const routeForStandaloneActivityDetails = (
   parameters: NamespaceParameter & { activityId: string; runId: string },
-) => {
+): ResolvedPathname => {
   return `${routeForStandaloneActivityBase(parameters)}/details`;
 };
 
 export const routeForStandaloneActivityWorkers = (
   parameters: NamespaceParameter & { activityId: string; runId: string },
-) => {
+): ResolvedPathname => {
   return `${routeForStandaloneActivityBase(parameters)}/workers`;
 };
 
 export const routeForStandaloneActivitySearchAttributes = (
   parameters: NamespaceParameter & { activityId: string; runId: string },
-) => {
+): ResolvedPathname => {
   return `${routeForStandaloneActivityBase(parameters)}/search-attributes`;
 };
 
 export const routeForStandaloneActivityMetadata = (
   parameters: NamespaceParameter & { activityId: string; runId: string },
-) => {
+): ResolvedPathname => {
   return `${routeForStandaloneActivityBase(parameters)}/metadata`;
 };
 
@@ -185,7 +179,7 @@ export const routeForWorkflowStart = ({
   runId,
   taskQueue,
   workflowType,
-}: StartWorkflowParameters): string => {
+}: StartWorkflowParameters): ResolvedPathname => {
   return toURL(`${routeForNamespace({ namespace })}/workflows/start-workflow`, {
     workflowId: workflowId || '',
     runId: runId || '',
@@ -198,7 +192,7 @@ export const routeForWorkflowsWithQuery = ({
   namespace,
   query,
   page,
-}: WorkflowsParameter): string | undefined => {
+}: WorkflowsParameter): ResolvedPathname | undefined => {
   if (!BROWSER) {
     return undefined;
   }
@@ -212,7 +206,7 @@ export const routeForWorkflowsWithQuery = ({
 export const routeForArchivalWorkflows = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {
-  return resolve(`${routeForNamespace(parameters)}/archival`, {});
+  return `${routeForNamespace(parameters)}/archival`;
 };
 
 export const routeForWorkflow = ({
@@ -222,19 +216,19 @@ export const routeForWorkflow = ({
 }: WorkflowParameters): ResolvedPathname => {
   const id = encodeURIForSvelte(workflow);
 
-  return resolve(`${routeForWorkflows(parameters)}/[id]/[run]`, { id, run });
+  return `${routeForWorkflows(parameters)}/${id}/${run}`;
 };
 
 export const routeForSchedules = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {
-  return resolve(`${routeForNamespace(parameters)}/schedules`, {});
+  return `${routeForNamespace(parameters)}/schedules`;
 };
 
 export const routeForScheduleCreate = ({
   namespace,
 }: NamespaceParameter): ResolvedPathname => {
-  return resolve(`${routeForSchedules({ namespace })}/create`, {});
+  return `${routeForSchedules({ namespace })}/create`;
 };
 
 export const routeForSchedule = ({
@@ -243,7 +237,7 @@ export const routeForSchedule = ({
 }: ScheduleParameters): ResolvedPathname => {
   const id = encodeURIForSvelte(scheduleId);
 
-  return resolve(`${routeForSchedules({ namespace })}/[id]`, { id });
+  return `${routeForSchedules({ namespace })}/${id}`;
 };
 
 export const routeForScheduleEdit = ({
@@ -252,7 +246,7 @@ export const routeForScheduleEdit = ({
 }: ScheduleParameters): ResolvedPathname => {
   const id = encodeURIForSvelte(scheduleId);
 
-  return resolve(`${routeForSchedules({ namespace })}/[id]/edit`, { id });
+  return `${routeForSchedules({ namespace })}/${id}/edit`;
 };
 
 export const routeForArchivalEventHistory = ({
@@ -261,17 +255,14 @@ export const routeForArchivalEventHistory = ({
   ...parameters
 }: WorkflowParameters): ResolvedPathname => {
   const id = encodeURIForSvelte(workflow);
-  return resolve(
-    `${routeForArchivalWorkflows(parameters)}/[id]/[run]/history`,
-    { id, run },
-  );
+  return `${routeForArchivalWorkflows(parameters)}/${id}/${run}/history`;
 };
 
 export const routeForEventHistory = ({
   queryParams,
   archival,
   ...parameters
-}: EventHistoryParameters & { archival?: boolean }): string => {
+}: EventHistoryParameters & { archival?: boolean }): ResolvedPathname => {
   if (archival) return toURL(routeForArchivalEventHistory(parameters));
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   return toURL(`${eventHistoryPath}`, queryParams);
@@ -282,9 +273,7 @@ export const routeForEventHistoryEvent = ({
   requestId,
   ...parameters
 }: EventParameters): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/history/events/[id]`, {
-    id: eventId || requestId,
-  });
+  return `${routeForWorkflow(parameters)}/history/events/${eventId || requestId}`;
 };
 
 export const routeForTimeline = ({
@@ -294,7 +283,7 @@ export const routeForTimeline = ({
 }: WorkflowParameters & {
   queryParams?: Record<string, string>;
   archival?: boolean;
-}): string => {
+}): ResolvedPathname => {
   if (archival) return toURL(routeForArchivalEventHistory(parameters));
   const path = `${routeForWorkflow(parameters)}/timeline`;
   return toURL(path, queryParams);
@@ -317,7 +306,9 @@ export const routeForWorkerDeployments = ({
 }: {
   namespace: string;
 }): ResolvedPathname => {
-  return resolve('/namespaces/[namespace]/worker-deployments', { namespace });
+  return resolve('/namespaces/[namespace]/worker-deployments', {
+    namespace,
+  });
 };
 
 export const routeForWorkerInstance = ({
@@ -357,19 +348,16 @@ export const routeForWorkerDeploymentVersion = ({
   deployment: string;
   version: string;
 }): ResolvedPathname => {
-  return resolve(
-    `${routeForWorkerDeployment({
-      namespace,
-      deployment,
-    })}/version/[version]`,
-    { version },
-  );
+  return `${routeForWorkerDeployment({
+    namespace,
+    deployment,
+  })}/version/${version}`;
 };
 
 export const routeForRelationships = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/relationships`, {});
+  return `${routeForWorkflow(parameters)}/relationships`;
 };
 
 export const routeForTaskQueue = (
@@ -377,60 +365,57 @@ export const routeForTaskQueue = (
 ): ResolvedPathname => {
   const queue = encodeURIForSvelte(parameters.queue);
 
-  return resolve(
-    `${routeForNamespace({
-      namespace: parameters.namespace,
-    })}/task-queues/[queue]`,
-    { queue },
-  );
+  return `${routeForNamespace({
+    namespace: parameters.namespace,
+  })}/task-queues/${queue}`;
 };
 
 export const routeForCallStack = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/call-stack`, {});
+  return `${routeForWorkflow(parameters)}/call-stack`;
 };
 
 export const routeForWorkflowQuery = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/query`, {});
+  return `${routeForWorkflow(parameters)}/query`;
 };
 
 export const routeForUserMetadata = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/user-metadata`, {});
+  return `${routeForWorkflow(parameters)}/user-metadata`;
 };
 
 export const routeForWorkflowSearchAttributes = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/search-attributes`, {});
+  return `${routeForWorkflow(parameters)}/search-attributes`;
 };
 
 export const routeForWorkflowMemo = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/memo`, {});
+  return `${routeForWorkflow(parameters)}/memo`;
 };
 
 export const routeForWorkflowUpdate = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/update`, {});
+  return `${routeForWorkflow(parameters)}/update`;
 };
 
 export const routeForPendingActivities = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/pending-activities`, {});
+  return `${routeForWorkflow(parameters)}/pending-activities`;
 };
 
 export const routeForNexusLinks = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return resolve(`${routeForWorkflow(parameters)}/nexus-links`, {});
+  return `${routeForWorkflow(parameters)}/nexus-links`;
 };
 
 export const routeForAuthentication = (
@@ -492,7 +477,9 @@ export const routeForBatchOperations = ({
 }: {
   namespace: string;
 }): ResolvedPathname => {
-  return resolve('/namespaces/[namespace]/batch-operations', { namespace });
+  return resolve('/namespaces/[namespace]/batch-operations', {
+    namespace,
+  });
 };
 
 export const routeForBatchOperation = ({

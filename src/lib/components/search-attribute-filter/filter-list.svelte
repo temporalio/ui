@@ -19,7 +19,7 @@
     isDateTimeFilter,
     isTextFilter,
   } from '$lib/utilities/query/search-attribute-filter';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
@@ -43,7 +43,7 @@
 
     if (index === $activeQueryIndex) {
       $activeQueryIndex = null;
-      $filter = emptyFilter();
+      $filter = createFilter();
     } else if (index < $activeQueryIndex) {
       $activeQueryIndex -= 1;
     }
@@ -70,7 +70,7 @@
 </script>
 
 <div class="flex flex-wrap gap-2" class:pt-2={visibleFilters.length}>
-  {#each visibleFilters as workflowFilter, i (`${workflowFilter.attribute}-${i}`)}
+  {#each visibleFilters as workflowFilter, i (workflowFilter.id)}
     {@const { attribute, value, conditional, customDate } = workflowFilter}
     {#if attribute}
       <div in:fade data-testid="{workflowFilter.attribute}-{i}">

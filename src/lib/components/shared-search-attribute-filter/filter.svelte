@@ -25,7 +25,7 @@
   import { afterNavigate } from '$app/navigation';
 
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
-  import { emptyFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import type { StatusAttribute } from './types.ts';
 
@@ -41,7 +41,7 @@
 
   let { filters, options, id, statusAttribute }: Props = $props();
 
-  const filter = writable<SearchAttributeFilter>(emptyFilter());
+  const filter = writable<SearchAttributeFilter>(createFilter());
   const activeQueryIndex = writable<number | null>(null);
   const focusedElementId = writable<string>('');
   const chipOpenIndex = writable<number | null>(null);
@@ -69,12 +69,12 @@
       $filters = [...$filters, $filter];
       chipOpenIndex.set(newIndex);
     }
-    filter.set(emptyFilter());
+    filter.set(createFilter());
   }
 
   function resetFilter() {
     activeQueryIndex.set(null);
-    filter.set(emptyFilter());
+    filter.set(createFilter());
   }
 </script>
 
