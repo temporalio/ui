@@ -58,7 +58,6 @@ export const Strings = {
   'workflow-cache': 'Workflow Cache',
   'cache-size': 'Cache size',
   'cache-hits': 'Cache hits',
-  'active-thread-count': 'Active thread count',
   diagnostics: 'Diagnostics',
   'poll-success-rate': 'Poll success rate',
   'rate-limit': 'Rate limit',

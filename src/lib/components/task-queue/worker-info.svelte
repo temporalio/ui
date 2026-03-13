@@ -55,6 +55,16 @@
     if (total === 0) return 0;
     return ((totalStickyCacheHit / total) * 100).toFixed(1);
   });
+  const pollSuccessRate = $derived.by(() => {
+    if (!heartbeat?.workflowTaskSlotsInfo?.totalProcessedTasks) return 0;
+    const successCount =
+      heartbeat.workflowTaskSlotsInfo.totalProcessedTasks -
+      (heartbeat.workflowTaskSlotsInfo.totalFailedTasks ?? 0);
+    return (
+      (successCount / heartbeat.workflowTaskSlotsInfo.totalProcessedTasks) *
+      100
+    ).toFixed(1);
+  });
 </script>
 
 <div class="flex flex-col gap-4">
@@ -333,12 +343,6 @@
         </div>
       </div>
     </div>
-    <div class="mt-3">
-      <span class="font-mono text-2xl font-semibold"> - </span>
-      <div class="text-sm text-secondary">
-        {translate('workers.active-thread-count')}
-      </div>
-    </div>
   </Card>
 {/snippet}
 
@@ -349,7 +353,7 @@
     </h3>
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <span class="font-mono text-2xl"> - % </span>
+        <span class="font-mono text-2xl">{pollSuccessRate}%</span>
         <div class="text-sm text-secondary">
           {translate('workers.poll-success-rate')}
         </div>
