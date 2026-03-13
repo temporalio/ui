@@ -72,6 +72,7 @@
     pageSizeOptions[0],
   );
   let error: Error;
+  let paginatedTable: PaginatedTable<T>;
 
   function clearError() {
     if (error) error = undefined;
@@ -129,6 +130,12 @@
     } else {
       store.nextPage();
     }
+    paginatedTable?.scrollToTop();
+  }
+
+  function handlePreviousPage() {
+    store.previousPage();
+    paginatedTable?.scrollToTop();
   }
 
   async function handleKeydown(event: KeyboardEvent) {
@@ -182,6 +189,7 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <PaginatedTable
+  bind:this={paginatedTable}
   loading={$store.loading}
   updating={$store.updating}
   visibleItems={$store.visibleItems}
@@ -233,7 +241,7 @@
     <IconButton
       label={previousButtonLabel}
       disabled={!$store.hasPrevious}
-      on:click={store.previousPage}
+      on:click={handlePreviousPage}
       icon="arrow-left"
     />
     <div class="flex gap-1">
