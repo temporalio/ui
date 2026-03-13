@@ -20,7 +20,7 @@
 
   type Item = $$Generic;
 
-  export let id: string = null;
+  export let id: string | null = null;
   export let items: Item[];
   export let loading = false;
   export let updating = false;
