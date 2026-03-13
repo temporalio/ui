@@ -18,6 +18,7 @@
     workflowStatusFilters,
   } from '$lib/models/workflow-status';
   import type { WorkflowStatus as WorkflowStatusType } from '$lib/types/workflows';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters.js';
 
   import type { StatusAttribute } from './types.ts';
 
@@ -73,26 +74,23 @@
 
     if (localFilters.length === 1 && localFilters[0].value === '') {
       localFilters = [
-        {
+        createFilter({
           attribute,
-          operator: '',
-          parenthesis: '',
           type: 'Keyword',
           value: status,
           conditional: '=',
-        },
+        }),
       ];
     } else {
       localFilters = [
         ...localFilters,
-        {
+        createFilter({
           attribute,
-          operator: '',
           parenthesis: localFilters.length ? ')' : '',
           type: 'Keyword',
           value: status,
           conditional: '=',
-        },
+        }),
       ];
     }
 
