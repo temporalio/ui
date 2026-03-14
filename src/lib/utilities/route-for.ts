@@ -306,7 +306,7 @@ export const routeForWorkerDeployments = ({
 }: {
   namespace: string;
 }): ResolvedPathname => {
-  return resolve('/namespaces/[namespace]/worker-deployments', {
+  return resolve('/namespaces/[namespace]/workers/deployments', {
     namespace,
   });
 };
@@ -333,7 +333,7 @@ export const routeForWorkerDeployment = ({
   deployment: string;
 }): ResolvedPathname => {
   const deploymentName = encodeURIForSvelte(deployment);
-  return resolve('/namespaces/[namespace]/worker-deployments/[deployment]', {
+  return resolve('/namespaces/[namespace]/workers/deployments/[deployment]', {
     namespace,
     deployment: deploymentName,
   });

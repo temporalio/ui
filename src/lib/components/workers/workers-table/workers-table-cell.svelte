@@ -6,7 +6,12 @@
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { workerFilters } from '$lib/stores/filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   interface Props {
     attribute?: string;
@@ -28,24 +33,23 @@
 
   const query = $derived(page.url.searchParams.get('query') || '');
 
-  const onRowFilterClick = () => {
-    if (query.includes(`${attribute}="`)) {
-      updateQueryParameters({
-        parameter: 'query',
-        value: '',
-        url: page.url,
-        clearParameters: [attribute],
+  const onRowFilterClick = async () => {
+    const filter = $workerFilters.find((f) => f.attribute === attribute);
+    const getOtherFilters = () =>
+      $workerFilters.filter((f) => f.attribute !== attribute);
+
+    if (!filter || filter.value !== value) {
+      const newFilter: SearchAttributeFilter = createFilter({
+        attribute,
+        value,
+        conditional: '=',
       });
+      $workerFilters = [...getOtherFilters(), newFilter];
     } else {
-      const newQuery = query
-        ? `${query} AND ${attribute}="${value}"`
-        : `${attribute}="${value}"`;
-      updateQueryParameters({
-        parameter: 'query',
-        value: newQuery,
-        url: page.url,
-      });
+      $workerFilters = [...getOtherFilters()];
     }
+
+    updateQueryParamsFromFilter(page.url, $workerFilters);
   };
 
   let filterOrCopyButtonsVisible = $state(false);

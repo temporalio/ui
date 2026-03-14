@@ -3,13 +3,13 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import { translate } from '$lib/i18n/translate';
-  import WorkerDetails from '$lib/pages/worker-details.svelte';
+  import Deployment from '$lib/pages/deployment.svelte';
 
-  const workerInstanceKey = $derived(page.params.workerInstanceKey);
+  const deployment = $derived(page.params.deployment);
 </script>
 
 <PageTitle
-  title="{translate('workers.workers')} | {workerInstanceKey}"
+  title="{translate('deployments.deployment')} | {deployment}"
   url={page.url.href}
 />
-<WorkerDetails />
+<Deployment />

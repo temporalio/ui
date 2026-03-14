@@ -1,31 +1,33 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/state';
 
-  import PageTitle from '$lib/components/page-title.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
-  import WorkerDeployments from '$lib/pages/deployments.svelte';
+  import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForWorkerDeployments,
     routeForWorkers,
   } from '$lib/utilities/route-for';
 
-  const { namespace } = $derived(page.params);
+  interface Props {
+    namespace: string;
+    children: Snippet;
+  }
+
+  const { children, namespace }: Props = $props();
 
   const workersHref = $derived(routeForWorkers({ namespace }));
   const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
 </script>
 
-<PageTitle
-  title={translate('deployments.worker-deployments')}
-  url={page.url.href}
-/>
 <header class="flex flex-col gap-2">
   <div class="flex flex-wrap items-center gap-2">
     <h1 class="leading-7" data-cy="workers-title">
-      {translate('deployments.worker-deployments')}
+      {translate('workers.workers')}
     </h1>
   </div>
   <Tabs>
@@ -34,16 +36,24 @@
         label={translate('workers.workers')}
         id="workers-tab"
         href={workersHref}
-        active={false}
+        active={pathMatches(
+          page.url.pathname,
+          routeForWorkers({ namespace }),
+          true,
+        )}
       />
       <Tab
         label={translate('deployments.deployments')}
         id="deployments-tab"
         href={deploymentsHref}
-        active={true}
+        active={pathMatches(
+          page.url.pathname,
+          routeForWorkerDeployments({ namespace }),
+          true,
+        )}
       />
     </TabList>
   </Tabs>
 </header>
 
-<WorkerDeployments />
+{@render children()}

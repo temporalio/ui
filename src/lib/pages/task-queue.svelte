@@ -1,15 +1,16 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import TaskQueueWorkerInsights from '$lib/components/task-queue/worker-insights.svelte';
+  import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
+  import { translate } from '$lib/i18n/translate';
 
-  const { queue: taskQueue } = $derived(page.params);
+  const { namespace, queue: taskQueue } = $derived(page.params);
 </script>
 
 <section class="flex flex-col gap-4">
-  <h1 data-testid="task-queue-title">Task Queue</h1>
+  <h1 data-testid="task-queue-title">{translate('workers.task-queue')}</h1>
   <h2 data-testid="task-queue-name">
     {taskQueue}
   </h2>
-  <TaskQueueWorkerInsights />
+  <WorkersTable {namespace} {taskQueue} />
 </section>

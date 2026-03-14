@@ -3,6 +3,7 @@
 
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Error from '$lib/holocene/error.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -72,7 +73,7 @@
         {translate('deployments.deployments')}
       </caption>
       <tr slot="headers">
-        {#each columns as { label }}
+        {#each columns as { label } (label)}
           <th>{label}</th>
         {/each}
       </tr>
@@ -84,5 +85,7 @@
         />
       {/each}
     </PaginatedTable>
+  {:catch error}
+    <Error {error} />
   {/await}
 </div>
