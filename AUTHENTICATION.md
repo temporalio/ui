@@ -54,7 +54,27 @@ auth:
 | `scopes`             | array   | OAuth2 scopes. Include `offline_access` to enable token refresh |
 | `callbackUrl`        | string  | OAuth2 callback URL for your deployment                         |
 | `options`            | object  | Additional URL parameters for the auth redirect                 |
-| `useIdTokenAsBearer` | boolean | Use ID token instead of access token in Authorization header    |
+| `useIdTokenAsBearer`     | boolean  | Use ID token instead of access token in Authorization header                                                                                                          |
+| `refreshTokenDuration`   | duration | Lifetime of the refresh token issued by this provider (e.g., `24h`, `168h`). When unset, the server attempts to derive it from the refresh token's JWT `exp` claim. Falls back to a 7-day default for opaque tokens. Set this to match your IdP's refresh token lifetime. |
+
+### Docker Environment Variables
+
+When using the default `docker.yaml`, all auth settings are configurable via environment variables:
+
+| Environment Variable                  | Config Field                       | Default  |
+| ------------------------------------- | ---------------------------------- | -------- |
+| `TEMPORAL_AUTH_ENABLED`               | `auth.enabled`                     | `false`  |
+| `TEMPORAL_MAX_SESSION_DURATION`       | `auth.maxSessionDuration`          | `2m`     |
+| `TEMPORAL_AUTH_LABEL`                 | `auth.providers[0].label`          | `sso`    |
+| `TEMPORAL_AUTH_TYPE`                  | `auth.providers[0].type`           | `oidc`   |
+| `TEMPORAL_AUTH_PROVIDER_URL`          | `auth.providers[0].providerUrl`    | —        |
+| `TEMPORAL_AUTH_ISSUER_URL`            | `auth.providers[0].issuerUrl`      | —        |
+| `TEMPORAL_AUTH_CLIENT_ID`             | `auth.providers[0].clientId`       | —        |
+| `TEMPORAL_AUTH_CLIENT_SECRET`         | `auth.providers[0].clientSecret`   | —        |
+| `TEMPORAL_AUTH_CALLBACK_URL`          | `auth.providers[0].callbackUrl`    | —        |
+| `TEMPORAL_AUTH_SCOPES`                | `auth.providers[0].scopes`         | —        |
+| `TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER`| `auth.providers[0].useIdTokenAsBearer` | `false` |
+| `TEMPORAL_AUTH_REFRESH_TOKEN_DURATION`| `auth.providers[0].refreshTokenDuration` | auto-detected or 7 days |
 
 ## Session Duration Management
 
@@ -218,6 +238,18 @@ Ensure:
 - `offline_access` scope is included and enabled in your IdP
 - Refresh tokens are enabled in your IdP configuration
 - The refresh token hasn't expired (check IdP settings)
+
+If token refresh fails with 401 immediately after the access token expires, your IdP likely issues **opaque refresh tokens** (non-JWT), which means the server cannot automatically derive their lifetime. Set `refreshTokenDuration` explicitly to match your IdP's refresh token lifetime:
+
+```yaml
+auth:
+  providers:
+    - label: My IdP
+      # ...
+      refreshTokenDuration: 24h # match your IdP's refresh token TTL
+```
+
+For IdPs that issue **JWT refresh tokens** (e.g. Keycloak), the server derives the lifetime automatically from the token's `exp` claim — no configuration needed.
 
 ### Redirect loop after login
 
