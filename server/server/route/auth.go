@@ -110,9 +110,9 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 
 	api := e.Group("/auth")
 	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration)) // compatibility with UI v1
-	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
+	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, providerCfg.RefreshTokenDuration))
+	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, providerCfg.RefreshTokenDuration)) // compatibility with UI v1
+	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, providerCfg.RefreshTokenDuration))
 	api.GET("/logout", logout())
 }
 
@@ -154,7 +154,7 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration) func(echo.Context) error {
 	return func(c echo.Context) error {
 		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
 		if err != nil {
@@ -166,7 +166,7 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 			sessionExpiresAt = time.Now().Add(maxSessionDuration)
 		}
 
-		err = auth.SetUser(c, user, sessionExpiresAt)
+		err = auth.SetUser(c, user, sessionExpiresAt, refreshTokenDuration)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set user: "+err.Error())
 		}
@@ -194,7 +194,7 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 
 // refreshTokens exchanges a refresh token (stored in an HttpOnly cookie) for a new access token
 // and optionally a new ID token. It resets the cookies using auth.SetUser and returns 200.
-func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
+func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, refreshTokenDuration time.Duration) func(echo.Context) error {
 	return func(c echo.Context) error {
 		startTime := time.Now()
 		clientIP := c.RealIP()
@@ -253,7 +253,7 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 			}
 		}
 
-		if err := auth.SetUser(c, &user, sessionExpiresAt); err != nil {
+		if err := auth.SetUser(c, &user, sessionExpiresAt, refreshTokenDuration); err != nil {
 			duration := time.Since(startTime).Milliseconds()
 			log.Printf("token_refresh_failed reason=set_user_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set refreshed user: "+err.Error())
