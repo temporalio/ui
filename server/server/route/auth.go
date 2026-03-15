@@ -161,7 +161,12 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 			return err
 		}
 
-		err = auth.SetUser(c, user)
+		var sessionExpiresAt time.Time
+		if maxSessionDuration > 0 {
+			sessionExpiresAt = time.Now().Add(maxSessionDuration)
+		}
+
+		err = auth.SetUser(c, user, sessionExpiresAt)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set user: "+err.Error())
 		}
@@ -239,7 +244,16 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 			}
 		}
 
-		if err := auth.SetUser(c, &user); err != nil {
+		var sessionExpiresAt time.Time
+		if maxSessionDuration > 0 {
+			if sessionCookie, err := c.Request().Cookie("session_start"); err == nil {
+				if startUnix, err := strconv.ParseInt(sessionCookie.Value, 10, 64); err == nil {
+					sessionExpiresAt = time.Unix(startUnix, 0).Add(maxSessionDuration)
+				}
+			}
+		}
+
+		if err := auth.SetUser(c, &user, sessionExpiresAt); err != nil {
 			duration := time.Since(startTime).Milliseconds()
 			log.Printf("token_refresh_failed reason=set_user_failed ip=%s error=%q duration_ms=%d", clientIP, err.Error(), duration)
 			return echo.NewHTTPError(http.StatusInternalServerError, "unable to set refreshed user: "+err.Error())

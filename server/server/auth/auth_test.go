@@ -25,7 +25,10 @@ package auth_test
 import (
 	_ "embed"
 	"net/http/httptest"
+	"strconv"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -95,7 +98,7 @@ func TestSetUser(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := auth.SetUser(tt.ctx, &tt.user)
+			err := auth.SetUser(tt.ctx, &tt.user, time.Time{})
 			cookies := tt.ctx.Cookies()
 
 			if tt.wantErr {
@@ -107,6 +110,74 @@ func TestSetUser(t *testing.T) {
 				setCookie := tt.ctx.Response().Header().Get(echo.HeaderSetCookie)
 				assert.Contains(t, setCookie, "user0")
 			}
+		})
+	}
+}
+
+func TestSetUserCookieMaxAge(t *testing.T) {
+	validUser := auth.User{
+		OAuth2Token: &oauth2.Token{AccessToken: "XXX.YYY.ZZZ"},
+	}
+
+	extractMaxAge := func(header string) int {
+		for _, part := range strings.Split(header, ";") {
+			part = strings.TrimSpace(part)
+			if strings.HasPrefix(strings.ToLower(part), "max-age=") {
+				val := strings.SplitN(part, "=", 2)[1]
+				n, _ := strconv.Atoi(val)
+				return n
+			}
+		}
+		return -1
+	}
+
+	tests := []struct {
+		name             string
+		sessionExpiresAt time.Time
+		wantMaxAge       func(got int) bool
+		desc             string
+	}{
+		{
+			name:             "no session limit uses 60s",
+			sessionExpiresAt: time.Time{},
+			wantMaxAge:       func(got int) bool { return got == 60 },
+			desc:             "zero sessionExpiresAt should default to 60s",
+		},
+		{
+			name:             "session expires in 2 minutes keeps 60s",
+			sessionExpiresAt: time.Now().Add(2 * time.Minute),
+			wantMaxAge:       func(got int) bool { return got == 60 },
+			desc:             "remaining > 60s should still use 60s",
+		},
+		{
+			name:             "session expires in 30 seconds caps to ~30s",
+			sessionExpiresAt: time.Now().Add(30 * time.Second),
+			wantMaxAge:       func(got int) bool { return got > 25 && got <= 30 },
+			desc:             "remaining < 60s should cap MaxAge to remaining",
+		},
+		{
+			name:             "session already expired clamps to 1",
+			sessionExpiresAt: time.Now().Add(-5 * time.Second),
+			wantMaxAge:       func(got int) bool { return got == 1 },
+			desc:             "expired session should clamp MaxAge to 1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(echo.GET, "/", nil)
+			rec := httptest.NewRecorder()
+			ctx := e.NewContext(req, rec)
+
+			err := auth.SetUser(ctx, &validUser, tt.sessionExpiresAt)
+			assert.NoError(t, err, tt.desc)
+
+			setCookie := rec.Header().Get(echo.HeaderSetCookie)
+			assert.Contains(t, setCookie, "user0", tt.desc)
+
+			maxAge := extractMaxAge(setCookie)
+			assert.True(t, tt.wantMaxAge(maxAge), "%s: got MaxAge=%d", tt.desc, maxAge)
 		})
 	}
 }

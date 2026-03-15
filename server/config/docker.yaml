@@ -49,6 +49,7 @@ uiServerTLS:
   keyFile: {{ env "TEMPORAL_UI_SERVER_TLS_KEY" | default "" }}
 auth:
   enabled: {{ env "TEMPORAL_AUTH_ENABLED" | default "false" }}
+  maxSessionDuration: {{ env "TEMPORAL_MAX_SESSION_DURATION" | default "2m" }}
   providers:
   - label: {{ env "TEMPORAL_AUTH_LABEL" | default "sso" }}
     type: {{ env "TEMPORAL_AUTH_TYPE" | default "oidc" }}

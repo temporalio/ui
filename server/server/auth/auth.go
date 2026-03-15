@@ -58,7 +58,7 @@ func stripBearerPrefix(token string) string {
 	return strings.TrimPrefix(token, "Bearer ")
 }
 
-func SetUser(c echo.Context, user *User) error {
+func SetUser(c echo.Context, user *User, sessionExpiresAt time.Time) error {
 	if user.OAuth2Token == nil {
 		return errors.New("no OAuth2Token")
 	}
@@ -81,6 +81,17 @@ func SetUser(c echo.Context, user *User) error {
 		return errors.New("unable to serialize user data")
 	}
 
+	userCookieMaxAge := int(time.Minute.Seconds())
+	if !sessionExpiresAt.IsZero() {
+		remaining := int(time.Until(sessionExpiresAt).Seconds())
+		if remaining <= 0 {
+			remaining = 1
+		}
+		if remaining < userCookieMaxAge {
+			userCookieMaxAge = remaining
+		}
+	}
+
 	s := base64.StdEncoding.EncodeToString(b)
 	parts := splitCookie(s)
 
@@ -88,7 +99,7 @@ func SetUser(c echo.Context, user *User) error {
 		cookie := &http.Cookie{
 			Name:     "user" + strconv.Itoa(i),
 			Value:    p,
-			MaxAge:   int(time.Minute.Seconds()),
+			MaxAge:   userCookieMaxAge,
 			Secure:   c.Request().TLS != nil,
 			HttpOnly: false,
 			Path:     "/",
