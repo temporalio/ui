@@ -2,16 +2,16 @@
   import { page } from '$app/state';
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
+  import WorkersDeploymentsEmptyState from '$lib/components/workers/workers-deployments-empty-state.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/holocene/link.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
   let error = $state('');
+  let search = $state('');
 
   const namespace = $derived(page.params.namespace);
 
@@ -28,22 +28,24 @@
   };
 
   const columns = [
+    { label: translate('deployments.status') },
     { label: translate('deployments.name') },
-    {
-      label: translate('deployments.build-id'),
-    },
+    { label: translate('deployments.build-id') },
     { label: translate('deployments.deployed') },
-    {
-      label: translate('deployments.actions'),
-    },
+    { label: translate('deployments.actions') },
   ];
 </script>
 
-<div class="flex flex-wrap items-center gap-2">
-  <h1>
-    {translate('deployments.worker-deployments')}
-  </h1>
-  <Badge class="shrink-0">Public Preview</Badge>
+<div class="mb-4">
+  <Input
+    id="deployment-search"
+    label="Filter deployments"
+    labelHidden
+    type="search"
+    placeholder="Filter by Name"
+    bind:value={search}
+    icon="search"
+  />
 </div>
 
 {#key [namespace]}
@@ -66,27 +68,19 @@
         <th>{label}</th>
       {/each}
     </tr>
-    {#each visibleItems as deployment}
+    {#each visibleItems.filter((d) => !search || d.name
+          .toLowerCase()
+          .includes(search.toLowerCase())) as deployment}
       <DeploymentTableRow {deployment} {columns} />
     {/each}
 
     <svelte:fragment slot="empty">
-      <EmptyState
-        title={translate('deployments.empty-state-title')}
-        class="px-4"
-      >
-        <p class="text-center">
-          Enable Worker Deployments to manage your workers more effectively. <Link
-            href="https://docs.temporal.io/worker-deployments"
-            newTab>Learn more</Link
-          >.
-        </p>
-        {#if error}
-          <Alert intent="warning" icon="warning" class="px-12">
-            {error}
-          </Alert>
-        {/if}
-      </EmptyState>
+      <WorkersDeploymentsEmptyState />
+      {#if error}
+        <Alert intent="warning" icon="warning" class="px-12">
+          {error}
+        </Alert>
+      {/if}
     </svelte:fragment>
   </PaginatedTable>
 {/key}

@@ -3,6 +3,7 @@ import type {
   CallbackState,
   NamespaceState,
   PendingNexusOperationState,
+  WorkerStatus,
   WorkflowExecutionStatus,
 } from '$lib/types';
 import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
@@ -97,4 +98,16 @@ export const toCallbackStateReadable = (
 ): CallbackState => {
   if (!state) return state;
   return fromScreamingEnum(state, 'CallbackState');
+};
+
+export type ReadableWorkerStatus = 'Unspecified' | 'Running' | 'Shutting Down';
+
+export const toWorkerStatusReadable = (
+  state?: WorkerStatus,
+): ReadableWorkerStatus => {
+  if (!state) return 'Unspecified';
+  return fromScreamingEnum(
+    state,
+    'WorkerStatus',
+  ) as unknown as ReadableWorkerStatus;
 };

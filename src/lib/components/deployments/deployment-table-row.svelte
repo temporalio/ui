@@ -47,7 +47,26 @@
 
 <tr>
   {#each columns as { label } (label)}
-    {#if label === translate('deployments.name')}
+    {#if label === translate('deployments.status')}
+      <td class="py-1 text-left">
+        <div class="flex flex-col gap-1">
+          {#if rampingBuildId && deployment?.routingConfig?.rampingVersionPercentage}
+            <DeploymentStatus
+              status="Ramping"
+              label={translate('deployments.ramping-percentage', {
+                percentage: deployment.routingConfig.rampingVersionPercentage,
+              })}
+            />
+          {/if}
+          {#if versionedCurrent}
+            <DeploymentStatus
+              status="Current"
+              label={translate('deployments.current')}
+            />
+          {/if}
+        </div>
+      </td>
+    {:else if label === translate('deployments.name')}
       <td class="py-1 text-left">
         <Copyable
           content={deployment.name}

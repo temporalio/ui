@@ -40,11 +40,11 @@
     routeForRelationships,
     routeForTimeline,
     routeForUserMetadata,
-    routeForWorkers,
     routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
     routeForWorkflowSearchAttributes,
+    routeForWorkflowWorkers,
   } from '$lib/utilities/route-for';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
@@ -300,10 +300,10 @@
       <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
-        href={routeForWorkers(routeParameters)}
+        href={routeForWorkflowWorkers(routeParameters)}
         active={pathMatches(
           page.url.pathname,
-          routeForWorkers(routeParameters),
+          routeForWorkflowWorkers(routeParameters),
         )}
       >
         <Badge type="primary" class="px-2 py-0">

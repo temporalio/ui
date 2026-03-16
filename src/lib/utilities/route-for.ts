@@ -290,6 +290,15 @@ export const routeForTimeline = ({
 };
 
 export const routeForWorkers = (
+  parameters: NamespaceParameter,
+): ResolvedPathname => {
+  return resolve(
+    `${routeForNamespace({ namespace: parameters.namespace })}/workers`,
+    {},
+  );
+};
+
+export const routeForWorkflowWorkers = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
   return `${routeForWorkflow(parameters)}/workers`;
@@ -302,6 +311,20 @@ export const routeForWorkerDeployments = ({
 }): ResolvedPathname => {
   return resolve('/namespaces/[namespace]/worker-deployments', {
     namespace,
+  });
+};
+
+export const routeForWorkerInstance = ({
+  namespace,
+  workerInstanceKey,
+}: {
+  namespace: string;
+  workerInstanceKey: string;
+}) => {
+  const workerInstanceKeyEncoded = encodeURIForSvelte(workerInstanceKey);
+  return resolve('/namespaces/[namespace]/workers/[workerInstanceKey]', {
+    namespace,
+    workerInstanceKey: workerInstanceKeyEncoded,
   });
 };
 
@@ -332,6 +355,42 @@ export const routeForWorkerDeploymentVersion = ({
     namespace,
     deployment,
   })}/version/${version}`;
+};
+
+export const routeForServerlessWorker = ({
+  namespace,
+  id,
+}: {
+  namespace: string;
+  id: string;
+}): ResolvedPathname => {
+  return resolve('/namespaces/[namespace]/serverless-workers/[id]', {
+    namespace,
+    id,
+  });
+};
+
+export function routeForServerlessWorkerEdit({
+  namespace,
+  id,
+}: {
+  namespace: string;
+  id: string;
+}): string {
+  return resolve('/namespaces/[namespace]/serverless-workers/[id]/edit', {
+    namespace,
+    id,
+  });
+}
+
+export const routeForServerlessWorkerCreate = ({
+  namespace,
+}: {
+  namespace: string;
+}): ResolvedPathname => {
+  return resolve('/namespaces/[namespace]/serverless-workers/create', {
+    namespace,
+  });
 };
 
 export const routeForRelationships = (
