@@ -6,6 +6,7 @@
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -18,7 +19,6 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
-  import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -235,6 +235,7 @@
       </Alert>
     </div>
   {/if}
+  <NoWorkersPollingAlert />
   <Tabs>
     <TabList label="workflow detail">
       <Tab
@@ -304,12 +305,7 @@
           routeForWorkflowWorkers(routeParameters),
         )}
       >
-        <Badge type="primary" class="px-2 py-0">
-          {getWorkflowPollersWithVersions(
-            workflow.searchAttributes.indexedFields,
-            workers,
-          )?.pollers?.length || 0}
-        </Badge>
+        <!-- TODO: Add Badge with workers count -->
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}

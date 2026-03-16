@@ -199,10 +199,10 @@ export const workerSearchAttributes: Readable<SearchAttributes> = readable({
   TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
   LastHeartbeatTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-  DeploymentName: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-  BuildId: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-  SdkName: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-  SdkVersion: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  DeploymentName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  BuildId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  SdkName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  SdkVersion: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
 });
 
 export const workerSearchAttributeOptions: Readable<SearchAttributeOption[]> =

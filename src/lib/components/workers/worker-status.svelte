@@ -14,7 +14,7 @@
 
   const label: Record<WorkerStatus, string> = {
     Running: translate('workflows.running'),
-    ShuttingDown: 'Shutting Down',
+    ShuttingDown: translate('workers.shutting-down'),
     Unspecified: translate('events.event-classification.unspecified'),
   };
 

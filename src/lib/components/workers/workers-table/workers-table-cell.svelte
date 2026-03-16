@@ -5,6 +5,7 @@
 
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workerFilters } from '$lib/stores/filters';
@@ -64,6 +65,12 @@
       hideFilterOrCopy();
     }
   };
+  const truncate = (value: string | undefined): string => {
+    if (value?.length > 13) {
+      return `${value.slice(0, 6)}...${value.slice(-6)}`;
+    }
+    return value ?? '';
+  };
 </script>
 
 <td
@@ -75,22 +82,34 @@
   onmouseleave={hideFilterOrCopy}
   onblur={hideFilterOrCopy}
 >
-  {#if href}
+  {#if attribute === 'BuildId' || attribute === 'WorkerInstanceKey'}
+    {#if href}
+      <Tooltip text={value} top class="min-w-0">
+        <Link {href}>{truncate(value)}</Link>
+      </Tooltip>
+    {:else}
+      <Tooltip text={value} top class="min-w-0">
+        {truncate(value)}
+      </Tooltip>
+    {/if}
+  {:else if href}
     <Link {href}>{value}</Link>
   {:else if children}
     {@render children?.()}
   {:else}
     {value}
   {/if}
-  <FilterOrCopyButtons
-    copyIconTitle={translate('common.copy-icon-title')}
-    copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    filterIconTitle={translate('common.filter-workflows')}
-    show={filterOrCopyButtonsVisible}
-    content={value}
-    onFilter={onRowFilterClick}
-    {copyable}
-    {filterable}
-    filtered={query.includes(`${attribute}=`)}
-  />
+  {#if value}
+    <FilterOrCopyButtons
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      filterIconTitle={translate('common.filter-workflows')}
+      show={filterOrCopyButtonsVisible}
+      content={value}
+      onFilter={onRowFilterClick}
+      {copyable}
+      {filterable}
+      filtered={query.includes(`${attribute}=`)}
+    />
+  {/if}
 </td>

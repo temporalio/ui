@@ -16,7 +16,6 @@
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type {
     WorkerInfo,
@@ -24,7 +23,7 @@
     WorkerSlotsInfo,
   } from '$lib/types';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
-  import { routeForTaskQueue } from '$lib/utilities/route-for';
+  import { routeForWorkersWithQuery } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
   type Props = {
@@ -67,8 +66,11 @@
   });
 </script>
 
-<div class="flex flex-col gap-4">
-  <div
+<section
+  aria-label={translate('workers.worker-details')}
+  class="flex flex-col gap-4"
+>
+  <header
     class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
   >
     <WorkerStatus {status} />
@@ -85,9 +87,9 @@
         class="overflow-hidden text-ellipsis text-left"
       />
     </h1>
-  </div>
+  </header>
 
-  <DetailList aria-label="worker details" rowCount={1}>
+  <DetailList aria-label="worker details" rowCount={2}>
     <DetailListColumn>
       <DetailListLabel>{translate('workflows.last-heartbeat')}</DetailListLabel>
       <DetailListTextValue
@@ -98,8 +100,6 @@
           relative: true,
         })}
       />
-    </DetailListColumn>
-    <DetailListColumn>
       <DetailListLabel>{translate('common.start')}</DetailListLabel>
       <DetailListTextValue
         text={heartbeat?.startTime ? $timestamp(heartbeat?.startTime) : '-'}
@@ -113,14 +113,14 @@
       <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
       <DetailListLinkValue
         copyable
+        copyableText={heartbeat?.taskQueue}
         text={heartbeat?.taskQueue}
-        href={routeForTaskQueue({
+        href={routeForWorkersWithQuery({
           namespace,
-          queue: heartbeat?.taskQueue,
+          query: `TaskQueue="${heartbeat?.taskQueue}"`,
         })}
+        iconName="filter"
       />
-    </DetailListColumn>
-    <DetailListColumn>
       <DetailListLabel>{translate('workers.sdk')}</DetailListLabel>
       <DetailListValue>
         <SdkLogo
@@ -129,10 +129,25 @@
         />
       </DetailListValue>
     </DetailListColumn>
+
+    <DetailListColumn>
+      <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
+      <DetailListTextValue
+        copyable={!!heartbeat?.deploymentVersion?.buildId}
+        copyableText={heartbeat?.deploymentVersion?.buildId}
+        text={heartbeat?.deploymentVersion?.buildId ?? '-'}
+      />
+      <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
+      <DetailListTextValue
+        copyable={!!heartbeat?.deploymentVersion?.deploymentName}
+        copyableText={heartbeat?.deploymentVersion?.deploymentName}
+        text={heartbeat?.deploymentVersion?.deploymentName ?? '-'}
+      />
+    </DetailListColumn>
   </DetailList>
 
   <div class="flex flex-col gap-4 lg:flex-row">
-    <div class="flex flex-1 flex-col gap-4">
+    <section class="flex flex-1 flex-col gap-4">
       {@render taskSlotCard(
         translate('common.workflows-plural', { count: 1 }),
         heartbeat?.workflowTaskSlotsInfo,
@@ -153,15 +168,15 @@
         heartbeat?.localActivitySlotsInfo,
         null,
       )}
-    </div>
+    </section>
 
-    <div class="flex w-full flex-col gap-4 lg:w-fit">
+    <aside class="flex w-full flex-col gap-4 lg:w-fit">
       {@render hostInfo()}
       {@render workflowCache()}
       {@render diagnostics()}
-    </div>
+    </aside>
   </div>
-</div>
+</section>
 
 {#snippet taskSlotCard(
   title: string,
@@ -174,69 +189,99 @@
       <Badge type="ghost" class="text-xs">{slots.slotSupplierKind}</Badge>
     </div>
 
-    <div class="flex flex-wrap gap-x-32 gap-y-4">
+    <dl class="flex flex-wrap gap-x-32 gap-y-4">
       <div>
-        <div class="flex h-6 items-center text-sm text-secondary">
+        <dt
+          id="slots-label"
+          class="flex h-6 items-center text-sm text-secondary"
+        >
           {translate('workers.slots')}
-        </div>
-        <div class="flex items-baseline gap-12">
-          <p class="font-mono text-2xl font-semibold text-brand">
-            {slots.currentUsedSlots ?? 0}
-          </p>
-          <p class="font-mono text-2xl font-semibold">
-            {#if slots.currentAvailableSlots}
-              {slots.currentAvailableSlots - slots.currentUsedSlots || 0}
-            {:else}
-              -
-            {/if}
-          </p>
-        </div>
-        <div class="flex gap-8 text-xs text-secondary">
-          <p>{translate('workers.used')}</p>
-          <p>
-            {#if slots.currentAvailableSlots}
-              {translate('workers.available-out-of', {
-                count: slots.currentAvailableSlots,
-              })}
-            {:else}
-              {translate('workers.none-available')}
-            {/if}
-          </p>
-        </div>
+        </dt>
+        <dd class="mb-2">
+          <div class="flex items-baseline gap-12">
+            <p class="font-mono text-2xl font-semibold text-brand">
+              {slots.currentUsedSlots ?? 0}
+            </p>
+            <p class="font-mono text-2xl font-semibold">
+              {#if slots.currentAvailableSlots}
+                {slots.currentAvailableSlots - slots.currentUsedSlots || 0}
+              {:else}
+                -
+              {/if}
+            </p>
+          </div>
+          <div class="flex gap-8 text-xs text-secondary">
+            <p>{translate('workers.used')}</p>
+            <p>
+              {#if slots.currentAvailableSlots}
+                {translate('workers.available-out-of', {
+                  count: slots.currentAvailableSlots,
+                })}
+              {:else}
+                {translate('workers.none-available')}
+              {/if}
+            </p>
+          </div>
+        </dd>
+        {@render meterBar(
+          'slots-label',
+          slots.currentUsedSlots ?? 0,
+          slots.currentAvailableSlots
+            ? slots.currentAvailableSlots
+            : (slots.currentUsedSlots ?? 0),
+        )}
       </div>
 
       <div>
-        <div class="flex h-6 items-center text-sm text-secondary">
+        <dt class="flex h-6 items-center text-sm text-secondary">
           {translate('workers.tasks-processed')}
-        </div>
-        <span class="font-mono text-2xl font-semibold">
+        </dt>
+        <dd class="font-mono text-2xl font-semibold">
           {(slots.totalProcessedTasks ?? 0).toLocaleString()}
-        </span>
+        </dd>
       </div>
 
       {#if poller}
         <div>
-          <div class="flex h-6 items-center gap-2 text-sm text-secondary">
+          <dt class="flex h-6 items-center gap-2 text-sm text-secondary">
             {translate('workers.poller')}
             <Badge type="ghost" class="text-xs">
               {poller.isAutoscaling ? 'Autoscaling' : 'Manual'}
             </Badge>
-          </div>
-          <span class="font-mono text-2xl font-semibold">
-            {poller.currentPollers ?? 0}
-          </span>
-          <div class="text-xs text-secondary">
-            {#if poller.lastSuccessfulPollTime}
-              {translate('workers.last-poll')}
-              <Timestamp dateTime={poller.lastSuccessfulPollTime} as="span" />
-            {:else}
-              {translate('workers.no-activity')}
-            {/if}
-          </div>
+          </dt>
+          <dd>
+            <p class="font-mono text-2xl font-semibold">
+              {poller.currentPollers ?? 0}
+            </p>
+            <p class="text-xs text-secondary">
+              {#if poller.lastSuccessfulPollTime}
+                {translate('workers.last-poll')}
+                <Timestamp dateTime={poller.lastSuccessfulPollTime} as="span" />
+              {:else}
+                {translate('workers.no-activity')}
+              {/if}
+            </p>
+          </dd>
         </div>
       {/if}
-    </div>
+    </dl>
   </Card>
+{/snippet}
+
+{#snippet meterBar(labelledby: string, value: number, maxValue: number = 100)}
+  <div
+    role="meter"
+    aria-labelledby={labelledby}
+    aria-valuenow={value}
+    aria-valuemin={0}
+    aria-valuemax={maxValue}
+    class="relative h-2 w-full overflow-hidden rounded bg-indigo-100"
+  >
+    <div
+      class="absolute left-0 h-full bg-indigo-600"
+      style="width:{Math.min((value / maxValue) * 100, 100)}%;"
+    ></div>
+  </div>
 {/snippet}
 
 {#snippet goDependencyWarning()}
@@ -257,39 +302,29 @@
   <Card class="flex flex-col gap-2 border-t-0">
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
-        <span class="flex items-center gap-1 font-semibold">
+        <span id="cpu-label" class="flex items-center gap-1 font-semibold">
           <Icon name="microchip" class="h-3 w-3 text-secondary" />
           {translate('workers.cpu-usage')}
         </span>
         <span>{heartbeat?.hostInfo?.currentHostCpuUsage.toFixed(0)}%</span>
       </div>
-      <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
-        <div
-          class="absolute left-0 flex h-full items-center bg-indigo-600"
-          style="width:{Math.min(
-            heartbeat?.hostInfo?.currentHostCpuUsage,
-            100,
-          )}%;"
-        ></div>
-      </div>
+      {@render meterBar(
+        'cpu-label',
+        heartbeat?.hostInfo?.currentHostCpuUsage ?? 0,
+      )}
     </div>
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
-        <span class="flex items-center gap-1 font-semibold">
+        <span id="memory-label" class="flex items-center gap-1 font-semibold">
           <Icon name="server" class="h-3 w-3 text-secondary" />
           {translate('workers.memory-usage')}
         </span>
         <span>{heartbeat?.hostInfo?.currentHostMemUsage.toFixed(0)}%</span>
       </div>
-      <div class="relative h-2 w-full overflow-hidden rounded bg-indigo-100">
-        <div
-          class="absolute left-0 flex h-full items-center bg-indigo-600"
-          style="width:{Math.min(
-            heartbeat?.hostInfo?.currentHostMemUsage,
-            100,
-          )}%;"
-        ></div>
-      </div>
+      {@render meterBar(
+        'memory-label',
+        heartbeat?.hostInfo?.currentHostMemUsage ?? 0,
+      )}
     </div>
     {#if goDependencyPotentiallyMissing}
       {@render goDependencyWarning()}
@@ -325,24 +360,24 @@
     <h3 class="mb-4 text-base font-medium">
       {translate('workers.workflow-cache')}
     </h3>
-    <div class="grid grid-cols-2 gap-4">
+    <dl class="grid grid-cols-2 gap-4">
       <div>
-        <span class="font-mono text-2xl font-semibold">
+        <dd class="font-mono text-2xl font-semibold">
           {currentStickyCacheSize.toLocaleString()}
-        </span>
-        <div class="text-sm text-secondary">
+        </dd>
+        <dt class="text-sm text-secondary">
           {translate('workers.cache-size')}
-        </div>
+        </dt>
       </div>
       <div>
-        <span class="font-mono text-2xl font-semibold">
+        <dd class="font-mono text-2xl font-semibold">
           {cacheHitRate}%
-        </span>
-        <div class="text-sm text-secondary">
+        </dd>
+        <dt class="text-sm text-secondary">
           {translate('workers.cache-hits')}
-        </div>
+        </dt>
       </div>
-    </div>
+    </dl>
   </Card>
 {/snippet}
 
@@ -351,19 +386,11 @@
     <h3 class="mb-4 text-base font-medium">
       {translate('workers.diagnostics')}
     </h3>
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <span class="font-mono text-2xl">{pollSuccessRate}%</span>
-        <div class="text-sm text-secondary">
-          {translate('workers.poll-success-rate')}
-        </div>
-      </div>
-      <div>
-        <span class="font-mono text-2xl">{translate('common.none')}</span>
-        <div class="text-sm text-secondary">
-          {translate('workers.rate-limit')}
-        </div>
-      </div>
-    </div>
+    <dl>
+      <dd class="font-mono text-2xl">{pollSuccessRate}%</dd>
+      <dt class="text-sm text-secondary">
+        {translate('workers.poll-success-rate')}
+      </dt>
+    </dl>
   </Card>
 {/snippet}

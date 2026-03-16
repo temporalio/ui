@@ -27,14 +27,6 @@ export const fetchPaginatedWorkers = async (
         query: parameters.query,
       },
     }).then(({ workersInfo, nextPageToken }) => {
-      if (!workersInfo) {
-        // TODO: Verify if we want this behavior
-        throw {
-          statusCode: 501,
-          statusText: 'Not Implemented',
-          message: 'No workers info in response',
-        };
-      }
       return {
         items: workersInfo ?? [],
         nextPageToken: nextPageToken ? String(nextPageToken) : '',

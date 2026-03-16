@@ -6,7 +6,7 @@
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { fullEventHistory } from '$lib/stores/events';
+  import { fullEventHistory, sdkInfo } from '$lib/stores/events';
   import {
     relativeTime,
     timeFormat,
@@ -19,8 +19,6 @@
     formatDuration,
   } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
-  import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
-  import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import {
     routeForSchedule,
     routeForTaskQueue,
@@ -84,13 +82,7 @@
     $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
   );
 
-  const workflowCompletedTasks = $derived(
-    $fullEventHistory.filter(isWorkflowTaskCompletedEvent),
-  );
-
-  const { sdk, version: sdkVersion } = $derived(
-    getSDKandVersion(workflowCompletedTasks),
-  );
+  const { sdk, version: sdkVersion } = $derived($sdkInfo);
 
   const fetchLatestRun = async () => {
     const result = await fetchWorkflow({

@@ -33,7 +33,7 @@
   <Tabs>
     <TabList label={translate('workers.worker-views')}>
       <Tab
-        label={translate('workers.workers')}
+        label={translate('workers.instance', { count: 2 })}
         id="workers-tab"
         href={workersHref}
         active={pathMatches(

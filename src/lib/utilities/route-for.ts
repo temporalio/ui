@@ -27,7 +27,7 @@ type RouteParameters = {
 };
 
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
-export type WorkflowsParameter = Pick<
+export type QueryParameters = Pick<
   RouteParameters,
   'namespace' | 'query' | 'page'
 >;
@@ -192,7 +192,7 @@ export const routeForWorkflowsWithQuery = ({
   namespace,
   query,
   page,
-}: WorkflowsParameter): ResolvedPathname | undefined => {
+}: QueryParameters): ResolvedPathname | undefined => {
   if (!BROWSER) {
     return undefined;
   }
@@ -293,6 +293,21 @@ export const routeForWorkers = (
   parameters: NamespaceParameter,
 ): ResolvedPathname => {
   return `${routeForNamespace({ namespace: parameters.namespace })}/workers`;
+};
+
+export const routeForWorkersWithQuery = ({
+  namespace,
+  query,
+  page,
+}: QueryParameters): ResolvedPathname | undefined => {
+  if (!BROWSER) {
+    return undefined;
+  }
+
+  return toURL(routeForWorkers({ namespace }), {
+    query: query ?? '',
+    ...(page && { page }),
+  });
 };
 
 export const routeForWorkflowWorkers = (

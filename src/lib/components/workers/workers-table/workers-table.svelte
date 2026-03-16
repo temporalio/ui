@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/state';
+
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import PaginatedTable, {
     type PaginatedRequest,
@@ -7,6 +9,7 @@
   import type { WorkerInfo } from '$lib/types';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
+  import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-alert.svelte';
   import WorkersTableRow from './workers-table-row.svelte';
 
   interface Props {
@@ -20,12 +23,17 @@
 
   const columns = [
     { label: translate('workers.status') },
-    { label: translate('workers.instance') },
+    { label: translate('workers.instance', { count: 1 }) },
+    { label: translate('deployments.deployment') },
+    { label: translate('deployments.build-id') },
     { label: translate('workers.task-queue') },
     { label: translate('workers.identity') },
     { label: translate('workers.host-name') },
+    { label: translate('common.start-time') },
     { label: translate('workers.sdk') },
   ];
+
+  const hasQuery = $derived(page.url.searchParams.get('query') !== null);
 </script>
 
 <PaginatedTable
@@ -53,6 +61,12 @@
   {/each}
 
   <svelte:fragment slot="empty">
-    <EmptyState title={translate('workers.empty-state-title')}></EmptyState>
+    {#if hasQuery}
+      <EmptyState title={translate('workers.empty-state-title')} />
+    {:else}
+      <div class="my-12 flex w-full flex-col items-center justify-start">
+        <WorkerHeartbeatsSDKAlert />
+      </div>
+    {/if}
   </svelte:fragment>
 </PaginatedTable>

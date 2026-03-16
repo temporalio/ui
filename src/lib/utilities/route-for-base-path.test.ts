@@ -56,6 +56,7 @@ import {
   routeForWorkerDeploymentVersion,
   routeForWorkerInstance,
   routeForWorkers,
+  routeForWorkersWithQuery,
   routeForWorkflow,
   routeForWorkflowMemo,
   routeForWorkflowQuery,
@@ -211,6 +212,10 @@ describe('routeFor functions should resolve the base path exactly once', () => {
           namespace: 'default',
           workerInstanceKey: 'worker-1',
         }),
+    ],
+    [
+      'routeForWorkersWithQuery',
+      () => routeForWorkersWithQuery({ namespace: 'default', query: 'test' }),
     ],
   ];
 

@@ -3,6 +3,7 @@ export const Namespace = 'workers' as const;
 export const Strings = {
   worker: 'Worker',
   workers: 'Workers',
+  'worker-details': 'Worker Details',
   'worker-views': 'Worker Views',
   'view-all-workers': 'View All Workers',
   'back-to-workers': 'Back to Workers',
@@ -16,9 +17,11 @@ export const Strings = {
   overall: 'Overall',
   'host-name': 'Host Name',
   identity: 'Identity',
-  instance: 'Instance',
+  instance_one: 'Instance',
+  instance_other: 'Instances',
   'task-queue': 'Task Queue',
   status: 'Status',
+  'shutting-down': 'Shutting Down',
   sdk: 'Worker SDK',
   'empty-state-title': 'No Workers Found',
   'error-message-fetching': 'An error occurred while fetching workers.',
@@ -60,11 +63,15 @@ export const Strings = {
   'cache-hits': 'Cache hits',
   diagnostics: 'Diagnostics',
   'poll-success-rate': 'Poll success rate',
-  'rate-limit': 'Rate limit',
   'troubleshooting-workers-link': 'Troubleshooting workers',
   poller: 'Poller',
   'go-dependency-warning': 'Potential missing dependency',
   'go-dependency-warning-description':
     'This worker is not showing any usage. You may need to enable a dependency for the Go SDK in order to see this data.',
   'go-dependency-warning-link': 'Learn more.',
+  'no-worker-heartbeats': 'No workers are sending heartbeats.',
+  'worker-heartbeats-sdk-link-preface': 'Upgrade SDK to',
+  'worker-heartbeats-sdk-link-postface': 'to enable.',
+  'worker-heartbeats-sdk-list-preface':
+    'Upgrade SDK to one of the following versions to enable:',
 } as const;

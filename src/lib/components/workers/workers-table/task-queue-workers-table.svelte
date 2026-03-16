@@ -2,32 +2,36 @@
   import FallbackWorkersTable from '$lib/components/worker-table.svelte';
   import { getPollers } from '$lib/services/pollers-service';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
-  import { isNotFound, isNotImplemented } from '$lib/utilities/handle-error';
-  import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
   import WorkersTable from './workers-table.svelte';
 
   interface Props {
     namespace: string;
+    useFallback?: boolean;
+    searchAttributes?: Record<string, string>;
     taskQueue: string;
   }
 
-  let { namespace, taskQueue }: Props = $props();
-  let useFallback: boolean = $state(false);
+  let {
+    namespace,
+    useFallback = false,
+    searchAttributes,
+    taskQueue,
+  }: Props = $props();
 
   const onFetch = $derived(() =>
     fetchPaginatedWorkers({ namespace, query: `TaskQueue="${taskQueue}"` }),
   );
-
-  const onError = (error: APIErrorResponse) => {
-    if (isNotFound(error) || isNotImplemented(error)) useFallback = true;
-  };
 </script>
 
-{#if useFallback}
+{#snippet fallback()}
   {#await getPollers({ queue: taskQueue, namespace }) then workers}
-    <FallbackWorkersTable {workers} />
+    <FallbackWorkersTable {workers} {searchAttributes} />
   {/await}
+{/snippet}
+
+{#if useFallback}
+  {@render fallback()}
 {:else}
-  <WorkersTable {namespace} {onFetch} {onError} />
+  <WorkersTable {namespace} {onFetch} />
 {/if}

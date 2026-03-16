@@ -1,5 +1,6 @@
 <script lang="ts">
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import type { WorkerInfo } from '$lib/types';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
@@ -34,6 +35,16 @@
     {filterable}
   />
   <WorkersTableCell
+    attribute="DeploymentName"
+    value={worker.workerHeartbeat?.deploymentVersion?.deploymentName}
+    {filterable}
+  />
+  <WorkersTableCell
+    attribute="BuildId"
+    value={worker.workerHeartbeat?.deploymentVersion?.buildId}
+    {filterable}
+  />
+  <WorkersTableCell
     attribute="TaskQueue"
     value={worker.workerHeartbeat.taskQueue}
     {filterable}
@@ -45,8 +56,12 @@
   />
   <WorkersTableCell
     attribute="HostName"
-    value={worker.workerHeartbeat.hostInfo.hostName}
+    value={worker.workerHeartbeat.hostInfo?.hostName}
     {filterable}
+  />
+  <WorkersTableCell
+    attribute="StartTime"
+    value={$timestamp(worker.workerHeartbeat.startTime)}
   />
   <WorkersTableCell copyable={false}>
     <SdkLogo
