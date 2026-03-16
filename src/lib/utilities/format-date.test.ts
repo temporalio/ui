@@ -79,10 +79,14 @@ describe('formatDate', () => {
     );
   });
 
-  it('should not format other timezones as relative', () => {
-    expect(formatDate(date, 'UTC', { relative: true })).toEqual(
-      'Apr 13, 2022, 4:29:35.63 PM UTC',
-    );
+  it('timezone does not matter when switching to relative time', () => {
+    expect(formatDate(date, 'UTC', { relative: true })).toContain('ago');
+    expect(
+      formatDate(date, 'Central Standard Time', { relative: true }),
+    ).toContain('ago');
+    expect(
+      formatDate(date, 'Greenwich Mean Time', { relative: true }),
+    ).toContain('ago');
   });
 
   it('should format relative local time with a custom label', () => {
