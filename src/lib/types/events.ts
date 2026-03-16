@@ -74,8 +74,6 @@ export type EventWithMetadata = {
 } & EventRequestMetadata;
 
 export type EventType = import('$lib/utilities/is-event-type').EventType;
-export type ResetEventType =
-  import('$lib/utilities/is-event-type').ResetEventType;
 
 export type EventTypeCategory =
   import('$lib/models/event-history/get-event-categorization').EventTypeCategory;

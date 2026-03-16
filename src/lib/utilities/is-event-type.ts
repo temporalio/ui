@@ -207,8 +207,8 @@ export const eventAttributeKeys: readonly EventAttributeKey[] = [
   'workflowExecutionUnpausedEventAttributes',
 ] as const;
 
-export type ResetEventType = (typeof validResetEventTypes)[number];
-export const validResetEventTypes = [
+export const validResetEventTypes: EventType[] = [
+  'WorkflowTaskStarted',
   'WorkflowTaskCompleted',
   'WorkflowTaskFailed',
   'WorkflowTaskTimedOut',
