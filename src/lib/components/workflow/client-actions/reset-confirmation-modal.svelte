@@ -99,7 +99,7 @@
         id="reset-event-id"
         required
       >
-        {#each $resetEvents as event}
+        {#each $resetEvents as event (event.eventId)}
           <Option value={event.id}>{event.id} - {event.eventType}</Option>
         {/each}
       </Select>
