@@ -80,6 +80,12 @@
       'TemporalWorkflowVersioningBehavior'
     ],
   );
+
+  const historySizeFormatted = $derived(
+    workflow?.historySizeBytes
+      ? parseInt(workflow.historySizeBytes, 10).toLocaleString()
+      : '',
+  );
   let totalActions = $derived(
     $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
   );
@@ -281,7 +287,7 @@
 
   <DetailListColumn>
     <DetailListLabel>{translate('common.history-size-bytes')}</DetailListLabel>
-    <DetailListTextValue text={workflow?.historySizeBytes} />
+    <DetailListTextValue text={historySizeFormatted} />
 
     {#if !$isCloud}
       <DetailListLabel

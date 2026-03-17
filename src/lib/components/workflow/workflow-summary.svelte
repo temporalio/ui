@@ -22,6 +22,10 @@
   $: startTimestamp = $timestamp(workflow?.startTime);
 
   $: endTimestamp = $timestamp(workflow?.endTime);
+
+  $: historySizeFormatted = workflow?.historySizeBytes
+    ? parseInt(workflow.historySizeBytes, 10).toLocaleString()
+    : '';
 </script>
 
 <section>
@@ -52,7 +56,7 @@
         />
         <WorkflowDetail
           title={translate('common.history-size-bytes')}
-          content={workflow?.historySizeBytes}
+          content={historySizeFormatted}
           copyable
           textSize="sm"
         />
