@@ -63,15 +63,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 		panic(err)
 	}
 
-	forwardHeaders := []string{
-		echo.HeaderAuthorization,
-		auth.AuthorizationExtrasHeader,
-		"Caller-Type",
-	}
-	if len(cfg.ForwardHeaders) > 0 {
-		forwardHeaders = append(forwardHeaders, cfg.ForwardHeaders...)
-	}
-
+	forwardHeaders := buildForwardHeaders(cfg.ForwardHeaders)
 	apiMiddleware := append(serverOpts.APIMiddleware, headers.WithForwardHeaders(forwardHeaders))
 
 	e := echo.New()
@@ -166,4 +158,16 @@ func (s *Server) Stop() {
 	if err := s.httpServer.Close(); err != nil {
 		s.httpServer.Logger.Warn(err)
 	}
+}
+
+func buildForwardHeaders(configHeaders []string) []string {
+	headers := []string{
+		echo.HeaderAuthorization,
+		auth.AuthorizationExtrasHeader,
+		"Caller-Type",
+	}
+	if len(configHeaders) > 0 {
+		headers = append(headers, configHeaders...)
+	}
+	return headers
 }
