@@ -5,6 +5,9 @@
   import { translate } from '$lib/i18n/translate';
 
   const { namespace, queue: taskQueue } = $derived(page.params);
+  const workerHeartbeatsEnabled = $derived(
+    !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
 </script>
 
 <section class="flex flex-col gap-4">
@@ -12,5 +15,9 @@
   <h2 data-testid="task-queue-name">
     {taskQueue}
   </h2>
-  <WorkersTable {namespace} {taskQueue} />
+  <WorkersTable
+    {namespace}
+    {taskQueue}
+    useFallback={!workerHeartbeatsEnabled}
+  />
 </section>

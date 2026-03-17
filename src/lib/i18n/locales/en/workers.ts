@@ -74,4 +74,8 @@ export const Strings = {
   'worker-heartbeats-sdk-link-postface': 'to enable.',
   'worker-heartbeats-sdk-list-preface':
     'Upgrade SDK to one of the following versions to enable:',
+  'worker-heartbeats-disabled':
+    'Worker heartbeats are disabled for this Namespace.',
+  'worker-heartbeats-enablement':
+    'If you want to enable worker heartbeats for this namespace, please ensure the following value is set in Dynamic Config.',
 } as const;

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/state';
+
   import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
   import { decodePayload } from '$lib/utilities/decode-payload';
   import { isEmptyObject } from '$lib/utilities/is';
@@ -12,6 +14,9 @@
 
   const searchAttributes = $derived($activityExecution?.info?.searchAttributes);
   const taskQueue = $derived($activityExecution?.info?.taskQueue);
+  const workerHeartbeatsEnabled = $derived(
+    !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
 
   const decodedSearchAttributes = $derived.by(() => {
     if (isEmptyObject(searchAttributes)) return {};
@@ -33,4 +38,5 @@
   {namespace}
   {taskQueue}
   searchAttributes={decodedSearchAttributes}
+  useFallback={!workerHeartbeatsEnabled}
 />

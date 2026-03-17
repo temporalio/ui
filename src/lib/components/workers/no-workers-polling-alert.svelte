@@ -4,12 +4,10 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
 
-  const { workflow, workers, workersLoaded } = $derived($workflowRun);
-  const isPending = $derived(workflow?.isRunning || workflow?.isPaused);
-  const runningWithNoWorkers = $derived(
-    workersLoaded && isPending && !workers?.pollers?.length,
-  );
+  const { workflow } = $derived($workflowRun);
+  const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
 </script>
 
 <Alert

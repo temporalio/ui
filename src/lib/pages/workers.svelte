@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import FilterBar from '$lib/components/shared-search-attribute-filter/filter-bar.svelte';
+  import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
@@ -23,15 +24,23 @@
       $workerFilters = toListWorkflowFilters(query, $workerSearchAttributes);
     }
   });
+
+  const workerHeartbeatsEnabled = $derived(
+    !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
 </script>
 
-<FilterBar
-  filters={workerFilters}
-  options={$workerSearchAttributeOptions}
-  id="worker"
-  statusAttribute="WorkerStatus"
-/>
+{#if workerHeartbeatsEnabled}
+  <FilterBar
+    filters={workerFilters}
+    options={$workerSearchAttributeOptions}
+    id="worker"
+    statusAttribute="WorkerStatus"
+  />
 
-{#key [namespace, query]}
-  <WorkersTable {namespace} {onFetch} filterable />
-{/key}
+  {#key [namespace, query]}
+    <WorkersTable {namespace} {onFetch} filterable />
+  {/key}
+{:else}
+  <WorkerHeartbeatsDisabled />
+{/if}

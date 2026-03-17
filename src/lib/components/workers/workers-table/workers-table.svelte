@@ -6,7 +6,9 @@
     type PaginatedRequest,
   } from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkerInfo } from '$lib/types';
+  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
   import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-alert.svelte';
@@ -34,6 +36,7 @@
   ];
 
   const hasQuery = $derived(page.url.searchParams.get('query') !== null);
+  const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
 </script>
 
 <PaginatedTable
@@ -61,7 +64,7 @@
   {/each}
 
   <svelte:fragment slot="empty">
-    {#if hasQuery}
+    {#if hasQuery || runningWithNoWorkers}
       <EmptyState title={translate('workers.empty-state-title')} />
     {:else}
       <div class="my-12 flex w-full flex-col items-center justify-start">
