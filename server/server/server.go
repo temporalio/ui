@@ -31,7 +31,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
 	"github.com/temporalio/ui-server/v2/server/cors"
@@ -54,17 +53,6 @@ type (
 
 // NewServer returns a new instance of server that serves one or many services.
 func NewServer(opts ...server_options.ServerOption) *Server {
-	authMiddleware := server_options.WithAPIMiddleware(([]api.Middleware{
-		headers.WithForwardHeaders(
-			[]string{
-				// NOTE: Authorization header is forwarded by grpc-gateway
-				auth.AuthorizationExtrasHeader,
-				"Caller-Type",
-			}),
-	}))
-
-	opts = append(opts, authMiddleware)
-
 	serverOpts := server_options.NewServerOptions(opts)
 	cfgProvider, err := config.NewConfigProviderWithRefresh(serverOpts.ConfigProvider)
 	if err != nil {
@@ -74,6 +62,17 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	if err != nil {
 		panic(err)
 	}
+
+	forwardHeaders := []string{
+		echo.HeaderAuthorization,
+		auth.AuthorizationExtrasHeader,
+		"Caller-Type",
+	}
+	if len(cfg.ForwardHeaders) > 0 {
+		forwardHeaders = append(forwardHeaders, cfg.ForwardHeaders...)
+	}
+
+	apiMiddleware := append(serverOpts.APIMiddleware, headers.WithForwardHeaders(forwardHeaders))
 
 	e := echo.New()
 	e.HideBanner = cfg.HideLogs
@@ -105,7 +104,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 
 	e.Pre(route.PublicPath(cfg.PublicPath))
 	route.SetHealthRoute(e)
-	route.SetAPIRoutes(e, cfgProvider, serverOpts.APIMiddleware)
+	route.SetAPIRoutes(e, cfgProvider, apiMiddleware)
 	route.SetAuthRoutes(e, cfgProvider)
 	if cfg.EnableUI {
 		var assets fs.FS
