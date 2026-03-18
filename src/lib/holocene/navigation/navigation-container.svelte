@@ -14,6 +14,7 @@
   interface Props extends HTMLAttributes<HTMLDivElement> {
     isCloud?: boolean;
     subtitle?: string;
+    subtitleHref?: string;
     children?: Snippet;
     bottom?: Snippet;
   }
@@ -21,6 +22,7 @@
   let {
     isCloud = false,
     subtitle,
+    subtitleHref,
     children,
     bottom,
     ...restProps
@@ -48,6 +50,7 @@
       {version}
       navOpen={$navOpen}
       {subtitle}
+      {subtitleHref}
       {children}
       {bottom}
       ontoggle={toggle}
@@ -57,6 +60,7 @@
       {version}
       navOpen={$navOpen}
       {subtitle}
+      {subtitleHref}
       {children}
       {bottom}
       ontoggle={toggle}
