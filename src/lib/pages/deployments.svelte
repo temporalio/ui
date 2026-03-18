@@ -8,7 +8,7 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
-  import type { APIErrorResponse } from '$lib/utilities/request-from-api';
+  import { has } from '$lib/utilities/has';
 
   let error = $state('');
 
@@ -21,9 +21,16 @@
     };
   });
 
-  const onError = (err: APIErrorResponse) => {
-    error =
-      err?.body?.message || translate('deployments.error-message-fetching');
+  const onError = (err: unknown) => {
+    if (
+      has(err, 'body') &&
+      has(err.body, 'message') &&
+      typeof err.body.message === 'string'
+    ) {
+      error = err.body.message;
+    } else {
+      error = translate('deployments.error-message-fetching');
+    }
   };
 
   const columns = [
@@ -54,7 +61,7 @@
       >{translate('deployments.deployments')}</caption
     >
     <tr slot="headers" class="text-left">
-      {#each columns as { label }}
+      {#each columns as { label } (label)}
         <th>{label}</th>
       {/each}
     </tr>

@@ -24,7 +24,7 @@ export const fetchPaginatedWorkers = async (
       params: {
         maximumPageSize: String(pageSize),
         nextPageToken: token,
-        query: parameters.query,
+        ...(parameters.query && { query: parameters.query }),
       },
     }).then(({ workersInfo, nextPageToken }) => {
       return {

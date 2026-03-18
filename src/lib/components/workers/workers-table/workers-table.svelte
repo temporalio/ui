@@ -9,7 +9,6 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { WorkerInfo } from '$lib/types';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
-  import type { APIErrorResponse } from '$lib/utilities/request-from-api';
 
   import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-alert.svelte';
   import WorkersTableRow from './workers-table-row.svelte';
@@ -18,7 +17,7 @@
     filterable?: boolean;
     namespace: string;
     onFetch: () => Promise<PaginatedRequest<WorkerInfo>>;
-    onError?: (err: APIErrorResponse) => void;
+    onError?: (err: unknown) => void;
   }
 
   let { filterable = false, namespace, onFetch, onError }: Props = $props();
@@ -59,7 +58,7 @@
       <th>{label}</th>
     {/each}
   </tr>
-  {#each visibleItems as worker (worker.workerHeartbeat.workerInstanceKey)}
+  {#each visibleItems as worker (worker.workerHeartbeat?.workerInstanceKey)}
     <WorkersTableRow {worker} {namespace} {filterable} />
   {/each}
 

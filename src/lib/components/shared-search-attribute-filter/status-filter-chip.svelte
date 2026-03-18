@@ -59,7 +59,7 @@
     `dropdown-filter-chip-${attribute.toLowerCase()}`,
   );
 
-  function handleStatusSelect(status: string) {
+  function handleStatusSelect(status: string | null) {
     if (localFilters.find((f) => f.value === status)) {
       localFilters = localFilters.filter((f) => f.value !== status);
       onUpdate(localFilters);
@@ -144,7 +144,7 @@
             <Checkbox
               on:change={() => handleStatusSelect(status)}
               {checked}
-              label={status}
+              label={status ?? undefined}
               labelHidden
             />
           {/snippet}

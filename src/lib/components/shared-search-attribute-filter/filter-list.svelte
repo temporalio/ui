@@ -87,7 +87,7 @@
     if (index === $activeQueryIndex) {
       $activeQueryIndex = null;
       $filter = createFilter();
-    } else if (index < $activeQueryIndex) {
+    } else if ($activeQueryIndex !== null && index < $activeQueryIndex) {
       $activeQueryIndex -= 1;
     }
   }

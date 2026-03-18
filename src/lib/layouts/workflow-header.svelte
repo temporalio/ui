@@ -53,7 +53,7 @@
     run: runId,
     id: eventId,
   } = $derived(page.params);
-  const { workflow, workers } = $derived($workflowRun);
+  const { workflow } = $derived($workflowRun);
   const routeParameters = $derived({
     namespace,
     workflow: workflowId,
@@ -265,7 +265,7 @@
         )}
       >
         <Badge type="primary" class="px-2 py-0">
-          {workflow.historyEvents}
+          {workflow?.historyEvents}
         </Badge>
       </Tab>
       <Tab

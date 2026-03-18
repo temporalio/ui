@@ -139,7 +139,7 @@
         onclick={() => {
           handleNewQuery(value, type);
         }}
-        disabled={statusAttribute &&
+        disabled={Boolean(statusAttribute) &&
           value === statusAttribute &&
           !!$filters.find((f) => f.attribute === statusAttribute)}
       >

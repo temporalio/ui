@@ -79,7 +79,9 @@
     ],
   );
   let totalActions = $derived(
-    $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
+    $fullEventHistory
+      .reduce((acc, e) => (e?.billableActions ?? 0) + acc, 0)
+      .toString(),
   );
 
   const { sdk, version: sdkVersion } = $derived($sdkInfo);
@@ -158,18 +160,20 @@
       href={routeForWorkflowsWithQuery({
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
-      })}
+      }) ?? ''}
       iconName="filter"
     />
 
-    <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
-    <DetailListLinkValue
-      text={workflow?.taskQueue}
-      href={routeForTaskQueue({
-        namespace,
-        queue: workflow?.taskQueue,
-      })}
-    />
+    {#if workflow?.taskQueue}
+      <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
+      <DetailListLinkValue
+        text={workflow.taskQueue}
+        href={routeForTaskQueue({
+          namespace,
+          queue: workflow.taskQueue,
+        })}
+      />
+    {/if}
 
     {#if workflow?.priority}
       {@const { priorityKey, fairnessKey } = workflow.priority}
@@ -206,11 +210,11 @@
           copyableText={versioningBuildId}
           text={versioningBuildId}
           href={deploymentVersion
-            ? routeForWorkflowsWithQuery({
+            ? (routeForWorkflowsWithQuery({
                 namespace,
                 query: `TemporalWorkerDeploymentVersion="${deploymentVersion}"`,
-              })
-            : undefined}
+              }) ?? '')
+            : ''}
           iconName={deploymentVersion ? 'filter' : undefined}
         />
       {/if}
@@ -226,7 +230,7 @@
           href={routeForWorkflowsWithQuery({
             namespace,
             query: `TemporalWorkflowVersioningBehavior="${versioningBehavior}"`,
-          })}
+          }) ?? ''}
           iconName="filter"
         />
       {/if}
@@ -244,15 +248,15 @@
         })}
       />
     {/if}
-    {#if parent}
+    {#if parent?.workflowId && parent?.runId}
       <DetailListLabel>{translate('workflows.parent-workflow')}</DetailListLabel
       >
       <DetailListLinkValue
-        text={parent?.workflowId}
+        text={parent.workflowId}
         href={routeForWorkflow({
           namespace,
-          workflow: parent?.workflowId,
-          run: parent?.runId,
+          workflow: parent.workflowId,
+          run: parent.runId,
         })}
       />
     {/if}

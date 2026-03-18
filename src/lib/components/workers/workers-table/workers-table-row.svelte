@@ -17,7 +17,7 @@
 
   let { worker, namespace, filterable = false }: Props = $props();
   const status = $derived(
-    toWorkerStatusReadable(worker.workerHeartbeat.status),
+    toWorkerStatusReadable(worker.workerHeartbeat?.status),
   );
 </script>
 
@@ -27,10 +27,10 @@
   </td>
   <WorkersTableCell
     attribute="WorkerInstanceKey"
-    value={worker.workerHeartbeat.workerInstanceKey}
+    value={worker.workerHeartbeat?.workerInstanceKey}
     href={routeForWorkerInstance({
       namespace,
-      workerInstanceKey: worker.workerHeartbeat.workerInstanceKey,
+      workerInstanceKey: worker.workerHeartbeat?.workerInstanceKey ?? '',
     })}
     {filterable}
   />
@@ -46,27 +46,27 @@
   />
   <WorkersTableCell
     attribute="TaskQueue"
-    value={worker.workerHeartbeat.taskQueue}
+    value={worker.workerHeartbeat?.taskQueue}
     {filterable}
   />
   <WorkersTableCell
     attribute="WorkerIdentity"
-    value={worker.workerHeartbeat.workerIdentity}
+    value={worker.workerHeartbeat?.workerIdentity}
     {filterable}
   />
   <WorkersTableCell
     attribute="HostName"
-    value={worker.workerHeartbeat.hostInfo?.hostName}
+    value={worker.workerHeartbeat?.hostInfo?.hostName}
     {filterable}
   />
   <WorkersTableCell
     attribute="StartTime"
-    value={$timestamp(worker.workerHeartbeat.startTime)}
+    value={$timestamp(worker.workerHeartbeat?.startTime)}
   />
   <WorkersTableCell copyable={false}>
     <SdkLogo
-      sdk={formatSDKName(worker.workerHeartbeat.sdkName)}
-      version={worker.workerHeartbeat.sdkVersion}
+      sdk={formatSDKName(worker.workerHeartbeat?.sdkName)}
+      version={worker.workerHeartbeat?.sdkVersion ?? ''}
     />
   </WorkersTableCell>
 </tr>

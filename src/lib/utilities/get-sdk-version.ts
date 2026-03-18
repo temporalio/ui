@@ -2,7 +2,7 @@ import type { WorkflowTaskCompletedEvent } from '$lib/types/events';
 
 import { capitalize } from './format-camel-case';
 
-export const formatSDKName = (sdkName: string | undefined): string => {
+export const formatSDKName = (sdkName: string | undefined | null): string => {
   let sdk = '';
   if (!sdkName) return sdk;
 

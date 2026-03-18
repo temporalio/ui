@@ -17,7 +17,7 @@
   interface Props {
     attribute?: string;
     copyable?: boolean;
-    value?: string;
+    value?: string | null;
     filterable?: boolean;
     href?: string;
     children?: Snippet;
@@ -65,8 +65,8 @@
       hideFilterOrCopy();
     }
   };
-  const truncate = (value: string | undefined): string => {
-    if (value?.length > 13) {
+  const truncate = (value: string | undefined | null): string => {
+    if (value?.length && value.length > 13) {
       return `${value.slice(0, 6)}...${value.slice(-6)}`;
     }
     return value ?? '';
@@ -84,11 +84,11 @@
 >
   {#if attribute === 'BuildId' || attribute === 'WorkerInstanceKey'}
     {#if href}
-      <Tooltip text={value} top class="min-w-0">
+      <Tooltip text={value ?? undefined} top class="min-w-0">
         <Link {href}>{truncate(value)}</Link>
       </Tooltip>
     {:else}
-      <Tooltip text={value} top class="min-w-0">
+      <Tooltip text={value ?? undefined} top class="min-w-0">
         {truncate(value)}
       </Tooltip>
     {/if}

@@ -27,13 +27,13 @@
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
   type Props = {
-    worker: WorkerInfo;
+    worker: WorkerInfo | null | undefined;
   };
 
   let { worker }: Props = $props();
 
   const { namespace } = $derived(page.params);
-  const heartbeat = $derived(worker.workerHeartbeat);
+  const heartbeat = $derived(worker?.workerHeartbeat);
   const status = $derived(toWorkerStatusReadable(heartbeat?.status));
 
   const totalStickyCacheHit = $derived(heartbeat?.totalStickyCacheHit ?? 0);
@@ -81,7 +81,7 @@
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        content={heartbeat?.workerInstanceKey}
+        content={heartbeat?.workerInstanceKey ?? ''}
         clickAllToCopy
         container-class="w-full"
         class="overflow-hidden text-ellipsis text-left"
@@ -110,22 +110,24 @@
     </DetailListColumn>
 
     <DetailListColumn>
-      <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
-      <DetailListLinkValue
-        copyable
-        copyableText={heartbeat?.taskQueue}
-        text={heartbeat?.taskQueue}
-        href={routeForWorkersWithQuery({
-          namespace,
-          query: `TaskQueue="${heartbeat?.taskQueue}"`,
-        })}
-        iconName="filter"
-      />
+      {#if heartbeat?.taskQueue}
+        <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
+        <DetailListLinkValue
+          copyable
+          copyableText={heartbeat.taskQueue}
+          text={heartbeat.taskQueue}
+          href={routeForWorkersWithQuery({
+            namespace,
+            query: `TaskQueue="${heartbeat.taskQueue}"`,
+          }) ?? ''}
+          iconName="filter"
+        />
+      {/if}
       <DetailListLabel>{translate('workers.sdk')}</DetailListLabel>
       <DetailListValue>
         <SdkLogo
           sdk={formatSDKName(heartbeat?.sdkName)}
-          version={heartbeat?.sdkVersion}
+          version={heartbeat?.sdkVersion ?? ''}
         />
       </DetailListValue>
     </DetailListColumn>
@@ -134,13 +136,13 @@
       <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
       <DetailListTextValue
         copyable={!!heartbeat?.deploymentVersion?.buildId}
-        copyableText={heartbeat?.deploymentVersion?.buildId}
+        copyableText={heartbeat?.deploymentVersion?.buildId ?? ''}
         text={heartbeat?.deploymentVersion?.buildId ?? '-'}
       />
       <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
       <DetailListTextValue
         copyable={!!heartbeat?.deploymentVersion?.deploymentName}
-        copyableText={heartbeat?.deploymentVersion?.deploymentName}
+        copyableText={heartbeat?.deploymentVersion?.deploymentName ?? ''}
         text={heartbeat?.deploymentVersion?.deploymentName ?? '-'}
       />
     </DetailListColumn>
@@ -180,13 +182,15 @@
 
 {#snippet taskSlotCard(
   title: string,
-  slots: WorkerSlotsInfo,
-  poller: WorkerPollerInfo,
+  slots: WorkerSlotsInfo | null | undefined,
+  poller: WorkerPollerInfo | null | undefined,
 )}
   <Card>
     <div class="mb-4 flex items-center gap-2">
       <h3 class="text-base font-medium">{title}</h3>
-      <Badge type="ghost" class="text-xs">{slots.slotSupplierKind}</Badge>
+      {#if slots?.slotSupplierKind}
+        <Badge type="ghost" class="text-xs">{slots.slotSupplierKind}</Badge>
+      {/if}
     </div>
 
     <dl class="flex flex-wrap gap-x-32 gap-y-4">
@@ -200,11 +204,11 @@
         <dd class="mb-2">
           <div class="flex items-baseline gap-12">
             <p class="font-mono text-2xl font-semibold text-brand">
-              {slots.currentUsedSlots ?? 0}
+              {slots?.currentUsedSlots ?? 0}
             </p>
             <p class="font-mono text-2xl font-semibold">
-              {#if slots.currentAvailableSlots}
-                {slots.currentAvailableSlots - slots.currentUsedSlots || 0}
+              {#if slots?.currentAvailableSlots}
+                {slots.currentAvailableSlots - (slots?.currentUsedSlots ?? 0)}
               {:else}
                 -
               {/if}
@@ -213,7 +217,7 @@
           <div class="flex gap-8 text-xs text-secondary">
             <p>{translate('workers.used')}</p>
             <p>
-              {#if slots.currentAvailableSlots}
+              {#if slots?.currentAvailableSlots}
                 {translate('workers.available-out-of', {
                   count: slots.currentAvailableSlots,
                 })}
@@ -225,10 +229,10 @@
         </dd>
         {@render meterBar(
           'slots-label',
-          slots.currentUsedSlots ?? 0,
-          slots.currentAvailableSlots
+          slots?.currentUsedSlots ?? 0,
+          slots?.currentAvailableSlots
             ? slots.currentAvailableSlots
-            : (slots.currentUsedSlots ?? 0),
+            : (slots?.currentUsedSlots ?? 0),
         )}
       </div>
 
@@ -237,7 +241,7 @@
           {translate('workers.tasks-processed')}
         </dt>
         <dd class="font-mono text-2xl font-semibold">
-          {(slots.totalProcessedTasks ?? 0).toLocaleString()}
+          {(slots?.totalProcessedTasks ?? 0).toLocaleString()}
         </dd>
       </div>
 
@@ -306,7 +310,9 @@
           <Icon name="microchip" class="h-3 w-3 text-secondary" />
           {translate('workers.cpu-usage')}
         </span>
-        <span>{heartbeat?.hostInfo?.currentHostCpuUsage.toFixed(0)}%</span>
+        <span
+          >{heartbeat?.hostInfo?.currentHostCpuUsage?.toFixed(0) ?? '-'}%</span
+        >
       </div>
       {@render meterBar(
         'cpu-label',
@@ -319,7 +325,9 @@
           <Icon name="server" class="h-3 w-3 text-secondary" />
           {translate('workers.memory-usage')}
         </span>
-        <span>{heartbeat?.hostInfo?.currentHostMemUsage.toFixed(0)}%</span>
+        <span
+          >{heartbeat?.hostInfo?.currentHostMemUsage?.toFixed(0) ?? '-'}%</span
+        >
       </div>
       {@render meterBar(
         'memory-label',

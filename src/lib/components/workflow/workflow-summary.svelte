@@ -40,19 +40,19 @@
         <div class="h-0.5 rounded-full bg-inverse"></div>
         <WorkflowDetail
           title={translate('common.workflow-type')}
-          content={workflow?.name}
+          content={workflow?.name ?? ''}
           copyable
           textSize="sm"
         />
         <WorkflowDetail
           title={translate('common.run-id')}
-          content={workflow?.runId}
+          content={workflow?.runId ?? ''}
           copyable
           textSize="sm"
         />
         <WorkflowDetail
           title={translate('common.history-size-bytes')}
-          content={workflow?.historySizeBytes}
+          content={workflow?.historySizeBytes ?? ''}
           copyable
           textSize="sm"
         />
@@ -60,19 +60,21 @@
       <div class="grow overflow-hidden">
         <h4>{translate('common.task-queue')}</h4>
         <div class="h-0.5 rounded-full bg-inverse"></div>
-        <WorkflowDetail
-          content={workflow?.taskQueue}
-          href={routeForWorkflowWorkers({
-            namespace: $page.params.namespace,
-            workflow: workflow?.id,
-            run: workflow?.runId,
-          })}
-          copyable
-          textSize="sm"
-        />
+        {#if workflow?.taskQueue}
+          <WorkflowDetail
+            content={workflow.taskQueue}
+            href={routeForWorkflowWorkers({
+              namespace: $page.params.namespace,
+              workflow: workflow?.id,
+              run: workflow?.runId,
+            })}
+            copyable
+            textSize="sm"
+          />
+        {/if}
         <WorkflowDetail
           title={translate('workflows.state-transitions')}
-          content={workflow?.stateTransitionCount}
+          content={workflow?.stateTransitionCount ?? ''}
           textSize="sm"
         />
       </div>

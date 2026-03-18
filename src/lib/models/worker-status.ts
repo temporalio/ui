@@ -1,4 +1,4 @@
-export type WorkerStatus = 'Unspecified' | 'Running' | 'ShuttingDown' | null;
+export type WorkerStatus = 'Unspecified' | 'Running' | 'ShuttingDown';
 
 export type WorkerFilters = readonly (WorkerStatus | 'All')[];
 

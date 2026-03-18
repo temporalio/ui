@@ -83,7 +83,7 @@ export const toWorkflowTaskFailureReadable = (
 export const toPendingActivityStateReadable = (
   state?: PendingActivityState,
 ): PendingActivityState => {
-  if (!state) return state;
+  if (!state) return 'Unspecified';
   return fromScreamingEnum(state, 'PendingActivityState');
 };
 
@@ -102,7 +102,7 @@ export const toCallbackStateReadable = (
 };
 
 export const toWorkerStatusReadable = (
-  state?: WorkerStatus,
+  state: WorkerStatus | undefined | null,
 ): ReadableWorkerStatus => {
   if (!state) return 'Unspecified';
   return fromScreamingEnum(
