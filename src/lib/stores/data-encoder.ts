@@ -2,7 +2,6 @@ import { derived } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import { authUser } from './auth-user';
 import { lastDataConverterStatus } from './data-converter-config';
 import {
   codecEndpoint,
@@ -18,7 +17,6 @@ type DataEncoder = {
   endpoint: string;
   customErrorMessage: string;
   customErrorLink: string;
-  accessToken?: string;
   hasNotRequested: boolean;
   hasError: boolean;
   hasSuccess: boolean;
@@ -31,7 +29,6 @@ export const dataEncoder = derived(
     overrideRemoteCodecConfiguration,
     lastDataEncoderStatus,
     lastDataConverterStatus,
-    authUser,
   ],
   ([
     $page,
@@ -39,7 +36,6 @@ export const dataEncoder = derived(
     $overrideRemoteCodecConfiguration,
     $lastDataEncoderStatus,
     $lastDataConverterStatus,
-    $authUser,
   ]): DataEncoder => {
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.data?.settings?.codec?.endpoint;
@@ -57,7 +53,6 @@ export const dataEncoder = derived(
     const endpoint = $overrideRemoteCodecConfiguration
       ? $codecEndpoint
       : settingsEndpoint || $codecEndpoint;
-    const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
       : $lastDataConverterStatus === 'notRequested';
@@ -74,7 +69,6 @@ export const dataEncoder = derived(
       settingsPassAccessToken,
       settingsIncludeCredentials,
       endpoint,
-      accessToken,
       customErrorMessage,
       customErrorLink,
       hasNotRequested,

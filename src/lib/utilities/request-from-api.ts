@@ -1,12 +1,16 @@
 import { BROWSER } from 'esm-env';
 
-import { getAuthUser } from '$lib/stores/auth-user';
 import type { NetworkError } from '$lib/types/global';
 
 import { refreshTokens } from './auth-refresh';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
+import {
+  getAccessToken,
+  getIdToken,
+  isCloudAuthProvider,
+} from './token-provider';
 
 export type TemporalAPIError = {
   code: number;
@@ -91,7 +95,7 @@ export const requestFromAPI = async <T>(
   try {
     options = withSecurityOptions(options, isBrowser);
     if (!endpoint.endsWith('api/v1/settings')) {
-      options = await withAuth(options, isBrowser);
+      options = await withAuth(options);
     }
 
     const queryIsTooLong = [...query.values()].some(
@@ -112,21 +116,29 @@ export const requestFromAPI = async <T>(
     let response = await makeRequest();
     let { status, statusText } = response;
 
-    // Shouldn't this check the expiry on the jwt and refresh before we make a request instead of
-    // doing a 401? If we get a 401 and we have done all of our refreshes shouldn't we send the user to the login
-    // page? Asking for a friend (claude)
     if (isBrowser && status === 401) {
-      const refreshed = await refreshTokens();
-      if (refreshed) {
+      if (isCloudAuthProvider()) {
+        // Cloud path: getAccessToken() handles refresh internally,
+        // so re-calling it gets a fresh token.
         options = withSecurityOptions(init.options, isBrowser);
         if (!endpoint.endsWith('api/v1/settings')) {
-          options = await withAuth(options, isBrowser);
+          options = await withAuth(options);
         }
         response = await makeRequest();
         status = response.status;
         statusText = response.statusText;
+      } else {
+        const refreshed = await refreshTokens();
+        if (refreshed) {
+          options = withSecurityOptions(init.options, isBrowser);
+          if (!endpoint.endsWith('api/v1/settings')) {
+            options = await withAuth(options);
+          }
+          response = await makeRequest();
+          status = response.status;
+          statusText = response.statusText;
+        }
       }
-      // If refresh failed, let the error flow to handleError() which will redirect to login
     }
 
     const body = await response.json();
@@ -163,60 +175,22 @@ const withSecurityOptions = (
   return opts;
 };
 
-const withAuth = async (
-  options: RequestInit,
-  isBrowser = BROWSER,
-): Promise<RequestInit> => {
+const withAuth = async (options: RequestInit): Promise<RequestInit> => {
   const headers: Record<string, string> =
     (options.headers as Record<string, string>) ?? {};
 
-  if ((globalThis as Record<string, unknown>)?.AccessToken) {
-    const accessToken = (globalThis as Record<string, unknown>)
-      .AccessToken as () => Promise<string>;
-    options.headers = await withBearerToken(headers, accessToken, isBrowser);
-  } else if (getAuthUser().accessToken) {
-    options.headers = await withBearerToken(
-      headers,
-      async () => getAuthUser().accessToken ?? '',
-      isBrowser,
-    );
-    options.headers = withIdToken(
-      options.headers as Record<string, string>,
-      getAuthUser().idToken ?? '',
-      isBrowser,
-    );
-  }
-
-  return options;
-};
-
-const withBearerToken = async (
-  headers: Record<string, string>,
-  accessToken: () => Promise<string>,
-  isBrowser = BROWSER,
-): Promise<Record<string, string>> => {
-  if (!isBrowser) return headers;
-
-  const token = await accessToken();
+  const token = await getAccessToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  return headers;
-};
-
-const withIdToken = (
-  headers: Record<string, string>,
-  idToken: string,
-  isBrowser = BROWSER,
-): Record<string, string> => {
-  if (!isBrowser) return headers;
-
+  const idToken = await getIdToken();
   if (idToken) {
     headers['Authorization-Extras'] = idToken;
   }
 
-  return headers;
+  options.headers = headers;
+  return options;
 };
 
 const withCsrf = (

@@ -9,7 +9,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
-  import { authUser } from '$lib/stores/auth-user';
   import {
     decodeLocalActivity,
     getLocalActivityMarkerEvent,
@@ -68,7 +67,6 @@
         decodedLocalActivity = await decodeLocalActivity(localActivityEvent, {
           namespace: page.params.namespace,
           settings: page.data.settings,
-          accessToken: $authUser.accessToken,
         });
 
         if (decodedLocalActivity) {

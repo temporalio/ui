@@ -14,6 +14,10 @@ import {
 } from '$lib/utilities/auth-user-cookie';
 import { isAuthorized } from '$lib/utilities/is-authorized';
 import { routeForLoginPage } from '$lib/utilities/route-for';
+import {
+  initTokenProvider,
+  isCloudAuthProvider,
+} from '$lib/utilities/token-provider';
 
 import '../../app.css';
 
@@ -22,14 +26,20 @@ export const load: LayoutLoad = async function ({
 }): Promise<LayoutData> {
   const settings: Settings = await fetchSettings(fetch);
 
+  initTokenProvider();
+
   if (!settings.auth.enabled) {
     cleanAuthUserCookie();
     clearAuthUser();
   }
 
-  const authUser = getAuthUserCookie();
-  if (authUser?.accessToken) {
-    setAuthUser(authUser);
+  if (!isCloudAuthProvider()) {
+    const authUser = getAuthUserCookie();
+    if (authUser?.accessToken) {
+      setAuthUser(authUser);
+      cleanAuthUserCookie();
+    }
+  } else {
     cleanAuthUserCookie();
   }
 

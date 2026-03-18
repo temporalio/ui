@@ -9,7 +9,6 @@
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowMetadata } from '$lib/services/query-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
 
   const { namespace } = $derived(page.params);
@@ -34,7 +33,6 @@
           },
         },
         settings,
-        $authUser?.accessToken ?? '',
       );
       $workflowRun.metadata = metadata;
       lastFetched = new Date();

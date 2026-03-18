@@ -19,7 +19,6 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { authUser } from '$lib/stores/auth-user';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -187,7 +186,6 @@
       primaryLocalAttribute = await decodeLocalActivity(event, {
         namespace: page.params.namespace,
         settings: page.data.settings,
-        accessToken: $authUser.accessToken,
       });
     } else if (
       isEventGroup(event) &&
@@ -196,7 +194,6 @@
       primaryLocalAttribute = await decodeLocalActivity(event.initialEvent, {
         namespace: page.params.namespace,
         settings: page.data.settings,
-        accessToken: $authUser.accessToken,
       });
     }
   });

@@ -66,7 +66,6 @@ export type Callbacks = import('$lib/types').CallbackInfo[];
 export type EventRequestMetadata = {
   namespace: string;
   settings: Settings;
-  accessToken: string;
 };
 
 export type EventWithMetadata = {
