@@ -6,33 +6,31 @@ import { page } from '$app/stores';
 import type { Capabilities } from '$lib/types';
 import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-import type { FeatureFlag } from './feature-flags';
-import { featureFlags } from './feature-flags';
+import { getFlagStore } from './feature-flags';
 import { temporalVersion } from './versions';
 
-const CAPABILITY_FLAG_MAP: Partial<Record<keyof Capabilities, FeatureFlag>> = {
-  serverlessWorkers: 'serverless-workers',
-};
+const LOCAL_OVERRIDE_CAPABILITIES = new Set<keyof Capabilities>([
+  'serverlessWorkers',
+]);
 
 function withLocalFallback(
   capabilityKey: keyof Capabilities,
-  flagKey: FeatureFlag,
 ): Readable<boolean> {
-  return derived([page, featureFlags], ([$page, $featureFlags]) => {
+  const localStore = getFlagStore(String(capabilityKey));
+  return derived([page, localStore], ([$page, $local]) => {
     const serverValue = $page.data?.systemInfo?.capabilities?.[capabilityKey];
     if (serverValue !== undefined && serverValue !== null) {
       return Boolean(serverValue);
     }
-    return Boolean($featureFlags[flagKey]);
+    return $local;
   });
 }
 
 export function isCapabilityEnabled(
   key: keyof Capabilities,
 ): Readable<boolean> {
-  const flagKey = CAPABILITY_FLAG_MAP[key];
-  if (flagKey) {
-    return withLocalFallback(key, flagKey);
+  if (LOCAL_OVERRIDE_CAPABILITIES.has(key)) {
+    return withLocalFallback(key);
   }
   return derived(page, ($page) =>
     Boolean($page.data?.systemInfo?.capabilities?.[key]),
