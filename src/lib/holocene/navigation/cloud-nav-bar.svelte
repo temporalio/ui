@@ -43,13 +43,15 @@
     {#if subtitle}
       {#if subtitleHref}
         <a href={subtitleHref} class="contents">
-          <Icon label="Project Namespaces" name="arrow-left" class="m-1" />
+          <Icon
+            label="Project Namespaces"
+            name="arrow-left"
+            class="m-1 group-data-[nav=closed]:hidden"
+          />
           <h2
             class={merge(
-              'font-secondary mb-0 hidden whitespace-nowrap px-1 pr-2 font-medium text-white underline group-data-[nav=open]:block',
-              subtitle === 'Cloud'
-                ? 'text-2xl'
-                : 'text-base underline-offset-2',
+              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-white underline group-data-[nav=open]:block',
+              subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
             )}
           >
             {subtitle}
@@ -58,9 +60,8 @@
       {:else}
         <h2
           class={merge(
-            'font-secondary mb-0 hidden whitespace-nowrap font-medium text-white group-data-[nav=open]:block',
-            subtitle === 'Cloud' ? 'text-2xl' : 'text-base',
-            subtitle !== 'Cloud' && 'px-2',
+            'mb-0 hidden whitespace-nowrap font-sans font-medium not-italic text-white group-data-[nav=open]:block',
+            subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
           )}
         >
           {subtitle}
