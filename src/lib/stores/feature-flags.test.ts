@@ -6,27 +6,27 @@ import { getFlagStore, setFeatureFlag } from './feature-flags';
 
 describe('setFeatureFlag', () => {
   afterEach(() => {
-    getFlagStore('serverlessWorkers').set(false);
+    getFlagStore('serverlessDeployments').set(false);
   });
 
   it('should enable a flag', () => {
-    setFeatureFlag('serverlessWorkers', true);
-    expect(get(getFlagStore('serverlessWorkers'))).toBe(true);
+    setFeatureFlag('serverlessDeployments', true);
+    expect(get(getFlagStore('serverlessDeployments'))).toBe(true);
   });
 
   it('should disable a flag', () => {
-    setFeatureFlag('serverlessWorkers', true);
-    setFeatureFlag('serverlessWorkers', false);
-    expect(get(getFlagStore('serverlessWorkers'))).toBe(false);
+    setFeatureFlag('serverlessDeployments', true);
+    setFeatureFlag('serverlessDeployments', false);
+    expect(get(getFlagStore('serverlessDeployments'))).toBe(false);
   });
 
   it('should use a per-flag localStorage key', () => {
-    setFeatureFlag('serverlessWorkers', true);
+    setFeatureFlag('serverlessDeployments', true);
     setFeatureFlag('otherFlag', true);
-    expect(get(getFlagStore('serverlessWorkers'))).toBe(true);
+    expect(get(getFlagStore('serverlessDeployments'))).toBe(true);
     expect(get(getFlagStore('otherFlag'))).toBe(true);
-    setFeatureFlag('serverlessWorkers', false);
-    expect(get(getFlagStore('serverlessWorkers'))).toBe(false);
+    setFeatureFlag('serverlessDeployments', false);
+    expect(get(getFlagStore('serverlessDeployments'))).toBe(false);
     expect(get(getFlagStore('otherFlag'))).toBe(true);
     getFlagStore('otherFlag').set(false);
   });

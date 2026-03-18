@@ -10,7 +10,7 @@ import { getFlagStore } from './feature-flags';
 import { temporalVersion } from './versions';
 
 const LOCAL_OVERRIDE_CAPABILITIES = new Set<keyof Capabilities>([
-  'serverlessWorkers',
+  'serverlessDeployments',
 ]);
 
 function withLocalFallback(
