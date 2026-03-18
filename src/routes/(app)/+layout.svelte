@@ -56,7 +56,7 @@
     isCloud
       ? [page.params.namespace]
       : $namespaces.map(
-          (namespace: Namespace) => namespace?.namespaceInfo?.name,
+          (namespace: Namespace) => namespace?.namespaceInfo?.name as string,
         ),
   );
   let namespaceList: NamespaceListItem[] = $derived(
@@ -236,13 +236,21 @@
         fullRoute: routeForStandaloneActivities({ namespace }),
       },
       {
+        subPath: 'workers/deployments',
+        fullRoute: routeForWorkerDeployments({ namespace }),
+      },
+      {
         subPath: 'workers',
         fullRoute: routeForWorkers({ namespace }),
       },
     ];
 
+    const segments = page.url.pathname.split('/').filter(Boolean);
+    const namespaceIndex = segments.indexOf(page.params.namespace);
+    const sectionSegments = segments.slice(namespaceIndex + 1);
+
     for (const { subPath, fullRoute } of namespacePages) {
-      if (page.url.pathname.endsWith(subPath)) {
+      if (sectionSegments.join('/').startsWith(subPath)) {
         return fullRoute;
       }
     }
