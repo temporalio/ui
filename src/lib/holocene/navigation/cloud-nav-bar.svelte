@@ -60,7 +60,7 @@
       {:else}
         <h2
           class={merge(
-            'mb-0 hidden whitespace-nowrap font-sans font-medium not-italic text-indigo-100 group-data-[nav=open]:block',
+            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-indigo-100 group-data-[nav=open]:block',
             subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
           )}
         >
