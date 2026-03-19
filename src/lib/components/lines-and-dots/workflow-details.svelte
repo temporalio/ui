@@ -287,7 +287,7 @@
   </DetailListColumn>
 
   <DetailListColumn>
-    <DetailListLabel>{translate('common.history-size-bytes')}</DetailListLabel>
+    <DetailListLabel>{translate('common.history-size')}</DetailListLabel>
     <DetailListTextValue text={historySizeFormatted} />
 
     {#if !$isCloud}
