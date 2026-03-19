@@ -6,7 +6,8 @@ export const formatSDKName = (sdkName: string | undefined | null): string => {
   let sdk = '';
   if (!sdkName) return sdk;
 
-  sdk = capitalize(sdkName.split('-')[1]);
+  const parts = sdkName.split('-');
+  sdk = capitalize(parts[1] ?? parts[0]);
   if (sdk === 'Dotnet') {
     sdk = '.NET';
   }

@@ -16,7 +16,6 @@
 
   const { namespace } = $derived(page.params);
   const query = $derived(page.url.searchParams.get('query') || '');
-  const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));
 
   onMount(() => {
     const query = page.url.searchParams.get('query') ?? '';
@@ -39,7 +38,11 @@
   />
 
   {#key [namespace, query]}
-    <WorkersTable {namespace} {onFetch} filterable />
+    <WorkersTable
+      {namespace}
+      onFetch={() => fetchPaginatedWorkers({ namespace, query })}
+      filterable
+    />
   {/key}
 {:else}
   <WorkerHeartbeatsDisabled />

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/state';
 
   import DetailListColumn from '$lib/components/detail-list/detail-list-column.svelte';
@@ -27,10 +29,11 @@
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
   type Props = {
+    breadcrumb: Snippet;
     worker: WorkerInfo | null | undefined;
   };
 
-  let { worker }: Props = $props();
+  let { breadcrumb, worker }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const heartbeat = $derived(worker?.workerHeartbeat);
@@ -51,11 +54,11 @@
 
   const cacheHitRate = $derived.by(() => {
     const total = totalStickyCacheHit + totalStickyCacheMiss;
-    if (total === 0) return 0;
+    if (total === 0) return '0';
     return ((totalStickyCacheHit / total) * 100).toFixed(1);
   });
   const pollSuccessRate = $derived.by(() => {
-    if (!heartbeat?.workflowTaskSlotsInfo?.totalProcessedTasks) return 0;
+    if (!heartbeat?.workflowTaskSlotsInfo?.totalProcessedTasks) return '0';
     const successCount =
       heartbeat.workflowTaskSlotsInfo.totalProcessedTasks -
       (heartbeat.workflowTaskSlotsInfo.totalFailedTasks ?? 0);
@@ -65,6 +68,14 @@
     ).toFixed(1);
   });
 </script>
+
+<div class="flex items-center gap-2">
+  {@render breadcrumb()}
+  {#if heartbeat?.workerInstanceKey}
+    <Icon name="chevron-left" />
+    {heartbeat.workerInstanceKey}
+  {/if}
+</div>
 
 <section
   aria-label={translate('workers.worker-details')}
@@ -196,7 +207,7 @@
     <dl class="flex flex-wrap gap-x-32 gap-y-4">
       <div>
         <dt
-          id="slots-label"
+          id="slots-{title}"
           class="flex h-6 items-center text-sm text-secondary"
         >
           {translate('workers.slots')}
@@ -228,7 +239,7 @@
           </div>
         </dd>
         {@render meterBar(
-          'slots-label',
+          `slots-${title}`,
           slots?.currentUsedSlots ?? 0,
           slots?.currentAvailableSlots
             ? slots.currentAvailableSlots
@@ -283,7 +294,9 @@
   >
     <div
       class="absolute left-0 h-full bg-indigo-600"
-      style="width:{Math.min((value / maxValue) * 100, 100)}%;"
+      style="width:{maxValue > 0
+        ? Math.min((value / maxValue) * 100, 100)
+        : 0}%;"
     ></div>
   </div>
 {/snippet}
@@ -311,7 +324,7 @@
           {translate('workers.cpu-usage')}
         </span>
         <span
-          >{heartbeat?.hostInfo?.currentHostCpuUsage?.toFixed(0) ?? '-'}%</span
+          >{heartbeat?.hostInfo?.currentHostCpuUsage?.toFixed(0) ?? '0'}%</span
         >
       </div>
       {@render meterBar(
@@ -326,7 +339,7 @@
           {translate('workers.memory-usage')}
         </span>
         <span
-          >{heartbeat?.hostInfo?.currentHostMemUsage?.toFixed(0) ?? '-'}%</span
+          >{heartbeat?.hostInfo?.currentHostMemUsage?.toFixed(0) ?? '0'}%</span
         >
       </div>
       {@render meterBar(
@@ -348,15 +361,17 @@
       </h3>
       <dl>
         <dt class="text-secondary">{translate('workers.host-name')}</dt>
-        <dd class="select-all">{heartbeat?.hostInfo?.hostName}</dd>
+        <dd class="select-all">{heartbeat?.hostInfo?.hostName ?? '-'}</dd>
 
         <dt class="mt-2 text-secondary">{translate('workers.process-id')}</dt>
-        <dd class="select-all">{heartbeat?.hostInfo?.processId}</dd>
+        <dd class="select-all">{heartbeat?.hostInfo?.processId ?? '-'}</dd>
 
         <dt class="mt-2 text-secondary">
           {translate('workers.worker-grouping')}
         </dt>
-        <dd class="select-all">{heartbeat?.hostInfo?.workerGroupingKey}</dd>
+        <dd class="select-all">
+          {heartbeat?.hostInfo?.workerGroupingKey ?? '-'}
+        </dd>
       </dl>
     </Card>
     {@render hostUsage()}

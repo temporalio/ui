@@ -1,5 +1,9 @@
 <script lang="ts">
   import FallbackWorkersTable from '$lib/components/worker-table.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
+  import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { getPollers } from '$lib/services/pollers-service';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
 
@@ -25,8 +29,17 @@
 </script>
 
 {#snippet fallback()}
-  {#await getPollers({ queue: taskQueue, namespace }) then workers}
+  {#await getPollers({ queue: taskQueue, namespace })}
+    <Skeleton class="h-8 w-24 rounded-none" />
+    <SkeletonTable rows={5} />
+  {:then workers}
     <FallbackWorkersTable {workers} {searchAttributes} />
+  {:catch error}
+    <Alert
+      intent="error"
+      title={error?.message ?? translate('workers.error-message-fetching')}
+      class="max-w-screen-lg xl:w-2/3"
+    />
   {/await}
 {/snippet}
 

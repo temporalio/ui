@@ -28,10 +28,12 @@
   <WorkersTableCell
     attribute="WorkerInstanceKey"
     value={worker.workerHeartbeat?.workerInstanceKey}
-    href={routeForWorkerInstance({
-      namespace,
-      workerInstanceKey: worker.workerHeartbeat?.workerInstanceKey ?? '',
-    })}
+    href={worker.workerHeartbeat?.workerInstanceKey
+      ? routeForWorkerInstance({
+          namespace,
+          workerInstanceKey: worker.workerHeartbeat.workerInstanceKey,
+        })
+      : undefined}
     {filterable}
   />
   <WorkersTableCell

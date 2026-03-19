@@ -58,7 +58,7 @@
       <th>{label}</th>
     {/each}
   </tr>
-  {#each visibleItems as worker (worker.workerHeartbeat?.workerInstanceKey)}
+  {#each visibleItems as worker, i (worker.workerHeartbeat?.workerInstanceKey ?? i)}
     <WorkersTableRow {worker} {namespace} {filterable} />
   {/each}
 

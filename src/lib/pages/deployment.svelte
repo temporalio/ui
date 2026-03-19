@@ -16,20 +16,18 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
-  const namespace = $derived(page.params.namespace);
-  const deploymentName = $derived(page.params.deployment);
-  const parameters = $derived({
-    namespace,
-    deploymentName: decodeURIForSvelte(deploymentName),
-  });
+  const { namespace } = $derived(page.params);
+  const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
   const workflowHref = $derived(
     routeForWorkflowsWithQuery({
-      namespace: page.params.namespace,
+      namespace,
       query: `TemporalWorkerDeployment="${deploymentName}"`,
     }),
   );
 
-  const deploymentFetch = $derived(fetchDeployment(parameters));
+  const deploymentFetch = $derived(
+    fetchDeployment({ namespace, deploymentName }),
+  );
 
   const columns = [
     { label: translate('deployments.build-id') },
