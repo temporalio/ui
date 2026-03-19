@@ -13,28 +13,20 @@ const LOCAL_OVERRIDE_CAPABILITIES = new Set<keyof Capabilities>([
   'serverlessDeployments',
 ]);
 
-function withLocalFallback(
-  capabilityKey: keyof Capabilities,
-): Readable<boolean> {
-  const localStore = getFlagStore(String(capabilityKey));
-  return derived([page, localStore], ([$page, $local]) => {
-    const serverValue = $page.data?.systemInfo?.capabilities?.[capabilityKey];
-    if (serverValue !== undefined && serverValue !== null) {
-      return Boolean(serverValue);
-    }
-    return $local;
-  });
-}
-
 export function isCapabilityEnabled(
   key: keyof Capabilities,
 ): Readable<boolean> {
-  if (LOCAL_OVERRIDE_CAPABILITIES.has(key)) {
-    return withLocalFallback(key);
+  if (!LOCAL_OVERRIDE_CAPABILITIES.has(key)) {
+    return derived(page, ($page) =>
+      Boolean($page.data?.systemInfo?.capabilities?.[key]),
+    );
   }
-  return derived(page, ($page) =>
-    Boolean($page.data?.systemInfo?.capabilities?.[key]),
-  );
+
+  const localStore = getFlagStore(String(key));
+  return derived([page, localStore], ([$page, $local]) => {
+    const serverValue = $page.data?.systemInfo?.capabilities?.[key];
+    return serverValue ?? $local;
+  });
 }
 
 export const prefixSearchEnabled = derived(
