@@ -1,7 +1,4 @@
-import type {
-  CreateFormData,
-  EditFormData,
-} from '$lib/components/workers/serverless-worker-form/shared';
+import type { EditFormData } from '$lib/components/workers/serverless-worker-form/shared';
 import type {
   MockValidationResult,
   ServerlessWorker,
@@ -179,33 +176,6 @@ export function getServerlessWorkerDetail(
       },
     ],
   };
-}
-
-export function createServerlessWorker(
-  input: CreateFormData,
-): ServerlessWorker {
-  const now = new Date().toISOString();
-  const worker: ServerlessWorker = {
-    id: crypto.randomUUID(),
-    name: input.name,
-    status: 'running',
-    compute: 'Lambda',
-    lambdaArn: input.lambdaArn,
-    iamRoleArn: input.iamRoleArn,
-    region: input.region,
-    taskQueue: input.taskQueue,
-    maxWorkers: input.maxWorkers ?? 10,
-    maxConcurrentActivities: input.maxConcurrentActivities ?? 5,
-    maxTaskQueueActivitiesPerSecond:
-      input.maxTaskQueueActivitiesPerSecond ?? 100,
-    idleTimeoutSeconds: input.idleTimeoutSeconds ?? 300,
-    sdkVersion: 'Python 1.17.0',
-    lastHeartbeat: now,
-    createdAt: now,
-    updatedAt: now,
-  };
-  mockWorkers = [...mockWorkers, worker];
-  return worker;
 }
 
 export function deleteServerlessWorker(id: string): boolean {
