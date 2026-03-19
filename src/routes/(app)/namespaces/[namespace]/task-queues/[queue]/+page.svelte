@@ -5,11 +5,11 @@
   import { translate } from '$lib/i18n/translate';
   import TaskQueue from '$lib/pages/task-queue.svelte';
 
-  const queue = $derived(page.params.queue);
+  const { namespace, queue } = $derived(page.params);
 </script>
 
 <PageTitle
   title="{translate('workers.task-queue')} | {queue}"
   url={page.url.href}
 />
-<TaskQueue />
+<TaskQueue {namespace} {queue} />

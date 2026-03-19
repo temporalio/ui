@@ -8,9 +8,10 @@
 
   interface Props {
     namespace: string;
+    useFallback?: boolean;
   }
 
-  let { namespace }: Props = $props();
+  let { namespace, useFallback = false }: Props = $props();
 
   const searchAttributes = $derived($activityExecution?.info?.searchAttributes);
   const taskQueue = $derived($activityExecution?.info?.taskQueue ?? '');
@@ -37,5 +38,5 @@
   {namespace}
   {taskQueue}
   searchAttributes={decodedSearchAttributes}
-  useFallback={!workerHeartbeatsEnabled}
+  useFallback={!workerHeartbeatsEnabled || useFallback}
 />

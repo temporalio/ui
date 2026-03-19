@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import WorkerInfoSkeleton from '$lib/components/workers/worker-details/skeleton.svelte';
-  import WorkerInfo from '$lib/components/workers/worker-details/worker-details.svelte';
+  import Skeleton from '$lib/components/workers/worker-details/skeleton.svelte';
+  import WorkerDetails from '$lib/components/workers/worker-details/worker-details.svelte';
   import Error from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -26,9 +26,9 @@
 {/snippet}
 
 {#await workerDetailsPromise}
-  <WorkerInfoSkeleton {breadcrumb} />
+  <Skeleton {breadcrumb} />
 {:then data}
-  <WorkerInfo worker={data.workerInfo} {breadcrumb} />
+  <WorkerDetails worker={data.workerInfo} {breadcrumb} />
 {:catch error}
   {@render breadcrumb()}
   <Error {error} status={error.statusCode} />

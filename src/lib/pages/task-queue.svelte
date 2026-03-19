@@ -4,7 +4,13 @@
   import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  const { namespace, queue: taskQueue } = $derived(page.params);
+  interface Props {
+    namespace: string;
+    queue: string;
+    useFallback?: boolean;
+  }
+
+  let { namespace, queue: taskQueue, useFallback = false }: Props = $props();
   const workerHeartbeatsEnabled = $derived(
     !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
   );
@@ -18,6 +24,6 @@
   <WorkersTable
     {namespace}
     {taskQueue}
-    useFallback={!workerHeartbeatsEnabled}
+    useFallback={!workerHeartbeatsEnabled || useFallback}
   />
 </section>
