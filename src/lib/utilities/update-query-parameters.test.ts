@@ -1,10 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { base } from '$app/paths';
+
 import {
   gotoOptions,
   updateMultipleQueryParameters,
   updateQueryParameters,
 } from './update-query-parameters';
+
+const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
 describe('updateQueryParameters', () => {
   afterEach(() => {
@@ -14,7 +18,6 @@ describe('updateQueryParameters', () => {
   it('should call `goto` with the correct path when no value is provided', () => {
     const url = new URL('https://temporal.io');
     const parameter = 'parameter';
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, url, goto });
 
@@ -28,7 +31,6 @@ describe('updateQueryParameters', () => {
     const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = '';
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -43,8 +45,6 @@ describe('updateQueryParameters', () => {
     const parameter = 'parameter';
     const value = '';
 
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
-
     updateQueryParameters({ parameter, value, url, goto });
 
     const [href, options] = goto.mock.calls[0];
@@ -57,7 +57,6 @@ describe('updateQueryParameters', () => {
     const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = null as unknown as string;
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -72,8 +71,6 @@ describe('updateQueryParameters', () => {
     const parameter = 'parameter';
     const value = null as unknown as string;
 
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
-
     updateQueryParameters({ parameter, value, url, goto });
 
     const [href, options] = goto.mock.calls[0];
@@ -86,7 +83,6 @@ describe('updateQueryParameters', () => {
     const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = 'value';
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -100,7 +96,6 @@ describe('updateQueryParameters', () => {
     const url = new URL('https://temporal.io/?other=value');
     const parameter = 'parameter';
     const value = 'value';
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -114,7 +109,6 @@ describe('updateQueryParameters', () => {
     const parameter = 'parameter';
     const value = 'value';
     const url = new URL(`https://temporal.io/?${parameter}=oldvalue`);
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -130,7 +124,6 @@ describe('updateQueryParameters', () => {
     const url = new URL(
       `https://temporal.io/?${parameter}=oldvalue&other=value`,
     );
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -146,7 +139,6 @@ describe('updateQueryParameters', () => {
     const url = new URL(
       `https://temporal.io/?other1=value1&${parameter}=oldValue&other2=value2`,
     );
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -160,7 +152,6 @@ describe('updateQueryParameters', () => {
     const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = null as unknown as string;
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -174,7 +165,6 @@ describe('updateQueryParameters', () => {
     const url = new URL('https://temporal.io');
     const parameter = 'parameter';
     const value = '';
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto, allowEmpty: true });
 
@@ -190,7 +180,6 @@ describe('updateQueryParameters', () => {
     const url = new URL(
       `https://temporal.io/?${parameter}=oldvalue&other=value`,
     );
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({
       parameter,
@@ -212,7 +201,6 @@ describe('updateQueryParameters', () => {
     const url = new URL(
       `https://temporal.io/?${parameter}=oldvalue&other=value&page=3`,
     );
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({
       parameter,
@@ -226,6 +214,104 @@ describe('updateQueryParameters', () => {
 
     expect(href).toBe('/?parameter=value');
     expect(options).toEqual(gotoOptions);
+  });
+});
+
+describe('updateQueryParameters with custom base path', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should not duplicate the base path in the url', () => {
+    const url = new URL(`https://temporal.io/${base}/namespaces`);
+    const parameter = 'parameter';
+    const value = 'value';
+
+    updateQueryParameters({ parameter, value, url, goto });
+
+    const [href] = goto.mock.calls[0];
+
+    expect(href).toBe(`/${base}/namespaces?parameter=value`);
+  });
+
+  it('should not duplicate the base path when no value is provided', () => {
+    const url = new URL(`https://temporal.io/${base}/namespaces`);
+    const parameter = 'parameter';
+
+    updateQueryParameters({ parameter, url, goto });
+
+    const [href] = goto.mock.calls[0];
+
+    expect(href).toBe(`/${base}/namespaces`);
+  });
+
+  it('should not duplicate the base path when updating existing params', () => {
+    const url = new URL(
+      `https://temporal.io/${base}/namespaces?parameter=oldvalue`,
+    );
+    const parameter = 'parameter';
+    const value = 'newvalue';
+
+    updateQueryParameters({ parameter, value, url, goto });
+
+    const [href] = goto.mock.calls[0];
+
+    expect(href).toBe(`/${base}/namespaces?parameter=newvalue`);
+  });
+});
+
+describe('updateMultipleQueryParameters with custom base path', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should not duplicate the base path in the url', () => {
+    const url = new URL(`https://temporal.io/${base}/namespaces`);
+    const parameters = [{ parameter: 'parameter', value: 'value' }];
+
+    updateMultipleQueryParameters({ parameters, url, goto });
+
+    const [href] = goto.mock.calls[0];
+
+    expect(href).toBe(`/${base}/namespaces?parameter=value`);
+  });
+
+  it('should not duplicate the base path when no value is provided', () => {
+    const url = new URL(`https://temporal.io/${base}/namespaces`);
+    const parameters = [{ parameter: 'parameter' }];
+
+    updateMultipleQueryParameters({ parameters, url, goto });
+
+    const [href] = goto.mock.calls[0];
+
+    expect(href).toBe(`/${base}/namespaces`);
+  });
+
+  it('should not duplicate the base path with multiple parameters', () => {
+    const url = new URL(`https://temporal.io/${base}/namespaces`);
+    const parameters = [
+      { parameter: 'A', value: 'value1' },
+      { parameter: 'B', value: 'value2' },
+    ];
+
+    updateMultipleQueryParameters({ parameters, url, goto });
+
+    const [href] = goto.mock.calls[0];
+
+    expect(href).toBe(`/${base}/namespaces?A=value1&B=value2`);
+  });
+
+  it('should not duplicate the base path when updating existing params', () => {
+    const url = new URL(
+      `https://temporal.io/${base}/namespaces?parameter=oldvalue&other=value`,
+    );
+    const parameters = [{ parameter: 'parameter', value: 'newvalue' }];
+
+    updateMultipleQueryParameters({ parameters, url, goto });
+
+    const [href] = goto.mock.calls[0];
+
+    expect(href).toBe(`/${base}/namespaces?other=value&parameter=newvalue`);
   });
 });
 
@@ -262,7 +348,6 @@ describe('updateMultipleQueryParameters', () => {
   it('should call `goto` with the correct path when no value is provided', () => {
     const url = new URL('https://temporal.io');
     const parameters = [{ parameter: 'parameter' }];
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -275,7 +360,6 @@ describe('updateMultipleQueryParameters', () => {
   it('should call `goto` with the correct path when an empty string is provided', () => {
     const url = new URL('https://temporal.io');
     const parameters = [{ parameter: 'parameter', value: '' }];
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -288,8 +372,6 @@ describe('updateMultipleQueryParameters', () => {
   it('should call `goto` with the correct path when an emmpty string is provided and there are other params', () => {
     const url = new URL('https://temporal.io/?other=value');
     const parameters = [{ parameter: 'parameter', value: '' }];
-
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -304,7 +386,6 @@ describe('updateMultipleQueryParameters', () => {
     const parameters = [
       { parameter: 'parameter', value: null as unknown as string },
     ];
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -320,8 +401,6 @@ describe('updateMultipleQueryParameters', () => {
       { parameter: 'parameter', value: null as unknown as string },
     ];
 
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
-
     updateMultipleQueryParameters({ parameters, url, goto });
 
     const [href, options] = goto.mock.calls[0];
@@ -333,7 +412,6 @@ describe('updateMultipleQueryParameters', () => {
   it('should call `goto` with the correct path', () => {
     const url = new URL('https://temporal.io');
     const parameters = [{ parameter: 'parameter', value: 'value' }];
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -349,7 +427,6 @@ describe('updateMultipleQueryParameters', () => {
       { parameter: 'A', value: 'value' },
       { parameter: 'B', value: 'value' },
     ];
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -362,7 +439,6 @@ describe('updateMultipleQueryParameters', () => {
   it('should call `goto` with the correct path when there are other params', () => {
     const url = new URL('https://temporal.io/?other=value');
     const parameters = [{ parameter: 'parameter', value: 'value' }];
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -378,7 +454,6 @@ describe('updateMultipleQueryParameters', () => {
       { parameter: 'A', value: 'value' },
       { parameter: 'B', value: 'value' },
     ];
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -392,7 +467,6 @@ describe('updateMultipleQueryParameters', () => {
     const parameter = 'parameter';
     const parameters = [{ parameter, value: 'value' }];
     const url = new URL(`https://temporal.io/?${parameter}=oldvalue`);
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -408,7 +482,6 @@ describe('updateMultipleQueryParameters', () => {
     const url = new URL(
       `https://temporal.io/?${parameter}=oldvalue&other=value`,
     );
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -423,7 +496,6 @@ describe('updateMultipleQueryParameters', () => {
     const parameters = [
       { parameter: 'parameter', value: null as unknown as string },
     ];
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({ parameters, url, goto });
 
@@ -439,7 +511,6 @@ describe('updateMultipleQueryParameters', () => {
     const url = new URL(
       `https://temporal.io/?${parameter}=oldvalue&other=value`,
     );
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({
       parameters,
@@ -460,7 +531,6 @@ describe('updateMultipleQueryParameters', () => {
     const url = new URL(
       `https://temporal.io/?${parameter}=oldvalue&other=value&page=3`,
     );
-    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateMultipleQueryParameters({
       parameters,
