@@ -146,7 +146,7 @@ func TestBuildUIIndexHandler_WithPublicPath_RedirectsWhenPrefixMissing(t *testin
 
 			err := handler(c)
 			assert.NoError(t, err)
-			assert.Equal(t, http.StatusTemporaryRedirect, rec.Code)
+			assert.Equal(t, http.StatusPermanentRedirect, rec.Code)
 			assert.Equal(t, tt.expectedTarget, rec.Header().Get("Location"))
 		})
 	}

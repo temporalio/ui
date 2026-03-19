@@ -92,11 +92,12 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 		missingPublicPath := hasPublicPath && !hasPublicPathPrefix && !isExactPublicPath
 
 		if missingPublicPath {
-			target := publicPath + c.Request().URL.Path
+			cleanPath := path.Clean(c.Request().URL.Path)
+			target := publicPath + cleanPath
 			if c.Request().URL.RawQuery != "" {
 				target += "?" + c.Request().URL.RawQuery
 			}
-			return c.Redirect(http.StatusTemporaryRedirect, target)
+			return c.Redirect(http.StatusPermanentRedirect, target)
 		}
 		return c.Stream(200, "text/html", bytes.NewBuffer(indexHTMLBytes))
 	}, nil
