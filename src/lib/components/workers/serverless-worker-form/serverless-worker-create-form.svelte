@@ -14,7 +14,6 @@
     validateIamRole,
     validateLambdaArn,
     validateRegion,
-    validateTaskQueue,
   } from '$lib/services/serverless-worker-service';
 
   import {
@@ -29,9 +28,10 @@
 
   type Props = {
     namespace: string;
-    onSubmit: (data: CreateFormData) => void;
+    onSubmit: (data: CreateFormData) => Promise<void>;
     cancelHref: string;
     submitButtonText: string;
+    error?: string;
   };
 
   let {
@@ -39,6 +39,7 @@
     onSubmit,
     cancelHref,
     submitButtonText,
+    error,
   }: Props = $props();
 
   const initialData = {
@@ -46,11 +47,8 @@
     lambdaArn: '',
     iamRoleArn: '',
     region: '',
-    taskQueue: '',
-    maxWorkers: 10,
-    maxConcurrentActivities: 5,
-    maxTaskQueueActivitiesPerSecond: 100,
-    idleTimeoutSeconds: 300,
+    minInstances: undefined,
+    maxInstances: undefined,
   };
 
   const superform = superForm(initialData, {
@@ -69,38 +67,24 @@
   let lambdaValidation = $state<ValidationState>({ checking: false });
   let iamValidation = $state<ValidationState>({ checking: false });
   let regionValidation = $state<ValidationState>({ checking: false });
-  let taskQueueValidation = $state<ValidationState>({ checking: false });
+  let validating = $state(false);
 
-  async function checkLambdaArn() {
-    const arn = $form.lambdaArn;
-    if (!arn || !/^arn:aws:lambda:/.test(arn)) return;
-    lambdaValidation = { checking: true };
-    const result = await validateLambdaArn(arn);
-    lambdaValidation = { checking: false, result };
-  }
-
-  async function checkIamRole() {
-    const arn = $form.iamRoleArn;
-    if (!arn || !/^arn:aws:iam::/.test(arn)) return;
-    iamValidation = { checking: true };
-    const result = await validateIamRole(arn);
-    iamValidation = { checking: false, result };
-  }
-
-  async function checkRegion() {
-    const region = $form.region;
-    if (!region) return;
-    regionValidation = { checking: true };
-    const result = await validateRegion(region);
-    regionValidation = { checking: false, result };
-  }
-
-  async function checkTaskQueue() {
-    const name = $form.taskQueue;
-    if (!name) return;
-    taskQueueValidation = { checking: true };
-    const result = await validateTaskQueue(name);
-    taskQueueValidation = { checking: false, result };
+  async function validateConnection() {
+    const { lambdaArn, iamRoleArn, region } = $form;
+    if (!lambdaArn && !iamRoleArn && !region) return;
+    validating = true;
+    lambdaValidation = { checking: !!lambdaArn };
+    iamValidation = { checking: !!iamRoleArn };
+    regionValidation = { checking: !!region };
+    const [lambdaResult, iamResult, regionResult] = await Promise.all([
+      lambdaArn ? validateLambdaArn(lambdaArn) : Promise.resolve(undefined),
+      iamRoleArn ? validateIamRole(iamRoleArn) : Promise.resolve(undefined),
+      region ? validateRegion(region) : Promise.resolve(undefined),
+    ]);
+    lambdaValidation = { checking: false, result: lambdaResult };
+    iamValidation = { checking: false, result: iamResult };
+    regionValidation = { checking: false, result: regionResult };
+    validating = false;
   }
 
   let showScaling = $state(false);
@@ -126,40 +110,6 @@
             placeholder={translate('workers.name-placeholder')}
             required
           />
-          <div class="flex flex-col gap-1">
-            <div class="flex items-center gap-1">
-              <label for="taskQueue" class="text-sm font-medium">
-                {translate('workers.task-queue-label')}
-              </label>
-              <Tooltip top text={translate('workers.task-queue-help')}>
-                <Icon name="circle-question" class="h-4 w-4 text-secondary" />
-              </Tooltip>
-            </div>
-            <Input
-              bind:value={$form.taskQueue}
-              id="taskQueue"
-              name="taskQueue"
-              labelHidden
-              label={translate('workers.task-queue-label')}
-              hintText={$errors.taskQueue?.[0] ||
-                translate('workers.task-queue-hint')}
-              error={!!$errors.taskQueue?.[0]}
-              placeholder={translate('workers.task-queue-placeholder')}
-              required
-              onblur={checkTaskQueue}
-            />
-            {#if taskQueueValidation.checking}
-              <div class="flex items-center gap-2 text-xs text-secondary">
-                <Icon name="spinner" class="h-3 w-3 animate-spin" />
-                <span>{translate('workers.validation-checking-queue')}</span>
-              </div>
-            {:else if taskQueueValidation.result}
-              <Alert
-                intent={taskQueueValidation.result.valid ? 'success' : 'info'}
-                title={taskQueueValidation.result.message}
-              />
-            {/if}
-          </div>
         </div>
       </Card>
 
@@ -196,7 +146,6 @@
                   error={!!$errors.lambdaArn?.[0]}
                   placeholder={translate('workers.lambda-arn-placeholder')}
                   required
-                  onblur={checkLambdaArn}
                 />
                 {#if lambdaValidation.checking}
                   <div class="flex items-center gap-2 text-xs text-secondary">
@@ -235,7 +184,6 @@
                   optionValueKey="value"
                   optionLabelKey="label"
                   bind:value={$form.region}
-                  onchange={checkRegion}
                   required
                   error={$errors.region?.[0]}
                 />
@@ -277,7 +225,6 @@
                 error={!!$errors.iamRoleArn?.[0]}
                 placeholder={translate('workers.iam-role-placeholder')}
                 required
-                onblur={checkIamRole}
               />
               {#if iamValidation.checking}
                 <div class="flex items-center gap-2 text-xs text-secondary">
@@ -294,60 +241,50 @@
 
             <div class="border-t border-subtle"></div>
 
-            <div>
+            <div class="flex gap-4">
+              <Button
+                variant="primary"
+                loading={validating}
+                disabled={!$form.lambdaArn || !$form.iamRoleArn}
+                on:click={validateConnection}
+              >
+                {translate('workers.validate-connection')}
+              </Button>
               <Button
                 variant="secondary"
                 on:click={() => (showScaling = !showScaling)}
               >
-                {translate('workers.edit-scaling-limits')}
+                {translate('workers.show-scaling-limits')}
               </Button>
             </div>
 
             {#if showScaling}
               <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Input
-                  value={String($form.maxWorkers)}
-                  oninput={(e) =>
-                    ($form.maxWorkers = Number(
-                      (e.currentTarget as HTMLInputElement).value,
-                    ))}
-                  id="maxWorkers"
-                  name="maxWorkers"
-                  label={translate('workers.max-workers-label')}
-                  hintText={translate('workers.max-workers-hint')}
+                  value={$form.minInstances !== undefined
+                    ? String($form.minInstances)
+                    : ''}
+                  oninput={(e) => {
+                    const val = (e.currentTarget as HTMLInputElement).value;
+                    $form.minInstances = val === '' ? undefined : Number(val);
+                  }}
+                  id="minInstances"
+                  name="minInstances"
+                  label={translate('workers.min-instances-label')}
+                  hintText={translate('workers.min-instances-hint')}
                 />
                 <Input
-                  value={String($form.maxConcurrentActivities)}
-                  oninput={(e) =>
-                    ($form.maxConcurrentActivities = Number(
-                      (e.currentTarget as HTMLInputElement).value,
-                    ))}
-                  id="maxConcurrentActivities"
-                  name="maxConcurrentActivities"
-                  label={translate('workers.max-concurrent-label')}
-                  hintText={translate('workers.max-concurrent-hint')}
-                />
-                <Input
-                  value={String($form.maxTaskQueueActivitiesPerSecond)}
-                  oninput={(e) =>
-                    ($form.maxTaskQueueActivitiesPerSecond = Number(
-                      (e.currentTarget as HTMLInputElement).value,
-                    ))}
-                  id="maxRate"
-                  name="maxRate"
-                  label={translate('workers.max-rate-label')}
-                  hintText={translate('workers.max-rate-hint')}
-                />
-                <Input
-                  value={String($form.idleTimeoutSeconds)}
-                  oninput={(e) =>
-                    ($form.idleTimeoutSeconds = Number(
-                      (e.currentTarget as HTMLInputElement).value,
-                    ))}
-                  id="idleTimeout"
-                  name="idleTimeout"
-                  label={translate('workers.idle-timeout-label')}
-                  hintText={translate('workers.idle-timeout-hint')}
+                  value={$form.maxInstances !== undefined
+                    ? String($form.maxInstances)
+                    : ''}
+                  oninput={(e) => {
+                    const val = (e.currentTarget as HTMLInputElement).value;
+                    $form.maxInstances = val === '' ? undefined : Number(val);
+                  }}
+                  id="maxInstances"
+                  name="maxInstances"
+                  label={translate('workers.max-instances-label')}
+                  hintText={translate('workers.max-instances-hint')}
                 />
               </div>
             {/if}

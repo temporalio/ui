@@ -35,15 +35,12 @@ const baseFields = {
     .min(1, 'IAM Role ARN is required')
     .regex(/^arn:aws:iam::\d{12}:role\/.+$/, 'Invalid IAM Role ARN format'),
   region: z.string().min(1, 'Region is required'),
-  taskQueue: z.string().min(1, 'Task queue is required'),
 };
 
 export const createSchema = z.object({
   ...baseFields,
-  maxWorkers: z.number().min(1).max(100).default(10),
-  maxConcurrentActivities: z.number().min(1).max(50).default(5),
-  maxTaskQueueActivitiesPerSecond: z.number().min(1).max(10000).default(100),
-  idleTimeoutSeconds: z.number().min(30).max(3600).default(300),
+  minInstances: z.number().int().min(0).optional(),
+  maxInstances: z.number().int().min(1).optional(),
 });
 
 export const editSchema = z.object({
