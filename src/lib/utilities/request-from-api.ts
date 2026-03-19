@@ -112,6 +112,9 @@ export const requestFromAPI = async <T>(
     let response = await makeRequest();
     let { status, statusText } = response;
 
+    // Shouldn't this check the expiry on the jwt and refresh before we make a request instead of
+    // doing a 401? If we get a 401 and we have done all of our refreshes shouldn't we send the user to the login
+    // page? Asking for a friend (claude)
     if (isBrowser && status === 401) {
       const refreshed = await refreshTokens();
       if (refreshed) {
@@ -194,14 +197,9 @@ const withBearerToken = async (
 ): Promise<Record<string, string>> => {
   if (!isBrowser) return headers;
 
-  try {
-    const token = await accessToken();
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    /* c8 ignore next 4 */
-  } catch (e) {
-    console.error(e);
+  const token = await accessToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   return headers;

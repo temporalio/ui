@@ -7,28 +7,6 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
 
-export const fetchWorkflowCount = async (
-  namespace: string,
-  query: string,
-  request = fetch,
-): Promise<{ count: number }> => {
-  let count = 0;
-  try {
-    const countRoute = routeForApi('workflows.count', { namespace });
-    const result = await requestFromAPI<{ count: string }>(countRoute, {
-      params: query ? { query } : {},
-      onError: () => {},
-      handleError: () => {},
-      request,
-    });
-    count = parseInt(result?.count || '0');
-  } catch {
-    // Don't fail the workflows call due to count
-  }
-
-  return { count };
-};
-
 export const fetchWorkflowTaskFailures = async (
   namespace: string,
   request = fetch,
