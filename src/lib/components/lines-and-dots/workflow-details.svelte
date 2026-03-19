@@ -13,6 +13,7 @@
     timestampFormat,
   } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     formatDistanceAbbreviated,
@@ -83,7 +84,7 @@
 
   const historySizeFormatted = $derived(
     workflow?.historySizeBytes
-      ? parseInt(workflow.historySizeBytes, 10).toLocaleString()
+      ? formatBytes(parseInt(workflow.historySizeBytes, 10))
       : '',
   );
   let totalActions = $derived(
