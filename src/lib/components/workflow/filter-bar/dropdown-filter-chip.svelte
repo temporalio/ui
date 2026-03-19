@@ -55,7 +55,7 @@
     onUpdate: (updatedFilter: SearchAttributeFilter) => void;
     onRemove: () => void;
     index?: number;
-    openIndex?: number;
+    openIndex?: number | null;
   };
 
   let {
@@ -179,7 +179,7 @@
     }
 
     if (isDateTimeFilter(filter)) {
-      if (filter.customDate) return value.split('BETWEEN')[1];
+      if (filter.customDate) return value?.split('BETWEEN')[1];
       return $timestamp(value, { format: 'short' });
     }
 
@@ -190,7 +190,7 @@
     return value;
   }
 
-  function applyChanges(e) {
+  function applyChanges(e: SubmitEvent) {
     e.preventDefault();
 
     if (isInConditional(localFilter.conditional)) {

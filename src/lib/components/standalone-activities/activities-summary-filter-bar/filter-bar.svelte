@@ -1,40 +1,19 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import FilterBar from '$lib/components/shared-search-attribute-filter/filter-bar.svelte';
+  import { activitiesQuery, activityRefresh } from '$lib/stores/activities';
+  import { activityFilters } from '$lib/stores/filters';
+  import { activitySearchAttributeOptions } from '$lib/stores/search-attributes';
 
-  import ActivityFilter from './filter.svelte';
-  import ActivityManualQuery from './manual-query.svelte';
-
-  let viewManualQuery = $state(false);
+  function onManualSearch(query: string) {
+    $activitiesQuery = query;
+    $activityRefresh = Date.now();
+  }
 </script>
 
-{#snippet actionToggleButtons()}
-  <div class="flex items-center gap-1">
-    <Tooltip text={viewManualQuery ? 'Hide raw query' : 'View raw query'} left>
-      <Button
-        variant="ghost"
-        size="xs"
-        leadingIcon="json"
-        active={viewManualQuery}
-        data-testid="toggle-manual-query"
-        on:click={() => (viewManualQuery = !viewManualQuery)}
-      />
-    </Tooltip>
-  </div>
-{/snippet}
-
-<div>
-  <div
-    class="flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
-  >
-    <div class="flex grow items-center justify-start gap-4 px-2">
-      <Icon name="filter-lines" class="text-primary-text h-4 w-4 shrink-0" />
-      <ActivityFilter />
-    </div>
-    {@render actionToggleButtons()}
-  </div>
-  {#if viewManualQuery}
-    <ActivityManualQuery />
-  {/if}
-</div>
+<FilterBar
+  filters={activityFilters}
+  options={$activitySearchAttributeOptions}
+  id="activity"
+  statusAttribute="ExecutionStatus"
+  {onManualSearch}
+/>

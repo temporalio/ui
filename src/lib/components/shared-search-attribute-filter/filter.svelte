@@ -1,29 +1,45 @@
 <script lang="ts" module>
-  import { writable, type Writable } from 'svelte/store';
+  import type { Writable } from 'svelte/store';
 
-  import { setContext } from 'svelte';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 
-  export const ACTIVITY_FILTER_CONTEXT = 'activity-filter-context';
+  export const SEARCH_ATTRIBUTE_FILTER_CONTEXT =
+    'search-attribute-filter-context';
 
-  export interface ActivityFilterContext {
+  export interface SearchAttributeFilterContext {
     filter: Writable<SearchAttributeFilter>;
     activeQueryIndex: Writable<number | null>;
     handleSubmit: () => void;
     focusedElementId: Writable<string>;
     resetFilter: () => void;
     chipOpenIndex: Writable<number | null>;
+    id: string;
   }
 </script>
 
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
+  import { setContext } from 'svelte';
+
   import { afterNavigate } from '$app/navigation';
 
-  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
-  import { activityFilters } from '$lib/stores/filters';
+  import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
-  import ActivityDropdownFilterList from './dropdown-filter-list.svelte';
-  import ActivitySearchAttributeMenu from './search-attribute-menu.svelte';
+  import type { StatusAttribute } from './types.ts';
+
+  import DropdownFilterList from './filter-list.svelte';
+  import SearchAttributeMenu from './search-attribute-menu.svelte';
+
+  interface Props {
+    filters: Writable<SearchAttributeFilter[]>;
+    options: SearchAttributeOption[];
+    id: string;
+    statusAttribute?: StatusAttribute;
+  }
+
+  let { filters, options, id, statusAttribute }: Props = $props();
 
   const filter = writable<SearchAttributeFilter>(createFilter());
   const activeQueryIndex = writable<number | null>(null);
@@ -34,22 +50,23 @@
     chipOpenIndex.set(null);
   });
 
-  setContext<ActivityFilterContext>(ACTIVITY_FILTER_CONTEXT, {
+  setContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT, {
     filter,
     activeQueryIndex,
     handleSubmit,
     focusedElementId,
     resetFilter,
     chipOpenIndex,
+    id,
   });
 
   function handleSubmit() {
     if ($activeQueryIndex !== null) {
-      $activityFilters[$activeQueryIndex] = $filter;
+      $filters[$activeQueryIndex] = $filter;
       $activeQueryIndex = null;
     } else {
-      const newIndex = $activityFilters.length;
-      $activityFilters = [...$activityFilters, $filter];
+      const newIndex = $filters.length;
+      $filters = [...$filters, $filter];
       chipOpenIndex.set(newIndex);
     }
     filter.set(createFilter());
@@ -62,6 +79,6 @@
 </script>
 
 <div class="flex shrink flex-wrap items-center justify-start gap-2">
-  <ActivityDropdownFilterList />
-  <ActivitySearchAttributeMenu />
+  <DropdownFilterList {filters} {statusAttribute} />
+  <SearchAttributeMenu {options} {filters} {statusAttribute} />
 </div>

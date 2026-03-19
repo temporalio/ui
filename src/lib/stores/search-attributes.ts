@@ -1,4 +1,4 @@
-import { derived, get, type Readable, writable } from 'svelte/store';
+import { derived, get, readable, type Readable, writable } from 'svelte/store';
 
 import { z } from 'zod/v3';
 
@@ -191,6 +191,30 @@ export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
       });
   });
 
+export const workerSearchAttributes: Readable<SearchAttributes> = readable({
+  WorkerStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  WorkerInstanceKey: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  WorkerIdentity: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  HostName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  LastHeartbeatTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  DeploymentName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  BuildId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  SdkName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  SdkVersion: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+});
+
+export const workerSearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived(workerSearchAttributes, ($workerSearchAttributes) => {
+    return Object.entries($workerSearchAttributes).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
+    });
+  });
 export const activitySearchAttributeOptions: Readable<SearchAttributeOption[]> =
   derived(customSearchAttributeOptions, ($customSearchAttributeOptions) => {
     return [

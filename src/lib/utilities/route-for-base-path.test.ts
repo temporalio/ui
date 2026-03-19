@@ -54,7 +54,9 @@ import {
   routeForWorkerDeployment,
   routeForWorkerDeployments,
   routeForWorkerDeploymentVersion,
+  routeForWorkerInstance,
   routeForWorkers,
+  routeForWorkersWithQuery,
   routeForWorkflow,
   routeForWorkflowMemo,
   routeForWorkflowQuery,
@@ -63,6 +65,7 @@ import {
   routeForWorkflowStart,
   routeForWorkflowsWithQuery,
   routeForWorkflowUpdate,
+  routeForWorkflowWorkers,
 } from './route-for';
 
 describe('routeFor functions should resolve the base path exactly once', () => {
@@ -108,7 +111,7 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     ],
     ['routeForEventHistory', () => routeForEventHistory(workflowParams)],
     ['routeForTimeline', () => routeForTimeline(workflowParams)],
-    ['routeForWorkers', () => routeForWorkers(workflowParams)],
+    ['routeForWorkers', () => routeForWorkers(namespaceParams)],
     [
       'routeForWorkerDeployments',
       () => routeForWorkerDeployments(namespaceParams),
@@ -201,6 +204,19 @@ describe('routeFor functions should resolve the base path exactly once', () => {
         }),
     ],
     ['routeForLoginPage', () => routeForLoginPage('', false)],
+    ['routeForWorkflowWorkers', () => routeForWorkflowWorkers(workflowParams)],
+    [
+      'routeForWorkerInstance',
+      () =>
+        routeForWorkerInstance({
+          namespace: 'default',
+          workerInstanceKey: 'worker-1',
+        }),
+    ],
+    [
+      'routeForWorkersWithQuery',
+      () => routeForWorkersWithQuery({ namespace: 'default', query: 'test' }),
+    ],
   ];
 
   it.each(cases)('%s should resolve the base path', (_name, fn) => {

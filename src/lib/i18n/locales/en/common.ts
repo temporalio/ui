@@ -108,6 +108,8 @@ export const Strings = {
   workflows: 'Workflows',
   'workflows-plural_one': 'Workflow',
   'workflows-plural_other': 'Workflows',
+  'activities-plural_one': 'Activity',
+  'activities-plural_other': 'Activities',
   schedules: 'Schedules',
   'schedules-plural_one': '{{ count }} Schedule',
   'schedules-plural_other': '{{ count }} Schedules',
