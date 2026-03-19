@@ -43,7 +43,7 @@
   <span class={workerStatus({ status })}>
     {label[status]}
     {#if isRunning}
-      <HeartBeat {delay} color="rgb(187 247 208)" />
+      <HeartBeat {delay} />
     {/if}
   </span>
 </div>
