@@ -37,7 +37,7 @@
       <Logo
         height={24}
         width={24}
-        class={merge('m-1', subtitle !== 'Cloud' && 'hidden')}
+        class={merge(subtitle !== 'Cloud' && 'hidden')}
       />
     </a>
     {#if subtitle}
