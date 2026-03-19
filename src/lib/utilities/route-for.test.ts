@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { base } from '$app/paths';
+
 import {
   hasParameters,
   isEventHistoryParameters,
@@ -29,14 +31,14 @@ import {
 describe('routeFor', () => {
   it('should route to "namespaces"', () => {
     const path = routeForNamespaces();
-    expect(path).toBe('/namespaces');
+    expect(path).toBe(`${base}/namespaces`);
   });
 
   it('should route to a "namespace"', () => {
     const path = routeForNamespace({
       namespace: 'default',
     });
-    expect(path).toBe('/namespaces/default');
+    expect(path).toBe(`${base}/namespaces/default`);
   });
 
   it('should route to "workflows with query"', () => {
@@ -45,18 +47,18 @@ describe('routeFor', () => {
       query: 'ExecutionStatus="Running"',
     });
     expect(path).toBe(
-      '/namespaces/default/workflows?query=ExecutionStatus%3D%22Running%22',
+      `${base}/namespaces/default/workflows?query=ExecutionStatus%3D%22Running%22`,
     );
   });
 
   it('should route to "workflows"', () => {
     const path = routeForWorkflows({ namespace: 'default' });
-    expect(path).toBe('/namespaces/default/workflows');
+    expect(path).toBe(`${base}/namespaces/default/workflows`);
   });
 
   it('should route to archival workflows', () => {
     const path = routeForArchivalWorkflows({ namespace: 'default' });
-    expect(path).toBe('/namespaces/default/archival');
+    expect(path).toBe(`${base}/namespaces/default/archival`);
   });
 
   it('should route to a "workflow"', () => {
@@ -65,7 +67,7 @@ describe('routeFor', () => {
       workflow: 'abc',
       run: 'def',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def');
+    expect(path).toBe(`${base}/namespaces/default/workflows/abc/def`);
   });
 
   it('should route to "workflow.events" history page', () => {
@@ -74,7 +76,7 @@ describe('routeFor', () => {
       workflow: 'abc',
       run: 'def',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history');
+    expect(path).toBe(`${base}/namespaces/default/workflows/abc/def/history`);
   });
 
   it('should route to "archival.events" history page', () => {
@@ -84,7 +86,7 @@ describe('routeFor', () => {
       run: 'def',
       archival: true,
     });
-    expect(path).toBe('/namespaces/default/archival/abc/def/history');
+    expect(path).toBe(`${base}/namespaces/default/archival/abc/def/history`);
   });
 
   it('should route to pending activities', () => {
@@ -94,7 +96,7 @@ describe('routeFor', () => {
       run: 'def',
     });
     expect(path).toBe(
-      '/namespaces/default/workflows/abc/def/pending-activities',
+      `${base}/namespaces/default/workflows/abc/def/pending-activities`,
     );
   });
 
@@ -104,7 +106,9 @@ describe('routeFor', () => {
       workflow: 'abc',
       run: 'def',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/call-stack');
+    expect(path).toBe(
+      `${base}/namespaces/default/workflows/abc/def/call-stack`,
+    );
   });
 
   it('should route to "workflow".query', () => {
@@ -113,7 +117,7 @@ describe('routeFor', () => {
       workflow: 'abc',
       run: 'def',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/query');
+    expect(path).toBe(`${base}/namespaces/default/workflows/abc/def/query`);
   });
 
   it('should route to "workers"', () => {
@@ -122,7 +126,7 @@ describe('routeFor', () => {
       workflow: 'abc',
       run: 'def',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/workers');
+    expect(path).toBe(`${base}/namespaces/default/workflows/abc/def/workers`);
   });
 
   it('should route to a task queue', () => {
@@ -130,7 +134,7 @@ describe('routeFor', () => {
       namespace: 'default',
       queue: 'some-task-queue',
     });
-    expect(path).toBe('/namespaces/default/task-queues/some-task-queue');
+    expect(path).toBe(`${base}/namespaces/default/task-queues/some-task-queue`);
   });
 
   it('should route to a task queue containing slashes', () => {
@@ -138,41 +142,45 @@ describe('routeFor', () => {
       namespace: 'default',
       queue: 'some/task-queue',
     });
-    expect(path).toBe('/namespaces/default/task-queues/some%2Ftask-queue');
+    expect(path).toBe(
+      `${base}/namespaces/default/task-queues/some%2Ftask-queue`,
+    );
   });
 });
 
 describe('routeFor import ', () => {
   it('should default route to "import/events" for import', () => {
     const path = routeForEventHistoryImport();
-    expect(path).toBe('/import/events');
+    expect(path).toBe(`${base}/import/events`);
   });
 
   it('should route to specific namespace and view for import', () => {
     const path = routeForEventHistoryImport('default', 'compact');
-    expect(path).toBe('/import/events/default/workflow/run/history/compact');
+    expect(path).toBe(
+      `${base}/import/events/default/workflow/run/history/compact`,
+    );
   });
 
   it('should route to root import if missing namespace', () => {
     const path = routeForEventHistoryImport(undefined, 'compact');
-    expect(path).toBe('/import/events');
+    expect(path).toBe(`${base}/import/events`);
   });
 
   it('should return the correct route for routeForSchedules', () => {
     expect(routeForSchedules({ namespace: 'default' })).toBe(
-      '/namespaces/default/schedules',
+      `${base}/namespaces/default/schedules`,
     );
   });
 
   it('should return the correct route for routeForSchedule', () => {
     expect(routeForSchedule({ namespace: 'default', scheduleId: '123' })).toBe(
-      '/namespaces/default/schedules/123',
+      `${base}/namespaces/default/schedules/123`,
     );
   });
 
   it('should return the correct route for routeForScheduleCreate', () => {
     expect(routeForScheduleCreate({ namespace: 'default' })).toBe(
-      '/namespaces/default/schedules/create',
+      `${base}/namespaces/default/schedules/create`,
     );
   });
 });
@@ -212,7 +220,7 @@ describe('routeFor SSO authentication ', () => {
     const sso = routeForAuthentication({ settings, searchParams, originUrl });
 
     expect(sso).toBe(
-      `${settings.baseUrl}auth/sso?returnUrl=${encodeURIComponent(originUrl)}`,
+      `https://localhost${base}/auth/sso?returnUrl=${encodeURIComponent(originUrl)}`,
     );
   });
 
@@ -231,7 +239,7 @@ describe('routeFor SSO authentication ', () => {
     const sso = routeForAuthentication({ settings, searchParams, originUrl });
 
     expect(sso).toBe(
-      `${settings.baseUrl}auth/sso?returnUrl=${encodeURIComponent(returnUrl)}`,
+      `https://localhost${base}/auth/sso?returnUrl=${encodeURIComponent(returnUrl)}`,
     );
   });
 
@@ -250,7 +258,7 @@ describe('routeFor SSO authentication ', () => {
     const ssoUrl = new URL(sso);
 
     expect(ssoUrl.searchParams.get('one')).toBeNull();
-    expect(sso).toEqual('https://localhost/auth/sso');
+    expect(sso).toEqual(`https://localhost${base}/auth/sso`);
   });
 
   it('Should render a login url', () => {
@@ -259,7 +267,7 @@ describe('routeFor SSO authentication ', () => {
 
     const sso = routeForAuthentication({ settings, searchParams });
 
-    expect(sso).toEqual('https://localhost/auth/sso');
+    expect(sso).toEqual(`https://localhost${base}/auth/sso`);
   });
 
   it('Should add return URL search param', () => {
@@ -307,7 +315,7 @@ describe('routeFor SSO authentication ', () => {
 
     expect(ssoUrl.searchParams.get('one')).toBeNull();
     expect(sso).toEqual(
-      'https://localhost/auth/sso?organization_name=temporal-cloud&invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3',
+      `https://localhost${base}/auth/sso?organization_name=temporal-cloud&invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3`,
     );
   });
 
@@ -326,12 +334,12 @@ describe('routeFor SSO authentication ', () => {
       });
 
       expect(routeForLoginPage()).toBe(
-        'https://temporal.io/login?returnUrl=https%3A%2F%2Ftemporal.io%2Fcurrent-page',
+        `https://temporal.io${base}/login?returnUrl=https%3A%2F%2Ftemporal.io%2Fcurrent-page`,
       );
     });
 
     it('should return a URL with the correct returnUrl', () => {
-      expect(routeForLoginPage('', false)).toBe('/login');
+      expect(routeForLoginPage('', false)).toBe(`${base}/login`);
     });
   });
 

@@ -2,8 +2,11 @@ import { writable } from 'svelte/store';
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { base } from '$app/paths';
+
 import { batchCancelWorkflows, batchTerminateWorkflows } from './batch-service';
 import { temporalVersion } from '../stores/versions';
+import { getApiOrigin } from '../utilities/get-api-origin';
 import { requestFromAPI } from '../utilities/request-from-api';
 
 const mockWorkflows = [
@@ -11,6 +14,8 @@ const mockWorkflows = [
   { id: '2', runId: 'b' },
   { id: '3', runId: 'c' },
 ];
+
+const origin = getApiOrigin();
 
 vi.mock('../utilities/request-from-api', () => ({
   requestFromAPI: vi.fn().mockImplementation((route) => {
@@ -52,7 +57,7 @@ describe('Batch Service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/default/batch-operations/xxx',
+        `${origin}${base}/api/v1/namespaces/default/batch-operations/xxx`,
         {
           notifyOnError: false,
           options: {
@@ -73,7 +78,7 @@ describe('Batch Service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/default/batch-operations/xxx',
+        `${origin}${base}/api/v1/namespaces/default/batch-operations/xxx`,
         {
           notifyOnError: false,
           options: {
@@ -102,7 +107,7 @@ describe('Batch Service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/default/batch-operations/xxx',
+        `${origin}${base}/api/v1/namespaces/default/batch-operations/xxx`,
         {
           notifyOnError: false,
           options: {
@@ -123,7 +128,7 @@ describe('Batch Service', () => {
 
       expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
-        'http://localhost:8233/api/v1/namespaces/default/batch-operations/xxx',
+        `${origin}${base}/api/v1/namespaces/default/batch-operations/xxx`,
         {
           notifyOnError: false,
           options: {

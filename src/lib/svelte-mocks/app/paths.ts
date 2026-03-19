@@ -1,10 +1,13 @@
+export const base = '/temporal';
+
 // A mock function for resolve from $app/paths: https://svelte.dev/docs/kit/$app-paths#resolve
 export const resolve = (route: string, params?: Record<string, string>) => {
+  let resolved = route;
   if (params) {
-    return Object.entries(params).reduce(
+    resolved = Object.entries(params).reduce(
       (path, [key, value]) => path.replace(`[${key}]`, value),
-      route,
+      resolved,
     );
   }
-  return route;
+  return `${base}${resolved}`;
 };

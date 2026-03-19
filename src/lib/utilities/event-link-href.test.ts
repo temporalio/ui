@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { base } from '$app/paths';
+
 import { getEventLinkHref } from './event-link-href';
 
 describe('getEventLinkHref', () => {
@@ -17,7 +19,7 @@ describe('getEventLinkHref', () => {
 
     const result = getEventLinkHref(link);
     expect(result).toBe(
-      '/namespaces/test-ns/workflows/test-wf/test-run/history/events/42',
+      `${base}/namespaces/test-ns/workflows/test-wf/test-run/history/events/42`,
     );
   });
 
@@ -35,7 +37,7 @@ describe('getEventLinkHref', () => {
 
     const result = getEventLinkHref(link);
     expect(result).toBe(
-      '/namespaces/test-ns/workflows/test-wf/test-run/history/events/1',
+      `${base}/namespaces/test-ns/workflows/test-wf/test-run/history/events/1`,
     );
   });
 
@@ -53,7 +55,7 @@ describe('getEventLinkHref', () => {
 
     const result = getEventLinkHref(link);
     expect(result).toBe(
-      '/namespaces/test-ns/workflows/test-wf/test-run/history/events/req-123',
+      `${base}/namespaces/test-ns/workflows/test-wf/test-run/history/events/req-123`,
     );
   });
 
@@ -68,7 +70,7 @@ describe('getEventLinkHref', () => {
 
     const result = getEventLinkHref(link);
     expect(result).toBe(
-      '/namespaces/test-ns/workflows/test-wf/test-run/timeline',
+      `${base}/namespaces/test-ns/workflows/test-wf/test-run/timeline`,
     );
   });
 
@@ -90,7 +92,7 @@ describe('getEventLinkHref', () => {
 
     const result = getEventLinkHref(link);
     expect(result).toBe(
-      '/namespaces/test-ns/workflows/test-wf/test-run/history/events/99',
+      `${base}/namespaces/test-ns/workflows/test-wf/test-run/history/events/99`,
     );
   });
 });
