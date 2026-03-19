@@ -49,6 +49,8 @@ export type PauseWorkflowRequest =
   temporal.api.workflowservice.v1.IPauseWorkflowExecutionRequest;
 export type UnpauseWorkflowRequest =
   temporal.api.workflowservice.v1.IUnpauseWorkflowExecutionRequest;
+export type ListTaskQueuePartitionsRequest =
+  temporal.api.workflowservice.v1.IListTaskQueuePartitionsRequest;
 export type ListWorkersRequest =
   temporal.api.workflowservice.v1.IListWorkersRequest;
 export type ListWorkersResponse =
