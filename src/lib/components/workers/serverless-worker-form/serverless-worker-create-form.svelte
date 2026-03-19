@@ -2,7 +2,6 @@
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
-  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
@@ -13,15 +12,9 @@
   import {
     validateIamRole,
     validateLambdaArn,
-    validateRegion,
   } from '$lib/services/serverless-worker-service';
 
-  import {
-    type CreateFormData,
-    createSchema,
-    regions,
-    type ValidationState,
-  } from './shared';
+  import { type CreateFormData, createSchema } from './shared';
 
   import ComputeProviderPicker from './compute-provider-picker.svelte';
   import ServerlessWorkerSetupGuide from './serverless-worker-setup-guide.svelte';
@@ -58,34 +51,33 @@
     dataType: 'json',
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
+
+      const [lambdaResult, iamResult] = await Promise.all([
+        validateLambdaArn(form.data.lambdaArn),
+        validateIamRole(form.data.iamRoleArn),
+      ]);
+
+      if (!lambdaResult?.valid) {
+        form.errors.lambdaArn = [
+          lambdaResult?.message ??
+            translate('workers.validation-function-not-found'),
+        ];
+        return;
+      }
+
+      if (!iamResult?.valid) {
+        form.errors.iamRoleArn = [
+          iamResult?.message ??
+            translate('workers.validation-permissions-missing'),
+        ];
+        return;
+      }
+
       onSubmit(form.data);
     },
   });
 
   const { form, errors, enhance, submitting } = superform;
-
-  let lambdaValidation = $state<ValidationState>({ checking: false });
-  let iamValidation = $state<ValidationState>({ checking: false });
-  let regionValidation = $state<ValidationState>({ checking: false });
-  let validating = $state(false);
-
-  async function validateConnection() {
-    const { lambdaArn, iamRoleArn, region } = $form;
-    if (!lambdaArn && !iamRoleArn && !region) return;
-    validating = true;
-    lambdaValidation = { checking: !!lambdaArn };
-    iamValidation = { checking: !!iamRoleArn };
-    regionValidation = { checking: !!region };
-    const [lambdaResult, iamResult, regionResult] = await Promise.all([
-      lambdaArn ? validateLambdaArn(lambdaArn) : Promise.resolve(undefined),
-      iamRoleArn ? validateIamRole(iamRoleArn) : Promise.resolve(undefined),
-      region ? validateRegion(region) : Promise.resolve(undefined),
-    ]);
-    lambdaValidation = { checking: false, result: lambdaResult };
-    iamValidation = { checking: false, result: iamResult };
-    regionValidation = { checking: false, result: regionResult };
-    validating = false;
-  }
 
   let showScaling = $state(false);
 </script>
@@ -106,6 +98,7 @@
             id="name"
             name="name"
             label={translate('workers.name-label')}
+            hintText={$errors.name?.[0] || translate('workers.name-hint')}
             error={!!$errors.name?.[0]}
             placeholder={translate('workers.name-placeholder')}
             required
@@ -122,87 +115,27 @@
         </p>
         <ComputeProviderPicker>
           <div class="flex flex-col gap-5">
-            <div class="flex gap-5">
-              <div class="flex flex-1 flex-col gap-1">
-                <div class="flex items-center gap-1">
-                  <label for="lambdaArn" class="text-sm font-medium">
-                    {translate('workers.lambda-arn-label')}
-                  </label>
-                  <Tooltip top text={translate('workers.lambda-arn-help')}>
-                    <Icon
-                      name="circle-question"
-                      class="h-4 w-4 text-secondary"
-                    />
-                  </Tooltip>
-                </div>
-                <Input
-                  bind:value={$form.lambdaArn}
-                  id="lambdaArn"
-                  name="lambdaArn"
-                  labelHidden
-                  label={translate('workers.lambda-arn-label')}
-                  hintText={$errors.lambdaArn?.[0] ||
-                    translate('workers.lambda-arn-hint')}
-                  error={!!$errors.lambdaArn?.[0]}
-                  placeholder={translate('workers.lambda-arn-placeholder')}
-                  required
-                />
-                {#if lambdaValidation.checking}
-                  <div class="flex items-center gap-2 text-xs text-secondary">
-                    <Icon name="spinner" class="h-3 w-3 animate-spin" />
-                    <span
-                      >{translate('workers.validation-checking-lambda')}</span
-                    >
-                  </div>
-                {:else if lambdaValidation.result}
-                  <Alert
-                    intent={lambdaValidation.result.valid ? 'success' : 'error'}
-                    title={lambdaValidation.result.message}
-                  />
-                {/if}
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-1">
+                <label for="lambdaArn" class="text-sm font-medium">
+                  {translate('workers.lambda-arn-label')}
+                </label>
+                <Tooltip top text={translate('workers.lambda-arn-help')}>
+                  <Icon name="circle-question" class="h-4 w-4 text-secondary" />
+                </Tooltip>
               </div>
-
-              <div class="flex w-40 flex-col gap-1">
-                <div class="flex items-center gap-1">
-                  <label for="region" class="text-sm font-medium">
-                    {translate('workers.region-label')}
-                  </label>
-                  <Tooltip top text={translate('workers.region-help')}>
-                    <Icon
-                      name="circle-question"
-                      class="h-4 w-4 text-secondary"
-                    />
-                  </Tooltip>
-                </div>
-                <Combobox
-                  id="region"
-                  label={translate('workers.region-label')}
-                  labelHidden
-                  placeholder="Search regions..."
-                  noResultsText="No matching regions"
-                  options={regions}
-                  optionValueKey="value"
-                  optionLabelKey="label"
-                  bind:value={$form.region}
-                  required
-                  error={$errors.region?.[0]}
-                />
-                {#if regionValidation.checking}
-                  <div class="flex items-center gap-2 text-xs text-secondary">
-                    <Icon name="spinner" class="h-3 w-3 animate-spin" />
-                    <span
-                      >{translate('workers.validation-checking-region')}</span
-                    >
-                  </div>
-                {:else if regionValidation.result}
-                  <Alert
-                    intent={regionValidation.result.valid
-                      ? 'success'
-                      : 'warning'}
-                    title={regionValidation.result.message}
-                  />
-                {/if}
-              </div>
+              <Input
+                bind:value={$form.lambdaArn}
+                id="lambdaArn"
+                name="lambdaArn"
+                labelHidden
+                label={translate('workers.lambda-arn-label')}
+                hintText={$errors.lambdaArn?.[0] ||
+                  translate('workers.lambda-arn-hint')}
+                error={!!$errors.lambdaArn?.[0]}
+                placeholder={translate('workers.lambda-arn-placeholder')}
+                required
+              />
             </div>
 
             <div class="flex flex-col gap-1">
@@ -226,37 +159,16 @@
                 placeholder={translate('workers.iam-role-placeholder')}
                 required
               />
-              {#if iamValidation.checking}
-                <div class="flex items-center gap-2 text-xs text-secondary">
-                  <Icon name="spinner" class="h-3 w-3 animate-spin" />
-                  <span>{translate('workers.validation-checking-iam')}</span>
-                </div>
-              {:else if iamValidation.result}
-                <Alert
-                  intent={iamValidation.result.valid ? 'success' : 'error'}
-                  title={iamValidation.result.message}
-                />
-              {/if}
             </div>
 
             <div class="border-t border-subtle"></div>
 
-            <div class="flex gap-4">
-              <Button
-                variant="primary"
-                loading={validating}
-                disabled={!$form.lambdaArn || !$form.iamRoleArn}
-                on:click={validateConnection}
-              >
-                {translate('workers.validate-connection')}
-              </Button>
-              <Button
-                variant="secondary"
-                on:click={() => (showScaling = !showScaling)}
-              >
-                {translate('workers.show-scaling-limits')}
-              </Button>
-            </div>
+            <Button
+              variant="secondary"
+              on:click={() => (showScaling = !showScaling)}
+            >
+              {translate('workers.show-scaling-limits')}
+            </Button>
 
             {#if showScaling}
               <div class="grid grid-cols-1 gap-4 md:grid-cols-2">

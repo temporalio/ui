@@ -24,7 +24,7 @@
     const providerDetail = {
       lambdaArn: data.lambdaArn,
       iamRoleArn: data.iamRoleArn,
-      region: data.region,
+      region: data.lambdaArn?.split(':')[3] ?? '',
     };
     await createWorkerDeployment(
       {

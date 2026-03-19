@@ -14,15 +14,16 @@
     validateLambdaArn,
     validateTaskQueue,
   } from '$lib/services/serverless-worker-service';
-  import type { ServerlessWorker } from '$lib/types/serverless-workers';
+  import type {
+    MockValidationResult,
+    ServerlessWorker,
+  } from '$lib/types/serverless-workers';
 
-  import {
-    type EditFormData,
-    editSchema,
-    type ValidationState,
-  } from './shared';
+  import { type EditFormData, editSchema } from './shared';
 
   import ComputeProviderPicker from './compute-provider-picker.svelte';
+
+  type ValidationState = { checking: boolean; result?: MockValidationResult };
 
   type Props = {
     namespace: string;

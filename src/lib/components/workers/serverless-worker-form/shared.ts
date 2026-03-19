@@ -1,22 +1,5 @@
 import { z } from 'zod/v3';
 
-import type { MockValidationResult } from '$lib/types/serverless-workers';
-
-export const regions = [
-  { value: 'us-east-1', label: 'US East (N. Virginia) — us-east-1' },
-  { value: 'us-west-2', label: 'US West (Oregon) — us-west-2' },
-  { value: 'eu-west-1', label: 'EU (Ireland) — eu-west-1' },
-  {
-    value: 'ap-southeast-1',
-    label: 'Asia Pacific (Singapore) — ap-southeast-1',
-  },
-];
-
-export type ValidationState = {
-  checking: boolean;
-  result?: MockValidationResult;
-};
-
 const baseFields = {
   name: z
     .string()
@@ -34,7 +17,6 @@ const baseFields = {
     .string()
     .min(1, 'IAM Role ARN is required')
     .regex(/^arn:aws:iam::\d{12}:role\/.+$/, 'Invalid IAM Role ARN format'),
-  region: z.string().min(1, 'Region is required'),
 };
 
 export const createSchema = z.object({
