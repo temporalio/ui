@@ -6,6 +6,7 @@ export const Strings = {
   'worker-details': 'Worker Details',
   'worker-views': 'Worker Views',
   'back-to-workers': 'Back to Workers',
+  'back-to-deployments': 'Back to Deployments',
   version: 'Version',
   versioning: 'Versioning',
   retirability: 'Retirability',
