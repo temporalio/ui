@@ -369,6 +369,51 @@ export const routeForWorkerDeploymentVersion = ({
   })}/version/${version}`;
 };
 
+export const routeForServerlessWorkerCreate = ({
+  namespace,
+}: {
+  namespace: string;
+}): ResolvedPathname => {
+  return resolve(
+    '/namespaces/[namespace]/workers/deployments/serverless/create',
+    {
+      namespace,
+    },
+  );
+};
+
+export const routeForServerlessWorker = ({
+  namespace,
+  id,
+}: {
+  namespace: string;
+  id: string;
+}): ResolvedPathname => {
+  return resolve(
+    '/namespaces/[namespace]/workers/deployments/serverless/[id]',
+    {
+      namespace,
+      id,
+    },
+  );
+};
+
+export const routeForServerlessWorkerEdit = ({
+  namespace,
+  id,
+}: {
+  namespace: string;
+  id: string;
+}): ResolvedPathname => {
+  return resolve(
+    '/namespaces/[namespace]/workers/deployments/serverless/[id]/edit',
+    {
+      namespace,
+      id,
+    },
+  );
+};
+
 export const routeForRelationships = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {

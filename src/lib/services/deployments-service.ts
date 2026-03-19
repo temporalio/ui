@@ -1,4 +1,6 @@
 import type {
+  CreateWorkerDeploymentRequest,
+  CreateWorkerDeploymentResponse,
   DeploymentParameters,
   DeploymentVersionParameters,
   ListWorkerDeploymentsResponse,
@@ -6,6 +8,7 @@ import type {
   WorkerDeploymentSummary,
   WorkerDeploymentVersionResponse,
 } from '$lib/types/deployments';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -38,6 +41,27 @@ export const fetchPaginatedDeployments = async (
       };
     });
   };
+};
+
+export const createWorkerDeployment = async (
+  request: CreateWorkerDeploymentRequest,
+  onError?: ErrorCallback,
+): Promise<CreateWorkerDeploymentResponse> => {
+  const route = routeForApi('worker-deployment', {
+    namespace: request.namespace,
+    deploymentName: request.deploymentName,
+  });
+  return requestFromAPI<CreateWorkerDeploymentResponse>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        deploymentName: request.deploymentName,
+        computeConfig: request.computeConfig,
+      }),
+    },
+    onError,
+    notifyOnError: false,
+  });
 };
 
 export const fetchDeployment = async (
