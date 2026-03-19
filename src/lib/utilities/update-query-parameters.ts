@@ -1,7 +1,6 @@
 import { BROWSER } from 'esm-env';
 
 import { goto as navigateTo } from '$app/navigation';
-import { resolve } from '$app/paths';
 
 type UpdateQueryParams = {
   parameter: string;
@@ -29,7 +28,7 @@ export const updateQueryParameters = async ({
   options = gotoOptions,
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
-  const params = {};
+  const params: Record<string, string> = {};
   let replaced = false;
 
   url.searchParams.forEach((value, key) => {
@@ -63,7 +62,7 @@ export const updateQueryParameters = async ({
     const query = newQuery?.toString();
     const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
 
-    goto(resolve(newUrl, {}), options);
+    goto(newUrl, options);
   }
 
   return value;
@@ -111,6 +110,6 @@ export const updateMultipleQueryParameters = async ({
     const query = newQuery?.toString();
     const newUrl = query ? `${url.pathname}?${query}` : url.pathname;
 
-    goto(resolve(newUrl, {}), gotoOptions);
+    goto(newUrl, gotoOptions);
   }
 };
