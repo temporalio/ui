@@ -46,11 +46,11 @@
           <Icon
             label="Project Namespaces"
             name="arrow-left"
-            class="m-1 group-data-[nav=closed]:hidden"
+            class="m-1 text-indigo-100 group-data-[nav=closed]:hidden"
           />
           <h2
             class={merge(
-              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-white underline group-data-[nav=open]:block',
+              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-indigo-100 underline group-data-[nav=open]:block',
               subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
             )}
           >
@@ -60,7 +60,7 @@
       {:else}
         <h2
           class={merge(
-            'mb-0 hidden whitespace-nowrap font-sans font-medium not-italic text-white group-data-[nav=open]:block',
+            'mb-0 hidden whitespace-nowrap font-sans font-medium not-italic text-indigo-100 group-data-[nav=open]:block',
             subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
           )}
         >
@@ -74,7 +74,7 @@
     class="mx-[8px] justify-self-end transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
     onclick={ontoggle}
   >
-    <Icon name="collapse" />
+    <Icon name="collapse" class="text-indigo-100" />
   </button>
 </div>
 <div role="list">
