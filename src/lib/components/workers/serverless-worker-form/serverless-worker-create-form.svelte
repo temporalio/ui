@@ -4,7 +4,6 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -215,7 +214,9 @@
     </form>
   </div>
 
-  <div class="col-span-1">
-    <ServerlessWorkerSetupGuide />
+  <div class="col-span-1 hidden xl:block">
+    <Card class="sticky top-16">
+      <ServerlessWorkerSetupGuide />
+    </Card>
   </div>
 </div>
