@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { HTMLAttributes, HTMLNavAttributes } from 'svelte/elements';
+  import type { HTMLAttributes } from 'svelte/elements';
 
   import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -11,7 +11,7 @@
   import CloudNavBar from './cloud-nav-bar.svelte';
   import OSSNavBar from './oss-nav-bar.svelte';
 
-  interface Props extends HTMLNavAttributes {
+  interface Props extends HTMLAttributes<HTMLElement> {
     isCloud?: boolean;
     subtitle?: string;
     subtitleHref?: string;
