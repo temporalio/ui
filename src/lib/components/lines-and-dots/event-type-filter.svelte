@@ -27,7 +27,6 @@
   import { CategoryIcon } from './constants';
 
   export let compact = false;
-  export let minimized = true;
 
   let open = writable(false);
 
@@ -120,7 +119,7 @@
   <Menu
     id="event-type-menu"
     keepOpen
-    position={minimized ? 'top-right' : 'right'}
+    position="right"
     class="w-[220px] md:w-[360px]"
   >
     <MenuItem data-testid={translate('common.all')} onclick={onAllClick}>

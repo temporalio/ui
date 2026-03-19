@@ -238,7 +238,7 @@
         </p>
       </div>
       <WorkflowCountRefresh count={$workflowCount.newCount} />
-      <WorkflowCounts bind:refreshTime />
+      <WorkflowCounts bind:refreshTime fetchTaskFailures />
     </div>
     {#if $$slots['header-actions'] || workflowStartEnabled}
       <div class="flex items-center gap-4">

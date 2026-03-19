@@ -8,7 +8,14 @@ import { typescript } from '@codemirror/legacy-modes/mode/javascript';
 import { python } from '@codemirror/legacy-modes/mode/python';
 import { ruby } from '@codemirror/legacy-modes/mode/ruby';
 import { shell } from '@codemirror/legacy-modes/mode/shell';
-import { EditorView } from '@codemirror/view';
+import type { DecorationSet, ViewUpdate } from '@codemirror/view';
+import {
+  Decoration,
+  EditorView,
+  MatchDecorator,
+  ViewPlugin,
+  WidgetType,
+} from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 import colors from 'tailwindcss/colors';
 
@@ -135,17 +142,36 @@ export const highlightStyles = HighlightStyle.define(
   { themeType: 'light' },
 );
 
-export const getLineBreakExtension = (editable: boolean) =>
-  EditorView.updateListener.of((update) => {
-    if (editable) return;
+class LineBreakWidget extends WidgetType {
+  toDOM() {
+    return document.createElement('br');
+  }
+}
 
-    const newText = update.state.doc.toString().replace(/\\n/g, '\n');
-    if (newText !== update.state.doc.toString()) {
-      update.view.dispatch({
-        changes: { from: 0, to: update.state.doc.length, insert: newText },
-      });
-    }
-  });
+const lineBreakDecorator = new MatchDecorator({
+  regexp: /\\n/g,
+  decoration: Decoration.replace({ widget: new LineBreakWidget() }),
+});
+
+export const getLineBreakExtension = (editable: boolean) => {
+  if (editable) return [];
+
+  return ViewPlugin.fromClass(
+    class {
+      decorations: DecorationSet;
+      constructor(view: EditorView) {
+        this.decorations = lineBreakDecorator.createDeco(view);
+      }
+      update(update: ViewUpdate) {
+        this.decorations = lineBreakDecorator.updateDeco(
+          update,
+          this.decorations,
+        );
+      }
+    },
+    { decorations: (v) => v.decorations },
+  );
+};
 
 export const getLanguageExtension = (language: EditorLanguage) =>
   ({

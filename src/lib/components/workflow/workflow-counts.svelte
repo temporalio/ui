@@ -4,12 +4,16 @@
   import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
-  import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
+  import {
+    fetchWorkflowCountByExecutionStatus,
+    fetchWorkflowTaskFailures,
+  } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     disableWorkflowCountsRefresh,
     refresh,
+    taskFailuresCount,
     workflowCount,
   } from '$lib/stores/workflows';
   import {
@@ -30,8 +34,13 @@
   type Props = {
     staticQuery?: string;
     refreshTime?: Date;
+    fetchTaskFailures?: boolean;
   };
-  let { staticQuery = '', refreshTime = $bindable() }: Props = $props();
+  let {
+    staticQuery = '',
+    refreshTime = $bindable(),
+    fetchTaskFailures = false,
+  }: Props = $props();
 
   const queryParam = $derived(page.url.searchParams.get('query'));
   const namespace = $derived(page.params.namespace);
@@ -42,8 +51,25 @@
   let newStatusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
   let refreshInterval: ReturnType<typeof setTimeout>;
 
+  const allStatusGroups = $derived(
+    newStatusGroups.length > statusGroups.length
+      ? [
+          ...statusGroups,
+          // Add any statuses that don't exist in the current groups but have a new count
+          ...newStatusGroups
+            .filter((g) => !statusGroups.some((s) => s.status === g.status))
+            .map((g) => ({ status: g.status, count: 0 })),
+        ]
+      : statusGroups,
+  );
+
   let attempt = $state(1);
   let loading = $state(false);
+
+  const hasTaskFailureAttribute = $derived(
+    !!page.data.namespace?.namespaceInfo?.capabilities
+      ?.reportedProblemsSearchAttribute,
+  );
 
   const initialIntervalSeconds = 60;
   const maxAttempts = 20;
@@ -81,15 +107,27 @@
     attempt = 1;
   };
 
-  const fetchInitialCounts = async () => {
-    loading = true;
-    try {
-      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
+  const fetchCounts = async () => {
+    const [{ count, groups }] = await Promise.all([
+      fetchWorkflowCountByExecutionStatus({
         namespace,
         query,
       }).catch((_e) => {
         return { count: '0', groups: [] };
-      });
+      }),
+      fetchTaskFailures && hasTaskFailureAttribute
+        ? fetchWorkflowTaskFailures(namespace).then(
+            (count) => ($taskFailuresCount = count ?? 0),
+          )
+        : Promise.resolve(),
+    ]);
+    return { count, groups };
+  };
+
+  const fetchInitialCounts = async () => {
+    loading = true;
+    try {
+      const { count, groups } = await fetchCounts();
       $workflowCount.count = parseInt(count);
       statusGroups = getStatusAndCountOfGroup(groups);
     } finally {
@@ -100,12 +138,7 @@
 
   const fetchNewCounts = async () => {
     try {
-      const { count, groups } = await fetchWorkflowCountByExecutionStatus({
-        namespace,
-        query,
-      }).catch((_e) => {
-        return { count: '0', groups: [] };
-      });
+      const { count, groups } = await fetchCounts();
       $workflowCount.newCount = parseInt(count) - $workflowCount.count;
       newStatusGroups = getStatusAndCountOfGroup(groups);
     } finally {
@@ -150,7 +183,7 @@
 </script>
 
 <div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
-  {#each statusGroups as { count, status } (status)}
+  {#each allStatusGroups as { count, status } (status)}
     {#if !loading}
       <button onclick={() => onStatusClick(status)}>
         <WorkflowCountStatus

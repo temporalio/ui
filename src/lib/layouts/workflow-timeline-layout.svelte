@@ -112,7 +112,7 @@
           on:click={onSort}
           size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
         >
-        <EventTypeFilter compact={false} minimized={false} />
+        <EventTypeFilter compact={false} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"
