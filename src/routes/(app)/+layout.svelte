@@ -11,6 +11,7 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
@@ -276,14 +277,16 @@
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud}>
       {#snippet bottom()}
-        <NavigationItem
-          link={page.data?.settings?.feedbackURL ||
-            'https://github.com/temporalio/ui/issues/new/choose'}
-          label={translate('common.feedback')}
-          icon="feedback"
-          tooltip={translate('common.feedback')}
-          external
-        />
+        {#if !isCloud}
+          <NavigationItem
+            link={page.data?.settings?.feedbackURL ||
+              'https://github.com/temporalio/ui/issues/new/choose'}
+            label={translate('common.feedback')}
+            icon="feedback"
+            tooltip={translate('common.feedback')}
+            external
+          />
+        {/if}
       {/snippet}
     </SideNavigation>
   </div>
@@ -295,6 +298,18 @@
           <NamespacePicker {namespaceList} />
         {/if}
       {/snippet}
+      {#if isCloud}
+        <a
+          href={page.data?.settings?.supportURL ||
+            'https://support.temporal.io'}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center text-indigo-100 hover:text-white"
+          aria-label="Support"
+        >
+          <Icon name="support" />
+        </a>
+      {/if}
       <UserMenu {logout} />
     </TopNavigation>
     <div
