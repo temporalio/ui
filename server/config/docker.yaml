@@ -49,6 +49,7 @@ uiServerTLS:
   keyFile: {{ env "TEMPORAL_UI_SERVER_TLS_KEY" | default "" }}
 auth:
   enabled: {{ env "TEMPORAL_AUTH_ENABLED" | default "false" }}
+  maxSessionDuration: {{ env "TEMPORAL_MAX_SESSION_DURATION" | default "2m" }}
   providers:
   - label: {{ env "TEMPORAL_AUTH_LABEL" | default "sso" }}
     type: {{ env "TEMPORAL_AUTH_TYPE" | default "oidc" }}
@@ -58,6 +59,7 @@ auth:
     clientSecret: {{ env "TEMPORAL_AUTH_CLIENT_SECRET" }}
     callbackUrl: {{ env "TEMPORAL_AUTH_CALLBACK_URL" }}
     useIdTokenAsBearer: {{ env "TEMPORAL_AUTH_USE_ID_TOKEN_AS_BEARER" | default "false" }}
+    refreshTokenDuration: {{ env "TEMPORAL_AUTH_REFRESH_TOKEN_DURATION" | default "" }}
     scopes:
     {{- if env "TEMPORAL_AUTH_SCOPES" }}
     {{- range env "TEMPORAL_AUTH_SCOPES" | split "," }}
