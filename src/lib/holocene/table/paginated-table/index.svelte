@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import { afterUpdate } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -28,9 +29,17 @@
 
   let tableContainer: HTMLDivElement;
 
-  $: tableOffset = tableContainer?.offsetTop
-    ? tableContainer.offsetTop + 32
-    : 0;
+  let tableOffset = 0;
+  afterUpdate(() => {
+    if (tableContainer) {
+      const newOffset = tableContainer.offsetTop
+        ? tableContainer.offsetTop + 32
+        : 0;
+      if (newOffset !== tableOffset) {
+        tableOffset = newOffset;
+      }
+    }
+  });
 
   export function scrollToTop() {
     tableContainer?.scrollTo({ top: 0, behavior: 'instant' });
