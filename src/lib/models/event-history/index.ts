@@ -27,7 +27,7 @@ import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
 
 export async function getEventAttributes(
-  { historyEvent, namespace, settings, accessToken }: EventWithMetadata,
+  { historyEvent, namespace, settings }: EventWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
     decodeAttributes = decodePayloadAttributes,
@@ -38,7 +38,6 @@ export async function getEventAttributes(
     attributes,
     namespace,
     settings,
-    accessToken,
   });
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;

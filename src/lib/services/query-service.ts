@@ -84,14 +84,12 @@ async function fetchQuery(
 export async function getWorkflowMetadata(
   options: WorkflowParameters,
   settings: Settings,
-  accessToken: string,
   signal?: AbortSignal,
 ): Promise<WorkflowMetadata> {
   try {
     const metadata = await getQuery(
       { ...options, queryType: '__temporal_workflow_metadata' },
       settings,
-      accessToken,
       signal,
     );
     if (!metadata.currentDetails) {
@@ -119,7 +117,6 @@ export async function getWorkflowMetadata(
 export async function getQuery(
   options: QueryRequestParameters,
   settings: Settings,
-  accessToken: string,
   signal?: AbortSignal,
 ): Promise<ParsedQuery> {
   return fetchQuery(options, signal).then(async (execution) => {
@@ -132,7 +129,6 @@ export async function getQuery(
           attributes: queryResult,
           namespace: options.namespace,
           settings,
-          accessToken,
         });
 
         if (
@@ -156,11 +152,6 @@ export async function getQuery(
 export async function getWorkflowStackTrace(
   options: WorkflowParameters,
   settings: Settings,
-  accessToken: string,
 ): Promise<ParsedQuery> {
-  return getQuery(
-    { ...options, queryType: '__stack_trace' },
-    settings,
-    accessToken,
-  );
+  return getQuery({ ...options, queryType: '__stack_trace' }, settings);
 }

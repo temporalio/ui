@@ -49,7 +49,6 @@ describe('fetchNamespaces', () => {
     expect(request).toHaveBeenCalledWith(
       `${origin}${base}/api/v1/namespaces?`,
       {
-        credentials: 'include',
         headers: {
           'Caller-Type': 'operator',
         },

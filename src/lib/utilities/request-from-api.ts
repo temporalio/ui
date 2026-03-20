@@ -1,12 +1,11 @@
 import { BROWSER } from 'esm-env';
 
-import { getAuthUser } from '$lib/stores/auth-user';
 import type { NetworkError } from '$lib/types/global';
 
-import { refreshTokens } from './auth-refresh';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
+import { runPostResponse, runPreRequest } from './token-provider';
 
 export type TemporalAPIError = {
   code: number;
@@ -70,7 +69,6 @@ export const requestFromAPI = async <T>(
     onError,
     isBrowser = BROWSER,
   } = init;
-  let { options } = init;
 
   let query = new URLSearchParams();
   if (params?.entries) {
@@ -78,7 +76,6 @@ export const requestFromAPI = async <T>(
     if (token) query.set('nextPageToken', token);
   } else {
     const nextPageToken = token ? { next_page_token: token } : {};
-    // Filter out undefined values before passing to URLSearchParams
     const paramsWithoutUndefined = Object.fromEntries(
       Object.entries({ ...params, ...nextPageToken }).filter(
         ([_, v]) => v !== undefined,
@@ -89,46 +86,52 @@ export const requestFromAPI = async <T>(
   const url = toURL(endpoint, query);
 
   try {
-    options = withSecurityOptions(options, isBrowser);
-    if (!endpoint.endsWith('api/v1/settings')) {
-      options = await withAuth(options, isBrowser);
-    }
+    const baseOptions: RequestInit = {
+      ...init.options,
+      headers: withCallerType(init.options?.headers),
+    };
 
     const queryIsTooLong = [...query.values()].some(
       (value) => value.length > MAX_QUERY_LENGTH,
     );
 
-    const makeRequest = async () =>
+    const executeRequest = async (ctx: {
+      url: string;
+      options: RequestInit;
+    }) =>
       queryIsTooLong
         ? new Response(
             JSON.stringify({ message: 'Query string is too long' }),
-            {
-              status: 414,
-              statusText: 'URI Too Long',
-            },
+            { status: 414, statusText: 'URI Too Long' },
           )
-        : await request(url, options);
+        : await request(ctx.url, ctx.options);
 
-    let response = await makeRequest();
-    let { status, statusText } = response;
+    let context = { url, options: baseOptions };
 
-    // Shouldn't this check the expiry on the jwt and refresh before we make a request instead of
-    // doing a 401? If we get a 401 and we have done all of our refreshes shouldn't we send the user to the login
-    // page? Asking for a friend (claude)
-    if (isBrowser && status === 401) {
-      const refreshed = await refreshTokens();
-      if (refreshed) {
-        options = withSecurityOptions(init.options, isBrowser);
-        if (!endpoint.endsWith('api/v1/settings')) {
-          options = await withAuth(options, isBrowser);
-        }
-        response = await makeRequest();
-        status = response.status;
-        statusText = response.statusText;
-      }
-      // If refresh failed, let the error flow to handleError() which will redirect to login
+    if (isBrowser) {
+      context = await runPreRequest(context);
     }
 
+    let response = await executeRequest(context);
+
+    if (isBrowser) {
+      response = await runPostResponse(response, {
+        ...context,
+        retry: async () => {
+          let retryContext = {
+            url,
+            options: {
+              ...init.options,
+              headers: withCallerType(init.options?.headers),
+            },
+          };
+          retryContext = await runPreRequest(retryContext);
+          return executeRequest(retryContext);
+        },
+      });
+    }
+
+    const { status, statusText } = response;
     const body = await response.json();
 
     if (!response.ok) {
@@ -154,92 +157,10 @@ export const requestFromAPI = async <T>(
   }
 };
 
-const withSecurityOptions = (
-  options: RequestInit | undefined,
-  isBrowser = BROWSER,
-): RequestInit => {
-  const opts: RequestInit = { credentials: 'include', ...options };
-  opts.headers = withCsrf(opts.headers, isBrowser);
-  return opts;
-};
-
-const withAuth = async (
-  options: RequestInit,
-  isBrowser = BROWSER,
-): Promise<RequestInit> => {
-  const headers: Record<string, string> =
-    (options.headers as Record<string, string>) ?? {};
-
-  if ((globalThis as Record<string, unknown>)?.AccessToken) {
-    const accessToken = (globalThis as Record<string, unknown>)
-      .AccessToken as () => Promise<string>;
-    options.headers = await withBearerToken(headers, accessToken, isBrowser);
-  } else if (getAuthUser().accessToken) {
-    options.headers = await withBearerToken(
-      headers,
-      async () => getAuthUser().accessToken ?? '',
-      isBrowser,
-    );
-    options.headers = withIdToken(
-      options.headers as Record<string, string>,
-      getAuthUser().idToken ?? '',
-      isBrowser,
-    );
-  }
-
-  return options;
-};
-
-const withBearerToken = async (
-  headers: Record<string, string>,
-  accessToken: () => Promise<string>,
-  isBrowser = BROWSER,
-): Promise<Record<string, string>> => {
-  if (!isBrowser) return headers;
-
-  const token = await accessToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return headers;
-};
-
-const withIdToken = (
-  headers: Record<string, string>,
-  idToken: string,
-  isBrowser = BROWSER,
-): Record<string, string> => {
-  if (!isBrowser) return headers;
-
-  if (idToken) {
-    headers['Authorization-Extras'] = idToken;
-  }
-
-  return headers;
-};
-
-const withCsrf = (
+const withCallerType = (
   headers: HeadersInit | undefined,
-  isBrowser = BROWSER,
 ): Record<string, string> => {
   const h: Record<string, string> = (headers as Record<string, string>) ?? {};
   h['Caller-Type'] = 'operator';
-  if (!isBrowser) return h;
-
-  const csrfCookie = '_csrf=';
-  const csrfHeader = 'X-CSRF-TOKEN';
-  try {
-    const cookies = document.cookie.split(';');
-    let csrf = cookies.find((c) => c.includes(csrfCookie));
-    if (csrf && !h[csrfHeader]) {
-      csrf = csrf.trim().slice(csrfCookie.length);
-      h[csrfHeader] = csrf;
-    }
-    /* c8 ignore next 4 */
-  } catch (error) {
-    console.error(error);
-  }
-
   return h;
 };
