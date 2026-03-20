@@ -1,30 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('$lib/stores/auth-user', () => ({
-  setAuthUser: vi.fn(),
-  getAuthUser: vi.fn(),
-}));
-
 vi.mock('$lib/utilities/auth-user-cookie', () => ({
-  getAuthUserCookie: vi.fn(),
-  cleanAuthUserCookie: vi.fn(),
+  consumeAuthCookies: vi.fn(),
 }));
 
 vi.mock('$lib/utilities/get-api-origin', () => ({
   getApiOrigin: vi.fn().mockReturnValue('http://localhost:8080'),
 }));
 
-import { setAuthUser } from '$lib/stores/auth-user';
-import {
-  cleanAuthUserCookie,
-  getAuthUserCookie,
-} from '$lib/utilities/auth-user-cookie';
+import { consumeAuthCookies } from '$lib/utilities/auth-user-cookie';
 
 import { refreshTokens } from './auth-refresh';
 
-const mockSetAuthUser = vi.mocked(setAuthUser);
-const mockGetAuthUserCookie = vi.mocked(getAuthUserCookie);
-const mockCleanAuthUserCookie = vi.mocked(cleanAuthUserCookie);
+const mockConsumeAuthCookies = vi.mocked(consumeAuthCookies);
 
 describe('refreshTokens', () => {
   let fetchSpy: ReturnType<typeof vi.fn>;
@@ -41,7 +29,7 @@ describe('refreshTokens', () => {
 
   it('should call GET /auth/refresh with credentials include', async () => {
     fetchSpy.mockResolvedValue({ ok: true });
-    mockGetAuthUserCookie.mockReturnValue({});
+    mockConsumeAuthCookies.mockReturnValue(false);
 
     await refreshTokens();
 
@@ -54,23 +42,14 @@ describe('refreshTokens', () => {
     );
   });
 
-  it('should update auth store and clean cookie on successful refresh', async () => {
+  it('should consume cookies and return true on successful refresh', async () => {
     fetchSpy.mockResolvedValue({ ok: true });
-    mockGetAuthUserCookie.mockReturnValue({
-      accessToken: 'new-access-token',
-      idToken: 'new-id-token',
-      name: 'Test User',
-    });
+    mockConsumeAuthCookies.mockReturnValue(true);
 
     const result = await refreshTokens();
 
     expect(result).toBe(true);
-    expect(mockSetAuthUser).toHaveBeenCalledWith({
-      accessToken: 'new-access-token',
-      idToken: 'new-id-token',
-      name: 'Test User',
-    });
-    expect(mockCleanAuthUserCookie).toHaveBeenCalledWith(true);
+    expect(mockConsumeAuthCookies).toHaveBeenCalledWith(true);
   });
 
   it('should return false when refresh endpoint returns non-ok', async () => {
@@ -83,17 +62,16 @@ describe('refreshTokens', () => {
     const result = await refreshTokens();
 
     expect(result).toBe(false);
-    expect(mockSetAuthUser).not.toHaveBeenCalled();
+    expect(mockConsumeAuthCookies).not.toHaveBeenCalled();
   });
 
-  it('should return false when cookie has no access token after refresh', async () => {
+  it('should return false when cookies have no access token after refresh', async () => {
     fetchSpy.mockResolvedValue({ ok: true });
-    mockGetAuthUserCookie.mockReturnValue({});
+    mockConsumeAuthCookies.mockReturnValue(false);
 
     const result = await refreshTokens();
 
     expect(result).toBe(false);
-    expect(mockSetAuthUser).not.toHaveBeenCalled();
   });
 
   it('should return false on network error', async () => {
@@ -102,7 +80,7 @@ describe('refreshTokens', () => {
     const result = await refreshTokens();
 
     expect(result).toBe(false);
-    expect(mockSetAuthUser).not.toHaveBeenCalled();
+    expect(mockConsumeAuthCookies).not.toHaveBeenCalled();
   });
 
   it('should deduplicate concurrent refresh calls', async () => {
@@ -113,7 +91,7 @@ describe('refreshTokens', () => {
           resolveRefresh = resolve;
         }),
     );
-    mockGetAuthUserCookie.mockReturnValue({ accessToken: 'refreshed' });
+    mockConsumeAuthCookies.mockReturnValue(true);
 
     const promise1 = refreshTokens();
     const promise2 = refreshTokens();
@@ -129,7 +107,7 @@ describe('refreshTokens', () => {
 
   it('should allow new refresh after previous one completes', async () => {
     fetchSpy.mockResolvedValue({ ok: true });
-    mockGetAuthUserCookie.mockReturnValue({ accessToken: 'token' });
+    mockConsumeAuthCookies.mockReturnValue(true);
 
     await refreshTokens();
     await refreshTokens();

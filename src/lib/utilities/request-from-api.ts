@@ -2,15 +2,10 @@ import { BROWSER } from 'esm-env';
 
 import type { NetworkError } from '$lib/types/global';
 
-import { refreshTokens } from './auth-refresh';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
-import {
-  getAccessToken,
-  getIdToken,
-  isCloudAuthProvider,
-} from './token-provider';
+import { runPostResponse, runPreRequest } from './token-provider';
 
 export type TemporalAPIError = {
   code: number;
@@ -74,7 +69,6 @@ export const requestFromAPI = async <T>(
     onError,
     isBrowser = BROWSER,
   } = init;
-  let { options } = init;
 
   let query = new URLSearchParams();
   if (params?.entries) {
@@ -82,7 +76,6 @@ export const requestFromAPI = async <T>(
     if (token) query.set('nextPageToken', token);
   } else {
     const nextPageToken = token ? { next_page_token: token } : {};
-    // Filter out undefined values before passing to URLSearchParams
     const paramsWithoutUndefined = Object.fromEntries(
       Object.entries({ ...params, ...nextPageToken }).filter(
         ([_, v]) => v !== undefined,
@@ -93,57 +86,52 @@ export const requestFromAPI = async <T>(
   const url = toURL(endpoint, query);
 
   try {
-    options = withSecurityOptions(options, isBrowser);
-    if (!endpoint.endsWith('api/v1/settings')) {
-      options = await withAuth(options);
-    }
+    const baseOptions: RequestInit = {
+      ...init.options,
+      headers: withCallerType(init.options?.headers),
+    };
 
     const queryIsTooLong = [...query.values()].some(
       (value) => value.length > MAX_QUERY_LENGTH,
     );
 
-    const makeRequest = async () =>
+    const executeRequest = async (ctx: {
+      url: string;
+      options: RequestInit;
+    }) =>
       queryIsTooLong
         ? new Response(
             JSON.stringify({ message: 'Query string is too long' }),
-            {
-              status: 414,
-              statusText: 'URI Too Long',
-            },
+            { status: 414, statusText: 'URI Too Long' },
           )
-        : await request(url, options);
+        : await request(ctx.url, ctx.options);
 
-    let response = await makeRequest();
-    let { status, statusText } = response;
+    let context = { url, options: baseOptions };
 
-    // Shouldn't this check the expiry on the jwt and refresh before we make a request instead of
-    // doing a 401? If we get a 401 and we have done all of our refreshes shouldn't we send the user to the login
-    // page? Asking for a friend (claude)
-    if (isBrowser && status === 401) {
-      if (isCloudAuthProvider()) {
-        // Cloud path: getAccessToken() handles refresh internally,
-        // so re-calling it gets a fresh token.
-        options = withSecurityOptions(init.options, isBrowser);
-        if (!endpoint.endsWith('api/v1/settings')) {
-          options = await withAuth(options);
-        }
-        response = await makeRequest();
-        status = response.status;
-        statusText = response.statusText;
-      } else {
-        const refreshed = await refreshTokens();
-        if (refreshed) {
-          options = withSecurityOptions(init.options, isBrowser);
-          if (!endpoint.endsWith('api/v1/settings')) {
-            options = await withAuth(options);
-          }
-          response = await makeRequest();
-          status = response.status;
-          statusText = response.statusText;
-        }
-      }
+    if (isBrowser) {
+      context = await runPreRequest(context);
     }
 
+    let response = await executeRequest(context);
+
+    if (isBrowser) {
+      response = await runPostResponse(response, {
+        ...context,
+        retry: async () => {
+          let retryContext = {
+            url,
+            options: {
+              ...init.options,
+              headers: withCallerType(init.options?.headers),
+            },
+          };
+          retryContext = await runPreRequest(retryContext);
+          return executeRequest(retryContext);
+        },
+      });
+    }
+
+    const { status, statusText } = response;
     const body = await response.json();
 
     if (!response.ok) {
@@ -169,54 +157,10 @@ export const requestFromAPI = async <T>(
   }
 };
 
-const withSecurityOptions = (
-  options: RequestInit | undefined,
-  isBrowser = BROWSER,
-): RequestInit => {
-  const opts: RequestInit = { credentials: 'include', ...options };
-  opts.headers = withCsrf(opts.headers, isBrowser);
-  return opts;
-};
-
-const withAuth = async (options: RequestInit): Promise<RequestInit> => {
-  const headers: Record<string, string> =
-    (options.headers as Record<string, string>) ?? {};
-
-  const token = await getAccessToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const idToken = await getIdToken();
-  if (idToken) {
-    headers['Authorization-Extras'] = idToken;
-  }
-
-  options.headers = headers;
-  return options;
-};
-
-const withCsrf = (
+const withCallerType = (
   headers: HeadersInit | undefined,
-  isBrowser = BROWSER,
 ): Record<string, string> => {
   const h: Record<string, string> = (headers as Record<string, string>) ?? {};
   h['Caller-Type'] = 'operator';
-  if (!isBrowser) return h;
-
-  const csrfCookie = '_csrf=';
-  const csrfHeader = 'X-CSRF-TOKEN';
-  try {
-    const cookies = document.cookie.split(';');
-    let csrf = cookies.find((c) => c.includes(csrfCookie));
-    if (csrf && !h[csrfHeader]) {
-      csrf = csrf.trim().slice(csrfCookie.length);
-      h[csrfHeader] = csrf;
-    }
-    /* c8 ignore next 4 */
-  } catch (error) {
-    console.error(error);
-  }
-
   return h;
 };

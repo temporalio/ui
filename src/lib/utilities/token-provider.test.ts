@@ -1,120 +1,158 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('$lib/stores/auth-user', () => ({
-  getAuthUser: vi.fn(),
-}));
-
-import { getAuthUser } from '$lib/stores/auth-user';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   getAccessToken,
   getIdToken,
   initTokenProvider,
-  isCloudAuthProvider,
+  runPostResponse,
+  runPreRequest,
 } from './token-provider';
 
-const mockGetAuthUser = vi.mocked(getAuthUser);
-
 describe('token-provider', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    delete (globalThis as Record<string, unknown>).AccessToken;
-    initTokenProvider();
-  });
-
-  afterEach(() => {
-    delete (globalThis as Record<string, unknown>).AccessToken;
-  });
-
-  describe('isCloudAuthProvider', () => {
-    it('should return false when globalThis.AccessToken is not set', () => {
-      expect(isCloudAuthProvider()).toBe(false);
-    });
-
-    it('should return true when globalThis.AccessToken is set', () => {
-      (globalThis as Record<string, unknown>).AccessToken = vi.fn();
-      expect(isCloudAuthProvider()).toBe(true);
-    });
-  });
-
-  describe('self-hosted path', () => {
-    it('should return accessToken from auth store', async () => {
-      mockGetAuthUser.mockReturnValue({
-        accessToken: 'store-token',
-        idToken: 'store-id-token',
+  describe('getAccessToken', () => {
+    it('should return token from provided getAccessToken function', async () => {
+      initTokenProvider({
+        getAccessToken: async () => 'my-token',
       });
-      initTokenProvider();
 
       const token = await getAccessToken();
-      expect(token).toBe('store-token');
+      expect(token).toBe('my-token');
     });
+  });
 
-    it('should return empty string when store has no accessToken', async () => {
-      mockGetAuthUser.mockReturnValue({});
-      initTokenProvider();
-
-      const token = await getAccessToken();
-      expect(token).toBe('');
-    });
-
-    it('should return idToken from auth store', async () => {
-      mockGetAuthUser.mockReturnValue({
-        accessToken: 'store-token',
-        idToken: 'store-id-token',
+  describe('getIdToken', () => {
+    it('should return token from provided getIdToken function', async () => {
+      initTokenProvider({
+        getAccessToken: async () => 'access',
+        getIdToken: async () => 'id-token',
       });
-      initTokenProvider();
 
       const idToken = await getIdToken();
-      expect(idToken).toBe('store-id-token');
+      expect(idToken).toBe('id-token');
     });
 
-    it('should return undefined idToken when store has none', async () => {
-      mockGetAuthUser.mockReturnValue({});
-      initTokenProvider();
+    it('should return undefined when getIdToken is not provided', async () => {
+      initTokenProvider({
+        getAccessToken: async () => 'access',
+      });
 
       const idToken = await getIdToken();
       expect(idToken).toBeUndefined();
     });
   });
 
-  describe('cloud path', () => {
-    it('should call globalThis.AccessToken for access token', async () => {
-      const mockAccessToken = vi.fn().mockResolvedValue('cloud-token');
-      (globalThis as Record<string, unknown>).AccessToken = mockAccessToken;
-      initTokenProvider();
+  describe('runPreRequest', () => {
+    it('should call the provided preRequest hook', async () => {
+      initTokenProvider({
+        getAccessToken: async () => 'token',
+        preRequest: async (ctx) => ({
+          ...ctx,
+          options: {
+            ...ctx.options,
+            headers: { Authorization: 'Bearer injected' },
+          },
+        }),
+      });
 
-      const token = await getAccessToken();
-      expect(token).toBe('cloud-token');
-      expect(mockAccessToken).toHaveBeenCalled();
+      const result = await runPreRequest({
+        url: '/api/test',
+        options: {},
+      });
+
+      expect(
+        (result.options.headers as Record<string, string>)['Authorization'],
+      ).toBe('Bearer injected');
     });
 
-    it('should return undefined for idToken on cloud path', async () => {
-      (globalThis as Record<string, unknown>).AccessToken = vi
-        .fn()
-        .mockResolvedValue('cloud-token');
-      initTokenProvider();
+    it('should pass through when no preRequest hook is provided', async () => {
+      initTokenProvider({
+        getAccessToken: async () => 'token',
+      });
 
-      const idToken = await getIdToken();
-      expect(idToken).toBeUndefined();
-    });
+      const context = { url: '/api/test', options: { method: 'GET' } };
+      const result = await runPreRequest(context);
 
-    it('should not read from auth store on cloud path', async () => {
-      (globalThis as Record<string, unknown>).AccessToken = vi
-        .fn()
-        .mockResolvedValue('cloud-token');
-      initTokenProvider();
-
-      await getAccessToken();
-      expect(mockGetAuthUser).not.toHaveBeenCalled();
+      expect(result).toEqual(context);
     });
   });
 
-  describe('lazy initialization', () => {
-    it('should auto-init provider on first getAccessToken call', async () => {
-      mockGetAuthUser.mockReturnValue({ accessToken: 'lazy-token' });
+  describe('runPostResponse', () => {
+    it('should call the provided postResponse hook', async () => {
+      const retryResponse = new Response('retried', { status: 200 });
+      const retry = vi.fn().mockResolvedValue(retryResponse);
 
-      const token = await getAccessToken();
-      expect(token).toBe('lazy-token');
+      initTokenProvider({
+        getAccessToken: async () => 'token',
+        postResponse: async (response, context) => {
+          if (response.status === 401) {
+            return context.retry();
+          }
+          return response;
+        },
+      });
+
+      const unauthorizedResponse = new Response('unauthorized', {
+        status: 401,
+      });
+      const result = await runPostResponse(unauthorizedResponse, {
+        url: '/api/test',
+        options: {},
+        retry,
+      });
+
+      expect(retry).toHaveBeenCalled();
+      expect(result.status).toBe(200);
+    });
+
+    it('should pass through when no postResponse hook is provided', async () => {
+      initTokenProvider({
+        getAccessToken: async () => 'token',
+      });
+
+      const response = new Response('ok', { status: 200 });
+      const result = await runPostResponse(response, {
+        url: '/api/test',
+        options: {},
+        retry: vi.fn(),
+      });
+
+      expect(result).toBe(response);
+    });
+
+    it('should not retry on non-401 responses when hook checks status', async () => {
+      const retry = vi.fn();
+
+      initTokenProvider({
+        getAccessToken: async () => 'token',
+        postResponse: async (response, context) => {
+          if (response.status === 401) return context.retry();
+          return response;
+        },
+      });
+
+      const response = new Response('forbidden', { status: 403 });
+      const result = await runPostResponse(response, {
+        url: '/api/test',
+        options: {},
+        retry,
+      });
+
+      expect(retry).not.toHaveBeenCalled();
+      expect(result.status).toBe(403);
+    });
+  });
+
+  describe('dependency injection', () => {
+    it('should allow swapping providers at runtime', async () => {
+      initTokenProvider({
+        getAccessToken: async () => 'first',
+      });
+      expect(await getAccessToken()).toBe('first');
+
+      initTokenProvider({
+        getAccessToken: async () => 'second',
+      });
+      expect(await getAccessToken()).toBe('second');
     });
   });
 });
