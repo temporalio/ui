@@ -21,20 +21,36 @@
     timezoneName = 'UTC',
     inline = false,
   }: Props = $props();
+
+  const cronString = $derived(
+    frequency.length > 0 && 'comment' in frequency[0] && frequency[0].comment
+      ? frequency[0].comment
+      : '',
+  );
 </script>
 
 {#key frequency}
   <div class={twMerge('flex flex-col', className)}>
     <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
     <div class="flex flex-col gap-2">
-      <CodeBlock
-        copyable
-        {inline}
-        testId="schedule-calendar"
-        language="json"
-        content={stringifyWithBigInt(frequency, null, 2)}
-        {...frequency.length > 1 ? { maxHeight: 600 } : {}}
-      />
+      {#if cronString}
+        <CodeBlock
+          copyable
+          {inline}
+          testId="schedule-cron-string"
+          language="text"
+          content={cronString}
+        />
+      {:else}
+        <CodeBlock
+          copyable
+          {inline}
+          testId="schedule-calendar"
+          language="json"
+          content={stringifyWithBigInt(frequency, null, 2)}
+          {...frequency.length > 1 ? { maxHeight: 600 } : {}}
+        />
+      {/if}
     </div>
   </div>
 {/key}
