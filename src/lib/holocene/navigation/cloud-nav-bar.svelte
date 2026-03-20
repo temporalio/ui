@@ -46,7 +46,7 @@
           <Icon
             label="Project Namespaces"
             name="arrow-left"
-            class="m-1 text-indigo-100 group-data-[nav=closed]:hidden"
+            class="m-1.5 text-indigo-100 group-data-[nav=closed]:hidden"
           />
           <h2
             class={merge(
