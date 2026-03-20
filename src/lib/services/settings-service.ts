@@ -48,6 +48,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     refreshWorkflowCountsDisabled:
       !!settingsResponse?.RefreshWorkflowCountsDisabled,
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
+    disableTrackingPixel: !!settingsResponse?.DisableTrackingPixel,
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
     feedbackURL: settingsResponse?.FeedbackURL,
