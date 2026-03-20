@@ -15,8 +15,6 @@ export const autoRefreshWorkflow = persistStore<'on' | 'off'>(
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed', true);
 
-export const minimizeEventView = persistStore('minimizeEventView', true, true);
-
 export const eventFilterSort = persistStore<EventSortOrder>(
   'eventFilterSort',
   'descending',

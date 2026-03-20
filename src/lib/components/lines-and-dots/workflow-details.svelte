@@ -13,6 +13,7 @@
     timestampFormat,
   } from '$lib/stores/time-format';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { formatBytes } from '$lib/utilities/format-bytes';
   import { formatDate } from '$lib/utilities/format-date';
   import {
     formatDistanceAbbreviated,
@@ -79,6 +80,12 @@
     workflow?.searchAttributes?.indexedFields?.[
       'TemporalWorkflowVersioningBehavior'
     ],
+  );
+
+  const historySizeFormatted = $derived(
+    workflow?.historySizeBytes
+      ? formatBytes(parseInt(workflow.historySizeBytes, 10))
+      : '',
   );
   let totalActions = $derived(
     $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
@@ -280,8 +287,8 @@
   </DetailListColumn>
 
   <DetailListColumn>
-    <DetailListLabel>{translate('common.history-size-bytes')}</DetailListLabel>
-    <DetailListTextValue text={workflow?.historySizeBytes} />
+    <DetailListLabel>{translate('common.history-size')}</DetailListLabel>
+    <DetailListTextValue text={historySizeFormatted} />
 
     {#if !$isCloud}
       <DetailListLabel

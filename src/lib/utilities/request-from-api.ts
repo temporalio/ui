@@ -116,6 +116,9 @@ export const requestFromAPI = async <T>(
     let response = await makeRequest();
     let { status, statusText } = response;
 
+    // Shouldn't this check the expiry on the jwt and refresh before we make a request instead of
+    // doing a 401? If we get a 401 and we have done all of our refreshes shouldn't we send the user to the login
+    // page? Asking for a friend (claude)
     if (isBrowser && status === 401) {
       if (isCloudAuthProvider()) {
         // Cloud path: getAccessToken() handles refresh internally,
