@@ -12,8 +12,6 @@
   }
 
   let { count }: Props = $props();
-
-  const duration = 300;
 </script>
 
 <Button
