@@ -5,7 +5,11 @@ import type { NetworkError } from '$lib/types/global';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
-import { runPostResponse, runPreRequest } from './token-provider';
+import {
+  type RequestContext,
+  runPostResponse,
+  runPreRequest,
+} from './token-provider';
 
 export type TemporalAPIError = {
   code: number;
@@ -118,7 +122,7 @@ export const requestFromAPI = async <T>(
       response = await runPostResponse(response, {
         ...context,
         retry: async () => {
-          let retryContext = {
+          let retryContext: RequestContext = {
             url,
             options: {
               ...init.options,
