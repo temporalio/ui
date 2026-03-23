@@ -8,10 +8,6 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    validateIamRole,
-    validateLambdaArn,
-  } from '$lib/services/serverless-worker-service';
 
   import { type CreateFormData, createSchema } from './shared';
 
@@ -51,26 +47,25 @@
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
 
-      const [lambdaResult, iamResult] = await Promise.all([
-        validateLambdaArn(form.data.lambdaArn),
-        validateIamRole(form.data.iamRoleArn),
-      ]);
-
-      if (!lambdaResult?.valid) {
-        form.errors.lambdaArn = [
-          lambdaResult?.message ??
-            translate('workers.validation-function-not-found'),
-        ];
-        return;
-      }
-
-      if (!iamResult?.valid) {
-        form.errors.iamRoleArn = [
-          iamResult?.message ??
-            translate('workers.validation-permissions-missing'),
-        ];
-        return;
-      }
+      // TODO: Re-enable when backend validation endpoint is available
+      // const [lambdaResult, iamResult] = await Promise.all([
+      //   validateLambdaArn(form.data.lambdaArn),
+      //   validateIamRole(form.data.iamRoleArn),
+      // ]);
+      // if (!lambdaResult?.valid) {
+      //   form.errors.lambdaArn = [
+      //     lambdaResult?.message ??
+      //       translate('workers.validation-function-not-found'),
+      //   ];
+      //   return;
+      // }
+      // if (!iamResult?.valid) {
+      //   form.errors.iamRoleArn = [
+      //     iamResult?.message ??
+      //       translate('workers.validation-permissions-missing'),
+      //   ];
+      //   return;
+      // }
 
       onSubmit(form.data);
     },
