@@ -181,7 +181,7 @@
     bind:this={portalElement}
     use:portal={target}
     {@attach setupPositioning}
-    class="pointer-events-auto fixed left-0 top-0"
+    class="pointer-events-auto fixed left-0 top-0 z-100"
     style:transform="translate({positionX}px, {positionY}px)"
     style:will-change="transform"
   >
