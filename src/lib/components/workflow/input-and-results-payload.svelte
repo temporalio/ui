@@ -81,8 +81,7 @@
             content={decodedValue}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            minHeight={120}
-            maxHeight={120}
+            maxHeight={300}
           />
         {/snippet}
       </PayloadDecoder>
