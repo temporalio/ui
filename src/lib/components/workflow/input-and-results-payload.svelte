@@ -14,6 +14,8 @@
   export let content: string = '';
   export let isPending: boolean = false;
 
+  const MAX_HEIGHT = 300;
+
   const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {
       return parseWithBigInt(c);
@@ -61,7 +63,7 @@
                 copySuccessIconTitle={translate(
                   'common.copy-success-icon-title',
                 )}
-                maxHeight={300}
+                maxHeight={MAX_HEIGHT}
               />
             {/each}
           {:else}
@@ -69,7 +71,7 @@
               content={decodedValue}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              maxHeight={300}
+              maxHeight={MAX_HEIGHT}
             />
           {/if}
         {/snippet}
@@ -81,8 +83,7 @@
             content={decodedValue}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            minHeight={120}
-            maxHeight={120}
+            maxHeight={MAX_HEIGHT}
           />
         {/snippet}
       </PayloadDecoder>
@@ -92,7 +93,7 @@
       content={isPending ? 'Results will appear upon completion.' : 'null'}
       language="text"
       copyable={false}
-      maxHeight={300}
+      maxHeight={MAX_HEIGHT}
     />
   {/if}
 </div>
