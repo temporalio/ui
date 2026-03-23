@@ -18,7 +18,7 @@
 <Navigation {isCloud} {bottom} aria-label={translate('common.primary')}>
   {#each linkList as item}
     {#if 'divider' in item && item.divider}
-      <hr class="-mx-4 my-4 border-subtle" />
+      <hr class="my-4 border-subtle group-data-[nav=closed]:hidden" />
     {:else if 'href' in item && !item.hidden}
       <NavigationItem
         link={item.href}
