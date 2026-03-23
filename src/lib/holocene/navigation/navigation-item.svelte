@@ -39,7 +39,7 @@
     data-track-intent="navigate"
     data-track-text={label}
     class={merge(
-      'mb-1 flex items-center whitespace-nowrap px-2 py-1 text-sm ',
+      'mb-1 flex items-center whitespace-nowrap px-2 py-1 text-sm group-data-[nav=closed]:justify-center',
       'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
       active &&
         'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
@@ -56,7 +56,7 @@
       </div>
     {/if}
     <div
-      class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100"
+      class="w-0 overflow-hidden opacity-0 transition-opacity group-data-[nav=open]:w-auto group-data-[nav=open]:opacity-100"
       class:pointer-events-none={!$navOpen}
     >
       {label}
