@@ -2,14 +2,14 @@ import { BROWSER } from 'esm-env';
 
 import type { NetworkError } from '$lib/types/global';
 
-import { handleError as handleRequestError } from './handle-error';
-import { isFunction } from './is-function';
-import { toURL } from './to-url';
 import {
   type RequestContext,
   runPostResponse,
   runPreRequest,
-} from './token-provider';
+} from './core-provider';
+import { handleError as handleRequestError } from './handle-error';
+import { isFunction } from './is-function';
+import { toURL } from './to-url';
 
 export type TemporalAPIError = {
   code: number;

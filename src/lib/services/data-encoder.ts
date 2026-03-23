@@ -8,6 +8,7 @@ import {
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
 import type { NetworkError, Settings } from '$lib/types/global';
+import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 import {
   getCodecEndpoint,
   getCodecIncludeCredentials,
@@ -15,7 +16,6 @@ import {
 } from '$lib/utilities/get-codec';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-import { getAccessToken, getIdToken } from '$lib/utilities/token-provider';
 
 export type PotentialPayloads = { payloads: unknown[] };
 

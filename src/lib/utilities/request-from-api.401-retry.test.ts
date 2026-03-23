@@ -4,14 +4,14 @@ vi.mock('./handle-error', () => ({
   handleError: vi.fn(),
 }));
 
-vi.mock('./token-provider', () => ({
+vi.mock('./core-provider', () => ({
   runPreRequest: vi.fn(),
   runPostResponse: vi.fn(),
 }));
 
+import { runPostResponse, runPreRequest } from './core-provider';
 import { handleError } from './handle-error';
 import { requestFromAPI } from './request-from-api';
-import { runPostResponse, runPreRequest } from './token-provider';
 
 const mockRunPreRequest = vi.mocked(runPreRequest);
 const mockRunPostResponse = vi.mocked(runPostResponse);

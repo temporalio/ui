@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('$lib/utilities/token-provider', () => ({
+vi.mock('$lib/utilities/core-provider', () => ({
   getAccessToken: vi.fn().mockResolvedValue(''),
   getIdToken: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { getAccessToken, getIdToken } from '$lib/utilities/token-provider';
+import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 
 import { codeServerRequest } from './data-encoder';
 

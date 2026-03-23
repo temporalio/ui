@@ -11,7 +11,12 @@ vi.mock('./auth-refresh', () => ({
 import { getAuthUser } from '$lib/stores/auth-user';
 
 import { refreshTokens } from './auth-refresh';
-import { getCsrfToken, ossPostResponse, ossPreRequest } from './oss-provider';
+
+import {
+  getCsrfToken,
+  ossPostResponse,
+  ossPreRequest,
+} from './oss-provider.svelte';
 
 const mockGetAuthUser = vi.mocked(getAuthUser);
 const mockRefreshTokens = vi.mocked(refreshTokens);

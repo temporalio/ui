@@ -1,10 +1,13 @@
+import { page } from '$app/state';
+
 import { getAuthUser } from '$lib/stores/auth-user';
 import type {
   PostResponseHook,
   PreRequestHook,
-} from '$lib/utilities/token-provider';
+} from '$lib/utilities/core-provider';
 
 import { refreshTokens } from './auth-refresh';
+import { getCodecEndpoint } from './get-codec';
 
 export function getCsrfToken(): string | undefined {
   try {
@@ -59,3 +62,10 @@ export const ossPostResponse: PostResponseHook = async (response, context) => {
 
   return response;
 };
+
+export async function ossGetDataEncoderEndpoint(
+  _namespace: string,
+): Promise<string> {
+  const settings = page.data?.settings;
+  return getCodecEndpoint(settings);
+}

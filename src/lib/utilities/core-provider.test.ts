@@ -3,15 +3,15 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   getAccessToken,
   getIdToken,
-  initTokenProvider,
+  initCoreProvider,
   runPostResponse,
   runPreRequest,
-} from './token-provider';
+} from './core-provider';
 
-describe('token-provider', () => {
+describe('core-provider', () => {
   describe('getAccessToken', () => {
     it('should return token from provided getAccessToken function', async () => {
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'my-token',
       });
 
@@ -22,7 +22,7 @@ describe('token-provider', () => {
 
   describe('getIdToken', () => {
     it('should return token from provided getIdToken function', async () => {
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'access',
         getIdToken: async () => 'id-token',
       });
@@ -32,7 +32,7 @@ describe('token-provider', () => {
     });
 
     it('should return undefined when getIdToken is not provided', async () => {
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'access',
       });
 
@@ -43,15 +43,17 @@ describe('token-provider', () => {
 
   describe('runPreRequest', () => {
     it('should call the provided preRequest hook', async () => {
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'token',
-        preRequest: async (ctx) => ({
-          ...ctx,
-          options: {
-            ...ctx.options,
-            headers: { Authorization: 'Bearer injected' },
-          },
-        }),
+        api: {
+          preRequest: async (ctx) => ({
+            ...ctx,
+            options: {
+              ...ctx.options,
+              headers: { Authorization: 'Bearer injected' },
+            },
+          }),
+        },
       });
 
       const result = await runPreRequest({
@@ -65,7 +67,7 @@ describe('token-provider', () => {
     });
 
     it('should pass through when no preRequest hook is provided', async () => {
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'token',
       });
 
@@ -81,13 +83,15 @@ describe('token-provider', () => {
       const retryResponse = new Response('retried', { status: 200 });
       const retry = vi.fn().mockResolvedValue(retryResponse);
 
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'token',
-        postResponse: async (response, context) => {
-          if (response.status === 401) {
-            return context.retry();
-          }
-          return response;
+        api: {
+          postResponse: async (response, context) => {
+            if (response.status === 401) {
+              return context.retry();
+            }
+            return response;
+          },
         },
       });
 
@@ -105,7 +109,7 @@ describe('token-provider', () => {
     });
 
     it('should pass through when no postResponse hook is provided', async () => {
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'token',
       });
 
@@ -122,11 +126,13 @@ describe('token-provider', () => {
     it('should not retry on non-401 responses when hook checks status', async () => {
       const retry = vi.fn();
 
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'token',
-        postResponse: async (response, context) => {
-          if (response.status === 401) return context.retry();
-          return response;
+        api: {
+          postResponse: async (response, context) => {
+            if (response.status === 401) return context.retry();
+            return response;
+          },
         },
       });
 
@@ -144,12 +150,12 @@ describe('token-provider', () => {
 
   describe('dependency injection', () => {
     it('should allow swapping providers at runtime', async () => {
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'first',
       });
       expect(await getAccessToken()).toBe('first');
 
-      initTokenProvider({
+      initCoreProvider({
         getAccessToken: async () => 'second',
       });
       expect(await getAccessToken()).toBe('second');

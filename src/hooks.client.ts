@@ -1,7 +1,11 @@
 import { getAuthUser } from '$lib/stores/auth-user';
 import { consumeAuthCookies } from '$lib/utilities/auth-user-cookie';
-import { ossPostResponse, ossPreRequest } from '$lib/utilities/oss-provider';
-import { initTokenProvider } from '$lib/utilities/token-provider';
+import { initCoreProvider } from '$lib/utilities/core-provider';
+import {
+  ossGetDataEncoderEndpoint,
+  ossPostResponse,
+  ossPreRequest,
+} from '$lib/utilities/oss-provider.svelte';
 
 if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
   crypto.randomUUID = function randomUUID() {
@@ -17,9 +21,12 @@ if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
 
 consumeAuthCookies();
 
-initTokenProvider({
+initCoreProvider({
   getAccessToken: async () => getAuthUser().accessToken ?? '',
   getIdToken: async () => getAuthUser().idToken,
-  preRequest: ossPreRequest,
-  postResponse: ossPostResponse,
+  api: {
+    preRequest: ossPreRequest,
+    postResponse: ossPostResponse,
+  },
+  getDataEncoderEndpoint: ossGetDataEncoderEndpoint,
 });

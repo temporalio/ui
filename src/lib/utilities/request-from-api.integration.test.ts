@@ -15,9 +15,10 @@ vi.mock('./auth-refresh', () => ({
 import { getAuthUser } from '$lib/stores/auth-user';
 
 import { refreshTokens } from './auth-refresh';
-import { ossPostResponse, ossPreRequest } from './oss-provider';
+import { initCoreProvider } from './core-provider';
 import { requestFromAPI } from './request-from-api';
-import { initTokenProvider } from './token-provider';
+
+import { ossPostResponse, ossPreRequest } from './oss-provider.svelte';
 
 const mockGetAuthUser = vi.mocked(getAuthUser);
 const mockRefreshTokens = vi.mocked(refreshTokens);
@@ -50,11 +51,13 @@ describe('request-from-api integration with OSS provider', () => {
       idToken: 'test-id-token',
     });
 
-    initTokenProvider({
+    initCoreProvider({
       getAccessToken: async () => mockGetAuthUser().accessToken ?? '',
       getIdToken: async () => mockGetAuthUser().idToken,
-      preRequest: ossPreRequest,
-      postResponse: ossPostResponse,
+      api: {
+        preRequest: ossPreRequest,
+        postResponse: ossPostResponse,
+      },
     });
   });
 
