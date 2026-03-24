@@ -1,0 +1,35 @@
+import { z } from 'zod/v3';
+
+const baseFields = {
+  name: z
+    .string()
+    .min(3, 'Name must be at least 3 characters')
+    .max(100)
+    .regex(/^[a-z][a-z0-9-]*$/, 'Must be lowercase, alphanumeric with hyphens'),
+  lambdaArn: z
+    .string()
+    .min(1, 'Lambda ARN is required')
+    .regex(
+      /^arn:aws:lambda:[a-z0-9-]+:\d{12}:function:.+$/,
+      'Invalid Lambda ARN format',
+    ),
+  iamRoleArn: z
+    .string()
+    .min(1, 'IAM Role ARN is required')
+    .regex(/^arn:aws:iam::\d{12}:role\/.+$/, 'Invalid IAM Role ARN format'),
+};
+
+export const createSchema = z.object({
+  ...baseFields,
+  minInstances: z.number().int().min(0).optional(),
+  maxInstances: z.number().int().min(1).optional(),
+});
+
+export const editSchema = z.object({
+  ...baseFields,
+  minInstances: z.number().int().min(0).optional(),
+  maxInstances: z.number().int().min(1).optional(),
+});
+
+export type CreateFormData = z.infer<typeof createSchema>;
+export type EditFormData = z.infer<typeof editSchema>;
