@@ -123,3 +123,33 @@ test('refreshes token and retries request on 401', async ({
   expect(authHeaders[0]).toBe('Bearer expired-token');
   expect(authHeaders[1]).toBe('Bearer refreshed-token-456');
 });
+
+test('redirects to login when session is expired and refresh fails', async ({
+  page,
+  baseURL,
+}) => {
+  await mockAuthApis(page);
+
+  await page.route(WORKFLOWS_API, async (route) => {
+    await route.fulfill({ status: 401, body: 'Unauthorized' });
+  });
+
+  await page.route('**/auth/refresh**', async (route) => {
+    await route.fulfill({ status: 401, body: 'session expired' });
+  });
+
+  await page.context().addCookies([
+    {
+      name: 'user0',
+      value: makeUserCookie('expired-token'),
+      domain: 'localhost',
+      path: '/',
+    },
+  ]);
+
+  await page.goto(baseURL);
+
+  await page.waitForURL('**/login**');
+
+  expect(page.url()).toContain('login');
+});

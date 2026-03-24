@@ -46,6 +46,13 @@ const createMockFetch = (...responses: MockResponseConfig[]) => {
 describe('request-from-api integration with OSS provider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal('window', {
+      location: {
+        assign: vi.fn(),
+        origin: 'http://localhost',
+        href: 'http://localhost/',
+      },
+    });
     mockGetAuthUser.mockReturnValue({
       accessToken: 'test-access-token',
       idToken: 'test-id-token',
@@ -63,6 +70,7 @@ describe('request-from-api integration with OSS provider', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('should attach auth headers and credentials on a successful request', async () => {
