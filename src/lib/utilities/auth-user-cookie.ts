@@ -25,7 +25,7 @@ export const getAuthUserCookie = (isBrowser = BROWSER): User => {
   let userBase64 = '';
 
   while (next) {
-    const [_, value] = next.split('=');
+    const value = next.slice(next.indexOf('=') + 1);
 
     userBase64 += value;
     i++;
