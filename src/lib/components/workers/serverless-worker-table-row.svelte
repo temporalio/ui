@@ -24,7 +24,6 @@
   <td>
     <a href={detailHref} class="text-blue-700 hover:underline">{worker.name}</a>
   </td>
-  <td>{worker.taskQueue}</td>
   <td>
     <div class="flex items-center gap-1.5">
       <Icon name="robot" />

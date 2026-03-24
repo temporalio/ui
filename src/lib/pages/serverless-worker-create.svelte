@@ -35,13 +35,10 @@
             type: 'lambda',
             detailJson: JSON.stringify(providerDetail),
           },
-          scaler:
-            data.minInstances !== undefined || data.maxInstances !== undefined
-              ? {
-                  minInstances: data.minInstances,
-                  maxInstances: data.maxInstances,
-                }
-              : undefined,
+          scaler: {
+            minInstances: data.minInstances ?? 0,
+            maxInstances: data.maxInstances ?? 10,
+          },
         },
       },
       (err) => {

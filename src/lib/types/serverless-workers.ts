@@ -13,11 +13,8 @@ export interface ServerlessWorker {
   lambdaArn: string;
   iamRoleArn: string;
   region: string;
-  taskQueue: string;
-  maxWorkers: number;
-  maxConcurrentActivities: number;
-  maxTaskQueueActivitiesPerSecond: number;
-  idleTimeoutSeconds: number;
+  minInstances?: number;
+  maxInstances?: number;
   lastHeartbeat: string;
   sdkVersion: string;
   createdAt: string;
@@ -35,11 +32,8 @@ export type ServerlessWorkerUpdateInput = Pick<
   | 'lambdaArn'
   | 'iamRoleArn'
   | 'region'
-  | 'taskQueue'
-  | 'maxWorkers'
-  | 'maxConcurrentActivities'
-  | 'maxTaskQueueActivitiesPerSecond'
-  | 'idleTimeoutSeconds'
+  | 'minInstances'
+  | 'maxInstances'
 >;
 
 export interface ServerlessWorkerMetricsCard {

@@ -27,10 +27,8 @@ export const createSchema = z.object({
 
 export const editSchema = z.object({
   ...baseFields,
-  maxWorkers: z.number().min(1).max(100),
-  maxConcurrentActivities: z.number().min(1).max(50),
-  maxTaskQueueActivitiesPerSecond: z.number().min(1).max(10000),
-  idleTimeoutSeconds: z.number().min(30).max(3600),
+  minInstances: z.number().int().min(0).optional(),
+  maxInstances: z.number().int().min(1).optional(),
 });
 
 export type CreateFormData = z.infer<typeof createSchema>;

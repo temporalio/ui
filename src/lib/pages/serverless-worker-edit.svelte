@@ -3,43 +3,70 @@
 
   import ServerlessWorkerEditForm from '$lib/components/workers/serverless-worker-form/serverless-worker-edit-form.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchDeployment } from '$lib/services/deployments-service';
   import {
-    deleteServerlessWorker,
-    getServerlessWorker,
-    updateServerlessWorker,
-  } from '$lib/services/serverless-worker-service';
-  import {
-    routeForServerlessWorker,
-    routeForWorkers,
+    routeForWorkerDeployment,
+    routeForWorkerDeployments,
   } from '$lib/utilities/route-for';
 
   type Props = { id: string; namespace: string };
   let { id, namespace }: Props = $props();
 
-  const worker = $derived(getServerlessWorker(id));
-  const detailHref = $derived(routeForServerlessWorker({ namespace, id }));
+  const deploymentFetch = $derived(
+    fetchDeployment({ namespace, deploymentName: id }),
+  );
 
-  function handleDelete() {
-    deleteServerlessWorker(id);
-    goto(routeForWorkers({ namespace }));
-  }
+  const detailHref = $derived(
+    routeForWorkerDeployment({ namespace, deployment: id }),
+  );
 </script>
 
-{#if !worker}
-  <Alert intent="warning" title="Serverless worker not found">
-    No serverless worker found with ID "{id}".
-  </Alert>
-{:else}
+{#await deploymentFetch}
+  <SkeletonTable rows={6} />
+{:then deployment}
+  {@const info = deployment.workerDeploymentInfo}
+  {@const computeConfig = info.computeConfig}
+  {@const providerDetail = computeConfig?.provider?.detailJson
+    ? (JSON.parse(computeConfig.provider.detailJson) as {
+        lambdaArn?: string;
+        iamRoleArn?: string;
+        region?: string;
+      })
+    : {}}
+  {@const worker = {
+    id: info.name,
+    name: info.name,
+    status: 'running' as const,
+    compute: 'Lambda' as const,
+    lastHeartbeat: '',
+    sdkVersion: '',
+    createdAt: '',
+    updatedAt: '',
+    lambdaArn: providerDetail.lambdaArn ?? '',
+    iamRoleArn: providerDetail.iamRoleArn ?? '',
+    region: providerDetail.region ?? '',
+    taskQueue: '',
+    maxWorkers: computeConfig?.scaler?.maxInstances ?? 0,
+    maxConcurrentActivities: 0,
+    maxTaskQueueActivitiesPerSecond: 0,
+    idleTimeoutSeconds: 0,
+  }}
   <ServerlessWorkerEditForm
     {namespace}
     {worker}
     submitButtonText={translate('workers.save-changes')}
     cancelHref={detailHref}
-    onSubmit={(data) => {
-      updateServerlessWorker(id, data);
+    onSubmit={() => {
       goto(detailHref);
     }}
-    onDelete={handleDelete}
+    onDelete={() => {
+      goto(routeForWorkerDeployments({ namespace }));
+    }}
   />
-{/if}
+{:catch error}
+  <Alert intent="warning" title={translate('common.error-occurred')}>
+    {error?.message ?? translate('common.unknown-error')}
+  </Alert>
+{/await}

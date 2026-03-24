@@ -77,7 +77,7 @@
       <Link
         href={routeForWorkflowsWithQuery({
           namespace,
-          query: `TaskQueue="${worker.taskQueue}"`,
+          query: `TemporalWorkerDeployment="${worker.name}"`,
         })}
       >
         {translate('workers.go-to-workflows')}
@@ -105,12 +105,6 @@
     </div>
 
     <div class="flex items-center gap-6 border-b border-subtle pb-4">
-      <div class="flex flex-col gap-0.5">
-        <span class="text-xs text-secondary"
-          >{translate('workers.task-queue')}</span
-        >
-        <span class="text-sm font-medium">{worker.taskQueue}</span>
-      </div>
       <div class="flex flex-col gap-0.5">
         <span class="text-xs text-secondary"
           >{translate('workers.compute-label')}</span
@@ -221,34 +215,18 @@
             <div class="flex gap-6">
               <div class="flex flex-col gap-1">
                 <span class="text-xs font-medium"
-                  >{translate('workers.max-workers')}</span
-                >
-                <span class="font-mono text-sm">{worker.maxWorkers}</span>
-              </div>
-              <div class="flex flex-col gap-1">
-                <span class="text-xs font-medium"
-                  >{translate('workers.max-task-queue-rate')}</span
+                  >{translate('workers.min-instances-label')}</span
                 >
                 <span class="font-mono text-sm"
-                  >{worker.maxTaskQueueActivitiesPerSecond}/s</span
-                >
-              </div>
-            </div>
-            <div class="flex gap-6">
-              <div class="flex flex-col gap-1">
-                <span class="text-xs font-medium"
-                  >{translate('workers.max-concurrent-activities')}</span
-                >
-                <span class="font-mono text-sm"
-                  >{worker.maxConcurrentActivities}</span
+                  >{worker.minInstances ?? '—'}</span
                 >
               </div>
               <div class="flex flex-col gap-1">
                 <span class="text-xs font-medium"
-                  >{translate('workers.idle-timeout')}</span
+                  >{translate('workers.max-instances-label')}</span
                 >
                 <span class="font-mono text-sm"
-                  >{worker.idleTimeoutSeconds}s</span
+                  >{worker.maxInstances ?? '—'}</span
                 >
               </div>
             </div>
@@ -503,7 +481,7 @@
                       class="inline-flex items-center gap-1"
                       href={routeForWorkflowsWithQuery({
                         namespace,
-                        query: `TaskQueue="${worker.taskQueue}"`,
+                        query: `TemporalWorkerDeployment="${worker.name}"`,
                       })}
                     >
                       {translate('workers.go-to-workflows')}

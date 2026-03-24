@@ -71,6 +71,7 @@ export interface VersionSummaryNew {
 export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {
   lastModifierIdentity: string;
   versionSummaries: VersionSummary[];
+  computeConfig?: ComputeConfig;
 }
 
 export interface WorkerDeploymentResponse {
