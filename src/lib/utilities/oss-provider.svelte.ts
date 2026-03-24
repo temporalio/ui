@@ -1,3 +1,5 @@
+import { BROWSER } from 'esm-env';
+
 import { page } from '$app/state';
 
 import { getAuthUser } from '$lib/stores/auth-user';
@@ -8,6 +10,7 @@ import type {
 
 import { refreshTokens } from './auth-refresh';
 import { getCodecEndpoint } from './get-codec';
+import { routeForLoginPage } from './route-for';
 
 export function getCsrfToken(): string | undefined {
   try {
@@ -58,6 +61,10 @@ export const ossPostResponse: PostResponseHook = async (response, context) => {
   const refreshed = await refreshTokens();
   if (refreshed) {
     return context.retry();
+  }
+
+  if (BROWSER) {
+    window.location.assign(routeForLoginPage());
   }
 
   return response;

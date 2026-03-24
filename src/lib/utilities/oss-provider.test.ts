@@ -138,8 +138,20 @@ describe('getCsrfToken', () => {
 });
 
 describe('ossPostResponse', () => {
+  let assignSpy: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    assignSpy = vi.fn();
+    Object.defineProperty(window, 'location', {
+      value: {
+        assign: assignSpy,
+        origin: 'http://localhost',
+        href: 'http://localhost/',
+      },
+      configurable: true,
+      writable: true,
+    });
   });
 
   it('should pass through non-401 responses', async () => {
@@ -188,5 +200,30 @@ describe('ossPostResponse', () => {
     expect(mockRefreshTokens).toHaveBeenCalledTimes(1);
     expect(retry).not.toHaveBeenCalled();
     expect(result).toBe(response);
+  });
+
+  it('should redirect to login when refreshTokens returns false', async () => {
+    mockRefreshTokens.mockResolvedValue(false);
+
+    const response = new Response('unauthorized', { status: 401 });
+    await ossPostResponse(response, {
+      url: '/api/test',
+      options: {},
+      retry: vi.fn(),
+    });
+
+    expect(assignSpy).toHaveBeenCalledWith(expect.stringContaining('login'));
+  });
+
+  it('should not redirect for non-401 responses', async () => {
+    const response = new Response('forbidden', { status: 403 });
+    await ossPostResponse(response, {
+      url: '/api/test',
+      options: {},
+      retry: vi.fn(),
+    });
+
+    expect(assignSpy).not.toHaveBeenCalled();
+    expect(mockRefreshTokens).not.toHaveBeenCalled();
   });
 });
