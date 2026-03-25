@@ -20,6 +20,7 @@
   import { translate } from '$lib/i18n/translate';
   import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
+  import { preferredWorkflowTab } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -97,6 +98,16 @@
   );
   const linkCount = $derived(outboundLinks + inboundLinks);
   const sharedFilterParams = $derived(getSharedFilterParams(page.url));
+
+  $effect(() => {
+    if (pathMatches(page.url.pathname, routeForTimeline(routeParameters))) {
+      $preferredWorkflowTab = 'timeline';
+    } else if (
+      pathMatches(page.url.pathname, routeForEventHistory(routeParameters))
+    ) {
+      $preferredWorkflowTab = 'history';
+    }
+  });
 </script>
 
 <div class="flex items-center justify-between">
