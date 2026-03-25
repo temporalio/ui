@@ -41,32 +41,29 @@
       />
     </a>
     {#if subtitle}
-      {#if subtitleHref}
-        <a href={subtitleHref} class="contents">
-          <Icon
-            label="Project Namespaces"
-            name="arrow-left"
-            class="m-1.5 text-indigo-100 group-data-[nav=closed]:hidden"
-          />
-          <h2
-            class={merge(
-              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-indigo-100 underline group-data-[nav=open]:block',
-              subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
-            )}
-          >
-            {subtitle}
-          </h2>
-        </a>
-      {:else}
+      <svelte:element
+        this={subtitleHref ? 'a' : 'div'}
+        href={subtitleHref ?? undefined}
+        class="contents"
+      >
+        <Icon
+          label="Project Namespaces"
+          name="arrow-left"
+          class={merge(
+            'm-1.5 text-indigo-100 group-data-[nav=closed]:hidden',
+            !subtitleHref && 'invisible',
+          )}
+        />
         <h2
           class={merge(
-            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-indigo-100 group-data-[nav=open]:block',
+            'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-indigo-100 group-data-[nav=open]:block',
             subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
+            subtitleHref && 'underline underline-offset-2',
           )}
         >
           {subtitle}
         </h2>
-      {/if}
+      </svelte:element>
     {/if}
   </div>
   <button
