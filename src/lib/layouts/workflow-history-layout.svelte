@@ -149,7 +149,7 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap-reverse items-center justify-between gap-2 border-b border-subtle md:top-12 md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[11] flex flex-wrap-reverse items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="items-bottom flex gap-4 pt-2">
       <h2>
