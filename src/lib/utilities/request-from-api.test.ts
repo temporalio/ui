@@ -26,22 +26,6 @@ vi.mock('./handle-error', () => {
   return { handleError: vi.fn() };
 });
 
-const withCookie = async (cookie: string, fn: () => void) => {
-  const currentCookie = document.cookie;
-
-  Object.defineProperty(document, 'cookie', {
-    writable: true,
-    value: cookie,
-  });
-
-  fn();
-
-  Object.defineProperty(document, 'cookie', {
-    writable: true,
-    value: currentCookie,
-  });
-};
-
 describe('isTemporalAPIError', () => {
   it('should return false if undefined', () => {
     expect(isTemporalAPIError(undefined)).toBe(false);
@@ -61,7 +45,6 @@ describe('requestFromAPI', () => {
   const responseBody = listWorkflowResponse;
 
   const options = {
-    credentials: 'include',
     headers: {
       'Caller-Type': 'operator',
     },
@@ -87,64 +70,10 @@ describe('requestFromAPI', () => {
     expect(request).toHaveBeenCalledWith(endpoint + '?', options);
   });
 
-  it('should add credentials to options', async () => {
+  it('should add Caller-Type header to options', async () => {
     const request = fetchMock();
     await requestFromAPI(endpoint, { request, options: {} });
     expect(request).toHaveBeenCalledWith(endpoint + '?', options);
-  });
-
-  it('should add csrf cookie to headers', async () => {
-    const token = 'token';
-
-    const request = fetchMock();
-    await withCookie(`_csrf=${token}`, async () => {
-      await requestFromAPI(endpoint, { request });
-    });
-
-    expect(request).toHaveBeenCalledWith(endpoint + '?', {
-      ...options,
-      headers: {
-        'X-CSRF-TOKEN': token,
-        'Caller-Type': 'operator',
-      },
-    });
-  });
-
-  it('should not add csrf cookie to headers if not presdent', async () => {
-    const token = 'token';
-
-    const request = fetchMock();
-    await withCookie(`_nope=${token}`, async () => {
-      await requestFromAPI(endpoint, { request });
-    });
-
-    expect(request).toHaveBeenCalledWith(endpoint + '?', options);
-  });
-
-  it('should not add csrf cookie to headers if not running in the browser', async () => {
-    const token = 'token';
-
-    const request = fetchMock();
-    await withCookie(`_csrf=${token}`, async () => {
-      await requestFromAPI(endpoint, { request, isBrowser: false });
-    });
-
-    expect(request).toHaveBeenCalledWith(endpoint + '?', options);
-  });
-
-  it('should not add csrf cookie to headers it already exists', async () => {
-    const token = 'token';
-    const headers = {
-      'X-CSRF-TOKEN': 'pre-existing',
-    };
-    const opts = { ...options, headers };
-
-    const request = fetchMock();
-    await withCookie(`_csrf=${token}`, async () => {
-      await requestFromAPI(endpoint, { request, options: opts as RequestInit });
-    });
-
-    expect(request).toHaveBeenCalledWith(endpoint + '?', opts);
   });
 
   it('should create an empty array of headers if not provided', async () => {

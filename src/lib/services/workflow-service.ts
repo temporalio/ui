@@ -13,7 +13,6 @@ import {
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 import { isCloud } from '$lib/stores/advanced-visibility';
-import { authUser } from '$lib/stores/auth-user';
 import type {
   SearchAttributeInput,
   SearchAttributesSchema,
@@ -833,7 +832,6 @@ export const fetchInitialValuesForStartWorkflow = async ({
       startEvent?.attributes?.input,
       namespace,
       get(page).data.settings,
-      get(authUser).accessToken,
       'readable',
       false,
     )) as PotentiallyDecodable;

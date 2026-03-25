@@ -10,7 +10,6 @@
   import { translate } from '$lib/i18n/translate';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
 
@@ -31,7 +30,6 @@
         namespace,
       },
       page.data?.settings,
-      $authUser?.accessToken,
     );
 
   $effect(() => {

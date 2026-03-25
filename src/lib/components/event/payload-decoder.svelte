@@ -3,7 +3,6 @@
 
   import { page } from '$app/stores';
 
-  import { authUser } from '$lib/stores/auth-user';
   import type { Memo } from '$lib/types';
   import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
   import {
@@ -51,7 +50,6 @@
         _value,
         $page.params.namespace,
         settings,
-        $authUser.accessToken,
       );
       const decodedAttributes = decodePayloadAttributes(
         convertedAttributes,
