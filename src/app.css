@@ -8,6 +8,7 @@
 
 @layer base {
   :root {
+    --top-nav-height: 3rem;
     --panel-collapsed-w: 60px;
     --panel-expanded-w: 240px;
     --panel-h: 73dvh;
