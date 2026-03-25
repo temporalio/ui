@@ -18,11 +18,7 @@
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { clearActives } from '$lib/stores/active-events';
-  import {
-    eventFilterSort,
-    eventViewType,
-    minimizeEventView,
-  } from '$lib/stores/event-view';
+  import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
   import {
     currentEventHistory,
     filteredEventHistory,
@@ -153,7 +149,7 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap-reverse items-center justify-between gap-2 border-b border-subtle md:top-12 md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[11] flex flex-wrap-reverse items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="items-bottom flex gap-4 pt-2">
       <h2>
@@ -197,7 +193,7 @@
               : translate('common.ascending')}
           </ToggleButton>
         {/if}
-        <EventTypeFilter {compact} minimized={$minimizeEventView} />
+        <EventTypeFilter {compact} />
         <ToggleButton
           disabled={isNotPending}
           data-testid="pause"

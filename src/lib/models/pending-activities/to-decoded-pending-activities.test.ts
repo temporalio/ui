@@ -10,7 +10,6 @@ import pendingActivityWorkflow from '$fixtures/workflow.pending-activities.json'
 
 const namespace = 'unit-tests';
 const settings = settingsFixture as unknown as Settings;
-const accessToken = 'access-token';
 
 describe('toDecodedPendingActivities', () => {
   it('should decode heartbeatDetails', async () => {
@@ -19,7 +18,6 @@ describe('toDecodedPendingActivities', () => {
       workflow,
       namespace,
       settings,
-      accessToken,
     );
 
     expect(decodedHeartbeatDetails[0].heartbeatDetails.payloads[0]).toBe(2);

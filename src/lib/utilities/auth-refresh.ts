@@ -1,14 +1,20 @@
 import { BROWSER } from 'esm-env';
 
-import { setAuthUser } from '$lib/stores/auth-user';
-import {
-  cleanAuthUserCookie,
-  getAuthUserCookie,
-} from '$lib/utilities/auth-user-cookie';
+import { consumeAuthCookies } from '$lib/utilities/auth-user-cookie';
 import { getApiOrigin } from '$lib/utilities/get-api-origin';
 
 let refreshPromise: Promise<boolean> | null = null;
 
+/**
+ * Calls the Go server's `/auth/refresh` endpoint, which uses the HttpOnly
+ * `refresh` cookie to obtain new tokens from the OIDC provider.
+ *
+ * The server responds by setting fresh `user*` transport cookies, which
+ * are then consumed into the auth store via `consumeAuthCookies()`.
+ *
+ * Concurrent calls are deduplicated — only one HTTP request is in flight
+ * at a time, and all callers share the same promise.
+ */
 export const refreshTokens = async (): Promise<boolean> => {
   if (!BROWSER) return false;
 
@@ -35,16 +41,11 @@ export const refreshTokens = async (): Promise<boolean> => {
         return false;
       }
 
-      const user = getAuthUserCookie(true);
-      if (user?.accessToken) {
-        setAuthUser(user);
-        cleanAuthUserCookie(true);
+      const consumed = consumeAuthCookies(true);
+      if (consumed) {
         const duration = performance.now() - startTime;
-        const expiryTime = user.expiresAt
-          ? new Date(user.expiresAt).toISOString()
-          : 'unknown';
         console.info(
-          `[Auth] Token refresh successful (duration: ${duration.toFixed(2)}ms, expires: ${expiryTime})`,
+          `[Auth] Token refresh successful (duration: ${duration.toFixed(2)}ms)`,
         );
         return true;
       }

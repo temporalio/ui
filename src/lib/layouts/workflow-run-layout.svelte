@@ -15,7 +15,6 @@
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import {
@@ -116,7 +115,6 @@
           },
         },
         settings,
-        $authUser?.accessToken,
         workflowRunController.signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;

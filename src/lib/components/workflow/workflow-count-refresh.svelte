@@ -12,8 +12,6 @@
   }
 
   let { count }: Props = $props();
-
-  const duration = 300;
 </script>
 
 <Button
@@ -30,11 +28,7 @@
     )}
   >
     {#key count}
-      <span
-        class="col-start-1 row-start-1"
-        in:fly|global={{ y: 8, duration }}
-        out:fly|global={{ y: -8, duration }}
-      >
+      <span class="col-start-1 row-start-1">
         {#if count > 0}
           +{count.toLocaleString()}
         {:else if count < 0}

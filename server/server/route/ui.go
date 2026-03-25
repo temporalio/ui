@@ -76,7 +76,8 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 	if err != nil {
 		return nil, err
 	}
-	if publicPath != "" {
+	hasPublicPath := publicPath != ""
+	if hasPublicPath {
 		indexHTML := string(indexHTMLBytes)
 		indexHTML = strings.ReplaceAll(indexHTML, "base: \"\"", fmt.Sprintf("base: \"%s\"", publicPath))
 		indexHTML = strings.ReplaceAll(indexHTML, "\"/_app/", fmt.Sprintf("\"%s/_app/", publicPath))
@@ -86,6 +87,18 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 	}
 
 	return func(c echo.Context) (err error) {
+		hasPublicPathPrefix := strings.HasPrefix(c.Request().RequestURI, publicPath+"/")
+		isExactPublicPath := c.Request().URL.Path == publicPath
+		missingPublicPath := hasPublicPath && !hasPublicPathPrefix && !isExactPublicPath
+
+		if missingPublicPath {
+			cleanPath := path.Clean(c.Request().URL.Path)
+			target := publicPath + cleanPath
+			if c.Request().URL.RawQuery != "" {
+				target += "?" + c.Request().URL.RawQuery
+			}
+			return c.Redirect(http.StatusPermanentRedirect, target)
+		}
 		return c.Stream(200, "text/html", bytes.NewBuffer(indexHTMLBytes))
 	}, nil
 }

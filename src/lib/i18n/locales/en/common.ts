@@ -176,7 +176,7 @@ export const Strings = {
   'more-options': 'More options',
   download: 'Download',
   duration: 'Duration',
-  'history-size-bytes': 'History Size (Bytes)',
+  'history-size': 'History Size',
   'execution-details': 'Execution Details',
   day: 'Day',
   night: 'Night',

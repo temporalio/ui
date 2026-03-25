@@ -3,7 +3,6 @@ import { get } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { fetchRawEvents } from '$lib/services/events-service';
-import { authUser } from '$lib/stores/auth-user';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import type { HistoryEvent } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
@@ -44,7 +43,6 @@ const decodePayloads = async (
       event,
       get(page).params.namespace,
       settingsWithLocalConfig,
-      get(authUser).accessToken,
       decodeSetting,
       returnDataOnly,
     );

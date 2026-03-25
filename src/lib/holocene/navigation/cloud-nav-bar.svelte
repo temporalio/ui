@@ -12,45 +12,69 @@
     version: string;
     navOpen: boolean;
     subtitle?: string;
+    subtitleHref?: string;
     children?: Snippet;
     bottom?: Snippet;
     ontoggle: () => void;
   }
 
-  let { version, navOpen, subtitle, children, bottom, ontoggle }: Props =
-    $props();
+  let {
+    version,
+    navOpen,
+    subtitle,
+    subtitleHref,
+    children,
+    bottom,
+    ontoggle,
+  }: Props = $props();
 </script>
 
 <div
   class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
 >
-  <a
-    href={resolve('', {})}
-    class="text-inherit flex items-center gap-2 no-underline"
-  >
-    <Logo
-      height={24}
-      width={24}
-      class={merge('m-1', subtitle !== 'Cloud' && 'hidden')}
-    />
+  <div class="flex flex-row items-center justify-start">
+    <a href={resolve('', {})} class="text-inherit flex items-center">
+      <Logo
+        height={24}
+        width={24}
+        class={merge(subtitle !== 'Cloud' && 'hidden')}
+      />
+    </a>
     {#if subtitle}
-      <h2
-        class={merge(
-          'font-secondary mb-0 hidden whitespace-nowrap font-medium text-white group-data-[nav=open]:block',
-          subtitle === 'Cloud' ? 'text-2xl' : 'text-base',
-          subtitle !== 'Cloud' && 'px-2',
-        )}
-      >
-        {subtitle}
-      </h2>
+      {#if subtitleHref}
+        <a href={subtitleHref} class="contents">
+          <Icon
+            label="Project Namespaces"
+            name="arrow-left"
+            class="m-1.5 text-indigo-100 group-data-[nav=closed]:hidden"
+          />
+          <h2
+            class={merge(
+              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-indigo-100 underline group-data-[nav=open]:block',
+              subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
+            )}
+          >
+            {subtitle}
+          </h2>
+        </a>
+      {:else}
+        <h2
+          class={merge(
+            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-indigo-100 group-data-[nav=open]:block',
+            subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
+          )}
+        >
+          {subtitle}
+        </h2>
+      {/if}
     {/if}
-  </a>
+  </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
     class="mx-[8px] justify-self-end transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
     onclick={ontoggle}
   >
-    <Icon name="collapse" />
+    <Icon name="collapse" class="text-indigo-100" />
   </button>
 </div>
 <div role="list">

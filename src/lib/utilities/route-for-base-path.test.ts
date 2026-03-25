@@ -1,19 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-const BASE_PATH = '/temporal';
-
-vi.mock('$app/paths', () => ({
-  resolve: (route: string, params?: Record<string, string>) => {
-    let resolved = route;
-    if (params) {
-      resolved = Object.entries(params).reduce(
-        (path, [key, value]) => path.replace(`[${key}]`, value),
-        resolved,
-      );
-    }
-    return `${BASE_PATH}${resolved}`;
-  },
-}));
+import { base } from '$app/paths';
 
 import * as routeForModule from './route-for';
 import {
@@ -223,8 +210,8 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     const result = fn();
     expect(typeof result).toBe('string');
     expect(result?.length).toBeGreaterThan(0);
-    expect(result).toMatch(new RegExp(`${BASE_PATH}`));
-    expect(result).not.toMatch(new RegExp(`${BASE_PATH}${BASE_PATH}`));
+    expect(result).toMatch(new RegExp(`${base}`));
+    expect(result).not.toMatch(new RegExp(`${base}${base}`));
   });
 
   it('should have a test case for every exported routeFor function', () => {

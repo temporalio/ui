@@ -14,7 +14,8 @@
   export let external = false;
   export let animate = false;
   export let disabled = false;
-  export let isActive: (path: string) => boolean | undefined = undefined;
+  export let isActive: ((path: string) => boolean | undefined) | undefined =
+    undefined;
 
   $: rel = external ? 'noopener noreferrer' : '';
   $: target = external ? '_blank' : '';
@@ -38,7 +39,7 @@
     data-track-intent="navigate"
     data-track-text={label}
     class={merge(
-      'mb-1 flex items-center whitespace-nowrap px-2 py-1 text-sm ',
+      'mb-1 flex items-center whitespace-nowrap px-2 py-1 text-sm',
       'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
       active &&
         'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',

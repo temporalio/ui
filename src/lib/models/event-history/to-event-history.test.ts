@@ -83,7 +83,6 @@ const historyEvent = {
 
 const namespace = 'unit-tests';
 const settings = settingsFixture as unknown as Settings;
-const accessToken = 'token-test';
 
 describe('getEventAttributes', () => {
   beforeEach(() => {
@@ -110,7 +109,6 @@ describe('getEventAttributes', () => {
       historyEvent,
       namespace,
       settings,
-      accessToken,
     });
     expect(event.type).toBe(eventType);
   });
@@ -123,7 +121,6 @@ describe('getEventAttributes', () => {
         historyEvent,
         namespace,
         settings,
-        accessToken,
       },
       {
         convertWithCodec,
@@ -141,7 +138,6 @@ describe('getEventAttributes', () => {
         historyEvent,
         namespace,
         settings: { ...settings, codec: { endpoint: 'https://localhost' } },
-        accessToken,
       },
       {
         convertWithCodec,
@@ -159,7 +155,6 @@ describe('getEventAttributes', () => {
         historyEvent,
         namespace,
         settings,
-        accessToken,
       },
       {
         convertWithCodec,

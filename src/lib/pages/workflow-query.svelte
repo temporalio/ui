@@ -18,7 +18,6 @@
     getWorkflowMetadata,
     type ParsedQuery,
   } from '$lib/services/query-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { Payloads } from '$lib/types';
   import type { WorkflowInteractionDefinition } from '$lib/types/workflows';
@@ -84,7 +83,6 @@
         },
       },
       settings,
-      $authUser?.accessToken,
     );
     $workflowRun.metadata = metadata;
   };
@@ -121,7 +119,6 @@
         queryArgs: payloads ? { payloads } : null,
       },
       $page.data?.settings,
-      $authUser?.accessToken,
     ).finally(() => {
       reset();
     });

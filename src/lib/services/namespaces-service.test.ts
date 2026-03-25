@@ -1,11 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { base } from '$app/paths';
+
 import { fetchNamespaces } from './namespaces-service';
 import { namespaces } from '../stores/namespaces';
 import { toaster } from '../stores/toaster';
+import { getApiOrigin } from '../utilities/get-api-origin';
 
 vi.mock('../stores/toaster', () => ({ toaster: { push: vi.fn() } }));
 vi.mock('../stores/namespaces', () => ({ namespaces: { set: vi.fn() } }));
+
+const origin = getApiOrigin();
 
 const createSuccessfulRequest = () =>
   vi.fn(() =>
@@ -42,9 +47,8 @@ describe('fetchNamespaces', () => {
 
     await fetchNamespaces({ runtimeEnvironment: { isCloud: false } }, request);
     expect(request).toHaveBeenCalledWith(
-      'http://localhost:8233/api/v1/namespaces?',
+      `${origin}${base}/api/v1/namespaces?`,
       {
-        credentials: 'include',
         headers: {
           'Caller-Type': 'operator',
         },

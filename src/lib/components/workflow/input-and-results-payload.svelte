@@ -1,7 +1,6 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { minimizeEventView } from '$lib/stores/event-view';
   import type { Payload } from '$lib/types';
   import type { PotentiallyDecodable } from '$lib/utilities/decode-payload';
   import {
@@ -14,6 +13,8 @@
   export let title: string;
   export let content: string = '';
   export let isPending: boolean = false;
+
+  const MAX_HEIGHT = 300;
 
   const parseContent = (c: string): PotentiallyDecodable | undefined => {
     try {
@@ -51,52 +52,48 @@
     {title}
   </h3>
   {#if content}
-    {#key $minimizeEventView}
-      {#if payloadsSize > 0}
-        <PayloadDecoder value={parsedContent} key="payloads">
-          {#snippet children(decodedValue)}
-            {#if payloadsSize > 1}
-              {#each parsePayloads(decodedValue) as decodedContent}
-                <CodeBlock
-                  content={stringifyWithBigInt(decodedContent)}
-                  copyIconTitle={translate('common.copy-icon-title')}
-                  copySuccessIconTitle={translate(
-                    'common.copy-success-icon-title',
-                  )}
-                  maxHeight={300}
-                />
-              {/each}
-            {:else}
+    {#if payloadsSize > 0}
+      <PayloadDecoder value={parsedContent} key="payloads">
+        {#snippet children(decodedValue)}
+          {#if payloadsSize > 1}
+            {#each parsePayloads(decodedValue) as decodedContent}
               <CodeBlock
-                content={decodedValue}
+                content={stringifyWithBigInt(decodedContent)}
                 copyIconTitle={translate('common.copy-icon-title')}
                 copySuccessIconTitle={translate(
                   'common.copy-success-icon-title',
                 )}
-                maxHeight={300}
+                maxHeight={MAX_HEIGHT}
               />
-            {/if}
-          {/snippet}
-        </PayloadDecoder>
-      {:else}
-        <PayloadDecoder value={parseWithBigInt(content)}>
-          {#snippet children(decodedValue)}
+            {/each}
+          {:else}
             <CodeBlock
               content={decodedValue}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              maxHeight={300}
+              maxHeight={MAX_HEIGHT}
             />
-          {/snippet}
-        </PayloadDecoder>
-      {/if}
-    {/key}
+          {/if}
+        {/snippet}
+      </PayloadDecoder>
+    {:else}
+      <PayloadDecoder value={parseWithBigInt(content)}>
+        {#snippet children(decodedValue)}
+          <CodeBlock
+            content={decodedValue}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            maxHeight={MAX_HEIGHT}
+          />
+        {/snippet}
+      </PayloadDecoder>
+    {/if}
   {:else}
     <CodeBlock
       content={isPending ? 'Results will appear upon completion.' : 'null'}
       language="text"
       copyable={false}
-      maxHeight={300}
+      maxHeight={MAX_HEIGHT}
     />
   {/if}
 </div>

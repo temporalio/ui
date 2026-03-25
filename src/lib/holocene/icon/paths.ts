@@ -1,3 +1,4 @@
+import action from './svg/action.svelte';
 import activity from './svg/activity.svelte';
 import addSquare from './svg/add-square.svelte';
 import add from './svg/add.svelte';
@@ -66,6 +67,7 @@ import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import happyLappy from './svg/happy-lappy.svelte';
 import heartbeat from './svg/heartbeat.svelte';
+import house from './svg/house.svelte';
 import hyphen from './svg/hyphen.svelte';
 import identities from './svg/identities.svelte';
 import importIcon from './svg/import.svelte';
@@ -109,6 +111,7 @@ import server from './svg/server.svelte';
 import settings from './svg/settings.svelte';
 import shield from './svg/shield.svelte';
 import signal from './svg/signal.svelte';
+import slashForward from './svg/slash-forward.svelte';
 import sliders from './svg/sliders.svelte';
 import spinner from './svg/spinner.svelte';
 import starEmpty from './svg/star-empty.svelte';
@@ -140,10 +143,12 @@ import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workers from './svg/workers.svelte';
 import workflow from './svg/workflow.svelte';
+import workflows from './svg/workflows.svelte';
 import xmarkFilled from './svg/xmark-filled.svelte';
 import xmarkSquare from './svg/xmark-square.svelte';
 
 export const icons = {
+  action,
   activity,
   'add-square': addSquare,
   add,
@@ -212,6 +217,7 @@ export const icons = {
   graph,
   'happy-lappy': happyLappy,
   heartbeat,
+  house,
   hyphen,
   identities,
   inactive,
@@ -255,6 +261,7 @@ export const icons = {
   settings,
   shield,
   signal,
+  'slash-forward': slashForward,
   sliders,
   spinner,
   'star-empty': starEmpty,
@@ -287,6 +294,7 @@ export const icons = {
   'system-window': systemWindow,
   workers,
   workflow,
+  workflows,
   'xmark-filled': xmarkFilled,
   'xmark-square': xmarkSquare,
 } as const;
