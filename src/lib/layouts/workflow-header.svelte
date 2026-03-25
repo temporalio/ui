@@ -305,7 +305,7 @@
           routeForWorkflowWorkers(routeParameters),
         )}
       >
-        <!-- TODO: Add Badge with workers count -->
+        <!-- TODO: Add Badge with workers count when there is a WorkersCount API available -->
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}

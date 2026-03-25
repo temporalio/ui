@@ -17,6 +17,7 @@
   interface Props {
     attribute?: string;
     copyable?: boolean;
+    filters?: SearchAttributeFilter[];
     value?: string | null;
     filterable?: boolean;
     href?: string;
@@ -26,29 +27,42 @@
   let {
     attribute,
     copyable = true,
+    filters,
     value,
     filterable = false,
     href,
     children,
   }: Props = $props();
 
-  const query = $derived(page.url.searchParams.get('query') || '');
+  const matchesFilter = (a: SearchAttributeFilter, b: SearchAttributeFilter) =>
+    a.attribute === b.attribute && a.value === b.value;
+
+  const toggleFilters = $derived(
+    filters && filters.length > 0
+      ? filters
+      : [createFilter({ attribute, value, conditional: '=' })],
+  );
+
+  const isFiltered = $derived(
+    toggleFilters.some((f) =>
+      $workerFilters.some((wf) => matchesFilter(wf, f)),
+    ),
+  );
 
   const onRowFilterClick = async () => {
-    const filter = $workerFilters.find((f) => f.attribute === attribute);
-    const getOtherFilters = () =>
-      $workerFilters.filter((f) => f.attribute !== attribute);
+    const toRemove = toggleFilters.filter((f) =>
+      $workerFilters.some((wf) => matchesFilter(wf, f)),
+    );
+    const toAdd = toggleFilters.filter(
+      (f) => !$workerFilters.some((wf) => matchesFilter(wf, f)),
+    );
 
-    if (!filter || filter.value !== value) {
-      const newFilter: SearchAttributeFilter = createFilter({
-        attribute,
-        value,
-        conditional: '=',
-      });
-      $workerFilters = [...getOtherFilters(), newFilter];
-    } else {
-      $workerFilters = [...getOtherFilters()];
-    }
+    $workerFilters = [
+      ...$workerFilters.filter(
+        (wf) => !toRemove.some((f) => matchesFilter(wf, f)),
+      ),
+      ...toAdd,
+    ];
 
     updateQueryParamsFromFilter(page.url, $workerFilters);
   };
@@ -99,7 +113,7 @@
   {:else}
     {value}
   {/if}
-  {#if value}
+  {#if value || (filters && filters.length > 0)}
     <FilterOrCopyButtons
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -109,7 +123,7 @@
       onFilter={onRowFilterClick}
       {copyable}
       {filterable}
-      filtered={query.includes(`${attribute}=`)}
+      filtered={isFiltered}
     />
   {/if}
 </td>

@@ -4,6 +4,7 @@
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import type { WorkerInfo } from '$lib/types';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkerInstance } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
@@ -41,10 +42,10 @@
     value={worker.workerHeartbeat?.deploymentVersion?.deploymentName}
     {filterable}
   />
+  <!-- TODO: Make Build ID filterable when API supports it -->
   <WorkersTableCell
     attribute="BuildId"
     value={worker.workerHeartbeat?.deploymentVersion?.buildId}
-    {filterable}
   />
   <WorkersTableCell
     attribute="TaskQueue"
@@ -65,7 +66,22 @@
     attribute="StartTime"
     value={$timestamp(worker.workerHeartbeat?.startTime)}
   />
-  <WorkersTableCell copyable={false}>
+  <WorkersTableCell
+    copyable={false}
+    {filterable}
+    filters={[
+      createFilter({
+        attribute: 'SdkName',
+        value: worker.workerHeartbeat?.sdkName,
+        conditional: '=',
+      }),
+      createFilter({
+        attribute: 'SdkVersion',
+        value: worker.workerHeartbeat?.sdkVersion,
+        conditional: '=',
+      }),
+    ]}
+  >
     <SdkLogo
       sdk={formatSDKName(worker.workerHeartbeat?.sdkName)}
       version={worker.workerHeartbeat?.sdkVersion ?? ''}

@@ -33,6 +33,7 @@
   <FilterBar
     filters={workerFilters}
     options={$workerSearchAttributeOptions}
+    searchAttributes={$workerSearchAttributes}
     id="worker"
     statusAttribute="WorkerStatus"
   />

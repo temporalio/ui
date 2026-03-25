@@ -6,6 +6,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
+  import type { SearchAttributes } from '$lib/types/workflows';
 
   import type { StatusAttribute } from './types.ts';
 
@@ -15,13 +16,20 @@
   interface Props {
     filters: Writable<SearchAttributeFilter[]>;
     options: SearchAttributeOption[];
+    searchAttributes?: SearchAttributes;
     id: string;
     statusAttribute?: StatusAttribute;
     onManualSearch?: (query: string) => void;
   }
 
-  let { filters, options, id, statusAttribute, onManualSearch }: Props =
-    $props();
+  let {
+    filters,
+    options,
+    searchAttributes,
+    id,
+    statusAttribute,
+    onManualSearch,
+  }: Props = $props();
 
   let viewManualQuery = $state(false);
 </script>
@@ -51,6 +59,6 @@
     </div>
   </div>
   {#if viewManualQuery}
-    <ManualQuery {filters} {id} onSearch={onManualSearch} />
+    <ManualQuery {filters} {searchAttributes} {id} onSearch={onManualSearch} />
   {/if}
 </div>

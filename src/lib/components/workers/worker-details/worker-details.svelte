@@ -18,6 +18,7 @@
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type {
     WorkerInfo,
@@ -144,18 +145,26 @@
     </DetailListColumn>
 
     <DetailListColumn>
+      <!-- TODO: Make filterable link for Build ID when API supports it -->
       <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
       <DetailListTextValue
         copyable={!!heartbeat?.deploymentVersion?.buildId}
         copyableText={heartbeat?.deploymentVersion?.buildId ?? ''}
         text={heartbeat?.deploymentVersion?.buildId ?? '-'}
       />
-      <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
-      <DetailListTextValue
-        copyable={!!heartbeat?.deploymentVersion?.deploymentName}
-        copyableText={heartbeat?.deploymentVersion?.deploymentName ?? ''}
-        text={heartbeat?.deploymentVersion?.deploymentName ?? '-'}
-      />
+      {#if heartbeat?.deploymentVersion?.deploymentName}
+        <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
+        <DetailListLinkValue
+          copyable
+          copyableText={heartbeat.deploymentVersion.deploymentName}
+          text={heartbeat.deploymentVersion.deploymentName}
+          href={routeForWorkersWithQuery({
+            namespace,
+            query: `DeploymentName="${heartbeat.deploymentVersion.deploymentName}"`,
+          }) ?? ''}
+          iconName="filter"
+        />
+      {/if}
     </DetailListColumn>
   </DetailList>
 
@@ -308,10 +317,13 @@
     title={translate('workers.go-dependency-warning')}
   >
     <p class="mb-1">{translate('workers.go-dependency-warning-description')}</p>
-    <!-- TODO: Add link when documentation is available -->
-    <!-- <Link icon="external-link" href="" newTab
-      >{translate('workers.go-dependency-warning-link')}</Link
-    > -->
+    <Link
+      icon="external-link"
+      href="https://docs.temporal.io/cloud/worker-health#enable-host-resource-reporting"
+      newTab
+    >
+      {translate('workers.go-dependency-warning-link')}
+    </Link>
   </Alert>
 {/snippet}
 
@@ -324,7 +336,7 @@
           {translate('workers.cpu-usage')}
         </span>
         <span
-          >{heartbeat?.hostInfo?.currentHostCpuUsage?.toFixed(0) ?? '0'}%</span
+          >{heartbeat?.hostInfo?.currentHostCpuUsage?.toFixed(1) ?? '0'}%</span
         >
       </div>
       {@render meterBar(
@@ -339,7 +351,7 @@
           {translate('workers.memory-usage')}
         </span>
         <span
-          >{heartbeat?.hostInfo?.currentHostMemUsage?.toFixed(0) ?? '0'}%</span
+          >{heartbeat?.hostInfo?.currentHostMemUsage?.toFixed(1) ?? '0'}%</span
         >
       </div>
       {@render meterBar(
