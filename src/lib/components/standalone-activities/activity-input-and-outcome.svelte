@@ -7,11 +7,12 @@
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
   interface Props {
-    input?: Payloads;
-    outcome?: ActivityExecutionOutcome;
+    input: Payloads | undefined;
+    outcome: ActivityExecutionOutcome | undefined;
+    pending: boolean;
   }
 
-  let { input, outcome }: Props = $props();
+  let { input, outcome, pending }: Props = $props();
 </script>
 
 <div class="grid w-full grid-cols-2 gap-4 max-md:grid-cols-1">
@@ -33,6 +34,8 @@
           <CodeBlock content={decodedValue} />
         {/snippet}
       </PayloadDecoder>
+    {:else if pending}
+      <CodeBlock content="Results will appear upon completion." />
     {:else}
       <CodeBlock content={JSON.stringify({}, null, 2)} />
     {/if}

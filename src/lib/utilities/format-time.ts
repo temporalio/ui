@@ -250,21 +250,24 @@ export const getTimestampDifference = (
   return Math.abs(parse1 - parse2);
 };
 
-export const formatSecondsAbbreviated = (seconds: number | string): string => {
+export const formatSecondsAbbreviated = (
+  seconds: number | string,
+  includeMilliseconds = true,
+): string => {
   const start = new Date();
   const end = new Date(start.getTime() + Number(seconds) * 1000);
-  return formatDistanceAbbreviated({ start, end, includeMilliseconds: true });
+  return formatDistanceAbbreviated({ start, end, includeMilliseconds });
 };
 
-export const fromDurationToNumber = (duration: string): string => {
+export const fromDurationToNumber = (duration: string): number => {
   if (!duration || !duration.endsWith('s')) {
-    return '';
+    return 0;
   }
 
-  return duration?.replace('s', '');
+  return parseInt(duration.replace('s', ''), 10);
 };
 
-export const fromNumberToDuration = (duration: string): string => {
+export const fromNumberToDuration = (duration: string | number): string => {
   if (!duration) return undefined;
-  return duration + 's';
+  return `${duration}s`;
 };
