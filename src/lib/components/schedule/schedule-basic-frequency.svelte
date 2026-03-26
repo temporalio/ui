@@ -12,6 +12,12 @@
   }
 
   let { class: className = '', frequency }: Props = $props();
+
+  const cronString = $derived(
+    frequency.length > 0 && 'comment' in frequency[0] && frequency[0].comment
+      ? frequency[0].comment
+      : '',
+  );
 </script>
 
 {#key frequency}
@@ -22,7 +28,11 @@
     )}
   >
     {#each frequency as content}
-      <code><pre>{stringifyWithBigInt(content, undefined, 2)}</pre></code>
+      {#if cronString}
+        <code><pre>{cronString}</pre></code>
+      {:else}
+        <code><pre>{stringifyWithBigInt(content, undefined, 2)}</pre></code>
+      {/if}
     {/each}
   </div>
 {/key}

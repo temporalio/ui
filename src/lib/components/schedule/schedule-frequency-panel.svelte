@@ -13,10 +13,18 @@
   }
 
   let { frequency, timezoneName = 'UTC' }: Props = $props();
+
+  const hasCronString = $derived(
+    frequency.length > 0 && 'comment' in frequency[0] && !!frequency[0].comment,
+  );
 </script>
 
 <Panel>
-  <h2 class="mb-4">{translate('schedules.schedule-spec')}</h2>
+  <h2 class="mb-4">
+    {hasCronString
+      ? translate('schedules.cron-string')
+      : translate('schedules.schedule-spec')}
+  </h2>
   <div class="pr-2">
     <ScheduleFrequency {frequency} {timezoneName} class="text-base" />
   </div>

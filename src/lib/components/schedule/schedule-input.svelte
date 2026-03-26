@@ -12,5 +12,11 @@
   <InputAndResultsPayload
     title={translate('schedules.schedule-input')}
     content={stringifyWithBigInt(input)}
-  />
+  >
+    {#snippet titleSnippet()}
+      <h2>
+        {translate('schedules.schedule-input')}
+      </h2>
+    {/snippet}
+  </InputAndResultsPayload>
 </Panel>
