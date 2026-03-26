@@ -11,6 +11,7 @@ export const Strings = {
   schedule: 'Schedule',
   frequency: 'Frequency',
   'schedule-spec': 'Schedule Spec',
+  'cron-string': 'Cron String',
   'schedule-input': 'Schedule Input',
   'empty-state-title': 'No Schedules Found',
   'empty-state-description':

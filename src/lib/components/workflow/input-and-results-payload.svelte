@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payload } from '$lib/types';
@@ -10,9 +12,18 @@
 
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
-  export let title: string;
-  export let content: string = '';
-  export let isPending: boolean = false;
+  type Props = {
+    title: string;
+    titleSnippet?: Snippet;
+    content?: string;
+    isPending?: boolean;
+  };
+  let {
+    title,
+    titleSnippet = defaultTitleSnippet,
+    content = '',
+    isPending = false,
+  }: Props = $props();
 
   const MAX_HEIGHT = 300;
 
@@ -42,15 +53,19 @@
     }
   };
 
-  $: parsedContent = parseContent(content);
-  $: payloads = getPayloads(parsedContent);
-  $: payloadsSize = payloads.length;
+  const parsedContent = $derived(parseContent(content));
+  const payloads = $derived(getPayloads(parsedContent));
+  const payloadsSize = $derived(payloads.length);
 </script>
 
-<div class="flex w-full grow flex-col gap-2">
+{#snippet defaultTitleSnippet()}
   <h3 class="flex items-center gap-2 text-xs text-secondary">
     {title}
   </h3>
+{/snippet}
+
+<div class="flex w-full grow flex-col gap-2">
+  {@render titleSnippet()}
   {#if content}
     {#if payloadsSize > 0}
       <PayloadDecoder value={parsedContent} key="payloads">
