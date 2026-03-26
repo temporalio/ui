@@ -2,10 +2,12 @@
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getEventLLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
@@ -56,6 +58,8 @@
       return ['initiatedEventId', 'startedEventId', 'namespaceId'];
     return ['namespaceId'];
   });
+  const llmMetadata = $derived(getEventLLMMetadata(event));
+
   const detailFields = $derived(
     fields.filter(
       ([key, value]) =>
@@ -94,6 +98,41 @@
       {#each linkFields as [key, value] (key)}
         {@render link(key, value)}
       {/each}
+      {#if llmMetadata}
+        <div class="mt-2 flex flex-col gap-1 rounded border border-subtle p-2">
+          <p class="text-xs font-medium text-secondary/80">LLM Details</p>
+          {#if llmMetadata.model}
+            <div class="flex items-center gap-2">
+              <p class="min-w-32 text-sm text-secondary/80">Model</p>
+              <Badge type="subtle">{llmMetadata.model}</Badge>
+            </div>
+          {/if}
+          {#if llmMetadata.promptTokens}
+            <div class="flex items-center gap-2">
+              <p class="min-w-32 text-sm text-secondary/80">Prompt tokens</p>
+              <p class="text-sm">{llmMetadata.promptTokens.toLocaleString()}</p>
+            </div>
+          {/if}
+          {#if llmMetadata.completionTokens}
+            <div class="flex items-center gap-2">
+              <p class="min-w-32 text-sm text-secondary/80">
+                Completion tokens
+              </p>
+              <p class="text-sm">
+                {llmMetadata.completionTokens.toLocaleString()}
+              </p>
+            </div>
+          {/if}
+          {#if llmMetadata.totalTokens}
+            <div class="flex items-center gap-2">
+              <p class="min-w-32 text-sm text-secondary/80">Total tokens</p>
+              <p class="text-sm font-medium">
+                {llmMetadata.totalTokens.toLocaleString()}
+              </p>
+            </div>
+          {/if}
+        </div>
+      {/if}
     </div>
     {#if payloadFields.length}
       <div class="flex w-full flex-col gap-1 xl:w-1/2">

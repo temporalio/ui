@@ -4,6 +4,7 @@ import { getDataConverter } from './data-converter';
 import {
   BlockingWorkflow,
   CompletedWorkflow,
+  LLMWorkflow,
   RunningWorkflow,
   Workflow,
 } from './workflows';
@@ -31,7 +32,15 @@ const workflows: WorkflowHandle[] = [];
 
 export const startWorkflows = async (
   client: Client,
-): Promise<(string | number | void)[]> => {
+): Promise<
+  (
+    | string
+    | number
+    | void
+    | Record<string, unknown>
+    | Record<string, unknown>[]
+  )[]
+> => {
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
     args: ['Plain text input 1'],
@@ -56,9 +65,15 @@ export const startWorkflows = async (
     workflowId: 'running-workflow',
   });
 
-  workflows.push(wf1, wf2, wf3, wf4);
+  const wf5 = await client.workflow.start(LLMWorkflow, {
+    taskQueue: 'e2e-1',
+    args: ['Tell me about Temporal'],
+    workflowId: 'llm-workflow',
+  });
 
-  return Promise.all([wf1.result(), wf3.result()]);
+  workflows.push(wf1, wf2, wf3, wf4, wf5);
+
+  return Promise.all([wf1.result(), wf3.result(), wf5.result()]);
 };
 
 export const stopWorkflows = (): Promise<void[]> => {

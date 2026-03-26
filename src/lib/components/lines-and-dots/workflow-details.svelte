@@ -4,6 +4,8 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { LLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
+  import { getEventLLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { fullEventHistory } from '$lib/stores/events';
@@ -98,6 +100,37 @@
   const { sdk, version: sdkVersion } = $derived(
     getSDKandVersion(workflowCompletedTasks),
   );
+
+  const workflowLLMMetadata = $derived.by(() => {
+    let totalTokens = 0;
+    let promptTokens = 0;
+    let completionTokens = 0;
+    const models = new Set<string>();
+    let llmSteps = 0;
+    let found = false;
+
+    for (const event of $fullEventHistory) {
+      const meta = getEventLLMMetadata(event);
+      if (meta) {
+        found = true;
+        llmSteps++;
+        if (meta.model) models.add(meta.model);
+        if (meta.totalTokens) totalTokens += meta.totalTokens;
+        if (meta.promptTokens) promptTokens += meta.promptTokens;
+        if (meta.completionTokens) completionTokens += meta.completionTokens;
+      }
+    }
+
+    if (!found) return null;
+    return {
+      totalTokens: totalTokens || undefined,
+      promptTokens: promptTokens || undefined,
+      completionTokens: completionTokens || undefined,
+      models: Array.from(models),
+      llmSteps,
+      totalSteps: $fullEventHistory.length,
+    };
+  });
 
   const fetchLatestRun = async () => {
     const result = await fetchWorkflow({
@@ -318,4 +351,23 @@
       </DetailListValue>
     {/if}
   </DetailListColumn>
+
+  {#if workflowLLMMetadata}
+    <DetailListColumn>
+      <DetailListLabel>LLM Tokens</DetailListLabel>
+      <DetailListTextValue
+        text={workflowLLMMetadata.totalTokens?.toLocaleString() ?? '-'}
+      />
+
+      {#if workflowLLMMetadata.models.length > 0}
+        <DetailListLabel>Models</DetailListLabel>
+        <DetailListTextValue text={workflowLLMMetadata.models.join(', ')} />
+      {/if}
+
+      <DetailListLabel>LLM Steps</DetailListLabel>
+      <DetailListTextValue
+        text={`${workflowLLMMetadata.llmSteps} / ${workflowLLMMetadata.totalSteps}`}
+      />
+    </DetailListColumn>
+  {/if}
 </DetailList>

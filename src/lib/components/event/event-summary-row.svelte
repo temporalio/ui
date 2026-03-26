@@ -18,6 +18,7 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { getGroupLLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { authUser } from '$lib/stores/auth-user';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
@@ -159,6 +160,8 @@
       secondaryAttribute?.key !== primaryAttribute?.key &&
       !currentEvent?.userMetadata?.summary,
   );
+
+  const llmMetadata = $derived(getGroupLLMMetadata(event));
 
   const eventTime = $derived($timestamp(currentEvent?.eventTime));
 
@@ -361,6 +364,37 @@
       {/if}
       {#if showSecondaryAttribute}
         <EventDetailsRow {...secondaryAttribute} {attributes} />
+      {/if}
+      {#if llmMetadata}
+        {#if llmMetadata.model}
+          <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
+            {llmMetadata.model}
+          </Badge>
+        {/if}
+        {#if llmMetadata.totalTokens}
+          <Tooltip text="Total LLM tokens (prompt + completion)" topRight>
+            <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
+              {llmMetadata.totalTokens.toLocaleString()} tokens
+            </Badge>
+          </Tooltip>
+        {/if}
+        {#if llmMetadata.cost}
+          <Tooltip text="Estimated LLM cost" topRight>
+            <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
+              ${llmMetadata.cost.toFixed(4)}
+            </Badge>
+          </Tooltip>
+        {/if}
+        {#if llmMetadata.score != null}
+          <Tooltip text="Eval score" topRight>
+            <Badge
+              type={llmMetadata.score >= 0.8 ? 'subtle' : 'warning'}
+              class="shrink-0 gap-1 px-1.5"
+            >
+              {llmMetadata.score.toFixed(2)}
+            </Badge>
+          </Tooltip>
+        {/if}
       {/if}
     </div>
   </td>

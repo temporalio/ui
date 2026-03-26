@@ -30,6 +30,7 @@
     openBatchCancelConfirmationModal,
     openBatchTerminateConfirmationModal,
     openBatchResetConfirmationModal,
+    openCompareModal,
   } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
   let coreUser = coreUserStore();
@@ -89,6 +90,15 @@
   {/if}
 {/if}
 <div class="ml-4 inline-flex gap-2">
+  {#if selectedWorkflowsCount === 2 && !$allSelected}
+    <Button
+      size="xs"
+      variant="ghost"
+      class="focus-visible:border-table"
+      data-testid="compare-runs-button"
+      on:click={openCompareModal}>Compare</Button
+    >
+  {/if}
   {#if cancelEnabled}
     <Button
       size="xs"

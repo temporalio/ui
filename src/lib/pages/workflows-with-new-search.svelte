@@ -17,6 +17,7 @@
     openBatchCancelConfirmationModal: () => void;
     openBatchTerminateConfirmationModal: () => void;
     openBatchResetConfirmationModal: () => void;
+    openCompareModal: () => void;
     handleSelectAll: (workflows: WorkflowExecution[]) => void;
     handleSelectPage: (
       checked: boolean,
@@ -38,6 +39,7 @@
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
+  import CompareRunsModal from '$lib/components/workflow/compare-runs-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
@@ -116,6 +118,7 @@
   let batchResetConfirmationModalOpen = $state(false);
   let terminateConfirmationModalOpen = $state(false);
   let cancelConfirmationModalOpen = $state(false);
+  let compareModalOpen = $state(false);
 
   const allSelected = writable<boolean>(false);
   const pageSelected = writable<boolean>(false);
@@ -150,6 +153,10 @@
     batchResetConfirmationModalOpen = true;
   };
 
+  const openCompareModal = () => {
+    compareModalOpen = true;
+  };
+
   const handleSelectAll = (workflows: WorkflowExecution[]) => {
     allSelected.set(true);
     selectedWorkflows.set([...workflows]);
@@ -178,6 +185,7 @@
     openBatchCancelConfirmationModal,
     openBatchTerminateConfirmationModal,
     openBatchResetConfirmationModal,
+    openCompareModal,
     handleSelectAll,
     handleSelectPage,
   });
@@ -215,6 +223,15 @@
   workflow={$selectedWorkflows[0]}
   bind:open={cancelConfirmationModalOpen}
 />
+
+{#if $selectedWorkflows.length === 2}
+  <CompareRunsModal
+    {namespace}
+    bind:open={compareModalOpen}
+    workflowA={$selectedWorkflows[0]}
+    workflowB={$selectedWorkflows[1]}
+  />
+{/if}
 
 <header class="flex flex-col gap-2">
   <div class="flex flex-col justify-between gap-2 md:flex-row">

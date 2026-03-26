@@ -1,3 +1,4 @@
+import { getGroupLLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
 import type { Payload } from '$lib/types';
 import type {
   ActivityTaskScheduledEvent,
@@ -124,6 +125,9 @@ const createGroupFor = <K extends keyof StartingEvents>(
         (acc, event) => event.billableActions + acc,
         0,
       );
+    },
+    get llmMetadata() {
+      return getGroupLLMMetadata(this);
     },
   };
 };

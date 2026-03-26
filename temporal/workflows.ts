@@ -22,6 +22,11 @@ const { double } = workflow.proxyActivities<typeof activities>({
   },
 });
 
+const { echo, callLLM, callLLMClaude, callLLMGemini } =
+  workflow.proxyActivities<typeof activities>({
+    startToCloseTimeout: '10 seconds',
+  });
+
 export async function Workflow(input: string): Promise<string> {
   let result: string;
 
@@ -62,4 +67,14 @@ export async function CompletedWorkflow(
 
 export async function RunningWorkflow(): Promise<void> {
   return await workflow.sleep('10 days');
+}
+
+export async function LLMWorkflow(
+  prompt: string,
+): Promise<Record<string, unknown>[]> {
+  const r1 = await callLLM(prompt);
+  await echo('Processing intermediate result...');
+  const r2 = await callLLMClaude(prompt);
+  const r3 = await callLLMGemini(prompt);
+  return [r1, r2, r3];
 }

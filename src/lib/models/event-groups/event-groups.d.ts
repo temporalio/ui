@@ -1,3 +1,4 @@
+import type { LLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
 import type { EventLink, Payload } from '$lib/types';
 import type {
   PendingActivity,
@@ -34,6 +35,7 @@ interface EventGroup extends Pick<
   decodedLocalActivity?: SummaryAttribute;
   links: EventLink[];
   billableActions: number;
+  llmMetadata: LLMMetadata | null;
 }
 
 type EventGroups = EventGroup[];
