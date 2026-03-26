@@ -1,6 +1,7 @@
 <script lang="ts">
   import Card from '$lib/holocene/card.svelte';
   import type { StandaloneActivity } from '$lib/pages/standalone-activity.svelte';
+  import { formatSecondsAbbreviated } from '$lib/utilities/format-time';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
   interface Props {
@@ -47,7 +48,10 @@
       {#if activity.running && activity.scheduleToCloseSecondsLeft}
         <p class="text-secondary">
           Times out in <span class="font-semibold text-brand"
-            >{activity.scheduleToCloseSecondsLeft}</span
+            >{formatSecondsAbbreviated(
+              activity.scheduleToCloseSecondsLeft,
+              false,
+            )}</span
           >
         </p>
       {/if}
@@ -58,7 +62,10 @@
       {#if activity.running && activity.startToCloseSecondsLeft}
         <p class="text-secondary">
           Times out in <span class="font-semibold text-brand"
-            >{activity.startToCloseSecondsLeft}</span
+            >{formatSecondsAbbreviated(
+              activity.startToCloseSecondsLeft,
+              false,
+            )}</span
           >
         </p>
       {/if}

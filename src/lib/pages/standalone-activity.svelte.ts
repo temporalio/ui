@@ -1,10 +1,14 @@
 import { SvelteDate } from 'svelte/reactivity';
 
-import type { ActivityExecution } from '$lib/types/activity-execution';
+import type {
+  ActivityExecution,
+  ActivityExecutionRunState,
+} from '$lib/types/activity-execution';
 import {
   formatSecondsAbbreviated,
   fromDurationToNumber,
 } from '$lib/utilities/format-time';
+import { fromSeconds } from '$lib/utilities/to-duration';
 
 interface ScheduleEntry {
   attempt: number;
@@ -31,39 +35,55 @@ export class StandaloneActivity {
   public scheduleToStartTimeout: string = $state();
   public heartbeatTimeout: string = $state();
   public closeTime: string | undefined = $state();
+  public runState: ActivityExecutionRunState | undefined = $state();
   public now = $state(SvelteDate.now());
+
+  private scheduleToCloseTimeoutSeconds: number = $derived(
+    fromDurationToNumber(this.scheduleToCloseTimeout),
+  );
+
+  private startToCloseTimeoutSeconds: number = $derived(
+    fromDurationToNumber(this.startToCloseTimeout),
+  );
 
   public running = $derived(
     this.activityExecution?.info?.status ===
       'ACTIVITY_EXECUTION_STATUS_RUNNING',
   );
+
   public schedule = $derived(
     this.buildSchedule(this.activityExecution?.info?.scheduleTime),
   );
+
   public upcomingAttempts = $derived(
     this.running
       ? this.buildUpcomingAttempts(
-          this.activityExecution?.info?.scheduleTime,
+          this.activityExecution?.info?.lastAttemptCompleteTime,
           this.currentAttempt,
         )
       : [],
   );
+
   public attemptsRemaining = $derived(
     this.maximumAttempts - this.currentAttempt,
   );
-  public retriedCount = $derived(this.currentAttempt - 1);
-  public timeRemaining = $derived.by(() => {
+
+  public secondsRemaining = $derived.by(() => {
     if (this.maximumAttempts) {
       let total = 0;
       for (let a = this.currentAttempt; a < this.maximumAttempts; a++) {
-        total += Math.min(
-          this.initialInterval * Math.pow(this.backoffCoefficient, a - 1),
-          this.maximumInterval,
+        total += this.intervalForAttempt(a);
+
+        total += Math.max(
+          this.scheduleToCloseTimeoutSeconds,
+          this.startToCloseTimeoutSeconds,
         );
       }
-      return formatSecondsAbbreviated(total, false);
+
+      return total;
     }
   });
+
   public nextRetrySecondsLeft = $derived.by(() => {
     const nextTime = this.activityExecution?.info?.nextAttemptScheduleTime;
     if (!nextTime) return 0;
@@ -74,78 +94,39 @@ export class StandaloneActivity {
   });
 
   public deadlineTime = $derived.by(() => {
-    if (
-      !this.maximumAttempts ||
-      !this.scheduleTime ||
-      (this.startToCloseTimeout === '0s' &&
-        this.scheduleToCloseTimeout === '0s')
-    )
-      return undefined;
+    if (!this.secondsRemaining) return undefined;
 
-    const scheduleToCloseSecondsLeft = fromDurationToNumber(
-      this.scheduleToCloseTimeout,
+    return new SvelteDate(
+      new SvelteDate(this.lastAttemptCompletedTime).getTime() +
+        this.secondsRemaining * 1000,
     );
-
-    const startToCloseSecondsLeft = fromDurationToNumber(
-      this.startToCloseTimeout,
-    );
-
-    const retrySecondsLeft = this.upcomingAttempts.reduce(
-      (sum, scheduleEntry) => {
-        return sum + scheduleEntry.waitSeconds;
-      },
-      0,
-    );
-
-    const secondsLeft = Math.max(
-      scheduleToCloseSecondsLeft,
-      startToCloseSecondsLeft,
-      retrySecondsLeft,
-    );
-
-    const deadline = new SvelteDate(
-      new SvelteDate(this.scheduleTime).getTime() + secondsLeft * 1000,
-    );
-
-    return deadline;
   });
 
   public startToCloseSecondsLeft = $derived.by(() => {
-    if (this.startToCloseTimeout === '0s') return;
-    const startToCloseTimeoutSeconds = fromDurationToNumber(
-      this.startToCloseTimeout,
-    );
+    if (this.startToCloseTimeoutSeconds === 0) return;
 
-    const startToCloseTimeoutMillis = startToCloseTimeoutSeconds * 1000;
+    const startToCloseTimeoutMillis = this.startToCloseTimeoutSeconds * 1000;
 
     const endTime = new SvelteDate(
       new SvelteDate(this.activityExecution.info.lastStartedTime).getTime() +
         startToCloseTimeoutMillis,
     );
 
-    return formatSecondsAbbreviated(
-      Math.max(0, (new SvelteDate(endTime).getTime() - this.now) / 1000),
-      false,
-    );
+    return Math.max(0, (new SvelteDate(endTime).getTime() - this.now) / 1000);
   });
 
   public scheduleToCloseSecondsLeft = $derived.by(() => {
-    if (this.scheduleToCloseTimeout === '0s') return;
-    const scheduleToCloseTimeoutSeconds = fromDurationToNumber(
-      this.scheduleToCloseTimeout,
-    );
+    if (this.scheduleToCloseTimeoutSeconds === 0) return;
 
-    const scheduleToCloseTimeoutMillis = scheduleToCloseTimeoutSeconds * 1000;
+    const scheduleToCloseTimeoutMillis =
+      this.scheduleToCloseTimeoutSeconds * 1000;
 
     const endTime = new SvelteDate(
-      new SvelteDate(this.activityExecution.info.lastStartedTime).getTime() +
+      new SvelteDate(this.activityExecution.info.scheduleTime).getTime() +
         scheduleToCloseTimeoutMillis,
     );
 
-    return formatSecondsAbbreviated(
-      Math.max(0, (new SvelteDate(endTime).getTime() - this.now) / 1000),
-      false,
-    );
+    return Math.max(0, (new SvelteDate(endTime).getTime() - this.now) / 1000);
   });
 
   constructor(activityExecution: ActivityExecution | undefined) {
@@ -176,6 +157,7 @@ export class StandaloneActivity {
     this.scheduleToStartTimeout =
       activityExecution?.info?.scheduleToStartTimeout;
     this.heartbeatTimeout = activityExecution?.info?.heartbeatTimeout;
+    this.runState = activityExecution?.info?.runState;
   }
 
   public intervalForAttempt(attempt: number): number {
@@ -186,18 +168,18 @@ export class StandaloneActivity {
   }
 
   private buildUpcomingAttempts(
-    scheduleTime: string | undefined,
+    lastAttemptCompletedTime: string | undefined,
     currentAttempt: number,
   ): ScheduleEntry[] {
-    if (!scheduleTime) return [];
+    if (!lastAttemptCompletedTime) return [];
     const entries: ScheduleEntry[] = [];
     let offset = 0;
+
     const totalAttempts = this.maximumAttempts ?? MAX_ATTEMPTS + currentAttempt;
 
     for (let attempt = currentAttempt; attempt <= totalAttempts; attempt += 1) {
-      const runAt = new SvelteDate(scheduleTime);
-      const waitSeconds = Math.round(this.intervalForAttempt(attempt));
-
+      const runAt = new SvelteDate(lastAttemptCompletedTime);
+      const waitSeconds = this.intervalForAttempt(attempt);
       runAt.setSeconds(runAt.getSeconds() + offset);
 
       entries.push({
@@ -220,7 +202,7 @@ export class StandaloneActivity {
 
     for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
       const runAt = new SvelteDate(scheduleTime);
-      const waitSeconds = Math.round(this.intervalForAttempt(attempt));
+      const waitSeconds = this.intervalForAttempt(attempt);
 
       runAt.setSeconds(runAt.getSeconds() + offset);
 

@@ -10,6 +10,7 @@
   import ActivityExecutionUpcomingAttempts from '$lib/components/standalone-activities/activity-execution-upcoming-attempts.svelte';
   import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import { formatSecondsAbbreviated } from '$lib/utilities/format-time';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   import { StandaloneActivity } from './standalone-activity.svelte';
@@ -58,9 +59,7 @@
             ? `of ${activity.maximumAttempts} maximum`
             : 'of unlimited'}
         >
-          <ActivityExecutionRunStateBadge
-            state={$activityExecution.info.runState}
-          />
+          <ActivityExecutionRunStateBadge state={activity.runState} />
         </ActivityExecutionDetailCard>
         <ActivityExecutionDetailCard
           title="Current Interval"
@@ -77,9 +76,11 @@
           )}"
         />
         <ActivityExecutionDetailCard
-          title="Times Retried"
-          content={activity.retriedCount}
-          description="since first attempt"
+          title="Time Remaining"
+          content={activity.secondsRemaining
+            ? formatSecondsAbbreviated(activity.secondsRemaining, false)
+            : '∞'}
+          description="(approximate)"
         />
       </div>
       <ActivityExecutionProgressBar

@@ -73,7 +73,7 @@
   });
 </script>
 
-<Card class="flex flex-col gap-4 py-5">
+<Card class="flex flex-col gap-4 pt-5">
   <div>
     <h5 class="text-xs font-semibold uppercase tracking-wide">
       Retry Schedule

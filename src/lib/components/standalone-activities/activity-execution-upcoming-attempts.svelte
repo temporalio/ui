@@ -2,6 +2,7 @@
   import Card from '$lib/holocene/card.svelte';
   import type { StandaloneActivity } from '$lib/pages/standalone-activity.svelte';
   import { formatSecondsAbbreviated } from '$lib/utilities/format-time';
+  import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
   import { timestamp } from '../timestamp.svelte';
 
@@ -12,7 +13,7 @@
   let { activity }: Props = $props();
 </script>
 
-<Card class="flex flex-col gap-4 py-5">
+<Card class="flex flex-col gap-4 pt-5">
   <div>
     <h5 class="text-xs font-semibold uppercase tracking-wide">
       Upcoming Attempts
@@ -34,14 +35,14 @@
   {/if}
 
   <div class="flex h-full max-h-[20rem] flex-col gap-1 overflow-auto">
-    {#each activity.upcomingAttempts as entry, i (entry.attempt)}
-      {@const isCurrent = i === 0}
+    {#each activity.upcomingAttempts as entry (entry.attempt)}
+      {@const isCurrent = entry.attempt === activity.currentAttempt}
       <div
         class="flex items-center gap-2 rounded px-2 py-1 {isCurrent
           ? 'bg-subtle'
           : ''}"
       >
-        {#if isCurrent}
+        {#if isCurrent && activity.runState === 'PENDING_ACTIVITY_STATE_STARTED'}
           <svg
             class="h-3 w-3 shrink-0 animate-spin text-secondary"
             viewBox="0 0 16 16"
@@ -56,6 +57,8 @@
               stroke-dasharray="2 2"
             />
           </svg>
+        {:else if isCurrent}
+          <span class="h-3 w-3 shrink-0 rounded-full bg-brand"></span>
         {:else}
           <span class="h-3 w-3 shrink-0 rounded-full bg-subtle"></span>
         {/if}
@@ -63,6 +66,11 @@
         <span class="text-xs text-secondary">
           wait {formatSecondsAbbreviated(entry.waitSeconds, false)}
         </span>
+        {#if isCurrent}
+          <span class="text-xs font-semibold">
+            {fromScreamingEnum(activity.runState, 'PendingActivityState')}
+          </span>
+        {/if}
         <span class="ml-auto text-right text-xs text-secondary">
           {$timestamp(entry.runAt)}
         </span>
