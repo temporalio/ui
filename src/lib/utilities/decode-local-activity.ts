@@ -32,7 +32,6 @@ export type DecodedLocalActivity = {
 export type LocalActivityDecodeOptions = {
   namespace: string;
   settings: Settings;
-  accessToken?: string;
 };
 
 export const decodeLocalActivity = async (
@@ -43,7 +42,7 @@ export const decodeLocalActivity = async (
     return undefined;
   }
 
-  const { namespace, settings, accessToken } = options;
+  const { namespace, settings } = options;
 
   const codecSettings = {
     ...settings,
@@ -60,7 +59,6 @@ export const decodeLocalActivity = async (
       event.attributes,
       namespace,
       codecSettings,
-      accessToken,
     );
 
     const payloads = (event.markerRecordedEventAttributes?.details?.data

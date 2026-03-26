@@ -3,7 +3,6 @@ import { get } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { decodePayloadsWithCodec } from '$lib/services/data-encoder';
-import { authUser } from '$lib/stores/auth-user';
 import type {
   codecEndpoint,
   includeCredentials,
@@ -218,7 +217,6 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   anyAttributes: EventAttribute | PotentiallyDecodable | Failure,
   namespace: string = get(page).params.namespace,
   settings: Settings = get(page).data.settings,
-  accessToken: string = get(authUser).accessToken,
 ): Promise<EventAttribute | PotentiallyDecodable | Failure> => {
   const decode = decodeReadablePayloads(settings);
 
@@ -237,7 +235,6 @@ export const decodeAllPotentialPayloadsWithCodec = async (
             next,
             namespace,
             settings,
-            accessToken,
           );
         }
       }
@@ -264,7 +261,6 @@ export const cloneAllPotentialPayloadsWithCodec = async (
     | null,
   namespace: string,
   settings: Settings,
-  accessToken: string,
   decodeSetting: DownloadEventHistorySetting = 'readable',
   returnDataOnly: boolean = true,
 ): Promise<
@@ -297,7 +293,6 @@ export const cloneAllPotentialPayloadsWithCodec = async (
             next,
             namespace,
             settings,
-            accessToken,
             decodeSetting,
             returnDataOnly,
           );
@@ -313,7 +308,6 @@ export const convertPayloadToJsonWithCodec = async ({
   attributes,
   namespace,
   settings,
-  accessToken,
 }: {
   attributes: EventAttribute | PotentiallyDecodable | Failure;
 } & EventRequestMetadata): Promise<
@@ -323,7 +317,6 @@ export const convertPayloadToJsonWithCodec = async ({
     attributes,
     namespace,
     settings,
-    accessToken,
   );
   return decodedAttributes;
 };

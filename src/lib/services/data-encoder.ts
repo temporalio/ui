@@ -3,12 +3,12 @@ import { get } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { translate } from '$lib/i18n/translate';
-import { authUser } from '$lib/stores/auth-user';
 import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
 import type { NetworkError, Settings } from '$lib/types/global';
+import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 import {
   getCodecEndpoint,
   getCodecIncludeCredentials,
@@ -41,14 +41,14 @@ export async function codeServerRequest({
 
   if (passAccessToken) {
     if (validateHttps(endpoint)) {
-      let accessToken = get(authUser).accessToken;
-      const accessTokenExtras = get(authUser).idToken;
-      if (globalThis?.AccessToken) {
-        accessToken = await globalThis?.AccessToken();
-      } else if (accessTokenExtras) {
-        headers['Authorization-Extras'] = accessTokenExtras;
+      const accessToken = await getAccessToken();
+      const idToken = await getIdToken();
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
       }
-      headers['Authorization'] = `Bearer ${accessToken}`;
+      if (idToken) {
+        headers['Authorization-Extras'] = idToken;
+      }
     } else {
       setLastDataEncoderFailure();
       return payloads;

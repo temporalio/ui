@@ -16,7 +16,7 @@
   const types = cva(
     [
       'w-full',
-      'md:sticky md:top-12',
+      'md:sticky md:top-[var(--top-nav-height)]',
       'max-md:fixed max-md:bottom-16',
       'z-[39]',
       'flex items-center justify-between gap-2',

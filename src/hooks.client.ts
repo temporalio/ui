@@ -1,3 +1,12 @@
+import { getAuthUser } from '$lib/stores/auth-user';
+import { consumeAuthCookies } from '$lib/utilities/auth-user-cookie';
+import { initCoreProvider } from '$lib/utilities/core-provider';
+import {
+  ossGetDataEncoderEndpoint,
+  ossPostResponse,
+  ossPreRequest,
+} from '$lib/utilities/oss-provider.svelte';
+
 if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
   crypto.randomUUID = function randomUUID() {
     return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) => {
@@ -9,3 +18,15 @@ if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
     }) as `${string}-${string}-${string}-${string}-${string}`;
   };
 }
+
+consumeAuthCookies();
+
+initCoreProvider({
+  getAccessToken: async () => getAuthUser().accessToken ?? '',
+  getIdToken: async () => getAuthUser().idToken,
+  api: {
+    preRequest: ossPreRequest,
+    postResponse: ossPostResponse,
+  },
+  getDataEncoderEndpoint: ossGetDataEncoderEndpoint,
+});

@@ -2,7 +2,6 @@ import { get } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import { authUser } from '$lib/stores/auth-user';
 import type {
   PendingActivity,
   PendingActivityWithMetadata,
@@ -16,7 +15,7 @@ import {
 } from '$lib/utilities/decode-payload';
 
 export async function getActivityAttributes(
-  { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,
+  { activity, namespace, settings }: PendingActivityWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
     decodeAttributes = decodePayloadAttributes,
@@ -26,7 +25,6 @@ export async function getActivityAttributes(
     attributes: activity,
     namespace,
     settings,
-    accessToken,
   });
 
   const decodedAttributes = decodeAttributes(
@@ -39,13 +37,11 @@ const decodePendingActivity = async ({
   activity,
   namespace,
   settings,
-  accessToken,
 }: PendingActivityWithMetadata): Promise<PendingActivity> => {
   const decodedActivity = await getActivityAttributes({
     activity,
     namespace,
     settings,
-    accessToken,
   });
   return decodedActivity;
 };
@@ -54,7 +50,6 @@ export const toDecodedPendingActivities = async (
   workflow: WorkflowExecution,
   namespace: string = get(page).params.namespace,
   settings: Settings = get(page).data.settings,
-  accessToken: string = get(authUser).accessToken,
 ) => {
   const pendingActivities = workflow?.pendingActivities ?? [];
   const decodedActivities: PendingActivity[] = [];
@@ -63,7 +58,6 @@ export const toDecodedPendingActivities = async (
       activity,
       namespace,
       settings,
-      accessToken,
     });
     decodedActivities.push(decodedActivity);
   }
