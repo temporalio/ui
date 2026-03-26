@@ -113,7 +113,7 @@
   });
 </script>
 
-<MenuContainer {open} class="max-md:w-full max-md:justify-items-end">
+<MenuContainer {open} class="`max-md:justify-items-end max-md:w-full">
   <MenuButton
     label={translate('common.timezone', { timezone })}
     controls="timezones-menu"
