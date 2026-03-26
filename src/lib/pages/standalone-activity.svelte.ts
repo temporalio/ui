@@ -8,7 +8,6 @@ import {
   formatSecondsAbbreviated,
   fromDurationToNumber,
 } from '$lib/utilities/format-time';
-import { fromSeconds } from '$lib/utilities/to-duration';
 
 interface ScheduleEntry {
   attempt: number;
@@ -85,10 +84,14 @@ export class StandaloneActivity {
   });
 
   public nextRetrySecondsLeft = $derived.by(() => {
-    const nextTime = this.activityExecution?.info?.nextAttemptScheduleTime;
-    if (!nextTime) return 0;
+    if (!this.nextAttemptScheduleTime) return 0;
+
     return formatSecondsAbbreviated(
-      Math.max(0, (new SvelteDate(nextTime).getTime() - this.now) / 1000),
+      Math.max(
+        0,
+        (new SvelteDate(this.nextAttemptScheduleTime).getTime() - this.now) /
+          1000,
+      ),
       false,
     );
   });

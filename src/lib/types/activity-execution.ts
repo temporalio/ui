@@ -79,7 +79,7 @@ export interface ActivityExecutionInfo {
   scheduleToCloseTimeout: string;
   scheduleToStartTimeout: string;
   startToCloseTimeout: string;
-  lastHeartbeatTime: string;
+  lastHeartbeatTime?: string;
   heartbeatDetails?: Payloads;
   heartbeatTimeout: string;
   retryPolicy: RetryPolicy;
@@ -87,7 +87,7 @@ export interface ActivityExecutionInfo {
   attempt: number;
   executionDuration?: string;
   scheduleTime: string;
-  closeTime: string;
+  closeTime?: string;
   lastWorkerIdentity: string;
   lastAttemptCompleteTime: string;
   nextAttemptScheduleTime: string;
