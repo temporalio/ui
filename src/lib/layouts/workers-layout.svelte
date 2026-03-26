@@ -3,6 +3,7 @@
 
   import { page } from '$app/state';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -25,11 +26,9 @@
 </script>
 
 <header class="flex flex-col gap-2">
-  <div class="flex flex-wrap items-center gap-2">
-    <h1 class="leading-7" data-cy="workers-title">
-      {translate('workers.workers')}
-    </h1>
-  </div>
+  <h1 class="leading-7" data-cy="workers-title">
+    {translate('workers.workers')}
+  </h1>
   <Tabs>
     <TabList label={translate('workers.worker-views')}>
       <Tab
@@ -41,7 +40,9 @@
           routeForWorkers({ namespace }),
           true,
         )}
-      />
+      >
+        <Badge class="shrink-0">Pre-Release</Badge>
+      </Tab>
       <Tab
         label={translate('deployments.deployments')}
         id="deployments-tab"

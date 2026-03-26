@@ -1,6 +1,6 @@
 <script lang="ts">
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { sdkInfo } from '$lib/stores/events';
@@ -37,28 +37,40 @@
   );
 </script>
 
-<Alert
-  title={translate('workers.no-worker-heartbeats')}
-  intent="info"
-  class="max-w-screen-lg xl:w-2/3"
+<div
+  class="my-12 flex w-full flex-col items-center justify-start gap-4"
+  data-testid="worker-heartbeats-sdk-warning"
+  aria-live="polite"
 >
-  <div class="mt-2 flex flex-col gap-2">
+  <span class="flex h-20 w-20 items-center justify-center rounded-full">
+    <Icon name="heartbeat" class="block h-full w-full text-blue-200" />
+  </span>
+  <div class="text-center">
+    <h5>{translate('workers.no-worker-heartbeats')}</h5>
     {#if currentSdk}
       {@const { href, sdk, version } = currentSdk}
-      <p class="flex flex-row gap-1">
+      <p class="flex flex-row text-secondary">
         {translate('workers.worker-heartbeats-sdk-link-preface')}
         <Link newTab {href}>
           <SdkLogo {sdk} {version} />
         </Link>
-        {translate('workers.worker-heartbeats-sdk-link-postface')}
+        <span class="ml-1"
+          >{translate('workers.worker-heartbeats-sdk-link-postface')}</span
+        >
       </p>
     {:else}
-      <p>{translate('workers.worker-heartbeats-sdk-list-preface')}</p>
-      {#each supportedVersions as { href, sdk, version } (`${sdk}:${version}`)}
-        <Link newTab {href}>
-          <SdkLogo {sdk} {version} />
-        </Link>
-      {/each}
+      <p class="text-secondary">
+        {translate('workers.worker-heartbeats-sdk-list-preface')}
+      </p>
+      <div
+        class="mt-4 flex flex-row flex-wrap items-center justify-center gap-4"
+      >
+        {#each supportedVersions as { href, sdk, version } (`${sdk}:${version}`)}
+          <Link newTab {href}>
+            <SdkLogo {sdk} {version} />
+          </Link>
+        {/each}
+      </div>
     {/if}
   </div>
-</Alert>
+</div>

@@ -5,7 +5,10 @@
   import type { WorkerInfo } from '$lib/types';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import { routeForWorkerInstance } from '$lib/utilities/route-for';
+  import {
+    routeForWorkerDeployment,
+    routeForWorkerInstance,
+  } from '$lib/utilities/route-for';
   import { toWorkerStatusReadable } from '$lib/utilities/screaming-enums';
 
   import WorkersTableCell from './workers-table-cell.svelte';
@@ -40,6 +43,12 @@
   <WorkersTableCell
     attribute="DeploymentName"
     value={worker.workerHeartbeat?.deploymentVersion?.deploymentName}
+    href={worker.workerHeartbeat?.deploymentVersion?.deploymentName
+      ? routeForWorkerDeployment({
+          namespace,
+          deployment: worker.workerHeartbeat.deploymentVersion.deploymentName,
+        })
+      : undefined}
     {filterable}
   />
   <!-- TODO: Make Build ID filterable when API supports it -->

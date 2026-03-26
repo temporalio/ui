@@ -23,6 +23,8 @@ export const Strings = {
   'shutting-down': 'Shutting Down',
   sdk: 'Worker SDK',
   'empty-state-title': 'No Workers Found',
+  'worker-query-empty-state-description':
+    'Try adjusting or clearing filters to see more results',
   'error-message-fetching': 'An error occurred while fetching workers.',
   'compatible-build-ids': 'Compatible Build IDs',
   'version-sets': 'Version Sets',
@@ -64,17 +66,16 @@ export const Strings = {
   'poll-success-rate': 'Poll success rate',
   'troubleshooting-workers-link': 'Troubleshooting workers',
   poller: 'Poller',
-  'go-dependency-warning': 'Potential missing dependency',
+  'go-dependency-warning': 'Missing Dependency',
   'go-dependency-warning-description':
-    'This worker is not showing any usage. You may need to enable a dependency for the Go SDK in order to see this data.',
+    'No usage data is available for this Worker. A Go SDK dependency may need to be enabled to surface this data.',
   'go-dependency-warning-link': 'Learn more.',
-  'no-worker-heartbeats': 'No workers are sending heartbeats.',
+  'no-worker-heartbeats': 'No Workers Sending Heartbeats',
   'worker-heartbeats-sdk-link-preface': 'Upgrade SDK to',
   'worker-heartbeats-sdk-link-postface': 'to enable.',
   'worker-heartbeats-sdk-list-preface':
-    'Upgrade SDK to one of the following versions to enable:',
-  'worker-heartbeats-disabled':
-    'Worker heartbeats are disabled for this Namespace.',
+    'Upgrade SDK to one of the following versions',
+  'worker-heartbeats-disabled': 'Worker Heartbeats Disabled',
   'worker-heartbeats-enablement':
-    'If you want to enable worker heartbeats for this namespace, please ensure the following value is set in Dynamic Config.',
+    'To enable Heartbeats for this Namespace, set the following value in Dynamic Config',
 } as const;

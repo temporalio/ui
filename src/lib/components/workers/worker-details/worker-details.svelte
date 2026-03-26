@@ -328,6 +328,8 @@
 {/snippet}
 
 {#snippet hostUsage()}
+  {@const cpuUsage = (heartbeat?.hostInfo?.currentHostCpuUsage ?? 0) * 100}
+  {@const memUsage = (heartbeat?.hostInfo?.currentHostMemUsage ?? 0) * 100}
   <Card class="flex flex-col gap-2 border-t-0">
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
@@ -335,14 +337,9 @@
           <Icon name="microchip" class="h-3 w-3 text-secondary" />
           {translate('workers.cpu-usage')}
         </span>
-        <span
-          >{heartbeat?.hostInfo?.currentHostCpuUsage?.toFixed(1) ?? '0'}%</span
-        >
+        <span>{cpuUsage.toFixed(0)}%</span>
       </div>
-      {@render meterBar(
-        'cpu-label',
-        heartbeat?.hostInfo?.currentHostCpuUsage ?? 0,
-      )}
+      {@render meterBar('cpu-label', cpuUsage)}
     </div>
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
@@ -350,14 +347,9 @@
           <Icon name="server" class="h-3 w-3 text-secondary" />
           {translate('workers.memory-usage')}
         </span>
-        <span
-          >{heartbeat?.hostInfo?.currentHostMemUsage?.toFixed(1) ?? '0'}%</span
-        >
+        <span>{memUsage.toFixed(0)}%</span>
       </div>
-      {@render meterBar(
-        'memory-label',
-        heartbeat?.hostInfo?.currentHostMemUsage ?? 0,
-      )}
+      {@render meterBar('memory-label', memUsage)}
     </div>
     {#if goDependencyPotentiallyMissing}
       {@render goDependencyWarning()}

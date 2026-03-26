@@ -10,7 +10,8 @@
   import type { WorkerInfo } from '$lib/types';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
 
-  import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-alert.svelte';
+  import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-warning.svelte';
+  import WorkersQueryEmptyState from './workers-query-empty-state.svelte';
   import WorkersTableRow from './workers-table-row.svelte';
 
   interface Props {
@@ -63,12 +64,12 @@
   {/each}
 
   <svelte:fragment slot="empty">
-    {#if hasQuery || runningWithNoWorkers}
+    {#if hasQuery}
+      <WorkersQueryEmptyState />
+    {:else if runningWithNoWorkers}
       <EmptyState title={translate('workers.empty-state-title')} />
     {:else}
-      <div class="my-12 flex w-full flex-col items-center justify-start">
-        <WorkerHeartbeatsSDKAlert />
-      </div>
+      <WorkerHeartbeatsSDKAlert />
     {/if}
   </svelte:fragment>
 </PaginatedTable>
