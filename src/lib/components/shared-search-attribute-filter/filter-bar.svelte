@@ -20,6 +20,7 @@
     id: string;
     statusAttribute?: StatusAttribute;
     onManualSearch?: (query: string) => void;
+    includeNullConditions?: boolean;
   }
 
   let {
@@ -29,6 +30,7 @@
     id,
     statusAttribute,
     onManualSearch,
+    includeNullConditions,
   }: Props = $props();
 
   let viewManualQuery = $state(false);
@@ -40,7 +42,13 @@
   >
     <div class="flex grow items-center justify-start gap-4 px-2">
       <Icon name="filter-lines" class="text-primary-text h-4 w-4 shrink-0" />
-      <Filter {filters} {options} {id} {statusAttribute} />
+      <Filter
+        {filters}
+        {options}
+        {id}
+        {statusAttribute}
+        {includeNullConditions}
+      />
     </div>
     <div class="flex items-center gap-1">
       <Tooltip
