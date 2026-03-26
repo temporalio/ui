@@ -126,7 +126,6 @@
         <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
         <DetailListLinkValue
           copyable
-          copyableText={heartbeat.taskQueue}
           text={heartbeat.taskQueue}
           href={routeForWorkersWithQuery({
             namespace,
@@ -156,7 +155,6 @@
         <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
         <DetailListLinkValue
           copyable
-          copyableText={heartbeat.deploymentVersion.deploymentName}
           text={heartbeat.deploymentVersion.deploymentName}
           href={routeForWorkersWithQuery({
             namespace,

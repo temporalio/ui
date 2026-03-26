@@ -79,16 +79,24 @@
     copyable={false}
     {filterable}
     filters={[
-      createFilter({
-        attribute: 'SdkName',
-        value: worker.workerHeartbeat?.sdkName,
-        conditional: '=',
-      }),
-      createFilter({
-        attribute: 'SdkVersion',
-        value: worker.workerHeartbeat?.sdkVersion,
-        conditional: '=',
-      }),
+      ...(worker.workerHeartbeat?.sdkName
+        ? [
+            createFilter({
+              attribute: 'SdkName',
+              value: worker.workerHeartbeat.sdkName,
+              conditional: '=',
+            }),
+          ]
+        : []),
+      ...(worker.workerHeartbeat?.sdkVersion
+        ? [
+            createFilter({
+              attribute: 'SdkVersion',
+              value: worker.workerHeartbeat.sdkVersion,
+              conditional: '=',
+            }),
+          ]
+        : []),
     ]}
   >
     <SdkLogo

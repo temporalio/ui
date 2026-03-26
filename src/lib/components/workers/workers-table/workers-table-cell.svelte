@@ -40,7 +40,7 @@
   const toggleFilters = $derived(
     filters && filters.length > 0
       ? filters
-      : [createFilter({ attribute, value, conditional: '=' })],
+      : [createFilter({ attribute, value: value ?? '', conditional: '=' })],
   );
 
   const isFiltered = $derived(
@@ -119,7 +119,7 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       filterIconTitle={translate('common.filter-workflows')}
       show={filterOrCopyButtonsVisible}
-      content={value}
+      content={value ?? ''}
       onFilter={onRowFilterClick}
       {copyable}
       {filterable}
