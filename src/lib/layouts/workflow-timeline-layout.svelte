@@ -96,7 +96,7 @@
 </div>
 <div class="relative pb-24">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:pt-2 xl:gap-8"
   >
     <div class="flex items-center gap-2">
       <h2>

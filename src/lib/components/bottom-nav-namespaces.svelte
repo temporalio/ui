@@ -3,16 +3,21 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
 
-  export let open = false;
-  export let namespaceList: NamespaceListItem[] = [];
+  interface Props {
+    open?: boolean;
+    namespaceList?: NamespaceListItem[];
+  }
 
-  let search = '';
+  let { open = false, namespaceList = [] }: Props = $props();
 
-  $: namespaces = (
-    search
+  let search = $state('');
+
+  const namespaces = $derived(
+    (search
       ? namespaceList.filter(({ namespace }) => namespace.includes(search))
       : namespaceList
-  ).sort((a, b) => a.namespace.localeCompare(b.namespace));
+    ).sort((a, b) => a.namespace.localeCompare(b.namespace)),
+  );
 </script>
 
 {#if open}
@@ -33,7 +38,11 @@
           <button
             class="namespace"
             class:selected={namespace === $lastUsedNamespace}
-            on:click|preventDefault|stopPropagation={() => onClick(namespace)}
+            onclick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClick(namespace);
+            }}
           >
             {namespace}
           </button>

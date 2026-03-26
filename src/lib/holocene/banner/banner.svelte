@@ -16,7 +16,7 @@
   const types = cva(
     [
       'w-full',
-      'md:sticky md:top-[var(--top-nav-height)]',
+      'md:sticky md:top-0',
       'max-md:fixed max-md:bottom-16',
       'z-[39]',
       'flex items-center justify-between gap-2',
@@ -41,33 +41,30 @@
 
   import type { IconName } from '../icon';
 
-  type BaseProps = {
+  interface Props {
     id: string;
     message: string;
     dismissible?: boolean;
     icon?: IconName;
     type?: BannerType;
     class?: string;
-  };
+    dismissable?: boolean;
+    dismissLabel?: string;
+    [key: string]: unknown;
+  }
 
-  type DismissibleBanner = BaseProps & {
-    dismissable: true;
-    dismissLabel: string;
-  };
+  let {
+    id,
+    message,
+    dismissLabel = '',
+    dismissable = false,
+    icon = null,
+    type = 'default',
+    class: className = '',
+    ...restProps
+  }: Props = $props();
 
-  type $$Props = BaseProps | DismissibleBanner;
-
-  export let id: string;
-  export let message: string;
-  export let dismissLabel: string = '';
-  export let dismissable = false;
-  export let icon: IconName = null;
-  export let type: BannerType = 'default';
-
-  let className = '';
-  export { className as class };
-
-  $: show = message && !$dismissedBanners[id];
+  const show = $derived(message && !$dismissedBanners[id]);
 
   const dismissBanner = () => {
     $dismissedBanners[id] = true;
@@ -75,7 +72,7 @@
 </script>
 
 {#if show}
-  <section class={merge(types({ type }), className)} {...$$restProps}>
+  <section class={merge(types({ type }), className)} {...restProps}>
     <span class="flex items-center gap-2">
       {#if icon}
         <Icon name={icon} />

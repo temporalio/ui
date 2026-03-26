@@ -12,7 +12,6 @@
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
@@ -256,7 +255,7 @@
   });
 
   afterNavigate(() => {
-    document.getElementById('content')?.scrollTo(0, 0);
+    document.getElementById('main-content')?.scrollTo(0, 0);
   });
 
   setCoreContext({
@@ -267,67 +266,59 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex w-screen flex-row">
+<div class="flex h-dvh w-screen flex-col overflow-hidden">
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
     position={toaster.position}
   />
-  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud}>
-      {#snippet bottom()}
-        {#if !isCloud}
-          <NavigationItem
-            link={page.data?.settings?.feedbackURL ||
-              'https://github.com/temporalio/ui/issues/new/choose'}
-            label={translate('common.feedback')}
-            icon="feedback"
-            tooltip={translate('common.feedback')}
-            external
-          />
-        {/if}
-      {/snippet}
-    </SideNavigation>
-  </div>
-  <MainContentContainer>
-    <DataEncoderSettings />
-    <TopNavigation>
-      {#snippet left()}
-        {#if showNamespacePicker}
-          <NamespacePicker {namespaceList} />
-        {/if}
-      {/snippet}
-      {#if isCloud}
-        <a
-          href={page.data?.settings?.supportURL ||
-            'https://support.temporal.io'}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="flex items-center text-indigo-100 hover:text-white"
-          aria-label="Support"
-        >
-          <Icon name="support" />
-        </a>
+  <TopNavigation>
+    {#snippet left()}
+      {#if showNamespacePicker}
+        <NamespacePicker {namespaceList} />
       {/if}
-      <UserMenu {logout} />
-    </TopNavigation>
-    <div
-      slot="main"
-      class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
-    >
-      <ErrorBoundary>
-        {@render children()}
-      </ErrorBoundary>
+    {/snippet}
+    {#if isCloud}
+      <a
+        href={page.data?.settings?.supportURL || 'https://support.temporal.io'}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center text-indigo-100 hover:text-white"
+        aria-label="Support"
+      >
+        <Icon name="support" />
+      </a>
+    {/if}
+    <UserMenu {logout} />
+  </TopNavigation>
+  <div class="flex min-h-0 flex-1">
+    <div class="hidden shrink-0 md:block">
+      <SideNavigation {linkList} {isCloud}>
+        {#snippet bottom()}
+          {#if !isCloud}
+            <NavigationItem
+              link={page.data?.settings?.feedbackURL ||
+                'https://github.com/temporalio/ui/issues/new/choose'}
+              label={translate('common.feedback')}
+              icon="feedback"
+              tooltip={translate('common.feedback')}
+              external
+            />
+          {/if}
+        {/snippet}
+      </SideNavigation>
     </div>
-    <BottomNavigation
-      slot="footer"
-      {linkList}
-      {namespaceList}
-      {isCloud}
-      {showNamespacePicker}
-    >
-      <UserMenuMobile {logout} />
-    </BottomNavigation>
-  </MainContentContainer>
+    <main id="main-content" class="flex-1 overflow-auto pb-20 md:pb-0">
+      <DataEncoderSettings />
+      <div class="flex w-full flex-col gap-4 p-4 md:p-8">
+        <ErrorBoundary>
+          {@render children()}
+        </ErrorBoundary>
+      </div>
+    </main>
+  </div>
+  <BottomNavigation {linkList} {namespaceList} {isCloud} {showNamespacePicker}>
+    <UserMenuMobile {logout} />
+  </BottomNavigation>
 </div>
