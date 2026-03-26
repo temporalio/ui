@@ -1,4 +1,4 @@
-import { namespaces } from '$lib/stores/namespaces';
+import { namespaceState } from '$lib/state/namespaces.svelte';
 import { toaster } from '$lib/stores/toaster';
 import type {
   DescribeNamespaceResponse,
@@ -40,13 +40,8 @@ const toNamespaceDetails = (
 export async function fetchNamespaces(
   settings: Settings,
   request = fetch,
-): Promise<void> {
-  const { showTemporalSystemNamespace, runtimeEnvironment } = settings;
-
-  if (runtimeEnvironment.isCloud) {
-    namespaces.set([]);
-    return;
-  }
+): Promise<DescribeNamespaceResponse[]> {
+  const { showTemporalSystemNamespace } = settings;
 
   try {
     const route = routeForApi('namespaces');
@@ -70,9 +65,11 @@ export async function fetchNamespaces(
       )
       .map(toNamespaceDetails);
 
-    namespaces.set(_namespaces);
+    namespaceState.hydrate(_namespaces);
+    return _namespaces;
   } catch {
-    namespaces.set([]);
+    namespaceState.hydrate([]);
+    return [];
   }
 }
 
@@ -82,10 +79,6 @@ export async function fetchNamespace(
   request = fetch,
 ): Promise<DescribeNamespaceResponse> {
   const [empty] = emptyNamespace.namespaces;
-
-  if (settings?.runtimeEnvironment?.isCloud) {
-    return empty;
-  }
 
   const route = routeForApi('namespace', { namespace });
   const results = await requestFromAPI<DescribeNamespaceResponse>(route, {

@@ -56,15 +56,6 @@ describe('fetchNamespaces', () => {
     );
   });
 
-  it('should return an empty array if the runtime environment is cloud', async () => {
-    const request = createSuccessfulRequest();
-
-    await fetchNamespaces({ runtimeEnvironment: { isCloud: true } }, request);
-
-    expect(request).not.toHaveBeenCalled();
-    expect(namespaces.set).toHaveBeenCalledWith([]);
-  });
-
   it('should return an empty array if the request fails', async () => {
     const request = createUnsuccessfulRequest();
 

@@ -28,7 +28,7 @@ export const load: LayoutLoad = async function ({
     redirect(302, routeForLoginPage());
   }
 
-  fetchNamespaces(settings, fetch);
+  await fetchNamespaces(settings, fetch);
 
   const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
   const systemInfo: GetSystemInfoResponse = await fetchSystemInfo(

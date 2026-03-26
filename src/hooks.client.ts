@@ -5,6 +5,7 @@ import {
   ossGetDataEncoderEndpoint,
   ossPostResponse,
   ossPreRequest,
+  ossSearchNamespaces,
 } from '$lib/utilities/oss-provider.svelte';
 
 if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
@@ -29,4 +30,5 @@ initCoreProvider({
     postResponse: ossPostResponse,
   },
   getDataEncoderEndpoint: ossGetDataEncoderEndpoint,
+  searchNamespaces: ossSearchNamespaces,
 });

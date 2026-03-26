@@ -11,15 +11,15 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { namespaceState } from '$lib/state/namespaces.svelte';
   import { authUser, clearAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
-  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
@@ -39,29 +39,19 @@
   } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
-
   interface Props {
     children: Snippet;
   }
 
   let { children }: Props = $props();
 
-  let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
   let activeNamespaceName = $derived(
     page.params?.namespace ?? $lastUsedNamespace,
   );
-  let namespaceNames = $derived(
-    isCloud
-      ? [page.params.namespace]
-      : $namespaces.map(
-          (namespace: Namespace) => namespace?.namespaceInfo?.name,
-        ),
-  );
+  let namespaceNames = $derived(namespaceState.names);
   let namespaceList: NamespaceListItem[] = $derived(
     namespaceNames.map((namespace: string) => {
-      const getHref = (namespace: string) =>
-        isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
+      const getHref = (namespace: string) => getCurrentHref(namespace);
       return {
         namespace,
         onClick: (namespace: string) => {
@@ -279,33 +269,20 @@
         <NamespacePicker {namespaceList} />
       {/if}
     {/snippet}
-    {#if isCloud}
-      <a
-        href={page.data?.settings?.supportURL || 'https://support.temporal.io'}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="flex items-center text-indigo-100 hover:text-white"
-        aria-label="Support"
-      >
-        <Icon name="support" />
-      </a>
-    {/if}
     <UserMenu {logout} />
   </TopNavigation>
   <div class="flex min-h-0 flex-1">
     <div class="hidden shrink-0 md:block">
-      <SideNavigation {linkList} {isCloud}>
+      <SideNavigation {linkList}>
         {#snippet bottom()}
-          {#if !isCloud}
-            <NavigationItem
-              link={page.data?.settings?.feedbackURL ||
-                'https://github.com/temporalio/ui/issues/new/choose'}
-              label={translate('common.feedback')}
-              icon="feedback"
-              tooltip={translate('common.feedback')}
-              external
-            />
-          {/if}
+          <NavigationItem
+            link={page.data?.settings?.feedbackURL ||
+              'https://github.com/temporalio/ui/issues/new/choose'}
+            label={translate('common.feedback')}
+            icon="feedback"
+            tooltip={translate('common.feedback')}
+            external
+          />
         {/snippet}
       </SideNavigation>
     </div>
@@ -318,7 +295,7 @@
       </div>
     </main>
   </div>
-  <BottomNavigation {linkList} {namespaceList} {isCloud} {showNamespacePicker}>
+  <BottomNavigation {linkList} {namespaceList} {showNamespacePicker}>
     <UserMenuMobile {logout} />
   </BottomNavigation>
 </div>

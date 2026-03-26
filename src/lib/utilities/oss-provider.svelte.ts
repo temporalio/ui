@@ -1,5 +1,6 @@
 import { page } from '$app/state';
 
+import { namespaceState } from '$lib/state/namespaces.svelte';
 import { getAuthUser } from '$lib/stores/auth-user';
 import type {
   PostResponseHook,
@@ -68,4 +69,8 @@ export async function ossGetDataEncoderEndpoint(
 ): Promise<string> {
   const settings = page.data?.settings;
   return getCodecEndpoint(settings);
+}
+
+export async function ossSearchNamespaces(query: string): Promise<string[]> {
+  return namespaceState.search(query);
 }
