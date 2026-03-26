@@ -38,11 +38,11 @@ export class StandaloneActivity {
   public now = $state(SvelteDate.now());
 
   private scheduleToCloseTimeoutSeconds: number = $derived(
-    fromDurationToNumber(this.scheduleToCloseTimeout),
+    parseInt(fromDurationToNumber(this.scheduleToCloseTimeout), 10),
   );
 
   private startToCloseTimeoutSeconds: number = $derived(
-    fromDurationToNumber(this.startToCloseTimeout),
+    parseInt(fromDurationToNumber(this.startToCloseTimeout), 10),
   );
 
   public running = $derived(
@@ -135,11 +135,17 @@ export class StandaloneActivity {
   constructor(activityExecution: ActivityExecution | undefined) {
     this.activityExecution = activityExecution;
     this.currentAttempt = activityExecution?.info?.attempt;
-    this.initialInterval = fromDurationToNumber(
-      activityExecution?.info?.retryPolicy.initialInterval,
+    this.initialInterval = parseInt(
+      fromDurationToNumber(
+        activityExecution?.info?.retryPolicy.initialInterval,
+      ),
+      10,
     );
-    this.maximumInterval = fromDurationToNumber(
-      activityExecution?.info?.retryPolicy.maximumInterval,
+    this.maximumInterval = parseInt(
+      fromDurationToNumber(
+        activityExecution?.info?.retryPolicy.maximumInterval,
+      ),
+      10,
     );
     this.maximumAttempts = activityExecution?.info?.retryPolicy.maximumAttempts;
     this.backoffCoefficient =
