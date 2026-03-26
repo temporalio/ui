@@ -259,12 +259,12 @@ export const formatSecondsAbbreviated = (
   return formatDistanceAbbreviated({ start, end, includeMilliseconds });
 };
 
-export const fromDurationToNumber = (duration: string): number => {
+export const fromDurationToNumber = (duration: string): string => {
   if (!duration || !duration.endsWith('s')) {
-    return 0;
+    return '';
   }
 
-  return parseInt(duration.replace('s', ''), 10);
+  return duration.replace('s', '');
 };
 
 export const fromNumberToDuration = (duration: string | number): string => {
