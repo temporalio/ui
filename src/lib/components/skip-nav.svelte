@@ -5,7 +5,7 @@
 
 <Link
   id="skip-nav"
-  href="#content"
+  href="#main-content"
   class="absolute left-1/2 z-100 -translate-y-full p-1 focus:translate-y-0"
 >
   {translate('common.skip-nav')}

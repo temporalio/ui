@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -20,14 +20,29 @@
   import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
   import BottomNavSettings from './bottom-nav-settings.svelte';
 
-  export let namespaceList: NamespaceListItem[] | undefined = [];
-  export let linkList: NavLinkListItem[];
-  export let isCloud = false;
-  export let showNamespacePicker = true;
+  interface Props {
+    namespaceList?: NamespaceListItem[];
+    linkList: NavLinkListItem[];
+    isCloud?: boolean;
+    showNamespacePicker?: boolean;
+    nsPicker?: Snippet<[{ open: boolean; closeMenu: () => void }]>;
+    profilePicture?: Snippet;
+    children?: Snippet;
+  }
 
-  let viewLinks = false;
-  let viewNamespaces = writable(false);
-  let viewSettings = false;
+  let {
+    namespaceList = [],
+    linkList,
+    isCloud = false,
+    showNamespacePicker = true,
+    nsPicker,
+    profilePicture,
+    children,
+  }: Props = $props();
+
+  let viewLinks = $state(false);
+  let viewNamespaces = $state(false);
+  let viewSettings = $state(false);
 
   function escapeHandler(e: KeyboardEvent) {
     if (
@@ -42,36 +57,38 @@
     closeMenu();
   });
 
-  $: namespace = $page.params.namespace || $lastUsedNamespace;
-  $: namespaceExists = namespaceList.some(
-    (namespaceListItem) => namespaceListItem.namespace === namespace,
+  const namespace = $derived(page.params.namespace || $lastUsedNamespace);
+  const namespaceExists = $derived(
+    namespaceList.some(
+      (namespaceListItem) => namespaceListItem.namespace === namespace,
+    ),
   );
 
   const onLinksClick = () => {
     viewLinks = !viewLinks;
-    $viewNamespaces = false;
+    viewNamespaces = false;
     viewSettings = false;
   };
 
   const onNamespaceClick = () => {
     viewLinks = false;
-    $viewNamespaces = !$viewNamespaces;
+    viewNamespaces = !viewNamespaces;
     viewSettings = false;
   };
 
   const onSettingsClick = () => {
     viewLinks = false;
-    $viewNamespaces = false;
+    viewNamespaces = false;
     viewSettings = !viewSettings;
   };
 
   function closeMenu() {
     viewLinks = false;
-    $viewNamespaces = false;
+    viewNamespaces = false;
     viewSettings = false;
   }
 
-  $: menuIsOpen = viewLinks || $viewNamespaces || viewSettings;
+  const menuIsOpen = $derived(viewLinks || viewNamespaces || viewSettings);
 
   const truncateNamespace = (namespace: string) => {
     if (namespace.length > 16) {
@@ -81,7 +98,7 @@
   };
 </script>
 
-<svelte:window on:keypress={escapeHandler} />
+<svelte:window onkeydown={escapeHandler} />
 
 {#if menuIsOpen}
   <div
@@ -97,11 +114,15 @@
     out:slide={{ duration: 200, delay: 0 }}
   >
     <BottomNavLinks open={viewLinks} {linkList} />
-    <slot name="nsPicker" open={$viewNamespaces} {closeMenu}>
-      <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
-    </slot>
+    {#if nsPicker}
+      {@render nsPicker({ open: viewNamespaces, closeMenu })}
+    {:else}
+      <BottomNavNamespaces open={viewNamespaces} {namespaceList} />
+    {/if}
     <BottomNavSettings open={viewSettings}>
-      <slot />
+      {#if children}
+        {@render children()}
+      {/if}
     </BottomNavSettings>
   </div>
 {/if}
@@ -121,7 +142,7 @@
     data-testid="nav-menu-button"
     class:active-shadow={viewLinks}
     type="button"
-    on:click={onLinksClick}
+    onclick={onLinksClick}
   >
     {#if viewLinks}
       <Icon name="close" height={32} width={32} />
@@ -154,7 +175,7 @@
     data-testid="nav-profile-button"
     class:active-shadow={viewSettings}
     type="button"
-    on:click={onSettingsClick}
+    onclick={onSettingsClick}
   >
     {#if viewSettings}
       <Icon name="close" height={32} width={32} />
@@ -162,13 +183,15 @@
       <div
         class="flex aspect-square w-[32px] min-w-[32px] items-center justify-center"
       >
-        <slot name="profile-picture">
+        {#if profilePicture}
+          {@render profilePicture()}
+        {:else}
           <img
             src={ziggy}
             alt={translate('common.user-profile')}
             class="h-[32px] w-[32px]"
           />
-        </slot>
+        {/if}
       </div>
     {/if}
   </button>

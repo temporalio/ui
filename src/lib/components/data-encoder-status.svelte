@@ -9,17 +9,11 @@
   const onIconClick = () => {
     $viewDataEncoderSettings = !$viewDataEncoderSettings;
     if ($viewDataEncoderSettings) {
-      document.getElementById('content-wrapper')?.scrollTo(0, 0);
+      document.getElementById('main-content')?.scrollTo(0, 0);
     }
   };
 
-  let variant: 'primary' | 'ghost' = 'ghost';
-
-  const updateVariant = (open: boolean) => {
-    variant = open ? 'primary' : 'ghost';
-  };
-
-  $: updateVariant($viewDataEncoderSettings);
+  const variant = $derived($viewDataEncoderSettings ? 'primary' : 'ghost');
 </script>
 
 <div class="mx-1 flex items-center">

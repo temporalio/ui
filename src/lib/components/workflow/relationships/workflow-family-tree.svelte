@@ -56,7 +56,7 @@
 
 <div class="flex flex-col bg-primary">
   <div
-    class="relative z-10 w-full overflow-hidden border-b border-subtle bg-primary lg:sticky lg:top-[var(--top-nav-height)]"
+    class="relative z-10 w-full overflow-hidden border-b border-subtle bg-primary lg:sticky lg:top-0"
   >
     <ZoomSvg
       initialZoom={2}

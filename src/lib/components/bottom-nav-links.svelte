@@ -2,8 +2,12 @@
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import type { NavLinkListItem } from '$lib/types/global';
 
-  export let open = false;
-  export let linkList: NavLinkListItem[];
+  interface Props {
+    open?: boolean;
+    linkList: NavLinkListItem[];
+  }
+
+  let { open = false, linkList }: Props = $props();
 </script>
 
 {#if open}

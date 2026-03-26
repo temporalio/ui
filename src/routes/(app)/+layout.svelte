@@ -11,16 +11,15 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { namespaceState } from '$lib/state/namespaces.svelte';
   import { authUser, clearAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
-  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
   import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
@@ -40,29 +39,19 @@
   } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
-
   interface Props {
     children: Snippet;
   }
 
   let { children }: Props = $props();
 
-  let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
   let activeNamespaceName = $derived(
     page.params?.namespace ?? $lastUsedNamespace,
   );
-  let namespaceNames = $derived(
-    isCloud
-      ? [page.params.namespace]
-      : $namespaces.map(
-          (namespace: Namespace) => namespace?.namespaceInfo?.name,
-        ),
-  );
+  let namespaceNames = $derived(namespaceState.names);
   let namespaceList: NamespaceListItem[] = $derived(
     namespaceNames.map((namespace: string) => {
-      const getHref = (namespace: string) =>
-        isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
+      const getHref = (namespace: string) => getCurrentHref(namespace);
       return {
         namespace,
         onClick: (namespace: string) => {
@@ -256,7 +245,7 @@
   });
 
   afterNavigate(() => {
-    document.getElementById('content')?.scrollTo(0, 0);
+    document.getElementById('main-content')?.scrollTo(0, 0);
   });
 
   setCoreContext({
@@ -267,17 +256,25 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex w-screen flex-row">
+<div class="flex h-dvh w-screen flex-col overflow-hidden">
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
     toasts={toaster.toasts}
     position={toaster.position}
   />
-  <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud}>
-      {#snippet bottom()}
-        {#if !isCloud}
+  <TopNavigation>
+    {#snippet left()}
+      {#if showNamespacePicker}
+        <NamespacePicker {namespaceList} />
+      {/if}
+    {/snippet}
+    <UserMenu {logout} />
+  </TopNavigation>
+  <div class="flex min-h-0 flex-1">
+    <div class="hidden shrink-0 md:block">
+      <SideNavigation {linkList}>
+        {#snippet bottom()}
           <NavigationItem
             link={page.data?.settings?.feedbackURL ||
               'https://github.com/temporalio/ui/issues/new/choose'}
@@ -286,48 +283,19 @@
             tooltip={translate('common.feedback')}
             external
           />
-        {/if}
-      {/snippet}
-    </SideNavigation>
-  </div>
-  <MainContentContainer>
-    <DataEncoderSettings />
-    <TopNavigation>
-      {#snippet left()}
-        {#if showNamespacePicker}
-          <NamespacePicker {namespaceList} />
-        {/if}
-      {/snippet}
-      {#if isCloud}
-        <a
-          href={page.data?.settings?.supportURL ||
-            'https://support.temporal.io'}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="flex items-center text-indigo-100 hover:text-white"
-          aria-label="Support"
-        >
-          <Icon name="support" />
-        </a>
-      {/if}
-      <UserMenu {logout} />
-    </TopNavigation>
-    <div
-      slot="main"
-      class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
-    >
-      <ErrorBoundary>
-        {@render children()}
-      </ErrorBoundary>
+        {/snippet}
+      </SideNavigation>
     </div>
-    <BottomNavigation
-      slot="footer"
-      {linkList}
-      {namespaceList}
-      {isCloud}
-      {showNamespacePicker}
-    >
-      <UserMenuMobile {logout} />
-    </BottomNavigation>
-  </MainContentContainer>
+    <main id="main-content" class="flex-1 overflow-auto pb-20 md:pb-0">
+      <DataEncoderSettings />
+      <div class="flex w-full flex-col gap-4 p-4 md:p-8">
+        <ErrorBoundary>
+          {@render children()}
+        </ErrorBoundary>
+      </div>
+    </main>
+  </div>
+  <BottomNavigation {linkList} {namespaceList} {showNamespacePicker}>
+    <UserMenuMobile {logout} />
+  </BottomNavigation>
 </div>
