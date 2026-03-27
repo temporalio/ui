@@ -24,6 +24,16 @@ test.describe('Schedules List with no schedules', () => {
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeEnabled();
   });
+
+  test('it displays empty state when there are no schedules', async ({
+    page,
+  }) => {
+    await page.goto(schedulesUrl);
+
+    await page.waitForResponse(SCHEDULES_COUNT_API);
+    const emptyState = page.getByText('No Schedules Found');
+    await expect(emptyState).toBeVisible();
+  });
 });
 
 test.describe('Schedules List with schedules', () => {
@@ -42,5 +52,19 @@ test.describe('Schedules List with schedules', () => {
 
     const createButton = page.getByTestId('create-schedule');
     await expect(createButton).toBeEnabled();
+  });
+
+  test('it renders schedule table rows', async ({ page }) => {
+    await page.goto(schedulesUrl);
+
+    await page.waitForResponse(SCHEDULES_COUNT_API);
+    const tableRows = page.locator('table tbody tr');
+    await expect(tableRows).toHaveCount(1);
+
+    const scheduleLink = page.getByRole('link', { name: 'test-schedule' });
+    await expect(scheduleLink).toBeVisible();
+
+    const workflowType = page.getByText('run-regularly');
+    await expect(workflowType).toBeVisible();
   });
 });
