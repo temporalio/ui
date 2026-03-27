@@ -19,6 +19,13 @@ export const eventFilterSort = persistStore<EventSortOrder>(
   'eventFilterSort',
   'descending',
 );
+
+export type WorkflowTab = 'timeline' | 'history';
+
+export const preferredWorkflowTab = persistStore<WorkflowTab>(
+  'preferredWorkflowTab',
+  'timeline',
+);
 export const eventShowElapsed = persistStore<BooleanString>(
   'eventShowElapsed',
   'false',

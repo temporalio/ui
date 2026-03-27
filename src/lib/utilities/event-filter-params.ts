@@ -1,7 +1,10 @@
+import { BROWSER } from 'esm-env';
+
 import { goto as navigateTo } from '$app/navigation';
 
 import type { EventSortOrder } from '$lib/stores/event-view';
 import type { EventTypeCategory } from '$lib/types/events';
+import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import { updateMultipleQueryParameters } from './update-query-parameters';
 
@@ -27,10 +30,23 @@ export function sharedFilterParamsToString(
   return new URLSearchParams(params).toString();
 }
 
+function getPersistedSort(): EventSortOrder {
+  if (!BROWSER) return 'descending';
+  try {
+    const stored = parseWithBigInt(
+      localStorage.getItem('eventFilterSort') ?? '"descending"',
+    );
+    return stored === 'ascending' ? 'ascending' : 'descending';
+  } catch {
+    return 'descending';
+  }
+}
+
 export function parseEventFilterParams(url: URL) {
   const categoryParam = url.searchParams.get('category');
   return {
-    sort: (url.searchParams.get('sort') as EventSortOrder) || 'descending',
+    sort:
+      (url.searchParams.get('sort') as EventSortOrder) || getPersistedSort(),
     categories: categoryParam
       ? (categoryParam.split(',') as EventTypeCategory[])
       : null,
