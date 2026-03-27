@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Card from '$lib/holocene/card.svelte';
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import type { Failure } from '$lib/types';
 
@@ -11,13 +11,7 @@
 </script>
 
 {#if failure}
-  <Card
-    class="flex flex-col gap-4 py-5 {failure
-      ? 'border-warning bg-warning'
-      : ''}"
-    title="Last Failure"
-  >
-    <h5 class="text-xs font-semibold uppercase tracking-wide">Last Failure</h5>
-    <CodeBlock content={JSON.stringify(failure, null, 2)} />
-  </Card>
+  <Accordion class="border-warning bg-warning" open title="Last Failure">
+    <CodeBlock maxHeight={320} content={JSON.stringify(failure, null, 2)} />
+  </Accordion>
 {/if}
