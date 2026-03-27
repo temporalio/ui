@@ -21,7 +21,7 @@ test.describe('Schedules List with schedules', () => {
     await page.waitForResponse(SCHEDULES_COUNT_API);
 
     const createButton = page.getByTestId('create-schedule');
-    await expect(createButton.first()).toBeEnabled();
+    await expect(createButton).toBeEnabled();
 
     const scheduleLink = page.getByRole('link', { name: /test-schedule/i });
     await expect(scheduleLink).toBeVisible();
