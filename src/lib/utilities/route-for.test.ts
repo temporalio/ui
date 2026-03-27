@@ -21,11 +21,11 @@ import {
   routeForScheduleCreate,
   routeForSchedules,
   routeForTaskQueue,
-  routeForWorkers,
   routeForWorkflow,
   routeForWorkflowQuery,
   routeForWorkflows,
   routeForWorkflowsWithQuery,
+  routeForWorkflowWorkers,
 } from './route-for';
 
 describe('routeFor', () => {
@@ -121,7 +121,7 @@ describe('routeFor', () => {
   });
 
   it('should route to "workers"', () => {
-    const path = routeForWorkers({
+    const path = routeForWorkflowWorkers({
       namespace: 'default',
       workflow: 'abc',
       run: 'def',
