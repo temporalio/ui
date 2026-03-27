@@ -39,8 +39,8 @@
 </script>
 
 <div class="space-y-2">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex flex-wrap items-center gap-2">
       <ActivityExecutionStatus status={activityExecutionInfo.status} />
       <div class="text-2xl font-medium">
         <Copyable

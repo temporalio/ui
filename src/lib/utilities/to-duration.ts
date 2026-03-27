@@ -6,6 +6,7 @@ import {
   sub,
 } from 'date-fns';
 
+import { fromNumberToDuration } from './format-time';
 import { isObject, isString } from './is';
 import { pluralize } from './pluralize';
 
@@ -128,15 +129,18 @@ export const fromDate = (
 };
 
 export const fromSeconds = (
-  seconds: string,
+  seconds: string | number,
   { delimiter = ', ' } = {},
 ): string => {
   if (!seconds) return '';
 
-  const parsedSeconds = parseInt(seconds);
-  const parsedDecimal = parseFloat(`.${seconds.split('.')[1] ?? 0}`);
+  const parsedSeconds =
+    typeof seconds === 'number' ? seconds : parseInt(seconds);
+  const stringSeconds =
+    typeof seconds === 'number' ? fromNumberToDuration(seconds) : seconds;
+  const parsedDecimal = parseFloat(`.${stringSeconds.split('.')[1] ?? 0}`);
 
-  if (!seconds.endsWith('s')) return '';
+  if (!stringSeconds.endsWith('s')) return '';
   if (isNaN(parsedSeconds) || isNaN(parsedDecimal)) return '';
 
   const start = new Date(Date.UTC(0, 0, 0, 0, 0, 0));
