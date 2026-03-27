@@ -22,6 +22,7 @@ startWorkflowDisabled: false
 hideWorkflowQueryErrors: false
 refreshWorkflowCountsDisabled: false
 activityCommandsDisabled: false
+disableTrackingPixel: false
 auth:
   enabled: false
   providers:
