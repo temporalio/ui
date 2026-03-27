@@ -78,4 +78,10 @@ export const Strings = {
   'worker-heartbeats-disabled': 'Worker Heartbeats Disabled',
   'worker-heartbeats-enablement':
     'To enable Heartbeats for this Namespace, set the following value in Dynamic Config',
+  'manual-poller': 'Poller count is set to a fixed number.',
+  'autoscaling-poller': 'Poller count adjusts automatically based on workload.',
+  'slot-supplier-kind-fixed': 'Poller count is set to a fixed number.',
+  'slot-supplier-kind-resource-based':
+    'Slot count adjusts based on CPU and memory usage.',
+  'slot-supplier-kind-custom': 'Slot count is managed by custom logic.',
 } as const;

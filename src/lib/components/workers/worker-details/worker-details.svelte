@@ -19,6 +19,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type {
     WorkerInfo,
@@ -68,6 +69,12 @@
       100
     ).toFixed(1);
   });
+
+  const SupplierKindTooltipText: Record<string, string> = {
+    Fixed: translate('workers.slot-supplier-kind-fixed'),
+    ResourceBased: translate('workers.slot-supplier-kind-resource-based'),
+    Custom: translate('workers.slot-supplier-kind-custom'),
+  };
 </script>
 
 <div class="flex items-center gap-2">
@@ -207,7 +214,10 @@
     <div class="mb-4 flex items-center gap-2">
       <h3 class="text-base font-medium">{title}</h3>
       {#if slots?.slotSupplierKind}
-        <Badge type="ghost" class="text-xs">{slots.slotSupplierKind}</Badge>
+        {@const tooltipText = SupplierKindTooltipText[slots.slotSupplierKind]}
+        <Tooltip topLeft text={tooltipText} hide={!tooltipText}>
+          <Badge type="ghost" class="text-xs">{slots.slotSupplierKind}</Badge>
+        </Tooltip>
       {/if}
     </div>
 
@@ -267,9 +277,16 @@
         <div>
           <dt class="flex h-6 items-center gap-2 text-sm text-secondary">
             {translate('workers.poller')}
-            <Badge type="ghost" class="text-xs">
-              {poller.isAutoscaling ? 'Autoscaling' : 'Manual'}
-            </Badge>
+            <Tooltip
+              topLeft
+              text={poller.isAutoscaling
+                ? translate('workers.autoscaling-poller')
+                : translate('workers.manual-poller')}
+            >
+              <Badge type="ghost" class="text-xs">
+                {poller.isAutoscaling ? 'Autoscaling' : 'Manual'}
+              </Badge>
+            </Tooltip>
           </dt>
           <dd>
             <p class="font-mono text-2xl font-semibold">
