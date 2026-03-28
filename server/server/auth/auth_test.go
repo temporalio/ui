@@ -24,8 +24,13 @@ package auth_test
 
 import (
 	_ "embed"
+	"encoding/base64"
+	"encoding/json"
 	"net/http/httptest"
+	"strconv"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -95,7 +100,7 @@ func TestSetUser(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := auth.SetUser(tt.ctx, &tt.user)
+			err := auth.SetUser(tt.ctx, &tt.user, time.Time{}, 0)
 			cookies := tt.ctx.Cookies()
 
 			if tt.wantErr {
@@ -107,6 +112,176 @@ func TestSetUser(t *testing.T) {
 				setCookie := tt.ctx.Response().Header().Get(echo.HeaderSetCookie)
 				assert.Contains(t, setCookie, "user0")
 			}
+		})
+	}
+}
+
+func TestSetUserCookieMaxAge(t *testing.T) {
+	validUser := auth.User{
+		OAuth2Token: &oauth2.Token{AccessToken: "XXX.YYY.ZZZ"},
+	}
+
+	extractMaxAge := func(header string) int {
+		for _, part := range strings.Split(header, ";") {
+			part = strings.TrimSpace(part)
+			if strings.HasPrefix(strings.ToLower(part), "max-age=") {
+				val := strings.SplitN(part, "=", 2)[1]
+				n, _ := strconv.Atoi(val)
+				return n
+			}
+		}
+		return -1
+	}
+
+	tests := []struct {
+		name             string
+		sessionExpiresAt time.Time
+		wantMaxAge       func(got int) bool
+		desc             string
+	}{
+		{
+			name:             "no session limit uses 60s",
+			sessionExpiresAt: time.Time{},
+			wantMaxAge:       func(got int) bool { return got == 60 },
+			desc:             "zero sessionExpiresAt should default to 60s",
+		},
+		{
+			name:             "session expires in 2 minutes keeps 60s",
+			sessionExpiresAt: time.Now().Add(2 * time.Minute),
+			wantMaxAge:       func(got int) bool { return got == 60 },
+			desc:             "remaining > 60s should still use 60s",
+		},
+		{
+			name:             "session expires in 30 seconds caps to ~30s",
+			sessionExpiresAt: time.Now().Add(30 * time.Second),
+			wantMaxAge:       func(got int) bool { return got > 25 && got <= 30 },
+			desc:             "remaining < 60s should cap MaxAge to remaining",
+		},
+		{
+			name:             "session already expired clamps to 1",
+			sessionExpiresAt: time.Now().Add(-5 * time.Second),
+			wantMaxAge:       func(got int) bool { return got == 1 },
+			desc:             "expired session should clamp MaxAge to 1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(echo.GET, "/", nil)
+			rec := httptest.NewRecorder()
+			ctx := e.NewContext(req, rec)
+
+			err := auth.SetUser(ctx, &validUser, tt.sessionExpiresAt, 0)
+			assert.NoError(t, err, tt.desc)
+
+			setCookie := rec.Header().Get(echo.HeaderSetCookie)
+			assert.Contains(t, setCookie, "user0", tt.desc)
+
+			maxAge := extractMaxAge(setCookie)
+			assert.True(t, tt.wantMaxAge(maxAge), "%s: got MaxAge=%d", tt.desc, maxAge)
+		})
+	}
+}
+
+func jwtToken(exp int64) string {
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none"}`))
+	payload, _ := json.Marshal(map[string]int64{"exp": exp})
+	return header + "." + base64.RawURLEncoding.EncodeToString(payload) + ".sig"
+}
+
+func TestSetUserRefreshCookieMaxAge(t *testing.T) {
+	extractCookieMaxAge := func(headers []string, name string) int {
+		for _, h := range headers {
+			parts := strings.Split(h, ";")
+			if !strings.HasPrefix(strings.TrimSpace(parts[0]), name+"=") {
+				continue
+			}
+			for _, part := range parts[1:] {
+				part = strings.TrimSpace(part)
+				if strings.HasPrefix(strings.ToLower(part), "max-age=") {
+					n, _ := strconv.Atoi(strings.SplitN(part, "=", 2)[1])
+					return n
+				}
+			}
+		}
+		return -1
+	}
+
+	tests := []struct {
+		name                 string
+		refreshToken         string
+		refreshTokenDuration time.Duration
+		wantMaxAge           func(got int) bool
+		desc                 string
+	}{
+		{
+			name:         "opaque token without config uses 7-day default",
+			refreshToken: "opaque-refresh-token",
+			wantMaxAge:   func(got int) bool { return got == int((7 * 24 * time.Hour).Seconds()) },
+			desc:         "opaque token with no config should fall back to 7 days",
+		},
+		{
+			name:                 "opaque token with config uses configured duration",
+			refreshToken:         "opaque-refresh-token",
+			refreshTokenDuration: 24 * time.Hour,
+			wantMaxAge:           func(got int) bool { return got == int((24 * time.Hour).Seconds()) },
+			desc:                 "opaque token with refreshTokenDuration=24h should set MaxAge to 86400s",
+		},
+		{
+			name:                 "opaque token with short config duration",
+			refreshToken:         "opaque-refresh-token",
+			refreshTokenDuration: 30 * time.Minute,
+			wantMaxAge:           func(got int) bool { return got == int((30 * time.Minute).Seconds()) },
+			desc:                 "opaque token with refreshTokenDuration=30m should set MaxAge to 1800s",
+		},
+		{
+			name:         "JWT exp used when no config",
+			refreshToken: jwtToken(time.Now().Add(12 * time.Hour).Unix()),
+			wantMaxAge:   func(got int) bool { return got > int((11*time.Hour+55*time.Minute).Seconds()) && got <= int((12*time.Hour).Seconds()) },
+			desc:         "JWT exp should be used as MaxAge when refreshTokenDuration is unset",
+		},
+		{
+			name:                 "JWT exp takes priority over configured duration",
+			refreshToken:         jwtToken(time.Now().Add(6 * time.Hour).Unix()),
+			refreshTokenDuration: 24 * time.Hour,
+			wantMaxAge:           func(got int) bool { return got > int((5*time.Hour+55*time.Minute).Seconds()) && got <= int((6*time.Hour).Seconds()) },
+			desc:                 "JWT exp should override refreshTokenDuration when present",
+		},
+		{
+			name:         "expired JWT without config falls back to 7-day default",
+			refreshToken: jwtToken(time.Now().Add(-1 * time.Hour).Unix()),
+			wantMaxAge:   func(got int) bool { return got == int((7 * 24 * time.Hour).Seconds()) },
+			desc:         "expired JWT exp with no config should fall back to 7 days",
+		},
+		{
+			name:                 "expired JWT with config falls back to configured duration",
+			refreshToken:         jwtToken(time.Now().Add(-1 * time.Hour).Unix()),
+			refreshTokenDuration: 24 * time.Hour,
+			wantMaxAge:           func(got int) bool { return got == int((24 * time.Hour).Seconds()) },
+			desc:                 "expired JWT exp should fall back to refreshTokenDuration config",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(echo.GET, "/", nil)
+			rec := httptest.NewRecorder()
+			ctx := e.NewContext(req, rec)
+
+			user := auth.User{
+				OAuth2Token: &oauth2.Token{
+					AccessToken:  "XXX.YYY.ZZZ",
+					RefreshToken: tt.refreshToken,
+				},
+			}
+
+			err := auth.SetUser(ctx, &user, time.Time{}, tt.refreshTokenDuration)
+			assert.NoError(t, err, tt.desc)
+
+			maxAge := extractCookieMaxAge(rec.Header().Values(echo.HeaderSetCookie), "refresh")
+			assert.True(t, tt.wantMaxAge(maxAge), "%s: got MaxAge=%d", tt.desc, maxAge)
 		})
 	}
 }
