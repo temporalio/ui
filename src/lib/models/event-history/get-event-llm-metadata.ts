@@ -17,15 +17,6 @@ export interface LLMMetadata {
   traceUrl?: string;
 }
 
-interface UsageObject {
-  total_tokens?: number;
-  totalTokens?: number;
-  prompt_tokens?: number;
-  promptTokens?: number;
-  completion_tokens?: number;
-  completionTokens?: number;
-}
-
 const isObject = (v: unknown): v is Record<string, unknown> =>
   v !== null && typeof v === 'object' && !Array.isArray(v);
 
@@ -34,29 +25,6 @@ const getNumber = (v: unknown): number | undefined =>
 
 const getString = (v: unknown): string | undefined =>
   typeof v === 'string' && v.length > 0 ? v : undefined;
-
-/**
- * Extracts token usage from a usage-shaped object.
- * Handles both snake_case (OpenAI) and camelCase conventions.
- */
-const extractUsage = (usage: UsageObject): Omit<LLMMetadata, 'model'> => {
-  const totalTokens =
-    getNumber(usage.total_tokens) ?? getNumber(usage.totalTokens);
-  const promptTokens =
-    getNumber(usage.prompt_tokens) ?? getNumber(usage.promptTokens);
-  const completionTokens =
-    getNumber(usage.completion_tokens) ?? getNumber(usage.completionTokens);
-
-  return {
-    totalTokens:
-      totalTokens ??
-      (promptTokens && completionTokens
-        ? promptTokens + completionTokens
-        : undefined),
-    promptTokens,
-    completionTokens,
-  };
-};
 
 /**
  * Extracts LLM metadata from the _llm convention.
@@ -97,60 +65,6 @@ const extractFromLLMConvention = (
 };
 
 /**
- * Inspects an event's attributes for recognized LLM response shapes.
- *
- * Handles:
- * - OpenAI style: { usage: { prompt_tokens, completion_tokens, total_tokens }, model: "gpt-4o" }
- * - Flat style: { total_tokens: 150, model: "gpt-4o" }
- * - Nested in result: { result: "...", usage: { ... } }
- * - Anthropic style: { usage: { input_tokens, output_tokens }, model: "claude-3-opus" }
- */
-const extractLLMMetadataFromAttributes = (
-  attrs: Record<string, unknown>,
-): LLMMetadata | null => {
-  const model = getString(attrs.model);
-
-  // Try nested usage object first (OpenAI / Anthropic standard shape)
-  if (isObject(attrs.usage)) {
-    const usage = extractUsage(attrs.usage as UsageObject);
-
-    // Also handle Anthropic's input_tokens/output_tokens
-    const anthropicPrompt =
-      usage.promptTokens ??
-      getNumber((attrs.usage as Record<string, unknown>).input_tokens);
-    const anthropicCompletion =
-      usage.completionTokens ??
-      getNumber((attrs.usage as Record<string, unknown>).output_tokens);
-
-    const result: LLMMetadata = {
-      model,
-      totalTokens:
-        usage.totalTokens ??
-        (anthropicPrompt && anthropicCompletion
-          ? anthropicPrompt + anthropicCompletion
-          : undefined),
-      promptTokens: anthropicPrompt,
-      completionTokens: anthropicCompletion,
-    };
-
-    if (result.model || result.totalTokens) return result;
-  }
-
-  // Try flat style (keys directly on the attributes)
-  const flatUsage = extractUsage(attrs as unknown as UsageObject);
-  if (flatUsage.totalTokens || flatUsage.promptTokens) {
-    return { model, ...flatUsage };
-  }
-
-  // Model present but no token info - still useful to display
-  if (model) {
-    return { model };
-  }
-
-  return null;
-};
-
-/**
  * Extracts LLM metadata from a single WorkflowEvent.
  * Only inspects ActivityTaskCompleted events (which contain the result payload).
  */
@@ -180,17 +94,11 @@ export const getEventLLMMetadata = (
       }
     }
 
-    // Check for _llm convention first (explicit, preferred)
-    const llmConvention = extractFromLLMConvention(resultData);
-    if (llmConvention) return llmConvention;
-
-    // Fall back to heuristic detection (OpenAI/Anthropic/flat shapes)
-    const metadata = extractLLMMetadataFromAttributes(resultData);
-    if (metadata) return metadata;
+    // Check for _llm convention (explicit, required)
+    return extractFromLLMConvention(resultData);
   }
 
-  // Check top-level attributes (some plugins put usage data at the top level)
-  return extractLLMMetadataFromAttributes(attrs as Record<string, unknown>);
+  return null;
 };
 
 /**
