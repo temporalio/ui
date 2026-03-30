@@ -93,6 +93,14 @@
 
         <ActivityExecutionUpcomingAttempts {activity} />
       </div>
+    {:else}
+      <ActivityExecutionDetailCard
+        title="Attempts"
+        content={activity.currentAttempt}
+        description={activity.maximumAttempts
+          ? `of ${activity.maximumAttempts} maximum`
+          : 'of unlimited'}
+      />
     {/if}
   </div>
 {/if}
