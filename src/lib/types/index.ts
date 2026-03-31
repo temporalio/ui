@@ -13,7 +13,11 @@ export type GetClusterInfoResponse =
 export type GetSystemInfoResponse =
   temporal.api.workflowservice.v1.IGetSystemInfoResponse;
 export type Capabilities =
-  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities;
+  temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
+    serverlessDeployments?: boolean | null;
+    editServerlessDeployment?: boolean | null;
+    deleteServerlessDeployment?: boolean | null;
+  };
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
@@ -49,6 +53,8 @@ export type PauseWorkflowRequest =
   temporal.api.workflowservice.v1.IPauseWorkflowExecutionRequest;
 export type UnpauseWorkflowRequest =
   temporal.api.workflowservice.v1.IUnpauseWorkflowExecutionRequest;
+export type ListTaskQueuePartitionsRequest =
+  temporal.api.workflowservice.v1.IListTaskQueuePartitionsRequest;
 export type ListWorkersRequest =
   temporal.api.workflowservice.v1.IListWorkersRequest;
 export type ListWorkersResponse =

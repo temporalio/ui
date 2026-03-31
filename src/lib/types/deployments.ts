@@ -71,6 +71,7 @@ export interface VersionSummaryNew {
 export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {
   lastModifierIdentity: string;
   versionSummaries: VersionSummary[];
+  computeConfig?: ComputeConfig;
 }
 
 export interface WorkerDeploymentResponse {
@@ -109,6 +110,31 @@ export interface WorkerDeploymentVersionInfo {
 
 export interface WorkerDeploymentVersionResponse {
   workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
+}
+
+export interface ComputeScaler {
+  minInstances?: number;
+  maxInstances?: number;
+}
+
+export interface ComputeProvider {
+  type: string;
+  detailJson?: string;
+}
+
+export interface ComputeConfig {
+  provider?: ComputeProvider;
+  scaler?: ComputeScaler;
+}
+
+export interface CreateWorkerDeploymentRequest {
+  namespace: string;
+  deploymentName: string;
+  computeConfig?: ComputeConfig;
+}
+
+export interface CreateWorkerDeploymentResponse {
+  conflictToken: string;
 }
 
 export const VersioningBehaviorEnum = {
