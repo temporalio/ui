@@ -1,5 +1,9 @@
 <script lang="ts">
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
+  import {
+    isNavDividerItem,
+    isNavLinkItem,
+  } from '$lib/holocene/navigation/navigation-utils';
   import type { NavLinkListItem } from '$lib/types/global';
 
   export let open = false;
@@ -10,10 +14,10 @@
   <div
     class="flex h-full flex-col-reverse justify-start gap-6 overflow-auto px-4 py-8"
   >
-    {#each linkList as item}
-      {#if 'divider' in item && item.divider}
+    {#each linkList as item, i (i)}
+      {#if isNavDividerItem(item)}
         <hr class="border-subtle" />
-      {:else if 'href' in item}
+      {:else if isNavLinkItem(item)}
         <NavigationItem
           link={item.href}
           label={item.label}
