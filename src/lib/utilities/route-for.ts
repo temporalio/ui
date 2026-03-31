@@ -1,8 +1,14 @@
+import { get } from 'svelte/store';
+
 import { BROWSER } from 'esm-env';
 
 import { resolve } from '$app/paths';
 import type { ResolvedPathname } from '$app/types';
 
+import {
+  eventFilterSort,
+  workflowViewPreference,
+} from '$lib/stores/event-view';
 import type { EventView } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
@@ -209,7 +215,7 @@ export const routeForArchivalWorkflows = (
   return `${routeForNamespace(parameters)}/archival`;
 };
 
-export const routeForWorkflow = ({
+export const baseRouteForWorkflow = ({
   workflow,
   run,
   ...parameters
@@ -264,7 +270,7 @@ export const routeForEventHistory = ({
   ...parameters
 }: EventHistoryParameters & { archival?: boolean }): ResolvedPathname => {
   if (archival) return toURL(routeForArchivalEventHistory(parameters));
-  const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
+  const eventHistoryPath = `${baseRouteForWorkflow(parameters)}/history`;
   return toURL(`${eventHistoryPath}`, queryParams);
 };
 
@@ -273,7 +279,7 @@ export const routeForEventHistoryEvent = ({
   requestId,
   ...parameters
 }: EventParameters): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/history/events/${eventId || requestId}`;
+  return `${baseRouteForWorkflow(parameters)}/history/events/${eventId || requestId}`;
 };
 
 export const routeForTimeline = ({
@@ -285,14 +291,41 @@ export const routeForTimeline = ({
   archival?: boolean;
 }): ResolvedPathname => {
   if (archival) return toURL(routeForArchivalEventHistory(parameters));
-  const path = `${routeForWorkflow(parameters)}/timeline`;
+  const path = `${baseRouteForWorkflow(parameters)}/timeline`;
   return toURL(path, queryParams);
+};
+
+export const routeForWorkflow = ({
+  queryParams,
+  ...parameters
+}: EventHistoryParameters & { archival?: boolean }): ResolvedPathname => {
+  if (!BROWSER) return routeForTimeline(parameters);
+
+  const view = get(workflowViewPreference);
+  const sort = get(eventFilterSort);
+  const params: Record<string, string> = {
+    ...(sort !== 'descending' && { sort }),
+    ...queryParams,
+  };
+
+  const hasParams = Object.keys(params).length > 0;
+
+  if (view === 'history') {
+    return routeForEventHistory({
+      ...parameters,
+      ...(hasParams && { queryParams: params }),
+    });
+  }
+  return routeForTimeline({
+    ...parameters,
+    ...(hasParams && { queryParams: params }),
+  });
 };
 
 export const routeForWorkers = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/workers`;
+  return `${baseRouteForWorkflow(parameters)}/workers`;
 };
 
 export const routeForWorkerDeployments = ({
@@ -337,7 +370,7 @@ export const routeForWorkerDeploymentVersion = ({
 export const routeForRelationships = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/relationships`;
+  return `${baseRouteForWorkflow(parameters)}/relationships`;
 };
 
 export const routeForTaskQueue = (
@@ -353,49 +386,49 @@ export const routeForTaskQueue = (
 export const routeForCallStack = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/call-stack`;
+  return `${baseRouteForWorkflow(parameters)}/call-stack`;
 };
 
 export const routeForWorkflowQuery = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/query`;
+  return `${baseRouteForWorkflow(parameters)}/query`;
 };
 
 export const routeForUserMetadata = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/user-metadata`;
+  return `${baseRouteForWorkflow(parameters)}/user-metadata`;
 };
 
 export const routeForWorkflowSearchAttributes = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/search-attributes`;
+  return `${baseRouteForWorkflow(parameters)}/search-attributes`;
 };
 
 export const routeForWorkflowMemo = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/memo`;
+  return `${baseRouteForWorkflow(parameters)}/memo`;
 };
 
 export const routeForWorkflowUpdate = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/update`;
+  return `${baseRouteForWorkflow(parameters)}/update`;
 };
 
 export const routeForPendingActivities = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/pending-activities`;
+  return `${baseRouteForWorkflow(parameters)}/pending-activities`;
 };
 
 export const routeForNexusLinks = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {
-  return `${routeForWorkflow(parameters)}/nexus-links`;
+  return `${baseRouteForWorkflow(parameters)}/nexus-links`;
 };
 
 export const routeForAuthentication = (

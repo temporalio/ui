@@ -7,7 +7,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
-  import { routeForSchedule, routeForTimeline } from '$lib/utilities/route-for';
+  import { routeForSchedule, routeForWorkflow } from '$lib/utilities/route-for';
 
   import ScheduleBasicFrequency from './schedule-basic-frequency.svelte';
 
@@ -62,7 +62,7 @@
         {#each sortRecentActions(schedule?.info?.recentActions) as run}
           <p>
             <Link
-              href={routeForTimeline({
+              href={routeForWorkflow({
                 namespace,
                 workflow: run?.startWorkflowResult?.workflowId,
                 run: run?.startWorkflowResult?.runId,
