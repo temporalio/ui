@@ -73,6 +73,7 @@ import identities from './svg/identities.svelte';
 import importIcon from './svg/import.svelte';
 import inactive from './svg/inactive.svelte';
 import info from './svg/info.svelte';
+import invite from './svg/invite.svelte';
 import json from './svg/json.svelte';
 import key from './svg/key.svelte';
 import keyboard from './svg/keyboard.svelte';
@@ -221,6 +222,7 @@ export const icons = {
   inactive,
   import: importIcon,
   info,
+  invite,
   json,
   keyboard,
   key,
