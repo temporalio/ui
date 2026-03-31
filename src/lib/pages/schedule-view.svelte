@@ -418,13 +418,7 @@
           <ScheduleInput
             input={schedule?.schedule?.action?.startWorkflow?.input}
           />
-          <ScheduleFrequencyPanel
-            frequency={[
-              ...(schedule?.schedule?.spec?.structuredCalendar ?? []),
-              ...(schedule?.schedule?.spec?.interval ?? []),
-            ]}
-            timezoneName={schedule?.schedule?.spec?.timezoneName}
-          />
+          <ScheduleFrequencyPanel spec={schedule?.schedule?.spec} />
         </div>
       </div>
     </div>

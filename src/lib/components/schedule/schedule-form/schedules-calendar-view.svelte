@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { page } from '$app/state';
-
   import ScheduleDayOfMonthView from '$lib/components/schedule/schedule-day-of-month-view.svelte';
   import ScheduleDayOfWeekView from '$lib/components/schedule/schedule-day-of-week-view.svelte';
   import ScheduleFrequency from '$lib/components/schedule/schedule-frequency.svelte';
@@ -113,13 +111,7 @@
   <div class="mt-4 flex w-full flex-wrap gap-6">
     {#if schedule}
       <TabPanel id="existing-panel" tabId="existing-tab" class="w-full">
-        <ScheduleFrequency
-          frequency={[
-            ...(schedule?.spec?.structuredCalendar ?? []),
-            ...(schedule?.spec?.interval ?? []),
-          ]}
-          timezoneName={schedule?.spec?.timezoneName}
-        />
+        <ScheduleFrequency spec={schedule.spec} />
       </TabPanel>
     {/if}
     <TabPanel id="interval-panel" tabId="interval-tab">

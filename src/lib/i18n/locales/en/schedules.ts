@@ -101,4 +101,6 @@ export const Strings = {
   'getting-started-cli-link-preface': 'or get started with',
   'add-schedule-attr': 'Schedule Attributes',
   'add-workflow-attr': 'Workflow Attributes',
+  'view-full-spec': 'View Full Spec',
+  'hide-full-spec': 'Hide Full Spec',
 } as const;
