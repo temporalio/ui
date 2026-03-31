@@ -1,70 +1,73 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
+  import DeploymentHeader from '$lib/components/deployments/deployment-header.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Error from '$lib/holocene/error.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchDeployment } from '$lib/services/deployments-service';
+  import { deleteWorkerDeployment } from '$lib/services/deployments-service';
+  import type { WorkerDeploymentResponse } from '$lib/types/deployments';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import {
-    routeForWorkerDeployments,
-    routeForWorkflowsWithQuery,
-  } from '$lib/utilities/route-for';
+  import { routeForWorkerDeployments } from '$lib/utilities/route-for';
+
+  interface Props {
+    deploymentPromise: Promise<WorkerDeploymentResponse>;
+  }
+
+  let { deploymentPromise }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
-  const workflowHref = $derived(
-    routeForWorkflowsWithQuery({
-      namespace,
-      query: `TemporalWorkerDeployment="${deploymentName}"`,
-    }),
-  );
-
-  const deploymentFetch = $derived(
-    fetchDeployment({ namespace, deploymentName }),
-  );
 
   const columns = [
     { label: translate('deployments.build-id') },
-    { label: translate('deployments.status') },
+    { label: translate('deployments.build-status') },
+    { label: translate('deployments.compute') },
     { label: translate('deployments.deployed') },
     { label: translate('deployments.actions') },
   ];
+
+  let showDeleteModal = $state(false);
+  let deleteError = $state<string | undefined>();
+
+  async function handleDeleteDeployment(conflictToken: string) {
+    await deleteWorkerDeployment(
+      { namespace, deploymentName, conflictToken },
+      () => {
+        deleteError = translate('deployments.delete-deployment-confirm-error');
+      },
+    );
+    if (!deleteError) {
+      goto(routeForWorkerDeployments({ namespace }));
+    }
+  }
 </script>
 
-<header class="flex flex-row flex-wrap justify-between gap-8">
-  <div class="relative flex w-full flex-col gap-4">
-    <div class="flex items-center gap-2">
-      <Link href={routeForWorkerDeployments({ namespace })} icon="chevron-left">
-        {translate('deployments.back-to-deployments')}
-      </Link>
-      <Icon name="chevron-left" />
-      {deploymentName}
-    </div>
-    <div class="flex w-full items-center justify-between">
-      <h1>{deploymentName}</h1>
-      <Button href={workflowHref}
-        >{translate('deployments.go-to-workflows')}</Button
-      >
-    </div>
-  </div>
-</header>
-<div>
-  {#await deploymentFetch}
-    <SkeletonTable rows={15} />
-  {:then deployment}
+{#await deploymentPromise}
+  <SkeletonTable rows={15} />
+{:then deployment}
+  {@const info = deployment.workerDeploymentInfo}
+
+  <DeploymentHeader
+    {namespace}
+    {deploymentName}
+    hasVersions={!!info.versionSummaries?.length}
+    onDeleteClick={() => (showDeleteModal = true)}
+  />
+
+  <div class="mt-4">
     <PaginatedTable
       aria-label={translate('deployments.deployments')}
       perPageLabel={translate('common.per-page')}
       nextPageButtonLabel={translate('common.next-page')}
       previousPageButtonLabel={translate('common.previous-page')}
-      pageButtonLabel={(page) => translate('common.go-to-page', { page })}
-      items={deployment.workerDeploymentInfo.versionSummaries}
+      pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
+      items={info.versionSummaries ?? []}
+      maxHeight="fit-content"
       let:visibleItems
     >
       <caption class="sr-only" slot="caption">
@@ -75,15 +78,28 @@
           <th>{label}</th>
         {/each}
       </tr>
-      {#each visibleItems as version}
+      {#each visibleItems as version (version.version)}
         <VersionTableRow
-          routingConfig={deployment.workerDeploymentInfo.routingConfig}
+          routingConfig={info.routingConfig}
           {version}
-          {columns}
+          {namespace}
+          {deploymentName}
+          conflictToken={deployment.conflictToken}
         />
       {/each}
     </PaginatedTable>
-  {:catch error}
-    <Error {error} />
-  {/await}
-</div>
+  </div>
+
+  {#if deleteError}
+    <Error error={deleteError} />
+  {/if}
+
+  <DeleteDeploymentModal
+    open={showDeleteModal}
+    {deploymentName}
+    onConfirm={() => handleDeleteDeployment(deployment.conflictToken)}
+    onCancel={() => (showDeleteModal = false)}
+  />
+{:catch error}
+  <Error {error} />
+{/await}

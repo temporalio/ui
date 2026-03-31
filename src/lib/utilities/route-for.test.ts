@@ -28,7 +28,11 @@ import {
   routeForSchedule,
   routeForScheduleCreate,
   routeForSchedules,
+  routeForServerlessWorkerCreate,
   routeForTaskQueue,
+  routeForWorkerDeploymentCreate,
+  routeForWorkerDeploymentVersionCreate,
+  routeForWorkerDeploymentVersionEdit,
   routeForWorkflowQuery,
   routeForWorkflows,
   routeForWorkflowsWithQuery,
@@ -528,5 +532,40 @@ describe('routeForWorkflow', () => {
     });
     expect(path).toContain('sort=ascending');
     expect(path).not.toContain('sort=descending');
+  });
+});
+
+describe('routeFor worker deployment version and serverless routes', () => {
+  it('should route to worker deployment version create', () => {
+    const path = routeForWorkerDeploymentVersionCreate({
+      namespace: 'default',
+      deployment: 'my-deployment',
+    });
+    expect(path).toBe(
+      `${base}/namespaces/default/workers/deployments/my-deployment/versions/create`,
+    );
+  });
+
+  it('should route to worker deployment version edit', () => {
+    const path = routeForWorkerDeploymentVersionEdit({
+      namespace: 'default',
+      deployment: 'my-deployment',
+      buildId: 'build-1',
+    });
+    expect(path).toBe(
+      `${base}/namespaces/default/workers/deployments/my-deployment/versions/build-1/edit`,
+    );
+  });
+
+  it('should route to serverless worker create', () => {
+    const path = routeForServerlessWorkerCreate({ namespace: 'default' });
+    expect(path).toBe(
+      `${base}/namespaces/default/workers/deployments/serverless/create`,
+    );
+  });
+
+  it('should route to worker deployment create', () => {
+    const path = routeForWorkerDeploymentCreate({ namespace: 'default' });
+    expect(path).toBe(`${base}/namespaces/default/workers/deployments/create`);
   });
 });

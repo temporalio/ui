@@ -67,13 +67,13 @@
       ? translate('deployments.current')
       : pollerHasRampingBuildId(poller)
         ? translate('deployments.ramping-percentage', {
-            percentage: workers.versioningInfo.rampingVersionPercentage,
+            percentage: workers.versioningInfo?.rampingVersionPercentage ?? 0,
           })
         : '';
   };
 
   const pollerHasCurrentBuildId = $derived(
-    (poller) =>
+    (poller: PollerWithTaskQueueTypes) =>
       getPollerDeploymentName(poller) === currentDeployment &&
       getPollerBuildId(poller) === currentBuildId,
   );
@@ -156,21 +156,26 @@
       <td data-testid="workflow-poller">
         <div class="flex items-center justify-center">
           <PollerIcon
-            includesTaskQueueType={poller.taskQueueTypes.includes('WORKFLOW')}
+            includesTaskQueueType={poller.taskQueueTypes?.includes(
+              'WORKFLOW',
+            ) ?? false}
           />
         </div>
       </td>
       <td data-testid="activity-poller">
         <div class="flex items-center justify-center">
           <PollerIcon
-            includesTaskQueueType={poller.taskQueueTypes.includes('ACTIVITY')}
+            includesTaskQueueType={poller.taskQueueTypes?.includes(
+              'ACTIVITY',
+            ) ?? false}
           />
         </div>
       </td>
       <td data-testid="nexus-poller">
         <div class="flex items-center justify-center">
           <PollerIcon
-            includesTaskQueueType={poller.taskQueueTypes.includes('NEXUS')}
+            includesTaskQueueType={poller.taskQueueTypes?.includes('NEXUS') ??
+              false}
           />
         </div>
       </td>

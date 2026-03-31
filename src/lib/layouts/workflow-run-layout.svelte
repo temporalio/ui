@@ -99,7 +99,7 @@
     await decodeUserMetadata(workflow);
 
     const { taskQueue } = workflow;
-    const workers = await getPollers({ queue: taskQueue, namespace });
+    const workers = await getPollers({ queue: taskQueue!, namespace });
 
     $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
@@ -149,7 +149,7 @@
         workflowError = error;
         return;
       }
-      $workflowRun.workflow = workflow;
+      $workflowRun.workflow = workflow ?? null;
     }
   };
 
@@ -163,10 +163,10 @@
   const clearWorkflowData = () => {
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
-    workflowError = undefined;
+    workflowError = null;
     abortPolling();
     resetLastDataEncoderSuccess();
-    clearInterval(refreshInterval);
+    if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = null;
   };
 
@@ -175,7 +175,10 @@
   $: getWorkflowAndEventHistory(namespace, workflowId, runId);
   $: getOnlyWorkflowWithPendingActivities($refresh, $pauseLiveUpdates);
 
-  const setCurrentEvents = (fullHistory, pause) => {
+  const setCurrentEvents = (
+    fullHistory: typeof $fullEventHistory,
+    pause: boolean,
+  ) => {
     if (!pause) {
       $currentEventHistory = fullHistory;
     }
@@ -207,7 +210,7 @@
       on:click={handleCopy}
       copied={$copied}
     />
-    {stringifyWithBigInt(fullJson, null, 2)}
+    {stringifyWithBigInt(fullJson, undefined, 2)}
   </div>
 {:else if workflowError}
   <WorkflowError error={workflowError} />
