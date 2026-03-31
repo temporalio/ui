@@ -4,6 +4,18 @@ import type {
   StructuredCalendarSpec,
 } from '$lib/types';
 
+import { formatDuration } from './format-time';
+
+function toSecondsString(d: unknown): string {
+  if (d == null) return '';
+  if (typeof d === 'string') return d.endsWith('s') ? d : '';
+  if (typeof d === 'object' && 'seconds' in d) {
+    const obj = d as { seconds: string | number };
+    return `${obj.seconds}s`;
+  }
+  return '';
+}
+
 const DAY_NAMES = [
   'Sunday',
   'Monday',
@@ -29,41 +41,6 @@ const MONTH_NAMES = [
   'November',
   'December',
 ];
-
-function durationToSeconds(d: unknown): number {
-  if (d == null) return 0;
-  if (typeof d === 'string') {
-    const match = d.match(/^(\d+)s$/);
-    return match ? parseInt(match[1], 10) : 0;
-  }
-  if (typeof d === 'object' && 'seconds' in d) {
-    const obj = d as { seconds: string | number };
-    return typeof obj.seconds === 'string'
-      ? parseInt(obj.seconds, 10) || 0
-      : Number(obj.seconds) || 0;
-  }
-  if (typeof d === 'number') return d;
-  return 0;
-}
-
-function formatDuration(totalSeconds: number): string {
-  if (totalSeconds <= 0) return '';
-
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor(totalSeconds / 60);
-
-  if (totalSeconds % 86400 === 0) {
-    return days === 1 ? 'day' : `${days} days`;
-  }
-  if (totalSeconds % 3600 === 0) {
-    return hours === 1 ? 'hour' : `${hours} hours`;
-  }
-  if (totalSeconds % 60 === 0) {
-    return minutes === 1 ? 'minute' : `${minutes} minutes`;
-  }
-  return `${totalSeconds} seconds`;
-}
 
 function expandRange(range: RangeSpec): number[] {
   const start = range.start ?? 0;
@@ -255,17 +232,15 @@ function getSingleCalendarLabel(
 }
 
 export function getIntervalLabel(spec: IntervalSpec): string {
-  const seconds = durationToSeconds(spec.interval);
-  if (seconds <= 0) return '';
+  const intervalStr = toSecondsString(spec.interval);
+  const label = formatDuration(intervalStr);
+  if (!label) return '';
 
-  const label = formatDuration(seconds);
   const result = `Every ${label}`;
 
-  const phaseSeconds = durationToSeconds(spec.phase);
-  if (phaseSeconds > 0) {
-    const phaseLabel = formatDuration(phaseSeconds);
-    return `${result}, offset by ${phaseLabel}`;
-  }
+  const phaseStr = toSecondsString(spec.phase);
+  const phaseLabel = formatDuration(phaseStr);
+  if (phaseLabel) return `${result}, offset by ${phaseLabel}`;
 
   return result;
 }
