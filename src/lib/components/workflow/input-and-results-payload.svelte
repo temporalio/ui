@@ -10,6 +10,7 @@
     stringifyWithBigInt,
   } from '$lib/utilities/parse-with-big-int';
 
+  import ImagePreview from '../event/image-preview.svelte';
   import PayloadDecoder from '../event/payload-decoder.svelte';
 
   type Props = {
@@ -72,34 +73,43 @@
         {#snippet children(decodedValue)}
           {#if payloadsSize > 1}
             {#each parsePayloads(decodedValue) as decodedContent}
+              {@const payloadStr = stringifyWithBigInt(decodedContent)}
+              <ImagePreview content={payloadStr}>
+                <CodeBlock
+                  content={payloadStr}
+                  copyIconTitle={translate('common.copy-icon-title')}
+                  copySuccessIconTitle={translate(
+                    'common.copy-success-icon-title',
+                  )}
+                  maxHeight={MAX_HEIGHT}
+                />
+              </ImagePreview>
+            {/each}
+          {:else}
+            <ImagePreview content={decodedValue}>
               <CodeBlock
-                content={stringifyWithBigInt(decodedContent)}
+                content={decodedValue}
                 copyIconTitle={translate('common.copy-icon-title')}
                 copySuccessIconTitle={translate(
                   'common.copy-success-icon-title',
                 )}
                 maxHeight={MAX_HEIGHT}
               />
-            {/each}
-          {:else}
-            <CodeBlock
-              content={decodedValue}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              maxHeight={MAX_HEIGHT}
-            />
+            </ImagePreview>
           {/if}
         {/snippet}
       </PayloadDecoder>
     {:else}
       <PayloadDecoder value={parseWithBigInt(content)}>
         {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            maxHeight={MAX_HEIGHT}
-          />
+          <ImagePreview content={decodedValue}>
+            <CodeBlock
+              content={decodedValue}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+              maxHeight={MAX_HEIGHT}
+            />
+          </ImagePreview>
         {/snippet}
       </PayloadDecoder>
     {/if}

@@ -25,6 +25,7 @@
   import { routeForNamespace } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
+  import ImagePreview from './image-preview.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
@@ -172,12 +173,14 @@
     {#if value?.payloads}
       <PayloadDecoder {value} key="payloads">
         {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
+          <ImagePreview content={decodedValue}>
+            <CodeBlock
+              content={decodedValue}
+              maxHeight={384}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            />
+          </ImagePreview>
         {/snippet}
       </PayloadDecoder>
     {:else if key === 'searchAttributes'}
@@ -186,23 +189,27 @@
         value={{ searchAttributes: codeBlockValue }}
       >
         {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
+          <ImagePreview content={decodedValue}>
+            <CodeBlock
+              content={decodedValue}
+              maxHeight={384}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            />
+          </ImagePreview>
         {/snippet}
       </PayloadDecoder>
     {:else}
       <PayloadDecoder value={codeBlockValue}>
         {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
+          <ImagePreview content={decodedValue}>
+            <CodeBlock
+              content={decodedValue}
+              maxHeight={384}
+              copyIconTitle={translate('common.copy-icon-title')}
+              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            />
+          </ImagePreview>
         {/snippet}
       </PayloadDecoder>
     {/if}
