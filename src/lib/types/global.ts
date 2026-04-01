@@ -144,7 +144,7 @@ export type BooleanString = 'true' | 'false';
 
 export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
-type NavLinkItem = {
+export type NavLinkItem = {
   href: string;
   icon: IconName;
   label: string;
