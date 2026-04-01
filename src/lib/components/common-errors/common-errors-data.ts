@@ -89,7 +89,7 @@ export const COMMON_ERRORS: CommonError[] = [
   {
     id: 9,
     severity: 'info',
-    title: 'Consider Using suggest_continue_as_new Instead',
+    title: 'Consider Using Suggest Continue-as-New Instead',
     description:
       "Rather than triggering Continue-as-New on a fixed schedule, you can rely on the server's suggest_continue_as_new flag, which is set at approximately 4,000 events. This approach ensures you only Continue-as-New when the Event History is actually getting large.",
     link: 'https://docs.temporal.io/workflow-execution/continue-as-new',
@@ -312,7 +312,7 @@ export const COMMON_ERRORS: CommonError[] = [
   {
     id: 31,
     severity: 'warning',
-    title: 'suggest_continue_as_new Was Ignored',
+    title: 'Suggest Continue-as-New Was Ignored',
     description:
       'The server set the suggest_continue_as_new flag at approximately 4,000 events, but this Workflow continued for a significant number of additional events. Large Event Histories increase replay time and memory consumption on your Workers. Implement a check for this flag in your Workflow code and call Continue-as-New when it is set.',
     link: 'https://docs.temporal.io/workflow-execution/continue-as-new',
