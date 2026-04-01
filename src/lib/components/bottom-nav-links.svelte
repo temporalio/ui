@@ -4,6 +4,7 @@
 
   export let open = false;
   export let linkList: NavLinkListItem[];
+  export let secondaryLinkList: NavLinkListItem[] = [];
 </script>
 
 {#if open}
@@ -24,5 +25,20 @@
         />
       {/if}
     {/each}
+    {#if secondaryLinkList.length > 0}
+      <hr class="border-subtle" />
+      {#each secondaryLinkList as item}
+        {#if 'href' in item}
+          <NavigationItem
+            link={item.href}
+            label={item.label}
+            icon={item.icon}
+            tooltip={item.tooltip || item.label}
+            external={item?.external}
+            animate={item?.animate}
+          />
+        {/if}
+      {/each}
+    {/if}
   </div>
 {/if}

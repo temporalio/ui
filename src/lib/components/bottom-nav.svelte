@@ -22,6 +22,7 @@
 
   export let namespaceList: NamespaceListItem[] | undefined = [];
   export let linkList: NavLinkListItem[];
+  export let secondaryLinkList: NavLinkListItem[] = [];
   export let isCloud = false;
   export let showNamespacePicker = true;
 
@@ -96,7 +97,7 @@
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
   >
-    <BottomNavLinks open={viewLinks} {linkList} />
+    <BottomNavLinks open={viewLinks} {linkList} {secondaryLinkList} />
     <slot name="nsPicker" open={$viewNamespaces} {closeMenu}>
       <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
     </slot>
