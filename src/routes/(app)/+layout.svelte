@@ -13,6 +13,7 @@
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
+  import NavGroup from '$lib/holocene/navigation/nav-group.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
@@ -276,6 +277,9 @@
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud}>
+      {#snippet navContent()}
+        <NavGroup navItems={linkList} />
+      {/snippet}
       {#snippet bottom()}
         {#if !isCloud}
           <NavigationItem
