@@ -345,6 +345,7 @@
     <BottomNavigation
       slot="footer"
       {linkList}
+      secondaryLinkList={linkListForSecondGroup}
       {namespaceList}
       {isCloud}
       {showNamespacePicker}
