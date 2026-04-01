@@ -196,6 +196,15 @@
 
   let routes = $derived(getRoutes(activeNamespaceName));
   let linkList = $derived(getLinkList(routes, !!$inProgressBatchOperation));
+  let linkListForFirstGroup = $derived(
+    linkList.slice(
+      0,
+      linkList.findIndex((item) => 'divider' in item),
+    ),
+  );
+  let linkListForSecondGroup = $derived(
+    linkList.slice(linkList.findIndex((item) => 'divider' in item) + 1),
+  );
   let {
     workflowsRoute,
     schedulesRoute,
@@ -278,7 +287,9 @@
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
     <SideNavigation {linkList} {isCloud}>
       {#snippet navContent()}
-        <NavGroup navItems={linkList} />
+        <NavGroup navItems={linkListForFirstGroup} />
+        <hr class="my-4 border-subtle group-data-[nav=closed]:hidden" />
+        <NavGroup navItems={linkListForSecondGroup} />
       {/snippet}
       {#snippet bottom()}
         {#if !isCloud}
