@@ -11,14 +11,16 @@
   let { navItems }: Props = $props();
 </script>
 
-{#each navItems as item (item.label)}
-  <NavigationItem
-    link={item.href}
-    label={item.label}
-    icon={item.icon}
-    tooltip={item.tooltip || item.label}
-    external={item.external}
-    animate={item.animate}
-    isActive={item.isActive}
-  />
+{#each navItems as item}
+  {#if isNavLinkItem(item)}
+    <NavigationItem
+      link={item.href}
+      label={item.label}
+      icon={item.icon}
+      tooltip={item.tooltip || item.label}
+      external={item.external}
+      animate={item.animate}
+      isActive={item.isActive}
+    />
+  {/if}
 {/each}
