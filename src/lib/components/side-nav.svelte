@@ -10,25 +10,30 @@
     isCloud?: boolean;
     linkList: NavLinkListItem[];
     bottom?: Snippet;
+    navContent?: Snippet;
   }
 
-  let { isCloud = false, linkList, bottom }: Props = $props();
+  let { isCloud = false, linkList, bottom, navContent }: Props = $props();
 </script>
 
 <Navigation {isCloud} {bottom} aria-label={translate('common.primary')}>
-  {#each linkList as item}
-    {#if 'divider' in item && item.divider}
-      <hr class="my-4 border-subtle group-data-[nav=closed]:hidden" />
-    {:else if 'href' in item && !item.hidden}
-      <NavigationItem
-        link={item.href}
-        label={item.label}
-        icon={item.icon}
-        tooltip={item?.tooltip || item.label}
-        external={item?.external}
-        animate={item?.animate}
-        isActive={item.isActive}
-      />
-    {/if}
-  {/each}
+  {#if isCloud && navContent}
+    {@render navContent()}
+  {:else}
+    {#each linkList as item}
+      {#if 'divider' in item && item.divider}
+        <hr class="my-4 border-subtle group-data-[nav=closed]:hidden" />
+      {:else if 'href' in item && !item.hidden}
+        <NavigationItem
+          link={item.href}
+          label={item.label}
+          icon={item.icon}
+          tooltip={item?.tooltip || item.label}
+          external={item?.external}
+          animate={item?.animate}
+          isActive={item.isActive}
+        />
+      {/if}
+    {/each}
+  {/if}
 </Navigation>
