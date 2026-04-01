@@ -22,7 +22,7 @@
   {:else}
     {#each linkList as item}
       {#if 'divider' in item && item.divider}
-        <hr class="my-4 border-subtle group-data-[nav=closed]:hidden" />
+        <hr class="border-subtle group-data-[nav=closed]:hidden" />
       {:else if 'href' in item && !item.hidden}
         <NavigationItem
           link={item.href}

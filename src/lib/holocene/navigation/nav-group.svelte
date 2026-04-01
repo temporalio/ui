@@ -10,7 +10,7 @@
   let { navItems }: Props = $props();
 </script>
 
-{#each navItems as item}
+{#each navItems as item (item.label)}
   <NavigationItem
     link={item.href}
     label={item.label}
