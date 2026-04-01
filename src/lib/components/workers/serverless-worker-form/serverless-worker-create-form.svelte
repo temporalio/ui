@@ -17,9 +17,16 @@
   import ComputeProviderPicker from './compute-provider-picker.svelte';
   import ServerlessWorkerSetupGuide from './serverless-worker-setup-guide.svelte';
 
+  type SubmitFieldErrors = {
+    lambdaArn?: string[];
+    iamRoleArn?: string[];
+  };
+
   type Props = {
     namespace: string;
-    onSubmit: (data: CreateDeploymentFormData) => Promise<void>;
+    onSubmit: (
+      data: CreateDeploymentFormData,
+    ) => Promise<SubmitFieldErrors | void>;
     cancelHref: string;
     submitButtonText: string;
     error?: string;
@@ -51,7 +58,13 @@
     dataType: 'json',
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
-      onSubmit(form.data);
+      const fieldErrors = await onSubmit(form.data);
+      if (fieldErrors) {
+        if (fieldErrors.lambdaArn)
+          form.errors.lambdaArn = fieldErrors.lambdaArn;
+        if (fieldErrors.iamRoleArn)
+          form.errors.iamRoleArn = fieldErrors.iamRoleArn;
+      }
     },
   });
 
