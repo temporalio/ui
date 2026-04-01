@@ -17,7 +17,7 @@
 </script>
 
 <Navigation {isCloud} {bottom} aria-label={translate('common.primary')}>
-  {#if isCloud && navContent}
+  {#if navContent}
     {@render navContent()}
   {:else}
     {#each linkList as item}
