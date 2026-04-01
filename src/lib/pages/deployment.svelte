@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -9,7 +11,10 @@
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchDeployment } from '$lib/services/deployments-service';
+  import {
+    deleteWorkerDeployment,
+    fetchDeployment,
+  } from '$lib/services/deployments-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import {
     routeForWorkerDeployments,
@@ -37,6 +42,21 @@
     { label: translate('deployments.deployed') },
     { label: translate('deployments.actions') },
   ];
+
+  let showDeleteModal = $state(false);
+  let deleteError = $state<string | undefined>();
+
+  async function handleDeleteDeployment(conflictToken: string) {
+    await deleteWorkerDeployment(
+      { namespace, deploymentName, conflictToken },
+      () => {
+        deleteError = translate('deployments.delete-deployment-confirm-error');
+      },
+    );
+    if (!deleteError) {
+      goto(routeForWorkerDeployments({ namespace }));
+    }
+  }
 </script>
 
 {#await deploymentFetch}
@@ -72,6 +92,14 @@
         >
           {translate('deployments.create-new-version')}
         </Button>
+        {#if info.versionSummaries.length === 0}
+          <Button
+            variant="destructive"
+            on:click={() => (showDeleteModal = true)}
+          >
+            {translate('deployments.delete-deployment')}
+          </Button>
+        {/if}
       </div>
     </div>
 
@@ -118,6 +146,17 @@
       {/each}
     </PaginatedTable>
   </div>
+
+  {#if deleteError}
+    <Error error={deleteError} />
+  {/if}
+
+  <DeleteDeploymentModal
+    open={showDeleteModal}
+    {deploymentName}
+    onConfirm={() => handleDeleteDeployment(deployment.conflictToken)}
+    onCancel={() => (showDeleteModal = false)}
+  />
 {:catch error}
   <Error {error} />
 {/await}

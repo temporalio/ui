@@ -56,4 +56,9 @@ export const Strings = {
   'edit-version': 'Edit Version',
   'view-workflows': 'View Workflows',
   'create-new-version': 'Create New Version',
+  'delete-deployment': 'Delete Deployment',
+  'delete-deployment-description':
+    'This action cannot be undone. The deployment and all its configuration will be permanently deleted.',
+  'delete-deployment-confirm-instruction': 'Type DELETE to confirm',
+  'delete-deployment-confirm-error': 'Failed to delete deployment',
 } as const;
