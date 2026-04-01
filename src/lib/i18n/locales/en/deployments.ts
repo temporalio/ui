@@ -52,4 +52,8 @@ export const Strings = {
     'The version is no longer "Current" or "Ramping", but it still has open pinned workflows running on it.',
   'status-tooltip-drained':
     'All pinned workflows that were running on this version are closed.',
+  compute: 'Compute',
+  'edit-version': 'Edit Version',
+  'view-workflows': 'View Workflows',
+  'create-new-version': 'Create New Version',
 } as const;

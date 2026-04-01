@@ -9,14 +9,17 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { type CreateFormData, createSchema } from './shared';
+  import {
+    type CreateDeploymentFormData,
+    createDeploymentSchema,
+  } from './shared';
 
   import ComputeProviderPicker from './compute-provider-picker.svelte';
   import ServerlessWorkerSetupGuide from './serverless-worker-setup-guide.svelte';
 
   type Props = {
     namespace: string;
-    onSubmit: (data: CreateFormData) => Promise<void>;
+    onSubmit: (data: CreateDeploymentFormData) => Promise<void>;
     cancelHref: string;
     submitButtonText: string;
     error?: string;
@@ -32,41 +35,22 @@
 
   const initialData = {
     name: '',
+    buildId: '1.0.0',
     lambdaArn: '',
     iamRoleArn: '',
-    region: '',
-    minInstances: undefined,
-    maxInstances: undefined,
+    maxWorkers: undefined as number | undefined,
+    maxConcurrentActivities: undefined as number | undefined,
+    maxTaskQueueRate: undefined as number | undefined,
+    idleTimeoutSeconds: undefined as number | undefined,
   };
 
   const superform = superForm(initialData, {
     SPA: true,
-    validators: zodClient(createSchema),
+    validators: zodClient(createDeploymentSchema),
     resetForm: false,
     dataType: 'json',
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
-
-      // TODO: Re-enable when backend validation endpoint is available
-      // const [lambdaResult, iamResult] = await Promise.all([
-      //   validateLambdaArn(form.data.lambdaArn),
-      //   validateIamRole(form.data.iamRoleArn),
-      // ]);
-      // if (!lambdaResult?.valid) {
-      //   form.errors.lambdaArn = [
-      //     lambdaResult?.message ??
-      //       translate('workers.validation-function-not-found'),
-      //   ];
-      //   return;
-      // }
-      // if (!iamResult?.valid) {
-      //   form.errors.iamRoleArn = [
-      //     iamResult?.message ??
-      //       translate('workers.validation-permissions-missing'),
-      //   ];
-      //   return;
-      // }
-
       onSubmit(form.data);
     },
   });
@@ -95,6 +79,17 @@
             hintText={$errors.name?.[0] || translate('workers.name-hint')}
             error={!!$errors.name?.[0]}
             placeholder={translate('workers.name-placeholder')}
+            required
+          />
+          <Input
+            bind:value={$form.buildId}
+            id="buildId"
+            name="buildId"
+            label={translate('workers.build-id-label')}
+            hintText={$errors.buildId?.[0] ||
+              translate('workers.build-id-hint')}
+            error={!!$errors.buildId?.[0]}
+            placeholder="1.0.0"
             required
           />
         </div>
@@ -167,30 +162,59 @@
             {#if showScaling}
               <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Input
-                  value={$form.minInstances !== undefined
-                    ? String($form.minInstances)
+                  value={$form.maxWorkers !== undefined
+                    ? String($form.maxWorkers)
                     : ''}
                   oninput={(e) => {
                     const val = (e.currentTarget as HTMLInputElement).value;
-                    $form.minInstances = val === '' ? undefined : Number(val);
+                    $form.maxWorkers = val === '' ? undefined : Number(val);
                   }}
-                  id="minInstances"
-                  name="minInstances"
-                  label={translate('workers.min-instances-label')}
-                  hintText={translate('workers.min-instances-hint')}
+                  id="maxWorkers"
+                  name="maxWorkers"
+                  label={translate('workers.max-workers-label')}
+                  hintText={translate('workers.max-workers-hint')}
                 />
                 <Input
-                  value={$form.maxInstances !== undefined
-                    ? String($form.maxInstances)
+                  value={$form.maxConcurrentActivities !== undefined
+                    ? String($form.maxConcurrentActivities)
                     : ''}
                   oninput={(e) => {
                     const val = (e.currentTarget as HTMLInputElement).value;
-                    $form.maxInstances = val === '' ? undefined : Number(val);
+                    $form.maxConcurrentActivities =
+                      val === '' ? undefined : Number(val);
                   }}
-                  id="maxInstances"
-                  name="maxInstances"
-                  label={translate('workers.max-instances-label')}
-                  hintText={translate('workers.max-instances-hint')}
+                  id="maxConcurrentActivities"
+                  name="maxConcurrentActivities"
+                  label={translate('workers.max-concurrent-activities-label')}
+                  hintText={translate('workers.max-concurrent-activities-hint')}
+                />
+                <Input
+                  value={$form.maxTaskQueueRate !== undefined
+                    ? String($form.maxTaskQueueRate)
+                    : ''}
+                  oninput={(e) => {
+                    const val = (e.currentTarget as HTMLInputElement).value;
+                    $form.maxTaskQueueRate =
+                      val === '' ? undefined : Number(val);
+                  }}
+                  id="maxTaskQueueRate"
+                  name="maxTaskQueueRate"
+                  label={translate('workers.max-task-queue-rate-label')}
+                  hintText={translate('workers.max-task-queue-rate-hint')}
+                />
+                <Input
+                  value={$form.idleTimeoutSeconds !== undefined
+                    ? String($form.idleTimeoutSeconds)
+                    : ''}
+                  oninput={(e) => {
+                    const val = (e.currentTarget as HTMLInputElement).value;
+                    $form.idleTimeoutSeconds =
+                      val === '' ? undefined : Number(val);
+                  }}
+                  id="idleTimeoutSeconds"
+                  name="idleTimeoutSeconds"
+                  label={translate('workers.idle-timeout-label')}
+                  hintText={translate('workers.idle-timeout-hint')}
                 />
               </div>
             {/if}

@@ -402,6 +402,44 @@ export const routeForWorkerDeploymentVersion = ({
   })}/version/${version}`;
 };
 
+export const routeForWorkerDeploymentVersionCreate = ({
+  namespace,
+  deployment,
+}: {
+  namespace: string;
+  deployment: string;
+}): ResolvedPathname => {
+  const deploymentName = encodeURIForSvelte(deployment);
+  return resolve(
+    '/namespaces/[namespace]/workers/deployments/[deployment]/versions/create',
+    {
+      namespace,
+      deployment: deploymentName,
+    },
+  );
+};
+
+export const routeForWorkerDeploymentVersionEdit = ({
+  namespace,
+  deployment,
+  buildId,
+}: {
+  namespace: string;
+  deployment: string;
+  buildId: string;
+}): ResolvedPathname => {
+  const deploymentName = encodeURIForSvelte(deployment);
+  const buildIdEncoded = encodeURIForSvelte(buildId);
+  return resolve(
+    '/namespaces/[namespace]/workers/deployments/[deployment]/versions/[buildId]/edit',
+    {
+      namespace,
+      deployment: deploymentName,
+      buildId: buildIdEncoded,
+    },
+  );
+};
+
 export const routeForServerlessWorkerCreate = ({
   namespace,
 }: {

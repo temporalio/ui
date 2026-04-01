@@ -251,4 +251,19 @@ export const Strings = {
     'Try adjusting or clearing filters to see more results',
   'task-failure-rate': 'Task failure rate',
   'learn-more-link': 'Learn more.',
+  'create-version-title': 'Create Worker Deployment Version',
+  'back-to-deployment': 'Back to {{deployment}}',
+  'create-version-error': 'Failed to create worker deployment version',
+  'build-id-label': 'Build ID',
+  'build-id-hint': 'A unique identifier for this version of your worker.',
+  'max-concurrent-activities-label': 'Max Concurrent Activities',
+  'max-concurrent-activities-hint':
+    'Maximum concurrent activities per worker instance.',
+  'max-task-queue-rate-label': 'Max Task Queue Rate',
+  'max-task-queue-rate-hint': 'Maximum tasks per second for this task queue.',
+  'edit-version-title': 'Edit Worker Deployment Version',
+  'edit-version-title-with-id': 'Edit Version: {{buildId}}',
+  'update-compute-config-unavailable':
+    'Version compute config updates are not yet available.',
+  'delete-version-error': 'Failed to delete worker deployment version',
 } as const;
