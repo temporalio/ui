@@ -24,7 +24,11 @@
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
-  import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
+  import {
+    isNavLinkItem,
+    type NamespaceListItem,
+    type NavLinkListItem,
+  } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
@@ -197,13 +201,17 @@
   let routes = $derived(getRoutes(activeNamespaceName));
   let linkList = $derived(getLinkList(routes, !!$inProgressBatchOperation));
   let linkListForFirstGroup = $derived(
-    linkList.slice(
-      0,
-      linkList.findIndex((item) => 'divider' in item),
-    ),
+    linkList
+      .slice(
+        0,
+        linkList.findIndex((item) => 'divider' in item),
+      )
+      .filter(isNavLinkItem),
   );
   let linkListForSecondGroup = $derived(
-    linkList.slice(linkList.findIndex((item) => 'divider' in item) + 1),
+    linkList
+      .slice(linkList.findIndex((item) => 'divider' in item) + 1)
+      .filter(isNavLinkItem),
   );
   let {
     workflowsRoute,

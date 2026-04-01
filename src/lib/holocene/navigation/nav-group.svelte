@@ -1,26 +1,23 @@
 <script lang="ts">
-  import type { NavLinkListItem } from '$lib/types/global';
-  import { isNavLinkItem } from '$lib/types/global';
+  import type { NavLinkItem } from '$lib/types/global';
 
   import NavigationItem from './navigation-item.svelte';
 
   interface Props {
-    navItems: NavLinkListItem[];
+    navItems: NavLinkItem[];
   }
 
   let { navItems }: Props = $props();
 </script>
 
 {#each navItems as item}
-  {#if isNavLinkItem(item)}
-    <NavigationItem
-      link={item.href}
-      label={item.label}
-      icon={item.icon}
-      tooltip={item.tooltip || item.label}
-      external={item.external}
-      animate={item.animate}
-      isActive={item.isActive}
-    />
-  {/if}
+  <NavigationItem
+    link={item.href}
+    label={item.label}
+    icon={item.icon}
+    tooltip={item.tooltip || item.label}
+    external={item.external}
+    animate={item.animate}
+    isActive={item.isActive}
+  />
 {/each}
