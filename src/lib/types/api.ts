@@ -56,7 +56,11 @@ export type SearchAttributesRoutePath = 'search-attributes';
 export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
 export type WorkerDeploymentAPIRoutePath = 'worker-deployment';
-export type WorkerDeploymentVersionAPIRoutePath = 'worker-deployment-version';
+export type WorkerDeploymentVersionAPIRoutePath =
+  | 'worker-deployment-version'
+  | 'worker-deployment-version-compute-config'
+  | 'worker-deployment-version-validate-compute-config';
+export type WorkerDeploymentVersionsAPIRoutePath = 'worker-deployment-versions';
 export type StandaloneActivitiesAPIRoutePath =
   | 'standalone-activities'
   | 'standalone-activities.count';
@@ -84,6 +88,7 @@ export type APIRoutePath =
   | WorkerDeploymentsAPIRoutePath
   | WorkerDeploymentAPIRoutePath
   | WorkerDeploymentVersionAPIRoutePath
+  | WorkerDeploymentVersionsAPIRoutePath
   | StandaloneActivityAPIRoutePath
   | StandaloneActivitiesAPIRoutePath;
 
@@ -101,6 +106,7 @@ export type APIRouteParameters = {
   activityId: string;
   endpointId: string;
   deploymentName: string;
+  buildId: string;
   version: string;
   workerInstanceKey: string;
 };
@@ -185,5 +191,5 @@ export type WorkerDeploymentRouteParameters = Pick<
 
 export type WorkerDeploymentVersionRouteParameters = Pick<
   APIRouteParameters,
-  'namespace' | 'version'
+  'namespace' | 'deploymentName' | 'buildId'
 >;

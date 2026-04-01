@@ -28,11 +28,20 @@
 {:then deployment}
   {@const info = deployment.workerDeploymentInfo}
   {@const computeConfig = info.computeConfig}
-  {@const providerDetail = computeConfig?.provider?.detailJson
-    ? (JSON.parse(computeConfig.provider.detailJson) as {
+  {@const defaultGroup = computeConfig?.scalingGroups
+    ? Object.values(computeConfig.scalingGroups)[0]
+    : undefined}
+  {@const providerDetail = defaultGroup?.provider?.details?.data
+    ? (JSON.parse(atob(defaultGroup.provider.details.data)) as {
         lambdaArn?: string;
         iamRoleArn?: string;
         region?: string;
+      })
+    : {}}
+  {@const scalerDetail = defaultGroup?.scaler?.details?.data
+    ? (JSON.parse(atob(defaultGroup.scaler.details.data)) as {
+        maxInstances?: number;
+        minInstances?: number;
       })
     : {}}
   {@const worker = {
@@ -48,7 +57,7 @@
     iamRoleArn: providerDetail.iamRoleArn ?? '',
     region: providerDetail.region ?? '',
     taskQueue: '',
-    maxWorkers: computeConfig?.scaler?.maxInstances ?? 0,
+    maxWorkers: scalerDetail.maxInstances ?? 0,
     maxConcurrentActivities: 0,
     maxTaskQueueActivitiesPerSecond: 0,
     idleTimeoutSeconds: 0,

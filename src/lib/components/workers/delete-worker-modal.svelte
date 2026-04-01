@@ -6,9 +6,11 @@
   type Props = {
     open: boolean;
     workerName: string;
+    onConfirm?: () => void;
+    onCancel?: () => void;
   };
 
-  let { open, workerName }: Props = $props();
+  let { open, workerName, onConfirm, onCancel }: Props = $props();
   let deleteInput = $state('');
 
   $effect(() => {
@@ -25,8 +27,8 @@
   cancelText={translate('common.cancel')}
   confirmType="destructive"
   confirmDisabled={deleteInput !== 'DELETE'}
-  on:confirmModal
-  on:cancelModal
+  on:confirmModal={() => onConfirm?.()}
+  on:cancelModal={() => onCancel?.()}
 >
   <h3 slot="title">{translate('workers.delete-serverless-worker')}</h3>
   <div slot="content" class="flex flex-col gap-4">

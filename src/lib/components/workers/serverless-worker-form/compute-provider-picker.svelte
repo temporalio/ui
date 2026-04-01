@@ -5,10 +5,24 @@
   import { RadioCard, RadioGroup } from '$lib/holocene/radio-input';
   import { translate } from '$lib/i18n/translate';
 
-  const provider = writable<string>('lambda');
+  type Props = {
+    provider?: string;
+  };
+
+  let { provider = $bindable('lambda') }: Props = $props();
+
+  const providerStore = writable(provider);
+
+  $effect(() => {
+    providerStore.set(provider);
+  });
+
+  providerStore.subscribe((value) => {
+    provider = value;
+  });
 </script>
 
-<RadioGroup name="provider" group={provider}>
+<RadioGroup name="provider" group={providerStore}>
   <RadioCard
     value="lambda"
     id="provider-lambda"

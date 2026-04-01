@@ -500,7 +500,7 @@
   <DeleteWorkerModal
     open={showDeleteModal}
     workerName={worker.name}
-    on:confirmModal={handleDelete}
-    on:cancelModal={() => (showDeleteModal = false)}
+    onConfirm={handleDelete}
+    onCancel={() => (showDeleteModal = false)}
   />
 {/if}

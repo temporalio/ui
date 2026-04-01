@@ -10,20 +10,11 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    validateIamRole,
-    validateLambdaArn,
-  } from '$lib/services/serverless-worker-service';
-  import type {
-    MockValidationResult,
-    ServerlessWorker,
-  } from '$lib/types/serverless-workers';
+  import type { ServerlessWorker } from '$lib/types/serverless-workers';
 
   import { type EditFormData, editSchema } from './shared';
 
   import ComputeProviderPicker from './compute-provider-picker.svelte';
-
-  type ValidationState = { checking: boolean; result?: MockValidationResult };
 
   type Props = {
     namespace: string;
@@ -64,25 +55,6 @@
   });
 
   const { form, errors, enhance, submitting } = superform;
-
-  let lambdaValidation = $state<ValidationState>({ checking: false });
-  let iamValidation = $state<ValidationState>({ checking: false });
-
-  async function checkLambdaArn() {
-    const arn = $form.lambdaArn;
-    if (!arn || !/^arn:aws:lambda:/.test(arn)) return;
-    lambdaValidation = { checking: true };
-    const result = await validateLambdaArn(arn);
-    lambdaValidation = { checking: false, result };
-  }
-
-  async function checkIamRole() {
-    const arn = $form.iamRoleArn;
-    if (!arn || !/^arn:aws:iam::/.test(arn)) return;
-    iamValidation = { checking: true };
-    const result = await validateIamRole(arn);
-    iamValidation = { checking: false, result };
-  }
 
   let showDeleteModal = $state(false);
 </script>
@@ -145,22 +117,7 @@
               error={!!$errors.lambdaArn?.[0]}
               placeholder={translate('workers.lambda-arn-placeholder')}
               required
-              onblur={checkLambdaArn}
             />
-            {#if lambdaValidation.checking}
-              <div class="flex items-center gap-2 text-xs text-secondary">
-                <Icon name="spinner" class="h-3 w-3 animate-spin" />
-                <span>{translate('workers.validation-checking-lambda')}</span>
-              </div>
-            {:else if lambdaValidation.result}
-              <p
-                class="text-xs"
-                class:text-green-600={lambdaValidation.result.valid}
-                class:text-danger={!lambdaValidation.result.valid}
-              >
-                {lambdaValidation.result.message}
-              </p>
-            {/if}
           </div>
 
           <div class="flex flex-col gap-1">
@@ -183,22 +140,7 @@
               error={!!$errors.iamRoleArn?.[0]}
               placeholder={translate('workers.iam-role-placeholder')}
               required
-              onblur={checkIamRole}
             />
-            {#if iamValidation.checking}
-              <div class="flex items-center gap-2 text-xs text-secondary">
-                <Icon name="spinner" class="h-3 w-3 animate-spin" />
-                <span>{translate('workers.validation-checking-iam')}</span>
-              </div>
-            {:else if iamValidation.result}
-              <p
-                class="text-xs"
-                class:text-green-600={iamValidation.result.valid}
-                class:text-danger={!iamValidation.result.valid}
-              >
-                {iamValidation.result.message}
-              </p>
-            {/if}
           </div>
 
           <div class="border-t border-subtle"></div>
@@ -256,6 +198,6 @@
 <DeleteWorkerModal
   open={showDeleteModal}
   workerName={worker.name}
-  on:confirmModal={onDelete}
-  on:cancelModal={() => (showDeleteModal = false)}
+  onConfirm={onDelete}
+  onCancel={() => (showDeleteModal = false)}
 />

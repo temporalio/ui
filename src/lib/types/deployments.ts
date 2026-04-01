@@ -7,7 +7,8 @@ export interface DeploymentParameters {
 
 export interface DeploymentVersionParameters {
   namespace: string;
-  version: string;
+  deploymentName: string;
+  buildId: string;
 }
 export interface WorkerDeploymentVersion {
   buildId: string;
@@ -66,6 +67,7 @@ export interface VersionSummaryNew {
   routingUpdateTime?: Timestamp;
   firstActivationTime?: Timestamp;
   lastDeactivationTime?: Timestamp;
+  computeConfig?: ComputeConfig;
 }
 
 export interface WorkerDeploymentInfo extends WorkerDeploymentSummary {
@@ -91,6 +93,7 @@ export interface VersioningInfo {
 
 export interface WorkerDeploymentVersionInfo {
   version: string;
+  deploymentVersion?: WorkerDeploymentVersion;
   deploymentName: string;
   createTime: Timestamp;
   routingChangedTime: Timestamp;
@@ -98,6 +101,7 @@ export interface WorkerDeploymentVersionInfo {
   rampingSinceTime: Timestamp;
   rampPercentage: number;
   taskQueueInfos: TaskQueueInfo[];
+  computeConfig?: ComputeConfig;
   drainageInfo: {
     status: string;
     lastChangedTime: Timestamp;
@@ -112,25 +116,43 @@ export interface WorkerDeploymentVersionResponse {
   workerDeploymentVersionInfo: WorkerDeploymentVersionInfo;
 }
 
-export interface ComputeScaler {
-  minInstances?: number;
-  maxInstances?: number;
+export interface Payload {
+  metadata?: { encoding?: string; [key: string]: string | undefined };
+  data?: string;
 }
 
 export interface ComputeProvider {
-  type: string;
-  detailJson?: string;
+  type?: string;
+  details?: Payload;
+  nexusEndpoint?: string;
+}
+
+export interface ComputeScaler {
+  type?: string;
+  details?: Payload;
+}
+
+export interface ComputeConfigScalingGroup {
+  taskQueueTypes?: string[];
+  provider?: ComputeProvider;
+  scaler?: ComputeScaler;
 }
 
 export interface ComputeConfig {
-  provider?: ComputeProvider;
-  scaler?: ComputeScaler;
+  scalingGroups?: { [key: string]: ComputeConfigScalingGroup };
 }
 
 export interface CreateWorkerDeploymentRequest {
   namespace: string;
   deploymentName: string;
+}
+
+export interface CreateWorkerDeploymentVersionRequest {
+  namespace: string;
+  deploymentVersion: { deploymentName: string; buildId: string };
   computeConfig?: ComputeConfig;
+  identity?: string;
+  requestId?: string;
 }
 
 export interface CreateWorkerDeploymentResponse {
