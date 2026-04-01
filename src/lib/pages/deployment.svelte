@@ -92,7 +92,7 @@
         >
           {translate('deployments.create-new-version')}
         </Button>
-        {#if info.versionSummaries.length === 0}
+        {#if !info.versionSummaries?.length}
           <Button
             variant="destructive"
             on:click={() => (showDeleteModal = true)}
@@ -125,7 +125,7 @@
       nextPageButtonLabel={translate('common.next-page')}
       previousPageButtonLabel={translate('common.previous-page')}
       pageButtonLabel={(p) => translate('common.go-to-page', { page: p })}
-      items={info.versionSummaries}
+      items={info.versionSummaries ?? []}
       let:visibleItems
     >
       <caption class="sr-only" slot="caption">
