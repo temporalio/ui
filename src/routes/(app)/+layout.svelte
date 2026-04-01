@@ -13,7 +13,6 @@
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
-  import NavGroup from '$lib/holocene/navigation/nav-group.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
@@ -215,9 +214,6 @@
   let linkList = $derived(
     getNavPrimaryLinks(routes, !!$inProgressBatchOperation),
   );
-  let linkListForFirstGroup = $derived(
-    getNavPrimaryLinks(routes, !!$inProgressBatchOperation),
-  );
   let linkListForSecondGroup = $derived(
     getNavSecondaryLinks(routes, !!$inProgressBatchOperation),
   );
@@ -301,12 +297,7 @@
     position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud}>
-      {#snippet navContent()}
-        <NavGroup navItems={linkListForFirstGroup} />
-        <hr class="my-4 border-subtle group-data-[nav=closed]:hidden" />
-        <NavGroup navItems={linkListForSecondGroup} />
-      {/snippet}
+    <SideNavigation sections={[linkList, linkListForSecondGroup]} {isCloud}>
       {#snippet bottom()}
         {#if !isCloud}
           <NavigationItem
