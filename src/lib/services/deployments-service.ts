@@ -174,7 +174,7 @@ export const buildLambdaComputeConfig = (
     idleTimeoutSeconds?: number;
   },
 ): ComputeConfig => {
-  const providerJson = JSON.stringify({ lambdaArn, iamRoleArn });
+  const providerJson = JSON.stringify({ arn: lambdaArn, role: iamRoleArn });
   const providerData = btoa(providerJson);
 
   const scalerDetails =
@@ -194,14 +194,14 @@ export const buildLambdaComputeConfig = (
           'TASK_QUEUE_TYPE_ACTIVITY',
         ],
         provider: {
-          type: 'lambda',
+          type: 'aws-lambda',
           details: {
             metadata: { encoding },
             data: providerData,
           },
         },
         scaler: {
-          type: 'lambda',
+          type: 'no-sync',
           details: {
             metadata: { encoding },
             data: scalerData,

@@ -86,11 +86,6 @@
 
 <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
   <div class="col-span-1 flex flex-col gap-6 xl:col-span-2">
-    {#if error}
-      <Alert intent="error" title={translate('common.error-occurred')}
-        >{error}</Alert
-      >
-    {/if}
     <form class="flex w-full flex-col gap-6" use:enhance novalidate>
       <Card>
         <h3 class="mb-1 text-base font-semibold">
@@ -250,6 +245,12 @@
           </div>
         </ComputeProviderPicker>
       </Card>
+
+      {#if error}
+        <Alert intent="error" title={translate('common.error-occurred')}
+          >{error}</Alert
+        >
+      {/if}
 
       <div class="flex gap-4">
         <Button type="submit" loading={$submitting}>
