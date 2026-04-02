@@ -4,6 +4,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { sdkInfo } from '$lib/stores/events';
+  import { minimumVersionRequired } from '$lib/utilities/version-check';
 
   const supportedVersions = [
     {
@@ -33,7 +34,9 @@
     },
   ];
   const currentSdk = $derived(
-    supportedVersions.find(({ sdk }) => sdk === $sdkInfo.sdk),
+    supportedVersions.find(
+      ({ sdk }) => sdk.toLowerCase() === $sdkInfo.sdk.toLowerCase(),
+    ),
   );
 </script>
 
@@ -49,15 +52,15 @@
     <h5>{translate('workers.no-worker-heartbeats')}</h5>
     {#if currentSdk}
       {@const { href, sdk, version } = currentSdk}
-      <p class="flex flex-row text-secondary">
-        {translate('workers.worker-heartbeats-sdk-link-preface')}
-        <Link newTab {href}>
-          <SdkLogo {sdk} {version} />
-        </Link>
-        <span class="ml-1"
-          >{translate('workers.worker-heartbeats-sdk-link-postface')}</span
-        >
-      </p>
+      {#if !minimumVersionRequired(version, $sdkInfo.version)}
+        <p class="flex flex-row gap-1 text-secondary">
+          {translate('workers.worker-heartbeats-sdk-link-preface')}
+          <Link newTab {href}>
+            <SdkLogo {sdk} {version} />
+          </Link>
+          {translate('workers.worker-heartbeats-sdk-link-postface')}
+        </p>
+      {/if}
     {:else}
       <p class="text-secondary">
         {translate('workers.worker-heartbeats-sdk-list-preface')}
