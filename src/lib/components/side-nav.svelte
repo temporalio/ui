@@ -13,7 +13,7 @@
   }
 
   let isNotLastItem = (section: NavLinkItem[], i: number): boolean => {
-    return i + 1 != section.length;
+    return i != section.length - 1;
   };
 
   let { isCloud = false, sections, bottom }: Props = $props();

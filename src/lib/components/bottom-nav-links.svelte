@@ -1,10 +1,10 @@
 <script lang="ts">
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
-  import type { NavLinkListItem } from '$lib/types/global';
+  import type { NavLinkItem } from '$lib/types/global';
 
   export let open = false;
-  export let linkList: NavLinkListItem[];
-  export let secondaryLinkList: NavLinkListItem[] = [];
+  export let linkList: NavLinkItem[];
+  export let secondaryLinkList: NavLinkItem[] = [];
 </script>
 
 {#if open}

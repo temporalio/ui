@@ -155,8 +155,3 @@ export type NavLinkItem = {
   animate?: boolean;
   isActive?: (path: string) => boolean;
 };
-
-export type NavLinkListItem = NavLinkItem;
-export function isNavLinkItem(item: NavLinkListItem): item is NavLinkItem {
-  return 'href' in item;
-}
