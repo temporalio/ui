@@ -1,56 +1,36 @@
 <script lang="ts">
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { StructuredCalendar } from '$lib/types/schedule';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { getScheduleSpecLabel } from '$lib/utilities/schedule-spec-label';
 
-  import type { IntervalSpec } from '$types';
+  import type { ScheduleSpec } from '$types';
 
   interface Props {
     class?: ClassNameValue;
-    frequency: (StructuredCalendar | IntervalSpec)[];
-    timezoneName?: string;
-    inline?: boolean;
+    spec: ScheduleSpec;
   }
 
-  let {
-    class: className = '',
-    frequency,
-    timezoneName = 'UTC',
-    inline = false,
-  }: Props = $props();
+  let { spec, class: className = '' }: Props = $props();
 
+  const timezoneName = $derived(spec?.timezoneName ?? 'UTC');
   const cronString = $derived(
-    frequency.length > 0 && 'comment' in frequency[0] && frequency[0].comment
-      ? frequency[0].comment
+    spec?.structuredCalendar?.length > 0 &&
+      !!spec?.structuredCalendar[0].comment
+      ? spec?.structuredCalendar[0].comment
       : '',
   );
 </script>
 
-{#key frequency}
-  <div class={twMerge('flex flex-col', className)}>
-    <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
-    <div class="flex flex-col gap-2">
-      {#if cronString}
-        <CodeBlock
-          copyable
-          {inline}
-          testId="schedule-cron-string"
-          language="text"
-          content={cronString}
-        />
-      {:else}
-        <CodeBlock
-          copyable
-          {inline}
-          testId="schedule-calendar"
-          language="json"
-          content={stringifyWithBigInt(frequency, null, 2)}
-          {...frequency.length > 1 ? { maxHeight: 600 } : {}}
-        />
-      {/if}
-    </div>
+<div class={twMerge('flex flex-col', className)}>
+  <div class="flex flex-col gap-2">
+    {#if cronString}
+      <p>{cronString}</p>
+    {:else}
+      <p>{getScheduleSpecLabel(spec, timezoneName)}</p>
+    {/if}
   </div>
-{/key}
+  <p class="text-secondary">
+    {@html translate('common.timezone', { timezone: timezoneName })}
+  </p>
+</div>

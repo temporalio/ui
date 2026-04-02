@@ -29,6 +29,7 @@
     'samples-python',
     'samples-dotnet',
     'samples-php',
+    'samples-ruby',
   ];
 </script>
 
