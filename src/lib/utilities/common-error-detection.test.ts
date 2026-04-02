@@ -74,6 +74,12 @@ describe('durationToSeconds', () => {
     expect(durationToSeconds('')).toBe(0);
   });
 
+  it('parses protobuf Duration objects with nanos', () => {
+    expect(durationToSeconds({ seconds: '10', nanos: 500000000 })).toBe(10.5);
+    expect(durationToSeconds({ seconds: '0', nanos: 500000000 })).toBe(0.5);
+    expect(durationToSeconds({ seconds: '3600' })).toBe(3600);
+  });
+
   it('parses "Ns" format', () => {
     expect(durationToSeconds('10s')).toBe(10);
     expect(durationToSeconds('3600s')).toBe(3600);
@@ -178,14 +184,14 @@ describe('detectWorkflowErrors', () => {
     );
   });
 
-  it('detects #31: history events > 4000', () => {
-    const workflow = makeWorkflow({ historyEvents: '5000' });
+  it('detects #31: history events > 10000', () => {
+    const workflow = makeWorkflow({ historyEvents: '15000' });
     const errors = detectWorkflowErrors(workflow);
     expect(errors.some((e) => e.id === 31)).toBe(true);
   });
 
-  it('does not fire #31 for <= 4000 events', () => {
-    const workflow = makeWorkflow({ historyEvents: '4000' });
+  it('does not fire #31 for <= 10000 events', () => {
+    const workflow = makeWorkflow({ historyEvents: '10000' });
     expect(detectWorkflowErrors(workflow).some((e) => e.id === 31)).toBe(false);
   });
 });
@@ -331,6 +337,30 @@ describe('detectFirstEventErrors', () => {
     const event = makeFirstEvent({ retryPolicy: null });
     expect(
       detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 10),
+    ).toBe(false);
+  });
+
+  it('does not fire #10 when retryPolicy is empty object', () => {
+    const event = makeFirstEvent({ retryPolicy: {} });
+    expect(
+      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 10),
+    ).toBe(false);
+  });
+
+  it('detects #3: very short run timeout from first event', () => {
+    const event = makeFirstEvent({
+      workflowRunTimeout: '1 minute',
+    });
+    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    expect(errors.some((e) => e.id === 3)).toBe(true);
+  });
+
+  it('does not fire #3 for run timeout >= 120s', () => {
+    const event = makeFirstEvent({
+      workflowRunTimeout: '5 minutes',
+    });
+    expect(
+      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 3),
     ).toBe(false);
   });
 

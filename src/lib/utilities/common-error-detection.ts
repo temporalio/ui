@@ -19,7 +19,8 @@ export function durationToSeconds(duration: unknown): number {
     'seconds' in duration
   ) {
     const seconds = Number((duration as { seconds: string | number }).seconds);
-    return isNaN(seconds) ? 0 : seconds;
+    const nanos = Number((duration as { nanos?: number }).nanos);
+    return (isNaN(seconds) ? 0 : seconds) + (isNaN(nanos) ? 0 : nanos / 1e9);
   }
 
   if (typeof duration !== 'string') return 0;
@@ -48,21 +49,26 @@ export function detectWorkflowErrors(
 ): CommonError[] {
   const errors: CommonError[] = [];
 
+  const addError = (id: number) => {
+    const err = getCommonErrorById(id);
+    if (err) errors.push(err);
+  };
+
   const execTimeout = durationToSeconds(workflow.workflowExecutionTimeout);
   if (execTimeout > 0) {
-    errors.push(getCommonErrorById(1));
+    addError(1);
     if (execTimeout < 120) {
-      errors.push(getCommonErrorById(3));
+      addError(3);
     }
   }
 
   const taskTimeout = durationToSeconds(workflow.defaultWorkflowTaskTimeout);
   if (taskTimeout > 0 && taskTimeout !== 10) {
-    errors.push(getCommonErrorById(4));
+    addError(4);
     if (taskTimeout > 10) {
-      errors.push(getCommonErrorById(5));
+      addError(5);
     } else {
-      errors.push(getCommonErrorById(6));
+      addError(6);
     }
   }
 
@@ -75,26 +81,26 @@ export function detectWorkflowErrors(
       new Date(workflow.endTime).getTime() -
       new Date(workflow.startTime).getTime();
     if (durationMs < 2000) {
-      errors.push(getCommonErrorById(7));
+      addError(7);
     }
   }
 
   const startDelay = durationToSeconds(workflow.startDelay);
   if (startDelay > 0) {
     if (startDelay > 86400) {
-      errors.push(getCommonErrorById(24));
+      addError(24);
     }
     if (startDelay < 1) {
-      errors.push(getCommonErrorById(25));
+      addError(25);
     }
   }
 
   const historyEvents = parseInt(workflow.historyEvents, 10);
-  if (historyEvents > 4000) {
-    errors.push(getCommonErrorById(31));
+  if (historyEvents > 10000) {
+    addError(31);
   }
 
-  return errors.filter(Boolean);
+  return errors;
 }
 
 export function detectActivityErrors(
@@ -162,14 +168,28 @@ export function detectFirstEventErrors(
     | undefined;
   if (!attrs) return [];
 
+  const addError = (id: number) => {
+    const err = getCommonErrorById(id);
+    if (err) errors.push(err);
+  };
+
   const execTimeout = durationToSeconds(attrs.workflowExecutionTimeout);
   const runTimeout = durationToSeconds(attrs.workflowRunTimeout);
   if (execTimeout > 0 && runTimeout > 0 && execTimeout <= runTimeout) {
-    errors.push(getCommonErrorById(2));
+    addError(2);
   }
 
-  if (attrs.retryPolicy) {
-    errors.push(getCommonErrorById(10));
+  if (runTimeout > 0 && runTimeout < 120) {
+    addError(3);
+  }
+
+  const retryPolicy = attrs.retryPolicy;
+  if (
+    retryPolicy &&
+    typeof retryPolicy === 'object' &&
+    Object.keys(retryPolicy).length > 0
+  ) {
+    addError(10);
   }
 
   const input = attrs.input;
@@ -177,21 +197,21 @@ export function detectFirstEventErrors(
     ? input
     : (input as { payloads?: unknown[] })?.payloads;
   if (Array.isArray(payloads) && payloads.length > 1) {
-    errors.push(getCommonErrorById(32));
+    addError(32);
   }
 
   const reusePolicy = String(attrs.workflowIdReusePolicy ?? '');
   if (reusePolicy.includes('TERMINATE_IF_RUNNING')) {
-    errors.push(getCommonErrorById(33));
+    addError(33);
   }
   if (
     reusePolicy.includes('REJECT_DUPLICATE') ||
     reusePolicy.includes('ALLOW_DUPLICATE_FAILED_ONLY')
   ) {
-    errors.push(getCommonErrorById(34));
+    addError(34);
   }
 
-  return errors.filter(Boolean);
+  return errors;
 }
 
 export function getApplicableCommonErrors(
