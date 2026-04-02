@@ -50,7 +50,7 @@
     dataType: 'json',
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
-      onSubmit(form.data);
+      await onSubmit(form.data);
     },
   });
 

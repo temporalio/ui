@@ -58,7 +58,7 @@
           error = err.statusText || translate('workers.create-version-error');
         },
       );
-      if (!error) onSuccess();
+      if (!error) await onSuccess();
     }}
   />
 </div>
