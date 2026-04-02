@@ -2,6 +2,7 @@
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -27,18 +28,20 @@
     onSubmit: (
       data: CreateDeploymentFormData,
     ) => Promise<SubmitFieldErrors | void>;
+    onSuccess: () => void;
     cancelHref: string;
     submitButtonText: string;
-    error?: string;
   };
 
   let {
     namespace: _namespace,
     onSubmit,
+    onSuccess,
     cancelHref,
     submitButtonText,
-    error,
   }: Props = $props();
+
+  let error = $state<string | undefined>();
 
   const initialData = {
     name: '',
@@ -58,12 +61,20 @@
     dataType: 'json',
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
-      const fieldErrors = await onSubmit(form.data);
-      if (fieldErrors) {
-        if (fieldErrors.lambdaArn)
-          form.errors.lambdaArn = fieldErrors.lambdaArn;
-        if (fieldErrors.iamRoleArn)
-          form.errors.iamRoleArn = fieldErrors.iamRoleArn;
+      error = undefined;
+      try {
+        const fieldErrors = await onSubmit(form.data);
+        if (fieldErrors) {
+          if (fieldErrors.lambdaArn)
+            form.errors.lambdaArn = fieldErrors.lambdaArn;
+          if (fieldErrors.iamRoleArn)
+            form.errors.iamRoleArn = fieldErrors.iamRoleArn;
+          return;
+        }
+        await onSuccess();
+        return { type: 'success' as const };
+      } catch (e) {
+        error = e instanceof Error ? e.message : 'An unexpected error occurred';
       }
     },
   });
@@ -75,6 +86,11 @@
 
 <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
   <div class="col-span-1 flex flex-col gap-6 xl:col-span-2">
+    {#if error}
+      <Alert intent="error" title={translate('common.error-occurred')}
+        >{error}</Alert
+      >
+    {/if}
     <form class="flex w-full flex-col gap-6" use:enhance novalidate>
       <Card>
         <h3 class="mb-1 text-base font-semibold">

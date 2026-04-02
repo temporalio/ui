@@ -22,25 +22,24 @@
   };
 
   let { namespace, onSuccess }: Props = $props();
-
-  let error = $state<string | undefined>();
 </script>
 
 <ServerlessWorkerCreateForm
   {namespace}
   submitButtonText={translate('workers.create-serverless-worker')}
   cancelHref={routeForWorkers({ namespace })}
-  {error}
+  {onSuccess}
   onSubmit={async (data): Promise<SubmitFieldErrors | void> => {
-    error = undefined;
+    let caughtError: string | undefined;
 
     const deploymentResponse = await createWorkerDeployment(
       { namespace, deploymentName: data.name },
       (err) => {
-        error = err.statusText || 'Failed to create deployment';
+        caughtError =
+          err.body?.message || err.statusText || 'Failed to create deployment';
       },
     );
-    if (error) return;
+    if (caughtError) throw new Error(caughtError);
 
     const computeConfig = buildLambdaComputeConfig(
       data.lambdaArn,
@@ -53,6 +52,7 @@
       },
     );
 
+    let versionError: string | undefined;
     await createWorkerDeploymentVersion(
       {
         namespace,
@@ -60,25 +60,27 @@
         computeConfig,
       },
       (err) => {
-        error = err.statusText || 'Failed to create deployment version';
-        console.error('createWorkerDeploymentVersion failed:', err);
+        versionError =
+          err.body?.message ||
+          err.statusText ||
+          'Failed to create deployment version';
       },
     );
 
-    if (error) {
+    if (versionError) {
+      let rollbackMessage = versionError;
       await deleteWorkerDeployment(
         {
           namespace,
           deploymentName: data.name,
           conflictToken: deploymentResponse.conflictToken,
         },
-        (rollbackErr) => {
-          error =
+        () => {
+          rollbackMessage =
             'Failed to create deployment version. The deployment could not be cleaned up automatically — delete it manually from the deployments list.';
-          console.error('Rollback deleteWorkerDeployment failed:', rollbackErr);
         },
       );
-      return;
+      throw new Error(rollbackMessage);
     }
 
     let validateError: string | undefined;
@@ -90,14 +92,15 @@
         computeConfig,
       },
       (err) => {
-        if (err.status === 501 || err.statusText?.includes('Unimplemented'))
-          return;
-        validateError = err.statusText || 'Failed to validate compute config';
+        if (err.status === 501) return;
+        validateError =
+          err.body?.message ||
+          err.statusText ||
+          'Failed to validate compute config';
       },
     );
 
     if (!validateError && (!validation || validation.valid !== false)) {
-      onSuccess();
       return;
     }
 
@@ -107,12 +110,8 @@
     let rollbackFailed = false;
     await deleteWorkerDeploymentVersion(
       { namespace, deploymentName: data.name, buildId: data.buildId },
-      (rollbackErr) => {
+      () => {
         rollbackFailed = true;
-        console.error(
-          'Rollback deleteWorkerDeploymentVersion failed:',
-          rollbackErr,
-        );
       },
     );
     if (!rollbackFailed) {
@@ -122,26 +121,22 @@
           deploymentName: data.name,
           conflictToken: deploymentResponse.conflictToken,
         },
-        (rollbackErr) => {
+        () => {
           rollbackFailed = true;
-          console.error('Rollback deleteWorkerDeployment failed:', rollbackErr);
         },
       );
     }
 
     if (rollbackFailed) {
-      error =
-        'Compute config validation failed and resources could not be cleaned up automatically. Delete the deployment and version manually, then try again.';
-      return;
+      throw new Error(
+        'Compute config validation failed and resources could not be cleaned up automatically. Delete the deployment and version manually, then try again.',
+      );
     }
 
     const lower = message.toLowerCase();
-    if (lower.includes('lambda')) {
-      return { lambdaArn: [message] };
-    }
-    if (lower.includes('iam') || lower.includes('role')) {
+    if (lower.includes('lambda')) return { lambdaArn: [message] };
+    if (lower.includes('iam') || lower.includes('role'))
       return { iamRoleArn: [message] };
-    }
-    error = message;
+    throw new Error(message);
   }}
 />
