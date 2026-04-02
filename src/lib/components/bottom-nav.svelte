@@ -12,7 +12,7 @@
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
+  import type { NamespaceListItem, NavLinkItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
   import ziggy from '$lib/vendor/ziggy-full-face.png';
 
@@ -22,8 +22,7 @@
 
   interface Props {
     namespaceList?: NamespaceListItem[];
-    linkList: NavLinkListItem[];
-    secondaryLinkList?: NavLinkListItem[];
+    sections: NavLinkItem[][];
     isCloud?: boolean;
     showNamespacePicker?: boolean;
     children?: Snippet;
@@ -40,8 +39,7 @@
 
   let {
     namespaceList = [],
-    linkList,
-    secondaryLinkList = [],
+    sections,
     isCloud = false,
     showNamespacePicker = true,
     children,
@@ -122,7 +120,7 @@
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
   >
-    <BottomNavLinks open={viewLinks} {linkList} {secondaryLinkList} />
+    <BottomNavLinks open={viewLinks} {sections} />
     {#if nsPicker}
       {@render nsPicker({ open: viewNamespaces, closeMenu })}
     {:else}
