@@ -7,7 +7,9 @@
   const { workflow } = $derived($workflowRun);
   const firstEvent = $derived($fullEventHistory[0]);
   const errors = $derived(
-    workflow ? getApplicableCommonErrors(workflow, firstEvent) : [],
+    workflow
+      ? getApplicableCommonErrors(workflow, firstEvent, $fullEventHistory)
+      : [],
   );
 </script>
 
