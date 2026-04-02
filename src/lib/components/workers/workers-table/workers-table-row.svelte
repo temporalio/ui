@@ -51,7 +51,7 @@
       : undefined}
     {filterable}
   />
-  <!-- TODO: Make Build ID filterable when API supports it -->
+  <!-- TODO: Make Build ID filterable with DT-3745 -->
   <WorkersTableCell
     attribute="BuildId"
     value={worker.workerHeartbeat?.deploymentVersion?.buildId}

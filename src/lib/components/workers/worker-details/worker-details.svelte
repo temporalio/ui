@@ -151,7 +151,7 @@
     </DetailListColumn>
 
     <DetailListColumn>
-      <!-- TODO: Make filterable link for Build ID when API supports it -->
+      <!-- TODO: Make filterable link for Build ID with DT-3745 -->
       <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
       <DetailListTextValue
         copyable={!!heartbeat?.deploymentVersion?.buildId}

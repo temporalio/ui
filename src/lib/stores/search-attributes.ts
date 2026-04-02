@@ -200,7 +200,7 @@ export const workerSearchAttributes: Readable<SearchAttributes> = readable({
   StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
   LastHeartbeatTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
   DeploymentName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-  // BuildId: SEARCH_ATTRIBUTE_TYPE.KEYWORD, // TODO: Add back when API supports it
+  // BuildId: SEARCH_ATTRIBUTE_TYPE.KEYWORD, // TODO: Add back with DT-3745
   SdkName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   SdkVersion: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
 });
