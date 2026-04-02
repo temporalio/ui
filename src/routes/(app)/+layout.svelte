@@ -344,8 +344,7 @@
     </div>
     <BottomNavigation
       slot="footer"
-      {linkList}
-      secondaryLinkList={linkListForSecondGroup}
+      sections={[linkList, linkListForSecondGroup]}
       {namespaceList}
       {isCloud}
       {showNamespacePicker}

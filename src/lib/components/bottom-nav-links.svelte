@@ -1,44 +1,26 @@
 <script lang="ts">
-  import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
+  import NavSection from '$lib/holocene/navigation/nav-section.svelte';
   import type { NavLinkItem } from '$lib/types/global';
 
-  export let open = false;
-  export let linkList: NavLinkItem[];
-  export let secondaryLinkList: NavLinkItem[] = [];
+  interface Props {
+    open?: boolean;
+    sections: NavLinkItem[][];
+  }
+
+  let { open = false, sections }: Props = $props();
+
+  const isNotLastSection = (i: number): boolean => i !== sections.length - 1;
 </script>
 
 {#if open}
   <div
     class="flex h-full flex-col-reverse justify-start gap-6 overflow-auto px-4 py-8"
   >
-    {#each linkList as item (item.label)}
-      {#if 'divider' in item && item.divider}
+    {#each sections as section, i (i)}
+      <NavSection navItems={section} />
+      {#if isNotLastSection(i)}
         <hr class="border-subtle" />
-      {:else if 'href' in item}
-        <NavigationItem
-          link={item.href}
-          label={item.label}
-          icon={item.icon}
-          tooltip={item.tooltip || item.label}
-          external={item?.external}
-          animate={item?.animate}
-        />
       {/if}
     {/each}
-    {#if secondaryLinkList.length > 0}
-      <hr class="border-subtle" />
-      {#each secondaryLinkList as item (item.label)}
-        {#if 'href' in item}
-          <NavigationItem
-            link={item.href}
-            label={item.label}
-            icon={item.icon}
-            tooltip={item.tooltip || item.label}
-            external={item?.external}
-            animate={item?.animate}
-          />
-        {/if}
-      {/each}
-    {/if}
   </div>
 {/if}
