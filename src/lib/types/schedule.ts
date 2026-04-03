@@ -28,7 +28,11 @@ export type SchedulePreset =
   | 'month'
   | 'string';
 
+export type ScheduleSpecType = 'cron' | 'week' | 'month' | 'interval';
+
 export type ScheduleOffsetUnit = 'days' | 'hrs' | 'min' | 'sec';
+
+export type EndDateType = 'never' | 'on' | 'after';
 
 export type ScheduleStatus = 'Paused' | 'Running';
 
