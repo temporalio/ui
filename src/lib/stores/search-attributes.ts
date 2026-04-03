@@ -1,4 +1,4 @@
-import { derived, get, type Readable, writable } from 'svelte/store';
+import { derived, get, readable, type Readable, writable } from 'svelte/store';
 
 import { z } from 'zod/v3';
 
@@ -191,59 +191,60 @@ export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
       });
   });
 
-export const activitySearchAttributeOptions: Readable<SearchAttributeOption[]> =
-  derived(customSearchAttributeOptions, ($customSearchAttributeOptions) => {
-    return [
-      {
-        label: 'ExecutionStatus',
-        value: 'ExecutionStatus',
-        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      },
-      {
-        label: 'ActivityId',
-        value: 'ActivityId',
-        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      },
-      {
-        label: 'ActivityType',
-        value: 'ActivityType',
-        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      },
-      { label: 'RunId', value: 'RunId', type: SEARCH_ATTRIBUTE_TYPE.KEYWORD },
-      {
-        label: 'TaskQueue',
-        value: 'TaskQueue',
-        type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      },
-      {
-        label: 'StartTime',
-        value: 'StartTime',
-        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-      },
-      {
-        label: 'ExecutionTime',
-        value: 'ExecutionTime',
-        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-      },
-      {
-        label: 'CloseTime',
-        value: 'CloseTime',
-        type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-      },
-      {
-        label: 'ExecutionDuration',
-        value: 'ExecutionDuration',
-        type: SEARCH_ATTRIBUTE_TYPE.INT,
-      },
-      {
-        label: 'StateTransitionCount',
-        value: 'StateTransitionCount',
-        type: SEARCH_ATTRIBUTE_TYPE.INT,
-      },
-      ...$customSearchAttributeOptions,
-    ].sort((a, b) => {
-      if (a.label < b.label) return -1;
-      if (a.label > b.label) return 1;
-      return 0;
+export const workerSearchAttributes: Readable<SearchAttributes> = readable({
+  WorkerStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  WorkerInstanceKey: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  WorkerIdentity: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  HostName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  LastHeartbeatTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+  DeploymentName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  // BuildId: SEARCH_ATTRIBUTE_TYPE.KEYWORD, // TODO: Add back with DT-3745
+  SdkName: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  SdkVersion: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+});
+
+export const workerSearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived(workerSearchAttributes, ($workerSearchAttributes) => {
+    return Object.entries($workerSearchAttributes).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
     });
+  });
+
+export const activitySearchAttributes: Readable<SearchAttributes> = derived(
+  customSearchAttributes,
+  ($customSearchAttributes) => ({
+    ExecutionStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ActivityId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ActivityType: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    ExecutionTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    ExecutionDuration: SEARCH_ATTRIBUTE_TYPE.INT,
+    StateTransitionCount: SEARCH_ATTRIBUTE_TYPE.INT,
+    ...$customSearchAttributes,
+  }),
+);
+export const activitySearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived(activitySearchAttributes, ($activitySearchAttributes) => {
+    return Object.entries($activitySearchAttributes)
+      .map(([key, value]) => {
+        return {
+          label: key,
+          value: key,
+          type: value,
+        };
+      })
+      .sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        return 0;
+      });
   });

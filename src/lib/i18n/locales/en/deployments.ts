@@ -12,7 +12,6 @@ export const Strings = {
   'error-message-fetching': 'Error fetching deployments',
   'empty-state-description':
     'Want to learn about versioning? <value proposition about versioning and why you should use it>. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae lacus eu mauris facilisis sodales.',
-  name: 'Deployment Name',
   'current-version': 'Current Version',
   'deployment-version': 'Deployment Version',
   'build-id': 'Build ID',
