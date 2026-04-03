@@ -55,7 +55,9 @@ export type ScheduleAPIRoutePath =
 export type SearchAttributesRoutePath = 'search-attributes';
 export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
-export type WorkerDeploymentAPIRoutePath = 'worker-deployment';
+export type WorkerDeploymentAPIRoutePath =
+  | 'worker-deployment'
+  | 'worker-deployment-set-current-version';
 export type WorkerDeploymentVersionAPIRoutePath =
   | 'worker-deployment-version'
   | 'worker-deployment-version-compute-config'

@@ -39,13 +39,8 @@
 
   const columns = [
     { label: translate('deployments.name') },
-    {
-      label: translate('deployments.build-id'),
-    },
-    { label: translate('deployments.deployed') },
-    {
-      label: translate('deployments.actions'),
-    },
+    { label: translate('deployments.latest-version') },
+    { label: translate('deployments.created') },
   ];
 </script>
 
@@ -57,10 +52,12 @@
           id="deployment-filter"
           bind:value={filter}
           icon="search"
-          label={translate('workers.filter-workers')}
+          label={translate('deployments.filter-deployments')}
           labelHidden
           type="search"
-          placeholder={translate('workers.filter-placeholder')}
+          placeholder={translate(
+            'deployments.worker-deployments-search-placeholder',
+          )}
           class="flex-1"
         />
         <Button variant="primary" href={createHref}>

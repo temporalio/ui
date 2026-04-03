@@ -7,6 +7,7 @@
     createWorkerDeploymentVersion,
     deleteWorkerDeployment,
     deleteWorkerDeploymentVersion,
+    setCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { routeForWorkers } from '$lib/utilities/route-for';
@@ -19,6 +20,7 @@
   type SubmitFieldErrors = {
     lambdaArn?: string[];
     iamRoleArn?: string[];
+    roleExternalId?: string[];
   };
 
   let { namespace, onSuccess }: Props = $props();
@@ -45,10 +47,12 @@
       data.lambdaArn,
       data.iamRoleArn,
       {
-        maxWorkers: data.maxWorkers,
-        maxConcurrentActivities: data.maxConcurrentActivities,
-        maxTaskQueueRate: data.maxTaskQueueRate,
-        idleTimeoutSeconds: data.idleTimeoutSeconds,
+        roleExternalId: data.roleExternalId,
+        scaleUpCooloffMs: data.scaleUpCooloffMs,
+        scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+        maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+        scaleUpDispatchRateEpsilon: data.scaleUpDispatchRateEpsilon,
+        metricsPollIntervalMs: data.metricsPollIntervalMs,
       },
     );
 
@@ -101,6 +105,11 @@
     );
 
     if (!validateError && (!validation || validation.valid !== false)) {
+      await setCurrentDeploymentVersion({
+        namespace,
+        deploymentName: data.name,
+        buildId: data.buildId,
+      });
       return;
     }
 

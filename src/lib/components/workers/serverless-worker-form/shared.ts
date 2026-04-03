@@ -12,13 +12,15 @@ const arnFields = {
     .string()
     .min(1, 'IAM Role ARN is required')
     .regex(/^arn:aws:iam::\d{12}:role\/.+$/, 'Invalid IAM Role ARN format'),
+  roleExternalId: z.string().min(1, 'External ID is required'),
 };
 
 const scalingFields = {
-  maxWorkers: z.number().int().min(1).optional(),
-  maxConcurrentActivities: z.number().int().min(1).optional(),
-  maxTaskQueueRate: z.number().int().min(1).optional(),
-  idleTimeoutSeconds: z.number().int().min(0).optional(),
+  scaleUpCooloffMs: z.number().int().min(0).optional(),
+  scaleUpBacklogThreshold: z.number().int().min(0).optional(),
+  maxWorkerLifetimeMs: z.number().int().min(0).optional(),
+  scaleUpDispatchRateEpsilon: z.number().min(0).optional(),
+  metricsPollIntervalMs: z.number().int().min(10000).optional(),
 };
 
 export const createDeploymentSchema = z.object({

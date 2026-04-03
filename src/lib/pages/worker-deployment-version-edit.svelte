@@ -9,6 +9,7 @@
   import { translate } from '$lib/i18n/translate';
   import {
     decodeLambdaProviderDetails,
+    decodeScalerDetails,
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
   } from '$lib/services/deployments-service';
@@ -44,6 +45,7 @@
 {:then versionResponse}
   {@const info = versionResponse.workerDeploymentVersionInfo}
   {@const providerDetails = decodeLambdaProviderDetails(info.computeConfig)}
+  {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
   <div class="flex flex-col gap-4">
     <Link href={backHref} icon="chevron-left">
       {translate('workers.back-to-deployment', { deployment })}
@@ -60,6 +62,12 @@
       initialData={{
         lambdaArn: providerDetails.lambdaArn ?? '',
         iamRoleArn: providerDetails.iamRoleArn ?? '',
+        roleExternalId: providerDetails.roleExternalId ?? '',
+        scaleUpCooloffMs: scalerDetails.scaleUpCooloffMs,
+        scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
+        maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
+        scaleUpDispatchRateEpsilon: scalerDetails.scaleUpDispatchRateEpsilon,
+        metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
       }}
       cancelHref={backHref}
       onSubmit={async (_data) => {

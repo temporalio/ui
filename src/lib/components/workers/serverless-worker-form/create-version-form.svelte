@@ -29,16 +29,19 @@
   }: Props = $props();
 
   let provider = $state('lambda');
+  let showScaling = $state(false);
 
   const superform = superForm(
     {
       buildId: '',
       lambdaArn: '',
       iamRoleArn: '',
-      maxWorkers: undefined as number | undefined,
-      maxConcurrentActivities: undefined as number | undefined,
-      maxTaskQueueRate: undefined as number | undefined,
-      idleTimeoutSeconds: undefined as number | undefined,
+      roleExternalId: '',
+      scaleUpCooloffMs: undefined as number | undefined,
+      scaleUpBacklogThreshold: undefined as number | undefined,
+      maxWorkerLifetimeMs: undefined as number | undefined,
+      scaleUpDispatchRateEpsilon: undefined as number | undefined,
+      metricsPollIntervalMs: undefined as number | undefined,
     },
     {
       SPA: true,
@@ -137,71 +140,127 @@
             />
           </div>
 
-          <div class="border-t border-subtle pt-4">
-            <h4 class="mb-4 text-sm font-medium">
-              {translate('workers.scaling-section')}
-            </h4>
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input
-                value={$form.maxWorkers !== undefined
-                  ? String($form.maxWorkers)
-                  : ''}
-                oninput={(e) => {
-                  const val = (e.currentTarget as HTMLInputElement).value;
-                  $form.maxWorkers = val === '' ? undefined : Number(val);
-                }}
-                id="maxWorkers"
-                name="maxWorkers"
-                label={translate('workers.max-workers-label')}
-                hintText={translate('workers.max-workers-hint')}
-                type="number"
-              />
-              <Input
-                value={$form.maxConcurrentActivities !== undefined
-                  ? String($form.maxConcurrentActivities)
-                  : ''}
-                oninput={(e) => {
-                  const val = (e.currentTarget as HTMLInputElement).value;
-                  $form.maxConcurrentActivities =
-                    val === '' ? undefined : Number(val);
-                }}
-                id="maxConcurrentActivities"
-                name="maxConcurrentActivities"
-                label={translate('workers.max-concurrent-activities-label')}
-                hintText={translate('workers.max-concurrent-activities-hint')}
-                type="number"
-              />
-              <Input
-                value={$form.maxTaskQueueRate !== undefined
-                  ? String($form.maxTaskQueueRate)
-                  : ''}
-                oninput={(e) => {
-                  const val = (e.currentTarget as HTMLInputElement).value;
-                  $form.maxTaskQueueRate = val === '' ? undefined : Number(val);
-                }}
-                id="maxTaskQueueRate"
-                name="maxTaskQueueRate"
-                label={translate('workers.max-task-queue-rate-label')}
-                hintText={translate('workers.max-task-queue-rate-hint')}
-                type="number"
-              />
-              <Input
-                value={$form.idleTimeoutSeconds !== undefined
-                  ? String($form.idleTimeoutSeconds)
-                  : ''}
-                oninput={(e) => {
-                  const val = (e.currentTarget as HTMLInputElement).value;
-                  $form.idleTimeoutSeconds =
-                    val === '' ? undefined : Number(val);
-                }}
-                id="idleTimeoutSeconds"
-                name="idleTimeoutSeconds"
-                label={translate('workers.idle-timeout-label')}
-                hintText={translate('workers.idle-timeout-hint')}
-                type="number"
-              />
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-1">
+              <label for="roleExternalId" class="text-sm font-medium">
+                {translate('workers.external-id-label')}
+              </label>
+              <Tooltip top text={translate('workers.external-id-help')}>
+                <Icon name="circle-question" class="h-4 w-4 text-secondary" />
+              </Tooltip>
             </div>
+            <Input
+              bind:value={$form.roleExternalId}
+              id="roleExternalId"
+              name="roleExternalId"
+              labelHidden
+              label={translate('workers.external-id-label')}
+              hintText={$errors.roleExternalId?.[0] ||
+                translate('workers.external-id-hint')}
+              error={!!$errors.roleExternalId?.[0]}
+              placeholder={translate('workers.external-id-placeholder')}
+              required
+            />
           </div>
+
+          <hr class="border-subtle" />
+
+          <Button
+            variant="secondary"
+            type="button"
+            on:click={() => (showScaling = !showScaling)}
+          >
+            {showScaling
+              ? 'Hide Scaling and Limits'
+              : translate('workers.show-scaling-limits')}
+          </Button>
+
+          {#if showScaling}
+            <Input
+              value={$form.scaleUpCooloffMs !== undefined
+                ? String($form.scaleUpCooloffMs)
+                : ''}
+              onchange={(e) => {
+                const val = (e.target as HTMLInputElement).value;
+                $form.scaleUpCooloffMs = val === '' ? undefined : Number(val);
+              }}
+              id="scaleUpCooloffMs"
+              name="scaleUpCooloffMs"
+              label={translate('workers.scale-up-cooloff-ms-label')}
+              hintText={$errors.scaleUpCooloffMs?.[0] ||
+                translate('workers.scale-up-cooloff-ms-hint')}
+              error={!!$errors.scaleUpCooloffMs?.[0]}
+              placeholder="100"
+            />
+            <Input
+              value={$form.scaleUpBacklogThreshold !== undefined
+                ? String($form.scaleUpBacklogThreshold)
+                : ''}
+              onchange={(e) => {
+                const val = (e.target as HTMLInputElement).value;
+                $form.scaleUpBacklogThreshold =
+                  val === '' ? undefined : Number(val);
+              }}
+              id="scaleUpBacklogThreshold"
+              name="scaleUpBacklogThreshold"
+              label={translate('workers.scale-up-backlog-threshold-label')}
+              hintText={$errors.scaleUpBacklogThreshold?.[0] ||
+                translate('workers.scale-up-backlog-threshold-hint')}
+              error={!!$errors.scaleUpBacklogThreshold?.[0]}
+              placeholder="0"
+            />
+            <Input
+              value={$form.maxWorkerLifetimeMs !== undefined
+                ? String($form.maxWorkerLifetimeMs)
+                : ''}
+              onchange={(e) => {
+                const val = (e.target as HTMLInputElement).value;
+                $form.maxWorkerLifetimeMs =
+                  val === '' ? undefined : Number(val);
+              }}
+              id="maxWorkerLifetimeMs"
+              name="maxWorkerLifetimeMs"
+              label={translate('workers.max-worker-lifetime-ms-label')}
+              hintText={$errors.maxWorkerLifetimeMs?.[0] ||
+                translate('workers.max-worker-lifetime-ms-hint')}
+              error={!!$errors.maxWorkerLifetimeMs?.[0]}
+              placeholder="600000"
+            />
+            <Input
+              value={$form.scaleUpDispatchRateEpsilon !== undefined
+                ? String($form.scaleUpDispatchRateEpsilon)
+                : ''}
+              onchange={(e) => {
+                const val = (e.target as HTMLInputElement).value;
+                $form.scaleUpDispatchRateEpsilon =
+                  val === '' ? undefined : Number(val);
+              }}
+              id="scaleUpDispatchRateEpsilon"
+              name="scaleUpDispatchRateEpsilon"
+              label={translate('workers.scale-up-dispatch-rate-epsilon-label')}
+              hintText={$errors.scaleUpDispatchRateEpsilon?.[0] ||
+                translate('workers.scale-up-dispatch-rate-epsilon-hint')}
+              error={!!$errors.scaleUpDispatchRateEpsilon?.[0]}
+              placeholder="0"
+            />
+            <Input
+              value={$form.metricsPollIntervalMs !== undefined
+                ? String($form.metricsPollIntervalMs)
+                : ''}
+              onchange={(e) => {
+                const val = (e.target as HTMLInputElement).value;
+                $form.metricsPollIntervalMs =
+                  val === '' ? undefined : Number(val);
+              }}
+              id="metricsPollIntervalMs"
+              name="metricsPollIntervalMs"
+              label={translate('workers.metrics-poll-interval-ms-label')}
+              hintText={$errors.metricsPollIntervalMs?.[0] ||
+                translate('workers.metrics-poll-interval-ms-hint')}
+              error={!!$errors.metricsPollIntervalMs?.[0]}
+              placeholder="60000"
+            />
+          {/if}
         </div>
       </ComputeProviderPicker>
     </Card>

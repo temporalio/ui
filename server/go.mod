@@ -11,7 +11,7 @@ require (
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.3.0
-	go.temporal.io/api v1.62.3-0.20260325221344-112518d1ad10
+	go.temporal.io/api v1.62.3-0.20260327234204-dbc016f3811d
 	golang.org/x/net v0.47.0
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/grpc v1.66.1
