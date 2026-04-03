@@ -34,6 +34,12 @@
         )
       : null,
   );
+
+  const latestComputeProviderType = $derived(
+    Object.values(
+      deployment.latestVersionSummary?.computeConfig?.scalingGroups ?? {},
+    )[0]?.provider?.type,
+  );
 </script>
 
 <tr>
@@ -77,12 +83,9 @@
                 label={latestVersionStatus.label}
               />
             {/if}
-            <ComputeBadge
-              type={Object.values(
-                deployment.latestVersionSummary?.computeConfig?.scalingGroups ??
-                  {},
-              )[0]?.provider?.type}
-            />
+            {#if latestComputeProviderType}
+              <ComputeBadge type={latestComputeProviderType} />
+            {/if}
           </div>
         {:else}
           <span class="text-secondary">—</span>

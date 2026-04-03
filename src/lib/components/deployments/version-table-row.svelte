@@ -11,13 +11,11 @@
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    decodeLambdaProviderDetails,
-    decodeScalerDetails,
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
     setCurrentDeploymentVersion,
+    validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
-  import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
   import {
     isVersionSummaryNew,
@@ -39,11 +37,11 @@
 
   import ComputeBadge from './compute-badge.svelte';
   import DeploymentStatus from './deployment-status.svelte';
+  import VersionComputeDetails from './version-compute-details.svelte';
 
   type Props = {
     routingConfig: RoutingConfig;
     version: VersionSummary;
-    columns: ConfigurableTableHeader[];
     namespace: string;
     deploymentName: string;
     conflictToken?: string;
@@ -51,7 +49,6 @@
   let {
     routingConfig,
     version,
-    columns,
     namespace,
     deploymentName,
     conflictToken,
@@ -152,6 +149,11 @@
     null,
   );
   let showDeleteVersionModal = $state(false);
+  let showValidateModal = $state(false);
+  let validateLoading = $state(false);
+  let validateResult = $state<{ valid: boolean; message?: string } | null>(
+    null,
+  );
   let setCurrentError = $state<string | null>(null);
   const menuOpen = writable(false);
 
@@ -178,6 +180,33 @@
     }
   }
 
+  async function handleValidateConnection() {
+    validateResult = null;
+    validateLoading = true;
+    showValidateModal = true;
+    const versionDetails = await fetchDeploymentVersion({
+      namespace,
+      deploymentName,
+      buildId: versionBuildId,
+    });
+    const computeConfig =
+      versionDetails.workerDeploymentVersionInfo.computeConfig;
+    if (!computeConfig) {
+      validateLoading = false;
+      return;
+    }
+    validateResult = await validateWorkerDeploymentVersionComputeConfig(
+      { namespace, deploymentName, buildId: versionBuildId, computeConfig },
+      () => {
+        validateResult = {
+          valid: false,
+          message: translate('deployments.validate-connection-error'),
+        };
+      },
+    );
+    validateLoading = false;
+  }
+
   async function handleDeleteVersion() {
     await deleteWorkerDeploymentVersion(
       { namespace, deploymentName, buildId: versionBuildId, conflictToken },
@@ -189,182 +218,97 @@
 </script>
 
 <tr>
-  {#each columns as { label } (label)}
-    {#if label === translate('deployments.build-id')}
-      <td class="text-left">
-        <div class="flex items-center gap-1">
-          <button
-            type="button"
-            aria-label={expanded ? 'Collapse' : 'Expand'}
-            onclick={() => (expanded = !expanded)}
-            class="shrink-0"
-          >
-            <Icon
-              name="chevron-right"
-              class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
-            />
-          </button>
-          <Copyable
-            content={versionBuildId}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          >
-            <Link href={workflowHref}>
-              {versionBuildId}
-            </Link>
-          </Copyable>
-        </div>
-      </td>
-    {:else if label === translate('deployments.build-status')}
-      <td class="text-left">
-        <div class="flex items-center gap-2">
-          <DeploymentStatus {status} label={statusLabel} />
-          {#if isCurrent && isVersionSummaryNew(version) && version?.currentSinceTime}
-            Since <Timestamp dateTime={version.currentSinceTime} />
-          {:else if isRamping && isVersionSummaryNew(version) && version?.rampingSinceTime}
-            Since <Timestamp dateTime={version.rampingSinceTime} />
-          {/if}
-        </div>
-      </td>
-    {:else if label === translate('deployments.compute')}
-      <td class="text-left">
-        <ComputeBadge type={computeProviderType} />
-      </td>
-    {:else if label === translate('deployments.deployed')}
-      <Timestamp
-        as="td"
-        class="whitespace-pre-line break-words text-left"
-        dateTime={version?.createTime}
-      />
-    {:else if label === translate('deployments.actions')}
-      <td class="w-24 whitespace-pre-line break-words">
-        <MenuContainer open={menuOpen}>
-          {#snippet children(open)}
-            <button
-              type="button"
-              aria-label="Actions"
-              aria-expanded={open}
-              aria-haspopup="menu"
-              aria-controls="version-actions-{versionBuildId}"
-              onclick={() => menuOpen.update((v) => !v)}
-              class="flex h-8 w-8 items-center justify-center rounded hover:surface-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
-            >
-              <Icon name="vertical-ellipsis" class="h-4 w-4" />
-            </button>
-            <Menu id="version-actions-{versionBuildId}" position="right">
-              <MenuItem href={editHref}>
-                {translate('deployments.edit-version')}
-              </MenuItem>
-              <MenuItem href={workflowHref}>
-                {translate('deployments.go-to-workflows')}
-              </MenuItem>
-              {#if !isCurrent}
-                <MenuItem onclick={handleSetCurrent}>
-                  {translate('deployments.set-as-current')}
-                </MenuItem>
-              {/if}
-              <MenuItem onclick={() => (showDeleteVersionModal = true)}>
-                {translate('deployments.delete-version')}
-              </MenuItem>
-            </Menu>
-          {/snippet}
-        </MenuContainer>
-      </td>
-    {/if}
-  {/each}
+  <td class="text-left">
+    <div class="flex items-center gap-1">
+      <button
+        type="button"
+        aria-label={expanded ? 'Collapse' : 'Expand'}
+        onclick={() => (expanded = !expanded)}
+        class="shrink-0"
+      >
+        <Icon
+          name="chevron-right"
+          class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
+        />
+      </button>
+      <Copyable
+        content={versionBuildId}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      >
+        <Link href={workflowHref}>
+          {versionBuildId}
+        </Link>
+      </Copyable>
+    </div>
+  </td>
+  <td class="text-left">
+    <DeploymentStatus {status} label={statusLabel} />
+  </td>
+  <td class="text-left">
+    <span class="text-secondary">—</span>
+  </td>
+  <td class="text-left">
+    <ComputeBadge type={computeProviderType} />
+  </td>
+  <Timestamp
+    as="td"
+    class="whitespace-pre-line break-words text-left"
+    dateTime={version?.createTime}
+  />
+  <td class="w-24 whitespace-pre-line break-words">
+    <MenuContainer open={menuOpen}>
+      {#snippet children(open)}
+        <button
+          type="button"
+          aria-label="Actions"
+          aria-expanded={open}
+          aria-haspopup="menu"
+          aria-controls="version-actions-{versionBuildId}"
+          onclick={() => menuOpen.update((v) => !v)}
+          class="flex h-8 w-8 items-center justify-center rounded hover:surface-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+        >
+          <Icon name="vertical-ellipsis" class="h-4 w-4" />
+        </button>
+        <Menu id="version-actions-{versionBuildId}" position="right">
+          <MenuItem href={editHref}>
+            {translate('deployments.edit')}
+          </MenuItem>
+          <MenuItem onclick={handleValidateConnection}>
+            {translate('deployments.validate-connection')}
+          </MenuItem>
+          <MenuItem href={workflowHref}>
+            {translate('deployments.view-workflows')}
+          </MenuItem>
+          <MenuItem onclick={() => (showDeleteVersionModal = true)}>
+            {translate('common.delete')}
+          </MenuItem>
+        </Menu>
+      {/snippet}
+    </MenuContainer>
+  </td>
 </tr>
 
 {#if expanded}
-  <tr class="surface-primary">
-    <td colspan={columns.length} class="px-4 pb-3 pt-1">
+  <tr class="surface-primary border-y border-subtle">
+    <td colspan={6} class="!p-1">
       {#await fetchPromise}
-        <div class="flex flex-col gap-2 py-2">
-          {#each [1, 2, 3, 4] as _ (_)}
+        <div class="surface-secondary flex flex-col gap-2 py-3 pl-6 text-xs">
+          {#each [1, 2, 3] as _ (_)}
             <div class="flex items-center gap-2">
-              <div class="h-4 w-40 animate-pulse rounded bg-subtle"></div>
-              <div class="h-4 w-48 animate-pulse rounded bg-subtle"></div>
+              <div class="h-3 w-20 animate-pulse rounded bg-subtle"></div>
+              <div class="h-3 w-64 animate-pulse rounded bg-subtle"></div>
             </div>
           {/each}
         </div>
       {:then result}
         {#if result}
-          {@const info = result.workerDeploymentVersionInfo}
-          {@const lambdaDetails = decodeLambdaProviderDetails(
-            info.computeConfig,
-          )}
-          {@const scalerParams = decodeScalerDetails(info.computeConfig)}
-          {@const isCompute = !!lambdaDetails.lambdaArn}
-          <div class="flex flex-col gap-2 text-sm">
-            {#if isCompute}
-              {#if lambdaDetails.lambdaArn}
-                <div class="flex items-center gap-2">
-                  <span class="w-40 shrink-0 text-secondary"
-                    >{translate('workers.lambda-arn-label')}</span
-                  >
-                  <code class="text-xs">{lambdaDetails.lambdaArn}</code>
-                </div>
-              {/if}
-              {#if lambdaDetails.iamRoleArn}
-                <div class="flex items-center gap-2">
-                  <span class="w-40 shrink-0 text-secondary"
-                    >{translate('workers.iam-role-label')}</span
-                  >
-                  <code class="text-xs">{lambdaDetails.iamRoleArn}</code>
-                </div>
-              {/if}
-              {#if lambdaDetails.roleExternalId}
-                <div class="flex items-center gap-2">
-                  <span class="w-40 shrink-0 text-secondary"
-                    >{translate('deployments.role-external-id')}</span
-                  >
-                  <code class="text-xs">{lambdaDetails.roleExternalId}</code>
-                </div>
-              {/if}
-              {#if scalerParams.scaleUpCooloffMs !== undefined}
-                <div class="flex items-center gap-2">
-                  <span class="w-40 shrink-0 text-secondary"
-                    >{translate('deployments.scale-up-cooloff')}</span
-                  >
-                  <span>{scalerParams.scaleUpCooloffMs}ms</span>
-                </div>
-              {/if}
-              {#if scalerParams.scaleUpBacklogThreshold !== undefined}
-                <div class="flex items-center gap-2">
-                  <span class="w-40 shrink-0 text-secondary"
-                    >{translate('deployments.backlog-threshold')}</span
-                  >
-                  <span>{scalerParams.scaleUpBacklogThreshold}</span>
-                </div>
-              {/if}
-              {#if scalerParams.maxWorkerLifetimeMs !== undefined}
-                <div class="flex items-center gap-2">
-                  <span class="w-40 shrink-0 text-secondary"
-                    >{translate('deployments.max-worker-lifetime')}</span
-                  >
-                  <span>{scalerParams.maxWorkerLifetimeMs}ms</span>
-                </div>
-              {/if}
-              {#if scalerParams.scaleUpDispatchRateEpsilon !== undefined}
-                <div class="flex items-center gap-2">
-                  <span class="w-40 shrink-0 text-secondary"
-                    >{translate('deployments.dispatch-rate-epsilon')}</span
-                  >
-                  <span>{scalerParams.scaleUpDispatchRateEpsilon}</span>
-                </div>
-              {/if}
-              {#if scalerParams.metricsPollIntervalMs !== undefined}
-                <div class="flex items-center gap-2">
-                  <span class="w-40 shrink-0 text-secondary"
-                    >{translate('deployments.metrics-poll-interval')}</span
-                  >
-                  <span>{scalerParams.metricsPollIntervalMs}ms</span>
-                </div>
-              {/if}
-            {/if}
-          </div>
+          <VersionComputeDetails
+            computeConfig={result.workerDeploymentVersionInfo.computeConfig}
+          />
         {/if}
       {:catch err}
-        <div class="flex items-center gap-2 py-2 text-sm">
+        <div class="flex items-center gap-2 py-2 text-xs">
           <span class="text-danger"
             >{err?.message ?? 'Failed to load version details'}</span
           >
@@ -384,6 +328,34 @@
     </td>
   </tr>
 {/if}
+
+<Modal
+  id="validate-connection-modal-{versionBuildId}"
+  open={showValidateModal}
+  confirmText={translate('common.close')}
+  cancelText={translate('common.cancel')}
+  on:confirmModal={() => (showValidateModal = false)}
+  on:cancelModal={() => (showValidateModal = false)}
+>
+  <h3 slot="title">{translate('deployments.validate-connection')}</h3>
+  <div slot="content">
+    {#if validateLoading}
+      <div class="flex flex-col gap-2">
+        <div class="h-3 w-32 animate-pulse rounded bg-subtle"></div>
+        <div class="h-3 w-48 animate-pulse rounded bg-subtle"></div>
+      </div>
+    {:else if validateResult}
+      <p class="text-sm">
+        {validateResult.valid !== false
+          ? translate('deployments.validate-connection-valid')
+          : translate('deployments.validate-connection-invalid')}
+      </p>
+      {#if validateResult.message}
+        <p class="mt-1 text-sm text-secondary">{validateResult.message}</p>
+      {/if}
+    {/if}
+  </div>
+</Modal>
 
 <Modal
   id="delete-version-modal-{versionBuildId}"
