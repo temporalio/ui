@@ -2,16 +2,14 @@ import { writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
+import type { ScheduleFormData } from '$lib/components/schedule/schedule-form/schema';
 import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import { setSearchAttributes } from '$lib/services/workflow-service';
 import type { Schedule } from '$lib/types';
 import type {
   DescribeFullSchedule,
-  ScheduleActionParameters,
   ScheduleInterval,
-  SchedulePresetsParameters,
-  ScheduleSpecParameters,
 } from '$lib/types/schedule';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -21,18 +19,14 @@ import {
   timeToInterval,
 } from '$lib/utilities/schedule-data-formatting';
 
-type ScheduleParameterArgs = {
-  action: ScheduleActionParameters;
-  spec: Partial<ScheduleSpecParameters>;
-  presets: SchedulePresetsParameters;
+type ScheduleContext = {
+  namespace: string;
+  identity?: string;
 };
 
-// TODO: Post Beta, add support of additional fields.
-// "startTime": "2022-07-04T03:18:59.668Z",
-// "endTime": "2022-07-04T03:18:59.668Z",
-// "jitter": "string",
-// "timezoneName": "string",
-// "timezoneData": "string"
+type EditScheduleContext = ScheduleContext & {
+  scheduleId: string;
+};
 
 const getSearchAttributes = (
   attrs: (typeof setSearchAttributes.arguments)[0],
@@ -44,20 +38,28 @@ const getSearchAttributes = (
 
 const setBodySpec = (
   body: DescribeFullSchedule,
-  spec: Partial<ScheduleSpecParameters>,
-  presets: SchedulePresetsParameters,
+  formData: ScheduleFormData,
 ) => {
-  const { hour, minute, second, phase, cronString } = spec;
-  const { preset, months, days, daysOfMonth, daysOfWeek } = presets;
+  const {
+    preset,
+    hour,
+    minute,
+    second,
+    phase,
+    cronString,
+    months,
+    days,
+    daysOfMonth,
+    daysOfWeek,
+  } = formData;
+
   if (preset === 'string') {
-    // Add the cronString as a comment to the cronString to view it for frequency
     const cronStringWithComment = `${cronString}#${cronString}`;
     body.schedule.spec.cronString = [cronStringWithComment];
     body.schedule.spec.calendar = [];
     body.schedule.spec.interval = [];
   } else if (preset === 'interval') {
     const interval = timeToInterval(days, hour, minute, second);
-    // The Schedule IntervalSpec implements IIntervalSpec which encodes/decodes string to Interval
     body.schedule.spec.interval = [
       { interval, phase: phase || '0s' },
     ] as ScheduleInterval[];
@@ -88,30 +90,21 @@ const setBodySpec = (
 let createTimeout: ReturnType<typeof setTimeout>;
 let editTimeout: ReturnType<typeof setTimeout>;
 
-export const submitCreateSchedule = async ({
-  action,
-  spec,
-  presets,
-}: ScheduleParameterArgs): Promise<void> => {
-  const {
-    identity,
-    namespace,
-    name,
-    workflowId,
-    workflowType,
-    taskQueue,
-    input,
-    encoding,
-    messageType,
-    searchAttributes,
-    workflowSearchAttributes,
-  } = action;
+export const submitCreateSchedule = async (
+  formData: ScheduleFormData,
+  context: ScheduleContext,
+): Promise<void> => {
+  const { namespace, identity } = context;
 
   let payloads;
 
-  if (input) {
+  if (formData.input) {
     try {
-      payloads = await encodePayloads({ input, encoding, messageType });
+      payloads = await encodePayloads({
+        input: formData.input,
+        encoding: formData.encoding,
+        messageType: formData.messageType,
+      });
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
@@ -119,15 +112,8 @@ export const submitCreateSchedule = async ({
   }
 
   const body: DescribeFullSchedule = {
-    schedule_id: name.trim(),
-    searchAttributes:
-      searchAttributes.length === 0
-        ? null
-        : {
-            indexedFields: {
-              ...setSearchAttributes(searchAttributes),
-            },
-          },
+    schedule_id: formData.name.trim(),
+    searchAttributes: getSearchAttributes(formData.searchAttributes),
     schedule: {
       spec: {
         calendar: [],
@@ -136,30 +122,24 @@ export const submitCreateSchedule = async ({
       },
       action: {
         startWorkflow: {
-          workflowId: workflowId,
-          workflowType: { name: workflowType },
-          taskQueue: { name: taskQueue },
+          workflowId: formData.workflowId,
+          workflowType: { name: formData.workflowType },
+          taskQueue: { name: formData.taskQueue },
           input: payloads ? { payloads } : null,
-          searchAttributes:
-            workflowSearchAttributes.length === 0
-              ? null
-              : {
-                  indexedFields: {
-                    ...setSearchAttributes(workflowSearchAttributes),
-                  },
-                },
+          searchAttributes: getSearchAttributes(
+            formData.workflowSearchAttributes,
+          ),
         },
       },
     },
   };
 
-  setBodySpec(body, spec, presets);
+  setBodySpec(body, formData);
 
-  // Wait 2 seconds for create to get it on fetchAllSchedules
   loading.set(true);
   const { error: err } = await createSchedule({
     identity,
-    scheduleId: name,
+    scheduleId: formData.name,
     namespace,
     body,
   });
@@ -178,49 +158,44 @@ export const submitCreateSchedule = async ({
 };
 
 export const submitEditSchedule = async (
-  { action, spec, presets }: ScheduleParameterArgs,
+  formData: ScheduleFormData,
   schedule: Schedule,
-  scheduleId: string,
+  context: EditScheduleContext,
 ): Promise<void> => {
-  const {
-    identity,
-    namespace,
-    name,
-    workflowId,
-    workflowType,
-    taskQueue,
-    input,
-    encoding,
-    messageType,
-    searchAttributes,
-    workflowSearchAttributes,
-  } = action;
+  const { namespace, identity, scheduleId } = context;
 
   let payloads;
 
-  if (input) {
+  if (formData.editInput && formData.input) {
     try {
-      payloads = await encodePayloads({ input, encoding, messageType });
+      payloads = await encodePayloads({
+        input: formData.input,
+        encoding: formData.encoding,
+        messageType: formData.messageType,
+      });
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
     }
   }
 
-  const { preset } = presets;
   const body: DescribeFullSchedule = {
     schedule_id: scheduleId,
-    searchAttributes: getSearchAttributes(searchAttributes),
+    searchAttributes: getSearchAttributes(formData.searchAttributes),
     schedule: {
       ...schedule,
       action: {
         startWorkflow: {
           ...schedule.action.startWorkflow,
-          workflowId,
-          workflowType: { name: workflowType },
-          taskQueue: { name: taskQueue },
-          ...(input !== undefined && { input: payloads ? { payloads } : null }),
-          searchAttributes: getSearchAttributes(workflowSearchAttributes),
+          workflowId: formData.workflowId,
+          workflowType: { name: formData.workflowType },
+          taskQueue: { name: formData.taskQueue },
+          ...(formData.editInput && {
+            input: payloads ? { payloads } : null,
+          }),
+          searchAttributes: getSearchAttributes(
+            formData.workflowSearchAttributes,
+          ),
         },
       },
     },
@@ -243,14 +218,13 @@ export const submitEditSchedule = async (
     }
   }
 
-  if (preset === 'existing') {
+  if (formData.preset === 'existing') {
     body.schedule.spec = schedule.spec;
   } else {
-    setBodySpec(body, spec, presets);
+    setBodySpec(body, formData);
     body.schedule.spec.structuredCalendar = [];
   }
 
-  // Wait 2 seconds for edit to get it on fetchSchedule
   loading.set(true);
   const { error: err } = await editSchedule({
     identity,
@@ -265,7 +239,7 @@ export const submitEditSchedule = async (
   } else {
     clearTimeout(editTimeout);
     editTimeout = setTimeout(() => {
-      goto(routeForSchedule({ namespace, scheduleId: name }));
+      goto(routeForSchedule({ namespace, scheduleId: formData.name }));
       error.set('');
       loading.set(false);
     }, 2000);

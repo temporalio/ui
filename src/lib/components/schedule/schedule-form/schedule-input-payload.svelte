@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
+  import { get, type Writable, writable } from 'svelte/store';
 
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
@@ -15,7 +15,7 @@
   interface Props {
     input: string;
     editInput: boolean;
-    encoding: Writable<PayloadInputEncoding>;
+    encoding?: PayloadInputEncoding;
     messageType: string;
     payloads: Payloads;
     showEditActions?: boolean;
@@ -24,11 +24,20 @@
   let {
     input = $bindable(),
     editInput = $bindable(),
-    encoding,
+    encoding = $bindable('json/plain'),
     messageType = $bindable(),
     payloads,
     showEditActions = false,
   }: Props = $props();
+
+  const encodingStore: Writable<PayloadInputEncoding> = writable(encoding);
+  $effect(() => {
+    if (get(encodingStore) !== encoding) encodingStore.set(encoding);
+  });
+  $effect(() => {
+    const val = $encodingStore;
+    if (val !== encoding) encoding = val;
+  });
 
   let initialInput = $state('');
   let initialEncoding = $state<PayloadInputEncoding>('json/plain');
@@ -46,8 +55,8 @@
       : '';
 
     if (isPayloadInputEncodingType(currentEncoding)) {
-      $encoding = currentEncoding;
-      initialEncoding = $encoding;
+      encoding = currentEncoding;
+      initialEncoding = encoding;
       if (currentEncoding === 'json/protobuf' && currentMessageType) {
         messageType = currentMessageType;
         initialMessageType = currentMessageType;
@@ -60,7 +69,7 @@
     if (editInput) {
       editInput = false;
       input = initialInput;
-      $encoding = initialEncoding;
+      encoding = initialEncoding;
       messageType = initialMessageType;
     } else {
       editInput = true;
@@ -72,7 +81,7 @@
   <PayloadDecoder value={payloads} key="payloads" onDecode={setInitialInput}>
     <PayloadInputWithEncoding
       bind:input
-      {encoding}
+      encoding={encodingStore}
       bind:messageType
       bind:loading
       editing={editInput}
