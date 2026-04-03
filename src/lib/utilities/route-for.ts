@@ -299,7 +299,7 @@ export const routeForWorkflow = ({
   queryParams,
   ...parameters
 }: EventHistoryParameters & { archival?: boolean }): ResolvedPathname => {
-  if (!BROWSER) return routeForTimeline(parameters);
+  if (!BROWSER) return routeForTimeline({ ...parameters, queryParams });
 
   const view = get(workflowViewPreference);
   const sort = get(eventFilterSort);
