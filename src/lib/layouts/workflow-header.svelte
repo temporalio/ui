@@ -7,6 +7,7 @@
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
+  import WorkflowCommonErrors from '$lib/components/workflow/workflow-common-errors.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -237,6 +238,7 @@
       </Alert>
     </div>
   {/if}
+  <WorkflowCommonErrors />
   <Tabs>
     <TabList label="workflow detail">
       <Tab
