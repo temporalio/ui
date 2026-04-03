@@ -15,7 +15,12 @@
     aria-live="polite"
   >
     <span class="flex h-20 w-20 items-center justify-center rounded-full">
-      <Icon name="workers" class="block h-full w-full text-blue-200" />
+      <Icon
+        name="workers"
+        class="block h-full w-full text-blue-200"
+        height={20}
+        width={20}
+      />
     </span>
     <div class="text-center">
       <h5>

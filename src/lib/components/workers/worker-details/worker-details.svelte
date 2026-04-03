@@ -59,7 +59,7 @@
     if (total === 0) return '0';
     return ((totalStickyCacheHit / total) * 100).toFixed(1);
   });
-  const pollSuccessRate = $derived.by(() => {
+  const taskSuccessRate = $derived.by(() => {
     if (!heartbeat?.workflowTaskSlotsInfo?.totalProcessedTasks) return '0';
     const successCount =
       heartbeat.workflowTaskSlotsInfo.totalProcessedTasks -
@@ -153,11 +153,15 @@
     <DetailListColumn>
       <!-- TODO: Make filterable link for Build ID with DT-3745 -->
       <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
-      <DetailListTextValue
-        copyable={!!heartbeat?.deploymentVersion?.buildId}
-        copyableText={heartbeat?.deploymentVersion?.buildId ?? ''}
-        text={heartbeat?.deploymentVersion?.buildId ?? '-'}
-      />
+      {@const buildId = heartbeat?.deploymentVersion?.buildId}
+      <span class="max-w-72">
+        <DetailListTextValue
+          copyable={!!buildId}
+          copyableText={buildId ?? ''}
+          text={buildId ?? '-'}
+          tooltipText={buildId}
+        />
+      </span>
       {#if heartbeat?.deploymentVersion?.deploymentName}
         <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
         <DetailListLinkValue
@@ -213,59 +217,57 @@
   <Card>
     <div class="mb-4 flex items-center gap-2">
       <h3 class="text-base font-medium">{title}</h3>
-      {#if slots?.slotSupplierKind}
-        {@const tooltipText = SupplierKindTooltipText[slots.slotSupplierKind]}
-        <Tooltip topLeft text={tooltipText} hide={!tooltipText}>
-          <Badge type="ghost" class="text-xs">{slots.slotSupplierKind}</Badge>
-        </Tooltip>
-      {/if}
     </div>
 
-    <dl class="flex flex-wrap gap-x-32 gap-y-4">
+    <dl class="grid grid-cols-1 gap-4 xl:grid-cols-3 xl:grid-rows-1">
       <div>
         <dt
           id="slots-{title}"
-          class="flex h-6 items-center text-sm text-secondary"
+          class="mb-1 flex h-6 items-center gap-2 text-sm text-secondary"
         >
           {translate('workers.slots')}
+          {#if slots?.slotSupplierKind}
+            {@const tooltipText =
+              SupplierKindTooltipText[slots.slotSupplierKind]}
+            <Tooltip topLeft text={tooltipText} hide={!tooltipText}>
+              <Badge type="ghost" class="text-xs"
+                >{slots.slotSupplierKind}</Badge
+              >
+            </Tooltip>
+          {/if}
         </dt>
         <dd class="mb-2">
           <div class="flex items-baseline gap-12">
-            <p class="font-mono text-2xl font-semibold text-brand">
-              {slots?.currentUsedSlots ?? 0}
-            </p>
-            <p class="font-mono text-2xl font-semibold">
-              {#if slots?.currentAvailableSlots}
-                {slots.currentAvailableSlots - (slots?.currentUsedSlots ?? 0)}
-              {:else}
-                -
-              {/if}
-            </p>
-          </div>
-          <div class="flex gap-8 text-xs text-secondary">
-            <p>{translate('workers.used')}</p>
-            <p>
-              {#if slots?.currentAvailableSlots}
-                {translate('workers.available-out-of', {
-                  count: slots.currentAvailableSlots,
-                })}
-              {:else}
-                {translate('workers.none-available')}
-              {/if}
-            </p>
+            <div>
+              <p class="truncate font-mono text-2xl font-semibold text-brand">
+                {slots?.currentUsedSlots ?? 0}
+              </p>
+              <p class="text-xs text-secondary">{translate('workers.used')}</p>
+            </div>
+            <div>
+              <p class="truncate font-mono text-2xl font-semibold">
+                {#if slots?.currentAvailableSlots}
+                  {slots.currentAvailableSlots - (slots?.currentUsedSlots ?? 0)}
+                {:else}
+                  -
+                {/if}
+              </p>
+              <p class="text-xs text-secondary">
+                {#if slots?.currentAvailableSlots}
+                  {translate('workers.available-out-of', {
+                    count: slots.currentAvailableSlots,
+                  })}
+                {:else}
+                  {translate('workers.none-available')}
+                {/if}
+              </p>
+            </div>
           </div>
         </dd>
-        {@render meterBar(
-          `slots-${title}`,
-          slots?.currentUsedSlots ?? 0,
-          slots?.currentAvailableSlots
-            ? slots.currentAvailableSlots
-            : (slots?.currentUsedSlots ?? 0),
-        )}
       </div>
 
       <div>
-        <dt class="flex h-6 items-center text-sm text-secondary">
+        <dt class="mb-1 flex h-6 items-center text-sm text-secondary">
           {translate('workers.tasks-processed')}
         </dt>
         <dd class="font-mono text-2xl font-semibold">
@@ -275,7 +277,7 @@
 
       {#if poller}
         <div>
-          <dt class="flex h-6 items-center gap-2 text-sm text-secondary">
+          <dt class="mb-1 flex h-6 items-center gap-2 text-sm text-secondary">
             {translate('workers.poller')}
             <Tooltip
               topLeft
@@ -384,13 +386,6 @@
 
         <dt class="mt-2 text-secondary">{translate('workers.process-id')}</dt>
         <dd class="select-all">{heartbeat?.hostInfo?.processId ?? '-'}</dd>
-
-        <dt class="mt-2 text-secondary">
-          {translate('workers.worker-grouping')}
-        </dt>
-        <dd class="select-all">
-          {heartbeat?.hostInfo?.workerGroupingKey ?? '-'}
-        </dd>
       </dl>
     </Card>
     {@render hostUsage()}
@@ -429,9 +424,9 @@
       {translate('workers.diagnostics')}
     </h3>
     <dl>
-      <dd class="font-mono text-2xl">{pollSuccessRate}%</dd>
+      <dd class="font-mono text-2xl">{taskSuccessRate}%</dd>
       <dt class="text-sm text-secondary">
-        {translate('workers.poll-success-rate')}
+        {translate('workers.task-success-rate')}
       </dt>
     </dl>
   </Card>

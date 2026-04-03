@@ -6,6 +6,8 @@
   import FilterBar from '$lib/components/shared-search-attribute-filter/filter-bar.svelte';
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
   import {
@@ -28,6 +30,11 @@
     !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
   );
 </script>
+
+<h2 class="flex items-center gap-2">
+  {translate('workers.worker-instances')}
+  <Badge class="h-fit shrink-0">Pre-Release</Badge>
+</h2>
 
 {#if workerHeartbeatsEnabled}
   <FilterBar
