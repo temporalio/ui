@@ -154,13 +154,37 @@ export const validateWorkerDeploymentVersionComputeConfig = async (
     'worker-deployment-version-validate-compute-config',
     parameters,
   );
+  const computeConfigScalingGroups = Object.fromEntries(
+    Object.entries(parameters.computeConfig.scalingGroups ?? {}).map(
+      ([name, group]) => [name, { scalingGroup: group }],
+    ),
+  );
   return requestFromAPI<{ valid: boolean; message?: string }>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ computeConfig: parameters.computeConfig }),
+      body: stringifyWithBigInt({ computeConfigScalingGroups }),
     },
     onError,
     notifyOnError: false,
+  });
+};
+
+export const setCurrentDeploymentVersion = async (
+  request: DeploymentVersionParameters,
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi('worker-deployment-set-current-version', {
+    namespace: request.namespace,
+    deploymentName: request.deploymentName,
+  });
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        version: `${request.deploymentName}.${request.buildId}`,
+      }),
+    },
+    onError,
   });
 };
 
@@ -168,23 +192,41 @@ export const buildLambdaComputeConfig = (
   lambdaArn: string,
   iamRoleArn: string,
   scalingOptions?: {
-    maxWorkers?: number;
-    maxConcurrentActivities?: number;
-    maxTaskQueueRate?: number;
-    idleTimeoutSeconds?: number;
+    scaleUpCooloffMs?: number;
+    scaleUpBacklogThreshold?: number;
+    maxWorkerLifetimeMs?: number;
+    scaleUpDispatchRateEpsilon?: number;
+    metricsPollIntervalMs?: number;
+    roleExternalId?: string;
   },
 ): ComputeConfig => {
-  const providerJson = JSON.stringify({ arn: lambdaArn, role: iamRoleArn });
+  const providerPayload: Record<string, string> = {
+    arn: lambdaArn,
+    role: iamRoleArn,
+  };
+  if (scalingOptions?.roleExternalId)
+    providerPayload['role_external_id'] = scalingOptions.roleExternalId;
+  const providerJson = JSON.stringify(providerPayload);
   const providerData = btoa(providerJson);
-
-  const scalerDetails =
-    scalingOptions && Object.values(scalingOptions).some((v) => v !== undefined)
-      ? scalingOptions
-      : {};
-  const scalerJson = JSON.stringify(scalerDetails);
-  const scalerData = btoa(scalerJson);
-
   const encoding = btoa('json/plain');
+
+  const scalerConfig: Record<string, number> = {};
+  if (scalingOptions) {
+    if (scalingOptions.scaleUpCooloffMs !== undefined)
+      scalerConfig['scale_up_cooloff_ms'] = scalingOptions.scaleUpCooloffMs;
+    if (scalingOptions.scaleUpBacklogThreshold !== undefined)
+      scalerConfig['scale_up_backlog_threshold'] =
+        scalingOptions.scaleUpBacklogThreshold;
+    if (scalingOptions.maxWorkerLifetimeMs !== undefined)
+      scalerConfig['max_worker_lifetime_ms'] =
+        scalingOptions.maxWorkerLifetimeMs;
+    if (scalingOptions.scaleUpDispatchRateEpsilon !== undefined)
+      scalerConfig['scale_up_dispatch_rate_epsilon'] =
+        scalingOptions.scaleUpDispatchRateEpsilon;
+    if (scalingOptions.metricsPollIntervalMs !== undefined)
+      scalerConfig['metrics_poll_interval_ms'] =
+        scalingOptions.metricsPollIntervalMs;
+  }
 
   return {
     scalingGroups: {
@@ -195,16 +237,13 @@ export const buildLambdaComputeConfig = (
         ],
         provider: {
           type: 'aws-lambda',
-          details: {
-            metadata: { encoding },
-            data: providerData,
-          },
+          details: { metadata: { encoding }, data: providerData },
         },
         scaler: {
           type: 'no-sync',
           details: {
             metadata: { encoding },
-            data: scalerData,
+            data: btoa(JSON.stringify(scalerConfig)),
           },
         },
       },
@@ -214,11 +253,50 @@ export const buildLambdaComputeConfig = (
 
 export const decodeLambdaProviderDetails = (
   computeConfig?: ComputeConfig,
-): { lambdaArn?: string; iamRoleArn?: string } => {
+): { lambdaArn?: string; iamRoleArn?: string; roleExternalId?: string } => {
   const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
   if (!scalingGroup?.provider?.details?.data) return {};
   try {
-    return JSON.parse(atob(scalingGroup.provider.details.data));
+    const raw = JSON.parse(atob(scalingGroup.provider.details.data));
+    const result: {
+      lambdaArn?: string;
+      iamRoleArn?: string;
+      roleExternalId?: string;
+    } = {};
+    if (raw.arn) result.lambdaArn = raw.arn;
+    if (raw.role) result.iamRoleArn = raw.role;
+    if (raw.role_external_id) result.roleExternalId = raw.role_external_id;
+    return result;
+  } catch {
+    return {};
+  }
+};
+
+export const decodeScalerDetails = (
+  computeConfig?: ComputeConfig,
+): {
+  scaleUpCooloffMs?: number;
+  scaleUpBacklogThreshold?: number;
+  maxWorkerLifetimeMs?: number;
+  scaleUpDispatchRateEpsilon?: number;
+  metricsPollIntervalMs?: number;
+} => {
+  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (!scalingGroup?.scaler?.details?.data) return {};
+  try {
+    const raw = JSON.parse(atob(scalingGroup.scaler.details.data));
+    const result: ReturnType<typeof decodeScalerDetails> = {};
+    if (raw['scale_up_cooloff_ms'] !== undefined)
+      result.scaleUpCooloffMs = raw['scale_up_cooloff_ms'];
+    if (raw['scale_up_backlog_threshold'] !== undefined)
+      result.scaleUpBacklogThreshold = raw['scale_up_backlog_threshold'];
+    if (raw['max_worker_lifetime_ms'] !== undefined)
+      result.maxWorkerLifetimeMs = raw['max_worker_lifetime_ms'];
+    if (raw['scale_up_dispatch_rate_epsilon'] !== undefined)
+      result.scaleUpDispatchRateEpsilon = raw['scale_up_dispatch_rate_epsilon'];
+    if (raw['metrics_poll_interval_ms'] !== undefined)
+      result.metricsPollIntervalMs = raw['metrics_poll_interval_ms'];
+    return result;
   } catch {
     return {};
   }

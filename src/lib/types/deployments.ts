@@ -170,4 +170,5 @@ export type DeploymentStatus =
   | 'Latest'
   | 'Draining'
   | 'Drained'
-  | 'Inactive';
+  | 'Inactive'
+  | 'Created';

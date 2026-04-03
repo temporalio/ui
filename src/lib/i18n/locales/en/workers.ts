@@ -143,6 +143,12 @@ export const Strings = {
     'arn:aws:iam::123456789:role/temporal-serverless-role',
   'iam-role-help':
     'Temporal assumes this role to invoke your Lambda function. The role needs a trust policy for Temporal and permission to invoke the function.',
+  'external-id-label': 'External ID',
+  'external-id-hint':
+    'The External ID configured in the IAM role trust policy.',
+  'external-id-placeholder': 'my-external-id',
+  'external-id-help':
+    'A secret string that must match the ExternalId condition in your IAM role trust policy. This prevents confused deputy attacks when Temporal assumes your role.',
   'region-label': 'Region',
   'region-hint': 'The AWS region where the Lambda function is deployed.',
   'region-help':
@@ -266,4 +272,22 @@ export const Strings = {
   'update-compute-config-unavailable':
     'Version compute config updates are not yet available.',
   'delete-version-error': 'Failed to delete worker deployment version',
+  'scale-up-cooloff-ms-label': 'Scale-up Cooloff (ms)',
+  'scale-up-cooloff-ms-hint':
+    'Minimum ms between scale-up actions. 0 = no cooloff. Default: 100.',
+  'scale-up-backlog-threshold-label': 'Backlog Threshold',
+  'scale-up-backlog-threshold-hint':
+    'Trigger scale-up when backlog exceeds this. Default: 0 (any backlog triggers).',
+  'max-worker-lifetime-ms-label': 'Max Worker Lifetime (ms)',
+  'max-worker-lifetime-ms-hint':
+    'Refresh a worker after this many ms when there is backlog. 0 = disabled. Default: 600000.',
+  'scale-up-dispatch-rate-epsilon-label': 'Dispatch Rate Epsilon',
+  'scale-up-dispatch-rate-epsilon-hint':
+    'Suppress scale-up when processing rate change is within this value. 0 = disabled.',
+  'metrics-poll-interval-ms-label': 'Metrics Poll Interval (ms)',
+  'metrics-poll-interval-ms-hint':
+    'Interval between metrics polls. Min: 10000. Default: 60000.',
+  'serverless-instances-note-title': 'Serverless Workers',
+  'serverless-instances-note':
+    'Serverless workers are ephemeral and do not appear in the instances list. View serverless worker status on the Deployments page.',
 } as const;
