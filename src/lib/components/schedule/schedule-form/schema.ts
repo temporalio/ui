@@ -7,10 +7,38 @@ import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 
 import type { SearchAttribute } from '$types';
 
+export const scheduleSpecItemSchema = z.object({
+  type: z.enum(['cron', 'week', 'month', 'interval']),
+  cronString: z.string().optional().default(''),
+  daysOfWeek: z.array(z.string()).optional().default([]),
+  daysOfMonth: z.array(z.number()).optional().default([]),
+  months: z.array(z.string()).optional().default([]),
+  days: z.string().optional().default(''),
+  hour: z.string().optional().default(''),
+  minute: z.string().optional().default(''),
+  second: z.string().optional().default(''),
+  phase: z.string().optional().default(''),
+});
+
+export type ScheduleSpecItem = z.infer<typeof scheduleSpecItemSchema>;
+
+export const DEFAULT_SPEC_ITEM: ScheduleSpecItem = {
+  type: 'cron',
+  cronString: '',
+  daysOfWeek: [],
+  daysOfMonth: [],
+  months: [],
+  days: '',
+  hour: '',
+  minute: '',
+  second: '',
+  phase: '',
+};
+
 export const scheduleFormSchema = z.object({
   name: z.string().min(1, 'Name is required').max(232, 'Name is too long'),
   workflowType: z.string().min(1, 'Workflow type is required'),
-  workflowId: z.string().min(1, 'Workflow ID is required'),
+  workflowId: z.string(),
   taskQueue: z.string().min(1, 'Task queue is required'),
   input: z
     .string()
@@ -32,17 +60,27 @@ export const scheduleFormSchema = z.object({
   editInput: z.boolean(),
   encoding: z.enum(['json/plain', 'json/protobuf'] as const),
   messageType: z.string().optional(),
-  daysOfWeek: z.array(z.string()),
-  daysOfMonth: z.array(z.number()),
-  months: z.array(z.string()),
-  days: z.string(),
-  hour: z.string(),
-  minute: z.string(),
-  second: z.string(),
-  phase: z.string(),
-  cronString: z.string(),
-  preset: z.enum(['existing', 'interval', 'week', 'month', 'string']),
+  specs: z
+    .array(scheduleSpecItemSchema)
+    .min(1, 'At least one schedule spec is required'),
   timezoneName: z.string(),
+  startDate: z.string().optional().default(''),
+  endDateType: z.enum(['never', 'on', 'after']),
+  endDate: z.string().optional().default(''),
+  endAfterOccurrences: z.number().optional(),
+  jitter: z.string().optional().default(''),
+  overlapPolicy: z.enum([
+    'Unspecified',
+    'Skip',
+    'BufferOne',
+    'BufferAll',
+    'CancelOther',
+    'TerminateOther',
+    'AllowAll',
+  ]),
+  catchupWindow: z.string().optional().default(''),
+  pauseOnFailure: z.boolean(),
+  keepOriginalWorkflowId: z.boolean(),
   searchAttributes: searchAttributesSchema,
   workflowSearchAttributes: searchAttributesSchema,
 });
@@ -90,6 +128,10 @@ export const getDefaultValues = (params: {
     type: customSearchAttributes[label],
   }));
 
+  const specs = schedule
+    ? parseScheduleSpecs(schedule)
+    : [{ ...DEFAULT_SPEC_ITEM }];
+
   return {
     name: scheduleId ?? '',
     workflowType: schedule?.action?.startWorkflow?.workflowType?.name ?? '',
@@ -99,18 +141,121 @@ export const getDefaultValues = (params: {
     editInput: !schedule,
     encoding: 'json/plain',
     messageType: '',
-    daysOfWeek: [],
-    daysOfMonth: [],
-    months: [],
-    days: '',
-    hour: '',
-    minute: '',
-    second: '',
-    phase: '',
-    cronString: '',
-    preset: schedule ? 'existing' : 'interval',
+    specs,
     timezoneName: schedule?.spec?.timezoneName ?? 'UTC',
+    startDate: schedule?.spec?.startTime ? String(schedule.spec.startTime) : '',
+    endDateType: schedule?.spec?.endTime ? 'on' : 'never',
+    endDate: schedule?.spec?.endTime ? String(schedule.spec.endTime) : '',
+    endAfterOccurrences: undefined,
+    jitter: schedule?.spec?.jitter ? String(schedule.spec.jitter) : '',
+    overlapPolicy: String(
+      schedule?.policies?.overlapPolicy ?? 'Skip',
+    ) as ScheduleFormData['overlapPolicy'],
+    catchupWindow: schedule?.policies?.catchupWindow
+      ? String(schedule.policies.catchupWindow)
+      : '',
+    pauseOnFailure: schedule?.policies?.pauseOnFailure ?? false,
+    keepOriginalWorkflowId: schedule?.policies?.keepOriginalWorkflowId ?? false,
     searchAttributes: searchAttributesInput,
     workflowSearchAttributes: workflowSearchAttributesInput,
   };
 };
+
+function parseIntervalString(intervalStr: string): {
+  days: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+} {
+  const totalSeconds = parseInt(intervalStr.replace(/s$/, ''), 10) || 0;
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return {
+    days: days > 0 ? String(days) : '',
+    hours: hours > 0 ? String(hours) : '',
+    minutes: minutes > 0 ? String(minutes) : '',
+    seconds: seconds > 0 ? String(seconds) : '',
+  };
+}
+
+function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
+  const specs: ScheduleSpecItem[] = [];
+
+  const cronStrings = schedule?.spec?.cronString ?? [];
+  for (const cron of cronStrings) {
+    const cleanCron = cron.includes('#') ? cron.split('#')[0].trim() : cron;
+    specs.push({
+      ...DEFAULT_SPEC_ITEM,
+      type: 'cron',
+      cronString: cleanCron,
+    });
+  }
+
+  const intervals = schedule?.spec?.interval ?? [];
+  for (const interval of intervals) {
+    const intervalStr = interval?.interval?.toString() ?? '0s';
+    const phaseStr = interval?.phase?.toString() ?? '';
+    const parsed = parseIntervalString(intervalStr);
+    specs.push({
+      ...DEFAULT_SPEC_ITEM,
+      type: 'interval',
+      days: parsed.days,
+      hour: parsed.hours,
+      minute: parsed.minutes,
+      second: parsed.seconds,
+      phase: phaseStr,
+    });
+  }
+
+  const calendars =
+    schedule?.spec?.structuredCalendar ?? schedule?.spec?.calendar ?? [];
+  for (const cal of calendars) {
+    const hasDayOfWeek =
+      cal?.dayOfWeek &&
+      (Array.isArray(cal.dayOfWeek)
+        ? cal.dayOfWeek.length > 0
+        : !!cal.dayOfWeek);
+    const hasDayOfMonth =
+      cal?.dayOfMonth &&
+      (Array.isArray(cal.dayOfMonth)
+        ? cal.dayOfMonth.length > 0
+        : !!cal.dayOfMonth);
+
+    if (hasDayOfWeek && !hasDayOfMonth) {
+      specs.push({
+        ...DEFAULT_SPEC_ITEM,
+        type: 'week',
+        daysOfWeek: Array.isArray(cal.dayOfWeek)
+          ? cal.dayOfWeek.map(String)
+          : [String(cal.dayOfWeek)],
+        hour: Array.isArray(cal.hour)
+          ? String(cal.hour[0] ?? '')
+          : String(cal.hour ?? ''),
+        minute: Array.isArray(cal.minute)
+          ? String(cal.minute[0] ?? '')
+          : String(cal.minute ?? ''),
+      });
+    } else {
+      specs.push({
+        ...DEFAULT_SPEC_ITEM,
+        type: 'month',
+        daysOfMonth: Array.isArray(cal.dayOfMonth)
+          ? cal.dayOfMonth.map(Number)
+          : [Number(cal.dayOfMonth ?? 1)],
+        months: Array.isArray(cal.month)
+          ? cal.month.map(String)
+          : [String(cal.month ?? '')],
+        hour: Array.isArray(cal.hour)
+          ? String(cal.hour[0] ?? '')
+          : String(cal.hour ?? ''),
+        minute: Array.isArray(cal.minute)
+          ? String(cal.minute[0] ?? '')
+          : String(cal.minute ?? ''),
+      });
+    }
+  }
+
+  return specs.length > 0 ? specs : [{ ...DEFAULT_SPEC_ITEM }];
+}

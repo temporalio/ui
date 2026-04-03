@@ -2,7 +2,10 @@ import { writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
-import type { ScheduleFormData } from '$lib/components/schedule/schedule-form/schema';
+import type {
+  ScheduleFormData,
+  ScheduleSpecItem,
+} from '$lib/components/schedule/schedule-form/schema';
 import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import { setSearchAttributes } from '$lib/services/workflow-service';
@@ -36,55 +39,104 @@ const getSearchAttributes = (
     : { indexedFields: { ...setSearchAttributes(attrs) } };
 };
 
-const setBodySpec = (
-  body: DescribeFullSchedule,
-  formData: ScheduleFormData,
-) => {
-  const {
-    preset,
-    hour,
-    minute,
-    second,
-    phase,
-    cronString,
-    months,
-    days,
-    daysOfMonth,
-    daysOfWeek,
-  } = formData;
+const buildSpecFromFormData = (formData: ScheduleFormData) => {
+  const spec: {
+    calendar: object[];
+    interval: ScheduleInterval[];
+    cronString: string[];
+    structuredCalendar: object[];
+    startTime?: string;
+    endTime?: string;
+    jitter?: string;
+    timezoneName?: string;
+  } = {
+    calendar: [],
+    interval: [],
+    cronString: [],
+    structuredCalendar: [],
+    timezoneName: formData.timezoneName || 'UTC',
+  };
 
-  if (preset === 'string') {
-    const cronStringWithComment = `${cronString}#${cronString}`;
-    body.schedule.spec.cronString = [cronStringWithComment];
-    body.schedule.spec.calendar = [];
-    body.schedule.spec.interval = [];
-  } else if (preset === 'interval') {
-    const interval = timeToInterval(days, hour, minute, second);
-    body.schedule.spec.interval = [
-      { interval, phase: phase || '0s' },
-    ] as ScheduleInterval[];
-    body.schedule.spec.cronString = [];
-    body.schedule.spec.calendar = [];
-  } else {
-    const { month, dayOfMonth, dayOfWeek } = convertDaysAndMonths({
-      months,
-      daysOfMonth,
-      daysOfWeek,
-    });
-    body.schedule.spec.calendar = [
-      {
-        year: '*',
-        month: preset === 'month' ? month : '',
-        dayOfMonth: preset === 'month' ? dayOfMonth : '',
-        dayOfWeek: preset === 'week' ? dayOfWeek : '',
-        hour,
-        minute,
-        second,
-      },
-    ];
-    body.schedule.spec.interval = [];
-    body.schedule.spec.cronString = [];
+  if (formData.startDate) {
+    spec.startTime = formData.startDate;
   }
+
+  if (formData.endDateType === 'on' && formData.endDate) {
+    spec.endTime = formData.endDate;
+  }
+
+  if (formData.jitter) {
+    spec.jitter = formData.jitter;
+  }
+
+  for (const specItem of formData.specs) {
+    buildSingleSpec(spec, specItem);
+  }
+
+  return spec;
+};
+
+const buildSingleSpec = (
+  spec: {
+    calendar: object[];
+    interval: ScheduleInterval[];
+    cronString: string[];
+  },
+  item: ScheduleSpecItem,
+) => {
+  if (item.type === 'cron') {
+    if (item.cronString) {
+      const cronStringWithComment = `${item.cronString}#${item.cronString}`;
+      spec.cronString.push(cronStringWithComment);
+    }
+  } else if (item.type === 'interval') {
+    const interval = timeToInterval(
+      item.days || '',
+      item.hour || '',
+      item.minute || '',
+      item.second || '',
+    );
+    spec.interval.push({
+      interval,
+      phase: item.phase || '0s',
+    } as ScheduleInterval);
+  } else if (item.type === 'week') {
+    const { dayOfWeek } = convertDaysAndMonths({
+      daysOfWeek: item.daysOfWeek || [],
+    });
+    spec.calendar.push({
+      year: '*',
+      month: '',
+      dayOfMonth: '',
+      dayOfWeek,
+      hour: item.hour || '',
+      minute: item.minute || '',
+      second: item.second || '',
+    });
+  } else if (item.type === 'month') {
+    const { month, dayOfMonth } = convertDaysAndMonths({
+      months: item.months || [],
+      daysOfMonth: item.daysOfMonth || [],
+    });
+    spec.calendar.push({
+      year: '*',
+      month,
+      dayOfMonth,
+      dayOfWeek: '',
+      hour: item.hour || '',
+      minute: item.minute || '',
+      second: item.second || '',
+    });
+  }
+};
+
+const buildPolicies = (formData: ScheduleFormData) => {
+  return {
+    overlapPolicy: formData.overlapPolicy,
+    catchupWindow: formData.catchupWindow || undefined,
+    pauseOnFailure: formData.pauseOnFailure,
+    keepOriginalWorkflowId: formData.keepOriginalWorkflowId,
+  };
 };
 
 let createTimeout: ReturnType<typeof setTimeout>;
@@ -111,15 +163,11 @@ export const submitCreateSchedule = async (
     }
   }
 
-  const body: DescribeFullSchedule = {
+  const body = {
     schedule_id: formData.name.trim(),
     searchAttributes: getSearchAttributes(formData.searchAttributes),
     schedule: {
-      spec: {
-        calendar: [],
-        interval: [],
-        cronString: [],
-      },
+      spec: buildSpecFromFormData(formData),
       action: {
         startWorkflow: {
           workflowId: formData.workflowId,
@@ -131,10 +179,16 @@ export const submitCreateSchedule = async (
           ),
         },
       },
+      policies: buildPolicies(formData),
+      state:
+        formData.endDateType === 'after' && formData.endAfterOccurrences
+          ? {
+              limitedActions: true,
+              remainingActions: formData.endAfterOccurrences,
+            }
+          : undefined,
     },
-  };
-
-  setBodySpec(body, formData);
+  } as unknown as DescribeFullSchedule;
 
   loading.set(true);
   const { error: err } = await createSchedule({
@@ -179,14 +233,15 @@ export const submitEditSchedule = async (
     }
   }
 
-  const body: DescribeFullSchedule = {
+  const body = {
     schedule_id: scheduleId,
     searchAttributes: getSearchAttributes(formData.searchAttributes),
     schedule: {
-      ...schedule,
+      ...(schedule as Record<string, unknown>),
+      spec: buildSpecFromFormData(formData),
       action: {
         startWorkflow: {
-          ...schedule.action.startWorkflow,
+          ...(schedule.action?.startWorkflow ?? {}),
           workflowId: formData.workflowId,
           workflowType: { name: formData.workflowType },
           taskQueue: { name: formData.taskQueue },
@@ -198,8 +253,16 @@ export const submitEditSchedule = async (
           ),
         },
       },
+      policies: buildPolicies(formData),
+      state:
+        formData.endDateType === 'after' && formData.endAfterOccurrences
+          ? {
+              limitedActions: true,
+              remainingActions: formData.endAfterOccurrences,
+            }
+          : schedule.state,
     },
-  };
+  } as unknown as DescribeFullSchedule;
 
   const fields = body.schedule.action.startWorkflow?.header?.fields;
   if (fields && Object.keys(fields).length > 0) {
@@ -215,13 +278,6 @@ export const submitEditSchedule = async (
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
       return;
     }
-  }
-
-  if (formData.preset === 'existing') {
-    body.schedule.spec = schedule.spec;
-  } else {
-    setBodySpec(body, formData);
-    body.schedule.spec.structuredCalendar = [];
   }
 
   loading.set(true);
