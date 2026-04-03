@@ -1,9 +1,18 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
+  import { get, type Writable, writable } from 'svelte/store';
 
   import Card from '$lib/holocene/card.svelte';
+  import Combobox from '$lib/holocene/combobox/combobox.svelte';
+  import DatePicker from '$lib/holocene/date-picker.svelte';
+  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import NumberInput from '$lib/holocene/input/number-input.svelte';
+  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
+  import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import type { EndDateType } from '$lib/types/schedule';
   import type { FullSchedule } from '$lib/types/schedule';
+  import { formatOffset, TimezoneOptions } from '$lib/utilities/timezone';
 
   import type { ScheduleFormData } from './schema';
 
@@ -18,6 +27,43 @@
   let { form, errors, schedule = null }: Props = $props();
 
   const endDateType = $derived($form.endDateType);
+
+  const timezoneComboboxOptions = $derived.by(() => {
+    const opts = [{ label: 'UTC', value: 'UTC' }];
+    for (const tz of TimezoneOptions) {
+      const offsetStr = formatOffset(tz.offset);
+      opts.push({
+        label: `${tz.label} (${tz.abbr}) ${offsetStr}`,
+        value: tz.zones?.[0] ?? tz.label,
+      });
+    }
+    return opts;
+  });
+
+  const endDateTypeStore: Writable<EndDateType> = writable($form.endDateType);
+  $effect(() => {
+    if (get(endDateTypeStore) !== $form.endDateType)
+      endDateTypeStore.set($form.endDateType);
+  });
+  $effect(() => {
+    const val = $endDateTypeStore;
+    if (val !== $form.endDateType) $form.endDateType = val;
+  });
+
+  const startDateValue = $derived(
+    $form.startDate ? new Date($form.startDate) : new Date(),
+  );
+  const endDateValue = $derived(
+    $form.endDate ? new Date($form.endDate) : new Date(),
+  );
+
+  const onStartDateChange = (e: CustomEvent<Date>) => {
+    $form.startDate = e.detail.toISOString();
+  };
+
+  const onEndDateChange = (e: CustomEvent<Date>) => {
+    $form.endDate = e.detail.toISOString();
+  };
 </script>
 
 <Card class="w-full">
@@ -62,88 +108,65 @@
       required
     />
 
-    <Input
-      id="startDate"
-      bind:value={$form.startDate}
+    <DatePicker
       label="Schedule Start Date"
-      placeholder="Today, {new Date().toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })}"
+      selected={startDateValue}
+      todayLabel={translate('common.today')}
+      closeLabel={translate('common.close')}
+      clearLabel={translate('common.clear-input-button-label')}
+      on:datechange={onStartDateChange}
     />
 
-    <fieldset class="flex flex-col gap-2">
-      <legend class="text-sm font-medium">End Date</legend>
-      <label class="flex items-center gap-2">
-        <input
-          type="radio"
-          name="endDateType"
-          value="never"
-          checked={endDateType === 'never'}
-          on:change={() => ($form.endDateType = 'never')}
-        />
-        <span class="text-sm">Never</span>
-      </label>
-      <label class="flex items-center gap-2">
-        <input
-          type="radio"
-          name="endDateType"
-          value="on"
-          checked={endDateType === 'on'}
-          on:change={() => ($form.endDateType = 'on')}
-        />
-        <span class="text-sm">On</span>
+    <RadioGroup
+      name="endDateType"
+      group={endDateTypeStore}
+      description="End Date"
+    >
+      <RadioInput id="end-date-never" value="never" label="Never" />
+      <div class="flex h-8 items-center gap-3">
+        <RadioInput id="end-date-on" value="on" label="On" />
         {#if endDateType === 'on'}
-          <Input
-            id="endDate"
+          <DatePicker
             label="End date"
-            bind:value={$form.endDate}
-            placeholder="MM/DD/YY"
+            labelHidden
+            selected={endDateValue}
+            todayLabel={translate('common.today')}
+            closeLabel={translate('common.close')}
+            clearLabel={translate('common.clear-input-button-label')}
+            on:datechange={onEndDateChange}
           />
         {/if}
-      </label>
-      <label class="flex items-center gap-2">
-        <input
-          type="radio"
-          name="endDateType"
-          value="after"
-          checked={endDateType === 'after'}
-          on:change={() => ($form.endDateType = 'after')}
-        />
-        <span class="text-sm">After</span>
+      </div>
+      <div class="flex h-8 items-center gap-3">
+        <RadioInput id="end-date-after" value="after" label="After" />
         {#if endDateType === 'after'}
-          <input
+          <NumberInput
             id="endAfterOccurrences"
-            type="number"
-            class="surface-primary w-48 rounded border border-subtle px-3 py-2 text-sm"
+            label="Occurrences"
+            labelHidden
             bind:value={$form.endAfterOccurrences}
             placeholder="### occurrences"
+            min={1}
           />
         {/if}
-      </label>
-    </fieldset>
+      </div>
+    </RadioGroup>
 
     <div class="flex gap-4">
-      <div class="flex-1">
-        <label for="timezoneName" class="text-sm font-medium">Timezone</label>
-        <select
-          id="timezoneName"
-          class="surface-primary mt-1 w-full rounded border border-subtle px-3 py-2 text-sm"
-          bind:value={$form.timezoneName}
-        >
-          <option value="UTC">UTC</option>
-          {#each Intl.supportedValuesOf('timeZone') as tz}
-            <option value={tz}>{tz}</option>
-          {/each}
-        </select>
-      </div>
-      <Input
-        id="jitter"
-        bind:value={$form.jitter}
-        label="Jitter"
-        placeholder="0 sec"
+      <Combobox
+        id="timezoneName"
+        label="Timezone"
+        bind:value={$form.timezoneName}
+        options={timezoneComboboxOptions}
+        optionValueKey="value"
+        optionLabelKey="label"
+        noResultsText={translate('common.no-results')}
+        placeholder="Search timezone..."
+        leadingIcon="clock"
+        required
+        class="w-96"
       />
+      <DurationInput id="jitter" bind:value={$form.jitter} label="Jitter" />
     </div>
 
     <ScheduleInputPayload

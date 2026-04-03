@@ -77,12 +77,25 @@
     validators: zodClient(scheduleFormSchema),
     resetForm: false,
     onUpdate: async ({ form }) => {
-      if (!form.valid) return;
+      if (!form.valid) {
+        const errors: string[] = [];
+        for (const [field, errs] of Object.entries(form.errors)) {
+          if (Array.isArray(errs) && errs.length > 0) {
+            errors.push(`${field}: ${(errs as string[]).join(', ')}`);
+          }
+        }
+        validationError =
+          errors.join('; ') || 'Please fix the form errors above.';
+        return;
+      }
+      validationError = '';
       await onSubmit(form.data);
     },
   });
 
   const { form, errors: formErrors, enhance, submitting } = superform;
+
+  let validationError = $state('');
 
   const onInput = () => {
     if ($error) {
@@ -106,7 +119,9 @@
     </Link>
     <h1>{title}</h1>
     <form novalidate use:enhance oninput={onInput}>
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+      <div
+        class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_480px] 2xl:grid-cols-[1fr_640px]"
+      >
         <div class="flex flex-col gap-6">
           <ScheduleDetailsCard {form} errors={$formErrors} {schedule} />
           <ScheduleSpecCard {form} />
@@ -117,6 +132,11 @@
             bind:workflowSearchAttributes={$form.workflowSearchAttributes}
           />
 
+          <Alert
+            intent="error"
+            title={validationError}
+            hidden={!validationError}
+          />
           <div class="flex flex-row items-center gap-4 max-sm:flex-col">
             <Button
               disabled={$submitting || !writeActionsAreAllowed()}
