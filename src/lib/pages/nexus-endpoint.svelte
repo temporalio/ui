@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import Button from '$lib/holocene/button.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
@@ -9,20 +8,17 @@
   import type { NexusEndpoint as Endpoint } from '$lib/types/nexus';
   import {
     routeForNamespace,
-    routeForNexusEndpointEdit,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
 
   let {
     endpoint,
-    editDisabled = false,
     taskQueueStatus,
-    editHref,
+    actions,
   }: {
     endpoint: Endpoint;
-    editDisabled?: boolean;
     taskQueueStatus?: Snippet;
-    editHref?: string;
+    actions?: Snippet;
   } = $props();
 </script>
 
@@ -32,10 +28,7 @@
       <h1 data-testid="namespace-selector-title">
         {endpoint.spec?.name || ''}
       </h1>
-      <Button
-        href={editHref ?? routeForNexusEndpointEdit(endpoint.id!)}
-        disabled={editDisabled}>{translate('common.edit')}</Button
-      >
+      {@render actions?.()}
     </div>
     <p>UUID: {endpoint.id}</p>
   </div>
