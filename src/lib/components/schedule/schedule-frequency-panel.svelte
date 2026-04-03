@@ -1,31 +1,46 @@
 <script lang="ts">
   import Panel from '$lib/components/panel.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { StructuredCalendar } from '$lib/types/schedule';
 
   import ScheduleFrequency from './schedule-frequency.svelte';
 
-  import type { IntervalSpec } from '$types';
+  import type { ScheduleSpec } from '$types';
 
   interface Props {
-    frequency: (StructuredCalendar | IntervalSpec)[];
-    timezoneName?: string;
+    spec: ScheduleSpec;
   }
 
-  let { frequency, timezoneName = 'UTC' }: Props = $props();
+  let { spec }: Props = $props();
 
   const hasCronString = $derived(
-    frequency.length > 0 && 'comment' in frequency[0] && !!frequency[0].comment,
+    spec?.structuredCalendar?.length > 0 &&
+      !!spec?.structuredCalendar[0].comment,
   );
+
+  let viewFullSpec = $state(false);
 </script>
 
 <Panel>
-  <h2 class="mb-4">
-    {hasCronString
-      ? translate('schedules.cron-string')
-      : translate('schedules.schedule-spec')}
-  </h2>
-  <div class="pr-2">
-    <ScheduleFrequency {frequency} {timezoneName} class="text-base" />
+  <div class="mb-4 flex items-center justify-between gap-4">
+    <h2>
+      {hasCronString
+        ? translate('schedules.cron-string')
+        : translate('schedules.schedule-spec')}
+    </h2>
+    <Button
+      size="xs"
+      variant="ghost"
+      on:click={() => (viewFullSpec = !viewFullSpec)}
+    >
+      {viewFullSpec
+        ? translate('schedules.hide-full-spec')
+        : translate('schedules.view-full-spec')}
+    </Button>
   </div>
+  <ScheduleFrequency {spec} />
+  {#if viewFullSpec}
+    <CodeBlock language="json" content={JSON.stringify(spec, null, 2)} />
+  {/if}
 </Panel>

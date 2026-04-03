@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -9,19 +9,24 @@
   import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
   import { routeForSchedule, routeForTimeline } from '$lib/utilities/route-for';
 
-  import ScheduleBasicFrequency from './schedule-basic-frequency.svelte';
+  import ScheduleFrequency from './schedule-frequency.svelte';
 
   import type { ScheduleActionResult, ScheduleListEntry } from '$types';
 
-  let { namespace } = $page.params;
+  const { namespace } = $derived(page.params);
 
-  export let schedule: ScheduleListEntry;
-  export let columns: ConfigurableTableHeader[];
+  type Props = {
+    schedule: ScheduleListEntry;
+    columns: ConfigurableTableHeader[];
+  };
 
-  $: spec = schedule?.info?.spec;
-  $: timezoneName = spec?.timezoneName || 'UTC';
-  $: searchAttributes = schedule?.searchAttributes ?? {};
-  $: decodedAttributes = decodePayloadAttributes({ searchAttributes });
+  let { schedule, columns }: Props = $props();
+
+  const spec = $derived(schedule?.info?.spec);
+  const searchAttributes = $derived(schedule?.searchAttributes ?? {});
+  const decodedAttributes = $derived(
+    decodePayloadAttributes({ searchAttributes }),
+  );
 
   const sortRecentActions = (recentActions: ScheduleActionResult[]) => {
     return (
@@ -35,10 +40,12 @@
     );
   };
 
-  $: route = routeForSchedule({
-    namespace,
-    scheduleId: schedule?.scheduleId as string,
-  });
+  const route = $derived(
+    routeForSchedule({
+      namespace,
+      scheduleId: schedule.scheduleId,
+    }),
+  );
 </script>
 
 <tr class="max-h-32">
@@ -81,13 +88,7 @@
       </td>
     {:else if label === translate('schedules.schedule-spec')}
       <td class="cell">
-        <p>{@html translate('common.timezone', { timezone: timezoneName })}</p>
-        <ScheduleBasicFrequency
-          frequency={[
-            ...(spec?.structuredCalendar ?? []),
-            ...(spec?.interval ?? []),
-          ]}
-        />
+        <ScheduleFrequency {spec} />
       </td>
     {:else}
       <td class="cell">

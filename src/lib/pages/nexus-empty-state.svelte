@@ -1,20 +1,16 @@
 <script lang="ts">
-  import Button from '$lib/holocene/button.svelte';
+  import type { Snippet } from 'svelte';
+
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { useDarkMode } from '$lib/utilities/dark-mode';
-  import { routeForNexusEndpointCreate } from '$lib/utilities/route-for';
   import andromeda from '$lib/vendor/andromeda.png';
 
   type Props = {
-    createDisabled?: boolean;
-    createHref?: string;
+    actions?: Snippet;
   };
 
-  let {
-    createDisabled = false,
-    createHref = routeForNexusEndpointCreate(),
-  }: Props = $props();
+  let { actions }: Props = $props();
 </script>
 
 <div class="flex min-h-screen flex-col gap-8 p-10">
@@ -61,9 +57,7 @@
           > are often registered in the same Worker as the underlying Temporal primitives
           they abstract.
         </p>
-        <Button disabled={createDisabled} variant="primary" href={createHref}
-          >{translate('nexus.create-endpoint')}</Button
-        >
+        {@render actions?.()}
       </div>
     </div>
     <div class="bg-dark mx-auto mt-8 w-full" class:invert={!$useDarkMode}>
