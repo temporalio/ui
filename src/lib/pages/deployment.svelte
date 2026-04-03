@@ -3,10 +3,9 @@
   import { page } from '$app/state';
 
   import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
+  import DeploymentHeader from '$lib/components/deployments/deployment-header.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Error from '$lib/holocene/error.svelte';
-  import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -15,20 +14,10 @@
     fetchDeployment,
   } from '$lib/services/deployments-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import {
-    routeForWorkerDeployments,
-    routeForWorkerDeploymentVersionCreate,
-    routeForWorkflowsWithQuery,
-  } from '$lib/utilities/route-for';
+  import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
-  const workflowHref = $derived(
-    routeForWorkflowsWithQuery({
-      namespace,
-      query: `TemporalWorkerDeployment="${deploymentName}"`,
-    }),
-  );
 
   const deploymentFetch = $derived(
     fetchDeployment({ namespace, deploymentName }),
@@ -64,42 +53,12 @@
 {:then deployment}
   {@const info = deployment.workerDeploymentInfo}
 
-  <header class="flex flex-col gap-4">
-    <div class="flex items-center gap-2 text-sm">
-      <Link href={routeForWorkerDeployments({ namespace })} icon="chevron-left">
-        {translate('deployments.back-to-deployments')}
-      </Link>
-      <span class="text-secondary">|</span>
-      <Link href={workflowHref}>
-        {translate('workers.go-to-workflows')}
-      </Link>
-    </div>
-
-    <div class="flex w-full items-center justify-between">
-      <h1 class="text-2xl font-semibold">{deploymentName}</h1>
-      <div class="flex items-center gap-2">
-        <Button variant="secondary" href={workflowHref}>
-          {translate('deployments.view-workflows')}
-        </Button>
-        <Button
-          href={routeForWorkerDeploymentVersionCreate({
-            namespace,
-            deployment: deploymentName,
-          })}
-        >
-          {translate('deployments.create-new-version')}
-        </Button>
-        {#if !info.versionSummaries?.length}
-          <Button
-            variant="destructive"
-            on:click={() => (showDeleteModal = true)}
-          >
-            {translate('deployments.delete-deployment')}
-          </Button>
-        {/if}
-      </div>
-    </div>
-  </header>
+  <DeploymentHeader
+    {namespace}
+    {deploymentName}
+    hasVersions={!!info.versionSummaries?.length}
+    onDeleteClick={() => (showDeleteModal = true)}
+  />
 
   <div class="mt-4">
     <PaginatedTable
