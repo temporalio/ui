@@ -264,7 +264,7 @@ export const submitEditSchedule = async (
     },
   } as unknown as DescribeFullSchedule;
 
-  const fields = body.schedule.action.startWorkflow?.header?.fields;
+  const fields = body.schedule?.action?.startWorkflow?.header?.fields;
   if (fields && Object.keys(fields).length > 0) {
     try {
       for (const [key, value] of Object.entries(fields)) {
