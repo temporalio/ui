@@ -1,19 +1,14 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
-
   import { invalidateAll } from '$app/navigation';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { Menu, MenuContainer, MenuItem } from '$lib/holocene/menu';
-  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
-    setCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
@@ -36,7 +31,10 @@
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
   import ComputeBadge from './compute-badge.svelte';
+  import DeleteVersionModal from './delete-version-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
+  import ValidateConnectionModal from './validate-connection-modal.svelte';
+  import VersionActionsMenu from './version-actions-menu.svelte';
   import VersionComputeDetails from './version-compute-details.svelte';
 
   type Props = {
@@ -154,8 +152,6 @@
   let validateResult = $state<{ valid: boolean; message?: string } | null>(
     null,
   );
-  let setCurrentError = $state<string | null>(null);
-  const menuOpen = writable(false);
 
   $effect(() => {
     if (expanded && !fetchPromise) {
@@ -166,19 +162,6 @@
       });
     }
   });
-
-  async function handleSetCurrent() {
-    setCurrentError = null;
-    await setCurrentDeploymentVersion(
-      { namespace, deploymentName, buildId: versionBuildId },
-      () => {
-        setCurrentError = translate('deployments.set-as-current-error');
-      },
-    );
-    if (!setCurrentError) {
-      await invalidateAll();
-    }
-  }
 
   async function handleValidateConnection() {
     validateResult = null;
@@ -256,37 +239,13 @@
     class="whitespace-pre-line break-words text-left"
     dateTime={version?.createTime}
   />
-  <td class="w-24 whitespace-pre-line break-words">
-    <MenuContainer open={menuOpen}>
-      {#snippet children(open)}
-        <button
-          type="button"
-          aria-label="Actions"
-          aria-expanded={open}
-          aria-haspopup="menu"
-          aria-controls="version-actions-{versionBuildId}"
-          onclick={() => menuOpen.update((v) => !v)}
-          class="flex h-8 w-8 items-center justify-center rounded hover:surface-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
-        >
-          <Icon name="vertical-ellipsis" class="h-4 w-4" />
-        </button>
-        <Menu id="version-actions-{versionBuildId}" position="right">
-          <MenuItem href={editHref}>
-            {translate('deployments.edit')}
-          </MenuItem>
-          <MenuItem onclick={handleValidateConnection}>
-            {translate('deployments.validate-connection')}
-          </MenuItem>
-          <MenuItem href={workflowHref}>
-            {translate('deployments.view-workflows')}
-          </MenuItem>
-          <MenuItem onclick={() => (showDeleteVersionModal = true)}>
-            {translate('common.delete')}
-          </MenuItem>
-        </Menu>
-      {/snippet}
-    </MenuContainer>
-  </td>
+  <VersionActionsMenu
+    buildId={versionBuildId}
+    {editHref}
+    {workflowHref}
+    onValidate={handleValidateConnection}
+    onDelete={() => (showDeleteVersionModal = true)}
+  />
 </tr>
 
 {#if expanded}
@@ -329,46 +288,17 @@
   </tr>
 {/if}
 
-<Modal
-  id="validate-connection-modal-{versionBuildId}"
+<ValidateConnectionModal
+  buildId={versionBuildId}
   open={showValidateModal}
-  confirmText={translate('common.close')}
-  cancelText={translate('common.cancel')}
-  on:confirmModal={() => (showValidateModal = false)}
-  on:cancelModal={() => (showValidateModal = false)}
->
-  <h3 slot="title">{translate('deployments.validate-connection')}</h3>
-  <div slot="content">
-    {#if validateLoading}
-      <div class="flex flex-col gap-2">
-        <div class="h-3 w-32 animate-pulse rounded bg-subtle"></div>
-        <div class="h-3 w-48 animate-pulse rounded bg-subtle"></div>
-      </div>
-    {:else if validateResult}
-      <p class="text-sm">
-        {validateResult.valid !== false
-          ? translate('deployments.validate-connection-valid')
-          : translate('deployments.validate-connection-invalid')}
-      </p>
-      {#if validateResult.message}
-        <p class="mt-1 text-sm text-secondary">{validateResult.message}</p>
-      {/if}
-    {/if}
-  </div>
-</Modal>
+  loading={validateLoading}
+  result={validateResult}
+  onClose={() => (showValidateModal = false)}
+/>
 
-<Modal
-  id="delete-version-modal-{versionBuildId}"
+<DeleteVersionModal
+  buildId={versionBuildId}
   open={showDeleteVersionModal}
-  confirmText={translate('common.delete')}
-  cancelText={translate('common.cancel')}
-  confirmType="destructive"
-  on:confirmModal={handleDeleteVersion}
-  on:cancelModal={() => (showDeleteVersionModal = false)}
->
-  <h3 slot="title">{translate('deployments.delete-version')}</h3>
-  <div slot="content" class="flex flex-col gap-2">
-    <p class="text-sm">{translate('deployments.delete-version-confirm')}</p>
-    <p class="text-sm">{translate('deployments.delete-version-description')}</p>
-  </div>
-</Modal>
+  onConfirm={handleDeleteVersion}
+  onCancel={() => (showDeleteVersionModal = false)}
+/>
