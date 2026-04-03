@@ -18,12 +18,20 @@
 
   const specs = $derived($form.specs);
 
+  let activeIndex = $state(specs.length - 1);
+
   const addSpec = () => {
     $form.specs = [...$form.specs, { ...DEFAULT_SPEC_ITEM }];
+    activeIndex = $form.specs.length - 1;
   };
 
   const removeSpec = (index: number) => {
     $form.specs = $form.specs.filter((_, i) => i !== index);
+    if (activeIndex >= $form.specs.length) {
+      activeIndex = $form.specs.length - 1;
+    } else if (activeIndex > index) {
+      activeIndex = activeIndex - 1;
+    }
   };
 </script>
 
@@ -38,11 +46,13 @@
     </Link>
   </p>
 
-  <div class="mt-4 flex flex-col gap-6">
-    {#each specs as _, i}
+  <div class="mt-4 flex flex-col gap-4">
+    {#each specs as _, i (i)}
       <ScheduleSpecItem
         {form}
         index={i}
+        expanded={activeIndex === i}
+        onExpand={() => (activeIndex = i)}
         onRemove={() => removeSpec(i)}
         canRemove={specs.length > 1}
       />

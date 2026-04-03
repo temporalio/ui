@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
-  import { get, writable } from 'svelte/store';
 
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
+  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
+  import Select from '$lib/holocene/select/select.svelte';
 
   import type { ScheduleFormData } from './schema';
 
@@ -44,35 +45,35 @@
 
   {#if editing}
     <div class="mt-4 flex flex-col gap-4">
-      <div>
-        <label for="overlap-policy" class="text-sm font-medium"
-          >Overlap Policy</label
-        >
-        <select
-          id="overlap-policy"
-          class="surface-primary mt-1 w-full rounded border border-subtle px-3 py-2 text-sm"
-          bind:value={$form.overlapPolicy}
-        >
-          {#each Object.entries(overlapPolicyLabels) as [value, label]}
-            <option {value}>{label}</option>
-          {/each}
-        </select>
-      </div>
-      <Input
+      <Select
+        id="overlap-policy"
+        label="Overlap Policy"
+        value={$form.overlapPolicy}
+        onChange={(value) => {
+          $form.overlapPolicy = String(value) as typeof $form.overlapPolicy;
+        }}
+      >
+        {#each Object.entries(overlapPolicyLabels) as [value, label] (value)}
+          <Option {value}>{label}</Option>
+        {/each}
+      </Select>
+      <DurationInput
         id="catchup-window"
         label="Catchup Window"
         bind:value={$form.catchupWindow}
-        hintText="Duration string, e.g. 8760h (1 year)"
       />
       <Checkbox
         id="pause-on-failure"
         label="Pause on Failure"
-        bind:checked={$form.pauseOnFailure}
+        checked={$form.pauseOnFailure}
+        on:change={() => ($form.pauseOnFailure = !$form.pauseOnFailure)}
       />
       <Checkbox
         id="keep-original-workflow-id"
         label="Keep Original Workflow ID"
-        bind:checked={$form.keepOriginalWorkflowId}
+        checked={$form.keepOriginalWorkflowId}
+        on:change={() =>
+          ($form.keepOriginalWorkflowId = !$form.keepOriginalWorkflowId)}
       />
       <Button variant="secondary" on:click={toggleEdit}>Done</Button>
     </div>

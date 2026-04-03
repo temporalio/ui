@@ -148,9 +148,7 @@ export const getDefaultValues = (params: {
     endDate: schedule?.spec?.endTime ? String(schedule.spec.endTime) : '',
     endAfterOccurrences: undefined,
     jitter: schedule?.spec?.jitter ? String(schedule.spec.jitter) : '',
-    overlapPolicy: String(
-      schedule?.policies?.overlapPolicy ?? 'Skip',
-    ) as ScheduleFormData['overlapPolicy'],
+    overlapPolicy: parseOverlapPolicy(schedule?.policies?.overlapPolicy),
     catchupWindow: schedule?.policies?.catchupWindow
       ? String(schedule.policies.catchupWindow)
       : '',
@@ -160,6 +158,30 @@ export const getDefaultValues = (params: {
     workflowSearchAttributes: workflowSearchAttributesInput,
   };
 };
+
+const OVERLAP_POLICY_MAP: Record<string, ScheduleFormData['overlapPolicy']> = {
+  SCHEDULE_OVERLAP_POLICY_UNSPECIFIED: 'Unspecified',
+  SCHEDULE_OVERLAP_POLICY_SKIP: 'Skip',
+  SCHEDULE_OVERLAP_POLICY_BUFFER_ONE: 'BufferOne',
+  SCHEDULE_OVERLAP_POLICY_BUFFER_ALL: 'BufferAll',
+  SCHEDULE_OVERLAP_POLICY_CANCEL_OTHER: 'CancelOther',
+  SCHEDULE_OVERLAP_POLICY_TERMINATE_OTHER: 'TerminateOther',
+  SCHEDULE_OVERLAP_POLICY_ALLOW_ALL: 'AllowAll',
+  Unspecified: 'Unspecified',
+  Skip: 'Skip',
+  BufferOne: 'BufferOne',
+  BufferAll: 'BufferAll',
+  CancelOther: 'CancelOther',
+  TerminateOther: 'TerminateOther',
+  AllowAll: 'AllowAll',
+};
+
+function parseOverlapPolicy(
+  value?: string | number | null,
+): ScheduleFormData['overlapPolicy'] {
+  if (!value) return 'Skip';
+  return OVERLAP_POLICY_MAP[String(value)] ?? 'Skip';
+}
 
 function parseIntervalString(intervalStr: string): {
   days: string;
