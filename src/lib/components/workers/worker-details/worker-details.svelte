@@ -15,6 +15,7 @@
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -33,9 +34,10 @@
   type Props = {
     breadcrumb: Snippet;
     worker: WorkerInfo | null | undefined;
+    onrefresh: () => void;
   };
 
-  let { breadcrumb, worker }: Props = $props();
+  let { breadcrumb, worker, onrefresh }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const heartbeat = $derived(worker?.workerHeartbeat);
@@ -68,6 +70,24 @@
       (successCount / heartbeat.workflowTaskSlotsInfo.totalProcessedTasks) *
       100
     ).toFixed(1);
+  });
+
+  let isHeartbeatStale = $state(false);
+
+  function checkHeartbeatStaleness() {
+    if (!heartbeat?.heartbeatTime) {
+      isHeartbeatStale = false;
+      return;
+    }
+    const elapsed =
+      Date.now() - new Date(heartbeat.heartbeatTime as string).getTime();
+    isHeartbeatStale = elapsed >= 60_000;
+  }
+
+  $effect(() => {
+    checkHeartbeatStaleness();
+    const interval = setInterval(checkHeartbeatStaleness, 10_000);
+    return () => clearInterval(interval);
   });
 
   const SupplierKindTooltipText: Record<string, string> = {
@@ -107,6 +127,24 @@
       />
     </h1>
   </header>
+
+  <Alert
+    intent="warning"
+    title={translate('workers.stale-heartbeat-title')}
+    class="max-w-screen-lg xl:w-2/3"
+    hidden={!isHeartbeatStale}
+  >
+    <p>{translate('workers.stale-heartbeat-description')}</p>
+    <Button
+      leadingIcon="retry"
+      variant="ghost"
+      size="xs"
+      class="mt-2"
+      on:click={() => onrefresh()}
+    >
+      {translate('common.refresh')}
+    </Button>
+  </Alert>
 
   <DetailList aria-label="worker details" rowCount={2}>
     <DetailListColumn>

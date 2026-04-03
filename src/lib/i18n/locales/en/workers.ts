@@ -84,4 +84,7 @@ export const Strings = {
   'slot-supplier-kind-resource-based':
     'Slot count adjusts based on CPU and memory usage.',
   'slot-supplier-kind-custom': 'Slot count is managed by custom logic.',
+  'stale-heartbeat-title': 'Worker data may be outdated',
+  'stale-heartbeat-description':
+    'More than a minute has elapsed since the last heartbeat. Refresh to see the latest.',
 } as const;

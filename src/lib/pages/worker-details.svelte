@@ -10,9 +10,11 @@
   import { routeForWorkers } from '$lib/utilities/route-for';
 
   const { namespace, workerInstanceKey } = $derived(page.params);
-  const workerDetailsPromise = $derived(
-    describeWorker({ namespace, workerInstanceKey }),
-  );
+  let refresh = $state(Date.now());
+  const workerDetailsPromise = $derived.by(() => {
+    void refresh;
+    return describeWorker({ namespace, workerInstanceKey });
+  });
 </script>
 
 {#snippet breadcrumb()}
@@ -28,7 +30,11 @@
 {#await workerDetailsPromise}
   <Skeleton {breadcrumb} />
 {:then data}
-  <WorkerDetails worker={data.workerInfo} {breadcrumb} />
+  <WorkerDetails
+    worker={data.workerInfo}
+    {breadcrumb}
+    onrefresh={() => (refresh = Date.now())}
+  />
 {:catch error}
   {@render breadcrumb()}
   <Error {error} status={error.statusCode} />
