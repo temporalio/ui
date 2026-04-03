@@ -1,5 +1,3 @@
-import type { ScheduleParameters } from '$lib/types/schedule';
-
 const parseTime = (time: string) => (time ? parseInt(time) : 0);
 
 export const timeToInterval = (
@@ -16,11 +14,23 @@ export const timeToInterval = (
   return `${interval}s`;
 };
 
+type DaysAndMonthsInput = {
+  months?: string[];
+  daysOfMonth?: number[];
+  daysOfWeek?: string[];
+};
+
+type DaysAndMonthsOutput = {
+  month: string;
+  dayOfMonth: string;
+  dayOfWeek: string;
+};
+
 export const convertDaysAndMonths = ({
   months = [],
   daysOfMonth = [],
   daysOfWeek = [],
-}: Partial<ScheduleParameters>): Partial<ScheduleParameters> => {
+}: DaysAndMonthsInput): DaysAndMonthsOutput => {
   const month = months
     .sort((a: string, b: string) => parseInt(a) - parseInt(b))
     .join(',');

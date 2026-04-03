@@ -1,8 +1,4 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
-  import { writable } from 'svelte/store';
-
-  import { onDestroy } from 'svelte';
   import { arrayProxy, superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -16,14 +12,9 @@
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
   import { error, loading } from '$lib/stores/schedules';
   import { customSearchAttributes } from '$lib/stores/search-attributes';
-  import type {
-    FullSchedule,
-    ScheduleParameters,
-    SchedulePreset,
-  } from '$lib/types/schedule';
+  import type { FullSchedule } from '$lib/types/schedule';
   import {
     routeForSchedule,
     routeForSchedules,
@@ -40,19 +31,15 @@
   import SchedulesCalendarView from './schedules-calendar-view.svelte';
   import SchedulesSearchAttributesInputs from './schedules-search-attributes-inputs.svelte';
 
-  import type { Schedule, SearchAttribute } from '$types';
+  import type { SearchAttribute } from '$types';
 
   interface Props {
     schedule?: FullSchedule | null;
     searchAttributes?: SearchAttribute;
-    onConfirm: (
-      preset: SchedulePreset,
-      formData: ScheduleFormData,
-      schedule?: Schedule,
-    ) => void;
+    onSubmit: (formData: ScheduleFormData) => Promise<void>;
   }
 
-  let { schedule = null, searchAttributes = {}, onConfirm }: Props = $props();
+  let { schedule = null, searchAttributes = {}, onSubmit }: Props = $props();
 
   const namespace = $derived(page.params.namespace);
   const scheduleId = $derived(page.params.schedule);
@@ -74,12 +61,6 @@
     schedule ? translate('common.save') : translate('schedules.create'),
   );
 
-  const encoding: Writable<PayloadInputEncoding> = writable('json/plain');
-
-  let preset = $state<SchedulePreset>(
-    page.params.schedule ? 'existing' : 'interval',
-  );
-
   const initialValues = $derived(
     getDefaultValues({
       schedule,
@@ -98,7 +79,7 @@
     resetForm: false,
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
-      handleConfirm(form.data);
+      await onSubmit(form.data);
     },
   });
 
@@ -119,38 +100,17 @@
     'workflowSearchAttributes',
   );
 
-  const handleConfirm = (form: ScheduleFormData) => {
-    const formData: ScheduleFormData = {
-      name: form.name.trimEnd(),
-      workflowType: form.workflowType,
-      workflowId: form.workflowId,
-      taskQueue: form.taskQueue,
-      ...(form.editInput && { input: form.input }),
-      encoding: $encoding,
-      messageType: form.messageType,
-      hour: form.hour,
-      minute: form.minute,
-      second: form.second,
-      phase: form.phase,
-      cronString: form.cronString,
-      daysOfWeek: form.daysOfWeek,
-      daysOfMonth: form.daysOfMonth,
-      days: form.days,
-      months: form.months,
-      searchAttributes: form.searchAttributes,
-      workflowSearchAttributes: form.workflowSearchAttributes,
-    };
-
-    onConfirm(preset, formData, schedule);
-  };
-
   const onInput = () => {
     if ($error) {
       $error = '';
     }
   };
 
-  onDestroy(() => ($error = ''));
+  $effect(() => {
+    return () => {
+      $error = '';
+    };
+  });
 </script>
 
 <div class="flex flex-col gap-4 pb-10">
@@ -212,7 +172,7 @@
         <ScheduleInputPayload
           bind:input={$form.input}
           bind:editInput={$form.editInput}
-          {encoding}
+          bind:encoding={$form.encoding}
           bind:messageType={$form.messageType}
           payloads={schedule?.action?.startWorkflow?.input}
           showEditActions={Boolean(schedule)}
@@ -228,7 +188,7 @@
           bind:second={$form.second}
           bind:phase={$form.phase}
           bind:cronString={$form.cronString}
-          bind:preset
+          bind:preset={$form.preset}
           timezoneName={$form.timezoneName}
         >
           <SchedulesSearchAttributesInputs
