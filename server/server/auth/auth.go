@@ -58,7 +58,7 @@ func stripBearerPrefix(token string) string {
 	return strings.TrimPrefix(token, "Bearer ")
 }
 
-func SetUser(c echo.Context, user *User) error {
+func SetUser(c echo.Context, user *User, sessionExpiresAt time.Time, refreshTokenDuration time.Duration) error {
 	if user.OAuth2Token == nil {
 		return errors.New("no OAuth2Token")
 	}
@@ -81,6 +81,17 @@ func SetUser(c echo.Context, user *User) error {
 		return errors.New("unable to serialize user data")
 	}
 
+	userCookieMaxAge := int(time.Minute.Seconds())
+	if !sessionExpiresAt.IsZero() {
+		remaining := int(time.Until(sessionExpiresAt).Seconds())
+		if remaining <= 0 {
+			remaining = 1
+		}
+		if remaining < userCookieMaxAge {
+			userCookieMaxAge = remaining
+		}
+	}
+
 	s := base64.StdEncoding.EncodeToString(b)
 	parts := splitCookie(s)
 
@@ -88,7 +99,7 @@ func SetUser(c echo.Context, user *User) error {
 		cookie := &http.Cookie{
 			Name:     "user" + strconv.Itoa(i),
 			Value:    p,
-			MaxAge:   int(time.Minute.Seconds()),
+			MaxAge:   userCookieMaxAge,
 			Secure:   c.Request().TLS != nil,
 			HttpOnly: false,
 			Path:     "/",
@@ -100,27 +111,19 @@ func SetUser(c echo.Context, user *User) error {
 	if rt := user.OAuth2Token.RefreshToken; rt != "" {
 		log.Println("[Auth] Setting refresh token cookie")
 
-		// Calculate MaxAge from OAuth2 token expiry.
-		// IMPORTANT: When a refresh token is issued, oauth2.Token.Expiry typically
-		// reflects the refresh token's lifetime, not the access token's lifetime.
-		// This is standard behavior in OIDC flows with offline_access scope.
-		// See: https://pkg.go.dev/golang.org/x/oauth2#Token
-		var refreshMaxAge int
-		if user.OAuth2Token.Expiry.IsZero() {
-			// Fallback: if IdP doesn't provide expiry, use 7 days
-			refreshMaxAge = int((7 * 24 * time.Hour).Seconds())
-			log.Printf("[Auth] Warning: No refresh token expiry from IdP, using 7-day default")
-		} else {
-			// Use IdP's expiry, capped at 30 days for safety
-			maxAge := time.Until(user.OAuth2Token.Expiry)
-			if maxAge > 30*24*time.Hour {
-				maxAge = 30 * 24 * time.Hour
-				log.Printf("[Auth] Warning: IdP refresh token expiry > 30 days, capping at 30 days")
+		const defaultRefreshDuration = 7 * 24 * time.Hour
+		if exp, ok := jwtExp(rt); ok {
+			if remaining := time.Until(exp); remaining > 0 {
+				refreshTokenDuration = remaining
+				log.Printf("[Auth] Derived refresh cookie MaxAge from JWT exp: %d seconds (%.1f days)", int(remaining.Seconds()), remaining.Hours()/24)
 			}
-			refreshMaxAge = int(maxAge.Seconds())
-			log.Printf("[Auth] Setting refresh cookie MaxAge to %d seconds (%.1f days) from IdP",
-				refreshMaxAge, maxAge.Hours()/24)
 		}
+		if refreshTokenDuration <= 0 {
+			refreshTokenDuration = defaultRefreshDuration
+			log.Printf("[Auth] No JWT exp found and no refreshTokenDuration configured, using 7-day default")
+		}
+		refreshMaxAge := int(refreshTokenDuration.Seconds())
+		log.Printf("[Auth] Setting refresh cookie MaxAge to %d seconds (%.1f days)", refreshMaxAge, refreshTokenDuration.Hours()/24)
 
 		refreshCookie := &http.Cookie{
 			Name:     "refresh",
@@ -259,6 +262,26 @@ func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProvider
 	}
 
 	return nil
+}
+
+// jwtExp attempts to extract the exp claim from a JWT without verifying its signature.
+// Returns the expiry time and true if successful, or zero and false for opaque tokens or malformed JWTs.
+func jwtExp(token string) (time.Time, bool) {
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return time.Time{}, false
+	}
+	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return time.Time{}, false
+	}
+	var claims struct {
+		Exp int64 `json:"exp"`
+	}
+	if err := json.Unmarshal(payload, &claims); err != nil || claims.Exp == 0 {
+		return time.Time{}, false
+	}
+	return time.Unix(claims.Exp, 0), true
 }
 
 func splitCookie(val string) []string {
