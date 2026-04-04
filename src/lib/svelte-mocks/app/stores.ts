@@ -34,6 +34,7 @@ const settings: Settings = {
   workflowTerminateDisabled: false,
   hideWorkflowQueryErrors: false,
   activityCommandsDisabled: false,
+  disableTrackingPixel: false,
   feedbackURL: '',
   runtimeEnvironment: {
     isCloud: false,
