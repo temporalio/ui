@@ -2,7 +2,6 @@
   import type { CommonError } from '$lib/types/common-errors';
 
   import CommonErrorItem from './common-error.svelte';
-
   interface Props {
     errors: CommonError[];
     class?: string;
