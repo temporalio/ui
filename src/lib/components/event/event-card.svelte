@@ -35,7 +35,12 @@
       ? translate('events.category.local-activity')
       : spaceBetweenCapitalLetters(event.name),
   );
-  const attributes = $derived(formatAttributes(event));
+  const attributes = $derived.by(() => {
+    const attrs = formatAttributes(event);
+    if (event?.principal?.name) attrs.principalName = event.principal.name;
+    if (event?.principal?.type) attrs.principalType = event.principal.type;
+    return attrs;
+  });
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
     fields.filter(
