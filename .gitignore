@@ -23,7 +23,6 @@ go.work
 go.work.sum
 
 # Claude Code local settings
-.serena/cache
 .claude/settings.local.json
 .claude/*
 !.claude/skills/
