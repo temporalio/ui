@@ -1,20 +1,22 @@
 <script lang="ts">
-  const LABELS: Record<string, string> = {
-    'aws-lambda': 'Lambda',
-    'gcp-cloud-run': 'Cloud Run',
-    vercel: 'Vercel',
+  import Icon from '$lib/holocene/icon/icon.svelte';
+
+  const CONFIG: Record<string, { icon: 'aws' | 'gcp'; label: string }> = {
+    'aws-lambda': { icon: 'aws', label: 'Lambda' },
+    'gcp-cloud-run': { icon: 'gcp', label: 'Cloud Run' },
   };
 
   let { type }: { type: string | undefined } = $props();
 
-  const label = $derived(type ? (LABELS[type] ?? type) : undefined);
+  const config = $derived(type ? CONFIG[type] : undefined);
 </script>
 
-{#if label}
+{#if config}
   <div
-    class="inline-flex items-center border border-subtle px-1.5 py-0.5 text-xs text-secondary"
+    class="inline-flex items-center gap-1 border border-subtle px-1.5 py-0.5 text-xs text-secondary"
   >
-    {label}
+    <Icon name={config.icon} class="h-4 w-4" />
+    {config.label}
   </div>
 {:else}
   <span class="text-secondary">—</span>
