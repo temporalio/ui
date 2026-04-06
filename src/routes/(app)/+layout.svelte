@@ -326,7 +326,7 @@
             'https://support.temporal.io'}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center text-indigo-100 hover:text-white"
+          class="flex items-center hover:text-white"
           aria-label="Support"
         >
           <Icon name="support" />
