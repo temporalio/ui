@@ -8,6 +8,7 @@ export const Strings = {
     'A simple line that explains the power and relationship of Deployment IDs, Series, and Build IDs.',
   'worker-deployments-search-placeholder': 'Filter by Deployment Name',
   'go-to-workflows': 'Go to Workflows',
+  'go-to-instances': 'Go to Instances',
   'empty-state-title': 'No Worker Deployments yet',
   'error-message-fetching': 'Error fetching deployments',
   'empty-state-description':
@@ -37,7 +38,7 @@ export const Strings = {
   'rollout-completed': 'Rollout Completed At',
   'rollout-url': 'Rollout URL',
   'worker-id': 'Worker ID',
-  'back-to-deployments': 'Back to Worker Deployments',
+  'back-to-deployments': 'Back to Deployments',
   'series-name': 'Series Name',
   'first-poller': 'First Poller',
   'last-poller': 'Last Poller',
@@ -84,9 +85,9 @@ export const Strings = {
   'validate-connection-error': 'Failed to validate connection',
   'validate-connection-valid': 'Connection is valid',
   'validate-connection-invalid': 'Connection is invalid',
-  'delete-version': 'Delete Version',
-  'delete-version-confirm': 'Are you sure you want to delete this version?',
-  'delete-version-description': 'This action cannot be undone.',
+  'delete-version': 'Delete Worker Deployment Version',
+  'delete-version-description':
+    'Deleting any running Workers will finish their current tasks. No new invocations will be made.',
   'delete-version-error': 'Failed to delete version',
   'version-load-error': 'Failed to load version details',
 } as const;

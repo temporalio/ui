@@ -1,20 +1,18 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import { has } from '$lib/utilities/has';
-  import { routeForServerlessWorkerCreate } from '$lib/utilities/route-for';
+  import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
   let error = $state('');
 
   const namespace = $derived(page.params.namespace);
-  const createHref = $derived(routeForServerlessWorkerCreate({ namespace }));
+  const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 
   const onFetch = $derived.by(() => {
     return () => {
@@ -44,13 +42,6 @@
 
 {#key [namespace]}
   <div class="flex flex-col gap-4">
-    <CapabilityGuard capability="serverlessDeployments">
-      <div class="flex justify-end">
-        <Button variant="primary" href={createHref}>
-          {translate('workers.create-serverless-worker')}
-        </Button>
-      </div>
-    </CapabilityGuard>
     <PaginatedTable
       let:visibleItems
       {onFetch}

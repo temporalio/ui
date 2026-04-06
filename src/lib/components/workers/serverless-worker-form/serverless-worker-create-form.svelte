@@ -320,7 +320,7 @@
   </div>
 
   <div class="col-span-1 hidden xl:block">
-    <Card class="sticky top-16">
+    <Card class="surface-secondary sticky top-16">
       <ServerlessWorkerSetupGuide />
     </Card>
   </div>

@@ -19,7 +19,7 @@
   dark={false}
   bind:open
 >
-  <div class="p-6 pt-4">
+  <div class="surface-secondary p-6 pt-4">
     <ServerlessWorkerSetupGuide />
   </div>
 </Drawer>

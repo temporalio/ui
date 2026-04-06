@@ -34,11 +34,7 @@
 >
   <h3 slot="title">{translate('deployments.delete-version')}</h3>
   <div slot="content" class="flex flex-col gap-4">
-    <p class="text-sm">
-      {translate('deployments.delete-version-confirm')}
-      {translate('deployments.delete-version-description')}
-    </p>
-    <p class="font-mono text-sm font-medium">{buildId}</p>
+    <p class="text-sm">{translate('deployments.delete-version-description')}</p>
     <Input
       id="delete-version-confirm-input"
       label={translate('deployments.delete-deployment-confirm-instruction')}

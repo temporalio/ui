@@ -222,9 +222,6 @@
     <DeploymentStatus {status} label={statusLabel} />
   </td>
   <td class="text-left">
-    <span class="text-secondary">—</span>
-  </td>
-  <td class="text-left">
     <ComputeBadge type={computeProviderType} />
   </td>
   <Timestamp
@@ -243,7 +240,7 @@
 
 {#if expanded}
   <tr class="surface-primary border-y border-subtle">
-    <td colspan={6} class="!p-1">
+    <td colspan={5} class="!p-1">
       <VersionRowDetails
         {namespace}
         {deploymentName}

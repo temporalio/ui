@@ -38,9 +38,7 @@ export const load: LayoutLoad = async function ({
 
   if (import.meta.env.DEV) {
     Object.assign(systemInfo.capabilities ?? {}, {
-      serverlessDeployments: true,
-      editServerlessDeployment: true,
-      deleteServerlessDeployment: true,
+      serverlessWorkers: true,
     });
   }
 

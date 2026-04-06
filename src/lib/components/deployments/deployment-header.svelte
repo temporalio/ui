@@ -6,6 +6,7 @@
   import {
     routeForWorkerDeployments,
     routeForWorkerDeploymentVersionCreate,
+    routeForWorkers,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
@@ -33,8 +34,8 @@
       {translate('deployments.back-to-deployments')}
     </Link>
     <span class="text-secondary">|</span>
-    <Link href={workflowHref}>
-      {translate('workers.go-to-workflows')}
+    <Link href={routeForWorkers({ namespace })}>
+      {translate('deployments.go-to-instances')}
     </Link>
   </div>
 
@@ -44,7 +45,7 @@
       <Button variant="secondary" href={workflowHref}>
         {translate('deployments.view-workflows')}
       </Button>
-      <CapabilityGuard capability="editServerlessDeployment">
+      <CapabilityGuard capability="serverlessWorkers">
         <Button
           href={routeForWorkerDeploymentVersionCreate({
             namespace,
@@ -55,7 +56,7 @@
         </Button>
       </CapabilityGuard>
       {#if !hasVersions}
-        <CapabilityGuard capability="deleteServerlessDeployment">
+        <CapabilityGuard capability="serverlessWorkers">
           <Button variant="destructive" on:click={onDeleteClick}>
             {translate('deployments.delete-deployment')}
           </Button>

@@ -26,7 +26,6 @@
   const columns = [
     { label: translate('deployments.build-id') },
     { label: translate('deployments.build-status') },
-    { label: translate('deployments.config-status') },
     { label: translate('deployments.compute') },
     { label: translate('deployments.deployed') },
     { label: translate('deployments.actions') },

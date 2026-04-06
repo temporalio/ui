@@ -24,7 +24,7 @@
     </p>
   </div>
   <div class="flex items-center gap-4">
-    <CapabilityGuard capability="serverlessDeployments">
+    <CapabilityGuard capability="serverlessWorkers">
       <Button variant="secondary" href={createHref}>
         {translate('deployments.create-serverless-deployment')}
       </Button>

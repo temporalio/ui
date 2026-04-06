@@ -102,8 +102,8 @@ export const Strings = {
     'An IAM role allowing Temporal to invoke your function',
   'serverless-empty-prereq-queue':
     'A task queue name for your serverless worker',
-  'create-serverless-worker': 'Create Serverless Deployment',
-  'create-serverless-title': 'Create Serverless Worker',
+  'create-serverless-worker': 'Create Worker Deployment',
+  'create-serverless-title': 'Create Worker Deployment',
   'edit-serverless-worker': 'Edit',
   'edit-serverless-worker-title': 'Edit Serverless Worker',
   'serverless-detail-title': 'Serverless Worker Details',

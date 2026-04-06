@@ -37,7 +37,7 @@
         <Icon name="vertical-ellipsis" class="h-4 w-4" />
       </button>
       <Menu id="version-actions-{buildId}" position="right">
-        <CapabilityGuard capability="editServerlessDeployment">
+        <CapabilityGuard capability="serverlessWorkers">
           <MenuItem href={editHref}>
             {translate('deployments.edit')}
           </MenuItem>
@@ -48,7 +48,7 @@
         <MenuItem href={workflowHref}>
           {translate('deployments.view-workflows')}
         </MenuItem>
-        <CapabilityGuard capability="deleteServerlessDeployment">
+        <CapabilityGuard capability="serverlessWorkers">
           <MenuItem onclick={onDelete}>
             {translate('common.delete')}
           </MenuItem>
