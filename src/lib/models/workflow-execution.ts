@@ -146,9 +146,9 @@ export const toWorkflowExecution = (
   const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
   const startDelay = getStartDelay({ executionTime, startTime });
   const externalPayloadCount =
-    response.workflowExecutionInfo?.externalPayloadCount;
+    response?.workflowExecutionInfo?.externalPayloadCount;
   const externalPayloadSizeBytes =
-    response.workflowExecutionInfo?.externalPayloadSizeBytes;
+    response?.workflowExecutionInfo?.externalPayloadSizeBytes;
 
   let summary;
   let details;
