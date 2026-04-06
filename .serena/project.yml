@@ -1,4 +1,3 @@
-
 # whether to use project's .gitignore files to ignore files
 ignore_all_files_in_gitignore: true
 
@@ -16,7 +15,7 @@ read_only: false
 # This extends the existing exclusions (e.g. from the global configuration)
 #
 # Below is the complete list of tools for convenience.
-# To make sure you have the latest list of tools, and to view their descriptions, 
+# To make sure you have the latest list of tools, and to view their descriptions,
 # execute `uv run scripts/print_tool_overview.py`.
 #
 #  * `activate_project`: Activates a project by name.
@@ -88,7 +87,6 @@ fixed_tools: []
 # For a list of possible encodings, see https://docs.python.org/3.11/library/codecs.html#standard-encodings
 encoding: utf-8
 
-
 # list of languages for which language servers are started; choose from:
 #   al                  bash                clojure             cpp                 csharp
 #   csharp_omnisharp    dart                elixir              elm                 erlang
@@ -113,7 +111,7 @@ encoding: utf-8
 # The first language is the default language and the respective language server will be used as a fallback.
 # Note that when using the JetBrains backend, language servers are not used and this list is correspondingly ignored.
 languages:
-- typescript
+  - typescript
 
 # time budget (seconds) per tool call for the retrieval of additional symbol information
 # such as docstrings or parameter information.
