@@ -87,6 +87,12 @@ export const toEvent = (
 
   const completionLinks = completionCallbacks || attachedCompletionCallbacks;
   const links = historyEvent?.links || completionLinks || [];
+  // const principal = historyEvent?.principal;
+  const principal = {
+    type: 'jwt',
+    name: 'alex.tideman@temporal.io',
+  };
+
   const event = {
     ...historyEvent,
     name: eventType,
@@ -96,6 +102,7 @@ export const toEvent = (
     classification,
     category,
     links,
+    principal,
     billableActions: 0,
     attributes: simplifyAttributes({ type: key, ...attributes }),
   };
