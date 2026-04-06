@@ -61,13 +61,11 @@
     if (total === 0) return '0';
     return ((totalStickyCacheHit / total) * 100).toFixed(1);
   });
-  const taskSuccessRate = $derived.by(() => {
+  const taskFailureRate = $derived.by(() => {
     if (!heartbeat?.workflowTaskSlotsInfo?.totalProcessedTasks) return '0';
-    const successCount =
-      heartbeat.workflowTaskSlotsInfo.totalProcessedTasks -
-      (heartbeat.workflowTaskSlotsInfo.totalFailedTasks ?? 0);
+    const failureCount = heartbeat.workflowTaskSlotsInfo.totalFailedTasks ?? 0;
     return (
-      (successCount / heartbeat.workflowTaskSlotsInfo.totalProcessedTasks) *
+      (failureCount / heartbeat.workflowTaskSlotsInfo.totalProcessedTasks) *
       100
     ).toFixed(1);
   });
@@ -242,7 +240,8 @@
     <aside class="flex w-full flex-col gap-4 lg:w-fit">
       {@render hostInfo()}
       {@render workflowCache()}
-      {@render diagnostics()}
+      <!-- TODO: Add back task failure rate. -->
+      <!-- {@render diagnostics()} -->
     </aside>
   </div>
 </section>
@@ -377,7 +376,7 @@
       href="https://docs.temporal.io/cloud/worker-health#enable-host-resource-reporting"
       newTab
     >
-      {translate('workers.go-dependency-warning-link')}
+      {translate('workers.learn-more-link')}
     </Link>
   </Alert>
 {/snippet}
@@ -453,6 +452,14 @@
         </dt>
       </div>
     </dl>
+    <Link
+      icon="external-link"
+      href="https://docs.temporal.io/develop/worker-performance#workflow-cache-tuning"
+      newTab
+      class="mt-4"
+    >
+      {translate('workers.learn-more-link')}
+    </Link>
   </Card>
 {/snippet}
 
@@ -462,9 +469,9 @@
       {translate('workers.diagnostics')}
     </h3>
     <dl>
-      <dd class="font-mono text-2xl">{taskSuccessRate}%</dd>
+      <dd class="font-mono text-2xl">{taskFailureRate}%</dd>
       <dt class="text-sm text-secondary">
-        {translate('workers.task-success-rate')}
+        {translate('workers.task-failure-rate')}
       </dt>
     </dl>
   </Card>
