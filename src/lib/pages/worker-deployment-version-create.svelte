@@ -8,11 +8,11 @@
   } from '$lib/services/deployments-service';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
-  type Props = {
+  interface Props {
     namespace: string;
     deployment: string;
     onSuccess: () => void;
-  };
+  }
 
   let { namespace, deployment, onSuccess }: Props = $props();
 

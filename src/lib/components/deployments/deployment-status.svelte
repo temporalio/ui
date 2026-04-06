@@ -1,16 +1,16 @@
 <script lang="ts">
   import { cva } from 'class-variance-authority';
 
-  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DeploymentStatus } from '$lib/types/deployments';
 
-  type Props = {
+  interface Props {
     status: DeploymentStatus;
     label: string;
-  };
+  }
   let { status, label }: Props = $props();
 
   const icon: Partial<Record<DeploymentStatus, IconName>> = {

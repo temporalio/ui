@@ -2,12 +2,13 @@
   import { writable } from 'svelte/store';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import { RadioCard, RadioGroup } from '$lib/holocene/radio-input';
+  import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
+  import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  type Props = {
+  interface Props {
     provider?: string;
-  };
+  }
 
   let { provider = $bindable('lambda') }: Props = $props();
 

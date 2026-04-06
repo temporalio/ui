@@ -14,7 +14,7 @@ import type { Settings } from '$lib/types/global';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { toURL } from '$lib/utilities/to-url';
 
-type RouteParameters = {
+interface RouteParameters {
   namespace: string;
   workflow: string;
   run: string;
@@ -30,7 +30,7 @@ type RouteParameters = {
   search?: string;
   page?: string;
   archival?: boolean;
-};
+}
 
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
 export type QueryParameters = Pick<
@@ -365,7 +365,7 @@ export const routeForWorkerInstance = ({
 }: {
   namespace: string;
   workerInstanceKey: string;
-}) => {
+}): ResolvedPathname => {
   const workerInstanceKeyEncoded = encodeURIForSvelte(workerInstanceKey);
   return resolve('/namespaces/[namespace]/workers/[workerInstanceKey]', {
     namespace,
@@ -462,22 +462,6 @@ export const routeForServerlessWorker = ({
 }): ResolvedPathname => {
   return resolve(
     '/namespaces/[namespace]/workers/deployments/serverless/[id]',
-    {
-      namespace,
-      id,
-    },
-  );
-};
-
-export const routeForServerlessWorkerEdit = ({
-  namespace,
-  id,
-}: {
-  namespace: string;
-  id: string;
-}): ResolvedPathname => {
-  return resolve(
-    '/namespaces/[namespace]/workers/deployments/serverless/[id]/edit',
     {
       namespace,
       id,

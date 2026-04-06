@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
+  import { invalidate } from '$app/navigation';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -16,7 +16,6 @@
     isVersionSummaryNew,
     type RoutingConfig,
     type VersionSummary,
-    type WorkerDeploymentVersionResponse,
   } from '$lib/types/deployments';
   import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
@@ -35,15 +34,15 @@
   import DeploymentStatus from './deployment-status.svelte';
   import ValidateConnectionModal from './validate-connection-modal.svelte';
   import VersionActionsMenu from './version-actions-menu.svelte';
-  import VersionComputeDetails from './version-compute-details.svelte';
+  import VersionRowDetails from './version-row-details.svelte';
 
-  type Props = {
+  interface Props {
     routingConfig: RoutingConfig;
     version: VersionSummary;
     namespace: string;
     deploymentName: string;
     conflictToken?: string;
-  };
+  }
   let {
     routingConfig,
     version,
@@ -94,31 +93,29 @@
       : 'VersionDrainageStatus',
   );
 
-  const status = $derived(
-    isCurrent
-      ? translate('deployments.current')
-      : isRamping
-        ? translate('deployments.ramping')
-        : isVersionSummaryNew(version)
-          ? parseVersionStatus(drainageStatus).status
-          : drainageStatus
-            ? fromScreamingEnum(drainageStatus, statusEnum)
-            : translate('common.inactive'),
-  ) as Status;
+  function resolveVersionStatus(): Status {
+    if (isCurrent) return translate('deployments.current') as Status;
+    if (isRamping) return translate('deployments.ramping') as Status;
+    if (isVersionSummaryNew(version))
+      return parseVersionStatus(drainageStatus).status;
+    if (drainageStatus)
+      return fromScreamingEnum(drainageStatus, statusEnum) as Status;
+    return translate('common.inactive') as Status;
+  }
+  const status = $derived(resolveVersionStatus());
 
-  const statusLabel = $derived(
-    isCurrent
-      ? translate('deployments.current')
-      : isRamping
-        ? translate('deployments.ramping-percentage', {
-            percentage: routingConfig.rampingVersionPercentage,
-          })
-        : isVersionSummaryNew(version)
-          ? parseVersionStatus(drainageStatus).label
-          : drainageStatus
-            ? fromScreamingEnum(drainageStatus, statusEnum)
-            : translate('common.inactive'),
-  );
+  function resolveVersionStatusLabel(): string {
+    if (isCurrent) return translate('deployments.current');
+    if (isRamping)
+      return translate('deployments.ramping-percentage', {
+        percentage: routingConfig.rampingVersionPercentage,
+      });
+    if (isVersionSummaryNew(version))
+      return parseVersionStatus(drainageStatus).label;
+    if (drainageStatus) return fromScreamingEnum(drainageStatus, statusEnum);
+    return translate('common.inactive');
+  }
+  const statusLabel = $derived(resolveVersionStatusLabel());
 
   const computeProviderType = $derived(
     isVersionSummaryNew(version) && version.computeConfig
@@ -143,25 +140,13 @@
   );
 
   let expanded = $state(false);
-  let fetchPromise = $state<Promise<WorkerDeploymentVersionResponse> | null>(
-    null,
-  );
   let showDeleteVersionModal = $state(false);
+  let deleteVersionError = $state('');
   let showValidateModal = $state(false);
   let validateLoading = $state(false);
   let validateResult = $state<{ valid: boolean; message?: string } | null>(
     null,
   );
-
-  $effect(() => {
-    if (expanded && !fetchPromise) {
-      fetchPromise = fetchDeploymentVersion({
-        namespace,
-        deploymentName,
-        buildId: versionBuildId,
-      });
-    }
-  });
 
   async function handleValidateConnection() {
     validateResult = null;
@@ -191,12 +176,18 @@
   }
 
   async function handleDeleteVersion() {
+    deleteVersionError = '';
     await deleteWorkerDeploymentVersion(
       { namespace, deploymentName, buildId: versionBuildId, conflictToken },
-      () => {},
+      (err) => {
+        deleteVersionError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.delete-version-error');
+      },
     );
+    if (deleteVersionError) return;
     showDeleteVersionModal = false;
-    await invalidateAll();
+    await invalidate('data:deployment');
   }
 </script>
 
@@ -205,7 +196,9 @@
     <div class="flex items-center gap-1">
       <button
         type="button"
-        aria-label={expanded ? 'Collapse' : 'Expand'}
+        aria-label={expanded
+          ? translate('common.collapse')
+          : translate('common.expand')}
         onclick={() => (expanded = !expanded)}
         class="shrink-0"
       >
@@ -251,39 +244,11 @@
 {#if expanded}
   <tr class="surface-primary border-y border-subtle">
     <td colspan={6} class="!p-1">
-      {#await fetchPromise}
-        <div class="surface-secondary flex flex-col gap-2 py-3 pl-6 text-xs">
-          {#each [1, 2, 3] as _ (_)}
-            <div class="flex items-center gap-2">
-              <div class="h-3 w-20 animate-pulse rounded bg-subtle"></div>
-              <div class="h-3 w-64 animate-pulse rounded bg-subtle"></div>
-            </div>
-          {/each}
-        </div>
-      {:then result}
-        {#if result}
-          <VersionComputeDetails
-            computeConfig={result.workerDeploymentVersionInfo.computeConfig}
-          />
-        {/if}
-      {:catch err}
-        <div class="flex items-center gap-2 py-2 text-xs">
-          <span class="text-danger"
-            >{err?.message ?? 'Failed to load version details'}</span
-          >
-          <button
-            type="button"
-            class="text-primary underline"
-            onclick={() => {
-              fetchPromise = fetchDeploymentVersion({
-                namespace,
-                deploymentName,
-                buildId: versionBuildId,
-              });
-            }}>Retry</button
-          >
-        </div>
-      {/await}
+      <VersionRowDetails
+        {namespace}
+        {deploymentName}
+        buildId={versionBuildId}
+      />
     </td>
   </tr>
 {/if}
@@ -299,6 +264,10 @@
 <DeleteVersionModal
   buildId={versionBuildId}
   open={showDeleteVersionModal}
+  error={deleteVersionError}
   onConfirm={handleDeleteVersion}
-  onCancel={() => (showDeleteVersionModal = false)}
+  onCancel={() => {
+    showDeleteVersionModal = false;
+    deleteVersionError = '';
+  }}
 />

@@ -9,12 +9,12 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
-  type Props = {
+  interface Props {
     namespace: string;
     deploymentName: string;
     hasVersions: boolean;
     onDeleteClick: () => void;
-  };
+  }
 
   let { namespace, deploymentName, hasVersions, onDeleteClick }: Props =
     $props();

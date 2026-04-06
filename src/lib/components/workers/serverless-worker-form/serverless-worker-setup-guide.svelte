@@ -1,7 +1,8 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { Timeline, TimelineStep } from '$lib/holocene/timeline';
+  import TimelineStep from '$lib/holocene/timeline/timeline-step.svelte';
+  import Timeline from '$lib/holocene/timeline/timeline.svelte';
   import { translate } from '$lib/i18n/translate';
 
   let activeTab = $state('CloudFormation');

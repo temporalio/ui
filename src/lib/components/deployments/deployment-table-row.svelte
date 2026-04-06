@@ -16,10 +16,10 @@
   import ComputeBadge from './compute-badge.svelte';
   import DeploymentStatus from './deployment-status.svelte';
 
-  type Props = {
+  interface Props {
     deployment: WorkerDeploymentSummary;
     columns: ConfigurableTableHeader[];
-  };
+  }
   let { deployment, columns }: Props = $props();
 
   const latestBuildId = $derived(

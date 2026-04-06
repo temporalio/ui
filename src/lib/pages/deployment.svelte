@@ -9,19 +9,19 @@
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    deleteWorkerDeployment,
-    fetchDeployment,
-  } from '$lib/services/deployments-service';
+  import { deleteWorkerDeployment } from '$lib/services/deployments-service';
+  import type { WorkerDeploymentResponse } from '$lib/types/deployments';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
+  interface Props {
+    deploymentPromise: Promise<WorkerDeploymentResponse>;
+  }
+
+  let { deploymentPromise }: Props = $props();
+
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
-
-  const deploymentFetch = $derived(
-    fetchDeployment({ namespace, deploymentName }),
-  );
 
   const columns = [
     { label: translate('deployments.build-id') },
@@ -48,7 +48,7 @@
   }
 </script>
 
-{#await deploymentFetch}
+{#await deploymentPromise}
   <SkeletonTable rows={15} />
 {:then deployment}
   {@const info = deployment.workerDeploymentInfo}

@@ -14,12 +14,12 @@
 
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
-  type Props = {
+  interface Props {
     deploymentName: string;
     onSubmit: (data: CreateVersionFormData) => Promise<void>;
     cancelHref: string;
     error?: string;
-  };
+  }
 
   let {
     deploymentName: _deploymentName,
@@ -171,7 +171,7 @@
             on:click={() => (showScaling = !showScaling)}
           >
             {showScaling
-              ? 'Hide Scaling and Limits'
+              ? translate('workers.hide-scaling-limits')
               : translate('workers.show-scaling-limits')}
           </Button>
 

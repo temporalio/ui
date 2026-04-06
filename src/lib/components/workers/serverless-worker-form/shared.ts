@@ -49,7 +49,6 @@ export type CreateDeploymentFormData = z.infer<typeof createDeploymentSchema>;
 export type CreateVersionFormData = z.infer<typeof createVersionSchema>;
 export type EditVersionFormData = z.infer<typeof editVersionSchema>;
 
-// Keep old aliases for backward compatibility during migration
 export const createSchema = createDeploymentSchema;
 export const editSchema = editVersionSchema;
 export type CreateFormData = CreateDeploymentFormData;

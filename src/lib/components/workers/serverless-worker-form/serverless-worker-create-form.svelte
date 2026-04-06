@@ -18,12 +18,12 @@
   import ComputeProviderPicker from './compute-provider-picker.svelte';
   import ServerlessWorkerSetupGuide from './serverless-worker-setup-guide.svelte';
 
-  type SubmitFieldErrors = {
+  interface SubmitFieldErrors {
     lambdaArn?: string[];
     iamRoleArn?: string[];
-  };
+  }
 
-  type Props = {
+  interface Props {
     namespace: string;
     onSubmit: (
       data: CreateDeploymentFormData,
@@ -31,7 +31,7 @@
     onSuccess: () => void;
     cancelHref: string;
     submitButtonText: string;
-  };
+  }
 
   let {
     namespace: _namespace,

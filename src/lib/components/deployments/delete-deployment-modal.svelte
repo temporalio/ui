@@ -3,12 +3,12 @@
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  type Props = {
+  interface Props {
     open: boolean;
     deploymentName: string;
     onConfirm?: () => void;
     onCancel?: () => void;
-  };
+  }
 
   let { open, deploymentName, onConfirm, onCancel }: Props = $props();
   let deleteInput = $state('');

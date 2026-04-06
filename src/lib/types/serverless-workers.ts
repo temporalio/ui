@@ -82,13 +82,13 @@ export interface ServerlessWorkerVersion {
   rampingPercentage?: number;
 }
 
-export type ServerlessWorkerDetail = ServerlessWorker & {
+export interface ServerlessWorkerDetail extends ServerlessWorker {
   metrics: ServerlessWorkerMetrics;
   hostInfo: ServerlessWorkerHostInfo;
   cache: ServerlessWorkerCache;
   diagnostics: ServerlessWorkerDiagnostics;
   versions: ServerlessWorkerVersion[];
-};
+}
 
 export interface MockValidationResult {
   valid: boolean;

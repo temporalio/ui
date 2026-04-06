@@ -13,7 +13,7 @@
 
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
-  type Props = {
+  interface Props {
     initialData: {
       lambdaArn: string;
       iamRoleArn: string;
@@ -27,7 +27,7 @@
     onSubmit: (data: EditVersionFormData) => Promise<void>;
     onDelete: () => void;
     cancelHref: string;
-  };
+  }
 
   let { initialData, onSubmit, onDelete, cancelHref }: Props = $props();
 
@@ -148,7 +148,7 @@
             on:click={() => (showScaling = !showScaling)}
           >
             {showScaling
-              ? 'Hide Scaling and Limits'
+              ? translate('workers.hide-scaling-limits')
               : translate('workers.show-scaling-limits')}
           </Button>
 

@@ -15,19 +15,13 @@
   } from '$lib/services/deployments-service';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
-  type Props = {
+  interface Props {
     namespace: string;
     deployment: string;
     buildId: string;
-    onSuccess: () => void;
-  };
+  }
 
-  let {
-    namespace,
-    deployment,
-    buildId,
-    onSuccess: _onSuccess,
-  }: Props = $props();
+  let { namespace, deployment, buildId }: Props = $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);

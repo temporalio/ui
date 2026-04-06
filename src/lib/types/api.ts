@@ -94,7 +94,7 @@ export type APIRoutePath =
   | StandaloneActivityAPIRoutePath
   | StandaloneActivitiesAPIRoutePath;
 
-export type APIRouteParameters = {
+export interface APIRouteParameters {
   namespace: string;
   workflowId: string;
   scheduleId: string;
@@ -111,7 +111,7 @@ export type APIRouteParameters = {
   buildId: string;
   version: string;
   workerInstanceKey: string;
-};
+}
 
 export type StandaloneActivitiesParameters = Pick<
   APIRouteParameters,

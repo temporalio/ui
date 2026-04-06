@@ -86,8 +86,8 @@ export const base = (namespace?: string): string => {
 };
 
 const getPath = (endpoint: string): string => {
-  if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `/api/v1/${endpoint}`;
+  const path = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+  return `/api/v1/${path}`;
 };
 
 const withBase = (path: string, namespace?: string): string => {

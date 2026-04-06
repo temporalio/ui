@@ -87,4 +87,6 @@ export const Strings = {
   'delete-version': 'Delete Version',
   'delete-version-confirm': 'Are you sure you want to delete this version?',
   'delete-version-description': 'This action cannot be undone.',
+  'delete-version-error': 'Failed to delete version',
+  'version-load-error': 'Failed to load version details',
 } as const;

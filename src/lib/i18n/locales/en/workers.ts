@@ -236,6 +236,7 @@ export const Strings = {
   'scaling-section': 'Scaling and Limits',
   'edit-scaling-limits': 'Edit Scaling and Limits',
   'show-scaling-limits': 'Show Scaling and Limits',
+  'hide-scaling-limits': 'Hide Scaling and Limits',
   'validate-connection': 'Validate Connection',
   'go-to-workflows': 'Go to Workflows',
   'compute-label': 'Compute',

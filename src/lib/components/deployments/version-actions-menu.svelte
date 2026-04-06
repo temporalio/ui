@@ -8,13 +8,13 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  type Props = {
+  interface Props {
     buildId: string;
     editHref: string;
     workflowHref: string;
     onValidate: () => void;
     onDelete: () => void;
-  };
+  }
 
   let { buildId, editHref, workflowHref, onValidate, onDelete }: Props =
     $props();

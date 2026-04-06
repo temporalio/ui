@@ -9,10 +9,9 @@
   interface Props {
     worker: ServerlessWorker;
     namespace: string;
-    columns: { label: string }[];
   }
 
-  let { worker, namespace, columns }: Props = $props();
+  let { worker, namespace }: Props = $props();
 
   const detailHref = $derived(
     routeForServerlessWorker({ namespace, id: worker.id }),

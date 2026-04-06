@@ -56,6 +56,8 @@ export const Strings = {
   event: 'Event',
   'collapse-all': 'Collapse All',
   'expand-all': 'Expand All',
+  collapse: 'Collapse',
+  expand: 'Expand',
   maximize: 'Maximize',
   minimize: 'Minimize',
   id: 'ID',
@@ -209,6 +211,7 @@ export const Strings = {
   'unexpected-error': 'An unexpected error occurred.',
   'temporary-error':
     'This appears to be a temporary issue. Please try again in a few moments.',
+  retry: 'Retry',
   retrying: 'Retrying...',
   'try-again': 'Try Again',
   'retry-attempt': 'Attempt {{current}} of {{total}}',
