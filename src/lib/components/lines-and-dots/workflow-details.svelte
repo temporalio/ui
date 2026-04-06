@@ -112,6 +112,8 @@
       fetchLatestRun();
     }
   });
+
+  $inspect(workflow);
 </script>
 
 <DetailList aria-label="workflow details" rowCount={5}>
@@ -288,7 +290,26 @@
 
   <DetailListColumn>
     <DetailListLabel>{translate('common.history-size')}</DetailListLabel>
-    <DetailListTextValue text={historySizeFormatted} />
+    <DetailListTextValue
+      tooltipText={workflow.externalPayloadCount
+        ? translate('workflows.external-payload-tooltip')
+        : ''}
+      iconName={workflow.externalPayloadCount ? 'square-info' : undefined}
+      iconPosition="trailing"
+      text={historySizeFormatted}
+    />
+    {#if workflow.externalPayloadCount}
+      <DetailListLabel
+        >{translate('workflows.external-payload-size')}</DetailListLabel
+      >
+      <DetailListTextValue
+        text={formatBytes(parseInt(workflow.externalPayloadSizeBytes, 10))}
+      />
+      <DetailListLabel
+        >{translate('workflows.external-payload-count')}</DetailListLabel
+      >
+      <DetailListTextValue text={workflow.externalPayloadCount} />
+    {/if}
 
     {#if !$isCloud}
       <DetailListLabel

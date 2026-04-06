@@ -348,4 +348,8 @@ export const Strings = {
   'timeline-minimized':
     'Timeline and Event History are collapsed to minimized height',
   'timeline-expanded': 'Timeline and Event History are expanded to full height',
+  'external-payload-size': 'External Payloads Size',
+  'external-payload-count': 'External Payloads',
+  'external-payload-tooltip':
+    'History Size does not include externally stored payload size.',
 } as const;

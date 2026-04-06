@@ -11,9 +11,11 @@
     copyableText?: string;
     text: string;
     tooltipText?: string;
+    tooltipWidth?: number;
     isBadge?: boolean;
     badgeType?: BadgeType;
     iconName?: IconName | undefined;
+    iconPosition?: 'leading' | 'trailing';
   }
 
   let {
@@ -21,7 +23,9 @@
     text,
     copyableText = text,
     tooltipText,
+    tooltipWidth = 256,
     iconName,
+    iconPosition = 'leading',
     isBadge = false,
     badgeType = 'default',
   }: Props = $props();
@@ -34,17 +38,20 @@
     </Badge>
   {:else}
     <div class="flex select-all items-center gap-1 truncate rounded-sm">
-      {#if iconName}
+      {#if iconName && iconPosition === 'leading'}
         <Icon name={iconName} class="shrink-0" />
       {/if}
       <span class="truncate">{text}</span>
+      {#if iconName && iconPosition === 'trailing'}
+        <Icon name={iconName} class="shrink-0" />
+      {/if}
     </div>
   {/if}
 {/snippet}
 
 <DetailListValue {copyable} {copyableText}>
   {#if tooltipText}
-    <Tooltip text={tooltipText} top class="min-w-0">
+    <Tooltip text={tooltipText} top width={tooltipWidth} class="min-w-0">
       {@render content()}
     </Tooltip>
   {:else}
