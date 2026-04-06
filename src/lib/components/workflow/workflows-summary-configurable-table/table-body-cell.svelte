@@ -19,8 +19,8 @@
   import { formatDistance } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
-    routeForTimeline,
     routeForWorkerDeployment,
+    routeForWorkflow,
   } from '$lib/utilities/route-for';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
@@ -83,7 +83,7 @@
         {filterOrCopyButtonsVisible}
         attribute="WorkflowType"
         value={workflow.name}
-        href={routeForTimeline({
+        href={routeForWorkflow({
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
@@ -95,7 +95,7 @@
         {filterOrCopyButtonsVisible}
         attribute="WorkflowId"
         value={workflow.id}
-        href={routeForTimeline({
+        href={routeForWorkflow({
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
@@ -107,7 +107,7 @@
         {filterOrCopyButtonsVisible}
         attribute="RunId"
         value={workflow.runId}
-        href={routeForTimeline({
+        href={routeForWorkflow({
           namespace,
           workflow: workflow.id,
           run: workflow.runId,

@@ -1,8 +1,16 @@
+import { writable } from 'svelte/store';
+
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { base } from '$app/paths';
 
+import type {
+  EventSortOrder,
+  WorkflowViewPreference,
+} from '$lib/stores/event-view';
+
 import {
+  baseRouteForWorkflow,
   hasParameters,
   isEventHistoryParameters,
   isEventParameters,
@@ -22,7 +30,6 @@ import {
   routeForSchedules,
   routeForTaskQueue,
   routeForWorkers,
-  routeForWorkflow,
   routeForWorkflowQuery,
   routeForWorkflows,
   routeForWorkflowsWithQuery,
@@ -62,7 +69,7 @@ describe('routeFor', () => {
   });
 
   it('should route to a "workflow"', () => {
-    const path = routeForWorkflow({
+    const path = baseRouteForWorkflow({
       namespace: 'default',
       workflow: 'abc',
       run: 'def',
@@ -433,5 +440,93 @@ describe('isNamespaceParameter', () => {
   it('should return false if it does not have a namespace parameter', () => {
     const result = isNamespaceParameter({});
     expect(result).toBe(false);
+  });
+});
+
+describe('routeForWorkflow', () => {
+  const workflowParams = {
+    namespace: 'default',
+    workflow: 'abc',
+    run: 'def',
+  };
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.resetModules();
+  });
+
+  async function getRouteForWorkflow(
+    tab: WorkflowViewPreference,
+    sort: EventSortOrder,
+  ) {
+    vi.doMock('$lib/stores/event-view', () => ({
+      workflowViewPreference: writable(tab),
+      eventFilterSort: writable(sort),
+    }));
+    return (await import('./route-for')).routeForWorkflow;
+  }
+
+  it('should route to timeline when preference is timeline', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'timeline',
+      'descending',
+    );
+    expect(routeForWorkflowFn(workflowParams)).toBe(
+      `${base}/namespaces/default/workflows/abc/def/timeline`,
+    );
+  });
+
+  it('should route to history when preference is history', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'history',
+      'descending',
+    );
+    expect(routeForWorkflowFn(workflowParams)).toBe(
+      `${base}/namespaces/default/workflows/abc/def/history`,
+    );
+  });
+
+  it('should include sort param when sort is ascending', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'timeline',
+      'ascending',
+    );
+    expect(routeForWorkflowFn(workflowParams)).toBe(
+      `${base}/namespaces/default/workflows/abc/def/timeline?sort=ascending`,
+    );
+  });
+
+  it('should not include sort param when sort is descending', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'history',
+      'descending',
+    );
+    expect(routeForWorkflowFn(workflowParams)).not.toContain('sort=');
+  });
+
+  it('should merge caller queryParams with sort preference', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'history',
+      'ascending',
+    );
+    const path = routeForWorkflowFn({
+      ...workflowParams,
+      queryParams: { category: 'activity' },
+    });
+    expect(path).toContain('sort=ascending');
+    expect(path).toContain('category=activity');
+  });
+
+  it('should allow caller queryParams sort to override eventFilterSort', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'history',
+      'descending',
+    );
+    const path = routeForWorkflowFn({
+      ...workflowParams,
+      queryParams: { sort: 'ascending' },
+    });
+    expect(path).toContain('sort=ascending');
+    expect(path).not.toContain('sort=descending');
   });
 });
