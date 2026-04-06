@@ -5,7 +5,6 @@
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
@@ -13,7 +12,6 @@
   import { routeForServerlessWorkerCreate } from '$lib/utilities/route-for';
 
   let error = $state('');
-  let filter = $state('');
 
   const namespace = $derived(page.params.namespace);
   const createHref = $derived(routeForServerlessWorkerCreate({ namespace }));
@@ -21,7 +19,7 @@
   const onFetch = $derived.by(() => {
     return () => {
       error = '';
-      return fetchPaginatedDeployments(namespace, filter, onError);
+      return fetchPaginatedDeployments(namespace, '', onError);
     };
   });
 
@@ -47,19 +45,7 @@
 {#key [namespace]}
   <div class="flex flex-col gap-4">
     <CapabilityGuard capability="serverlessDeployments">
-      <div class="flex items-center gap-2">
-        <Input
-          id="deployment-filter"
-          bind:value={filter}
-          icon="search"
-          label={translate('deployments.filter-deployments')}
-          labelHidden
-          type="search"
-          placeholder={translate(
-            'deployments.worker-deployments-search-placeholder',
-          )}
-          class="flex-1"
-        />
+      <div class="flex justify-end">
         <Button variant="primary" href={createHref}>
           {translate('workers.create-serverless-worker')}
         </Button>
