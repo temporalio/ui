@@ -79,8 +79,8 @@ export type EventWithMetadata = {
 
 // Remove once TS SDK has support
 export type Principal = {
-  type: string;
-  name: string;
+  type?: string;
+  name?: string;
 };
 
 export type EventType = import('$lib/utilities/is-event-type').EventType;
