@@ -305,7 +305,7 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex w-screen flex-row">
+<div class="flex h-dvh w-screen flex-row">
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
