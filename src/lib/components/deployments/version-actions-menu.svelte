@@ -36,7 +36,7 @@
       >
         <Icon name="vertical-ellipsis" class="h-4 w-4" />
       </button>
-      <Menu id="version-actions-{buildId}" position="right">
+      <Menu id="version-actions-{buildId}" position="right" usePortal>
         <CapabilityGuard capability="serverlessWorkers">
           <MenuItem href={editHref}>
             {translate('deployments.edit')}
