@@ -3,6 +3,7 @@
 
   import { page } from '$app/state';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
@@ -28,7 +29,9 @@
         id="workers-tab"
         href={workersHref}
         active={page.url.pathname.endsWith('/workers')}
-      ></Tab>
+      >
+        <Badge class="shrink-0">Pre-Release</Badge>
+      </Tab>
       <Tab
         label={translate('deployments.deployments')}
         id="deployments-tab"

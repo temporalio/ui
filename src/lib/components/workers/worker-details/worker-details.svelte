@@ -135,7 +135,7 @@
     <p>{translate('workers.stale-heartbeat-description')}</p>
     <Button
       leadingIcon="retry"
-      variant="ghost"
+      variant="secondary"
       size="xs"
       class="mt-2"
       on:click={() => onrefresh()}

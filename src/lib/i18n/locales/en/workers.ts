@@ -18,7 +18,6 @@ export const Strings = {
   identity: 'Identity',
   instance_one: 'Instance',
   instance_other: 'Instances',
-  'worker-instances': 'Worker Instances',
   'task-queue': 'Task Queue',
   status: 'Status',
   'shutting-down': 'Shutting Down',
@@ -84,7 +83,7 @@ export const Strings = {
   'slot-supplier-kind-resource-based':
     'Slot count adjusts based on CPU and memory usage.',
   'slot-supplier-kind-custom': 'Slot count is managed by custom logic.',
-  'stale-heartbeat-title': 'Worker data may be outdated',
+  'stale-heartbeat-title': 'Worker Insights May Be Outdated',
   'stale-heartbeat-description':
-    'More than a minute has elapsed since the last heartbeat. Refresh to see the latest.',
+    'No heartbeat received in over a minute. Refresh to check for updates.',
 } as const;

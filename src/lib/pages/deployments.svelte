@@ -45,8 +45,6 @@
   ];
 </script>
 
-<h2>{translate('deployments.worker-deployments')}</h2>
-
 {#key [namespace]}
   <PaginatedTable
     let:visibleItems
