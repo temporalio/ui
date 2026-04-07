@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -23,26 +24,20 @@
     'data-testid'?: string;
     hidden?: boolean;
     class?: string;
+    children?: Snippet;
   }
 
-  export let intent: Intent;
-  export let title = '';
-  export let icon: AlertIcon = intent;
-  export let hidden = false;
+  let {
+    intent,
+    title = '',
+    icon = intent,
+    hidden = false,
+    class: className = '',
+    children,
+    ...rest
+  }: $$Props = $props();
 
-  let className = '';
-  export { className as class };
-
-  $: role = getRole(intent);
-
-  $: iconColorClass =
-    intent === 'error'
-      ? 'text-danger'
-      : intent === 'warning'
-        ? 'text-warning'
-        : '';
-
-  $: titleColorClass = intent === 'error' ? 'font-semibold text-danger' : '';
+  const role = $derived(getRole(intent));
 
   function getRole(
     alertIntent: typeof intent,
@@ -63,16 +58,16 @@
   class={merge('alert flex', intent, className)}
   class:hidden
   {role}
-  {...$$restProps}
+  {...rest}
 >
-  <Icon name={icon} class="mt-0.5 shrink-0 {iconColorClass}" />
+  <Icon name={icon} class="mt-0.5 shrink-0" />
   <div class="w-full min-w-0 gap-1">
-    <p class="font-medium {titleColorClass}">
+    <p class="font-medium">
       {title}
     </p>
-    {#if $$slots.default}
+    {#if children}
       <div class="content">
-        <slot />
+        {@render children()}
       </div>
     {/if}
   </div>
@@ -80,23 +75,23 @@
 
 <style lang="postcss">
   .alert {
-    @apply items-start gap-2 break-words border-y-0 border-l border-r-0 p-5 text-sm text-primary;
+    @apply items-start gap-2 break-words border p-5 text-sm text-primary;
   }
 
   .alert.success {
-    @apply border-l-2 border-l-success bg-success;
+    @apply border-success bg-success;
   }
 
   .alert.info {
-    @apply border-l-2 border-l-information bg-information;
+    @apply border-information bg-information;
   }
 
   .alert.error {
-    @apply border-l-4 border-l-danger bg-danger;
+    @apply border-danger bg-danger;
   }
 
   .alert.warning {
-    @apply border-l-[3px] border-l-warning bg-warning;
+    @apply border-warning bg-warning;
   }
 
   .content :global(> *) {
