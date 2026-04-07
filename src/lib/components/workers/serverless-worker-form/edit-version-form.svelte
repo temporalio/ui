@@ -2,6 +2,7 @@
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -27,9 +28,10 @@
     onSubmit: (data: EditVersionFormData) => Promise<void>;
     onDelete: () => void;
     cancelHref: string;
+    error?: string;
   }
 
-  let { initialData, onSubmit, onDelete, cancelHref }: Props = $props();
+  let { initialData, onSubmit, onDelete, cancelHref, error }: Props = $props();
 
   let provider = $state('lambda');
   let showScaling = $state(false);
@@ -61,6 +63,11 @@
 </script>
 
 <div class="flex flex-col gap-6">
+  {#if error}
+    <Alert intent="error" title={translate('common.error-occurred')}
+      >{error}</Alert
+    >
+  {/if}
   <form class="flex flex-col gap-6" use:enhance novalidate>
     <Card>
       <h3 class="mb-1 text-base font-semibold">

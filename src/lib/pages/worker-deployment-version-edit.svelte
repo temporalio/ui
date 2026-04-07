@@ -8,10 +8,13 @@
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    buildLambdaComputeConfig,
     decodeLambdaProviderDetails,
     decodeScalerDetails,
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
+    updateWorkerDeploymentVersionComputeConfig,
+    validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
@@ -47,12 +50,8 @@
     <h1 class="text-2xl font-semibold">
       {translate('workers.edit-version-title-with-id', { buildId })}
     </h1>
-    {#if error}
-      <Alert intent="error" title={translate('common.error-occurred')}
-        >{error}</Alert
-      >
-    {/if}
     <EditVersionForm
+      {error}
       initialData={{
         lambdaArn: providerDetails.lambdaArn ?? '',
         iamRoleArn: providerDetails.iamRoleArn ?? '',
@@ -64,8 +63,55 @@
         metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
       }}
       cancelHref={backHref}
-      onSubmit={async (_data) => {
-        error = translate('workers.update-compute-config-unavailable');
+      onSubmit={async (data) => {
+        error = undefined;
+        const computeConfig = buildLambdaComputeConfig(
+          data.lambdaArn,
+          data.iamRoleArn,
+          {
+            roleExternalId: data.roleExternalId,
+            scaleUpCooloffMs: data.scaleUpCooloffMs,
+            scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+            maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+            scaleUpDispatchRateEpsilon: data.scaleUpDispatchRateEpsilon,
+            metricsPollIntervalMs: data.metricsPollIntervalMs,
+          },
+        );
+        await updateWorkerDeploymentVersionComputeConfig(
+          { namespace, deploymentName: deployment, buildId, computeConfig },
+          (err) => {
+            error =
+              err.body?.message ||
+              err.statusText ||
+              translate('workers.update-compute-config-error');
+          },
+        );
+        if (error) return;
+
+        let validateError: string | undefined;
+        const validation = await validateWorkerDeploymentVersionComputeConfig(
+          { namespace, deploymentName: deployment, buildId, computeConfig },
+          (err) => {
+            if (err.status === 501) return;
+            validateError =
+              err.body?.message ||
+              err.statusText ||
+              translate('workers.update-compute-config-error');
+          },
+        );
+
+        if (validateError) {
+          error = validateError;
+          return;
+        }
+        if (validation?.valid === false) {
+          error =
+            validation.message ??
+            translate('workers.update-compute-config-error');
+          return;
+        }
+
+        await goto(backHref);
       }}
       onDelete={() => {
         showDeleteModal = true;
@@ -90,7 +136,7 @@
         error = err.statusText || translate('workers.delete-version-error');
       },
     );
-    if (!error) goto(backHref);
+    if (!error) await goto(backHref);
   }}
   onCancel={() => {
     showDeleteModal = false;

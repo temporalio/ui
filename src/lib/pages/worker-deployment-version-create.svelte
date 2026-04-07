@@ -5,6 +5,8 @@
   import {
     buildLambdaComputeConfig,
     createWorkerDeploymentVersion,
+    deleteWorkerDeploymentVersion,
+    validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
@@ -36,6 +38,18 @@
     cancelHref={backHref}
     onSubmit={async (data) => {
       error = undefined;
+      const computeConfig = buildLambdaComputeConfig(
+        data.lambdaArn,
+        data.iamRoleArn,
+        {
+          roleExternalId: data.roleExternalId,
+          scaleUpCooloffMs: data.scaleUpCooloffMs,
+          scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+          maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+          scaleUpDispatchRateEpsilon: data.scaleUpDispatchRateEpsilon,
+          metricsPollIntervalMs: data.metricsPollIntervalMs,
+        },
+      );
       await createWorkerDeploymentVersion(
         {
           namespace,
@@ -43,24 +57,55 @@
             deploymentName: deployment,
             buildId: data.buildId,
           },
-          computeConfig: buildLambdaComputeConfig(
-            data.lambdaArn,
-            data.iamRoleArn,
-            {
-              roleExternalId: data.roleExternalId,
-              scaleUpCooloffMs: data.scaleUpCooloffMs,
-              scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-              maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-              scaleUpDispatchRateEpsilon: data.scaleUpDispatchRateEpsilon,
-              metricsPollIntervalMs: data.metricsPollIntervalMs,
-            },
-          ),
+          computeConfig,
         },
         (err) => {
-          error = err.statusText || translate('workers.create-version-error');
+          error =
+            err.body?.message ||
+            err.statusText ||
+            translate('workers.create-version-error');
         },
       );
-      if (!error) await onSuccess();
+      if (error) return;
+
+      let validateError: string | undefined;
+      const validation = await validateWorkerDeploymentVersionComputeConfig(
+        {
+          namespace,
+          deploymentName: deployment,
+          buildId: data.buildId,
+          computeConfig,
+        },
+        (err) => {
+          if (err.status === 501) return;
+          validateError =
+            err.body?.message ||
+            err.statusText ||
+            translate('workers.create-version-error');
+        },
+      );
+
+      if (!validateError && (!validation || validation.valid !== false)) {
+        await onSuccess();
+        return;
+      }
+
+      const message =
+        validation?.message ??
+        validateError ??
+        translate('workers.create-version-error');
+
+      let rollbackFailed = false;
+      await deleteWorkerDeploymentVersion(
+        { namespace, deploymentName: deployment, buildId: data.buildId },
+        () => {
+          rollbackFailed = true;
+        },
+      );
+
+      error = rollbackFailed
+        ? translate('workers.create-version-rollback-failed', { message })
+        : message;
     }}
   />
 </div>

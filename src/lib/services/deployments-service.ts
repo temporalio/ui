@@ -146,6 +146,29 @@ export const createWorkerDeploymentVersion = async (
   });
 };
 
+export const updateWorkerDeploymentVersionComputeConfig = async (
+  parameters: DeploymentVersionParameters & { computeConfig: ComputeConfig },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-version-compute-config',
+    parameters,
+  );
+  const computeConfigScalingGroups = Object.fromEntries(
+    Object.entries(parameters.computeConfig.scalingGroups ?? {}).map(
+      ([name, group]) => [name, { scalingGroup: group }],
+    ),
+  );
+  return requestFromAPI<void>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({ computeConfigScalingGroups }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
 export const validateWorkerDeploymentVersionComputeConfig = async (
   parameters: DeploymentVersionParameters & { computeConfig: ComputeConfig },
   onError?: ErrorCallback,

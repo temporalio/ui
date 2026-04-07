@@ -463,22 +463,6 @@ export const routeForWorkerDeploymentCreate = ({
   });
 };
 
-export const routeForServerlessWorker = ({
-  namespace,
-  id,
-}: {
-  namespace: string;
-  id: string;
-}): ResolvedPathname => {
-  return resolve(
-    '/namespaces/[namespace]/workers/deployments/serverless/[id]',
-    {
-      namespace,
-      id,
-    },
-  );
-};
-
 export const routeForRelationships = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {

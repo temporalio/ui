@@ -261,6 +261,8 @@ export const Strings = {
   'create-version-title': 'Create Worker Deployment Version',
   'back-to-deployment': 'Back to {{deployment}}',
   'create-version-error': 'Failed to create worker deployment version',
+  'create-version-rollback-failed':
+    '{{message}} The version could not be cleaned up automatically — delete it manually from the deployment.',
   'build-id-label': 'Build ID',
   'build-id-hint': 'A unique identifier for this version of your worker.',
   'max-concurrent-activities-label': 'Max Concurrent Activities',
@@ -270,8 +272,8 @@ export const Strings = {
   'max-task-queue-rate-hint': 'Maximum tasks per second for this task queue.',
   'edit-version-title': 'Edit Worker Deployment Version',
   'edit-version-title-with-id': 'Edit Version: {{buildId}}',
-  'update-compute-config-unavailable':
-    'Version compute config updates are not yet available.',
+  'update-compute-config-error':
+    'Failed to update worker deployment version compute config',
   'delete-version-error': 'Failed to delete worker deployment version',
   'scale-up-cooloff-ms-label': 'Scale-up Cooloff (ms)',
   'scale-up-cooloff-ms-hint':
