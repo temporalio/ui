@@ -19,6 +19,7 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
+  import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -39,6 +40,7 @@
     routeForRelationships,
     routeForTimeline,
     routeForUserMetadata,
+    routeForWorkflow,
     routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
@@ -111,7 +113,7 @@
     </Link>
     {#if eventId}
       <Link
-        href={routeForTimeline({
+        href={routeForWorkflow({
           ...routeParameters,
         })}
         data-testid="back-to-workflow-execution"
@@ -226,7 +228,7 @@
         class="max-w-screen-lg xl:w-2/3"
       >
         You can find the resulting Workflow Execution <Link
-          href={routeForTimeline({
+          href={routeForWorkflow({
             namespace,
             workflow: workflowId,
             run: resetRunId,
@@ -249,6 +251,7 @@
           page.url.pathname,
           routeForTimeline(routeParameters),
         )}
+        onClick={() => ($workflowViewPreference = 'timeline')}
       />
       <Tab
         label={translate('workflows.history-tab')}
@@ -257,6 +260,7 @@
           ...routeParameters,
           queryParams: sharedFilterParams,
         })}
+        onClick={() => ($workflowViewPreference = 'history')}
         active={pathMatches(
           page.url.pathname,
           routeForEventHistory({

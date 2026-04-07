@@ -113,7 +113,10 @@
   });
 </script>
 
-<MenuContainer {open} class="max-md:w-full max-md:justify-items-end">
+<MenuContainer
+  {open}
+  class="text-sm font-medium text-primary max-md:w-full max-md:justify-items-end"
+>
   <MenuButton
     label={translate('common.timezone', { timezone })}
     controls="timezones-menu"
@@ -222,7 +225,7 @@
     <MenuDivider />
 
     {#if !search}
-      {#each QuickTimezoneOptions as { value, label }}
+      {#each QuickTimezoneOptions as { value, label } (label)}
         <MenuItem
           onclick={() => selectTimezone(value)}
           data-testid="timezones-{value}"
@@ -238,7 +241,7 @@
       <MenuDivider />
     {/if}
 
-    {#each filteredOptions as { value, label, offset, abbr }}
+    {#each filteredOptions as { value, label, offset, abbr } (label)}
       <MenuItem
         selected={value === $timeFormat}
         onclick={() => selectTimezone(value)}

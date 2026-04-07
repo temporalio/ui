@@ -1,33 +1,30 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import NavSection from '$lib/holocene/navigation/nav-section.svelte';
   import Navigation from '$lib/holocene/navigation/navigation-container.svelte';
-  import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { NavLinkListItem } from '$lib/types/global';
+  import type { NavLinkItem } from '$lib/types/global';
 
   interface Props {
     isCloud?: boolean;
-    linkList: NavLinkListItem[];
+    sections: NavLinkItem[][];
     bottom?: Snippet;
   }
 
-  let { isCloud = false, linkList, bottom }: Props = $props();
+  let isNotLastItem = (section: NavLinkItem[], i: number): boolean => {
+    return i != section.length - 1;
+  };
+
+  let { isCloud = false, sections, bottom }: Props = $props();
 </script>
 
 <Navigation {isCloud} {bottom} aria-label={translate('common.primary')}>
-  {#each linkList as item}
-    {#if 'divider' in item && item.divider}
-      <hr class="my-4 border-subtle group-data-[nav=closed]:hidden" />
-    {:else if 'href' in item && !item.hidden}
-      <NavigationItem
-        link={item.href}
-        label={item.label}
-        icon={item.icon}
-        tooltip={item?.tooltip || item.label}
-        external={item?.external}
-        animate={item?.animate}
-        isActive={item.isActive}
+  {#each sections as section, i (i)}
+    <NavSection navItems={section} />
+    {#if isNotLastItem(section, i)}
+      <hr
+        class="border-black border-opacity-25 group-data-[nav=closed]:hidden"
       />
     {/if}
   {/each}

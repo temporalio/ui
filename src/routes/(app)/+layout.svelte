@@ -23,7 +23,7 @@
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
-  import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
+  import { type NamespaceListItem, type NavLinkItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
@@ -89,7 +89,7 @@
     };
   };
 
-  const getLinkList = (
+  const getNavPrimaryLinks = (
     {
       workflowsRoute,
       standaloneActivitiesRoute,
@@ -100,7 +100,6 @@
       archivalRoute,
       namespacesRoute,
       nexusRoute,
-      historyImportRoute,
     }: {
       workflowsRoute: string;
       standaloneActivitiesRoute: string;
@@ -114,7 +113,7 @@
       historyImportRoute: string;
     },
     inProgressBatch: boolean,
-  ): NavLinkListItem[] => {
+  ): NavLinkItem[] => {
     return [
       {
         href: namespacesRoute,
@@ -175,9 +174,27 @@
           return !!match;
         },
       },
-      {
-        divider: true,
-      },
+    ];
+  };
+
+  const getNavSecondaryLinks = (
+    {
+      archivalRoute,
+      historyImportRoute,
+    }: {
+      workflowsRoute: string;
+      standaloneActivitiesRoute: string;
+      schedulesRoute: string;
+      batchOperationsRoute: string;
+      workerDeploymentsRoute: string;
+      archivalRoute: string;
+      namespacesRoute: string;
+      nexusRoute: string;
+      historyImportRoute: string;
+    },
+    _inProgressBatch: boolean,
+  ): NavLinkItem[] => {
+    return [
       {
         href: archivalRoute,
         icon: 'archives',
@@ -200,7 +217,12 @@
   };
 
   let routes = $derived(getRoutes(activeNamespaceName));
-  let linkList = $derived(getLinkList(routes, !!$inProgressBatchOperation));
+  let linkList = $derived(
+    getNavPrimaryLinks(routes, !!$inProgressBatchOperation),
+  );
+  let linkListForSecondGroup = $derived(
+    getNavSecondaryLinks(routes, !!$inProgressBatchOperation),
+  );
   let {
     workflowsRoute,
     schedulesRoute,
@@ -291,7 +313,7 @@
     position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud}>
+    <SideNavigation sections={[linkList, linkListForSecondGroup]} {isCloud}>
       {#snippet bottom()}
         {#if !isCloud}
           <NavigationItem
@@ -320,7 +342,7 @@
             'https://support.temporal.io'}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center text-indigo-100 hover:text-white"
+          class="flex items-center hover:text-white"
           aria-label="Support"
         >
           <Icon name="support" />
@@ -338,7 +360,7 @@
     </div>
     <BottomNavigation
       slot="footer"
-      {linkList}
+      sections={[linkList, linkListForSecondGroup]}
       {namespaceList}
       {isCloud}
       {showNamespacePicker}
