@@ -476,8 +476,7 @@ describe('detectActivityErrors', () => {
 
 describe('detectFirstEventErrors', () => {
   it('returns empty for undefined firstEvent', () => {
-    const workflow = makeWorkflow();
-    expect(detectFirstEventErrors(workflow, undefined)).toHaveLength(0);
+    expect(detectFirstEventErrors(undefined)).toHaveLength(0);
   });
 
   it('detects #2: execution timeout <= run timeout', () => {
@@ -485,7 +484,7 @@ describe('detectFirstEventErrors', () => {
       workflowExecutionTimeout: '10 minutes',
       workflowRunTimeout: '20 minutes',
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 2)).toBe(true);
   });
 
@@ -494,7 +493,7 @@ describe('detectFirstEventErrors', () => {
       workflowExecutionTimeout: '2 hours',
       workflowRunTimeout: '1 hour',
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 2)).toBe(false);
   });
 
@@ -503,9 +502,7 @@ describe('detectFirstEventErrors', () => {
       workflowExecutionTimeout: '0s',
       workflowRunTimeout: '1 hour',
     });
-    expect(
-      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 2),
-    ).toBe(false);
+    expect(detectFirstEventErrors(event).some((e) => e.id === 2)).toBe(false);
   });
 
   it('detects #10: retry policy defined', () => {
@@ -517,22 +514,18 @@ describe('detectFirstEventErrors', () => {
         maximumAttempts: 0,
       },
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 10)).toBe(true);
   });
 
   it('does not fire #10 when retryPolicy is null', () => {
     const event = makeFirstEvent({ retryPolicy: null });
-    expect(
-      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 10),
-    ).toBe(false);
+    expect(detectFirstEventErrors(event).some((e) => e.id === 10)).toBe(false);
   });
 
   it('does not fire #10 when retryPolicy is empty object', () => {
     const event = makeFirstEvent({ retryPolicy: {} });
-    expect(
-      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 10),
-    ).toBe(false);
+    expect(detectFirstEventErrors(event).some((e) => e.id === 10)).toBe(false);
   });
 
   it('detects #11: workflow is being retried (attempt >= 2)', () => {
@@ -543,7 +536,7 @@ describe('detectFirstEventErrors', () => {
         maximumAttempts: 5,
       },
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 11)).toBe(true);
   });
 
@@ -555,23 +548,19 @@ describe('detectFirstEventErrors', () => {
         maximumAttempts: 5,
       },
     });
-    expect(
-      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 11),
-    ).toBe(false);
+    expect(detectFirstEventErrors(event).some((e) => e.id === 11)).toBe(false);
   });
 
   it('does not fire #11 when attempt is 0 or undefined', () => {
     const event = makeFirstEvent({});
-    expect(
-      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 11),
-    ).toBe(false);
+    expect(detectFirstEventErrors(event).some((e) => e.id === 11)).toBe(false);
   });
 
   it('detects #3: very short run timeout from first event', () => {
     const event = makeFirstEvent({
       workflowRunTimeout: '1 minute',
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 3)).toBe(true);
   });
 
@@ -579,16 +568,14 @@ describe('detectFirstEventErrors', () => {
     const event = makeFirstEvent({
       workflowRunTimeout: '5 minutes',
     });
-    expect(
-      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 3),
-    ).toBe(false);
+    expect(detectFirstEventErrors(event).some((e) => e.id === 3)).toBe(false);
   });
 
   it('detects #32: multiple input payloads', () => {
     const event = makeFirstEvent({
       input: ['arg1', 'arg2'],
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 32)).toBe(true);
   });
 
@@ -596,16 +583,14 @@ describe('detectFirstEventErrors', () => {
     const event = makeFirstEvent({
       input: ['arg1'],
     });
-    expect(
-      detectFirstEventErrors(makeWorkflow(), event).some((e) => e.id === 32),
-    ).toBe(false);
+    expect(detectFirstEventErrors(event).some((e) => e.id === 32)).toBe(false);
   });
 
   it('detects #33: TERMINATE_IF_RUNNING reuse policy', () => {
     const event = makeFirstEvent({
       workflowIdReusePolicy: 'WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING',
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 33)).toBe(true);
   });
 
@@ -613,7 +598,7 @@ describe('detectFirstEventErrors', () => {
     const event = makeFirstEvent({
       workflowIdReusePolicy: 'WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE',
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 34)).toBe(true);
   });
 
@@ -622,7 +607,7 @@ describe('detectFirstEventErrors', () => {
       workflowIdReusePolicy:
         'WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY',
     });
-    const errors = detectFirstEventErrors(makeWorkflow(), event);
+    const errors = detectFirstEventErrors(event);
     expect(errors.some((e) => e.id === 34)).toBe(true);
   });
 });
