@@ -17,7 +17,7 @@
     | 'transcoder-error';
   type AlertIcon = Extract<IconName, Intent>;
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     intent: Intent;
     title?: string;
     icon?: AlertIcon;
@@ -35,7 +35,7 @@
     class: className = '',
     children,
     ...rest
-  }: $$Props = $props();
+  }: Props = $props();
 
   const role = $derived(getRole(intent));
 
