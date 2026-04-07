@@ -25,7 +25,7 @@
   );
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex max-w-[45rem] flex-col gap-4">
   <Link href={backHref} icon="chevron-left">
     {translate('workers.back-to-deployment', { deployment })}
   </Link>

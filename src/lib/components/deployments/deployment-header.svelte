@@ -6,7 +6,7 @@
   import {
     routeForWorkerDeployments,
     routeForWorkerDeploymentVersionCreate,
-    routeForWorkers,
+    routeForWorkersWithQuery,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
@@ -26,6 +26,13 @@
       query: `TemporalWorkerDeployment="${deploymentName}"`,
     }),
   );
+
+  const instancesHref = $derived(
+    routeForWorkersWithQuery({
+      namespace,
+      query: `\`DeploymentName\`="${deploymentName}"`,
+    }),
+  );
 </script>
 
 <header class="flex flex-col gap-4">
@@ -34,7 +41,7 @@
       {translate('deployments.back-to-deployments')}
     </Link>
     <span class="text-secondary">|</span>
-    <Link href={routeForWorkers({ namespace })}>
+    <Link href={instancesHref}>
       {translate('deployments.go-to-instances')}
     </Link>
   </div>
