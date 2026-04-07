@@ -55,7 +55,12 @@
 
 <DetailListValue class={className} {copyable} {copyableText}>
   {#if tooltipText}
-    <Tooltip text={tooltipText} top width={tooltipWidth} class="min-w-0">
+    <Tooltip
+      text={tooltipText}
+      top
+      width={tooltipWidth}
+      class="min-w-0 font-sans"
+    >
       {@render content()}
     </Tooltip>
   {:else}
