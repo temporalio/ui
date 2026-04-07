@@ -220,7 +220,6 @@ export function detectActivityErrors(
 }
 
 export function detectFirstEventErrors(
-  workflow: WorkflowExecution,
   firstEvent: WorkflowEvent | undefined,
 ): CommonError[] {
   if (!firstEvent || !isWorkflowExecutionStartedEvent(firstEvent)) return [];
@@ -468,7 +467,7 @@ export function getApplicableCommonErrors(
     workflow.pendingActivities,
     workflowRunTimeout,
   );
-  const firstEventErrors = detectFirstEventErrors(workflow, firstEvent);
+  const firstEventErrors = detectFirstEventErrors(firstEvent);
   const eventHistoryErrors = eventHistory?.length
     ? detectEventHistoryErrors(workflow, eventHistory)
     : [];

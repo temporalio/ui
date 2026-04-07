@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, type Snippet } from 'svelte';
 
+  import WorkflowCommonErrors from '$lib/components/workflow/workflow-common-errors.svelte';
   import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
   import { clearPreviousEventParameters } from '$lib/stores/previous-events';
 
@@ -15,5 +16,8 @@
 </script>
 
 <WorkflowRunLayout>
+  {#snippet headerSnippet()}
+    <WorkflowCommonErrors />
+  {/snippet}
   {@render children()}
 </WorkflowRunLayout>

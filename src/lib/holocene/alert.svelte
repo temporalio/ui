@@ -35,6 +35,15 @@
 
   $: role = getRole(intent);
 
+  $: iconColorClass =
+    intent === 'error'
+      ? 'text-danger'
+      : intent === 'warning'
+        ? 'text-warning'
+        : '';
+
+  $: titleColorClass = intent === 'error' ? 'font-semibold text-danger' : '';
+
   function getRole(
     alertIntent: typeof intent,
   ): HTMLAttributes<HTMLDivElement>['role'] {
@@ -56,9 +65,9 @@
   {role}
   {...$$restProps}
 >
-  <Icon name={icon} class="mt-0.5 shrink-0" />
+  <Icon name={icon} class="mt-0.5 shrink-0 {iconColorClass}" />
   <div class="w-full min-w-0 gap-1">
-    <p class="font-medium">
+    <p class="font-medium {titleColorClass}">
       {title}
     </p>
     {#if $$slots.default}
@@ -71,23 +80,23 @@
 
 <style lang="postcss">
   .alert {
-    @apply items-start gap-2 break-words border p-5 text-sm text-primary;
+    @apply items-start gap-2 break-words border-y-0 border-l border-r-0 p-5 text-sm text-primary;
   }
 
   .alert.success {
-    @apply border-success bg-success;
+    @apply border-l-2 border-l-success bg-success;
   }
 
   .alert.info {
-    @apply border-information bg-information;
+    @apply border-l-2 border-l-information bg-information;
   }
 
   .alert.error {
-    @apply border-danger bg-danger;
+    @apply border-l-4 border-l-danger bg-danger;
   }
 
   .alert.warning {
-    @apply border-warning bg-warning;
+    @apply border-l-[3px] border-l-warning bg-warning;
   }
 
   .content :global(> *) {

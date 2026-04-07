@@ -370,3 +370,9 @@ export function getCommonErrorsByCategory(
 ): CommonError[] {
   return COMMON_ERRORS.filter((error) => error.category === category);
 }
+
+export function getCommonErrorsBySeverity(
+  severity: CommonErrorSeverity,
+): CommonError[] {
+  return COMMON_ERRORS.filter((error) => error.severity === severity);
+}

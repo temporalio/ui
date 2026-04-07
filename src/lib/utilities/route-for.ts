@@ -77,6 +77,10 @@ export const routeForNexus = (): ResolvedPathname => {
   return resolve('/nexus', {});
 };
 
+export const routeForCommonErrors = (): ResolvedPathname => {
+  return resolve('/common-errors', {});
+};
+
 export const routeForNexusEndpoint = (id: string): ResolvedPathname => {
   return resolve('/nexus/[id]', { id });
 };
