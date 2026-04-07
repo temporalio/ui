@@ -35,7 +35,8 @@
 <div class={merge('flex flex-col', className)}>
   <div
     class={merge(
-      'flex items-start gap-3 border border-subtle p-4',
+      'flex items-start gap-3 border p-4',
+      selected ? 'border-primary' : 'border-subtle',
       disabled && 'opacity-50',
     )}
   >
@@ -56,15 +57,18 @@
         {disabled}
       />
       <div class="flex-1">
-        <span class="text-sm font-medium">{label}</span>
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium">{label}</span>
+          <slot name="label-badge" />
+        </div>
         {#if description}
           <p class="text-sm text-secondary">{description}</p>
         {/if}
       </div>
     </label>
-    {#if $$slots.badge}
+    {#if $$slots.icon}
       <div class="shrink-0">
-        <slot name="badge" />
+        <slot name="icon" />
       </div>
     {/if}
   </div>

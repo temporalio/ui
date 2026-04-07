@@ -19,6 +19,9 @@ Resources:
             Principal:
               Service: temporal.io
             Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: <your-external-id>
       Policies:
         - PolicyName: InvokeLambda
           PolicyDocument:
@@ -36,6 +39,11 @@ Resources:
       Effect = "Allow"
       Principal = { Service = "temporal.io" }
       Action = "sts:AssumeRole"
+      Condition = {
+        StringEquals = {
+          "sts:ExternalId" = "<your-external-id>"
+        }
+      }
     }]
   })
 }

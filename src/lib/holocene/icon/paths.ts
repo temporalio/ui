@@ -142,6 +142,7 @@ import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import userGroup from './svg/user-group.svelte';
+import vercel from './svg/vercel.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workers from './svg/workers.svelte';
@@ -295,6 +296,7 @@ export const icons = {
   upload,
   usage,
   'user-group': userGroup,
+  vercel,
   'vertical-ellipsis': verticalEllipsis,
   warning,
   'system-window': systemWindow,

@@ -2,6 +2,7 @@
   import { writable } from 'svelte/store';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -30,7 +31,12 @@
     label={translate('workers.provider-lambda')}
     description={translate('workers.provider-lambda-description')}
   >
-    <Badge slot="badge" type="primary">Enabled</Badge>
+    <div
+      slot="icon"
+      class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded border border-subtle"
+    >
+      <Icon name="aws" width={32} height={32} />
+    </div>
     <slot />
   </RadioCard>
 
@@ -41,7 +47,15 @@
     description={translate('workers.provider-cloud-run-description')}
     disabled
   >
-    <Badge slot="badge" type="subtle">{translate('workers.coming-soon')}</Badge>
+    <Badge slot="label-badge" type="subtle"
+      >{translate('workers.coming-soon')}</Badge
+    >
+    <div
+      slot="icon"
+      class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded border border-subtle"
+    >
+      <Icon name="gcp" width={32} height={32} />
+    </div>
   </RadioCard>
 
   <RadioCard
@@ -51,6 +65,14 @@
     description={translate('workers.provider-vercel-description')}
     disabled
   >
-    <Badge slot="badge" type="subtle">{translate('workers.coming-soon')}</Badge>
+    <Badge slot="label-badge" type="subtle"
+      >{translate('workers.coming-soon')}</Badge
+    >
+    <div
+      slot="icon"
+      class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded border border-subtle"
+    >
+      <Icon name="vercel" width={18} height={18} />
+    </div>
   </RadioCard>
 </RadioGroup>

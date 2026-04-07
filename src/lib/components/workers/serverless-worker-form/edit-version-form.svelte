@@ -249,13 +249,15 @@
       </ComputeProviderPicker>
     </Card>
 
-    <div class="flex gap-4">
-      <Button type="submit" loading={$submitting}
-        >{translate('common.save')}</Button
-      >
-      <Button variant="ghost" href={cancelHref}
-        >{translate('common.cancel')}</Button
-      >
+    <div class="flex items-center justify-between">
+      <div class="flex gap-4">
+        <Button type="submit" loading={$submitting}
+          >{translate('common.save')}</Button
+        >
+        <Button variant="ghost" href={cancelHref}
+          >{translate('common.cancel')}</Button
+        >
+      </div>
       <Button variant="destructive" type="button" on:click={() => onDelete()}>
         {translate('common.delete')}
       </Button>
