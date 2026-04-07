@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ClassNameValue } from 'tailwind-merge';
+
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -16,6 +18,7 @@
     badgeType?: BadgeType;
     iconName?: IconName | undefined;
     iconPosition?: 'leading' | 'trailing';
+    class?: ClassNameValue;
   }
 
   let {
@@ -28,6 +31,7 @@
     iconPosition = 'leading',
     isBadge = false,
     badgeType = 'default',
+    class: className = '',
   }: Props = $props();
 </script>
 
@@ -49,7 +53,7 @@
   {/if}
 {/snippet}
 
-<DetailListValue {copyable} {copyableText}>
+<DetailListValue class={className} {copyable} {copyableText}>
   {#if tooltipText}
     <Tooltip text={tooltipText} top width={tooltipWidth} class="min-w-0">
       {@render content()}
