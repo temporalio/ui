@@ -57,7 +57,7 @@
   on:confirmModal={onActivityUnpause}
 >
   <h3 slot="title">
-    {translate('activities.pause-modal-confirmation', {
+    {translate('activities.unpause-modal-confirmation', {
       activityId: activity.id,
     })}
   </h3>
