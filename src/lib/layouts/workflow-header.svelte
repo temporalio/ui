@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fly, slide } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
 
   import { page } from '$app/state';
 
