@@ -13,7 +13,12 @@ export type EventHistory = Replace<
 
 export type HistoryEvent = Replace<
   import('$lib/types').HistoryEvent,
-  { eventType: EventType; eventId: string; links?: EventLink[] }
+  {
+    eventType: EventType;
+    eventId: string;
+    links?: EventLink[];
+    principal?: Principal;
+  }
 >;
 
 export type GetWorkflowExecutionHistoryResponse = Replace<
@@ -72,6 +77,12 @@ export type EventWithMetadata = {
   historyEvent: HistoryEvent;
 } & EventRequestMetadata;
 
+// Remove once TS SDK has support
+export type Principal = {
+  type?: string;
+  name?: string;
+};
+
 export type EventType = import('$lib/utilities/is-event-type').EventType;
 
 export type EventTypeCategory =
@@ -89,6 +100,7 @@ export interface WorkflowEvent extends HistoryEvent {
   name: EventType;
   links?: EventLink[];
   billableActions?: number;
+  principal?: Principal;
 }
 
 export type WorkflowEvents = WorkflowEvent[];
@@ -110,7 +122,8 @@ export type CommonEventKey =
   | 'category'
   | 'workerMayIgnore'
   | 'name'
-  | 'links';
+  | 'links'
+  | 'principal';
 
 export type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 
