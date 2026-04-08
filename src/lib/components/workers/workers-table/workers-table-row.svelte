@@ -2,7 +2,7 @@
   import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
-  import type { WorkerInfo } from '$lib/types';
+  import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import {
@@ -14,15 +14,13 @@
   import WorkersTableCell from './workers-table-cell.svelte';
 
   interface Props {
-    worker: WorkerInfo;
+    worker: WorkerListInfo | WorkerHeartbeat;
     namespace: string;
     filterable?: boolean;
   }
 
   let { worker, namespace, filterable = false }: Props = $props();
-  const status = $derived(
-    toWorkerStatusReadable(worker.workerHeartbeat?.status),
-  );
+  const status = $derived(toWorkerStatusReadable(worker?.status));
 </script>
 
 <tr>
@@ -31,22 +29,22 @@
   </td>
   <WorkersTableCell
     attribute="WorkerInstanceKey"
-    value={worker.workerHeartbeat?.workerInstanceKey}
-    href={worker.workerHeartbeat?.workerInstanceKey
+    value={worker?.workerInstanceKey}
+    href={worker?.workerInstanceKey
       ? routeForWorkerInstance({
           namespace,
-          workerInstanceKey: worker.workerHeartbeat.workerInstanceKey,
+          workerInstanceKey: worker.workerInstanceKey,
         })
       : undefined}
     {filterable}
   />
   <WorkersTableCell
     attribute="DeploymentName"
-    value={worker.workerHeartbeat?.deploymentVersion?.deploymentName}
-    href={worker.workerHeartbeat?.deploymentVersion?.deploymentName
+    value={worker?.deploymentVersion?.deploymentName}
+    href={worker?.deploymentVersion?.deploymentName
       ? routeForWorkerDeployment({
           namespace,
-          deployment: worker.workerHeartbeat.deploymentVersion.deploymentName,
+          deployment: worker.deploymentVersion.deploymentName,
         })
       : undefined}
     {filterable}
@@ -54,45 +52,49 @@
   <!-- TODO: Make Build ID filterable with DT-3745 -->
   <WorkersTableCell
     attribute="BuildId"
-    value={worker.workerHeartbeat?.deploymentVersion?.buildId}
+    value={worker?.deploymentVersion?.buildId}
   />
   <WorkersTableCell
     attribute="TaskQueue"
-    value={worker.workerHeartbeat?.taskQueue}
+    value={worker?.taskQueue}
     {filterable}
   />
   <WorkersTableCell
     attribute="WorkerIdentity"
-    value={worker.workerHeartbeat?.workerIdentity}
+    value={worker?.workerIdentity}
     {filterable}
   />
   <WorkersTableCell
     attribute="HostName"
-    value={worker.workerHeartbeat?.hostInfo?.hostName}
+    value={'hostName' in worker
+      ? worker?.hostName
+      : 'hostInfo' in worker
+        ? worker?.hostInfo?.hostName
+        : ''}
     {filterable}
   />
   <WorkersTableCell
     attribute="StartTime"
-    value={$timestamp(worker.workerHeartbeat?.startTime)}
+    value={$timestamp(worker?.startTime)}
   />
   <WorkersTableCell
     copyable={false}
     {filterable}
     filters={[
-      ...(worker.workerHeartbeat?.sdkName
+      ...(worker?.sdkName
         ? [
             createFilter({
               attribute: 'SdkName',
-              value: worker.workerHeartbeat.sdkName,
+              value: worker.sdkName,
               conditional: '=',
             }),
           ]
         : []),
-      ...(worker.workerHeartbeat?.sdkVersion
+      ...(worker?.sdkVersion
         ? [
             createFilter({
               attribute: 'SdkVersion',
-              value: worker.workerHeartbeat.sdkVersion,
+              value: worker.sdkVersion,
               conditional: '=',
             }),
           ]
@@ -100,8 +102,8 @@
     ]}
   >
     <SdkLogo
-      sdk={formatSDKName(worker.workerHeartbeat?.sdkName)}
-      version={worker.workerHeartbeat?.sdkVersion ?? ''}
+      sdk={formatSDKName(worker?.sdkName)}
+      version={worker?.sdkVersion ?? ''}
     />
   </WorkersTableCell>
 </tr>

@@ -7,7 +7,7 @@
   } from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { WorkerInfo } from '$lib/types';
+  import type { WorkerHeartbeat, WorkerListInfo } from '$lib/types';
   import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
 
   import WorkerHeartbeatsSDKAlert from './worker-heartbeats-sdk-warning.svelte';
@@ -17,7 +17,7 @@
   interface Props {
     filterable?: boolean;
     namespace: string;
-    onFetch: () => Promise<PaginatedRequest<WorkerInfo>>;
+    onFetch: () => Promise<PaginatedRequest<WorkerListInfo | WorkerHeartbeat>>;
     onError?: (err: unknown) => void;
   }
 
@@ -59,7 +59,7 @@
       <th>{label}</th>
     {/each}
   </tr>
-  {#each visibleItems as worker, i (worker.workerHeartbeat?.workerInstanceKey ?? i)}
+  {#each visibleItems as worker, i (worker?.workerInstanceKey ?? i)}
     <WorkersTableRow {worker} {namespace} {filterable} />
   {/each}
 

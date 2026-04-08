@@ -52,7 +52,9 @@ export type UnpauseWorkflowRequest =
 export type ListWorkersRequest =
   temporal.api.workflowservice.v1.IListWorkersRequest;
 export type ListWorkersResponse =
-  temporal.api.workflowservice.v1.IListWorkersResponse;
+  temporal.api.workflowservice.v1.IListWorkersResponse & {
+    workers?: WorkerListInfo[];
+  };
 export type DescribeWorkerRequest =
   temporal.api.workflowservice.v1.IDescribeWorkerRequest;
 export type DescribeWorkerResponse =
@@ -284,12 +286,24 @@ export type Failure = temporal.api.failure.v1.IFailure;
 export type WorkerHostInfo = temporal.api.worker.v1.IWorkerHostInfo & {
   workerGroupingKey?: string;
 };
-export type WorkerHeartbeat = temporal.api.worker.v1.IWorkerHeartbeat & {
-  hostInfo?: WorkerHostInfo;
-};
+export type WorkerHeartbeat = temporal.api.worker.v1.IWorkerHeartbeat;
 export type WorkerPollerInfo = temporal.api.worker.v1.IWorkerPollerInfo;
 export type WorkerSlotsInfo = temporal.api.worker.v1.IWorkerSlotsInfo;
 export type WorkerInfo = temporal.api.worker.v1.IWorkerInfo;
+export type WorkerListInfo = {
+  workerInstanceKey?: string | null;
+  workerIdentity?: string | null;
+  taskQueue?: string | null;
+  deploymentVersion?: temporal.api.deployment.v1.IWorkerDeploymentVersion | null;
+  sdkName?: string | null;
+  sdkVersion?: string | null;
+  status?: temporal.api.enums.v1.WorkerStatus | null;
+  startTime?: google.protobuf.ITimestamp | null;
+  hostName?: string | null;
+  workerGroupingKey?: string | null;
+  processId?: string | null;
+  plugins?: temporal.api.worker.v1.IPluginInfo[] | null;
+};
 export type PluginInfo = temporal.api.worker.v1.PluginInfo;
 
 // google

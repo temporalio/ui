@@ -3,7 +3,8 @@ import type {
   DescribeWorkerResponse,
   ListWorkersRequest,
   ListWorkersResponse,
-  WorkerInfo,
+  WorkerHeartbeat,
+  WorkerListInfo,
 } from '$lib/types';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -11,7 +12,10 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 type PaginatedWorkerListPromise = (
   pageSize: number,
   token: string,
-) => Promise<{ items: WorkerInfo[]; nextPageToken: string }>;
+) => Promise<{
+  items: WorkerHeartbeat[] | WorkerListInfo[];
+  nextPageToken: string;
+}>;
 
 export const fetchPaginatedWorkers = async (
   parameters: ListWorkersRequest,
@@ -26,9 +30,14 @@ export const fetchPaginatedWorkers = async (
         nextPageToken: token,
         ...(parameters.query && { query: parameters.query }),
       },
-    }).then(({ workersInfo, nextPageToken }) => {
+    }).then(({ workersInfo, workers, nextPageToken }) => {
       return {
-        items: workersInfo ?? [],
+        items:
+          workers ??
+          workersInfo
+            ?.map(({ workerHeartbeat }) => workerHeartbeat)
+            .filter((h): h is WorkerHeartbeat => !!h) ??
+          [],
         nextPageToken: nextPageToken ? String(nextPageToken) : '',
       };
     });
