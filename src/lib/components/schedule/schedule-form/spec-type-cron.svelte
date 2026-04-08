@@ -4,6 +4,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import Label from '$lib/holocene/label.svelte';
 
   import type { ScheduleFormData } from './schema';
 
@@ -32,17 +33,18 @@
 </script>
 
 <div class="flex flex-col gap-3">
-  <div class="flex flex-wrap gap-2">
-    {#each shortcuts as shortcut (shortcut.value)}
-      <Button
-        variant="ghost"
-        size="xs"
-        on:click={() => ($form.specs[index].cronString = shortcut.value)}
-        >{shortcut.label}</Button
-      >
-    {/each}
+  <div>
+    <Label label="Cron Shortcuts" />
+    <div class="flex flex-wrap gap-2">
+      {#each shortcuts as shortcut (shortcut.value)}
+        <Button
+          variant="secondary"
+          on:click={() => ($form.specs[index].cronString = shortcut.value)}
+          >{shortcut.label}</Button
+        >
+      {/each}
+    </div>
   </div>
-
   <Input
     id="cron-string-{index}"
     label="Cron expression"

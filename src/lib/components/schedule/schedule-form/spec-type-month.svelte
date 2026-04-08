@@ -3,6 +3,7 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import TimePicker from '$lib/holocene/time-picker.svelte';
 
   import type { ScheduleFormData } from './schema';
 
@@ -14,18 +15,18 @@
   let { form, index }: Props = $props();
 
   const monthNames = [
-    { label: 'Jan', value: '1' },
-    { label: 'Feb', value: '2' },
-    { label: 'Mar', value: '3' },
-    { label: 'Apr', value: '4' },
+    { label: 'January', value: '1' },
+    { label: 'February', value: '2' },
+    { label: 'March', value: '3' },
+    { label: 'April', value: '4' },
     { label: 'May', value: '5' },
-    { label: 'Jun', value: '6' },
-    { label: 'Jul', value: '7' },
-    { label: 'Aug', value: '8' },
-    { label: 'Sep', value: '9' },
-    { label: 'Oct', value: '10' },
-    { label: 'Nov', value: '11' },
-    { label: 'Dec', value: '12' },
+    { label: 'June', value: '6' },
+    { label: 'July', value: '7' },
+    { label: 'August', value: '8' },
+    { label: 'September', value: '9' },
+    { label: 'October', value: '10' },
+    { label: 'November', value: '11' },
+    { label: 'December', value: '12' },
   ];
 
   const dayNumbers = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -62,11 +63,12 @@
     <p class="text-sm text-secondary">
       Select the specific dates for the schedule to always run on.
     </p>
-    <div class="grid grid-cols-7 gap-1">
+    <div class="grid grid-cols-7 gap-3 border border-subtle p-3">
       {#each dayNumbers as day (day)}
         <Button
-          variant={isDaySelected(day) ? 'primary' : 'ghost'}
-          size="xs"
+          variant={isDaySelected(day) ? 'primary' : 'secondary'}
+          size="sm"
+          class="w-12"
           on:click={() => toggleDay(day)}>{day}</Button
         >
       {/each}
@@ -76,14 +78,12 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-wrap gap-2">
       <Button
-        variant="ghost"
-        size="xs"
+        variant="secondary"
         on:click={() => ($form.specs[index].months = [])}>Every month</Button
       >
       {#each monthNames as month (month.value)}
         <Button
-          variant={isMonthSelected(month.value) ? 'primary' : 'ghost'}
-          size="xs"
+          variant={isMonthSelected(month.value) ? 'primary' : 'secondary'}
           on:click={() => toggleMonth(month.value)}>{month.label}</Button
         >
       {/each}
@@ -94,20 +94,12 @@
     <p class="text-sm text-secondary">
       Specify the time (UTC) for this schedule to run.
     </p>
-    <div class="flex gap-4">
-      <Input
-        id="hour-{index}"
-        label="Hour"
-        bind:value={$form.specs[index].hour}
-        placeholder="0"
-        class="w-24"
-      />
-      <Input
-        id="minute-{index}"
-        label="Minute"
-        bind:value={$form.specs[index].minute}
-        placeholder="0"
-        class="w-24"
+    <div class="flex w-96 gap-4">
+      <TimePicker
+        bind:hour={$form.specs[index].hour}
+        bind:minute={$form.specs[index].minute}
+        bind:second={$form.specs[index].second}
+        twelveHourClock={false}
       />
     </div>
     <p class="text-xs text-secondary">Based on Universal Standard Time (UTC)</p>
