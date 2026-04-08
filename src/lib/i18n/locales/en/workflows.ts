@@ -171,6 +171,8 @@ export const Strings = {
   children_one: '1 Child',
   children_other: '{{count}} Children',
   'show-children': 'View Child Workflows',
+  'show-workflow-details': 'Show Workflow Details',
+  'hide-workflow-details': 'Hide Workflow Details',
   first: '{{count}} First',
   previous: '{{count}} Previous',
   next: '{{count}} Next',
