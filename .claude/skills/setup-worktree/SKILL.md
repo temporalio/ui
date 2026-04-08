@@ -15,7 +15,7 @@ When a new git worktree is created, gitignored files (like the Temporal CLI bina
 git worktree list
 ```
 
-The first entry is the main worktree (e.g. `/Users/ross/code/ui`). Use it as `$MAIN`.
+The first entry is the main worktree. Use it as `$MAIN`.
 
 ### 2. Copy .env from the main worktree
 
