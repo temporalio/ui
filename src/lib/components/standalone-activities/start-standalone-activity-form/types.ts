@@ -10,6 +10,7 @@ export interface StandaloneActivityFormData {
   startToCloseTimeout: string;
   scheduleToCloseTimeout: string;
   scheduleToStartTimeout: string;
+  heartbeatTimeout: string;
   input: string;
   encoding: PayloadInputEncoding;
   messageType: string;
