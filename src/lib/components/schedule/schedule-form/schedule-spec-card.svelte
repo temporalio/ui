@@ -4,6 +4,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { getScheduleSpecLabel } from '$lib/utilities/schedule-spec-label';
 
   import type { ScheduleFormData } from './schema';
   import { DEFAULT_SPEC_ITEM } from './schema';
@@ -47,7 +48,7 @@
   </p>
 
   <div class="mt-4 flex flex-col gap-4">
-    {#each specs as _, i (i)}
+    {#each specs as spec, i (i)}
       <ScheduleSpecItem
         {form}
         index={i}
@@ -56,6 +57,7 @@
         onRemove={() => removeSpec(i)}
         canRemove={specs.length > 1}
       />
+      <p>{getScheduleSpecLabel(form)}</p>
     {/each}
   </div>
 
