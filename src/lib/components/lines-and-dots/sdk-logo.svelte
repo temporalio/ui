@@ -22,14 +22,13 @@
   };
 
   const sdkToDocsSlug: Record<string, string> = {
-    Rubg: 'ruby',
+    Ruby: 'ruby',
     Go: 'go',
     Java: 'java',
     Python: 'python',
-    '.NET': 'dot-net',
+    '.NET': 'dotnet',
     PHP: 'php',
-    TypeScript: 'typescript',
-    Rust: 'rust',
+    Typescript: 'typescript',
   };
 
   interface Props {
