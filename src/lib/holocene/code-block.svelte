@@ -2,7 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
-  import { historyKeymap, standardKeymap } from '@codemirror/commands';
+  import { history, historyKeymap, standardKeymap } from '@codemirror/commands';
   import {
     bracketMatching,
     ensureSyntaxTree,
@@ -11,7 +11,12 @@
     indentUnit,
     syntaxHighlighting,
   } from '@codemirror/language';
-  import { Compartment, EditorState, type Extension } from '@codemirror/state';
+  import {
+    Compartment,
+    EditorState,
+    type Extension,
+    Transaction,
+  } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
   import { onMount, type Snippet } from 'svelte';
   import { twMerge as merge, twMerge } from 'tailwind-merge';
@@ -116,6 +121,7 @@
           to: doc.length,
           insert: newContent,
         },
+        annotations: Transaction.addToHistory.of(false),
       });
     }
   };
@@ -145,6 +151,7 @@
   const compartment = $state(new Compartment());
 
   const staticExtensions: Extension[] = [
+    history(),
     keymap.of([...standardKeymap, ...historyKeymap]),
     syntaxHighlighting(highlightStyles, { fallback: true }),
     indentUnit.of('  '),
