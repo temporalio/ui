@@ -5,7 +5,7 @@
 
   import { page } from '$app/state';
 
-  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  import Payload from '$lib/components/payload.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
@@ -257,40 +257,43 @@
       />
     {/if}
     {#if showText}
-      <MetadataDecoder
+      <Payload
         value={group?.userMetadata?.summary}
+        mode="summary"
         prefix={isActivityTaskScheduledEvent(group.initialEvent)
           ? group?.displayName
           : ''}
         fallback={decodedLocalActivity
           ? translate('events.category.local-activity')
           : group?.displayName}
-        let:decodedValue
       >
-        <Text
-          point={textPosition}
-          {textAnchor}
-          {backdrop}
-          backdropHeight={radius * 2}
-          config={TimelineConfig}
-          icon={(pendingActivity && !pendingActivity.paused) || retried
-            ? 'retry'
-            : undefined}
-        >
-          {#if pendingActivity}
-            {translate('workflows.attempt')}
-            {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
-            {'• '}
-            {decodedValue}
-          {:else if retried}
-            {activityTaskScheduled.attributes.attempt} • {decodedValue}
-          {:else if decodedLocalActivity}
-            {decodedLocalActivity.value}
-          {:else}
-            {decodedValue}
-          {/if}
-        </Text>
-      </MetadataDecoder>
+        {#snippet children(decodedValue)}
+          <Text
+            point={textPosition}
+            {textAnchor}
+            {backdrop}
+            backdropHeight={radius * 2}
+            config={TimelineConfig}
+            icon={(pendingActivity && !pendingActivity.paused) || retried
+              ? 'retry'
+              : undefined}
+          >
+            {#if pendingActivity}
+              {translate('workflows.attempt')}
+              {pendingActivity.attempt} / {pendingActivity.maximumAttempts ||
+                '∞'}
+              {'• '}
+              {decodedValue}
+            {:else if retried}
+              {activityTaskScheduled.attributes.attempt} • {decodedValue}
+            {:else if decodedLocalActivity}
+              {decodedLocalActivity.value}
+            {:else}
+              {decodedValue}
+            {/if}
+          </Text>
+        {/snippet}
+      </Payload>
     {/if}
     <Dot
       point={[x, y]}

@@ -1,16 +1,15 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import Payload from '$lib/components/payload.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { Payload } from '$lib/types';
+  import type { Payload as RawPayload } from '$lib/types';
   import type { PotentiallyDecodable } from '$lib/utilities/decode-payload';
   import {
     parseWithBigInt,
     stringifyWithBigInt,
   } from '$lib/utilities/parse-with-big-int';
-
-  import PayloadDecoder from '../event/payload-decoder.svelte';
 
   type Props = {
     title: string;
@@ -44,7 +43,9 @@
     }
   };
 
-  const getPayloads = (value: PotentiallyDecodable | undefined): Payload[] => {
+  const getPayloads = (
+    value: PotentiallyDecodable | undefined,
+  ): RawPayload[] => {
     try {
       const payloads = value?.payloads;
       return Array.isArray(payloads) ? payloads : [];
@@ -68,10 +69,16 @@
   {@render titleSnippet()}
   {#if content}
     {#if payloadsSize > 0}
-      <PayloadDecoder value={parsedContent} key="payloads">
+      <Payload
+        value={parsedContent}
+        key="payloads"
+        maxHeight={MAX_HEIGHT}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      >
         {#snippet children(decodedValue)}
           {#if payloadsSize > 1}
-            {#each parsePayloads(decodedValue) as decodedContent}
+            {#each parsePayloads(decodedValue) as decodedContent (decodedContent)}
               <CodeBlock
                 content={stringifyWithBigInt(decodedContent)}
                 copyIconTitle={translate('common.copy-icon-title')}
@@ -90,18 +97,14 @@
             />
           {/if}
         {/snippet}
-      </PayloadDecoder>
+      </Payload>
     {:else}
-      <PayloadDecoder value={parseWithBigInt(content)}>
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            maxHeight={MAX_HEIGHT}
-          />
-        {/snippet}
-      </PayloadDecoder>
+      <Payload
+        value={parseWithBigInt(content)}
+        maxHeight={MAX_HEIGHT}
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      />
     {/if}
   {:else}
     <CodeBlock

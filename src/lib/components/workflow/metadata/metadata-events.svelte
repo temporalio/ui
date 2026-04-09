@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  import Payload from '$lib/components/payload.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
@@ -22,19 +22,21 @@
   </div>
 {/if}
 <div class="flex flex-col gap-2">
-  {#each metadataGroups as group}
+  {#each metadataGroups as group (group)}
     <div
       class="flex items-center justify-between gap-4 border-b border-subtle px-3 pb-1 text-lg"
     >
       <div class="flex items-center gap-2">
         <p class="w-32 min-w-32 text-sm font-medium">{group.label}</p>
-        <MetadataDecoder
+        <Payload
           value={group.userMetadata.summary}
+          mode="summary"
           fallback={translate('events.decode-failed')}
-          let:decodedValue
         >
-          <span class="text-sm">{decodedValue}</span>
-        </MetadataDecoder>
+          {#snippet children(decodedValue)}
+            <span class="text-sm">{decodedValue}</span>
+          {/snippet}
+        </Payload>
       </div>
       <WorkflowStatus status={group.finalClassification} />
     </div>

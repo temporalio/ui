@@ -1,6 +1,7 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Payload from '$lib/components/payload.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -10,7 +11,6 @@
   import { displayLinkType } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetailsLink from './event-details-link.svelte';
-  import PayloadDecoder from './payload-decoder.svelte';
 
   export let key: string;
   export let value: string | Record<string, unknown> | Payloads;
@@ -33,15 +33,12 @@
       <div
         class="flex max-w-sm items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
-        <PayloadDecoder {value} key="payloads">
-          {#snippet children(decodedValue)}
-            <div class={merge('payload', $$props.class)}>
-              <code>
-                <pre class="truncate">{decodedValue.slice(0, 60)}</pre>
-              </code>
-            </div>
-          {/snippet}
-        </PayloadDecoder>
+        <Payload
+          {value}
+          key="payloads"
+          mode="inline-truncated"
+          class={merge($$props.class)}
+        />
       </div>
     {:else if linkType !== 'none'}
       <Copyable
@@ -64,17 +61,3 @@
     {/if}
   </div>
 {/if}
-
-<style lang="postcss">
-  .payload {
-    @apply overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs;
-  }
-
-  .payload code {
-    @apply text-primary;
-  }
-
-  .payload pre {
-    @apply text-primary;
-  }
-</style>

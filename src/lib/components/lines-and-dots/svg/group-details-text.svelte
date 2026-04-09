@@ -1,7 +1,6 @@
 <script lang="ts">
   import EventDetailsLink from '$lib/components/event/event-details-link.svelte';
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Payload from '$lib/components/payload.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     displayLinkType,
@@ -23,42 +22,25 @@
 
 {#if typeof value === 'object'}
   {#if value?.payloads}
-    <PayloadDecoder {value} key="payloads" {onDecode}>
-      {#snippet children(decodedValue)}
-        {#key decodedValue}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
-        {/key}
-      {/snippet}
-    </PayloadDecoder>
+    <Payload
+      {value}
+      key="payloads"
+      maxHeight={staticCodeBlockHeight - fontSizeRatio}
+      {onDecode}
+    />
   {:else if key === 'searchAttributes'}
-    <PayloadDecoder
+    <Payload
       key="searchAttributes"
       value={{ searchAttributes: codeBlockValue }}
+      maxHeight={staticCodeBlockHeight - fontSizeRatio}
       {onDecode}
-    >
-      {#snippet children(decodedValue)}
-        {#key decodedValue}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
-        {/key}
-      {/snippet}
-    </PayloadDecoder>
+    />
   {:else}
-    <PayloadDecoder value={codeBlockValue} {onDecode}>
-      {#snippet children(decodedValue)}
-        {#key decodedValue}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={staticCodeBlockHeight - fontSizeRatio}
-          />
-        {/key}
-      {/snippet}
-    </PayloadDecoder>
+    <Payload
+      value={codeBlockValue}
+      maxHeight={staticCodeBlockHeight - fontSizeRatio}
+      {onDecode}
+    />
   {/if}
 {:else if linkType !== 'none'}
   <EventDetailsLink {value} {attributes} type={linkType} />

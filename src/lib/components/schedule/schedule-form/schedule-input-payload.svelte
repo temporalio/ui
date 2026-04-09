@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
+  import Payload from '$lib/components/payload.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -69,20 +69,22 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <PayloadDecoder value={payloads} key="payloads" onDecode={setInitialInput}>
-    <PayloadInputWithEncoding
-      bind:input
-      {encoding}
-      bind:messageType
-      bind:loading
-      editing={editInput}
-      id="schedule-payload-input"
-    >
-      <div slot="action" class:hidden={!showEditActions}>
-        <Button variant="secondary" on:click={handleEdit}>
-          {editInput ? translate('common.cancel') : translate('common.edit')}
-        </Button>
-      </div>
-    </PayloadInputWithEncoding>
-  </PayloadDecoder>
+  <Payload value={payloads} key="payloads" onDecode={setInitialInput}>
+    {#snippet children(_decodedValue)}
+      <PayloadInputWithEncoding
+        bind:input
+        {encoding}
+        bind:messageType
+        bind:loading
+        editing={editInput}
+        id="schedule-payload-input"
+      >
+        <div slot="action" class:hidden={!showEditActions}>
+          <Button variant="secondary" on:click={handleEdit}>
+            {editInput ? translate('common.cancel') : translate('common.edit')}
+          </Button>
+        </div>
+      </PayloadInputWithEncoding>
+    {/snippet}
+  </Payload>
 </div>
