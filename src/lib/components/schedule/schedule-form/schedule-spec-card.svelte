@@ -47,8 +47,8 @@
     </Link>
   </p>
 
-  <div class="mt-4 flex flex-col gap-4">
-    {#each specs as spec, i (i)}
+  <div class="mt-4 flex flex-col gap-2">
+    {#each specs as _, i (i)}
       <ScheduleSpecItem
         {form}
         index={i}

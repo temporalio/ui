@@ -44,7 +44,7 @@
   </p>
 
   {#if editing}
-    <div class="mt-4 flex flex-col gap-4">
+    <div class="mt-4 flex max-w-sm flex-col gap-2">
       <Select
         id="overlap-policy"
         label="Overlap Policy"
