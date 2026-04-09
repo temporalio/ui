@@ -121,6 +121,8 @@ import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
 import switchIcon from './svg/switch.svelte';
 import systemWindow from './svg/system-window.svelte';
+import tableComfy from './svg/table-comfy.svelte';
+import tableCompact from './svg/table-compact.svelte';
 import table from './svg/table.svelte';
 import tag from './svg/tag.svelte';
 import target from './svg/target.svelte';
@@ -271,6 +273,8 @@ export const icons = {
   support,
   switch: switchIcon,
   table,
+  'table-comfy': tableComfy,
+  'table-compact': tableCompact,
   tag,
   target,
   'temporal-logo': temporalLogo,
