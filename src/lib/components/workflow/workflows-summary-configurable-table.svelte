@@ -12,6 +12,7 @@
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
@@ -74,6 +75,12 @@
   };
 
   $: onFetch = () => fetchPaginatedWorkflows(namespace, query);
+
+  $: compact = $tableDensity === 'compact';
+
+  const setTableDensity = () => {
+    $tableDensity = compact ? 'comfortable' : 'compact';
+  };
 </script>
 
 {#key [namespace, query, $refresh]}
@@ -128,6 +135,21 @@
       </TableEmptyState>
     </svelte:fragment>
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
+      <Tooltip
+        text={compact
+          ? translate('common.compact')
+          : translate('common.comfortable')}
+        top
+      >
+        <Button
+          on:click={setTableDensity}
+          data-testid="table-density-button"
+          size="xs"
+          variant="ghost"
+          leadingIcon={compact ? 'table-compact' : 'table-comfy'}
+        ></Button>
+      </Tooltip>
+
       <Tooltip text={translate('common.download-json')} top>
         <Button
           on:click={() => exportWorkflows(visibleItems, page)}
