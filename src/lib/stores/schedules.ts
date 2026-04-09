@@ -13,7 +13,10 @@ import type {
   SchedulePresetsParameters,
   ScheduleSpecParameters,
 } from '$lib/types/schedule';
-import { encodePayloads } from '$lib/utilities/encode-payload';
+import {
+  encodePayloads,
+  isEncodedPayload,
+} from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 import {
@@ -26,13 +29,6 @@ type ScheduleParameterArgs = {
   spec: Partial<ScheduleSpecParameters>;
   presets: SchedulePresetsParameters;
 };
-
-// TODO: Post Beta, add support of additional fields.
-// "startTime": "2022-07-04T03:18:59.668Z",
-// "endTime": "2022-07-04T03:18:59.668Z",
-// "jitter": "string",
-// "timezoneName": "string",
-// "timezoneData": "string"
 
 const getSearchAttributes = (
   attrs: (typeof setSearchAttributes.arguments)[0],
@@ -229,13 +225,14 @@ export const submitEditSchedule = async (
   const fields = body.schedule.action.startWorkflow?.header?.fields;
   if (fields && Object.keys(fields).length > 0) {
     try {
-      const entries = Object.entries(fields);
-      for (const [key, value] of entries) {
-        const encodedValue = await encodePayloads({
-          input: stringifyWithBigInt(value),
-          encoding: 'json/plain',
-        });
-        fields[key] = encodedValue[0];
+      for (const [key, value] of Object.entries(fields)) {
+        if (!isEncodedPayload(value)) {
+          const encodedValue = await encodePayloads({
+            input: stringifyWithBigInt(value),
+            encoding: 'json/plain',
+          });
+          fields[key] = encodedValue[0];
+        }
       }
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);

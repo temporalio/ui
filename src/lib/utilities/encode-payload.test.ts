@@ -5,7 +5,11 @@ import {
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
 
-import { encodePayloads, getSinglePayload } from './encode-payload';
+import {
+  encodePayloads,
+  getSinglePayload,
+  isEncodedPayload,
+} from './encode-payload';
 
 describe('getSinglePayload', () => {
   it('should return single payload from single payload', () => {
@@ -26,6 +30,51 @@ describe('getSinglePayload', () => {
     const payload = 'cats';
     const singlePayload = getSinglePayload(stringifyWithBigInt(payload));
     expect(parseWithBigInt(singlePayload)).toEqual(payload);
+  });
+});
+
+describe('isEncodedPayload', () => {
+  it('should return true for a base64-encoded payload', () => {
+    expect(
+      isEncodedPayload({
+        metadata: { encoding: 'anNvbi9wbGFpbg==' },
+        data: 'eyJmb28iOiJiYXIifQ==',
+      }),
+    ).toBe(true);
+  });
+
+  it('should return true for a binary/null encoded payload', () => {
+    expect(
+      isEncodedPayload({
+        metadata: { encoding: 'YmluYXJ5L251bGw=' },
+        data: '',
+      }),
+    ).toBe(true);
+  });
+
+  it('should return false for a decoded payload', () => {
+    expect(
+      isEncodedPayload({
+        metadata: { encoding: 'json/plain' },
+        data: { foo: 'bar' },
+      }),
+    ).toBe(false);
+  });
+
+  it('should return false for a raw string value', () => {
+    expect(isEncodedPayload('hello')).toBe(false);
+  });
+
+  it('should return false for a raw object value', () => {
+    expect(isEncodedPayload({ foo: 'bar' })).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isEncodedPayload(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isEncodedPayload(undefined)).toBe(false);
   });
 });
 

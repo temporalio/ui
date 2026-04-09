@@ -4,11 +4,19 @@ import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
 import { encodePayloadsWithCodec } from '$lib/services/data-encoder';
 import { dataEncoder } from '$lib/stores/data-encoder';
 import type { Payload } from '$lib/types';
+import { atob } from '$lib/utilities/atob';
 import { btoa } from '$lib/utilities/btoa';
 import {
   parseWithBigInt,
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
+
+export const isEncodedPayload = (payload: Payload): boolean => {
+  const encoding = payload?.metadata?.encoding;
+  if (typeof encoding !== 'string' || typeof payload?.data !== 'string')
+    return false;
+  return atob(encoding) !== encoding;
+};
 
 export const getSinglePayload = (decodedValue: string): string => {
   if (decodedValue) {
