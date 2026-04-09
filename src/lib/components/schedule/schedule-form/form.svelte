@@ -119,10 +119,8 @@
     </Link>
     <h1>{title}</h1>
     <form novalidate use:enhance oninput={onInput}>
-      <div
-        class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_480px] 2xl:grid-cols-[1fr_640px]"
-      >
-        <div class="flex flex-col gap-6">
+      <div class="relative flex gap-6">
+        <div class="flex w-full flex-col gap-6">
           <ScheduleDetailsCard {form} errors={$formErrors} {schedule} />
           <ScheduleSpecCard {form} />
           <SchedulePoliciesCard {form} />
@@ -155,7 +153,7 @@
           </div>
         </div>
 
-        <div class="hidden lg:block">
+        <div class="w-full">
           <ScheduleSummarySidebar formData={$form} />
         </div>
       </div>

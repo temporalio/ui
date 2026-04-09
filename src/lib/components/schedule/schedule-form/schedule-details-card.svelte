@@ -68,7 +68,7 @@
 
 <Card class="w-full">
   <h2 class="text-lg font-semibold">Schedule Details</h2>
-  <div class="mt-4 flex flex-col gap-4">
+  <div class="mt-4 flex flex-col gap-2">
     <Input
       id="name"
       bind:value={$form.name}
