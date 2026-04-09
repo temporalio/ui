@@ -114,6 +114,7 @@ import signal from './svg/signal.svelte';
 import slashForward from './svg/slash-forward.svelte';
 import sliders from './svg/sliders.svelte';
 import spinner from './svg/spinner.svelte';
+import squareInfo from './svg/square-info.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
@@ -263,6 +264,7 @@ export const icons = {
   'slash-forward': slashForward,
   sliders,
   spinner,
+  'square-info': squareInfo,
   'star-empty': starEmpty,
   'star-filled': starFilled,
   success: checkmark,
