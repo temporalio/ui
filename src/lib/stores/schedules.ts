@@ -13,10 +13,7 @@ import type {
   SchedulePresetsParameters,
   ScheduleSpecParameters,
 } from '$lib/types/schedule';
-import {
-  encodePayloads,
-  isEncodedPayload,
-} from '$lib/utilities/encode-payload';
+import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 import {
@@ -226,13 +223,11 @@ export const submitEditSchedule = async (
   if (fields && Object.keys(fields).length > 0) {
     try {
       for (const [key, value] of Object.entries(fields)) {
-        if (!isEncodedPayload(value)) {
-          const encodedValue = await encodePayloads({
-            input: stringifyWithBigInt(value),
-            encoding: 'json/plain',
-          });
-          fields[key] = encodedValue[0];
-        }
+        const encodedValue = await encodePayloads({
+          input: stringifyWithBigInt(value),
+          encoding: 'json/plain',
+        });
+        fields[key] = encodedValue[0];
       }
     } catch (e) {
       error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);

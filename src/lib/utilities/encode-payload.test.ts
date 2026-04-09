@@ -8,7 +8,7 @@ import {
 import {
   encodePayloads,
   getSinglePayload,
-  isEncodedPayload,
+  isBase64EncodedPayload,
 } from './encode-payload';
 
 describe('getSinglePayload', () => {
@@ -33,10 +33,10 @@ describe('getSinglePayload', () => {
   });
 });
 
-describe('isEncodedPayload', () => {
+describe('isBase64EncodedPayload', () => {
   it('should return true for a base64-encoded payload', () => {
     expect(
-      isEncodedPayload({
+      isBase64EncodedPayload({
         metadata: { encoding: 'anNvbi9wbGFpbg==' },
         data: 'eyJmb28iOiJiYXIifQ==',
       }),
@@ -45,7 +45,7 @@ describe('isEncodedPayload', () => {
 
   it('should return true for a binary/null encoded payload', () => {
     expect(
-      isEncodedPayload({
+      isBase64EncodedPayload({
         metadata: { encoding: 'YmluYXJ5L251bGw=' },
         data: '',
       }),
@@ -54,7 +54,7 @@ describe('isEncodedPayload', () => {
 
   it('should return false for a decoded payload', () => {
     expect(
-      isEncodedPayload({
+      isBase64EncodedPayload({
         metadata: { encoding: 'json/plain' },
         data: { foo: 'bar' },
       }),
@@ -62,23 +62,35 @@ describe('isEncodedPayload', () => {
   });
 
   it('should return false for a raw string value', () => {
-    expect(isEncodedPayload('hello')).toBe(false);
+    expect(isBase64EncodedPayload('hello')).toBe(false);
   });
 
   it('should return false for a raw object value', () => {
-    expect(isEncodedPayload({ foo: 'bar' })).toBe(false);
+    expect(isBase64EncodedPayload({ foo: 'bar' })).toBe(false);
   });
 
   it('should return false for null', () => {
-    expect(isEncodedPayload(null)).toBe(false);
+    expect(isBase64EncodedPayload(null)).toBe(false);
   });
 
   it('should return false for undefined', () => {
-    expect(isEncodedPayload(undefined)).toBe(false);
+    expect(isBase64EncodedPayload(undefined)).toBe(false);
   });
 });
 
 describe('encodePayloads', () => {
+  it('should return already-encoded payload as-is', async () => {
+    const alreadyEncoded = {
+      metadata: { encoding: 'anNvbi9wbGFpbg==' },
+      data: 'eyJmb28iOiJiYXIifQ==',
+    };
+    const payload = await encodePayloads({
+      input: stringifyWithBigInt(alreadyEncoded),
+      encoding: 'json/plain',
+    });
+    expect(payload).toEqual([alreadyEncoded]);
+  });
+
   it('should encode single simple string payload', async () => {
     const payload = await encodePayloads({
       input: stringifyWithBigInt('cats'),

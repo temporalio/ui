@@ -11,10 +11,11 @@ import {
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
 
-export const isEncodedPayload = (payload: Payload): boolean => {
-  const encoding = payload?.metadata?.encoding;
-  if (typeof encoding !== 'string' || typeof payload?.data !== 'string')
-    return false;
+export const isBase64EncodedPayload = (value: unknown): value is Payload => {
+  if (!value || typeof value !== 'object') return false;
+  const { metadata, data } = value as Payload;
+  const encoding = metadata?.encoding;
+  if (typeof encoding !== 'string' || typeof data !== 'string') return false;
   return atob(encoding) !== encoding;
 };
 
@@ -66,18 +67,25 @@ export const encodePayloads = async ({
   messageType = '',
   encodeWithCodec = true,
 }: EncodePayloads): Promise<Payload[]> => {
-  let payloads = null;
+  if (!input) return null;
 
-  if (input) {
-    const parsedInput = parseWithBigInt(input);
-    payloads = [setBase64Payload(parsedInput, encoding, messageType)];
-    const endpoint = get(dataEncoder).endpoint;
-    if (endpoint && encodeWithCodec) {
-      const awaitData = await encodePayloadsWithCodec({
-        payloads: { payloads },
-      });
-      payloads = awaitData?.payloads ?? null;
-    }
+  const parsedInput = parseWithBigInt(input);
+  let payloads: Payload[] = isBase64EncodedPayload(parsedInput)
+    ? [parsedInput]
+    : [
+        setBase64Payload(
+          parsedInput,
+          encoding,
+          messageType,
+        ) as unknown as Payload,
+      ];
+
+  const endpoint = get(dataEncoder).endpoint;
+  if (endpoint && encodeWithCodec) {
+    const awaitData = await encodePayloadsWithCodec({
+      payloads: { payloads },
+    });
+    payloads = (awaitData?.payloads as Payload[]) ?? null;
   }
   return payloads;
 };
