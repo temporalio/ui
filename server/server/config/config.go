@@ -67,6 +67,8 @@ type (
 		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
 		// Whether to disable activity commands in the UI
 		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
+		// Whether to disable the tracking pixel in the UI
+		DisableTrackingPixel bool `yaml:"disableTrackingPixel"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
 		HideLogs       bool     `yaml:"hideLogs"`
