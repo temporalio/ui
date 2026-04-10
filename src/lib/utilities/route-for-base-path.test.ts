@@ -1,6 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { base } from '$app/paths';
+
+import { routePrefix } from '$lib/stores/route-prefix';
 
 import * as routeForModule from './route-for';
 import {
@@ -256,4 +258,174 @@ describe('routeFor functions should resolve the base path exactly once', () => {
       );
     }
   });
+});
+
+describe('routeFor functions with prefix should resolve base + prefix correctly', () => {
+  const prefix = '/projects/my-project';
+
+  const namespaceParams = { namespace: 'default' };
+  const workflowParams = {
+    namespace: 'default',
+    workflow: 'wf-id',
+    run: 'run-id',
+  };
+  const scheduleParams = { namespace: 'default', scheduleId: 'sched-1' };
+  const activityParams = {
+    namespace: 'default',
+    activityId: 'act-1',
+    runId: 'run-1',
+  };
+
+  afterEach(() => {
+    routePrefix.set('');
+  });
+
+  const prefixedCases: [string, () => string | undefined][] = [
+    ['routeForNamespaces', () => routeForNamespaces()],
+    ['routeForNexus', () => routeForNexus()],
+    ['routeForNexusEndpoint', () => routeForNexusEndpoint('ep-1')],
+    ['routeForNexusEndpointEdit', () => routeForNexusEndpointEdit('ep-1')],
+    ['routeForNexusEndpointCreate', () => routeForNexusEndpointCreate()],
+    ['routeForNamespace', () => routeForNamespace(namespaceParams)],
+    ['routeForNamespaceSelector', () => routeForNamespaceSelector()],
+    ['routeForWorkflows', () => routeForWorkflows(namespaceParams)],
+    [
+      'routeForArchivalWorkflows',
+      () => routeForArchivalWorkflows(namespaceParams),
+    ],
+    ['routeForWorkflow', () => routeForWorkflow(workflowParams)],
+    ['routeForSchedules', () => routeForSchedules(namespaceParams)],
+    ['routeForScheduleCreate', () => routeForScheduleCreate(namespaceParams)],
+    ['routeForSchedule', () => routeForSchedule(scheduleParams)],
+    ['routeForScheduleEdit', () => routeForScheduleEdit(scheduleParams)],
+    [
+      'routeForArchivalEventHistory',
+      () => routeForArchivalEventHistory(workflowParams),
+    ],
+    [
+      'routeForEventHistoryEvent',
+      () => routeForEventHistoryEvent({ ...workflowParams, eventId: '1' }),
+    ],
+    ['routeForEventHistory', () => routeForEventHistory(workflowParams)],
+    ['routeForTimeline', () => routeForTimeline(workflowParams)],
+    ['routeForWorkers', () => routeForWorkers(workflowParams)],
+    [
+      'routeForWorkerDeployments',
+      () => routeForWorkerDeployments(namespaceParams),
+    ],
+    [
+      'routeForWorkerDeployment',
+      () =>
+        routeForWorkerDeployment({
+          namespace: 'default',
+          deployment: 'dep-1',
+        }),
+    ],
+    [
+      'routeForWorkerDeploymentVersion',
+      () =>
+        routeForWorkerDeploymentVersion({
+          namespace: 'default',
+          deployment: 'dep-1',
+          version: 'v1',
+        }),
+    ],
+    ['routeForRelationships', () => routeForRelationships(workflowParams)],
+    [
+      'routeForTaskQueue',
+      () => routeForTaskQueue({ namespace: 'default', queue: 'q-1' }),
+    ],
+    ['routeForCallStack', () => routeForCallStack(workflowParams)],
+    ['routeForWorkflowQuery', () => routeForWorkflowQuery(workflowParams)],
+    ['routeForUserMetadata', () => routeForUserMetadata(workflowParams)],
+    [
+      'routeForWorkflowSearchAttributes',
+      () => routeForWorkflowSearchAttributes(workflowParams),
+    ],
+    ['routeForWorkflowMemo', () => routeForWorkflowMemo(workflowParams)],
+    ['routeForWorkflowUpdate', () => routeForWorkflowUpdate(workflowParams)],
+    [
+      'routeForPendingActivities',
+      () => routeForPendingActivities(workflowParams),
+    ],
+    ['routeForNexusLinks', () => routeForNexusLinks(workflowParams)],
+    ['routeForEventHistoryImport', () => routeForEventHistoryImport()],
+    ['routeForBatchOperations', () => routeForBatchOperations(namespaceParams)],
+    [
+      'routeForBatchOperation',
+      () => routeForBatchOperation({ namespace: 'default', jobId: 'job-1' }),
+    ],
+    [
+      'routeForStandaloneActivities',
+      () => routeForStandaloneActivities(namespaceParams),
+    ],
+    [
+      'routeForStandaloneActivitiesWithQuery',
+      () =>
+        routeForStandaloneActivitiesWithQuery(namespaceParams, 'test-query'),
+    ],
+    [
+      'routeForStartStandaloneActivity',
+      () => routeForStartStandaloneActivity(namespaceParams),
+    ],
+    [
+      'routeForStandaloneActivityDetails',
+      () => routeForStandaloneActivityDetails(activityParams),
+    ],
+    [
+      'routeForStandaloneActivityWorkers',
+      () => routeForStandaloneActivityWorkers(activityParams),
+    ],
+    [
+      'routeForStandaloneActivitySearchAttributes',
+      () => routeForStandaloneActivitySearchAttributes(activityParams),
+    ],
+    [
+      'routeForStandaloneActivityMetadata',
+      () => routeForStandaloneActivityMetadata(activityParams),
+    ],
+    [
+      'routeForWorkflowStart',
+      () => routeForWorkflowStart({ namespace: 'default' }),
+    ],
+    [
+      'routeForWorkflowsWithQuery',
+      () => routeForWorkflowsWithQuery({ namespace: 'default', query: 'test' }),
+    ],
+  ];
+
+  const authCases: [string, () => string | undefined][] = [
+    [
+      'routeForAuthentication',
+      () =>
+        routeForAuthentication({
+          settings: { auth: {}, baseUrl: 'https://example.com' },
+          searchParams: new URLSearchParams(),
+        }),
+    ],
+    ['routeForLoginPage', () => routeForLoginPage('', false)],
+  ];
+
+  it.each(prefixedCases)(
+    '%s should include base + prefix when prefix is set',
+    (_name, fn) => {
+      routePrefix.set(prefix);
+      const result = fn();
+      expect(typeof result).toBe('string');
+      expect(result).toMatch(new RegExp(`^${base}${prefix}`));
+      expect(result).not.toMatch(
+        new RegExp(`${base}${prefix}${base}${prefix}`),
+      );
+    },
+  );
+
+  it.each(authCases)(
+    '%s should NOT include prefix (auth routes excluded)',
+    (_name, fn) => {
+      routePrefix.set(prefix);
+      const result = fn();
+      expect(typeof result).toBe('string');
+      expect(result).not.toContain(prefix);
+    },
+  );
 });
