@@ -151,7 +151,6 @@
   const compartment = $state(new Compartment());
 
   const staticExtensions: Extension[] = [
-    history(),
     keymap.of([...standardKeymap, ...historyKeymap]),
     syntaxHighlighting(highlightStyles, { fallback: true }),
     indentUnit.of('  '),
@@ -163,6 +162,7 @@
 
   let dynamicExtensions: Extension[] = $derived(
     [
+      ...(editable ? [history()] : []),
       getEditorTheme($useDarkMode, hasHeader),
       getActionsTheme({ hasActions: copyable || maximizable }),
       EditorState.readOnly.of(!editable),
