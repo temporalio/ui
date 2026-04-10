@@ -100,9 +100,6 @@
       <div
         class="surface-primary flex flex-col border-b border-subtle xl:flex-row"
       >
-        <div class="flex w-full flex-col gap-1 p-4 xl:w-1/2">
-          <EventPayloads payloadFields={allPayloadFields} />
-        </div>
         <div class="flex w-full flex-col xl:w-1/2 xl:border-l xl:border-subtle">
           {#each processedEvents as processed, i (processed.event.id)}
             <div
@@ -121,6 +118,9 @@
               </div>
             </div>
           {/each}
+        </div>
+        <div class="flex w-full flex-col gap-1 p-4 xl:w-1/2">
+          <EventPayloads payloadFields={allPayloadFields} />
         </div>
       </div>
     {:else}

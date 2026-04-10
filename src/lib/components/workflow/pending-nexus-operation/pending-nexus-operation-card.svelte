@@ -20,37 +20,6 @@
   class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
   <div class="flex flex-1 flex-col gap-4 xl:flex-row">
-    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
-      {#if failed}
-        {@render failures()}
-      {/if}
-      {#if operation.blockedReason}
-        <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
-            {translate('nexus.blocked-reason')}
-          </p>
-          <CodeBlock
-            language="text"
-            content={operation.blockedReason}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </div>
-      {/if}
-      {#if Object.keys(operation.cancellationInfo ?? {}).length > 0}
-        <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
-            {translate('nexus.cancellation-info')}
-          </p>
-          <CodeBlock
-            language="text"
-            content={stringifyWithBigInt(operation.cancellationInfo)}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        </div>
-      {/if}
-    </div>
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if operation.endpoint}
         {@render detail(translate('nexus.endpoint'), operation.endpoint)}
@@ -112,6 +81,37 @@
           translate('workflows.start-to-close-timeout'),
           operation.startToCloseTimeout as string,
         )}
+      {/if}
+    </div>
+    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
+      {#if failed}
+        {@render failures()}
+      {/if}
+      {#if operation.blockedReason}
+        <div class="flex flex-1 flex-col">
+          <p class="text-sm text-secondary/80">
+            {translate('nexus.blocked-reason')}
+          </p>
+          <CodeBlock
+            language="text"
+            content={operation.blockedReason}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        </div>
+      {/if}
+      {#if Object.keys(operation.cancellationInfo ?? {}).length > 0}
+        <div class="flex flex-1 flex-col">
+          <p class="text-sm text-secondary/80">
+            {translate('nexus.cancellation-info')}
+          </p>
+          <CodeBlock
+            language="text"
+            content={stringifyWithBigInt(operation.cancellationInfo)}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+          />
+        </div>
       {/if}
     </div>
   </div>

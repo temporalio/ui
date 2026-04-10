@@ -97,13 +97,6 @@
     <Timestamp as="p" class="text-sm" dateTime={event.eventTime} />
   </div>
   <div class="flex flex-col gap-1 xl:flex-row">
-    {#if payloadFields.length}
-      <div class="flex w-full flex-col gap-1 xl:w-1/2">
-        {#each payloadFields as [key, value] (key)}
-          {@render payloads(key, value)}
-        {/each}
-      </div>
-    {/if}
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if event?.links?.length}
         {@render eventLinks(event.links)}
@@ -118,6 +111,13 @@
         {@render link(key, value)}
       {/each}
     </div>
+    {#if payloadFields.length}
+      <div class="flex w-full flex-col gap-1 xl:w-1/2">
+        {#each payloadFields as [key, value] (key)}
+          {@render payloads(key, value)}
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>
 

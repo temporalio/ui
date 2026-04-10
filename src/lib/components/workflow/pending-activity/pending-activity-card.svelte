@@ -47,24 +47,7 @@
 <div
   class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
-  {#if showActivityCommands}
-    <div class="flex flex-1 flex-wrap justify-end gap-2">
-      <ActivityCommands {activity} class="justify-end" />
-    </div>
-  {/if}
   <div class="flex flex-1 flex-col gap-4 xl:flex-row">
-    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
-      {#if failed}
-        {#if totalPending > 20}
-          {@render failuresAccordion()}
-        {:else}
-          {@render failuresCodeBlock()}
-        {/if}
-      {/if}
-      {#if activity.heartbeatDetails}
-        {@render heartbeat()}
-      {/if}
-    </div>
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {#if activity.paused && activity.pauseInfo}
@@ -142,6 +125,23 @@
             activity.priority.fairnessKey,
           )}
         {/if}
+      {/if}
+      {#if showActivityCommands}
+        <div class="py-2">
+          <ActivityCommands {activity} />
+        </div>
+      {/if}
+    </div>
+    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
+      {#if failed}
+        {#if totalPending > 20}
+          {@render failuresAccordion()}
+        {:else}
+          {@render failuresCodeBlock()}
+        {/if}
+      {/if}
+      {#if activity.heartbeatDetails}
+        {@render heartbeat()}
       {/if}
     </div>
   </div>
