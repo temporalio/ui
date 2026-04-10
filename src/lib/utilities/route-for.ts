@@ -9,11 +9,12 @@ import {
   eventFilterSort,
   workflowViewPreference,
 } from '$lib/stores/event-view';
-import { getRoutePrefix } from '$lib/stores/route-prefix';
 import type { EventView } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { toURL } from '$lib/utilities/to-url';
+
+import { getRoutePrefix } from './core-provider';
 
 const withPrefix = (path: ResolvedPathname): ResolvedPathname => {
   const prefix = getRoutePrefix();

@@ -2,8 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { base } from '$app/paths';
 
-import { routePrefix } from '$lib/stores/route-prefix';
-
+import { initCoreProvider } from './core-provider';
 import * as routeForModule from './route-for';
 import {
   routeForArchivalEventHistory,
@@ -237,7 +236,10 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
   };
 
   afterEach(() => {
-    routePrefix.set('');
+    initCoreProvider({
+      getAccessToken: async () => '',
+      getRoutePrefix: () => '',
+    });
   });
 
   const prefixedCases: [string, () => string | undefined][] = [
@@ -369,7 +371,10 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
   it.each(prefixedCases)(
     '%s should include base + prefix when prefix is set',
     (_name, fn) => {
-      routePrefix.set(prefix);
+      initCoreProvider({
+        getAccessToken: async () => '',
+        getRoutePrefix: () => prefix,
+      });
       const result = fn();
       expect(typeof result).toBe('string');
       expect(result).toMatch(new RegExp(`^${base}${prefix}`));
@@ -382,7 +387,10 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
   it.each(authCases)(
     '%s should NOT include prefix (auth routes excluded)',
     (_name, fn) => {
-      routePrefix.set(prefix);
+      initCoreProvider({
+        getAccessToken: async () => '',
+        getRoutePrefix: () => prefix,
+      });
       const result = fn();
       expect(typeof result).toBe('string');
       expect(result).not.toContain(prefix);
