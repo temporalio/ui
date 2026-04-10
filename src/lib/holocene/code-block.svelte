@@ -292,7 +292,6 @@
       class={merge('h-full', className)}
       data-testid={testId}
       {...editorProps}
-      onblur={handleEditorBlur}
     ></div>
 
     {#snippet actions()}
