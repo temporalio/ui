@@ -6,6 +6,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
+  import { sortNamespaces } from '$lib/utilities/sort-namespaces';
 
   interface Props {
     namespaceList?: NamespaceListItem[];
@@ -35,6 +36,8 @@
     $lastUsedNamespace = namespaceListItem.namespace;
     namespaceListItem?.onClick(namespaceListItem.namespace);
   };
+
+  let sortedNamespaceList = $derived(sortNamespaces(namespaceList));
 </script>
 
 <Combobox
@@ -44,7 +47,7 @@
   {value}
   id="namespace-switcher"
   leadingIcon="namespace-switcher"
-  options={namespaceList}
+  options={sortedNamespaceList}
   optionValueKey="namespace"
   onchange={handleNamespaceSelect}
   minSize={32}
