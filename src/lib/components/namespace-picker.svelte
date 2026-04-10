@@ -6,7 +6,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
-  import { sortNamespaces } from '$lib/utilities/sort-namespaces';
+  import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
 
   interface Props {
     namespaceList?: NamespaceListItem[];
@@ -37,7 +37,9 @@
     namespaceListItem?.onClick(namespaceListItem.namespace);
   };
 
-  let sortedNamespaceList = $derived(sortNamespaces(namespaceList));
+  let sortedNamespaceList = $derived(
+    sortAlphabetically(namespaceList, (ns) => ns.namespace),
+  );
 </script>
 
 <Combobox
