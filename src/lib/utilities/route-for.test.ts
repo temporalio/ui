@@ -8,6 +8,7 @@ import type {
   EventSortOrder,
   WorkflowViewPreference,
 } from '$lib/stores/event-view';
+import { routePrefix } from '$lib/stores/route-prefix';
 
 import {
   baseRouteForWorkflow,
@@ -24,6 +25,7 @@ import {
   routeForLoginPage,
   routeForNamespace,
   routeForNamespaces,
+  routeForNexus,
   routeForPendingActivities,
   routeForSchedule,
   routeForScheduleCreate,
@@ -528,5 +530,81 @@ describe('routeForWorkflow', () => {
     });
     expect(path).toContain('sort=ascending');
     expect(path).not.toContain('sort=descending');
+  });
+});
+
+describe('routeFor with prefix', () => {
+  const prefix = '/projects/my-project';
+
+  afterEach(() => {
+    routePrefix.set('');
+  });
+
+  it('should prepend prefix to root route', () => {
+    routePrefix.set(prefix);
+    expect(routeForNamespaces()).toBe(`${base}${prefix}/namespaces`);
+  });
+
+  it('should prepend prefix to namespace route', () => {
+    routePrefix.set(prefix);
+    expect(routeForNamespace({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default`,
+    );
+  });
+
+  it('should propagate prefix through leaf functions', () => {
+    routePrefix.set(prefix);
+    expect(routeForWorkflows({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default/workflows`,
+    );
+  });
+
+  it('should propagate prefix through deep leaf functions', () => {
+    routePrefix.set(prefix);
+    expect(
+      routeForCallStack({
+        namespace: 'default',
+        workflow: 'abc',
+        run: 'def',
+      }),
+    ).toBe(`${base}${prefix}/namespaces/default/workflows/abc/def/call-stack`);
+  });
+
+  it('should propagate prefix to nexus routes', () => {
+    routePrefix.set(prefix);
+    expect(routeForNexus()).toBe(`${base}${prefix}/nexus`);
+  });
+
+  it('should propagate prefix to schedule routes', () => {
+    routePrefix.set(prefix);
+    expect(routeForSchedules({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default/schedules`,
+    );
+  });
+
+  it('should not apply prefix when store is empty', () => {
+    routePrefix.set('');
+    expect(routeForNamespaces()).toBe(`${base}/namespaces`);
+  });
+
+  it('should not apply prefix to auth routes', () => {
+    routePrefix.set(prefix);
+    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const searchParams = new URLSearchParams();
+    const sso = routeForAuthentication({ settings, searchParams });
+    expect(sso).not.toContain(prefix);
+  });
+
+  it('should not apply prefix to login page', () => {
+    routePrefix.set(prefix);
+    const login = routeForLoginPage('', false);
+    expect(login).not.toContain(prefix);
+  });
+
+  it('should revert to default behavior when prefix is cleared', () => {
+    routePrefix.set(prefix);
+    expect(routeForNamespaces()).toBe(`${base}${prefix}/namespaces`);
+    routePrefix.set('');
+    expect(routeForNamespaces()).toBe(`${base}/namespaces`);
   });
 });
