@@ -17,6 +17,7 @@ export type PostResponseHook = (
 export type CoreProvider = {
   getAccessToken: () => Promise<string>;
   getIdToken: () => Promise<string | undefined>;
+  getRoutePrefix: () => string;
   api: {
     preRequest: PreRequestHook;
     postResponse: PostResponseHook;
@@ -28,6 +29,7 @@ export type CoreProvider = {
 export type InitOptions = {
   getAccessToken: () => Promise<string>;
   getIdToken?: () => Promise<string | undefined>;
+  getRoutePrefix?: () => string;
   api?: {
     preRequest?: PreRequestHook;
     postResponse?: PostResponseHook;
@@ -45,6 +47,7 @@ export function initCoreProvider(options: InitOptions): void {
   provider = {
     getAccessToken: options.getAccessToken,
     getIdToken: options.getIdToken ?? (async () => undefined),
+    getRoutePrefix: options.getRoutePrefix ?? (() => ''),
     api: {
       preRequest: options.api?.preRequest ?? passthrough,
       postResponse: options.api?.postResponse ?? passthroughResponse,
@@ -62,6 +65,11 @@ export async function getAccessToken(): Promise<string> {
 export async function getIdToken(): Promise<string | undefined> {
   if (!BROWSER || !provider) return undefined;
   return provider.getIdToken();
+}
+
+export function getRoutePrefix(): string {
+  if (!BROWSER || !provider) return '';
+  return provider.getRoutePrefix();
 }
 
 export async function getDataEncoderEndpoint(
