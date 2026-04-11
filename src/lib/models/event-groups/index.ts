@@ -10,6 +10,8 @@ import {
   isNexusOperationCanceledEvent,
   isNexusOperationCompletedEvent,
   isNexusOperationFailedEvent,
+  isTimerStartedEvent,
+  isWorkflowExecutionCancelRequestedEvent,
 } from '$lib/utilities/is-event-type';
 import {
   getPendingActivity,
@@ -101,6 +103,21 @@ export const groupEvents = (
   } else {
     for (let i = events.length - 1; i >= 0; i--) {
       createGroups(events[i]);
+    }
+  }
+
+  const cancelRequestedEvent = events.find(
+    isWorkflowExecutionCancelRequestedEvent,
+  );
+
+  if (cancelRequestedEvent) {
+    for (const group of Object.values(groups)) {
+      if (
+        isTimerStartedEvent(group.initialEvent) &&
+        group.eventList.length === 1
+      ) {
+        group.cancelRequested = true;
+      }
     }
   }
 
