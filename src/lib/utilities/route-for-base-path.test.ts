@@ -10,6 +10,7 @@ import {
   routeForBatchOperation,
   routeForBatchOperations,
   routeForCallStack,
+  routeForCommonErrors,
   routeForEventHistory,
   routeForEventHistoryEvent,
   routeForEventHistoryImport,
@@ -188,6 +189,7 @@ describe('routeFor functions should resolve the base path exactly once', () => {
         }),
     ],
     ['routeForLoginPage', () => routeForLoginPage('', false)],
+    ['routeForCommonErrors', () => routeForCommonErrors()],
   ];
 
   it.each(cases)('%s should resolve the base path', (_name, fn) => {

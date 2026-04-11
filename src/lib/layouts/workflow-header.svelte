@@ -1,12 +1,15 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
+  import WorkflowCommonErrors from '$lib/components/workflow/workflow-common-errors.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -56,6 +59,8 @@
     run: runId,
     id: eventId,
   } = $derived(page.params);
+  let { headerSnippet }: { headerSnippet?: Snippet } = $props();
+
   const { workflow, workers } = $derived($workflowRun);
   const routeParameters = $derived({
     namespace,
@@ -238,6 +243,9 @@
         >.
       </Alert>
     </div>
+  {/if}
+  {#if headerSnippet}
+    {@render headerSnippet()}
   {/if}
   <Tabs>
     <TabList label="workflow detail">
