@@ -129,6 +129,11 @@ type (
 		Options map[string]interface{} `yaml:"options"`
 		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
 		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
+		// RefreshTokenDuration - optional lifetime of the refresh token issued by this provider.
+		// When set, the refresh cookie MaxAge is set to this value. When unset, defaults to 7 days.
+		// Set this to match your IdP's refresh token lifetime to avoid premature cookie expiry.
+		// Example values: "8h", "24h", "168h" (1 week).
+		RefreshTokenDuration time.Duration `yaml:"refreshTokenDuration"`
 	}
 
 	Codec struct {
