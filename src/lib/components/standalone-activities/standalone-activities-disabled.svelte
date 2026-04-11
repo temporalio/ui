@@ -36,6 +36,7 @@ activity.enableStandalone:
 <Alert
   title={translate('standalone-activities.standalone-activities-disabled')}
   intent="info"
+  class="max-w-4xl"
 />
 <div class="flex max-w-4xl flex-col gap-2">
   <p>{translate('standalone-activities.standalone-activities-enablement')}</p>

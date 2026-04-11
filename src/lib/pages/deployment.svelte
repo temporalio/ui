@@ -3,6 +3,7 @@
 
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Error from '$lib/holocene/error.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -15,20 +16,18 @@
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
-  const namespace = $derived(page.params.namespace);
-  const deploymentName = $derived(page.params.deployment);
-  const parameters = $derived({
-    namespace,
-    deploymentName: decodeURIForSvelte(deploymentName),
-  });
+  const { namespace } = $derived(page.params);
+  const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
   const workflowHref = $derived(
     routeForWorkflowsWithQuery({
-      namespace: page.params.namespace,
+      namespace,
       query: `TemporalWorkerDeployment="${deploymentName}"`,
     }),
   );
 
-  const deploymentFetch = $derived(fetchDeployment(parameters));
+  const deploymentFetch = $derived(
+    fetchDeployment({ namespace, deploymentName }),
+  );
 
   const columns = [
     { label: translate('deployments.build-id') },
@@ -72,7 +71,7 @@
         {translate('deployments.deployments')}
       </caption>
       <tr slot="headers">
-        {#each columns as { label }}
+        {#each columns as { label } (label)}
           <th>{label}</th>
         {/each}
       </tr>
@@ -84,5 +83,7 @@
         />
       {/each}
     </PaginatedTable>
+  {:catch error}
+    <Error {error} />
   {/await}
 </div>
