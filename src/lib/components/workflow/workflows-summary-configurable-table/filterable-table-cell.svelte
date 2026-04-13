@@ -64,16 +64,14 @@
     {truncate ? truncateValue(value) : value}
   </Tooltip>
 {/if}
-{#if !truncate}
-  <FilterOrCopyButtons
-    copyIconTitle={translate('common.copy-icon-title')}
-    copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    filterIconTitle={translate('common.filter-workflows')}
-    show={filterOrCopyButtonsVisible}
-    content={value}
-    onFilter={onRowFilterClick}
-    filtered={$workflowFilters.some(
-      (filter) => filter.attribute === attribute && filter.value === value,
-    )}
-  />
-{/if}
+<FilterOrCopyButtons
+  copyIconTitle={translate('common.copy-icon-title')}
+  copySuccessIconTitle={translate('common.copy-success-icon-title')}
+  filterIconTitle={translate('common.filter-workflows')}
+  show={filterOrCopyButtonsVisible}
+  content={value}
+  onFilter={onRowFilterClick}
+  filtered={$workflowFilters.some(
+    (filter) => filter.attribute === attribute && filter.value === value,
+  )}
+/>

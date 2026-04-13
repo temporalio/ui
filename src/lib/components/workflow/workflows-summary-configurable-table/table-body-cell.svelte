@@ -294,10 +294,10 @@
 
 <style lang="postcss">
   .workflows-summary-table-body-cell {
-    @apply h-8 whitespace-nowrap;
+    @apply relative h-8 whitespace-nowrap;
 
     &.filterable {
-      @apply relative pr-24;
+      @apply pr-24;
     }
   }
 </style>
