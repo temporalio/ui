@@ -137,7 +137,7 @@
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
       <Tooltip
         text={compact
-          ? translate('common.compact')
+          ? translate('common.dense')
           : translate('common.comfortable')}
         top
       >

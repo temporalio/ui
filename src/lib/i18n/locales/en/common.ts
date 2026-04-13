@@ -220,4 +220,5 @@ export const Strings = {
   'change-log': 'Change Log',
   compact: 'Compact',
   comfortable: 'Comfortable',
+  dense: 'Dense',
 } as const;
