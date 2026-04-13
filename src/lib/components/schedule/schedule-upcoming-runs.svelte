@@ -1,29 +1,24 @@
 <script lang="ts">
-  import Panel from '$lib/components/panel.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import type { Timestamp as ITimestamp } from '$types';
+  import type { DescribeScheduleResponse } from '$types';
 
-  export let futureRuns: ITimestamp[] = [];
+  type Props = {
+    schedule: DescribeScheduleResponse;
+  };
+
+  let { schedule }: Props = $props();
+  const futureRuns = $derived(schedule?.info?.futureActionTimes);
 </script>
 
-<Panel class="w-full">
-  <h2 class="mb-4">{translate('schedules.upcoming-runs')}</h2>
-  {#each futureRuns.slice(0, 5) as run}
-    <div class="row">
-      <Timestamp as="p" dateTime={run} />
-    </div>
-  {:else}
-    <EmptyState
-      title={translate('schedules.upcoming-runs-empty-state-title')}
-    />
-  {/each}
-</Panel>
-
-<style lang="postcss">
-  .row {
-    @apply my-1 inline-flex h-10 w-full justify-start border-b border-subtle py-1;
-  }
-</style>
+{#each futureRuns.slice(0, 5) as run}
+  <div
+    class="my-1.5 inline-flex w-full justify-start border-b border-subtle py-1 font-mono"
+  >
+    <Timestamp as="p" dateTime={run} />
+  </div>
+{:else}
+  <EmptyState title={translate('schedules.upcoming-runs-empty-state-title')} />
+{/each}

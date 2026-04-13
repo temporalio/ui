@@ -2,88 +2,99 @@
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   import { formatDuration } from '$lib/utilities/format-time';
+  import { getScheduleSpecLabel } from '$lib/utilities/schedule-spec-label';
+  import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  import ScheduleNotes from './schedule-notes.svelte';
+  import type { DescribeScheduleResponse, Timestamp } from '$types';
 
-  import type { SchedulePolicies, ScheduleSpec, ScheduleState } from '$types';
+  type Props = {
+    schedule: DescribeScheduleResponse;
+  };
+  let { schedule }: Props = $props();
 
-  export let spec: ScheduleSpec;
-  export let state: ScheduleState;
-  export let policies: SchedulePolicies;
-  export let notes = '';
+  const spec = $derived(schedule?.schedule?.spec);
+  const state = $derived(schedule?.schedule?.state);
+  const policies = $derived(schedule?.schedule?.policies);
+  const notes = $derived(schedule?.schedule?.state?.notes);
 </script>
 
-<ScheduleNotes {notes} />
-<Accordion title={translate('schedules.advanced-settings')}>
-  <ul class="settings-list">
-    <li>
-      {translate('schedules.start-time')}
-      <span> {spec?.startTime ?? translate('common.none')}</span>
-    </li>
-    <li>
-      {translate('schedules.end-time')}
-      <span>{spec?.endTime ?? translate('common.none')} </span>
-    </li>
-    <li>
-      {translate('schedules.jitter')}
-      <span>{spec?.jitter ?? translate('common.none')} </span>
-    </li>
+{#snippet Info(header: string, value: string | Timestamp)}
+  <div class="flex w-full flex-col gap-0 text-sm">
+    <p class="text-secondary">
+      {header}
+    </p>
+    <p>
+      {value}
+    </p>
+  </div>
+{/snippet}
 
-    <li>
-      {translate('schedules.exclusion-calendar')}
-      <span> {spec?.excludeCalendar?.[0] ?? translate('common.none')}</span>
-    </li>
-    {#if state?.limitedActions}
-      <li>
-        {translate('schedules.remaining-actions')}
-        <span>{state?.remainingActions ?? translate('common.none')} </span>
-      </li>
-    {/if}
-    <li>
-      {translate('schedules.overlap-policy')}
-      <span>{policies?.overlapPolicy ?? translate('common.none')} </span>
-    </li>
-    <li>
-      {translate('schedules.catchup-window')}
-      <span
-        >{policies?.catchupWindow != null
+<Accordion title={translate('schedules.advanced-settings')} open>
+  <div class="flex w-full flex-col gap-4">
+    <div class="flex items-center gap-4">
+      {@render Info(
+        translate('common.start-date'),
+        spec?.startTime ?? translate('common.none'),
+      )}
+      {@render Info(
+        translate('common.end-date'),
+        spec?.endTime ?? translate('common.never'),
+      )}
+    </div>
+    <div class="flex items-center gap-4">
+      {@render Info(
+        translate('schedules.jitter'),
+        spec?.jitter ?? translate('common.none'),
+      )}
+      {@render Info(
+        translate('schedules.overlap-policy'),
+        fromScreamingEnum(policies?.overlapPolicy, 'ScheduleOverlapPolicy') ??
+          translate('common.none'),
+      )}
+    </div>
+    <div class="flex items-center gap-4">
+      {@render Info(
+        translate('schedules.catchup-window-policy'),
+        policies?.catchupWindow != null
           ? formatDuration(policies.catchupWindow.toString())
-          : translate('common.none')}
-      </span>
-    </li>
-    {#if policies?.pauseOnFailure != null}
-      <li>
-        {translate('schedules.pause-on-failure')}
-        <span
-          >{policies.pauseOnFailure
+          : translate('common.none'),
+      )}
+      {@render Info(
+        translate('schedules.pause-on-failure'),
+        policies?.pauseOnFailure
+          ? translate('common.true')
+          : translate('common.false'),
+      )}
+    </div>
+    <div class="flex items-center gap-4">
+      {@render Info(
+        translate('schedules.exclusion-calendar'),
+        spec?.excludeCalendar
+          ? (getScheduleSpecLabel({
+              structuredCalendar: spec.excludeCalendar,
+            }) ?? translate('common.none'))
+          : translate('common.none'),
+      )}
+      {#if state.limitedActions}
+        {@render Info(
+          translate('schedules.remaining-actions'),
+          state?.remainingActions ?? translate('common.none'),
+        )}
+      {/if}
+      {#if policies?.keepOriginalWorkflowId != null}
+        {@render Info(
+          translate('schedules.keep-original-workflow-id'),
+          policies?.keepOriginalWorkflowId
             ? translate('common.true')
-            : translate('common.false')}</span
-        >
-      </li>
-    {/if}
-    {#if policies?.keepOriginalWorkflowId != null}
-      <li>
-        {translate('schedules.keep-original-workflow-id')}
-        <span
-          >{policies.keepOriginalWorkflowId
-            ? translate('common.true')
-            : translate('common.false')}</span
-        >
-      </li>
-    {/if}
-  </ul>
+            : translate('common.false'),
+        )}
+      {/if}
+    </div>
+    <div class="flex items-center gap-4">
+      {@render Info(
+        translate('common.notes'),
+        notes ?? translate('common.none'),
+      )}
+    </div>
+  </div>
 </Accordion>
-
-<style lang="postcss">
-  .settings-list {
-    @apply w-full;
-
-    li {
-      @apply flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0;
-
-      span {
-        @apply surface-subtle select-all rounded-sm p-1 leading-4;
-      }
-    }
-  }
-</style>
