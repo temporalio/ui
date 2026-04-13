@@ -8,7 +8,7 @@ import type { HistoryEvent } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
 
 import {
-  decodeEventAttributes,
+  decodeEventAttributesForExport,
   decodePayloadAttributes,
 } from './decode-payload';
 import {
@@ -36,17 +36,14 @@ const decodePayloads = async (
     },
   };
 
-  // Keep download in payload structure
-  const returnDataOnly = false;
   try {
-    const convertedAttributes = await decodeEventAttributes(
+    const convertedAttributes = await decodeEventAttributesForExport(
       event,
       settingsWithLocalConfig,
       decodeSetting,
-      returnDataOnly,
     );
 
-    return decodePayloadAttributes(convertedAttributes, returnDataOnly);
+    return decodePayloadAttributes(convertedAttributes, false);
   } catch {
     return event;
   }

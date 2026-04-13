@@ -51,7 +51,7 @@ import type {
   WorkflowIdentifier,
 } from '$lib/types/workflows';
 import {
-  decodeEventAttributes,
+  decodeEventAttributesForExport,
   decodeUserMetadataPayload,
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
@@ -837,11 +837,9 @@ export const fetchInitialValuesForStartWorkflow = async ({
     const firstEvent = await fetchInitialEvent(params);
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
-    const convertedAttributes = (await decodeEventAttributes(
+    const convertedAttributes = (await decodeEventAttributesForExport(
       startEvent?.attributes?.input,
       get(page).data.settings,
-      'readable',
-      false,
     )) as PotentiallyDecodable;
 
     let summary = '';

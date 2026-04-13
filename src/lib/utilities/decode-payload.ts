@@ -206,7 +206,7 @@ export const isRawPayload = (payload: unknown): boolean => {
   );
 };
 
-export const decodeEventAttributes = async (
+const decodeEventAttributesInternal = async (
   anyAttributes:
     | PotentiallyDecodable
     | EventAttribute
@@ -214,8 +214,8 @@ export const decodeEventAttributes = async (
     | Memo
     | null,
   settings: Settings,
-  decodeSetting: DownloadEventHistorySetting = 'readable',
-  returnDataOnly: boolean = true,
+  decodeSetting: DownloadEventHistorySetting,
+  returnDataOnly: boolean,
 ): Promise<
   PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
 > => {
@@ -242,7 +242,7 @@ export const decodeEventAttributes = async (
       } else {
         const next = clone[key];
         if (isObject(next)) {
-          clone[key] = await decodeEventAttributes(
+          clone[key] = await decodeEventAttributesInternal(
             next,
             settings,
             decodeSetting,
@@ -255,3 +255,31 @@ export const decodeEventAttributes = async (
 
   return clone;
 };
+
+export const decodeEventAttributes = (
+  anyAttributes:
+    | PotentiallyDecodable
+    | EventAttribute
+    | WorkflowEvent
+    | Memo
+    | null,
+  settings: Settings,
+  decodeSetting: DownloadEventHistorySetting = 'readable',
+): Promise<
+  PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
+> =>
+  decodeEventAttributesInternal(anyAttributes, settings, decodeSetting, true);
+
+export const decodeEventAttributesForExport = (
+  anyAttributes:
+    | PotentiallyDecodable
+    | EventAttribute
+    | WorkflowEvent
+    | Memo
+    | null,
+  settings: Settings,
+  decodeSetting: DownloadEventHistorySetting = 'readable',
+): Promise<
+  PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
+> =>
+  decodeEventAttributesInternal(anyAttributes, settings, decodeSetting, false);
