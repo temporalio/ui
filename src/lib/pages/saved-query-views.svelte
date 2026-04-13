@@ -28,6 +28,7 @@
   import { taskFailuresCount } from '$lib/stores/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   let activeQueryView: SavedQuery | undefined = $state();
@@ -48,9 +49,7 @@
   );
 
   const namespaceSavedQueries = $derived(
-    $savedWorkflowQueries?.[namespace]?.sort((a, b) =>
-      a.name.localeCompare(b.name),
-    ) || [],
+    sortAlphabetically($savedWorkflowQueries?.[namespace] || [], (q) => q.name),
   );
   const systemQueryView = $derived(
     (query && systemWorkflowViews.find((q) => q.query === query)) ||

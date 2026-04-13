@@ -267,8 +267,7 @@ export const submitEditSchedule = async (
   const fields = body.schedule?.action?.startWorkflow?.header?.fields;
   if (fields && Object.keys(fields).length > 0) {
     try {
-      const entries = Object.entries(fields);
-      for (const [key, value] of entries) {
+      for (const [key, value] of Object.entries(fields)) {
         const encodedValue = await encodePayloads({
           input: stringifyWithBigInt(value),
           encoding: 'json/plain',

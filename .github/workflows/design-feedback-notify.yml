@@ -1,0 +1,53 @@
+name: Design Feedback Slack Notification
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  notify:
+    if: >-
+      github.event.label.name == 'DESIGN FEEDBACK REQUESTED' &&
+      contains(fromJSON('["MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v2
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: "${{ vars.DESIGN_FEEDBACK_SLACK_CHANNEL }}"
+            text: "Design Feedback Requested: ${{ env.PR_TITLE }}"
+            blocks:
+              - type: header
+                text:
+                  type: plain_text
+                  text: "Design Feedback Requested"
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "*<${{ env.PR_URL }}|#${{ env.PR_NUMBER }}: ${{ env.PR_TITLE }}>*"
+              - type: section
+                fields:
+                  - type: mrkdwn
+                    text: "*Author:*\n${{ env.PR_AUTHOR }}"
+                  - type: mrkdwn
+                    text: "*Repository:*\n${{ github.repository }}"
+              - type: actions
+                elements:
+                  - type: button
+                    text:
+                      type: plain_text
+                      text: "View PR"
+                    style: primary
+                    url: "${{ env.PR_URL }}"

@@ -639,11 +639,20 @@ export async function fetchWorkflowForSchedule(
     console.error(err);
   };
 
-  const route = routeForApi('workflow', parameters);
+  const route = routeForApi('workflow', {
+    namespace: parameters.namespace,
+    workflowId: parameters.workflowId,
+  });
+
   return requestFromAPI(route, {
     request,
     onError,
     handleError: onError,
+    params: parameters.runId
+      ? {
+          'execution.runId': parameters.runId,
+        }
+      : {},
   }).then(toWorkflowExecution);
 }
 
