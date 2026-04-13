@@ -26,7 +26,7 @@
   data-track-intent="action"
   data-track-text={label}
   class={merge(
-    'relative mb-1 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+    'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
     disabled && 'pointer-events-none cursor-not-allowed opacity-50',
     className,
   )}
