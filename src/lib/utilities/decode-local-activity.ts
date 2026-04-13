@@ -57,7 +57,6 @@ export const decodeLocalActivity = async (
   try {
     const convertedAttributes = await decodeEventAttributes(
       event.attributes,
-      namespace,
       codecSettings,
     );
 

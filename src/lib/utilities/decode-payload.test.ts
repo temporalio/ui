@@ -256,11 +256,7 @@ describe('decodePayloadAttributes', () => {
 
 describe('decodeEventAttributes', () => {
   it('Should decode a payload with codec endpoint with encoding json/plain`', async () => {
-    const event = await decodeEventAttributes(
-      getTestPayloadEvent(),
-      'default',
-      {},
-    );
+    const event = await decodeEventAttributes(getTestPayloadEvent(), {});
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual('a test attribute');
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
@@ -268,7 +264,6 @@ describe('decodeEventAttributes', () => {
   it('Should not decode a null payload with codec endpoint with encoding json/plain`', async () => {
     const event = await decodeEventAttributes(
       getTestPayloadEventWithNullEncodedAttributes(),
-      'default',
       {},
     );
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
@@ -290,7 +285,6 @@ describe('decodeEventAttributes', () => {
     const endpoint = 'http://localhost:1337';
     const convertedPayload = await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      'default',
       { codec: { endpoint } },
     );
 
@@ -309,7 +303,6 @@ describe('decodeEventAttributes', () => {
     const endpoint = 'http://localhost:1337';
     const convertedPayload = await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      'default',
       { codec: { endpoint } },
     );
 
@@ -321,7 +314,6 @@ describe('decodeEventAttributes', () => {
   it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
     const convertedPayload = await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      'default',
       { codec: { endpoint: '' } },
     );
     const decodedPayload = decodePayloadAttributes(convertedPayload);
@@ -342,7 +334,6 @@ describe('decodeEventAttributes', () => {
     const endpoint = 'http://localhost:1337';
     await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      'default',
       { codec: { endpoint } },
     );
 
@@ -363,7 +354,6 @@ describe('decodeEventAttributes', () => {
     const endpoint = 'http://localhost:1337';
     await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      'default',
       { codec: { endpoint, includeCredentials: true } },
     );
 

@@ -213,7 +213,6 @@ export const decodeEventAttributes = async (
     | WorkflowEvent
     | Memo
     | null,
-  namespace: string,
   settings: Settings,
   decodeSetting: DownloadEventHistorySetting = 'readable',
   returnDataOnly: boolean = true,
@@ -245,7 +244,6 @@ export const decodeEventAttributes = async (
         if (isObject(next)) {
           clone[key] = await decodeEventAttributes(
             next,
-            namespace,
             settings,
             decodeSetting,
             returnDataOnly,

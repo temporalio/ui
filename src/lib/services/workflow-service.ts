@@ -839,7 +839,6 @@ export const fetchInitialValuesForStartWorkflow = async ({
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
     const convertedAttributes = (await decodeEventAttributes(
       startEvent?.attributes?.input,
-      namespace,
       get(page).data.settings,
       'readable',
       false,

@@ -46,11 +46,7 @@
       },
     };
     try {
-      const convertedAttributes = await decodeEventAttributes(
-        _value,
-        $page.params.namespace,
-        settings,
-      );
+      const convertedAttributes = await decodeEventAttributes(_value, settings);
       const decodedAttributes = decodePayloadAttributes(
         convertedAttributes,
       ) as object;

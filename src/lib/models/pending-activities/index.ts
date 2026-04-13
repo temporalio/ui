@@ -21,11 +21,7 @@ export async function getActivityAttributes(
     decodeAttributes = decodePayloadAttributes,
   }: DecodeFunctions = {},
 ): Promise<PendingActivity> {
-  const convertedAttributes = await convertWithCodec(
-    activity,
-    namespace,
-    settings,
-  );
+  const convertedAttributes = await convertWithCodec(activity, settings);
 
   const decodedAttributes = decodeAttributes(
     convertedAttributes,

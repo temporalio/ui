@@ -127,7 +127,6 @@ export async function getQuery(
       if (data[0]) {
         const convertedAttributes = await decodeEventAttributes(
           queryResult,
-          options.namespace,
           settings,
         );
 

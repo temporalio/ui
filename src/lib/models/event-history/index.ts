@@ -34,11 +34,7 @@ export async function getEventAttributes(
   }: DecodeFunctions = {},
 ): Promise<EventAttributesWithType<EventAttributeKey>> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  const convertedAttributes = await convertWithCodec(
-    attributes,
-    namespace,
-    settings,
-  );
+  const convertedAttributes = await convertWithCodec(attributes, settings);
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;
 

@@ -41,7 +41,6 @@ const decodePayloads = async (
   try {
     const convertedAttributes = await decodeEventAttributes(
       event,
-      get(page).params.namespace,
       settingsWithLocalConfig,
       decodeSetting,
       returnDataOnly,
