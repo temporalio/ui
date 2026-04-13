@@ -47,7 +47,7 @@
 
 <tr>
   {#each columns as { label } (label)}
-    {#if label === translate('deployments.name')}
+    {#if label === translate('deployments.deployment')}
       <td class="py-1 text-left">
         <Copyable
           content={deployment.name}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
+  import { writable, type Writable } from 'svelte/store';
 
   import { getContext } from 'svelte';
 
@@ -14,13 +14,12 @@
     MenuItem,
   } from '$lib/holocene/menu';
   import { translate } from '$lib/i18n/translate';
-  import { activityFilters } from '$lib/stores/filters';
-  import { activitySearchAttributeOptions } from '$lib/stores/search-attributes';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import type { SearchAttributeOption } from '$lib/stores/search-attributes';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
-  import { isStatusFilter } from '$lib/utilities/query/search-attribute-filter';
   import {
     createFilter,
     updateQueryParamsFromFilter,
@@ -28,15 +27,23 @@
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
 
   import {
-    ACTIVITY_FILTER_CONTEXT,
-    type ActivityFilterContext,
+    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
+    type SearchAttributeFilterContext,
   } from './filter.svelte';
+
+  interface Props {
+    options: SearchAttributeOption[];
+    filters: Writable<SearchAttributeFilter[]>;
+    statusAttribute?: string;
+  }
+
+  let { options, filters, statusAttribute }: Props = $props();
 
   const query = $derived(page.url.searchParams.get('query') ?? '');
   let searchAttributeValue = $state('');
 
-  const { filter, activeQueryIndex, handleSubmit } =
-    getContext<ActivityFilterContext>(ACTIVITY_FILTER_CONTEXT);
+  const { filter, activeQueryIndex, handleSubmit, id } =
+    getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT);
 
   const open = writable(false);
 
@@ -76,8 +83,8 @@
 
   const filteredOptions = $derived(
     !searchAttributeValue
-      ? $activitySearchAttributeOptions
-      : $activitySearchAttributeOptions.filter((option) =>
+      ? options
+      : options.filter((option) =>
           option.value
             .toLowerCase()
             .includes(searchAttributeValue.toLowerCase()),
@@ -85,8 +92,8 @@
   );
 
   function clearAllFilters() {
-    $activityFilters = [];
-    updateQueryParamsFromFilter(page.url, $activityFilters, true);
+    $filters = [];
+    updateQueryParamsFromFilter(page.url, $filters, true);
     $activeQueryIndex = null;
     $filter = createFilter();
   }
@@ -94,8 +101,8 @@
 
 <MenuContainer {open}>
   <MenuButton
-    id="activity-search-attribute-filter-button"
-    controls="activity-search-attribute-menu"
+    id="{id}-search-attribute-filter-button"
+    controls="{id}-search-attribute-menu"
     leadingIcon="add"
     variant="secondary"
     data-testid="add-filter-button"
@@ -106,18 +113,18 @@
   >
     Add Filter
   </MenuButton>
-  <Menu id="activity-search-attribute-menu">
+  <Menu id="{id}-search-attribute-menu">
     <MenuItem
       class="p-0"
       hoverable={false}
       onclick={() => {
-        document.getElementById('activity-filter-search')?.focus();
+        document.getElementById(`${id}-filter-search`)?.focus();
       }}
     >
       <Input
         label={translate('common.search')}
         labelHidden
-        id="activity-filter-search"
+        id="{id}-filter-search"
         noBorder
         bind:value={searchAttributeValue}
         icon="search"
@@ -132,8 +139,9 @@
         onclick={() => {
           handleNewQuery(value, type);
         }}
-        disabled={value === 'ExecutionStatus' &&
-          !!$activityFilters.find((f) => isStatusFilter(f))}
+        disabled={Boolean(statusAttribute) &&
+          value === statusAttribute &&
+          !!$filters.find((f) => f.attribute === statusAttribute)}
       >
         <div>
           <p class="leading-3">{label}</p>
@@ -147,7 +155,7 @@
     {/each}
   </Menu>
 </MenuContainer>
-{#if $activityFilters.length > 0}
+{#if $filters.length > 0}
   <Button
     variant="ghost"
     size="xs"

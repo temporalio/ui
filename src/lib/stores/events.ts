@@ -5,9 +5,11 @@ import { page } from '$app/stores';
 import type { FetchEventsParameters } from '$lib/services/events-service';
 import type { WorkflowEvents } from '$lib/types/events';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
 import {
   isLocalActivityMarkerEvent,
   isResetEvent,
+  isWorkflowTaskCompletedEvent,
 } from '$lib/utilities/is-event-type';
 
 import { eventFilterSort } from './event-view';
@@ -68,6 +70,11 @@ export const filteredEventHistory = derived(
 export const resetEvents = derived(fullEventHistory, (events) =>
   events.filter(isResetEvent),
 );
+
+export const sdkInfo = derived(fullEventHistory, ($history) => {
+  const workflowCompletedTasks = $history.filter(isWorkflowTaskCompletedEvent);
+  return getSDKandVersion(workflowCompletedTasks);
+});
 
 export const decodeEventHistory = persistStore<boolean>(
   'decodeEventHistory',

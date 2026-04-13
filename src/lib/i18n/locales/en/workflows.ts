@@ -155,9 +155,11 @@ export const Strings = {
   'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
     'We are having technical difficulties retrieving this Workflow',
-  'workflow-error-no-workers-title': 'No Workers Running',
+  'workflow-error-no-workers-title': 'No workers polling',
   'workflow-error-no-workers-description':
-    'There are no Workers polling the {{taskQueue}} Task Queue.',
+    'There are no workers polling the {{taskQueue}} task queue.',
+  'workers-alert-description':
+    'Check your deployment or orchestration system (Kubernetes, ECS, etc.). Review worker logs for crash information. Restart or redeploy workers.',
   'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
   'workflow-error-no-compatible-workers-description':
     'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
@@ -203,7 +205,6 @@ export const Strings = {
   'workflow-task-handler': 'Workflow Task Handler',
   'activity-handler': 'Activity Handler',
   'nexus-handler': 'Nexus Handler',
-  'workers-empty-state': 'No Workers Found',
   'call-stack-empty-state': 'No Call Stacks Found',
   'no-workers-failure-message':
     'This will fail if you have no workers running.',
@@ -348,4 +349,5 @@ export const Strings = {
   'timeline-minimized':
     'Timeline and Event History are collapsed to minimized height',
   'timeline-expanded': 'Timeline and Event History are expanded to full height',
+  sdk: 'Workflow SDK',
 } as const;

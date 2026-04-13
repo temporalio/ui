@@ -84,6 +84,21 @@ export const activityFilters = writable<SearchAttributeFilter[]>(
   updateActivityFilters,
 );
 
+const updateWorkerFilters: StartStopNotifier<SearchAttributeFilter[]> = (
+  set,
+) => {
+  return parameters.subscribe(({ query }) => {
+    if (!query && get(workerFilters).length) {
+      set([]);
+    }
+  });
+};
+
+export const workerFilters = writable<SearchAttributeFilter[]>(
+  [],
+  updateWorkerFilters,
+);
+
 const updateEventCategoryFilter: StartStopNotifier<
   EventTypeCategory[] | null
 > = (set) => {

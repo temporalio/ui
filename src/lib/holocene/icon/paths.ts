@@ -86,6 +86,7 @@ import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import marker from './svg/marker.svelte';
 import merge from './svg/merge.svelte';
+import microchip from './svg/microchip.svelte';
 import microsoft from './svg/microsoft.svelte';
 import minimize from './svg/minimize.svelte';
 import moon from './svg/moon.svelte';
@@ -141,6 +142,7 @@ import usage from './svg/usage.svelte';
 import userGroup from './svg/user-group.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
+import workers from './svg/workers.svelte';
 import workflow from './svg/workflow.svelte';
 import workflows from './svg/workflows.svelte';
 import xmarkFilled from './svg/xmark-filled.svelte';
@@ -235,6 +237,7 @@ export const icons = {
   logout,
   marker,
   merge,
+  microchip,
   microsoft,
   minimize,
   moon,
@@ -291,6 +294,7 @@ export const icons = {
   'vertical-ellipsis': verticalEllipsis,
   warning,
   'system-window': systemWindow,
+  workers,
   workflow,
   workflows,
   'xmark-filled': xmarkFilled,

@@ -2,10 +2,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import {
-    routeForStandaloneActivitiesWithQuery,
-    routeForTaskQueue,
-  } from '$lib/utilities/route-for';
+  import { routeForStandaloneActivitiesWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
@@ -36,6 +33,12 @@
       `ActivityType="${activityType}"`,
     ),
   );
+  const taskQueueFilterLink = $derived(
+    routeForStandaloneActivitiesWithQuery(
+      { namespace },
+      `TaskQueue="${activityExecutionInfo.taskQueue}"`,
+    ),
+  );
 </script>
 
 <div class="space-y-2">
@@ -57,20 +60,28 @@
   </div>
   <DetailList aria-label="activity execution details" rowCount={4}>
     <DetailListColumn>
-      <DetailListLabel>Scheduled Time</DetailListLabel>
+      <DetailListLabel
+        >{translate('standalone-activities.scheduled-time')}</DetailListLabel
+      >
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.scheduleTime}
       />
-      <DetailListLabel>Last Started Time</DetailListLabel>
+      <DetailListLabel
+        >{translate('standalone-activities.last-started-time')}</DetailListLabel
+      >
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.lastStartedTime}
       />
-      <DetailListLabel>Close Time</DetailListLabel>
+      <DetailListLabel
+        >{translate('standalone-activities.close-time')}</DetailListLabel
+      >
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.closeTime}
         fallback="-"
       />
-      <DetailListLabel>Duration</DetailListLabel>
+      <DetailListLabel
+        >{translate('standalone-activities.duration')}</DetailListLabel
+      >
       <DetailListTextValue
         text={activityExecutionInfo.executionDuration
           ? fromSeconds(activityExecutionInfo.executionDuration)
@@ -78,22 +89,29 @@
       />
     </DetailListColumn>
     <DetailListColumn>
-      <DetailListLabel>Run ID</DetailListLabel>
-      <DetailListTextValue copyable text={activityExecutionInfo.runId} />
-      <DetailListLabel>Activity Type</DetailListLabel>
+      <DetailListLabel
+        >{translate('standalone-activities.run-id')}</DetailListLabel
+      >
+      <DetailListTextValue copyable text={activityExecutionInfo.runId} />\
+      {#if activityType}
+        <DetailListLabel
+          >{translate('standalone-activities.activity-type')}</DetailListLabel
+        >
+        <DetailListLinkValue
+          copyable
+          iconName="filter"
+          text={activityType}
+          href={activityTypeFilterLink}
+        />
+      {/if}
+      <DetailListLabel
+        >{translate('standalone-activities.task-queue')}</DetailListLabel
+      >
       <DetailListLinkValue
         copyable
         iconName="filter"
-        text={activityType}
-        href={activityTypeFilterLink}
-      />
-      <DetailListLabel>Task Queue</DetailListLabel>
-      <DetailListLinkValue
-        href={routeForTaskQueue({
-          namespace,
-          queue: activityExecutionInfo.taskQueue,
-        })}
         text={activityExecutionInfo.taskQueue}
+        href={taskQueueFilterLink}
       />
     </DetailListColumn>
   </DetailList>

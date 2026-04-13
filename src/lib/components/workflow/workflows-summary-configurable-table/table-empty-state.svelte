@@ -3,15 +3,14 @@
 
   import { page } from '$app/state';
 
+  import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import NoWorkflowTaskFailures from '$lib/components/empty-states/no-workflow-task-failures.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowError } from '$lib/stores/workflows';
   import { TASK_FAILURES_QUERY } from '$lib/utilities/workflow-task-failures';
   import noResultsImages from '$lib/vendor/empty-state.svg';
-
-  import NoWorkflowTaskFailures from './empty-states/no-workflow-task-failures.svelte';
-  import NoWorkflows from './empty-states/no-workflows.svelte';
 
   interface Props {
     cloud?: Snippet;
@@ -65,7 +64,7 @@
       {#if hasTaskFailuresQuery}
         <NoWorkflowTaskFailures class="m-auto mt-8 text-subtle" />
       {:else}
-        <NoWorkflows class="m-auto mt-8 text-subtle" />
+        <NoQueryResults class="m-auto mt-8 text-subtle" />
       {/if}
     </div>
   </div>

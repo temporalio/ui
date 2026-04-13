@@ -3,8 +3,12 @@
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
-  import { untrack } from 'svelte';
+  import { getContext, untrack } from 'svelte';
 
+  import {
+    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
+    type SearchAttributeFilterContext,
+  } from '$lib/components/shared-search-attribute-filter/filter.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -55,7 +59,7 @@
     onUpdate: (updatedFilter: SearchAttributeFilter) => void;
     onRemove: () => void;
     index?: number;
-    openIndex?: number;
+    openIndex?: number | null;
   };
 
   let {
@@ -65,6 +69,10 @@
     index = 0,
     openIndex = null,
   }: Props = $props();
+
+  const { includeNullConditions = true } =
+    getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT) ??
+    {};
 
   const open = writable(false);
   let localFilter = $state({ ...filter });
@@ -81,12 +89,16 @@
   const isTimeRange = $derived(localFilter.conditional === 'BETWEEN');
   const selectedTime = $derived(getSelectedTimezone($timeFormat));
 
-  const defaultConditionOptions = [
-    { value: 'is', label: translate('common.is-null') },
-    { value: 'is not', label: translate('common.is-not-null') },
-  ];
+  const defaultConditionOptions = $derived(
+    includeNullConditions
+      ? [
+          { value: 'is', label: translate('common.is-null') },
+          { value: 'is not', label: translate('common.is-not-null') },
+        ]
+      : [],
+  );
 
-  const conditionalOptions = [
+  const conditionalOptions = $derived([
     { value: '=', label: translate('common.equal-to'), id: 'equal-to' },
     {
       value: '!=',
@@ -99,16 +111,16 @@
       id: 'starts-with',
     },
     ...defaultConditionOptions,
-  ];
+  ]);
 
-  const dateConditionalOptions = [
+  const dateConditionalOptions = $derived([
     { value: '<=', label: translate('common.before') },
     { value: 'BETWEEN', label: translate('common.between') },
     { value: '>=', label: translate('common.after') },
     ...defaultConditionOptions,
-  ];
+  ]);
 
-  const numberConditionalOptions = [
+  const numberConditionalOptions = $derived([
     { value: '>', label: '>', id: 'greater-than' },
     {
       value: '>=',
@@ -132,14 +144,14 @@
     },
     { value: '<', label: '<', id: 'less-than' },
     ...defaultConditionOptions,
-  ];
+  ]);
 
-  const listConditionalOptions = [
+  const listConditionalOptions = $derived([
     { value: 'in', label: 'In' },
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
     ...defaultConditionOptions,
-  ];
+  ]);
 
   function getDisplayKeyWithConditional(filter: SearchAttributeFilter): string {
     const { attribute, conditional } = filter;
@@ -179,7 +191,7 @@
     }
 
     if (isDateTimeFilter(filter)) {
-      if (filter.customDate) return value.split('BETWEEN')[1];
+      if (filter.customDate) return value?.split('BETWEEN')[1];
       return $timestamp(value, { format: 'short' });
     }
 
@@ -190,7 +202,7 @@
     return value;
   }
 
-  function applyChanges(e) {
+  function applyChanges(e: SubmitEvent) {
     e.preventDefault();
 
     if (isInConditional(localFilter.conditional)) {

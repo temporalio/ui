@@ -3,13 +3,12 @@
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
-  import type { APIErrorResponse } from '$lib/utilities/request-from-api';
+  import { has } from '$lib/utilities/has';
 
   let error = $state('');
 
@@ -22,13 +21,20 @@
     };
   });
 
-  const onError = (err: APIErrorResponse) => {
-    error =
-      err?.body?.message || translate('deployments.error-message-fetching');
+  const onError = (err: unknown) => {
+    if (
+      has(err, 'body') &&
+      has(err.body, 'message') &&
+      typeof err.body.message === 'string'
+    ) {
+      error = err.body.message;
+    } else {
+      error = translate('deployments.error-message-fetching');
+    }
   };
 
   const columns = [
-    { label: translate('deployments.name') },
+    { label: translate('deployments.deployment') },
     {
       label: translate('deployments.build-id'),
     },
@@ -38,13 +44,6 @@
     },
   ];
 </script>
-
-<div class="flex flex-wrap items-center gap-2">
-  <h1>
-    {translate('deployments.worker-deployments')}
-  </h1>
-  <Badge class="shrink-0">Public Preview</Badge>
-</div>
 
 {#key [namespace]}
   <PaginatedTable
@@ -62,7 +61,7 @@
       >{translate('deployments.deployments')}</caption
     >
     <tr slot="headers" class="text-left">
-      {#each columns as { label }}
+      {#each columns as { label } (label)}
         <th>{label}</th>
       {/each}
     </tr>
