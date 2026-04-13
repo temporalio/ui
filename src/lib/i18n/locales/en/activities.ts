@@ -11,9 +11,6 @@ export const Strings = {
   'reset-modal-confirmation': 'Reset Activity {{activityId}}',
   'reset-modal-description':
     'Reset the execution of this Activity back to the initial attempt.',
-  'apply-to-all-activity-types': 'Apply changes to all {{type}} runs',
-  'pause-all-activity-types': 'Pause all {{type}} runs',
-  'unpause-all-activity-types': 'Unpause all {{type}} runs',
   'reset-heartbeat-details': 'Reset Heartbeat Details (optional)',
   'reset-success': 'Activity {{activityId}} has been reset successfully.',
 };
