@@ -2,17 +2,17 @@
   import { page } from '$app/state';
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/holocene/link.svelte';
+  import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
   import { has } from '$lib/utilities/has';
+  import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
   let error = $state('');
 
   const namespace = $derived(page.params.namespace);
+  const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 
   const onFetch = $derived.by(() => {
     return () => {
@@ -35,57 +35,39 @@
 
   const columns = [
     { label: translate('deployments.deployment') },
-    {
-      label: translate('deployments.build-id'),
-    },
-    { label: translate('deployments.deployed') },
-    {
-      label: translate('deployments.actions'),
-    },
+    { label: translate('deployments.latest-version') },
+    { label: translate('deployments.created') },
   ];
 </script>
 
 {#key [namespace]}
-  <PaginatedTable
-    let:visibleItems
-    {onFetch}
-    {onError}
-    aria-label={translate('deployments.deployments')}
-    pageSizeSelectLabel={translate('common.per-page')}
-    nextButtonLabel={translate('common.next')}
-    previousButtonLabel={translate('common.previous')}
-    emptyStateMessage={translate('deployments.empty-state-title')}
-    errorMessage={translate('deployments.error-message-fetching')}
-  >
-    <caption class="sr-only" slot="caption"
-      >{translate('deployments.deployments')}</caption
+  <div class="flex flex-col gap-4">
+    <PaginatedTable
+      let:visibleItems
+      {onFetch}
+      {onError}
+      aria-label={translate('deployments.deployments')}
+      pageSizeSelectLabel={translate('common.per-page')}
+      nextButtonLabel={translate('common.next')}
+      previousButtonLabel={translate('common.previous')}
+      emptyStateMessage={translate('deployments.empty-state-title')}
+      errorMessage={translate('deployments.error-message-fetching')}
     >
-    <tr slot="headers" class="text-left">
-      {#each columns as { label } (label)}
-        <th>{label}</th>
-      {/each}
-    </tr>
-    {#each visibleItems as deployment}
-      <DeploymentTableRow {deployment} {columns} />
-    {/each}
-
-    <svelte:fragment slot="empty">
-      <EmptyState
-        title={translate('deployments.empty-state-title')}
-        class="px-4"
+      <caption class="sr-only" slot="caption"
+        >{translate('deployments.deployments')}</caption
       >
-        <p class="text-center">
-          Enable Worker Deployments to manage your workers more effectively. <Link
-            href="https://docs.temporal.io/worker-deployments"
-            newTab>Learn more</Link
-          >.
-        </p>
-        {#if error}
-          <Alert intent="warning" icon="warning" class="px-12">
-            {error}
-          </Alert>
-        {/if}
-      </EmptyState>
-    </svelte:fragment>
-  </PaginatedTable>
+      <tr slot="headers" class="text-left">
+        {#each columns as { label } (label)}
+          <th>{label}</th>
+        {/each}
+      </tr>
+      {#each visibleItems as deployment}
+        <DeploymentTableRow {deployment} {columns} />
+      {/each}
+
+      <svelte:fragment slot="empty">
+        <DeploymentsEmptyState {createHref} {error} />
+      </svelte:fragment>
+    </PaginatedTable>
+  </div>
 {/key}

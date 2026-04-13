@@ -8,20 +8,32 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    routeForWorkerDeployments,
+    routeForWorkers,
+  } from '$lib/utilities/route-for';
 
   interface Props {
     children: Snippet;
-    deploymentsHref: string;
-    workersHref: string;
+    namespace: string;
+    headerAction?: Snippet;
   }
 
-  const { children, deploymentsHref, workersHref }: Props = $props();
+  const { children, namespace, headerAction }: Props = $props();
+
+  const workersHref = $derived(routeForWorkers({ namespace }));
+  const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
 </script>
 
 <header class="flex flex-col gap-2">
-  <h1>
-    {translate('workers.workers')}
-  </h1>
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <h1 class="leading-7" data-cy="workers-title">
+      {translate('workers.workers')}
+    </h1>
+    {#if headerAction}
+      {@render headerAction()}
+    {/if}
+  </div>
   <Tabs>
     <TabList label={translate('workers.worker-views')}>
       <Tab

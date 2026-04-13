@@ -33,6 +33,7 @@ import type {
   WorkerDeploymentsAPIRoutePath,
   WorkerDeploymentVersionAPIRoutePath,
   WorkerDeploymentVersionRouteParameters,
+  WorkerDeploymentVersionsAPIRoutePath,
   WorkflowActivitiesAPIRoutePath,
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
@@ -85,8 +86,8 @@ export const base = (namespace?: string): string => {
 };
 
 const getPath = (endpoint: string): string => {
-  if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `/api/v1/${endpoint}`;
+  const path = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+  return `/api/v1/${path}`;
 };
 
 const withBase = (path: string, namespace?: string): string => {
@@ -120,6 +121,7 @@ const encode = (
       activityId: '',
       endpointId: '',
       deploymentName: '',
+      buildId: '',
       version: '',
       workerInstanceKey: '',
     },
@@ -178,7 +180,11 @@ export function pathForApi(
     'nexus-endpoint.update': `/nexus/endpoints/${parameters?.endpointId}/update`,
     'worker-deployments': `/namespaces/${parameters?.namespace}/worker-deployments`,
     'worker-deployment': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}`,
-    'worker-deployment-version': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.version}`,
+    'worker-deployment-version': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}`,
+    'worker-deployment-versions': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}`,
+    'worker-deployment-version-compute-config': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}/update-compute-config`,
+    'worker-deployment-version-validate-compute-config': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}/validate-compute-config`,
+    'worker-deployment-set-current-version': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}/set-current-version`,
     'standalone-activity': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}`,
     'standalone-activities': `/namespaces/${parameters?.namespace}/activities`,
     'standalone-activities.count': `/namespaces/${parameters?.namespace}/activity-count`,
@@ -285,6 +291,11 @@ export function routeForApi(
 export function routeForApi(
   route: WorkerDeploymentVersionAPIRoutePath,
   parameters: WorkerDeploymentVersionRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: WorkerDeploymentVersionsAPIRoutePath,
+  parameters: WorkerDeploymentRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(route: ParameterlessAPIRoutePath): string;

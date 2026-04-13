@@ -36,6 +36,12 @@ export const load: LayoutLoad = async function ({
     fetch,
   );
 
+  if (import.meta.env.DEV) {
+    Object.assign(systemInfo.capabilities ?? {}, {
+      serverlessWorkers: true,
+    });
+  }
+
   return {
     user,
     settings,
