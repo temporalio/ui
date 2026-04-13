@@ -201,7 +201,7 @@
 
 <tr
   class={merge(
-    'hover:cursor-pointer',
+    expanded ? 'hover:!bg-transparent' : 'hover:cursor-pointer',
     failure && '!bg-red-400/40 hover:!bg-red-400/60',
     canceled && '!bg-yellow-400/30 hover:!bg-yellow-400/50',
     terminated && '!bg-pink-700/30 hover:!bg-pink-700/50',
@@ -380,7 +380,7 @@
 </tr>
 {#if expanded}
   <tr
-    class="w-full text-sm no-underline"
+    class="w-full text-sm no-underline hover:!bg-transparent"
     data-testid="event-summary-row-expanded"
   >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>

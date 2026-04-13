@@ -1,27 +1,29 @@
 <script lang="ts">
-  import PendingActivityCard from '$lib/components/workflow/pending-activity/pending-activity-card.svelte';
+  import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { groupEvents } from '$lib/models/event-groups';
+  import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  const pendingActivities = $derived(
-    $workflowRun.workflow?.pendingActivities?.sort((a, b) => {
-      if (isNaN(parseInt(a.activityId)) || isNaN(parseInt(b.activityId))) {
-        return a.activityId.localeCompare(b.activityId);
-      }
-      return parseInt(a.activityId) - parseInt(b.activityId);
-    }) || [],
-  );
+  const { workflow } = $derived($workflowRun);
+  const pendingActivities = $derived(workflow?.pendingActivities ?? []);
+
+  const pendingGroups = $derived.by(() => {
+    const groups = groupEvents(
+      $fullEventHistory,
+      'ascending',
+      pendingActivities,
+    );
+    return groups.filter((g) => g.pendingActivity);
+  });
 </script>
 
 <div class="pb-16">
-  {#if pendingActivities.length}
+  {#if pendingGroups.length}
     <div class="flex flex-col gap-4">
-      {#each pendingActivities as activity (activity.id)}
-        <PendingActivityCard
-          {activity}
-          totalPending={pendingActivities.length}
-        />
+      {#each pendingGroups as group (group.id)}
+        <EventDetailsFull {group} />
       {/each}
     </div>
   {:else}

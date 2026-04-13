@@ -19,13 +19,6 @@
 <div
   class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
-  <div class="flex-1">
-    <div class="flex flex-wrap items-center space-x-3">
-      <Badge>{operation.state}</Badge>
-      <h4>{translate('workflows.pending-nexus-operation')}</h4>
-    </div>
-  </div>
-
   <div class="flex flex-1 flex-col gap-4 xl:flex-row">
     <div class="flex w-full flex-col gap-1 xl:w-1/2">
       {#if operation.endpoint}
@@ -80,7 +73,7 @@
       {#if operation.scheduleToStartTimeout}
         {@render detail(
           translate('workflows.schedule-to-start-timeout'),
-          operation.scheduleToCloseTimeout as string,
+          operation.scheduleToStartTimeout as string,
         )}
       {/if}
       {#if operation.startToCloseTimeout}
