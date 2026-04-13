@@ -94,18 +94,13 @@ export const decodePayloadAttributes = <
   Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>
 > => {
   // Decode Search Attributes
-  if (
-    has(eventAttribute, 'searchAttributes') &&
-    has(eventAttribute.searchAttributes, 'indexedFields')
-  ) {
-    const searchAttributes = eventAttribute.searchAttributes.indexedFields;
-    Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodeRawPayload(value, returnDataOnly);
-    });
-  } else if (has(eventAttribute, 'searchAttributes')) {
-    // Decode Search Attributes on UpsertWorkflowSearchAttributes
-    const searchAttributes = eventAttribute.searchAttributes;
-
+  if (has(eventAttribute, 'searchAttributes')) {
+    const searchAttributes = has(
+      eventAttribute.searchAttributes,
+      'indexedFields',
+    )
+      ? eventAttribute.searchAttributes.indexedFields
+      : eventAttribute.searchAttributes;
     Object.entries(searchAttributes).forEach(([key, value]) => {
       searchAttributes[key] = decodeRawPayload(value, returnDataOnly);
     });

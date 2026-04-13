@@ -89,11 +89,11 @@ describe('getEventAttributes', () => {
     vi.mock('$lib/utilities/decode-payload', () => {
       const fn = async <T>(x: T): Promise<T> => x;
 
-      const convertPayloadToJsonWithCodec = vi.fn(fn);
+      const decodeEventAttributes = vi.fn(fn);
       const decodePayloadAttributes = vi.fn(fn);
 
       return {
-        convertPayloadToJsonWithCodec,
+        decodeEventAttributes,
         decodePayloadAttributes,
       };
     });
