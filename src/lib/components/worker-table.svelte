@@ -178,7 +178,7 @@
   {:else}
     <tr class="w-full">
       <td colspan="7">
-        <EmptyState title={translate('workflows.workers-empty-state')} />
+        <EmptyState title={translate('workers.empty-state-title')} />
       </td>
     </tr>
   {/each}
