@@ -17,6 +17,7 @@ export const Strings = {
   'empty-state-description':
     'Try adjusting or clearing the filters to see the Schedules running on this Namespace.',
   'error-message-fetching': 'Error fetching schedules',
+  'workflow-runs': 'Workflow Runs',
   'recent-runs': 'Recent Runs',
   'recent-runs-empty-state-title': 'No Recent Runs',
   'upcoming-runs': 'Upcoming Runs',
@@ -67,7 +68,7 @@ export const Strings = {
   'exclusion-calendar': 'Exclusion Calendar',
   'remaining-actions': 'Remaining Actions',
   'overlap-policy': 'Overlap Policy',
-  'catchup-window': 'Catchup Window',
+  'catchup-window-policy': 'Catchup Window Policy',
   'pause-on-failure': 'Pause on Failure',
   'keep-original-workflow-id': 'Keep Original Workflow ID',
   'recurring-dates-heading': 'Recurring date(s)',

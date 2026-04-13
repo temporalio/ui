@@ -2,19 +2,17 @@
   import { writable } from 'svelte/store';
 
   import { addDays, addHours, startOfDay } from 'date-fns';
-  import { onDestroy } from 'svelte';
 
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import ScheduleInput from '$lib/components/schedule/schedule-input.svelte';
-  import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
-  import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import ScheduleWorkflowRuns from '$lib/components/schedule/schedule-workflow-runs.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -31,7 +29,6 @@
   import SplitButton from '$lib/holocene/split-button.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
-  import Translate from '$lib/i18n/translate.svelte';
   import {
     backfillRequest,
     deleteSchedule,
@@ -55,72 +52,81 @@
 
   import type { DescribeScheduleResponse } from '$types';
 
-  let namespace = $page.params.namespace;
-  let scheduleId = $page.params.schedule;
-  let workflowQuery = `TemporalScheduledById="${scheduleId}"`;
+  const namespace = $derived(page.params.namespace);
+  const scheduleId = $derived(page.params.schedule);
+  const workflowQuery = $derived(`TemporalScheduledById="${scheduleId}"`);
 
   const identity = getIdentity();
 
-  const parameters = {
+  const parameters = $derived({
     namespace,
     scheduleId: decodeURIForSvelte(scheduleId),
-  };
+  });
 
-  let scheduleFetch = fetchSchedule(parameters);
+  let scheduleFetch = $state(
+    fetchSchedule({
+      namespace: page.params.namespace,
+      scheduleId: decodeURIForSvelte(page.params.schedule),
+    }),
+  );
 
-  let pauseConfirmationModalOpen = false;
-  let triggerConfirmationModalOpen = false;
-  let backfillConfirmationModalOpen = false;
-  let deleteConfirmationModalOpen = false;
-  let reason = '';
-  let error = '';
-  let scheduleUpdating = false;
+  let pauseConfirmationModalOpen = $state(false);
+  let triggerConfirmationModalOpen = $state(false);
+  let backfillConfirmationModalOpen = $state(false);
+  let deleteConfirmationModalOpen = $state(false);
+  let reason = $state('');
+  let error = $state('');
+  let scheduleUpdating = $state(false);
   let overlapPolicy = writable<OverlapPolicy>('Unspecified');
   let deleteTimeout: ReturnType<typeof setTimeout>;
   let triggerTimeout: ReturnType<typeof setTimeout>;
   let backfillTimeout: ReturnType<typeof setTimeout>;
-  let policies: { label: string; description: string; value: OverlapPolicy }[] =
-    [
-      {
-        description: translate('schedules.trigger-unspecified-description'),
-        label: translate('schedules.trigger-unspecified-title'),
-        value: 'Unspecified',
-      },
-      {
-        description: translate('schedules.trigger-buffer-all-description'),
-        label: translate('schedules.trigger-buffer-all-title'),
-        value: 'BufferAll',
-      },
-      {
-        description: translate('schedules.trigger-allow-all-description'),
-        label: translate('schedules.trigger-allow-all-title'),
-        value: 'AllowAll',
-      },
-      {
-        description: translate('schedules.trigger-skip-description'),
-        label: translate('schedules.trigger-skip-title'),
-        value: 'Skip',
-      },
-      {
-        description: translate('schedules.trigger-buffer-one-description'),
-        label: translate('schedules.trigger-buffer-one-title'),
-        value: 'BufferOne',
-      },
-      {
-        description: translate('schedules.trigger-cancel-other-description'),
-        label: translate('schedules.trigger-cancel-other-title'),
-        value: 'CancelOther',
-      },
-      {
-        description: translate('schedules.trigger-terminate-other-description'),
-        label: translate('schedules.trigger-terminate-other-title'),
-        value: 'TerminateOther',
-      },
-    ];
+  const policies: {
+    label: string;
+    description: string;
+    value: OverlapPolicy;
+  }[] = [
+    {
+      description: translate('schedules.trigger-unspecified-description'),
+      label: translate('schedules.trigger-unspecified-title'),
+      value: 'Unspecified',
+    },
+    {
+      description: translate('schedules.trigger-buffer-all-description'),
+      label: translate('schedules.trigger-buffer-all-title'),
+      value: 'BufferAll',
+    },
+    {
+      description: translate('schedules.trigger-allow-all-description'),
+      label: translate('schedules.trigger-allow-all-title'),
+      value: 'AllowAll',
+    },
+    {
+      description: translate('schedules.trigger-skip-description'),
+      label: translate('schedules.trigger-skip-title'),
+      value: 'Skip',
+    },
+    {
+      description: translate('schedules.trigger-buffer-one-description'),
+      label: translate('schedules.trigger-buffer-one-title'),
+      value: 'BufferOne',
+    },
+    {
+      description: translate('schedules.trigger-cancel-other-description'),
+      label: translate('schedules.trigger-cancel-other-title'),
+      value: 'CancelOther',
+    },
+    {
+      description: translate('schedules.trigger-terminate-other-description'),
+      label: translate('schedules.trigger-terminate-other-title'),
+      value: 'TerminateOther',
+    },
+  ];
 
-  let coreUser = coreUserStore();
-  $: editDisabled =
-    $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed();
+  const coreUser = coreUserStore();
+  const editDisabled = $derived(
+    $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed(),
+  );
 
   const handleDelete = async () => {
     error = '';
@@ -182,16 +188,16 @@
     }, 1000);
   };
 
-  let viewMoreBackfillOptions = false;
-  let startDate = startOfDay(new Date());
-  let endDate = startOfDay(new Date());
+  let viewMoreBackfillOptions = $state(false);
+  let startDate = $state(startOfDay(new Date()));
+  let endDate = $state(startOfDay(new Date()));
 
-  let startHour = '';
-  let startMinute = '';
-  let startSecond = '';
-  let endHour = '';
-  let endMinute = '';
-  let endSecond = '';
+  let startHour = $state('');
+  let startMinute = $state('');
+  let startSecond = $state('');
+  let endHour = $state('');
+  let endMinute = $state('');
+  let endSecond = $state('');
 
   const onStartDateChange = (d: Date) => {
     startDate = startOfDay(d);
@@ -219,7 +225,11 @@
         : startOfDay(new Date());
   };
 
-  $: backfillConfirmationModalOpen && updateDefaultBackfillTimes();
+  $effect(() => {
+    if (backfillConfirmationModalOpen) {
+      updateDefaultBackfillTimes();
+    }
+  });
 
   const closeBackfillModal = () => {
     backfillConfirmationModalOpen = false;
@@ -263,10 +273,12 @@
     reason = '';
   };
 
-  onDestroy(() => {
-    clearTimeout(deleteTimeout);
-    clearTimeout(triggerTimeout);
-    clearTimeout(backfillTimeout);
+  $effect(() => {
+    return () => {
+      clearTimeout(deleteTimeout);
+      clearTimeout(triggerTimeout);
+      clearTimeout(backfillTimeout);
+    };
   });
 </script>
 
@@ -286,44 +298,74 @@
   {#if $loading}
     <Loading class="my-2" />
   {:else}
-    <header class="flex flex-row flex-wrap justify-between gap-4">
-      <div class="relative flex flex-col">
+    <header class="flex flex-row flex-wrap justify-between gap-2">
+      <div class="relative flex flex-col gap-2">
         <Link href={routeForSchedules({ namespace })} icon="chevron-left">
           {translate('schedules.back-to-schedules')}
         </Link>
-        <h1 class="relative flex items-center">
-          <span class="select-all" data-testid="schedule-name">
-            {scheduleId}
-          </span>
-        </h1>
-        <div class="flex flex-wrap items-center gap-2 text-lg">
+        <div class="mt-2 flex flex-wrap items-center gap-2">
           <WorkflowStatus
             status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
           />
+          <h1 class="select-all" data-testid="schedule-name">
+            {scheduleId}
+          </h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <p class="text-sm font-medium text-secondary">Workflow Type</p>
           <p>
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>
-        <Timestamp
-          as="p"
-          class="flex items-center gap-2 text-right text-sm"
-          dateTime={schedule?.info?.createTime}
-        >
-          {#snippet leading()}
-            Created
-          {/snippet}
-        </Timestamp>
-        {#if schedule?.info?.updateTime}
+        <div class="flex flex-wrap items-center gap-2">
           <Timestamp
             as="p"
-            class="flex items-center gap-2 text-right text-sm"
-            dateTime={schedule?.info?.updateTime}
+            class="flex items-center gap-2 text-right"
+            dateTime={schedule?.info?.createTime}
           >
             {#snippet leading()}
-              Last Updated
+              <span class="text-sm font-medium text-secondary"> Created </span>
             {/snippet}
           </Timestamp>
+        </div>
+        {#if schedule?.info?.updateTime}
+          <div class="flex flex-wrap items-center gap-2">
+            <Timestamp
+              as="p"
+              class="flex items-center gap-2 text-right"
+              dateTime={schedule?.info?.updateTime}
+            >
+              {#snippet leading()}
+                <span class="text-sm font-medium text-secondary">
+                  Last Updated
+                </span>
+              {/snippet}
+            </Timestamp>
+          </div>
         {/if}
+        <div class="flex w-full flex-col gap-2">
+          <p class="text-sm font-medium text-secondary">Total Workflows</p>
+
+          <div class="flex items-center gap-2">
+            <span class="font-mono" data-testid="workflow-count"
+              >{$workflowCount.count.toLocaleString()}
+            </span>
+            <Button
+              size="xs"
+              variant="ghost"
+              leadingIcon="retry"
+              on:click={() => {
+                scheduleFetch = fetchSchedule(parameters);
+                $refresh = Date.now();
+              }}
+            >
+              {#if $workflowCount.newCount > 0}
+                +{$workflowCount.newCount.toLocaleString()}
+              {/if}
+            </Button>
+          </div>
+          <StatusCounts staticQuery={workflowQuery} />
+        </div>
       </div>
       <SplitButton
         position="right"
@@ -369,50 +411,11 @@
           <ScheduleError error={schedule?.info?.invalidScheduleError} />
         </div>
       {/if}
-      <div class="flex w-full flex-col gap-2 text-lg">
-        <div class="flex items-center gap-2">
-          <span data-testid="workflow-count"
-            >{$workflowCount.count.toLocaleString()}
-            <Translate
-              key="common.workflows-plural"
-              count={$workflowCount.count}
-            />
-          </span>
-          <Button
-            size="xs"
-            variant="ghost"
-            leadingIcon="retry"
-            on:click={() => {
-              scheduleFetch = fetchSchedule(parameters);
-              $refresh = Date.now();
-            }}
-          >
-            {#if $workflowCount.newCount > 0}
-              +{$workflowCount.newCount.toLocaleString()}
-            {/if}
-          </Button>
-        </div>
-        <StatusCounts staticQuery={workflowQuery} />
-      </div>
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
-          <ScheduleRecentRuns
-            {namespace}
-            recentRuns={schedule?.info?.recentActions}
-            {workflowQuery}
-          />
-          <ScheduleUpcomingRuns
-            futureRuns={schedule?.info?.futureActionTimes}
-          />
-          <ScheduleAdvancedSettings
-            spec={schedule?.schedule?.spec}
-            state={schedule?.schedule?.state}
-            policies={schedule?.schedule?.policies}
-            notes={schedule?.schedule?.state?.notes}
-          />
-          <ScheduleSearchAttributes
-            searchAttributes={schedule?.searchAttributes ?? {}}
-          />
+          <ScheduleWorkflowRuns {namespace} {schedule} {workflowQuery} />
+          <ScheduleAdvancedSettings {schedule} />
+          <ScheduleSearchAttributes {schedule} />
         </div>
         <div class="flex w-full flex-col gap-4 xl:w-1/3">
           <ScheduleInput

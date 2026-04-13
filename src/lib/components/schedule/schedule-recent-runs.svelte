@@ -1,27 +1,22 @@
 <script lang="ts">
-  import Panel from '$lib/components/panel.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import {
-    routeForWorkflow,
-    routeForWorkflowsWithQuery,
-  } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
+  import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
 
   import WorkflowStatus from '../workflow-status.svelte';
 
-  import type { ScheduleActionResult } from '$types';
+  import type { DescribeScheduleResponse, ScheduleActionResult } from '$types';
 
   type Props = {
-    recentRuns?: ScheduleActionResult[];
     namespace: string;
-    workflowQuery: string;
+    schedule: DescribeScheduleResponse;
   };
 
-  let { recentRuns = [], namespace, workflowQuery }: Props = $props();
+  let { namespace, schedule }: Props = $props();
+  const recentRuns = $derived(schedule?.info?.recentActions);
 
   const sortRecentRuns = (recentRuns: ScheduleActionResult[]) => {
     return (
@@ -34,61 +29,34 @@
         ?.slice(0, 5) ?? []
     );
   };
+
+  const sortedRuns = $derived(sortRecentRuns(recentRuns));
 </script>
 
-<Panel class="w-full">
-  <div class="flex justify-between">
-    <h2 class="mb-4">{translate('schedules.recent-runs')}</h2>
-    <Link
-      href={routeForWorkflowsWithQuery({
-        namespace,
-        query: workflowQuery,
-      })}
-      icon="filter"
-    >
-      {translate('common.view-all-runs')}
-    </Link>
+{#each sortedRuns as run, i (`${run?.startWorkflowResult?.workflowId ?? i}:${run?.startWorkflowResult?.runId ?? i + 1}`)}
+  <div
+    class="my-1 inline-flex w-full items-center justify-between border-b border-subtle py-1"
+  >
+    <div class="w-28">
+      <WorkflowStatus
+        status={toWorkflowStatusReadable(run.startWorkflowStatus)}
+      />
+    </div>
+    <div class="mx-2 w-auto break-words">
+      <Link
+        href={routeForWorkflow({
+          workflow: run.startWorkflowResult.workflowId,
+          run: run.startWorkflowResult.runId,
+          namespace,
+        })}
+      >
+        {run.startWorkflowResult.workflowId}
+      </Link>
+    </div>
+    <div class="ml-auto font-mono">
+      <Timestamp as="p" dateTime={run.actualTime} />
+    </div>
   </div>
-  {#each sortRecentRuns(recentRuns) as run, i (`${run?.startWorkflowResult?.workflowId ?? i}:${run?.startWorkflowResult?.runId ?? i + 1}`)}
-    {#await fetchWorkflowForSchedule({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
-      <div class="row">
-        <div class="w-28">
-          <WorkflowStatus status={workflow.status} />
-        </div>
-        <div class="mx-2 w-auto break-words">
-          <Link
-            href={routeForWorkflow({
-              workflow: run.startWorkflowResult.workflowId,
-              run: run.startWorkflowResult.runId,
-              namespace,
-            })}
-          >
-            {run.startWorkflowResult.workflowId}
-          </Link>
-        </div>
-        <div class="ml-auto">
-          <Timestamp as="p" dateTime={run.actualTime} />
-        </div>
-      </div>
-    {:catch}
-      <div class="row">
-        <div class="w-28"></div>
-        <div class="w-96">
-          {run.startWorkflowResult.workflowId}
-        </div>
-        <div class="ml-auto">
-          <Timestamp as="p" dateTime={run.actualTime} />
-        </div>
-      </div>
-    {/await}
-  {/each}
-  {#if !recentRuns.length}
-    <EmptyState title={translate('schedules.recent-runs-empty-state-title')} />
-  {/if}
-</Panel>
-
-<style lang="postcss">
-  .row {
-    @apply my-1 inline-flex w-full items-center border-b border-subtle py-1;
-  }
-</style>
+{:else}
+  <EmptyState title={translate('schedules.recent-runs-empty-state-title')} />
+{/each}
