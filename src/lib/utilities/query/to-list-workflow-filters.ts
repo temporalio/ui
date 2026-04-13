@@ -79,6 +79,7 @@ const DefaultAttributes: SearchAttributes = {
   WorkflowId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   WorkflowType: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  ActivityId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
 };
 
 export const toListWorkflowFilters = (

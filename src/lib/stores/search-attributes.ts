@@ -24,6 +24,7 @@ export const searchAttributes: Readable<SearchAttributes> = derived(
   ([$allSearchAttributes]) => ({
     ...$allSearchAttributes.customAttributes,
     ...$allSearchAttributes.systemAttributes,
+    ActivityId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
   }),
 );
 
@@ -172,6 +173,7 @@ export const sortedSearchAttributeOptions: Readable<SearchAttributeOption[]> =
       'WorkflowId',
       'WorkflowType',
       'RunId',
+      'ActivityId',
       'StartTime',
       'CloseTime',
     ];
