@@ -45,7 +45,7 @@
   };
 </script>
 
-<Panel class="w-full">
+<Panel class="flex w-full flex-col gap-4">
   <div class="flex justify-between">
     <h2 class="mb-4">{translate('schedules.workflow-runs')}</h2>
     <Link {href} icon="filter">
