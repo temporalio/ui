@@ -146,7 +146,7 @@
           data-testid="table-density-button"
           size="xs"
           variant="ghost"
-          leadingIcon={compact ? 'table-compact' : 'table-comfy'}
+          leadingIcon={compact ? 'table-dense' : 'table-comfy'}
         ></Button>
       </Tooltip>
 
