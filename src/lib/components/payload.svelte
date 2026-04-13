@@ -162,23 +162,11 @@
     {decodedValue || fallback}
   </Badge>
 {:else if mode === 'inline-truncated'}
-  <div class="payload {className}">
+  <div
+    class="overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs text-primary {className}"
+  >
     <code>
       <pre class="truncate">{decodedValue.slice(0, truncateAt)}</pre>
     </code>
   </div>
 {/if}
-
-<style lang="postcss">
-  .payload {
-    @apply overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs;
-  }
-
-  .payload code {
-    @apply text-primary;
-  }
-
-  .payload pre {
-    @apply text-primary;
-  }
-</style>
