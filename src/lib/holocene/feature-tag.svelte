@@ -1,15 +1,13 @@
 <script lang="ts">
   import { viewedFeatureTags } from '$lib/stores/new-feature-tags';
 
-  export let feature: string;
-  export let alpha = false;
+  type Props = { feature: string; alpha?: boolean };
+  let { feature, alpha }: Props = $props();
 
-  $: hide = $viewedFeatureTags?.includes(feature);
+  const show = $derived(!$viewedFeatureTags?.includes(feature));
 </script>
 
-{#if hide}
-  <slot />
-{:else}
+{#if show}
   <span class="new-tag" class:alpha></span>
 {/if}
 

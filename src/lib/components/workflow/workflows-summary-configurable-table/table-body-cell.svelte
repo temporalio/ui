@@ -120,7 +120,7 @@
           run: workflow.runId,
           archival,
         })}
-        {truncate}
+        truncate
       />
     {:else if label === 'Deployment'}
       {@const deployment =
@@ -214,9 +214,20 @@
         options={{ format: truncate ? 'short' : 'long' }}
       />
     {:else if label === 'Task Queue'}
-      {workflow.taskQueue}
+      <Tooltip text={workflow.taskQueue} top class="min-w-0" hide={!truncate}>
+        {truncate ? truncateValue(workflow.taskQueue) : workflow.taskQueue}
+      </Tooltip>
     {:else if label === 'Parent Namespace'}
-      {workflow?.parentNamespaceId ?? ''}
+      <Tooltip
+        text={workflow?.parentNamespaceId ?? ''}
+        top
+        class="min-w-0"
+        hide={!truncate}
+      >
+        {truncate
+          ? truncateValue(workflow?.parentNamespaceId ?? '')
+          : (workflow?.parentNamespaceId ?? '')}
+      </Tooltip>
     {:else if label === 'History Size'}
       {formatBytes(parseInt(workflow.historySizeBytes, 10))}
     {:else if label === 'State Transitions'}
@@ -237,7 +248,21 @@
     {:else if label === 'History Length'}
       {parseInt(workflow.historyEvents, 10) > 0 ? workflow.historyEvents : ''}
     {:else if label === 'Scheduled By ID'}
-      {workflow.searchAttributes?.indexedFields?.TemporalScheduledById ?? ''}
+      <Tooltip
+        text={workflow.searchAttributes?.indexedFields?.TemporalScheduledById ??
+          ''}
+        top
+        class="min-w-0"
+        hide={!truncate}
+      >
+        {truncate
+          ? truncateValue(
+              workflow.searchAttributes?.indexedFields?.TemporalScheduledById ??
+                '',
+            )
+          : (workflow.searchAttributes?.indexedFields?.TemporalScheduledById ??
+            '')}
+      </Tooltip>
     {:else if label === 'Scheduled Start Time'}
       {@const content =
         workflow.searchAttributes?.indexedFields?.TemporalScheduledStartTime}

@@ -3,6 +3,7 @@
 
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import FeatureTag from '$lib/holocene/feature-tag.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -12,6 +13,7 @@
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import { viewFeature } from '$lib/stores/new-feature-tags';
   import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -80,6 +82,7 @@
 
   const setTableDensity = () => {
     $tableDensity = compact ? 'comfortable' : 'compact';
+    viewFeature('tableDensity');
   };
 </script>
 
@@ -141,6 +144,7 @@
           : translate('common.comfortable')}
         top
       >
+        <FeatureTag feature="tableDensity" alpha />
         <Button
           on:click={setTableDensity}
           data-testid="table-density-button"
@@ -149,7 +153,6 @@
           leadingIcon={compact ? 'table-dense' : 'table-comfy'}
         ></Button>
       </Tooltip>
-
       <Tooltip text={translate('common.download-json')} top>
         <Button
           on:click={() => exportWorkflows(visibleItems, page)}
