@@ -4,7 +4,7 @@
 
   import { page } from '$app/state';
 
-  import Payload from '$lib/components/payload.svelte';
+  import Payload from '$lib/components/payload/payload.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';

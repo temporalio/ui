@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import Payload from '$lib/components/payload.svelte';
+  import Payload from '$lib/components/payload/payload.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';

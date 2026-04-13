@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Payload from '$lib/components/payload.svelte';
+  import Payload from '$lib/components/payload/payload.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import type { Payloads } from '$lib/types';
   import type { ActivityExecutionOutcome } from '$lib/types/activity-execution';

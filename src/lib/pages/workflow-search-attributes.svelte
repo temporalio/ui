@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Payload from '$lib/components/payload.svelte';
+  import Payload from '$lib/components/payload/payload.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 

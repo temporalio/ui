@@ -4,7 +4,7 @@
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
-  import Payload from '$lib/components/payload.svelte';
+  import Payload from '$lib/components/payload/payload.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';

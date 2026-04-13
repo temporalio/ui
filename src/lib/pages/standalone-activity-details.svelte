@@ -7,7 +7,7 @@
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
-  import Payload from '$lib/components/payload.svelte';
+  import Payload from '$lib/components/payload/payload.svelte';
   import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';

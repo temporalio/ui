@@ -3,8 +3,8 @@
 
   import { page } from '$app/state';
 
+  import Payload from '$lib/components/payload/payload.svelte';
   import PayloadInput from '$lib/components/payload-input.svelte';
-  import Payload from '$lib/components/payload.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';

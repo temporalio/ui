@@ -1,7 +1,7 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Payload from '$lib/components/payload.svelte';
+  import Payload from '$lib/components/payload/payload.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';

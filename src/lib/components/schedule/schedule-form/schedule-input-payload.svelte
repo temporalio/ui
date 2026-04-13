@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
+  import Payload from '$lib/components/payload/payload.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
-  import Payload from '$lib/components/payload.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
