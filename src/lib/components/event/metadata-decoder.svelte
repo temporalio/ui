@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import type { Payload } from '$lib/types';
-  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
+  import { decodeUserMetadataPayload } from '$lib/utilities/decode-payload';
   import {
     getCodecEndpoint,
     getCodecIncludeCredentials,
@@ -44,10 +44,7 @@
     if (!_value) return fallback;
     if (decodedValue) return decodedValue;
 
-    const metadata = await decodeSingleReadablePayloadWithCodec(
-      _value,
-      settings,
-    );
+    const metadata = await decodeUserMetadataPayload(_value, settings);
 
     if (typeof metadata === 'string') {
       decodedValue = setPrefix(metadata);

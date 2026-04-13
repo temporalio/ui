@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import { decodePayloadsWithCodec } from '$lib/services/data-encoder';
+import { decodePayloadsWithCodec as callCodecEndpoint } from '$lib/services/data-encoder';
 import type {
   codecEndpoint,
   includeCredentials,
@@ -24,7 +24,7 @@ export type PotentiallyDecodable =
   | Record<string | number | symbol, unknown>;
 
 export type DecodeFunctions = {
-  convertWithCodec?: typeof cloneAllPotentialPayloadsWithCodec;
+  convertWithCodec?: typeof decodeEventAttributes;
   decodeAttributes?: typeof decodePayloadAttributes;
   encoderEndpoint?: typeof codecEndpoint;
   codecPassAccessToken?: typeof passAccessToken;
@@ -49,7 +49,7 @@ const decodeMetadata = (metadata: Record<string, unknown>) => {
   );
 };
 
-export function decodePayload(
+export function decodeRawPayload(
   payload: Payload,
   returnDataOnly: boolean = true,
   // This could decode to any object. So we either use the payload object passed in or decode it
@@ -100,14 +100,14 @@ export const decodePayloadAttributes = <
   ) {
     const searchAttributes = eventAttribute.searchAttributes.indexedFields;
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodePayload(value, returnDataOnly);
+      searchAttributes[key] = decodeRawPayload(value, returnDataOnly);
     });
   } else if (has(eventAttribute, 'searchAttributes')) {
     // Decode Search Attributes on UpsertWorkflowSearchAttributes
     const searchAttributes = eventAttribute.searchAttributes;
 
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodePayload(value, returnDataOnly);
+      searchAttributes[key] = decodeRawPayload(value, returnDataOnly);
     });
   }
 
@@ -116,7 +116,7 @@ export const decodePayloadAttributes = <
     const memo = eventAttribute.memo.fields;
 
     Object.entries(memo).forEach(([key, value]) => {
-      memo[key] = decodePayload(value, returnDataOnly);
+      memo[key] = decodeRawPayload(value, returnDataOnly);
     });
   }
 
@@ -125,7 +125,7 @@ export const decodePayloadAttributes = <
     const header = eventAttribute.header.fields;
 
     Object.entries(header).forEach(([key, value]) => {
-      header[key] = decodePayload(value, returnDataOnly);
+      header[key] = decodeRawPayload(value, returnDataOnly);
     });
   }
 
@@ -135,14 +135,14 @@ export const decodePayloadAttributes = <
     const queryResult = eventAttribute?.queryResult;
 
     Object.entries(queryResult).forEach(([key, value]) => {
-      queryResult[key] = decodePayload(value, returnDataOnly);
+      queryResult[key] = decodeRawPayload(value, returnDataOnly);
     });
   }
 
   return eventAttribute;
 };
 
-const decodeReadablePayloads =
+const decodePayloadsWithCodec =
   (settings: Settings) =>
   async (
     payloads: unknown[],
@@ -150,24 +150,24 @@ const decodeReadablePayloads =
   ): Promise<unknown[]> => {
     if (getCodecEndpoint(settings)) {
       // Convert Payload data
-      const awaitData = await decodePayloadsWithCodec({
+      const awaitData = await callCodecEndpoint({
         payloads: { payloads },
         settings,
       });
       return (awaitData?.payloads ?? []).map((p) =>
-        decodePayload(p, returnDataOnly),
+        decodeRawPayload(p, returnDataOnly),
       );
     } else {
-      return payloads.map((p) => decodePayload(p, returnDataOnly));
+      return payloads.map((p) => decodeRawPayload(p, returnDataOnly));
     }
   };
 
-export const decodePayloads =
+export const applyCodecToPayloads =
   (settings: Settings) =>
   async (payloads: unknown[]): Promise<unknown[]> => {
     if (getCodecEndpoint(settings)) {
       // Convert Payload data
-      const awaitData = await decodePayloadsWithCodec({
+      const awaitData = await callCodecEndpoint({
         payloads: { payloads },
         settings,
       });
@@ -184,12 +184,12 @@ const keyIs = (key: string, ...validKeys: string[]) => {
   return false;
 };
 
-export const decodeSingleReadablePayloadWithCodec = async (
+export const decodeUserMetadataPayload = async (
   payload: RawPayload | Payload,
   settings: Settings = get(page).data.settings,
 ): Promise<string | Payload> => {
   try {
-    const decode = decodeReadablePayloads(settings);
+    const decode = decodePayloadsWithCodec(settings);
     const data = await decode([payload]);
     const result = data[0];
     return result || '';
@@ -198,7 +198,7 @@ export const decodeSingleReadablePayloadWithCodec = async (
   }
 };
 
-export const isSinglePayload = (payload: unknown): boolean => {
+export const isRawPayload = (payload: unknown): boolean => {
   if (!isObject(payload)) return false;
   const keys = Object.keys(payload);
   return (
@@ -206,7 +206,7 @@ export const isSinglePayload = (payload: unknown): boolean => {
   );
 };
 
-export const cloneAllPotentialPayloadsWithCodec = async (
+export const decodeEventAttributes = async (
   anyAttributes:
     | PotentiallyDecodable
     | EventAttribute
@@ -224,12 +224,12 @@ export const cloneAllPotentialPayloadsWithCodec = async (
 
   const decode =
     decodeSetting === 'readable'
-      ? decodeReadablePayloads(settings)
-      : decodePayloads(settings);
+      ? decodePayloadsWithCodec(settings)
+      : applyCodecToPayloads(settings);
   const clone = { ...anyAttributes };
   if (anyAttributes) {
     // Now that we can have single Payload that is not an array (Nexus)
-    if (isSinglePayload(clone)) {
+    if (isRawPayload(clone)) {
       const data = toArray(clone as Payload);
       const decoded = await decode(data, returnDataOnly);
       return decoded?.[0] || clone;
@@ -243,7 +243,7 @@ export const cloneAllPotentialPayloadsWithCodec = async (
       } else {
         const next = clone[key];
         if (isObject(next)) {
-          clone[key] = await cloneAllPotentialPayloadsWithCodec(
+          clone[key] = await decodeEventAttributes(
             next,
             namespace,
             settings,

@@ -9,7 +9,7 @@ import type {
 import type { Settings } from '$lib/types/global';
 import type { WorkflowExecution } from '$lib/types/workflows';
 import {
-  cloneAllPotentialPayloadsWithCodec,
+  decodeEventAttributes,
   type DecodeFunctions,
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
@@ -17,7 +17,7 @@ import {
 export async function getActivityAttributes(
   { activity, namespace, settings }: PendingActivityWithMetadata,
   {
-    convertWithCodec = cloneAllPotentialPayloadsWithCodec,
+    convertWithCodec = decodeEventAttributes,
     decodeAttributes = decodePayloadAttributes,
   }: DecodeFunctions = {},
 ): Promise<PendingActivity> {

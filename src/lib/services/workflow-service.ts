@@ -51,8 +51,8 @@ import type {
   WorkflowIdentifier,
 } from '$lib/types/workflows';
 import {
-  cloneAllPotentialPayloadsWithCodec,
-  decodeSingleReadablePayloadWithCodec,
+  decodeEventAttributes,
+  decodeUserMetadataPayload,
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
 import {
@@ -837,7 +837,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
     const firstEvent = await fetchInitialEvent(params);
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
-    const convertedAttributes = (await cloneAllPotentialPayloadsWithCodec(
+    const convertedAttributes = (await decodeEventAttributes(
       startEvent?.attributes?.input,
       namespace,
       get(page).data.settings,
@@ -847,9 +847,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     let summary = '';
     if (workflow.summary) {
-      const decodedSummary = await decodeSingleReadablePayloadWithCodec(
-        workflow.summary,
-      );
+      const decodedSummary = await decodeUserMetadataPayload(workflow.summary);
       if (typeof decodedSummary === 'string') {
         summary = decodedSummary;
       }
@@ -857,9 +855,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     let details = '';
     if (workflow.details) {
-      const decodedDetails = await decodeSingleReadablePayloadWithCodec(
-        workflow.details,
-      );
+      const decodedDetails = await decodeUserMetadataPayload(workflow.details);
       if (typeof decodedDetails === 'string') {
         details = decodedDetails;
       }

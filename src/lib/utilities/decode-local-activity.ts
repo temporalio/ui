@@ -3,7 +3,7 @@ import type { IterableEvent, Payload, WorkflowEvent } from '$lib/types/events';
 import type { Settings } from '$lib/types/global';
 
 import {
-  cloneAllPotentialPayloadsWithCodec,
+  decodeEventAttributes,
   decodePayloadAttributes,
 } from './decode-payload';
 import {
@@ -55,7 +55,7 @@ export const decodeLocalActivity = async (
   };
 
   try {
-    const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
+    const convertedAttributes = await decodeEventAttributes(
       event.attributes,
       namespace,
       codecSettings,

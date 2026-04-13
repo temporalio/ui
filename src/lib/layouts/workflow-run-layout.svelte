@@ -32,7 +32,7 @@
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
+  import { decodeUserMetadataPayload } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
@@ -53,7 +53,7 @@
     const userMetadata = { summary: '', details: '' };
     try {
       if (workflow?.summary) {
-        const decodedSummary = await decodeSingleReadablePayloadWithCodec(
+        const decodedSummary = await decodeUserMetadataPayload(
           workflow.summary,
         );
         if (typeof decodedSummary === 'string') {
@@ -61,7 +61,7 @@
         }
       }
       if (workflow?.details) {
-        const decodedDetails = await decodeSingleReadablePayloadWithCodec(
+        const decodedDetails = await decodeUserMetadataPayload(
           workflow.details,
         );
         if (typeof decodedDetails === 'string') {

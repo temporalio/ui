@@ -2,7 +2,7 @@
   import { page } from '$app/state';
 
   import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
-  import { decodePayload } from '$lib/utilities/decode-payload';
+  import { decodeRawPayload } from '$lib/utilities/decode-payload';
   import { isEmptyObject } from '$lib/utilities/is';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
@@ -27,7 +27,7 @@
     ).reduce((searchAttributes, [searchAttributeName, payload]) => {
       return {
         ...searchAttributes,
-        [searchAttributeName]: decodePayload(payload),
+        [searchAttributeName]: decodeRawPayload(payload),
       };
     }, {});
     return decoded;

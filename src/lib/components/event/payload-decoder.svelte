@@ -6,7 +6,7 @@
   import type { Memo } from '$lib/types';
   import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
   import {
-    cloneAllPotentialPayloadsWithCodec,
+    decodeEventAttributes,
     decodePayloadAttributes,
     type PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
@@ -46,7 +46,7 @@
       },
     };
     try {
-      const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
+      const convertedAttributes = await decodeEventAttributes(
         _value,
         $page.params.namespace,
         settings,

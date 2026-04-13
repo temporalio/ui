@@ -1,5 +1,5 @@
 import { fetchNexusEndpoint } from '$lib/services/nexus-service.js';
-import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload.js';
+import { decodeUserMetadataPayload } from '$lib/utilities/decode-payload.js';
 
 export const load = async ({ params, fetch, parent }) => {
   const { id } = params;
@@ -11,7 +11,7 @@ export const load = async ({ params, fetch, parent }) => {
     let description = '';
     try {
       if (endpoint?.spec?.description?.data) {
-        const decodedDescription = await decodeSingleReadablePayloadWithCodec(
+        const decodedDescription = await decodeUserMetadataPayload(
           endpoint.spec.description,
           data.settings,
         );
