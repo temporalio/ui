@@ -40,30 +40,32 @@
   const sortedRuns = $derived(sortRecentRuns(recentRuns));
 </script>
 
-{#each sortedRuns as run, i (`${run?.startWorkflowResult?.workflowId ?? i}:${run?.startWorkflowResult?.runId ?? i + 1}`)}
-  <div
-    class="my-1 inline-flex w-full items-center justify-between border-b border-subtle py-1"
-  >
-    <div class="w-28">
-      <WorkflowStatus
-        status={toWorkflowStatusReadable(run.startWorkflowStatus)}
-      />
+<div>
+  {#each sortedRuns as run, i (`${run?.startWorkflowResult?.workflowId ?? i}:${run?.startWorkflowResult?.runId ?? i + 1}`)}
+    <div
+      class="my-1 inline-flex w-full items-center justify-between border-b border-subtle py-1"
+    >
+      <div class="w-28">
+        <WorkflowStatus
+          status={toWorkflowStatusReadable(run.startWorkflowStatus)}
+        />
+      </div>
+      <div class="mx-2 w-auto break-words">
+        <Link
+          href={routeForWorkflow({
+            workflow: run.startWorkflowResult.workflowId,
+            run: run.startWorkflowResult.runId,
+            namespace,
+          })}
+        >
+          {run.startWorkflowResult.workflowId}
+        </Link>
+      </div>
+      <div class="ml-auto font-mono">
+        <Timestamp as="p" dateTime={run.actualTime} />
+      </div>
     </div>
-    <div class="mx-2 w-auto break-words">
-      <Link
-        href={routeForWorkflow({
-          workflow: run.startWorkflowResult.workflowId,
-          run: run.startWorkflowResult.runId,
-          namespace,
-        })}
-      >
-        {run.startWorkflowResult.workflowId}
-      </Link>
-    </div>
-    <div class="ml-auto font-mono">
-      <Timestamp as="p" dateTime={run.actualTime} />
-    </div>
-  </div>
-{:else}
-  <ScheduleNoRuns {triggerConfirmation} {backfillConfirmation} />
-{/each}
+  {:else}
+    <ScheduleNoRuns {triggerConfirmation} {backfillConfirmation} />
+  {/each}
+</div>
