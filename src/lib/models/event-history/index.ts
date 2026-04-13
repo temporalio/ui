@@ -7,7 +7,7 @@ import type {
   WorkflowEvents,
 } from '$lib/types/events';
 import {
-  convertPayloadToJsonWithCodec,
+  cloneAllPotentialPayloadsWithCodec,
   type DecodeFunctions,
   decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
@@ -29,16 +29,16 @@ import { simplifyAttributes } from './simplify-attributes';
 export async function getEventAttributes(
   { historyEvent, namespace, settings }: EventWithMetadata,
   {
-    convertWithCodec = convertPayloadToJsonWithCodec,
+    convertWithCodec = cloneAllPotentialPayloadsWithCodec,
     decodeAttributes = decodePayloadAttributes,
   }: DecodeFunctions = {},
 ): Promise<EventAttributesWithType<EventAttributeKey>> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  const convertedAttributes = await convertWithCodec({
+  const convertedAttributes = await convertWithCodec(
     attributes,
     namespace,
     settings,
-  });
+  );
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;
 

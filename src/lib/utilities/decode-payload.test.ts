@@ -4,8 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
 
 import {
-  convertPayloadToJsonWithCodec,
-  decodeAllPotentialPayloadsWithCodec,
+  cloneAllPotentialPayloadsWithCodec,
   decodePayload,
   decodePayloadAttributes,
 } from './decode-payload';
@@ -249,32 +248,28 @@ describe('decodePayloadAttributes', () => {
   });
 });
 
-describe('decode all potential payloads', () => {
+describe('cloneAllPotentialPayloadsWithCodec', () => {
   it('Should decode a payload with codec endpoint with encoding json/plain`', async () => {
-    const event = await decodeAllPotentialPayloadsWithCodec(
+    const event = await cloneAllPotentialPayloadsWithCodec(
       getTestPayloadEvent(),
       'default',
       {},
-      '',
     );
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual('a test attribute');
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
   });
   it('Should not decode a null payload with codec endpoint with encoding json/plain`', async () => {
-    const event = await decodeAllPotentialPayloadsWithCodec(
+    const event = await cloneAllPotentialPayloadsWithCodec(
       getTestPayloadEventWithNullEncodedAttributes(),
       'default',
       {},
-      '',
     );
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual(null);
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
   });
-});
 
-describe('convertPayloadToJsonWithCodec', () => {
   afterEach(() => {
     resetLastDataEncoderSuccess();
     vi.clearAllMocks();
@@ -287,15 +282,11 @@ describe('convertPayloadToJsonWithCodec', () => {
     });
 
     const endpoint = 'http://localhost:1337';
-    const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
+    const convertedPayload = await cloneAllPotentialPayloadsWithCodec(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      'default',
+      { codec: { endpoint } },
+    );
 
     const decodedPayload = decodePayloadAttributes(convertedPayload);
     expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
@@ -303,7 +294,6 @@ describe('convertPayloadToJsonWithCodec', () => {
     expect(dataConverterStatus).toEqual('success');
   });
   it('Should fail converting a payload through data-converter and set the error status when the endpoint is set and the endpoint fails', async () => {
-    // tslint:disable-next-line
     vi.stubGlobal('fetch', async () => {
       return {
         json: () => Promise.reject(),
@@ -311,15 +301,11 @@ describe('convertPayloadToJsonWithCodec', () => {
     });
 
     const endpoint = 'http://localhost:1337';
-    const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
+    const convertedPayload = await cloneAllPotentialPayloadsWithCodec(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      'default',
+      { codec: { endpoint } },
+    );
 
     const decodedPayload = decodePayloadAttributes(convertedPayload);
     expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
@@ -327,15 +313,11 @@ describe('convertPayloadToJsonWithCodec', () => {
     expect(dataConverterStatus).toEqual('error');
   });
   it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
-    const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint: '',
-        },
-      },
-    });
+    const convertedPayload = await cloneAllPotentialPayloadsWithCodec(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      'default',
+      { codec: { endpoint: '' } },
+    );
     const decodedPayload = decodePayloadAttributes(convertedPayload);
     expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
 
@@ -352,15 +334,11 @@ describe('convertPayloadToJsonWithCodec', () => {
     vi.stubGlobal('fetch', mockFetch);
 
     const endpoint = 'http://localhost:1337';
-    await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
+    await cloneAllPotentialPayloadsWithCodec(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      'default',
+      { codec: { endpoint } },
+    );
 
     expect(mockFetch).toBeCalledWith(
       expect.any(String),
@@ -377,16 +355,11 @@ describe('convertPayloadToJsonWithCodec', () => {
     vi.stubGlobal('fetch', mockFetch);
 
     const endpoint = 'http://localhost:1337';
-    await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-          includeCredentials: true,
-        },
-      },
-    });
+    await cloneAllPotentialPayloadsWithCodec(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      'default',
+      { codec: { endpoint, includeCredentials: true } },
+    );
 
     expect(mockFetch).toBeCalledWith(
       expect.any(String),

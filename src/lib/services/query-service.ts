@@ -3,7 +3,7 @@ import type { Payloads } from '$lib/types';
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
 import type { Eventual, Settings } from '$lib/types/global';
 import type { WorkflowMetadata } from '$lib/types/workflows';
-import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
+import { cloneAllPotentialPayloadsWithCodec } from '$lib/utilities/decode-payload';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { has } from '$lib/utilities/has';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -125,11 +125,11 @@ export async function getQuery(
     let data: ParsedQuery = queryResult.payloads;
     try {
       if (data[0]) {
-        const convertedAttributes = await convertPayloadToJsonWithCodec({
-          attributes: queryResult,
-          namespace: options.namespace,
+        const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
+          queryResult,
+          options.namespace,
           settings,
-        });
+        );
 
         if (
           has(convertedAttributes, 'payloads') &&

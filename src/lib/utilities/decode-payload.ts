@@ -9,18 +9,8 @@ import type {
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type {
-  Failure,
-  Memo,
-  Payloads,
-  Payload as RawPayload,
-} from '$lib/types';
-import type {
-  EventAttribute,
-  EventRequestMetadata,
-  Payload,
-  WorkflowEvent,
-} from '$lib/types/events';
+import type { Memo, Payloads, Payload as RawPayload } from '$lib/types';
+import type { EventAttribute, Payload, WorkflowEvent } from '$lib/types/events';
 import type { Optional, Replace, Settings } from '$lib/types/global';
 
 import { atob } from './atob';
@@ -33,14 +23,9 @@ export type PotentiallyDecodable =
   | Payloads
   | Record<string | number | symbol, unknown>;
 
-export type Decode = {
-  convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;
-  decodePayloadAttributes: typeof decodePayloadAttributes;
-};
-
 export type DecodeFunctions = {
-  convertWithCodec?: Decode['convertPayloadToJsonWithCodec'];
-  decodeAttributes?: Decode['decodePayloadAttributes'];
+  convertWithCodec?: typeof cloneAllPotentialPayloadsWithCodec;
+  decodeAttributes?: typeof decodePayloadAttributes;
   encoderEndpoint?: typeof codecEndpoint;
   codecPassAccessToken?: typeof passAccessToken;
   codecIncludeCredentials?: typeof includeCredentials;
@@ -213,37 +198,6 @@ export const decodeSingleReadablePayloadWithCodec = async (
   }
 };
 
-export const decodeAllPotentialPayloadsWithCodec = async (
-  anyAttributes: EventAttribute | PotentiallyDecodable | Failure,
-  namespace: string = get(page).params.namespace,
-  settings: Settings = get(page).data.settings,
-): Promise<EventAttribute | PotentiallyDecodable | Failure> => {
-  const decode = decodeReadablePayloads(settings);
-
-  if (anyAttributes) {
-    for (const key of Object.keys(anyAttributes)) {
-      if (keyIs(key, 'payloads', 'encodedAttributes') && anyAttributes[key]) {
-        const data = toArray(anyAttributes[key]);
-        const decoded = await decode(data);
-        anyAttributes[key] = keyIs(key, 'encodedAttributes')
-          ? decoded[0]
-          : decoded;
-      } else {
-        const next = anyAttributes[key];
-        if (isObject(next)) {
-          anyAttributes[key] = await decodeAllPotentialPayloadsWithCodec(
-            next,
-            namespace,
-            settings,
-          );
-        }
-      }
-    }
-  }
-
-  return anyAttributes;
-};
-
 export const isSinglePayload = (payload: unknown): boolean => {
   if (!isObject(payload)) return false;
   const keys = Object.keys(payload);
@@ -302,21 +256,4 @@ export const cloneAllPotentialPayloadsWithCodec = async (
   }
 
   return clone;
-};
-
-export const convertPayloadToJsonWithCodec = async ({
-  attributes,
-  namespace,
-  settings,
-}: {
-  attributes: EventAttribute | PotentiallyDecodable | Failure;
-} & EventRequestMetadata): Promise<
-  EventAttribute | PotentiallyDecodable | Failure
-> => {
-  const decodedAttributes = await decodeAllPotentialPayloadsWithCodec(
-    attributes,
-    namespace,
-    settings,
-  );
-  return decodedAttributes;
 };
