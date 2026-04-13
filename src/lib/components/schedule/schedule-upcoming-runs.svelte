@@ -1,16 +1,18 @@
 <script lang="ts">
   import Timestamp from '$lib/components/timestamp.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import { translate } from '$lib/i18n/translate';
+
+  import ScheduleNoRuns from './schedule-no-runs.svelte';
 
   import type { DescribeScheduleResponse } from '$types';
 
   type Props = {
     schedule: DescribeScheduleResponse;
+    triggerConfirmation: () => void;
+    backfillConfirmation: () => void;
   };
 
-  let { schedule }: Props = $props();
-  const futureRuns = $derived(schedule?.info?.futureActionTimes);
+  let { schedule, triggerConfirmation, backfillConfirmation }: Props = $props();
+  const futureRuns = $derived(schedule?.info?.futureActionTimes ?? []);
 </script>
 
 {#each futureRuns.slice(0, 5) as run}
@@ -20,5 +22,5 @@
     <Timestamp as="p" dateTime={run} />
   </div>
 {:else}
-  <EmptyState title={translate('schedules.upcoming-runs-empty-state-title')} />
+  <ScheduleNoRuns {triggerConfirmation} {backfillConfirmation} />
 {/each}

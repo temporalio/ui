@@ -413,7 +413,13 @@
       {/if}
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
-          <ScheduleWorkflowRuns {namespace} {schedule} {workflowQuery} />
+          <ScheduleWorkflowRuns
+            {namespace}
+            {schedule}
+            {workflowQuery}
+            triggerConfirmation={() => (triggerConfirmationModalOpen = true)}
+            backfillConfirmation={() => (backfillConfirmationModalOpen = true)}
+          />
           <ScheduleAdvancedSettings {schedule} />
           <ScheduleSearchAttributes {schedule} />
         </div>
