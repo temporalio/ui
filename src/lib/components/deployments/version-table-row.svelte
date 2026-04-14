@@ -228,9 +228,11 @@
   <td class="text-left">
     <DeploymentStatus {status} label={statusLabel} />
   </td>
-  <td class="text-left">
-    <ComputeBadge type={computeProviderType} />
-  </td>
+  <CapabilityGuard capability="serverlessWorkers">
+    <td class="text-left">
+      <ComputeBadge type={computeProviderType} />
+    </td>
+  </CapabilityGuard>
   <Timestamp
     as="td"
     class="whitespace-pre-line break-words text-left"

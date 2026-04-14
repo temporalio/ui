@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
   import DeploymentHeader from '$lib/components/deployments/deployment-header.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
@@ -28,14 +29,6 @@
   const effectiveDeploymentPromise = $derived(
     deploymentPromise ?? fetchDeployment({ namespace, deploymentName }),
   );
-
-  const columns = [
-    { label: translate('deployments.build-id') },
-    { label: translate('deployments.build-status') },
-    { label: translate('deployments.compute') },
-    { label: translate('deployments.deployed') },
-    { label: translate('deployments.actions') },
-  ];
 
   let showDeleteModal = $state(false);
   let deleteError = $state<string | undefined>();
@@ -80,9 +73,13 @@
         {translate('deployments.deployments')}
       </caption>
       <tr slot="headers">
-        {#each columns as { label } (label)}
-          <th>{label}</th>
-        {/each}
+        <th>{translate('deployments.build-id')}</th>
+        <th>{translate('deployments.build-status')}</th>
+        <CapabilityGuard capability="serverlessWorkers">
+          <th>{translate('deployments.compute')}</th>
+        </CapabilityGuard>
+        <th>{translate('deployments.deployed')}</th>
+        <th>{translate('deployments.actions')}</th>
       </tr>
       {#each visibleItems as version (version.version)}
         <VersionTableRow
