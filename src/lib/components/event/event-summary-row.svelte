@@ -280,8 +280,7 @@
       <Icon
         name={CategoryIcon[event.category].name}
         title={CategoryIcon[event.category].title}
-        class="mr-1 inline{isEventGroup(event) &&
-        (event.pendingActivity || event.pendingNexusOperation)
+        class="mr-1 inline {isEventGroup(event) && event.isPending
           ? ' animate-pulse'
           : ''}"
       />
