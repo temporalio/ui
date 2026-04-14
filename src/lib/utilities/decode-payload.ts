@@ -10,10 +10,10 @@ import type {
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import type {
+  Payload as ApiPayload,
   Failure,
   Memo,
   Payloads,
-  Payload as RawPayload,
 } from '$lib/types';
 import type {
   EventAttribute,
@@ -44,6 +44,51 @@ export type DecodeFunctions = {
   encoderEndpoint?: typeof codecEndpoint;
   codecPassAccessToken?: typeof passAccessToken;
   codecIncludeCredentials?: typeof includeCredentials;
+};
+
+/**
+ * Payload phase system — tagged types for tracking decode state.
+ *
+ * The pipeline flows:
+ *   ApiPayload (protobuf Uint8Array) -> Payload (JSON base64 strings) -> RawPayload -> ParsedPayload -> DecodedPayload
+ *
+ * RawPayload extends the events Payload type (which is the JSON-serialized
+ * form of ApiPayload) and adds `phase?: never` to prevent ParsedPayload
+ * from being passed to parsePayload() at compile time.
+ *
+ * parsePayload() converts Raw -> Parsed:
+ *   - atob() each metadata value
+ *   - atob() + parseWithBigInt() the data field
+ *   - Handles binary/null encoding -> null data
+ *   - On error: keeps last valid value, adds to errors
+ *
+ * Future: async decode (remote codec) converts Parsed -> Decoded.
+ *
+ * Future enhancement: replace string-based phase tags with branded
+ * types (e.g., `{ readonly __raw: unique symbol }`) for even stronger
+ * compile-time guarantees without runtime overhead.
+ */
+export type PayloadErrors = {
+  data?: string;
+  metadata?: string;
+};
+
+export type RawPayload = Payload & {
+  phase?: never;
+};
+
+export type ParsedPayload = {
+  metadata?: Record<string, string>;
+  data?: unknown;
+  phase: 'parsed';
+  errors?: PayloadErrors;
+};
+
+export type DecodedPayload = {
+  metadata?: Record<string, string>;
+  data?: unknown;
+  phase: 'decoded';
+  errors?: PayloadErrors;
 };
 
 const toArray = (payloads: Payload | Payload[]): Payload[] => {
@@ -97,6 +142,112 @@ export function decodePayload(
   }
 
   return payload;
+}
+
+function isRawPayload(obj: unknown): obj is RawPayload {
+  if (!isObject(obj)) return false;
+  if ('phase' in obj) return false;
+  const hasMetadata = has(obj, 'metadata');
+  const hasData = has(obj, 'data');
+  if (!hasMetadata && !hasData) return false;
+  if (hasMetadata && !isObject(obj.metadata) && obj.metadata != null)
+    return false;
+  if (hasData && typeof obj.data !== 'string' && obj.data != null) return false;
+  return true;
+}
+
+export function parsePayload(raw: RawPayload): ParsedPayload {
+  if (raw == null) {
+    return { data: null, phase: 'parsed' };
+  }
+
+  const errors: PayloadErrors = {};
+
+  let decodedMetadata: Record<string, string> | undefined;
+  if (raw.metadata != null) {
+    try {
+      decodedMetadata = Object.entries(raw.metadata).reduce(
+        (acc, [key, value]) => {
+          acc[key] = atob(String(value));
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+    } catch (e) {
+      errors.metadata = e instanceof Error ? e.message : String(e);
+      decodedMetadata = raw.metadata;
+    }
+  }
+
+  const encoding = decodedMetadata?.encoding;
+  if (encoding === 'binary/null') {
+    const result: ParsedPayload = {
+      metadata: decodedMetadata,
+      data: null,
+      phase: 'parsed',
+    };
+    if (Object.keys(errors).length) result.errors = errors;
+    return result;
+  }
+
+  let data: unknown = raw.data;
+  if (raw.data != null && raw.data !== '') {
+    try {
+      const atobResult = atob(String(raw.data));
+      data = atobResult;
+      try {
+        data = parseWithBigInt(atobResult);
+      } catch (e) {
+        errors.data = e instanceof Error ? e.message : String(e);
+      }
+    } catch (e) {
+      errors.data = e instanceof Error ? e.message : String(e);
+    }
+  } else {
+    data = null;
+  }
+
+  const result: ParsedPayload = {
+    metadata: decodedMetadata,
+    data,
+    phase: 'parsed',
+  };
+  if (Object.keys(errors).length) result.errors = errors;
+  return result;
+}
+
+export function parsePayloadAttributes<T>(obj: T): T {
+  if (obj == null || typeof obj !== 'object') return obj;
+
+  if (Array.isArray(obj)) {
+    for (let i = 0; i < obj.length; i++) {
+      const item = obj[i];
+      if (isRawPayload(item)) {
+        obj[i] = parsePayload(item);
+      } else if (typeof item === 'object' && item != null) {
+        parsePayloadAttributes(item);
+      }
+    }
+    return obj;
+  }
+
+  if (isRawPayload(obj)) {
+    return parsePayload(obj as RawPayload) as T;
+  }
+
+  const record = obj as Record<string, unknown>;
+  for (const key of Object.keys(record)) {
+    const value = record[key];
+    if (isRawPayload(value)) {
+      record[key] = parsePayload(value);
+    } else if (Array.isArray(value)) {
+      parsePayloadAttributes(value);
+    } else if (isObject(value)) {
+      parsePayloadAttributes(value);
+    }
+  }
+
+  return obj;
 }
 
 export const decodePayloadAttributes = <
@@ -200,7 +351,7 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 };
 
 export const decodeSingleReadablePayloadWithCodec = async (
-  payload: RawPayload | Payload,
+  payload: ApiPayload | Payload,
   settings: Settings = get(page).data.settings,
 ): Promise<string | Payload> => {
   try {
