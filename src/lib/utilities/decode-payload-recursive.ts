@@ -90,14 +90,14 @@ function decodeMetadataFields(
   const decoded: Record<string, string> = {};
   let error: string | undefined;
 
-  for (const key of Object.keys(metadata)) {
+  Object.entries(metadata).forEach(([key, value]) => {
     try {
-      decoded[key] = atob(String(metadata[key]));
+      decoded[key] = atob(String(value));
     } catch (e) {
       error = errorMessage(e);
-      decoded[key] = String(metadata[key]);
+      decoded[key] = String(value);
     }
-  }
+  });
 
   return [decoded, error];
 }
@@ -155,14 +155,13 @@ export function parsePayloadAttributes<T>(obj: T): T {
   if (obj == null || typeof obj !== 'object') return obj;
 
   if (Array.isArray(obj)) {
-    for (let i = 0; i < obj.length; i++) {
-      const item = obj[i];
+    obj.forEach((item, i) => {
       if (hasPayloadShape(item)) {
         obj[i] = parsePayload(item);
       } else if (isObject(item)) {
         parsePayloadAttributes(item);
       }
-    }
+    });
     return obj;
   }
 
@@ -171,8 +170,7 @@ export function parsePayloadAttributes<T>(obj: T): T {
   }
 
   const record = obj as Record<string, unknown>;
-  for (const key of Object.keys(record)) {
-    const value = record[key];
+  Object.entries(record).forEach(([key, value]) => {
     if (hasPayloadShape(value)) {
       record[key] = parsePayload(value);
     } else if (Array.isArray(value)) {
@@ -180,7 +178,7 @@ export function parsePayloadAttributes<T>(obj: T): T {
     } else if (isObject(value)) {
       parsePayloadAttributes(value);
     }
-  }
+  });
 
   return obj;
 }
