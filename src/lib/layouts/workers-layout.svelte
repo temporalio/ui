@@ -15,14 +15,26 @@
 
   interface Props {
     children: Snippet;
-    namespace: string;
     headerAction?: Snippet;
+    namespace?: string;
+    deploymentsHref?: string;
+    workersHref?: string;
   }
 
-  const { children, namespace, headerAction }: Props = $props();
+  const {
+    children,
+    namespace = '',
+    headerAction,
+    deploymentsHref: deploymentsHrefProp,
+    workersHref: workersHrefProp,
+  }: Props = $props();
 
-  const workersHref = $derived(routeForWorkers({ namespace }));
-  const deploymentsHref = $derived(routeForWorkerDeployments({ namespace }));
+  const workersHref = $derived(
+    workersHrefProp ?? routeForWorkers({ namespace }),
+  );
+  const deploymentsHref = $derived(
+    deploymentsHrefProp ?? routeForWorkerDeployments({ namespace }),
+  );
 </script>
 
 <header class="flex flex-col gap-2">
