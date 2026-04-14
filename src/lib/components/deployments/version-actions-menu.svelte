@@ -42,9 +42,11 @@
             {translate('deployments.edit')}
           </MenuItem>
         </CapabilityGuard>
-        <MenuItem onclick={onValidate}>
-          {translate('deployments.validate-connection')}
-        </MenuItem>
+        <CapabilityGuard capability="serverlessWorkers">
+          <MenuItem onclick={onValidate}>
+            {translate('deployments.validate-connection')}
+          </MenuItem>
+        </CapabilityGuard>
         <MenuItem href={workflowHref}>
           {translate('deployments.view-workflows')}
         </MenuItem>

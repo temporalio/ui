@@ -1,6 +1,7 @@
 <script lang="ts">
   import { invalidate } from '$app/navigation';
 
+  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -196,19 +197,23 @@
 <tr>
   <td class="text-left">
     <div class="flex items-center gap-1">
-      <button
-        type="button"
-        aria-label={expanded
-          ? translate('common.collapse')
-          : translate('common.expand')}
-        onclick={() => (expanded = !expanded)}
-        class="shrink-0"
-      >
-        <Icon
-          name="chevron-right"
-          class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
-        />
-      </button>
+      <CapabilityGuard capability="serverlessWorkers">
+        {#if computeProviderType}
+          <button
+            type="button"
+            aria-label={expanded
+              ? translate('common.collapse')
+              : translate('common.expand')}
+            onclick={() => (expanded = !expanded)}
+            class="shrink-0"
+          >
+            <Icon
+              name="chevron-right"
+              class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
+            />
+          </button>
+        {/if}
+      </CapabilityGuard>
       <Copyable
         content={versionBuildId}
         copyIconTitle={translate('common.copy-icon-title')}
