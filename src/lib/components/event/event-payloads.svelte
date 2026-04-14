@@ -7,6 +7,7 @@
     getStackTrace,
   } from '$lib/utilities/get-single-attribute-for-event';
 
+  import EventLlmMetadata from './event-llm-metadata.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,6 +24,7 @@
     {#if value?.payloads}
       <PayloadDecoder {value} key="payloads">
         {#snippet children(decodedValue)}
+          <EventLlmMetadata value={decodedValue} />
           <CodeBlock
             content={decodedValue}
             maxHeight={384}

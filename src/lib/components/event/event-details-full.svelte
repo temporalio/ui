@@ -65,8 +65,8 @@
   });
 
   const payloadKeyOrder = [
-    'input',
     'result',
+    'input',
     'lastFailure',
     'failure',
     'header',
