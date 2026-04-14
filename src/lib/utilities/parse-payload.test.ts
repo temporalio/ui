@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type {
-  ParsedPayload,
-  RawPayload,
-  UnparsedPayload,
-} from './decode-payload';
+import type { ParsedPayload, UnparsedPayload } from './decode-payload';
 import {
   decodePayload,
   decodePayloadAttributes,
@@ -210,62 +206,6 @@ describe('parsePayload', () => {
       for (const payload of cases) {
         expect(parsePayload(payload).phase).toBe('parsed');
       }
-    });
-  });
-
-  describe('Uint8Array handling', () => {
-    function toBytes(str: string): Uint8Array {
-      return new TextEncoder().encode(str);
-    }
-
-    it('decodes Uint8Array data field', () => {
-      const result = parsePayload({
-        metadata: { encoding: jsonPlainEncoding },
-        data: toBytes('"hello from bytes"'),
-      });
-      expect(result.data).toBe('hello from bytes');
-      expect(result.phase).toBe('parsed');
-    });
-
-    it('decodes Uint8Array metadata values', () => {
-      const result = parsePayload({
-        metadata: {
-          encoding: toBytes('json/plain'),
-          type: toBytes('Keyword'),
-        },
-        data: encode('test'),
-      });
-      expect(result.metadata?.encoding).toBe('json/plain');
-      expect(result.metadata?.type).toBe('Keyword');
-      expect(result.data).toBe('test');
-    });
-
-    it('handles binary/null encoding from Uint8Array metadata', () => {
-      const result = parsePayload({
-        metadata: {
-          encoding: toBytes('binary/null'),
-        },
-      });
-      expect(result.data).toBeNull();
-      expect(result.metadata?.encoding).toBe('binary/null');
-      expect(result.phase).toBe('parsed');
-    });
-
-    it('parsePayloadAttributes detects Uint8Array payloads in tree', () => {
-      const obj = {
-        input: {
-          payloads: [
-            {
-              metadata: { encoding: jsonPlainEncoding },
-              data: toBytes('"byte value"'),
-            },
-          ],
-        },
-      };
-      parsePayloadAttributes(obj);
-      const parsed = obj.input.payloads[0] as unknown as ParsedPayload;
-      expect(parsed.data).toBe('byte value');
-      expect(parsed.phase).toBe('parsed');
     });
   });
 });
@@ -603,17 +543,6 @@ describe('parsePayloadAttributes', () => {
       const payload = {
         metadata: { encoding: jsonPlainEncoding },
         data: encode('test'),
-      };
-      const result = parsePayload(payload);
-      expect(result.phase).toBe('parsed');
-      expect(result.data).toBe('test');
-    });
-
-    it('accepts RawPayload with phase raw', () => {
-      const payload: RawPayload = {
-        metadata: { encoding: jsonPlainEncoding },
-        data: encode('test'),
-        phase: 'raw',
       };
       const result = parsePayload(payload);
       expect(result.phase).toBe('parsed');

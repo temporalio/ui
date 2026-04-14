@@ -19,18 +19,15 @@ import type {
 import type { Optional, Replace, Settings } from '$lib/types/global';
 
 import { atob } from './atob';
-import type { UnparsedPayload } from './decode-payload-recursive';
 import { getCodecEndpoint } from './get-codec';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
 
 export type {
-  BytePayload,
   DecodedPayload,
   ParsedPayload,
   PayloadErrors,
-  RawPayload,
   UnparsedPayload,
 } from './decode-payload-recursive';
 export {
@@ -213,7 +210,7 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 };
 
 export const decodeSingleReadablePayloadWithCodec = async (
-  payload: UnparsedPayload | Payload,
+  payload: Payload,
   settings: Settings = get(page).data.settings,
 ): Promise<string | Payload> => {
   try {
