@@ -9,12 +9,7 @@ import type {
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type {
-  Payload as ApiPayload,
-  Failure,
-  Memo,
-  Payloads,
-} from '$lib/types';
+import type { Failure, Memo, Payloads } from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
@@ -24,10 +19,24 @@ import type {
 import type { Optional, Replace, Settings } from '$lib/types/global';
 
 import { atob } from './atob';
+import type { UnparsedPayload } from './decode-payload-recursive';
 import { getCodecEndpoint } from './get-codec';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
+
+export type {
+  BytePayload,
+  DecodedPayload,
+  ParsedPayload,
+  PayloadErrors,
+  RawPayload,
+  UnparsedPayload,
+} from './decode-payload-recursive';
+export {
+  parsePayload,
+  parsePayloadAttributes,
+} from './decode-payload-recursive';
 
 export type PotentiallyDecodable =
   | Payloads
@@ -44,51 +53,6 @@ export type DecodeFunctions = {
   encoderEndpoint?: typeof codecEndpoint;
   codecPassAccessToken?: typeof passAccessToken;
   codecIncludeCredentials?: typeof includeCredentials;
-};
-
-/**
- * Payload phase system — tagged types for tracking decode state.
- *
- * The pipeline flows:
- *   ApiPayload (protobuf Uint8Array) -> Payload (JSON base64 strings) -> RawPayload -> ParsedPayload -> DecodedPayload
- *
- * RawPayload extends the events Payload type (which is the JSON-serialized
- * form of ApiPayload) and adds `phase?: never` to prevent ParsedPayload
- * from being passed to parsePayload() at compile time.
- *
- * parsePayload() converts Raw -> Parsed:
- *   - atob() each metadata value
- *   - atob() + parseWithBigInt() the data field
- *   - Handles binary/null encoding -> null data
- *   - On error: keeps last valid value, adds to errors
- *
- * Future: async decode (remote codec) converts Parsed -> Decoded.
- *
- * Future enhancement: replace string-based phase tags with branded
- * types (e.g., `{ readonly __raw: unique symbol }`) for even stronger
- * compile-time guarantees without runtime overhead.
- */
-export type PayloadErrors = {
-  data?: string;
-  metadata?: string;
-};
-
-export type RawPayload = Payload & {
-  phase?: never;
-};
-
-export type ParsedPayload = {
-  metadata?: Record<string, string>;
-  data?: unknown;
-  phase: 'parsed';
-  errors?: PayloadErrors;
-};
-
-export type DecodedPayload = {
-  metadata?: Record<string, string>;
-  data?: unknown;
-  phase: 'decoded';
-  errors?: PayloadErrors;
 };
 
 const toArray = (payloads: Payload | Payload[]): Payload[] => {
@@ -121,7 +85,7 @@ export function decodePayload(
   try {
     const data = parseWithBigInt(atob(String(payload?.data ?? '')));
     if (returnDataOnly) return data;
-    const metadata = decodeMetadata(payload?.metadata);
+    const metadata = decodeMetadata(payload?.metadata ?? {});
     return {
       metadata,
       data,
@@ -134,7 +98,7 @@ export function decodePayload(
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
   if (encoding === 'binary/null') {
     if (returnDataOnly) return null;
-    const metadata = decodeMetadata(payload?.metadata);
+    const metadata = decodeMetadata(payload?.metadata ?? {});
     return {
       metadata,
       data: null,
@@ -142,112 +106,6 @@ export function decodePayload(
   }
 
   return payload;
-}
-
-function isRawPayload(obj: unknown): obj is RawPayload {
-  if (!isObject(obj)) return false;
-  if ('phase' in obj) return false;
-  const hasMetadata = has(obj, 'metadata');
-  const hasData = has(obj, 'data');
-  if (!hasMetadata && !hasData) return false;
-  if (hasMetadata && !isObject(obj.metadata) && obj.metadata != null)
-    return false;
-  if (hasData && typeof obj.data !== 'string' && obj.data != null) return false;
-  return true;
-}
-
-export function parsePayload(raw: RawPayload): ParsedPayload {
-  if (raw == null) {
-    return { data: null, phase: 'parsed' };
-  }
-
-  const errors: PayloadErrors = {};
-
-  let decodedMetadata: Record<string, string> | undefined;
-  if (raw.metadata != null) {
-    try {
-      decodedMetadata = Object.entries(raw.metadata).reduce(
-        (acc, [key, value]) => {
-          acc[key] = atob(String(value));
-          return acc;
-        },
-        {} as Record<string, string>,
-      );
-    } catch (e) {
-      errors.metadata = e instanceof Error ? e.message : String(e);
-      decodedMetadata = raw.metadata;
-    }
-  }
-
-  const encoding = decodedMetadata?.encoding;
-  if (encoding === 'binary/null') {
-    const result: ParsedPayload = {
-      metadata: decodedMetadata,
-      data: null,
-      phase: 'parsed',
-    };
-    if (Object.keys(errors).length) result.errors = errors;
-    return result;
-  }
-
-  let data: unknown = raw.data;
-  if (raw.data != null && raw.data !== '') {
-    try {
-      const atobResult = atob(String(raw.data));
-      data = atobResult;
-      try {
-        data = parseWithBigInt(atobResult);
-      } catch (e) {
-        errors.data = e instanceof Error ? e.message : String(e);
-      }
-    } catch (e) {
-      errors.data = e instanceof Error ? e.message : String(e);
-    }
-  } else {
-    data = null;
-  }
-
-  const result: ParsedPayload = {
-    metadata: decodedMetadata,
-    data,
-    phase: 'parsed',
-  };
-  if (Object.keys(errors).length) result.errors = errors;
-  return result;
-}
-
-export function parsePayloadAttributes<T>(obj: T): T {
-  if (obj == null || typeof obj !== 'object') return obj;
-
-  if (Array.isArray(obj)) {
-    for (let i = 0; i < obj.length; i++) {
-      const item = obj[i];
-      if (isRawPayload(item)) {
-        obj[i] = parsePayload(item);
-      } else if (typeof item === 'object' && item != null) {
-        parsePayloadAttributes(item);
-      }
-    }
-    return obj;
-  }
-
-  if (isRawPayload(obj)) {
-    return parsePayload(obj as RawPayload) as T;
-  }
-
-  const record = obj as Record<string, unknown>;
-  for (const key of Object.keys(record)) {
-    const value = record[key];
-    if (isRawPayload(value)) {
-      record[key] = parsePayload(value);
-    } else if (Array.isArray(value)) {
-      parsePayloadAttributes(value);
-    } else if (isObject(value)) {
-      parsePayloadAttributes(value);
-    }
-  }
-
-  return obj;
 }
 
 export const decodePayloadAttributes = <
@@ -264,44 +122,48 @@ export const decodePayloadAttributes = <
     has(eventAttribute, 'searchAttributes') &&
     has(eventAttribute.searchAttributes, 'indexedFields')
   ) {
-    const searchAttributes = eventAttribute.searchAttributes.indexedFields;
+    const searchAttributes = eventAttribute.searchAttributes
+      .indexedFields as Record<string, unknown>;
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodePayload(value, returnDataOnly);
+      searchAttributes[key] = decodePayload(value as Payload, returnDataOnly);
     });
   } else if (has(eventAttribute, 'searchAttributes')) {
     // Decode Search Attributes on UpsertWorkflowSearchAttributes
-    const searchAttributes = eventAttribute.searchAttributes;
+    const searchAttributes = eventAttribute.searchAttributes as Record<
+      string,
+      unknown
+    >;
 
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodePayload(value, returnDataOnly);
+      searchAttributes[key] = decodePayload(value as Payload, returnDataOnly);
     });
   }
 
   // Decode Memo
   if (has(eventAttribute, 'memo') && has(eventAttribute.memo, 'fields')) {
-    const memo = eventAttribute.memo.fields;
+    const memo = eventAttribute.memo.fields as Record<string, unknown>;
 
     Object.entries(memo).forEach(([key, value]) => {
-      memo[key] = decodePayload(value, returnDataOnly);
+      memo[key] = decodePayload(value as Payload, returnDataOnly);
     });
   }
 
   // Decode Header
   if (has(eventAttribute, 'header') && has(eventAttribute.header, 'fields')) {
-    const header = eventAttribute.header.fields;
+    const header = eventAttribute.header.fields as Record<string, unknown>;
 
     Object.entries(header).forEach(([key, value]) => {
-      header[key] = decodePayload(value, returnDataOnly);
+      header[key] = decodePayload(value as Payload, returnDataOnly);
     });
   }
 
   // Decode Query Result
   // This one is a best guess from the previous codebase and needs verified
   if (has(eventAttribute, 'queryResult')) {
-    const queryResult = eventAttribute?.queryResult;
+    const queryResult = eventAttribute?.queryResult as Record<string, unknown>;
 
     Object.entries(queryResult).forEach(([key, value]) => {
-      queryResult[key] = decodePayload(value, returnDataOnly);
+      queryResult[key] = decodePayload(value as Payload, returnDataOnly);
     });
   }
 
@@ -321,10 +183,10 @@ const decodeReadablePayloads =
         settings,
       });
       return (awaitData?.payloads ?? []).map((p) =>
-        decodePayload(p, returnDataOnly),
+        decodePayload(p as Payload, returnDataOnly),
       );
     } else {
-      return payloads.map((p) => decodePayload(p, returnDataOnly));
+      return payloads.map((p) => decodePayload(p as Payload, returnDataOnly));
     }
   };
 
@@ -351,7 +213,7 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 };
 
 export const decodeSingleReadablePayloadWithCodec = async (
-  payload: ApiPayload | Payload,
+  payload: UnparsedPayload | Payload,
   settings: Settings = get(page).data.settings,
 ): Promise<string | Payload> => {
   try {
@@ -372,17 +234,16 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   const decode = decodeReadablePayloads(settings);
 
   if (anyAttributes) {
-    for (const key of Object.keys(anyAttributes)) {
-      if (keyIs(key, 'payloads', 'encodedAttributes') && anyAttributes[key]) {
-        const data = toArray(anyAttributes[key]);
+    const attrs = anyAttributes as Record<string, unknown>;
+    for (const key of Object.keys(attrs)) {
+      if (keyIs(key, 'payloads', 'encodedAttributes') && attrs[key]) {
+        const data = toArray(attrs[key] as Payload);
         const decoded = await decode(data);
-        anyAttributes[key] = keyIs(key, 'encodedAttributes')
-          ? decoded[0]
-          : decoded;
+        attrs[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
       } else {
-        const next = anyAttributes[key];
+        const next = attrs[key];
         if (isObject(next)) {
-          anyAttributes[key] = await decodeAllPotentialPayloadsWithCodec(
+          attrs[key] = await decodeAllPotentialPayloadsWithCodec(
             next,
             namespace,
             settings,
@@ -432,15 +293,16 @@ export const cloneAllPotentialPayloadsWithCodec = async (
       return decoded?.[0] || clone;
     }
 
-    for (const key of Object.keys(clone)) {
-      if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
-        const data = toArray(clone[key]);
+    const record = clone as Record<string, unknown>;
+    for (const key of Object.keys(record)) {
+      if (keyIs(key, 'payloads', 'encodedAttributes') && record[key]) {
+        const data = toArray(record[key] as Payload);
         const decoded = await decode(data, returnDataOnly);
-        clone[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
+        record[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
       } else {
-        const next = clone[key];
+        const next = record[key];
         if (isObject(next)) {
-          clone[key] = await cloneAllPotentialPayloadsWithCodec(
+          record[key] = await cloneAllPotentialPayloadsWithCodec(
             next,
             namespace,
             settings,

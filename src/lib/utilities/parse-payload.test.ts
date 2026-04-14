@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import type { ParsedPayload, RawPayload } from './decode-payload';
+import type {
+  ParsedPayload,
+  RawPayload,
+  UnparsedPayload,
+} from './decode-payload';
 import {
   decodePayload,
   decodePayloadAttributes,
@@ -20,14 +24,18 @@ function encode(value: unknown): string {
   return btoa(JSON.stringify(value));
 }
 
+function unparsed(payload: Omit<UnparsedPayload, 'phase'>): UnparsedPayload {
+  return { ...payload };
+}
+
 describe('parsePayload', () => {
   describe('basic decoding', () => {
     it('decodes a json/plain payload with string data', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: jsonPlainEncoding },
         data: encode('test@test.com'),
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBe('test@test.com');
       expect(result.phase).toBe('parsed');
       expect(result.metadata?.encoding).toBe('json/plain');
@@ -35,24 +43,24 @@ describe('parsePayload', () => {
     });
 
     it('decodes a json/plain payload with object data', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: jsonPlainEncoding },
         data: encode({ test: 'detail' }),
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toEqual({ test: 'detail' });
       expect(result.phase).toBe('parsed');
     });
 
     it('decodes multiple metadata fields', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: {
           encoding: jsonPlainEncoding,
           type: keywordType,
         },
         data: encode('hello'),
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.metadata?.encoding).toBe('json/plain');
       expect(result.metadata?.type).toBe('Keyword');
       expect(result.data).toBe('hello');
@@ -60,22 +68,22 @@ describe('parsePayload', () => {
 
     it('preserves BigInt values in data', () => {
       const bigNumber = '9007199254740993';
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: jsonPlainEncoding },
         data: btoa(bigNumber),
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBe(BigInt(bigNumber));
     });
   });
 
   describe('binary/null handling', () => {
     it('returns null data for binary/null encoding', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: binaryNullEncoding },
         data: '',
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBeNull();
       expect(result.metadata?.encoding).toBe('binary/null');
       expect(result.phase).toBe('parsed');
@@ -83,10 +91,10 @@ describe('parsePayload', () => {
     });
 
     it('returns null data for binary/null with null data field', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: binaryNullEncoding },
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBeNull();
       expect(result.phase).toBe('parsed');
     });
@@ -95,42 +103,42 @@ describe('parsePayload', () => {
   describe('error handling', () => {
     it('keeps atob result in data when parseWithBigInt fails', () => {
       const notJson = btoa('not valid json {{{');
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: jsonPlainEncoding },
         data: notJson,
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBe('not valid json {{{');
       expect(result.errors?.data).toBeDefined();
       expect(result.phase).toBe('parsed');
     });
 
     it('keeps raw data string when atob fails', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: jsonPlainEncoding },
         data: '!!!not-base64!!!',
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.errors?.data).toBeDefined();
       expect(result.phase).toBe('parsed');
     });
 
     it('handles invalid base64 in metadata gracefully (atob returns original string)', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: '!!!not-base64!!!' },
         data: encode('test'),
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.metadata?.encoding).toBe('!!!not-base64!!!');
       expect(result.phase).toBe('parsed');
     });
 
     it('omits errors field when no errors occur', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: jsonPlainEncoding },
         data: encode('test'),
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.errors).toBeUndefined();
     });
   });
@@ -149,56 +157,115 @@ describe('parsePayload', () => {
     });
 
     it('handles payload with missing metadata', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         data: encode('test'),
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBe('test');
       expect(result.metadata).toBeUndefined();
       expect(result.phase).toBe('parsed');
     });
 
     it('handles payload with missing data', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: jsonPlainEncoding },
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBeNull();
       expect(result.metadata?.encoding).toBe('json/plain');
       expect(result.phase).toBe('parsed');
     });
 
     it('handles payload with empty data string', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: { encoding: jsonPlainEncoding },
         data: '',
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBeNull();
       expect(result.phase).toBe('parsed');
     });
 
     it('handles payload with empty metadata object', () => {
-      const raw: RawPayload = {
+      const payload = unparsed({
         metadata: {},
         data: encode('test'),
-      };
-      const result = parsePayload(raw);
+      });
+      const result = parsePayload(payload);
       expect(result.data).toBe('test');
       expect(result.metadata).toEqual({});
       expect(result.phase).toBe('parsed');
     });
 
     it('always returns phase: parsed', () => {
-      const cases: RawPayload[] = [
-        { metadata: { encoding: jsonPlainEncoding }, data: encode('a') },
-        { metadata: { encoding: binaryNullEncoding } },
-        { data: encode(42) },
-        {},
+      const cases: UnparsedPayload[] = [
+        unparsed({
+          metadata: { encoding: jsonPlainEncoding },
+          data: encode('a'),
+        }),
+        unparsed({ metadata: { encoding: binaryNullEncoding } }),
+        unparsed({ data: encode(42) }),
+        unparsed({}),
       ];
-      for (const raw of cases) {
-        expect(parsePayload(raw).phase).toBe('parsed');
+      for (const payload of cases) {
+        expect(parsePayload(payload).phase).toBe('parsed');
       }
+    });
+  });
+
+  describe('Uint8Array handling', () => {
+    function toBytes(str: string): Uint8Array {
+      return new TextEncoder().encode(str);
+    }
+
+    it('decodes Uint8Array data field', () => {
+      const result = parsePayload({
+        metadata: { encoding: jsonPlainEncoding },
+        data: toBytes('"hello from bytes"'),
+      });
+      expect(result.data).toBe('hello from bytes');
+      expect(result.phase).toBe('parsed');
+    });
+
+    it('decodes Uint8Array metadata values', () => {
+      const result = parsePayload({
+        metadata: {
+          encoding: toBytes('json/plain'),
+          type: toBytes('Keyword'),
+        },
+        data: encode('test'),
+      });
+      expect(result.metadata?.encoding).toBe('json/plain');
+      expect(result.metadata?.type).toBe('Keyword');
+      expect(result.data).toBe('test');
+    });
+
+    it('handles binary/null encoding from Uint8Array metadata', () => {
+      const result = parsePayload({
+        metadata: {
+          encoding: toBytes('binary/null'),
+        },
+      });
+      expect(result.data).toBeNull();
+      expect(result.metadata?.encoding).toBe('binary/null');
+      expect(result.phase).toBe('parsed');
+    });
+
+    it('parsePayloadAttributes detects Uint8Array payloads in tree', () => {
+      const obj = {
+        input: {
+          payloads: [
+            {
+              metadata: { encoding: jsonPlainEncoding },
+              data: toBytes('"byte value"'),
+            },
+          ],
+        },
+      };
+      parsePayloadAttributes(obj);
+      const parsed = obj.input.payloads[0] as unknown as ParsedPayload;
+      expect(parsed.data).toBe('byte value');
+      expect(parsed.phase).toBe('parsed');
     });
   });
 });
@@ -245,12 +312,12 @@ describe('parsePayloadAttributes', () => {
     });
 
     it('matches decodePayload data output for a single payload', () => {
-      const raw = {
+      const payload = {
         metadata: { encoding: jsonPlainEncoding, type: keywordType },
         data: encode('whadup@lolcats.com'),
       };
-      const legacyResult = decodePayload(raw, true);
-      const modernResult = parsePayload(raw as RawPayload);
+      const legacyResult = decodePayload(payload, true);
+      const modernResult = parsePayload(payload);
       expect(modernResult.data).toEqual(legacyResult);
     });
   });
@@ -493,14 +560,14 @@ describe('parsePayloadAttributes', () => {
           data: 'decoded value',
           phase: 'parsed',
         },
-        raw: {
+        untagged: {
           metadata: { encoding: jsonPlainEncoding },
           data: encode('new'),
         },
       };
       parsePayloadAttributes(obj);
       expect(obj.alreadyParsed.data).toBe('decoded value');
-      expect((obj.raw as unknown as ParsedPayload).data).toBe('new');
+      expect((obj.untagged as unknown as ParsedPayload).data).toBe('new');
     });
 
     it('does not treat objects with only data key as payloads if data is not a string', () => {
@@ -528,8 +595,29 @@ describe('parsePayloadAttributes', () => {
         data: 'test',
         phase: 'parsed',
       };
-      // @ts-expect-error ParsedPayload should not be assignable to RawPayload
+      // @ts-expect-error ParsedPayload should not be assignable to UnparsedPayload
       parsePayload(parsed);
+    });
+
+    it('accepts untagged Payload directly', () => {
+      const payload = {
+        metadata: { encoding: jsonPlainEncoding },
+        data: encode('test'),
+      };
+      const result = parsePayload(payload);
+      expect(result.phase).toBe('parsed');
+      expect(result.data).toBe('test');
+    });
+
+    it('accepts RawPayload with phase raw', () => {
+      const payload: RawPayload = {
+        metadata: { encoding: jsonPlainEncoding },
+        data: encode('test'),
+        phase: 'raw',
+      };
+      const result = parsePayload(payload);
+      expect(result.phase).toBe('parsed');
+      expect(result.data).toBe('test');
     });
   });
 });
