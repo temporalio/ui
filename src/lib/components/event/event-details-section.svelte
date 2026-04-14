@@ -2,12 +2,10 @@
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { EventLink as ELink } from '$lib/types';
-  import { type Payload } from '$lib/types';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import type { WorkflowEvent } from '$lib/types/events';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import {
@@ -15,6 +13,7 @@
     spaceBetweenCapitalLetters,
   } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import {
     displayLinkType,
     shouldDisplayAsTime,
@@ -30,16 +29,16 @@
 
   let {
     event,
+    group,
     attributes,
     detailFields,
     linkFields,
-    showHeader = false,
   }: {
     event: WorkflowEvent;
+    group?: EventGroup;
     attributes: CombinedAttributes;
     detailFields: [string, unknown][];
     linkFields: [string, unknown][];
-    showHeader?: boolean;
   } = $props();
 
   const { namespace, workflow, run } = $derived(page.params);
@@ -49,33 +48,48 @@
       ? translate('events.category.local-activity')
       : spaceBetweenCapitalLetters(event.name),
   );
+
+  const durationSinceLastEvent = $derived.by(() => {
+    if (!group) return '';
+    const eventIndex = group.eventList.findIndex((evt) => evt.id === event.id);
+    if (eventIndex === -1 || eventIndex === 0) return '';
+    const previousEvent = group.eventList[eventIndex - 1];
+    return formatDistanceAbbreviated({
+      start: event.eventTime,
+      end: previousEvent.eventTime,
+      includeMilliseconds: true,
+    });
+  });
 </script>
 
-{#if showHeader}
-  <div class="flex flex-wrap items-center justify-between gap-2">
-    <div class="flex items-center gap-2 text-base">
-      <Link
-        href={routeForEventHistoryEvent({
-          eventId: event.id,
-          run,
-          workflow,
-          namespace,
-        })}>{event.id}</Link
-      >
-      <p class="font-medium">
-        {displayName}
-      </p>
-    </div>
-    <Timestamp as="p" class="text-sm" dateTime={event.eventTime} />
+<div class="mb-2 flex w-full flex-wrap items-center justify-between gap-2">
+  <div class="flex items-center gap-2 text-base">
+    <Link
+      href={routeForEventHistoryEvent({
+        eventId: event.id,
+        run,
+        workflow,
+        namespace,
+      })}>{event.id}</Link
+    >
+    <p class="font-medium">
+      {displayName}
+    </p>
   </div>
-{/if}
+  <div class="flex flex-col items-end gap-0 font-mono text-sm leading-4">
+    <Timestamp as="p" dateTime={event.eventTime} />
+    {#if durationSinceLastEvent}
+      <p class="font-medium text-secondary">+{durationSinceLastEvent}</p>
+    {/if}
+  </div>
+</div>
 
 {#if event?.links?.length}
   {#each event.links as link}
     {@const href = getEventLinkHref(link)}
     {@const value = href.split('workflows/')?.[1] || href}
     <div class="flex items-start gap-4">
-      <p class="min-w-56 text-sm text-secondary/80">
+      <p class="min-w-56 text-sm font-medium text-secondary">
         {translate('nexus.link')}
       </p>
       <Copyable
@@ -90,7 +104,7 @@
       namespace: link.workflowEvent.namespace,
     })}
     <div class="flex items-start gap-4">
-      <p class="min-w-56 text-sm text-secondary/80">
+      <p class="min-w-56 text-sm font-medium text-secondary">
         {translate('nexus.link-namespace')}
       </p>
       <Copyable
@@ -108,7 +122,7 @@
 
 {#if event?.userMetadata?.summary}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">Summary</p>
+    <p class="min-w-56 text-sm font-medium text-secondary">Summary</p>
     <p class="whitespace-pre-line">
       <MetadataDecoder
         value={event.userMetadata.summary}
@@ -123,7 +137,7 @@
 
 {#each detailFields as [key, value] (key)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">
@@ -138,7 +152,7 @@
 
 {#each linkFields as [key, value] (key)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {format(key)}
     </p>
     <Copyable

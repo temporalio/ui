@@ -6,7 +6,6 @@
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
   import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -45,10 +44,10 @@
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class="surface-primary flex cursor-default flex-col gap-2 border-b border-subtle"
 >
-  <div class="flex flex-1 flex-col gap-4 xl:flex-row">
-    <div class="flex w-full flex-col gap-1 xl:w-1/2">
+  <div class="flex flex-1 flex-col xl:flex-row">
+    <div class="flex w-full flex-col gap-1 p-4 xl:w-1/2">
       {@render detail(translate('workflows.activity-id'), activity.activityId)}
       {#if activity.paused && activity.pauseInfo}
         {@render detail(
@@ -132,7 +131,7 @@
         </div>
       {/if}
     </div>
-    <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
+    <div class="flex w-full flex-col gap-1 p-4 md:flex-1 xl:w-1/2">
       {#if failed}
         {#if totalPending > 20}
           {@render failuresAccordion()}
@@ -149,7 +148,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {label}
     </p>
     <p class="w-full whitespace-pre-line">
@@ -164,7 +163,7 @@
 
 {#snippet heartbeat()}
   <div>
-    <p class="text-sm text-secondary/80">
+    <p class="text-sm font-medium text-secondary">
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
@@ -186,7 +185,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if activity.lastFailure}
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm font-medium text-secondary">
           {translate('workflows.last-failure')}
         </p>
         {#key activity.attempt}
@@ -207,7 +206,7 @@
     </div>
     {#if activity.lastFailure?.stackTrace}
       <div>
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm font-medium text-secondary">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock
@@ -237,7 +236,7 @@
 
 {#snippet nextRetry(timeDifference)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">

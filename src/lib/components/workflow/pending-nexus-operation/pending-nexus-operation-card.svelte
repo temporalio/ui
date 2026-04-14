@@ -89,7 +89,7 @@
       {/if}
       {#if operation.blockedReason}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="text-sm font-medium text-secondary">
             {translate('nexus.blocked-reason')}
           </p>
           <CodeBlock
@@ -102,7 +102,7 @@
       {/if}
       {#if Object.keys(operation.cancellationInfo ?? {}).length > 0}
         <div class="flex flex-1 flex-col">
-          <p class="text-sm text-secondary/80">
+          <p class="text-sm font-medium text-secondary">
             {translate('nexus.cancellation-info')}
           </p>
           <CodeBlock
@@ -119,7 +119,7 @@
 
 {#snippet nextRetry(timeDifference)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
@@ -131,7 +131,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {label}
     </p>
     <p class="w-full whitespace-pre-line">
@@ -155,7 +155,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if operation.lastAttemptFailure}
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm font-medium text-secondary">
           {translate('workflows.last-failure')}
         </p>
         <CodeBlock
@@ -170,7 +170,7 @@
     </div>
     <div class="flex flex-1 flex-col">
       {#if operation.lastAttemptFailure?.stackTrace}
-        <p class="text-sm text-secondary/80">
+        <p class="text-sm font-medium text-secondary">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock

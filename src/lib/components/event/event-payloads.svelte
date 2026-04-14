@@ -17,7 +17,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
-    <p class="mb-1 min-w-56 text-sm text-secondary/80">
+    <p class="mb-1 min-w-56 text-sm font-medium text-secondary">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -60,7 +60,7 @@
   </div>
   {#if stackTrace}
     <div>
-      <p class="mb-1 min-w-56 text-sm text-secondary/80">
+      <p class="mb-1 min-w-56 text-sm font-medium text-secondary">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock

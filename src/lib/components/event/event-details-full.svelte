@@ -89,7 +89,9 @@
 </script>
 
 {#if showEventGroup}
-  <div class="flex flex-col overflow-hidden">
+  <div
+    class="surface-primary flex flex-col overflow-hidden border-t border-subtle"
+  >
     {#if group?.pendingActivity}
       <PendingActivityCard activity={group.pendingActivity} />
     {:else if group?.pendingNexusOperation}
@@ -97,10 +99,8 @@
     {/if}
 
     {#if hasAnyPayloads}
-      <div
-        class="surface-primary flex flex-col border-b border-subtle xl:flex-row"
-      >
-        <div class="flex w-full flex-col xl:w-1/2 xl:border-l xl:border-subtle">
+      <div class="flex flex-col border-b border-subtle xl:flex-row">
+        <div class="flex w-full flex-col xl:w-1/2">
           {#each processedEvents as processed, i (processed.event.id)}
             <div
               class="p-4 {i < processedEvents.length - 1
@@ -110,10 +110,10 @@
               <div class="flex flex-col gap-1">
                 <EventDetailsSection
                   event={processed.event}
+                  {group}
                   attributes={processed.attributes}
                   detailFields={processed.detailFields}
                   linkFields={processed.linkFields}
-                  showHeader={true}
                 />
               </div>
             </div>
@@ -125,14 +125,14 @@
       </div>
     {:else}
       {#each processedEvents as processed (processed.event.id)}
-        <div class="surface-primary border-b border-subtle p-4">
+        <div class="border-b border-subtle p-4">
           <div class="flex flex-col gap-1">
             <EventDetailsSection
               event={processed.event}
+              {group}
               attributes={processed.attributes}
               detailFields={processed.detailFields}
               linkFields={processed.linkFields}
-              showHeader={true}
             />
           </div>
         </div>
