@@ -7,7 +7,7 @@
   import {
     routeForNexusEndpoint,
     routeForTaskQueue,
-    routeForTimeline,
+    routeForWorkflow,
   } from '$lib/utilities/route-for';
 
   export let value: string;
@@ -24,11 +24,11 @@
     linkType: EventLinkType,
   ): string {
     if (linkType === 'execution') {
-      return routeForTimeline({ namespace: ns, workflow: wf, run: val });
+      return routeForWorkflow({ namespace: ns, workflow: wf, run: val });
     } else if (linkType === 'task-queue') {
       return routeForTaskQueue({ namespace: ns, queue: val });
     } else if (linkType === 'child-workflow') {
-      return routeForTimeline({
+      return routeForWorkflow({
         namespace: ns,
         workflow: attrs.workflowExecutionWorkflowId,
         run: attrs.workflowExecutionRunId,

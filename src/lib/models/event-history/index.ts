@@ -87,6 +87,8 @@ export const toEvent = (
 
   const completionLinks = completionCallbacks || attachedCompletionCallbacks;
   const links = historyEvent?.links || completionLinks || [];
+  const principal = historyEvent?.principal;
+
   const event = {
     ...historyEvent,
     name: eventType,
@@ -96,6 +98,7 @@ export const toEvent = (
     classification,
     category,
     links,
+    principal,
     billableActions: 0,
     attributes: simplifyAttributes({ type: key, ...attributes }),
   };

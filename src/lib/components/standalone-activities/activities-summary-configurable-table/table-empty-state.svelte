@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import NoWorkflows from '$lib/components/workflow/workflows-summary-configurable-table/empty-states/no-workflows.svelte';
+  import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import { translate } from '$lib/i18n/translate';
   import { activityError } from '$lib/stores/activities';
@@ -30,7 +30,7 @@
           {translate('standalone-activities.empty-state-description')}
         {/if}
       </p>
-      <NoWorkflows class="m-auto mt-8 text-subtle" />
+      <NoQueryResults class="m-auto mt-8 text-subtle" />
     </div>
   </div>
 {:else}

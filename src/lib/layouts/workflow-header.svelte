@@ -8,8 +8,7 @@
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import WorkflowCallStackError from '$lib/components/workflow/workflow-call-stack-error.svelte';
-  import WorkflowCommonErrors from '$lib/components/workflow/workflow-common-errors.svelte';
+  import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -22,7 +21,7 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getInboundNexusLinkEvents } from '$lib/runes/inbound-nexus-links.svelte';
-  import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
+  import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -43,11 +42,12 @@
     routeForRelationships,
     routeForTimeline,
     routeForUserMetadata,
-    routeForWorkers,
+    routeForWorkflow,
     routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
     routeForWorkflowSearchAttributes,
+    routeForWorkflowWorkers,
   } from '$lib/utilities/route-for';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
@@ -57,9 +57,10 @@
     run: runId,
     id: eventId,
   } = $derived(page.params);
+
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
 
-  const { workflow, workers } = $derived($workflowRun);
+  const { workflow } = $derived($workflowRun);
   const routeParameters = $derived({
     namespace,
     workflow: workflowId,
@@ -117,7 +118,7 @@
     </Link>
     {#if eventId}
       <Link
-        href={routeForTimeline({
+        href={routeForWorkflow({
           ...routeParameters,
         })}
         data-testid="back-to-workflow-execution"
@@ -180,7 +181,6 @@
   </div>
   <CodecServerErrorBanner />
   <WorkflowDetails {workflow} next={workflowRelationships.next} />
-  <WorkflowCallStackError />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
@@ -233,7 +233,7 @@
         class="max-w-screen-lg xl:w-2/3"
       >
         You can find the resulting Workflow Execution <Link
-          href={routeForTimeline({
+          href={routeForWorkflow({
             namespace,
             workflow: workflowId,
             run: resetRunId,
@@ -245,6 +245,7 @@
   {#if headerSnippet}
     {@render headerSnippet()}
   {/if}
+  <NoWorkersPollingAlert />
   <Tabs>
     <TabList label="workflow detail">
       <Tab
@@ -258,6 +259,7 @@
           page.url.pathname,
           routeForTimeline(routeParameters),
         )}
+        onClick={() => ($workflowViewPreference = 'timeline')}
       />
       <Tab
         label={translate('workflows.history-tab')}
@@ -266,6 +268,7 @@
           ...routeParameters,
           queryParams: sharedFilterParams,
         })}
+        onClick={() => ($workflowViewPreference = 'history')}
         active={pathMatches(
           page.url.pathname,
           routeForEventHistory({
@@ -274,7 +277,7 @@
         )}
       >
         <Badge type="primary" class="px-2 py-0">
-          {workflow.historyEvents}
+          {workflow?.historyEvents}
         </Badge>
       </Tab>
       <Tab
@@ -308,18 +311,13 @@
       <Tab
         label={translate('workflows.workers-tab')}
         id="workers-tab"
-        href={routeForWorkers(routeParameters)}
+        href={routeForWorkflowWorkers(routeParameters)}
         active={pathMatches(
           page.url.pathname,
-          routeForWorkers(routeParameters),
+          routeForWorkflowWorkers(routeParameters),
         )}
       >
-        <Badge type="primary" class="px-2 py-0">
-          {getWorkflowPollersWithVersions(
-            workflow.searchAttributes.indexedFields,
-            workers,
-          )?.pollers?.length || 0}
-        </Badge>
+        <!-- TODO: Add Badge with workers count when there is a WorkersCount API available -->
       </Tab>
       <Tab
         label={translate('workflows.pending-activities-tab')}

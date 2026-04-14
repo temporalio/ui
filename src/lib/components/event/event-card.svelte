@@ -22,20 +22,29 @@
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  import { routeForNamespace } from '$lib/utilities/route-for';
+  import {
+    routeForEventHistoryEvent,
+    routeForNamespace,
+  } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
   import MetadataDecoder from './metadata-decoder.svelte';
   import PayloadDecoder from './payload-decoder.svelte';
 
   let { event }: { event: WorkflowEvent } = $props();
+  const { namespace, workflow, run } = $derived(page.params);
 
   const displayName = $derived(
     isLocalActivityMarkerEvent(event)
       ? translate('events.category.local-activity')
       : spaceBetweenCapitalLetters(event.name),
   );
-  const attributes = $derived(formatAttributes(event));
+  const attributes = $derived.by(() => {
+    const attrs = formatAttributes(event);
+    if (event?.principal?.name) attrs.principalName = event.principal.name;
+    if (event?.principal?.type) attrs.principalType = event.principal.type;
+    return attrs;
+  });
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
     fields.filter(
@@ -73,7 +82,14 @@
 >
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center gap-2 text-base">
-      <p class="font-mono">{event.id}</p>
+      <Link
+        href={routeForEventHistoryEvent({
+          eventId: event.id,
+          run,
+          workflow,
+          namespace,
+        })}>{event.id}</Link
+      >
       <p class="font-medium">
         {displayName}
       </p>
