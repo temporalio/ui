@@ -297,7 +297,7 @@
     @apply relative h-8 whitespace-nowrap;
 
     &.filterable {
-      @apply pr-24;
+      @apply pr-16;
     }
   }
 </style>
