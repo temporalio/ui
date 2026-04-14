@@ -1,20 +1,10 @@
-import { get } from 'svelte/store';
-
-import { page } from '$app/stores';
-
 import { decodePayloadsWithCodec as callCodecEndpoint } from '$lib/services/data-encoder';
-import type {
-  codecEndpoint,
-  includeCredentials,
-  passAccessToken,
-} from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import type { Memo, Payloads, Payload as RawPayload } from '$lib/types';
 import type { EventAttribute, Payload, WorkflowEvent } from '$lib/types/events';
-import type { Optional, Replace, Settings } from '$lib/types/global';
+import type { Optional, Replace } from '$lib/types/global';
 
 import { atob } from './atob';
-import { getCodecEndpoint } from './get-codec';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -26,9 +16,6 @@ export type PotentiallyDecodable =
 export type DecodeFunctions = {
   convertWithCodec?: typeof decodeEventAttributes;
   decodeAttributes?: typeof decodePayloadAttributes;
-  encoderEndpoint?: typeof codecEndpoint;
-  codecPassAccessToken?: typeof passAccessToken;
-  codecIncludeCredentials?: typeof includeCredentials;
 };
 
 const toArray = (payloads: Payload | Payload[]): Payload[] => {
@@ -137,40 +124,22 @@ export const decodePayloadAttributes = <
   return eventAttribute;
 };
 
-const decodePayloadsWithCodec =
-  (settings: Settings) =>
-  async (
-    payloads: unknown[],
-    returnDataOnly: boolean = true,
-  ): Promise<unknown[]> => {
-    if (getCodecEndpoint(settings)) {
-      // Convert Payload data
-      const awaitData = await callCodecEndpoint({
-        payloads: { payloads },
-        settings,
-      });
-      return (awaitData?.payloads ?? []).map((p) =>
-        decodeRawPayload(p, returnDataOnly),
-      );
-    } else {
-      return payloads.map((p) => decodeRawPayload(p, returnDataOnly));
-    }
-  };
+const decodePayloadsWithCodec = async (
+  payloads: unknown[],
+  returnDataOnly: boolean = true,
+): Promise<unknown[]> => {
+  const awaitData = await callCodecEndpoint({ payloads: { payloads } });
+  return (awaitData?.payloads ?? []).map((p) =>
+    decodeRawPayload(p, returnDataOnly),
+  );
+};
 
-export const applyCodecToPayloads =
-  (settings: Settings) =>
-  async (payloads: unknown[]): Promise<unknown[]> => {
-    if (getCodecEndpoint(settings)) {
-      // Convert Payload data
-      const awaitData = await callCodecEndpoint({
-        payloads: { payloads },
-        settings,
-      });
-      return awaitData?.payloads ?? [];
-    } else {
-      return payloads;
-    }
-  };
+export const applyCodecToPayloads = async (
+  payloads: unknown[],
+): Promise<unknown[]> => {
+  const awaitData = await callCodecEndpoint({ payloads: { payloads } });
+  return awaitData?.payloads ?? [];
+};
 
 const keyIs = (key: string, ...validKeys: string[]) => {
   for (const validKey of validKeys) {
@@ -181,11 +150,9 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 
 export const decodeUserMetadataPayload = async (
   payload: RawPayload | Payload,
-  settings: Settings = get(page).data.settings,
 ): Promise<string | Payload> => {
   try {
-    const decode = decodePayloadsWithCodec(settings);
-    const data = await decode([payload]);
+    const data = await decodePayloadsWithCodec([payload]);
     const result = data[0];
     return result || '';
   } catch {
@@ -208,7 +175,6 @@ const decodeEventAttributesInternal = async (
     | WorkflowEvent
     | Memo
     | null,
-  settings: Settings,
   decodeSetting: DownloadEventHistorySetting,
   returnDataOnly: boolean,
 ): Promise<
@@ -218,8 +184,8 @@ const decodeEventAttributesInternal = async (
 
   const decode =
     decodeSetting === 'readable'
-      ? decodePayloadsWithCodec(settings)
-      : applyCodecToPayloads(settings);
+      ? decodePayloadsWithCodec
+      : applyCodecToPayloads;
   const clone = { ...anyAttributes };
   if (anyAttributes) {
     // Now that we can have single Payload that is not an array (Nexus)
@@ -239,7 +205,6 @@ const decodeEventAttributesInternal = async (
         if (isObject(next)) {
           clone[key] = await decodeEventAttributesInternal(
             next,
-            settings,
             decodeSetting,
             returnDataOnly,
           );
@@ -258,12 +223,10 @@ export const decodeEventAttributes = (
     | WorkflowEvent
     | Memo
     | null,
-  settings: Settings,
   decodeSetting: DownloadEventHistorySetting = 'readable',
 ): Promise<
   PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
-> =>
-  decodeEventAttributesInternal(anyAttributes, settings, decodeSetting, true);
+> => decodeEventAttributesInternal(anyAttributes, decodeSetting, true);
 
 export const decodeEventAttributesForExport = (
   anyAttributes:
@@ -272,9 +235,7 @@ export const decodeEventAttributesForExport = (
     | WorkflowEvent
     | Memo
     | null,
-  settings: Settings,
   decodeSetting: DownloadEventHistorySetting = 'readable',
 ): Promise<
   PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
-> =>
-  decodeEventAttributesInternal(anyAttributes, settings, decodeSetting, false);
+> => decodeEventAttributesInternal(anyAttributes, decodeSetting, false);

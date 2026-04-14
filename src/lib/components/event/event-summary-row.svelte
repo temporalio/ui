@@ -183,18 +183,12 @@
 
   onMount(async () => {
     if (isLocalActivityMarkerEvent(event)) {
-      primaryLocalAttribute = await decodeLocalActivity(event, {
-        namespace: page.params.namespace,
-        settings: page.data.settings,
-      });
+      primaryLocalAttribute = await decodeLocalActivity(event);
     } else if (
       isEventGroup(event) &&
       isLocalActivityMarkerEvent(event.initialEvent)
     ) {
-      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent, {
-        namespace: page.params.namespace,
-        settings: page.data.settings,
-      });
+      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent);
     }
   });
 </script>

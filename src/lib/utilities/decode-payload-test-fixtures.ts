@@ -79,7 +79,7 @@ export const dataConvertedWorkflowStartedEvent = {
   cronSchedule: '',
   firstWorkflowTaskBackoff: '0s',
   memo: null,
-  searchAttributes: { indexedFields: { CandidateEmail: 'whadup@lolcats.com' } },
+  searchAttributes: { indexedFields: { CandidateEmail: 'test@test.com' } },
   prevAutoResetPoints: null,
   header: {
     fields: {

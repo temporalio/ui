@@ -114,7 +114,6 @@
             runId,
           },
         },
-        settings,
         workflowRunController.signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;

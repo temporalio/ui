@@ -21,6 +21,7 @@ import { getEventAttributes } from '../../lib/models/event-history';
 import { resetLastDataConverterSuccess } from '../stores/data-converter-config';
 import {
   codecEndpoint,
+  includeCredentials,
   lastDataEncoderStatus,
   resetLastDataEncoderSuccess,
 } from '../stores/data-encoder-config';
@@ -255,8 +256,15 @@ describe('decodePayloadAttributes', () => {
 });
 
 describe('decodeEventAttributes', () => {
+  afterEach(() => {
+    resetLastDataEncoderSuccess();
+    codecEndpoint.set(null);
+    includeCredentials.set(false);
+    vi.clearAllMocks();
+  });
+
   it('Should decode a payload with codec endpoint with encoding json/plain`', async () => {
-    const event = await decodeEventAttributes(getTestPayloadEvent(), {});
+    const event = await decodeEventAttributes(getTestPayloadEvent());
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual('a test attribute');
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
@@ -264,17 +272,12 @@ describe('decodeEventAttributes', () => {
   it('Should not decode a null payload with codec endpoint with encoding json/plain`', async () => {
     const event = await decodeEventAttributes(
       getTestPayloadEventWithNullEncodedAttributes(),
-      {},
     );
     expect(event.input).toEqual({ payloads: ['test@test.com'] });
     expect(event.encodedAttributes).toEqual(null);
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
   });
 
-  afterEach(() => {
-    resetLastDataEncoderSuccess();
-    vi.clearAllMocks();
-  });
   it('Should convert a payload through data-converter and set the success status when the endpoint is set and the endpoint connects', async () => {
     vi.stubGlobal('fetch', async () => {
       return {
@@ -282,10 +285,9 @@ describe('decodeEventAttributes', () => {
       };
     });
 
-    const endpoint = 'http://localhost:1337';
+    codecEndpoint.set('http://localhost:1337');
     const convertedPayload = await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      { codec: { endpoint } },
     );
 
     const decodedPayload = decodePayloadAttributes(convertedPayload);
@@ -300,10 +302,9 @@ describe('decodeEventAttributes', () => {
       };
     });
 
-    const endpoint = 'http://localhost:1337';
+    codecEndpoint.set('http://localhost:1337');
     const convertedPayload = await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      { codec: { endpoint } },
     );
 
     const decodedPayload = decodePayloadAttributes(convertedPayload);
@@ -314,7 +315,6 @@ describe('decodeEventAttributes', () => {
   it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
     const convertedPayload = await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      { codec: { endpoint: '' } },
     );
     const decodedPayload = decodePayloadAttributes(convertedPayload);
     expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
@@ -331,10 +331,9 @@ describe('decodeEventAttributes', () => {
 
     vi.stubGlobal('fetch', mockFetch);
 
-    const endpoint = 'http://localhost:1337';
+    codecEndpoint.set('http://localhost:1337');
     await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      { codec: { endpoint } },
     );
 
     expect(mockFetch).toBeCalledWith(
@@ -351,10 +350,10 @@ describe('decodeEventAttributes', () => {
 
     vi.stubGlobal('fetch', mockFetch);
 
-    const endpoint = 'http://localhost:1337';
+    codecEndpoint.set('http://localhost:1337');
+    includeCredentials.set(true);
     await decodeEventAttributes(
       parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      { codec: { endpoint, includeCredentials: true } },
     );
 
     expect(mockFetch).toBeCalledWith(
@@ -369,6 +368,7 @@ describe('getEventAttributes', () => {
   afterEach(() => {
     resetLastDataEncoderSuccess();
     resetLastDataConverterSuccess();
+    codecEndpoint.set(null);
   });
   it('Should convert a payload through data-converter and set the success status when the endpoint is set locally and the endpoint connects', async () => {
     vi.stubGlobal('fetch', async () => {
@@ -377,20 +377,11 @@ describe('getEventAttributes', () => {
       };
     });
 
-    const endpoint = 'http://localhost:1337';
-    codecEndpoint.set(endpoint);
+    codecEndpoint.set('http://localhost:1337');
 
-    const decodedPayload = await getEventAttributes({
-      historyEvent: parseWithBigInt(
-        stringifyWithBigInt(workflowStartedHistoryEvent),
-      ),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint: '',
-        },
-      },
-    });
+    const decodedPayload = await getEventAttributes(
+      parseWithBigInt(stringifyWithBigInt(workflowStartedHistoryEvent)),
+    );
 
     expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
     const dataConverterStatus = get(lastDataEncoderStatus);

@@ -13,7 +13,6 @@ export const load = async ({ params, fetch, parent }) => {
       if (endpoint?.spec?.description?.data) {
         const decodedDescription = await decodeUserMetadataPayload(
           endpoint.spec.description,
-          data.settings,
         );
 
         if (typeof decodedDescription === 'string') {

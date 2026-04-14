@@ -1,7 +1,6 @@
 import type {
   EventAttributeKey,
   EventAttributesWithType,
-  EventWithMetadata,
   HistoryEvent,
   WorkflowEvent,
   WorkflowEvents,
@@ -27,14 +26,14 @@ import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
 
 export async function getEventAttributes(
-  { historyEvent, namespace, settings }: EventWithMetadata,
+  historyEvent: HistoryEvent,
   {
     convertWithCodec = decodeEventAttributes,
     decodeAttributes = decodePayloadAttributes,
   }: DecodeFunctions = {},
 ): Promise<EventAttributesWithType<EventAttributeKey>> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  const convertedAttributes = await convertWithCodec(attributes, settings);
+  const convertedAttributes = await convertWithCodec(attributes);
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;
 

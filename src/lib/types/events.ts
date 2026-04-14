@@ -4,7 +4,7 @@ import type { google } from '@temporalio/proto';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { ActivityOptions, EventLink } from '$lib/types';
 
-import type { Replace, Settings } from './global';
+import type { Replace } from './global';
 
 export type EventHistory = Replace<
   import('$lib/types').History,
@@ -68,15 +68,6 @@ export type PendingNexusOperation = import('$lib/types').PendingNexusInfo & {
 };
 export type Callbacks = import('$lib/types').CallbackInfo[];
 
-export type EventRequestMetadata = {
-  namespace: string;
-  settings: Settings;
-};
-
-export type EventWithMetadata = {
-  historyEvent: HistoryEvent;
-} & EventRequestMetadata;
-
 // Remove once TS SDK has support
 export type Principal = {
   type?: string;
@@ -107,7 +98,7 @@ export type WorkflowEvents = WorkflowEvent[];
 
 export type PendingActivityWithMetadata = {
   activity: PendingActivity;
-} & EventRequestMetadata;
+};
 
 export type CommonEventKey =
   | 'id'
