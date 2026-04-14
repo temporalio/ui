@@ -6,7 +6,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { routeForTimeline } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import { showFullTree } from '../workflow-relationships.svelte';
 
@@ -46,7 +46,7 @@
         <p class="text-xs">{translate('common.id')}</p>
       {/if}
       <Link
-        href={routeForTimeline({
+        href={routeForWorkflow({
           namespace,
           workflow: workflow.id,
           run: workflow.runId,

@@ -7,7 +7,7 @@
   import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import {
-    routeForTimeline,
+    routeForWorkflow,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
@@ -53,7 +53,7 @@
         </div>
         <div class="mx-2 w-auto break-words">
           <Link
-            href={routeForTimeline({
+            href={routeForWorkflow({
               workflow: run.startWorkflowResult.workflowId,
               run: run.startWorkflowResult.runId,
               namespace,

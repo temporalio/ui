@@ -2,17 +2,19 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
+  import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
 
   export let open = false;
   export let namespaceList: NamespaceListItem[] = [];
 
   let search = '';
 
-  $: namespaces = (
+  $: namespaces = sortAlphabetically(
     search
       ? namespaceList.filter(({ namespace }) => namespace.includes(search))
-      : namespaceList
-  ).sort((a, b) => a.namespace.localeCompare(b.namespace));
+      : namespaceList,
+    (ns) => ns.namespace,
+  );
 </script>
 
 {#if open}

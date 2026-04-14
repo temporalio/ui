@@ -49,6 +49,16 @@ export type PauseWorkflowRequest =
   temporal.api.workflowservice.v1.IPauseWorkflowExecutionRequest;
 export type UnpauseWorkflowRequest =
   temporal.api.workflowservice.v1.IUnpauseWorkflowExecutionRequest;
+export type ListWorkersRequest =
+  temporal.api.workflowservice.v1.IListWorkersRequest;
+export type ListWorkersResponse =
+  temporal.api.workflowservice.v1.IListWorkersResponse & {
+    workers?: WorkerListInfo[];
+  };
+export type DescribeWorkerRequest =
+  temporal.api.workflowservice.v1.IDescribeWorkerRequest;
+export type DescribeWorkerResponse =
+  temporal.api.workflowservice.v1.IDescribeWorkerResponse;
 
 // api.history
 
@@ -178,6 +188,7 @@ export type PendingNexusOperationState =
 export type CallbackState = temporal.api.enums.v1.CallbackState;
 export type VersioningBehavior = temporal.api.enums.v1.VersioningBehavior;
 export type EventType = temporal.api.enums.v1.EventType;
+export type WorkerStatus = temporal.api.enums.v1.WorkerStatus;
 
 // temporal.api.enums.v1.ResetReapplyExcludeType
 export enum ResetReapplyExcludeType {
@@ -270,6 +281,30 @@ export type EventLink = temporal.api.common.v1.ILink;
 
 // api.failure
 export type Failure = temporal.api.failure.v1.IFailure;
+
+// api.worker
+export type WorkerHostInfo = temporal.api.worker.v1.IWorkerHostInfo & {
+  workerGroupingKey?: string;
+};
+export type WorkerHeartbeat = temporal.api.worker.v1.IWorkerHeartbeat;
+export type WorkerPollerInfo = temporal.api.worker.v1.IWorkerPollerInfo;
+export type WorkerSlotsInfo = temporal.api.worker.v1.IWorkerSlotsInfo;
+export type WorkerInfo = temporal.api.worker.v1.IWorkerInfo;
+export type WorkerListInfo = {
+  workerInstanceKey?: string | null;
+  workerIdentity?: string | null;
+  taskQueue?: string | null;
+  deploymentVersion?: temporal.api.deployment.v1.IWorkerDeploymentVersion | null;
+  sdkName?: string | null;
+  sdkVersion?: string | null;
+  status?: temporal.api.enums.v1.WorkerStatus | null;
+  startTime?: google.protobuf.ITimestamp | null;
+  hostName?: string | null;
+  workerGroupingKey?: string | null;
+  processId?: string | null;
+  plugins?: temporal.api.worker.v1.IPluginInfo[] | null;
+};
+export type PluginInfo = temporal.api.worker.v1.PluginInfo;
 
 // google
 

@@ -29,7 +29,7 @@ test('Navigate to import page from nav', async ({ page }, {
   await expect(count).toHaveText('31,230');
 
   await page.goto(importUrl);
-  page.waitForRequest(SETTINGS_API);
+  await page.waitForRequest(SETTINGS_API);
 
   // eslint-disable-next-line playwright/no-conditional-in-test
   if (isMobile) {
@@ -48,7 +48,7 @@ test('Navigate to import page directly and upload a json file for event history 
   page,
 }) => {
   await page.goto(importUrl);
-  page.waitForRequest(SETTINGS_API);
+  await page.waitForRequest(SETTINGS_API);
 
   const title = page.getByTestId('import-event-history');
   await expect(title).toHaveText('Import Event History');
@@ -72,7 +72,7 @@ test('Navigate to import event history page directly to import event history', a
   page,
 }) => {
   await page.goto(importEventHistoryUrl);
-  page.waitForRequest(SETTINGS_API);
+  await page.waitForRequest(SETTINGS_API);
 
   const table = page.locator('table');
   await expect(table).toBeVisible();
