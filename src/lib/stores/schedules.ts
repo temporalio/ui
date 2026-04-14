@@ -27,13 +27,6 @@ type ScheduleParameterArgs = {
   presets: SchedulePresetsParameters;
 };
 
-// TODO: Post Beta, add support of additional fields.
-// "startTime": "2022-07-04T03:18:59.668Z",
-// "endTime": "2022-07-04T03:18:59.668Z",
-// "jitter": "string",
-// "timezoneName": "string",
-// "timezoneData": "string"
-
 const getSearchAttributes = (
   attrs: (typeof setSearchAttributes.arguments)[0],
 ) => {
@@ -229,8 +222,7 @@ export const submitEditSchedule = async (
   const fields = body.schedule.action.startWorkflow?.header?.fields;
   if (fields && Object.keys(fields).length > 0) {
     try {
-      const entries = Object.entries(fields);
-      for (const [key, value] of entries) {
+      for (const [key, value] of Object.entries(fields)) {
         const encodedValue = await encodePayloads({
           input: stringifyWithBigInt(value),
           encoding: 'json/plain',
