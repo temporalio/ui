@@ -5,7 +5,6 @@
     EventGroups,
   } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, activeGroups } from '$lib/stores/active-events';
-  import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -51,10 +50,10 @@
   };
 
   $: activeGroupsHeightAboveGroup = (group: EventGroup) => {
+    const groupIndex = filteredGroups.findIndex((g) => g.id === group.id);
     const activeGroupIsAbove = $activeGroups?.filter((id) => {
-      if ($eventFilterSort === 'ascending')
-        return parseInt(id) < parseInt(group.id);
-      return parseInt(id) > parseInt(group.id);
+      const activeIndex = filteredGroups.findIndex((g) => g.id === id);
+      return activeIndex !== -1 && activeIndex < groupIndex;
     });
 
     if (!activeGroupIsAbove?.length) return 0;

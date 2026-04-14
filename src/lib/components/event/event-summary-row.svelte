@@ -111,7 +111,11 @@
 
   const displayName = $derived(
     isEventGroup(event)
-      ? event.label
+      ? event.pendingActivity
+        ? translate('workflows.pending-activity')
+        : event.pendingNexusOperation
+          ? translate('workflows.pending-nexus-operation')
+          : event.label
       : isLocalActivityMarkerEvent(event)
         ? translate('events.category.local-activity')
         : spaceBetweenCapitalLetters(event.name),
@@ -276,7 +280,10 @@
       <Icon
         name={CategoryIcon[event.category].name}
         title={CategoryIcon[event.category].title}
-        class="mr-1 inline"
+        class="mr-1 inline{isEventGroup(event) &&
+        (event.pendingActivity || event.pendingNexusOperation)
+          ? ' animate-pulse'
+          : ''}"
       />
       {displayName}
     </p>
