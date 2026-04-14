@@ -52,7 +52,7 @@ import type {
 } from '$lib/types/workflows';
 import {
   decodeEventAttributesForExport,
-  decodeUserMetadataPayload,
+  decodeUserMetadata,
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
 import {
@@ -843,7 +843,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     let summary = '';
     if (workflow.summary) {
-      const decodedSummary = await decodeUserMetadataPayload(workflow.summary);
+      const decodedSummary = await decodeUserMetadata(workflow.summary);
       if (typeof decodedSummary === 'string') {
         summary = decodedSummary;
       }
@@ -851,7 +851,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     let details = '';
     if (workflow.details) {
-      const decodedDetails = await decodeUserMetadataPayload(workflow.details);
+      const decodedDetails = await decodeUserMetadata(workflow.details);
       if (typeof decodedDetails === 'string') {
         details = decodedDetails;
       }

@@ -85,11 +85,11 @@ describe('getEventAttributes', () => {
       const fn = async <T>(x: T): Promise<T> => x;
 
       const decodeEventAttributes = vi.fn(fn);
-      const decodePayloadAttributes = vi.fn(fn);
+      const parsePayloadAttributes = vi.fn(fn);
 
       return {
         decodeEventAttributes,
-        decodePayloadAttributes,
+        parsePayloadAttributes,
       };
     });
   });

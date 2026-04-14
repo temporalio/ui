@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Payload } from '$lib/types';
-  import { decodeUserMetadataPayload } from '$lib/utilities/decode-payload';
+  import { decodeUserMetadata } from '$lib/utilities/decode-payload';
 
   export let value: Payload | undefined = undefined;
   export let fallback: string = '';
@@ -24,7 +24,7 @@
     if (!_value) return fallback;
     if (decodedValue) return decodedValue;
 
-    const metadata = await decodeUserMetadataPayload(_value);
+    const metadata = await decodeUserMetadata(_value);
 
     if (typeof metadata === 'string') {
       decodedValue = setPrefix(metadata);

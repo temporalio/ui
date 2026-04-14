@@ -8,7 +8,7 @@ import type {
 import {
   decodeEventAttributes,
   type DecodeFunctions,
-  decodePayloadAttributes,
+  parsePayloadAttributes,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
 import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
@@ -29,7 +29,7 @@ export async function getEventAttributes(
   historyEvent: HistoryEvent,
   {
     convertWithCodec = decodeEventAttributes,
-    decodeAttributes = decodePayloadAttributes,
+    decodeAttributes = parsePayloadAttributes,
   }: DecodeFunctions = {},
 ): Promise<EventAttributesWithType<EventAttributeKey>> {
   const { key, attributes } = findAttributesAndKey(historyEvent);

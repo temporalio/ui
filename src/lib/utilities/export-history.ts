@@ -4,7 +4,7 @@ import type { HistoryEvent } from '$lib/types/events';
 
 import {
   decodeEventAttributesForExport,
-  decodePayloadAttributes,
+  parsePayloadAttributes,
 } from './decode-payload';
 import { stringifyWithBigInt } from './parse-with-big-int';
 
@@ -18,7 +18,7 @@ const decodePayloads = async (
       decodeSetting,
     );
 
-    return decodePayloadAttributes(convertedAttributes, false);
+    return parsePayloadAttributes(convertedAttributes, false);
   } catch {
     return event;
   }

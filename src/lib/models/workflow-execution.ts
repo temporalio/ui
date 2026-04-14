@@ -14,7 +14,7 @@ import type {
   WorkflowExecutionAPIResponse,
   WorkflowSearchAttributes,
 } from '$lib/types/workflows';
-import { decodeRawPayload } from '$lib/utilities/decode-payload';
+import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
 import {
   toCallbackStateReadable,
   toPendingActivityStateReadable,
@@ -70,7 +70,7 @@ const toSearchAttributes = (
     (searchAttributes, [searchAttributeName, payload]) => {
       return {
         ...searchAttributes,
-        [searchAttributeName]: decodeRawPayload(payload),
+        [searchAttributeName]: parseRawPayloadToJSON(payload),
       };
     },
     {},

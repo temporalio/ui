@@ -15,7 +15,7 @@ export type PotentiallyDecodable =
 
 export type DecodeFunctions = {
   convertWithCodec?: typeof decodeEventAttributes;
-  decodeAttributes?: typeof decodePayloadAttributes;
+  decodeAttributes?: typeof parsePayloadAttributes;
 };
 
 const toArray = (payloads: Payload | Payload[]): Payload[] => {
@@ -26,17 +26,17 @@ const toArray = (payloads: Payload | Payload[]): Payload[] => {
   }
 };
 
-const decodeMetadata = (metadata: Record<string, unknown>) => {
-  return Object.entries(metadata).reduce(
-    (acc, [key, value]) => {
-      acc[key] = atob(String(value));
-      return acc;
-    },
-    {} as Record<string, string>,
-  );
+const parseBase64ObjectValues = (
+  metadata: Record<string, unknown>,
+): Record<string, string> => {
+  const parsed: Record<string, string> = {};
+  for (const key in metadata) {
+    parsed[key] = atob(String(metadata[key]));
+  }
+  return parsed;
 };
 
-export function decodeRawPayload(
+export function parseRawPayloadToJSON(
   payload: Payload,
   returnDataOnly: boolean = true,
   // This could decode to any object. So we either use the payload object passed in or decode it
@@ -48,7 +48,7 @@ export function decodeRawPayload(
   try {
     const data = parseWithBigInt(atob(String(payload?.data ?? '')));
     if (returnDataOnly) return data;
-    const metadata = decodeMetadata(payload?.metadata);
+    const metadata = parseBase64ObjectValues(payload?.metadata);
     return {
       metadata,
       data,
@@ -61,7 +61,7 @@ export function decodeRawPayload(
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
   if (encoding === 'binary/null') {
     if (returnDataOnly) return null;
-    const metadata = decodeMetadata(payload?.metadata);
+    const metadata = parseBase64ObjectValues(payload?.metadata);
     return {
       metadata,
       data: null,
@@ -71,7 +71,7 @@ export function decodeRawPayload(
   return payload;
 }
 
-export const decodePayloadAttributes = <
+export const parsePayloadAttributes = <
   T extends Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>,
 >(
   eventAttribute: T,
@@ -89,7 +89,7 @@ export const decodePayloadAttributes = <
       ? eventAttribute.searchAttributes.indexedFields
       : eventAttribute.searchAttributes;
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodeRawPayload(value, returnDataOnly);
+      searchAttributes[key] = parseRawPayloadToJSON(value, returnDataOnly);
     });
   }
 
@@ -98,7 +98,7 @@ export const decodePayloadAttributes = <
     const memo = eventAttribute.memo.fields;
 
     Object.entries(memo).forEach(([key, value]) => {
-      memo[key] = decodeRawPayload(value, returnDataOnly);
+      memo[key] = parseRawPayloadToJSON(value, returnDataOnly);
     });
   }
 
@@ -107,7 +107,7 @@ export const decodePayloadAttributes = <
     const header = eventAttribute.header.fields;
 
     Object.entries(header).forEach(([key, value]) => {
-      header[key] = decodeRawPayload(value, returnDataOnly);
+      header[key] = parseRawPayloadToJSON(value, returnDataOnly);
     });
   }
 
@@ -117,24 +117,24 @@ export const decodePayloadAttributes = <
     const queryResult = eventAttribute?.queryResult;
 
     Object.entries(queryResult).forEach(([key, value]) => {
-      queryResult[key] = decodeRawPayload(value, returnDataOnly);
+      queryResult[key] = parseRawPayloadToJSON(value, returnDataOnly);
     });
   }
 
   return eventAttribute;
 };
 
-const decodePayloadsWithCodec = async (
+const decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON = async (
   payloads: unknown[],
   returnDataOnly: boolean = true,
 ): Promise<unknown[]> => {
   const awaitData = await callCodecEndpoint({ payloads: { payloads } });
   return (awaitData?.payloads ?? []).map((p) =>
-    decodeRawPayload(p, returnDataOnly),
+    parseRawPayloadToJSON(p, returnDataOnly),
   );
 };
 
-export const applyCodecToPayloads = async (
+export const decodePayloadsWithRemoteCodec = async (
   payloads: unknown[],
 ): Promise<unknown[]> => {
   const awaitData = await callCodecEndpoint({ payloads: { payloads } });
@@ -148,11 +148,11 @@ const keyIs = (key: string, ...validKeys: string[]) => {
   return false;
 };
 
-export const decodeUserMetadataPayload = async (
+export const decodeUserMetadata = async (
   payload: RawPayload | Payload,
 ): Promise<string | Payload> => {
   try {
-    const data = await decodePayloadsWithCodec([payload]);
+    const data = await decodePayloadsWithRemoteCodec([payload]);
     const result = data[0];
     return result || '';
   } catch {
@@ -184,8 +184,8 @@ const decodeEventAttributesInternal = async (
 
   const decode =
     decodeSetting === 'readable'
-      ? decodePayloadsWithCodec
-      : applyCodecToPayloads;
+      ? decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON
+      : decodePayloadsWithRemoteCodec;
   const clone = { ...anyAttributes };
   if (anyAttributes) {
     // Now that we can have single Payload that is not an array (Nexus)

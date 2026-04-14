@@ -5,7 +5,7 @@
   import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
   import {
     decodeEventAttributes,
-    decodePayloadAttributes,
+    parsePayloadAttributes,
     type PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -31,7 +31,7 @@
   ) => {
     try {
       const convertedAttributes = await decodeEventAttributes(_value);
-      const decodedAttributes = decodePayloadAttributes(
+      const decodedAttributes = parsePayloadAttributes(
         convertedAttributes,
       ) as object;
       const keyExists = key && decodedAttributes?.[key];

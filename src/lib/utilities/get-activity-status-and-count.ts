@@ -1,5 +1,5 @@
 import type { ActivityExecutionStatus } from '$lib/types/activity-execution';
-import { decodeRawPayload } from '$lib/utilities/decode-payload';
+import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
 
 export type ActivityStatus =
   | 'Running'
@@ -40,7 +40,7 @@ export const toActivityStatus = (
 export const getActivityStatusAndCountOfGroup = (groups = []) => {
   return groups
     .map((group) => {
-      const rawStatus = decodeRawPayload(
+      const rawStatus = parseRawPayloadToJSON(
         group?.groupValues[0],
       ) as unknown as ActivityStatus;
       const count = parseInt(group.count);
