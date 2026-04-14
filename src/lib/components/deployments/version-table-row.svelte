@@ -197,7 +197,7 @@
 <tr>
   <td class="text-left">
     <div class="flex items-center gap-1">
-      <CapabilityGuard capability="serverlessWorkers">
+      <CapabilityGuard capability="serverScaledDeployments">
         {#if computeProviderType}
           <button
             type="button"
@@ -228,7 +228,7 @@
   <td class="text-left">
     <DeploymentStatus {status} label={statusLabel} />
   </td>
-  <CapabilityGuard capability="serverlessWorkers">
+  <CapabilityGuard capability="serverScaledDeployments">
     <td class="text-left">
       <ComputeBadge type={computeProviderType} />
     </td>

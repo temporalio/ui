@@ -37,12 +37,12 @@
         <Icon name="vertical-ellipsis" class="h-4 w-4" />
       </button>
       <Menu id="version-actions-{buildId}" position="right" usePortal>
-        <CapabilityGuard capability="serverlessWorkers">
+        <CapabilityGuard capability="serverScaledDeployments">
           <MenuItem href={editHref}>
             {translate('deployments.edit')}
           </MenuItem>
         </CapabilityGuard>
-        <CapabilityGuard capability="serverlessWorkers">
+        <CapabilityGuard capability="serverScaledDeployments">
           <MenuItem onclick={onValidate}>
             {translate('deployments.validate-connection')}
           </MenuItem>
@@ -50,7 +50,7 @@
         <MenuItem href={workflowHref}>
           {translate('deployments.view-workflows')}
         </MenuItem>
-        <CapabilityGuard capability="serverlessWorkers">
+        <CapabilityGuard capability="serverScaledDeployments">
           <MenuItem onclick={onDelete}>
             {translate('common.delete')}
           </MenuItem>

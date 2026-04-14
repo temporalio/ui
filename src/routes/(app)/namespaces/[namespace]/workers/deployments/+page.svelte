@@ -19,7 +19,7 @@
 />
 <WorkersLayout {namespace}>
   {#snippet headerAction()}
-    <CapabilityGuard capability="serverlessWorkers">
+    <CapabilityGuard capability="serverScaledDeployments">
       <Button variant="primary" href={createHref}>
         {translate('workers.create-serverless-worker')}
       </Button>

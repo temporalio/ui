@@ -75,7 +75,7 @@
       <tr slot="headers">
         <th>{translate('deployments.build-id')}</th>
         <th>{translate('deployments.build-status')}</th>
-        <CapabilityGuard capability="serverlessWorkers">
+        <CapabilityGuard capability="serverScaledDeployments">
           <th>{translate('deployments.compute')}</th>
         </CapabilityGuard>
         <th>{translate('deployments.deployed')}</th>

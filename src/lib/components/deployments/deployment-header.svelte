@@ -52,7 +52,7 @@
       <Button variant="secondary" href={workflowHref}>
         {translate('deployments.view-workflows')}
       </Button>
-      <CapabilityGuard capability="serverlessWorkers">
+      <CapabilityGuard capability="serverScaledDeployments">
         <Button
           href={routeForWorkerDeploymentVersionCreate({
             namespace,
@@ -63,7 +63,7 @@
         </Button>
       </CapabilityGuard>
       {#if !hasVersions}
-        <CapabilityGuard capability="serverlessWorkers">
+        <CapabilityGuard capability="serverScaledDeployments">
           <Button variant="destructive" on:click={onDeleteClick}>
             {translate('deployments.delete-deployment')}
           </Button>
