@@ -280,5 +280,9 @@ export type NexusOperationTimedOutEvent =
   EventWithAttributes<'nexusOperationTimedOutEventAttributes'>;
 export type NexusOperationCancelRequestedEvent =
   EventWithAttributes<'nexusOperationCancelRequestedEventAttributes'>;
+export type NexusOperationCancelRequestCompletedEvent =
+  EventWithAttributes<'nexusOperationCancelRequestCompletedEventAttributes'>;
+export type NexusOperationCancelRequestFailedEvent =
+  EventWithAttributes<'nexusOperationCancelRequestFailedEventAttributes'>;
 export type WorkflowPropertiesModifiedEvent =
   EventWithAttributes<'workflowPropertiesModifiedEventAttributes'>;
