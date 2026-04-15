@@ -9,12 +9,7 @@ import type {
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type {
-  Failure,
-  Memo,
-  Payloads,
-  Payload as RawPayload,
-} from '$lib/types';
+import type { Failure, Memo, Payloads } from '$lib/types';
 import type {
   EventAttribute,
   EventRequestMetadata,
@@ -28,6 +23,17 @@ import { getCodecEndpoint } from './get-codec';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
+
+export type {
+  DecodedPayload,
+  ParsedPayload,
+  PayloadErrors,
+  UnparsedPayload,
+} from './decode-payload-recursive';
+export {
+  parsePayload,
+  parsePayloadAttributes,
+} from './decode-payload-recursive';
 
 export type PotentiallyDecodable =
   | Payloads
@@ -76,7 +82,7 @@ export function decodePayload(
   try {
     const data = parseWithBigInt(atob(String(payload?.data ?? '')));
     if (returnDataOnly) return data;
-    const metadata = decodeMetadata(payload?.metadata);
+    const metadata = decodeMetadata(payload?.metadata ?? {});
     return {
       metadata,
       data,
@@ -89,7 +95,7 @@ export function decodePayload(
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
   if (encoding === 'binary/null') {
     if (returnDataOnly) return null;
-    const metadata = decodeMetadata(payload?.metadata);
+    const metadata = decodeMetadata(payload?.metadata ?? {});
     return {
       metadata,
       data: null,
@@ -113,44 +119,48 @@ export const decodePayloadAttributes = <
     has(eventAttribute, 'searchAttributes') &&
     has(eventAttribute.searchAttributes, 'indexedFields')
   ) {
-    const searchAttributes = eventAttribute.searchAttributes.indexedFields;
+    const searchAttributes = eventAttribute.searchAttributes
+      .indexedFields as Record<string, unknown>;
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodePayload(value, returnDataOnly);
+      searchAttributes[key] = decodePayload(value as Payload, returnDataOnly);
     });
   } else if (has(eventAttribute, 'searchAttributes')) {
     // Decode Search Attributes on UpsertWorkflowSearchAttributes
-    const searchAttributes = eventAttribute.searchAttributes;
+    const searchAttributes = eventAttribute.searchAttributes as Record<
+      string,
+      unknown
+    >;
 
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodePayload(value, returnDataOnly);
+      searchAttributes[key] = decodePayload(value as Payload, returnDataOnly);
     });
   }
 
   // Decode Memo
   if (has(eventAttribute, 'memo') && has(eventAttribute.memo, 'fields')) {
-    const memo = eventAttribute.memo.fields;
+    const memo = eventAttribute.memo.fields as Record<string, unknown>;
 
     Object.entries(memo).forEach(([key, value]) => {
-      memo[key] = decodePayload(value, returnDataOnly);
+      memo[key] = decodePayload(value as Payload, returnDataOnly);
     });
   }
 
   // Decode Header
   if (has(eventAttribute, 'header') && has(eventAttribute.header, 'fields')) {
-    const header = eventAttribute.header.fields;
+    const header = eventAttribute.header.fields as Record<string, unknown>;
 
     Object.entries(header).forEach(([key, value]) => {
-      header[key] = decodePayload(value, returnDataOnly);
+      header[key] = decodePayload(value as Payload, returnDataOnly);
     });
   }
 
   // Decode Query Result
   // This one is a best guess from the previous codebase and needs verified
   if (has(eventAttribute, 'queryResult')) {
-    const queryResult = eventAttribute?.queryResult;
+    const queryResult = eventAttribute?.queryResult as Record<string, unknown>;
 
     Object.entries(queryResult).forEach(([key, value]) => {
-      queryResult[key] = decodePayload(value, returnDataOnly);
+      queryResult[key] = decodePayload(value as Payload, returnDataOnly);
     });
   }
 
@@ -170,10 +180,10 @@ const decodeReadablePayloads =
         settings,
       });
       return (awaitData?.payloads ?? []).map((p) =>
-        decodePayload(p, returnDataOnly),
+        decodePayload(p as Payload, returnDataOnly),
       );
     } else {
-      return payloads.map((p) => decodePayload(p, returnDataOnly));
+      return payloads.map((p) => decodePayload(p as Payload, returnDataOnly));
     }
   };
 
@@ -200,7 +210,7 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 };
 
 export const decodeSingleReadablePayloadWithCodec = async (
-  payload: RawPayload | Payload,
+  payload: Payload,
   settings: Settings = get(page).data.settings,
 ): Promise<string | Payload> => {
   try {
@@ -221,17 +231,16 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   const decode = decodeReadablePayloads(settings);
 
   if (anyAttributes) {
-    for (const key of Object.keys(anyAttributes)) {
-      if (keyIs(key, 'payloads', 'encodedAttributes') && anyAttributes[key]) {
-        const data = toArray(anyAttributes[key]);
+    const attrs = anyAttributes as Record<string, unknown>;
+    for (const key of Object.keys(attrs)) {
+      if (keyIs(key, 'payloads', 'encodedAttributes') && attrs[key]) {
+        const data = toArray(attrs[key] as Payload);
         const decoded = await decode(data);
-        anyAttributes[key] = keyIs(key, 'encodedAttributes')
-          ? decoded[0]
-          : decoded;
+        attrs[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
       } else {
-        const next = anyAttributes[key];
+        const next = attrs[key];
         if (isObject(next)) {
-          anyAttributes[key] = await decodeAllPotentialPayloadsWithCodec(
+          attrs[key] = await decodeAllPotentialPayloadsWithCodec(
             next,
             namespace,
             settings,
@@ -281,15 +290,16 @@ export const cloneAllPotentialPayloadsWithCodec = async (
       return decoded?.[0] || clone;
     }
 
-    for (const key of Object.keys(clone)) {
-      if (keyIs(key, 'payloads', 'encodedAttributes') && clone[key]) {
-        const data = toArray(clone[key]);
+    const record = clone as Record<string, unknown>;
+    for (const key of Object.keys(record)) {
+      if (keyIs(key, 'payloads', 'encodedAttributes') && record[key]) {
+        const data = toArray(record[key] as Payload);
         const decoded = await decode(data, returnDataOnly);
-        clone[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
+        record[key] = keyIs(key, 'encodedAttributes') ? decoded[0] : decoded;
       } else {
-        const next = clone[key];
+        const next = record[key];
         if (isObject(next)) {
-          clone[key] = await cloneAllPotentialPayloadsWithCodec(
+          record[key] = await cloneAllPotentialPayloadsWithCodec(
             next,
             namespace,
             settings,
