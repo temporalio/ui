@@ -18,6 +18,25 @@ export type DecodeFunctions = {
   decodeAttributes?: typeof parsePayloadAttributes;
 };
 
+/**
+ * Decoding TL;DR
+ * Decoding includes either 1 or 2 phases - "parse" and "decode"
+ * "Parse" (Phase 1) refers to the act of deserializing a base64-encoded string into a JSON object
+ * "Decode" (Phase 2) refers to the act of applying a Codec to a Payload via a remote Codec Server (configured by users)
+ *
+ * Many primitives that are or contain Payloads only need to to undergo Phase 1. These primitives include:
+ * Workflow Memo
+ * Workflow Header
+ * Search Attributes
+ *
+ * The primitives that are or contain Payloads that may need to undergo Phase 1 include
+ * Activity Inputs
+ * Activity Results
+ * Query Results
+ * Stack Traces
+ */
+
+/** Normalises a single Payload or an array of Payloads into an array. */
 const toArray = (payloads: Payload | Payload[]): Payload[] => {
   if (Array.isArray(payloads)) {
     return payloads;
@@ -26,16 +45,27 @@ const toArray = (payloads: Payload | Payload[]): Payload[] => {
   }
 };
 
+/** Decodes every Base64-encoded value in any Record to a plain string. */
 const parseBase64ObjectValues = (
-  metadata: Record<string, unknown>,
+  anyObject: Record<string, unknown>,
 ): Record<string, string> => {
   const parsed: Record<string, string> = {};
-  for (const key in metadata) {
-    parsed[key] = atob(String(metadata[key]));
+  for (const key in anyObject) {
+    parsed[key] = atob(String(anyObject[key]));
   }
   return parsed;
 };
 
+/**
+ * Phase 1 — synchronous, no network.
+ *
+ * Base64-decodes `payload.data` and returns the parsed JS value.
+ * When `returnDataOnly` is `false` the full `{ metadata, data }` object is
+ * returned instead of just `data`.
+ *
+ * Returns `null` for `binary/null`-encoded payloads and returns the original
+ * `payload` unchanged when decoding fails (e.g. encrypted payloads).
+ */
 export function parseRawPayloadToJSON(
   payload: Payload,
   returnDataOnly: boolean = true,
@@ -71,6 +101,13 @@ export function parseRawPayloadToJSON(
   return payload;
 }
 
+/**
+ * Phase 1 — synchronous, no network.
+ *
+ * Walks an object and Base64-decodes every payload found in
+ * `searchAttributes`, `memo.fields`, `header.fields`, and `queryResult`.
+ * Mutates the object in place and returns it.
+ */
 export const parsePayloadAttributes = <
   T extends Optional<PotentiallyDecodable | EventAttribute | WorkflowEvent>,
 >(
@@ -124,6 +161,11 @@ export const parsePayloadAttributes = <
   return eventAttribute;
 };
 
+/**
+ * Phase 2 + Phase 1 (internal).
+ * Sends `payloads` through the remote codec server, then Base64-decodes each
+ * result with {@link parseRawPayloadToJSON}.
+ */
 const decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON = async (
   payloads: unknown[],
   returnDataOnly: boolean = true,
@@ -134,6 +176,13 @@ const decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON = async (
   );
 };
 
+/**
+ * Phase 2 — async, requires a configured codec endpoint.
+ *
+ * Sends `payloads` through the remote codec server and returns the raw
+ * decoded payloads without further Base64-decoding. Use this when the
+ * caller needs the full Payload shape (e.g. for re-serialisation on export).
+ */
 export const decodePayloadsWithRemoteCodec = async (
   payloads: unknown[],
 ): Promise<unknown[]> => {
@@ -141,6 +190,7 @@ export const decodePayloadsWithRemoteCodec = async (
   return awaitData?.payloads ?? [];
 };
 
+/** Returns true if `key` matches any of the provided `validKeys`. */
 const keyIs = (key: string, ...validKeys: string[]) => {
   for (const validKey of validKeys) {
     if (key === validKey) return true;
@@ -148,6 +198,13 @@ const keyIs = (key: string, ...validKeys: string[]) => {
   return false;
 };
 
+/**
+ * Phase 2 — async, requires a configured codec endpoint.
+ *
+ * Decodes a single user-metadata payload (`summary` or `details` field on a
+ * workflow) through the remote codec server. Returns the decoded string value
+ * or the original Payload object; returns an empty string on error.
+ */
 export const decodeUserMetadata = async (
   payload: RawPayload | Payload,
 ): Promise<string | Payload> => {
@@ -160,6 +217,11 @@ export const decodeUserMetadata = async (
   }
 };
 
+/**
+ * Returns `true` when `payload` has exactly the `{ metadata, data }` shape of
+ * a raw Temporal Payload object. Used to distinguish a bare Payload from a
+ * map of payloads.
+ */
 export const isRawPayload = (payload: unknown): boolean => {
   if (!isObject(payload)) return false;
   const keys = Object.keys(payload);
@@ -168,6 +230,16 @@ export const isRawPayload = (payload: unknown): boolean => {
   );
 };
 
+/**
+ * Phase 2 internal implementation shared by {@link decodeEventAttributes} and
+ * {@link decodeEventAttributesForExport}.
+ *
+ * Recursively walks `anyAttributes`, finds every `payloads` /
+ * `encodedAttributes` array, and routes each through the codec server.
+ * When `decodeSetting` is `'readable'`, each result is also Base64-decoded
+ * (Phase 1). When it is not `'readable'`, raw codec-server payloads are
+ * returned so the caller (e.g. export) can serialise them faithfully.
+ */
 const decodeEventAttributesInternal = async (
   anyAttributes:
     | PotentiallyDecodable
@@ -216,6 +288,16 @@ const decodeEventAttributesInternal = async (
   return clone;
 };
 
+/**
+ * Phase 2 + Phase 1 — async, requires a configured codec endpoint.
+ *
+ * Decodes all payloads within `anyAttributes` through the remote codec server
+ * and then Base64-decodes each result to a plain JS value (`returnDataOnly =
+ * true`). Use this for display; decoded values are human-readable.
+ *
+ * @see decodeEventAttributesForExport for the export / download variant that
+ * preserves the full Payload shape.
+ */
 export const decodeEventAttributes = (
   anyAttributes:
     | PotentiallyDecodable
@@ -228,6 +310,13 @@ export const decodeEventAttributes = (
   PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
 > => decodeEventAttributesInternal(anyAttributes, decodeSetting, true);
 
+/**
+ * Phase 2 only — async, requires a configured codec endpoint.
+ *
+ * Like {@link decodeEventAttributes} but keeps the full `{ metadata, data }`
+ * Payload shape after codec decoding (`returnDataOnly = false`). Use this when
+ * the result will be re-serialised (e.g. JSON history export / download).
+ */
 export const decodeEventAttributesForExport = (
   anyAttributes:
     | PotentiallyDecodable
