@@ -30,12 +30,12 @@ const makeNonActivityEvent = (
 describe('getEventLLMMetadata', () => {
   it('returns null for non-activity events', () => {
     const event = makeNonActivityEvent({
-      result: { _llm: { model: 'gpt-4o', totalTokens: 100 } },
+      result: { _details: { model: 'gpt-4o', totalTokens: 100 } },
     });
     expect(getEventLLMMetadata(event)).toBeNull();
   });
 
-  it('returns null when no _llm key is present', () => {
+  it('returns null when no _details key is present', () => {
     const event = makeCompletedEvent({
       result: { data: 'something', model: 'gpt-4o' },
     });
@@ -49,11 +49,11 @@ describe('getEventLLMMetadata', () => {
     expect(getEventLLMMetadata(event)).toBeNull();
   });
 
-  it('extracts metadata from _llm convention', () => {
+  it('extracts metadata from _details convention', () => {
     const event = makeCompletedEvent({
       result: {
         answer: 'some output',
-        _llm: {
+        _details: {
           model: 'gpt-4o',
           promptTokens: 50,
           completionTokens: 30,
@@ -76,10 +76,10 @@ describe('getEventLLMMetadata', () => {
     });
   });
 
-  it('extracts _llm with snake_case fields', () => {
+  it('extracts _details with snake_case fields', () => {
     const event = makeCompletedEvent({
       result: {
-        _llm: {
+        _details: {
           model: 'claude-3-5-sonnet',
           prompt_tokens: 120,
           completion_tokens: 80,
@@ -99,7 +99,7 @@ describe('getEventLLMMetadata', () => {
   it('computes total from prompt + completion when total is missing', () => {
     const event = makeCompletedEvent({
       result: {
-        _llm: {
+        _details: {
           model: 'gpt-4',
           promptTokens: 100,
           completionTokens: 50,
@@ -113,25 +113,25 @@ describe('getEventLLMMetadata', () => {
   it('returns model-only metadata when no tokens present', () => {
     const event = makeCompletedEvent({
       result: {
-        _llm: { model: 'gpt-4o' },
+        _details: { model: 'gpt-4o' },
       },
     });
     expect(getEventLLMMetadata(event)).toEqual({ model: 'gpt-4o' });
   });
 
-  it('returns null when _llm has no useful data', () => {
+  it('returns null when _details has no useful data', () => {
     const event = makeCompletedEvent({
       result: {
-        _llm: { traceUrl: 'https://example.com' },
+        _details: { traceUrl: 'https://example.com' },
       },
     });
     expect(getEventLLMMetadata(event)).toBeNull();
   });
 
-  it('extracts _llm from base64 payload wrapper', () => {
+  it('extracts _details from base64 payload wrapper', () => {
     const llmResult = {
       answer: 'output',
-      _llm: {
+      _details: {
         model: 'claude-3-5-sonnet',
         promptTokens: 120,
         completionTokens: 80,
@@ -160,7 +160,7 @@ describe('getEventLLMMetadata', () => {
     });
   });
 
-  it('returns null for base64 payload without _llm', () => {
+  it('returns null for base64 payload without _details', () => {
     const plainResult = { status: 'ok', count: 42 };
     const base64Data = btoa(JSON.stringify(plainResult));
 
@@ -178,7 +178,7 @@ describe('getEventLLMMetadata', () => {
     expect(getEventLLMMetadata(event)).toBeNull();
   });
 
-  it('ignores heuristic LLM shapes without _llm key', () => {
+  it('ignores heuristic LLM shapes without _details key', () => {
     const event = makeCompletedEvent({
       result: {
         model: 'gpt-4o',
@@ -195,10 +195,10 @@ describe('getGroupLLMMetadata', () => {
     expect(getGroupLLMMetadata(event)).toBeNull();
   });
 
-  it('extracts metadata from a single completed event with _llm', () => {
+  it('extracts metadata from a single completed event with _details', () => {
     const event = makeCompletedEvent({
       result: {
-        _llm: {
+        _details: {
           model: 'gpt-4o',
           totalTokens: 100,
           promptTokens: 60,

@@ -3,3 +3,8 @@ export { default as double } from './double';
 export { default as callLLM } from './call-llm';
 export { default as callLLMClaude } from './call-llm-claude';
 export { default as callLLMGemini } from './call-llm-gemini';
+export { default as callLLMFlaky } from './call-llm-flaky';
+export { default as callAgentStep } from './call-agent-step';
+export { default as runGuardrail } from './run-guardrail';
+export { default as searchKnowledgeBase } from './search-knowledge-base';
+export { default as executeTool } from './execute-tool';

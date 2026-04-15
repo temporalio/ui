@@ -189,7 +189,7 @@ export const mockLLMEventHistory = {
         'callLLM',
         {
           result: 'Hello from the LLM',
-          _llm: {
+          _details: {
             model: 'gpt-4o',
             promptTokens: 50,
             completionTokens: 30,
@@ -212,7 +212,7 @@ export const mockLLMEventHistory = {
         'callLLMClaude',
         {
           result: 'Claude response',
-          _llm: {
+          _details: {
             model: 'claude-3-5-sonnet',
             promptTokens: 120,
             completionTokens: 80,
@@ -235,7 +235,7 @@ export const mockLLMEventHistory = {
         'callLLMGemini',
         {
           result: 'Gemini response',
-          _llm: {
+          _details: {
             model: 'gemini-1.5-pro',
             promptTokens: 75,
             completionTokens: 45,

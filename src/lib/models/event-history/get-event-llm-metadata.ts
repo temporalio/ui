@@ -15,6 +15,7 @@ export interface LLMMetadata {
   cost?: number;
   score?: number;
   traceUrl?: string;
+  extra?: Record<string, unknown>;
 }
 
 const isObject = (v: unknown): v is Record<string, unknown> =>
@@ -27,14 +28,14 @@ const getString = (v: unknown): string | undefined =>
   typeof v === 'string' && v.length > 0 ? v : undefined;
 
 /**
- * Extracts LLM metadata from the _llm convention.
+ * Extracts LLM metadata from the _details convention.
  * This is the preferred, explicit way to signal LLM metadata in an activity result.
- * The _llm key is set by wrappers (wrap_openai, Braintrust plugin, etc.) or by user code.
+ * The _details key is set by wrappers (wrap_openai, Braintrust plugin, etc.) or by user code.
  */
 const extractFromLLMConvention = (
   resultData: Record<string, unknown>,
 ): LLMMetadata | null => {
-  const llm = resultData._llm;
+  const llm = resultData._details;
   if (!isObject(llm)) return null;
 
   const model = getString(llm.model);
@@ -49,6 +50,26 @@ const extractFromLLMConvention = (
 
   if (!model && !totalTokens && !promptTokens) return null;
 
+  const knownKeys = new Set([
+    'model',
+    'totalTokens',
+    'total_tokens',
+    'promptTokens',
+    'prompt_tokens',
+    'completionTokens',
+    'completion_tokens',
+    'cost',
+    'score',
+    'traceUrl',
+    'trace_url',
+  ]);
+  const extra: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(llm)) {
+    if (!knownKeys.has(key) && value !== undefined && value !== null) {
+      extra[key] = value;
+    }
+  }
+
   return {
     model,
     totalTokens:
@@ -61,6 +82,7 @@ const extractFromLLMConvention = (
     cost,
     score,
     traceUrl,
+    ...(Object.keys(extra).length > 0 ? { extra } : {}),
   };
 };
 
@@ -94,7 +116,7 @@ export const getEventLLMMetadata = (
       }
     }
 
-    // Check for _llm convention (explicit, required)
+    // Check for _details convention (explicit, required)
     return extractFromLLMConvention(resultData);
   }
 

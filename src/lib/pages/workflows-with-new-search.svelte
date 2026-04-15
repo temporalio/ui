@@ -31,6 +31,7 @@
 
   import { onMount, setContext } from 'svelte';
 
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
@@ -39,7 +40,6 @@
   import BatchTerminateConfirmationModal from '$lib/components/workflow/client-actions/batch-terminate-confirmation-modal.svelte';
   import CancelConfirmationModal from '$lib/components/workflow/client-actions/cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
-  import CompareRunsModal from '$lib/components/workflow/compare-runs-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
@@ -118,7 +118,6 @@
   let batchResetConfirmationModalOpen = $state(false);
   let terminateConfirmationModalOpen = $state(false);
   let cancelConfirmationModalOpen = $state(false);
-  let compareModalOpen = $state(false);
 
   const allSelected = writable<boolean>(false);
   const pageSelected = writable<boolean>(false);
@@ -154,7 +153,13 @@
   };
 
   const openCompareModal = () => {
-    compareModalOpen = true;
+    const wfA = $selectedWorkflows[0];
+    const wfB = $selectedWorkflows[1];
+    if (wfA && wfB) {
+      goto(
+        `/namespaces/${page.params.namespace}/workflows/compare?a=${encodeURIComponent(wfA.id)}&runA=${encodeURIComponent(wfA.runId)}&b=${encodeURIComponent(wfB.id)}&runB=${encodeURIComponent(wfB.runId)}`,
+      );
+    }
   };
 
   const handleSelectAll = (workflows: WorkflowExecution[]) => {
@@ -223,15 +228,6 @@
   workflow={$selectedWorkflows[0]}
   bind:open={cancelConfirmationModalOpen}
 />
-
-{#if $selectedWorkflows.length === 2}
-  <CompareRunsModal
-    {namespace}
-    bind:open={compareModalOpen}
-    workflowA={$selectedWorkflows[0]}
-    workflowB={$selectedWorkflows[1]}
-  />
-{/if}
 
 <header class="flex flex-col gap-2">
   <div class="flex flex-col justify-between gap-2 md:flex-row">

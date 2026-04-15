@@ -222,21 +222,17 @@
 >
   {#if isEventGroup(event)}
     <td class="font-mono">
-      <div class="flex items-center gap-0.5">
-        {#each event.eventList as groupEvent}
-          <Link
-            data-testid="link"
-            href={routeForEventHistoryEvent({
-              eventId: groupEvent.id,
-              namespace,
-              workflow,
-              run,
-            })}
-          >
-            {groupEvent.id}
-          </Link>
-        {/each}
-      </div>
+      <Link
+        data-testid="link"
+        href={routeForEventHistoryEvent({
+          eventId: event.initialEvent?.id || event.id,
+          namespace,
+          workflow,
+          run,
+        })}
+      >
+        {event.initialEvent?.id || event.id}
+      </Link>
     </td>
   {:else}
     <td class="font-mono">
@@ -245,38 +241,6 @@
       </Link>
     </td>
   {/if}
-  <td class="text-right md:hidden">
-    <Tooltip
-      hide={(isEventGroup(event) && !duration) || !elapsedTime}
-      text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
-      class="block"
-      bottom
-    >
-      <Copyable
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        content={abbrEventTime}
-      >
-        {abbrEventTime}
-      </Copyable>
-    </Tooltip>
-  </td>
-  <td class="hidden text-right md:table-cell">
-    <Tooltip
-      hide={(isEventGroup(event) && !duration) || !elapsedTime}
-      text={isEventGroup(event) ? `Duration: ${duration}` : `+${elapsedTime}`}
-      class="block"
-      bottom
-    >
-      <Copyable
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        content={eventTime}
-      >
-        {eventTime}
-      </Copyable>
-    </Tooltip>
-  </td>
   <td class="truncate">
     <p class={eventTypeStyle({ category: event.category })}>
       <Icon
@@ -286,6 +250,18 @@
       />
       {displayName}
     </p>
+  </td>
+  <td class="text-sm">
+    {#if primaryAttribute?.key === 'activityType'}
+      {primaryAttribute.value}
+    {:else if isEventGroup(event) && event.label}
+      {event.label}
+    {/if}
+  </td>
+  <td class="text-sm text-secondary/60">
+    {#if duration}
+      {duration}
+    {/if}
   </td>
   <td
     class="w-full items-center gap-2 text-right text-sm font-normal xl:text-left"
@@ -325,78 +301,95 @@
           {/if}
         </Badge>
       {/if}
-      {#if !primaryLocalAttribute && primaryAttribute?.key}
-        <EventDetailsRow {...primaryAttribute} {attributes} />
-      {/if}
-      {#if primaryLocalAttribute && primaryLocalAttribute.key}
-        <EventDetailsRow {...primaryLocalAttribute} {attributes} />
-      {/if}
-      {#if currentEvent?.userMetadata?.summary}
-        <MetadataDecoder
-          value={currentEvent.userMetadata.summary}
-          let:decodedValue
-        >
-          {#if decodedValue}
-            <div
-              class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
-            >
-              <p class="whitespace-nowrap text-right text-xs">Summary</p>
-              <Badge type="secondary" class="block select-none truncate">
-                {decodedValue}
-              </Badge>
-            </div>
-          {/if}
-        </MetadataDecoder>
-      {/if}
-      {#if currentEvent?.links?.length}
-        <EventLink
-          link={currentEvent.links[0]}
-          class="max-w-xl"
-          linkClass="truncate"
-        />
-      {/if}
-      {#if nonPendingActivityAttempt}
-        <EventDetailsRow
-          key="attempt"
-          value={nonPendingActivityAttempt.toString()}
-          {attributes}
-        />
-      {/if}
-      {#if showSecondaryAttribute}
-        <EventDetailsRow {...secondaryAttribute} {attributes} />
-      {/if}
       {#if llmMetadata}
+        <!-- Clean LLM row: model + tokens + cost + extras -->
+        {#if nonPendingActivityAttempt && nonPendingActivityAttempt > 1}
+          <Badge type="warning" class="shrink-0 gap-1 px-1.5">
+            Attempt {nonPendingActivityAttempt}
+          </Badge>
+        {/if}
         {#if llmMetadata.model}
           <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
             {llmMetadata.model}
           </Badge>
         {/if}
         {#if llmMetadata.totalTokens}
-          <Tooltip text="Total LLM tokens (prompt + completion)" topRight>
-            <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
-              {llmMetadata.totalTokens.toLocaleString()} tokens
-            </Badge>
-          </Tooltip>
+          <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
+            {llmMetadata.totalTokens.toLocaleString()} tokens
+          </Badge>
         {/if}
         {#if llmMetadata.cost}
-          <Tooltip text="Estimated LLM cost" topRight>
-            <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
-              ${llmMetadata.cost.toFixed(4)}
-            </Badge>
-          </Tooltip>
+          <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
+            ${llmMetadata.cost.toFixed(4)}
+          </Badge>
         {/if}
         {#if llmMetadata.score != null}
-          <Tooltip text="Eval score" topRight>
-            <Badge
-              type={llmMetadata.score >= 0.8 ? 'subtle' : 'warning'}
-              class="shrink-0 gap-1 px-1.5"
-            >
-              {llmMetadata.score.toFixed(2)}
-            </Badge>
-          </Tooltip>
+          <Badge
+            type={llmMetadata.score >= 0.8 ? 'subtle' : 'warning'}
+            class="shrink-0 gap-1 px-1.5"
+          >
+            {llmMetadata.score.toFixed(2)}
+          </Badge>
+        {/if}
+        {#if llmMetadata.extra}
+          {#each Object.entries(llmMetadata.extra) as [key, value]}
+            <span class="shrink-0 text-xs">
+              <span class="text-secondary/50">{key}:</span>
+              <span class="text-secondary/80"
+                >{typeof value === 'object'
+                  ? JSON.stringify(value)
+                  : String(value)}</span
+              >
+            </span>
+          {/each}
+        {/if}
+      {:else}
+        {#if !primaryLocalAttribute && primaryAttribute?.key && primaryAttribute.key !== 'activityType'}
+          <EventDetailsRow {...primaryAttribute} {attributes} />
+        {/if}
+        {#if primaryLocalAttribute && primaryLocalAttribute.key && primaryLocalAttribute.key !== 'activityType'}
+          <EventDetailsRow {...primaryLocalAttribute} {attributes} />
+        {/if}
+        {#if currentEvent?.userMetadata?.summary}
+          <MetadataDecoder
+            value={currentEvent.userMetadata.summary}
+            let:decodedValue
+          >
+            {#if decodedValue}
+              <div
+                class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
+              >
+                <p class="whitespace-nowrap text-right text-xs">Summary</p>
+                <Badge type="secondary" class="block select-none truncate">
+                  {decodedValue}
+                </Badge>
+              </div>
+            {/if}
+          </MetadataDecoder>
+        {/if}
+        {#if currentEvent?.links?.length}
+          <EventLink
+            link={currentEvent.links[0]}
+            class="max-w-xl"
+            linkClass="truncate"
+          />
+        {/if}
+        {#if nonPendingActivityAttempt && nonPendingActivityAttempt > 1}
+          <Badge type="warning" class="shrink-0 gap-1 px-1.5">
+            Attempt {nonPendingActivityAttempt}
+          </Badge>
+        {/if}
+        {#if showSecondaryAttribute}
+          <EventDetailsRow {...secondaryAttribute} {attributes} />
         {/if}
       {/if}
     </div>
+  </td>
+  <td class="text-right text-sm md:hidden">
+    {abbrEventTime}
+  </td>
+  <td class="hidden text-right text-sm md:table-cell">
+    {eventTime}
   </td>
   {#if $isCloud}
     <td>
@@ -420,7 +413,8 @@
     class="w-full text-sm no-underline"
     data-testid="event-summary-row-expanded"
   >
-    <td class="!p-0" colspan={$isCloud ? 5 : 4}>
+    <td class="!p-0" colspan={$isCloud ? 7 : 6}>
+      <!-- Event ID + Timestamp + Event Type + Activity Type + Duration + Details [+ Billable] -->
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>

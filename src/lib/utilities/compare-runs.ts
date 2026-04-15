@@ -69,7 +69,7 @@ export const extractCompareSteps = (
     .map((group) => {
       const llmMetadata = getGroupLLMMetadata(group);
       return {
-        activityName: group.label || group.displayName || group.name,
+        activityName: group.displayName || group.name || group.label,
         model: llmMetadata?.model,
         promptTokens: llmMetadata?.promptTokens,
         completionTokens: llmMetadata?.completionTokens,

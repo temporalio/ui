@@ -1,6 +1,8 @@
 import { createRequire } from 'node:module';
 
+import { createBraintrustTemporalPlugin } from '@braintrust/temporal';
 import { DefaultLogger, Runtime, Worker } from '@temporalio/worker';
+import { initLogger } from 'braintrust';
 
 const logger = new DefaultLogger('ERROR', () => {});
 
@@ -8,6 +10,15 @@ Runtime.install({ logger });
 
 import * as activities from './activities/index';
 import { getDataConverter } from './data-converter';
+
+// Initialize Braintrust if API key is available
+const braintrustApiKey = process.env.BRAINTRUST_API_KEY;
+const braintrustPlugin = braintrustApiKey
+  ? (() => {
+      initLogger({ projectName: 'My Project', apiKey: braintrustApiKey });
+      return createBraintrustTemporalPlugin();
+    })()
+  : null;
 
 const require = createRequire(import.meta.url);
 
@@ -19,6 +30,7 @@ const createWorker = async (): Promise<Worker> => {
     workflowsPath: require.resolve('./workflows'),
     activities,
     taskQueue: 'e2e-1',
+    ...(braintrustPlugin ? { plugins: [braintrustPlugin] } : {}),
   });
 };
 

@@ -15,6 +15,7 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { fetchAllWorkflows } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { coreUserStore } from '$lib/stores/core-user';
   import { resetEvents } from '$lib/stores/events';
@@ -44,6 +45,22 @@
 
   const isRunning = $derived(workflow?.isRunning);
   const isPaused = $derived(workflow?.isPaused);
+
+  // Session detection
+  let sessionRunCount = $state(0);
+  $effect(() => {
+    if (namespace && workflow?.id) {
+      fetchAllWorkflows(namespace, {
+        query: `WorkflowId="${workflow.id}"`,
+      })
+        .then((response) => {
+          sessionRunCount = response.workflows?.length ?? 0;
+        })
+        .catch(() => {
+          sessionRunCount = 0;
+        });
+    }
+  });
 
   let cancelConfirmationModalOpen = $state(false);
   let terminateConfirmationModalOpen = $state(false);
@@ -245,6 +262,20 @@
   </MenuItem>
 {/snippet}
 
+{#snippet viewSession()}
+  {#if sessionRunCount > 1}
+    <MenuItem
+      onclick={() =>
+        goto(
+          `/namespaces/${namespace}/workflows/session?workflowId=${encodeURIComponent(workflow.id)}`,
+        )}
+      data-testid="view-session-button"
+    >
+      View Session ({sessionRunCount} runs)
+    </MenuItem>
+  {/if}
+{/snippet}
+
 {#snippet runningWorkflowActions()}
   {#each workflowActions as { onClick, destructive, label, enabled, testId, description } (label)}
     {#if destructive}
@@ -261,10 +292,12 @@
     </MenuItem>
   {/each}
   <MenuDivider />
+  {@render viewSession()}
   {@render startWorkflow()}
 {/snippet}
 
 {#snippet worklfowActions()}
+  {@render viewSession()}
   {@render startWorkflow()}
   {#if terminateEnabled && next}
     <MenuDivider />

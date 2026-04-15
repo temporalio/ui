@@ -56,12 +56,14 @@
 
   const columns = [
     { label: 'Event ID' },
-    { label: 'Timestamp' },
     { label: 'Event Type' },
+    { label: 'Name' },
+    { label: 'Duration' },
     { label: 'Details' },
+    { label: 'Timestamp' },
   ];
 
-  $: if ($isCloud && columns.length === 4) {
+  $: if ($isCloud && columns.length === 6) {
     columns.push({ label: 'Billable Actions' });
   }
 
