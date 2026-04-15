@@ -32,6 +32,7 @@
     maxHeight?: string;
     onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
+    onItemsChange?: (items: T[]) => void;
     onShiftUp?: KeyboardHandler;
     onShiftDown?: KeyboardHandler;
     onSpace?: KeyboardHandler;
@@ -51,6 +52,7 @@
   export let maxHeight = '';
   export let onError: ((error: Error) => void) | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest<T>>;
+  export let onItemsChange: ((items: T[]) => void) | undefined = undefined;
   export let onShiftUp: KeyboardHandler = undefined;
   export let onShiftDown: KeyboardHandler = undefined;
   export let onSpace: KeyboardHandler = undefined;
@@ -180,6 +182,12 @@
         }
         break;
     }
+  }
+
+  let previousItems: T[] | undefined;
+  $: if (onItemsChange && $store.visibleItems !== previousItems) {
+    previousItems = $store.visibleItems;
+    onItemsChange($store.visibleItems);
   }
 
   $: adjustedTotal =
