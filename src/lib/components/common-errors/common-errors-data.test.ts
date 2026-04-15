@@ -5,11 +5,7 @@ import type {
   CommonErrorSeverity,
 } from '$lib/types/common-errors';
 
-import {
-  COMMON_ERRORS,
-  getCommonErrorById,
-  getCommonErrorsByCategory,
-} from './common-errors-data';
+import { COMMON_ERRORS, getCommonErrorById } from './common-errors-data';
 
 const VALID_SEVERITIES: CommonErrorSeverity[] = ['error', 'warning', 'info'];
 
@@ -81,27 +77,5 @@ describe('getCommonErrorById', () => {
 
   it('returns undefined for ID 0', () => {
     expect(getCommonErrorById(0)).toBeUndefined();
-  });
-});
-
-describe('getCommonErrorsByCategory', () => {
-  it('returns only errors matching the category', () => {
-    const errors = getCommonErrorsByCategory('workflow-timeouts');
-    expect(errors.length).toBeGreaterThan(0);
-    for (const error of errors) {
-      expect(error.category).toBe('workflow-timeouts');
-    }
-  });
-
-  it('returns 6 workflow-timeouts errors', () => {
-    expect(getCommonErrorsByCategory('workflow-timeouts')).toHaveLength(6);
-  });
-
-  it('returns 3 continue-as-new errors', () => {
-    expect(getCommonErrorsByCategory('continue-as-new')).toHaveLength(3);
-  });
-
-  it('returns errors for memo-headers category', () => {
-    expect(getCommonErrorsByCategory('memo-headers')).toHaveLength(1);
   });
 });
