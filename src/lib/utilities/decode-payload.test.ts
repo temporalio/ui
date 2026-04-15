@@ -5,8 +5,8 @@ import { vi } from 'vitest';
 
 import {
   decodeEventAttributes,
-  parsePayload,
   parsePayloadAttributes,
+  parseRawPayloadToJSON,
 } from './decode-payload';
 import {
   dataConvertedWorkflowStartedEvent,
@@ -95,35 +95,37 @@ const JsonObjectEncodedWithConstructor = {
 const JsonObjectDecoded = { Transformer: 'OptimusPrime' };
 const JsonObjectDecodedWithConstructor = { ConstructorOutput: 'OptimusPrime' };
 
-describe('parsePayload with default returnDataOnly', () => {
+describe('parseRawPayloadToJSON with default returnDataOnly', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
-    expect(parsePayload(WebDecodePayload)).toEqual(WebDecodePayload);
+    expect(parseRawPayloadToJSON(WebDecodePayload)).toEqual(WebDecodePayload);
   });
   it('Should not decode a payload with encoding binary/null', () => {
-    expect(parsePayload(BinaryNullEncodedNoData)).toEqual(null);
+    expect(parseRawPayloadToJSON(BinaryNullEncodedNoData)).toEqual(null);
   });
   it('Should decode a payload with encoding json/plain', () => {
-    expect(parsePayload(JsonPlainEncoded)).toEqual(Base64Decoded);
+    expect(parseRawPayloadToJSON(JsonPlainEncoded)).toEqual(Base64Decoded);
   });
   it('Should decode a payload with encoding json/foo', () => {
-    expect(parsePayload(JsonFooEncoded)).toEqual(Base64Decoded);
+    expect(parseRawPayloadToJSON(JsonFooEncoded)).toEqual(Base64Decoded);
   });
   it('Should decode a payload with encoding json/protobuf', () => {
-    expect(parsePayload(ProtobufEncoded)).toEqual(Base64Decoded);
+    expect(parseRawPayloadToJSON(ProtobufEncoded)).toEqual(Base64Decoded);
   });
   it('Should decode a json payload with encoding json/plain', () => {
-    expect(parsePayload(JsonObjectEncoded)).toEqual(JsonObjectDecoded);
+    expect(parseRawPayloadToJSON(JsonObjectEncoded)).toEqual(JsonObjectDecoded);
   });
   it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
-    expect(parsePayload(JsonObjectEncodedWithConstructor)).toEqual(
+    expect(parseRawPayloadToJSON(JsonObjectEncodedWithConstructor)).toEqual(
       JsonObjectDecodedWithConstructor,
     );
   });
 });
 
-describe('parsePayload with returnDataOnly = false', () => {
+describe('parseRawPayloadToJSON with returnDataOnly = false', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
-    expect(parsePayload(WebDecodePayload, false)).toEqual(WebDecodePayload);
+    expect(parseRawPayloadToJSON(WebDecodePayload, false)).toEqual(
+      WebDecodePayload,
+    );
   });
   it('Should not decode a payload with encoding binary/null', () => {
     const fullDecodedPayload = {
@@ -132,7 +134,7 @@ describe('parsePayload with returnDataOnly = false', () => {
       },
       data: null,
     };
-    expect(parsePayload(BinaryNullEncodedNoData, false)).toEqual(
+    expect(parseRawPayloadToJSON(BinaryNullEncodedNoData, false)).toEqual(
       fullDecodedPayload,
     );
   });
@@ -144,7 +146,9 @@ describe('parsePayload with returnDataOnly = false', () => {
       },
       data: Base64Decoded,
     };
-    expect(parsePayload(JsonPlainEncoded, false)).toEqual(fullDecodedPayload);
+    expect(parseRawPayloadToJSON(JsonPlainEncoded, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a payload with encoding json/foo', () => {
     const fullDecodedPayload = {
@@ -154,7 +158,9 @@ describe('parsePayload with returnDataOnly = false', () => {
       },
       data: Base64Decoded,
     };
-    expect(parsePayload(JsonFooEncoded, false)).toEqual(fullDecodedPayload);
+    expect(parseRawPayloadToJSON(JsonFooEncoded, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a payload with encoding json/protobuf', () => {
     const fullDecodedPayload = {
@@ -164,7 +170,9 @@ describe('parsePayload with returnDataOnly = false', () => {
       },
       data: Base64Decoded,
     };
-    expect(parsePayload(ProtobufEncoded, false)).toEqual(fullDecodedPayload);
+    expect(parseRawPayloadToJSON(ProtobufEncoded, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a payload with encoding json/protobuf with messageType', () => {
     const fullDecodedPayload = {
@@ -175,9 +183,9 @@ describe('parsePayload with returnDataOnly = false', () => {
       },
       data: Base64Decoded,
     };
-    expect(parsePayload(ProtobufEncodedWithMessageType, false)).toEqual(
-      fullDecodedPayload,
-    );
+    expect(
+      parseRawPayloadToJSON(ProtobufEncodedWithMessageType, false),
+    ).toEqual(fullDecodedPayload);
   });
   it('Should decode a json payload with encoding json/plain', () => {
     const fullDecodedPayload = {
@@ -187,7 +195,9 @@ describe('parsePayload with returnDataOnly = false', () => {
       },
       data: JsonObjectDecoded,
     };
-    expect(parsePayload(JsonObjectEncoded, false)).toEqual(fullDecodedPayload);
+    expect(parseRawPayloadToJSON(JsonObjectEncoded, false)).toEqual(
+      fullDecodedPayload,
+    );
   });
   it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
     const fullDecodedPayload = {
@@ -197,9 +207,9 @@ describe('parsePayload with returnDataOnly = false', () => {
       },
       data: JsonObjectDecodedWithConstructor,
     };
-    expect(parsePayload(JsonObjectEncodedWithConstructor, false)).toEqual(
-      fullDecodedPayload,
-    );
+    expect(
+      parseRawPayloadToJSON(JsonObjectEncodedWithConstructor, false),
+    ).toEqual(fullDecodedPayload);
   });
 });
 
