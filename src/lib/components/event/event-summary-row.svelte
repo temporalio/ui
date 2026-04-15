@@ -280,9 +280,10 @@
       <Icon
         name={CategoryIcon[event.category].name}
         title={CategoryIcon[event.category].title}
-        class="mr-1 inline {isEventGroup(event) && event.isPending
-          ? ' animate-pulse'
-          : ''}"
+        class={merge(
+          'mr-1 inline',
+          isEventGroup(event) && event.isPending && 'animate-pulse',
+        )}
       />
       {displayName}
     </p>

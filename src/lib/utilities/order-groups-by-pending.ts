@@ -4,10 +4,9 @@ export const orderGroupsByPending = (
   groups: EventGroups,
   reverseSort: boolean,
 ): EventGroups => {
-  const pendingGroups = groups.filter((g) => g.isPending);
-  const nonPendingGroups = groups.filter((g) => !g.isPending);
-
-  return reverseSort
-    ? [...pendingGroups, ...nonPendingGroups]
-    : [...nonPendingGroups, ...pendingGroups];
+  return groups.toSorted((a, b) => {
+    if (a.isPending === b.isPending) return 0;
+    if (a.isPending) return reverseSort ? -1 : 1;
+    return reverseSort ? 1 : -1;
+  });
 };
