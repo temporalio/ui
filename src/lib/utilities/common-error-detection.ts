@@ -40,7 +40,7 @@ export function durationToSeconds(duration: unknown): number {
   if (typeof duration !== 'string') return 0;
 
   const secondsMatch = duration.match(/^(\d+\.?\d*)s$/);
-  if (nsMatch) return parseFloat(nsMatch[1]);
+  if (secondsMatch) return parseFloat(secondsMatch[1]);
 
   let total = 0;
   const parts = duration.split(', ');
