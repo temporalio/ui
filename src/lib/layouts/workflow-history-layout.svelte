@@ -33,6 +33,7 @@
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+  import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
@@ -84,7 +85,7 @@
 
   let items = $derived(
     (compact
-      ? groups
+      ? orderGroupsByPending(groups, reverseSort)
       : reverseSort
         ? [...pendingNexusOperations, ...pendingActivities, ...history]
         : [...history, ...pendingActivities, ...pendingNexusOperations]) as
