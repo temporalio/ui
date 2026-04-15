@@ -59,22 +59,4 @@
       <Icon name="gcp" width={32} height={32} />
     </div>
   </RadioCard>
-
-  <RadioCard
-    value="vercel"
-    id="provider-vercel"
-    label={translate('workers.provider-vercel')}
-    description={translate('workers.provider-vercel-description')}
-    disabled
-  >
-    <Badge slot="label-badge" type="subtle"
-      >{translate('workers.coming-soon')}</Badge
-    >
-    <div
-      slot="icon"
-      class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded border border-subtle"
-    >
-      <Icon name="vercel" width={18} height={18} />
-    </div>
-  </RadioCard>
 </RadioGroup>

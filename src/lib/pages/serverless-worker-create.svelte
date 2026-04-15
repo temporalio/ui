@@ -15,6 +15,7 @@
   interface Props {
     namespace: string;
     onSuccess: () => void;
+    cfnTemplate?: string;
   }
 
   interface SubmitFieldErrors {
@@ -23,13 +24,14 @@
     roleExternalId?: string[];
   }
 
-  let { namespace, onSuccess }: Props = $props();
+  let { namespace, onSuccess, cfnTemplate }: Props = $props();
 </script>
 
 <ServerlessWorkerCreateForm
   submitButtonText={translate('workers.create-serverless-worker')}
   cancelHref={routeForWorkers({ namespace })}
   {onSuccess}
+  {cfnTemplate}
   onSubmit={async (data): Promise<SubmitFieldErrors | void> => {
     let caughtError: string | undefined;
 

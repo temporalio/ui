@@ -30,9 +30,16 @@
     onSuccess: () => void;
     cancelHref: string;
     submitButtonText: string;
+    cfnTemplate?: string;
   }
 
-  let { onSubmit, onSuccess, cancelHref, submitButtonText }: Props = $props();
+  let {
+    onSubmit,
+    onSuccess,
+    cancelHref,
+    submitButtonText,
+    cfnTemplate,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
   let showScaling = $state(false);
@@ -315,7 +322,7 @@
 
   <div class="col-span-1 hidden xl:block">
     <Card class="surface-secondary sticky top-16">
-      <ServerlessWorkerSetupGuide />
+      <ServerlessWorkerSetupGuide {cfnTemplate} />
     </Card>
   </div>
 </div>

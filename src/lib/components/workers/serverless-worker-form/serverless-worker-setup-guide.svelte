@@ -5,9 +5,13 @@
   import Timeline from '$lib/holocene/timeline/timeline.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  let activeTab = $state('CloudFormation');
+  interface Props {
+    cfnTemplate?: string;
+  }
 
-  const cfnSnippet = `AWSTemplateFormatVersion: '2010-09-09'
+  let { cfnTemplate }: Props = $props();
+
+  const defaultCfnTemplate = `AWSTemplateFormatVersion: '2010-09-09'
 Resources:
   TemporalWorkerRole:
     Type: AWS::IAM::Role
@@ -31,40 +35,7 @@ Resources:
                 Action: lambda:InvokeFunction
                 Resource: '*'`;
 
-  const terraformSnippet = `resource "aws_iam_role" "temporal_worker" {
-  name = "temporal-serverless-worker"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = { Service = "temporal.io" }
-      Action = "sts:AssumeRole"
-      Condition = {
-        StringEquals = {
-          "sts:ExternalId" = "<your-external-id>"
-        }
-      }
-    }]
-  })
-}
-
-resource "aws_iam_role_policy" "invoke_lambda" {
-  name = "invoke-lambda"
-  role = aws_iam_role.temporal_worker.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = "lambda:InvokeFunction"
-      Resource = "*"
-    }]
-  })
-}`;
-
-  const snippetContent = $derived(
-    activeTab === 'CloudFormation' ? cfnSnippet : terraformSnippet,
-  );
-  const snippetLanguage = 'text';
+  const snippetContent = $derived(cfnTemplate ?? defaultCfnTemplate);
 </script>
 
 <h3 class="mb-4 text-base font-semibold">
@@ -102,10 +73,8 @@ resource "aws_iam_role_policy" "invoke_lambda" {
     </p>
     <div class="mt-3">
       <CodeBlock
-        tabs={['CloudFormation', 'Terraform']}
-        bind:activeTab
         content={snippetContent}
-        language={snippetLanguage}
+        language="text"
         copyable
         copyIconTitle={translate('workers.copy-snippet')}
         copySuccessIconTitle={translate('workers.copied')}

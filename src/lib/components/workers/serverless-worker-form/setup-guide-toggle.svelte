@@ -5,6 +5,11 @@
 
   import ServerlessWorkerSetupGuide from './serverless-worker-setup-guide.svelte';
 
+  interface Props {
+    cfnTemplate?: string;
+  }
+
+  let { cfnTemplate }: Props = $props();
   let open = $state(false);
 </script>
 
@@ -20,6 +25,6 @@
   bind:open
 >
   <div class="surface-secondary p-6 pt-4">
-    <ServerlessWorkerSetupGuide />
+    <ServerlessWorkerSetupGuide {cfnTemplate} />
   </div>
 </Drawer>
