@@ -16,7 +16,7 @@
   intent={error.severity}
   title={error.title}
   class={className}
-  data-testid={rest['data-testid']}
+  {...rest}
 >
   <p>{error.description}</p>
   <Link href={error.link} newTab>{error.action} →</Link>
