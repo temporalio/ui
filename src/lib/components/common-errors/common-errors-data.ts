@@ -361,8 +361,12 @@ export const COMMON_ERRORS: CommonError[] = [
   },
 ];
 
+const COMMON_ERRORS_BY_ID = new Map<number, CommonError>(                                                                                        
+  COMMON_ERRORS.map((error) => [error.id, error]),                                                                                               
+);                                                                                                                                               
+                                                                                                                                  
 export function getCommonErrorById(id: number): CommonError | undefined {
-  return COMMON_ERRORS.find((error) => error.id === id);
+  return return COMMON_ERRORS_BY_ID.get(id);
 }
 
 export function getCommonErrorsByCategory(
