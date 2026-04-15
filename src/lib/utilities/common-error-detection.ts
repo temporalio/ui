@@ -39,7 +39,7 @@ export function durationToSeconds(duration: unknown): number {
 
   if (typeof duration !== 'string') return 0;
 
-  const nsMatch = duration.match(/^(\d+\.?\d*)s$/);
+  const secondsMatch = duration.match(/^(\d+\.?\d*)s$/);
   if (nsMatch) return parseFloat(nsMatch[1]);
 
   let total = 0;
