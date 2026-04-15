@@ -184,7 +184,9 @@
     }
   }
 
-  $: if (onItemsChange && $store.visibleItems) {
+  let previousItems: T[] | undefined;
+  $: if (onItemsChange && $store.visibleItems !== previousItems) {
+    previousItems = $store.visibleItems;
     onItemsChange($store.visibleItems);
   }
 
