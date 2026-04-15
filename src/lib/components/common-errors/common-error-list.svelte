@@ -14,7 +14,7 @@
 {#if errors.length > 0}
   <div
     class="flex flex-col gap-4 {className}"
-    data-testid={rest['data-testid']}
+    {...rest}
   >
     {#each errors as error (error.id)}
       <CommonErrorItem {error} />
