@@ -10,6 +10,7 @@
 
   import { type CreateVersionFormData, createVersionSchema } from './shared';
 
+  import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
 
   interface Props {
@@ -21,7 +22,6 @@
   let { onSubmit, cancelHref, error }: Props = $props();
 
   let provider = $state('lambda');
-  let showScaling = $state(false);
 
   const superform = superForm(
     {
@@ -85,144 +85,17 @@
         {translate('workers.compute-description')}
       </p>
       <ComputeProviderPicker bind:provider>
-        <div class="flex flex-col gap-5">
-          <Input
-            bind:value={$form.lambdaArn}
-            id="lambdaArn"
-            name="lambdaArn"
-            label={translate('workers.lambda-arn-label')}
-            hintText={$errors.lambdaArn?.[0] ||
-              translate('workers.lambda-arn-hint')}
-            error={!!$errors.lambdaArn?.[0]}
-            placeholder={translate('workers.lambda-arn-placeholder')}
-            required
-          />
-
-          <Input
-            bind:value={$form.iamRoleArn}
-            id="iamRoleArn"
-            name="iamRoleArn"
-            label={translate('workers.iam-role-label')}
-            hintText={$errors.iamRoleArn?.[0] ||
-              translate('workers.iam-role-hint')}
-            error={!!$errors.iamRoleArn?.[0]}
-            placeholder={translate('workers.iam-role-placeholder')}
-            required
-          />
-
-          <Input
-            bind:value={$form.roleExternalId}
-            id="roleExternalId"
-            name="roleExternalId"
-            label={translate('workers.external-id-label')}
-            hintText={$errors.roleExternalId?.[0] ||
-              translate('workers.external-id-hint')}
-            error={!!$errors.roleExternalId?.[0]}
-            placeholder={translate('workers.external-id-placeholder')}
-            required
-          />
-
-          <hr class="border-subtle" />
-
-          <Button
-            variant="secondary"
-            size="sm"
-            type="button"
-            trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
-            on:click={() => (showScaling = !showScaling)}
-          >
-            {showScaling
-              ? translate('workers.hide-scaling-limits')
-              : translate('workers.show-scaling-limits')}
-          </Button>
-
-          {#if showScaling}
-            <Input
-              value={$form.scaleUpCooloffMs !== undefined
-                ? String($form.scaleUpCooloffMs)
-                : ''}
-              onchange={(e) => {
-                const val = (e.target as HTMLInputElement).value;
-                $form.scaleUpCooloffMs = val === '' ? undefined : Number(val);
-              }}
-              id="scaleUpCooloffMs"
-              name="scaleUpCooloffMs"
-              label={translate('workers.scale-up-cooloff-ms-label')}
-              hintText={$errors.scaleUpCooloffMs?.[0] ||
-                translate('workers.scale-up-cooloff-ms-hint')}
-              error={!!$errors.scaleUpCooloffMs?.[0]}
-              placeholder="100"
-            />
-            <Input
-              value={$form.scaleUpBacklogThreshold !== undefined
-                ? String($form.scaleUpBacklogThreshold)
-                : ''}
-              onchange={(e) => {
-                const val = (e.target as HTMLInputElement).value;
-                $form.scaleUpBacklogThreshold =
-                  val === '' ? undefined : Number(val);
-              }}
-              id="scaleUpBacklogThreshold"
-              name="scaleUpBacklogThreshold"
-              label={translate('workers.scale-up-backlog-threshold-label')}
-              hintText={$errors.scaleUpBacklogThreshold?.[0] ||
-                translate('workers.scale-up-backlog-threshold-hint')}
-              error={!!$errors.scaleUpBacklogThreshold?.[0]}
-              placeholder="0"
-            />
-            <Input
-              value={$form.maxWorkerLifetimeMs !== undefined
-                ? String($form.maxWorkerLifetimeMs)
-                : ''}
-              onchange={(e) => {
-                const val = (e.target as HTMLInputElement).value;
-                $form.maxWorkerLifetimeMs =
-                  val === '' ? undefined : Number(val);
-              }}
-              id="maxWorkerLifetimeMs"
-              name="maxWorkerLifetimeMs"
-              label={translate('workers.max-worker-lifetime-ms-label')}
-              hintText={$errors.maxWorkerLifetimeMs?.[0] ||
-                translate('workers.max-worker-lifetime-ms-hint')}
-              error={!!$errors.maxWorkerLifetimeMs?.[0]}
-              placeholder="600000"
-            />
-            <Input
-              value={$form.scaleUpDispatchRateEpsilon !== undefined
-                ? String($form.scaleUpDispatchRateEpsilon)
-                : ''}
-              onchange={(e) => {
-                const val = (e.target as HTMLInputElement).value;
-                $form.scaleUpDispatchRateEpsilon =
-                  val === '' ? undefined : Number(val);
-              }}
-              id="scaleUpDispatchRateEpsilon"
-              name="scaleUpDispatchRateEpsilon"
-              label={translate('workers.scale-up-dispatch-rate-epsilon-label')}
-              hintText={$errors.scaleUpDispatchRateEpsilon?.[0] ||
-                translate('workers.scale-up-dispatch-rate-epsilon-hint')}
-              error={!!$errors.scaleUpDispatchRateEpsilon?.[0]}
-              placeholder="0"
-            />
-            <Input
-              value={$form.metricsPollIntervalMs !== undefined
-                ? String($form.metricsPollIntervalMs)
-                : ''}
-              onchange={(e) => {
-                const val = (e.target as HTMLInputElement).value;
-                $form.metricsPollIntervalMs =
-                  val === '' ? undefined : Number(val);
-              }}
-              id="metricsPollIntervalMs"
-              name="metricsPollIntervalMs"
-              label={translate('workers.metrics-poll-interval-ms-label')}
-              hintText={$errors.metricsPollIntervalMs?.[0] ||
-                translate('workers.metrics-poll-interval-ms-hint')}
-              error={!!$errors.metricsPollIntervalMs?.[0]}
-              placeholder="60000"
-            />
-          {/if}
-        </div>
+        <ComputeFields
+          bind:lambdaArn={$form.lambdaArn}
+          bind:iamRoleArn={$form.iamRoleArn}
+          bind:roleExternalId={$form.roleExternalId}
+          bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
+          bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
+          bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
+          bind:scaleUpDispatchRateEpsilon={$form.scaleUpDispatchRateEpsilon}
+          bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+          errors={$errors}
+        />
       </ComputeProviderPicker>
     </Card>
 
