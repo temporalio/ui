@@ -11,7 +11,6 @@
     isCustomSearchAttribute,
     workflowIncludesSearchAttribute,
   } from '$lib/stores/search-attributes';
-  import { tableDensity } from '$lib/stores/table-density';
   import {
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowExecution,
@@ -32,10 +31,15 @@
   type Props = {
     column: ConfigurableTableHeader;
     workflow: WorkflowExecution;
+    truncate?: boolean;
     archival?: boolean;
   };
-  let { column, workflow, archival = false }: Props = $props();
-  let truncate = $derived($tableDensity === 'compact');
+  let {
+    column,
+    workflow,
+    truncate = false,
+    archival = false,
+  }: Props = $props();
 
   const { label } = $derived(column);
   const namespace = $derived(page.params.namespace);
@@ -120,7 +124,7 @@
           run: workflow.runId,
           archival,
         })}
-        truncate
+        {truncate}
       />
     {:else if label === 'Deployment'}
       {@const deployment =
@@ -194,8 +198,6 @@
   <td
     class="workflows-summary-table-body-cell"
     data-testid="workflows-summary-table-body-cell"
-    class:comfy={!truncate}
-    class:dense={truncate}
   >
     {#if label === 'Status'}
       <WorkflowStatus

@@ -78,10 +78,10 @@
 
   $: onFetch = () => fetchPaginatedWorkflows(namespace, query);
 
-  $: compact = $tableDensity === 'compact';
+  $: dense = $tableDensity === 'dense';
 
   const setTableDensity = () => {
-    $tableDensity = compact ? 'comfortable' : 'compact';
+    $tableDensity = dense ? 'comfortable' : 'dense';
     viewFeature('tableDensity');
   };
 </script>
@@ -119,14 +119,14 @@
         childCount={childrenActive(workflow)?.children.length}
       >
         {#each columns as column}
-          <TableBodyCell {workflow} {column} />
+          <TableBodyCell {workflow} {column} truncate={dense} />
         {/each}
       </TableRow>
       {#if childrenActive(workflow)}
         {#each childrenActive(workflow).children as child (`${child.id}:${child.runId}`)}
           <TableRow workflow={child} child>
             {#each columns as column}
-              <TableBodyCell workflow={child} {column} />
+              <TableBodyCell workflow={child} {column} truncate={dense} />
             {/each}
           </TableRow>
         {/each}
@@ -139,7 +139,7 @@
     </svelte:fragment>
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
       <Tooltip
-        text={compact
+        text={dense
           ? translate('common.dense')
           : translate('common.comfortable')}
         top
@@ -150,7 +150,7 @@
           data-testid="table-density-button"
           size="xs"
           variant="ghost"
-          leadingIcon={compact ? 'table-dense' : 'table-comfy'}
+          leadingIcon={dense ? 'table-dense' : 'table-comfy'}
         ></Button>
       </Tooltip>
       <Tooltip text={translate('common.download-json')} top>

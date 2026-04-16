@@ -15,7 +15,10 @@
     createFilter,
     updateQueryParamsFromFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
-  import { truncateValue } from '$lib/utilities/truncate-value';
+  import {
+    TRUNCATE_LENGTH,
+    truncateValue,
+  } from '$lib/utilities/truncate-value';
 
   type Props = {
     attribute: string;
@@ -31,7 +34,7 @@
     value,
     href,
     type = SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-    truncate = true,
+    truncate = false,
   }: Props = $props();
 
   const onRowFilterClick = () => {
@@ -53,14 +56,18 @@
 
     updateQueryParamsFromFilter(page.url, $workflowFilters);
   };
+
+  const hideTooltip = $derived(
+    !truncate || (truncate && truncateValue(value).length <= TRUNCATE_LENGTH),
+  );
 </script>
 
 {#if href}
-  <Tooltip text={value} top class="min-w-0" hide={!truncate}>
+  <Tooltip text={value} top class="min-w-0" hide={hideTooltip}>
     <Link {href}>{truncate ? truncateValue(value) : value}</Link>
   </Tooltip>
 {:else}
-  <Tooltip text={value} top class="min-w-0" hide={!truncate}>
+  <Tooltip text={value} top class="min-w-0" hide={hideTooltip}>
     {truncate ? truncateValue(value) : value}
   </Tooltip>
 {/if}

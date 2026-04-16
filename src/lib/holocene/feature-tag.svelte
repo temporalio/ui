@@ -1,8 +1,11 @@
 <script lang="ts">
   import { viewedFeatureTags } from '$lib/stores/new-feature-tags';
 
-  type Props = { feature: string; alpha?: boolean };
-  let { feature, alpha }: Props = $props();
+  interface Props {
+    feature: string;
+    alpha?: boolean;
+  }
+  let { feature, alpha = true }: Props = $props();
 
   const show = $derived(!$viewedFeatureTags?.includes(feature));
 </script>

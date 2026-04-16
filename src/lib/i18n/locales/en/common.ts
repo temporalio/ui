@@ -220,7 +220,6 @@ export const Strings = {
   'slack-community': 'Slack Community',
   'community-forum': 'Community Forum',
   'change-log': 'Change Log',
-  compact: 'Compact',
   comfortable: 'Comfortable',
   dense: 'Dense',
 } as const;

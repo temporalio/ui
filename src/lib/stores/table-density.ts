@@ -1,6 +1,6 @@
 import { persistStore } from './persist-store';
 
-type TableDensity = 'compact' | 'comfortable';
+type TableDensity = 'dense' | 'comfortable';
 export const tableDensity = persistStore<TableDensity>(
   'tableDensity',
   'comfortable',
