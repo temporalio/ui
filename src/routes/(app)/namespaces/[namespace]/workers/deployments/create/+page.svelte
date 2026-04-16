@@ -22,7 +22,7 @@
     {translate('workers.back-to-deployments')}
   </Link>
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-semibold">
+    <h1>
       {translate('workers.create-serverless-title')}
     </h1>
     <SetupGuideToggle />

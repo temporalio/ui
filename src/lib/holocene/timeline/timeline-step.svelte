@@ -31,7 +31,7 @@
     {/if}
   </div>
   <div class="flex-1 pb-6" class:pb-0={last}>
-    <h4 class="text-sm font-semibold">{title}</h4>
+    <h4 class="text-base font-medium">{title}</h4>
     {@render children?.()}
   </div>
 </div>

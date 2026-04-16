@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     decodeLambdaProviderDetails,
@@ -28,7 +29,13 @@
         <span class="font-medium text-secondary"
           >{translate('workers.lambda-arn-label')}</span
         >
-        <code class="text-primary">{lambdaDetails.lambdaArn}</code>
+        <Copyable
+          content={lambdaDetails.lambdaArn}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        >
+          <code class="text-primary">{lambdaDetails.lambdaArn}</code>
+        </Copyable>
       </div>
     {/if}
     {#if lambdaDetails.iamRoleArn}
@@ -36,7 +43,13 @@
         <span class="font-medium text-secondary"
           >{translate('workers.iam-role-label')}</span
         >
-        <code class="text-primary">{lambdaDetails.iamRoleArn}</code>
+        <Copyable
+          content={lambdaDetails.iamRoleArn}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        >
+          <code class="text-primary">{lambdaDetails.iamRoleArn}</code>
+        </Copyable>
       </div>
     {/if}
     {#if lambdaDetails.roleExternalId}

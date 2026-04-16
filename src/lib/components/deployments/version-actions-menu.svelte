@@ -51,7 +51,7 @@
           {translate('deployments.view-workflows')}
         </MenuItem>
         <CapabilityGuard capability="serverScaledDeployments">
-          <MenuItem onclick={onDelete}>
+          <MenuItem onclick={onDelete} destructive>
             {translate('common.delete')}
           </MenuItem>
         </CapabilityGuard>

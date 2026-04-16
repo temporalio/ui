@@ -29,7 +29,7 @@
   <Link href={backHref} icon="chevron-left">
     {translate('workers.back-to-deployment', { deployment })}
   </Link>
-  <h1 class="text-2xl font-semibold">
+  <h1>
     {translate('workers.create-version-title')}
   </h1>
   <CreateVersionForm

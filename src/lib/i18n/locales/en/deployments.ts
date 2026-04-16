@@ -94,6 +94,9 @@ export const Strings = {
   'failed-to-create-version': 'Failed to create deployment version',
   'failed-to-create-version-rollback-failed':
     'Failed to create deployment version. The deployment could not be cleaned up automatically — delete it manually from the deployments list.',
+  'failed-to-set-current-version': 'Failed to set version as current',
+  'failed-to-set-current-version-cleanup-failed':
+    'Failed to set version as current. Resources could not be cleaned up automatically — delete the deployment and version manually, then try again.',
   'failed-to-validate-compute-config': 'Failed to validate compute config',
   'invalid-compute-configuration': 'Invalid compute configuration',
   'validation-failed-cleanup-failed':

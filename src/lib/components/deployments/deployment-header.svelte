@@ -47,8 +47,8 @@
   </div>
 
   <div class="flex w-full items-center justify-between">
-    <h1 class="text-2xl font-semibold">{deploymentName}</h1>
-    <div class="flex items-center gap-2">
+    <h1>{deploymentName}</h1>
+    <div class="flex items-center gap-4">
       <Button variant="secondary" href={workflowHref}>
         {translate('deployments.view-workflows')}
       </Button>

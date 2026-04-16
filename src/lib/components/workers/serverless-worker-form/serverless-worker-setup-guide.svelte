@@ -1,6 +1,6 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import TimelineStep from '$lib/holocene/timeline/timeline-step.svelte';
   import Timeline from '$lib/holocene/timeline/timeline.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -47,24 +47,12 @@ Resources:
       {translate('workers.setup-guide-intro')}
     </p>
     <div class="mt-3 flex flex-col gap-2">
-      <a
-        href="https://console.aws.amazon.com/lambda"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="hover:surface-interactive-hover flex items-center justify-between border border-subtle px-3 py-2 text-sm font-medium"
-      >
+      <Link href="https://console.aws.amazon.com/lambda" newTab>
         {translate('workers.setup-guide-lambda-console')}
-        <Icon name="external-link" class="h-4 w-4" />
-      </a>
-      <a
-        href="https://console.aws.amazon.com/iam"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="hover:surface-interactive-hover flex items-center justify-between border border-subtle px-3 py-2 text-sm font-medium"
-      >
+      </Link>
+      <Link href="https://console.aws.amazon.com/iam" newTab>
         {translate('workers.setup-guide-iam-console')}
-        <Icon name="external-link" class="h-4 w-4" />
-      </a>
+      </Link>
     </div>
   </TimelineStep>
   <TimelineStep step={2} title={translate('workers.setup-step-templates')}>

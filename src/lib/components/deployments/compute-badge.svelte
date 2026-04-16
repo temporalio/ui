@@ -13,7 +13,7 @@
 
 {#if config}
   <div
-    class="inline-flex items-center gap-1 border border-subtle px-1.5 py-0.5 text-xs text-secondary"
+    class="inline-flex items-center gap-1 rounded-sm border border-subtle px-2 py-0.5 text-sm text-primary"
   >
     <Icon name={config.icon} class="h-4 w-4" />
     {config.label}

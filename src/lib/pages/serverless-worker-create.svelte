@@ -1,5 +1,6 @@
 <script lang="ts">
   import ServerlessWorkerCreateForm from '$lib/components/workers/serverless-worker-form/serverless-worker-create-form.svelte';
+  import type { CreateDeploymentFormData } from '$lib/components/workers/serverless-worker-form/shared';
   import { translate } from '$lib/i18n/translate';
   import {
     buildLambdaComputeConfig,
@@ -25,26 +26,51 @@
   }
 
   let { namespace, onSuccess, cfnTemplate }: Props = $props();
-</script>
 
-<ServerlessWorkerCreateForm
-  submitButtonText={translate('workers.create-serverless-worker')}
-  cancelHref={routeForWorkers({ namespace })}
-  {onSuccess}
-  {cfnTemplate}
-  onSubmit={async (data): Promise<SubmitFieldErrors | void> => {
-    let caughtError: string | undefined;
+  async function rollbackDeployment(
+    deploymentName: string,
+    conflictToken: string | undefined,
+  ): Promise<boolean> {
+    let failed = false;
+    await deleteWorkerDeployment(
+      { namespace, deploymentName, conflictToken },
+      () => {
+        failed = true;
+      },
+    );
+    return !failed;
+  }
 
-    const deploymentResponse = await createWorkerDeployment(
+  async function rollbackAll(
+    deploymentName: string,
+    buildId: string,
+    conflictToken: string | undefined,
+  ): Promise<boolean> {
+    let failed = false;
+    await deleteWorkerDeploymentVersion(
+      { namespace, deploymentName, buildId },
+      () => {
+        failed = true;
+      },
+    );
+    if (failed) return false;
+    return rollbackDeployment(deploymentName, conflictToken);
+  }
+
+  async function handleCreate(
+    data: CreateDeploymentFormData,
+  ): Promise<SubmitFieldErrors | void> {
+    let deploymentError: string | undefined;
+    const deployment = await createWorkerDeployment(
       { namespace, deploymentName: data.name },
       (err) => {
-        caughtError =
+        deploymentError =
           err.body?.message ||
           err.statusText ||
           translate('deployments.failed-to-create-deployment');
       },
     );
-    if (caughtError) throw new Error(caughtError);
+    if (deploymentError) throw new Error(deploymentError);
 
     const computeConfig = buildLambdaComputeConfig(
       data.lambdaArn,
@@ -73,22 +99,16 @@
           translate('deployments.failed-to-create-version');
       },
     );
-
     if (versionError) {
-      let rollbackMessage = versionError;
-      await deleteWorkerDeployment(
-        {
-          namespace,
-          deploymentName: data.name,
-          conflictToken: deploymentResponse.conflictToken,
-        },
-        () => {
-          rollbackMessage = translate(
-            'deployments.failed-to-create-version-rollback-failed',
-          );
-        },
+      const cleaned = await rollbackDeployment(
+        data.name,
+        deployment.conflictToken,
       );
-      throw new Error(rollbackMessage);
+      throw new Error(
+        cleaned
+          ? versionError
+          : translate('deployments.failed-to-create-version-rollback-failed'),
+      );
     }
 
     let validateError: string | undefined;
@@ -109,12 +129,30 @@
     );
 
     if (!validateError && (!validation || validation.valid !== false)) {
-      await setCurrentDeploymentVersion({
-        namespace,
-        deploymentName: data.name,
-        buildId: data.buildId,
-      });
-      return;
+      let setCurrentError: string | undefined;
+      await setCurrentDeploymentVersion(
+        { namespace, deploymentName: data.name, buildId: data.buildId },
+        (err) => {
+          setCurrentError =
+            err.body?.message ||
+            err.statusText ||
+            translate('deployments.failed-to-set-current-version');
+        },
+      );
+      if (!setCurrentError) return;
+
+      const cleaned = await rollbackAll(
+        data.name,
+        data.buildId,
+        deployment.conflictToken,
+      );
+      throw new Error(
+        cleaned
+          ? setCurrentError
+          : translate(
+              'deployments.failed-to-set-current-version-cleanup-failed',
+            ),
+      );
     }
 
     const message =
@@ -122,36 +160,28 @@
       validateError ??
       translate('deployments.invalid-compute-configuration');
 
-    let rollbackFailed = false;
-    await deleteWorkerDeploymentVersion(
-      { namespace, deploymentName: data.name, buildId: data.buildId },
-      () => {
-        rollbackFailed = true;
-      },
+    const cleaned = await rollbackAll(
+      data.name,
+      data.buildId,
+      deployment.conflictToken,
     );
-    if (!rollbackFailed) {
-      await deleteWorkerDeployment(
-        {
-          namespace,
-          deploymentName: data.name,
-          conflictToken: deploymentResponse.conflictToken,
-        },
-        () => {
-          rollbackFailed = true;
-        },
-      );
-    }
-
-    if (rollbackFailed) {
+    if (!cleaned)
       throw new Error(
         translate('deployments.validation-failed-cleanup-failed'),
       );
-    }
 
     const lower = message.toLowerCase();
     if (lower.includes('lambda')) return { lambdaArn: [message] };
     if (lower.includes('iam') || lower.includes('role'))
       return { iamRoleArn: [message] };
     throw new Error(message);
-  }}
+  }
+</script>
+
+<ServerlessWorkerCreateForm
+  submitButtonText={translate('workers.create-serverless-worker')}
+  cancelHref={routeForWorkers({ namespace })}
+  {onSuccess}
+  {cfnTemplate}
+  onSubmit={handleCreate}
 />

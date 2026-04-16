@@ -36,7 +36,7 @@
   <div
     class={merge(
       'flex items-start gap-3 border p-4',
-      selected ? 'border-primary' : 'border-subtle',
+      'border-subtle',
       disabled && 'opacity-50',
     )}
   >
@@ -74,7 +74,7 @@
   </div>
 
   {#if selected && $$slots.default}
-    <div class="border border-t-0 border-subtle bg-subtle/50 p-5">
+    <div class="surface-background border border-t-0 border-subtle p-5">
       <slot />
     </div>
   {/if}
