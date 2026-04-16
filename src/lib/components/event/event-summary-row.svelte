@@ -19,6 +19,7 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isCloud } from '$lib/stores/advanced-visibility';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
@@ -66,6 +67,7 @@
     hoveredEventId = $bindable(),
   }: Props = $props();
 
+  let isRunning = $derived($workflowRun.workflow.isRunning);
   let expanded = $state(expandedProp);
   let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
 
@@ -114,7 +116,7 @@
       if (event.pendingActivity) return translate('workflows.pending-activity');
       if (event.pendingNexusOperation)
         return translate('workflows.pending-nexus-operation');
-      if (event.isPending && event.category === 'child-workflow')
+      if (event.isPending && event.category === 'child-workflow' && isRunning)
         return translate('workflows.pending-child-workflow');
       return event.label;
     }
