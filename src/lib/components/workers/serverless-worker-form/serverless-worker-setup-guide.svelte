@@ -50,9 +50,6 @@ Resources:
       <Link href="https://console.aws.amazon.com/lambda" newTab>
         {translate('workers.setup-guide-lambda-console')}
       </Link>
-      <Link href="https://console.aws.amazon.com/iam" newTab>
-        {translate('workers.setup-guide-iam-console')}
-      </Link>
     </div>
   </TimelineStep>
   <TimelineStep step={2} title={translate('workers.setup-step-templates')}>

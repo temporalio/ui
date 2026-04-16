@@ -194,7 +194,7 @@ export const Strings = {
   'setup-guide-lambda-console': 'Open AWS Lambda Console',
   'setup-guide-iam-console': 'Open AWS IAM Console',
   'setup-guide-iam-note':
-    'The IAM role must have a trust policy allowing Temporal to assume it. Use the templates below as a starting point.',
+    'The IAM role must have a trust policy allowing Temporal to assume it. Use the CloudFormation template below as a starting point.',
   'setup-step-setup': 'Setup',
   'setup-step-templates': 'Templates',
   'validation-checking': 'Checking...',

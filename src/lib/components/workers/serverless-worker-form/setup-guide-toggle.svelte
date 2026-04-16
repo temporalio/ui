@@ -24,7 +24,7 @@
   dark={false}
   bind:open
 >
-  <div class="surface-secondary p-6 pt-4">
+  <div class="surface-information p-6 pt-4">
     <ServerlessWorkerSetupGuide {cfnTemplate} />
   </div>
 </Drawer>

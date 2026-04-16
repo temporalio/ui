@@ -287,7 +287,7 @@
   </div>
 
   <div class="col-span-1 hidden xl:block">
-    <Card class="surface-secondary sticky top-16 bg-blue-50">
+    <Card class="surface-information sticky top-16">
       <ServerlessWorkerSetupGuide {cfnTemplate} />
     </Card>
   </div>
