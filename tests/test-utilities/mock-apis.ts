@@ -10,7 +10,10 @@ import {
   EVENT_HISTORY_API_REVERSE,
   mockEventHistoryApi,
 } from './mocks/event-history';
-import { mockNamespaceApi } from './mocks/namespace';
+import {
+  mockNamespaceApi,
+  mockNamespaceWithNoWorkerHeartbeats,
+} from './mocks/namespace';
 import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
 import { mockSchedulesApi } from './mocks/schedules';
 import { mockSchedulesCountApi } from './mocks/schedules-count';
@@ -18,6 +21,7 @@ import { mockSearchAttributesApi } from './mocks/search-attributes';
 import { mockSettingsApi, SETTINGS_API } from './mocks/settings';
 import { mockSystemInfoApi } from './mocks/system-info';
 import { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
+import { mockWorkersApi } from './mocks/workers';
 import { mockWorkflow, mockWorkflowApi, WORKFLOW_API } from './mocks/workflow';
 import { mockWorkflowsApi, WORKFLOWS_API } from './mocks/workflows';
 import {
@@ -34,6 +38,7 @@ export { mockClusterApi, CLUSTER_API } from './mocks/cluster';
 export {
   mockNamespaceApi,
   mockNamespaceWithPauseCapability,
+  mockNamespaceWithNoWorkerHeartbeats,
   NAMESPACE_API,
 } from './mocks/namespace';
 export { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
@@ -71,6 +76,7 @@ export {
 } from './mocks/batch-operations';
 export { EVENT_HISTORY_API, mockEventHistoryApi } from './mocks/event-history';
 export { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
+export { mockWorkersApi, WORKERS_API } from './mocks/workers';
 
 export const mockGlobalApis = (page: Page) => {
   return Promise.all([
@@ -102,7 +108,7 @@ export const mockSchedulesApis = (
     mockNamespaceApis(page),
     mockSearchAttributesApi(page, customSearchAttributes),
     mockSchedulesApi(page, empty),
-    mockWorkflowsCountApi(page, emptySchedulesCount),
+    mockSchedulesCountApi(page, emptySchedulesCount),
   ]);
 };
 
@@ -111,6 +117,20 @@ export const mockNamespaceApis = (page: Page) => {
     mockGlobalApis(page),
     mockNamespaceApi(page),
     mockSearchAttributesApi(page),
+  ]);
+};
+
+export const mockWorkersPageApis = (
+  page: Page,
+  { empty = false, heartbeatsEnabled = true } = {},
+) => {
+  return Promise.all([
+    mockGlobalApis(page),
+    heartbeatsEnabled
+      ? mockNamespaceApi(page)
+      : mockNamespaceWithNoWorkerHeartbeats(page),
+    mockSearchAttributesApi(page),
+    mockWorkersApi(page, empty),
   ]);
 };
 

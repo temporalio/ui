@@ -51,8 +51,8 @@ import type {
   WorkflowIdentifier,
 } from '$lib/types/workflows';
 import {
-  cloneAllPotentialPayloadsWithCodec,
-  decodeSingleReadablePayloadWithCodec,
+  decodeEventAttributesForExport,
+  decodeUserMetadata,
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
 import {
@@ -639,11 +639,20 @@ export async function fetchWorkflowForSchedule(
     console.error(err);
   };
 
-  const route = routeForApi('workflow', parameters);
+  const route = routeForApi('workflow', {
+    namespace: parameters.namespace,
+    workflowId: parameters.workflowId,
+  });
+
   return requestFromAPI(route, {
     request,
     onError,
     handleError: onError,
+    params: parameters.runId
+      ? {
+          'execution.runId': parameters.runId,
+        }
+      : {},
   }).then(toWorkflowExecution);
 }
 
@@ -828,19 +837,13 @@ export const fetchInitialValuesForStartWorkflow = async ({
     const firstEvent = await fetchInitialEvent(params);
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
-    const convertedAttributes = (await cloneAllPotentialPayloadsWithCodec(
+    const convertedAttributes = (await decodeEventAttributesForExport(
       startEvent?.attributes?.input,
-      namespace,
-      get(page).data.settings,
-      'readable',
-      false,
     )) as PotentiallyDecodable;
 
     let summary = '';
     if (workflow.summary) {
-      const decodedSummary = await decodeSingleReadablePayloadWithCodec(
-        workflow.summary,
-      );
+      const decodedSummary = await decodeUserMetadata(workflow.summary);
       if (typeof decodedSummary === 'string') {
         summary = decodedSummary;
       }
@@ -848,9 +851,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     let details = '';
     if (workflow.details) {
-      const decodedDetails = await decodeSingleReadablePayloadWithCodec(
-        workflow.details,
-      );
+      const decodedDetails = await decodeUserMetadata(workflow.details);
       if (typeof decodedDetails === 'string') {
         details = decodedDetails;
       }

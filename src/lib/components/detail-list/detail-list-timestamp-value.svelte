@@ -31,7 +31,7 @@
   </div>
 {/snippet}
 
-<DetailListValue>
+<DetailListValue class="font-mono">
   <Tooltip
     hide={!t}
     text={$relativeTime ? formattedTimestamp : relativeTimestamp}

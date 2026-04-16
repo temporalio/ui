@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { WorkflowExecution } from '@temporalio/client';
 
-  import Checkbox from '$lib/holocene/checkbox.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/activity-actions';
@@ -18,25 +17,22 @@
   };
 
   let { open = $bindable(), namespace, execution, activity }: Props = $props();
-  let { activityId: id, activityType: type } = $derived(activity);
+  let { activityId: id } = $derived(activity);
 
   let error = $state('');
   let loading = $state(false);
-  let includeType = $state(false);
 
   const identity = getIdentity();
 
   const hideModal = () => {
     open = false;
-    includeType = false;
   };
 
   const onActivityUnpause = async () => {
     await unpauseActivity({
       namespace,
       execution,
-      id: includeType ? undefined : id,
-      type: includeType ? type : undefined,
+      id,
       identity,
     });
     triggerRefresh(Action.Unpause);
@@ -61,13 +57,7 @@
       activityId: activity.id,
     })}
   </h3>
-  <div slot="content" class="flex flex-col gap-4">
+  <div slot="content">
     <p>{translate('activities.unpause-modal-description')}</p>
-    <Checkbox
-      bind:checked={includeType}
-      label={translate('activities.unpause-all-activity-types', {
-        type,
-      })}
-    />
   </div>
 </Modal>

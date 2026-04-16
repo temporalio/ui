@@ -22,7 +22,9 @@ import type {
   IterableEvent,
   MarkerRecordedEvent,
   NexusOperationCanceledEvent,
+  NexusOperationCancelRequestCompletedEvent,
   NexusOperationCancelRequestedEvent,
+  NexusOperationCancelRequestFailedEvent,
   NexusOperationCompletedEvent,
   NexusOperationFailedEvent,
   NexusOperationScheduledEvent,
@@ -530,4 +532,14 @@ export const isNexusOperationTimedOutEvent =
 export const isNexusOperationCancelRequestedEvent =
   hasAttributes<NexusOperationCancelRequestedEvent>(
     'nexusOperationCancelRequestedEventAttributes',
+  );
+
+export const isNexusOperationCancelRequestCompletedEvent =
+  hasAttributes<NexusOperationCancelRequestCompletedEvent>(
+    'nexusOperationCancelRequestCompletedEventAttributes',
+  );
+
+export const isNexusOperationCancelRequestFailedEvent =
+  hasAttributes<NexusOperationCancelRequestFailedEvent>(
+    'nexusOperationCancelRequestFailedEventAttributes',
   );

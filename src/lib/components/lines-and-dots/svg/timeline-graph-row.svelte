@@ -64,10 +64,7 @@
     const localActivityEvent = getLocalActivityMarkerEvent(group);
     if (localActivityEvent) {
       try {
-        decodedLocalActivity = await decodeLocalActivity(localActivityEvent, {
-          namespace: page.params.namespace,
-          settings: page.data.settings,
-        });
+        decodedLocalActivity = await decodeLocalActivity(localActivityEvent);
 
         if (decodedLocalActivity) {
           group.decodedLocalActivity = decodedLocalActivity;

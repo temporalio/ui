@@ -3,7 +3,7 @@ import { z } from 'zod/v3';
 import { searchAttributesSchema } from '$lib/stores/search-attributes';
 import type { FullSchedule } from '$lib/types/schedule';
 import type { SearchAttributes } from '$lib/types/workflows';
-import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
+import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 
 import type { SearchAttribute } from '$types';
 
@@ -61,8 +61,8 @@ export const getDefaultValues = (params: {
     scheduleId,
   } = params;
 
-  const decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
-  const decodedWorkflowSearchAttributes = decodePayloadAttributes({
+  const decodedSearchAttributes = parsePayloadAttributes({ searchAttributes });
+  const decodedWorkflowSearchAttributes = parsePayloadAttributes({
     searchAttributes: schedule?.action?.startWorkflow?.searchAttributes ?? {},
   });
 
