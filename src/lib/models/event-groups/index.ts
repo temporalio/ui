@@ -10,12 +10,9 @@ import {
   isNexusOperationCanceledEvent,
   isNexusOperationCompletedEvent,
   isNexusOperationFailedEvent,
-<<<<<<< fix/timer-pending-after-cancel-3156
   isTimerStartedEvent,
   isWorkflowExecutionCancelRequestedEvent,
-=======
   isNexusOperationTimedOutEvent,
->>>>>>> main
 } from '$lib/utilities/is-event-type';
 import {
   getPendingActivity,
