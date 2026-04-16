@@ -11,6 +11,7 @@ export default async function callLLMFlaky(
     result: `After retry, here is the response to: "${prompt}"\n\nThe model was temporarily rate limited but recovered on the second attempt. This is a common pattern with LLM APIs under load.`,
     _details: {
       model: 'gpt-4o',
+      response: `After retry, here is the response to: "${prompt}"\n\nThe model was temporarily rate limited but recovered on the second attempt.`,
       promptTokens: 85,
       completionTokens: 120,
       totalTokens: 205,

@@ -351,11 +351,15 @@
             {/if}
 
             {#if node.llmBlock}
-              {@const resultText = node.llmBlock.result
-                ? String(node.llmBlock.result)
-                : ''}
+              {@const resultText = node.llmBlock.response
+                ? String(node.llmBlock.response)
+                : node.llmBlock.result
+                  ? String(node.llmBlock.result)
+                  : ''}
               {@const meta = Object.fromEntries(
-                Object.entries(node.llmBlock).filter(([k]) => k !== 'result'),
+                Object.entries(node.llmBlock).filter(
+                  ([k]) => k !== 'result' && k !== 'response',
+                ),
               )}
               {@const hasMeta = Object.keys(meta).length > 0}
               <div>
@@ -518,12 +522,14 @@
                           </div>
                         {/if}
                         {#if child.llmBlock}
-                          {@const cResultText = child.llmBlock.result
-                            ? String(child.llmBlock.result)
-                            : ''}
+                          {@const cResultText = child.llmBlock.response
+                            ? String(child.llmBlock.response)
+                            : child.llmBlock.result
+                              ? String(child.llmBlock.result)
+                              : ''}
                           {@const cMeta = Object.fromEntries(
                             Object.entries(child.llmBlock).filter(
-                              ([k]) => k !== 'result',
+                              ([k]) => k !== 'result' && k !== 'response',
                             ),
                           )}
                           <div>

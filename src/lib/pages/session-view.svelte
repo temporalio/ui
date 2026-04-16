@@ -474,12 +474,14 @@
 
                 <!-- _details output - right aligned -->
                 {#if node.llmBlock}
-                  {@const resultText = node.llmBlock.result
-                    ? String(node.llmBlock.result)
-                    : ''}
+                  {@const resultText = node.llmBlock.response
+                    ? String(node.llmBlock.response)
+                    : node.llmBlock.result
+                      ? String(node.llmBlock.result)
+                      : ''}
                   {@const meta = Object.fromEntries(
                     Object.entries(node.llmBlock).filter(
-                      ([k]) => k !== 'result',
+                      ([k]) => k !== 'result' && k !== 'response',
                     ),
                   )}
                   {@const hasMeta = Object.keys(meta).length > 0}
@@ -698,7 +700,7 @@
                         : ''}
                       {@const meta = Object.fromEntries(
                         Object.entries(node.llmBlock).filter(
-                          ([k]) => k !== 'result',
+                          ([k]) => k !== 'result' && k !== 'response',
                         ),
                       )}
                       {@const hasMeta = Object.keys(meta).length > 0}
@@ -868,7 +870,7 @@
                                   : ''}
                                 {@const cMeta = Object.fromEntries(
                                   Object.entries(child.llmBlock).filter(
-                                    ([k]) => k !== 'result',
+                                    ([k]) => k !== 'result' && k !== 'response',
                                   ),
                                 )}
                                 <div>

@@ -15,9 +15,10 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { groupEvents } from '$lib/models/event-groups';
+  import { groupEvents, isEventGroup } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { isCategoryType } from '$lib/models/event-history/get-event-categorization';
+  import { getGroupLLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort, eventViewType } from '$lib/stores/event-view';
@@ -124,6 +125,14 @@
     );
   };
 
+  // Chat tab only visible when at least one activity has _details.model
+  const hasModel = $derived(
+    ascendingGroups.some((g) => {
+      const meta = getGroupLLMMetadata(g);
+      return meta?.model;
+    }),
+  );
+
   const onAllClick = () => {
     $eventViewType = 'feed';
   };
@@ -187,12 +196,14 @@
           class="h-10"
           on:click={onJSONClick}>JSON</TabButton
         >
-        <TabButton
-          active={$eventViewType === 'chat'}
-          data-testid="chat"
-          class="h-10"
-          on:click={onChatClick}>Chat</TabButton
-        >
+        {#if hasModel}
+          <TabButton
+            active={$eventViewType === 'chat'}
+            data-testid="chat"
+            class="h-10"
+            on:click={onChatClick}>Chat</TabButton
+          >
+        {/if}
         <TabButton
           active={$eventViewType === 'tree'}
           data-testid="tree"

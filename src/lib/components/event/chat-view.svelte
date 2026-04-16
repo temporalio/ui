@@ -43,26 +43,29 @@
   };
 
   const extractResultText = (result: unknown): string => {
+    let decoded: unknown = result;
     if (
       result &&
       typeof result === 'object' &&
       'payloads' in result &&
       Array.isArray((result as Record<string, unknown>).payloads)
     ) {
-      const decoded = decodePayload(
-        (result as Record<string, unknown>).payloads[0],
-      );
-      if (decoded && typeof decoded === 'object' && 'result' in decoded) {
-        return String((decoded as Record<string, unknown>).result);
+      decoded = decodePayload((result as Record<string, unknown>).payloads[0]);
+    }
+
+    if (decoded && typeof decoded === 'object') {
+      const obj = decoded as Record<string, unknown>;
+      // Prefer _details.response for chat display
+      if (obj._details && typeof obj._details === 'object') {
+        const details = obj._details as Record<string, unknown>;
+        if (typeof details.response === 'string') return details.response;
       }
-      if (typeof decoded === 'string') return decoded;
+      // Fall back to result field
+      if ('result' in obj) return String(obj.result);
       return JSON.stringify(decoded, null, 2);
     }
-    if (result && typeof result === 'object' && 'result' in result) {
-      return String((result as Record<string, unknown>).result);
-    }
-    if (typeof result === 'string') return result;
-    return JSON.stringify(result, null, 2);
+    if (typeof decoded === 'string') return decoded;
+    return JSON.stringify(decoded, null, 2);
   };
 
   const extractStep = (item: IterableEvent): ActivityStep | null => {
