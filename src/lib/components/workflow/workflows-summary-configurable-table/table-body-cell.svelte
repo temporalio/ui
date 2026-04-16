@@ -23,7 +23,10 @@
     routeForWorkerDeployment,
     routeForWorkflow,
   } from '$lib/utilities/route-for';
-  import { truncateValue } from '$lib/utilities/truncate-value';
+  import {
+    TRUNCATE_LENGTH,
+    truncateValue,
+  } from '$lib/utilities/truncate-value';
   import { isWorkflowTaskFailure } from '$lib/utilities/workflow-task-failures';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
@@ -73,6 +76,12 @@
     'Build ID',
     'Scheduled By ID',
   ];
+
+  const hideTooltip = (value: string | undefined) => {
+    return (
+      !truncate || (truncate && truncateValue(value).length <= TRUNCATE_LENGTH)
+    );
+  };
 </script>
 
 {#if filterableLabels.includes(label) || isCustomKeywordOrTextAttribute}
@@ -216,7 +225,12 @@
         options={{ format: truncate ? 'short' : 'long' }}
       />
     {:else if label === 'Task Queue'}
-      <Tooltip text={workflow.taskQueue} top class="min-w-0" hide={!truncate}>
+      <Tooltip
+        text={workflow.taskQueue}
+        top
+        class="min-w-0"
+        hide={hideTooltip(workflow.taskQueue)}
+      >
         {truncate ? truncateValue(workflow.taskQueue) : workflow.taskQueue}
       </Tooltip>
     {:else if label === 'Parent Namespace'}
@@ -224,7 +238,7 @@
         text={workflow?.parentNamespaceId ?? ''}
         top
         class="min-w-0"
-        hide={!truncate}
+        hide={hideTooltip(workflow?.parentNamespaceId)}
       >
         {truncate
           ? truncateValue(workflow?.parentNamespaceId ?? '')
@@ -255,7 +269,9 @@
           ''}
         top
         class="min-w-0"
-        hide={!truncate}
+        hide={hideTooltip(
+          workflow.searchAttributes?.indexedFields?.TemporalScheduledById,
+        )}
       >
         {truncate
           ? truncateValue(
@@ -286,7 +302,7 @@
       {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
         <Badge>{content}</Badge>
       {:else}
-        <Tooltip text={content} top class="min-w-0" hide={!truncate}>
+        <Tooltip text={content} top class="min-w-0" hide={hideTooltip(content)}>
           {truncate ? truncateValue(content) : content}
         </Tooltip>
       {/if}
