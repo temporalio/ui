@@ -32,7 +32,7 @@
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
+  import { decodeUserMetadata } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
@@ -49,21 +49,17 @@
     copy(e, stringifyWithBigInt(fullJson));
   };
 
-  const decodeUserMetadata = async (workflow: WorkflowExecution) => {
+  const decodeWorkflowUserMetadata = async (workflow: WorkflowExecution) => {
     const userMetadata = { summary: '', details: '' };
     try {
       if (workflow?.summary) {
-        const decodedSummary = await decodeSingleReadablePayloadWithCodec(
-          workflow.summary,
-        );
+        const decodedSummary = await decodeUserMetadata(workflow.summary);
         if (typeof decodedSummary === 'string') {
           userMetadata.summary = decodedSummary;
         }
       }
       if (workflow?.details) {
-        const decodedDetails = await decodeSingleReadablePayloadWithCodec(
-          workflow.details,
-        );
+        const decodedDetails = await decodeUserMetadata(workflow.details);
         if (typeof decodedDetails === 'string') {
           userMetadata.details = decodedDetails;
         }
@@ -96,7 +92,7 @@
       return;
     }
 
-    await decodeUserMetadata(workflow);
+    await decodeWorkflowUserMetadata(workflow);
 
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
@@ -114,7 +110,6 @@
             runId,
           },
         },
-        settings,
         workflowRunController.signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;

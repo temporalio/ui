@@ -1,15 +1,14 @@
 import type {
   EventAttributeKey,
   EventAttributesWithType,
-  EventWithMetadata,
   HistoryEvent,
   WorkflowEvent,
   WorkflowEvents,
 } from '$lib/types/events';
 import {
-  convertPayloadToJsonWithCodec,
+  decodeEventAttributes,
   type DecodeFunctions,
-  decodePayloadAttributes,
+  parsePayloadAttributes,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
 import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
@@ -27,18 +26,14 @@ import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
 
 export async function getEventAttributes(
-  { historyEvent, namespace, settings }: EventWithMetadata,
+  historyEvent: HistoryEvent,
   {
-    convertWithCodec = convertPayloadToJsonWithCodec,
-    decodeAttributes = decodePayloadAttributes,
+    convertWithCodec = decodeEventAttributes,
+    decodeAttributes = parsePayloadAttributes,
   }: DecodeFunctions = {},
 ): Promise<EventAttributesWithType<EventAttributeKey>> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  const convertedAttributes = await convertWithCodec({
-    attributes,
-    namespace,
-    settings,
-  });
+  const convertedAttributes = await convertWithCodec(attributes);
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;
 

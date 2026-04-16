@@ -23,17 +23,13 @@
     if (!workflow || loading) return;
     loading = true;
     try {
-      const { settings } = page.data;
-      const metadata = await getWorkflowMetadata(
-        {
-          namespace,
-          workflow: {
-            id: workflow.id,
-            runId: workflow.runId,
-          },
+      const metadata = await getWorkflowMetadata({
+        namespace,
+        workflow: {
+          id: workflow.id,
+          runId: workflow.runId,
         },
-        settings,
-      );
+      });
       $workflowRun.metadata = metadata;
       lastFetched = new Date();
     } catch (error) {

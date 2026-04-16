@@ -73,17 +73,13 @@
   });
 
   const fetchCurrentDetails = async () => {
-    const { settings } = $page.data;
-    const metadata = await getWorkflowMetadata(
-      {
-        namespace,
-        workflow: {
-          id: workflowId,
-          runId: runId,
-        },
+    const metadata = await getWorkflowMetadata({
+      namespace,
+      workflow: {
+        id: workflowId,
+        runId: runId,
       },
-      settings,
-    );
+    });
     $workflowRun.metadata = metadata;
   };
 
@@ -111,15 +107,12 @@
       return;
     }
 
-    queryResult = getQuery(
-      {
-        namespace,
-        workflow: params,
-        queryType,
-        queryArgs: payloads ? { payloads } : null,
-      },
-      $page.data?.settings,
-    ).finally(() => {
+    queryResult = getQuery({
+      namespace,
+      workflow: params,
+      queryType,
+      queryArgs: payloads ? { payloads } : null,
+    }).finally(() => {
       reset();
     });
   };
