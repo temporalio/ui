@@ -72,7 +72,7 @@
           workflowId={workflow.id}
           taskQueue={workflow.taskQueue}
           workflowType={workflow.name}
-          class={$tableDensity === 'compact' ? 'mt-1 h-5 w-5' : ''}
+          class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
         />
       {/if}
       <IsTemporalServerVersionGuard minimumVersion="1.23.0">
@@ -81,7 +81,7 @@
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
             on:click={() => viewChildren(workflow)}
-            class={$tableDensity === 'compact' ? 'mt-1 h-5 w-5' : ''}
+            class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
               text={childrenShown
