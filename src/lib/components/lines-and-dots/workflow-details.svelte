@@ -1,27 +1,18 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import { timestamp } from '$lib/components/timestamp.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { fullEventHistory } from '$lib/stores/events';
-  import {
-    relativeTime,
-    timeFormat,
-    timestampFormat,
-  } from '$lib/stores/time-format';
+  import { fullEventHistory, sdkInfo } from '$lib/stores/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
-  import { formatDate } from '$lib/utilities/format-date';
   import {
     formatDistanceAbbreviated,
     formatDuration,
   } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
-  import { getSDKandVersion } from '$lib/utilities/get-sdk-version';
-  import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
   import {
     routeForSchedule,
     routeForTaskQueue,
@@ -38,6 +29,7 @@
     DetailListTextValue,
     DetailListValue,
   } from '../detail-list';
+  import DetailListTimestampValue from '../detail-list/detail-list-timestamp-value.svelte';
 
   import SdkLogo from './sdk-logo.svelte';
 
@@ -88,16 +80,12 @@
       : '',
   );
   let totalActions = $derived(
-    $fullEventHistory.reduce((acc, e) => e.billableActions + acc, 0).toString(),
+    $fullEventHistory
+      .reduce((acc, e) => (e?.billableActions ?? 0) + acc, 0)
+      .toString(),
   );
 
-  const workflowCompletedTasks = $derived(
-    $fullEventHistory.filter(isWorkflowTaskCompletedEvent),
-  );
-
-  const { sdk, version: sdkVersion } = $derived(
-    getSDKandVersion(workflowCompletedTasks),
-  );
+  const { sdk, version: sdkVersion } = $derived($sdkInfo);
 
   const fetchLatestRun = async () => {
     const result = await fetchWorkflow({
@@ -116,42 +104,25 @@
 
 <DetailList aria-label="workflow details" rowCount={5}>
   <DetailListLabel>{translate('common.start')}</DetailListLabel>
-  <DetailListTextValue
-    text={$timestamp(workflow?.startTime)}
-    tooltipText={formatDate(workflow?.startTime, $timeFormat, {
-      relative: !$relativeTime,
-      format: $timestampFormat,
-    })}
-  />
+  <DetailListTimestampValue timestamp={workflow?.startTime} />
 
   {#if workflow?.startDelay}
     <DetailListLabel>{translate('workflows.execution-start')}</DetailListLabel>
-    <DetailListTextValue
-      text={$timestamp(workflow?.executionTime)}
-      tooltipText={formatDate(workflow?.executionTime, $timeFormat, {
-        relative: !$relativeTime,
-        format: $timestampFormat,
-      })}
-    />
+    <DetailListTimestampValue timestamp={workflow?.executionTime} />
   {/if}
 
   <DetailListLabel>{translate('common.end')}</DetailListLabel>
-  <DetailListTextValue
-    text={workflow?.endTime ? $timestamp(workflow?.endTime) : '-'}
-    tooltipText={formatDate(workflow?.endTime, $timeFormat, {
-      relative: !$relativeTime,
-      format: $timestampFormat,
-    })}
-  />
+  <DetailListTimestampValue timestamp={workflow?.endTime} fallback="-" />
 
   <DetailListLabel>
     {translate('common.duration')}
   </DetailListLabel>
-  <DetailListTextValue text={elapsedTime} />
+  <DetailListTextValue class="font-mono" text={elapsedTime} />
 
   {#if workflow?.workflowExecutionTimeout && workflow?.workflowExecutionTimeout.toString() !== '0s'}
     <DetailListLabel>{translate('workflows.workflow-timeout')}</DetailListLabel>
     <DetailListTextValue
+      class="font-mono"
       text={formatDuration(workflow.workflowExecutionTimeout)}
       tooltipText={formatDuration(workflow.workflowExecutionTimeout)}
     />
@@ -173,18 +144,20 @@
       href={routeForWorkflowsWithQuery({
         namespace,
         query: `WorkflowType="${workflow?.name}"`,
-      })}
+      }) ?? ''}
       iconName="filter"
     />
 
-    <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
-    <DetailListLinkValue
-      text={workflow?.taskQueue}
-      href={routeForTaskQueue({
-        namespace,
-        queue: workflow?.taskQueue,
-      })}
-    />
+    {#if workflow?.taskQueue}
+      <DetailListLabel>{translate('common.task-queue')}</DetailListLabel>
+      <DetailListLinkValue
+        text={workflow.taskQueue}
+        href={routeForTaskQueue({
+          namespace,
+          queue: workflow.taskQueue,
+        })}
+      />
+    {/if}
 
     {#if workflow?.priority}
       {@const { priorityKey, fairnessKey } = workflow.priority}
@@ -221,11 +194,11 @@
           copyableText={versioningBuildId}
           text={versioningBuildId}
           href={deploymentVersion
-            ? routeForWorkflowsWithQuery({
+            ? (routeForWorkflowsWithQuery({
                 namespace,
                 query: `TemporalWorkerDeploymentVersion="${deploymentVersion}"`,
-              })
-            : undefined}
+              }) ?? '')
+            : ''}
           iconName={deploymentVersion ? 'filter' : undefined}
         />
       {/if}
@@ -241,7 +214,7 @@
           href={routeForWorkflowsWithQuery({
             namespace,
             query: `TemporalWorkflowVersioningBehavior="${versioningBehavior}"`,
-          })}
+          }) ?? ''}
           iconName="filter"
         />
       {/if}
@@ -259,15 +232,15 @@
         })}
       />
     {/if}
-    {#if parent}
+    {#if parent?.workflowId && parent?.runId}
       <DetailListLabel>{translate('workflows.parent-workflow')}</DetailListLabel
       >
       <DetailListLinkValue
-        text={parent?.workflowId}
+        text={parent.workflowId}
         href={routeForWorkflow({
           namespace,
-          workflow: parent?.workflowId,
-          run: parent?.runId,
+          workflow: parent.workflowId,
+          run: parent.runId,
         })}
       />
     {/if}
@@ -288,13 +261,40 @@
 
   <DetailListColumn>
     <DetailListLabel>{translate('common.history-size')}</DetailListLabel>
-    <DetailListTextValue text={historySizeFormatted} />
+    <DetailListTextValue
+      class="font-mono"
+      tooltipText={workflow.externalPayloadCount
+        ? translate('workflows.external-payload-tooltip')
+        : ''}
+      iconName={workflow.externalPayloadCount ? 'square-info' : undefined}
+      iconPosition="trailing"
+      text={historySizeFormatted}
+    />
+    {#if workflow.externalPayloadCount}
+      <DetailListLabel
+        >{translate('workflows.external-payload-size')}</DetailListLabel
+      >
+      <DetailListTextValue
+        class="font-mono"
+        text={formatBytes(parseInt(workflow.externalPayloadSizeBytes, 10))}
+      />
+      <DetailListLabel
+        >{translate('workflows.external-payload-count')}</DetailListLabel
+      >
+      <DetailListTextValue
+        class="font-mono"
+        text={workflow.externalPayloadCount}
+      />
+    {/if}
 
     {#if !$isCloud}
       <DetailListLabel
         >{translate('workflows.state-transitions')}</DetailListLabel
       >
-      <DetailListTextValue text={workflow?.stateTransitionCount} />
+      <DetailListTextValue
+        class="font-mono"
+        text={workflow?.stateTransitionCount}
+      />
     {:else}
       <Tooltip
         bottomLeft
@@ -312,7 +312,7 @@
     {/if}
 
     {#if sdk && sdkVersion}
-      <DetailListLabel>SDK</DetailListLabel>
+      <DetailListLabel>{translate('workflows.sdk')}</DetailListLabel>
       <DetailListValue>
         <SdkLogo {sdk} version={sdkVersion} />
       </DetailListValue>

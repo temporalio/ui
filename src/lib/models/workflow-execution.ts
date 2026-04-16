@@ -145,6 +145,10 @@ export const toWorkflowExecution = (
   const priority = response.workflowExecutionInfo?.priority;
   const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
   const startDelay = getStartDelay({ executionTime, startTime });
+  const externalPayloadCount =
+    response?.workflowExecutionInfo?.externalPayloadCount;
+  const externalPayloadSizeBytes =
+    response?.workflowExecutionInfo?.externalPayloadSizeBytes;
 
   let summary;
   let details;
@@ -163,6 +167,8 @@ export const toWorkflowExecution = (
     status,
     historyEvents,
     historySizeBytes,
+    externalPayloadCount,
+    externalPayloadSizeBytes,
     searchAttributes,
     memo,
     rootExecution,
