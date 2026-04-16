@@ -170,6 +170,7 @@ export const Strings = {
   parents_one: '1 Parent',
   'pending-children_one': '1 Pending Child',
   'pending-children_other': '{{count}} Pending Children',
+  'pending-child-workflow': 'Pending Child Workflow',
   children_one: '1 Child',
   children_other: '{{count}} Children',
   'show-children': 'View Child Workflows',

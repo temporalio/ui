@@ -109,17 +109,22 @@
   const canceled = $derived(eventOrGroupIsCanceled(event));
   const terminated = $derived(eventOrGroupIsTerminated(event));
 
-  const displayName = $derived(
-    isEventGroup(event)
-      ? event.pendingActivity
-        ? translate('workflows.pending-activity')
-        : event.pendingNexusOperation
-          ? translate('workflows.pending-nexus-operation')
-          : event.label
-      : isLocalActivityMarkerEvent(event)
-        ? translate('events.category.local-activity')
-        : spaceBetweenCapitalLetters(event.name),
-  );
+  function getDisplayName(event: IterableEvent): string {
+    if (isEventGroup(event)) {
+      if (event.pendingActivity) return translate('workflows.pending-activity');
+      if (event.pendingNexusOperation)
+        return translate('workflows.pending-nexus-operation');
+      if (event.isPending && event.category === 'child-workflow')
+        return translate('workflows.pending-child-workflow');
+      return event.label;
+    }
+
+    if (isLocalActivityMarkerEvent(event))
+      return translate('events.category.local-activity');
+    return spaceBetweenCapitalLetters(event.name);
+  }
+
+  const displayName = $derived(getDisplayName(event));
 
   const primaryAttribute = $derived(
     !isLocalActivityMarkerEvent(event)
