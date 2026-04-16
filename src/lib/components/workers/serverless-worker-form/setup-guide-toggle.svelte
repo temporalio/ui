@@ -13,18 +13,24 @@
   let open = $state(false);
 </script>
 
-<Button variant="ghost" class="xl:hidden" on:click={() => (open = true)}>
+<Button
+  variant="secondary"
+  class="xl:hidden"
+  trailingIcon="chevron-right"
+  on:click={() => (open = true)}
+>
   {translate('workers.setup-guide-title')}
 </Button>
 
 <Drawer
+  class="surface-information"
   closeButtonLabel={translate('common.close')}
   onClick={() => (open = false)}
   position="right"
   dark={false}
   bind:open
 >
-  <div class="surface-information p-6 pt-4">
+  <div class="p-6 pt-4">
     <ServerlessWorkerSetupGuide {cfnTemplate} />
   </div>
 </Drawer>

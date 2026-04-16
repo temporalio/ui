@@ -34,6 +34,7 @@
   let deleteError = $state<string | undefined>();
 
   async function handleDeleteDeployment(conflictToken: string) {
+    deleteError = undefined;
     await deleteWorkerDeployment(
       { namespace, deploymentName, conflictToken },
       () => {

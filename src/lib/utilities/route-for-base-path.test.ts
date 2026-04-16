@@ -28,7 +28,6 @@ import {
   routeForScheduleCreate,
   routeForScheduleEdit,
   routeForSchedules,
-  routeForServerlessWorkerCreate,
   routeForStandaloneActivities,
   routeForStandaloneActivitiesWithQuery,
   routeForStandaloneActivityDetails,
@@ -207,10 +206,6 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     [
       'routeForWorkersWithQuery',
       () => routeForWorkersWithQuery({ namespace: 'default', query: 'test' }),
-    ],
-    [
-      'routeForServerlessWorkerCreate',
-      () => routeForServerlessWorkerCreate(namespaceParams),
     ],
     [
       'routeForWorkerDeploymentCreate',

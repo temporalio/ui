@@ -21,7 +21,9 @@
   <Link href={deploymentsHref} icon="chevron-left">
     {translate('workers.back-to-deployments')}
   </Link>
-  <div class="flex items-center justify-between">
+  <div
+    class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
+  >
     <h1>
       {translate('workers.create-serverless-title')}
     </h1>

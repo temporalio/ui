@@ -68,12 +68,12 @@
 
   const versionDeploymentName = $derived(
     isVersionSummaryNew(version)
-      ? version.deploymentVersion!.deploymentName
+      ? version.deploymentVersion.deploymentName
       : getDeploymentFromVersion(version.version),
   );
   const versionBuildId = $derived(
     isVersionSummaryNew(version)
-      ? version.deploymentVersion!.buildId
+      ? version.deploymentVersion.buildId
       : getBuildIdFromVersion(version.version),
   );
 
@@ -169,6 +169,7 @@
     validateResult = await validateWorkerDeploymentVersionComputeConfig(
       { namespace, deploymentName, buildId: versionBuildId, computeConfig },
       () => {
+        validateLoading = false;
         validateResult = {
           valid: false,
           message: translate('deployments.validate-connection-error'),

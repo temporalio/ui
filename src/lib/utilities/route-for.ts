@@ -440,19 +440,6 @@ export const routeForWorkerDeploymentVersionEdit = ({
   );
 };
 
-export const routeForServerlessWorkerCreate = ({
-  namespace,
-}: {
-  namespace: string;
-}): ResolvedPathname => {
-  return resolve(
-    '/namespaces/[namespace]/workers/deployments/serverless/create',
-    {
-      namespace,
-    },
-  );
-};
-
 export const routeForWorkerDeploymentCreate = ({
   namespace,
 }: {

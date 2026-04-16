@@ -12,9 +12,11 @@
 
   let { namespace, deploymentName, buildId }: Props = $props();
 
-  let fetchPromise = $state(
-    fetchDeploymentVersion({ namespace, deploymentName, buildId }),
-  );
+  let retryCount = $state(0);
+  const fetchPromise = $derived.by(() => {
+    void retryCount;
+    return fetchDeploymentVersion({ namespace, deploymentName, buildId });
+  });
 </script>
 
 {#await fetchPromise}
@@ -41,11 +43,7 @@
       type="button"
       class="text-primary underline"
       onclick={() => {
-        fetchPromise = fetchDeploymentVersion({
-          namespace,
-          deploymentName,
-          buildId,
-        });
+        retryCount++;
       }}>{translate('common.retry')}</button
     >
   </div>

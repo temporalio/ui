@@ -170,6 +170,7 @@
               variant="secondary"
               size="sm"
               type="button"
+              trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
               on:click={() => (showScaling = !showScaling)}
             >
               {showScaling

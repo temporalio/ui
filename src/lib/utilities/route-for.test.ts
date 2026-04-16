@@ -28,7 +28,6 @@ import {
   routeForSchedule,
   routeForScheduleCreate,
   routeForSchedules,
-  routeForServerlessWorkerCreate,
   routeForTaskQueue,
   routeForWorkerDeploymentCreate,
   routeForWorkerDeploymentVersionCreate,
@@ -554,13 +553,6 @@ describe('routeFor worker deployment version and serverless routes', () => {
     });
     expect(path).toBe(
       `${base}/namespaces/default/workers/deployments/my-deployment/versions/build-1/edit`,
-    );
-  });
-
-  it('should route to serverless worker create', () => {
-    const path = routeForServerlessWorkerCreate({ namespace: 'default' });
-    expect(path).toBe(
-      `${base}/namespaces/default/workers/deployments/serverless/create`,
     );
   });
 

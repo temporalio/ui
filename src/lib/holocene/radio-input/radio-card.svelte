@@ -57,7 +57,7 @@
         {disabled}
       />
       <div class="flex-1">
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span class="text-sm font-medium">{label}</span>
           <slot name="label-badge" />
         </div>

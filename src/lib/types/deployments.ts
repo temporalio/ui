@@ -41,8 +41,12 @@ export interface ListWorkerDeploymentsResponse {
 
 export function isVersionSummaryNew(
   version: VersionSummary,
-): version is VersionSummaryNew {
-  return 'deploymentVersion' in version;
+): version is VersionSummaryNew & {
+  deploymentVersion: WorkerDeploymentVersion;
+} {
+  return (
+    'deploymentVersion' in version && version.deploymentVersion !== undefined
+  );
 }
 
 export type VersionSummary = VersionSummaryOld | VersionSummaryNew;
