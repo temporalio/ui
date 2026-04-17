@@ -60,6 +60,7 @@ Resources:
       <CodeBlock
         content={snippetContent}
         language="text"
+        maxHeight={300}
         copyable
         copyIconTitle={translate('workers.copy-snippet')}
         copySuccessIconTitle={translate('workers.copied')}
