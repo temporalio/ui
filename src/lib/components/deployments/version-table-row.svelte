@@ -8,6 +8,7 @@
   import {
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
+    setCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
@@ -179,6 +180,14 @@
     validateLoading = false;
   }
 
+  async function handleSetCurrentVersion() {
+    await setCurrentDeploymentVersion(
+      { namespace, deploymentName, buildId: versionBuildId },
+      () => {},
+    );
+    await invalidate('data:deployment');
+  }
+
   async function handleDeleteVersion() {
     deleteVersionError = '';
     await deleteWorkerDeploymentVersion(
@@ -243,6 +252,8 @@
     buildId={versionBuildId}
     {editHref}
     {workflowHref}
+    {isCurrent}
+    onSetCurrent={handleSetCurrentVersion}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}
   />

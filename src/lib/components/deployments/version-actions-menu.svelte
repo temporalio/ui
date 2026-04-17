@@ -12,12 +12,21 @@
     buildId: string;
     editHref: string;
     workflowHref: string;
+    isCurrent: boolean;
+    onSetCurrent: () => void;
     onValidate: () => void;
     onDelete: () => void;
   }
 
-  let { buildId, editHref, workflowHref, onValidate, onDelete }: Props =
-    $props();
+  let {
+    buildId,
+    editHref,
+    workflowHref,
+    isCurrent,
+    onSetCurrent,
+    onValidate,
+    onDelete,
+  }: Props = $props();
 
   const menuOpen = writable(false);
 </script>
@@ -45,6 +54,11 @@
         <CapabilityGuard capability="serverScaledDeployments">
           <MenuItem onclick={onValidate}>
             {translate('deployments.validate-connection')}
+          </MenuItem>
+        </CapabilityGuard>
+        <CapabilityGuard capability="serverScaledDeployments">
+          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
+            {translate('deployments.set-as-current')}
           </MenuItem>
         </CapabilityGuard>
         <MenuItem href={workflowHref}>
