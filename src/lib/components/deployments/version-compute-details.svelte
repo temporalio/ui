@@ -25,7 +25,7 @@
 {#if isCompute}
   <div class="surface-secondary flex flex-col gap-2 py-3 pl-6 text-xs">
     {#if lambdaDetails.lambdaArn}
-      <div class="flex gap-1">
+      <div class="flex items-center gap-1">
         <span class="font-medium text-secondary"
           >{translate('workers.lambda-arn-label')}</span
         >
@@ -39,7 +39,7 @@
       </div>
     {/if}
     {#if lambdaDetails.iamRoleArn}
-      <div class="flex gap-1">
+      <div class="flex items-center gap-1">
         <span class="font-medium text-secondary"
           >{translate('workers.iam-role-label')}</span
         >

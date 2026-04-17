@@ -36,12 +36,6 @@ export const load: LayoutLoad = async function ({
     fetch,
   );
 
-  if (import.meta.env.DEV) {
-    Object.assign(systemInfo.capabilities ?? {}, {
-      serverScaledDeployments: true,
-    });
-  }
-
   return {
     user,
     settings,
