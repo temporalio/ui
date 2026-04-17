@@ -234,7 +234,7 @@ export async function PayloadCoverageWorkflow(
     },
   );
 
-  const timedOut = !(await workflow.condition(() => triggered, '5 minutes'));
+  const timedOut = !(await workflow.condition(() => triggered, '10 days'));
 
   return {
     received: input,

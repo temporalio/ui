@@ -6,7 +6,7 @@ import {
   type PayloadCodec,
   ValueError,
 } from '@temporalio/common';
-import { decode, encode } from '@temporalio/common/lib/encoding';
+import encoding from '@temporalio/common/lib/encoding.js';
 import temporal from '@temporalio/proto';
 
 import { decrypt, encrypt } from './crypto';
@@ -30,8 +30,8 @@ export class EncryptionCodec implements PayloadCodec {
     return Promise.all(
       payloads.map(async (payload) => ({
         metadata: {
-          [METADATA_ENCODING_KEY]: encode(ENCODING),
-          [METADATA_ENCRYPTION_KEY_ID]: encode(this.defaultKeyId),
+          [METADATA_ENCODING_KEY]: encoding.encode(ENCODING),
+          [METADATA_ENCRYPTION_KEY_ID]: encoding.encode(this.defaultKeyId),
         },
         data: await encrypt(
           temporal.temporal.api.common.v1.Payload.encode(payload).finish(),
@@ -46,7 +46,7 @@ export class EncryptionCodec implements PayloadCodec {
       payloads.map(async (payload) => {
         if (
           !payload.metadata ||
-          decode(payload.metadata[METADATA_ENCODING_KEY]) !== ENCODING
+          encoding.decode(payload.metadata[METADATA_ENCODING_KEY]) !== ENCODING
         ) {
           return payload;
         }
@@ -61,7 +61,7 @@ export class EncryptionCodec implements PayloadCodec {
           );
         }
 
-        const keyId = decode(keyIdBytes);
+        const keyId = encoding.decode(keyIdBytes);
         let key = this.keys.get(keyId);
         if (!key) {
           key = await fetchKey(keyId);

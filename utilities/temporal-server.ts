@@ -94,12 +94,17 @@ export const createTemporalServer = async ({
     { flag: 'frontend.workerVersioningDataAPIs', value: 'true' },
     { flag: 'frontend.workerVersioningWorkflowAPIs', value: 'true' },
     { flag: 'worker.buildIdScavengerEnabled', value: 'true' },
+    { flag: 'history.enableChasm', value: 'true' },
+    { flag: 'history.externalPayloadsEnabled', value: 'true' },
+    { flag: 'activity.enableStandalone', value: 'true' },
   ].forEach(({ flag, value }) => {
     flags.push('--dynamic-config-value');
     flags.push(`${flag}=${value}`);
   });
 
   const temporal = $`${cliPath} server start-dev ${flags}`.quiet();
+
+  await $`${cliPath} operator search-attribute create --name CustomKeywordField --type Keyword --name CustomIntField --type Int`;
 
   temporal.catch(async ({ stdout, stderr, exitCode }) => {
     console.log('EXIT CODE', exitCode);
