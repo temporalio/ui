@@ -179,7 +179,7 @@
 </script>
 
 <ServerlessWorkerCreateForm
-  submitButtonText={translate('workers.create-serverless-worker')}
+  submitButtonText={translate('common.save')}
   cancelHref={routeForWorkers({ namespace })}
   {onSuccess}
   {cfnTemplate}
