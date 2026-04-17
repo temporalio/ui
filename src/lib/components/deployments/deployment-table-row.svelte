@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -86,9 +87,11 @@
                 label={latestVersionStatus.label}
               />
             {/if}
-            {#if latestComputeProviderType}
-              <ComputeBadge type={latestComputeProviderType} />
-            {/if}
+            <CapabilityGuard capability="serverScaledDeployments">
+              {#if latestComputeProviderType}
+                <ComputeBadge type={latestComputeProviderType} />
+              {/if}
+            </CapabilityGuard>
           </div>
         {:else}
           <span class="text-secondary">—</span>
