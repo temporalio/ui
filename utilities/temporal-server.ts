@@ -102,9 +102,8 @@ export const createTemporalServer = async ({
     flags.push(`${flag}=${value}`);
   });
 
-  const temporal = $`${cliPath} server start-dev ${flags}`.quiet();
-
-  await $`${cliPath} operator search-attribute create --name CustomKeywordField --type Keyword --name CustomIntField --type Int`;
+  const temporal =
+    $`${cliPath} server start-dev --search-attribute CustomKeywordField=Keyword --search-attribute CustomIntField=Int ${flags}`.quiet();
 
   temporal.catch(async ({ stdout, stderr, exitCode }) => {
     console.log('EXIT CODE', exitCode);
