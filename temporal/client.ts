@@ -4,6 +4,8 @@ import { getDataConverter } from './data-converter';
 import {
   BlockingWorkflow,
   CompletedWorkflow,
+  type PayloadCoverageResult,
+  PayloadCoverageWorkflow,
   RunningWorkflow,
   Workflow,
 } from './workflows';
@@ -21,7 +23,7 @@ export const connect = async () => {
 
   const client = new Client({
     connection,
-    dataConverter: getDataConverter(),
+    dataConverter: await getDataConverter(),
   });
 
   return client;
@@ -59,6 +61,46 @@ export const startWorkflows = async (
   workflows.push(wf1, wf2, wf3, wf4);
 
   return Promise.all([wf1.result(), wf3.result()]);
+};
+
+export const startPayloadCoverageWorkflow = async (
+  client: Client,
+): Promise<PayloadCoverageResult> => {
+  const wf = await client.workflow.start(PayloadCoverageWorkflow, {
+    taskQueue: 'e2e-1',
+    workflowId: 'payload-coverage-workflow',
+    args: [
+      {
+        stringField: 'hello world',
+        numberField: 42,
+        floatField: 3.14159,
+        booleanField: true,
+        nullField: null,
+        arrayOfStrings: ['alpha', 'beta', 'gamma'],
+        arrayOfNumbers: [1, 2, 3, 100, -7],
+        mixedArray: ['text', 99, false, null, 'more'],
+        nestedObject: {
+          level1: {
+            level2: 'deep value',
+            array: [10, 20, 30],
+          },
+          flag: false,
+        },
+        emptyObject: {},
+        emptyArray: [],
+      },
+    ],
+    memo: {
+      description: 'Payload coverage test workflow',
+      tags: ['e2e', 'payload', 'coverage'],
+      version: 1,
+      testData: { nested: { value: 42 }, active: true },
+    },
+  });
+
+  workflows.push(wf);
+  console.log(`✨ started payload-coverage-workflow (${wf.workflowId})`);
+  return wf.result();
 };
 
 export const stopWorkflows = (): Promise<void[]> => {
