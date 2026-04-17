@@ -52,13 +52,13 @@
           </MenuItem>
         </CapabilityGuard>
         <CapabilityGuard capability="serverScaledDeployments">
-          <MenuItem onclick={onValidate}>
-            {translate('deployments.validate-connection')}
+          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
+            {translate('deployments.set-as-current')}
           </MenuItem>
         </CapabilityGuard>
         <CapabilityGuard capability="serverScaledDeployments">
-          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-            {translate('deployments.set-as-current')}
+          <MenuItem onclick={onValidate}>
+            {translate('deployments.validate-connection')}
           </MenuItem>
         </CapabilityGuard>
         <MenuItem href={workflowHref}>
