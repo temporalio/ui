@@ -10,6 +10,7 @@ import {
   routeForBatchOperation,
   routeForBatchOperations,
   routeForCallStack,
+  routeForCommonErrors,
   routeForEventHistory,
   routeForEventHistoryEvent,
   routeForEventHistoryImport,
@@ -191,6 +192,7 @@ describe('routeFor functions should resolve the base path exactly once', () => {
         }),
     ],
     ['routeForLoginPage', () => routeForLoginPage('', false)],
+    ['routeForCommonErrors', () => routeForCommonErrors()],
     ['routeForWorkflowWorkers', () => routeForWorkflowWorkers(workflowParams)],
     [
       'routeForWorkerInstance',
