@@ -1,0 +1,38 @@
+name: PR Review Reminder
+
+on:
+  schedule:
+    # ~8am Pacific (16:00 UTC): 8am PST / 9am PDT
+    - cron: '0 16 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: pr-review-reminder
+  cancel-in-progress: false
+
+jobs:
+  find-and-notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+
+      - name: Find Pending Reviews and Send Reminders
+        uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71 # v9.0.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_USER_MAP: ${{ secrets.SLACK_USER_MAP }}
+        with:
+          script: |
+            const { default: script } = await import(`${process.cwd()}/.github/scripts/find-pending-reviews.mjs`);
+            await script({ github, context });
