@@ -1,7 +1,6 @@
 <script lang="ts">
+  import DeleteConfirmModal from '$lib/components/delete-confirmation-modal.svelte';
   import { translate } from '$lib/i18n/translate';
-
-  import DeleteConfirmModal from './delete-confirm-modal.svelte';
 
   interface Props {
     buildId: string;
