@@ -1,6 +1,6 @@
 <script lang="ts">
   import EventDetailsLink from '$lib/components/event/event-details-link.svelte';
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import {
     displayLinkType,
@@ -22,21 +22,21 @@
 
 {#if typeof value === 'object'}
   {#if value?.payloads}
-    <Payload
+    <PayloadCodeBlock
       {value}
-      key="payloads"
+      fieldName="payloads"
       maxHeight={staticCodeBlockHeight - fontSizeRatio}
       {onDecode}
     />
   {:else if key === 'searchAttributes'}
-    <Payload
-      key="searchAttributes"
+    <PayloadCodeBlock
+      fieldName="searchAttributes"
       value={{ searchAttributes: codeBlockValue }}
       maxHeight={staticCodeBlockHeight - fontSizeRatio}
       {onDecode}
     />
   {:else}
-    <Payload
+    <PayloadCodeBlock
       value={codeBlockValue}
       maxHeight={staticCodeBlockHeight - fontSizeRatio}
       {onDecode}

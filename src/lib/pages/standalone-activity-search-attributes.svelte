@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
@@ -8,9 +8,9 @@
 
 <div class="flex flex-col gap-2">
   {#if searchAttributes}
-    <Payload
+    <PayloadCodeBlock
       value={{ searchAttributes: searchAttributes }}
-      key="searchAttributes"
+      fieldName="searchAttributes"
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
     />

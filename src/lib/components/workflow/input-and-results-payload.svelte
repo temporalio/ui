@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
+  import PayloadDecoder from '$lib/components/payload/payload-decoder.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { Payload as RawPayload } from '$lib/types';
@@ -69,13 +70,7 @@
   {@render titleSnippet()}
   {#if content}
     {#if payloadsSize > 0}
-      <Payload
-        value={parsedContent}
-        key="payloads"
-        maxHeight={MAX_HEIGHT}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      >
+      <PayloadDecoder value={parsedContent} fieldName="payloads">
         {#snippet children(decodedValue)}
           {#if payloadsSize > 1}
             {#each parsePayloads(decodedValue) as decodedContent (decodedContent)}
@@ -97,9 +92,9 @@
             />
           {/if}
         {/snippet}
-      </Payload>
+      </PayloadDecoder>
     {:else}
-      <Payload
+      <PayloadCodeBlock
         value={parseWithBigInt(content)}
         maxHeight={MAX_HEIGHT}
         copyIconTitle={translate('common.copy-icon-title')}

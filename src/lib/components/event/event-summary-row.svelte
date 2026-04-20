@@ -4,7 +4,7 @@
 
   import { page } from '$app/state';
 
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -331,9 +331,8 @@
           class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
           <p class="whitespace-nowrap text-right text-xs">Summary</p>
-          <Payload
+          <PayloadSummary
             value={currentEvent.userMetadata.summary}
-            mode="summary"
             class="block select-none truncate"
           />
         </div>

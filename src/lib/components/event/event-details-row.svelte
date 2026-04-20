@@ -1,7 +1,7 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadInline from '$lib/components/payload/payload-inline.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -33,10 +33,9 @@
       <div
         class="flex max-w-sm items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
-        <Payload
+        <PayloadInline
           {value}
-          key="payloads"
-          mode="inline-truncated"
+          fieldName="payloads"
           class={merge($$props.class)}
         />
       </div>

@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadInput from '$lib/components/payload-input.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -179,7 +179,7 @@
     {#if success && typeof success === 'object'}
       <Alert intent="success" title="Success">
         {#if success?.payloads?.[0] && success.payloads[0].data}
-          <Payload value={success.payloads[0]} class="mt-4" language="text" />
+          <PayloadCodeBlock value={success.payloads[0]} language="text" />
         {/if}
       </Alert>
     {/if}

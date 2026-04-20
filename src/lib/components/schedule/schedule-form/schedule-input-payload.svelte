@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadDecoder from '$lib/components/payload/payload-decoder.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -69,7 +69,11 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <Payload value={payloads} key="payloads" onDecode={setInitialInput}>
+  <PayloadDecoder
+    value={payloads}
+    fieldName="payloads"
+    onDecode={setInitialInput}
+  >
     {#snippet children(_decodedValue)}
       <PayloadInputWithEncoding
         bind:input
@@ -86,5 +90,5 @@
         </div>
       </PayloadInputWithEncoding>
     {/snippet}
-  </Payload>
+  </PayloadDecoder>
 </div>

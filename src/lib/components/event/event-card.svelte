@@ -1,7 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -165,11 +166,7 @@
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">Summary</p>
     <p class="whitespace-pre-line">
-      <Payload
-        {value}
-        mode="summary"
-        fallback={translate('events.decode-failed')}
-      />
+      <PayloadSummary {value} fallback={translate('events.decode-failed')} />
     </p>
   </div>
 {/snippet}
@@ -182,23 +179,23 @@
       {format(key)}
     </p>
     {#if value?.payloads}
-      <Payload
+      <PayloadCodeBlock
         {value}
-        key="payloads"
+        fieldName="payloads"
         maxHeight={384}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
     {:else if key === 'searchAttributes'}
-      <Payload
-        key="searchAttributes"
+      <PayloadCodeBlock
+        fieldName="searchAttributes"
         value={{ searchAttributes: codeBlockValue }}
         maxHeight={384}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
     {:else}
-      <Payload
+      <PayloadCodeBlock
         value={codeBlockValue}
         maxHeight={384}
         copyIconTitle={translate('common.copy-icon-title')}
@@ -211,7 +208,7 @@
       <p class="mb-1 min-w-56 text-sm text-secondary/80">
         {translate('workflows.call-stack-tab')}
       </p>
-      <Payload
+      <PayloadCodeBlock
         value={stackTrace}
         language="text"
         maxHeight={384}

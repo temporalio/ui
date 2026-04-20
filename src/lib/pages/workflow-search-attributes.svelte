@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
@@ -11,9 +11,9 @@
     {translate('events.attribute-group.search-attributes')}
   </h3>
   {#if workflow?.searchAttributes}
-    <Payload
+    <PayloadCodeBlock
       value={{ searchAttributes: workflow.searchAttributes }}
-      key="searchAttributes"
+      fieldName="searchAttributes"
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
     />

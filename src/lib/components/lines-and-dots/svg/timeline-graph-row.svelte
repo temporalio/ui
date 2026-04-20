@@ -5,7 +5,7 @@
 
   import { page } from '$app/state';
 
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
@@ -254,9 +254,8 @@
       />
     {/if}
     {#if showText}
-      <Payload
+      <PayloadSummary
         value={group?.userMetadata?.summary}
-        mode="summary"
         prefix={isActivityTaskScheduledEvent(group.initialEvent)
           ? group?.displayName
           : ''}
@@ -290,7 +289,7 @@
             {/if}
           </Text>
         {/snippet}
-      </Payload>
+      </PayloadSummary>
     {/if}
     <Dot
       point={[x, y]}

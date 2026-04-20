@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
@@ -9,9 +9,9 @@
 <div class="mt-4 flex flex-col gap-2">
   <h3>{translate('common.memo')}</h3>
   {#if workflow?.memo}
-    <Payload
+    <PayloadCodeBlock
       value={{ memo: workflow.memo }}
-      key="memo"
+      fieldName="memo"
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
     />

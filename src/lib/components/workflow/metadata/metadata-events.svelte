@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Payload from '$lib/components/payload/payload.svelte';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
@@ -28,15 +28,14 @@
     >
       <div class="flex items-center gap-2">
         <p class="w-32 min-w-32 text-sm font-medium">{group.label}</p>
-        <Payload
+        <PayloadSummary
           value={group.userMetadata.summary}
-          mode="summary"
           fallback={translate('events.decode-failed')}
         >
           {#snippet children(decodedValue)}
             <span class="text-sm">{decodedValue}</span>
           {/snippet}
-        </Payload>
+        </PayloadSummary>
       </div>
       <WorkflowStatus status={group.finalClassification} />
     </div>
