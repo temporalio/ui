@@ -4,10 +4,7 @@
   import Badge from '$lib/holocene/badge.svelte';
   import type { Payload as RawPayload } from '$lib/types';
   import type { Payload } from '$lib/types/events';
-  import {
-    decodeEventAttributes,
-    type PotentiallyDecodable,
-  } from '$lib/utilities/decode-payload';
+  import { decodeUserMetadata } from '$lib/utilities/decode-payload';
 
   interface Props {
     value: RawPayload | Payload | null | undefined;
@@ -15,6 +12,7 @@
     prefix?: string;
     maxSummaryLength?: number;
     class?: string;
+    onDecode?: (decodedValue: string) => void;
     children?: Snippet<[decodedValue: string]>;
   }
 
@@ -24,6 +22,7 @@
     prefix = '',
     maxSummaryLength = 120,
     class: className = '',
+    onDecode,
     children,
   }: Props = $props();
 
@@ -42,9 +41,10 @@
       return;
     }
     try {
-      const result = await decodeEventAttributes(value as PotentiallyDecodable);
+      const result = await decodeUserMetadata(value);
       if (typeof result === 'string' && result) {
         decodedValue = applyPrefix(result);
+        onDecode?.(decodedValue);
       } else {
         decodedValue = fallback;
       }
