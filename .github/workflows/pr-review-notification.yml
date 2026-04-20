@@ -1,0 +1,51 @@
+name: PR Review Notification
+
+on:
+  pull_request:
+    types: [review_requested, ready_for_review]
+  workflow_call:
+    secrets:
+      SLACK_BOT_TOKEN:
+        required: true
+      SLACK_USER_MAP:
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  notify-reviewer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout workflow source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: temporalio/ui
+          ref: ${{ github.workflow_sha }}
+          path: ._reusable
+
+      - name: Get Reviewers to Notify
+        id: get-reviewers
+        uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71 # v9.0.0
+        env:
+          SLACK_USER_MAP: ${{ secrets.SLACK_USER_MAP }}
+        with:
+          script: |
+            const { default: script } = await import(`${process.env.GITHUB_WORKSPACE}/._reusable/.github/scripts/get-reviewers-to-notify.mjs`);
+            await script({ context, core });
+
+      - name: Send Slack Notifications
+        uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71 # v9.0.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          REVIEWERS_JSON: ${{ steps.get-reviewers.outputs.reviewers }}
+        with:
+          script: |
+            const { default: script } = await import(`${process.env.GITHUB_WORKSPACE}/._reusable/.github/scripts/send-review-notifications.mjs`);
+            await script({ context });
