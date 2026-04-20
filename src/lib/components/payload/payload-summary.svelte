@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, type Snippet } from 'svelte';
+  import { type Snippet } from 'svelte';
 
   import Badge from '$lib/holocene/badge.svelte';
   import type { Payload as RawPayload } from '$lib/types';
@@ -35,22 +35,23 @@
     return prefixed.slice(0, maxSummaryLength) + '...';
   };
 
-  onMount(async () => {
+  $effect(() => {
     if (!value) {
       decodedValue = fallback;
       return;
     }
-    try {
-      const result = await decodeUserMetadata(value);
-      if (typeof result === 'string' && result) {
-        decodedValue = applyPrefix(result);
-        onDecode?.(decodedValue);
-      } else {
+    decodeUserMetadata(value)
+      .then((result) => {
+        if (typeof result === 'string' && result) {
+          decodedValue = applyPrefix(result);
+          onDecode?.(decodedValue);
+        } else {
+          decodedValue = fallback;
+        }
+      })
+      .catch(() => {
         decodedValue = fallback;
-      }
-    } catch {
-      decodedValue = fallback;
-    }
+      });
   });
 </script>
 

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import {
     type DecodableValue,
     decodePayloadValue,
@@ -23,13 +21,15 @@
 
   let decodedValue = $state(getInitialPayloadValue(value, fieldName));
 
-  onMount(async () => {
+  $effect(() => {
     if (!value) return;
-    try {
-      decodedValue = await decodePayloadValue(value, fieldName);
-    } catch {
-      console.error('Could not decode payloads');
-    }
+    decodePayloadValue(value, fieldName)
+      .then((result) => {
+        decodedValue = result;
+      })
+      .catch(() => {
+        console.error('Could not decode payloads');
+      });
   });
 </script>
 

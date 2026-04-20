@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import {
     type DecodableValue,
@@ -33,14 +31,16 @@
 
   let decodedValue = $state(getInitialPayloadValue(value, fieldName));
 
-  onMount(async () => {
+  $effect(() => {
     if (!value) return;
-    try {
-      decodedValue = await decodePayloadValue(value, fieldName);
-      onDecode?.(decodedValue);
-    } catch {
-      console.error('Could not decode payloads');
-    }
+    decodePayloadValue(value, fieldName)
+      .then((result) => {
+        decodedValue = result;
+        onDecode?.(result);
+      })
+      .catch(() => {
+        console.error('Could not decode payloads');
+      });
   });
 </script>
 
