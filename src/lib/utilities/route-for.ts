@@ -14,7 +14,7 @@ import type { Settings } from '$lib/types/global';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { toURL } from '$lib/utilities/to-url';
 
-type RouteParameters = {
+interface RouteParameters {
   namespace: string;
   workflow: string;
   run: string;
@@ -30,7 +30,7 @@ type RouteParameters = {
   search?: string;
   page?: string;
   archival?: boolean;
-};
+}
 
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
 export type QueryParameters = Pick<
@@ -365,7 +365,7 @@ export const routeForWorkerInstance = ({
 }: {
   namespace: string;
   workerInstanceKey: string;
-}) => {
+}): ResolvedPathname => {
   const workerInstanceKeyEncoded = encodeURIForSvelte(workerInstanceKey);
   return resolve('/namespaces/[namespace]/workers/[workerInstanceKey]', {
     namespace,
@@ -400,6 +400,54 @@ export const routeForWorkerDeploymentVersion = ({
     namespace,
     deployment,
   })}/version/${version}`;
+};
+
+export const routeForWorkerDeploymentVersionCreate = ({
+  namespace,
+  deployment,
+}: {
+  namespace: string;
+  deployment: string;
+}): ResolvedPathname => {
+  const deploymentName = encodeURIForSvelte(deployment);
+  return resolve(
+    '/namespaces/[namespace]/workers/deployments/[deployment]/versions/create',
+    {
+      namespace,
+      deployment: deploymentName,
+    },
+  );
+};
+
+export const routeForWorkerDeploymentVersionEdit = ({
+  namespace,
+  deployment,
+  buildId,
+}: {
+  namespace: string;
+  deployment: string;
+  buildId: string;
+}): ResolvedPathname => {
+  const deploymentName = encodeURIForSvelte(deployment);
+  const buildIdEncoded = encodeURIForSvelte(buildId);
+  return resolve(
+    '/namespaces/[namespace]/workers/deployments/[deployment]/versions/[buildId]/edit',
+    {
+      namespace,
+      deployment: deploymentName,
+      buildId: buildIdEncoded,
+    },
+  );
+};
+
+export const routeForWorkerDeploymentCreate = ({
+  namespace,
+}: {
+  namespace: string;
+}): ResolvedPathname => {
+  return resolve('/namespaces/[namespace]/workers/deployments/create', {
+    namespace,
+  });
 };
 
 export const routeForRelationships = (

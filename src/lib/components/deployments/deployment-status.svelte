@@ -1,14 +1,17 @@
 <script lang="ts">
   import { cva } from 'class-variance-authority';
 
-  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DeploymentStatus } from '$lib/types/deployments';
 
-  export let status: DeploymentStatus;
-  export let label: string;
+  interface Props {
+    status: DeploymentStatus;
+    label: string;
+  }
+  let { status, label }: Props = $props();
 
   const icon: Partial<Record<DeploymentStatus, IconName>> = {
     Current: 'heartbeat',
@@ -16,6 +19,7 @@
     Draining: 'trending-down',
     Drained: 'drained',
     Inactive: 'inactive',
+    Created: 'add',
   };
 
   const tooltip: Partial<Record<DeploymentStatus, string>> = {
@@ -24,6 +28,7 @@
     Draining: translate('deployments.status-tooltip-draining'),
     Drained: translate('deployments.status-tooltip-drained'),
     Inactive: translate('deployments.status-tooltip-inactive'),
+    Created: translate('deployments.status-tooltip-created'),
   };
 
   const deploymentStatus = cva(
@@ -39,6 +44,7 @@
           Draining: 'text-yellow-600 dark:text-yellow-200',
           Drained: 'text-secondary',
           Inactive: 'text-secondary',
+          Created: 'text-secondary',
         },
       },
     },
@@ -47,6 +53,6 @@
 
 <Tooltip text={tooltip[status]} topLeft width={250}>
   <p class={deploymentStatus({ status })}>
-    <Icon name={icon[status]} />{label}
+    {#if icon[status]}<Icon name={icon[status]!} />{/if}{label}
   </p>
 </Tooltip>

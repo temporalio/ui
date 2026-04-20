@@ -10,6 +10,7 @@ import arrowRight from './svg/arrow-right.svelte';
 import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
 import astronaut from './svg/astronaut.svelte';
+import aws from './svg/aws.svelte';
 import batchOperation from './svg/batch-operation.svelte';
 import book from './svg/book-sparkles.svelte';
 import bookmark from './svg/bookmark.svelte';
@@ -63,6 +64,7 @@ import filter from './svg/filter.svelte';
 import fireExtinguisher from './svg/fire-extinguisher.svelte';
 import flag from './svg/flag.svelte';
 import folders from './svg/folders.svelte';
+import gcp from './svg/gcp.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import happyLappy from './svg/happy-lappy.svelte';
@@ -143,6 +145,7 @@ import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import userGroup from './svg/user-group.svelte';
+import vercel from './svg/vercel.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workers from './svg/workers.svelte';
@@ -164,6 +167,7 @@ export const icons = {
   'arrow-right': arrowRight,
   ascending,
   astronaut,
+  aws,
   'batch-operation': batchOperation,
   book,
   bookmark,
@@ -217,6 +221,7 @@ export const icons = {
   'filter-solid': filterSolid,
   'fire-extinguisher': fireExtinguisher,
   folders,
+  gcp,
   github,
   graph,
   'happy-lappy': happyLappy,
@@ -297,6 +302,7 @@ export const icons = {
   upload,
   usage,
   'user-group': userGroup,
+  vercel,
   'vertical-ellipsis': verticalEllipsis,
   warning,
   'system-window': systemWindow,
