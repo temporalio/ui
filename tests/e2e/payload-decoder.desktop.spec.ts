@@ -183,9 +183,7 @@ test.describe('Payload Decoder', () => {
         .click();
     });
 
-    test('user metadata tab shows decoded summary and details', async ({
-      page,
-    }) => {
+    test('user metadata shows decoded payloads', async ({ page }) => {
       const workflowDetail = new WorkflowDetailPage(page);
       const eventHistory = new EventHistoryPage(page);
       await workflowDetail.openHistory();
@@ -214,6 +212,33 @@ test.describe('Payload Decoder', () => {
       await expect(workflowDetail.userMetadataCurrentDetails).toContainText(
         'Paused at checkpoint.',
       );
+    });
+
+    test('user metadata shows encoded payloads when codec server is misconfigured', async ({
+      page,
+    }) => {
+      const workflowDetail = new WorkflowDetailPage(page);
+
+      await page.route('http://localhost:8888/decode', async (route) => {
+        route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({}),
+        });
+      });
+
+      await workflowDetail.openUserMetadata();
+      await expect(
+        workflowDetail.main.getByText('No summary available'),
+      ).toBeVisible();
+      await expect(
+        workflowDetail.main.getByText('No details available'),
+      ).toBeVisible();
+      await expect(
+        workflowDetail.userMetadataCurrentDetails.getByText(
+          'No Current Details',
+        ),
+      ).toBeVisible();
     });
   });
 });
