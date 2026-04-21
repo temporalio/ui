@@ -33,12 +33,8 @@ export const connect = async () => {
 const workflows: WorkflowHandle[] = [];
 
 export const startWorkflows = async (
-  client?: Client,
+  client: Client,
 ): Promise<(string | number | PayloadCoverageResult)[]> => {
-  if (!client) {
-    client = await connect();
-  }
-
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
     args: ['Plain text input 1'],
@@ -118,8 +114,3 @@ export const stopWorkflows = (): Promise<void[]> => {
     }),
   );
 };
-
-startWorkflows().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
