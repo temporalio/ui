@@ -34,6 +34,7 @@ const workflows: WorkflowHandle[] = [];
 
 export const startWorkflows = async (
   client: Client,
+  config: { waitForResult?: boolean } = { waitForResult: true },
 ): Promise<(string | number | PayloadCoverageResult)[]> => {
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
@@ -101,7 +102,9 @@ export const startWorkflows = async (
 
   workflows.push(wf1, wf2, wf3, wf4, wf5, wf6);
 
-  return Promise.all([wf1.result(), wf3.result(), wf5.result(), wf6.result()]);
+  if (config?.waitForResult) {
+    return Promise.all(workflows.map((wf) => wf.result()));
+  }
 };
 
 export const stopWorkflows = (): Promise<void[]> => {
