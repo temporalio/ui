@@ -16,9 +16,15 @@
       | 'details'
       | ''
       | undefined;
+    frameId?: string;
   }
 
-  let { content, class: className = '', overrideTheme = '' }: Props = $props();
+  let {
+    content,
+    class: className = '',
+    overrideTheme = '',
+    frameId = '',
+  }: Props = $props();
 
   let iframe: HTMLIFrameElement | null = $state(null);
 
@@ -65,5 +71,6 @@
     title="output"
     class="w-full"
     src={previewPath}
+    id={frameId}
   ></iframe>
 </section>

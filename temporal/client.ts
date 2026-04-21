@@ -7,6 +7,7 @@ import {
   type PayloadCoverageResult,
   PayloadCoverageWorkflow,
   RunningWorkflow,
+  UserMetadataWorkflow,
   Workflow,
 } from './workflows';
 
@@ -33,7 +34,8 @@ const workflows: WorkflowHandle[] = [];
 
 export const startWorkflows = async (
   client: Client,
-): Promise<(string | number | void)[]> => {
+  config: { waitForResult?: boolean } = { waitForResult: true },
+): Promise<(string | number | PayloadCoverageResult)[]> => {
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
     args: ['Plain text input 1'],
@@ -58,15 +60,15 @@ export const startWorkflows = async (
     workflowId: 'running-workflow',
   });
 
-  workflows.push(wf1, wf2, wf3, wf4);
+  const wf5 = await client.workflow.start(UserMetadataWorkflow, {
+    taskQueue: 'e2e-1',
+    args: ['Plain text input 5'],
+    workflowId: 'user-metadata-workflow',
+    staticSummary: '# Summary\n **this is the summary**',
+    staticDetails: '# Details\n **these are the details**',
+  });
 
-  return Promise.all([wf1.result(), wf3.result()]);
-};
-
-export const startPayloadCoverageWorkflow = async (
-  client: Client,
-): Promise<PayloadCoverageResult> => {
-  const wf = await client.workflow.start(PayloadCoverageWorkflow, {
+  const wf6 = await client.workflow.start(PayloadCoverageWorkflow, {
     taskQueue: 'e2e-1',
     workflowId: 'payload-coverage-workflow',
     args: [
@@ -98,9 +100,11 @@ export const startPayloadCoverageWorkflow = async (
     },
   });
 
-  workflows.push(wf);
-  console.log(`✨ started payload-coverage-workflow (${wf.workflowId})`);
-  return wf.result();
+  workflows.push(wf1, wf2, wf3, wf4, wf5, wf6);
+
+  if (config?.waitForResult) {
+    return Promise.all(workflows.map((wf) => wf.result()));
+  }
 };
 
 export const stopWorkflows = (): Promise<void[]> => {

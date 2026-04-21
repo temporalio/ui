@@ -1,5 +1,5 @@
 import { connect, startWorkflows } from '../temporal/client';
-import { runWorkerUntil } from '../temporal/workers';
+import { runWorkerUntil } from '../temporal/worker';
 
 async function main() {
   const client = await connect();

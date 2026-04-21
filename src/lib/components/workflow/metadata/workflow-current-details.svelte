@@ -85,6 +85,11 @@
     </div>
   </div>
   {#key currentDetails}
-    <Markdown class="p-3" overrideTheme="primary" content={currentDetails} />
+    <Markdown
+      frameId="user-metadata-current-details"
+      class="p-3"
+      overrideTheme="primary"
+      content={currentDetails}
+    />
   {/key}
 </div>
