@@ -14,6 +14,7 @@ const { echo: LocalActivity } = workflow.proxyLocalActivities<
 
 const isBlockedQuery = workflow.defineQuery<boolean>('is-blocked');
 const unblockSignal = workflow.defineSignal('unblock');
+const proceedSignal = workflow.defineSignal('proceed');
 
 const { double } = workflow.proxyActivities<typeof activities>({
   startToCloseTimeout: '1 hour',
@@ -62,4 +63,34 @@ export async function CompletedWorkflow(
 
 export async function RunningWorkflow(): Promise<void> {
   return await workflow.sleep('10 days');
+}
+
+export async function UserMetadataWorkflow(input: string): Promise<string> {
+  let signalReceived = false;
+
+  workflow.setHandler(proceedSignal, () => void (signalReceived = true));
+
+  workflow.setCurrentDetails(
+    `# Paused at checkpoint.\n Send 'proceed' signal to continue, or workflow will auto-proceed after 10 minutes. Input: ${input}`,
+  );
+
+  await workflow.condition(() => signalReceived, '10 minutes', {
+    summary: 'Sleeping for 10 minutes',
+  });
+
+  const currentDetails = workflow.getCurrentDetails();
+  console.log(`Current details: ${currentDetails}`);
+
+  workflow.setCurrentDetails(
+    signalReceived
+      ? 'Received proceed signal, continuing execution'
+      : 'Timed out after 10 minutes, continuing execution',
+  );
+
+  return await Activity.executeWithOptions(
+    {
+      summary: '# This is the summary',
+    },
+    [input],
+  );
 }

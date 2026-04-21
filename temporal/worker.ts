@@ -66,3 +66,8 @@ export const stopWorker = async (): Promise<void> => {
     });
   }
 };
+
+runWorker().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -31,11 +31,8 @@
         <PayloadSummary
           value={group.userMetadata.summary}
           fallback={translate('events.decode-failed')}
-        >
-          {#snippet children(decodedValue)}
-            <span class="text-sm">{decodedValue}</span>
-          {/snippet}
-        </PayloadSummary>
+          class="text-sm"
+        />
       </div>
       <WorkflowStatus status={group.finalClassification} />
     </div>

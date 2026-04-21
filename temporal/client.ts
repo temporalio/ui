@@ -5,6 +5,7 @@ import {
   BlockingWorkflow,
   CompletedWorkflow,
   RunningWorkflow,
+  UserMetadataWorkflow,
   Workflow,
 } from './workflows';
 
@@ -29,9 +30,9 @@ export const connect = async () => {
 
 const workflows: WorkflowHandle[] = [];
 
-export const startWorkflows = async (
-  client: Client,
-): Promise<(string | number | void)[]> => {
+export const startWorkflows = async (): Promise<(string | number | void)[]> => {
+  const client = await connect();
+
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
     args: ['Plain text input 1'],
@@ -56,9 +57,17 @@ export const startWorkflows = async (
     workflowId: 'running-workflow',
   });
 
-  workflows.push(wf1, wf2, wf3, wf4);
+  const wf5 = await client.workflow.start(UserMetadataWorkflow, {
+    taskQueue: 'e2e-1',
+    args: ['Plain text input 5'],
+    workflowId: 'user-metadata-workflow',
+    staticSummary: '# Summary\n **this is the summary**',
+    staticDetails: '# Details\n **these are the details**',
+  });
 
-  return Promise.all([wf1.result(), wf3.result()]);
+  workflows.push(wf1, wf2, wf3, wf4, wf5);
+
+  return Promise.all([wf1.result(), wf3.result(), wf5.result()]);
 };
 
 export const stopWorkflows = (): Promise<void[]> => {
@@ -71,3 +80,8 @@ export const stopWorkflows = (): Promise<void[]> => {
     }),
   );
 };
+
+startWorkflows().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
