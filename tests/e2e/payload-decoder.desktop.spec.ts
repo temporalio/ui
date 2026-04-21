@@ -187,8 +187,33 @@ test.describe('Payload Decoder', () => {
       page,
     }) => {
       const workflowDetail = new WorkflowDetailPage(page);
+      const eventHistory = new EventHistoryPage(page);
+      await workflowDetail.openHistory();
+
+      await expect(
+        eventHistory.eventRow('Workflow Execution Started'),
+      ).toContainText('this is the summary');
+      await expect(eventHistory.eventRow('Timer Started')).toContainText(
+        'Sleeping for 10 minutes',
+      );
+      await eventHistory.expandEvent('Timer Started');
+      await expect(eventHistory.expandedRow('first')).toContainText(
+        'Sleeping for 10 minutes',
+      );
+
       await workflowDetail.openUserMetadata();
-      await expect(workflowDetail.main).toContainText('This is the summary');
+
+      await expect(workflowDetail.userMetadataSummary).toContainText('Summary');
+      await expect(workflowDetail.userMetadataSummary).toContainText(
+        'this is the summary',
+      );
+      await expect(workflowDetail.userMetadataDetails).toContainText('Details');
+      await expect(workflowDetail.userMetadataDetails).toContainText(
+        'these are the details',
+      );
+      await expect(workflowDetail.userMetadataCurrentDetails).toContainText(
+        'Paused at checkpoint.',
+      );
     });
   });
 });

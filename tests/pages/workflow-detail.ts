@@ -11,6 +11,10 @@ export class WorkflowDetailPage {
   readonly queriesTab: Locator;
   readonly userMetadataTab: Locator;
   readonly callStackEditor: Locator;
+  readonly userMetadataSummary: Locator;
+  readonly userMetadataDetails: Locator;
+  readonly userMetadataCurrentDetails: Locator;
+  readonly timerStartedHistoryRow: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -23,6 +27,15 @@ export class WorkflowDetailPage {
     this.queriesTab = page.getByTestId('queries-tab');
     this.userMetadataTab = page.getByTestId('user-metadata-tab');
     this.callStackEditor = page.getByRole('textbox');
+    this.userMetadataSummary = page
+      .frameLocator('#user-metadata-summary')
+      .locator('body');
+    this.userMetadataDetails = page
+      .frameLocator('#user-metadata-details')
+      .locator('body');
+    this.userMetadataCurrentDetails = page
+      .frameLocator('#user-metadata-current-details')
+      .locator('body');
   }
 
   async navigate(baseURL: string, workflowId: string) {
