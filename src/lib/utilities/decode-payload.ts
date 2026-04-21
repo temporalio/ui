@@ -211,7 +211,7 @@ export const decodeUserMetadata = async (
   try {
     const data = await decodePayloadsWithRemoteCodec([payload]);
     const result = data[0];
-    return result || '';
+    return parseRawPayloadToJSON(result) || '';
   } catch {
     return '';
   }
