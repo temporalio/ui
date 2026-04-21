@@ -166,9 +166,11 @@
 {#snippet eventSummary(value: RawPayload)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">Summary</p>
-    <p class="whitespace-pre-line">
-      <PayloadSummary {value} fallback={translate('events.decode-failed')} />
-    </p>
+    <PayloadSummary
+      class="whitespace-pre-line"
+      {value}
+      fallback={translate('events.decode-failed')}
+    />
   </div>
 {/snippet}
 

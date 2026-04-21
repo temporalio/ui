@@ -331,10 +331,7 @@
           class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
           <p class="whitespace-nowrap text-right text-xs">Summary</p>
-          <PayloadSummary
-            value={currentEvent.userMetadata.summary}
-            class="block select-none truncate"
-          />
+          <PayloadSummary value={currentEvent.userMetadata.summary} />
         </div>
       {/if}
       {#if currentEvent?.links?.length}
