@@ -93,12 +93,7 @@
 <div class="min-h-screen py-4">
   {#if $decodeEventHistory && events.length > 0}
     {#key [index, $decodeEventHistory]}
-      <PayloadCodeBlock
-        value={rawEvent}
-        testId="event-history-json"
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+      <PayloadCodeBlock value={rawEvent} testId="event-history-json" />
     {/key}
   {:else}
     {#key index}

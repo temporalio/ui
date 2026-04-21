@@ -14,8 +14,6 @@
     <PayloadCodeBlock
       value={{ searchAttributes: workflow.searchAttributes }}
       fieldName="searchAttributes"
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
     />
   {:else}
     <p>{translate('events.empty-search-attributes')}</p>

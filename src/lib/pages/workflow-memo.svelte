@@ -9,12 +9,7 @@
 <div class="mt-4 flex flex-col gap-2">
   <h3>{translate('common.memo')}</h3>
   {#if workflow?.memo}
-    <PayloadCodeBlock
-      value={{ memo: workflow.memo }}
-      fieldName="memo"
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-    />
+    <PayloadCodeBlock value={{ memo: workflow.memo }} fieldName="memo" />
   {:else}
     <p>{translate('events.empty-memo-attributes')}</p>
   {/if}

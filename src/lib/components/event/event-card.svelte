@@ -4,6 +4,7 @@
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -179,28 +180,15 @@
       {format(key)}
     </p>
     {#if value?.payloads}
-      <PayloadCodeBlock
-        {value}
-        fieldName="payloads"
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+      <PayloadCodeBlock {value} fieldName="payloads" maxHeight={384} />
     {:else if key === 'searchAttributes'}
       <PayloadCodeBlock
         fieldName="searchAttributes"
         value={{ searchAttributes: codeBlockValue }}
         maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
     {:else}
-      <PayloadCodeBlock
-        value={codeBlockValue}
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+      <PayloadCodeBlock value={codeBlockValue} maxHeight={384} />
     {/if}
   </div>
   {#if stackTrace}
@@ -208,13 +196,7 @@
       <p class="mb-1 min-w-56 text-sm text-secondary/80">
         {translate('workflows.call-stack-tab')}
       </p>
-      <PayloadCodeBlock
-        value={stackTrace}
-        language="text"
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+      <CodeBlock content={stackTrace} language="text" maxHeight={384} />
     </div>
   {/if}
 {/snippet}

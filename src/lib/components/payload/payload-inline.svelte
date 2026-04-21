@@ -3,7 +3,7 @@
     type DecodableValue,
     decodePayloadValue,
     getInitialPayloadValue,
-  } from '$lib/utilities/decode-payload-value';
+  } from './decode-payload-value';
 
   interface Props {
     value: DecodableValue;

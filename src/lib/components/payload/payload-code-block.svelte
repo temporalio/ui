@@ -1,33 +1,24 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import { translate } from '$lib/i18n/translate';
+  import type { EditorLanguage } from '$lib/vendor/codemirror/custom-extensions';
+
   import {
     type DecodableValue,
     decodePayloadValue,
     getInitialPayloadValue,
-  } from '$lib/utilities/decode-payload-value';
-  import type { EditorLanguage } from '$lib/vendor/codemirror/custom-extensions';
+  } from './decode-payload-value';
 
   interface Props {
     value: DecodableValue;
     fieldName?: string;
     maxHeight?: number;
-    copyIconTitle?: string;
-    copySuccessIconTitle?: string;
     testId?: string;
     language?: EditorLanguage;
     onDecode?: (decodedValue: string) => void;
   }
 
-  let {
-    value,
-    fieldName = '',
-    maxHeight,
-    copyIconTitle = '',
-    copySuccessIconTitle = '',
-    testId,
-    language = 'json',
-    onDecode,
-  }: Props = $props();
+  let { value, fieldName = '', maxHeight, testId, onDecode }: Props = $props();
 
   let decodedValue = $state(getInitialPayloadValue(value, fieldName));
 
@@ -47,8 +38,8 @@
 <CodeBlock
   content={decodedValue}
   {maxHeight}
-  {copyIconTitle}
-  {copySuccessIconTitle}
+  copyIconTitle={translate('common.copy-icon-title')}
+  copySuccessIconTitle={translate('common.copy-success-icon-title')}
   {testId}
-  {language}
+  language="json"
 />

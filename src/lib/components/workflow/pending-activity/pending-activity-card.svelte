@@ -176,8 +176,6 @@
         value={activity.heartbeatDetails}
         fieldName="payloads"
         maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
     {/key}
   </div>
@@ -194,8 +192,6 @@
           <PayloadCodeBlock
             value={omit(activity.lastFailure, 'stackTrace')}
             maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
         {/key}
       {/if}
