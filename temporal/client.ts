@@ -30,8 +30,12 @@ export const connect = async () => {
 
 const workflows: WorkflowHandle[] = [];
 
-export const startWorkflows = async (): Promise<(string | number | void)[]> => {
-  const client = await connect();
+export const startWorkflows = async (
+  client?: Client,
+): Promise<(string | number | void)[]> => {
+  if (!client) {
+    client = await connect();
+  }
 
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
