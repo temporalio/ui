@@ -145,7 +145,7 @@
             <Option {value} {description}>{value}</Option>
           {/each}
         </Select>
-        <div class="flex flex-col gap-1">
+        <div data-testid="query-input" class="flex flex-col gap-1">
           <PayloadInput bind:input label={translate('workflows.query-arg')} />
         </div>
         <div class="flex w-full flex-wrap items-end justify-end gap-4">
