@@ -71,7 +71,6 @@ export const Strings = {
   'scale-up-cooloff': 'Scale-up Cooloff',
   'backlog-threshold': 'Backlog Threshold',
   'max-worker-lifetime': 'Max Worker Lifetime',
-  'dispatch-rate-epsilon': 'Dispatch Rate Epsilon',
   'metrics-poll-interval': 'Metrics Poll Interval',
   'filter-deployments': 'Filter deployments',
   'drainage-status': 'Drainage Status',

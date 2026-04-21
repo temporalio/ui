@@ -281,9 +281,6 @@ export const Strings = {
   'max-worker-lifetime-ms-label': 'Max Worker Lifetime (ms)',
   'max-worker-lifetime-ms-hint':
     'Refresh a worker after this many ms when there is backlog. 0 = disabled. Default: 600000.',
-  'scale-up-dispatch-rate-epsilon-label': 'Dispatch Rate Epsilon',
-  'scale-up-dispatch-rate-epsilon-hint':
-    'Suppress scale-up when processing rate change is within this value. 0 = disabled.',
   'metrics-poll-interval-ms-label': 'Metrics Poll Interval (ms)',
   'metrics-poll-interval-ms-hint':
     'Interval between metrics polls. Min: 10000. Default: 60000.',

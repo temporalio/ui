@@ -59,7 +59,6 @@
         scaleUpCooloffMs: scalerDetails.scaleUpCooloffMs,
         scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
         maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
-        scaleUpDispatchRateEpsilon: scalerDetails.scaleUpDispatchRateEpsilon,
         metricsPollIntervalMs: scalerDetails.metricsPollIntervalMs,
       }}
       cancelHref={backHref}
@@ -73,7 +72,6 @@
             scaleUpCooloffMs: data.scaleUpCooloffMs,
             scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
             maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-            scaleUpDispatchRateEpsilon: data.scaleUpDispatchRateEpsilon,
             metricsPollIntervalMs: data.metricsPollIntervalMs,
           },
         );
