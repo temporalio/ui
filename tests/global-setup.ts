@@ -3,7 +3,7 @@ import { chromium, FullConfig } from '@playwright/test';
 import { startWorkflows } from '../temporal/client';
 import { connect } from '../temporal/client';
 import { createCodecServer } from '../temporal/codec-server';
-import { runWorker } from '../temporal/workers';
+import { runWorker } from '../temporal/worker';
 import { createTemporalServer } from '../utilities/temporal-server';
 import { createUIServer } from '../utilities/ui-server';
 
