@@ -34,7 +34,7 @@ const workflows: WorkflowHandle[] = [];
 
 export const startWorkflows = async (
   client?: Client,
-): Promise<(string | number | void)[]> => {
+): Promise<(string | number | PayloadCoverageResult)[]> => {
   if (!client) {
     client = await connect();
   }
@@ -71,15 +71,7 @@ export const startWorkflows = async (
     staticDetails: '# Details\n **these are the details**',
   });
 
-  workflows.push(wf1, wf2, wf3, wf4, wf5);
-
-  return Promise.all([wf1.result(), wf3.result(), wf5.result()]);
-};
-
-export const startPayloadCoverageWorkflow = async (
-  client: Client,
-): Promise<PayloadCoverageResult> => {
-  const wf = await client.workflow.start(PayloadCoverageWorkflow, {
+  const wf6 = await client.workflow.start(PayloadCoverageWorkflow, {
     taskQueue: 'e2e-1',
     workflowId: 'payload-coverage-workflow',
     args: [
@@ -111,9 +103,9 @@ export const startPayloadCoverageWorkflow = async (
     },
   });
 
-  workflows.push(wf);
-  console.log(`✨ started payload-coverage-workflow (${wf.workflowId})`);
-  return wf.result();
+  workflows.push(wf1, wf2, wf3, wf4, wf5, wf6);
+
+  return Promise.all([wf1.result(), wf3.result(), wf5.result(), wf6.result()]);
 };
 
 export const stopWorkflows = (): Promise<void[]> => {

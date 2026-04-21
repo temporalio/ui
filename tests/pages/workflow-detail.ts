@@ -9,6 +9,7 @@ export class WorkflowDetailPage {
   readonly historyTab: Locator;
   readonly callStackTab: Locator;
   readonly queriesTab: Locator;
+  readonly userMetadataTab: Locator;
   readonly callStackEditor: Locator;
 
   constructor(page: Page) {
@@ -20,6 +21,7 @@ export class WorkflowDetailPage {
     this.historyTab = page.getByTestId('history-tab');
     this.callStackTab = page.getByTestId('call-stack-tab');
     this.queriesTab = page.getByTestId('queries-tab');
+    this.userMetadataTab = page.getByTestId('user-metadata-tab');
     this.callStackEditor = page.getByRole('textbox');
   }
 
@@ -48,5 +50,9 @@ export class WorkflowDetailPage {
 
   async openQueries() {
     await this.queriesTab.click();
+  }
+
+  async openUserMetadata() {
+    await this.userMetadataTab.click();
   }
 }

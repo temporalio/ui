@@ -1,9 +1,6 @@
 import { chromium, FullConfig } from '@playwright/test';
 
-import {
-  startPayloadCoverageWorkflow,
-  startWorkflows,
-} from '../temporal/client';
+import { startWorkflows } from '../temporal/client';
 import { connect } from '../temporal/client';
 import { createCodecServer } from '../temporal/codec-server';
 import { runWorker } from '../temporal/worker';
@@ -27,7 +24,6 @@ const setupDependencies = async () => {
     const client = await connect();
     await runWorker();
     await startWorkflows(client);
-    startPayloadCoverageWorkflow(client).catch(() => {});
   } catch (e) {
     console.log('Error setting up server: ', e);
   }
