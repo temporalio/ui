@@ -223,6 +223,7 @@ export const Strings = {
   'query-arg': 'Query Arg',
   'run-query': 'Run Query',
   'refresh-query': 'Refresh Query',
+  'refresh-call-stack': 'Refresh Call Stack',
   'pending-activities-empty-state': 'No Pending Activities',
   'activity-id': 'Activity ID',
   summary: 'Summary',
