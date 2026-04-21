@@ -17,14 +17,14 @@
     openIndex?: number;
   };
 
-  let { filters, onUpdate, index = 0, openIndex = null }: Props = $props();
+  let { filters, onUpdate, index = 0, openIndex = undefined }: Props = $props();
 
   const open = writable(false);
   let localFilters = $state([...filters]);
 
   const controlsId = $derived('dropdown-filter-chip-execution-status');
 
-  function handleStatusSelect(status: string) {
+  function handleStatusSelect(status: string | null) {
     if (localFilters.find((f) => f.value === status)) {
       localFilters = localFilters.filter((f) => f.value !== status);
       onUpdate(localFilters);
@@ -42,7 +42,7 @@
         createFilter({
           attribute: 'ExecutionStatus',
           type: 'Keyword',
-          value: status,
+          value: status ?? undefined,
           conditional: '=',
         }),
       ];
@@ -53,7 +53,7 @@
           attribute: 'ExecutionStatus',
           parenthesis: localFilters.length ? ')' : '',
           type: 'Keyword',
-          value: status,
+          value: status ?? undefined,
           conditional: '=',
         }),
       ];
@@ -107,7 +107,7 @@
             <Checkbox
               on:change={() => handleStatusSelect(status)}
               {checked}
-              label={status}
+              label={status ?? undefined}
               labelHidden
             />
           {/snippet}

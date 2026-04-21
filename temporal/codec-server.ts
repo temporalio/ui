@@ -1,8 +1,11 @@
 import type { Server } from 'http';
 
+import type { Payload } from '@temporalio/common';
 import cors from 'cors';
 import type { Application } from 'express';
 import express from 'express';
+
+import { EncryptionCodec } from './encryption-codec';
 
 export type CodecServer = {
   start: () => Promise<Server>;
@@ -27,11 +30,40 @@ const PORT = 8888;
 let codecServer: CodecServer;
 export const getCodecServer = (): CodecServer => codecServer;
 
+function fromJSON({ metadata, data }: JSONPayload): Payload {
+  return {
+    metadata:
+      metadata &&
+      Object.fromEntries(
+        Object.entries(metadata).map(([k, v]): [string, Uint8Array] => [
+          k,
+          Buffer.from(v, 'base64'),
+        ]),
+      ),
+    data: data ? Buffer.from(data, 'base64') : undefined,
+  };
+}
+
+function toJSON({ metadata, data }: Payload): JSONPayload {
+  return {
+    metadata:
+      metadata &&
+      Object.fromEntries(
+        Object.entries(metadata).map(([k, v]): [string, string] => [
+          k,
+          Buffer.from(v).toString('base64'),
+        ]),
+      ),
+    data: data ? Buffer.from(data).toString('base64') : undefined,
+  };
+}
+
 export async function createCodecServer(
   { port }: CodecServerOptions = { port: PORT },
 ): Promise<CodecServer> {
   let server: Server;
   const app: Application = express();
+  const codec = await EncryptionCodec.create('test-key-id');
 
   app.use(cors({ allowedHeaders: ['x-namespace', 'content-type'] }));
   app.use(express.json());
@@ -39,7 +71,10 @@ export async function createCodecServer(
   app.post('/encode', async (req, res) => {
     try {
       const { payloads: raw } = req.body as Body;
-      res.json({ payloads: raw }).end();
+      const decoded = raw.map(fromJSON);
+      const encoded = await codec.encode(decoded);
+      const payloads = encoded.map(toJSON);
+      res.json({ payloads }).end();
     } catch (err) {
       console.error('Error in /encode', err);
       res.status(500).end('Internal server error');
@@ -49,7 +84,10 @@ export async function createCodecServer(
   app.post('/decode', async (req, res) => {
     try {
       const { payloads: raw } = req.body as Body;
-      res.json({ payloads: raw }).end();
+      const encoded = raw.map(fromJSON);
+      const decoded = await codec.decode(encoded);
+      const payloads = decoded.map(toJSON);
+      res.json({ payloads }).end();
     } catch (err) {
       console.error('Error in /decode', err);
       res.status(500).end('Internal server error');

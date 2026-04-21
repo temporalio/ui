@@ -4,6 +4,8 @@ import { getDataConverter } from './data-converter';
 import {
   BlockingWorkflow,
   CompletedWorkflow,
+  type PayloadCoverageResult,
+  PayloadCoverageWorkflow,
   RunningWorkflow,
   UserMetadataWorkflow,
   Workflow,
@@ -22,7 +24,7 @@ export const connect = async () => {
 
   const client = new Client({
     connection,
-    dataConverter: getDataConverter(),
+    dataConverter: await getDataConverter(),
   });
 
   return client;
@@ -30,9 +32,10 @@ export const connect = async () => {
 
 const workflows: WorkflowHandle[] = [];
 
-export const startWorkflows = async (): Promise<(string | number | void)[]> => {
-  const client = await connect();
-
+export const startWorkflows = async (
+  client: Client,
+  config: { waitForResult?: boolean } = { waitForResult: true },
+): Promise<(string | number | PayloadCoverageResult)[]> => {
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
     args: ['Plain text input 1'],
@@ -65,9 +68,43 @@ export const startWorkflows = async (): Promise<(string | number | void)[]> => {
     staticDetails: '# Details\n **these are the details**',
   });
 
-  workflows.push(wf1, wf2, wf3, wf4, wf5);
+  const wf6 = await client.workflow.start(PayloadCoverageWorkflow, {
+    taskQueue: 'e2e-1',
+    workflowId: 'payload-coverage-workflow',
+    args: [
+      {
+        stringField: 'hello world',
+        numberField: 42,
+        floatField: 3.14159,
+        booleanField: true,
+        nullField: null,
+        arrayOfStrings: ['alpha', 'beta', 'gamma'],
+        arrayOfNumbers: [1, 2, 3, 100, -7],
+        mixedArray: ['text', 99, false, null, 'more'],
+        nestedObject: {
+          level1: {
+            level2: 'deep value',
+            array: [10, 20, 30],
+          },
+          flag: false,
+        },
+        emptyObject: {},
+        emptyArray: [],
+      },
+    ],
+    memo: {
+      description: 'Payload coverage test workflow',
+      tags: ['e2e', 'payload', 'coverage'],
+      version: 1,
+      testData: { nested: { value: 42 }, active: true },
+    },
+  });
 
-  return Promise.all([wf1.result(), wf3.result(), wf5.result()]);
+  workflows.push(wf1, wf2, wf3, wf4, wf5, wf6);
+
+  if (config?.waitForResult) {
+    return Promise.all(workflows.map((wf) => wf.result()));
+  }
 };
 
 export const stopWorkflows = (): Promise<void[]> => {
@@ -80,8 +117,3 @@ export const stopWorkflows = (): Promise<void[]> => {
     }),
   );
 };
-
-startWorkflows().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
