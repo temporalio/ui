@@ -14,21 +14,13 @@
     deleteWorkerDeployment,
     fetchDeployment,
   } from '$lib/services/deployments-service';
-  import type { WorkerDeploymentResponse } from '$lib/types/deployments';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
-
-  interface Props {
-    deploymentPromise?: Promise<WorkerDeploymentResponse>;
-    showInstancesLink?: boolean;
-  }
-
-  let { deploymentPromise, showInstancesLink = true }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
   const effectiveDeploymentPromise = $derived(
-    deploymentPromise ?? fetchDeployment({ namespace, deploymentName }),
+    fetchDeployment({ namespace, deploymentName }),
   );
 
   let showDeleteModal = $state(false);
