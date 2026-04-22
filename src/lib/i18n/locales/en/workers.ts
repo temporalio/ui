@@ -3,6 +3,7 @@ export const Namespace = 'workers' as const;
 export const Strings = {
   worker: 'Worker',
   workers: 'Workers',
+  pollers: 'Pollers',
   'worker-details': 'Worker Details',
   'worker-views': 'Worker Views',
   'back-to-workers': 'Back to Workers',
@@ -24,6 +25,7 @@ export const Strings = {
   'shutting-down': 'Shutting Down',
   sdk: 'Worker SDK',
   'empty-state-title': 'No Workers Found',
+  'pollers-empty-state-title': 'No Pollers Found',
   'worker-query-empty-state-description':
     'Try adjusting or clearing filters to see more results',
   'error-message-fetching': 'An error occurred while fetching workers.',

@@ -1,8 +1,14 @@
+<!--
+@component
+@deprecated Use `$lib/components/workers/workers-table` instead.
+-->
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
   import { page } from '$app/state';
 
+  import DeploymentStatus from '$lib/components/deployments/deployment-status.svelte';
+  import Timestamp from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -16,9 +22,7 @@
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
-  import DeploymentStatus from './deployments/deployment-status.svelte';
   import PollerIcon from './poller-icon.svelte';
-  import Timestamp from './timestamp.svelte';
 
   type Props = {
     workers: TaskQueueResponse;
@@ -85,10 +89,6 @@
   );
 </script>
 
-<h2 class="flex items-center gap-2" data-testid="workers">
-  {translate('workers.workers')}
-  <Badge type="count">{pollers?.length || 0}</Badge>
-</h2>
 {@render children?.()}
 {#if pinned}
   <p>
@@ -101,7 +101,7 @@
 {/if}
 <Table class="mb-6" fixed>
   <caption class="sr-only" slot="caption"
-    >{translate('workflows.workers-tab')}</caption
+    >{translate('workers.pollers')}</caption
   >
   <TableHeaderRow slot="headers">
     <th>{translate('common.id')}</th>
@@ -123,11 +123,11 @@
     {@const buildId = getPollerBuildId(poller)}
     {@const status = getPollerStatus(poller)}
     {@const label = getPollerLabel(poller)}
-    <TableRow data-testid="worker-row">
-      <td class="select-all break-all" data-testid="worker-identity">
+    <TableRow data-testid="poller-row">
+      <td class="select-all break-all" data-testid="poller-identity">
         {poller.identity}
       </td>
-      <td class="select-all break-all" data-testid="worker-build-id">
+      <td class="select-all break-all" data-testid="poller-build-id">
         <div class="flex items-center gap-2">
           {buildId}
           {#if status}
@@ -135,7 +135,7 @@
           {/if}
         </div>
       </td>
-      <td class="select-all break-all" data-testid="worker-deployment">
+      <td class="select-all break-all" data-testid="poller-deployment">
         {#if deployment}
           <Link
             href={routeForWorkerDeployment({
@@ -183,7 +183,7 @@
   {:else}
     <tr class="w-full">
       <td colspan="7">
-        <EmptyState title={translate('workers.empty-state-title')} />
+        <EmptyState title={translate('workers.pollers-empty-state-title')} />
       </td>
     </tr>
   {/each}

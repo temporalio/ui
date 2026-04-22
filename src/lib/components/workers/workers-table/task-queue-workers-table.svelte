@@ -1,9 +1,13 @@
 <script lang="ts">
-  import FallbackWorkersTable from '$lib/components/worker-table.svelte';
+  import PollersTable from '$lib/components/workers/pollers-table/pollers-table.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { getPollers } from '$lib/services/pollers-service';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
 
@@ -26,14 +30,33 @@
   const onFetch = $derived(() =>
     fetchPaginatedWorkers({ namespace, query: `TaskQueue="${taskQueue}"` }),
   );
+
+  const View = {
+    Workers: 'workers',
+    Pollers: 'pollers',
+  } as const;
+  type View = (typeof View)[keyof typeof View];
+
+  let selected = $state<View>(View.Workers);
+
+  const pollersPromise = $derived(getPollers({ queue: taskQueue, namespace }));
 </script>
 
-{#snippet fallback()}
-  {#await getPollers({ queue: taskQueue, namespace })}
+{#snippet pollersTable(showHeader = false)}
+  {#await pollersPromise}
     <Skeleton class="h-8 w-24 rounded-none" />
     <SkeletonTable rows={5} />
   {:then workers}
-    <FallbackWorkersTable {workers} {searchAttributes} />
+    {#if showHeader}
+      {@const pollerCount =
+        getWorkflowPollersWithVersions(searchAttributes, workers)?.pollers
+          ?.length ?? 0}
+      <h2 class="flex items-center gap-2" data-testid="workers">
+        {translate('workers.workers')}
+        <Badge type="count">{pollerCount}</Badge>
+      </h2>
+    {/if}
+    <PollersTable {workers} {searchAttributes} />
   {:catch error}
     <Alert
       intent="error"
@@ -44,7 +67,33 @@
 {/snippet}
 
 {#if useFallback}
-  {@render fallback()}
+  {@render pollersTable(true)}
 {:else}
-  <WorkersTable {namespace} {onFetch} />
+  <ToggleButtons>
+    <ToggleButton
+      active={selected === View.Workers}
+      on:click={() => (selected = View.Workers)}
+    >
+      {translate('workers.workers')}
+    </ToggleButton>
+    <ToggleButton
+      active={selected === View.Pollers}
+      on:click={() => (selected = View.Pollers)}
+    >
+      {translate('workers.pollers')}
+      {#await pollersPromise then workers}
+        {@const pollerCount =
+          getWorkflowPollersWithVersions(searchAttributes, workers)?.pollers
+            ?.length ?? 0}
+        <Badge type="count">
+          {pollerCount}
+        </Badge>
+      {/await}
+    </ToggleButton>
+  </ToggleButtons>
+  {#if selected === View.Workers}
+    <WorkersTable {namespace} {onFetch} />
+  {:else}
+    {@render pollersTable()}
+  {/if}
 {/if}
