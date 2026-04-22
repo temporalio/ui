@@ -20,9 +20,10 @@
 
   interface Props {
     deploymentPromise?: Promise<WorkerDeploymentResponse>;
+    showInstancesLink?: boolean;
   }
 
-  let { deploymentPromise }: Props = $props();
+  let { deploymentPromise, showInstancesLink = true }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
@@ -56,6 +57,7 @@
     {namespace}
     {deploymentName}
     hasVersions={!!info.versionSummaries?.length}
+    {showInstancesLink}
     onDeleteClick={() => (showDeleteModal = true)}
   />
 

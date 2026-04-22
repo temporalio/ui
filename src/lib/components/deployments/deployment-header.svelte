@@ -14,11 +14,17 @@
     namespace: string;
     deploymentName: string;
     hasVersions: boolean;
+    showInstancesLink?: boolean;
     onDeleteClick: () => void;
   }
 
-  let { namespace, deploymentName, hasVersions, onDeleteClick }: Props =
-    $props();
+  let {
+    namespace,
+    deploymentName,
+    hasVersions,
+    showInstancesLink = true,
+    onDeleteClick,
+  }: Props = $props();
 
   const workflowHref = $derived(
     routeForWorkflowsWithQuery({
@@ -40,10 +46,12 @@
     <Link href={routeForWorkerDeployments({ namespace })} icon="chevron-left">
       {translate('deployments.back-to-deployments')}
     </Link>
-    <span class="text-secondary">|</span>
-    <Link href={instancesHref}>
-      {translate('deployments.go-to-instances')}
-    </Link>
+    {#if showInstancesLink}
+      <span class="text-secondary">|</span>
+      <Link href={instancesHref}>
+        {translate('deployments.go-to-instances')}
+      </Link>
+    {/if}
   </div>
 
   <div class="flex w-full items-center justify-between">
