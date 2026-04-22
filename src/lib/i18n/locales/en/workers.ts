@@ -3,6 +3,7 @@ export const Namespace = 'workers' as const;
 export const Strings = {
   worker: 'Worker',
   workers: 'Workers',
+  pollers: 'Pollers',
   'worker-details': 'Worker Details',
   'worker-views': 'Worker Views',
   'back-to-workers': 'Back to Workers',
@@ -24,6 +25,7 @@ export const Strings = {
   'shutting-down': 'Shutting Down',
   sdk: 'Worker SDK',
   'empty-state-title': 'No Workers Found',
+  'pollers-empty-state-title': 'No Pollers Found',
   'worker-query-empty-state-description':
     'Try adjusting or clearing filters to see more results',
   'error-message-fetching': 'An error occurred while fetching workers.',
@@ -71,10 +73,10 @@ export const Strings = {
     'No usage data is available for this Worker. A Go SDK dependency may need to be enabled to surface this data.',
   'learn-more-link': 'Learn more.',
   'no-worker-heartbeats': 'No Workers Sending Heartbeats',
-  'worker-heartbeats-sdk-link-preface': 'Upgrade SDK to',
+  'worker-heartbeats-sdk-link-preface': 'Upgrade SDK to at least',
   'worker-heartbeats-sdk-link-postface': 'to enable.',
   'worker-heartbeats-sdk-list-preface':
-    'Start Workers and ensure SDK is one of the following versions',
+    'Start Workers and ensure SDK is at least one of the following versions',
   'worker-heartbeats-disabled': 'Worker Heartbeats Disabled',
   'worker-heartbeats-enablement':
     'To view Workers, enable Heartbeats for this Namespace. Set the following value in Dynamic Config.',
@@ -84,9 +86,8 @@ export const Strings = {
   'slot-supplier-kind-resource-based':
     'Slot count adjusts based on CPU and memory usage.',
   'slot-supplier-kind-custom': 'Slot count is managed by custom logic.',
-  'stale-heartbeat-title': 'Worker Insights May Be Outdated',
-  'stale-heartbeat-description':
-    'No heartbeat received in over a minute. Refresh to check for updates.',
+  'stale-heartbeat-title': 'Worker Details May Be Outdated',
+  'stale-heartbeat-description': 'Refresh to check for updates.',
   'serverless-workers': 'Serverless Workers',
   'serverless-worker': 'Serverless Worker',
   'serverless-empty-state': 'No Serverless Workers Configured',
@@ -287,4 +288,6 @@ export const Strings = {
   'serverless-instances-note-title': 'Serverless Workers',
   'serverless-instances-note':
     'Serverless workers are ephemeral and do not appear in the instances list. View serverless worker status on the Deployments page.',
+  'pollers-description':
+    'Pollers are threads within Workers that retrieve Tasks from the Task Queue.',
 } as const;

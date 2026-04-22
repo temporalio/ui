@@ -34,9 +34,10 @@
   interface Props {
     sdk: string;
     version: string;
+    hideDocsLink?: boolean;
   }
 
-  let { sdk, version }: Props = $props();
+  let { sdk, version, hideDocsLink = false }: Props = $props();
   const logo = $derived(sdkLogos[sdk.toLowerCase()]);
   const href = $derived(
     sdkToDocsSlug[sdk]
@@ -55,7 +56,7 @@
     {sdk}
     {version}
   </span>
-  {#if href}
+  {#if href && !hideDocsLink}
     <Link {href} newTab>Docs</Link>
     <Icon name="book" />
   {/if}
