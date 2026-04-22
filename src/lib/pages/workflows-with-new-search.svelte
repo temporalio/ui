@@ -135,15 +135,19 @@
   );
 
   const openBatchCancelConfirmationModal = () => {
-    $selectedWorkflows.length > 1
-      ? (batchCancelConfirmationModalOpen = true)
-      : (cancelConfirmationModalOpen = true);
+    if ($selectedWorkflows.length > 1) {
+      batchCancelConfirmationModalOpen = true;
+    } else {
+      cancelConfirmationModalOpen = true;
+    }
   };
 
   const openBatchTerminateConfirmationModal = () => {
-    $selectedWorkflows.length > 1
-      ? (batchTerminateConfirmationModalOpen = true)
-      : (terminateConfirmationModalOpen = true);
+    if ($selectedWorkflows.length > 1) {
+      batchTerminateConfirmationModalOpen = true;
+    } else {
+      terminateConfirmationModalOpen = true;
+    }
   };
 
   const openBatchResetConfirmationModal = () => {
