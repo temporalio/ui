@@ -99,92 +99,96 @@
     {translate('workers.viewing-auto-upgrade-build-ids')}
   </p>
 {/if}
-<Table class="mb-6" fixed>
-  <caption class="sr-only" slot="caption"
-    >{translate('workers.pollers')}</caption
-  >
-  <TableHeaderRow slot="headers">
-    <th>{translate('common.id')}</th>
-    <th>{translate('workers.buildId')}</th>
-    <th>{translate('deployments.deployment')}</th>
-    <th class="hidden md:table-cell">{translate('workflows.last-accessed')}</th>
-    <th class="!text-center xl:w-48">
-      {translate('workflows.workflow-task-handler')}
-    </th>
-    <th class="!text-center xl:w-36">
-      {translate('workflows.activity-handler')}
-    </th>
-    <th class="!text-center xl:w-36">
-      {translate('workflows.nexus-handler')}
-    </th>
-  </TableHeaderRow>
-  {#each pollers as poller}
-    {@const deployment = getPollerDeploymentName(poller)}
-    {@const buildId = getPollerBuildId(poller)}
-    {@const status = getPollerStatus(poller)}
-    {@const label = getPollerLabel(poller)}
-    <TableRow data-testid="poller-row">
-      <td class="select-all break-all" data-testid="poller-identity">
-        {poller.identity}
-      </td>
-      <td class="select-all break-all" data-testid="poller-build-id">
-        <div class="flex items-center gap-2">
-          {buildId}
-          {#if status}
-            <DeploymentStatus {status} {label} />
+<div class="w-full overflow-x-auto">
+  <Table class="mb-6 min-w-[640px]" fixed>
+    <caption class="sr-only" slot="caption"
+      >{translate('workers.pollers')}</caption
+    >
+    <TableHeaderRow slot="headers">
+      <th>{translate('common.id')}</th>
+      <th>{translate('workers.buildId')}</th>
+      <th>{translate('deployments.deployment')}</th>
+      <th class="hidden md:table-cell"
+        >{translate('workflows.last-accessed')}</th
+      >
+      <th class="!text-center xl:w-48">
+        {translate('workflows.workflow-task-handler')}
+      </th>
+      <th class="!text-center xl:w-36">
+        {translate('workflows.activity-handler')}
+      </th>
+      <th class="!text-center xl:w-36">
+        {translate('workflows.nexus-handler')}
+      </th>
+    </TableHeaderRow>
+    {#each pollers as poller}
+      {@const deployment = getPollerDeploymentName(poller)}
+      {@const buildId = getPollerBuildId(poller)}
+      {@const status = getPollerStatus(poller)}
+      {@const label = getPollerLabel(poller)}
+      <TableRow data-testid="poller-row">
+        <td class="select-all break-all" data-testid="poller-identity">
+          {poller.identity}
+        </td>
+        <td class="select-all break-all" data-testid="poller-build-id">
+          <div class="flex items-center gap-2">
+            {buildId}
+            {#if status}
+              <DeploymentStatus {status} {label} />
+            {/if}
+          </div>
+        </td>
+        <td class="select-all break-all" data-testid="poller-deployment">
+          {#if deployment}
+            <Link
+              href={routeForWorkerDeployment({
+                namespace,
+                deployment,
+              })}
+            >
+              {deployment}
+            </Link>
           {/if}
-        </div>
-      </td>
-      <td class="select-all break-all" data-testid="poller-deployment">
-        {#if deployment}
-          <Link
-            href={routeForWorkerDeployment({
-              namespace,
-              deployment,
-            })}
-          >
-            {deployment}
-          </Link>
-        {/if}
-      </td>
-      <Timestamp
-        as="td"
-        dateTime={poller.lastAccessTime}
-        class="hidden md:table-cell"
-        data-testid="worker-last-access-time"
-      />
-      <td data-testid="workflow-poller">
-        <div class="flex items-center justify-center">
-          <PollerIcon
-            includesTaskQueueType={poller.taskQueueTypes?.includes(
-              'WORKFLOW',
-            ) ?? false}
-          />
-        </div>
-      </td>
-      <td data-testid="activity-poller">
-        <div class="flex items-center justify-center">
-          <PollerIcon
-            includesTaskQueueType={poller.taskQueueTypes?.includes(
-              'ACTIVITY',
-            ) ?? false}
-          />
-        </div>
-      </td>
-      <td data-testid="nexus-poller">
-        <div class="flex items-center justify-center">
-          <PollerIcon
-            includesTaskQueueType={poller.taskQueueTypes?.includes('NEXUS') ??
-              false}
-          />
-        </div>
-      </td>
-    </TableRow>
-  {:else}
-    <tr class="w-full">
-      <td colspan="7">
-        <EmptyState title={translate('workers.pollers-empty-state-title')} />
-      </td>
-    </tr>
-  {/each}
-</Table>
+        </td>
+        <Timestamp
+          as="td"
+          dateTime={poller.lastAccessTime}
+          class="hidden md:table-cell"
+          data-testid="worker-last-access-time"
+        />
+        <td data-testid="workflow-poller">
+          <div class="flex items-center justify-center">
+            <PollerIcon
+              includesTaskQueueType={poller.taskQueueTypes?.includes(
+                'WORKFLOW',
+              ) ?? false}
+            />
+          </div>
+        </td>
+        <td data-testid="activity-poller">
+          <div class="flex items-center justify-center">
+            <PollerIcon
+              includesTaskQueueType={poller.taskQueueTypes?.includes(
+                'ACTIVITY',
+              ) ?? false}
+            />
+          </div>
+        </td>
+        <td data-testid="nexus-poller">
+          <div class="flex items-center justify-center">
+            <PollerIcon
+              includesTaskQueueType={poller.taskQueueTypes?.includes('NEXUS') ??
+                false}
+            />
+          </div>
+        </td>
+      </TableRow>
+    {:else}
+      <tr class="w-full">
+        <td colspan="7">
+          <EmptyState title={translate('workers.pollers-empty-state-title')} />
+        </td>
+      </tr>
+    {/each}
+  </Table>
+</div>
