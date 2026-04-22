@@ -226,9 +226,9 @@ Option 1 is simpler.
 
 Steps 1–3 can be done in a single pass. Step 4 is optional but recommended for type safety.
 
-# Make decoding ASYNC/AWAIT and include Retries
+## Make decoding ASYNC/AWAIT and include Retries
 
-## Current state
+### Current state
 
 The decode utilities (`decodeEventAttributes`, `decodeUserMetadata`, `decodePayloadValue`) are already `async` functions that return Promises. However, the components cannot use `await` directly inside `$effect` — returning a Promise from `$effect` is treated as a cleanup function, not a suspension. So all four components fall back to chained `.then().catch()`:
 
@@ -250,11 +250,11 @@ Additionally, `data-encoder.ts` `codeServerRequest` makes a single `fetch` with 
 
 ---
 
-## Problem 1: Race conditions on reactive updates
+### Problem 1: Race conditions on reactive updates
 
 When `value` changes while a decode is in progress, the `$effect` re-runs and fires a second decode. Both are in flight simultaneously. The later one to _resolve_ (not necessarily the one started later) wins. This can cause the UI to flash the wrong decoded value.
 
-### Fix: AbortController + `$effect` cleanup
+#### Fix: AbortController + `$effect` cleanup
 
 `$effect` supports a cleanup function — whatever it returns is called before the next run. An `AbortController` cancels the stale request:
 
@@ -294,11 +294,11 @@ const decoderResponse = fetch(endpoint + `/${type}`, {
 
 ---
 
-## Problem 2: No timeout on codec server requests
+### Problem 2: No timeout on codec server requests
 
 `codeServerRequest` makes an unbounded `fetch`. If the codec server hangs, the UI waits indefinitely. The component shows the initial (undecoded) value forever with no feedback.
 
-### Fix: Timeout via `AbortSignal.timeout` (or `AbortSignal.any`)
+#### Fix: Timeout via `AbortSignal.timeout` (or `AbortSignal.any`)
 
 ```typescript
 // Option A — native timeout signal (supported in modern browsers)
@@ -315,11 +315,11 @@ In `codeServerRequest`, a `TimeoutError` should be handled distinctly from a net
 
 ---
 
-## Problem 3: No retry on transient codec failures
+### Problem 3: No retry on transient codec failures
 
 `codeServerRequest` catches all errors and returns the original payloads on `decode` failures. This means a temporary codec server blip (e.g. a cold-start 502) permanently shows encoded data for that page load. There is no attempt to recover.
 
-### Fix: Exponential backoff retry in `codeServerRequest`
+#### Fix: Exponential backoff retry in `codeServerRequest`
 
 Adding retry at the `codeServerRequest` level benefits every decode path (components, export, event history) without changes to callers.
 
@@ -357,11 +357,11 @@ Retry should only apply to transient errors (network failure, 5xx). A 4xx (bad r
 
 ---
 
-## Problem 4: No loading state in components
+### Problem 4: No loading state in components
 
 Because the initial render uses `getInitialPayloadValue` (which returns the raw base64 JSON), the user sees undecoded data until the async decode resolves. There is no loading indicator, so it is not clear whether decoding is in progress or has failed.
 
-### Fix: Explicit `isDecoding` state
+#### Fix: Explicit `isDecoding` state
 
 ```typescript
 let isDecoding = $state(false);
@@ -402,7 +402,7 @@ $effect(() => {
 
 ---
 
-## Summary of changes
+### Summary of changes
 
 | Layer                                          | Change                                                                         | Benefit                                                |
 | ---------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------ |
