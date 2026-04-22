@@ -86,9 +86,8 @@ export const Strings = {
   'slot-supplier-kind-resource-based':
     'Slot count adjusts based on CPU and memory usage.',
   'slot-supplier-kind-custom': 'Slot count is managed by custom logic.',
-  'stale-heartbeat-title': 'Worker Insights May Be Outdated',
-  'stale-heartbeat-description':
-    'No heartbeat received in over a minute. Refresh to check for updates.',
+  'stale-heartbeat-title': 'Worker Details May Be Outdated',
+  'stale-heartbeat-description': 'Refresh to check for updates.',
   'serverless-workers': 'Serverless Workers',
   'serverless-worker': 'Serverless Worker',
   'serverless-empty-state': 'No Serverless Workers Configured',
