@@ -17,11 +17,25 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
+  interface Props {
+    showInstancesLink?: boolean;
+  }
+
+  let { showInstancesLink = true }: Props = $props();
+
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
-  const effectiveDeploymentPromise = $derived(
-    fetchDeployment({ namespace, deploymentName }),
-  );
+
+  // fetchDeployment lives here rather than in +page.ts because the grpc
+  // transport requires a server-relative base URL that isn't available at
+  // the SvelteKit load layer in cloud-ui. We use a reload counter so
+  // child actions (e.g. version delete) can trigger a same-page re-fetch
+  // without navigating away.
+  let reloadCount = $state(0);
+  const effectiveDeploymentPromise = $derived.by(() => {
+    reloadCount; // tracked so incrementing it re-fetches
+    return fetchDeployment({ namespace, deploymentName });
+  });
 
   let showDeleteModal = $state(false);
   let deleteError = $state<string | undefined>();
@@ -83,6 +97,7 @@
           {namespace}
           {deploymentName}
           conflictToken={deployment.conflictToken}
+          onVersionDeleted={() => reloadCount++}
         />
       {/each}
     </PaginatedTable>
