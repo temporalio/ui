@@ -26,11 +26,9 @@
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
 
-  // fetchDeployment lives here rather than in +page.ts because the grpc
-  // transport requires a server-relative base URL that isn't available at
-  // the SvelteKit load layer in cloud-ui. We use a reload counter so
-  // child actions (e.g. version delete) can trigger a same-page re-fetch
-  // without navigating away.
+  // fetchDeployment lives here rather than in +page.ts because it requires a
+  // server-relative base URL that isn't available at import time for package
+  // consumers.
   let reloadCount = $state(0);
   const effectiveDeploymentPromise = $derived.by(() => {
     reloadCount; // tracked so incrementing it re-fetches
