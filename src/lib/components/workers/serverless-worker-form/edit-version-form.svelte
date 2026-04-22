@@ -20,7 +20,6 @@
       scaleUpCooloffMs?: number;
       scaleUpBacklogThreshold?: number;
       maxWorkerLifetimeMs?: number;
-      scaleUpDispatchRateEpsilon?: number;
       metricsPollIntervalMs?: number;
     };
     onSubmit: (data: EditVersionFormData) => Promise<void>;
@@ -41,7 +40,6 @@
       scaleUpCooloffMs: initialData.scaleUpCooloffMs,
       scaleUpBacklogThreshold: initialData.scaleUpBacklogThreshold,
       maxWorkerLifetimeMs: initialData.maxWorkerLifetimeMs,
-      scaleUpDispatchRateEpsilon: initialData.scaleUpDispatchRateEpsilon,
       metricsPollIntervalMs: initialData.metricsPollIntervalMs,
     },
     {
@@ -81,7 +79,6 @@
           bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
           bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-          bind:scaleUpDispatchRateEpsilon={$form.scaleUpDispatchRateEpsilon}
           bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
           errors={$errors}
         />

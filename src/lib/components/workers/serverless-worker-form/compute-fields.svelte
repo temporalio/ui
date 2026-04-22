@@ -10,7 +10,6 @@
     scaleUpCooloffMs?: number;
     scaleUpBacklogThreshold?: number;
     maxWorkerLifetimeMs?: number;
-    scaleUpDispatchRateEpsilon?: number;
     metricsPollIntervalMs?: number;
     errors?: {
       lambdaArn?: string[];
@@ -19,7 +18,6 @@
       scaleUpCooloffMs?: string[];
       scaleUpBacklogThreshold?: string[];
       maxWorkerLifetimeMs?: string[];
-      scaleUpDispatchRateEpsilon?: string[];
       metricsPollIntervalMs?: string[];
     };
   }
@@ -31,7 +29,6 @@
     scaleUpCooloffMs = $bindable(),
     scaleUpBacklogThreshold = $bindable(),
     maxWorkerLifetimeMs = $bindable(),
-    scaleUpDispatchRateEpsilon = $bindable(),
     metricsPollIntervalMs = $bindable(),
     errors = {},
   }: Props = $props();
@@ -134,22 +131,6 @@
         translate('workers.max-worker-lifetime-ms-hint')}
       error={!!errors.maxWorkerLifetimeMs?.[0]}
       placeholder="600000"
-    />
-    <Input
-      value={scaleUpDispatchRateEpsilon !== undefined
-        ? String(scaleUpDispatchRateEpsilon)
-        : ''}
-      onchange={(e) => {
-        const val = (e.target as HTMLInputElement).value;
-        scaleUpDispatchRateEpsilon = val === '' ? undefined : Number(val);
-      }}
-      id="scaleUpDispatchRateEpsilon"
-      name="scaleUpDispatchRateEpsilon"
-      label={translate('workers.scale-up-dispatch-rate-epsilon-label')}
-      hintText={errors.scaleUpDispatchRateEpsilon?.[0] ||
-        translate('workers.scale-up-dispatch-rate-epsilon-hint')}
-      error={!!errors.scaleUpDispatchRateEpsilon?.[0]}
-      placeholder="0"
     />
     <Input
       value={metricsPollIntervalMs !== undefined
