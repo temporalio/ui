@@ -29,11 +29,15 @@
   // fetchDeployment lives here rather than in +page.ts because it requires a
   // server-relative base URL that isn't available at import time for package
   // consumers.
-  let reloadCount = $state(0);
+  let lastInvalidatedAt = $state(Date.now());
   const effectiveDeploymentPromise = $derived.by(() => {
-    reloadCount; // tracked so incrementing it re-fetches
+    lastInvalidatedAt; // tracked so updating it re-fetches
     return fetchDeployment({ namespace, deploymentName });
   });
+
+  function reload() {
+    lastInvalidatedAt = Date.now();
+  }
 
   let showDeleteModal = $state(false);
   let deleteError = $state<string | undefined>();
@@ -95,7 +99,7 @@
           {namespace}
           {deploymentName}
           conflictToken={deployment.conflictToken}
-          onVersionDeleted={() => reloadCount++}
+          onVersionDeleted={reload}
         />
       {/each}
     </PaginatedTable>
