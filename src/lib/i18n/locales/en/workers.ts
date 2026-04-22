@@ -73,10 +73,10 @@ export const Strings = {
     'No usage data is available for this Worker. A Go SDK dependency may need to be enabled to surface this data.',
   'learn-more-link': 'Learn more.',
   'no-worker-heartbeats': 'No Workers Sending Heartbeats',
-  'worker-heartbeats-sdk-link-preface': 'Upgrade SDK to',
+  'worker-heartbeats-sdk-link-preface': 'Upgrade SDK to at least',
   'worker-heartbeats-sdk-link-postface': 'to enable.',
   'worker-heartbeats-sdk-list-preface':
-    'Start Workers and ensure SDK is one of the following versions',
+    'Start Workers and ensure SDK is at least one of the following versions',
   'worker-heartbeats-disabled': 'Worker Heartbeats Disabled',
   'worker-heartbeats-enablement':
     'To view Workers, enable Heartbeats for this Namespace. Set the following value in Dynamic Config.',
