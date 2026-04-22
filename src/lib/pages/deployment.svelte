@@ -14,22 +14,30 @@
     deleteWorkerDeployment,
     fetchDeployment,
   } from '$lib/services/deployments-service';
-  import type { WorkerDeploymentResponse } from '$lib/types/deployments';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
   interface Props {
-    deploymentPromise?: Promise<WorkerDeploymentResponse>;
     showInstancesLink?: boolean;
   }
 
-  let { deploymentPromise, showInstancesLink = true }: Props = $props();
+  let { showInstancesLink = true }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const deploymentName = $derived(decodeURIForSvelte(page.params.deployment));
-  const effectiveDeploymentPromise = $derived(
-    deploymentPromise ?? fetchDeployment({ namespace, deploymentName }),
-  );
+
+  // fetchDeployment lives here rather than in +page.ts because it requires a
+  // server-relative base URL that isn't available at import time for package
+  // consumers.
+  let lastInvalidatedAt = $state(Date.now());
+  const effectiveDeploymentPromise = $derived.by(() => {
+    lastInvalidatedAt; // tracked so updating it re-fetches
+    return fetchDeployment({ namespace, deploymentName });
+  });
+
+  function reload() {
+    lastInvalidatedAt = Date.now();
+  }
 
   let showDeleteModal = $state(false);
   let deleteError = $state<string | undefined>();
@@ -91,6 +99,7 @@
           {namespace}
           {deploymentName}
           conflictToken={deployment.conflictToken}
+          onVersionDeleted={reload}
         />
       {/each}
     </PaginatedTable>

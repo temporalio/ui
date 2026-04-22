@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { invalidate } from '$app/navigation';
-
   import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -43,6 +41,7 @@
     namespace: string;
     deploymentName: string;
     conflictToken?: string;
+    onVersionDeleted?: () => void;
   }
   let {
     routingConfig,
@@ -50,6 +49,7 @@
     namespace,
     deploymentName,
     conflictToken,
+    onVersionDeleted,
   }: Props = $props();
 
   const currentDeploymentName = $derived(
@@ -191,7 +191,7 @@
     );
     if (deleteVersionError) return;
     showDeleteVersionModal = false;
-    await invalidate('data:deployment');
+    onVersionDeleted?.();
   }
 </script>
 
