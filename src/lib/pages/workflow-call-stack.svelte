@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { page } from '$app/state';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -10,18 +13,14 @@
   import { translate } from '$lib/i18n/translate';
   import type { ParsedQuery } from '$lib/services/query-service';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import type { Eventual } from '$lib/types/global';
 
   let { workflow, workers } = $derived($workflowRun);
   const namespace = $derived(page.params.namespace);
   let stackTrace: Eventual<ParsedQuery> = $state();
 
-  let refreshDate = $derived(
-    $timestamp($refresh.timestamp ? new Date($refresh.timestamp) : new Date(), {
-      format: 'short',
-    }),
-  );
+  let refreshDate = $state<string>();
 
   const getStackTrace = () =>
     getWorkflowStackTrace({
@@ -29,9 +28,16 @@
       namespace,
     });
 
-  $effect(() => {
+  const setStackTrace = () => {
+    stackTrace = getStackTrace();
+    refreshDate = $timestamp(new Date(), {
+      format: 'short',
+    });
+  };
+
+  onMount(() => {
     if (workflow?.isRunning) {
-      stackTrace = getStackTrace();
+      setStackTrace();
     }
   });
 </script>
@@ -51,10 +57,19 @@
           title={translate('workflows.call-stack-alert')}
           class="mb-4 w-fit"
         />
-        <p>
-          {translate('workflows.call-stack-at')}
-          {refreshDate}
-        </p>
+        <div class="flex items-center gap-2">
+          <Button
+            variant="primary"
+            leadingIcon="retry"
+            on:click={setStackTrace}
+          >
+            {translate('workflows.refresh-call-stack')}
+          </Button>
+          <p>
+            {translate('workflows.call-stack-at')}
+            {refreshDate}
+          </p>
+        </div>
         <div class="my-2 flex h-full items-start">
           <CodeBlock
             content={result}
