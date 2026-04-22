@@ -292,4 +292,6 @@ export const Strings = {
   'serverless-instances-note-title': 'Serverless Workers',
   'serverless-instances-note':
     'Serverless workers are ephemeral and do not appear in the instances list. View serverless worker status on the Deployments page.',
+  'pollers-description':
+    'Pollers are threads within Workers that retrieve Tasks from the Task Queue.',
 } as const;

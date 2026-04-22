@@ -55,6 +55,12 @@
         {translate('workers.workers')}
         <Badge type="count">{pollerCount}</Badge>
       </h2>
+    {:else}
+      <Alert
+        intent="info"
+        title={translate('workers.pollers-description')}
+        class="max-w-screen-lg xl:w-2/3"
+      />
     {/if}
     <PollersTable {workers} {searchAttributes} />
   {:catch error}
@@ -77,6 +83,7 @@
       {translate('workers.workers')}
     </ToggleButton>
     <ToggleButton
+      class="!border-r"
       active={selected === View.Pollers}
       on:click={() => (selected = View.Pollers)}
     >
