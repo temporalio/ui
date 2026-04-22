@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import Modal from '$lib/holocene/modal.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
@@ -21,7 +19,6 @@
       namespace,
       workflowId,
       runId,
-      settings: $page.data.settings,
       decodeSetting: $downloadEventHistorySetting,
     });
   };

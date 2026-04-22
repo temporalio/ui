@@ -179,6 +179,64 @@ describe('routeForApi', () => {
   });
 });
 
+describe('worker deployment version API routes', () => {
+  it('should return a route for worker-deployment-version', () => {
+    const route = routeForApi('worker-deployment-version', {
+      namespace: 'namespace',
+      deploymentName: 'my-deployment',
+      buildId: 'build-1',
+    });
+    expect(route).toBe(
+      `${origin}${base}/api/v1/namespaces/namespace/worker-deployment-versions/my-deployment/build-1`,
+    );
+  });
+
+  it('should return a route for worker-deployment-versions', () => {
+    const route = routeForApi('worker-deployment-versions', {
+      namespace: 'namespace',
+      deploymentName: 'my-deployment',
+    });
+    expect(route).toBe(
+      `${origin}${base}/api/v1/namespaces/namespace/worker-deployment-versions/my-deployment`,
+    );
+  });
+
+  it('should return a route for worker-deployment-version-compute-config', () => {
+    const route = routeForApi('worker-deployment-version-compute-config', {
+      namespace: 'namespace',
+      deploymentName: 'my-deployment',
+      buildId: 'build-1',
+    });
+    expect(route).toBe(
+      `${origin}${base}/api/v1/namespaces/namespace/worker-deployment-versions/my-deployment/build-1/update-compute-config`,
+    );
+  });
+
+  it('should return a route for worker-deployment-version-validate-compute-config', () => {
+    const route = routeForApi(
+      'worker-deployment-version-validate-compute-config',
+      {
+        namespace: 'namespace',
+        deploymentName: 'my-deployment',
+        buildId: 'build-1',
+      },
+    );
+    expect(route).toBe(
+      `${origin}${base}/api/v1/namespaces/namespace/worker-deployment-versions/my-deployment/build-1/validate-compute-config`,
+    );
+  });
+
+  it('should return a route for worker-deployment-set-current-version', () => {
+    const route = routeForApi('worker-deployment-set-current-version', {
+      namespace: 'namespace',
+      deploymentName: 'my-deployment',
+    });
+    expect(route).toBe(
+      `${origin}${base}/api/v1/namespaces/namespace/worker-deployments/my-deployment/set-current-version`,
+    );
+  });
+});
+
 describe('API Request Encoding', () => {
   it('should return a route for workflow', () => {
     const route = routeForApi('workflow', {

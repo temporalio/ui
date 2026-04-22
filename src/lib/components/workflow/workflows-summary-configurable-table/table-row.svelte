@@ -14,6 +14,7 @@
     type BatchOperationContext,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { tableDensity } from '$lib/stores/table-density';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
@@ -71,6 +72,7 @@
           workflowId={workflow.id}
           taskQueue={workflow.taskQueue}
           workflowType={workflow.name}
+          class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
         />
       {/if}
       <IsTemporalServerVersionGuard minimumVersion="1.23.0">
@@ -79,6 +81,7 @@
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
             on:click={() => viewChildren(workflow)}
+            class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
               text={childrenShown

@@ -10,6 +10,7 @@ import arrowRight from './svg/arrow-right.svelte';
 import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
 import astronaut from './svg/astronaut.svelte';
+import aws from './svg/aws.svelte';
 import batchOperation from './svg/batch-operation.svelte';
 import book from './svg/book-sparkles.svelte';
 import bookmark from './svg/bookmark.svelte';
@@ -63,6 +64,7 @@ import filter from './svg/filter.svelte';
 import fireExtinguisher from './svg/fire-extinguisher.svelte';
 import flag from './svg/flag.svelte';
 import folders from './svg/folders.svelte';
+import gcp from './svg/gcp.svelte';
 import github from './svg/github.svelte';
 import graph from './svg/graph.svelte';
 import happyLappy from './svg/happy-lappy.svelte';
@@ -115,6 +117,7 @@ import signal from './svg/signal.svelte';
 import slashForward from './svg/slash-forward.svelte';
 import sliders from './svg/sliders.svelte';
 import spinner from './svg/spinner.svelte';
+import squareInfo from './svg/square-info.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
@@ -122,6 +125,8 @@ import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
 import switchIcon from './svg/switch.svelte';
 import systemWindow from './svg/system-window.svelte';
+import tableComfy from './svg/table-comfy.svelte';
+import tableDense from './svg/table-dense.svelte';
 import table from './svg/table.svelte';
 import tag from './svg/tag.svelte';
 import target from './svg/target.svelte';
@@ -140,6 +145,7 @@ import update from './svg/update.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import userGroup from './svg/user-group.svelte';
+import vercel from './svg/vercel.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
 import warning from './svg/warning.svelte';
 import workers from './svg/workers.svelte';
@@ -161,6 +167,7 @@ export const icons = {
   'arrow-right': arrowRight,
   ascending,
   astronaut,
+  aws,
   'batch-operation': batchOperation,
   book,
   bookmark,
@@ -214,6 +221,7 @@ export const icons = {
   'filter-solid': filterSolid,
   'fire-extinguisher': fireExtinguisher,
   folders,
+  gcp,
   github,
   graph,
   'happy-lappy': happyLappy,
@@ -266,6 +274,7 @@ export const icons = {
   'slash-forward': slashForward,
   sliders,
   spinner,
+  'square-info': squareInfo,
   'star-empty': starEmpty,
   'star-filled': starFilled,
   success: checkmark,
@@ -274,6 +283,8 @@ export const icons = {
   support,
   switch: switchIcon,
   table,
+  'table-comfy': tableComfy,
+  'table-dense': tableDense,
   tag,
   target,
   'temporal-logo': temporalLogo,
@@ -291,6 +302,7 @@ export const icons = {
   upload,
   usage,
   'user-group': userGroup,
+  vercel,
   'vertical-ellipsis': verticalEllipsis,
   warning,
   'system-window': systemWindow,

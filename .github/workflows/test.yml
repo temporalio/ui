@@ -27,12 +27,6 @@ jobs:
           cache-dependency-path: server/go.sum
           cache: true
           check-latest: true
-      - name: Set up Protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          version: '3.x'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: build
         working-directory: server
         run: make build

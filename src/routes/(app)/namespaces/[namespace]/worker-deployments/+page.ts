@@ -1,10 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 
-import type { PageLoad } from './$types';
-
 import { routeForWorkerDeployments } from '$lib/utilities/route-for';
 
-export const load: PageLoad = async function ({ params }) {
+export const load = async function ({
+  params,
+}: {
+  params: { namespace: string };
+}) {
   const { namespace } = params;
   const route = routeForWorkerDeployments({
     namespace,

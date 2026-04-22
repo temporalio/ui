@@ -3,7 +3,6 @@ import { get } from 'svelte/store';
 import { resolve } from '$app/paths';
 import { page } from '$app/stores';
 
-import type { DescribeWorkerRequest } from '$lib/types';
 import type {
   APIRouteParameters,
   APIRoutePath,
@@ -33,6 +32,7 @@ import type {
   WorkerDeploymentsAPIRoutePath,
   WorkerDeploymentVersionAPIRoutePath,
   WorkerDeploymentVersionRouteParameters,
+  WorkerDeploymentVersionsAPIRoutePath,
   WorkflowActivitiesAPIRoutePath,
   WorkflowActivitiesRouteParameters,
   WorkflowAPIRoutePath,
@@ -65,16 +65,20 @@ export const base = (namespace?: string): string => {
   let baseUrl = '';
   const webUrl: string | undefined = get(page).data?.webUrl;
 
+  const globalThisRecord = globalThis as Record<string, unknown>;
+  const appConfig = globalThisRecord.AppConfig as
+    | Record<string, string>
+    | undefined;
   const webUrlExistsWithNamespace = webUrl && namespace;
-  const apiUrlExistsWithNamespace = globalThis?.AppConfig?.apiUrl && namespace;
+  const apiUrlExistsWithNamespace = appConfig?.apiUrl && namespace;
 
   if (webUrlExistsWithNamespace) {
     baseUrl = webUrl;
   } else if (apiUrlExistsWithNamespace) {
     console.warn('Using fallback api url, web url not found');
-    baseUrl = replaceNamespaceInApiUrl(globalThis.AppConfig.apiUrl, namespace);
+    baseUrl = replaceNamespaceInApiUrl(appConfig.apiUrl, namespace);
   } else {
-    baseUrl = getApiOrigin();
+    baseUrl = getApiOrigin() ?? '';
   }
 
   baseUrl = `${baseUrl}${resolve('', {})}`; // Append base path
@@ -85,8 +89,8 @@ export const base = (namespace?: string): string => {
 };
 
 const getPath = (endpoint: string): string => {
-  if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `/api/v1/${endpoint}`;
+  const path = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+  return `/api/v1/${path}`;
 };
 
 const withBase = (path: string, namespace?: string): string => {
@@ -100,10 +104,12 @@ const encode = (
   const version = get(page)?.data?.settings?.version;
   return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
+      const k = key as keyof typeof acc;
+      const v = (parameters as Record<string, string>)[key];
       if (version && minimumVersionRequired('2.23.0', version)) {
-        acc[key] = encodeURIComponent(parameters[key]);
+        acc[k] = encodeURIComponent(v);
       } else {
-        acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
+        acc[k] = encodeURIComponent(encodeURIComponent(v));
       }
       return acc;
     },
@@ -120,6 +126,7 @@ const encode = (
       activityId: '',
       endpointId: '',
       deploymentName: '',
+      buildId: '',
       version: '',
       workerInstanceKey: '',
     },
@@ -178,7 +185,11 @@ export function pathForApi(
     'nexus-endpoint.update': `/nexus/endpoints/${parameters?.endpointId}/update`,
     'worker-deployments': `/namespaces/${parameters?.namespace}/worker-deployments`,
     'worker-deployment': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}`,
-    'worker-deployment-version': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.version}`,
+    'worker-deployment-version': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}`,
+    'worker-deployment-versions': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}`,
+    'worker-deployment-version-compute-config': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}/update-compute-config`,
+    'worker-deployment-version-validate-compute-config': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}/validate-compute-config`,
+    'worker-deployment-set-current-version': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}/set-current-version`,
     'standalone-activity': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}`,
     'standalone-activities': `/namespaces/${parameters?.namespace}/activities`,
     'standalone-activities.count': `/namespaces/${parameters?.namespace}/activity-count`,
@@ -215,7 +226,7 @@ export function routeForApi(
 ): string;
 export function routeForApi(
   route: WorkerAPIRoutePath,
-  parameters: DescribeWorkerRequest,
+  parameters: Partial<APIRouteParameters>,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
@@ -287,10 +298,15 @@ export function routeForApi(
   parameters: WorkerDeploymentVersionRouteParameters,
   shouldEncode?: boolean,
 ): string;
+export function routeForApi(
+  route: WorkerDeploymentVersionsAPIRoutePath,
+  parameters: WorkerDeploymentRouteParameters,
+  shouldEncode?: boolean,
+): string;
 export function routeForApi(route: ParameterlessAPIRoutePath): string;
 export function routeForApi(
   route: APIRoutePath,
-  parameters?: APIRouteParameters,
+  parameters?: Partial<APIRouteParameters>,
   shouldEncode = true,
 ): string {
   const path = pathForApi(route, parameters, shouldEncode);

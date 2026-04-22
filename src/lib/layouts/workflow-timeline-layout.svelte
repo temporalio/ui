@@ -26,6 +26,7 @@
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+  import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   $: ({ namespace } = $page.params);
   $: ({ workflow } = $workflowRun);
@@ -47,7 +48,10 @@
     pendingNexusOperations,
   );
 
-  $: groups = reverseSort ? [...ascendingGroups].reverse() : ascendingGroups;
+  $: groups = orderGroupsByPending(
+    reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
+    reverseSort,
+  );
 
   $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
     $currentEventHistory,

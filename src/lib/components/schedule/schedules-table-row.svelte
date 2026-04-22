@@ -6,7 +6,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
-  import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
+  import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
   import { routeForSchedule, routeForWorkflow } from '$lib/utilities/route-for';
 
   import ScheduleFrequency from './schedule-frequency.svelte';
@@ -25,7 +25,7 @@
   const spec = $derived(schedule?.info?.spec);
   const searchAttributes = $derived(schedule?.searchAttributes ?? {});
   const decodedAttributes = $derived(
-    decodePayloadAttributes({ searchAttributes }),
+    parsePayloadAttributes({ searchAttributes }),
   );
 
   const sortRecentActions = (recentActions: ScheduleActionResult[]) => {

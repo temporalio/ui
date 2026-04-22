@@ -1,11 +1,7 @@
 <script lang="ts">
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import type {
-    EventGroup,
-    EventGroups,
-  } from '$lib/models/event-groups/event-groups';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, activeGroups } from '$lib/stores/active-events';
-  import { eventFilterSort } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -50,15 +46,14 @@
     scrollY = e?.target?.scrollTop;
   };
 
-  $: activeGroupsHeightAboveGroup = (group: EventGroup) => {
-    const activeGroupIsAbove = $activeGroups?.filter((id) => {
-      if ($eventFilterSort === 'ascending')
-        return parseInt(id) < parseInt(group.id);
-      return parseInt(id) > parseInt(group.id);
-    });
+  $: groupIndexMap = new Map(filteredGroups.map((g, i) => [g.id, i]));
 
-    if (!activeGroupIsAbove?.length) return 0;
-    return expandedGroupHeight;
+  $: activeGroupsHeightAboveGroup = (groupIndex: number) => {
+    const hasActiveAbove = $activeGroups?.some((id) => {
+      const activeIndex = groupIndexMap.get(id);
+      return activeIndex !== undefined && activeIndex < groupIndex;
+    });
+    return hasActiveAbove ? expandedGroupHeight : 0;
   };
 </script>
 
@@ -111,7 +106,7 @@
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
       {#each filteredGroups as group, index (group.id)}
-        {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(group)}
+        {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(index)}
         {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
           {#key group.eventList.length}
             <TimelineGraphRow

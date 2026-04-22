@@ -90,14 +90,14 @@ export const toPendingActivityStateReadable = (
 export const toPendingNexusOperationStateReadable = (
   state?: PendingNexusOperationState,
 ): PendingNexusOperationState => {
-  if (!state) return state;
+  if (!state) return 'Unspecified' as unknown as PendingNexusOperationState;
   return fromScreamingEnum(state, 'PendingNexusOperationState');
 };
 
 export const toCallbackStateReadable = (
   state?: CallbackState,
 ): CallbackState => {
-  if (!state) return state;
+  if (!state) return 'Unspecified' as unknown as CallbackState;
   return fromScreamingEnum(state, 'CallbackState');
 };
 

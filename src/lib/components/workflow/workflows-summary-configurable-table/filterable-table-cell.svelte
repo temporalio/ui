@@ -15,6 +15,10 @@
     createFilter,
     updateQueryParamsFromFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    TRUNCATE_LENGTH,
+    truncateValue,
+  } from '$lib/utilities/truncate-value';
 
   type Props = {
     attribute: string;
@@ -22,6 +26,7 @@
     value: string;
     href?: string;
     type?: SearchAttributeType;
+    truncate?: boolean;
   };
   let {
     attribute,
@@ -29,16 +34,8 @@
     value,
     href,
     type = SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    truncate = false,
   }: Props = $props();
-
-  const truncateRunId = (runId: string): string => {
-    if (runId.length > 11) {
-      return `${runId.slice(0, 4)}...${runId.slice(-4)}`;
-    }
-    return runId;
-  };
-
-  const isRunId = attribute === 'RunId';
 
   const onRowFilterClick = () => {
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
@@ -59,16 +56,20 @@
 
     updateQueryParamsFromFilter(page.url, $workflowFilters);
   };
+
+  const hideTooltip = $derived(
+    !truncate || (truncate && truncateValue(value).length <= TRUNCATE_LENGTH),
+  );
 </script>
 
-{#if isRunId}
-  <Tooltip text={value} top class="min-w-0">
-    <Link {href} class="cursor-help">{truncateRunId(value)}</Link>
+{#if href}
+  <Tooltip text={value} top class="min-w-0" hide={hideTooltip}>
+    <Link {href}>{truncate ? truncateValue(value) : value}</Link>
   </Tooltip>
-{:else if href}
-  <Link {href}>{value}</Link>
 {:else}
-  {value}
+  <Tooltip text={value} top class="min-w-0" hide={hideTooltip}>
+    {truncate ? truncateValue(value) : value}
+  </Tooltip>
 {/if}
 <FilterOrCopyButtons
   copyIconTitle={translate('common.copy-icon-title')}

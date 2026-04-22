@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ClassNameValue } from 'tailwind-merge';
+
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -11,9 +13,12 @@
     copyableText?: string;
     text: string;
     tooltipText?: string;
+    tooltipWidth?: number;
     isBadge?: boolean;
     badgeType?: BadgeType;
     iconName?: IconName | undefined;
+    iconPosition?: 'leading' | 'trailing';
+    class?: ClassNameValue;
   }
 
   let {
@@ -21,9 +26,12 @@
     text,
     copyableText = text,
     tooltipText,
+    tooltipWidth = 256,
     iconName,
+    iconPosition = 'leading',
     isBadge = false,
     badgeType = 'default',
+    class: className = '',
   }: Props = $props();
 </script>
 
@@ -34,17 +42,25 @@
     </Badge>
   {:else}
     <div class="flex select-all items-center gap-1 truncate rounded-sm">
-      {#if iconName}
+      {#if iconName && iconPosition === 'leading'}
         <Icon name={iconName} class="shrink-0" />
       {/if}
       <span class="truncate">{text}</span>
+      {#if iconName && iconPosition === 'trailing'}
+        <Icon name={iconName} class="shrink-0" />
+      {/if}
     </div>
   {/if}
 {/snippet}
 
-<DetailListValue {copyable} {copyableText}>
+<DetailListValue class={className} {copyable} {copyableText}>
   {#if tooltipText}
-    <Tooltip text={tooltipText} top class="min-w-0">
+    <Tooltip
+      text={tooltipText}
+      top
+      width={tooltipWidth}
+      class="min-w-0 font-sans"
+    >
       {@render content()}
     </Tooltip>
   {:else}

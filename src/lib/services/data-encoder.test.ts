@@ -5,6 +5,11 @@ vi.mock('$lib/utilities/core-provider', () => ({
   getIdToken: vi.fn().mockResolvedValue(undefined),
 }));
 
+import {
+  codecEndpoint,
+  includeCredentials,
+  passAccessToken,
+} from '$lib/stores/data-encoder-config';
 import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 
 import { codeServerRequest } from './data-encoder';
@@ -12,17 +17,15 @@ import { codeServerRequest } from './data-encoder';
 const mockGetAccessToken = vi.mocked(getAccessToken);
 const mockGetIdToken = vi.mocked(getIdToken);
 
-const settings = {
-  codec: {
-    endpoint: 'http://localcodecserver.com',
-    passAccessToken: false,
-    includeCredentials: false,
-  },
-};
-
 describe('Codec Server Requests for Decode and Encode', () => {
   const payloads = { payloads: [{}] };
-  const namespace = 'test-namespace';
+
+  afterEach(() => {
+    codecEndpoint.set(null);
+    passAccessToken.set(false);
+    includeCredentials.set(false);
+    vi.clearAllMocks();
+  });
 
   it('should send a request and return decoded payloads', async () => {
     global.fetch = vi.fn(() =>
@@ -32,12 +35,10 @@ describe('Codec Server Requests for Decode and Encode', () => {
       } as Response),
     );
 
-    const namespace = 'test-namespace';
+    codecEndpoint.set('http://localcodecserver.com');
     const response = await codeServerRequest({
       type: 'decode',
       payloads,
-      namespace,
-      settings,
     });
     expect(response).toEqual(payloads);
   });
@@ -50,11 +51,11 @@ describe('Codec Server Requests for Decode and Encode', () => {
         statusText: 'Internal Server Error',
       } as Response),
     );
+
+    codecEndpoint.set('http://localcodecserver.com');
     const response = await codeServerRequest({
       type: 'decode',
       payloads,
-      namespace,
-      settings,
     });
     expect(response).toEqual(payloads);
   });
@@ -67,11 +68,10 @@ describe('Codec Server Requests for Decode and Encode', () => {
       } as Response),
     );
 
+    codecEndpoint.set('http://localcodecserver.com');
     const response = await codeServerRequest({
       type: 'encode',
       payloads,
-      namespace,
-      settings,
     });
     expect(response).toEqual(payloads);
   });
@@ -84,8 +84,10 @@ describe('Codec Server Requests for Decode and Encode', () => {
         statusText: 'Internal Server Error',
       } as Response),
     );
+
+    codecEndpoint.set('http://localcodecserver.com');
     await expect(
-      codeServerRequest({ type: 'encode', payloads, namespace, settings }),
+      codeServerRequest({ type: 'encode', payloads }),
     ).rejects.toThrow();
   });
 
@@ -96,17 +98,20 @@ describe('Codec Server Requests for Decode and Encode', () => {
     });
     global.fetch = vi.fn(() => Promise.resolve(response));
 
+    codecEndpoint.set('http://localcodecserver.com');
     await expect(
-      codeServerRequest({ type: 'encode', payloads, namespace, settings }),
+      codeServerRequest({ type: 'encode', payloads }),
     ).rejects.toThrow();
   });
 });
 
 describe('codecPassAccessToken', () => {
   const payloads = { payloads: [{}] };
-  const namespace = 'test-namespace';
 
   afterEach(() => {
+    codecEndpoint.set(null);
+    passAccessToken.set(false);
+    includeCredentials.set(false);
     vi.clearAllMocks();
   });
 
@@ -121,19 +126,12 @@ describe('codecPassAccessToken', () => {
       } as Response),
     );
 
-    const httpsSettings = {
-      codec: {
-        endpoint: 'https://codecserver.com',
-        passAccessToken: true,
-        includeCredentials: false,
-      },
-    };
+    codecEndpoint.set('https://codecserver.com');
+    passAccessToken.set(true);
 
     await codeServerRequest({
       type: 'decode',
       payloads,
-      namespace,
-      settings: httpsSettings,
     });
 
     expect(mockGetAccessToken).toHaveBeenCalled();
@@ -157,19 +155,12 @@ describe('codecPassAccessToken', () => {
       } as Response),
     );
 
-    const httpsSettings = {
-      codec: {
-        endpoint: 'https://codecserver.com',
-        passAccessToken: true,
-        includeCredentials: false,
-      },
-    };
+    codecEndpoint.set('https://codecserver.com');
+    passAccessToken.set(true);
 
     await codeServerRequest({
       type: 'decode',
       payloads,
-      namespace,
-      settings: httpsSettings,
     });
 
     const fetchCall = vi.mocked(global.fetch).mock.calls[0];
@@ -182,19 +173,12 @@ describe('codecPassAccessToken', () => {
   it('should not make request and return original payloads when passAccessToken is true but endpoint is HTTP', async () => {
     global.fetch = vi.fn();
 
-    const httpSettings = {
-      codec: {
-        endpoint: 'http://codecserver.com',
-        passAccessToken: true,
-        includeCredentials: false,
-      },
-    };
+    codecEndpoint.set('http://codecserver.com');
+    passAccessToken.set(true);
 
     const result = await codeServerRequest({
       type: 'decode',
       payloads,
-      namespace,
-      settings: httpSettings,
     });
 
     expect(global.fetch).not.toHaveBeenCalled();
@@ -209,11 +193,11 @@ describe('codecPassAccessToken', () => {
       } as Response),
     );
 
+    codecEndpoint.set('http://localcodecserver.com');
+
     await codeServerRequest({
       type: 'decode',
       payloads,
-      namespace,
-      settings,
     });
 
     expect(mockGetAccessToken).not.toHaveBeenCalled();
@@ -223,9 +207,11 @@ describe('codecPassAccessToken', () => {
 
 describe('codecIncludeCredentials', () => {
   const payloads = { payloads: [{}] };
-  const namespace = 'test-namespace';
 
   afterEach(() => {
+    codecEndpoint.set(null);
+    passAccessToken.set(false);
+    includeCredentials.set(false);
     vi.clearAllMocks();
   });
 
@@ -237,19 +223,12 @@ describe('codecIncludeCredentials', () => {
       } as Response),
     );
 
-    const credSettings = {
-      codec: {
-        endpoint: 'http://localcodecserver.com',
-        passAccessToken: false,
-        includeCredentials: true,
-      },
-    };
+    codecEndpoint.set('http://localcodecserver.com');
+    includeCredentials.set(true);
 
     await codeServerRequest({
       type: 'decode',
       payloads,
-      namespace,
-      settings: credSettings,
     });
 
     const fetchCall = vi.mocked(global.fetch).mock.calls[0];
@@ -265,11 +244,11 @@ describe('codecIncludeCredentials', () => {
       } as Response),
     );
 
+    codecEndpoint.set('http://localcodecserver.com');
+
     await codeServerRequest({
       type: 'decode',
       payloads,
-      namespace,
-      settings,
     });
 
     const fetchCall = vi.mocked(global.fetch).mock.calls[0];

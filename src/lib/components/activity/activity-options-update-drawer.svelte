@@ -66,7 +66,6 @@
       String(activity?.activityOptions?.retryPolicy?.maximumInterval),
     ),
   );
-  let includeType = $state(false);
 
   const activityOptions = $derived({
     taskQueue: { name: taskQueue },
@@ -95,8 +94,7 @@
       await updateActivityOptions({
         namespace,
         execution,
-        id: includeType ? undefined : id,
-        type: includeType ? type : undefined,
+        id,
         activityOptions,
         identity,
       });
@@ -291,12 +289,6 @@
           class="w-full"
         />
       </div>
-      <Checkbox
-        bind:checked={includeType}
-        label={translate('activities.apply-to-all-activity-types', {
-          type,
-        })}
-      />
       <div class="flex items-center justify-end gap-4">
         <Button
           type="button"

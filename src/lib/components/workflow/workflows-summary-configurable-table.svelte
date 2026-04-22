@@ -3,6 +3,7 @@
 
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import FeatureTag from '$lib/holocene/feature-tag.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -12,6 +13,8 @@
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import { viewFeature } from '$lib/stores/new-feature-tags';
+  import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { exportWorkflows } from '$lib/utilities/export-workflows';
@@ -74,6 +77,13 @@
   };
 
   $: onFetch = () => fetchPaginatedWorkflows(namespace, query);
+
+  $: dense = $tableDensity === 'dense';
+
+  const setTableDensity = () => {
+    $tableDensity = dense ? 'comfortable' : 'dense';
+    viewFeature('tableDensity');
+  };
 </script>
 
 {#key [namespace, query, $refresh]}
@@ -109,14 +119,14 @@
         childCount={childrenActive(workflow)?.children.length}
       >
         {#each columns as column}
-          <TableBodyCell {workflow} {column} />
+          <TableBodyCell {workflow} {column} truncate={dense} />
         {/each}
       </TableRow>
       {#if childrenActive(workflow)}
         {#each childrenActive(workflow).children as child (`${child.id}:${child.runId}`)}
           <TableRow workflow={child} child>
             {#each columns as column}
-              <TableBodyCell workflow={child} {column} />
+              <TableBodyCell workflow={child} {column} truncate={dense} />
             {/each}
           </TableRow>
         {/each}
@@ -128,6 +138,21 @@
       </TableEmptyState>
     </svelte:fragment>
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
+      <Tooltip
+        text={dense
+          ? translate('common.dense')
+          : translate('common.comfortable')}
+        top
+      >
+        <FeatureTag feature="tableDensity" alpha />
+        <Button
+          on:click={setTableDensity}
+          data-testid="table-density-button"
+          size="xs"
+          variant="ghost"
+          leadingIcon={dense ? 'table-dense' : 'table-comfy'}
+        ></Button>
+      </Tooltip>
       <Tooltip text={translate('common.download-json')} top>
         <Button
           on:click={() => exportWorkflows(visibleItems, page)}

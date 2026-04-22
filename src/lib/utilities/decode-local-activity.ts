@@ -1,16 +1,10 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { IterableEvent, Payload, WorkflowEvent } from '$lib/types/events';
-import type { Settings } from '$lib/types/global';
 
 import {
-  cloneAllPotentialPayloadsWithCodec,
-  decodePayloadAttributes,
+  decodeEventAttributes,
+  parsePayloadAttributes,
 } from './decode-payload';
-import {
-  getCodecEndpoint,
-  getCodecIncludeCredentials,
-  getCodecPassAccessToken,
-} from './get-codec';
 import {
   formatSummaryValue,
   getActivityType,
@@ -31,35 +25,17 @@ export type DecodedLocalActivity = {
 
 export type LocalActivityDecodeOptions = {
   namespace: string;
-  settings: Settings;
 };
 
 export const decodeLocalActivity = async (
   event: IterableEvent,
-  options: LocalActivityDecodeOptions,
 ): Promise<SummaryAttribute | undefined> => {
   if (!('eventType' in event) || !isLocalActivityMarkerEvent(event)) {
     return undefined;
   }
 
-  const { namespace, settings } = options;
-
-  const codecSettings = {
-    ...settings,
-    codec: {
-      ...settings?.codec,
-      endpoint: getCodecEndpoint(settings),
-      passAccessToken: getCodecPassAccessToken(settings),
-      includeCredentials: getCodecIncludeCredentials(settings),
-    },
-  };
-
   try {
-    const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
-      event.attributes,
-      namespace,
-      codecSettings,
-    );
+    const convertedAttributes = await decodeEventAttributes(event.attributes);
 
     const payloads = (event.markerRecordedEventAttributes?.details?.data
       ?.payloads ||
@@ -68,7 +44,7 @@ export const decodeLocalActivity = async (
 
     if (!payloads?.length) return undefined;
 
-    const decodedAttributes = decodePayloadAttributes(
+    const decodedAttributes = parsePayloadAttributes(
       convertedAttributes,
     ) as DecodedLocalActivity;
 

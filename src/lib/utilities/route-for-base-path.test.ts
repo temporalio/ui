@@ -39,8 +39,11 @@ import {
   routeForTimeline,
   routeForUserMetadata,
   routeForWorkerDeployment,
+  routeForWorkerDeploymentCreate,
   routeForWorkerDeployments,
   routeForWorkerDeploymentVersion,
+  routeForWorkerDeploymentVersionCreate,
+  routeForWorkerDeploymentVersionEdit,
   routeForWorkerInstance,
   routeForWorkers,
   routeForWorkersWithQuery,
@@ -203,6 +206,27 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     [
       'routeForWorkersWithQuery',
       () => routeForWorkersWithQuery({ namespace: 'default', query: 'test' }),
+    ],
+    [
+      'routeForWorkerDeploymentCreate',
+      () => routeForWorkerDeploymentCreate(namespaceParams),
+    ],
+    [
+      'routeForWorkerDeploymentVersionCreate',
+      () =>
+        routeForWorkerDeploymentVersionCreate({
+          namespace: 'default',
+          deployment: 'test-deployment',
+        }),
+    ],
+    [
+      'routeForWorkerDeploymentVersionEdit',
+      () =>
+        routeForWorkerDeploymentVersionEdit({
+          namespace: 'default',
+          deployment: 'test-deployment',
+          buildId: 'v1',
+        }),
     ],
   ];
 

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
@@ -84,8 +83,10 @@
     }
   });
 
-  const onError = (err: APIErrorResponse) => {
-    error = err?.body?.message || translate('schedules.error-message-fetching');
+  const onError = (err: unknown) => {
+    error =
+      (err as APIErrorResponse)?.body?.message ||
+      translate('schedules.error-message-fetching');
   };
 
   const showFilters = $derived(Number($schedulesCount) > 0 || query);
@@ -170,15 +171,6 @@
               >Temporal CLI</Link
             >.
           </p>
-          {#if !createDisabled}
-            <Button
-              data-testid="create-schedule"
-              on:click={() => goto(routeForScheduleCreate({ namespace }))}
-              disabled={!writeActionsAreAllowed()}
-            >
-              {translate('schedules.create')}
-            </Button>
-          {/if}
         </EmptyState>
       {/if}
     </svelte:fragment>

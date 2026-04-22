@@ -1,18 +1,18 @@
 import type { DataConverter } from '@temporalio/common';
 
-import { PayloadCodec } from './payload-codec';
+import { EncryptionCodec } from './encryption-codec';
 
 let dataConverter: DataConverter;
 
-export function getDataConverter(): DataConverter {
+export async function getDataConverter(): Promise<DataConverter> {
   if (!dataConverter) {
-    dataConverter = createDataConverter();
+    dataConverter = await createDataConverter();
   }
   return dataConverter;
 }
 
-function createDataConverter(): DataConverter {
+async function createDataConverter(): Promise<DataConverter> {
   return {
-    payloadCodecs: [new PayloadCodec()],
+    payloadCodecs: [await EncryptionCodec.create('test-key-id')],
   };
 }

@@ -23,17 +23,13 @@
     if (!workflow || loading) return;
     loading = true;
     try {
-      const { settings } = page.data;
-      const metadata = await getWorkflowMetadata(
-        {
-          namespace,
-          workflow: {
-            id: workflow.id,
-            runId: workflow.runId,
-          },
+      const metadata = await getWorkflowMetadata({
+        namespace,
+        workflow: {
+          id: workflow.id,
+          runId: workflow.runId,
         },
-        settings,
-      );
+      });
       $workflowRun.metadata = metadata;
       lastFetched = new Date();
     } catch (error) {
@@ -89,6 +85,11 @@
     </div>
   </div>
   {#key currentDetails}
-    <Markdown class="p-3" overrideTheme="primary" content={currentDetails} />
+    <Markdown
+      frameId="user-metadata-current-details"
+      class="p-3"
+      overrideTheme="primary"
+      content={currentDetails}
+    />
   {/key}
 </div>

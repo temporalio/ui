@@ -1,13 +1,11 @@
-import { get } from 'svelte/store';
-
-import { page } from '$app/stores';
+import { page } from '$app/state';
 
 import { translate } from '$lib/i18n/translate';
 import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
-import type { NetworkError, Settings } from '$lib/types/global';
+import type { NetworkError } from '$lib/types/global';
 import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 import {
   getCodecEndpoint,
@@ -22,15 +20,19 @@ export type PotentialPayloads = { payloads: unknown[] };
 export async function codeServerRequest({
   type,
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
 }: {
   type: 'decode' | 'encode';
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
 }): Promise<PotentialPayloads> {
+  const settings = page.data.settings;
+  const namespace = page.params.namespace;
   const endpoint = getCodecEndpoint(settings);
+
+  if (!endpoint) {
+    if (type === 'decode') return payloads;
+    throw new Error('No codec endpoint configured');
+  }
+
   const passAccessToken = getCodecPassAccessToken(settings);
   const includeCredentials = getCodecIncludeCredentials(settings);
 
@@ -103,24 +105,16 @@ export async function codeServerRequest({
 
 export async function decodePayloadsWithCodec({
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
 }: {
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
 }): Promise<PotentialPayloads> {
-  return codeServerRequest({ type: 'decode', payloads, namespace, settings });
+  return codeServerRequest({ type: 'decode', payloads });
 }
 
 export async function encodePayloadsWithCodec({
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
 }: {
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
 }): Promise<PotentialPayloads> {
-  return codeServerRequest({ type: 'encode', payloads, namespace, settings });
+  return codeServerRequest({ type: 'encode', payloads });
 }

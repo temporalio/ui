@@ -24,13 +24,10 @@
   );
 
   const getStackTrace = () =>
-    getWorkflowStackTrace(
-      {
-        workflow,
-        namespace,
-      },
-      page.data?.settings,
-    );
+    getWorkflowStackTrace({
+      workflow,
+      namespace,
+    });
 
   $effect(() => {
     if (workflow?.isRunning) {

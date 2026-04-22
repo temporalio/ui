@@ -23,14 +23,12 @@
 
   let error = $state('');
   let loading = $state(false);
-  let includeType = $state(false);
   let resetHeartbeat = $state(false);
 
   const identity = getIdentity();
 
   const hideModal = () => {
     open = false;
-    includeType = false;
     resetHeartbeat = false;
   };
 
@@ -38,9 +36,8 @@
     await resetActivity({
       namespace,
       execution,
-      id: includeType ? undefined : id,
+      id,
       resetHeartbeat,
-      type: includeType ? type : undefined,
       identity,
     });
     triggerRefresh(Action.Reset);
@@ -71,12 +68,6 @@
   </h3>
   <div slot="content" class="flex flex-col gap-4">
     <p>{translate('activities.reset-modal-description')}</p>
-    <Checkbox
-      bind:checked={includeType}
-      label={translate('activities.apply-to-all-activity-types', {
-        type,
-      })}
-    />
     <Checkbox
       bind:checked={resetHeartbeat}
       label={translate('activities.reset-heartbeat-details')}

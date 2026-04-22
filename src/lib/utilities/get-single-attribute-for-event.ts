@@ -8,7 +8,7 @@ import type {
 import type { Payload } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
-import { decodePayload, isSinglePayload } from './decode-payload';
+import { isRawPayload, parseRawPayloadToJSON } from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
@@ -226,7 +226,7 @@ export const formatSummaryValue = (
   value: unknown,
 ): SummaryAttribute => {
   if (typeof value === 'object') {
-    if (isSinglePayload(value)) {
+    if (isRawPayload(value)) {
       return { key, value };
     }
     const [firstKey] = Object.keys(value);
@@ -302,7 +302,7 @@ export const getEventSummaryAttribute = (
       ?.payloads ||
       event.markerRecordedEventAttributes?.details?.type?.payloads ||
       []) as unknown as Payload[];
-    const decodedPayloads = payloads.map((p) => decodePayload(p));
+    const decodedPayloads = payloads.map((p) => parseRawPayloadToJSON(p));
     const payload = decodedPayloads?.[0];
     if (isJavaSDK(event) && payload) {
       return formatSummaryValue('ActivityType', payload);

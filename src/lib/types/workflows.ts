@@ -38,6 +38,8 @@ export type WorkflowExecutionInfo = Replace<
     closeTime: string;
     executionTime: string;
     historySizeBytes: string;
+    externalPayloadCount?: string;
+    externalPayloadSizeBytes?: string;
     historyLength: string;
     searchAttributes?: WorkflowSearchAttributes;
     memo?: Memo;
@@ -173,6 +175,8 @@ export type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
+  externalPayloadCount: string | undefined;
+  externalPayloadSizeBytes: string | undefined;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
   assignedBuildId?: string;
   searchAttributes?: DecodedWorkflowSearchAttributes;

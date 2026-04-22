@@ -13,6 +13,7 @@
     createFilter,
     updateQueryParamsFromFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
+  import { truncateValue } from '$lib/utilities/truncate-value';
 
   interface Props {
     attribute?: string;
@@ -79,12 +80,6 @@
       hideFilterOrCopy();
     }
   };
-  const truncate = (value: string | undefined | null): string => {
-    if (value?.length && value.length > 13) {
-      return `${value.slice(0, 6)}...${value.slice(-6)}`;
-    }
-    return value ?? '';
-  };
 </script>
 
 <td
@@ -99,11 +94,11 @@
   {#if attribute === 'BuildId' || attribute === 'WorkerInstanceKey'}
     {#if href}
       <Tooltip text={value ?? undefined} top class="min-w-0">
-        <Link {href}>{truncate(value)}</Link>
+        <Link {href}>{truncateValue(value)}</Link>
       </Tooltip>
     {:else}
       <Tooltip text={value ?? undefined} top class="min-w-0">
-        {truncate(value)}
+        {truncateValue(value)}
       </Tooltip>
     {/if}
   {:else if href}

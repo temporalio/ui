@@ -77,7 +77,7 @@
         createFilter({
           attribute,
           type: 'Keyword',
-          value: status,
+          value: status ?? undefined,
           conditional: '=',
         }),
       ];
@@ -88,7 +88,7 @@
           attribute,
           parenthesis: localFilters.length ? ')' : '',
           type: 'Keyword',
-          value: status,
+          value: status ?? undefined,
           conditional: '=',
         }),
       ];

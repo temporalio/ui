@@ -30,9 +30,11 @@
 </script>
 
 <div
-  class="flex items-center justify-between pb-4 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
+  class="flex items-center justify-between pb-2 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
 >
-  <div class="flex flex-row items-center justify-start">
+  <div
+    class="flex flex-row items-center justify-start group-data-[nav=open]:min-h-7"
+  >
     <a href={resolve('', {})} class="text-inherit flex items-center">
       <Logo
         height={24}
