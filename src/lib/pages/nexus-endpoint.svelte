@@ -144,11 +144,10 @@
       <h1>
         {endpoint.spec?.name || ''}
       </h1>
-         {@render actions?.('max-sm:hidden')}
+      {@render actions?.('max-sm:hidden')}
     </header>
     <p>UUID: {endpoint.id}</p>
     {@render actions?.('sm:hidden mt-6 w-full')}
-    
   </div>
   <div
     class={merge(

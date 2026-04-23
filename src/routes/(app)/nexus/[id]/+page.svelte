@@ -32,7 +32,10 @@
     </Link>
     <NexusEndpoint {endpoint}>
       {#snippet actions(className: ClassNameValue = undefined)}
-        <Button href={routeForNexusEndpointEdit(endpoint.id!)} class={merge(className)}>
+        <Button
+          href={routeForNexusEndpointEdit(endpoint.id!)}
+          class={merge(className)}
+        >
           {translate('common.edit')}
         </Button>
       {/snippet}

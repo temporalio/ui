@@ -40,6 +40,11 @@ export const Strings = {
   'target-namespace-required': 'Please select a target Namespace.',
   'task-queue-required': 'Please enter a Task Queue.',
   'caller-namespace-required': 'Please select at least one Namespace.',
+  'caller-namespaces-do-not-exist_one':
+    'Namespace "{{namespaces}}" does not exist.',
+  'caller-namespaces-do-not-exist_other':
+    '{{count}} Namespaces do not exist: {{namespaces}}.',
+  'caller-namespace-validation-failed': 'Failed to validate caller Namespaces.',
   'access-policy': 'Access Policy',
   'allowed-caller-namespaces': 'Allowed Caller Namespaces',
   'no-allowed-caller-namespaces': 'No Allowed Caller Namespaces',
