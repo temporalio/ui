@@ -377,10 +377,12 @@ export const routeForWorkerInstance = ({
   workerInstanceKey: string;
 }): ResolvedPathname => {
   const workerInstanceKeyEncoded = encodeURIForSvelte(workerInstanceKey);
-  return resolve('/namespaces/[namespace]/workers/[workerInstanceKey]', {
-    namespace,
-    workerInstanceKey: workerInstanceKeyEncoded,
-  });
+  return withPrefix(
+    resolve('/namespaces/[namespace]/workers/[workerInstanceKey]', {
+      namespace,
+      workerInstanceKey: workerInstanceKeyEncoded,
+    }),
+  );
 };
 
 export const routeForWorkerDeployment = ({
@@ -422,12 +424,14 @@ export const routeForWorkerDeploymentVersionCreate = ({
   deployment: string;
 }): ResolvedPathname => {
   const deploymentName = encodeURIForSvelte(deployment);
-  return resolve(
-    '/namespaces/[namespace]/workers/deployments/[deployment]/versions/create',
-    {
-      namespace,
-      deployment: deploymentName,
-    },
+  return withPrefix(
+    resolve(
+      '/namespaces/[namespace]/workers/deployments/[deployment]/versions/create',
+      {
+        namespace,
+        deployment: deploymentName,
+      },
+    ),
   );
 };
 
@@ -442,13 +446,15 @@ export const routeForWorkerDeploymentVersionEdit = ({
 }): ResolvedPathname => {
   const deploymentName = encodeURIForSvelte(deployment);
   const buildIdEncoded = encodeURIForSvelte(buildId);
-  return resolve(
-    '/namespaces/[namespace]/workers/deployments/[deployment]/versions/[buildId]/edit',
-    {
-      namespace,
-      deployment: deploymentName,
-      buildId: buildIdEncoded,
-    },
+  return withPrefix(
+    resolve(
+      '/namespaces/[namespace]/workers/deployments/[deployment]/versions/[buildId]/edit',
+      {
+        namespace,
+        deployment: deploymentName,
+        buildId: buildIdEncoded,
+      },
+    ),
   );
 };
 
@@ -457,9 +463,11 @@ export const routeForWorkerDeploymentCreate = ({
 }: {
   namespace: string;
 }): ResolvedPathname => {
-  return resolve('/namespaces/[namespace]/workers/deployments/create', {
-    namespace,
-  });
+  return withPrefix(
+    resolve('/namespaces/[namespace]/workers/deployments/create', {
+      namespace,
+    }),
+  );
 };
 
 export const routeForRelationships = (
