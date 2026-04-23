@@ -52,7 +52,6 @@
         typeof value === 'object' && Object.keys(value).length > 0,
     ),
   );
-  $inspect(payloadFields);
   const linkFields = $derived(
     fields.filter(
       ([key, _value]) => displayLinkType(key, attributes) !== 'none',
