@@ -179,7 +179,7 @@
     {#if success && typeof success === 'object'}
       <Alert intent="success" title="Success">
         {#if success?.payloads?.[0] && success.payloads[0].data}
-          <PayloadCodeBlock value={success.payloads[0]} language="text" />
+          <PayloadCodeBlock value={success} />
         {/if}
       </Alert>
     {/if}

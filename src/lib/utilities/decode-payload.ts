@@ -10,6 +10,7 @@ import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
 
 export type PotentiallyDecodable =
+  | Payload
   | Payloads
   | Record<string | number | symbol, unknown>;
 
@@ -254,17 +255,25 @@ export const isRawPayloads = (payloads: unknown): payloads is Payloads => {
   );
 };
 
-export const decodePayloadAndParseDataToJSON = async (
+export async function decodePayloadAndParseDataToJSON(
+  payload: Payload,
+): Promise<unknown>;
+export async function decodePayloadAndParseDataToJSON(
+  payload: Payload,
+  returnDataOnly: false,
+): Promise<ParsedPayload>;
+export async function decodePayloadAndParseDataToJSON(
   payload: Payload | null | undefined,
-): Promise<unknown> => {
+  returnDataOnly: boolean = true,
+): Promise<unknown | ParsedPayload> {
   const decoded = await decodePayloadsWithRemoteCodec(toArray(payload));
 
   if (!decoded || !decoded[0]) {
     return null;
   }
 
-  return parseRawPayloadToJSON(decoded[0]);
-};
+  return parseRawPayloadToJSON(decoded[0], returnDataOnly);
+}
 
 export const decodePayloadsAndParseDataToJSON = async (
   payloads: Payloads | null | undefined,

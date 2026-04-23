@@ -31,6 +31,7 @@ export type LocalActivityDecodeOptions = {
 export const decodeLocalActivity = async (
   event: IterableEvent,
 ): Promise<SummaryAttribute | undefined> => {
+  console.log(event);
   if (!('eventType' in event) || !isLocalActivityMarkerEvent(event)) {
     return undefined;
   }
@@ -38,10 +39,10 @@ export const decodeLocalActivity = async (
   try {
     const convertedAttributes = await decodeEventAttributes(event.attributes);
 
-    const payloads = (event.markerRecordedEventAttributes?.details?.data
-      ?.payloads ||
+    const payloads =
+      event.markerRecordedEventAttributes?.details?.data?.payloads ||
       event.markerRecordedEventAttributes?.details?.type?.payloads ||
-      []) as unknown as Payload[];
+      [];
 
     if (!payloads?.length) return undefined;
 

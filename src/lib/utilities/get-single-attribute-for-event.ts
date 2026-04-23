@@ -1,14 +1,17 @@
 import { isEvent } from '$lib/models/event-history';
-import type { Payloads } from '$lib/types';
+import type { Payload, Payloads } from '$lib/types';
 import type {
   PendingActivity,
   PendingNexusOperation,
   WorkflowEvent,
 } from '$lib/types/events';
-import type { Payload } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
-import { isRawPayload, parseRawPayloadToJSON } from './decode-payload';
+import {
+  isRawPayload,
+  isRawPayloads,
+  parseRawPayloadToJSON,
+} from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
@@ -23,7 +26,7 @@ import {
 
 export type SummaryAttribute = {
   key: string;
-  value: string | Record<string, unknown> | Payloads;
+  value: string | Payload | Payloads | Record<string, unknown>;
 };
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
@@ -226,16 +229,14 @@ export const formatSummaryValue = (
   value: unknown,
 ): SummaryAttribute => {
   if (typeof value === 'object') {
-    if (isRawPayload(value)) {
+    if (isRawPayload(value) || isRawPayloads(value)) {
       return { key, value };
     }
     const [firstKey] = Object.keys(value);
     if (!firstKey) {
       return { key, value: {} };
     }
-    if (firstKey === 'payloads') {
-      return { key, value };
-    }
+
     return { key: key + capitalize(firstKey), value: value[firstKey] };
   } else {
     return { key, value: value.toString() };

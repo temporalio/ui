@@ -5,7 +5,8 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { Payloads } from '$lib/types';
+  import type { Payload, Payloads } from '$lib/types';
+  import { isRawPayload, isRawPayloads } from '$lib/utilities/decode-payload';
   import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import { displayLinkType } from '$lib/utilities/get-single-attribute-for-event';
@@ -13,7 +14,7 @@
   import EventDetailsLink from './event-details-link.svelte';
 
   export let key: string;
-  export let value: string | Record<string, unknown> | Payloads;
+  export let value: string | Payload | Payloads | Record<string, unknown>;
   export let attributes: CombinedAttributes;
   export let showKey = true;
 
@@ -29,13 +30,13 @@
         {format(key)}
       </p>
     {/if}
-    {#if typeof value === 'object'}
+    {#if isRawPayload(value) || isRawPayloads(value)}
       <div
         class="flex max-w-sm items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
         <PayloadInline {value} class={merge($$props.class)} />
       </div>
-    {:else if linkType !== 'none'}
+    {:else if typeof value === 'string' && linkType !== 'none'}
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
