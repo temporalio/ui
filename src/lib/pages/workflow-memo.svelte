@@ -9,7 +9,7 @@
 <div class="mt-4 flex flex-col gap-2">
   <h3>{translate('common.memo')}</h3>
   {#if workflow?.memo}
-    <PayloadCodeBlock value={{ memo: workflow.memo }} fieldName="memo" />
+    <PayloadCodeBlock value={workflow.memo} />
   {:else}
     <p>{translate('events.empty-memo-attributes')}</p>
   {/if}

@@ -18,7 +18,8 @@ const decodePayloads = async (
       decodeSetting,
     );
 
-    return parsePayloadAttributes(convertedAttributes, false);
+    return convertedAttributes;
+    // return parsePayloadAttributes(convertedAttributes, false);
   } catch {
     return event;
   }

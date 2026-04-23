@@ -33,11 +33,7 @@
       <div
         class="flex max-w-sm items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
-        <PayloadInline
-          {value}
-          fieldName="payloads"
-          class={merge($$props.class)}
-        />
+        <PayloadInline {value} class={merge($$props.class)} />
       </div>
     {:else if linkType !== 'none'}
       <Copyable

@@ -10,14 +10,14 @@
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
   import type { Payloads } from '$lib/types';
-  import { atob } from '$lib/utilities/atob';
+  import { base64ParsePayloadMetadata } from '$lib/utilities/decode-payload';
 
   interface Props {
     input: string;
     editInput: boolean;
     encoding: Writable<PayloadInputEncoding>;
     messageType: string;
-    payloads: Payloads;
+    payloads: Payloads | undefined;
     showEditActions?: boolean;
   }
 
@@ -35,15 +35,19 @@
   let initialMessageType = $state('');
   let loading = $state(true);
 
-  const setInitialInput = (decodedValue: string): void => {
-    initialInput = decodedValue;
+  const setInitialInput = (decodedValue: string[]): void => {
+    initialInput = decodedValue[0];
     input = initialInput;
-    const currentEncoding = atob(
-      String(payloads?.payloads[0]?.metadata?.encoding ?? 'json/plain'),
-    );
-    const currentMessageType = payloads?.payloads[0]?.metadata?.messageType
-      ? atob(String(payloads?.payloads[0]?.metadata?.messageType))
-      : '';
+    let currentEncoding: PayloadInputEncoding = 'json/plain';
+    let currentMessageType = '';
+
+    if (payloads) {
+      const parsedMetadata = base64ParsePayloadMetadata(payloads);
+
+      currentEncoding =
+        (parsedMetadata[0]?.encoding as PayloadInputEncoding) ?? 'json/plain';
+      currentMessageType = parsedMetadata[0]?.messageType ?? '';
+    }
 
     if (isPayloadInputEncodingType(currentEncoding)) {
       $encoding = currentEncoding;
@@ -69,11 +73,7 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <PayloadDecoder
-    value={payloads}
-    fieldName="payloads"
-    onDecode={setInitialInput}
-  >
+  <PayloadDecoder value={payloads} onDecode={setInitialInput}>
     {#snippet children(_decodedValue)}
       <PayloadInputWithEncoding
         bind:input

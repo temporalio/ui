@@ -1,5 +1,6 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
-import type { IterableEvent, Payload, WorkflowEvent } from '$lib/types/events';
+import type { Payload } from '$lib/types';
+import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
 
 import {
   decodeEventAttributes,

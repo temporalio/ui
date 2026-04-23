@@ -172,11 +172,7 @@
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
-      <PayloadCodeBlock
-        value={activity.heartbeatDetails}
-        fieldName="payloads"
-        maxHeight={384}
-      />
+      <PayloadCodeBlock value={activity.heartbeatDetails} maxHeight={384} />
     {/key}
   </div>
 {/snippet}

@@ -2,12 +2,11 @@
   import { type Snippet } from 'svelte';
 
   import Badge from '$lib/holocene/badge.svelte';
-  import type { Payload as RawPayload } from '$lib/types';
-  import type { Payload } from '$lib/types/events';
-  import { decodeUserMetadata } from '$lib/utilities/decode-payload';
+  import type { Payload } from '$lib/types';
+  import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 
   interface Props {
-    value: RawPayload | Payload | null | undefined;
+    value: Payload | null | undefined;
     fallback?: string;
     prefix?: string;
     maxSummaryLength?: number;
@@ -40,7 +39,7 @@
       decodedValue = fallback;
       return;
     }
-    decodeUserMetadata(value)
+    decodePayloadAndParseDataToJSON(value)
       .then((result) => {
         if (typeof result === 'string' && result) {
           decodedValue = applyPrefix(result);

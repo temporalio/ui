@@ -92,9 +92,7 @@
 </div>
 <div class="min-h-screen py-4">
   {#if $decodeEventHistory && events.length > 0}
-    {#key [index, $decodeEventHistory]}
-      <PayloadCodeBlock value={rawEvent} testId="event-history-json" />
-    {/key}
+    <PayloadCodeBlock value={rawEvent} testId="event-history-json" />
   {:else}
     {#key index}
       <CodeBlock

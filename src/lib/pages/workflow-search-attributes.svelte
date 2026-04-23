@@ -11,10 +11,7 @@
     {translate('events.attribute-group.search-attributes')}
   </h3>
   {#if workflow?.searchAttributes}
-    <PayloadCodeBlock
-      value={{ searchAttributes: workflow.searchAttributes }}
-      fieldName="searchAttributes"
-    />
+    <PayloadCodeBlock value={workflow.searchAttributes.indexedFields} />
   {:else}
     <p>{translate('events.empty-search-attributes')}</p>
   {/if}

@@ -52,6 +52,7 @@
         typeof value === 'object' && Object.keys(value).length > 0,
     ),
   );
+  $inspect(payloadFields);
   const linkFields = $derived(
     fields.filter(
       ([key, _value]) => displayLinkType(key, attributes) !== 'none',
@@ -182,13 +183,7 @@
       {format(key)}
     </p>
     {#if value?.payloads}
-      <PayloadCodeBlock {value} fieldName="payloads" maxHeight={384} />
-    {:else if key === 'searchAttributes'}
-      <PayloadCodeBlock
-        fieldName="searchAttributes"
-        value={{ searchAttributes: codeBlockValue }}
-        maxHeight={384}
-      />
+      <PayloadCodeBlock {value} maxHeight={384} />
     {:else}
       <PayloadCodeBlock value={codeBlockValue} maxHeight={384} />
     {/if}

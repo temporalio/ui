@@ -1,7 +1,7 @@
 import { decodePayloadsWithCodec as callCodecEndpoint } from '$lib/services/data-encoder';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
-import type { Memo, Payloads, Payload as RawPayload } from '$lib/types';
-import type { EventAttribute, Payload, WorkflowEvent } from '$lib/types/events';
+import type { Memo, Payload, Payloads } from '$lib/types';
+import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
 import type { Optional, Replace } from '$lib/types/global';
 
 import { atob } from './atob';
@@ -16,6 +16,20 @@ export type PotentiallyDecodable =
 export type DecodeFunctions = {
   convertWithCodec?: typeof decodeEventAttributes;
   decodeAttributes?: typeof parsePayloadAttributes;
+};
+
+export type PayloadContainingObject<T = object> = {
+  [K in keyof T]:
+    | Payload
+    | Payloads
+    | (T[K] extends object ? PayloadContainingObject<T[K]> : T[K]);
+};
+
+export type ParsedMetadata = { [key: string]: string };
+
+export type ParsedPayload = {
+  data: unknown;
+  metadata: ParsedMetadata;
 };
 
 /**
@@ -55,6 +69,22 @@ const parseBase64ObjectValues = (
   }
   return parsed;
 };
+
+export function base64ParsePayloadMetadata(payload: Payload): ParsedMetadata;
+export function base64ParsePayloadMetadata(
+  payloads: Payloads,
+): ParsedMetadata[];
+export function base64ParsePayloadMetadata(
+  payloadOrPayloads: Payload | Payloads,
+): ParsedMetadata | ParsedMetadata[] {
+  if (isRawPayload(payloadOrPayloads)) {
+    return parseBase64ObjectValues(payloadOrPayloads.metadata);
+  }
+
+  return payloadOrPayloads.payloads.map((payload) =>
+    parseBase64ObjectValues(payload.metadata),
+  );
+}
 
 /**
  * Phase 1 — synchronous, no network.
@@ -183,9 +213,9 @@ const decodePayloadsWithRemoteCodecAndParseRawPayloadToJSON = async (
  * decoded payloads without further Base64-decoding. Use this when the
  * caller needs the full Payload shape (e.g. for re-serialisation on export).
  */
-export const decodePayloadsWithRemoteCodec = async (
+const decodePayloadsWithRemoteCodec = async (
   payloads: unknown[],
-): Promise<unknown[]> => {
+): Promise<Payload[]> => {
   const awaitData = await callCodecEndpoint({ payloads: { payloads } });
   return awaitData?.payloads ?? [];
 };
@@ -199,35 +229,53 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 };
 
 /**
- * Phase 2 — async, requires a configured codec endpoint.
- *
- * Decodes a single user-metadata payload (`summary` or `details` field on a
- * workflow) through the remote codec server. Returns the decoded string value
- * or the original Payload object; returns an empty string on error.
- */
-export const decodeUserMetadata = async (
-  payload: RawPayload | Payload,
-): Promise<string | Payload> => {
-  try {
-    const data = await decodePayloadsWithRemoteCodec([payload]);
-    const result = data[0];
-    return parseRawPayloadToJSON(result) || '';
-  } catch {
-    return '';
-  }
-};
-
-/**
  * Returns `true` when `payload` has exactly the `{ metadata, data }` shape of
  * a raw Temporal Payload object. Used to distinguish a bare Payload from a
  * map of payloads.
  */
-export const isRawPayload = (payload: unknown): boolean => {
+export const isRawPayload = (payload: unknown): payload is Payload => {
   if (!isObject(payload)) return false;
   const keys = Object.keys(payload);
   return (
     keys.length === 2 && keys.includes('metadata') && keys.includes('data')
   );
+};
+
+/**
+ * Returns `true` when `payloads` has exactly the `{ payloads: Payloads[] }` shape of
+ * a raw Temporal Payloads proto.
+ */
+export const isRawPayloads = (payloads: unknown): payloads is Payloads => {
+  if (!isObject(payloads)) return false;
+  return (
+    has(payloads, 'payloads') &&
+    Array.isArray(payloads.payloads) &&
+    payloads.payloads.every(isRawPayload)
+  );
+};
+
+export const decodePayloadAndParseDataToJSON = async (
+  payload: Payload | null | undefined,
+): Promise<unknown> => {
+  const decoded = await decodePayloadsWithRemoteCodec(toArray(payload));
+
+  if (!decoded || !decoded[0]) {
+    return null;
+  }
+
+  return parseRawPayloadToJSON(decoded[0]);
+};
+
+export const decodePayloadsAndParseDataToJSON = async (
+  payloads: Payloads | null | undefined,
+): Promise<unknown[]> => {
+  const decoded = await decodePayloadsWithRemoteCodec(payloads.payloads);
+
+  if (!decoded || !decoded[0]) {
+    return [null];
+  }
+
+  return decoded.map((payload) => parseRawPayloadToJSON(payload));
 };
 
 /**
@@ -262,9 +310,8 @@ const decodeEventAttributesInternal = async (
   if (anyAttributes) {
     // Now that we can have single Payload that is not an array (Nexus)
     if (isRawPayload(clone)) {
-      const data = toArray(clone as Payload);
-      const decoded = await decode(data, returnDataOnly);
-      return decoded?.[0] || clone;
+      const decoded = await decode(toArray(clone), returnDataOnly);
+      return decoded?.[0] ?? clone;
     }
 
     for (const key of Object.keys(clone)) {
@@ -305,10 +352,9 @@ export const decodeEventAttributes = (
     | WorkflowEvent
     | Memo
     | null,
-  decodeSetting: DownloadEventHistorySetting = 'readable',
 ): Promise<
   PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo | null
-> => decodeEventAttributesInternal(anyAttributes, decodeSetting, true);
+> => decodeEventAttributesInternal(anyAttributes, 'readable', true);
 
 /**
  * Phase 2 only — async, requires a configured codec endpoint.
