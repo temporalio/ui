@@ -229,14 +229,16 @@ export const formatSummaryValue = (
   value: unknown,
 ): SummaryAttribute => {
   if (typeof value === 'object') {
-    if (isRawPayload(value) || isRawPayloads(value)) {
+    if (isRawPayload(value)) {
       return { key, value };
     }
     const [firstKey] = Object.keys(value);
     if (!firstKey) {
       return { key, value: {} };
     }
-
+    if (firstKey === 'payloads') {
+      return { key, value };
+    }
     return { key: key + capitalize(firstKey), value: value[firstKey] };
   } else {
     return { key, value: value.toString() };
