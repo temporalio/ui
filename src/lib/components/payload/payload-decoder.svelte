@@ -29,7 +29,6 @@
       return stringified;
     } else {
       const decoded = await decodeEventAttributes(value);
-      console.log(decoded);
       const stringified = stringifyWithBigInt(decoded);
       onDecode?.([stringified]);
       return [stringified];
