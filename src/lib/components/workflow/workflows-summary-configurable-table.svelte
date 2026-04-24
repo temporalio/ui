@@ -37,9 +37,8 @@
 
   let { onClickConfigure, cloud }: Props = $props();
 
-  const { selectWorkflows } = getContext<BatchOperationContext>(
-    BATCH_OPERATION_CONTEXT,
-  );
+  const { allSelected, pageSelected, selectWorkflows } =
+    getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
   const namespace = $derived(page.params.namespace);
   const baseColumns = $derived(
@@ -114,6 +113,8 @@
   let prevVisibleItemBatchSelectClickIndex = $state<null | number>(null);
   $effect(() => {
     void visibleItems;
+    void $allSelected;
+    void $pageSelected;
     prevVisibleItemBatchSelectClickIndex = null;
   });
 </script>
