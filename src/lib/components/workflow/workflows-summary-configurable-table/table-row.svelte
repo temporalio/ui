@@ -64,7 +64,7 @@
         on:click={onClickBatchSelect}
         {checked}
         value={workflow}
-        disabled={$allSelected || child}
+        disabled={$allSelected}
         aria-label={label}
       />
     </td>
