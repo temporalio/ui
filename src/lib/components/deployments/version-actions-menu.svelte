@@ -41,7 +41,7 @@
         aria-haspopup="menu"
         aria-controls="version-actions-{buildId}"
         onclick={() => menuOpen.update((v) => !v)}
-        class="flex h-8 w-8 items-center justify-center rounded hover:surface-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+        class="flex h-8 w-8 items-center justify-center hover:surface-interactive-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
       >
         <Icon name="vertical-ellipsis" class="h-4 w-4" />
       </button>
