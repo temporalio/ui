@@ -32,7 +32,9 @@
     BATCH_OPERATION_CONTEXT,
   );
 
-  export let onClickBatchSelect: PointerEventHandler<HTMLInputElement>;
+  export let onClickBatchSelect: PointerEventHandler<
+    HTMLInputElement
+  > = () => {};
 
   $: ({ namespace } = $page.params);
 
@@ -62,7 +64,7 @@
         on:click={onClickBatchSelect}
         {checked}
         value={workflow}
-        disabled={$allSelected}
+        disabled={$allSelected || child}
         aria-label={label}
       />
     </td>
