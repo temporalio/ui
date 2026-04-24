@@ -15,6 +15,7 @@
     Compartment,
     EditorState,
     type Extension,
+    Prec,
     Transaction,
   } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
@@ -40,7 +41,7 @@
 
   interface BaseProps extends Override<
     HTMLAttributes<HTMLDivElement>,
-    { onchange?: (text: string) => void }
+    { onchange?: (text: string) => void; onsubmit?: (text: string) => void }
   > {
     content: string;
     language?: EditorLanguage;
@@ -57,6 +58,7 @@
     tabs?: string[];
     activeTab?: string;
     headerActions?: Snippet<[]>;
+    onsubmit?: (text: string) => void;
   }
 
   interface PropsWithCopyable extends Override<
@@ -80,6 +82,7 @@
     maxHeight = undefined,
     label = '',
     onchange = undefined,
+    onsubmit = undefined,
     tabs,
     activeTab = $bindable(),
     headerActions,
@@ -160,8 +163,29 @@
     bracketMatching(),
   ];
 
+  const submitOnEnterExtension = $derived.by(() => {
+    if (!editable || !onsubmit) {
+      return undefined;
+    }
+
+    return Prec.highest(
+      keymap.of([
+        {
+          key: 'Enter',
+          run: () => {
+            const formattedDoc = getFormattedDoc();
+            onchange?.(formattedDoc);
+            onsubmit(formattedDoc);
+            return true;
+          },
+        },
+      ]),
+    );
+  });
+
   let dynamicExtensions: Extension[] = $derived(
     [
+      submitOnEnterExtension,
       ...(editable ? [history()] : []),
       getEditorTheme($useDarkMode, hasHeader),
       getActionsTheme({ hasActions: copyable || maximizable }),

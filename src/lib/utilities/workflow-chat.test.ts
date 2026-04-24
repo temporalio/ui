@@ -92,10 +92,11 @@ describe('getWorkflowChatTurn', () => {
     );
 
     expect(turn).toEqual({
-      id: '13',
+      id: '11',
       activityId: 'chat-1',
       activityType: 'CallLLM',
-      timestamp: 'Apr 24, 2026, 10:00:03',
+      userTimestamp: 'Apr 24, 2026, 10:00:00',
+      assistantTimestamp: 'Apr 24, 2026, 10:00:03',
       userContent: 'What is the weather?',
       assistantContent: 'Sunny.',
       llm: {
@@ -104,11 +105,77 @@ describe('getWorkflowChatTurn', () => {
         promptKey: 'prompt',
         responseKey: 'result',
       },
+      status: 'completed',
     });
   });
 });
 
 describe('getWorkflowChatTurns', () => {
+  it('renders an LLM input turn before the activity completes', async () => {
+    const events = [scheduledEvent] as unknown as WorkflowEvents;
+
+    const decode = async (value: unknown) => {
+      if (value === scheduledEvent.activityTaskScheduledEventAttributes.input) {
+        return {
+          payloads: [
+            {
+              prompt: 'What is the weather?',
+              _details: {
+                promptKey: 'prompt',
+              },
+            },
+          ],
+        };
+      }
+
+      return value;
+    };
+
+    const turns = await getWorkflowChatTurns(events, decode);
+
+    expect(turns).toEqual([
+      {
+        id: '11',
+        activityId: 'chat-1',
+        activityType: 'CallLLM',
+        userTimestamp: 'Apr 24, 2026, 10:00:00',
+        userContent: 'What is the weather?',
+        llm: {
+          promptKey: 'prompt',
+        },
+        status: 'pending',
+      },
+    ]);
+  });
+
+  it('renders a scheduled chat activity before completion even without input metadata', async () => {
+    const events = [scheduledEvent] as unknown as WorkflowEvents;
+
+    const decode = async (value: unknown) => {
+      if (value === scheduledEvent.activityTaskScheduledEventAttributes.input) {
+        return {
+          payloads: [{ prompt: 'What is the weather?' }],
+        };
+      }
+
+      return value;
+    };
+
+    const turns = await getWorkflowChatTurns(events, decode);
+
+    expect(turns).toEqual([
+      {
+        id: '11',
+        activityId: 'chat-1',
+        activityType: 'CallLLM',
+        userTimestamp: 'Apr 24, 2026, 10:00:00',
+        userContent: 'What is the weather?',
+        llm: {},
+        status: 'pending',
+      },
+    ]);
+  });
+
   it('filters out activities without llm metadata', async () => {
     const events = [
       scheduledEvent,
@@ -162,5 +229,35 @@ describe('getWorkflowChatTurns', () => {
 
     expect(turns).toHaveLength(1);
     expect(turns[0].activityId).toBe('chat-1');
+    expect(turns[0].status).toBe('completed');
+  });
+
+  it('drops heuristic scheduled turns after completion if they are not actually LLM activities', async () => {
+    const events = [
+      scheduledEvent,
+      completedEvent,
+    ] as unknown as WorkflowEvents;
+
+    const decode = async (value: unknown) => {
+      if (value === scheduledEvent.activityTaskScheduledEventAttributes.input) {
+        return {
+          payloads: [{ prompt: 'What is the weather?' }],
+        };
+      }
+
+      if (
+        value === completedEvent.activityTaskCompletedEventAttributes.result
+      ) {
+        return {
+          payloads: [{ result: 'Sunny.' }],
+        };
+      }
+
+      return value;
+    };
+
+    const turns = await getWorkflowChatTurns(events, decode);
+
+    expect(turns).toEqual([]);
   });
 });

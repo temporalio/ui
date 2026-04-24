@@ -147,37 +147,44 @@
         <div class="flex w-full flex-col gap-6">
           {#each [...turns].reverse() as turn (turn.id)}
             <article class="flex w-full flex-col gap-3">
-              <div class="flex justify-start">
-                <div
-                  class="surface-primary w-full rounded-2xl rounded-bl-sm border border-subtle p-2"
-                >
-                  <div class="flex flex-wrap items-center gap-2">
-                    {#if turn.llm.provider}
-                      <Badge type="default">{turn.llm.provider}</Badge>
-                    {/if}
-                    {#if turn.llm.model}
-                      <Badge type="secondary">{turn.llm.model}</Badge>
-                    {/if}
+              {#if turn.assistantContent}
+                <div class="flex justify-start">
+                  <div
+                    class="surface-primary w-full rounded-2xl rounded-bl-sm border border-subtle p-2"
+                  >
+                    <div
+                      class="mb-2 flex flex-wrap items-center justify-between gap-2"
+                    >
+                      <div class="flex flex-wrap items-center gap-2">
+                        {#if turn.llm.provider}
+                          <Badge type="success">{turn.llm.provider}</Badge>
+                        {/if}
+                        {#if turn.llm.model}
+                          <Badge type="default">{turn.llm.model}</Badge>
+                        {/if}
+                      </div>
+                      {#if turn.assistantTimestamp}
+                        <p class="text-xs text-secondary">
+                          {turn.assistantTimestamp}
+                        </p>
+                      {/if}
+                    </div>
+                    {@render CostNumbers(turn)}
+                    <Markdown
+                      frameId={`workflow-chat-assistant-${turn.id}`}
+                      overrideTheme="primary"
+                      content={turn.assistantContent}
+                    />
                   </div>
-                  {@render CostNumbers(turn)}
-                  <Markdown
-                    frameId={`workflow-chat-assistant-${turn.id}`}
-                    overrideTheme="primary"
-                    content={turn.assistantContent}
-                  />
                 </div>
-              </div>
+              {/if}
               <div class="flex justify-end">
                 <div
                   class="surface-primary rounded-2xl rounded-br-sm border border-subtle p-2"
                 >
                   <div class="mb-2 flex items-center justify-between gap-4">
-                    <p
-                      class="text-xs font-medium uppercase tracking-wider text-secondary"
-                    >
-                      User
-                    </p>
-                    <p class="text-xs text-secondary">{turn.timestamp}</p>
+                    <Badge type="primary">User</Badge>
+                    <p class="text-xs text-secondary">{turn.userTimestamp}</p>
                   </div>
                   <Markdown
                     frameId={`workflow-chat-user-${turn.id}`}

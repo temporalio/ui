@@ -30,7 +30,7 @@
 
   const resizeIframe = () => {
     if (!iframe) return;
-    const minHeight = 100;
+    const minHeight = 40;
     const height = Math.max(
       iframe.contentWindow.document.body.scrollHeight + 2,
       minHeight,

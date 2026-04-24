@@ -52,6 +52,7 @@
   let messageType = $state('');
   let error = $state('');
   let loading = $state(false);
+  let editorResetKey = $state(0);
   const encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
 
   const metadata = $derived($workflowRun.metadata);
@@ -105,10 +106,10 @@
 
   const reset = () => {
     input = '';
-    loading = true;
     messageType = '';
     error = '';
     customSignal = false;
+    editorResetKey += 1;
     $encoding = defaultEncoding;
     getDefaultSignal();
   };
@@ -120,6 +121,7 @@
 
   const sendSignal = async () => {
     error = '';
+    loading = true;
 
     try {
       await signalWorkflow({
@@ -152,16 +154,25 @@
       input = text;
     }
   };
+
+  const handleEditorSubmit = (_text: string): void => {
+    if (!name || error || loading) {
+      return;
+    }
+
+    void sendSignal();
+  };
 </script>
 
 <div>
   {#if !workflow.isRunning && !workflow.isPaused}
-    <EmptyState
-      icon="signal"
-      title={translate('workflows.chat-composer-unavailable')}
-      content={translate('workflows.chat-composer-unavailable-description')}
-      class="my-0 border border-subtle py-8"
-    />
+    <Card>
+      <EmptyState
+        icon="signal"
+        title={translate('workflows.chat-composer-unavailable')}
+        content={translate('workflows.chat-composer-unavailable-description')}
+      />
+    </Card>
   {:else if !signalEnabled}
     <EmptyState
       icon="signal"
@@ -222,12 +233,13 @@
       {#if selectedSignal?.description}
         <p class="text-sm text-secondary">{selectedSignal.description}</p>
       {/if}
-      {#key input === ''}
+      {#key editorResetKey}
         <CodeBlock
           id="signal-input"
           maxHeight={320}
           content={input}
           onchange={handleInputChange}
+          onsubmit={handleEditorSubmit}
           editable
           copyable={false}
         />
@@ -238,6 +250,7 @@
       {/if}
       <div class="flex items-end justify-end">
         <Button
+          trailingIcon="signal"
           on:click={sendSignal}
           disabled={!name || !!error}
           data-testid="send-signal-button"
