@@ -111,7 +111,11 @@
 
   const displayName = $derived(
     isEventGroup(event)
-      ? event.label
+      ? event.pendingActivity
+        ? translate('workflows.pending-activity')
+        : event.pendingNexusOperation
+          ? translate('workflows.pending-nexus-operation')
+          : event.label
       : isLocalActivityMarkerEvent(event)
         ? translate('events.category.local-activity')
         : spaceBetweenCapitalLetters(event.name),
@@ -183,18 +187,12 @@
 
   onMount(async () => {
     if (isLocalActivityMarkerEvent(event)) {
-      primaryLocalAttribute = await decodeLocalActivity(event, {
-        namespace: page.params.namespace,
-        settings: page.data.settings,
-      });
+      primaryLocalAttribute = await decodeLocalActivity(event);
     } else if (
       isEventGroup(event) &&
       isLocalActivityMarkerEvent(event.initialEvent)
     ) {
-      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent, {
-        namespace: page.params.namespace,
-        settings: page.data.settings,
-      });
+      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent);
     }
   });
 </script>
@@ -276,7 +274,10 @@
       <Icon
         name={CategoryIcon[event.category].name}
         title={CategoryIcon[event.category].title}
-        class="mr-1 inline"
+        class={merge(
+          'mr-1 inline',
+          isEventGroup(event) && event.isPending && 'animate-pulse',
+        )}
       />
       {displayName}
     </p>

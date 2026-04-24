@@ -2,7 +2,7 @@
   import { slide } from 'svelte/transition';
 
   import type { Snippet } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/state';
@@ -35,6 +35,7 @@
       ]
     >;
     profilePicture?: Snippet;
+    class?: ClassNameValue;
   }
 
   let {
@@ -45,6 +46,7 @@
     children,
     nsPicker,
     profilePicture,
+    class: className = '',
   }: Props = $props();
 
   let viewLinks = $state(false);
@@ -138,6 +140,7 @@
     isCloud
       ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-off-white focus-visible:[&_a]:ring-success focus-visible:[&_button]:ring-success'
       : 'surface-black border-t border-subtle',
+    className,
   )}
   data-testid="top-nav"
   aria-label={translate('common.main')}

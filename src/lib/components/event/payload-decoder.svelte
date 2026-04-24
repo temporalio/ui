@@ -1,20 +1,13 @@
 <script lang="ts">
   import { onMount, type Snippet } from 'svelte';
 
-  import { page } from '$app/stores';
-
   import type { Memo } from '$lib/types';
   import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
   import {
-    cloneAllPotentialPayloadsWithCodec,
-    decodePayloadAttributes,
+    decodeEventAttributes,
+    parsePayloadAttributes,
     type PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
-  import {
-    getCodecEndpoint,
-    getCodecIncludeCredentials,
-    getCodecPassAccessToken,
-  } from '$lib/utilities/get-codec';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {
@@ -36,22 +29,9 @@
   const decodePayloads = async (
     _value: PotentiallyDecodable | EventAttribute | WorkflowEvent | Memo,
   ) => {
-    const settings = {
-      ...$page.data.settings,
-      codec: {
-        ...$page.data.settings?.codec,
-        endpoint: getCodecEndpoint($page.data.settings),
-        passAccessToken: getCodecPassAccessToken($page.data.settings),
-        includeCredentials: getCodecIncludeCredentials($page.data.settings),
-      },
-    };
     try {
-      const convertedAttributes = await cloneAllPotentialPayloadsWithCodec(
-        _value,
-        $page.params.namespace,
-        settings,
-      );
-      const decodedAttributes = decodePayloadAttributes(
+      const convertedAttributes = await decodeEventAttributes(_value);
+      const decodedAttributes = parsePayloadAttributes(
         convertedAttributes,
       ) as object;
       const keyExists = key && decodedAttributes?.[key];

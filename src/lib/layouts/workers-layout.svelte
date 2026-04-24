@@ -8,20 +8,44 @@
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    routeForWorkerDeployments,
+    routeForWorkers,
+  } from '$lib/utilities/route-for';
 
   interface Props {
     children: Snippet;
-    deploymentsHref: string;
-    workersHref: string;
+    headerAction?: Snippet;
+    namespace?: string;
+    deploymentsHref?: string;
+    workersHref?: string;
   }
 
-  const { children, deploymentsHref, workersHref }: Props = $props();
+  const {
+    children,
+    namespace = '',
+    headerAction,
+    deploymentsHref: deploymentsHrefProp,
+    workersHref: workersHrefProp,
+  }: Props = $props();
+
+  const workersHref = $derived(
+    workersHrefProp ?? routeForWorkers({ namespace }),
+  );
+  const deploymentsHref = $derived(
+    deploymentsHrefProp ?? routeForWorkerDeployments({ namespace }),
+  );
 </script>
 
 <header class="flex flex-col gap-2">
-  <h1>
-    {translate('workers.workers')}
-  </h1>
+  <div class="flex min-h-10 flex-wrap items-center justify-between gap-2">
+    <h1 class="leading-7" data-cy="workers-title">
+      {translate('workers.workers')}
+    </h1>
+    {#if headerAction}
+      {@render headerAction()}
+    {/if}
+  </div>
   <Tabs>
     <TabList label={translate('workers.worker-views')}>
       <Tab
@@ -30,7 +54,7 @@
         href={workersHref}
         active={page.url.pathname.endsWith('/workers')}
       >
-        <Badge class="shrink-0">Pre-Release</Badge>
+        <Badge type="secondary" class="shrink-0">Preview</Badge>
       </Tab>
       <Tab
         label={translate('deployments.deployments')}

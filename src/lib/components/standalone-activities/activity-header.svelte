@@ -92,7 +92,7 @@
       <DetailListLabel
         >{translate('standalone-activities.run-id')}</DetailListLabel
       >
-      <DetailListTextValue copyable text={activityExecutionInfo.runId} />\
+      <DetailListTextValue copyable text={activityExecutionInfo.runId} />
       {#if activityType}
         <DetailListLabel
           >{translate('standalone-activities.activity-type')}</DetailListLabel

@@ -223,6 +223,7 @@ export const Strings = {
   'query-arg': 'Query Arg',
   'run-query': 'Run Query',
   'refresh-query': 'Refresh Query',
+  'refresh-call-stack': 'Refresh Call Stack',
   'pending-activities-empty-state': 'No Pending Activities',
   'activity-id': 'Activity ID',
   summary: 'Summary',
@@ -349,5 +350,9 @@ export const Strings = {
   'timeline-minimized':
     'Timeline and Event History are collapsed to minimized height',
   'timeline-expanded': 'Timeline and Event History are expanded to full height',
+  'external-payload-size': 'External Payloads Size',
+  'external-payload-count': 'External Payloads',
+  'external-payload-tooltip':
+    'History Size does not include externally stored payload size.',
   sdk: 'Workflow SDK',
 } as const;

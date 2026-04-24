@@ -14,6 +14,7 @@
     EventTypeCategory,
     IterableEventWithPending,
   } from '$lib/types/events';
+  import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   export let history: IterableEventWithPending[];
   export let groups: EventGroups;
@@ -34,7 +35,7 @@
   $: pendingNexusOperations = workflow.pendingNexusOperations;
 
   $: items = compact
-    ? groups
+    ? orderGroupsByPending(groups, reverseSort)
     : reverseSort
       ? [...pendingNexusOperations, ...pendingActivities, ...history]
       : [...history, ...pendingActivities, ...pendingNexusOperations];

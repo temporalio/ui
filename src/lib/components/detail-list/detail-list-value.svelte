@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -9,9 +10,15 @@
     copyable?: boolean;
     copyableText?: string;
     children: Snippet;
+    class?: ClassNameValue;
   }
 
-  const { children, copyable, copyableText }: Props = $props();
+  const {
+    children,
+    copyable,
+    copyableText,
+    class: className = '',
+  }: Props = $props();
   const { copy, copied } = copyToClipboard();
 
   const handleCopy = (e: Event) => {
@@ -19,7 +26,7 @@
   };
 </script>
 
-<dt class="col-[2] flex">
+<dt class={twMerge('col-[2] flex', className)}>
   {@render children()}
   {#if copyable}
     <!-- 

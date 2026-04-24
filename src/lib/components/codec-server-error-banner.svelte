@@ -9,7 +9,7 @@
     translate('data-encoder.codec-server-error');
   $: linkUrl =
     $dataEncoder.customErrorLink ||
-    'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server-endpoints';
+    'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server-endpoints-with-web-ui-and-cli';
 </script>
 
 {#if $dataEncoder.hasError}

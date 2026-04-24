@@ -68,10 +68,10 @@ test.describe('Workflow Workers Tab', () => {
       await expect(heading).toBeVisible();
       await expect(heading).toContainText('Workers');
 
-      const rows = page.getByTestId('worker-row');
+      const rows = page.getByTestId('poller-row');
       await expect(rows).toHaveCount(1);
 
-      const identity = page.getByTestId('worker-identity');
+      const identity = page.getByTestId('poller-identity');
       await expect(identity).toContainText('@poller');
     });
   });

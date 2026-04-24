@@ -195,7 +195,7 @@
           copyable={!!buildId}
           copyableText={buildId ?? ''}
           text={buildId ?? '-'}
-          tooltipText={buildId}
+          tooltipText={buildId ?? undefined}
         />
       </span>
       {#if heartbeat?.deploymentVersion?.deploymentName}
