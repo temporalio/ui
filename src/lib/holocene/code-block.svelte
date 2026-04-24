@@ -295,7 +295,9 @@
     ></div>
 
     {#snippet actions()}
-      {#if copyable && !hasHeader}
+      {#if headerActions}
+        {@render headerActions()}
+      {:else if copyable && !hasHeader}
         <CopyButton
           {copyIconTitle}
           {copySuccessIconTitle}
