@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { invalidate } from '$app/navigation';
+
   import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
