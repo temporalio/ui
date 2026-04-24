@@ -99,7 +99,7 @@
           {namespace}
           {deploymentName}
           conflictToken={deployment.conflictToken}
-          onVersionDeleted={reload}
+          onChange={reload}
         />
       {/each}
     </PaginatedTable>
