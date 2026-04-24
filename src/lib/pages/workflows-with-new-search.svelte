@@ -22,6 +22,7 @@
       checked: boolean,
       workflows: WorkflowExecution[],
     ) => void;
+    selectWorkflows: (checked: boolean, workflows: WorkflowExecution[]) => void;
   };
 </script>
 
@@ -175,6 +176,32 @@
     }
   };
 
+  /**
+   * Handle the selection or deselection of workflows.
+   * This modifies the existing selection. It does not replace it (i.e., if a workflow was already selected and it was not deselected by this call, it will remain selected).
+   * @param checked Whether to select or deselect workflows
+   * @param workflows Workflows to be selected or deselected
+   */
+  const selectWorkflows = (
+    checked: boolean,
+    workflows: WorkflowExecution[],
+  ): void => {
+    // Set is not being used reactively here.
+    // We could refactor the selected workflows store to use SvelteSet if we wanted to though.
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
+    const selected = new Set($selectedWorkflows);
+
+    for (const workflow of workflows) {
+      if (checked) {
+        selected.add(workflow);
+      } else {
+        selected.delete(workflow);
+      }
+    }
+
+    selectedWorkflows.set(Array.from(selected));
+  };
+
   setContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT, {
     allSelected,
     pageSelected,
@@ -187,6 +214,7 @@
     openBatchResetConfirmationModal,
     handleSelectAll,
     handleSelectPage,
+    selectWorkflows,
   });
 
   const openCustomizationDrawer = () => {

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { PointerEventHandler } from 'svelte/elements';
+
   import { getContext } from 'svelte';
 
   import { page } from '$app/stores';
@@ -30,6 +32,8 @@
     BATCH_OPERATION_CONTEXT,
   );
 
+  export let onClickBatchSelect: PointerEventHandler<HTMLInputElement>;
+
   $: ({ namespace } = $page.params);
 
   $: parentWorkflows =
@@ -40,6 +44,8 @@
   });
 
   $: childrenShown = childCount !== undefined;
+
+  $: checked = $selectedWorkflows.some((selected) => selected === workflow);
 </script>
 
 <tr
@@ -53,7 +59,8 @@
       <Checkbox
         {label}
         labelHidden
-        bind:group={$selectedWorkflows}
+        on:click={onClickBatchSelect}
+        {checked}
         value={workflow}
         disabled={$allSelected}
         aria-label={label}

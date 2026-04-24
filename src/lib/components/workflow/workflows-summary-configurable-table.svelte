@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -10,6 +10,10 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    BATCH_OPERATION_CONTEXT,
+    type BatchOperationContext,
+  } from '$lib/pages/workflows-with-new-search.svelte';
   import {
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
@@ -32,6 +36,10 @@
   }
 
   let { onClickConfigure, cloud }: Props = $props();
+
+  const { selectWorkflows } = getContext<BatchOperationContext>(
+    BATCH_OPERATION_CONTEXT,
+  );
 
   const namespace = $derived(page.params.namespace);
   const baseColumns = $derived(
@@ -101,13 +109,22 @@
     $tableDensity = dense ? 'comfortable' : 'dense';
     viewFeature('tableDensity');
   };
+
+  let visibleItems: WorkflowExecution[] = $state([]);
+  let prevVisibleItemBatchSelectClickIndex = $state<null | number>(null);
+  $effect(() => {
+    void visibleItems;
+    prevVisibleItemBatchSelectClickIndex = null;
+  });
 </script>
 
 {#key [namespace, query, $refresh]}
   <PaginatedTable
     total={$workflowCount.count}
     {onFetch}
-    let:visibleItems
+    onItemsChange={(items) => {
+      visibleItems = items;
+    }}
     aria-label={translate('common.workflows')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
@@ -122,17 +139,39 @@
       columnsCount={columns.length}
       empty={visibleItems.length === 0}
       slot="headers"
-      let:visibleItems
       workflows={visibleItems}
     >
       {#each columns as column (column)}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
-    {#each visibleItems as workflow (`${workflow.id}:${workflow.runId}`)}
+    {#each visibleItems as workflow, visibleItemIndex (`${workflow.id}:${workflow.runId}`)}
       <TableRow
         {workflow}
         {viewChildren}
+        onClickBatchSelect={(e) => {
+          let targetedWorkflows = [workflow];
+
+          if (e.shiftKey && prevVisibleItemBatchSelectClickIndex != null) {
+            const rangeStartInclusive = Math.min(
+              prevVisibleItemBatchSelectClickIndex,
+              visibleItemIndex,
+            );
+            const rangeEndInclusive = Math.max(
+              prevVisibleItemBatchSelectClickIndex,
+              visibleItemIndex,
+            );
+
+            // end of the slice range is exclusive, so add 1 to include the full range
+            targetedWorkflows = visibleItems.slice(
+              rangeStartInclusive,
+              rangeEndInclusive + 1,
+            );
+          }
+
+          selectWorkflows(e.currentTarget.checked, targetedWorkflows);
+          prevVisibleItemBatchSelectClickIndex = visibleItemIndex;
+        }}
         childCount={childrenActive(workflow)?.children.length}
       >
         {#each columns as column (column)}
