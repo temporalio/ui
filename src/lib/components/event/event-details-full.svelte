@@ -99,8 +99,8 @@
     {/if}
 
     {#if hasAnyPayloads}
-      <div class="flex flex-col border-b border-subtle xl:flex-row">
-        <div class="flex w-full flex-col xl:w-1/2">
+      <div class="flex flex-col border-b border-subtle lg:flex-row">
+        <div class="flex w-full flex-col lg:w-1/2 xl:w-1/3">
           {#each processedEvents as processed, i (processed.event.id)}
             <div
               class="p-4 {i < processedEvents.length - 1
@@ -119,7 +119,9 @@
             </div>
           {/each}
         </div>
-        <div class="flex w-full flex-col gap-1 p-4 xl:w-1/2">
+        <div
+          class="flex w-full flex-col gap-1 p-4 lg:w-1/2 lg:border-l lg:border-subtle xl:w-2/3"
+        >
           <EventPayloads payloadFields={allPayloadFields} />
         </div>
       </div>

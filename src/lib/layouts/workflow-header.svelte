@@ -7,6 +7,7 @@
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
+  import WorkflowLlmMetadata from '$lib/components/workflow/workflow-llm-metadata.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -176,6 +177,7 @@
   </div>
   <CodecServerErrorBanner />
   <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
+  <WorkflowLlmMetadata {workflow} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert

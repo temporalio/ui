@@ -1,8 +1,30 @@
 <script lang="ts">
   import Badge from '$lib/holocene/badge.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   let { value }: { value: string } = $props();
+
+  type LLMMetadata = {
+    model?: string;
+    provider?: string;
+    promptTokens?: number | string;
+    completionTokens?: number | string;
+    totalTokens?: number | string;
+    cost?: number | string;
+    score?: number | string;
+    traceUrl?: string;
+    latencyMs?: number | string;
+    status?: string;
+    statusDetail?: string;
+    costCurrency?: string;
+    streaming?: boolean;
+    timeToFirstTokenMs?: number | string;
+    promptKey?: string;
+    responseKey?: string;
+  };
 
   const jsonValue = $derived.by(() => {
     try {
@@ -12,20 +34,14 @@
     }
   });
 
-  const isLLMMetadata = $derived.by(() => {
-    if (jsonValue && typeof jsonValue === 'object' && '_llm' in jsonValue) {
-      return true;
-    }
-    return false;
-  });
-
-  const llm = $derived(jsonValue?._llm);
+  const llm: LLMMetadata | null = $derived(jsonValue?._details);
   const model = $derived(llm?.model);
   const provider = $derived(llm?.provider);
   const cost = $derived(llm?.cost);
-  const inputTokens = $derived(llm?.inputTokens);
-  const outputTokens = $derived(llm?.outputTokens);
+  const promptTokens = $derived(llm?.promptTokens);
+  const completionTokens = $derived(llm?.completionTokens);
   const totalTokens = $derived(llm?.totalTokens);
+  const responseKey = $derived(llm?.responseKey ?? 'result');
 
   const formatNumber = (n: unknown): string => {
     if (n == null) return '--';
@@ -55,30 +71,33 @@
   {/if}
 {/snippet}
 
-{#if isLLMMetadata}
-  <div class="surface-primary overflow-hidden">
-    <div class="flex flex-col gap-1 p-2">
-      {#if model || provider}
-        <div class="flex flex-wrap items-center gap-2">
-          {#if provider}
-            <Badge type="default">
-              {provider}
-            </Badge>
-          {/if}
-          {#if model}
-            <Badge type="secondary">
-              {model}
-            </Badge>
-          {/if}
-        </div>
-      {/if}
-
-      <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {@render Info('Cost', formatCost(cost))}
-        {@render Info('Input Tokens', formatNumber(inputTokens))}
-        {@render Info('Output Tokens', formatNumber(outputTokens))}
-        {@render Info('Total Tokens', formatNumber(totalTokens))}
-      </div>
+<div class="surface-primary mb-2 overflow-hidden">
+  <div class="flex flex-col gap-1">
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {@render Info('Cost', formatCost(cost))}
+      {@render Info('Input Tokens', formatNumber(promptTokens))}
+      {@render Info('Output Tokens', formatNumber(completionTokens))}
+      {@render Info('Total Tokens', formatNumber(totalTokens))}
     </div>
+    {#if model || provider}
+      <div class="flex flex-wrap items-center gap-2">
+        {#if provider}
+          <Badge type="default">
+            {provider}
+          </Badge>
+        {/if}
+        {#if model}
+          <Badge type="secondary">
+            {model}
+          </Badge>
+        {/if}
+      </div>
+    {/if}
   </div>
-{/if}
+</div>
+<CodeBlock
+  content={jsonValue?.[responseKey]}
+  maxHeight={384}
+  copyIconTitle={translate('common.copy-icon-title')}
+  copySuccessIconTitle={translate('common.copy-success-icon-title')}
+/>
