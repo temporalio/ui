@@ -8,8 +8,10 @@
   import {
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
+    setCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
+  import { toaster } from '$lib/stores/toaster';
   import type { DeploymentStatus as Status } from '$lib/types/deployments';
   import {
     isVersionSummaryNew,
@@ -31,6 +33,7 @@
   import ComputeBadge from './compute-badge.svelte';
   import DeleteVersionModal from './delete-version-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
+  import SetCurrentVersionModal from './set-current-version-modal.svelte';
   import ValidateConnectionModal from './validate-connection-modal.svelte';
   import VersionActionsMenu from './version-actions-menu.svelte';
   import VersionRowDetails from './version-row-details.svelte';
@@ -41,7 +44,7 @@
     namespace: string;
     deploymentName: string;
     conflictToken?: string;
-    onVersionDeleted?: () => void;
+    onChange?: () => void;
   }
   let {
     routingConfig,
@@ -49,7 +52,7 @@
     namespace,
     deploymentName,
     conflictToken,
-    onVersionDeleted,
+    onChange,
   }: Props = $props();
 
   const currentDeploymentName = $derived(
@@ -143,6 +146,8 @@
   );
 
   let expanded = $state(false);
+  let showSetCurrentModal = $state(false);
+  let setCurrentError = $state('');
   let showDeleteVersionModal = $state(false);
   let deleteVersionError = $state('');
   let showValidateModal = $state(false);
@@ -179,6 +184,27 @@
     validateLoading = false;
   }
 
+  async function handleSetCurrentVersion() {
+    setCurrentError = '';
+    await setCurrentDeploymentVersion(
+      { namespace, deploymentName, buildId: versionBuildId },
+      (err) => {
+        setCurrentError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.set-as-current-error');
+      },
+    );
+    if (setCurrentError) return;
+    showSetCurrentModal = false;
+    toaster.push({
+      variant: 'primary',
+      message: translate('deployments.set-current-version-success', {
+        buildId: versionBuildId,
+      }),
+    });
+    onChange?.();
+  }
+
   async function handleDeleteVersion() {
     deleteVersionError = '';
     await deleteWorkerDeploymentVersion(
@@ -191,7 +217,7 @@
     );
     if (deleteVersionError) return;
     showDeleteVersionModal = false;
-    onVersionDeleted?.();
+    onChange?.();
   }
 </script>
 
@@ -243,6 +269,8 @@
     buildId={versionBuildId}
     {editHref}
     {workflowHref}
+    {isCurrent}
+    onSetCurrent={() => (showSetCurrentModal = true)}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}
   />
@@ -259,6 +287,19 @@
     </td>
   </tr>
 {/if}
+
+<SetCurrentVersionModal
+  buildId={versionBuildId}
+  {currentBuildId}
+  {deploymentName}
+  open={showSetCurrentModal}
+  error={setCurrentError}
+  onConfirm={handleSetCurrentVersion}
+  onCancel={() => {
+    showSetCurrentModal = false;
+    setCurrentError = '';
+  }}
+/>
 
 <ValidateConnectionModal
   buildId={versionBuildId}
