@@ -7,6 +7,7 @@
     decodePayloadsAndParseDataToJSON,
     isRawPayload,
     isRawPayloads,
+    type ParsedPayload,
     type PayloadContainingObject,
     type PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
@@ -14,31 +15,37 @@
 
   export const decodePayloadValue = async (
     value: PotentiallyDecodable | PayloadContainingObject,
-  ): Promise<string[]> => {
+  ): Promise<ParsedPayload[]> => {
     if (isRawPayload(value)) {
-      const decodedPayloadData = await decodePayloadAndParseDataToJSON(value);
-      const stringified = stringifyWithBigInt(decodedPayloadData);
-      onDecode?.([stringified]);
-      return [stringified];
-    } else if (isRawPayloads(value)) {
-      const parsedPayloadsData = await decodePayloadsAndParseDataToJSON(value);
-      const stringified = parsedPayloadsData.map((data) =>
-        stringifyWithBigInt(data),
+      const decodedPayload = await decodePayloadAndParseDataToJSON(
+        value,
+        false,
       );
-      onDecode?.(stringified);
-      return stringified;
+      // const stringified = stringifyWithBigInt(decodedPayload.data);
+      onDecode?.([decodedPayload]);
+      return [decodedPayload];
+    } else if (isRawPayloads(value)) {
+      const decodedPayloads = await decodePayloadsAndParseDataToJSON(
+        value,
+        false,
+      );
+      // const stringified = decodedPayloads.map((payload) =>
+      //   stringifyWithBigInt(payload.data),
+      // );
+      onDecode?.(decodedPayloads);
+      return decodedPayloads;
     } else {
       const decoded = await decodeEventAttributes(value);
-      const stringified = stringifyWithBigInt(decoded);
-      onDecode?.([stringified]);
-      return [stringified];
+      // const stringified = stringifyWithBigInt(decoded);
+      // onDecode?.(decoded);
+      // return [stringified];
     }
   };
 
   interface Props {
     value: PotentiallyDecodable | PayloadContainingObject;
-    onDecode?: (decodedPayloads: string[]) => void;
-    children: Snippet<[decodedPayloads: string[]]>;
+    onDecode?: (decodedPayloads: ParsedPayload[]) => void;
+    children: Snippet<[decodedPayloads: ParsedPayload[]]>;
     loading?: Snippet;
   }
 
