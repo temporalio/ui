@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import type { Snippet } from 'svelte';
+
+  import { page } from '$app/state';
 
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -24,33 +26,48 @@
   import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
 
-  export let onClickConfigure: () => void;
+  interface Props {
+    onClickConfigure: () => void;
+    cloud?: Snippet;
+  }
 
-  $: ({ namespace } = $page.params);
-  $: baseColumns = $configurableTableColumns?.[namespace]?.workflows ?? [];
-  $: query = $page.url.searchParams.get('query');
+  let { onClickConfigure, cloud }: Props = $props();
 
-  $: hasVersioningFilter =
-    query?.includes('TemporalWorkerDeploymentVersion') ?? false;
-  $: hasVersioningBehaviorColumn = baseColumns.some(
-    (col) => col.label === 'Versioning Behavior',
+  const namespace = $derived(page.params.namespace);
+  const baseColumns = $derived(
+    $configurableTableColumns?.[namespace]?.workflows ?? [],
   );
-  $: columns =
+  const query = $derived(page.url.searchParams.get('query'));
+
+  const hasVersioningFilter = $derived(
+    query?.includes('TemporalWorkerDeploymentVersion') ?? false,
+  );
+  const hasVersioningBehaviorColumn = $derived(
+    baseColumns.some((col) => col.label === 'Versioning Behavior'),
+  );
+  const columns = $derived(
     hasVersioningFilter && !hasVersioningBehaviorColumn
       ? [...baseColumns, { label: 'Versioning Behavior' }]
-      : baseColumns;
+      : baseColumns,
+  );
 
-  let childrenIds: {
-    workflowId: string;
-    runId: string;
-    children: WorkflowExecution[];
-  }[] = [];
+  let childrenIds = $state<
+    {
+      workflowId: string;
+      runId: string;
+      children: WorkflowExecution[];
+    }[]
+  >([]);
 
   const clearChildren = () => {
     childrenIds = [];
   };
 
-  $: ($refresh, query, clearChildren());
+  $effect(() => {
+    void $refresh;
+    void query;
+    clearChildren();
+  });
 
   const viewChildren = async (workflow: WorkflowExecution) => {
     if (childrenActive(workflow)) {
@@ -70,15 +87,15 @@
     }
   };
 
-  $: childrenActive = (workflow: WorkflowExecution) => {
+  const childrenActive = (workflow: WorkflowExecution) => {
     return childrenIds.find(
       (id) => id.workflowId === workflow.id && id.runId === workflow.runId,
     );
   };
 
-  $: onFetch = () => fetchPaginatedWorkflows(namespace, query);
+  const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
 
-  $: dense = $tableDensity === 'dense';
+  const dense = $derived($tableDensity === 'dense');
 
   const setTableDensity = () => {
     $tableDensity = dense ? 'comfortable' : 'dense';
@@ -108,7 +125,7 @@
       let:visibleItems
       workflows={visibleItems}
     >
-      {#each columns as column}
+      {#each columns as column (column)}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
@@ -118,14 +135,14 @@
         {viewChildren}
         childCount={childrenActive(workflow)?.children.length}
       >
-        {#each columns as column}
+        {#each columns as column (column)}
           <TableBodyCell {workflow} {column} truncate={dense} />
         {/each}
       </TableRow>
       {#if childrenActive(workflow)}
         {#each childrenActive(workflow).children as child (`${child.id}:${child.runId}`)}
           <TableRow workflow={child} child>
-            {#each columns as column}
+            {#each columns as column (column)}
               <TableBodyCell workflow={child} {column} truncate={dense} />
             {/each}
           </TableRow>
@@ -133,9 +150,7 @@
       {/if}
     {/each}
     <svelte:fragment slot="empty">
-      <TableEmptyState>
-        <slot name="cloud" slot="cloud" />
-      </TableEmptyState>
+      <TableEmptyState {cloud} />
     </svelte:fragment>
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
       <Tooltip

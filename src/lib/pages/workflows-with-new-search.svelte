@@ -28,7 +28,7 @@
 <script lang="ts">
   import { derived as derivedStore, writable } from 'svelte/store';
 
-  import { onMount, setContext } from 'svelte';
+  import { onMount, setContext, type Snippet } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -63,6 +63,9 @@
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
+  const { headerActions, cloud }: { headerActions?: Snippet; cloud?: Snippet } =
+    $props();
+
   const query = $derived(page.url.searchParams.get('query'));
   const namespace = $derived(page.params.namespace);
   const perPage = $derived(page.url.searchParams.get('per-page'));
@@ -96,10 +99,10 @@
   });
 
   $effect(() => {
-    namespace;
-    query;
-    perPage;
-    $refresh;
+    void namespace;
+    void query;
+    void perPage;
+    void $refresh;
     resetSelection();
   });
 
@@ -244,9 +247,9 @@
       <WorkflowCountRefresh count={$workflowCount.newCount} />
       <WorkflowCounts bind:refreshTime fetchTaskFailures />
     </div>
-    {#if $$slots['header-actions'] || workflowStartEnabled}
+    {#if headerActions || workflowStartEnabled}
       <div class="flex items-center gap-4">
-        <slot name="header-actions" />
+        {@render headerActions?.()}
         {#if workflowStartEnabled}
           <Button
             leadingIcon="lightning-bolt"
@@ -270,9 +273,8 @@
   >
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
-    >
-      <slot name="cloud" slot="cloud" />
-    </WorkflowsSummaryConfigurableTable>
+      {cloud}
+    />
   </div>
 </div>
 <ConfigurableTableHeadersDrawer
