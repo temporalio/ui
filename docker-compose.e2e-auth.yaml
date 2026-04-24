@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  oidc-server:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      OIDC_PORT: '8889'
+      OIDC_ISSUER: 'http://oidc-server:8889'
+    command: >
+      sh -c "corepack enable &&
+             pnpm install --frozen-lockfile &&
+             pnpm exec esno scripts/start-oidc-server-e2e-auth.ts"
+    ports:
+      - '8889:8889'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--quiet',
+          '--tries=1',
+          '--spider',
+          'http://localhost:8889/.well-known/openid-configuration',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  ui-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      target: ui-server
+    environment:
+      TEMPORAL_ADDRESS: '127.0.0.1:7233'
+      TEMPORAL_UI_PORT: '8082'
+      TEMPORAL_AUTH_ENABLED: 'true'
+      TEMPORAL_MAX_SESSION_DURATION: '15s'
+      TEMPORAL_AUTH_PROVIDER_URL: 'http://oidc-server:8889'
+      TEMPORAL_AUTH_ISSUER_URL: 'http://oidc-server:8889'
+      TEMPORAL_AUTH_CLIENT_ID: 'temporal-ui'
+      TEMPORAL_AUTH_CLIENT_SECRET: 'temporal-secret'
+      TEMPORAL_AUTH_CALLBACK_URL: 'http://localhost:8082/auth/sso/callback'
+      TEMPORAL_AUTH_SCOPES: 'openid,profile,email,offline_access'
+      TEMPORAL_AUTH_REFRESH_TOKEN_DURATION: '30s'
+      TEMPORAL_CSRF_COOKIE_INSECURE: 'true'
+      TEMPORAL_CORS_ORIGINS: 'http://localhost:8082'
+    ports:
+      - '8082:8082'
+    depends_on:
+      oidc-server:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ['CMD', 'curl', '--fail', '--silent', 'http://localhost:8082/healthz']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s

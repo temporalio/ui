@@ -1,0 +1,53 @@
+publicPath:
+port: 8082
+enableUi: true
+cors:
+  cookieInsecure: true
+  allowOrigins:
+    - http://localhost:8082
+refreshInterval: 0s
+defaultNamespace: default
+showTemporalSystemNamespace: false
+feedbackUrl:
+disableWriteActions: false
+workflowTerminateDisabled: false
+workflowCancelDisabled: false
+workflowSignalDisabled: false
+workflowUpdateDisabled: false
+workflowResetDisabled: false
+batchActionsDisabled: false
+startWorkflowDisabled: false
+hideWorkflowQueryErrors: false
+refreshWorkflowCountsDisabled: false
+auth:
+  enabled: true
+  maxSessionDuration: 15s
+  providers:
+    - label: Dummy OIDC
+      type: oidc
+      providerUrl: http://localhost:8889
+      issuerUrl: ""
+      clientId: temporal-ui
+      clientSecret: temporal-secret
+      scopes:
+        - openid
+        - profile
+        - email
+        - offline_access
+      callbackUrl: http://localhost:8082/auth/sso/callback
+      refreshTokenDuration: 30s
+tls:
+  caFile:
+  certFile:
+  keyFile:
+  caData:
+  certData:
+  keyData:
+  enableHostVerification: false
+  serverName:
+codec:
+  endpoint:
+  passAccessToken: false
+  includeCredentials: false
+forwardHeaders:
+  - X-Forwarded-For
