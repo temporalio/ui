@@ -478,6 +478,12 @@ export const routeForWorkflowQuery = (
   return `${baseRouteForWorkflow(parameters)}/query`;
 };
 
+export const routeForWorkflowChat = (
+  parameters: WorkflowParameters,
+): ResolvedPathname => {
+  return `${baseRouteForWorkflow(parameters)}/chat`;
+};
+
 export const routeForUserMetadata = (
   parameters: WorkflowParameters,
 ): ResolvedPathname => {

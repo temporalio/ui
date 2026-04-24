@@ -42,6 +42,7 @@
     routeForTimeline,
     routeForUserMetadata,
     routeForWorkflow,
+    routeForWorkflowChat,
     routeForWorkflowMemo,
     routeForWorkflowQuery,
     routeForWorkflows,
@@ -254,6 +255,15 @@
           routeForTimeline(routeParameters),
         )}
         onClick={() => ($workflowViewPreference = 'timeline')}
+      />
+      <Tab
+        label={translate('workflows.chat-tab')}
+        id="chat-tab"
+        href={routeForWorkflowChat(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForWorkflowChat(routeParameters),
+        )}
       />
       <Tab
         label={translate('workflows.history-tab')}

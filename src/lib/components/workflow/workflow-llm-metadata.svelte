@@ -10,7 +10,19 @@
   let { workflow }: Props = $props();
 
   const searchAttributes = $derived(workflow?.searchAttributes?.indexedFields);
-  const modelsAndProviders = $derived(searchAttributes?.ModelsAndProviders);
+  const modelsAndProviders = $derived.by(() => {
+    const value = searchAttributes?.ModelsAndProviders;
+
+    if (Array.isArray(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      return [value];
+    }
+
+    return [];
+  });
   const models = $derived(
     modelsAndProviders
       ?.filter((mp) => mp.includes('model:'))
@@ -44,7 +56,7 @@
 {#snippet Info(key: string, value: string)}
   {#if value !== null && value !== undefined}
     <div class="py-2">
-      <p class="text-xs font-medium uppercase tracking-wider text-secondary">
+      <p class="text-secondary">
         {key}
       </p>
       <p class="text-sm font-semibold tabular-nums text-primary">
@@ -55,18 +67,11 @@
 {/snippet}
 
 {#if totalTokens}
-  <div class="overflow-hidden px-2">
-    <p class="flex items-center gap-2 font-medium text-secondary">
-      <Icon name="robot" /> LLM Details
-    </p>
+  <div class="overflow-hidden">
     <div class="flex flex-col gap-1">
       <div class="grid grid-cols-2 gap-2 sm:grid-cols-6">
         <div class="py-2">
-          <p
-            class="text-xs font-medium uppercase tracking-wider text-secondary"
-          >
-            Models
-          </p>
+          <p class="text-secondary">Models</p>
           <div class="flex flex-wrap items-center gap-2">
             {#each models as model}
               <Badge type="secondary">
@@ -76,11 +81,7 @@
           </div>
         </div>
         <div class="py-2">
-          <p
-            class="text-xs font-medium uppercase tracking-wider text-secondary"
-          >
-            Providers
-          </p>
+          <p class="text-secondary">Providers</p>
           <div class="flex flex-wrap items-center gap-2">
             {#each providers as provider}
               <Badge type="default">

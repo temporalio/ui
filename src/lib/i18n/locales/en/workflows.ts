@@ -118,6 +118,22 @@ export const Strings = {
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Data',
   'signal-payload-input-label-hint': '(only single JSON payload supported)',
+  'chat-compose-title': 'Send the next message',
+  'chat-compose-description':
+    'Use the workflow signal interface to continue the conversation from this transcript.',
+  'chat-compose-payload': 'Signal payload',
+  'chat-send-message': 'Send message',
+  'chat-composer-unavailable': 'Chat input unavailable',
+  'chat-composer-unavailable-description':
+    'This workflow is no longer running, so it cannot accept new chat signals.',
+  'chat-empty-state-title': 'No LLM chat activity found',
+  'chat-empty-state-description':
+    'Completed activities with LLM details will appear here as a conversation.',
+  'chat-cost': 'Cost',
+  'chat-prompt-tokens': 'Input Tokens',
+  'chat-completion-tokens': 'Output Tokens',
+  'chat-total-tokens': 'Total Tokens',
+  'chat-latency': 'Latency',
   'update-modal-title': 'Send an Update',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
@@ -140,6 +156,7 @@ export const Strings = {
   'pause-success': 'Workflow paused',
   'unpause-success': 'Workflow unpaused',
   'timeline-tab': 'Timeline',
+  'chat-tab': 'Chat',
   'history-tab': 'Event History',
   'workflow-history': 'Workflow History',
   'workers-tab': 'Workers',
