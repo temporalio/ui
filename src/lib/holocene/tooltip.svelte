@@ -3,6 +3,8 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Portal from '$lib/holocene/portal/portal.svelte';
+  import type { PortalPosition } from '$lib/holocene/portal/types';
   import type { Only } from '$lib/types/global';
 
   type BaseProps = {
@@ -13,6 +15,8 @@
     class?: string;
     tooltipClass?: string;
     show?: boolean;
+    usePortal?: boolean;
+    scrollContainer?: string;
   };
 
   type BasePositionProps = {
@@ -71,42 +75,90 @@
   export let width: number | null = null;
   export let tooltipClass = '';
   export let show = false;
+  export let usePortal = false;
+  export let scrollContainer: string | undefined = undefined;
+
+  let wrapperElement: HTMLElement | null = null;
+  let isHovered = false;
+
+  $: portalPosition = ((): PortalPosition => {
+    if (top) return 'top';
+    if (topRight) return 'top-right';
+    if (right) return 'right';
+    if (bottomRight) return 'bottom-right';
+    if (bottom) return 'bottom';
+    if (bottomLeft) return 'bottom-left';
+    if (left) return 'left';
+    if (topLeft) return 'top-left';
+    return 'top';
+  })();
 </script>
 
 {#if hide}
   <slot />
 {:else}
-  <div class={merge('wrapper group relative inline-block', className)}>
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div
+    bind:this={wrapperElement}
+    class={merge('wrapper group relative inline-block', className)}
+    on:mouseenter={() => (isHovered = true)}
+    on:mouseleave={() => (isHovered = false)}
+  >
     <slot />
-    <div
-      class={merge(
-        'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-95',
-        show && 'inline-block opacity-95',
-      )}
-      class:left
-      class:right
-      class:bottom
-      class:bottomLeft
-      class:bottomRight
-      class:top
-      class:topRight
-      class:topLeft
-      style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
-    >
+
+    {#if usePortal && wrapperElement}
+      <Portal
+        anchor={wrapperElement}
+        open={show || isHovered}
+        position={portalPosition}
+        {scrollContainer}
+      >
+        <div
+          class={merge(
+            'inline-block rounded-md bg-slate-800 px-2 py-2 text-xs text-slate-50',
+            tooltipClass,
+          )}
+          style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
+        >
+          <div class="flex gap-2">
+            <slot name="content">
+              {#if icon}<Icon name={icon} class="inline h-4" />{/if}
+              <span>{text}</span>
+            </slot>
+          </div>
+        </div>
+      </Portal>
+    {:else}
       <div
         class={merge(
-          'inline-block rounded-md bg-slate-800 px-2 py-2 text-slate-50',
-          tooltipClass,
+          'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-95',
+          show && 'inline-block opacity-95',
         )}
+        class:left
+        class:right
+        class:bottom
+        class:bottomLeft
+        class:bottomRight
+        class:top
+        class:topRight
+        class:topLeft
+        style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
       >
-        <div class="flex gap-2">
-          <slot name="content">
-            {#if icon}<Icon name={icon} class="inline h-4" />{/if}
-            <span>{text}</span>
-          </slot>
+        <div
+          class={merge(
+            'inline-block rounded-md bg-slate-800 px-2 py-2 text-slate-50',
+            tooltipClass,
+          )}
+        >
+          <div class="flex gap-2">
+            <slot name="content">
+              {#if icon}<Icon name={icon} class="inline h-4" />{/if}
+              <span>{text}</span>
+            </slot>
+          </div>
         </div>
       </div>
-    </div>
+    {/if}
   </div>
 {/if}
 

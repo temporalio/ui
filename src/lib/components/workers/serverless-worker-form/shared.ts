@@ -19,7 +19,6 @@ const scalingFields = {
   scaleUpCooloffMs: z.number().int().min(0).optional(),
   scaleUpBacklogThreshold: z.number().int().min(0).optional(),
   maxWorkerLifetimeMs: z.number().int().min(0).optional(),
-  scaleUpDispatchRateEpsilon: z.number().min(0).optional(),
   metricsPollIntervalMs: z.number().int().min(10000).optional(),
 };
 

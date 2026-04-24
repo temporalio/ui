@@ -56,7 +56,7 @@
         <p class="flex flex-row gap-1 text-secondary">
           {translate('workers.worker-heartbeats-sdk-link-preface')}
           <Link newTab {href}>
-            <SdkLogo {sdk} {version} />
+            <SdkLogo {sdk} {version} hideDocsLink />
           </Link>
           {translate('workers.worker-heartbeats-sdk-link-postface')}
         </p>
@@ -70,7 +70,7 @@
       >
         {#each supportedVersions as { href, sdk, version } (`${sdk}:${version}`)}
           <Link newTab {href}>
-            <SdkLogo {sdk} {version} />
+            <SdkLogo {sdk} {version} hideDocsLink />
           </Link>
         {/each}
       </div>

@@ -51,7 +51,6 @@
     scaleUpCooloffMs: undefined as number | undefined,
     scaleUpBacklogThreshold: undefined as number | undefined,
     maxWorkerLifetimeMs: undefined as number | undefined,
-    scaleUpDispatchRateEpsilon: undefined as number | undefined,
     metricsPollIntervalMs: undefined as number | undefined,
   };
 
@@ -134,7 +133,6 @@
             bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
             bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
             bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-            bind:scaleUpDispatchRateEpsilon={$form.scaleUpDispatchRateEpsilon}
             bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
             errors={$errors}
           />

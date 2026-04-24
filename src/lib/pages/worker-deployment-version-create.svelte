@@ -45,7 +45,6 @@
           scaleUpCooloffMs: data.scaleUpCooloffMs,
           scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
           maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-          scaleUpDispatchRateEpsilon: data.scaleUpDispatchRateEpsilon,
           metricsPollIntervalMs: data.metricsPollIntervalMs,
         },
       );

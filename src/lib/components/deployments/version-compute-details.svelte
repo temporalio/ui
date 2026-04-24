@@ -17,7 +17,6 @@
     scalerParams.scaleUpCooloffMs !== undefined ||
       scalerParams.scaleUpBacklogThreshold !== undefined ||
       scalerParams.maxWorkerLifetimeMs !== undefined ||
-      scalerParams.scaleUpDispatchRateEpsilon !== undefined ||
       scalerParams.metricsPollIntervalMs !== undefined,
   );
 </script>
@@ -87,16 +86,6 @@
             >
             <span class="text-primary"
               >{scalerParams.maxWorkerLifetimeMs}ms</span
-            >
-          </div>
-        {/if}
-        {#if scalerParams.scaleUpDispatchRateEpsilon !== undefined}
-          <div class="flex gap-1">
-            <span class="font-medium text-secondary"
-              >{translate('deployments.dispatch-rate-epsilon')}</span
-            >
-            <span class="text-primary"
-              >{scalerParams.scaleUpDispatchRateEpsilon}</span
             >
           </div>
         {/if}
