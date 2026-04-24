@@ -1,4 +1,7 @@
 <script lang="ts">
+  import type { PointerEventHandler } from 'svelte/elements';
+  import { SvelteMap } from 'svelte/reactivity';
+
   import { getContext, type Snippet } from 'svelte';
 
   import { page } from '$app/state';
@@ -76,28 +79,35 @@
     clearChildren();
   });
 
-  const viewChildren = async (workflow: WorkflowExecution) => {
-    if (childrenActive(workflow)) {
+  const getVisibleChildren = (workflow: WorkflowExecution) => {
+    return childrenIds.find(
+      (id) => id.workflowId === workflow.id && id.runId === workflow.runId,
+    )?.children;
+  };
+
+  const toggleChildrenVisibility = async (workflow: WorkflowExecution) => {
+    const visibleChildren = getVisibleChildren(workflow);
+
+    if (visibleChildren?.length) {
       childrenIds = childrenIds.filter(
         (id) => id.workflowId !== workflow.id && id.runId !== workflow.runId,
       );
-    } else {
-      const children = await fetchAllChildWorkflows(
-        namespace,
-        workflow.id,
-        workflow.runId,
-      );
-      childrenIds = [
-        { workflowId: workflow.id, runId: workflow.runId, children },
-        ...childrenIds,
-      ];
+      // deselect children when collapsing
+      selectWorkflows(false, visibleChildren);
+      // clear prevClickIndex when collapsing
+      prevClickMap.delete(workflow);
+      return;
     }
-  };
 
-  const childrenActive = (workflow: WorkflowExecution) => {
-    return childrenIds.find(
-      (id) => id.workflowId === workflow.id && id.runId === workflow.runId,
+    const children = await fetchAllChildWorkflows(
+      namespace,
+      workflow.id,
+      workflow.runId,
     );
+    childrenIds = [
+      { workflowId: workflow.id, runId: workflow.runId, children },
+      ...childrenIds,
+    ];
   };
 
   const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
@@ -110,13 +120,50 @@
   };
 
   let visibleItems: WorkflowExecution[] = $state([]);
-  let prevVisibleItemBatchSelectClickIndex = $state<null | number>(null);
+
+  let prevClickMap = new SvelteMap<
+    'default' | WorkflowExecution,
+    null | number
+  >();
+
   $effect(() => {
     void visibleItems;
     void $allSelected;
     void $pageSelected;
-    prevVisibleItemBatchSelectClickIndex = null;
+    prevClickMap.clear();
   });
+
+  function getClickBatchSelectHandler(args: {
+    workflows: WorkflowExecution[];
+    clickedWorkflow: WorkflowExecution;
+    clickedWorkflowIndex: number;
+    clickMapKey: 'default' | WorkflowExecution;
+  }): PointerEventHandler<HTMLInputElement> {
+    return (event) => {
+      let targetedWorkflows = [args.clickedWorkflow];
+      const prevClickIndex = prevClickMap.get(args.clickMapKey) ?? null;
+
+      if (event.shiftKey && prevClickIndex != null) {
+        const rangeStartInclusive = Math.min(
+          prevClickIndex,
+          args.clickedWorkflowIndex,
+        );
+        const rangeEndInclusive = Math.max(
+          prevClickIndex,
+          args.clickedWorkflowIndex,
+        );
+
+        // end of the slice range is exclusive, so add 1 to include the full range
+        targetedWorkflows = args.workflows.slice(
+          rangeStartInclusive,
+          rangeEndInclusive + 1,
+        );
+      }
+
+      selectWorkflows(event.currentTarget.checked, targetedWorkflows);
+      prevClickMap.set(args.clickMapKey, args.clickedWorkflowIndex);
+    };
+  }
 </script>
 
 {#key [namespace, query, $refresh]}
@@ -147,47 +194,39 @@
       {/each}
     </TableHeaderRow>
     {#each visibleItems as workflow, visibleItemIndex (`${workflow.id}:${workflow.runId}`)}
+      {@const workflowChildren = getVisibleChildren(workflow)}
       <TableRow
         {workflow}
-        {viewChildren}
-        onClickBatchSelect={(e) => {
-          let targetedWorkflows = [workflow];
-
-          if (e.shiftKey && prevVisibleItemBatchSelectClickIndex != null) {
-            const rangeStartInclusive = Math.min(
-              prevVisibleItemBatchSelectClickIndex,
-              visibleItemIndex,
-            );
-            const rangeEndInclusive = Math.max(
-              prevVisibleItemBatchSelectClickIndex,
-              visibleItemIndex,
-            );
-
-            // end of the slice range is exclusive, so add 1 to include the full range
-            targetedWorkflows = visibleItems.slice(
-              rangeStartInclusive,
-              rangeEndInclusive + 1,
-            );
-          }
-
-          selectWorkflows(e.currentTarget.checked, targetedWorkflows);
-          prevVisibleItemBatchSelectClickIndex = visibleItemIndex;
-        }}
-        childCount={childrenActive(workflow)?.children.length}
+        {toggleChildrenVisibility}
+        onClickBatchSelect={getClickBatchSelectHandler({
+          clickMapKey: 'default',
+          clickedWorkflow: workflow,
+          clickedWorkflowIndex: visibleItemIndex,
+          workflows: visibleItems,
+        })}
+        childCount={workflowChildren?.length}
       >
         {#each columns as column (column)}
           <TableBodyCell {workflow} {column} truncate={dense} />
         {/each}
       </TableRow>
-      {#if childrenActive(workflow)}
-        {#each childrenActive(workflow).children as child (`${child.id}:${child.runId}`)}
-          <TableRow workflow={child} child>
-            {#each columns as column (column)}
-              <TableBodyCell workflow={child} {column} truncate={dense} />
-            {/each}
-          </TableRow>
-        {/each}
-      {/if}
+
+      {#each workflowChildren as child, childIndex (`${child.id}:${child.runId}`)}
+        <TableRow
+          workflow={child}
+          child
+          onClickBatchSelect={getClickBatchSelectHandler({
+            clickMapKey: workflow,
+            clickedWorkflow: child,
+            clickedWorkflowIndex: childIndex,
+            workflows: workflowChildren,
+          })}
+        >
+          {#each columns as column (column)}
+            <TableBodyCell workflow={child} {column} truncate={dense} />
+          {/each}
+        </TableRow>
+      {/each}
     {/each}
     <svelte:fragment slot="empty">
       <TableEmptyState {cloud} />

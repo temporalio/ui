@@ -24,7 +24,9 @@
 
   export let workflow: WorkflowExecution | undefined = undefined;
   export let empty = false;
-  export let viewChildren: (workflow?: WorkflowExecution) => void = () => {};
+  export let toggleChildrenVisibility: (
+    workflow?: WorkflowExecution,
+  ) => void = () => {};
   export let childCount: number | undefined = undefined;
   export let child = false;
 
@@ -89,7 +91,7 @@
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
-            on:click={() => viewChildren(workflow)}
+            on:click={() => toggleChildrenVisibility(workflow)}
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
