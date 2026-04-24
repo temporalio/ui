@@ -1,13 +1,15 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventLink as ELink } from '$lib/types';
-  import { type Payload } from '$lib/types';
+  import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import {
@@ -28,8 +30,6 @@
   } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
-  import MetadataDecoder from './metadata-decoder.svelte';
-  import PayloadDecoder from './payload-decoder.svelte';
 
   let { event }: { event: WorkflowEvent } = $props();
   const { namespace, workflow, run } = $derived(page.params);
@@ -157,24 +157,20 @@
 {/snippet}
 
 {#snippet eventLinks(links: ELink[])}
-  {#each links as link}
+  {#each links as link (link)}
     {@render eventLink(link)}
     {@render eventNamespaceLink(link)}
   {/each}
 {/snippet}
 
-{#snippet eventSummary(value: Payload)}
+{#snippet eventSummary(value: RawPayload)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">Summary</p>
-    <p class="whitespace-pre-line">
-      <MetadataDecoder
-        {value}
-        let:decodedValue
-        fallback={translate('events.decode-failed')}
-      >
-        {decodedValue}
-      </MetadataDecoder>
-    </p>
+    <PayloadSummary
+      class="whitespace-pre-line"
+      {value}
+      fallback={translate('events.decode-failed')}
+    />
   </div>
 {/snippet}
 
@@ -186,41 +182,9 @@
       {format(key)}
     </p>
     {#if value?.payloads}
-      <PayloadDecoder {value} key="payloads">
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
-    {:else if key === 'searchAttributes'}
-      <PayloadDecoder
-        key="searchAttributes"
-        value={{ searchAttributes: codeBlockValue }}
-      >
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
+      <PayloadCodeBlock {value} maxHeight={384} />
     {:else}
-      <PayloadDecoder value={codeBlockValue}>
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
+      <PayloadCodeBlock value={codeBlockValue} maxHeight={384} />
     {/if}
   </div>
   {#if stackTrace}
@@ -228,13 +192,7 @@
       <p class="mb-1 min-w-56 text-sm text-secondary/80">
         {translate('workflows.call-stack-tab')}
       </p>
-      <CodeBlock
-        content={stackTrace}
-        language="text"
-        maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      />
+      <CodeBlock content={stackTrace} language="text" maxHeight={384} />
     </div>
   {/if}
 {/snippet}

@@ -7,7 +7,7 @@
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import ActivityExecutionInputAndOutcome from '$lib/components/standalone-activities/activity-input-and-outcome.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Card from '$lib/holocene/card.svelte';
@@ -211,21 +211,15 @@
         {#if $activityExecution.info.heartbeatDetails}
           <div class="space-y-2">
             <p class="font-medium text-secondary">Heartbeat Details</p>
-            <PayloadDecoder value={$activityExecution.info.heartbeatDetails}>
-              {#snippet children(content)}
-                <CodeBlock {content} />
-              {/snippet}
-            </PayloadDecoder>
+            <PayloadCodeBlock
+              value={$activityExecution.info.heartbeatDetails}
+            />
           </div>
         {/if}
         {#if $activityExecution.info.header}
           <div class="space-y-2">
             <p class="font-medium text-secondary">Header</p>
-            <PayloadDecoder value={$activityExecution.info.header.fields}>
-              {#snippet children(content)}
-                <CodeBlock {content} />
-              {/snippet}
-            </PayloadDecoder>
+            <PayloadCodeBlock value={$activityExecution.info.header.fields} />
           </div>
         {/if}
         {#if $activityExecution.info.priority}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -8,8 +9,6 @@
   import { decodeEventHistory } from '$lib/stores/events';
   import type { WorkflowEvents } from '$lib/types/events';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-
-  import PayloadDecoder from '../event/payload-decoder.svelte';
 
   interface Props {
     events?: WorkflowEvents;
@@ -93,18 +92,7 @@
 </div>
 <div class="min-h-screen py-4">
   {#if $decodeEventHistory && events.length > 0}
-    {#key [index, $decodeEventHistory]}
-      <PayloadDecoder value={rawEvent}>
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            testId="event-history-json"
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
-    {/key}
+    <PayloadCodeBlock value={rawEvent} testId="event-history-json" />
   {:else}
     {#key index}
       <CodeBlock

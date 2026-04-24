@@ -4,6 +4,7 @@
 
   import { page } from '$app/state';
 
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -42,7 +43,6 @@
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
-  import MetadataDecoder from './metadata-decoder.svelte';
 
   interface Props {
     event: IterableEvent;
@@ -327,21 +327,12 @@
         <EventDetailsRow {...primaryLocalAttribute} {attributes} />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
-        <MetadataDecoder
-          value={currentEvent.userMetadata.summary}
-          let:decodedValue
+        <div
+          class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
-          {#if decodedValue}
-            <div
-              class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
-            >
-              <p class="whitespace-nowrap text-right text-xs">Summary</p>
-              <Badge type="secondary" class="block select-none truncate">
-                {decodedValue}
-              </Badge>
-            </div>
-          {/if}
-        </MetadataDecoder>
+          <p class="whitespace-nowrap text-right text-xs">Summary</p>
+          <PayloadSummary value={currentEvent.userMetadata.summary} />
+        </div>
       {/if}
       {#if currentEvent?.links?.length}
         <EventLink

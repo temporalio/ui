@@ -2,7 +2,7 @@
   import UserMetadata from '$lib/components/user-metadata.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import type { UserMetadata as IUserMetadata } from '$lib/types';
-  import { decodeUserMetadata } from '$lib/utilities/decode-payload';
+  import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   const decodeMetadata = async (userMetadata: IUserMetadata) => {
@@ -14,14 +14,18 @@
     if (!userMetadata) return metadata;
 
     if (userMetadata.summary) {
-      const summary = await decodeUserMetadata(userMetadata.summary);
+      const summary = await decodePayloadAndParseDataToJSON(
+        userMetadata.summary,
+      );
       if (typeof summary === 'string') {
         metadata.summary = summary;
       }
     }
 
     if (userMetadata.details) {
-      const details = await decodeUserMetadata(userMetadata.details);
+      const details = await decodePayloadAndParseDataToJSON(
+        userMetadata.details,
+      );
 
       if (typeof details === 'string') {
         metadata.details = details;

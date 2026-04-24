@@ -1,9 +1,9 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadInput from '$lib/components/payload-input.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -17,28 +17,37 @@
   import { updateWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type { UpdateWorkflowResponse } from '$lib/types';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  $: ({ run: runId } = $page.params);
-  $: ({ metadata } = $workflowRun);
-  $: updateDefinitions = metadata?.definition?.updateDefinitions;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+  }
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
+  let { open = $bindable(), workflow, namespace }: Props = $props();
+
+  const runId = $derived(page.params.run);
+  const metadata = $derived($workflowRun.metadata);
+  const updateDefinitions = $derived(metadata?.definition?.updateDefinitions);
 
   const defaultEncoding: PayloadInputEncoding = 'json/plain';
 
-  let error = '';
-  let loading = false;
-  let failure;
-  let success;
+  let error = $state('');
+  let loading = $state(false);
+  let failure = $state<
+    UpdateWorkflowResponse['outcome']['failure'] | undefined
+  >(undefined);
+  let success = $state<
+    UpdateWorkflowResponse['outcome']['success'] | boolean | undefined
+  >(undefined);
 
-  let name = '';
-  let updateId = crypto.randomUUID();
-  let input = '';
-  let customUpdate = false;
+  let name = $state('');
+  let updateId = $state(crypto.randomUUID());
+  let input = $state('');
+  let customUpdate = $state(false);
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
 
   const hideModal = () => {
@@ -118,7 +127,7 @@
         placeholder="Select an Update"
         required
       >
-        {#each updateDefinitions as { name: value, description = '' }}
+        {#each updateDefinitions as { name: value, description = '' } (value)}
           <Option {value} {description}>{value}</Option>
         {/each}
         <Option onclick={handleCustom} value="custom">Custom</Option>
@@ -167,14 +176,10 @@
         {/if}
       </Alert>
     {/if}
-    {#if success}
+    {#if success && typeof success === 'object'}
       <Alert intent="success" title="Success">
         {#if success?.payloads?.[0] && success.payloads[0].data}
-          <PayloadDecoder value={success.payloads[0]}>
-            {#snippet children(decodedValue)}
-              <CodeBlock class="mt-4" content={decodedValue} language="text" />
-            {/snippet}
-          </PayloadDecoder>
+          <PayloadCodeBlock value={success} />
         {/if}
       </Alert>
     {/if}
