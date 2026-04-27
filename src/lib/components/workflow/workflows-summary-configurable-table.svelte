@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { PointerEventHandler } from 'svelte/elements';
   import { SvelteMap } from 'svelte/reactivity';
 
   import { getContext, type Snippet } from 'svelte';
@@ -61,41 +60,30 @@
       : baseColumns,
   );
 
-  let childrenIds = $state<
-    {
-      workflowId: string;
-      runId: string;
-      children: WorkflowExecution[];
-    }[]
-  >([]);
-
-  const clearChildren = () => {
-    childrenIds = [];
-  };
+  const visibleChildrenMap = new SvelteMap<string, WorkflowExecution[]>();
 
   $effect(() => {
     void $refresh;
     void query;
-    clearChildren();
+    visibleChildrenMap.clear();
   });
 
-  const getVisibleChildren = (workflow: WorkflowExecution) => {
-    return childrenIds.find(
-      (id) => id.workflowId === workflow.id && id.runId === workflow.runId,
-    )?.children;
-  };
-
   const toggleChildrenVisibility = async (workflow: WorkflowExecution) => {
-    const visibleChildren = getVisibleChildren(workflow);
+    const visibleChildren = visibleChildrenMap.get(workflow.runId);
 
     if (visibleChildren?.length) {
-      childrenIds = childrenIds.filter(
-        (id) => id.workflowId !== workflow.id && id.runId !== workflow.runId,
-      );
+      visibleChildrenMap.delete(workflow.runId);
       // deselect children when collapsing
       selectWorkflows(false, visibleChildren);
-      // clear prevClickIndex when collapsing
-      prevClickMap.delete(workflow);
+
+      // clear prevClickedRow if row is collapsing
+      if (
+        prevClickedRow.rowType === 'child' &&
+        prevClickedRow.parentRow.value.runId === workflow.runId
+      ) {
+        prevClickedRow = prevClickedRow.parentRow;
+      }
+
       return;
     }
 
@@ -104,10 +92,8 @@
       workflow.id,
       workflow.runId,
     );
-    childrenIds = [
-      { workflowId: workflow.id, runId: workflow.runId, children },
-      ...childrenIds,
-    ];
+
+    visibleChildrenMap.set(workflow.runId, children);
   };
 
   const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
@@ -121,49 +107,42 @@
 
   let visibleItems: WorkflowExecution[] = $state([]);
 
-  let prevClickMap = new SvelteMap<
-    'default' | WorkflowExecution,
-    null | number
-  >();
+  type VisibleRow =
+    | { rowType: 'root'; childCount?: number; value: WorkflowExecution }
+    | {
+        rowType: 'child';
+        parentRow: Extract<VisibleRow, { rowType: 'root' }>;
+        value: WorkflowExecution;
+      };
+  const visibleRows: VisibleRow[] = $derived.by(() => {
+    return visibleItems.flatMap((workflow) => {
+      const visibleChildren = visibleChildrenMap.get(workflow.runId) ?? [];
+
+      const rootRow = {
+        rowType: 'root' as const,
+        childCount: visibleChildren.length,
+        value: workflow,
+      };
+
+      return [
+        rootRow,
+        ...visibleChildren.map((c) => ({
+          rowType: 'child' as const,
+          parentRow: rootRow,
+          value: c,
+        })),
+      ];
+    });
+  });
+
+  let prevClickedRow = $state<VisibleRow | null>(null);
 
   $effect(() => {
     void visibleItems;
     void $allSelected;
     void $pageSelected;
-    prevClickMap.clear();
+    prevClickedRow = null;
   });
-
-  function getClickBatchSelectHandler(args: {
-    workflows: WorkflowExecution[];
-    clickedWorkflow: WorkflowExecution;
-    clickedWorkflowIndex: number;
-    clickMapKey: 'default' | WorkflowExecution;
-  }): PointerEventHandler<HTMLInputElement> {
-    return (event) => {
-      let targetedWorkflows = [args.clickedWorkflow];
-      const prevClickIndex = prevClickMap.get(args.clickMapKey) ?? null;
-
-      if (event.shiftKey && prevClickIndex != null) {
-        const rangeStartInclusive = Math.min(
-          prevClickIndex,
-          args.clickedWorkflowIndex,
-        );
-        const rangeEndInclusive = Math.max(
-          prevClickIndex,
-          args.clickedWorkflowIndex,
-        );
-
-        // end of the slice range is exclusive, so add 1 to include the full range
-        targetedWorkflows = args.workflows.slice(
-          rangeStartInclusive,
-          rangeEndInclusive + 1,
-        );
-      }
-
-      selectWorkflows(event.currentTarget.checked, targetedWorkflows);
-      prevClickMap.set(args.clickMapKey, args.clickedWorkflowIndex);
-    };
-  }
 </script>
 
 {#key [namespace, query, $refresh]}
@@ -193,40 +172,47 @@
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
-    {#each visibleItems as workflow, visibleItemIndex (`${workflow.id}:${workflow.runId}`)}
-      {@const workflowChildren = getVisibleChildren(workflow)}
+    {#each visibleRows as row, visibleRowIndex (`${row.value.id}:${row.value.runId}`)}
+      {@const isChildRow = row.rowType === 'child'}
       <TableRow
-        {workflow}
+        workflow={row.value}
         {toggleChildrenVisibility}
-        onClickBatchSelect={getClickBatchSelectHandler({
-          clickMapKey: 'default',
-          clickedWorkflow: workflow,
-          clickedWorkflowIndex: visibleItemIndex,
-          workflows: visibleItems,
-        })}
-        childCount={workflowChildren?.length}
+        childCount={!isChildRow && row.childCount > 0
+          ? row.childCount
+          : undefined}
+        child={isChildRow}
+        onClickBatchSelect={(event) => {
+          let targetedWorkflows = [row.value];
+
+          const prevClickedRowIndex = visibleRows.findIndex(
+            (r) => r.value.runId === prevClickedRow?.value.runId,
+          );
+
+          console.log({ prevClickedRowIndex });
+          if (event.shiftKey && prevClickedRowIndex >= 0) {
+            const rangeStartInclusive = Math.min(
+              prevClickedRowIndex,
+              visibleRowIndex,
+            );
+            const rangeEndInclusive = Math.max(
+              prevClickedRowIndex,
+              visibleRowIndex,
+            );
+
+            // end of the slice range is exclusive, so add 1 to include the full range
+            targetedWorkflows = visibleRows
+              .slice(rangeStartInclusive, rangeEndInclusive + 1)
+              .map((r) => r.value);
+          }
+
+          selectWorkflows(event.currentTarget.checked, targetedWorkflows);
+          prevClickedRow = row;
+        }}
       >
         {#each columns as column (column)}
-          <TableBodyCell {workflow} {column} truncate={dense} />
+          <TableBodyCell workflow={row.value} {column} truncate={dense} />
         {/each}
       </TableRow>
-
-      {#each workflowChildren as child, childIndex (`${child.id}:${child.runId}`)}
-        <TableRow
-          workflow={child}
-          child
-          onClickBatchSelect={getClickBatchSelectHandler({
-            clickMapKey: workflow,
-            clickedWorkflow: child,
-            clickedWorkflowIndex: childIndex,
-            workflows: workflowChildren,
-          })}
-        >
-          {#each columns as column (column)}
-            <TableBodyCell workflow={child} {column} truncate={dense} />
-          {/each}
-        </TableRow>
-      {/each}
     {/each}
     <svelte:fragment slot="empty">
       <TableEmptyState {cloud} />
