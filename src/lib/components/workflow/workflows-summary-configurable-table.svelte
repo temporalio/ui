@@ -188,7 +188,6 @@
             (r) => r.value.runId === prevClickedRow?.value.runId,
           );
 
-          console.log({ prevClickedRowIndex });
           if (event.shiftKey && prevClickedRowIndex >= 0) {
             const rangeStartInclusive = Math.min(
               prevClickedRowIndex,
