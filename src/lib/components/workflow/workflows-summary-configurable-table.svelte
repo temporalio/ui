@@ -196,7 +196,7 @@
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
-    {#each visibleRows as row, visibleRowIndex (`${row.value.id}:${row.value.runId}`)}
+    {#each visibleRows as row, visibleRowIndex (row.value.runId)}
       {@const isChildRow = row.rowType === 'child'}
       <TableRow
         workflow={row.value}
