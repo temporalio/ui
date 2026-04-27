@@ -216,7 +216,15 @@
               .map((r) => r.value);
           }
 
-          selectWorkflows(event.currentTarget.checked, targetedWorkflows);
+          // this is required due to how the underlying Checkbox component
+          // get's it's onclick type from svelte event forwarding. It does not
+          // know what the current event target type is a checkbox input
+          if ('checked' in event.currentTarget) {
+            selectWorkflows(
+              Boolean(event.currentTarget.checked),
+              targetedWorkflows,
+            );
+          }
           prevClickedRow = row;
         }}
       >

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { PointerEventHandler } from 'svelte/elements';
-
   import { getContext } from 'svelte';
 
   import { page } from '$app/stores';
@@ -34,9 +32,7 @@
     BATCH_OPERATION_CONTEXT,
   );
 
-  export let onClickBatchSelect: PointerEventHandler<
-    HTMLInputElement
-  > = () => {};
+  export let onClickBatchSelect: (e: MouseEvent) => void = () => {};
 
   $: ({ namespace } = $page.params);
 
