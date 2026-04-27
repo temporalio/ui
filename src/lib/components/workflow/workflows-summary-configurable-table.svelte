@@ -96,7 +96,13 @@
     visibleChildrenMap.set(workflow.runId, children);
   };
 
-  const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
+  const onFetch = $derived(() =>
+    fetchPaginatedWorkflows(
+      namespace,
+      // query can be null but this function signature only accepts undefined | string
+      query ?? undefined,
+    ),
+  );
 
   const dense = $derived($tableDensity === 'dense');
 
