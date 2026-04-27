@@ -41,7 +41,9 @@
   export { className as class };
 
   let inputElement: HTMLInputElement;
-  $: inputElement !== undefined && (inputElement.indeterminate = indeterminate);
+  $: if (inputElement !== undefined) {
+    inputElement.indeterminate = indeterminate;
+  }
 
   const dispatch = createEventDispatcher<{
     change: { checked: boolean; value?: T };
