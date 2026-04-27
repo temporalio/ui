@@ -61,6 +61,7 @@
   {#if !empty && $supportsBulkActions}
     <td class="relative">
       <Checkbox
+        data-testid="batch-checkbox"
         {label}
         labelHidden
         on:click={onClickBatchSelect}
