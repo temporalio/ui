@@ -78,6 +78,9 @@
   role="none"
 >
   <Label
+    data-testid={$$restProps['data-testid']
+      ? `${$$restProps['data-testid']}-label`
+      : null}
     class={merge(
       [
         'flex',
