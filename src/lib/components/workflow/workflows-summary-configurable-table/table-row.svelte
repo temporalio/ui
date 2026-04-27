@@ -22,10 +22,10 @@
 
   import StartWorkflowButton from '../start-workflow-button.svelte';
 
-  export let workflow: WorkflowExecution | undefined = undefined;
+  export let workflow: WorkflowExecution;
   export let empty = false;
   export let toggleChildrenVisibility: (
-    workflow?: WorkflowExecution,
+    workflow: WorkflowExecution,
   ) => void = () => {};
   export let childCount: number | undefined = undefined;
   export let child = false;
