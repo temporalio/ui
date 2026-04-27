@@ -180,7 +180,9 @@
       {@const isChildRow = row.rowType === 'child'}
       <TableRow
         workflow={row.value}
-        {toggleChildrenVisibility}
+        toggleChildrenVisibility={(workflow) => {
+          toggleChildrenVisibility(workflow);
+        }}
         childCount={!isChildRow && row.childCount > 0
           ? row.childCount
           : undefined}
