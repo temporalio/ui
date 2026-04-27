@@ -20,15 +20,19 @@
 
   import StartWorkflowButton from '../start-workflow-button.svelte';
 
-  export let workflow: WorkflowExecution | undefined = undefined;
+  export let workflow: WorkflowExecution;
   export let empty = false;
-  export let viewChildren: (workflow?: WorkflowExecution) => void = () => {};
+  export let toggleChildrenVisibility: (
+    workflow: WorkflowExecution,
+  ) => void = () => {};
   export let childCount: number | undefined = undefined;
   export let child = false;
 
   const { allSelected, selectedWorkflows } = getContext<BatchOperationContext>(
     BATCH_OPERATION_CONTEXT,
   );
+
+  export let onClickBatchSelect: (e: MouseEvent) => void = () => {};
 
   $: ({ namespace } = $page.params);
 
@@ -40,6 +44,8 @@
   });
 
   $: childrenShown = childCount !== undefined;
+
+  $: checked = $selectedWorkflows.some((selected) => selected === workflow);
 </script>
 
 <tr
@@ -51,9 +57,11 @@
   {#if !empty && $supportsBulkActions}
     <td class="relative">
       <Checkbox
+        data-testid="batch-checkbox"
         {label}
         labelHidden
-        bind:group={$selectedWorkflows}
+        on:click={onClickBatchSelect}
+        {checked}
         value={workflow}
         disabled={$allSelected}
         aria-label={label}
@@ -80,11 +88,11 @@
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
-            on:click={() => viewChildren(workflow)}
+            on:click={() => toggleChildrenVisibility(workflow)}
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
-              text={childrenShown
+              text={childrenShown && childCount != null
                 ? translate('workflows.children', { count: childCount })
                 : translate('workflows.show-children')}
               topLeft
