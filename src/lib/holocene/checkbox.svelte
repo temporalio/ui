@@ -70,7 +70,7 @@
 </script>
 
 <div
-  data-testid={$$restProps['data-testid'] ?? null}
+  data-testid={$$restProps['data-testid']}
   // applying noop handler because without it on:click handlers get forwarded
   // to this div element (in addition to the input checkbox element).
   on:click|stopPropagation={() => {}}
@@ -80,7 +80,7 @@
   <Label
     data-testid={$$restProps['data-testid']
       ? `${$$restProps['data-testid']}-label`
-      : null}
+      : undefined}
     class={merge(
       [
         'flex',
