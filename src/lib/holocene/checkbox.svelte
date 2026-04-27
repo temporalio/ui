@@ -31,8 +31,8 @@
   export let labelHidden = false;
   export let indeterminate = false;
   export let disabled = false;
-  export let value: T = undefined;
-  export let group: T[] = undefined;
+  export let value: T | undefined = undefined;
+  export let group: T[] | undefined = undefined;
   export let valid = true;
   export let error = '';
   export let required = false;
@@ -67,6 +67,12 @@
   };
 
   $: checked = group !== undefined ? group.includes(value) : checked;
+
+  $: checkIconName = indeterminate
+    ? ('hyphen' as const)
+    : checked
+      ? ('checkmark' as const)
+      : null;
 </script>
 
 <div
@@ -149,10 +155,10 @@
         valid ? 'border-secondary' : 'border-danger peer-checked:border-danger',
       )}
     >
-      {#if indeterminate || checked}
+      {#if checkIconName}
         <Icon
           class="absolute left-0 top-0 h-4 w-4"
-          name={indeterminate ? 'hyphen' : checked ? 'checkmark' : null}
+          name={checkIconName}
           strokeWidth={3}
         />
       {/if}

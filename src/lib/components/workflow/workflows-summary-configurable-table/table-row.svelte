@@ -92,7 +92,7 @@
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
-              text={childrenShown
+              text={childrenShown && childCount != null
                 ? translate('workflows.children', { count: childCount })
                 : translate('workflows.show-children')}
               topLeft
