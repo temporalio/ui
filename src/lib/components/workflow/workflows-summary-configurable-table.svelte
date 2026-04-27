@@ -194,6 +194,13 @@
           : undefined}
         child={isChildRow}
         onClickBatchSelect={(event) => {
+          // this is required due to how the underlying Checkbox component
+          // get's it's onclick type from svelte event forwarding. It does not
+          // know what the current event target type is a checkbox input
+          if (!(event.currentTarget instanceof HTMLInputElement)) {
+            return;
+          }
+
           let targetedWorkflows = [row.value];
 
           const prevClickedRowIndex = visibleRows.findIndex(
@@ -216,15 +223,11 @@
               .map((r) => r.value);
           }
 
-          // this is required due to how the underlying Checkbox component
-          // get's it's onclick type from svelte event forwarding. It does not
-          // know what the current event target type is a checkbox input
-          if (event.currentTarget instanceof HTMLInputElement) {
-            selectWorkflows(
-              Boolean(event.currentTarget.checked),
-              targetedWorkflows,
-            );
-          }
+          selectWorkflows(
+            Boolean(event.currentTarget.checked),
+            targetedWorkflows,
+          );
+
           prevClickedRow = row;
         }}
       >
