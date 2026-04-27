@@ -102,7 +102,7 @@
         workflow.runId,
       );
 
-      if (inFlightChildRequests) {
+      if (inFlightChildRequests.has(workflow.runId)) {
         visibleChildrenMap.set(workflow.runId, children);
       }
     } finally {
