@@ -79,9 +79,10 @@
 
 <div
   data-testid={$$restProps['data-testid']}
-  // applying noop handler because without it on:click handlers get forwarded
-  // to this div element (in addition to the input checkbox element).
-  on:click|stopPropagation={() => {}}
+  on:click|stopPropagation={() => {
+    // applying noop handler because without it on:click handlers get forwarded
+    // to this div element (in addition to the input checkbox element).
+  }}
   on:keypress|stopPropagation
   role="none"
 >
