@@ -67,7 +67,7 @@
   const { headerActions, cloud }: { headerActions?: Snippet; cloud?: Snippet } =
     $props();
 
-  const query = $derived(page.url.searchParams.get('query') ?? undefined);
+  const query = $derived(page.url.searchParams.get('query') ?? '');
   const namespace = $derived(page.params.namespace);
   const perPage = $derived(page.url.searchParams.get('per-page'));
   const searchParams = $derived(page.url.searchParams.toString());
