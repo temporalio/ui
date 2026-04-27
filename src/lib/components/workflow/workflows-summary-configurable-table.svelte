@@ -201,6 +201,8 @@
             return;
           }
 
+          const isChecked = event.currentTarget.checked;
+
           let targetedWorkflows = [row.value];
 
           const prevClickedRowIndex = visibleRows.findIndex(
@@ -223,10 +225,7 @@
               .map((r) => r.value);
           }
 
-          selectWorkflows(
-            Boolean(event.currentTarget.checked),
-            targetedWorkflows,
-          );
+          selectWorkflows(isChecked, targetedWorkflows);
 
           prevClickedRow = row;
         }}
