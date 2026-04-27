@@ -110,6 +110,11 @@
       label: translate('common.starts-with'),
       id: 'starts-with',
     },
+    {
+      value: 'CONTAINS',
+      label: translate('common.contains'),
+      id: 'contains',
+    },
     ...defaultConditionOptions,
   ]);
 
@@ -172,7 +177,9 @@
       const conditionText =
         conditional === 'STARTS_WITH'
           ? translate('common.starts-with').toLowerCase()
-          : conditional;
+          : conditional === 'CONTAINS'
+            ? translate('common.contains').toLowerCase()
+            : conditional;
       return `${attribute} ${conditionText}`;
     }
 
