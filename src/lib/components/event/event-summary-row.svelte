@@ -381,7 +381,7 @@
 </tr>
 {#if expanded}
   <tr
-    class="w-full text-sm no-underline"
+    class="w-full text-sm no-underline hover:!bg-transparent"
     data-testid="event-summary-row-expanded"
   >
     <td class="!p-0" colspan={$isCloud ? 5 : 4}>
