@@ -108,7 +108,11 @@
   let visibleItems: WorkflowExecution[] = $state([]);
 
   type VisibleRow =
-    | { rowType: 'root'; childCount?: number; value: WorkflowExecution }
+    | {
+        rowType: 'root';
+        childCount: number;
+        value: WorkflowExecution;
+      }
     | {
         rowType: 'child';
         parentRow: Extract<VisibleRow, { rowType: 'root' }>;
