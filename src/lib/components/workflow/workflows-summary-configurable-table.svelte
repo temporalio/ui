@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SvelteMap } from 'svelte/reactivity';
+  import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
   import { getContext, type Snippet } from 'svelte';
 
@@ -68,10 +68,15 @@
     visibleChildrenMap.clear();
   });
 
+  const inFlightChildRequests = new SvelteSet<string>();
   const toggleChildrenVisibility = async (workflow: WorkflowExecution) => {
     const visibleChildren = visibleChildrenMap.get(workflow.runId);
 
     if (visibleChildren?.length) {
+      // we are collapsing the children so if there is an inflight request
+      // we don't want it's resolution to reopen the children.
+      inFlightChildRequests.delete(workflow.runId);
+
       visibleChildrenMap.delete(workflow.runId);
       // deselect children when collapsing
       selectWorkflows(false, visibleChildren);
@@ -87,13 +92,22 @@
       return;
     }
 
-    const children = await fetchAllChildWorkflows(
-      namespace,
-      workflow.id,
-      workflow.runId,
-    );
+    if (inFlightChildRequests.has(workflow.runId)) return;
 
-    visibleChildrenMap.set(workflow.runId, children);
+    inFlightChildRequests.add(workflow.runId);
+    try {
+      const children = await fetchAllChildWorkflows(
+        namespace,
+        workflow.id,
+        workflow.runId,
+      );
+
+      if (inFlightChildRequests) {
+        visibleChildrenMap.set(workflow.runId, children);
+      }
+    } finally {
+      inFlightChildRequests.delete(workflow.runId);
+    }
   };
 
   const onFetch = $derived(() =>
