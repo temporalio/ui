@@ -78,7 +78,7 @@
 
       // clear prevClickedRow if row is collapsing
       if (
-        prevClickedRow.rowType === 'child' &&
+        prevClickedRow?.rowType === 'child' &&
         prevClickedRow.parentRow.value.runId === workflow.runId
       ) {
         prevClickedRow = prevClickedRow.parentRow;
