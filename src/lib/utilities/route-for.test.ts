@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { base } from '$app/paths';
 
@@ -9,6 +9,7 @@ import type {
   WorkflowViewPreference,
 } from '$lib/stores/event-view';
 
+import { initCoreProvider } from './core-provider';
 import {
   baseRouteForWorkflow,
   hasParameters,
@@ -24,6 +25,7 @@ import {
   routeForLoginPage,
   routeForNamespace,
   routeForNamespaces,
+  routeForNexus,
   routeForPendingActivities,
   routeForSchedule,
   routeForScheduleCreate,
@@ -559,5 +561,81 @@ describe('routeFor worker deployment version and serverless routes', () => {
   it('should route to worker deployment create', () => {
     const path = routeForWorkerDeploymentCreate({ namespace: 'default' });
     expect(path).toBe(`${base}/namespaces/default/workers/deployments/create`);
+  });
+});
+
+describe('routeFor with prefix', () => {
+  const prefix = '/projects/my-project';
+
+  beforeEach(() => {
+    initCoreProvider({
+      getAccessToken: async () => '',
+      getRoutePrefix: () => prefix,
+    });
+  });
+
+  it('should prepend prefix to root route', () => {
+    expect(routeForNamespaces()).toBe(`${base}${prefix}/namespaces`);
+  });
+
+  it('should prepend prefix to namespace route', () => {
+    expect(routeForNamespace({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default`,
+    );
+  });
+
+  it('should propagate prefix through leaf functions', () => {
+    expect(routeForWorkflows({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default/workflows`,
+    );
+  });
+
+  it('should propagate prefix through deep leaf functions', () => {
+    expect(
+      routeForCallStack({
+        namespace: 'default',
+        workflow: 'abc',
+        run: 'def',
+      }),
+    ).toBe(`${base}${prefix}/namespaces/default/workflows/abc/def/call-stack`);
+  });
+
+  it('should propagate prefix to nexus routes', () => {
+    expect(routeForNexus()).toBe(`${base}${prefix}/nexus`);
+  });
+
+  it('should propagate prefix to schedule routes', () => {
+    expect(routeForSchedules({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default/schedules`,
+    );
+  });
+
+  it('should not apply prefix when store is empty', () => {
+    initCoreProvider({
+      getAccessToken: async () => '',
+      getRoutePrefix: () => '',
+    });
+    expect(routeForNamespaces()).toBe(`${base}/namespaces`);
+  });
+
+  it('should not apply prefix to auth routes', () => {
+    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const searchParams = new URLSearchParams();
+    const sso = routeForAuthentication({ settings, searchParams });
+    expect(sso).not.toContain(prefix);
+  });
+
+  it('should not apply prefix to login page', () => {
+    const login = routeForLoginPage('', false);
+    expect(login).not.toContain(prefix);
+  });
+
+  it('should revert to default behavior when prefix is cleared', () => {
+    expect(routeForNamespaces()).toBe(`${base}${prefix}/namespaces`);
+    initCoreProvider({
+      getAccessToken: async () => '',
+      getRoutePrefix: () => '',
+    });
+    expect(routeForNamespaces()).toBe(`${base}/namespaces`);
   });
 });
