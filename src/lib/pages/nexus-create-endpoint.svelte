@@ -1,6 +1,9 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-  import NexusForm, { type NexusFormData } from '$lib/pages/nexus-form.svelte';
+  import NexusForm, {
+    type NexusFormData,
+    type ValidateNamespacesExist,
+  } from '$lib/pages/nexus-form.svelte';
 
   type Props = {
     onCreate: (formData: NexusFormData) => Promise<void>;
@@ -10,6 +13,7 @@
     nameRegexPattern?: RegExp;
     nameHintText?: string;
     cancelHref?: string;
+    validateNamespacesExist?: ValidateNamespacesExist;
   };
 
   let {
@@ -20,6 +24,7 @@
     nameRegexPattern = /^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$/,
     nameHintText = undefined,
     cancelHref = '/nexus',
+    validateNamespacesExist,
   }: Props = $props();
 </script>
 
@@ -30,6 +35,7 @@
     {targetNamespaceList}
     {callerNamespaceList}
     {isCloud}
+    {validateNamespacesExist}
     {cancelHref}
     submitButtonText={translate('nexus.create-endpoint')}
     onSubmit={onCreate}

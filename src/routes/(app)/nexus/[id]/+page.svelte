@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
+
   import { page } from '$app/stores';
 
   import type { LayoutData } from './$types';
@@ -29,10 +31,13 @@
       {translate('nexus.back-to-endpoints')}
     </Link>
     <NexusEndpoint {endpoint}>
-      {#snippet actions()}
-        <Button href={routeForNexusEndpointEdit(endpoint.id!)}
-          >{translate('common.edit')}</Button
+      {#snippet actions(className: ClassNameValue = undefined)}
+        <Button
+          href={routeForNexusEndpointEdit(endpoint.id!)}
+          class={merge(className)}
         >
+          {translate('common.edit')}
+        </Button>
       {/snippet}
       {#snippet taskQueueStatus()}
         <TaskQueueStatus {endpoint} />

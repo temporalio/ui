@@ -26,6 +26,7 @@ export const Strings = {
     '//Provide a readme for users to use this endpoint',
   'description-label': 'Description',
   'description-hint': 'Do not include sensitive data.',
+  'no-description': 'No description provided.',
   handler: 'Handler',
   'delete-endpoint': 'Delete Endpoint',
   'delete-modal-title': 'Delete Nexus Endpoint?',
@@ -39,8 +40,14 @@ export const Strings = {
   'target-namespace-required': 'Please select a target Namespace.',
   'task-queue-required': 'Please enter a Task Queue.',
   'caller-namespace-required': 'Please select at least one Namespace.',
+  'caller-namespaces-do-not-exist_one':
+    'Namespace "{{namespaces}}" does not exist.',
+  'caller-namespaces-do-not-exist_other':
+    '{{count}} Namespaces do not exist: {{namespaces}}.',
+  'caller-namespace-validation-failed': 'Failed to validate caller Namespaces.',
   'access-policy': 'Access Policy',
-  'allowed-caller-namespaces': 'Allowed caller Namespaces',
+  'allowed-caller-namespaces': 'Allowed Caller Namespaces',
+  'no-allowed-caller-namespaces': 'No Allowed Caller Namespaces',
   'allowed-caller-namespaces-description':
     'Namespace(s) that are allowed to call this Endpoint.',
   'select-namespaces': 'Select Namespace(s)',
