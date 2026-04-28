@@ -15,23 +15,22 @@
   export let workflows: WorkflowExecution[];
   export let empty: boolean;
   export let columnsCount: number;
+  export let pageSelectionStatus: 'checked' | 'unchecked' | 'partial' =
+    'unchecked';
+  export let onSelectPage: (
+    selected: boolean,
+    workflows: WorkflowExecution[],
+  ) => void = () => {};
 
-  const {
-    handleSelectPage,
-    selectedWorkflows,
-    pageSelected,
-    batchActionsVisible,
-  } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
+  const { batchActionsVisible } = getContext<BatchOperationContext>(
+    BATCH_OPERATION_CONTEXT,
+  );
 
   const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
-    handleSelectPage(checked, workflows);
+    onSelectPage(checked, workflows);
   };
-
-  $: indeterminate =
-    $selectedWorkflows.length > 0 &&
-    $selectedWorkflows.length < workflows.length;
-  $: label = translate('workflows.select-all-workflows');
+  const label = translate('workflows.select-all-workflows');
 </script>
 
 <tr>
@@ -42,8 +41,9 @@
         labelHidden
         id="select-visible-workflows"
         data-testid="batch-actions-checkbox"
-        bind:checked={$pageSelected}
-        {indeterminate}
+        checked={pageSelectionStatus === 'checked' ||
+          pageSelectionStatus === 'partial'}
+        indeterminate={pageSelectionStatus === 'partial'}
         on:change={handleCheckboxChange}
       />
     </th>

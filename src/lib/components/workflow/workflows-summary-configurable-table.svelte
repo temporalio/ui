@@ -39,14 +39,14 @@
 
   let { onClickConfigure, cloud }: Props = $props();
 
-  const { allSelected, pageSelected, selectWorkflows } =
+  const { allSelected, selectedWorkflows, selectWorkflows } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
 
   const namespace = $derived(page.params.namespace);
   const baseColumns = $derived(
     $configurableTableColumns?.[namespace]?.workflows ?? [],
   );
-  const query = $derived(page.url.searchParams.get('query'));
+  const query = $derived(page.url.searchParams.get('query') ?? '');
 
   const hasVersioningFilter = $derived(
     query?.includes('TemporalWorkerDeploymentVersion') ?? false,
@@ -110,13 +110,7 @@
     }
   };
 
-  const onFetch = $derived(() =>
-    fetchPaginatedWorkflows(
-      namespace,
-      // query can be null but this function signature only accepts undefined | string
-      query ?? undefined,
-    ),
-  );
+  const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
 
   const dense = $derived($tableDensity === 'dense');
 
@@ -161,10 +155,45 @@
 
   let prevClickedRow = $state<VisibleRow | null>(null);
 
+  type PageSelectionStatus = 'checked' | 'unchecked' | 'partial';
+
+  const pageSelectionStatus: PageSelectionStatus = $derived.by(() => {
+    const selectedRunIdSet = new Set($selectedWorkflows.map((w) => w.runId));
+
+    if ($allSelected) {
+      return 'checked';
+    }
+
+    const visibleItemsNotSelected = visibleItems.filter(
+      (i) => !selectedRunIdSet.has(i.runId),
+    );
+
+    if (visibleItemsNotSelected.length === visibleItems.length) {
+      return 'unchecked';
+    }
+
+    if (visibleItemsNotSelected.length === 0) {
+      return 'checked';
+    }
+
+    return 'partial';
+  });
+
+  const handleSelectPage = (
+    isSelected: boolean,
+    workflows: WorkflowExecution[],
+  ) => {
+    selectWorkflows(isSelected, workflows);
+    prevClickedRow = null;
+
+    if (!isSelected) {
+      allSelected.set(false);
+    }
+  };
+
   $effect(() => {
     void visibleItems;
     void $allSelected;
-    void $pageSelected;
     prevClickedRow = null;
   });
 </script>
@@ -191,6 +220,8 @@
       empty={visibleItems.length === 0}
       slot="headers"
       workflows={visibleItems}
+      {pageSelectionStatus}
+      onSelectPage={handleSelectPage}
     >
       {#each columns as column (column)}
         <TableHeaderCell {column} />

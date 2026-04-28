@@ -9,7 +9,6 @@
 
   export type BatchOperationContext = {
     allSelected: Writable<boolean>;
-    pageSelected: Writable<boolean>;
     terminableWorkflows: Readable<WorkflowExecution[]>;
     cancelableWorkflows: Readable<WorkflowExecution[]>;
     selectedWorkflows: Writable<WorkflowExecution[]>;
@@ -18,10 +17,6 @@
     openBatchTerminateConfirmationModal: () => void;
     openBatchResetConfirmationModal: () => void;
     handleSelectAll: (workflows: WorkflowExecution[]) => void;
-    handleSelectPage: (
-      checked: boolean,
-      workflows: WorkflowExecution[],
-    ) => void;
     selectWorkflows: (checked: boolean, workflows: WorkflowExecution[]) => void;
   };
 </script>
@@ -109,7 +104,6 @@
 
   const resetSelection = () => {
     $allSelected = false;
-    $pageSelected = false;
     $selectedWorkflows = [];
   };
 
@@ -122,7 +116,6 @@
   let cancelConfirmationModalOpen = $state(false);
 
   const allSelected = writable<boolean>(false);
-  const pageSelected = writable<boolean>(false);
   const selectedWorkflows = writable<WorkflowExecution[]>([]);
   const batchActionsVisible = derivedStore(
     selectedWorkflows,
@@ -163,19 +156,6 @@
     selectedWorkflows.set([...workflows]);
   };
 
-  const handleSelectPage = (
-    checked: boolean,
-    workflows: WorkflowExecution[],
-  ) => {
-    pageSelected.set(checked);
-    if ($allSelected) allSelected.set(false);
-    if (checked) {
-      selectedWorkflows.set([...workflows]);
-    } else {
-      selectedWorkflows.set([]);
-    }
-  };
-
   /**
    * Handle the selection or deselection of workflows.
    * This modifies the existing selection. It does not replace it (i.e., if a workflow was already selected and it was not deselected by this call, it will remain selected).
@@ -204,7 +184,6 @@
 
   setContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT, {
     allSelected,
-    pageSelected,
     terminableWorkflows,
     cancelableWorkflows,
     selectedWorkflows,
@@ -213,7 +192,6 @@
     openBatchTerminateConfirmationModal,
     openBatchResetConfirmationModal,
     handleSelectAll,
-    handleSelectPage,
     selectWorkflows,
   });
 
