@@ -1,17 +1,18 @@
 <script lang="ts">
+  import type { Writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { refresh } from '$lib/stores/workflows';
 
   interface Props {
     count: number;
+    refresh: Writable<number>;
   }
 
-  let { count }: Props = $props();
+  let { count, refresh }: Props = $props();
 
   const duration = 300;
 </script>
