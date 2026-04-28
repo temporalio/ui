@@ -140,13 +140,13 @@
         <WorkflowStatus
           status={workflow?.status}
           big
-          delayed={isWorkflowDelayed(workflow)}
-          taskFailure={isWorkflowTaskFailure(workflow)}
+          delayed={workflow ? isWorkflowDelayed(workflow) : false}
+          taskFailure={workflow ? isWorkflowTaskFailure(workflow) : false}
         />
         <div class="xl:hidden">
           <WorkflowActions
             {cancelInProgress}
-            {workflow}
+            workflow={workflow!}
             {namespace}
             first={workflowRelationships.first}
             next={workflowRelationships.next}
@@ -172,7 +172,7 @@
     <div class="max-xl:hidden">
       <WorkflowActions
         {cancelInProgress}
-        {workflow}
+        workflow={workflow!}
         {namespace}
         first={workflowRelationships.first}
         next={workflowRelationships.next}
@@ -180,7 +180,7 @@
     </div>
   </div>
   <CodecServerErrorBanner />
-  <WorkflowDetails {workflow} next={workflowRelationships.next} />
+  <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
@@ -236,7 +236,7 @@
           href={routeForWorkflow({
             namespace,
             workflow: workflowId,
-            run: resetRunId,
+            run: resetRunId!,
           })}>here</Link
         >.
       </Alert>

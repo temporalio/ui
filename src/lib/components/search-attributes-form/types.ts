@@ -2,6 +2,7 @@ export interface SearchAttributeDefinition {
   name?: string;
   type?: string;
   isDeletable?: boolean;
+  initialName?: string;
 }
 
 export interface SearchAttributeTypeOption {

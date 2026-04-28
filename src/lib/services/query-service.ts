@@ -1,9 +1,9 @@
 import { translate } from '$lib/i18n/translate';
 import type { Payloads } from '$lib/types';
 import type { WorkflowQueryRouteParameters } from '$lib/types/api';
-import type { Eventual, Settings } from '$lib/types/global';
+import type { Eventual } from '$lib/types/global';
 import type { WorkflowMetadata } from '$lib/types/workflows';
-import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
+import { decodeEventAttributes } from '$lib/utilities/decode-payload';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { has } from '$lib/utilities/has';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -83,13 +83,11 @@ async function fetchQuery(
 
 export async function getWorkflowMetadata(
   options: WorkflowParameters,
-  settings: Settings,
   signal?: AbortSignal,
 ): Promise<WorkflowMetadata> {
   try {
     const metadata = await getQuery(
       { ...options, queryType: '__temporal_workflow_metadata' },
-      settings,
       signal,
     );
     if (!metadata.currentDetails) {
@@ -116,7 +114,6 @@ export async function getWorkflowMetadata(
 
 export async function getQuery(
   options: QueryRequestParameters,
-  settings: Settings,
   signal?: AbortSignal,
 ): Promise<ParsedQuery> {
   return fetchQuery(options, signal).then(async (execution) => {
@@ -125,11 +122,7 @@ export async function getQuery(
     let data: ParsedQuery = queryResult.payloads;
     try {
       if (data[0]) {
-        const convertedAttributes = await convertPayloadToJsonWithCodec({
-          attributes: queryResult,
-          namespace: options.namespace,
-          settings,
-        });
+        const convertedAttributes = await decodeEventAttributes(queryResult);
 
         if (
           has(convertedAttributes, 'payloads') &&
@@ -151,7 +144,7 @@ export async function getQuery(
 
 export async function getWorkflowStackTrace(
   options: WorkflowParameters,
-  settings: Settings,
+  signal?: AbortSignal,
 ): Promise<ParsedQuery> {
-  return getQuery({ ...options, queryType: '__stack_trace' }, settings);
+  return getQuery({ ...options, queryType: '__stack_trace' }, signal);
 }
