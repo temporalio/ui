@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -16,24 +17,27 @@
     | 'transcoder-error';
   type AlertIcon = Extract<IconName, Intent>;
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+  interface Props extends HTMLAttributes<HTMLDivElement> {
     intent: Intent;
     title?: string;
     icon?: AlertIcon;
     'data-testid'?: string;
     hidden?: boolean;
     class?: string;
+    children?: Snippet;
   }
 
-  export let intent: Intent;
-  export let title = '';
-  export let icon: AlertIcon = intent;
-  export let hidden = false;
+  let {
+    intent,
+    title = '',
+    icon = intent,
+    hidden = false,
+    class: className = '',
+    children,
+    ...rest
+  }: Props = $props();
 
-  let className = '';
-  export { className as class };
-
-  $: role = getRole(intent);
+  const role = $derived(getRole(intent));
 
   function getRole(
     alertIntent: typeof intent,
@@ -54,16 +58,16 @@
   class={merge('alert flex', intent, className)}
   class:hidden
   {role}
-  {...$$restProps}
+  {...rest}
 >
   <Icon name={icon} class="mt-0.5 shrink-0" />
   <div class="w-full min-w-0 gap-1">
     <p class="font-medium">
       {title}
     </p>
-    {#if $$slots.default}
+    {#if children}
       <div class="content">
-        <slot />
+        {@render children()}
       </div>
     {/if}
   </div>
