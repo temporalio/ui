@@ -48,7 +48,6 @@
     readOnly = false,
   }: Props = $props();
 
-  $inspect('TIMELINE GRAPH ROW RENDER');
   const { height, gutter, radius } = TimelineConfig;
 
   let hovering = $state(false);
