@@ -12,6 +12,7 @@
     workerSearchAttributeOptions,
     workerSearchAttributes,
   } from '$lib/stores/search-attributes';
+  import { refresh } from '$lib/stores/workers';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   const { namespace } = $derived(page.params);
@@ -39,7 +40,7 @@
     includeNullConditions={false}
   />
 
-  {#key [namespace, query]}
+  {#key [namespace, query, $refresh]}
     <WorkersTable
       {namespace}
       onFetch={() => fetchPaginatedWorkers({ namespace, query })}
