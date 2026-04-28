@@ -186,20 +186,20 @@
     checked: boolean,
     workflows: WorkflowExecution[],
   ): void => {
-    // Set is not being used reactively here.
-    // We could refactor the selected workflows store to use SvelteSet if we wanted to though.
+    // Map is not being used reactively here.
+    // We could refactor the selected workflows store to use SvelteMap if we wanted to though.
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const selected = new Set($selectedWorkflows);
+    const selected = new Map($selectedWorkflows.map((w) => [w.runId, w]));
 
     for (const workflow of workflows) {
       if (checked) {
-        selected.add(workflow);
+        selected.set(workflow.runId, workflow);
       } else {
-        selected.delete(workflow);
+        selected.delete(workflow.runId);
       }
     }
 
-    selectedWorkflows.set(Array.from(selected));
+    selectedWorkflows.set(Array.from(selected.values()));
   };
 
   setContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT, {
