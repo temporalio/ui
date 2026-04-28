@@ -21,6 +21,7 @@
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
+  import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -97,9 +98,8 @@
 
   const duration = $derived(
     isEventGroup(event)
-      ? formatDistanceAbbreviated({
-          start: event.initialEvent?.eventTime,
-          end: event.lastEvent?.eventTime,
+      ? formatEventGroupDuration({
+          group: event,
           includeMillisecondsForUnderSecond: true,
         })
       : '',

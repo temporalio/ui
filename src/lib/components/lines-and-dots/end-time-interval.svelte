@@ -9,10 +9,11 @@
   export let workflow: WorkflowExecution;
   export let startTime: string | Timestamp;
 
+  let currentTime = Date.now();
+
   const rightNow = () => {
-    const now = new Date();
-    now.setSeconds(now.getSeconds() + 1);
-    return now;
+    currentTime = Date.now();
+    return currentTime + 1000;
   };
 
   $: endTime = workflow?.endTime || rightNow();
@@ -52,4 +53,4 @@
   });
 </script>
 
-<slot {endTime} {duration} />
+<slot {endTime} {duration} {currentTime} />
