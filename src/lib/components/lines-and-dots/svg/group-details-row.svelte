@@ -17,7 +17,7 @@
 
   export let group: EventGroup;
   export let canvasWidth: number;
-  export let currentTime: string | Date | number = Date.now();
+  export let endTime: string | Date | number = Date.now();
   export let x = 0;
   export let y: number;
 
@@ -40,7 +40,7 @@
 
   $: duration = formatEventGroupDuration({
     group,
-    currentTime,
+    endTime,
     includeMilliseconds: true,
   });
 

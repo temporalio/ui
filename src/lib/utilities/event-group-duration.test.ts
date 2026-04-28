@@ -69,7 +69,7 @@ describe('getEventGroupDurationEnd', () => {
   });
 
   it('returns the current time for pending activity and Nexus groups', () => {
-    const currentTime = '2026-04-28T10:20:00Z';
+    const endTime = '2026-04-28T10:20:00Z';
 
     expect(
       getEventGroupDurationEnd(
@@ -79,9 +79,9 @@ describe('getEventGroupDurationEnd', () => {
             activityId: 'activity-id',
           } as EventGroup['pendingActivity'],
         }),
-        currentTime,
+        endTime,
       ),
-    ).toBe(currentTime);
+    ).toBe(endTime);
 
     expect(
       getEventGroupDurationEnd(
@@ -91,9 +91,9 @@ describe('getEventGroupDurationEnd', () => {
             scheduledEventId: '1',
           } as EventGroup['pendingNexusOperation'],
         }),
-        currentTime,
+        endTime,
       ),
-    ).toBe(currentTime);
+    ).toBe(endTime);
   });
 });
 
@@ -111,7 +111,7 @@ describe('formatEventGroupDuration', () => {
             activityId: 'activity-id',
           } as EventGroup['pendingActivity'],
         }),
-        currentTime: '2026-04-28T10:20:00Z',
+        endTime: '2026-04-28T10:20:00Z',
       }),
     ).toBe('20m');
   });

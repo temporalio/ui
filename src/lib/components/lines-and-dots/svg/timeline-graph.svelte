@@ -130,7 +130,7 @@
             y={y + 1.33 * radius}
             {group}
             {canvasWidth}
-            currentTime={workflow?.endTime ? endTime : currentTime}
+            endTime={workflow?.endTime ? endTime : currentTime}
           />
         {/if}
       {/each}

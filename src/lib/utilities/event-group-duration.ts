@@ -12,27 +12,27 @@ export const eventGroupUsesCurrentDuration = (
 
 export const getEventGroupDurationEnd = (
   group: EventGroup | undefined,
-  currentTime: ValidTime = new Date(),
+  endTime: ValidTime = new Date(),
 ): ValidTime | null | undefined => {
   if (!group) return undefined;
-  if (eventGroupUsesCurrentDuration(group)) return currentTime;
+  if (eventGroupUsesCurrentDuration(group)) return endTime;
   return group.lastEvent?.eventTime;
 };
 
 export const formatEventGroupDuration = ({
   group,
-  currentTime,
+  endTime,
   includeMilliseconds = false,
   includeMillisecondsForUnderSecond = false,
 }: {
   group: EventGroup | undefined;
-  currentTime?: ValidTime;
+  endTime?: ValidTime;
   includeMilliseconds?: boolean;
   includeMillisecondsForUnderSecond?: boolean;
 }): string => {
   return formatDistanceAbbreviated({
     start: group?.initialEvent?.eventTime,
-    end: getEventGroupDurationEnd(group, currentTime),
+    end: getEventGroupDurationEnd(group, endTime),
     includeMilliseconds,
     includeMillisecondsForUnderSecond,
   });
