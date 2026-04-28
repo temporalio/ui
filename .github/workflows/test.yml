@@ -13,7 +13,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Checkout and setup Node
@@ -21,7 +21,7 @@ jobs:
       - name: Build UI
         run: pnpm build:server
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v6
         with:
           go-version-file: server/go.mod
           cache-dependency-path: server/go.sum
