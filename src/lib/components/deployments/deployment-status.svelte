@@ -51,7 +51,7 @@
   );
 </script>
 
-<Tooltip text={tooltip[status]} topLeft width={250}>
+<Tooltip text={tooltip[status]} topLeft width={250} usePortal>
   <p class={deploymentStatus({ status })}>
     {#if icon[status]}<Icon name={icon[status]!} />{/if}{label}
   </p>
