@@ -135,6 +135,10 @@ export function detectWorkflowErrors(
   return errors;
 }
 
+function isDefined(error: CommonError | undefined): error is CommonError {
+  return error !== undefined;
+}
+
 export function detectActivityErrors(
   pendingActivities: PendingActivity[],
   workflowRunTimeout = 0,
@@ -216,7 +220,7 @@ export function detectActivityErrors(
     }
   }
 
-  return [...errorIds].map(getCommonErrorById).filter(Boolean);
+  return [...errorIds].map(getCommonErrorById).filter(isDefined);
 }
 
 export function detectFirstEventErrors(
