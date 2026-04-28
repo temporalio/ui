@@ -13,7 +13,7 @@ export const Strings = {
   'error-message-fetching': 'Error fetching deployments',
   'empty-state-description':
     'Worker Deployments let you manage how Temporal invokes your Workers, including serverless functions that scale automatically.',
-  'create-serverless-deployment': 'Create Serverless Worker Deployment',
+  'create-serverless-deployment': 'Create Worker Deployment',
   'self-managed-deployment': 'Self-Managed Worker Deployment',
   name: 'Deployment Name',
   'current-version': 'Current Version',
