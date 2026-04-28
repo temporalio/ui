@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Notify Slack
-        uses: slackapi/slack-github-action@v2
+        uses: slackapi/slack-github-action@v3
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}

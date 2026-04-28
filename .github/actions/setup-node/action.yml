@@ -5,12 +5,12 @@ runs:
   using: 'composite'
   steps:
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.0.0
+      uses: pnpm/action-setup@v5
       with:
         run_install: false
 
     - name: Install Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: 22
         registry-url: 'https://registry.npmjs.org'
@@ -22,7 +22,7 @@ runs:
       run: |
         echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v5
       name: Setup pnpm cache
       with:
         path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
