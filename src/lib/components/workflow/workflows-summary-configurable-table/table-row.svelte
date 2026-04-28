@@ -45,9 +45,9 @@
 
   $: childrenShown = childCount !== undefined;
 
-  $: checked = $selectedWorkflows.some(
-    (selected) => selected.runId === workflow.runId,
-  );
+  $: checked =
+    ($allSelected && !child) ||
+    $selectedWorkflows.some((selected) => selected.runId === workflow.runId);
 </script>
 
 <tr
