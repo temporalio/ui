@@ -30,14 +30,11 @@ jobs:
         uses: ./.github/actions/build-and-package
 
       - name: upload package artifact
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ steps.build-package.outputs.package-path }}
-          asset_name: temporal-ui-package.tar.gz
-          asset_content_type: application/gzip
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            "${{ steps.build-package.outputs.package-path }}#temporal-ui-package.tar.gz"
 
       - name: Prepare dispatch token
         id: dispatch_token
