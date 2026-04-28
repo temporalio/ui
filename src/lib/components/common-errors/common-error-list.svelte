@@ -12,10 +12,7 @@
 </script>
 
 {#if errors.length > 0}
-  <div
-    class="flex flex-col gap-4 {className}"
-    {...rest}
-  >
+  <div class="flex flex-col gap-4 {className}" {...rest}>
     {#each errors as error (error.id)}
       <CommonErrorItem {error} />
     {/each}

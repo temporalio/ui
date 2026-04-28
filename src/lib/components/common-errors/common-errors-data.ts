@@ -1,6 +1,5 @@
 import type {
   CommonError,
-  CommonErrorCategory,
   CommonErrorSeverity,
 } from '$lib/types/common-errors';
 

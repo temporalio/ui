@@ -12,12 +12,7 @@
   let { error, class: className = '', ...rest }: Props = $props();
 </script>
 
-<Alert
-  intent={error.severity}
-  title={error.title}
-  class={className}
-  {...rest}
->
+<Alert intent={error.severity} title={error.title} class={className} {...rest}>
   <p>{error.description}</p>
   <Link href={error.link} newTab>{error.action} →</Link>
 </Alert>
