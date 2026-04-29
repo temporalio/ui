@@ -244,9 +244,7 @@
       <div class="flex items-center gap-4">
         <slot name="header-actions" />
         {#if workflowStartEnabled}
-          <Button
-            leadingIcon="lightning-bolt"
-            href={routeForWorkflowStart({ namespace })}
+          <Button href={routeForWorkflowStart({ namespace })}
             >{translate('workflows.start-workflow')}</Button
           >
         {/if}
