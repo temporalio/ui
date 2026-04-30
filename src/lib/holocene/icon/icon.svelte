@@ -1,12 +1,13 @@
 <script lang="ts">
-  import type { ComponentProps } from 'svelte';
-
   import { type IconName, icons } from './paths';
 
-  import type Svg from './svg.svelte';
-
-  interface Props extends ComponentProps<typeof Svg> {
+  interface Props {
     name: IconName;
+    width?: number;
+    height?: number;
+    title?: string;
+    class?: string;
+    [key: string]: unknown;
   }
 
   let {
