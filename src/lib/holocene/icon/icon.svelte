@@ -1,21 +1,26 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import { type IconName, icons } from './paths';
 
-  export let name: IconName;
-  export let width = 16;
-  export let height = 16;
-  export let title = '';
+  import type Svg from './svg.svelte';
 
-  $: icon = icons[name];
+  interface Props extends ComponentProps<typeof Svg> {
+    name: IconName;
+  }
+
+  let {
+    name,
+    width = 16,
+    height = 16,
+    title = '',
+    class: className = '',
+    ...rest
+  }: Props = $props();
+
+  const Icon = $derived(icons[name]);
 </script>
 
-{#if icon}
-  <svelte:component
-    this={icon}
-    {width}
-    {height}
-    {title}
-    class="shrink-0 {$$props.class}"
-    {...$$restProps}
-  />
+{#if Icon}
+  <Icon {width} {height} {title} class="shrink-0 {className}" {...rest} />
 {/if}

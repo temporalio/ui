@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import { iconNames } from './';
 
@@ -22,7 +23,7 @@
       height: { name: 'Height', control: 'number' },
       width: { name: 'Width', control: 'number' },
     },
-  } satisfies Meta<Icon>;
+  } satisfies Meta<ComponentProps<typeof Icon>>;
 </script>
 
 <script lang="ts">
