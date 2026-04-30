@@ -1,13 +1,20 @@
-<script>
+<script lang="ts">
   import apple from '$lib/vendor/apple-touch-icon.png';
   import banner from '$lib/vendor/banner.png';
   import favicon from '$lib/vendor/favicon.ico';
   import manifest from '$lib/vendor/site.webmanifest';
 
-  export let title = 'Temporal';
-  export let url = 'https://temporal.io';
+  interface Props {
+    title?: string;
+    url?: string;
+    image?: string;
+  }
 
-  export let image = banner;
+  let {
+    title = 'Temporal',
+    url = 'https://temporal.io',
+    image = banner,
+  }: Props = $props();
 </script>
 
 <svelte:head>
