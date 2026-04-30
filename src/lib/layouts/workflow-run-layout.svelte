@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import type { Snippet } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
@@ -35,11 +36,20 @@
   import { decodeUserMetadata } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-  $: showJson = $page.url.searchParams.has('json');
-  $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
+  interface Props {
+    children: Snippet;
+    headerSnippet?: Snippet;
+  }
 
-  let workflowError: NetworkError | null = null;
+  let { children, headerSnippet = undefined }: Props = $props();
+
+  let namespace = $derived(page.params.namespace);
+  let workflowId = $derived(page.params.workflow);
+  let runId = $derived(page.params.run);
+  let showJson = $derived(page.url.searchParams.has('json'));
+  let fullJson = $derived({ ...$workflowRun, eventHistory: $fullEventHistory });
+
+  let workflowError: NetworkError | null = $state(null);
   let workflowRunController: AbortController;
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -76,7 +86,7 @@
     workflowId: string,
     runId: string,
   ) => {
-    const { settings } = $page.data;
+    const { settings } = page.data;
     const { workflow, error } = await fetchWorkflow({
       namespace,
       workflowId,
@@ -165,32 +175,46 @@
     refreshInterval = null;
   };
 
-  $: (runId, clearWorkflowData());
+  $effect(() => {
+    runId;
+    untrack(() => {
+      clearWorkflowData();
+    });
+  });
 
-  $: getWorkflowAndEventHistory(namespace, workflowId, runId);
-  $: getOnlyWorkflowWithPendingActivities($refresh, $pauseLiveUpdates);
+  $effect(() => {
+    const ns = namespace;
+    const wfId = workflowId;
+    const rId = runId;
+    untrack(() => {
+      getWorkflowAndEventHistory(ns, wfId, rId);
+    });
+  });
 
-  const setCurrentEvents = (
-    fullHistory: typeof $fullEventHistory,
-    pause: boolean,
-  ) => {
-    if (!pause) {
-      $currentEventHistory = fullHistory;
+  $effect(() => {
+    const refreshValue = $refresh;
+    const pause = $pauseLiveUpdates;
+    untrack(() => {
+      getOnlyWorkflowWithPendingActivities(refreshValue, pause);
+    });
+  });
+
+  $effect(() => {
+    if (!$pauseLiveUpdates) {
+      $currentEventHistory = $fullEventHistory;
     }
-  };
-
-  $: setCurrentEvents($fullEventHistory, $pauseLiveUpdates);
+  });
 
   onMount(() => {
-    const sort = $page.url.searchParams.get('sort');
+    const sort = page.url.searchParams.get('sort');
     if (sort) $eventFilterSort = sort as EventSortOrder;
     refreshInterval = setInterval(() => {
       throttleRefresh();
     }, 10000);
-  });
 
-  onDestroy(() => {
-    clearWorkflowData();
+    return () => {
+      clearWorkflowData();
+    };
   });
 </script>
 
@@ -212,6 +236,6 @@
 {:else if !$workflowRun.workflow}
   <SkeletonWorkflow />
 {:else}
-  <WorkflowHeader />
-  <slot />
+  <WorkflowHeader {headerSnippet} />
+  {@render children()}
 {/if}

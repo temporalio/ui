@@ -91,6 +91,10 @@ export const routeForNexus = (): ResolvedPathname => {
   return withPrefix(resolve('/nexus', {}));
 };
 
+export const routeForCommonErrors = (): ResolvedPathname => {
+  return resolve('/common-errors', {});
+};
+
 export const routeForNexusEndpoint = (id: string): ResolvedPathname => {
   return withPrefix(resolve('/nexus/[id]', { id }));
 };

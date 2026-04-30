@@ -28,6 +28,7 @@
 
   import { page } from '$app/state';
 
+  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
   import BatchResetConfirmationModal from '$lib/components/workflow/client-actions/batch-reset-confirmation-modal.svelte';
@@ -36,7 +37,6 @@
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
-  import WorkflowCountRefresh from '$lib/components/workflow/workflow-count-refresh.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -250,16 +250,14 @@
           {refreshTimeFormatted}
         </p>
       </div>
-      <WorkflowCountRefresh count={$workflowCount.newCount} />
+      <CountRefreshButton count={$workflowCount.newCount} {refresh} />
       <WorkflowCounts bind:refreshTime fetchTaskFailures />
     </div>
     {#if headerActions || workflowStartEnabled}
       <div class="flex items-center gap-4">
         {@render headerActions?.()}
         {#if workflowStartEnabled}
-          <Button
-            leadingIcon="lightning-bolt"
-            href={routeForWorkflowStart({ namespace })}
+          <Button href={routeForWorkflowStart({ namespace })}
             >{translate('workflows.start-workflow')}</Button
           >
         {/if}
