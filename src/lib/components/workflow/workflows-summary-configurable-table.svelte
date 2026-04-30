@@ -66,6 +66,7 @@
     void $refresh;
     void query;
     visibleChildrenMap.clear();
+    inFlightChildRequests.clear();
   });
 
   const inFlightChildRequests = new SvelteSet<string>();
@@ -74,7 +75,7 @@
 
     if (visibleChildren?.length) {
       // we are collapsing the children so if there is an inflight request
-      // we don't want it's resolution to reopen the children.
+      // we don't want its resolution to reopen the children.
       inFlightChildRequests.delete(workflow.runId);
 
       visibleChildrenMap.delete(workflow.runId);
@@ -119,7 +120,7 @@
     viewFeature('tableDensity');
   };
 
-  let visibleItems: WorkflowExecution[] = $state([]);
+  let visiblePaginatedItems: WorkflowExecution[] = $state([]);
 
   type VisibleRow =
     | {
@@ -133,7 +134,7 @@
         value: WorkflowExecution;
       };
   const visibleRows: VisibleRow[] = $derived.by(() => {
-    return visibleItems.flatMap((workflow) => {
+    return visiblePaginatedItems.flatMap((workflow) => {
       const visibleChildren = visibleChildrenMap.get(workflow.runId) ?? [];
 
       const rootRow = {
@@ -164,11 +165,11 @@
       return 'checked';
     }
 
-    const visibleItemsNotSelected = visibleItems.filter(
+    const visibleItemsNotSelected = visiblePaginatedItems.filter(
       (i) => !selectedRunIdSet.has(i.runId),
     );
 
-    if (visibleItemsNotSelected.length === visibleItems.length) {
+    if (visibleItemsNotSelected.length === visiblePaginatedItems.length) {
       return 'unchecked';
     }
 
@@ -192,7 +193,7 @@
   };
 
   $effect(() => {
-    void visibleItems;
+    void visiblePaginatedItems;
     void $allSelected;
     prevClickedRow = null;
   });
@@ -203,7 +204,7 @@
     total={$workflowCount.count}
     {onFetch}
     onItemsChange={(items) => {
-      visibleItems = items;
+      visiblePaginatedItems = items;
     }}
     aria-label={translate('common.workflows')}
     pageSizeSelectLabel={translate('common.per-page')}
@@ -217,9 +218,9 @@
     </caption>
     <TableHeaderRow
       columnsCount={columns.length}
-      empty={visibleItems.length === 0}
+      empty={visiblePaginatedItems.length === 0}
       slot="headers"
-      workflows={visibleItems}
+      workflows={visiblePaginatedItems}
       {pageSelectionStatus}
       onSelectPage={handleSelectPage}
     >
@@ -231,16 +232,14 @@
       {@const isChildRow = row.rowType === 'child'}
       <TableRow
         workflow={row.value}
-        toggleChildrenVisibility={(workflow) => {
-          toggleChildrenVisibility(workflow);
-        }}
+        {toggleChildrenVisibility}
         childCount={!isChildRow && row.childCount > 0
           ? row.childCount
           : undefined}
         child={isChildRow}
         onClickBatchSelect={(event) => {
           // this is required due to how the underlying Checkbox component
-          // get's it's onclick type from svelte event forwarding. It does not
+          // gets its onclick type from svelte event forwarding. It does not
           // know what the current event target type is a checkbox input
           if (!(event.currentTarget instanceof HTMLInputElement)) {
             return;

@@ -24,7 +24,7 @@
   export let empty = false;
   export let toggleChildrenVisibility: (
     workflow: WorkflowExecution,
-  ) => void = () => {};
+  ) => void | Promise<void> = () => {};
   export let childCount: number | undefined = undefined;
   export let child = false;
 
@@ -94,8 +94,8 @@
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
-              text={childrenShown && childCount != null
-                ? translate('workflows.children', { count: childCount })
+              text={childrenShown
+                ? translate('workflows.children', { count: childCount ?? 0 })
                 : translate('workflows.show-children')}
               topLeft
             >

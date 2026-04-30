@@ -20,7 +20,7 @@
   export let onSelectPage: (
     selected: boolean,
     workflows: WorkflowExecution[],
-  ) => void = () => {};
+  ) => void;
 
   const { batchActionsVisible } = getContext<BatchOperationContext>(
     BATCH_OPERATION_CONTEXT,
@@ -41,8 +41,7 @@
         labelHidden
         id="select-visible-workflows"
         data-testid="batch-actions-checkbox"
-        checked={pageSelectionStatus === 'checked' ||
-          pageSelectionStatus === 'partial'}
+        checked={pageSelectionStatus === 'checked'}
         indeterminate={pageSelectionStatus === 'partial'}
         on:change={handleCheckboxChange}
       />
