@@ -1,9 +1,17 @@
 <script lang="ts">
-  export let error = false;
+  import type { Snippet } from 'svelte';
+
+  interface Props {
+    error?: boolean;
+    class?: string;
+    children?: Snippet;
+  }
+
+  let { error = false, class: className = '', children }: Props = $props();
 </script>
 
-<div class="panel surface-primary {$$props.class}" class:error>
-  <slot />
+<div class="panel surface-primary {className}" class:error>
+  {@render children?.()}
 </div>
 
 <style lang="postcss">
