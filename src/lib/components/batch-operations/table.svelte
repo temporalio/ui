@@ -13,8 +13,12 @@
   } from '$lib/types/batch';
   import { routeForBatchOperation } from '$lib/utilities/route-for';
 
-  export let namespace: string;
-  export let operations: BatchOperationInfo[];
+  interface Props {
+    namespace: string;
+    operations: BatchOperationInfo[];
+  }
+
+  let { namespace, operations }: Props = $props();
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
     Completed: 'success',
