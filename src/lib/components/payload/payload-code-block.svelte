@@ -3,9 +3,10 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { downloadExternalPayloadWithCodec } from '$lib/services/data-encoder';
+  import type { Payloads } from '$lib/types';
   import {
     isExternallyStoredRawPayload,
-    type ParsedPayload,
+    parseRawPayloadToJSON,
     type PayloadContainingObject,
     type PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
@@ -22,8 +23,15 @@
 
   let { value, maxHeight, testId }: Props = $props();
 
-  const downloadExternalPayload = async (payload: ParsedPayload) => {
-    const stuff = await downloadExternalPayloadWithCodec(payload);
+  const downloadExternalPayload = async (payloads: Payloads) => {
+    const stuff = await downloadExternalPayloadWithCodec(payloads);
+    const parsed = parseRawPayloadToJSON(stuff.payloads[0]);
+    const content = stringifyWithBigInt(parsed, null, 2);
+    const a = document.createElement('a');
+    const file = new Blob([content], { type: 'text/plain' });
+    a.href = URL.createObjectURL(file);
+    a.download = 'payload.txt';
+    a.click();
   };
 </script>
 
@@ -45,7 +53,7 @@
                 size="sm"
                 variant="ghost"
                 leadingIcon="download"
-                on:click={() => downloadExternalPayload(payload)}
+                on:click={() => downloadExternalPayload(value)}
               >
                 {formatBytes(payload.externalPayloads?.[0].sizeBytes)}
               </Button>

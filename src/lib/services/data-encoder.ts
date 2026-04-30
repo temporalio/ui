@@ -122,10 +122,10 @@ export async function encodePayloadsWithCodec({
 }
 
 export async function downloadExternalPayloadWithCodec(
-  payload: ParsedPayload,
-): Promise<unknown> {
+  payloads: PotentialPayloads,
+): Promise<Payloads> {
   return codeServerRequest({
     type: 'download',
-    payloads: { payloads: [payload] },
+    payloads,
   });
 }

@@ -103,7 +103,6 @@ export function parseRawPayloadToJSON(
   returnDataOnly: boolean = true,
   // This could decode to any object. So we either use the payload object passed in or decode it
 ): unknown | Payload | null {
-  console.log('parseRawPayloadToJSON', payload);
   if (payload === null) {
     return payload;
   }
@@ -115,10 +114,7 @@ export function parseRawPayloadToJSON(
     return {
       metadata,
       data,
-      // tracking down why this is necessary, I don't believe it should be
-      externalPayloads: (payload.external_payloads ?? []).map((details) => ({
-        sizeBytes: details?.size_bytes,
-      })),
+      externalPayloads: payload.externalPayloads ?? [],
     };
   } catch (_e) {
     console.warn('Could not parse payload: ', _e);
@@ -249,9 +245,10 @@ export const isRawPayload = (payload: unknown): payload is Payload => {
 export const isExternallyStoredRawPayload = (payload: unknown): boolean => {
   return (
     isRawPayload(payload) &&
-    has(payload, 'externalPayloads') &&
-    payload.externalPayloads.length > 0
-  ); // payload.externalPayloads?.length > 0 and has messageType 'external';
+    has(payload.metadata, 'messageType') &&
+    payload.metadata.messageType ===
+      'temporal.api.sdk.v1.ExternalStorageReference'
+  );
 };
 
 /**
