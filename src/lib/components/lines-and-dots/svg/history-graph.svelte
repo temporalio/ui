@@ -11,27 +11,26 @@
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
   import Line from './line.svelte';
 
-  export let groups: EventGroups;
-  export let history: WorkflowEventWithPending[];
+  interface Props {
+    groups: EventGroups;
+    history: WorkflowEventWithPending[];
+  }
 
-  $: workflowTaskGroups = groupWorkflowTaskEvents(
-    $filteredEventHistory,
-    $eventFilterSort,
+  let { groups, history }: Props = $props();
+
+  const workflowTaskGroups = $derived(
+    groupWorkflowTaskEvents($filteredEventHistory, $eventFilterSort),
   );
-  $: allGroups = [...workflowTaskGroups, ...groups];
+  const allGroups = $derived([...workflowTaskGroups, ...groups]);
 
   const { height, radius } = HistoryConfig;
 
   const nodeBuffer = 4 * radius;
   const maxWidth = 600;
 
-  let canvasWidth = nodeBuffer;
-  let visualWidth = 0;
-
-  $: canvasHeight = history.length * height;
-
-  $: getMaxWidth = (items: WorkflowEventWithPending[]) => {
-    items.forEach((event) => {
+  const canvasWidth = $derived.by(() => {
+    let width = nodeBuffer;
+    history.forEach((event) => {
       const { offset } = getNextDistanceAndOffset(
         history,
         event,
@@ -39,12 +38,13 @@
         height,
         $eventFilterSort,
       );
-      canvasWidth = Math.max(canvasWidth, offset * 1.75 * radius + nodeBuffer);
-      visualWidth = Math.min(canvasWidth - 2 * radius, maxWidth);
+      width = Math.max(width, offset * 1.75 * radius + nodeBuffer);
     });
-  };
+    return width;
+  });
+  const visualWidth = $derived(Math.min(canvasWidth - 2 * radius, maxWidth));
 
-  $: getMaxWidth(history);
+  const canvasHeight = $derived(history.length * height);
 </script>
 
 <div

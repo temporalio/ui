@@ -23,46 +23,52 @@
   import Dot from './dot.svelte';
   import Line from './line.svelte';
 
-  export let event: WorkflowEventWithPending;
-  export let group: EventGroup;
-  export let history: WorkflowEventWithPending[];
-  export let groups: EventGroups;
-  export let index: number;
-  export let canvasWidth: number;
+  interface Props {
+    event: WorkflowEventWithPending;
+    group: EventGroup;
+    history: WorkflowEventWithPending[];
+    groups: EventGroups;
+    index: number;
+    canvasWidth: number;
+  }
+
+  let { event, group, history, groups, index, canvasWidth }: Props = $props();
 
   const { height, radius } = HistoryConfig;
   const strokeWidth = radius / 2;
 
-  $: y = index * height + height / 2;
-  $: ({ nextDistance, offset } = getNextDistanceAndOffset(
-    history,
-    event,
-    groups,
-    height,
-    $eventFilterSort,
-  ));
+  const y = $derived(index * height + height / 2);
+  const distanceAndOffset = $derived(
+    getNextDistanceAndOffset(history, event, groups, height, $eventFilterSort),
+  );
+  const nextDistance = $derived(distanceAndOffset.nextDistance);
+  const offset = $derived(distanceAndOffset.offset);
 
-  $: zoomNextDistance = offset > 0 && nextDistance;
+  const zoomNextDistance = $derived(offset > 0 && nextDistance);
 
-  $: classification =
+  const classification = $derived(
     isPendingActivity(event) || isPendingNexusOperation(event)
       ? 'pending'
-      : event?.classification;
+      : event?.classification,
+  );
 
-  $: horizontalOffset = offset * 1.75 * radius;
-  $: nextIsPending =
-    isEvent(event) && group?.lastEvent.id === event?.id && group?.isPending;
-  $: connectLine =
+  const horizontalOffset = $derived(offset * 1.75 * radius);
+  const nextIsPending = $derived(
+    isEvent(event) && group?.lastEvent.id === event?.id && group?.isPending,
+  );
+  const connectLine = $derived(
     isPendingActivity(event) || isPendingNexusOperation(event) || offset === 0
       ? false
-      : !isMiddleEvent(event, groups);
-  $: category =
+      : !isMiddleEvent(event, groups),
+  );
+  const category = $derived(
     isPendingActivity(event) || isPendingNexusOperation(event)
       ? 'pending'
       : nextIsPending
         ? event?.category
-        : (undefined as EventTypeCategory | 'pending' | undefined);
-  $: reverseSort = $eventFilterSort === 'descending';
+        : (undefined as EventTypeCategory | 'pending' | undefined),
+  );
+  const reverseSort = $derived($eventFilterSort === 'descending');
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer">
