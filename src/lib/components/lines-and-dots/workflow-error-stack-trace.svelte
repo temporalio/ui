@@ -4,7 +4,13 @@
   import { translate } from '$lib/i18n/translate';
   import type { Failure } from '$lib/types';
 
-  export let failure: Failure | undefined = undefined;
+  import Self from './workflow-error-stack-trace.svelte';
+
+  interface Props {
+    failure?: Failure | undefined;
+  }
+
+  let { failure = undefined }: Props = $props();
 </script>
 
 {#if failure}
@@ -42,5 +48,5 @@
   </Accordion>
 {/if}
 {#if failure?.cause}
-  <svelte:self failure={failure.cause} />
+  <Self failure={failure.cause} />
 {/if}

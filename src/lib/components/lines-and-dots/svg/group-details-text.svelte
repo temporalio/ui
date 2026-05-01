@@ -10,15 +10,19 @@
 
   import { DetailsConfig, staticCodeBlockHeight } from '../constants';
 
-  export let key: string;
-  export let value: string | Record<string, unknown>;
-  export let attributes: CombinedAttributes;
-  export let onDecode: (decodedValue: string) => void | undefined = undefined;
+  interface Props {
+    key: string;
+    value: string | Record<string, unknown>;
+    attributes: CombinedAttributes;
+    onDecode?: (decodedValue: string) => void | undefined;
+  }
+
+  let { key, value, attributes, onDecode = undefined }: Props = $props();
 
   const { fontSizeRatio } = DetailsConfig;
 
-  $: codeBlockValue = getCodeBlockValue(value);
-  $: linkType = displayLinkType(key, attributes);
+  const codeBlockValue = $derived(getCodeBlockValue(value));
+  const linkType = $derived(displayLinkType(key, attributes));
 </script>
 
 {#if typeof value === 'object'}
