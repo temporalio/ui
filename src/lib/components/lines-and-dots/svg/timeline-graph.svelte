@@ -59,7 +59,7 @@
 
 <div
   id="event-history-timeline-graph"
-  class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary"
+  class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary [scrollbar-gutter:stable]"
   bind:clientWidth={canvasWidth}
   style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
   on:scroll={handleScroll}
