@@ -24,6 +24,14 @@
     @apply body-normal surface-background relative overscroll-none;
   }
 
+  body[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  body[data-theme='dark'] {
+    color-scheme: dark;
+  }
+
   input[type='search']::-webkit-search-cancel-button {
     @apply hidden;
   }
