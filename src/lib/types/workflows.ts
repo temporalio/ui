@@ -1,5 +1,6 @@
 import type {
   Memo,
+  Payload,
   Payloads,
   PendingWorkflowTaskInfo,
   Priority,
@@ -11,7 +12,6 @@ import type { Callback } from '$lib/types/nexus';
 
 import type { VersioningInfo } from './deployments';
 import type {
-  Payload,
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,

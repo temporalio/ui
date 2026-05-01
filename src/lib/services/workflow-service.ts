@@ -51,8 +51,7 @@ import type {
   WorkflowIdentifier,
 } from '$lib/types/workflows';
 import {
-  decodeEventAttributesForExport,
-  decodeUserMetadata,
+  decodePayloadAndParseDataToJSON,
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
 import {
@@ -837,13 +836,16 @@ export const fetchInitialValuesForStartWorkflow = async ({
     const firstEvent = await fetchInitialEvent(params);
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
-    const convertedAttributes = (await decodeEventAttributesForExport(
-      startEvent?.attributes?.input,
-    )) as PotentiallyDecodable;
+    const decodedInput = await decodePayloadAndParseDataToJSON(
+      startEvent.attributes.input[0],
+      false,
+    ); // only single payloads are supported starting a workflow;
 
     let summary = '';
     if (workflow.summary) {
-      const decodedSummary = await decodeUserMetadata(workflow.summary);
+      const decodedSummary = await decodePayloadAndParseDataToJSON(
+        workflow.summary,
+      );
       if (typeof decodedSummary === 'string') {
         summary = decodedSummary;
       }
@@ -851,24 +853,36 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     let details = '';
     if (workflow.details) {
-      const decodedDetails = await decodeUserMetadata(workflow.details);
+      const decodedDetails = await decodePayloadAndParseDataToJSON(
+        workflow.details,
+      );
       if (typeof decodedDetails === 'string') {
         details = decodedDetails;
       }
     }
-    const input = convertedAttributes?.payloads
-      ? stringifyWithBigInt(convertedAttributes.payloads[0]?.data)
-      : '';
-    const encoding =
-      convertedAttributes?.payloads &&
-      isPayloadInputEncodingType(
-        convertedAttributes.payloads[0]?.metadata?.encoding,
-      )
-        ? convertedAttributes.payloads[0]?.metadata?.encoding
-        : 'json/plain';
-    const messageType = convertedAttributes?.payloads
-      ? convertedAttributes.payloads[0]?.metadata?.messageType
-      : '';
+
+    let input = '';
+    let encoding: PayloadInputEncoding = 'json/plain';
+    let messageType = '';
+
+    if (decodedInput) {
+      if (decodedInput.data) {
+        input = stringifyWithBigInt(decodedInput.data);
+      }
+
+      if (decodedInput.metadata) {
+        if (
+          decodedInput.metadata.encoding &&
+          isPayloadInputEncodingType(decodedInput.metadata.encoding)
+        ) {
+          encoding = decodedInput.metadata.encoding;
+        }
+
+        if (decodedInput.metadata.messageType) {
+          messageType = decodedInput.metadata.messageType;
+        }
+      }
+    }
 
     return {
       input,

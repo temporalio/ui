@@ -4,6 +4,7 @@ import { getDataConverter } from './data-converter';
 import {
   BlockingWorkflow,
   CompletedWorkflow,
+  MultiInputWorkflow,
   type PayloadCoverageResult,
   PayloadCoverageWorkflow,
   RunningWorkflow,
@@ -100,7 +101,17 @@ export const startWorkflows = async (
     },
   });
 
-  workflows.push(wf1, wf2, wf3, wf4, wf5, wf6);
+  const wf7 = await client.workflow.start(MultiInputWorkflow, {
+    taskQueue: 'e2e-1',
+    workflowId: 'multi-payload-workflow',
+    args: [
+      'hello world',
+      { foo: 'bar', baz: true, blue: 42 },
+      ['cats', 'dogs', 'lizards'],
+    ],
+  });
+
+  workflows.push(wf1, wf2, wf3, wf4, wf5, wf6, wf7);
 
   if (config?.waitForResult) {
     return Promise.all(workflows.map((wf) => wf.result()));
