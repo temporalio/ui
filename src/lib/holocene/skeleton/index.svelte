@@ -1,8 +1,7 @@
 <script lang="ts">
   import { twMerge as merge } from 'tailwind-merge';
 
-  let className = '';
-  export { className as class };
+  let { class: className = '' }: { class?: string } = $props();
 </script>
 
 <div

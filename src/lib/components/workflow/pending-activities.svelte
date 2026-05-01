@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
@@ -19,17 +19,19 @@
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  $: ({ workflow } = $workflowRun);
-  $: pendingActivities = workflow?.pendingActivities;
+  const workflow = $derived($workflowRun.workflow);
+  const pendingActivities = $derived(workflow?.pendingActivities);
 
-  $: href = routeForPendingActivities({
-    namespace: $page.params.namespace,
-    workflow: $page.params.workflow,
-    run: $page.params.run,
-  });
+  const href = $derived(
+    routeForPendingActivities({
+      namespace: page.params.namespace,
+      workflow: page.params.workflow,
+      run: page.params.run,
+    }),
+  );
 
-  $: canceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    workflow?.status,
+  const canceled = $derived(
+    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
   );
 </script>
 

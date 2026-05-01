@@ -20,11 +20,12 @@
     { value: 'is not', label: translate('common.is-not-null') },
   ];
 
-  $: selectedOption =
+  const selectedOption = $derived(
     options.find(
       (o) => o.value === $filter.value || o.value === $filter.conditional,
-    ) ?? options[0];
-  $: selectedLabel = selectedOption?.label;
+    ) ?? options[0],
+  );
+  const selectedLabel = $derived(selectedOption?.label);
 </script>
 
 <MenuContainer>

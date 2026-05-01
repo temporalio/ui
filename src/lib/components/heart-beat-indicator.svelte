@@ -2,10 +2,10 @@
   // Heart rate animation
   // https://codepen.io/jupa8712/pen/XmbyXE?js-preprocessor=none
 
-  let text = '';
-  export let delay = 0;
+  const text = '';
+  let { delay = 0 }: { delay?: number } = $props();
 
-  $: cssVarStyles = `--animation-delay:${delay}ms;`;
+  const cssVarStyles = $derived(`--animation-delay:${delay}ms;`);
 </script>
 
 <div class="heart-beat" style={cssVarStyles}>

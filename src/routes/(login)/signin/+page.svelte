@@ -1,7 +1,7 @@
 <script lang="ts">
   import { BROWSER } from 'esm-env';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import type { PageData } from './$types';
 
@@ -11,13 +11,12 @@
   import { routeForAuthentication } from '$lib/utilities/route-for';
   import Logo from '$lib/vendor/logo.svg';
 
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
 
-  let { settings } = data;
-  const error = $page.url.searchParams.get('error');
+  const error = $derived(page.url.searchParams.get('error'));
 </script>
 
-<PageTitle title="Login" url={$page.url.href} />
+<PageTitle title="Login" url={page.url.href} />
 <header class="flex h-16 w-full items-center justify-between bg-primary px-10">
   <img src={Logo} alt="" class="max-h-10" />
   <FeedbackButton />
@@ -35,9 +34,9 @@
         if (BROWSER) {
           window.location.assign(
             routeForAuthentication({
-              settings,
-              searchParams: $page.url.searchParams,
-              originUrl: $page.url.origin,
+              settings: data.settings,
+              searchParams: page.url.searchParams,
+              originUrl: page.url.origin,
             }),
           );
         }
