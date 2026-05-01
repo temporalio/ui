@@ -3,7 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { BatchOperation } from '$lib/types/batch';
 
-  export let operation: BatchOperation;
+  let { operation }: { operation: BatchOperation } = $props();
 </script>
 
 <div class="flex flex-col gap-2">

@@ -2,7 +2,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let error = '';
+  let { error = '' }: { error?: string } = $props();
 </script>
 
 <Alert intent="error">
