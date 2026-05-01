@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
