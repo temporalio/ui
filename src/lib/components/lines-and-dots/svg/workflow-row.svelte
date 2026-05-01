@@ -8,14 +8,18 @@
   import Dot from './dot.svelte';
   import Line from './line.svelte';
 
-  export let workflow: WorkflowExecution;
-  export let length: number;
-  export let y: number;
+  interface Props {
+    workflow: WorkflowExecution;
+    length: number;
+    y: number;
+  }
+
+  let { workflow, length, y }: Props = $props();
 
   const { radius, height, gutter } = TimelineConfig;
 
-  $: start = gutter;
-  $: end = start + length - 2 * gutter;
+  const start = $derived(gutter);
+  const end = $derived(start + length - 2 * gutter);
 </script>
 
 <g role="button" tabindex="0" class="relative cursor-pointer" {height}>

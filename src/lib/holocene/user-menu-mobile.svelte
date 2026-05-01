@@ -3,7 +3,11 @@
   import { translate } from '$lib/i18n/translate';
   import { authUser } from '$lib/stores/auth-user';
 
-  export let logout: () => void;
+  interface Props {
+    logout: () => void;
+  }
+
+  let { logout }: Props = $props();
 </script>
 
 {#if $authUser.accessToken}

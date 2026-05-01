@@ -21,14 +21,29 @@
     | 'Pending'
     | 'Retrying';
 
-  export let delay = 0;
-  export let status: Status = 'Running';
-  export let count: number | undefined = undefined;
-  export let loading = false;
-  export let newCount: number | undefined = undefined;
-  export let big = false;
-  export let delayed = false;
-  export let taskFailure = false;
+  interface Props {
+    delay?: number;
+    status?: Status;
+    count?: number | undefined;
+    loading?: boolean;
+    newCount?: number | undefined;
+    big?: boolean;
+    delayed?: boolean;
+    taskFailure?: boolean;
+    'test-id'?: string;
+  }
+
+  let {
+    delay = 0,
+    status = 'Running',
+    count = undefined,
+    loading = false,
+    newCount = undefined,
+    big = false,
+    delayed = false,
+    taskFailure = false,
+    'test-id': testId,
+  }: Props = $props();
 
   const label: Record<Status, string> = {
     Running: translate('workflows.running'),
@@ -83,11 +98,13 @@
     },
   );
 
-  $: tooltipText = delayed
-    ? translate('workflows.delayed')
-    : taskFailure
-      ? translate('workflows.task-failure')
-      : '';
+  const tooltipText = $derived(
+    delayed
+      ? translate('workflows.delayed')
+      : taskFailure
+        ? translate('workflows.task-failure')
+        : '',
+  );
 </script>
 
 <Tooltip
@@ -101,7 +118,7 @@
       'relative flex items-center gap-0 text-center text-xs leading-4',
       big && 'text-lg',
     )}
-    data-testid={$$props['test-id'] || 'workflow-status'}
+    data-testid={testId || 'workflow-status'}
   >
     <span
       class={merge(

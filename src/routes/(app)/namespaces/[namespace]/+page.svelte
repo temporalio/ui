@@ -18,7 +18,11 @@
   import { temporalVersion, uiVersion } from '$lib/stores/versions';
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 
   enum ArchivalState {
     ARCHIVAL_STATE_UNSPECIFIED = 0,
@@ -47,9 +51,11 @@
     return bool ? translate('common.disabled') : translate('common.enabled');
   };
 
-  $: ({ namespace, clusters } = data);
-  $: pauseEnabled =
-    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause;
+  const namespace = $derived(data.namespace);
+  const clusters = $derived(data.clusters);
+  const pauseEnabled = $derived(
+    !!page.data.namespace.namespaceInfo?.capabilities?.workflowPause,
+  );
 
   onMount(() => {
     $lastUsedNamespace = namespace?.namespaceInfo?.name;
