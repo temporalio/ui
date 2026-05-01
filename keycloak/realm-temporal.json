@@ -1,0 +1,69 @@
+{
+  "realm": "temporal",
+  "displayName": "Temporal",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+
+  "accessTokenLifespan": 5,
+  "ssoSessionIdleTimeout": 30,
+  "ssoSessionMaxLifespan": 30,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanUserAction": 300,
+  "accessCodeLifespanLogin": 1800,
+
+  "clients": [
+    {
+      "clientId": "temporal-ui",
+      "name": "Temporal UI",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "temporal-secret",
+      "redirectUris": ["http://localhost:8083/auth/sso/callback"],
+      "webOrigins": ["http://localhost:8083"],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true,
+      "defaultClientScopes": ["web-origins", "profile", "roles", "email"],
+      "optionalClientScopes": ["address", "phone", "microprofile-jwt"],
+      "attributes": {
+        "use.refresh.tokens": "true"
+      }
+    }
+  ],
+
+  "users": [
+    {
+      "username": "user@example.com",
+      "email": "user@example.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "Default user role"
+      }
+    ]
+  },
+
+  "scopeMappings": [],
+  "clientScopeMappings": {}
+}
