@@ -10,7 +10,7 @@
   let loading = $state(false);
   let abortController: AbortController | null = null;
 
-  let i = $derived(0);
+  let i = $state(0);
 
   interface Props {
     id?: string;
