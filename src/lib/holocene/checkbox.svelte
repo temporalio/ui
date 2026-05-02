@@ -41,7 +41,9 @@
   export { className as class };
 
   let inputElement: HTMLInputElement;
-  $: inputElement !== undefined && (inputElement.indeterminate = indeterminate);
+  $: if (inputElement !== undefined) {
+    inputElement.indeterminate = indeterminate;
+  }
 
   const dispatch = createEventDispatcher<{
     change: { checked: boolean; value?: T };
@@ -67,15 +69,27 @@
   };
 
   $: checked = group !== undefined ? group.includes(value) : checked;
+
+  $: checkIconName = indeterminate
+    ? ('hyphen' as const)
+    : checked
+      ? ('checkmark' as const)
+      : null;
 </script>
 
 <div
-  data-testid={$$restProps['data-testid'] ?? null}
-  on:click|stopPropagation
+  data-testid={$$restProps['data-testid']}
+  on:click|stopPropagation={() => {
+    // applying noop handler because without it on:click handlers get forwarded
+    // to this div element (in addition to the input checkbox element).
+  }}
   on:keypress|stopPropagation
   role="none"
 >
   <Label
+    data-testid={$$restProps['data-testid']
+      ? `${$$restProps['data-testid']}-label`
+      : undefined}
     class={merge(
       [
         'flex',
@@ -144,10 +158,10 @@
         valid ? 'border-secondary' : 'border-danger peer-checked:border-danger',
       )}
     >
-      {#if indeterminate || checked}
+      {#if checkIconName}
         <Icon
           class="absolute left-0 top-0 h-4 w-4"
-          name={indeterminate ? 'hyphen' : checked ? 'checkmark' : null}
+          name={checkIconName}
           strokeWidth={3}
         />
       {/if}

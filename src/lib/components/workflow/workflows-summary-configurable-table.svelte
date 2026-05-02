@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+
+  import { getContext, type Snippet } from 'svelte';
+
+  import { page } from '$app/state';
 
   import TableEmptyState from '$lib/components/workflow/workflows-summary-configurable-table/table-empty-state.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -8,6 +12,10 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    BATCH_OPERATION_CONTEXT,
+    type BatchOperationContext,
+  } from '$lib/pages/workflows-with-new-search.svelte';
   import {
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
@@ -24,73 +32,180 @@
   import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
 
-  export let onClickConfigure: () => void;
+  interface Props {
+    onClickConfigure: () => void;
+    cloud?: Snippet;
+  }
 
-  $: ({ namespace } = $page.params);
-  $: baseColumns = $configurableTableColumns?.[namespace]?.workflows ?? [];
-  $: query = $page.url.searchParams.get('query');
+  let { onClickConfigure, cloud }: Props = $props();
 
-  $: hasVersioningFilter =
-    query?.includes('TemporalWorkerDeploymentVersion') ?? false;
-  $: hasVersioningBehaviorColumn = baseColumns.some(
-    (col) => col.label === 'Versioning Behavior',
+  const { allSelected, selectedWorkflows, selectWorkflows } =
+    getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
+
+  const namespace = $derived(page.params.namespace);
+  const baseColumns = $derived(
+    $configurableTableColumns?.[namespace]?.workflows ?? [],
   );
-  $: columns =
+  const query = $derived(page.url.searchParams.get('query') ?? '');
+
+  const hasVersioningFilter = $derived(
+    query?.includes('TemporalWorkerDeploymentVersion') ?? false,
+  );
+  const hasVersioningBehaviorColumn = $derived(
+    baseColumns.some((col) => col.label === 'Versioning Behavior'),
+  );
+  const columns = $derived(
     hasVersioningFilter && !hasVersioningBehaviorColumn
       ? [...baseColumns, { label: 'Versioning Behavior' }]
-      : baseColumns;
+      : baseColumns,
+  );
 
-  let childrenIds: {
-    workflowId: string;
-    runId: string;
-    children: WorkflowExecution[];
-  }[] = [];
+  const visibleChildrenMap = new SvelteMap<string, WorkflowExecution[]>();
 
-  const clearChildren = () => {
-    childrenIds = [];
-  };
+  $effect(() => {
+    void $refresh;
+    void query;
+    visibleChildrenMap.clear();
+    inFlightChildRequests.clear();
+  });
 
-  $: ($refresh, query, clearChildren());
+  const inFlightChildRequests = new SvelteSet<string>();
+  const toggleChildrenVisibility = async (workflow: WorkflowExecution) => {
+    const visibleChildren = visibleChildrenMap.get(workflow.runId);
 
-  const viewChildren = async (workflow: WorkflowExecution) => {
-    if (childrenActive(workflow)) {
-      childrenIds = childrenIds.filter(
-        (id) => id.workflowId !== workflow.id && id.runId !== workflow.runId,
-      );
-    } else {
+    if (visibleChildren?.length) {
+      // we are collapsing the children so if there is an inflight request
+      // we don't want its resolution to reopen the children.
+      inFlightChildRequests.delete(workflow.runId);
+
+      visibleChildrenMap.delete(workflow.runId);
+      // deselect children when collapsing
+      selectWorkflows(false, visibleChildren);
+
+      // clear prevClickedRow if row is collapsing
+      if (
+        prevClickedRow?.rowType === 'child' &&
+        prevClickedRow.parentRow.value.runId === workflow.runId
+      ) {
+        prevClickedRow = prevClickedRow.parentRow;
+      }
+
+      return;
+    }
+
+    if (inFlightChildRequests.has(workflow.runId)) return;
+
+    inFlightChildRequests.add(workflow.runId);
+    try {
       const children = await fetchAllChildWorkflows(
         namespace,
         workflow.id,
         workflow.runId,
       );
-      childrenIds = [
-        { workflowId: workflow.id, runId: workflow.runId, children },
-        ...childrenIds,
-      ];
+
+      if (inFlightChildRequests.has(workflow.runId)) {
+        visibleChildrenMap.set(workflow.runId, children);
+      }
+    } finally {
+      inFlightChildRequests.delete(workflow.runId);
     }
   };
 
-  $: childrenActive = (workflow: WorkflowExecution) => {
-    return childrenIds.find(
-      (id) => id.workflowId === workflow.id && id.runId === workflow.runId,
-    );
-  };
+  const onFetch = $derived(() => fetchPaginatedWorkflows(namespace, query));
 
-  $: onFetch = () => fetchPaginatedWorkflows(namespace, query);
-
-  $: dense = $tableDensity === 'dense';
+  const dense = $derived($tableDensity === 'dense');
 
   const setTableDensity = () => {
     $tableDensity = dense ? 'comfortable' : 'dense';
     viewFeature('tableDensity');
   };
+
+  let visiblePaginatedItems: WorkflowExecution[] = $state([]);
+
+  type VisibleRow =
+    | {
+        rowType: 'root';
+        childCount: number;
+        value: WorkflowExecution;
+      }
+    | {
+        rowType: 'child';
+        parentRow: Extract<VisibleRow, { rowType: 'root' }>;
+        value: WorkflowExecution;
+      };
+  const visibleRows: VisibleRow[] = $derived.by(() => {
+    return visiblePaginatedItems.flatMap((workflow) => {
+      const visibleChildren = visibleChildrenMap.get(workflow.runId) ?? [];
+
+      const rootRow = {
+        rowType: 'root' as const,
+        childCount: visibleChildren.length,
+        value: workflow,
+      };
+
+      return [
+        rootRow,
+        ...visibleChildren.map((c) => ({
+          rowType: 'child' as const,
+          parentRow: rootRow,
+          value: c,
+        })),
+      ];
+    });
+  });
+
+  let prevClickedRow = $state<VisibleRow | null>(null);
+
+  type PageSelectionStatus = 'checked' | 'unchecked' | 'partial';
+
+  const pageSelectionStatus: PageSelectionStatus = $derived.by(() => {
+    const selectedRunIdSet = new Set($selectedWorkflows.map((w) => w.runId));
+
+    if ($allSelected) {
+      return 'checked';
+    }
+
+    const visibleItemsNotSelected = visiblePaginatedItems.filter(
+      (i) => !selectedRunIdSet.has(i.runId),
+    );
+
+    if (visibleItemsNotSelected.length === visiblePaginatedItems.length) {
+      return 'unchecked';
+    }
+
+    if (visibleItemsNotSelected.length === 0) {
+      return 'checked';
+    }
+
+    return 'partial';
+  });
+
+  const handleSelectPage = (
+    isSelected: boolean,
+    workflows: WorkflowExecution[],
+  ) => {
+    selectWorkflows(isSelected, workflows);
+    prevClickedRow = null;
+
+    if (!isSelected) {
+      allSelected.set(false);
+    }
+  };
+
+  $effect(() => {
+    void visiblePaginatedItems;
+    void $allSelected;
+    prevClickedRow = null;
+  });
 </script>
 
 {#key [namespace, query, $refresh]}
   <PaginatedTable
     total={$workflowCount.count}
     {onFetch}
-    let:visibleItems
+    onItemsChange={(items) => {
+      visiblePaginatedItems = items;
+    }}
     aria-label={translate('common.workflows')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
@@ -103,39 +218,69 @@
     </caption>
     <TableHeaderRow
       columnsCount={columns.length}
-      empty={visibleItems.length === 0}
+      empty={visiblePaginatedItems.length === 0}
       slot="headers"
-      let:visibleItems
-      workflows={visibleItems}
+      workflows={visiblePaginatedItems}
+      {pageSelectionStatus}
+      onSelectPage={handleSelectPage}
     >
-      {#each columns as column}
+      {#each columns as column (column.label)}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
-    {#each visibleItems as workflow (`${workflow.id}:${workflow.runId}`)}
+    {#each visibleRows as row, visibleRowIndex (row.value.runId)}
+      {@const isChildRow = row.rowType === 'child'}
       <TableRow
-        {workflow}
-        {viewChildren}
-        childCount={childrenActive(workflow)?.children.length}
+        workflow={row.value}
+        {toggleChildrenVisibility}
+        childCount={!isChildRow && row.childCount > 0
+          ? row.childCount
+          : undefined}
+        child={isChildRow}
+        onClickBatchSelect={(event) => {
+          // this is required due to how the underlying Checkbox component
+          // gets its onclick type from svelte event forwarding. It does not
+          // know what the current event target type is a checkbox input
+          if (!(event.currentTarget instanceof HTMLInputElement)) {
+            return;
+          }
+
+          const isChecked = event.currentTarget.checked;
+
+          let targetedWorkflows = [row.value];
+
+          const prevClickedRowIndex = visibleRows.findIndex(
+            (r) => r.value.runId === prevClickedRow?.value.runId,
+          );
+
+          if (event.shiftKey && prevClickedRowIndex >= 0) {
+            const rangeStartInclusive = Math.min(
+              prevClickedRowIndex,
+              visibleRowIndex,
+            );
+            const rangeEndInclusive = Math.max(
+              prevClickedRowIndex,
+              visibleRowIndex,
+            );
+
+            // end of the slice range is exclusive, so add 1 to include the full range
+            targetedWorkflows = visibleRows
+              .slice(rangeStartInclusive, rangeEndInclusive + 1)
+              .map((r) => r.value);
+          }
+
+          selectWorkflows(isChecked, targetedWorkflows);
+
+          prevClickedRow = row;
+        }}
       >
-        {#each columns as column}
-          <TableBodyCell {workflow} {column} truncate={dense} />
+        {#each columns as column (column.label)}
+          <TableBodyCell workflow={row.value} {column} truncate={dense} />
         {/each}
       </TableRow>
-      {#if childrenActive(workflow)}
-        {#each childrenActive(workflow).children as child (`${child.id}:${child.runId}`)}
-          <TableRow workflow={child} child>
-            {#each columns as column}
-              <TableBodyCell workflow={child} {column} truncate={dense} />
-            {/each}
-          </TableRow>
-        {/each}
-      {/if}
     {/each}
     <svelte:fragment slot="empty">
-      <TableEmptyState>
-        <slot name="cloud" slot="cloud" />
-      </TableEmptyState>
+      <TableEmptyState {cloud} />
     </svelte:fragment>
     <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
       <Tooltip
