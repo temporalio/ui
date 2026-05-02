@@ -125,7 +125,7 @@
   {@const href = getEventLinkHref(link)}
   {@const value = href.split('workflows/')?.[1] || href}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {translate('nexus.link')}
     </p>
     <Copyable
@@ -141,7 +141,7 @@
 {#snippet eventNamespaceLink(link: ELink)}
   {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {translate('nexus.link-namespace')}
     </p>
     <Copyable
@@ -165,7 +165,7 @@
 
 {#snippet eventSummary(value: Payload)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">Summary</p>
+    <p class="min-w-56 text-sm font-medium text-secondary">Summary</p>
     <p class="whitespace-pre-line">
       <MetadataDecoder
         {value}
@@ -182,7 +182,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
-    <p class="mb-1 min-w-56 text-sm text-secondary/80">
+    <p class="mb-1 min-w-56 text-sm font-medium text-secondary">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -225,7 +225,7 @@
   </div>
   {#if stackTrace}
     <div>
-      <p class="mb-1 min-w-56 text-sm text-secondary/80">
+      <p class="mb-1 min-w-56 text-sm font-medium text-secondary">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock
@@ -241,7 +241,7 @@
 
 {#snippet link(key, value)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {format(key)}
     </p>
     <Copyable
@@ -261,7 +261,7 @@
 
 {#snippet details(key, value)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="min-w-56 text-sm font-medium text-secondary">
       {format(key)}
     </p>
     <p class="whitespace-pre-line break-all">
