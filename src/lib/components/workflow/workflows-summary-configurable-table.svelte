@@ -224,7 +224,7 @@
       {pageSelectionStatus}
       onSelectPage={handleSelectPage}
     >
-      {#each columns as column (column)}
+      {#each columns as column (column.label)}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
@@ -274,7 +274,7 @@
           prevClickedRow = row;
         }}
       >
-        {#each columns as column (column)}
+        {#each columns as column (column.label)}
           <TableBodyCell workflow={row.value} {column} truncate={dense} />
         {/each}
       </TableRow>
