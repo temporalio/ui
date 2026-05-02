@@ -338,6 +338,7 @@ export type SettingsResponse = {
   HideWorkflowQueryErrors: boolean;
   RefreshWorkflowCountsDisabled: boolean;
   ActivityCommandsDisabled: boolean;
+  DisableTrackingPixel: boolean;
   ShowTemporalSystemNamespace: boolean;
   FeedbackURL: string;
   Version: string;

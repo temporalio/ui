@@ -99,6 +99,7 @@ export type Settings = {
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
   activityCommandsDisabled: boolean;
+  disableTrackingPixel: boolean;
   showTemporalSystemNamespace: boolean;
   feedbackURL: string;
   runtimeEnvironment: {
