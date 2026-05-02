@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import {
   mockBatchOperationApis,
@@ -137,6 +137,60 @@ test.describe('Batch and Bulk Workflow Actions', () => {
         .getByTestId('batch-terminate-confirmation')
         .getByTestId('batch-action-workflows-query');
       await expect(terminateQueryValue).toHaveText('WorkflowId="test"');
+    });
+
+    test.describe('shift+click bulk selection', () => {
+      const rowCheckbox = (page: Page, index: number) => {
+        return page
+          .getByTestId('workflows-summary-configurable-table-row')
+          .nth(index)
+          .getByTestId('batch-checkbox-label');
+      };
+
+      test('selects a range of rows from top to bottom', async ({ page }) => {
+        await rowCheckbox(page, 0).click();
+        await rowCheckbox(page, 2).click({ modifiers: ['Shift'] });
+
+        await expect(rowCheckbox(page, 0)).toBeChecked();
+        await expect(rowCheckbox(page, 1)).toBeChecked();
+        await expect(rowCheckbox(page, 2)).toBeChecked();
+      });
+
+      test('selects a range of rows from bottom to top', async ({ page }) => {
+        await rowCheckbox(page, 2).click();
+        await rowCheckbox(page, 0).click({ modifiers: ['Shift'] });
+
+        await expect(rowCheckbox(page, 0)).toBeChecked();
+        await expect(rowCheckbox(page, 1)).toBeChecked();
+        await expect(rowCheckbox(page, 2)).toBeChecked();
+      });
+
+      test('deselects a range of rows with shift+click', async ({ page }) => {
+        await rowCheckbox(page, 0).click();
+        await rowCheckbox(page, 2).click({ modifiers: ['Shift'] });
+
+        await expect(rowCheckbox(page, 0)).toBeChecked();
+        await expect(rowCheckbox(page, 1)).toBeChecked();
+        await expect(rowCheckbox(page, 2)).toBeChecked();
+
+        await rowCheckbox(page, 0).click();
+        await rowCheckbox(page, 2).click({ modifiers: ['Shift'] });
+
+        await expect(rowCheckbox(page, 0)).not.toBeChecked();
+        await expect(rowCheckbox(page, 1)).not.toBeChecked();
+        await expect(rowCheckbox(page, 2)).not.toBeChecked();
+      });
+
+      test('without shift held, click only selects the clicked row', async ({
+        page,
+      }) => {
+        await rowCheckbox(page, 0).click();
+        await rowCheckbox(page, 2).click();
+
+        await expect(rowCheckbox(page, 0)).toBeChecked();
+        await expect(rowCheckbox(page, 1)).not.toBeChecked();
+        await expect(rowCheckbox(page, 2)).toBeChecked();
+      });
     });
   });
 });
