@@ -243,6 +243,13 @@ const temporal = plugin(
 
         danger: css('--color-text-danger'),
       }),
+      fill: ({ theme }) => ({
+        ...theme('colors'),
+
+        secondary: css('--color-surface-secondary'),
+        brand: css('--color-surface-brand'),
+        subtle: css('--color-surface-subtle'),
+      }),
       extend: {
         transitionProperty: {
           width: 'width',

@@ -1,6 +1,7 @@
 <script lang="ts">
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import { routeForStandaloneActivitiesWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
@@ -42,8 +43,8 @@
 </script>
 
 <div class="space-y-2">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex flex-wrap items-center gap-2">
       <ActivityExecutionStatus status={activityExecutionInfo.status} />
       <div class="text-2xl font-medium">
         <Copyable
@@ -113,6 +114,17 @@
         text={activityExecutionInfo.taskQueue}
         href={taskQueueFilterLink}
       />
+    </DetailListColumn>
+    <DetailListColumn>
+      {#if $isCloud}
+        <DetailListLabel>Billable Actions</DetailListLabel>
+        <DetailListTextValue text={String(activityExecutionInfo.attempt)} />
+      {:else}
+        <DetailListLabel>State Transitions</DetailListLabel>
+        <DetailListTextValue
+          text={activityExecutionInfo.stateTransitionCount}
+        />
+      {/if}
     </DetailListColumn>
   </DetailList>
 </div>
