@@ -32,6 +32,7 @@ const isWorkflowTypeStatement = is('WorkflowType');
 const isWorkflowIdStatement = is('WorkflowId');
 const isStartTimeStatement = is('StartTime');
 const isExecutionStatusStatement = is('ExecutionStatus');
+const isActivityIdStatement = is('ActivityId');
 
 export const toListWorkflowParameters = (query: string): ParsedParameters => {
   const tokens = tokenize(query);
@@ -39,7 +40,8 @@ export const toListWorkflowParameters = (query: string): ParsedParameters => {
     workflowId: '',
     workflowType: '',
     executionStatus: null,
-    timeRange: null,
+    timeRange: undefined,
+    activityId: '',
   };
 
   tokens.forEach((token, index) => {
@@ -66,6 +68,9 @@ export const toListWorkflowParameters = (query: string): ParsedParameters => {
         console.error('Error parsing StartTime from query', error);
       }
     }
+
+    if (isActivityIdStatement(token))
+      parameters.activityId = getTwoAhead(tokens, index);
   });
 
   return parameters;

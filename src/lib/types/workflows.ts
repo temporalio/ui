@@ -120,6 +120,7 @@ export type FilterParameters = {
   executionStatus?: WorkflowStatus;
   timeRange?: Duration | string;
   query?: string;
+  activityId?: string;
 };
 
 export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
