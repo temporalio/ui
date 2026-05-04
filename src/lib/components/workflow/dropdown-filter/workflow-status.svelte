@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
@@ -21,8 +21,8 @@
     updateQueryParamsFromFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
 
-  $: statusFilters = $workflowFilters.filter(
-    (f) => f.attribute === 'ExecutionStatus',
+  const statusFilters = $derived(
+    $workflowFilters.filter((f) => f.attribute === 'ExecutionStatus'),
   );
 
   function mapStatusToFilter(value: string): SearchAttributeFilter {
@@ -82,7 +82,7 @@
       }
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, true);
+    updateQueryParamsFromFilter(page.url, $workflowFilters, true);
   };
 </script>
 

@@ -6,13 +6,25 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let title = '';
-  export let content: string;
-  export let copyable = false;
-  export let href: string = null;
-  export let textSize = 'md';
-  export let icon: IconName | undefined = undefined;
-  export let tooltip: string = '';
+  type Props = {
+    title?: string;
+    content: string;
+    copyable?: boolean;
+    href?: string | null;
+    textSize?: string;
+    icon?: IconName | undefined;
+    tooltip?: string;
+  };
+
+  let {
+    title = '',
+    content,
+    copyable = false,
+    href = null,
+    textSize = 'md',
+    icon = undefined,
+    tooltip = '',
+  }: Props = $props();
 </script>
 
 <p class="flex items-center gap-2 text-{textSize} whitespace-nowrap pt-2">

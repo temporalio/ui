@@ -7,13 +7,15 @@
 
   const { namespace, workflowId, runId } = $parameters;
 
-  $: href = routeForEventHistory({
-    namespace,
-    workflow: workflowId,
-    run: runId,
-  });
+  const href = $derived(
+    routeForEventHistory({
+      namespace,
+      workflow: workflowId,
+      run: runId,
+    }),
+  );
 
-  $: jsonHref = href + '.json';
+  const jsonHref = $derived(href + '.json');
 </script>
 
 {#if !$isCloud}

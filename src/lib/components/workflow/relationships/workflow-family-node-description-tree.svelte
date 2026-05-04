@@ -4,12 +4,23 @@
 
   import WorkflowFamilyNodeDescription from './workflow-family-node-description.svelte';
 
-  export let root: RootNode;
-  export let expandAll: boolean;
-  export let onNodeClick: (node: RootNode, generation: number) => void;
-  export let activeWorkflow: WorkflowExecution | undefined = undefined;
-  export let generation = 1;
-  export let openRuns: Map<number, string>;
+  type Props = {
+    root: RootNode;
+    expandAll: boolean;
+    onNodeClick: (node: RootNode, generation: number) => void;
+    activeWorkflow?: WorkflowExecution | undefined;
+    generation?: number;
+    openRuns: Map<number, string>;
+  };
+
+  let {
+    root,
+    expandAll,
+    onNodeClick,
+    activeWorkflow = undefined,
+    generation = 1,
+    openRuns,
+  }: Props = $props();
 </script>
 
 {#each root?.children as child}

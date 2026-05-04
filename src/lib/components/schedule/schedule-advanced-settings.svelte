@@ -7,10 +7,14 @@
 
   import type { SchedulePolicies, ScheduleSpec, ScheduleState } from '$types';
 
-  export let spec: ScheduleSpec;
-  export let state: ScheduleState;
-  export let policies: SchedulePolicies;
-  export let notes = '';
+  type Props = {
+    spec: ScheduleSpec;
+    state: ScheduleState;
+    policies: SchedulePolicies;
+    notes?: string;
+  };
+
+  const { spec, state, policies, notes = '' }: Props = $props();
 </script>
 
 <ScheduleNotes {notes} />

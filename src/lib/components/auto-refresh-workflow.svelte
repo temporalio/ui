@@ -4,9 +4,9 @@
   import { translate } from '$lib/i18n/translate';
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
 
-  export let onChange: () => void;
+  let { onChange }: { onChange: () => void } = $props();
 
-  $: checked = $autoRefreshWorkflow === 'on';
+  const checked = $derived($autoRefreshWorkflow === 'on');
 </script>
 
 <Tooltip
