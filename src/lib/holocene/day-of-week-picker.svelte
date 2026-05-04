@@ -37,7 +37,7 @@
       {@const active = daysOfWeek.includes(value)}
       <Button
         variant="secondary"
-        class={active && 'bg-interactive-secondary-active'}
+        class={active ? 'bg-interactive-secondary-active' : undefined}
         on:click={(e) => onClick(e, value)}
       >
         {label}
@@ -49,7 +49,7 @@
       {@const active = daysOfWeek.includes(value)}
       <Button
         variant="secondary"
-        class={active && 'bg-interactive-secondary-active'}
+        class={active ? 'bg-interactive-secondary-active' : undefined}
         on:click={(e) => onClick(e, value)}
       >
         {label}

@@ -12,7 +12,7 @@
   const error = $derived(page.error);
   const status = $derived.by(() => {
     let resolvedStatus: number = page.status;
-    let requestFromAPIError: Record<string, unknown>;
+    let requestFromAPIError: Record<string, unknown> = {};
 
     try {
       if (error?.message) {
