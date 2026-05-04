@@ -1,13 +1,23 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { isCloud } from '$lib/stores/advanced-visibility';
   import { temporalVersion } from '$lib/stores/versions';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-  export let minimumVersion: string;
+  let {
+    minimumVersion,
+    children,
+    fallback,
+  }: {
+    minimumVersion: string;
+    children?: Snippet;
+    fallback?: Snippet;
+  } = $props();
 </script>
 
 {#if $isCloud || minimumVersionRequired(minimumVersion, $temporalVersion)}
-  <slot />
+  {@render children?.()}
 {:else}
-  <slot name="fallback" />
+  {@render fallback?.()}
 {/if}

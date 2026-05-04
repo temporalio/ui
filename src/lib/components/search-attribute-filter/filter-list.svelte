@@ -3,7 +3,7 @@
 
   import { getContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -24,7 +24,11 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  export let filters: SearchAttributeFilter[];
+  interface Props {
+    filters: SearchAttributeFilter[];
+  }
+
+  let { filters = $bindable() }: Props = $props();
 
   const { filter, activeQueryIndex } =
     getContext<FilterContext>(FILTER_CONTEXT);
@@ -32,7 +36,7 @@
   const removeQuery = (index: number) => {
     filters.splice(index, 1);
     filters = filters;
-    updateQueryParamsFromFilter($page.url, filters);
+    updateQueryParamsFromFilter(page.url, filters);
 
     if (index === filters.length) {
       const previousQuery = filters[filters.length - 1];
@@ -49,10 +53,10 @@
     }
   };
 
-  let totalFiltersInView = 5;
+  let totalFiltersInView = $state(5);
 
-  $: visibleFilters = filters.slice(0, totalFiltersInView);
-  $: hasMoreFilters = totalFiltersInView < filters.length;
+  const visibleFilters = $derived(filters.slice(0, totalFiltersInView));
+  const hasMoreFilters = $derived(totalFiltersInView < filters.length);
 
   const viewMoreFilters = () => {
     if (hasMoreFilters) {

@@ -8,7 +8,11 @@
   import { autoRefresh } from '$lib/stores/batch-operations';
   import type { BatchOperation, BatchOperationState } from '$lib/types/batch';
 
-  export let operation: BatchOperation;
+  interface Props {
+    operation: BatchOperation;
+  }
+
+  let { operation }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     toggleAutoRefresh: { checked: boolean };

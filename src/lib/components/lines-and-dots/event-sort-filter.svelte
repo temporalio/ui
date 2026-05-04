@@ -1,9 +1,9 @@
-<script context="module">
+<script module>
   export const dateParameter = 'time-format';
 </script>
 
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import {
@@ -22,9 +22,13 @@
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  export let compact: boolean;
+  interface Props {
+    compact: boolean;
+  }
 
-  let sortOptions: EventSortOrderOptions = [
+  let { compact }: Props = $props();
+
+  const sortOptions: EventSortOrderOptions = [
     { label: translate('events.sort-ascending'), option: 'ascending' },
     { label: translate('events.sort-descending'), option: 'descending' },
   ];
@@ -34,7 +38,7 @@
     updateQueryParameters({
       parameter: 'sort',
       value: option,
-      url: $page.url,
+      url: page.url,
     });
   };
 
@@ -46,11 +50,13 @@
     }
   };
 
-  $: value = getDateFilterValue({
-    compact,
-    sortOrder: $eventFilterSort,
-    showElapsed: $eventShowElapsed,
-  });
+  const value = $derived(
+    getDateFilterValue({
+      compact,
+      sortOrder: $eventFilterSort,
+      showElapsed: $eventShowElapsed,
+    }),
+  );
 </script>
 
 <MenuContainer>

@@ -10,10 +10,8 @@
 
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  $: ({ value } = $filter);
-  $: _value = value;
-
-  let isValid = true;
+  let _value = $derived($filter.value);
+  let isValid = $state(true);
 
   const handleKeydown = (e: KeyboardEvent) => {
     const newValue = _value.trim();
@@ -24,12 +22,12 @@
     }
   };
 
-  const validateDuration = (event: Event & { target: HTMLInputElement }) => {
-    if (isValidDurationQuery(event.target.value.trim())) {
-      isValid = true;
-    } else {
-      isValid = false;
+  const validateDuration = (event: Event) => {
+    if (!(event.currentTarget instanceof HTMLInputElement)) {
+      return;
     }
+
+    isValid = isValidDurationQuery(event.currentTarget.value.trim());
   };
 </script>
 
