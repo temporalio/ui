@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <div class="row">
   <div class="cell md:table-cell">
     <p></p>
