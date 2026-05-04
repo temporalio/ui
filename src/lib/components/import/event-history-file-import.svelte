@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import { goto } from '$app/navigation';
 
@@ -13,8 +15,9 @@
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';
 
-  let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
-  let fileLoaded = false;
+  let rawEvents: HistoryEvent[] | { events: HistoryEvent[] } | undefined =
+    $state(undefined);
+  let fileLoaded = $state(false);
 
   const onFileSelect = async (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -70,7 +73,7 @@
     class="import-input block border border-slate-200 p-2"
     type="file"
     accept=".json"
-    on:change={onFileSelect}
+    onchange={onFileSelect}
   />
   <Button leadingIcon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
     >{translate('common.import')}</Button

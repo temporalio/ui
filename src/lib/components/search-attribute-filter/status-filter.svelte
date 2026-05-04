@@ -3,7 +3,7 @@
 
   import { getContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
@@ -22,16 +22,22 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  export let filters: SearchAttributeFilter[];
+  interface Props {
+    filters: SearchAttributeFilter[];
+  }
+
+  let { filters = $bindable() }: Props = $props();
 
   const { filter, resetFilter } = getContext<FilterContext>(FILTER_CONTEXT);
   const open = writable(true);
-  $: _filters = [...filters];
-  $: statusFilters = _filters.filter((filter) => isStatusFilter(filter));
+  let _filters: SearchAttributeFilter[] = $derived([...filters]);
+  const statusFilters = $derived(
+    _filters.filter((filter) => isStatusFilter(filter)),
+  );
 
   function apply() {
     filters = _filters;
-    updateQueryParamsFromFilter($page.url, filters);
+    updateQueryParamsFromFilter(page.url, filters);
   }
 
   function mapStatusToFilter(value: string) {

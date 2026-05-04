@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Link from '$lib/holocene/link.svelte';

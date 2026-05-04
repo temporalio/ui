@@ -12,25 +12,25 @@
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = page.params);
-  $: ({ workflow } = $workflowRun);
+  const namespace = $derived(page.params.namespace);
+  const workflowId = $derived(page.params.workflow);
+  const runId = $derived(page.params.run);
+  const workflow = $derived($workflowRun.workflow);
 
-  $: workflowRelationships = getWorkflowRelationships(
-    workflow,
-    $fullEventHistory,
-    page.data.namespace,
+  const workflowRelationships = $derived(
+    getWorkflowRelationships(workflow, $fullEventHistory, page.data.namespace),
   );
 
-  $: ({
-    hasChildren,
-    first,
-    parent,
-    parentNamespaceName,
-    children,
-    next,
-    previous,
-    scheduleId,
-  } = workflowRelationships);
+  const hasChildren = $derived(workflowRelationships.hasChildren);
+  const first = $derived(workflowRelationships.first);
+  const parent = $derived(workflowRelationships.parent);
+  const parentNamespaceName = $derived(
+    workflowRelationships.parentNamespaceName,
+  );
+  const children = $derived(workflowRelationships.children);
+  const next = $derived(workflowRelationships.next);
+  const previous = $derived(workflowRelationships.previous);
+  const scheduleId = $derived(workflowRelationships.scheduleId);
 </script>
 
 <div class="flex flex-col gap-4 px-4 py-4 xl:px-8">

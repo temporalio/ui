@@ -9,10 +9,14 @@
   import { autoRefresh } from '$lib/stores/batch-operations';
   import { routeForBatchOperations } from '$lib/utilities/route-for';
 
-  export let namespace: string;
-  export let jobId: string;
+  interface Props {
+    namespace: string;
+    jobId: string;
+  }
 
-  let fetchKey: number = 0;
+  let { namespace, jobId }: Props = $props();
+
+  let fetchKey = $state(0);
   let timeout: number;
 
   const handleToggleAutoRefresh = (
