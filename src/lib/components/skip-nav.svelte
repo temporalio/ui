@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
