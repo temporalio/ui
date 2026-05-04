@@ -31,7 +31,10 @@ export type ParsedMetadata = { [key: string]: string };
 export type ParsedPayload = {
   data: unknown;
   metadata: ParsedMetadata;
-  externalPayloads?: { sizeBytes: number }[];
+};
+
+export type ParsedExternalPayload = ParsedPayload & {
+  externalPayloads: { sizeBytes: number }[];
 };
 
 /**
@@ -242,9 +245,17 @@ export const isRawPayload = (payload: unknown): payload is Payload => {
   return keys.length >= 2 && keys.includes('metadata') && keys.includes('data');
 };
 
-export const isExternallyStoredRawPayload = (payload: unknown): boolean => {
+export const isParsedPayload = (payload: unknown): payload is ParsedPayload => {
+  if (!isObject(payload)) return false;
+  const keys = Object.keys(payload);
+  return keys.length >= 2 && keys.includes('metadata') && keys.includes('data');
+};
+
+export const isExternallyStoredRawPayload = (
+  payload: unknown,
+): payload is ParsedExternalPayload => {
   return (
-    isRawPayload(payload) &&
+    isParsedPayload(payload) &&
     has(payload.metadata, 'messageType') &&
     payload.metadata.messageType ===
       'temporal.api.sdk.v1.ExternalStorageReference'

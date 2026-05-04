@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import PayloadDecoder from '$lib/components/payload/payload-decoder.svelte';
+  import PayloadDecoder, {
+    type DecodedPayloadResult,
+  } from '$lib/components/payload/payload-decoder.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -35,8 +37,9 @@
   let initialMessageType = $state('');
   let loading = $state(true);
 
-  const setInitialInput = (decodedValue: string[]): void => {
-    initialInput = decodedValue[0];
+  const setInitialInput = (result: DecodedPayloadResult): void => {
+    initialInput = result[0].decodedValue.data;
+
     input = initialInput;
     let currentEncoding: PayloadInputEncoding = 'json/plain';
     let currentMessageType = '';

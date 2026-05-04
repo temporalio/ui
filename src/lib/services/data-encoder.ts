@@ -5,10 +5,9 @@ import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
-import type { Payloads } from '$lib/types';
+import type { Payload, Payloads } from '$lib/types';
 import type { NetworkError } from '$lib/types/global';
 import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
-import type { ParsedPayload } from '$lib/utilities/decode-payload';
 import {
   getCodecEndpoint,
   getCodecIncludeCredentials,
@@ -18,6 +17,10 @@ import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 export type PotentialPayloads = { payloads: unknown[] };
+
+export const NO_CODEC_SERVER_CONFIGURED_ERROR = new Error(
+  'No codec server configured',
+);
 
 export async function codeServerRequest({
   type,
@@ -32,7 +35,7 @@ export async function codeServerRequest({
 
   if (!endpoint) {
     if (type === 'decode') return payloads;
-    throw new Error('No codec endpoint configured');
+    throw NO_CODEC_SERVER_CONFIGURED_ERROR;
   }
 
   const passAccessToken = getCodecPassAccessToken(settings);
@@ -77,7 +80,7 @@ export async function codeServerRequest({
 
   const decoderResponse: Promise<PotentialPayloads> = fetch(url, requestOptions)
     .then((response) => {
-      if (response.ok === false && type !== 'download') {
+      if (response.ok === false) {
         throw {
           statusCode: response.status,
           statusText: response.statusText,
@@ -94,7 +97,9 @@ export async function codeServerRequest({
       return response;
     })
     .catch((err: unknown) => {
-      setLastDataEncoderFailure(err);
+      if (type !== 'download') {
+        setLastDataEncoderFailure(err);
+      }
       if (type === 'decode') {
         return payloads;
       } else {
@@ -122,10 +127,10 @@ export async function encodePayloadsWithCodec({
 }
 
 export async function downloadExternalPayloadWithCodec(
-  payloads: PotentialPayloads,
+  payload: Payload,
 ): Promise<Payloads> {
   return codeServerRequest({
     type: 'download',
-    payloads,
+    payloads: { payloads: [payload] },
   });
 }

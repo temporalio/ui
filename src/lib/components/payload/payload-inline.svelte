@@ -14,8 +14,8 @@
 </script>
 
 <PayloadDecoder {value}>
-  {#snippet children(decodedPayloads)}
-    {@const stringifiedData = stringifyWithBigInt(decodedPayloads[0].data)}
+  {#snippet children(result)}
+    {@const stringifiedData = stringifyWithBigInt(result[0].decodedValue.data)}
     <div
       class="overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs text-primary {className}"
     >
