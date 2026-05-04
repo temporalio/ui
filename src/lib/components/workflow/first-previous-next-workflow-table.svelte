@@ -7,12 +7,15 @@
   import { translate } from '$lib/i18n/translate';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  export let workflow: string;
-  export let namespace: string;
+  interface Props {
+    workflow: string;
+    namespace: string;
+    first: string;
+    next: string;
+    previous: string;
+  }
 
-  export let first: string;
-  export let next: string;
-  export let previous: string;
+  let { workflow, namespace, first, next, previous }: Props = $props();
 </script>
 
 <Table class="w-full">
