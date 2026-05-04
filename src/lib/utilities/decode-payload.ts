@@ -33,6 +33,10 @@ export type ParsedPayload = {
   metadata: ParsedMetadata;
 };
 
+export type ParsedExternalPayload = ParsedPayload & {
+  externalPayloads: { sizeBytes: number }[];
+};
+
 /**
  * Decoding TL;DR
  * Decoding includes either 1 or 2 phases - "parse" and "decode"
@@ -113,6 +117,7 @@ export function parseRawPayloadToJSON(
     return {
       metadata,
       data,
+      externalPayloads: payload.externalPayloads ?? [],
     };
   } catch (_e) {
     console.warn('Could not parse payload: ', _e);
@@ -237,8 +242,23 @@ const keyIs = (key: string, ...validKeys: string[]) => {
 export const isRawPayload = (payload: unknown): payload is Payload => {
   if (!isObject(payload)) return false;
   const keys = Object.keys(payload);
+  return keys.length >= 2 && keys.includes('metadata') && keys.includes('data');
+};
+
+export const isParsedPayload = (payload: unknown): payload is ParsedPayload => {
+  if (!isObject(payload)) return false;
+  const keys = Object.keys(payload);
+  return keys.length >= 2 && keys.includes('metadata') && keys.includes('data');
+};
+
+export const isExternallyStoredRawPayload = (
+  payload: unknown,
+): payload is ParsedExternalPayload => {
   return (
-    keys.length === 2 && keys.includes('metadata') && keys.includes('data')
+    isParsedPayload(payload) &&
+    has(payload.metadata, 'messageType') &&
+    payload.metadata.messageType ===
+      'temporal.api.sdk.v1.ExternalStorageReference'
   );
 };
 
@@ -275,17 +295,27 @@ export async function decodePayloadAndParseDataToJSON(
   return parseRawPayloadToJSON(decoded[0], returnDataOnly);
 }
 
-export const decodePayloadsAndParseDataToJSON = async (
+export async function decodePayloadsAndParseDataToJSON(
+  payload: Payloads,
+): Promise<unknown[]>;
+export async function decodePayloadsAndParseDataToJSON(
+  payload: Payloads,
+  returnDataOnly: false,
+): Promise<ParsedPayload[]>;
+export async function decodePayloadsAndParseDataToJSON(
   payloads: Payloads | null | undefined,
-): Promise<unknown[]> => {
+  returnDataOnly: boolean = true,
+): Promise<unknown[]> {
   const decoded = await decodePayloadsWithRemoteCodec(payloads.payloads);
 
   if (!decoded || !decoded[0]) {
     return [null];
   }
 
-  return decoded.map((payload) => parseRawPayloadToJSON(payload));
-};
+  return decoded.map((payload) =>
+    parseRawPayloadToJSON(payload, returnDataOnly),
+  );
+}
 
 /**
  * Phase 2 internal implementation shared by {@link decodeEventAttributes} and

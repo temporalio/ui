@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PotentiallyDecodable } from '$lib/utilities/decode-payload';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import PayloadDecoder from './payload-decoder.svelte';
 
@@ -13,12 +14,13 @@
 </script>
 
 <PayloadDecoder {value}>
-  {#snippet children(decodedValue)}
+  {#snippet children(result)}
+    {@const stringifiedData = stringifyWithBigInt(result[0].decodedValue.data)}
     <div
       class="overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs text-primary {className}"
     >
       <code>
-        <pre class="truncate">{decodedValue.slice(0, truncateAt)}</pre>
+        <pre class="truncate">{stringifiedData.slice(0, truncateAt)}</pre>
       </code>
     </div>
   {/snippet}
