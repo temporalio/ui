@@ -15,9 +15,13 @@
 
   import type { ScheduleActionResult } from '$types';
 
-  export let recentRuns: ScheduleActionResult[] = [];
-  export let namespace: string;
-  export let workflowQuery: string;
+  type Props = {
+    recentRuns?: ScheduleActionResult[];
+    namespace: string;
+    workflowQuery: string;
+  };
+
+  let { recentRuns = [], namespace, workflowQuery }: Props = $props();
 
   const sortRecentRuns = (recentRuns: ScheduleActionResult[]) => {
     return (

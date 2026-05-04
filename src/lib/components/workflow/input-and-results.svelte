@@ -6,10 +6,12 @@
 
   import InputAndResultsPayload from './input-and-results-payload.svelte';
 
-  $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
-  $: isPending =
-    $workflowRun.workflow.isRunning || $workflowRun.workflow.isPaused;
+  const workflowEvents = $derived(
+    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory),
+  );
+  const isPending = $derived(
+    $workflowRun.workflow.isRunning || $workflowRun.workflow.isPaused,
+  );
 </script>
 
 <div class="flex flex-col gap-4 lg:flex-row" data-testid="input-and-result">

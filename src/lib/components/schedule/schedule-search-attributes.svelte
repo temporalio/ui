@@ -6,12 +6,15 @@
   import { payloadToString } from '$lib/utilities/payload-to-string';
   import { pluralize } from '$lib/utilities/pluralize';
 
-  export let searchAttributes: SearchAttribute;
+  let { searchAttributes }: { searchAttributes: SearchAttribute } = $props();
 
-  $: decodedSearchAttributes = parsePayloadAttributes({ searchAttributes });
-  $: indexedFields =
-    decodedSearchAttributes?.searchAttributes.indexedFields ?? {};
-  $: searchAttributeCount = Object.keys(indexedFields).length;
+  const decodedSearchAttributes = $derived(
+    parsePayloadAttributes({ searchAttributes }),
+  );
+  const indexedFields = $derived(
+    decodedSearchAttributes?.searchAttributes.indexedFields ?? {},
+  );
+  const searchAttributeCount = $derived(Object.keys(indexedFields).length);
 </script>
 
 <Accordion

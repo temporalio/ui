@@ -5,7 +5,7 @@
 
   import MetadataDecoder from './metadata-decoder.svelte';
 
-  export let value: Payload;
+  let { value }: { value: Payload } = $props();
 </script>
 
 <div class="block w-full select-all px-2 py-1 text-left">

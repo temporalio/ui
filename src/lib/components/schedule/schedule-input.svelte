@@ -5,7 +5,7 @@
   import type { Payloads } from '$lib/types';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export let input: Payloads;
+  let { input }: { input: Payloads } = $props();
 </script>
 
 <Panel>

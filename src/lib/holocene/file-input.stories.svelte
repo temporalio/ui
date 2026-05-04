@@ -12,7 +12,7 @@
       id: { control: 'text' },
       accept: { control: 'text' },
     },
-  } satisfies Meta<FileInput>;
+  } satisfies Meta<typeof FileInput>;
 </script>
 
 <script lang="ts">
