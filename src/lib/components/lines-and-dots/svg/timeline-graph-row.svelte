@@ -143,11 +143,11 @@
   const activityTaskScheduled = $derived(
     group.eventList.find(isActivityTaskStartedEvent),
   );
-  const retried = $derived(
-    activityTaskScheduled &&
-      activityTaskScheduled.attributes?.attempt &&
-      activityTaskScheduled.attributes.attempt > 1,
+
+  const retryAttempt = $derived(
+    activityTaskScheduled?.attributes?.attempt ?? 0,
   );
+  const retried = $derived(retryAttempt > 1);
   const pendingLine = $derived(group.isPending || !!pauseTime);
 
   const multiEventHoverWidth = $derived(
@@ -283,7 +283,7 @@
               {'• '}
               {decodedValue}
             {:else if retried}
-              {activityTaskScheduled.attributes.attempt} • {decodedValue}
+              {retryAttempt} • {decodedValue}
             {:else if decodedLocalActivity}
               {decodedLocalActivity.value}
             {:else}
