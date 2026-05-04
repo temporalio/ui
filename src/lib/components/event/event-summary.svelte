@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import TabButton from '$lib/holocene/tab-buttons/tab-button.svelte';
@@ -16,29 +16,40 @@
   } from '$lib/types/events';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
-  export let history: IterableEventWithPending[];
-  export let groups: EventGroups;
-  export let minimized = true;
+  let {
+    history,
+    groups,
+    minimized = true,
+  }: {
+    history: IterableEventWithPending[];
+    groups: EventGroups;
+    minimized?: boolean;
+  } = $props();
 
-  $: ({ workflow } = $workflowRun);
-  $: reverseSort = $eventFilterSort === 'descending';
-  $: updating = !$fullEventHistory.length;
-  $: compact = $eventViewType === 'compact';
+  const workflow = $derived($workflowRun.workflow);
+  const reverseSort = $derived($eventFilterSort === 'descending');
+  const updating = $derived(!$fullEventHistory.length);
+  const compact = $derived($eventViewType === 'compact');
 
-  $: $eventCategoryFilter = $page.url?.searchParams?.get('category')
-    ? ($page.url?.searchParams
-        ?.get('category')
-        .split(',') as EventTypeCategory[])
-    : undefined;
+  $effect(() => {
+    const category = page.url?.searchParams?.get('category');
+    $eventCategoryFilter = category
+      ? (category.split(',') as EventTypeCategory[])
+      : undefined;
+  });
 
-  $: pendingActivities = workflow.pendingActivities;
-  $: pendingNexusOperations = workflow.pendingNexusOperations;
+  const pendingActivities = $derived(workflow?.pendingActivities ?? []);
+  const pendingNexusOperations = $derived(
+    workflow?.pendingNexusOperations ?? [],
+  );
 
-  $: items = compact
-    ? orderGroupsByPending(groups, reverseSort)
-    : reverseSort
-      ? [...pendingNexusOperations, ...pendingActivities, ...history]
-      : [...history, ...pendingActivities, ...pendingNexusOperations];
+  const items = $derived(
+    compact
+      ? orderGroupsByPending(groups, reverseSort)
+      : reverseSort
+        ? [...pendingNexusOperations, ...pendingActivities, ...history]
+        : [...history, ...pendingActivities, ...pendingNexusOperations],
+  );
 
   const onAllClick = () => {
     $eventViewType = 'feed';

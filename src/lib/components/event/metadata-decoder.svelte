@@ -1,11 +1,22 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import type { Payload } from '$lib/types';
   import { decodeUserMetadata } from '$lib/utilities/decode-payload';
 
-  export let value: Payload | undefined = undefined;
-  export let fallback: string = '';
-  export let prefix: string = '';
-  export let onDecode: (decodedValue: string) => void | undefined = undefined;
+  let {
+    value,
+    fallback = '',
+    prefix = '',
+    onDecode,
+    children,
+  }: {
+    value?: Payload;
+    fallback?: string;
+    prefix?: string;
+    onDecode?: (decodedValue: string) => void;
+    children?: Snippet<[string]>;
+  } = $props();
 
   const maxLength = 120;
 
@@ -20,7 +31,7 @@
     return metadata;
   };
 
-  $: decodePayload = async (_value: Payload | undefined) => {
+  const decodePayload = $derived(async (_value: Payload | undefined) => {
     if (!_value) return fallback;
     if (decodedValue) return decodedValue;
 
@@ -28,19 +39,17 @@
 
     if (typeof metadata === 'string') {
       decodedValue = setPrefix(metadata);
-      if (onDecode) {
-        onDecode(decodedValue);
-      }
+      onDecode?.(decodedValue);
       return decodedValue;
     }
 
     decodedValue = fallback;
     return fallback;
-  };
+  });
 </script>
 
 {#await decodePayload(value) then metadata}
-  <slot decodedValue={metadata} />
+  {@render children?.(metadata)}
 {:catch}
-  <slot decodedValue={fallback} />
+  {@render children?.(fallback)}
 {/await}

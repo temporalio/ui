@@ -167,12 +167,10 @@
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">Summary</p>
     <p class="whitespace-pre-line">
-      <MetadataDecoder
-        {value}
-        let:decodedValue
-        fallback={translate('events.decode-failed')}
-      >
-        {decodedValue}
+      <MetadataDecoder {value} fallback={translate('events.decode-failed')}>
+        {#snippet children(decodedValue)}
+          {decodedValue}
+        {/snippet}
       </MetadataDecoder>
     </p>
   </div>
