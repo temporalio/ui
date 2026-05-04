@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
   import { monthNames } from '$lib/utilities/calendar';
