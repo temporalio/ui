@@ -7,8 +7,12 @@
   import { translate } from '$lib/i18n/translate';
   import { routeForSchedule } from '$lib/utilities/route-for';
 
-  export let scheduleId: string;
-  export let namespace: string;
+  interface Props {
+    scheduleId: string;
+    namespace: string;
+  }
+
+  let { scheduleId, namespace }: Props = $props();
 </script>
 
 <Table class="w-full">

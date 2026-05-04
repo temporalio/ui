@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Link from '$lib/holocene/link.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -12,9 +12,13 @@
 
   import WorkflowStatus from '../workflow-status.svelte';
 
-  export let children: WorkflowExecution[] = [];
+  interface Props {
+    children?: WorkflowExecution[];
+  }
 
-  $: ({ namespace } = $page.params);
+  let { children = [] }: Props = $props();
+
+  const namespace = $derived(page.params.namespace);
 </script>
 
 <Pagination
