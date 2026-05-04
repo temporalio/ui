@@ -1,5 +1,3 @@
-import * as temporalProto from '@temporalio/proto';
-
 import { decodePayloadsWithCodec as callCodecEndpoint } from '$lib/services/data-encoder';
 import type { DownloadEventHistorySetting } from '$lib/stores/events';
 import type { Memo, Payload, Payloads } from '$lib/types';
@@ -7,67 +5,13 @@ import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
 import type { Optional, Replace } from '$lib/types/global';
 
 import { atob } from './atob';
+import {
+  decodeBinaryProtobuf,
+  recursivelyDecodeNestedPayloads,
+} from './decode-binary-protobuf';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
-
-type ProtobufType = {
-  decode: (bytes: Uint8Array) => unknown;
-  toObject: (
-    msg: unknown,
-    opts?: Record<string, unknown>,
-  ) => Record<string, unknown>;
-};
-
-const lookupTemporalProtoType = (fqn: string): ProtobufType | null => {
-  const parts = fqn.split('.');
-  let cur: unknown = temporalProto;
-  for (const part of parts) {
-    if (!cur || typeof cur !== 'object') return null;
-    cur = (cur as Record<string, unknown>)[part];
-  }
-  if (
-    cur &&
-    typeof (cur as ProtobufType).decode === 'function' &&
-    typeof (cur as ProtobufType).toObject === 'function'
-  ) {
-    return cur as ProtobufType;
-  }
-  return null;
-};
-
-const base64ToUint8Array = (b64: string): Uint8Array => {
-  // The local `./atob` does UTF-8 decoding via decodeURIComponent — fine for
-  // JSON text, fatal for raw protobuf bytes. Use the raw browser atob here.
-  const binary =
-    typeof globalThis.atob === 'function'
-      ? globalThis.atob(b64)
-      : Buffer.from(b64, 'base64').toString('binary');
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
-};
-
-const looksLikeRawPayload = (n: unknown): boolean => {
-  if (!n || typeof n !== 'object' || Array.isArray(n)) return false;
-  const obj = n as Record<string, unknown>;
-  return 'metadata' in obj && 'data' in obj && isObject(obj.metadata);
-};
-
-const recursivelyDecodeNestedPayloads = (node: unknown): unknown => {
-  if (Array.isArray(node)) return node.map(recursivelyDecodeNestedPayloads);
-  if (!node || typeof node !== 'object') return node;
-  if (looksLikeRawPayload(node)) {
-    const decoded = parseRawPayloadToJSON(node as Payload, true);
-    if (decoded === node) return node;
-    return recursivelyDecodeNestedPayloads(decoded);
-  }
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(node as Record<string, unknown>)) {
-    out[k] = recursivelyDecodeNestedPayloads(v);
-  }
-  return out;
-};
 
 export type PotentiallyDecodable =
   | Payload
@@ -166,36 +110,19 @@ export function parseRawPayloadToJSON(
     return payload;
   }
 
-  const rawEncoding = atob(String(payload?.metadata?.encoding ?? ''));
-  const rawMessageType = atob(String(payload?.metadata?.messageType ?? ''));
-
-  if (rawEncoding === 'binary/protobuf' && rawMessageType) {
-    const T = lookupTemporalProtoType(rawMessageType);
-    if (T) {
-      try {
-        const bytes = base64ToUint8Array(String(payload?.data ?? ''));
-        const raw = T.toObject(T.decode(bytes), {
-          longs: String,
-          enums: String,
-          bytes: String,
-          defaults: false,
-        });
-        const data = recursivelyDecodeNestedPayloads(raw);
-        if (returnDataOnly) return data;
-        return {
-          metadata: {
-            ...parseBase64ObjectValues(payload?.metadata),
-            encoding: 'json/plain',
-          },
-          data,
-        };
-      } catch (e) {
-        console.warn(
-          `Could not decode binary/protobuf payload (${rawMessageType}):`,
-          e,
-        );
-      }
-    }
+  const decoded = decodeBinaryProtobuf(payload);
+  if (decoded) {
+    const data = recursivelyDecodeNestedPayloads(decoded.data, (p) =>
+      parseRawPayloadToJSON(p, true),
+    );
+    if (returnDataOnly) return data;
+    return {
+      metadata: {
+        ...parseBase64ObjectValues(payload?.metadata),
+        encoding: 'json/plain',
+      },
+      data,
+    };
   }
 
   try {
