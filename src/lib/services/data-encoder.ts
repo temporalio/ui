@@ -18,12 +18,28 @@ import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 export type PotentialPayloads = { payloads: unknown[] };
 
+const delay = (ms: number, signal?: AbortSignal): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(signal.reason);
+      return;
+    }
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(signal.reason);
+    });
+  });
+};
+
 export async function codeServerRequest({
   type,
   payloads,
+  signal,
 }: {
   type: 'decode' | 'encode';
   payloads: PotentialPayloads;
+  signal?: AbortSignal;
 }): Promise<Payloads> {
   const settings = page.data.settings;
   const namespace = page.params.namespace;
@@ -37,7 +53,7 @@ export async function codeServerRequest({
   const passAccessToken = getCodecPassAccessToken(settings);
   const includeCredentials = getCodecIncludeCredentials(settings);
 
-  const headers = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'X-Namespace': namespace,
   };
@@ -64,44 +80,70 @@ export async function codeServerRequest({
         credentials: 'include' as RequestCredentials,
         method: 'POST',
         body: stringifyWithBigInt(payloads),
+        signal,
       }
     : {
         headers,
         method: 'POST',
         body: stringifyWithBigInt(payloads),
+        signal,
       };
 
-  const decoderResponse: Promise<PotentialPayloads> = fetch(
-    endpoint + `/${type}`,
-    requestOptions,
-  )
-    .then((response) => {
+  const delays = [0, 500, 1000];
+  let lastErr: unknown;
+
+  for (let attempt = 0; attempt < delays.length; attempt++) {
+    if (attempt > 0) {
+      try {
+        await delay(delays[attempt], signal);
+      } catch {
+        break;
+      }
+    }
+    if (signal?.aborted) break;
+
+    try {
+      const response = await fetch(endpoint + `/${type}`, requestOptions);
+
       if (response.ok === false) {
-        throw {
+        const err = {
           statusCode: response.status,
           statusText: response.statusText,
           response,
           message: translate(`common.${type}-failed`),
         } as NetworkError;
-      } else {
-        return response.json();
-      }
-    })
-    .then((response) => {
-      setLastDataEncoderSuccess();
 
-      return response;
-    })
-    .catch((err: unknown) => {
-      setLastDataEncoderFailure(err);
-      if (type === 'decode') {
-        return payloads;
-      } else {
+        if (response.status >= 400 && response.status < 500) {
+          setLastDataEncoderFailure(err);
+          if (type === 'decode') return payloads;
+          throw err;
+        }
+
+        lastErr = err;
+        continue;
+      }
+
+      const data = await response.json();
+      setLastDataEncoderSuccess();
+      return data;
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'statusCode' in err &&
+        (err as { statusCode: number }).statusCode >= 400 &&
+        (err as { statusCode: number }).statusCode < 500
+      ) {
         throw err;
       }
-    });
+      if (signal?.aborted) break;
+      lastErr = err;
+    }
+  }
 
-  return decoderResponse;
+  setLastDataEncoderFailure(lastErr);
+  if (type === 'decode') return payloads;
+  throw lastErr;
 }
 
 export async function decodePayloadsWithCodec({
