@@ -143,9 +143,11 @@
   const activityTaskScheduled = $derived(
     group.eventList.find(isActivityTaskStartedEvent),
   );
-  const retried = $derived(
-    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1,
+
+  const retryAttempt = $derived(
+    activityTaskScheduled?.attributes?.attempt ?? 0,
   );
+  const retried = $derived(retryAttempt > 1);
   const pendingLine = $derived(group.isPending || !!pauseTime);
 
   const multiEventHoverWidth = $derived(
@@ -262,31 +264,33 @@
         fallback={decodedLocalActivity
           ? translate('events.category.local-activity')
           : group?.displayName}
-        let:decodedValue
       >
-        <Text
-          point={textPosition}
-          {textAnchor}
-          {backdrop}
-          backdropHeight={radius * 2}
-          config={TimelineConfig}
-          icon={(pendingActivity && !pendingActivity.paused) || retried
-            ? 'retry'
-            : undefined}
-        >
-          {#if pendingActivity}
-            {translate('workflows.attempt')}
-            {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
-            {'• '}
-            {decodedValue}
-          {:else if retried}
-            {activityTaskScheduled.attributes.attempt} • {decodedValue}
-          {:else if decodedLocalActivity}
-            {decodedLocalActivity.value}
-          {:else}
-            {decodedValue}
-          {/if}
-        </Text>
+        {#snippet children(decodedValue)}
+          <Text
+            point={textPosition}
+            {textAnchor}
+            {backdrop}
+            backdropHeight={radius * 2}
+            config={TimelineConfig}
+            icon={(pendingActivity && !pendingActivity.paused) || retried
+              ? 'retry'
+              : undefined}
+          >
+            {#if pendingActivity}
+              {translate('workflows.attempt')}
+              {pendingActivity.attempt} / {pendingActivity.maximumAttempts ||
+                '∞'}
+              {'• '}
+              {decodedValue}
+            {:else if retried}
+              {retryAttempt} • {decodedValue}
+            {:else if decodedLocalActivity}
+              {decodedLocalActivity.value}
+            {:else}
+              {decodedValue}
+            {/if}
+          </Text>
+        {/snippet}
       </MetadataDecoder>
     {/if}
     <Dot

@@ -327,20 +327,19 @@
         <EventDetailsRow {...primaryLocalAttribute} {attributes} />
       {/if}
       {#if currentEvent?.userMetadata?.summary}
-        <MetadataDecoder
-          value={currentEvent.userMetadata.summary}
-          let:decodedValue
-        >
-          {#if decodedValue}
-            <div
-              class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
-            >
-              <p class="whitespace-nowrap text-right text-xs">Summary</p>
-              <Badge type="secondary" class="block select-none truncate">
-                {decodedValue}
-              </Badge>
-            </div>
-          {/if}
+        <MetadataDecoder value={currentEvent.userMetadata.summary}>
+          {#snippet children(decodedValue)}
+            {#if decodedValue}
+              <div
+                class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
+              >
+                <p class="whitespace-nowrap text-right text-xs">Summary</p>
+                <Badge type="secondary" class="block select-none truncate">
+                  {decodedValue}
+                </Badge>
+              </div>
+            {/if}
+          {/snippet}
         </MetadataDecoder>
       {/if}
       {#if currentEvent?.links?.length}
