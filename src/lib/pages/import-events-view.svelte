@@ -1,10 +1,14 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { routeForEventHistoryImport } from '$lib/utilities/route-for';
+
+  let { children }: { children?: Snippet } = $props();
 </script>
 
 <section id="event-history">
@@ -43,5 +47,5 @@
       </ToggleButtons>
     </div>
   </nav>
-  <slot />
+  {@render children?.()}
 </section>
