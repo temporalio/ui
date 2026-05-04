@@ -13,13 +13,9 @@
     }
   };
 
-  let variant: 'primary' | 'ghost' = 'ghost';
-
-  const updateVariant = (open: boolean) => {
-    variant = open ? 'primary' : 'ghost';
-  };
-
-  $: updateVariant($viewDataEncoderSettings);
+  const variant = $derived<'primary' | 'ghost'>(
+    $viewDataEncoderSettings ? 'primary' : 'ghost',
+  );
 </script>
 
 <div class="mx-1 flex items-center">

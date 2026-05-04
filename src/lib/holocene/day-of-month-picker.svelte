@@ -1,9 +1,13 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
 
-  const daysInMonth = Array.from({ length: 31 }).map((_, i) => i + 1);
+  interface Props {
+    daysOfMonth: number[];
+  }
 
-  export let daysOfMonth: number[];
+  let { daysOfMonth = $bindable() }: Props = $props();
+
+  const daysInMonth = Array.from({ length: 31 }).map((_, i) => i + 1);
 
   const onClick = (e: MouseEvent, day: number) => {
     if (e.metaKey) {
@@ -21,7 +25,7 @@
 <div
   class="surface-primary grid place-items-center gap-1 rounded border border-subtle px-0 py-4 text-center sm:gap-4 md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
 >
-  {#each daysInMonth as day}
+  {#each daysInMonth as day (day)}
     {@const active = daysOfMonth.includes(day)}
     <Button
       variant="secondary"

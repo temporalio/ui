@@ -13,11 +13,21 @@
 
   import OrderableList from './orderable-list.svelte';
 
-  export let availableColumns: Readable<ConfigurableTableHeader[]>;
-  export let open: boolean;
-  export let table: ConfigurableTableType = TABLE_TYPE.WORKFLOWS;
-  export let type: string;
-  export let title: string;
+  interface Props {
+    availableColumns: Readable<ConfigurableTableHeader[]>;
+    open: boolean;
+    table?: ConfigurableTableType;
+    type: string;
+    title: string;
+  }
+
+  let {
+    availableColumns,
+    open = $bindable(),
+    table = TABLE_TYPE.WORKFLOWS,
+    type,
+    title,
+  }: Props = $props();
 
   const closeCustomizationDrawer = () => {
     open = false;
