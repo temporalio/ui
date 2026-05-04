@@ -1,3 +1,8 @@
+<script module lang="ts">
+  type Option = { label: string; value: string; icon?: IconName };
+  export type MultiSelectOptions = Option[];
+</script>
+
 <script lang="ts">
   import { writable } from 'svelte/store';
 
@@ -13,9 +18,6 @@
   import type { ButtonStyles } from '../button.svelte';
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
-
-  type Option = { label: string; value: string; icon?: IconName };
-  type MultiSelectOptions = Option[];
 
   export let options: MultiSelectOptions = [];
   export let initialSelected: MultiSelectOptions = [];
