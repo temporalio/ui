@@ -5,6 +5,10 @@ import type { EventAttribute, WorkflowEvent } from '$lib/types/events';
 import type { Optional, Replace } from '$lib/types/global';
 
 import { atob } from './atob';
+import {
+  decodeBinaryProtobuf,
+  recursivelyDecodeNestedPayloads,
+} from './decode-binary-protobuf';
 import { has } from './has';
 import { isObject } from './is';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -104,6 +108,21 @@ export function parseRawPayloadToJSON(
 ): unknown | Payload | null {
   if (payload === null) {
     return payload;
+  }
+
+  const decoded = decodeBinaryProtobuf(payload);
+  if (decoded) {
+    const data = recursivelyDecodeNestedPayloads(decoded.data, (p) =>
+      parseRawPayloadToJSON(p, true),
+    );
+    if (returnDataOnly) return data;
+    return {
+      metadata: {
+        ...parseBase64ObjectValues(payload?.metadata),
+        encoding: 'json/plain',
+      },
+      data,
+    };
   }
 
   try {

@@ -12,29 +12,6 @@
   } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export const decodePayloadValue = async (
-    value: PotentiallyDecodable | PayloadContainingObject,
-  ): Promise<string[]> => {
-    if (isRawPayload(value)) {
-      const decodedPayloadData = await decodePayloadAndParseDataToJSON(value);
-      const stringified = stringifyWithBigInt(decodedPayloadData);
-      onDecode?.([stringified]);
-      return [stringified];
-    } else if (isRawPayloads(value)) {
-      const parsedPayloadsData = await decodePayloadsAndParseDataToJSON(value);
-      const stringified = parsedPayloadsData.map((data) =>
-        stringifyWithBigInt(data),
-      );
-      onDecode?.(stringified);
-      return stringified;
-    } else {
-      const decoded = await decodeEventAttributes(value);
-      const stringified = stringifyWithBigInt(decoded);
-      onDecode?.([stringified]);
-      return [stringified];
-    }
-  };
-
   interface Props {
     value: PotentiallyDecodable | PayloadContainingObject;
     onDecode?: (decodedPayloads: string[]) => void;
@@ -43,10 +20,51 @@
   }
 
   let { value, onDecode, children, loading }: Props = $props();
+
+  let decodedValue = $state<string[]>([]);
+  let isDecoding = $state(true);
+
+  $effect(() => {
+    const controller = new AbortController();
+    isDecoding = true;
+
+    (async () => {
+      try {
+        let result: string[];
+        if (isRawPayload(value)) {
+          const decodedPayloadData =
+            await decodePayloadAndParseDataToJSON(value);
+          if (controller.signal.aborted) return;
+          result = [stringifyWithBigInt(decodedPayloadData)];
+        } else if (isRawPayloads(value)) {
+          const parsedPayloadsData =
+            await decodePayloadsAndParseDataToJSON(value);
+          if (controller.signal.aborted) return;
+          result = parsedPayloadsData.map((data) => stringifyWithBigInt(data));
+        } else {
+          const decoded = await decodeEventAttributes(value);
+          if (controller.signal.aborted) return;
+          result = [stringifyWithBigInt(decoded)];
+        }
+        decodedValue = result;
+        isDecoding = false;
+        onDecode?.(result);
+      } catch {
+        if (!controller.signal.aborted) {
+          isDecoding = false;
+        }
+      }
+    })();
+
+    return () => {
+      controller.abort();
+      isDecoding = false;
+    };
+  });
 </script>
 
-{#await decodePayloadValue(value)}
+{#if isDecoding}
   {@render loading?.()}
-{:then decodedValue}
+{:else}
   {@render children(decodedValue)}
-{/await}
+{/if}
