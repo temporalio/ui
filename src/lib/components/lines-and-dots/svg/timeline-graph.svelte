@@ -46,11 +46,18 @@
   const filteredGroups = $derived(
     getFailedOrPendingGroups(groups, $eventStatusFilter),
   );
-  const firstStartTime = $derived(
-    $fullEventHistory[0]?.eventTime < workflow.executionTime
-      ? $fullEventHistory[0]?.eventTime
-      : workflow.executionTime,
-  );
+  const firstStartTime = $derived.by(() => {
+    const firstEventTime = $fullEventHistory[0]?.eventTime;
+
+    if (!firstEventTime) {
+      return workflow.executionTime;
+    }
+
+    return firstEventTime < workflow.executionTime
+      ? firstEventTime
+      : workflow.executionTime;
+  });
+
   const startTime = $derived(
     (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime,
   );
@@ -127,7 +134,7 @@
         x2={canvasWidth - gutter + radius / 4}
         {timelineHeight}
         {startTime}
-        {duration}
+        duration={duration ?? 0}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
       {#each filteredGroups as group, index (group.id)}
