@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import MultiSelect from '$lib/holocene/select/multi-select.svelte';
+  import MultiSelect, {
+    type MultiSelectOptions,
+  } from '$lib/holocene/select/multi-select.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     allEventTypeOptions,
@@ -12,39 +14,42 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { isVersionNewer } from '$lib/utilities/version-check';
 
-  export let compact = false;
+  let { compact = false }: { compact?: boolean } = $props();
 
-  $: label = compact
-    ? translate('events.event-type')
-    : translate('events.workflow-events');
-
-  let parameter = 'category';
-  let options = (compact ? compactEventTypeOptions : allEventTypeOptions).map(
-    (o) => ({
-      ...o,
-      label: translate(o.label),
-    }),
+  const label = $derived(
+    compact
+      ? translate('events.event-type')
+      : translate('events.workflow-events'),
   );
 
-  $: {
-    if (isVersionNewer('1.21', $temporalVersion)) {
-      options = options.filter(({ value }) => value !== 'update');
-    }
-  }
-  $: initialSelected = $eventCategoryFilter
-    ? options.filter((o) => $eventCategoryFilter.includes(o.value))
-    : [];
+  const parameter = 'category';
+  const baseOptions = $derived(
+    (compact ? compactEventTypeOptions : allEventTypeOptions).map((o) => ({
+      ...o,
+      label: translate(o.label),
+    })),
+  );
+  const options = $derived(
+    isVersionNewer('1.21', $temporalVersion)
+      ? baseOptions.filter(({ value }) => value !== 'update')
+      : baseOptions,
+  );
+  const initialSelected = $derived(
+    $eventCategoryFilter
+      ? options.filter((o) => $eventCategoryFilter.includes(o.value))
+      : [],
+  );
 
-  const onOptionClick = (_options) => {
+  const onOptionClick = (_options: MultiSelectOptions) => {
     if (_options.length === options.length) {
       _options = [];
     }
 
     const value = _options.map((o) => o.value).join(',');
     updateQueryParameters({
-      parameter: parameter,
+      parameter,
       value,
-      url: $page.url,
+      url: page.url,
     });
   };
 </script>

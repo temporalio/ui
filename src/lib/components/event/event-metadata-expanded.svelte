@@ -10,13 +10,11 @@
 
 <div class="block w-full select-all px-2 py-1 text-left">
   <p class="text-sm">Summary</p>
-  <MetadataDecoder
-    {value}
-    let:decodedValue
-    fallback={translate('events.decode-failed')}
-  >
-    <Badge type="secondary" class="inline-block whitespace-pre-wrap">
-      {decodedValue}
-    </Badge>
+  <MetadataDecoder {value} fallback={translate('events.decode-failed')}>
+    {#snippet children(decodedValue)}
+      <Badge type="secondary" class="inline-block whitespace-pre-wrap">
+        {decodedValue}
+      </Badge>
+    {/snippet}
   </MetadataDecoder>
 </div>
