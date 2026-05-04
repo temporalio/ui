@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import Drawer from './drawer.svelte';
@@ -45,7 +47,7 @@
   import Button from './button.svelte';
   import DrawerContent from './drawer-content.svelte';
 
-  let open = true;
+  let open = $state(true);
 </script>
 
 <Template let:args>
