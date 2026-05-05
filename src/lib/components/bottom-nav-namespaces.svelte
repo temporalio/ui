@@ -4,16 +4,22 @@
   import type { NamespaceListItem } from '$lib/types/global';
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
 
-  export let open = false;
-  export let namespaceList: NamespaceListItem[] = [];
+  type Props = {
+    open?: boolean;
+    namespaceList?: NamespaceListItem[];
+  };
 
-  let search = '';
+  let { open = false, namespaceList = [] }: Props = $props();
 
-  $: namespaces = sortAlphabetically(
-    search
-      ? namespaceList.filter(({ namespace }) => namespace.includes(search))
-      : namespaceList,
-    (ns) => ns.namespace,
+  let search = $state('');
+
+  const namespaces = $derived(
+    sortAlphabetically(
+      search
+        ? namespaceList.filter(({ namespace }) => namespace.includes(search))
+        : namespaceList,
+      (ns) => ns.namespace,
+    ),
   );
 </script>
 
@@ -35,7 +41,11 @@
           <button
             class="namespace"
             class:selected={namespace === $lastUsedNamespace}
-            on:click|preventDefault|stopPropagation={() => onClick(namespace)}
+            onclick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClick(namespace);
+            }}
           >
             {namespace}
           </button>
