@@ -22,11 +22,16 @@
 
   import BatchOperationConfirmationForm from './batch-operation-confirmation-form.svelte';
 
-  export let namespace: string;
-  export let open = false;
-  let error = '';
-  let jobIdPlaceholder = crypto.randomUUID();
-  let resetType = writable<'first' | 'last'>('first');
+  type Props = {
+    namespace: string;
+    open?: boolean;
+  };
+
+  let { namespace, open = $bindable(false) }: Props = $props();
+
+  let error = $state('');
+  let jobIdPlaceholder = $state(crypto.randomUUID());
+  const resetType = writable<'first' | 'last'>('first');
   const identity = getIdentity();
   const reason = writable('');
   const reasonPlaceholder = getPlaceholder(Action.Reset, identity);
@@ -44,7 +49,9 @@
     jobIdPlaceholder = crypto.randomUUID();
   };
 
-  $: if (open) resetForm();
+  $effect(() => {
+    if (open) resetForm();
+  });
 
   const resetWorkflows = async () => {
     error = '';
@@ -67,9 +74,10 @@
         id: 'batch-reset-success-toast',
       });
     } catch (err) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     }
   };
 </script>
@@ -97,7 +105,7 @@
     >
       <RadioGroup
         description={translate('workflows.reset-event-radio-group-description')}
-        bind:group={resetType}
+        group={resetType}
         name="reset-event"
       >
         <RadioInput
