@@ -7,7 +7,11 @@
   import { translate } from '$lib/i18n/translate';
   import { getUTCString } from '$lib/utilities/format-date';
 
-  export let value: string | null;
+  type Props = {
+    value: string | null;
+  };
+
+  let { value = $bindable() }: Props = $props();
 
   const datetime = value ? new Date(value) : new Date();
   const utcDate = new Date(
@@ -15,10 +19,10 @@
     datetime.getUTCMonth(),
     datetime.getUTCDate(),
   );
-  let date = startOfDay(utcDate);
-  let hour = value ? String(datetime.getUTCHours()) : '';
-  let minute = value ? String(datetime.getUTCMinutes()) : '';
-  let second = value ? String(datetime.getUTCSeconds()) : '';
+  let date = $state(startOfDay(utcDate));
+  let hour = $state(value ? String(datetime.getUTCHours()) : '');
+  let minute = $state(value ? String(datetime.getUTCMinutes()) : '');
+  let second = $state(value ? String(datetime.getUTCSeconds()) : '');
 
   onMount(() => {
     if (!value) updateDatetime();

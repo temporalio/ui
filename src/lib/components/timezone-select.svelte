@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { type Unsubscriber, writable } from 'svelte/store';
+  import { SvelteDate } from 'svelte/reactivity';
+  import { writable } from 'svelte/store';
 
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import type { ButtonStyles } from '$lib/holocene/button.svelte';
@@ -37,8 +38,12 @@
     Timezones,
   } from '$lib/utilities/timezone';
 
-  export let position: 'left' | 'right' = 'right';
-  export let size: ButtonStyles['size'] = 'md';
+  type Props = {
+    position?: 'left' | 'right';
+    size?: ButtonStyles['size'];
+  };
+
+  let { position = 'right', size = 'md' }: Props = $props();
 
   const open = writable(false);
   const localTime = getLocalTime();
@@ -50,21 +55,22 @@
     { label: translate('common.local'), value: BASE_TIME_FORMAT_OPTIONS.LOCAL },
   ];
 
-  let search = '';
-  let intervalId: number | undefined = undefined;
-  let currentDate = new Date().setMilliseconds(0);
-  let openUnsubscriber: Unsubscriber | undefined;
+  let search = $state('');
+  let currentDate = new SvelteDate();
+  currentDate.setMilliseconds(0);
 
-  $: filteredOptions = !search
-    ? TimezoneOptions
-    : TimezoneOptions.filter(({ abbr, value, zones }) => {
-        const searchValue = search.trim().toLowerCase();
-        return (
-          value.toLowerCase().includes(searchValue) ||
-          abbr?.toLowerCase().includes(searchValue) ||
-          zones?.some((zone) => zone.toLowerCase().includes(searchValue))
-        );
-      });
+  const filteredOptions = $derived(
+    !search
+      ? TimezoneOptions
+      : TimezoneOptions.filter(({ abbr, value, zones }) => {
+          const searchValue = search.trim().toLowerCase();
+          return (
+            value.toLowerCase().includes(searchValue) ||
+            abbr?.toLowerCase().includes(searchValue) ||
+            zones?.some((zone) => zone.toLowerCase().includes(searchValue))
+          );
+        }),
+  );
 
   const selectTimezone = (value: string) => {
     if ($relativeTime && value !== BASE_TIME_FORMAT_OPTIONS.LOCAL)
@@ -88,17 +94,29 @@
     $hourFormat = format;
   };
 
-  $: timezone = Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat;
+  const timezone = $derived(Timezones[$timeFormat ?? '']?.abbr ?? $timeFormat);
 
-  openUnsubscriber = open.subscribe((isOpen) => {
-    if (isOpen) {
-      currentDate = new Date().setMilliseconds(0);
+  $effect(() => {
+    let intervalId: number;
+    const clearInterval = () => {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
+    };
+
+    const updateCurrentDate = () => {
+      currentDate.setTime(Date.now());
+      currentDate.setMilliseconds(0);
+    };
+
+    if ($open) {
+      updateCurrentDate();
       intervalId = window.setInterval(() => {
-        currentDate = new Date().setMilliseconds(0);
+        updateCurrentDate();
       }, 1000);
-    } else {
-      window.clearInterval(intervalId);
     }
+
+    return clearInterval;
   });
 
   onMount(() => {
@@ -106,10 +124,6 @@
       $timeFormat = BASE_TIME_FORMAT_OPTIONS.LOCAL;
       $relativeTime = true;
     }
-  });
-
-  onDestroy(() => {
-    openUnsubscriber?.();
   });
 </script>
 
