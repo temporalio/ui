@@ -8,10 +8,19 @@
 
   import WorkflowRawHistoryLink from '../workflow-raw-history-link.svelte';
 
-  export let open = false;
-  export let namespace: string;
-  export let workflowId: string;
-  export let runId: string;
+  type Props = {
+    open?: boolean;
+    namespace: string;
+    workflowId: string;
+    runId: string;
+  };
+
+  let {
+    open = $bindable(false),
+    namespace,
+    workflowId,
+    runId,
+  }: Props = $props();
 
   const onDownloadClick = () => {
     open = false;
