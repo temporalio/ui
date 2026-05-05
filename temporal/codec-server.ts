@@ -94,6 +94,10 @@ export async function createCodecServer(
     }
   });
 
+  app.post('/download', async (req, res) => {
+    res.status(404).end('Not found');
+  });
+
   const start = () =>
     new Promise<Server>((resolve, reject) => {
       server = app.listen(port, () => {

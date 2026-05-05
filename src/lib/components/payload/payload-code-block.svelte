@@ -2,16 +2,14 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import {
-    downloadExternalPayloadWithCodec,
-    NO_CODEC_SERVER_CONFIGURED_ERROR,
-  } from '$lib/services/data-encoder';
-  import { toaster } from '$lib/stores/toaster';
+  import { downloadExternalPayloadWithCodec } from '$lib/services/data-encoder';
+  import { codecEndpoint } from '$lib/stores/data-encoder-config';
   import type { Payload, Payloads } from '$lib/types';
   import {
     isExternallyStoredRawPayload,
-    isRawPayload,
     parseRawPayloadToJSON,
     type PayloadContainingObject,
   } from '$lib/utilities/decode-payload';
@@ -21,47 +19,60 @@
 
   import PayloadDecoder from './payload-decoder.svelte';
 
+  type FilenameData = {
+    workflowId: string | undefined;
+    runId: string | undefined;
+    type: 'input' | 'result' | undefined;
+    eventId?: string | undefined;
+  };
+
   interface Props {
     value: Payload | Payloads | PayloadContainingObject;
     maxHeight?: number;
     testId?: string;
+    filenameData?: FilenameData;
   }
 
-  let { value, maxHeight, testId }: Props = $props();
+  let { value, maxHeight, testId, filenameData = undefined }: Props = $props();
 
   let downloadError: string | undefined = $state(undefined);
+  let downloadLoading: boolean = $state(false);
+
+  const fileName = $derived.by(() => {
+    if (!filenameData) {
+      return 'payload.json';
+    }
+
+    const base = `payload-wf-${filenameData.workflowId}-run-${filenameData.runId}`;
+
+    if (filenameData.eventId) {
+      return `${base}-event-${filenameData.eventId}-${filenameData.type}.json`;
+    }
+
+    return `${base}-${filenameData.type}.json`;
+  });
 
   const downloadExternalPayload = async (payload: Payload) => {
+    downloadLoading = true;
     let data: Payloads | undefined = undefined;
     try {
       data = await downloadExternalPayloadWithCodec(payload);
-      const parsed = parseRawPayloadToJSON(data.payloads[0], false);
-      const content = stringifyWithBigInt(parsed);
+      const parsed = parseRawPayloadToJSON(data.payloads[0]);
+      const content = stringifyWithBigInt(parsed, undefined, 2);
       const a = document.createElement('a');
       const file = new Blob([content], { type: 'json/plain' });
       a.href = URL.createObjectURL(file);
-      a.download = 'payload.json';
+      a.download = fileName;
       a.click();
     } catch (error) {
-      console.error(error);
       if (isNetworkError(error) && error.statusCode === 404) {
-        downloadError = 'Unable to download payload file.';
-        toaster.push({
-          variant: 'error',
-          duration: 5000,
-          message:
-            'Unable to download file due to codec server not having a /download endpoint configured. Update codec server and try again.',
-        });
-      } else if (error === NO_CODEC_SERVER_CONFIGURED_ERROR) {
         downloadError =
-          'Unable to download payload file. No codec server is configured.';
-        toaster.push({
-          variant: 'error',
-          duration: 5000,
-          message:
-            'Unable to download file due to no codec server being configured. Add a codec server with a /download endpoint and try again.',
-        });
+          "Unable to download payload file. Your codec server is connected, but it isn't configured to download from external storage.";
+      } else {
+        downloadError = 'Unable to download payload file.';
       }
+    } finally {
+      downloadLoading = false;
     }
   };
 </script>
@@ -80,29 +91,51 @@
             language="json"
           >
             {#snippet headerActions()}
-              <Button
-                size="sm"
-                variant="ghost"
-                leadingIcon="download"
-                on:click={() => downloadExternalPayload(result.originalValue)}
+              <Tooltip
+                width={192}
+                top
+                hide={!!$codecEndpoint}
+                text="Add a codec server with a /download endpoint to download this payload."
               >
-                {formatBytes(
-                  result.decodedValue.externalPayloads?.[0].sizeBytes,
-                )}
-              </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  leadingIcon="download"
+                  disabled={!$codecEndpoint}
+                  loading={downloadLoading}
+                  on:click={() => downloadExternalPayload(result.originalValue)}
+                >
+                  {formatBytes(
+                    result.decodedValue.externalPayloads?.[0].sizeBytes,
+                  )}
+                </Button>
+              </Tooltip>
             {/snippet}
           </CodeBlock>
           {#if downloadError}
-            <div class="flex items-center gap-1 text-danger">
-              <Icon name="exclamation-octagon" />
-              <p>{downloadError}</p>
+            <div class="flex items-start gap-2 text-danger">
+              <Icon width={16} height={16} name="exclamation-octagon" />
+              <p class="leading-4">{downloadError}</p>
             </div>
           {/if}
           <p>
             Payload downloads require a codec server with a <span
               class="rounded-sm bg-code-block px-1 font-mono">/download</span
-            > endpoint.
+            >
+            endpoint. <Link href="https://docs.temporal.io/codec-server" newTab
+              >How to set up a codec server
+            </Link>
+            <Icon class="inline" name="external-link" />
           </p>
+        {:else}
+          <CodeBlock
+            content={stringifyWithBigInt(result.decodedValue.data)}
+            {maxHeight}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            {testId}
+            language="json"
+          />
         {/if}
       {/each}
     </div>

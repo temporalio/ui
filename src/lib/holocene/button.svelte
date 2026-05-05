@@ -194,14 +194,14 @@
     )}
     {...$$restProps}
   >
-    {#if leadingIcon}
-      <span>
-        <Icon name={leadingIcon} />
+    {#if (leadingIcon || loading) && !trailingIcon}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
     <slot />
 
-    {#if trailingIcon || loading}
+    {#if (trailingIcon || loading) && !leadingIcon}
       <span class:animate-spin={loading}>
         <Icon name={loading ? 'spinner' : trailingIcon} />
       </span>
