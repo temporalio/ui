@@ -23,7 +23,7 @@ jobs:
       - name: Checkout and Setup Node
         uses: ./.github/actions/setup-node
       - name: Run Chromatic
-        uses: chromaui/action@v1
+        uses: chromaui/action@c93e0bc3a63aa176e14a75b61a31847cbfdd341c # v11.27.0
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           autoAcceptChanges: 'main'
