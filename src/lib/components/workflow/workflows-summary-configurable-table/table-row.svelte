@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -20,34 +20,48 @@
 
   import StartWorkflowButton from '../start-workflow-button.svelte';
 
-  export let workflow: WorkflowExecution;
-  export let empty = false;
-  export let toggleChildrenVisibility: (
-    workflow: WorkflowExecution,
-  ) => void | Promise<void> = () => {};
-  export let childCount: number | undefined = undefined;
-  export let child = false;
+  type Props = {
+    workflow: WorkflowExecution;
+    empty?: boolean;
+    toggleChildrenVisibility?: (
+      workflow: WorkflowExecution,
+    ) => void | Promise<void>;
+    childCount?: number | undefined;
+    child?: boolean;
+    onClickBatchSelect?: (e: MouseEvent) => void;
+    children?: Snippet;
+  };
+
+  let {
+    workflow,
+    empty = false,
+    toggleChildrenVisibility = () => {},
+    childCount = undefined,
+    child = false,
+    onClickBatchSelect = () => {},
+    children,
+  }: Props = $props();
 
   const { allSelected, selectedWorkflows } = getContext<BatchOperationContext>(
     BATCH_OPERATION_CONTEXT,
   );
 
-  export let onClickBatchSelect: (e: MouseEvent) => void = () => {};
+  const namespace = $derived(page.params.namespace);
 
-  $: ({ namespace } = $page.params);
+  const parentWorkflows = $derived(
+    page.url.searchParams.get('query') === '`ParentWorkflowId` is null',
+  );
 
-  $: parentWorkflows =
-    $page.url.searchParams.get('query') === '`ParentWorkflowId` is null';
+  const label = $derived(
+    translate('workflows.select-workflow', { workflow: workflow?.id }),
+  );
 
-  $: label = translate('workflows.select-workflow', {
-    workflow: workflow?.id,
-  });
+  const childrenShown = $derived(childCount !== undefined);
 
-  $: childrenShown = childCount !== undefined;
-
-  $: checked =
+  const checked = $derived(
     ($allSelected && !child) ||
-    $selectedWorkflows.some((selected) => selected.runId === workflow.runId);
+      $selectedWorkflows.some((selected) => selected.runId === workflow.runId),
+  );
 </script>
 
 <tr
@@ -75,7 +89,7 @@
         ? 'w-auto'
         : 'w-6'}"
     >
-      {#if !workflowCreateDisabled($page)}
+      {#if !workflowCreateDisabled(page)}
         <StartWorkflowButton
           {namespace}
           runId={workflow.runId}
@@ -108,7 +122,7 @@
   {:else}
     <td></td>
   {/if}
-  <slot />
+  {@render children?.()}
 </tr>
 
 <style lang="postcss">
