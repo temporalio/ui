@@ -350,22 +350,22 @@
       {/if}
       <UserMenu {logout} />
     </TopNavigation>
-    <div
-      slot="main"
-      class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
-    >
-      <ErrorBoundary>
-        {@render children()}
-      </ErrorBoundary>
-    </div>
-    <BottomNavigation
-      slot="footer"
-      sections={[linkList, linkListForSecondGroup]}
-      {namespaceList}
-      {isCloud}
-      {showNamespacePicker}
-    >
-      <UserMenuMobile {logout} />
-    </BottomNavigation>
+    {#snippet main()}
+      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+        <ErrorBoundary>
+          {@render children()}
+        </ErrorBoundary>
+      </div>
+    {/snippet}
+    {#snippet footer()}
+      <BottomNavigation
+        sections={[linkList, linkListForSecondGroup]}
+        {namespaceList}
+        {isCloud}
+        {showNamespacePicker}
+      >
+        <UserMenuMobile {logout} />
+      </BottomNavigation>
+    {/snippet}
   </MainContentContainer>
 </div>
