@@ -46,7 +46,7 @@ jobs:
           repositories: ${{ vars.DOWNSTREAM_REPO }}
 
       - name: Trigger ui-server workflow
-        uses: peter-evans/repository-dispatch@v4
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
         with:
           token: ${{ steps.dispatch_token.outputs.token }}
           repository: ${{ vars.DOWNSTREAM_ORG }}/${{ vars.DOWNSTREAM_REPO }}
