@@ -24,8 +24,8 @@
     }
   };
 
-  const validateDuration = (event: Event & { target: HTMLInputElement }) => {
-    if (isValidDurationQuery(event.target.value.trim())) {
+  const validateDuration = (event: InputEvent) => {
+    if (isValidDurationQuery((event.target as HTMLInputElement).value.trim())) {
       isValid = true;
     } else {
       isValid = false;
