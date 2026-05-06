@@ -9,7 +9,7 @@
   export let namespace: string;
   export let workflowId: string;
   export let runId: string;
-  export let taskQueue: string;
+  export let taskQueue: string | undefined;
   export let workflowType: string;
 
   $: href = routeForWorkflowStart({
