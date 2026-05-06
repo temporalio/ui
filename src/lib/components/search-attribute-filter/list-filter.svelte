@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
@@ -11,12 +11,19 @@
   import ConditionalMenu from './conditional-menu.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
+  type Props = {
+    children?: Snippet;
+  };
+
+  let { children }: Props = $props();
+
   const { filter, handleSubmit } = getContext<FilterContext>(FILTER_CONTEXT);
 
-  $: ({ value, conditional } = $filter);
-  $: _value = value;
-  $: chips = formatListFilterValue(_value);
-  $: options = [
+  const value = $derived($filter.value);
+  const conditional = $derived($filter.conditional);
+  let _value = $derived(value);
+  let chips = $derived(formatListFilterValue(_value));
+  const options = [
     { value: 'in', label: 'In' },
     { value: '=', label: translate('common.equal-to') },
     { value: '!=', label: translate('common.not-equal-to') },
@@ -36,7 +43,13 @@
   }
 </script>
 
-<form class="flex grow" on:submit|preventDefault={onSubmit}>
+<form
+  class="flex grow"
+  onsubmit={(e) => {
+    e.preventDefault();
+    onSubmit();
+  }}
+>
   <ConditionalMenu inputId="list-filter" noBorderLeft {options}>
     {#if isInConditional(conditional)}
       <ChipInput
@@ -54,7 +67,7 @@
         <Button disabled={!chips.length} type="submit">
           {translate('common.search')}
         </Button>
-        <slot />
+        {@render children?.()}
       </div>
     {:else}
       <Input
@@ -68,7 +81,7 @@
         bind:value={_value}
         on:keydown={handleKeydown}
       />
-      <slot />
+      {@render children?.()}
     {/if}
   </ConditionalMenu>
 </form>
