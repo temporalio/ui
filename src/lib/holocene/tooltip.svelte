@@ -100,7 +100,7 @@
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     bind:this={wrapperElement}
-    class={merge('wrapper group relative inline-block', className)}
+    class={merge('wrapper group/tooltip relative inline-block', className)}
     on:mouseenter={() => (isHovered = true)}
     on:mouseleave={() => (isHovered = false)}
   >
@@ -131,7 +131,7 @@
     {:else}
       <div
         class={merge(
-          'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover:inline-block group-hover:opacity-95',
+          'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover/tooltip:inline-block group-hover/tooltip:opacity-95',
           show && 'inline-block opacity-95',
         )}
         class:left
