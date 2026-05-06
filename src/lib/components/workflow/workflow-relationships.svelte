@@ -1,11 +1,11 @@
-<script context="module" lang="ts">
+<script module lang="ts">
+  import { writable } from 'svelte/store';
+
   export const showFullTree = writable(true);
 </script>
 
 <script lang="ts">
-  import { writable } from 'svelte/store';
-
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -22,44 +22,50 @@
 
   const MAX_UPPER_LIMIT = 5000;
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
+  const namespace = $derived(page.params.namespace);
+  const workflow = $derived($workflowRun.workflow);
 
-  let initialWorkflow: WorkflowExecution | undefined = undefined;
+  let initialWorkflow = $state<WorkflowExecution | undefined>(undefined);
 
-  $: rootWorkflowId = initialWorkflow?.rootExecution?.workflowId;
-  $: rootRunId = initialWorkflow?.rootExecution?.runId;
-  $: parentWorkflowId = initialWorkflow?.parent?.workflowId;
-  $: parentRunId = initialWorkflow?.parent?.runId;
+  const rootWorkflowId = $derived(initialWorkflow?.rootExecution?.workflowId);
+  const rootRunId = $derived(initialWorkflow?.rootExecution?.runId);
+  const parentWorkflowId = $derived(initialWorkflow?.parent?.workflowId);
+  const parentRunId = $derived(initialWorkflow?.parent?.runId);
 
-  $: {
+  $effect(() => {
     if (!initialWorkflow && workflow) {
       initialWorkflow = workflow;
     }
-  }
+  });
 
   const fetchWorkflowsForTree = async () => {
+    if (!rootWorkflowId || !rootRunId) {
+      return;
+    }
+
     const result = await fetchAllRootWorkflowsCount(
       namespace,
       rootWorkflowId,
       rootRunId,
     );
-    const count = parseInt(result.count);
+    const count = parseInt(result.count ?? '0', 10);
     const overMaxLimit = count > MAX_UPPER_LIMIT;
     if (overMaxLimit) {
       $showFullTree = false;
-    } else {
-      $showFullTree = true;
+
+      if (!parentWorkflowId || !parentRunId || !initialWorkflow) {
+        return;
+      }
+      return fetchAllDirectWorkflows({
+        namespace,
+        parentWorkflowId,
+        parentRunId,
+        workflow: initialWorkflow,
+      });
     }
 
-    return overMaxLimit
-      ? fetchAllDirectWorkflows({
-          namespace,
-          parentWorkflowId,
-          parentRunId,
-          workflow: initialWorkflow,
-        })
-      : fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId);
+    $showFullTree = true;
+    return fetchAllRootWorkflows(namespace, rootWorkflowId, rootRunId);
   };
 </script>
 
@@ -69,7 +75,11 @@
       {#await fetchWorkflowsForTree()}
         <Loading />
       {:then root}
-        <WorkflowFamilyTree {root} {namespace} />
+        {#if root}
+          <WorkflowFamilyTree {root} {namespace} />
+        {:else}
+          <WorkflowRelationshipsOld />
+        {/if}
       {:catch}
         <WorkflowRelationshipsOld />
       {/await}
