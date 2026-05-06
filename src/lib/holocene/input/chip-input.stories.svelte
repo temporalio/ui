@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
   import { userEvent, within } from '@storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
@@ -42,7 +43,7 @@
       },
       scrollTo: { name: 'Scroll To', control: 'boolean' },
     },
-  } satisfies Meta<ChipInput>;
+  } satisfies Meta<ComponentProps<typeof ChipInput>>;
 </script>
 
 <script lang="ts">
