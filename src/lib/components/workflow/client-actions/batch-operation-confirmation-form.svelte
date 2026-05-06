@@ -57,8 +57,8 @@
     );
   };
 
-  const handleJobIdChange = (event: Event & { target: HTMLInputElement }) => {
-    jobIdValid = /^[\w.~-]*$/.test(event.target.value);
+  const handleJobIdChange = (event: InputEvent) => {
+    jobIdValid = /^[\w.~-]*$/.test((event.target as HTMLInputElement).value);
   };
 </script>
 
