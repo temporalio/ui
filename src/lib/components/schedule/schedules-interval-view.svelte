@@ -5,21 +5,31 @@
   import { translate } from '$lib/i18n/translate';
   import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
-  export let days = '';
-  export let hour = '';
-  export let minute = '';
-  export let second = '';
-  export let phase = '';
+  type Props = {
+    days?: string;
+    hour?: string;
+    minute?: string;
+    second?: string;
+    phase?: string;
+  };
 
-  let offset = '';
-  let offsetUnit: ScheduleOffsetUnit = 'min';
+  let {
+    days = $bindable(''),
+    hour = $bindable(''),
+    minute = $bindable(''),
+    second = $bindable(''),
+    phase = $bindable(''),
+  }: Props = $props();
+
+  let offset = $state('');
+  let offsetUnit = $state<ScheduleOffsetUnit>('min');
 
   const error = (x: string) => {
     if (x) return isNaN(parseInt(x));
     return false;
   };
 
-  $: {
+  $effect(() => {
     if (offset) {
       if (offsetUnit === 'days') {
         phase = (parseInt(offset) * 60 * 60 * 24).toString() + 's';
@@ -31,7 +41,7 @@
         phase = parseInt(offset).toString() + 's';
       }
     }
-  }
+  });
 </script>
 
 <div class="flex flex-col gap-4">

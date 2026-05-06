@@ -4,10 +4,19 @@
 
   import SchedulesTimeView from './schedules-time-view.svelte';
 
-  export let daysOfWeek: string[];
-  export let hour: string;
-  export let minute: string;
-  export let timezoneName: string;
+  type Props = {
+    daysOfWeek: string[];
+    hour: string;
+    minute: string;
+    timezoneName: string;
+  };
+
+  let {
+    daysOfWeek = $bindable(),
+    hour = $bindable(),
+    minute = $bindable(),
+    timezoneName,
+  }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-4">
