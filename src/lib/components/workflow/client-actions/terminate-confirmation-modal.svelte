@@ -18,7 +18,7 @@
     namespace: string;
     refresh?: Writable<number>;
     first?: string;
-  };
+  }
 
   let {
     open = $bindable(),

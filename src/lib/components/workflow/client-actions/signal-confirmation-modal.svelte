@@ -20,7 +20,7 @@
     open: boolean;
     workflow: WorkflowExecution;
     namespace: string;
-  };
+  }
 
   let { open = $bindable(), workflow, namespace }: Props = $props();
 

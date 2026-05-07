@@ -13,7 +13,7 @@
     namespace: string;
     workflowId: string;
     runId: string;
-  };
+  }
 
   let {
     open = $bindable(false),

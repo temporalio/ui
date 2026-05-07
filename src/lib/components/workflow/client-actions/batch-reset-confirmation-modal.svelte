@@ -25,7 +25,7 @@
   interface Props {
     namespace: string;
     open?: boolean;
-  };
+  }
 
   let { namespace, open = $bindable(false) }: Props = $props();
 

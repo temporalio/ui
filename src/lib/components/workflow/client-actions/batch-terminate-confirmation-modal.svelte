@@ -23,7 +23,7 @@
   interface Props {
     namespace: string;
     open: boolean;
-  };
+  }
 
   let { namespace, open = $bindable() }: Props = $props();
 

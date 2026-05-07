@@ -16,7 +16,7 @@
     workflow: WorkflowExecution;
     namespace: string;
     refresh?: Writable<number>;
-  };
+  }
 
   let {
     open = $bindable(),
