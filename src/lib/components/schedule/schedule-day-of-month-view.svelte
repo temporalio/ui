@@ -11,7 +11,7 @@
     hour: string;
     minute: string;
     timezoneName: string;
-  };
+  }
 
   let {
     daysOfMonth = $bindable(),

@@ -11,7 +11,7 @@
     minute?: string;
     second?: string;
     phase?: string;
-  };
+  }
 
   let {
     days = $bindable(''),

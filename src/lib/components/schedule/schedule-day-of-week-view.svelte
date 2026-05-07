@@ -9,7 +9,7 @@
     hour: string;
     minute: string;
     timezoneName: string;
-  };
+  }
 
   let {
     daysOfWeek = $bindable(),

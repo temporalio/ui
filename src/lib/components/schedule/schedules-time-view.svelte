@@ -7,7 +7,7 @@
     hour?: string;
     minute?: string;
     timezoneName: string;
-  };
+  }
 
   let {
     hour = $bindable(''),
