@@ -38,7 +38,7 @@ Resources:
   const snippetContent = $derived(cfnTemplate ?? defaultCfnTemplate);
 </script>
 
-<h3 class="mb-4 text-base font-semibold">
+<h3 class="mb-4 text-base font-medium">
   {translate('workers.setup-guide-title')}
 </h3>
 <Timeline>

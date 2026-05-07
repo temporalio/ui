@@ -32,6 +32,11 @@
       version: '1.1.0',
       href: 'https://github.com/temporalio/sdk-ruby/releases/tag/v1.1.0',
     },
+    {
+      sdk: 'Java',
+      version: '1.35.0',
+      href: 'https://github.com/temporalio/sdk-java/releases/tag/v1.35.0',
+    },
   ];
   const currentSdk = $derived(
     supportedVersions.find(

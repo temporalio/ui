@@ -10,13 +10,14 @@
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
-  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
   import GraphWidget from './graph-widget.svelte';
 
   export let group: EventGroup;
   export let canvasWidth: number;
+  export let endTime: string | Date | number = Date.now();
   export let x = 0;
   export let y: number;
 
@@ -37,9 +38,9 @@
   $: childWorkflowStartedEvent =
     group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
 
-  $: duration = formatDistanceAbbreviated({
-    start: group?.initialEvent?.eventTime,
-    end: group?.lastEvent?.eventTime,
+  $: duration = formatEventGroupDuration({
+    group,
+    endTime,
     includeMilliseconds: true,
   });
 

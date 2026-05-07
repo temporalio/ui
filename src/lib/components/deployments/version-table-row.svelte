@@ -152,9 +152,7 @@
   let deleteVersionError = $state('');
   let showValidateModal = $state(false);
   let validateLoading = $state(false);
-  let validateResult = $state<{ valid: boolean; message?: string } | null>(
-    null,
-  );
+  let validateResult = $state<{ message?: string } | null>(null);
 
   async function handleValidateConnection() {
     validateResult = null;
@@ -171,16 +169,16 @@
       validateLoading = false;
       return;
     }
-    validateResult = await validateWorkerDeploymentVersionComputeConfig(
+    let errorMessage: string | undefined;
+    await validateWorkerDeploymentVersionComputeConfig(
       { namespace, deploymentName, buildId: versionBuildId, computeConfig },
-      () => {
-        validateLoading = false;
-        validateResult = {
-          valid: false,
-          message: translate('deployments.validate-connection-error'),
-        };
+      (error) => {
+        errorMessage =
+          (error.body as { message?: string })?.message ??
+          translate('deployments.validate-connection-error');
       },
     );
+    validateResult = { message: errorMessage };
     validateLoading = false;
   }
 
@@ -307,6 +305,7 @@
   loading={validateLoading}
   result={validateResult}
   onClose={() => (showValidateModal = false)}
+  onRetry={handleValidateConnection}
 />
 
 <DeleteVersionModal
