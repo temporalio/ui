@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   import {
     Menu,
@@ -12,8 +12,6 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  const { filter, focusedElementId, handleSubmit } =
-    getContext<FilterContext>(FILTER_CONTEXT);
   const defaultConditionOptions = [
     { value: '>' },
     { value: '>=' },
@@ -23,39 +21,54 @@
     { value: '<' },
   ];
 
-  export let options: { value: string; label?: string }[] =
-    defaultConditionOptions;
-  export let disabled = false;
-  export let inputId: string;
-  export let noBorderLeft = false;
-  export let noBorderRight = false;
+  interface Props {
+    options?: { value: string; label?: string }[];
+    disabled?: boolean;
+    inputId: string;
+    noBorderLeft?: boolean;
+    noBorderRight?: boolean;
+    children?: Snippet;
+  }
 
-  let conditionalOptions = [
+  let {
+    options = defaultConditionOptions,
+    disabled = false,
+    inputId,
+    noBorderLeft = false,
+    noBorderRight = false,
+    children,
+  }: Props = $props();
+
+  const { filter, focusedElementId, handleSubmit } =
+    getContext<FilterContext>(FILTER_CONTEXT);
+
+  const conditionalOptions = $derived([
     ...options,
     { value: 'is', label: translate('common.is-null') },
     { value: 'is not', label: translate('common.is-not-null') },
-  ];
+  ]);
 
-  $: filterConditionalOption = conditionalOptions.find(
-    (o) => o.value === $filter.conditional,
+  const filterConditionalOption = $derived(
+    conditionalOptions.find((o) => o.value === $filter.conditional),
   );
-  $: {
-    filterConditionalOption;
-    updateFilterConditional();
-  }
-  $: isNullFilter = isNullConditional($filter.conditional);
-  $: selectedOption = filterConditionalOption ?? conditionalOptions[0];
-  $: selectedLabel = selectedOption?.label ?? selectedOption?.value;
+  const isNullFilter = $derived(isNullConditional($filter.conditional));
+  const selectedOption = $derived(
+    filterConditionalOption ?? conditionalOptions[0],
+  );
+  const selectedLabel = $derived(
+    selectedOption?.label ?? selectedOption?.value,
+  );
+
+  $effect(() => {
+    if (!filterConditionalOption) {
+      $filter.conditional = conditionalOptions[0].value;
+    }
+  });
 
   function handleNullFilter() {
     $filter.value = null;
     $filter.customDate = false;
     handleSubmit();
-  }
-
-  function updateFilterConditional() {
-    if (!filterConditionalOption)
-      $filter.conditional = conditionalOptions[0].value;
   }
 </script>
 
@@ -85,5 +98,5 @@
   </Menu>
 </MenuContainer>
 {#if !isNullFilter}
-  <slot />
+  {@render children?.()}
 {/if}
