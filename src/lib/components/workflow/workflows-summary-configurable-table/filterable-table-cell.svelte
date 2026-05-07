@@ -63,11 +63,11 @@
 </script>
 
 {#if href}
-  <Tooltip text={value} top class="min-w-0" hide={hideTooltip}>
+  <Tooltip usePortal text={value} top class="min-w-0" hide={hideTooltip}>
     <Link {href}>{truncate ? truncateValue(value) : value}</Link>
   </Tooltip>
 {:else}
-  <Tooltip text={value} top class="min-w-0" hide={hideTooltip}>
+  <Tooltip usePortal text={value} top class="min-w-0" hide={hideTooltip}>
     {truncate ? truncateValue(value) : value}
   </Tooltip>
 {/if}

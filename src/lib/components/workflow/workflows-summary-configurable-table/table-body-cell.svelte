@@ -226,6 +226,7 @@
       />
     {:else if label === 'Task Queue'}
       <Tooltip
+        usePortal
         text={workflow.taskQueue}
         top
         class="min-w-0"
@@ -235,6 +236,7 @@
       </Tooltip>
     {:else if label === 'Parent Namespace'}
       <Tooltip
+        usePortal
         text={workflow?.parentNamespaceId ?? ''}
         top
         class="min-w-0"
@@ -265,6 +267,7 @@
       {parseInt(workflow.historyEvents, 10) > 0 ? workflow.historyEvents : ''}
     {:else if label === 'Scheduled By ID'}
       <Tooltip
+        usePortal
         text={workflow.searchAttributes?.indexedFields?.TemporalScheduledById ??
           ''}
         top
@@ -302,7 +305,13 @@
       {:else if $customSearchAttributes[label] === SEARCH_ATTRIBUTE_TYPE.BOOL}
         <Badge>{content}</Badge>
       {:else}
-        <Tooltip text={content} top class="min-w-0" hide={hideTooltip(content)}>
+        <Tooltip
+          usePortal
+          text={content}
+          top
+          class="min-w-0"
+          hide={hideTooltip(content)}
+        >
           {truncate ? truncateValue(content) : content}
         </Tooltip>
       {/if}
