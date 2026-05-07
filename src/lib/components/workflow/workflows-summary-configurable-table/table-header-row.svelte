@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -12,15 +12,23 @@
 
   import BatchActions from './batch-actions.svelte';
 
-  export let workflows: WorkflowExecution[];
-  export let empty: boolean;
-  export let columnsCount: number;
-  export let pageSelectionStatus: 'checked' | 'unchecked' | 'partial' =
-    'unchecked';
-  export let onSelectPage: (
-    selected: boolean,
-    workflows: WorkflowExecution[],
-  ) => void;
+  type Props = {
+    workflows: WorkflowExecution[];
+    empty: boolean;
+    columnsCount: number;
+    pageSelectionStatus?: 'checked' | 'unchecked' | 'partial';
+    onSelectPage: (selected: boolean, workflows: WorkflowExecution[]) => void;
+    children?: Snippet;
+  };
+
+  let {
+    workflows,
+    empty,
+    columnsCount,
+    pageSelectionStatus = 'unchecked',
+    onSelectPage,
+    children,
+  }: Props = $props();
 
   const { batchActionsVisible } = getContext<BatchOperationContext>(
     BATCH_OPERATION_CONTEXT,
@@ -53,7 +61,7 @@
       <BatchActions {workflows} />
     </th>
   {:else}
-    <slot />
+    {@render children?.()}
   {/if}
 </tr>
 

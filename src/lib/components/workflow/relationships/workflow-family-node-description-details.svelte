@@ -15,7 +15,7 @@
     namespace: string;
     isRootWorkflow?: boolean;
     isActive?: boolean;
-    children?: number;
+    childrenCount?: number;
     expanded?: boolean;
   };
 
@@ -24,7 +24,7 @@
     namespace,
     isRootWorkflow = false,
     isActive = false,
-    children = 0,
+    childrenCount = 0,
     expanded = false,
   }: Props = $props();
 
@@ -36,7 +36,9 @@
     }),
   );
 
-  const showExpandIcon = $derived(!isRootWorkflow && $showFullTree && children);
+  const showExpandIcon = $derived(
+    !isRootWorkflow && $showFullTree && childrenCount,
+  );
 </script>
 
 <div
@@ -75,7 +77,7 @@
           <p class="text-xs">{translate('common.child-count')}</p>
         {/if}
         <div class="flex basis-16 items-center gap-1 leading-4 lg:justify-end">
-          <span class="font-mono">{children}</span>
+          <span class="font-mono">{childrenCount}</span>
         </div>
       </div>
     {/if}
