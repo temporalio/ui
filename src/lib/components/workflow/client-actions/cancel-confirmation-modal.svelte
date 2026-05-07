@@ -11,13 +11,22 @@
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let refresh: Writable<number> | undefined = undefined;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+    refresh?: Writable<number>;
+  }
 
-  let loading: boolean;
-  let error: string = '';
+  let {
+    open = $bindable(),
+    workflow,
+    namespace,
+    refresh = undefined,
+  }: Props = $props();
+
+  let loading = $state(false);
+  let error = $state('');
 
   const identity = getIdentity();
 
@@ -45,9 +54,10 @@
         message: translate('workflows.cancel-success'),
       });
     } catch (err: unknown) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     } finally {
       loading = false;
     }

@@ -19,17 +19,21 @@
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-  export let open: boolean;
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
+  interface Props {
+    open: boolean;
+    workflow: WorkflowExecution;
+    namespace: string;
+  }
 
-  let error = '';
-  let loading = false;
+  let { open = $bindable(), workflow, namespace }: Props = $props();
+
+  let error = $state('');
+  let loading = $state(false);
   let eventId: Writable<string> = writable('');
-  let reason: string;
-  let includeSignals = true;
-  let excludeSignals = false;
-  let excludeUpdates = false;
+  let reason = $state('');
+  let includeSignals = $state(true);
+  let excludeSignals = $state(false);
+  let excludeUpdates = $state(false);
 
   const identity = getIdentity();
 
