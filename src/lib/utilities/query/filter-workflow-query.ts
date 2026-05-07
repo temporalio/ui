@@ -32,7 +32,8 @@ const filterKeys: Readonly<Record<string, QueryKey>> = {
 } as const;
 
 const isValid = (value: unknown, conditional: string): boolean => {
-  if (value === null && !isNullConditional(conditional)) return false;
+  if (isNullConditional(conditional)) return true;
+  if (value === null) return false;
   if (value === undefined) return false;
   if (value === '') return false;
   if (typeof value === 'string' && value === 'undefined') return false;
@@ -87,7 +88,7 @@ const toFilterQueryStatement = (
   }
 
   if (isNullConditional(conditional)) {
-    return `\`${queryKey}\` ${conditional} ${value}`;
+    return `\`${queryKey}\` ${conditional} null`;
   }
 
   if (isDuration(value) || isDurationString(value)) {

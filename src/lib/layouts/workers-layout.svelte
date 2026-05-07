@@ -3,11 +3,13 @@
 
   import { page } from '$app/state';
 
+  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { refresh } from '$lib/stores/workers';
   import {
     routeForWorkerDeployments,
     routeForWorkers,
@@ -39,9 +41,13 @@
 
 <header class="flex flex-col gap-2">
   <div class="flex min-h-10 flex-wrap items-center justify-between gap-2">
-    <h1 class="leading-7" data-cy="workers-title">
-      {translate('workers.workers')}
-    </h1>
+    <div class="flex flex-row flex-wrap items-start gap-2">
+      <h1 class="leading-7" data-cy="workers-title">
+        {translate('workers.workers')}
+      </h1>
+      <!-- TODO: Add count when there is a WorkersCount API available -->
+      <CountRefreshButton count={0} {refresh} />
+    </div>
     {#if headerAction}
       {@render headerAction()}
     {/if}

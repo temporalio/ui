@@ -18,6 +18,7 @@
   import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   export interface BaseProps {
+    active?: boolean;
     selected?: boolean;
     destructive?: boolean;
     disabled?: boolean;
@@ -47,6 +48,7 @@
 
   const {
     class: className,
+    active = false,
     selected,
     destructive = false,
     disabled = false,
@@ -137,6 +139,7 @@
       centered ? 'justify-center' : 'justify-between',
       className,
     )}
+    class:active
     class:disabled
     class:hoverable
     aria-hidden={disabled ? 'true' : 'false'}
@@ -168,6 +171,7 @@
     class:disabled
     class:selected
     class:hoverable
+    class:active
     aria-hidden={disabled ? 'true' : 'false'}
     aria-disabled={disabled}
     tabindex={disabled ? -1 : 0}
@@ -199,6 +203,10 @@
 <style lang="postcss">
   .menu-item {
     @apply cursor-pointer border border-transparent text-sm focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
+
+    &.active {
+      @apply bg-interactive-secondary-hover;
+    }
 
     &.hoverable {
       @apply hover:surface-interactive-secondary focus-visible:surface-interactive-secondary;

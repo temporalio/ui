@@ -64,7 +64,13 @@
   style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
   on:scroll={handleScroll}
 >
-  <EndTimeInterval {workflow} {startTime} let:endTime let:duration>
+  <EndTimeInterval
+    {workflow}
+    {startTime}
+    let:endTime
+    let:duration
+    let:currentTime
+  >
     <div
       class="pointer-events-none sticky top-[120px]"
       class:invisible={!!$activeGroups.length}
@@ -120,7 +126,12 @@
           {/key}
         {/if}
         {#if !readOnly && $activeGroups.includes(group.id)}
-          <GroupDetailsRow y={y + 1.33 * radius} {group} {canvasWidth} />
+          <GroupDetailsRow
+            y={y + 1.33 * radius}
+            {group}
+            {canvasWidth}
+            endTime={workflow?.endTime ? endTime : currentTime}
+          />
         {/if}
       {/each}
     </svg>

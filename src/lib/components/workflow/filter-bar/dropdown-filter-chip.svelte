@@ -326,7 +326,7 @@
         active={localFilter.conditional === option.value}
         on:click={() => {
           if (isNullConditional(option.value)) {
-            localFilter.value = '';
+            localFilter.value = null;
           } else if (isNullFilter) {
             localFilter.value = filter.value;
           }

@@ -34,7 +34,7 @@
     y: number;
     group: EventGroup;
     startTime: string | Timestamp;
-    endTime: string | Date;
+    endTime: string | Date | number;
     canvasWidth: number;
     readOnly: boolean;
   };
@@ -76,7 +76,7 @@
   });
 
   const getDistancePointsAndPositions = (
-    endTime: string | Date,
+    endTime: string | Date | number,
     timelineWidth: number,
     y: number,
   ) => {

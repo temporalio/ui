@@ -6,6 +6,7 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
+  import { refresh } from '$lib/stores/workers';
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
@@ -40,7 +41,7 @@
   ];
 </script>
 
-{#key [namespace]}
+{#key [namespace, $refresh]}
   <div class="flex flex-col gap-4">
     <PaginatedTable
       let:visibleItems

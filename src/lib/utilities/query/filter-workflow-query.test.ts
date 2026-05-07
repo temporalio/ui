@@ -202,6 +202,38 @@ describe('toListWorkflowQueryFromFilters', () => {
     );
   });
 
+  it.each([
+    ['null', null],
+    ['empty string', ''],
+    ['undefined', undefined],
+  ])(
+    'should convert a Keyword filter with is null conditional when value is %s',
+    (_, value) => {
+      const filters = [
+        {
+          attribute: 'CustomKeywordField',
+          type: 'Keyword',
+          conditional: 'is',
+          operator: '',
+          parenthesis: '',
+          value,
+        },
+        {
+          attribute: 'CustomKeywordField',
+          type: 'Keyword',
+          conditional: 'is not',
+          operator: '',
+          parenthesis: '',
+          value,
+        },
+      ];
+      const query = toListWorkflowQueryFromFilters(combineFilters(filters));
+      expect(query).toBe(
+        '`CustomKeywordField` is null AND `CustomKeywordField` is not null',
+      );
+    },
+  );
+
   it('should convert a KeywordList filter', () => {
     const filters = [
       {

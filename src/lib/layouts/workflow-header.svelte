@@ -1,6 +1,8 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
@@ -55,6 +57,9 @@
     run: runId,
     id: eventId,
   } = $derived(page.params);
+
+  let { headerSnippet }: { headerSnippet?: Snippet } = $props();
+
   const { workflow } = $derived($workflowRun);
   const routeParameters = $derived({
     namespace,
@@ -236,6 +241,9 @@
         >.
       </Alert>
     </div>
+  {/if}
+  {#if headerSnippet}
+    {@render headerSnippet()}
   {/if}
   <NoWorkersPollingAlert />
   <Tabs>
