@@ -13,9 +13,13 @@
   import Icon from './icon/icon.svelte';
   import MenuDivider from './menu/menu-divider.svelte';
 
-  export let logout: () => void;
+  interface Props {
+    logout: () => void;
+  }
 
-  let showProfilePic = true;
+  let { logout }: Props = $props();
+
+  let showProfilePic = $state(true);
 
   function fixImage() {
     showProfilePic = false;
@@ -34,7 +38,7 @@
         src={$authUser?.picture}
         alt={$authUser?.profile ?? translate('common.user-profile')}
         class="h-[24px] w-[24px] cursor-pointer"
-        on:error={fixImage}
+        onerror={fixImage}
         class:hidden={!showProfilePic}
       />
       <div
