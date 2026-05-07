@@ -73,7 +73,7 @@
   const toggleChildrenVisibility = async (workflow: WorkflowExecution) => {
     const visibleChildren = visibleChildrenMap.get(workflow.runId);
 
-    if (visibleChildren?.length) {
+    if (visibleChildren?.length != null) {
       // we are collapsing the children so if there is an inflight request
       // we don't want its resolution to reopen the children.
       inFlightChildRequests.delete(workflow.runId);
@@ -125,7 +125,7 @@
   type VisibleRow =
     | {
         rowType: 'root';
-        childCount: number;
+        childCount: number | undefined;
         value: WorkflowExecution;
       }
     | {
@@ -135,17 +135,17 @@
       };
   const visibleRows: VisibleRow[] = $derived.by(() => {
     return visiblePaginatedItems.flatMap((workflow) => {
-      const visibleChildren = visibleChildrenMap.get(workflow.runId) ?? [];
+      const visibleChildren = visibleChildrenMap.get(workflow.runId);
 
       const rootRow = {
         rowType: 'root' as const,
-        childCount: visibleChildren.length,
+        childCount: visibleChildren?.length,
         value: workflow,
       };
 
       return [
         rootRow,
-        ...visibleChildren.map((c) => ({
+        ...(visibleChildren || []).map((c) => ({
           rowType: 'child' as const,
           parentRow: rootRow,
           value: c,
@@ -233,7 +233,7 @@
       <TableRow
         workflow={row.value}
         {toggleChildrenVisibility}
-        childCount={!isChildRow && row.childCount > 0
+        childCount={!isChildRow && row.childCount != null
           ? row.childCount
           : undefined}
         child={isChildRow}
