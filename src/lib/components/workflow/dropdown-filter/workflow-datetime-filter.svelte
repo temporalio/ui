@@ -69,7 +69,7 @@
     }
   };
 
-  $: (timeFilter, setTimeValues());
+  $: setTimeValues();
 
   const getOtherFilters = () =>
     $workflowFilters.filter(
