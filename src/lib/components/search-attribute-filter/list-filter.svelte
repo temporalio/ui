@@ -11,9 +11,9 @@
   import ConditionalMenu from './conditional-menu.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  type Props = {
+  interface Props {
     children?: Snippet;
-  };
+  }
 
   let { children }: Props = $props();
 

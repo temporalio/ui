@@ -4,10 +4,10 @@
   import type { NamespaceListItem } from '$lib/types/global';
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
 
-  type Props = {
+  interface Props {
     open?: boolean;
     namespaceList?: NamespaceListItem[];
-  };
+  }
 
   let { open = false, namespaceList = [] }: Props = $props();
 

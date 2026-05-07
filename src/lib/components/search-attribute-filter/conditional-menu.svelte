@@ -21,14 +21,14 @@
     { value: '<' },
   ];
 
-  type Props = {
+  interface Props {
     options?: { value: string; label?: string }[];
     disabled?: boolean;
     inputId: string;
     noBorderLeft?: boolean;
     noBorderRight?: boolean;
     children?: Snippet;
-  };
+  }
 
   let {
     options = defaultConditionOptions,

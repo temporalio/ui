@@ -26,9 +26,9 @@
 
   import { CategoryIcon } from './constants';
 
-  type Props = {
+  interface Props {
     compact?: boolean;
-  };
+  }
 
   let { compact = false }: Props = $props();
 

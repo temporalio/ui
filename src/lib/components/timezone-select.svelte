@@ -38,10 +38,10 @@
     Timezones,
   } from '$lib/utilities/timezone';
 
-  type Props = {
+  interface Props {
     position?: 'left' | 'right';
     size?: ButtonStyles['size'];
-  };
+  }
 
   let { position = 'right', size = 'md' }: Props = $props();
 

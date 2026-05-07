@@ -7,9 +7,9 @@
   import { translate } from '$lib/i18n/translate';
   import { getUTCString } from '$lib/utilities/format-date';
 
-  type Props = {
+  interface Props {
     value: string | null;
-  };
+  }
 
   let { value = $bindable() }: Props = $props();
 
