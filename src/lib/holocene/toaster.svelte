@@ -10,10 +10,14 @@
   import Link from './link.svelte';
   import ToastComponent from './toast.svelte';
 
-  export let pop: Toast['pop'];
-  export let toasts: Toast['toasts'];
-  export let closeButtonLabel: string;
-  export let position: Writable<ToastPosition>;
+  interface Props {
+    pop: Toast['pop'];
+    toasts: Toast['toasts'];
+    closeButtonLabel: string;
+    position: Writable<ToastPosition>;
+  }
+
+  let { pop, toasts, closeButtonLabel, position }: Props = $props();
 
   const dismissToast = (event: CustomEvent<{ id: string }>) => {
     pop(event.detail.id);
