@@ -4,7 +4,7 @@
 
   import SchedulesTimeView from './schedules-time-view.svelte';
 
-  type Props = {
+  interface Props {
     daysOfWeek: string[];
     hour: string;
     minute: string;

@@ -3,7 +3,7 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  type Props = {
+  interface Props {
     hour?: string;
     minute?: string;
     timezoneName: string;

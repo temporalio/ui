@@ -5,7 +5,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
-  type Props = {
+  interface Props {
     days?: string;
     hour?: string;
     minute?: string;
