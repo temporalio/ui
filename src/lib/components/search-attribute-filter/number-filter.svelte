@@ -11,8 +11,7 @@
     getContext<FilterContext>(FILTER_CONTEXT);
   const min = 0;
 
-  $: ({ value } = $filter);
-  $: _value = value ? Number(value) : null;
+  let _value = $derived($filter.value ? Number($filter.value) : null);
 
   const handleKeydown = (e: KeyboardEvent) => {
     $focusedElementId = '';
