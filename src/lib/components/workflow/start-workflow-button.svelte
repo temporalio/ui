@@ -21,7 +21,11 @@
   });
 </script>
 
-<Tooltip text={translate('workflows.start-workflow-like-this-one')} topLeft>
+<Tooltip
+  usePortal
+  text={translate('workflows.start-workflow-like-this-one')}
+  topLeft
+>
   <Button
     size="xs"
     variant="ghost"
