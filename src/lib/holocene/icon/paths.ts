@@ -79,7 +79,6 @@ import invite from './svg/invite.svelte';
 import json from './svg/json.svelte';
 import key from './svg/key.svelte';
 import keyboard from './svg/keyboard.svelte';
-import labs from './svg/labs.svelte';
 import laptopCode from './svg/laptop-code.svelte';
 import lightningBolt from './svg/lightning-bolt.svelte';
 import link from './svg/link.svelte';
@@ -236,7 +235,6 @@ export const icons = {
   json,
   keyboard,
   key,
-  labs,
   'laptop-code': laptopCode,
   'lightning-bolt': lightningBolt,
   link,

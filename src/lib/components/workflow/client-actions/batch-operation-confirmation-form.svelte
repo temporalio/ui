@@ -21,7 +21,7 @@
     jobIdPlaceholder: string;
     jobIdValid: boolean;
     children?: Snippet;
-  };
+  }
 
   let {
     action,

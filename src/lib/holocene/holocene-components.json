@@ -713,7 +713,6 @@
       "type": "'up' | 'down' | 'left' | 'right' | undefined"
     }
   ],
-  "labs-mode-guard": [],
   "link": [
     {
       "name": "href",

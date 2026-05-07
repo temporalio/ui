@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import WorkflowJsonNavigator from '$lib/components/workflow/workflow-json-navigator.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';

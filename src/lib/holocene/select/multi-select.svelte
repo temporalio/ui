@@ -19,25 +19,46 @@
   import type { IconName } from '../icon';
   import Icon from '../icon/icon.svelte';
 
-  export let options: MultiSelectOptions = [];
-  export let initialSelected: MultiSelectOptions = [];
-  export let onChange: (options: MultiSelectOptions) => void;
-  export let label: string;
-  export let id: string;
-  export let variant: ButtonStyles['variant'] = 'secondary';
-  export let icon: IconName | undefined = undefined;
-  export let selectAllLabel: string;
-  export let clearAllLabel: string;
-  export let active = false;
-  export let disabled = false;
-  export let position: 'left' | 'right' = 'left';
-  export let initialSelectedAll = true;
+  interface Props {
+    options?: MultiSelectOptions;
+    initialSelected?: MultiSelectOptions;
+    onChange: (options: MultiSelectOptions) => void;
+    label: string;
+    id: string;
+    variant?: ButtonStyles['variant'];
+    icon?: IconName | undefined;
+    selectAllLabel: string;
+    clearAllLabel: string;
+    active?: boolean;
+    disabled?: boolean;
+    position?: 'left' | 'right';
+    initialSelectedAll?: boolean;
+  }
 
-  let selectedOptions = initialSelected.length
-    ? initialSelected
-    : initialSelectedAll
-      ? options
-      : [];
+  let {
+    options = [],
+    initialSelected = [],
+    onChange,
+    label,
+    id,
+    variant = 'secondary',
+    icon = undefined,
+    selectAllLabel,
+    clearAllLabel,
+    active = false,
+    disabled = false,
+    position = 'left',
+    initialSelectedAll = true,
+  }: Props = $props();
+
+  // svelte-ignore state_referenced_locally
+  let selectedOptions = $state(
+    initialSelected.length
+      ? initialSelected
+      : initialSelectedAll
+        ? options
+        : [],
+  );
 
   const open = writable(false);
 
