@@ -837,7 +837,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
     const decodedInput = await decodePayloadAndParseDataToJSON(
-      startEvent.attributes.input[0],
+      startEvent.attributes.input?.payloads[0],
       false,
     ); // only single payloads are supported starting a workflow;
 

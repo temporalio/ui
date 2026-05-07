@@ -18,7 +18,10 @@
       class="overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs text-primary {className}"
     >
       <code>
-        <pre class="truncate">{decodedValue.slice(0, truncateAt)}</pre>
+        <pre class="truncate">{(decodedValue[0] ?? '').slice(
+            0,
+            truncateAt,
+          )}</pre>
       </code>
     </div>
   {/snippet}
