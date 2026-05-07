@@ -19,7 +19,7 @@
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
 
-  type Props = {
+  interface Props {
     open: boolean;
     workflow: WorkflowExecution;
     namespace: string;

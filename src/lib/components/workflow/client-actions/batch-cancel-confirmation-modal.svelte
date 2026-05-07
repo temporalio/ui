@@ -20,7 +20,7 @@
 
   import BatchOperationConfirmationModalBody from './batch-operation-confirmation-form.svelte';
 
-  type Props = {
+  interface Props {
     namespace: string;
     open: boolean;
   };

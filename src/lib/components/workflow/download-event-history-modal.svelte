@@ -8,7 +8,7 @@
 
   import WorkflowRawHistoryLink from '../workflow-raw-history-link.svelte';
 
-  type Props = {
+  interface Props {
     open?: boolean;
     namespace: string;
     workflowId: string;

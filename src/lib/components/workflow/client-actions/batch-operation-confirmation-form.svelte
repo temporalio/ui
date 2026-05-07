@@ -13,7 +13,7 @@
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { workflowsQuery } from '$lib/stores/workflows';
 
-  type Props = {
+  interface Props {
     action: Action;
     reason: string;
     jobId: string;

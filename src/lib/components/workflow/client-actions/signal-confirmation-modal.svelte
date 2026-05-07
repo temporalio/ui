@@ -16,7 +16,7 @@
   import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  type Props = {
+  interface Props {
     open: boolean;
     workflow: WorkflowExecution;
     namespace: string;
