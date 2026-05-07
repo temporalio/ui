@@ -108,6 +108,7 @@
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
+              usePortal
               text={childrenShown
                 ? translate('workflows.children', { count: childCount ?? 0 })
                 : translate('workflows.show-children')}
