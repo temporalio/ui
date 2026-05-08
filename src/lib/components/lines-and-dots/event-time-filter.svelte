@@ -16,6 +16,7 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { translate } from '$lib/i18n/translate';
   import { eventTimeFilter } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
@@ -74,6 +75,7 @@
   let endMinute = $state<string>('');
   let endSecond = $state<string>('');
 
+  let endEnabled = $state<boolean>(false);
   const filterActive = $derived(
     Boolean($eventTimeFilter.startTime || $eventTimeFilter.endTime),
   );
@@ -106,7 +108,8 @@
 
   const hydrateFromStore = () => {
     const s = $eventTimeFilter.startTime ?? defaultStart;
-    const e = $eventTimeFilter.endTime ?? defaultEnd ?? new Date();
+    const storedEnd = $eventTimeFilter.endTime;
+    const e = storedEnd ?? defaultEnd ?? new Date();
     startDate = toStartOfDay(s);
     startHour = toHour(s);
     startMinute = toMinute(s);
@@ -115,6 +118,7 @@
     endHour = toHour(e);
     endMinute = toMinute(e);
     endSecond = toSecond(e);
+    endEnabled = storedEnd !== null;
   };
 
   const onToggle = (next: boolean) => {
@@ -123,12 +127,18 @@
 
   const onApply = () => {
     const start = composeDate(startDate, startHour, startMinute, startSecond);
-    const end = composeDate(endDate, endHour, endMinute, endSecond);
-    end.setUTCMilliseconds(999);
+    let end: Date | null = null;
+    if (endEnabled) {
+      end = composeDate(endDate, endHour, endMinute, endSecond);
+      end.setUTCMilliseconds(999);
+    }
     $eventTimeFilter = { startTime: start, endTime: end };
     updateEventFilterParams(
       $page.url,
-      { timeStart: start.toISOString(), timeEnd: end.toISOString() },
+      {
+        timeStart: start.toISOString(),
+        timeEnd: end ? end.toISOString() : null,
+      },
       goto,
     );
     $open = false;
@@ -189,9 +199,17 @@
     <MenuDivider />
     <MenuItem>
       <div class="flex w-full flex-col gap-2">
-        <span class="text-xs font-medium text-secondary">
-          {translate('common.end')}
-        </span>
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-secondary">
+            {translate('common.end')}
+          </span>
+          <ToggleSwitch
+            id="event-time-filter-end-enabled"
+            label={translate('common.end')}
+            labelHidden
+            bind:checked={endEnabled}
+          />
+        </div>
         <DatePicker
           label={translate('common.end')}
           labelHidden
@@ -201,12 +219,14 @@
           todayLabel={translate('common.today')}
           closeLabel={translate('common.close')}
           clearLabel={translate('common.clear-input-button-label')}
+          disabled={!endEnabled}
         />
         <TimePicker
           bind:hour={endHour}
           bind:minute={endMinute}
           bind:second={endSecond}
           twelveHourClock={false}
+          disabled={!endEnabled}
         />
       </div>
     </MenuItem>
