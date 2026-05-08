@@ -12,7 +12,7 @@ import {
   isWorkflowTaskCompletedEvent,
 } from '$lib/utilities/is-event-type';
 
-import { eventFilterSort } from './event-view';
+import { eventFilterSort, eventTimeFilter } from './event-view';
 import { eventTypeFilter } from './filters';
 import { persistStore } from './persist-store';
 
@@ -55,14 +55,39 @@ export const fullEventHistory = writable<WorkflowEvents>([]);
 export const pauseLiveUpdates = writable(false);
 export const currentEventHistory = writable<WorkflowEvents>([]);
 
-export const filteredEventHistory = derived(
+const ISO_SECOND_LENGTH = 19;
+const toIsoSecond = (d: Date) => d.toISOString().slice(0, ISO_SECOND_LENGTH);
+
+const matchesType = (
+  event: WorkflowEvents[number],
+  types: string[],
+): boolean => {
+  if (isLocalActivityMarkerEvent(event))
+    return types.includes('local-activity');
+  return types.includes(event.category);
+};
+
+export const typeFilteredEventHistory = derived(
   [currentEventHistory, eventTypeFilter],
-  ([$history, $types]) => {
+  ([$history, $types]) =>
+    $history.filter((event) => matchesType(event, $types)),
+);
+
+export const filteredEventHistory = derived(
+  [currentEventHistory, eventTypeFilter, eventTimeFilter],
+  ([$history, $types, $timeRange]) => {
+    const startIso = $timeRange.startTime
+      ? toIsoSecond($timeRange.startTime)
+      : null;
+    const endIso = $timeRange.endTime ? toIsoSecond($timeRange.endTime) : null;
     return $history.filter((event) => {
-      if (isLocalActivityMarkerEvent(event)) {
-        return $types.includes('local-activity');
-      }
-      return $types.includes(event.category);
+      if (!matchesType(event, $types)) return false;
+      if (startIso === null && endIso === null) return true;
+      if (!event.eventTime) return true;
+      const eventIso = (event.eventTime as string).slice(0, ISO_SECOND_LENGTH);
+      if (startIso !== null && eventIso < startIso) return false;
+      if (endIso !== null && eventIso > endIso) return false;
+      return true;
     });
   },
 );

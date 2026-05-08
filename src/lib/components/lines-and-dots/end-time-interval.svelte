@@ -8,6 +8,7 @@
 
   export let workflow: WorkflowExecution;
   export let startTime: string | Timestamp;
+  export let overrideEndTime: string | undefined = undefined;
 
   let currentTime = Date.now();
 
@@ -16,7 +17,7 @@
     return currentTime + 1000;
   };
 
-  $: endTime = workflow?.endTime || rightNow();
+  $: endTime = overrideEndTime || workflow?.endTime || rightNow();
   $: duration = getMillisecondDuration({
     start: startTime,
     end: endTime,
@@ -33,7 +34,7 @@
   };
 
   const startStopInterval = (pauseLiveUpdates) => {
-    if (pauseLiveUpdates) {
+    if (pauseLiveUpdates || overrideEndTime) {
       clearInterval(endTimeInterval);
       endTimeInterval = null;
     } else if (!endTimeInterval && (workflow.isRunning || workflow.isPaused)) {
