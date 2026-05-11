@@ -196,6 +196,8 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
+<slot name="before-table" visibleItems={$store.visibleItems} />
+
 <PaginatedTable
   bind:this={paginatedTable}
   loading={$store.loading}

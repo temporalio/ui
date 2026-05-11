@@ -25,6 +25,9 @@
   import TableRow from './workflows-summary-configurable-table/table-row.svelte';
 
   export let onClickConfigure: () => void;
+  export let onItemsChange:
+    | ((workflows: WorkflowExecution[]) => void)
+    | undefined = undefined;
 
   $: ({ namespace } = $page.params);
   $: baseColumns = $configurableTableColumns?.[namespace]?.workflows ?? [];
@@ -90,14 +93,18 @@
   <PaginatedTable
     total={$workflowCount.count}
     {onFetch}
+    {onItemsChange}
     let:visibleItems
     aria-label={translate('common.workflows')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('workflows.empty-state-title')}
-    maxHeight="var(--panel-h)"
+    maxHeight="var(--table-h)"
   >
+    <svelte:fragment slot="before-table">
+      <slot name="before-table" />
+    </svelte:fragment>
     <caption class="sr-only" slot="caption">
       {translate('common.workflows')}
     </caption>

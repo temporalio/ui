@@ -254,7 +254,7 @@
   style="will-change: width"
 >
   <div
-    class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
+    class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.75rem]"
   >
     <div
       class={merge(

@@ -42,16 +42,19 @@
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import FilterBar from '$lib/components/workflow/filter-bar/index.svelte';
   import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
+  import WorkflowStartSummary from '$lib/components/workflow/workflow-start-summary.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import SavedQueryViews from '$lib/pages/saved-query-views.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
+  import { currentPageKey } from '$lib/stores/pagination';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
     refresh,
@@ -59,8 +62,15 @@
     workflowsQuery,
     workflowsSearchParams,
   } from '$lib/stores/workflows';
-  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+  import {
+    combineFilters,
+    createFilter,
+    toListWorkflowFilters,
+  } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
   const query = $derived(page.url.searchParams.get('query'));
@@ -133,6 +143,72 @@
   const cancelableWorkflows = derivedStore(selectedWorkflows, (workflows) =>
     workflows.filter((workflow) => workflow.status === 'Running'),
   );
+
+  let workflowStartSummaryKey = $state('');
+  let workflowStartSummaryItems = $state<WorkflowExecution[]>([]);
+
+  const addWorkflowStartSummaryItems = (workflows: WorkflowExecution[]) => {
+    if (!workflows.length) return;
+
+    const existingWorkflowKeys = new Set(
+      workflowStartSummaryItems.map(
+        (workflow) => `${workflow.id}:${workflow.runId}`,
+      ),
+    );
+    const newWorkflows = workflows.filter(
+      (workflow) =>
+        !existingWorkflowKeys.has(`${workflow.id}:${workflow.runId}`),
+    );
+
+    if (newWorkflows.length) {
+      workflowStartSummaryItems = [
+        ...workflowStartSummaryItems,
+        ...newWorkflows,
+      ];
+    }
+  };
+
+  $effect(() => {
+    const nextWorkflowStartSummaryKey = `${namespace ?? ''}|${query ?? ''}|${$refresh}`;
+    if (workflowStartSummaryKey !== nextWorkflowStartSummaryKey) {
+      workflowStartSummaryKey = nextWorkflowStartSummaryKey;
+      workflowStartSummaryItems = [];
+    }
+  });
+
+  const isValidFilter = (filter: SearchAttributeFilter): boolean => {
+    return Boolean(
+      filter.attribute &&
+      (filter.value ||
+        filter.conditional?.toLocaleLowerCase().includes('null')),
+    );
+  };
+
+  const filterByWorkflowType = (event: CustomEvent<string>) => {
+    const workflowType = event.detail;
+    const baseFilters = toListWorkflowFilters(
+      query ?? '',
+      $searchAttributes,
+    ).filter(
+      (filter) => filter.attribute !== 'WorkflowType' && isValidFilter(filter),
+    );
+    const workflowTypeFilter = createFilter({
+      attribute: 'WorkflowType',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: workflowType,
+      conditional: '=',
+    });
+    const nextFilters = combineFilters([...baseFilters, workflowTypeFilter]);
+    const nextQuery = toListWorkflowQueryFromFilters(nextFilters);
+
+    $workflowFilters = nextFilters;
+    updateQueryParameters({
+      url: page.url,
+      parameter: 'query',
+      value: nextQuery,
+      clearParameters: [currentPageKey],
+    });
+  };
 
   const openBatchCancelConfirmationModal = () => {
     $selectedWorkflows.length > 1
@@ -253,7 +329,10 @@
   </div>
 </header>
 
-<FilterBar />
+<WorkflowStartSummary
+  workflows={workflowStartSummaryItems}
+  on:filter={filterByWorkflowType}
+/>
 <div class="flex overflow-auto">
   <SavedQueryViews />
   <div
@@ -264,7 +343,9 @@
   >
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
+      onItemsChange={addWorkflowStartSummaryItems}
     >
+      <FilterBar slot="before-table" />
       <slot name="cloud" slot="cloud" />
     </WorkflowsSummaryConfigurableTable>
   </div>
