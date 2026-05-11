@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { onDestroy, type Snippet } from 'svelte';
+  import { type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { portal } from '$lib/holocene/portal/portal-action';
+  import { focusTrap } from '$lib/utilities/focus-trap';
 
   import MaximizeButton from './button.svelte';
 
@@ -44,36 +45,21 @@
   };
 
   let wrapperEl: HTMLElement | undefined = $state();
-  let originalParent: ParentNode | null = null;
-  let originalNextSibling: ChildNode | null = null;
-  let portalElement: ReturnType<typeof portal> | null = null;
 
   $effect(() => {
-    if (!wrapperEl) return;
+    if (!wrapperEl || !maximized) return;
 
-    if (maximized) {
-      originalParent = wrapperEl.parentNode;
-      originalNextSibling = wrapperEl.nextSibling;
-      portalElement = portal(wrapperEl, document.body);
-    } else if (portalElement) {
-      portalElement.destroy();
-      portalElement = null;
-      if (originalParent) {
-        originalParent.insertBefore(wrapperEl, originalNextSibling);
-        originalParent = null;
-        originalNextSibling = null;
-      }
-    }
-  });
+    const el = wrapperEl;
+    const parent = el.parentNode;
+    const nextSibling = el.nextSibling;
+    const pe = portal(el, document.body);
 
-  onDestroy(() => {
-    if (portalElement && wrapperEl) {
-      if (originalParent) {
-        originalParent.insertBefore(wrapperEl, originalNextSibling);
+    return () => {
+      pe?.destroy();
+      if (parent) {
+        parent.insertBefore(el, nextSibling);
       }
-      portalElement.destroy();
-      portalElement = null;
-    }
+    };
   });
 </script>
 
@@ -88,6 +74,7 @@
     className,
   )}
   onfocusout={handleFocusOut}
+  use:focusTrap={maximized}
 >
   {@render children()}
 
