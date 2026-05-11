@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { type Snippet } from 'svelte';
+  import { onDestroy, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
+
+  import { portal } from '$lib/holocene/portal/portal-action';
 
   import MaximizeButton from './button.svelte';
 
@@ -40,11 +42,45 @@
       maximized = false;
     }
   };
+
+  let wrapperEl: HTMLElement | undefined = $state();
+  let originalParent: ParentNode | null = null;
+  let originalNextSibling: ChildNode | null = null;
+  let portalElement: ReturnType<typeof portal> | null = null;
+
+  $effect(() => {
+    if (!wrapperEl) return;
+
+    if (maximized) {
+      originalParent = wrapperEl.parentNode;
+      originalNextSibling = wrapperEl.nextSibling;
+      portalElement = portal(wrapperEl, document.body);
+    } else if (portalElement) {
+      portalElement.destroy();
+      portalElement = null;
+      if (originalParent) {
+        originalParent.insertBefore(wrapperEl, originalNextSibling);
+        originalParent = null;
+        originalNextSibling = null;
+      }
+    }
+  });
+
+  onDestroy(() => {
+    if (portalElement && wrapperEl) {
+      if (originalParent) {
+        originalParent.insertBefore(wrapperEl, originalNextSibling);
+      }
+      portalElement.destroy();
+      portalElement = null;
+    }
+  });
 </script>
 
 <svelte:window onkeydown={escapeListener} />
 
 <div
+  bind:this={wrapperEl}
   class={merge(
     'relative',
     maximized &&
