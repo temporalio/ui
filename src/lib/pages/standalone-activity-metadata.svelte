@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
   import UserMetadata from '$lib/components/user-metadata.svelte';
   import Alert from '$lib/holocene/alert.svelte';

@@ -4,12 +4,14 @@
   import { translate } from '$lib/i18n/translate';
   import { dataEncoder } from '$lib/stores/data-encoder';
 
-  $: message =
+  const message = $derived(
     $dataEncoder.customErrorMessage ||
-    translate('data-encoder.codec-server-error');
-  $: linkUrl =
+      translate('data-encoder.codec-server-error'),
+  );
+  const linkUrl = $derived(
     $dataEncoder.customErrorLink ||
-    'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server-endpoints-with-web-ui-and-cli';
+      'https://docs.temporal.io/production-deployment/data-encryption#set-your-codec-server-endpoints-with-web-ui-and-cli',
+  );
 </script>
 
 {#if $dataEncoder.hasError}

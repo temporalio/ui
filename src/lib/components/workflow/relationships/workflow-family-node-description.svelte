@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import type { RootNode } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -7,21 +7,37 @@
   import WorkflowFamilyNodeDescriptionDetails from './workflow-family-node-description-details.svelte';
   import WorkflowFamilyNodeDescriptionTree from './workflow-family-node-description-tree.svelte';
 
-  export let root: RootNode;
-  export let expandAll: boolean;
-  export let generation = 0;
-  export let onNodeClick: (node: RootNode, generation: number) => void;
-  export let activeWorkflow: WorkflowExecution | undefined = undefined;
-  export let openRuns: Map<number, string>;
+  type Props = {
+    root: RootNode;
+    expandAll: boolean;
+    generation?: number;
+    onNodeClick: (node: RootNode, generation: number) => void;
+    activeWorkflow?: WorkflowExecution | undefined;
+    openRuns: Map<number, string>;
+  };
 
-  $: ({ namespace, workflow, run } = $page.params);
-  $: expanded =
+  let {
+    root,
+    expandAll,
+    generation = 0,
+    onNodeClick,
+    activeWorkflow = undefined,
+    openRuns,
+  }: Props = $props();
+
+  const namespace = $derived(page.params.namespace);
+  const workflow = $derived(page.params.workflow);
+  const run = $derived(page.params.run);
+  const expanded = $derived(
     expandAll ||
-    openRuns.get(generation) === root.workflow.runId ||
-    generation === 0;
-  $: isCurrent = root.workflow.id === workflow && root.workflow.runId === run;
-  $: isActive = root.workflow.runId === activeWorkflow?.runId;
-  $: isRootWorkflow = generation === 0;
+      openRuns.get(generation) === root.workflow.runId ||
+      generation === 0,
+  );
+  const isCurrent = $derived(
+    root.workflow.id === workflow && root.workflow.runId === run,
+  );
+  const isActive = $derived(root.workflow.runId === activeWorkflow?.runId);
+  const isRootWorkflow = $derived(generation === 0);
 
   const onClick = () => {
     onNodeClick(root, generation);
@@ -36,7 +52,10 @@
       'surface-subtle'} items-center gap-1 px-2 py-1 lg:py-2 {!isActive &&
       'hover:surface-interactive-secondary'}"
     class:border-l={!isRootWorkflow && !isActive}
-    on:click|stopPropagation={onClick}
+    onclick={(e) => {
+      e.stopPropagation();
+      onClick();
+    }}
   >
     {#if !isRootWorkflow && !isActive}
       <div
@@ -49,7 +68,7 @@
         {namespace}
         {isRootWorkflow}
         {isActive}
-        children={root.children?.length}
+        childrenCount={root.children?.length ?? 0}
         {expanded}
       />
     </div>

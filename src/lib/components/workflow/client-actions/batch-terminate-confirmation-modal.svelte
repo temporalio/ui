@@ -20,15 +20,20 @@
 
   import BatchOperationConfirmationModalBody from './batch-operation-confirmation-form.svelte';
 
-  export let namespace: string;
-  export let open: boolean;
+  interface Props {
+    namespace: string;
+    open: boolean;
+  }
+
+  let { namespace, open = $bindable() }: Props = $props();
+
   const identity = getIdentity();
   const reason = writable('');
   const reasonPlaceholder = getPlaceholder(Action.Terminate, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
-  let jobIdPlaceholder = crypto.randomUUID();
-  let error = '';
+  let jobIdPlaceholder = $state(crypto.randomUUID());
+  let error = $state('');
 
   const { allSelected, terminableWorkflows } =
     getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
@@ -40,7 +45,9 @@
     jobIdPlaceholder = crypto.randomUUID();
   };
 
-  $: if (open) resetForm();
+  $effect(() => {
+    if (open) resetForm();
+  });
 
   const terminateWorkflows = async () => {
     error = '';
@@ -61,9 +68,10 @@
         id: 'batch-terminate-success-toast',
       });
     } catch (err) {
-      error = isNetworkError(err)
-        ? err.message
-        : translate('common.unknown-error');
+      error =
+        isNetworkError(err) && err.message
+          ? err.message
+          : translate('common.unknown-error');
     }
   };
 </script>

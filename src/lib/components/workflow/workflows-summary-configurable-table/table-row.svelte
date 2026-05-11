@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -20,26 +20,48 @@
 
   import StartWorkflowButton from '../start-workflow-button.svelte';
 
-  export let workflow: WorkflowExecution | undefined = undefined;
-  export let empty = false;
-  export let viewChildren: (workflow?: WorkflowExecution) => void = () => {};
-  export let childCount: number | undefined = undefined;
-  export let child = false;
+  type Props = {
+    workflow: WorkflowExecution;
+    empty?: boolean;
+    toggleChildrenVisibility?: (
+      workflow: WorkflowExecution,
+    ) => void | Promise<void>;
+    childCount?: number | undefined;
+    child?: boolean;
+    onClickBatchSelect?: (e: MouseEvent) => void;
+    children?: Snippet;
+  };
+
+  let {
+    workflow,
+    empty = false,
+    toggleChildrenVisibility = () => {},
+    childCount = undefined,
+    child = false,
+    onClickBatchSelect = () => {},
+    children,
+  }: Props = $props();
 
   const { allSelected, selectedWorkflows } = getContext<BatchOperationContext>(
     BATCH_OPERATION_CONTEXT,
   );
 
-  $: ({ namespace } = $page.params);
+  const namespace = $derived(page.params.namespace);
 
-  $: parentWorkflows =
-    $page.url.searchParams.get('query') === '`ParentWorkflowId` is null';
+  const parentWorkflows = $derived(
+    page.url.searchParams.get('query') === '`ParentWorkflowId` is null',
+  );
 
-  $: label = translate('workflows.select-workflow', {
-    workflow: workflow?.id,
-  });
+  const label = $derived(
+    translate('workflows.select-workflow', { workflow: workflow?.id }),
+  );
 
-  $: childrenShown = childCount !== undefined;
+  const childrenShown = $derived(childCount !== undefined);
+
+  const checked = $derived(
+    ($allSelected && !child) ||
+      $selectedWorkflows.some((selected) => selected.runId === workflow.runId),
+  );
 </script>
 
 <tr
@@ -51,9 +73,11 @@
   {#if !empty && $supportsBulkActions}
     <td class="relative">
       <Checkbox
+        data-testid="batch-checkbox"
         {label}
         labelHidden
-        bind:group={$selectedWorkflows}
+        on:click={onClickBatchSelect}
+        {checked}
         value={workflow}
         disabled={$allSelected}
         aria-label={label}
@@ -65,7 +89,7 @@
         ? 'w-auto'
         : 'w-6'}"
     >
-      {#if !workflowCreateDisabled($page)}
+      {#if !workflowCreateDisabled(page)}
         <StartWorkflowButton
           {namespace}
           runId={workflow.runId}
@@ -80,12 +104,13 @@
           <Button
             size="xs"
             variant={childrenShown ? 'primary' : 'ghost'}
-            on:click={() => viewChildren(workflow)}
+            on:click={() => toggleChildrenVisibility(workflow)}
             class={$tableDensity === 'dense' ? 'mt-1 h-5 w-5' : ''}
           >
             <Tooltip
+              usePortal
               text={childrenShown
-                ? translate('workflows.children', { count: childCount })
+                ? translate('workflows.children', { count: childCount ?? 0 })
                 : translate('workflows.show-children')}
               topLeft
             >
@@ -98,7 +123,7 @@
   {:else}
     <td></td>
   {/if}
-  <slot />
+  {@render children?.()}
 </tr>
 
 <style lang="postcss">

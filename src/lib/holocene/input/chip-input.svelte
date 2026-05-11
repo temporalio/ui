@@ -1,41 +1,55 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
-
   import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
   import Label from '$lib/holocene/label.svelte';
 
-  export let id: string;
-  export let chips: string[];
-  export let label: string;
-  export let labelHidden = false;
-  export let placeholder = '';
-  export let name = id;
-  export let disabled = false;
-  export let required = false;
-  export let hintText = '';
-  export let validator: (value: string) => boolean = () => true;
-  export let removeChipButtonLabel: string | ((chipValue: string) => string);
-  export let external = false;
-  export let maxLength = 0;
+  type Props = {
+    id: string;
+    chips: string[];
+    label: string;
+    labelHidden?: boolean;
+    placeholder?: string;
+    name?: string;
+    disabled?: boolean;
+    required?: boolean;
+    hintText?: string;
+    validator?: (value: string) => boolean;
+    removeChipButtonLabel: string | ((chipValue: string) => string);
+    external?: boolean;
+    maxLength?: number;
+    class?: string;
+    scrollTo?: boolean;
+  };
 
-  const values = writable<string[]>(Array.isArray(chips) ? [...chips] : []);
-  let displayValue = '';
+  let {
+    id,
+    chips = $bindable([]),
+    label,
+    labelHidden = false,
+    placeholder = '',
+    name = id,
+    disabled = false,
+    required = false,
+    hintText = '',
+    validator = () => true,
+    removeChipButtonLabel,
+    external = false,
+    maxLength = 0,
+    class: className = '',
+    scrollTo = false,
+  }: Props = $props();
 
-  $: (chips, ($values = chips ?? []));
-  $: invalid = $values.some((chip) => !validator(chip));
+  let displayValue = $state('');
 
-  let className = '';
-  export { className as class };
-  export let scrollTo = false;
+  const invalid = $derived(chips.some((chip) => !validator(chip)));
 
   const handleKeydown = (e: KeyboardEvent) => {
+    e.stopPropagation();
     const value = displayValue.trim();
     if ((e.key === ',' || e.key === 'Enter') && value !== '') {
       e.preventDefault();
-      values.update((previous) => [...previous, value]);
-      chips = $values;
+      chips = [...chips, value];
       displayValue = '';
     }
 
@@ -44,44 +58,37 @@
       e.key === 'Backspace' &&
       eventTarget &&
       eventTarget.value === '' &&
-      $values.length > 0
+      chips.length > 0
     ) {
-      values.update((previous) => previous.slice(0, -1));
-      chips = $values;
+      chips = chips.slice(0, -1);
     }
   };
 
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
-    if (maxLength && $values.length >= maxLength) return;
+    if (maxLength && chips.length >= maxLength) return;
     const clipboardContents = e.clipboardData.getData('text/plain');
     let newValues = clipboardContents
       .split(',')
       .map((content) => content.trim());
 
     if (maxLength) {
-      newValues = newValues.slice(0, maxLength - $values.length);
+      newValues = newValues.slice(0, maxLength - chips.length);
     }
 
-    values.update((previous) => [...previous, ...newValues]);
-    chips = $values;
+    chips = [...chips, ...newValues];
   };
 
   const handleBlur = () => {
     const value = displayValue.trim();
     if (value !== '') {
-      values.update((previous) => [...previous, value]);
-      chips = $values;
+      chips = [...chips, value];
       displayValue = '';
     }
   };
 
   const removeChip = (index: number) => {
-    values.update((previous) => {
-      previous.splice(index, 1);
-      return previous;
-    });
-    chips = $values;
+    chips = chips.toSpliced(index, 1);
   };
 
   const scrollIntoView = (element: HTMLInputElement, _: string[]) => {
@@ -110,8 +117,8 @@
       invalid && 'invalid',
     )}
   >
-    {#if $values.length > 0 && !external}
-      {#each $values as chip, i (`${chip}-${i}`)}
+    {#if chips.length > 0 && !external}
+      {#each chips as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
         <Chip
           removeButtonLabel={typeof removeChipButtonLabel === 'string'
@@ -136,11 +143,11 @@
       multiple
       data-testid={id}
       bind:value={displayValue}
-      on:blur={handleBlur}
-      on:keydown|stopPropagation={handleKeydown}
-      on:paste={handlePaste}
-      use:scrollIntoView={$values}
-      maxlength={maxLength && $values.length >= maxLength ? 0 : undefined}
+      onblur={handleBlur}
+      onkeydown={handleKeydown}
+      onpaste={handlePaste}
+      use:scrollIntoView={chips}
+      maxlength={maxLength && chips.length >= maxLength ? 0 : undefined}
       size={placeholder.length || undefined}
     />
   </div>
@@ -160,19 +167,19 @@
         <span class="count">
           <span
             class="text-information"
-            class:warn={maxLength - $values?.length <= 5}
-            class:error={maxLength === $values?.length}
+            class:warn={maxLength - chips.length <= 5}
+            class:error={maxLength === chips?.length}
           >
-            {$values?.length ?? 0}
+            {chips.length}
           </span>&nbsp;/&nbsp;{maxLength}
         </span>
       {/if}
     </div>
   {/if}
 
-  {#if $values.length > 0 && external}
+  {#if chips.length > 0 && external}
     <div class="flex flex-row flex-wrap gap-1">
-      {#each $values as chip, i (`${chip}-${i}`)}
+      {#each chips as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
         <Chip
           removeButtonLabel={typeof removeChipButtonLabel === 'string'

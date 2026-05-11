@@ -11,31 +11,39 @@
 
   import WorkflowStatus from '../workflow-status.svelte';
 
-  export let children: ChildWorkflowClosedEvent[] = [];
-  export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
-  export let namespace: string;
+  interface Props {
+    children?: ChildWorkflowClosedEvent[];
+    pendingChildren?: WorkflowExecution['pendingChildren'];
+    namespace: string;
+  }
 
-  $: formattedPending = pendingChildren.map((c) => {
-    return {
-      runId: c.runId,
-      workflowId: c.workflowId,
-      status: 'Running' as const,
-      type: c.workflowTypeName,
-      namespace,
-    };
-  });
+  let { children = [], pendingChildren = [], namespace }: Props = $props();
 
-  $: formattedCompleted = children.map((c) => {
-    return {
-      runId: c.attributes.workflowExecution.runId,
-      workflowId: c.attributes.workflowExecution.workflowId,
-      type: c.attributes.workflowType,
-      status: c.classification,
-      namespace: c.attributes?.namespace || namespace,
-    };
-  });
+  const formattedPending = $derived(
+    pendingChildren.map((c) => {
+      return {
+        runId: c.runId,
+        workflowId: c.workflowId,
+        status: 'Running' as const,
+        type: c.workflowTypeName,
+        namespace,
+      };
+    }),
+  );
 
-  $: formattedAll = [...formattedPending, ...formattedCompleted];
+  const formattedCompleted = $derived(
+    children.map((c) => {
+      return {
+        runId: c.attributes.workflowExecution.runId,
+        workflowId: c.attributes.workflowExecution.workflowId,
+        type: c.attributes.workflowType,
+        status: c.classification,
+        namespace: c.attributes?.namespace || namespace,
+      };
+    }),
+  );
+
+  const formattedAll = $derived([...formattedPending, ...formattedCompleted]);
 </script>
 
 <Pagination

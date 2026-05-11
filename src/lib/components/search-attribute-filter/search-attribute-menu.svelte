@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -24,8 +24,12 @@
 
   import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
 
-  export let filters: SearchAttributeFilter[];
-  export let options: SearchAttributeOption[];
+  interface Props {
+    filters: SearchAttributeFilter[];
+    options: SearchAttributeOption[];
+  }
+
+  let { filters, options }: Props = $props();
 
   const { filter, activeQueryIndex, focusedElementId } =
     getContext<FilterContext>(FILTER_CONTEXT);
@@ -45,22 +49,26 @@
     $focusedElementId = getFocusedElementId($filter);
   }
 
-  let searchAttributeValue = '';
+  let searchAttributeValue = $state('');
 
-  $: filteredOptions = !searchAttributeValue
-    ? options
-    : options.filter((option) =>
-        option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
-      );
+  const filteredOptions = $derived(
+    !searchAttributeValue
+      ? options
+      : options.filter((option) =>
+          option.value
+            .toLowerCase()
+            .includes(searchAttributeValue.toLowerCase()),
+        ),
+  );
 
-  $: query = $page.url.searchParams.get('query');
+  const query = $derived(page.url.searchParams.get('query') ?? '');
 </script>
 
 <MenuContainer>
   <MenuButton
     id="search-attribute-filter-button"
     controls="search-attribute-menu"
-    disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
+    disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
     onclick={() => (searchAttributeValue = '')}
     class="text-nowrap"
   >

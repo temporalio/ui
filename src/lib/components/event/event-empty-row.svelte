@@ -4,9 +4,15 @@
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
 
-  export let loading = false;
-  export let title = translate('events.empty-state-title');
-  export let content = translate('events.empty-state-description');
+  let {
+    loading = false,
+    title = translate('events.empty-state-title'),
+    content = translate('events.empty-state-description'),
+  }: {
+    loading?: boolean;
+    title?: string;
+    content?: string;
+  } = $props();
 </script>
 
 <tr class="bg-primary">

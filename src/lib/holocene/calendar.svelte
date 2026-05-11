@@ -5,26 +5,35 @@
 
   const dispatch = createEventDispatcher();
 
-  export let date: Date | undefined;
-  export let month: number | undefined;
-  export let year: number | undefined;
-  export let isAllowed = (_date: Date) => true;
-
-  let cells = [];
-
-  const onChange = (date: number) => {
-    dispatch('datechange', new Date(year, month, date));
+  type Props = {
+    date: Date;
+    month: number;
+    year: number;
+    isAllowed?: (date: Date) => boolean;
   };
 
-  const allow = (year: number, month: number, date: number) => {
-    if (!date) return true;
-    return isAllowed(new Date(year, month, date));
+  let {
+    date,
+    month,
+    year,
+    isAllowed = (_date: Date) => true,
+  }: Props = $props();
+
+  const onChange = (selectedDay: number) => {
+    dispatch('datechange', new Date(year, month, selectedDay));
   };
 
-  $: cells = getDateRows(month, year).map((c) => ({
-    value: c,
-    allowed: allow(year, month, c),
-  }));
+  const allow = (year: number, month: number, day: number | undefined) => {
+    if (!day) return true;
+    return isAllowed(new Date(year, month, day));
+  };
+
+  const cells = $derived(
+    getDateRows(month, year).map((c) => ({
+      value: c,
+      allowed: allow(year, month, c),
+    })),
+  );
 </script>
 
 <div class="container">
@@ -39,7 +48,7 @@
       {#if value}
         <button
           type="button"
-          on:click={allowed && value ? () => onChange(value) : () => {}}
+          onclick={allowed && value ? () => onChange(value) : () => {}}
           class="cell"
           class:highlight={allowed && value}
           class:disabled={!allowed}

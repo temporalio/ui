@@ -9,7 +9,7 @@
   export let namespace: string;
   export let workflowId: string;
   export let runId: string;
-  export let taskQueue: string;
+  export let taskQueue: string | undefined;
   export let workflowType: string;
 
   $: href = routeForWorkflowStart({
@@ -21,7 +21,11 @@
   });
 </script>
 
-<Tooltip text={translate('workflows.start-workflow-like-this-one')} topLeft>
+<Tooltip
+  usePortal
+  text={translate('workflows.start-workflow-like-this-one')}
+  topLeft
+>
   <Button
     size="xs"
     variant="ghost"

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import MultiSelect from '$lib/holocene/select/multi-select.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -7,17 +7,19 @@
   import { eventClassificationFilter } from '$lib/stores/filters';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  $: label = translate('events.event-classification-label');
+  const label = translate('events.event-classification-label');
 
-  let parameter = 'classification';
-  let options = eventClassifications.map((o) => ({
+  const parameter = 'classification';
+  const options = eventClassifications.map((o) => ({
     value: o,
     label: o,
   }));
 
-  $: initialSelected = $eventClassificationFilter
-    ? options.filter((o) => $eventClassificationFilter.includes(o.value))
-    : [];
+  const initialSelected = $derived(
+    $eventClassificationFilter
+      ? options.filter((o) => $eventClassificationFilter.includes(o.value))
+      : [],
+  );
 
   const onOptionClick = (_options) => {
     if (_options.length === options.length) {
@@ -28,7 +30,7 @@
     updateQueryParameters({
       parameter: parameter,
       value,
-      url: $page.url,
+      url: page.url,
     });
   };
 </script>

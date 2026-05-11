@@ -9,7 +9,6 @@
 
   export type BatchOperationContext = {
     allSelected: Writable<boolean>;
-    pageSelected: Writable<boolean>;
     terminableWorkflows: Readable<WorkflowExecution[]>;
     cancelableWorkflows: Readable<WorkflowExecution[]>;
     selectedWorkflows: Writable<WorkflowExecution[]>;
@@ -18,17 +17,14 @@
     openBatchTerminateConfirmationModal: () => void;
     openBatchResetConfirmationModal: () => void;
     handleSelectAll: (workflows: WorkflowExecution[]) => void;
-    handleSelectPage: (
-      checked: boolean,
-      workflows: WorkflowExecution[],
-    ) => void;
+    selectWorkflows: (checked: boolean, workflows: WorkflowExecution[]) => void;
   };
 </script>
 
 <script lang="ts">
   import { derived as derivedStore, writable } from 'svelte/store';
 
-  import { onMount, setContext } from 'svelte';
+  import { onMount, setContext, type Snippet } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -63,7 +59,10 @@
   import { routeForWorkflowStart } from '$lib/utilities/route-for';
   import { workflowCreateDisabled } from '$lib/utilities/workflow-create-disabled';
 
-  const query = $derived(page.url.searchParams.get('query'));
+  const { headerActions, cloud }: { headerActions?: Snippet; cloud?: Snippet } =
+    $props();
+
+  const query = $derived(page.url.searchParams.get('query') ?? '');
   const namespace = $derived(page.params.namespace);
   const perPage = $derived(page.url.searchParams.get('per-page'));
   const searchParams = $derived(page.url.searchParams.toString());
@@ -96,16 +95,15 @@
   });
 
   $effect(() => {
-    namespace;
-    query;
-    perPage;
-    $refresh;
+    void namespace;
+    void query;
+    void perPage;
+    void $refresh;
     resetSelection();
   });
 
   const resetSelection = () => {
     $allSelected = false;
-    $pageSelected = false;
     $selectedWorkflows = [];
   };
 
@@ -118,7 +116,6 @@
   let cancelConfirmationModalOpen = $state(false);
 
   const allSelected = writable<boolean>(false);
-  const pageSelected = writable<boolean>(false);
   const selectedWorkflows = writable<WorkflowExecution[]>([]);
   const batchActionsVisible = derivedStore(
     selectedWorkflows,
@@ -135,15 +132,19 @@
   );
 
   const openBatchCancelConfirmationModal = () => {
-    $selectedWorkflows.length > 1
-      ? (batchCancelConfirmationModalOpen = true)
-      : (cancelConfirmationModalOpen = true);
+    if ($selectedWorkflows.length > 1) {
+      batchCancelConfirmationModalOpen = true;
+    } else {
+      cancelConfirmationModalOpen = true;
+    }
   };
 
   const openBatchTerminateConfirmationModal = () => {
-    $selectedWorkflows.length > 1
-      ? (batchTerminateConfirmationModalOpen = true)
-      : (terminateConfirmationModalOpen = true);
+    if ($selectedWorkflows.length > 1) {
+      batchTerminateConfirmationModalOpen = true;
+    } else {
+      terminateConfirmationModalOpen = true;
+    }
   };
 
   const openBatchResetConfirmationModal = () => {
@@ -155,22 +156,34 @@
     selectedWorkflows.set([...workflows]);
   };
 
-  const handleSelectPage = (
+  /**
+   * Handle the selection or deselection of workflows.
+   * This modifies the existing selection. It does not replace it (i.e., if a workflow was already selected and it was not deselected by this call, it will remain selected).
+   * @param checked Whether to select or deselect workflows
+   * @param workflows Workflows to be selected or deselected
+   */
+  const selectWorkflows = (
     checked: boolean,
     workflows: WorkflowExecution[],
-  ) => {
-    pageSelected.set(checked);
-    if ($allSelected) allSelected.set(false);
-    if (checked) {
-      selectedWorkflows.set([...workflows]);
-    } else {
-      selectedWorkflows.set([]);
+  ): void => {
+    // Map is not being used reactively here.
+    // We could refactor the selected workflows store to use SvelteMap if we wanted to though.
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
+    const selected = new Map($selectedWorkflows.map((w) => [w.runId, w]));
+
+    for (const workflow of workflows) {
+      if (checked) {
+        selected.set(workflow.runId, workflow);
+      } else {
+        selected.delete(workflow.runId);
+      }
     }
+
+    selectedWorkflows.set(Array.from(selected.values()));
   };
 
   setContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT, {
     allSelected,
-    pageSelected,
     terminableWorkflows,
     cancelableWorkflows,
     selectedWorkflows,
@@ -179,7 +192,7 @@
     openBatchTerminateConfirmationModal,
     openBatchResetConfirmationModal,
     handleSelectAll,
-    handleSelectPage,
+    selectWorkflows,
   });
 
   const openCustomizationDrawer = () => {
@@ -240,9 +253,9 @@
       <CountRefreshButton count={$workflowCount.newCount} {refresh} />
       <WorkflowCounts bind:refreshTime fetchTaskFailures />
     </div>
-    {#if $$slots['header-actions'] || workflowStartEnabled}
+    {#if headerActions || workflowStartEnabled}
       <div class="flex items-center gap-4">
-        <slot name="header-actions" />
+        {@render headerActions?.()}
         {#if workflowStartEnabled}
           <Button href={routeForWorkflowStart({ namespace })}
             >{translate('workflows.start-workflow')}</Button
@@ -264,9 +277,8 @@
   >
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
-    >
-      <slot name="cloud" slot="cloud" />
-    </WorkflowsSummaryConfigurableTable>
+      {cloud}
+    />
   </div>
 </div>
 <ConfigurableTableHeadersDrawer
