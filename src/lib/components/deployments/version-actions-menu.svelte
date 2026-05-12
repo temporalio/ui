@@ -45,11 +45,9 @@
           {translate('deployments.edit')}
         </MenuItem>
       </CapabilityGuard>
-      <CapabilityGuard capability="serverScaledDeployments">
-        <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-          {translate('deployments.set-as-current')}
-        </MenuItem>
-      </CapabilityGuard>
+      <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
+        {translate('deployments.set-as-current')}
+      </MenuItem>
       <CapabilityGuard capability="serverScaledDeployments">
         <MenuItem onclick={onValidate}>
           {translate('deployments.validate-connection')}
