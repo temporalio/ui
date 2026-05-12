@@ -2,6 +2,9 @@
   import { type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import { portal } from '$lib/holocene/portal/portal-action';
+  import { focusTrap } from '$lib/utilities/focus-trap';
+
   import MaximizeButton from './button.svelte';
 
   interface Props {
@@ -40,11 +43,31 @@
       maximized = false;
     }
   };
+
+  let wrapperEl: HTMLElement | undefined = $state();
+  let portalElement: ReturnType<typeof portal> | null = null;
+
+  $effect(() => {
+    if (!wrapperEl || !maximized) return;
+
+    const originalParent = wrapperEl.parentNode;
+    const originalNextSibling = wrapperEl.nextSibling;
+    portalElement = portal(wrapperEl, document.body);
+
+    return () => {
+      portalElement?.destroy();
+      portalElement = null;
+      if (originalParent?.isConnected) {
+        originalParent.insertBefore(wrapperEl!, originalNextSibling);
+      }
+    };
+  });
 </script>
 
 <svelte:window onkeydown={escapeListener} />
 
 <div
+  bind:this={wrapperEl}
   class={merge(
     'relative',
     maximized &&
@@ -52,6 +75,7 @@
     className,
   )}
   onfocusout={handleFocusOut}
+  use:focusTrap={maximized}
 >
   {@render children()}
 
