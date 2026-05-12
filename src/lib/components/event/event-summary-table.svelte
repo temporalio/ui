@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
@@ -30,40 +30,49 @@
   import PendingActivitySummaryRow from './pending-activity-summary-row.svelte';
   import PendingNexusSummaryRow from './pending-nexus-summary-row.svelte';
 
-  export let items: IterableEventWithPending[];
-  export let groups: EventGroups = [];
-  export let updating = false;
-  export let loading = false;
-  export let compact = false;
-  export let minimized = true;
-  export let hoveredEventId: string | undefined = undefined;
+  let {
+    items,
+    groups = [],
+    updating = false,
+    loading = false,
+    compact = false,
+    minimized = true,
+    hoveredEventId = $bindable(undefined),
+  }: {
+    items: IterableEventWithPending[];
+    groups?: EventGroups;
+    updating?: boolean;
+    loading?: boolean;
+    compact?: boolean;
+    minimized?: boolean;
+    hoveredEventId?: string;
+  } = $props();
 
-  $: showGraph = !minimized && !compact;
+  const showGraph = $derived(!minimized && !compact);
+  const initialItem = $derived($fullEventHistory?.[0]);
+  const url = $derived(page.url);
+  const perPageParam = $derived(url.searchParams.get(perPageKey) ?? '100');
+  const currentPageParam = $derived(
+    url.searchParams.get(currentPageKey) || '1',
+  );
 
-  $: initialItem = $fullEventHistory?.[0];
+  const filteredForStatus = (items: IterableEventWithPending[]) =>
+    getFailedOrPendingEvents(items, $eventStatusFilter);
 
-  $: url = $page.url;
-  $: perPageParam = url.searchParams.get(perPageKey) ?? '100';
-  $: currentPageParam = url.searchParams.get(currentPageKey) || '1';
-  $: paginatedHistory = (items: IterableEventWithPending[]) => {
+  const paginatedHistory = (items: IterableEventWithPending[]) => {
     return filteredForStatus(items).slice(
       (parseInt(currentPageParam) - 1) * parseInt(perPageParam),
       parseInt(currentPageParam) * parseInt(perPageParam),
     ) as WorkflowEventWithPending[];
   };
-  $: filteredForStatus = (items: IterableEventWithPending[]) =>
-    getFailedOrPendingEvents(items, $eventStatusFilter);
 
-  const columns = [
+  const columns = $derived([
     { label: 'Event ID' },
     { label: 'Timestamp' },
     { label: 'Event Type' },
     { label: 'Details' },
-  ];
-
-  $: if ($isCloud && columns.length === 4) {
-    columns.push({ label: 'Billable Actions' });
-  }
+    ...($isCloud ? [{ label: 'Billable Actions' }] : []),
+  ]);
 
   const iterableKey = (event: IterableEventWithPending) => {
     if (isPendingNexusOperation(event))

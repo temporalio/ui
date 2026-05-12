@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <div class="meter">
   <span></span>
 </div>

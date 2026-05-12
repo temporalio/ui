@@ -3,7 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  $: ({ workflow } = $workflowRun);
+  const workflow = $derived($workflowRun.workflow);
 </script>
 
 <div class="flex flex-col gap-4">

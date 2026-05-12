@@ -154,7 +154,6 @@ export const Strings = {
   'arrow-key-right': 'Arrow key right',
   on: 'On',
   off: 'Off',
-  labs: 'Labs',
   experimental: 'Experimental',
   timezone: 'Timezone {{ timezone }}',
   'time-unit': 'Time Unit',

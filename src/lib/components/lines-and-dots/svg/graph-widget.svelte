@@ -7,11 +7,23 @@
 
   import TimelineGraph from './timeline-graph.svelte';
 
-  export let namespace: string;
-  export let workflowId: string;
-  export let runId = '';
-  export let viewportHeight = 360;
-  export let onLoad: () => void = () => {};
+  interface Props {
+    namespace: string;
+    workflowId: string;
+    runId?: string;
+    viewportHeight?: number;
+    onLoad?: () => void;
+    class?: string;
+  }
+
+  let {
+    namespace,
+    workflowId,
+    runId = '',
+    viewportHeight = 360,
+    onLoad = () => {},
+    class: className = '',
+  }: Props = $props();
 
   const getWorkflowAndEventHistory = async () => {
     const [workflow, history] = await Promise.all([
@@ -32,7 +44,7 @@
 </script>
 
 {#await getWorkflowAndEventHistory() then { workflow, history }}
-  <div class="cursor-pointer overflow-auto {$$restProps.class}">
+  <div class="cursor-pointer overflow-auto {className}">
     <TimelineGraph
       {viewportHeight}
       {workflow}

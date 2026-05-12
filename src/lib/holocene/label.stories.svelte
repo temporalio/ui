@@ -1,6 +1,9 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
 
   import Label from '$lib/holocene/label.svelte';
 
@@ -23,7 +26,7 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta<Label>;
+  } satisfies Meta<ComponentProps<typeof Label>>;
 </script>
 
 <Template let:args>

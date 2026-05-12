@@ -4,7 +4,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
 
-  export let input: Payloads;
+  let { input }: { input: Payloads } = $props();
 </script>
 
 <Panel>

@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script>
   import { page } from '$app/state';
 

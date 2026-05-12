@@ -8,9 +8,13 @@
   import type { WorkflowIdentifier } from '$lib/types/workflows';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  export let parent: WorkflowIdentifier;
-  export let parentNamespaceName: string | undefined;
-  export let namespace: string;
+  interface Props {
+    parent: WorkflowIdentifier;
+    parentNamespaceName: string | undefined;
+    namespace: string;
+  }
+
+  let { parent, parentNamespaceName, namespace }: Props = $props();
 </script>
 
 <Table class="w-full">

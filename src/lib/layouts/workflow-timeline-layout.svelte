@@ -1,6 +1,6 @@
 <script lang="ts">
   import { beforeNavigate, goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
@@ -28,58 +28,64 @@
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
-  $: ({ namespace } = $page.params);
-  $: ({ workflow } = $workflowRun);
-  $: pendingActivities = workflow?.pendingActivities;
-  $: pendingNexusOperations = workflow?.pendingNexusOperations;
+  const namespace = $derived(page.params.namespace);
+  const workflow = $derived($workflowRun.workflow);
+  const pendingActivities = $derived(workflow?.pendingActivities);
+  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
-  $: urlParams = parseEventFilterParams($page.url);
-  $: {
+  const urlParams = $derived(parseEventFilterParams(page.url));
+
+  $effect(() => {
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
-  }
+  });
 
-  $: reverseSort = $eventFilterSort === 'descending';
+  const reverseSort = $derived($eventFilterSort === 'descending');
 
-  $: ascendingGroups = groupEvents(
-    $filteredEventHistory,
-    'ascending',
-    pendingActivities,
-    pendingNexusOperations,
+  const ascendingGroups = $derived(
+    groupEvents(
+      $filteredEventHistory,
+      'ascending',
+      pendingActivities,
+      pendingNexusOperations,
+    ),
   );
 
-  $: groups = orderGroupsByPending(
-    reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
-    reverseSort,
+  const groups = $derived(
+    orderGroupsByPending(
+      reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
+      reverseSort,
+    ),
   );
 
-  $: workflowTaskFailedError = getWorkflowTaskFailedEvent(
-    $currentEventHistory,
-    'ascending',
+  const workflowTaskFailedError = $derived(
+    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
   );
 
-  $: isNotPending = workflow && !workflow?.isRunning && !workflow?.isPaused;
+  const isNotPending = $derived(
+    Boolean(workflow && !workflow?.isRunning && !workflow?.isPaused),
+  );
 
   beforeNavigate(() => {
     clearActives();
   });
 
-  $: {
+  $effect(() => {
     if (isNotPending && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
     }
-  }
+  });
 
-  let showDownloadPrompt = false;
+  let showDownloadPrompt = $state(false);
 
   const onSort = () => {
     const newSort = reverseSort ? 'ascending' : 'descending';
-    updateEventFilterParams($page.url, { sort: newSort }, goto);
+    updateEventFilterParams(page.url, { sort: newSort }, goto);
   };
 
   const onAutoRefreshToggle = () => {
     updateEventFilterParams(
-      $page.url,
+      page.url,
       { refresh_off: !$pauseLiveUpdates },
       goto,
     );
@@ -144,18 +150,22 @@
       </ToggleButtons>
     </div>
   </div>
-  <div class="flex w-full flex-col">
-    <TimelineGraph
-      {workflow}
-      {groups}
-      viewportHeight={undefined}
-      error={Boolean(workflowTaskFailedError)}
-    />
-  </div>
+  {#if workflow}
+    <div class="flex w-full flex-col">
+      <TimelineGraph
+        {workflow}
+        {groups}
+        viewportHeight={undefined}
+        error={Boolean(workflowTaskFailedError)}
+      />
+    </div>
+  {/if}
 </div>
-<DownloadEventHistoryModal
-  bind:open={showDownloadPrompt}
-  {namespace}
-  workflowId={workflow.id}
-  runId={workflow.runId}
-/>
+{#if workflow}
+  <DownloadEventHistoryModal
+    bind:open={showDownloadPrompt}
+    {namespace}
+    workflowId={workflow.id}
+    runId={workflow.runId}
+  />
+{/if}
