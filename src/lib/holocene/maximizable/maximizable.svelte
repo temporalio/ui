@@ -45,19 +45,20 @@
   };
 
   let wrapperEl: HTMLElement | undefined = $state();
+  let portalElement: ReturnType<typeof portal> | null = null;
 
   $effect(() => {
     if (!wrapperEl || !maximized) return;
 
-    const el = wrapperEl;
-    const parent = el.parentNode;
-    const nextSibling = el.nextSibling;
-    const pe = portal(el, document.body);
+    const originalParent = wrapperEl.parentNode;
+    const originalNextSibling = wrapperEl.nextSibling;
+    portalElement = portal(wrapperEl, document.body);
 
     return () => {
-      pe?.destroy();
-      if (parent) {
-        parent.insertBefore(el, nextSibling);
+      portalElement?.destroy();
+      portalElement = null;
+      if (originalParent?.isConnected) {
+        originalParent.insertBefore(wrapperEl!, originalNextSibling);
       }
     };
   });
