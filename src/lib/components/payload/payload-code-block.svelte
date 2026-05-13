@@ -20,7 +20,7 @@
 <PayloadDecoder {value}>
   {#snippet children(decodedValue)}
     <div class="space-y-2">
-      {#each decodedValue as data (data)}
+      {#each decodedValue as data, index (index)}
         <CodeBlock
           content={data}
           {maxHeight}
