@@ -16,10 +16,13 @@ import { toURL } from '$lib/utilities/to-url';
 
 import { getRoutePrefix } from './core-provider';
 
-const withPrefix = (path: ResolvedPathname): ResolvedPathname => {
+const withPrefix = (
+  route: string,
+  params: Record<string, string>,
+): ResolvedPathname => {
   const prefix = getRoutePrefix();
-  if (!prefix) return path;
-  return `${base}${prefix}${path.slice(base.length)}` as ResolvedPathname;
+  if (!prefix) return resolve(route, params);
+  return resolve(`${prefix}${route}`, params);
 };
 
 interface RouteParameters {
@@ -84,11 +87,11 @@ export interface StartActivityExecutionQueryParams {
 }
 
 export const routeForNamespaces = (): ResolvedPathname => {
-  return withPrefix(resolve('/namespaces', {}));
+  return withPrefix('/namespaces', {});
 };
 
 export const routeForNexus = (): ResolvedPathname => {
-  return withPrefix(resolve('/nexus', {}));
+  return withPrefix('/nexus', {});
 };
 
 export const routeForCommonErrors = (): ResolvedPathname => {
@@ -96,25 +99,25 @@ export const routeForCommonErrors = (): ResolvedPathname => {
 };
 
 export const routeForNexusEndpoint = (id: string): ResolvedPathname => {
-  return withPrefix(resolve('/nexus/[id]', { id }));
+  return withPrefix('/nexus/[id]', { id });
 };
 
 export const routeForNexusEndpointEdit = (id: string): ResolvedPathname => {
-  return withPrefix(resolve('/nexus/[id]/edit', { id }));
+  return withPrefix('/nexus/[id]/edit', { id });
 };
 
 export const routeForNexusEndpointCreate = (): ResolvedPathname => {
-  return withPrefix(resolve('/nexus/create', {}));
+  return withPrefix('/nexus/create', {});
 };
 
 export const routeForNamespace = ({
   namespace,
 }: NamespaceParameter): ResolvedPathname => {
-  return withPrefix(resolve('/namespaces/[namespace]', { namespace }));
+  return withPrefix('/namespaces/[namespace]', { namespace });
 };
 
 export const routeForNamespaceSelector = (): ResolvedPathname => {
-  return withPrefix(resolve('/select-namespace', {}));
+  return withPrefix('/select-namespace', {});
 };
 
 export const routeForWorkflows = (
@@ -366,11 +369,9 @@ export const routeForWorkerDeployments = ({
 }: {
   namespace: string;
 }): ResolvedPathname => {
-  return withPrefix(
-    resolve('/namespaces/[namespace]/workers/deployments', {
-      namespace,
-    }),
-  );
+  return withPrefix('/namespaces/[namespace]/workers/deployments', {
+    namespace,
+  });
 };
 
 export const routeForWorkerInstance = ({
@@ -381,12 +382,10 @@ export const routeForWorkerInstance = ({
   workerInstanceKey: string;
 }): ResolvedPathname => {
   const workerInstanceKeyEncoded = encodeURIForSvelte(workerInstanceKey);
-  return withPrefix(
-    resolve('/namespaces/[namespace]/workers/[workerInstanceKey]', {
-      namespace,
-      workerInstanceKey: workerInstanceKeyEncoded,
-    }),
-  );
+  return withPrefix('/namespaces/[namespace]/workers/[workerInstanceKey]', {
+    namespace,
+    workerInstanceKey: workerInstanceKeyEncoded,
+  });
 };
 
 export const routeForWorkerDeployment = ({
@@ -398,10 +397,11 @@ export const routeForWorkerDeployment = ({
 }): ResolvedPathname => {
   const deploymentName = encodeURIForSvelte(deployment);
   return withPrefix(
-    resolve('/namespaces/[namespace]/workers/deployments/[deployment]', {
+    '/namespaces/[namespace]/workers/deployments/[deployment]',
+    {
       namespace,
       deployment: deploymentName,
-    }),
+    },
   );
 };
 
@@ -429,13 +429,11 @@ export const routeForWorkerDeploymentVersionCreate = ({
 }): ResolvedPathname => {
   const deploymentName = encodeURIForSvelte(deployment);
   return withPrefix(
-    resolve(
-      '/namespaces/[namespace]/workers/deployments/[deployment]/versions/create',
-      {
-        namespace,
-        deployment: deploymentName,
-      },
-    ),
+    '/namespaces/[namespace]/workers/deployments/[deployment]/versions/create',
+    {
+      namespace,
+      deployment: deploymentName,
+    },
   );
 };
 
@@ -451,14 +449,12 @@ export const routeForWorkerDeploymentVersionEdit = ({
   const deploymentName = encodeURIForSvelte(deployment);
   const buildIdEncoded = encodeURIForSvelte(buildId);
   return withPrefix(
-    resolve(
-      '/namespaces/[namespace]/workers/deployments/[deployment]/versions/[buildId]/edit',
-      {
-        namespace,
-        deployment: deploymentName,
-        buildId: buildIdEncoded,
-      },
-    ),
+    '/namespaces/[namespace]/workers/deployments/[deployment]/versions/[buildId]/edit',
+    {
+      namespace,
+      deployment: deploymentName,
+      buildId: buildIdEncoded,
+    },
   );
 };
 
@@ -467,11 +463,9 @@ export const routeForWorkerDeploymentCreate = ({
 }: {
   namespace: string;
 }): ResolvedPathname => {
-  return withPrefix(
-    resolve('/namespaces/[namespace]/workers/deployments/create', {
-      namespace,
-    }),
-  );
+  return withPrefix('/namespaces/[namespace]/workers/deployments/create', {
+    namespace,
+  });
 };
 
 export const routeForRelationships = (
@@ -585,13 +579,14 @@ export const routeForEventHistoryImport = (
 ): ResolvedPathname => {
   if (namespace && view) {
     return withPrefix(
-      resolve('/import/events/[namespace]/workflow/run/history/[view]', {
+      '/import/events/[namespace]/workflow/run/history/[view]',
+      {
         namespace,
         view,
-      }),
+      },
     );
   }
-  return withPrefix(resolve('/import/events', {}));
+  return withPrefix('/import/events', {});
 };
 
 export const routeForBatchOperations = ({
@@ -599,11 +594,9 @@ export const routeForBatchOperations = ({
 }: {
   namespace: string;
 }): ResolvedPathname => {
-  return withPrefix(
-    resolve('/namespaces/[namespace]/batch-operations', {
-      namespace,
-    }),
-  );
+  return withPrefix('/namespaces/[namespace]/batch-operations', {
+    namespace,
+  });
 };
 
 export const routeForBatchOperation = ({
@@ -615,12 +608,10 @@ export const routeForBatchOperation = ({
 }): ResolvedPathname => {
   const jId = encodeURIForSvelte(jobId);
 
-  return withPrefix(
-    resolve('/namespaces/[namespace]/batch-operations/[jobId]', {
-      namespace,
-      jobId: jId,
-    }),
-  );
+  return withPrefix('/namespaces/[namespace]/batch-operations/[jobId]', {
+    namespace,
+    jobId: jId,
+  });
 };
 
 export const hasParameters =
