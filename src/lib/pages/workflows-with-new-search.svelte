@@ -246,7 +246,7 @@
             <Translate key="workflows.recent-workflows" />
           {/if}
         </h1>
-        <p class="text-xs text-secondary">
+        <p class="mt-2 text-xs text-secondary">
           {refreshTimeFormatted}
         </p>
       </div>
