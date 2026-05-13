@@ -95,7 +95,7 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 			}
 			return c.Redirect(http.StatusPermanentRedirect, target)
 		}
-		return c.Stream(200, "text/html", bytes.NewBuffer(indexHTMLBytes))
+		return c.Stream(http.StatusOK, "text/html", bytes.NewBuffer(indexHTMLBytes))
 	}, nil
 }
 
