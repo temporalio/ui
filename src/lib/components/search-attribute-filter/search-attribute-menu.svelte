@@ -74,7 +74,7 @@
   >
     {#snippet leading()}
       {#if !$filter.attribute}
-        <Icon name="add" />
+        <Icon name="filter-lines" />
       {/if}
     {/snippet}
     {$filter.attribute || 'Search Attribute'}
