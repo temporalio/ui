@@ -12,7 +12,7 @@
   } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  export const decodePayloadValue = async (
+  const decodePayloadValue = async (
     value: PotentiallyDecodable | PayloadContainingObject,
   ): Promise<string[]> => {
     if (isRawPayload(value)) {
