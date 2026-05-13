@@ -1,4 +1,6 @@
 import {
+  max as dateFnsMax,
+  min as dateFnsMin,
   differenceInDays,
   formatDuration as durationToString,
   getMilliseconds as getSecondAsMilliseconds,
@@ -38,6 +40,14 @@ export function validTimeToDate(validTime: ValidTime) {
   }
 
   return parseJSON(validTime);
+}
+
+export function minDate(...validTimes: ValidTime[]): Date {
+  return dateFnsMin(validTimes.map((validTime) => validTimeToDate(validTime)));
+}
+
+export function maxDate(...validTimes: ValidTime[]): Date {
+  return dateFnsMax(validTimes.map((validTime) => validTimeToDate(validTime)));
 }
 
 export function formatDuration(
