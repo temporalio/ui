@@ -266,6 +266,7 @@ export async function decodePayloadAndParseDataToJSON(
   payload: Payload | null | undefined,
   returnDataOnly: boolean = true,
 ): Promise<unknown | ParsedPayload> {
+  if (!payload) return null;
   const decoded = await decodePayloadsWithRemoteCodec(toArray(payload));
 
   if (!decoded || !decoded[0]) {
@@ -278,6 +279,7 @@ export async function decodePayloadAndParseDataToJSON(
 export const decodePayloadsAndParseDataToJSON = async (
   payloads: Payloads | null | undefined,
 ): Promise<unknown[]> => {
+  if (!payloads) return null;
   const decoded = await decodePayloadsWithRemoteCodec(payloads?.payloads);
 
   if (!decoded || !decoded[0]) {
