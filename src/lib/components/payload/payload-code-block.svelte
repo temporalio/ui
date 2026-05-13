@@ -12,9 +12,10 @@
     value: PotentiallyDecodable | PayloadContainingObject;
     maxHeight?: number;
     testId?: string;
+    language?: 'text' | 'json';
   }
 
-  let { value, maxHeight, testId }: Props = $props();
+  let { value, maxHeight, testId, language = 'json' }: Props = $props();
 </script>
 
 <PayloadDecoder {value}>
@@ -27,7 +28,7 @@
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
           {testId}
-          language="json"
+          {language}
         />
       {/each}
     </div>
