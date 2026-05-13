@@ -32,6 +32,14 @@ export function isTimestamp(arg: unknown): arg is Timestamp {
   return false;
 }
 
+export function validTimeToDate(validTime: ValidTime) {
+  if (isTimestamp(validTime)) {
+    return timestampToDate(validTime);
+  }
+
+  return parseJSON(validTime);
+}
+
 export function formatDuration(
   duration: Duration | string,
   delimiter = ', ',
@@ -88,16 +96,8 @@ export function getDuration({
   if (!start || !end) return null;
 
   try {
-    if (isTimestamp(start)) {
-      start = timestampToDate(start);
-    }
-
-    if (isTimestamp(end)) {
-      end = timestampToDate(end);
-    }
-
-    const parsedStart = parseJSON(start);
-    const parsedEnd = parseJSON(end);
+    const parsedStart = validTimeToDate(start);
+    const parsedEnd = validTimeToDate(end);
 
     const duration = intervalToDuration({ start: parsedStart, end: parsedEnd });
     return flexibleUnits
@@ -127,16 +127,8 @@ export function getMillisecondDuration({
   if (!start || !end) return null;
 
   try {
-    if (isTimestamp(start)) {
-      start = timestampToDate(start);
-    }
-
-    if (isTimestamp(end)) {
-      end = timestampToDate(end);
-    }
-
-    const parsedStart = parseJSON(start);
-    const parsedEnd = parseJSON(end);
+    const parsedStart = validTimeToDate(start);
+    const parsedEnd = validTimeToDate(end);
     const ms = parsedEnd.getTime() - parsedStart.getTime();
     return onlyUnderSecond ? Math.abs(ms % 1000) : Math.abs(ms);
   } catch {
@@ -199,12 +191,7 @@ export function formatDistanceAbbreviated({
 
 export function getMilliseconds(date: ValidTime | undefined | null): number {
   if (!date) return 0;
-  if (isTimestamp(date)) {
-    date = timestampToDate(date);
-  }
-  const parsedDate = parseJSON(date);
-
-  return getSecondAsMilliseconds(parsedDate);
+  return getSecondAsMilliseconds(validTimeToDate(date));
 }
 
 export function fromSecondsToMinutesAndSeconds(seconds: number): string {

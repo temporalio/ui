@@ -9,6 +9,7 @@ import {
   fromSecondsToMinutesAndSeconds,
   getDuration,
   getTimestampDifference,
+  validTimeToDate,
 } from './format-time';
 
 describe('getDuration', () => {
@@ -368,5 +369,62 @@ describe('formatSecondsAbbreviated', () => {
   it('should return "1ms" for 0.001 seconds', () => {
     expect(formatSecondsAbbreviated(0.001)).toBe('1ms');
     expect(formatSecondsAbbreviated('0.001')).toBe('1ms');
+  });
+});
+
+describe('validTimeToDate', () => {
+  it('should convert a Timestamp object with seconds and nanos to a Date', () => {
+    const timestamp = { seconds: '1649866175', nanos: 630571000 };
+    const result = validTimeToDate(timestamp);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.630Z');
+  });
+
+  it('should convert a Timestamp object with numeric seconds to a Date', () => {
+    const timestamp = { seconds: 1649866175, nanos: 630571000 };
+    const result = validTimeToDate(timestamp);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.630Z');
+  });
+
+  it('should convert a Timestamp object with zero nanos to a Date', () => {
+    const timestamp = { seconds: '1649866175', nanos: 0 };
+    const result = validTimeToDate(timestamp);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.000Z');
+  });
+
+  it('should convert a Timestamp object with null nanos to a Date', () => {
+    const timestamp = { seconds: '1649866175', nanos: null };
+    const result = validTimeToDate(timestamp);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:09:35.000Z');
+  });
+
+  it('should convert an ISO date string to a Date', () => {
+    const isoString = '2022-04-13T16:29:35.630Z';
+    const result = validTimeToDate(isoString);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
+  });
+
+  it('should convert an ISO date string with nanosecond precision to a Date', () => {
+    const isoString = '2022-04-13T16:29:35.630571Z';
+    const result = validTimeToDate(isoString);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
+  });
+
+  it('should return a Date when passed a Date instance', () => {
+    const date = new Date('2022-04-13T16:29:35.630Z');
+    const result = validTimeToDate(date);
+    expect(result).toBeInstanceOf(Date);
+    expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
+  });
+
+  it('should return an invalid Date for an unparseable string', () => {
+    const result = validTimeToDate('not-a-date');
+    expect(result).toBeInstanceOf(Date);
+    expect(Number.isNaN(result.getTime())).toBe(true);
   });
 });
