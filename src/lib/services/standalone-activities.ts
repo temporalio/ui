@@ -149,6 +149,9 @@ const toStartActivityExecutionRequest = async (
     ...(activityFormData.scheduleToStartTimeout && {
       scheduleToStartTimeout: activityFormData.scheduleToStartTimeout,
     }),
+    ...(activityFormData.heartbeatTimeout && {
+      heartbeatTimeout: activityFormData.heartbeatTimeout,
+    }),
     retryPolicy: {
       ...(activityFormData.initialInterval && {
         initialInterval: activityFormData.initialInterval,

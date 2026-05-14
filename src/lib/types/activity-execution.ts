@@ -21,6 +21,14 @@ export type ActivityExecutionStatus =
   | 'ACTIVITY_EXECUTION_STATUS_TERMINATED'
   | 'ACTIVITY_EXECUTION_STATUS_TIMED_OUT';
 
+export type ActivityExecutionRunState =
+  | 'PENDING_ACTIVITY_STATE_UNSPECIFIED'
+  | 'PENDING_ACTIVITY_STATE_SCHEDULED'
+  | 'PENDING_ACTIVITY_STATE_STARTED'
+  | 'PENDING_ACTIVITY_STATE_CANCEL_REQUESTED'
+  | 'PENDING_ACTIVITY_STATE_PAUSED'
+  | 'PENDING_ACTIVITY_STATE_PAUSE_REQUESTED';
+
 export const ACTIVITY_ID_REUSE_POLICIES = [
   'ACTIVITY_ID_REUSE_POLICY_UNSPECIFIED',
   'ACTIVITY_ID_REUSE_POLICY_ALLOW_DUPLICATE',
@@ -54,7 +62,7 @@ export type ActivityExecutionOutcome =
       failure: Failure;
     };
 
-interface RetryPolicy {
+export interface RetryPolicy {
   initialInterval: string;
   backoffCoefficient: number;
   maximumInterval: string;
@@ -66,12 +74,12 @@ export interface ActivityExecutionInfo {
   runId: string;
   activityType: ActivityType;
   status: ActivityExecutionStatus;
-  runState?: string; // only for running activities
+  runState?: ActivityExecutionRunState; // only for running activities
   taskQueue: string;
   scheduleToCloseTimeout: string;
   scheduleToStartTimeout: string;
   startToCloseTimeout: string;
-  lastHeartbeatTime: string;
+  lastHeartbeatTime?: string;
   heartbeatDetails?: Payloads;
   heartbeatTimeout: string;
   retryPolicy: RetryPolicy;
@@ -79,7 +87,7 @@ export interface ActivityExecutionInfo {
   attempt: number;
   executionDuration?: string;
   scheduleTime: string;
-  closeTime: string;
+  closeTime?: string;
   lastWorkerIdentity: string;
   lastAttemptCompleteTime: string;
   nextAttemptScheduleTime: string;
@@ -110,6 +118,7 @@ export interface StartActivityExecutionRequest {
   startToCloseTimeout: string;
   scheduleToCloseTimeout: string;
   scheduleToStartTimeout: string;
+  heartbeatTimeout?: string;
   input?: Payloads;
   userMetadata?: UserMetadata;
   retryPolicy?: RetryPolicy;
