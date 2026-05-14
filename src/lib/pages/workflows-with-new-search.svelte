@@ -203,27 +203,117 @@
     );
   };
 
-  const workflowStartSummaryUsesCurrentTimeEnd = $derived(
-    toListWorkflowFilters(query ?? '', $searchAttributes).some(
-      (filter) =>
-        filter.type === SEARCH_ATTRIBUTE_TYPE.DATETIME && isValidFilter(filter),
-    ),
+  const parseTimestamp = (value: string): number | null => {
+    const timestamp = new Date(value).getTime();
+    return Number.isFinite(timestamp) ? timestamp : null;
+  };
+
+  const getQuotedDateValues = (value: string): string[] => {
+    return Array.from(value.matchAll(/"([^"]+)"/g), (match) => match[1]);
+  };
+
+  const getWorkflowStartSummaryRangeStartTime = (
+    filter: SearchAttributeFilter,
+  ): number | null => {
+    if (filter.attribute !== 'StartTime' || !isValidFilter(filter)) {
+      return null;
+    }
+
+    const conditional = filter.conditional.toUpperCase();
+
+    if (conditional === 'BETWEEN') {
+      const [startTime] = getQuotedDateValues(filter.value);
+      return startTime ? parseTimestamp(startTime) : null;
+    }
+
+    if (['>', '>=', '='].includes(conditional)) {
+      return parseTimestamp(filter.value);
+    }
+
+    return null;
+  };
+
+  const getWorkflowStartSummaryRangeEndTime = (
+    filter: SearchAttributeFilter,
+  ): number | null => {
+    if (filter.attribute !== 'StartTime' || !isValidFilter(filter)) {
+      return null;
+    }
+
+    const conditional = filter.conditional.toUpperCase();
+
+    if (conditional === 'BETWEEN') {
+      const [, endTime] = getQuotedDateValues(filter.value);
+      return endTime ? parseTimestamp(endTime) : null;
+    }
+
+    if (['<', '<=', '='].includes(conditional)) {
+      return parseTimestamp(filter.value);
+    }
+
+    return null;
+  };
+
+  const workflowStartSummaryFilters = $derived(
+    toListWorkflowFilters(query ?? '', $searchAttributes),
   );
 
-  const filterByWorkflowType = (workflowType: string) => {
+  const workflowStartSummaryRangeStartTime = $derived(
+    workflowStartSummaryFilters.reduce<number | null>((startTime, filter) => {
+      const filterStartTime = getWorkflowStartSummaryRangeStartTime(filter);
+      if (filterStartTime === null) return startTime;
+      if (startTime === null) return filterStartTime;
+      return Math.min(startTime, filterStartTime);
+    }, null),
+  );
+
+  const workflowStartSummaryRangeEndTime = $derived(
+    workflowStartSummaryFilters.reduce<number | null>((endTime, filter) => {
+      const filterEndTime = getWorkflowStartSummaryRangeEndTime(filter);
+      if (filterEndTime === null) return endTime;
+      if (endTime === null) return filterEndTime;
+      return Math.max(endTime, filterEndTime);
+    }, null),
+  );
+
+  const workflowStartSummaryUsesCurrentTimeEnd = $derived(
+    workflowStartSummaryRangeEndTime === null &&
+      workflowStartSummaryFilters.some(
+        (filter) =>
+          filter.type === SEARCH_ATTRIBUTE_TYPE.DATETIME &&
+          isValidFilter(filter),
+      ),
+  );
+
+  const filterByWorkflowStartTimeRange = ({
+    start,
+    end,
+  }: {
+    start: number;
+    end: number;
+  }) => {
+    if (!Number.isFinite(start) || !Number.isFinite(end)) return;
+
+    const earliest = Math.min(start, end);
+    const latest = Math.max(start, end);
+    const rangeStart = earliest;
+    const rangeEnd = Math.max(latest, earliest + 1);
     const baseFilters = toListWorkflowFilters(
       query ?? '',
       $searchAttributes,
     ).filter(
-      (filter) => filter.attribute !== 'WorkflowType' && isValidFilter(filter),
+      (filter) => filter.attribute !== 'StartTime' && isValidFilter(filter),
     );
-    const workflowTypeFilter = createFilter({
-      attribute: 'WorkflowType',
-      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      value: workflowType,
-      conditional: '=',
+    const startTimeFilter = createFilter({
+      attribute: 'StartTime',
+      type: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+      value: `BETWEEN "${new Date(rangeStart).toISOString()}" AND "${new Date(
+        rangeEnd,
+      ).toISOString()}"`,
+      conditional: 'BETWEEN',
+      customDate: true,
     });
-    const nextFilters = combineFilters([...baseFilters, workflowTypeFilter]);
+    const nextFilters = combineFilters([startTimeFilter, ...baseFilters]);
     const nextQuery = toListWorkflowQueryFromFilters(nextFilters);
 
     $workflowFilters = nextFilters;
@@ -359,8 +449,10 @@
 <WorkflowStartSummary
   loading={workflowStartSummaryLoading}
   workflows={workflowStartSummaryItems}
+  rangeStartTime={workflowStartSummaryRangeStartTime}
+  rangeEndTime={workflowStartSummaryRangeEndTime}
   useCurrentTimeEnd={workflowStartSummaryUsesCurrentTimeEnd}
-  onFilter={filterByWorkflowType}
+  onTimeRangeFilter={filterByWorkflowStartTimeRange}
 />
 <div class="flex overflow-auto">
   <SavedQueryViews />

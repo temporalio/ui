@@ -295,7 +295,7 @@
 
     {#if $savedQueryNavOpen}
       <p
-        class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
+        class="hidden items-center justify-between whitespace-nowrap px-2 py-1.5 text-xs font-medium leading-3 lg:flex lg:text-sm"
         transition:slide
       >
         {translate('standalone-activities.custom-views')}

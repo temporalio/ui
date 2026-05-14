@@ -8,16 +8,27 @@
   type Props = {
     workflows?: WorkflowExecution[];
     loading?: boolean;
+    rangeStartTime?: number | null;
+    rangeEndTime?: number | null;
     useCurrentTimeEnd?: boolean;
-    onFilter?: (workflowType: string) => void;
+    onTimeRangeFilter?: (range: TimeRange) => void;
+    showControls?: boolean;
   };
 
   let {
     workflows = [],
     loading = false,
+    rangeStartTime = null,
+    rangeEndTime = null,
     useCurrentTimeEnd = false,
-    onFilter,
+    onTimeRangeFilter,
+    showControls = false,
   }: Props = $props();
+
+  type TimeRange = {
+    start: number;
+    end: number;
+  };
 
   type Bar = {
     key: string;
@@ -27,6 +38,38 @@
     statusLabel: string;
     left: number;
     color: string;
+    rangeStart: number;
+    rangeEnd: number;
+  };
+
+  type StatusSegment = {
+    key: string;
+    status: WorkflowStatus;
+    statusLabel: string;
+    count: number;
+    percent: number;
+    color: string;
+  };
+
+  type WorkflowTypeCount = {
+    name: string;
+    count: number;
+  };
+
+  type DensityBucket = {
+    key: string;
+    workflows: WorkflowExecution[];
+    count: number;
+    start: number;
+    end: number;
+    left: number;
+    width: number;
+    height: number;
+    opacity: number;
+    glow: number;
+    columnWidth: number;
+    peakCount: number;
+    statusSegments: StatusSegment[];
   };
 
   type Tick = {
@@ -46,9 +89,38 @@
 
   const defaultRangePaddingMs = 5 * 60 * 1000;
   const minimumZoomDurationMs = 60 * 1000;
+  const fallbackGraphWidthPx = 800;
+  const minimumDensityBucketWidthPx = 14;
   const tickCount = 5;
+  const secondMs = 1000;
+  const minuteMs = 60 * secondMs;
+  const hourMs = 60 * minuteMs;
+  const dayMs = 24 * hourMs;
+  const bucketIntervalsMs = [
+    secondMs,
+    5 * secondMs,
+    15 * secondMs,
+    30 * secondMs,
+    minuteMs,
+    5 * minuteMs,
+    15 * minuteMs,
+    30 * minuteMs,
+    hourMs,
+    3 * hourMs,
+    6 * hourMs,
+    12 * hourMs,
+    dayMs,
+    2 * dayMs,
+    7 * dayMs,
+    14 * dayMs,
+    30 * dayMs,
+    90 * dayMs,
+    180 * dayMs,
+    365 * dayMs,
+  ];
 
   let graphElement = $state<HTMLDivElement | null>(null);
+  let graphWidth = $state(0);
   let viewStart = $state(0);
   let viewEnd = $state(0);
   let lastFullStart = $state(0);
@@ -67,6 +139,28 @@
     Paused: '#fef08a',
   };
 
+  const densityStatusColors: Partial<Record<StatusColorKey, string>> = {
+    Running: '#3b82f6',
+    TimedOut: '#f97316',
+    Completed: '#22c55e',
+    Failed: '#ef4444',
+    ContinuedAsNew: '#a855f7',
+    Canceled: '#64748b',
+    Terminated: '#eab308',
+    Paused: '#ca8a04',
+  };
+
+  const statusOrder: StatusColorKey[] = [
+    'Running',
+    'TimedOut',
+    'Completed',
+    'Failed',
+    'ContinuedAsNew',
+    'Canceled',
+    'Terminated',
+    'Paused',
+  ];
+
   const getStartTimestamp = (workflow: WorkflowExecution): number => {
     return new Date(workflow.startTime).getTime();
   };
@@ -75,12 +169,22 @@
     return status ? (statusColors[status] ?? '#cbd5e1') : '#cbd5e1';
   };
 
+  const getDensityStatusColor = (status: WorkflowStatus): string => {
+    return status ? (densityStatusColors[status] ?? '#94a3b8') : '#94a3b8';
+  };
+
+  const getWorkflowType = (workflow: WorkflowExecution): string => {
+    return workflow.name || 'Unknown workflow type';
+  };
+
   const toBar = (
     workflow: WorkflowExecution,
     start: number,
     duration: number,
+    rangeStart: number,
+    rangeEnd: number,
   ): Bar => {
-    const workflowType = workflow.name || 'Unknown workflow type';
+    const workflowType = getWorkflowType(workflow);
     const startTimestamp = getStartTimestamp(workflow);
     const left = duration ? ((startTimestamp - start) / duration) * 100 : 50;
 
@@ -92,11 +196,72 @@
       statusLabel: workflow.status ?? 'Unknown',
       left,
       color: getStatusColor(workflow.status),
+      rangeStart,
+      rangeEnd,
     };
+  };
+
+  const toStatusLabel = (status: WorkflowStatus): string => {
+    return status ?? 'Unknown';
+  };
+
+  const getStatusRank = (status: WorkflowStatus): number => {
+    return status ? statusOrder.indexOf(status) : statusOrder.length;
+  };
+
+  const countByStatus = (workflows: WorkflowExecution[]) => {
+    const counts = new Map<WorkflowStatus, number>();
+
+    workflows.forEach((workflow) => {
+      counts.set(workflow.status, (counts.get(workflow.status) ?? 0) + 1);
+    });
+
+    return counts;
+  };
+
+  const countByWorkflowType = (
+    workflows: WorkflowExecution[],
+  ): WorkflowTypeCount[] => {
+    const counts = new Map<string, number>();
+
+    workflows.forEach((workflow) => {
+      const workflowType = getWorkflowType(workflow);
+      counts.set(workflowType, (counts.get(workflowType) ?? 0) + 1);
+    });
+
+    return Array.from(counts, ([name, count]) => ({ name, count })).sort(
+      (a, b) => b.count - a.count,
+    );
+  };
+
+  const toStatusSegments = (
+    workflows: WorkflowExecution[],
+  ): StatusSegment[] => {
+    const total = workflows.length;
+
+    return Array.from(
+      countByStatus(workflows),
+      ([status, count]): StatusSegment => ({
+        key: toStatusLabel(status),
+        status,
+        statusLabel: toStatusLabel(status),
+        count,
+        percent: total ? (count / total) * 100 : 0,
+        color: getDensityStatusColor(status),
+      }),
+    ).sort((a, b) => getStatusRank(a.status) - getStatusRank(b.status));
   };
 
   const clamp = (value: number, min: number, max: number): number => {
     return Math.min(Math.max(value, min), max);
+  };
+
+  const getBucketInterval = (duration: number, maxBuckets: number): number => {
+    const targetInterval = duration / Math.max(maxBuckets, 1);
+    return (
+      bucketIntervalsMs.find((interval) => interval >= targetInterval) ??
+      Math.ceil(targetInterval)
+    );
   };
 
   const setVisibleRange = (start: number, end: number) => {
@@ -185,6 +350,19 @@
     dragState = null;
   };
 
+  const applyTimeRangeFilter = (start: number, end: number) => {
+    if (onTimeRangeFilter) {
+      onTimeRangeFilter({ start, end });
+      return;
+    }
+
+    setVisibleRange(start, end);
+  };
+
+  const handleBucketClick = (bucket: DensityBucket) => {
+    applyTimeRangeFilter(bucket.start, bucket.end);
+  };
+
   const sortedWorkflows = $derived(
     [...workflows]
       .filter((workflow) => Number.isFinite(getStartTimestamp(workflow)))
@@ -192,7 +370,6 @@
   );
 
   const hasWorkflows = $derived(sortedWorkflows.length > 0);
-  const showControls = $derived(hasWorkflows);
   const rawMinStart = $derived(
     hasWorkflows ? getStartTimestamp(sortedWorkflows[0]) : 0,
   );
@@ -201,16 +378,28 @@
       ? getStartTimestamp(sortedWorkflows[sortedWorkflows.length - 1])
       : 0,
   );
-  const rawFullEnd = $derived(
-    useCurrentTimeEnd ? Math.max(rawMaxStart, currentTime) : rawMaxStart,
-  );
-  const fullStart = $derived(
-    hasWorkflows && rawMinStart === rawFullEnd
-      ? rawMinStart - defaultRangePaddingMs
+  const rawFullStart = $derived(
+    typeof rangeStartTime === 'number' && Number.isFinite(rangeStartTime)
+      ? rangeStartTime
       : rawMinStart,
   );
+  const rawFullEnd = $derived(
+    Math.max(
+      typeof rangeEndTime === 'number' && Number.isFinite(rangeEndTime)
+        ? rangeEndTime
+        : useCurrentTimeEnd
+          ? Math.max(rawMaxStart, currentTime)
+          : rawMaxStart,
+      rawFullStart,
+    ),
+  );
+  const fullStart = $derived(
+    hasWorkflows && rawFullStart === rawFullEnd
+      ? rawFullStart - defaultRangePaddingMs
+      : rawFullStart,
+  );
   const fullEnd = $derived(
-    hasWorkflows && rawMinStart === rawFullEnd
+    hasWorkflows && rawFullStart === rawFullEnd
       ? rawFullEnd + defaultRangePaddingMs
       : rawFullEnd,
   );
@@ -226,13 +415,82 @@
     viewStart <= fullStart + 1 && viewEnd >= fullEnd - 1,
   );
 
-  const bars = $derived(
-    sortedWorkflows
-      .filter((workflow) => {
+  const visibleWorkflows = $derived(
+    sortedWorkflows.filter((workflow) => {
+      const startTimestamp = getStartTimestamp(workflow);
+      return startTimestamp >= viewStart && startTimestamp <= viewEnd;
+    }),
+  );
+  const maxBucketCount = $derived(
+    Math.max(
+      1,
+      Math.floor(
+        (graphWidth || fallbackGraphWidthPx) / minimumDensityBucketWidthPx,
+      ),
+    ),
+  );
+  const bucketInterval = $derived(
+    getBucketInterval(viewDuration, maxBucketCount),
+  );
+  const densityBuckets = $derived<DensityBucket[]>(
+    (() => {
+      const buckets = new Map<number, WorkflowExecution[]>();
+
+      visibleWorkflows.forEach((workflow) => {
         const startTimestamp = getStartTimestamp(workflow);
-        return startTimestamp >= viewStart && startTimestamp <= viewEnd;
+        const index = Math.floor(startTimestamp / bucketInterval);
+        const bucket = buckets.get(index) ?? [];
+        bucket.push(workflow);
+        buckets.set(index, bucket);
+      });
+
+      const maxFilledBucketCount = Math.max(
+        1,
+        ...Array.from(buckets.values(), (bucket) => bucket.length),
+      );
+      const maxLogCount = Math.log1p(maxFilledBucketCount);
+
+      return Array.from(buckets, ([index, bucket]) => {
+        const bucketStart = Math.max(index * bucketInterval, viewStart);
+        const bucketEnd = Math.min((index + 1) * bucketInterval, viewEnd);
+        const normalized =
+          maxLogCount > 0 ? Math.log1p(bucket.length) / maxLogCount : 1;
+
+        return {
+          key: `${index}:${bucket.length}:${bucketInterval}`,
+          workflows: bucket,
+          count: bucket.length,
+          start: bucketStart,
+          end: bucketEnd,
+          left: ((bucketStart - viewStart) / viewDuration) * 100,
+          width: ((bucketEnd - bucketStart) / viewDuration) * 100,
+          height: 22 + normalized * 78,
+          opacity: 0.78 + normalized * 0.22,
+          glow: normalized * 4,
+          columnWidth: 4 + normalized * 12,
+          peakCount: maxFilledBucketCount,
+          statusSegments: toStatusSegments(bucket),
+        };
       })
-      .map((workflow) => toBar(workflow, viewStart, viewDuration)),
+        .filter((bucket) => bucket.end > bucket.start)
+        .sort((a, b) => a.start - b.start);
+    })(),
+  );
+  const bars = $derived(
+    densityBuckets
+      .filter((bucket) => bucket.count === 1)
+      .map((bucket) =>
+        toBar(
+          bucket.workflows[0],
+          viewStart,
+          viewDuration,
+          bucket.start,
+          bucket.end,
+        ),
+      ),
+  );
+  const aggregateBuckets = $derived(
+    densityBuckets.filter((bucket) => bucket.count > 1),
   );
 
   const ticks = $derived<Tick[]>(
@@ -284,14 +542,27 @@
 
     return () => clearInterval(interval);
   });
+
+  $effect(() => {
+    if (!graphElement) return;
+
+    const updateGraphWidth = () => {
+      graphWidth = graphElement?.getBoundingClientRect().width ?? 0;
+    };
+    const observer = new ResizeObserver(updateGraphWidth);
+    observer.observe(graphElement);
+    updateGraphWidth();
+
+    return () => observer.disconnect();
+  });
 </script>
 
 <div class="w-full">
-  <div
-    class="mb-1 flex h-6 justify-end gap-1"
-    aria-label="Workflow timeline zoom controls"
-  >
-    {#if showControls}
+  {#if showControls && hasWorkflows}
+    <div
+      class="mb-1 flex h-6 justify-end gap-1"
+      aria-label="Workflow timeline zoom controls"
+    >
       <Tooltip top usePortal text="Zoom out">
         <button
           type="button"
@@ -325,8 +596,8 @@
           <Icon name="retry" class="h-4 w-4" />
         </button>
       </Tooltip>
-    {/if}
-  </div>
+    </div>
+  {/if}
 
   {#if hasWorkflows}
     <div
@@ -353,6 +624,69 @@
         </div>
       {/each}
 
+      {#each aggregateBuckets as bucket (bucket.key)}
+        <div
+          class="absolute top-0 h-10"
+          style:left={`${bucket.left}%`}
+          style:width={`${bucket.width}%`}
+        >
+          <Tooltip top usePortal class="h-full w-full">
+            <svelte:fragment slot="content">
+              <div class="flex min-w-56 flex-col gap-2 text-left">
+                <div>
+                  <div class="font-medium">
+                    {bucket.count.toLocaleString()}
+                    loaded {bucket.count === 1 ? 'workflow' : 'workflows'} started
+                  </div>
+                  <div class="text-slate-300">
+                    {$timestamp(new Date(bucket.start))} - {$timestamp(
+                      new Date(bucket.end),
+                    )}
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1">
+                  {#each bucket.statusSegments as segment (segment.key)}
+                    <div class="flex items-center justify-between gap-3">
+                      {#if segment.status}
+                        <WorkflowStatusBadge status={segment.status} />
+                      {:else}
+                        <span class="text-slate-300">
+                          {segment.statusLabel}
+                        </span>
+                      {/if}
+                      <span class="text-slate-300">
+                        {segment.count.toLocaleString()}
+                      </span>
+                    </div>
+                  {/each}
+                </div>
+              </div>
+            </svelte:fragment>
+            <button
+              class="workflow-density-bucket relative h-full w-full cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              style:--bucket-height={`${bucket.height}%`}
+              style:--bucket-opacity={bucket.opacity}
+              style:--bucket-glow={`${bucket.glow}px`}
+              style:--bucket-width={`${bucket.columnWidth}px`}
+              aria-label={`${bucket.count.toLocaleString()} loaded workflows started between ${$timestamp(
+                new Date(bucket.start),
+              )} and ${$timestamp(new Date(bucket.end))}`}
+              onclick={() => handleBucketClick(bucket)}
+            >
+              <span class="workflow-density-column" aria-hidden="true">
+                {#each bucket.statusSegments as segment (segment.key)}
+                  <span
+                    class="block w-full"
+                    style:height={`${segment.percent}%`}
+                    style:background-color={segment.color}
+                  ></span>
+                {/each}
+              </span>
+            </button>
+          </Tooltip>
+        </div>
+      {/each}
+
       {#each bars as bar (bar.key)}
         <div
           class="absolute top-0 h-10 w-4 -translate-x-2"
@@ -370,13 +704,20 @@
                   {/if}
                 </div>
                 <span class="text-slate-300">{$timestamp(bar.startTime)}</span>
+                <span class="text-slate-300">
+                  Range: {$timestamp(new Date(bar.rangeStart))} - {$timestamp(
+                    new Date(bar.rangeEnd),
+                  )}
+                </span>
               </div>
             </svelte:fragment>
             <button
               class="workflow-start-bar relative h-full w-full cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               style:--bar-color={bar.color}
-              aria-label={`Filter by workflow type ${bar.workflowType}`}
-              onclick={() => onFilter?.(bar.workflowType)}
+              aria-label={`Filter workflows started between ${$timestamp(
+                new Date(bar.rangeStart),
+              )} and ${$timestamp(new Date(bar.rangeEnd))}`}
+              onclick={() => applyTimeRangeFilter(bar.rangeStart, bar.rangeEnd)}
             >
               <span class="sr-only">
                 {bar.workflowType} - {bar.statusLabel} - {$timestamp(
@@ -429,5 +770,22 @@
   .workflow-start-bar:hover::before,
   .workflow-start-bar:focus-visible::before {
     @apply h-10 w-1;
+  }
+
+  .workflow-density-column {
+    @apply absolute bottom-1 left-1/2 flex min-h-2 -translate-x-1/2 flex-col-reverse overflow-hidden rounded-sm transition-all;
+
+    width: var(--bucket-width);
+    height: min(var(--bucket-height), calc(100% - 0.5rem));
+    min-width: 3px;
+    opacity: var(--bucket-opacity);
+    box-shadow: 0 0 var(--bucket-glow) rgb(15 23 42 / 45%);
+  }
+
+  .workflow-density-bucket:hover .workflow-density-column,
+  .workflow-density-bucket:focus-visible .workflow-density-column {
+    height: var(--bucket-height);
+    opacity: 1;
+    width: calc(var(--bucket-width) + 2px);
   }
 </style>

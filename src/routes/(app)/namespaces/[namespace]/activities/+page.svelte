@@ -19,7 +19,10 @@
 
 <StandaloneActivities>
   {#snippet headerActions()}
-    <Button href={routeForStartStandaloneActivity({ namespace })}>
+    <Button
+      variant="secondary"
+      href={routeForStartStandaloneActivity({ namespace })}
+    >
       {translate('standalone-activities.start-standalone-activity')}
     </Button>
   {/snippet}

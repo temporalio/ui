@@ -14,6 +14,7 @@
     loading?: boolean;
     useCurrentTimeEnd?: boolean;
     onFilter?: (activityType: string) => void;
+    showControls?: boolean;
   };
 
   let {
@@ -21,6 +22,7 @@
     loading = false,
     useCurrentTimeEnd = false,
     onFilter,
+    showControls = false,
   }: Props = $props();
 
   type Bar = {
@@ -194,7 +196,6 @@
   );
 
   const hasActivities = $derived(sortedActivities.length > 0);
-  const showControls = $derived(hasActivities);
   const rawMinStart = $derived(
     hasActivities ? getStartTimestamp(sortedActivities[0]) : 0,
   );
@@ -289,11 +290,11 @@
 </script>
 
 <div class="w-full">
-  <div
-    class="mb-1 flex h-6 justify-end gap-1"
-    aria-label="Activity timeline zoom controls"
-  >
-    {#if showControls}
+  {#if showControls && hasActivities}
+    <div
+      class="mb-1 flex h-6 justify-end gap-1"
+      aria-label="Activity timeline zoom controls"
+    >
       <Tooltip top usePortal text="Zoom out">
         <button
           type="button"
@@ -327,8 +328,8 @@
           <Icon name="retry" class="h-4 w-4" />
         </button>
       </Tooltip>
-    {/if}
-  </div>
+    </div>
+  {/if}
 
   {#if hasActivities}
     <div
