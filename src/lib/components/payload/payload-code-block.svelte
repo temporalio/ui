@@ -10,6 +10,7 @@
   import type { Payload, Payloads } from '$lib/types';
   import {
     isExternallyStoredRawPayload,
+    isParsedPayload,
     parseRawPayloadToJSON,
     type PayloadContainingObject,
   } from '$lib/utilities/decode-payload';
@@ -80,10 +81,13 @@
 <PayloadDecoder {value}>
   {#snippet children(results)}
     <div class="space-y-2">
-      {#each results as result (result.decodedValue)}
-        {#if isExternallyStoredRawPayload(result.decodedValue)}
+      {#each results as result (result)}
+        {#if isExternallyStoredRawPayload(result)}
+          {@const size = formatBytes(
+            result.externalPayloads?.[0].sizeBytes ?? 0,
+          )}
           <CodeBlock
-            content={stringifyWithBigInt(result.decodedValue.data)}
+            content={stringifyWithBigInt(result.data)}
             {maxHeight}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -105,9 +109,7 @@
                   loading={downloadLoading}
                   on:click={() => downloadExternalPayload(result.originalValue)}
                 >
-                  {formatBytes(
-                    result.decodedValue.externalPayloads?.[0].sizeBytes,
-                  )}
+                  {size}
                 </Button>
               </Tooltip>
             {/snippet}
@@ -127,9 +129,18 @@
             </Link>
             <Icon class="inline" name="external-link" />
           </p>
-        {:else}
+        {:else if isParsedPayload(result.decodedValue)}
           <CodeBlock
             content={stringifyWithBigInt(result.decodedValue.data)}
+            {maxHeight}
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            {testId}
+            language="json"
+          />
+        {:else}
+          <CodeBlock
+            content={stringifyWithBigInt(result.decodedValue)}
             {maxHeight}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}

@@ -12,7 +12,10 @@
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
   import type { Payloads } from '$lib/types';
-  import { base64ParsePayloadMetadata } from '$lib/utilities/decode-payload';
+  import {
+    base64ParsePayloadMetadata,
+    isParsedPayload,
+  } from '$lib/utilities/decode-payload';
 
   interface Props {
     input: string;
@@ -38,28 +41,31 @@
   let loading = $state(true);
 
   const setInitialInput = (result: DecodedPayloadResult): void => {
-    initialInput = result[0].decodedValue.data;
+    if (result && result[0] && isParsedPayload(result[0].decodedValue)) {
+      initialInput = result[0].decodedValue.data as string;
 
-    input = initialInput;
-    let currentEncoding: PayloadInputEncoding = 'json/plain';
-    let currentMessageType = '';
+      input = initialInput;
+      let currentEncoding: PayloadInputEncoding = 'json/plain';
+      let currentMessageType = '';
 
-    if (payloads) {
-      const parsedMetadata = base64ParsePayloadMetadata(payloads);
+      if (payloads) {
+        const parsedMetadata = base64ParsePayloadMetadata(payloads);
 
-      currentEncoding =
-        (parsedMetadata[0]?.encoding as PayloadInputEncoding) ?? 'json/plain';
-      currentMessageType = parsedMetadata[0]?.messageType ?? '';
-    }
+        currentEncoding =
+          (parsedMetadata[0]?.encoding as PayloadInputEncoding) ?? 'json/plain';
+        currentMessageType = parsedMetadata[0]?.messageType ?? '';
+      }
 
-    if (isPayloadInputEncodingType(currentEncoding)) {
-      $encoding = currentEncoding;
-      initialEncoding = $encoding;
-      if (currentEncoding === 'json/protobuf' && currentMessageType) {
-        messageType = currentMessageType;
-        initialMessageType = currentMessageType;
+      if (isPayloadInputEncodingType(currentEncoding)) {
+        $encoding = currentEncoding;
+        initialEncoding = $encoding;
+        if (currentEncoding === 'json/protobuf' && currentMessageType) {
+          messageType = currentMessageType;
+          initialMessageType = currentMessageType;
+        }
       }
     }
+
     loading = false;
   };
 
