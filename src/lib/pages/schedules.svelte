@@ -5,7 +5,7 @@
 
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import FilterBar from '$lib/components/shared-search-attribute-filter/filter-bar.svelte';
+  import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';

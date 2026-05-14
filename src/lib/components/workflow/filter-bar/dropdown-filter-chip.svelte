@@ -8,7 +8,7 @@
   import {
     SEARCH_ATTRIBUTE_FILTER_CONTEXT,
     type SearchAttributeFilterContext,
-  } from '$lib/components/shared-search-attribute-filter/filter.svelte';
+  } from '$lib/components/search-attribute-filter/filter.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
