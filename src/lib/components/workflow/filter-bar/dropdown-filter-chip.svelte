@@ -24,6 +24,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { prefixSearchEnabled } from '$lib/stores/capability-enablement';
   import {
     endDate,
     endHour,
@@ -38,6 +39,7 @@
     timeFormat,
     timeFormatType,
   } from '$lib/stores/time-format';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { isInConditional, isNullConditional } from '$lib/utilities/is';
   import { getInitialDateTimes } from '$lib/utilities/query/datetime-filter-parse';
@@ -105,11 +107,15 @@
       label: translate('common.not-equal-to'),
       id: 'not-equal-to',
     },
-    {
-      value: 'STARTS_WITH',
-      label: translate('common.starts-with'),
-      id: 'starts-with',
-    },
+    ...($prefixSearchEnabled && filter.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD
+      ? [
+          {
+            value: 'STARTS_WITH',
+            label: translate('common.starts-with'),
+            id: 'starts-with',
+          },
+        ]
+      : []),
     ...defaultConditionOptions,
   ]);
 
