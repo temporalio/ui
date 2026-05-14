@@ -254,6 +254,7 @@ export const isParsedPayload = (payload: unknown): payload is ParsedPayload => {
 export const isExternallyStoredRawPayload = (
   payload: unknown,
 ): payload is ParsedExternalPayload => {
+  console.log(payload);
   return (
     isParsedPayload(payload) &&
     has(payload.metadata, 'messageType') &&

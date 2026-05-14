@@ -54,6 +54,7 @@
   });
 
   const downloadExternalPayload = async (payload: Payload) => {
+    downloadError = undefined;
     downloadLoading = true;
     let data: Payloads | undefined = undefined;
     try {
@@ -82,12 +83,12 @@
   {#snippet children(results)}
     <div class="space-y-2">
       {#each results as result (result)}
-        {#if isExternallyStoredRawPayload(result)}
+        {#if isExternallyStoredRawPayload(result?.decodedValue)}
           {@const size = formatBytes(
-            result.externalPayloads?.[0].sizeBytes ?? 0,
+            result.decodedValue.externalPayloads?.[0].sizeBytes ?? 0,
           )}
           <CodeBlock
-            content={stringifyWithBigInt(result.data)}
+            content={stringifyWithBigInt(result.decodedValue.data)}
             {maxHeight}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
