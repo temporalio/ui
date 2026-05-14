@@ -2,12 +2,15 @@ import { derived, get, readable, type Readable, writable } from 'svelte/store';
 
 import { z } from 'zod/v3';
 
+import { isCloud } from '$lib/stores/advanced-visibility';
+import { temporalVersion } from '$lib/stores/versions';
 import {
   SEARCH_ATTRIBUTE_TYPE,
   type SearchAttributes,
   type SearchAttributeType,
   type WorkflowExecution,
 } from '$lib/types/workflows';
+import { minimumVersionRequired } from '$lib/utilities/version-check';
 
 type SearchAttributesStore = {
   customAttributes: SearchAttributes;
@@ -28,12 +31,26 @@ export const searchAttributes: Readable<SearchAttributes> = derived(
 );
 
 export const scheduleSearchAttributes: Readable<SearchAttributes> = derived(
-  [allSearchAttributes],
-  ([$allSearchAttributes]) => ({
-    ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+  [allSearchAttributes, isCloud, temporalVersion],
+  ([$allSearchAttributes, $isCloud, $temporalVersion]) => ({
+    ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
+      ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    }),
+    TemporalSchedulePaused: SEARCH_ATTRIBUTE_TYPE.BOOL,
     ...$allSearchAttributes.customAttributes,
   }),
 );
+
+export const scheduleSearchAttributeOptions: Readable<SearchAttributeOption[]> =
+  derived(scheduleSearchAttributes, ($scheduleSearchAttributes) => {
+    return Object.entries($scheduleSearchAttributes).map(([key, value]) => {
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
+    });
+  });
 
 export const activityExecutionSearchAttributes: Readable<SearchAttributes> =
   derived(searchAttributes, ($searchAttributes) => ({
