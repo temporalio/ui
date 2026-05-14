@@ -17,13 +17,19 @@
 
 <script lang="ts">
   import { afterNavigate } from '$app/navigation';
+  import { page } from '$app/state';
 
   import DropdownFilterList from '$lib/components/workflow/filter-bar/dropdown-filter-list.svelte';
   import SearchAttributeMenu from '$lib/components/workflow/filter-bar/search-attribute-menu.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { workflowFilters } from '$lib/stores/filters';
   import { sortedSearchAttributeOptions } from '$lib/stores/search-attributes';
-  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   const filter = writable<SearchAttributeFilter>(createFilter());
   const activeQueryIndex = writable<number>(null);
@@ -61,9 +67,26 @@
     activeQueryIndex.set(null);
     filter.set(createFilter());
   }
+
+  function clearAllFilters() {
+    $workflowFilters = [];
+    updateQueryParamsFromFilter(page.url, $workflowFilters, true);
+    $activeQueryIndex = null;
+    $filter = createFilter();
+  }
 </script>
 
 <div class="flex shrink flex-wrap items-center justify-start gap-2">
-  <DropdownFilterList />
   <SearchAttributeMenu {options} />
+  <DropdownFilterList />
+  {#if $workflowFilters.length > 0}
+    <Button
+      variant="ghost"
+      size="xs"
+      on:click={clearAllFilters}
+      data-testid="clear-all-filters-button"
+    >
+      {translate('common.clear-all')}
+    </Button>
+  {/if}
 </div>

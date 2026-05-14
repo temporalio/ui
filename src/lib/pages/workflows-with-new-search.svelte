@@ -184,8 +184,7 @@
     );
   };
 
-  const filterByWorkflowType = (event: CustomEvent<string>) => {
-    const workflowType = event.detail;
+  const filterByWorkflowType = (workflowType: string) => {
     const baseFilters = toListWorkflowFilters(
       query ?? '',
       $searchAttributes,
@@ -331,7 +330,7 @@
 
 <WorkflowStartSummary
   workflows={workflowStartSummaryItems}
-  on:filter={filterByWorkflowType}
+  onFilter={filterByWorkflowType}
 />
 <div class="flex overflow-auto">
   <SavedQueryViews />

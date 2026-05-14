@@ -3,7 +3,7 @@
 
   import { getContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';

@@ -82,13 +82,6 @@
             .includes(searchAttributeValue.toLowerCase()),
         ),
   );
-
-  function clearAllFilters() {
-    $workflowFilters = [];
-    updateQueryParamsFromFilter(page.url, $workflowFilters, true);
-    $activeQueryIndex = null;
-    $filter = createFilter();
-  }
 </script>
 
 <MenuContainer {open}>
@@ -102,7 +95,7 @@
     onclick={() => (searchAttributeValue = '')}
     class="text-nowrap"
   >
-    Filter
+    <span class="text-sm">Filter</span>
   </MenuButton>
   <Menu id="search-attribute-menu">
     <MenuItem
@@ -145,13 +138,3 @@
     {/each}
   </Menu>
 </MenuContainer>
-{#if $workflowFilters.length > 0}
-  <Button
-    variant="ghost"
-    size="xs"
-    on:click={clearAllFilters}
-    data-testid="clear-all-filters-button"
-  >
-    {translate('common.clear-all')}
-  </Button>
-{/if}
