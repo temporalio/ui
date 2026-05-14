@@ -17,6 +17,7 @@ import { has } from './has';
 import { isObject } from './is';
 import {
   isLocalActivityMarkerEvent,
+  isNexusOperationScheduledEvent,
   isWorkflowExecutionUpdateAcceptedEvent,
 } from './is-event-type';
 import {
@@ -321,6 +322,15 @@ export const getEventSummaryAttribute = (
       return {
         key: 'name',
         value: event.attributes.acceptedRequest.input.name,
+      };
+    }
+  }
+
+  if (isNexusOperationScheduledEvent(event)) {
+    if (event.attributes?.operation) {
+      return {
+        key: 'operation',
+        value: event.attributes.operation,
       };
     }
   }
