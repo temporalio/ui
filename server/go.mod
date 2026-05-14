@@ -5,7 +5,7 @@ go 1.26.2
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/coreos/go-oidc/v3 v3.11.0
-	github.com/gomarkdown/markdown v0.0.0-20240729212818-a2a9c4f76ef5
+	github.com/gomarkdown/markdown v0.0.0-20260411013819-759bbc3e3207
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0
 	github.com/labstack/echo/v4 v4.13.4

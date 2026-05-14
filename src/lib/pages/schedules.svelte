@@ -93,23 +93,12 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-    <SchedulesCount />
-  </h1>
   <div
-    class="flex flex-col gap-2 md:flex-row {showFilters
-      ? 'justify-between'
-      : 'justify-end'}"
+    class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
   >
-    {#if showFilters}
-      <SearchAttributeFilter
-        bind:filters={$scheduleFilters}
-        {searchAttributeOptions}
-        refresh={() => {
-          refresh = Date.now();
-        }}
-      />
-    {/if}
+    <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
+      <SchedulesCount />
+    </h1>
     {#if !createDisabled}
       <Button
         data-testid="create-schedule"
@@ -120,6 +109,15 @@
       </Button>
     {/if}
   </div>
+  {#if showFilters}
+    <SearchAttributeFilter
+      bind:filters={$scheduleFilters}
+      {searchAttributeOptions}
+      refresh={() => {
+        refresh = Date.now();
+      }}
+    />
+  {/if}
 </div>
 
 {#key [namespace, query, refresh]}
