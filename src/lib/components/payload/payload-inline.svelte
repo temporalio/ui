@@ -1,8 +1,11 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
+    isExternallyStoredRawPayload,
     isParsedPayload,
     type PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
+  import { formatBytes } from '$lib/utilities/format-bytes';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import PayloadDecoder from './payload-decoder.svelte';
@@ -27,11 +30,22 @@
 {/snippet}
 
 <PayloadDecoder {value}>
-  {#snippet children(result)}
-    {#if isParsedPayload(result[0]?.decodedValue)}
-      {@const stringifiedData = stringifyWithBigInt(
-        result[0].decodedValue.data,
+  {#snippet children(results)}
+    {#if isExternallyStoredRawPayload(results[0]?.decodedValue)}
+      {@const size = formatBytes(
+        results[0].decodedValue.externalPayloads?.[0].sizeBytes ?? 0,
       )}
+      <div class="flex flex-row items-center gap-2">
+        <Icon name="storage" />
+        {@render codeBlock(`${size} payload stored externally`)}
+      </div>
+    {:else if isParsedPayload(results[0]?.decodedValue)}
+      {@const stringifiedData = stringifyWithBigInt(
+        results[0].decodedValue.data,
+      )}
+      {@render codeBlock(stringifiedData)}
+    {:else}
+      {@const stringifiedData = stringifyWithBigInt(results[0].decodedValue)}
       {@render codeBlock(stringifiedData)}
     {/if}
   {/snippet}
