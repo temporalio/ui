@@ -21,6 +21,7 @@
     statusAttribute?: StatusAttribute;
     onManualSearch?: (query: string) => void;
     includeNullConditions?: boolean;
+    appearance?: 'boxed' | 'plain';
   }
 
   let {
@@ -31,22 +32,30 @@
     statusAttribute,
     onManualSearch,
     includeNullConditions,
+    appearance = 'boxed',
   }: Props = $props();
 
   let viewManualQuery = $state(false);
 </script>
 
-<div>
+<div class={appearance === 'plain' ? 'py-1' : ''}>
   <div
-    class="flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
+    class={appearance === 'plain'
+      ? 'flex w-full flex-wrap items-center justify-between gap-2'
+      : 'flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5'}
   >
-    <div class="flex grow items-center justify-start gap-4 px-2">
+    <div
+      class={appearance === 'plain'
+        ? 'flex grow items-center justify-start gap-4'
+        : 'flex grow items-center justify-start gap-4 px-2'}
+    >
       <Filter
         {filters}
         {options}
         {id}
         {statusAttribute}
         {includeNullConditions}
+        {appearance}
       />
     </div>
     <div class="flex items-center gap-1">

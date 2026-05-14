@@ -1,11 +1,10 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
-  import { getContext } from 'svelte';
+  import { getContext, tick } from 'svelte';
 
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -20,10 +19,7 @@
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
-  import {
-    createFilter,
-    updateQueryParamsFromFilter,
-  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
 
   import {
@@ -35,9 +31,15 @@
     options: SearchAttributeOption[];
     filters: Writable<SearchAttributeFilter[]>;
     statusAttribute?: string;
+    appearance?: 'boxed' | 'plain';
   }
 
-  let { options, filters, statusAttribute }: Props = $props();
+  let {
+    options,
+    filters,
+    statusAttribute,
+    appearance = 'boxed',
+  }: Props = $props();
 
   const query = $derived(page.url.searchParams.get('query') ?? '');
   let searchAttributeValue = $state('');
@@ -46,6 +48,11 @@
     getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT);
 
   const open = writable(false);
+
+  async function focusSearchInput() {
+    await tick();
+    document.getElementById(`${id}-filter-search`)?.focus();
+  }
 
   const getDefaultConditional = (type: SearchAttributeType) => {
     switch (type) {
@@ -91,28 +98,42 @@
         ),
   );
 
-  function clearAllFilters() {
-    $filters = [];
-    updateQueryParamsFromFilter(page.url, $filters, true);
-    $activeQueryIndex = null;
-    $filter = createFilter();
-  }
+  $effect(() => {
+    if ($open) {
+      focusSearchInput();
+    }
+  });
 </script>
 
 <MenuContainer {open}>
-  <MenuButton
-    id="{id}-search-attribute-filter-button"
-    controls="{id}-search-attribute-menu"
-    leadingIcon="add"
-    variant="secondary"
-    data-testid="add-filter-button"
-    disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
-    onclick={() => (searchAttributeValue = '')}
-    class="text-nowrap"
-    size="xs"
-  >
-    Add Filter
-  </MenuButton>
+  {#if appearance === 'plain'}
+    <MenuButton
+      id="{id}-search-attribute-filter-button"
+      controls="{id}-search-attribute-menu"
+      leadingIcon="filter"
+      variant="ghost"
+      data-testid="add-filter-button"
+      disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
+      onclick={() => (searchAttributeValue = '')}
+      class="text-nowrap"
+    >
+      <span class="text-sm">Filter</span>
+    </MenuButton>
+  {:else}
+    <MenuButton
+      id="{id}-search-attribute-filter-button"
+      controls="{id}-search-attribute-menu"
+      leadingIcon="add"
+      variant="secondary"
+      data-testid="add-filter-button"
+      disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
+      onclick={() => (searchAttributeValue = '')}
+      class="text-nowrap"
+      size="xs"
+    >
+      Add Filter
+    </MenuButton>
+  {/if}
   <Menu id="{id}-search-attribute-menu">
     <MenuItem
       class="p-0"
@@ -156,13 +177,3 @@
     {/each}
   </Menu>
 </MenuContainer>
-{#if $filters.length > 0}
-  <Button
-    variant="ghost"
-    size="xs"
-    on:click={clearAllFilters}
-    data-testid="clear-all-filters-button"
-  >
-    {translate('common.clear-all')}
-  </Button>
-{/if}

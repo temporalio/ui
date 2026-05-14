@@ -3,17 +3,21 @@
   import WorkflowStatusBadge from '$lib/components/workflow-status.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import type { WorkflowExecution, WorkflowStatus } from '$lib/types/workflows';
+  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import {
+    type ActivityStatus,
+    toActivityStatus,
+  } from '$lib/utilities/get-activity-status-and-count';
 
   type Props = {
-    workflows?: WorkflowExecution[];
+    activities?: ActivityExecutionInfo[];
     loading?: boolean;
     useCurrentTimeEnd?: boolean;
-    onFilter?: (workflowType: string) => void;
+    onFilter?: (activityType: string) => void;
   };
 
   let {
-    workflows = [],
+    activities = [],
     loading = false,
     useCurrentTimeEnd = false,
     onFilter,
@@ -21,9 +25,9 @@
 
   type Bar = {
     key: string;
-    workflowType: string;
+    activityType: string;
     startTime: string;
-    status: WorkflowStatus;
+    status: ActivityStatus;
     statusLabel: string;
     left: number;
     color: string;
@@ -42,8 +46,6 @@
     end: number;
   };
 
-  type StatusColorKey = Exclude<WorkflowStatus, null>;
-
   const defaultRangePaddingMs = 5 * 60 * 1000;
   const minimumZoomDurationMs = 60 * 1000;
   const tickCount = 5;
@@ -56,42 +58,42 @@
   let dragState = $state<DragState | null>(null);
   let currentTime = $state(Date.now());
 
-  const statusColors: Partial<Record<StatusColorKey, string>> = {
+  const statusColors: Record<ActivityStatus, string> = {
     Running: '#93c5fd',
     TimedOut: '#fed7aa',
     Completed: '#bbf7d0',
     Failed: '#fecaca',
-    ContinuedAsNew: '#e9d5ff',
     Canceled: '#f1f5f9',
     Terminated: '#fef08a',
-    Paused: '#fef08a',
   };
 
-  const getStartTimestamp = (workflow: WorkflowExecution): number => {
-    return new Date(workflow.startTime).getTime();
+  const getActivityStartTime = (activity: ActivityExecutionInfo): string => {
+    return activity.lastStartedTime || activity.scheduleTime;
   };
 
-  const getStatusColor = (status: WorkflowStatus): string => {
-    return status ? (statusColors[status] ?? '#cbd5e1') : '#cbd5e1';
+  const getStartTimestamp = (activity: ActivityExecutionInfo): number => {
+    return new Date(getActivityStartTime(activity)).getTime();
   };
 
   const toBar = (
-    workflow: WorkflowExecution,
+    activity: ActivityExecutionInfo,
     start: number,
     duration: number,
   ): Bar => {
-    const workflowType = workflow.name || 'Unknown workflow type';
-    const startTimestamp = getStartTimestamp(workflow);
+    const activityType = activity.activityType?.name || 'Unknown activity type';
+    const startTime = getActivityStartTime(activity);
+    const startTimestamp = getStartTimestamp(activity);
+    const status = toActivityStatus(activity.status);
     const left = duration ? ((startTimestamp - start) / duration) * 100 : 50;
 
     return {
-      key: `${workflow.id}:${workflow.runId}`,
-      workflowType,
-      startTime: workflow.startTime,
-      status: workflow.status,
-      statusLabel: workflow.status ?? 'Unknown',
+      key: `${activity.activityId}:${activity.runId}`,
+      activityType,
+      startTime,
+      status,
+      statusLabel: status,
       left,
-      color: getStatusColor(workflow.status),
+      color: statusColors[status],
     };
   };
 
@@ -100,7 +102,7 @@
   };
 
   const setVisibleRange = (start: number, end: number) => {
-    if (!hasWorkflows) return;
+    if (!hasActivities) return;
 
     const unclampedDuration = Math.max(end - start, 1);
     const duration = clamp(
@@ -185,32 +187,32 @@
     dragState = null;
   };
 
-  const sortedWorkflows = $derived(
-    [...workflows]
-      .filter((workflow) => Number.isFinite(getStartTimestamp(workflow)))
+  const sortedActivities = $derived(
+    [...activities]
+      .filter((activity) => Number.isFinite(getStartTimestamp(activity)))
       .sort((a, b) => getStartTimestamp(a) - getStartTimestamp(b)),
   );
 
-  const hasWorkflows = $derived(sortedWorkflows.length > 0);
-  const showControls = $derived(hasWorkflows);
+  const hasActivities = $derived(sortedActivities.length > 0);
+  const showControls = $derived(hasActivities);
   const rawMinStart = $derived(
-    hasWorkflows ? getStartTimestamp(sortedWorkflows[0]) : 0,
+    hasActivities ? getStartTimestamp(sortedActivities[0]) : 0,
   );
   const rawMaxStart = $derived(
-    hasWorkflows
-      ? getStartTimestamp(sortedWorkflows[sortedWorkflows.length - 1])
+    hasActivities
+      ? getStartTimestamp(sortedActivities[sortedActivities.length - 1])
       : 0,
   );
   const rawFullEnd = $derived(
     useCurrentTimeEnd ? Math.max(rawMaxStart, currentTime) : rawMaxStart,
   );
   const fullStart = $derived(
-    hasWorkflows && rawMinStart === rawFullEnd
+    hasActivities && rawMinStart === rawFullEnd
       ? rawMinStart - defaultRangePaddingMs
       : rawMinStart,
   );
   const fullEnd = $derived(
-    hasWorkflows && rawMinStart === rawFullEnd
+    hasActivities && rawMinStart === rawFullEnd
       ? rawFullEnd + defaultRangePaddingMs
       : rawFullEnd,
   );
@@ -227,16 +229,16 @@
   );
 
   const bars = $derived(
-    sortedWorkflows
-      .filter((workflow) => {
-        const startTimestamp = getStartTimestamp(workflow);
+    sortedActivities
+      .filter((activity) => {
+        const startTimestamp = getStartTimestamp(activity);
         return startTimestamp >= viewStart && startTimestamp <= viewEnd;
       })
-      .map((workflow) => toBar(workflow, viewStart, viewDuration)),
+      .map((activity) => toBar(activity, viewStart, viewDuration)),
   );
 
   const ticks = $derived<Tick[]>(
-    hasWorkflows
+    hasActivities
       ? Array.from({ length: tickCount }, (_, index) => {
           const value = viewStart + (viewDuration * index) / (tickCount - 1);
           return {
@@ -250,7 +252,7 @@
   );
 
   $effect(() => {
-    if (!hasWorkflows) {
+    if (!hasActivities) {
       viewStart = 0;
       viewEnd = 0;
       lastFullStart = 0;
@@ -289,7 +291,7 @@
 <div class="w-full">
   <div
     class="mb-1 flex h-6 justify-end gap-1"
-    aria-label="Workflow timeline zoom controls"
+    aria-label="Activity timeline zoom controls"
   >
     {#if showControls}
       <Tooltip top usePortal text="Zoom out">
@@ -328,13 +330,13 @@
     {/if}
   </div>
 
-  {#if hasWorkflows}
+  {#if hasActivities}
     <div
       bind:this={graphElement}
       class={dragState
         ? 'relative h-10 w-full cursor-grabbing touch-none select-none bg-subtle/40'
         : 'relative h-10 w-full cursor-grab touch-none select-none bg-subtle/40'}
-      aria-label="Workflow start overview. Use the mouse wheel to zoom and drag to pan."
+      aria-label="Activity start overview. Use the mouse wheel to zoom and drag to pan."
       role="group"
       aria-busy={loading}
       onwheel={handleWheel}
@@ -362,24 +364,20 @@
             <svelte:fragment slot="content">
               <div class="flex flex-col gap-1 text-left">
                 <div class="flex items-center gap-2">
-                  <span>{bar.workflowType}</span>
-                  {#if bar.status}
-                    <WorkflowStatusBadge status={bar.status} />
-                  {:else}
-                    <span class="text-slate-300">{bar.statusLabel}</span>
-                  {/if}
+                  <span>{bar.activityType}</span>
+                  <WorkflowStatusBadge status={bar.status} />
                 </div>
                 <span class="text-slate-300">{$timestamp(bar.startTime)}</span>
               </div>
             </svelte:fragment>
             <button
-              class="workflow-start-bar relative h-full w-full cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              class="activity-start-bar relative h-full w-full cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               style:--bar-color={bar.color}
-              aria-label={`Filter by workflow type ${bar.workflowType}`}
-              onclick={() => onFilter?.(bar.workflowType)}
+              aria-label={`Filter by activity type ${bar.activityType}`}
+              onclick={() => onFilter?.(bar.activityType)}
             >
               <span class="sr-only">
-                {bar.workflowType} - {bar.statusLabel} - {$timestamp(
+                {bar.activityType} - {bar.statusLabel} - {$timestamp(
                   bar.startTime,
                 )}
               </span>
@@ -396,7 +394,7 @@
   {/if}
 
   <div class="relative mt-1 h-4 text-xs text-secondary">
-    {#if hasWorkflows}
+    {#if hasActivities}
       {#each ticks as tick (tick.key)}
         {#if tick.index === 0}
           <span class="absolute left-0 whitespace-nowrap">
@@ -420,14 +418,14 @@
 </div>
 
 <style lang="postcss">
-  .workflow-start-bar::before {
+  .activity-start-bar::before {
     @apply absolute left-1/2 top-1/2 block h-8 w-0.5 -translate-x-1/2 -translate-y-1/2 content-[''];
 
     background-color: var(--bar-color);
   }
 
-  .workflow-start-bar:hover::before,
-  .workflow-start-bar:focus-visible::before {
+  .activity-start-bar:hover::before,
+  .activity-start-bar:focus-visible::before {
     @apply h-10 w-1;
   }
 </style>

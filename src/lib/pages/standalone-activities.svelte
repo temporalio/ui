@@ -9,15 +9,18 @@
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
   import ActivityCountRefresh from '$lib/components/standalone-activities/activity-count-refresh.svelte';
   import ActivityCounts from '$lib/components/standalone-activities/activity-counts.svelte';
+  import ActivityStartSummary from '$lib/components/standalone-activities/activity-start-summary.svelte';
   import SavedActivityViews from '$lib/components/standalone-activities/saved-views.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import {
     activitiesQuery,
     activitiesSearchParams,
     activityCount,
+    activityRefresh,
   } from '$lib/stores/activities';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import {
@@ -27,8 +30,20 @@
   import { activityFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
-  import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
-  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { currentPageKey } from '$lib/stores/pagination';
+  import {
+    activityExecutionSearchAttributes,
+    activitySearchAttributes,
+  } from '$lib/stores/search-attributes';
+  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+  import {
+    combineFilters,
+    createFilter,
+    toListWorkflowFilters,
+  } from '$lib/utilities/query/to-list-workflow-filters';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   interface Props {
     headerActions?: Snippet;
@@ -69,6 +84,99 @@
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
+
+  let activityStartSummaryKey = $state('');
+  let activityStartSummaryItems = $state<ActivityExecutionInfo[]>([]);
+  let activityStartSummaryVisibleItems = $state<ActivityExecutionInfo[]>([]);
+  let activityStartSummaryLoading = $state(true);
+
+  const addActivityStartSummaryItems = (
+    activities: ActivityExecutionInfo[],
+  ) => {
+    activityStartSummaryVisibleItems = activities;
+    if (activityStartSummaryLoading) return;
+    if (!activities.length) return;
+
+    const existingActivityKeys = new Set(
+      activityStartSummaryItems.map(
+        (activity) => `${activity.activityId}:${activity.runId}`,
+      ),
+    );
+    const newActivities = activities.filter(
+      (activity) =>
+        !existingActivityKeys.has(`${activity.activityId}:${activity.runId}`),
+    );
+
+    if (newActivities.length) {
+      activityStartSummaryItems = [
+        ...activityStartSummaryItems,
+        ...newActivities,
+      ];
+    }
+  };
+
+  const setActivityStartSummaryLoading = (loading: boolean) => {
+    if (loading) {
+      activityStartSummaryLoading = true;
+      activityStartSummaryVisibleItems = [];
+      return;
+    }
+
+    if (activityStartSummaryLoading) {
+      activityStartSummaryItems = [...activityStartSummaryVisibleItems];
+    }
+
+    activityStartSummaryLoading = false;
+  };
+
+  $effect(() => {
+    const nextActivityStartSummaryKey = `${namespace ?? ''}|${query ?? ''}|${$activityRefresh}`;
+    if (activityStartSummaryKey !== nextActivityStartSummaryKey) {
+      activityStartSummaryKey = nextActivityStartSummaryKey;
+      activityStartSummaryVisibleItems = [];
+      activityStartSummaryLoading = true;
+    }
+  });
+
+  const isValidFilter = (filter: SearchAttributeFilter): boolean => {
+    return Boolean(
+      filter.attribute &&
+      (filter.value ||
+        filter.conditional?.toLocaleLowerCase().includes('null')),
+    );
+  };
+
+  const activityStartSummaryUsesCurrentTimeEnd = $derived(
+    toListWorkflowFilters(query, $activitySearchAttributes).some(
+      (filter) =>
+        filter.type === SEARCH_ATTRIBUTE_TYPE.DATETIME && isValidFilter(filter),
+    ),
+  );
+
+  const filterByActivityType = (activityType: string) => {
+    const baseFilters = toListWorkflowFilters(
+      query,
+      $activitySearchAttributes,
+    ).filter(
+      (filter) => filter.attribute !== 'ActivityType' && isValidFilter(filter),
+    );
+    const activityTypeFilter = createFilter({
+      attribute: 'ActivityType',
+      type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+      value: activityType,
+      conditional: '=',
+    });
+    const nextFilters = combineFilters([...baseFilters, activityTypeFilter]);
+    const nextQuery = toListWorkflowQueryFromFilters(nextFilters);
+
+    $activityFilters = nextFilters;
+    updateQueryParameters({
+      url: page.url,
+      parameter: 'query',
+      value: nextQuery,
+      clearParameters: [currentPageKey],
+    });
+  };
 </script>
 
 <header class="flex flex-col gap-2">
@@ -104,7 +212,12 @@
   </div>
 </header>
 
-<FilterBar />
+<ActivityStartSummary
+  loading={activityStartSummaryLoading}
+  activities={activityStartSummaryItems}
+  useCurrentTimeEnd={activityStartSummaryUsesCurrentTimeEnd}
+  onFilter={filterByActivityType}
+/>
 <div class="flex overflow-auto">
   <SavedActivityViews />
   <div
@@ -115,7 +228,13 @@
   >
     <ActivitiesSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
-    />
+      onItemsChange={addActivityStartSummaryItems}
+      onLoadingChange={setActivityStartSummaryLoading}
+    >
+      {#snippet beforeTable()}
+        <FilterBar />
+      {/snippet}
+    </ActivitiesSummaryConfigurableTable>
   </div>
 </div>
 <ConfigurableTableHeadersDrawer

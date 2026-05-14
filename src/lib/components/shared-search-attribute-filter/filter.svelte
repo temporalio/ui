@@ -24,9 +24,15 @@
   import { setContext } from 'svelte';
 
   import { afterNavigate } from '$app/navigation';
+  import { page } from '$app/state';
 
+  import Button from '$lib/holocene/button.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeOption } from '$lib/stores/search-attributes';
-  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   import type { StatusAttribute } from './types.ts';
 
@@ -39,6 +45,7 @@
     id: string;
     statusAttribute?: StatusAttribute;
     includeNullConditions?: boolean;
+    appearance?: 'boxed' | 'plain';
   }
 
   let {
@@ -47,6 +54,7 @@
     id,
     statusAttribute,
     includeNullConditions = true,
+    appearance = 'boxed',
   }: Props = $props();
 
   const filter = writable<SearchAttributeFilter>(createFilter());
@@ -85,9 +93,26 @@
     activeQueryIndex.set(null);
     filter.set(createFilter());
   }
+
+  function clearAllFilters() {
+    $filters = [];
+    updateQueryParamsFromFilter(page.url, $filters, true);
+    $activeQueryIndex = null;
+    $filter = createFilter();
+  }
 </script>
 
 <div class="flex shrink flex-wrap items-center justify-start gap-2">
+  <SearchAttributeMenu {options} {filters} {statusAttribute} {appearance} />
   <DropdownFilterList {filters} {statusAttribute} />
-  <SearchAttributeMenu {options} {filters} {statusAttribute} />
+  {#if $filters.length > 0}
+    <Button
+      variant="ghost"
+      size="xs"
+      on:click={clearAllFilters}
+      data-testid="clear-all-filters-button"
+    >
+      {translate('common.clear-all')}
+    </Button>
+  {/if}
 </div>

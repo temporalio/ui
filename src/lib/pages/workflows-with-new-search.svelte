@@ -203,6 +203,13 @@
     );
   };
 
+  const workflowStartSummaryUsesCurrentTimeEnd = $derived(
+    toListWorkflowFilters(query ?? '', $searchAttributes).some(
+      (filter) =>
+        filter.type === SEARCH_ATTRIBUTE_TYPE.DATETIME && isValidFilter(filter),
+    ),
+  );
+
   const filterByWorkflowType = (workflowType: string) => {
     const baseFilters = toListWorkflowFilters(
       query ?? '',
@@ -352,6 +359,7 @@
 <WorkflowStartSummary
   loading={workflowStartSummaryLoading}
   workflows={workflowStartSummaryItems}
+  useCurrentTimeEnd={workflowStartSummaryUsesCurrentTimeEnd}
   onFilter={filterByWorkflowType}
 />
 <div class="flex overflow-auto">

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
@@ -9,6 +11,7 @@
   import { fetchPaginatedActivities } from '$lib/services/standalone-activities';
   import { activityCount, activityRefresh } from '$lib/stores/activities';
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
 
   import TableBodyCell from './activities-summary-configurable-table/table-body-cell.svelte';
   import TableEmptyState from './activities-summary-configurable-table/table-empty-state.svelte';
@@ -18,9 +21,13 @@
 
   interface Props {
     onClickConfigure: () => void;
+    onItemsChange?: (activities: ActivityExecutionInfo[]) => void;
+    onLoadingChange?: (loading: boolean) => void;
+    beforeTable?: Snippet;
   }
 
-  let { onClickConfigure }: Props = $props();
+  let { onClickConfigure, onItemsChange, onLoadingChange, beforeTable }: Props =
+    $props();
 
   const namespace = $derived(page.params.namespace);
   const columns = $derived(
@@ -35,14 +42,19 @@
   <PaginatedTable
     total={$activityCount.count}
     {onFetch}
+    {onItemsChange}
+    {onLoadingChange}
     let:visibleItems
     aria-label={translate('standalone-activities.standalone-activities')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
     previousButtonLabel={translate('common.previous')}
     emptyStateMessage={translate('standalone-activities.empty-state-title')}
-    maxHeight="var(--panel-h)"
+    maxHeight="var(--table-h)"
   >
+    <svelte:fragment slot="before-table">
+      {@render beforeTable?.()}
+    </svelte:fragment>
     <caption class="sr-only" slot="caption">
       {translate('standalone-activities.standalone-activities')}
     </caption>
