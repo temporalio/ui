@@ -117,7 +117,9 @@ export function parseRawPayloadToJSON(
     return {
       metadata,
       data,
-      externalPayloads: payload.externalPayloads ?? [],
+      ...(payload.externalyPayloads && {
+        externalPayloads: payload.externalPayloads,
+      }),
     };
   } catch (_e) {
     console.warn('Could not parse payload: ', _e);

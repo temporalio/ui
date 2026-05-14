@@ -10,11 +10,13 @@
     getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory),
   );
   const isPending = $derived(
-    $workflowRun.workflow.isRunning || $workflowRun.workflow.isPaused,
+    $workflowRun.workflow?.isRunning ||
+      $workflowRun.workflow?.isPaused ||
+      false,
   );
   const payloadDownloadFilenameData = $derived({
-    workflowId: $workflowRun.workflow.id,
-    runId: $workflowRun.workflow.runId,
+    workflowId: $workflowRun.workflow?.id ?? '',
+    runId: $workflowRun.workflow?.runId ?? '',
   });
 </script>
 
