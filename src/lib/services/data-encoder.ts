@@ -5,6 +5,7 @@ import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
+import type { Payloads } from '$lib/types';
 import type { NetworkError } from '$lib/types/global';
 import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 import {
@@ -23,7 +24,7 @@ export async function codeServerRequest({
 }: {
   type: 'decode' | 'encode';
   payloads: PotentialPayloads;
-}): Promise<PotentialPayloads> {
+}): Promise<Payloads> {
   const settings = page.data.settings;
   const namespace = page.params.namespace;
   const endpoint = getCodecEndpoint(settings);
@@ -107,7 +108,7 @@ export async function decodePayloadsWithCodec({
   payloads,
 }: {
   payloads: PotentialPayloads;
-}): Promise<PotentialPayloads> {
+}): Promise<Payloads> {
   return codeServerRequest({ type: 'decode', payloads });
 }
 
@@ -115,6 +116,6 @@ export async function encodePayloadsWithCodec({
   payloads,
 }: {
   payloads: PotentialPayloads;
-}): Promise<PotentialPayloads> {
+}): Promise<Payloads> {
   return codeServerRequest({ type: 'encode', payloads });
 }

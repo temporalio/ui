@@ -33,7 +33,7 @@
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import { decodeUserMetadata } from '$lib/utilities/decode-payload';
+  import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {
@@ -63,13 +63,17 @@
     const userMetadata = { summary: '', details: '' };
     try {
       if (workflow?.summary) {
-        const decodedSummary = await decodeUserMetadata(workflow.summary);
+        const decodedSummary = await decodePayloadAndParseDataToJSON(
+          workflow.summary,
+        );
         if (typeof decodedSummary === 'string') {
           userMetadata.summary = decodedSummary;
         }
       }
       if (workflow?.details) {
-        const decodedDetails = await decodeUserMetadata(workflow.details);
+        const decodedDetails = await decodePayloadAndParseDataToJSON(
+          workflow.details,
+        );
         if (typeof decodedDetails === 'string') {
           userMetadata.details = decodedDetails;
         }

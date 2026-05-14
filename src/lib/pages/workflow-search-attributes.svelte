@@ -1,6 +1,5 @@
 <script lang="ts">
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { workflowRun } from '$lib/stores/workflow-run';
 
@@ -12,18 +11,7 @@
     {translate('events.attribute-group.search-attributes')}
   </h3>
   {#if workflow?.searchAttributes}
-    <PayloadDecoder
-      value={{ searchAttributes: workflow.searchAttributes }}
-      key="searchAttributes"
-    >
-      {#snippet children(decodedValue)}
-        <CodeBlock
-          content={decodedValue}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      {/snippet}
-    </PayloadDecoder>
+    <PayloadCodeBlock value={workflow.searchAttributes.indexedFields} />
   {:else}
     <p>{translate('events.empty-search-attributes')}</p>
   {/if}

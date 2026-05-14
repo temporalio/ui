@@ -1,14 +1,17 @@
 import { isEvent } from '$lib/models/event-history';
-import type { Payloads } from '$lib/types';
+import type { Payload, Payloads } from '$lib/types';
 import type {
   PendingActivity,
   PendingNexusOperation,
   WorkflowEvent,
 } from '$lib/types/events';
-import type { Payload } from '$lib/types/events';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
-import { isRawPayload, parseRawPayloadToJSON } from './decode-payload';
+import {
+  isRawPayload,
+  isRawPayloads,
+  parseRawPayloadToJSON,
+} from './decode-payload';
 import type { CombinedAttributes } from './format-event-attributes';
 import { has } from './has';
 import { isObject } from './is';
@@ -23,7 +26,7 @@ import {
 
 export type SummaryAttribute = {
   key: string;
-  value: string | Record<string, unknown> | Payloads;
+  value: string | Payload | Payloads | Record<string, unknown>;
 };
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
