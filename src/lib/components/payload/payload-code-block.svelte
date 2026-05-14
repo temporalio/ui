@@ -1,3 +1,13 @@
+<script lang="ts" module>
+  export type PayloadDownloadFilenameData = {
+    workflowId?: string;
+    runId?: string;
+    scheduleId?: string;
+    type: 'input' | 'result' | undefined;
+    eventId?: string | undefined;
+  };
+</script>
+
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -20,18 +30,11 @@
 
   import PayloadDecoder from './payload-decoder.svelte';
 
-  type FilenameData = {
-    workflowId: string | undefined;
-    runId: string | undefined;
-    type: 'input' | 'result' | undefined;
-    eventId?: string | undefined;
-  };
-
   interface Props {
     value: Payload | Payloads | PayloadContainingObject;
     maxHeight?: number;
     testId?: string;
-    filenameData?: FilenameData;
+    filenameData?: PayloadDownloadFilenameData;
   }
 
   let { value, maxHeight, testId, filenameData = undefined }: Props = $props();
@@ -44,8 +47,11 @@
       return 'payload.json';
     }
 
-    const base = `payload-wf-${filenameData.workflowId}-run-${filenameData.runId}`;
+    if (filenameData.scheduleId) {
+      return `payload-schedule-${filenameData.scheduleId}.json`;
+    }
 
+    const base = `payload-wf-${filenameData.workflowId}-run-${filenameData.runId}`;
     if (filenameData.eventId) {
       return `${base}-event-${filenameData.eventId}-${filenameData.type}.json`;
     }

@@ -4,13 +4,14 @@
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
 
-  let { input }: { input: Payloads } = $props();
+  let { input, scheduleId }: { input: Payloads; scheduleId: string } = $props();
 </script>
 
 <Panel>
   <InputAndResultsPayload
     title={translate('schedules.schedule-input')}
     content={input}
+    payloadDownloadFilenameData={{ scheduleId, type: 'input' }}
   >
     {#snippet titleSnippet()}
       <h2>

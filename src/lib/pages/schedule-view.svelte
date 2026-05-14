@@ -416,6 +416,7 @@
         </div>
         <div class="flex w-full flex-col gap-4 xl:w-1/3">
           <ScheduleInput
+            {scheduleId}
             input={schedule?.schedule?.action?.startWorkflow?.input}
           />
           <ScheduleFrequencyPanel spec={schedule?.schedule?.spec} />
