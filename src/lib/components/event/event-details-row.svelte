@@ -14,7 +14,7 @@
   import EventDetailsLink from './event-details-link.svelte';
 
   export let key: string;
-  export let value: string | Payload | Payloads | Record<string, unknown>;
+  export let value: string | Payload | Payloads;
   export let attributes: CombinedAttributes;
   export let showKey = true;
 

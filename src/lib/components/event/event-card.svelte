@@ -210,7 +210,13 @@
       <p class="mb-1 min-w-56 text-sm text-secondary/80">
         {translate('workflows.call-stack-tab')}
       </p>
-      <CodeBlock content={stackTrace} language="text" maxHeight={384} />
+      <CodeBlock
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        content={stackTrace}
+        language="text"
+        maxHeight={384}
+      />
     </div>
   {/if}
 {/snippet}

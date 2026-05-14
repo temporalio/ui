@@ -11,7 +11,6 @@
     prefix?: string;
     maxSummaryLength?: number;
     class?: string;
-    onDecode?: (decodedValue: string) => void;
     children?: Snippet<[decodedValue: string]>;
   }
 
@@ -21,36 +20,43 @@
     prefix = '',
     maxSummaryLength = 120,
     class: className = '',
-    onDecode,
     children,
   }: Props = $props();
 
   let decodedValue = $state(fallback);
 
-  const applyPrefix = (text: string): string => {
-    if (!prefix) return text;
-    const prefixed = `${prefix} • ${text}`;
-    if (prefixed.length <= maxSummaryLength) return prefixed;
-    return prefixed.slice(0, maxSummaryLength) + '...';
-  };
+  const decodePromise = $derived(
+    (() => {
+      const _value = value;
+      const _fallback = fallback;
+      const _prefix = prefix;
+      const _max = maxSummaryLength;
+
+      if (!_value) return Promise.resolve(_fallback);
+
+      return decodePayloadAndParseDataToJSON(_value).then((result) => {
+        if (typeof result !== 'string' || !result) return _fallback;
+        if (!_prefix) return result;
+        const prefixed = `${_prefix} • ${result}`;
+        return prefixed.length <= _max
+          ? prefixed
+          : prefixed.slice(0, _max) + '...';
+      });
+    })(),
+  );
 
   $effect(() => {
-    if (!value) {
-      decodedValue = fallback;
-      return;
-    }
-    decodePayloadAndParseDataToJSON(value)
+    let cancelled = false;
+    decodePromise
       .then((result) => {
-        if (typeof result === 'string' && result) {
-          decodedValue = applyPrefix(result);
-          onDecode?.(decodedValue);
-        } else {
-          decodedValue = fallback;
-        }
+        if (!cancelled) decodedValue = result;
       })
       .catch(() => {
-        decodedValue = fallback;
+        if (!cancelled) decodedValue = fallback;
       });
+    return () => {
+      cancelled = true;
+    };
   });
 </script>
 

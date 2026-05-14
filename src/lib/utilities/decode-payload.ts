@@ -286,6 +286,7 @@ export async function decodePayloadAndParseDataToJSON(
   payload: Payload | null | undefined,
   returnDataOnly: boolean = true,
 ): Promise<unknown | ParsedPayload> {
+  if (!payload) return null;
   const decoded = await decodePayloadsWithRemoteCodec(toArray(payload));
 
   if (!decoded || !decoded[0]) {
