@@ -117,7 +117,7 @@ export function parseRawPayloadToJSON(
     return {
       metadata,
       data,
-      ...(payload.externalyPayloads && {
+      ...(payload.externalPayloads && {
         externalPayloads: payload.externalPayloads,
       }),
     };
