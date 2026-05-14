@@ -57,6 +57,7 @@
       ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
         ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
       }),
+      TemporalSchedulePaused: SEARCH_ATTRIBUTE_TYPE.BOOL,
       ...$customSearchAttributes,
     }).map(([key, value]) => {
       return {
