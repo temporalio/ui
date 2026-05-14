@@ -3,6 +3,7 @@
 
   import { page } from '$app/state';
 
+  import DropdownFilterChip from '$lib/components/search-attribute-filter/dropdown-filter-chip.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
@@ -11,7 +12,6 @@
   import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
-  import DropdownFilterChip from './dropdown-filter-chip.svelte';
   import { FILTER_CONTEXT, type FilterContext } from './filter.svelte';
   import StatusDropdownFilterChip from './status-dropdown-filter-chip.svelte';
 

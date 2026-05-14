@@ -5,7 +5,6 @@
 
   import { page } from '$app/state';
 
-  import DropdownFilterChip from '$lib/components/workflow/filter-bar/dropdown-filter-chip.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
@@ -14,6 +13,7 @@
 
   import type { StatusAttribute } from './types.ts';
 
+  import DropdownFilterChip from './dropdown-filter-chip.svelte';
   import {
     SEARCH_ATTRIBUTE_FILTER_CONTEXT,
     type SearchAttributeFilterContext,

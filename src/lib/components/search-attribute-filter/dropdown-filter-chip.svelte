@@ -5,10 +5,6 @@
   import { zonedTimeToUtc } from 'date-fns-tz';
   import { getContext, untrack } from 'svelte';
 
-  import {
-    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
-    type SearchAttributeFilterContext,
-  } from '$lib/components/search-attribute-filter/filter.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -55,6 +51,11 @@
   } from '$lib/utilities/query/search-attribute-filter';
   import { getTimezone, TIME_UNIT_OPTIONS } from '$lib/utilities/timezone';
   import { toDate } from '$lib/utilities/to-duration';
+
+  import {
+    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
+    type SearchAttributeFilterContext,
+  } from './filter.svelte';
 
   type Props = {
     filter: SearchAttributeFilter;
