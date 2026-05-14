@@ -24,9 +24,9 @@
   </div>
 {/snippet}
 
-<div>
-  <div class="flex w-full flex-wrap items-center justify-between gap-2 p-1.5">
-    <div class="flex grow items-center justify-start gap-4 px-2">
+<div class="py-1">
+  <div class="flex w-full flex-wrap items-center justify-between gap-2">
+    <div class="flex grow items-center justify-start gap-4">
       <Filter />
     </div>
     {@render actionToggleButtons()}
