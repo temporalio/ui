@@ -254,7 +254,7 @@
   style="will-change: width"
 >
   <div
-    class="flex items-center justify-center gap-2 px-2 py-2 text-center lg:justify-start"
+    class="flex items-center justify-center gap-2 px-2 py-1.5 text-center lg:justify-start"
   >
     <div class={merge('flex w-full items-center gap-2')}>
       <Button

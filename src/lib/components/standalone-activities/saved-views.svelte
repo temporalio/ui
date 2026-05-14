@@ -256,7 +256,7 @@
   style="will-change: width"
 >
   <div
-    class="flex items-center justify-center gap-2 px-2 py-2 text-center lg:justify-start"
+    class="flex items-center justify-center gap-2 px-2 py-1.5 text-center lg:justify-start"
   >
     <div class={merge('flex w-full items-center gap-2')}>
       <Button
@@ -306,8 +306,6 @@
       </p>
     {/if}
 
-    <div class="border-t border-subtle"></div>
-
     {#if unsavedQuery}
       {@render queryButton(unsaveView)}
     {/if}
@@ -333,7 +331,7 @@
     {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
       <p
         class={merge(
-          ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
+          ' py-1.5 pl-1 text-center text-secondary lg:pl-4 lg:text-left',
           !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
         )}
       >

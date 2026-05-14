@@ -7,10 +7,11 @@
 
   type Props = {
     workflows?: WorkflowExecution[];
+    loading?: boolean;
     onFilter?: (workflowType: string) => void;
   };
 
-  let { workflows = [], onFilter }: Props = $props();
+  let { workflows = [], loading = false, onFilter }: Props = $props();
 
   type Bar = {
     key: string;
@@ -184,6 +185,7 @@
   );
 
   const hasWorkflows = $derived(sortedWorkflows.length > 0);
+  const showControls = $derived(hasWorkflows);
   const rawMinStart = $derived(
     hasWorkflows ? getStartTimestamp(sortedWorkflows[0]) : 0,
   );
@@ -263,12 +265,12 @@
   });
 </script>
 
-{#if hasWorkflows}
-  <div class="w-full">
-    <div
-      class="mb-1 flex justify-end gap-1"
-      aria-label="Workflow timeline zoom controls"
-    >
+<div class="w-full">
+  <div
+    class="mb-1 flex h-6 justify-end gap-1"
+    aria-label="Workflow timeline zoom controls"
+  >
+    {#if showControls}
       <Tooltip top usePortal text="Zoom out">
         <button
           type="button"
@@ -302,15 +304,18 @@
           <Icon name="retry" class="h-4 w-4" />
         </button>
       </Tooltip>
-    </div>
+    {/if}
+  </div>
 
+  {#if hasWorkflows}
     <div
       bind:this={graphElement}
       class={dragState
-        ? 'relative h-12 w-full cursor-grabbing touch-none select-none bg-subtle/40'
-        : 'relative h-12 w-full cursor-grab touch-none select-none bg-subtle/40'}
+        ? 'relative h-10 w-full cursor-grabbing touch-none select-none bg-subtle/40'
+        : 'relative h-10 w-full cursor-grab touch-none select-none bg-subtle/40'}
       aria-label="Workflow start overview. Use the mouse wheel to zoom and drag to pan."
       role="group"
+      aria-busy={loading}
       onwheel={handleWheel}
       onpointerdown={handlePointerDown}
       onpointermove={handlePointerMove}
@@ -329,7 +334,7 @@
 
       {#each bars as bar (bar.key)}
         <div
-          class="absolute top-1 h-10 w-4 -translate-x-2"
+          class="absolute top-0 h-10 w-4 -translate-x-2"
           style:left={`${bar.left}%`}
         >
           <Tooltip top usePortal class="h-full w-full">
@@ -362,8 +367,15 @@
         </div>
       {/each}
     </div>
+  {:else}
+    <div
+      class="flex h-10 w-full items-center justify-center bg-subtle/40 text-xs text-secondary"
+      aria-live="polite"
+    ></div>
+  {/if}
 
-    <div class="relative mt-1 h-4 text-xs text-secondary">
+  <div class="relative mt-1 h-4 text-xs text-secondary">
+    {#if hasWorkflows}
       {#each ticks as tick (tick.key)}
         {#if tick.index === 0}
           <span class="absolute left-0 whitespace-nowrap">
@@ -382,9 +394,9 @@
           </span>
         {/if}
       {/each}
-    </div>
+    {/if}
   </div>
-{/if}
+</div>
 
 <style lang="postcss">
   .workflow-start-bar::before {

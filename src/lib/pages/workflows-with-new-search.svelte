@@ -146,8 +146,12 @@
 
   let workflowStartSummaryKey = $state('');
   let workflowStartSummaryItems = $state<WorkflowExecution[]>([]);
+  let workflowStartSummaryVisibleItems = $state<WorkflowExecution[]>([]);
+  let workflowStartSummaryLoading = $state(true);
 
   const addWorkflowStartSummaryItems = (workflows: WorkflowExecution[]) => {
+    workflowStartSummaryVisibleItems = workflows;
+    if (workflowStartSummaryLoading) return;
     if (!workflows.length) return;
 
     const existingWorkflowKeys = new Set(
@@ -168,11 +172,26 @@
     }
   };
 
+  const setWorkflowStartSummaryLoading = (loading: boolean) => {
+    if (loading) {
+      workflowStartSummaryLoading = true;
+      workflowStartSummaryVisibleItems = [];
+      return;
+    }
+
+    if (workflowStartSummaryLoading) {
+      workflowStartSummaryItems = [...workflowStartSummaryVisibleItems];
+    }
+
+    workflowStartSummaryLoading = false;
+  };
+
   $effect(() => {
     const nextWorkflowStartSummaryKey = `${namespace ?? ''}|${query ?? ''}|${$refresh}`;
     if (workflowStartSummaryKey !== nextWorkflowStartSummaryKey) {
       workflowStartSummaryKey = nextWorkflowStartSummaryKey;
-      workflowStartSummaryItems = [];
+      workflowStartSummaryVisibleItems = [];
+      workflowStartSummaryLoading = true;
     }
   });
 
@@ -319,7 +338,9 @@
       <div class="flex items-center gap-4">
         <slot name="header-actions" />
         {#if workflowStartEnabled}
-          <Button href={routeForWorkflowStart({ namespace })}
+          <Button
+            variant="secondary"
+            href={routeForWorkflowStart({ namespace })}
             >{translate('workflows.start-workflow')}</Button
           >
         {/if}
@@ -329,6 +350,7 @@
 </header>
 
 <WorkflowStartSummary
+  loading={workflowStartSummaryLoading}
   workflows={workflowStartSummaryItems}
   onFilter={filterByWorkflowType}
 />
@@ -343,6 +365,7 @@
     <WorkflowsSummaryConfigurableTable
       onClickConfigure={openCustomizationDrawer}
       onItemsChange={addWorkflowStartSummaryItems}
+      onLoadingChange={setWorkflowStartSummaryLoading}
     >
       <FilterBar slot="before-table" />
       <slot name="cloud" slot="cloud" />

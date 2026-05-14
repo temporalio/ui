@@ -32,7 +32,7 @@
   const removeQuery = (index: number) => {
     filters.splice(index, 1);
     filters = filters;
-    updateQueryParamsFromFilter($page.url, filters);
+    updateQueryParamsFromFilter(page.url, filters);
 
     if (index === filters.length) {
       const previousQuery = filters[filters.length - 1];

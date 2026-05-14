@@ -56,9 +56,8 @@
       $workflowFilters[$activeQueryIndex] = $filter;
       $activeQueryIndex = null;
     } else {
-      const newIndex = $workflowFilters.length;
-      $workflowFilters = [...$workflowFilters, $filter];
-      chipOpenIndex.set(newIndex);
+      $workflowFilters = [$filter, ...$workflowFilters];
+      chipOpenIndex.set(0);
     }
     filter.set(createFilter());
   }

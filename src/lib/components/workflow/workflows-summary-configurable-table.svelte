@@ -28,6 +28,8 @@
   export let onItemsChange:
     | ((workflows: WorkflowExecution[]) => void)
     | undefined = undefined;
+  export let onLoadingChange: ((loading: boolean) => void) | undefined =
+    undefined;
 
   $: ({ namespace } = $page.params);
   $: baseColumns = $configurableTableColumns?.[namespace]?.workflows ?? [];
@@ -94,6 +96,7 @@
     total={$workflowCount.count}
     {onFetch}
     {onItemsChange}
+    {onLoadingChange}
     let:visibleItems
     aria-label={translate('common.workflows')}
     pageSizeSelectLabel={translate('common.per-page')}

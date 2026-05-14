@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import { getContext } from 'svelte';
+  import { getContext, tick } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -38,6 +38,11 @@
     getContext<FilterContext>(FILTER_CONTEXT);
 
   const open = writable(false);
+
+  async function focusSearchInput() {
+    await tick();
+    document.getElementById('filter-search')?.focus();
+  }
 
   const getDefaultConditional = (type: SearchAttributeType) => {
     switch (type) {
@@ -82,6 +87,12 @@
             .includes(searchAttributeValue.toLowerCase()),
         ),
   );
+
+  $effect(() => {
+    if ($open) {
+      focusSearchInput();
+    }
+  });
 </script>
 
 <MenuContainer {open}>

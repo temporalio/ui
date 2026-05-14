@@ -3,7 +3,7 @@
 
   import { addHours, addMinutes, addSeconds, startOfDay } from 'date-fns';
   import { zonedTimeToUtc } from 'date-fns-tz';
-  import { getContext, untrack } from 'svelte';
+  import { getContext, tick, untrack } from 'svelte';
 
   import {
     SEARCH_ATTRIBUTE_FILTER_CONTEXT,
@@ -88,6 +88,37 @@
   const isNullFilter = $derived(isNullConditional(localFilter.conditional));
   const isTimeRange = $derived(localFilter.conditional === 'BETWEEN');
   const selectedTime = $derived(getSelectedTimezone($timeFormat));
+
+  const valueInputId = $derived(`${controlsId}-value`);
+  const listInputId = $derived(`${controlsId}-list`);
+  const relativeDateTimeInputId = $derived(`${controlsId}-relative-datetime`);
+
+  async function focusFilterInput() {
+    await tick();
+
+    const focusableElementId = isTextFilter(localFilter)
+      ? valueInputId
+      : isNumberFilter(localFilter)
+        ? valueInputId
+        : isListFilter(localFilter)
+          ? listInputId
+          : isDateTimeFilter(localFilter)
+            ? relativeDateTimeInputId
+            : valueInputId;
+
+    const focusedElement = document.getElementById(
+      focusableElementId,
+    ) as HTMLInputElement | null;
+
+    focusedElement?.focus();
+
+    if (document.activeElement !== focusedElement) {
+      document
+        .getElementById(controlsId)
+        ?.querySelector<HTMLInputElement>('input:not([disabled])')
+        ?.focus();
+    }
+  }
 
   const defaultConditionOptions = $derived(
     includeNullConditions
@@ -299,6 +330,7 @@
   $effect(() => {
     if (openIndex === index) {
       $open = true;
+      focusFilterInput();
     }
   });
 
@@ -356,7 +388,7 @@
           <div class="space-y-3">
             {@render conditionalButtons(conditionalOptions)}
             <Input
-              id={`${controlsId}-text`}
+              id={valueInputId}
               label="Value"
               placeholder="Enter value..."
               disabled={isNullFilter}
@@ -413,7 +445,7 @@
                   <Input
                     label={translate('common.relative')}
                     labelHidden
-                    id="relative-datetime-input"
+                    id={relativeDateTimeInputId}
                     bind:value={$relativeTimeDuration}
                     placeholder="00"
                     error={timeError($relativeTimeDuration)}
@@ -477,7 +509,7 @@
           <div class="space-y-3">
             {@render conditionalButtons(numberConditionalOptions)}
             <Input
-              id={`${controlsId}-number`}
+              id={valueInputId}
               label="Value"
               placeholder={isDurationFilter(localFilter)
                 ? translate('workflows.duration-filter-placeholder')
@@ -493,7 +525,7 @@
               <ChipInput
                 label={localFilter.attribute}
                 labelHidden
-                id="list-filter"
+                id={listInputId}
                 bind:chips
                 class="w-full"
                 removeChipButtonLabel={(chip) =>
@@ -509,7 +541,7 @@
               <Input
                 label={localFilter.attribute}
                 labelHidden
-                id="list-filter"
+                id={listInputId}
                 type="search"
                 placeholder={`${translate('common.enter')} ${localFilter.attribute}`}
                 class="w-full"
@@ -546,7 +578,7 @@
         {:else}
           <div class="space-y-2">
             <Input
-              id={`${controlsId}-generic`}
+              id={valueInputId}
               label="Value"
               placeholder="Enter value..."
               bind:value={localFilter.value}

@@ -20,6 +20,7 @@
       'no-underline',
       'active:scale-[0.98]',
       'transition-all duration-200',
+      'rounded-sm',
     ],
     {
       variants: {

@@ -72,10 +72,10 @@ export const systemWorkflowViews: SavedQuery[] = [
   },
   TASK_FAILURES_VIEW,
   {
-    id: 'running',
-    name: 'Running',
-    query: '`ExecutionStatus`="Running"',
-    icon: 'heartbeat',
+    id: 'scheduled',
+    name: 'Scheduled',
+    query: '`TemporalScheduledById` IS NOT NULL',
+    icon: 'schedules',
     type: 'system',
   },
   {
