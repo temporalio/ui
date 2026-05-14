@@ -28,9 +28,9 @@ const getLastHour = () => {
   return lastHour.toISOString();
 };
 
-export const DEFAULT_SYSTEM_VIEW: SavedQuery = {
+export const ALL_WORKFLOWS_VIEW: SavedQuery = {
   id: 'all',
-  name: 'All Workflows',
+  name: 'All',
   query: '',
   icon: 'workflow',
   type: 'system',
@@ -44,8 +44,32 @@ export const TASK_FAILURES_VIEW: SavedQuery = {
   type: 'system',
 };
 
+const LAST_HOUR_VIEW: SavedQuery = {
+  id: 'last-hour',
+  name: 'Last Hour',
+  query: `StartTime >= "${getLastHour()}"`,
+  icon: 'clock',
+  type: 'system',
+};
+
+export const DEFAULT_SYSTEM_VIEW = ALL_WORKFLOWS_VIEW;
+
 export const systemWorkflowViews: SavedQuery[] = [
-  DEFAULT_SYSTEM_VIEW,
+  ALL_WORKFLOWS_VIEW,
+  {
+    id: 'last-hour',
+    name: 'Last Hour',
+    query: `StartTime >= "${getLastHour()}"`,
+    icon: 'clock',
+    type: 'system',
+  },
+  {
+    id: 'today',
+    name: 'Today',
+    query: `StartTime >= "${getToday()}"`,
+    icon: 'calendar',
+    type: 'system',
+  },
   TASK_FAILURES_VIEW,
   {
     id: 'running',
@@ -59,20 +83,6 @@ export const systemWorkflowViews: SavedQuery[] = [
     name: 'Parent Workflows',
     query: '`ParentWorkflowId` is null',
     icon: 'relationship',
-    type: 'system',
-  },
-  {
-    id: 'today',
-    name: 'Today',
-    query: `StartTime >= "${getToday()}"`,
-    icon: 'calendar',
-    type: 'system',
-  },
-  {
-    id: 'last-hour',
-    name: 'Last Hour',
-    query: `StartTime >= "${getLastHour()}"`,
-    icon: 'clock',
     type: 'system',
   },
 ];

@@ -25,11 +25,8 @@
 {/snippet}
 
 <div>
-  <div
-    class="flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
-  >
+  <div class="flex w-full flex-wrap items-center justify-between gap-2 p-1.5">
     <div class="flex grow items-center justify-start gap-4 px-2">
-      <Icon name="filter-lines" class="text-primary-text h-4 w-4 shrink-0" />
       <Filter />
     </div>
     {@render actionToggleButtons()}

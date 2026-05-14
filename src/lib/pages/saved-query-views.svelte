@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { slide } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
 
   import { onMount } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
@@ -246,7 +246,7 @@
 
 <div
   class={merge(
-    'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
+    'relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto shadow-sm transition-all duration-300 ease-in-out',
     $savedQueryNavOpen
       ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
       : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
@@ -254,37 +254,32 @@
   style="will-change: width"
 >
   <div
-    class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.75rem]"
+    class="flex items-center justify-center gap-2 px-2 py-2 text-center lg:justify-start"
   >
-    <div
-      class={merge(
-        'flex w-full items-center justify-between',
-        $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
-      )}
-    >
-      {#if $savedQueryNavOpen}
-        <p
-          class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
-          in:slide
-        >
-          Saved Views
-        </p>
-      {/if}
-      <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
-      <button
-        class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
+    <div class={merge('flex w-full items-center gap-2')}>
+      <Button
+        variant="ghost"
+        size="xs"
+        leadingIcon={$savedQueryNavOpen ? 'chevron-left' : 'chevron-right'}
         aria-label={$savedQueryNavOpen
           ? 'Collapse saved views'
           : 'Expand saved views'}
         title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
-        onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
-      >
-        <Icon name={$savedQueryNavOpen ? 'chevron-left' : 'chevron-right'} />
-      </button>
+        on:click={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
+        data-testid="toggle-saved-views-button"
+      ></Button>
+      {#if $savedQueryNavOpen}
+        <p
+          class="hidden whitespace-nowrap text-xs leading-3 lg:block lg:text-sm"
+          transition:fade
+        >
+          Saved Views
+        </p>
+      {/if}
     </div>
   </div>
 
-  <div class="space-y-2 p-1.5">
+  <div class="p-1.5">
     <div class="pb-2 text-center">
       <div class="space-y-1">
         {#each systemWorkflowViews as view (view.id)}
@@ -303,8 +298,7 @@
 
     {#if $savedQueryNavOpen}
       <p
-        class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
-        in:slide
+        class="hidden items-center justify-between whitespace-nowrap px-2 py-1.5 text-xs font-medium leading-3 lg:flex lg:text-sm"
       >
         {translate('workflows.custom-views')}
         {@render queryBadge({
@@ -313,8 +307,6 @@
         })}
       </p>
     {/if}
-
-    <div class="border-t border-subtle"></div>
 
     {#if unsavedQuery}
       {@render queryButton(unsaveView)}
@@ -341,7 +333,7 @@
     {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
       <p
         class={merge(
-          ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
+          ' py-1.5 pl-1 text-center text-secondary lg:pl-4 lg:text-left',
           !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
         )}
       >
@@ -456,7 +448,8 @@
         <Button
           size="xs"
           class="w-full"
-          variant="secondary"
+          variant="ghost"
+          leadingIcon="pencil"
           data-testid="edit-view-button"
           data-track-name="edit-view-button"
           data-track-intent="action"
@@ -488,7 +481,7 @@
         <Button
           size="xs"
           class="w-full break-all transition-all"
-          variant="secondary"
+          variant="ghost"
           disabled={maxViewsReached}
           data-testid="create-view-button"
           data-track-name="create-view-button"
@@ -528,7 +521,7 @@
       icon && 'gap-1.5 p-0.5 pl-2',
       className,
     )}
-    in:slide
+    transition:slide
   >
     <span class="max-w-16 truncate">{content}</span>
     {#if icon}

@@ -95,15 +95,14 @@
   <MenuButton
     id="search-attribute-filter-button"
     controls="search-attribute-menu"
-    leadingIcon="add"
-    variant="secondary"
+    leadingIcon="filter"
+    variant="ghost"
     data-testid="add-filter-button"
     disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
     onclick={() => (searchAttributeValue = '')}
     class="text-nowrap"
-    size="xs"
   >
-    Add Filter
+    Filter
   </MenuButton>
   <Menu id="search-attribute-menu">
     <MenuItem
