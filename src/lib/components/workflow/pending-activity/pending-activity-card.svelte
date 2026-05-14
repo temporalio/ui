@@ -4,7 +4,7 @@
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
@@ -172,16 +172,7 @@
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
-      <PayloadDecoder value={activity.heartbeatDetails} key="payloads">
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
+      <PayloadCodeBlock value={activity.heartbeatDetails} maxHeight={384} />
     {/key}
   </div>
 {/snippet}
@@ -194,18 +185,10 @@
           {translate('workflows.last-failure')}
         </p>
         {#key activity.attempt}
-          <PayloadDecoder value={omit(activity.lastFailure, 'stackTrace')}>
-            {#snippet children(decodedValue)}
-              <CodeBlock
-                content={decodedValue}
-                maxHeight={384}
-                copyIconTitle={translate('common.copy-icon-title')}
-                copySuccessIconTitle={translate(
-                  'common.copy-success-icon-title',
-                )}
-              />
-            {/snippet}
-          </PayloadDecoder>
+          <PayloadCodeBlock
+            value={omit(activity.lastFailure, 'stackTrace')}
+            maxHeight={384}
+          />
         {/key}
       {/if}
     </div>

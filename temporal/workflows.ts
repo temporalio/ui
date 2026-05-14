@@ -3,7 +3,9 @@ import * as workflow from '@temporalio/workflow';
 import type * as activities from './activities';
 import type { ComplexActivityResult } from './activities/complex';
 
-const { echo: Activity } = workflow.proxyActivities<typeof activities>({
+const { echo: Activity, multi: MultiInputActivity } = workflow.proxyActivities<
+  typeof activities
+>({
   startToCloseTimeout: '10 seconds',
 });
 
@@ -275,4 +277,14 @@ export async function PayloadCoverageWorkflow(
     timedOut,
     completedAt: new Date().toISOString(),
   };
+}
+
+export async function MultiInputWorkflow(
+  input1: string,
+  input2: object,
+  input3: unknown[],
+): Promise<string> {
+  const activityResult = await MultiInputActivity(input1, input2, input3);
+
+  return activityResult;
 }

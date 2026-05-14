@@ -5,7 +5,7 @@
 
   import { page } from '$app/state';
 
-  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
@@ -256,7 +256,7 @@
       />
     {/if}
     {#if showText}
-      <MetadataDecoder
+      <PayloadSummary
         value={group?.userMetadata?.summary}
         prefix={isActivityTaskScheduledEvent(group.initialEvent)
           ? group?.displayName
@@ -291,7 +291,7 @@
             {/if}
           </Text>
         {/snippet}
-      </MetadataDecoder>
+      </PayloadSummary>
     {/if}
     <Dot
       point={[x, y]}
