@@ -5,9 +5,9 @@
 
   import { page } from '$app/state';
 
+  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
-  import ActivityCountRefresh from '$lib/components/standalone-activities/activity-count-refresh.svelte';
   import ActivityCounts from '$lib/components/standalone-activities/activity-counts.svelte';
   import SavedActivityViews from '$lib/components/standalone-activities/saved-views.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
@@ -18,6 +18,7 @@
     activitiesQuery,
     activitiesSearchParams,
     activityCount,
+    activityRefresh,
   } from '$lib/stores/activities';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import {
@@ -93,7 +94,10 @@
         </p>
       </div>
       {@render releaseStageBadge?.()}
-      <ActivityCountRefresh count={$activityCount.newCount} />
+      <CountRefreshButton
+        count={$activityCount.newCount}
+        refresh={activityRefresh}
+      />
       <ActivityCounts bind:refreshTime />
     </div>
     {#if headerActions}
