@@ -286,7 +286,7 @@ describe('getSummaryEvent', () => {
     });
   });
 
-  it('should return the operation name for a NexusOperationScheduled event', async () => {
+  it('should return the input for a NexusOperationScheduled event', async () => {
     const nexusEvent = {
       eventId: '5',
       eventTime: '2024-07-11T17:42:53.326959Z',
@@ -310,8 +310,13 @@ describe('getSummaryEvent', () => {
     };
     const event = await toEvent(nexusEvent);
     expect(getSummaryAttribute(event)).toStrictEqual({
-      key: 'operation',
-      value: 'custom-op',
+      key: 'input',
+      value: {
+        data: 'InN0YXJ0LWFzeW5jIg==',
+        metadata: {
+          encoding: 'anNvbi9wbGFpbg==',
+        },
+      },
     });
   });
 });
