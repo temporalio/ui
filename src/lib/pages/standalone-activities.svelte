@@ -8,12 +8,13 @@
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
-  import ActivityCounts from '$lib/components/standalone-activities/activity-counts.svelte';
   import SavedActivityViews from '$lib/components/standalone-activities/saved-views.svelte';
+  import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import { fetchActivityCountByStatus } from '$lib/services/activity-counts';
   import {
     activitiesQuery,
     activitiesSearchParams,
@@ -29,6 +30,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
+  import { getActivityStatusAndCountOfGroup } from '$lib/utilities/get-activity-status-and-count';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   interface Props {
@@ -98,7 +100,15 @@
         count={$activityCount.newCount}
         refresh={activityRefresh}
       />
-      <ActivityCounts bind:refreshTime />
+      <StatusCounts
+        bind:refreshTime
+        countStore={activityCount}
+        refresh={activityRefresh}
+        filters={activityFilters}
+        fetchCounts={fetchActivityCountByStatus}
+        getStatusAndCount={getActivityStatusAndCountOfGroup}
+        data-testid="activity-status"
+      />
     </div>
     {#if headerActions}
       <div class="flex items-center gap-4">

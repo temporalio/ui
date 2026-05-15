@@ -15,8 +15,8 @@
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import StatusCounts from '$lib/components/status-counts.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -392,7 +392,7 @@
             {/if}
           </Button>
         </div>
-        <WorkflowCounts staticQuery={workflowQuery} />
+        <StatusCounts staticQuery={workflowQuery} />
       </div>
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
