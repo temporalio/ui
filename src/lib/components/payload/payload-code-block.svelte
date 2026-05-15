@@ -5,6 +5,7 @@
     PayloadContainingObject,
     PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import PayloadDecoder from './payload-decoder.svelte';
 
@@ -19,6 +20,16 @@
 </script>
 
 <PayloadDecoder {value}>
+  {#snippet loading()}
+    <CodeBlock
+      content={stringifyWithBigInt(value)}
+      {maxHeight}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      {testId}
+      language="json"
+    />
+  {/snippet}
   {#snippet children(decodedValue)}
     <div class="space-y-2">
       {#each decodedValue as data, index (index)}
