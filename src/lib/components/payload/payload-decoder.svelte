@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import { type Snippet } from 'svelte';
+  import { type Snippet, untrack } from 'svelte';
 
   import type { Payload, Payloads } from '$lib/types';
   import {
@@ -103,9 +103,9 @@
 
   const valueJson = $derived(stringifyWithBigInt(value));
   const decodePromise = $derived.by(() => {
-    valueJson;
-    retryCount;
-    return decodeValue(value);
+    void valueJson;
+    void retryCount;
+    return untrack(() => decodeValue(value));
   });
 </script>
 
