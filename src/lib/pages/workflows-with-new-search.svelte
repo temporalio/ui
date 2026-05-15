@@ -233,24 +233,29 @@
   <div class="flex flex-col justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
-        <h1 class="flex items-center gap-2 leading-7" data-cy="workflows-title">
-          {#if $supportsAdvancedVisibility}
-            <span data-testid="workflow-count"
-              >{$workflowCount.count.toLocaleString()}</span
-            >
-            <Translate
-              key="common.workflows-plural"
-              count={$workflowCount.count}
-            />
-          {:else}
-            <Translate key="workflows.recent-workflows" />
-          {/if}
-        </h1>
+        <div class="flex flex-row flex-wrap items-start gap-2">
+          <h1
+            class="flex items-center gap-2 leading-7"
+            data-cy="workflows-title"
+          >
+            {#if $supportsAdvancedVisibility}
+              <span data-testid="workflow-count"
+                >{$workflowCount.count.toLocaleString()}</span
+              >
+              <Translate
+                key="common.workflows-plural"
+                count={$workflowCount.count}
+              />
+            {:else}
+              <Translate key="workflows.recent-workflows" />
+            {/if}
+          </h1>
+          <CountRefreshButton count={$workflowCount.newCount} {refresh} />
+        </div>
         <p class="mt-2 text-xs text-secondary">
           {refreshTimeFormatted}
         </p>
       </div>
-      <CountRefreshButton count={$workflowCount.newCount} {refresh} />
       <WorkflowCounts bind:refreshTime fetchTaskFailures />
     </div>
     {#if headerActions || workflowStartEnabled}
