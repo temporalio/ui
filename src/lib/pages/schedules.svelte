@@ -5,7 +5,7 @@
 
   import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
+  import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -16,7 +16,6 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
-  import { isCloud } from '$lib/stores/advanced-visibility';
   import {
     availableScheduleColumns,
     configurableTableColumns,
@@ -26,20 +25,15 @@
   import { scheduleFilters } from '$lib/stores/filters';
   import { schedulesCount } from '$lib/stores/schedules';
   import {
-    customSearchAttributes,
+    scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
-    type SearchAttributeOption,
   } from '$lib/stores/search-attributes';
-  import { temporalVersion } from '$lib/stores/versions';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
-  import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   const coreUser = coreUserStore();
-  let refresh = $state(Date.now());
   let customizationDrawerOpen = $state(false);
   let error = $state('');
 
@@ -52,20 +46,6 @@
     $configurableTableColumns?.[namespace]?.schedules ?? [],
   );
   const createDisabled = $derived($coreUser.namespaceWriteDisabled(namespace));
-  const searchAttributeOptions = $derived(
-    Object.entries({
-      ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
-        ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      }),
-      ...$customSearchAttributes,
-    }).map(([key, value]) => {
-      return {
-        label: key,
-        value: key,
-        type: value,
-      } as SearchAttributeOption;
-    }),
-  );
   const query = $derived(page.url.searchParams.get('query'));
   const onFetch = $derived(() => {
     error = '';
@@ -75,7 +55,6 @@
 
   onMount(() => {
     if (query) {
-      // Set filters from inital page load query if it exists
       $scheduleFilters = toListWorkflowFilters(
         query,
         $scheduleSearchAttributes,
@@ -110,17 +89,16 @@
     {/if}
   </div>
   {#if showFilters}
-    <SearchAttributeFilter
-      bind:filters={$scheduleFilters}
-      {searchAttributeOptions}
-      refresh={() => {
-        refresh = Date.now();
-      }}
+    <FilterBar
+      filters={scheduleFilters}
+      options={$scheduleSearchAttributeOptions}
+      searchAttributes={$scheduleSearchAttributes}
+      id="schedules"
     />
   {/if}
 </div>
 
-{#key [namespace, query, refresh]}
+{#key [namespace, query]}
   <PaginatedTable
     let:visibleItems
     {onFetch}

@@ -3,7 +3,7 @@
 
   import { page } from '$app/state';
 
-  import FilterBar from '$lib/components/shared-search-attribute-filter/filter-bar.svelte';
+  import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import WorkerHeartbeatsDisabled from '$lib/components/workers/worker-heartbeats-disabled.svelte';
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';

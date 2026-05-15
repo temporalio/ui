@@ -5,10 +5,6 @@
   import { zonedTimeToUtc } from 'date-fns-tz';
   import { getContext, untrack } from 'svelte';
 
-  import {
-    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
-    type SearchAttributeFilterContext,
-  } from '$lib/components/shared-search-attribute-filter/filter.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -24,6 +20,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { prefixSearchEnabled } from '$lib/stores/capability-enablement';
   import {
     endDate,
     endHour,
@@ -38,6 +35,7 @@
     timeFormat,
     timeFormatType,
   } from '$lib/stores/time-format';
+  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { isInConditional, isNullConditional } from '$lib/utilities/is';
   import { getInitialDateTimes } from '$lib/utilities/query/datetime-filter-parse';
@@ -53,6 +51,11 @@
   } from '$lib/utilities/query/search-attribute-filter';
   import { getTimezone, TIME_UNIT_OPTIONS } from '$lib/utilities/timezone';
   import { toDate } from '$lib/utilities/to-duration';
+
+  import {
+    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
+    type SearchAttributeFilterContext,
+  } from './filter.svelte';
 
   type Props = {
     filter: SearchAttributeFilter;
@@ -105,11 +108,15 @@
       label: translate('common.not-equal-to'),
       id: 'not-equal-to',
     },
-    {
-      value: 'STARTS_WITH',
-      label: translate('common.starts-with'),
-      id: 'starts-with',
-    },
+    ...($prefixSearchEnabled && filter.type === SEARCH_ATTRIBUTE_TYPE.KEYWORD
+      ? [
+          {
+            value: 'STARTS_WITH',
+            label: translate('common.starts-with'),
+            id: 'starts-with',
+          },
+        ]
+      : []),
     ...defaultConditionOptions,
   ]);
 
