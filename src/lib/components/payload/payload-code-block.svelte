@@ -86,6 +86,16 @@
 </script>
 
 <PayloadDecoder {value}>
+  {#snippet loading()}
+    <CodeBlock
+      content={stringifyWithBigInt(value)}
+      {maxHeight}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      {testId}
+      language="json"
+    />
+  {/snippet}
   {#snippet children(results)}
     <div class="space-y-2">
       {#each results as result (result)}
