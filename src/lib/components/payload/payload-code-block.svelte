@@ -168,7 +168,21 @@
       {/each}
     </div>
   {/snippet}
-  {#snippet error({ error })}
+  {#snippet error({ error, retry })}
+    <CodeBlock
+      content={stringifyWithBigInt(value)}
+      {maxHeight}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      {testId}
+      language="json"
+    >
+      {#snippet headerActions()}
+        <Button size="sm" variant="ghost" leadingIcon="retry" on:click={retry}>
+          {translate('common.retry')}
+        </Button>
+      {/snippet}
+    </CodeBlock>
     <div class="flex items-start gap-2 text-danger">
       <Icon width={16} height={16} name="exclamation-octagon" />
       <p class="leading-4">

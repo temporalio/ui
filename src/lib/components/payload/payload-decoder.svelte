@@ -90,16 +90,23 @@
     children: Snippet<[DecodedPayloadResult]>;
     onDecode?: (result: DecodedPayloadResult) => void;
     loading?: Snippet<[]>;
-    error?: Snippet<[{ error: unknown }]>;
+    error?: Snippet<[{ error: unknown; retry: () => void }]>;
   };
 
   let { value, children, onDecode, loading, error }: Props = $props();
+
+  let retryCount = $state(0);
+  const retry = () => {
+    retryCount++;
+  };
 </script>
 
-{#await decodeValue(value)}
-  {@render loading?.()}
-{:then decodeResult}
-  {@render children(decodeResult)}
-{:catch e}
-  {@render error({ error: e })}
-{/await}
+{#key retryCount}
+  {#await decodeValue(value)}
+    {@render loading?.()}
+  {:then decodeResult}
+    {@render children(decodeResult)}
+  {:catch e}
+    {@render error?.({ error: e, retry })}
+  {/await}
+{/key}
