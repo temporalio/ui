@@ -100,11 +100,7 @@ export async function codeServerRequest({
       if (type !== 'download') {
         setLastDataEncoderFailure(err);
       }
-      if (type === 'decode') {
-        return payloads;
-      } else {
-        throw err;
-      }
+      throw err;
     });
 
   return decoderResponse;

@@ -7,7 +7,6 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
@@ -362,7 +361,6 @@
         </MenuItem>
       </SplitButton>
     </header>
-    <CodecServerErrorBanner />
     <div class="flex flex-col gap-4 pb-24">
       {#if schedule?.info?.invalidScheduleError}
         <div class="w-full xl:w-1/2">

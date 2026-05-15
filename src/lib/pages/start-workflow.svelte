@@ -5,7 +5,6 @@
 
   import { page } from '$app/stores';
 
-  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -413,6 +412,5 @@
         {/if}
       </Alert>
     {/if}
-    <CodecServerErrorBanner />
   </Card>
 </div>

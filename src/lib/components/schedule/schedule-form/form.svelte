@@ -8,7 +8,6 @@
 
   import { page } from '$app/state';
 
-  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
@@ -253,7 +252,6 @@
           </div>
         </SchedulesCalendarView>
         <Alert intent="error" title={$error} hidden={!$error} />
-        <CodecServerErrorBanner />
       </form>
     </Card>
   {/if}

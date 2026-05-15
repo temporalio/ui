@@ -168,4 +168,12 @@
       {/each}
     </div>
   {/snippet}
+  {#snippet error({ error })}
+    <div class="flex items-start gap-2 text-danger">
+      <Icon width={16} height={16} name="exclamation-octagon" />
+      <p class="leading-4">
+        {error instanceof Error ? error.message : String(error)}
+      </p>
+    </div>
+  {/snippet}
 </PayloadDecoder>

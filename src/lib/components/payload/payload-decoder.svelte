@@ -90,13 +90,16 @@
     children: Snippet<[DecodedPayloadResult]>;
     onDecode?: (result: DecodedPayloadResult) => void;
     loading?: Snippet<[]>;
+    error?: Snippet<[{ error: unknown }]>;
   };
 
-  let { value, children, onDecode, loading }: Props = $props();
+  let { value, children, onDecode, loading, error }: Props = $props();
 </script>
 
 {#await decodeValue(value)}
   {@render loading?.()}
 {:then decodeResult}
   {@render children(decodeResult)}
+{:catch e}
+  {@render error({ error: e })}
 {/await}
