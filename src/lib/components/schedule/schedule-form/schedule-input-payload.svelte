@@ -52,8 +52,9 @@
         const parsedMetadata = base64ParsePayloadMetadata(payloads);
 
         currentEncoding =
-          (parsedMetadata[0]?.encoding as PayloadInputEncoding) ?? 'json/plain';
-        currentMessageType = parsedMetadata[0]?.messageType ?? '';
+          (parsedMetadata?.[0]?.encoding as PayloadInputEncoding) ??
+          'json/plain';
+        currentMessageType = parsedMetadata?.[0]?.messageType ?? '';
       }
 
       if (isPayloadInputEncodingType(currentEncoding)) {
