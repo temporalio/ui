@@ -186,7 +186,7 @@
     <div class="flex items-start gap-2 text-danger">
       <Icon width={16} height={16} name="exclamation-octagon" />
       <p class="leading-4">
-        {error instanceof Error ? error.message : String(error)}
+        {error instanceof Error ? error.message : stringifyWithBigInt(error)}
       </p>
     </div>
   {/snippet}
