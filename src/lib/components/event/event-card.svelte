@@ -182,9 +182,27 @@
       {format(key)}
     </p>
     {#if value?.payloads}
-      <PayloadCodeBlock {value} maxHeight={384} />
+      <PayloadCodeBlock
+        filenameData={{
+          workflowId: workflow,
+          runId: run,
+          eventId: event.id,
+          type: key,
+        }}
+        {value}
+        maxHeight={384}
+      />
     {:else}
-      <PayloadCodeBlock value={codeBlockValue} maxHeight={384} />
+      <PayloadCodeBlock
+        filenameData={{
+          workflowId: workflow,
+          runId: run,
+          eventId: event.id,
+          type: key,
+        }}
+        value={codeBlockValue}
+        maxHeight={384}
+      />
     {/if}
   </div>
   {#if stackTrace}

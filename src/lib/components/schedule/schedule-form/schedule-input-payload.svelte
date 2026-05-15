@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import PayloadDecoder from '$lib/components/payload/payload-decoder.svelte';
+  import PayloadDecoder, {
+    type DecodedPayloadResult,
+  } from '$lib/components/payload/payload-decoder.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -10,7 +12,10 @@
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
   import type { Payloads } from '$lib/types';
-  import { base64ParsePayloadMetadata } from '$lib/utilities/decode-payload';
+  import {
+    base64ParsePayloadMetadata,
+    isParsedPayload,
+  } from '$lib/utilities/decode-payload';
 
   interface Props {
     input: string;
@@ -35,28 +40,33 @@
   let initialMessageType = $state('');
   let loading = $state(true);
 
-  const setInitialInput = (decodedValue: string[]): void => {
-    initialInput = decodedValue[0];
-    input = initialInput;
-    let currentEncoding: PayloadInputEncoding = 'json/plain';
-    let currentMessageType = '';
+  const setInitialInput = (result: DecodedPayloadResult): void => {
+    if (result && result[0] && isParsedPayload(result[0].decodedValue)) {
+      initialInput = result[0].decodedValue.data as string;
 
-    if (payloads) {
-      const parsedMetadata = base64ParsePayloadMetadata(payloads);
+      input = initialInput;
+      let currentEncoding: PayloadInputEncoding = 'json/plain';
+      let currentMessageType = '';
 
-      currentEncoding =
-        (parsedMetadata[0]?.encoding as PayloadInputEncoding) ?? 'json/plain';
-      currentMessageType = parsedMetadata[0]?.messageType ?? '';
-    }
+      if (payloads) {
+        const parsedMetadata = base64ParsePayloadMetadata(payloads);
 
-    if (isPayloadInputEncodingType(currentEncoding)) {
-      $encoding = currentEncoding;
-      initialEncoding = $encoding;
-      if (currentEncoding === 'json/protobuf' && currentMessageType) {
-        messageType = currentMessageType;
-        initialMessageType = currentMessageType;
+        currentEncoding =
+          (parsedMetadata?.[0]?.encoding as PayloadInputEncoding) ??
+          'json/plain';
+        currentMessageType = parsedMetadata?.[0]?.messageType ?? '';
+      }
+
+      if (isPayloadInputEncodingType(currentEncoding)) {
+        $encoding = currentEncoding;
+        initialEncoding = $encoding;
+        if (currentEncoding === 'json/protobuf' && currentMessageType) {
+          messageType = currentMessageType;
+          initialMessageType = currentMessageType;
+        }
       }
     }
+
     loading = false;
   };
 

@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
+  import PayloadCodeBlock, {
+    type PayloadDownloadFilenameData,
+  } from '$lib/components/payload/payload-code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import type { Payloads } from '$lib/types';
   import type { CompletionEventAttributes } from '$lib/utilities/get-started-completed-and-task-failed-events';
@@ -11,12 +13,14 @@
     titleSnippet?: Snippet;
     content: Payloads | CompletionEventAttributes;
     isPending?: boolean;
+    payloadDownloadFilenameData: PayloadDownloadFilenameData;
   };
   let {
     title,
     titleSnippet = defaultTitleSnippet,
     content,
     isPending = false,
+    payloadDownloadFilenameData,
   }: Props = $props();
 
   const MAX_HEIGHT = 300;
@@ -31,7 +35,11 @@
 <div class="flex w-full grow flex-col gap-2">
   {@render titleSnippet()}
   {#if content}
-    <PayloadCodeBlock maxHeight={MAX_HEIGHT} value={content} />
+    <PayloadCodeBlock
+      maxHeight={MAX_HEIGHT}
+      value={content}
+      filenameData={payloadDownloadFilenameData}
+    />
   {:else}
     <CodeBlock
       content={isPending ? 'Results will appear upon completion.' : 'null'}

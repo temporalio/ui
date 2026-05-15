@@ -119,6 +119,7 @@ import spinner from './svg/spinner.svelte';
 import squareInfo from './svg/square-info.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
+import storage from './svg/storage.svelte';
 import summary from './svg/summary.svelte';
 import sun from './svg/sun.svelte';
 import support from './svg/support.svelte';
@@ -275,6 +276,7 @@ export const icons = {
   'square-info': squareInfo,
   'star-empty': starEmpty,
   'star-filled': starFilled,
+  storage,
   success: checkmark,
   sun,
   summary,

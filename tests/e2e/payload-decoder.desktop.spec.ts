@@ -214,12 +214,12 @@ test.describe('Payload Decoder', () => {
       );
     });
 
-    test('user metadata shows encoded payloads when codec server is misconfigured', async ({
+    test('user metadata shows no payloads when codec server is misconfigured', async ({
       page,
     }) => {
       const workflowDetail = new WorkflowDetailPage(page);
 
-      await page.route('http://localhost:8888/decode', async (route) => {
+      await page.route('http://localhost:8888/decode*', async (route) => {
         route.fulfill({
           status: 500,
           contentType: 'application/json',

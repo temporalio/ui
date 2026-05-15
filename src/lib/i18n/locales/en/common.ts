@@ -168,6 +168,7 @@ export const Strings = {
   'not-equal-to': 'Not equal to',
   'encode-failed': 'Data encoding failed',
   'decode-failed': 'Data decoding failed',
+  'download-failed': 'Download failed',
   'job-id': 'Job ID',
   'auto-refresh': 'Auto refresh',
   'auto-refresh-tooltip': '{{ interval }} second page refresh',
