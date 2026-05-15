@@ -419,10 +419,8 @@ describe('minDate', () => {
     expect(result.toISOString()).toBe('2022-04-13T16:09:35.100Z');
   });
 
-  it('should return an invalid Date when given no arguments', () => {
-    const result = minDate();
-    expect(result).toBeInstanceOf(Date);
-    expect(Number.isNaN(result.getTime())).toBe(true);
+  it('should throw RangeError when given no arguments', () => {
+    expect(() => minDate()).toThrow(RangeError);
   });
 });
 
@@ -471,10 +469,8 @@ describe('maxDate', () => {
     expect(result.toISOString()).toBe('2022-04-13T16:09:35.900Z');
   });
 
-  it('should return an invalid Date when given no arguments', () => {
-    const result = maxDate();
-    expect(result).toBeInstanceOf(Date);
-    expect(Number.isNaN(result.getTime())).toBe(true);
+  it('should throw RangeError when given no arguments', () => {
+    expect(() => minDate()).toThrow(RangeError);
   });
 });
 
@@ -528,9 +524,11 @@ describe('validTimeToDate', () => {
     expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
   });
 
-  it('should return an invalid Date for an unparseable string', () => {
-    const result = validTimeToDate('not-a-date');
-    expect(result).toBeInstanceOf(Date);
-    expect(Number.isNaN(result.getTime())).toBe(true);
+  it('should throw a TypeError if given unparsable string', () => {
+    expect(() => validTimeToDate('not-a-date')).toThrow(TypeError);
+  });
+
+  it('should throw on an empty string', () => {
+    expect(() => validTimeToDate('')).toThrow(TypeError);
   });
 });

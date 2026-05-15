@@ -34,19 +34,73 @@ export function isTimestamp(arg: unknown): arg is Timestamp {
   return false;
 }
 
+/**
+ * Converts a {@link ValidTime} (a {@link Timestamp} object, ISO 8601 string,
+ * epoch number, or `Date`) into a `Date` instance.
+ *
+ * If the input is a {@link Timestamp}, its `seconds` and `nanos` fields are
+ * combined into a millisecond-precision `Date`. Otherwise the value is parsed
+ * via `date-fns`'s `parseJSON`.
+ *
+ * @param validTime - The time value to convert.
+ * @returns A `Date` representing `validTime`. The returned `Date` is
+ *   guaranteed to be valid (i.e. its time value is never `NaN`).
+ * @throws {TypeError} If `validTime` is a string/number that cannot be parsed
+ *   into a valid date.
+ */
 export function validTimeToDate(validTime: ValidTime) {
   if (isTimestamp(validTime)) {
     return timestampToDate(validTime);
   }
 
-  return parseJSON(validTime);
+  const parsedDate = parseJSON(validTime);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    throw new TypeError(`Invalid time: ${String(validTime)}`);
+  }
+
+  return parsedDate;
 }
 
+/**
+ * Returns the earliest `Date` from the given times.
+ *
+ * Each argument is normalized via {@link validTimeToDate} before comparison,
+ * so a mix of {@link Timestamp} objects, ISO 8601 strings, epoch numbers, and
+ * `Date` instances is accepted.
+ *
+ * @param validTimes - One or more times to compare.
+ * @returns The earliest time as a `Date`.
+ * @throws {RangeError} If called with no arguments.
+ * @throws {TypeError} If any argument cannot be converted to a valid `Date`
+ *   (propagated from {@link validTimeToDate}).
+ */
 export function minDate(...validTimes: ValidTime[]): Date {
+  if (!validTimes.length) {
+    throw new RangeError('Requires at least one time');
+  }
+
   return dateFnsMin(validTimes.map((validTime) => validTimeToDate(validTime)));
 }
 
+/**
+ * Returns the latest `Date` from the given times.
+ *
+ * Each argument is normalized via {@link validTimeToDate} before comparison,
+ * so a mix of {@link Timestamp} objects, ISO 8601 strings, epoch numbers, and
+ * `Date` instances is accepted.
+ *
+ * @param validTimes - One or more times to compare.
+ * @returns The latest time as a `Date`.
+ * @throws {RangeError} If called with no arguments.
+ * @throws {TypeError} If any argument cannot be converted to a valid `Date`
+ *   (propagated from {@link validTimeToDate}).
+ */
 export function maxDate(...validTimes: ValidTime[]): Date {
+  if (!validTimes.length) {
+    throw new RangeError('Requires at least one time');
+  }
+
   return dateFnsMax(validTimes.map((validTime) => validTimeToDate(validTime)));
 }
 
