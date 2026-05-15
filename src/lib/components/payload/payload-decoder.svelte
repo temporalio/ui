@@ -18,6 +18,7 @@
     type ParsedPayload,
     type PayloadContainingObject,
   } from '$lib/utilities/decode-payload';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   type T = $$Generic<PayloadContainingObject>;
 
@@ -99,14 +100,19 @@
   const retry = () => {
     retryCount++;
   };
+
+  const valueJson = $derived(stringifyWithBigInt(value));
+  const decodePromise = $derived.by(() => {
+    valueJson;
+    retryCount;
+    return decodeValue(value);
+  });
 </script>
 
-{#key retryCount}
-  {#await decodeValue(value)}
-    {@render loading?.()}
-  {:then decodeResult}
-    {@render children(decodeResult)}
-  {:catch e}
-    {@render error?.({ error: e, retry })}
-  {/await}
-{/key}
+{#await decodePromise}
+  {@render loading?.()}
+{:then decodeResult}
+  {@render children(decodeResult)}
+{:catch e}
+  {@render error?.({ error: e, retry })}
+{/await}
