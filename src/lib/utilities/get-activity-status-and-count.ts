@@ -45,7 +45,7 @@ export const getActivityStatusAndCountOfGroup = (
   return groups
     .map((group) => {
       const rawStatus = parseRawPayloadToJSON(
-        (group?.groupValues as unknown as Payload[])[0],
+        group?.groupValues[0],
       ) as unknown as ActivityStatus;
       const count = parseInt(group.count);
       return {

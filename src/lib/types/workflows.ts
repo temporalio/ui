@@ -1,7 +1,6 @@
 import type {
   Memo,
   Payload,
-  Payloads,
   PendingWorkflowTaskInfo,
   Priority,
   WorkflowExecutionStatus,
@@ -53,12 +52,12 @@ export type ListWorkflowExecutionsResponse = Replace<
 
 export type CountWorkflowExecutionsResponse = {
   count?: string;
-  groups?: { count: string; groupValues: Payloads }[];
+  groups?: { count: string; groupValues: Payload[] }[];
 };
 
 export type CountSchedulesResponse = {
   count?: string;
-  groups?: { count: string; groupValues: Payloads }[];
+  groups?: { count: string; groupValues: Payload[] }[];
 };
 
 export type WorkflowExecutionConfig = Replace<

@@ -1,5 +1,4 @@
 import { workflowStatuses } from '$lib/models/workflow-status';
-import type { Payload } from '$lib/types';
 import type {
   CountWorkflowExecutionsResponse,
   WorkflowStatus,
@@ -13,7 +12,7 @@ export const getStatusAndCountOfGroup = (
   return groups
     .map((group) => {
       const status = parseRawPayloadToJSON(
-        (group?.groupValues as unknown as Payload[])[0],
+        group?.groupValues[0],
       ) as unknown as WorkflowStatus;
       const count = parseInt(group.count);
       return {
