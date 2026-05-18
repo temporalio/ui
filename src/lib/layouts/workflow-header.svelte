@@ -5,6 +5,7 @@
 
   import { page } from '$app/state';
 
+  import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
@@ -178,6 +179,7 @@
       />
     </div>
   </div>
+  <CodecServerErrorBanner />
   <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
