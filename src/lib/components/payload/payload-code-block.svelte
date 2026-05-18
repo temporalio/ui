@@ -12,6 +12,7 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -178,15 +179,17 @@
       language="json"
     >
       {#snippet headerActions()}
-        <Button size="sm" variant="ghost" leadingIcon="retry" on:click={retry}>
-          {translate('common.retry')}
-        </Button>
+        <IconButton
+          icon="retry"
+          on:click={retry}
+          label={translate('common.retry')}
+        />
       {/snippet}
     </CodeBlock>
     <div class="flex items-start gap-2 text-danger">
       <Icon width={16} height={16} name="exclamation-octagon" />
       <p class="leading-4">
-        {error instanceof Error ? error.message : stringifyWithBigInt(error)}
+        {isNetworkError(error) ? error.message : stringifyWithBigInt(error)}
       </p>
     </div>
   {/snippet}
