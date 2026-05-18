@@ -133,10 +133,13 @@ export const mockSchedulesApi = (page: Page, empty = false) => {
   });
 };
 
-export const mockScheduleApi = (page: Page) => {
+export const mockScheduleApi = (
+  page: Page,
+  scheduleResponse = mockSchedule,
+) => {
   return page.route(SCHEDULE_API, (route) => {
     return route.fulfill({
-      json: mockSchedule,
+      json: scheduleResponse,
     });
   });
 };
