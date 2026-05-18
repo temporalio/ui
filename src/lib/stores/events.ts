@@ -53,10 +53,9 @@ export const timelineEvents = writable(null);
 export const fullEventHistory = writable<WorkflowEvents>([]);
 
 export const pauseLiveUpdates = writable(false);
-export const currentEventHistory = writable<WorkflowEvents>([]);
 
 export const filteredEventHistory = derived(
-  [currentEventHistory, eventTypeFilter],
+  [fullEventHistory, eventTypeFilter],
   ([$history, $types]) => {
     return $history.filter((event) => {
       if (isLocalActivityMarkerEvent(event)) {

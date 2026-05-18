@@ -19,7 +19,6 @@
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import {
-    currentEventHistory,
     fullEventHistory,
     pauseLiveUpdates,
     timelineEvents,
@@ -34,6 +33,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+  import { parseEventFilterParams } from '$lib/utilities/event-filter-params';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {
@@ -124,7 +124,7 @@
             runId,
           },
         },
-        workflowRunController.signal,
+        $pauseLiveUpdates ? undefined : workflowRunController.signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;
       });
@@ -135,7 +135,7 @@
       workflowId,
       runId,
       sort: 'ascending',
-      signal: workflowRunController.signal,
+      signal: $pauseLiveUpdates ? undefined : workflowRunController.signal,
       historySize: workflow.historyEvents,
     });
   };
@@ -147,7 +147,6 @@
     const shouldFetch =
       refresh.timestamp &&
       (refresh.action || (!pause && $workflowRun?.workflow?.isRunning));
-
     if (shouldFetch) {
       const { workflow, error } = await fetchWorkflow({
         namespace,
@@ -201,12 +200,6 @@
     untrack(() => {
       getOnlyWorkflowWithPendingActivities(refreshValue, pause);
     });
-  });
-
-  $effect(() => {
-    if (!$pauseLiveUpdates) {
-      $currentEventHistory = $fullEventHistory;
-    }
   });
 
   onMount(() => {
