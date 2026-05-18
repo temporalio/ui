@@ -264,6 +264,7 @@ const preferredSummaryKeys = [
   'identity',
   'parentInitiatedEventId',
   'endpointId',
+  'operation',
 ] as const;
 
 /**

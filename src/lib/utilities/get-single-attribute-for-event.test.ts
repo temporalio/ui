@@ -286,7 +286,7 @@ describe('getSummaryEvent', () => {
     });
   });
 
-  it('should return expected payload for a Nexus single payload', async () => {
+  it('should return the input for a NexusOperationScheduled event', async () => {
     const nexusEvent = {
       eventId: '5',
       eventTime: '2024-07-11T17:42:53.326959Z',
@@ -312,10 +312,10 @@ describe('getSummaryEvent', () => {
     expect(getSummaryAttribute(event)).toStrictEqual({
       key: 'input',
       value: {
+        data: 'InN0YXJ0LWFzeW5jIg==',
         metadata: {
           encoding: 'anNvbi9wbGFpbg==',
         },
-        data: 'InN0YXJ0LWFzeW5jIg==',
       },
     });
   });
