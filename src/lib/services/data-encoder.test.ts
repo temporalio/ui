@@ -27,6 +27,25 @@ describe('Codec Server Requests for Decode and Encode', () => {
     vi.clearAllMocks();
   });
 
+  it('should preserve a route prefix if the user has one configured', async () => {
+    const mockFetch = vi.fn(async () => {
+      return {
+        json: () => Promise.resolve(payloads),
+      };
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    codecEndpoint.set('http://localcodecserver.com/prefix');
+    await codeServerRequest({
+      type: 'decode',
+      payloads,
+    });
+    expect(mockFetch).toBeCalledWith(
+      'http://localcodecserver.com/prefix/decode?preserveStorageRefs=true',
+      expect.any(Object),
+    );
+  });
+
   it('should send a request and return decoded payloads', async () => {
     global.fetch = vi.fn(() =>
       Promise.resolve({

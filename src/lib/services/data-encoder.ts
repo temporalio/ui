@@ -75,8 +75,9 @@ export async function codeServerRequest({
         body: stringifyWithBigInt(payloads),
       };
 
-  const url = new URL(type, endpoint);
-  url.searchParams.set('preserveStorageRefs', 'true');
+  // explicitly not constructing a new URL here because it
+  // drops any route prefix the user has configured, eg localhost:8080/codec-server
+  const url = `${endpoint}/${type}?preserveStorageRefs=true`;
 
   const decoderResponse: Promise<PotentialPayloads> = fetch(url, requestOptions)
     .then((response) => {
