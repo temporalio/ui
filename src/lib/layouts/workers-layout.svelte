@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import Tab from '$lib/holocene/tab/tab.svelte';
@@ -37,16 +38,30 @@
   const deploymentsHref = $derived(
     deploymentsHrefProp ?? routeForWorkerDeployments({ namespace }),
   );
+
+  let refreshTime = $state(new Date());
+
+  const refreshTimeFormatted = $derived($timestamp(refreshTime));
+
+  $effect(() => {
+    void $refresh;
+    refreshTime = new Date();
+  });
 </script>
 
 <header class="flex flex-col gap-2">
   <div class="flex min-h-10 flex-wrap items-center justify-between gap-2">
-    <div class="flex flex-row flex-wrap items-start gap-2">
-      <h1 class="leading-7" data-cy="workers-title">
-        {translate('workers.workers')}
-      </h1>
-      <!-- TODO: Add count when there is a WorkersCount API available -->
-      <CountRefreshButton count={0} {refresh} />
+    <div>
+      <div class="flex items-center gap-2">
+        <h1 class="leading-7" data-cy="workers-title">
+          {translate('workers.workers')}
+        </h1>
+        <!-- TODO: Add count when there is a WorkersCount API available -->
+        <CountRefreshButton count={0} {refresh} />
+      </div>
+      <p class="mt-2 text-xs text-secondary">
+        {refreshTimeFormatted}
+      </p>
     </div>
     {#if headerAction}
       {@render headerAction()}

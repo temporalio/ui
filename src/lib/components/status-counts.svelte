@@ -1,25 +1,26 @@
 <script lang="ts">
+  import { type Readable, type Writable } from 'svelte/store';
+
   import { onDestroy } from 'svelte';
 
   import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
-  import {
-    fetchWorkflowCountByExecutionStatus,
-    fetchWorkflowTaskFailures,
-  } from '$lib/services/workflow-counts';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
     disableWorkflowCountsRefresh,
-    refresh,
-    taskFailuresCount,
     workflowCount,
+    refresh as workflowRefresh,
   } from '$lib/stores/workflows';
   import {
+    type CountWorkflowExecutionsResponse,
     SEARCH_ATTRIBUTE_TYPE,
     type WorkflowStatus,
   } from '$lib/types/workflows';
+  import type { ActivityStatus } from '$lib/utilities/get-activity-status-and-count';
   import { getStatusAndCountOfGroup } from '$lib/utilities/get-group-status-and-count';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
   import {
@@ -29,33 +30,53 @@
   import { getExponentialBackoff } from '$lib/utilities/refresh-rate';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import WorkflowCountStatus from '../workflow-status.svelte';
+  import WorkflowCountStatus from './workflow-status.svelte';
 
-  type Props = {
+  type Status = WorkflowStatus | ActivityStatus;
+  type StatusCount = { status: Status; count: number };
+
+  interface Props {
     staticQuery?: string;
     refreshTime?: Date;
-    fetchTaskFailures?: boolean;
-  };
+    countStore?: Writable<{ count: number; newCount: number }>;
+    refresh?: Writable<number>;
+    filters?: Writable<SearchAttributeFilter[]>;
+    fetchCounts?: (opts: {
+      namespace: string;
+      query: string;
+    }) => Promise<CountWorkflowExecutionsResponse>;
+    getStatusAndCount?: (
+      groups: CountWorkflowExecutionsResponse['groups'],
+    ) => StatusCount[];
+    'data-testid'?: string;
+    disableRefresh?: Readable<boolean>;
+  }
+
   let {
     staticQuery = '',
     refreshTime = $bindable(),
-    fetchTaskFailures = false,
+    countStore = workflowCount,
+    refresh = workflowRefresh,
+    filters = workflowFilters,
+    fetchCounts = fetchWorkflowCountByExecutionStatus,
+    getStatusAndCount = getStatusAndCountOfGroup,
+    'data-testid': testId = 'workflow-status',
+    disableRefresh = disableWorkflowCountsRefresh,
   }: Props = $props();
 
   const queryParam = $derived(page.url.searchParams.get('query'));
-  const namespace = $derived(page.params.namespace);
-  const query = $derived(staticQuery || queryParam);
+  const namespace = $derived(page.params.namespace ?? '');
+  const query = $derived(staticQuery || queryParam || '');
   const perPage = $derived(page.url.searchParams.get('per-page'));
 
-  let statusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
-  let newStatusGroups: { status: WorkflowStatus; count: number }[] = $state([]);
+  let statusGroups: StatusCount[] = $state([]);
+  let newStatusGroups: StatusCount[] = $state([]);
   let refreshInterval: ReturnType<typeof setTimeout>;
 
   const allStatusGroups = $derived(
     newStatusGroups.length > statusGroups.length
       ? [
           ...statusGroups,
-          // Add any statuses that don't exist in the current groups but have a new count
           ...newStatusGroups
             .filter((g) => !statusGroups.some((s) => s.status === g.status))
             .map((g) => ({ status: g.status, count: 0 })),
@@ -66,30 +87,25 @@
   let attempt = $state(1);
   let loading = $state(false);
 
-  const hasTaskFailureAttribute = $derived(
-    !!page.data.namespace?.namespaceInfo?.capabilities
-      ?.reportedProblemsSearchAttribute,
-  );
-
   const initialIntervalSeconds = 60;
   const maxAttempts = 20;
 
-  const onStatusClick = (status) => {
-    const statusExists = $workflowFilters.some(
+  const onStatusClick = (status: Status) => {
+    const statusExists = $filters.some(
       (filter) =>
         filter.attribute === 'ExecutionStatus' && filter.value === status,
     );
 
-    if (!statusExists) {
+    if (!statusExists && status) {
       const filter = createFilter({
         attribute: 'ExecutionStatus',
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
         value: status,
         conditional: '=',
       });
-      $workflowFilters = [...$workflowFilters, filter];
+      $filters = [...$filters, filter];
       const searchQuery = toListWorkflowQueryFromFilters(
-        combineFilters($workflowFilters),
+        combineFilters($filters),
       );
       updateQueryParameters({
         url: page.url,
@@ -103,33 +119,22 @@
   const clearNewCounts = () => {
     clearTimeout(refreshInterval);
     newStatusGroups = [];
-    $workflowCount.newCount = 0;
+    $countStore.newCount = 0;
     attempt = 1;
   };
 
-  const fetchCounts = async () => {
-    const [{ count, groups }] = await Promise.all([
-      fetchWorkflowCountByExecutionStatus({
-        namespace,
-        query,
-      }).catch((_e) => {
-        return { count: '0', groups: [] };
-      }),
-      fetchTaskFailures && hasTaskFailureAttribute
-        ? fetchWorkflowTaskFailures(namespace).then(
-            (count) => ($taskFailuresCount = count ?? 0),
-          )
-        : Promise.resolve(),
-    ]);
-    return { count, groups };
-  };
+  const runFetch = () =>
+    fetchCounts({ namespace, query }).catch(() => ({
+      count: '0',
+      groups: [],
+    }));
 
   const fetchInitialCounts = async () => {
     loading = true;
     try {
-      const { count, groups } = await fetchCounts();
-      $workflowCount.count = parseInt(count);
-      statusGroups = getStatusAndCountOfGroup(groups);
+      const { count, groups } = await runFetch();
+      $countStore.count = parseInt(count ?? '0');
+      statusGroups = getStatusAndCount(groups);
     } finally {
       refreshTime = new Date();
       loading = false;
@@ -138,9 +143,9 @@
 
   const fetchNewCounts = async () => {
     try {
-      const { count, groups } = await fetchCounts();
-      $workflowCount.newCount = parseInt(count) - $workflowCount.count;
-      newStatusGroups = getStatusAndCountOfGroup(groups);
+      const { count, groups } = await runFetch();
+      $countStore.newCount = parseInt(count ?? '0') - $countStore.count;
+      newStatusGroups = getStatusAndCount(groups);
     } finally {
       refreshTime = new Date();
       attempt += 1;
@@ -154,7 +159,7 @@
     );
     refreshInterval = setTimeout(async () => {
       await fetchNewCounts();
-      if (!$disableWorkflowCountsRefresh && attempt <= maxAttempts) {
+      if (!$disableRefresh && attempt <= maxAttempts) {
         scheduleNext();
       }
     }, intervalSeconds);
@@ -163,16 +168,16 @@
   const scheduleFirst = async () => {
     clearNewCounts();
     await fetchInitialCounts();
-    if (!$disableWorkflowCountsRefresh) {
+    if (!$disableRefresh) {
       scheduleNext();
     }
   };
 
   $effect(() => {
-    namespace;
-    query;
-    perPage;
-    $refresh;
+    void namespace;
+    void query;
+    void perPage;
+    void $refresh;
 
     scheduleFirst();
   });
@@ -185,14 +190,13 @@
 <div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
   {#each allStatusGroups as { count, status } (status)}
     {#if !loading}
+      {@const group = newStatusGroups.find((g) => g.status === status)}
       <button onclick={() => onStatusClick(status)}>
         <WorkflowCountStatus
           {status}
           {count}
-          newCount={newStatusGroups.find((g) => g.status === status)
-            ? newStatusGroups.find((g) => g.status === status).count - count
-            : 0}
-          test-id="workflow-status-{status}"
+          newCount={group ? group.count - count : 0}
+          test-id="{testId}-{status}"
         />
       </button>
     {:else}
