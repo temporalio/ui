@@ -15,9 +15,17 @@
     namespace: string;
     schedule: DescribeScheduleResponse;
     workflowQuery: string;
+    triggerConfirmation: () => void;
+    backfillConfirmation: () => void;
   };
 
-  let { namespace, schedule, workflowQuery }: Props = $props();
+  let {
+    namespace,
+    schedule,
+    workflowQuery,
+    triggerConfirmation,
+    backfillConfirmation,
+  }: Props = $props();
 
   const recentRuns = $derived(schedule?.info?.recentActions);
 
@@ -57,8 +65,17 @@
     >
   </PillContainer>
   {#if view === 'recent'}
-    <ScheduleRecentRuns {namespace} {schedule} />
+    <ScheduleRecentRuns
+      {namespace}
+      {schedule}
+      {triggerConfirmation}
+      {backfillConfirmation}
+    />
   {:else}
-    <ScheduleUpcomingRuns {schedule} />
+    <ScheduleUpcomingRuns
+      {schedule}
+      {triggerConfirmation}
+      {backfillConfirmation}
+    />
   {/if}
 </Panel>

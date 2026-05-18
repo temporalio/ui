@@ -1,21 +1,28 @@
 <script lang="ts">
   import Timestamp from '$lib/components/timestamp.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { translate } from '$lib/i18n/translate';
   import { routeForWorkflow } from '$lib/utilities/route-for';
   import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
 
   import WorkflowStatus from '../workflow-status.svelte';
+
+  import ScheduleNoRuns from './schedule-no-runs.svelte';
 
   import type { DescribeScheduleResponse, ScheduleActionResult } from '$types';
 
   type Props = {
     namespace: string;
     schedule: DescribeScheduleResponse;
+    triggerConfirmation: () => void;
+    backfillConfirmation: () => void;
   };
 
-  let { namespace, schedule }: Props = $props();
+  let {
+    namespace,
+    schedule,
+    triggerConfirmation,
+    backfillConfirmation,
+  }: Props = $props();
   const recentRuns = $derived(schedule?.info?.recentActions);
 
   const sortRecentRuns = (recentRuns: ScheduleActionResult[]) => {
@@ -58,5 +65,5 @@
     </div>
   </div>
 {:else}
-  <EmptyState title={translate('schedules.recent-runs-empty-state-title')} />
+  <ScheduleNoRuns {triggerConfirmation} {backfillConfirmation} />
 {/each}
