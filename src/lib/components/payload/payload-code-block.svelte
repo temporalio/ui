@@ -189,7 +189,11 @@
     <div class="flex items-start gap-2 text-danger">
       <Icon width={16} height={16} name="exclamation-octagon" />
       <p class="leading-4">
-        {isNetworkError(error) ? error.message : stringifyWithBigInt(error)}
+        {#if isNetworkError(error)}
+          {error.message} - {error.statusText}
+        {:else}
+          {stringifyWithBigInt(error)}
+        {/if}
       </p>
     </div>
   {/snippet}

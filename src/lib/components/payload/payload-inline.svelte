@@ -1,11 +1,14 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
+  import { translate } from '$lib/i18n/translate';
   import {
     isExternallyStoredRawPayload,
     isParsedPayload,
     type PotentiallyDecodable,
   } from '$lib/utilities/decode-payload';
   import { formatBytes } from '$lib/utilities/format-bytes';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   import PayloadDecoder from './payload-decoder.svelte';
@@ -48,5 +51,16 @@
       {@const stringifiedData = stringifyWithBigInt(results[0].decodedValue)}
       {@render codeBlock(stringifiedData)}
     {/if}
+  {/snippet}
+  {#snippet error({ error, retry })}
+    {@render codeBlock(
+      isNetworkError(error) ? error.message : stringifyWithBigInt(error),
+    )}
+    <IconButton
+      class="h-8 w-8"
+      icon="retry"
+      on:click={retry}
+      label={translate('common.retry')}
+    />
   {/snippet}
 </PayloadDecoder>
