@@ -16,6 +16,7 @@
     base64ParsePayloadMetadata,
     isParsedPayload,
   } from '$lib/utilities/decode-payload';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {
     input: string;
@@ -42,7 +43,7 @@
 
   const setInitialInput = (result: DecodedPayloadResult): void => {
     if (result && result[0] && isParsedPayload(result[0].decodedValue)) {
-      initialInput = result[0].decodedValue.data as string;
+      initialInput = stringifyWithBigInt(result[0].decodedValue.data) ?? '';
 
       input = initialInput;
       let currentEncoding: PayloadInputEncoding = 'json/plain';

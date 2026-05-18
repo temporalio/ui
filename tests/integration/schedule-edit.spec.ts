@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  mockSchedule,
   mockScheduleApi,
   mockSchedulesApis,
   SCHEDULES_COUNT_API,
@@ -9,13 +10,36 @@ import {
 const schedulesUrl = '/namespaces/default/schedules';
 const scheduleEditUrl = '/namespaces/default/schedules/test-schedule/edit';
 
+const scheduleWithInput = (data: string) => ({
+  ...mockSchedule,
+  schedule: {
+    ...mockSchedule.schedule,
+    action: {
+      ...mockSchedule.schedule.action,
+      startWorkflow: {
+        ...mockSchedule.schedule.action.startWorkflow,
+        input: {
+          payloads: [
+            {
+              metadata: {
+                encoding: 'anNvbi9wbGFpbg==',
+              },
+              data,
+            },
+          ],
+        },
+      },
+    },
+  },
+});
+
 test.describe('Schedules List with schedules', () => {
   test.beforeEach(async ({ page }) => {
     await mockSchedulesApis(page);
-    await mockScheduleApi(page);
   });
 
   test('selects schedule and edits', async ({ page }) => {
+    await mockScheduleApi(page);
     await page.goto(schedulesUrl);
 
     await page.waitForResponse(SCHEDULES_COUNT_API);
@@ -40,6 +64,7 @@ test.describe('Schedules List with schedules', () => {
   });
 
   test('Edits existing schedule', async ({ page }) => {
+    await mockScheduleApi(page);
     await page.goto(scheduleEditUrl);
 
     const heading = page.locator('h1');
@@ -60,5 +85,49 @@ test.describe('Schedules List with schedules', () => {
     await expect(submitButton).toBeVisible();
     await expect(submitButton).toBeEnabled();
     await submitButton.click();
+  });
+
+  test('edits an existing schedule with an object input payload', async ({
+    page,
+  }) => {
+    const pageErrors: Error[] = [];
+    page.on('pageerror', (error) => pageErrors.push(error));
+    await mockScheduleApi(
+      page,
+      scheduleWithInput('eyJtZXNzYWdlIjoiaGVsbG8ifQ=='),
+    );
+
+    await page.goto(scheduleEditUrl);
+
+    const payloadInput = page
+      .locator('#schedule-payload-input')
+      .getByRole('textbox');
+    await expect(payloadInput).toContainText('"message"');
+
+    await page.getByRole('button', { name: 'Edit' }).click();
+
+    await expect(payloadInput).toContainText('"message"');
+    expect(pageErrors.map(({ message }) => message).join('\n')).not.toContain(
+      'split is not a function',
+    );
+  });
+
+  test('edits an existing schedule with a string input payload', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, scheduleWithInput('ImhlbGxvIg=='));
+
+    await page.goto(scheduleEditUrl);
+
+    const payloadInput = page
+      .locator('#schedule-payload-input')
+      .getByRole('textbox');
+    await expect(payloadInput).toContainText('"hello"');
+    await expect(page.getByText('Input must be valid JSON')).toBeHidden();
+
+    await page.getByRole('button', { name: 'Edit' }).click();
+
+    await expect(payloadInput).toContainText('"hello"');
+    await expect(page.getByText('Input must be valid JSON')).toBeHidden();
   });
 });

@@ -49,7 +49,7 @@ export {
   mockSearchAttributesApi,
   SEARCH_ATTRIBUTES_API,
 } from './mocks/search-attributes';
-export { mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
+export { mockSchedule, mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
 export {
   mockSchedulesCountApi,
   SCHEDULES_COUNT_API,
