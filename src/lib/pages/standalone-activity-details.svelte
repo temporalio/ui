@@ -90,7 +90,11 @@
         {/if}
         <h6 class="underline underline-offset-4">Timing and Progress</h6>
         <DetailList
-          rowCount={isClosed ? 4 : 2}
+          rowCount={isClosed
+            ? $activityExecution.info.attempt > 1
+              ? 5
+              : 4
+            : 2}
           aria-label="Activity Execution Timing and Progress Details"
         >
           <DetailListLabel>Schedule Time</DetailListLabel>
@@ -110,6 +114,13 @@
             <DetailListTimestampValue
               timestamp={$activityExecution.info.lastStartedTime}
             />
+            {#if $activityExecution.info.attempt > 1}
+              {@render activityExecutionAttemptsBadge(
+                $activityExecution.info.attempt,
+                $activityExecution.info.retryPolicy?.maximumAttempts,
+                $activityExecution.info.lastFailure,
+              )}
+            {/if}
           {/if}
         </DetailList>
         {#if !isClosed}
