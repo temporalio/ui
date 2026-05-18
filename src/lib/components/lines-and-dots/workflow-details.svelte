@@ -308,7 +308,7 @@
           {translate('workflows.billable-actions')}
         </DetailListLabel>
       </Tooltip>
-      <DetailListTextValue text={totalActions} />
+      <DetailListTextValue class="font-mono" text={totalActions} />
     {/if}
 
     {#if sdk && sdkVersion}
