@@ -1,3 +1,5 @@
+import { SvelteDate } from 'svelte/reactivity';
+
 import {
   max as dateFnsMax,
   min as dateFnsMin,
@@ -48,9 +50,10 @@ export function isTimestamp(arg: unknown): arg is Timestamp {
  * @throws {TypeError} If `validTime` is a string/number that cannot be parsed
  *   into a valid date.
  */
-export function validTimeToDate(validTime: ValidTime) {
+export function validTimeToDate(validTime: ValidTime): SvelteDate {
   if (isTimestamp(validTime)) {
-    return timestampToDate(validTime);
+    const date = timestampToDate(validTime);
+    return new SvelteDate(date.getTime());
   }
 
   const parsedDate = parseJSON(validTime);
@@ -59,7 +62,7 @@ export function validTimeToDate(validTime: ValidTime) {
     throw new TypeError(`Invalid time: ${String(validTime)}`);
   }
 
-  return parsedDate;
+  return new SvelteDate(parsedDate.getTime());
 }
 
 /**

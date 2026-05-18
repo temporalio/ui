@@ -1,3 +1,5 @@
+import { SvelteDate } from 'svelte/reactivity';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -381,7 +383,7 @@ describe('minDate', () => {
       '2022-04-13T16:29:33.630Z',
       '2022-04-13T16:29:41.630Z',
     );
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:29:33.630Z');
   });
 
@@ -391,7 +393,7 @@ describe('minDate', () => {
       { seconds: '1649866170', nanos: 0 },
       { seconds: '1649866180', nanos: 0 },
     );
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:09:30.000Z');
   });
 
@@ -401,7 +403,7 @@ describe('minDate', () => {
       { seconds: '1649866175', nanos: 630000000 },
       new Date('2022-04-13T16:29:41.000Z'),
     );
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:09:35.630Z');
   });
 
@@ -431,7 +433,7 @@ describe('maxDate', () => {
       '2022-04-13T16:29:33.630Z',
       '2022-04-13T16:29:41.630Z',
     );
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:29:41.630Z');
   });
 
@@ -441,7 +443,7 @@ describe('maxDate', () => {
       { seconds: '1649866170', nanos: 0 },
       { seconds: '1649866180', nanos: 0 },
     );
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:09:40.000Z');
   });
 
@@ -451,7 +453,7 @@ describe('maxDate', () => {
       { seconds: '1649866175', nanos: 630000000 },
       new Date('2022-04-13T16:29:41.000Z'),
     );
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:29:41.000Z');
   });
 
@@ -478,49 +480,49 @@ describe('validTimeToDate', () => {
   it('should convert a Timestamp object with seconds and nanos to a Date', () => {
     const timestamp = { seconds: '1649866175', nanos: 630571000 };
     const result = validTimeToDate(timestamp);
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:09:35.630Z');
   });
 
   it('should convert a Timestamp object with numeric seconds to a Date', () => {
     const timestamp = { seconds: 1649866175, nanos: 630571000 };
     const result = validTimeToDate(timestamp);
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:09:35.630Z');
   });
 
   it('should convert a Timestamp object with zero nanos to a Date', () => {
     const timestamp = { seconds: '1649866175', nanos: 0 };
     const result = validTimeToDate(timestamp);
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:09:35.000Z');
   });
 
   it('should convert a Timestamp object with null nanos to a Date', () => {
     const timestamp = { seconds: '1649866175', nanos: null };
     const result = validTimeToDate(timestamp);
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:09:35.000Z');
   });
 
   it('should convert an ISO date string to a Date', () => {
     const isoString = '2022-04-13T16:29:35.630Z';
     const result = validTimeToDate(isoString);
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
   });
 
   it('should convert an ISO date string with nanosecond precision to a Date', () => {
     const isoString = '2022-04-13T16:29:35.630571Z';
     const result = validTimeToDate(isoString);
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
   });
 
   it('should return a Date when passed a Date instance', () => {
     const date = new Date('2022-04-13T16:29:35.630Z');
     const result = validTimeToDate(date);
-    expect(result).toBeInstanceOf(Date);
+    expect(result).toBeInstanceOf(SvelteDate);
     expect(result.toISOString()).toBe('2022-04-13T16:29:35.630Z');
   });
 
