@@ -45,7 +45,9 @@
       namespace: string;
       query: string;
     }) => Promise<CountWorkflowExecutionsResponse>;
-    getStatusAndCount?: (groups: unknown[]) => StatusCount[];
+    getStatusAndCount?: (
+      groups: CountWorkflowExecutionsResponse['groups'],
+    ) => StatusCount[];
     'data-testid'?: string;
     disableRefresh?: Readable<boolean>;
   }
@@ -63,8 +65,8 @@
   }: Props = $props();
 
   const queryParam = $derived(page.url.searchParams.get('query'));
-  const namespace = $derived(page.params.namespace);
-  const query = $derived(staticQuery || queryParam);
+  const namespace = $derived(page.params.namespace ?? '');
+  const query = $derived(staticQuery || queryParam || '');
   const perPage = $derived(page.url.searchParams.get('per-page'));
 
   let statusGroups: StatusCount[] = $state([]);
@@ -94,7 +96,7 @@
         filter.attribute === 'ExecutionStatus' && filter.value === status,
     );
 
-    if (!statusExists) {
+    if (!statusExists && status) {
       const filter = createFilter({
         attribute: 'ExecutionStatus',
         type: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
@@ -131,7 +133,7 @@
     loading = true;
     try {
       const { count, groups } = await runFetch();
-      $countStore.count = parseInt(count);
+      $countStore.count = parseInt(count ?? '0');
       statusGroups = getStatusAndCount(groups);
     } finally {
       refreshTime = new Date();
@@ -142,7 +144,7 @@
   const fetchNewCounts = async () => {
     try {
       const { count, groups } = await runFetch();
-      $countStore.newCount = parseInt(count) - $countStore.count;
+      $countStore.newCount = parseInt(count ?? '0') - $countStore.count;
       newStatusGroups = getStatusAndCount(groups);
     } finally {
       refreshTime = new Date();
@@ -188,13 +190,12 @@
 <div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
   {#each allStatusGroups as { count, status } (status)}
     {#if !loading}
+      {@const group = newStatusGroups.find((g) => g.status === status)}
       <button onclick={() => onStatusClick(status)}>
         <WorkflowCountStatus
           {status}
           {count}
-          newCount={newStatusGroups.find((g) => g.status === status)
-            ? newStatusGroups.find((g) => g.status === status).count - count
-            : 0}
+          newCount={group ? group.count - count : 0}
           test-id="{testId}-{status}"
         />
       </button>
