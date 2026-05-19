@@ -123,16 +123,12 @@
         <DetailListLabel
           >{translate('workflows.billable-actions')}</DetailListLabel
         >
-        <DetailListTextValue
-          class="font-mono"
-          text={String(activityExecutionInfo.attempt)}
-        />
+        <DetailListTextValue text={String(activityExecutionInfo.attempt)} />
       {:else}
         <DetailListLabel
           >{translate('workflows.state-transitions')}</DetailListLabel
         >
         <DetailListTextValue
-          class="font-mono"
           text={activityExecutionInfo.stateTransitionCount}
         />
       {/if}
