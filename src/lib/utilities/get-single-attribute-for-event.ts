@@ -252,6 +252,7 @@ const preferredSummaryKeys = [
   'activityType',
   'signalName',
   'workflowType',
+  'operation',
   'result',
   'failure',
   'input',
@@ -264,7 +265,6 @@ const preferredSummaryKeys = [
   'identity',
   'parentInitiatedEventId',
   'endpointId',
-  'operation',
 ] as const;
 
 /**
