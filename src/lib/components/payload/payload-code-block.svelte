@@ -12,6 +12,7 @@
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -166,6 +167,34 @@
           />
         {/if}
       {/each}
+    </div>
+  {/snippet}
+  {#snippet error({ error, retry })}
+    <CodeBlock
+      content={stringifyWithBigInt(value)}
+      {maxHeight}
+      copyIconTitle={translate('common.copy-icon-title')}
+      copySuccessIconTitle={translate('common.copy-success-icon-title')}
+      {testId}
+      language="json"
+    >
+      {#snippet headerActions()}
+        <IconButton
+          icon="retry"
+          on:click={retry}
+          label={translate('common.retry')}
+        />
+      {/snippet}
+    </CodeBlock>
+    <div class="flex items-start gap-2 text-danger">
+      <Icon width={16} height={16} name="exclamation-octagon" />
+      <p class="leading-4">
+        {#if isNetworkError(error)}
+          {error.message} - {error.statusText}
+        {:else}
+          {stringifyWithBigInt(error)}
+        {/if}
+      </p>
     </div>
   {/snippet}
 </PayloadDecoder>

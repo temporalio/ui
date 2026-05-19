@@ -307,12 +307,14 @@ describe('decodeEventAttributes', () => {
     });
 
     codecEndpoint.set('http://localhost:1337');
-    const convertedPayload = await decodeEventAttributes(
-      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-    );
+    try {
+      await decodeEventAttributes(
+        parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      );
+    } catch {
+      // expected to throw on codec failure
+    }
 
-    const decodedPayload = parsePayloadAttributes(convertedPayload);
-    expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('error');
   });
