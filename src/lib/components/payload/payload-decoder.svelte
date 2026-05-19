@@ -96,17 +96,16 @@
 
   let { value, children, onDecode, loading, error }: Props = $props();
 
-  let retryCount = $state(0);
-  const retry = () => {
-    retryCount++;
-  };
-
   const valueJson = $derived(stringifyWithBigInt(value));
-  const decodePromise = $derived.by(() => {
+
+  let decodePromise = $derived.by(() => {
     void valueJson;
-    void retryCount;
     return untrack(() => decodeValue(value));
   });
+
+  const retry = () => {
+    decodePromise = decodeValue(value);
+  };
 </script>
 
 {#await decodePromise}
