@@ -43,10 +43,15 @@
 </script>
 
 <div class="space-y-2">
-  <div class="flex flex-wrap items-center justify-between gap-2">
-    <div class="flex flex-wrap items-center gap-2">
-      <ActivityExecutionStatus status={activityExecutionInfo.status} />
-      <div class="text-2xl font-medium">
+  <div
+    class="flex items-center justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
+  >
+    <ActivityExecutionStatus status={activityExecutionInfo.status} />
+    <div class="text-2xl font-medium">
+      <h1
+        data-testid="activity-id-heading"
+        class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+      >
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -55,7 +60,7 @@
           container-class="w-full"
           class="overflow-hidden text-ellipsis text-left"
         />
-      </div>
+      </h1>
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
