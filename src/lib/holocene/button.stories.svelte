@@ -82,6 +82,8 @@
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import { shouldNotBeTransparent } from './test-utilities';
+
+  let loading = $state(false);
 </script>
 
 <Template let:args>
@@ -133,3 +135,48 @@
 <Story name="With Trailing Icon" args={{ trailingIcon: 'workflow' }} />
 
 <Story name="With Link" args={{ href: 'https://example.com' }} />
+
+<Story name="With Leading Icon & Loading" let:args>
+  <Button
+    {...args}
+    leadingIcon="temporal-logo"
+    {loading}
+    on:click={() => {
+      loading = true;
+      setTimeout(() => {
+        loading = false;
+      }, 2000);
+    }}
+  >
+    Click me for Loading
+  </Button>
+</Story>
+
+<Story name="With Trailing Icon & Loading" let:args>
+  <Button
+    {...args}
+    trailingIcon="temporal-logo"
+    {loading}
+    on:click={() => {
+      loading = true;
+      setTimeout(() => {
+        loading = false;
+      }, 2000);
+    }}>Click me for Loading</Button
+  >
+</Story>
+
+<Story name="With Trailing and Leading Icon & Loading" let:args>
+  <Button
+    {...args}
+    trailingIcon="temporal-logo"
+    leadingIcon="temporal-logo"
+    {loading}
+    on:click={() => {
+      loading = true;
+      setTimeout(() => {
+        loading = false;
+      }, 2000);
+    }}>Click me for Loading</Button
+  >
+</Story>

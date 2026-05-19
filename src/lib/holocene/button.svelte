@@ -157,15 +157,18 @@
     tabindex={href ? null : 0}
     {...$$restProps}
   >
-    {#if leadingIcon}
-      <span>
-        <Icon name={leadingIcon} />
+    {#if leadingIcon || (loading && !trailingIcon)}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
     <slot />
-    {#if trailingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : trailingIcon} />
+    {#if trailingIcon}
+      <span
+        class:animate-spin={loading && !leadingIcon}
+        class:invisible={loading && leadingIcon}
+      >
+        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
@@ -194,16 +197,19 @@
     )}
     {...$$restProps}
   >
-    {#if (leadingIcon || loading) && !trailingIcon}
+    {#if leadingIcon || (loading && !trailingIcon)}
       <span class:animate-spin={loading}>
         <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
     <slot />
 
-    {#if (trailingIcon || loading) && !leadingIcon}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : trailingIcon} />
+    {#if trailingIcon}
+      <span
+        class:animate-spin={loading && !leadingIcon}
+        class:invisible={loading && leadingIcon}
+      >
+        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
