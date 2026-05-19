@@ -164,7 +164,10 @@
     {/if}
     <slot />
     {#if trailingIcon}
-      <span class:animate-spin={loading && !leadingIcon}>
+      <span
+        class:animate-spin={loading && !leadingIcon}
+        class:invisible={loading && leadingIcon}
+      >
         <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
       </span>
     {/if}
@@ -202,7 +205,10 @@
     <slot />
 
     {#if trailingIcon}
-      <span class:animate-spin={loading && !leadingIcon}>
+      <span
+        class:animate-spin={loading && !leadingIcon}
+        class:invisible={loading && leadingIcon}
+      >
         <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
       </span>
     {/if}
