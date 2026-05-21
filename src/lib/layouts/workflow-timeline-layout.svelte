@@ -12,6 +12,7 @@
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import { clearActives } from '$lib/stores/active-events';
@@ -111,6 +112,10 @@
     Boolean(workflow && !workflow?.isRunning && !workflow?.isPaused),
   );
 
+  const autoRefreshDisabledByEndTime = $derived(
+    !isNotPending && $eventTimeFilter.endTime !== null,
+  );
+
   beforeNavigate(() => {
     clearActives();
   });
@@ -118,6 +123,12 @@
   $effect(() => {
     if (isNotPending && $pauseLiveUpdates) {
       $pauseLiveUpdates = false;
+    }
+  });
+
+  $effect(() => {
+    if (autoRefreshDisabledByEndTime && !$pauseLiveUpdates) {
+      updateEventFilterParams(page.url, { refresh_off: true }, goto);
     }
   });
 
@@ -171,22 +182,28 @@
           >{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
         >
         <EventTypeFilter compact={false} />
-        <ToggleButton
-          disabled={isNotPending}
-          data-testid="pause"
-          class="border-l-0"
-          size="sm"
-          on:click={onAutoRefreshToggle}
+        <Tooltip
+          top
+          text={translate('workflows.auto-refresh-disabled-end-time')}
+          hide={!autoRefreshDisabledByEndTime}
         >
-          <span
-            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-              ? 'bg-slate-300'
-              : 'bg-green-600'}"
-          ></span>
-          {$pauseLiveUpdates || isNotPending
-            ? translate('workflows.auto-refresh-off')
-            : translate('workflows.auto-refresh-on')}
-        </ToggleButton>
+          <ToggleButton
+            disabled={isNotPending || autoRefreshDisabledByEndTime}
+            data-testid="pause"
+            class="border-l-0"
+            size="sm"
+            on:click={onAutoRefreshToggle}
+          >
+            <span
+              class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
+                ? 'bg-slate-300'
+                : 'bg-green-600'}"
+            ></span>
+            {$pauseLiveUpdates || isNotPending
+              ? translate('workflows.auto-refresh-off')
+              : translate('workflows.auto-refresh-on')}
+          </ToggleButton>
+        </Tooltip>
         <ToggleButton
           data-testid="download"
           leadingIcon="download"
