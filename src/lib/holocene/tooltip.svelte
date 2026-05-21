@@ -80,6 +80,33 @@
 
   let wrapperElement: HTMLElement | null = null;
   let isHovered = false;
+  let isFocused = false;
+  let isPopoverHovered = false;
+  let dismissed = false;
+  const tooltipId = `tooltip-${Math.random().toString(36).slice(2, 11)}`;
+
+  $: isOpen =
+    (show || isHovered || isFocused || isPopoverHovered) && !dismissed;
+
+  $: if (!isHovered && !isFocused && !isPopoverHovered && dismissed) {
+    dismissed = false;
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape' && isOpen) {
+      dismissed = true;
+    }
+  }
+
+  function handleFocusIn() {
+    isFocused = true;
+  }
+
+  function handleFocusOut(event: FocusEvent) {
+    const next = event.relatedTarget as HTMLElement | null;
+    if (next && wrapperElement?.contains(next)) return;
+    isFocused = false;
+  }
 
   $: portalPosition = ((): PortalPosition => {
     if (top) return 'top';
@@ -101,23 +128,31 @@
   <div
     bind:this={wrapperElement}
     class={merge('wrapper group/tooltip relative inline-block', className)}
+    aria-describedby={isOpen ? tooltipId : undefined}
     on:mouseenter={() => (isHovered = true)}
     on:mouseleave={() => (isHovered = false)}
+    on:focusin={handleFocusIn}
+    on:focusout={handleFocusOut}
+    on:keydown={handleKeydown}
   >
     <slot />
 
     {#if usePortal && wrapperElement}
       <Portal
         anchor={wrapperElement}
-        open={show || isHovered}
+        open={isOpen}
         position={portalPosition}
         {scrollContainer}
       >
         <div
+          id={tooltipId}
+          role="tooltip"
           class={merge(
             'inline-block rounded-md bg-slate-800 px-2 py-2 text-xs text-slate-50',
             tooltipClass,
           )}
+          on:mouseenter={() => (isPopoverHovered = true)}
+          on:mouseleave={() => (isPopoverHovered = false)}
           style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
         >
           <div class="flex gap-2">
@@ -130,10 +165,14 @@
       </Portal>
     {:else}
       <div
+        id={tooltipId}
+        role="tooltip"
         class={merge(
-          'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover/tooltip:inline-block group-hover/tooltip:opacity-95',
-          show && 'inline-block opacity-95',
+          'tooltip absolute left-0 top-0 z-50 translate-x-12 whitespace-nowrap text-xs transition-all',
+          isOpen ? 'inline-block opacity-95' : 'hidden opacity-0',
         )}
+        on:mouseenter={() => (isPopoverHovered = true)}
+        on:mouseleave={() => (isPopoverHovered = false)}
         class:left
         class:right
         class:bottom
