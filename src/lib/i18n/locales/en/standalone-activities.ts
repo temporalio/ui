@@ -108,4 +108,7 @@ export const Strings = {
   'heartbeat-details': 'Heartbeat Details',
   header: 'Header',
   priority: 'Priority',
+  'priority-key': 'Priority Key',
+  'fairness-key': 'Fairness Key',
+  'fairness-weight': 'Fairness Weight',
 } as const;

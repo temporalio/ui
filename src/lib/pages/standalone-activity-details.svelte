@@ -44,8 +44,7 @@
       $activityExecution?.info?.lastFailure ||
       $activityExecution?.info?.retryPolicy ||
       $activityExecution?.info?.heartbeatDetails ||
-      $activityExecution?.info?.header ||
-      $activityExecution?.info?.priority
+      $activityExecution?.info?.header
     ),
   );
 </script>
@@ -291,6 +290,50 @@
             />
           </DetailList>
         </div>
+        {#if $activityExecution.info.priority}
+          {@const { priorityKey, fairnessKey, fairnessWeight } =
+            $activityExecution.info.priority}
+          {@const priorityRowCount =
+            (priorityKey ? 1 : 0) +
+            (fairnessKey ? 1 : 0) +
+            (fairnessWeight ? 1 : 0)}
+          {#if priorityRowCount > 0}
+            <div class="space-y-2">
+              <h5>
+                {translate('standalone-activities.priority')}
+              </h5>
+              <DetailList
+                rowCount={priorityRowCount}
+                aria-label={translate('standalone-activities.priority')}
+              >
+                {#if priorityKey}
+                  <DetailListLabel
+                    >{translate(
+                      'standalone-activities.priority-key',
+                    )}</DetailListLabel
+                  >
+                  <DetailListTextValue text={String(priorityKey)} />
+                {/if}
+                {#if fairnessKey}
+                  <DetailListLabel
+                    >{translate(
+                      'standalone-activities.fairness-key',
+                    )}</DetailListLabel
+                  >
+                  <DetailListTextValue text={fairnessKey} />
+                {/if}
+                {#if fairnessWeight}
+                  <DetailListLabel
+                    >{translate(
+                      'standalone-activities.fairness-weight',
+                    )}</DetailListLabel
+                  >
+                  <DetailListTextValue text={String(fairnessWeight)} />
+                {/if}
+              </DetailList>
+            </div>
+          {/if}
+        {/if}
       </div>
       {#if hasCodeBlocks}
         <div class="space-y-2">
@@ -338,20 +381,6 @@
                 {translate('standalone-activities.header')}
               </p>
               <PayloadCodeBlock value={$activityExecution.info.header.fields} />
-            </div>
-          {/if}
-          {#if $activityExecution.info.priority}
-            <div class="space-y-2">
-              <p class="font-medium text-secondary">
-                {translate('standalone-activities.priority')}
-              </p>
-              <CodeBlock
-                content={JSON.stringify(
-                  $activityExecution.info.priority,
-                  null,
-                  2,
-                )}
-              />
             </div>
           {/if}
         </div>
