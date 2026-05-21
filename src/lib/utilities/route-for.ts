@@ -95,7 +95,7 @@ export const routeForNexus = (): ResolvedPathname => {
 };
 
 export const routeForCommonErrors = (): ResolvedPathname => {
-  return resolve('/common-errors', {});
+  return withPrefix('/common-errors', {});
 };
 
 export const routeForNexusEndpoint = (id: string): ResolvedPathname => {
