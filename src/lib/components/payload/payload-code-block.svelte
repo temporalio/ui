@@ -9,6 +9,8 @@
 </script>
 
 <script lang="ts">
+  import { page } from '$app/state';
+
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -17,7 +19,6 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { downloadExternalPayloadWithCodec } from '$lib/services/data-encoder';
-  import { codecEndpoint } from '$lib/stores/data-encoder-config';
   import type { Payload, Payloads } from '$lib/types';
   import {
     isExternallyStoredRawPayload,
@@ -26,6 +27,7 @@
     type PayloadContainingObject,
   } from '$lib/utilities/decode-payload';
   import { formatBytes } from '$lib/utilities/format-bytes';
+  import { getCodecEndpoint } from '$lib/utilities/get-codec';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
@@ -116,14 +118,14 @@
               <Tooltip
                 width={192}
                 top
-                hide={!!$codecEndpoint}
+                hide={!!getCodecEndpoint(page.data.settings)}
                 text="Add a codec server with a /download endpoint to download this payload."
               >
                 <Button
                   size="sm"
                   variant="ghost"
                   leadingIcon="download"
-                  disabled={!$codecEndpoint}
+                  disabled={!getCodecEndpoint(page.data.settings)}
                   loading={downloadLoading}
                   on:click={() => downloadExternalPayload(result.originalValue)}
                 >
