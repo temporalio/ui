@@ -1,9 +1,11 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$lib/utilities/core-provider', () => ({
   getAccessToken: vi.fn().mockResolvedValue(''),
   getIdToken: vi.fn().mockResolvedValue(undefined),
 }));
+
+import { page } from '$app/state';
 
 import {
   codecEndpoint,
@@ -271,5 +273,61 @@ describe('codecIncludeCredentials', () => {
     const fetchCall = vi.mocked(global.fetch).mock.calls[0];
     const requestOptions = fetchCall[1] as RequestInit;
     expect(requestOptions.credentials).toBeUndefined();
+  });
+});
+
+describe('download with namespace-level codec endpoint', () => {
+  // Regression test: the download button in payload-code-block.svelte was
+  // disabled when the browser-level $codecEndpoint store was empty, even
+  // though codeServerRequest correctly falls back to settings.codec.endpoint.
+  // These tests document the expected service-layer behaviour so a regression
+  // in data-encoder.ts would be caught immediately.
+  const payloads = { payloads: [{}] };
+  const namespaceEndpoint = 'http://namespace-codec.example.com';
+
+  beforeEach(() => {
+    // Browser store intentionally left empty — only namespace settings set.
+    codecEndpoint.set(null);
+    passAccessToken.set(false);
+    includeCredentials.set(false);
+    (page.data.settings as { codec: { endpoint: string } }).codec.endpoint =
+      namespaceEndpoint;
+  });
+
+  afterEach(() => {
+    (page.data.settings as { codec: { endpoint: string } }).codec.endpoint = '';
+    vi.clearAllMocks();
+  });
+
+  it('should use the namespace endpoint for download when browser store is not configured', async () => {
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(payloads),
+      } as Response),
+    );
+
+    await codeServerRequest({ type: 'download', payloads });
+
+    expect(vi.mocked(global.fetch)).toHaveBeenCalledWith(
+      `${namespaceEndpoint}/download?preserveStorageRefs=true`,
+      expect.any(Object),
+    );
+  });
+
+  it('should use the namespace endpoint for decode when browser store is not configured', async () => {
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(payloads),
+      } as Response),
+    );
+
+    await codeServerRequest({ type: 'decode', payloads });
+
+    expect(vi.mocked(global.fetch)).toHaveBeenCalledWith(
+      `${namespaceEndpoint}/decode?preserveStorageRefs=true`,
+      expect.any(Object),
+    );
   });
 });
