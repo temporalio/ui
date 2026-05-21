@@ -55,7 +55,7 @@ describe('deployments service', () => {
         `${origin}${base}/api/v1/namespaces/${encodedNamespace}/worker-deployments`,
         expect.objectContaining({
           params: {
-            maximumPageSize: '50',
+            pageSize: '50',
             nextPageToken: 'token123',
           },
           onError: expect.any(Function),
@@ -76,7 +76,7 @@ describe('deployments service', () => {
         `${origin}${base}/api/v1/namespaces/${encodedNamespace}/worker-deployments`,
         expect.objectContaining({
           params: {
-            maximumPageSize: '100',
+            pageSize: '100',
             nextPageToken: '',
             query: 'some-query',
           },

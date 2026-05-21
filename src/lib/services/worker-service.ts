@@ -26,7 +26,7 @@ export const fetchPaginatedWorkers = async (
     return requestFromAPI<ListWorkersResponse>(route, {
       request,
       params: {
-        maximumPageSize: String(pageSize),
+        pageSize: String(pageSize),
         nextPageToken: token,
         ...(parameters.query && { query: parameters.query }),
       },
