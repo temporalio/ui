@@ -87,20 +87,27 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 	}
 
 	return func(c echo.Context) (err error) {
-		hasPublicPathPrefix := strings.HasPrefix(c.Request().RequestURI, publicPath+"/")
-		isExactPublicPath := c.Request().URL.Path == publicPath
-		missingPublicPath := hasPublicPath && !hasPublicPathPrefix && !isExactPublicPath
-
-		if missingPublicPath {
-			cleanPath := path.Clean(c.Request().URL.Path)
-			target := publicPath + cleanPath
-			if c.Request().URL.RawQuery != "" {
-				target += "?" + c.Request().URL.RawQuery
+		reqPath, rawQuery := splitRequestURI(c.Request().RequestURI)
+		if hasPublicPath && !hasPathPrefix(reqPath, publicPath) {
+			target := publicPath + path.Clean(reqPath)
+			if rawQuery != "" {
+				target += "?" + rawQuery
 			}
 			return c.Redirect(http.StatusPermanentRedirect, target)
 		}
-		return c.Stream(200, "text/html", bytes.NewBuffer(indexHTMLBytes))
+		return c.Stream(http.StatusOK, "text/html", bytes.NewBuffer(indexHTMLBytes))
 	}, nil
+}
+
+func hasPathPrefix(p, prefix string) bool {
+	return p == prefix || strings.HasPrefix(p, prefix+"/")
+}
+
+func splitRequestURI(uri string) (reqPath, rawQuery string) {
+	if i := strings.Index(uri, "?"); i >= 0 {
+		return uri[:i], uri[i+1:]
+	}
+	return uri, ""
 }
 
 func buildUIAssetsHandler(assets fs.FS) echo.HandlerFunc {

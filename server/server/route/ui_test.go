@@ -100,47 +100,50 @@ func TestBuildUIIndexHandler_WithPublicPath_RedirectsWhenPrefixMissing(t *testin
 
 	tests := []struct {
 		name           string
-		requestURI     string
-		path           string
-		query          string
+		target         string
 		expectedTarget string
 	}{
 		{
 			name:           "root path redirects to public path",
-			requestURI:     "/",
-			path:           "/",
+			target:         "/",
 			expectedTarget: "/temporal/",
 		},
 		{
 			name:           "sub page redirects with prefix",
-			requestURI:     "/namespaces",
-			path:           "/namespaces",
+			target:         "/namespaces",
 			expectedTarget: "/temporal/namespaces",
 		},
 		{
 			name:           "sub page preserves query params",
-			requestURI:     "/namespaces?ns=default",
-			path:           "/namespaces",
-			query:          "ns=default",
+			target:         "/namespaces?ns=default",
 			expectedTarget: "/temporal/namespaces?ns=default",
 		},
 		{
 			name:           "deep path redirects with prefix",
-			requestURI:     "/namespaces/default/workflows",
-			path:           "/namespaces/default/workflows",
+			target:         "/namespaces/default/workflows",
 			expectedTarget: "/temporal/namespaces/default/workflows",
+		},
+		{
+			name:           "path sharing prefix string but not a sub-path",
+			target:         "/temporalfoo",
+			expectedTarget: "/temporal/temporalfoo",
+		},
+		{
+			name:           "path sharing prefix string with query preserves both",
+			target:         "/temporalfoo?x=1",
+			expectedTarget: "/temporal/temporalfoo?x=1",
+		},
+		{
+			name:           "trailing slash is normalized away by path.Clean",
+			target:         "/namespaces/",
+			expectedTarget: "/temporal/namespaces",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := echo.New()
-			target := tt.path
-			if tt.query != "" {
-				target += "?" + tt.query
-			}
-			req := httptest.NewRequest(http.MethodGet, target, nil)
-			req.RequestURI = tt.requestURI
+			req := httptest.NewRequest(http.MethodGet, tt.target, nil)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
 
@@ -157,48 +160,90 @@ func TestBuildUIIndexHandler_WithPublicPath_ServesWhenPrefixPresent(t *testing.T
 	assert.NoError(t, err)
 
 	tests := []struct {
-		name       string
-		requestURI string
-		path       string
+		name   string
+		target string
 	}{
 		{
-			name:       "prefixed root",
-			requestURI: "/temporal/",
-			path:       "/",
+			name:   "prefixed root",
+			target: "/temporal/",
 		},
 		{
-			name:       "prefixed sub page",
-			requestURI: "/temporal/namespaces",
-			path:       "/namespaces",
+			name:   "prefixed sub page",
+			target: "/temporal/namespaces",
 		},
 		{
-			name:       "prefixed with query",
-			requestURI: "/temporal/namespaces?ns=default",
-			path:       "/namespaces",
+			name:   "prefixed with query",
+			target: "/temporal/namespaces?ns=default",
 		},
 		{
-			name:       "exact public path",
-			requestURI: "/temporal",
-			path:       "/temporal",
+			name:   "exact public path",
+			target: "/temporal",
 		},
 		{
-			name:       "exact public path with query",
-			requestURI: "/temporal?q=1",
-			path:       "/temporal",
+			name:   "exact public path with query",
+			target: "/temporal?q=1",
+		},
+		{
+			name:   "already-prefixed path is not re-prefixed",
+			target: "/temporal/temporal/namespaces",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := echo.New()
-			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
-			req.RequestURI = tt.requestURI
+			req := httptest.NewRequest(http.MethodGet, tt.target, nil)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
 
 			err := handler(c)
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Contains(t, rec.Body.String(), `base: "/temporal"`)
+		})
+	}
+}
+
+// The PublicPath middleware rewrites URL.Path to strip the prefix before
+// reaching this handler, while leaving RequestURI intact. The handler must
+// not redirect in that case, otherwise the rewrite + redirect loops.
+func TestBuildUIIndexHandler_WithPublicPath_HandlesMiddlewareRewrittenPath(t *testing.T) {
+	handler, err := buildUIIndexHandler("/temporal", newTestAssets(testIndexHTML))
+	assert.NoError(t, err)
+
+	tests := []struct {
+		name       string
+		requestURI string
+		urlPath    string
+	}{
+		{
+			name:       "prefixed sub page rewritten by middleware",
+			requestURI: "/temporal/namespaces",
+			urlPath:    "/namespaces",
+		},
+		{
+			name:       "prefixed root rewritten by middleware",
+			requestURI: "/temporal/",
+			urlPath:    "/",
+		},
+		{
+			name:       "prefixed with query rewritten by middleware",
+			requestURI: "/temporal/namespaces?ns=default",
+			urlPath:    "/namespaces",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, tt.urlPath, nil)
+			req.RequestURI = tt.requestURI
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			err := handler(c)
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, rec.Code, "handler should serve index, not redirect")
 			assert.Contains(t, rec.Body.String(), `base: "/temporal"`)
 		})
 	}
