@@ -52,7 +52,7 @@
 {#snippet activityExecutionAttemptsBadge(
   attempt: number,
   maximumAttempts: number | undefined,
-  lastFailure: Failure,
+  lastFailure: Failure | undefined,
 )}
   {@const failed = attempt > 1 && !!lastFailure}
   {@const badgeType = failed ? 'danger' : 'default'}
@@ -62,7 +62,7 @@
   <DetailListValue>
     <Badge type={badgeType} class="flex items-center gap-2">
       <Icon name="retry" class={failed ? 'text-red-400' : ''} />
-      <span>{attempt} of {formatMaximumAttempts(maximumAttempts)}</span>
+      <span>{attempt} of {formatMaximumAttempts(maximumAttempts ?? null)}</span>
     </Badge>
 
     {#if maximumAttempts && !isClosed}
@@ -95,7 +95,10 @@
                 >{translate('standalone-activities.run-state')}</DetailListLabel
               >
               <DetailListTextValue
-                text={fromScreamingEnum($activityExecution.info.runState, '')}
+                text={fromScreamingEnum(
+                  $activityExecution.info.runState ?? '',
+                  '',
+                )}
               />
               {@render activityExecutionAttemptsBadge(
                 $activityExecution.info.attempt,
@@ -140,7 +143,9 @@
                 )}</DetailListLabel
               >
               <DetailListTextValue
-                text={fromSeconds($activityExecution.info.executionDuration)}
+                text={fromSeconds(
+                  $activityExecution.info.executionDuration ?? '',
+                )}
               />
               <DetailListLabel
                 >{translate(
@@ -377,7 +382,7 @@
               />
             </div>
           {/if}
-          {#if $activityExecution.info.header}
+          {#if $activityExecution.info.header?.fields}
             <div class="space-y-2">
               <p class="font-medium text-secondary">
                 {translate('standalone-activities.header')}

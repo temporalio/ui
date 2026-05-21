@@ -273,7 +273,9 @@
         >{translate('workflows.external-payload-size')}</DetailListLabel
       >
       <DetailListTextValue
-        text={formatBytes(parseInt(workflow.externalPayloadSizeBytes, 10))}
+        text={formatBytes(
+          parseInt(workflow.externalPayloadSizeBytes ?? '', 10),
+        )}
       />
       <DetailListLabel
         >{translate('workflows.external-payload-count')}</DetailListLabel
