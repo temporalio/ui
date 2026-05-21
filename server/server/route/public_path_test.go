@@ -115,3 +115,32 @@ func TestPublicPath_DoesNotMatchPrefixWithoutSeparator(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Equal(t, "/customfoo", rec.Body.String())
 }
+
+func TestPublicPath_EmptyPrefix_IsNoop(t *testing.T) {
+	e := newEchoWithPublicPath("")
+	for _, p := range []string{"/", "/namespaces", "/namespaces/default/workflows"} {
+		req := httptest.NewRequest(http.MethodGet, p, nil)
+		rec := httptest.NewRecorder()
+		e.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, p, rec.Body.String(), "empty prefix must not rewrite path %q", p)
+	}
+}
+
+func TestPublicPath_QuotesRegexMetacharacters(t *testing.T) {
+	e := newEchoWithPublicPath("/foo.bar")
+
+	// The "." must not act as a wildcard — "/fooXbar/baz" should not be rewritten.
+	req := httptest.NewRequest(http.MethodGet, "/fooXbar/baz", nil)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "/fooXbar/baz", rec.Body.String(), "metacharacter in prefix must not match unrelated path")
+
+	// The literal prefix should still be stripped correctly.
+	req = httptest.NewRequest(http.MethodGet, "/foo.bar/baz", nil)
+	rec = httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "/baz", rec.Body.String())
+}

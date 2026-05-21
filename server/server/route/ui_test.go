@@ -133,6 +133,11 @@ func TestBuildUIIndexHandler_WithPublicPath_RedirectsWhenPrefixMissing(t *testin
 			target:         "/temporalfoo?x=1",
 			expectedTarget: "/temporal/temporalfoo?x=1",
 		},
+		{
+			name:           "trailing slash is normalized away by path.Clean",
+			target:         "/namespaces/",
+			expectedTarget: "/temporal/namespaces",
+		},
 	}
 
 	for _, tt := range tests {
