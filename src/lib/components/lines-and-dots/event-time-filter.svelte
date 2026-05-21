@@ -65,6 +65,11 @@
     return true;
   };
 
+  const isEndDateAllowed = $derived((d: Date) => {
+    if (!isDateAllowed(d)) return false;
+    return startOfDay(d).getTime() >= startDate.getTime();
+  });
+
   let startDate = $state<Date>(toStartOfDay(null));
   let startHour = $state<string>('');
   let startMinute = $state<string>('');
@@ -79,6 +84,13 @@
   const filterActive = $derived(
     Boolean($eventTimeFilter.startTime || $eventTimeFilter.endTime),
   );
+
+  const endBeforeStart = $derived.by(() => {
+    if (!endEnabled) return false;
+    const start = composeDate(startDate, startHour, startMinute, startSecond);
+    const end = composeDate(endDate, endHour, endMinute, endSecond);
+    return end.getTime() < start.getTime();
+  });
 
   const composeDate = (
     date: Date,
@@ -100,6 +112,9 @@
 
   const onStartDateChange = (e: CustomEvent) => {
     startDate = startOfDay(e.detail);
+    if (endDate.getTime() < startDate.getTime()) {
+      endDate = startDate;
+    }
   };
 
   const onEndDateChange = (e: CustomEvent) => {
@@ -215,7 +230,7 @@
           labelHidden
           on:datechange={onEndDateChange}
           selected={endDate}
-          isAllowed={isDateAllowed}
+          isAllowed={isEndDateAllowed}
           todayLabel={translate('common.today')}
           closeLabel={translate('common.close')}
           clearLabel={translate('common.clear-input-button-label')}
@@ -228,6 +243,12 @@
           twelveHourClock={false}
           disabled={!endEnabled}
         />
+        {#if endBeforeStart}
+          <p class="flex gap-1 text-xs text-danger">
+            <Icon name="error" aria-hidden="true" />
+            {translate('common.end-must-be-after-start')}
+          </p>
+        {/if}
       </div>
     </MenuItem>
     <MenuDivider />
@@ -247,7 +268,12 @@
       >
         {translate('common.clear-all')}
       </Button>
-      <Button size="xs" class="grow" on:click={onApply}>
+      <Button
+        size="xs"
+        class="grow"
+        on:click={onApply}
+        disabled={endBeforeStart}
+      >
         {translate('common.apply')}
       </Button>
     </div>

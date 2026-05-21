@@ -15,6 +15,7 @@ export const Strings = {
   custom: 'Custom',
   'start-time': 'Start Time',
   'end-time': 'End Time',
+  'end-must-be-after-start': 'End time must be on or after start time',
   'close-time': 'Close Time',
   relative: 'Relative',
   utc: 'UTC',
