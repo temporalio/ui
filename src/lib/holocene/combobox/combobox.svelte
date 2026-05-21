@@ -545,7 +545,7 @@
             className,
           )}
           role="combobox"
-          autocomplete="off"
+          autocomplete={rest.autocomplete ?? 'off'}
           autocapitalize="off"
           spellcheck="false"
           data-lpignore="true"
