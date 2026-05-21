@@ -89,7 +89,7 @@
             </h5>
             <DetailList
               rowCount={2}
-              aria-label="Activity Execution Status Details"
+              aria-label={translate('standalone-activities.current-state')}
             >
               <DetailListLabel
                 >{translate('standalone-activities.run-state')}</DetailListLabel
@@ -115,7 +115,7 @@
                 ? 5
                 : 4
               : 2}
-            aria-label="Activity Execution Timing and Progress Details"
+            aria-label={translate('standalone-activities.timing-and-progress')}
           >
             <DetailListLabel
               >{translate(
@@ -167,7 +167,7 @@
             </h5>
             <DetailList
               rowCount={2}
-              aria-label="Activity Execution Health Details"
+              aria-label={translate('standalone-activities.health')}
             >
               <DetailListLabel
                 >{translate(
@@ -195,7 +195,7 @@
             </h5>
             <DetailList
               rowCount={3}
-              aria-label="Activity Execution Retry State"
+              aria-label={translate('standalone-activities.retry-state')}
             >
               <DetailListLabel
                 >{translate(
@@ -233,7 +233,9 @@
           </h5>
           <DetailList
             rowCount={3}
-            aria-label="Activity Execution Timeout Details"
+            aria-label={translate(
+              'standalone-activities.timeout-configuration',
+            )}
           >
             <DetailListLabel
               >{translate(
@@ -267,7 +269,7 @@
           </h5>
           <DetailList
             rowCount={2}
-            aria-label="Activity Execution Worker Details"
+            aria-label={translate('standalone-activities.worker')}
           >
             <DetailListLabel
               >{translate('standalone-activities.task-queue')}</DetailListLabel
