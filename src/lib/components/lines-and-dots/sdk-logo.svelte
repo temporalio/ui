@@ -49,7 +49,7 @@
 <p class="flex w-full items-center gap-2">
   {#if logo}
     <span class="relative flex w-6 shrink-0 items-center" aria-hidden="true">
-      <img src={logo} alt="SDK Icon" class="absolute h-6 w-6" />
+      <img src={logo} alt="" class="absolute h-6 w-6" />
     </span>
   {/if}
   <span class="truncate">
