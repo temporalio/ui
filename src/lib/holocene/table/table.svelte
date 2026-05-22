@@ -104,7 +104,7 @@
     }
 
     :global(tr:not(.empty)) {
-      @apply min-h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }
   }
 </style>
