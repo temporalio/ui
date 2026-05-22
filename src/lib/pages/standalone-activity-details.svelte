@@ -96,7 +96,8 @@
               >
               <DetailListTextValue
                 text={fromScreamingEnum(
-                  $activityExecution.info.runState ?? '',
+                  $activityExecution.info.runState ??
+                    'PENDING_ACTIVITY_STATE_UNSPECIFIED',
                   '',
                 )}
               />
