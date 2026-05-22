@@ -18,6 +18,7 @@
     badgeType?: BadgeType;
     iconName?: IconName | undefined;
     iconPosition?: 'leading' | 'trailing';
+    hasNumber?: boolean;
     class?: ClassNameValue;
   }
 
@@ -31,13 +32,14 @@
     iconPosition = 'leading',
     isBadge = false,
     badgeType = 'default',
+    hasNumber = /\d/.test(text ?? ''),
     class: className = '',
   }: Props = $props();
 </script>
 
 {#snippet content()}
   {#if isBadge}
-    <Badge type={badgeType}>
+    <Badge type={badgeType} class={hasNumber ? 'font-mono' : ''}>
       {text}
     </Badge>
   {:else}
@@ -45,7 +47,7 @@
       {#if iconName && iconPosition === 'leading'}
         <Icon name={iconName} class="shrink-0" />
       {/if}
-      <span class="truncate">{text}</span>
+      <span class="truncate {hasNumber ? 'font-mono' : ''}">{text}</span>
       {#if iconName && iconPosition === 'trailing'}
         <Icon name={iconName} class="shrink-0" />
       {/if}
