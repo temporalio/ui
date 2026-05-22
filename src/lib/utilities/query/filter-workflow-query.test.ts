@@ -234,6 +234,74 @@ describe('toListWorkflowQueryFromFilters', () => {
     },
   );
 
+  it('should convert an Int filter without quoting the value', () => {
+    const filters = [
+      {
+        attribute: 'CustomIntField',
+        type: 'Int',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: '1',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`CustomIntField`=1');
+  });
+
+  it('should convert a Double filter without quoting the value', () => {
+    const filters = [
+      {
+        attribute: 'CustomDoubleField',
+        type: 'Double',
+        conditional: '>',
+        operator: '',
+        parenthesis: '',
+        value: '1.5',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`CustomDoubleField`>1.5');
+  });
+
+  it('should convert numeric filters alongside keyword filters', () => {
+    const filters = [
+      {
+        attribute: 'CustomIntField',
+        type: 'Int',
+        conditional: '>=',
+        operator: '',
+        parenthesis: '',
+        value: '10',
+      },
+      {
+        attribute: 'WorkflowId',
+        type: 'Keyword',
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+        value: 'abcd',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(combineFilters(filters));
+    expect(query).toBe('`CustomIntField`>=10 AND `WorkflowId`="abcd"');
+  });
+
+  it('should convert an Int filter with is null conditional', () => {
+    const filters = [
+      {
+        attribute: 'CustomIntField',
+        type: 'Int',
+        conditional: 'is',
+        operator: '',
+        parenthesis: '',
+        value: null,
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`CustomIntField` is null');
+  });
+
   it('should convert a KeywordList filter', () => {
     const filters = [
       {
