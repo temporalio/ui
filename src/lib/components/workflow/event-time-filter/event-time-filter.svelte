@@ -2,7 +2,7 @@
   import { writable } from 'svelte/store';
 
   import { startOfDay } from 'date-fns';
-  import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+  import { utcToZonedTime } from 'date-fns-tz';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -24,6 +24,14 @@
   import { getSelectedTimezone } from '$lib/utilities/format-date';
   import { getTimezone } from '$lib/utilities/timezone';
 
+  import {
+    composeDate,
+    endBeforeStart as endBeforeStartCalc,
+    isDateAllowed as isDateAllowedCalc,
+    isEndDateAllowed as isEndDateAllowedCalc,
+    toStartOfDayInTz,
+  } from './event-time-filter';
+
   type Props = {
     defaultStart: Date | null;
     defaultEnd: Date | null;
@@ -32,6 +40,9 @@
   let { defaultStart, defaultEnd }: Props = $props();
 
   const open = writable(false);
+
+  let innerWidth = $state(0);
+  const menuPosition = $derived(innerWidth < 1134 ? 'left' : 'right');
 
   const timezone = $derived(getTimezone($timeFormat ?? 'UTC'));
   const selectedTime = $derived(getSelectedTimezone($timeFormat ?? 'UTC'));
@@ -50,24 +61,14 @@
     const z = toZoned(d);
     return z ? pad(z.getSeconds()) : '';
   };
-  const toStartOfDay = (d: Date | null) => {
-    const z = toZoned(d) ?? new Date();
-    return startOfDay(new Date(z.getFullYear(), z.getMonth(), z.getDate()));
-  };
+  const toStartOfDay = (d: Date | null) => toStartOfDayInTz(d, timezone);
 
-  const isDateAllowed = (d: Date) => {
-    const cellDay = startOfDay(d).getTime();
-    if (defaultStart && cellDay < toStartOfDay(defaultStart).getTime()) {
-      return false;
-    }
-    const upperBound = defaultEnd ?? new Date();
-    if (cellDay > toStartOfDay(upperBound).getTime()) return false;
-    return true;
-  };
+  const isDateAllowed = (d: Date) =>
+    isDateAllowedCalc(d, { defaultStart, defaultEnd, timezone });
 
-  const isEndDateAllowed = $derived((d: Date) => {
-    if (!isDateAllowed(d)) return false;
-    return startOfDay(d).getTime() >= startDate.getTime();
+  const isEndDateAllowed = $derived.by(() => {
+    const bounds = { defaultStart, defaultEnd, timezone, startDate };
+    return (d: Date) => isEndDateAllowedCalc(d, bounds);
   });
 
   let startDate = $state<Date>(toStartOfDay(null));
@@ -85,30 +86,20 @@
     Boolean($eventTimeFilter.startTime || $eventTimeFilter.endTime),
   );
 
-  const endBeforeStart = $derived.by(() => {
-    if (!endEnabled) return false;
-    const start = composeDate(startDate, startHour, startMinute, startSecond);
-    const end = composeDate(endDate, endHour, endMinute, endSecond);
-    return end.getTime() < start.getTime();
-  });
-
-  const composeDate = (
-    date: Date,
-    hour: string,
-    minute: string,
-    second: string,
-  ): Date => {
-    const wallClock = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      parseInt(hour) || 0,
-      parseInt(minute) || 0,
-      parseInt(second) || 0,
-      0,
-    );
-    return zonedTimeToUtc(wallClock, timezone);
-  };
+  const endBeforeStart = $derived(
+    endBeforeStartCalc({
+      endEnabled,
+      startDate,
+      startHour,
+      startMinute,
+      startSecond,
+      endDate,
+      endHour,
+      endMinute,
+      endSecond,
+      timezone,
+    }),
+  );
 
   const onStartDateChange = (e: CustomEvent) => {
     startDate = startOfDay(e.detail);
@@ -141,10 +132,16 @@
   };
 
   const onApply = () => {
-    const start = composeDate(startDate, startHour, startMinute, startSecond);
+    const start = composeDate(
+      startDate,
+      startHour,
+      startMinute,
+      startSecond,
+      timezone,
+    );
     let end: Date | null = null;
     if (endEnabled) {
-      end = composeDate(endDate, endHour, endMinute, endSecond);
+      end = composeDate(endDate, endHour, endMinute, endSecond, timezone);
       end.setUTCMilliseconds(999);
     }
     $eventTimeFilter = { startTime: start, endTime: end };
@@ -170,8 +167,15 @@
   };
 </script>
 
+<svelte:window bind:innerWidth />
+
 <MenuContainer {open}>
-  <MenuButton controls="event-time-filter-menu" size="sm" onclick={onToggle}>
+  <MenuButton
+    controls="event-time-filter-menu"
+    size="sm"
+    onclick={onToggle}
+    data-testid="event-time-filter"
+  >
     {#snippet leading()}
       <div
         class="flex h-6 w-6 flex-col items-center justify-center rounded-full transition-colors duration-200"
@@ -185,11 +189,14 @@
   <Menu
     id="event-time-filter-menu"
     keepOpen
-    position="right"
-    class="max-h-fit w-[340px] !overflow-visible md:w-[400px]"
+    position={menuPosition}
+    class="max-h-fit w-[400px]"
   >
     <MenuItem>
-      <div class="flex w-full flex-col gap-2">
+      <div
+        class="flex w-full flex-col gap-2"
+        data-testid="event-time-filter-start-section"
+      >
         <span class="text-xs font-medium text-secondary">
           {translate('common.start')}
         </span>
@@ -213,7 +220,10 @@
     </MenuItem>
     <MenuDivider />
     <MenuItem>
-      <div class="flex w-full flex-col gap-2">
+      <div
+        class="flex w-full flex-col gap-2"
+        data-testid="event-time-filter-end-section"
+      >
         <div class="flex items-center justify-between">
           <span class="text-xs font-medium text-secondary">
             {translate('common.end')}
@@ -265,6 +275,7 @@
         variant="ghost"
         on:click={onClear}
         disabled={!filterActive}
+        data-testid="event-time-filter-clear-button"
       >
         {translate('common.clear-all')}
       </Button>
@@ -273,6 +284,7 @@
         class="grow"
         on:click={onApply}
         disabled={endBeforeStart}
+        data-testid="event-time-filter-apply-button"
       >
         {translate('common.apply')}
       </Button>
