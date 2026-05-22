@@ -56,7 +56,7 @@
 
   <tr slot="headers" class="text-left">
     {#each columns as { label } (label)}
-      <th>{label}</th>
+      <th scope="col">{label}</th>
     {/each}
   </tr>
   {#each visibleItems as worker, i (worker?.workerInstanceKey ?? i)}
