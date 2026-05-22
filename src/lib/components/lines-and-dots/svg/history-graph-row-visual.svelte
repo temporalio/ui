@@ -88,13 +88,22 @@
     Failed: 'events.event-classification.failed',
     Terminated: 'events.event-classification.terminated',
     pending: 'events.event-classification.pending',
+    retrying: 'events.event-classification.retrying',
   } as const;
 
+  const isRetrying = $derived(
+    !!group?.pendingActivity && Number(group.pendingActivity.attempt) > 1,
+  );
+
+  const labelClassification = $derived(
+    isRetrying ? 'retrying' : classification,
+  );
+
   const classificationLabel = $derived(
-    classification && classification in CLASSIFICATION_LABEL_KEY
+    labelClassification && labelClassification in CLASSIFICATION_LABEL_KEY
       ? translate(
           CLASSIFICATION_LABEL_KEY[
-            classification as keyof typeof CLASSIFICATION_LABEL_KEY
+            labelClassification as keyof typeof CLASSIFICATION_LABEL_KEY
           ],
         )
       : translate('common.unknown'),
