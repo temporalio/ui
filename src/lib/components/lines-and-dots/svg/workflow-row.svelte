@@ -22,16 +22,22 @@
   const start = $derived(gutter);
   const end = $derived(start + length - 2 * gutter);
 
-  const workflowStatusKey = (status: WorkflowExecution['status']) => {
-    if (!status) return 'unknown';
-    if (status === 'TimedOut') return 'timed-out';
-    if (status === 'ContinuedAsNew') return 'continued-as-new';
-    return status.toLowerCase();
-  };
+  const STATUS_LABEL_KEY = {
+    Running: 'workflows.running',
+    TimedOut: 'workflows.timed-out',
+    Completed: 'workflows.completed',
+    Failed: 'workflows.failed',
+    ContinuedAsNew: 'workflows.continued-as-new',
+    Canceled: 'workflows.canceled',
+    Terminated: 'workflows.terminated',
+    Paused: 'workflows.paused',
+  } as const;
 
   const statusLabel = $derived(
-    workflow.status
-      ? translate(`workflows.${workflowStatusKey(workflow.status)}`)
+    workflow.status && workflow.status in STATUS_LABEL_KEY
+      ? translate(
+          STATUS_LABEL_KEY[workflow.status as keyof typeof STATUS_LABEL_KEY],
+        )
       : translate('common.unknown'),
   );
 

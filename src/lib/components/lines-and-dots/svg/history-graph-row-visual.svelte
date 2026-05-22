@@ -71,15 +71,45 @@
   );
   const reverseSort = $derived($eventFilterSort === 'descending');
 
+  const CLASSIFICATION_LABEL_KEY = {
+    Unspecified: 'events.event-classification.unspecified',
+    Scheduled: 'events.event-classification.scheduled',
+    Open: 'events.event-classification.open',
+    New: 'events.event-classification.new',
+    Started: 'events.event-classification.started',
+    Initiated: 'events.event-classification.initiated',
+    Running: 'events.event-classification.running',
+    Completed: 'events.event-classification.completed',
+    Fired: 'events.event-classification.fired',
+    CancelRequested: 'events.event-classification.cancelrequested',
+    TimedOut: 'events.event-classification.timedout',
+    Signaled: 'events.event-classification.signaled',
+    Canceled: 'events.event-classification.canceled',
+    Failed: 'events.event-classification.failed',
+    Terminated: 'events.event-classification.terminated',
+    pending: 'events.event-classification.pending',
+    Retrying: 'events.event-classification.retrying',
+  } as const;
+
   const classificationLabel = $derived(
-    classification
-      ? translate(`events.event-classification.${classification.toLowerCase()}`)
+    classification && classification in CLASSIFICATION_LABEL_KEY
+      ? translate(
+          CLASSIFICATION_LABEL_KEY[
+            classification as keyof typeof CLASSIFICATION_LABEL_KEY
+          ],
+        )
+      : translate('common.unknown'),
+  );
+
+  const eventTypeLabel = $derived(
+    event && 'eventType' in event
+      ? event.eventType
       : translate('common.unknown'),
   );
 
   const accessibleName = $derived(
     translate('events.row-accessible-name', {
-      eventType: event?.eventType ?? translate('common.unknown'),
+      eventType: eventTypeLabel,
       classification: classificationLabel,
     }),
   );
