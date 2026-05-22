@@ -22,7 +22,10 @@
   <FeedbackButton />
 </header>
 <section class="my-[20vh] text-center">
-  <h1 class="text-7xl font-semibold sm:text-8xl" data-testid="login-title">
+  <h1
+    class="text-5xl font-semibold sm:text-7xl md:text-8xl"
+    data-testid="login-title"
+  >
     Welcome back.
   </h1>
   <p class="my-7" data-testid="login-info">Let's get you signed in.</p>
