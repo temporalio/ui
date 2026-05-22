@@ -159,6 +159,7 @@
   <g
     role="button"
     tabindex="0"
+    aria-label="Workflow {child.workflow.id}: {child.workflow.status}"
     class="outline-none transition-all"
     on:click={(e) => nodeClick(e, child)}
     on:keypress={(e) => nodeClick(e, child)}
@@ -284,6 +285,7 @@
     role="button"
     class="outline-none"
     tabindex="0"
+    aria-label="Workflow {root.workflow.id}: {root.workflow.status}"
     on:click={(e) => nodeClick(e, root)}
     on:keypress={(e) => nodeClick(e, root)}
   >
