@@ -52,7 +52,7 @@
   {#if required}
     <span
       aria-hidden="true"
-      class="text-interactive-error text-sm font-medium leading-none">*</span
+      class="text-sm font-medium leading-none text-danger">*</span
     >
   {/if}
 </label>
