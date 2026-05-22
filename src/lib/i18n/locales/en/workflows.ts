@@ -41,6 +41,7 @@ export const Strings = {
   'configure-headers-description':
     'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), {{type}} to personalize the {{title}} Table.',
   'all-statuses': 'All Statuses',
+  'row-accessible-name': 'Workflow {{workflowId}}: {{status}}',
   running: 'Running',
   'timed-out': 'Timed Out',
   completed: 'Completed',
