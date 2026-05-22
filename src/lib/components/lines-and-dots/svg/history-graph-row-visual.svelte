@@ -88,7 +88,6 @@
     Failed: 'events.event-classification.failed',
     Terminated: 'events.event-classification.terminated',
     pending: 'events.event-classification.pending',
-    Retrying: 'events.event-classification.retrying',
   } as const;
 
   const classificationLabel = $derived(
