@@ -1,8 +1,10 @@
 <script lang="ts">
+  import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { routeForStandaloneActivitiesWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
@@ -14,6 +16,7 @@
     DetailListLinkValue,
     DetailListTextValue,
     DetailListTimestampValue,
+    DetailListValue,
   } from '../detail-list';
 
   import ActivityExecutionActions from './activity-actions.svelte';
@@ -119,6 +122,8 @@
         text={activityExecutionInfo.taskQueue}
         href={taskQueueFilterLink}
       />
+    </DetailListColumn>
+    <DetailListColumn>
       {#if $isCloud}
         <DetailListLabel
           >{translate('workflows.billable-actions')}</DetailListLabel
@@ -131,6 +136,15 @@
         <DetailListTextValue
           text={activityExecutionInfo.stateTransitionCount}
         />
+      {/if}
+      {#if activityExecutionInfo.sdkName && activityExecutionInfo.sdkVersion}
+        <DetailListLabel>{translate('workflows.sdk')}</DetailListLabel>
+        <DetailListValue>
+          <SdkLogo
+            sdk={formatSDKName(activityExecutionInfo.sdkName)}
+            version={activityExecutionInfo.sdkVersion}
+          />
+        </DetailListValue>
       {/if}
     </DetailListColumn>
   </DetailList>
