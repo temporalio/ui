@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { translate } from '$lib/i18n/translate';
   import type {
     EventGroup,
     EventGroups,
@@ -69,9 +70,27 @@
         : (undefined as EventTypeCategory | 'pending' | undefined),
   );
   const reverseSort = $derived($eventFilterSort === 'descending');
+
+  const classificationLabel = $derived(
+    classification
+      ? translate(`events.event-classification.${classification.toLowerCase()}`)
+      : translate('common.unknown'),
+  );
+
+  const accessibleName = $derived(
+    translate('events.row-accessible-name', {
+      eventType: event?.eventType ?? translate('common.unknown'),
+      classification: classificationLabel,
+    }),
+  );
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer">
+<g
+  role="button"
+  tabindex="0"
+  aria-label={accessibleName}
+  class="relative cursor-pointer"
+>
   {#if connectLine}
     <Line
       startPoint={[canvasWidth, y]}

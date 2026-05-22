@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
 
@@ -20,9 +21,35 @@
 
   const start = $derived(gutter);
   const end = $derived(start + length - 2 * gutter);
+
+  const workflowStatusKey = (status: WorkflowExecution['status']) => {
+    if (!status) return 'unknown';
+    if (status === 'TimedOut') return 'timed-out';
+    if (status === 'ContinuedAsNew') return 'continued-as-new';
+    return status.toLowerCase();
+  };
+
+  const statusLabel = $derived(
+    workflow.status
+      ? translate(`workflows.${workflowStatusKey(workflow.status)}`)
+      : translate('common.unknown'),
+  );
+
+  const accessibleName = $derived(
+    translate('workflows.row-accessible-name', {
+      workflowId: workflow.id,
+      status: statusLabel,
+    }),
+  );
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer" {height}>
+<g
+  role="button"
+  tabindex="0"
+  aria-label={accessibleName}
+  class="relative cursor-pointer"
+  {height}
+>
   <Line
     startPoint={[start, y]}
     endPoint={[end, y]}

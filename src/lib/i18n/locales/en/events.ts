@@ -66,6 +66,7 @@ export const Strings = {
   'event-history-import-error': 'Could not create event history from JSON',
   'event-history-load-error': 'Could not parse JSON',
   'event-classification-label': 'Event Classification',
+  'row-accessible-name': 'Event {{eventType}}: {{classification}}',
   'event-classification': {
     unspecified: 'Unspecified',
     scheduled: 'Scheduled',
