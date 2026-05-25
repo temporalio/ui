@@ -30,6 +30,8 @@
   export let variant: keyof typeof variants;
   export let closeButtonLabel: string;
 
+  $: icon = variantIcon[variant];
+
   const handleDismiss = () => {
     dispatch('dismiss', { id });
   };
@@ -43,8 +45,8 @@
   )}
   transition:fly={{ x: 250 }}
 >
-  {#if variantIcon[variant]}
-    <Icon name={variantIcon[variant]} class="shrink-0" />
+  {#if icon}
+    <Icon name={icon} class="shrink-0" />
   {/if}
   <p class="text-sm">
     <slot />
