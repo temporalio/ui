@@ -4,6 +4,7 @@
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { ToastVariant } from '$lib/types/holocene';
 
@@ -15,6 +16,14 @@
     error: 'bg-danger',
     info: 'bg-information',
     warning: 'bg-warning',
+  };
+
+  const variantIcon: Readonly<Record<ToastVariant, IconName | null>> = {
+    primary: null,
+    success: 'success',
+    error: 'error',
+    info: 'info',
+    warning: 'warning',
   };
 
   export let id: string;
@@ -34,6 +43,9 @@
   )}
   transition:fly={{ x: 250 }}
 >
+  {#if variantIcon[variant]}
+    <Icon name={variantIcon[variant]} class="shrink-0" />
+  {/if}
   <p class="text-sm">
     <slot />
   </p>
