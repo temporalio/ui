@@ -53,7 +53,7 @@
       <img src={logo} alt="" class="absolute h-6 w-6" />
     </span>
   {/if}
-  <Tooltip bottomLeft text={`${sdk} ${version}`}>
+  <Tooltip bottomRight text={`${sdk} ${version}`}>
     <span class="truncate">
       {sdk}
       {version}
