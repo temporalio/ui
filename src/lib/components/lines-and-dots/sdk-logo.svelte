@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import dotNet from '$lib/vendor/sdk-logos/dotnet-colorblock.svg';
   import go from '$lib/vendor/sdk-logos/go-colorblock.svg';
   import java from '$lib/vendor/sdk-logos/java-colorblock.svg';
@@ -52,10 +53,12 @@
       <img src={logo} alt="" class="absolute h-6 w-6" />
     </span>
   {/if}
-  <span class="truncate">
-    {sdk}
-    {version}
-  </span>
+  <Tooltip bottomRight text={`${sdk} ${version}`}>
+    <span class="truncate">
+      {sdk}
+      {version}
+    </span>
+  </Tooltip>
   {#if href && !hideDocsLink}
     <Link {href} newTab>Docs</Link>
     <Icon name="book" />
