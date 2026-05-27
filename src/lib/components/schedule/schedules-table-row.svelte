@@ -1,13 +1,19 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
-  import { routeForSchedule, routeForWorkflow } from '$lib/utilities/route-for';
+  import {
+    routeForSchedule,
+    routeForWorkflow,
+    routeForWorkflowsWithQuery,
+  } from '$lib/utilities/route-for';
 
   import ScheduleFrequency from './schedule-frequency.svelte';
 
@@ -61,12 +67,30 @@
         <Link href={route}>{schedule.scheduleId}</Link>
       </td>
     {:else if label === translate('common.workflow-type')}
-      <td class="cell whitespace-pre-line break-words">
-        {schedule?.info?.workflowType?.name ?? ''}
-      </td>
+      {@const workflowTypeName = schedule?.info?.workflowType?.name ?? ''}
+      {@const filterRoute = routeForWorkflowsWithQuery({
+        namespace,
+        query: [
+          workflowTypeName && `WorkflowType="${workflowTypeName}"`,
+          schedule?.scheduleId &&
+            `TemporalScheduledById="${schedule.scheduleId}"`,
+        ]
+          .filter(Boolean)
+          .join(' AND '),
+      })}
+      <TableCellWithFilterOrCopyButtons
+        class="cell whitespace-pre-line break-words"
+        filterIconTitle={translate('common.filter-workflows')}
+        copyValue={workflowTypeName}
+        onFilter={() => goto(filterRoute)}
+      >
+        <Link href={filterRoute}>
+          {workflowTypeName}
+        </Link>
+      </TableCellWithFilterOrCopyButtons>
     {:else if label === translate('schedules.recent-runs')}
       <td class="cell truncate">
-        {#each sortRecentActions(schedule?.info?.recentActions) as run}
+        {#each sortRecentActions(schedule?.info?.recentActions) as run (run.actualTime)}
           <p>
             <Link
               href={routeForWorkflow({
@@ -82,7 +106,7 @@
       </td>
     {:else if label === translate('schedules.upcoming-runs')}
       <td class="cell truncate">
-        {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
+        {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run (run)}
           <Timestamp as="div" dateTime={run} />
         {/each}
       </td>

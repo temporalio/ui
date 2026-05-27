@@ -136,6 +136,7 @@ export const Strings = {
   absolute: 'Absolute',
   'copy-icon-title': 'Click to copy content',
   'copy-success-icon-title': 'Content copied to clipboard',
+  'filter-items': 'Filter items',
   'filter-workflows': 'Filter workflows',
   'filter-activities': 'Filter activities',
   'event-category-filter-label': 'Open event category filter menu',
