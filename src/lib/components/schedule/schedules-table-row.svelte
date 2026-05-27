@@ -125,7 +125,7 @@
       </td>
     {:else if label === translate('schedules.schedule-spec')}
       <td class="cell">
-        {#if spec}}
+        {#if spec}
           <ScheduleFrequency {spec} />
         {/if}
       </td>
