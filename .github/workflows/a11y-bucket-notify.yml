@@ -7,6 +7,10 @@
 #   COLLABORATOR PRs, matching the sibling workflow's policy of not pinging
 #   on external-contributor labels.
 # - No shell `run:` interpolation of untrusted strings.
+# - issues: write is required so the dedup step can create/update the hidden
+#   marker comment that records the last bucket pinged. Without this, removing
+#   and re-adding the same bucket label (e.g., via A11y-Audit-Ref trailer
+#   edit cycles) would fire a duplicate Slack ping.
 name: A11y Bucket Slack Notification
 
 on:
@@ -16,6 +20,14 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  issues: write
+
+# Serialize runs per PR so the marker check is race-free across rapid label
+# events on the same PR (e.g., a triage run that flips bucket-3 -> bucket-4
+# back-to-back).
+concurrency:
+  group: a11y-bucket-notify-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   notify:
@@ -24,7 +36,40 @@ jobs:
       contains(fromJSON('["MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
     runs-on: ubuntu-latest
     steps:
+      - name: Check ping history
+        id: dedup
+        uses: actions/github-script@v7
+        env:
+          BUCKET: ${{ github.event.label.name }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const bucket = process.env.BUCKET;
+            const MARKER_PREFIX = '<!-- a11y-bucket-notify-fired:';
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((c) => c.body && c.body.startsWith(MARKER_PREFIX));
+
+            let shouldSkip = false;
+            if (existing) {
+              const match = existing.body.match(/<!-- a11y-bucket-notify-fired: (a11y:bucket-[34]) -->/);
+              if (match && match[1] === bucket) {
+                core.info(`Already pinged for ${bucket} on this PR; skipping duplicate Slack notification.`);
+                shouldSkip = true;
+              }
+            }
+
+            core.setOutput('skip', shouldSkip ? 'true' : 'false');
+            core.setOutput('existing_id', existing ? String(existing.id) : '');
+
       - name: Notify Slack
+        if: steps.dedup.outputs.skip != 'true'
         uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -63,3 +108,25 @@ jobs:
                       text: "View PR"
                     style: primary
                     url: "${{ env.PR_URL }}"
+
+      - name: Update ping marker
+        if: steps.dedup.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        env:
+          BUCKET: ${{ github.event.label.name }}
+          EXISTING_ID: ${{ steps.dedup.outputs.existing_id }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const body = `<!-- a11y-bucket-notify-fired: ${process.env.BUCKET} -->\n<sub>Slack notification dedup marker (DT-4048).</sub>`;
+            if (process.env.EXISTING_ID) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: parseInt(process.env.EXISTING_ID, 10),
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
