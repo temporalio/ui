@@ -65,7 +65,7 @@ jobs:
             if (!pr) return;
             const issue_number = pr.number;
 
-            const TITLE_GATE = /^(fix\()?a11y[(:]/i;
+            const TITLE_GATE = /^(fix\()?a11y[():]/i;
             if (!TITLE_GATE.test(pr.title || '')) {
               core.info(`PR title does not match a11y gate; skipping.`);
               return;
