@@ -1,0 +1,207 @@
+# Security review notes:
+# - No untrusted input is interpolated into `run:` shell commands. The script
+#   reads PR title and body via the github-script JS context (pr.title, pr.body),
+#   which are JavaScript variables, not shell-expanded strings.
+# - npm install uses a pinned package spec (js-yaml@^4). No version comes from
+#   event payload.
+# - All write operations (labels, comments) go through the github-script-bound
+#   Octokit, never through shell.
+name: A11y PR Triage
+
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to (re)triage. Use for backfilling or re-running after manifest updates.'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (manifest only)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/a11y/manifest.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Install js-yaml
+        run: npm install --no-save --no-audit --no-fund --silent js-yaml@^4
+
+      - name: Triage and label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const yaml = require('js-yaml');
+
+            const { owner, repo } = context.repo;
+
+            async function getPullRequest() {
+              if (context.eventName === 'workflow_dispatch') {
+                const raw = context.payload.inputs && context.payload.inputs.pr_number;
+                const prNumber = parseInt(raw, 10);
+                if (!Number.isInteger(prNumber) || prNumber <= 0) {
+                  core.setFailed(`Invalid pr_number input: ${raw}`);
+                  return null;
+                }
+                const { data } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+                return data;
+              }
+              return context.payload.pull_request;
+            }
+
+            const pr = await getPullRequest();
+            if (!pr) return;
+            const issue_number = pr.number;
+
+            const TITLE_GATE = /^(fix\()?a11y[(:]/i;
+            if (!TITLE_GATE.test(pr.title || '')) {
+              core.info(`PR title does not match a11y gate; skipping.`);
+              return;
+            }
+
+            const body = pr.body || '';
+            const refRegex = /^A11y-Audit-Ref:\s+([\w.-]+)\s*$/gim;
+            const slugs = [...body.matchAll(refRegex)].map((m) => m[1]);
+
+            const manifestPath = path.join(process.env.GITHUB_WORKSPACE, 'scripts/a11y/manifest.yml');
+            let manifest = [];
+            try {
+              const loaded = yaml.load(fs.readFileSync(manifestPath, 'utf8'));
+              manifest = Array.isArray(loaded) ? loaded : [];
+            } catch (err) {
+              core.warning(`Manifest unreadable at ${manifestPath}: ${err.message}. Falling back to umbrella label only.`);
+            }
+            const bySlug = new Map(manifest.map((entry) => [entry.slug, entry]));
+
+            const states = slugs.map((slug) => {
+              const entry = bySlug.get(slug);
+              if (!entry) return { slug, status: 'broken-ref' };
+              if (entry.bucket == null) return { slug, status: 'needs-categorization', entry };
+              return { slug, status: 'resolved', entry };
+            });
+
+            const desired = new Set(['a11y']);
+            const resolved = states.filter((s) => s.status === 'resolved');
+            const maxBucket = resolved.reduce((max, s) => Math.max(max, s.entry.bucket), 0);
+            if (maxBucket > 0) desired.add(`a11y:bucket-${maxBucket}`);
+            for (const s of resolved) desired.add(`a11y:sc-${s.entry.sc}`);
+            if (resolved.some((s) => s.entry.scope === 'cloud-only')) desired.add('a11y:scope-cloud');
+            if (states.some((s) => s.status === 'needs-categorization')) desired.add('a11y:needs-categorization');
+            if (states.some((s) => s.status === 'broken-ref')) desired.add('a11y:broken-ref');
+            if (slugs.length === 0) desired.add('a11y:no-fix-doc');
+
+            const LABEL_PALETTE = {
+              'a11y': { color: '5319e7', description: 'Accessibility audit PR' },
+              'a11y:bucket-1': { color: '2ea043', description: 'Bucket 1: design-mergeable, CSS / tokens' },
+              'a11y:bucket-2': { color: 'a4d65e', description: 'Bucket 2: design-mergeable, HTML / ARIA' },
+              'a11y:bucket-3': { color: 'fbca04', description: 'Bucket 3: engineer required' },
+              'a11y:bucket-4': { color: 'd93f0b', description: 'Bucket 4: engineer + product' },
+              'a11y:scope-cloud': { color: '1d76db', description: 'Cloud-only a11y fix' },
+              'a11y:needs-categorization': { color: 'fef2c0', description: 'Audit team: set bucket on referenced entry' },
+              'a11y:broken-ref': { color: 'b60205', description: 'A11y-Audit-Ref slug not in manifest' },
+              'a11y:no-fix-doc': { color: 'fef2c0', description: 'No A11y-Audit-Ref line; audit team triage' },
+            };
+
+            async function ensureLabel(name) {
+              const meta = LABEL_PALETTE[name] || { color: 'cccccc', description: '' };
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name, color: meta.color, description: meta.description });
+              } catch (err) {
+                if (err.status !== 422) throw err;
+              }
+            }
+
+            const desiredArr = [...desired];
+            for (const name of desiredArr) {
+              if (LABEL_PALETTE[name] || /^a11y:sc-\d+\.\d+\.\d+$/.test(name)) {
+                await ensureLabel(name);
+              }
+            }
+
+            const currentLabels = (
+              await github.rest.issues.listLabelsOnIssue({ owner, repo, issue_number })
+            ).data.map((l) => l.name);
+
+            const currentA11y = currentLabels.filter((l) => l === 'a11y' || l.startsWith('a11y:'));
+            const toRemove = currentA11y.filter((l) => !desired.has(l));
+            const toAdd = desiredArr.filter((l) => !currentLabels.includes(l));
+
+            for (const name of toRemove) {
+              await github.rest.issues
+                .removeLabel({ owner, repo, issue_number, name })
+                .catch((err) => {
+                  if (err.status !== 404) throw err;
+                });
+            }
+            if (toAdd.length > 0) {
+              await github.rest.issues.addLabels({ owner, repo, issue_number, labels: toAdd });
+            }
+
+            const failureLabels = ['a11y:needs-categorization', 'a11y:broken-ref', 'a11y:no-fix-doc'];
+            const triggered = desiredArr.filter((l) => failureLabels.includes(l));
+
+            const BOT_MARKER = '<!-- a11y-triage-bot -->';
+
+            async function findBotComment() {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number,
+                per_page: 100,
+              });
+              return comments.find((c) => c.body && c.body.startsWith(BOT_MARKER));
+            }
+
+            const existingComment = await findBotComment();
+
+            if (triggered.length === 0) {
+              if (existingComment) {
+                await github.rest.issues.deleteComment({ owner, repo, comment_id: existingComment.id });
+              }
+              core.info('Triage complete. No failure-mode labels.');
+              return;
+            }
+
+            const lines = [BOT_MARKER, '## Accessibility triage', ''];
+
+            const brokenRefs = states.filter((s) => s.status === 'broken-ref').map((s) => s.slug);
+            const needsCat = states.filter((s) => s.status === 'needs-categorization').map((s) => s.slug);
+
+            if (slugs.length === 0) {
+              lines.push(
+                '**No `A11y-Audit-Ref:` lines found in the PR body.** If this PR closes an audit fix doc, add an `A11y-Audit-Ref: <slug>` line (one per fix doc). If this is a net-new accessibility finding not yet covered by the audit, coordinate with the audit team via `#team-feux` so they can add a manifest entry.',
+              );
+            }
+            if (brokenRefs.length > 0) {
+              lines.push('', '**Unknown slugs in manifest:**');
+              for (const slug of brokenRefs) lines.push(`- \`${slug}\``);
+              lines.push(
+                '',
+                'Either the slug is misspelled, or the entry has not been authored yet. Audit team: add the entry to `scripts/a11y/manifest.yml` (or correct the slug here).',
+              );
+            }
+            if (needsCat.length > 0) {
+              lines.push('', '**Entries missing a `bucket` value:**');
+              for (const slug of needsCat) lines.push(`- \`${slug}\``);
+              lines.push('', 'Audit team: assign a bucket (1-4) in `scripts/a11y/manifest.yml`.');
+            }
+            lines.push('', '---', '', '<sub>See [DT-4048](https://temporalio.atlassian.net/browse/DT-4048) for the triage system design.</sub>');
+
+            const body_md = lines.join('\n');
+            if (existingComment) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existingComment.id, body: body_md });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body: body_md });
+            }

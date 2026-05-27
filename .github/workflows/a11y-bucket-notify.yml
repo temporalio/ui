@@ -1,0 +1,65 @@
+# Security review notes:
+# - The only event-derived strings used in payloads are PR title, URL, number,
+#   author, and label name. They are exposed via env: vars (PR_TITLE, etc.)
+#   and referenced as ${{ env.* }} in the YAML payload literal -- mirrors the
+#   sibling design-feedback-notify.yml workflow's pattern.
+# - The author_association guard restricts Slack pings to MEMBER /
+#   COLLABORATOR PRs, matching the sibling workflow's policy of not pinging
+#   on external-contributor labels.
+# - No shell `run:` interpolation of untrusted strings.
+name: A11y Bucket Slack Notification
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  notify:
+    if: >-
+      (github.event.label.name == 'a11y:bucket-3' || github.event.label.name == 'a11y:bucket-4') &&
+      contains(fromJSON('["MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BUCKET: ${{ github.event.label.name }}
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: "${{ vars.DESIGN_FEEDBACK_SLACK_CHANNEL }}"
+            text: "A11y review needed (${{ env.BUCKET }}): ${{ env.PR_TITLE }}"
+            blocks:
+              - type: header
+                text:
+                  type: plain_text
+                  text: "Accessibility PR needs engineer review"
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "*<${{ env.PR_URL }}|#${{ env.PR_NUMBER }}: ${{ env.PR_TITLE }}>*"
+              - type: section
+                fields:
+                  - type: mrkdwn
+                    text: "*Bucket:*\n${{ env.BUCKET }}"
+                  - type: mrkdwn
+                    text: "*Author:*\n${{ env.PR_AUTHOR }}"
+                  - type: mrkdwn
+                    text: "*Repository:*\n${{ github.repository }}"
+              - type: actions
+                elements:
+                  - type: button
+                    text:
+                      type: plain_text
+                      text: "View PR"
+                    style: primary
+                    url: "${{ env.PR_URL }}"
