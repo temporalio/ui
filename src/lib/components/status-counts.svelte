@@ -42,7 +42,7 @@
     fetchCounts?: (opts: {
       namespace: string;
       query: string;
-    }) => Promise<CountWorkflowExecutionsResponse>;
+    }) => Promise<Required<CountWorkflowExecutionsResponse>>;
     getStatusAndCount?: (
       groups: CountWorkflowExecutionsResponse['groups'],
     ) => StatusCount[];

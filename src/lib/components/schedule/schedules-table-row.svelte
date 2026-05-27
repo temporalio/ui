@@ -46,12 +46,12 @@
     );
   };
 
-  const route = $derived(
-    routeForSchedule({
+  const route = $derived.by(() => {
+    return routeForSchedule({
       namespace,
-      scheduleId: schedule.scheduleId,
-    }),
-  );
+      scheduleId: schedule.scheduleId ?? '',
+    });
+  });
 </script>
 
 <tr class="max-h-32">
@@ -81,26 +81,39 @@
       <TableCellWithFilterOrCopyButtons
         class="cell whitespace-pre-line break-words"
         filterIconTitle={translate('common.filter-workflows')}
-        copyValue={workflowTypeName}
-        onFilter={() => goto(filterRoute)}
+        copyValue={workflowTypeName ?? undefined}
+        onFilter={() => {
+          if (filterRoute) {
+            goto(filterRoute);
+          }
+        }}
       >
-        <Link href={filterRoute}>
+        {#if filterRoute}
+          <Link href={filterRoute}>
+            {workflowTypeName}
+          </Link>
+        {:else}
           {workflowTypeName}
-        </Link>
+        {/if}
       </TableCellWithFilterOrCopyButtons>
     {:else if label === translate('schedules.recent-runs')}
       <td class="cell truncate">
-        {#each sortRecentActions(schedule?.info?.recentActions) as run (run.actualTime)}
+        {#each sortRecentActions(schedule?.info?.recentActions ?? []) as run (run?.actualTime)}
+          {@const startWorkflowResult = run?.startWorkflowResult}
           <p>
-            <Link
-              href={routeForWorkflow({
-                namespace,
-                workflow: run?.startWorkflowResult?.workflowId,
-                run: run?.startWorkflowResult?.runId,
-              })}
-            >
+            {#if startWorkflowResult && startWorkflowResult.workflowId && startWorkflowResult.runId}
+              <Link
+                href={routeForWorkflow({
+                  namespace,
+                  workflow: startWorkflowResult.workflowId,
+                  run: startWorkflowResult.runId,
+                })}
+              >
+                <Timestamp dateTime={run.actualTime} />
+              </Link>
+            {:else}
               <Timestamp dateTime={run.actualTime} />
-            </Link>
+            {/if}
           </p>
         {/each}
       </td>
@@ -112,7 +125,9 @@
       </td>
     {:else if label === translate('schedules.schedule-spec')}
       <td class="cell">
-        <ScheduleFrequency {spec} />
+        {#if spec}}
+          <ScheduleFrequency {spec} />
+        {/if}
       </td>
     {:else}
       <td class="cell">

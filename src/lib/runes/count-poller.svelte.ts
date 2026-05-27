@@ -54,8 +54,8 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
       opts.getStore().update((s) => ({ ...s, count }));
       setRefresh();
       opts.onInitialFetch?.(count, response);
-    } catch (e) {
-      console.error('Initial count fetch failed', e?.message);
+    } catch (e: unknown) {
+      console.error('Initial count fetch failed', e);
     } finally {
       loading = false;
     }
@@ -70,8 +70,8 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
       opts.getStore().update((s) => ({ ...s, newCount }));
       setRefresh();
       opts.onPollFetch?.(newCount, response);
-    } catch (e) {
-      console.error('Polling count fetch failed', e?.message);
+    } catch (e: unknown) {
+      console.error('Polling count fetch failed', e);
     } finally {
       attempt += 1;
     }
