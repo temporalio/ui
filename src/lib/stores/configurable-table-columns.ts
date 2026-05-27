@@ -41,6 +41,7 @@ export const TABLE_TYPE = {
   WORKFLOWS: 'workflows',
   SCHEDULES: 'schedules',
   ACTIVITIES: 'activities',
+  NEXUS_OPERATIONS: 'nexus-operations',
 } as const;
 
 type Keys = keyof typeof TABLE_TYPE;
@@ -137,6 +138,22 @@ export const ActivityHeaderLabels = [
 
 export type ActivityHeaderLabel = (typeof ActivityHeaderLabels)[number];
 
+export const NexusOperationHeaderLabels = [
+  'Operation ID',
+  'Run ID',
+  'Endpoint',
+  'Service',
+  'Operation',
+  'Status',
+  'Schedule Time',
+  'Close Time',
+  'Execution Duration',
+  'State Transitions',
+] as const;
+
+export type NexusOperationHeaderLabel =
+  (typeof NexusOperationHeaderLabels)[number];
+
 export const DEFAULT_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Status' },
   { label: 'Activity ID' },
@@ -148,6 +165,22 @@ export const DEFAULT_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
 
 const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Run ID' },
+  { label: 'Execution Duration' },
+  { label: 'State Transitions' },
+];
+
+export const DEFAULT_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Status' },
+  { label: 'Operation ID' },
+  { label: 'Endpoint' },
+  { label: 'Service' },
+  { label: 'Operation' },
+  { label: 'Schedule Time' },
+];
+
+const DEFAULT_AVAILABLE_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Run ID' },
+  { label: 'Close Time' },
   { label: 'Execution Duration' },
   { label: 'State Transitions' },
 ];
@@ -167,6 +200,11 @@ export const persistedActivitiesTableColumns = persistStore<State>(
   {},
 );
 
+export const persistedNexusOperationsTableColumns = persistStore<State>(
+  'namespace-nexus-operations-table-columns',
+  {},
+);
+
 export const configurableTableColumns: Readable<TableColumns> = derived(
   [
     namespaces,
@@ -174,6 +212,7 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
     persistedWorkflowTableColumns,
     persistedSchedulesTableColumns,
     persistedActivitiesTableColumns,
+    persistedNexusOperationsTableColumns,
   ],
   ([
     $namespaces,
@@ -181,6 +220,7 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
     $persistedWorkflowTableColumns,
     $persistedSchedulesTableColumns,
     $persistedActivitiesTableColumns,
+    $persistedNexusOperationsTableColumns,
   ]) => {
     const state: TableColumns = {};
     const useOrAddDefaultTableColumnsToNamespace = (
@@ -211,6 +251,11 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
         $persistedActivitiesTableColumns,
         namespace,
         DEFAULT_ACTIVITIES_COLUMNS,
+      ),
+      'nexus-operations': useOrAddDefaultTableColumnsToNamespace(
+        $persistedNexusOperationsTableColumns,
+        namespace,
+        DEFAULT_NEXUS_OPERATIONS_COLUMNS,
       ),
     });
 
@@ -280,6 +325,21 @@ export const availableActivityColumns: (
     ),
   );
 
+export const availableNexusOperationColumns: (
+  namespace: string,
+) => Readable<ConfigurableTableHeader[]> = (namespace) =>
+  derived(configurableTableColumns, ($configurableTableColumns) =>
+    [
+      ...DEFAULT_NEXUS_OPERATIONS_COLUMNS,
+      ...DEFAULT_AVAILABLE_NEXUS_OPERATIONS_COLUMNS,
+    ].filter(
+      (header) =>
+        !$configurableTableColumns[namespace]?.['nexus-operations']?.some(
+          (column) => column.label === header.label,
+        ),
+    ),
+  );
+
 export const availableCustomSearchAttributeColumns: (
   namespace: string,
   table?: ConfigurableTableType,
@@ -310,6 +370,8 @@ const getDefaultColumns = (table: ConfigurableTableType) => {
       return DEFAULT_SCHEDULES_COLUMNS;
     case TABLE_TYPE.ACTIVITIES:
       return DEFAULT_ACTIVITIES_COLUMNS;
+    case TABLE_TYPE.NEXUS_OPERATIONS:
+      return DEFAULT_NEXUS_OPERATIONS_COLUMNS;
   }
 };
 
@@ -359,6 +421,8 @@ const getPersistedColumns = (table: ConfigurableTableType): Writable<State> => {
       return persistedSchedulesTableColumns;
     case TABLE_TYPE.ACTIVITIES:
       return persistedActivitiesTableColumns;
+    case TABLE_TYPE.NEXUS_OPERATIONS:
+      return persistedNexusOperationsTableColumns;
   }
 };
 
