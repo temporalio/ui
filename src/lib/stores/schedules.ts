@@ -264,6 +264,11 @@ export const submitEditSchedule = async (
   }
 };
 
+export const schedulesRefresh = writable(0);
+
 export const loading = writable(false);
 export const error = writable('');
-export const schedulesCount = writable('0');
+export const schedulesCount = writable({
+  count: 0,
+  newCount: 0,
+});
