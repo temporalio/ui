@@ -8,6 +8,7 @@ interface CountPollerOptions<T> {
   transform: (response: T) => number;
   getStore: () => Writable<{ count: number; newCount: number }>;
   disabled?: () => boolean;
+  /** Reads inside this function become reactive dependencies — when they change, the poller resets from the initial fetch. */
   watch?: () => void;
   onInitialFetch?: (count: number, response: T) => void;
   onPollFetch?: (newCount: number, response: T) => void;
