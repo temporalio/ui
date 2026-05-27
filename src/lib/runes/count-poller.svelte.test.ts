@@ -134,7 +134,7 @@ describe('createCountPoller', () => {
 
       expect(console.error).toHaveBeenCalledWith(
         'Initial count fetch failed',
-        error.message,
+        error,
       );
       expect(get(store).count).toBe(0);
       expect(onInitialFetch).not.toHaveBeenCalled();
@@ -163,7 +163,7 @@ describe('createCountPoller', () => {
 
       expect(console.error).toHaveBeenCalledWith(
         'Polling count fetch failed',
-        pollError.message,
+        pollError,
       );
       expect(get(store)).toEqual({ count: 4, newCount: 0 });
     });
