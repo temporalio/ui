@@ -177,9 +177,7 @@ test('it should filter by HistoryLength (number)', async ({ page }) => {
     .fill('10');
   await page.getByTestId('apply-filter-button').click();
 
-  await expect
-    .poll(() => getQueryParam(page.url()))
-    .toBe('`HistoryLength`="10"');
+  await expect.poll(() => getQueryParam(page.url())).toBe('`HistoryLength`=10');
 });
 
 test('it should combine filters and then clear them all', async ({ page }) => {

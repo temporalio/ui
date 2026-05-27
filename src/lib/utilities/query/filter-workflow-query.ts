@@ -59,6 +59,12 @@ const formatValue = ({
   ) {
     return value;
   }
+  if (
+    type === SEARCH_ATTRIBUTE_TYPE.INT ||
+    type === SEARCH_ATTRIBUTE_TYPE.DOUBLE
+  ) {
+    return value;
+  }
   return `"${value}"`;
 };
 
