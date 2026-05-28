@@ -1,4 +1,3 @@
-import { SvelteDate } from 'svelte/reactivity';
 import { get, type Writable } from 'svelte/store';
 
 import { getExponentialBackoff } from '$lib/utilities/refresh-rate';
