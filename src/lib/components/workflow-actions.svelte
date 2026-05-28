@@ -9,6 +9,7 @@
   import TerminateConfirmationModal from '$lib/components/workflow/client-actions/terminate-confirmation-modal.svelte';
   import UnpauseConfirmationModal from '$lib/components/workflow/client-actions/unpause-confirmation-modal.svelte';
   import UpdateConfirmationModal from '$lib/components/workflow/client-actions/update-confirmation-modal.svelte';
+  import { dismissedWorkflowCommonErrors } from '$lib/components/workflow/workflow-common-errors.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
   import MenuButton from '$lib/holocene/menu/menu-button.svelte';
@@ -31,7 +32,6 @@
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowUpdateEnabled } from '$lib/utilities/workflow-update-enabled';
-
   interface Props {
     workflow: WorkflowExecution;
     namespace: string;
@@ -245,6 +245,17 @@
   </MenuItem>
 {/snippet}
 
+{#snippet showWorkflowCommonErrors()}
+  {#if $dismissedWorkflowCommonErrors}
+    <MenuItem
+      onclick={() => ($dismissedWorkflowCommonErrors = false)}
+      data-testid="show-common-errors-button"
+    >
+      {translate('workflows.show-common-errors')}
+    </MenuItem>
+  {/if}
+{/snippet}
+
 {#snippet runningWorkflowActions()}
   {#each workflowActions as { onClick, destructive, label, enabled, testId, description } (label)}
     {#if destructive}
@@ -262,10 +273,12 @@
   {/each}
   <MenuDivider />
   {@render startWorkflow()}
+  {@render showWorkflowCommonErrors()}
 {/snippet}
 
 {#snippet worklfowActions()}
   {@render startWorkflow()}
+  {@render showWorkflowCommonErrors()}
   {#if terminateEnabled && next}
     <MenuDivider />
     <MenuItem
