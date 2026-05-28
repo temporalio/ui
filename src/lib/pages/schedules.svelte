@@ -6,6 +6,7 @@
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -38,7 +39,7 @@
   const { namespace } = $derived(page.params);
   const query = $derived(page.url.searchParams.get('query') ?? '');
 
-  const _countPoller = createCountPoller({
+  const countPoller = createCountPoller({
     getStore: () => schedulesCount,
     fetch: () => fetchScheduleCount({ namespace, query }),
     transform: (countStr) => parseInt(countStr ?? '0', 10),
@@ -48,6 +49,9 @@
       void $schedulesRefresh;
     },
   });
+
+  const refreshTime = $derived(new Date(countPoller.refreshTime));
+  const refreshTimeFormatted = $derived($timestamp(refreshTime));
 
   const coreUser = coreUserStore();
   let customizationDrawerOpen = $state(false);
@@ -85,40 +89,54 @@
   const showFilters = $derived($schedulesCount.count > 0 || query);
 </script>
 
-<div class="flex flex-col gap-4">
-  <div
-    class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
-  >
-    <div class="flex flex-wrap items-center gap-6">
-      <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-        {translate('common.schedules-plural', {
-          count: $schedulesCount.count,
-        })}
-      </h1>
-      <CountRefreshButton
-        count={$schedulesCount.newCount}
-        refresh={schedulesRefresh}
-      />
+<header class="flex flex-col gap-2">
+  <div class="flex flex-col justify-between gap-2 md:flex-row">
+    <div class="flex flex-row flex-wrap items-start gap-2">
+      <div>
+        <div class="flex flex-row flex-wrap items-start gap-2">
+          <h1
+            class="flex items-center gap-2 leading-7"
+            data-cy="schedules-title"
+          >
+            <span data-testid="schedule-count"
+              >{$schedulesCount.count.toLocaleString()}</span
+            >
+            {translate('common.schedules-plural', {
+              count: $schedulesCount.count,
+            })}
+          </h1>
+          <CountRefreshButton
+            count={$schedulesCount.newCount}
+            refresh={schedulesRefresh}
+          />
+        </div>
+        <p class="mt-2 text-xs text-secondary">
+          {refreshTimeFormatted}
+        </p>
+      </div>
     </div>
     {#if !createDisabled}
-      <Button
-        data-testid="create-schedule"
-        href={routeForScheduleCreate({ namespace })}
-        disabled={!writeActionsAreAllowed()}
-      >
-        {translate('schedules.create')}
-      </Button>
+      <div class="flex items-center gap-4">
+        <Button
+          data-testid="create-schedule"
+          href={routeForScheduleCreate({ namespace })}
+          disabled={!writeActionsAreAllowed()}
+        >
+          {translate('schedules.create')}
+        </Button>
+      </div>
     {/if}
   </div>
-  {#if showFilters}
-    <FilterBar
-      filters={scheduleFilters}
-      options={$scheduleSearchAttributeOptions}
-      searchAttributes={$scheduleSearchAttributes}
-      id="schedules"
-    />
-  {/if}
-</div>
+</header>
+
+{#if showFilters}
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
+  />
+{/if}
 
 {#key [namespace, query, $schedulesRefresh]}
   <PaginatedTable
