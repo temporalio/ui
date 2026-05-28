@@ -163,7 +163,7 @@ export const Strings = {
   'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
   'workflow-error-no-compatible-workers-description':
     'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
-  'dismiss-common-errors': 'Dismiss common errors',
+  'dismiss-common-errors': 'Dismiss Common Errors',
   'state-transitions': 'State Transitions',
   'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
