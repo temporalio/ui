@@ -6,6 +6,9 @@
 #   event payload.
 # - All write operations (labels, comments) go through the github-script-bound
 #   Octokit, never through shell.
+# - The Slack notification step receives PR title / URL / author via step
+#   outputs that came from JS context, then re-exposed via env: vars. No shell
+#   interpolation of untrusted strings.
 name: A11y PR Triage
 
 on:
@@ -38,6 +41,7 @@ jobs:
         run: npm install --no-save --no-audit --no-fund --silent js-yaml@^4
 
       - name: Triage and label
+        id: triage
         uses: actions/github-script@v7
         with:
           script: |
@@ -149,6 +153,43 @@ jobs:
               await github.rest.issues.addLabels({ owner, repo, issue_number, labels: toAdd });
             }
 
+            // Slack notification gating. The previous bucket-notify-via-labeled-event
+            // design didn't work because GITHUB_TOKEN-triggered events don't fire
+            // downstream workflows (GitHub's recursion-prevention rule). We inline
+            // the ping here and dedup via a hidden bot comment so trailer-edit
+            // cycles don't double-ping.
+            const PING_BUCKETS = ['a11y:bucket-3', 'a11y:bucket-4'];
+            const newlyAddedBucket = toAdd.find((l) => PING_BUCKETS.includes(l));
+
+            if (newlyAddedBucket) {
+              const NOTIFY_MARKER_PREFIX = '<!-- a11y-bucket-notify-fired:';
+              const allComments = await github.paginate(github.rest.issues.listComments, {
+                owner, repo, issue_number, per_page: 100,
+              });
+              const marker = allComments.find((c) => c.body && c.body.startsWith(NOTIFY_MARKER_PREFIX));
+              let lastPinged = '';
+              if (marker) {
+                const m = marker.body.match(/<!-- a11y-bucket-notify-fired: (a11y:bucket-[34]) -->/);
+                if (m) lastPinged = m[1];
+              }
+              if (lastPinged === newlyAddedBucket) {
+                core.info(`Already pinged Slack for ${newlyAddedBucket}; skipping.`);
+              } else {
+                const newBody = `<!-- a11y-bucket-notify-fired: ${newlyAddedBucket} -->\n<sub>Slack notification dedup marker (DT-4048).</sub>`;
+                if (marker) {
+                  await github.rest.issues.updateComment({ owner, repo, comment_id: marker.id, body: newBody });
+                } else {
+                  await github.rest.issues.createComment({ owner, repo, issue_number, body: newBody });
+                }
+                core.setOutput('ping_bucket', newlyAddedBucket);
+                core.setOutput('pr_title', pr.title || '');
+                core.setOutput('pr_url', pr.html_url || '');
+                core.setOutput('pr_number', String(pr.number));
+                core.setOutput('pr_author', (pr.user && pr.user.login) || '');
+                core.setOutput('author_association', pr.author_association || '');
+              }
+            }
+
             const failureLabels = ['a11y:needs-categorization', 'a11y:broken-ref', 'a11y:no-fix-doc'];
             const triggered = desiredArr.filter((l) => failureLabels.includes(l));
 
@@ -205,3 +246,46 @@ jobs:
             } else {
               await github.rest.issues.createComment({ owner, repo, issue_number, body: body_md });
             }
+
+      - name: Notify Slack (Bucket-3/4)
+        if: >-
+          steps.triage.outputs.ping_bucket != '' &&
+          contains(fromJSON('["MEMBER","COLLABORATOR","OWNER"]'), steps.triage.outputs.author_association)
+        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        env:
+          PR_TITLE: ${{ steps.triage.outputs.pr_title }}
+          PR_URL: ${{ steps.triage.outputs.pr_url }}
+          PR_NUMBER: ${{ steps.triage.outputs.pr_number }}
+          PR_AUTHOR: ${{ steps.triage.outputs.pr_author }}
+          BUCKET: ${{ steps.triage.outputs.ping_bucket }}
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: "${{ vars.DESIGN_FEEDBACK_SLACK_CHANNEL }}"
+            text: "A11y review needed (${{ env.BUCKET }}): ${{ env.PR_TITLE }}"
+            blocks:
+              - type: header
+                text:
+                  type: plain_text
+                  text: "Accessibility PR needs engineer review"
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "*<${{ env.PR_URL }}|#${{ env.PR_NUMBER }}: ${{ env.PR_TITLE }}>*"
+              - type: section
+                fields:
+                  - type: mrkdwn
+                    text: "*Bucket:*\n${{ env.BUCKET }}"
+                  - type: mrkdwn
+                    text: "*Author:*\n${{ env.PR_AUTHOR }}"
+                  - type: mrkdwn
+                    text: "*Repository:*\n${{ github.repository }}"
+              - type: actions
+                elements:
+                  - type: button
+                    text:
+                      type: plain_text
+                      text: "View PR"
+                    style: primary
+                    url: "${{ env.PR_URL }}"
