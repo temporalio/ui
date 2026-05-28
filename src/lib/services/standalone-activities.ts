@@ -62,7 +62,6 @@ export const fetchPaginatedActivities = async (
       },
       request,
       onError,
-      handleError: onError,
     }).then((response) => {
       const { executions = [], nextPageToken = '' } = response || {};
       return {
@@ -79,7 +78,7 @@ const toStartActivityExecutionRequest = async (
   let inputPayloads: Payload[] | null = null;
   let summaryPayload: Payload | null = null;
   let detailsPayload: Payload | null = null;
-  let searchAttributes: SearchAttribute | null = null;
+  let searchAttributes: SearchAttribute | undefined = undefined;
 
   if (activityFormData.input) {
     const { input, encoding, messageType } = activityFormData;

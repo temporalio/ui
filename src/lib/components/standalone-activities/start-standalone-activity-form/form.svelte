@@ -31,7 +31,7 @@
   } from '$lib/services/standalone-activities';
   import {
     customSearchAttributes,
-    type SearchAttributeInput,
+    type SearchAttributesSchema,
   } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import {
@@ -72,7 +72,7 @@
 
   const encoding = writable<PayloadInputEncoding>('json/plain');
 
-  let searchAttributes = $state<SearchAttributeInput[]>([]);
+  let searchAttributes = $state<SearchAttributesSchema>([]);
   let taskQueueActive = $state<boolean | null>(null);
   let advancedOptionsVisible = $state(false);
 
@@ -98,9 +98,9 @@
       details: z.string().optional(),
       scheduleToStartTimeout: z.string().optional(),
       heartbeatTimeout: z.string().optional(),
-      initialInterval: z.string().optional(),
+      initialInterval: z.string().default(''),
       backoffCoefficient: z.number().optional().nullable(),
-      maximumInterval: z.string().optional(),
+      maximumInterval: z.string().default(''),
       maximumAttempts: z.number().optional().nullable(),
       idReusePolicy: z.string().optional(),
       idConflictPolicy: z.string().optional(),
@@ -130,9 +130,9 @@
       details: '',
       heartbeatTimeout: '',
       initialInterval: '',
-      backoffCoefficient: undefined,
+      backoffCoefficient: null,
       maximumInterval: '',
-      maximumAttempts: undefined,
+      maximumAttempts: null,
       idReusePolicy: '',
       idConflictPolicy: '',
     },
@@ -147,7 +147,7 @@
 
         try {
           const { runId } = await startStandaloneActivity({
-            ...form.data,
+            ...(form.data as StandaloneActivityFormData),
             searchAttributes,
           });
           toaster.push({
@@ -203,7 +203,7 @@
           label: key,
           value,
           type: customAttrs[key],
-        })) as SearchAttributeInput[];
+        })) as SearchAttributesSchema;
       searchAttributes = [...searchAttributes, ...newAttrs];
     }
 

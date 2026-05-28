@@ -1,5 +1,5 @@
 import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
-import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
 export interface StandaloneActivityFormData {
   identity: string;
@@ -13,7 +13,7 @@ export interface StandaloneActivityFormData {
   input: string;
   encoding: PayloadInputEncoding;
   messageType: string;
-  searchAttributes: SearchAttributeInput[];
+  searchAttributes: SearchAttributesSchema;
   summary: string;
   details: string;
   // retry policy
