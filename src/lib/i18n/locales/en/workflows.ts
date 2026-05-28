@@ -358,5 +358,5 @@ export const Strings = {
   sdk: 'Workflow SDK',
   'show-common-errors': 'Show Common Errors',
   'show-common-errors-description':
-    'Show Common Errors if present in the Workflow History',
+    'Show alerts for common errors if present in the Event History',
 } as const;
