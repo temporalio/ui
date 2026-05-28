@@ -20,11 +20,12 @@ test.describe('Creates Schedule Successfully', () => {
     await page.getByTestId('schedule-type-input').fill('test');
     await page.getByTestId('schedule-workflow-id-input').fill('test');
     await page.getByTestId('schedule-task-queue-input').fill('test');
-    await page.getByTestId('interval-tab').click();
-    await page.getByTestId('days-input').fill('1');
-    await page.getByTestId('hour-interval-input').fill('2');
-    await page.getByTestId('minute-interval-input').fill('30');
-    await page.getByTestId('second-interval-input').fill('0');
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
+    await page.getByTestId('days-0').fill('1');
+    await page.getByTestId('hour-0').fill('2');
+    await page.getByTestId('minute-0').fill('30');
+    await page.getByTestId('second-0').fill('0');
 
     const createButton = page.getByTestId('create-schedule-button');
     await expect(createButton).toBeEnabled();
@@ -40,11 +41,12 @@ test.describe('Creates Schedule Successfully', () => {
     await page.getByTestId('schedule-type-input').fill('test');
     await page.getByTestId('schedule-workflow-id-input').fill('test');
     await page.getByTestId('schedule-task-queue-input').fill('test');
-    await page.getByTestId('interval-tab').click();
-    await page.getByTestId('days-input').fill('1');
-    await page.getByTestId('hour-interval-input').fill('2');
-    await page.getByTestId('minute-interval-input').fill('30');
-    await page.getByTestId('second-interval-input').fill('0');
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
+    await page.getByTestId('days-0').fill('1');
+    await page.getByTestId('hour-0').fill('2');
+    await page.getByTestId('minute-0').fill('30');
+    await page.getByTestId('second-0').fill('0');
 
     await page.getByTestId('workflows-tab').click();
     const workflowsTab = page.getByTestId('workflows-panel');
@@ -74,7 +76,9 @@ test.describe('Creates Schedule Successfully', () => {
       scheduleTab.getByTestId('search-attribute-select-button'),
     ).toBeEnabled();
     await scheduleTab.getByTestId('search-attribute-select-button').click();
-
+    await expect(
+      scheduleTab.getByRole('option', { name: 'attributeTwo' }),
+    ).toBeVisible();
     await scheduleTab.getByRole('option', { name: 'attributeTwo' }).click();
     await scheduleTab
       .getByTestId('custom-search-attribute-value')

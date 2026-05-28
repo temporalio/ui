@@ -97,6 +97,22 @@
 
   let validationError = $state('');
 
+  // The search attribute inputs edit rows in place (e.g. selecting an
+  // attribute or typing a value). Those deep mutations propagate through
+  // Svelte's reactive proxies but never reach superForm's `$form` store, so
+  // binding the inputs directly to `$form` would drop every edit that isn't a
+  // whole-array add/remove. Bridge through local $state proxies and sync the
+  // snapshots back to `$form` so the changes are committed before submit.
+  let scheduleSearchAttributes = $state($form.searchAttributes);
+  let workflowSearchAttributes = $state($form.workflowSearchAttributes);
+
+  $effect(() => {
+    $form.searchAttributes = $state.snapshot(scheduleSearchAttributes);
+  });
+  $effect(() => {
+    $form.workflowSearchAttributes = $state.snapshot(workflowSearchAttributes);
+  });
+
   const onInput = () => {
     if ($error) {
       $error = '';
@@ -126,8 +142,8 @@
           <SchedulePoliciesCard {form} />
 
           <SchedulesSearchAttributesInputs
-            bind:scheduleSearchAttributes={$form.searchAttributes}
-            bind:workflowSearchAttributes={$form.workflowSearchAttributes}
+            bind:scheduleSearchAttributes
+            bind:workflowSearchAttributes
           />
 
           <Alert

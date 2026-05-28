@@ -35,6 +35,8 @@ test.describe('Schedules Page', () => {
       .locator('#schedule-payload-input')
       .getByRole('textbox')
       .fill('abc');
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
     await page.getByRole('textbox', { name: 'hrs' }).fill('1');
     const createSchedule = page.getByRole('button', {
       name: 'Create Schedule',

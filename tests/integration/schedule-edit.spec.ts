@@ -104,7 +104,7 @@ test.describe('Schedules List with schedules', () => {
       .getByRole('textbox');
     await expect(payloadInput).toContainText('"message"');
 
-    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
 
     await expect(payloadInput).toContainText('"message"');
     expect(pageErrors.map(({ message }) => message).join('\n')).not.toContain(
@@ -125,7 +125,7 @@ test.describe('Schedules List with schedules', () => {
     await expect(payloadInput).toContainText('"hello"');
     await expect(page.getByText('Input must be valid JSON')).toBeHidden();
 
-    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
 
     await expect(payloadInput).toContainText('"hello"');
     await expect(page.getByText('Input must be valid JSON')).toBeHidden();
