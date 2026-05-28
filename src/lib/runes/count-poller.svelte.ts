@@ -24,7 +24,7 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
 
   let attempt = 1;
   let loading = $state(false);
-  const refreshTime = new SvelteDate();
+  let refreshTime = $state(0);
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   const clearTimer = () => {
@@ -40,7 +40,7 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
 
   function setRefresh() {
     const now = Date.now();
-    refreshTime.setTime(now);
+    refreshTime = now;
     opts.onRefresh?.(now);
   }
 

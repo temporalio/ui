@@ -104,7 +104,7 @@
   });
 
   $effect(function propagateRefreshTimeChange() {
-    refreshTime = countPoller.refreshTime;
+    refreshTime = new Date(countPoller.refreshTime);
   });
 
   const onStatusClick = (status: Status) => {
