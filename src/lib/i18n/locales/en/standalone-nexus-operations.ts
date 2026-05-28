@@ -23,4 +23,18 @@ export const Strings = {
   'empty-state-title': 'No Nexus Operations Found',
   'empty-state-description': 'No nexus operations match the current filters.',
   'nexus-operations-table': 'Standalone Nexus Operations Table',
+  'empty-state-no-data-title':
+    "This namespace doesn't have any Standalone Nexus Operations yet.",
+  'empty-state-value-proposition':
+    'Standalone Nexus Operations can call any Temporal-hosted endpoint from existing code using a simple SDK client call - no need to set up a Workflow or run a worker. Get all the durable execution benefits like automatic retries, timeouts, and at-least-once execution guarantees out of the box.',
+  'empty-state-read-docs-prefix': 'Read the',
+  'empty-state-nexus-docs-link': 'Nexus Docs',
+  'empty-state-read-docs-middle': 'and check out the',
+  'empty-state-nexus-eval-guide-link': 'Nexus Evaluation Guide',
+  'empty-state-read-docs-suffix':
+    'to learn how Nexus can fit into your operations.',
+  'empty-state-code-samples-title':
+    'Explore code samples for Standalone Nexus Operations',
+  'start-standalone-nexus-operation': 'Start a Standalone Nexus Operation',
+  'custom-views': 'Custom Views',
 } as const;
