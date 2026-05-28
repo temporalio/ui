@@ -41,6 +41,22 @@
         },
       ]
     >;
+    menuButton?: Snippet<
+      [
+        {
+          open: boolean;
+          onClick: () => void;
+        },
+      ]
+    >;
+    linksContent?: Snippet<
+      [
+        {
+          open: boolean;
+          closeMenu: () => void;
+        },
+      ]
+    >;
     profilePicture?: Snippet;
     class?: ClassNameValue;
   }
@@ -53,6 +69,8 @@
     children,
     nsPicker,
     centerButton,
+    menuButton,
+    linksContent,
     profilePicture,
     class: className = '',
   }: Props = $props();
@@ -130,7 +148,9 @@
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
   >
-    {#if viewLinks}
+    {#if linksContent}
+      {@render linksContent({ open: viewLinks, closeMenu })}
+    {:else}
       <div
         class="flex h-full flex-col-reverse justify-start gap-6 overflow-auto px-4 py-8"
       >
@@ -159,19 +179,23 @@
   data-testid="top-nav"
   aria-label={translate('common.main')}
 >
-  <button
-    class="nav-button relative"
-    data-testid="nav-menu-button"
-    class:active-shadow={viewLinks}
-    type="button"
-    onclick={onLinksClick}
-  >
-    {#if viewLinks}
-      <Icon name="close" height={32} width={32} />
-    {:else}
-      <Logo height={32} width={32} />
-    {/if}
-  </button>
+  {#if menuButton}
+    {@render menuButton({ open: viewLinks, onClick: onLinksClick })}
+  {:else}
+    <button
+      class="nav-button relative"
+      data-testid="nav-menu-button"
+      class:active-shadow={viewLinks}
+      type="button"
+      onclick={onLinksClick}
+    >
+      {#if viewLinks}
+        <Icon name="close" height={32} width={32} />
+      {:else}
+        <Logo height={32} width={32} />
+      {/if}
+    </button>
+  {/if}
   {#if showNamespacePicker}
     {#if centerButton}
       {@render centerButton({
