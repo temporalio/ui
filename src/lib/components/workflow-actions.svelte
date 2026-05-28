@@ -250,6 +250,7 @@
     <MenuItem
       onclick={() => ($dismissedWorkflowCommonErrors = false)}
       data-testid="show-common-errors-button"
+      description={translate('workflows.show-common-errors-description')}
     >
       {translate('workflows.show-common-errors')}
     </MenuItem>

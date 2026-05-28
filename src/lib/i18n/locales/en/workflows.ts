@@ -357,4 +357,6 @@ export const Strings = {
     'History Size does not include externally stored payload size.',
   sdk: 'Workflow SDK',
   'show-common-errors': 'Show Common Errors',
+  'show-common-errors-description':
+    'Show Common Errors if present in the Workflow History',
 } as const;
