@@ -45,7 +45,10 @@
   } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  import type { StandaloneActivityFormDefaults } from './types';
+  import type {
+    StandaloneActivityFormData,
+    StandaloneActivityFormDefaults,
+  } from './types';
   import Message from '../../form/message.svelte';
   import PayloadInputWithEncoding from '../../payload-input-with-encoding.svelte';
   import RetryPolicyInput from '../../retry-policy-input.svelte';
