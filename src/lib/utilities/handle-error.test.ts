@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { handleError } from './handle-error';
+import { handleError, handleUnauthorizedError } from './handle-error';
 import { routeForLoginPage } from './route-for';
 
 const realLocation = window.location.assign;
@@ -42,7 +42,7 @@ describe('handleError', () => {
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
-  it('should redirect if it is a forbidden error with status', () => {
+  it('should NOT redirect if it is a forbidden error with statusCode', () => {
     const error = {
       statusCode: 403,
       statusText: 'Forbidden',
@@ -50,10 +50,10 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
-  it('should redirect if it is a forbidden error with statusCode', () => {
+  it('should NOT redirect if it is a forbidden error with status', () => {
     const error = {
       status: 403,
       statusText: 'Forbidden',
@@ -61,7 +61,7 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
   it('should not redirect if not 401/403', () => {
@@ -119,5 +119,26 @@ describe('handleError', () => {
       variant: 'error',
       message: 'lol',
     });
+  });
+});
+
+describe('handleUnauthorizedError', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', { value: fakeLocation });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'location', { value: realLocation });
+    vi.clearAllMocks();
+  });
+
+  it('redirects on 401', () => {
+    handleUnauthorizedError({ statusCode: 401, statusText: 'Unauthorized' });
+    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+  });
+
+  it('does NOT redirect on 403', () => {
+    handleUnauthorizedError({ statusCode: 403, statusText: 'Forbidden' });
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 });

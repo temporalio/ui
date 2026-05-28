@@ -37,9 +37,8 @@ export const handleError = (
     window.location.assign(routeForLoginPage());
   }
 
-  if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
-  }
+  // 403 (Forbidden) is an authorization failure, not a session failure.
+  // Let it propagate to the caller's error UI instead of redirecting to login.
 
   if (isNetworkError(error)) {
     toasts.push({
@@ -53,7 +52,7 @@ export const handleError = (
   throw error;
 };
 
-export const handleUnauthorizedOrForbiddenError = (
+export const handleUnauthorizedError = (
   error: APIErrorResponse,
   isBrowser = BROWSER,
 ): void => {
@@ -62,11 +61,13 @@ export const handleUnauthorizedOrForbiddenError = (
     return;
   }
 
-  if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
-    return;
-  }
+  // 403 (Forbidden) intentionally falls through with no redirect.
 };
+
+/**
+ * @deprecated Use `handleUnauthorizedError`. 403 should not log the user out.
+ */
+export const handleUnauthorizedOrForbiddenError = handleUnauthorizedError;
 
 export const isUnauthorized = (error: unknown): error is TemporalAPIError => {
   return hasStatusCode(error, 401);
