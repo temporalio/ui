@@ -48,8 +48,10 @@
       )}
       {@render Info(
         translate('schedules.overlap-policy'),
-        fromScreamingEnum(policies?.overlapPolicy, 'ScheduleOverlapPolicy') ??
-          translate('common.none'),
+        String(
+          fromScreamingEnum(policies?.overlapPolicy, 'ScheduleOverlapPolicy') ??
+            translate('common.none'),
+        ),
       )}
     </div>
     <div class="flex items-center gap-4">
@@ -69,16 +71,16 @@
     <div class="flex items-center gap-4">
       {@render Info(
         translate('schedules.exclusion-calendar'),
-        spec?.excludeCalendar
+        spec?.excludeStructuredCalendar
           ? (getScheduleSpecLabel({
-              structuredCalendar: spec.excludeCalendar,
+              structuredCalendar: spec.excludeStructuredCalendar,
             }) ?? translate('common.none'))
           : translate('common.none'),
       )}
       {#if state.limitedActions}
         {@render Info(
           translate('schedules.remaining-actions'),
-          state?.remainingActions ?? translate('common.none'),
+          state?.remainingActions?.toString() ?? translate('common.none'),
         )}
       {/if}
       {#if policies?.keepOriginalWorkflowId != null}
