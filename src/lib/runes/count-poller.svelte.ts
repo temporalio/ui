@@ -119,6 +119,7 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
     get loading() {
       return loading;
     },
+    /** Timestamp of the most recent full fetch. Not updated by poll fetches. */
     get refreshTime() {
       return refreshTime;
     },
