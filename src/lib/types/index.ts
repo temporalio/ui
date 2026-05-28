@@ -20,7 +20,7 @@ export type Capabilities =
 export type NamespaceCapabilities = NonNullable<
   NonNullable<DescribeNamespaceResponse['namespaceInfo']>['capabilities']
 > & {
-  standaloneNexusOperations?: boolean | null;
+  standaloneNexusOperation?: boolean | null;
 };
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
