@@ -349,7 +349,7 @@ describe('decodeEventAttributes', () => {
     );
 
     expect(mockFetch).toBeCalledWith(
-      expect.any(URL),
+      expect.any(String),
       expect.not.objectContaining({ credentials: 'same-origin' }),
     );
   });
@@ -369,7 +369,7 @@ describe('decodeEventAttributes', () => {
     );
 
     expect(mockFetch).toBeCalledWith(
-      expect.any(URL),
+      expect.any(String),
       expect.objectContaining({ credentials: 'include' }),
     );
   });
