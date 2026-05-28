@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
+  import { get, writable } from 'svelte/store';
 
   import { onDestroy, onMount } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
@@ -25,8 +25,14 @@
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
   import { getActivityPollers } from '$lib/services/pollers-service';
-  import { startStandaloneActivity } from '$lib/services/standalone-activities';
-  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+  import {
+    fetchInitialValuesForStartActivity,
+    startStandaloneActivity,
+  } from '$lib/services/standalone-activities';
+  import {
+    customSearchAttributes,
+    type SearchAttributeInput,
+  } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import {
     activityIDConflictPolicyOptions,
@@ -169,8 +175,44 @@
     $form.encoding = e;
   });
 
-  onMount(() => {
+  onMount(async () => {
     checkTaskQueue(taskQueueParam);
+
+    const activityIdParam = page.url.searchParams.get('activityId') ?? '';
+    const runIdParam = page.url.searchParams.get('runId') ?? '';
+
+    if (!activityIdParam || !runIdParam) return;
+
+    const initialValues = await fetchInitialValuesForStartActivity(
+      namespace,
+      activityIdParam,
+      runIdParam,
+    );
+
+    $form.input = initialValues.input;
+    encoding.set(initialValues.encoding);
+    $form.messageType = initialValues.messageType;
+    $form.summary = initialValues.summary;
+    $form.details = initialValues.details;
+
+    if (initialValues.searchAttributes) {
+      const customAttrs = get(customSearchAttributes);
+      const newAttrs = Object.entries(initialValues.searchAttributes)
+        .filter(([key]) => key in customAttrs)
+        .map(([key, value]) => ({
+          label: key,
+          value,
+          type: customAttrs[key],
+        })) as SearchAttributeInput[];
+      searchAttributes = [...searchAttributes, ...newAttrs];
+    }
+
+    const hasAdvancedData =
+      Object.keys(initialValues.searchAttributes ?? {}).length > 0 ||
+      !!initialValues.summary ||
+      !!initialValues.details;
+
+    advancedOptionsVisible = advancedOptionsVisible || hasAdvancedData;
   });
 
   onDestroy(() => {

@@ -69,6 +69,7 @@
             routeForStartStandaloneActivity({
               namespace,
               activityId: activityExecutionInfo.activityId,
+              runId: activityExecutionInfo.runId,
               activityType: activityExecutionInfo.activityType.name,
               taskQueue: activityExecutionInfo.taskQueue,
               startToCloseTimeout: activityExecutionInfo.startToCloseTimeout,

@@ -1,5 +1,9 @@
 import type { StandaloneActivityFormData } from '$lib/components/standalone-activities/start-standalone-activity-form/types';
 import { translate } from '$lib/i18n/translate';
+import {
+  isPayloadInputEncodingType,
+  type PayloadInputEncoding,
+} from '$lib/models/payload-encoding';
 import { activityError } from '$lib/stores/activities';
 import type { Payload, SearchAttribute } from '$lib/types';
 import type {
@@ -7,6 +11,7 @@ import type {
   ActivityExecutionInfo,
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
+import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
@@ -185,6 +190,94 @@ export const startStandaloneActivity = async (
       body: stringifyWithBigInt(startActivityExecutionRequest),
     },
   });
+};
+
+interface ActivityInputValues {
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
+}
+
+const extractInputValues = async (
+  payloads: Payload[] | null | undefined,
+): Promise<ActivityInputValues> => {
+  const defaults: ActivityInputValues = {
+    input: '',
+    encoding: 'json/plain',
+    messageType: '',
+  };
+
+  const payload = payloads?.[0];
+  if (!payload) return defaults;
+
+  const decoded = await decodePayloadAndParseDataToJSON(payload, false);
+  if (!decoded) return defaults;
+
+  const encodingValue = decoded.metadata?.encoding;
+  return {
+    input: decoded.data ? stringifyWithBigInt(decoded.data) : '',
+    encoding:
+      encodingValue && isPayloadInputEncodingType(encodingValue)
+        ? encodingValue
+        : 'json/plain',
+    messageType: decoded.metadata?.messageType ?? '',
+  };
+};
+
+const extractMetadataString = async (
+  payload: Payload | null | undefined,
+): Promise<string> => {
+  if (!payload) return '';
+  const decoded = await decodePayloadAndParseDataToJSON(payload);
+  return typeof decoded === 'string' ? decoded : '';
+};
+
+export interface ActivityInitialValues {
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
+  summary: string;
+  details: string;
+  searchAttributes: Record<string, string | Payload> | undefined;
+}
+
+export const fetchInitialValuesForStartActivity = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+): Promise<ActivityInitialValues> => {
+  const emptyValues: ActivityInitialValues = {
+    input: '',
+    encoding: 'json/plain',
+    messageType: '',
+    summary: '',
+    details: '',
+    searchAttributes: undefined,
+  };
+
+  try {
+    const activity = await getActivityExecution(namespace, activityId, runId);
+    const { input, encoding, messageType } = await extractInputValues(
+      activity.input?.payloads,
+    );
+    const summary = await extractMetadataString(
+      activity.info.userMetadata?.summary,
+    );
+    const details = await extractMetadataString(
+      activity.info.userMetadata?.details,
+    );
+
+    return {
+      input,
+      encoding,
+      messageType,
+      summary,
+      details,
+      searchAttributes: activity.info.searchAttributes?.indexedFields,
+    };
+  } catch {
+    return emptyValues;
+  }
 };
 
 export const getActivityExecutions = (namespace: string) => {
