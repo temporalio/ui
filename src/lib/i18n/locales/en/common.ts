@@ -126,6 +126,7 @@ export const Strings = {
   type: 'Type',
   disabled: 'Disabled',
   enabled: 'Enabled',
+  dismiss: 'Dismiss',
   primary: 'Primary',
   previous: 'Previous',
   next: 'Next',

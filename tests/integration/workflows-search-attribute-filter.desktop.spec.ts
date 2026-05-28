@@ -163,9 +163,7 @@ test('it should filter by HistoryLength (number)', async ({ page }) => {
     .fill('10');
   await page.getByTestId('apply-filter-button').click();
 
-  await expect
-    .poll(() => getQueryParam(page.url()))
-    .toBe('`HistoryLength`="10"');
+  await expect.poll(() => getQueryParam(page.url())).toBe('`HistoryLength`=10');
 });
 
 test('it should combine filters', async ({ page }) => {
@@ -188,7 +186,7 @@ test('it should combine filters', async ({ page }) => {
 
   await expect
     .poll(() => getQueryParam(page.url()))
-    .toBe('`ExecutionStatus`="Completed" AND `HistoryLength`="10"');
+    .toBe('`ExecutionStatus`="Completed" AND `HistoryLength`=10');
 
   await page.getByTestId('add-filter-button').click();
   await page.getByRole('menuitem', { name: 'WorkflowType Keyword' }).click();
@@ -202,7 +200,7 @@ test('it should combine filters', async ({ page }) => {
   await expect
     .poll(() => getQueryParam(page.url()))
     .toBe(
-      '`ExecutionStatus`="Completed" AND `HistoryLength`="10" AND `WorkflowType`="ExampleWorkflow"',
+      '`ExecutionStatus`="Completed" AND `HistoryLength`=10 AND `WorkflowType`="ExampleWorkflow"',
     );
 });
 
@@ -226,7 +224,7 @@ test('it should combine filters and then clear them all', async ({ page }) => {
 
   await expect
     .poll(() => getQueryParam(page.url()))
-    .toBe('`ExecutionStatus`="Completed" AND `HistoryLength`="10"');
+    .toBe('`ExecutionStatus`="Completed" AND `HistoryLength`=10');
 
   await page.getByTestId('add-filter-button').click();
   await page.getByRole('menuitem', { name: 'WorkflowType Keyword' }).click();
@@ -240,7 +238,7 @@ test('it should combine filters and then clear them all', async ({ page }) => {
   await expect
     .poll(() => getQueryParam(page.url()))
     .toBe(
-      '`ExecutionStatus`="Completed" AND `HistoryLength`="10" AND `WorkflowType`="ExampleWorkflow"',
+      '`ExecutionStatus`="Completed" AND `HistoryLength`=10 AND `WorkflowType`="ExampleWorkflow"',
     );
 
   await page.getByTestId('clear-all-filters-button').click();
