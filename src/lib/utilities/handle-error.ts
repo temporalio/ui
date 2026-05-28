@@ -60,7 +60,6 @@ export const handleUnauthorizedError = (
     window.location.assign(routeForLoginPage());
     return;
   }
-
   // 403 (Forbidden) intentionally falls through with no redirect.
 };
 
