@@ -7,15 +7,15 @@ export interface StandaloneActivityFormData {
   activityId: string;
   taskQueue: string;
   activityType: string;
-  startToCloseTimeout: string;
-  scheduleToCloseTimeout: string;
-  scheduleToStartTimeout: string;
-  input: string;
+  startToCloseTimeout: string | undefined;
+  scheduleToCloseTimeout: string | undefined;
+  scheduleToStartTimeout: string | undefined;
+  input: string | undefined;
   encoding: PayloadInputEncoding;
-  messageType: string;
+  messageType: string | undefined;
   searchAttributes: SearchAttributesSchema;
-  summary: string;
-  details: string;
+  summary: string | undefined;
+  details: string | undefined;
   // retry policy
   initialInterval: string;
   backoffCoefficient: number | null | undefined;
