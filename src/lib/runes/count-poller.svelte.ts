@@ -68,7 +68,6 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
 
       const newCount = opts.transform(response) - get(opts.getStore()).count;
       opts.getStore().update((s) => ({ ...s, newCount }));
-      setRefresh();
       opts.onPollFetch?.(newCount, response);
     } catch (e: unknown) {
       console.error('Polling count fetch failed', e);
