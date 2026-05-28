@@ -33,6 +33,14 @@
         },
       ]
     >;
+    centerButton?: Snippet<
+      [
+        {
+          open: boolean;
+          onClick: () => void;
+        },
+      ]
+    >;
     profilePicture?: Snippet;
     class?: ClassNameValue;
   }
@@ -44,6 +52,7 @@
     showNamespacePicker = true,
     children,
     nsPicker,
+    centerButton,
     profilePicture,
     class: className = '',
   }: Props = $props();
@@ -164,24 +173,31 @@
     {/if}
   </button>
   {#if showNamespacePicker}
-    <div class="namespace-wrapper">
-      <Button
-        variant="ghost"
-        data-testid="namespace-switcher"
-        leadingIcon="namespace-switcher"
-        size="xs"
-        class="grow text-white"
-        on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
-      >
-      <div class="ml-1 h-full w-1 border-l border-subtle"></div>
-      <Button
-        variant="ghost"
-        size="xs"
-        href={routeForNamespace({ namespace })}
-        disabled={!namespaceExists}
-        ><Icon class="text-white" name="external-link" /></Button
-      >
-    </div>
+    {#if centerButton}
+      {@render centerButton({
+        open: viewNamespaces,
+        onClick: onNamespaceClick,
+      })}
+    {:else}
+      <div class="namespace-wrapper">
+        <Button
+          variant="ghost"
+          data-testid="namespace-switcher"
+          leadingIcon="namespace-switcher"
+          size="xs"
+          class="grow text-white"
+          on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+        >
+        <div class="ml-1 h-full w-1 border-l border-subtle"></div>
+        <Button
+          variant="ghost"
+          size="xs"
+          href={routeForNamespace({ namespace })}
+          disabled={!namespaceExists}
+          ><Icon class="text-white" name="external-link" /></Button
+        >
+      </div>
+    {/if}
   {/if}
   <button
     class="nav-button"
