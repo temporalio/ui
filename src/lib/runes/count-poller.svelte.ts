@@ -24,7 +24,7 @@ export function createCountPoller<T>(opts: CountPollerOptions<T>) {
 
   let attempt = 1;
   let loading = $state(false);
-  let refreshTime = $state(0);
+  let refreshTime = $state(Date.now());
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
   const clearTimer = () => {
