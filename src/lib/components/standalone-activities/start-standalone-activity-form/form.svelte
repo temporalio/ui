@@ -150,7 +150,7 @@
 
         try {
           const { runId } = await startStandaloneActivity({
-            ...(form.data as StandaloneActivityFormData),
+            ...(form.data as unknown as StandaloneActivityFormData),
             searchAttributes,
           });
           toaster.push({
