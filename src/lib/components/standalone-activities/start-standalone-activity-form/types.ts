@@ -18,9 +18,9 @@ export interface StandaloneActivityFormData {
   details: string;
   // retry policy
   initialInterval: string;
-  backoffCoefficient: string;
+  backoffCoefficient: number | null | undefined;
   maximumInterval: string;
-  maximumAttempts: string;
+  maximumAttempts: number | null | undefined;
 }
 
 export type StandaloneActivityFormDefaults = Pick<

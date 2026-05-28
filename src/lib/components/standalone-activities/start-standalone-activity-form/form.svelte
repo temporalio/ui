@@ -45,10 +45,7 @@
   } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  import type {
-    StandaloneActivityFormData,
-    StandaloneActivityFormDefaults,
-  } from './types';
+  import type { StandaloneActivityFormDefaults } from './types';
   import Message from '../../form/message.svelte';
   import PayloadInputWithEncoding from '../../payload-input-with-encoding.svelte';
   import RetryPolicyInput from '../../retry-policy-input.svelte';
@@ -92,21 +89,21 @@
       activityType: z.string().min(1, {
         message: translate('standalone-activities.form-activity-type-required'),
       }),
-      input: z.string().optional(),
-      startToCloseTimeout: z.string().optional(),
-      scheduleToCloseTimeout: z.string().optional(),
-      encoding: z.enum(encodings).optional(),
-      messageType: z.string().optional(),
-      summary: z.string().optional(),
-      details: z.string().optional(),
-      scheduleToStartTimeout: z.string().optional(),
-      heartbeatTimeout: z.string().optional(),
+      input: z.string().default(''),
+      startToCloseTimeout: z.string().default(''),
+      scheduleToCloseTimeout: z.string().default(''),
+      encoding: z.enum(encodings).default('json/plain'),
+      messageType: z.string().default(''),
+      summary: z.string().default(''),
+      details: z.string().default(''),
+      scheduleToStartTimeout: z.string().default(''),
+      heartbeatTimeout: z.string().default(''),
       initialInterval: z.string().default(''),
       backoffCoefficient: z.number().optional().nullable(),
       maximumInterval: z.string().default(''),
       maximumAttempts: z.number().optional().nullable(),
-      idReusePolicy: z.string().optional(),
-      idConflictPolicy: z.string().optional(),
+      idReusePolicy: z.string().default(''),
+      idConflictPolicy: z.string().default(''),
     })
     .superRefine((data, context) => {
       if (!data.startToCloseTimeout && !data.scheduleToCloseTimeout) {
@@ -150,7 +147,7 @@
 
         try {
           const { runId } = await startStandaloneActivity({
-            ...(form.data as unknown as StandaloneActivityFormData),
+            ...form.data,
             searchAttributes,
           });
           toaster.push({
@@ -206,7 +203,7 @@
           label: key,
           value,
           type: customAttrs[key],
-        })) as SearchAttributesSchema;
+        }));
       searchAttributes = [...searchAttributes, ...newAttrs];
     }
 
