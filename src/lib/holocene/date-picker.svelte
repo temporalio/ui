@@ -13,6 +13,7 @@
     isAllowed?: (d: Date) => boolean;
     selected?: Date;
     label: string;
+    afterLabel?: Snippet;
     labelIcon?: Snippet;
     labelHidden?: boolean;
     todayLabel: string;
@@ -26,7 +27,7 @@
     isAllowed = () => true,
     selected = $bindable(new Date()),
     label,
-    labelIcon,
+    afterLabel,
     labelHidden = false,
     todayLabel,
     closeLabel,
@@ -90,7 +91,7 @@
   <Input
     id="datepicker"
     {label}
-    {labelIcon}
+    {afterLabel}
     {labelHidden}
     icon="calendar-plus"
     type="text"
