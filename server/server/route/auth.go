@@ -23,6 +23,7 @@
 package route
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -129,8 +130,16 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 		setCallbackCookie(c, "state", state)
 		setCallbackCookie(c, "nonce", nonce)
 
+		codeVerifier, err := randCodeVerifier()
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
+		setCallbackCookie(c, "code_verifier", codeVerifier)
+
 		opts := []oauth2.AuthCodeOption{
 			oidc.Nonce(nonce),
+			oauth2.SetAuthURLParam("code_challenge_method", "S256"),
+			oauth2.SetAuthURLParam("code_challenge", sha256CodeChallenge(codeVerifier)),
 		}
 		for k, v := range options {
 			var value string
@@ -160,6 +169,8 @@ func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc
 		if err != nil {
 			return err
 		}
+
+		clearCookie(c, "code_verifier")
 
 		err = auth.SetUser(c, user)
 		if err != nil {
@@ -257,6 +268,9 @@ func refreshTokens(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.
 func logout() func(echo.Context) error {
 	return func(c echo.Context) error {
 		log.Printf("[Auth] User logout initiated from %s", c.RealIP())
+
+		// Clear PKCE code verifier
+		clearCookie(c, "code_verifier")
 
 		// Clear refresh token cookie
 		clearCookie(c, "refresh")
@@ -362,6 +376,19 @@ func nonceFromString(nonce string) (*Nonce, error) {
 	}
 
 	return &n, nil
+}
+
+func randCodeVerifier() (string, error) {
+	b := securecookie.GenerateRandomKey(32)
+	if b == nil {
+		return "", errors.New("unable to generate PKCE code verifier")
+	}
+	return base64.RawURLEncoding.EncodeToString(b), nil
+}
+
+func sha256CodeChallenge(verifier string) string {
+	h := sha256.Sum256([]byte(verifier))
+	return base64.RawURLEncoding.EncodeToString(h[:])
 }
 
 type Nonce struct {
