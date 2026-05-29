@@ -15,7 +15,7 @@
     id: string;
     value: string;
     label: string;
-    labelIcon?: Snippet;
+    afterLabel?: Snippet;
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
@@ -44,7 +44,7 @@
     id,
     value = $bindable(),
     label,
-    labelIcon,
+    afterLabel,
     labelHidden = false,
     icon = null,
     placeholder = '',
@@ -93,10 +93,16 @@
 </script>
 
 <div class={merge('group flex flex-col gap-1', className)}>
-  <Label {required} hidden={labelHidden} for={id}>
-    <span>label</span>
-    {@render labelIcon?.()}
-  </Label>
+  <div class="flex items-center justify-start gap-1">
+    <Label
+      class="grow-0 gap-[inherit]"
+      {required}
+      {label}
+      hidden={labelHidden}
+      for={id}
+    />
+    {@render afterLabel?.()}
+  </div>
   <div class="input-group flex">
     {@render beforeInput?.({ disabled: isDisabled })}
     <div
