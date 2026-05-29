@@ -57,12 +57,12 @@
     $form.endDate ? new Date($form.endDate) : new Date(),
   );
 
-  const onStartDateChange = (e: CustomEvent<Date>) => {
-    $form.startDate = e.detail.toISOString();
+  const onStartDateChange = (d: Date) => {
+    $form.startDate = d.toISOString();
   };
 
-  const onEndDateChange = (e: CustomEvent<Date>) => {
-    $form.endDate = e.detail.toISOString();
+  const onEndDateChange = (d: Date) => {
+    $form.endDate = d.toISOString();
   };
 </script>
 
@@ -116,7 +116,7 @@
         todayLabel={translate('common.today')}
         closeLabel={translate('common.close')}
         clearLabel={translate('common.clear-input-button-label')}
-        on:datechange={onStartDateChange}
+        onDateChange={onStartDateChange}
         clearable={false}
         required
       />
@@ -145,7 +145,7 @@
           todayLabel={translate('common.today')}
           closeLabel={translate('common.close')}
           clearLabel={translate('common.clear-input-button-label')}
-          on:datechange={onEndDateChange}
+          onDateChange={onEndDateChange}
         />
       </div>
       <div class="grid grid-cols-[theme(spacing.24)_1fr] items-center gap-3">
