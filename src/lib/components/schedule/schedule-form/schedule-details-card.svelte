@@ -68,7 +68,7 @@
 
 <Card class="w-full">
   <h2 class="text-lg font-semibold">Schedule Details</h2>
-  <div class="mt-4 flex flex-col gap-2">
+  <div class="mt-4 flex flex-col gap-4">
     <Input
       id="name"
       bind:value={$form.name}
@@ -104,51 +104,62 @@
       data-testid="schedule-task-queue-input"
       label="Task Queue"
       error={!!errors.taskQueue?.[0]}
-      hintText={errors.taskQueue?.[0]}
+      hintText={errors.taskQueue?.[0] ||
+        'The task queue this schedule should poll.'}
       required
     />
 
-    <DatePicker
-      label="Schedule Start Date"
-      selected={startDateValue}
-      todayLabel={translate('common.today')}
-      closeLabel={translate('common.close')}
-      clearLabel={translate('common.clear-input-button-label')}
-      on:datechange={onStartDateChange}
-    />
+    <div class="max-w-96">
+      <DatePicker
+        label="Schedule Start Date"
+        selected={startDateValue}
+        todayLabel={translate('common.today')}
+        closeLabel={translate('common.close')}
+        clearLabel={translate('common.clear-input-button-label')}
+        on:datechange={onStartDateChange}
+        clearable={false}
+        required
+      />
+    </div>
 
     <RadioGroup
       name="endDateType"
       group={endDateTypeStore}
+      class="flex max-w-96 flex-col gap-1 p-0"
       description="End Date"
     >
-      <RadioInput id="end-date-never" value="never" label="Never" />
-      <div class="flex h-8 items-center gap-3">
-        <RadioInput id="end-date-on" value="on" label="On" />
-        {#if endDateType === 'on'}
-          <DatePicker
-            label="End date"
-            labelHidden
-            selected={endDateValue}
-            todayLabel={translate('common.today')}
-            closeLabel={translate('common.close')}
-            clearLabel={translate('common.clear-input-button-label')}
-            on:datechange={onEndDateChange}
-          />
-        {/if}
+      <div
+        class="grid h-10 grid-cols-[theme(spacing.24)_1fr] items-center gap-3"
+      >
+        <RadioInput id="end-date-never" value="never" label="Never" />
       </div>
-      <div class="flex h-8 items-center gap-3">
+      <div
+        class="grid h-10 grid-cols-[theme(spacing.24)_1fr] items-center gap-3"
+      >
+        <RadioInput id="end-date-on" value="on" label="On" />
+        <DatePicker
+          label="End date"
+          labelHidden
+          disabled={endDateType !== 'on'}
+          selected={endDateValue}
+          todayLabel={translate('common.today')}
+          closeLabel={translate('common.close')}
+          clearLabel={translate('common.clear-input-button-label')}
+          on:datechange={onEndDateChange}
+        />
+      </div>
+      <div class="grid grid-cols-[theme(spacing.24)_1fr] items-center gap-3">
         <RadioInput id="end-date-after" value="after" label="After" />
-        {#if endDateType === 'after'}
-          <NumberInput
-            id="endAfterOccurrences"
-            label="Occurrences"
-            labelHidden
-            bind:value={$form.endAfterOccurrences}
-            placeholder="### occurrences"
-            min={1}
-          />
-        {/if}
+        <NumberInput
+          id="endAfterOccurrences"
+          label="Occurrences"
+          labelHidden
+          bind:value={$form.endAfterOccurrences}
+          placeholder="### occurrences"
+          min={1}
+          disabled={endDateType !== 'after'}
+          class="w-full"
+        />
       </div>
     </RadioGroup>
 

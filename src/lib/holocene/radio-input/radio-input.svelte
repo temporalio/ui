@@ -36,7 +36,7 @@
   const { name, group } = ctx;
 </script>
 
-<div>
+<div class="flex items-center">
   <Label {disabled} class={className}>
     <input
       bind:group={$group}

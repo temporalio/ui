@@ -20,6 +20,8 @@
     closeLabel: string;
     clearLabel: string;
     disabled?: boolean;
+    clearable?: boolean;
+    required?: boolean;
     onDateChange?: (date: Date) => void;
   }
 
@@ -33,6 +35,8 @@
     closeLabel,
     clearLabel,
     disabled = false,
+    clearable = true,
+    required = false,
     onDateChange,
   }: Props = $props();
 
@@ -99,9 +103,10 @@
     oninput={onInput}
     placeholder="MM/DD/YY"
     value={selected.toDateString()}
-    clearable
+    {clearable}
     clearButtonLabel={clearLabel}
     {disabled}
+    {required}
   />
   {#if showDatePicker}
     <div
