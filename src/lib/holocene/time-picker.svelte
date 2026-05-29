@@ -33,7 +33,7 @@
     hideCount
     error={twelveHourClock ? parseInt(hour) > 12 : parseInt(hour) > 23}
     {disabled}
-    on:input={onInput}
+    oninput={onInput}
   />
   <Input
     id="minute"
@@ -46,7 +46,7 @@
     hideCount
     error={Boolean(parseInt(hour) > 59)}
     {disabled}
-    on:input={onInput}
+    oninput={onInput}
   />
   {#if includeSeconds}
     <Input
@@ -60,7 +60,7 @@
       hideCount
       error={Boolean(parseInt(hour) > 59)}
       {disabled}
-      on:input={onInput}
+      oninput={onInput}
     />
   {/if}
   {#if twelveHourClock}

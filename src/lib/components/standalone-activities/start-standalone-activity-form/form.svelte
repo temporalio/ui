@@ -205,14 +205,15 @@
     error={!!$errors?.activityId}
     hintText={$errors?.activityId?.[0]}
   >
-    <Button
-      class="ml-2.5"
-      variant="secondary"
-      slot="after-input"
-      on:click={generateRandomId}
-      leadingIcon="retry"
-      >{translate('standalone-activities.form-random-uuid')}</Button
-    >
+    {#snippet afterInput()}
+      <Button
+        class="ml-2.5"
+        variant="secondary"
+        on:click={generateRandomId}
+        leadingIcon="retry"
+        >{translate('standalone-activities.form-random-uuid')}</Button
+      >
+    {/snippet}
   </Input>
 
   <Input
@@ -222,7 +223,7 @@
     bind:value={$form.taskQueue}
     error={!!$errors.taskQueue}
     hintText={$errors.taskQueue?.[0]}
-    on:blur={() => checkTaskQueue($form.taskQueue)}
+    onblur={() => checkTaskQueue($form.taskQueue)}
   />
   {#if taskQueueActive !== null}
     <Alert

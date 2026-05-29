@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
   import { getMonthName } from '$lib/utilities/calendar';
@@ -11,6 +13,7 @@
     isAllowed?: (d: Date) => boolean;
     selected?: Date;
     label: string;
+    labelIcon?: Snippet;
     labelHidden?: boolean;
     todayLabel: string;
     closeLabel: string;
@@ -23,6 +26,7 @@
     isAllowed = () => true,
     selected = $bindable(new Date()),
     label,
+    labelIcon,
     labelHidden = false,
     todayLabel,
     closeLabel,
@@ -86,11 +90,12 @@
   <Input
     id="datepicker"
     {label}
+    {labelIcon}
     {labelHidden}
     icon="calendar-plus"
     type="text"
-    on:focus={onFocus}
-    on:input={onInput}
+    onfocus={onFocus}
+    oninput={onInput}
     placeholder="MM/DD/YY"
     value={selected.toDateString()}
     clearable

@@ -171,7 +171,7 @@
       required
       maxLength={255}
       bind:value={name}
-      on:input={() => (touched = true)}
+      oninput={() => (touched = true)}
       valid={!touched || nameValid}
       hintText={touched && !nameValid ? nameError() : ''}
       error={touched && !nameValid}
