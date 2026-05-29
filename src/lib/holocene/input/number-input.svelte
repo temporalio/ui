@@ -65,6 +65,7 @@
         {id}
         {name}
         {step}
+        {required}
         {autocomplete}
         spellcheck="false"
         bind:value

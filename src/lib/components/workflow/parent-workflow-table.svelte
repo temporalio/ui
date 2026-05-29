@@ -22,8 +22,8 @@
     >{translate('workflows.parent-workflow')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('workflows.parent-id')}</th>
-    <th>{translate('workflows.parent-run-id')}</th>
+    <th scope="col">{translate('workflows.parent-id')}</th>
+    <th scope="col">{translate('workflows.parent-run-id')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>

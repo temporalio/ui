@@ -20,7 +20,7 @@
     >{translate('schedules.schedule')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('schedules.schedule')}</th>
+    <th scope="col">{translate('schedules.schedule')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>

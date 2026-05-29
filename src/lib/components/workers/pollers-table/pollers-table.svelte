@@ -105,19 +105,19 @@
       >{translate('workers.pollers')}</caption
     >
     <TableHeaderRow slot="headers">
-      <th>{translate('common.id')}</th>
-      <th>{translate('workers.buildId')}</th>
-      <th>{translate('deployments.deployment')}</th>
-      <th class="hidden md:table-cell"
+      <th scope="col">{translate('common.id')}</th>
+      <th scope="col">{translate('workers.buildId')}</th>
+      <th scope="col">{translate('deployments.deployment')}</th>
+      <th scope="col" class="hidden md:table-cell"
         >{translate('workflows.last-accessed')}</th
       >
-      <th class="!text-center xl:w-48">
+      <th scope="col" class="!text-center xl:w-48">
         {translate('workflows.workflow-task-handler')}
       </th>
-      <th class="!text-center xl:w-36">
+      <th scope="col" class="!text-center xl:w-36">
         {translate('workflows.activity-handler')}
       </th>
-      <th class="!text-center xl:w-36">
+      <th scope="col" class="!text-center xl:w-36">
         {translate('workflows.nexus-handler')}
       </th>
     </TableHeaderRow>

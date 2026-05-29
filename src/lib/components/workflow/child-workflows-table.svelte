@@ -60,10 +60,10 @@
       >{translate('workflows.child-workflows')}</caption
     >
     <TableHeaderRow slot="headers">
-      <th class="max-md:hidden">{translate('common.status')}</th>
-      <th class="max-lg:hidden">{translate('common.type')}</th>
-      <th>{translate('workflows.child-id')}</th>
-      <th>{translate('workflows.child-run-id')}</th>
+      <th scope="col" class="max-md:hidden">{translate('common.status')}</th>
+      <th scope="col" class="max-lg:hidden">{translate('common.type')}</th>
+      <th scope="col">{translate('workflows.child-id')}</th>
+      <th scope="col">{translate('workflows.child-run-id')}</th>
     </TableHeaderRow>
     {#each visibleItems as child}
       <TableRow>
