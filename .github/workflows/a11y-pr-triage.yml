@@ -286,4 +286,3 @@ jobs:
             } else {
               await github.rest.issues.createComment({ owner, repo, issue_number, body: body_md });
             }
-
