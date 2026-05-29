@@ -80,3 +80,7 @@ const { form, errors, enhance } = $derived(
 - **Functions**: camelCase
 - **Types**: PascalCase
 - **Use** `import type` for type-only imports
+
+## Accessibility audit follow-up
+
+PRs that close an accessibility audit fix doc are auto-labeled by the `A11y PR Triage` GitHub Action. For PR conventions, label semantics, and audit-team manifest discipline, see the `a11y-pr-review`, `a11y-manifest-discipline`, and `wcag-audit` skills under `.claude/skills/`.
