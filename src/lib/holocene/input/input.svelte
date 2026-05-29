@@ -93,8 +93,14 @@
 </script>
 
 <div class={merge('group flex flex-col gap-1', className)}>
-  <div class="flex items-center justify-start gap-2">
-    <Label class="grow-0" {required} {label} hidden={labelHidden} for={id} />
+  <div class="flex items-center justify-start gap-1">
+    <Label
+      class="grow-0 gap-[inherit]"
+      {required}
+      {label}
+      hidden={labelHidden}
+      for={id}
+    />
     {@render afterLabel?.()}
   </div>
   <div class="input-group flex">
