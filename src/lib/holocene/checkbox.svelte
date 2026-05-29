@@ -153,6 +153,8 @@
           'group-hover:ring-primary/70',
           'peer-focus-visible:ring-2',
           'peer-focus-visible:ring-primary/70',
+          'peer-focus-visible:ring-offset-2',
+          'peer-focus-visible:ring-offset-[var(--color-surface-primary)]',
         ],
         disabled && ['cursor-not-allowed', 'opacity-50'],
         valid ? 'border-secondary' : 'border-danger peer-checked:border-danger',
