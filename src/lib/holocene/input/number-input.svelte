@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { FullAutoFill } from 'svelte/elements';
+
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -20,6 +22,7 @@
   export let min: number = undefined;
   export let step: number = 1;
   export let search = false;
+  export let autocomplete: FullAutoFill = 'off';
 
   let valid = true;
 
@@ -63,7 +66,7 @@
         {name}
         {step}
         {required}
-        autocomplete="off"
+        {autocomplete}
         spellcheck="false"
         bind:value
         on:input

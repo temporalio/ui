@@ -1,12 +1,11 @@
 <script lang="ts">
   import { type Readable, type Writable } from 'svelte/store';
 
-  import { onDestroy } from 'svelte';
-
   import { page } from '$app/state';
 
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
+  import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { fetchWorkflowCountByExecutionStatus } from '$lib/services/workflow-counts';
   import { workflowFilters } from '$lib/stores/filters';
   import { currentPageKey } from '$lib/stores/pagination';
@@ -27,7 +26,6 @@
     combineFilters,
     createFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
-  import { getExponentialBackoff } from '$lib/utilities/refresh-rate';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import WorkflowCountStatus from './workflow-status.svelte';
@@ -44,7 +42,7 @@
     fetchCounts?: (opts: {
       namespace: string;
       query: string;
-    }) => Promise<CountWorkflowExecutionsResponse>;
+    }) => Promise<Required<CountWorkflowExecutionsResponse>>;
     getStatusAndCount?: (
       groups: CountWorkflowExecutionsResponse['groups'],
     ) => StatusCount[];
@@ -71,7 +69,6 @@
 
   let statusGroups: StatusCount[] = $state([]);
   let newStatusGroups: StatusCount[] = $state([]);
-  let refreshInterval: ReturnType<typeof setTimeout>;
 
   const allStatusGroups = $derived(
     newStatusGroups.length > statusGroups.length
@@ -84,11 +81,31 @@
       : statusGroups,
   );
 
-  let attempt = $state(1);
-  let loading = $state(false);
+  const countPoller = createCountPoller({
+    getStore: () => countStore,
+    fetch: () => fetchCounts({ namespace, query }),
+    transform: (response) => parseInt(response.count, 10),
+    disabled: () => $disableRefresh,
+    onInitialFetch(_count, response) {
+      statusGroups = getStatusAndCount(response.groups);
+    },
+    onPollFetch(_newCount, response) {
+      newStatusGroups = getStatusAndCount(response.groups);
+    },
+    onReset() {
+      newStatusGroups = [];
+    },
+    watch() {
+      void namespace;
+      void query;
+      void perPage;
+      void $refresh;
+    },
+  });
 
-  const initialIntervalSeconds = 60;
-  const maxAttempts = 20;
+  $effect(function propagateRefreshTimeChange() {
+    refreshTime = new Date(countPoller.refreshTime);
+  });
 
   const onStatusClick = (status: Status) => {
     const statusExists = $filters.some(
@@ -115,81 +132,11 @@
       });
     }
   };
-
-  const clearNewCounts = () => {
-    clearTimeout(refreshInterval);
-    newStatusGroups = [];
-    $countStore.newCount = 0;
-    attempt = 1;
-  };
-
-  const runFetch = () =>
-    fetchCounts({ namespace, query }).catch(() => ({
-      count: '0',
-      groups: [],
-    }));
-
-  const fetchInitialCounts = async () => {
-    loading = true;
-    try {
-      const { count, groups } = await runFetch();
-      $countStore.count = parseInt(count ?? '0');
-      statusGroups = getStatusAndCount(groups);
-    } finally {
-      refreshTime = new Date();
-      loading = false;
-    }
-  };
-
-  const fetchNewCounts = async () => {
-    try {
-      const { count, groups } = await runFetch();
-      $countStore.newCount = parseInt(count ?? '0') - $countStore.count;
-      newStatusGroups = getStatusAndCount(groups);
-    } finally {
-      refreshTime = new Date();
-      attempt += 1;
-    }
-  };
-
-  const scheduleNext = () => {
-    const intervalSeconds = getExponentialBackoff(
-      initialIntervalSeconds,
-      attempt,
-    );
-    refreshInterval = setTimeout(async () => {
-      await fetchNewCounts();
-      if (!$disableRefresh && attempt <= maxAttempts) {
-        scheduleNext();
-      }
-    }, intervalSeconds);
-  };
-
-  const scheduleFirst = async () => {
-    clearNewCounts();
-    await fetchInitialCounts();
-    if (!$disableRefresh) {
-      scheduleNext();
-    }
-  };
-
-  $effect(() => {
-    void namespace;
-    void query;
-    void perPage;
-    void $refresh;
-
-    scheduleFirst();
-  });
-
-  onDestroy(() => {
-    clearNewCounts();
-  });
 </script>
 
 <div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
   {#each allStatusGroups as { count, status } (status)}
-    {#if !loading}
+    {#if !countPoller.loading}
       {@const group = newStatusGroups.find((g) => g.status === status)}
       <button onclick={() => onStatusClick(status)}>
         <WorkflowCountStatus

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
+  import { get, writable } from 'svelte/store';
 
   import { onDestroy, onMount } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
@@ -25,8 +25,14 @@
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
   import { getActivityPollers } from '$lib/services/pollers-service';
-  import { startStandaloneActivity } from '$lib/services/standalone-activities';
-  import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+  import {
+    fetchInitialValuesForStartActivity,
+    startStandaloneActivity,
+  } from '$lib/services/standalone-activities';
+  import {
+    customSearchAttributes,
+    type SearchAttributesSchema,
+  } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import {
     activityIDConflictPolicyOptions,
@@ -66,7 +72,7 @@
 
   const encoding = writable<PayloadInputEncoding>('json/plain');
 
-  let searchAttributes = $state<SearchAttributeInput[]>([]);
+  let searchAttributes = $state<SearchAttributesSchema>([]);
   let taskQueueActive = $state<boolean | null>(null);
   let advancedOptionsVisible = $state(false);
 
@@ -86,15 +92,15 @@
       input: z.string().optional(),
       startToCloseTimeout: z.string().optional(),
       scheduleToCloseTimeout: z.string().optional(),
-      encoding: z.enum(encodings).optional(),
+      encoding: z.enum(encodings).default('json/plain'),
       messageType: z.string().optional(),
       summary: z.string().optional(),
       details: z.string().optional(),
       scheduleToStartTimeout: z.string().optional(),
       heartbeatTimeout: z.string().optional(),
-      initialInterval: z.string().optional(),
+      initialInterval: z.string().default(''),
       backoffCoefficient: z.number().optional().nullable(),
-      maximumInterval: z.string().optional(),
+      maximumInterval: z.string().default(''),
       maximumAttempts: z.number().optional().nullable(),
       idReusePolicy: z.string().optional(),
       idConflictPolicy: z.string().optional(),
@@ -124,9 +130,9 @@
       details: '',
       heartbeatTimeout: '',
       initialInterval: '',
-      backoffCoefficient: undefined,
+      backoffCoefficient: null,
       maximumInterval: '',
-      maximumAttempts: undefined,
+      maximumAttempts: null,
       idReusePolicy: '',
       idConflictPolicy: '',
     },
@@ -169,8 +175,44 @@
     $form.encoding = e;
   });
 
-  onMount(() => {
+  onMount(async () => {
     checkTaskQueue(taskQueueParam);
+
+    const activityIdParam = page.url.searchParams.get('activityId') ?? '';
+    const runIdParam = page.url.searchParams.get('runId') ?? '';
+
+    if (!activityIdParam || !runIdParam) return;
+
+    const initialValues = await fetchInitialValuesForStartActivity(
+      namespace,
+      activityIdParam,
+      runIdParam,
+    );
+
+    $form.input = initialValues.input;
+    encoding.set(initialValues.encoding);
+    $form.messageType = initialValues.messageType;
+    $form.summary = initialValues.summary;
+    $form.details = initialValues.details;
+
+    if (initialValues.searchAttributes) {
+      const customAttrs = get(customSearchAttributes);
+      const newAttrs = Object.entries(initialValues.searchAttributes)
+        .filter(([key]) => key in customAttrs)
+        .map(([key, value]) => ({
+          label: key,
+          value,
+          type: customAttrs[key],
+        }));
+      searchAttributes = [...searchAttributes, ...newAttrs];
+    }
+
+    const hasAdvancedData =
+      Object.keys(initialValues.searchAttributes ?? {}).length > 0 ||
+      !!initialValues.summary ||
+      !!initialValues.details;
+
+    advancedOptionsVisible = advancedOptionsVisible || hasAdvancedData;
   });
 
   onDestroy(() => {
