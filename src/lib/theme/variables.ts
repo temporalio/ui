@@ -183,8 +183,8 @@ export const variables = {
     dark: 'slate.700',
   },
   '--color-border-subtle': {
-    light: 'slate.200',
-    dark: 'slate.800',
+    light: 'slate.400',
+    dark: 'slate.500',
   },
   '--color-border-table': {
     light: 'space-black',
