@@ -31,7 +31,7 @@ export const fetchPaginatedDeployments = async (
     const route = routeForApi('worker-deployments', { namespace });
     return requestFromAPI<ListWorkerDeploymentsResponse>(route, {
       params: {
-        maximumPageSize: String(pageSize),
+        pageSize: String(pageSize),
         nextPageToken: token,
         ...(query ? { query } : {}),
       },

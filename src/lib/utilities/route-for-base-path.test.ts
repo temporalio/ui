@@ -426,6 +426,26 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     },
   );
 
+  it.each(prefixedCases)(
+    '%s should insert prefix between base and route without altering the rest',
+    (_name, fn) => {
+      initCoreProvider({
+        getAccessToken: async () => '',
+        getRoutePrefix: () => '',
+      });
+      const unprefixed = fn();
+      if (unprefixed === undefined) return;
+
+      initCoreProvider({
+        getAccessToken: async () => '',
+        getRoutePrefix: () => prefix,
+      });
+      const prefixed = fn();
+
+      expect(prefixed).toBe(`${base}${prefix}${unprefixed.slice(base.length)}`);
+    },
+  );
+
   it.each(authCases)(
     '%s should NOT include prefix (auth routes excluded)',
     (_name, fn) => {

@@ -12,17 +12,16 @@
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import type { NamespaceListItem, NavLinkItem } from '$lib/types/global';
+  import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
   import ziggy from '$lib/vendor/ziggy-full-face.png';
 
-  import BottomNavLinks from './bottom-nav-links.svelte';
   import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
   import BottomNavSettings from './bottom-nav-settings.svelte';
 
   interface Props {
     namespaceList?: NamespaceListItem[];
-    sections: NavLinkItem[][];
+    linksSnippet: Snippet;
     isCloud?: boolean;
     showNamespacePicker?: boolean;
     children?: Snippet;
@@ -64,7 +63,7 @@
 
   let {
     namespaceList = [],
-    sections,
+    linksSnippet,
     isCloud = false,
     showNamespacePicker = true,
     children,
@@ -149,10 +148,16 @@
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
   >
-    {#if linksContent}
-      {@render linksContent({ open: viewLinks, closeMenu })}
-    {:else}
-      <BottomNavLinks open={viewLinks} {sections} />
+    {#if viewLinks}
+      {#if linksContent}
+        {@render linksContent({ open: viewLinks, closeMenu })}
+      {:else}
+        <div
+          class="flex h-full flex-col-reverse justify-start gap-6 overflow-auto px-4 py-8"
+        >
+          {@render linksSnippet?.()}
+        </div>
+      {/if}
     {/if}
     {#if nsPicker}
       {@render nsPicker({ open: viewNamespaces, closeMenu })}
