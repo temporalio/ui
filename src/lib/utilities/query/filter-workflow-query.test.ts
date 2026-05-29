@@ -302,6 +302,36 @@ describe('toListWorkflowQueryFromFilters', () => {
     expect(query).toBe('`CustomIntField` is null');
   });
 
+  it('should quote ExecutionDuration Go duration strings', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionDuration',
+        type: 'Int',
+        conditional: '>=',
+        operator: '',
+        parenthesis: '',
+        value: '30s',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`ExecutionDuration`>="30s"');
+  });
+
+  it('should not quote ExecutionDuration nanosecond integers', () => {
+    const filters = [
+      {
+        attribute: 'ExecutionDuration',
+        type: 'Int',
+        conditional: '>=',
+        operator: '',
+        parenthesis: '',
+        value: '30000000000',
+      },
+    ];
+    const query = toListWorkflowQueryFromFilters(filters);
+    expect(query).toBe('`ExecutionDuration`>=30000000000');
+  });
+
   it('should convert a KeywordList filter', () => {
     const filters = [
       {
