@@ -40,9 +40,12 @@ jobs:
       - name: Install js-yaml
         run: npm install --no-save --no-audit --no-fund --silent js-yaml@^4
 
-      - name: Triage and label
+      - name: Triage, label, and notify
         id: triage
         uses: actions/github-script@v7
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ vars.DESIGN_FEEDBACK_SLACK_CHANNEL }}
         with:
           script: |
             const fs = require('fs');
@@ -162,31 +165,68 @@ jobs:
             const newlyAddedBucket = toAdd.find((l) => PING_BUCKETS.includes(l));
 
             if (newlyAddedBucket) {
-              const NOTIFY_MARKER_PREFIX = '<!-- a11y-bucket-notify-fired:';
-              const allComments = await github.paginate(github.rest.issues.listComments, {
-                owner, repo, issue_number, per_page: 100,
-              });
-              const marker = allComments.find((c) => c.body && c.body.startsWith(NOTIFY_MARKER_PREFIX));
-              let lastPinged = '';
-              if (marker) {
-                const m = marker.body.match(/<!-- a11y-bucket-notify-fired: (a11y:bucket-[34]) -->/);
-                if (m) lastPinged = m[1];
-              }
-              if (lastPinged === newlyAddedBucket) {
-                core.info(`Already pinged Slack for ${newlyAddedBucket}; skipping.`);
-              } else {
-                const newBody = `<!-- a11y-bucket-notify-fired: ${newlyAddedBucket} -->\n<sub>Slack notification dedup marker (DT-4048).</sub>`;
+              try {
+                const NOTIFY_MARKER_PREFIX = '<!-- a11y-bucket-notify-fired:';
+                const allComments = await github.paginate(github.rest.issues.listComments, {
+                  owner, repo, issue_number, per_page: 100,
+                });
+                const marker = allComments.find((c) => c.body && c.body.startsWith(NOTIFY_MARKER_PREFIX));
+                let lastPinged = '';
                 if (marker) {
-                  await github.rest.issues.updateComment({ owner, repo, comment_id: marker.id, body: newBody });
-                } else {
-                  await github.rest.issues.createComment({ owner, repo, issue_number, body: newBody });
+                  const m = marker.body.match(/<!-- a11y-bucket-notify-fired: (a11y:bucket-[34]) -->/);
+                  if (m) lastPinged = m[1];
                 }
-                core.setOutput('ping_bucket', newlyAddedBucket);
-                core.setOutput('pr_title', pr.title || '');
-                core.setOutput('pr_url', pr.html_url || '');
-                core.setOutput('pr_number', String(pr.number));
-                core.setOutput('pr_author', (pr.user && pr.user.login) || '');
-                core.setOutput('author_association', pr.author_association || '');
+                if (lastPinged === newlyAddedBucket) {
+                  core.info(`Already pinged Slack for ${newlyAddedBucket}; skipping.`);
+                } else {
+                  const newBody = `<!-- a11y-bucket-notify-fired: ${newlyAddedBucket} -->\n<sub>Slack notification dedup marker (DT-4048).</sub>`;
+                  if (marker) {
+                    await github.rest.issues.updateComment({ owner, repo, comment_id: marker.id, body: newBody });
+                  } else {
+                    await github.rest.issues.createComment({ owner, repo, issue_number, body: newBody });
+                  }
+                  // CONTRIBUTOR is included because GITHUB_TOKEN-issued lookups
+                  // return CONTRIBUTOR for org members with private membership
+                  // (whose membership visibility isn't visible to repo-scope
+                  // tokens). All four values represent "authorized author."
+                  const ALLOWED_ASSOC = ['MEMBER', 'COLLABORATOR', 'OWNER', 'CONTRIBUTOR'];
+                  if (!ALLOWED_ASSOC.includes(pr.author_association)) {
+                    core.info(`Skipping Slack ping: author_association ${pr.author_association} not in allowed list.`);
+                  } else {
+                    const slackPayload = {
+                      channel: process.env.SLACK_CHANNEL,
+                      text: `A11y review needed (${newlyAddedBucket}): ${pr.title}`,
+                      blocks: [
+                        { type: 'header', text: { type: 'plain_text', text: 'Accessibility PR needs engineer review' } },
+                        { type: 'section', text: { type: 'mrkdwn', text: `*<${pr.html_url}|#${pr.number}: ${pr.title}>*` } },
+                        { type: 'section', fields: [
+                          { type: 'mrkdwn', text: `*Bucket:*\n${newlyAddedBucket}` },
+                          { type: 'mrkdwn', text: `*Author:*\n${(pr.user && pr.user.login) || ''}` },
+                          { type: 'mrkdwn', text: `*Repository:*\n${owner}/${repo}` },
+                        ] },
+                        { type: 'actions', elements: [
+                          { type: 'button', text: { type: 'plain_text', text: 'View PR' }, style: 'primary', url: pr.html_url },
+                        ] },
+                      ],
+                    };
+                    const slackResp = await fetch('https://slack.com/api/chat.postMessage', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Authorization': `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+                      },
+                      body: JSON.stringify(slackPayload),
+                    });
+                    const slackResult = await slackResp.json();
+                    if (slackResult.ok) {
+                      core.info(`Slack ping sent (${newlyAddedBucket}) to ${process.env.SLACK_CHANNEL}`);
+                    } else {
+                      core.warning(`Slack ping failed: ${slackResult.error || 'unknown'} (status ${slackResp.status})`);
+                    }
+                  }
+                }
+              } catch (err) {
+                core.warning(`A11y Slack section failed: ${err && err.message}`);
               }
             }
 
@@ -247,45 +287,3 @@ jobs:
               await github.rest.issues.createComment({ owner, repo, issue_number, body: body_md });
             }
 
-      - name: Notify Slack (Bucket-3/4)
-        if: >-
-          steps.triage.outputs.ping_bucket != '' &&
-          contains(fromJSON('["MEMBER","COLLABORATOR","OWNER"]'), steps.triage.outputs.author_association)
-        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
-        env:
-          PR_TITLE: ${{ steps.triage.outputs.pr_title }}
-          PR_URL: ${{ steps.triage.outputs.pr_url }}
-          PR_NUMBER: ${{ steps.triage.outputs.pr_number }}
-          PR_AUTHOR: ${{ steps.triage.outputs.pr_author }}
-          BUCKET: ${{ steps.triage.outputs.ping_bucket }}
-        with:
-          method: chat.postMessage
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            channel: "${{ vars.DESIGN_FEEDBACK_SLACK_CHANNEL }}"
-            text: "A11y review needed (${{ env.BUCKET }}): ${{ env.PR_TITLE }}"
-            blocks:
-              - type: header
-                text:
-                  type: plain_text
-                  text: "Accessibility PR needs engineer review"
-              - type: section
-                text:
-                  type: mrkdwn
-                  text: "*<${{ env.PR_URL }}|#${{ env.PR_NUMBER }}: ${{ env.PR_TITLE }}>*"
-              - type: section
-                fields:
-                  - type: mrkdwn
-                    text: "*Bucket:*\n${{ env.BUCKET }}"
-                  - type: mrkdwn
-                    text: "*Author:*\n${{ env.PR_AUTHOR }}"
-                  - type: mrkdwn
-                    text: "*Repository:*\n${{ github.repository }}"
-              - type: actions
-                elements:
-                  - type: button
-                    text:
-                      type: plain_text
-                      text: "View PR"
-                    style: primary
-                    url: "${{ env.PR_URL }}"
