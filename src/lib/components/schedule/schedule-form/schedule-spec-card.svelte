@@ -37,31 +37,33 @@
 
 <Card class="w-full">
   <h2 class="text-lg font-semibold">Schedule Spec</h2>
-  <p class="mt-1 text-xs text-secondary">
-    Define rules for when this Workflow should run. You can add as many Schedule
-    Specifications as you need to comprehensively describe the schedule. Specs
-    can be calendar-based, cron-based, or interval-based.
-    <Link href="https://docs.temporal.io/schedules#spec" newTab>
-      Learn more about the Schedule Spec
-    </Link>
-  </p>
+  <div class="mt-4 flex flex-col gap-4">
+    <p class="text-sm text-secondary">
+      Define rules for when this Workflow should run. You can add as many
+      Schedule Specifications as you need to comprehensively describe the
+      schedule. Specs can be calendar-based, cron-based, or interval-based.
+      <Link href="https://docs.temporal.io/schedules#spec" newTab>
+        Learn more about the Schedule Spec
+      </Link>
+    </p>
 
-  <div class="mt-4 flex flex-col gap-2">
-    {#each specs as _, i (i)}
-      <ScheduleSpecItem
-        {form}
-        index={i}
-        expanded={activeIndex === i}
-        onExpand={() => (activeIndex = i)}
-        onRemove={() => removeSpec(i)}
-        canRemove={specs.length > 1}
-      />
-    {/each}
-  </div>
+    <div class="flex flex-col gap-2">
+      {#each specs as _, i (i)}
+        <ScheduleSpecItem
+          {form}
+          index={i}
+          expanded={activeIndex === i}
+          onExpand={() => (activeIndex = i)}
+          onRemove={() => removeSpec(i)}
+          canRemove={specs.length > 1}
+        />
+      {/each}
+    </div>
 
-  <div class="mt-4">
-    <Button variant="secondary" on:click={addSpec}>
-      + Add another schedule spec
-    </Button>
+    <div>
+      <Button variant="secondary" on:click={addSpec}>
+        + Add another schedule spec
+      </Button>
+    </div>
   </div>
 </Card>

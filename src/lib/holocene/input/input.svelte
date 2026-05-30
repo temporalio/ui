@@ -21,7 +21,7 @@
     suffix?: string;
     prefix?: string;
     valid?: boolean;
-    hintText?: string;
+    hintText?: string | Snippet<[{ valid: boolean; error: boolean }]>;
     maxLength?: number;
     hideCount?: boolean;
     noBorder?: boolean;
@@ -191,7 +191,11 @@
       class:error
       role={error ? 'alert' : null}
     >
-      {hintText}
+      {#if typeof hintText === 'string'}
+        {hintText}
+      {:else}
+        {@render hintText?.({ valid, error })}
+      {/if}
     </span>
     {#if maxLength && !isDisabled && !hideCount}
       <span

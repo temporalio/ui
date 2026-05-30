@@ -1,11 +1,12 @@
 <script lang="ts">
-  import cronstrue from 'cronstrue';
   import type { SuperForm } from 'sveltekit-superforms';
 
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
 
+  import { cronToHumanPreview } from './cronstring-to-human-preview';
   import type { ScheduleFormData } from './schema';
 
   interface Props {
@@ -24,16 +25,18 @@
   ];
 
   const preview = $derived.by(() => {
-    try {
-      return cronstrue.toString($form.specs[index].cronString || '* * * * *');
-    } catch {
-      return 'Invalid cron expression';
-    }
+    return cronToHumanPreview($form.specs[index].cronString || '* * * * *', {
+      startDate: $form.startDate ? $timestamp($form.startDate) : undefined,
+      timezoneName: $form.timezoneName,
+      endDateType: $form.endDateType,
+      endDate: $form.endDate ? $timestamp($form.endDate) : undefined,
+      endAfterOccurrences: $form.endAfterOccurrences,
+    });
   });
 </script>
 
-<div class="flex flex-col gap-3">
-  <div>
+<div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-1">
     <Label label="Cron Shortcuts" />
     <div class="flex flex-wrap gap-2">
       {#each shortcuts as shortcut (shortcut.value)}
@@ -50,11 +53,11 @@
     label="Cron expression"
     bind:value={$form.specs[index].cronString}
     placeholder="* * * * *"
+    required
+    hintText="Format: minute (0-59) &nbsp; hour (0-23) &nbsp; day-of-month (1-31) &nbsp;
+      month (1-12) &nbsp; day-of-week (0-6)"
   />
-
-  <p class="text-xs text-secondary">
-    Format: minute (0-59) &nbsp; hour (0-23) &nbsp; day-of-month (1-31) &nbsp;
-    month (1-12) &nbsp; day-of-week (0-6) &nbsp;
+  <p>
     <a
       href="https://crontab.guru"
       target="_blank"
@@ -63,7 +66,7 @@
     >
   </p>
 
-  <div class="surface-subtle rounded p-3">
-    <p class="text-sm italic">{preview}</p>
+  <div class="border border-subtle p-8">
+    <p class="font-mono text-sm">{preview}.</p>
   </div>
 </div>

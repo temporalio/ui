@@ -135,7 +135,9 @@
     </Link>
     <h1>{title}</h1>
     <form novalidate use:enhance oninput={onInput}>
-      <div class="relative flex gap-6">
+      <div
+        class="relative grid grid-cols-1 gap-6 lg:grid-cols-[1fr,minmax(19rem,23rem)]"
+      >
         <div class="flex w-full flex-col gap-6">
           <ScheduleDetailsCard {form} errors={$formErrors} {schedule} />
           <ScheduleSpecCard {form} />

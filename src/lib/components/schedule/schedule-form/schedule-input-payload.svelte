@@ -101,6 +101,8 @@
         bind:messageType
         bind:loading
         editing={editInput}
+        payloadLabel="JSON Data"
+        placeholder={'{"key": "value"}'}
         id="schedule-payload-input"
       >
         <div slot="action" class:hidden={!showEditActions}>

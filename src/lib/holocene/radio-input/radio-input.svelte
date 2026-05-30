@@ -52,7 +52,7 @@
       {disabled}
       {...omit($$restProps, 'class')}
     />
-    <span class="label" class:hidden={labelHidden}>
+    <span class="font-normal" class:hidden={labelHidden}>
       {label}
     </span>
   </Label>

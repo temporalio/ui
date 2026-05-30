@@ -117,7 +117,7 @@ export const Strings = {
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Data',
-  'signal-payload-input-label-hint': '(only single JSON payload supported)',
+  'signal-payload-input-label-hint': 'Single JSON payload supported.',
   'update-modal-title': 'Send an Update',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':

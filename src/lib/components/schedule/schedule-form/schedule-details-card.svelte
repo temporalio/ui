@@ -4,11 +4,12 @@
   import Card from '$lib/holocene/card.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
-  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EndDateType } from '$lib/types/schedule';
   import type { FullSchedule } from '$lib/types/schedule';
@@ -109,7 +110,7 @@
       required
     />
 
-    <div class="max-w-96">
+    <div class="max-w-108">
       <DatePicker
         label="Schedule Start Date"
         selected={startDateValue}
@@ -118,24 +119,31 @@
         clearLabel={translate('common.clear-input-button-label')}
         onDateChange={onStartDateChange}
         clearable={false}
-        required
-      />
+      >
+        {#snippet afterLabel()}
+          <Tooltip
+            topLeft
+            width={250}
+            text="If a Schedule Spec start time has already passed for the start date, the schedule will run at the next time specified in the Schedule Spec."
+          >
+            <Icon name="square-info" class="h-3 w-3" />
+          </Tooltip>
+        {/snippet}
+      </DatePicker>
     </div>
 
     <RadioGroup
       name="endDateType"
       group={endDateTypeStore}
-      class="flex max-w-96 flex-col gap-1 p-0"
+      class="flex max-w-108 flex-col gap-1 p-0"
       description="End Date"
     >
-      <div
-        class="grid h-10 grid-cols-[theme(spacing.24)_1fr] items-center gap-3"
-      >
+      {@const rowClass =
+        'grid h-11 grid-cols-[theme(spacing.24)_1fr] items-center gap-3'}
+      <div class={rowClass}>
         <RadioInput id="end-date-never" value="never" label="Never" />
       </div>
-      <div
-        class="grid h-10 grid-cols-[theme(spacing.24)_1fr] items-center gap-3"
-      >
+      <div class={rowClass}>
         <RadioInput id="end-date-on" value="on" label="On" />
         <DatePicker
           label="End date"
@@ -148,7 +156,7 @@
           onDateChange={onEndDateChange}
         />
       </div>
-      <div class="grid grid-cols-[theme(spacing.24)_1fr] items-center gap-3">
+      <div class={rowClass}>
         <RadioInput id="end-date-after" value="after" label="After" />
         <NumberInput
           id="endAfterOccurrences"
@@ -163,7 +171,9 @@
       </div>
     </RadioGroup>
 
-    <div class="flex gap-4">
+    <div
+      class="grid grid-cols-[theme(spacing.108)] gap-4 md:grid-cols-[minmax(theme(spacing.56),4fr)_minmax(theme(spacing.56),3fr)]"
+    >
       <Combobox
         id="timezoneName"
         label="Timezone"
@@ -175,9 +185,28 @@
         placeholder="Search timezone..."
         leadingIcon="clock"
         required
-        class="w-96"
       />
-      <DurationInput id="jitter" bind:value={$form.jitter} label="Jitter" />
+
+      <Input
+        id="jitter"
+        label="Jitter"
+        type="number"
+        step={1}
+        min={0}
+        suffix="sec"
+        defaultValue={0}
+        bind:value={$form.jitter}
+      >
+        {#snippet afterLabel()}
+          <Tooltip
+            topLeft
+            width={250}
+            text="A random offset between zero and this value added to each action time, bound by the next scheduled Action time, used to avoid load spikes."
+          >
+            <Icon name="square-info" class="h-3 w-3" />
+          </Tooltip>
+        {/snippet}
+      </Input>
     </div>
 
     <ScheduleInputPayload

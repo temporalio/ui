@@ -123,7 +123,7 @@
 </script>
 
 {#if expanded}
-  <div class="flex flex-col gap-4 border-b border-subtle pb-6 last:border-b-0">
+  <div class="flex flex-col gap-4 border-b border-subtle last:border-b-0">
     <div class="flex w-72 items-end justify-between gap-4">
       <Select
         id="spec-type-{index}"
@@ -153,7 +153,7 @@
   </div>
 {:else}
   <div
-    class="surface-subtle flex w-full items-center gap-4 rounded-lg px-4 py-3 text-left transition-colors hover:bg-interactive-secondary-hover"
+    class="surface-background flex w-full items-center gap-4 border border-subtle px-4 py-3 text-left transition-colors hover:bg-interactive-secondary-hover"
   >
     <span class="min-w-[120px] text-sm font-semibold">{typeLabel}</span>
     <span class="flex-1 truncate text-sm text-secondary">{summary}</span>

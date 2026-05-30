@@ -691,7 +691,7 @@
   }
 
   .input-wrapper {
-    @apply flex w-full flex-wrap items-center;
+    @apply flex grow flex-wrap items-center;
   }
 
   .combobox-input {
