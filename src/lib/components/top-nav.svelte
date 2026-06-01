@@ -22,7 +22,7 @@
 {#if md.current}
   <nav
     class={merge(
-      'surface-primary',
+      'bg-red-600 text-white',
       'sticky top-0 z-40',
       'flex',
       'w-full',
