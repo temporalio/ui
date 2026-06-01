@@ -1,6 +1,9 @@
 <script lang="ts">
   import { get, type Writable, writable } from 'svelte/store';
 
+  import { isBefore } from 'date-fns';
+  import { utcToZonedTime } from 'date-fns-tz';
+
   import Card from '$lib/holocene/card.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -13,7 +16,12 @@
   import { translate } from '$lib/i18n/translate';
   import type { EndDateType } from '$lib/types/schedule';
   import type { FullSchedule } from '$lib/types/schedule';
-  import { formatOffset, TimezoneOptions } from '$lib/utilities/timezone';
+  import {
+    formatOffset,
+    TimezoneOptions,
+    utcToZonedWallClock,
+    zonedWallClockToUTCISOString,
+  } from '$lib/utilities/timezone';
 
   import type { ScheduleFormData } from './schema';
 
@@ -51,19 +59,52 @@
     if (val !== $form.endDateType) $form.endDateType = val;
   });
 
-  const startDateValue = $derived(
-    $form.startDate ? new Date($form.startDate) : new Date(),
-  );
-  const endDateValue = $derived(
-    $form.endDate ? new Date($form.endDate) : new Date(),
+  const timezone = $derived($form.timezoneName || 'UTC');
+
+  // svelte-ignore state_referenced_locally
+  let startDay = $state<Date | null>(
+    utcToZonedWallClock($form.startDate, timezone),
   );
 
+  $effect(() => {
+    // keep $form.startDate value in sync with selected date and selected timezone
+    // (underlying value potentially changes when either changes)
+    $form.startDate = zonedWallClockToUTCISOString(startDay, timezone);
+  });
+
+  // svelte-ignore state_referenced_locally
+  let endDay = $state<Date | null>(
+    utcToZonedWallClock($form.endDate, timezone),
+  );
+
+  $effect(() => {
+    // keep $form.endDate value in sync with selected date and selected timezone
+    // (underlying value potentially changes when either changes)
+    $form.endDate = zonedWallClockToUTCISOString(endDay, timezone);
+  });
+
+  const startDateValue = $derived(
+    startDay ?? utcToZonedTime(new Date(), timezone),
+  );
+  const endDateValue = $derived.by(() => {
+    if (!endDay) {
+      const now = utcToZonedTime(new Date(), timezone);
+
+      return isBefore(now, startDateValue) ? startDateValue : now;
+    }
+
+    return endDay;
+  });
+
   const onStartDateChange = (d: Date) => {
-    $form.startDate = d.toISOString();
+    startDay = d;
+    if (isBefore(endDateValue, d)) {
+      endDay = d;
+    }
   };
 
   const onEndDateChange = (d: Date) => {
-    $form.endDate = d.toISOString();
+    endDay = d;
   };
 </script>
 
@@ -145,29 +186,34 @@
       </div>
       <div class={rowClass}>
         <RadioInput id="end-date-on" value="on" label="On" />
-        <DatePicker
-          label="End date"
-          labelHidden
-          disabled={endDateType !== 'on'}
-          selected={endDateValue}
-          todayLabel={translate('common.today')}
-          closeLabel={translate('common.close')}
-          clearLabel={translate('common.clear-input-button-label')}
-          onDateChange={onEndDateChange}
-        />
+        {#if endDateType === 'on'}
+          <DatePicker
+            label="End date"
+            labelHidden
+            selected={endDateValue}
+            todayLabel={translate('common.today')}
+            closeLabel={translate('common.close')}
+            clearLabel={translate('common.clear-input-button-label')}
+            onDateChange={onEndDateChange}
+            clearable={false}
+            isAllowed={(d) => !isBefore(d, startDateValue)}
+          />
+        {/if}
       </div>
       <div class={rowClass}>
         <RadioInput id="end-date-after" value="after" label="After" />
-        <NumberInput
-          id="endAfterOccurrences"
-          label="Occurrences"
-          labelHidden
-          bind:value={$form.endAfterOccurrences}
-          placeholder="### occurrences"
-          min={1}
-          disabled={endDateType !== 'after'}
-          class="w-full"
-        />
+        {#if endDateType === 'after'}
+          <NumberInput
+            id="endAfterOccurrences"
+            label="Occurrences"
+            labelHidden
+            bind:value={$form.endAfterOccurrences}
+            placeholder="### occurrences"
+            min={1}
+            disabled={endDateType !== 'after'}
+            class="w-full"
+          />
+        {/if}
       </div>
     </RadioGroup>
 
@@ -194,7 +240,6 @@
         step={1}
         min={0}
         suffix="sec"
-        defaultValue={0}
         bind:value={$form.jitter}
       >
         {#snippet afterLabel()}

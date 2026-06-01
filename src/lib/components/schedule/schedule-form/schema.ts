@@ -68,7 +68,7 @@ export const scheduleFormSchema = z.object({
   endDateType: z.enum(['never', 'on', 'after']),
   endDate: z.string().optional().default(''),
   endAfterOccurrences: z.number().optional(),
-  jitter: z.string().optional().default(''),
+  jitter: z.string().optional().default('0'),
   overlapPolicy: z.enum([
     'Unspecified',
     'Skip',
@@ -147,7 +147,7 @@ export const getDefaultValues = (params: {
     endDateType: schedule?.spec?.endTime ? 'on' : 'never',
     endDate: schedule?.spec?.endTime ? String(schedule.spec.endTime) : '',
     endAfterOccurrences: undefined,
-    jitter: schedule?.spec?.jitter ? String(schedule.spec.jitter) : '',
+    jitter: schedule?.spec?.jitter ? String(schedule.spec.jitter) : '0',
     overlapPolicy: parseOverlapPolicy(schedule?.policies?.overlapPolicy),
     catchupWindow: schedule?.policies?.catchupWindow
       ? String(schedule.policies.catchupWindow)

@@ -65,7 +65,7 @@ const buildSpecFromFormData = (formData: ScheduleFormData) => {
     spec.endTime = formData.endDate;
   }
 
-  if (formData.jitter) {
+  if (formData.jitter && Number(formData.jitter) > 0) {
     spec.jitter = formData.jitter;
   }
 

@@ -108,6 +108,17 @@ export const formatOffset = (offset: number) => {
   return offset >= 0 ? `+${formattedOffset}:00` : `-${formattedOffset}:00`;
 };
 
+export const utcToZonedWallClock = (
+  isoString: string,
+  timeZone: string,
+): Date | null =>
+  isoString ? dateTz.utcToZonedTime(new Date(isoString), timeZone) : null;
+
+export const zonedWallClockToUTCISOString = (
+  date: Date | null,
+  timeZone: string,
+): string => (date ? dateTz.zonedTimeToUtc(date, timeZone).toISOString() : '');
+
 export type TimezoneSelectOption = {
   label: string;
   value: string;
