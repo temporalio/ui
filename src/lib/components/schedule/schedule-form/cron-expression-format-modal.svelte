@@ -21,7 +21,7 @@
     <p class="text-secondary">
       Temporal Workflow Schedule Cron strings follow this format:
     </p>
-    <pre class="w-full overflow-auto bg-code-black p-4 text-xs">
+    <pre class="w-full overflow-auto bg-code-block p-4 text-xs">
 ┌───────────── minute (0 - 59)
 │ ┌───────────── hour (0 - 23)
 │ │ ┌───────────── day of the month (1 - 31)
