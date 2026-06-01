@@ -16,7 +16,7 @@
   large
   confirmText="Got It"
 >
-  <span slot="title">Cron expression format</span>
+  <h2 slot="title">Cron expression format</h2>
   <div slot="content" class="flex flex-col gap-2">
     <p class="text-secondary">
       Temporal Workflow Schedule Cron strings follow this format:
