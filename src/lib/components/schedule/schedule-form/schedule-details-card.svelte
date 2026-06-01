@@ -228,7 +228,7 @@
         optionValueKey="value"
         optionLabelKey="label"
         noResultsText={translate('common.no-results')}
-        placeholder="Search timezone..."
+        placeholder="Search timezone…"
         leadingIcon="clock"
         required
       />

@@ -7,6 +7,7 @@
 
   import type { ScheduleFormData } from './schema';
 
+  import CronExpressionFormatModal from './cron-expression-format-modal.svelte';
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
   interface Props {
@@ -23,6 +24,8 @@
     { label: 'Every Monday', value: '0 0 * * 1' },
     { label: 'Monthly on 1st', value: '0 0 1 * *' },
   ];
+
+  let isCronExpressionFormatModalOpen = $state(false);
 </script>
 
 <div class="flex flex-col gap-4">
@@ -47,14 +50,13 @@
     hintText="Format: minute (0-59) &nbsp; hour (0-23) &nbsp; day-of-month (1-31) &nbsp;
       month (1-12) &nbsp; day-of-week (0-6)"
   />
-  <p>
-    <a
-      href="https://crontab.guru"
-      target="_blank"
-      rel="noreferrer"
-      class="text-primary underline">Formatting help</a
-    >
-  </p>
+  <button
+    class="mr-auto underline"
+    onclick={() => (isCronExpressionFormatModalOpen = true)}
+  >
+    Formatting help
+  </button>
+  <CronExpressionFormatModal bind:open={isCronExpressionFormatModalOpen} />
 
   <ScheduleSpecPreview {form} {index} />
 </div>
