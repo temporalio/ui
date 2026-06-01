@@ -18,6 +18,7 @@
 
   const specs = $derived($form.specs);
 
+  // svelte-ignore state_referenced_locally
   let activeIndex = $state(specs.length - 1);
 
   const addSpec = () => {
@@ -47,7 +48,7 @@
       </Link>
     </p>
 
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4">
       {#each specs as _, i (i)}
         <ScheduleSpecItem
           {form}

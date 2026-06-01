@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
+  import { twMerge } from 'tailwind-merge';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
 
@@ -9,9 +10,10 @@
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
     index: number;
+    class?: string;
   }
 
-  let { form, index }: Props = $props();
+  let { form, index, class: className }: Props = $props();
 
   const spec = $derived($form.specs[index]);
 
@@ -32,6 +34,6 @@
   });
 </script>
 
-<div class="border border-subtle p-8">
+<div class={twMerge('border border-subtle p-8', className)}>
   <p class="font-mono text-sm">{preview}.</p>
 </div>

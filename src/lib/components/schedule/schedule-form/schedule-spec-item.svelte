@@ -120,10 +120,26 @@
     const newType = value as ScheduleFormData['specs'][number]['type'];
     $form.specs[index] = { ...DEFAULT_SPEC_ITEM, type: newType };
   }
+
+  // svelte-ignore non_reactive_update
+  let el: HTMLElement;
+  let prevExpanded = false;
+
+  $effect(() => {
+    if (expanded && !prevExpanded) {
+      el?.focus();
+    }
+    prevExpanded = expanded;
+  });
 </script>
 
 {#if expanded}
-  <div class="flex flex-col gap-4 border-b border-subtle last:border-b-0">
+  <div
+    bind:this={el}
+    tabindex="-1"
+    class="flex flex-col gap-4"
+    aria-expanded="true"
+  >
     <div class="flex w-72 items-end justify-between gap-4">
       <Select
         id="spec-type-{index}"
@@ -153,13 +169,17 @@
   </div>
 {:else}
   <div
-    class="surface-background flex w-full items-center gap-4 border border-subtle px-4 py-3 text-left transition-colors hover:bg-interactive-secondary-hover"
+    class="surface-background relative flex w-full items-center gap-4 border border-subtle px-4 py-3 text-left transition-colors hover:bg-interactive-secondary-hover"
+    aria-expanded="false"
   >
     <span class="min-w-[120px] text-sm font-semibold">{typeLabel}</span>
     <span class="flex-1 truncate text-sm text-secondary">{summary}</span>
     {#if rawValue}
       <span class="shrink-0 font-mono text-sm">{rawValue}</span>
     {/if}
+    <button class="absolute inset-0" onclick={onExpand}>
+      <span class="sr-only">Expand spec</span>
+    </button>
     {#if canRemove}
       <Button
         variant="ghost"
