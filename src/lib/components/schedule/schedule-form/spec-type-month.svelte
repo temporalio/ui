@@ -2,10 +2,12 @@
   import type { SuperForm } from 'sveltekit-superforms';
 
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import TimePicker from '$lib/holocene/time-picker.svelte';
 
   import type { ScheduleFormData } from './schema';
+
+  import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
@@ -56,6 +58,18 @@
       $form.specs[index].months = [...current, month];
     }
   }
+
+  const allMonthsActive = $derived.by(() => {
+    const monthValueSet = new Set(monthNames.map((m) => m.value));
+    if (
+      $form.specs[index].months.length !== 0 &&
+      $form.specs[index].months.length !== monthNames.length
+    ) {
+      return false;
+    }
+
+    return monthNames.every((m) => monthValueSet.has(m.value));
+  });
 </script>
 
 <div class="flex flex-col gap-4">
@@ -63,12 +77,17 @@
     <p class="text-sm text-secondary">
       Select the specific dates for the schedule to always run on.
     </p>
-    <div class="grid grid-cols-7 gap-3 border border-subtle p-3">
+    <div
+      class="grid max-w-108 grid-cols-5 gap-3 border border-subtle p-3 sm:grid-cols-7"
+    >
       {#each dayNumbers as day (day)}
+        {@const isSelected = isDaySelected(day)}
         <Button
-          variant={isDaySelected(day) ? 'primary' : 'secondary'}
+          active={isSelected}
+          aria-pressed={isSelected}
+          variant="secondary"
           size="sm"
-          class="w-12"
+          class="aspect-square min-h-12 min-w-12"
           on:click={() => toggleDay(day)}>{day}</Button
         >
       {/each}
@@ -78,30 +97,64 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-wrap gap-2">
       <Button
+        active={allMonthsActive}
+        aria-pressed={allMonthsActive}
         variant="secondary"
         on:click={() => ($form.specs[index].months = [])}>Every month</Button
       >
       {#each monthNames as month (month.value)}
+        {@const isSelected = isMonthSelected(month.value)}
         <Button
-          variant={isMonthSelected(month.value) ? 'primary' : 'secondary'}
+          active={isSelected}
+          aria-pressed={isSelected}
+          variant="secondary"
+          size="sm"
           on:click={() => toggleMonth(month.value)}>{month.label}</Button
         >
       {/each}
     </div>
   </div>
 
-  <div class="flex flex-col gap-2">
+  <fieldset class="flex flex-col gap-2.5">
+    <legend class="contents font-medium">Run time</legend>
     <p class="text-sm text-secondary">
-      Specify the time (UTC) for this schedule to run.
+      Specify the time (UTC) for this schedule to run. The schedule will run at
+      00:00 UTC if left blank.
     </p>
-    <div class="flex w-96 gap-4">
-      <TimePicker
-        bind:hour={$form.specs[index].hour}
-        bind:minute={$form.specs[index].minute}
-        bind:second={$form.specs[index].second}
-        twelveHourClock={false}
+    <div class="grid max-w-108 gap-2 md:grid-cols-2">
+      <Input
+        id="hours"
+        label="Hours"
+        labelHidden
+        type="number"
+        inputmode="numeric"
+        step={1}
+        min={0}
+        max={23}
+        placeholder="00"
+        suffix="hrs"
+        bind:value={$form.specs[index].hour}
+      />
+
+      <Input
+        id="minutes"
+        label="Minutes"
+        labelHidden
+        type="number"
+        inputmode="numeric"
+        step={1}
+        min={0}
+        max={59}
+        placeholder="00"
+        suffix="min"
+        bind:value={$form.specs[index].minute}
       />
     </div>
-    <p class="text-xs text-secondary">Based on Universal Standard Time (UTC)</p>
-  </div>
+    <div class="flex gap-2 text-xs">
+      <Icon name="clock" class="inline-block" />
+      <p class="text-secondary">Based on Universal Standard Time (UTC)</p>
+    </div>
+  </fieldset>
+
+  <ScheduleSpecPreview {form} {index} class="mt-4" />
 </div>

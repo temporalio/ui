@@ -16,7 +16,6 @@ export const scheduleSpecItemSchema = z.object({
   days: z.string().optional().default(''),
   hour: z.string().optional().default(''),
   minute: z.string().optional().default(''),
-  second: z.string().optional().default(''),
   phase: z.string().optional().default(''),
 });
 
@@ -31,7 +30,6 @@ export const DEFAULT_SPEC_ITEM: ScheduleSpecItem = {
   days: '',
   hour: '',
   minute: '',
-  second: '',
   phase: '',
 };
 

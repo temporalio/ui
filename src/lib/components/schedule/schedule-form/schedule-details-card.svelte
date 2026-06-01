@@ -218,7 +218,7 @@
     </RadioGroup>
 
     <div
-      class="grid grid-cols-[theme(spacing.108)] gap-4 md:grid-cols-[minmax(theme(spacing.56),4fr)_minmax(theme(spacing.56),3fr)]"
+      class="grid grid-cols-[minmax(100%,theme(spacing.108))] gap-4 md:grid-cols-[minmax(theme(spacing.56),4fr)_minmax(theme(spacing.56),3fr)]"
     >
       <Combobox
         id="timezoneName"
