@@ -11,6 +11,7 @@ import arrowUp from './svg/arrow-up.svelte';
 import ascending from './svg/ascending.svelte';
 import astronaut from './svg/astronaut.svelte';
 import aws from './svg/aws.svelte';
+import bars from './svg/bars.svelte';
 import batchOperation from './svg/batch-operation.svelte';
 import book from './svg/book-sparkles.svelte';
 import bookmark from './svg/bookmark.svelte';
@@ -168,6 +169,7 @@ export const icons = {
   ascending,
   astronaut,
   aws,
+  bars,
   'batch-operation': batchOperation,
   book,
   bookmark,
