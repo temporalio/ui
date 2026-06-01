@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
 
-  import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
 
-  import { cronToHumanPreview } from './cronstring-to-human-preview';
   import type { ScheduleFormData } from './schema';
+
+  import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
@@ -23,16 +23,6 @@
     { label: 'Every Monday', value: '0 0 * * 1' },
     { label: 'Monthly on 1st', value: '0 0 1 * *' },
   ];
-
-  const preview = $derived.by(() => {
-    return cronToHumanPreview($form.specs[index].cronString || '* * * * *', {
-      startDate: $form.startDate ? $timestamp($form.startDate) : undefined,
-      timezoneName: $form.timezoneName,
-      endDateType: $form.endDateType,
-      endDate: $form.endDate ? $timestamp($form.endDate) : undefined,
-      endAfterOccurrences: $form.endAfterOccurrences,
-    });
-  });
 </script>
 
 <div class="flex flex-col gap-4">
@@ -66,7 +56,5 @@
     >
   </p>
 
-  <div class="border border-subtle p-8">
-    <p class="font-mono text-sm">{preview}.</p>
-  </div>
+  <ScheduleSpecPreview {form} {index} />
 </div>
