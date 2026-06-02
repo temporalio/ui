@@ -109,7 +109,7 @@
 </script>
 
 <Card class="w-full">
-  <h2 class="text-lg font-semibold">Schedule Details</h2>
+  <h2 class="text-2xl font-medium">Schedule Details</h2>
   <div class="mt-4 flex flex-col gap-4">
     <Input
       id="name"

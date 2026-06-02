@@ -37,7 +37,7 @@
 </script>
 
 <Card class="w-full">
-  <h2 class="text-lg font-semibold">Schedule Spec</h2>
+  <h2 class="text-2xl font-medium">Schedule Spec</h2>
   <div class="mt-4 flex flex-col gap-4">
     <p class="text-sm text-secondary">
       Define rules for when this Workflow should run. You can add as many

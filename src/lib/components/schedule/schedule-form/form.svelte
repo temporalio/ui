@@ -29,7 +29,7 @@
   import SchedulePoliciesCard from './schedule-policies-card.svelte';
   import ScheduleSpecCard from './schedule-spec-card.svelte';
   import ScheduleSummarySidebar from './schedule-summary-sidebar.svelte';
-  import SchedulesSearchAttributesInputs from './schedules-search-attributes-inputs.svelte';
+  import SchedulesSearchAttributesCard from './schedules-search-attributes-card.svelte';
 
   import type { SearchAttribute } from '$types';
 
@@ -135,19 +135,23 @@
     </Link>
     <h1>{title}</h1>
 
-    <div
-      class="relative grid grid-cols-1 gap-6 lg:grid-cols-[1fr,minmax(19rem,23rem)]"
-    >
-      <form novalidate use:enhance oninput={onInput}>
+    <form novalidate use:enhance oninput={onInput}>
+      <div
+        class="relative grid grid-cols-1 gap-6 xl:grid-cols-[1fr,minmax(19rem,23rem)]"
+      >
         <div class="flex w-full flex-col gap-6">
           <ScheduleDetailsCard {form} errors={$formErrors} {schedule} />
           <ScheduleSpecCard {form} />
           <SchedulePoliciesCard {form} />
 
-          <SchedulesSearchAttributesInputs
+          <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
             bind:workflowSearchAttributes
           />
+
+          <div class="w-full xl:hidden">
+            <ScheduleSummarySidebar formData={$form} />
+          </div>
 
           <Alert
             intent="error"
@@ -171,12 +175,13 @@
             >
           </div>
         </div>
-      </form>
 
-      <div class="w-full">
-        <ScheduleSummarySidebar formData={$form} />
+        <div class="hidden w-full xl:block">
+          <ScheduleSummarySidebar formData={$form} />
+        </div>
       </div>
-    </div>
+    </form>
+
     <Alert intent="error" title={$error} hidden={!$error} />
     <CodecServerErrorBanner />
   {/if}

@@ -100,6 +100,7 @@
         active={allMonthsActive}
         aria-pressed={allMonthsActive}
         variant="secondary"
+        size="sm"
         on:click={() => ($form.specs[index].months = [])}>Every month</Button
       >
       {#each monthNames as month (month.value)}

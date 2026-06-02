@@ -35,7 +35,7 @@
 </script>
 
 <Card class="w-full">
-  <h2 class="text-lg font-semibold">Schedule Policies</h2>
+  <h2 class="text-2xl font-medium">Schedule Policies</h2>
   <p class="mt-1 text-xs text-secondary">
     Schedule policies allow you to customize Schedule and Workflow behavior.
     <Link href="https://docs.temporal.io/schedules#policies" newTab>

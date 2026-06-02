@@ -139,9 +139,7 @@
     class="flex flex-col gap-4"
     aria-expanded="true"
   >
-    <div
-      class="flex items-end justify-between gap-4 border border-transparent pr-4"
-    >
+    <div class="flex items-end justify-between gap-4 border border-transparent">
       <Select
         id="spec-type-{index}"
         label="Schedule Spec Type"
@@ -158,7 +156,7 @@
           variant="ghost"
           leadingIcon="trash"
           size="xs"
-          class="h-10"
+          class="mr-4 h-10"
           on:click={onRemove}
         />
       {/if}

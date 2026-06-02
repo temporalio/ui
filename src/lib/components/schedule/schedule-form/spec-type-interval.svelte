@@ -23,7 +23,7 @@
   </p>
 
   <div
-    class="grid grid-cols-1 items-center gap-2 sm:grid-cols-[1fr,min-content,1fr,min-content,1fr,min-content,1fr] md:grid-cols-[1fr,min-content,1fr] md:grid-rows-2 xl:grid-cols-[1fr,min-content,1fr,min-content,1fr,min-content,1fr]"
+    class="grid grid-cols-1 items-center gap-2 sm:grid-cols-[1fr,min-content,1fr,min-content,1fr,min-content,1fr] md:grid-cols-[1fr,min-content,1fr] xl:grid-cols-[1fr,min-content,1fr,min-content,1fr,min-content,1fr]"
   >
     <Input
       id="days-{index}"
