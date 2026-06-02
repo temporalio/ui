@@ -134,10 +134,11 @@
       {backTitle}
     </Link>
     <h1>{title}</h1>
-    <form novalidate use:enhance oninput={onInput}>
-      <div
-        class="relative grid grid-cols-1 gap-6 lg:grid-cols-[1fr,minmax(19rem,23rem)]"
-      >
+
+    <div
+      class="relative grid grid-cols-1 gap-6 lg:grid-cols-[1fr,minmax(19rem,23rem)]"
+    >
+      <form novalidate use:enhance oninput={onInput}>
         <div class="flex w-full flex-col gap-6">
           <ScheduleDetailsCard {form} errors={$formErrors} {schedule} />
           <ScheduleSpecCard {form} />
@@ -170,14 +171,13 @@
             >
           </div>
         </div>
+      </form>
 
-        <div class="w-full">
-          <ScheduleSummarySidebar formData={$form} />
-        </div>
+      <div class="w-full">
+        <ScheduleSummarySidebar formData={$form} />
       </div>
-
-      <Alert intent="error" title={$error} hidden={!$error} />
-      <CodecServerErrorBanner />
-    </form>
+    </div>
+    <Alert intent="error" title={$error} hidden={!$error} />
+    <CodecServerErrorBanner />
   {/if}
 </div>

@@ -4,8 +4,8 @@
 
   import { timestamp } from '$lib/components/timestamp.svelte';
 
-  import { cronToHumanPreview } from './cronstring-to-human-preview';
   import type { ScheduleFormData } from './schema';
+  import { cronToHumanPreview } from './utilities/cronstring-to-human-preview';
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];

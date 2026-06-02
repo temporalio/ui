@@ -3,7 +3,6 @@
   import type { SuperForm } from 'sveltekit-superforms';
 
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
 
@@ -140,7 +139,9 @@
     class="flex flex-col gap-4"
     aria-expanded="true"
   >
-    <div class="flex w-72 items-end justify-between gap-4">
+    <div
+      class="flex items-end justify-between gap-4 border border-transparent pr-4"
+    >
       <Select
         id="spec-type-{index}"
         label="Schedule Spec Type"
@@ -153,7 +154,13 @@
         {/each}
       </Select>
       {#if canRemove}
-        <Button variant="ghost" leadingIcon="trash" on:click={onRemove} />
+        <Button
+          variant="ghost"
+          leadingIcon="trash"
+          size="xs"
+          class="h-10"
+          on:click={onRemove}
+        />
       {/if}
     </div>
 
@@ -169,17 +176,19 @@
   </div>
 {:else}
   <div
-    class="surface-background relative flex w-full items-center gap-4 border border-subtle px-4 py-3 text-left transition-colors hover:bg-interactive-secondary-hover"
+    class="surface-background relative flex w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors hover:bg-interactive-secondary-hover"
     aria-expanded="false"
   >
-    <span class="min-w-[120px] text-sm font-semibold">{typeLabel}</span>
-    <span class="flex-1 truncate text-sm text-secondary">{summary}</span>
-    {#if rawValue}
-      <span class="shrink-0 font-mono text-sm">{rawValue}</span>
-    {/if}
     <button class="absolute inset-0" onclick={onExpand}>
       <span class="sr-only">Expand spec</span>
     </button>
+    <div
+      class="grid w-full grid-cols-1 items-center gap-2 text-sm md:grid-cols-[minmax(8rem,max-content)_4fr_minmax(max-content,1fr)] md:gap-4"
+    >
+      <span class="font-semibold">{typeLabel}</span>
+      <span class="flex-1 text-secondary md:truncate">{summary}</span>
+      <span class="font-mono">{rawValue}</span>
+    </div>
     {#if canRemove}
       <Button
         variant="ghost"

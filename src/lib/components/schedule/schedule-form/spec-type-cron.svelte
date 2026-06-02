@@ -4,6 +4,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import { ordinal } from '$lib/utilities/schedule-spec-label';
 
   import type { ScheduleFormData } from './schema';
 
@@ -17,12 +18,20 @@
 
   let { form, index }: Props = $props();
 
+  const today = new Date();
+  const weekday = today.toLocaleDateString(undefined, { weekday: 'long' });
+  const weekdayNumber = today.getDay();
+  const dayOfMonth = today.getDate();
+
   const shortcuts = [
     { label: 'Every minute', value: '* * * * *' },
     { label: 'Every hour', value: '0 * * * *' },
     { label: 'Daily', value: '0 0 * * *' },
-    { label: 'Every Monday', value: '0 0 * * 1' },
-    { label: 'Monthly on 1st', value: '0 0 1 * *' },
+    { label: `Every ${weekday}`, value: `0 0 * * ${weekdayNumber}` },
+    {
+      label: `Monthly on ${ordinal(dayOfMonth)}`,
+      value: `0 0 ${dayOfMonth} * *`,
+    },
   ];
 
   let isCronExpressionFormatModalOpen = $state(false);

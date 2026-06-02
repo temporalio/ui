@@ -151,7 +151,7 @@ function getDayNames(dayOfWeek: RangeSpec[] | undefined | null): string {
   return values.map((v) => DAY_NAMES[v] ?? `Day ${v}`).join(', ');
 }
 
-function ordinal(n: number): string {
+export function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);

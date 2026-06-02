@@ -2,7 +2,7 @@ import cronstrue from 'cronstrue';
 
 import { pluralize } from '$lib/utilities/pluralize';
 
-import type { ScheduleFormData } from './schema';
+import type { ScheduleFormData } from '../schema';
 
 type PreviewOptions = Pick<
   ScheduleFormData,
