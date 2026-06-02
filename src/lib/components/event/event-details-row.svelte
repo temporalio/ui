@@ -5,16 +5,19 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { Payload, Payloads } from '$lib/types';
   import { isRawPayload, isRawPayloads } from '$lib/utilities/decode-payload';
   import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
-  import { displayLinkType } from '$lib/utilities/get-single-attribute-for-event';
+  import {
+    displayLinkType,
+    formatSummaryAttributeDisplayValue,
+    type SummaryAttribute,
+  } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetailsLink from './event-details-link.svelte';
 
   export let key: string;
-  export let value: string | Payload | Payloads;
+  export let value: SummaryAttribute['value'] | number | boolean | null;
   export let attributes: CombinedAttributes;
   export let showKey = true;
 
@@ -52,7 +55,7 @@
       </Copyable>
     {:else}
       <Badge type="subtle" class="block select-none truncate">
-        {value}
+        {formatSummaryAttributeDisplayValue(value)}
       </Badge>
     {/if}
   </div>

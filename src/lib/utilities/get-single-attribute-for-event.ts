@@ -23,6 +23,7 @@ import {
   isPendingActivity,
   isPendingNexusOperation,
 } from './is-pending-activity';
+import { stringifyWithBigInt } from './parse-with-big-int';
 
 export type SummaryAttribute = {
   key: string;
@@ -126,6 +127,20 @@ export const getCodeBlockValue: Parameters<typeof JSON.stringify>[0] = (
   return [value?.payloads, value?.indexedFields, value?.points, value].find(
     (v) => v !== undefined,
   );
+};
+
+export const formatSummaryAttributeDisplayValue = (value: unknown): string => {
+  let displayValue = getCodeBlockValue(value);
+  if (
+    isObject(value) &&
+    has(value, 'payloads') &&
+    Array.isArray(displayValue)
+  ) {
+    displayValue = displayValue.length ? displayValue[0] : displayValue;
+  }
+  if (typeof displayValue === 'string') return displayValue;
+
+  return stringifyWithBigInt(displayValue) ?? String(displayValue);
 };
 
 export const getStackTrace = (value: unknown) => {
