@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { twMerge as merge } from 'tailwind-merge';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import PayloadInline from '$lib/components/payload/payload-inline.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -16,12 +16,23 @@
 
   import EventDetailsLink from './event-details-link.svelte';
 
-  export let key: string;
-  export let value: SummaryAttribute['value'] | number | boolean | null;
-  export let attributes: CombinedAttributes;
-  export let showKey = true;
+  interface Props {
+    key: string;
+    value: SummaryAttribute['value'] | number | boolean | null;
+    attributes: CombinedAttributes;
+    showKey?: boolean;
+    class?: ClassNameValue;
+  }
 
-  $: linkType = displayLinkType(key, attributes);
+  let {
+    key,
+    value,
+    attributes,
+    showKey = true,
+    class: className = '',
+  }: Props = $props();
+
+  const linkType = $derived(displayLinkType(key, attributes));
 </script>
 
 {#if key}
@@ -37,7 +48,7 @@
       <div
         class="flex max-w-sm items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
-        <PayloadInline {value} class={merge($$props.class)} />
+        <PayloadInline {value} class={merge(className)} />
       </div>
     {:else if typeof value === 'string' && linkType !== 'none'}
       <Copyable
