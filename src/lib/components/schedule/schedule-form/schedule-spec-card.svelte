@@ -43,7 +43,7 @@
       Define rules for when this Workflow should run. You can add as many
       Schedule Specifications as you need to comprehensively describe the
       schedule. Specs can be calendar-based, cron-based, or interval-based.
-      <Link href="https://docs.temporal.io/schedules#spec" newTab>
+      <Link href="https://docs.temporal.io/schedule#spec" newTab>
         Learn more about the Schedule Spec
       </Link>
     </p>
