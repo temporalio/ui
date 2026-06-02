@@ -35,5 +35,5 @@
 </script>
 
 <div class={twMerge('border border-subtle p-8', className)}>
-  <p class="font-mono text-sm">{preview}.</p>
+  <p class="font-mono text-xs">{preview}.</p>
 </div>

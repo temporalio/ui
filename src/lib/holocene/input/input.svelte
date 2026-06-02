@@ -19,6 +19,7 @@
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
+    suffixClass?: string;
     prefix?: string;
     valid?: boolean;
     hintText?: string | Snippet<[{ valid: boolean; error: boolean }]>;
@@ -49,6 +50,7 @@
     icon = null,
     placeholder = '',
     suffix = '',
+    suffixClass,
     prefix = '',
     name = id,
     copyable = false,
@@ -173,7 +175,12 @@
         </div>
       {/if}
       {#if suffix}
-        <div class="suffix">
+        <div
+          class={merge(
+            'block h-full w-fit border-l border-subtle bg-subtle px-4 py-2',
+            suffixClass,
+          )}
+        >
           {suffix}
         </div>
       {/if}
@@ -238,10 +245,6 @@
 
   .prefix {
     @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
-  }
-
-  .suffix {
-    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
   }
 
   .noBorder {

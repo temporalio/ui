@@ -70,7 +70,7 @@
 
   interface PropsWithoutCustomUnits extends BaseProps {
     units?: never;
-    initialUnit?: never;
+    initialUnit?: DefaultUnits;
   }
 
   interface PropsWithCustomUnits extends BaseProps {

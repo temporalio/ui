@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
 
-  import DurationInput, {
-    DEFAULT_UNITS,
-  } from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
 
   import type { ScheduleFormData } from './schema';
+
+  import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
@@ -36,6 +36,7 @@
       bind:value={$form.specs[index].days}
       placeholder="000"
       suffix="days"
+      suffixClass="min-w-16 text-center"
     />
     <span class="align-center hidden text-secondary sm:flex">:</span>
     <Input
@@ -49,6 +50,7 @@
       bind:value={$form.specs[index].hour}
       placeholder="00"
       suffix="hrs"
+      suffixClass="min-w-16 text-center"
     />
     <span class="align-center hidden text-secondary sm:flex md:hidden xl:flex"
       >:</span
@@ -64,6 +66,7 @@
       bind:value={$form.specs[index].minute}
       placeholder="00"
       suffix="min"
+      suffixClass="min-w-16 text-center"
     />
     <span class="align-center hidden text-secondary sm:flex">:</span>
     <Input
@@ -77,6 +80,7 @@
       bind:value={$form.specs[index].second}
       placeholder="00"
       suffix="sec"
+      suffixClass="min-w-16 text-center"
     />
   </div>
 
@@ -85,14 +89,19 @@
       Specify the time to offset when this schedule will run (for example, 15
       min past the hour).
     </p>
-    <DurationInput
-      id="phase-{index}"
-      label="Offset"
-      bind:value={$form.specs[index].phase}
-      initialUnit="minute(s)"
-      units={DEFAULT_UNITS}
-      placeholder="00"
-      class="w-40"
-    />
+    <div class="max-w-108">
+      <DurationInput
+        id="phase-{index}"
+        label="Offset"
+        bind:value={$form.specs[index].phase}
+        initialUnit="minute(s)"
+        inputmode="numeric"
+        min={0}
+        placeholder="00"
+        hintText="Specify the time to offset when this schedule will run (for example, 15 min past the hour)."
+      />
+    </div>
   </div>
+
+  <ScheduleSpecPreview {form} {index} />
 </div>
