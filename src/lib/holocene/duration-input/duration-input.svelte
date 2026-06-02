@@ -47,7 +47,10 @@
 </script>
 
 <script lang="ts">
-  import type { ChangeEventHandler } from 'svelte/elements';
+  import type {
+    ChangeEventHandler,
+    HTMLInputAttributes,
+  } from 'svelte/elements';
 
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
@@ -56,7 +59,7 @@
   type K = $$Generic<string>;
   type T = $$Generic<Units<K>>;
 
-  interface BaseProps {
+  interface BaseProps extends Omit<HTMLInputAttributes, 'class'> {
     value: string;
     label: string;
     id: string;
@@ -86,6 +89,7 @@
     required = false,
     value = $bindable(),
     class: className = '',
+    ...inputProps
   }: Props = $props();
 
   let rawValue = $state(parseDuration(value));
@@ -119,6 +123,7 @@
       type="number"
       bind:value={rawValue}
       oninput={handleNumberInput}
+      {...inputProps}
     />
     <select
       id="{id}-unit-select"
