@@ -131,6 +131,8 @@ export const getDefaultValues = (params: {
     ? parseScheduleSpecs(schedule)
     : [{ ...DEFAULT_SPEC_ITEM }];
 
+  const nowIsoString = new Date().toISOString();
+
   return {
     name: scheduleId ?? '',
     workflowType: schedule?.action?.startWorkflow?.workflowType?.name ?? '',
@@ -142,9 +144,13 @@ export const getDefaultValues = (params: {
     messageType: '',
     specs,
     timezoneName: schedule?.spec?.timezoneName ?? 'UTC',
-    startDate: schedule?.spec?.startTime ? String(schedule.spec.startTime) : '',
+    startDate: schedule?.spec?.startTime
+      ? String(schedule.spec.startTime)
+      : nowIsoString,
     endDateType: schedule?.spec?.endTime ? 'on' : 'never',
-    endDate: schedule?.spec?.endTime ? String(schedule.spec.endTime) : '',
+    endDate: schedule?.spec?.endTime
+      ? String(schedule.spec.endTime)
+      : nowIsoString,
     endAfterOccurrences: undefined,
     jitter: schedule?.spec?.jitter ? String(schedule.spec.jitter) : '0',
     overlapPolicy: parseOverlapPolicy(schedule?.policies?.overlapPolicy),

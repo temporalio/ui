@@ -149,7 +149,7 @@
           <SchedulePoliciesCard {form} />
 
           <div class="w-full xl:hidden">
-            <ScheduleSummarySidebar formData={$form} />
+            <ScheduleSummarySidebar {form} />
           </div>
 
           <Alert
@@ -176,7 +176,7 @@
         </div>
 
         <div class="hidden w-full xl:block">
-          <ScheduleSummarySidebar formData={$form} />
+          <ScheduleSummarySidebar {form} />
         </div>
       </div>
     </form>

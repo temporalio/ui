@@ -45,7 +45,9 @@ export function getSpecSummary(spec: Spec, formatDate: FormatDateFn): string {
   switch (spec.type) {
     case 'cron': {
       try {
-        return cronstrue.toString(spec.cronString || '* * * * *');
+        return cronstrue.toString(spec.cronString || '* * * * *', {
+          verbose: true,
+        });
       } catch {
         return '';
       }
