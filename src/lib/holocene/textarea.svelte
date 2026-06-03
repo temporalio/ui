@@ -63,6 +63,7 @@
       {placeholder}
       {rows}
       {spellcheck}
+      {required}
       on:input
       on:change
       on:focus

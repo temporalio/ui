@@ -92,7 +92,7 @@
       id="advanced-search"
       placeholder={translate('common.query')}
       value={query}
-      on:submit={updateQuery}
+      onsubmit={updateQuery}
     />
   {:else}
     <div
@@ -107,7 +107,7 @@
         label={translate('common.workflow-id')}
         labelHidden
         bind:value={parameters.workflowId}
-        on:input={handleParameterChange}
+        oninput={handleParameterChange}
       />
       <Input
         icon="search"
@@ -117,7 +117,7 @@
         label={translate('common.workflow-type')}
         labelHidden
         bind:value={parameters.workflowType}
-        on:input={handleParameterChange}
+        oninput={handleParameterChange}
       />
       <Select
         id="time-range-filter"

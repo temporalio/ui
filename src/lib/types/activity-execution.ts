@@ -112,6 +112,6 @@ export interface StartActivityExecutionRequest {
   scheduleToStartTimeout: string;
   input?: Payloads;
   userMetadata?: UserMetadata;
-  retryPolicy?: RetryPolicy;
+  retryPolicy?: Partial<RetryPolicy>;
   searchAttributes?: SearchAttribute;
 }

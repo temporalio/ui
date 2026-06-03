@@ -264,7 +264,7 @@
         bind:value={workflowId}
         label="Workflow ID"
         class="w-full grow"
-        on:blur={(e) => onInputChange(e, 'workflowId')}
+        onblur={(e) => onInputChange(e, 'workflowId')}
       />
       <Button
         class="mt-0 md:mt-6"
@@ -280,7 +280,7 @@
         bind:value={taskQueue}
         label="Task Queue"
         class="grow"
-        on:blur={(e) => onInputChange(e, 'taskQueue')}
+        onblur={(e) => onInputChange(e, 'taskQueue')}
       />
     </div>
     {#if pollerCount !== undefined}
@@ -307,7 +307,7 @@
       required
       bind:value={workflowType}
       label="Workflow Type"
-      on:blur={(e) => onInputChange(e, 'workflowType')}
+      onblur={(e) => onInputChange(e, 'workflowType')}
     />
     <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
     {#if viewAdvancedOptions}

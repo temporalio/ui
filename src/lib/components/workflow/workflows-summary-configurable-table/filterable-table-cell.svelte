@@ -1,8 +1,10 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import { page } from '$app/state';
 
-  import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
@@ -20,21 +22,29 @@
     truncateValue,
   } from '$lib/utilities/truncate-value';
 
-  type Props = {
+  interface Props extends Omit<
+    ComponentProps<typeof TableCellWithFilterOrCopyButtons>,
+    | 'children'
+    | 'filterIconTitle'
+    | 'copyIconTitle'
+    | 'copySuccessIconTitle'
+    | 'copyValue'
+    | 'onFilter'
+    | 'isFiltered'
+  > {
     attribute: string;
-    filterOrCopyButtonsVisible: boolean;
     value: string;
     href?: string;
     type?: SearchAttributeType;
     truncate?: boolean;
-  };
+  }
   let {
     attribute,
-    filterOrCopyButtonsVisible = false,
     value,
     href,
     type = SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     truncate = false,
+    ...cellProps
   }: Props = $props();
 
   const onRowFilterClick = () => {
@@ -62,23 +72,21 @@
   );
 </script>
 
-{#if href}
-  <Tooltip usePortal text={value} top class="min-w-0" hide={hideTooltip}>
-    <Link {href}>{truncate ? truncateValue(value) : value}</Link>
-  </Tooltip>
-{:else}
-  <Tooltip usePortal text={value} top class="min-w-0" hide={hideTooltip}>
-    {truncate ? truncateValue(value) : value}
-  </Tooltip>
-{/if}
-<FilterOrCopyButtons
-  copyIconTitle={translate('common.copy-icon-title')}
-  copySuccessIconTitle={translate('common.copy-success-icon-title')}
+<TableCellWithFilterOrCopyButtons
+  {...cellProps}
+  density={truncate ? 'dense' : 'comfortable'}
   filterIconTitle={translate('common.filter-workflows')}
-  show={filterOrCopyButtonsVisible}
-  content={value}
+  copyValue={value}
   onFilter={onRowFilterClick}
-  filtered={$workflowFilters.some(
+  isFiltered={$workflowFilters.some(
     (filter) => filter.attribute === attribute && filter.value === value,
   )}
-/>
+>
+  <Tooltip usePortal text={value} top class="min-w-0" hide={hideTooltip}>
+    {#if href}
+      <Link {href}>{truncate ? truncateValue(value) : value}</Link>
+    {:else}
+      {truncate ? truncateValue(value) : value}
+    {/if}
+  </Tooltip>
+</TableCellWithFilterOrCopyButtons>

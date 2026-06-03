@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { FullAutoFill, HTMLInputAttributes } from 'svelte/elements';
 
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -11,10 +11,11 @@
 
   import IconButton from '../icon-button.svelte';
 
-  type BaseProps = HTMLInputAttributes & {
+  interface Props extends HTMLInputAttributes {
     id: string;
     value: string;
     label: string;
+    afterLabel?: Snippet;
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
@@ -23,83 +24,88 @@
     hintText?: string;
     maxLength?: number;
     hideCount?: boolean;
-    spellcheck?: boolean;
     noBorder?: boolean;
     autoFocus?: boolean;
     error?: boolean;
+    autocomplete?: FullAutoFill;
+    copyable?: boolean;
+    copyButtonLabel?: string;
+    clearable?: boolean;
+    clearButtonLabel?: string;
     'data-testid'?: string;
     class?: string;
     inputContainerClass?: string;
-  };
+    onClear?: () => void;
+    beforeInput?: Snippet<[{ disabled: boolean }]>;
+    afterInput?: Snippet<[{ disabled: boolean }]>;
+  }
 
-  type CopyableProps = BaseProps & {
-    copyable: boolean;
-    copyButtonLabel: string;
-  };
+  let {
+    id,
+    value = $bindable(),
+    label,
+    afterLabel,
+    labelHidden = false,
+    icon = null,
+    placeholder = '',
+    suffix = '',
+    prefix = '',
+    name = id,
+    copyable = false,
+    disabled = false,
+    clearable = false,
+    autocomplete = 'off',
+    valid = true,
+    hintText = '',
+    maxLength = 0,
+    hideCount = false,
+    spellcheck = null,
+    noBorder = false,
+    autoFocus = false,
+    error = false,
+    required = false,
+    copyButtonLabel = '',
+    clearButtonLabel = '',
+    class: className = '',
+    inputContainerClass = '',
+    'data-testid': dataTestId,
+    onClear,
+    onclick,
+    onkeydown,
+    beforeInput,
+    afterInput,
+    ...rest
+  }: Props = $props();
 
-  type ClearableProps = BaseProps & {
-    clearable: boolean;
-    clearButtonLabel: string;
-  };
-
-  type $$Props = BaseProps | CopyableProps | ClearableProps;
-
-  export let id: string;
-  export let value: string;
-  export let label: string;
-  export let labelHidden = false;
-  export let icon: IconName = null;
-  export let placeholder = '';
-  export let suffix = '';
-  export let prefix = '';
-  export let name = id;
-  export let copyable = false;
-  export let disabled = false;
-  export let clearable = false;
-  export let autocomplete: FullAutoFill = 'off';
-  export let valid = true;
-  export let hintText = '';
-  export let maxLength = 0;
-  export let hideCount = false;
-  export let spellcheck: boolean = null;
-  export let noBorder = false;
-  export let autoFocus = false;
-  export let error = false;
-  export let required = false;
-  export let copyButtonLabel = '';
-  export let clearButtonLabel = '';
-
-  let className = '';
-  export { className as class };
-  export let inputContainerClass = '';
-
-  let testId = $$props['data-testid'] || id;
+  const isDisabled = $derived(disabled || copyable);
+  const testId = $derived(dataTestId || id);
 
   function callFocus(input: HTMLInputElement) {
     if (autoFocus && input) input.focus();
   }
 
-  const dispatch = createEventDispatcher();
-  function onClear() {
+  function handleClear() {
     value = '';
-    dispatch('clear', {});
+    onClear?.();
   }
 
   const { copy, copied } = copyToClipboard();
-  $: disabled = disabled || copyable;
 </script>
 
 <div class={merge('group flex flex-col gap-1', className)}>
-  <Label {required} {label} hidden={labelHidden} for={id} />
+  <div class="flex items-center justify-start gap-2">
+    <Label class="grow-0" {required} {label} hidden={labelHidden} for={id} />
+    {@render afterLabel?.()}
+  </div>
   <div class="input-group flex">
-    <slot name="before-input" {disabled} />
+    {@render beforeInput?.({ disabled: isDisabled })}
     <div
       class={merge(
         'input-container',
         'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
         inputContainerClass,
       )}
-      class:disabled
+      class:disabled={isDisabled}
       class:error
       class:noBorder
       class:invalid={!valid}
@@ -113,8 +119,8 @@
       {/if}
       <input
         class="input"
-        class:disabled
-        {disabled}
+        class:disabled={isDisabled}
+        disabled={isDisabled}
         data-lpignore="true"
         data-1p-ignore="true"
         maxlength={maxLength > 0 ? maxLength : undefined}
@@ -125,15 +131,17 @@
         {required}
         {autocomplete}
         bind:value
-        on:click|stopPropagation
-        on:input
-        on:keydown|stopPropagation
-        on:change
-        on:focus
-        on:blur
+        onclick={(e) => {
+          e.stopPropagation();
+          onclick?.(e);
+        }}
+        onkeydown={(e) => {
+          e.stopPropagation();
+          onkeydown?.(e);
+        }}
         use:callFocus
         data-testid={testId}
-        {...$$restProps}
+        {...rest}
       />
       {#if copyable}
         <div class="copy-icon-container">
@@ -142,7 +150,7 @@
             data-track-name="input-copy-button"
             data-track-intent="copy"
             data-track-text={label || copyButtonLabel}
-            on:click={(e) => copy(e, value)}
+            onclick={(e) => copy(e, value)}
           >
             {#if $copied}
               <Icon name="checkmark" />
@@ -151,7 +159,7 @@
             {/if}
           </button>
         </div>
-      {:else if disabled}
+      {:else if isDisabled}
         <div class="disabled-icon-container">
           <Icon name="lock" />
         </div>
@@ -159,7 +167,7 @@
         <div class="clear-icon-container" data-testid="clear-input">
           <IconButton
             label={clearButtonLabel}
-            on:click={onClear}
+            on:click={handleClear}
             icon="close"
           />
         </div>
@@ -170,12 +178,12 @@
         </div>
       {/if}
     </div>
-    <slot name="after-input" {disabled} />
+    {@render afterInput?.({ disabled: isDisabled })}
   </div>
 
   <div
     class="inline-flex justify-between gap-2"
-    class:hidden={!hintText && (!maxLength || disabled || hideCount)}
+    class:hidden={!hintText && (!maxLength || isDisabled || hideCount)}
   >
     <span
       class="hint-text inline-block"
@@ -185,7 +193,7 @@
     >
       {hintText}
     </span>
-    {#if maxLength && !disabled && !hideCount}
+    {#if maxLength && !isDisabled && !hideCount}
       <span
         class="invisible text-right text-xs tracking-widest group-focus-within:visible"
       >

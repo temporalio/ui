@@ -12,7 +12,7 @@
   let { label } = $derived(column);
 </script>
 
-<th data-testid="workflows-summary-table-header-cell-{label}">
+<th scope="col" data-testid="workflows-summary-table-header-cell-{label}">
   <div class="flex items-center gap-2">
     {label}
     {@render children?.()}

@@ -20,15 +20,22 @@
   export let group: Writable<T>;
   export let description = '';
 
+  $: descriptionId = description ? `${name}-description` : undefined;
+
   setContext<RadioGroupContext<T>>(RADIO_GROUP_CONTEXT, {
     name,
     group,
   });
 </script>
 
-<div class={merge('flex flex-col gap-4 p-1', className)} {...$$restProps}>
+<div
+  role="radiogroup"
+  aria-labelledby={descriptionId}
+  class={merge('flex flex-col gap-4 p-1', className)}
+  {...$$restProps}
+>
   {#if description}
-    <p class="text-sm font-medium">{description}</p>
+    <p id={descriptionId} class="text-sm font-medium">{description}</p>
   {/if}
   <slot />
 </div>

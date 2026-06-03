@@ -93,7 +93,7 @@
   class="relative overflow-hidden"
   bind:clientWidth={width}
   bind:clientHeight={height}
-  style="height: {containerHeight}px"
+  style="height: min({containerHeight}px, calc(100dvh - 8rem));"
 >
   <div class="absolute right-4 top-4 z-20 flex items-center gap-2">
     <slot name="controls" />

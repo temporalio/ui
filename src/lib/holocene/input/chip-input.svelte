@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { FullAutoFill } from 'svelte/elements';
+
   import { twMerge as merge } from 'tailwind-merge';
 
   import Chip from '$lib/holocene/chip.svelte';
@@ -20,6 +22,7 @@
     maxLength?: number;
     class?: string;
     scrollTo?: boolean;
+    autocomplete?: FullAutoFill;
   };
 
   let {
@@ -38,6 +41,7 @@
     maxLength = 0,
     class: className = '',
     scrollTo = false,
+    autocomplete = 'off',
   }: Props = $props();
 
   let displayValue = $state('');
@@ -133,7 +137,7 @@
     <input
       data-lpignore="true"
       data-1p-ignore="true"
-      autocomplete="off"
+      {autocomplete}
       class:cursor-not-allowed={disabled}
       {disabled}
       {placeholder}

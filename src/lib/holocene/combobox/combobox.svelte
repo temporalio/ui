@@ -108,6 +108,7 @@
     removeChipLabel?: string;
     selectAllLabel?: string;
     deselectAllLabel?: string;
+    hideControls?: boolean;
     numberOfItemsSelectedLabel?: (count: number) => string;
   }
 
@@ -119,6 +120,7 @@
     removeChipLabel?: never;
     selectAllLabel?: never;
     deselectAllLabel?: never;
+    hideControls?: never;
     numberOfItemsSelectedLabel?: never;
   }
 
@@ -168,6 +170,7 @@
     displayChips = true,
     selectAllLabel = 'Select All',
     deselectAllLabel = 'Deselect All',
+    hideControls = false,
     removeChipLabel = 'Remove Option',
     numberOfItemsSelectedLabel = (count: number) =>
       `${count} option${count > 1 ? 's' : ''} selected`,
@@ -545,7 +548,7 @@
             className,
           )}
           role="combobox"
-          autocomplete="off"
+          autocomplete={rest.autocomplete ?? 'off'}
           autocapitalize="off"
           spellcheck="false"
           data-lpignore="true"
@@ -626,7 +629,7 @@
     class="w-full"
     maxHeight={maxMenuHeight}
   >
-    {#if multiselect && isArrayValue(value)}
+    {#if multiselect && isArrayValue(value) && !hideControls}
       <ComboboxOption
         disabled={value.length === allOptions.length}
         onclick={selectAll}

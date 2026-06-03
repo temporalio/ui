@@ -82,7 +82,7 @@
     }
   }
 
-  .holocene-table-body {
+  :where(.holocene-table-body) {
     :global(tr) {
       @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }

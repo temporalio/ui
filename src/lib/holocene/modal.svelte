@@ -161,7 +161,11 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer transition-opacity duration-200;
+    @apply cursor-pointer bg-black/50 transition-opacity duration-200;
+
+    :global([data-theme='dark']) & {
+      background-color: rgb(var(--color-surface-background) / 50%);
+    }
   }
 
   .body.hightlightNav::backdrop {

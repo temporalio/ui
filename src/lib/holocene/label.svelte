@@ -50,6 +50,9 @@
     <span>{label}</span>
   {/if}
   {#if required}
-    <span class="h-1.5 w-1.5 rounded-full bg-interactive-error"></span>
+    <span
+      aria-hidden="true"
+      class="-ml-1 translate-y-0.5 font-mono leading-none text-danger">*</span
+    >
   {/if}
 </label>

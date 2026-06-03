@@ -81,7 +81,7 @@ export const Strings = {
   'set-as-current-error': 'Failed to set version as current',
   'set-current-version-success': '{{ buildId }} is now the current version',
   edit: 'Edit',
-  'validate-connection': 'Validate Connection',
+  'validate-connection': 'Validate Connection for',
   'validate-connection-error': 'Failed to validate connection',
   'validate-connection-valid': 'Connection is valid',
   'validate-connection-invalid': 'Connection is invalid',

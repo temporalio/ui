@@ -193,12 +193,12 @@
   let endMinute = '';
   let endSecond = '';
 
-  const onStartDateChange = (d: CustomEvent) => {
-    startDate = startOfDay(d.detail);
+  const onStartDateChange = (d: Date) => {
+    startDate = startOfDay(d);
   };
 
-  const onEndDateChange = (d: CustomEvent) => {
-    endDate = startOfDay(d.detail);
+  const onEndDateChange = (d: Date) => {
+    endDate = startOfDay(d);
   };
 
   const updateDefaultBackfillTimes = () => {
@@ -514,7 +514,7 @@
         <div class="flex flex-col gap-2 p-2">
           <DatePicker
             label={translate('common.start')}
-            on:datechange={onStartDateChange}
+            onDateChange={onStartDateChange}
             selected={startDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}
@@ -528,7 +528,7 @@
           />
           <DatePicker
             label={translate('common.end')}
-            on:datechange={onEndDateChange}
+            onDateChange={onEndDateChange}
             selected={endDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}
