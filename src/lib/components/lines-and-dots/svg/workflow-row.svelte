@@ -3,7 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
-  import { getStatusLabel } from '$lib/utilities/get-status-label';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
 
   import { TimelineConfig } from '../constants';
 
@@ -26,7 +26,7 @@
   const accessibleName = $derived(
     translate('workflows.row-accessible-name', {
       workflowId: workflow.id,
-      status: getStatusLabel(workflow.status),
+      status: getWorkflowStatusLabel(workflow.status),
     }),
   );
 </script>

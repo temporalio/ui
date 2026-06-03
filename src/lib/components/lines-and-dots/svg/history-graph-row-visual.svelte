@@ -10,7 +10,7 @@
     EventTypeCategory,
     WorkflowEventWithPending,
   } from '$lib/types/events';
-  import { getStatusLabel } from '$lib/utilities/get-status-label';
+  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -84,7 +84,9 @@
         : classification,
   );
 
-  const classificationLabel = $derived(getStatusLabel(statusForLabel));
+  const classificationLabel = $derived(
+    getEventClassificationLabel(statusForLabel),
+  );
 
   const eventTypeLabel = $derived(
     event && 'eventType' in event

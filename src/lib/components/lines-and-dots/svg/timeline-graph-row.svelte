@@ -15,7 +15,7 @@
   } from '$lib/utilities/decode-local-activity';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
-  import { getStatusLabel } from '$lib/utilities/get-status-label';
+  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
@@ -59,7 +59,7 @@
   const accessibleName = $derived(
     translate('events.row-accessible-name', {
       eventType: group.displayName,
-      classification: getStatusLabel(
+      classification: getEventClassificationLabel(
         group.finalClassification || group.classification,
       ),
     }),
