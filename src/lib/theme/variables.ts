@@ -212,7 +212,7 @@ export const variables = {
   },
   '--color-border-focus-info': {
     light: 'indigo.600',
-    dark: 'indigo.600',
+    dark: 'indigo.400',
   },
   '--color-border-focus-danger': {
     light: 'red.600',
