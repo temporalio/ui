@@ -139,6 +139,10 @@ export const fromSeconds = (
   if (!seconds.endsWith('s')) return '';
   if (isNaN(parsedSeconds) || isNaN(parsedDecimal)) return '';
 
+  if (parsedSeconds === 0 && !parsedDecimal) {
+    return '0 seconds';
+  }
+
   const start = new Date(Date.UTC(0, 0, 0, 0, 0, 0));
   const end = new Date(Date.UTC(0, 0, 0, 0, 0, parsedSeconds));
   const duration = intervalToDuration({ start, end });

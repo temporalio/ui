@@ -11,8 +11,9 @@ import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import { setSearchAttributes } from '$lib/services/workflow-service';
 import type { Schedule } from '$lib/types';
 import type {
-  DescribeFullSchedule,
   ScheduleInterval,
+  ScheduleRequestBody,
+  ScheduleSpecRequest,
 } from '$lib/types/schedule';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -39,7 +40,9 @@ const getSearchAttributes = (
     : { indexedFields: { ...setSearchAttributes(attrs) } };
 };
 
-const buildSpecFromFormData = (formData: ScheduleFormData) => {
+const buildSpecFromFormData = (
+  formData: ScheduleFormData,
+): ScheduleSpecRequest => {
   const spec: {
     calendar: object[];
     interval: ScheduleInterval[];
@@ -139,6 +142,14 @@ const buildPolicies = (formData: ScheduleFormData) => {
   };
 };
 
+const buildWorkflowTimeouts = (formData: ScheduleFormData) => ({
+  ...(formData.taskTimeout && { workflowTaskTimeout: formData.taskTimeout }),
+  ...(formData.runTimeout && { workflowRunTimeout: formData.runTimeout }),
+  ...(formData.executionTimeout && {
+    workflowExecutionTimeout: formData.executionTimeout,
+  }),
+});
+
 let createTimeout: ReturnType<typeof setTimeout>;
 let editTimeout: ReturnType<typeof setTimeout>;
 
@@ -177,18 +188,21 @@ export const submitCreateSchedule = async (
           searchAttributes: getSearchAttributes(
             formData.workflowSearchAttributes,
           ),
+          ...buildWorkflowTimeouts(formData),
         },
       },
       policies: buildPolicies(formData),
-      state:
-        formData.endDateType === 'after' && formData.endAfterOccurrences
+      state: {
+        ...(formData.endDateType === 'after' && formData.endAfterOccurrences
           ? {
               limitedActions: true,
               remainingActions: formData.endAfterOccurrences,
             }
-          : undefined,
+          : {}),
+        ...(formData.pauseSchedule && { paused: true }),
+      },
     },
-  } as unknown as DescribeFullSchedule;
+  } satisfies ScheduleRequestBody;
 
   loading.set(true);
   const { error: err } = await createSchedule({
@@ -237,7 +251,7 @@ export const submitEditSchedule = async (
     schedule_id: scheduleId,
     searchAttributes: getSearchAttributes(formData.searchAttributes),
     schedule: {
-      ...(schedule as Record<string, unknown>),
+      ...schedule,
       spec: buildSpecFromFormData(formData),
       action: {
         startWorkflow: {
@@ -251,18 +265,22 @@ export const submitEditSchedule = async (
           searchAttributes: getSearchAttributes(
             formData.workflowSearchAttributes,
           ),
+          ...buildWorkflowTimeouts(formData),
         },
       },
       policies: buildPolicies(formData),
-      state:
-        formData.endDateType === 'after' && formData.endAfterOccurrences
+      state: {
+        ...(schedule.state ?? {}),
+        ...(formData.endDateType === 'after' && formData.endAfterOccurrences
           ? {
               limitedActions: true,
               remainingActions: formData.endAfterOccurrences,
             }
-          : schedule.state,
+          : {}),
+        paused: formData.pauseSchedule,
+      },
     },
-  } as unknown as DescribeFullSchedule;
+  } satisfies ScheduleRequestBody;
 
   const fields = body.schedule?.action?.startWorkflow?.header?.fields;
   if (fields && Object.keys(fields).length > 0) {

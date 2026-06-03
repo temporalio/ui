@@ -5,6 +5,14 @@ import type { FullSchedule } from '$lib/types/schedule';
 import type { SearchAttributes } from '$lib/types/workflows';
 import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 
+import {
+  DEFAULT_CATCHUP_WINDOW,
+  DEFAULT_EXECUTION_TIMEOUT,
+  DEFAULT_RUN_TIMEOUT,
+  DEFAULT_TASK_TIMEOUT,
+  schedulePoliciesSchema,
+} from './policies-schema';
+
 import type { SearchAttribute } from '$types';
 
 export const scheduleSpecItemSchema = z.object({
@@ -35,57 +43,46 @@ export const DEFAULT_SPEC_ITEM: ScheduleSpecItem = {
   phase: '',
 };
 
-export const scheduleFormSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(232, 'Name is too long'),
-  workflowType: z.string().min(1, 'Workflow type is required'),
-  workflowId: z.string(),
-  taskQueue: z.string().min(1, 'Task queue is required'),
-  input: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        try {
-          JSON.parse(val);
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      {
-        message: 'Input must be valid JSON',
-      },
-    ),
-  editInput: z.boolean(),
-  encoding: z.enum(['json/plain', 'json/protobuf'] as const),
-  messageType: z.string().optional(),
-  specs: z
-    .array(scheduleSpecItemSchema)
-    .min(1, 'At least one schedule spec is required'),
-  timezoneName: z.string(),
-  startDate: z.string().optional().default(''),
-  endDateType: z.enum(['never', 'on', 'after']),
-  endDate: z.string().optional().default(''),
-  endAfterOccurrences: z.number().optional(),
-  jitter: z.string().optional().default('0'),
-  overlapPolicy: z
-    .enum([
-      'Skip',
-      'BufferOne',
-      'BufferAll',
-      'CancelOther',
-      'TerminateOther',
-      'AllowAll',
-    ])
-    .optional()
-    .default('Skip'),
-  catchupWindow: z.string().optional().default(''),
-  pauseOnFailure: z.boolean(),
-  keepOriginalWorkflowId: z.boolean(),
-  searchAttributes: searchAttributesSchema,
-  workflowSearchAttributes: searchAttributesSchema,
-});
+export const scheduleFormSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required').max(232, 'Name is too long'),
+    workflowType: z.string().min(1, 'Workflow type is required'),
+    workflowId: z.string(),
+    taskQueue: z.string().min(1, 'Task queue is required'),
+    input: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val || val.trim() === '') return true;
+          try {
+            JSON.parse(val);
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: 'Input must be valid JSON',
+        },
+      ),
+    editInput: z.boolean(),
+    encoding: z.enum(['json/plain', 'json/protobuf'] as const),
+    messageType: z.string().optional(),
+    specs: z
+      .array(scheduleSpecItemSchema)
+      .min(1, 'At least one schedule spec is required'),
+    timezoneName: z.string(),
+    startDate: z.string().optional().default(''),
+    endDateType: z.enum(['never', 'on', 'after']),
+    endDate: z.string().optional().default(''),
+    endAfterOccurrences: z.number().optional(),
+    jitter: z.string().optional().default('0'),
+    keepOriginalWorkflowId: z.boolean(),
+    searchAttributes: searchAttributesSchema,
+    workflowSearchAttributes: searchAttributesSchema,
+  })
+  .merge(schedulePoliciesSchema);
 
 export type ScheduleFormData = z.infer<typeof scheduleFormSchema>;
 
@@ -153,8 +150,18 @@ export const getDefaultValues = (params: {
     overlapPolicy: parseOverlapPolicy(schedule?.policies?.overlapPolicy),
     catchupWindow: schedule?.policies?.catchupWindow
       ? String(schedule.policies.catchupWindow)
-      : '',
+      : DEFAULT_CATCHUP_WINDOW,
     pauseOnFailure: schedule?.policies?.pauseOnFailure ?? false,
+    pauseSchedule: schedule?.state?.paused ?? false,
+    taskTimeout: schedule?.action?.startWorkflow?.workflowTaskTimeout
+      ? String(schedule.action.startWorkflow.workflowTaskTimeout)
+      : DEFAULT_TASK_TIMEOUT,
+    runTimeout: schedule?.action?.startWorkflow?.workflowRunTimeout
+      ? String(schedule.action.startWorkflow.workflowRunTimeout)
+      : DEFAULT_RUN_TIMEOUT,
+    executionTimeout: schedule?.action?.startWorkflow?.workflowExecutionTimeout
+      ? String(schedule.action.startWorkflow.workflowExecutionTimeout)
+      : DEFAULT_EXECUTION_TIMEOUT,
     keepOriginalWorkflowId: schedule?.policies?.keepOriginalWorkflowId ?? false,
     searchAttributes: searchAttributesInput,
     workflowSearchAttributes: workflowSearchAttributesInput,
