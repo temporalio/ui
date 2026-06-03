@@ -1,8 +1,12 @@
 import {
   QueryWorkflowRequestSchema,
+  QueryWorkflowResponseSchema,
   SignalWithStartWorkflowExecutionRequestSchema,
+  SignalWithStartWorkflowExecutionResponseSchema,
   SignalWorkflowExecutionRequestSchema,
+  SignalWorkflowExecutionResponseSchema,
   StartWorkflowExecutionRequestSchema,
+  StartWorkflowExecutionResponseSchema,
 } from '@buf/temporalio_api.bufbuild_es/temporal/api/workflowservice/v1/request_response_pb.js';
 import { type DescMessage, fromBinary, toJson } from '@bufbuild/protobuf';
 
@@ -17,16 +21,32 @@ const SCHEMA_REGISTRY = new Map<string, DescMessage>([
     StartWorkflowExecutionRequestSchema,
   ],
   [
+    'temporal.api.workflowservice.v1.StartWorkflowExecutionResponse',
+    StartWorkflowExecutionResponseSchema,
+  ],
+  [
     'temporal.api.workflowservice.v1.SignalWorkflowExecutionRequest',
     SignalWorkflowExecutionRequestSchema,
+  ],
+  [
+    'temporal.api.workflowservice.v1.SignalWorkflowExecutionResponse',
+    SignalWorkflowExecutionResponseSchema,
   ],
   [
     'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest',
     SignalWithStartWorkflowExecutionRequestSchema,
   ],
   [
+    'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse',
+    SignalWithStartWorkflowExecutionResponseSchema,
+  ],
+  [
     'temporal.api.workflowservice.v1.QueryWorkflowRequest',
     QueryWorkflowRequestSchema,
+  ],
+  [
+    'temporal.api.workflowservice.v1.QueryWorkflowResponse',
+    QueryWorkflowResponseSchema,
   ],
 ]);
 
