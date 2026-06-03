@@ -86,7 +86,7 @@
   let isFocused = false;
   let dismissed = false;
   let hoverHideTimer: ReturnType<typeof setTimeout> | null = null;
-  const tooltipId = `tooltip-${Math.random().toString(36).slice(2, 11)}`;
+  const tooltipId = `tooltip-${crypto.randomUUID()}`;
 
   $: isOpen = (show || isHovered || isFocused) && !dismissed;
 
