@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
+  import { untrack } from 'svelte';
+
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -33,6 +35,16 @@
       .filter(Boolean)
       .join(', ') || 'No timeouts set',
   );
+
+  let editPoliciesButton: { focus: () => void };
+
+  let wasEditingPolicies = false;
+  $effect(() => {
+    if (!isEditingPolicies && wasEditingPolicies) {
+      untrack(() => editPoliciesButton?.focus());
+    }
+    wasEditingPolicies = isEditingPolicies;
+  });
 </script>
 
 <div class="flex flex-col gap-1">
@@ -80,8 +92,11 @@
         <dd>{timeoutsSummary}</dd>
       </div>
     </dl>
-    <div class="mt-2">
-      <Button variant="secondary" on:click={() => (isEditingPolicies = true)}
+    <div class="mr-auto mt-2">
+      <Button
+        bind:this={editPoliciesButton}
+        variant="secondary"
+        on:click={() => (isEditingPolicies = true)}
         >Edit Schedule Policies</Button
       >
     </div>
