@@ -155,7 +155,7 @@
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     bind:this={wrapperElement}
-    class={merge('wrapper group/tooltip relative inline-block', className)}
+    class={merge('wrapper relative inline-block', className)}
     aria-describedby={isOpen ? tooltipId : undefined}
     on:mouseenter={handleHoverEnter}
     on:mouseleave={handleHoverLeave}
