@@ -209,7 +209,7 @@ func TestExchangeCode_MissingCodeVerifier(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
 
 	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider)
+	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "Code verifier is not set")
 }
@@ -230,7 +230,7 @@ func TestExchangeCode_WithPKCE(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: "nonce", Value: tokenNonce})
 
 	cfg := harness.OAuth2Config()
-	user, err := auth.ExchangeCode(context.Background(), req, cfg, provider)
+	user, err := auth.ExchangeCode(context.Background(), req, cfg, provider, true)
 	require.NoError(t, err)
 	require.NotNil(t, user)
 	require.NotNil(t, user.OAuth2Token)
@@ -248,6 +248,36 @@ func TestExchangeCode_WithPKCE(t *testing.T) {
 		"code_verifier must be sent to token endpoint")
 }
 
+func TestExchangeCode_WithoutPKCE(t *testing.T) {
+	harness := newOIDCTestHarness(t)
+	defer harness.Close()
+
+	tokenNonce := "non-pkce-nonce"
+	harness.nonce = tokenNonce
+
+	provider, err := harness.Provider(context.Background())
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodGet, "/auth/sso/callback?code=test-code&state=test-state", nil)
+	req.AddCookie(&http.Cookie{Name: "state", Value: "test-state"})
+	req.AddCookie(&http.Cookie{Name: "nonce", Value: tokenNonce})
+
+	cfg := harness.OAuth2Config()
+	user, err := auth.ExchangeCode(context.Background(), req, cfg, provider, false)
+	require.NoError(t, err)
+	require.NotNil(t, user)
+	require.NotNil(t, user.OAuth2Token)
+	assert.Equal(t, "mock-access-token", user.OAuth2Token.AccessToken)
+
+	require.NotNil(t, user.IDToken)
+	require.NotNil(t, user.IDToken.Claims)
+	assert.Equal(t, "test@example.com", user.IDToken.Claims.Email)
+
+	require.NotNil(t, harness.lastTokenParams)
+	assert.Empty(t, harness.lastTokenParams.Get("code_verifier"),
+		"code_verifier must NOT be sent to token endpoint when PKCE disabled")
+}
+
 func TestExchangeCode_StateMismatch(t *testing.T) {
 	harness := newOIDCTestHarness(t)
 	defer harness.Close()
@@ -261,7 +291,7 @@ func TestExchangeCode_StateMismatch(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: "nonce", Value: "test-nonce"})
 
 	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider)
+	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "State cookie did not match")
 }
@@ -279,7 +309,7 @@ func TestExchangeCode_NonceMismatch(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: "nonce", Value: "expected-nonce"})
 
 	cfg := harness.OAuth2Config()
-	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider)
+	_, err = auth.ExchangeCode(context.Background(), req, cfg, provider, true)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "Nonce did not match")
 }

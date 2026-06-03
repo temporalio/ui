@@ -69,7 +69,7 @@ func TestAuthenticate_AddsPKCEParamsToAuthURL(t *testing.T) {
 		Scopes:      []string{"openid", "profile"},
 	}
 
-	handler := authenticate(oauthCfg, nil, []string{})
+	handler := authenticate(oauthCfg, nil, []string{}, true)
 	err := handler(c)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusFound, rec.Code)
@@ -103,7 +103,7 @@ func TestAuthenticate_SetsCodeVerifierCookie(t *testing.T) {
 		Scopes:      []string{"openid"},
 	}
 
-	handler := authenticate(oauthCfg, nil, []string{})
+	handler := authenticate(oauthCfg, nil, []string{}, true)
 	err := handler(c)
 	require.NoError(t, err)
 
@@ -139,7 +139,7 @@ func TestAuthenticate_SetsCallbackCookieForPreV280(t *testing.T) {
 		Scopes:      []string{"openid"},
 	}
 
-	handler := authenticate(oauthCfg, nil, []string{})
+	handler := authenticate(oauthCfg, nil, []string{}, true)
 	err := handler(c)
 	require.NoError(t, err)
 
@@ -176,6 +176,66 @@ func TestLogout_ClearsCodeVerifier(t *testing.T) {
 	assert.True(t, cleared, "logout should clear code_verifier cookie")
 }
 
+func TestAuthenticate_PKCEDisabled_NoChallengeParams(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/auth/sso", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	oauthCfg := &oauth2.Config{
+		ClientID: "test-client",
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  "https://idp.example.com/auth",
+			TokenURL: "https://idp.example.com/token",
+		},
+		RedirectURL: "https://app.example.com/auth/sso/callback",
+		Scopes:      []string{"openid"},
+	}
+
+	handler := authenticate(oauthCfg, nil, []string{}, false)
+	err := handler(c)
+	require.NoError(t, err)
+
+	location := rec.Header().Get("Location")
+	require.NotEmpty(t, location)
+
+	parsed, err := url.Parse(location)
+	require.NoError(t, err)
+
+	query := parsed.Query()
+	assert.Empty(t, query.Get("code_challenge_method"), "must NOT include code_challenge_method when PKCE disabled")
+	assert.Empty(t, query.Get("code_challenge"), "must NOT include code_challenge when PKCE disabled")
+	assert.NotEmpty(t, query.Get("state"), "auth URL must include state")
+	assert.NotEmpty(t, query.Get("nonce"), "auth URL must include nonce")
+}
+
+func TestAuthenticate_PKCEDisabled_NoVerifierCookie(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/auth/sso", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	oauthCfg := &oauth2.Config{
+		ClientID: "test-client",
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  "https://idp.example.com/auth",
+			TokenURL: "https://idp.example.com/token",
+		},
+		RedirectURL: "https://app.example.com/auth/sso/callback",
+		Scopes:      []string{"openid"},
+	}
+
+	handler := authenticate(oauthCfg, nil, []string{}, false)
+	err := handler(c)
+	require.NoError(t, err)
+
+	setCookieHeaders := rec.Header().Values("Set-Cookie")
+	for _, h := range setCookieHeaders {
+		assert.False(t, containsCookieName(h, "code_verifier"),
+			"must NOT set code_verifier cookie when PKCE disabled")
+	}
+}
+
 func TestAuthenticate_WithOptionsIncludesPKCE(t *testing.T) {
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, "/auth/sso", nil)
@@ -196,7 +256,7 @@ func TestAuthenticate_WithOptionsIncludesPKCE(t *testing.T) {
 		"audience": "test-audience",
 	}
 
-	handler := authenticate(oauthCfg, options, []string{})
+	handler := authenticate(oauthCfg, options, []string{}, true)
 	err := handler(c)
 	require.NoError(t, err)
 

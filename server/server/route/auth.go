@@ -110,14 +110,14 @@ func SetAuthRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh) 
 	}
 
 	api := e.Group("/auth")
-	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins))
-	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
-	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration)) // compatibility with UI v1
+	api.GET("/sso", authenticate(&oauthCfg, providerCfg.Options, serverCfg.CORS.AllowOrigins, serverCfg.Auth.PKCEEnabled))
+	api.GET("/sso/callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, serverCfg.Auth.PKCEEnabled))
+	api.GET("/sso_callback", authenticateCb(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration, serverCfg.Auth.PKCEEnabled)) // compatibility with UI v1
 	api.GET("/refresh", refreshTokens(ctx, &oauthCfg, provider, serverCfg.Auth.MaxSessionDuration))
 	api.GET("/logout", logout())
 }
 
-func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string) func(echo.Context) error {
+func authenticate(config *oauth2.Config, options map[string]interface{}, allowedOrigins []string, pkceEnabled bool) func(echo.Context) error {
 	return func(c echo.Context) error {
 		state, err := randString()
 		if err != nil {
@@ -130,17 +130,20 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 		setCallbackCookie(c, "state", state)
 		setCallbackCookie(c, "nonce", nonce)
 
-		codeVerifier, err := randCodeVerifier()
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
-		}
-		setCallbackCookie(c, "code_verifier", codeVerifier)
+		opts := []oauth2.AuthCodeOption{oidc.Nonce(nonce)}
 
-		opts := []oauth2.AuthCodeOption{
-			oidc.Nonce(nonce),
-			oauth2.SetAuthURLParam("code_challenge_method", "S256"),
-			oauth2.SetAuthURLParam("code_challenge", sha256CodeChallenge(codeVerifier)),
+		if pkceEnabled {
+			codeVerifier, err := randCodeVerifier()
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err)
+			}
+			setCallbackCookie(c, "code_verifier", codeVerifier)
+			opts = append(opts,
+				oauth2.SetAuthURLParam("code_challenge_method", "S256"),
+				oauth2.SetAuthURLParam("code_challenge", sha256CodeChallenge(codeVerifier)),
+			)
 		}
+
 		for k, v := range options {
 			var value string
 			if vStr, ok := v.(string); ok {
@@ -163,9 +166,9 @@ func authenticate(config *oauth2.Config, options map[string]interface{}, allowed
 	}
 }
 
-func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration) func(echo.Context) error {
+func authenticateCb(ctx context.Context, oauthCfg *oauth2.Config, provider *oidc.Provider, maxSessionDuration time.Duration, pkceEnabled bool) func(echo.Context) error {
 	return func(c echo.Context) error {
-		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider)
+		user, err := auth.ExchangeCode(ctx, c.Request(), oauthCfg, provider, pkceEnabled)
 		if err != nil {
 			return err
 		}
