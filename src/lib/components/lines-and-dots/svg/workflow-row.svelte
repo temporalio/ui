@@ -3,6 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { getStatusLabel } from '$lib/utilities/get-status-label';
 
   import { TimelineConfig } from '../constants';
 
@@ -22,29 +23,10 @@
   const start = $derived(gutter);
   const end = $derived(start + length - 2 * gutter);
 
-  const STATUS_LABEL_KEY = {
-    Running: 'workflows.running',
-    TimedOut: 'workflows.timed-out',
-    Completed: 'workflows.completed',
-    Failed: 'workflows.failed',
-    ContinuedAsNew: 'workflows.continued-as-new',
-    Canceled: 'workflows.canceled',
-    Terminated: 'workflows.terminated',
-    Paused: 'workflows.paused',
-  } as const;
-
-  const statusLabel = $derived(
-    workflow.status && workflow.status in STATUS_LABEL_KEY
-      ? translate(
-          STATUS_LABEL_KEY[workflow.status as keyof typeof STATUS_LABEL_KEY],
-        )
-      : translate('common.unknown'),
-  );
-
   const accessibleName = $derived(
     translate('workflows.row-accessible-name', {
       workflowId: workflow.id,
-      status: statusLabel,
+      status: getStatusLabel(workflow.status),
     }),
   );
 </script>

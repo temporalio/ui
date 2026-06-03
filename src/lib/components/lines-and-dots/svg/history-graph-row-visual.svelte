@@ -10,6 +10,7 @@
     EventTypeCategory,
     WorkflowEventWithPending,
   } from '$lib/types/events';
+  import { getStatusLabel } from '$lib/utilities/get-status-label';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -71,43 +72,19 @@
   );
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  const CLASSIFICATION_LABEL_KEY = {
-    Unspecified: 'events.event-classification.unspecified',
-    Scheduled: 'events.event-classification.scheduled',
-    Open: 'events.event-classification.open',
-    New: 'events.event-classification.new',
-    Started: 'events.event-classification.started',
-    Initiated: 'events.event-classification.initiated',
-    Running: 'events.event-classification.running',
-    Completed: 'events.event-classification.completed',
-    Fired: 'events.event-classification.fired',
-    CancelRequested: 'events.event-classification.cancelrequested',
-    TimedOut: 'events.event-classification.timedout',
-    Signaled: 'events.event-classification.signaled',
-    Canceled: 'events.event-classification.canceled',
-    Failed: 'events.event-classification.failed',
-    Terminated: 'events.event-classification.terminated',
-    pending: 'events.event-classification.pending',
-    retrying: 'events.event-classification.retrying',
-  } as const;
-
   const isRetrying = $derived(
     !!group?.pendingActivity && Number(group.pendingActivity.attempt) > 1,
   );
 
-  const labelClassification = $derived(
-    isRetrying ? 'retrying' : classification,
+  const statusForLabel = $derived(
+    isRetrying
+      ? 'Retrying'
+      : classification === 'pending'
+        ? 'Pending'
+        : classification,
   );
 
-  const classificationLabel = $derived(
-    labelClassification && labelClassification in CLASSIFICATION_LABEL_KEY
-      ? translate(
-          CLASSIFICATION_LABEL_KEY[
-            labelClassification as keyof typeof CLASSIFICATION_LABEL_KEY
-          ],
-        )
-      : translate('common.unknown'),
-  );
+  const classificationLabel = $derived(getStatusLabel(statusForLabel));
 
   const eventTypeLabel = $derived(
     event && 'eventType' in event
