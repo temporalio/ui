@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -6,6 +7,8 @@
   import Portal from '$lib/holocene/portal/portal.svelte';
   import type { PortalPosition } from '$lib/holocene/portal/types';
   import type { Only } from '$lib/types/global';
+
+  const HOVER_HIDE_DELAY_MS = 120;
 
   type BaseProps = {
     text?: string;
@@ -80,6 +83,56 @@
 
   let wrapperElement: HTMLElement | null = null;
   let isHovered = false;
+  let isFocused = false;
+  let dismissed = false;
+  let hoverHideTimer: ReturnType<typeof setTimeout> | null = null;
+  const tooltipId = `tooltip-${crypto.randomUUID()}`;
+
+  $: isOpen = (show || isHovered || isFocused) && !dismissed;
+
+  $: if (!isHovered && !isFocused && dismissed) {
+    dismissed = false;
+  }
+
+  function cancelHide() {
+    if (hoverHideTimer) {
+      clearTimeout(hoverHideTimer);
+      hoverHideTimer = null;
+    }
+  }
+
+  function handleHoverEnter() {
+    cancelHide();
+    isHovered = true;
+  }
+
+  function handleHoverLeave() {
+    cancelHide();
+    hoverHideTimer = setTimeout(() => {
+      isHovered = false;
+      hoverHideTimer = null;
+    }, HOVER_HIDE_DELAY_MS);
+  }
+
+  function handleWindowKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape' && isOpen) {
+      dismissed = true;
+    }
+  }
+
+  function handleFocusIn() {
+    isFocused = true;
+  }
+
+  function handleFocusOut(event: FocusEvent) {
+    const next = event.relatedTarget as HTMLElement | null;
+    if (next && wrapperElement?.contains(next)) return;
+    isFocused = false;
+  }
+
+  onDestroy(() => {
+    cancelHide();
+  });
 
   $: portalPosition = ((): PortalPosition => {
     if (top) return 'top';
@@ -94,30 +147,39 @@
   })();
 </script>
 
+<svelte:window on:keydown={handleWindowKeydown} />
+
 {#if hide}
   <slot />
 {:else}
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     bind:this={wrapperElement}
-    class={merge('wrapper group/tooltip relative inline-block', className)}
-    on:mouseenter={() => (isHovered = true)}
-    on:mouseleave={() => (isHovered = false)}
+    class={merge('wrapper relative inline-block', className)}
+    aria-describedby={isOpen ? tooltipId : undefined}
+    on:mouseenter={handleHoverEnter}
+    on:mouseleave={handleHoverLeave}
+    on:focusin={handleFocusIn}
+    on:focusout={handleFocusOut}
   >
     <slot />
 
     {#if usePortal && wrapperElement}
       <Portal
         anchor={wrapperElement}
-        open={show || isHovered}
+        open={isOpen}
         position={portalPosition}
         {scrollContainer}
       >
         <div
+          id={tooltipId}
+          role="tooltip"
           class={merge(
             'inline-block rounded-md bg-slate-800 px-2 py-2 text-xs text-slate-50',
             tooltipClass,
           )}
+          on:mouseenter={handleHoverEnter}
+          on:mouseleave={handleHoverLeave}
           style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
         >
           <div class="flex gap-2">
@@ -130,10 +192,14 @@
       </Portal>
     {:else}
       <div
+        id={tooltipId}
+        role="tooltip"
         class={merge(
-          'tooltip absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all group-hover/tooltip:inline-block group-hover/tooltip:opacity-95',
-          show && 'inline-block opacity-95',
+          'tooltip absolute left-0 top-0 z-50 translate-x-12 whitespace-nowrap text-xs transition-all',
+          isOpen ? 'inline-block opacity-95' : 'hidden opacity-0',
         )}
+        on:mouseenter={handleHoverEnter}
+        on:mouseleave={handleHoverLeave}
         class:left
         class:right
         class:bottom
