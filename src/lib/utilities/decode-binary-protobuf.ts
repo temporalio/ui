@@ -30,7 +30,7 @@ const SCHEMA_REGISTRY = new Map<string, DescMessage>([
   ],
 ]);
 
-export const base64ToUint8Array = (b64: string): Uint8Array => {
+const base64ToUint8Array = (b64: string): Uint8Array => {
   // The local `./atob` does UTF-8 decoding via decodeURIComponent — fine for
   // JSON text, fatal for raw protobuf bytes. Use the raw browser atob here.
   const binary =
@@ -42,13 +42,13 @@ export const base64ToUint8Array = (b64: string): Uint8Array => {
   return bytes;
 };
 
-export const looksLikeRawPayload = (n: unknown): boolean => {
+const looksLikeRawPayload = (n: unknown): boolean => {
   if (!n || typeof n !== 'object' || Array.isArray(n)) return false;
   const obj = n as Record<string, unknown>;
   return 'metadata' in obj && 'data' in obj && isObject(obj.metadata);
 };
 
-export const recursivelyDecodeNestedPayloads = (
+const recursivelyDecodeNestedPayloads = (
   node: unknown,
   recurse: (p: Payload) => unknown,
 ): unknown => {
@@ -69,6 +69,7 @@ export const recursivelyDecodeNestedPayloads = (
 
 export const decodeBinaryProtobuf = (
   payload: Payload,
+  recurse: (p: Payload) => unknown = (p) => p,
 ): { data: unknown } | null => {
   const rawEncoding = atob(String(payload?.metadata?.encoding ?? ''));
   const rawMessageType = atob(String(payload?.metadata?.messageType ?? ''));
@@ -80,7 +81,8 @@ export const decodeBinaryProtobuf = (
   try {
     const bytes = base64ToUint8Array(String(payload?.data ?? ''));
     const message = fromBinary(schema, bytes);
-    const data = toJson(schema, message);
+    const raw = toJson(schema, message);
+    const data = recursivelyDecodeNestedPayloads(raw, recurse);
     return { data };
   } catch (e) {
     console.warn(
