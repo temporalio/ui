@@ -34,9 +34,7 @@
 </script>
 
 <div class="space-y-2">
-  <div
-    class="flex items-center justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
-  >
+  <div class="flex items-center gap-4 max-xl:w-full max-xl:flex-wrap">
     <WorkflowStatus
       status={toNexusOperationStatus(nexusOperationInfo.status)}
     />
