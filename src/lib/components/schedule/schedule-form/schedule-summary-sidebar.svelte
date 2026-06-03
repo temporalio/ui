@@ -8,7 +8,7 @@
   import { pluralize } from '$lib/utilities/pluralize';
 
   import type { ScheduleFormData } from './schema';
-  import { getSpecSummary } from './utilities/spec.ts';
+  import { getSpecSummary } from './utilities/spec';
 
   interface Props {
     form: Readable<ScheduleFormData>;
