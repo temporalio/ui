@@ -166,6 +166,7 @@ export const Strings = {
   'state-transitions': 'State Transitions',
   'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
+  'family-node-label': 'Workflow {{id}}: {{status}}',
   parents_zero: '0 Parents',
   parents_one: '1 Parent',
   'pending-children_one': '1 Pending Child',
