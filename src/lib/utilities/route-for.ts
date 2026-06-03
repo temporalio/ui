@@ -84,6 +84,7 @@ export interface StartActivityExecutionQueryParams {
   taskQueue: string;
   startToCloseTimeout: string;
   scheduleToCloseTimeout: string;
+  runId: string;
 }
 
 export const routeForNamespaces = (): ResolvedPathname => {
@@ -151,6 +152,7 @@ export const routeForStartStandaloneActivity = (
     scheduleToCloseTimeout: parameters.scheduleToCloseTimeout ?? '',
     startToCloseTimeout: parameters.startToCloseTimeout ?? '',
     taskQueue: parameters.taskQueue ?? '',
+    runId: parameters.runId ?? '',
   };
   return toURL(`${routeForStandaloneActivities(parameters)}/start`, params);
 };

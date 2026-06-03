@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
@@ -20,63 +22,49 @@
   const { label } = $derived(column);
   const namespace = $derived(page.params.namespace);
 
-  let filterOrCopyButtonsVisible = $state(false);
-  const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
-  const hideFilterOrCopy = () => (filterOrCopyButtonsVisible = false);
-  const handleFocusOut = (e: FocusEvent) => {
-    const nextTarget = e.relatedTarget as HTMLElement;
-    if (
-      nextTarget &&
-      !['filter-button', 'copy-button'].includes(nextTarget.id)
-    ) {
-      hideFilterOrCopy();
-    }
-  };
-
   const filterableLabels = ['Activity ID', 'Activity Type', 'Task Queue'];
+
+  const className = 'h-8 whitespace-nowrap';
+  const testId = 'activities-summary-table-body-cell';
 </script>
 
+{#snippet renderFilterableTableCell(
+  filterableCellProps: Pick<
+    ComponentProps<typeof FilterableTableCell>,
+    'attribute' | 'value' | 'href'
+  >,
+)}
+  <FilterableTableCell
+    class={className}
+    data-testid={testId}
+    {...filterableCellProps}
+  />
+{/snippet}
+
 {#if filterableLabels.includes(label)}
-  <td
-    class="relative h-8 whitespace-nowrap pr-24"
-    data-testid="activities-summary-table-body-cell"
-    onmouseover={showFilterOrCopy}
-    onfocus={showFilterOrCopy}
-    onfocusin={showFilterOrCopy}
-    onfocusout={handleFocusOut}
-    onmouseleave={hideFilterOrCopy}
-    onblur={hideFilterOrCopy}
-  >
-    {#if label === 'Activity ID'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="ActivityId"
-        value={activity.activityId}
-        href={routeForStandaloneActivityDetails({
-          namespace,
-          activityId: activity.activityId,
-          runId: activity.runId,
-        })}
-      />
-    {:else if label === 'Activity Type'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="ActivityType"
-        value={activity.activityType?.name ?? ''}
-      />
-    {:else if label === 'Task Queue'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="TaskQueue"
-        value={activity.taskQueue ?? ''}
-      />
-    {/if}
-  </td>
+  {#if label === 'Activity ID'}
+    {@render renderFilterableTableCell({
+      attribute: 'ActivityId',
+      value: activity.activityId,
+      href: routeForStandaloneActivityDetails({
+        namespace,
+        activityId: activity.activityId,
+        runId: activity.runId,
+      }),
+    })}
+  {:else if label === 'Activity Type'}
+    {@render renderFilterableTableCell({
+      attribute: 'ActivityType',
+      value: activity.activityType?.name ?? '',
+    })}
+  {:else if label === 'Task Queue'}
+    {@render renderFilterableTableCell({
+      attribute: 'TaskQueue',
+      value: activity.taskQueue ?? '',
+    })}
+  {/if}
 {:else}
-  <td
-    class="h-8 whitespace-nowrap"
-    data-testid="activities-summary-table-body-cell"
-  >
+  <td class={className} data-testid={testId}>
     {#if label === 'Status'}
       <WorkflowStatus status={toActivityStatus(activity.status)} />
     {:else if label === 'Run ID'}

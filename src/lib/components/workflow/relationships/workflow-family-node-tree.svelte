@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import Icon from '$lib/holocene/icon';
+  import { translate } from '$lib/i18n/translate';
   import type { RootNode } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -159,6 +160,10 @@
   <g
     role="button"
     tabindex="0"
+    aria-label={translate('workflows.family-node-label', {
+      id: child.workflow.id,
+      status: child.workflow.status,
+    })}
     class="outline-none transition-all"
     on:click={(e) => nodeClick(e, child)}
     on:keypress={(e) => nodeClick(e, child)}
@@ -284,6 +289,10 @@
     role="button"
     class="outline-none"
     tabindex="0"
+    aria-label={translate('workflows.family-node-label', {
+      id: root.workflow.id,
+      status: root.workflow.status,
+    })}
     on:click={(e) => nodeClick(e, root)}
     on:keypress={(e) => nodeClick(e, root)}
   >

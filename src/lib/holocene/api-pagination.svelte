@@ -235,8 +235,8 @@
         label={filterInputPlaceholder}
         labelHidden
         placeholder={filterInputPlaceholder}
-        on:input={debouncedHandleFilter}
-        on:clear={handleFilter}
+        oninput={debouncedHandleFilter}
+        onClear={handleFilter}
         clearable
       />
     {/if}

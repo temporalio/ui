@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
 
   import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
@@ -9,26 +9,37 @@
   import Icon from './icon/icon.svelte';
   import Input from './input/input.svelte';
 
-  const dispatch = createEventDispatcher();
-
-  export let isAllowed: (d: Date) => boolean = () => true;
-  export let selected = new Date();
-  export let label: string;
-  export let labelHidden = false;
-  export let todayLabel: string;
-  export let closeLabel: string;
-  export let clearLabel: string;
-  export let disabled = false;
-
-  let month: number | undefined;
-  let year: number | undefined;
-  let showDatePicker = false;
-
-  // so that these change with props
-  $: {
-    month = selected.getMonth();
-    year = selected.getFullYear();
+  interface Props {
+    isAllowed?: (d: Date) => boolean;
+    selected?: Date;
+    label: string;
+    afterLabel?: Snippet;
+    labelIcon?: Snippet;
+    labelHidden?: boolean;
+    todayLabel: string;
+    closeLabel: string;
+    clearLabel: string;
+    disabled?: boolean;
+    onDateChange?: (date: Date) => void;
   }
+
+  let {
+    isAllowed = () => true,
+    selected = $bindable(new Date()),
+    label,
+    afterLabel,
+    labelHidden = false,
+    todayLabel,
+    closeLabel,
+    clearLabel,
+    disabled = false,
+    onDateChange,
+  }: Props = $props();
+
+  // derived from selected, but prev/next can override until selected changes
+  let month = $derived(selected.getMonth());
+  let year = $derived(selected.getFullYear());
+  let showDatePicker = $state(false);
 
   // handlers
   const onFocus = () => {
@@ -45,7 +56,7 @@
       const month = parseInt(inputDateSplit[0]) - 1;
       const date = parseInt(inputDateSplit[1]);
       const newDate = new Date(year, month, date);
-      dispatch('datechange', newDate);
+      onDateChange?.(newDate);
     }
   };
 
@@ -67,9 +78,9 @@
     month -= 1;
   };
 
-  const onDateChange = (d: CustomEvent) => {
+  const handleDateChange = (d: Date) => {
     showDatePicker = false;
-    dispatch('datechange', d.detail);
+    onDateChange?.(d);
   };
 
   const previousMonth = translate('date-picker.previous-month');
@@ -80,11 +91,12 @@
   <Input
     id="datepicker"
     {label}
+    {afterLabel}
     {labelHidden}
     icon="calendar-plus"
     type="text"
-    on:focus={onFocus}
-    on:input={onInput}
+    onfocus={onFocus}
+    oninput={onInput}
     placeholder="MM/DD/YY"
     value={selected.toDateString()}
     clearable
@@ -97,7 +109,7 @@
     >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">
-          <button type="button" on:click={prev} title={previousMonth}>
+          <button type="button" onclick={prev} title={previousMonth}>
             <span class="sr-only">{previousMonth}</span>
             <Icon name="chevron-left" /></button
           >
@@ -108,7 +120,7 @@
         </div>
         <div class="flex items-center justify-center">
           <span class="sr-only">Next Month</span>
-          <button type="button" on:click={next} title={nextMonth}>
+          <button type="button" onclick={next} title={nextMonth}>
             <span class="sr-only">{nextMonth}</span>
             <Icon name="chevron-right" />
           </button>
@@ -119,20 +131,20 @@
         {year}
         date={selected}
         {isAllowed}
-        on:datechange={onDateChange}
+        onDateChange={handleDateChange}
       />
       <div class="my-1 flex justify-between px-2">
         <button
           type="button"
           class="cursor-pointer text-[12px]"
-          on:click={() => (selected = new Date())}
+          onclick={() => (selected = new Date())}
         >
           {todayLabel}
         </button>
         <button
           type="button"
           class="cursor-pointer text-[12px]"
-          on:click={() => (showDatePicker = false)}
+          onclick={() => (showDatePicker = false)}
         >
           {closeLabel}
         </button>

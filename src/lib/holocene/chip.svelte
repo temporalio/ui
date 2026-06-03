@@ -58,7 +58,7 @@
 
 <style lang="postcss">
   .chip {
-    @apply surface-subtle flex h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm p-1.5 text-sm;
+    @apply surface-subtle flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm p-1.5 text-sm leading-[1.5];
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;

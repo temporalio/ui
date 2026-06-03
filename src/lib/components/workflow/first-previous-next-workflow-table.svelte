@@ -23,9 +23,9 @@
     >{translate('workflows.relationships')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('workflows.first-execution')}</th>
-    <th>{translate('workflows.previous-execution')}</th>
-    <th>{translate('workflows.next-execution')}</th>
+    <th scope="col">{translate('workflows.first-execution')}</th>
+    <th scope="col">{translate('workflows.previous-execution')}</th>
+    <th scope="col">{translate('workflows.next-execution')}</th>
   </TableHeaderRow>
   <TableRow>
     <td class="w-1/3">
