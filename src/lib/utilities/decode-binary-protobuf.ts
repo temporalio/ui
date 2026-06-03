@@ -1,34 +1,34 @@
-import * as temporalProto from '@temporalio/proto';
+import {
+  QueryWorkflowRequestSchema,
+  SignalWithStartWorkflowExecutionRequestSchema,
+  SignalWorkflowExecutionRequestSchema,
+  StartWorkflowExecutionRequestSchema,
+} from '@buf/temporalio_api.bufbuild_es/temporal/api/workflowservice/v1/request_response_pb.js';
+import { type DescMessage, fromBinary, toJson } from '@bufbuild/protobuf';
 
 import type { Payload } from '$lib/types';
 
 import { atob } from './atob';
 import { isObject } from './is';
 
-type ProtobufType = {
-  decode: (bytes: Uint8Array) => unknown;
-  toObject: (
-    msg: unknown,
-    opts?: Record<string, unknown>,
-  ) => Record<string, unknown>;
-};
-
-export const lookupTemporalProtoType = (fqn: string): ProtobufType | null => {
-  const parts = fqn.split('.');
-  let cur: unknown = temporalProto;
-  for (const part of parts) {
-    if (!cur || typeof cur !== 'object') return null;
-    cur = (cur as Record<string, unknown>)[part];
-  }
-  if (
-    cur &&
-    typeof (cur as ProtobufType).decode === 'function' &&
-    typeof (cur as ProtobufType).toObject === 'function'
-  ) {
-    return cur as ProtobufType;
-  }
-  return null;
-};
+const SCHEMA_REGISTRY = new Map<string, DescMessage>([
+  [
+    'temporal.api.workflowservice.v1.StartWorkflowExecutionRequest',
+    StartWorkflowExecutionRequestSchema,
+  ],
+  [
+    'temporal.api.workflowservice.v1.SignalWorkflowExecutionRequest',
+    SignalWorkflowExecutionRequestSchema,
+  ],
+  [
+    'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest',
+    SignalWithStartWorkflowExecutionRequestSchema,
+  ],
+  [
+    'temporal.api.workflowservice.v1.QueryWorkflowRequest',
+    QueryWorkflowRequestSchema,
+  ],
+]);
 
 export const base64ToUint8Array = (b64: string): Uint8Array => {
   // The local `./atob` does UTF-8 decoding via decodeURIComponent — fine for
@@ -74,17 +74,13 @@ export const decodeBinaryProtobuf = (
   const rawMessageType = atob(String(payload?.metadata?.messageType ?? ''));
   if (rawEncoding !== 'binary/protobuf' || !rawMessageType) return null;
 
-  const T = lookupTemporalProtoType(rawMessageType);
-  if (!T) return null;
+  const schema = SCHEMA_REGISTRY.get(rawMessageType);
+  if (!schema) return null;
 
   try {
     const bytes = base64ToUint8Array(String(payload?.data ?? ''));
-    const data = T.toObject(T.decode(bytes), {
-      longs: String,
-      enums: String,
-      bytes: String,
-      defaults: false,
-    });
+    const message = fromBinary(schema, bytes);
+    const data = toJson(schema, message);
     return { data };
   } catch (e) {
     console.warn(
