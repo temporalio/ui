@@ -5,6 +5,7 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { ToastVariant } from '$lib/types/holocene';
 
   const dispatch = createEventDispatcher<{ dismiss: { id: string } }>();
@@ -19,7 +20,9 @@
 
   export let id: string;
   export let variant: keyof typeof variants;
-  export let closeButtonLabel: string;
+  export let closeButtonLabel: string = '';
+
+  $: dismissLabel = closeButtonLabel || translate('common.close');
 
   const handleDismiss = () => {
     dispatch('dismiss', { id });
@@ -40,7 +43,7 @@
   <button
     type="button"
     on:click|stopPropagation={handleDismiss}
-    aria-label={closeButtonLabel}
+    aria-label={dismissLabel}
   >
     <Icon name="close" />
   </button>
