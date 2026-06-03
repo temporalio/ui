@@ -19,6 +19,7 @@
 
   import { durationUnits, overlapPolicyContent } from './constants';
   import {
+    DEFAULT_CATCHUP_WINDOW,
     DEFAULT_EXECUTION_TIMEOUT,
     DEFAULT_RUN_TIMEOUT,
     DEFAULT_TASK_TIMEOUT,
@@ -209,6 +210,11 @@
         class="max-w-80"
         step="any"
         min={0}
+        emptyValue={DEFAULT_CATCHUP_WINDOW}
+        emptyUnit={getFirstWholeNumberUnit(
+          DEFAULT_CATCHUP_WINDOW,
+          durationUnits,
+        )}
       >
         {#snippet afterLabel()}
           <Tooltip
