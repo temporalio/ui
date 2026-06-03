@@ -44,6 +44,7 @@ export class StandaloneNexusOperationPoller {
       );
     } catch (error) {
       this.onError(error);
+      return;
     }
 
     this.onUpdate(nexusOperationExecution);
