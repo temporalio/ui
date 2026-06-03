@@ -78,7 +78,7 @@
 
             return summary.toLowerCase();
           })
-          .join(' AND ')}
+          .join(' AND ') || '--'}
       </dd>
     </div>
   </dl>
