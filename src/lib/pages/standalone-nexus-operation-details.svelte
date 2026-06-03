@@ -20,6 +20,12 @@
   import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
+  interface Props {
+    namespace: string;
+  }
+
+  let { namespace }: Props = $props();
+
   const info = $derived($nexusOperationExecution?.info);
 
   const hasLastAttemptFailure = $derived(!!info?.lastAttemptFailure);
@@ -49,7 +55,7 @@
   const endpointFilterLink = $derived(
     info
       ? routeForStandaloneNexusOperationsWithQuery(
-          { namespace: '' },
+          { namespace },
           `Endpoint="${info.endpoint}"`,
         )
       : null,
@@ -57,7 +63,7 @@
   const serviceFilterLink = $derived(
     info
       ? routeForStandaloneNexusOperationsWithQuery(
-          { namespace: '' },
+          { namespace },
           `Service="${info.service}"`,
         )
       : null,
@@ -65,7 +71,7 @@
   const operationFilterLink = $derived(
     info
       ? routeForStandaloneNexusOperationsWithQuery(
-          { namespace: '' },
+          { namespace },
           `Operation="${info.operation}"`,
         )
       : null,

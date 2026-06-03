@@ -5,6 +5,7 @@
   import StandaloneNexusOperationDetails from '$lib/pages/standalone-nexus-operation-details.svelte';
 
   const operationId = $derived(page.params.operationId);
+  const namespace = $derived(page.params.namespace);
 </script>
 
 <PageTitle
@@ -12,4 +13,4 @@
   url={page.url.href}
 />
 
-<StandaloneNexusOperationDetails />
+<StandaloneNexusOperationDetails {namespace} />
