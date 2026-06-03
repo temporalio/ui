@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import NexusOperationRenderer from '$lib/components/payload/nexus-operation-renderer.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
@@ -11,6 +12,7 @@
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
+  import { isRawPayload } from '$lib/utilities/decode-payload';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import {
     format,
@@ -24,6 +26,7 @@
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { describeNexusOperation } from '$lib/utilities/nexus-operation-registry';
   import {
     routeForEventHistoryEvent,
     routeForNamespace,
@@ -177,11 +180,19 @@
 {#snippet payloads(key, value)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
+  {@const nexusDescriptor = isRawPayload(codeBlockValue)
+    ? describeNexusOperation(codeBlockValue as RawPayload)
+    : null}
   <div>
     <p class="mb-1 min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
-    {#if value?.payloads}
+    {#if nexusDescriptor}
+      <NexusOperationRenderer
+        payload={codeBlockValue as RawPayload}
+        maxHeight={384}
+      />
+    {:else if value?.payloads}
       <PayloadCodeBlock
         filenameData={{
           workflowId: workflow,
