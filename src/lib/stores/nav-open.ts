@@ -7,3 +7,8 @@ export const navOpen = persistStore('navOpen', true);
 export const namespaceSelectorOpen = writable<boolean | null>();
 
 export const savedQueryNavOpen = persistStore('savedQueryNavOpen', true);
+
+export const savedNexusQueryNavOpen = persistStore(
+  'savedNexusQueryNavOpen',
+  true,
+);

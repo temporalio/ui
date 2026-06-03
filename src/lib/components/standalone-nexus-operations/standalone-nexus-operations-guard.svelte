@@ -17,7 +17,7 @@
   let { namespace, children, fallback }: Props = $props();
 </script>
 
-{#if (namespace.namespaceInfo?.capabilities as NamespaceCapabilities)?.standaloneNexusOperations && minimumVersionRequired('1.31.0', $temporalVersion)}
+{#if (namespace.namespaceInfo?.capabilities as NamespaceCapabilities)?.standaloneNexusOperation && minimumVersionRequired('1.31.0', $temporalVersion)}
   {@render children()}
 {:else if fallback}
   {@render fallback()}

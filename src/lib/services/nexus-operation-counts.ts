@@ -19,7 +19,7 @@ export const fetchNexusOperationCount = async (
       request,
     });
     count = parseInt(result?.count || '0');
-  } catch (e) {
+  } catch {
     // Don't fail the nexus operations call due to count
   }
 
