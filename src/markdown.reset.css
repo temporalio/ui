@@ -5,9 +5,9 @@ body {
   border: 0;
   font-size: 100%;
   vertical-align: baseline;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 400;
-  line-height: 20px;
+  line-height: 1.4;
 }
 
 body {
@@ -68,7 +68,7 @@ li {
   list-style-position: inside;
 }
 
-li * {
+li > p {
   display: inline;
 }
 

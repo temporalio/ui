@@ -129,7 +129,7 @@ export const toListWorkflowFilters = (
             console.error('Error parsing Datetime field from query');
           }
         } else if (isBoolStatement(filter.type)) {
-          filter.value = nextToken.replace('=', '');
+          filter.value = tokenTwoAhead;
           filter.conditional = '=';
         } else {
           filter.value = tokenTwoAhead;

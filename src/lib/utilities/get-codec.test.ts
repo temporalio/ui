@@ -160,7 +160,7 @@ describe('getCodec with configuration settings and local settings but override o
     expect(credentials).toEqual(true);
   });
 
-  it('should return codec endpoint from local setting with no settings', () => {
+  it('should return empty endpoint when no namespace-level codec is configured and override is off', () => {
     codecEndpoint.set('http://mylocalserver.dev');
     passAccessToken.set(true);
     includeCredentials.set(false);
@@ -168,8 +168,8 @@ describe('getCodec with configuration settings and local settings but override o
     const endpoint = getCodecEndpoint(settings);
     const token = getCodecPassAccessToken(settings);
     const credentials = getCodecIncludeCredentials(settings);
-    expect(endpoint).toEqual('http://mylocalserver.dev');
-    expect(token).toEqual(true);
+    expect(endpoint).toEqual('');
+    expect(token).toEqual(false);
     expect(credentials).toEqual(false);
   });
 });

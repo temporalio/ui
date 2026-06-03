@@ -226,12 +226,12 @@
     return false;
   }
 
-  const onStartDateChange = (d: CustomEvent) => {
-    start.date = startOfDay(d.detail);
+  const onStartDateChange = (d: Date) => {
+    start.date = startOfDay(d);
   };
 
-  const onEndDateChange = (d: CustomEvent) => {
-    end.date = startOfDay(d.detail);
+  const onEndDateChange = (d: Date) => {
+    end.date = startOfDay(d);
   };
 
   const applyTimeChanges = (
@@ -377,7 +377,7 @@
               <div class="flex flex-col gap-2">
                 <DatePicker
                   label={translate('common.start')}
-                  on:datechange={onStartDateChange}
+                  onDateChange={onStartDateChange}
                   selected={new Date(start.date)}
                   todayLabel={translate('common.today')}
                   closeLabel={translate('common.close')}
@@ -393,7 +393,7 @@
               <div class="flex flex-col gap-2">
                 <DatePicker
                   label={translate('common.end')}
-                  on:datechange={onEndDateChange}
+                  onDateChange={onEndDateChange}
                   selected={new Date(end.date)}
                   todayLabel={translate('common.today')}
                   closeLabel={translate('common.close')}
@@ -455,7 +455,7 @@
                   <DatePicker
                     label=""
                     labelHidden
-                    on:datechange={onStartDateChange}
+                    onDateChange={onStartDateChange}
                     selected={new Date(start.date)}
                     todayLabel={translate('common.today')}
                     closeLabel={translate('common.close')}

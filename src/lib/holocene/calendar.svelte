@@ -1,15 +1,12 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
   import { getDateRows, weekDays } from '$lib/utilities/calendar';
-
-  const dispatch = createEventDispatcher();
 
   type Props = {
     date: Date;
     month: number;
     year: number;
     isAllowed?: (date: Date) => boolean;
+    onDateChange?: (date: Date) => void;
   };
 
   let {
@@ -17,10 +14,11 @@
     month,
     year,
     isAllowed = (_date: Date) => true,
+    onDateChange,
   }: Props = $props();
 
   const onChange = (selectedDay: number) => {
-    dispatch('datechange', new Date(year, month, selectedDay));
+    onDateChange?.(new Date(year, month, selectedDay));
   };
 
   const allow = (year: number, month: number, day: number | undefined) => {

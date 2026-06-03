@@ -89,7 +89,7 @@
       clearable
       copyButtonLabel={translate('common.copy-icon-title')}
       clearButtonLabel={translate('common.clear-input-button-label')}
-      on:clear={handleClearInput}
+      onClear={handleClearInput}
       bind:value={manualSearchString}
       maxLength={MAX_QUERY_LENGTH}
       hideCount={!manualSearchString ||

@@ -1,6 +1,7 @@
 <script lang="ts">
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import { routeForStandaloneActivitiesWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
@@ -42,10 +43,15 @@
 </script>
 
 <div class="space-y-2">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      <ActivityExecutionStatus status={activityExecutionInfo.status} />
-      <div class="text-2xl font-medium">
+  <div
+    class="flex items-center justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
+  >
+    <ActivityExecutionStatus status={activityExecutionInfo.status} />
+    <div class="text-2xl font-medium">
+      <h1
+        data-testid="activity-id-heading"
+        class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+      >
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -54,7 +60,7 @@
           container-class="w-full"
           class="overflow-hidden text-ellipsis text-left"
         />
-      </div>
+      </h1>
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
@@ -113,6 +119,19 @@
         text={activityExecutionInfo.taskQueue}
         href={taskQueueFilterLink}
       />
+      {#if $isCloud}
+        <DetailListLabel
+          >{translate('workflows.billable-actions')}</DetailListLabel
+        >
+        <DetailListTextValue text={String(activityExecutionInfo.attempt)} />
+      {:else}
+        <DetailListLabel
+          >{translate('workflows.state-transitions')}</DetailListLabel
+        >
+        <DetailListTextValue
+          text={activityExecutionInfo.stateTransitionCount}
+        />
+      {/if}
     </DetailListColumn>
   </DetailList>
 </div>

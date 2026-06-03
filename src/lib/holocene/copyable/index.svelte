@@ -29,7 +29,9 @@
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
-      class={visible ? 'visible' : 'invisible group-hover:visible'}
+      class={visible
+        ? 'visible'
+        : 'invisible group-focus-within:visible group-hover:visible'}
       on:click={handleOnClick}
       copied={$copied}
     />
@@ -44,7 +46,9 @@
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
-      class={visible ? 'visible' : 'invisible group-hover:visible'}
+      class={visible
+        ? 'visible'
+        : 'invisible group-focus-within:visible group-hover:visible'}
       on:click={handleOnClick}
       copied={$copied}
     />

@@ -10,6 +10,7 @@ import { page } from '$app/state';
 import {
   codecEndpoint,
   includeCredentials,
+  overrideRemoteCodecConfiguration,
   passAccessToken,
 } from '$lib/stores/data-encoder-config';
 import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
@@ -22,10 +23,15 @@ const mockGetIdToken = vi.mocked(getIdToken);
 describe('Codec Server Requests for Decode and Encode', () => {
   const payloads = { payloads: [{}] };
 
+  beforeEach(() => {
+    overrideRemoteCodecConfiguration.set(true);
+  });
+
   afterEach(() => {
     codecEndpoint.set(null);
     passAccessToken.set(false);
     includeCredentials.set(false);
+    overrideRemoteCodecConfiguration.set(false);
     vi.clearAllMocks();
   });
 
@@ -127,10 +133,15 @@ describe('Codec Server Requests for Decode and Encode', () => {
 describe('codecPassAccessToken', () => {
   const payloads = { payloads: [{}] };
 
+  beforeEach(() => {
+    overrideRemoteCodecConfiguration.set(true);
+  });
+
   afterEach(() => {
     codecEndpoint.set(null);
     passAccessToken.set(false);
     includeCredentials.set(false);
+    overrideRemoteCodecConfiguration.set(false);
     vi.clearAllMocks();
   });
 
@@ -227,10 +238,15 @@ describe('codecPassAccessToken', () => {
 describe('codecIncludeCredentials', () => {
   const payloads = { payloads: [{}] };
 
+  beforeEach(() => {
+    overrideRemoteCodecConfiguration.set(true);
+  });
+
   afterEach(() => {
     codecEndpoint.set(null);
     passAccessToken.set(false);
     includeCredentials.set(false);
+    overrideRemoteCodecConfiguration.set(false);
     vi.clearAllMocks();
   });
 

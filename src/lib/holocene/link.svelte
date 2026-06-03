@@ -18,6 +18,7 @@
     icon?: IconName;
     text?: string;
     light?: boolean;
+    gotoParams?: Parameters<typeof goto>[1];
     'data-testid'?: string;
   };
 
@@ -30,13 +31,14 @@
   export let icon: IconName = null;
   export let text: string = '';
   export let light = false;
+  export let gotoParams = {};
 
   const onLinkClick = (e: MouseEvent) => {
     if (e.button === 1 || newTab || e.metaKey || e.ctrlKey || e.shiftKey)
       return;
 
     e.preventDefault();
-    goto(href);
+    goto(href, gotoParams);
   };
 </script>
 
