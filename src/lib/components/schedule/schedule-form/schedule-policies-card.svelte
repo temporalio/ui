@@ -27,10 +27,12 @@
 
   const timeoutsSummary = $derived(
     [
-      $form.taskTimeout && `Task: ${formatDuration($form.taskTimeout)}`,
-      $form.runTimeout && `Run: ${formatDuration($form.runTimeout)}`,
+      $form.taskTimeout &&
+        `Task: ${formatDuration($form.taskTimeout) || '0 seconds'}`,
+      $form.runTimeout &&
+        `Run: ${formatDuration($form.runTimeout) || '0 seconds'}`,
       $form.executionTimeout &&
-        `Execution: ${formatDuration($form.executionTimeout)}`,
+        `Execution: ${formatDuration($form.executionTimeout) || '0 seconds'}`,
     ]
       .filter(Boolean)
       .join(', ') || 'No timeouts set',
