@@ -69,15 +69,17 @@ export const scheduleFormSchema = z.object({
   endDate: z.string().optional().default(''),
   endAfterOccurrences: z.number().optional(),
   jitter: z.string().optional().default('0'),
-  overlapPolicy: z.enum([
-    'Unspecified',
-    'Skip',
-    'BufferOne',
-    'BufferAll',
-    'CancelOther',
-    'TerminateOther',
-    'AllowAll',
-  ]),
+  overlapPolicy: z
+    .enum([
+      'Skip',
+      'BufferOne',
+      'BufferAll',
+      'CancelOther',
+      'TerminateOther',
+      'AllowAll',
+    ])
+    .optional()
+    .default('Skip'),
   catchupWindow: z.string().optional().default(''),
   pauseOnFailure: z.boolean(),
   keepOriginalWorkflowId: z.boolean(),
@@ -160,14 +162,12 @@ export const getDefaultValues = (params: {
 };
 
 const OVERLAP_POLICY_MAP: Record<string, ScheduleFormData['overlapPolicy']> = {
-  SCHEDULE_OVERLAP_POLICY_UNSPECIFIED: 'Unspecified',
   SCHEDULE_OVERLAP_POLICY_SKIP: 'Skip',
   SCHEDULE_OVERLAP_POLICY_BUFFER_ONE: 'BufferOne',
   SCHEDULE_OVERLAP_POLICY_BUFFER_ALL: 'BufferAll',
   SCHEDULE_OVERLAP_POLICY_CANCEL_OTHER: 'CancelOther',
   SCHEDULE_OVERLAP_POLICY_TERMINATE_OTHER: 'TerminateOther',
   SCHEDULE_OVERLAP_POLICY_ALLOW_ALL: 'AllowAll',
-  Unspecified: 'Unspecified',
   Skip: 'Skip',
   BufferOne: 'BufferOne',
   BufferAll: 'BufferAll',

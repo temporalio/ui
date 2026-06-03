@@ -122,10 +122,11 @@
 
   // svelte-ignore non_reactive_update
   let el: HTMLElement;
-  let prevExpanded = false;
+  let prevExpanded: boolean | null = null;
 
   $effect(() => {
-    if (expanded && !prevExpanded) {
+    // prevExpanded is null on mount, we only want to focus when it actually changed
+    if (prevExpanded != null && expanded && !prevExpanded) {
       el?.focus();
     }
     prevExpanded = expanded;

@@ -224,8 +224,8 @@ importers:
         specifier: 1.16.0
         version: 1.16.0
       '@temporalio/proto':
-        specifier: 1.16.0
-        version: 1.16.0
+        specifier: 1.17.2
+        version: 1.17.2
       '@temporalio/worker':
         specifier: 1.16.0
         version: 1.16.0(esbuild@0.25.12)
@@ -2166,6 +2166,10 @@ packages:
 
   '@temporalio/proto@1.16.0':
     resolution: {integrity: sha512-2zT4k0FP9pOi445ZviVceKy4+QdNXiydWRmmYnsg7gDbS3jCwe1Z+SBGdFBEIu/gQHyaR8a2a9Ru2hhDr7nFPw==}
+    engines: {node: '>= 20.0.0'}
+
+  '@temporalio/proto@1.17.2':
+    resolution: {integrity: sha512-ecsk9F8863/FBwipQjJtuO/kEzWpIU9poAx+/twnJOesZW5dOabw7hYuqfUQul2H5MWm25qUvgU+SgLEgwr3zw==}
     engines: {node: '>= 20.0.0'}
 
   '@temporalio/worker@1.16.0':
@@ -9684,6 +9688,11 @@ snapshots:
       nexus-rpc: 0.0.2
 
   '@temporalio/proto@1.16.0':
+    dependencies:
+      long: 5.3.2
+      protobufjs: 7.5.8
+
+  '@temporalio/proto@1.17.2':
     dependencies:
       long: 5.3.2
       protobufjs: 7.5.8

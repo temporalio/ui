@@ -142,12 +142,11 @@
         <div class="flex w-full flex-col gap-6">
           <ScheduleDetailsCard {form} errors={$formErrors} {schedule} />
           <ScheduleSpecCard {form} />
-          <SchedulePoliciesCard {form} />
-
           <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
             bind:workflowSearchAttributes
           />
+          <SchedulePoliciesCard {form} />
 
           <div class="w-full xl:hidden">
             <ScheduleSummarySidebar formData={$form} />

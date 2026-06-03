@@ -60,7 +60,7 @@
       month (1-12) &nbsp; day-of-week (0-6)"
   />
   <button
-    class="mr-auto underline"
+    class="mr-auto underline hover:text-brand"
     onclick={() => (isCronExpressionFormatModalOpen = true)}
   >
     Formatting help
