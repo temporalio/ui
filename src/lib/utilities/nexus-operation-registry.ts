@@ -84,6 +84,25 @@ const NEXUS_OPERATIONS: Record<string, OperationSpec> = {
   },
 };
 
+const SYSTEM_NEXUS_RESPONSE_LABELS: Record<string, string> = {
+  'temporal.api.workflowservice.v1.StartWorkflowExecutionResponse':
+    'Start Operation',
+  'temporal.api.workflowservice.v1.SignalWorkflowExecutionResponse':
+    'Signal Operation',
+  'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse':
+    'Signal With Start Operation',
+  'temporal.api.workflowservice.v1.QueryWorkflowResponse': 'Query Operation',
+};
+
+export const getSystemNexusLabelFromResponsePayload = (
+  payload: Payload,
+): string | null => {
+  const encoding = atob(String(payload?.metadata?.encoding ?? ''));
+  const messageType = atob(String(payload?.metadata?.messageType ?? ''));
+  if (encoding !== 'binary/protobuf' || !messageType) return null;
+  return SYSTEM_NEXUS_RESPONSE_LABELS[messageType] ?? null;
+};
+
 export const describeNexusOperation = (
   payload: Payload,
 ): NexusOperationDescriptor | null => {

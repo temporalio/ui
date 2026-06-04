@@ -22,6 +22,7 @@
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
+  import { isRawPayload } from '$lib/utilities/decode-payload';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
@@ -34,7 +35,13 @@
   import {
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
+    isNexusOperationCompletedEvent,
+    isNexusOperationScheduledEvent,
   } from '$lib/utilities/is-event-type';
+  import {
+    describeNexusOperation,
+    getSystemNexusLabelFromResponsePayload,
+  } from '$lib/utilities/nexus-operation-registry';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -109,20 +116,59 @@
   const canceled = $derived(eventOrGroupIsCanceled(event));
   const terminated = $derived(eventOrGroupIsTerminated(event));
 
-  const displayName = $derived(
-    isEventGroup(event)
-      ? event.pendingActivity
-        ? translate('workflows.pending-activity')
-        : event.pendingNexusOperation
-          ? translate('workflows.pending-nexus-operation')
-          : event.label
-      : isLocalActivityMarkerEvent(event)
-        ? translate('events.category.local-activity')
-        : spaceBetweenCapitalLetters(event.name),
-  );
+  const systemNexusLabel = $derived.by(() => {
+    if (isEventGroup(event)) return null;
+    const wfEvent = event as WorkflowEvent;
+    if (isNexusOperationScheduledEvent(wfEvent)) {
+      const attrs = wfEvent.nexusOperationScheduledEventAttributes;
+      if (String(attrs.endpoint ?? '') !== '__temporal_system') return null;
+      const input = attrs.input;
+      if (isRawPayload(input)) {
+        const descriptor = describeNexusOperation(
+          input as Parameters<typeof describeNexusOperation>[0],
+        );
+        if (descriptor) return descriptor.label;
+      }
+      const LABELS: Record<string, string> = {
+        SignalWithStartWorkflowExecution: 'Signal With Start Workflow',
+        StartWorkflowExecution: 'Start Workflow',
+        SignalWorkflowExecution: 'Signal Workflow',
+        QueryWorkflow: 'Query Workflow',
+      };
+      return LABELS[String(attrs.operation ?? '')] ?? null;
+    }
+    if (isNexusOperationCompletedEvent(wfEvent)) {
+      const result = wfEvent.nexusOperationCompletedEventAttributes.result;
+      if (isRawPayload(result))
+        return getSystemNexusLabelFromResponsePayload(
+          result as Parameters<
+            typeof getSystemNexusLabelFromResponsePayload
+          >[0],
+        );
+    }
+    return null;
+  });
+
+  const displayName = $derived.by(() => {
+    if (isEventGroup(event)) {
+      if (event.pendingActivity) return translate('workflows.pending-activity');
+      if (event.pendingNexusOperation)
+        return translate('workflows.pending-nexus-operation');
+      return event.label;
+    }
+    if (isLocalActivityMarkerEvent(event))
+      return translate('events.category.local-activity');
+    if (systemNexusLabel) {
+      const state = spaceBetweenCapitalLetters(
+        event.name.replace('NexusOperation', ''),
+      );
+      return `${systemNexusLabel} ${state}`;
+    }
+    return spaceBetweenCapitalLetters(event.name);
+  });
 
   const primaryAttribute = $derived(
-    !isLocalActivityMarkerEvent(event)
+    !isLocalActivityMarkerEvent(event) && !systemNexusLabel
       ? getPrimaryAttributeForEvent(
           isEventGroup(event) ? event.initialEvent : event,
         )

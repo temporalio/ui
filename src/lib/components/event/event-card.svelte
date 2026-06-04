@@ -25,8 +25,15 @@
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  import { describeNexusOperation } from '$lib/utilities/nexus-operation-registry';
+  import {
+    isLocalActivityMarkerEvent,
+    isNexusOperationCompletedEvent,
+    isNexusOperationScheduledEvent,
+  } from '$lib/utilities/is-event-type';
+  import {
+    describeNexusOperation,
+    getSystemNexusLabelFromResponsePayload,
+  } from '$lib/utilities/nexus-operation-registry';
   import {
     routeForEventHistoryEvent,
     routeForNamespace,
@@ -37,16 +44,72 @@
   let { event }: { event: WorkflowEvent } = $props();
   const { namespace, workflow, run } = $derived(page.params);
 
-  const displayName = $derived(
-    isLocalActivityMarkerEvent(event)
-      ? translate('events.category.local-activity')
-      : spaceBetweenCapitalLetters(event.name),
-  );
   const attributes = $derived.by(() => {
     const attrs = formatAttributes(event);
     if (event?.principal?.name) attrs.principalName = event.principal.name;
     if (event?.principal?.type) attrs.principalType = event.principal.type;
     return attrs;
+  });
+
+  const SYSTEM_NEXUS_LABELS: Record<string, string> = {
+    SignalWithStartWorkflowExecution: 'Signal With Start Workflow',
+    StartWorkflowExecution: 'Start Workflow',
+    SignalWorkflowExecution: 'Signal Workflow',
+    QueryWorkflow: 'Query Workflow',
+  };
+
+  const nexusScheduledAttrs = $derived(
+    isNexusOperationScheduledEvent(event)
+      ? event.nexusOperationScheduledEventAttributes
+      : null,
+  );
+
+  const nexusCompletedAttrs = $derived(
+    isNexusOperationCompletedEvent(event)
+      ? event.nexusOperationCompletedEventAttributes
+      : null,
+  );
+
+  const isSystemNexusScheduled = $derived(
+    nexusScheduledAttrs !== null &&
+      String(nexusScheduledAttrs.endpoint ?? '') === '__temporal_system',
+  );
+
+  const isSystemNexusEvent = $derived(
+    isSystemNexusScheduled || nexusCompletedAttrs !== null,
+  );
+
+  const systemNexusDescriptor = $derived.by(() => {
+    if (!isSystemNexusScheduled || !nexusScheduledAttrs) return null;
+    const input = nexusScheduledAttrs.input;
+    if (!isRawPayload(input)) return null;
+    return describeNexusOperation(input as RawPayload);
+  });
+
+  const systemNexusLabel = $derived.by(() => {
+    if (isSystemNexusScheduled && nexusScheduledAttrs) {
+      if (systemNexusDescriptor) return systemNexusDescriptor.label;
+      const op = String(nexusScheduledAttrs.operation ?? '');
+      return SYSTEM_NEXUS_LABELS[op] ?? null;
+    }
+    if (nexusCompletedAttrs) {
+      const result = nexusCompletedAttrs.result;
+      if (isRawPayload(result))
+        return getSystemNexusLabelFromResponsePayload(result as RawPayload);
+    }
+    return null;
+  });
+
+  const displayName = $derived.by(() => {
+    if (systemNexusLabel) {
+      const state = spaceBetweenCapitalLetters(
+        event.name.replace('NexusOperation', ''),
+      );
+      return `${systemNexusLabel} ${state}`;
+    }
+    if (isLocalActivityMarkerEvent(event))
+      return translate('events.category.local-activity');
+    return spaceBetweenCapitalLetters(event.name);
   });
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
@@ -62,11 +125,24 @@
   );
 
   const hiddenDetailFields = $derived.by(() => {
+    const systemNexusFields = isSystemNexusEvent
+      ? ['endpoint', 'service', 'operation', 'requestId']
+      : [];
     if (event.category === 'activity')
-      return ['scheduledEventId', 'startedEventId', 'namespaceId'];
+      return [
+        ...systemNexusFields,
+        'scheduledEventId',
+        'startedEventId',
+        'namespaceId',
+      ];
     if (event.category === 'child-workflow')
-      return ['initiatedEventId', 'startedEventId', 'namespaceId'];
-    return ['namespaceId'];
+      return [
+        ...systemNexusFields,
+        'initiatedEventId',
+        'startedEventId',
+        'namespaceId',
+      ];
+    return [...systemNexusFields, 'namespaceId'];
   });
   const detailFields = $derived(
     fields.filter(
