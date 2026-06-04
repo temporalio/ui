@@ -65,6 +65,17 @@ export const durationUnits = [
 ];
 
 export const DAYS_OF_WEEK = ['0', '1', '2', '3', '4', '5', '6'] as const;
+
+export const DAYS_WITH_LABEL = [
+  { label: 'Sunday', value: '0' },
+  { label: 'Monday', value: '1' },
+  { label: 'Tuesday', value: '2' },
+  { label: 'Wednesday', value: '3' },
+  { label: 'Thursday', value: '4' },
+  { label: 'Friday', value: '5' },
+  { label: 'Saturday', value: '6' },
+] as const;
+
 export const DAYS_OF_MONTH = [
   '1',
   '2',
@@ -114,17 +125,23 @@ export const MONTHS = [
   '12',
 ] as const;
 
+export const MONTHS_WITH_LABEL = [
+  { label: 'January', value: '1' },
+  { label: 'February', value: '2' },
+  { label: 'March', value: '3' },
+  { label: 'April', value: '4' },
+  { label: 'May', value: '5' },
+  { label: 'June', value: '6' },
+  { label: 'July', value: '7' },
+  { label: 'August', value: '8' },
+  { label: 'September', value: '9' },
+  { label: 'October', value: '10' },
+  { label: 'November', value: '11' },
+  { label: 'December', value: '12' },
+] as const;
+
 export const WEEKDAYS = ['1', '2', '3', '4', '5'] as const;
 export const WEEKEND = ['0', '6'] as const;
-export const DAYS_WITH_LABEL = [
-  { label: 'Sunday', value: '0' },
-  { label: 'Monday', value: '1' },
-  { label: 'Tuesday', value: '2' },
-  { label: 'Wednesday', value: '3' },
-  { label: 'Thursday', value: '4' },
-  { label: 'Friday', value: '5' },
-  { label: 'Saturday', value: '6' },
-] as const;
 
 export const SECONDS_PER_DAY = 86400;
 export const SECONDS_PER_HOUR = 3600;

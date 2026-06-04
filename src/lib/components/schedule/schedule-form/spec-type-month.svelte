@@ -1,22 +1,3 @@
-<script lang="ts" module>
-  type MonthMode = 'every-month' | 'custom-months';
-
-  const monthNames: { label: string; value: Month }[] = [
-    { label: 'January', value: '1' },
-    { label: 'February', value: '2' },
-    { label: 'March', value: '3' },
-    { label: 'April', value: '4' },
-    { label: 'May', value: '5' },
-    { label: 'June', value: '6' },
-    { label: 'July', value: '7' },
-    { label: 'August', value: '8' },
-    { label: 'September', value: '9' },
-    { label: 'October', value: '10' },
-    { label: 'November', value: '11' },
-    { label: 'December', value: '12' },
-  ];
-</script>
-
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
 
@@ -25,7 +6,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
 
-  import { DAYS_OF_MONTH, MONTHS } from './constants';
+  import { DAYS_OF_MONTH, MONTHS, MONTHS_WITH_LABEL } from './constants';
   import { type ScheduleFormData } from './schema';
   import type { DayOfMonth, Month } from './types';
 
@@ -38,6 +19,8 @@
   }
 
   let { form, index }: Props = $props();
+
+  type MonthMode = 'every-month' | 'custom-months';
 
   function getInitialMonthMode(): MonthMode {
     const selectedMonthSet = new Set($form.specs?.[index]?.months ?? []);
@@ -161,7 +144,7 @@
         role="group"
         aria-label="Custom months"
       >
-        {#each monthNames as month (month.value)}
+        {#each MONTHS_WITH_LABEL as month (month.value)}
           {@const isSelected = isCustomMonthSelected(month.value)}
           <Button
             active={isSelected}
