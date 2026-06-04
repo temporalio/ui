@@ -165,6 +165,14 @@
       : undefined,
   );
 
+  const effectiveCategory = $derived(
+    systemNexusLabel
+      ? 'other'
+      : isEventGroup(event)
+        ? event.category
+        : event.category,
+  );
+
   const secondaryAttribute = $derived(
     getSecondaryAttributeForEvent(
       isEventGroup(event) ? event.lastEvent : event,
@@ -306,10 +314,10 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p class={eventTypeStyle({ category: event.category })}>
+    <p class={eventTypeStyle({ category: effectiveCategory })}>
       <Icon
-        name={CategoryIcon[event.category].name}
-        title={CategoryIcon[event.category].title}
+        name={CategoryIcon[effectiveCategory].name}
+        title={CategoryIcon[effectiveCategory].title}
         class={merge(
           'mr-1 inline',
           isEventGroup(event) && event.isPending && 'animate-pulse',
