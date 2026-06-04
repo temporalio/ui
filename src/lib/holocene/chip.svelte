@@ -31,6 +31,9 @@
 </script>
 
 <span class={merge('chip', intent)}>
+  {#if intent === 'warning'}
+    <Icon name="warning" class="shrink-0" />
+  {/if}
   {#if button}
     <button
       class="flex items-center gap-1"
