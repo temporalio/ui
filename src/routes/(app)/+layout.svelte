@@ -360,13 +360,17 @@
     {#snippet footer()}
       <BottomNavigation {namespaceList} {isCloud} {showNamespacePicker}>
         {#snippet linksSnippet()}
-          {#each [...linkListForSecondGroup].reverse() as link, i (i)}
+          {#each [...linkListForSecondGroup]
+            .filter((item) => !item.hidden)
+            .reverse() as link, i (i)}
             <NavigationItem {...link} link={link.href} />
           {/each}
 
           <hr class="border-subtle" />
 
-          {#each [...linkList].reverse() as link, i (i)}
+          {#each [...linkList]
+            .filter((item) => !item.hidden)
+            .reverse() as link, i (i)}
             <NavigationItem {...link} link={link.href} />
           {/each}
         {/snippet}
