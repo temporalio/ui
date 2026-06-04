@@ -34,7 +34,7 @@ describe('describeNexusOperation', () => {
   it('returns a descriptor with a label for the operation', () => {
     const result = describeNexusOperation(SignalWithStartBinaryProtobuf);
     expect(result).not.toBeNull();
-    expect(result?.label).toBe('Signal With Start Operation');
+    expect(result?.label).toBe('Signal With Start Workflow Execution');
   });
 
   it('returns null for a non-binary/protobuf payload', () => {

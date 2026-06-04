@@ -59,10 +59,15 @@
   });
 
   const SYSTEM_NEXUS_LABELS: Record<string, string> = {
-    SignalWithStartWorkflowExecution: 'Signal With Start Operation',
+    SignalWithStartWorkflowExecution: 'Signal With Start Workflow Execution',
     StartWorkflowExecution: 'Start Operation',
     SignalWorkflowExecution: 'Signal Operation',
     QueryWorkflow: 'Query Operation',
+  };
+
+  const NEXUS_STATE_VERBS: Record<string, string> = {
+    Scheduled: 'Initiated',
+    Completed: 'Delivered',
   };
 
   const nexusScheduledAttrs = $derived(
@@ -108,9 +113,9 @@
 
   const displayName = $derived.by(() => {
     if (systemNexusLabel) {
-      const state = spaceBetweenCapitalLetters(
-        event.name.replace('NexusOperation', ''),
-      );
+      const rawState = event.name.replace('NexusOperation', '');
+      const state =
+        NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
       return `${systemNexusLabel} ${state}`;
     }
     if (isLocalActivityMarkerEvent(event))

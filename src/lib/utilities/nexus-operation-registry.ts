@@ -67,7 +67,7 @@ const NEXUS_OPERATIONS: Record<string, OperationSpec> = {
   },
   'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest': {
     kind: 'signal-with-start-workflow',
-    getLabel: (_d) => 'Signal With Start Operation',
+    getLabel: (_d) => 'Signal With Start Workflow Execution',
     getInput: (d) => getPayloads(d.signalInput),
     getWorkflowInput: (d) => getPayloads(d.input),
     getWorkflowType: (d) => getName(d.workflowType),
@@ -89,7 +89,7 @@ const SYSTEM_NEXUS_RESPONSE_LABELS: Record<string, string> = {
   'temporal.api.workflowservice.v1.SignalWorkflowExecutionResponse':
     'Signal Operation',
   'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse':
-    'Signal With Start Operation',
+    'Signal With Start Workflow Execution',
   'temporal.api.workflowservice.v1.QueryWorkflowResponse': 'Query Operation',
 };
 
