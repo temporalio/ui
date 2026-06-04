@@ -17,9 +17,7 @@
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
 
-  import ButtonRadioGroup, {
-    type ButtonRadioOption,
-  } from '$lib/holocene/button-radio-group.svelte';
+  import ButtonRadioGroup from '$lib/holocene/button-radio-group.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -164,7 +162,7 @@
   </ButtonRadioGroup>
 
   {#if selection.type === 'custom'}
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Custom days">
       {#each days as day (day.value)}
         {@const isSelected = isCustomDaySelected(day.value)}
         <Button
