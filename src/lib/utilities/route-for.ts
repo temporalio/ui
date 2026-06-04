@@ -87,6 +87,13 @@ export interface StartActivityExecutionQueryParams {
   runId: string;
 }
 
+export interface StartNexusOperationQueryParams {
+  operationId: string;
+  endpoint: string;
+  service: string;
+  operation: string;
+}
+
 export const routeForNamespaces = (): ResolvedPathname => {
   return withPrefix('/namespaces', {});
 };
@@ -206,9 +213,18 @@ export const routeForStandaloneNexusOperationsWithQuery = (
 };
 
 export const routeForStartStandaloneNexusOperation = (
-  parameters: NamespaceParameter,
+  parameters: NamespaceParameter & Partial<StartNexusOperationQueryParams>,
 ): ResolvedPathname => {
-  return `${routeForStandaloneNexusOperations(parameters)}/start`;
+  const params = {
+    operationId: parameters.operationId ?? '',
+    endpoint: parameters.endpoint ?? '',
+    service: parameters.service ?? '',
+    operation: parameters.operation ?? '',
+  };
+  return toURL(
+    `${routeForStandaloneNexusOperations(parameters)}/start`,
+    params,
+  );
 };
 
 const routeForStandaloneNexusOperationBase = (
