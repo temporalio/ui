@@ -19,10 +19,7 @@
 </script>
 
 {#if descriptor}
-  <div class="flex flex-col gap-2">
-    <h4 class="text-xs font-medium text-secondary">{descriptor.label}</h4>
-    <PayloadCodeBlock value={descriptor.embeddedInput} {maxHeight} />
-  </div>
+  <PayloadCodeBlock value={descriptor.embeddedInput} {maxHeight} />
 {:else}
   <PayloadCodeBlock value={payload} {maxHeight} />
 {/if}
