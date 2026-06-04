@@ -167,7 +167,7 @@
 
   const effectiveCategory = $derived(
     systemNexusLabel
-      ? 'other'
+      ? 'signal'
       : isEventGroup(event)
         ? event.category
         : event.category,
