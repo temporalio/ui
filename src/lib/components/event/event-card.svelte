@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import NexusOperationRenderer from '$lib/components/payload/nexus-operation-renderer.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
+  import SystemNexusOperationRenderer from '$lib/components/payload/system-nexus-operation-renderer.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -270,7 +270,7 @@
       {format(key)}
     </p>
     {#if nexusDescriptor}
-      <NexusOperationRenderer
+      <SystemNexusOperationRenderer
         payload={codeBlockValue as RawPayload}
         maxHeight={384}
       />
