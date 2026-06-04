@@ -1,12 +1,25 @@
 <script lang="ts" module>
-  const everyday = ['0', '1', '2', '3', '4', '5', '6'];
-  const weekdays = ['1', '2', '3', '4', '5'];
-  const weekend = ['0', '6'];
+  import { type DayOfWeek, DAYS_OF_WEEK } from './schema';
+  const everyday = DAYS_OF_WEEK;
+  const weekdays = ['1', '2', '3', '4', '5'] as const;
+  const weekend = ['0', '6'] as const;
+  const days = [
+    { label: 'Sunday', value: '0' },
+    { label: 'Monday', value: '1' },
+    { label: 'Tuesday', value: '2' },
+    { label: 'Wednesday', value: '3' },
+    { label: 'Thursday', value: '4' },
+    { label: 'Friday', value: '5' },
+    { label: 'Saturday', value: '6' },
+  ] as const;
 </script>
 
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
 
+  import ButtonRadioGroup, {
+    type ButtonRadioOption,
+  } from '$lib/holocene/button-radio-group.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -17,53 +30,108 @@
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
+    errors: SuperForm<ScheduleFormData>['errors'];
     index: number;
   }
 
   let { form, index }: Props = $props();
 
-  const days = [
-    { label: 'Sunday', value: '0' },
-    { label: 'Monday', value: '1' },
-    { label: 'Tuesday', value: '2' },
-    { label: 'Wednesday', value: '3' },
-    { label: 'Thursday', value: '4' },
-    { label: 'Friday', value: '5' },
-    { label: 'Saturday', value: '6' },
-  ];
+  type Selection =
+    | {
+        type: 'everyday' | 'weekdays' | 'weekends';
+      }
+    | {
+        type: 'custom';
+        days: DayOfWeek[];
+      };
 
-  function isDaySelected(day: string): boolean {
-    return $form.specs[index].daysOfWeek?.includes(day) ?? false;
+  function getInitialSelectionState(): Selection {
+    if (!$form.specs?.[index]?.daysOfWeek) {
+      return { type: 'everyday' };
+    }
+
+    const selectedSet = new Set($form.specs[index].daysOfWeek);
+
+    if (everyday.every((d) => selectedSet.has(d))) {
+      return { type: 'everyday' };
+    }
+
+    if (weekdays.every((d) => selectedSet.has(d))) {
+      return { type: 'weekdays' };
+    }
+
+    if (weekend.every((d) => selectedSet.has(d))) {
+      return { type: 'weekends' };
+    }
+
+    return {
+      type: 'custom',
+      days: [...$form.specs[index].daysOfWeek],
+    };
   }
 
-  function toggleDay(day: string) {
-    const current = $form.specs[index].daysOfWeek ?? [];
-    if (current.includes(day)) {
-      $form.specs[index].daysOfWeek = current.filter((d) => d !== day);
-    } else {
-      $form.specs[index].daysOfWeek = [...current, day];
+  let selection = $state(getInitialSelectionState());
+
+  $effect(() => {
+    // synchronize form state with selection
+    switch (selection.type) {
+      case 'everyday': {
+        $form.specs[index].daysOfWeek = [...everyday];
+        return;
+      }
+
+      case 'weekdays': {
+        $form.specs[index].daysOfWeek = [...weekdays];
+        return;
+      }
+
+      case 'weekends': {
+        $form.specs[index].daysOfWeek = [...weekend];
+        return;
+      }
+
+      case 'custom': {
+        $form.specs[index].daysOfWeek = [...selection.days];
+      }
+    }
+  });
+
+  function selectType(type: Selection['type']): void {
+    if (type === selection.type) return;
+
+    if (type === 'custom') {
+      selection = {
+        type: 'custom',
+        days: [new Date().getDay().toString() as DayOfWeek],
+      };
+      return;
+    }
+
+    selection = { type };
+  }
+
+  function isCustomDaySelected(day: DayOfWeek): boolean {
+    if (selection.type !== 'custom') {
+      return false;
+    }
+
+    return selection.days.includes(day);
+  }
+
+  function toggleCustomDay(day: DayOfWeek): void {
+    if (selection.type !== 'custom') {
+      return;
+    }
+
+    if (!selection.days.includes(day)) {
+      selection.days = [...selection.days, day];
+      return;
+    }
+
+    if (selection.days.length > 1) {
+      selection.days = selection.days.filter((d) => d !== day);
     }
   }
-
-  const activeCollection: 'every' | 'weekday' | 'weekend' | 'none' =
-    $derived.by(() => {
-      const selectedSet = new Set($form.specs[index].daysOfWeek);
-      switch (selectedSet.size) {
-        case everyday.length: {
-          return everyday.every((d) => selectedSet.has(d)) ? 'every' : 'none';
-        }
-        case weekdays.length: {
-          return weekdays.every((d) => selectedSet.has(d)) ? 'weekday' : 'none';
-        }
-        case weekend.length: {
-          return weekend.every((d) => selectedSet.has(d)) ? 'weekend' : 'none';
-        }
-
-        default: {
-          return 'none';
-        }
-      }
-    });
 </script>
 
 <div class="flex flex-col gap-4">
@@ -71,39 +139,46 @@
     Select the day(s) of the week this schedule will always run on.
   </p>
 
-  <div class="flex flex-wrap gap-2">
-    <Button
-      variant="secondary"
-      active={activeCollection === 'every'}
-      on:click={() => ($form.specs[index].daysOfWeek = everyday)}
-      >Every day</Button
-    >
-    <Button
-      variant="secondary"
-      active={activeCollection === 'weekday'}
-      on:click={() => ($form.specs[index].daysOfWeek = weekdays)}
-      >Weekdays</Button
-    >
-    <Button
-      variant="secondary"
-      active={activeCollection === 'weekend'}
-      on:click={() => ($form.specs[index].daysOfWeek = weekend)}
-      >Weekends</Button
-    >
-  </div>
-
-  <div class="flex flex-wrap gap-2">
-    {#each days as day (day.value)}
-      {@const isSelected = isDaySelected(day.value)}
+  <ButtonRadioGroup
+    label="Recurrence"
+    value={selection.type}
+    options={[
+      { label: 'Every day', value: 'everyday' },
+      { label: 'Weekdays', value: 'weekdays' },
+      { label: 'Weekends', value: 'weekends' },
+      { label: 'Custom days', value: 'custom' },
+    ]}
+    onChange={selectType}
+  >
+    {#snippet item({ option, checked, attrs, onSelect, onKeydown })}
       <Button
-        size="sm"
-        aria-pressed={isSelected}
         variant="secondary"
-        active={isSelected}
-        on:click={() => toggleDay(day.value)}>{day.label}</Button
+        active={checked}
+        {...attrs}
+        on:click={onSelect}
+        on:keydown={onKeydown}
       >
-    {/each}
-  </div>
+        {option.label}
+      </Button>
+    {/snippet}
+  </ButtonRadioGroup>
+
+  {#if selection.type === 'custom'}
+    <div class="flex flex-wrap gap-2">
+      {#each days as day (day.value)}
+        {@const isSelected = isCustomDaySelected(day.value)}
+        <Button
+          size="sm"
+          aria-pressed={isSelected}
+          variant="secondary"
+          active={isSelected}
+          on:click={() => toggleCustomDay(day.value)}
+        >
+          {day.label}
+        </Button>
+      {/each}
+    </div>
+  {/if}
 
   <fieldset class="flex flex-col gap-2.5">
     <legend class="contents font-medium">Run time</legend>

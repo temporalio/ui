@@ -170,13 +170,13 @@
     </div>
 
     {#if specType === 'cron'}
-      <SpecTypeCron {form} {index} />
+      <SpecTypeCron {form} {errors} {index} />
     {:else if specType === 'week'}
-      <SpecTypeWeek {form} {index} />
+      <SpecTypeWeek {form} {errors} {index} />
     {:else if specType === 'month'}
-      <SpecTypeMonth {form} {index} />
+      <SpecTypeMonth {form} {errors} {index} />
     {:else if specType === 'interval'}
-      <SpecTypeInterval {form} {index} />
+      <SpecTypeInterval {form} {errors} {index} />
     {/if}
   </div>
 {:else}

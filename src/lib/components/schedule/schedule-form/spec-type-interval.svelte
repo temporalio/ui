@@ -10,10 +10,11 @@
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
+    errors: SuperForm<ScheduleFormData>['errors'];
     index: number;
   }
 
-  let { form, index }: Props = $props();
+  let { form, errors, index }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-4">

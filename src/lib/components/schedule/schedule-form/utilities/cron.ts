@@ -4,23 +4,30 @@ import { pluralize } from '$lib/utilities/pluralize';
 
 import type { ScheduleFormData } from '../schema';
 
-type PreviewOptions = Pick<
-  ScheduleFormData,
-  | 'startDate'
-  | 'timezoneName'
-  | 'endDateType'
-  | 'endDate'
-  | 'endAfterOccurrences'
->;
+export function isValidCronString(cronString: string): boolean {
+  try {
+    cronstrue.toString(cronString, { throwExceptionOnParseError: true });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function cronToHumanPreview(
-  cronstring: string,
-  opts: PreviewOptions,
+  cronString: string,
+  opts: Pick<
+    ScheduleFormData,
+    | 'startDate'
+    | 'timezoneName'
+    | 'endDateType'
+    | 'endDate'
+    | 'endAfterOccurrences'
+  >,
 ): string {
   const previewSegments: string[] = [];
 
   try {
-    previewSegments.push(cronstrue.toString(cronstring, { verbose: true }));
+    previewSegments.push(cronstrue.toString(cronString, { verbose: true }));
 
     switch (opts.endDateType) {
       case 'never': {

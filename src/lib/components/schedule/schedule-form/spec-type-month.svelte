@@ -11,10 +11,11 @@
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
+    errors: SuperForm<ScheduleFormData>['errors'];
     index: number;
   }
 
-  let { form, index }: Props = $props();
+  let { form, errors, index }: Props = $props();
 
   const monthNames = [
     { label: 'January', value: '1' },

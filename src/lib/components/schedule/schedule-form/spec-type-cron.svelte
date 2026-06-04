@@ -13,10 +13,11 @@
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
+    errors: SuperForm<ScheduleFormData>['errors'];
     index: number;
   }
 
-  let { form, index }: Props = $props();
+  let { form, errors, index }: Props = $props();
 
   const today = new Date();
   const weekday = today.toLocaleDateString(undefined, { weekday: 'long' });
@@ -56,8 +57,9 @@
     bind:value={$form.specs[index].cronString}
     placeholder="* * * * *"
     required
-    hintText="Format: minute (0-59) &nbsp; hour (0-23) &nbsp; day-of-month (1-31) &nbsp;
-      month (1-12) &nbsp; day-of-week (0-6)"
+    error={!!$errors.specs?.[index]?.cronString?.[0]}
+    hintText={$errors.specs?.[index]?.cronString?.[0] ??
+      'Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6)'}
   />
   <button
     class="mr-auto underline hover:text-brand"

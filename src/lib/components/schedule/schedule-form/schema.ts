@@ -12,33 +12,81 @@ import {
   DEFAULT_TASK_TIMEOUT,
   schedulePoliciesSchema,
 } from './policies-schema';
+import { isValidCronString } from './utilities/cron';
 
 import type { SearchAttribute } from '$types';
 
-export const scheduleSpecItemSchema = z.object({
-  type: z
-    .enum(['cron', 'week', 'month', 'interval'])
-    .optional()
-    .refine((val) => val !== undefined, {
-      message: 'Select a schedule spec type',
-    }),
-  cronString: z.string().optional().default(''),
-  daysOfWeek: z.array(z.string()).optional().default([]),
-  daysOfMonth: z.array(z.number()).optional().default([]),
-  months: z.array(z.string()).optional().default([]),
-  days: z.string().optional().default(''),
-  hour: z.string().optional().default(''),
-  minute: z.string().optional().default(''),
-  second: z.string().optional().default(''),
-  phase: z.string().optional().default(''),
-});
+export const DAYS_OF_WEEK = ['0', '1', '2', '3', '4', '5', '6'] as const;
+export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
+
+export const scheduleSpecItemSchema = z
+  .object({
+    type: z
+      .enum(['cron', 'week', 'month', 'interval'])
+      .optional()
+      .refine((val) => val !== undefined, {
+        message: 'Select a schedule spec type',
+      }),
+    cronString: z.string().optional().default(''),
+    daysOfWeek: z
+      .array(z.enum(DAYS_OF_WEEK))
+      .optional()
+      .default([...DAYS_OF_WEEK]),
+    daysOfMonth: z.array(z.number()).optional().default([]),
+    months: z.array(z.string()).optional().default([]),
+    days: z.string().optional().default(''),
+    hour: z.string().optional().default(''),
+    minute: z.string().optional().default(''),
+    second: z.string().optional().default(''),
+    phase: z.string().optional().default(''),
+  })
+  .superRefine((val, ctx) => {
+    switch (val.type) {
+      case 'cron': {
+        const cronString = val.cronString?.trim();
+
+        if (!cronString) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Cron expression is required',
+            path: ['cronString'],
+          });
+          return;
+        }
+
+        if (!isValidCronString(cronString)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Invalid cron expression',
+            path: ['cronString'],
+          });
+          return;
+        }
+
+        return;
+      }
+
+      case 'week': {
+        if (!val.daysOfWeek.length) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'At least one day must be selected',
+            path: ['daysOfWeek'],
+          });
+          return;
+        }
+
+        return;
+      }
+    }
+  });
 
 export type ScheduleSpecItem = z.infer<typeof scheduleSpecItemSchema>;
 
 export const DEFAULT_SPEC_ITEM: ScheduleSpecItem = {
   type: 'cron',
   cronString: '',
-  daysOfWeek: [],
+  daysOfWeek: [...DAYS_OF_WEEK],
   daysOfMonth: [],
   months: [],
   days: '',
@@ -272,9 +320,12 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
       specs.push({
         ...DEFAULT_SPEC_ITEM,
         type: 'week',
-        daysOfWeek: Array.isArray(cal.dayOfWeek)
+        daysOfWeek: (Array.isArray(cal.dayOfWeek)
           ? cal.dayOfWeek.map(String)
-          : [String(cal.dayOfWeek)],
+          : [String(cal.dayOfWeek)]
+        ).filter((d): d is DayOfWeek =>
+          (DAYS_OF_WEEK as readonly string[]).includes(d),
+        ),
         hour: Array.isArray(cal.hour)
           ? String(cal.hour[0] ?? '')
           : String(cal.hour ?? ''),
