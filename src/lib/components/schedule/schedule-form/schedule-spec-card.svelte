@@ -14,15 +14,35 @@
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
     errors: SuperForm<ScheduleFormData>['errors'];
+    validateForm: SuperForm<ScheduleFormData>['validateForm'];
     schedule?: FullSchedule | null;
   }
 
-  let { form, errors, schedule = null }: Props = $props();
+  let { form, errors, validateForm, schedule = null }: Props = $props();
 
   // svelte-ignore state_referenced_locally
   let expandedIndex: number | null = $state(schedule ? null : 0);
 
-  const addSpec = () => {
+  const validateSpec = async (index: number): Promise<boolean> => {
+    const { errors: formErrors } = await validateForm();
+    const specErrors = formErrors.specs?.[index];
+
+    errors.update((errStore) => ({
+      ...errStore,
+      specs: { ...(errStore.specs ?? {}), [index]: specErrors ?? {} },
+    }));
+
+    return !specErrors || Object.keys(specErrors).length === 0;
+  };
+
+  const addSpec = async () => {
+    if (
+      typeof expandedIndex === 'number' &&
+      !(await validateSpec(expandedIndex))
+    ) {
+      return;
+    }
+
     $form.specs = [...$form.specs, { ...SPEC_ITEM_NO_TYPE }];
     expandedIndex = $form.specs.length - 1;
   };
@@ -79,9 +99,7 @@
 
     <div>
       <Button variant="secondary" on:click={addSpec}>
-        + {$form.specs.length > 0
-          ? 'Add another schedule spec'
-          : 'Add a schedule spec'}
+        + Add another schedule spec
       </Button>
     </div>
   </div>

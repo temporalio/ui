@@ -93,7 +93,13 @@
     },
   });
 
-  const { form, errors: formErrors, enhance, submitting } = superform;
+  const {
+    form,
+    errors: formErrors,
+    enhance,
+    submitting,
+    validateForm,
+  } = superform;
 
   let validationError = $state('');
 
@@ -141,7 +147,12 @@
       >
         <div class="flex w-full flex-col gap-6">
           <ScheduleDetailsCard {form} errors={formErrors} {schedule} />
-          <ScheduleSpecCard {form} errors={formErrors} {schedule} />
+          <ScheduleSpecCard
+            {form}
+            errors={formErrors}
+            {validateForm}
+            {schedule}
+          />
           <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
             bind:workflowSearchAttributes
