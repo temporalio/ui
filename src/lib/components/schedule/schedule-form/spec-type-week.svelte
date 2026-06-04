@@ -1,19 +1,3 @@
-<script lang="ts" module>
-  import { type DayOfWeek, DAYS_OF_WEEK } from './schema';
-  const everyday = DAYS_OF_WEEK;
-  const weekdays = ['1', '2', '3', '4', '5'] as const;
-  const weekend = ['0', '6'] as const;
-  const days = [
-    { label: 'Sunday', value: '0' },
-    { label: 'Monday', value: '1' },
-    { label: 'Tuesday', value: '2' },
-    { label: 'Wednesday', value: '3' },
-    { label: 'Thursday', value: '4' },
-    { label: 'Friday', value: '5' },
-    { label: 'Saturday', value: '6' },
-  ] as const;
-</script>
-
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
 
@@ -22,7 +6,14 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
 
+  import {
+    DAYS_OF_WEEK,
+    DAYS_WITH_LABEL,
+    WEEKDAYS,
+    WEEKEND,
+  } from './constants';
   import type { ScheduleFormData } from './schema';
+  import { type DayOfWeek } from './types';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
@@ -50,15 +41,15 @@
 
     const selectedSet = new Set($form.specs[index].daysOfWeek);
 
-    if (everyday.every((d) => selectedSet.has(d))) {
+    if (DAYS_OF_WEEK.every((d) => selectedSet.has(d))) {
       return { type: 'everyday' };
     }
 
-    if (weekdays.every((d) => selectedSet.has(d))) {
+    if (WEEKDAYS.every((d) => selectedSet.has(d))) {
       return { type: 'weekdays' };
     }
 
-    if (weekend.every((d) => selectedSet.has(d))) {
+    if (WEEKEND.every((d) => selectedSet.has(d))) {
       return { type: 'weekends' };
     }
 
@@ -74,17 +65,17 @@
     // synchronize form state with selection
     switch (selection.type) {
       case 'everyday': {
-        $form.specs[index].daysOfWeek = [...everyday];
+        $form.specs[index].daysOfWeek = [...DAYS_OF_WEEK];
         return;
       }
 
       case 'weekdays': {
-        $form.specs[index].daysOfWeek = [...weekdays];
+        $form.specs[index].daysOfWeek = [...DAYS_OF_WEEK];
         return;
       }
 
       case 'weekends': {
-        $form.specs[index].daysOfWeek = [...weekend];
+        $form.specs[index].daysOfWeek = [...DAYS_OF_WEEK];
         return;
       }
 
@@ -163,7 +154,7 @@
 
   {#if selection.type === 'custom'}
     <div class="flex flex-wrap gap-2" role="group" aria-label="Custom days">
-      {#each days as day (day.value)}
+      {#each DAYS_WITH_LABEL as day (day.value)}
         {@const isSelected = isCustomDaySelected(day.value)}
         <Button
           size="sm"

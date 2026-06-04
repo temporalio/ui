@@ -14,7 +14,7 @@
     index: number;
   }
 
-  let { form, errors, index }: Props = $props();
+  let { form, index }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-4">

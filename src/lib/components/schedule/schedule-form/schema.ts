@@ -6,18 +6,24 @@ import type { SearchAttributes } from '$lib/types/workflows';
 import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 
 import {
+  DAYS_OF_MONTH,
+  DAYS_OF_WEEK,
+  MONTHS,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  SECONDS_PER_MINUTE,
+} from './constants';
+import {
   DEFAULT_CATCHUP_WINDOW,
   DEFAULT_EXECUTION_TIMEOUT,
   DEFAULT_RUN_TIMEOUT,
   DEFAULT_TASK_TIMEOUT,
   schedulePoliciesSchema,
 } from './policies-schema';
+import type { DayOfMonth, DayOfWeek, Month } from './types';
 import { isValidCronString } from './utilities/cron';
 
 import type { SearchAttribute } from '$types';
-
-export const DAYS_OF_WEEK = ['0', '1', '2', '3', '4', '5', '6'] as const;
-export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
 
 export const scheduleSpecItemSchema = z
   .object({
@@ -32,8 +38,8 @@ export const scheduleSpecItemSchema = z
       .array(z.enum(DAYS_OF_WEEK))
       .optional()
       .default([...DAYS_OF_WEEK]),
-    daysOfMonth: z.array(z.number()).optional().default([]),
-    months: z.array(z.string()).optional().default([]),
+    daysOfMonth: z.array(z.enum(DAYS_OF_MONTH)).optional().default([]),
+    months: z.array(z.enum(MONTHS)).optional().default([]),
     days: z.string().optional().default(''),
     hour: z.string().optional().default(''),
     minute: z.string().optional().default(''),
@@ -87,8 +93,8 @@ export const DEFAULT_SPEC_ITEM: ScheduleSpecItem = {
   type: 'cron',
   cronString: '',
   daysOfWeek: [...DAYS_OF_WEEK],
-  daysOfMonth: [],
-  months: [],
+  daysOfMonth: [new Date().getDay().toString() as DayOfMonth],
+  months: [(new Date().getMonth() + 1).toString() as Month],
   days: '',
   hour: '',
   minute: '',
@@ -261,10 +267,12 @@ function parseIntervalString(intervalStr: string): {
   seconds: string;
 } {
   const totalSeconds = parseInt(intervalStr.replace(/s$/, ''), 10) || 0;
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const days = Math.floor(totalSeconds / SECONDS_PER_DAY);
+  const hours = Math.floor((totalSeconds % SECONDS_PER_DAY) / SECONDS_PER_HOUR);
+  const minutes = Math.floor(
+    (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE,
+  );
+  const seconds = totalSeconds % SECONDS_PER_MINUTE;
   return {
     days: days > 0 ? String(days) : '',
     hours: hours > 0 ? String(hours) : '',
@@ -338,11 +346,11 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
         ...DEFAULT_SPEC_ITEM,
         type: 'month',
         daysOfMonth: Array.isArray(cal.dayOfMonth)
-          ? cal.dayOfMonth.map(Number)
-          : [Number(cal.dayOfMonth ?? 1)],
+          ? cal.dayOfMonth.map((d) => String(d) as DayOfMonth)
+          : [String(cal.dayOfMonth ?? 1) as DayOfMonth],
         months: Array.isArray(cal.month)
-          ? cal.month.map(String)
-          : [String(cal.month ?? '')],
+          ? cal.month.map((m) => String(m) as Month)
+          : [String(cal.month ?? '') as Month],
         hour: Array.isArray(cal.hour)
           ? String(cal.hour[0] ?? '')
           : String(cal.hour ?? ''),

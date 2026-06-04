@@ -1,23 +1,7 @@
-<script lang="ts">
-  import type { SuperForm } from 'sveltekit-superforms';
+<script lang="ts" module>
+  type MonthMode = 'every-month' | 'custom-months';
 
-  import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-
-  import type { ScheduleFormData } from './schema';
-
-  import ScheduleSpecPreview from './schedule-spec-preview.svelte';
-
-  interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
-    errors: SuperForm<ScheduleFormData>['errors'];
-    index: number;
-  }
-
-  let { form, errors, index }: Props = $props();
-
-  const monthNames = [
+  const monthNames: { label: string; value: Month }[] = [
     { label: 'January', value: '1' },
     { label: 'February', value: '2' },
     { label: 'March', value: '3' },
@@ -31,57 +15,110 @@
     { label: 'November', value: '11' },
     { label: 'December', value: '12' },
   ];
+</script>
 
-  const dayNumbers = Array.from({ length: 31 }, (_, i) => i + 1);
+<script lang="ts">
+  import type { SuperForm } from 'sveltekit-superforms';
 
-  function isDaySelected(day: number): boolean {
+  import ButtonRadioGroup from '$lib/holocene/button-radio-group.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+
+  import { DAYS_OF_MONTH, MONTHS } from './constants';
+  import { type ScheduleFormData } from './schema';
+  import type { DayOfMonth, Month } from './types';
+
+  import ScheduleSpecPreview from './schedule-spec-preview.svelte';
+
+  interface Props {
+    form: SuperForm<ScheduleFormData>['form'];
+    errors: SuperForm<ScheduleFormData>['errors'];
+    index: number;
+  }
+
+  let { form, index }: Props = $props();
+
+  function getInitialMonthMode(): MonthMode {
+    const selectedMonthSet = new Set($form.specs?.[index]?.months ?? []);
+    if (MONTHS.every((m) => selectedMonthSet.has(m))) {
+      return 'every-month';
+    }
+
+    return 'custom-months';
+  }
+
+  let monthMode = $state<MonthMode>(getInitialMonthMode());
+
+  function selectMode(mode: MonthMode) {
+    if (monthMode === mode) return;
+
+    switch (mode) {
+      case 'every-month': {
+        monthMode = mode;
+        $form.specs[index].months = [...MONTHS];
+        return;
+      }
+
+      case 'custom-months': {
+        monthMode = mode;
+        $form.specs[index].months = [
+          (new Date().getMonth() + 1).toString() as Month,
+        ];
+        return;
+      }
+    }
+  }
+
+  function isDaySelected(day: DayOfMonth): boolean {
     return $form.specs[index].daysOfMonth?.includes(day) ?? false;
   }
 
-  function toggleDay(day: number) {
+  function toggleDay(day: DayOfMonth) {
     const current = $form.specs[index].daysOfMonth ?? [];
-    if (current.includes(day)) {
-      $form.specs[index].daysOfMonth = current.filter((d) => d !== day);
-    } else {
+
+    if (!current.includes(day)) {
       $form.specs[index].daysOfMonth = [...current, day];
+      return;
+    }
+
+    const next = current.filter((d) => d !== day);
+
+    if (next.length >= 1) {
+      $form.specs[index].daysOfMonth = next;
+      return;
     }
   }
 
-  function isMonthSelected(month: string): boolean {
+  function isCustomMonthSelected(month: Month): boolean {
     return $form.specs[index].months?.includes(month) ?? false;
   }
 
-  function toggleMonth(month: string) {
+  function toggleCustomMonth(month: Month) {
     const current = $form.specs[index].months ?? [];
-    if (current.includes(month)) {
-      $form.specs[index].months = current.filter((m) => m !== month);
-    } else {
+
+    if (!current.includes(month)) {
       $form.specs[index].months = [...current, month];
+      return;
+    }
+
+    const next = current.filter((m) => m !== month);
+    if (next.length >= 1) {
+      $form.specs[index].months = next;
+      return;
     }
   }
-
-  const allMonthsActive = $derived.by(() => {
-    const monthValueSet = new Set(monthNames.map((m) => m.value));
-    if (
-      $form.specs[index].months.length !== 0 &&
-      $form.specs[index].months.length !== monthNames.length
-    ) {
-      return false;
-    }
-
-    return monthNames.every((m) => monthValueSet.has(m.value));
-  });
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="flex flex-col gap-2">
-    <p class="text-sm text-secondary">
+  <fieldset class="flex flex-col gap-2">
+    <legend class="contents text-sm text-secondary">
       Select the specific dates for the schedule to always run on.
-    </p>
+    </legend>
     <div
       class="grid max-w-108 grid-cols-5 gap-3 border border-subtle p-3 sm:grid-cols-7"
     >
-      {#each dayNumbers as day (day)}
+      {#each DAYS_OF_MONTH as day (day)}
         {@const isSelected = isDaySelected(day)}
         <Button
           active={isSelected}
@@ -93,28 +130,52 @@
         >
       {/each}
     </div>
-  </div>
+  </fieldset>
 
   <div class="flex flex-col gap-2">
-    <div class="flex flex-wrap gap-2">
-      <Button
-        active={allMonthsActive}
-        aria-pressed={allMonthsActive}
-        variant="secondary"
-        size="sm"
-        on:click={() => ($form.specs[index].months = [])}>Every month</Button
-      >
-      {#each monthNames as month (month.value)}
-        {@const isSelected = isMonthSelected(month.value)}
+    <ButtonRadioGroup
+      label="Month selection"
+      value={monthMode}
+      options={[
+        { label: 'Every month', value: 'every-month' },
+        { label: ' Custom months', value: 'custom-months' },
+      ] as const}
+      onChange={selectMode}
+    >
+      {#snippet item({ option, checked, attrs, onSelect, onKeydown })}
         <Button
-          active={isSelected}
-          aria-pressed={isSelected}
+          active={checked}
           variant="secondary"
-          size="sm"
-          on:click={() => toggleMonth(month.value)}>{month.label}</Button
+          on:click={onSelect}
+          on:keydown={onKeydown}
+          {...attrs}
         >
-      {/each}
-    </div>
+          {option.label}
+        </Button>
+      {/snippet}
+    </ButtonRadioGroup>
+
+    {#if monthMode === 'custom-months'}
+      <div
+        class="mt-2 grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-6"
+        role="group"
+        aria-label="Custom months"
+      >
+        {#each monthNames as month (month.value)}
+          {@const isSelected = isCustomMonthSelected(month.value)}
+          <Button
+            active={isSelected}
+            aria-pressed={isSelected}
+            variant="secondary"
+            size="sm"
+            class="w-full"
+            on:click={() => toggleCustomMonth(month.value)}
+          >
+            {month.label}
+          </Button>
+        {/each}
+      </div>
+    {/if}
   </div>
 
   <fieldset class="flex flex-col gap-2.5">
