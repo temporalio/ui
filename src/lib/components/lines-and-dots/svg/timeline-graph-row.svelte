@@ -307,6 +307,7 @@
     {/if}
     <Dot
       point={[x, y]}
+      category={effectiveCategory}
       classification={group.eventList[index]?.classification}
       icon={pauseTime && index !== 0
         ? 'pause'
