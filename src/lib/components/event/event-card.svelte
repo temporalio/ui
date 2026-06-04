@@ -48,6 +48,13 @@
     const attrs = formatAttributes(event);
     if (event?.principal?.name) attrs.principalName = event.principal.name;
     if (event?.principal?.type) attrs.principalType = event.principal.type;
+    if (isSystemNexusScheduled && systemNexusDescriptor) {
+      const extra = attrs as Record<string, unknown>;
+      if (systemNexusDescriptor.workflowId)
+        extra.workflowId = systemNexusDescriptor.workflowId;
+      if (systemNexusDescriptor.signalName)
+        extra.signalName = systemNexusDescriptor.signalName;
+    }
     return attrs;
   });
 
