@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { get, type Writable } from 'svelte/store';
+  import { get } from 'svelte/store';
 
-  import { fieldProxy, superForm } from 'sveltekit-superforms';
+  import { fieldProxy, superForm, type SuperForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
   import Button from '$lib/holocene/button.svelte';
@@ -29,7 +29,7 @@
   import type { ScheduleFormData } from './schema';
 
   interface Props {
-    form: Writable<ScheduleFormData>;
+    form: SuperForm<ScheduleFormData>['form'];
     isOpen: boolean;
   }
 

@@ -16,7 +16,12 @@ import {
 import type { SearchAttribute } from '$types';
 
 export const scheduleSpecItemSchema = z.object({
-  type: z.enum(['cron', 'week', 'month', 'interval']),
+  type: z
+    .enum(['cron', 'week', 'month', 'interval'])
+    .optional()
+    .refine((val) => val !== undefined, {
+      message: 'Select a schedule spec type',
+    }),
   cronString: z.string().optional().default(''),
   daysOfWeek: z.array(z.string()).optional().default([]),
   daysOfMonth: z.array(z.number()).optional().default([]),
@@ -41,6 +46,11 @@ export const DEFAULT_SPEC_ITEM: ScheduleSpecItem = {
   minute: '',
   second: '',
   phase: '',
+};
+
+export const SPEC_ITEM_NO_TYPE: ScheduleSpecItem = {
+  ...DEFAULT_SPEC_ITEM,
+  type: undefined,
 };
 
 export const scheduleFormSchema = z

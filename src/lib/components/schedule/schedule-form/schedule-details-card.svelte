@@ -3,6 +3,7 @@
 
   import { isBefore } from 'date-fns';
   import { utcToZonedTime } from 'date-fns-tz';
+  import { type SuperForm } from 'sveltekit-superforms';
 
   import Card from '$lib/holocene/card.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
@@ -28,8 +29,8 @@
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 
   interface Props {
-    form: Writable<ScheduleFormData>;
-    errors: Record<string, string[] | undefined> | Record<string, unknown>;
+    form: SuperForm<ScheduleFormData>['form'];
+    errors: SuperForm<ScheduleFormData>['errors'];
     schedule?: FullSchedule | null;
   }
 
@@ -116,8 +117,8 @@
       bind:value={$form.name}
       data-testid="schedule-name-input"
       label="Schedule Name"
-      error={!!errors.name?.[0]}
-      hintText={errors.name?.[0]}
+      error={!!$errors.name?.[0]}
+      hintText={$errors.name?.[0]}
       maxLength={232}
       disabled={Boolean(schedule)}
       required
@@ -127,8 +128,8 @@
       bind:value={$form.workflowType}
       data-testid="schedule-type-input"
       label="Workflow Type"
-      error={!!errors.workflowType?.[0]}
-      hintText={errors.workflowType?.[0]}
+      error={!!$errors.workflowType?.[0]}
+      hintText={$errors.workflowType?.[0]}
       required
     />
     <Input
@@ -136,17 +137,17 @@
       bind:value={$form.workflowId}
       data-testid="schedule-workflow-id-input"
       label="Workflow ID"
-      hintText={errors.workflowId?.[0] ||
+      hintText={$errors.workflowId?.[0] ||
         'The unique ID of the Workflow Execution. If left blank, we will generate a unique ID.'}
-      error={!!errors.workflowId?.[0]}
+      error={!!$errors.workflowId?.[0]}
     />
     <Input
       id="taskQueue"
       bind:value={$form.taskQueue}
       data-testid="schedule-task-queue-input"
       label="Task Queue"
-      error={!!errors.taskQueue?.[0]}
-      hintText={errors.taskQueue?.[0] ||
+      error={!!$errors.taskQueue?.[0]}
+      hintText={$errors.taskQueue?.[0] ||
         'The task queue this schedule should poll.'}
       required
     />

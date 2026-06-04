@@ -140,8 +140,8 @@
         class="relative grid grid-cols-1 gap-6 xl:grid-cols-[1fr,minmax(19rem,23rem)]"
       >
         <div class="flex w-full flex-col gap-6">
-          <ScheduleDetailsCard {form} errors={$formErrors} {schedule} />
-          <ScheduleSpecCard {form} />
+          <ScheduleDetailsCard {form} errors={formErrors} {schedule} />
+          <ScheduleSpecCard {form} errors={formErrors} {schedule} />
           <SchedulesSearchAttributesCard
             bind:scheduleSearchAttributes
             bind:workflowSearchAttributes

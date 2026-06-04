@@ -15,15 +15,14 @@
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
+    errors: SuperForm<ScheduleFormData>['errors'];
     index: number;
     expanded: boolean;
-    onExpand: () => void;
     onRemove: () => void;
     canRemove: boolean;
   }
 
-  let { form, index, expanded, onExpand, onRemove, canRemove }: Props =
-    $props();
+  let { form, errors, index, expanded, onRemove, canRemove }: Props = $props();
 
   const specTypeOptions = [
     { value: 'cron', label: 'Cron String' },
@@ -36,7 +35,9 @@
   const spec = $derived($form.specs[index]);
 
   const typeLabel = $derived(
-    specTypeOptions.find((o) => o.value === specType)?.label ?? specType,
+    specTypeOptions.find((o) => o.value === specType)?.label ??
+      specType ??
+      'No type selected',
   );
 
   const DAY_NAMES = [
@@ -140,12 +141,17 @@
     class="flex flex-col gap-4"
     aria-expanded="true"
   >
-    <div class="flex items-end justify-between gap-4 border border-transparent">
+    <div
+      class="flex items-start justify-between gap-4 border border-transparent"
+    >
       <Select
         id="spec-type-{index}"
         label="Schedule Spec Type"
+        placeholder="Select a spec type"
         value={$form.specs[index].type}
         onChange={onTypeChange}
+        valid={!$errors.specs?.[index]?.type?.[0]}
+        error={$errors.specs?.[index]?.type?.[0]}
         required
       >
         {#each specTypeOptions as option (option.value)}
@@ -157,7 +163,7 @@
           variant="ghost"
           leadingIcon="trash"
           size="xs"
-          class="mr-4 h-10"
+          class="mr-4 mt-[1.625rem] h-10"
           on:click={onRemove}
         />
       {/if}
@@ -175,12 +181,9 @@
   </div>
 {:else}
   <div
-    class="surface-background relative flex w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors hover:bg-interactive-secondary-hover"
+    class="surface-background relative flex w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
     aria-expanded="false"
   >
-    <button class="absolute inset-0" onclick={onExpand}>
-      <span class="sr-only">Expand spec</span>
-    </button>
     <div
       class="grid w-full grid-cols-1 items-center gap-2 text-sm md:grid-cols-[minmax(8rem,max-content)_4fr_minmax(max-content,1fr)] md:gap-4"
     >

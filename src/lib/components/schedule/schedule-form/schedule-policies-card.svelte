@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
-
   import { untrack } from 'svelte';
+  import { type SuperForm } from 'sveltekit-superforms';
 
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
@@ -14,7 +13,7 @@
   import SchedulesPoliciesDrawer from './schedule-policies-drawer.svelte';
 
   interface Props {
-    form: Writable<ScheduleFormData>;
+    form: SuperForm<ScheduleFormData>['form'];
   }
 
   let { form }: Props = $props();
