@@ -227,7 +227,7 @@
     tooltipY = Math.round(rect.top + 16);
   };
 
-  const onQueryBtnEnter = (e: MouseEvent, name: string) => {
+  const onQueryBtnEnter = (e: MouseEvent | FocusEvent, name: string) => {
     if ($savedQueryNavOpen) return;
     const el = e.currentTarget as HTMLElement;
     tooltipText = name;
@@ -235,7 +235,7 @@
     showTooltip = true;
   };
 
-  const onQueryBtnMove = (e: MouseEvent) => {
+  const onQueryBtnMove = (e: MouseEvent | FocusEvent) => {
     if (!showTooltip) return;
     const el = e.currentTarget as HTMLElement;
     positionTooltipFrom(el);
@@ -364,6 +364,8 @@
     onmouseenter={(e) => onQueryBtnEnter(e, view.name)}
     onmousemove={onQueryBtnMove}
     onmouseleave={onQueryBtnLeave}
+    onfocusin={(e) => onQueryBtnEnter(e, view.name)}
+    onfocusout={onQueryBtnLeave}
   >
     <Button
       variant="ghost"
