@@ -31,10 +31,10 @@ describe('describeNexusOperation', () => {
     expect(result?.kind).toBe('signal-with-start-workflow');
   });
 
-  it('returns a descriptor with a label containing the workflow type name', () => {
+  it('returns a descriptor with a label for the operation', () => {
     const result = describeNexusOperation(SignalWithStartBinaryProtobuf);
     expect(result).not.toBeNull();
-    expect(result?.label).toContain('EchoWorkflow');
+    expect(result?.label).toBe('Signal With Start Operation');
   });
 
   it('returns null for a non-binary/protobuf payload', () => {

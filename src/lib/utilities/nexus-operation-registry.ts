@@ -50,7 +50,7 @@ const getString = (v: unknown): string | undefined =>
 const NEXUS_OPERATIONS: Record<string, OperationSpec> = {
   'temporal.api.workflowservice.v1.StartWorkflowExecutionRequest': {
     kind: 'start-workflow',
-    getLabel: (d) => `Start Workflow: ${getName(d.workflowType) ?? 'Unknown'}`,
+    getLabel: (_d) => 'Start Operation',
     getInput: (d) => getPayloads(d.input),
     getWorkflowType: (d) => getName(d.workflowType),
     getWorkflowId: (d) => getString(d.workflowId),
@@ -58,15 +58,14 @@ const NEXUS_OPERATIONS: Record<string, OperationSpec> = {
   },
   'temporal.api.workflowservice.v1.SignalWorkflowExecutionRequest': {
     kind: 'signal-workflow',
-    getLabel: (d) => `Signal Workflow: ${getString(d.signalName) ?? 'Unknown'}`,
+    getLabel: (_d) => 'Signal Operation',
     getInput: (d) => getPayloads(d.input),
     getWorkflowId: (d) => getString(d.workflowId),
     getSignalName: (d) => getString(d.signalName),
   },
   'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest': {
     kind: 'signal-with-start-workflow',
-    getLabel: (d) =>
-      `Signal With Start Workflow: ${getName(d.workflowType) ?? 'Unknown'}`,
+    getLabel: (_d) => 'Signal With Start Operation',
     getInput: (d) => getPayloads(d.input),
     getWorkflowType: (d) => getName(d.workflowType),
     getWorkflowId: (d) => getString(d.workflowId),
@@ -75,10 +74,7 @@ const NEXUS_OPERATIONS: Record<string, OperationSpec> = {
   },
   'temporal.api.workflowservice.v1.QueryWorkflowRequest': {
     kind: 'query-workflow',
-    getLabel: (d) => {
-      const q = d.query as D | undefined;
-      return `Query Workflow: ${getString(d.queryType) ?? getString(q?.queryType) ?? 'Unknown'}`;
-    },
+    getLabel: (_d) => 'Query Operation',
     getInput: (d) => getPayloads((d.query as D | undefined)?.queryArgs),
     getWorkflowId: (d) => getString(d.workflowId),
   },

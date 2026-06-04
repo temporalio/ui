@@ -52,10 +52,10 @@
   });
 
   const SYSTEM_NEXUS_LABELS: Record<string, string> = {
-    SignalWithStartWorkflowExecution: 'Signal With Start Workflow',
-    StartWorkflowExecution: 'Start Workflow',
-    SignalWorkflowExecution: 'Signal Workflow',
-    QueryWorkflow: 'Query Workflow',
+    SignalWithStartWorkflowExecution: 'Signal With Start Operation',
+    StartWorkflowExecution: 'Start Operation',
+    SignalWorkflowExecution: 'Signal Operation',
+    QueryWorkflow: 'Query Operation',
   };
 
   const nexusScheduledAttrs = $derived(
@@ -88,7 +88,6 @@
 
   const systemNexusLabel = $derived.by(() => {
     if (isSystemNexusScheduled && nexusScheduledAttrs) {
-      if (systemNexusDescriptor) return systemNexusDescriptor.label;
       const op = String(nexusScheduledAttrs.operation ?? '');
       return SYSTEM_NEXUS_LABELS[op] ?? null;
     }

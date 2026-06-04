@@ -38,10 +38,7 @@
     isNexusOperationCompletedEvent,
     isNexusOperationScheduledEvent,
   } from '$lib/utilities/is-event-type';
-  import {
-    describeNexusOperation,
-    getSystemNexusLabelFromResponsePayload,
-  } from '$lib/utilities/nexus-operation-registry';
+  import { getSystemNexusLabelFromResponsePayload } from '$lib/utilities/nexus-operation-registry';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -122,18 +119,11 @@
     if (isNexusOperationScheduledEvent(wfEvent)) {
       const attrs = wfEvent.nexusOperationScheduledEventAttributes;
       if (String(attrs.endpoint ?? '') !== '__temporal_system') return null;
-      const input = attrs.input;
-      if (isRawPayload(input)) {
-        const descriptor = describeNexusOperation(
-          input as Parameters<typeof describeNexusOperation>[0],
-        );
-        if (descriptor) return descriptor.label;
-      }
       const LABELS: Record<string, string> = {
-        SignalWithStartWorkflowExecution: 'Signal With Start Workflow',
-        StartWorkflowExecution: 'Start Workflow',
-        SignalWorkflowExecution: 'Signal Workflow',
-        QueryWorkflow: 'Query Workflow',
+        SignalWithStartWorkflowExecution: 'Signal With Start Operation',
+        StartWorkflowExecution: 'Start Operation',
+        SignalWorkflowExecution: 'Signal Operation',
+        QueryWorkflow: 'Query Operation',
       };
       return LABELS[String(attrs.operation ?? '')] ?? null;
     }
