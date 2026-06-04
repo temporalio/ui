@@ -34,7 +34,9 @@ type NexusOperationCountByStatusOptions = {
 export const fetchNexusOperationCountByStatus = async ({
   namespace,
   query,
-}: NexusOperationCountByStatusOptions): Promise<CountWorkflowExecutionsResponse> => {
+}: NexusOperationCountByStatusOptions): Promise<
+  Required<CountWorkflowExecutionsResponse>
+> => {
   const groupByClause = 'GROUP BY ExecutionStatus';
   const countRoute = routeForApi('standalone-nexus-operations.count', {
     namespace,
@@ -46,5 +48,5 @@ export const fetchNexusOperationCountByStatus = async ({
       },
       notifyOnError: false,
     });
-  return { count: count ?? '0', groups };
+  return { count: count ?? '0', groups: groups ?? [] };
 };
