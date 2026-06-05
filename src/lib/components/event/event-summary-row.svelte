@@ -22,6 +22,7 @@
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
+  import { isRawPayload } from '$lib/utilities/decode-payload';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
@@ -31,6 +32,7 @@
     getPrimaryAttributeForEvent,
     getSecondaryAttributeForEvent,
   } from '$lib/utilities/get-single-attribute-for-event';
+  import { getSystemNexusEventDisplay } from '$lib/utilities/get-system-nexus-event-display';
   import {
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
@@ -109,24 +111,39 @@
   const canceled = $derived(eventOrGroupIsCanceled(event));
   const terminated = $derived(eventOrGroupIsTerminated(event));
 
-  const displayName = $derived(
-    isEventGroup(event)
-      ? event.pendingActivity
-        ? translate('workflows.pending-activity')
-        : event.pendingNexusOperation
-          ? translate('workflows.pending-nexus-operation')
-          : event.label
-      : isLocalActivityMarkerEvent(event)
-        ? translate('events.category.local-activity')
-        : spaceBetweenCapitalLetters(event.name),
+  const systemNexus = $derived(
+    !isEventGroup(event)
+      ? getSystemNexusEventDisplay(event as WorkflowEvent)
+      : null,
   );
 
+  const displayName = $derived.by(() => {
+    if (isEventGroup(event)) {
+      if (event.pendingActivity) return translate('workflows.pending-activity');
+      if (event.pendingNexusOperation)
+        return translate('workflows.pending-nexus-operation');
+      return event.label;
+    }
+    if (isLocalActivityMarkerEvent(event))
+      return translate('events.category.local-activity');
+    if (systemNexus?.displayName) return systemNexus.displayName;
+    return spaceBetweenCapitalLetters(event.name);
+  });
+
   const primaryAttribute = $derived(
-    !isLocalActivityMarkerEvent(event)
+    !isLocalActivityMarkerEvent(event) && !systemNexus
       ? getPrimaryAttributeForEvent(
           isEventGroup(event) ? event.initialEvent : event,
         )
       : undefined,
+  );
+
+  const effectiveCategory = $derived(
+    systemNexus
+      ? 'signal'
+      : isEventGroup(event)
+        ? event.category
+        : event.category,
   );
 
   const secondaryAttribute = $derived(
@@ -270,10 +287,10 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p class={eventTypeStyle({ category: event.category })}>
+    <p class={eventTypeStyle({ category: effectiveCategory })}>
       <Icon
-        name={CategoryIcon[event.category].name}
-        title={CategoryIcon[event.category].title}
+        name={CategoryIcon[effectiveCategory].name}
+        title={CategoryIcon[effectiveCategory].title}
         class={merge(
           'mr-1 inline',
           isEventGroup(event) && event.isPending && 'animate-pulse',

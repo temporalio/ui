@@ -3,6 +3,7 @@
 
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
+  import SystemNexusOperationRenderer from '$lib/components/payload/system-nexus-operation-renderer.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -11,6 +12,7 @@
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
+  import { isRawPayload } from '$lib/utilities/decode-payload';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import {
     format,
@@ -23,7 +25,9 @@
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
+  import { getSystemNexusEventDisplay } from '$lib/utilities/get-system-nexus-event-display';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { describeNexusOperation } from '$lib/utilities/nexus-operation-registry';
   import {
     routeForEventHistoryEvent,
     routeForNamespace,
@@ -34,17 +38,26 @@
   let { event }: { event: WorkflowEvent } = $props();
   const { namespace, workflow, run } = $derived(page.params);
 
-  const displayName = $derived(
-    isLocalActivityMarkerEvent(event)
-      ? translate('events.category.local-activity')
-      : spaceBetweenCapitalLetters(event.name),
-  );
+  const systemNexus = $derived(getSystemNexusEventDisplay(event));
+
   const attributes = $derived.by(() => {
     const attrs = formatAttributes(event);
     if (event?.principal?.name) attrs.principalName = event.principal.name;
     if (event?.principal?.type) attrs.principalType = event.principal.type;
+    if (systemNexus?.extraAttributes) {
+      const extra = attrs as Record<string, unknown>;
+      Object.assign(extra, systemNexus.extraAttributes);
+    }
     return attrs;
   });
+
+  const displayName = $derived(
+    systemNexus?.displayName ??
+      (isLocalActivityMarkerEvent(event)
+        ? translate('events.category.local-activity')
+        : spaceBetweenCapitalLetters(event.name)),
+  );
+
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
     fields.filter(
@@ -59,11 +72,22 @@
   );
 
   const hiddenDetailFields = $derived.by(() => {
+    const systemNexusFields = systemNexus?.hiddenFields ?? [];
     if (event.category === 'activity')
-      return ['scheduledEventId', 'startedEventId', 'namespaceId'];
+      return [
+        ...systemNexusFields,
+        'scheduledEventId',
+        'startedEventId',
+        'namespaceId',
+      ];
     if (event.category === 'child-workflow')
-      return ['initiatedEventId', 'startedEventId', 'namespaceId'];
-    return ['namespaceId'];
+      return [
+        ...systemNexusFields,
+        'initiatedEventId',
+        'startedEventId',
+        'namespaceId',
+      ];
+    return [...systemNexusFields, 'namespaceId'];
   });
   const detailFields = $derived(
     fields.filter(
@@ -177,11 +201,19 @@
 {#snippet payloads(key, value)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
+  {@const nexusDescriptor = isRawPayload(codeBlockValue)
+    ? describeNexusOperation(codeBlockValue as RawPayload)
+    : null}
   <div>
     <p class="mb-1 min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
-    {#if value?.payloads}
+    {#if nexusDescriptor}
+      <SystemNexusOperationRenderer
+        payload={codeBlockValue as RawPayload}
+        maxHeight={384}
+      />
+    {:else if value?.payloads}
       <PayloadCodeBlock
         filenameData={{
           workflowId: workflow,

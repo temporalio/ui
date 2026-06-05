@@ -19,6 +19,7 @@
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
+    isNexusOperationScheduledEvent,
   } from '$lib/utilities/is-event-type';
 
   import {
@@ -67,6 +68,16 @@
   const pauseTime = $derived(
     pendingActivity && pendingActivity.pauseInfo?.pauseTime,
   );
+
+  const systemNexusCategory = $derived.by((): typeof group.category | null => {
+    if (!isNexusOperationScheduledEvent(group.initialEvent)) return null;
+    const attrs = group.initialEvent.nexusOperationScheduledEventAttributes;
+    if (String(attrs.endpoint ?? '') !== '__temporal_system') return null;
+    if (attrs.operation === 'SignalWithStartWorkflowExecution') return 'signal';
+    return null;
+  });
+
+  const effectiveCategory = $derived(systemNexusCategory ?? group.category);
 
   let decodedLocalActivity: SummaryAttribute | undefined = $state(undefined);
 
@@ -199,7 +210,7 @@
   >
     <div
       class={groupHover({
-        category: group ? group.category : 'default',
+        category: group ? effectiveCategory : 'default',
       })}
     ></div>
   </foreignObject>
@@ -235,7 +246,7 @@
       <Line
         startPoint={[x, y]}
         endPoint={[nextPoint, y]}
-        category={group.category}
+        category={effectiveCategory}
         classification={group.lastEvent.classification}
         pending={!!pauseTime}
         paused={!!pauseTime}
@@ -253,7 +264,7 @@
           ? pendingActivity.attempt > 1
             ? 'retry'
             : 'pending'
-          : group.category}
+          : effectiveCategory}
         classification={group.lastEvent.classification}
         pending
         paused={!!pauseTime}
@@ -306,12 +317,13 @@
     {/if}
     <Dot
       point={[x, y]}
+      category={effectiveCategory}
       classification={group.eventList[index]?.classification}
       icon={pauseTime && index !== 0
         ? 'pause'
         : decodedLocalActivity
           ? CategoryIcon['local-activity'].name
-          : CategoryIcon[group.category].name}
+          : CategoryIcon[effectiveCategory].name}
       r={radius}
     />
   {/each}
