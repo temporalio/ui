@@ -67,7 +67,7 @@
     <div
       class="flex items-start justify-between gap-4 border border-transparent"
     >
-      <div class="flex items-end gap-4">
+      <div class="flex flex-col items-end gap-4 sm:flex-row">
         <Select
           id="spec-type-{index}"
           label="Schedule Spec Type"
