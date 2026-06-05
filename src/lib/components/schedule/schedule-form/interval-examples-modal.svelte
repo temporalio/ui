@@ -41,7 +41,7 @@
         height="101"
         viewBox="0 0 346 101"
         fill="none"
-        class="mr-auto bg-code-block"
+        class="mr-auto max-w-full bg-code-block"
       >
         <line x1="20.5" y1="44" x2="20.5" y2="60" stroke="currentcolor" />
         <line x1="108.5" y1="44" x2="108.5" y2="60" stroke="currentcolor" />
@@ -147,7 +147,7 @@
         height="117"
         viewBox="0 0 346 117"
         fill="none"
-        class="mr-auto bg-code-block"
+        class="mr-auto max-w-full bg-code-block"
       >
         <line x1="20.5" y1="44" x2="20.5" y2="60" stroke="currentcolor" />
         <line x1="108.5" y1="44" x2="108.5" y2="60" stroke="currentcolor" />
@@ -258,7 +258,7 @@
         height="117"
         viewBox="0 0 382 117"
         fill="none"
-        class="mr-auto bg-code-block"
+        class="mr-auto max-w-full bg-code-block"
       >
         <line x1="20.5" y1="44" x2="20.5" y2="60" stroke="currentcolor" />
         <line x1="100.5" y1="44" x2="100.5" y2="60" stroke="currentcolor" />
