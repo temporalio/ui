@@ -32,13 +32,11 @@
     getPrimaryAttributeForEvent,
     getSecondaryAttributeForEvent,
   } from '$lib/utilities/get-single-attribute-for-event';
+  import { getSystemNexusEventDisplay } from '$lib/utilities/get-system-nexus-event-display';
   import {
     isActivityTaskStartedEvent,
     isLocalActivityMarkerEvent,
-    isNexusOperationCompletedEvent,
-    isNexusOperationScheduledEvent,
   } from '$lib/utilities/is-event-type';
-  import { getSystemNexusLabelFromResponsePayload } from '$lib/utilities/nexus-operation-registry';
   import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -113,29 +111,11 @@
   const canceled = $derived(eventOrGroupIsCanceled(event));
   const terminated = $derived(eventOrGroupIsTerminated(event));
 
-  const systemNexusLabel = $derived.by(() => {
-    if (isEventGroup(event)) return null;
-    const wfEvent = event as WorkflowEvent;
-    if (isNexusOperationScheduledEvent(wfEvent)) {
-      const attrs = wfEvent.nexusOperationScheduledEventAttributes;
-      if (String(attrs.endpoint ?? '') !== '__temporal_system') return null;
-      const LABELS: Record<string, string> = {
-        SignalWithStartWorkflowExecution:
-          'Signal With Start Workflow Execution',
-      };
-      return LABELS[String(attrs.operation ?? '')] ?? null;
-    }
-    if (isNexusOperationCompletedEvent(wfEvent)) {
-      const result = wfEvent.nexusOperationCompletedEventAttributes.result;
-      if (isRawPayload(result))
-        return getSystemNexusLabelFromResponsePayload(
-          result as Parameters<
-            typeof getSystemNexusLabelFromResponsePayload
-          >[0],
-        );
-    }
-    return null;
-  });
+  const systemNexus = $derived(
+    !isEventGroup(event)
+      ? getSystemNexusEventDisplay(event as WorkflowEvent)
+      : null,
+  );
 
   const displayName = $derived.by(() => {
     if (isEventGroup(event)) {
@@ -146,21 +126,12 @@
     }
     if (isLocalActivityMarkerEvent(event))
       return translate('events.category.local-activity');
-    if (systemNexusLabel) {
-      const NEXUS_STATE_VERBS: Record<string, string> = {
-        Scheduled: 'Initiated',
-        Completed: 'Delivered',
-      };
-      const rawState = event.name.replace('NexusOperation', '');
-      const state =
-        NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
-      return `${systemNexusLabel} ${state}`;
-    }
+    if (systemNexus?.displayName) return systemNexus.displayName;
     return spaceBetweenCapitalLetters(event.name);
   });
 
   const primaryAttribute = $derived(
-    !isLocalActivityMarkerEvent(event) && !systemNexusLabel
+    !isLocalActivityMarkerEvent(event) && !systemNexus
       ? getPrimaryAttributeForEvent(
           isEventGroup(event) ? event.initialEvent : event,
         )
@@ -168,7 +139,7 @@
   );
 
   const effectiveCategory = $derived(
-    systemNexusLabel
+    systemNexus
       ? 'signal'
       : isEventGroup(event)
         ? event.category

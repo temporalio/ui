@@ -25,15 +25,9 @@
     getStackTrace,
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import {
-    isLocalActivityMarkerEvent,
-    isNexusOperationCompletedEvent,
-    isNexusOperationScheduledEvent,
-  } from '$lib/utilities/is-event-type';
-  import {
-    describeNexusOperation,
-    getSystemNexusLabelFromResponsePayload,
-  } from '$lib/utilities/nexus-operation-registry';
+  import { getSystemNexusEventDisplay } from '$lib/utilities/get-system-nexus-event-display';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { describeNexusOperation } from '$lib/utilities/nexus-operation-registry';
   import {
     routeForEventHistoryEvent,
     routeForNamespace,
@@ -44,81 +38,26 @@
   let { event }: { event: WorkflowEvent } = $props();
   const { namespace, workflow, run } = $derived(page.params);
 
+  const systemNexus = $derived(getSystemNexusEventDisplay(event));
+
   const attributes = $derived.by(() => {
     const attrs = formatAttributes(event);
     if (event?.principal?.name) attrs.principalName = event.principal.name;
     if (event?.principal?.type) attrs.principalType = event.principal.type;
-    if (isSystemNexusScheduled && systemNexusDescriptor) {
+    if (systemNexus?.extraAttributes) {
       const extra = attrs as Record<string, unknown>;
-      if (systemNexusDescriptor.workflowId)
-        extra.workflowId = systemNexusDescriptor.workflowId;
-      if (systemNexusDescriptor.signalName)
-        extra.signalName = systemNexusDescriptor.signalName;
+      Object.assign(extra, systemNexus.extraAttributes);
     }
     return attrs;
   });
 
-  const SYSTEM_NEXUS_LABELS: Record<string, string> = {
-    SignalWithStartWorkflowExecution: 'Signal With Start Workflow Execution',
-  };
-
-  const NEXUS_STATE_VERBS: Record<string, string> = {
-    Scheduled: 'Initiated',
-    Completed: 'Delivered',
-  };
-
-  const nexusScheduledAttrs = $derived(
-    isNexusOperationScheduledEvent(event)
-      ? event.nexusOperationScheduledEventAttributes
-      : null,
+  const displayName = $derived(
+    systemNexus?.displayName ??
+      (isLocalActivityMarkerEvent(event)
+        ? translate('events.category.local-activity')
+        : spaceBetweenCapitalLetters(event.name)),
   );
 
-  const nexusCompletedAttrs = $derived(
-    isNexusOperationCompletedEvent(event)
-      ? event.nexusOperationCompletedEventAttributes
-      : null,
-  );
-
-  const isSystemNexusScheduled = $derived(
-    nexusScheduledAttrs !== null &&
-      String(nexusScheduledAttrs.endpoint ?? '') === '__temporal_system',
-  );
-
-  const isSystemNexusEvent = $derived(
-    isSystemNexusScheduled || nexusCompletedAttrs !== null,
-  );
-
-  const systemNexusDescriptor = $derived.by(() => {
-    if (!isSystemNexusScheduled || !nexusScheduledAttrs) return null;
-    const input = nexusScheduledAttrs.input;
-    if (!isRawPayload(input)) return null;
-    return describeNexusOperation(input as RawPayload);
-  });
-
-  const systemNexusLabel = $derived.by(() => {
-    if (isSystemNexusScheduled && nexusScheduledAttrs) {
-      const op = String(nexusScheduledAttrs.operation ?? '');
-      return SYSTEM_NEXUS_LABELS[op] ?? null;
-    }
-    if (nexusCompletedAttrs) {
-      const result = nexusCompletedAttrs.result;
-      if (isRawPayload(result))
-        return getSystemNexusLabelFromResponsePayload(result as RawPayload);
-    }
-    return null;
-  });
-
-  const displayName = $derived.by(() => {
-    if (systemNexusLabel) {
-      const rawState = event.name.replace('NexusOperation', '');
-      const state =
-        NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
-      return `${systemNexusLabel} ${state}`;
-    }
-    if (isLocalActivityMarkerEvent(event))
-      return translate('events.category.local-activity');
-    return spaceBetweenCapitalLetters(event.name);
-  });
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
     fields.filter(
@@ -133,9 +72,7 @@
   );
 
   const hiddenDetailFields = $derived.by(() => {
-    const systemNexusFields = isSystemNexusEvent
-      ? ['endpoint', 'service', 'operation', 'requestId']
-      : [];
+    const systemNexusFields = systemNexus?.hiddenFields ?? [];
     if (event.category === 'activity')
       return [
         ...systemNexusFields,
