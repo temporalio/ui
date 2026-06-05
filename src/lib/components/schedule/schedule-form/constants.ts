@@ -64,6 +64,13 @@ export const durationUnits = [
   SECONDS_UNIT,
 ];
 
+export const intervalUnits = [
+  DAYS_UNIT,
+  HOURS_UNIT,
+  MINUTES_UNIT,
+  SECONDS_UNIT,
+];
+
 export const DAYS_OF_WEEK = ['0', '1', '2', '3', '4', '5', '6'] as const;
 
 export const DAYS_WITH_LABEL = [

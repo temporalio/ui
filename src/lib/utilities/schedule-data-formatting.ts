@@ -1,49 +1,7 @@
-const parseTime = (time: string) => (time ? parseInt(time) : 0);
+import { sortNumStrings } from './array';
 
-export const timeToInterval = (
-  days: string,
-  hour: string,
-  minute: string,
-  second: string,
-) => {
-  const interval =
-    parseTime(days) * 60 * 60 * 24 +
-    parseTime(hour) * 60 * 60 +
-    parseTime(minute) * 60 +
-    parseTime(second);
-  return `${interval}s`;
-};
-
-type DaysAndMonthsInput = {
-  months?: string[];
-  daysOfMonth?: number[];
-  daysOfWeek?: string[];
-};
-
-type DaysAndMonthsOutput = {
-  month: string;
-  dayOfMonth: string;
-  dayOfWeek: string;
-};
-
-export const convertDaysAndMonths = ({
-  months = [],
-  daysOfMonth = [],
-  daysOfWeek = [],
-}: DaysAndMonthsInput): DaysAndMonthsOutput => {
-  const month = months
-    .sort((a: string, b: string) => parseInt(a) - parseInt(b))
-    .join(',');
-  const dayOfMonth = daysOfMonth
-    .sort((a: number, b: number) => a - b)
-    .join(',');
-  const normalizedDaysOfWeek =
-    daysOfWeek?.[0]?.split(',')?.length > 1
-      ? daysOfWeek[0].split(',')
-      : daysOfWeek;
-  const dayOfWeek = normalizedDaysOfWeek
-    .sort((a: string, b: string) => parseInt(a) - parseInt(b))
-    .join(',');
-
-  return { month, dayOfMonth, dayOfWeek };
-};
+export function sortAndStringifyNumStrings<T extends `${number}` = `${number}`>(
+  numStrings: T[],
+) {
+  return sortNumStrings(numStrings).join(',');
+}

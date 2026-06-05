@@ -71,13 +71,14 @@
       <dd class="flex flex-col text-sm">
         {$form.specs
           .map((spec, i) => {
-            const summary = getSpecSummary(spec, $timestamp);
+            const summary = getSpecSummary(spec);
             if (i === 0) {
               return summary;
             }
 
             return summary.toLowerCase();
           })
+          .filter(Boolean)
           .join(' AND ') || '--'}
       </dd>
     </div>

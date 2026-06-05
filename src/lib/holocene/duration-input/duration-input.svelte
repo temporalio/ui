@@ -70,8 +70,10 @@
     id: string;
     required?: boolean;
     hintText?: string;
+    hintTextAbove?: string;
     error?: boolean;
     class?: ClassNameValue;
+    inputClass?: ClassNameValue;
     emptyValue?: string;
   }
 
@@ -94,12 +96,14 @@
     afterLabel,
     id,
     hintText,
+    hintTextAbove,
     error = false,
     units = DEFAULT_UNITS as T,
     initialUnit = 'second(s)' as ExtractLabel<T>,
     required = false,
     value = $bindable(),
     class: className = '',
+    inputClass = '',
     emptyValue,
     emptyUnit,
     ...inputProps
@@ -154,9 +158,15 @@
     <Label class="grow-0" {required} {label} for={id} />
     {@render afterLabel?.()}
   </div>
+  {#if hintTextAbove}
+    <p class="text-xs text-secondary">
+      {hintTextAbove}
+    </p>
+  {/if}
   <div
     class={twMerge(
       'surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50',
+      inputClass,
       error && 'border-danger focus-within:ring-danger/50',
     )}
   >

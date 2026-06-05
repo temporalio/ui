@@ -19,7 +19,7 @@
     index: number;
   }
 
-  let { form, index }: Props = $props();
+  let { form, index, errors }: Props = $props();
 
   const spec = $derived(assertSpecType($form.specs[index], 'month'));
 
@@ -183,9 +183,15 @@
         max={23}
         placeholder="00"
         suffix="hrs"
+        error={!!$errors.specs?.[index]?.time?.hour?.[0]}
+        hintText={$errors.specs?.[index]?.time?.hour?.[0]}
         bind:value={
-          () => spec.hour?.toString(),
-          (v) => ($form.specs[index] = { ...spec, hour: Number(v) })
+          () => spec.time?.hour?.toString(),
+          (v) =>
+            ($form.specs[index] = {
+              ...spec,
+              time: { ...spec.time, hour: Number(v) },
+            })
         }
       />
 
@@ -200,9 +206,15 @@
         max={59}
         placeholder="00"
         suffix="min"
+        error={!!$errors.specs?.[index]?.time?.minute?.[0]}
+        hintText={$errors.specs?.[index]?.time?.minute?.[0]}
         bind:value={
-          () => spec.minute?.toString(),
-          (v) => ($form.specs[index] = { ...spec, minute: Number(v) })
+          () => spec.time?.minute?.toString(),
+          (v) =>
+            ($form.specs[index] = {
+              ...spec,
+              time: { ...spec.time, minute: Number(v) },
+            })
         }
       />
     </div>

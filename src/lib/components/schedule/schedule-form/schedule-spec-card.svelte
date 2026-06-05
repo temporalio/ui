@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { SvelteMap } from 'svelte/reactivity';
+
+  import { tick } from 'svelte';
   import type { SuperForm } from 'sveltekit-superforms';
 
   import Button from '$lib/holocene/button.svelte';
@@ -19,6 +22,8 @@
   }
 
   let { form, errors, validateForm, schedule = null }: Props = $props();
+
+  const specItemElsByIndex = new SvelteMap<number, ScheduleSpecItem>();
 
   // svelte-ignore state_referenced_locally
   let expandedIndex: number | null = $state(schedule ? null : 0);
@@ -45,9 +50,12 @@
 
     $form.specs = [...$form.specs, { ...SPEC_ITEM_NO_TYPE }];
     expandedIndex = $form.specs.length - 1;
+
+    await tick();
+    specItemElsByIndex.get(expandedIndex)?.focus();
   };
 
-  const removeSpec = (index: number) => {
+  const removeSpec = async (index: number) => {
     $form.specs = $form.specs.filter((_, i) => i !== index);
 
     if (typeof expandedIndex !== 'number') {
@@ -69,6 +77,8 @@
 
     // clamp index to new spec list size
     expandedIndex = Math.min(expandedIndex, $form.specs.length - 1);
+    await tick();
+    specItemElsByIndex.get(expandedIndex)?.focus();
   };
 </script>
 
@@ -88,6 +98,9 @@
       {#each $form.specs as _, i (i)}
         <ScheduleSpecItem
           {form}
+          bind:this={
+            () => specItemElsByIndex.get(i), (v) => specItemElsByIndex.set(i, v)
+          }
           index={i}
           expanded={expandedIndex === i}
           canRemove={$form.specs.length > 1}

@@ -18,10 +18,7 @@ import type {
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
-import {
-  convertDaysAndMonths,
-  timeToInterval,
-} from '$lib/utilities/schedule-data-formatting';
+import { sortAndStringifyNumStrings } from '$lib/utilities/schedule-data-formatting';
 
 type ScheduleContext = {
   namespace: string;
@@ -87,49 +84,51 @@ const buildSingleSpec = (
   },
   item: ScheduleSpecItem,
 ) => {
-  if (item.type === 'cron') {
-    if (item.cronString) {
-      const cronStringWithComment = `${item.cronString}#${item.cronString}`;
-      spec.cronString.push(cronStringWithComment);
+  switch (item.type) {
+    case 'cron': {
+      if (item.cronString) {
+        const cronStringWithComment = `${item.cronString}#${item.cronString}`;
+        spec.cronString.push(cronStringWithComment);
+      }
+
+      return;
     }
-  } else if (item.type === 'interval') {
-    const interval = timeToInterval(
-      item.days || '',
-      item.hour || '',
-      item.minute || '',
-      item.second || '',
-    );
-    spec.interval.push({
-      interval,
-      phase: item.phase || '0s',
-    } as ScheduleInterval);
-  } else if (item.type === 'week') {
-    const { dayOfWeek } = convertDaysAndMonths({
-      daysOfWeek: item.daysOfWeek || [],
-    });
-    spec.calendar.push({
-      year: '*',
-      month: '',
-      dayOfMonth: '',
-      dayOfWeek,
-      hour: item.hour || '',
-      minute: item.minute || '',
-      second: item.second || '',
-    });
-  } else if (item.type === 'month') {
-    const { month, dayOfMonth } = convertDaysAndMonths({
-      months: item.months || [],
-      daysOfMonth: item.daysOfMonth || [],
-    });
-    spec.calendar.push({
-      year: '*',
-      month,
-      dayOfMonth,
-      dayOfWeek: '',
-      hour: item.hour || '',
-      minute: item.minute || '',
-      second: item.second || '',
-    });
+
+    case 'interval': {
+      spec.interval.push({
+        interval: item.interval,
+        phase: item.phase || '0s',
+      } as ScheduleInterval);
+
+      return;
+    }
+
+    case 'week': {
+      spec.calendar.push({
+        year: '*',
+        month: '',
+        dayOfMonth: '',
+        dayOfWeek: sortAndStringifyNumStrings(item.daysOfWeek ?? []),
+        hour: item?.time?.hour || '',
+        minute: item?.time?.minute || '',
+        second: '',
+      });
+
+      return;
+    }
+
+    case 'month': {
+      spec.calendar.push({
+        year: '*',
+        month: sortAndStringifyNumStrings(item.months ?? []),
+        dayOfMonth: sortAndStringifyNumStrings(item.daysOfMonth ?? []),
+        dayOfWeek: '',
+        hour: item.time?.hour || '',
+        minute: item.time?.minute || '',
+        second: '',
+      });
+      return;
+    }
   }
 };
 

@@ -2,8 +2,8 @@
   import type { SuperForm } from 'sveltekit-superforms';
 
   import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
 
+  import { intervalUnits } from './constants';
   import type { ScheduleFormData } from './schema';
   import { assertSpecType } from './utilities/spec';
 
@@ -15,111 +15,45 @@
     index: number;
   }
 
-  let { form, index }: Props = $props();
+  let { form, index, errors }: Props = $props();
 
   const spec = $derived(assertSpecType($form.specs[index], 'interval'));
 </script>
 
 <div class="flex flex-col gap-4">
-  <p class="text-sm text-secondary">
-    Specify the time interval for this schedule to run (for example every 5
-    minutes).
-  </p>
+  <DurationInput
+    id="interval-{index}"
+    inputClass="max-w-96"
+    label="Time Interval"
+    bind:value={
+      () => spec.interval,
+      (v) => ($form.specs[index] = { ...spec, interval: v })
+    }
+    units={intervalUnits}
+    initialUnit="second(s)"
+    inputmode="numeric"
+    min={1}
+    placeholder="00"
+    error={!!$errors.specs?.[index]?.interval?.[0]}
+    hintText={$errors.specs?.[index]?.interval?.[0]}
+    hintTextAbove="Specify the time interval for this schedule to run (for example every 5 minutes)."
+  />
 
-  <div
-    class="grid grid-cols-1 items-center gap-2 sm:grid-cols-[1fr,min-content,1fr,min-content,1fr,min-content,1fr] md:grid-cols-[1fr,min-content,1fr] xl:grid-cols-[1fr,min-content,1fr,min-content,1fr,min-content,1fr]"
-  >
-    <Input
-      id="days-{index}"
-      label="Days"
-      inputmode="numeric"
-      type="number"
-      min={0}
-      step={1}
-      labelHidden
-      bind:value={
-        () => spec.days?.toString(),
-        (v) => ($form.specs[index] = { ...spec, days: Number(v) })
-      }
-      placeholder="000"
-      suffix="days"
-      suffixClass="min-w-16 text-center"
-    />
-    <span class="align-center hidden text-secondary sm:flex">:</span>
-    <Input
-      id="hour-{index}"
-      label="Hours"
-      labelHidden
-      inputmode="numeric"
-      type="number"
-      min={0}
-      step={1}
-      bind:value={
-        () => spec.hours?.toString(),
-        (v) => ($form.specs[index] = { ...spec, hours: Number(v) })
-      }
-      placeholder="00"
-      suffix="hrs"
-      suffixClass="min-w-16 text-center"
-    />
-    <span class="align-center hidden text-secondary sm:flex md:hidden xl:flex"
-      >:</span
-    >
-    <Input
-      id="minute-{index}"
-      label="Minutes"
-      labelHidden
-      inputmode="numeric"
-      type="number"
-      min={0}
-      step={1}
-      bind:value={
-        () => spec.minutes?.toString(),
-        (v) => ($form.specs[index] = { ...spec, minutes: Number(v) })
-      }
-      placeholder="00"
-      suffix="min"
-      suffixClass="min-w-16 text-center"
-    />
-    <span class="align-center hidden text-secondary sm:flex">:</span>
-    <Input
-      id="second-{index}"
-      label="Seconds"
-      labelHidden
-      inputmode="numeric"
-      type="number"
-      min={0}
-      step={1}
-      bind:value={
-        () => spec.seconds?.toString(),
-        (v) => ($form.specs[index] = { ...spec, seconds: Number(v) })
-      }
-      placeholder="00"
-      suffix="sec"
-      suffixClass="min-w-16 text-center"
-    />
-  </div>
-
-  <div class="flex flex-col gap-2">
-    <p class="text-sm text-secondary">
-      Specify the time to offset when this schedule will run (for example, 15
-      min past the hour).
-    </p>
-    <div class="max-w-108">
-      <DurationInput
-        id="phase-{index}"
-        label="Offset"
-        bind:value={
-          () => spec.phase, (v) => ($form.specs[index] = { ...spec, phase: v })
-        }
-        initialUnit="minute(s)"
-        inputmode="numeric"
-        min={0}
-        placeholder="00"
-        hintText="Specify the time to offset when this schedule will run (for example, 15 min past the hour)."
-      />
-    </div>
-  </div>
+  <DurationInput
+    id="phase-{index}"
+    inputClass="max-w-96"
+    label="Offset"
+    bind:value={
+      () => spec.phase, (v) => ($form.specs[index] = { ...spec, phase: v })
+    }
+    initialUnit="minute(s)"
+    inputmode="numeric"
+    min={0}
+    placeholder="00"
+    error={!!$errors.specs?.[index]?.phase?.[0]}
+    hintText={$errors.specs?.[index]?.phase?.[0]}
+    hintTextAbove="Specify the time to offset when this schedule will run (for example, 15 min past the hour)."
+  />
 
   <ScheduleSpecPreview {form} {index} />
 </div>

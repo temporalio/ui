@@ -1,8 +1,8 @@
 <script lang="ts">
   import { type SuperForm } from 'sveltekit-superforms';
 
-  import { timestamp } from '$lib/components/timestamp.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
 
@@ -13,6 +13,7 @@
     getSpecSummary,
   } from './utilities/spec';
 
+  import IntervalExamplesModal from './interval-examples-modal.svelte';
   import SpecTypeCron from './spec-type-cron.svelte';
   import SpecTypeInterval from './spec-type-interval.svelte';
   import SpecTypeMonth from './spec-type-month.svelte';
@@ -49,32 +50,54 @@
     const newType = value as ScheduleFormData['specs'][number]['type'];
     $form.specs[index] = getInitialSpecData(newType);
   }
+
+  let isIntervalExampleModalOpen = $state(false);
+
+  let containerEl: HTMLElement | null = $state(null);
+  export const focus = () => containerEl?.focus();
 </script>
 
 {#if expanded}
-  <div class="flex flex-col gap-4" aria-expanded="true">
+  <div
+    bind:this={containerEl}
+    tabindex="-1"
+    class="flex flex-col gap-4"
+    aria-expanded="true"
+  >
     <div
       class="flex items-start justify-between gap-4 border border-transparent"
     >
-      <Select
-        id="spec-type-{index}"
-        label="Schedule Spec Type"
-        placeholder="Select a spec type"
-        value={$form.specs[index].type}
-        onChange={onTypeChange}
-        valid={!$errors.specs?.[index]?.type?.[0]}
-        error={$errors.specs?.[index]?.type?.[0]}
-        required
-      >
-        {#each specTypeOptions as option (option.value)}
-          <Option value={option.value}>{option.label}</Option>
-        {/each}
-      </Select>
+      <div class="flex items-end gap-4">
+        <Select
+          id="spec-type-{index}"
+          label="Schedule Spec Type"
+          placeholder="Select a spec type"
+          value={$form.specs[index].type}
+          onChange={onTypeChange}
+          valid={!$errors.specs?.[index]?.type?.[0]}
+          error={$errors.specs?.[index]?.type?.[0]}
+          required
+        >
+          {#each specTypeOptions as option (option.value)}
+            <Option value={option.value}>{option.label}</Option>
+          {/each}
+        </Select>
+        {#if spec.type === 'interval'}
+          <Button
+            variant="ghost"
+            on:click={() => (isIntervalExampleModalOpen = true)}
+          >
+            Explore interval examples
+          </Button>
+          <IntervalExamplesModal bind:open={isIntervalExampleModalOpen} />
+        {/if}
+      </div>
       {#if canRemove}
-        <Button
+        <IconButton
           variant="ghost"
-          leadingIcon="trash"
-          size="xs"
+          size="sm"
+          icon="trash"
+          label="Delete"
           class="mr-4 mt-[1.625rem] h-10"
           on:click={onRemove}
         />
@@ -92,7 +115,9 @@
     {/if}
   </div>
 {:else}
+  {@const rawValue = getRawValue(spec)}
   <div
+    bind:this={containerEl}
     class="surface-background relative flex w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
     aria-expanded="false"
   >
@@ -100,21 +125,24 @@
       class="grid w-full grid-cols-1 items-center gap-2 text-sm md:grid-cols-[minmax(8rem,max-content)_4fr_minmax(max-content,1fr)] md:gap-4"
     >
       <span class="font-semibold">{typeLabel}</span>
-      <span class="flex-1 flex-wrap text-secondary">
-        {getSpecSummary(spec, $timestamp)}
+      <span class="flex-1 flex-wrap text-xs text-secondary">
+        {getSpecSummary(spec)}.
       </span>
-      <span class="font-mono">{getRawValue(spec)}</span>
+      {#if rawValue}
+        <span class="font-mono">{rawValue}</span>
+      {/if}
     </div>
     {#if canRemove}
-      <Button
+      <IconButton
         variant="ghost"
-        leadingIcon="trash"
-        size="xs"
+        size="sm"
+        icon="trash"
+        label="Delete"
         on:click={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-      ></Button>
+      />
     {/if}
   </div>
 {/if}

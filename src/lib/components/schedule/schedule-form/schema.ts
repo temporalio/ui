@@ -1,18 +1,12 @@
 import { z } from 'zod/v3';
 
+import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 import { searchAttributesSchema } from '$lib/stores/search-attributes';
 import type { FullSchedule } from '$lib/types/schedule';
 import type { SearchAttributes } from '$lib/types/workflows';
 import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 
-import {
-  DAYS_OF_MONTH,
-  DAYS_OF_WEEK,
-  MONTHS,
-  SECONDS_PER_DAY,
-  SECONDS_PER_HOUR,
-  SECONDS_PER_MINUTE,
-} from './constants';
+import { DAYS_OF_MONTH, DAYS_OF_WEEK, MONTHS } from './constants';
 import {
   DEFAULT_CATCHUP_WINDOW,
   DEFAULT_EXECUTION_TIMEOUT,
@@ -26,36 +20,45 @@ import { isValidCronString } from './utilities/cron';
 import type { SearchAttribute } from '$types';
 
 export const scheduleSpecItemSchema = z
-  .discriminatedUnion('type', [
-    z.object({
-      type: z.literal('cron'),
-      cronString: z.string().default(''),
-    }),
-    z.object({
-      type: z.literal('week'),
-      daysOfWeek: z
-        .array(z.enum(DAYS_OF_WEEK))
-        .optional()
-        .default([...DAYS_OF_WEEK]),
-      hour: z.number().min(0).max(23).optional().default(0),
-      minute: z.number().min(0).max(59).optional().default(0),
-    }),
-    z.object({
-      type: z.literal('month'),
-      daysOfMonth: z.array(z.enum(DAYS_OF_MONTH)).optional().default([]),
-      months: z.array(z.enum(MONTHS)).optional().default([]),
-      hour: z.number().min(0).max(23).optional().default(0),
-      minute: z.number().min(0).max(59).optional().default(0),
-    }),
-    z.object({
-      type: z.literal('interval'),
-      days: z.number().min(0).optional().default(0),
-      hours: z.number().min(0).optional().default(0),
-      minutes: z.number().min(0).optional().default(0),
-      seconds: z.number().min(0).optional().default(0),
-      phase: z.string().optional(),
-    }),
-  ])
+  .discriminatedUnion(
+    'type',
+    [
+      z.object({
+        type: z.literal('cron'),
+        cronString: z.string().default(''),
+      }),
+      z.object({
+        type: z.literal('week'),
+        daysOfWeek: z.array(z.enum(DAYS_OF_WEEK)).min(1),
+        time: z.object({
+          hour: z.number().min(0).max(23).optional(),
+          minute: z.number().min(0).max(59).optional(),
+        }),
+      }),
+      z.object({
+        type: z.literal('month'),
+        daysOfMonth: z.array(z.enum(DAYS_OF_MONTH)).min(1),
+        months: z.array(z.enum(MONTHS)).min(1),
+        time: z.object({
+          hour: z.number().min(0).max(23).optional(),
+          minute: z.number().min(0).max(59).optional(),
+        }),
+      }),
+      z.object({
+        type: z.literal('interval'),
+        interval: z.string().optional(),
+        phase: z.string().optional(),
+      }),
+    ],
+    {
+      errorMap: (issue, ctx) => {
+        if (issue.code === z.ZodIssueCode.invalid_union_discriminator) {
+          return { message: 'Schedule type is required' };
+        }
+        return { message: ctx.defaultError };
+      },
+    },
+  )
   .superRefine((val, ctx) => {
     switch (val.type) {
       case 'cron': {
@@ -83,11 +86,23 @@ export const scheduleSpecItemSchema = z
       }
 
       case 'week': {
-        if (!val.daysOfWeek.length) {
+        // no extra validation
+        return;
+      }
+
+      case 'month': {
+        // no extra validation
+        return;
+      }
+
+      case 'interval': {
+        const interval = Number(parseDuration(val.interval ?? ''));
+
+        if (!interval) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'At least one day must be selected',
-            path: ['daysOfWeek'],
+            message: 'Interval must be more than 0 seconds.',
+            path: ['interval'],
           });
           return;
         }
@@ -262,27 +277,6 @@ function parseOverlapPolicy(
   return OVERLAP_POLICY_MAP[String(value)] ?? 'Skip';
 }
 
-function parseIntervalString(intervalStr: string): {
-  days: string;
-  hours: string;
-  minutes: string;
-  seconds: string;
-} {
-  const totalSeconds = parseInt(intervalStr.replace(/s$/, ''), 10) || 0;
-  const days = Math.floor(totalSeconds / SECONDS_PER_DAY);
-  const hours = Math.floor((totalSeconds % SECONDS_PER_DAY) / SECONDS_PER_HOUR);
-  const minutes = Math.floor(
-    (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE,
-  );
-  const seconds = totalSeconds % SECONDS_PER_MINUTE;
-  return {
-    days: days > 0 ? String(days) : '',
-    hours: hours > 0 ? String(hours) : '',
-    minutes: minutes > 0 ? String(minutes) : '',
-    seconds: seconds > 0 ? String(seconds) : '',
-  };
-}
-
 function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
   const specs: ScheduleSpecItem[] = [];
 
@@ -299,19 +293,16 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
   for (const interval of intervals) {
     const intervalStr = interval?.interval?.toString() ?? '0s';
     const phaseStr = interval?.phase?.toString() ?? '';
-    const parsed = parseIntervalString(intervalStr);
     specs.push({
       type: 'interval',
-      days: Number(parsed.days),
-      hours: Number(parsed.hours),
-      minutes: Number(parsed.minutes),
-      seconds: Number(parsed.seconds),
+      interval: intervalStr,
       phase: phaseStr,
     });
   }
 
   const calendars =
     schedule?.spec?.structuredCalendar ?? schedule?.spec?.calendar ?? [];
+
   for (const cal of calendars) {
     const hasDayOfWeek =
       cal?.dayOfWeek &&
@@ -333,10 +324,14 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
         ).filter((d): d is DayOfWeek =>
           (DAYS_OF_WEEK as readonly string[]).includes(d),
         ),
-        hour: Array.isArray(cal.hour) ? Number(cal.hour[0]) : Number(cal.hour),
-        minute: Array.isArray(cal.minute)
-          ? Number(cal.minute[0])
-          : Number(cal.minute),
+        time: {
+          hour: Array.isArray(cal.hour)
+            ? Number(cal.hour[0])
+            : Number(cal.hour),
+          minute: Array.isArray(cal.minute)
+            ? Number(cal.minute[0])
+            : Number(cal.minute),
+        },
       });
     } else {
       specs.push({
@@ -347,10 +342,14 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
         months: Array.isArray(cal.month)
           ? cal.month.map((m) => String(m) as Month)
           : [String(cal.month ?? '') as Month],
-        hour: Array.isArray(cal.hour) ? Number(cal.hour[0]) : Number(cal.hour),
-        minute: Array.isArray(cal.minute)
-          ? Number(cal.minute[0])
-          : Number(cal.minute),
+        time: {
+          hour: Array.isArray(cal.hour)
+            ? Number(cal.hour[0])
+            : Number(cal.hour),
+          minute: Array.isArray(cal.minute)
+            ? Number(cal.minute[0])
+            : Number(cal.minute),
+        },
       });
     }
   }

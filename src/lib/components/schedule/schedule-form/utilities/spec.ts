@@ -1,15 +1,22 @@
 import cronstrue from 'cronstrue';
 
-import {
-  type FormatDateOptions,
-  type ValidTime,
-} from '$lib/utilities/format-date';
+import { sortNumStrings } from '$lib/utilities/array';
+import { pluralize } from '$lib/utilities/pluralize';
 
-import { DAYS_OF_WEEK, DAYS_WITH_LABEL, WEEKDAYS, WEEKEND } from '../constants';
+import {
+  DAYS_OF_MONTH,
+  DAYS_OF_WEEK,
+  DAYS_WITH_LABEL,
+  durationUnits,
+  intervalUnits,
+  MONTHS,
+  MONTHS_WITH_LABEL,
+  WEEKDAYS,
+  WEEKEND,
+} from '../constants';
 import { type ScheduleFormData } from '../schema';
 import type { DayOfMonth, Month } from '../types';
-
-type FormatDateFn = (date: ValidTime, options: FormatDateOptions) => string;
+import { getLargestWholeUnit } from './duration';
 
 type Spec = ScheduleFormData['specs'][number];
 
@@ -38,30 +45,37 @@ export function getInitialSpecData<T extends Spec['type']>(
     week: {
       type: 'week',
       daysOfWeek: [...DAYS_OF_WEEK],
-      hour: undefined,
-      minute: undefined,
+      time: {
+        hour: undefined,
+        minute: undefined,
+      },
     },
     month: {
       type: 'month',
       daysOfMonth: [new Date().getDay().toString() as DayOfMonth],
       months: [(new Date().getMonth() + 1).toString() as Month],
-      hour: 0,
-      minute: 0,
+      time: {
+        hour: undefined,
+        minute: undefined,
+      },
     },
     interval: {
       type: 'interval',
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      phase: '0s',
+      interval: undefined,
+      phase: undefined,
     },
   };
 
   return initial[type] as Extract<Spec, { type: T }>;
 }
 
-export function getSpecSummary(spec: Spec, formatDate: FormatDateFn): string {
+const pad0ForTime = (num = 0): string => num.toString().padStart(2, '0');
+const listFormatter = new Intl.ListFormat('en', {
+  style: 'long',
+  type: 'conjunction',
+});
+
+export function getSpecSummary(spec: Spec): string {
   if (!spec) {
     return '';
   }
@@ -79,30 +93,68 @@ export function getSpecSummary(spec: Spec, formatDate: FormatDateFn): string {
 
     case 'week': {
       const selectedSet = new Set(spec.daysOfWeek ?? []);
-      const pad0 = (num = 0): string => num.toString().padStart(2, '0');
-      const time = `${pad0(spec.hour)}:${pad0(spec.minute)} UTC`;
+      const time = `${pad0ForTime(spec.time.hour)}:${pad0ForTime(spec.time.minute)} UTC`;
 
       if (DAYS_OF_WEEK.every((d) => selectedSet.has(d))) {
-        return `Everyday at ${time}.`;
+        return `Everyday at ${time}`;
       }
 
       if (WEEKDAYS.every((d) => selectedSet.has(d))) {
-        return `Weekdays at ${time}.`;
+        return `Weekdays at ${time}`;
       }
 
       if (WEEKEND.every((d) => selectedSet.has(d))) {
         return `Weekends at ${time}`;
       }
 
-      return `Every ${spec.daysOfWeek.map((d) => DAYS_WITH_LABEL.find((withLabel) => d === withLabel.value).label)} at ${time}.`;
+      const sortedLabels = sortNumStrings(spec.daysOfWeek).map(
+        (d) => DAYS_WITH_LABEL.find((withLabel) => d === withLabel.value).label,
+      );
+
+      return `Every ${listFormatter.format(sortedLabels)} at ${time}`;
     }
 
     case 'month': {
-      return '';
+      const selectedMonthsSet = new Set(spec.months ?? []);
+
+      const time = `${pad0ForTime(spec.time.hour)}:${pad0ForTime(spec.time.minute)} UTC`;
+
+      const formatedDays = listFormatter.format(
+        sortNumStrings(spec.daysOfMonth),
+      );
+
+      const selectedDaysSet = new Set(spec.daysOfMonth ?? []);
+      const isEveryDay = DAYS_OF_MONTH.every((d) => selectedDaysSet.has(d));
+      const daysStr = isEveryDay
+        ? 'every day'
+        : `${pluralize('day', spec.daysOfMonth.length)} ${formatedDays}`;
+
+      if (MONTHS.every((m) => selectedMonthsSet.has(m))) {
+        return `On ${daysStr} of every month at ${time}`;
+      }
+
+      const sortedMonthLabels = sortNumStrings(spec.months)
+        .map(
+          (m) =>
+            MONTHS_WITH_LABEL.find((withLabel) => m === withLabel.value)?.label,
+        )
+        .filter(Boolean);
+
+      const formatedMonthLabels = listFormatter.format(sortedMonthLabels);
+
+      return `On ${daysStr} of ${formatedMonthLabels} at ${time}`;
     }
 
     case 'interval': {
-      return '';
+      if (!spec.interval) {
+        return '';
+      }
+
+      const largest = getLargestWholeUnit(spec.interval, intervalUnits);
+
+      const offset = getLargestWholeUnit(spec.phase ?? '0s', durationUnits);
+
+      return `Every ${largest.value} ${largest.unit.label} offset by ${offset.value} ${offset.unit.label}`;
     }
 
     default: {
