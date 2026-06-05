@@ -59,13 +59,12 @@
     pendingActivity && pendingActivity.pauseInfo?.pauseTime,
   );
 
-  const systemNexusCategory = $derived.by(() => {
+  const systemNexusCategory = $derived.by((): typeof group.category | null => {
     if (!isNexusOperationScheduledEvent(group.initialEvent)) return null;
     const attrs = group.initialEvent.nexusOperationScheduledEventAttributes;
     if (String(attrs.endpoint ?? '') !== '__temporal_system') return null;
-    const op = String(attrs.operation ?? '');
-    if (op.includes('Signal')) return 'signal';
-    return 'workflow';
+    if (attrs.operation === 'SignalWithStartWorkflowExecution') return 'signal';
+    return null;
   });
 
   const effectiveCategory = $derived(systemNexusCategory ?? group.category);

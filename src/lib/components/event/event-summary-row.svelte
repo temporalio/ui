@@ -122,9 +122,6 @@
       const LABELS: Record<string, string> = {
         SignalWithStartWorkflowExecution:
           'Signal With Start Workflow Execution',
-        StartWorkflowExecution: 'Start Operation',
-        SignalWorkflowExecution: 'Signal Operation',
-        QueryWorkflow: 'Query Operation',
       };
       return LABELS[String(attrs.operation ?? '')] ?? null;
     }
