@@ -92,6 +92,7 @@ export interface StartNexusOperationQueryParams {
   endpoint: string;
   service: string;
   operation: string;
+  runId: string;
 }
 
 export const routeForNamespaces = (): ResolvedPathname => {
@@ -220,6 +221,7 @@ export const routeForStartStandaloneNexusOperation = (
     endpoint: parameters.endpoint ?? '',
     service: parameters.service ?? '',
     operation: parameters.operation ?? '',
+    runId: parameters.runId ?? '',
   };
   return toURL(
     `${routeForStandaloneNexusOperations(parameters)}/start`,

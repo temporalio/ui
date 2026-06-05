@@ -72,6 +72,7 @@
               endpoint: nexusOperationInfo.endpoint,
               service: nexusOperationInfo.service,
               operation: nexusOperationInfo.operation,
+              runId: nexusOperationInfo.runId,
             }),
           )}
         data-testid="start-nexus-operation-button"

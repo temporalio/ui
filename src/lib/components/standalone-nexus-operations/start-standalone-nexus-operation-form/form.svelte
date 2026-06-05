@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
+  import { get, writable } from 'svelte/store';
 
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { twMerge } from 'tailwind-merge';
@@ -22,8 +22,14 @@
     encodings,
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
-  import { startStandaloneNexusOperation } from '$lib/services/standalone-nexus-operations';
-  import { type SearchAttributesSchema } from '$lib/stores/search-attributes';
+  import {
+    fetchInitialValuesForStartNexusOperation,
+    startStandaloneNexusOperation,
+  } from '$lib/services/standalone-nexus-operations';
+  import {
+    customSearchAttributes,
+    type SearchAttributesSchema,
+  } from '$lib/stores/search-attributes';
   import { toaster } from '$lib/stores/toaster';
   import {
     type NexusOperationIdConflictPolicy,
@@ -188,6 +194,43 @@
 
   const unsubscribe = encoding.subscribe((e) => {
     $form.encoding = e;
+  });
+
+  onMount(async () => {
+    const operationIdParam = page.url.searchParams.get('operationId') ?? '';
+    const runIdParam = page.url.searchParams.get('runId') ?? '';
+
+    if (!operationIdParam || !runIdParam) return;
+
+    const initialValues = await fetchInitialValuesForStartNexusOperation(
+      namespace,
+      operationIdParam,
+    );
+
+    $form.input = initialValues.input;
+    encoding.set(initialValues.encoding);
+    $form.messageType = initialValues.messageType;
+    $form.summary = initialValues.summary;
+    $form.details = initialValues.details;
+
+    if (initialValues.searchAttributes) {
+      const customAttrs = get(customSearchAttributes);
+      const newAttrs = Object.entries(initialValues.searchAttributes)
+        .filter(([key]) => key in customAttrs)
+        .map(([key, value]) => ({
+          label: key,
+          value,
+          type: customAttrs[key],
+        }));
+      searchAttributes = [...searchAttributes, ...newAttrs];
+    }
+
+    const hasAdvancedData =
+      Object.keys(initialValues.searchAttributes ?? {}).length > 0 ||
+      !!initialValues.summary ||
+      !!initialValues.details;
+
+    advancedOptionsVisible = advancedOptionsVisible || hasAdvancedData;
   });
 
   onDestroy(() => {
