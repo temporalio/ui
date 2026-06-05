@@ -68,6 +68,7 @@
         {#if latestBuildId}
           <div class="flex items-center gap-2">
             <Copyable
+              container-class="min-w-32 shrink-0"
               content={latestBuildId}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}

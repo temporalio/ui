@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { translate } from '$lib/i18n/translate';
   import type {
     EventGroup,
     EventGroups,
@@ -9,6 +10,7 @@
     EventTypeCategory,
     WorkflowEventWithPending,
   } from '$lib/types/events';
+  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
     isPendingActivity,
     isPendingNexusOperation,
@@ -69,9 +71,43 @@
         : (undefined as EventTypeCategory | 'pending' | undefined),
   );
   const reverseSort = $derived($eventFilterSort === 'descending');
+
+  const isRetrying = $derived(
+    !!group?.pendingActivity && Number(group.pendingActivity.attempt) > 1,
+  );
+
+  const statusForLabel = $derived(
+    isRetrying
+      ? 'Retrying'
+      : classification === 'pending'
+        ? 'Pending'
+        : classification,
+  );
+
+  const classificationLabel = $derived(
+    getEventClassificationLabel(statusForLabel),
+  );
+
+  const eventTypeLabel = $derived(
+    event && 'eventType' in event
+      ? event.eventType
+      : translate('common.unknown'),
+  );
+
+  const accessibleName = $derived(
+    translate('events.row-accessible-name', {
+      eventType: eventTypeLabel,
+      classification: classificationLabel,
+    }),
+  );
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer">
+<g
+  role="button"
+  tabindex="0"
+  aria-label={accessibleName}
+  class="relative cursor-pointer"
+>
   {#if connectLine}
     <Line
       startPoint={[canvasWidth, y]}
