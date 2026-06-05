@@ -15,6 +15,7 @@
   } from '$lib/utilities/decode-local-activity';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
+  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
@@ -54,6 +55,15 @@
 
   const timelineWidth = $derived(canvasWidth - 2 * gutter);
   const pendingActivity = $derived(group?.pendingActivity);
+
+  const accessibleName = $derived(
+    translate('events.row-accessible-name', {
+      eventType: group.displayName,
+      classification: getEventClassificationLabel(
+        group.finalClassification || group.classification,
+      ),
+    }),
+  );
   const pauseTime = $derived(
     pendingActivity && pendingActivity.pauseInfo?.pauseTime,
   );
@@ -197,6 +207,7 @@
 <g
   role="button"
   tabindex="0"
+  aria-label={accessibleName}
   onclick={onClick}
   onkeypress={onClick}
   onmouseenter={onMouseEnter}

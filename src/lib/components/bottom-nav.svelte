@@ -152,7 +152,7 @@
       {@render linksContent({ open: viewLinks, closeMenu })}
     {:else}
       <div
-        class="flex h-full flex-col-reverse justify-start gap-6 overflow-auto px-4 py-8"
+        class="flex h-full flex-col justify-end gap-6 overflow-auto px-4 py-8"
       >
         {@render linksSnippet?.()}
       </div>

@@ -1,7 +1,9 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
 
   import { TimelineConfig } from '../constants';
 
@@ -20,9 +22,22 @@
 
   const start = $derived(gutter);
   const end = $derived(start + length - 2 * gutter);
+
+  const accessibleName = $derived(
+    translate('workflows.row-accessible-name', {
+      workflowId: workflow.id,
+      status: getWorkflowStatusLabel(workflow.status),
+    }),
+  );
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer" {height}>
+<g
+  role="button"
+  tabindex="0"
+  aria-label={accessibleName}
+  class="relative cursor-pointer"
+  {height}
+>
   <Line
     startPoint={[start, y]}
     endPoint={[end, y]}
