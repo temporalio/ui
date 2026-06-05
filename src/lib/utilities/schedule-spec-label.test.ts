@@ -616,6 +616,53 @@ describe('getScheduleSpecLabel', () => {
     ).toBe('Every weekday at 8:30 AM UTC');
   });
 
+  it('should handle stepped calendar specs as intervals', () => {
+    expect(
+      getScheduleSpecLabel({
+        calendar: [
+          {
+            second: '0',
+            minute: '0-59/15',
+            hour: '0-23',
+            dayOfMonth: '1-31',
+            month: '1-12',
+            dayOfWeek: '0-6',
+          },
+        ],
+      }),
+    ).toBe('Every 15 minutes');
+  });
+
+  it('should handle stepped structured calendar specs as intervals', () => {
+    expect(
+      getScheduleSpecLabel({
+        structuredCalendar: [
+          {
+            second: [{ start: 0 }],
+            minute: [{ start: 0, end: 59, step: 15 }],
+            hour: [{ start: 0, end: 23, step: 1 }],
+            dayOfMonth: [{ start: 1, end: 31, step: 1 }],
+            month: [{ start: 1, end: 12, step: 1 }],
+            dayOfWeek: [{ start: 0, end: 6, step: 1 }],
+          },
+        ],
+      }),
+    ).toBe('Every 15 minutes');
+  });
+
+  it('should handle direct stepped calendar specs as intervals', () => {
+    expect(
+      getScheduleSpecLabel({
+        second: '0',
+        minute: '0-59/15',
+        hour: '0-23',
+        dayOfMonth: '1-31',
+        month: '1-12',
+        dayOfWeek: '0-6',
+      }),
+    ).toBe('Every 15 minutes');
+  });
+
   it('should dispatch to interval spec', () => {
     expect(
       getScheduleSpecLabel({

@@ -1,4 +1,5 @@
 import type {
+  CalendarSpec,
   IntervalSpec,
   RangeSpec,
   StructuredCalendarSpec,
@@ -41,6 +42,47 @@ const MONTH_NAMES = [
   'November',
   'December',
 ];
+
+type CalendarField =
+  | 'second'
+  | 'minute'
+  | 'hour'
+  | 'dayOfMonth'
+  | 'month'
+  | 'year'
+  | 'dayOfWeek';
+
+type CalendarFieldConfig = {
+  defaultExpression: string;
+  max: number;
+  min: number;
+};
+
+type ScheduleSpecLabelInput = Partial<CalendarSpec> & {
+  calendar?: CalendarSpec[] | null;
+  interval?: IntervalSpec[] | null;
+  structuredCalendar?: StructuredCalendarSpec[] | null;
+};
+
+const CALENDAR_FIELDS: CalendarField[] = [
+  'second',
+  'minute',
+  'hour',
+  'dayOfMonth',
+  'month',
+  'year',
+  'dayOfWeek',
+];
+
+const CALENDAR_FIELD_CONFIG: Record<CalendarField, CalendarFieldConfig> = {
+  second: { min: 0, max: 59, defaultExpression: '0' },
+  minute: { min: 0, max: 59, defaultExpression: '0' },
+  hour: { min: 0, max: 23, defaultExpression: '0' },
+  dayOfMonth: { min: 1, max: 31, defaultExpression: '*' },
+  month: { min: 1, max: 12, defaultExpression: '*' },
+  year: { min: 0, max: 9999, defaultExpression: '*' },
+  dayOfWeek: { min: 0, max: 6, defaultExpression: '*' },
+};
 
 function expandRange(range: RangeSpec): number[] {
   const start = range.start ?? 0;
@@ -111,6 +153,90 @@ function isAllDaysOfMonth(dayOfMonth: RangeSpec[] | undefined | null): boolean {
   return isFullRange(values, 1, 31);
 }
 
+function isAllYears(year: RangeSpec[] | undefined | null): boolean {
+  return !year || year.length === 0;
+}
+
+function isFullField(
+  ranges: RangeSpec[] | undefined | null,
+  min: number,
+  max: number,
+): boolean {
+  const values = expandRanges(ranges);
+  if (values.length === 0) return false;
+
+  return isFullRange(values, min, max);
+}
+
+function isSingleValue(
+  ranges: RangeSpec[] | undefined | null,
+  value: number,
+): boolean {
+  const values = expandRanges(ranges);
+  return values.length === 0 || (values.length === 1 && values[0] === value);
+}
+
+function getFullFieldStep(
+  ranges: RangeSpec[] | undefined | null,
+  min: number,
+  max: number,
+): number | null {
+  if (!ranges || ranges.length !== 1) return null;
+
+  const range = ranges[0];
+  const start = range.start ?? min;
+  const end = range.end ?? start;
+  const step = range.step && range.step > 0 ? range.step : 1;
+
+  if (step <= 1 || start !== min || end !== max) return null;
+
+  return step;
+}
+
+function formatIntervalLabel(seconds: number): string {
+  const label = formatDuration(`${seconds}s`);
+  return label ? `Every ${label}` : '';
+}
+
+function getCalendarIntervalLabel(spec: StructuredCalendarSpec): string {
+  const allDates =
+    isAllDays(spec.dayOfWeek) &&
+    isAllDaysOfMonth(spec.dayOfMonth) &&
+    isAllMonths(spec.month) &&
+    isAllYears(spec.year);
+
+  if (!allDates) return '';
+
+  const secondStep = getFullFieldStep(spec.second, 0, 59);
+  if (
+    secondStep &&
+    isFullField(spec.minute, 0, 59) &&
+    isFullField(spec.hour, 0, 23)
+  ) {
+    return formatIntervalLabel(secondStep);
+  }
+
+  const minuteStep = getFullFieldStep(spec.minute, 0, 59);
+  if (
+    minuteStep &&
+    isSingleValue(spec.second, 0) &&
+    isFullField(spec.hour, 0, 23)
+  ) {
+    return formatIntervalLabel(minuteStep * 60);
+  }
+
+  const hourStep = getFullFieldStep(spec.hour, 0, 23);
+  if (
+    hourStep &&
+    isSingleValue(spec.second, 0) &&
+    isSingleValue(spec.minute, 0)
+  ) {
+    return formatIntervalLabel(hourStep * 60 * 60);
+  }
+
+  return '';
+}
+
 function formatHour12(hour: number): { hour: number; period: string } {
   if (hour === 0) return { hour: 12, period: 'AM' };
   if (hour < 12) return { hour, period: 'AM' };
@@ -155,6 +281,109 @@ function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+function parseNamedCalendarValue(value: string, field: CalendarField): number {
+  const normalized = value.toLowerCase();
+
+  if (field === 'month') {
+    const monthIndex = MONTH_NAMES.findIndex(
+      (name) =>
+        name.toLowerCase() === normalized ||
+        name.toLowerCase().slice(0, 3) === normalized,
+    );
+
+    return monthIndex > 0 ? monthIndex : Number.NaN;
+  }
+
+  if (field === 'dayOfWeek') {
+    if (normalized === '7') return 0;
+
+    const dayIndex = DAY_NAMES.findIndex(
+      (name) =>
+        name.toLowerCase() === normalized ||
+        name.toLowerCase().slice(0, 3) === normalized,
+    );
+
+    return dayIndex >= 0 ? dayIndex : Number.NaN;
+  }
+
+  return Number.NaN;
+}
+
+function parseCalendarValue(value: string, field: CalendarField): number {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isNaN(parsed)) return parsed;
+
+  return parseNamedCalendarValue(value, field);
+}
+
+function parseCalendarRangePart(
+  part: string,
+  field: CalendarField,
+): RangeSpec | null {
+  const [rangeExpression, stepExpression] = part.split('/');
+  const config = CALENDAR_FIELD_CONFIG[field];
+  const step = stepExpression ? Number.parseInt(stepExpression, 10) : 1;
+
+  if (!Number.isFinite(step) || step < 1) return null;
+
+  if (rangeExpression === '*') {
+    return { start: config.min, end: config.max, step };
+  }
+
+  if (rangeExpression.includes('-')) {
+    const [startExpression, endExpression] = rangeExpression.split('-');
+    const start = parseCalendarValue(startExpression, field);
+    const end = parseCalendarValue(endExpression, field);
+
+    if (Number.isNaN(start) || Number.isNaN(end)) return null;
+
+    return { start, end, step };
+  }
+
+  const start = parseCalendarValue(rangeExpression, field);
+  if (Number.isNaN(start)) return null;
+
+  return {
+    start,
+    end: step > 1 ? config.max : start,
+    step,
+  };
+}
+
+function parseCalendarField(
+  expression: string | null | undefined,
+  field: CalendarField,
+): RangeSpec[] | undefined {
+  const config = CALENDAR_FIELD_CONFIG[field];
+  const value = expression?.trim() || config.defaultExpression;
+
+  if (field === 'year' && value === '*') return undefined;
+
+  return value
+    .split(',')
+    .map((part) => parseCalendarRangePart(part.trim(), field))
+    .filter((range): range is RangeSpec => range !== null);
+}
+
+function toStructuredCalendarSpec(spec: CalendarSpec): StructuredCalendarSpec {
+  return {
+    comment: spec.comment,
+    second: parseCalendarField(spec.second, 'second'),
+    minute: parseCalendarField(spec.minute, 'minute'),
+    hour: parseCalendarField(spec.hour, 'hour'),
+    dayOfMonth: parseCalendarField(spec.dayOfMonth, 'dayOfMonth'),
+    month: parseCalendarField(spec.month, 'month'),
+    year: parseCalendarField(spec.year, 'year'),
+    dayOfWeek: parseCalendarField(spec.dayOfWeek, 'dayOfWeek'),
+  };
+}
+
+function hasCalendarSpecFields(
+  spec: ScheduleSpecLabelInput,
+): spec is CalendarSpec {
+  return CALENDAR_FIELDS.some((field) => typeof spec[field] === 'string');
 }
 
 function getSingleCalendarLabel(
@@ -256,23 +485,43 @@ export function getCalendarSpecLabel(
   }
 
   if (specs.length === 1) {
-    return getSingleCalendarLabel(specs[0], timezone);
+    return (
+      getCalendarIntervalLabel(specs[0]) ||
+      getSingleCalendarLabel(specs[0], timezone)
+    );
   }
 
-  return specs.map((spec) => getSingleCalendarLabel(spec, timezone)).join('; ');
+  return specs
+    .map(
+      (spec) =>
+        getCalendarIntervalLabel(spec) ||
+        getSingleCalendarLabel(spec, timezone),
+    )
+    .join('; ');
 }
 
 export function getScheduleSpecLabel(
-  spec: {
-    structuredCalendar?: StructuredCalendarSpec[];
-    interval?: IntervalSpec[];
-  },
+  spec: ScheduleSpecLabelInput,
   timezone = 'UTC',
 ): string {
   const parts: string[] = [];
 
   if (spec.structuredCalendar && spec.structuredCalendar.length > 0) {
     const label = getCalendarSpecLabel(spec.structuredCalendar, timezone);
+    if (label) parts.push(label);
+  }
+
+  if (spec.calendar && spec.calendar.length > 0) {
+    const label = getCalendarSpecLabel(
+      spec.calendar.map(toStructuredCalendarSpec),
+      timezone,
+    );
+    if (label) parts.push(label);
+  } else if (hasCalendarSpecFields(spec)) {
+    const label = getCalendarSpecLabel(
+      [toStructuredCalendarSpec(spec)],
+      timezone,
+    );
     if (label) parts.push(label);
   }
 
