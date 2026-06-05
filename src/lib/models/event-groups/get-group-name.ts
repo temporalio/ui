@@ -14,6 +14,13 @@ import {
   isWorkflowExecutionUpdateAcceptedEvent,
 } from '$lib/utilities/is-event-type';
 
+const SYSTEM_NEXUS_OPERATION_LABELS: Record<string, string> = {
+  SignalWithStartWorkflowExecution: 'Signal With Start Workflow Execution',
+  StartWorkflowExecution: 'Start Operation',
+  SignalWorkflowExecution: 'Signal Operation',
+  QueryWorkflow: 'Query Operation',
+};
+
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return '';
 
@@ -56,7 +63,14 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isNexusOperationScheduledEvent(event)) {
-    return `${event.nexusOperationScheduledEventAttributes.service}.${event.nexusOperationScheduledEventAttributes.operation}`;
+    const attrs = event.nexusOperationScheduledEventAttributes;
+    if (String(attrs.endpoint ?? '') === '__temporal_system') {
+      return (
+        SYSTEM_NEXUS_OPERATION_LABELS[String(attrs.operation ?? '')] ??
+        `${attrs.service}.${attrs.operation}`
+      );
+    }
+    return `${attrs.service}.${attrs.operation}`;
   }
 };
 
