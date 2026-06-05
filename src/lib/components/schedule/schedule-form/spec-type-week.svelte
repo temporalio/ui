@@ -5,13 +5,10 @@
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { getWeekdayLabel } from '$lib/i18n/format-date-names';
+  import { translate } from '$lib/i18n/translate';
 
-  import {
-    DAYS_OF_WEEK,
-    DAYS_WITH_LABEL,
-    WEEKDAYS,
-    WEEKEND,
-  } from './constants';
+  import { DAYS_OF_WEEK, WEEKDAYS, WEEKEND } from './constants';
   import type { ScheduleFormData } from './schema';
   import { type DayOfWeek } from './types';
   import { assertSpecType } from './utilities/spec';
@@ -124,17 +121,17 @@
 
 <div class="flex flex-col gap-4">
   <p class="text-sm text-secondary">
-    Select the day(s) of the week this schedule will always run on.
+    {translate('schedules.recurring-days-description')}
   </p>
 
   <ButtonRadioGroup
-    label="Recurrence"
+    label={translate('schedules.recurrence-label')}
     value={selection.type}
     options={[
-      { label: 'Every day', value: 'everyday' },
-      { label: 'Weekdays', value: 'weekdays' },
-      { label: 'Weekends', value: 'weekends' },
-      { label: 'Custom days', value: 'custom' },
+      { label: translate('schedules.recurrence-everyday'), value: 'everyday' },
+      { label: translate('schedules.recurrence-weekdays'), value: 'weekdays' },
+      { label: translate('schedules.recurrence-weekends'), value: 'weekends' },
+      { label: translate('schedules.recurrence-custom'), value: 'custom' },
     ]}
     onChange={selectType}
   >
@@ -152,32 +149,37 @@
   </ButtonRadioGroup>
 
   {#if selection.type === 'custom'}
-    <div class="flex flex-wrap gap-2" role="group" aria-label="Custom days">
-      {#each DAYS_WITH_LABEL as day (day.value)}
-        {@const isSelected = isCustomDaySelected(day.value)}
+    <div
+      class="flex flex-wrap gap-2"
+      role="group"
+      aria-label={translate('schedules.recurrence-custom')}
+    >
+      {#each DAYS_OF_WEEK as value (value)}
+        {@const isSelected = isCustomDaySelected(value)}
         <Button
           size="sm"
           aria-pressed={isSelected}
           variant="secondary"
           active={isSelected}
-          on:click={() => toggleCustomDay(day.value)}
+          on:click={() => toggleCustomDay(value)}
         >
-          {day.label}
+          {getWeekdayLabel(Number(value))}
         </Button>
       {/each}
     </div>
   {/if}
 
   <fieldset class="flex flex-col gap-2.5">
-    <legend class="contents font-medium">Run time</legend>
+    <legend class="contents font-medium"
+      >{translate('schedules.run-time-heading')}</legend
+    >
     <p class="text-sm text-secondary">
-      Specify the time (UTC) for this schedule to run. The schedule will run at
-      00:00 UTC if left blank.
+      {translate('schedules.run-time-description')}
     </p>
     <div class="grid max-w-108 gap-2 md:grid-cols-2">
       <Input
         id="hours"
-        label="Hours"
+        label={translate('common.hours')}
         labelHidden
         type="number"
         inputmode="numeric"
@@ -185,7 +187,7 @@
         min={0}
         max={23}
         placeholder="00"
-        suffix="hrs"
+        suffix={translate('common.hours-abbreviated')}
         error={!!$errors.specs?.[index]?.time?.hour?.[0]}
         hintText={$errors.specs?.[index]?.time?.hour?.[0]}
         bind:value={
@@ -200,7 +202,7 @@
 
       <Input
         id="minutes"
-        label="Minutes"
+        label={translate('common.minutes')}
         labelHidden
         type="number"
         inputmode="numeric"
@@ -208,7 +210,7 @@
         min={0}
         max={59}
         placeholder="00"
-        suffix="min"
+        suffix={translate('common.minutes-abbreviated')}
         error={!!$errors.specs?.[index]?.time?.minute?.[0]}
         hintText={$errors.specs?.[index]?.time?.minute?.[0]}
         bind:value={
@@ -223,7 +225,10 @@
     </div>
     <div class="flex gap-2 text-xs">
       <Icon name="clock" class="inline-block" />
-      <p class="text-secondary">Based on Universal Standard Time (UTC)</p>
+      <p class="text-secondary">
+        {translate('common.based-on-time-preface')}
+        {translate('common.universal-standard-time')}
+      </p>
     </div>
   </fieldset>
 

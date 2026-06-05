@@ -4,47 +4,42 @@ import {
   SECONDS as SECONDS_UNIT,
   type Unit,
 } from '$lib/holocene/duration-input/duration-input.svelte';
+import { translate } from '$lib/i18n/translate';
 
 import type { ScheduleFormData } from './schema';
 
 type OverlapPolicy = ScheduleFormData['overlapPolicy'];
 
-export const overlapPolicyContent: Record<
+export const getOverlapPolicyContent = (): Record<
   OverlapPolicy,
   { isDefault?: boolean; label: string; description: string }
-> = {
+> => ({
   Skip: {
     isDefault: true,
-    label: 'Skip',
-    description:
-      'Workflow Executions are not started when a previously started Workflow Execution started by this schedule is already running.',
+    label: translate('schedules.overlap-skip-label'),
+    description: translate('schedules.overlap-skip-description'),
   },
   BufferOne: {
-    label: 'Buffer One',
-    description:
-      'Starts the Workflow Execution as soon as the current one completes. Limited to one.',
+    label: translate('schedules.overlap-buffer-one-label'),
+    description: translate('schedules.overlap-buffer-one-description'),
   },
   BufferAll: {
-    label: 'Buffer All',
-    description:
-      'Allows an unlimited number of Workflows to buffer; Workflows start in order they were added to buffer.',
+    label: translate('schedules.overlap-buffer-all-label'),
+    description: translate('schedules.overlap-buffer-all-description'),
   },
   CancelOther: {
-    label: 'Cancel Other',
-    description:
-      'Cancels currently running Workflow Execution, starts new one after cancellation completes.',
+    label: translate('schedules.overlap-cancel-other-label'),
+    description: translate('schedules.overlap-cancel-other-description'),
   },
   TerminateOther: {
-    label: 'Terminate Other',
-    description:
-      'Terminates currently running Workflow Execution, starts new one immediately.',
+    label: translate('schedules.overlap-terminate-other-label'),
+    description: translate('schedules.overlap-terminate-other-description'),
   },
   AllowAll: {
-    label: 'Allow All',
-    description:
-      'Starts any number of concurrent Workflow Executions; more than one Workflow Execution can run simultaneously.',
+    label: translate('schedules.overlap-allow-all-label'),
+    description: translate('schedules.overlap-allow-all-description'),
   },
-};
+});
 
 const MONTHS_UNIT: Unit<'month(s)'> = {
   label: 'month(s)',
@@ -72,16 +67,6 @@ export const intervalUnits = [
 ];
 
 export const DAYS_OF_WEEK = ['0', '1', '2', '3', '4', '5', '6'] as const;
-
-export const DAYS_WITH_LABEL = [
-  { label: 'Sunday', value: '0' },
-  { label: 'Monday', value: '1' },
-  { label: 'Tuesday', value: '2' },
-  { label: 'Wednesday', value: '3' },
-  { label: 'Thursday', value: '4' },
-  { label: 'Friday', value: '5' },
-  { label: 'Saturday', value: '6' },
-] as const;
 
 export const DAYS_OF_MONTH = [
   '1',
@@ -130,21 +115,6 @@ export const MONTHS = [
   '10',
   '11',
   '12',
-] as const;
-
-export const MONTHS_WITH_LABEL = [
-  { label: 'January', value: '1' },
-  { label: 'February', value: '2' },
-  { label: 'March', value: '3' },
-  { label: 'April', value: '4' },
-  { label: 'May', value: '5' },
-  { label: 'June', value: '6' },
-  { label: 'July', value: '7' },
-  { label: 'August', value: '8' },
-  { label: 'September', value: '9' },
-  { label: 'October', value: '10' },
-  { label: 'November', value: '11' },
-  { label: 'December', value: '12' },
 ] as const;
 
 export const WEEKDAYS = ['1', '2', '3', '4', '5'] as const;

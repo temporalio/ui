@@ -1,3 +1,6 @@
+import { getMonthLabel, getWeekdayLabel } from '$lib/i18n/format-date-names';
+import { formatList } from '$lib/i18n/format-list';
+import { translate } from '$lib/i18n/translate';
 import type {
   IntervalSpec,
   RangeSpec,
@@ -16,31 +19,8 @@ function toSecondsString(d: unknown): string {
   return '';
 }
 
-const DAY_NAMES = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
-
-const MONTH_NAMES = [
-  '',
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+const formatOrdinal = (n: number): string =>
+  translate('common.ordinal', { count: n, ordinal: true });
 
 function expandRange(range: RangeSpec): number[] {
   const start = range.start ?? 0;
@@ -112,10 +92,12 @@ function isAllDaysOfMonth(dayOfMonth: RangeSpec[] | undefined | null): boolean {
 }
 
 function formatHour12(hour: number): { hour: number; period: string } {
-  if (hour === 0) return { hour: 12, period: 'AM' };
-  if (hour < 12) return { hour, period: 'AM' };
-  if (hour === 12) return { hour: 12, period: 'PM' };
-  return { hour: hour - 12, period: 'PM' };
+  const am = translate('common.meridiem-am');
+  const pm = translate('common.meridiem-pm');
+  if (hour === 0) return { hour: 12, period: am };
+  if (hour < 12) return { hour, period: am };
+  if (hour === 12) return { hour: 12, period: pm };
+  return { hour: hour - 12, period: pm };
 }
 
 function formatSingleTime(hour: number, minute: number): string {
@@ -134,27 +116,12 @@ function formatTime(
 
   if (hours.length === 0) return '';
 
-  if (hours.length === 1) {
-    return formatSingleTime(hours[0], min);
-  }
-
-  if (hours.length === 2) {
-    return `${formatSingleTime(hours[0], min)} and ${formatSingleTime(hours[1], min)}`;
-  }
-
-  const times = hours.map((h) => formatSingleTime(h, min));
-  return `${times.slice(0, -1).join(', ')}, and ${times[times.length - 1]}`;
+  return formatList(hours.map((h) => formatSingleTime(h, min)));
 }
 
 function getDayNames(dayOfWeek: RangeSpec[] | undefined | null): string {
   const values = expandRanges(dayOfWeek);
-  return values.map((v) => DAY_NAMES[v] ?? `Day ${v}`).join(', ');
-}
-
-export function ordinal(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  return values.map((v) => getWeekdayLabel(v)).join(', ');
 }
 
 function getSingleCalendarLabel(
@@ -162,21 +129,27 @@ function getSingleCalendarLabel(
   timezone: string,
 ): string {
   const time = formatTime(spec.hour, spec.minute);
-  const timeWithTz = time ? `at ${time} ${timezone}` : '';
+  const timeWithTz = time
+    ? translate('schedules.label-at-time', { time, timezone })
+    : '';
   const allDays = isAllDays(spec.dayOfWeek);
   const allMonths = isAllMonths(spec.month);
   const allDaysOfMonth = isAllDaysOfMonth(spec.dayOfMonth);
 
   if (isWeekdays(spec.dayOfWeek) && allMonths && allDaysOfMonth) {
-    return `Every weekday ${timeWithTz}`.trim();
+    return translate('schedules.label-every-weekday', {
+      time: timeWithTz,
+    }).trim();
   }
 
   if (isWeekends(spec.dayOfWeek) && allMonths && allDaysOfMonth) {
-    return `Every weekend ${timeWithTz}`.trim();
+    return translate('schedules.label-every-weekend', {
+      time: timeWithTz,
+    }).trim();
   }
 
   if (allDays && allMonths && allDaysOfMonth && time) {
-    return `Every day ${timeWithTz}`.trim();
+    return translate('schedules.label-every-day', { time: timeWithTz }).trim();
   }
 
   const dayOfMonthValues = expandRanges(spec.dayOfMonth);
@@ -188,9 +161,11 @@ function getSingleCalendarLabel(
     !allDaysOfMonth &&
     dayOfMonthValues.length === 1
   ) {
-    const monthName = MONTH_NAMES[monthValues[0]] ?? `Month ${monthValues[0]}`;
-    const day = ordinal(dayOfMonthValues[0]);
-    return `Annually on ${monthName} ${day} ${timeWithTz}`.trim();
+    return translate('schedules.label-annually', {
+      month: getMonthLabel(monthValues[0] - 1),
+      day: formatOrdinal(dayOfMonthValues[0]),
+      time: timeWithTz,
+    }).trim();
   }
 
   if (
@@ -199,36 +174,50 @@ function getSingleCalendarLabel(
     dayOfMonthValues.length === 1 &&
     allDays
   ) {
-    const day = ordinal(dayOfMonthValues[0]);
-    return `Monthly on the ${day} ${timeWithTz}`.trim();
+    return translate('schedules.label-monthly', {
+      day: formatOrdinal(dayOfMonthValues[0]),
+      time: timeWithTz,
+    }).trim();
   }
 
   if (!allDays && allMonths && allDaysOfMonth) {
-    const dayNames = getDayNames(spec.dayOfWeek);
-    return `Every ${dayNames} ${timeWithTz}`.trim();
+    return translate('schedules.label-every-days', {
+      days: getDayNames(spec.dayOfWeek),
+      time: timeWithTz,
+    }).trim();
   }
 
   if (allDays && allMonths && allDaysOfMonth && !time) {
-    return 'Every second';
+    return translate('schedules.label-every-second');
   }
 
   const parts: string[] = [];
   if (!allMonths) {
     parts.push(
-      `In ${monthValues.map((m) => MONTH_NAMES[m] ?? `Month ${m}`).join(', ')}`,
+      translate('schedules.label-in-months', {
+        months: monthValues.map((m) => getMonthLabel(m - 1)).join(', '),
+      }),
     );
   }
   if (!allDaysOfMonth) {
-    parts.push(`on the ${dayOfMonthValues.map((d) => ordinal(d)).join(', ')}`);
+    parts.push(
+      translate('schedules.label-on-days-of-month', {
+        days: dayOfMonthValues.map((d) => formatOrdinal(d)).join(', '),
+      }),
+    );
   }
   if (!allDays) {
-    parts.push(`on ${getDayNames(spec.dayOfWeek)}`);
+    parts.push(
+      translate('schedules.label-on-days', {
+        days: getDayNames(spec.dayOfWeek),
+      }),
+    );
   }
   if (time) {
-    parts.push(`at ${time} ${timezone}`);
+    parts.push(translate('schedules.label-at-time', { time, timezone }));
   }
 
-  return parts.join(' ').trim() || 'Custom schedule';
+  return parts.join(' ').trim() || translate('schedules.label-custom');
 }
 
 export function getIntervalLabel(spec: IntervalSpec): string {
@@ -236,13 +225,16 @@ export function getIntervalLabel(spec: IntervalSpec): string {
   const label = formatDuration(intervalStr);
   if (!label) return '';
 
-  const result = `Every ${label}`;
-
   const phaseStr = toSecondsString(spec.phase);
   const phaseLabel = formatDuration(phaseStr);
-  if (phaseLabel) return `${result}, offset by ${phaseLabel}`;
+  if (phaseLabel) {
+    return translate('schedules.label-interval-with-offset', {
+      duration: label,
+      phase: phaseLabel,
+    });
+  }
 
-  return result;
+  return translate('schedules.label-interval', { duration: label });
 }
 
 export function getCalendarSpecLabel(

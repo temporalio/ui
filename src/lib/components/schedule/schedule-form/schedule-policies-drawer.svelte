@@ -16,8 +16,9 @@
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { translate } from '$lib/i18n/translate';
 
-  import { durationUnits, overlapPolicyContent } from './constants';
+  import { durationUnits, getOverlapPolicyContent } from './constants';
   import {
     DEFAULT_CATCHUP_WINDOW,
     DEFAULT_EXECUTION_TIMEOUT,
@@ -34,6 +35,8 @@
   }
 
   let { form, isOpen = $bindable(false) }: Props = $props();
+
+  const overlapPolicyContent = getOverlapPolicyContent();
 
   const pickPolicies = (data: ScheduleFormData): SchedulePoliciesData => ({
     overlapPolicy: data.overlapPolicy,
@@ -102,19 +105,22 @@
   position="right"
   open={isOpen}
   onClick={onCancel}
-  closeButtonLabel="Cancel policy edits"
+  closeButtonLabel={translate('schedules.policies-drawer-close')}
   class="w-[35.5rem] max-w-full "
 >
   <form use:enhance class="flex flex-col gap-4 p-4 pt-0">
-    <h2 class="text-3xl font-medium">Edit Schedule Policies</h2>
+    <h2 class="text-3xl font-medium">
+      {translate('schedules.policies-title')}
+    </h2>
 
     <fieldset class="flex flex-col gap-4">
       <legend class="contents">
         <hgroup>
-          <h3 class="text-2xl font-medium">Overlap Policy</h3>
+          <h3 class="text-2xl font-medium">
+            {translate('schedules.overlap-policy')}
+          </h3>
           <p class="mt-1 text-secondary">
-            Define what to do when a Workflow Execution started by this Schedule
-            is running when the Schedule is triggered.
+            {translate('schedules.overlap-policy-description')}
           </p>
         </hgroup>
       </legend>
@@ -123,7 +129,11 @@
           <RadioCard
             id="overlap-policy-{value}"
             value={value as ScheduleFormData['overlapPolicy']}
-            label={[content.label, content.isDefault && '(Default)']
+            label={[
+              content.label,
+              content.isDefault &&
+                translate('schedules.overlap-default-suffix'),
+            ]
               .filter(Boolean)
               .join(' ')}
             description={content.description}
@@ -136,19 +146,21 @@
     <fieldset class="flex flex-col gap-4">
       <legend class="contents">
         <hgroup>
-          <h3 class="text-2xl font-medium">On Start Behavior</h3>
+          <h3 class="text-2xl font-medium">
+            {translate('schedules.on-start-behavior')}
+          </h3>
           <p class="mt-1 text-secondary">
-            Define what happens when the Schedule starts.
+            {translate('schedules.on-start-behavior-description')}
           </p>
         </hgroup>
       </legend>
 
       <div class="flex flex-col gap-2">
-        <p class="font-medium">On Schedule Start</p>
+        <p class="font-medium">{translate('schedules.on-schedule-start')}</p>
         <Checkbox
           id="on-start-behavior-pause-schedule"
-          label="Pause Schedule"
-          description="Schedule will not run if paused."
+          label={translate('schedules.pause-schedule-label')}
+          description={translate('schedules.pause-schedule-description')}
           checked={$policies.pauseSchedule}
           error={$errors.pauseSchedule?.[0] ?? ''}
           on:change={() => ($policies.pauseSchedule = !$policies.pauseSchedule)}
@@ -159,9 +171,11 @@
     <fieldset class="flex flex-col gap-4">
       <legend class="contents">
         <hgroup>
-          <h3 class="text-2xl font-medium">Pause on failure</h3>
+          <h3 class="text-2xl font-medium">
+            {translate('schedules.pause-on-failure')}
+          </h3>
           <p class="mt-1 text-secondary">
-            If true, pauses Schedule after any Workflow failure.
+            {translate('schedules.pause-on-failure-description')}
           </p>
         </hgroup>
       </legend>
@@ -169,12 +183,12 @@
         <RadioInput
           id="pause-on-failure"
           value={true}
-          label="Pause on failure"
+          label={translate('schedules.pause-on-failure')}
         />
         <RadioInput
           id="do-not-pause-on-failure"
           value={false}
-          label="Do not pause"
+          label={translate('schedules.do-not-pause')}
         />
       </RadioGroup>
     </fieldset>
@@ -182,22 +196,22 @@
     <fieldset class="flex flex-col gap-4">
       <legend class="contents">
         <hgroup>
-          <h3 class="text-2xl font-medium">Catchup Window Policy</h3>
+          <h3 class="text-2xl font-medium">
+            {translate('schedules.catchup-window-policy')}
+          </h3>
           <p class="mt-1 text-secondary">
-            Define what happens to actions missed during an outage when the
-            service returns.
+            {translate('schedules.catchup-window-policy-description')}
           </p>
         </hgroup>
       </legend>
 
       <p>
-        Actions skipped due to an outage within the Catchup Window will be taken
-        once the service returns. Minimum 10 seconds.
+        {translate('schedules.catchup-window-policy-detail')}
       </p>
 
       <DurationInput
         id="catchup-window-policy-duration"
-        label="Window"
+        label={translate('schedules.catchup-window-label')}
         inputmode="numeric"
         bind:value={$policies.catchupWindow}
         initialUnit={getFirstWholeNumberUnit(
@@ -220,7 +234,7 @@
           <Tooltip
             topLeft
             width={250}
-            text="Selecting 1 month will default to 31 days. If you wish to select less than 31 days but remain near the month window, use the Day unit."
+            text={translate('schedules.catchup-window-tooltip')}
           >
             <Icon name="square-info" class="h-3 w-3" />
           </Tooltip>
@@ -229,16 +243,15 @@
     </fieldset>
 
     <hgroup>
-      <h3 class="text-2xl font-medium">Timeouts</h3>
+      <h3 class="text-2xl font-medium">{translate('schedules.timeouts')}</h3>
       <p class="mt-1 text-secondary">
-        Define how long a scheduled task, run, or execution should continue
-        before considering it failed.
+        {translate('schedules.timeouts-description')}
       </p>
     </hgroup>
 
     <DurationInput
       id="task-timeout-duration"
-      label="Task Timeout"
+      label={translate('schedules.task-timeout')}
       inputmode="numeric"
       bind:value={$policies.taskTimeout}
       initialUnit={getFirstWholeNumberUnit(
@@ -256,7 +269,7 @@
 
     <DurationInput
       id="run-timeout-duration"
-      label="Run Timeout"
+      label={translate('schedules.run-timeout')}
       inputmode="numeric"
       bind:value={$policies.runTimeout}
       initialUnit={getFirstWholeNumberUnit($policies.runTimeout, durationUnits)}
@@ -271,7 +284,7 @@
 
     <DurationInput
       id="execution-timeout-duration"
-      label="Execution Timeout"
+      label={translate('schedules.execution-timeout')}
       inputmode="numeric"
       bind:value={$policies.executionTimeout}
       initialUnit={getFirstWholeNumberUnit(
@@ -291,8 +304,12 @@
     />
 
     <div class="ml-auto mt-2 flex gap-4">
-      <Button variant="secondary" on:click={onCancel}>Cancel</Button>
-      <Button variant="primary" type="submit">Update Policies</Button>
+      <Button variant="secondary" on:click={onCancel}
+        >{translate('common.cancel')}</Button
+      >
+      <Button variant="primary" type="submit"
+        >{translate('schedules.update-policies')}</Button
+      >
     </div>
   </form>
 </Drawer>

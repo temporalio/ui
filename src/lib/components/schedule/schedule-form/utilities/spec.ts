@@ -1,17 +1,16 @@
 import cronstrue from 'cronstrue';
 
+import { getMonthLabel, getWeekdayLabel } from '$lib/i18n/format-date-names';
 import { formatList } from '$lib/i18n/format-list';
+import { translate } from '$lib/i18n/translate';
 import { sortNumStrings } from '$lib/utilities/array';
-import { pluralize } from '$lib/utilities/pluralize';
 
 import {
   DAYS_OF_MONTH,
   DAYS_OF_WEEK,
-  DAYS_WITH_LABEL,
   durationUnits,
   intervalUnits,
   MONTHS,
-  MONTHS_WITH_LABEL,
   WEEKDAYS,
   WEEKEND,
 } from '../constants';
@@ -93,22 +92,25 @@ export function getSpecSummary(spec: Spec): string {
       const time = `${pad0ForTime(spec.time.hour)}:${pad0ForTime(spec.time.minute)} UTC`;
 
       if (DAYS_OF_WEEK.every((d) => selectedSet.has(d))) {
-        return `Everyday at ${time}`;
+        return translate('schedules.spec-summary-everyday', { time });
       }
 
       if (WEEKDAYS.every((d) => selectedSet.has(d))) {
-        return `Weekdays at ${time}`;
+        return translate('schedules.spec-summary-weekdays', { time });
       }
 
       if (WEEKEND.every((d) => selectedSet.has(d))) {
-        return `Weekends at ${time}`;
+        return translate('schedules.spec-summary-weekends', { time });
       }
 
-      const sortedLabels = sortNumStrings(spec.daysOfWeek).map(
-        (d) => DAYS_WITH_LABEL.find((withLabel) => d === withLabel.value).label,
+      const sortedLabels = sortNumStrings(spec.daysOfWeek).map((d) =>
+        getWeekdayLabel(Number(d)),
       );
 
-      return `Every ${formatList(sortedLabels)} at ${time}`;
+      return translate('schedules.spec-summary-week', {
+        days: formatList(sortedLabels),
+        time,
+      });
     }
 
     case 'month': {
@@ -121,23 +123,28 @@ export function getSpecSummary(spec: Spec): string {
       const selectedDaysSet = new Set(spec.daysOfMonth ?? []);
       const isEveryDay = DAYS_OF_MONTH.every((d) => selectedDaysSet.has(d));
       const daysStr = isEveryDay
-        ? 'every day'
-        : `${pluralize('day', spec.daysOfMonth.length)} ${formatedDays}`;
+        ? translate('schedules.spec-summary-every-day')
+        : translate('schedules.spec-summary-days', {
+            count: spec.daysOfMonth.length,
+            days: formatedDays,
+          });
 
       if (MONTHS.every((m) => selectedMonthsSet.has(m))) {
-        return `On ${daysStr} of every month at ${time}`;
+        return translate('schedules.spec-summary-month-every', {
+          days: daysStr,
+          time,
+        });
       }
 
-      const sortedMonthLabels = sortNumStrings(spec.months)
-        .map(
-          (m) =>
-            MONTHS_WITH_LABEL.find((withLabel) => m === withLabel.value)?.label,
-        )
-        .filter(Boolean);
+      const sortedMonthLabels = sortNumStrings(spec.months).map((m) =>
+        getMonthLabel(Number(m) - 1),
+      );
 
-      const formatedMonthLabels = formatList(sortedMonthLabels);
-
-      return `On ${daysStr} of ${formatedMonthLabels} at ${time}`;
+      return translate('schedules.spec-summary-month', {
+        days: daysStr,
+        months: formatList(sortedMonthLabels),
+        time,
+      });
     }
 
     case 'interval': {
@@ -149,7 +156,12 @@ export function getSpecSummary(spec: Spec): string {
 
       const offset = getLargestWholeUnit(spec.phase ?? '0s', durationUnits);
 
-      return `Every ${largest.value} ${largest.unit.label} offset by ${offset.value} ${offset.unit.label}`;
+      return translate('schedules.spec-summary-interval', {
+        interval: largest.value,
+        intervalUnit: largest.unit.label,
+        offset: offset.value,
+        offsetUnit: offset.unit.label,
+      });
     }
 
     default: {

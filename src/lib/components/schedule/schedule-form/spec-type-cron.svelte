@@ -4,7 +4,8 @@
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
-  import { ordinal } from '$lib/utilities/schedule-spec-label';
+  import { getWeekdayLabel } from '$lib/i18n/format-date-names';
+  import { translate } from '$lib/i18n/translate';
 
   import type { ScheduleFormData } from './schema';
   import { assertSpecType } from './utilities/spec';
@@ -23,17 +24,29 @@
   const spec = $derived(assertSpecType($form.specs[index], 'cron'));
 
   const today = new Date();
-  const weekday = today.toLocaleDateString(undefined, { weekday: 'long' });
   const weekdayNumber = today.getDay();
   const dayOfMonth = today.getDate();
 
   const shortcuts = [
-    { label: 'Every minute', value: '* * * * *' },
-    { label: 'Every hour', value: '0 * * * *' },
-    { label: 'Daily', value: '0 0 * * *' },
-    { label: `Every ${weekday}`, value: `0 0 * * ${weekdayNumber}` },
     {
-      label: `Monthly on ${ordinal(dayOfMonth)}`,
+      label: translate('schedules.cron-shortcut-every-minute'),
+      value: '* * * * *',
+    },
+    {
+      label: translate('schedules.cron-shortcut-every-hour'),
+      value: '0 * * * *',
+    },
+    { label: translate('schedules.cron-shortcut-daily'), value: '0 0 * * *' },
+    {
+      label: translate('schedules.cron-shortcut-weekly', {
+        weekday: getWeekdayLabel(weekdayNumber),
+      }),
+      value: `0 0 * * ${weekdayNumber}`,
+    },
+    {
+      label: translate('schedules.cron-shortcut-monthly', {
+        day: translate('common.ordinal', { count: dayOfMonth, ordinal: true }),
+      }),
       value: `0 0 ${dayOfMonth} * *`,
     },
   ];
@@ -43,7 +56,7 @@
 
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-1">
-    <Label label="Cron Shortcuts" />
+    <Label label={translate('schedules.cron-shortcuts')} />
     <div class="flex flex-wrap gap-2">
       {#each shortcuts as shortcut (shortcut.value)}
         <Button
@@ -57,7 +70,7 @@
   </div>
   <Input
     id="cron-string-{index}"
-    label="Cron expression"
+    label={translate('schedules.cron-expression-label')}
     bind:value={
       () => spec.cronString,
       (v) => ($form.specs[index] = { ...spec, cronString: v })
@@ -66,13 +79,13 @@
     required
     error={!!$errors.specs?.[index]?.cronString?.[0]}
     hintText={$errors.specs?.[index]?.cronString?.[0] ??
-      'Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6)'}
+      translate('schedules.cron-format-hint')}
   />
   <button
     class="mr-auto underline hover:text-brand"
     onclick={() => (isCronExpressionFormatModalOpen = true)}
   >
-    Formatting help
+    {translate('schedules.cron-formatting-help')}
   </button>
   <CronExpressionFormatModal bind:open={isCronExpressionFormatModalOpen} />
 

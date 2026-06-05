@@ -2,6 +2,7 @@
   import type { SuperForm } from 'sveltekit-superforms';
 
   import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import { intervalUnits } from './constants';
   import type { ScheduleFormData } from './schema';
@@ -24,7 +25,7 @@
   <DurationInput
     id="interval-{index}"
     inputClass="max-w-96"
-    label="Time Interval"
+    label={translate('schedules.interval-label')}
     bind:value={
       () => spec.interval,
       (v) => ($form.specs[index] = { ...spec, interval: v })
@@ -36,13 +37,13 @@
     placeholder="00"
     error={!!$errors.specs?.[index]?.interval?.[0]}
     hintText={$errors.specs?.[index]?.interval?.[0]}
-    hintTextAbove="Specify the time interval for this schedule to run (for example every 5 minutes)."
+    hintTextAbove={translate('schedules.interval-view-description')}
   />
 
   <DurationInput
     id="phase-{index}"
     inputClass="max-w-96"
-    label="Offset"
+    label={translate('schedules.offset-heading')}
     bind:value={
       () => spec.phase, (v) => ($form.specs[index] = { ...spec, phase: v })
     }
@@ -52,7 +53,7 @@
     placeholder="00"
     error={!!$errors.specs?.[index]?.phase?.[0]}
     hintText={$errors.specs?.[index]?.phase?.[0]}
-    hintTextAbove="Specify the time to offset when this schedule will run (for example, 15 min past the hour)."
+    hintTextAbove={translate('schedules.offset-description')}
   />
 
   <ScheduleSpecPreview {form} {index} />
