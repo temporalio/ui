@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import NexusOperationRenderer from '$lib/components/payload/nexus-operation-renderer.svelte';
   import PayloadCodeBlock, {
     type PayloadDownloadFilenameData,
   } from '$lib/components/payload/payload-code-block.svelte';
+  import SystemNexusOperationRenderer from '$lib/components/payload/system-nexus-operation-renderer.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import type { Payload, Payloads } from '$lib/types';
   import { isRawPayload } from '$lib/utilities/decode-payload';
@@ -43,7 +43,7 @@
 <div class="flex w-full grow flex-col gap-2">
   {@render titleSnippet()}
   {#if content && isNexusPayload}
-    <NexusOperationRenderer
+    <SystemNexusOperationRenderer
       payload={content as Payload}
       maxHeight={MAX_HEIGHT}
     />

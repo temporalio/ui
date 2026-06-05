@@ -120,7 +120,8 @@
       const attrs = wfEvent.nexusOperationScheduledEventAttributes;
       if (String(attrs.endpoint ?? '') !== '__temporal_system') return null;
       const LABELS: Record<string, string> = {
-        SignalWithStartWorkflowExecution: 'Signal With Start Operation',
+        SignalWithStartWorkflowExecution:
+          'Signal With Start Workflow Execution',
         StartWorkflowExecution: 'Start Operation',
         SignalWorkflowExecution: 'Signal Operation',
         QueryWorkflow: 'Query Operation',
@@ -149,9 +150,13 @@
     if (isLocalActivityMarkerEvent(event))
       return translate('events.category.local-activity');
     if (systemNexusLabel) {
-      const state = spaceBetweenCapitalLetters(
-        event.name.replace('NexusOperation', ''),
-      );
+      const NEXUS_STATE_VERBS: Record<string, string> = {
+        Scheduled: 'Initiated',
+        Completed: 'Delivered',
+      };
+      const rawState = event.name.replace('NexusOperation', '');
+      const state =
+        NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
       return `${systemNexusLabel} ${state}`;
     }
     return spaceBetweenCapitalLetters(event.name);
@@ -163,6 +168,14 @@
           isEventGroup(event) ? event.initialEvent : event,
         )
       : undefined,
+  );
+
+  const effectiveCategory = $derived(
+    systemNexusLabel
+      ? 'signal'
+      : isEventGroup(event)
+        ? event.category
+        : event.category,
   );
 
   const secondaryAttribute = $derived(
@@ -306,10 +319,10 @@
     </Tooltip>
   </td>
   <td class="truncate">
-    <p class={eventTypeStyle({ category: event.category })}>
+    <p class={eventTypeStyle({ category: effectiveCategory })}>
       <Icon
-        name={CategoryIcon[event.category].name}
-        title={CategoryIcon[event.category].title}
+        name={CategoryIcon[effectiveCategory].name}
+        title={CategoryIcon[effectiveCategory].title}
         class={merge(
           'mr-1 inline',
           isEventGroup(event) && event.isPending && 'animate-pulse',

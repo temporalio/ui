@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import NexusOperationRenderer from '$lib/components/payload/nexus-operation-renderer.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
+  import SystemNexusOperationRenderer from '$lib/components/payload/system-nexus-operation-renderer.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
@@ -48,14 +48,26 @@
     const attrs = formatAttributes(event);
     if (event?.principal?.name) attrs.principalName = event.principal.name;
     if (event?.principal?.type) attrs.principalType = event.principal.type;
+    if (isSystemNexusScheduled && systemNexusDescriptor) {
+      const extra = attrs as Record<string, unknown>;
+      if (systemNexusDescriptor.workflowId)
+        extra.workflowId = systemNexusDescriptor.workflowId;
+      if (systemNexusDescriptor.signalName)
+        extra.signalName = systemNexusDescriptor.signalName;
+    }
     return attrs;
   });
 
   const SYSTEM_NEXUS_LABELS: Record<string, string> = {
-    SignalWithStartWorkflowExecution: 'Signal With Start Operation',
+    SignalWithStartWorkflowExecution: 'Signal With Start Workflow Execution',
     StartWorkflowExecution: 'Start Operation',
     SignalWorkflowExecution: 'Signal Operation',
     QueryWorkflow: 'Query Operation',
+  };
+
+  const NEXUS_STATE_VERBS: Record<string, string> = {
+    Scheduled: 'Initiated',
+    Completed: 'Delivered',
   };
 
   const nexusScheduledAttrs = $derived(
@@ -101,9 +113,9 @@
 
   const displayName = $derived.by(() => {
     if (systemNexusLabel) {
-      const state = spaceBetweenCapitalLetters(
-        event.name.replace('NexusOperation', ''),
-      );
+      const rawState = event.name.replace('NexusOperation', '');
+      const state =
+        NEXUS_STATE_VERBS[rawState] ?? spaceBetweenCapitalLetters(rawState);
       return `${systemNexusLabel} ${state}`;
     }
     if (isLocalActivityMarkerEvent(event))
@@ -263,7 +275,7 @@
       {format(key)}
     </p>
     {#if nexusDescriptor}
-      <NexusOperationRenderer
+      <SystemNexusOperationRenderer
         payload={codeBlockValue as RawPayload}
         maxHeight={384}
       />

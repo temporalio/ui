@@ -15,7 +15,7 @@ import {
 } from '$lib/utilities/is-event-type';
 
 const SYSTEM_NEXUS_OPERATION_LABELS: Record<string, string> = {
-  SignalWithStartWorkflowExecution: 'Signal With Start Operation',
+  SignalWithStartWorkflowExecution: 'Signal With Start Workflow Execution',
   StartWorkflowExecution: 'Start Operation',
   SignalWorkflowExecution: 'Signal Operation',
   QueryWorkflow: 'Query Operation',
