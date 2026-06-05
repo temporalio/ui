@@ -1,5 +1,6 @@
 import cronstrue from 'cronstrue';
 
+import { formatList } from '$lib/i18n/format-list';
 import { sortNumStrings } from '$lib/utilities/array';
 import { pluralize } from '$lib/utilities/pluralize';
 
@@ -70,10 +71,6 @@ export function getInitialSpecData<T extends Spec['type']>(
 }
 
 const pad0ForTime = (num = 0): string => num.toString().padStart(2, '0');
-const listFormatter = new Intl.ListFormat('en', {
-  style: 'long',
-  type: 'conjunction',
-});
 
 export function getSpecSummary(spec: Spec): string {
   if (!spec) {
@@ -111,7 +108,7 @@ export function getSpecSummary(spec: Spec): string {
         (d) => DAYS_WITH_LABEL.find((withLabel) => d === withLabel.value).label,
       );
 
-      return `Every ${listFormatter.format(sortedLabels)} at ${time}`;
+      return `Every ${formatList(sortedLabels)} at ${time}`;
     }
 
     case 'month': {
@@ -119,9 +116,7 @@ export function getSpecSummary(spec: Spec): string {
 
       const time = `${pad0ForTime(spec.time.hour)}:${pad0ForTime(spec.time.minute)} UTC`;
 
-      const formatedDays = listFormatter.format(
-        sortNumStrings(spec.daysOfMonth),
-      );
+      const formatedDays = formatList(sortNumStrings(spec.daysOfMonth));
 
       const selectedDaysSet = new Set(spec.daysOfMonth ?? []);
       const isEveryDay = DAYS_OF_MONTH.every((d) => selectedDaysSet.has(d));
@@ -140,7 +135,7 @@ export function getSpecSummary(spec: Spec): string {
         )
         .filter(Boolean);
 
-      const formatedMonthLabels = listFormatter.format(sortedMonthLabels);
+      const formatedMonthLabels = formatList(sortedMonthLabels);
 
       return `On ${daysStr} of ${formatedMonthLabels} at ${time}`;
     }

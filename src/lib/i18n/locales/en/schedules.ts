@@ -3,6 +3,7 @@ export const Namespace = 'schedules' as const;
 export const Strings = {
   edit: 'Edit Schedule',
   create: 'Create Schedule',
+  'fix-form-errors': 'Please fix the following errors:',
   editing: 'Editing Schedule...',
   creating: 'Creating Schedule...',
   'back-to-schedule': 'Back to Schedule',

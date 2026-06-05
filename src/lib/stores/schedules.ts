@@ -168,7 +168,9 @@ export const submitCreateSchedule = async (
         messageType: formData.messageType,
       });
     } catch (e) {
-      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+      serverError.set(
+        `${translate('data-encoder.encode-error')}: ${e?.message}`,
+      );
       return;
     }
   }
@@ -212,12 +214,12 @@ export const submitCreateSchedule = async (
   });
 
   if (err) {
-    error.set(err);
+    serverError.set(err);
     loading.set(false);
   } else {
     clearTimeout(createTimeout);
     createTimeout = setTimeout(() => {
-      error.set('');
+      serverError.set('');
       loading.set(false);
       goto(routeForSchedules({ namespace }));
     }, 2000);
@@ -241,7 +243,9 @@ export const submitEditSchedule = async (
         messageType: formData.messageType,
       });
     } catch (e) {
-      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+      serverError.set(
+        `${translate('data-encoder.encode-error')}: ${e?.message}`,
+      );
       return;
     }
   }
@@ -292,7 +296,9 @@ export const submitEditSchedule = async (
         fields[key] = encodedValue[0];
       }
     } catch (e) {
-      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+      serverError.set(
+        `${translate('data-encoder.encode-error')}: ${e?.message}`,
+      );
       return;
     }
   }
@@ -306,13 +312,13 @@ export const submitEditSchedule = async (
   });
 
   if (err) {
-    error.set(err);
+    serverError.set(err);
     loading.set(false);
   } else {
     clearTimeout(editTimeout);
     editTimeout = setTimeout(() => {
       goto(routeForSchedule({ namespace, scheduleId: formData.name }));
-      error.set('');
+      serverError.set('');
       loading.set(false);
     }, 2000);
   }
@@ -321,7 +327,7 @@ export const submitEditSchedule = async (
 export const schedulesRefresh = writable(0);
 
 export const loading = writable(false);
-export const error = writable('');
+export const serverError = writable('');
 export const schedulesCount = writable({
   count: 0,
   newCount: 0,

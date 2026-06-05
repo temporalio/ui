@@ -10,7 +10,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { error, loading } from '$lib/stores/schedules';
+  import { loading, serverError } from '$lib/stores/schedules';
   import { customSearchAttributes } from '$lib/stores/search-attributes';
   import type { FullSchedule } from '$lib/types/schedule';
   import {
@@ -77,18 +77,7 @@
     validators: zodClient(scheduleFormSchema),
     resetForm: false,
     onUpdate: async ({ form }) => {
-      if (!form.valid) {
-        const errors: string[] = [];
-        for (const [field, errs] of Object.entries(form.errors)) {
-          if (Array.isArray(errs) && errs.length > 0) {
-            errors.push(`${field}: ${(errs as string[]).join(', ')}`);
-          }
-        }
-        validationError =
-          errors.join('; ') || 'Please fix the form errors above.';
-        return;
-      }
-      validationError = '';
+      if (!form.valid) return;
       await onSubmit(form.data);
     },
   });
@@ -96,12 +85,11 @@
   const {
     form,
     errors: formErrors,
+    allErrors,
     enhance,
     submitting,
     validateForm,
   } = superform;
-
-  let validationError = $state('');
 
   // The search attribute inputs edit rows in place (e.g. selecting an
   // attribute or typing a value). Those deep mutations propagate through
@@ -120,14 +108,14 @@
   });
 
   const onInput = () => {
-    if ($error) {
-      $error = '';
+    if ($serverError) {
+      $serverError = '';
     }
   };
 
   $effect(() => {
     return () => {
-      $error = '';
+      $serverError = '';
     };
   });
 </script>
@@ -165,9 +153,20 @@
 
           <Alert
             intent="error"
-            title={validationError}
-            hidden={!validationError}
-          />
+            title={translate('schedules.fix-form-errors')}
+            hidden={!$allErrors.length}
+          >
+            <ul class="list-inside list-disc">
+              {#each $allErrors as { path, messages } (path)}
+                <li>
+                  {new Intl.ListFormat('en', {
+                    type: 'conjunction',
+                    style: 'long',
+                  }).format(messages)}
+                </li>
+              {/each}
+            </ul>
+          </Alert>
           <div class="flex flex-row items-center gap-4 max-sm:flex-col">
             <Button
               disabled={$submitting || !writeActionsAreAllowed()}
@@ -192,7 +191,7 @@
       </div>
     </form>
 
-    <Alert intent="error" title={$error} hidden={!$error} />
+    <Alert intent="error" title={$serverError} hidden={!$serverError} />
     <CodecServerErrorBanner />
   {/if}
 </div>
