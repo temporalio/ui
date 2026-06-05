@@ -39,6 +39,22 @@
 
     return '--';
   });
+
+  const descriptionDisplay = $derived.by(() => {
+    const specs = $form.specs
+      .map((spec, i) => {
+        const summary = getSpecSummary(spec);
+        if (i === 0) {
+          return summary;
+        }
+
+        return summary.toLowerCase();
+      })
+      .filter(Boolean)
+      .join(' AND ');
+
+    return specs ? `${specs}.` : '--';
+  });
 </script>
 
 <Card class="w-full">
@@ -69,17 +85,7 @@
     <div>
       <dt class="text-xs text-secondary">Description</dt>
       <dd class="flex flex-col text-sm">
-        {$form.specs
-          .map((spec, i) => {
-            const summary = getSpecSummary(spec);
-            if (i === 0) {
-              return summary;
-            }
-
-            return summary.toLowerCase();
-          })
-          .filter(Boolean)
-          .join(' AND ') || '--'}
+        {descriptionDisplay}
       </dd>
     </div>
   </dl>
