@@ -6,6 +6,7 @@
 
   import type { ScheduleFormData } from './schema';
   import { cronToHumanPreview } from './utilities/cron';
+  import { getSpecSummary } from './utilities/spec';
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
@@ -18,23 +19,15 @@
   const spec = $derived($form.specs[index]);
 
   const preview = $derived.by(() => {
-    switch (spec?.type) {
-      case 'cron': {
-        const textPreview = cronToHumanPreview(spec.cronString || '* * * * *', {
-          startDate: $form.startDate ? $timestamp($form.startDate) : undefined,
-          timezoneName: $form.timezoneName,
-          endDateType: $form.endDateType,
-          endDate: $form.endDate ? $timestamp($form.endDate) : undefined,
-          endAfterOccurrences: $form.endAfterOccurrences,
-        });
-
-        if (!spec.cronString) {
-          return `Example: ${textPreview}`;
-        }
-
-        return textPreview;
-      }
+    if (spec.type === 'cron' && !spec.cronString) {
+      return `Example: ${getSpecSummary(spec)}`;
     }
+
+    if (spec.type === 'interval' && !spec.interval) {
+      return 'Set an interval for a summary';
+    }
+
+    return getSpecSummary(spec);
   });
 </script>
 
