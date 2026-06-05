@@ -14,6 +14,7 @@ export type NexusOperationDescriptor = {
   messageType: string;
   label: string;
   embeddedInput?: Payload[] | null;
+  workflowInput?: Payload[] | null;
   workflowType?: string;
   signalName?: string;
   workflowId?: string;
@@ -26,6 +27,7 @@ type OperationSpec = {
   kind: NexusEmbeddedOperationKind;
   getLabel: (d: D) => string;
   getInput: (d: D) => Payload[] | null;
+  getWorkflowInput?: (d: D) => Payload[] | null;
   getWorkflowType?: (d: D) => string | undefined;
   getSignalName?: (d: D) => string | undefined;
   getWorkflowId?: (d: D) => string | undefined;
@@ -50,7 +52,7 @@ const getString = (v: unknown): string | undefined =>
 const NEXUS_OPERATIONS: Record<string, OperationSpec> = {
   'temporal.api.workflowservice.v1.StartWorkflowExecutionRequest': {
     kind: 'start-workflow',
-    getLabel: (d) => `Start Workflow: ${getName(d.workflowType) ?? 'Unknown'}`,
+    getLabel: (_d) => 'Start Operation',
     getInput: (d) => getPayloads(d.input),
     getWorkflowType: (d) => getName(d.workflowType),
     getWorkflowId: (d) => getString(d.workflowId),
@@ -58,16 +60,16 @@ const NEXUS_OPERATIONS: Record<string, OperationSpec> = {
   },
   'temporal.api.workflowservice.v1.SignalWorkflowExecutionRequest': {
     kind: 'signal-workflow',
-    getLabel: (d) => `Signal Workflow: ${getString(d.signalName) ?? 'Unknown'}`,
+    getLabel: (_d) => 'Signal Operation',
     getInput: (d) => getPayloads(d.input),
     getWorkflowId: (d) => getString(d.workflowId),
     getSignalName: (d) => getString(d.signalName),
   },
   'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionRequest': {
     kind: 'signal-with-start-workflow',
-    getLabel: (d) =>
-      `Signal With Start Workflow: ${getName(d.workflowType) ?? 'Unknown'}`,
-    getInput: (d) => getPayloads(d.input),
+    getLabel: (_d) => 'Signal With Start Workflow Execution',
+    getInput: (d) => getPayloads(d.signalInput),
+    getWorkflowInput: (d) => getPayloads(d.input),
     getWorkflowType: (d) => getName(d.workflowType),
     getWorkflowId: (d) => getString(d.workflowId),
     getSignalName: (d) => getString(d.signalName),
@@ -75,13 +77,29 @@ const NEXUS_OPERATIONS: Record<string, OperationSpec> = {
   },
   'temporal.api.workflowservice.v1.QueryWorkflowRequest': {
     kind: 'query-workflow',
-    getLabel: (d) => {
-      const q = d.query as D | undefined;
-      return `Query Workflow: ${getString(d.queryType) ?? getString(q?.queryType) ?? 'Unknown'}`;
-    },
+    getLabel: (_d) => 'Query Operation',
     getInput: (d) => getPayloads((d.query as D | undefined)?.queryArgs),
     getWorkflowId: (d) => getString(d.workflowId),
   },
+};
+
+const SYSTEM_NEXUS_RESPONSE_LABELS: Record<string, string> = {
+  'temporal.api.workflowservice.v1.StartWorkflowExecutionResponse':
+    'Start Operation',
+  'temporal.api.workflowservice.v1.SignalWorkflowExecutionResponse':
+    'Signal Operation',
+  'temporal.api.workflowservice.v1.SignalWithStartWorkflowExecutionResponse':
+    'Signal With Start Workflow Execution',
+  'temporal.api.workflowservice.v1.QueryWorkflowResponse': 'Query Operation',
+};
+
+export const getSystemNexusLabelFromResponsePayload = (
+  payload: Payload,
+): string | null => {
+  const encoding = atob(String(payload?.metadata?.encoding ?? ''));
+  const messageType = atob(String(payload?.metadata?.messageType ?? ''));
+  if (encoding !== 'binary/protobuf' || !messageType) return null;
+  return SYSTEM_NEXUS_RESPONSE_LABELS[messageType] ?? null;
 };
 
 export const describeNexusOperation = (
@@ -100,6 +118,7 @@ export const describeNexusOperation = (
     messageType,
     label: spec.getLabel(d),
     embeddedInput: spec.getInput(d),
+    workflowInput: spec.getWorkflowInput?.(d) ?? undefined,
     workflowType: spec.getWorkflowType?.(d),
     signalName: spec.getSignalName?.(d),
     workflowId: spec.getWorkflowId?.(d),
