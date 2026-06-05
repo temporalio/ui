@@ -26,26 +26,36 @@ import { isValidCronString } from './utilities/cron';
 import type { SearchAttribute } from '$types';
 
 export const scheduleSpecItemSchema = z
-  .object({
-    type: z
-      .enum(['cron', 'week', 'month', 'interval'])
-      .optional()
-      .refine((val) => val !== undefined, {
-        message: 'Select a schedule spec type',
-      }),
-    cronString: z.string().optional().default(''),
-    daysOfWeek: z
-      .array(z.enum(DAYS_OF_WEEK))
-      .optional()
-      .default([...DAYS_OF_WEEK]),
-    daysOfMonth: z.array(z.enum(DAYS_OF_MONTH)).optional().default([]),
-    months: z.array(z.enum(MONTHS)).optional().default([]),
-    days: z.string().optional().default(''),
-    hour: z.string().optional().default(''),
-    minute: z.string().optional().default(''),
-    second: z.string().optional().default(''),
-    phase: z.string().optional().default(''),
-  })
+  .discriminatedUnion('type', [
+    z.object({
+      type: z.literal('cron'),
+      cronString: z.string().default(''),
+    }),
+    z.object({
+      type: z.literal('week'),
+      daysOfWeek: z
+        .array(z.enum(DAYS_OF_WEEK))
+        .optional()
+        .default([...DAYS_OF_WEEK]),
+      hour: z.number().min(0).max(23).optional().default(0),
+      minute: z.number().min(0).max(59).optional().default(0),
+    }),
+    z.object({
+      type: z.literal('month'),
+      daysOfMonth: z.array(z.enum(DAYS_OF_MONTH)).optional().default([]),
+      months: z.array(z.enum(MONTHS)).optional().default([]),
+      hour: z.number().min(0).max(23).optional().default(0),
+      minute: z.number().min(0).max(59).optional().default(0),
+    }),
+    z.object({
+      type: z.literal('interval'),
+      days: z.number().min(0).optional().default(0),
+      hours: z.number().min(0).optional().default(0),
+      minutes: z.number().min(0).optional().default(0),
+      seconds: z.number().min(0).optional().default(0),
+      phase: z.string().optional(),
+    }),
+  ])
   .superRefine((val, ctx) => {
     switch (val.type) {
       case 'cron': {
@@ -92,14 +102,6 @@ export type ScheduleSpecItem = z.infer<typeof scheduleSpecItemSchema>;
 export const DEFAULT_SPEC_ITEM: ScheduleSpecItem = {
   type: 'cron',
   cronString: '',
-  daysOfWeek: [...DAYS_OF_WEEK],
-  daysOfMonth: [new Date().getDay().toString() as DayOfMonth],
-  months: [(new Date().getMonth() + 1).toString() as Month],
-  days: '',
-  hour: '',
-  minute: '',
-  second: '',
-  phase: '',
 };
 
 export const SPEC_ITEM_NO_TYPE: ScheduleSpecItem = {
@@ -288,7 +290,6 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
   for (const cron of cronStrings) {
     const cleanCron = cron.includes('#') ? cron.split('#')[0].trim() : cron;
     specs.push({
-      ...DEFAULT_SPEC_ITEM,
       type: 'cron',
       cronString: cleanCron,
     });
@@ -300,12 +301,11 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
     const phaseStr = interval?.phase?.toString() ?? '';
     const parsed = parseIntervalString(intervalStr);
     specs.push({
-      ...DEFAULT_SPEC_ITEM,
       type: 'interval',
-      days: parsed.days,
-      hour: parsed.hours,
-      minute: parsed.minutes,
-      second: parsed.seconds,
+      days: Number(parsed.days),
+      hours: Number(parsed.hours),
+      minutes: Number(parsed.minutes),
+      seconds: Number(parsed.seconds),
       phase: phaseStr,
     });
   }
@@ -326,7 +326,6 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
 
     if (hasDayOfWeek && !hasDayOfMonth) {
       specs.push({
-        ...DEFAULT_SPEC_ITEM,
         type: 'week',
         daysOfWeek: (Array.isArray(cal.dayOfWeek)
           ? cal.dayOfWeek.map(String)
@@ -334,16 +333,13 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
         ).filter((d): d is DayOfWeek =>
           (DAYS_OF_WEEK as readonly string[]).includes(d),
         ),
-        hour: Array.isArray(cal.hour)
-          ? String(cal.hour[0] ?? '')
-          : String(cal.hour ?? ''),
+        hour: Array.isArray(cal.hour) ? Number(cal.hour[0]) : Number(cal.hour),
         minute: Array.isArray(cal.minute)
-          ? String(cal.minute[0] ?? '')
-          : String(cal.minute ?? ''),
+          ? Number(cal.minute[0])
+          : Number(cal.minute),
       });
     } else {
       specs.push({
-        ...DEFAULT_SPEC_ITEM,
         type: 'month',
         daysOfMonth: Array.isArray(cal.dayOfMonth)
           ? cal.dayOfMonth.map((d) => String(d) as DayOfMonth)
@@ -351,12 +347,10 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
         months: Array.isArray(cal.month)
           ? cal.month.map((m) => String(m) as Month)
           : [String(cal.month ?? '') as Month],
-        hour: Array.isArray(cal.hour)
-          ? String(cal.hour[0] ?? '')
-          : String(cal.hour ?? ''),
+        hour: Array.isArray(cal.hour) ? Number(cal.hour[0]) : Number(cal.hour),
         minute: Array.isArray(cal.minute)
-          ? String(cal.minute[0] ?? '')
-          : String(cal.minute ?? ''),
+          ? Number(cal.minute[0])
+          : Number(cal.minute),
       });
     }
   }

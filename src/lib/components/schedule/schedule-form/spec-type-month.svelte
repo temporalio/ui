@@ -9,6 +9,7 @@
   import { DAYS_OF_MONTH, MONTHS, MONTHS_WITH_LABEL } from './constants';
   import { type ScheduleFormData } from './schema';
   import type { DayOfMonth, Month } from './types';
+  import { assertSpecType } from './utilities/spec';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
@@ -20,10 +21,12 @@
 
   let { form, index }: Props = $props();
 
+  const spec = $derived(assertSpecType($form.specs[index], 'month'));
+
   type MonthMode = 'every-month' | 'custom-months';
 
   function getInitialMonthMode(): MonthMode {
-    const selectedMonthSet = new Set($form.specs?.[index]?.months ?? []);
+    const selectedMonthSet = new Set(spec.months ?? []);
     if (MONTHS.every((m) => selectedMonthSet.has(m))) {
       return 'every-month';
     }
@@ -39,55 +42,56 @@
     switch (mode) {
       case 'every-month': {
         monthMode = mode;
-        $form.specs[index].months = [...MONTHS];
+        $form.specs[index] = { ...spec, months: [...MONTHS] };
         return;
       }
 
       case 'custom-months': {
         monthMode = mode;
-        $form.specs[index].months = [
-          (new Date().getMonth() + 1).toString() as Month,
-        ];
+        $form.specs[index] = {
+          ...spec,
+          months: [(new Date().getMonth() + 1).toString() as Month],
+        };
         return;
       }
     }
   }
 
   function isDaySelected(day: DayOfMonth): boolean {
-    return $form.specs[index].daysOfMonth?.includes(day) ?? false;
+    return spec.daysOfMonth?.includes(day) ?? false;
   }
 
   function toggleDay(day: DayOfMonth) {
-    const current = $form.specs[index].daysOfMonth ?? [];
+    const current = spec.daysOfMonth ?? [];
 
     if (!current.includes(day)) {
-      $form.specs[index].daysOfMonth = [...current, day];
+      $form.specs[index] = { ...spec, daysOfMonth: [...current, day] };
       return;
     }
 
     const next = current.filter((d) => d !== day);
 
     if (next.length >= 1) {
-      $form.specs[index].daysOfMonth = next;
+      $form.specs[index] = { ...spec, daysOfMonth: next };
       return;
     }
   }
 
   function isCustomMonthSelected(month: Month): boolean {
-    return $form.specs[index].months?.includes(month) ?? false;
+    return spec.months?.includes(month) ?? false;
   }
 
   function toggleCustomMonth(month: Month) {
-    const current = $form.specs[index].months ?? [];
+    const current = spec.months ?? [];
 
     if (!current.includes(month)) {
-      $form.specs[index].months = [...current, month];
+      $form.specs[index] = { ...spec, months: [...current, month] };
       return;
     }
 
     const next = current.filter((m) => m !== month);
     if (next.length >= 1) {
-      $form.specs[index].months = next;
+      $form.specs[index] = { ...spec, months: next };
       return;
     }
   }
@@ -179,7 +183,10 @@
         max={23}
         placeholder="00"
         suffix="hrs"
-        bind:value={$form.specs[index].hour}
+        bind:value={
+          () => spec.hour?.toString(),
+          (v) => ($form.specs[index] = { ...spec, hour: Number(v) })
+        }
       />
 
       <Input
@@ -193,7 +200,10 @@
         max={59}
         placeholder="00"
         suffix="min"
-        bind:value={$form.specs[index].minute}
+        bind:value={
+          () => spec.minute?.toString(),
+          (v) => ($form.specs[index] = { ...spec, minute: Number(v) })
+        }
       />
     </div>
     <div class="flex gap-2 text-xs">

@@ -5,6 +5,7 @@
   import Input from '$lib/holocene/input/input.svelte';
 
   import type { ScheduleFormData } from './schema';
+  import { assertSpecType } from './utilities/spec';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
@@ -15,6 +16,8 @@
   }
 
   let { form, index }: Props = $props();
+
+  const spec = $derived(assertSpecType($form.specs[index], 'interval'));
 </script>
 
 <div class="flex flex-col gap-4">
@@ -34,7 +37,10 @@
       min={0}
       step={1}
       labelHidden
-      bind:value={$form.specs[index].days}
+      bind:value={
+        () => spec.days?.toString(),
+        (v) => ($form.specs[index] = { ...spec, days: Number(v) })
+      }
       placeholder="000"
       suffix="days"
       suffixClass="min-w-16 text-center"
@@ -48,7 +54,10 @@
       type="number"
       min={0}
       step={1}
-      bind:value={$form.specs[index].hour}
+      bind:value={
+        () => spec.hours?.toString(),
+        (v) => ($form.specs[index] = { ...spec, hours: Number(v) })
+      }
       placeholder="00"
       suffix="hrs"
       suffixClass="min-w-16 text-center"
@@ -64,7 +73,10 @@
       type="number"
       min={0}
       step={1}
-      bind:value={$form.specs[index].minute}
+      bind:value={
+        () => spec.minutes?.toString(),
+        (v) => ($form.specs[index] = { ...spec, minutes: Number(v) })
+      }
       placeholder="00"
       suffix="min"
       suffixClass="min-w-16 text-center"
@@ -78,7 +90,10 @@
       type="number"
       min={0}
       step={1}
-      bind:value={$form.specs[index].second}
+      bind:value={
+        () => spec.seconds?.toString(),
+        (v) => ($form.specs[index] = { ...spec, seconds: Number(v) })
+      }
       placeholder="00"
       suffix="sec"
       suffixClass="min-w-16 text-center"
@@ -94,7 +109,9 @@
       <DurationInput
         id="phase-{index}"
         label="Offset"
-        bind:value={$form.specs[index].phase}
+        bind:value={
+          () => spec.phase, (v) => ($form.specs[index] = { ...spec, phase: v })
+        }
         initialUnit="minute(s)"
         inputmode="numeric"
         min={0}

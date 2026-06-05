@@ -18,19 +18,23 @@
   const spec = $derived($form.specs[index]);
 
   const preview = $derived.by(() => {
-    const textPreview = cronToHumanPreview(spec.cronString || '* * * * *', {
-      startDate: $form.startDate ? $timestamp($form.startDate) : undefined,
-      timezoneName: $form.timezoneName,
-      endDateType: $form.endDateType,
-      endDate: $form.endDate ? $timestamp($form.endDate) : undefined,
-      endAfterOccurrences: $form.endAfterOccurrences,
-    });
+    switch (spec?.type) {
+      case 'cron': {
+        const textPreview = cronToHumanPreview(spec.cronString || '* * * * *', {
+          startDate: $form.startDate ? $timestamp($form.startDate) : undefined,
+          timezoneName: $form.timezoneName,
+          endDateType: $form.endDateType,
+          endDate: $form.endDate ? $timestamp($form.endDate) : undefined,
+          endAfterOccurrences: $form.endAfterOccurrences,
+        });
 
-    if (!spec.cronString) {
-      return `Example: ${textPreview}`;
+        if (!spec.cronString) {
+          return `Example: ${textPreview}`;
+        }
+
+        return textPreview;
+      }
     }
-
-    return textPreview;
   });
 </script>
 

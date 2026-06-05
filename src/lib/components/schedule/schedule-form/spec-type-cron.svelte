@@ -7,6 +7,7 @@
   import { ordinal } from '$lib/utilities/schedule-spec-label';
 
   import type { ScheduleFormData } from './schema';
+  import { assertSpecType } from './utilities/spec';
 
   import CronExpressionFormatModal from './cron-expression-format-modal.svelte';
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
@@ -18,6 +19,8 @@
   }
 
   let { form, errors, index }: Props = $props();
+
+  const spec = $derived(assertSpecType($form.specs[index], 'cron'));
 
   const today = new Date();
   const weekday = today.toLocaleDateString(undefined, { weekday: 'long' });
@@ -45,7 +48,8 @@
       {#each shortcuts as shortcut (shortcut.value)}
         <Button
           variant="secondary"
-          on:click={() => ($form.specs[index].cronString = shortcut.value)}
+          on:click={() =>
+            ($form.specs[index] = { ...spec, cronString: shortcut.value })}
           >{shortcut.label}</Button
         >
       {/each}
@@ -54,7 +58,10 @@
   <Input
     id="cron-string-{index}"
     label="Cron expression"
-    bind:value={$form.specs[index].cronString}
+    bind:value={
+      () => spec.cronString,
+      (v) => ($form.specs[index] = { ...spec, cronString: v })
+    }
     placeholder="* * * * *"
     required
     error={!!$errors.specs?.[index]?.cronString?.[0]}
