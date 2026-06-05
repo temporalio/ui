@@ -17,13 +17,15 @@
     DetailListTimestampValue,
   } from '../detail-list';
 
+  import NexusOperationActions from './nexus-operation-actions.svelte';
+
   interface Props {
     nexusOperationInfo: NexusOperationExecutionInfo;
     namespace: string;
     poller: StandaloneNexusOperationPoller;
   }
 
-  let { nexusOperationInfo, namespace }: Props = $props();
+  let { nexusOperationInfo, namespace, poller }: Props = $props();
 
   const endpointFilterLink = $derived(
     routeForStandaloneNexusOperationsWithQuery(
@@ -52,6 +54,9 @@
           class="overflow-hidden text-ellipsis text-left"
         />
       </h1>
+    </div>
+    <div class="ml-auto">
+      <NexusOperationActions {nexusOperationInfo} {namespace} {poller} />
     </div>
   </div>
   <DetailList aria-label="nexus operation execution details" rowCount={4}>

@@ -1,3 +1,7 @@
+import {
+  isPayloadInputEncodingType,
+  type PayloadInputEncoding,
+} from '$lib/models/payload-encoding';
 import { nexusOperationError } from '$lib/stores/nexus-operations';
 import type { Payload, SearchAttribute } from '$lib/types';
 import type {
@@ -8,6 +12,7 @@ import type {
   StartNexusOperationExecutionRequest,
   StartNexusOperationExecutionResponse,
 } from '$lib/types/nexus-operation-execution';
+import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
@@ -224,6 +229,85 @@ export const getNexusOperationExecution = (
   });
 
   return requestFromAPI(route, { params });
+};
+
+export interface NexusOperationInitialValues {
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
+  summary: string;
+  details: string;
+  searchAttributes: Record<string, string | Payload> | undefined;
+}
+
+const extractNexusInputValues = async (
+  payload: Payload | undefined,
+): Promise<
+  Pick<NexusOperationInitialValues, 'input' | 'encoding' | 'messageType'>
+> => {
+  const defaults = {
+    input: '',
+    encoding: 'json/plain' as PayloadInputEncoding,
+    messageType: '',
+  };
+  if (!payload) return defaults;
+  const decoded = await decodePayloadAndParseDataToJSON(payload, false);
+  if (!decoded) return defaults;
+  const encodingValue = decoded.metadata?.encoding;
+  return {
+    input: decoded.data ? stringifyWithBigInt(decoded.data) : '',
+    encoding:
+      encodingValue && isPayloadInputEncodingType(encodingValue)
+        ? encodingValue
+        : 'json/plain',
+    messageType: decoded.metadata?.messageType ?? '',
+  };
+};
+
+const extractMetadataString = async (
+  payload: Payload | null | undefined,
+): Promise<string> => {
+  if (!payload) return '';
+  const decoded = await decodePayloadAndParseDataToJSON(payload);
+  return typeof decoded === 'string' ? decoded : '';
+};
+
+export const fetchInitialValuesForStartNexusOperation = async (
+  namespace: string,
+  operationId: string,
+): Promise<NexusOperationInitialValues> => {
+  const emptyValues: NexusOperationInitialValues = {
+    input: '',
+    encoding: 'json/plain',
+    messageType: '',
+    summary: '',
+    details: '',
+    searchAttributes: undefined,
+  };
+
+  try {
+    const operation = await getNexusOperationExecution(namespace, operationId);
+    const { input, encoding, messageType } = await extractNexusInputValues(
+      operation.input,
+    );
+    const summary = await extractMetadataString(
+      operation.info.userMetadata?.summary,
+    );
+    const details = await extractMetadataString(
+      operation.info.userMetadata?.details,
+    );
+
+    return {
+      input,
+      encoding,
+      messageType,
+      summary,
+      details,
+      searchAttributes: operation.info.searchAttributes?.indexedFields,
+    };
+  } catch {
+    return emptyValues;
+  }
 };
 
 export const pollNexusOperationExecution = (
