@@ -663,6 +663,45 @@ describe('getScheduleSpecLabel', () => {
     ).toBe('Every 15 minutes');
   });
 
+  it('should handle minute step shorthand as intervals', () => {
+    expect(
+      getScheduleSpecLabel({
+        second: '0',
+        minute: '*/20',
+        hour: '*',
+        dayOfMonth: '*',
+        month: '*',
+        dayOfWeek: '*',
+      }),
+    ).toBe('Every 20 minutes');
+  });
+
+  it('should handle stepped day-of-week calendar specs', () => {
+    expect(
+      getScheduleSpecLabel({
+        second: '0',
+        minute: '0',
+        hour: '9',
+        dayOfMonth: '*',
+        month: '*',
+        dayOfWeek: '1-5/2',
+      }),
+    ).toBe('Every Monday, Wednesday, Friday at 9:00 AM UTC');
+  });
+
+  it('should handle stepped day-of-month calendar specs', () => {
+    expect(
+      getScheduleSpecLabel({
+        second: '0',
+        minute: '0',
+        hour: '9',
+        dayOfMonth: '1-31/10',
+        month: '*',
+        dayOfWeek: '*',
+      }),
+    ).toBe('on the 1st, 11th, 21st, 31st at 9:00 AM UTC');
+  });
+
   it('should dispatch to interval spec', () => {
     expect(
       getScheduleSpecLabel({
