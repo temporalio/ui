@@ -20,7 +20,7 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import { type ScheduleFormData, scheduleFormSchema } from './schema';
-  import { scheduleToFormData } from './serialization';
+  import { scheduleToFormData } from './utilities/request-data-to-form-data';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';
   import SchedulePoliciesCard from './schedule-policies-card.svelte';

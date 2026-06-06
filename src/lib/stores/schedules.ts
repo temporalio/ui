@@ -6,7 +6,7 @@ import type { ScheduleFormData } from '$lib/components/schedule/schedule-form/sc
 import {
   formDataToCreateScheduleRequest,
   formDataToEditScheduleRequest,
-} from '$lib/components/schedule/schedule-form/serialization';
+} from '$lib/components/schedule/schedule-form/utilities/form-data-to-request-data';
 import { translate } from '$lib/i18n/translate';
 import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import type { Schedule } from '$lib/types';
