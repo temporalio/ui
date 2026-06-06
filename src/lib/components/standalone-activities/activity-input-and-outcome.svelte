@@ -21,7 +21,7 @@
   <div class="flex flex-col gap-2">
     <h5>Result</h5>
     {#if has(outcome, 'failure')}
-      <CodeBlock content={JSON.stringify(outcome.failure, null, 2)} />
+      <PayloadCodeBlock value={outcome.failure} />
     {:else if has(outcome, 'result')}
       <PayloadCodeBlock value={outcome.result} />
     {:else}
