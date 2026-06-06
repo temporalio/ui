@@ -161,6 +161,7 @@
         clearLabel={translate('common.clear-input-button-label')}
         onDateChange={onStartDateChange}
         clearable={false}
+        disabled={Boolean(schedule)}
       >
         {#snippet afterLabel()}
           <Tooltip
