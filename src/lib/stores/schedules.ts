@@ -279,7 +279,7 @@ export const submitEditSchedule = async (
               limitedActions: true,
               remainingActions: formData.endAfterOccurrences,
             }
-          : {}),
+          : { limitedActions: false, remainingActions: undefined }),
         paused: formData.pauseSchedule,
       },
     },
