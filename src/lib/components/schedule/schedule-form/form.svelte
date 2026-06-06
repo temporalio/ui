@@ -10,7 +10,11 @@
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { loading, serverError } from '$lib/stores/schedules';
+  import {
+    loading,
+    openConfirmationModal,
+    serverError,
+  } from '$lib/stores/schedules';
   import { customSearchAttributes } from '$lib/stores/search-attributes';
   import type { FullSchedule } from '$lib/types/schedule';
   import {
@@ -21,6 +25,7 @@
 
   import { type ScheduleFormData, scheduleFormSchema } from './schema';
   import { scheduleToFormData } from './utilities/request-data-to-form-data';
+  import DeleteScheduleModal from '../schedule-view/delete-schedule-modal.svelte';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';
   import SchedulePoliciesCard from './schedule-policies-card.svelte';
@@ -187,9 +192,11 @@
                 data-testid="delete-schedule-button"
                 leadingIcon="trash"
                 class="ml-auto hidden sm:inline-flex"
+                on:click={() => openConfirmationModal('delete')}
               >
                 {translate('schedules.delete')}
               </Button>
+              <DeleteScheduleModal {scheduleId} {namespace} />
             {/if}
           </div>
         </div>
