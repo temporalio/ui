@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  mockMonthlyCalendarSchedule,
   mockSchedule,
   mockScheduleApi,
   mockSchedulesApis,
+  mockWeeklyCalendarSchedule,
   SCHEDULES_COUNT_API,
 } from '~/test-utilities/mock-apis';
 
@@ -85,6 +87,30 @@ test.describe('Schedules List with schedules', () => {
     await expect(submitButton).toBeVisible();
     await expect(submitButton).toBeEnabled();
     await submitButton.click();
+  });
+
+  test('loads a weekly calendar schedule into a week spec', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, mockWeeklyCalendarSchedule);
+    await page.goto(scheduleEditUrl);
+
+    await expect(page.locator('h1')).toHaveText('Edit Schedule');
+
+    await expect(page.getByText('Weekdays at 09:30 UTC')).toBeVisible();
+  });
+
+  test('loads a monthly calendar schedule into a month spec', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, mockMonthlyCalendarSchedule);
+    await page.goto(scheduleEditUrl);
+
+    await expect(page.locator('h1')).toHaveText('Edit Schedule');
+
+    await expect(
+      page.getByText('On days 1 and 15 of June at 00:00 UTC'),
+    ).toBeVisible();
   });
 
   test('edits an existing schedule with an object input payload', async ({
