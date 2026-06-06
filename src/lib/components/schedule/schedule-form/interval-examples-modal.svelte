@@ -1,5 +1,7 @@
 <script lang="ts">
   import Modal from '$lib/holocene/modal.svelte';
+  import { translate } from '$lib/i18n/translate';
+
   interface Props {
     open: boolean;
   }
@@ -13,24 +15,32 @@
   on:confirmModal={() => (open = false)}
   cancelText=""
   hideCancel
-  confirmText="Got It"
+  confirmText={translate('common.got-it')}
 >
-  <h2 slot="title">Interval and phase examples</h2>
+  <h2 slot="title">{translate('schedules.interval-examples-title')}</h2>
   <div slot="content" class="flex flex-col gap-4">
     <section class="flex flex-col gap-[inherit]">
       <div class="flex flex-col gap-1.5">
-        <h3 class="text-base font-medium">Every hour on the hour</h3>
+        <h3 class="text-base font-medium">
+          {translate('schedules.interval-examples-hourly-title')}
+        </h3>
         <dl class="text-sm">
           <div class="flex gap-1">
-            <dt class="font-medium">Interval:</dt>
-            <dd>1 hour</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-interval-label')}
+            </dt>
+            <dd>{translate('schedules.interval-examples-hourly-interval')}</dd>
 
-            <dt class="font-medium">Phase:</dt>
-            <dd>0 seconds</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-phase-label')}
+            </dt>
+            <dd>{translate('schedules.interval-examples-hourly-phase')}</dd>
           </div>
           <div class="flex gap-1">
-            <dt class="font-medium">Matches:</dt>
-            <dd>00:00:00, 01:00:00, 02:00:00…</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-matches-label')}
+            </dt>
+            <dd>{translate('schedules.interval-examples-hourly-matches')}</dd>
           </div>
         </dl>
       </div>
@@ -124,19 +134,33 @@
 
     <section class="flex flex-col gap-[inherit]">
       <div class="flex flex-col gap-1.5">
-        <h3 class="text-base font-medium">Every hour, but 19 minutes in</h3>
+        <h3 class="text-base font-medium">
+          {translate('schedules.interval-examples-hourly-offset-title')}
+        </h3>
 
         <dl class="text-sm">
           <div class="flex gap-1">
-            <dt class="font-medium">Interval:</dt>
-            <dd>1 hour</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-interval-label')}
+            </dt>
+            <dd>
+              {translate('schedules.interval-examples-hourly-offset-interval')}
+            </dd>
 
-            <dt class="font-medium">Phase:</dt>
-            <dd>19 minutes</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-phase-label')}
+            </dt>
+            <dd>
+              {translate('schedules.interval-examples-hourly-offset-phase')}
+            </dd>
           </div>
           <div class="flex gap-1">
-            <dt class="font-medium">Matches:</dt>
-            <dd>00:19:00, 01:19:00, 02:19:00…</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-matches-label')}
+            </dt>
+            <dd>
+              {translate('schedules.interval-examples-hourly-offset-matches')}
+            </dd>
           </div>
         </dl>
       </div>
@@ -235,19 +259,31 @@
     <section class="flex flex-col gap-[inherit]">
       <div class="flex flex-col gap-1.5">
         <h3 class="text-base font-medium">
-          Every 15 minutes, offset by 5 minutes
+          {translate('schedules.interval-examples-minutes-offset-title')}
         </h3>
         <dl class="text-sm">
           <div class="flex gap-1">
-            <dt class="font-medium">Interval:</dt>
-            <dd>15 minutes</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-interval-label')}
+            </dt>
+            <dd>
+              {translate('schedules.interval-examples-minutes-offset-interval')}
+            </dd>
 
-            <dt class="font-medium">Phase:</dt>
-            <dd>5 minutes</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-phase-label')}
+            </dt>
+            <dd>
+              {translate('schedules.interval-examples-minutes-offset-phase')}
+            </dd>
           </div>
           <div class="flex gap-1">
-            <dt class="font-medium">Matches:</dt>
-            <dd>00:20:00, 00:35:00, 00:50:00…</dd>
+            <dt class="font-medium">
+              {translate('schedules.interval-examples-matches-label')}
+            </dt>
+            <dd>
+              {translate('schedules.interval-examples-minutes-offset-matches')}
+            </dd>
           </div>
         </dl>
       </div>

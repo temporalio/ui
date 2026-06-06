@@ -7,6 +7,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { FullSchedule } from '$lib/types/schedule';
 
   import type { ScheduleFormData } from './schema';
@@ -83,14 +84,12 @@
 </script>
 
 <Card class="w-full">
-  <h2 class="text-2xl font-medium">Schedule Spec</h2>
+  <h2 class="text-2xl font-medium">{translate('schedules.schedule-spec')}</h2>
   <div class="mt-4 flex flex-col gap-4">
     <p class="text-sm text-secondary">
-      Define rules for when this Workflow should run. You can add as many
-      Schedule Specifications as you need to comprehensively describe the
-      schedule. Specs can be calendar-based, cron-based, or interval-based.
+      {translate('schedules.spec-description')}
       <Link href="https://docs.temporal.io/schedule#spec" newTab>
-        Learn more about the Schedule Spec
+        {translate('schedules.spec-learn-more')}
       </Link>
     </p>
 
@@ -112,7 +111,7 @@
 
     <div>
       <Button variant="secondary" on:click={addSpec}>
-        + Add another schedule spec
+        {translate('schedules.add-another-spec')}
       </Button>
     </div>
   </div>

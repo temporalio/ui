@@ -39,7 +39,7 @@
   const endDateType = $derived($form.endDateType);
 
   const timezoneComboboxOptions = $derived.by(() => {
-    const opts = [{ label: 'UTC', value: 'UTC' }];
+    const opts = [{ label: translate('common.utc'), value: 'UTC' }];
     for (const tz of TimezoneOptions) {
       const offsetStr = formatOffset(tz.offset);
       opts.push({
@@ -110,13 +110,13 @@
 </script>
 
 <Card class="w-full">
-  <h2 class="text-2xl font-medium">Schedule Details</h2>
+  <h2 class="text-2xl font-medium">{translate('schedules.details-title')}</h2>
   <div class="mt-4 flex flex-col gap-4">
     <Input
       id="name"
       bind:value={$form.name}
       data-testid="schedule-name-input"
-      label="Schedule Name"
+      label={translate('schedules.name-input-label')}
       error={!!$errors.name?.[0]}
       hintText={$errors.name?.[0]}
       maxLength={232}
@@ -127,7 +127,7 @@
       id="workflowType"
       bind:value={$form.workflowType}
       data-testid="schedule-type-input"
-      label="Workflow Type"
+      label={translate('common.workflow-type')}
       error={!!$errors.workflowType?.[0]}
       hintText={$errors.workflowType?.[0]}
       required
@@ -136,25 +136,25 @@
       id="workflowId"
       bind:value={$form.workflowId}
       data-testid="schedule-workflow-id-input"
-      label="Workflow ID"
+      label={translate('common.workflow-id')}
       hintText={$errors.workflowId?.[0] ||
-        'The unique ID of the Workflow Execution. If left blank, we will generate a unique ID.'}
+        translate('schedules.workflow-id-hint')}
       error={!!$errors.workflowId?.[0]}
     />
     <Input
       id="taskQueue"
       bind:value={$form.taskQueue}
       data-testid="schedule-task-queue-input"
-      label="Task Queue"
+      label={translate('common.task-queue')}
       error={!!$errors.taskQueue?.[0]}
       hintText={$errors.taskQueue?.[0] ||
-        'The task queue this schedule should poll.'}
+        translate('schedules.task-queue-hint')}
       required
     />
 
     <div class="max-w-108">
       <DatePicker
-        label="Schedule Start Date"
+        label={translate('schedules.start-date-label')}
         selected={startDateValue}
         todayLabel={translate('common.today')}
         closeLabel={translate('common.close')}
@@ -166,7 +166,7 @@
           <Tooltip
             topLeft
             width={250}
-            text="If a Schedule Spec start time has already passed for the start date, the schedule will run at the next time specified in the Schedule Spec."
+            text={translate('schedules.start-date-tooltip')}
           >
             <Icon name="square-info" class="h-3 w-3" />
           </Tooltip>
@@ -178,18 +178,26 @@
       name="endDateType"
       group={endDateTypeStore}
       class="flex max-w-108 flex-col gap-1 p-0"
-      description="End Date"
+      description={translate('schedules.end-date-label')}
     >
       {@const rowClass =
         'grid h-11 grid-cols-[theme(spacing.24)_1fr] items-center gap-3'}
       <div class={rowClass}>
-        <RadioInput id="end-date-never" value="never" label="Never" />
+        <RadioInput
+          id="end-date-never"
+          value="never"
+          label={translate('common.never')}
+        />
       </div>
       <div class={rowClass}>
-        <RadioInput id="end-date-on" value="on" label="On" />
+        <RadioInput
+          id="end-date-on"
+          value="on"
+          label={translate('common.on')}
+        />
         {#if endDateType === 'on'}
           <DatePicker
-            label="End date"
+            label={translate('schedules.end-date-picker-label')}
             labelHidden
             selected={endDateValue}
             todayLabel={translate('common.today')}
@@ -202,14 +210,18 @@
         {/if}
       </div>
       <div class={rowClass}>
-        <RadioInput id="end-date-after" value="after" label="After" />
+        <RadioInput
+          id="end-date-after"
+          value="after"
+          label={translate('common.after')}
+        />
         {#if endDateType === 'after'}
           <NumberInput
             id="endAfterOccurrences"
-            label="Occurrences"
+            label={translate('schedules.occurrences-label')}
             labelHidden
             bind:value={$form.endAfterOccurrences}
-            placeholder="### occurrences"
+            placeholder={translate('schedules.occurrences-placeholder')}
             min={1}
             disabled={endDateType !== 'after'}
             class="w-full"
@@ -223,31 +235,31 @@
     >
       <Combobox
         id="timezoneName"
-        label="Timezone"
+        label={translate('schedules.timezone-label')}
         bind:value={$form.timezoneName}
         options={timezoneComboboxOptions}
         optionValueKey="value"
         optionLabelKey="label"
         noResultsText={translate('common.no-results')}
-        placeholder="Search timezone…"
+        placeholder={translate('schedules.timezone-placeholder')}
         leadingIcon="clock"
         required
       />
 
       <Input
         id="jitter"
-        label="Jitter"
+        label={translate('schedules.jitter')}
         type="number"
         step={1}
         min={0}
-        suffix="sec"
+        suffix={translate('common.seconds-abbreviated')}
         bind:value={$form.jitter}
       >
         {#snippet afterLabel()}
           <Tooltip
             topLeft
             width={250}
-            text="A random offset between zero and this value added to each action time, bound by the next scheduled Action time, used to avoid load spikes."
+            text={translate('schedules.jitter-tooltip')}
           >
             <Icon name="square-info" class="h-3 w-3" />
           </Tooltip>

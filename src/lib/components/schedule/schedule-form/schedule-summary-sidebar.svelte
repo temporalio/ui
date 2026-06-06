@@ -5,7 +5,7 @@
 
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import { pluralize } from '$lib/utilities/pluralize';
+  import { translate } from '$lib/i18n/translate';
 
   import type { ScheduleFormData } from './schema';
   import { getSpecSummary } from './utilities/spec';
@@ -19,7 +19,7 @@
   const endDisplay = $derived.by(() => {
     switch ($form.endDateType) {
       case 'never': {
-        return 'Never';
+        return translate('common.never');
       }
 
       case 'on': {
@@ -31,7 +31,9 @@
 
       case 'after': {
         if ($form.endAfterOccurrences) {
-          return `After ${$form.endAfterOccurrences} ${pluralize('occurrence', $form.endAfterOccurrences)}`;
+          return translate('schedules.after-n-occurrence', {
+            count: $form.endAfterOccurrences,
+          });
         }
         break;
       }
@@ -51,39 +53,49 @@
         return summary.toLowerCase();
       })
       .filter(Boolean)
-      .join(' AND ');
+      .join(` ${translate('schedules.summary-spec-conjunction')} `);
 
     return specs ? `${specs}.` : '--';
   });
 </script>
 
 <Card class="w-full">
-  <h2 class="text-lg font-semibold">Schedule Summary</h2>
+  <h2 class="text-lg font-semibold">{translate('schedules.summary-title')}</h2>
   <dl class="mt-4 flex flex-col gap-3">
     <div>
-      <dt class="text-xs text-secondary">Schedule Name</dt>
+      <dt class="text-xs text-secondary">
+        {translate('schedules.name-input-label')}
+      </dt>
       <dd class="text-sm">{$form.name || '--'}</dd>
     </div>
     <div>
-      <dt class="text-xs text-secondary">Start date</dt>
+      <dt class="text-xs text-secondary">
+        {translate('schedules.summary-start-date-label')}
+      </dt>
       <dd class="text-sm">
         {$form.startDate ? $timestamp($form.startDate) : '--'}
       </dd>
     </div>
     <div>
-      <dt class="text-xs text-secondary">End</dt>
+      <dt class="text-xs text-secondary">
+        {translate('schedules.summary-end-label')}
+      </dt>
       <dd class="text-sm">{endDisplay}</dd>
     </div>
     <div>
-      <dt class="text-xs text-secondary">Assigned Workflow Type</dt>
+      <dt class="text-xs text-secondary">
+        {translate('schedules.summary-workflow-type-label')}
+      </dt>
       <dd class="text-sm">{$form.workflowType || '--'}</dd>
     </div>
     <div>
-      <dt class="text-xs text-secondary">Task Queue</dt>
+      <dt class="text-xs text-secondary">{translate('common.task-queue')}</dt>
       <dd class="text-sm">{$form.taskQueue || '--'}</dd>
     </div>
     <div>
-      <dt class="text-xs text-secondary">Description</dt>
+      <dt class="text-xs text-secondary">
+        {translate('common.description')}
+      </dt>
       <dd class="flex flex-col text-sm">
         {descriptionDisplay}
       </dd>

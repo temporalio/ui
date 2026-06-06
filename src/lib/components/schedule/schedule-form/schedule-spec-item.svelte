@@ -5,6 +5,7 @@
   import IconButton from '$lib/holocene/icon-button.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import { type ScheduleFormData } from './schema';
   import {
@@ -31,10 +32,10 @@
   let { form, errors, index, expanded, onRemove, canRemove }: Props = $props();
 
   const specTypeOptions = [
-    { value: 'cron', label: 'Cron String' },
-    { value: 'week', label: 'Days of Week' },
-    { value: 'month', label: 'Days of Month' },
-    { value: 'interval', label: 'Interval' },
+    { value: 'cron', label: translate('schedules.cron-string') },
+    { value: 'week', label: translate('schedules.spec-type-week') },
+    { value: 'month', label: translate('schedules.spec-type-month') },
+    { value: 'interval', label: translate('schedules.spec-type-interval') },
   ];
 
   const specType = $derived($form.specs[index]?.type);
@@ -43,7 +44,7 @@
   const typeLabel = $derived(
     specTypeOptions.find((o) => o.value === specType)?.label ??
       specType ??
-      'No type selected',
+      translate('schedules.spec-type-none'),
   );
 
   function onTypeChange(value: string) {
@@ -70,8 +71,8 @@
       <div class="flex flex-col items-end gap-4 sm:flex-row">
         <Select
           id="spec-type-{index}"
-          label="Schedule Spec Type"
-          placeholder="Select a spec type"
+          label={translate('schedules.spec-type-label')}
+          placeholder={translate('schedules.spec-type-placeholder')}
           value={$form.specs[index].type}
           onChange={onTypeChange}
           valid={!$errors.specs?.[index]?.type?.[0]}
@@ -87,7 +88,7 @@
             variant="ghost"
             on:click={() => (isIntervalExampleModalOpen = true)}
           >
-            Explore interval examples
+            {translate('schedules.explore-interval-examples')}
           </Button>
           <IntervalExamplesModal bind:open={isIntervalExampleModalOpen} />
         {/if}
@@ -97,7 +98,7 @@
           variant="ghost"
           size="sm"
           icon="trash"
-          label="Delete"
+          label={translate('common.delete')}
           class="mr-4 mt-[1.625rem] h-10"
           on:click={onRemove}
         />
@@ -137,7 +138,7 @@
         variant="ghost"
         size="sm"
         icon="trash"
-        label="Delete"
+        label={translate('common.delete')}
         on:click={(e) => {
           e.stopPropagation();
           onRemove();

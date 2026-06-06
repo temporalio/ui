@@ -21,20 +21,22 @@
 
 <Card class="w-full">
   <Tabs class="flex flex-col gap-4">
-    <h2 class="text-2xl font-medium">Search Attributes</h2>
+    <h2 class="text-2xl font-medium">
+      {translate('schedules.search-attributes-title')}
+    </h2>
     <TabList
       label={translate('schedules.add-schedule-attr')}
       class="flex flex-wrap gap-4 text-secondary"
     >
       <Tab
-        label="Schedule"
+        label={translate('schedules.schedule')}
         id="schedule-tab"
         data-testid="schedule-tab"
         panelId="schedule-panel"
         class="px-1"
       />
       <Tab
-        label="Workflows"
+        label={translate('common.workflows')}
         id="workflows-tab"
         data-testid="workflows-tab"
         panelId="workflows-panel"

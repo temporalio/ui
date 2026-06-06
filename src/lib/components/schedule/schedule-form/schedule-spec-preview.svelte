@@ -2,10 +2,9 @@
   import type { SuperForm } from 'sveltekit-superforms';
   import { twMerge } from 'tailwind-merge';
 
-  import { timestamp } from '$lib/components/timestamp.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import type { ScheduleFormData } from './schema';
-  import { cronToHumanPreview } from './utilities/cron';
   import { getSpecSummary } from './utilities/spec';
 
   interface Props {
@@ -20,11 +19,13 @@
 
   const preview = $derived.by(() => {
     if (spec.type === 'cron' && !spec.cronString) {
-      return `Example: ${getSpecSummary(spec)}`;
+      return translate('schedules.spec-preview-example', {
+        summary: getSpecSummary(spec),
+      });
     }
 
     if (spec.type === 'interval' && !spec.interval) {
-      return 'Set an interval for a summary';
+      return translate('schedules.spec-preview-interval-empty');
     }
 
     return getSpecSummary(spec);

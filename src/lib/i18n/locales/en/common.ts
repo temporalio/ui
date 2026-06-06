@@ -51,6 +51,7 @@ export const Strings = {
   identity: 'Identity',
   'identity-placeholder': 'Enter an identity',
   confirm: 'Confirm',
+  'got-it': 'Got It',
   summary: 'Summary',
   scheduled: 'Scheduled',
   'show-all': 'Show all',

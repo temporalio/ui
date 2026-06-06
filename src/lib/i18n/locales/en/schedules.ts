@@ -213,4 +213,66 @@ export const Strings = {
   'label-custom': 'Custom schedule',
   'label-interval': 'Every {{- duration}}',
   'label-interval-with-offset': 'Every {{- duration}}, offset by {{- phase}}',
+  'after-n-occurrence_one': 'After {{count}} occurrence',
+  'after-n-occurrence_other': 'After {{count}} occurrences',
+  'cron-format-modal-title': 'Cron expression format',
+  'cron-format-diagram': `┌───────────── minute (0 - 59)
+│ ┌───────────── hour (0 - 23)
+│ │ ┌───────────── day of the month (1 - 31)
+│ │ │ ┌───────────── month (1 - 12)
+│ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday)
+│ │ │ │ │
+* * * * *`,
+  'spec-preview-example': 'Example: {{- summary}}',
+  'spec-preview-interval-empty': 'Set an interval for a summary',
+  'interval-examples-title': 'Interval and phase examples',
+  'interval-examples-interval-label': 'Interval:',
+  'interval-examples-phase-label': 'Phase:',
+  'interval-examples-matches-label': 'Matches:',
+  'interval-examples-hourly-title': 'Every hour on the hour',
+  'interval-examples-hourly-interval': '1 hour',
+  'interval-examples-hourly-phase': '0 seconds',
+  'interval-examples-hourly-matches': '00:00:00, 01:00:00, 02:00:00…',
+  'interval-examples-hourly-offset-title': 'Every hour, but 19 minutes in',
+  'interval-examples-hourly-offset-interval': '1 hour',
+  'interval-examples-hourly-offset-phase': '19 minutes',
+  'interval-examples-hourly-offset-matches': '00:19:00, 01:19:00, 02:19:00…',
+  'interval-examples-minutes-offset-title':
+    'Every 15 minutes, offset by 5 minutes',
+  'interval-examples-minutes-offset-interval': '15 minutes',
+  'interval-examples-minutes-offset-phase': '5 minutes',
+  'interval-examples-minutes-offset-matches': '00:20:00, 00:35:00, 00:50:00…',
+  'details-title': 'Schedule Details',
+  'name-input-label': 'Schedule Name',
+  'workflow-id-hint':
+    'The unique ID of the Workflow Execution. If left blank, we will generate a unique ID.',
+  'task-queue-hint': 'The task queue this schedule should poll.',
+  'start-date-label': 'Schedule Start Date',
+  'start-date-tooltip':
+    'If a Schedule Spec start time has already passed for the start date, the schedule will run at the next time specified in the Schedule Spec.',
+  'end-date-label': 'End Date',
+  'end-date-picker-label': 'End date',
+  'occurrences-label': 'Occurrences',
+  'occurrences-placeholder': '### occurrences',
+  'timezone-label': 'Timezone',
+  'timezone-placeholder': 'Search timezone…',
+  'jitter-tooltip':
+    'A random offset between zero and this value added to each action time, bound by the next scheduled Action time, used to avoid load spikes.',
+  'summary-title': 'Schedule Summary',
+  'summary-start-date-label': 'Start date',
+  'summary-end-label': 'End',
+  'summary-workflow-type-label': 'Assigned Workflow Type',
+  'summary-spec-conjunction': 'AND',
+  'search-attributes-title': 'Search Attributes',
+  'spec-type-label': 'Schedule Spec Type',
+  'spec-type-placeholder': 'Select a spec type',
+  'spec-type-none': 'No type selected',
+  'spec-type-week': 'Days of Week',
+  'spec-type-month': 'Days of Month',
+  'spec-type-interval': 'Interval',
+  'explore-interval-examples': 'Explore interval examples',
+  'spec-description':
+    'Define rules for when this Workflow should run. You can add as many Schedule Specifications as you need to comprehensively describe the schedule. Specs can be calendar-based, cron-based, or interval-based.',
+  'spec-learn-more': 'Learn more about the Schedule Spec',
+  'add-another-spec': '+ Add another schedule spec',
 } as const;

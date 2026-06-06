@@ -1,5 +1,7 @@
 <script lang="ts">
   import Modal from '$lib/holocene/modal.svelte';
+  import { translate } from '$lib/i18n/translate';
+
   interface Props {
     open: boolean;
   }
@@ -14,20 +16,15 @@
   cancelText=""
   hideCancel
   large
-  confirmText="Got It"
+  confirmText={translate('common.got-it')}
 >
-  <h2 slot="title">Cron expression format</h2>
+  <h2 slot="title">{translate('schedules.cron-format-modal-title')}</h2>
   <div slot="content" class="flex flex-col gap-2">
     <p class="text-secondary">
-      Temporal Workflow Schedule Cron strings follow this format:
+      {translate('schedules.cron-view-example-description')}
     </p>
-    <pre class="w-full overflow-auto bg-code-block p-4 text-xs">
-┌───────────── minute (0 - 59)
-│ ┌───────────── hour (0 - 23)
-│ │ ┌───────────── day of the month (1 - 31)
-│ │ │ ┌───────────── month (1 - 12)
-│ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday)
-│ │ │ │ │
-* * * * *</pre>
+    <pre class="w-full overflow-auto bg-code-block p-4 text-xs">{translate(
+        'schedules.cron-format-diagram',
+      )}</pre>
   </div>
 </Modal>
