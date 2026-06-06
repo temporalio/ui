@@ -52,7 +52,7 @@ export function getInitialSpecData<T extends Spec['type']>(
     },
     month: {
       type: 'month',
-      daysOfMonth: [new Date().getDay().toString() as DayOfMonth],
+      daysOfMonth: [new Date().getDate().toString() as DayOfMonth],
       months: [(new Date().getMonth() + 1).toString() as Month],
       time: {
         hour: undefined,

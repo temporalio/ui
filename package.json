@@ -145,7 +145,7 @@
     "@temporalio/activity": "1.16.0",
     "@temporalio/client": "1.16.0",
     "@temporalio/common": "1.16.0",
-    "@temporalio/proto": "1.17.2",
+    "@temporalio/proto": "1.16.0",
     "@temporalio/worker": "1.16.0",
     "@temporalio/workflow": "1.16.0",
     "@types/cors": "^2.8.13",
