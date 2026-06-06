@@ -179,6 +179,18 @@
               data-testid="cancel-schedule-button"
               >{translate('common.cancel')}</Button
             >
+            {#if Boolean(schedule)}
+              <Button
+                disabled={$submitting || !writeActionsAreAllowed()}
+                variant="destructive"
+                type="button"
+                data-testid="delete-schedule-button"
+                leadingIcon="trash"
+                class="ml-auto hidden sm:inline-flex"
+              >
+                {translate('schedules.delete')}
+              </Button>
+            {/if}
           </div>
         </div>
 

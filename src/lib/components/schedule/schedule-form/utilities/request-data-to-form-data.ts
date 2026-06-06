@@ -82,12 +82,30 @@ const OVERLAP_POLICY_MAP: Record<string, ScheduleFormData['overlapPolicy']> = {
   AllowAll: 'AllowAll',
 };
 
-function parseOverlapPolicy(
+export function parseOverlapPolicy(
   value?: string | number | null,
 ): ScheduleFormData['overlapPolicy'] {
   if (!value) return 'Skip';
 
   return OVERLAP_POLICY_MAP[String(value)] ?? 'Skip';
+}
+
+function cronStringToSpec(
+  cronStr: string,
+): (ScheduleSpecItem & { type: 'cron' }) | undefined {
+  if (!cronStr) {
+    return;
+  }
+
+  const cleanCron = cronStr
+    // strip off any comment
+    .replace(/#.*$/gm, '')
+    .trim();
+
+  return {
+    type: 'cron',
+    cronString: cleanCron,
+  };
 }
 
 function parseCronSpecs(
@@ -96,15 +114,11 @@ function parseCronSpecs(
   const specs: (ScheduleSpecItem & { type: 'cron' })[] = [];
 
   for (const cron of schedule?.spec?.cronString ?? []) {
-    const cleanCron = cron
-      // strip off any comment
-      .replace(/#.*$/gm, '')
-      .trim();
+    const spec = cronStringToSpec(cron);
 
-    specs.push({
-      type: 'cron',
-      cronString: cleanCron,
-    });
+    if (spec) {
+      specs.push(spec);
+    }
   }
 
   return specs;
@@ -137,16 +151,22 @@ function parseCalendarField(
     .filter((n) => Number.isFinite(n));
 }
 
-function parseWeekAndMonthSpecs(
-  schedule: FullSchedule,
-): (ScheduleSpecItem & ({ type: 'week' } | { type: 'month' }))[] {
-  const specs: (ScheduleSpecItem & ({ type: 'week' } | { type: 'month' }))[] =
-    [];
+function parseCalendarSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
+  const specs: ScheduleSpecItem[] = [];
 
   const calendars =
     schedule?.spec?.structuredCalendar ?? schedule?.spec?.calendar ?? [];
 
   for (const calendar of calendars) {
+    // a calendar can actualy have come from a cron string
+    if (calendar.comment) {
+      const spec = cronStringToSpec(calendar.comment);
+      if (spec) {
+        specs.push(spec);
+        continue;
+      }
+    }
+
     const daysOfWeek = parseCalendarField(calendar?.dayOfWeek);
     const daysOfMonth = parseCalendarField(calendar?.dayOfMonth);
     const months = parseCalendarField(calendar?.month);
@@ -212,7 +232,7 @@ function parseIntervalSpecs(
 function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
   const specs: ScheduleSpecItem[] = [
     ...parseCronSpecs(schedule),
-    ...parseWeekAndMonthSpecs(schedule),
+    ...parseCalendarSpecs(schedule),
     ...parseIntervalSpecs(schedule),
   ];
 

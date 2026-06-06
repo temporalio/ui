@@ -3,6 +3,7 @@ export const Namespace = 'schedules' as const;
 export const Strings = {
   edit: 'Edit Schedule',
   create: 'Create Schedule',
+  delete: 'Delete Schedule',
   'fix-form-errors': 'Please fix the following errors:',
   editing: 'Editing Schedule...',
   creating: 'Creating Schedule...',
@@ -32,17 +33,24 @@ export const Strings = {
   'pause-modal-title': 'Pause Schedule?',
   'pause-modal-confirmation': 'Are you sure you want to pause {{schedule}}?',
   'pause-reason': 'Enter a reason for pausing the schedule.',
+  'pause-schedule-error': 'There was an error pausing the schedule. {{error}}',
   'unpause-modal-title': 'Unpause Schedule?',
   'unpause-modal-confirmation':
     'Are you sure you want to unpause {{schedule}}?',
   'unpause-reason': 'Enter a reason for unpausing the schedule.',
+  'unpause-schedule-error':
+    'There was an error unpausing the schedule. {{error}}',
   trigger: 'Trigger',
   'trigger-now': 'Trigger a run now',
   backfill: 'Backfill',
   'backfill-schedule': 'Backfill this schedule',
+  'backfill-schedule-error':
+    'There was an error backfilling the schedule. {{error}}',
   'more-options': 'More options',
   'trigger-modal-title': 'Trigger Immediately',
   'trigger-unspecified-title': 'Use Policy',
+  'trigger-schedule-error':
+    'There was an error triggering the schedule. {{error}}',
   'trigger-unspecified-description': "Use the Schedule's overlap policy.",
   'trigger-skip-title': 'Skip',
   'trigger-skip-description':

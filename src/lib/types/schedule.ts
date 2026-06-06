@@ -103,7 +103,6 @@ export type EndDateType = 'never' | 'on' | 'after';
 export type ScheduleStatus = 'Paused' | 'Running';
 
 export type OverlapPolicy =
-  | 'Unspecified'
   | 'Skip'
   | 'BufferOne'
   | 'BufferAll'

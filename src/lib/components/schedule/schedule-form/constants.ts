@@ -4,42 +4,6 @@ import {
   SECONDS as SECONDS_UNIT,
   type Unit,
 } from '$lib/holocene/duration-input/duration-input.svelte';
-import { translate } from '$lib/i18n/translate';
-
-import type { ScheduleFormData } from './schema';
-
-type OverlapPolicy = ScheduleFormData['overlapPolicy'];
-
-export const getOverlapPolicyContent = (): Record<
-  OverlapPolicy,
-  { isDefault?: boolean; label: string; description: string }
-> => ({
-  Skip: {
-    isDefault: true,
-    label: translate('schedules.overlap-skip-label'),
-    description: translate('schedules.overlap-skip-description'),
-  },
-  BufferOne: {
-    label: translate('schedules.overlap-buffer-one-label'),
-    description: translate('schedules.overlap-buffer-one-description'),
-  },
-  BufferAll: {
-    label: translate('schedules.overlap-buffer-all-label'),
-    description: translate('schedules.overlap-buffer-all-description'),
-  },
-  CancelOther: {
-    label: translate('schedules.overlap-cancel-other-label'),
-    description: translate('schedules.overlap-cancel-other-description'),
-  },
-  TerminateOther: {
-    label: translate('schedules.overlap-terminate-other-label'),
-    description: translate('schedules.overlap-terminate-other-description'),
-  },
-  AllowAll: {
-    label: translate('schedules.overlap-allow-all-label'),
-    description: translate('schedules.overlap-allow-all-description'),
-  },
-});
 
 const MONTHS_UNIT: Unit<'month(s)'> = {
   label: 'month(s)',

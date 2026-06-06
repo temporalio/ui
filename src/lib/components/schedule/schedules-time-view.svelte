@@ -17,7 +17,7 @@
 
   const timezoneHint = $derived(
     timezoneName.toLowerCase() === 'utc'
-      ? 'Universal Standard Time (UTC)'
+      ? translate('common.universal-standard-time')
       : timezoneName,
   );
 </script>

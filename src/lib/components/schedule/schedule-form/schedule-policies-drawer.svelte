@@ -18,7 +18,8 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { durationUnits, getOverlapPolicyContent } from './constants';
+  import { getOverlapPolicyContent } from '../constants';
+  import { durationUnits } from './constants';
   import {
     DEFAULT_CATCHUP_WINDOW,
     DEFAULT_EXECUTION_TIMEOUT,
