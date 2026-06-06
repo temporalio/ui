@@ -20,9 +20,9 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import {
-    getDefaultValues,
     type ScheduleFormData,
     scheduleFormSchema,
+    scheduleToFormData,
   } from './schema';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';
@@ -61,8 +61,8 @@
     schedule ? translate('common.save') : translate('schedules.create'),
   );
 
-  const initialValues = $derived(
-    getDefaultValues({
+  const initialFormValues = $derived(
+    scheduleToFormData({
       schedule,
       searchAttributes,
       customSearchAttributes: $customSearchAttributes,
@@ -71,7 +71,7 @@
   );
 
   // svelte-ignore state_referenced_locally
-  const superform = superForm(initialValues, {
+  const superform = superForm(initialFormValues, {
     SPA: true,
     dataType: 'json',
     validators: zodClient(scheduleFormSchema),

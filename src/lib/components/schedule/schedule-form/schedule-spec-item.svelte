@@ -50,6 +50,11 @@
   function onTypeChange(value: string) {
     const newType = value as ScheduleFormData['specs'][number]['type'];
     $form.specs[index] = getInitialSpecData(newType);
+
+    if ($errors.specs?.[index]?.type) {
+      delete $errors.specs[index].type;
+      $errors = $errors;
+    }
   }
 
   let isIntervalExampleModalOpen = $state(false);
@@ -73,7 +78,9 @@
           id="spec-type-{index}"
           label={translate('schedules.spec-type-label')}
           placeholder={translate('schedules.spec-type-placeholder')}
-          value={$form.specs[index].type}
+          value={$form.specs[index].type === 'unspecified'
+            ? undefined
+            : $form.specs[index].type}
           onChange={onTypeChange}
           valid={!$errors.specs?.[index]?.type?.[0]}
           error={$errors.specs?.[index]?.type?.[0]}

@@ -11,7 +11,7 @@
   import type { FullSchedule } from '$lib/types/schedule';
 
   import type { ScheduleFormData } from './schema';
-  import { SPEC_ITEM_NO_TYPE } from './schema';
+  import { getInitialSpecData } from './utilities/spec';
 
   import ScheduleSpecItem from './schedule-spec-item.svelte';
 
@@ -49,7 +49,7 @@
       return;
     }
 
-    $form.specs = [...$form.specs, { ...SPEC_ITEM_NO_TYPE }];
+    $form.specs = [...$form.specs, getInitialSpecData('unspecified')];
     expandedIndex = $form.specs.length - 1;
 
     await tick();

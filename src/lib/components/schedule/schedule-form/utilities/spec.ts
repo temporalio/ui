@@ -64,6 +64,9 @@ export function getInitialSpecData<T extends Spec['type']>(
       interval: undefined,
       phase: undefined,
     },
+    unspecified: {
+      type: 'unspecified',
+    },
   };
 
   return initial[type] as Extract<Spec, { type: T }>;
@@ -164,6 +167,10 @@ export function getSpecSummary(spec: Spec): string {
       });
     }
 
+    case 'unspecified': {
+      return '';
+    }
+
     default: {
       return '';
     }
@@ -189,6 +196,10 @@ export function getRawValue(spec: Spec): string {
     }
 
     case 'interval': {
+      return '';
+    }
+
+    case 'unspecified': {
       return '';
     }
 

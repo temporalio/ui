@@ -67,6 +67,9 @@ export const intervalUnits = [
 ];
 
 export const DAYS_OF_WEEK = ['0', '1', '2', '3', '4', '5', '6'] as const;
+export const DAYS_OF_WEEK_SET = new Set<string>(
+  DAYS_OF_WEEK as readonly string[],
+);
 
 export const DAYS_OF_MONTH = [
   '1',
@@ -101,6 +104,9 @@ export const DAYS_OF_MONTH = [
   '30',
   '31',
 ] as const;
+export const DAYS_OF_MONTH_SET = new Set<string>(
+  DAYS_OF_MONTH as readonly string[],
+);
 
 export const MONTHS = [
   '1',
@@ -116,6 +122,7 @@ export const MONTHS = [
   '11',
   '12',
 ] as const;
+export const MONTHS_SET = new Set<string>(MONTHS as readonly string[]);
 
 export const WEEKDAYS = ['1', '2', '3', '4', '5'] as const;
 export const WEEKEND = ['0', '6'] as const;

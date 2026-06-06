@@ -2,11 +2,20 @@ import { z } from 'zod/v3';
 
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 import { searchAttributesSchema } from '$lib/stores/search-attributes';
+import type { RangeSpec } from '$lib/types';
 import type { FullSchedule } from '$lib/types/schedule';
 import type { SearchAttributes } from '$lib/types/workflows';
+import { sortNumStrings } from '$lib/utilities/array';
 import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 
-import { DAYS_OF_MONTH, DAYS_OF_WEEK, MONTHS } from './constants';
+import {
+  DAYS_OF_MONTH,
+  DAYS_OF_MONTH_SET,
+  DAYS_OF_WEEK,
+  DAYS_OF_WEEK_SET,
+  MONTHS,
+  MONTHS_SET,
+} from './constants';
 import {
   DEFAULT_CATCHUP_WINDOW,
   DEFAULT_EXECUTION_TIMEOUT,
@@ -16,49 +25,43 @@ import {
 } from './policies-schema';
 import type { DayOfMonth, DayOfWeek, Month } from './types';
 import { isValidCronString } from './utilities/cron';
+import { expandRanges } from './utilities/range';
+import { getInitialSpecData } from './utilities/spec';
 
 import type { SearchAttribute } from '$types';
 
 export const scheduleSpecItemSchema = z
-  .discriminatedUnion(
-    'type',
-    [
-      z.object({
-        type: z.literal('cron'),
-        cronString: z.string().default(''),
+  .discriminatedUnion('type', [
+    z.object({
+      type: z.literal('unspecified'),
+    }),
+    z.object({
+      type: z.literal('cron'),
+      cronString: z.string().default(''),
+    }),
+    z.object({
+      type: z.literal('week'),
+      daysOfWeek: z.array(z.enum(DAYS_OF_WEEK)).min(1),
+      time: z.object({
+        hour: z.number().min(0).max(23).optional(),
+        minute: z.number().min(0).max(59).optional(),
       }),
-      z.object({
-        type: z.literal('week'),
-        daysOfWeek: z.array(z.enum(DAYS_OF_WEEK)).min(1),
-        time: z.object({
-          hour: z.number().min(0).max(23).optional(),
-          minute: z.number().min(0).max(59).optional(),
-        }),
+    }),
+    z.object({
+      type: z.literal('month'),
+      daysOfMonth: z.array(z.enum(DAYS_OF_MONTH)).min(1),
+      months: z.array(z.enum(MONTHS)).min(1),
+      time: z.object({
+        hour: z.number().min(0).max(23).optional(),
+        minute: z.number().min(0).max(59).optional(),
       }),
-      z.object({
-        type: z.literal('month'),
-        daysOfMonth: z.array(z.enum(DAYS_OF_MONTH)).min(1),
-        months: z.array(z.enum(MONTHS)).min(1),
-        time: z.object({
-          hour: z.number().min(0).max(23).optional(),
-          minute: z.number().min(0).max(59).optional(),
-        }),
-      }),
-      z.object({
-        type: z.literal('interval'),
-        interval: z.string().optional(),
-        phase: z.string().optional(),
-      }),
-    ],
-    {
-      errorMap: (issue, ctx) => {
-        if (issue.code === z.ZodIssueCode.invalid_union_discriminator) {
-          return { message: 'Schedule type is required' };
-        }
-        return { message: ctx.defaultError };
-      },
-    },
-  )
+    }),
+    z.object({
+      type: z.literal('interval'),
+      interval: z.string().optional(),
+      phase: z.string().optional(),
+    }),
+  ])
   .superRefine((val, ctx) => {
     switch (val.type) {
       case 'cron': {
@@ -109,20 +112,19 @@ export const scheduleSpecItemSchema = z
 
         return;
       }
+
+      case 'unspecified': {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Spec type is required',
+          path: ['type'],
+        });
+        return;
+      }
     }
   });
 
 export type ScheduleSpecItem = z.infer<typeof scheduleSpecItemSchema>;
-
-export const DEFAULT_SPEC_ITEM: ScheduleSpecItem = {
-  type: 'cron',
-  cronString: '',
-};
-
-export const SPEC_ITEM_NO_TYPE: ScheduleSpecItem = {
-  ...DEFAULT_SPEC_ITEM,
-  type: undefined,
-};
 
 export const scheduleFormSchema = z
   .object({
@@ -167,91 +169,124 @@ export const scheduleFormSchema = z
 
 export type ScheduleFormData = z.infer<typeof scheduleFormSchema>;
 
-export const getDefaultValues = (params: {
-  schedule: FullSchedule | null;
-  searchAttributes: SearchAttribute;
-  customSearchAttributes: SearchAttributes;
-  scheduleId: string;
-}): ScheduleFormData => {
-  const {
-    schedule,
-    searchAttributes = {},
-    customSearchAttributes = {},
-    scheduleId,
-  } = params;
+const stringOrDefault = (
+  value: string | number | object | null | undefined,
+  fallback: string,
+): string => (value ? String(value) : fallback);
 
-  const decodedSearchAttributes = parsePayloadAttributes({ searchAttributes });
-  const decodedWorkflowSearchAttributes = parsePayloadAttributes({
-    searchAttributes: schedule?.action?.startWorkflow?.searchAttributes ?? {},
-  });
-
+const decodeSearchAttributeRows = (
+  searchAttributes: SearchAttribute,
+  customSearchAttributes: SearchAttributes,
+): ScheduleFormData['searchAttributes'] => {
+  const decoded = parsePayloadAttributes({ searchAttributes });
   const indexedFields =
-    decodedSearchAttributes?.searchAttributes.indexedFields ??
-    ({} as { [k: string]: string });
-  const workflowIndexedFields =
-    decodedWorkflowSearchAttributes?.searchAttributes.indexedFields ??
-    ({} as { [k: string]: string });
+    decoded?.searchAttributes.indexedFields ?? ({} as Record<string, string>);
 
-  const searchAttributesInput = Object.entries(indexedFields).map(
-    ([label, value]) => ({
-      label,
-      value,
-      type: customSearchAttributes[label],
-    }),
-  );
-
-  const workflowSearchAttributesInput = Object.entries(
-    workflowIndexedFields,
-  ).map(([label, value]) => ({
+  return Object.entries(indexedFields).map(([label, value]) => ({
     label,
     value,
     type: customSearchAttributes[label],
   }));
+};
 
-  const specs = schedule
-    ? parseScheduleSpecs(schedule)
-    : [{ ...DEFAULT_SPEC_ITEM }];
+const parseEndCondition = (
+  schedule: FullSchedule | null,
+  nowIsoString: string,
+): Pick<
+  ScheduleFormData,
+  'endDateType' | 'endDate' | 'endAfterOccurrences'
+> => {
+  const remainingActions =
+    schedule?.state?.limitedActions && schedule?.state?.remainingActions
+      ? Number(schedule.state.remainingActions)
+      : undefined;
 
+  const endDate = stringOrDefault(schedule?.spec?.endTime, nowIsoString);
+
+  if (remainingActions) {
+    return {
+      endDateType: 'after',
+      endDate,
+      endAfterOccurrences: remainingActions,
+    };
+  }
+
+  if (schedule?.spec?.endTime) {
+    return { endDateType: 'on', endDate, endAfterOccurrences: undefined };
+  }
+
+  return { endDateType: 'never', endDate, endAfterOccurrences: undefined };
+};
+
+type ScheduleToFormDataParams = {
+  schedule: FullSchedule | null;
+  searchAttributes: SearchAttribute;
+  customSearchAttributes: SearchAttributes;
+  scheduleId: string;
+};
+
+// Inverse of the form -> proto mapping in `$lib/stores/schedules`: reads a
+// Describe response (or `null` when creating) into the flat `ScheduleFormData`.
+export const scheduleToFormData = ({
+  schedule,
+  searchAttributes = {},
+  customSearchAttributes = {},
+  scheduleId,
+}: ScheduleToFormDataParams): ScheduleFormData => {
+  const startWorkflow = schedule?.action?.startWorkflow;
+  const spec = schedule?.spec;
+  const policies = schedule?.policies;
   const nowIsoString = new Date().toISOString();
 
   return {
     name: scheduleId ?? '',
-    workflowType: schedule?.action?.startWorkflow?.workflowType?.name ?? '',
-    workflowId: schedule?.action?.startWorkflow?.workflowId ?? '',
-    taskQueue: schedule?.action?.startWorkflow?.taskQueue?.name ?? '',
+    workflowType: startWorkflow?.workflowType?.name ?? '',
+    workflowId: startWorkflow?.workflowId ?? '',
+    taskQueue: startWorkflow?.taskQueue?.name ?? '',
+
     input: '',
     editInput: !schedule,
     encoding: 'json/plain',
     messageType: '',
-    specs,
-    timezoneName: schedule?.spec?.timezoneName ?? 'UTC',
-    startDate: schedule?.spec?.startTime
-      ? String(schedule.spec.startTime)
-      : nowIsoString,
-    endDateType: schedule?.spec?.endTime ? 'on' : 'never',
-    endDate: schedule?.spec?.endTime
-      ? String(schedule.spec.endTime)
-      : nowIsoString,
-    endAfterOccurrences: undefined,
-    jitter: schedule?.spec?.jitter ? String(schedule.spec.jitter) : '0',
-    overlapPolicy: parseOverlapPolicy(schedule?.policies?.overlapPolicy),
-    catchupWindow: schedule?.policies?.catchupWindow
-      ? String(schedule.policies.catchupWindow)
-      : DEFAULT_CATCHUP_WINDOW,
-    pauseOnFailure: schedule?.policies?.pauseOnFailure ?? false,
+
+    specs: schedule
+      ? parseScheduleSpecs(schedule)
+      : [getInitialSpecData('cron')],
+    timezoneName: spec?.timezoneName ?? 'UTC',
+    startDate: stringOrDefault(spec?.startTime, nowIsoString),
+    jitter: stringOrDefault(spec?.jitter, '0'),
+    ...parseEndCondition(schedule, nowIsoString),
+
+    overlapPolicy: parseOverlapPolicy(policies?.overlapPolicy),
+    catchupWindow: stringOrDefault(
+      policies?.catchupWindow,
+      DEFAULT_CATCHUP_WINDOW,
+    ),
+    pauseOnFailure: policies?.pauseOnFailure ?? false,
     pauseSchedule: schedule?.state?.paused ?? false,
-    taskTimeout: schedule?.action?.startWorkflow?.workflowTaskTimeout
-      ? String(schedule.action.startWorkflow.workflowTaskTimeout)
-      : DEFAULT_TASK_TIMEOUT,
-    runTimeout: schedule?.action?.startWorkflow?.workflowRunTimeout
-      ? String(schedule.action.startWorkflow.workflowRunTimeout)
-      : DEFAULT_RUN_TIMEOUT,
-    executionTimeout: schedule?.action?.startWorkflow?.workflowExecutionTimeout
-      ? String(schedule.action.startWorkflow.workflowExecutionTimeout)
-      : DEFAULT_EXECUTION_TIMEOUT,
-    keepOriginalWorkflowId: schedule?.policies?.keepOriginalWorkflowId ?? false,
-    searchAttributes: searchAttributesInput,
-    workflowSearchAttributes: workflowSearchAttributesInput,
+    keepOriginalWorkflowId: policies?.keepOriginalWorkflowId ?? false,
+
+    taskTimeout: stringOrDefault(
+      startWorkflow?.workflowTaskTimeout,
+      DEFAULT_TASK_TIMEOUT,
+    ),
+    runTimeout: stringOrDefault(
+      startWorkflow?.workflowRunTimeout,
+      DEFAULT_RUN_TIMEOUT,
+    ),
+    executionTimeout: stringOrDefault(
+      startWorkflow?.workflowExecutionTimeout,
+      DEFAULT_EXECUTION_TIMEOUT,
+    ),
+
+    searchAttributes: decodeSearchAttributeRows(
+      searchAttributes,
+      customSearchAttributes,
+    ),
+    workflowSearchAttributes: decodeSearchAttributeRows(
+      startWorkflow?.searchAttributes ?? {},
+      customSearchAttributes,
+    ),
   };
 };
 
@@ -274,85 +309,139 @@ function parseOverlapPolicy(
   value?: string | number | null,
 ): ScheduleFormData['overlapPolicy'] {
   if (!value) return 'Skip';
+
   return OVERLAP_POLICY_MAP[String(value)] ?? 'Skip';
 }
 
-function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
-  const specs: ScheduleSpecItem[] = [];
+function parseCronSpecs(
+  schedule: FullSchedule,
+): (ScheduleSpecItem & { type: 'cron' })[] {
+  const specs: (ScheduleSpecItem & { type: 'cron' })[] = [];
 
-  const cronStrings = schedule?.spec?.cronString ?? [];
-  for (const cron of cronStrings) {
-    const cleanCron = cron.includes('#') ? cron.split('#')[0].trim() : cron;
+  for (const cron of schedule?.spec?.cronString ?? []) {
+    const cleanCron = cron
+      // strip off any comment
+      .replace(/#.*$/gm, '')
+      .trim();
+
     specs.push({
       type: 'cron',
       cronString: cleanCron,
     });
   }
 
-  const intervals = schedule?.spec?.interval ?? [];
-  for (const interval of intervals) {
-    const intervalStr = interval?.interval?.toString() ?? '0s';
-    const phaseStr = interval?.phase?.toString() ?? '';
-    specs.push({
-      type: 'interval',
-      interval: intervalStr,
-      phase: phaseStr,
-    });
+  return specs;
+}
+
+// Calendar fields arrive as `IRange[]` from `structuredCalendar` (the modern
+// describe response) or comma-separated strings from the deprecated `calendar`.
+// Normalize either shape into a sorted list of numbers.
+function parseCalendarField(
+  field: RangeSpec[] | string | number | null | undefined,
+): number[] {
+  if (field == null) return [];
+
+  if (Array.isArray(field)) {
+    if (field.length > 0 && typeof field[0] === 'object') {
+      return expandRanges(field as RangeSpec[]);
+    }
+
+    return (field as (string | number)[])
+      .flatMap((v) => String(v).split(','))
+      .map((v) => Number(v.trim()))
+      .filter((n) => Number.isFinite(n));
   }
+
+  return String(field)
+    .split(',')
+    .map((v) => v.trim())
+    .filter((v) => v && v !== '*')
+    .map(Number)
+    .filter((n) => Number.isFinite(n));
+}
+
+function parseWeekAndMonthSpecs(
+  schedule: FullSchedule,
+): (ScheduleSpecItem & ({ type: 'week' } | { type: 'month' }))[] {
+  const specs: (ScheduleSpecItem & ({ type: 'week' } | { type: 'month' }))[] =
+    [];
 
   const calendars =
     schedule?.spec?.structuredCalendar ?? schedule?.spec?.calendar ?? [];
 
-  for (const cal of calendars) {
-    const hasDayOfWeek =
-      cal?.dayOfWeek &&
-      (Array.isArray(cal.dayOfWeek)
-        ? cal.dayOfWeek.length > 0
-        : !!cal.dayOfWeek);
-    const hasDayOfMonth =
-      cal?.dayOfMonth &&
-      (Array.isArray(cal.dayOfMonth)
-        ? cal.dayOfMonth.length > 0
-        : !!cal.dayOfMonth);
+  for (const calendar of calendars) {
+    const daysOfWeek = parseCalendarField(calendar?.dayOfWeek);
+    const daysOfMonth = parseCalendarField(calendar?.dayOfMonth);
+    const months = parseCalendarField(calendar?.month);
+    const hoursField = parseCalendarField(calendar?.hour);
+    const minutesField = parseCalendarField(calendar?.minute);
 
-    if (hasDayOfWeek && !hasDayOfMonth) {
+    const time = {
+      hour: hoursField.length > 0 ? hoursField[0] : 0,
+      minute: minutesField.length > 0 ? minutesField[0] : 0,
+    };
+
+    if (daysOfWeek.length && !daysOfMonth.length) {
       specs.push({
         type: 'week',
-        daysOfWeek: (Array.isArray(cal.dayOfWeek)
-          ? cal.dayOfWeek.map(String)
-          : [String(cal.dayOfWeek)]
-        ).filter((d): d is DayOfWeek =>
-          (DAYS_OF_WEEK as readonly string[]).includes(d),
+        time,
+        daysOfWeek: sortNumStrings(
+          daysOfWeek
+            .map((d) => String(d))
+            .filter((d): d is DayOfWeek => DAYS_OF_WEEK_SET.has(d)),
         ),
-        time: {
-          hour: Array.isArray(cal.hour)
-            ? Number(cal.hour[0])
-            : Number(cal.hour),
-          minute: Array.isArray(cal.minute)
-            ? Number(cal.minute[0])
-            : Number(cal.minute),
-        },
       });
-    } else {
-      specs.push({
-        type: 'month',
-        daysOfMonth: Array.isArray(cal.dayOfMonth)
-          ? cal.dayOfMonth.map((d) => String(d) as DayOfMonth)
-          : [String(cal.dayOfMonth ?? 1) as DayOfMonth],
-        months: Array.isArray(cal.month)
-          ? cal.month.map((m) => String(m) as Month)
-          : [String(cal.month ?? '') as Month],
-        time: {
-          hour: Array.isArray(cal.hour)
-            ? Number(cal.hour[0])
-            : Number(cal.hour),
-          minute: Array.isArray(cal.minute)
-            ? Number(cal.minute[0])
-            : Number(cal.minute),
-        },
-      });
+      continue;
     }
+
+    specs.push({
+      type: 'month',
+      time,
+      daysOfMonth: sortNumStrings(
+        daysOfMonth
+          .map((d) => String(d))
+          .filter((d): d is DayOfMonth => DAYS_OF_MONTH_SET.has(d)),
+      ),
+      months: sortNumStrings(
+        months
+          .map((m) => String(m))
+          .filter((m): m is Month => MONTHS_SET.has(m)),
+      ),
+    });
   }
 
-  return specs.length > 0 ? specs : [{ ...DEFAULT_SPEC_ITEM }];
+  return specs;
+}
+
+function parseIntervalSpecs(
+  schedule: FullSchedule,
+): (ScheduleSpecItem & { type: 'interval' })[] {
+  const specs: (ScheduleSpecItem & { type: 'interval' })[] = [];
+
+  for (const interval of schedule?.spec?.interval ?? []) {
+    const intervalDurationStr = interval?.interval?.toString() ?? '0s';
+    const phaseDurationStr = interval?.phase?.toString() ?? '0s';
+
+    specs.push({
+      type: 'interval',
+      interval: intervalDurationStr,
+      phase: phaseDurationStr,
+    });
+  }
+
+  return specs;
+}
+
+function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
+  const specs: ScheduleSpecItem[] = [
+    ...parseCronSpecs(schedule),
+    ...parseWeekAndMonthSpecs(schedule),
+    ...parseIntervalSpecs(schedule),
+  ];
+
+  if (specs.length) {
+    return specs;
+  }
+
+  return [getInitialSpecData('cron')];
 }
