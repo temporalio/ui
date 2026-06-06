@@ -54,7 +54,7 @@
     $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed(),
   );
 
-  $effect(() => {
+  $effect.pre(() => {
     refreshCurrentScheduleFetch({ namespace, scheduleId });
 
     return () => {
