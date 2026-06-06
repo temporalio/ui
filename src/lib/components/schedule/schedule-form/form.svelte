@@ -19,11 +19,8 @@
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  import {
-    type ScheduleFormData,
-    scheduleFormSchema,
-    scheduleToFormData,
-  } from './schema';
+  import { type ScheduleFormData, scheduleFormSchema } from './schema';
+  import { scheduleToFormData } from './serialization';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';
   import SchedulePoliciesCard from './schedule-policies-card.svelte';

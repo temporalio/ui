@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { FullSchedule } from '$lib/types/schedule';
 
-import { scheduleToFormData } from './schema';
+import { scheduleToFormData } from './serialization';
 
 const baseParams = {
   searchAttributes: {},
