@@ -7,7 +7,6 @@
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import ScheduleInput from '$lib/components/schedule/schedule-input.svelte';
   import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
-  import ScheduleWorkflowRuns from '$lib/components/schedule/schedule-workflow-runs.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -45,6 +44,8 @@
   import TriggerScheduleModal from '../schedule-action-modals/trigger-schedule-modal.svelte';
   import { parseOverlapPolicy } from '../schedule-form/utilities/request-data-to-form-data';
 
+  import ScheduleInputCard from './schedule-input-card.svelte';
+  import ScheduleSpecCard from './schedule-spec-card.svelte';
   import ScheduleViewError from './schedule-view-error.svelte';
   import ScheduleViewLoading from './schedule-view-loading.svelte';
   import WorkflowRunsCard from './workflow-runs-card.svelte';
@@ -241,12 +242,13 @@
           <ScheduleAdvancedSettings schedule={currentSchedule} />
           <ScheduleSearchAttributes schedule={currentSchedule} />
         </div>
+
         <div class="flex w-full flex-col gap-4 xl:w-1/3">
-          <ScheduleInput
+          <ScheduleInputCard
             {scheduleId}
             input={currentSchedule?.schedule?.action?.startWorkflow?.input}
           />
-          <ScheduleFrequencyPanel spec={currentSchedule?.schedule?.spec} />
+          <ScheduleSpecCard schedule={currentSchedule} />
         </div>
       </div>
     </div>

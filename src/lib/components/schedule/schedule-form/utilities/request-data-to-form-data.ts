@@ -245,8 +245,8 @@ function parseScheduleSpecs(schedule: FullSchedule): ScheduleSpecItem[] {
 
 type ScheduleToFormDataParams = {
   schedule: FullSchedule | null;
-  searchAttributes: SearchAttribute;
-  customSearchAttributes: SearchAttributes;
+  searchAttributes?: SearchAttribute;
+  customSearchAttributes?: SearchAttributes;
   scheduleId: string;
 };
 

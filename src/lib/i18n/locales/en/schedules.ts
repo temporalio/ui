@@ -121,6 +121,9 @@ export const Strings = {
   'getting-started-cli-link-preface': 'or get started with',
   'add-schedule-attr': 'Schedule Attributes',
   'add-workflow-attr': 'Workflow Attributes',
+  'schedule-specs': 'Schedule Specs',
+  'schedule-specs-description':
+    'This Schedule will run at the union of all times and intervals represented in the inputs provided to the Schedule.',
   'view-full-spec': 'View Full Spec',
   'hide-full-spec': 'Hide Full Spec',
   'spec-summary-everyday': 'Everyday at {{- time}}',
