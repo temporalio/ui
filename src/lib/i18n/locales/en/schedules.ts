@@ -22,6 +22,10 @@ export const Strings = {
   'workflow-runs': 'Workflow Runs',
   'recent-runs': 'Recent Runs',
   'recent-runs-empty-state-title': 'No Recent Runs',
+  'workflow-runs-empty-state-title':
+    'This Schedule hasn’t triggered any Workflow Execution runs yet.',
+  'workflow-runs-empty-state-description':
+    'Runs will appear here once triggered.',
   'upcoming-runs': 'Upcoming Runs',
   'upcoming-runs-empty-state-title': 'No Upcoming Runs',
   loading: 'Loading Schedule...',

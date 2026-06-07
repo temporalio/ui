@@ -1,9 +1,8 @@
 <script lang="ts">
+  import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { routeForSchedules } from '$lib/utilities/route-for';
-
-  import ScheduleError from '../schedule-error.svelte';
 
   interface Props {
     namespace: string;
@@ -27,4 +26,9 @@
     </p>
   </div>
 </header>
-<ScheduleError error={errorMessage} />
+<Alert intent="error">
+  <p>{translate('schedules.error-title')}</p>
+  <p>
+    {errorMessage}
+  </p>
+</Alert>

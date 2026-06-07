@@ -47,6 +47,7 @@
 
   import ScheduleViewError from './schedule-view-error.svelte';
   import ScheduleViewLoading from './schedule-view-loading.svelte';
+  import WorkflowRunsCard from './workflow-runs-card.svelte';
 
   const namespace = $derived(page.params.namespace);
   const scheduleId = $derived(decodeURIForSvelte(page.params.schedule));
@@ -228,12 +229,14 @@
       {/if}
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
-          <ScheduleWorkflowRuns
+          <WorkflowRunsCard
             {namespace}
             schedule={currentSchedule}
             {workflowQuery}
-            triggerConfirmation={() => openConfirmationModal('trigger')}
-            backfillConfirmation={() => openConfirmationModal('backfill')}
+            openTriggerConfirmationModal={() =>
+              openConfirmationModal('trigger')}
+            openBackfillConfirmationModal={() =>
+              openConfirmationModal('backfill')}
           />
           <ScheduleAdvancedSettings schedule={currentSchedule} />
           <ScheduleSearchAttributes schedule={currentSchedule} />
