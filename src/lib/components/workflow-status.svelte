@@ -38,7 +38,7 @@
 
   const workflowStatus = cva(
     [
-      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap text-black gap-1 font-medium',
+      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap text-black gap-0.5 font-medium',
     ],
     {
       variants: {
@@ -84,7 +84,7 @@
 >
   <div
     class={merge(
-      'relative flex items-center gap-0 text-center text-xs leading-4',
+      '[] relative flex items-center gap-0 text-center text-xs leading-4',
       big && 'text-lg',
     )}
     data-testid={testId || 'workflow-status'}

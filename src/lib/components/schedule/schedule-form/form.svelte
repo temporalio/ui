@@ -25,7 +25,7 @@
 
   import { type ScheduleFormData, scheduleFormSchema } from './schema';
   import { scheduleToFormData } from './utilities/request-data-to-form-data';
-  import DeleteScheduleModal from '../schedule-view/delete-schedule-modal.svelte';
+  import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';
   import SchedulePoliciesCard from './schedule-policies-card.svelte';

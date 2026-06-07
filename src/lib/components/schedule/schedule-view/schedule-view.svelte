@@ -9,9 +9,10 @@
   import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
   import ScheduleWorkflowRuns from '$lib/components/schedule/schedule-workflow-runs.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
-  import Timestamp from '$lib/components/timestamp.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -29,21 +30,23 @@
     workflowCount,
     refresh as workflowRefresh,
   } from '$lib/stores/workflows';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import {
     routeForScheduleEdit,
     routeForSchedules,
+    routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  import BackfillScheduleModal from '../schedule-action-modals/backfill-schedule-modal.svelte';
+  import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
+  import PauseScheduleModal from '../schedule-action-modals/pause-schedule-modal.svelte';
+  import TriggerScheduleModal from '../schedule-action-modals/trigger-schedule-modal.svelte';
   import { parseOverlapPolicy } from '../schedule-form/utilities/request-data-to-form-data';
 
-  import BackfillScheduleModal from './backfill-schedule-modal.svelte';
-  import DeleteScheduleModal from './delete-schedule-modal.svelte';
-  import PauseScheduleModal from './pause-schedule-modal.svelte';
   import ScheduleViewError from './schedule-view-error.svelte';
   import ScheduleViewLoading from './schedule-view-loading.svelte';
-  import TriggerScheduleModal from './trigger-schedule-modal.svelte';
 
   const namespace = $derived(page.params.namespace);
   const scheduleId = $derived(decodeURIForSvelte(page.params.schedule));
@@ -61,6 +64,8 @@
       clearScheduleTimeouts();
     };
   });
+
+  const { copy, copied } = copyToClipboard();
 </script>
 
 {#await $currentScheduleFetch}
@@ -69,114 +74,150 @@
   {#if $loading || !currentSchedule}
     <Loading class="my-2" />
   {:else}
-    <header class="flex flex-row flex-wrap justify-between gap-2">
-      <div class="relative flex flex-col gap-2">
-        <Link href={routeForSchedules({ namespace })} icon="chevron-left">
-          {translate('schedules.back-to-schedules')}
-        </Link>
-        <div class="mt-2 flex flex-wrap items-center gap-2">
-          <WorkflowStatus
-            status={currentSchedule?.schedule.state.paused
-              ? 'Paused'
-              : 'Running'}
-          />
-          <h1 class="select-all" data-testid="schedule-name">
+    <header class="mb-2 flex flex-col gap-4">
+      <Link href={routeForSchedules({ namespace })} icon="chevron-left">
+        {translate('schedules.back-to-schedules')}
+      </Link>
+      <div class="flex items-start justify-between">
+        <div class="flex flex-col gap-2">
+          <h1
+            class="flex select-all flex-wrap items-center gap-2 text-3xl"
+            data-testid="schedule-name"
+          >
+            <WorkflowStatus
+              status={currentSchedule?.schedule.state.paused
+                ? 'Paused'
+                : 'Running'}
+            />
             {scheduleId}
           </h1>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <p class="text-sm font-medium text-secondary">Workflow Type</p>
-          <p>
-            {currentSchedule?.schedule?.action?.startWorkflow?.workflowType
-              ?.name}
-          </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <Timestamp
-            as="p"
-            class="flex items-center gap-2 text-right"
-            dateTime={currentSchedule?.info?.createTime}
-          >
-            {#snippet leading()}
-              <span class="text-sm font-medium text-secondary"> Created </span>
-            {/snippet}
-          </Timestamp>
-        </div>
-        {#if currentSchedule?.info?.updateTime}
-          <div class="flex flex-wrap items-center gap-2">
-            <Timestamp
-              as="p"
-              class="flex items-center gap-2 text-right"
-              dateTime={currentSchedule?.info?.updateTime}
-            >
-              {#snippet leading()}
-                <span class="text-sm font-medium text-secondary">
-                  Last Updated
-                </span>
-              {/snippet}
-            </Timestamp>
-          </div>
-        {/if}
-        <div class="flex w-full flex-col gap-2">
-          <p class="text-sm font-medium text-secondary">Total Workflows</p>
 
-          <div class="flex items-center gap-2">
-            <span class="font-mono" data-testid="workflow-count"
-              >{$workflowCount.count.toLocaleString()}
-            </span>
-            <Button
-              size="xs"
-              variant="ghost"
-              leadingIcon="retry"
-              on:click={() => {
-                refreshCurrentScheduleFetch({ namespace, scheduleId });
-                $workflowRefresh = Date.now();
-              }}
-            >
-              {#if $workflowCount.newCount > 0}
-                +{$workflowCount.newCount.toLocaleString()}
-              {/if}
-            </Button>
-          </div>
-          <StatusCounts staticQuery={workflowQuery} />
+          <dl class="contents">
+            <div class="flex items-center gap-2">
+              <dt class="text-sm font-medium text-secondary">Workflow Type</dt>
+              <dd class="inline-flex items-center gap-1">
+                {currentSchedule?.schedule?.action?.startWorkflow?.workflowType
+                  ?.name}
+                <div class="flex items-center gap-2">
+                  <Link
+                    class="block p-1"
+                    href={routeForWorkflowsWithQuery({
+                      namespace,
+                      query: [
+                        `WorkflowType="${
+                          currentSchedule?.schedule?.action?.startWorkflow
+                            ?.workflowType?.name
+                        }"`,
+                        `TemporalScheduledById="${scheduleId}"`,
+                      ].join(' AND '),
+                    })}
+                  >
+                    <Icon
+                      name="filter"
+                      title="Filter scheduled workflows by this type"
+                      class="h-4 w-4"
+                    />
+                  </Link>
+                  <button
+                    class="p-1 text-secondary"
+                    onclick={(e) => {
+                      copy(
+                        e,
+                        currentSchedule?.schedule?.action?.startWorkflow
+                          ?.workflowType?.name,
+                      );
+                    }}
+                  >
+                    <Icon
+                      title={$copied
+                        ? translate('common.copy-success-icon-title')
+                        : translate('common.copy-icon-title')}
+                      name={$copied ? 'checkmark' : 'copy'}
+                      class="h-4 w-4"
+                    />
+                  </button>
+                </div>
+              </dd>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <dt class="text-sm font-medium text-secondary">Created</dt>
+              <dd>
+                {$timestamp(currentSchedule?.info?.createTime)}
+              </dd>
+            </div>
+
+            {#if currentSchedule?.info.updateTime}
+              <div class="flex items-center gap-2">
+                <dt class="text-sm font-medium text-secondary">Last Updated</dt>
+                <dd>
+                  {$timestamp(currentSchedule?.info?.updateTime)}
+                </dd>
+              </div>
+            {/if}
+          </dl>
         </div>
+
+        <SplitButton
+          position="right"
+          label={currentSchedule?.schedule?.state?.paused
+            ? translate('schedules.unpause')
+            : translate('schedules.pause')}
+          menuLabel={translate('schedules.schedule-actions')}
+          id="schedule-actions"
+          disabled={editDisabled}
+          on:click={() => openConfirmationModal('pause')}
+        >
+          <MenuItem
+            data-testid="trigger-schedule"
+            onclick={() => openConfirmationModal('trigger')}
+          >
+            {translate('schedules.trigger')}
+          </MenuItem>
+          <MenuItem
+            data-testid="backfill-schedule"
+            onclick={() => openConfirmationModal('backfill')}
+          >
+            {translate('schedules.backfill')}
+          </MenuItem>
+          <MenuItem
+            data-testid="edit-schedule"
+            href={routeForScheduleEdit({ namespace, scheduleId })}
+          >
+            {translate('common.edit')}
+          </MenuItem>
+          <MenuItem
+            data-testid="delete-schedule"
+            destructive
+            onclick={() => openConfirmationModal('delete')}
+          >
+            {translate('common.delete')}
+          </MenuItem>
+        </SplitButton>
       </div>
-      <SplitButton
-        position="right"
-        label={currentSchedule?.schedule?.state?.paused
-          ? translate('schedules.unpause')
-          : translate('schedules.pause')}
-        menuLabel={translate('schedules.schedule-actions')}
-        id="schedule-actions"
-        disabled={editDisabled}
-        on:click={() => openConfirmationModal('pause')}
-      >
-        <MenuItem
-          data-testid="trigger-schedule"
-          onclick={() => openConfirmationModal('trigger')}
-        >
-          {translate('schedules.trigger')}
-        </MenuItem>
-        <MenuItem
-          data-testid="backfill-schedule"
-          onclick={() => openConfirmationModal('backfill')}
-        >
-          {translate('schedules.backfill')}
-        </MenuItem>
-        <MenuItem
-          data-testid="edit-schedule"
-          href={routeForScheduleEdit({ namespace, scheduleId })}
-        >
-          {translate('common.edit')}
-        </MenuItem>
-        <MenuItem
-          data-testid="delete-schedule"
-          destructive
-          onclick={() => openConfirmationModal('delete')}
-        >
-          {translate('common.delete')}
-        </MenuItem>
-      </SplitButton>
+
+      <dl class="flex flex-col gap-2">
+        <dt class="text-sm font-medium text-secondary">Total Workflows</dt>
+        <dd class="flex flex-wrap items-center gap-2">
+          <span class="font-mono" data-testid="workflow-count"
+            >{$workflowCount.count.toLocaleString()}
+          </span>
+          <Button
+            size="xs"
+            variant="ghost"
+            leadingIcon="retry"
+            on:click={() => {
+              refreshCurrentScheduleFetch({ namespace, scheduleId });
+              $workflowRefresh = Date.now();
+            }}
+          >
+            {#if $workflowCount.newCount > 0}
+              +{$workflowCount.newCount.toLocaleString()}
+            {/if}
+          </Button>
+          <StatusCounts class="p-0" staticQuery={workflowQuery} />
+        </dd>
+      </dl>
     </header>
     <CodecServerErrorBanner />
     <div class="flex flex-col gap-4 pb-24">
