@@ -8,8 +8,8 @@
   import { translate } from '$lib/i18n/translate';
   import { formatDuration } from '$lib/utilities/format-time';
 
-  import type { ScheduleFormData } from './schema';
   import { getOverlapPolicyContent } from '../constants';
+  import type { ScheduleFormData } from '../schema/schema';
 
   import SchedulesPoliciesDrawer from './schedule-policies-drawer.svelte';
 

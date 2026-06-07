@@ -19,16 +19,18 @@
   import { translate } from '$lib/i18n/translate';
 
   import { getOverlapPolicyContent } from '../constants';
-  import { durationUnits } from './constants';
+  import { durationUnits } from '../constants';
   import {
     DEFAULT_CATCHUP_WINDOW,
     DEFAULT_EXECUTION_TIMEOUT,
     DEFAULT_RUN_TIMEOUT,
     DEFAULT_TASK_TIMEOUT,
+  } from '../constants';
+  import {
     type SchedulePoliciesData,
     schedulePoliciesSchema,
-  } from './policies-schema';
-  import type { ScheduleFormData } from './schema';
+  } from '../schema/policies-schema';
+  import type { ScheduleFormData } from '../schema/schema';
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];

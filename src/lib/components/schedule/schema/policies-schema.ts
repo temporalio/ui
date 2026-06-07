@@ -1,12 +1,6 @@
 import { z } from 'zod/v3';
 
-const ONE_YEAR_SECONDS = 365 * 24 * 60 * 60;
-const MIN_CATCHUP_SECONDS = 10;
-
-export const DEFAULT_CATCHUP_WINDOW = `${ONE_YEAR_SECONDS}s`;
-export const DEFAULT_TASK_TIMEOUT = '30s';
-export const DEFAULT_RUN_TIMEOUT = '120s';
-export const DEFAULT_EXECUTION_TIMEOUT = '14400s';
+import { MIN_CATCHUP_SECONDS } from '../constants';
 
 const durationToSeconds = (value: string): number | null => {
   if (!value) return null;

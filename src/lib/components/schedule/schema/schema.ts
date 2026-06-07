@@ -3,9 +3,9 @@ import { z } from 'zod/v3';
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 import { searchAttributesSchema } from '$lib/stores/search-attributes';
 
-import { DAYS_OF_MONTH, DAYS_OF_WEEK, MONTHS } from './constants';
+import { DAYS_OF_MONTH, DAYS_OF_WEEK, MONTHS } from '../constants';
 import { schedulePoliciesSchema } from './policies-schema';
-import { isValidCronString } from './utilities/cron';
+import { isValidCronString } from '../utilities/cron';
 
 export const scheduleSpecItemSchema = z
   .discriminatedUnion('type', [

@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import type { FullSchedule } from '$lib/types/schedule';
 
+import { scheduleToFormData } from './request-data-to-form-data';
 import {
   DEFAULT_CATCHUP_WINDOW,
   DEFAULT_EXECUTION_TIMEOUT,
   DEFAULT_RUN_TIMEOUT,
   DEFAULT_TASK_TIMEOUT,
-} from '../policies-schema';
-import { scheduleToFormData } from './request-data-to-form-data';
+} from '../constants';
 
 const baseParams = {
   searchAttributes: {},

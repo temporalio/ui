@@ -14,9 +14,9 @@ import {
   WEEKDAYS,
   WEEKEND,
 } from '../constants';
-import { type ScheduleFormData } from '../schema';
-import type { DayOfMonth, Month } from '../types';
 import { getLargestWholeUnit } from './duration';
+import { type ScheduleFormData } from '../schema/schema';
+import { type DayOfMonth, type Month } from '../types';
 
 type Spec = ScheduleFormData['specs'][number];
 

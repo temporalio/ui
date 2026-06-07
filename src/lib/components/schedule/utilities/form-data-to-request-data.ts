@@ -9,7 +9,7 @@ import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { sortAndStringifyNumStrings } from '$lib/utilities/schedule-data-formatting';
 
-import type { ScheduleFormData, ScheduleSpecItem } from '../schema';
+import type { ScheduleFormData, ScheduleSpecItem } from '../schema/schema';
 
 function getSearchAttributes(attrs: (typeof setSearchAttributes.arguments)[0]) {
   return attrs.length === 0

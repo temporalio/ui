@@ -7,12 +7,12 @@
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { type ScheduleFormData } from './schema';
+  import { type ScheduleFormData } from '../schema/schema';
   import {
     getInitialSpecData,
     getRawValue,
     getSpecSummary,
-  } from './utilities/spec';
+  } from '../utilities/spec';
 
   import IntervalExamplesModal from './interval-examples-modal.svelte';
   import SpecTypeCron from './spec-type-cron.svelte';

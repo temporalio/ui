@@ -2,11 +2,11 @@ import { get, writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
-import type { ScheduleFormData } from '$lib/components/schedule/schedule-form/schema';
+import type { ScheduleFormData } from '$lib/components/schedule/schema/schema';
 import {
   formDataToCreateScheduleRequest,
   formDataToEditScheduleRequest,
-} from '$lib/components/schedule/schedule-form/utilities/form-data-to-request-data';
+} from '$lib/components/schedule/utilities/form-data-to-request-data';
 import { translate } from '$lib/i18n/translate';
 import {
   backfillRequest,
@@ -303,6 +303,10 @@ export async function submitBackfillSchedule(
 
 export const currentScheduleFetch =
   writable<Promise<DescribeFullSchedule | null>>(null);
+
+currentScheduleFetch.subscribe((p) => {
+  p?.then((p) => console.log({ scheduleResult: p }));
+});
 
 export function refreshCurrentScheduleFetch(
   context: Pick<ScheduleContext, 'namespace' | 'scheduleId'>,

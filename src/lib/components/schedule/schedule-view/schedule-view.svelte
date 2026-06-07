@@ -42,8 +42,9 @@
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
   import PauseScheduleModal from '../schedule-action-modals/pause-schedule-modal.svelte';
   import TriggerScheduleModal from '../schedule-action-modals/trigger-schedule-modal.svelte';
-  import { parseOverlapPolicy } from '../schedule-form/utilities/request-data-to-form-data';
+  import { parseOverlapPolicy } from '../utilities/request-data-to-form-data';
 
+  import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import ScheduleInputCard from './schedule-input-card.svelte';
   import ScheduleSpecCard from './schedule-spec-card.svelte';
   import ScheduleViewError from './schedule-view-error.svelte';
@@ -239,7 +240,8 @@
             openBackfillConfirmationModal={() =>
               openConfirmationModal('backfill')}
           />
-          <ScheduleAdvancedSettings schedule={currentSchedule} />
+          <AdvancedSettingsCard schedule={currentSchedule} />
+
           <ScheduleSearchAttributes schedule={currentSchedule} />
         </div>
 

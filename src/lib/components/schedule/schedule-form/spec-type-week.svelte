@@ -8,10 +8,10 @@
   import { getWeekdayLabel } from '$lib/i18n/format-date-names';
   import { translate } from '$lib/i18n/translate';
 
-  import { DAYS_OF_WEEK, WEEKDAYS, WEEKEND } from './constants';
-  import type { ScheduleFormData } from './schema';
-  import { type DayOfWeek } from './types';
-  import { assertSpecType } from './utilities/spec';
+  import { DAYS_OF_WEEK, WEEKDAYS, WEEKEND } from '../constants';
+  import type { ScheduleFormData } from '../schema/schema';
+  import { type DayOfWeek } from '../types';
+  import { assertSpecType } from '../utilities/spec';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 

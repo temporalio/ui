@@ -7,8 +7,8 @@
   import { getWeekdayLabel } from '$lib/i18n/format-date-names';
   import { translate } from '$lib/i18n/translate';
 
-  import type { ScheduleFormData } from './schema';
-  import { assertSpecType } from './utilities/spec';
+  import type { ScheduleFormData } from '../schema/schema';
+  import { assertSpecType } from '../utilities/spec';
 
   import CronExpressionFormatModal from './cron-expression-format-modal.svelte';
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';

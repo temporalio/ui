@@ -4,9 +4,9 @@
   import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { intervalUnits } from './constants';
-  import type { ScheduleFormData } from './schema';
-  import { assertSpecType } from './utilities/spec';
+  import { intervalUnits } from '../constants';
+  import type { ScheduleFormData } from '../schema/schema';
+  import { assertSpecType } from '../utilities/spec';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 

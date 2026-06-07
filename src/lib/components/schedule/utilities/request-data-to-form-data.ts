@@ -4,17 +4,19 @@ import type { SearchAttributes } from '$lib/types/workflows';
 import { sortNumStrings } from '$lib/utilities/array';
 import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 
-import { DAYS_OF_MONTH_SET, DAYS_OF_WEEK_SET, MONTHS_SET } from '../constants';
+import type { DayOfMonth, DayOfWeek, Month } from '../types';
+import { expandRanges } from './range';
+import { getInitialSpecData } from './spec';
 import {
+  DAYS_OF_MONTH_SET,
+  DAYS_OF_WEEK_SET,
   DEFAULT_CATCHUP_WINDOW,
   DEFAULT_EXECUTION_TIMEOUT,
   DEFAULT_RUN_TIMEOUT,
   DEFAULT_TASK_TIMEOUT,
-} from '../policies-schema';
-import type { ScheduleFormData, ScheduleSpecItem } from '../schema';
-import type { DayOfMonth, DayOfWeek, Month } from '../types';
-import { expandRanges } from './range';
-import { getInitialSpecData } from './spec';
+  MONTHS_SET,
+} from '../constants';
+import type { ScheduleFormData, ScheduleSpecItem } from '../schema/schema';
 
 import type { SearchAttribute } from '$types';
 

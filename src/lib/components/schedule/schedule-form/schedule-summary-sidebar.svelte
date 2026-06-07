@@ -7,8 +7,8 @@
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import type { ScheduleFormData } from './schema';
-  import { getSpecSummary } from './utilities/spec';
+  import type { ScheduleFormData } from '../schema/schema';
+  import { getSpecSummary } from '../utilities/spec';
 
   interface Props {
     form: Readable<ScheduleFormData>;

@@ -24,7 +24,7 @@
     zonedWallClockToUTCISOString,
   } from '$lib/utilities/timezone';
 
-  import type { ScheduleFormData } from './schema';
+  import type { ScheduleFormData } from '../schema/schema';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 
@@ -254,7 +254,11 @@
         step={1}
         min={0}
         suffix={translate('common.seconds-abbreviated')}
-        bind:value={$form.jitter}
+        bind:value={
+          () => $form.jitter.replace(/\D/g, ''), (v) => ($form.jitter = `${v}s`)
+        }
+        error={!!$errors.jitter?.[0]}
+        hintText={$errors.jitter?.[0]}
       >
         {#snippet afterLabel()}
           <Tooltip

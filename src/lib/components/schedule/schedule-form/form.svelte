@@ -23,9 +23,9 @@
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  import { type ScheduleFormData, scheduleFormSchema } from './schema';
-  import { scheduleToFormData } from './utilities/request-data-to-form-data';
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
+  import { type ScheduleFormData, scheduleFormSchema } from '../schema/schema';
+  import { scheduleToFormData } from '../utilities/request-data-to-form-data';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';
   import SchedulePoliciesCard from './schedule-policies-card.svelte';
@@ -92,6 +92,8 @@
     submitting,
     validateForm,
   } = superform;
+
+  $inspect($allErrors);
 
   // The search attribute inputs edit rows in place (e.g. selecting an
   // attribute or typing a value). Those deep mutations propagate through

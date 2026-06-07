@@ -5,8 +5,8 @@
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
 
-  import { scheduleToFormData } from '../schedule-form/utilities/request-data-to-form-data';
-  import { getSpecSummary } from '../schedule-form/utilities/spec';
+  import { scheduleToFormData } from '../utilities/request-data-to-form-data';
+  import { getSpecSummary } from '../utilities/spec';
 
   interface Props {
     schedule: DescribeFullSchedule;

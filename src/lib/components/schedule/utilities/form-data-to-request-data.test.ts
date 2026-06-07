@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Schedule } from '$lib/types';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 
-import type { ScheduleFormData } from '../schema';
 import {
   formDataToCreateScheduleRequest,
   formDataToEditScheduleRequest,
 } from './form-data-to-request-data';
+import type { ScheduleFormData } from '../schema/schema';
 
 vi.mock('$lib/utilities/encode-payload', async (importOriginal) => ({
   ...(await importOriginal<typeof import('$lib/utilities/encode-payload')>()),
