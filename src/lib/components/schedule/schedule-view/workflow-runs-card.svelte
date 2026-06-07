@@ -39,7 +39,6 @@
 <Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
   <header class="mb-1 flex items-center justify-between">
     <h2 class="text-2xl font-medium">{translate('schedules.workflow-runs')}</h2>
-
     <Link
       href={routeForWorkflowsWithQuery({
         namespace,
@@ -49,6 +48,7 @@
       {translate('common.view-all-runs')}
     </Link>
   </header>
+
   <PillContainer class="mr-auto flex flex-row p-1">
     <Pill
       active={view === 'recent'}
@@ -61,6 +61,7 @@
       id="upcoming">Upcoming Runs</Pill
     >
   </PillContainer>
+
   {#if view === 'recent'}
     <WorkflowRunsRecent
       {schedule}
