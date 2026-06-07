@@ -4,6 +4,7 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { getMilliseconds } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
@@ -41,6 +42,10 @@
 {#if !sortedRecentRuns.length}
   <WorkflowRunsEmpty
     class={className}
+    title={translate('schedules.workflow-runs-empty-state-recent-title')}
+    description={translate(
+      'schedules.workflow-runs-empty-state-recent-description',
+    )}
     {openBackfillConfirmationModal}
     {openTriggerConfirmationModal}
   />

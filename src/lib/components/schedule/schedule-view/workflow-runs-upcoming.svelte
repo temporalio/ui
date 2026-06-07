@@ -2,6 +2,7 @@
   import { twMerge } from 'tailwind-merge';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { getMilliseconds } from '$lib/utilities/format-time';
 
@@ -33,6 +34,10 @@
 
 {#if !sortedUpcomingRuns.length}
   <WorkflowRunsEmpty
+    title={translate('schedules.workflow-runs-empty-state-upcoming-title')}
+    description={translate(
+      'schedules.workflow-runs-empty-state-upcoming-description',
+    )}
     {openBackfillConfirmationModal}
     {openTriggerConfirmationModal}
   />
