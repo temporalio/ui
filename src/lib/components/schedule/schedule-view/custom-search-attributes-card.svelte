@@ -31,7 +31,7 @@
 >
   {#if searchAttributeCount}
     <ul class="w-full">
-      {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue]}
+      {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue] (`${searchAttrName}-${searchAttrValue}`)}
         {@const value = payloadToString(searchAttrValue)}
         <li
           class="flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0"
