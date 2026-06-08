@@ -18,6 +18,7 @@
     submitBackfillSchedule,
   } from '$lib/stores/schedules';
   import type { OverlapPolicy } from '$lib/types/schedule';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { getUTCString } from '$lib/utilities/format-date';
 
   import { getOverlapPolicyContent } from '../constants';
@@ -29,6 +30,7 @@
   }
 
   const overlapPolicyContent = getOverlapPolicyContent();
+  const identity = getIdentity();
 
   let { initialOverlapPolicy, scheduleId, namespace }: Props = $props();
 
@@ -82,6 +84,7 @@
         overlapPolicy: $selectedOverlapPolicy,
       },
       {
+        identity,
         scheduleId,
         namespace,
       },

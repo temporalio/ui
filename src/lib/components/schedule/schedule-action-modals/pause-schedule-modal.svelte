@@ -9,12 +9,15 @@
     serverError,
     submitPauseSchedule,
   } from '$lib/stores/schedules';
+  import { getIdentity } from '$lib/utilities/core-context';
 
   interface Props {
     isSchedulePaused?: boolean;
     scheduleId: string;
     namespace: string;
   }
+
+  const identity = getIdentity();
 
   let { isSchedulePaused, scheduleId, namespace }: Props = $props();
 
@@ -35,6 +38,7 @@
   on:cancelModal={() => closeConfirmationModal('pause')}
   on:confirmModal={() =>
     submitPauseSchedule(reason, {
+      identity,
       scheduleId,
       namespace,
       isPaused: isSchedulePaused,

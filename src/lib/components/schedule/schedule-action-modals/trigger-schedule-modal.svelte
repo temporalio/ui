@@ -13,6 +13,7 @@
     submitTriggerImmediatelySchedule,
   } from '$lib/stores/schedules';
   import type { OverlapPolicy } from '$lib/types/schedule';
+  import { getIdentity } from '$lib/utilities/core-context';
 
   import { getOverlapPolicyContent } from '../constants';
 
@@ -23,6 +24,7 @@
   }
 
   const overlapPolicyContent = getOverlapPolicyContent();
+  const identity = getIdentity();
 
   let { initialOverlapPolicy, scheduleId, namespace }: Props = $props();
 
@@ -43,6 +45,7 @@
   error={$serverError}
   on:confirmModal={() =>
     submitTriggerImmediatelySchedule($selectedOverlapPolicy, {
+      identity,
       scheduleId,
       namespace,
     })}
