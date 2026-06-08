@@ -39,6 +39,11 @@
   <tbody class="holocene-table-body">
     <slot />
   </tbody>
+  {#if $$slots.footer}
+    <tfoot class="holocene-table-footer">
+      <slot name="footer" />
+    </tfoot>
+  {/if}
 </table>
 
 <style lang="postcss">
@@ -79,6 +84,21 @@
 
     :global(tr > th) {
       @apply h-9 border-b border-subtle px-2 text-left text-sm font-medium;
+    }
+  }
+
+  .holocene-table-footer {
+    @apply sticky z-10;
+
+    bottom: var(--table-footer-bottom, 0);
+
+    :global(tr) {
+      @apply surface-table-header;
+    }
+
+    :global(tr > th),
+    :global(tr > td) {
+      @apply h-9 border-t border-subtle px-2 text-left text-sm font-medium;
     }
   }
 

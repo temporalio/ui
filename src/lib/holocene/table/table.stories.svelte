@@ -23,6 +23,14 @@
 
 <script lang="ts">
   import { Story, Template } from '@storybook/addon-svelte-csf';
+
+  const totalRows = Array.from({ length: 40 }, (_, i) => ({
+    name: `Item ${i + 1}`,
+    requests: (i + 1) * 100,
+    storage: (i + 1) * 3,
+  }));
+  const totalRequests = totalRows.reduce((sum, row) => sum + row.requests, 0);
+  const totalStorage = totalRows.reduce((sum, row) => sum + row.storage, 0);
 </script>
 
 <Template let:args let:context>
@@ -45,3 +53,62 @@
 <Story name="Primary" args={{ variant: 'primary' }} />
 
 <Story name="Primary, Updating" args={{ updating: true, variant: 'primary' }} />
+
+<Story name="Pinned Total Row">
+  <div class="h-72 overflow-auto border border-subtle">
+    <Table class="w-full" bordered={false}>
+      <tr slot="headers">
+        <th>Name</th>
+        <th>Requests</th>
+        <th>Storage (GB)</th>
+      </tr>
+      {#each totalRows as row (row.name)}
+        <tr>
+          <td>{row.name}</td>
+          <td>{row.requests.toLocaleString()}</td>
+          <td>{row.storage.toLocaleString()}</td>
+        </tr>
+      {/each}
+      <tr slot="footer">
+        <td>Total</td>
+        <td>{totalRequests.toLocaleString()}</td>
+        <td>{totalStorage.toLocaleString()}</td>
+      </tr>
+    </Table>
+  </div>
+</Story>
+
+<Story name="Pinned Total Row, Above Footer Bar">
+  <div class="flex h-72 flex-col overflow-auto border border-subtle">
+    <Table
+      class="w-full"
+      bordered={false}
+      style="
+
+--table-footer-bottom: 2.75rem;"
+    >
+      <tr slot="headers">
+        <th>Name</th>
+        <th>Requests</th>
+        <th>Storage (GB)</th>
+      </tr>
+      {#each totalRows as row (row.name)}
+        <tr>
+          <td>{row.name}</td>
+          <td>{row.requests.toLocaleString()}</td>
+          <td>{row.storage.toLocaleString()}</td>
+        </tr>
+      {/each}
+      <tr slot="footer">
+        <td>Total</td>
+        <td>{totalRequests.toLocaleString()}</td>
+        <td>{totalStorage.toLocaleString()}</td>
+      </tr>
+    </Table>
+    <div
+      class="surface-primary sticky bottom-0 left-0 flex h-11 w-full shrink-0 items-center justify-end gap-2 border-t border-subtle px-4"
+    >
+      <span class="text-sm text-secondary">Pagination controls</span>
+    </div>
+  </div>
+</Story>
