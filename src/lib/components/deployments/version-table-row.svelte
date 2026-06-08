@@ -11,6 +11,7 @@
     removeRampingDeploymentVersion,
     setCurrentDeploymentVersion,
     setRampingDeploymentVersion,
+    unsetCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { toaster } from '$lib/stores/toaster';
@@ -241,6 +242,11 @@
     onChange?.();
   }
 
+  async function handleUnsetCurrentVersion() {
+    await unsetCurrentDeploymentVersion({ namespace, deploymentName });
+    onChange?.();
+  }
+
   function openSetRamping() {
     rampingPercentage = isRamping
       ? (routingConfig.rampingVersionPercentage ?? 0)
@@ -379,6 +385,7 @@
     {isRamping}
     onSetCurrent={() => (showSetCurrentModal = true)}
     onSetRamping={openSetRamping}
+    onUnsetCurrent={handleUnsetCurrentVersion}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}
   />
