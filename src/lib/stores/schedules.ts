@@ -57,6 +57,10 @@ function setScheduleTimeout(
 export function clearScheduleTimeouts() {
   scheduleTimeouts.forEach(clearTimeout);
   scheduleTimeouts.clear();
+  // Reset loading/action state so a killed timeout doesn't leave the UI
+  // permanently rendering a spinner after the user navigates away.
+  loading.set(false);
+  actionPending.set(false);
 }
 
 type ConfirmationModal = 'none' | 'delete' | 'pause' | 'trigger' | 'backfill';
