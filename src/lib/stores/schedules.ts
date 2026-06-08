@@ -245,7 +245,7 @@ export async function submitTriggerImmediatelySchedule(
       1000,
     );
   } catch (e) {
-    actionPending.set(true);
+    actionPending.set(false);
     serverError.set(
       translate('schedules.trigger-schedule-error', {
         error: e?.message,
@@ -292,7 +292,7 @@ export async function submitBackfillSchedule(
       1000,
     );
   } catch (e) {
-    actionPending.set(true);
+    actionPending.set(false);
     serverError.set(
       translate('schedules.backfill-schedule-error', {
         error: e?.message,
