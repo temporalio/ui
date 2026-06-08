@@ -1,3 +1,4 @@
+import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 import { setSearchAttributes } from '$lib/services/workflow-service';
 import type { CalendarSpec, Payload, Schedule } from '$lib/types';
 import type {
@@ -49,7 +50,7 @@ function buildSpecFromFormData(
     spec.endTime = formData.endDate;
   }
 
-  if (formData.jitter && Number(formData.jitter) > 0) {
+  if (formData.jitter && Number(parseDuration(formData.jitter)) > 0) {
     spec.jitter = formData.jitter.endsWith('s')
       ? formData.jitter
       : `${formData.jitter}s`;
