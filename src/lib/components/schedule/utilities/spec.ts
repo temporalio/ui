@@ -15,6 +15,7 @@ import {
   WEEKEND,
 } from '../constants';
 import { getLargestWholeUnit } from './duration';
+import { protoSpecToFormSpecs } from '../schema/proto-spec-schema';
 import { type ScheduleFormData } from '../schema/schema';
 import { type DayOfMonth, type Month } from '../types';
 
@@ -74,7 +75,7 @@ export function getInitialSpecData<T extends Spec['type']>(
 
 const pad0ForTime = (num = 0): string => num.toString().padStart(2, '0');
 
-export function getSpecSummary(spec: Spec): string {
+export function getSpecSummary(spec: Spec, timezone = 'UTC'): string {
   if (!spec) {
     return '';
   }
@@ -92,7 +93,7 @@ export function getSpecSummary(spec: Spec): string {
 
     case 'week': {
       const selectedSet = new Set(spec.daysOfWeek ?? []);
-      const time = `${pad0ForTime(spec.time.hour)}:${pad0ForTime(spec.time.minute)} UTC`;
+      const time = `${pad0ForTime(spec.time.hour)}:${pad0ForTime(spec.time.minute)} ${timezone}`;
 
       if (DAYS_OF_WEEK.every((d) => selectedSet.has(d))) {
         return translate('schedules.spec-summary-everyday', { time });
@@ -119,7 +120,7 @@ export function getSpecSummary(spec: Spec): string {
     case 'month': {
       const selectedMonthsSet = new Set(spec.months ?? []);
 
-      const time = `${pad0ForTime(spec.time.hour)}:${pad0ForTime(spec.time.minute)} UTC`;
+      const time = `${pad0ForTime(spec.time.hour)}:${pad0ForTime(spec.time.minute)} ${timezone}`;
 
       const formatedDays = formatList(sortNumStrings(spec.daysOfMonth));
 
@@ -175,6 +176,19 @@ export function getSpecSummary(spec: Spec): string {
       return '';
     }
   }
+}
+
+// Summarize a proto `ScheduleSpec` (or any subset, e.g. an exclusion calendar)
+// by normalizing it into canonical form specs and reusing `getSpecSummary`, so
+// the form and view paths render schedules through a single code path.
+export function getScheduleSpecSummary(
+  spec: Parameters<typeof protoSpecToFormSpecs>[0],
+  timezone = 'UTC',
+): string {
+  return protoSpecToFormSpecs(spec)
+    .map((item) => getSpecSummary(item, timezone))
+    .filter(Boolean)
+    .join('; ');
 }
 
 export function getRawValue(spec: Spec): string {

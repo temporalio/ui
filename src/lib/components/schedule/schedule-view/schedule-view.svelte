@@ -2,14 +2,10 @@
   import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
-  import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
-  import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
-  import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import ScheduleInput from '$lib/components/schedule/schedule-input.svelte';
-  import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon';
   import Link from '$lib/holocene/link.svelte';
@@ -45,6 +41,7 @@
   import { parseOverlapPolicy } from '../utilities/request-data-to-form-data';
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
+  import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';
   import ScheduleInputCard from './schedule-input-card.svelte';
   import ScheduleSpecCard from './schedule-spec-card.svelte';
   import ScheduleViewError from './schedule-view-error.svelte';
@@ -226,7 +223,12 @@
     <div class="flex flex-col gap-4 pb-24">
       {#if currentSchedule?.info?.invalidScheduleError}
         <div class="w-full xl:w-1/2">
-          <ScheduleError error={currentSchedule?.info?.invalidScheduleError} />
+          <Alert intent="error">
+            <p>{translate('schedules.error-title')}</p>
+            <p>
+              {currentSchedule?.info?.invalidScheduleError}
+            </p>
+          </Alert>
         </div>
       {/if}
       <div class="flex flex-col gap-4 xl:flex-row">
@@ -241,8 +243,7 @@
               openConfirmationModal('backfill')}
           />
           <AdvancedSettingsCard schedule={currentSchedule} />
-
-          <ScheduleSearchAttributes schedule={currentSchedule} />
+          <CustomSearchAttributesCard schedule={currentSchedule} />
         </div>
 
         <div class="flex w-full flex-col gap-4 xl:w-1/3">

@@ -3,8 +3,9 @@
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   import { formatDuration } from '$lib/utilities/format-time';
-  import { getScheduleSpecLabel } from '$lib/utilities/schedule-spec-label';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
+
+  import { getScheduleSpecSummary } from '../utilities/spec';
 
   import type { DescribeFullSchedule } from '$types/schedule';
 
@@ -73,9 +74,9 @@
       {@render Info(
         translate('schedules.exclusion-calendar'),
         spec?.excludeStructuredCalendar
-          ? (getScheduleSpecLabel({
+          ? getScheduleSpecSummary({
               structuredCalendar: spec.excludeStructuredCalendar,
-            }) ?? translate('common.none'))
+            }) || translate('common.none')
           : translate('common.none'),
       )}
       {#if state.limitedActions}

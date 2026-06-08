@@ -2,7 +2,8 @@
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
 
   import { translate } from '$lib/i18n/translate';
-  import { getScheduleSpecLabel } from '$lib/utilities/schedule-spec-label';
+
+  import { getScheduleSpecSummary } from '../utilities/spec';
 
   import type { ScheduleSpec } from '$types';
 
@@ -27,7 +28,7 @@
     {#if cronString}
       <p>{cronString}</p>
     {:else}
-      <p>{getScheduleSpecLabel(spec, timezoneName)}</p>
+      <p>{getScheduleSpecSummary(spec, timezoneName)}</p>
     {/if}
   </div>
   <p class="text-secondary">
