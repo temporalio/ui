@@ -9,7 +9,7 @@
   import { formatDuration } from '$lib/utilities/format-time';
 
   import { getOverlapPolicyContent } from '../constants';
-  import type { ScheduleFormData } from '../schema/schema';
+  import type { ScheduleFormData } from '../schema/form-schema';
 
   import SchedulesPoliciesDrawer from './schedule-policies-drawer.svelte';
 

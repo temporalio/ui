@@ -4,7 +4,7 @@
   import { page } from '$app/state';
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form/form.svelte';
-  import type { ScheduleFormData } from '$lib/components/schedule/schema/schema';
+  import type { ScheduleFormData } from '$lib/components/schedule/schema/form-schema';
   import { submitCreateSchedule } from '$lib/stores/schedules';
   import { getIdentity } from '$lib/utilities/core-context';
 

@@ -7,7 +7,7 @@ import {
   formDataToCreateScheduleRequest,
   formDataToEditScheduleRequest,
 } from './form-data-to-request-data';
-import type { ScheduleFormData } from '../schema/schema';
+import type { ScheduleFormData } from '../schema/form-schema';
 
 vi.mock('$lib/utilities/encode-payload', async (importOriginal) => ({
   ...(await importOriginal<typeof import('$lib/utilities/encode-payload')>()),

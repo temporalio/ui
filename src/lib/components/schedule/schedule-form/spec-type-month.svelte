@@ -9,7 +9,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import { DAYS_OF_MONTH, MONTHS } from '../constants';
-  import { type ScheduleFormData } from '../schema/schema';
+  import { type ScheduleFormData } from '../schema/form-schema';
   import type { DayOfMonth, Month } from '../types';
   import { assertSpecType } from '../utilities/spec';
 

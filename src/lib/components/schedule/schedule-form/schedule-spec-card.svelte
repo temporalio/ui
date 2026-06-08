@@ -10,7 +10,7 @@
   import { translate } from '$lib/i18n/translate';
   import type { FullSchedule } from '$lib/types/schedule';
 
-  import type { ScheduleFormData } from '../schema/schema';
+  import type { ScheduleFormData } from '../schema/form-schema';
   import { getInitialSpecData } from '../utilities/spec';
 
   import ScheduleSpecItem from './schedule-spec-item.svelte';

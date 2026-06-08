@@ -9,8 +9,8 @@ import {
   DEFAULT_RUN_TIMEOUT,
   DEFAULT_TASK_TIMEOUT,
 } from '../constants';
+import type { ScheduleFormData } from '../schema/form-schema';
 import { protoSpecToFormSpecs } from '../schema/proto-spec-schema';
-import type { ScheduleFormData } from '../schema/schema';
 
 import type { SearchAttribute } from '$types';
 

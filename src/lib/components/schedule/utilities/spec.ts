@@ -15,8 +15,8 @@ import {
   WEEKEND,
 } from '../constants';
 import { getLargestWholeUnit } from './duration';
+import { type ScheduleFormData } from '../schema/form-schema';
 import { protoSpecToFormSpecs } from '../schema/proto-spec-schema';
-import { type ScheduleFormData } from '../schema/schema';
 import { type DayOfMonth, type Month } from '../types';
 
 type Spec = ScheduleFormData['specs'][number];

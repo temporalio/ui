@@ -5,7 +5,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import { intervalUnits } from '../constants';
-  import type { ScheduleFormData } from '../schema/schema';
+  import type { ScheduleFormData } from '../schema/form-schema';
   import { assertSpecType } from '../utilities/spec';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';

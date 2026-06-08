@@ -26,11 +26,11 @@
     DEFAULT_RUN_TIMEOUT,
     DEFAULT_TASK_TIMEOUT,
   } from '../constants';
+  import type { ScheduleFormData } from '../schema/form-schema';
   import {
     type SchedulePoliciesData,
-    schedulePoliciesSchema,
-  } from '../schema/policies-schema';
-  import type { ScheduleFormData } from '../schema/schema';
+    schedulePoliciesFormSchema,
+  } from '../schema/policies-form-schema';
 
   interface Props {
     form: SuperForm<ScheduleFormData>['form'];
@@ -55,7 +55,7 @@
   const policiesForm = superForm(pickPolicies(get(form)), {
     SPA: true,
     dataType: 'json',
-    validators: zodClient(schedulePoliciesSchema),
+    validators: zodClient(schedulePoliciesFormSchema),
     resetForm: false,
     onUpdate: ({ form: validated }) => {
       if (!validated.valid) return;

@@ -24,7 +24,10 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
-  import { type ScheduleFormData, scheduleFormSchema } from '../schema/schema';
+  import {
+    type ScheduleFormData,
+    scheduleFormSchema,
+  } from '../schema/form-schema';
   import { scheduleToFormData } from '../utilities/request-data-to-form-data';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';

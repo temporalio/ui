@@ -22,7 +22,7 @@ const optionalDuration = (message: string) =>
       { message },
     );
 
-export const schedulePoliciesSchema = z.object({
+export const schedulePoliciesFormSchema = z.object({
   overlapPolicy: z
     .enum([
       'Skip',
@@ -55,4 +55,4 @@ export const schedulePoliciesSchema = z.object({
   ),
 });
 
-export type SchedulePoliciesData = z.infer<typeof schedulePoliciesSchema>;
+export type SchedulePoliciesData = z.infer<typeof schedulePoliciesFormSchema>;

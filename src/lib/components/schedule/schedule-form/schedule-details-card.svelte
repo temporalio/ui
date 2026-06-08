@@ -24,7 +24,7 @@
     zonedWallClockToUTCISOString,
   } from '$lib/utilities/timezone';
 
-  import type { ScheduleFormData } from '../schema/schema';
+  import type { ScheduleFormData } from '../schema/form-schema';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 

@@ -1,13 +1,11 @@
 import { z } from 'zod/v3';
 
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
-import { searchAttributesSchema } from '$lib/stores/search-attributes';
 
 import { DAYS_OF_MONTH, DAYS_OF_WEEK, MONTHS } from '../constants';
-import { schedulePoliciesSchema } from './policies-schema';
 import { isValidCronString } from '../utilities/cron';
 
-export const scheduleSpecItemSchema = z
+export const scheduleSpecItemFormSchema = z
   .discriminatedUnion('type', [
     z.object({
       type: z.literal('unspecified'),
@@ -101,47 +99,4 @@ export const scheduleSpecItemSchema = z
     }
   });
 
-export type ScheduleSpecItem = z.infer<typeof scheduleSpecItemSchema>;
-
-export const scheduleFormSchema = z
-  .object({
-    name: z.string().min(1, 'Name is required').max(232, 'Name is too long'),
-    workflowType: z.string().min(1, 'Workflow type is required'),
-    workflowId: z.string(),
-    taskQueue: z.string().min(1, 'Task queue is required'),
-    input: z
-      .string()
-      .optional()
-      .refine(
-        (val) => {
-          if (!val || val.trim() === '') return true;
-          try {
-            JSON.parse(val);
-            return true;
-          } catch {
-            return false;
-          }
-        },
-        {
-          message: 'Input must be valid JSON',
-        },
-      ),
-    editInput: z.boolean(),
-    encoding: z.enum(['json/plain', 'json/protobuf'] as const),
-    messageType: z.string().optional(),
-    specs: z
-      .array(scheduleSpecItemSchema)
-      .min(1, 'At least one schedule spec is required'),
-    timezoneName: z.string(),
-    startDate: z.string().optional().default(''),
-    endDateType: z.enum(['never', 'on', 'after']),
-    endDate: z.string().optional().default(''),
-    endAfterOccurrences: z.number().optional(),
-    jitter: z.string().optional().default('0'),
-    keepOriginalWorkflowId: z.boolean(),
-    searchAttributes: searchAttributesSchema,
-    workflowSearchAttributes: searchAttributesSchema,
-  })
-  .merge(schedulePoliciesSchema);
-
-export type ScheduleFormData = z.infer<typeof scheduleFormSchema>;
+export type ScheduleSpecItem = z.infer<typeof scheduleSpecItemFormSchema>;

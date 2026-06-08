@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
-import type { ScheduleFormData } from '$lib/components/schedule/schema/schema';
+import type { ScheduleFormData } from '$lib/components/schedule/schema/form-schema';
 import {
   formDataToCreateScheduleRequest,
   formDataToEditScheduleRequest,

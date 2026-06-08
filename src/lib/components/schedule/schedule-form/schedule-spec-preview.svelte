@@ -4,7 +4,7 @@
 
   import { translate } from '$lib/i18n/translate';
 
-  import type { ScheduleFormData } from '../schema/schema';
+  import type { ScheduleFormData } from '../schema/form-schema';
   import { getSpecSummary } from '../utilities/spec';
 
   interface Props {

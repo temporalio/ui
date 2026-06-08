@@ -5,7 +5,7 @@ import { sortNumStrings } from '$lib/utilities/array';
 
 import { DAYS_OF_MONTH_SET, DAYS_OF_WEEK_SET, MONTHS_SET } from '../constants';
 import type { DayOfMonth, DayOfWeek, Month } from '../types';
-import { type ScheduleSpecItem } from './schema';
+import { type ScheduleSpecItem } from './spec-item-form-schema';
 import { expandRanges } from '../utilities/range';
 
 type ProtoCalendarField = RangeSpec[] | string | number | null | undefined;
@@ -59,7 +59,7 @@ const calendarField = z.preprocess(
 
 // Coerce a single proto calendar entry (structured or deprecated) into the
 // canonical form `ScheduleSpecItem`. The return is type-checked, but it is not
-// piped back through `scheduleSpecItemSchema` because that schema enforces
+// piped back through `scheduleSpecItemFormSchema` because that schema enforces
 // form-input rules (e.g. at least one month) that a parsed schedule may not
 // satisfy (e.g. "every month" carries no explicit months).
 const protoCalendarToSpec = z
