@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { Readable } from 'svelte/store';
 
-  import { _toLowerCase } from 'zod/v4/core';
-
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
