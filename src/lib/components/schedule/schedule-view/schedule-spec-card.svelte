@@ -22,10 +22,6 @@
       scheduleId: schedule.schedule_id,
     }),
   );
-
-  $inspect(schedule);
-
-  $inspect(formSchedule);
 </script>
 
 <Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
