@@ -96,8 +96,6 @@
     validateForm,
   } = superform;
 
-  $inspect($allErrors);
-
   // The search attribute inputs edit rows in place (e.g. selecting an
   // attribute or typing a value). Those deep mutations propagate through
   // Svelte's reactive proxies but never reach superForm's `$form` store, so
