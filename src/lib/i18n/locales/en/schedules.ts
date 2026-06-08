@@ -29,7 +29,7 @@ export const Strings = {
   'workflow-runs-empty-state-upcoming-title':
     'This Schedule does not have upcoming runs.',
   'workflow-runs-empty-state-upcoming-description':
-    'Upcoming runs will apear hear once available.',
+    'Upcoming runs will apear here once available.',
   'upcoming-runs': 'Upcoming Runs',
   'upcoming-runs-empty-state-title': 'No Upcoming Runs',
   loading: 'Loading Schedule...',
