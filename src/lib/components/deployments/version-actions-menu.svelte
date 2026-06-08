@@ -13,6 +13,7 @@
     workflowHref: string;
     isCurrent: boolean;
     onSetCurrent: () => void;
+    onUnsetCurrent: () => void;
     onValidate: () => void;
     onDelete: () => void;
   }
@@ -23,6 +24,7 @@
     workflowHref,
     isCurrent,
     onSetCurrent,
+    onUnsetCurrent,
     onValidate,
     onDelete,
   }: Props = $props();
@@ -45,7 +47,11 @@
           {translate('deployments.edit')}
         </MenuItem>
       </CapabilityGuard>
-      {#if !isCurrent}
+      {#if isCurrent}
+        <MenuItem onclick={onUnsetCurrent}>
+          {translate('deployments.unset-current')}
+        </MenuItem>
+      {:else}
         <MenuItem onclick={onSetCurrent}>
           {translate('deployments.set-as-current')}
         </MenuItem>

@@ -86,6 +86,7 @@ export const Strings = {
     'Unversioned Workers Ramping at {{ percentage }}%.',
   'set-as-current': 'Set Current Version',
   'set-as-current-error': 'Failed to set version as current',
+  'unset-current': 'Unset Current',
   'set-current-version-success': '{{ buildId }} is now the current version',
   edit: 'Edit',
   'validate-connection': 'Validate Connection for',

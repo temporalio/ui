@@ -9,6 +9,7 @@
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
     setCurrentDeploymentVersion,
+    unsetCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { toaster } from '$lib/stores/toaster';
@@ -203,6 +204,11 @@
     onChange?.();
   }
 
+  async function handleUnsetCurrentVersion() {
+    await unsetCurrentDeploymentVersion({ namespace, deploymentName });
+    onChange?.();
+  }
+
   async function handleDeleteVersion() {
     deleteVersionError = '';
     await deleteWorkerDeploymentVersion(
@@ -269,6 +275,7 @@
     {workflowHref}
     {isCurrent}
     onSetCurrent={() => (showSetCurrentModal = true)}
+    onUnsetCurrent={handleUnsetCurrentVersion}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}
   />

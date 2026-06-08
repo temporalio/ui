@@ -218,6 +218,24 @@ export const setCurrentDeploymentVersion = async (
   });
 };
 
+export const unsetCurrentDeploymentVersion = async (
+  parameters: DeploymentParameters,
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-current-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({ version: '' }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
 export const setRampingUnversionedWorkers = async (
   parameters: DeploymentParameters & { percentage: number },
   onError?: ErrorCallback,
