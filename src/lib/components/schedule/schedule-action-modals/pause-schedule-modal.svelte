@@ -4,6 +4,7 @@
   import { translate } from '$lib/i18n/translate';
   import {
     actionPending,
+    clearConfirmationModalActionTimeout,
     closeConfirmationModal,
     confirmationModal,
     serverError,
@@ -22,6 +23,10 @@
   let { isSchedulePaused, scheduleId, namespace }: Props = $props();
 
   let reason = $state('');
+
+  $effect(() => {
+    return () => clearConfirmationModalActionTimeout('pause');
+  });
 </script>
 
 <Modal

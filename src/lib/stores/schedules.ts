@@ -54,17 +54,24 @@ function setScheduleTimeout(
   scheduleTimeouts.set(action, setTimeout(callback, delay));
 }
 
-export function clearScheduleTimeouts() {
-  scheduleTimeouts.forEach(clearTimeout);
-  scheduleTimeouts.clear();
-  // Reset loading/action state so a killed timeout doesn't leave the UI
-  // permanently rendering a spinner after the user navigates away.
+function clearScheduleTimeout(action: ScheduleAction) {
+  clearTimeout(scheduleTimeouts.get(action));
+}
+
+export function clearScheduleViewActionTimeout(action: 'edit' | 'create') {
   loading.set(false);
-  actionPending.set(false);
+  clearScheduleTimeout(action);
 }
 
 type ConfirmationModal = 'none' | 'delete' | 'pause' | 'trigger' | 'backfill';
 export const confirmationModal = writable<ConfirmationModal>('none');
+
+export function clearConfirmationModalActionTimeout(
+  modal: Exclude<ConfirmationModal, 'none'>,
+) {
+  actionPending.set(false);
+  clearScheduleTimeout(modal);
+}
 
 export function openConfirmationModal(
   modal: Exclude<ConfirmationModal, 'none'>,

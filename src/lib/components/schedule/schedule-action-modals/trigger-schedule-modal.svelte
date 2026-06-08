@@ -7,6 +7,7 @@
   import { translate } from '$lib/i18n/translate';
   import {
     actionPending,
+    clearConfirmationModalActionTimeout,
     closeConfirmationModal,
     confirmationModal,
     serverError,
@@ -32,6 +33,10 @@
   let selectedOverlapPolicy = writable<OverlapPolicy>(
     initialOverlapPolicy ?? 'Skip',
   );
+
+  $effect(() => {
+    return () => clearConfirmationModalActionTimeout('trigger');
+  });
 </script>
 
 <Modal

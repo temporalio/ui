@@ -12,6 +12,7 @@
   import { translate } from '$lib/i18n/translate';
   import {
     actionPending,
+    clearConfirmationModalActionTimeout,
     closeConfirmationModal,
     confirmationModal,
     serverError,
@@ -55,6 +56,10 @@
   let endHour = $state(anHourAhead.getHours().toString());
   let endMinute = $state(anHourAhead.getMinutes().toString());
   let endSecond = $state(anHourAhead.getSeconds().toString());
+
+  $effect(() => {
+    return () => clearConfirmationModalActionTimeout('backfill');
+  });
 </script>
 
 <Modal

@@ -3,6 +3,7 @@
   import { translate } from '$lib/i18n/translate';
   import {
     actionPending,
+    clearConfirmationModalActionTimeout,
     closeConfirmationModal,
     confirmationModal,
     serverError,
@@ -18,6 +19,10 @@
   const identity = getIdentity();
 
   let { scheduleId, namespace }: Props = $props();
+
+  $effect(() => {
+    return () => clearConfirmationModalActionTimeout('delete');
+  });
 </script>
 
 <Modal
