@@ -92,8 +92,8 @@ function consolidateIntoSingleSpec(
         month: '',
         dayOfMonth: '',
         dayOfWeek: sortAndStringifyNumStrings(item.daysOfWeek ?? []),
-        hour: String(item?.time?.hour || ''),
-        minute: String(item?.time?.minute || ''),
+        hour: String(item?.time?.hour ?? 0),
+        minute: String(item?.time?.minute ?? 0),
         second: '',
       });
 
@@ -106,8 +106,8 @@ function consolidateIntoSingleSpec(
         month: sortAndStringifyNumStrings(item.months ?? []),
         dayOfMonth: sortAndStringifyNumStrings(item.daysOfMonth ?? []),
         dayOfWeek: '',
-        hour: String(item.time?.hour || ''),
-        minute: String(item.time?.minute || ''),
+        hour: String(item.time?.hour ?? 0),
+        minute: String(item.time?.minute ?? 0),
         second: '',
       });
       return;

@@ -156,8 +156,34 @@ describe('formDataToCreateScheduleRequest', () => {
         month: '1,6',
         dayOfMonth: '1,15',
         dayOfWeek: '',
-        hour: '',
-        minute: '',
+        hour: '0',
+        minute: '0',
+        second: '',
+      },
+    ]);
+  });
+
+  it('serializes midnight (hour 0, minute 0) without collapsing to wildcards', async () => {
+    const body = await formDataToCreateScheduleRequest(
+      baseFormData({
+        specs: [
+          {
+            type: 'week',
+            daysOfWeek: ['1'],
+            time: { hour: 0, minute: 0 },
+          },
+        ],
+      }),
+    );
+
+    expect(body.schedule.spec.calendar).toEqual([
+      {
+        year: '*',
+        month: '',
+        dayOfMonth: '',
+        dayOfWeek: '1',
+        hour: '0',
+        minute: '0',
         second: '',
       },
     ]);
