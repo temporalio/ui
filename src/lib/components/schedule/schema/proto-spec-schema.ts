@@ -6,6 +6,7 @@ import { sortNumStrings } from '$lib/utilities/array';
 import { DAYS_OF_MONTH_SET, DAYS_OF_WEEK_SET, MONTHS_SET } from '../constants';
 import type { DayOfMonth, DayOfWeek, Month } from '../types';
 import { type ScheduleSpecItem } from './spec-item-form-schema';
+import { isValidCronString } from '../utilities/cron';
 import { expandRanges } from '../utilities/range';
 
 type ProtoCalendarField = RangeSpec[] | string | number | null | undefined;
@@ -48,6 +49,8 @@ function cronStringToSpec(
   if (!cronStr) return;
 
   const cleanCron = cronStr.replace(/#.*$/gm, '').trim();
+
+  if (!isValidCronString(cleanCron)) return;
 
   return { type: 'cron', cronString: cleanCron };
 }

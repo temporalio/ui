@@ -123,6 +123,31 @@ describe('scheduleToFormData spec parsing', () => {
     expect(specs).toEqual([{ type: 'cron', cronString: '0 12 * * *' }]);
   });
 
+  it('falls through to a week spec when the calendar comment is not a valid cron', () => {
+    const schedule = {
+      spec: {
+        structuredCalendar: [
+          {
+            comment: 'manually edited',
+            dayOfWeek: [{ start: 1, end: 5, step: 1 }],
+            hour: [{ start: 9, end: 9 }],
+            minute: [{ start: 30, end: 30 }],
+          },
+        ],
+      },
+    } as unknown as FullSchedule;
+
+    const { specs } = getValues(schedule);
+
+    expect(specs).toEqual([
+      {
+        type: 'week',
+        daysOfWeek: ['1', '2', '3', '4', '5'],
+        time: { hour: 9, minute: 30 },
+      },
+    ]);
+  });
+
   it('parses a weekly structuredCalendar (IRange[]) into a week spec', () => {
     const schedule = {
       spec: {

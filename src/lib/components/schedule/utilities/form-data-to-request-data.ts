@@ -11,6 +11,7 @@ import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { sortAndStringifyNumStrings } from '$lib/utilities/schedule-data-formatting';
 
+import { isValidCronString } from './cron';
 import type { ScheduleFormData } from '../schema/form-schema';
 import type { ScheduleSpecItem } from '../schema/spec-item-form-schema';
 
@@ -69,11 +70,12 @@ function consolidateIntoSingleSpec(
 ) {
   switch (item.type) {
     case 'cron': {
-      if (item.cronString) {
-        // Add the cronString as a comment to the cronString so we save the cronString in the comment field and can
-        // determine that the spec was derived from this cronString.
-        const cronStringWithComment = `${item.cronString}#${item.cronString}`;
-        spec.cronString.push(cronStringWithComment);
+      const trimmed = item.cronString?.trim();
+      if (trimmed && isValidCronString(trimmed)) {
+        // Double the expression as its own comment so the server stores it in
+        // the calendar entry's `comment` field — that's what lets us recognize
+        // the round-tripped calendar as a cron rather than a week/month spec.
+        spec.cronString.push(`${trimmed}#${trimmed}`);
       }
 
       return;

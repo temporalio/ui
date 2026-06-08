@@ -89,15 +89,31 @@ describe('formDataToCreateScheduleRequest', () => {
     });
   });
 
-  it('builds a cron spec with the duplicated comment marker', async () => {
+  it('builds a cron spec with the duplicated comment marker and trims whitespace', async () => {
     const body = await formDataToCreateScheduleRequest(
-      baseFormData({ specs: [{ type: 'cron', cronString: '0 12 * * *' }] }),
+      baseFormData({ specs: [{ type: 'cron', cronString: '  0 12 * * *  ' }] }),
     );
 
     expect(body.schedule.spec.cronString).toEqual(['0 12 * * *#0 12 * * *']);
     expect(body.schedule.spec.calendar).toEqual([]);
     expect(body.schedule.spec.interval).toEqual([]);
     expect(body.schedule.spec.timezoneName).toBe('UTC');
+  });
+
+  it('drops a cron spec whose expression is empty', async () => {
+    const body = await formDataToCreateScheduleRequest(
+      baseFormData({ specs: [{ type: 'cron', cronString: '   ' }] }),
+    );
+
+    expect(body.schedule.spec.cronString).toEqual([]);
+  });
+
+  it('drops a cron spec whose expression is invalid', async () => {
+    const body = await formDataToCreateScheduleRequest(
+      baseFormData({ specs: [{ type: 'cron', cronString: 'not a cron' }] }),
+    );
+
+    expect(body.schedule.spec.cronString).toEqual([]);
   });
 
   it('builds an interval spec and defaults the phase to 0s', async () => {
