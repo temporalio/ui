@@ -80,6 +80,21 @@ export const Strings = {
   'set-as-current': 'Set Current Version',
   'set-as-current-error': 'Failed to set version as current',
   'set-current-version-success': '{{ buildId }} is now the current version',
+  'set-ramping-version': 'Set Ramping Version',
+  'edit-ramping-percentage': 'Edit Ramping Percentage',
+  'remove-ramping': 'Remove Ramping',
+  'set-ramping-no-pollers-title': 'Cannot Set Ramping Version',
+  'set-ramping-no-pollers-body':
+    'This Worker Deployment Version has no active pollers. Ensure Workers are running before setting a ramping percentage',
+  'set-ramping-body':
+    'This will route a percentage of new traffic to Build ID {{ buildId }} for {{ deploymentName }}. The Current Version will continue to receive the remaining traffic.',
+  'set-ramping-existing':
+    'Worker Deployment Version {{ buildId }} is currently ramping at {{ percentage }}%.',
+  'ramping-percentage-label': 'Ramping Percentage',
+  'set-ramping-success': '{{ buildId }} is now ramping at {{ percentage }}%',
+  'set-ramping-error': 'Failed to set ramping version',
+  'remove-ramping-success': 'Ramping removed from {{ buildId }}',
+  'remove-ramping-error': 'Failed to remove ramping version',
   edit: 'Edit',
   'validate-connection': 'Validate Connection for',
   'validate-connection-error': 'Failed to validate connection',

@@ -8,7 +8,9 @@
   import {
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
+    removeRampingDeploymentVersion,
     setCurrentDeploymentVersion,
+    setRampingDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { toaster } from '$lib/stores/toaster';
@@ -34,6 +36,7 @@
   import DeleteVersionModal from './delete-version-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
   import SetCurrentVersionModal from './set-current-version-modal.svelte';
+  import SetRampingVersionModal from './set-ramping-version-modal.svelte';
   import ValidateConnectionModal from './validate-connection-modal.svelte';
   import VersionActionsMenu from './version-actions-menu.svelte';
   import VersionRowDetails from './version-row-details.svelte';
@@ -145,6 +148,13 @@
     }),
   );
 
+  const hasActivePollers = $derived(
+    parseVersionStatus(drainageStatus).status !== 'Created',
+  );
+  const otherVersionRamping = $derived(
+    rampingBuildId && !isRamping ? rampingBuildId : undefined,
+  );
+
   let expanded = $state(false);
   let showSetCurrentModal = $state(false);
   let setCurrentError = $state('');
@@ -153,6 +163,9 @@
   let showValidateModal = $state(false);
   let validateLoading = $state(false);
   let validateResult = $state<{ message?: string } | null>(null);
+  let showSetRampingModal = $state(false);
+  let setRampingError = $state('');
+  let rampingPercentage = $state(0);
 
   async function handleValidateConnection() {
     validateResult = null;
@@ -200,6 +213,62 @@
     toaster.push({
       variant: 'primary',
       message: translate('deployments.set-current-version-success', {
+        buildId: versionBuildId,
+      }),
+    });
+    onChange?.();
+  }
+
+  function openSetRamping() {
+    rampingPercentage = isRamping
+      ? (routingConfig.rampingVersionPercentage ?? 0)
+      : 0;
+    setRampingError = '';
+    showSetRampingModal = true;
+  }
+
+  async function handleSetRamping() {
+    setRampingError = '';
+    await setRampingDeploymentVersion(
+      {
+        namespace,
+        deploymentName,
+        buildId: versionBuildId,
+        rampingVersionPercentage: rampingPercentage,
+      },
+      (err) => {
+        setRampingError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.set-ramping-error');
+      },
+    );
+    if (setRampingError) return;
+    showSetRampingModal = false;
+    toaster.push({
+      variant: 'primary',
+      message: translate('deployments.set-ramping-success', {
+        buildId: versionBuildId,
+        percentage: rampingPercentage,
+      }),
+    });
+    onChange?.();
+  }
+
+  async function handleRemoveRamping() {
+    setRampingError = '';
+    await removeRampingDeploymentVersion(
+      { namespace, deploymentName },
+      (err) => {
+        setRampingError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.remove-ramping-error');
+      },
+    );
+    if (setRampingError) return;
+    showSetRampingModal = false;
+    toaster.push({
+      variant: 'primary',
+      message: translate('deployments.remove-ramping-success', {
         buildId: versionBuildId,
       }),
     });
@@ -274,7 +343,9 @@
     hasComputeConfig={isVersionSummaryNew(version)
       ? !!version.computeConfig
       : true}
+    {isRamping}
     onSetCurrent={() => (showSetCurrentModal = true)}
+    onSetRamping={openSetRamping}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}
   />
@@ -302,6 +373,24 @@
   onCancel={() => {
     showSetCurrentModal = false;
     setCurrentError = '';
+  }}
+/>
+
+<SetRampingVersionModal
+  buildId={versionBuildId}
+  {deploymentName}
+  open={showSetRampingModal}
+  error={setRampingError}
+  {hasActivePollers}
+  {isRamping}
+  existingRampingBuildId={otherVersionRamping}
+  existingRampingPercentage={routingConfig.rampingVersionPercentage}
+  bind:percentage={rampingPercentage}
+  onConfirm={handleSetRamping}
+  onRemove={handleRemoveRamping}
+  onCancel={() => {
+    showSetRampingModal = false;
+    setRampingError = '';
   }}
 />
 

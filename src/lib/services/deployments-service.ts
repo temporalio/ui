@@ -226,6 +226,40 @@ export const setCurrentDeploymentVersion = async (
   });
 };
 
+export const setRampingDeploymentVersion = async (
+  request: DeploymentVersionParameters & { rampingVersionPercentage: number },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi('worker-deployment-set-ramping-version', {
+    namespace: request.namespace,
+    deploymentName: request.deploymentName,
+  });
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        version: `${request.deploymentName}.${request.buildId}`,
+        rampingVersionPercentage: request.rampingVersionPercentage,
+      }),
+    },
+    onError,
+  });
+};
+
+export const removeRampingDeploymentVersion = async (
+  request: DeploymentParameters,
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi('worker-deployment-set-ramping-version', request);
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({ version: '' }),
+    },
+    onError,
+  });
+};
+
 export const buildLambdaComputeConfig = (
   lambdaArn: string,
   iamRoleArn: string,

@@ -13,7 +13,9 @@
     workflowHref: string;
     isCurrent: boolean;
     hasComputeConfig: boolean;
+    isRamping: boolean;
     onSetCurrent: () => void;
+    onSetRamping: () => void;
     onValidate: () => void;
     onDelete: () => void;
   }
@@ -24,7 +26,9 @@
     workflowHref,
     isCurrent,
     hasComputeConfig,
+    isRamping,
     onSetCurrent,
+    onSetRamping,
     onValidate,
     onDelete,
   }: Props = $props();
@@ -52,6 +56,13 @@
           <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
             {translate('deployments.set-as-current')}
           </MenuItem>
+          {#if !isCurrent}
+            <MenuItem onclick={onSetRamping}>
+              {isRamping
+                ? translate('deployments.edit-ramping-percentage')
+                : translate('deployments.set-ramping-version')}
+            </MenuItem>
+          {/if}
           <MenuItem onclick={onValidate}>
             {translate('deployments.validate-connection')}
           </MenuItem>
@@ -60,6 +71,13 @@
           <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
             {translate('deployments.set-as-current')}
           </MenuItem>
+          {#if !isCurrent}
+            <MenuItem onclick={onSetRamping}>
+              {isRamping
+                ? translate('deployments.edit-ramping-percentage')
+                : translate('deployments.set-ramping-version')}
+            </MenuItem>
+          {/if}
         {/snippet}
       </CapabilityGuard>
       <MenuItem href={workflowHref}>
