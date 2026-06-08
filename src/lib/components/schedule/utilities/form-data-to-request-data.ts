@@ -1,9 +1,10 @@
 import { setSearchAttributes } from '$lib/services/workflow-service';
-import type { Payload, Schedule } from '$lib/types';
+import type { CalendarSpec, Payload, Schedule } from '$lib/types';
 import type {
   ScheduleInterval,
   ScheduleRequestBody,
   ScheduleSpecRequest,
+  StructuredCalendar,
 } from '$lib/types/schedule';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -17,19 +18,21 @@ function getSearchAttributes(attrs: (typeof setSearchAttributes.arguments)[0]) {
     : { indexedFields: { ...setSearchAttributes(attrs) } };
 }
 
+type ScheduleSpecAccumulator = {
+  calendar: CalendarSpec[];
+  interval: ScheduleInterval[];
+  cronString: string[];
+  structuredCalendar: StructuredCalendar[];
+  startTime?: string;
+  endTime?: string;
+  jitter?: string;
+  timezoneName?: string;
+};
+
 function buildSpecFromFormData(
   formData: ScheduleFormData,
 ): ScheduleSpecRequest {
-  const spec: {
-    calendar: object[];
-    interval: ScheduleInterval[];
-    cronString: string[];
-    structuredCalendar: object[];
-    startTime?: string;
-    endTime?: string;
-    jitter?: string;
-    timezoneName?: string;
-  } = {
+  const spec: ScheduleSpecAccumulator = {
     calendar: [],
     interval: [],
     cronString: [],
@@ -46,22 +49,20 @@ function buildSpecFromFormData(
   }
 
   if (formData.jitter && Number(formData.jitter) > 0) {
-    spec.jitter = formData.jitter;
+    spec.jitter = formData.jitter.endsWith('s')
+      ? formData.jitter
+      : `${formData.jitter}s`;
   }
 
   for (const specItem of formData.specs) {
-    buildSingleSpec(spec, specItem);
+    consolidateIntoSingleSpec(spec, specItem);
   }
 
   return spec;
 }
 
-function buildSingleSpec(
-  spec: {
-    calendar: object[];
-    interval: ScheduleInterval[];
-    cronString: string[];
-  },
+function consolidateIntoSingleSpec(
+  spec: ScheduleSpecAccumulator,
   item: ScheduleSpecItem,
 ) {
   switch (item.type) {
@@ -89,8 +90,8 @@ function buildSingleSpec(
         month: '',
         dayOfMonth: '',
         dayOfWeek: sortAndStringifyNumStrings(item.daysOfWeek ?? []),
-        hour: item?.time?.hour || '',
-        minute: item?.time?.minute || '',
+        hour: String(item?.time?.hour || ''),
+        minute: String(item?.time?.minute || ''),
         second: '',
       });
 
@@ -103,8 +104,8 @@ function buildSingleSpec(
         month: sortAndStringifyNumStrings(item.months ?? []),
         dayOfMonth: sortAndStringifyNumStrings(item.daysOfMonth ?? []),
         dayOfWeek: '',
-        hour: item.time?.hour || '',
-        minute: item.time?.minute || '',
+        hour: String(item.time?.hour || ''),
+        minute: String(item.time?.minute || ''),
         second: '',
       });
       return;
@@ -197,7 +198,6 @@ export async function formDataToEditScheduleRequest(
     schedule_id: scheduleId,
     searchAttributes: getSearchAttributes(formData.searchAttributes),
     schedule: {
-      ...schedule,
       spec: buildSpecFromFormData(formData),
       action: {
         startWorkflow: {

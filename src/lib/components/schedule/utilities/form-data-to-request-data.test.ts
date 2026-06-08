@@ -129,8 +129,8 @@ describe('formDataToCreateScheduleRequest', () => {
         month: '',
         dayOfMonth: '',
         dayOfWeek: '1,3,5',
-        hour: 9,
-        minute: 30,
+        hour: '9',
+        minute: '30',
         second: '',
       },
     ]);
@@ -175,7 +175,7 @@ describe('formDataToCreateScheduleRequest', () => {
 
     expect(body.schedule.spec.startTime).toBe('2026-01-01T00:00:00Z');
     expect(body.schedule.spec.endTime).toBe('2026-12-31T00:00:00Z');
-    expect(body.schedule.spec.jitter).toBe('60');
+    expect(body.schedule.spec.jitter).toBe('60s');
   });
 
   it('omits jitter when it is zero', async () => {

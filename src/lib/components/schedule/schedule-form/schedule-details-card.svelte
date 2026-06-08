@@ -254,9 +254,7 @@
         step={1}
         min={0}
         suffix={translate('common.seconds-abbreviated')}
-        bind:value={
-          () => $form.jitter.replace(/\D/g, ''), (v) => ($form.jitter = `${v}s`)
-        }
+        bind:value={() => $form.jitter, (v) => ($form.jitter = v?.toString())}
         error={!!$errors.jitter?.[0]}
         hintText={$errors.jitter?.[0]}
       >

@@ -304,10 +304,6 @@ export async function submitBackfillSchedule(
 export const currentScheduleFetch =
   writable<Promise<DescribeFullSchedule | null>>(null);
 
-currentScheduleFetch.subscribe((p) => {
-  p?.then((p) => console.log({ scheduleResult: p }));
-});
-
 export function refreshCurrentScheduleFetch(
   context: Pick<ScheduleContext, 'namespace' | 'scheduleId'>,
 ) {

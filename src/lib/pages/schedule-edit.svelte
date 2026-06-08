@@ -2,7 +2,7 @@
   import { page } from '$app/state';
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form/form.svelte';
-  import type { ScheduleFormData } from '$lib/components/schedule/schedule-form/schema';
+  import type { ScheduleFormData } from '$lib/components/schedule/schema/schema';
   import Loading from '$lib/holocene/loading.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
   import { submitEditSchedule } from '$lib/stores/schedules';
