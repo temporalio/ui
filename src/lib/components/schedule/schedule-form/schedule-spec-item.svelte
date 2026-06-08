@@ -31,6 +31,8 @@
 
   let { form, errors, index, expanded, onRemove, canRemove }: Props = $props();
 
+  const uuid = $props.id();
+
   const specTypeOptions = [
     { value: 'cron', label: translate('schedules.cron-string') },
     { value: 'week', label: translate('schedules.spec-type-week') },
@@ -75,7 +77,8 @@
     >
       <div class="flex flex-col items-end gap-4 sm:flex-row">
         <Select
-          id="spec-type-{index}"
+          id="spec-type-{uuid}"
+          data-testid="spec-type-{index}"
           label={translate('schedules.spec-type-label')}
           placeholder={translate('schedules.spec-type-placeholder')}
           value={$form.specs[index].type === 'unspecified'

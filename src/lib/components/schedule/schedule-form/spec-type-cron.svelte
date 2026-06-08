@@ -21,6 +21,8 @@
 
   let { form, errors, index }: Props = $props();
 
+  const uuid = $props.id();
+
   const spec = $derived(assertSpecType($form.specs[index], 'cron'));
 
   const today = new Date();
@@ -69,7 +71,7 @@
     </div>
   </div>
   <Input
-    id="cron-string-{index}"
+    id="cron-string-{uuid}"
     label={translate('schedules.cron-expression-label')}
     bind:value={
       () => spec.cronString,

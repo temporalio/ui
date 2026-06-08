@@ -18,12 +18,14 @@
 
   let { form, index, errors }: Props = $props();
 
+  const uuid = $props.id();
+
   const spec = $derived(assertSpecType($form.specs[index], 'interval'));
 </script>
 
 <div class="flex flex-col gap-4">
   <DurationInput
-    id="interval-{index}"
+    id="interval-{uuid}"
     inputClass="max-w-96"
     label={translate('schedules.interval-label')}
     bind:value={
@@ -41,7 +43,7 @@
   />
 
   <DurationInput
-    id="phase-{index}"
+    id="phase-{uuid}"
     inputClass="max-w-96"
     label={translate('schedules.offset-heading')}
     bind:value={
