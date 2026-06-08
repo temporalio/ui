@@ -23,6 +23,8 @@
 
   let { form, index, errors }: Props = $props();
 
+  const uuid = $props.id();
+
   const spec = $derived(assertSpecType($form.specs[index], 'week'));
 
   type Selection =
@@ -178,7 +180,7 @@
     </p>
     <div class="grid max-w-108 gap-2 md:grid-cols-2">
       <Input
-        id="hours"
+        id="hours-{uuid}"
         label={translate('common.hours')}
         labelHidden
         type="number"
@@ -201,7 +203,7 @@
       />
 
       <Input
-        id="minutes"
+        id="minutes-{uuid}"
         label={translate('common.minutes')}
         labelHidden
         type="number"
