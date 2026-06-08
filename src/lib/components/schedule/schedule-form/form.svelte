@@ -11,7 +11,6 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    clearScheduleViewActionTimeout,
     loading,
     openConfirmationModal,
     serverError,
@@ -122,7 +121,6 @@
   $effect(() => {
     return () => {
       $serverError = '';
-      clearScheduleViewActionTimeout(schedule ? 'edit' : 'create');
     };
   });
 </script>

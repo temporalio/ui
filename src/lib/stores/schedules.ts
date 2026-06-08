@@ -58,11 +58,6 @@ function clearScheduleTimeout(action: ScheduleAction) {
   clearTimeout(scheduleTimeouts.get(action));
 }
 
-export function clearScheduleViewActionTimeout(action: 'edit' | 'create') {
-  loading.set(false);
-  clearScheduleTimeout(action);
-}
-
 type ConfirmationModal = 'none' | 'delete' | 'pause' | 'trigger' | 'backfill';
 export const confirmationModal = writable<ConfirmationModal>('none');
 
