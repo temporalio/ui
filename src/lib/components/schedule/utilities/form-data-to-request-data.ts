@@ -70,6 +70,8 @@ function consolidateIntoSingleSpec(
   switch (item.type) {
     case 'cron': {
       if (item.cronString) {
+        // Add the cronString as a comment to the cronString so we save the cronString in the comment field and can
+        // determine that the spec was derived from this cronString.
         const cronStringWithComment = `${item.cronString}#${item.cronString}`;
         spec.cronString.push(cronStringWithComment);
       }
