@@ -11,13 +11,14 @@
   interface Props {
     namespace: DescribeNamespaceResponse;
     children: Snippet;
+    isCloud?: boolean;
     fallback?: Snippet;
   }
 
-  let { namespace, children, fallback }: Props = $props();
+  let { namespace, children, isCloud = false, fallback }: Props = $props();
 </script>
 
-{#if (namespace.namespaceInfo?.capabilities as NamespaceCapabilities)?.standaloneNexusOperation && minimumVersionRequired('1.31.0', $temporalVersion)}
+{#if (namespace.namespaceInfo?.capabilities as NamespaceCapabilities)?.standaloneNexusOperation && (isCloud || minimumVersionRequired('1.31.0', $temporalVersion))}
   {@render children()}
 {:else if fallback}
   {@render fallback()}

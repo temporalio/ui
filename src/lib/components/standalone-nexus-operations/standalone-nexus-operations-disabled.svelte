@@ -12,10 +12,10 @@
 
   let { namespace, href }: Props = $props();
 
-  const configValues = `nexus.enableStandaloneOperations:
+  const configValues = `nexus.enableStandaloneOperation:
   - value: true`;
 
-  const configValuesPerNamespace = $derived(`nexus.enableStandaloneOperations:
+  const configValuesPerNamespace = $derived(`nexus.enableStandaloneOperation:
   - value: true
     constraints:
       namespace: ${namespace}`);
