@@ -84,7 +84,7 @@
 >
   <div
     class={merge(
-      '[] relative flex items-center gap-0 text-center text-xs leading-4',
+      'relative flex items-center gap-0 text-center text-xs leading-4',
       big && 'text-lg',
     )}
     data-testid={testId || 'workflow-status'}
