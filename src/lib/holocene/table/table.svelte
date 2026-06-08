@@ -93,12 +93,12 @@
     bottom: var(--table-footer-bottom, 0);
 
     :global(tr) {
-      @apply surface-table-header;
+      @apply surface-background;
     }
 
     :global(tr > th),
     :global(tr > td) {
-      @apply h-9 border-t border-subtle px-2 text-left text-sm font-medium;
+      @apply h-8 border-t border-subtle px-2 text-left text-sm;
     }
   }
 

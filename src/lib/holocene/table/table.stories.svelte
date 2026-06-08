@@ -65,14 +65,15 @@
       {#each totalRows as row (row.name)}
         <tr>
           <td>{row.name}</td>
-          <td>{row.requests.toLocaleString()}</td>
-          <td>{row.storage.toLocaleString()}</td>
+          <td class="font-mono tabular-nums">{row.requests.toLocaleString()}</td
+          >
+          <td class="font-mono tabular-nums">{row.storage.toLocaleString()}</td>
         </tr>
       {/each}
       <tr slot="footer">
         <td>Total</td>
-        <td>{totalRequests.toLocaleString()}</td>
-        <td>{totalStorage.toLocaleString()}</td>
+        <td class="font-mono tabular-nums">{totalRequests.toLocaleString()}</td>
+        <td class="font-mono tabular-nums">{totalStorage.toLocaleString()}</td>
       </tr>
     </Table>
   </div>
@@ -95,14 +96,15 @@
       {#each totalRows as row (row.name)}
         <tr>
           <td>{row.name}</td>
-          <td>{row.requests.toLocaleString()}</td>
-          <td>{row.storage.toLocaleString()}</td>
+          <td class="font-mono tabular-nums">{row.requests.toLocaleString()}</td
+          >
+          <td class="font-mono tabular-nums">{row.storage.toLocaleString()}</td>
         </tr>
       {/each}
       <tr slot="footer">
         <td>Total</td>
-        <td>{totalRequests.toLocaleString()}</td>
-        <td>{totalStorage.toLocaleString()}</td>
+        <td class="font-mono tabular-nums">{totalRequests.toLocaleString()}</td>
+        <td class="font-mono tabular-nums">{totalStorage.toLocaleString()}</td>
       </tr>
     </Table>
     <div
