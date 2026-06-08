@@ -238,8 +238,8 @@ export const setRampingDeploymentVersion = async (
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
-        version: `${request.deploymentName}.${request.buildId}`,
-        rampingVersionPercentage: request.rampingVersionPercentage,
+        build_id: request.buildId,
+        percentage: request.rampingVersionPercentage,
       }),
     },
     onError,
@@ -254,7 +254,7 @@ export const removeRampingDeploymentVersion = async (
   await requestFromAPI<unknown>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ version: '' }),
+      body: stringifyWithBigInt({ build_id: '' }),
     },
     onError,
   });
