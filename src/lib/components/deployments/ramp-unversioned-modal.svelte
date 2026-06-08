@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Button from '$lib/holocene/button.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -9,6 +10,7 @@
     error?: string;
     onConfirm?: (percentage: number) => void;
     onCancel?: () => void;
+    onRemove?: () => void;
   }
 
   let {
@@ -17,6 +19,7 @@
     error = '',
     onConfirm,
     onCancel,
+    onRemove,
   }: Props = $props();
 </script>
 
@@ -28,6 +31,15 @@
   on:confirmModal={() => onConfirm?.(percentage)}
   on:cancelModal={onCancel}
 >
+  <Button
+    slot="footer"
+    variant="destructive"
+    size="sm"
+    class={!onRemove ? 'invisible' : ''}
+    on:click={onRemove}
+  >
+    {translate('deployments.remove-unversioned-ramping')}
+  </Button>
   <h3 slot="title">{translate('deployments.ramp-to-unversioned')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     <p class="text-sm">

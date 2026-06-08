@@ -82,6 +82,7 @@ export const Strings = {
   'ramp-to-unversioned-description':
     'This will route a percentage of new traffic to unversioned Workers.',
   'ramp-to-unversioned-error': 'Failed to set unversioned ramping',
+  'remove-unversioned-ramping': 'Remove Unversioned Ramping',
   'unversioned-ramping-banner':
     'Unversioned Workers Ramping at {{ percentage }}%.',
   'set-as-current': 'Set Current Version',
