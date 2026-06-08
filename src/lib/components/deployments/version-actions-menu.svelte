@@ -53,9 +53,11 @@
       </CapabilityGuard>
       <CapabilityGuard capability="serverScaledDeployments">
         {#if hasComputeConfig}
-          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-            {translate('deployments.set-as-current')}
-          </MenuItem>
+          {#if !isCurrent}
+            <MenuItem onclick={onSetCurrent}>
+              {translate('deployments.set-as-current')}
+            </MenuItem>
+          {/if}
           <MenuItem onclick={onSetRamping} disabled={isCurrent}>
             {isRamping
               ? translate('deployments.edit-ramping-percentage')
@@ -66,9 +68,11 @@
           </MenuItem>
         {/if}
         {#snippet fallback()}
-          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-            {translate('deployments.set-as-current')}
-          </MenuItem>
+          {#if !isCurrent}
+            <MenuItem onclick={onSetCurrent}>
+              {translate('deployments.set-as-current')}
+            </MenuItem>
+          {/if}
           <MenuItem onclick={onSetRamping} disabled={isCurrent}>
             {isRamping
               ? translate('deployments.edit-ramping-percentage')

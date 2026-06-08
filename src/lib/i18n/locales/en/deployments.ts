@@ -77,6 +77,13 @@ export const Strings = {
   'drainage-last-changed': 'Last Changed',
   'drainage-last-checked': 'Last Checked',
   metadata: 'Metadata',
+  'more-actions': 'More Actions',
+  'ramp-to-unversioned': 'Ramp to Unversioned Workers',
+  'ramp-to-unversioned-description':
+    'This will route a percentage of new traffic to unversioned Workers.',
+  'ramp-to-unversioned-error': 'Failed to set unversioned ramping',
+  'unversioned-ramping-banner':
+    'Unversioned Workers Ramping at {{ percentage }}%.',
   'set-as-current': 'Set Current Version',
   'set-as-current-error': 'Failed to set version as current',
   'set-current-version-success': '{{ buildId }} is now the current version',

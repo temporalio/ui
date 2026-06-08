@@ -5,7 +5,9 @@
   import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
   import DeploymentHeader from '$lib/components/deployments/deployment-header.svelte';
+  import RampUnversionedModal from '$lib/components/deployments/ramp-unversioned-modal.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Error from '$lib/holocene/error.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
@@ -13,6 +15,8 @@
   import {
     deleteWorkerDeployment,
     fetchDeployment,
+    removeRampingUnversionedWorkers,
+    setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
@@ -54,20 +58,85 @@
       goto(routeForWorkerDeployments({ namespace }));
     }
   }
+
+  let showRampUnversionedModal = $state(false);
+  let rampUnversionedPercentage = $state(0);
+  let rampUnversionedError = $state('');
+
+  async function handleRampUnversioned(percentage: number) {
+    rampUnversionedError = '';
+    await setRampingUnversionedWorkers(
+      { namespace, deploymentName, percentage },
+      (err) => {
+        rampUnversionedError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.ramp-to-unversioned-error');
+      },
+    );
+    if (rampUnversionedError) return;
+    showRampUnversionedModal = false;
+    reload();
+  }
+
+  async function handleRemoveRampUnversioned() {
+    await removeRampingUnversionedWorkers({ namespace, deploymentName });
+    reload();
+  }
 </script>
 
 {#await effectiveDeploymentPromise}
   <SkeletonTable rows={15} />
 {:then deployment}
   {@const info = deployment.workerDeploymentInfo}
+  {@const unversionedRampingPercentage =
+    !info.routingConfig?.rampingDeploymentVersion &&
+    info.routingConfig?.rampingVersionPercentage
+      ? info.routingConfig.rampingVersionPercentage
+      : null}
 
   <DeploymentHeader
     {namespace}
     {deploymentName}
-    hasVersions={!!info.versionSummaries?.length}
     {showInstancesLink}
     onDeleteClick={() => (showDeleteModal = true)}
+    onRampToUnversioned={() => {
+      rampUnversionedPercentage = unversionedRampingPercentage ?? 0;
+      showRampUnversionedModal = true;
+    }}
   />
+
+  {#if unversionedRampingPercentage !== null}
+    <CapabilityGuard capability="serverScaledDeployments">
+      <div
+        class="mt-4 flex items-center justify-between rounded border border-warning bg-warning/10 px-4 py-2 text-sm"
+      >
+        <span>
+          {translate('deployments.unversioned-ramping-banner', {
+            percentage: unversionedRampingPercentage,
+          })}
+        </span>
+        <div class="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="xs"
+            on:click={() => {
+              rampUnversionedPercentage = unversionedRampingPercentage;
+              showRampUnversionedModal = true;
+            }}
+          >
+            {translate('common.edit')}
+          </Button>
+          <Button
+            variant="ghost"
+            size="xs"
+            on:click={handleRemoveRampUnversioned}
+          >
+            {translate('common.delete')}
+          </Button>
+        </div>
+      </div>
+    </CapabilityGuard>
+  {/if}
 
   <div class="mt-4">
     <PaginatedTable
@@ -114,6 +183,17 @@
     {deploymentName}
     onConfirm={() => handleDeleteDeployment(deployment.conflictToken)}
     onCancel={() => (showDeleteModal = false)}
+  />
+
+  <RampUnversionedModal
+    open={showRampUnversionedModal}
+    bind:percentage={rampUnversionedPercentage}
+    error={rampUnversionedError}
+    onConfirm={handleRampUnversioned}
+    onCancel={() => {
+      showRampUnversionedModal = false;
+      rampUnversionedError = '';
+    }}
   />
 {:catch error}
   <Error {error} />

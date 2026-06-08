@@ -271,6 +271,45 @@ export const removeRampingDeploymentVersion = async (
   });
 };
 
+export const setRampingUnversionedWorkers = async (
+  parameters: DeploymentParameters & { percentage: number },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-ramping-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        build_id: '',
+        percentage: parameters.percentage,
+      }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
+export const removeRampingUnversionedWorkers = async (
+  parameters: DeploymentParameters,
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-ramping-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({ build_id: '' }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
 export const buildLambdaComputeConfig = (
   lambdaArn: string,
   iamRoleArn: string,

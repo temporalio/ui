@@ -12,9 +12,7 @@
 </script>
 
 {#if config}
-  <div
-    class="flex items-center gap-1 rounded-sm border border-subtle px-1 text-primary"
-  >
+  <div class="flex items-center gap-1 text-primary">
     <Icon name={config.icon} class="h-4 w-4" />
     {config.label}
   </div>
