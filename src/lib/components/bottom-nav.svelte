@@ -150,10 +150,8 @@
   >
     {#if linksContent}
       {@render linksContent({ open: viewLinks, closeMenu })}
-    {:else}
-      <div
-        class="flex h-full flex-col justify-end gap-6 overflow-auto px-4 py-8"
-      >
+    {:else if viewLinks}
+      <div class="flex h-full flex-col justify-end gap-6 overflow-auto px-4 py-8">
         {@render linksSnippet?.()}
       </div>
     {/if}
