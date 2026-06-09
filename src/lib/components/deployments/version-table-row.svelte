@@ -169,6 +169,15 @@
       validateLoading = false;
       return;
     }
+    const taskQueueInfos =
+      versionDetails.workerDeploymentVersionInfo.taskQueueInfos;
+    if (!taskQueueInfos?.length) {
+      validateResult = {
+        message: translate('deployments.validate-connection-no-task-queue'),
+      };
+      validateLoading = false;
+      return;
+    }
     let errorMessage: string | undefined;
     await validateWorkerDeploymentVersionComputeConfig(
       { namespace, deploymentName, buildId: versionBuildId, computeConfig },

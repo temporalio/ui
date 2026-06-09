@@ -85,6 +85,8 @@ export const Strings = {
   'validate-connection-error': 'Failed to validate connection',
   'validate-connection-valid': 'Connection is valid',
   'validate-connection-invalid': 'Connection is invalid',
+  'validate-connection-no-task-queue':
+    "This Worker Deployment Version's Task Queue is not registered. The Lambda may be failing after invocation. Check the function for configuration or runtime errors, then re-run it from the AWS Console. Alternatively, create a new Version to retry.",
   'delete-version': 'Delete Worker Deployment Version',
   'delete-version-description':
     'Deleting any running Workers will finish their current tasks. No new invocations will be made.',
