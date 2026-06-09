@@ -4,7 +4,7 @@ import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import { isValidCronString } from './cron';
-import type { ScheduleFormSchema } from '../schema/form';
+import type { FormScheduleSchema } from '../schema/form';
 
 import type {
   DescribeFullSchedule,
@@ -52,17 +52,17 @@ async function encodeHeaderFields(
 }
 
 function getScheduleStateRequest(
-  scheduleForm: ScheduleFormSchema,
+  scheduleForm: FormScheduleSchema,
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): ScheduleStateRequest {
   const existingState = describeFullSchedule?.schedule?.state ?? {};
 
   return {
     ...existingState,
-    ...(scheduleForm.endKind === 'after' && scheduleForm.endAfterOccurences
+    ...(scheduleForm.endKind === 'after' && scheduleForm.endAfterOccurrences
       ? {
           limitedActions: true,
-          remainingActions: scheduleForm.endAfterOccurences,
+          remainingActions: scheduleForm.endAfterOccurrences,
         }
       : { limitedActions: false, remainingActions: undefined }),
     paused: scheduleForm.pauseSchedule,
@@ -70,7 +70,7 @@ function getScheduleStateRequest(
 }
 
 function getSchedulePoliciesRequest(
-  scheduleForm: ScheduleFormSchema,
+  scheduleForm: FormScheduleSchema,
 ): SchedulePoliciesRequest {
   return {
     overlapPolicy: scheduleForm.overlapPolicy,
@@ -81,7 +81,7 @@ function getSchedulePoliciesRequest(
 }
 
 async function getScheduleActionRequest(
-  scheduleForm: ScheduleFormSchema,
+  scheduleForm: FormScheduleSchema,
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): Promise<ScheduleActionRequest> {
   let payloads: null | Payload[] = null;
@@ -128,7 +128,7 @@ async function getScheduleActionRequest(
   } satisfies ScheduleActionRequest;
 }
 
-type SpecFormItem = ScheduleFormSchema['specs'][number];
+type SpecFormItem = FormScheduleSchema['specs'][number];
 
 function toStructuredCalendar(
   calendar: SpecFormItem['calendar'],
@@ -145,7 +145,7 @@ function toInterval(interval: SpecFormItem['interval']): ScheduleInterval {
 }
 
 function getScheduleSpecRequest(
-  scheduleForm: ScheduleFormSchema,
+  scheduleForm: FormScheduleSchema,
 ): ScheduleSpecRequest {
   const interval: ScheduleInterval[] = [];
   const cronString: string[] = [];
@@ -153,6 +153,10 @@ function getScheduleSpecRequest(
 
   for (const item of scheduleForm.specs) {
     switch (item.kind) {
+      case 'none': {
+        break;
+      }
+
       case 'cron': {
         const trimmed = item.cronString?.trim();
         if (trimmed && isValidCronString(trimmed)) {
@@ -203,7 +207,7 @@ function getScheduleSpecRequest(
 }
 
 export async function getRequestBody(
-  scheduleForm: ScheduleFormSchema,
+  scheduleForm: FormScheduleSchema,
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): Promise<ScheduleRequestBody> {
   return {

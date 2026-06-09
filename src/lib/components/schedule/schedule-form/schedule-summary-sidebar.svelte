@@ -5,24 +5,31 @@
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import type { ScheduleFormData } from '../schema/form-schema';
-  import { getSpecSummary } from '../utilities/spec';
+  import type { FormScheduleSchema } from '../schema/form';
+  import { getScheduleSpecSummary } from '../utilities/summarize';
 
   interface Props {
-    form: Readable<ScheduleFormData>;
+    form: Readable<FormScheduleSchema>;
   }
 
   let { form }: Props = $props();
 
+  const timing = $derived({
+    timezoneName: $form.timezoneName,
+    startTime: $form.startTime,
+    endTime: $form.endTime,
+    endAfterOccurrences: $form.endAfterOccurrences,
+  });
+
   const endDisplay = $derived.by(() => {
-    switch ($form.endDateType) {
+    switch ($form.endKind) {
       case 'never': {
         return translate('common.never');
       }
 
       case 'on': {
-        if ($form.endDate) {
-          return $timestamp($form.endDate);
+        if ($form.endTime) {
+          return $timestamp($form.endTime);
         }
         break;
       }
@@ -43,7 +50,7 @@
   const descriptionDisplay = $derived.by(() => {
     const specs = $form.specs
       .map((spec, i) => {
-        const summary = getSpecSummary(spec);
+        const summary = getScheduleSpecSummary(spec, timing);
         if (i === 0) {
           return summary;
         }
@@ -71,7 +78,7 @@
         {translate('schedules.summary-start-date-label')}
       </dt>
       <dd class="text-sm">
-        {$form.startDate ? $timestamp($form.startDate) : '--'}
+        {$form.startTime ? $timestamp($form.startTime) : '--'}
       </dd>
     </div>
     <div>

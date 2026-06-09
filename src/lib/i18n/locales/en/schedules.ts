@@ -135,6 +135,7 @@ export const Strings = {
   'spec-summary-every-day': 'every day',
   'spec-summary-days_one': 'day {{- days}}',
   'spec-summary-days_other': 'days {{- days}}',
+  'spec-summary-year': 'in {{- years}}',
   'spec-summary-interval':
     'Every {{- interval}} {{- intervalUnit}} offset by {{- offset}} {{- offsetUnit}}',
   'overlap-skip-label': 'Skip',

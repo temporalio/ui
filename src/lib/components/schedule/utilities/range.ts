@@ -1,6 +1,16 @@
-import type { ScheduleSpecRange } from '../schema/spec-item-form-schema';
+type Range = {
+  start: number;
+  end?: number;
+  step?: number;
+};
 
-function expandRange(range: ScheduleSpecRange): number[] {
+type RangeInput = {
+  start?: number;
+  end?: number;
+  step?: number;
+};
+
+function expandRange(range: RangeInput): number[] {
   const start = range.start ?? 0;
   const end = range.end ?? start;
   const step = range.step && range.step > 0 ? range.step : 1;
@@ -16,7 +26,7 @@ function expandRange(range: ScheduleSpecRange): number[] {
 }
 
 export function expandRanges(
-  ranges: ScheduleSpecRange[] | undefined | null,
+  ranges: RangeInput[] | undefined | null,
 ): number[] {
   if (!ranges || ranges.length === 0) return [];
 
@@ -33,7 +43,7 @@ export function expandRanges(
 // Compact a list of integers into the smallest `Range[]` that expands back to
 // the same set. Single arithmetic progressions become one `{start, end, step}`
 // entry; otherwise we emit consecutive runs.
-export function compactToRanges(values: number[]): ScheduleSpecRange[] {
+export function compactToRanges(values: number[]): Range[] {
   const sorted = Array.from(new Set(values)).sort((a, b) => a - b);
 
   if (!sorted.length) {
@@ -57,7 +67,7 @@ export function compactToRanges(values: number[]): ScheduleSpecRange[] {
     });
 
   if (isArithemticProgression) {
-    const range: ScheduleSpecRange = {
+    const range: Range = {
       start: sorted[0],
       end: sorted[sorted.length - 1],
       step: potentialStep === 1 ? undefined : potentialStep,
@@ -66,7 +76,7 @@ export function compactToRanges(values: number[]): ScheduleSpecRange[] {
     return [range];
   }
 
-  const ranges: ScheduleSpecRange[] = [];
+  const ranges: Range[] = [];
   let runStart = sorted[0];
   let runEnd = sorted[0];
   for (let i = 1; i < sorted.length; i++) {

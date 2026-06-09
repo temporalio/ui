@@ -2,11 +2,11 @@
   import { page } from '$app/state';
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form/form.svelte';
-  import type { ScheduleFormData } from '$lib/components/schedule/schema/form-schema';
+  import type { FormScheduleSchema } from '$lib/components/schedule/schema/form';
   import Loading from '$lib/holocene/loading.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
   import { submitEditSchedule } from '$lib/stores/schedules';
-  import type { FullSchedule } from '$lib/types/schedule';
+  import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { getIdentity } from '$lib/utilities/core-context';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
@@ -22,7 +22,8 @@
   });
 
   const handleEdit =
-    (schedule: FullSchedule) => async (formData: ScheduleFormData) => {
+    (schedule: DescribeFullSchedule) =>
+    async (formData: FormScheduleSchema) => {
       await submitEditSchedule(formData, schedule, {
         namespace: page.params.namespace,
         identity,
@@ -33,10 +34,6 @@
 
 {#await scheduleFetch}
   <Loading />
-{:then { schedule, searchAttributes }}
-  <ScheduleFormView
-    onSubmit={handleEdit(schedule)}
-    {schedule}
-    {searchAttributes}
-  />
+{:then schedule}
+  <ScheduleFormView onSubmit={handleEdit(schedule)} {schedule} />
 {/await}

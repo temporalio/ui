@@ -7,23 +7,20 @@
   import { getWeekdayLabel } from '$lib/i18n/format-date-names';
   import { translate } from '$lib/i18n/translate';
 
-  import type { ScheduleFormData } from '../schema/form-schema';
-  import { assertSpecType } from '../utilities/spec';
+  import type { FormScheduleSchema } from '../schema/form';
 
   import CronExpressionFormatModal from './cron-expression-format-modal.svelte';
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
-    errors: SuperForm<ScheduleFormData>['errors'];
+    form: SuperForm<FormScheduleSchema>['form'];
+    errors: SuperForm<FormScheduleSchema>['errors'];
     index: number;
   }
 
   let { form, errors, index }: Props = $props();
 
   const uuid = $props.id();
-
-  const spec = $derived(assertSpecType($form.specs[index], 'cron'));
 
   const today = new Date();
   const weekdayNumber = today.getDay();
@@ -54,6 +51,15 @@
   ];
 
   let isCronExpressionFormatModalOpen = $state(false);
+
+  function setCronString(value: string) {
+    $form.specs[index] = { ...$form.specs[index], cronString: value };
+
+    if ($errors.specs?.[index]?.cronString) {
+      delete $errors.specs[index].cronString;
+      $errors = $errors;
+    }
+  }
 </script>
 
 <div class="flex flex-col gap-4">
@@ -63,8 +69,7 @@
       {#each shortcuts as shortcut (shortcut.value)}
         <Button
           variant="secondary"
-          on:click={() =>
-            ($form.specs[index] = { ...spec, cronString: shortcut.value })}
+          on:click={() => setCronString(shortcut.value)}
           >{shortcut.label}</Button
         >
       {/each}
@@ -74,8 +79,8 @@
     id="cron-string-{uuid}"
     label={translate('schedules.cron-expression-label')}
     bind:value={
-      () => spec.cronString,
-      (v) => ($form.specs[index] = { ...spec, cronString: v })
+      () => $form.specs[index]?.cronString,
+      (v) => ($form.specs[index] = { ...$form.specs[index], cronString: v })
     }
     placeholder="* * * * *"
     required

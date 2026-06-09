@@ -7,12 +7,13 @@
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { type ScheduleFormData } from '../schema/form-schema';
   import {
-    getInitialSpecData,
-    getRawValue,
-    getSpecSummary,
-  } from '../utilities/spec';
+    type FormScheduleSchema,
+    type FormScheduleTimingSchema,
+  } from '../schema/form';
+  import { getFormSpecInitialData } from '../utilities/get-form-spec-initial-data';
+  import { getRawValue } from '../utilities/get-raw-value';
+  import { getScheduleSpecSummary } from '../utilities/summarize';
 
   import IntervalExamplesModal from './interval-examples-modal.svelte';
   import SpecTypeCron from './spec-type-cron.svelte';
@@ -21,8 +22,8 @@
   import SpecTypeWeek from './spec-type-week.svelte';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
-    errors: SuperForm<ScheduleFormData>['errors'];
+    form: SuperForm<FormScheduleSchema>['form'];
+    errors: SuperForm<FormScheduleSchema>['errors'];
     index: number;
     expanded: boolean;
     onRemove: () => void;
@@ -38,23 +39,31 @@
     { value: 'week', label: translate('schedules.spec-type-week') },
     { value: 'month', label: translate('schedules.spec-type-month') },
     { value: 'interval', label: translate('schedules.spec-type-interval') },
-  ];
+  ] as const;
 
-  const specType = $derived($form.specs[index]?.type);
+  const timing: FormScheduleTimingSchema = $derived.by(() => {
+    return {
+      startTime: $form.startTime,
+      timezoneName: $form.timezoneName,
+      endTime: $form.endTime,
+      endAfterOccurrences: $form.endAfterOccurrences,
+    };
+  });
   const spec = $derived($form.specs[index]);
+  const specKind = $derived($form.specs[index]?.kind ?? 'none');
 
   const typeLabel = $derived(
-    specTypeOptions.find((o) => o.value === specType)?.label ??
-      specType ??
+    specTypeOptions.find((o) => o.value === specKind)?.label ??
+      specKind ??
       translate('schedules.spec-type-none'),
   );
 
   function onTypeChange(value: string) {
-    const newType = value as ScheduleFormData['specs'][number]['type'];
-    $form.specs[index] = getInitialSpecData(newType);
+    const newKind = value as (typeof specTypeOptions)[number]['value'];
+    $form.specs[index] = getFormSpecInitialData(newKind);
 
-    if ($errors.specs?.[index]?.type) {
-      delete $errors.specs[index].type;
+    if ($errors.specs?.[index]?.kind) {
+      delete $errors.specs[index].kind;
       $errors = $errors;
     }
   }
@@ -81,19 +90,17 @@
           data-testid="spec-type-{index}"
           label={translate('schedules.spec-type-label')}
           placeholder={translate('schedules.spec-type-placeholder')}
-          value={$form.specs[index].type === 'unspecified'
-            ? undefined
-            : $form.specs[index].type}
+          value={specKind === 'none' ? undefined : specKind}
           onChange={onTypeChange}
-          valid={!$errors.specs?.[index]?.type?.[0]}
-          error={$errors.specs?.[index]?.type?.[0]}
+          valid={!$errors.specs?.[index]?.kind?.[0]}
+          error={$errors.specs?.[index]?.kind?.[0]}
           required
         >
           {#each specTypeOptions as option (option.value)}
             <Option value={option.value}>{option.label}</Option>
           {/each}
         </Select>
-        {#if spec.type === 'interval'}
+        {#if spec.kind === 'interval'}
           <Button
             variant="ghost"
             on:click={() => (isIntervalExampleModalOpen = true)}
@@ -115,18 +122,18 @@
       {/if}
     </div>
 
-    {#if specType === 'cron'}
+    {#if specKind === 'cron'}
       <SpecTypeCron {form} {errors} {index} />
-    {:else if specType === 'week'}
+    {:else if specKind === 'week'}
       <SpecTypeWeek {form} {errors} {index} />
-    {:else if specType === 'month'}
+    {:else if specKind === 'month'}
       <SpecTypeMonth {form} {errors} {index} />
-    {:else if specType === 'interval'}
+    {:else if specKind === 'interval'}
       <SpecTypeInterval {form} {errors} {index} />
     {/if}
   </div>
 {:else}
-  {@const rawValue = getRawValue(spec)}
+  {@const rawValue = getRawValue(spec, timing)}
   <div
     bind:this={containerEl}
     class="surface-background relative flex w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
@@ -137,7 +144,7 @@
     >
       <span class="font-semibold">{typeLabel}</span>
       <span class="flex-1 flex-wrap text-xs text-secondary">
-        {getSpecSummary(spec)}.
+        {getScheduleSpecSummary(spec, timing)}.
       </span>
       {#if rawValue}
         <span class="font-mono">{rawValue}</span>

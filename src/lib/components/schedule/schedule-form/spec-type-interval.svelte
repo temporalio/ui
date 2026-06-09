@@ -5,14 +5,13 @@
   import { translate } from '$lib/i18n/translate';
 
   import { intervalUnits } from '../constants';
-  import type { ScheduleFormData } from '../schema/form-schema';
-  import { assertSpecType } from '../utilities/spec';
+  import type { FormScheduleSchema } from '../schema/form';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
-    errors: SuperForm<ScheduleFormData>['errors'];
+    form: SuperForm<FormScheduleSchema>['form'];
+    errors: SuperForm<FormScheduleSchema>['errors'];
     index: number;
   }
 
@@ -20,7 +19,7 @@
 
   const uuid = $props.id();
 
-  const spec = $derived(assertSpecType($form.specs[index], 'interval'));
+  const spec = $derived($form.specs[index]);
 </script>
 
 <div class="flex flex-col gap-4">
@@ -29,16 +28,20 @@
     inputClass="max-w-96"
     label={translate('schedules.interval-label')}
     bind:value={
-      () => spec.interval,
-      (v) => ($form.specs[index] = { ...spec, interval: v })
+      () => spec.interval.interval,
+      (v) =>
+        ($form.specs[index] = {
+          ...spec,
+          interval: { ...spec.interval, interval: v },
+        })
     }
     units={intervalUnits}
     initialUnit="second(s)"
     inputmode="numeric"
     min={1}
     placeholder="00"
-    error={!!$errors.specs?.[index]?.interval?.[0]}
-    hintText={$errors.specs?.[index]?.interval?.[0]}
+    error={!!$errors.specs?.[index]?.interval?.interval?.[0]}
+    hintText={$errors.specs?.[index]?.interval?.interval?.[0]}
     hintTextAbove={translate('schedules.interval-view-description')}
   />
 
@@ -47,14 +50,19 @@
     inputClass="max-w-96"
     label={translate('schedules.offset-heading')}
     bind:value={
-      () => spec.phase, (v) => ($form.specs[index] = { ...spec, phase: v })
+      () => spec.interval.phase,
+      (v) =>
+        ($form.specs[index] = {
+          ...spec,
+          interval: { ...spec.interval, phase: v },
+        })
     }
     initialUnit="minute(s)"
     inputmode="numeric"
     min={0}
     placeholder="00"
-    error={!!$errors.specs?.[index]?.phase?.[0]}
-    hintText={$errors.specs?.[index]?.phase?.[0]}
+    error={!!$errors.specs?.[index]?.interval?.phase?.[0]}
+    hintText={$errors.specs?.[index]?.interval?.phase?.[0]}
     hintTextAbove={translate('schedules.offset-description')}
   />
 

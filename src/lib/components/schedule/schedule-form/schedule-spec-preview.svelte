@@ -4,11 +4,11 @@
 
   import { translate } from '$lib/i18n/translate';
 
-  import type { ScheduleFormData } from '../schema/form-schema';
-  import { getSpecSummary } from '../utilities/spec';
+  import type { FormScheduleSchema } from '../schema/form';
+  import { getScheduleSpecSummary } from '../utilities/summarize';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
+    form: SuperForm<FormScheduleSchema>['form'];
     index: number;
     class?: string;
   }
@@ -17,18 +17,26 @@
 
   const spec = $derived($form.specs[index]);
 
+  const timing = $derived({
+    timezoneName: $form.timezoneName,
+    startTime: $form.startTime,
+    endTime: $form.endTime,
+    endAfterOccurrences: $form.endAfterOccurrences,
+  });
+
   const preview = $derived.by(() => {
-    if (spec.type === 'cron' && !spec.cronString) {
+    console.log({ spec: $form.specs[index] });
+    if (spec.kind === 'cron' && !spec.cronString) {
       return translate('schedules.spec-preview-example', {
-        summary: getSpecSummary(spec),
+        summary: getScheduleSpecSummary(spec, timing),
       });
     }
 
-    if (spec.type === 'interval' && !spec.interval) {
+    if (spec.kind === 'interval' && !spec.interval.interval) {
       return translate('schedules.spec-preview-interval-empty');
     }
 
-    return getSpecSummary(spec);
+    return getScheduleSpecSummary(spec, timing);
   });
 </script>
 

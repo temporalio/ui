@@ -3,7 +3,7 @@
 
   import { translate } from '$lib/i18n/translate';
 
-  import { getScheduleSpecSummary } from '../utilities/spec';
+  import { summarizeScheduleSpec } from '../utilities/summarize';
 
   import type { ScheduleSpec } from '$types';
 
@@ -28,10 +28,10 @@
     {#if cronString}
       <p>{cronString}</p>
     {:else}
-      <p>{getScheduleSpecSummary(spec, timezoneName)}</p>
+      <p>{summarizeScheduleSpec(spec)}</p>
     {/if}
   </div>
   <p class="text-secondary">
-    {@html translate('common.timezone', { timezone: timezoneName })}
+    {translate('common.timezone', { timezone: timezoneName })}
   </p>
 </div>

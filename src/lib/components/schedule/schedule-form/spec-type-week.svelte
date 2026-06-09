@@ -9,62 +9,68 @@
   import { translate } from '$lib/i18n/translate';
 
   import { DAYS_OF_WEEK, WEEKDAYS, WEEKEND } from '../constants';
-  import type { ScheduleFormData } from '../schema/form-schema';
+  import type { FormScheduleSchema } from '../schema/form';
   import { type DayOfWeek } from '../types';
-  import { assertSpecType } from '../utilities/spec';
+  import { compactToRanges, expandRanges } from '../utilities/range';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
-    errors: SuperForm<ScheduleFormData>['errors'];
+    form: SuperForm<FormScheduleSchema>['form'];
+    errors: SuperForm<FormScheduleSchema>['errors'];
     index: number;
   }
 
-  let { form, index, errors }: Props = $props();
+  let { form, index }: Props = $props();
 
   const uuid = $props.id();
 
-  const spec = $derived(assertSpecType($form.specs[index], 'week'));
+  const spec = $derived($form.specs[index]);
+
+  const selectedDays = $derived(
+    expandRanges(spec.calendar.dayOfWeek) as DayOfWeek[],
+  );
 
   type Selection =
-    | {
-        type: 'everyday' | 'weekdays' | 'weekends';
-      }
-    | {
-        type: 'custom';
-        days: DayOfWeek[];
-      };
+    | { type: 'everyday' | 'weekdays' | 'weekends' }
+    | { type: 'custom'; days: DayOfWeek[] };
 
   function getInitialSelectionState(): Selection {
-    if (!spec.daysOfWeek) {
+    if (selectedDays.length === 0) {
       return { type: 'everyday' };
     }
 
-    const selectedSet = new Set(spec.daysOfWeek);
+    const selectedSet = new Set(selectedDays);
 
     if (DAYS_OF_WEEK.every((d) => selectedSet.has(d))) {
       return { type: 'everyday' };
     }
 
-    if (WEEKDAYS.every((d) => selectedSet.has(d))) {
+    if (
+      WEEKDAYS.every((d) => selectedSet.has(d)) &&
+      selectedSet.size === WEEKDAYS.length
+    ) {
       return { type: 'weekdays' };
     }
 
-    if (WEEKEND.every((d) => selectedSet.has(d))) {
+    if (
+      WEEKEND.every((d) => selectedSet.has(d)) &&
+      selectedSet.size === WEEKEND.length
+    ) {
       return { type: 'weekends' };
     }
 
-    return {
-      type: 'custom',
-      days: [...spec.daysOfWeek],
-    };
+    return { type: 'custom', days: [...selectedDays] };
   }
 
   let selection = $state(getInitialSelectionState());
 
-  function syncDays(daysOfWeek: DayOfWeek[]): void {
-    $form.specs[index] = { ...spec, daysOfWeek };
+  function syncDays(days: DayOfWeek[]): void {
+    const ranges = compactToRanges(days.map(Number));
+    $form.specs[index] = {
+      ...spec,
+      calendar: { ...spec.calendar, dayOfWeek: ranges },
+    };
   }
 
   function selectType(type: Selection['type']): void {
@@ -87,7 +93,7 @@
         return;
 
       case 'custom': {
-        const days = [new Date().getDay().toString() as DayOfWeek];
+        const days = [new Date().getDay() as DayOfWeek];
         selection = { type: 'custom', days };
         syncDays([...days]);
         return;
@@ -118,6 +124,30 @@
       selection.days = selection.days.filter((d) => d !== day);
       syncDays([...selection.days]);
     }
+  }
+
+  function setHour(value: string): void {
+    const n = value === '' ? undefined : Number(value);
+    $form.specs[index] = {
+      ...spec,
+      calendar: {
+        ...spec.calendar,
+        hour:
+          n !== undefined && Number.isFinite(n) ? [{ start: n }] : undefined,
+      },
+    };
+  }
+
+  function setMinute(value: string): void {
+    const n = value === '' ? undefined : Number(value);
+    $form.specs[index] = {
+      ...spec,
+      calendar: {
+        ...spec.calendar,
+        minute:
+          n !== undefined && Number.isFinite(n) ? [{ start: n }] : undefined,
+      },
+    };
   }
 </script>
 
@@ -190,15 +220,8 @@
         max={23}
         placeholder="00"
         suffix={translate('common.hours-abbreviated')}
-        error={!!$errors.specs?.[index]?.time?.hour?.[0]}
-        hintText={$errors.specs?.[index]?.time?.hour?.[0]}
         bind:value={
-          () => spec.time?.hour?.toString(),
-          (v) =>
-            ($form.specs[index] = {
-              ...spec,
-              time: { ...spec.time, hour: Number(v) },
-            })
+          () => spec.calendar.hour?.[0]?.start?.toString() ?? '', setHour
         }
       />
 
@@ -213,15 +236,8 @@
         max={59}
         placeholder="00"
         suffix={translate('common.minutes-abbreviated')}
-        error={!!$errors.specs?.[index]?.time?.minute?.[0]}
-        hintText={$errors.specs?.[index]?.time?.minute?.[0]}
         bind:value={
-          () => spec.time?.minute?.toString(),
-          (v) =>
-            ($form.specs[index] = {
-              ...spec,
-              time: { ...spec.time, minute: Number(v) },
-            })
+          () => spec.calendar.minute?.[0]?.start?.toString() ?? '', setMinute
         }
       />
     </div>

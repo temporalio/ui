@@ -5,6 +5,7 @@ import { searchAttributesSchema } from '$lib/stores/search-attributes';
 
 import { durationString, jsonString, structuredCalendarSchema } from './common';
 import { MIN_CATCHUP_SECONDS } from '../constants';
+import { isValidCronString } from '../utilities/cron';
 
 export const overlapPolicy = z
   .enum([
@@ -19,7 +20,7 @@ export const overlapPolicy = z
 
 export type OverlapPolicy = z.infer<typeof overlapPolicy>;
 
-const schedulePoliciesSchema = z.object({
+export const formSchedulePoliciesSchema = z.object({
   overlapPolicy,
   pauseOnFailure: z.boolean().default(false),
   pauseSchedule: z.boolean().default(false),
@@ -41,23 +42,91 @@ const schedulePoliciesSchema = z.object({
   keepOriginalWorkflowId: z.boolean().optional(),
 });
 
-export type SchedulePoliciesSchema = z.infer<typeof schedulePoliciesSchema>;
+export type FormSchedulePoliciesSchema = z.infer<
+  typeof formSchedulePoliciesSchema
+>;
 
-const specFormSchema = z.object({
-  kind: z.enum(['cron', 'interval', 'week', 'month', 'frozen']),
-  cronString: z.string().trim().default(''),
-  interval: z
-    .object({
-      interval: durationString().optional(),
-      phase: durationString().optional(),
-    })
-    .default({}),
-  calendar: structuredCalendarSchema(),
+const formSpecKind = z.enum([
+  'none',
+  'cron',
+  'interval',
+  'week',
+  'month',
+  'frozen',
+]);
+export type FormSpecKind = z.infer<typeof formSpecKind>;
+
+export const formSpecSchema = z
+  .object({
+    kind: formSpecKind,
+    cronString: z.string().trim().default(''),
+    interval: z
+      .object({
+        interval: durationString().optional(),
+        phase: durationString().optional(),
+      })
+      .default({}),
+    calendar: structuredCalendarSchema(),
+  })
+  .superRefine((spec, ctx) => {
+    switch (spec.kind) {
+      case 'none': {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Type is required ',
+          path: ['kind'],
+        });
+        return;
+      }
+
+      case 'cron': {
+        if (!spec.cronString) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Cron expression is required',
+            path: ['cronString'],
+          });
+        } else if (!isValidCronString(spec.cronString)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Must be a valid cron string',
+            path: ['cronString'],
+          });
+        }
+        return;
+      }
+
+      case 'frozen': {
+        return;
+      }
+
+      case 'interval': {
+        return;
+      }
+
+      case 'month': {
+        return;
+      }
+
+      case 'week': {
+        return;
+      }
+    }
+  });
+
+export type FormSpecSchema = z.infer<typeof formSpecSchema>;
+
+export const formScheduleTimingSchema = z.object({
+  timezoneName: z.string().trim().default('UTC'),
+  startTime: z.string().datetime().default(new Date().toISOString()),
+  endKind: z.enum(['never', 'on', 'after']).default('never'),
+  endTime: z.string().datetime().optional(),
+  endAfterOccurrences: z.number().optional(),
 });
 
-export type SpecFormSchema = z.infer<typeof specFormSchema>;
+export type FormScheduleTimingSchema = z.infer<typeof formScheduleTimingSchema>;
 
-export const scheduleFormSchema = z
+export const formScheduleSchema = z
   .object({
     name: z
       .string()
@@ -71,18 +140,14 @@ export const scheduleFormSchema = z
     editInput: z.boolean().default(false),
     encoding: z.enum(['json/plain', 'json/protobuf']).default('json/plain'),
     messageType: z.string().trim().optional(),
-    timezoneName: z.string().trim().default('UTC'),
-    startTime: z.string().datetime().default(new Date().toISOString()),
-    endKind: z.enum(['never', 'on', 'after']).default('never'),
-    endTime: z.string().datetime().optional(),
-    endAfterOccurences: z.number().optional(),
     jitter: durationString().optional(),
     searchAttributes: searchAttributesSchema.default([]),
     workflowSearchAttributes: searchAttributesSchema.default([]),
     specs: z
-      .array(specFormSchema)
+      .array(formSpecSchema)
       .min(1, 'At least one schedule spec is required'),
   })
-  .merge(schedulePoliciesSchema);
+  .merge(formSchedulePoliciesSchema)
+  .merge(formScheduleTimingSchema);
 
-export type ScheduleFormSchema = z.infer<typeof scheduleFormSchema>;
+export type FormScheduleSchema = z.infer<typeof formScheduleSchema>;

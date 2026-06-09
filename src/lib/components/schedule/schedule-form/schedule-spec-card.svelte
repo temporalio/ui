@@ -8,18 +8,17 @@
   import Card from '$lib/holocene/card.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { FullSchedule } from '$lib/types/schedule';
+  import type { DescribeFullSchedule } from '$lib/types/schedule';
 
-  import type { ScheduleFormData } from '../schema/form-schema';
-  import { getInitialSpecData } from '../utilities/spec';
+  import type { FormScheduleSchema } from '../schema/form';
 
   import ScheduleSpecItem from './schedule-spec-item.svelte';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
-    errors: SuperForm<ScheduleFormData>['errors'];
-    validateForm: SuperForm<ScheduleFormData>['validateForm'];
-    schedule?: FullSchedule | null;
+    form: SuperForm<FormScheduleSchema>['form'];
+    errors: SuperForm<FormScheduleSchema>['errors'];
+    validateForm: SuperForm<FormScheduleSchema>['validateForm'];
+    schedule?: DescribeFullSchedule | null;
   }
 
   let { form, errors, validateForm, schedule = null }: Props = $props();
@@ -49,7 +48,7 @@
       return;
     }
 
-    $form.specs = [...$form.specs, getInitialSpecData('unspecified')];
+    $form.specs = [...$form.specs, { kind: 'cron', cronString: '' }];
     expandedIndex = $form.specs.length - 1;
 
     await tick();

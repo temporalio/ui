@@ -2,11 +2,8 @@ import { get, writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
-import type { ScheduleFormData } from '$lib/components/schedule/schema/form-schema';
-import {
-  formDataToCreateScheduleRequest,
-  formDataToEditScheduleRequest,
-} from '$lib/components/schedule/utilities/form-data-to-request-data';
+import type { FormScheduleSchema } from '$lib/components/schedule/schema/form';
+import { getRequestBody } from '$lib/components/schedule/utilities/get-request-body';
 import { translate } from '$lib/i18n/translate';
 import {
   backfillRequest,
@@ -18,7 +15,6 @@ import {
   triggerImmediately,
   unpauseSchedule,
 } from '$lib/services/schedule-service';
-import type { Schedule } from '$lib/types';
 import type {
   DescribeFullSchedule,
   OverlapPolicy,
@@ -87,14 +83,14 @@ export function closeConfirmationModal(
 }
 
 export async function submitCreateSchedule(
-  formData: ScheduleFormData,
+  formData: FormScheduleSchema,
   context: Omit<ScheduleContext, 'scheduleId'>,
 ): Promise<void> {
   const { namespace, identity } = context;
 
   let body: ScheduleRequestBody;
   try {
-    body = await formDataToCreateScheduleRequest(formData);
+    body = await getRequestBody(formData);
   } catch (e) {
     serverError.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
     return;
@@ -121,15 +117,15 @@ export async function submitCreateSchedule(
 }
 
 export async function submitEditSchedule(
-  formData: ScheduleFormData,
-  schedule: Schedule,
+  formData: FormScheduleSchema,
+  schedule: DescribeFullSchedule,
   context: ScheduleContext,
 ): Promise<void> {
   const { namespace, identity, scheduleId } = context;
 
   let body: ScheduleRequestBody;
   try {
-    body = await formDataToEditScheduleRequest(formData, schedule, scheduleId);
+    body = await getRequestBody(formData, schedule);
   } catch (e) {
     serverError.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
     return;

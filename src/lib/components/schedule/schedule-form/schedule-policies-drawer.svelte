@@ -26,14 +26,15 @@
     DEFAULT_RUN_TIMEOUT,
     DEFAULT_TASK_TIMEOUT,
   } from '../constants';
-  import type { ScheduleFormData } from '../schema/form-schema';
   import {
-    type SchedulePoliciesData,
-    schedulePoliciesFormSchema,
-  } from '../schema/policies-form-schema';
+    type FormSchedulePoliciesSchema,
+    formSchedulePoliciesSchema,
+    type FormScheduleSchema,
+    type OverlapPolicy,
+  } from '../schema/form';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
+    form: SuperForm<FormScheduleSchema>['form'];
     isOpen: boolean;
   }
 
@@ -41,7 +42,9 @@
 
   const overlapPolicyContent = getOverlapPolicyContent();
 
-  const pickPolicies = (data: ScheduleFormData): SchedulePoliciesData => ({
+  const pickPolicies = (
+    data: FormScheduleSchema,
+  ): FormSchedulePoliciesSchema => ({
     overlapPolicy: data.overlapPolicy,
     pauseOnFailure: data.pauseOnFailure,
     pauseSchedule: data.pauseSchedule,
@@ -55,7 +58,7 @@
   const policiesForm = superForm(pickPolicies(get(form)), {
     SPA: true,
     dataType: 'json',
-    validators: zodClient(schedulePoliciesFormSchema),
+    validators: zodClient(formSchedulePoliciesSchema),
     resetForm: false,
     onUpdate: ({ form: validated }) => {
       if (!validated.valid) return;
@@ -131,7 +134,7 @@
         {#each Object.entries(overlapPolicyContent) as [value, content] (value)}
           <RadioCard
             id="overlap-policy-{value}"
-            value={value as ScheduleFormData['overlapPolicy']}
+            value={value as OverlapPolicy}
             label={[
               content.label,
               content.isDefault &&

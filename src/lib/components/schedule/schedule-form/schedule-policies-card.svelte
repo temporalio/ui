@@ -9,12 +9,12 @@
   import { formatDuration } from '$lib/utilities/format-time';
 
   import { getOverlapPolicyContent } from '../constants';
-  import type { ScheduleFormData } from '../schema/form-schema';
+  import type { FormScheduleSchema } from '../schema/form';
 
   import SchedulesPoliciesDrawer from './schedule-policies-drawer.svelte';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
+    form: SuperForm<FormScheduleSchema>['form'];
   }
 
   let { form }: Props = $props();

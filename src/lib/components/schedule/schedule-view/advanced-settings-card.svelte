@@ -5,7 +5,7 @@
   import { formatDuration } from '$lib/utilities/format-time';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-  import { getScheduleSpecSummary } from '../utilities/spec';
+  import { summarizeScheduleSpec } from '../utilities/summarize';
 
   import type { DescribeFullSchedule } from '$types/schedule';
 
@@ -74,8 +74,9 @@
       {@render Info(
         translate('schedules.exclusion-calendar'),
         spec?.excludeStructuredCalendar
-          ? getScheduleSpecSummary({
+          ? summarizeScheduleSpec({
               structuredCalendar: spec.excludeStructuredCalendar,
+              timezoneName: spec.timezoneName,
             }) || translate('common.none')
           : translate('common.none'),
       )}

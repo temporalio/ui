@@ -16,7 +16,8 @@
     serverError,
   } from '$lib/stores/schedules';
   import { customSearchAttributes } from '$lib/stores/search-attributes';
-  import type { FullSchedule } from '$lib/types/schedule';
+  import type { DescribeFullSchedule } from '$lib/types/schedule';
+  import type { SearchAttributes } from '$lib/types/workflows';
   import {
     routeForSchedule,
     routeForSchedules,
@@ -24,11 +25,8 @@
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
-  import {
-    type ScheduleFormData,
-    scheduleFormSchema,
-  } from '../schema/form-schema';
-  import { scheduleToFormData } from '../utilities/request-data-to-form-data';
+  import { type FormScheduleSchema, formScheduleSchema } from '../schema/form';
+  import { getFormScheduleDefaults } from '../utilities/get-form-schedule-defaults';
 
   import ScheduleDetailsCard from './schedule-details-card.svelte';
   import SchedulePoliciesCard from './schedule-policies-card.svelte';
@@ -36,12 +34,10 @@
   import ScheduleSummarySidebar from './schedule-summary-sidebar.svelte';
   import SchedulesSearchAttributesCard from './schedules-search-attributes-card.svelte';
 
-  import type { SearchAttribute } from '$types';
-
   interface Props {
-    schedule?: FullSchedule | null;
-    searchAttributes?: SearchAttribute;
-    onSubmit: (formData: ScheduleFormData) => Promise<void>;
+    schedule?: DescribeFullSchedule | null;
+    searchAttributes?: SearchAttributes;
+    onSubmit: (formData: FormScheduleSchema) => Promise<void>;
   }
 
   let { schedule = null, searchAttributes = {}, onSubmit }: Props = $props();
@@ -67,11 +63,9 @@
   );
 
   const initialFormValues = $derived(
-    scheduleToFormData({
-      schedule,
+    getFormScheduleDefaults(schedule, {
       searchAttributes,
       customSearchAttributes: $customSearchAttributes,
-      scheduleId,
     }),
   );
 
@@ -79,7 +73,7 @@
   const superform = superForm(initialFormValues, {
     SPA: true,
     dataType: 'json',
-    validators: zodClient(scheduleFormSchema),
+    validators: zodClient(formScheduleSchema),
     resetForm: false,
     onUpdate: async ({ form }) => {
       if (!form.valid) return;

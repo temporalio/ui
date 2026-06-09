@@ -9,28 +9,37 @@
   import { translate } from '$lib/i18n/translate';
 
   import { DAYS_OF_MONTH, MONTHS } from '../constants';
-  import { type ScheduleFormData } from '../schema/form-schema';
+  import type { FormScheduleSchema } from '../schema/form';
   import type { DayOfMonth, Month } from '../types';
-  import { assertSpecType } from '../utilities/spec';
+  import { compactToRanges, expandRanges } from '../utilities/range';
 
   import ScheduleSpecPreview from './schedule-spec-preview.svelte';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
-    errors: SuperForm<ScheduleFormData>['errors'];
+    form: SuperForm<FormScheduleSchema>['form'];
+    errors: SuperForm<FormScheduleSchema>['errors'];
     index: number;
   }
 
-  let { form, index, errors }: Props = $props();
+  let { form, index }: Props = $props();
   let uuid = $props.id();
 
-  const spec = $derived(assertSpecType($form.specs[index], 'month'));
+  const spec = $derived($form.specs[index]);
+
+  const selectedDays = $derived(
+    expandRanges(spec.calendar.dayOfMonth) as DayOfMonth[],
+  );
+
+  const selectedMonths = $derived(expandRanges(spec.calendar.month) as Month[]);
 
   type MonthMode = 'every-month' | 'custom-months';
 
   function getInitialMonthMode(): MonthMode {
-    const selectedMonthSet = new Set(spec.months ?? []);
-    if (MONTHS.every((m) => selectedMonthSet.has(m))) {
+    const selectedMonthSet = new Set(selectedMonths);
+    if (
+      selectedMonthSet.size > 0 &&
+      MONTHS.every((m) => selectedMonthSet.has(m))
+    ) {
       return 'every-month';
     }
 
@@ -39,64 +48,99 @@
 
   let monthMode = $state<MonthMode>(getInitialMonthMode());
 
+  function syncMonths(months: Month[]): void {
+    $form.specs[index] = {
+      ...spec,
+      calendar: {
+        ...spec.calendar,
+        month: compactToRanges(months.map(Number)),
+      },
+    };
+  }
+
+  function syncDays(days: DayOfMonth[]): void {
+    $form.specs[index] = {
+      ...spec,
+      calendar: {
+        ...spec.calendar,
+        dayOfMonth: compactToRanges(days.map(Number)),
+      },
+    };
+  }
+
   function selectMode(mode: MonthMode) {
     if (monthMode === mode) return;
 
     switch (mode) {
       case 'every-month': {
         monthMode = mode;
-        $form.specs[index] = { ...spec, months: [...MONTHS] };
+        syncMonths([...MONTHS]);
         return;
       }
 
       case 'custom-months': {
         monthMode = mode;
-        $form.specs[index] = {
-          ...spec,
-          months: [(new Date().getMonth() + 1).toString() as Month],
-        };
+        syncMonths([(new Date().getMonth() + 1) as Month]);
         return;
       }
     }
   }
 
   function isDaySelected(day: DayOfMonth): boolean {
-    return spec.daysOfMonth?.includes(day) ?? false;
+    return selectedDays.includes(day);
   }
 
   function toggleDay(day: DayOfMonth) {
-    const current = spec.daysOfMonth ?? [];
-
-    if (!current.includes(day)) {
-      $form.specs[index] = { ...spec, daysOfMonth: [...current, day] };
+    if (!selectedDays.includes(day)) {
+      syncDays([...selectedDays, day]);
       return;
     }
 
-    const next = current.filter((d) => d !== day);
+    const next = selectedDays.filter((d) => d !== day);
 
     if (next.length >= 1) {
-      $form.specs[index] = { ...spec, daysOfMonth: next };
-      return;
+      syncDays(next);
     }
   }
 
   function isCustomMonthSelected(month: Month): boolean {
-    return spec.months?.includes(month) ?? false;
+    return selectedMonths.includes(month);
   }
 
   function toggleCustomMonth(month: Month) {
-    const current = spec.months ?? [];
-
-    if (!current.includes(month)) {
-      $form.specs[index] = { ...spec, months: [...current, month] };
+    if (!selectedMonths.includes(month)) {
+      syncMonths([...selectedMonths, month]);
       return;
     }
 
-    const next = current.filter((m) => m !== month);
+    const next = selectedMonths.filter((m) => m !== month);
     if (next.length >= 1) {
-      $form.specs[index] = { ...spec, months: next };
-      return;
+      syncMonths(next);
     }
+  }
+
+  function setHour(value: string): void {
+    const n = value === '' ? undefined : Number(value);
+    $form.specs[index] = {
+      ...spec,
+      calendar: {
+        ...spec.calendar,
+        hour:
+          n !== undefined && Number.isFinite(n) ? [{ start: n }] : undefined,
+      },
+    };
+  }
+
+  function setMinute(value: string): void {
+    const n = value === '' ? undefined : Number(value);
+    $form.specs[index] = {
+      ...spec,
+      calendar: {
+        ...spec.calendar,
+        minute:
+          n !== undefined && Number.isFinite(n) ? [{ start: n }] : undefined,
+      },
+    };
   }
 </script>
 
@@ -193,15 +237,8 @@
         max={23}
         placeholder="00"
         suffix={translate('common.hours-abbreviated')}
-        error={!!$errors.specs?.[index]?.time?.hour?.[0]}
-        hintText={$errors.specs?.[index]?.time?.hour?.[0]}
         bind:value={
-          () => spec.time?.hour?.toString(),
-          (v) =>
-            ($form.specs[index] = {
-              ...spec,
-              time: { ...spec.time, hour: Number(v) },
-            })
+          () => spec.calendar.hour?.[0]?.start?.toString() ?? '', setHour
         }
       />
 
@@ -216,15 +253,8 @@
         max={59}
         placeholder="00"
         suffix={translate('common.minutes-abbreviated')}
-        error={!!$errors.specs?.[index]?.time?.minute?.[0]}
-        hintText={$errors.specs?.[index]?.time?.minute?.[0]}
         bind:value={
-          () => spec.time?.minute?.toString(),
-          (v) =>
-            ($form.specs[index] = {
-              ...spec,
-              time: { ...spec.time, minute: Number(v) },
-            })
+          () => spec.calendar.minute?.[0]?.start?.toString() ?? '', setMinute
         }
       />
     </div>

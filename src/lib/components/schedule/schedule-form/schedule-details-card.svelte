@@ -15,8 +15,7 @@
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { EndDateType } from '$lib/types/schedule';
-  import type { FullSchedule } from '$lib/types/schedule';
+  import type { DescribeFullSchedule } from '$lib/types/schedule';
   import {
     formatOffset,
     TimezoneOptions,
@@ -24,19 +23,18 @@
     zonedWallClockToUTCISOString,
   } from '$lib/utilities/timezone';
 
-  import type { ScheduleFormData } from '../schema/form-schema';
+  import { durationString } from '../schema/common';
+  import type { FormScheduleSchema } from '../schema/form';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 
   interface Props {
-    form: SuperForm<ScheduleFormData>['form'];
-    errors: SuperForm<ScheduleFormData>['errors'];
-    schedule?: FullSchedule | null;
+    form: SuperForm<FormScheduleSchema>['form'];
+    errors: SuperForm<FormScheduleSchema>['errors'];
+    schedule?: DescribeFullSchedule | null;
   }
 
   let { form, errors, schedule = null }: Props = $props();
-
-  const endDateType = $derived($form.endDateType);
 
   const timezoneComboboxOptions = $derived.by(() => {
     const opts = [{ label: translate('common.utc'), value: 'UTC' }];
@@ -50,38 +48,39 @@
     return opts;
   });
 
-  const endDateTypeStore: Writable<EndDateType> = writable($form.endDateType);
+  const endKindStore: Writable<FormScheduleSchema['endKind']> = writable(
+    $form.endKind,
+  );
   $effect(() => {
-    if (get(endDateTypeStore) !== $form.endDateType)
-      endDateTypeStore.set($form.endDateType);
+    if (get(endKindStore) !== $form.endKind) endKindStore.set($form.endKind);
   });
   $effect(() => {
-    const val = $endDateTypeStore;
-    if (val !== $form.endDateType) $form.endDateType = val;
+    const val = $endKindStore;
+    if (val !== $form.endKind) $form.endKind = val;
   });
 
   const timezone = $derived($form.timezoneName || 'UTC');
 
   // svelte-ignore state_referenced_locally
   let startDay = $state<Date | null>(
-    utcToZonedWallClock($form.startDate, timezone),
+    utcToZonedWallClock($form.startTime, timezone),
   );
 
   $effect(() => {
-    // keep $form.startDate value in sync with selected date and selected timezone
+    // keep $form.startTime value in sync with selected date and selected timezone
     // (underlying value potentially changes when either changes)
-    $form.startDate = zonedWallClockToUTCISOString(startDay, timezone);
+    $form.startTime = zonedWallClockToUTCISOString(startDay, timezone);
   });
 
   // svelte-ignore state_referenced_locally
   let endDay = $state<Date | null>(
-    utcToZonedWallClock($form.endDate, timezone),
+    utcToZonedWallClock($form.endTime, timezone),
   );
 
   $effect(() => {
-    // keep $form.endDate value in sync with selected date and selected timezone
+    // keep $form.endTime value in sync with selected date and selected timezone
     // (underlying value potentially changes when either changes)
-    $form.endDate = zonedWallClockToUTCISOString(endDay, timezone);
+    $form.endTime = zonedWallClockToUTCISOString(endDay, timezone);
   });
 
   const startDateValue = $derived(
@@ -177,7 +176,7 @@
 
     <RadioGroup
       name="endDateType"
-      group={endDateTypeStore}
+      group={endKindStore}
       class="flex max-w-108 flex-col gap-1 p-0"
       description={translate('schedules.end-date-label')}
     >
@@ -196,7 +195,7 @@
           value="on"
           label={translate('common.on')}
         />
-        {#if endDateType === 'on'}
+        {#if $form.endKind === 'on'}
           <DatePicker
             label={translate('schedules.end-date-picker-label')}
             labelHidden
@@ -216,7 +215,7 @@
           value="after"
           label={translate('common.after')}
         />
-        {#if endDateType === 'after'}
+        {#if $form.endKind === 'after'}
           <NumberInput
             id="endAfterOccurrences"
             label={translate('schedules.occurrences-label')}
@@ -224,7 +223,7 @@
             bind:value={$form.endAfterOccurrences}
             placeholder={translate('schedules.occurrences-placeholder')}
             min={1}
-            disabled={endDateType !== 'after'}
+            disabled={$form.endKind !== 'after'}
             class="w-full"
           />
         {/if}
@@ -232,7 +231,7 @@
     </RadioGroup>
 
     <div
-      class="grid grid-cols-[minmax(100%,theme(spacing.108))] gap-4 md:grid-cols-[minmax(theme(spacing.56),4fr)_minmax(theme(spacing.56),3fr)]"
+      class="grid grid-cols-[minmax(100%,27rem)] gap-4 md:grid-cols-[minmax(14rem,4fr)_minmax(14rem,3fr)]"
     >
       <Combobox
         id="timezoneName"
@@ -254,7 +253,10 @@
         step={1}
         min={0}
         suffix={translate('common.seconds-abbreviated')}
-        bind:value={() => $form.jitter, (v) => ($form.jitter = v?.toString())}
+        bind:value={
+          () => $form.jitter,
+          (v) => ($form.jitter = durationString().safeParse(v)?.data)
+        }
         error={!!$errors.jitter?.[0]}
         hintText={$errors.jitter?.[0]}
       >
@@ -275,7 +277,7 @@
       bind:editInput={$form.editInput}
       bind:encoding={$form.encoding}
       bind:messageType={$form.messageType}
-      payloads={schedule?.action?.startWorkflow?.input}
+      payloads={schedule?.schedule?.action?.startWorkflow?.input}
       showEditActions={Boolean(schedule)}
     />
   </div>

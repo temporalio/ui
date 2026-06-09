@@ -32,7 +32,7 @@
   import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
   import PauseScheduleModal from '../schedule-action-modals/pause-schedule-modal.svelte';
   import TriggerScheduleModal from '../schedule-action-modals/trigger-schedule-modal.svelte';
-  import { parseOverlapPolicy } from '../utilities/request-data-to-form-data';
+  import { parseOverlapPolicy } from '../utilities/get-form-schedule-defaults';
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';

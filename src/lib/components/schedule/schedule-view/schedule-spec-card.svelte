@@ -5,8 +5,8 @@
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
 
-  import { scheduleToFormData } from '../utilities/request-data-to-form-data';
-  import { getSpecSummary } from '../utilities/spec';
+  import { getFormSpecFromSpec } from '../utilities/get-form-spec';
+  import { getScheduleSpecSummary } from '../utilities/summarize';
 
   interface Props {
     schedule: DescribeFullSchedule;
@@ -16,12 +16,10 @@
 
   let isFullSpecVisible = $state(false);
 
-  const formSchedule = $derived(
-    scheduleToFormData({
-      schedule: schedule.schedule,
-      scheduleId: schedule.schedule_id,
-    }),
-  );
+  const specs = $derived(getFormSpecFromSpec(schedule?.schedule?.spec));
+  const timing = $derived({
+    timezoneName: schedule?.schedule?.spec?.timezoneName ?? 'UTC',
+  });
 </script>
 
 <Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
@@ -46,9 +44,9 @@
   </p>
 
   <ul class="flex flex-col gap-4 text-sm">
-    {#each formSchedule.specs as spec (spec)}
+    {#each specs as spec (spec)}
       <li>
-        {getSpecSummary(spec)}
+        {getScheduleSpecSummary(spec, timing)}
       </li>
     {/each}
   </ul>
