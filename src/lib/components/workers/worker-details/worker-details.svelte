@@ -15,11 +15,12 @@
   import WorkerStatus from '$lib/components/workers/worker-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type {
@@ -35,9 +36,10 @@
     breadcrumb: Snippet;
     worker: WorkerInfo | null | undefined;
     onrefresh: () => void;
+    refreshing?: boolean;
   };
 
-  let { breadcrumb, worker, onrefresh }: Props = $props();
+  let { breadcrumb, worker, onrefresh, refreshing = false }: Props = $props();
 
   const { namespace } = $derived(page.params);
   const heartbeat = $derived(worker?.workerHeartbeat);
@@ -70,23 +72,21 @@
     ).toFixed(1);
   });
 
-  let isHeartbeatStale = $state(false);
-
-  function checkHeartbeatStaleness() {
-    if (!heartbeat?.heartbeatTime) {
-      isHeartbeatStale = false;
-      return;
-    }
-    const elapsed =
-      Date.now() - new Date(heartbeat.heartbeatTime as string).getTime();
-    isHeartbeatStale = elapsed >= 60_000;
-  }
+  let autoRefresh = $state(true);
+  let lastRefresh = $state(new Date());
 
   $effect(() => {
-    checkHeartbeatStaleness();
-    const interval = setInterval(checkHeartbeatStaleness, 10_000);
+    void worker;
+    lastRefresh = new Date();
+  });
+
+  $effect(() => {
+    if (!autoRefresh) return;
+    const interval = setInterval(() => onrefresh(), 60_000);
     return () => clearInterval(interval);
   });
+
+  const lastRefreshFormatted = $derived($timestamp(lastRefresh));
 
   const SupplierKindTooltipText: Record<string, string> = {
     Fixed: translate('workers.slot-supplier-kind-fixed'),
@@ -125,24 +125,6 @@
       />
     </h1>
   </header>
-
-  <Alert
-    intent="warning"
-    title={translate('workers.stale-heartbeat-title')}
-    class="max-w-screen-lg xl:w-2/3"
-    hidden={!isHeartbeatStale}
-  >
-    <p>{translate('workers.stale-heartbeat-description')}</p>
-    <Button
-      leadingIcon="retry"
-      variant="secondary"
-      size="xs"
-      class="mt-2"
-      on:click={() => onrefresh()}
-    >
-      {translate('common.refresh')}
-    </Button>
-  </Alert>
 
   <DetailList aria-label="worker details" rowCount={2}>
     <DetailListColumn>
@@ -235,6 +217,37 @@
       {/if}
     </DetailListColumn>
   </DetailList>
+
+  <div class="flex flex-wrap items-center gap-2">
+    <ToggleButtons>
+      <ToggleButton
+        size="xs"
+        on:click={() => {
+          autoRefresh = !autoRefresh;
+          if (autoRefresh) onrefresh();
+        }}
+      >
+        <span
+          class="h-1.5 w-1.5 rounded-full {autoRefresh
+            ? 'bg-green-600'
+            : 'bg-slate-300'}"
+        ></span>
+        {autoRefresh
+          ? translate('workflows.auto-refresh-on')
+          : translate('workflows.auto-refresh-off')}
+      </ToggleButton>
+    </ToggleButtons>
+    {#if refreshing}
+      <p class="flex items-center gap-1">
+        <Icon name="spinner" class="animate-spin text-indigo-600" />
+        {translate('workers.pulling-latest-snapshot')}
+      </p>
+    {:else}
+      <p>
+        {translate('workers.last-refreshed', { time: lastRefreshFormatted })}
+      </p>
+    {/if}
+  </div>
 
   <div class="flex flex-col gap-4 xl:flex-row">
     <section
