@@ -278,6 +278,62 @@ export const buildLambdaComputeConfig = (
   };
 };
 
+export const buildGcpCloudRunComputeConfig = (
+  project: string,
+  region: string,
+  workerPool: string,
+  serviceAccount: string,
+  scalingOptions?: {
+    scaleUpCooloffMs?: number;
+    scaleUpBacklogThreshold?: number;
+    maxWorkerLifetimeMs?: number;
+    metricsPollIntervalMs?: number;
+  },
+): ComputeConfig => {
+  const providerPayload: Record<string, string> = {
+    project,
+    region,
+    worker_pool: workerPool,
+    service_account: serviceAccount,
+  };
+  const providerData = btoa(JSON.stringify(providerPayload));
+  const encoding = btoa('json/plain');
+
+  const scalerConfig: Record<string, number> = {};
+  if (scalingOptions?.scaleUpCooloffMs !== undefined)
+    scalerConfig['scale_up_cooloff_ms'] = scalingOptions.scaleUpCooloffMs;
+  if (scalingOptions?.scaleUpBacklogThreshold !== undefined)
+    scalerConfig['scale_up_backlog_threshold'] =
+      scalingOptions.scaleUpBacklogThreshold;
+  if (scalingOptions?.maxWorkerLifetimeMs !== undefined)
+    scalerConfig['max_worker_lifetime_ms'] = scalingOptions.maxWorkerLifetimeMs;
+  if (scalingOptions?.metricsPollIntervalMs !== undefined)
+    scalerConfig['metrics_poll_interval_ms'] =
+      scalingOptions.metricsPollIntervalMs;
+
+  return {
+    scalingGroups: {
+      default: {
+        taskQueueTypes: [
+          'TASK_QUEUE_TYPE_WORKFLOW',
+          'TASK_QUEUE_TYPE_ACTIVITY',
+        ],
+        provider: {
+          type: 'gcp-cloud-run',
+          details: { metadata: { encoding }, data: providerData },
+        },
+        scaler: {
+          type: 'no-sync',
+          details: {
+            metadata: { encoding },
+            data: btoa(JSON.stringify(scalerConfig)),
+          },
+        },
+      },
+    },
+  };
+};
+
 export const decodeLambdaProviderDetails = (
   computeConfig?: ComputeConfig,
 ): { lambdaArn?: string; iamRoleArn?: string; roleExternalId?: string } => {
