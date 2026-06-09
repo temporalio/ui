@@ -25,6 +25,7 @@ for (const file of walk(distPath)) {
     exports[`./${base}`] = {
       types: `./dist/${base}.d.ts`,
       import: `./dist/${rel}`,
+      default: `./dist/${rel}`,
     };
   }
 }
