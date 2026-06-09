@@ -1,10 +1,10 @@
-export function sortNumStrings<T extends `${number}` = `${number}`>(
-  numStrings: T[],
+export function sortNumbers<T extends number = number>(
+  nums: T[],
   direction: 'ascending' | 'descending' = 'ascending',
 ): T[] {
   if (direction === 'ascending') {
-    return numStrings.toSorted((a, b) => Number(a) - Number(b));
+    return nums.toSorted((a, b) => a - b);
   }
 
-  return numStrings.toSorted((a, b) => Number(b) - Number(a));
+  return nums.toSorted((a, b) => b - a);
 }
