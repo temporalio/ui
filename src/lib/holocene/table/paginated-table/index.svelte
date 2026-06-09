@@ -27,7 +27,7 @@
   export { className as class };
 
   let tableContainer: HTMLDivElement;
-  let footerBarHeight = 0;
+  let actionBarHeight = 0;
 
   $: tableOffset = tableContainer?.offsetTop
     ? tableContainer.offsetTop + 32
@@ -47,7 +47,7 @@
   bind:this={tableContainer}
   style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`};
 
-  --table-header-h: 2.25rem; --table-footer-bottom: {footerBarHeight}px;"
+  --table-header-h: 2.25rem; --table-footer-bottom: {actionBarHeight}px;"
 >
   {#if loading}
     {#if $$slots.loading}
@@ -64,7 +64,7 @@
     </Table>
     {#if visibleItems.length}
       <div
-        bind:clientHeight={footerBarHeight}
+        bind:clientHeight={actionBarHeight}
         class="surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2"
       >
         <slot name="actions-start" />
