@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -9,6 +10,7 @@
     deploymentName: string;
     open: boolean;
     error?: string;
+    hasComputeConfig?: boolean;
     onConfirm: () => void;
     onCancel: () => void;
   }
@@ -19,6 +21,7 @@
     deploymentName,
     open,
     error = '',
+    hasComputeConfig = true,
     onConfirm,
     onCancel,
   }: Props = $props();
@@ -35,6 +38,12 @@
 >
   <h3 slot="title">{translate('deployments.set-as-current')}</h3>
   <div slot="content" class="flex flex-col gap-4">
+    {#if !hasComputeConfig}
+      <Alert
+        intent="warning"
+        title={translate('deployments.set-current-no-config-warning')}
+      />
+    {/if}
     <p class="text-sm">
       This will set Build ID <span class="font-mono font-medium">{buildId}</span
       >
