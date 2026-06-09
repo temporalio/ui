@@ -59,7 +59,7 @@
   const cacheHitRate = $derived.by(() => {
     const total = totalStickyCacheHit + totalStickyCacheMiss;
     if (total === 0) return '0';
-    return ((totalStickyCacheHit / total) * 100).toFixed(1);
+    return ((totalStickyCacheHit / total) * 100).toFixed(0);
   });
   const taskFailureRate = $derived.by(() => {
     if (!heartbeat?.workflowTaskSlotsInfo?.totalProcessedTasks) return '0';
@@ -187,17 +187,19 @@
     </DetailListColumn>
 
     <DetailListColumn>
-      <!-- TODO: Make filterable link for Build ID with DT-3745 -->
-      <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
       {@const buildId = heartbeat?.deploymentVersion?.buildId}
-      <span class="max-w-72">
-        <DetailListTextValue
-          copyable={!!buildId}
-          copyableText={buildId ?? ''}
-          text={buildId ?? '-'}
-          tooltipText={buildId ?? undefined}
-        />
-      </span>
+      {#if buildId}
+        <DetailListLabel>{translate('deployments.build-id')}</DetailListLabel>
+        <span class="max-w-72">
+          <!-- TODO: Make filterable link for Build ID with DT-3745 -->
+          <DetailListTextValue
+            copyable={!!buildId}
+            copyableText={buildId}
+            text={buildId}
+            tooltipText={buildId}
+          />
+        </span>
+      {/if}
       {#if heartbeat?.deploymentVersion?.deploymentName}
         <DetailListLabel>{translate('deployments.deployment')}</DetailListLabel>
         <DetailListLinkValue
@@ -211,24 +213,47 @@
         />
       {/if}
     </DetailListColumn>
+
+    <DetailListColumn>
+      {@const hostName = heartbeat?.hostInfo?.hostName}
+      {#if hostName}
+        <DetailListLabel>{translate('workers.host-name')}</DetailListLabel>
+        <DetailListLinkValue
+          copyable
+          text={hostName}
+          href={routeForWorkersWithQuery({
+            namespace,
+            query: `HostName="${hostName}"`,
+          }) ?? ''}
+          iconName="filter"
+        />
+      {/if}
+      {@const processId = heartbeat?.hostInfo?.processId}
+      {#if processId}
+        <DetailListLabel>{translate('workers.process-id')}</DetailListLabel>
+        <DetailListTextValue text={processId} tooltipText={processId} />
+      {/if}
+    </DetailListColumn>
   </DetailList>
 
-  <div class="flex flex-col gap-4 lg:flex-row">
-    <section class="flex flex-1 flex-col gap-4">
+  <div class="flex flex-col gap-4 xl:flex-row">
+    <section
+      class="grid flex-1 grid-cols-1 gap-4 xl:self-start 2xl:grid-flow-col 2xl:grid-cols-2 2xl:grid-rows-2"
+    >
       {@render taskSlotCard(
         translate('common.workflows-plural', { count: 1 }),
         heartbeat?.workflowTaskSlotsInfo,
         heartbeat?.workflowPollerInfo,
       )}
       {@render taskSlotCard(
-        translate('common.activities-plural', { count: 1 }),
-        heartbeat?.activityTaskSlotsInfo,
-        heartbeat?.activityPollerInfo,
-      )}
-      {@render taskSlotCard(
         translate('workers.nexus-tasks'),
         heartbeat?.nexusTaskSlotsInfo,
         heartbeat?.nexusPollerInfo,
+      )}
+      {@render taskSlotCard(
+        translate('common.activities-plural', { count: 1 }),
+        heartbeat?.activityTaskSlotsInfo,
+        heartbeat?.activityPollerInfo,
       )}
       {@render taskSlotCard(
         translate('workers.local-activities'),
@@ -237,9 +262,12 @@
       )}
     </section>
 
-    <aside class="flex w-full flex-col gap-4 lg:w-fit">
-      {@render hostInfo()}
-      {@render workflowCache()}
+    <aside class="flex w-full flex-col gap-4 xl:max-w-sm">
+      <Card>
+        {@render hostUsage()}
+        <hr class="my-4 border-subtle" />
+        {@render workflowCache()}
+      </Card>
       <!-- TODO: Add back task failure rate. -->
       <!-- {@render diagnostics()} -->
     </aside>
@@ -251,55 +279,38 @@
   slots: WorkerSlotsInfo | null | undefined,
   poller: WorkerPollerInfo | null | undefined,
 )}
-  <Card>
-    <div class="mb-4 flex items-center gap-2">
-      <h3 class="text-base font-medium">{title}</h3>
-    </div>
+  <Card class="flex flex-col gap-2">
+    <h5 class="mb-2">{title}</h5>
 
-    <dl class="grid grid-cols-1 gap-4 xl:grid-cols-3 xl:grid-rows-1">
+    <dl class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:grid-rows-1">
       <div>
         <dt
           id="slots-{title}"
           class="mb-1 flex h-6 items-center gap-2 text-sm text-secondary"
         >
-          {translate('workers.slots')}
+          {translate('workers.slots-used')}
+        </dt>
+        <dd class="mb-2">
+          <p class="truncate font-mono text-lg text-secondary">
+            <span class="text-2xl font-semibold text-brand">
+              {#if !slots?.currentUsedSlots && !slots?.currentAvailableSlots}
+                -
+              {:else}
+                {slots?.currentUsedSlots ?? 0}
+              {/if}
+            </span>{#if slots?.currentAvailableSlots}
+              /{slots.currentAvailableSlots - (slots?.currentUsedSlots ?? 0)}
+            {/if}
+          </p>
           {#if slots?.slotSupplierKind}
             {@const tooltipText =
               SupplierKindTooltipText[slots.slotSupplierKind]}
-            <Tooltip topLeft text={tooltipText} hide={!tooltipText}>
-              <Badge type="ghost" class="text-xs"
+            <Tooltip topLeft text={tooltipText} hide={!tooltipText} width={200}>
+              <Badge type="ghost" class="mt-1 text-xs"
                 >{slots.slotSupplierKind}</Badge
               >
             </Tooltip>
           {/if}
-        </dt>
-        <dd class="mb-2">
-          <div class="flex items-baseline gap-12">
-            <div>
-              <p class="truncate font-mono text-2xl font-semibold text-brand">
-                {slots?.currentUsedSlots ?? 0}
-              </p>
-              <p class="text-xs text-secondary">{translate('workers.used')}</p>
-            </div>
-            <div>
-              <p class="truncate font-mono text-2xl font-semibold">
-                {#if slots?.currentAvailableSlots}
-                  {slots.currentAvailableSlots - (slots?.currentUsedSlots ?? 0)}
-                {:else}
-                  -
-                {/if}
-              </p>
-              <p class="text-xs text-secondary">
-                {#if slots?.currentAvailableSlots}
-                  {translate('workers.available-out-of', {
-                    count: slots.currentAvailableSlots,
-                  })}
-                {:else}
-                  {translate('workers.none-available')}
-                {/if}
-              </p>
-            </div>
-          </div>
         </dd>
       </div>
 
@@ -307,42 +318,58 @@
         <dt class="mb-1 flex h-6 items-center text-sm text-secondary">
           {translate('workers.tasks-processed')}
         </dt>
-        <dd class="font-mono text-2xl font-semibold">
-          {(slots?.totalProcessedTasks ?? 0).toLocaleString()}
+        <dd class="font-mono text-2xl font-semibold text-brand">
+          {slots?.totalProcessedTasks !== undefined
+            ? (slots.totalProcessedTasks ?? 0).toLocaleString()
+            : '-'}
         </dd>
       </div>
 
       {#if poller}
         <div>
           <dt class="mb-1 flex h-6 items-center gap-2 text-sm text-secondary">
-            {translate('workers.poller')}
+            {translate('workers.poller-count')}
+          </dt>
+          <dd>
+            <p class="font-mono text-2xl font-semibold text-brand">
+              {poller.currentPollers !== undefined
+                ? (poller.currentPollers ?? 0)
+                : '-'}
+            </p>
             <Tooltip
               topLeft
               text={poller.isAutoscaling
                 ? translate('workers.autoscaling-poller')
-                : translate('workers.manual-poller')}
+                : translate('workers.simple-maximum-poller')}
+              width={200}
             >
-              <Badge type="ghost" class="text-xs">
-                {poller.isAutoscaling ? 'Autoscaling' : 'Manual'}
+              <Badge type="ghost" class="mt-1 text-xs">
+                {poller.isAutoscaling ? 'Autoscaling' : 'SimpleMaximum'}
               </Badge>
             </Tooltip>
-          </dt>
-          <dd>
-            <p class="font-mono text-2xl font-semibold">
-              {poller.currentPollers ?? 0}
-            </p>
-            <p class="text-xs text-secondary">
-              {#if poller.lastSuccessfulPollTime}
-                {translate('workers.last-poll')}
-                <Timestamp dateTime={poller.lastSuccessfulPollTime} as="span" />
-              {:else}
-                {translate('workers.no-activity')}
-              {/if}
-            </p>
           </dd>
         </div>
       {/if}
     </dl>
+    {#if !slots?.currentUsedSlots && !slots?.currentAvailableSlots}
+      <div class="flex items-end gap-1 text-xs">
+        <p class="text-secondary">
+          {translate('workers.zero-slots-configured')}
+        </p>
+        <Link
+          icon="external-link"
+          href="https://docs.temporal.io/develop/worker-performance#custom-slot-implementation"
+          newTab
+        >
+          {translate('workers.configure-slots-link')}
+        </Link>
+      </div>
+    {:else if poller?.lastSuccessfulPollTime}
+      <p class="text-xs text-secondary">
+        {translate('workers.last-polled')}
+        <Timestamp dateTime={poller.lastSuccessfulPollTime} as="span" />
+      </p>
+    {/if}
   </Card>
 {/snippet}
 
@@ -365,18 +392,14 @@
 {/snippet}
 
 {#snippet goDependencyWarning()}
-  <Alert
-    class="max-w-96"
-    intent="warning"
-    title={translate('workers.go-dependency-warning')}
-  >
+  <Alert intent="warning" title={translate('workers.go-dependency-warning')}>
     <p class="mb-1">{translate('workers.go-dependency-warning-description')}</p>
     <Link
       icon="external-link"
       href="https://docs.temporal.io/cloud/worker-health#enable-host-resource-reporting"
       newTab
     >
-      {translate('workers.learn-more-link')}
+      {translate('workers.go-dependency-warning-link')}
     </Link>
   </Alert>
 {/snippet}
@@ -384,7 +407,8 @@
 {#snippet hostUsage()}
   {@const cpuUsage = (heartbeat?.hostInfo?.currentHostCpuUsage ?? 0) * 100}
   {@const memUsage = (heartbeat?.hostInfo?.currentHostMemUsage ?? 0) * 100}
-  <Card class="flex flex-col gap-2 border-t-0">
+  <div class="flex flex-col gap-2">
+    <h5 class="mb-2">{translate('workers.resource-utilization')}</h5>
     <div>
       <div class="mb-1 flex items-center justify-between text-sm">
         <span id="cpu-label" class="flex items-center gap-1 font-semibold">
@@ -408,48 +432,36 @@
     {#if goDependencyPotentiallyMissing}
       {@render goDependencyWarning()}
     {/if}
-  </Card>
-{/snippet}
-
-{#snippet hostInfo()}
-  <div>
-    <Card>
-      <h3 class="mb-4 text-base font-medium">
-        {translate('workers.host-info')}
-      </h3>
-      <dl>
-        <dt class="text-secondary">{translate('workers.host-name')}</dt>
-        <dd class="select-all">{heartbeat?.hostInfo?.hostName ?? '-'}</dd>
-
-        <dt class="mt-2 text-secondary">{translate('workers.process-id')}</dt>
-        <dd class="select-all">{heartbeat?.hostInfo?.processId ?? '-'}</dd>
-      </dl>
-    </Card>
-    {@render hostUsage()}
   </div>
 {/snippet}
 
 {#snippet workflowCache()}
-  <Card>
-    <h3 class="mb-4 text-base font-medium">
+  <div>
+    <h6 class="mb-4">
       {translate('workers.workflow-cache')}
-    </h3>
-    <dl class="grid grid-cols-2 gap-4">
+    </h6>
+    <dl class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
       <div>
-        <dd class="font-mono text-2xl font-semibold">
-          {currentStickyCacheSize.toLocaleString()}
-        </dd>
-        <dt class="text-sm text-secondary">
+        <dt class="text-sm font-medium text-secondary">
           {translate('workers.cache-size')}
         </dt>
+        <dd class="font-mono text-2xl font-semibold text-brand">
+          {currentStickyCacheSize.toLocaleString()}
+        </dd>
+        <dd class="text-xs text-secondary">
+          {translate('workers.cache-size-description')}
+        </dd>
       </div>
       <div>
-        <dd class="font-mono text-2xl font-semibold">
-          {cacheHitRate}%
-        </dd>
-        <dt class="text-sm text-secondary">
+        <dt class="font-mediumtext-sm text-secondary">
           {translate('workers.cache-hits')}
         </dt>
+        <dd class="font-mono text-2xl font-semibold text-brand">
+          {cacheHitRate}%
+        </dd>
+        <dd class="text-xs text-secondary">
+          {translate('workers.cache-hits-description', { hits: cacheHitRate })}
+        </dd>
       </div>
     </dl>
     <Link
@@ -458,21 +470,21 @@
       newTab
       class="mt-4"
     >
-      {translate('workers.learn-more-link')}
+      {translate('workers.workflow-cache-link')}
     </Link>
-  </Card>
+  </div>
 {/snippet}
 
 {#snippet diagnostics()}
   <Card>
-    <h3 class="mb-4 text-base font-medium">
+    <h5 class="mb-4">
       {translate('workers.diagnostics')}
-    </h3>
+    </h5>
     <dl>
-      <dd class="font-mono text-2xl">{taskFailureRate}%</dd>
       <dt class="text-sm text-secondary">
         {translate('workers.task-failure-rate')}
       </dt>
+      <dd class="font-mono text-2xl text-brand">{taskFailureRate}%</dd>
     </dl>
   </Card>
 {/snippet}
