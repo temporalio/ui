@@ -271,6 +271,9 @@
     {editHref}
     {workflowHref}
     {isCurrent}
+    hasComputeConfig={isVersionSummaryNew(version)
+      ? !!version.computeConfig
+      : true}
     onSetCurrent={() => (showSetCurrentModal = true)}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}

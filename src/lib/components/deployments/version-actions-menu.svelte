@@ -12,6 +12,7 @@
     editHref: string;
     workflowHref: string;
     isCurrent: boolean;
+    hasComputeConfig: boolean;
     onSetCurrent: () => void;
     onValidate: () => void;
     onDelete: () => void;
@@ -22,6 +23,7 @@
     editHref,
     workflowHref,
     isCurrent,
+    hasComputeConfig,
     onSetCurrent,
     onValidate,
     onDelete,
@@ -45,14 +47,16 @@
           {translate('deployments.edit')}
         </MenuItem>
       </CapabilityGuard>
-      <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-        {translate('deployments.set-as-current')}
-      </MenuItem>
-      <CapabilityGuard capability="serverScaledDeployments">
-        <MenuItem onclick={onValidate}>
-          {translate('deployments.validate-connection')}
+      {#if hasComputeConfig}
+        <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
+          {translate('deployments.set-as-current')}
         </MenuItem>
-      </CapabilityGuard>
+        <CapabilityGuard capability="serverScaledDeployments">
+          <MenuItem onclick={onValidate}>
+            {translate('deployments.validate-connection')}
+          </MenuItem>
+        </CapabilityGuard>
+      {/if}
       <MenuItem href={workflowHref}>
         {translate('deployments.view-workflows')}
       </MenuItem>
