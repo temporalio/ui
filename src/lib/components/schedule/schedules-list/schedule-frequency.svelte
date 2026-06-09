@@ -32,6 +32,6 @@
     {/if}
   </div>
   <p class="text-secondary">
-    {translate('common.timezone', { timezone: timezoneName })}
+    {@html translate('common.timezone', { timezone: timezoneName })}
   </p>
 </div>
