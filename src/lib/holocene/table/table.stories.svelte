@@ -81,13 +81,7 @@
 
 <Story name="Pinned Total Row, Above Footer Bar">
   <div class="flex h-72 flex-col overflow-auto border border-subtle">
-    <Table
-      class="w-full"
-      bordered={false}
-      style="
-
---table-footer-bottom: 2.75rem;"
-    >
+    <Table class="w-full [--table-footer-bottom:2.75rem]" bordered={false}>
       <tr slot="headers">
         <th>Name</th>
         <th>Requests</th>
