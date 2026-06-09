@@ -209,6 +209,8 @@
 
   <slot visibleItems={$store.visibleItems} />
 
+  <slot name="footer" slot="footer" visibleItems={$store.visibleItems} />
+
   <svelte:fragment slot="empty">
     {#if $store.loading}
       <slot name="loading">

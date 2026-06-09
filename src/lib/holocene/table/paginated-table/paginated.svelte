@@ -111,6 +111,8 @@
   <slot name="headers" slot="headers" visibleItems={$store.items} />
   <slot visibleItems={$store.items} />
 
+  <slot name="footer" slot="footer" visibleItems={$store.items} />
+
   <svelte:fragment slot="actions-start">
     <FilterSelect
       label={perPageLabel}
