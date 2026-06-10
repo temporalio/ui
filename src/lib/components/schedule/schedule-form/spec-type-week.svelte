@@ -206,7 +206,9 @@
       >{translate('schedules.run-time-heading')}</legend
     >
     <p class="text-sm text-secondary">
-      {translate('schedules.run-time-description')}
+      {translate('schedules.run-time-description', {
+        timezoneName: $form.timezoneName ?? 'UTC',
+      })}
     </p>
     <div class="grid max-w-108 gap-2 md:grid-cols-2">
       <Input
@@ -244,8 +246,9 @@
     <div class="flex gap-2 text-xs">
       <Icon name="clock" class="inline-block" />
       <p class="text-secondary">
-        {translate('common.based-on-time-preface')}
-        {translate('common.universal-standard-time')}
+        {translate('schedules.run-time-based-on-timezone', {
+          timezoneName: $form.timezoneName,
+        })}
       </p>
     </div>
   </fieldset>

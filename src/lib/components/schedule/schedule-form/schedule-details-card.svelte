@@ -18,11 +18,7 @@
   import { formatOffset, TimezoneOptions } from '$lib/utilities/timezone';
 
   import type { FormScheduleSchema } from '../schema/form';
-  import {
-    fromCalendarDateStr,
-    getNowCalendarDateStr,
-    toCalendarDateStr,
-  } from '../utilities/date';
+  import { fromCalendarDateStr, toCalendarDateStr } from '../utilities/date';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 
@@ -74,8 +70,6 @@
   const onEndDateChange = (d: Date) => {
     $form.endTime = toCalendarDateStr(d);
   };
-
-  $inspect($form);
 </script>
 
 <Card class="w-full">

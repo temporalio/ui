@@ -167,7 +167,7 @@ export const Strings = {
   'month-selection-custom': 'Custom months',
   'run-time-heading': 'Run time',
   'run-time-description':
-    'Specify the time (UTC) for this schedule to run. The schedule will run at 00:00 UTC if left blank.',
+    'Specify the time ({{- timezoneName }}) for this schedule to run. The schedule will run at 00:00 {{- timezoneName }} if left blank.',
   'policies-title': 'Edit Schedule Policies',
   'policies-drawer-close': 'Cancel policy edits',
   'overlap-policy-description':
@@ -295,4 +295,6 @@ export const Strings = {
     'Define rules for when this Workflow should run. You can add as many Schedule Specifications as you need to comprehensively describe the schedule. Specs can be calendar-based, cron-based, or interval-based.',
   'spec-learn-more': 'Learn more about the Schedule Spec',
   'add-another-spec': '+ Add another schedule spec',
+  'run-time-based-on-timezone':
+    'Based on the specified timezone ({{- timezoneName}})',
 } as const;
