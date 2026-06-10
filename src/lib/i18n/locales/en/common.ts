@@ -227,4 +227,13 @@ export const Strings = {
   'change-log': 'Change Log',
   comfortable: 'Comfortable',
   dense: 'Dense',
+  'session-warning-title': 'Your session is about to expire',
+  'session-warning-body':
+    'Your session will expire in {{seconds}} seconds. Stay signed in to keep working.',
+  'session-warning-extend': 'Stay signed in',
+  'session-warning-sign-out': 'Sign out',
+  'session-expired-title': 'Your session has expired',
+  'session-expired-body':
+    'Your session has expired. Sign in again to continue.',
+  'session-expired-sign-in-again': 'Sign in again',
 } as const;
