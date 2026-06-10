@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { SuperForm } from 'sveltekit-superforms';
-  import { twMerge } from 'tailwind-merge';
+  import { twJoin, twMerge } from 'tailwind-merge';
 
   import { translate } from '$lib/i18n/translate';
 
@@ -24,8 +24,19 @@
     endAfterOccurrences: $form.endAfterOccurrences,
   });
 
+  const isEmpty = $derived.by(() => {
+    if (spec.kind === 'cron' && !spec.cronString) {
+      return true;
+    }
+    if (spec.kind === 'interval' && !spec.interval.interval) {
+      console.log(spec.interval);
+      return true;
+    }
+
+    return false;
+  });
+
   const preview = $derived.by(() => {
-    console.log({ spec: $form.specs[index] });
     if (spec.kind === 'cron' && !spec.cronString) {
       return translate('schedules.spec-preview-example', {
         summary: getScheduleSpecSummary(spec, timing),
@@ -41,5 +52,5 @@
 </script>
 
 <div class={twMerge('border border-subtle p-8', className)}>
-  <p class="font-mono text-xs">{preview}.</p>
+  <p class={twJoin('font-mono text-xs', isEmpty && 'italic')}>{preview}.</p>
 </div>

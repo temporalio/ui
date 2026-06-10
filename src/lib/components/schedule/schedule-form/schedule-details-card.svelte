@@ -2,7 +2,6 @@
   import { get, type Writable, writable } from 'svelte/store';
 
   import { isBefore } from 'date-fns';
-  import { utcToZonedTime } from 'date-fns-tz';
   import { type SuperForm } from 'sveltekit-superforms';
 
   import Card from '$lib/holocene/card.svelte';
@@ -16,15 +15,14 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import {
-    formatOffset,
-    TimezoneOptions,
-    utcToZonedWallClock,
-    zonedWallClockToUTCISOString,
-  } from '$lib/utilities/timezone';
+  import { formatOffset, TimezoneOptions } from '$lib/utilities/timezone';
 
-  import { durationString } from '../schema/common';
   import type { FormScheduleSchema } from '../schema/form';
+  import {
+    fromCalendarDateStr,
+    getNowCalendarDateStr,
+    toCalendarDateStr,
+  } from '../utilities/date';
 
   import ScheduleInputPayload from './schedule-input-payload.svelte';
 
@@ -59,52 +57,31 @@
     if (val !== $form.endKind) $form.endKind = val;
   });
 
-  const timezone = $derived($form.timezoneName || 'UTC');
-
-  // svelte-ignore state_referenced_locally
-  let startDay = $state<Date | null>(
-    utcToZonedWallClock($form.startTime, timezone),
+  const startDate = $derived(
+    fromCalendarDateStr($form.startTime || getNowCalendarDateStr()),
   );
 
-  $effect(() => {
-    // keep $form.startTime value in sync with selected date and selected timezone
-    // (underlying value potentially changes when either changes)
-    $form.startTime = zonedWallClockToUTCISOString(startDay, timezone);
-  });
-
-  // svelte-ignore state_referenced_locally
-  let endDay = $state<Date | null>(
-    utcToZonedWallClock($form.endTime, timezone),
-  );
-
-  $effect(() => {
-    // keep $form.endTime value in sync with selected date and selected timezone
-    // (underlying value potentially changes when either changes)
-    $form.endTime = zonedWallClockToUTCISOString(endDay, timezone);
-  });
-
-  const startDateValue = $derived(
-    startDay ?? utcToZonedTime(new Date(), timezone),
-  );
-  const endDateValue = $derived.by(() => {
-    if (!endDay) {
-      const now = utcToZonedTime(new Date(), timezone);
-
-      return isBefore(now, startDateValue) ? startDateValue : now;
+  const endDate = $derived.by(() => {
+    if (!$form.endTime) {
+      const nowCalendarDate = fromCalendarDateStr(getNowCalendarDateStr());
+      return isBefore(nowCalendarDate, startDate)
+        ? new Date(startDate)
+        : nowCalendarDate;
     }
 
-    return endDay;
+    return fromCalendarDateStr($form.endTime);
   });
 
   const onStartDateChange = (d: Date) => {
-    startDay = d;
-    if (isBefore(endDateValue, d)) {
-      endDay = d;
+    const nextCalendarDateStr = toCalendarDateStr(d);
+    $form.startTime = nextCalendarDateStr;
+    if (isBefore(endDate, fromCalendarDateStr(nextCalendarDateStr))) {
+      $form.endTime = nextCalendarDateStr;
     }
   };
 
   const onEndDateChange = (d: Date) => {
-    endDay = d;
+    $form.endTime = toCalendarDateStr(d);
   };
 </script>
 
@@ -154,7 +131,7 @@
     <div class="max-w-108">
       <DatePicker
         label={translate('schedules.start-date-label')}
-        selected={startDateValue}
+        selected={startDate}
         todayLabel={translate('common.today')}
         closeLabel={translate('common.close')}
         clearLabel={translate('common.clear-input-button-label')}
@@ -199,13 +176,13 @@
           <DatePicker
             label={translate('schedules.end-date-picker-label')}
             labelHidden
-            selected={endDateValue}
+            selected={endDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}
             clearLabel={translate('common.clear-input-button-label')}
             onDateChange={onEndDateChange}
             clearable={false}
-            isAllowed={(d) => !isBefore(d, startDateValue)}
+            isAllowed={(d) => !isBefore(d, startDate)}
           />
         {/if}
       </div>
@@ -254,8 +231,7 @@
         min={0}
         suffix={translate('common.seconds-abbreviated')}
         bind:value={
-          () => $form.jitter,
-          (v) => ($form.jitter = durationString().safeParse(v)?.data)
+          () => $form.jitter.toString(), (v) => ($form.jitter = Number(v))
         }
         error={!!$errors.jitter?.[0]}
         hintText={$errors.jitter?.[0]}

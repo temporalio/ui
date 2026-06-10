@@ -1,8 +1,10 @@
+import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 import type { SearchAttributes } from '$lib/types/workflows';
 import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
+import { isoStringToCalendarDateStr } from './date';
 import { getFormSpecsFromDescribeFullSchedule } from './get-form-spec';
 import { getFormSpecInitialData } from './get-form-spec-initial-data';
 import {
@@ -75,7 +77,10 @@ function getEndCondition(
   }
 
   if (spec?.endTime) {
-    return { endKind: 'on', endTime: String(spec.endTime) };
+    return {
+      endKind: 'on',
+      endTime: isoStringToCalendarDateStr(String(spec.endTime)),
+    };
   }
 
   return { endKind: 'never' };
@@ -123,8 +128,10 @@ export function getFormScheduleDefaults(
 
     specs: getSpecs(describeFullSchedule),
     timezoneName: spec?.timezoneName || 'UTC',
-    startTime: String(spec?.startTime ?? new Date().toISOString()),
-    jitter: toDurationString(spec?.jitter, '0s'),
+    startTime: isoStringToCalendarDateStr(
+      String(spec?.startTime || new Date().toISOString()),
+    ),
+    jitter: Number(parseDuration(spec?.jitter ?? '') || 0),
     ...getEndCondition(describeFullSchedule),
 
     overlapPolicy: parseOverlapPolicy(policies?.overlapPolicy),

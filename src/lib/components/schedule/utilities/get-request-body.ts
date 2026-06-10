@@ -4,6 +4,7 @@ import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import { isValidCronString } from './cron';
+import { calendarDateStrToTimestamp } from './date';
 import type { FormScheduleSchema } from '../schema/form';
 
 import type {
@@ -147,6 +148,7 @@ function toInterval(interval: SpecFormItem['interval']): ScheduleInterval {
 function getScheduleSpecRequest(
   scheduleForm: FormScheduleSchema,
 ): ScheduleSpecRequest {
+  const timeZone = scheduleForm.timezoneName || 'UTC';
   const interval: ScheduleInterval[] = [];
   const cronString: string[] = [];
   const structuredCalendar: StructuredCalendar[] = [];
@@ -195,13 +197,15 @@ function getScheduleSpecRequest(
     interval,
     cronString,
     structuredCalendar,
-    timezoneName: scheduleForm.timezoneName || 'UTC',
-    startTime: scheduleForm.startTime,
+    timezoneName: timeZone,
+    startTime: calendarDateStrToTimestamp(scheduleForm.startTime),
     ...(scheduleForm.endKind === 'on' &&
-      scheduleForm.endTime && { endTime: scheduleForm.endTime }),
+      scheduleForm.endTime && {
+        endTime: calendarDateStrToTimestamp(scheduleForm.endTime),
+      }),
     ...(scheduleForm.jitter &&
-      Number.parseInt(scheduleForm.jitter, 10) > 0 && {
-        jitter: scheduleForm.jitter,
+      scheduleForm.jitter > 0 && {
+        jitter: `${scheduleForm.jitter}s`,
       }),
   } satisfies ScheduleSpecRequest;
 }

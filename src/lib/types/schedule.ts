@@ -14,12 +14,32 @@ import type {
   StructuredCalendarSpec,
 } from '$lib/types';
 
+type Override<T, U> = Omit<T, keyof U> & U;
+
+/**
+ * Duration as encoded by the Temporal HTTP API: a whole number of seconds
+ * suffixed with `s` (e.g. `"30s"`), rather than the protobuf IDuration object.
+ */
+export type DurationString = `${number}s`;
+
+export type ScheduleSpecResponse = Override<
+  ScheduleSpec,
+  {
+    jitter?: DurationString;
+  }
+>;
+
+export type ScheduleResponse = Override<
+  Schedule,
+  {
+    spec?: ScheduleSpecResponse | null;
+  }
+>;
+
 export type DescribeFullSchedule = DescribeScheduleResponse & {
   schedule_id: string;
-  schedule?: Schedule;
+  schedule?: ScheduleResponse;
 };
-
-type Override<T, U> = Omit<T, keyof U> & U;
 
 /**
  * Schedule create/edit request bodies. The Temporal HTTP API encodes durations

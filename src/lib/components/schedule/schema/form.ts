@@ -6,6 +6,7 @@ import { searchAttributesSchema } from '$lib/stores/search-attributes';
 import { durationString, jsonString, structuredCalendarSchema } from './common';
 import { MIN_CATCHUP_SECONDS } from '../constants';
 import { isValidCronString } from '../utilities/cron';
+import { getNowCalendarDateStr } from '../utilities/date';
 
 export const overlapPolicy = z
   .enum([
@@ -118,9 +119,18 @@ export type FormSpecSchema = z.infer<typeof formSpecSchema>;
 
 export const formScheduleTimingSchema = z.object({
   timezoneName: z.string().trim().default('UTC'),
-  startTime: z.string().datetime().default(new Date().toISOString()),
+  startTime: z
+    .string()
+    .trim()
+    .date('Invalid start time')
+    .default(getNowCalendarDateStr()),
   endKind: z.enum(['never', 'on', 'after']).default('never'),
-  endTime: z.string().datetime().optional(),
+  endTime: z
+    .string()
+    .trim()
+    .date('Invalid end time')
+    .or(z.literal(''))
+    .optional(),
   endAfterOccurrences: z.number().optional(),
 });
 
@@ -140,7 +150,7 @@ export const formScheduleSchema = z
     editInput: z.boolean().default(false),
     encoding: z.enum(['json/plain', 'json/protobuf']).default('json/plain'),
     messageType: z.string().trim().optional(),
-    jitter: durationString().optional(),
+    jitter: z.number().int().min(0).optional(),
     searchAttributes: searchAttributesSchema.default([]),
     workflowSearchAttributes: searchAttributesSchema.default([]),
     specs: z
@@ -148,6 +158,15 @@ export const formScheduleSchema = z
       .min(1, 'At least one schedule spec is required'),
   })
   .merge(formSchedulePoliciesSchema)
-  .merge(formScheduleTimingSchema);
+  .merge(formScheduleTimingSchema)
+  .superRefine((schedule, ctx) => {
+    if (schedule.endKind === 'on' && !schedule.endTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'End time is required',
+        path: ['endTime'],
+      });
+    }
+  });
 
 export type FormScheduleSchema = z.infer<typeof formScheduleSchema>;
