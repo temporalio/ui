@@ -4,6 +4,8 @@
   import type { IconName } from '$lib/holocene/icon';
 
   import Icon from '../icon/icon.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { navOpen } from '$lib/stores/nav-open';
 
   export let onClick: () => void = () => {};
   export let label: string;
@@ -32,13 +34,14 @@
   )}
 >
   {#if icon}
-    <div
-      class="flex h-6 w-6 items-center after:absolute after:left-[calc(100%_+_1.5rem)] after:top-0 after:hidden after:h-8 after:items-center after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=closed]:hover:after:flex"
-      data-tooltip={tooltip}
-      aria-hidden="true"
+    <Tooltip
+      text={tooltip}
+      right
+      hide={$navOpen}
+      class="flex h-6 w-6 items-center"
     >
       <Icon name={icon} {animate} {active} />
-    </div>
+    </Tooltip>
   {/if}
   <div class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100">
     {label}
