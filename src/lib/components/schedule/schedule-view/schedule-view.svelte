@@ -36,8 +36,8 @@
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';
-  import ScheduleInputCard from './schedule-input-card.svelte';
   import ScheduleSpecCard from './schedule-spec-card.svelte';
+  import WorkflowInputCard from './workflow-input-card.svelte';
   import WorkflowRunsCard from './workflow-runs-card.svelte';
 
   interface Props {
@@ -226,7 +226,7 @@
     </div>
 
     <div class="flex w-full flex-col gap-4 xl:w-1/3">
-      <ScheduleInputCard
+      <WorkflowInputCard
         {scheduleId}
         input={schedule?.schedule?.action?.startWorkflow?.input}
       />

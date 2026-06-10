@@ -14,7 +14,7 @@ export const Strings = {
   frequency: 'Frequency',
   'schedule-spec': 'Schedule Spec',
   'cron-string': 'Cron String',
-  'schedule-input': 'Schedule Input',
+  'workflow-input': 'Workflow Input',
   'empty-state-title': 'No Schedules Found',
   'empty-state-description':
     'Try adjusting or clearing the filters to see the Schedules running on this Namespace.',

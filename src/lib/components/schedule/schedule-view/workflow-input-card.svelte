@@ -14,13 +14,13 @@
 
 <Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
   <InputAndResultsPayload
-    title={translate('schedules.schedule-input')}
+    title={translate('schedules.workflow-input')}
     content={input}
     payloadDownloadFilenameData={{ scheduleId, type: 'input' }}
   >
     {#snippet titleSnippet()}
       <h2 class="mb-[0.75rem] text-2xl font-medium">
-        {translate('schedules.schedule-input')}
+        {translate('schedules.workflow-input')}
       </h2>
     {/snippet}
   </InputAndResultsPayload>
