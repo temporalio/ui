@@ -69,7 +69,7 @@ export const structuredCalendarSchema = () =>
       dayOfWeek: z
         .array(rangeSchemaOf(dayOfWeek()))
         .default([{ start: 0, end: 6 }]),
-      month: z.array(rangeSchemaOf(month())).default([{ start: 1, end: 1 }]),
+      month: z.array(rangeSchemaOf(month())).default([{ start: 1, end: 12 }]),
       year: z.array(rangeSchemaOf(year())).optional(),
       comment: z.string().default(''),
     })
