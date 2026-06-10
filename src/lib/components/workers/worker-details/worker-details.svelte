@@ -357,7 +357,9 @@
               width={200}
             >
               <Badge type="ghost" class="mt-1 text-xs">
-                {poller.isAutoscaling ? 'Autoscaling' : 'SimpleMaximum'}
+                {poller.isAutoscaling
+                  ? translate('workers.autoscaling')
+                  : translate('workers.simple-maximum')}
               </Badge>
             </Tooltip>
           </dd>

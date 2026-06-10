@@ -296,4 +296,6 @@ export const Strings = {
   'go-dependency-warning-link': 'Enable host resource reporting',
   'zero-slots-configured': 'Zero slots configured.',
   'configure-slots-link': 'Configure slots',
+  autoscaling: 'Autoscaling',
+  'simple-maximum': 'SimpleMaximum',
 } as const;
