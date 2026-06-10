@@ -38,7 +38,7 @@
     units={intervalUnits}
     initialUnit="minute(s)"
     inputmode="numeric"
-    min={0}
+    min={1}
     placeholder="00"
     error={!!$errors.specs?.[index]?.interval?.interval?.[0]}
     hintText={$errors.specs?.[index]?.interval?.interval?.[0]}
