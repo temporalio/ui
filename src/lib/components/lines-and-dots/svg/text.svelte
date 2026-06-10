@@ -22,6 +22,12 @@
     config?: GraphConfig;
     label?: boolean;
     children?: Snippet;
+    /**
+     * Pass any value that captures the rendered content (e.g. the decoded text).
+     * Whenever it changes, the text bbox is re-measured so the background rect
+     * stays sized to the actual text.
+     */
+    contentKey?: unknown;
   };
 
   let {
@@ -37,6 +43,7 @@
     config = undefined,
     label = false,
     children,
+    contentKey,
   }: Props = $props();
 
   const [x, y] = $derived(point);
@@ -44,7 +51,11 @@
   let textElement: SVGTextElement = $state();
 
   const showIcon = $derived(icon && config);
-  const textBBox = $derived(textElement?.getBBox());
+  let textBBox = $state<DOMRect | undefined>();
+  $effect(() => {
+    void contentKey;
+    if (textElement) textBBox = textElement.getBBox();
+  });
   const textWidth = $derived(textBBox?.width || 0);
   const textHeight = $derived(textBBox?.height || 0);
   const backdropWidth = $derived(showIcon ? textWidth + 36 : textWidth + 12);
