@@ -60,11 +60,14 @@ for (const rel of allFiles) {
   const dir = dirname(file);
   let code = readFileSync(file, 'utf-8');
 
-  const rewritten = code.replace(/from '(\.[^']+\.svelte)'/g, (_, relImport) => {
-    const abs = resolve(dir, relImport);
-    const pkgRel = relative(distPath, abs).replace(/\\/g, '/');
-    return `from '${pkgName}/${pkgRel}'`;
-  });
+  const rewritten = code.replace(
+    /from '(\.[^']+\.svelte)'/g,
+    (_, relImport) => {
+      const abs = resolve(dir, relImport);
+      const pkgRel = relative(distPath, abs).replace(/\\/g, '/');
+      return `from '${pkgName}/${pkgRel}'`;
+    },
+  );
 
   if (rewritten !== code) writeFileSync(file, rewritten);
 }
