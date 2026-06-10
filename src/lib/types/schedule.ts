@@ -1,11 +1,9 @@
 import type { temporal } from '@temporalio/proto';
 
 import type {
-  CalendarSpec,
   DescribeScheduleResponse,
   Duration,
   IntervalSpec,
-  RangeSpec,
   Schedule,
   SchedulePolicies,
   ScheduleSpec,
@@ -99,26 +97,8 @@ export type ScheduleRequestBody = {
   schedule: ScheduleRequest;
 };
 
-export type FullSchedule = Schedule;
-export type FullScheduleSpec = ScheduleSpec;
-export type FullCalendarSpec = CalendarSpec;
-export type StructuredCalendars = StructuredCalendarSpec[];
 export type StructuredCalendar = StructuredCalendarSpec;
 export type ScheduleInterval = IntervalSpec;
-export type ScheduleRange = RangeSpec;
-
-export type SchedulePreset =
-  | 'existing'
-  | 'interval'
-  | 'week'
-  | 'month'
-  | 'string';
-
-export type ScheduleSpecType = 'cron' | 'week' | 'month' | 'interval';
-
-export type ScheduleOffsetUnit = 'days' | 'hrs' | 'min' | 'sec';
-
-export type EndDateType = 'never' | 'on' | 'after';
 
 export type ScheduleStatus = 'Paused' | 'Running';
 
