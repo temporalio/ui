@@ -4,6 +4,11 @@
   import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
   import { getMonthName } from '$lib/utilities/calendar';
+  import {
+    DATE_PICKER_INPUT_FORMAT,
+    evaluateDatePickerInput,
+    formatDatePickerInput,
+  } from '$lib/utilities/date-picker-input';
 
   import Calender from './calendar.svelte';
   import Icon from './icon/icon.svelte';
@@ -40,6 +45,7 @@
   let month = $derived(selected.getMonth());
   let year = $derived(selected.getFullYear());
   let showDatePicker = $state(false);
+  let inputError = $state(false);
 
   // handlers
   const onFocus = () => {
@@ -48,16 +54,9 @@
 
   const onInput = (e: Event) => {
     const target = e.target as HTMLInputElement;
-    const inputDate = target.value;
-    if (inputDate.length === 8) {
-      const inputDateSplit = inputDate?.split('/');
-      const yearEnd = parseInt(inputDateSplit[2]);
-      const year = 2000 + yearEnd;
-      const month = parseInt(inputDateSplit[0]) - 1;
-      const date = parseInt(inputDateSplit[1]);
-      const newDate = new Date(year, month, date);
-      onDateChange?.(newDate);
-    }
+    const { date, error } = evaluateDatePickerInput(target.value, isAllowed);
+    inputError = error;
+    if (date) onDateChange?.(date);
   };
 
   const next = () => {
@@ -80,11 +79,13 @@
 
   const handleDateChange = (d: Date) => {
     showDatePicker = false;
+    inputError = false;
     onDateChange?.(d);
   };
 
   const previousMonth = translate('date-picker.previous-month');
   const nextMonth = translate('date-picker.next-month');
+  const invalidDate = translate('date-picker.invalid-date');
 </script>
 
 <div class="relative" use:clickoutside={() => (showDatePicker = false)}>
@@ -97,8 +98,10 @@
     type="text"
     onfocus={onFocus}
     oninput={onInput}
-    placeholder="MM/DD/YY"
-    value={selected.toDateString()}
+    placeholder={DATE_PICKER_INPUT_FORMAT}
+    value={formatDatePickerInput(selected)}
+    error={inputError}
+    hintText={inputError ? invalidDate : ''}
     clearable
     clearButtonLabel={clearLabel}
     {disabled}
@@ -137,7 +140,10 @@
         <button
           type="button"
           class="cursor-pointer text-[12px]"
-          onclick={() => (selected = new Date())}
+          onclick={() => {
+            inputError = false;
+            selected = new Date();
+          }}
         >
           {todayLabel}
         </button>
