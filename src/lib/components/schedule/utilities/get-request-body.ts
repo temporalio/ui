@@ -198,10 +198,10 @@ function getScheduleSpecRequest(
     cronString,
     structuredCalendar,
     timezoneName: timeZone,
-    startTime: calendarDateStrToTimestamp(scheduleForm.startTime),
+    startTime: calendarDateStrToTimestamp(scheduleForm.startTime, timeZone),
     ...(scheduleForm.endKind === 'on' &&
       scheduleForm.endTime && {
-        endTime: calendarDateStrToTimestamp(scheduleForm.endTime),
+        endTime: calendarDateStrToTimestamp(scheduleForm.endTime, timeZone),
       }),
     ...(scheduleForm.jitter &&
       scheduleForm.jitter > 0 && {

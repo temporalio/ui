@@ -42,6 +42,7 @@
         translate('common.end-date'),
         spec?.endTime ? $timestamp(spec.endTime) : translate('common.never'),
       )}
+      {@render Info(translate('common.timezone'), spec?.timezoneName ?? 'UTC')}
     </div>
     <div class="flex items-center gap-4">
       {@render Info(

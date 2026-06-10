@@ -79,7 +79,10 @@ function getEndCondition(
   if (spec?.endTime) {
     return {
       endKind: 'on',
-      endTime: isoStringToCalendarDateStr(String(spec.endTime)),
+      endTime: isoStringToCalendarDateStr(
+        String(spec.endTime),
+        spec.timezoneName || 'UTC',
+      ),
     };
   }
 
@@ -130,6 +133,7 @@ export function getFormScheduleDefaults(
     timezoneName: spec?.timezoneName || 'UTC',
     startTime: isoStringToCalendarDateStr(
       String(spec?.startTime || new Date().toISOString()),
+      spec?.timezoneName || 'UTC',
     ),
     jitter: Number(parseDuration(spec?.jitter ?? '') || 0),
     ...getEndCondition(describeFullSchedule),
