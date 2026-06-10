@@ -233,8 +233,8 @@
             : 'bg-slate-300'}"
         ></span>
         {autoRefresh
-          ? translate('workflows.auto-refresh-on')
-          : translate('workflows.auto-refresh-off')}
+          ? translate('workers.auto-refresh-on')
+          : translate('workers.auto-refresh-off')}
       </ToggleButton>
     </ToggleButtons>
     {#if refreshing}
@@ -297,10 +297,7 @@
 
     <dl class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:grid-rows-1">
       <div>
-        <dt
-          id="slots-{title}"
-          class="mb-1 flex h-6 items-center gap-2 text-sm text-secondary"
-        >
+        <dt id="slots-{title}" class="mb-1 h-6 text-sm text-secondary">
           {translate('workers.slots-used')}
         </dt>
         <dd class="mb-2">
@@ -340,7 +337,7 @@
 
       {#if poller}
         <div>
-          <dt class="mb-1 flex h-6 items-center gap-2 text-sm text-secondary">
+          <dt class="mb-1 h-6 text-sm text-secondary">
             {translate('workers.poller-count')}
           </dt>
           <dd>
@@ -367,12 +364,12 @@
       {/if}
     </dl>
     {#if !slots?.currentUsedSlots && !slots?.currentAvailableSlots}
-      <div class="flex items-end gap-1 text-xs">
+      <div class="flex items-end gap-1 text-sm">
         <p class="text-secondary">
           {translate('workers.zero-slots-configured')}
         </p>
         <Link
-          icon="external-link"
+          trailingIcon="external-link"
           href="https://docs.temporal.io/develop/worker-performance#custom-slot-implementation"
           newTab
         >
@@ -380,7 +377,7 @@
         </Link>
       </div>
     {:else if poller?.lastSuccessfulPollTime}
-      <p class="text-xs text-secondary">
+      <p class="text-sm text-secondary">
         {translate('workers.last-polled')}
         <Timestamp dateTime={poller.lastSuccessfulPollTime} as="span" />
       </p>
@@ -410,7 +407,7 @@
   <Alert intent="warning" title={translate('workers.go-dependency-warning')}>
     <p class="mb-1">{translate('workers.go-dependency-warning-description')}</p>
     <Link
-      icon="external-link"
+      trailingIcon="external-link"
       href="https://docs.temporal.io/cloud/worker-health#enable-host-resource-reporting"
       newTab
     >
@@ -480,7 +477,7 @@
       </div>
     </dl>
     <Link
-      icon="external-link"
+      trailingIcon="external-link"
       href="https://docs.temporal.io/develop/worker-performance#workflow-cache-tuning"
       newTab
       class="mt-4"

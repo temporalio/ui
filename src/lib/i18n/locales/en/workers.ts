@@ -69,7 +69,7 @@ export const Strings = {
   'go-dependency-warning': 'Missing Dependency',
   'go-dependency-warning-description':
     'No usage data is available for this Worker. A Go SDK dependency may need to be enabled to surface this data.',
-  'workflow-cache-link': 'Learn how to tune your Workflow cache',
+  'workflow-cache-link': 'Learn how to tune your Workflow Cache',
   'no-worker-heartbeats': 'No Workers Sending Heartbeats',
   'worker-heartbeats-sdk-link-preface': 'Upgrade SDK to at least',
   'worker-heartbeats-sdk-link-postface': 'to enable.',
@@ -298,4 +298,6 @@ export const Strings = {
   'configure-slots-link': 'Configure slots',
   autoscaling: 'Autoscaling',
   'simple-maximum': 'SimpleMaximum',
+  'auto-refresh-on': 'Auto Refresh On',
+  'auto-refresh-off': 'Auto Refresh Off',
 } as const;
