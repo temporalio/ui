@@ -85,7 +85,7 @@ function summarizeCronSpec(
   _timing: FormScheduleTimingSchema,
 ): string {
   try {
-    return cronstrue.toString(spec.cronString || '* * * * *', {
+    return cronstrue.toString(spec.cronString, {
       verbose: true,
       use24HourTimeFormat: true,
     });

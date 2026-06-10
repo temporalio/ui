@@ -20,87 +20,117 @@
   const notes = $derived(schedule?.schedule?.state?.notes);
 </script>
 
-{#snippet Info(header: string, value: string)}
-  <div class="flex w-full flex-col gap-0 text-sm">
-    <p class="text-secondary">
-      {header}
-    </p>
-    <p>
-      {value}
-    </p>
-  </div>
-{/snippet}
-
 <Accordion title={translate('schedules.advanced-settings')} open>
-  <div class="flex w-full flex-col gap-4">
-    <div class="flex items-center gap-4">
-      {@render Info(
-        translate('common.start-date'),
-        spec?.startTime ? $timestamp(spec.startTime) : translate('common.none'),
-      )}
-      {@render Info(
-        translate('common.end-date'),
-        spec?.endTime ? $timestamp(spec.endTime) : translate('common.never'),
-      )}
-      {@render Info(translate('common.timezone'), spec?.timezoneName ?? 'UTC')}
+  <dl class="grid grid-cols-2 gap-4 text-sm">
+    <div>
+      <dt class="text-secondary">{translate('common.start-date')}</dt>
+      <dd>
+        {spec?.startTime
+          ? $timestamp(spec.startTime)
+          : translate('common.none')}
+      </dd>
     </div>
-    <div class="flex items-center gap-4">
-      {@render Info(
-        translate('schedules.jitter'),
-        spec?.jitter ? String(spec.jitter) : translate('common.none'),
-      )}
-      {@render Info(
-        translate('schedules.overlap-policy'),
-        String(
+
+    <div>
+      <dt class="text-secondary">{translate('common.end-date')}</dt>
+      <dd>
+        {spec?.endTime ? $timestamp(spec.endTime) : translate('common.never')}
+      </dd>
+    </div>
+
+    <div>
+      <dt class="text-secondary">{translate('common.timezone-label')}</dt>
+      <dd>
+        {spec?.timezoneName || 'UTC'}
+      </dd>
+    </div>
+
+    <div>
+      <dt class="text-secondary">{translate('schedules.jitter')}</dt>
+      <dd>
+        {spec?.jitter && spec.jitter !== '0s'
+          ? String(spec.jitter)
+          : translate('common.none')}
+      </dd>
+    </div>
+
+    <div>
+      <dt class="text-secondary">{translate('schedules.overlap-policy')}</dt>
+      <dd>
+        {String(
           fromScreamingEnum(policies?.overlapPolicy, 'ScheduleOverlapPolicy') ??
             translate('common.none'),
-        ),
-      )}
+        )}
+      </dd>
     </div>
-    <div class="flex items-center gap-4">
-      {@render Info(
-        translate('schedules.catchup-window-policy'),
-        policies?.catchupWindow != null
+
+    <div>
+      <dt class="text-secondary">
+        {translate('schedules.catchup-window-policy')}
+      </dt>
+      <dd>
+        {policies?.catchupWindow != null
           ? formatDuration(policies.catchupWindow.toString())
-          : translate('common.none'),
-      )}
-      {@render Info(
-        translate('schedules.pause-on-failure'),
-        policies?.pauseOnFailure
+          : translate('common.none')}
+      </dd>
+    </div>
+
+    <div>
+      <dt class="text-secondary">
+        {translate('schedules.pause-on-failure')}
+      </dt>
+      <dd>
+        {policies?.pauseOnFailure
           ? translate('common.true')
-          : translate('common.false'),
-      )}
+          : translate('common.false')}
+      </dd>
     </div>
-    <div class="flex items-center gap-4">
-      {@render Info(
-        translate('schedules.exclusion-calendar'),
-        spec?.excludeStructuredCalendar
-          ? summarizeScheduleSpec({
-              structuredCalendar: spec.excludeStructuredCalendar,
-              timezoneName: spec.timezoneName,
-            }) || translate('common.none')
-          : translate('common.none'),
-      )}
-      {#if state.limitedActions}
-        {@render Info(
-          translate('schedules.remaining-actions'),
-          state?.remainingActions?.toString() ?? translate('common.none'),
-        )}
-      {/if}
-      {#if policies?.keepOriginalWorkflowId != null}
-        {@render Info(
-          translate('schedules.keep-original-workflow-id'),
-          policies?.keepOriginalWorkflowId
+
+    <div>
+      <dt class="text-secondary">
+        {translate('schedules.exclusion-calendar')}
+      </dt>
+      <dd>
+        {(spec?.excludeStructuredCalendar &&
+          summarizeScheduleSpec({
+            structuredCalendar: spec.excludeStructuredCalendar,
+            timezoneName: spec.timezoneName,
+          })) ||
+          translate('common.none')}
+      </dd>
+    </div>
+
+    {#if state.limitedActions}
+      <div>
+        <dt class="text-secondary">
+          {translate('schedules.remaining-actions')}
+        </dt>
+        <dd>
+          {state?.remainingActions?.toString() ?? translate('common.none')}
+        </dd>
+      </div>
+    {/if}
+
+    {#if policies?.keepOriginalWorkflowId != null}
+      <div>
+        <dt class="text-secondary">
+          {translate('schedules.keep-original-workflow-id')}
+        </dt>
+        <dd>
+          {policies?.keepOriginalWorkflowId
             ? translate('common.true')
-            : translate('common.false'),
-        )}
-      {/if}
+            : translate('common.false')}
+        </dd>
+      </div>
+    {/if}
+
+    <div class="col-span-full">
+      <dt class="text-secondary">
+        {translate('common.notes')}
+      </dt>
+      <dd>
+        {notes ?? translate('common.none')}
+      </dd>
     </div>
-    <div class="flex items-center gap-4">
-      {@render Info(
-        translate('common.notes'),
-        notes ?? translate('common.none'),
-      )}
-    </div>
-  </div>
+  </dl>
 </Accordion>

@@ -57,18 +57,9 @@
     if (val !== $form.endKind) $form.endKind = val;
   });
 
-  const startDate = $derived(
-    fromCalendarDateStr($form.startTime || getNowCalendarDateStr()),
-  );
+  const startDate = $derived(fromCalendarDateStr($form.startTime));
 
   const endDate = $derived.by(() => {
-    if (!$form.endTime) {
-      const nowCalendarDate = fromCalendarDateStr(getNowCalendarDateStr());
-      return isBefore(nowCalendarDate, startDate)
-        ? new Date(startDate)
-        : nowCalendarDate;
-    }
-
     return fromCalendarDateStr($form.endTime);
   });
 
@@ -83,6 +74,8 @@
   const onEndDateChange = (d: Date) => {
     $form.endTime = toCalendarDateStr(d);
   };
+
+  $inspect($form);
 </script>
 
 <Card class="w-full">
@@ -193,16 +186,20 @@
           label={translate('common.after')}
         />
         {#if $form.endKind === 'after'}
-          <NumberInput
-            id="endAfterOccurrences"
-            label={translate('schedules.occurrences-label')}
-            labelHidden
-            bind:value={$form.endAfterOccurrences}
-            placeholder={translate('schedules.occurrences-placeholder')}
-            min={1}
-            disabled={$form.endKind !== 'after'}
-            class="w-full"
-          />
+          <div>
+            <NumberInput
+              id="endAfterOccurrences"
+              label={translate('schedules.occurrences-label')}
+              labelHidden
+              bind:value={$form.endAfterOccurrences}
+              placeholder={translate('schedules.occurrences-placeholder')}
+              min={1}
+              required
+              error={!!$errors.endAfterOccurrences?.[0]}
+              hintText={$errors.endAfterOccurrences?.[0]}
+              class="w-full"
+            />
+          </div>
         {/if}
       </div>
     </RadioGroup>

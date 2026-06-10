@@ -4,7 +4,7 @@ import type { SearchAttributes } from '$lib/types/workflows';
 import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-import { isoStringToCalendarDateStr } from './date';
+import { getNowCalendarDateStr, isoStringToCalendarDateStr } from './date';
 import { getFormSpecsFromDescribeFullSchedule } from './get-form-spec';
 import { getFormSpecInitialData } from './get-form-spec-initial-data';
 import {
@@ -61,32 +61,37 @@ function decodeSearchAttributeRows(
   }));
 }
 
-function getEndCondition(
+function getEndKind(
   describeFullSchedule: DescribeFullSchedule | null,
-): Pick<FormScheduleSchema, 'endKind' | 'endTime' | 'endAfterOccurrences'> {
-  const spec = describeFullSchedule?.schedule?.spec;
+): FormScheduleSchema['endKind'] {
   const state = describeFullSchedule?.schedule?.state;
+  const spec = describeFullSchedule?.schedule?.spec;
 
-  const remainingActions =
-    state?.limitedActions && state?.remainingActions
-      ? Number(state.remainingActions)
-      : undefined;
-
-  if (remainingActions) {
-    return { endKind: 'after', endAfterOccurrences: remainingActions };
+  if (state?.limitedActions) {
+    return 'after';
   }
 
   if (spec?.endTime) {
-    return {
-      endKind: 'on',
-      endTime: isoStringToCalendarDateStr(
-        String(spec.endTime),
-        spec.timezoneName || 'UTC',
-      ),
-    };
+    return 'on';
   }
 
-  return { endKind: 'never' };
+  return 'never';
+}
+
+function getEndCondition(
+  describeFullSchedule: DescribeFullSchedule | null,
+): Pick<FormScheduleSchema, 'endKind' | 'endTime' | 'endAfterOccurrences'> {
+  const state = describeFullSchedule?.schedule?.state;
+  const spec = describeFullSchedule?.schedule?.spec;
+
+  return {
+    endKind: getEndKind(describeFullSchedule),
+    endAfterOccurrences: state?.remainingActions,
+    endTime: isoStringToCalendarDateStr(
+      String(spec?.endTime ?? getNowCalendarDateStr()),
+      spec?.timezoneName || 'UTC',
+    ),
+  };
 }
 
 function getSpecs(

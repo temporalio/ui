@@ -39,7 +39,10 @@
   const preview = $derived.by(() => {
     if (spec.kind === 'cron' && !spec.cronString) {
       return translate('schedules.spec-preview-example', {
-        summary: getScheduleSpecSummary(spec, timing),
+        summary: getScheduleSpecSummary(
+          { ...spec, cronString: '* * * * *' },
+          timing,
+        ),
       });
     }
 

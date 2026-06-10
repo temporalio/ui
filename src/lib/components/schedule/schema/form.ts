@@ -129,8 +129,7 @@ export const formScheduleTimingSchema = z.object({
     .string()
     .trim()
     .date('Invalid end time')
-    .or(z.literal(''))
-    .optional(),
+    .default(getNowCalendarDateStr()),
   endAfterOccurrences: z.number().optional(),
 });
 
@@ -165,6 +164,17 @@ export const formScheduleSchema = z
         code: z.ZodIssueCode.custom,
         message: 'End time is required',
         path: ['endTime'],
+      });
+    }
+
+    if (
+      schedule.endKind === 'after' &&
+      typeof schedule.endAfterOccurrences !== 'number'
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Number of occurrences is required',
+        path: ['endAfterOccurrences'],
       });
     }
   });
