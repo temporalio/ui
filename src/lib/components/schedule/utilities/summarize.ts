@@ -17,10 +17,7 @@ import {
 import { getLargestWholeUnit } from './duration';
 import { getFormSpecFromSpec } from './get-form-spec';
 import { expandRanges } from './range';
-import {
-  type FormScheduleTimingSchema,
-  type FormSpecSchema,
-} from '../schema/form';
+import { type FormSpecSchema } from '../schema/form';
 
 import type { ScheduleSpec } from '$types';
 
@@ -30,60 +27,49 @@ import type { ScheduleSpec } from '$types';
 export function summarizeScheduleSpec(
   spec: ScheduleSpec | null | undefined,
 ): string {
-  const timing = { timezoneName: spec?.timezoneName ?? 'UTC' };
-
   return getFormSpecFromSpec(spec)
-    .map((item) => getScheduleSpecSummary(item, timing))
+    .map((item) => getScheduleSpecSummary(item))
     .filter(Boolean)
     .join('; ');
 }
 
-export function getScheduleSpecSummary(
-  spec: FormSpecSchema,
-  timing: FormScheduleTimingSchema,
-) {
+export function getScheduleSpecSummary(spec: FormSpecSchema) {
   switch (spec.kind) {
     case 'none': {
       return '';
     }
 
     case 'cron': {
-      return summarizeCronSpec(spec, timing);
+      return summarizeCronSpec(spec);
     }
 
     case 'week': {
-      return summarizeWeekSpec(spec, timing);
+      return summarizeWeekSpec(spec);
     }
 
     case 'month': {
-      return summarizeMonthSpec(spec, timing);
+      return summarizeMonthSpec(spec);
     }
 
     case 'interval': {
-      return summarizeIntervalSpec(spec, timing);
+      return summarizeIntervalSpec(spec);
     }
 
     case 'frozen': {
-      return summarizeFrozenSpec(spec, timing);
+      return summarizeFrozenSpec(spec);
     }
   }
 }
 
 const pad0ForTime = (num = 0): string => num.toString().padStart(2, '0');
 
-function getCalendarTime(
-  calendar: FormSpecSchema['calendar'],
-  timezone: string,
-): string {
+function getCalendarTime(calendar: FormSpecSchema['calendar']): string {
   const hour = calendar.hour?.[0]?.start ?? 0;
   const minute = calendar.minute?.[0]?.start ?? 0;
-  return `${pad0ForTime(hour)}:${pad0ForTime(minute)} ${timezone}`;
+  return `${pad0ForTime(hour)}:${pad0ForTime(minute)}`;
 }
 
-function summarizeCronSpec(
-  spec: FormSpecSchema,
-  _timing: FormScheduleTimingSchema,
-): string {
+function summarizeCronSpec(spec: FormSpecSchema): string {
   try {
     return cronstrue.toString(spec.cronString, {
       verbose: true,
@@ -94,17 +80,11 @@ function summarizeCronSpec(
   }
 }
 
-function summarizeWeekSpec(
-  spec: FormSpecSchema,
-  timing: FormScheduleTimingSchema,
-): string {
+function summarizeWeekSpec(spec: FormSpecSchema): string {
   const { calendar } = spec;
-  const timezone = timing.timezoneName;
 
   const selectedSet = new Set(expandRanges(calendar.dayOfWeek));
-  const time = getCalendarTime(calendar, timezone);
-
-  console.log({ week: selectedSet, time });
+  const time = getCalendarTime(calendar);
 
   if (DAYS_OF_WEEK.every((d) => selectedSet.has(d))) {
     return translate('schedules.spec-summary-everyday', { time });
@@ -128,17 +108,13 @@ function summarizeWeekSpec(
   });
 }
 
-function summarizeMonthSpec(
-  spec: FormSpecSchema,
-  timing: FormScheduleTimingSchema,
-): string {
+function summarizeMonthSpec(spec: FormSpecSchema): string {
   const { calendar } = spec;
-  const timezone = timing.timezoneName;
 
   const selectedMonths = new Set(expandRanges(calendar.month));
   const selectedDays = new Set(expandRanges(calendar.dayOfMonth));
 
-  const time = getCalendarTime(calendar, timezone);
+  const time = getCalendarTime(calendar);
 
   const sortedDays = sortNumbers(Array.from(selectedDays));
   const formattedDays = formatList(sortedDays.map(String));
@@ -172,10 +148,7 @@ function summarizeMonthSpec(
   });
 }
 
-function summarizeIntervalSpec(
-  spec: FormSpecSchema,
-  _timing: FormScheduleTimingSchema,
-): string {
+function summarizeIntervalSpec(spec: FormSpecSchema): string {
   const { interval, phase } = spec.interval;
 
   if (!interval) {
@@ -197,12 +170,9 @@ function summarizeIntervalSpec(
 // either an interval or a structured calendar of arbitrary field combinations.
 // Mirror the interval-vs-calendar split used when re-emitting the request, then
 // pick the week- or month-style summary based on which day field is restricted.
-function summarizeFrozenSpec(
-  spec: FormSpecSchema,
-  timing: FormScheduleTimingSchema,
-): string {
+function summarizeFrozenSpec(spec: FormSpecSchema): string {
   if (spec.interval?.interval) {
-    return summarizeIntervalSpec(spec, timing);
+    return summarizeIntervalSpec(spec);
   }
 
   const { calendar } = spec;
@@ -214,9 +184,7 @@ function summarizeFrozenSpec(
 
   const isWeek = !isEveryDayOfWeek && isEveryDayOfMonth;
 
-  const summary = isWeek
-    ? summarizeWeekSpec(spec, timing)
-    : summarizeMonthSpec(spec, timing);
+  const summary = isWeek ? summarizeWeekSpec(spec) : summarizeMonthSpec(spec);
 
   // The CLI can pin a structured calendar to specific years; the week/month
   // summaries omit it, so append the year(s) here when present.

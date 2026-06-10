@@ -153,7 +153,7 @@
     >
       <span class="font-semibold">{typeLabel}</span>
       <span class="flex-1 flex-wrap text-xs text-secondary">
-        {getScheduleSpecSummary(spec, timing)}.
+        {getScheduleSpecSummary(spec)}.
       </span>
       {#if rawValue}
         <span class="font-mono">{rawValue}</span>

@@ -17,13 +17,6 @@
 
   const spec = $derived($form.specs[index]);
 
-  const timing = $derived({
-    timezoneName: $form.timezoneName,
-    startTime: $form.startTime,
-    endTime: $form.endTime,
-    endAfterOccurrences: $form.endAfterOccurrences,
-  });
-
   const isEmpty = $derived.by(() => {
     if (spec.kind === 'cron' && !spec.cronString) {
       return true;
@@ -39,10 +32,7 @@
   const preview = $derived.by(() => {
     if (spec.kind === 'cron' && !spec.cronString) {
       return translate('schedules.spec-preview-example', {
-        summary: getScheduleSpecSummary(
-          { ...spec, cronString: '* * * * *' },
-          timing,
-        ),
+        summary: getScheduleSpecSummary({ ...spec, cronString: '* * * * *' }),
       });
     }
 
@@ -50,7 +40,7 @@
       return translate('schedules.spec-preview-interval-empty');
     }
 
-    return getScheduleSpecSummary(spec, timing);
+    return getScheduleSpecSummary(spec);
   });
 </script>
 

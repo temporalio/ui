@@ -14,13 +14,6 @@
 
   let { form }: Props = $props();
 
-  const timing = $derived({
-    timezoneName: $form.timezoneName,
-    startTime: $form.startTime,
-    endTime: $form.endTime,
-    endAfterOccurrences: $form.endAfterOccurrences,
-  });
-
   const endDisplay = $derived.by(() => {
     switch ($form.endKind) {
       case 'never': {
@@ -50,7 +43,7 @@
   const descriptionDisplay = $derived.by(() => {
     const specs = $form.specs
       .map((spec, i) => {
-        const summary = getScheduleSpecSummary(spec, timing);
+        const summary = getScheduleSpecSummary(spec);
         if (i === 0) {
           return summary;
         }

@@ -17,9 +17,6 @@
   let isFullSpecVisible = $state(false);
 
   const specs = $derived(getFormSpecFromSpec(schedule?.schedule?.spec));
-  const timing = $derived({
-    timezoneName: schedule?.schedule?.spec?.timezoneName ?? 'UTC',
-  });
 </script>
 
 <Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
@@ -46,7 +43,7 @@
   <ul class="flex flex-col gap-4 text-sm">
     {#each specs as spec (spec)}
       <li>
-        {getScheduleSpecSummary(spec, timing)}
+        {getScheduleSpecSummary(spec)}
       </li>
     {/each}
   </ul>
