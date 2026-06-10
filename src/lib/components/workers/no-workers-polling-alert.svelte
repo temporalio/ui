@@ -20,16 +20,26 @@
 
   let serverlessDeployment = $state(false);
   let deploymentChecked = $state(false);
+  let lastCheckedDeployment: string | undefined = undefined;
 
   $effect(() => {
     if (!runningWithNoWorkers || !deployment) {
       serverlessDeployment = false;
       deploymentChecked = true;
+      lastCheckedDeployment = undefined;
       return;
     }
 
+    if (lastCheckedDeployment === deployment) return;
+    lastCheckedDeployment = deployment;
+
     deploymentChecked = false;
-    fetchDeployment({ namespace, deploymentName: deployment }, fetch, () => {})
+    fetchDeployment(
+      { namespace, deploymentName: deployment },
+      fetch,
+      () => {},
+      false,
+    )
       .then((response) => {
         serverlessDeployment = deploymentHasComputeConfig(
           response?.workerDeploymentInfo,

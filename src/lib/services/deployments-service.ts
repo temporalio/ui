@@ -70,12 +70,10 @@ export const fetchDeployment = async (
   parameters: DeploymentParameters,
   request = fetch,
   onError?: ErrorCallback,
+  notifyOnError = true,
 ): Promise<WorkerDeploymentResponse> => {
   const route = routeForApi('worker-deployment', parameters);
-  return requestFromAPI(route, {
-    request,
-    ...(onError ? { onError, notifyOnError: false } : {}),
-  });
+  return requestFromAPI(route, { request, onError, notifyOnError });
 };
 
 export const fetchDeploymentVersion = async (

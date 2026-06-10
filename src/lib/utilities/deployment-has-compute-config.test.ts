@@ -64,11 +64,11 @@ describe('deploymentHasComputeConfig', () => {
     ).toBe(true);
   });
 
-  it('returns true when the latest version summary has a compute config', () => {
+  it('returns true when the ramping version summary has a compute config', () => {
     expect(
       deploymentHasComputeConfig({
         ...baseDeployment,
-        latestVersionSummary: {
+        rampingVersionSummary: {
           version: 'loan-underwriting-app.build-2',
           createTime: undefined,
           computeConfig,
@@ -77,30 +77,20 @@ describe('deploymentHasComputeConfig', () => {
     ).toBe(true);
   });
 
-  it('returns true when a version summary has a compute config', () => {
+  it('ignores compute configs on inactive versions', () => {
     expect(
       deploymentHasComputeConfig({
         ...baseDeployment,
+        latestVersionSummary: {
+          version: 'loan-underwriting-app.build-2',
+          createTime: undefined,
+          computeConfig,
+        },
         versionSummaries: [
           {
-            version: 'loan-underwriting-app.build-1',
+            version: 'loan-underwriting-app.build-0',
             createTime: undefined,
             computeConfig,
-          },
-        ],
-      }),
-    ).toBe(true);
-  });
-
-  it('returns false when version summaries are the old shape without compute config', () => {
-    expect(
-      deploymentHasComputeConfig({
-        ...baseDeployment,
-        versionSummaries: [
-          {
-            version: 'loan-underwriting-app.build-1',
-            createTime: undefined,
-            drainageStatus: 'DRAINAGE_STATUS_UNSPECIFIED',
           },
         ],
       }),
