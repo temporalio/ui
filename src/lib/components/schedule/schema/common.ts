@@ -74,19 +74,3 @@ export const structuredCalendarSchema = () =>
       comment: z.string().default(''),
     })
     .default({});
-
-export const specSchema = z.object({
-  timezoneName: z.string().default('UTC'),
-  startTime: z.string().datetime().default(new Date().toISOString()),
-  endTime: z.string().datetime().optional(),
-  jitter: durationString().optional(),
-  structuredCalendar: z.array(structuredCalendarSchema()).optional(),
-  interval: z
-    .array(
-      z.object({
-        interval: durationString().optional(),
-        phase: durationString().optional(),
-      }),
-    )
-    .optional(),
-});
