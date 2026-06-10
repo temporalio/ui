@@ -4,7 +4,10 @@ import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import { isValidCronString } from './cron';
-import { calendarDateStrToTimestamp } from './date';
+import {
+  calendarDateStrToEndOfDayTimestamp,
+  calendarDateStrToTimestamp,
+} from './date';
 import type { FormScheduleSchema } from '../schema/form';
 
 import type {
@@ -201,7 +204,10 @@ function getScheduleSpecRequest(
     startTime: calendarDateStrToTimestamp(scheduleForm.startTime, timeZone),
     ...(scheduleForm.endKind === 'on' &&
       scheduleForm.endTime && {
-        endTime: calendarDateStrToTimestamp(scheduleForm.endTime, timeZone),
+        endTime: calendarDateStrToEndOfDayTimestamp(
+          scheduleForm.endTime,
+          timeZone,
+        ),
       }),
     ...(scheduleForm.jitter &&
       scheduleForm.jitter > 0 && {

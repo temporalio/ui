@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { calendarDateStrToTimestamp, isoStringToCalendarDateStr } from './date';
+import {
+  calendarDateStrToEndOfDayTimestamp,
+  calendarDateStrToTimestamp,
+  isoStringToCalendarDateStr,
+} from './date';
 
 describe('calendarDateStrToTimestamp', () => {
   it('anchors a calendar date to midnight of the given timezone', () => {
@@ -11,6 +15,28 @@ describe('calendarDateStrToTimestamp', () => {
     expect(calendarDateStrToTimestamp('2026-10-10', 'America/New_York')).toBe(
       '2026-10-10T04:00:00.000Z',
     );
+  });
+});
+
+describe('calendarDateStrToEndOfDayTimestamp', () => {
+  it('anchors a calendar date to end-of-day of the given timezone', () => {
+    expect(calendarDateStrToEndOfDayTimestamp('2026-10-10', 'UTC')).toBe(
+      '2026-10-10T23:59:59.000Z',
+    );
+    // 23:59:59 Eastern (UTC-4 in October) is 03:59:59 UTC the next day.
+    expect(
+      calendarDateStrToEndOfDayTimestamp('2026-10-10', 'America/New_York'),
+    ).toBe('2026-10-11T03:59:59.000Z');
+  });
+
+  it('reads back as the same calendar date', () => {
+    const timeZone = 'America/New_York';
+    expect(
+      isoStringToCalendarDateStr(
+        calendarDateStrToEndOfDayTimestamp('2026-10-10', timeZone),
+        timeZone,
+      ),
+    ).toBe('2026-10-10');
   });
 });
 
