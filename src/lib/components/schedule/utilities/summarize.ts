@@ -26,11 +26,10 @@ import type { ScheduleSpec } from '$types';
 // form-side summary so both paths render through one code path.
 export function summarizeScheduleSpec(
   spec: ScheduleSpec | null | undefined,
-): string {
+): string[] {
   return getFormSpecFromSpec(spec)
     .map((item) => getScheduleSpecSummary(item))
-    .filter(Boolean)
-    .join('; ');
+    .filter(Boolean);
 }
 
 export function getScheduleSpecSummary(spec: FormSpecSchema) {

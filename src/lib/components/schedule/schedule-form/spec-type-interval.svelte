@@ -36,9 +36,9 @@
         })
     }
     units={intervalUnits}
-    initialUnit="second(s)"
+    initialUnit="minute(s)"
     inputmode="numeric"
-    min={1}
+    min={0}
     placeholder="00"
     error={!!$errors.specs?.[index]?.interval?.interval?.[0]}
     hintText={$errors.specs?.[index]?.interval?.interval?.[0]}
@@ -57,7 +57,8 @@
           interval: { ...spec.interval, phase: v },
         })
     }
-    initialUnit="minute(s)"
+    units={intervalUnits}
+    initialUnit="second(s)"
     inputmode="numeric"
     min={0}
     placeholder="00"

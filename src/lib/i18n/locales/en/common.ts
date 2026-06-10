@@ -170,7 +170,7 @@ export const Strings = {
   off: 'Off',
   experimental: 'Experimental',
   'timezone-label': 'Timezone',
-  timezone: 'Timezone {{ timezone }}',
+  timezone: 'Timezone {{- timezone }}',
   'time-unit': 'Time Unit',
   'time-format': 'Time Format',
   'time-range': 'Time Range',

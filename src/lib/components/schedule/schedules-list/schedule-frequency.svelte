@@ -15,25 +15,19 @@
   let { spec, class: className = '' }: Props = $props();
 
   const timezoneName = $derived(spec?.timezoneName ?? 'UTC');
-  const cronString = $derived(
-    spec?.structuredCalendar?.length > 0 &&
-      !!spec?.structuredCalendar[0].comment
-      ? spec?.structuredCalendar[0].comment
-      : '',
-  );
-
-  $inspect(spec);
 </script>
 
 <div class={twMerge('flex flex-col', className)}>
   <div class="flex flex-col gap-2">
-    {#if cronString}
-      <p>{cronString}</p>
-    {:else}
-      <p>{summarizeScheduleSpec(spec)}</p>
-    {/if}
+    <ul>
+      {#each summarizeScheduleSpec(spec) as summary (summary)}
+        <li>{summary}</li>
+      {:else}
+        <li>{translate('common.none')}</li>
+      {/each}
+    </ul>
   </div>
   <p class="text-secondary">
-    {@html translate('common.timezone', { timezone: timezoneName })}
+    {translate('common.timezone', { timezone: timezoneName })}
   </p>
 </div>

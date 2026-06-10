@@ -91,12 +91,17 @@
         {translate('schedules.exclusion-calendar')}
       </dt>
       <dd>
-        {(spec?.excludeStructuredCalendar &&
-          summarizeScheduleSpec({
-            structuredCalendar: spec.excludeStructuredCalendar,
-            timezoneName: spec.timezoneName,
-          })) ||
-          translate('common.none')}
+        {#if spec?.excludeStructuredCalendar}
+          <ul>
+            {#each summarizeScheduleSpec( { structuredCalendar: spec.excludeStructuredCalendar, timezoneName: spec.timezoneName }, ) as summary (summary)}
+              <li>{summary}</li>
+            {:else}
+              <li>{translate('common.none')}</li>
+            {/each}
+          </ul>
+        {:else}
+          {translate('common.none')}
+        {/if}
       </dd>
     </div>
 
