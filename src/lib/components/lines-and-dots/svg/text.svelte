@@ -48,9 +48,9 @@
 
   const [x, y] = $derived(point);
 
-  let textElement: SVGTextElement = $state();
+  let textElement: SVGTextElement | undefined = $state();
 
-  const showIcon = $derived(icon && config);
+  const iconInfo = $derived(icon && config ? { icon, config } : undefined);
   let textBBox = $state<DOMRect | undefined>();
   $effect(() => {
     void contentKey;
@@ -58,9 +58,9 @@
   });
   const textWidth = $derived(textBBox?.width || 0);
   const textHeight = $derived(textBBox?.height || 0);
-  const backdropWidth = $derived(showIcon ? textWidth + 36 : textWidth + 12);
+  const backdropWidth = $derived(iconInfo ? textWidth + 36 : textWidth + 12);
   const textX = $derived(
-    showIcon && textAnchor === 'start' ? x + config.radius * 2 : x,
+    iconInfo && textAnchor === 'start' ? x + iconInfo.config.radius * 2 : x,
   );
 </script>
 
@@ -72,9 +72,9 @@
     strokeWidth={backdropHeight}
   />
 {/if}
-{#if showIcon}
+{#if iconInfo}
   <Icon
-    name={icon}
+    name={iconInfo.icon}
     x={textAnchor === 'end' ? x - textWidth - backdropHeight : x}
     y={y - 8}
     class={!backdrop ? 'text-primary' : 'text-white'}
