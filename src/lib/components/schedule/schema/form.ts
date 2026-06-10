@@ -87,13 +87,16 @@ export const formSpecSchema = z
             message: 'Cron expression is required',
             path: ['cronString'],
           });
-        } else if (!isValidCronString(spec.cronString)) {
+        }
+
+        if (!isValidCronString(spec.cronString)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: 'Must be a valid cron string',
             path: ['cronString'],
           });
         }
+
         return;
       }
 
@@ -102,6 +105,17 @@ export const formSpecSchema = z
       }
 
       case 'interval': {
+        if (
+          !spec.interval?.interval ||
+          !Number(parseDuration(spec.interval.interval))
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Interval is required',
+            path: ['interval.interval'],
+          });
+        }
+
         return;
       }
 
