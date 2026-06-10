@@ -62,6 +62,7 @@
     schedule ? translate('common.save') : translate('schedules.create'),
   );
 
+  $inspect(schedule);
   const initialFormValues = $derived(
     getFormScheduleDefaults(schedule, {
       searchAttributes,

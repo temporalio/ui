@@ -50,13 +50,22 @@
     };
   });
   const spec = $derived($form.specs[index]);
+
   const specKind = $derived($form.specs[index]?.kind ?? 'none');
 
-  const typeLabel = $derived(
-    specTypeOptions.find((o) => o.value === specKind)?.label ??
-      specKind ??
-      translate('schedules.spec-type-none'),
-  );
+  const typeLabel = $derived.by(() => {
+    const listedOption = specTypeOptions.find((o) => o.value === specKind);
+
+    if (listedOption) {
+      return listedOption?.label;
+    }
+
+    if (specKind === 'frozen') {
+      return spec.calendar ? 'Calendar' : 'Interval';
+    }
+
+    return translate('schedules.spec-type-none');
+  });
 
   function onTypeChange(value: string) {
     const newKind = value as (typeof specTypeOptions)[number]['value'];

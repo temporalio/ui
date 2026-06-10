@@ -34,7 +34,7 @@ export function getRawValue(
     }
 
     case 'frozen': {
-      return 'frozen';
+      return '';
     }
 
     case 'none': {

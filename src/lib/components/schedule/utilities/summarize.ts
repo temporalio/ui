@@ -1,10 +1,8 @@
 import cronstrue from 'cronstrue';
-import { z } from 'zod/v3';
 
 import { getMonthLabel, getWeekdayLabel } from '$lib/i18n/format-date-names';
 import { formatList } from '$lib/i18n/format-list';
 import { translate } from '$lib/i18n/translate';
-import type { DescribeFullSchedule } from '$lib/types/schedule';
 import { sortNumbers } from '$lib/utilities/array';
 
 import {
@@ -21,9 +19,7 @@ import { getFormSpecFromSpec } from './get-form-spec';
 import { expandRanges } from './range';
 import {
   type FormScheduleTimingSchema,
-  formScheduleTimingSchema,
   type FormSpecSchema,
-  formSpecSchema,
 } from '../schema/form';
 
 import type { ScheduleSpec } from '$types';
@@ -107,6 +103,8 @@ function summarizeWeekSpec(
 
   const selectedSet = new Set(expandRanges(calendar.dayOfWeek));
   const time = getCalendarTime(calendar, timezone);
+
+  console.log({ week: selectedSet, time });
 
   if (DAYS_OF_WEEK.every((d) => selectedSet.has(d))) {
     return translate('schedules.spec-summary-everyday', { time });

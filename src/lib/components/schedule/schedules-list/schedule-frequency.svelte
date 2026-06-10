@@ -21,6 +21,8 @@
       ? spec?.structuredCalendar[0].comment
       : '',
   );
+
+  $inspect(spec);
 </script>
 
 <div class={twMerge('flex flex-col', className)}>
