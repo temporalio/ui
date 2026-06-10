@@ -86,7 +86,10 @@ function getEndCondition(
 
   return {
     endKind: getEndKind(describeFullSchedule),
-    endAfterOccurrences: state?.remainingActions,
+    endAfterOccurrences:
+      typeof state?.remainingActions === 'number'
+        ? state?.remainingActions
+        : undefined,
     endTime: isoStringToCalendarDateStr(
       String(spec?.endTime ?? getNowCalendarDateStr()),
       spec?.timezoneName || 'UTC',
