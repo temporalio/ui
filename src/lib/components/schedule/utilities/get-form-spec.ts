@@ -21,11 +21,15 @@ export function getFormSpecFromSpec(
     specs.push({
       kind: 'frozen',
       calendar: {
-        dayOfMonth: calendar?.dayOfMonth ?? [{ start: 1, end: 31, step: 1 }],
-        dayOfWeek: defaultMissingRangeStart(calendar?.dayOfWeek, 0),
+        dayOfMonth: calendar.dayOfMonth ?? [{ start: 1, end: 31, step: 1 }],
+        dayOfWeek: defaultMissingRangeStart(
+          calendar?.dayOfWeek ?? [{ start: 0, end: 6, step: 1 }],
+          0,
+        ),
         hour: defaultMissingRangeStart(calendar.hour, 0),
         minute: defaultMissingRangeStart(calendar.minute, 0),
         second: defaultMissingRangeStart(calendar.second, 0),
+        month: calendar.month ?? [{ start: 1, end: 12, step: 1 }],
         year: calendar.year,
       },
     } satisfies FormSpecSchema);
