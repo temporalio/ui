@@ -283,12 +283,6 @@ export const buildGcpCloudRunComputeConfig = (
   region: string,
   workerPool: string,
   serviceAccount: string,
-  scalingOptions?: {
-    scaleUpCooloffMs?: number;
-    scaleUpBacklogThreshold?: number;
-    maxWorkerLifetimeMs?: number;
-    metricsPollIntervalMs?: number;
-  },
 ): ComputeConfig => {
   const providerPayload: Record<string, string> = {
     project,
@@ -298,18 +292,6 @@ export const buildGcpCloudRunComputeConfig = (
   };
   const providerData = btoa(JSON.stringify(providerPayload));
   const encoding = btoa('json/plain');
-
-  const scalerConfig: Record<string, number> = {};
-  if (scalingOptions?.scaleUpCooloffMs !== undefined)
-    scalerConfig['scale_up_cooloff_ms'] = scalingOptions.scaleUpCooloffMs;
-  if (scalingOptions?.scaleUpBacklogThreshold !== undefined)
-    scalerConfig['scale_up_backlog_threshold'] =
-      scalingOptions.scaleUpBacklogThreshold;
-  if (scalingOptions?.maxWorkerLifetimeMs !== undefined)
-    scalerConfig['max_worker_lifetime_ms'] = scalingOptions.maxWorkerLifetimeMs;
-  if (scalingOptions?.metricsPollIntervalMs !== undefined)
-    scalerConfig['metrics_poll_interval_ms'] =
-      scalingOptions.metricsPollIntervalMs;
 
   return {
     scalingGroups: {
@@ -321,13 +303,6 @@ export const buildGcpCloudRunComputeConfig = (
         provider: {
           type: 'gcp-cloud-run',
           details: { metadata: { encoding }, data: providerData },
-        },
-        scaler: {
-          type: 'no-sync',
-          details: {
-            metadata: { encoding },
-            data: btoa(JSON.stringify(scalerConfig)),
-          },
         },
       },
     },
@@ -349,6 +324,29 @@ export const decodeLambdaProviderDetails = (
     if (raw.arn) result.lambdaArn = raw.arn;
     if (raw.role) result.iamRoleArn = raw.role;
     if (raw.role_external_id) result.roleExternalId = raw.role_external_id;
+    return result;
+  } catch {
+    return {};
+  }
+};
+
+export const decodeGcpCloudRunProviderDetails = (
+  computeConfig?: ComputeConfig,
+): {
+  gcpProject?: string;
+  gcpRegion?: string;
+  gcpWorkerPool?: string;
+  gcpServiceAccount?: string;
+} => {
+  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (!scalingGroup?.provider?.details?.data) return {};
+  try {
+    const raw = JSON.parse(atob(scalingGroup.provider.details.data));
+    const result: ReturnType<typeof decodeGcpCloudRunProviderDetails> = {};
+    if (raw.project) result.gcpProject = raw.project;
+    if (raw.region) result.gcpRegion = raw.region;
+    if (raw.worker_pool) result.gcpWorkerPool = raw.worker_pool;
+    if (raw.service_account) result.gcpServiceAccount = raw.service_account;
     return result;
   } catch {
     return {};

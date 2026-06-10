@@ -81,12 +81,6 @@
         data.gcpRegion,
         data.gcpWorkerPool,
         data.gcpServiceAccount,
-        {
-          scaleUpCooloffMs: data.scaleUpCooloffMs,
-          scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-          maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-          metricsPollIntervalMs: data.metricsPollIntervalMs,
-        },
       );
     } else {
       computeConfig = buildLambdaComputeConfig(
