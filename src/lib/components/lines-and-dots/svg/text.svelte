@@ -44,7 +44,9 @@
   let textElement: SVGTextElement = $state();
 
   const showIcon = $derived(icon && config);
-  const textWidth = $derived(textElement?.getBBox()?.width || 0);
+  const textBBox = $derived(textElement?.getBBox());
+  const textWidth = $derived(textBBox?.width || 0);
+  const textHeight = $derived(textBBox?.height || 0);
   const backdropWidth = $derived(showIcon ? textWidth + 36 : textWidth + 12);
   const textX = $derived(
     showIcon && textAnchor === 'start' ? x + config.radius * 2 : x,
@@ -68,6 +70,16 @@
   />
 {/if}
 {#key textX}
+  {#if !backdrop}
+    <rect
+      x={textBBox?.x ?? 0}
+      y={y - textHeight / 2}
+      width={textWidth}
+      height={textHeight}
+      class="text-background"
+      pointer-events="none"
+    />
+  {/if}
   <text
     bind:this={textElement}
     class="cursor-pointer select-none outline-none {category} text-primary"
@@ -91,6 +103,10 @@
     stroke: none;
     dominant-baseline: middle;
     alignment-baseline: baseline;
+  }
+
+  rect.text-background {
+    fill: rgb(var(--color-surface-primary));
   }
 
   text.backdrop {
