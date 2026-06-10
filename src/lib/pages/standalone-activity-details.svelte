@@ -96,7 +96,8 @@
               >
               <DetailListTextValue
                 text={fromScreamingEnum(
-                  $activityExecution.info.runState ?? '',
+                  $activityExecution.info.runState ??
+                    'PENDING_ACTIVITY_STATE_UNSPECIFIED',
                   '',
                 )}
               />
@@ -349,13 +350,7 @@
               <p class="font-medium text-secondary">
                 {translate('standalone-activities.last-failure')}
               </p>
-              <CodeBlock
-                content={JSON.stringify(
-                  $activityExecution.info.lastFailure,
-                  null,
-                  2,
-                )}
-              />
+              <PayloadCodeBlock value={$activityExecution.info.lastFailure} />
             </div>
           {/if}
           {#if $activityExecution.info.retryPolicy}
