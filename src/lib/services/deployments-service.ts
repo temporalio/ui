@@ -227,7 +227,10 @@ export const setCurrentDeploymentVersion = async (
 };
 
 export const setRampingDeploymentVersion = async (
-  request: DeploymentVersionParameters & { rampingVersionPercentage: number },
+  request: DeploymentVersionParameters & {
+    rampingVersionPercentage: number;
+    conflictToken?: string;
+  },
   onError?: ErrorCallback,
 ): Promise<void> => {
   const route = routeForApi('worker-deployment-set-ramping-version', {
@@ -238,8 +241,11 @@ export const setRampingDeploymentVersion = async (
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
-        build_id: request.buildId,
+        buildId: request.buildId,
         percentage: request.rampingVersionPercentage,
+        ...(request.conflictToken
+          ? { conflictToken: request.conflictToken }
+          : {}),
       }),
     },
     onError,
@@ -247,14 +253,19 @@ export const setRampingDeploymentVersion = async (
 };
 
 export const removeRampingDeploymentVersion = async (
-  request: DeploymentParameters,
+  request: DeploymentParameters & { conflictToken?: string },
   onError?: ErrorCallback,
 ): Promise<void> => {
   const route = routeForApi('worker-deployment-set-ramping-version', request);
   await requestFromAPI<unknown>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ build_id: '' }),
+      body: stringifyWithBigInt({
+        buildId: '',
+        ...(request.conflictToken
+          ? { conflictToken: request.conflictToken }
+          : {}),
+      }),
     },
     onError,
   });

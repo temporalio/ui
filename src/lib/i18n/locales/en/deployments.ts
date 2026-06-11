@@ -89,7 +89,7 @@ export const Strings = {
   'set-ramping-body':
     'This will route a percentage of new traffic to Build ID {{ buildId }} for {{ deploymentName }}. The Current Version will continue to receive the remaining traffic.',
   'set-ramping-existing':
-    'Worker Deployment Version {{ buildId }} is currently ramping at {{ percentage }}%.',
+    'Worker Deployment Version {{ version }} is currently ramping at {{ percentage }}%.',
   'ramping-percentage-label': 'Ramping Percentage',
   'set-ramping-success': '{{ buildId }} is now ramping at {{ percentage }}%',
   'set-ramping-error': 'Failed to set ramping version',

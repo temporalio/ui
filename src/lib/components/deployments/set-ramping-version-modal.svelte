@@ -10,9 +10,11 @@
     open: boolean;
     hasActivePollers: boolean;
     isRamping: boolean;
-    existingRampingBuildId?: string;
+    existingRampingVersion?: string;
     existingRampingPercentage?: number;
+    currentPercentage?: number;
     percentage: number;
+    loading?: boolean;
     error?: string;
     onConfirm: () => void;
     onRemove: () => void;
@@ -25,9 +27,11 @@
     open,
     hasActivePollers,
     isRamping,
-    existingRampingBuildId,
+    existingRampingVersion,
     existingRampingPercentage,
+    currentPercentage,
     percentage = $bindable(),
+    loading = false,
     error = '',
     onConfirm,
     onRemove,
@@ -61,24 +65,27 @@
     confirmText={translate('deployments.set-ramping-version')}
     cancelText={translate('common.cancel')}
     confirmDisabled={Number.isNaN(percentage) ||
-      percentage < 0 ||
-      percentage > 100}
+      percentage <= 0 ||
+      percentage > 100 ||
+      (currentPercentage !== undefined && percentage === currentPercentage)}
+    {loading}
     on:confirmModal={onConfirm}
     on:cancelModal={onCancel}
   >
     <h3 slot="title">{translate('deployments.set-ramping-version')}</h3>
     <div slot="content" class="flex flex-col gap-4">
       <p class="text-sm">
-        This will route a percentage of new traffic to Build ID
-        <span class="font-mono font-medium">{buildId}</span>
-        for <strong>{deploymentName}</strong>. The Current Version will continue
-        to receive the remaining traffic.
+        {translate('deployments.set-ramping-body', {
+          buildId,
+          deploymentName,
+        })}
       </p>
-      {#if existingRampingBuildId && existingRampingBuildId !== buildId}
+      {#if existingRampingVersion}
         <p class="text-sm">
-          Worker Deployment Version
-          <span class="font-mono font-medium">{existingRampingBuildId}</span>
-          is currently ramping at {existingRampingPercentage ?? 0}%.
+          {translate('deployments.set-ramping-existing', {
+            version: existingRampingVersion,
+            percentage: existingRampingPercentage ?? 0,
+          })}
         </p>
       {/if}
       <NumberInput
@@ -86,6 +93,7 @@
         bind:value={percentage}
         min={0}
         max={100}
+        step={0.1}
         units="%"
         label={translate('deployments.ramping-percentage-label')}
       />

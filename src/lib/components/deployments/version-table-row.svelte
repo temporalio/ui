@@ -152,7 +152,9 @@
     parseVersionStatus(drainageStatus).status !== 'Created',
   );
   const otherVersionRamping = $derived(
-    rampingBuildId && !isRamping ? rampingBuildId : undefined,
+    rampingBuildId && !isRamping
+      ? `${rampingDeploymentName}.${rampingBuildId}`
+      : undefined,
   );
 
   let expanded = $state(false);
@@ -165,6 +167,7 @@
   let validateResult = $state<{ message?: string } | null>(null);
   let showSetRampingModal = $state(false);
   let setRampingError = $state('');
+  let setRampingLoading = $state(false);
   let rampingPercentage = $state(0);
 
   async function handleValidateConnection() {
@@ -229,12 +232,14 @@
 
   async function handleSetRamping() {
     setRampingError = '';
+    setRampingLoading = true;
     await setRampingDeploymentVersion(
       {
         namespace,
         deploymentName,
         buildId: versionBuildId,
         rampingVersionPercentage: rampingPercentage,
+        conflictToken,
       },
       (err) => {
         setRampingError =
@@ -242,6 +247,7 @@
           translate('deployments.set-ramping-error');
       },
     );
+    setRampingLoading = false;
     if (setRampingError) return;
     showSetRampingModal = false;
     toaster.push({
@@ -256,14 +262,16 @@
 
   async function handleRemoveRamping() {
     setRampingError = '';
+    setRampingLoading = true;
     await removeRampingDeploymentVersion(
-      { namespace, deploymentName },
+      { namespace, deploymentName, conflictToken },
       (err) => {
         setRampingError =
           (err as { body?: { message?: string } })?.body?.message ??
           translate('deployments.remove-ramping-error');
       },
     );
+    setRampingLoading = false;
     if (setRampingError) return;
     showSetRampingModal = false;
     toaster.push({
@@ -381,10 +389,14 @@
   {deploymentName}
   open={showSetRampingModal}
   error={setRampingError}
+  loading={setRampingLoading}
   {hasActivePollers}
   {isRamping}
-  existingRampingBuildId={otherVersionRamping}
+  existingRampingVersion={otherVersionRamping}
   existingRampingPercentage={routingConfig.rampingVersionPercentage}
+  currentPercentage={isRamping
+    ? (routingConfig.rampingVersionPercentage ?? undefined)
+    : undefined}
   bind:percentage={rampingPercentage}
   onConfirm={handleSetRamping}
   onRemove={handleRemoveRamping}

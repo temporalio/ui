@@ -56,13 +56,11 @@
           <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
             {translate('deployments.set-as-current')}
           </MenuItem>
-          {#if !isCurrent}
-            <MenuItem onclick={onSetRamping}>
-              {isRamping
-                ? translate('deployments.edit-ramping-percentage')
-                : translate('deployments.set-ramping-version')}
-            </MenuItem>
-          {/if}
+          <MenuItem onclick={onSetRamping} disabled={isCurrent}>
+            {isRamping
+              ? translate('deployments.edit-ramping-percentage')
+              : translate('deployments.set-ramping-version')}
+          </MenuItem>
           <MenuItem onclick={onValidate}>
             {translate('deployments.validate-connection')}
           </MenuItem>
@@ -71,13 +69,11 @@
           <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
             {translate('deployments.set-as-current')}
           </MenuItem>
-          {#if !isCurrent}
-            <MenuItem onclick={onSetRamping}>
-              {isRamping
-                ? translate('deployments.edit-ramping-percentage')
-                : translate('deployments.set-ramping-version')}
-            </MenuItem>
-          {/if}
+          <MenuItem onclick={onSetRamping} disabled={isCurrent}>
+            {isRamping
+              ? translate('deployments.edit-ramping-percentage')
+              : translate('deployments.set-ramping-version')}
+          </MenuItem>
         {/snippet}
       </CapabilityGuard>
       <MenuItem href={workflowHref}>
