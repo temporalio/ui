@@ -8,5 +8,5 @@
   const activityId = $derived(page.params.activityId);
 </script>
 
-<PageTitle title="Activity Execution | {activityId}" url={page.url.href} />
+<PageTitle title="Activity Execution Workers | {activityId}" url={page.url.href} />
 <ActivityExecutionWorkers {namespace} />
