@@ -294,7 +294,9 @@
   });
 
   afterNavigate(() => {
-    document.getElementById('content')?.scrollTo(0, 0);
+    const main = document.getElementById('content');
+    main?.scrollTo(0, 0);
+    main?.focus({ preventScroll: true });
   });
 
   setCoreContext({
