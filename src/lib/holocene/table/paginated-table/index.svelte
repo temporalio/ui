@@ -48,6 +48,7 @@
   style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`};
   scroll-padding-top: var(--table-header-h, 2.25rem);
   scroll-padding-bottom: {footerHeight}px;
+
   --table-header-h: 2.25rem;"
 >
   {#if loading}

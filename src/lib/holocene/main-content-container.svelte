@@ -13,7 +13,7 @@
 <div
   id="content-wrapper"
   class="relative h-full w-max flex-auto overflow-auto"
-  style="scroll-padding-top: calc(var(--top-nav-height, 3rem) + var(--banner-height, 0px)); scroll-padding-bottom: var(--bottom-nav-height, 0px);"
+  style="scroll-padding-top: calc(var(--top-nav-height, 3rem) + var(--banner-height, 0)); scroll-padding-bottom: var(--bottom-nav-height, 0);"
 >
   {@render children?.()}
   <main id="content" tabindex="-1" class="pb-16 md:pb-0">
