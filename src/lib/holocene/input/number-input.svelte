@@ -43,7 +43,7 @@
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center">
     <div
-      class="surface-primary relative box-border flex h-10 min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
+      class="surface-primary border-subtle focus-within:ring-primary/70 relative box-border flex h-10 min-w-16 items-center border text-sm focus-within:ring-2 focus-within:outline-hidden"
       class:opacity-50={disabled}
       class:search
       class:invalid={!valid}
@@ -54,7 +54,7 @@
         </span>
       {/if}
       <input
-        class="m-2 block w-full bg-transparent text-center text-primary focus:text-brand focus:outline-none"
+        class="text-primary focus:text-brand m-2 block w-full bg-transparent text-center focus:outline-hidden"
         type="number"
         {max}
         {min}
@@ -78,18 +78,20 @@
     </div>
     {#if units}
       <div
-        class="flex h-10 items-center border-y border-r border-subtle bg-subtle px-2"
+        class="border-subtle bg-subtle flex h-10 items-center border-y border-r px-2"
       >
-        <p class="text-sm font-normal text-primary">{units}</p>
+        <p class="text-primary text-sm font-normal">{units}</p>
       </div>
     {/if}
   </div>
 </div>
 {#if !valid && hintText}
-  <span class="mt-1 text-xs text-danger">{hintText}</span>
+  <span class="text-danger mt-1 text-xs">{hintText}</span>
 {/if}
 
 <style lang="postcss">
+  @reference "../../../app.css";
+
   .search {
     @apply w-fit;
 

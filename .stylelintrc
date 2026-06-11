@@ -24,7 +24,14 @@
           "if",
           "else",
           "return",
-          "layer"
+          "layer",
+          "reference",
+          "config",
+          "utility",
+          "custom-variant",
+          "theme",
+          "plugin",
+          "source"
         ]
       }
     ],

@@ -19,6 +19,8 @@
 </div>
 
 <style lang="postcss">
+  @reference "../../../app.css";
+
   .row {
     @apply items-center border-b p-2 text-sm no-underline last-of-type:border-b-0 md:table-row md:text-base;
   }

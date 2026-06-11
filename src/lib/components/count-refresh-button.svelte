@@ -26,7 +26,7 @@
   {translate('common.refresh')}
   <span
     class={merge(
-      'inline-grid overflow-hidden rounded-sm bg-slate-50 px-1 py-0.5 dark:bg-slate-600',
+      'inline-grid overflow-hidden rounded-xs bg-slate-50 px-1 py-0.5 dark:bg-slate-600',
       !count && 'bg-transparent p-0',
     )}
   >

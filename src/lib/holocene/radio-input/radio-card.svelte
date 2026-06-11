@@ -50,7 +50,7 @@
       <input
         bind:group={$group}
         type="radio"
-        class="radio-card-input surface-primary mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border border-secondary"
+        class="radio-card-input surface-primary border-secondary mt-0.5 h-5 w-5 shrink-0 appearance-none rounded-full border"
         {name}
         {value}
         {id}
@@ -62,7 +62,7 @@
           <slot name="label-badge" />
         </div>
         {#if description}
-          <p class="text-sm text-secondary">{description}</p>
+          <p class="text-secondary text-sm">{description}</p>
         {/if}
       </div>
     </label>
@@ -74,15 +74,17 @@
   </div>
 
   {#if selected && $$slots.default}
-    <div class="surface-background border border-t-0 border-subtle p-5">
+    <div class="surface-background border-subtle border border-t-0 p-5">
       <slot />
     </div>
   {/if}
 </div>
 
 <style lang="postcss">
+  @reference "../../../app.css";
+
   .radio-card-input {
-    @apply box-border cursor-pointer outline-none;
+    @apply box-border cursor-pointer outline-hidden;
 
     &:checked {
       @apply bg-interactive shadow-[inset_0_0_0_1px] shadow-white dark:shadow-black;
@@ -91,7 +93,7 @@
     &:enabled {
       &:focus-visible,
       &:hover {
-        @apply bg-interactive-active ring-2 ring-primary/70;
+        @apply bg-interactive-active ring-primary/70 ring-2;
 
         &:not(:active) {
           @apply border-inverse;

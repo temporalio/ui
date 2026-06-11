@@ -39,17 +39,17 @@
     data-track-intent="navigate"
     data-track-text={label}
     class={merge(
-      'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm',
-      'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+      'mb-2 flex items-center px-2 py-1 text-sm whitespace-nowrap',
+      'hover:hover:bg-black/25 group-[.surface-black]:hover:bg-black/25 group-[.surface-black]:hover:bg-white',
       active &&
-        'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
+        'bg-black/25 group-[.surface-black]:bg-black/25 group-[.surface-black]:bg-white',
       disabled && 'pointer-events-none cursor-not-allowed opacity-50',
     )}
     class:text-disabled={disabled}
   >
     {#if icon}
       <div
-        class="flex h-6 w-6 items-center after:absolute after:left-[calc(100%_+_1.5rem)] after:top-0 after:hidden after:h-8 after:items-center after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=closed]:hover:after:flex"
+        class="flex h-6 w-6 items-center after:absolute after:top-0 after:left-[calc(100%_+_1.5rem)] after:hidden after:h-8 after:items-center after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=closed]:hover:after:flex"
         data-tooltip={tooltip}
       >
         <Icon name={icon} {animate} />

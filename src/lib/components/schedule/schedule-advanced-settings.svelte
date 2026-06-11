@@ -79,6 +79,8 @@
 </Accordion>
 
 <style lang="postcss">
+  @reference "../../../app.css";
+
   .settings-list {
     @apply w-full;
 
@@ -86,7 +88,7 @@
       @apply flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0;
 
       span {
-        @apply surface-subtle select-all rounded-sm p-1 leading-4;
+        @apply surface-subtle rounded-xs p-1 leading-4 select-all;
       }
     }
   }

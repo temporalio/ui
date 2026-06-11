@@ -23,7 +23,9 @@
 </Panel>
 
 <style lang="postcss">
+  @reference "../../../app.css";
+
   .row {
-    @apply my-1 inline-flex h-10 w-full justify-start border-b border-subtle py-1;
+    @apply border-subtle my-1 inline-flex h-10 w-full justify-start border-b py-1;
   }
 </style>

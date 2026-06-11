@@ -246,15 +246,15 @@
 
 <div
   class={merge(
-    'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
+    'surface-primary border-subtle relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 shadow-xs transition-all duration-300 ease-in-out',
     $savedQueryNavOpen
-      ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
-      : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
+      ? 'lg:w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)]'
+      : 'lg:w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)]',
   )}
   style="will-change: width"
 >
   <div
-    class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
+    class="border-subtle flex items-center justify-center gap-2 border-b px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
   >
     <div
       class={merge(
@@ -264,15 +264,15 @@
     >
       {#if $savedQueryNavOpen}
         <p
-          class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
+          class="hidden text-xs leading-3 font-medium whitespace-nowrap lg:block lg:text-sm"
           in:slide
         >
           Saved Views
         </p>
       {/if}
-      <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
+      <p class="block text-xs leading-3 font-medium lg:hidden">Saved Views</p>
       <button
-        class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
+        class="hover:bg-secondary hidden rounded-xs p-0.5 lg:inline-flex"
         aria-label={$savedQueryNavOpen
           ? 'Collapse saved views'
           : 'Expand saved views'}
@@ -303,7 +303,7 @@
 
     {#if $savedQueryNavOpen}
       <p
-        class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
+        class="hidden items-center justify-between px-2 text-xs leading-3 font-medium whitespace-nowrap lg:flex lg:text-sm"
         in:slide
       >
         {translate('workflows.custom-views')}
@@ -314,7 +314,7 @@
       </p>
     {/if}
 
-    <div class="border-t border-subtle"></div>
+    <div class="border-subtle border-t"></div>
 
     {#if unsavedQuery}
       {@render queryButton(unsaveView)}
@@ -341,7 +341,7 @@
     {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
       <p
         class={merge(
-          ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
+          ' text-secondary pl-1 text-center lg:pl-4 lg:text-left',
           !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
         )}
       >
@@ -406,7 +406,7 @@
           ? 'exclamation-octagon'
           : view.icon || 'bookmark'}
         class={merge(
-          'h-4 w-4 flex-shrink-0  transition-colors duration-200',
+          'h-4 w-4 shrink-0  transition-colors duration-200',
           $savedQueryNavOpen ? 'lg:hidden' : '',
         )}
       />
@@ -532,7 +532,7 @@
 })}
   <span
     class={merge(
-      'surface-subtle right-2 top-2 hidden items-center rounded-full px-2 py-1 text-xs font-medium lg:static lg:ml-auto lg:flex',
+      'surface-subtle top-2 right-2 hidden items-center rounded-full px-2 py-1 text-xs font-medium lg:static lg:ml-auto lg:flex',
       icon && 'gap-1.5 p-0.5 pl-2',
       className,
     )}
@@ -550,7 +550,7 @@
 {#if showTooltip && tooltipText}
   <div
     use:portal
-    class="pointer-events-none z-[9999] inline-block select-none rounded-md bg-slate-800 p-2 text-xs text-slate-50 opacity-95"
+    class="pointer-events-none z-[9999] inline-block rounded-md bg-slate-800 p-2 text-xs text-slate-50 opacity-95 select-none"
     style={`position: fixed; top: ${tooltipY}px; left: ${tooltipX}px; transform: translateY(-50%); max-width: 280px;`}
     role="tooltip"
   >

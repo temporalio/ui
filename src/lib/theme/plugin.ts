@@ -4,7 +4,7 @@ import { colors } from './colors';
 import { css } from './utilities';
 import { dark, light } from './variables';
 
-const textStyles = plugin(({ addBase, theme }) => {
+const textStyles = plugin(({ addBase, addComponents, theme }) => {
   addBase({
     h1: {
       fontSize: theme('fontSize.3xl'),
@@ -30,6 +30,8 @@ const textStyles = plugin(({ addBase, theme }) => {
       fontSize: theme('fontSize.sm'),
       fontWeight: theme('fontWeight.medium'),
     },
+  });
+  addComponents({
     '.body-normal': {
       fontSize: theme('fontSize.sm'),
       fontWeight: theme('fontWeight.normal'),
