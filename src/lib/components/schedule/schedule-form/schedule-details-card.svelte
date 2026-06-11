@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { get, type Writable, writable } from 'svelte/store';
-
   import { isBefore } from 'date-fns';
-  import { type SuperForm } from 'sveltekit-superforms';
+  import { fieldProxy, type SuperForm } from 'sveltekit-superforms';
 
   import Card from '$lib/holocene/card.svelte';
   import Combobox from '$lib/holocene/combobox/combobox.svelte';
@@ -42,16 +40,8 @@
     return opts;
   });
 
-  const endKindStore: Writable<FormScheduleSchema['endKind']> = writable(
-    $form.endKind,
-  );
-  $effect(() => {
-    if (get(endKindStore) !== $form.endKind) endKindStore.set($form.endKind);
-  });
-  $effect(() => {
-    const val = $endKindStore;
-    if (val !== $form.endKind) $form.endKind = val;
-  });
+  // svelte-ignore state_referenced_locally
+  const endKindStore = fieldProxy(form, 'endKind');
 
   const startDate = $derived(fromCalendarDateStr($form.startTime));
 
@@ -115,7 +105,7 @@
       required
     />
 
-    <div class="max-w-108">
+    <div class="max-w-[27rem]">
       <DatePicker
         label={translate('schedules.start-date-label')}
         selected={startDate}
@@ -141,7 +131,7 @@
     <RadioGroup
       name="endDateType"
       group={endKindStore}
-      class="flex max-w-108 flex-col gap-1 p-0"
+      class="flex max-w-[27rem] flex-col gap-1 p-0"
       description={translate('schedules.end-date-label')}
     >
       {@const rowClass =

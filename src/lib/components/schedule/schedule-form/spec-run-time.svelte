@@ -62,7 +62,7 @@
       timezoneName: $form.timezoneName ?? 'UTC',
     })}
   </p>
-  <div class="grid max-w-108 gap-2 md:grid-cols-2">
+  <div class="grid max-w-[27rem] gap-2 md:grid-cols-2">
     <Input
       id="hours-{uuid}"
       label={translate('common.hours')}
