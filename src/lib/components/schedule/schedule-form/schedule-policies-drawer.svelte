@@ -18,13 +18,13 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { getOverlapPolicyContent } from '../constants';
-  import { durationUnits } from '../constants';
   import {
     DEFAULT_CATCHUP_WINDOW,
     DEFAULT_EXECUTION_TIMEOUT,
     DEFAULT_RUN_TIMEOUT,
     DEFAULT_TASK_TIMEOUT,
+    durationUnits,
+    getOverlapPolicyContent,
   } from '../constants';
   import {
     type FormSchedulePoliciesSchema,
@@ -32,6 +32,7 @@
     type FormScheduleSchema,
     type OverlapPolicy,
   } from '../schema/form';
+  import type { DurationString } from '../types';
 
   interface Props {
     form: SuperForm<FormScheduleSchema>['form'];
@@ -80,6 +81,24 @@
 
   const overlapPolicyStore = fieldProxy(policies, 'overlapPolicy');
   const pauseOnFailureStore = fieldProxy(policies, 'pauseOnFailure');
+
+  let resetKeys = $state({
+    catchupWindow: 0,
+    taskTimeout: 0,
+    runTimeout: 0,
+    executionTimeout: 0,
+  });
+
+  // DurationInput seeds its display from `value` only on mount, so after
+  // snapping back to the default, bump the key to remount it.
+  const snapToDefault =
+    (field: keyof typeof resetKeys, fallback: DurationString) =>
+    (e: FocusEvent & { currentTarget: HTMLInputElement }) => {
+      if (!e.currentTarget.value) {
+        $policies[field] = fallback;
+        resetKeys[field] += 1;
+      }
+    };
 
   const onCancel = () => {
     isOpen = false;
@@ -215,37 +234,35 @@
         {translate('schedules.catchup-window-policy-detail')}
       </p>
 
-      <DurationInput
-        id="catchup-window-policy-duration"
-        label={translate('schedules.catchup-window-label')}
-        inputmode="numeric"
-        bind:value={$policies.catchupWindow}
-        initialUnit={getFirstWholeNumberUnit(
-          $policies.catchupWindow,
-          durationUnits,
-        )}
-        units={durationUnits}
-        error={!!$errors.catchupWindow?.[0]}
-        hintText={$errors.catchupWindow?.[0] ?? ''}
-        class="max-w-80"
-        step="any"
-        min={0}
-        emptyValue={DEFAULT_CATCHUP_WINDOW}
-        emptyUnit={getFirstWholeNumberUnit(
-          DEFAULT_CATCHUP_WINDOW,
-          durationUnits,
-        )}
-      >
-        {#snippet afterLabel()}
-          <Tooltip
-            topLeft
-            width={250}
-            text={translate('schedules.catchup-window-tooltip')}
-          >
-            <Icon name="square-info" class="h-3 w-3" />
-          </Tooltip>
-        {/snippet}
-      </DurationInput>
+      {#key resetKeys.catchupWindow}
+        <DurationInput
+          id="catchup-window-policy-duration"
+          label={translate('schedules.catchup-window-label')}
+          inputmode="numeric"
+          bind:value={$policies.catchupWindow}
+          initialUnit={getFirstWholeNumberUnit(
+            $policies.catchupWindow,
+            durationUnits,
+          )}
+          units={durationUnits}
+          error={!!$errors.catchupWindow?.[0]}
+          hintText={$errors.catchupWindow?.[0] ?? ''}
+          class="max-w-80"
+          step="any"
+          min={0}
+          onblur={snapToDefault('catchupWindow', DEFAULT_CATCHUP_WINDOW)}
+        >
+          {#snippet afterLabel()}
+            <Tooltip
+              topLeft
+              width={250}
+              text={translate('schedules.catchup-window-tooltip')}
+            >
+              <Icon name="square-info" class="h-3 w-3" />
+            </Tooltip>
+          {/snippet}
+        </DurationInput>
+      {/key}
     </fieldset>
 
     <hgroup>
@@ -255,59 +272,62 @@
       </p>
     </hgroup>
 
-    <DurationInput
-      id="task-timeout-duration"
-      label={translate('schedules.task-timeout')}
-      inputmode="numeric"
-      bind:value={$policies.taskTimeout}
-      initialUnit={getFirstWholeNumberUnit(
-        $policies.taskTimeout,
-        durationUnits,
-      )}
-      units={durationUnits}
-      error={!!$errors.taskTimeout?.[0]}
-      hintText={$errors.taskTimeout?.[0] ?? ''}
-      class="max-w-80"
-      min={0}
-      emptyValue={DEFAULT_TASK_TIMEOUT}
-      emptyUnit={getFirstWholeNumberUnit(DEFAULT_TASK_TIMEOUT, durationUnits)}
-    />
+    {#key resetKeys.taskTimeout}
+      <DurationInput
+        id="task-timeout-duration"
+        label={translate('schedules.task-timeout')}
+        inputmode="numeric"
+        bind:value={$policies.taskTimeout}
+        initialUnit={getFirstWholeNumberUnit(
+          $policies.taskTimeout,
+          durationUnits,
+        )}
+        units={durationUnits}
+        error={!!$errors.taskTimeout?.[0]}
+        hintText={$errors.taskTimeout?.[0] ?? ''}
+        class="max-w-80"
+        min={0}
+        onblur={snapToDefault('taskTimeout', DEFAULT_TASK_TIMEOUT)}
+      />
+    {/key}
 
-    <DurationInput
-      id="run-timeout-duration"
-      label={translate('schedules.run-timeout')}
-      inputmode="numeric"
-      bind:value={$policies.runTimeout}
-      initialUnit={getFirstWholeNumberUnit($policies.runTimeout, durationUnits)}
-      units={durationUnits}
-      error={!!$errors.runTimeout?.[0]}
-      hintText={$errors.runTimeout?.[0] ?? ''}
-      class="max-w-80"
-      min={0}
-      emptyValue={DEFAULT_RUN_TIMEOUT}
-      emptyUnit={getFirstWholeNumberUnit(DEFAULT_RUN_TIMEOUT, durationUnits)}
-    />
+    {#key resetKeys.runTimeout}
+      <DurationInput
+        id="run-timeout-duration"
+        label={translate('schedules.run-timeout')}
+        inputmode="numeric"
+        bind:value={$policies.runTimeout}
+        initialUnit={getFirstWholeNumberUnit(
+          $policies.runTimeout,
+          durationUnits,
+        )}
+        units={durationUnits}
+        error={!!$errors.runTimeout?.[0]}
+        hintText={$errors.runTimeout?.[0] ?? ''}
+        class="max-w-80"
+        min={0}
+        onblur={snapToDefault('runTimeout', DEFAULT_RUN_TIMEOUT)}
+      />
+    {/key}
 
-    <DurationInput
-      id="execution-timeout-duration"
-      label={translate('schedules.execution-timeout')}
-      inputmode="numeric"
-      bind:value={$policies.executionTimeout}
-      initialUnit={getFirstWholeNumberUnit(
-        $policies.executionTimeout,
-        durationUnits,
-      )}
-      units={durationUnits}
-      error={!!$errors.executionTimeout?.[0]}
-      hintText={$errors.executionTimeout?.[0] ?? ''}
-      class="max-w-80"
-      min={0}
-      emptyValue={DEFAULT_EXECUTION_TIMEOUT}
-      emptyUnit={getFirstWholeNumberUnit(
-        DEFAULT_EXECUTION_TIMEOUT,
-        durationUnits,
-      )}
-    />
+    {#key resetKeys.executionTimeout}
+      <DurationInput
+        id="execution-timeout-duration"
+        label={translate('schedules.execution-timeout')}
+        inputmode="numeric"
+        bind:value={$policies.executionTimeout}
+        initialUnit={getFirstWholeNumberUnit(
+          $policies.executionTimeout,
+          durationUnits,
+        )}
+        units={durationUnits}
+        error={!!$errors.executionTimeout?.[0]}
+        hintText={$errors.executionTimeout?.[0] ?? ''}
+        class="max-w-80"
+        min={0}
+        onblur={snapToDefault('executionTimeout', DEFAULT_EXECUTION_TIMEOUT)}
+      />
+    {/key}
 
     <div class="ml-auto mt-2 flex gap-4">
       <Button variant="secondary" on:click={onCancel}

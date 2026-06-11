@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { getRequestBody } from './get-request-body';
+import { DEFAULT_CATCHUP_WINDOW, DEFAULT_TASK_TIMEOUT } from '../constants';
 import { formScheduleSchema, type FormScheduleSchema } from '../schema/form';
 
 import type { DescribeFullSchedule } from '$types/schedule';
@@ -127,6 +128,17 @@ describe('getRequestBody', () => {
 
     const withoutJitter = await getRequestBody(buildForm({ jitter: 0 }));
     expect(withoutJitter.schedule.spec.jitter).toBeUndefined();
+  });
+
+  it('falls back to defaults for emptied duration fields', async () => {
+    const body = await getRequestBody(
+      buildForm({ catchupWindow: '', taskTimeout: '' }),
+    );
+
+    expect(body.schedule.policies.catchupWindow).toBe(DEFAULT_CATCHUP_WINDOW);
+    expect(body.schedule.action.startWorkflow.workflowTaskTimeout).toBe(
+      DEFAULT_TASK_TIMEOUT,
+    );
   });
 
   it('maps policy fields', async () => {

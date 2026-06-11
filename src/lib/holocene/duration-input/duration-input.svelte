@@ -49,7 +49,6 @@
 <script lang="ts">
   import type {
     ChangeEventHandler,
-    FocusEventHandler,
     HTMLInputAttributes,
   } from 'svelte/elements';
 
@@ -74,19 +73,16 @@
     error?: boolean;
     class?: ClassNameValue;
     inputClass?: ClassNameValue;
-    emptyValue?: string;
   }
 
   interface PropsWithoutCustomUnits extends BaseProps {
     units?: never;
     initialUnit?: DefaultUnits;
-    emptyUnit?: DefaultUnits;
   }
 
   interface PropsWithCustomUnits extends BaseProps {
     units: T;
     initialUnit: ExtractLabel<T>;
-    emptyUnit?: ExtractLabel<T>;
   }
 
   type Props = PropsWithoutCustomUnits | PropsWithCustomUnits;
@@ -104,8 +100,6 @@
     value = $bindable(),
     class: className = '',
     inputClass = '',
-    emptyValue,
-    emptyUnit,
     ...inputProps
   }: Props = $props();
 
@@ -127,8 +121,8 @@
     const unit = units.find((u) => u.label === durationUnit);
     if (!unit) return;
 
-    if (durationValue == null && emptyValue !== undefined) {
-      value = emptyValue;
+    if (!durationValue) {
+      value = '';
       return;
     }
 
@@ -137,15 +131,6 @@
 
   const handleNumberInput: ChangeEventHandler<HTMLInputElement> = (e) => {
     convert(e.currentTarget.value, unit);
-  };
-
-  const handleNumberBlur: FocusEventHandler<HTMLInputElement> = () => {
-    if (rawValue == null && emptyValue !== undefined) {
-      const newUnit = emptyUnit || unit;
-      unit = newUnit;
-      rawValue = toUnitValue(emptyValue, newUnit);
-      convert(rawValue, newUnit);
-    }
   };
 
   const handleUnitChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
@@ -177,7 +162,6 @@
       bind:value={rawValue}
       {...inputProps}
       oninput={composeEventHandlers(handleNumberInput, inputProps.oninput)}
-      onblur={composeEventHandlers(handleNumberBlur, inputProps.onblur)}
     />
     <select
       id="{id}-unit-select"
