@@ -39,6 +39,7 @@ auth:
 | -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `enabled`            | boolean  | Enable or disable authentication                                                                                               |
 | `maxSessionDuration` | duration | Maximum session duration before forced re-login (e.g., `8h`, `24h`, `168h`). Set to `0` or omit for unlimited session duration |
+| `pkceEnabled`        | boolean  | Enable PKCE (Proof Key for Code Exchange) for the OAuth2 authorization code flow. Default: `false`                             |
 | `providers`          | array    | List of auth providers (currently only the first is used)                                                                      |
 
 #### Provider Settings
@@ -55,6 +56,44 @@ auth:
 | `callbackUrl`        | string  | OAuth2 callback URL for your deployment                         |
 | `options`            | object  | Additional URL parameters for the auth redirect                 |
 | `useIdTokenAsBearer` | boolean | Use ID token instead of access token in Authorization header    |
+
+## PKCE Support
+
+Temporal UI supports PKCE (Proof Key for Code Exchange, RFC 7636) for the OAuth2 authorization code flow. PKCE provides protection against authorization code interception attacks and is recommended for all OAuth2 applications, especially those that cannot securely store a client secret (e.g., public clients).
+
+### Configuration
+
+```yaml
+auth:
+  enabled: true
+  pkceEnabled: true # Enable PKCE
+  providers:
+    # ... provider config
+```
+
+PKCE can also be enabled via environment variable:
+
+| Environment Variable         | Default | Description                  |
+| ---------------------------- | ------- | ---------------------------- |
+| `TEMPORAL_AUTH_PKCE_ENABLED` | `false` | Set to `true` to enable PKCE |
+
+### How It Works
+
+When PKCE is enabled:
+
+1. The UI server generates a cryptographically random `code_verifier` and stores it in a secure, HttpOnly cookie
+2. A `code_challenge` (SHA-256 hash of the verifier) is included in the authorization request as `code_challenge_method=S256`
+3. Upon receiving the authorization code in the callback, the server sends the original `code_verifier` to the token endpoint
+4. The identity provider verifies that the challenge matches the verifier, ensuring the party exchanging the code is the same one that initiated the request
+
+### When to Enable
+
+Enabling PKCE is recommended:
+
+- When using public clients or single-page applications
+- To mitigate authorization code interception attacks
+- As a defense-in-depth measure even for confidential clients with a client secret
+- When required by your identity provider (many modern IdPs strongly recommend or require PKCE)
 
 ## Session Duration Management
 

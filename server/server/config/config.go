@@ -108,6 +108,10 @@ type (
 		// forced to re-login after this duration regardless of token validity.
 		// Example values: "8h", "24h", "168h" (1 week). If zero, no max duration is enforced.
 		MaxSessionDuration time.Duration `yaml:"maxSessionDuration"`
+		// PKCEEnabled - enable PKCE (Proof Key for Code Exchange) for OAuth2 authorization code flow.
+		// When enabled, the server generates a code_verifier and code_challenge (S256) for each auth request.
+		// Default is false (PKCE disabled).
+		PKCEEnabled bool `yaml:"pkceEnabled"`
 	}
 
 	AuthProvider struct {
