@@ -6,6 +6,7 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ToastVariant } from '$lib/types/holocene';
 
@@ -54,11 +55,10 @@
   <p class="text-sm">
     <slot />
   </p>
-  <button
-    type="button"
+  <IconButton
+    variant="ghost"
+    icon="close"
+    label={dismissLabel}
     on:click|stopPropagation={handleDismiss}
-    aria-label={dismissLabel}
-  >
-    <Icon name="close" />
-  </button>
+  />
 </div>
