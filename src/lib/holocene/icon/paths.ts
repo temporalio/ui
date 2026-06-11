@@ -32,6 +32,7 @@ import circleCheck from './svg/circle-check.svelte';
 import cirlceQuestion from './svg/circle-question.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
+import code from './svg/code.svelte';
 import collapse from './svg/collapse.svelte';
 import cometSolid from './svg/comet-solid.svelte';
 import comet from './svg/comet.svelte';
@@ -190,6 +191,7 @@ export const icons = {
   'circle-question': cirlceQuestion,
   clock,
   close,
+  code,
   collapse,
   'comet-solid': cometSolid,
   comet,
