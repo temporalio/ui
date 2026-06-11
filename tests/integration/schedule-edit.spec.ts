@@ -97,7 +97,7 @@ test.describe('Schedules List with schedules', () => {
 
     await expect(page.locator('h1')).toHaveText('Edit Schedule');
 
-    await expect(page.getByText('Weekdays at 09:30 UTC')).toBeVisible();
+    await expect(page.getByText('At 09:30 on weekdays UTC')).toBeVisible();
   });
 
   test('loads a monthly calendar schedule into a month spec', async ({

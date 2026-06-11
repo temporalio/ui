@@ -42,20 +42,22 @@ export function getScheduleSpecSummary(spec: FormSpecSchema) {
       return summarizeCronSpec(spec);
     }
 
-    case 'week': {
-      return summarizeWeekSpec(spec);
-    }
-
+    case 'week':
     case 'month': {
-      return summarizeMonthSpec(spec);
+      return summarizeCalendar(spec.calendar);
     }
 
     case 'interval': {
       return summarizeIntervalSpec(spec);
     }
 
+    // A frozen spec is loaded verbatim from a `DescribeFullSchedule` and
+    // carries either an interval or a structured calendar; mirror the split
+    // used when re-emitting the request.
     case 'frozen': {
-      return summarizeFrozenSpec(spec);
+      return spec.interval?.interval
+        ? summarizeIntervalSpec(spec)
+        : summarizeCalendar(spec.calendar);
     }
   }
 }
@@ -83,6 +85,29 @@ function getRepeatingStep(
   return range.start - min < step && max - end < step ? step : null;
 }
 
+const formatHourWindow = (start: number, end: number, minute = 0): string =>
+  `${pad0ForTime(start)}:${pad0ForTime(minute)}-${pad0ForTime(
+    end,
+  )}:${pad0ForTime(minute)}`;
+
+// A single contiguous hour range that doesn't span the whole day, rendered as
+// a "09:00-17:00" window.
+function getHourWindow(hours: number[]): string | null {
+  const [range, ...rest] = compactToRanges(hours);
+
+  if (!range || rest.length || (range.step ?? 1) !== 1) {
+    return null;
+  }
+
+  const end = range.end ?? range.start;
+
+  if (end <= range.start) {
+    return null;
+  }
+
+  return formatHourWindow(range.start, end);
+}
+
 function getRepeatingTimePhrase(
   calendar: FormSpecSchema['calendar'],
 ): string | null {
@@ -100,28 +125,48 @@ function getRepeatingTimePhrase(
     });
   }
 
-  if (minuteStep !== null && hourStep === 1 && seconds.length <= 1) {
-    return translate('schedules.spec-summary-every-minutes', {
+  if (minuteStep !== null && seconds.length <= 1) {
+    const everyMinutes = translate('schedules.spec-summary-every-minutes', {
       count: minuteStep,
     });
+
+    if (hourStep === 1) {
+      return everyMinutes;
+    }
+
+    const window = getHourWindow(hours);
+    if (window) {
+      return `${everyMinutes} ${window}`;
+    }
   }
 
-  if (hourStep !== null && minutes.length <= 1 && seconds.length <= 1) {
-    return translate('schedules.spec-summary-every-hours', {
-      count: hourStep,
-    });
+  if (minutes.length <= 1 && seconds.length <= 1) {
+    if (hourStep !== null) {
+      return translate('schedules.spec-summary-every-hours', {
+        count: hourStep,
+      });
+    }
+
+    // Hours bounded to part of the day, e.g. {start: 9, end: 17, step: 2} →
+    // "every 2 hours 09:00-17:00" and {start: 9, end: 17} → "every hour
+    // 09:00-17:00". Any two times form a trivial "progression", so require
+    // three before phrasing it as repeating.
+    const [range, ...rest] = compactToRanges(hours);
+    if (range && !rest.length && hours.length >= 3) {
+      return `${translate('schedules.spec-summary-every-hours', {
+        count: range.step ?? 1,
+      })} ${formatHourWindow(
+        range.start,
+        range.end ?? range.start,
+        minutes[0] ?? 0,
+      )}`;
+    }
   }
 
   return null;
 }
 
 function getCalendarTime(calendar: FormSpecSchema['calendar']): string {
-  const repeating = getRepeatingTimePhrase(calendar);
-
-  if (repeating) {
-    return repeating;
-  }
-
   const hours = expandRanges(calendar.hour);
   const minutes = expandRanges(calendar.minute);
   const minute = minutes.length === 1 ? minutes[0] : 0;
@@ -148,72 +193,116 @@ function summarizeCronSpec(spec: FormSpecSchema): string {
   return summarizeCronString(spec.cronString);
 }
 
-function summarizeWeekSpec(spec: FormSpecSchema): string {
-  const { calendar } = spec;
+// A contiguous run renders as a bounded window ("Monday-Thursday", "1-15");
+// anything else falls back to a list.
+function formatValues(
+  values: number[],
+  label: (value: number) => string,
+): string {
+  const [range, ...rest] = compactToRanges(values);
 
-  const selectedSet = new Set(expandRanges(calendar.dayOfWeek));
-  const time = getCalendarTime(calendar);
+  if (range && !rest.length && (range.step ?? 1) === 1) {
+    const end = range.end ?? range.start;
 
-  if (DAYS_OF_WEEK.every((d) => selectedSet.has(d))) {
-    return translate('schedules.spec-summary-everyday', { time });
+    if (end > range.start) {
+      return `${label(range.start)}-${label(end)}`;
+    }
   }
 
-  if (WEEKDAYS.every((d) => selectedSet.has(d))) {
-    return translate('schedules.spec-summary-weekdays', { time });
+  return formatList(sortNumbers(values).map((value) => label(value)));
+}
+
+function getDaysOfWeekFragment(
+  calendar: FormSpecSchema['calendar'],
+): string | null {
+  const days = expandRanges(calendar.dayOfWeek);
+  const selected = new Set(days);
+
+  if (!days.length || DAYS_OF_WEEK.every((d) => selected.has(d))) {
+    return null;
   }
 
-  if (WEEKEND.every((d) => selectedSet.has(d))) {
-    return translate('schedules.spec-summary-weekends', { time });
+  if (
+    selected.size === WEEKDAYS.length &&
+    WEEKDAYS.every((d) => selected.has(d))
+  ) {
+    return translate('schedules.spec-summary-on-weekdays');
   }
 
-  const sortedLabels = sortNumbers(Array.from(selectedSet)).map((d) =>
-    getWeekdayLabel(Number(d)),
-  );
+  if (
+    selected.size === WEEKEND.length &&
+    WEEKEND.every((d) => selected.has(d))
+  ) {
+    return translate('schedules.spec-summary-on-weekends');
+  }
 
-  return translate('schedules.spec-summary-week', {
-    days: formatList(sortedLabels),
-    time,
+  return translate('schedules.spec-summary-on-days-of-week', {
+    days: formatValues(days, getWeekdayLabel),
   });
 }
 
-function summarizeMonthSpec(spec: FormSpecSchema): string {
-  const { calendar } = spec;
+function getDaysOfMonthFragment(
+  calendar: FormSpecSchema['calendar'],
+): string | null {
+  const days = expandRanges(calendar.dayOfMonth);
+  const selected = new Set(days);
 
-  const selectedMonths = new Set(expandRanges(calendar.month));
-  const selectedDays = new Set(expandRanges(calendar.dayOfMonth));
-
-  const time = getCalendarTime(calendar);
-
-  const sortedDays = sortNumbers(Array.from(selectedDays));
-  const formattedDays = formatList(sortedDays.map(String));
-
-  const isEveryDay = DAYS_OF_MONTH.every((d) => selectedDays.has(d));
-  const daysStr = isEveryDay
-    ? translate('schedules.spec-summary-every-day')
-    : translate('schedules.spec-summary-days', {
-        count: sortedDays.length,
-        days: formattedDays,
-      });
-
-  const isEveryMonth =
-    selectedMonths.size === 0 || MONTHS.every((m) => selectedMonths.has(m));
-
-  if (isEveryMonth) {
-    return translate('schedules.spec-summary-month-every', {
-      days: daysStr,
-      time,
-    });
+  if (!days.length || DAYS_OF_MONTH.every((d) => selected.has(d))) {
+    return null;
   }
 
-  const sortedMonthLabels = sortNumbers(Array.from(selectedMonths)).map((m) =>
-    getMonthLabel(Number(m) - 1),
-  );
-
-  return translate('schedules.spec-summary-month', {
-    days: daysStr,
-    months: formatList(sortedMonthLabels),
-    time,
+  return translate('schedules.spec-summary-on-days-of-month', {
+    count: days.length,
+    days: formatValues(days, String),
   });
+}
+
+function getMonthsFragment(
+  calendar: FormSpecSchema['calendar'],
+  hasDaysOfMonth: boolean,
+): string | null {
+  const months = expandRanges(calendar.month);
+  const selected = new Set(months);
+
+  if (!months.length || MONTHS.every((m) => selected.has(m))) {
+    return null;
+  }
+
+  const labels = formatValues(months, (m) => getMonthLabel(m - 1));
+
+  // "on days 1-15 of January" but "At 09:00 in January"
+  return hasDaysOfMonth
+    ? translate('schedules.spec-summary-of-months', { months: labels })
+    : translate('schedules.spec-summary-in-months', { months: labels });
+}
+
+function getYearsFragment(calendar: FormSpecSchema['calendar']): string | null {
+  const years = expandRanges(calendar.year);
+
+  if (!years.length) {
+    return null;
+  }
+
+  return translate('schedules.spec-summary-year', {
+    years: formatValues(years, String),
+  });
+}
+
+function summarizeCalendar(calendar: FormSpecSchema['calendar']): string {
+  const time = getRepeatingTimePhrase(calendar) ?? getCalendarTime(calendar);
+
+  const daysOfMonth = getDaysOfMonthFragment(calendar);
+  const days = [
+    getDaysOfWeekFragment(calendar),
+    daysOfMonth,
+    getMonthsFragment(calendar, Boolean(daysOfMonth)),
+  ].filter(Boolean);
+
+  if (!days.length) {
+    days.push(translate('schedules.spec-summary-every-day'));
+  }
+
+  return [time, ...days, getYearsFragment(calendar)].filter(Boolean).join(' ');
 }
 
 function summarizeIntervalSpec(spec: FormSpecSchema): string {
@@ -232,36 +321,4 @@ function summarizeIntervalSpec(spec: FormSpecSchema): string {
     offset: offset.value,
     offsetUnit: offset.unit.label,
   });
-}
-
-// A frozen spec is loaded verbatim from a `DescribeFullSchedule` and carries
-// either an interval or a structured calendar of arbitrary field combinations.
-// Mirror the interval-vs-calendar split used when re-emitting the request, then
-// pick the week- or month-style summary based on which day field is restricted.
-function summarizeFrozenSpec(spec: FormSpecSchema): string {
-  if (spec.interval?.interval) {
-    return summarizeIntervalSpec(spec);
-  }
-
-  const { calendar } = spec;
-  const daysOfWeek = new Set(expandRanges(calendar.dayOfWeek));
-  const daysOfMonth = new Set(expandRanges(calendar.dayOfMonth));
-
-  const isEveryDayOfWeek = DAYS_OF_WEEK.every((d) => daysOfWeek.has(d));
-  const isEveryDayOfMonth = DAYS_OF_MONTH.every((d) => daysOfMonth.has(d));
-
-  const isWeek = !isEveryDayOfWeek && isEveryDayOfMonth;
-
-  const summary = isWeek ? summarizeWeekSpec(spec) : summarizeMonthSpec(spec);
-
-  // The CLI can pin a structured calendar to specific years; the week/month
-  // summaries omit it, so append the year(s) here when present.
-  const years = sortNumbers(expandRanges(calendar.year));
-  if (years.length) {
-    return `${summary} ${translate('schedules.spec-summary-year', {
-      years: formatList(years.map(String)),
-    })}`;
-  }
-
-  return summary;
 }

@@ -42,7 +42,7 @@ describe('getScheduleSpecSummary', () => {
           },
         }),
       );
-      expect(summary).toBe('Everyday at 09:30');
+      expect(summary).toBe('At 09:30 every day');
     });
 
     it('summarizes weekdays', () => {
@@ -52,7 +52,7 @@ describe('getScheduleSpecSummary', () => {
           calendar: { dayOfWeek: [{ start: 1, end: 5 }] },
         }),
       );
-      expect(summary).toBe('Weekdays at 00:00');
+      expect(summary).toBe('At 00:00 on weekdays');
     });
 
     it('summarizes weekends', () => {
@@ -62,7 +62,7 @@ describe('getScheduleSpecSummary', () => {
           calendar: { dayOfWeek: [{ start: 0 }, { start: 6 }] },
         }),
       );
-      expect(summary).toBe('Weekends at 00:00');
+      expect(summary).toBe('At 00:00 on weekends');
     });
 
     it('lists individual days', () => {
@@ -72,8 +72,17 @@ describe('getScheduleSpecSummary', () => {
           calendar: { dayOfWeek: [{ start: 1 }, { start: 3 }] },
         }),
       );
-      expect(summary).toContain('Monday');
-      expect(summary).toContain('Wednesday');
+      expect(summary).toBe('At 00:00 on Monday and Wednesday');
+    });
+
+    it('renders contiguous days as a window', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'week',
+          calendar: { dayOfWeek: [{ start: 1, end: 4 }] },
+        }),
+      );
+      expect(summary).toBe('At 00:00 on Monday-Thursday');
     });
   });
 
@@ -85,11 +94,10 @@ describe('getScheduleSpecSummary', () => {
           calendar: { dayOfMonth: [{ start: 1 }], month: [{ start: 1 }] },
         }),
       );
-      expect(summary).toContain('day 1');
-      expect(summary).toContain('January');
+      expect(summary).toBe('At 00:00 on day 1 of January');
     });
 
-    it('summarizes every month when all months are selected', () => {
+    it('omits the month fragment when all months are selected', () => {
       const summary = getScheduleSpecSummary(
         spec({
           kind: 'month',
@@ -99,7 +107,27 @@ describe('getScheduleSpecSummary', () => {
           },
         }),
       );
-      expect(summary).toContain('every month');
+      expect(summary).toBe('At 00:00 on day 15');
+    });
+
+    it('renders contiguous days of the month as a window', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'month',
+          calendar: { dayOfMonth: [{ start: 1, end: 15 }] },
+        }),
+      );
+      expect(summary).toBe('At 00:00 on days 1-15');
+    });
+
+    it('renders contiguous months as a window', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'month',
+          calendar: { month: [{ start: 1, end: 3 }] },
+        }),
+      );
+      expect(summary).toBe('At 00:00 in January-March');
     });
   });
 
@@ -139,8 +167,7 @@ describe('getScheduleSpecSummary', () => {
           },
         }),
       );
-      expect(summary).toContain('Weekdays');
-      expect(summary).toContain('2026');
+      expect(summary).toBe('At 00:00 on weekdays in 2026');
     });
 
     it('lists every time when the calendar has multiple hour ranges', () => {
@@ -154,7 +181,7 @@ describe('getScheduleSpecSummary', () => {
           },
         }),
       );
-      expect(summary).toBe('Weekdays at 09:00 and 17:00');
+      expect(summary).toBe('At 09:00 and 17:00 on weekdays');
     });
 
     it('summarizes a stepped minute range as every n minutes', () => {
@@ -167,7 +194,24 @@ describe('getScheduleSpecSummary', () => {
           },
         }),
       );
-      expect(summary).toContain('every 15 minutes');
+      expect(summary).toBe('Every 15 minutes every day');
+    });
+
+    it('leads with the repetition for restricted days', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'frozen',
+          calendar: {
+            second: [{ start: 0, step: 1 }],
+            minute: [{ start: 0, end: 59, step: 30 }],
+            hour: [{ start: 0, end: 23, step: 1 }],
+            dayOfMonth: [{ start: 1, end: 31, step: 1 }],
+            month: [{ start: 1, end: 12, step: 1 }],
+            dayOfWeek: [{ start: 1, end: 1, step: 1 }],
+          },
+        }),
+      );
+      expect(summary).toBe('Every 30 minutes on Monday');
     });
 
     it('summarizes a stepped hour range as every n hours', () => {
@@ -181,7 +225,35 @@ describe('getScheduleSpecSummary', () => {
           },
         }),
       );
-      expect(summary).toBe('Weekdays every 2 hours');
+      expect(summary).toBe('Every 2 hours on weekdays');
+    });
+
+    it('bounds stepped minutes to an hour window', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'frozen',
+          calendar: {
+            dayOfWeek: [{ start: 1, end: 5 }],
+            minute: [{ start: 0, end: 59, step: 15 }],
+            hour: [{ start: 9, end: 17 }],
+          },
+        }),
+      );
+      expect(summary).toBe('Every 15 minutes 09:00-17:00 on weekdays');
+    });
+
+    it('bounds stepped hours to a window anchored at the fixed minute', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'frozen',
+          calendar: {
+            dayOfWeek: [{ start: 1, end: 5 }],
+            hour: [{ start: 9, end: 17, step: 2 }],
+            minute: [{ start: 30 }],
+          },
+        }),
+      );
+      expect(summary).toBe('Every 2 hours 09:30-17:30 on weekdays');
     });
 
     it('summarizes full minute and hour ranges as every minute', () => {
@@ -194,7 +266,7 @@ describe('getScheduleSpecSummary', () => {
           },
         }),
       );
-      expect(summary).toContain('every minute');
+      expect(summary).toBe('Every minute every day');
     });
 
     it('appends every year when several are pinned', () => {
@@ -207,10 +279,21 @@ describe('getScheduleSpecSummary', () => {
           },
         }),
       );
-      expect(summary).toContain('Weekdays');
-      expect(summary).toContain('2025');
-      expect(summary).toContain('2026');
-      expect(summary).toContain('2027');
+      expect(summary).toBe('At 00:00 on weekdays in 2025-2027');
+    });
+
+    it('summarizes contiguous hours at a fixed minute as hourly in a window', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'frozen',
+          calendar: {
+            dayOfWeek: [{ start: 1, end: 5 }],
+            hour: [{ start: 9, end: 17 }],
+            minute: [{ start: 0 }],
+          },
+        }),
+      );
+      expect(summary).toBe('Every hour 09:00-17:00 on weekdays');
     });
   });
 });
@@ -226,7 +309,7 @@ describe('summarizeScheduleSpec', () => {
       structuredCalendar: [{ dayOfWeek: [{ start: 1, end: 5 }] }],
     } as ScheduleSpec);
 
-    expect(summaries).toEqual(['Weekdays at 00:00']);
+    expect(summaries).toEqual(['At 00:00 on weekdays']);
   });
 
   it('summarizes interval entries', () => {
