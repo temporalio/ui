@@ -227,7 +227,7 @@ export const setCurrentDeploymentVersion = async (
 };
 
 export const unsetCurrentDeploymentVersion = async (
-  parameters: DeploymentParameters,
+  parameters: DeploymentParameters & { conflictToken?: string },
   onError?: ErrorCallback,
 ): Promise<void> => {
   const route = routeForApi(
@@ -237,7 +237,12 @@ export const unsetCurrentDeploymentVersion = async (
   await requestFromAPI<unknown>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ version: '' }),
+      body: stringifyWithBigInt({
+        buildId: '',
+        ...(parameters.conflictToken
+          ? { conflictToken: parameters.conflictToken }
+          : {}),
+      }),
     },
     onError,
     notifyOnError: false,

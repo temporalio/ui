@@ -248,7 +248,7 @@
   async function handleUnsetCurrentVersion() {
     unsetCurrentError = '';
     await unsetCurrentDeploymentVersion(
-      { namespace, deploymentName },
+      { namespace, deploymentName, conflictToken },
       (err) => {
         unsetCurrentError =
           (err as { body?: { message?: string } })?.body?.message ??

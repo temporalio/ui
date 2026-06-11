@@ -11,7 +11,10 @@
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { deleteWorkerDeployment } from '$lib/services/deployments-service';
+  import {
+    deleteWorkerDeployment,
+    fetchDeployment,
+  } from '$lib/services/deployments-service';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { WorkerDeploymentSummary } from '$lib/types/deployments';
   import { parseVersionStatus } from '$lib/utilities/deployments';
@@ -38,11 +41,21 @@
 
   let showDeleteModal = $state(false);
   let deleteError = $state('');
+  let conflictToken = $state<string | undefined>(undefined);
+
+  async function openDeleteModal() {
+    showDeleteModal = true;
+    const result = await fetchDeployment({
+      namespace,
+      deploymentName: deployment.name,
+    });
+    conflictToken = result.conflictToken;
+  }
 
   async function handleDelete() {
     deleteError = '';
     await deleteWorkerDeployment(
-      { namespace, deploymentName: deployment.name },
+      { namespace, deploymentName: deployment.name, conflictToken },
       (err) => {
         deleteError =
           (err as { body?: { message?: string } })?.body?.message ??
@@ -151,7 +164,7 @@
         position="right"
         usePortal
       >
-        <MenuItem onclick={() => (showDeleteModal = true)} destructive>
+        <MenuItem onclick={openDeleteModal} destructive>
           {translate('common.delete')}
         </MenuItem>
       </Menu>
