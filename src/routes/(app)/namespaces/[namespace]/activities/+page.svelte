@@ -5,8 +5,8 @@
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import StandaloneActivities from '$lib/pages/standalone-activities.svelte';
-  import { standaloneActivityCommandsDisabled } from '$lib/utilities/activity-create-disabled';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
+  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   const namespace = $derived(page.params.namespace);
   const activityStartEnabled = $derived(

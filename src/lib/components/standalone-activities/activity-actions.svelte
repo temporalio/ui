@@ -9,8 +9,8 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import { standaloneActivityCommandsDisabled } from '$lib/utilities/activity-create-disabled';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
+  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
 
   import CancelConfirmationModal from './cancel-confirmation-modal.svelte';
