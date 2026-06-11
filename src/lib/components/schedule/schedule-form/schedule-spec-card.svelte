@@ -58,6 +58,14 @@
   const removeSpec = async (index: number) => {
     $form.specs = $form.specs.filter((_, i) => i !== index);
 
+    if (!$form.specs.length) {
+      $form.specs = [{ kind: 'cron', cronString: '' }];
+      expandedIndex = 0;
+      await tick();
+      specItemElsByIndex.get(expandedIndex)?.focus();
+      return;
+    }
+
     if (typeof expandedIndex !== 'number') {
       // no spec was expanded
       return;
@@ -94,14 +102,15 @@
 
     <div class="flex flex-col gap-4">
       {#each $form.specs as _, i (i)}
+        {@const isExpanded = expandedIndex === i}
         <ScheduleSpecItem
           {form}
           bind:this={
             () => specItemElsByIndex.get(i), (v) => specItemElsByIndex.set(i, v)
           }
           index={i}
-          expanded={expandedIndex === i}
-          canRemove={$form.specs.length > 1}
+          expanded={isExpanded}
+          canRemove={!isExpanded || $form.specs.length > 1}
           onRemove={() => removeSpec(i)}
           {errors}
         />
