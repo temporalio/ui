@@ -20,37 +20,38 @@
 
   let serverlessDeployment = $state(false);
   let deploymentChecked = $state(false);
-  let lastCheckedDeployment: string | undefined = undefined;
 
   $effect(() => {
     if (!runningWithNoWorkers || !deployment) {
       serverlessDeployment = false;
       deploymentChecked = true;
-      lastCheckedDeployment = undefined;
       return;
     }
 
-    if (lastCheckedDeployment === deployment) return;
-    lastCheckedDeployment = deployment;
-
     deploymentChecked = false;
+    const controller = new AbortController();
+
     fetchDeployment(
       { namespace, deploymentName: deployment },
       fetch,
       () => {},
       false,
+      controller.signal,
     )
       .then((response) => {
+        if (controller.signal.aborted) return;
         serverlessDeployment = deploymentHasComputeConfig(
           response?.workerDeploymentInfo,
         );
+        deploymentChecked = true;
       })
       .catch(() => {
+        if (controller.signal.aborted) return;
         serverlessDeployment = false;
-      })
-      .finally(() => {
         deploymentChecked = true;
       });
+
+    return () => controller.abort();
   });
 </script>
 
