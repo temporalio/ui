@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
@@ -8,6 +9,7 @@
   import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { standaloneActivityCommandsDisabled } from '$lib/utilities/activity-create-disabled';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
 
@@ -28,6 +30,7 @@
   let isRunning = $derived(
     activityExecutionInfo.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING',
   );
+  const commandsDisabled = $derived(standaloneActivityCommandsDisabled(page));
 
   const onConfirmCancelOrTerminate = () => {
     poller.fetchOnce().then(() => {
@@ -39,7 +42,7 @@
 <div class="flex items-center gap-2">
   <Button
     on:click={() => (cancelConfirmationModalOpen = true)}
-    disabled={!isRunning}
+    disabled={!isRunning || commandsDisabled}
     size="sm"
   >
     {translate('standalone-activities.request-cancellation')}
@@ -50,6 +53,7 @@
       controls="activity-execution-actions"
       variant="secondary"
       size="sm"
+      disabled={commandsDisabled}
     >
       {translate('workflows.more-actions')}
     </MenuButton>
@@ -85,15 +89,17 @@
   </MenuContainer>
 </div>
 
-<CancelConfirmationModal
-  onConfirm={onConfirmCancelOrTerminate}
-  {activityExecutionInfo}
-  {namespace}
-  bind:open={cancelConfirmationModalOpen}
-/>
-<TerminateConfirmationModal
-  onConfirm={onConfirmCancelOrTerminate}
-  {activityExecutionInfo}
-  {namespace}
-  bind:open={terminateConfirmationModalOpen}
-/>
+{#if !commandsDisabled}
+  <CancelConfirmationModal
+    onConfirm={onConfirmCancelOrTerminate}
+    {activityExecutionInfo}
+    {namespace}
+    bind:open={cancelConfirmationModalOpen}
+  />
+  <TerminateConfirmationModal
+    onConfirm={onConfirmCancelOrTerminate}
+    {activityExecutionInfo}
+    {namespace}
+    bind:open={terminateConfirmationModalOpen}
+  />
+{/if}
