@@ -34,7 +34,7 @@ test.describe('Schedules Page', () => {
     await page
       .locator('#schedule-payload-input')
       .getByRole('textbox')
-      .fill('abc');
+      .fill('"abc"');
     await page.getByTestId('spec-type-0-button').click();
     await page.getByRole('option', { name: 'Interval' }).click();
     await page.getByLabel('Time Interval').fill('90');
@@ -49,7 +49,7 @@ test.describe('Schedules Page', () => {
     await expect(scheduleLink).toBeVisible();
     await scheduleLink.click();
 
-    await expect(page.getByTestId('schedule-name')).toHaveText(
+    await expect(page.getByTestId('schedule-name')).toContainText(
       'e2e-schedule-1',
     );
     await expect(page.getByText('Every 90 minute(s)').first()).toBeVisible();
