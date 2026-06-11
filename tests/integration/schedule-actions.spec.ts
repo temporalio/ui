@@ -1,6 +1,10 @@
 import { expect, type Request, test } from '@playwright/test';
 
-import { mockScheduleApi, mockSchedulesApis } from '~/test-utilities/mock-apis';
+import {
+  mockSchedule,
+  mockScheduleApi,
+  mockSchedulesApis,
+} from '~/test-utilities/mock-apis';
 
 const scheduleUrl = '/namespaces/default/schedules/test-schedule';
 
@@ -80,6 +84,61 @@ test.describe('Schedule actions', () => {
     await expect(
       triggerModal.getByTestId('confirm-modal-button'),
     ).toBeEnabled();
+  });
+
+  test('backfill modal shows times based on the schedule timezone', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page, {
+      ...mockSchedule,
+      schedule: {
+        ...mockSchedule.schedule,
+        spec: { ...mockSchedule.schedule.spec, timezoneName: 'Asia/Tokyo' },
+      },
+    });
+    await page.goto(scheduleUrl);
+    await expect(page.getByTestId('schedule-name')).toContainText(
+      'test-schedule',
+    );
+
+    await page.getByLabel('Schedule Actions').click();
+    await page.getByTestId('backfill-schedule').click();
+
+    const modal = page.locator('#backfill-schedule-modal');
+    await expect(modal).toBeVisible();
+    await expect(modal.getByText('Based on Asia/Tokyo')).toBeVisible();
+  });
+
+  test('backfill rejects an end time before the start time', async ({
+    page,
+  }) => {
+    await page.getByLabel('Schedule Actions').click();
+    await page.getByTestId('backfill-schedule').click();
+
+    const modal = page.locator('#backfill-schedule-modal');
+    await expect(modal).toBeVisible();
+    await expect(
+      modal.getByText('Based on Universal Standard Time (UTC)'),
+    ).toBeVisible();
+
+    const popup = modal.locator('.z-30');
+    await modal.locator('#backfill-start-date').click();
+    await popup.getByRole('button', { name: 'Next Month' }).click();
+    await popup.getByRole('button', { name: '15', exact: true }).click();
+
+    await expect(
+      modal.getByText('End time must be after the start time.'),
+    ).toBeVisible();
+    await expect(modal.getByTestId('confirm-modal-button')).toBeDisabled();
+
+    await modal.locator('#backfill-end-date').click();
+    await popup.getByRole('button', { name: 'Next Month' }).click();
+    await popup.getByRole('button', { name: '16', exact: true }).click();
+
+    await expect(
+      modal.getByText('End time must be after the start time.'),
+    ).toBeHidden();
+    await expect(modal.getByTestId('confirm-modal-button')).toBeEnabled();
   });
 
   test('delete confirms and issues a delete request', async ({ page }) => {

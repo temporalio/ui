@@ -54,6 +54,7 @@ export const Strings = {
   'backfill-schedule': 'Backfill this schedule',
   'backfill-schedule-error':
     'There was an error backfilling the schedule. {{error}}',
+  'backfill-end-before-start': 'End time must be after the start time.',
   'more-options': 'More options',
   'trigger-modal-title': 'Trigger Immediately',
   'trigger-schedule-error':

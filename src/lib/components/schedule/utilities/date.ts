@@ -23,3 +23,18 @@ export const calendarDateStrToEndOfDayTimestamp = (
 
 export const isoStringToCalendarDateStr = (isoStr: string, timeZone: string) =>
   format(utcToZonedTime(new Date(isoStr), timeZone), 'yyyy-MM-dd');
+
+export const dateAndTimeToTimestamp = (
+  date: Date,
+  hour: string | number,
+  minute: string | number,
+  second: string | number,
+  timeZone: string,
+): string => {
+  const pad = (value: string | number) =>
+    String(Number(value)).padStart(2, '0');
+  return zonedTimeToUtc(
+    `${toCalendarDateStr(date)}T${pad(hour)}:${pad(minute)}:${pad(second)}`,
+    timeZone,
+  ).toISOString();
+};

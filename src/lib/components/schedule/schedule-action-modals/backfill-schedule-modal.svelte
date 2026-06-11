@@ -2,6 +2,7 @@
   import { writable } from 'svelte/store';
 
   import { addHours, isBefore, startOfDay } from 'date-fns';
+  import { utcToZonedTime } from 'date-fns-tz';
 
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -20,42 +21,57 @@
   } from '$lib/stores/schedules';
   import type { OverlapPolicy } from '$lib/types/schedule';
   import { getIdentity } from '$lib/utilities/core-context';
-  import { getUTCString } from '$lib/utilities/format-date';
 
   import { getOverlapPolicyContent } from '../constants';
+  import { dateAndTimeToTimestamp } from '../utilities/date';
 
   interface Props {
     scheduleOverlapPolicy?: OverlapPolicy;
     scheduleId: string;
     namespace: string;
+    timezoneName?: string;
   }
 
   const overlapPolicyContent = getOverlapPolicyContent();
   const identity = getIdentity();
 
-  let { scheduleOverlapPolicy, scheduleId, namespace }: Props = $props();
+  let { scheduleOverlapPolicy, scheduleId, namespace, timezoneName }: Props =
+    $props();
+
+  // svelte-ignore state_referenced_locally
+  const timezone = timezoneName || 'UTC';
 
   // svelte-ignore state_referenced_locally
   let selectedOverlapPolicy = writable<OverlapPolicy>(
     scheduleOverlapPolicy ?? 'Skip',
   );
 
-  const localNow = new Date();
-  const MILLISECONDS_IN_MINUTE = 60000;
-  const utcNow = new Date(
-    localNow.getTime() + localNow.getTimezoneOffset() * MILLISECONDS_IN_MINUTE,
-  );
-  const anHourAhead = addHours(utcNow, 1);
+  const zonedNow = utcToZonedTime(new Date(), timezone);
+  const anHourAhead = addHours(zonedNow, 1);
 
-  let startDate = $state(startOfDay(utcNow));
-  let startHour = $state(utcNow.getHours().toString());
-  let startMinute = $state(utcNow.getMinutes().toString());
-  let startSecond = $state(utcNow.getSeconds().toString());
+  let startDate = $state(startOfDay(zonedNow));
+  let startHour = $state(zonedNow.getHours().toString());
+  let startMinute = $state(zonedNow.getMinutes().toString());
+  let startSecond = $state(zonedNow.getSeconds().toString());
 
-  let endDate = $state(startOfDay(utcNow));
+  let endDate = $state(startOfDay(anHourAhead));
   let endHour = $state(anHourAhead.getHours().toString());
   let endMinute = $state(anHourAhead.getMinutes().toString());
   let endSecond = $state(anHourAhead.getSeconds().toString());
+
+  const startTimestamp = $derived(
+    dateAndTimeToTimestamp(
+      startDate,
+      startHour,
+      startMinute,
+      startSecond,
+      timezone,
+    ),
+  );
+  const endTimestamp = $derived(
+    dateAndTimeToTimestamp(endDate, endHour, endMinute, endSecond, timezone),
+  );
+  const invalidEndTime = $derived(endTimestamp <= startTimestamp);
 
   $effect(() => {
     return () => clearConfirmationModalActionTimeout('backfill');
@@ -71,21 +87,12 @@
   cancelText={translate('common.cancel')}
   loading={$actionPending}
   error={$serverError}
+  confirmDisabled={invalidEndTime}
   on:confirmModal={() =>
     submitBackfillSchedule(
       {
-        startTime: getUTCString({
-          date: startDate,
-          hour: startHour,
-          minute: startMinute,
-          second: startSecond,
-        }),
-        endTime: getUTCString({
-          date: endDate,
-          hour: endHour,
-          minute: endMinute,
-          second: endSecond,
-        }),
+        startTime: startTimestamp,
+        endTime: endTimestamp,
         overlapPolicy: $selectedOverlapPolicy,
       },
       {
@@ -105,6 +112,7 @@
   <div slot="content">
     <div class="flex flex-col gap-2 p-2">
       <DatePicker
+        id="backfill-start-date"
         label={translate('common.start')}
         onDateChange={(d) => (startDate = startOfDay(d))}
         selected={startDate}
@@ -113,12 +121,14 @@
         clearLabel={translate('common.clear-input-button-label')}
       />
       <TimePicker
+        idPrefix="backfill-start-"
         bind:hour={startHour}
         bind:minute={startMinute}
         bind:second={startSecond}
         twelveHourClock={false}
       />
       <DatePicker
+        id="backfill-end-date"
         label={translate('common.end')}
         onDateChange={(d) => (endDate = startOfDay(d))}
         selected={endDate}
@@ -128,16 +138,25 @@
         isAllowed={(d) => !isBefore(d, startDate)}
       />
       <TimePicker
+        idPrefix="backfill-end-"
         bind:hour={endHour}
         bind:minute={endMinute}
         bind:second={endSecond}
         twelveHourClock={false}
+        error={invalidEndTime}
       />
+      {#if invalidEndTime}
+        <span class="text-xs text-danger" role="alert">
+          {translate('schedules.backfill-end-before-start')}
+        </span>
+      {/if}
       <div class="flex w-full flex-row items-center gap-2">
         <Icon name="clock" aria-hidden="true" />
         <span class="text-xs font-normal text-slate-500"
           >{translate('common.based-on-time-preface')}
-          {translate('common.universal-standard-time')}
+          {timezone === 'UTC'
+            ? translate('common.universal-standard-time')
+            : timezone}
         </span>
       </div>
     </div>

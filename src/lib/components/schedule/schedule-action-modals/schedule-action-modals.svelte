@@ -32,7 +32,12 @@
 {:else if $confirmationModal === 'trigger'}
   <TriggerScheduleModal {scheduleId} {namespace} {scheduleOverlapPolicy} />
 {:else if $confirmationModal === 'backfill'}
-  <BackfillScheduleModal {scheduleId} {namespace} {scheduleOverlapPolicy} />
+  <BackfillScheduleModal
+    {scheduleId}
+    {namespace}
+    {scheduleOverlapPolicy}
+    timezoneName={schedule?.schedule?.spec?.timezoneName}
+  />
 {:else if $confirmationModal === 'delete'}
   <DeleteScheduleModal {scheduleId} {namespace} />
 {/if}
