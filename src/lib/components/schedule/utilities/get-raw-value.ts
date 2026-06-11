@@ -1,20 +1,15 @@
 import { z } from 'zod/v3';
 
-import { formScheduleTimingSchema, formSpecSchema } from '../schema/form';
+import { formSpecSchema } from '../schema/form';
 
-export function getRawValue(
-  specInput: z.input<typeof formSpecSchema>,
-  timinginput: z.input<typeof formScheduleTimingSchema>,
-): string {
+export function getRawValue(specInput: z.input<typeof formSpecSchema>): string {
   const parsedSpec = formSpecSchema.safeParse(specInput);
-  const parsedTiming = formScheduleTimingSchema.safeParse(timinginput);
 
-  if (!parsedSpec.success || !parsedTiming.success) {
+  if (!parsedSpec.success) {
     return '';
   }
 
   const spec = parsedSpec.data;
-  const timing = parsedTiming.data;
 
   switch (spec.kind) {
     case 'cron': {
@@ -22,15 +17,15 @@ export function getRawValue(
     }
 
     case 'week': {
-      return 'week';
+      return '';
     }
 
     case 'month': {
-      return 'month';
+      return '';
     }
 
     case 'interval': {
-      return 'interval';
+      return '';
     }
 
     case 'frozen': {

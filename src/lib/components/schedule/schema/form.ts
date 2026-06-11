@@ -143,8 +143,7 @@ export const formSpecSchema = z
   });
 
 export type FormSpecSchema = z.infer<typeof formSpecSchema>;
-
-export const formScheduleTimingSchema = z.object({
+const formScheduleTimingSchema = z.object({
   timezoneName: z.string().trim().default('UTC'),
   startTime: z
     .string()
@@ -159,8 +158,6 @@ export const formScheduleTimingSchema = z.object({
     .default(getNowCalendarDateStr()),
   endAfterOccurrences: z.number().optional(),
 });
-
-export type FormScheduleTimingSchema = z.infer<typeof formScheduleTimingSchema>;
 
 export const formScheduleSchema = z
   .object({

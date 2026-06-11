@@ -7,10 +7,7 @@
   import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import {
-    type FormScheduleSchema,
-    type FormScheduleTimingSchema,
-  } from '../schema/form';
+  import { type FormScheduleSchema } from '../schema/form';
   import { getFormSpecInitialData } from '../utilities/get-form-spec-initial-data';
   import { getRawValue } from '../utilities/get-raw-value';
   import { getScheduleSpecSummary } from '../utilities/summarize';
@@ -41,14 +38,6 @@
     { value: 'interval', label: translate('schedules.spec-type-interval') },
   ] as const;
 
-  const timing: FormScheduleTimingSchema = $derived.by(() => {
-    return {
-      startTime: $form.startTime,
-      timezoneName: $form.timezoneName,
-      endTime: $form.endTime,
-      endAfterOccurrences: $form.endAfterOccurrences,
-    };
-  });
   const spec = $derived($form.specs[index]);
 
   const specKind = $derived($form.specs[index]?.kind ?? 'none');
@@ -142,7 +131,7 @@
     {/if}
   </div>
 {:else}
-  {@const rawValue = getRawValue(spec, timing)}
+  {@const rawValue = getRawValue(spec)}
   <div
     bind:this={containerEl}
     class="surface-background relative flex w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
