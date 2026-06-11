@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { handleError } from './handle-error';
+import {
+  handleError,
+  handleUnauthorizedOrForbiddenError,
+} from './handle-error';
 import { routeForLoginPage } from './route-for';
 
 const realLocation = window.location.assign;
@@ -20,7 +23,7 @@ describe('handleError', () => {
     vi.clearAllMocks();
   });
 
-  it('should redirect if it is an unauthorized error with status', () => {
+  it('should not redirect if it is an unauthorized error with status', () => {
     const error = {
       status: 401,
       statusText: 'Unauthorized',
@@ -28,10 +31,10 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
-  it('should redirect if it is an unauthorized error with statusCode', () => {
+  it('should not redirect if it is an unauthorized error with statusCode', () => {
     const error = {
       statusCode: 401,
       statusText: 'Unauthorized',
@@ -39,10 +42,10 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
-  it('should redirect if it is a forbidden error with status', () => {
+  it('should not redirect if it is a forbidden error with status', () => {
     const error = {
       statusCode: 403,
       statusText: 'Forbidden',
@@ -50,10 +53,10 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
-  it('should redirect if it is a forbidden error with statusCode', () => {
+  it('should not redirect if it is a forbidden error with statusCode', () => {
     const error = {
       status: 403,
       statusText: 'Forbidden',
@@ -61,7 +64,35 @@ describe('handleError', () => {
     };
 
     expect(() => handleError(error)).toThrowError();
+    expect(window.location.assign).not.toHaveBeenCalled();
+  });
+
+  it('should redirect unauthorized errors when explicitly requested', () => {
+    const error = {
+      status: 401,
+      statusText: 'Unauthorized',
+      body: { message: 'Unauthorized' },
+    };
+
+    handleUnauthorizedOrForbiddenError(error, true, {
+      redirectToLogin: true,
+    });
+
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+  });
+
+  it('should not redirect forbidden errors when explicitly requested', () => {
+    const error = {
+      status: 403,
+      statusText: 'Forbidden',
+      body: { message: 'Forbidden' },
+    };
+
+    handleUnauthorizedOrForbiddenError(error, true, {
+      redirectToLogin: true,
+    });
+
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
   it('should not redirect if not 401/403', () => {

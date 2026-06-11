@@ -1,7 +1,15 @@
 import { BROWSER } from 'esm-env';
 
-import type { NetworkError } from '$lib/types/global';
-
+import {
+  type ErrorCallback,
+  handleCaughtRequestError,
+  normalizeHeaders,
+  parseResponseBody,
+  type RequestErrorHandler,
+  type TemporalAPIError,
+  toAPIErrorResponse,
+  toAPIRequestError,
+} from './api-request-manager';
 import {
   type RequestContext,
   runPostResponse,
@@ -11,22 +19,21 @@ import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
 
-export type TemporalAPIError = {
-  code: number;
-  message: string;
-  details: unknown[];
-};
+export type {
+  APIErrorBody,
+  APIErrorResponse,
+  ErrorCallback,
+  RequestErrorHandler,
+  TemporalAPIError,
+} from './api-request-manager';
+
+export {
+  APIRequestError,
+  isAPIRequestError,
+  isAuthenticationError,
+} from './api-request-manager';
 
 export type RetryCallback = (retriesRemaining: number) => void;
-
-export type APIErrorResponse = {
-  status: number;
-  statusText: string;
-  statusCode?: number;
-  body: TemporalAPIError;
-};
-
-export type ErrorCallback = (error: APIErrorResponse) => void;
 
 type toURLParams = Parameters<typeof toURL>;
 
@@ -37,7 +44,7 @@ type RequestFromAPIOptions = {
   token?: string;
   onError?: ErrorCallback;
   notifyOnError?: boolean;
-  handleError?: typeof handleRequestError;
+  handleError?: RequestErrorHandler;
   isBrowser?: boolean;
   signal?: AbortController['signal'];
 };
@@ -92,7 +99,8 @@ export const requestFromAPI = async <T>(
   try {
     const baseOptions: RequestInit = {
       ...init.options,
-      headers: withCallerType(init.options?.headers),
+      signal: init.signal ?? init.options?.signal,
+      headers: normalizeHeaders(init.options?.headers),
     };
 
     const queryIsTooLong = [...query.values()].some(
@@ -126,7 +134,8 @@ export const requestFromAPI = async <T>(
             url,
             options: {
               ...init.options,
-              headers: withCallerType(init.options?.headers),
+              signal: init.signal ?? init.options?.signal,
+              headers: normalizeHeaders(init.options?.headers),
             },
           };
           retryContext = await runPreRequest(retryContext);
@@ -135,36 +144,18 @@ export const requestFromAPI = async <T>(
       });
     }
 
-    const { status, statusText } = response;
-    const body = await response.json();
+    const body = await parseResponseBody(response);
 
     if (!response.ok) {
       if (onError && isFunction(onError)) {
-        onError({ status, statusText, body });
+        onError(toAPIErrorResponse(response, body));
       } else {
-        throw {
-          statusCode: response.status,
-          statusText: response.statusText,
-          response,
-          message: body?.message ?? response.statusText,
-        } as NetworkError;
+        throw toAPIRequestError(response, body);
       }
     }
 
-    return body;
+    return body as T;
   } catch (error: unknown) {
-    if (notifyOnError) {
-      handleError(error);
-    } else {
-      throw error;
-    }
+    handleCaughtRequestError(error, { notifyOnError, handleError });
   }
-};
-
-const withCallerType = (
-  headers: HeadersInit | undefined,
-): Record<string, string> => {
-  const h: Record<string, string> = (headers as Record<string, string>) ?? {};
-  h['Caller-Type'] = 'operator';
-  return h;
 };

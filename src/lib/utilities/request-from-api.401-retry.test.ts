@@ -11,7 +11,7 @@ vi.mock('./core-provider', () => ({
 
 import { runPostResponse, runPreRequest } from './core-provider';
 import { handleError } from './handle-error';
-import { requestFromAPI } from './request-from-api';
+import { isAuthenticationError, requestFromAPI } from './request-from-api';
 
 const mockRunPreRequest = vi.mocked(runPreRequest);
 const mockRunPostResponse = vi.mocked(runPostResponse);
@@ -158,8 +158,12 @@ describe('requestFromAPI with hooks', () => {
         body: { message: 'unauthorized' },
       });
 
-      await requestFromAPI(endpoint, { request, isBrowser: false });
+      const error = await requestFromAPI(endpoint, {
+        request,
+        isBrowser: false,
+      }).catch((error) => error);
 
+      expect(isAuthenticationError(error)).toBe(true);
       expect(mockRunPostResponse).not.toHaveBeenCalled();
     });
 
@@ -244,8 +248,11 @@ describe('requestFromAPI with hooks', () => {
         return res;
       });
 
-      await requestFromAPI(endpoint, { request });
+      const error = await requestFromAPI(endpoint, { request }).catch(
+        (error) => error,
+      );
 
+      expect(isAuthenticationError(error)).toBe(true);
       expect(mockRunPostResponse).toHaveBeenCalledTimes(1);
       expect(request).toHaveBeenCalledTimes(2);
     });
