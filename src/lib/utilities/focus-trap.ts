@@ -41,7 +41,10 @@ export const focusTrap = (node: HTMLElement, enabled: boolean) => {
     lastFocusable = focusable[focusable.length - 1];
 
     if (!fromObserver) {
-      if (previouslyFocused === null && document.activeElement instanceof HTMLElement) {
+      if (
+        previouslyFocused === null &&
+        document.activeElement instanceof HTMLElement
+      ) {
         previouslyFocused = document.activeElement;
       }
       firstFocusable?.focus();
