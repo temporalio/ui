@@ -499,7 +499,7 @@
         comboboxStyles({ variant }),
         !valid &&
           variant === 'default' &&
-          'border border-danger text-danger focus-within:ring-danger/70',
+          'border-danger text-danger focus-within:ring-danger/70 border',
         disabled && 'opacity-50',
         className,
       )}
@@ -568,7 +568,7 @@
         />
       </div>
       {#if action}
-        <div class="ml-1 flex h-full items-start border-l border-subtle p-0.5">
+        <div class="border-subtle ml-1 flex h-full items-start border-l p-0.5">
           {#if actionTooltip}
             <Tooltip text={actionTooltip} right>
               {@render action()}
@@ -578,7 +578,7 @@
           {/if}
         </div>
       {:else if href}
-        <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
+        <div class="border-subtle ml-1 flex h-full items-center border-l p-0.5">
           {#if actionTooltip}
             <Tooltip text={actionTooltip} right>
               <Button
@@ -603,7 +603,7 @@
       {#if showChevron}
         <button
           type="button"
-          class="hover:bg-gray-100 flex h-full items-center rounded pr-2 focus:outline-none"
+          class="flex h-full items-center rounded pr-2 hover:bg-gray-100 focus:outline-none"
           onclick={handleChevronClick}
           aria-label={$open ? 'Close options' : 'Open options'}
           tabindex="-1"
@@ -687,7 +687,7 @@
 
 <style lang="postcss">
   .error {
-    @apply text-xs text-danger;
+    @apply text-danger text-xs;
   }
 
   .input-wrapper {
@@ -695,6 +695,6 @@
   }
 
   .combobox-input {
-    @apply flex grow bg-transparent text-primary focus:outline-none;
+    @apply text-primary flex grow bg-transparent focus:outline-none;
   }
 </style>

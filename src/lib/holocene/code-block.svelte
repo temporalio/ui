@@ -258,11 +258,11 @@
 {/snippet}
 
 <div
-  class={twMerge('min-w-[80px] grow', hasHeader && ['border border-subtle'])}
+  class={twMerge('min-w-[80px] grow', hasHeader && ['border-subtle border'])}
 >
   {#if tabs && tabs.length > 0}
     <div
-      class="flex flex-row items-center justify-between border-b border-subtle bg-code-block px-3"
+      class="border-subtle bg-code-block flex flex-row items-center justify-between border-b px-3"
     >
       <div class="flex flex-row items-center gap-4">
         {#each tabs as title (title)}
@@ -275,7 +275,7 @@
           <CopyButton
             {copyIconTitle}
             {copySuccessIconTitle}
-            class="m-0 rounded-full text-secondary"
+            class="text-secondary m-0 rounded-full"
             on:click={handleCopy}
             copied={$copied}
           />
@@ -301,7 +301,7 @@
         <CopyButton
           {copyIconTitle}
           {copySuccessIconTitle}
-          class="m-0 rounded-full text-secondary"
+          class="text-secondary m-0 rounded-full"
           on:click={handleCopy}
           copied={$copied}
         />

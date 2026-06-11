@@ -10,7 +10,7 @@
   let { summary, details }: Props = $props();
 </script>
 
-<div data-testid="user-metadata" class="flex h-full flex-1 flex-col bg-primary">
+<div data-testid="user-metadata" class="bg-primary flex h-full flex-1 flex-col">
   <div>
     <div class="surface-information w-full px-6 py-2">
       <h3 data-testid="user-metadata-summary-heading">
@@ -25,7 +25,7 @@
         content={summary}
       />
     {:else}
-      <div class="py-6 pl-6 text-secondary/70">
+      <div class="text-secondary/70 py-6 pl-6">
         <p class="text-sm italic">
           {translate('workflows.no-summary-available')}
         </p>
@@ -46,7 +46,7 @@
         content={details}
       />
     {:else}
-      <div class="py-6 pl-6 text-secondary/70">
+      <div class="text-secondary/70 py-6 pl-6">
         <p class="text-sm italic">
           {translate('workflows.no-details-available')}
         </p>

@@ -140,7 +140,7 @@
         <h2 class="text-base font-medium">
           {translate('search-attributes.title')}
         </h2>
-        <p class="text-sm text-secondary">
+        <p class="text-secondary text-sm">
           {translate('search-attributes.description')}
         </p>
       </div>

@@ -28,7 +28,7 @@
       'w-full',
       'flex-row',
       'items-center justify-end',
-      'border-b border-subtle',
+      'border-subtle border-b',
       'px-8 py-1',
       className,
     )}

@@ -66,7 +66,7 @@
     </Badge>
 
     {#if maximumAttempts && !isClosed}
-      <p class="ml-1 text-secondary">
+      <p class="text-secondary ml-1">
         {formatAttemptsLeft(maximumAttempts, attempt)} remaining
       </p>
     {/if}
@@ -347,7 +347,7 @@
         <div class="space-y-2">
           {#if $activityExecution.info.lastFailure}
             <div class="space-y-2">
-              <p class="font-medium text-secondary">
+              <p class="text-secondary font-medium">
                 {translate('standalone-activities.last-failure')}
               </p>
               <PayloadCodeBlock value={$activityExecution.info.lastFailure} />
@@ -355,7 +355,7 @@
           {/if}
           {#if $activityExecution.info.retryPolicy}
             <div class="space-y-2">
-              <p class="font-medium text-secondary">
+              <p class="text-secondary font-medium">
                 {translate('standalone-activities.retry-policy')}
               </p>
               <CodeBlock
@@ -369,7 +369,7 @@
           {/if}
           {#if $activityExecution.info.heartbeatDetails}
             <div class="space-y-2">
-              <p class="font-medium text-secondary">
+              <p class="text-secondary font-medium">
                 {translate('standalone-activities.heartbeat-details')}
               </p>
               <PayloadCodeBlock
@@ -379,7 +379,7 @@
           {/if}
           {#if $activityExecution.info.header?.fields}
             <div class="space-y-2">
-              <p class="font-medium text-secondary">
+              <p class="text-secondary font-medium">
                 {translate('standalone-activities.header')}
               </p>
               <PayloadCodeBlock value={$activityExecution.info.header.fields} />

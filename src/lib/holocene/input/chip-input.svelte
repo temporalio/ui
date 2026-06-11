@@ -116,7 +116,7 @@
   <Label {required} {label} {disabled} hidden={labelHidden} for={id} />
   <div
     class={merge(
-      'surface-primary flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border border-subtle p-2 text-sm text-primary focus-within:border-interactive focus-within:ring-2 focus-within:ring-primary/70',
+      'surface-primary border-subtle text-primary focus-within:border-interactive focus-within:ring-primary/70 flex min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll border p-2 text-sm focus-within:ring-2',
       disabled && 'cursor-not-allowed opacity-65',
       invalid && 'invalid',
     )}
@@ -200,7 +200,7 @@
 
 <style lang="postcss">
   .invalid {
-    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
+    @apply border-danger focus-within:border-danger focus-within:ring-danger/70 focus-within:ring-2;
   }
 
   input {
@@ -208,7 +208,7 @@
   }
 
   .error-msg {
-    @apply break-words text-sm text-danger;
+    @apply text-danger text-sm break-words;
   }
 
   .error-msg.min-width {
@@ -216,7 +216,7 @@
   }
 
   .count {
-    @apply invisible text-right text-sm font-medium text-primary group-focus-within:visible;
+    @apply text-primary invisible text-right text-sm font-medium group-focus-within:visible;
   }
 
   .count > .warn {

@@ -6,7 +6,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
 </script>
 
-<div class="flex flex-col bg-primary lg:flex-row">
+<div class="bg-primary flex flex-col lg:flex-row">
   <UserMetadata
     summary={$workflowRun.userMetadata.summary}
     details={$workflowRun.userMetadata.details}

@@ -348,7 +348,7 @@
 <MenuContainer {open}>
   <MenuButton size="xs" controls={controlsId} hasIndicator class="bg-secondary">
     {getDisplayKeyWithConditional(localFilter)}<span
-      class="max-w-[160px] truncate pl-1 text-brand lg:max-w-full"
+      class="text-brand max-w-[160px] truncate pl-1 lg:max-w-full"
       >{getDisplayValue(localFilter)}</span
     >
   </MenuButton>
@@ -473,7 +473,7 @@
               </div>
             {/if}
             <p
-              class="flex items-center justify-end gap-1 text-sm text-secondary"
+              class="text-secondary flex items-center justify-end gap-1 text-sm"
             >
               <Icon name="clock" aria-hidden="true" />
               {translate('common.based-on-time-preface')}

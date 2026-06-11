@@ -117,7 +117,7 @@
 
 <MenuContainer {open}>
   <MenuButton size="xs" controls={controlsId} hasIndicator class="bg-secondary">
-    {attribute} =<span class="pl-1 text-brand"
+    {attribute} =<span class="text-brand pl-1"
       >{filters.map((f) => f.value).join(', ')}</span
     >
   </MenuButton>

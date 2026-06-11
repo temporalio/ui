@@ -43,7 +43,7 @@ Resources:
 </h3>
 <Timeline>
   <TimelineStep step={1} title={translate('workers.setup-step-setup')}>
-    <p class="mt-1 text-sm text-secondary">
+    <p class="text-secondary mt-1 text-sm">
       {translate('workers.setup-guide-intro')}
     </p>
     <div class="mt-3 flex flex-col gap-2">
@@ -53,7 +53,7 @@ Resources:
     </div>
   </TimelineStep>
   <TimelineStep step={2} title={translate('workers.setup-step-templates')}>
-    <p class="mt-1 text-sm text-secondary">
+    <p class="text-secondary mt-1 text-sm">
       {translate('workers.setup-guide-iam-note')}
     </p>
     <div class="mt-3">

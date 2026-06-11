@@ -152,7 +152,7 @@
     }
 
     :global(tr > td) {
-      @apply whitespace-nowrap p-2;
+      @apply p-2 whitespace-nowrap;
     }
   }
 </style>

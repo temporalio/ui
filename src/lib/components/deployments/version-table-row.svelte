@@ -260,7 +260,7 @@
   </CapabilityGuard>
   <Timestamp
     as="td"
-    class="whitespace-pre-line break-words text-left"
+    class="text-left break-words whitespace-pre-line"
     dateTime={version?.createTime}
   />
   <VersionActionsMenu
@@ -275,7 +275,7 @@
 </tr>
 
 {#if expanded}
-  <tr class="surface-primary border-y border-subtle">
+  <tr class="surface-primary border-subtle border-y">
     <td colspan={5} class="!p-1">
       <VersionRowDetails
         {namespace}

@@ -30,7 +30,7 @@
           {translate('standalone-activities.empty-state-description')}
         {/if}
       </p>
-      <NoQueryResults class="m-auto mt-8 text-subtle" />
+      <NoQueryResults class="text-subtle m-auto mt-8" />
     </div>
   </div>
 {:else}

@@ -45,7 +45,7 @@
 </script>
 
 <div
-  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
+  class="surface-primary border-subtle flex flex-1 cursor-default flex-col gap-2 border-b p-4"
 >
   <div class="flex flex-1 flex-wrap justify-between gap-2">
     <div class="flex flex-wrap items-center space-x-3">
@@ -153,7 +153,7 @@
 
 {#snippet detail(label: string, value: string | number | Snippet)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="text-secondary/80 min-w-56 text-sm">
       {label}
     </p>
     <p class="w-full whitespace-pre-line">
@@ -168,7 +168,7 @@
 
 {#snippet heartbeat()}
   <div>
-    <p class="text-sm text-secondary/80">
+    <p class="text-secondary/80 text-sm">
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
@@ -181,7 +181,7 @@
   <div class="flex flex-col gap-2">
     <div class="flex flex-1 flex-col">
       {#if activity.lastFailure}
-        <p class="text-sm text-secondary/80">
+        <p class="text-secondary/80 text-sm">
           {translate('workflows.last-failure')}
         </p>
         {#key activity.attempt}
@@ -194,7 +194,7 @@
     </div>
     {#if activity.lastFailure?.stackTrace}
       <div>
-        <p class="text-sm text-secondary/80">
+        <p class="text-secondary/80 text-sm">
           {translate('common.stack-trace')}
         </p>
         <CodeBlock
@@ -224,7 +224,7 @@
 
 {#snippet nextRetry(timeDifference)}
   <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
+    <p class="text-secondary/80 min-w-56 text-sm">
       {translate('workflows.next-retry')}
     </p>
     <p class="flex w-full items-center gap-1 whitespace-pre-line">
@@ -243,7 +243,7 @@
       )}
     </Badge>
     {#if activity.maximumAttempts}
-      <p class="ml-1 text-sm text-secondary">
+      <p class="text-secondary ml-1 text-sm">
         {formatAttemptsLeft(activity.maximumAttempts, activity.attempt)} remaining
       </p>
     {/if}

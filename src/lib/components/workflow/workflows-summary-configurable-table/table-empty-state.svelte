@@ -62,9 +62,9 @@
         {/if}
       </p>
       {#if hasTaskFailuresQuery}
-        <NoWorkflowTaskFailures class="m-auto mt-8 text-subtle" />
+        <NoWorkflowTaskFailures class="text-subtle m-auto mt-8" />
       {:else}
-        <NoQueryResults class="m-auto mt-8 text-subtle" />
+        <NoQueryResults class="text-subtle m-auto mt-8" />
       {/if}
     </div>
   </div>

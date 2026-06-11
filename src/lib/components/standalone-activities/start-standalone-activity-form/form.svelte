@@ -343,7 +343,7 @@
     />
 
     {#if $errors.startToCloseTimeout}
-      <p class="text-xs text-danger">
+      <p class="text-danger text-xs">
         {$errors.startToCloseTimeout}
       </p>
     {/if}

@@ -53,14 +53,14 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="flex flex-1 flex-col border-l border-subtle">
+<div class="border-subtle flex flex-1 flex-col border-l">
   <div class="surface-information w-full px-6 py-2">
     <div class="flex items-center justify-between">
       <h3>{translate('workflows.current-details')}</h3>
       <div class="flex flex-row items-center gap-2 lg:flex-col xl:flex-row">
         <p class="hidden sm:block">
           Press the <span
-            class="mx-1 rounded bg-subtle px-1 text-sm font-medium leading-4"
+            class="bg-subtle mx-1 rounded px-1 text-sm leading-4 font-medium"
             >R</span
           > for freshness
         </p>
@@ -77,7 +77,7 @@
         {#if lastFetched}
           <Timestamp
             as="p"
-            class="text-xs text-secondary"
+            class="text-secondary text-xs"
             dateTime={lastFetched}
           />
         {/if}

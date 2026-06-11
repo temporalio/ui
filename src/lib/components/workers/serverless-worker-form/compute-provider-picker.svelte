@@ -35,7 +35,7 @@
   >
     <div
       slot="icon"
-      class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded-none border border-subtle"
+      class="bg-surface-primary border-subtle flex h-11 w-11 items-center justify-center rounded-none border"
     >
       <Icon name="aws" width={32} height={32} />
     </div>
@@ -54,7 +54,7 @@
     >
     <div
       slot="icon"
-      class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded-none border border-subtle"
+      class="bg-surface-primary border-subtle flex h-11 w-11 items-center justify-center rounded-none border"
     >
       <Icon name="gcp" width={32} height={32} />
     </div>

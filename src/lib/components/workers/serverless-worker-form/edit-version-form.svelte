@@ -68,7 +68,7 @@
       <h3 class="text-base font-medium">
         {translate('workers.compute-section')}
       </h3>
-      <p class="mb-4 text-sm text-secondary">
+      <p class="text-secondary mb-4 text-sm">
         {translate('workers.compute-description')}
       </p>
       <ComputeProviderPicker bind:provider>

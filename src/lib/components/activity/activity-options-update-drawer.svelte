@@ -129,7 +129,7 @@
     <form onsubmit={onUpdate} class="flex flex-col gap-4">
       <div>
         <Label for="heartbeat-timeout" label="Heartbeat Timeout Duration" />
-        <p class="mb-1 text-xs text-secondary">
+        <p class="text-secondary mb-1 text-xs">
           Maximum permitted time between successful Worker Heartbeats.
         </p>
         <div class="flex flex-wrap items-center gap-2">
@@ -142,7 +142,7 @@
             class="w-36"
             error={isNaN(Number(heartbeatTimeout))}
           />
-          <p class="text-nowrap text-secondary">
+          <p class="text-secondary text-nowrap">
             {formatSecondsAbbreviated(heartbeatTimeout)}
           </p>
         </div>
@@ -152,7 +152,7 @@
           for="retry-backoff-coefficient"
           label="Retry Backoff Coefficient"
         />
-        <p class="mb-1 text-xs text-secondary">
+        <p class="text-secondary mb-1 text-xs">
           Coefficient used to calculate the next retry interval. The next retry
           interval is previous interval multiplied by the coefficient. Must be 1
           or larger.
@@ -172,7 +172,7 @@
           for="retry-initial-interval"
           label="Retry Initial Interval Duration"
         />
-        <p class="mb-1 text-xs text-secondary">
+        <p class="text-secondary mb-1 text-xs">
           Interval of the first retry. If retryBackoffCoefficient is 1.0 then it
           is used for all retries.
         </p>
@@ -186,14 +186,14 @@
             class="w-36"
             error={isNaN(Number(initialInterval))}
           />
-          <p class="text-nowrap text-secondary">
+          <p class="text-secondary text-nowrap">
             {formatSecondsAbbreviated(initialInterval)}
           </p>
         </div>
       </div>
       <div>
         <Label for="maximum-attempts" label="Retry Maximum Attempts" />
-        <p class="mb-1 text-xs text-secondary">
+        <p class="text-secondary mb-1 text-xs">
           Maximum number of attempts. When exceeded the retries stop even if not
           expired yet. 1 disables retries. 0 means unlimited (up to the
           timeouts).
@@ -211,7 +211,7 @@
           for="schedule-to-close-timeout"
           label="Schedule to Close Timeout Duration"
         />
-        <p class="mb-1 text-xs text-secondary">
+        <p class="text-secondary mb-1 text-xs">
           Indicates how long the caller is willing to wait for an Activity
           completion. Limits how long retries will be attempted.
         </p>
@@ -225,7 +225,7 @@
             class="w-36"
             error={isNaN(Number(scheduleToCloseTimeout))}
           />
-          <p class="text-nowrap text-secondary">
+          <p class="text-secondary text-nowrap">
             {formatSecondsAbbreviated(scheduleToCloseTimeout)}
           </p>
         </div>
@@ -235,7 +235,7 @@
           for="schedule-to-start-timeout"
           label="Schedule to Start Timeout Duration"
         />
-        <p class="mb-1 text-xs text-secondary">
+        <p class="text-secondary mb-1 text-xs">
           Limits time an Activity Task can stay in a task queue before a Worker
           picks it up. This timeout is always non retryable, as all a retry
           would achieve is to put it back into the same queue.
@@ -250,7 +250,7 @@
             class="w-36"
             error={isNaN(Number(scheduleToStartTimeout))}
           />
-          <p class="text-nowrap text-secondary">
+          <p class="text-secondary text-nowrap">
             {formatSecondsAbbreviated(scheduleToStartTimeout)}
           </p>
         </div>
@@ -260,7 +260,7 @@
           for="start-to-close-timeout"
           label="Start to Close Timeout Duration"
         />
-        <p class="mb-1 text-xs text-secondary">
+        <p class="text-secondary mb-1 text-xs">
           Maximum time an Activity is allowed to execute after being picked up
           by a Worker. This Timeout is always retryable.
         </p>
@@ -274,7 +274,7 @@
             class="w-36"
             error={isNaN(Number(startToCloseTimeout))}
           />
-          <p class="text-nowrap text-secondary">
+          <p class="text-secondary text-nowrap">
             {formatSecondsAbbreviated(startToCloseTimeout)}
           </p>
         </div>

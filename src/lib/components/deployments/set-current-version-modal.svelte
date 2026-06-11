@@ -42,13 +42,13 @@
       will be routed to this Worker Deployment Version.
     </p>
     {#if currentBuildId}
-      <div class="border border-subtle">
+      <div class="border-subtle border">
         <div class="flex items-center justify-between px-4 py-3 text-sm">
           <span class="text-secondary">{translate('deployments.build-id')}</span
           >
           <span class="flex items-center gap-2 font-mono font-medium">
             <span class="text-secondary">{currentBuildId}</span>
-            <Icon name="arrow-right" class="h-3.5 w-3.5 text-secondary" />
+            <Icon name="arrow-right" class="text-secondary h-3.5 w-3.5" />
             <span>{buildId}</span>
           </span>
         </div>

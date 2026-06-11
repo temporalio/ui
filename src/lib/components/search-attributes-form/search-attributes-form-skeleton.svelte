@@ -13,7 +13,7 @@
 <div class="space-y-6 {className}">
   <Card class="space-y-3">
     <div
-      class="text-gray-700 grid grid-cols-[1fr_140px_40px] gap-3 border-b border-subtle pb-2 text-sm font-medium"
+      class="border-subtle grid grid-cols-[1fr_140px_40px] gap-3 border-b pb-2 text-sm font-medium text-gray-700"
     >
       <div>{translate('search-attributes.column-attribute')}</div>
       <div>{translate('search-attributes.column-type')}</div>
@@ -29,7 +29,7 @@
       </div>
     {/each}
 
-    <div class="border-t border-subtle pt-4">
+    <div class="border-subtle border-t pt-4">
       <Skeleton class="h-10 w-64 rounded" />
     </div>
   </Card>

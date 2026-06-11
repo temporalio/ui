@@ -4,7 +4,7 @@
   import Skeleton from './index.svelte';
 </script>
 
-<div class="flex flex-col gap-4 border-subtle">
+<div class="border-subtle flex flex-col gap-4">
   <Skeleton class="h-4 w-32" />
   <div class="flex justify-between gap-4">
     <div class="flex w-full items-center gap-4">
@@ -14,7 +14,7 @@
     <Skeleton class="h-8 w-20 rounded-sm" />
   </div>
   <Skeleton class="h-32 w-full rounded-sm" />
-  <div class="flex items-center gap-4 border-b border-subtle pb-2">
+  <div class="border-subtle flex items-center gap-4 border-b pb-2">
     <Skeleton class="h-4 w-16" />
     <Skeleton class="h-4 w-16" />
     <Skeleton class="h-4 w-16" />

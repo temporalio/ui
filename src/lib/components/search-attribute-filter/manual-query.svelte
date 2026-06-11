@@ -70,7 +70,7 @@
   }
 </script>
 
-<div class="w-full border border-t-0 border-subtle" in:fade>
+<div class="border-subtle w-full border border-t-0" in:fade>
   <form
     onsubmit={handleSearch}
     class="flex gap-0"

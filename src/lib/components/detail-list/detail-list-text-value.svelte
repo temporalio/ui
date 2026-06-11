@@ -43,7 +43,7 @@
       {text}
     </Badge>
   {:else}
-    <div class="flex select-all items-center gap-1 truncate rounded-sm">
+    <div class="flex items-center gap-1 truncate rounded-sm select-all">
       {#if iconName && iconPosition === 'leading'}
         <Icon name={iconName} class="shrink-0" />
       {/if}

@@ -337,16 +337,16 @@
     >
       <div class="flex items-center gap-4">
         {#if command.icon}
-          <div class="h-6 w-6 flex-shrink-0 text-secondary">
+          <div class="text-secondary h-6 w-6 flex-shrink-0">
             <Icon name={command.icon} />
           </div>
         {/if}
         <div class="flex flex-col gap-1">
-          <div class="text-lg font-semibold text-secondary">
+          <div class="text-secondary text-lg font-semibold">
             {command.title}
           </div>
           {#if command.subtitle}
-            <div class="text-sm text-secondary">
+            <div class="text-secondary text-sm">
               {command.subtitle}
             </div>
           {/if}
@@ -382,7 +382,7 @@
   {#snippet content()}
     <div class="flex h-full flex-1 flex-col">
       <div
-        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pb-4 pt-2 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
+        class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 pt-2 pb-4 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/95"
       >
         <div class="flex items-center justify-between px-6 py-3">
           <div

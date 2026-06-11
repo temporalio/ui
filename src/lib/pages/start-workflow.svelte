@@ -314,7 +314,7 @@
       <Card class="flex flex-col gap-2">
         <div>
           <h3>{translate('search-attributes.custom-search-attributes')}</h3>
-          <p class="text-xs text-secondary">
+          <p class="text-secondary text-xs">
             Indexed fields used in a List Filter to filter a list of Workflow
             Executions.
           </p>
@@ -332,7 +332,7 @@
             label={translate('workflows.workflow-start-delay')}
             class="text-xl"
           />
-          <p class="text-xs text-secondary">
+          <p class="text-secondary text-xs">
             Time to wait before dispatching the first workflow task.
           </p>
         </div>
@@ -346,7 +346,7 @@
             class="w-36"
             error={isNaN(Number(workflowStartDelay))}
           />
-          <p class="text-nowrap text-secondary">
+          <p class="text-secondary text-nowrap">
             {formatSecondsAbbreviated(workflowStartDelay)}
           </p>
         </div>
@@ -355,12 +355,12 @@
         <div class="flex flex-wrap justify-between">
           <div>
             <h3>{translate('workflows.user-metadata')}</h3>
-            <p class="text-xs text-secondary">
+            <p class="text-secondary text-xs">
               Add context to Workflow Execution to help identity and understand
               its operations.
             </p>
           </div>
-          <p class="flex items-center gap-1 text-sm text-secondary">
+          <p class="text-secondary flex items-center gap-1 text-sm">
             {translate('workflows.markdown-supported')}
             <Tooltip
               topRight

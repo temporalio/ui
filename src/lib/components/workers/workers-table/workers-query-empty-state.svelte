@@ -17,5 +17,5 @@
       {translate('workers.worker-query-empty-state-description')}
     </p>
   </div>
-  <NoQueryResults class="m-auto mt-8 text-subtle" />
+  <NoQueryResults class="text-subtle m-auto mt-8" />
 </div>

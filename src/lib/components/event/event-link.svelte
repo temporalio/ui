@@ -18,7 +18,7 @@
 <div
   class="flex flex-row items-center gap-2 overflow-hidden first:pt-0 last:border-b-0 {$$props.class}"
 >
-  <p class="max-w-fit whitespace-nowrap text-right text-sm">
+  <p class="max-w-fit text-right text-sm whitespace-nowrap">
     {label}
   </p>
   <div class="overflow-hidden {$$props.linkClass}">

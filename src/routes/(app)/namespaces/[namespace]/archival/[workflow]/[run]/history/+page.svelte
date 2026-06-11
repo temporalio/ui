@@ -45,7 +45,7 @@
   <EventSummaryTable items={history} {groups} />
 {:catch error}
   <div class="text-center align-middle">
-    <h1 class="leading-0 text-[12rem] font-semibold">
+    <h1 class="text-[12rem] leading-0 font-semibold">
       {error?.statusCode ?? '500'}
     </h1>
     <p class="-mt-12 text-lg">{translate('workflows.workflow-error-title')}</p>

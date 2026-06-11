@@ -19,7 +19,7 @@
     <p class="text-base font-medium">
       {translate('deployments.empty-state-title')}
     </p>
-    <p class="max-w-[500px] text-center text-sm text-secondary">
+    <p class="text-secondary max-w-[500px] text-center text-sm">
       {translate('deployments.empty-state-description')}
     </p>
   </div>

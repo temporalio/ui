@@ -110,7 +110,7 @@
             refresh={schedulesRefresh}
           />
         </div>
-        <p class="mt-2 text-xs text-secondary">
+        <p class="text-secondary mt-2 text-xs">
           {refreshTimeFormatted}
         </p>
       </div>

@@ -27,7 +27,7 @@
 </script>
 
 {#snippet defaultTitleSnippet()}
-  <h3 class="flex items-center gap-2 text-xs text-secondary">
+  <h3 class="text-secondary flex items-center gap-2 text-xs">
     {title}
   </h3>
 {/snippet}

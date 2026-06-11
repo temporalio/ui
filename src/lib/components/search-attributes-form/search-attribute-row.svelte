@@ -90,7 +90,7 @@
 </div>
 
 {#if error}
-  <div class="col-span-2 mt-1 text-xs text-danger">
+  <div class="text-danger col-span-2 mt-1 text-xs">
     {error}
   </div>
 {/if}

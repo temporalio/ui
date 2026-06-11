@@ -552,7 +552,7 @@
         <hr
           tabindex="-1"
           aria-hidden="true"
-          class="my-4 w-full border-subtle"
+          class="border-subtle my-4 w-full"
         />
 
         <div class="flex max-h-52 flex-col gap-2 overflow-auto">

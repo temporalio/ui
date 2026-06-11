@@ -70,7 +70,7 @@
 
     <Portal anchor="portal-button" open={args.open} {...args}>
       <div
-        class="border border-subtle bg-primary p-4"
+        class="border-subtle bg-primary border p-4"
         style="max-width: 200px;"
       >
         <p class="text-sm">Portal content goes here.</p>
@@ -90,7 +90,7 @@
     <Button
       id="top-button"
       on:click={() => (args.open = !args.open)}
-      class="absolute left-1/2 top-4"
+      class="absolute top-4 left-1/2"
     >
       Top
     </Button>
@@ -101,7 +101,7 @@
       flipOnCollision={args.flipOnCollision}
       offset={args.offset}
     >
-      <div class="border border-subtle bg-primary p-4 shadow-lg">
+      <div class="border-subtle bg-primary border p-4 shadow-lg">
         <p class="text-xs">Positioned top but flipOnCollision is enabled.</p>
       </div>
     </Portal>
@@ -128,7 +128,7 @@
       flipOnCollision={args.flipOnCollision}
       offset={args.offset}
     >
-      <div class="border border-subtle bg-primary p-4 shadow-lg">
+      <div class="border-subtle bg-primary border p-4 shadow-lg">
         <p class="text-xs">Positioned bottom but flipOnCollision is enabled.</p>
       </div>
     </Portal>
@@ -144,7 +144,7 @@
     <Button
       id="left-button"
       on:click={() => (args.open = !args.open)}
-      class="absolute left-4 top-1/2"
+      class="absolute top-1/2 left-4"
     >
       Left
     </Button>
@@ -155,7 +155,7 @@
       flipOnCollision={args.flipOnCollision}
       offset={args.offset}
     >
-      <div class="border border-subtle bg-primary p-4 shadow-lg">
+      <div class="border-subtle bg-primary border p-4 shadow-lg">
         <p class="text-xs">Positioned left but flipOnCollision is enabled.</p>
       </div>
     </Portal>
@@ -171,7 +171,7 @@
     <Button
       id="right-button"
       on:click={() => (args.open = !args.open)}
-      class="absolute right-4 top-1/2"
+      class="absolute top-1/2 right-4"
     >
       Right
     </Button>
@@ -182,7 +182,7 @@
       flipOnCollision={args.flipOnCollision}
       offset={args.offset}
     >
-      <div class="border border-subtle bg-primary p-4 shadow-lg">
+      <div class="border-subtle bg-primary border p-4 shadow-lg">
         <p class="text-xs">Positioned right but flipOnCollision is enabled.</p>
       </div>
     </Portal>
@@ -192,14 +192,14 @@
 <Story name="Hide When Invisible" let:args args={{ offset: { y: 4 } }}>
   <div
     id="combined-container"
-    class="h-96 w-1/2 overflow-auto rounded border border-subtle bg-secondary p-4"
+    class="border-subtle bg-secondary h-96 w-1/2 overflow-auto rounded border p-4"
   >
     <div class="h-[800px] w-[1200px]">
-      <p class="mb-2 text-xs text-secondary">
+      <p class="text-secondary mb-2 text-xs">
         Scroll in any direction. The portal will hide when out of view and flip
         when near edges.
       </p>
-      <div class="ml-[200px] mt-[300px]">
+      <div class="mt-[300px] ml-[200px]">
         <Button id="combined-button" on:click={() => (args.open = !args.open)}>
           Toggle Portal
         </Button>
@@ -212,7 +212,7 @@
           flipOnCollision={args.flipOnCollision}
           offset={args.offset}
         >
-          <div class="max-w-60 border border-subtle bg-primary p-4 shadow-lg">
+          <div class="border-subtle bg-primary max-w-60 border p-4 shadow-lg">
             <p class="text-sm">
               ✅ Custom scroll container<br />
               ✅ Hide when invisible<br />

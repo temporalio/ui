@@ -63,7 +63,7 @@
         />
       </td>
     {:else if label === translate('schedules.id')}
-      <td class="cell whitespace-pre-line break-words">
+      <td class="cell break-words whitespace-pre-line">
         <Link href={route}>{schedule.scheduleId}</Link>
       </td>
     {:else if label === translate('common.workflow-type')}
@@ -79,7 +79,7 @@
           .join(' AND '),
       })}
       <TableCellWithFilterOrCopyButtons
-        class="cell whitespace-pre-line break-words"
+        class="cell break-words whitespace-pre-line"
         filterIconTitle={translate('common.filter-workflows')}
         copyValue={workflowTypeName ?? undefined}
         onFilter={() => {

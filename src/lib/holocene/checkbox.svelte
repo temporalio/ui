@@ -162,7 +162,7 @@
     >
       {#if checkIconName}
         <Icon
-          class="absolute left-0 top-0 h-4 w-4"
+          class="absolute top-0 left-0 h-4 w-4"
           name={checkIconName}
           strokeWidth={3}
         />
@@ -176,6 +176,6 @@
     </slot>
   </Label>
   {#if !valid && error}
-    <span class="text-xs text-danger">{error}</span>
+    <span class="text-danger text-xs">{error}</span>
   {/if}
 </div>

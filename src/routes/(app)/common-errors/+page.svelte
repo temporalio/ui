@@ -31,7 +31,7 @@
 <PageTitle title="Common Errors" url={page.url.href} />
 
 <h1>Common Errors</h1>
-<div class="border-b border-subtle">
+<div class="border-subtle border-b">
   <TabButtons>
     <TabButton
       active={activeFilter === 'all'}

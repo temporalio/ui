@@ -41,7 +41,7 @@
   id="{table}-table-configuration-drawer"
   dark={false}
   closeButtonLabel={translate('workflows.close-configure-headers', { title })}
-  class="w-[35vw] min-w-min max-w-fit"
+  class="w-[35vw] max-w-fit min-w-min"
 >
   <DrawerContent title={translate('workflows.configure-headers', { title })}>
     <svelte:fragment slot="subtitle">

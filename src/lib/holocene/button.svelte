@@ -173,7 +173,7 @@
     {/if}
     {#if count > 0}
       <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
+        class="badge absolute top-0 right-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
         type="count">{count}</Badge
       >
     {/if}
@@ -214,7 +214,7 @@
     {/if}
     {#if count > 0}
       <Badge
-        class="badge absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
+        class="badge absolute top-0 right-0 origin-bottom-left translate-x-[10px] translate-y-[-10px]"
         type="count">{count}</Badge
       >
     {/if}

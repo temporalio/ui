@@ -46,7 +46,7 @@
     @apply surface-primary table-auto;
 
     &.bordered {
-      @apply border border-subtle;
+      @apply border-subtle border;
     }
 
     &.layout-auto {
@@ -78,17 +78,17 @@
     }
 
     :global(tr > th) {
-      @apply h-9 border-b border-subtle px-2 text-left text-sm font-medium;
+      @apply border-subtle h-9 border-b px-2 text-left text-sm font-medium;
     }
   }
 
   :where(.holocene-table-body) {
     :global(tr) {
-      @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-subtle hover:bg-interactive-table-hover border-b last-of-type:border-0 hover:bg-fixed;
     }
 
     :global(tr.expanded) {
-      @apply w-full hover:bg-primary;
+      @apply hover:bg-primary w-full;
     }
 
     :global(tr:nth-of-type(odd)) {
@@ -104,7 +104,7 @@
     }
 
     :global(tr:not(.empty)) {
-      @apply h-8 border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
+      @apply border-subtle hover:bg-interactive-table-hover h-8 border-b last-of-type:border-0 hover:bg-fixed;
     }
   }
 </style>

@@ -35,7 +35,7 @@
       id="{id}-trigger"
       aria-expanded={open}
       aria-controls="{id}-content"
-      class="focus-visible:outline-interactive grow cursor-pointer hover:bg-interactive-secondary-hover"
+      class="focus-visible:outline-interactive hover:bg-interactive-secondary-hover grow cursor-pointer"
       type="button"
       on:click={toggleAccordion}
     >
@@ -52,7 +52,7 @@
   <div
     id="{id}-content"
     aria-labelledby="{id}-trigger"
-    class="block w-full bg-primary p-2"
+    class="bg-primary block w-full p-2"
     class:hidden={!open}
   >
     <slot {open} />
