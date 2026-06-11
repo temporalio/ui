@@ -19,7 +19,6 @@
     type VersionSummary,
   } from '$lib/types/deployments';
   import { parseVersionStatus } from '$lib/utilities/deployments';
-  import { getMilliseconds } from '$lib/utilities/format-time';
   import {
     getBuildIdFromVersion,
     getDeploymentFromVersion,
@@ -175,10 +174,10 @@
     const taskQueueInfos =
       versionDetails.workerDeploymentVersionInfo.taskQueueInfos;
     if (!taskQueueInfos?.length) {
-      const createdMs = getMilliseconds(
-        versionDetails.workerDeploymentVersionInfo.createTime,
-      );
-      const isNewlyCreated = Date.now() - createdMs < newVersionGracePeriodMs;
+      const createTime = versionDetails.workerDeploymentVersionInfo.createTime;
+      const isNewlyCreated =
+        Date.now() - new Date(String(createTime)).getTime() <
+        newVersionGracePeriodMs;
       validateResult = {
         message: translate(
           isNewlyCreated
