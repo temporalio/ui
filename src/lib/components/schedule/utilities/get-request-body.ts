@@ -44,16 +44,17 @@ async function encodeHeaderFields(
     return header;
   }
 
-  const encodedFields: typeof fields = {};
-  for (const [key, value] of Object.entries(fields)) {
-    const encodedValue = await encodePayloads({
-      input: stringifyWithBigInt(value),
-      encoding: 'json/plain',
-    });
-    encodedFields[key] = encodedValue[0];
-  }
+  const encodedEntries = await Promise.all(
+    Object.entries(fields).map(async ([key, value]) => {
+      const encodedValue = await encodePayloads({
+        input: stringifyWithBigInt(value),
+        encoding: 'json/plain',
+      });
+      return [key, encodedValue[0]] as const;
+    }),
+  );
 
-  return { ...header, fields: encodedFields };
+  return { ...header, fields: Object.fromEntries(encodedEntries) };
 }
 
 function getScheduleStateRequest(
@@ -89,19 +90,19 @@ async function getScheduleActionRequest(
   scheduleForm: FormScheduleSchema,
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): Promise<ScheduleActionRequest> {
-  let payloads: null | Payload[] = null;
-
-  if (scheduleForm.editInput && scheduleForm.input) {
-    payloads = await encodePayloads({
-      input: scheduleForm.input,
-      encoding: scheduleForm.encoding,
-      messageType: scheduleForm.messageType,
-    });
-  }
-
   const startWorkflow =
     describeFullSchedule?.schedule.action?.startWorkflow ?? {};
-  const header = await encodeHeaderFields(startWorkflow.header);
+
+  const [payloads, header] = await Promise.all([
+    scheduleForm.editInput && scheduleForm.input
+      ? encodePayloads({
+          input: scheduleForm.input,
+          encoding: scheduleForm.encoding,
+          messageType: scheduleForm.messageType,
+        })
+      : (null as null | Payload[]),
+    encodeHeaderFields(startWorkflow.header),
+  ]);
 
   return {
     startWorkflow: {

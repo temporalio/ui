@@ -9,6 +9,7 @@
   import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import { formatList } from '$lib/i18n/format-list';
   import { translate } from '$lib/i18n/translate';
   import {
     loading,
@@ -145,61 +146,57 @@
             bind:workflowSearchAttributes
           />
           <SchedulePoliciesCard {form} />
-
-          <div class="w-full xl:hidden">
-            <ScheduleSummarySidebar {form} />
-          </div>
-
-          <Alert
-            intent="error"
-            title={translate('schedules.fix-form-errors')}
-            hidden={!$allErrors.length}
-          >
-            <ul class="list-inside list-disc">
-              {#each $allErrors as { path, messages } (path)}
-                <li>
-                  {new Intl.ListFormat('en', {
-                    type: 'conjunction',
-                    style: 'long',
-                  }).format(messages)}
-                </li>
-              {/each}
-            </ul>
-          </Alert>
-          <div class="flex flex-row items-center gap-4 max-sm:flex-col">
-            <Button
-              disabled={$submitting || !writeActionsAreAllowed()}
-              type="submit"
-              class="max-sm:w-full"
-              data-testid="create-schedule-button">{confirmText}</Button
-            >
-            <Button
-              variant="ghost"
-              type="button"
-              href={backHref}
-              class="max-sm:w-full"
-              data-testid="cancel-schedule-button"
-              >{translate('common.cancel')}</Button
-            >
-            {#if Boolean(schedule)}
-              <Button
-                disabled={$submitting || !writeActionsAreAllowed()}
-                variant="destructive"
-                type="button"
-                data-testid="delete-schedule-button"
-                leadingIcon="trash"
-                class="ml-auto hidden sm:inline-flex"
-                on:click={() => openConfirmationModal('delete')}
-              >
-                {translate('schedules.delete')}
-              </Button>
-              <DeleteScheduleModal {scheduleId} {namespace} />
-            {/if}
-          </div>
         </div>
 
-        <div class="hidden w-full xl:block">
+        <div class="w-full xl:col-start-2 xl:row-start-1">
           <ScheduleSummarySidebar {form} />
+        </div>
+
+        <Alert
+          class="xl:col-start-1"
+          intent="error"
+          title={translate('schedules.fix-form-errors')}
+          hidden={!$allErrors.length}
+        >
+          <ul class="list-inside list-disc">
+            {#each $allErrors as { path, messages } (path)}
+              <li>
+                {formatList(messages)}
+              </li>
+            {/each}
+          </ul>
+        </Alert>
+        <div
+          class="flex flex-row items-center gap-4 max-sm:flex-col xl:col-start-1"
+        >
+          <Button
+            disabled={$submitting || !writeActionsAreAllowed()}
+            type="submit"
+            class="max-sm:w-full"
+            data-testid="create-schedule-button">{confirmText}</Button
+          >
+          <Button
+            variant="ghost"
+            type="button"
+            href={backHref}
+            class="max-sm:w-full"
+            data-testid="cancel-schedule-button"
+            >{translate('common.cancel')}</Button
+          >
+          {#if Boolean(schedule)}
+            <Button
+              disabled={$submitting || !writeActionsAreAllowed()}
+              variant="destructive"
+              type="button"
+              data-testid="delete-schedule-button"
+              leadingIcon="trash"
+              class="ml-auto hidden sm:inline-flex"
+              on:click={() => openConfirmationModal('delete')}
+            >
+              {translate('schedules.delete')}
+            </Button>
+            <DeleteScheduleModal {scheduleId} {namespace} />
+          {/if}
         </div>
       </div>
     </form>

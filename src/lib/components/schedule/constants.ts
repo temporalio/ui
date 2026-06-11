@@ -66,27 +66,18 @@ export const intervalUnits = [
 ];
 
 export const DAYS_OF_WEEK = [0, 1, 2, 3, 4, 5, 6] as const;
-export const DAYS_OF_WEEK_SET = new Set<number>(
-  DAYS_OF_WEEK as readonly number[],
-);
 
 export const DAYS_OF_MONTH = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
   23, 24, 25, 26, 27, 28, 29, 30, 31,
 ] as const;
-export const DAYS_OF_MONTH_SET = new Set<number>(
-  DAYS_OF_MONTH as readonly number[],
-);
 
 export const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
-export const MONTHS_SET = new Set<number>(MONTHS as readonly number[]);
 
 export const WEEKDAYS = [1, 2, 3, 4, 5] as const;
 export const WEEKEND = [0, 6] as const;
 
-export const SECONDS_PER_DAY = 86400;
-export const SECONDS_PER_HOUR = 3600;
-export const SECONDS_PER_MINUTE = 60;
+const SECONDS_PER_DAY = 86400;
 const SECONDS_PER_YEAR = 365 * SECONDS_PER_DAY;
 
 export const MIN_CATCHUP_SECONDS = 10;

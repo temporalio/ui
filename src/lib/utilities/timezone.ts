@@ -108,22 +108,6 @@ export const formatOffset = (offset: number) => {
   return offset >= 0 ? `+${formattedOffset}:00` : `-${formattedOffset}:00`;
 };
 
-export type TimezoneSelectOption = {
-  label: string;
-  value: string;
-};
-
-export const getTimezoneSelectOptions = (): TimezoneSelectOption[] => {
-  return Object.entries(Timezones)
-    .flatMap(([displayName, info]: [string, TimezoneInfo]) =>
-      info.zones.map((zone) => ({
-        label: `${displayName} (${zone})`,
-        value: zone,
-      })),
-    )
-    .sort((a, b) => a.label.localeCompare(b.label));
-};
-
 export const getUTCOffset = (timeFormat: string): string => {
   let offset: number | undefined = Timezones[timeFormat]?.offset;
 

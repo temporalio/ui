@@ -7,13 +7,11 @@ import { sortNumbers } from '$lib/utilities/array';
 
 import {
   DAYS_OF_MONTH,
-  DAYS_OF_WEEK,
   durationUnits,
   intervalUnits,
   MONTHS,
-  WEEKDAYS,
-  WEEKEND,
 } from '../constants';
+import { classifyDaysOfWeek } from './days-of-week';
 import { getLargestWholeUnit } from './duration';
 import { getFormSpecFromSpec } from './get-form-spec';
 import { compactToRanges, expandRanges } from './range';
@@ -216,29 +214,26 @@ function getDaysOfWeekFragment(
   calendar: FormSpecSchema['calendar'],
 ): string | null {
   const days = expandRanges(calendar.dayOfWeek);
-  const selected = new Set(days);
 
-  if (!days.length || DAYS_OF_WEEK.every((d) => selected.has(d))) {
-    return null;
+  switch (classifyDaysOfWeek(days)) {
+    case 'everyday': {
+      return null;
+    }
+
+    case 'weekdays': {
+      return translate('schedules.spec-summary-on-weekdays');
+    }
+
+    case 'weekends': {
+      return translate('schedules.spec-summary-on-weekends');
+    }
+
+    case 'custom': {
+      return translate('schedules.spec-summary-on-days-of-week', {
+        days: formatValues(days, getWeekdayLabel),
+      });
+    }
   }
-
-  if (
-    selected.size === WEEKDAYS.length &&
-    WEEKDAYS.every((d) => selected.has(d))
-  ) {
-    return translate('schedules.spec-summary-on-weekdays');
-  }
-
-  if (
-    selected.size === WEEKEND.length &&
-    WEEKEND.every((d) => selected.has(d))
-  ) {
-    return translate('schedules.spec-summary-on-weekends');
-  }
-
-  return translate('schedules.spec-summary-on-days-of-week', {
-    days: formatValues(days, getWeekdayLabel),
-  });
 }
 
 function getDaysOfMonthFragment(
