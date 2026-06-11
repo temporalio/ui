@@ -16,8 +16,8 @@
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort } from '$lib/stores/event-view';
   import {
-    currentEventHistory,
     filteredEventHistory,
+    fullEventHistory,
     pauseLiveUpdates,
   } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -59,7 +59,7 @@
   );
 
   const workflowTaskFailedError = $derived(
-    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
+    getWorkflowTaskFailedEvent($fullEventHistory, 'ascending'),
   );
 
   const isNotPending = $derived(

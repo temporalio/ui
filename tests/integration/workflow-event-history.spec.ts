@@ -43,6 +43,21 @@ test.describe('Workflow History', () => {
     );
   });
 
+  test('Workflow Execution loads event history when live updates are paused from the URL', async ({
+    page,
+  }) => {
+    await mockWorkflowApis(page);
+    await page.goto(`${workflowUrl}?refresh_off=true`);
+
+    await expect(page.getByTestId('pause')).toContainText('Auto Refresh Off');
+    await expect(
+      page
+        .getByTestId('event-summary-row')
+        .filter({ hasText: 'Workflow Execution Started' })
+        .first(),
+    ).toBeVisible();
+  });
+
   test('Workflow Execution links to specific event', async ({ page }) => {
     await mockWorkflowApis(page);
     await expect(page.getByTestId('workflow-id-heading')).toHaveText(
