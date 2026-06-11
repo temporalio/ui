@@ -298,9 +298,6 @@
   {deploymentName}
   open={showSetCurrentModal}
   error={setCurrentError}
-  hasComputeConfig={isVersionSummaryNew(version)
-    ? !!version.computeConfig
-    : true}
   onConfirm={handleSetCurrentVersion}
   onCancel={() => {
     showSetCurrentModal = false;

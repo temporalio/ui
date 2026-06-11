@@ -86,9 +86,7 @@ export const Strings = {
   'validate-connection-valid': 'Connection is valid',
   'validate-connection-invalid': 'Connection is invalid',
   'validate-connection-no-config':
-    'This version has no compute configuration. It may have been created outside the UI without the required IAM details.',
-  'set-current-no-config-warning':
-    'This version has no compute configuration and may not function correctly as the current version.',
+    'This version is missing compute configuration. It may have been created outside the UI without the required IAM details.',
   'delete-version': 'Delete Worker Deployment Version',
   'delete-version-description':
     'Deleting any running Workers will finish their current tasks. No new invocations will be made.',

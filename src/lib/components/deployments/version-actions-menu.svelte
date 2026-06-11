@@ -47,16 +47,21 @@
           {translate('deployments.edit')}
         </MenuItem>
       </CapabilityGuard>
-      {#if hasComputeConfig}
-        <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-          {translate('deployments.set-as-current')}
-        </MenuItem>
-        <CapabilityGuard capability="serverScaledDeployments">
+      <CapabilityGuard capability="serverScaledDeployments">
+        {#if hasComputeConfig}
+          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
+            {translate('deployments.set-as-current')}
+          </MenuItem>
           <MenuItem onclick={onValidate}>
             {translate('deployments.validate-connection')}
           </MenuItem>
-        </CapabilityGuard>
-      {/if}
+        {/if}
+        {#snippet fallback()}
+          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
+            {translate('deployments.set-as-current')}
+          </MenuItem>
+        {/snippet}
+      </CapabilityGuard>
       <MenuItem href={workflowHref}>
         {translate('deployments.view-workflows')}
       </MenuItem>
