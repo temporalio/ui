@@ -8,18 +8,16 @@
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { hasCapability } from '$lib/utilities/has-capability.svelte';
 
   interface Props {
     provider?: string;
-    cloudRunEnabled?: boolean;
     children?: Snippet;
   }
 
-  let {
-    provider = $bindable('lambda'),
-    cloudRunEnabled = false,
-    children,
-  }: Props = $props();
+  let { provider = $bindable('lambda'), children }: Props = $props();
+
+  const cloudRunEnabled = $derived(hasCapability('gcpCloudRunDeployments'));
 
   const providerStore = writable(provider);
 

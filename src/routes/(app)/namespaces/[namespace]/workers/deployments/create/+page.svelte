@@ -23,9 +23,5 @@
   <h1>
     {translate('workers.create-serverless-title')}
   </h1>
-  <ServerlessWorkerCreate
-    {namespace}
-    cloudRunEnabled
-    onSuccess={() => goto(deploymentsHref)}
-  />
+  <ServerlessWorkerCreate {namespace} onSuccess={() => goto(deploymentsHref)} />
 </div>

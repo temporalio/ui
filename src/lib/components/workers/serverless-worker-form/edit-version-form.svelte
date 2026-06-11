@@ -31,17 +31,9 @@
     onDelete: () => void;
     cancelHref: string;
     error?: string;
-    cloudRunEnabled?: boolean;
   }
 
-  let {
-    initialData,
-    onSubmit,
-    onDelete,
-    cancelHref,
-    error,
-    cloudRunEnabled = false,
-  }: Props = $props();
+  let { initialData, onSubmit, onDelete, cancelHref, error }: Props = $props();
 
   const superform = superForm(
     {
@@ -87,7 +79,7 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider={$form.provider} {cloudRunEnabled} />
+      <ComputeProviderPicker bind:provider={$form.provider} />
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}

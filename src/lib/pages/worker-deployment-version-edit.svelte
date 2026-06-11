@@ -24,15 +24,9 @@
     namespace: string;
     deployment: string;
     buildId: string;
-    cloudRunEnabled?: boolean;
   }
 
-  let {
-    namespace,
-    deployment,
-    buildId,
-    cloudRunEnabled = false,
-  }: Props = $props();
+  let { namespace, deployment, buildId }: Props = $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -61,7 +55,6 @@
     </h1>
     <EditVersionForm
       {error}
-      {cloudRunEnabled}
       initialData={{
         provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',

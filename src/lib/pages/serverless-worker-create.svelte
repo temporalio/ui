@@ -20,7 +20,6 @@
     onSuccess: () => void;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
-    cloudRunEnabled?: boolean;
   }
 
   interface SubmitFieldErrors {
@@ -28,13 +27,7 @@
     iamRoleArn?: string[];
   }
 
-  let {
-    namespace,
-    onSuccess,
-    cfnTemplateUrl,
-    cfnTemplate,
-    cloudRunEnabled = false,
-  }: Props = $props();
+  let { namespace, onSuccess, cfnTemplateUrl, cfnTemplate }: Props = $props();
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -204,5 +197,4 @@
   onSubmit={handleCreate}
   {cfnTemplateUrl}
   {cfnTemplate}
-  {cloudRunEnabled}
 />

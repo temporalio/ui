@@ -21,6 +21,5 @@
 <WorkerDeploymentVersionCreatePage
   {namespace}
   {deployment}
-  cloudRunEnabled
   onSuccess={() => goto(backHref)}
 />
