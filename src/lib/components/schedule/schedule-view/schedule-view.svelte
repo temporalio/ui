@@ -28,11 +28,7 @@
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  import BackfillScheduleModal from '../schedule-action-modals/backfill-schedule-modal.svelte';
-  import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
-  import PauseScheduleModal from '../schedule-action-modals/pause-schedule-modal.svelte';
-  import TriggerScheduleModal from '../schedule-action-modals/trigger-schedule-modal.svelte';
-  import { parseOverlapPolicy } from '../utilities/get-form-schedule-defaults';
+  import ScheduleActionModals from '../schedule-action-modals/schedule-action-modals.svelte';
 
   import AdvancedSettingsCard from './advanced-settings-card.svelte';
   import CustomSearchAttributesCard from './custom-search-attributes-card.svelte';
@@ -234,23 +230,4 @@
     </div>
   </div>
 </div>
-<PauseScheduleModal
-  {scheduleId}
-  {namespace}
-  isSchedulePaused={schedule?.schedule?.state?.paused}
-/>
-<TriggerScheduleModal
-  {scheduleId}
-  {namespace}
-  scheduleOverlapPolicy={parseOverlapPolicy(
-    schedule?.schedule?.policies?.overlapPolicy,
-  )}
-/>
-<BackfillScheduleModal
-  {scheduleId}
-  {namespace}
-  scheduleOverlapPolicy={parseOverlapPolicy(
-    schedule?.schedule?.policies?.overlapPolicy,
-  )}
-/>
-<DeleteScheduleModal {scheduleId} {namespace} />
+<ScheduleActionModals {schedule} {namespace} {scheduleId} />
