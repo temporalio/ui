@@ -162,6 +162,8 @@
   <DeleteDeploymentModal
     open={showDeleteModal}
     {deploymentName}
+    hasVersions={!!info.versionSummaries?.length}
+    error={deleteError}
     onConfirm={() => handleDeleteDeployment(deployment.conflictToken)}
     onCancel={() => (showDeleteModal = false)}
   />

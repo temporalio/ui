@@ -62,11 +62,14 @@ export const Strings = {
   'edit-version': 'Edit Version',
   'view-workflows': 'View Workflows',
   'create-new-version': 'Create New Version',
-  'delete-deployment': 'Delete Deployment',
+  'delete-deployment': 'Delete Worker Deployment',
   'delete-deployment-description':
-    'This action cannot be undone. The deployment and all its configuration will be permanently deleted.',
+    "Deleting this deployment will permanently remove all its versions and configuration. This action can't be undone.",
   'delete-deployment-confirm-instruction': 'Type DELETE to confirm',
   'delete-deployment-confirm-error': 'Failed to delete deployment',
+  'cannot-delete-deployment': 'Cannot Delete Worker Deployment',
+  'cannot-delete-deployment-body':
+    'All Versions must be deleted before this Deployment can be removed. Delete each Version first, then try again.',
   'role-external-id': 'External ID',
   'scale-up-cooloff': 'Scale-up Cooloff',
   'backlog-threshold': 'Backlog Threshold',
