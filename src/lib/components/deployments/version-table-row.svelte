@@ -168,6 +168,9 @@
     const computeConfig =
       versionDetails.workerDeploymentVersionInfo.computeConfig;
     if (!computeConfig) {
+      validateResult = {
+        message: translate('deployments.validate-connection-no-config'),
+      };
       validateLoading = false;
       return;
     }
@@ -287,6 +290,9 @@
     {editHref}
     {workflowHref}
     {isCurrent}
+    hasComputeConfig={isVersionSummaryNew(version)
+      ? !!version.computeConfig
+      : true}
     onSetCurrent={() => (showSetCurrentModal = true)}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}

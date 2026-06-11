@@ -89,6 +89,8 @@ export const Strings = {
     "This Worker Deployment Version's Task Queue is not registered. The serverless function may be failing after invocation. Check the function for configuration or runtime errors, then re-run it from your cloud provider's console. Alternatively, create a new Version to retry.",
   'validate-connection-no-task-queue-pending':
     "This Worker Deployment Version's Task Queue is not registered yet. The version was recently created, so the worker may still be starting up. Wait a moment, then retry.",
+  'validate-connection-no-config':
+    'This version is missing compute configuration. It may have been created outside the UI without the required IAM details.',
   'delete-version': 'Delete Worker Deployment Version',
   'delete-version-description':
     'Deleting any running Workers will finish their current tasks. No new invocations will be made.',
