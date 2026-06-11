@@ -15,7 +15,7 @@ export type GetSystemInfoResponse =
 export type Capabilities =
   temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
     serverScaledDeployments?: boolean | null;
-    gcpCloudRunDeployments?: boolean | null;
+    serverScaledProviderCloudRun?: boolean | null;
   };
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;

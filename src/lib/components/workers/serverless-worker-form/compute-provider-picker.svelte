@@ -17,7 +17,9 @@
 
   let { provider = $bindable('lambda'), children }: Props = $props();
 
-  const cloudRunEnabled = $derived(hasCapability('gcpCloudRunDeployments'));
+  const cloudRunEnabled = $derived(
+    hasCapability('serverScaledProviderCloudRun'),
+  );
 
   const providerStore = writable(provider);
 
