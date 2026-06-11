@@ -148,7 +148,7 @@
     }),
   );
 
-  const hasActivePollers = $derived(
+  const canRampToVersion = $derived(
     parseVersionStatus(drainageStatus).status !== 'Created',
   );
   const otherVersionRamping = $derived(
@@ -233,21 +233,24 @@
   async function handleSetRamping() {
     setRampingError = '';
     setRampingLoading = true;
-    await setRampingDeploymentVersion(
-      {
-        namespace,
-        deploymentName,
-        buildId: versionBuildId,
-        rampingVersionPercentage: rampingPercentage,
-        conflictToken,
-      },
-      (err) => {
-        setRampingError =
-          (err as { body?: { message?: string } })?.body?.message ??
-          translate('deployments.set-ramping-error');
-      },
-    );
-    setRampingLoading = false;
+    try {
+      await setRampingDeploymentVersion(
+        {
+          namespace,
+          deploymentName,
+          buildId: versionBuildId,
+          rampingVersionPercentage: rampingPercentage,
+          conflictToken,
+        },
+        (err) => {
+          setRampingError =
+            (err as { body?: { message?: string } })?.body?.message ??
+            translate('deployments.set-ramping-error');
+        },
+      );
+    } finally {
+      setRampingLoading = false;
+    }
     if (setRampingError) return;
     showSetRampingModal = false;
     toaster.push({
@@ -263,15 +266,18 @@
   async function handleRemoveRamping() {
     setRampingError = '';
     setRampingLoading = true;
-    await removeRampingDeploymentVersion(
-      { namespace, deploymentName, conflictToken },
-      (err) => {
-        setRampingError =
-          (err as { body?: { message?: string } })?.body?.message ??
-          translate('deployments.remove-ramping-error');
-      },
-    );
-    setRampingLoading = false;
+    try {
+      await removeRampingDeploymentVersion(
+        { namespace, deploymentName, conflictToken },
+        (err) => {
+          setRampingError =
+            (err as { body?: { message?: string } })?.body?.message ??
+            translate('deployments.remove-ramping-error');
+        },
+      );
+    } finally {
+      setRampingLoading = false;
+    }
     if (setRampingError) return;
     showSetRampingModal = false;
     toaster.push({
@@ -390,7 +396,7 @@
   open={showSetRampingModal}
   error={setRampingError}
   loading={setRampingLoading}
-  {hasActivePollers}
+  hasActivePollers={canRampToVersion}
   {isRamping}
   existingRampingVersion={otherVersionRamping}
   existingRampingPercentage={routingConfig.rampingVersionPercentage}
