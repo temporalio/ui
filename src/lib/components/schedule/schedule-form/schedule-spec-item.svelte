@@ -73,12 +73,7 @@
 </script>
 
 {#if expanded}
-  <div
-    bind:this={containerEl}
-    tabindex="-1"
-    class="flex flex-col gap-4"
-    aria-expanded="true"
-  >
+  <div bind:this={containerEl} tabindex="-1" class="flex flex-col gap-4">
     <div
       class="flex items-start justify-between gap-4 border border-transparent"
     >
@@ -135,7 +130,6 @@
   <div
     bind:this={containerEl}
     class="surface-background relative flex min-h-16 w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
-    aria-expanded="false"
   >
     <div
       class="grid w-full grid-cols-1 items-center gap-2 text-sm md:grid-cols-[minmax(8rem,max-content)_4fr_minmax(max-content,1fr)] md:gap-4"
