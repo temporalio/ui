@@ -6,6 +6,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import type { FormScheduleSchema } from '../schema/form';
+  import { calendarDateStrToEndOfDayTimestamp } from '../utilities/date';
   import { getScheduleSpecSummary } from '../utilities/summarize';
 
   interface Props {
@@ -22,7 +23,12 @@
 
       case 'on': {
         if ($form.endTime) {
-          return $timestamp($form.endTime);
+          return $timestamp(
+            calendarDateStrToEndOfDayTimestamp(
+              $form.endTime,
+              $form.timezoneName || 'UTC',
+            ),
+          );
         }
         break;
       }

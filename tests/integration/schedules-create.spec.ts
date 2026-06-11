@@ -135,6 +135,27 @@ test.describe('Creates Schedule Successfully', () => {
     await expect(page.getByTestId('loading')).toBeHidden();
   });
 
+  test('re-anchors the end time when the timezone changes', async ({
+    page,
+  }) => {
+    await fillBaseFields(page);
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Interval' }).click();
+    await page.getByLabel('Time Interval').fill('90');
+
+    await page.locator('#end-date-on').check();
+
+    await page.locator('#timezoneName').fill('Japan');
+    await page.getByRole('option', { name: /Japan/ }).first().click();
+
+    const createRequest = page.waitForRequest(isCreateRequest);
+    await page.getByTestId('create-schedule-button').click();
+    const body = (await createRequest).postDataJSON();
+
+    expect(body.schedule.spec.timezoneName).toContain('Tokyo');
+    expect(body.schedule.spec.endTime).toMatch(/T14:59:59\.000Z$/);
+  });
+
   test('removing the only spec resets it to a fresh cron spec', async ({
     page,
   }) => {
