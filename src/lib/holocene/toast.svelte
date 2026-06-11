@@ -36,7 +36,8 @@
 
   $: icon = variantIcon[variant];
 
-  const handleDismiss = () => {
+  const handleDismiss = (e: Event) => {
+    e.stopPropagation();
     dispatch('dismiss', { id });
   };
 </script>
@@ -59,6 +60,6 @@
     variant="ghost"
     icon="close"
     label={dismissLabel}
-    on:click|stopPropagation={handleDismiss}
+    on:click={handleDismiss}
   />
 </div>
