@@ -309,10 +309,14 @@ export const buildGcpCloudRunComputeConfig = (
   };
 };
 
+const providerTypeOf = (scalingGroup?: ComputeConfigScalingGroup) =>
+  scalingGroup?.providerType ?? scalingGroup?.provider?.type;
+
 export const decodeLambdaProviderDetails = (
   computeConfig?: ComputeConfig,
 ): { lambdaArn?: string; iamRoleArn?: string; roleExternalId?: string } => {
   const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'aws-lambda') return {};
   if (!scalingGroup?.provider?.details?.data) return {};
   try {
     const raw = JSON.parse(atob(scalingGroup.provider.details.data));
@@ -339,6 +343,7 @@ export const decodeGcpCloudRunProviderDetails = (
   gcpServiceAccount?: string;
 } => {
   const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'gcp-cloud-run') return {};
   if (!scalingGroup?.provider?.details?.data) return {};
   try {
     const raw = JSON.parse(atob(scalingGroup.provider.details.data));

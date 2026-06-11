@@ -39,7 +39,7 @@
   const superform = superForm(
     {
       name: '',
-      buildId: Math.random().toString(16).slice(2, 8),
+      buildId: crypto.randomUUID() as string,
       provider: 'lambda' as 'lambda' | 'cloud-run',
       lambdaArn: '',
       iamRoleArn: '',
