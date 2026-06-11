@@ -34,6 +34,6 @@
   }
 
   .content {
-    @apply px-6 pb-6 whitespace-normal;
+    @apply whitespace-normal px-6 pb-6;
   }
 </style>

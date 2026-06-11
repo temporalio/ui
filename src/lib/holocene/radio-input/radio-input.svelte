@@ -65,11 +65,11 @@
 
 <style lang="postcss">
   .description {
-    @apply text-primary ml-7 text-sm font-normal;
+    @apply ml-7 text-sm font-normal text-primary;
   }
 
   input[type='radio'] {
-    @apply border-secondary box-border h-5 w-5 cursor-pointer appearance-none rounded-full border outline-none;
+    @apply box-border h-5 w-5 cursor-pointer appearance-none rounded-full border border-secondary outline-none;
 
     &:checked {
       @apply bg-interactive;
@@ -78,7 +78,7 @@
     &:enabled {
       &:focus-visible,
       &:hover {
-        @apply bg-interactive-active ring-primary/70 ring-2;
+        @apply bg-interactive-active ring-2 ring-primary/70;
 
         &:checked {
           &:not(:active) {

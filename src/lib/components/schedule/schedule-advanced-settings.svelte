@@ -86,7 +86,7 @@
       @apply flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0;
 
       span {
-        @apply surface-subtle rounded-sm p-1 leading-4 select-all;
+        @apply surface-subtle select-all rounded-sm p-1 leading-4;
       }
     }
   }

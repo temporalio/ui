@@ -7,7 +7,7 @@
 <div data-testid="loading" class="flex justify-center">
   <div
     class={twMerge(
-      'w-[45dvw] max-w-[500px] min-w-fit scale-[.30] antialiased',
+      'w-[45dvw] min-w-fit max-w-[500px] scale-[.30] antialiased',
       className,
     )}
   >

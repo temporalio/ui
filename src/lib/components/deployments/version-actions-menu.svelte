@@ -28,7 +28,7 @@
   }: Props = $props();
 </script>
 
-<td class="w-24 break-words whitespace-pre-line">
+<td class="w-24 whitespace-pre-line break-words">
   <MenuContainer>
     <MenuButton
       label="Actions"

@@ -89,7 +89,7 @@
       />
     </p>
     <div
-      class="surface-subtle border-subtle mb-2 overflow-scroll border p-2 whitespace-nowrap"
+      class="surface-subtle mb-2 overflow-scroll whitespace-nowrap border border-subtle p-2"
     >
       <code data-testid="batch-action-workflows-query">
         {$workflowsQuery}

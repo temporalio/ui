@@ -174,7 +174,7 @@
   {/if}
 
   {#if error && !valid}
-    <span class="text-danger text-xs">{error}</span>
+    <span class="text-xs text-danger">{error}</span>
   {/if}
 </MenuContainer>
 

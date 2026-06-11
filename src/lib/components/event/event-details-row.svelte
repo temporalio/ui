@@ -40,7 +40,7 @@
     class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
   >
     {#if showKey}
-      <p class="text-right text-xs whitespace-nowrap">
+      <p class="whitespace-nowrap text-right text-xs">
         {format(key)}
       </p>
     {/if}
@@ -65,7 +65,7 @@
         />
       </Copyable>
     {:else}
-      <Badge type="subtle" class="block truncate select-none">
+      <Badge type="subtle" class="block select-none truncate">
         {formatSummaryAttributeDisplayValue(value)}
       </Badge>
     {/if}

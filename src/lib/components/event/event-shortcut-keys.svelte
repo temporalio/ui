@@ -26,7 +26,7 @@
   {open}
   onClick={onClose}
   closeButtonLabel={translate('common.close-keyboard-shortcuts')}
-  class="max-w-fit min-w-min"
+  class="min-w-min max-w-fit"
 >
   <DrawerContent title={translate('common.keyboard-shortcuts')}>
     <div

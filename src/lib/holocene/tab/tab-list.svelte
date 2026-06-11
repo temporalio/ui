@@ -20,7 +20,7 @@
 
 <div
   class={merge(
-    'border-subtle flex flex-wrap gap-x-4 gap-y-1 border-b',
+    'flex flex-wrap gap-x-4 gap-y-1 border-b border-subtle',
     className,
   )}
   role="tablist"

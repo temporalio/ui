@@ -71,6 +71,6 @@
   }
 
   .batch-actions-table-cell {
-    @apply overflow-visible font-medium whitespace-nowrap;
+    @apply overflow-visible whitespace-nowrap font-medium;
   }
 </style>

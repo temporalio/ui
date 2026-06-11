@@ -78,7 +78,7 @@
 </script>
 
 <div
-  class="surface-primary border-subtle flex flex-1 cursor-default flex-col gap-2 border-b p-4"
+  class="surface-primary flex flex-1 cursor-default flex-col gap-2 border-b border-subtle p-4"
 >
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center gap-2 text-base">
@@ -125,7 +125,7 @@
   {@const href = getEventLinkHref(link)}
   {@const value = href.split('workflows/')?.[1] || href}
   <div class="flex items-start gap-4">
-    <p class="text-secondary/80 min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-secondary/80">
       {translate('nexus.link')}
     </p>
     <Copyable
@@ -141,7 +141,7 @@
 {#snippet eventNamespaceLink(link: ELink)}
   {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
   <div class="flex items-start gap-4">
-    <p class="text-secondary/80 min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-secondary/80">
       {translate('nexus.link-namespace')}
     </p>
     <Copyable
@@ -165,7 +165,7 @@
 
 {#snippet eventSummary(value: RawPayload)}
   <div class="flex items-start gap-4">
-    <p class="text-secondary/80 min-w-56 text-sm">Summary</p>
+    <p class="min-w-56 text-sm text-secondary/80">Summary</p>
     <PayloadSummary
       class="whitespace-pre-line"
       {value}
@@ -178,7 +178,7 @@
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
-    <p class="text-secondary/80 mb-1 min-w-56 text-sm">
+    <p class="mb-1 min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
     {#if value?.payloads}
@@ -207,7 +207,7 @@
   </div>
   {#if stackTrace}
     <div>
-      <p class="text-secondary/80 mb-1 min-w-56 text-sm">
+      <p class="mb-1 min-w-56 text-sm text-secondary/80">
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock
@@ -223,7 +223,7 @@
 
 {#snippet link(key, value)}
   <div class="flex items-start gap-4">
-    <p class="text-secondary/80 min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
     <Copyable
@@ -243,10 +243,10 @@
 
 {#snippet details(key, value)}
   <div class="flex items-start gap-4">
-    <p class="text-secondary/80 min-w-56 text-sm">
+    <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
     </p>
-    <p class="break-all whitespace-pre-line">
+    <p class="whitespace-pre-line break-all">
       {#if shouldDisplayAsTime(key)}
         <Timestamp dateTime={value} />
       {:else}

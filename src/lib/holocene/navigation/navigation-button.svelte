@@ -26,14 +26,14 @@
   data-track-intent="action"
   data-track-text={label}
   class={merge(
-    'hover:bg-opacity-25 group-[.surface-black]:hover:bg-opacity-25 relative mb-2 flex items-center pl-1 text-sm whitespace-nowrap hover:bg-black group-[.surface-black]:hover:bg-white',
+    'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
     disabled && 'pointer-events-none cursor-not-allowed opacity-50',
     className,
   )}
 >
   {#if icon}
     <div
-      class="flex h-6 w-6 items-center after:absolute after:top-0 after:left-[calc(100%_+_1.5rem)] after:hidden after:h-8 after:items-center after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=closed]:hover:after:flex"
+      class="flex h-6 w-6 items-center after:absolute after:left-[calc(100%_+_1.5rem)] after:top-0 after:hidden after:h-8 after:items-center after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=closed]:hover:after:flex"
       data-tooltip={tooltip}
       aria-hidden="true"
     >

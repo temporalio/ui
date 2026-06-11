@@ -56,25 +56,25 @@
       </p>
     {/if}
     <div
-      class="border-danger mt-2 flex w-full flex-col gap-0 overflow-hidden border"
+      class="mt-2 flex w-full flex-col gap-0 overflow-hidden border border-danger"
     >
-      <div class="bg-danger flex items-center justify-between gap-2 px-2 py-2">
+      <div class="flex items-center justify-between gap-2 bg-danger px-2 py-2">
         <div class="flex items-center gap-2">
           {error.id}
           <Icon
             name={CategoryIcon[error.category].name}
             title={CategoryIcon[error.category].title}
           />
-          <span class="text-danger font-semibold"
+          <span class="font-semibold text-danger"
             >{spaceBetweenCapitalLetters(error?.name)}</span
           >
         </div>
         <Timestamp dateTime={error?.eventTime} />
       </div>
-      <div class="bg-primary flex flex-col gap-2 p-4">
+      <div class="flex flex-col gap-2 bg-primary p-4">
         {#if timeoutType}
           <p>
-            <span class="text-secondary mr-2">Timeout Type</span>
+            <span class="mr-2 text-secondary">Timeout Type</span>
             {timeoutType}
           </p>
         {/if}

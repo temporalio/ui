@@ -12,7 +12,7 @@
 
 {#if show && count > 0}
   <Badge
-    class="absolute top-0 right-0 origin-bottom-left translate-x-[10px] translate-y-[-10px] {className}"
+    class="absolute right-0 top-0 origin-bottom-left translate-x-[10px] translate-y-[-10px] {className}"
     type="count"
   >
     {count}

@@ -9,7 +9,7 @@
 </script>
 
 <div
-  class="text-primary my-12 flex w-full flex-col items-center justify-start gap-2 {$$props.class}"
+  class="my-12 flex w-full flex-col items-center justify-start gap-2 text-primary {$$props.class}"
   data-testid={$$props.testId}
 >
   <span class="flex h-16 w-16 items-center justify-center rounded-full">
@@ -20,7 +20,7 @@
     <p class="text-center">{content}</p>
   {/if}
   {#if error}
-    <p class="border-danger bg-danger border p-5 text-center">
+    <p class="border border-danger bg-danger p-5 text-center">
       {error}
     </p>
   {/if}

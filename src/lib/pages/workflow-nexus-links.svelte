@@ -67,14 +67,14 @@
       {#each inboundLinkEvents as event}
         {@const link = getInboundLinkForEvent(event)}
         <TableRow data-testid="worker-row">
-          <td class="text-left break-all" data-testid="caller-event">
+          <td class="break-all text-left" data-testid="caller-event">
             {#if link?.workflowEvent}
               <Link href={getEventLinkHref(link)}>
                 {link.workflowEvent?.eventRef?.eventId}
               </Link>
             {/if}
           </td>
-          <td class="text-left break-all" data-testid="link-event">
+          <td class="break-all text-left" data-testid="link-event">
             {#if link?.workflowEvent}
               <Link
                 href={routeForWorkflow({
@@ -85,7 +85,7 @@
               >
             {/if}
           </td>
-          <td class="text-left break-all" data-testid="link-namespace">
+          <td class="break-all text-left" data-testid="link-namespace">
             {#if link?.workflowEvent}
               <Link
                 href={routeForNamespace({
@@ -94,7 +94,7 @@
               >
             {/if}
           </td>
-          <td class="text-left break-all" data-testid="handler-event">
+          <td class="break-all text-left" data-testid="handler-event">
             <Link
               href={routeForEventHistoryEvent({
                 namespace: namespace,
@@ -131,7 +131,7 @@
           isNexusOperationScheduledEvent(e),
         )}
         <TableRow data-testid="worker-row">
-          <td class="text-left break-all" data-testid="link-event">
+          <td class="break-all text-left" data-testid="link-event">
             <Link
               href={routeForEventHistoryEvent({
                 namespace,
@@ -141,16 +141,16 @@
               })}>{scheduledEvent.id}</Link
             >
           </td>
-          <td class="text-left break-all" data-testid="link-endpoint">
+          <td class="break-all text-left" data-testid="link-endpoint">
             {scheduledEvent?.nexusOperationScheduledEventAttributes?.endpoint}
           </td>
-          <td class="text-left break-all" data-testid="link-service">
+          <td class="break-all text-left" data-testid="link-service">
             {scheduledEvent?.nexusOperationScheduledEventAttributes?.service}
           </td>
-          <td class="text-left break-all" data-testid="link-operation">
+          <td class="break-all text-left" data-testid="link-operation">
             {scheduledEvent?.nexusOperationScheduledEventAttributes?.operation}
           </td>
-          <td class="text-left break-all" data-testid="link-namespace">
+          <td class="break-all text-left" data-testid="link-namespace">
             {#if link?.workflowEvent}
               <Link
                 href={routeForNamespace({
@@ -159,7 +159,7 @@
               >
             {/if}
           </td>
-          <td class="text-left break-all" data-testid="link-href">
+          <td class="break-all text-left" data-testid="link-href">
             {#if link?.workflowEvent}
               <Link
                 href={routeForWorkflow({
@@ -170,7 +170,7 @@
               >
             {/if}
           </td>
-          <td class="text-left break-all" data-testid="link-href">
+          <td class="break-all text-left" data-testid="link-href">
             {#if link?.workflowEvent}
               <Link href={getEventLinkHref(link)}
                 >{fromScreamingEnum(

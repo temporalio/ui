@@ -82,10 +82,10 @@
     data-track-text={label}
     class={merge(
       'group relative flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors',
-      'focus-visible:ring-primary/70 focus-visible:ring-2 focus-visible:outline-none',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
       isActive && 'text-primary',
       !isActive && 'text-secondary hover:text-primary',
-      disabled && 'hover:text-secondary cursor-not-allowed opacity-50',
+      disabled && 'cursor-not-allowed opacity-50 hover:text-secondary',
       className,
     )}
     onclick={handleClick}
@@ -100,7 +100,7 @@
     <div class="flex flex-1 flex-col">
       <span>{label}</span>
       {#if description}
-        <span class="text-secondary text-xs">{description}</span>
+        <span class="text-xs text-secondary">{description}</span>
       {/if}
     </div>
 

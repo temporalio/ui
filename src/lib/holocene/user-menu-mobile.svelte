@@ -11,7 +11,7 @@
 </script>
 
 {#if $authUser.accessToken}
-  <div class="border-subtle border-b"></div>
+  <div class="border-b border-subtle"></div>
   <NavigationButton
     tooltip={$authUser.email}
     label={$authUser.email}

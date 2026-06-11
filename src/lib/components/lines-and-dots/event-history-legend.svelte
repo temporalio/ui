@@ -113,7 +113,7 @@
 >
   <div
     slot="content"
-    class="flex gap-6 p-2 text-xs whitespace-normal max-sm:flex-col"
+    class="flex gap-6 whitespace-normal p-2 text-xs max-sm:flex-col"
   >
     {#if !eventTypesOnly}
       <dl>

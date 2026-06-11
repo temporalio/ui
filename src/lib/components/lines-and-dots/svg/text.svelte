@@ -70,7 +70,7 @@
 {#key textX}
   <text
     bind:this={textElement}
-    class="cursor-pointer outline-none select-none {category} text-primary"
+    class="cursor-pointer select-none outline-none {category} text-primary"
     class:label
     class:backdrop
     x={textX}

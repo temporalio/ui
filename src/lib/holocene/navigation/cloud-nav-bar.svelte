@@ -35,7 +35,7 @@
   <div
     class="flex flex-row items-center justify-start group-data-[nav=open]:min-h-7"
   >
-    <a href={resolve('', {})} class="flex items-center text-inherit">
+    <a href={resolve('', {})} class="text-inherit flex items-center">
       <Logo
         height={24}
         width={24}
@@ -52,7 +52,7 @@
           />
           <h2
             class={merge(
-              'mb-0 hidden px-1 pr-2 font-sans font-medium whitespace-nowrap text-indigo-100 not-italic underline group-data-[nav=open]:block',
+              'mb-0 hidden whitespace-nowrap px-1 pr-2 font-sans font-medium not-italic text-indigo-100 underline group-data-[nav=open]:block',
               subtitle === 'Cloud' ? 'text-2xl' : 'text-xs underline-offset-2',
             )}
           >
@@ -62,7 +62,7 @@
       {:else}
         <h2
           class={merge(
-            'mb-0 hidden pl-2 font-sans font-medium whitespace-nowrap text-indigo-100 not-italic group-data-[nav=open]:block',
+            'mb-0 hidden whitespace-nowrap pl-2 font-sans font-medium not-italic text-indigo-100 group-data-[nav=open]:block',
             subtitle === 'Cloud' ? 'text-2xl' : 'text-xs',
           )}
         >
@@ -73,7 +73,7 @@
   </div>
   <button
     title={navOpen ? 'Collapse Navigation' : 'Expand Navigation'}
-    class="focus-visible:ring-success mx-[8px] justify-self-end transition-[opacity,transform] focus-visible:ring-2 focus-visible:outline-none"
+    class="mx-[8px] justify-self-end transition-[opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
     onclick={ontoggle}
   >
     <Icon name="collapse" class="text-indigo-100" />

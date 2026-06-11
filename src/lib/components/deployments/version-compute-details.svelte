@@ -25,7 +25,7 @@
   <div class="surface-secondary flex flex-col gap-2 py-3 pl-6 text-xs">
     {#if lambdaDetails.lambdaArn}
       <div class="flex items-center gap-1">
-        <span class="text-secondary font-medium"
+        <span class="font-medium text-secondary"
           >{translate('workers.lambda-arn-label')}</span
         >
         <Copyable
@@ -39,7 +39,7 @@
     {/if}
     {#if lambdaDetails.iamRoleArn}
       <div class="flex items-center gap-1">
-        <span class="text-secondary font-medium"
+        <span class="font-medium text-secondary"
           >{translate('workers.iam-role-label')}</span
         >
         <Copyable
@@ -53,7 +53,7 @@
     {/if}
     {#if lambdaDetails.roleExternalId}
       <div class="flex gap-1">
-        <span class="text-secondary font-medium"
+        <span class="font-medium text-secondary"
           >{translate('deployments.role-external-id')}</span
         >
         <code class="text-primary">{lambdaDetails.roleExternalId}</code>
@@ -63,7 +63,7 @@
       <div class="flex gap-3">
         {#if scalerParams.scaleUpCooloffMs !== undefined}
           <div class="flex gap-1">
-            <span class="text-secondary font-medium"
+            <span class="font-medium text-secondary"
               >{translate('deployments.scale-up-cooloff')}</span
             >
             <span class="text-primary">{scalerParams.scaleUpCooloffMs}ms</span>
@@ -71,7 +71,7 @@
         {/if}
         {#if scalerParams.scaleUpBacklogThreshold !== undefined}
           <div class="flex gap-1">
-            <span class="text-secondary font-medium"
+            <span class="font-medium text-secondary"
               >{translate('deployments.backlog-threshold')}</span
             >
             <span class="text-primary"
@@ -81,7 +81,7 @@
         {/if}
         {#if scalerParams.maxWorkerLifetimeMs !== undefined}
           <div class="flex gap-1">
-            <span class="text-secondary font-medium"
+            <span class="font-medium text-secondary"
               >{translate('deployments.max-worker-lifetime')}</span
             >
             <span class="text-primary"
@@ -91,7 +91,7 @@
         {/if}
         {#if scalerParams.metricsPollIntervalMs !== undefined}
           <div class="flex gap-1">
-            <span class="text-secondary font-medium"
+            <span class="font-medium text-secondary"
               >{translate('deployments.metrics-poll-interval')}</span
             >
             <span class="text-primary"

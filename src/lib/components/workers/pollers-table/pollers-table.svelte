@@ -127,10 +127,10 @@
       {@const status = getPollerStatus(poller)}
       {@const label = getPollerLabel(poller)}
       <TableRow data-testid="poller-row">
-        <td class="break-all select-all" data-testid="poller-identity">
+        <td class="select-all break-all" data-testid="poller-identity">
           {poller.identity}
         </td>
-        <td class="break-all select-all" data-testid="poller-build-id">
+        <td class="select-all break-all" data-testid="poller-build-id">
           <div class="flex items-center gap-2">
             {buildId}
             {#if status}
@@ -138,7 +138,7 @@
             {/if}
           </div>
         </td>
-        <td class="break-all select-all" data-testid="poller-deployment">
+        <td class="select-all break-all" data-testid="poller-deployment">
           {#if deployment}
             <Link
               href={routeForWorkerDeployment({

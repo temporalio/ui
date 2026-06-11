@@ -39,7 +39,7 @@
 
 <div
   class={merge(
-    'surface-primary border-subtle min-h-[154px] grow overflow-auto border',
+    'surface-primary min-h-[154px] grow overflow-auto border border-subtle',
     className,
   )}
   id="{$$restProps['id']}-container"
@@ -62,7 +62,7 @@
     </Table>
     {#if visibleItems.length}
       <div
-        class="surface-primary border-subtle sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t px-4 py-2"
+        class="surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2"
       >
         <slot name="actions-start" />
         <slot name="actions-center" />

@@ -17,7 +17,7 @@
 </script>
 
 <Template let:args>
-  <div class="border-subtle min-h-[400px] w-64 border-r p-4">
+  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
     <VerticalNav
       aria-label="Settings navigation"
       activeItemId={args.activeItemId}
@@ -65,7 +65,7 @@
 <Story name="With Active Item" args={{ activeItemId: 'security' }} />
 
 <Story name="With Disabled Items">
-  <div class="border-subtle min-h-[400px] w-64 border-r p-4">
+  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
     <VerticalNav aria-label="Settings navigation" activeItemId="overview">
       <VerticalNavItem
         id="overview"
@@ -101,7 +101,7 @@
 </Story>
 
 <Story name="Interactive">
-  <div class="border-subtle min-h-[400px] w-64 border-r p-4">
+  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
     <VerticalNav aria-label="Settings navigation" {activeItemId}>
       <VerticalNavItem
         id="overview"
@@ -166,7 +166,7 @@
 </Story>
 
 <Story name="With Trailing Icons">
-  <div class="border-subtle min-h-[400px] w-64 border-r p-4">
+  <div class="min-h-[400px] w-64 border-r border-subtle p-4">
     <VerticalNav aria-label="Settings navigation" activeItemId="overview">
       <VerticalNavItem
         id="overview"
@@ -198,7 +198,7 @@
 <Story name="With Content Panels">
   <div class="flex min-h-[500px]">
     <!-- Navigation -->
-    <div class="border-subtle w-64 border-r p-4">
+    <div class="w-64 border-r border-subtle p-4">
       <VerticalNav aria-label="Settings navigation" {activeItemId}>
         <VerticalNavItem
           id="overview"
@@ -266,13 +266,13 @@
             Get a high-level view of your namespace configuration and usage.
           </p>
           <div class="grid gap-4 md:grid-cols-2">
-            <div class="border-subtle rounded-lg border p-4">
+            <div class="rounded-lg border border-subtle p-4">
               <h3 class="mb-2 font-medium">Region</h3>
-              <p class="text-secondary text-sm">us-west-2</p>
+              <p class="text-sm text-secondary">us-west-2</p>
             </div>
-            <div class="border-subtle rounded-lg border p-4">
+            <div class="rounded-lg border border-subtle p-4">
               <h3 class="mb-2 font-medium">Created</h3>
-              <p class="text-secondary text-sm">2 months ago</p>
+              <p class="text-sm text-secondary">2 months ago</p>
             </div>
           </div>
         </div>
@@ -282,12 +282,12 @@
           <p class="text-secondary">
             Configure deletion protection and other security features.
           </p>
-          <div class="border-subtle rounded-lg border p-4">
+          <div class="rounded-lg border border-subtle p-4">
             <label class="flex items-center gap-3">
               <input type="checkbox" class="rounded" checked />
               <div>
                 <div class="font-medium">Enable deletion protection</div>
-                <div class="text-secondary text-sm">
+                <div class="text-sm text-secondary">
                   Prevent accidental namespace deletion
                 </div>
               </div>
@@ -309,7 +309,7 @@
                 team: platform
               </span>
             </div>
-            <button class="text-primary text-sm hover:underline">
+            <button class="text-sm text-primary hover:underline">
               + Add tag
             </button>
           </div>
@@ -320,10 +320,10 @@
           <p class="text-secondary">
             Configure private links and network connectivity options.
           </p>
-          <div class="border-subtle rounded-lg border p-4">
+          <div class="rounded-lg border border-subtle p-4">
             <h3 class="mb-2 font-medium">Private Links</h3>
-            <p class="text-secondary text-sm">No private links configured</p>
-            <button class="text-primary mt-2 text-sm hover:underline">
+            <p class="text-sm text-secondary">No private links configured</p>
+            <button class="mt-2 text-sm text-primary hover:underline">
               Configure private link
             </button>
           </div>
@@ -335,19 +335,19 @@
             Define custom search attributes for advanced workflow filtering.
           </p>
           <div class="space-y-2">
-            <div class="border-subtle rounded-lg border p-3">
+            <div class="rounded-lg border border-subtle p-3">
               <div class="flex items-center justify-between">
                 <span class="font-mono text-sm">CustomerId</span>
-                <span class="text-secondary text-sm">Keyword</span>
+                <span class="text-sm text-secondary">Keyword</span>
               </div>
             </div>
-            <div class="border-subtle rounded-lg border p-3">
+            <div class="rounded-lg border border-subtle p-3">
               <div class="flex items-center justify-between">
                 <span class="font-mono text-sm">OrderAmount</span>
-                <span class="text-secondary text-sm">Double</span>
+                <span class="text-sm text-secondary">Double</span>
               </div>
             </div>
-            <button class="text-primary text-sm hover:underline">
+            <button class="text-sm text-primary hover:underline">
               + Add attribute
             </button>
           </div>

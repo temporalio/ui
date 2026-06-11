@@ -17,7 +17,7 @@
 </script>
 
 <PageTitle title="Login" url={page.url.href} />
-<header class="bg-primary flex h-16 w-full items-center justify-between px-10">
+<header class="flex h-16 w-full items-center justify-between bg-primary px-10">
   <img src={Logo} alt="" class="max-h-10" />
   <FeedbackButton />
 </header>

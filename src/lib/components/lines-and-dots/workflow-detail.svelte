@@ -42,7 +42,7 @@
         </Link>
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
-          <span class="w-fit truncate rounded-sm font-mono leading-4 select-all"
+          <span class="w-fit select-all truncate rounded-sm font-mono leading-4"
             >{content}</span
           >
         </Tooltip>
@@ -57,7 +57,7 @@
       {#if badge}
         <Badge
           type={badge}
-          class="w-fit gap-1 truncate rounded-sm px-1 font-mono leading-4 select-all"
+          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
         >
           {#if icon}
             <Icon name={icon} class="shrink-0" />
@@ -66,7 +66,7 @@
         </Badge>
       {:else}
         <span
-          class="w-fit gap-1 truncate rounded-sm px-1 font-mono leading-4 select-all"
+          class="w-fit select-all gap-1 truncate rounded-sm px-1 font-mono leading-4"
         >
           {#if icon}
             <Icon name={icon} class="shrink-0" />

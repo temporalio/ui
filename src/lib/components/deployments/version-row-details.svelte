@@ -23,8 +23,8 @@
   <div class="surface-secondary flex flex-col gap-2 py-3 pl-6 text-xs">
     {#each [1, 2, 3] as _ (_)}
       <div class="flex items-center gap-2">
-        <div class="bg-subtle h-3 w-20 animate-pulse rounded"></div>
-        <div class="bg-subtle h-3 w-64 animate-pulse rounded"></div>
+        <div class="h-3 w-20 animate-pulse rounded bg-subtle"></div>
+        <div class="h-3 w-64 animate-pulse rounded bg-subtle"></div>
       </div>
     {/each}
   </div>

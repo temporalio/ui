@@ -16,7 +16,7 @@
 
 <style lang="postcss">
   .panel {
-    @apply dark:border-subtle border p-8;
+    @apply border p-8 dark:border-subtle;
 
     &.error {
       @apply border-danger bg-danger;

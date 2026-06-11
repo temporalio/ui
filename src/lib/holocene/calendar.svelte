@@ -83,12 +83,12 @@
   }
 
   .disabled {
-    @apply bg-interactive/50 text-primary cursor-not-allowed;
+    @apply cursor-not-allowed bg-interactive/50 text-primary;
   }
 
   .highlight {
     &:not(.disabled) {
-      @apply hover:bg-interactive-hover hover:text-off-white hover:scale-125 hover:cursor-pointer;
+      @apply hover:scale-125 hover:cursor-pointer hover:bg-interactive-hover hover:text-off-white;
 
       transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
     }

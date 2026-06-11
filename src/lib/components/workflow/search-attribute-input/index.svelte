@@ -64,7 +64,7 @@
 </script>
 
 <div
-  class="border-subtle flex flex-col gap-2 border-b pb-4 sm:flex-row sm:gap-4"
+  class="flex flex-col gap-2 border-b border-subtle pb-4 sm:flex-row sm:gap-4"
 >
   <div class="flex min-w-fit justify-between gap-2 sm:gap-4">
     <div class="grow [&_button]:w-full">

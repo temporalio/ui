@@ -107,7 +107,7 @@
     <div
       class={merge(
         'input-container',
-        'surface-primary border-subtle focus-within:ring-primary/70 relative box-border inline-flex h-10 w-full items-center border text-sm focus-within:ring-2 focus-within:outline-none',
+        'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
         inputContainerClass,
       )}
       class:disabled={isDisabled}
@@ -234,15 +234,15 @@
   }
 
   .input {
-    @apply focus:text-brand m-2 h-full w-full bg-transparent focus:outline-none;
+    @apply m-2 h-full w-full bg-transparent focus:text-brand focus:outline-none;
   }
 
   .prefix {
-    @apply border-subtle text-secondary block h-full w-fit border-r px-4 py-2;
+    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
   }
 
   .suffix {
-    @apply border-subtle bg-subtle block h-full w-fit border-l px-4 py-2;
+    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
   }
 
   .noBorder {
@@ -254,7 +254,7 @@
   }
 
   .copy-icon-container {
-    @apply border-subtle flex h-full w-9 cursor-pointer items-center justify-center border-l;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center border-l border-subtle;
   }
 
   .disabled-icon-container {
@@ -266,7 +266,7 @@
   }
 
   .hint-text {
-    @apply text-primary text-xs;
+    @apply text-xs text-primary;
 
     &.error,
     &.invalid {

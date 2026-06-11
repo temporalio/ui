@@ -120,7 +120,7 @@
     <div id="modal-content-{id}" class="content">
       <slot name="content" />
       <p
-        class="text-danger mt-2 text-sm font-normal"
+        class="mt-2 text-sm font-normal text-danger"
         class:hidden={!error}
         role="alert"
       >
@@ -157,7 +157,7 @@
 
 <style lang="postcss">
   .body {
-    @apply surface-primary border-secondary text-primary z-50 w-full max-w-lg overflow-y-auto border p-0 shadow-xl md:h-max;
+    @apply surface-primary z-50 w-full max-w-lg overflow-y-auto border border-secondary p-0 text-primary shadow-xl md:h-max;
   }
 
   .body::backdrop {
@@ -169,7 +169,7 @@
   }
 
   .body.hightlightNav::backdrop {
-    @apply top-[40px] left-[60px];
+    @apply left-[60px] top-[40px];
   }
 
   .large {
@@ -177,10 +177,10 @@
   }
 
   .title {
-    @apply surface-primary px-8 pt-8 pb-0 text-2xl;
+    @apply surface-primary px-8 pb-0 pt-8 text-2xl;
   }
 
   .content {
-    @apply p-8 whitespace-normal;
+    @apply whitespace-normal p-8;
   }
 </style>

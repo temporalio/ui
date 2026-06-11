@@ -71,7 +71,7 @@
   class={merge(
     'relative',
     maximized &&
-      'fixed top-0 right-0 bottom-0 left-0 z-100 h-full w-full overflow-y-auto bg-white dark:bg-black',
+      'fixed bottom-0 left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-white dark:bg-black',
     className,
   )}
   onfocusout={handleFocusOut}
@@ -83,13 +83,13 @@
     class={merge(
       'absolute',
       maximized && 'fixed',
-      'top-2 right-2 flex items-center',
+      'right-2 top-2 flex items-center',
     )}
   >
     {@render actions?.()}
     {#if enabled}
       <MaximizeButton
-        class="text-secondary m-0 rounded-full"
+        class="m-0 rounded-full text-secondary"
         onclick={handleClick}
         {maximized}
       />

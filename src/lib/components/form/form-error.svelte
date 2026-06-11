@@ -57,7 +57,7 @@
                 : translate('common.try-again')}
             </Button>
             {#if retryCount > 0}
-              <span class="text-secondary text-sm">
+              <span class="text-sm text-secondary">
                 {translate('common.retry-attempt', {
                   current: retryCount + 1,
                   total: maxRetries + 1,
@@ -66,7 +66,7 @@
             {/if}
           </div>
         {:else if onRetry && retryCount >= maxRetries}
-          <div class="text-secondary text-sm">
+          <div class="text-sm text-secondary">
             <p>
               {translate('common.max-retries-exceeded', {
                 attempts: maxRetries + 1,

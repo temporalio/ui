@@ -75,7 +75,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply text-primary items-start gap-2 border p-5 text-sm break-words;
+    @apply items-start gap-2 break-words border p-5 text-sm text-primary;
   }
 
   .alert.success {

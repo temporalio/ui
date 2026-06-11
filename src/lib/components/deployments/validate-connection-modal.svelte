@@ -28,7 +28,7 @@
 >
   <h3 slot="title">
     {translate('deployments.validate-connection')}
-    <span class="text-secondary font-mono">{buildId}</span>
+    <span class="font-mono text-secondary">{buildId}</span>
   </h3>
   <svelte:fragment slot="footer">
     <div class="flex w-full items-center justify-end gap-2">
@@ -44,9 +44,9 @@
     {#if loading}
       <div class="flex items-center gap-2">
         <div
-          class="bg-subtle h-5 w-5 shrink-0 animate-pulse rounded-full"
+          class="h-5 w-5 shrink-0 animate-pulse rounded-full bg-subtle"
         ></div>
-        <div class="bg-subtle h-5 w-40 animate-pulse rounded"></div>
+        <div class="h-5 w-40 animate-pulse rounded bg-subtle"></div>
       </div>
     {:else if result}
       <div class="flex items-start gap-2">
@@ -67,7 +67,7 @@
               : translate('deployments.validate-connection-invalid')}
           </p>
           {#if result.message}
-            <p class="text-secondary text-xs">{result.message}</p>
+            <p class="text-xs text-secondary">{result.message}</p>
           {/if}
         </div>
       </div>

@@ -202,7 +202,7 @@
 
 <style lang="postcss">
   .menu-item {
-    @apply focus-visible:border-inverse focus-visible:ring-primary/70 dark:focus-visible:border-interactive cursor-pointer border border-transparent text-sm focus-visible:ring-2 focus-visible:outline-none;
+    @apply cursor-pointer border border-transparent text-sm focus-visible:border-inverse focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 dark:focus-visible:border-interactive;
 
     &.active {
       @apply bg-interactive-secondary-hover;
@@ -234,6 +234,6 @@
   }
 
   .menu-item-description {
-    @apply text-secondary mr-6 text-xs font-normal;
+    @apply mr-6 text-xs font-normal text-secondary;
   }
 </style>
