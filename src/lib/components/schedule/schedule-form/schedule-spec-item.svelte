@@ -134,7 +134,7 @@
   {@const rawValue = getRawValue(spec)}
   <div
     bind:this={containerEl}
-    class="surface-background relative flex w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
+    class="surface-background relative flex min-h-16 w-full justify-between gap-4 border border-subtle px-4 py-3 text-left transition-colors"
     aria-expanded="false"
   >
     <div
