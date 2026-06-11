@@ -8,7 +8,6 @@
   import RampUnversionedModal from '$lib/components/deployments/ramp-unversioned-modal.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Error from '$lib/holocene/error.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
@@ -79,8 +78,17 @@
     reload();
   }
 
-  async function handleRemoveRampUnversioned() {
-    await removeRampingUnversionedWorkers({ namespace, deploymentName });
+  async function handleRemoveRampUnversioned(conflictToken?: string) {
+    rampUnversionedError = '';
+    await removeRampingUnversionedWorkers(
+      { namespace, deploymentName, conflictToken },
+      (err) => {
+        rampUnversionedError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.ramp-to-unversioned-error');
+      },
+    );
+    if (rampUnversionedError) return;
     showRampUnversionedModal = false;
     reload();
   }
@@ -92,7 +100,7 @@
   {@const info = deployment.workerDeploymentInfo}
   {@const unversionedRampingPercentage =
     !info.routingConfig?.rampingDeploymentVersion &&
-    info.routingConfig?.rampingVersionPercentage
+    info.routingConfig?.rampingVersionPercentage != null
       ? info.routingConfig.rampingVersionPercentage
       : null}
 
@@ -178,7 +186,7 @@
       rampUnversionedError = '';
     }}
     onRemove={unversionedRampingPercentage !== null
-      ? handleRemoveRampUnversioned
+      ? () => handleRemoveRampUnversioned(deployment.conflictToken)
       : undefined}
   />
 {:catch error}

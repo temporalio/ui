@@ -301,7 +301,7 @@ export const setRampingUnversionedWorkers = async (
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
-        build_id: '',
+        buildId: '',
         percentage: parameters.percentage,
       }),
     },
@@ -311,7 +311,7 @@ export const setRampingUnversionedWorkers = async (
 };
 
 export const removeRampingUnversionedWorkers = async (
-  parameters: DeploymentParameters,
+  parameters: DeploymentParameters & { conflictToken?: string },
   onError?: ErrorCallback,
 ): Promise<void> => {
   const route = routeForApi(
@@ -321,7 +321,12 @@ export const removeRampingUnversionedWorkers = async (
   await requestFromAPI<unknown>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({ build_id: '' }),
+      body: stringifyWithBigInt({
+        buildId: '',
+        ...(parameters.conflictToken
+          ? { conflictToken: parameters.conflictToken }
+          : {}),
+      }),
     },
     onError,
     notifyOnError: false,

@@ -31,15 +31,11 @@
   on:confirmModal={() => onConfirm?.(percentage)}
   on:cancelModal={onCancel}
 >
-  <Button
-    slot="footer"
-    variant="destructive"
-    size="sm"
-    class={!onRemove ? 'invisible' : ''}
-    on:click={onRemove}
-  >
-    {translate('deployments.remove-unversioned-ramping')}
-  </Button>
+  {#if onRemove}
+    <Button slot="footer" variant="destructive" size="sm" on:click={onRemove}>
+      {translate('deployments.remove-unversioned-ramping')}
+    </Button>
+  {/if}
   <h3 slot="title">{translate('deployments.ramp-to-unversioned')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     <p class="text-sm">

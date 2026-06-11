@@ -64,7 +64,7 @@ export const Strings = {
   'create-new-version': 'Create New Version',
   'delete-deployment': 'Delete Worker Deployment',
   'delete-deployment-description':
-    "Deleting this deployment will permanently remove all its versions and configuration. This action can't be undone.",
+    "Deleting {{ name }} will permanently remove all its versions and configuration. This action can't be undone.",
   'delete-deployment-confirm-instruction': 'Type DELETE to confirm',
   'delete-deployment-confirm-error': 'Failed to delete deployment',
   'cannot-delete-deployment': 'Cannot Delete Worker Deployment',
@@ -91,6 +91,9 @@ export const Strings = {
   'set-as-current': 'Set Current Version',
   'set-as-current-error': 'Failed to set version as current',
   'unset-current': 'Unset Current',
+  'unset-current-description':
+    'This will remove the current version designation from this deployment.',
+  'unset-current-error': 'Failed to unset current version',
   'set-current-version-success': '{{ buildId }} is now the current version',
   'set-ramping-version': 'Set Ramping Version',
   'edit-ramping-percentage': 'Edit Ramping Percentage',

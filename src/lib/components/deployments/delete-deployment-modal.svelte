@@ -44,7 +44,9 @@
     {open}
     {error}
     title={translate('deployments.delete-deployment')}
-    description={translate('deployments.delete-deployment-description')}
+    description={translate('deployments.delete-deployment-description', {
+      name: deploymentName,
+    })}
     entityName={deploymentName}
     {onConfirm}
     {onCancel}
