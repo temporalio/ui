@@ -143,6 +143,7 @@ export const Strings = {
   'overlap-allow-all-description':
     'Starts any number of concurrent Workflow Executions; more than one Workflow Execution can run simultaneously.',
   'overlap-default-suffix': '(Default)',
+  'overlap-schedule-policy-suffix': "(Schedule's current policy)",
   'recurrence-label': 'Recurrence',
   'recurrence-everyday': 'Every day',
   'recurrence-weekdays': 'Weekdays',

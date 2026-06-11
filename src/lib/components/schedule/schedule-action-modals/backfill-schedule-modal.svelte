@@ -25,7 +25,7 @@
   import { getOverlapPolicyContent } from '../constants';
 
   interface Props {
-    initialOverlapPolicy?: OverlapPolicy;
+    scheduleOverlapPolicy?: OverlapPolicy;
     scheduleId: string;
     namespace: string;
   }
@@ -33,11 +33,11 @@
   const overlapPolicyContent = getOverlapPolicyContent();
   const identity = getIdentity();
 
-  let { initialOverlapPolicy, scheduleId, namespace }: Props = $props();
+  let { scheduleOverlapPolicy, scheduleId, namespace }: Props = $props();
 
   // svelte-ignore state_referenced_locally
   let selectedOverlapPolicy = writable<OverlapPolicy>(
-    initialOverlapPolicy ?? 'Skip',
+    scheduleOverlapPolicy ?? 'Skip',
   );
 
   const localNow = new Date();
@@ -151,7 +151,8 @@
           value={value as OverlapPolicy}
           label={[
             content.label,
-            content.isDefault && translate('schedules.overlap-default-suffix'),
+            value === scheduleOverlapPolicy &&
+              translate('schedules.overlap-schedule-policy-suffix'),
           ]
             .filter(Boolean)
             .join(' ')}

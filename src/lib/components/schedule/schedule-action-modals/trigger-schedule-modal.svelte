@@ -21,12 +21,13 @@
   interface Props {
     scheduleId: string;
     namespace: string;
+    scheduleOverlapPolicy: OverlapPolicy;
   }
 
   const overlapPolicyContent = getOverlapPolicyContent();
   const identity = getIdentity();
 
-  let { scheduleId, namespace }: Props = $props();
+  let { scheduleId, namespace, scheduleOverlapPolicy }: Props = $props();
 
   let selectedOverlapPolicy = writable<OverlapPolicy>('AllowAll');
 
@@ -65,7 +66,8 @@
           value={value as OverlapPolicy}
           label={[
             content.label,
-            content.isDefault && translate('schedules.overlap-default-suffix'),
+            value === scheduleOverlapPolicy &&
+              translate('schedules.overlap-schedule-policy-suffix'),
           ]
             .filter(Boolean)
             .join(' ')}

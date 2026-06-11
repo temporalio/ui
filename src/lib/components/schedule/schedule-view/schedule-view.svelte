@@ -239,11 +239,17 @@
   {namespace}
   isSchedulePaused={schedule?.schedule?.state?.paused}
 />
-<TriggerScheduleModal {scheduleId} {namespace} />
+<TriggerScheduleModal
+  {scheduleId}
+  {namespace}
+  scheduleOverlapPolicy={parseOverlapPolicy(
+    schedule?.schedule?.policies?.overlapPolicy,
+  )}
+/>
 <BackfillScheduleModal
   {scheduleId}
   {namespace}
-  initialOverlapPolicy={parseOverlapPolicy(
+  scheduleOverlapPolicy={parseOverlapPolicy(
     schedule?.schedule?.policies?.overlapPolicy,
   )}
 />
