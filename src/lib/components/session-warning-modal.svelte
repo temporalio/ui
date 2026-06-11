@@ -3,12 +3,12 @@
 
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { logout } from '$lib/stores/auth-user';
   import {
     dismissSessionWarning,
     sessionWarningState,
   } from '$lib/stores/session-warning';
   import { refreshTokens } from '$lib/utilities/auth-refresh';
-  import { logout } from '$lib/stores/auth-user';
 
   const WARNING_SECONDS = 60;
 

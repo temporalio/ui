@@ -6,8 +6,8 @@
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
-  import SessionWarningModal from '$lib/components/session-warning-modal.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
+  import SessionWarningModal from '$lib/components/session-warning-modal.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
