@@ -144,7 +144,7 @@ export function getFormScheduleDefaults(
       String(spec?.startTime || new Date().toISOString()),
       spec?.timezoneName || 'UTC',
     ),
-    jitter: Number(parseDuration(String(spec?.jitter ?? '')) || 0),
+    jitter: Number(parseDuration(spec?.jitter ?? '') || 0),
     ...getEndCondition(describeFullSchedule),
 
     overlapPolicy: parseOverlapPolicy(policies?.overlapPolicy),
