@@ -182,7 +182,7 @@
       {#if suffix}
         <div
           class={merge(
-            'block h-full w-fit border-l border-subtle bg-subtle px-4 py-2',
+            'flex w-fit items-center self-stretch border-l border-subtle bg-subtle px-4',
             suffixClass,
           )}
         >
@@ -249,7 +249,7 @@
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
+    @apply flex w-fit items-center self-stretch border-r border-subtle px-4 text-secondary;
   }
 
   .noBorder {

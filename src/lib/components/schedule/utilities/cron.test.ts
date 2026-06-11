@@ -20,4 +20,9 @@ describe('isValidCronString', () => {
     expect(isValidCronString('not a cron string')).toBe(false);
     expect(isValidCronString('foo bar baz qux quux')).toBe(false);
   });
+
+  it('returns false for expressions containing "#"', () => {
+    expect(isValidCronString('0 0 * * 1#2')).toBe(false);
+    expect(isValidCronString('0 12 * * *#comment')).toBe(false);
+  });
 });

@@ -16,7 +16,7 @@ import {
 } from '../constants';
 import { getLargestWholeUnit } from './duration';
 import { getFormSpecFromSpec } from './get-form-spec';
-import { expandRanges } from './range';
+import { compactToRanges, expandRanges } from './range';
 import { type FormSpecSchema } from '../schema/form';
 
 import type { ScheduleSpec } from '$types';
@@ -62,21 +62,90 @@ export function getScheduleSpecSummary(spec: FormSpecSchema) {
 
 const pad0ForTime = (num = 0): string => num.toString().padStart(2, '0');
 
-function getCalendarTime(calendar: FormSpecSchema['calendar']): string {
-  const hour = calendar.hour?.[0]?.start ?? 0;
-  const minute = calendar.minute?.[0]?.start ?? 0;
-  return `${pad0ForTime(hour)}:${pad0ForTime(minute)}`;
+// The step at which `values` repeat across the whole [min, max] domain (e.g.
+// minute 0,15,30,45 over 0-59 repeats every 15), or null when they don't form
+// a single arithmetic progression or leave a gap wider than the step at either
+// end of the domain.
+function getRepeatingStep(
+  values: number[],
+  min: number,
+  max: number,
+): number | null {
+  const [range, ...rest] = compactToRanges(values);
+
+  if (!range || rest.length) {
+    return null;
+  }
+
+  const step = range.step ?? 1;
+  const end = range.end ?? range.start;
+
+  return range.start - min < step && max - end < step ? step : null;
 }
 
-function summarizeCronSpec(spec: FormSpecSchema): string {
+function getRepeatingTimePhrase(
+  calendar: FormSpecSchema['calendar'],
+): string | null {
+  const seconds = expandRanges(calendar.second);
+  const minutes = expandRanges(calendar.minute);
+  const hours = expandRanges(calendar.hour);
+
+  const secondStep = getRepeatingStep(seconds, 0, 59);
+  const minuteStep = getRepeatingStep(minutes, 0, 59);
+  const hourStep = getRepeatingStep(hours, 0, 23);
+
+  if (secondStep !== null && minuteStep === 1 && hourStep === 1) {
+    return translate('schedules.spec-summary-every-seconds', {
+      count: secondStep,
+    });
+  }
+
+  if (minuteStep !== null && hourStep === 1 && seconds.length <= 1) {
+    return translate('schedules.spec-summary-every-minutes', {
+      count: minuteStep,
+    });
+  }
+
+  if (hourStep !== null && minutes.length <= 1 && seconds.length <= 1) {
+    return translate('schedules.spec-summary-every-hours', {
+      count: hourStep,
+    });
+  }
+
+  return null;
+}
+
+function getCalendarTime(calendar: FormSpecSchema['calendar']): string {
+  const repeating = getRepeatingTimePhrase(calendar);
+
+  if (repeating) {
+    return repeating;
+  }
+
+  const hours = expandRanges(calendar.hour);
+  const minutes = expandRanges(calendar.minute);
+  const minute = minutes.length === 1 ? minutes[0] : 0;
+
+  const time = !hours.length
+    ? `${pad0ForTime(0)}:${pad0ForTime(minute)}`
+    : formatList(hours.map((h) => `${pad0ForTime(h)}:${pad0ForTime(minute)}`));
+
+  return translate('schedules.spec-summary-at-time', { time });
+}
+
+function summarizeCronString(cronString: string): string {
   try {
-    return cronstrue.toString(spec.cronString, {
+    return cronstrue.toString(cronString, {
       verbose: true,
       use24HourTimeFormat: true,
     });
   } catch {
     return '';
   }
+}
+
+function summarizeCronSpec(spec: FormSpecSchema): string {
+  return summarizeCronString(spec.cronString);
 }
 
 function summarizeWeekSpec(spec: FormSpecSchema): string {

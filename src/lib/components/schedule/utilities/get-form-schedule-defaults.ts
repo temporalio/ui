@@ -4,7 +4,7 @@ import type { SearchAttributes } from '$lib/types/workflows';
 import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
 import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
-import { getNowCalendarDateStr, isoStringToCalendarDateStr } from './date';
+import { isoStringToCalendarDateStr } from './date';
 import { getFormSpecsFromDescribeFullSchedule } from './get-form-spec';
 import { getFormSpecInitialData } from './get-form-spec-initial-data';
 import {
@@ -83,15 +83,16 @@ function getEndCondition(
 ): Pick<FormScheduleSchema, 'endKind' | 'endTime' | 'endAfterOccurrences'> {
   const state = describeFullSchedule?.schedule?.state;
   const spec = describeFullSchedule?.schedule?.spec;
+  const remainingActions = Number(state?.remainingActions);
 
   return {
     endKind: getEndKind(describeFullSchedule),
     endAfterOccurrences:
-      typeof state?.remainingActions === 'number'
-        ? state?.remainingActions
+      Number.isFinite(remainingActions) && remainingActions > 0
+        ? remainingActions
         : undefined,
     endTime: isoStringToCalendarDateStr(
-      String(spec?.endTime ?? getNowCalendarDateStr()),
+      String(spec?.endTime ?? new Date().toISOString()),
       spec?.timezoneName || 'UTC',
     ),
   };

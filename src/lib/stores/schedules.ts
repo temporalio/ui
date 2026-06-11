@@ -286,7 +286,7 @@ export async function submitBackfillSchedule(
     setScheduleTimeout(
       'backfill',
       () => {
-        actionPending.set(true);
+        actionPending.set(false);
         serverError.set('');
         refreshCurrentScheduleFetch({ namespace, scheduleId });
         closeConfirmationModal('backfill');

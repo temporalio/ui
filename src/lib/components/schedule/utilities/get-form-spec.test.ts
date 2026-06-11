@@ -32,9 +32,18 @@ describe('getFormSpecFromSpec', () => {
           second: [],
           month: [{ start: 1, end: 12, step: 1 }],
           year: undefined,
+          comment: '',
         },
       },
     ]);
+  });
+
+  it('preserves the calendar comment', () => {
+    const [spec] = getFormSpecFromSpec({
+      structuredCalendar: [{ comment: '0 12 * * *' }],
+    } as ScheduleSpec);
+
+    expect(spec.calendar?.comment).toBe('0 12 * * *');
   });
 
   it('defaults missing range starts to zero for provided fields', () => {

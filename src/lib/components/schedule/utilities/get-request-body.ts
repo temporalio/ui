@@ -7,6 +7,7 @@ import { isValidCronString } from './cron';
 import {
   calendarDateStrToEndOfDayTimestamp,
   calendarDateStrToTimestamp,
+  isoStringToCalendarDateStr,
 } from './date';
 import type { FormScheduleSchema } from '../schema/form';
 
@@ -148,9 +149,71 @@ function toInterval(interval: SpecFormItem['interval']): ScheduleInterval {
   } as ScheduleInterval;
 }
 
+// Keep the exact existing timestamp when the form's calendar date still
+// matches it, so editing unrelated fields doesn't shift sub-day times the
+// form can't represent.
+function getSpecStartTime(
+  scheduleForm: FormScheduleSchema,
+  existingSpec: DescribeFullSchedule['schedule']['spec'],
+  timeZone: string,
+): Pick<ScheduleSpecRequest, 'startTime'> {
+  const existing = existingSpec?.startTime
+    ? String(existingSpec.startTime)
+    : undefined;
+
+  if (
+    existing &&
+    isoStringToCalendarDateStr(existing, timeZone) === scheduleForm.startTime
+  ) {
+    return { startTime: existing };
+  }
+
+  // An existing schedule may have no startTime at all; don't invent one
+  // unless the user moved the date off the untouched default (today).
+  if (
+    existingSpec &&
+    !existing &&
+    scheduleForm.startTime ===
+      isoStringToCalendarDateStr(new Date().toISOString(), timeZone)
+  ) {
+    return {};
+  }
+
+  return {
+    startTime: calendarDateStrToTimestamp(scheduleForm.startTime, timeZone),
+  };
+}
+
+function getSpecEndTime(
+  scheduleForm: FormScheduleSchema,
+  existingSpec: DescribeFullSchedule['schedule']['spec'],
+  timeZone: string,
+): Pick<ScheduleSpecRequest, 'endTime'> {
+  if (scheduleForm.endKind !== 'on' || !scheduleForm.endTime) {
+    return {};
+  }
+
+  const existing = existingSpec?.endTime
+    ? String(existingSpec.endTime)
+    : undefined;
+
+  if (
+    existing &&
+    isoStringToCalendarDateStr(existing, timeZone) === scheduleForm.endTime
+  ) {
+    return { endTime: existing };
+  }
+
+  return {
+    endTime: calendarDateStrToEndOfDayTimestamp(scheduleForm.endTime, timeZone),
+  };
+}
+
 function getScheduleSpecRequest(
   scheduleForm: FormScheduleSchema,
+  describeFullSchedule: DescribeFullSchedule | null = null,
 ): ScheduleSpecRequest {
+  const existingSpec = describeFullSchedule?.schedule?.spec;
   const timeZone = scheduleForm.timezoneName || 'UTC';
   const interval: ScheduleInterval[] = [];
   const cronString: string[] = [];
@@ -165,7 +228,7 @@ function getScheduleSpecRequest(
       case 'cron': {
         const trimmed = item.cronString?.trim();
         if (trimmed && isValidCronString(trimmed)) {
-          cronString.push(`${trimmed}#${trimmed}`);
+          cronString.push(trimmed);
         }
         break;
       }
@@ -197,18 +260,20 @@ function getScheduleSpecRequest(
   }
 
   return {
+    // Preserve spec fields the form doesn't model, e.g. exclusion calendars
+    // set via the CLI or an SDK, so editing doesn't silently clear them
+    ...(existingSpec?.excludeStructuredCalendar?.length && {
+      excludeStructuredCalendar: existingSpec.excludeStructuredCalendar,
+    }),
+    ...(existingSpec?.timezoneData && {
+      timezoneData: existingSpec.timezoneData,
+    }),
     interval,
     cronString,
     structuredCalendar,
     timezoneName: timeZone,
-    startTime: calendarDateStrToTimestamp(scheduleForm.startTime, timeZone),
-    ...(scheduleForm.endKind === 'on' &&
-      scheduleForm.endTime && {
-        endTime: calendarDateStrToEndOfDayTimestamp(
-          scheduleForm.endTime,
-          timeZone,
-        ),
-      }),
+    ...getSpecStartTime(scheduleForm, existingSpec, timeZone),
+    ...getSpecEndTime(scheduleForm, existingSpec, timeZone),
     ...(scheduleForm.jitter &&
       scheduleForm.jitter > 0 && {
         jitter: `${scheduleForm.jitter}s`,
@@ -224,7 +289,7 @@ export async function getRequestBody(
     schedule_id: describeFullSchedule?.schedule_id ?? scheduleForm.name,
     searchAttributes: getSearchAttributes(scheduleForm.searchAttributes),
     schedule: {
-      spec: getScheduleSpecRequest(scheduleForm),
+      spec: getScheduleSpecRequest(scheduleForm, describeFullSchedule),
       action: await getScheduleActionRequest(
         scheduleForm,
         describeFullSchedule,

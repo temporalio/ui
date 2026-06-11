@@ -31,6 +31,7 @@ export function getFormSpecFromSpec(
         second: defaultMissingRangeStart(calendar.second, 0),
         month: calendar.month ?? [{ start: 1, end: 12, step: 1 }],
         year: calendar.year,
+        comment: calendar.comment ?? '',
       },
     } satisfies FormSpecSchema);
   }

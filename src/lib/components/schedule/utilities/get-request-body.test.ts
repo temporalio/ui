@@ -45,10 +45,10 @@ describe('getRequestBody', () => {
     expect(body.schedule_id).toBe('existing-id');
   });
 
-  it('emits a self-referencing cron string for cron specs', async () => {
+  it('emits the cron string for cron specs', async () => {
     const body = await getRequestBody(buildForm());
 
-    expect(body.schedule.spec.cronString).toEqual(['0 12 * * *#0 12 * * *']);
+    expect(body.schedule.spec.cronString).toEqual(['0 12 * * *']);
   });
 
   it('drops invalid cron specs', async () => {
@@ -141,5 +141,74 @@ describe('getRequestBody', () => {
   it('reflects the paused state', async () => {
     const body = await getRequestBody(buildForm({ pauseSchedule: true }));
     expect(body.schedule.state.paused).toBe(true);
+  });
+
+  describe('editing an existing schedule', () => {
+    const describeWithSpec = (spec: Record<string, unknown>) =>
+      ({
+        schedule_id: 'existing-id',
+        schedule: { spec },
+      }) as unknown as DescribeFullSchedule;
+
+    it('preserves exclusion calendars and timezone data', async () => {
+      const body = await getRequestBody(
+        buildForm(),
+        describeWithSpec({
+          excludeStructuredCalendar: [{ dayOfWeek: [{ start: 6 }] }],
+          timezoneData: 'dGVzdA==',
+        }),
+      );
+
+      expect(body.schedule.spec.excludeStructuredCalendar).toEqual([
+        { dayOfWeek: [{ start: 6 }] },
+      ]);
+      expect(body.schedule.spec.timezoneData).toBe('dGVzdA==');
+    });
+
+    it('keeps the exact start time when its calendar date is unchanged', async () => {
+      const body = await getRequestBody(
+        buildForm(),
+        describeWithSpec({ startTime: '2026-01-01T05:30:00.000Z' }),
+      );
+
+      expect(body.schedule.spec.startTime).toBe('2026-01-01T05:30:00.000Z');
+    });
+
+    it('re-anchors the start time when the date is changed', async () => {
+      const body = await getRequestBody(
+        buildForm({ startTime: '2026-02-01' }),
+        describeWithSpec({ startTime: '2026-01-01T05:30:00.000Z' }),
+      );
+
+      expect(body.schedule.spec.startTime).toBe('2026-02-01T00:00:00.000Z');
+    });
+
+    it('does not invent a start time for a schedule without one', async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      const body = await getRequestBody(
+        buildForm({ startTime: today }),
+        describeWithSpec({}),
+      );
+
+      expect(body.schedule.spec.startTime).toBeUndefined();
+    });
+
+    it('keeps the exact end time when its calendar date is unchanged', async () => {
+      const body = await getRequestBody(
+        buildForm({ endKind: 'on', endTime: '2026-12-31' }),
+        describeWithSpec({ endTime: '2026-12-31T12:00:00.000Z' }),
+      );
+
+      expect(body.schedule.spec.endTime).toBe('2026-12-31T12:00:00.000Z');
+    });
+
+    it('re-anchors the end time to end-of-day when the date is changed', async () => {
+      const body = await getRequestBody(
+        buildForm({ endKind: 'on', endTime: '2026-12-30' }),
+        describeWithSpec({ endTime: '2026-12-31T12:00:00.000Z' }),
+      );
+
+      expect(body.schedule.spec.endTime).toBe('2026-12-30T23:59:59.000Z');
+    });
   });
 });

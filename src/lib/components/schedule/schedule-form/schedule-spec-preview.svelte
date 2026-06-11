@@ -22,7 +22,6 @@
       return true;
     }
     if (spec.kind === 'interval' && !spec.interval.interval) {
-      console.log(spec.interval);
       return true;
     }
 

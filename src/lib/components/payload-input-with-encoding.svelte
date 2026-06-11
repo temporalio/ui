@@ -21,6 +21,7 @@
   export let hintText: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let payloadLabel: string | undefined = undefined;
+  export let copyable = false;
 
   $: {
     if ($encoding === 'json/plain' && messageType) {
@@ -41,7 +42,7 @@
       {placeholder}
       label={payloadLabel}
       {hintText}
-      copyable={true}
+      {copyable}
     />
     <div
       class="flex items-end gap-2 {editing ? 'justify-between' : 'justify-end'}"

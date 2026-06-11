@@ -19,7 +19,6 @@
   import { getOverlapPolicyContent } from '../constants';
 
   interface Props {
-    initialOverlapPolicy: OverlapPolicy;
     scheduleId: string;
     namespace: string;
   }
@@ -27,12 +26,9 @@
   const overlapPolicyContent = getOverlapPolicyContent();
   const identity = getIdentity();
 
-  let { initialOverlapPolicy, scheduleId, namespace }: Props = $props();
+  let { scheduleId, namespace }: Props = $props();
 
-  // svelte-ignore state_referenced_locally
-  let selectedOverlapPolicy = writable<OverlapPolicy>(
-    initialOverlapPolicy ?? 'Skip',
-  );
+  let selectedOverlapPolicy = writable<OverlapPolicy>('AllowAll');
 
   $effect(() => {
     return () => clearConfirmationModalActionTimeout('trigger');

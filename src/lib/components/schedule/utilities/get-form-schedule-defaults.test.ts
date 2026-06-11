@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { DescribeFullSchedule } from '$lib/types/schedule';
 
@@ -35,6 +35,10 @@ describe('parseOverlapPolicy', () => {
 });
 
 describe('getFormScheduleDefaults', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   describe('without an existing schedule', () => {
     const defaults = getFormScheduleDefaults(null, noAttributes);
 
@@ -95,7 +99,8 @@ describe('getFormScheduleDefaults', () => {
         state: {
           paused: true,
           limitedActions: true,
-          remainingActions: 3,
+          // int64 fields arrive as strings from the HTTP API
+          remainingActions: '3',
         },
       },
     } as unknown as DescribeFullSchedule;
@@ -139,6 +144,23 @@ describe('getFormScheduleDefaults', () => {
       expect(defaults.endKind).toBe('after');
       expect(defaults.endAfterOccurrences).toBe(3);
     });
+  });
+
+  it('prefills the end date with today in the schedule timezone', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-10T02:00:00.000Z'));
+
+    const defaults = getFormScheduleDefaults(
+      {
+        schedule: {
+          spec: { timezoneName: 'America/New_York' },
+        },
+      } as unknown as DescribeFullSchedule,
+      noAttributes,
+    );
+
+    expect(defaults.endKind).toBe('never');
+    expect(defaults.endTime).toBe('2026-06-09');
   });
 
   it('derives an "on" end condition from an end time', () => {

@@ -143,6 +143,60 @@ describe('getScheduleSpecSummary', () => {
       expect(summary).toContain('2026');
     });
 
+    it('lists every time when the calendar has multiple hour ranges', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'frozen',
+          calendar: {
+            dayOfWeek: [{ start: 1, end: 5 }],
+            hour: [{ start: 9 }, { start: 17 }],
+            minute: [{ start: 0 }],
+          },
+        }),
+      );
+      expect(summary).toBe('Weekdays at 09:00 and 17:00');
+    });
+
+    it('summarizes a stepped minute range as every n minutes', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'frozen',
+          calendar: {
+            minute: [{ start: 0, end: 59, step: 15 }],
+            hour: [{ start: 0, end: 23 }],
+          },
+        }),
+      );
+      expect(summary).toContain('every 15 minutes');
+    });
+
+    it('summarizes a stepped hour range as every n hours', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'frozen',
+          calendar: {
+            dayOfWeek: [{ start: 1, end: 5 }],
+            hour: [{ start: 0, end: 22, step: 2 }],
+            minute: [{ start: 0 }],
+          },
+        }),
+      );
+      expect(summary).toBe('Weekdays every 2 hours');
+    });
+
+    it('summarizes full minute and hour ranges as every minute', () => {
+      const summary = getScheduleSpecSummary(
+        spec({
+          kind: 'frozen',
+          calendar: {
+            minute: [{ start: 0, end: 59 }],
+            hour: [{ start: 0, end: 23 }],
+          },
+        }),
+      );
+      expect(summary).toContain('every minute');
+    });
+
     it('appends every year when several are pinned', () => {
       const summary = getScheduleSpecSummary(
         spec({

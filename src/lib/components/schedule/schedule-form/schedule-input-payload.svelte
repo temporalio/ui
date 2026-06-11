@@ -104,6 +104,7 @@
         payloadLabel="JSON Data"
         placeholder={'{"key": "value"}'}
         id="schedule-payload-input"
+        copyable={true}
       >
         <div slot="action" class:hidden={!showEditActions}>
           <Button variant="secondary" on:click={handleEdit}>
