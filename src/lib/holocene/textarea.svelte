@@ -47,7 +47,7 @@
   {/if}
   <div
     class={merge(
-      'relative box-border inline-flex w-full border border-subtle focus-within:border-information focus-within:ring-2 focus-within:ring-primary/70',
+      'border-subtle focus-within:border-information focus-within:ring-primary/70 relative box-border inline-flex w-full border focus-within:ring-2',
       !isValid && 'error',
       !disabled && 'hover:border-information',
     )}
@@ -55,7 +55,7 @@
     <textarea
       bind:value
       class={merge(
-        'surface-primary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-none',
+        'surface-primary min-h-fit w-full px-3 py-2 text-sm focus-visible:outline-hidden',
         disabled && 'cursor-not-allowed opacity-50',
       )}
       {id}
@@ -100,12 +100,14 @@
 </div>
 
 <style lang="postcss">
+  @reference "../../app.css";
+
   .error {
-    @apply border-danger focus-within:border-danger focus-within:ring-2 focus-within:ring-danger/70;
+    @apply border-danger focus-within:border-danger focus-within:ring-danger/70 focus-within:ring-2;
   }
 
   .error-msg {
-    @apply min-h-[1.25rem] break-words border-danger text-xs text-danger;
+    @apply border-danger text-danger min-h-[1.25rem] text-xs break-words;
   }
 
   .error-msg.min-width {
@@ -113,7 +115,7 @@
   }
 
   .count {
-    @apply invisible text-right text-xs text-primary group-focus-within:visible;
+    @apply text-primary invisible text-right text-xs group-focus-within:visible;
   }
 
   .count > .warn {

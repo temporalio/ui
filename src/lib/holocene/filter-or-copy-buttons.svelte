@@ -70,12 +70,14 @@
 {/if}
 
 <style lang="postcss">
+  @reference "../../app.css";
+
   .copy-or-filter {
-    @apply absolute bottom-0 right-0 top-0 inline-flex gap-1 px-1;
+    @apply absolute top-0 right-0 bottom-0 inline-flex gap-1 px-1;
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full p-0.5 text-primary hover:surface-inverse;
+    @apply surface-primary text-primary hover:surface-inverse relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full p-0.5;
   }
 
   .filtered {

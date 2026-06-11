@@ -26,7 +26,7 @@
 </script>
 
 {#snippet content()}
-  <div class="flex select-all items-center gap-1 truncate rounded-sm">
+  <div class="flex items-center gap-1 truncate rounded-xs select-all">
     {$relativeTime ? relativeTimestamp : formattedTimestamp}
   </div>
 {/snippet}

@@ -23,7 +23,7 @@
       'items-center',
       'justify-center',
       'text-nowrap',
-      'rounded-sm',
+      'rounded-xs',
       'p-1',
       'text-sm',
       'font-medium',

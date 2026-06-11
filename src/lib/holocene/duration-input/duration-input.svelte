@@ -111,18 +111,18 @@
 <div class={twMerge('flex flex-col gap-1', className)}>
   <Label {required} {label} for={id} />
   <div
-    class="surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50"
+    class="surface-primary border-subtle focus-within:ring-brand/50 flex h-10 items-center border focus-within:ring-2"
   >
     <input
       {id}
-      class="flex h-full grow border-r border-subtle bg-transparent p-2 focus-visible:outline-none"
+      class="border-subtle flex h-full grow border-r bg-transparent p-2 focus-visible:outline-hidden"
       type="number"
       bind:value={rawValue}
       oninput={handleNumberInput}
     />
     <select
       id="{id}-unit-select"
-      class="surface-secondary h-full pl-2 focus-visible:outline-none"
+      class="surface-secondary h-full pl-2 focus-visible:outline-hidden"
       bind:value={unit}
       onchange={handleUnitChange}
     >
@@ -132,6 +132,6 @@
     </select>
   </div>
   {#if hintText}
-    <p class="text-xs text-secondary">{hintText}</p>
+    <p class="text-secondary text-xs">{hintText}</p>
   {/if}
 </div>

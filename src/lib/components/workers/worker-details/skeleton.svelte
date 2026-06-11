@@ -16,7 +16,7 @@
 <div class="flex items-center gap-2">
   {@render breadcrumb()}
   <Icon name="chevron-left" />
-  <Skeleton class="h-5 w-96 rounded-sm" />
+  <Skeleton class="h-5 w-96 rounded-xs" />
 </div>
 
 <section
@@ -26,7 +26,7 @@
   <header
     class="flex w-full flex-col items-start gap-4 xl:flex-row xl:items-center"
   >
-    <Skeleton class="h-5 w-20 rounded-sm" />
+    <Skeleton class="h-5 w-20 rounded-xs" />
     <Skeleton class="h-8 w-96" />
   </header>
 

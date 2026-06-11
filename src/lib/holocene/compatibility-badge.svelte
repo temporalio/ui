@@ -8,11 +8,11 @@
   export let buildId: string;
 </script>
 
-<p class="flex select-all gap-2 font-mono">
+<p class="flex gap-2 font-mono select-all">
   {#if defaultVersion && buildId}
     <span
       class={merge(
-        'flex items-center gap-1 rounded-sm border border-subtle px-1 text-sm text-primary',
+        'border-subtle text-primary flex items-center gap-1 rounded-xs border px-1 text-sm',
         active && 'border-green-200 bg-green-200 text-black',
       )}
     >
@@ -22,7 +22,7 @@
     </span>
   {:else if buildId}
     <span
-      class="flex items-center gap-1 rounded-sm border border-subtle px-1 text-sm text-primary"
+      class="border-subtle text-primary flex items-center gap-1 rounded-xs border px-1 text-sm"
     >
       <Icon name="merge" />{buildId}
     </span>

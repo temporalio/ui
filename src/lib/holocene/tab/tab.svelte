@@ -56,7 +56,7 @@
   type={href ? undefined : 'button'}
   role="tab"
   class={merge(
-    'flex cursor-pointer items-center gap-1 whitespace-nowrap border-b border-transparent text-sm font-medium leading-8 outline-none focus-visible:ring-2 focus-visible:ring-primary/70',
+    'focus-visible:ring-primary/70 flex cursor-pointer items-center gap-1 border-b border-transparent text-sm leading-8 font-medium whitespace-nowrap outline-hidden focus-visible:ring-2',
     isActive && 'border-brand text-brand',
     disabled && 'cursor-not-allowed opacity-50',
     !disabled && 'hover:text-brand',

@@ -1,6 +1,4 @@
-const tailwindcss = require('tailwindcss');
-const tailwindcssNesting = require('tailwindcss/nesting');
-const autoprefixer = require('autoprefixer');
+const tailwindcssPostcss = require('@tailwindcss/postcss');
 const cssnano = require('cssnano');
 
 const mode = process.env.NODE_ENV;
@@ -8,9 +6,7 @@ const dev = mode === 'development';
 
 const config = {
   plugins: [
-    autoprefixer(),
-    tailwindcssNesting(),
-    tailwindcss(),
+    tailwindcssPostcss(),
     !dev &&
       cssnano({
         preset: 'default',
