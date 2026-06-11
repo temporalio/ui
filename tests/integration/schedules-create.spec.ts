@@ -135,6 +135,25 @@ test.describe('Creates Schedule Successfully', () => {
     await expect(page.getByTestId('loading')).toBeHidden();
   });
 
+  test('removing the only spec resets it to a fresh cron spec', async ({
+    page,
+  }) => {
+    const cronInput = page.getByPlaceholder('* * * * *');
+    await cronInput.fill('0 12 * * *');
+    await page
+      .getByRole('button', { name: '+ Add another schedule spec' })
+      .click();
+    await expect(page.getByRole('button', { name: 'Delete' })).toHaveCount(2);
+
+    await page.getByRole('button', { name: 'Delete' }).last().click();
+    await expect(page.getByText('At 12:00, every day.').first()).toBeVisible();
+    await expect(cronInput).toBeHidden();
+
+    await page.getByRole('button', { name: 'Delete' }).click();
+    await expect(cronInput).toBeVisible();
+    await expect(cronInput).toHaveValue('');
+  });
+
   test('snaps an emptied catchup window back to its default on blur', async ({
     page,
   }) => {
