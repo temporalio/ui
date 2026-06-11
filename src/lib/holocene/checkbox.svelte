@@ -98,6 +98,8 @@
         'gap-3',
         'text-sm',
         'leading-[18px]',
+        'min-h-6',
+        'min-w-6',
         'group',
       ],
       disabled && 'cursor-not-allowed',
