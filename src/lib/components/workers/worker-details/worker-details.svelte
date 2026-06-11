@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -292,6 +293,8 @@
   slots: WorkerSlotsInfo | null | undefined,
   poller: WorkerPollerInfo | null | undefined,
 )}
+  {@const noSlotsConfigured =
+    !slots?.currentUsedSlots && !slots?.currentAvailableSlots}
   <Card class="flex flex-col gap-2">
     <h5 class="mb-2">{title}</h5>
 
@@ -303,7 +306,7 @@
         <dd class="mb-2">
           <p class="truncate font-mono text-lg text-secondary">
             <span class="text-2xl font-semibold text-brand">
-              {#if !slots?.currentUsedSlots && !slots?.currentAvailableSlots}
+              {#if noSlotsConfigured}
                 -
               {:else}
                 {slots?.currentUsedSlots ?? 0}
@@ -315,10 +318,18 @@
           {#if slots?.slotSupplierKind}
             {@const tooltipText =
               SupplierKindTooltipText[slots.slotSupplierKind]}
-            <Tooltip topLeft text={tooltipText} hide={!tooltipText} width={200}>
-              <Badge type="ghost" class="mt-1 text-xs"
-                >{slots.slotSupplierKind}</Badge
+            <Tooltip
+              topLeft
+              text={tooltipText}
+              hide={!tooltipText || noSlotsConfigured}
+              width={200}
+            >
+              <Badge
+                type="ghost"
+                class={merge('mt-1 text-xs', noSlotsConfigured && 'invisible')}
               >
+                {slots.slotSupplierKind}
+              </Badge>
             </Tooltip>
           {/if}
         </dd>
@@ -336,24 +347,27 @@
       </div>
 
       {#if poller}
+        {@const hasCurrentPollers = poller.currentPollers !== undefined}
         <div>
           <dt class="mb-1 h-6 text-sm text-secondary">
             {translate('workers.poller-count')}
           </dt>
           <dd>
             <p class="font-mono text-2xl font-semibold text-brand">
-              {poller.currentPollers !== undefined
-                ? (poller.currentPollers ?? 0)
-                : '-'}
+              {hasCurrentPollers ? (poller.currentPollers ?? 0) : '-'}
             </p>
             <Tooltip
               topLeft
               text={poller.isAutoscaling
                 ? translate('workers.autoscaling-poller')
                 : translate('workers.simple-maximum-poller')}
+              hide={!hasCurrentPollers}
               width={200}
             >
-              <Badge type="ghost" class="mt-1 text-xs">
+              <Badge
+                type="ghost"
+                class={merge('mt-1 text-xs', !hasCurrentPollers && 'invisible')}
+              >
                 {poller.isAutoscaling
                   ? translate('workers.autoscaling')
                   : translate('workers.simple-maximum')}
