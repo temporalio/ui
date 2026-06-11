@@ -85,7 +85,12 @@ export async function fetchSchedule(
   request = fetch,
 ): Promise<DescribeFullSchedule> {
   const route = routeForApi('schedule', parameters);
-  return requestFromAPI(route, { request });
+  const response = await requestFromAPI<
+    Omit<DescribeFullSchedule, 'schedule_id'>
+  >(route, { request });
+  // schedule_id is not actually populated by all routes, even though
+  // DescribeFullSchedule says it should, since we know it we can attach it here.
+  return { ...response, schedule_id: parameters.scheduleId };
 }
 
 export async function deleteSchedule(
