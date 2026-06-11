@@ -10,6 +10,7 @@
   import Input from './input/input.svelte';
 
   interface Props {
+    id?: string;
     isAllowed?: (d: Date) => boolean;
     selected?: Date;
     label: string;
@@ -20,10 +21,13 @@
     closeLabel: string;
     clearLabel: string;
     disabled?: boolean;
+    clearable?: boolean;
+    required?: boolean;
     onDateChange?: (date: Date) => void;
   }
 
   let {
+    id = 'datepicker',
     isAllowed = () => true,
     selected = $bindable(new Date()),
     label,
@@ -33,6 +37,8 @@
     closeLabel,
     clearLabel,
     disabled = false,
+    clearable = true,
+    required = false,
     onDateChange,
   }: Props = $props();
 
@@ -89,7 +95,7 @@
 
 <div class="relative" use:clickoutside={() => (showDatePicker = false)}>
   <Input
-    id="datepicker"
+    {id}
     {label}
     {afterLabel}
     {labelHidden}
@@ -99,9 +105,10 @@
     oninput={onInput}
     placeholder="MM/DD/YY"
     value={selected.toDateString()}
-    clearable
+    {clearable}
     clearButtonLabel={clearLabel}
     {disabled}
+    {required}
   />
   {#if showDatePicker}
     <div

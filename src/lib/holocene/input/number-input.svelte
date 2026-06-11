@@ -23,6 +23,7 @@
   export let step: number = 1;
   export let search = false;
   export let autocomplete: FullAutoFill = 'off';
+  export let error: boolean = false;
 
   let valid = true;
 
@@ -43,10 +44,10 @@
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center">
     <div
-      class="surface-primary relative box-border flex h-10 min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
+      class="surface-primary relative box-border flex h-10 w-full min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
       class:opacity-50={disabled}
       class:search
-      class:invalid={!valid}
+      class:invalid={error || !valid}
     >
       {#if icon}
         <span class="icon-container">
@@ -85,7 +86,7 @@
     {/if}
   </div>
 </div>
-{#if !valid && hintText}
+{#if (error || !valid) && hintText}
   <span class="mt-1 text-xs text-danger">{hintText}</span>
 {/if}
 

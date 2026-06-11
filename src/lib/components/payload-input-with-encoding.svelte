@@ -18,6 +18,10 @@
   export let loading = false;
   export let label = translate('workflows.input');
   export let editing = true;
+  export let hintText: string | undefined = undefined;
+  export let placeholder: string | undefined = undefined;
+  export let payloadLabel: string | undefined = undefined;
+  export let copyable = false;
 
   $: {
     if ($encoding === 'json/plain' && messageType) {
@@ -28,8 +32,18 @@
 
 <div>
   <h5 class="pb-1 text-sm font-medium">{label}</h5>
-  <Card class="flex flex-col gap-2">
-    <PayloadInput bind:input bind:loading {error} {id} {editing} />
+  <Card class="flex flex-col gap-4">
+    <PayloadInput
+      bind:input
+      bind:loading
+      {error}
+      {id}
+      {editing}
+      {placeholder}
+      label={payloadLabel}
+      {hintText}
+      {copyable}
+    />
     <div
       class="flex items-end gap-2 {editing ? 'justify-between' : 'justify-end'}"
     >
@@ -39,6 +53,7 @@
             description={translate('workflows.encoding')}
             group={encoding}
             name="encoding"
+            class="p-0"
           >
             <RadioInput id="json/plain" value="json/plain" label="json/plain" />
             <RadioInput
