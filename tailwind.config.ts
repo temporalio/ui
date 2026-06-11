@@ -18,9 +18,6 @@ const config = {
       zIndex: {
         100: '100',
       },
-      spacing: {
-        108: '27rem',
-      },
     },
   },
   plugins: [temporal, textStyles],

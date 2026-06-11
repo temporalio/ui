@@ -19,7 +19,6 @@
     labelHidden?: boolean;
     icon?: IconName;
     suffix?: string;
-    suffixClass?: string;
     prefix?: string;
     valid?: boolean;
     hintText?: string | Snippet<[{ valid: boolean; error: boolean }]>;
@@ -50,7 +49,6 @@
     icon = null,
     placeholder = '',
     suffix = '',
-    suffixClass,
     prefix = '',
     name = id,
     copyable = false,
@@ -183,7 +181,6 @@
         <div
           class={merge(
             'flex w-fit items-center self-stretch border-l border-subtle bg-subtle px-4',
-            suffixClass,
           )}
         >
           {suffix}
