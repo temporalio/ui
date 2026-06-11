@@ -374,10 +374,10 @@
   }
 
   .caret {
-    @apply relative;
+    @apply relative inline-flex items-center justify-center;
 
-    width: 12px;
-    height: 12px;
+    width: 24px;
+    height: 24px;
   }
 
   .caret:disabled {
