@@ -1,6 +1,6 @@
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/inter' layer(base);
 
-@import '@fontsource/noto-sans-mono';
+@import '@fontsource/noto-sans-mono' layer(base);
 
 @import 'tailwindcss';
 @config "../tailwind.config.ts";
@@ -24,7 +24,7 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-border-primary);
+    border-color: rgb(var(--color-border-primary));
   }
 
   :root {
