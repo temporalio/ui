@@ -19,6 +19,7 @@
     type VersionSummary,
   } from '$lib/types/deployments';
   import { parseVersionStatus } from '$lib/utilities/deployments';
+  import { getMilliseconds } from '$lib/utilities/format-time';
   import {
     getBuildIdFromVersion,
     getDeploymentFromVersion,
@@ -154,6 +155,8 @@
   let validateLoading = $state(false);
   let validateResult = $state<{ message?: string } | null>(null);
 
+  const newVersionGracePeriodMs = 2 * 60 * 1000;
+
   async function handleValidateConnection() {
     validateResult = null;
     validateLoading = true;
@@ -172,8 +175,16 @@
     const taskQueueInfos =
       versionDetails.workerDeploymentVersionInfo.taskQueueInfos;
     if (!taskQueueInfos?.length) {
+      const createdMs = getMilliseconds(
+        versionDetails.workerDeploymentVersionInfo.createTime,
+      );
+      const isNewlyCreated = Date.now() - createdMs < newVersionGracePeriodMs;
       validateResult = {
-        message: translate('deployments.validate-connection-no-task-queue'),
+        message: translate(
+          isNewlyCreated
+            ? 'deployments.validate-connection-no-task-queue-pending'
+            : 'deployments.validate-connection-no-task-queue',
+        ),
       };
       validateLoading = false;
       return;
