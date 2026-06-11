@@ -1,8 +1,9 @@
 <script lang="ts">
-  import type { IconName } from '../icon';
-  import Icon from '../icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { navOpen } from '$lib/stores/nav-open';
+
+  import type { IconName } from '../icon';
+  import Icon from '../icon/icon.svelte';
 
   export let icon: IconName;
   export let link: string;

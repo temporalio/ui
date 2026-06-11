@@ -2,10 +2,10 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
-
-  import Icon from '../icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { navOpen } from '$lib/stores/nav-open';
+
+  import Icon from '../icon/icon.svelte';
 
   export let onClick: () => void = () => {};
   export let label: string;
