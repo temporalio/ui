@@ -14,4 +14,9 @@
   title={translate('workers.edit-version-title')}
   url={page.url.href}
 />
-<WorkerDeploymentVersionEdit {namespace} {deployment} {buildId} />
+<WorkerDeploymentVersionEdit
+  {namespace}
+  {deployment}
+  {buildId}
+  cloudRunEnabled
+/>

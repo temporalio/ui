@@ -29,10 +29,17 @@
     cancelHref: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    cloudRunEnabled?: boolean;
   }
 
-  let { onSubmit, onSuccess, cancelHref, cfnTemplateUrl, cfnTemplate }: Props =
-    $props();
+  let {
+    onSubmit,
+    onSuccess,
+    cancelHref,
+    cfnTemplateUrl,
+    cfnTemplate,
+    cloudRunEnabled = false,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
 
@@ -125,7 +132,7 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider={$form.provider} />
+      <ComputeProviderPicker bind:provider={$form.provider} {cloudRunEnabled} />
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}

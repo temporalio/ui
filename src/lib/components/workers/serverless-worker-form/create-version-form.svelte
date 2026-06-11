@@ -17,9 +17,15 @@
     onSubmit: (data: CreateVersionFormData) => Promise<void>;
     cancelHref: string;
     error?: string;
+    cloudRunEnabled?: boolean;
   }
 
-  let { onSubmit, cancelHref, error }: Props = $props();
+  let {
+    onSubmit,
+    cancelHref,
+    error,
+    cloudRunEnabled = false,
+  }: Props = $props();
 
   const superform = superForm(
     {
@@ -86,7 +92,7 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider={$form.provider}>
+      <ComputeProviderPicker bind:provider={$form.provider} {cloudRunEnabled}>
         <ComputeFields
           provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}

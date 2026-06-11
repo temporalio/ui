@@ -15,9 +15,15 @@
     namespace: string;
     deployment: string;
     onSuccess: () => void;
+    cloudRunEnabled?: boolean;
   }
 
-  let { namespace, deployment, onSuccess }: Props = $props();
+  let {
+    namespace,
+    deployment,
+    onSuccess,
+    cloudRunEnabled = false,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
 
@@ -35,6 +41,7 @@
   </h1>
   <CreateVersionForm
     {error}
+    {cloudRunEnabled}
     cancelHref={backHref}
     onSubmit={async (data) => {
       error = undefined;

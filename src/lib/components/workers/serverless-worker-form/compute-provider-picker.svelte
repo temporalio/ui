@@ -3,6 +3,7 @@
 
   import type { Snippet } from 'svelte';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
@@ -10,10 +11,15 @@
 
   interface Props {
     provider?: string;
+    cloudRunEnabled?: boolean;
     children?: Snippet;
   }
 
-  let { provider = $bindable('lambda'), children }: Props = $props();
+  let {
+    provider = $bindable('lambda'),
+    cloudRunEnabled = false,
+    children,
+  }: Props = $props();
 
   const providerStore = writable(provider);
 
@@ -48,7 +54,13 @@
     id="provider-cloud-run"
     label={translate('workers.provider-cloud-run')}
     description={translate('workers.provider-cloud-run-description')}
+    disabled={!cloudRunEnabled}
   >
+    <span slot="label-badge">
+      {#if !cloudRunEnabled}
+        <Badge type="secondary">{translate('workers.coming-soon')}</Badge>
+      {/if}
+    </span>
     <div
       slot="icon"
       class="bg-surface-primary flex h-11 w-11 items-center justify-center rounded-none border border-subtle"
