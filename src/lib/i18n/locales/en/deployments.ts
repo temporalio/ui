@@ -85,6 +85,8 @@ export const Strings = {
   'validate-connection-error': 'Failed to validate connection',
   'validate-connection-valid': 'Connection is valid',
   'validate-connection-invalid': 'Connection is invalid',
+  'validate-connection-no-config':
+    'This version is missing compute configuration. It may have been created outside the UI without the required IAM details.',
   'delete-version': 'Delete Worker Deployment Version',
   'delete-version-description':
     'Deleting any running Workers will finish their current tasks. No new invocations will be made.',
