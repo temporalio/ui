@@ -1,8 +1,21 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, type Request, test } from '@playwright/test';
 
 import { mockSchedulesApis } from '~/test-utilities/mock-apis';
 
 const createScheduleUrl = '/namespaces/default/schedules/create';
+
+const fillBaseFields = async (page: Page) => {
+  await page.getByTestId('schedule-name-input').fill('test');
+  await page.getByTestId('schedule-type-input').fill('test');
+  await page.getByTestId('schedule-workflow-id-input').fill('test');
+  await page.getByTestId('schedule-task-queue-input').fill('test');
+};
+
+const isCreateRequest = (request: Request) =>
+  request.method() === 'POST' &&
+  request.url().includes('/schedules/test') &&
+  !request.url().includes('/update') &&
+  !request.url().includes('/patch');
 
 test.describe('Creates Schedule Successfully', () => {
   test.beforeEach(async ({ page }) => {
@@ -16,16 +29,10 @@ test.describe('Creates Schedule Successfully', () => {
   });
 
   test('fills out interval-based schedule and submits', async ({ page }) => {
-    await page.getByTestId('schedule-name-input').fill('test');
-    await page.getByTestId('schedule-type-input').fill('test');
-    await page.getByTestId('schedule-workflow-id-input').fill('test');
-    await page.getByTestId('schedule-task-queue-input').fill('test');
+    await fillBaseFields(page);
     await page.getByTestId('spec-type-0-button').click();
     await page.getByRole('option', { name: 'Interval' }).click();
-    await page.getByTestId('days-0').fill('1');
-    await page.getByTestId('hour-0').fill('2');
-    await page.getByTestId('minute-0').fill('30');
-    await page.getByTestId('second-0').fill('0');
+    await page.getByLabel('Time Interval').fill('90');
 
     const createButton = page.getByTestId('create-schedule-button');
     await expect(createButton).toBeEnabled();
@@ -37,16 +44,10 @@ test.describe('Creates Schedule Successfully', () => {
   test('fills out schedule with custom search attributes and submits', async ({
     page,
   }) => {
-    await page.getByTestId('schedule-name-input').fill('test');
-    await page.getByTestId('schedule-type-input').fill('test');
-    await page.getByTestId('schedule-workflow-id-input').fill('test');
-    await page.getByTestId('schedule-task-queue-input').fill('test');
+    await fillBaseFields(page);
     await page.getByTestId('spec-type-0-button').click();
     await page.getByRole('option', { name: 'Interval' }).click();
-    await page.getByTestId('days-0').fill('1');
-    await page.getByTestId('hour-0').fill('2');
-    await page.getByTestId('minute-0').fill('30');
-    await page.getByTestId('second-0').fill('0');
+    await page.getByLabel('Time Interval').fill('90');
 
     await page.getByTestId('workflows-tab').click();
     const workflowsTab = page.getByTestId('workflows-panel');
@@ -89,5 +90,67 @@ test.describe('Creates Schedule Successfully', () => {
     await createButton.click();
 
     await expect(page.getByTestId('loading')).toBeVisible();
+  });
+
+  test('submits a weekly spec that runs in every month', async ({ page }) => {
+    await fillBaseFields(page);
+    await page.getByTestId('spec-type-0-button').click();
+    await page.getByRole('option', { name: 'Days of Week' }).click();
+    await page.getByRole('radio', { name: 'Weekdays' }).click();
+
+    const createRequest = page.waitForRequest(isCreateRequest);
+    await page.getByTestId('create-schedule-button').click();
+    const body = (await createRequest).postDataJSON();
+
+    expect(body.schedule.spec.cronString).toEqual([]);
+    expect(body.schedule.spec.structuredCalendar).toHaveLength(1);
+
+    const calendar = body.schedule.spec.structuredCalendar[0];
+    expect(calendar.dayOfWeek).toEqual([{ start: 1, end: 5 }]);
+    expect(calendar.month).toEqual([{ start: 1, end: 12 }]);
+    expect(calendar.dayOfMonth).toEqual([{ start: 1, end: 31 }]);
+  });
+
+  test('submits the cron expression exactly as entered', async ({ page }) => {
+    await fillBaseFields(page);
+    await page.getByPlaceholder('* * * * *').fill('0 12 * * *');
+
+    const createRequest = page.waitForRequest(isCreateRequest);
+    await page.getByTestId('create-schedule-button').click();
+    const body = (await createRequest).postDataJSON();
+
+    expect(body.schedule.spec.cronString).toEqual(['0 12 * * *']);
+    expect(body.schedule.spec.structuredCalendar).toEqual([]);
+  });
+
+  test('rejects cron expressions containing "#"', async ({ page }) => {
+    await fillBaseFields(page);
+    await page.getByPlaceholder('* * * * *').fill('0 0 * * 1#2');
+
+    await page.getByTestId('create-schedule-button').click();
+
+    await expect(
+      page.getByText('Must be a valid cron string').first(),
+    ).toBeVisible();
+    await expect(page.getByTestId('loading')).toBeHidden();
+  });
+
+  test('snaps an emptied catchup window back to its default on blur', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Edit Schedule Policies' }).click();
+
+    const catchupWindow = page.locator('#catchup-window-policy-duration');
+    await expect(catchupWindow).toHaveValue('365');
+
+    await catchupWindow.fill('');
+    await catchupWindow.blur();
+
+    await expect(page.locator('#catchup-window-policy-duration')).toHaveValue(
+      '365',
+    );
+    await expect(
+      page.locator('#catchup-window-policy-duration-unit-select'),
+    ).toHaveValue('day(s)');
   });
 });
