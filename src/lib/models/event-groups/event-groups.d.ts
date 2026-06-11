@@ -30,6 +30,7 @@ interface EventGroup extends Pick<
   level: number | undefined;
   pendingActivity: PendingActivity | undefined;
   pendingNexusOperation: PendingNexusOperation | undefined;
+  cancelRequested: boolean;
   userMetadata?: { summary?: Payload };
   decodedLocalActivity?: SummaryAttribute;
   links: EventLink[];

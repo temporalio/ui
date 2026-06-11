@@ -81,6 +81,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     level: undefined,
     pendingActivity: undefined,
     pendingNexusOperation: undefined,
+    cancelRequested: false,
     userMetadata: event?.userMetadata,
     get eventTime() {
       return this.lastEvent?.eventTime;
@@ -105,7 +106,8 @@ const createGroupFor = <K extends keyof StartingEvents>(
         !!this.pendingActivity ||
         !!this.pendingNexusOperation ||
         (isTimerStartedEvent(this.initialEvent) &&
-          this.eventList.length === 1) ||
+          this.eventList.length === 1 &&
+          !this.cancelRequested) ||
         (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&
           this.eventList.length === 2)
       );
@@ -114,7 +116,12 @@ const createGroupFor = <K extends keyof StartingEvents>(
       return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
     },
     get isCanceled() {
-      return Boolean(this.eventList.find(eventIsCanceled));
+      return (
+        Boolean(this.eventList.find(eventIsCanceled)) ||
+        (isTimerStartedEvent(this.initialEvent) &&
+          this.eventList.length === 1 &&
+          this.cancelRequested)
+      );
     },
     get isTerminated() {
       return Boolean(this.eventList.find(eventIsTerminated));
