@@ -17,15 +17,19 @@
 </script>
 
 {#if clickAllToCopy}
-  <button
-    class="group flex items-center gap-1 break-all {$$props['container-class']}"
-    on:click={handleOnClick}
-  >
-    <slot>
-      <span class={$$props.class} class:select-all={!$$slots.default}
-        >{content}</span
-      >
-    </slot>
+  <div class="group flex items-center gap-1 {$$props['container-class']}">
+    <button
+      type="button"
+      class="break-all text-left"
+      on:click={handleOnClick}
+      aria-label={`Copy ${content}`}
+    >
+      <slot>
+        <span class={$$props.class} class:select-all={!$$slots.default}
+          >{content}</span
+        >
+      </slot>
+    </button>
     <CopyButton
       {copyIconTitle}
       {copySuccessIconTitle}
@@ -35,7 +39,7 @@
       on:click={handleOnClick}
       copied={$copied}
     />
-  </button>
+  </div>
 {:else}
   <div class="group flex items-center gap-1 {$$props['container-class']}">
     <slot>
