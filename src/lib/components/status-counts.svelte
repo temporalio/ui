@@ -134,7 +134,10 @@
   };
 </script>
 
-<div class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5">
+<div
+  class="flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5"
+  aria-busy={countPoller.loading}
+>
   {#each allStatusGroups as { count, status } (status)}
     {#if !countPoller.loading}
       {@const group = newStatusGroups.find((g) => g.status === status)}
