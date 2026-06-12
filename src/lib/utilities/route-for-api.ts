@@ -195,6 +195,7 @@ export function pathForApi(
     'worker-deployment-version-compute-config': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}/update-compute-config`,
     'worker-deployment-version-validate-compute-config': `/namespaces/${parameters?.namespace}/worker-deployment-versions/${parameters?.deploymentName}/${parameters?.buildId}/validate-compute-config`,
     'worker-deployment-set-current-version': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}/set-current-version`,
+    'worker-deployment-set-ramping-version': `/namespaces/${parameters?.namespace}/worker-deployments/${parameters?.deploymentName}/set-ramping-version`,
     'standalone-activity': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}`,
     'standalone-activities': `/namespaces/${parameters?.namespace}/activities`,
     'standalone-activities.count': `/namespaces/${parameters?.namespace}/activity-count`,

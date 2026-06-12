@@ -15,6 +15,7 @@ export type GetSystemInfoResponse =
 export type Capabilities =
   temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
     serverScaledDeployments?: boolean | null;
+    serverScaledProviderCloudRun?: boolean | null;
   };
 
 export type NamespaceCapabilities = NonNullable<

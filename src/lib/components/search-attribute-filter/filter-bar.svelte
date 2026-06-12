@@ -28,7 +28,7 @@
     options,
     searchAttributes,
     id,
-    statusAttribute,
+    statusAttribute = 'ExecutionStatus',
     onManualSearch,
     includeNullConditions,
   }: Props = $props();

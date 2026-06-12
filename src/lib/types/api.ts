@@ -57,7 +57,8 @@ export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
 export type WorkerDeploymentAPIRoutePath =
   | 'worker-deployment'
-  | 'worker-deployment-set-current-version';
+  | 'worker-deployment-set-current-version'
+  | 'worker-deployment-set-ramping-version';
 export type WorkerDeploymentVersionAPIRoutePath =
   | 'worker-deployment-version'
   | 'worker-deployment-version-compute-config'

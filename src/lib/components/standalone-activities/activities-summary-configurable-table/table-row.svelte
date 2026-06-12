@@ -5,6 +5,7 @@
 
   import StartActivityButton from '$lib/components/standalone-activities/start-activity-button.svelte';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   interface Props {
     activity?: ActivityExecutionInfo;
@@ -15,6 +16,9 @@
   let { activity, empty = false, children }: Props = $props();
 
   const namespace = $derived(page.params.namespace);
+  const activityStartEnabled = $derived(
+    !standaloneActivityCommandsDisabled(page),
+  );
 </script>
 
 <tr
@@ -22,7 +26,7 @@
   class:empty
   class="dense"
 >
-  {#if !empty && activity}
+  {#if !empty && activity && activityStartEnabled}
     <td class="relative flex items-center justify-center py-0.5">
       <StartActivityButton
         {namespace}
