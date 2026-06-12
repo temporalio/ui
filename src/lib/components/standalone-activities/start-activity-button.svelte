@@ -45,6 +45,7 @@
     variant="ghost"
     class="start-button"
     leadingIcon="lightning-bolt"
+    label={translate('standalone-activities.start-activity-like-this-one')}
     on:click={() => goto(href)}
   ></Button>
 </Tooltip>

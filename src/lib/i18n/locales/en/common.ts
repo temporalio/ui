@@ -227,4 +227,5 @@ export const Strings = {
   'change-log': 'Change Log',
   comfortable: 'Comfortable',
   dense: 'Dense',
+  'configure-columns': 'Configure Columns',
 } as const;
