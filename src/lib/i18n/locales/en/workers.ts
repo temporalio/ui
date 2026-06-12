@@ -21,6 +21,7 @@ export const Strings = {
   instance_one: 'Instance',
   instance_other: 'Instances',
   'task-queue': 'Task Queue',
+  'task-queues': 'Task Queues',
   status: 'Status',
   'shutting-down': 'Shutting Down',
   sdk: 'Worker SDK',
