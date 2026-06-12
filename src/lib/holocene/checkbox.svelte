@@ -75,6 +75,9 @@
     : checked
       ? ('checkmark' as const)
       : null;
+
+  $: errorId = `${id}-error`;
+  $: showError = !valid && !!error;
 </script>
 
 <div
@@ -114,6 +117,8 @@
       data-track-name="checkbox"
       data-track-intent="toggle"
       data-track-text={label}
+      aria-invalid={showError ? 'true' : undefined}
+      aria-describedby={showError ? errorId : undefined}
       bind:checked
       {disabled}
       {required}
@@ -175,7 +180,7 @@
       </span>
     </slot>
   </Label>
-  {#if !valid && error}
-    <span class="text-xs text-danger">{error}</span>
+  {#if showError}
+    <span id={errorId} role="alert" class="text-xs text-danger">{error}</span>
   {/if}
 </div>

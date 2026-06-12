@@ -37,6 +37,8 @@
   $: {
     validate(value);
   }
+
+  $: errorId = `${id}-error`;
 </script>
 
 <div class={merge('flex flex-col gap-1', $$props.class)}>
@@ -66,6 +68,8 @@
         {name}
         {step}
         {required}
+        aria-invalid={!valid ? 'true' : undefined}
+        aria-describedby={!valid && hintText ? errorId : undefined}
         {autocomplete}
         spellcheck="false"
         bind:value
@@ -86,7 +90,9 @@
   </div>
 </div>
 {#if !valid && hintText}
-  <span class="mt-1 text-xs text-danger">{hintText}</span>
+  <span id={errorId} role="alert" class="mt-1 text-xs text-danger"
+    >{hintText}</span
+  >
 {/if}
 
 <style lang="postcss">
