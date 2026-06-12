@@ -48,6 +48,17 @@
     hoveredEventId?: string;
   } = $props();
 
+  let prevItemCount = $state(0);
+  let newEventCount = $state(0);
+
+  $effect(() => {
+    const current = items.length;
+    if (current > prevItemCount && prevItemCount > 0) {
+      newEventCount = current - prevItemCount;
+    }
+    prevItemCount = current;
+  });
+
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
   const url = $derived(page.url);
@@ -82,6 +93,11 @@
   };
 </script>
 
+<span class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+  {#if newEventCount > 0}
+    {translate('workflows.new-events-announcement', { count: newEventCount })}
+  {/if}
+</span>
 <div class="flex">
   <div class="pt-9">
     {#if showGraph}
