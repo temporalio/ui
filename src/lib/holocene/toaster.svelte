@@ -40,7 +40,7 @@
   });
 </script>
 
-<div class={toast({ position: $position })} role="log">
+<div class={toast({ position: $position })}>
   {#each $toasts as { message, variant, id, link } (id)}
     <ToastComponent {closeButtonLabel} {variant} {id} on:dismiss={dismissToast}>
       {#if link}
