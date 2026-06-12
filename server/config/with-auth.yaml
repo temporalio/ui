@@ -50,6 +50,7 @@ auth:
         - email
         - offline_access
       callbackUrl: http://localhost:8081/auth/sso/callback
+      refreshTokenDuration: 24h # Set to match your IdP's refresh token lifetime (0 or omit = 7-day default)
       options: # added as URL query params when redirecting to auth provider
         audience: myorg-dev
         organization: org_xxxxxxxxxxxx
