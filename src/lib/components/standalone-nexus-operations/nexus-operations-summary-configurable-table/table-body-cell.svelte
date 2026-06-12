@@ -67,7 +67,7 @@
     {:else if label === 'Run ID'}
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
-        attribute="RunID"
+        attribute="RunId"
         value={operation.runId}
         href={routeForStandaloneNexusOperationDetails({
           namespace,
