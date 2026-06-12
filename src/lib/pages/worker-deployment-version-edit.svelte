@@ -8,7 +8,9 @@
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    buildGcpCloudRunComputeConfig,
     buildLambdaComputeConfig,
+    decodeGcpCloudRunProviderDetails,
     decodeLambdaProviderDetails,
     decodeScalerDetails,
     deleteWorkerDeploymentVersion,
@@ -42,6 +44,7 @@
 {:then versionResponse}
   {@const info = versionResponse.workerDeploymentVersionInfo}
   {@const providerDetails = decodeLambdaProviderDetails(info.computeConfig)}
+  {@const gcpDetails = decodeGcpCloudRunProviderDetails(info.computeConfig)}
   {@const scalerDetails = decodeScalerDetails(info.computeConfig)}
   <div class="flex max-w-[45rem] flex-col gap-4">
     <Link href={backHref} icon="chevron-left">
@@ -53,9 +56,14 @@
     <EditVersionForm
       {error}
       initialData={{
+        provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',
         iamRoleArn: providerDetails.iamRoleArn ?? '',
         roleExternalId: providerDetails.roleExternalId ?? '',
+        gcpProject: gcpDetails.gcpProject,
+        gcpRegion: gcpDetails.gcpRegion,
+        gcpWorkerPool: gcpDetails.gcpWorkerPool,
+        gcpServiceAccount: gcpDetails.gcpServiceAccount,
         scaleUpCooloffMs: scalerDetails.scaleUpCooloffMs,
         scaleUpBacklogThreshold: scalerDetails.scaleUpBacklogThreshold,
         maxWorkerLifetimeMs: scalerDetails.maxWorkerLifetimeMs,
@@ -64,17 +72,21 @@
       cancelHref={backHref}
       onSubmit={async (data) => {
         error = undefined;
-        const computeConfig = buildLambdaComputeConfig(
-          data.lambdaArn,
-          data.iamRoleArn,
-          {
-            roleExternalId: data.roleExternalId,
-            scaleUpCooloffMs: data.scaleUpCooloffMs,
-            scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-            maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-            metricsPollIntervalMs: data.metricsPollIntervalMs,
-          },
-        );
+        const computeConfig =
+          data.provider === 'cloud-run'
+            ? buildGcpCloudRunComputeConfig(
+                data.gcpProject,
+                data.gcpRegion,
+                data.gcpWorkerPool,
+                data.gcpServiceAccount,
+              )
+            : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {
+                roleExternalId: data.roleExternalId,
+                scaleUpCooloffMs: data.scaleUpCooloffMs,
+                scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+                maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+                metricsPollIntervalMs: data.metricsPollIntervalMs,
+              });
         await updateWorkerDeploymentVersionComputeConfig(
           { namespace, deploymentName: deployment, buildId, computeConfig },
           (err) => {

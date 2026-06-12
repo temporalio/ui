@@ -398,10 +398,45 @@ export const buildLambdaComputeConfig = (
   };
 };
 
+export const buildGcpCloudRunComputeConfig = (
+  project: string,
+  region: string,
+  workerPool: string,
+  serviceAccount: string,
+): ComputeConfig => {
+  const providerPayload: Record<string, string> = {
+    project,
+    region,
+    worker_pool: workerPool,
+    service_account: serviceAccount,
+  };
+  const providerData = btoa(JSON.stringify(providerPayload));
+  const encoding = btoa('json/plain');
+
+  return {
+    scalingGroups: {
+      default: {
+        taskQueueTypes: [
+          'TASK_QUEUE_TYPE_WORKFLOW',
+          'TASK_QUEUE_TYPE_ACTIVITY',
+        ],
+        provider: {
+          type: 'gcp-cloud-run',
+          details: { metadata: { encoding }, data: providerData },
+        },
+      },
+    },
+  };
+};
+
+const providerTypeOf = (scalingGroup?: ComputeConfigScalingGroup) =>
+  scalingGroup?.providerType ?? scalingGroup?.provider?.type;
+
 export const decodeLambdaProviderDetails = (
   computeConfig?: ComputeConfig,
 ): { lambdaArn?: string; iamRoleArn?: string; roleExternalId?: string } => {
   const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'aws-lambda') return {};
   if (!scalingGroup?.provider?.details?.data) return {};
   try {
     const raw = JSON.parse(atob(scalingGroup.provider.details.data));
@@ -413,6 +448,30 @@ export const decodeLambdaProviderDetails = (
     if (raw.arn) result.lambdaArn = raw.arn;
     if (raw.role) result.iamRoleArn = raw.role;
     if (raw.role_external_id) result.roleExternalId = raw.role_external_id;
+    return result;
+  } catch {
+    return {};
+  }
+};
+
+export const decodeGcpCloudRunProviderDetails = (
+  computeConfig?: ComputeConfig,
+): {
+  gcpProject?: string;
+  gcpRegion?: string;
+  gcpWorkerPool?: string;
+  gcpServiceAccount?: string;
+} => {
+  const scalingGroup = Object.values(computeConfig?.scalingGroups ?? {})[0];
+  if (providerTypeOf(scalingGroup) !== 'gcp-cloud-run') return {};
+  if (!scalingGroup?.provider?.details?.data) return {};
+  try {
+    const raw = JSON.parse(atob(scalingGroup.provider.details.data));
+    const result: ReturnType<typeof decodeGcpCloudRunProviderDetails> = {};
+    if (raw.project) result.gcpProject = raw.project;
+    if (raw.region) result.gcpRegion = raw.region;
+    if (raw.worker_pool) result.gcpWorkerPool = raw.worker_pool;
+    if (raw.service_account) result.gcpServiceAccount = raw.service_account;
     return result;
   } catch {
     return {};
