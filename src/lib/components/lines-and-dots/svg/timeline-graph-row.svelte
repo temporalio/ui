@@ -286,6 +286,7 @@
             icon={(pendingActivity && !pendingActivity.paused) || retried
               ? 'retry'
               : undefined}
+            contentKey={decodedValue}
           >
             {#if pendingActivity}
               {translate('workflows.attempt')}
