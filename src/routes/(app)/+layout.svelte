@@ -35,6 +35,7 @@
     routeForNexus,
     routeForSchedules,
     routeForStandaloneActivities,
+    routeForStandaloneNexusOperations,
     routeForWorkerDeployments,
     routeForWorkers,
     routeForWorkflows,
@@ -78,6 +79,9 @@
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
+      standaloneNexusOperationsRoute: routeForStandaloneNexusOperations({
+        namespace,
+      }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
       workersRoute: routeForWorkers({ namespace }),
@@ -93,6 +97,7 @@
     {
       workflowsRoute,
       standaloneActivitiesRoute,
+      standaloneNexusOperationsRoute,
       schedulesRoute,
       batchOperationsRoute,
       workersRoute,
@@ -103,6 +108,7 @@
     }: {
       workflowsRoute: string;
       standaloneActivitiesRoute: string;
+      standaloneNexusOperationsRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
       workersRoute: string;
@@ -141,6 +147,15 @@
         label: translate('standalone-activities.standalone-activities'),
         isActive: (path) => path.includes(standaloneActivitiesRoute),
         hidden: !minimumVersionRequired('1.30.0', $temporalVersion),
+      },
+      {
+        href: standaloneNexusOperationsRoute,
+        icon: 'nexus',
+        label: translate(
+          'standalone-nexus-operations.standalone-nexus-operations',
+        ),
+        isActive: (path) => path.includes(standaloneNexusOperationsRoute),
+        hidden: !minimumVersionRequired('1.31.0', $temporalVersion),
       },
       {
         href: schedulesRoute,
@@ -231,6 +246,7 @@
     workerDeploymentsRoute,
     archivalRoute,
     standaloneActivitiesRoute,
+    standaloneNexusOperationsRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
@@ -241,6 +257,7 @@
       batchOperationsRoute,
       archivalRoute,
       standaloneActivitiesRoute,
+      standaloneNexusOperationsRoute,
     ].some((route) => page.url.href.includes(route)),
   );
 
@@ -257,6 +274,10 @@
       {
         subPath: 'activities',
         fullRoute: routeForStandaloneActivities({ namespace }),
+      },
+      {
+        subPath: 'nexus-operations',
+        fullRoute: routeForStandaloneNexusOperations({ namespace }),
       },
       {
         subPath: 'workers/deployments',
