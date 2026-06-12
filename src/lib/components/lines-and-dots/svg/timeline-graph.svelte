@@ -25,6 +25,8 @@
     viewportHeight: number | undefined;
     readOnly?: boolean;
     error?: boolean;
+    overrideStartTime?: string;
+    overrideEndTime?: string;
   }
 
   let {
@@ -35,6 +37,8 @@
     viewportHeight,
     readOnly = false,
     error = false,
+    overrideStartTime,
+    overrideEndTime,
   }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
@@ -59,7 +63,9 @@
   });
 
   const startTime = $derived(
-    (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime,
+    overrideStartTime ||
+      (!isWorkflowDelayed(workflow) && firstStartTime) ||
+      workflow.startTime,
   );
   const timelineHeight = $derived(
     Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight,
@@ -93,6 +99,7 @@
   <EndTimeInterval
     {workflow}
     {startTime}
+    {overrideEndTime}
     let:endTime
     let:duration
     let:currentTime

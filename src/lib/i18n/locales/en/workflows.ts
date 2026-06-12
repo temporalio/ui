@@ -352,6 +352,8 @@ export const Strings = {
   'scheduled-by': 'Scheduled By',
   'auto-refresh-on': 'Auto Refresh On',
   'auto-refresh-off': 'Auto Refresh Off',
+  'auto-refresh-disabled-end-time':
+    'Auto refresh is disabled while an end time filter is set',
   minimized: 'Minimized',
   expanded: 'Expanded',
   'timeline-minimized':

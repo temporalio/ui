@@ -96,6 +96,8 @@
       onlyUnderSecond: false,
     });
 
+    const clampRatio = (r: number) => Math.max(0, Math.min(1, r));
+
     const points = group.eventList.map((event) => {
       const distance = getMillisecondDuration({
         start: startTime,
@@ -103,7 +105,7 @@
         onlyUnderSecond: false,
       });
 
-      const ratio = distance / workflowDistance;
+      const ratio = clampRatio((distance ?? 0) / (workflowDistance ?? 1));
       return Math.round(ratio * timelineWidth) + gutter;
     });
 
@@ -114,7 +116,7 @@
         onlyUnderSecond: false,
       });
 
-      const ratio = distance / workflowDistance;
+      const ratio = clampRatio((distance ?? 0) / (workflowDistance ?? 1));
       const pausePoint = Math.round(ratio * timelineWidth) + gutter;
       points.push(pausePoint);
     }
@@ -250,7 +252,7 @@
         startPoint={[x, y]}
         endPoint={[canvasWidth - gutter, y]}
         category={pendingActivity
-          ? pendingActivity.attempt > 1
+          ? (pendingActivity.attempt ?? 0) > 1
             ? 'retry'
             : 'pending'
           : group.category}
