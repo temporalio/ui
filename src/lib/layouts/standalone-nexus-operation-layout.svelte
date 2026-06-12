@@ -26,10 +26,11 @@
   interface Props {
     namespace: string;
     operationId: string;
+    runId: string;
     children: Snippet;
   }
 
-  let { children, namespace, operationId }: Props = $props();
+  let { children, namespace, operationId, runId }: Props = $props();
 
   let error = $state<Error | undefined>();
 
@@ -38,6 +39,7 @@
     new StandaloneNexusOperationPoller(
       namespace,
       operationId,
+      runId,
       nexusOperationPollerAbortController,
       (execution) => {
         $nexusOperationExecution = execution;
@@ -48,7 +50,7 @@
     ),
   );
 
-  const routeParameters = $derived({ namespace, operationId });
+  const routeParameters = $derived({ namespace, operationId, runId });
 
   const detailsRoute = $derived(
     routeForStandaloneNexusOperationDetails(routeParameters),

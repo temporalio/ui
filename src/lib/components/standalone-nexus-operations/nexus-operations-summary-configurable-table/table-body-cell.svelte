@@ -33,7 +33,13 @@
     }
   };
 
-  const filterableLabels = ['Operation ID', 'Endpoint', 'Service', 'Operation'];
+  const filterableLabels = [
+    'Operation ID',
+    'Run ID',
+    'Endpoint',
+    'Service',
+    'Operation',
+  ];
 </script>
 
 {#if filterableLabels.includes(label)}
@@ -55,6 +61,18 @@
         href={routeForStandaloneNexusOperationDetails({
           namespace,
           operationId: operation.operationId,
+          runId: operation.runId,
+        })}
+      />
+    {:else if label === 'Run ID'}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="RunID"
+        value={operation.runId}
+        href={routeForStandaloneNexusOperationDetails({
+          namespace,
+          operationId: operation.operationId,
+          runId: operation.runId,
         })}
       />
     {:else if label === 'Endpoint'}
@@ -84,8 +102,6 @@
   >
     {#if label === 'Status'}
       <WorkflowStatus status={toNexusOperationStatus(operation.status)} />
-    {:else if label === 'Run ID'}
-      {operation.runId ?? ''}
     {:else if label === 'Schedule Time'}
       <Timestamp dateTime={operation.scheduleTime} />
     {:else if label === 'Close Time'}

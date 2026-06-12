@@ -16,6 +16,7 @@ export class StandaloneNexusOperationPoller {
   private abortController: AbortController;
   private namespace: string;
   private operationId: string;
+  private runId: string;
   private token: string;
   private onUpdate: (nexusOperationExecution: NexusOperationExecution) => void;
   private onError: (error: Error) => void;
@@ -23,12 +24,14 @@ export class StandaloneNexusOperationPoller {
   constructor(
     namespace: string,
     operationId: string,
+    runId: string,
     abortController: AbortController,
     onUpdate: (nexusOperationExecution: NexusOperationExecution) => void,
     onError: (error: Error) => void,
   ) {
     this.namespace = namespace;
     this.operationId = operationId;
+    this.runId = runId;
     this.abortController = abortController;
     this.onUpdate = onUpdate;
     this.onError = onError;
@@ -61,6 +64,7 @@ export class StandaloneNexusOperationPoller {
             await pollNexusOperationExecution(
               this.namespace,
               this.operationId,
+              this.runId,
               this.token,
               this.abortController.signal,
             );

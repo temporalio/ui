@@ -313,6 +313,7 @@ export const fetchInitialValuesForStartNexusOperation = async (
 export const pollNexusOperationExecution = (
   namespace: string,
   operationId: string,
+  runId: string,
   token: string,
   signal: AbortSignal,
 ): Promise<NexusOperationExecution> => {
@@ -324,6 +325,7 @@ export const pollNexusOperationExecution = (
   const params = new URLSearchParams({
     includeInput: 'false',
     includeOutcome: 'true',
+    runId,
     longPollToken: token,
   });
 

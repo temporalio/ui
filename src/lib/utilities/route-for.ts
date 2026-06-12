@@ -230,27 +230,27 @@ export const routeForStartStandaloneNexusOperation = (
 };
 
 const routeForStandaloneNexusOperationBase = (
-  parameters: NamespaceParameter & { operationId: string },
+  parameters: NamespaceParameter & { operationId: string; runId: string },
 ): ResolvedPathname => {
   const operationId = encodeURIForSvelte(parameters.operationId);
 
-  return `${routeForStandaloneNexusOperations(parameters)}/${operationId}`;
+  return `${routeForStandaloneNexusOperations(parameters)}/${operationId}/${parameters.runId}`;
 };
 
 export const routeForStandaloneNexusOperationDetails = (
-  parameters: NamespaceParameter & { operationId: string },
+  parameters: NamespaceParameter & { operationId: string; runId: string },
 ): ResolvedPathname => {
   return `${routeForStandaloneNexusOperationBase(parameters)}/details`;
 };
 
 export const routeForStandaloneNexusOperationSearchAttributes = (
-  parameters: NamespaceParameter & { operationId: string },
+  parameters: NamespaceParameter & { operationId: string; runId: string },
 ): ResolvedPathname => {
   return `${routeForStandaloneNexusOperationBase(parameters)}/search-attributes`;
 };
 
 export const routeForStandaloneNexusOperationMetadata = (
-  parameters: NamespaceParameter & { operationId: string },
+  parameters: NamespaceParameter & { operationId: string; runId: string },
 ): ResolvedPathname => {
   return `${routeForStandaloneNexusOperationBase(parameters)}/metadata`;
 };

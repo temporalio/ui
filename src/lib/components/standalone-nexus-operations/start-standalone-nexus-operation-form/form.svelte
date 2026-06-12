@@ -156,7 +156,7 @@
             return acc;
           }, {});
 
-          await startStandaloneNexusOperation({
+          const { runId } = await startStandaloneNexusOperation({
             ...form.data,
             idReusePolicy: idReusePolicy as
               | NexusOperationIdReusePolicy
@@ -182,6 +182,7 @@
             link: routeForStandaloneNexusOperationDetails({
               namespace,
               operationId,
+              runId,
             }),
           });
           return { type: 'success' };

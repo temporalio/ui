@@ -7,8 +7,9 @@
 
   const namespace = $derived(params.namespace);
   const operationId = $derived(params.operationId);
+  const runId = $derived(params.runId);
 </script>
 
-<StandaloneNexusOperationLayout {namespace} {operationId}>
+<StandaloneNexusOperationLayout {namespace} {operationId} {runId}>
   {@render children()}
 </StandaloneNexusOperationLayout>

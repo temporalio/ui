@@ -172,6 +172,7 @@ const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
 export const DEFAULT_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Status' },
   { label: 'Operation ID' },
+  { label: 'Run ID' },
   { label: 'Endpoint' },
   { label: 'Service' },
   { label: 'Operation' },
@@ -179,7 +180,6 @@ export const DEFAULT_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
 ];
 
 const DEFAULT_AVAILABLE_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
-  { label: 'Run ID' },
   { label: 'Close Time' },
   { label: 'Execution Duration' },
   { label: 'State Transitions' },
