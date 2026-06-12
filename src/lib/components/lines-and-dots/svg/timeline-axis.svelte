@@ -64,6 +64,8 @@
 {/each}
 
 <style lang="postcss">
+  @reference "../../../../app.css";
+
   text {
     @apply fill-current;
   }

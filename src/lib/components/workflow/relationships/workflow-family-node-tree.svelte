@@ -164,7 +164,7 @@
       id: child.workflow.id,
       status: child.workflow.status,
     })}
-    class="outline-none transition-all"
+    class="outline-hidden transition-all"
     on:click={(e) => nodeClick(e, child)}
     on:keypress={(e) => nodeClick(e, child)}
   >
@@ -239,7 +239,7 @@
       class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="dark:fill-space-black fill-white stroke-slate-50 dark:stroke-slate-900"
       x={x - 3 * radius - radius / 2}
       y={y - radius / 4}
       cx={radius / 2}
@@ -248,7 +248,7 @@
       height={radius / 2}
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="dark:fill-space-black fill-white stroke-slate-50 dark:stroke-slate-900"
       x={x - 1.5 * radius - radius / 2}
       y={y - radius / 4}
       cx={radius / 2}
@@ -264,7 +264,7 @@
       class="stroke-slate-50 stroke-2 duration-300 ease-in-out dark:stroke-slate-900"
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="dark:fill-space-black fill-white stroke-slate-50 dark:stroke-slate-900"
       x={x + 1.5 * radius}
       y={y - radius / 4}
       cx={radius / 2}
@@ -273,7 +273,7 @@
       height={radius / 2}
     />
     <rect
-      class="fill-white stroke-slate-50 dark:fill-space-black dark:stroke-slate-900"
+      class="dark:fill-space-black fill-white stroke-slate-50 dark:stroke-slate-900"
       x={x + 3 * radius}
       y={y - radius / 4}
       cx={radius / 2}
@@ -287,7 +287,7 @@
 {#if generation === 1}
   <g
     role="button"
-    class="outline-none"
+    class="outline-hidden"
     tabindex="0"
     aria-label={translate('workflows.family-node-label', {
       id: root.workflow.id,

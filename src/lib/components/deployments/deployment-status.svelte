@@ -33,7 +33,7 @@
 
   const deploymentStatus = cva(
     [
-      'flex items-center justify-center gap-1 px-1 min-w-24 transition-colors rounded-sm border border-subtle',
+      'flex items-center justify-center gap-1 px-1 min-w-24 transition-colors rounded-xs border border-subtle',
     ],
     {
       variants: {

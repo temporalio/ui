@@ -27,7 +27,7 @@
   }: Props = $props();
 </script>
 
-<p class="flex items-center gap-2 text-{textSize} whitespace-nowrap pt-2">
+<p class="flex items-center gap-2 text-{textSize} pt-2 whitespace-nowrap">
   {#if copyable}
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
@@ -45,13 +45,13 @@
       {#if href}
         <Link
           {href}
-          class="surface-subtle w-fit truncate rounded-sm p-1 leading-4"
+          class="surface-subtle w-fit truncate rounded-xs p-1 leading-4"
           >{content}</Link
         >
       {:else}
         <Tooltip text={tooltip} hide={!tooltip} top>
           <span
-            class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
+            class="surface-subtle w-fit truncate rounded-xs p-1 leading-4 select-all"
             >{content}</span
           >
         </Tooltip>
@@ -67,13 +67,13 @@
     {#if href}
       <Link
         {href}
-        class="surface-subtle w-fit truncate rounded-sm p-1 leading-4"
+        class="surface-subtle w-fit truncate rounded-xs p-1 leading-4"
         >{content}</Link
       >
     {:else}
       <Tooltip text={tooltip} hide={!tooltip} top>
         <span
-          class="surface-subtle w-fit select-all truncate rounded-sm p-1 leading-4"
+          class="surface-subtle w-fit truncate rounded-xs p-1 leading-4 select-all"
           >{content}</span
         >
       </Tooltip>

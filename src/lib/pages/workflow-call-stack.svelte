@@ -46,9 +46,9 @@
   {#if workflow?.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}
       <div class="flex flex-col gap-2">
-        <Skeleton class="h-16 w-1/3 rounded-sm" />
+        <Skeleton class="h-16 w-1/3 rounded-xs" />
         <Skeleton class="h-3 w-32" />
-        <Skeleton class="h-48 w-full rounded-sm" />
+        <Skeleton class="h-48 w-full rounded-xs" />
       </div>
     {:then result}
       {#if typeof result === 'string'}

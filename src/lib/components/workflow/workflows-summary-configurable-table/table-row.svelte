@@ -127,6 +127,8 @@
 </tr>
 
 <style lang="postcss">
+  @reference "../../../../app.css";
+
   .child {
     @apply bg-slate-100/50 dark:bg-slate-100/5;
   }

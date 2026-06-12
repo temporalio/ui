@@ -1,12 +1,32 @@
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/inter' layer(base);
 
-@import '@fontsource/noto-sans-mono';
+@import '@fontsource/noto-sans-mono' layer(base);
 
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'tailwindcss';
+@config "../tailwind.config.ts";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-mono:
+    'Noto Sans Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo,
+    Consolas, 'DejaVu Sans Mono', monospace;
+  --animate-spin-slow: spin 3s linear infinite;
+  --z-100: 100;
+}
 
 @layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: rgb(var(--color-border-primary));
+  }
+
   :root {
     --top-nav-height: 3rem;
     --panel-collapsed-w: 60px;

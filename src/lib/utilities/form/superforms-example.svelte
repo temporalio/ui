@@ -215,7 +215,7 @@
           name="description"
           id="description"
           rows="4"
-          class="border-gray-300 w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
         ></textarea>
         {#if $loadingErrors.description}
           <span class="text-sm text-red-500"

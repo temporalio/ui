@@ -27,7 +27,7 @@
 <DetailListValue {copyable} {copyableText}>
   <Link
     {href}
-    class="flex w-fit flex-row items-center gap-1 truncate rounded-sm {isBadge &&
+    class="flex w-fit flex-row items-center gap-1 truncate rounded-xs {isBadge &&
       'surface-subtle'}"
   >
     <span class="truncate">

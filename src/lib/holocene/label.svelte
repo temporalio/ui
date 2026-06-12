@@ -36,7 +36,7 @@
     'text-primary',
     'text-sm',
     'font-medium',
-    'focus:outline-none',
+    'focus:outline-hidden',
     hidden && 'sr-only',
     disabled && 'cursor-not-allowed',
     className,
@@ -52,7 +52,7 @@
   {#if required}
     <span
       aria-hidden="true"
-      class="-ml-1 translate-y-0.5 font-mono leading-none text-danger">*</span
+      class="text-danger -ml-1 translate-y-0.5 font-mono leading-none">*</span
     >
   {/if}
 </label>

@@ -330,7 +330,7 @@
         <div
           class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
         >
-          <p class="whitespace-nowrap text-right text-xs">Summary</p>
+          <p class="text-right text-xs whitespace-nowrap">Summary</p>
           <PayloadSummary value={currentEvent.userMetadata.summary} />
         </div>
       {/if}
@@ -382,6 +382,8 @@
 {/if}
 
 <style lang="postcss">
+  @reference "../../../app.css";
+
   tr[data-testid='event-summary-row'].active {
     @apply surface-table-related-hover;
   }

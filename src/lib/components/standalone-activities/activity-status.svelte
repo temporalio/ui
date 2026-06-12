@@ -21,7 +21,7 @@
 
   const activityStatus = cva(
     [
-      'flex items-center rounded-sm px-4 py-0.5 whitespace-nowrap text-black gap-1 font-medium text-lg',
+      'flex items-center rounded-xs px-4 py-0.5 whitespace-nowrap text-black gap-1 font-medium text-lg',
     ],
     {
       variants: {

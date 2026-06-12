@@ -146,13 +146,15 @@
 </div>
 
 <style lang="postcss">
+  @reference "../../app.css";
+
   tbody {
     :global(tr:nth-of-type(odd)) {
       @apply surface-primary;
     }
 
     :global(tr > td) {
-      @apply whitespace-nowrap p-2;
+      @apply p-2 whitespace-nowrap;
     }
   }
 </style>
