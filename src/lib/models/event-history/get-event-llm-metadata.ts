@@ -29,14 +29,16 @@ const getString = (v: unknown): string | undefined =>
   typeof v === 'string' && v.length > 0 ? v : undefined;
 
 /**
- * Extracts LLM metadata from the _details convention.
- * This is the preferred, explicit way to signal LLM metadata in an activity result.
- * The _details key is set by wrappers (wrap_openai, Braintrust plugin, etc.) or by user code.
+ * Extracts LLM metadata from the details.llm convention (ActivityCompletionDetails.LLMCallDetails).
+ * Falls back to _details for backwards compatibility with older integrations.
  */
 const extractFromLLMConvention = (
   resultData: Record<string, unknown>,
 ): LLMMetadata | null => {
-  const llm = resultData._details;
+  const details = isObject(resultData.details) ? resultData.details : null;
+  const llm =
+    (details && isObject(details.llm) ? details.llm : null) ??
+    (isObject(resultData._details) ? resultData._details : null);
   if (!isObject(llm)) return null;
 
   const model = getString(llm.model);

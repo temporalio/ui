@@ -56,11 +56,21 @@
 
     if (decoded && typeof decoded === 'object') {
       const obj = decoded as Record<string, unknown>;
-      // Prefer _details.response for chat display
-      if (obj._details && typeof obj._details === 'object') {
-        const details = obj._details as Record<string, unknown>;
-        if (typeof details.response === 'string') return details.response;
-      }
+      // Prefer details.llm.response for chat display, fall back to _details
+      const llmDetails =
+        obj.details &&
+        typeof obj.details === 'object' &&
+        (obj.details as Record<string, unknown>).llm &&
+        typeof (obj.details as Record<string, unknown>).llm === 'object'
+          ? ((obj.details as Record<string, unknown>).llm as Record<
+              string,
+              unknown
+            >)
+          : obj._details && typeof obj._details === 'object'
+            ? (obj._details as Record<string, unknown>)
+            : null;
+      if (llmDetails && typeof llmDetails.response === 'string')
+        return llmDetails.response;
       // Fall back to result field
       if ('result' in obj) return String(obj.result);
       return JSON.stringify(decoded, null, 2);

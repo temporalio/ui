@@ -125,7 +125,7 @@
     );
   };
 
-  // Chat tab only visible when at least one activity has _details.model
+  // Chat tab only visible when at least one activity has details.llm.model
   const hasModel = $derived(
     ascendingGroups.some((g) => {
       const meta = getGroupLLMMetadata(g);
