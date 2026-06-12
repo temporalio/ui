@@ -21,14 +21,17 @@
 
   let { onSubmit, cancelHref, error }: Props = $props();
 
-  let provider = $state('lambda');
-
   const superform = superForm(
     {
       buildId: '',
+      provider: 'lambda' as 'lambda' | 'cloud-run',
       lambdaArn: '',
       iamRoleArn: '',
       roleExternalId: '',
+      gcpProject: '',
+      gcpRegion: '',
+      gcpWorkerPool: '',
+      gcpServiceAccount: '',
       scaleUpCooloffMs: undefined as number | undefined,
       scaleUpBacklogThreshold: undefined as number | undefined,
       maxWorkerLifetimeMs: undefined as number | undefined,
@@ -83,11 +86,16 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider>
+      <ComputeProviderPicker bind:provider={$form.provider}>
         <ComputeFields
+          provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}
           bind:iamRoleArn={$form.iamRoleArn}
           bind:roleExternalId={$form.roleExternalId}
+          bind:gcpProject={$form.gcpProject}
+          bind:gcpRegion={$form.gcpRegion}
+          bind:gcpWorkerPool={$form.gcpWorkerPool}
+          bind:gcpServiceAccount={$form.gcpServiceAccount}
           bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
           bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
