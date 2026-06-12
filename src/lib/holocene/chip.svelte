@@ -49,7 +49,10 @@
   {/if}
   <button
     aria-label={removeButtonLabel}
-    class={disabled ? 'hidden' : ''}
+    class={merge(
+      'inline-flex items-center justify-center p-1',
+      disabled ? 'hidden' : '',
+    )}
     data-track-name="chip"
     data-track-intent="remove"
     data-track-text={removeButtonLabel}
