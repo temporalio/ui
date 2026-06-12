@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import { MenuDivider, MenuItem } from '$lib/holocene/menu';
@@ -10,6 +11,7 @@
   import type { NexusOperationExecutionInfo } from '$lib/types/nexus-operation-execution';
   import { routeForStartStandaloneNexusOperation } from '$lib/utilities/route-for';
   import type { StandaloneNexusOperationPoller } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
+  import { standaloneNexusOperationsCommandsDisabled } from '$lib/utilities/standalone-nexus-operations-commands-disabled';
 
   import CancelConfirmationModal from './cancel-confirmation-modal.svelte';
   import TerminateConfirmationModal from './terminate-confirmation-modal.svelte';
@@ -29,6 +31,10 @@
     nexusOperationInfo.status === 'NEXUS_OPERATION_EXECUTION_STATUS_RUNNING',
   );
 
+  const commandsDisabled = $derived(
+    standaloneNexusOperationsCommandsDisabled(page, namespace),
+  );
+
   const onConfirmCancelOrTerminate = () => {
     poller.fetchOnce().then(() => {
       poller.abort();
@@ -39,7 +45,7 @@
 <div class="flex items-center gap-2">
   <Button
     on:click={() => (cancelConfirmationModalOpen = true)}
-    disabled={!isRunning}
+    disabled={!isRunning || commandsDisabled}
     size="sm"
   >
     {translate('standalone-nexus-operations.request-cancellation')}
@@ -50,6 +56,7 @@
       controls="nexus-operation-actions"
       variant="secondary"
       size="sm"
+      disabled={commandsDisabled}
     >
       {translate('workflows.more-actions')}
     </MenuButton>
@@ -85,15 +92,17 @@
   </MenuContainer>
 </div>
 
-<CancelConfirmationModal
-  onConfirm={onConfirmCancelOrTerminate}
-  operationId={nexusOperationInfo.operationId}
-  {namespace}
-  bind:open={cancelConfirmationModalOpen}
-/>
-<TerminateConfirmationModal
-  onConfirm={onConfirmCancelOrTerminate}
-  operationId={nexusOperationInfo.operationId}
-  {namespace}
-  bind:open={terminateConfirmationModalOpen}
-/>
+{#if !commandsDisabled}
+  <CancelConfirmationModal
+    onConfirm={onConfirmCancelOrTerminate}
+    operationId={nexusOperationInfo.operationId}
+    {namespace}
+    bind:open={cancelConfirmationModalOpen}
+  />
+  <TerminateConfirmationModal
+    onConfirm={onConfirmCancelOrTerminate}
+    operationId={nexusOperationInfo.operationId}
+    {namespace}
+    bind:open={terminateConfirmationModalOpen}
+  />
+{/if}

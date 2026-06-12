@@ -6,8 +6,12 @@
   import { translate } from '$lib/i18n/translate';
   import StandaloneNexusOperations from '$lib/pages/standalone-nexus-operations.svelte';
   import { routeForStartStandaloneNexusOperation } from '$lib/utilities/route-for';
+  import { standaloneNexusOperationsCommandsDisabled } from '$lib/utilities/standalone-nexus-operations-commands-disabled';
 
   const namespace = $derived(page.params.namespace);
+  const startDisabled = $derived(
+    standaloneNexusOperationsCommandsDisabled(page, namespace),
+  );
 </script>
 
 <PageTitle
@@ -19,10 +23,12 @@
 
 <StandaloneNexusOperations>
   {#snippet headerActions()}
-    <Button href={routeForStartStandaloneNexusOperation({ namespace })}>
-      {translate(
-        'standalone-nexus-operations.start-standalone-nexus-operation',
-      )}
-    </Button>
+    {#if !startDisabled}
+      <Button href={routeForStartStandaloneNexusOperation({ namespace })}>
+        {translate(
+          'standalone-nexus-operations.start-standalone-nexus-operation',
+        )}
+      </Button>
+    {/if}
   {/snippet}
 </StandaloneNexusOperations>
