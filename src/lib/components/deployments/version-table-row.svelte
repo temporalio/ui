@@ -170,6 +170,8 @@
   let setRampingLoading = $state(false);
   let rampingPercentage = $state(0);
 
+  const newVersionGracePeriodMs = 2 * 60 * 1000;
+
   async function handleValidateConnection() {
     validateResult = null;
     validateLoading = true;
@@ -184,6 +186,23 @@
     if (!computeConfig) {
       validateResult = {
         message: translate('deployments.validate-connection-no-config'),
+      };
+      validateLoading = false;
+      return;
+    }
+    const taskQueueInfos =
+      versionDetails.workerDeploymentVersionInfo.taskQueueInfos;
+    if (!taskQueueInfos?.length) {
+      const createTime = versionDetails.workerDeploymentVersionInfo.createTime;
+      const isNewlyCreated =
+        Date.now() - new Date(String(createTime)).getTime() <
+        newVersionGracePeriodMs;
+      validateResult = {
+        message: translate(
+          isNewlyCreated
+            ? 'deployments.validate-connection-no-task-queue-pending'
+            : 'deployments.validate-connection-no-task-queue',
+        ),
       };
       validateLoading = false;
       return;
