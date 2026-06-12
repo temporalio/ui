@@ -350,7 +350,10 @@
               <p class="font-medium text-secondary">
                 {translate('standalone-activities.last-failure')}
               </p>
-              <PayloadCodeBlock value={$activityExecution.info.lastFailure} />
+              <PayloadCodeBlock
+                value={$activityExecution.info.lastFailure}
+                label={translate('standalone-activities.last-failure')}
+              />
             </div>
           {/if}
           {#if $activityExecution.info.retryPolicy}
@@ -364,6 +367,7 @@
                   null,
                   2,
                 )}
+                label={translate('standalone-activities.retry-policy')}
               />
             </div>
           {/if}
@@ -374,6 +378,7 @@
               </p>
               <PayloadCodeBlock
                 value={$activityExecution.info.heartbeatDetails}
+                label={translate('standalone-activities.heartbeat-details')}
               />
             </div>
           {/if}
@@ -382,7 +387,10 @@
               <p class="font-medium text-secondary">
                 {translate('standalone-activities.header')}
               </p>
-              <PayloadCodeBlock value={$activityExecution.info.header.fields} />
+              <PayloadCodeBlock
+                value={$activityExecution.info.header.fields}
+                label={translate('standalone-activities.header')}
+              />
             </div>
           {/if}
         </div>

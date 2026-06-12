@@ -155,6 +155,7 @@
         <CodeBlock
           inline
           language="text"
+          label={translate('schedules.cron-view-title')}
           content={`┌───────────── minute (0 - 59)
 │ ┌───────────── hour (0 - 23)
 │ │ ┌───────────── day of the month (1 - 31)

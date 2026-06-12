@@ -38,11 +38,13 @@
     <PayloadCodeBlock
       maxHeight={MAX_HEIGHT}
       value={content}
+      label={title}
       filenameData={payloadDownloadFilenameData}
     />
   {:else}
     <CodeBlock
       content={isPending ? 'Results will appear upon completion.' : 'null'}
+      label={title}
       language="text"
       copyable={false}
       maxHeight={MAX_HEIGHT}

@@ -29,7 +29,7 @@
 <div>
   <h5 class="pb-1 text-sm font-medium">{label}</h5>
   <Card class="flex flex-col gap-2">
-    <PayloadInput bind:input bind:loading {error} {id} {editing} />
+    <PayloadInput bind:input bind:loading {error} {id} {editing} {label} />
     <div
       class="flex items-end gap-2 {editing ? 'justify-between' : 'justify-end'}"
     >

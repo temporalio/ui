@@ -171,6 +171,7 @@
           <CodeBlock
             class="mt-4"
             content={failure.stackTrace}
+            label={translate('common.stack-trace')}
             language="text"
           />
         {/if}
@@ -179,7 +180,10 @@
     {#if success && typeof success === 'object'}
       <Alert intent="success" title="Success">
         {#if success?.payloads?.[0] && success.payloads[0].data}
-          <PayloadCodeBlock value={success} />
+          <PayloadCodeBlock
+            value={success}
+            label={translate('workflows.update-result')}
+          />
         {/if}
       </Alert>
     {/if}

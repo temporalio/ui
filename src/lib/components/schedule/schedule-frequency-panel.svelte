@@ -41,6 +41,12 @@
   </div>
   <ScheduleFrequency {spec} />
   {#if viewFullSpec}
-    <CodeBlock language="json" content={JSON.stringify(spec, null, 2)} />
+    <CodeBlock
+      language="json"
+      content={JSON.stringify(spec, null, 2)}
+      label={hasCronString
+        ? translate('schedules.cron-string')
+        : translate('schedules.schedule-spec')}
+    />
   {/if}
 </Panel>

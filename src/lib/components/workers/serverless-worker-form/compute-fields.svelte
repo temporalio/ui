@@ -267,6 +267,7 @@
               language="text"
               maxHeight={300}
               copyable
+              label={translate('workers.terraform-iam-module-link')}
               copyIconTitle={translate('workers.copy-snippet')}
               copySuccessIconTitle={translate('workers.copied')}
             />
