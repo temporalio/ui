@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
   import { fly } from 'svelte/transition';
 
   import { createEventDispatcher } from 'svelte';
@@ -27,13 +28,18 @@
     warning: 'warning',
   };
 
+  function getRole(v: ToastVariant): HTMLAttributes<HTMLDivElement>['role'] {
+    if (v === 'error') return 'alert';
+    return 'status';
+  }
+
   export let id: string;
   export let variant: keyof typeof variants;
   export let closeButtonLabel: string = '';
 
   $: dismissLabel = closeButtonLabel || translate('common.close');
-
   $: icon = variantIcon[variant];
+  $: role = getRole(variant);
 
   const handleDismiss = () => {
     dispatch('dismiss', { id });
@@ -42,6 +48,8 @@
 
 <div
   {id}
+  {role}
+  aria-atomic="true"
   class={merge(
     'flex grow-0 items-center justify-between gap-4 rounded-md px-3 py-2.5 shadow',
     variants[variant],
