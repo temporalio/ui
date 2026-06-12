@@ -32,14 +32,20 @@ describe('parseDatePickerInput', () => {
     expect(date?.getDate()).toBe(5);
   });
 
-  test('returns null for partial input (mid-typing)', () => {
-    expect(parseDatePickerInput('06/05/20')).toBeNull();
+  test('parses single-digit month and day without padding', () => {
+    const date = parseDatePickerInput('6/5/2026');
+    expect(date?.getFullYear()).toBe(2026);
+    expect(date?.getMonth()).toBe(5);
+    expect(date?.getDate()).toBe(5);
+  });
+
+  test('returns null for incomplete input (mid-typing)', () => {
     expect(parseDatePickerInput('06/05')).toBeNull();
     expect(parseDatePickerInput('06')).toBeNull();
   });
 
-  test('returns null for a two-digit year', () => {
-    expect(parseDatePickerInput('06/05/26')).toBeNull();
+  test('leniently parses a short year as entered', () => {
+    expect(parseDatePickerInput('06/05/26')?.getFullYear()).toBe(26);
   });
 
   test('returns null for an out-of-range month', () => {
@@ -74,8 +80,8 @@ describe('evaluateDatePickerInput', () => {
     });
   });
 
-  test('returns no date and no error for partial entry (no dispatch)', () => {
-    expect(evaluateDatePickerInput('06/05/20')).toEqual({
+  test('returns no date and no error for incomplete entry (no dispatch)', () => {
+    expect(evaluateDatePickerInput('06/05')).toEqual({
       date: null,
       error: true,
     });
