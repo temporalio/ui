@@ -4,6 +4,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     deleteWorkerDeploymentVersion,
@@ -11,6 +12,7 @@
     removeRampingDeploymentVersion,
     setCurrentDeploymentVersion,
     setRampingDeploymentVersion,
+    unsetCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { toaster } from '$lib/stores/toaster';
@@ -160,6 +162,8 @@
   let expanded = $state(false);
   let showSetCurrentModal = $state(false);
   let setCurrentError = $state('');
+  let showUnsetCurrentModal = $state(false);
+  let unsetCurrentError = $state('');
   let showDeleteVersionModal = $state(false);
   let deleteVersionError = $state('');
   let showValidateModal = $state(false);
@@ -238,6 +242,21 @@
         buildId: versionBuildId,
       }),
     });
+    onChange?.();
+  }
+
+  async function handleUnsetCurrentVersion() {
+    unsetCurrentError = '';
+    await unsetCurrentDeploymentVersion(
+      { namespace, deploymentName, conflictToken },
+      (err) => {
+        unsetCurrentError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.unset-current-error');
+      },
+    );
+    if (unsetCurrentError) return;
+    showUnsetCurrentModal = false;
     onChange?.();
   }
 
@@ -379,6 +398,7 @@
     {isRamping}
     onSetCurrent={() => (showSetCurrentModal = true)}
     onSetRamping={openSetRamping}
+    onUnsetCurrent={() => (showUnsetCurrentModal = true)}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}
   />
@@ -450,3 +470,23 @@
     deleteVersionError = '';
   }}
 />
+
+<Modal
+  id="unset-current-version-modal"
+  open={showUnsetCurrentModal}
+  confirmText={translate('common.confirm')}
+  cancelText={translate('common.cancel')}
+  on:confirmModal={handleUnsetCurrentVersion}
+  on:cancelModal={() => {
+    showUnsetCurrentModal = false;
+    unsetCurrentError = '';
+  }}
+>
+  <h3 slot="title">{translate('deployments.unset-current')}</h3>
+  <div slot="content" class="flex flex-col gap-4">
+    <p class="text-sm">{translate('deployments.unset-current-description')}</p>
+    {#if unsetCurrentError}
+      <p class="text-sm text-danger">{unsetCurrentError}</p>
+    {/if}
+  </div>
+</Modal>

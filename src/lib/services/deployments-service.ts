@@ -226,6 +226,29 @@ export const setCurrentDeploymentVersion = async (
   });
 };
 
+export const unsetCurrentDeploymentVersion = async (
+  parameters: DeploymentParameters & { conflictToken?: string },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-current-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        buildId: '',
+        ...(parameters.conflictToken
+          ? { conflictToken: parameters.conflictToken }
+          : {}),
+      }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
 export const setRampingDeploymentVersion = async (
   request: DeploymentVersionParameters & {
     rampingVersionPercentage: number;
@@ -268,6 +291,50 @@ export const removeRampingDeploymentVersion = async (
       }),
     },
     onError,
+  });
+};
+
+export const setRampingUnversionedWorkers = async (
+  parameters: DeploymentParameters & { percentage: number },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-ramping-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        buildId: '',
+        percentage: parameters.percentage,
+      }),
+    },
+    onError,
+    notifyOnError: false,
+  });
+};
+
+export const removeRampingUnversionedWorkers = async (
+  parameters: DeploymentParameters & { conflictToken?: string },
+  onError?: ErrorCallback,
+): Promise<void> => {
+  const route = routeForApi(
+    'worker-deployment-set-ramping-version',
+    parameters,
+  );
+  await requestFromAPI<unknown>(route, {
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        buildId: '',
+        ...(parameters.conflictToken
+          ? { conflictToken: parameters.conflictToken }
+          : {}),
+      }),
+    },
+    onError,
+    notifyOnError: false,
   });
 };
 

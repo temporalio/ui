@@ -62,11 +62,14 @@ export const Strings = {
   'edit-version': 'Edit Version',
   'view-workflows': 'View Workflows',
   'create-new-version': 'Create New Version',
-  'delete-deployment': 'Delete Deployment',
+  'delete-deployment': 'Delete Worker Deployment',
   'delete-deployment-description':
-    'This action cannot be undone. The deployment and all its configuration will be permanently deleted.',
+    "Deleting {{ name }} will permanently remove all its versions and configuration. This action can't be undone.",
   'delete-deployment-confirm-instruction': 'Type DELETE to confirm',
   'delete-deployment-confirm-error': 'Failed to delete deployment',
+  'cannot-delete-deployment': 'Cannot Delete Worker Deployment',
+  'cannot-delete-deployment-body':
+    'All Versions must be deleted before this Deployment can be removed. Delete each Version first, then try again.',
   'role-external-id': 'External ID',
   'scale-up-cooloff': 'Scale-up Cooloff',
   'backlog-threshold': 'Backlog Threshold',
@@ -77,8 +80,20 @@ export const Strings = {
   'drainage-last-changed': 'Last Changed',
   'drainage-last-checked': 'Last Checked',
   metadata: 'Metadata',
+  'more-actions': 'More Actions',
+  'ramp-to-unversioned': 'Ramp to Unversioned Workers',
+  'ramp-to-unversioned-description':
+    'This will route a percentage of new traffic to unversioned Workers.',
+  'ramp-to-unversioned-error': 'Failed to set unversioned ramping',
+  'remove-unversioned-ramping': 'Remove Unversioned Ramping',
+  'unversioned-ramping-banner':
+    'Unversioned Workers Ramping at {{ percentage }}%.',
   'set-as-current': 'Set Current Version',
   'set-as-current-error': 'Failed to set version as current',
+  'unset-current': 'Unset Current',
+  'unset-current-description':
+    'This will remove the current version designation from this deployment.',
+  'unset-current-error': 'Failed to unset current version',
   'set-current-version-success': '{{ buildId }} is now the current version',
   'set-ramping-version': 'Set Ramping Version',
   'edit-ramping-percentage': 'Edit Ramping Percentage',

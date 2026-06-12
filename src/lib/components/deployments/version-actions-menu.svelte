@@ -16,6 +16,7 @@
     isRamping: boolean;
     onSetCurrent: () => void;
     onSetRamping: () => void;
+    onUnsetCurrent: () => void;
     onValidate: () => void;
     onDelete: () => void;
   }
@@ -29,6 +30,7 @@
     isRamping,
     onSetCurrent,
     onSetRamping,
+    onUnsetCurrent,
     onValidate,
     onDelete,
   }: Props = $props();
@@ -53,9 +55,15 @@
       </CapabilityGuard>
       <CapabilityGuard capability="serverScaledDeployments">
         {#if hasComputeConfig}
-          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-            {translate('deployments.set-as-current')}
-          </MenuItem>
+          {#if isCurrent}
+            <MenuItem onclick={onUnsetCurrent}>
+              {translate('deployments.unset-current')}
+            </MenuItem>
+          {:else}
+            <MenuItem onclick={onSetCurrent}>
+              {translate('deployments.set-as-current')}
+            </MenuItem>
+          {/if}
           <MenuItem onclick={onSetRamping} disabled={isCurrent}>
             {isRamping
               ? translate('deployments.edit-ramping-percentage')
@@ -66,9 +74,15 @@
           </MenuItem>
         {/if}
         {#snippet fallback()}
-          <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-            {translate('deployments.set-as-current')}
-          </MenuItem>
+          {#if isCurrent}
+            <MenuItem onclick={onUnsetCurrent}>
+              {translate('deployments.unset-current')}
+            </MenuItem>
+          {:else}
+            <MenuItem onclick={onSetCurrent}>
+              {translate('deployments.set-as-current')}
+            </MenuItem>
+          {/if}
           <MenuItem onclick={onSetRamping} disabled={isCurrent}>
             {isRamping
               ? translate('deployments.edit-ramping-percentage')
