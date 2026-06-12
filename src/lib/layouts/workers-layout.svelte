@@ -75,7 +75,7 @@
         href={workersHref}
         active={page.url.pathname.endsWith('/workers')}
       >
-        <Badge type="secondary" class="shrink-0">Preview</Badge>
+        <Badge type="secondary" class="shrink-0 leading-none">Preview</Badge>
       </Tab>
       <Tab
         label={translate('deployments.deployments')}
