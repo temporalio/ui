@@ -70,7 +70,11 @@ export type StandaloneActivitiesAPIRoutePath =
 export type StandaloneActivityAPIRoutePath =
   | 'standalone-activity'
   | 'standalone-activity.cancel'
-  | 'standalone-activity.terminate';
+  | 'standalone-activity.terminate'
+  | 'standalone-activity.pause'
+  | 'standalone-activity.unpause'
+  | 'standalone-activity.reset'
+  | 'standalone-activity.update-options';
 
 export type StandaloneNexusOperationsAPIRoutePath =
   | 'standalone-nexus-operations'

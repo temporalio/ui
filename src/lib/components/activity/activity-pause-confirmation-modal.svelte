@@ -1,31 +1,21 @@
 <script lang="ts">
-  import type { WorkflowExecution } from '@temporalio/client';
-
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Action } from '$lib/models/workflow-actions';
-  import { pauseActivity } from '$lib/services/workflow-activities-service';
-  import { triggerRefresh } from '$lib/stores/workflow-run';
-  import type { PendingActivity } from '$lib/types/events';
-  import { getIdentity } from '$lib/utilities/core-context';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
 
   type Props = {
     open: boolean;
-    namespace: string;
-    execution: WorkflowExecution;
-    activity: PendingActivity;
+    activityId: string;
+    onConfirm: (reason: string) => Promise<void>;
   };
 
-  let { open = $bindable(), namespace, execution, activity }: Props = $props();
-  let { activityId: id, activityType: type } = $derived(activity);
+  let { open = $bindable(), activityId, onConfirm }: Props = $props();
 
   let error = $state('');
   let loading = $state(false);
   let reason = $state('');
-
-  const identity = getIdentity();
 
   const hideModal = () => {
     open = false;
@@ -33,15 +23,18 @@
   };
 
   const onActivityPause = async () => {
-    await pauseActivity({
-      namespace,
-      execution,
-      id,
-      reason,
-      identity,
-    });
-    triggerRefresh(Action.Pause);
-    hideModal();
+    error = '';
+    loading = true;
+    try {
+      await onConfirm(reason);
+      hideModal();
+    } catch (err: unknown) {
+      error = isNetworkError(err)
+        ? err.message
+        : translate('common.unknown-error');
+    } finally {
+      loading = false;
+    }
   };
 </script>
 
@@ -59,7 +52,7 @@
 >
   <h3 slot="title">
     {translate('activities.pause-modal-confirmation', {
-      activityId: activity.id,
+      activityId,
     })}
   </h3>
   <div slot="content">

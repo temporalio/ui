@@ -14,7 +14,7 @@ import {
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
 import { activityError } from '$lib/stores/activities';
-import type { Payload, SearchAttribute } from '$lib/types';
+import type { ActivityOptions, Payload, SearchAttribute } from '$lib/types';
 import type {
   ActivityExecution,
   ActivityExecutionInfo,
@@ -29,6 +29,7 @@ import {
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
+import { ACTIVITY_OPTIONS_UPDATE_MASK } from './workflow-activities-service';
 import { setSearchAttributes } from './workflow-service';
 
 // Timeout duration inputs on the activity forms; largest-first so
@@ -407,6 +408,114 @@ export const terminateActivityExecution = async (
       body: stringifyWithBigInt({
         runId,
         reason: reason || '',
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const pauseActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  reason?: string,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.pause', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        requestId: crypto.randomUUID(),
+        ...(reason && { reason }),
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const unpauseActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.unpause', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const resetActivityExecution = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  resetHeartbeat: boolean,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.reset', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        resetHeartbeat,
+        ...(identity && { identity }),
+      }),
+    },
+  });
+};
+
+export const updateActivityExecutionOptions = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+  activityOptions: ActivityOptions,
+  identity?: string,
+): Promise<void> => {
+  const route = routeForApi('standalone-activity.update-options', {
+    namespace,
+    activityId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        namespace,
+        activityId,
+        runId,
+        activityOptions,
+        updateMask: ACTIVITY_OPTIONS_UPDATE_MASK,
         ...(identity && { identity }),
       }),
     },

@@ -1,31 +1,20 @@
 <script lang="ts">
-  import type { WorkflowExecution } from '@temporalio/client';
-
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { Action } from '$lib/models/workflow-actions';
-  import { resetActivity } from '$lib/services/workflow-activities-service';
-  import { toaster } from '$lib/stores/toaster';
-  import { triggerRefresh } from '$lib/stores/workflow-run';
-  import type { PendingActivity } from '$lib/types/events';
-  import { getIdentity } from '$lib/utilities/core-context';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
 
   type Props = {
     open: boolean;
-    namespace: string;
-    execution: WorkflowExecution;
-    activity: PendingActivity;
+    activityId: string;
+    onConfirm: (resetHeartbeat: boolean) => Promise<void>;
   };
 
-  let { open = $bindable(), namespace, execution, activity }: Props = $props();
-  let { activityId: id, activityType: type } = $derived(activity);
+  let { open = $bindable(), activityId, onConfirm }: Props = $props();
 
   let error = $state('');
   let loading = $state(false);
   let resetHeartbeat = $state(false);
-
-  const identity = getIdentity();
 
   const hideModal = () => {
     open = false;
@@ -33,25 +22,24 @@
   };
 
   const onActivityReset = async () => {
-    await resetActivity({
-      namespace,
-      execution,
-      id,
-      resetHeartbeat,
-      identity,
-    });
-    triggerRefresh(Action.Reset);
-    toaster.push({
-      variant: 'success',
-      message: translate('activities.reset-success', { activityId: id }),
-    });
-    hideModal();
+    error = '';
+    loading = true;
+    try {
+      await onConfirm(resetHeartbeat);
+      hideModal();
+    } catch (err: unknown) {
+      error = isNetworkError(err)
+        ? err.message
+        : translate('common.unknown-error');
+    } finally {
+      loading = false;
+    }
   };
 </script>
 
 <Modal
-  id="activity-pause-confirmation-modal"
-  data-testid="activity-pause-confirmation-modal"
+  id="activity-reset-confirmation-modal"
+  data-testid="activity-reset-confirmation-modal"
   bind:error
   bind:open
   {loading}
@@ -63,7 +51,7 @@
 >
   <h3 slot="title">
     {translate('activities.reset-modal-confirmation', {
-      activityId: activity.id,
+      activityId,
     })}
   </h3>
   <div slot="content" class="flex flex-col gap-4">
