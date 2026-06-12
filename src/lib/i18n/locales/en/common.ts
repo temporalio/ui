@@ -256,4 +256,5 @@ export const Strings = {
   dense: 'Dense',
   'configure-columns': 'Configure Columns',
   'random-uuid': 'Random UUID',
+  json: 'JSON',
 } as const;
