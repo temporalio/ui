@@ -43,6 +43,8 @@
 
   let { children, headerSnippet = undefined }: Props = $props();
 
+  let isPolling = $state(false);
+
   let namespace = $derived(page.params.namespace);
   let workflowId = $derived(page.params.workflow);
   let runId = $derived(page.params.run);
@@ -213,7 +215,11 @@
     const sort = page.url.searchParams.get('sort');
     if (sort) $eventFilterSort = sort as EventSortOrder;
     refreshInterval = setInterval(() => {
+      isPolling = true;
       throttleRefresh();
+      queueMicrotask(() => {
+        isPolling = false;
+      });
     }, 10000);
 
     return () => {
@@ -241,5 +247,7 @@
   <SkeletonWorkflow />
 {:else}
   <WorkflowHeader {headerSnippet} />
-  {@render children()}
+  <div aria-busy={isPolling}>
+    {@render children()}
+  </div>
 {/if}

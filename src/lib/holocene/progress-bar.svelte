@@ -1,6 +1,6 @@
 <svelte:options runes />
 
-<div class="meter">
+<div class="meter" role="progressbar" aria-busy="true">
   <span></span>
 </div>
 
