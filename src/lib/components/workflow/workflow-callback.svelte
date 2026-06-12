@@ -103,6 +103,7 @@
         <p>{translate('nexus.last-attempt-failure')}</p>
         <CodeBlock
           content={failure}
+          label={translate('workflows.callback-metadata')}
           language="text"
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}

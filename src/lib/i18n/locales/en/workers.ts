@@ -324,4 +324,5 @@ export const Strings = {
     'The service account email Temporal will impersonate.',
   'gcp-service-account-placeholder':
     'temporal-worker@my-project.iam.gserviceaccount.com',
+  'heartbeat-config': 'Heartbeat Configuration',
 } as const;
