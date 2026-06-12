@@ -1,6 +1,7 @@
 import { BROWSER } from 'esm-env';
 
 import { networkError } from '$lib/stores/error';
+import { triggerSessionExpired } from '$lib/stores/session-warning';
 import { toaster } from '$lib/stores/toaster';
 import type { NetworkError } from '$lib/types/global';
 
@@ -34,7 +35,8 @@ export const handleError = (
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    triggerSessionExpired();
+    return;
   }
 
   if (isForbidden(error) && isBrowser) {
@@ -58,7 +60,7 @@ export const handleUnauthorizedOrForbiddenError = (
   isBrowser = BROWSER,
 ): void => {
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    triggerSessionExpired();
     return;
   }
 
