@@ -93,7 +93,7 @@
 {#if filterableLabels.includes(label) || isCustomKeywordOrTextAttribute}
   {#if label === 'Type'}
     {@render renderFilterableTableCell({
-      attribute: 'WorkflowType',
+      attribute: archival ? 'WorkflowTypeName' : 'WorkflowType',
       value: workflow.name,
       href: routeForWorkflow({
         namespace,
