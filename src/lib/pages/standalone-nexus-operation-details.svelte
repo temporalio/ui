@@ -6,6 +6,7 @@
     DetailListTextValue,
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
+  import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import NexusOperationInputAndOutcome from '$lib/components/standalone-nexus-operations/nexus-operation-input-and-outcome.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Card from '$lib/holocene/card.svelte';
@@ -95,6 +96,7 @@
         aria-label={translate(
           'standalone-nexus-operations.run-details-section',
         )}
+        class="gap-y-4"
       >
         <DetailListLabel
           >{translate(
@@ -152,11 +154,17 @@
       <h6 class="text-secondary">
         {translate('standalone-nexus-operations.operation-details-section')}
       </h6>
+      {#if handlerWorkflowLink}
+        <p class="text-sm text-secondary">
+          {translate('standalone-nexus-operations.handler-namespace-note')}
+        </p>
+      {/if}
       <DetailList
         rowCount={6}
         aria-label={translate(
           'standalone-nexus-operations.operation-details-section',
         )}
+        class="gap-y-4"
       >
         <DetailListLabel
           >{translate(
@@ -209,18 +217,6 @@
         {:else}
           <DetailListTextValue text={info.operation} />
         {/if}
-        <DetailListLabel
-          >{translate('standalone-nexus-operations.state')}</DetailListLabel
-        >
-        <WorkflowStatus status={toNexusOperationStatus(info.status)} />
-        {#if info.state}
-          <DetailListLabel
-            >{translate(
-              'standalone-nexus-operations.blocked-reason',
-            )}</DetailListLabel
-          >
-          <DetailListTextValue text={info.state} />
-        {/if}
         {#if info.blockedReason}
           <DetailListLabel
             >{translate(
@@ -256,11 +252,7 @@
           />
         {/if}
       </DetailList>
-      {#if handlerWorkflowLink}
-        <p class="text-sm text-secondary">
-          {translate('standalone-nexus-operations.handler-namespace-note')}
-        </p>
-      {/if}
+
       {#if hasNexusHeader}
         <div class="space-y-2">
           <p class="font-medium text-secondary">
@@ -280,6 +272,7 @@
         aria-label={translate(
           'standalone-nexus-operations.timeout-configuration',
         )}
+        class="gap-y-4"
       >
         <DetailListLabel
           >{translate(
@@ -310,6 +303,7 @@
         <DetailList
           rowCount={3}
           aria-label={translate('standalone-nexus-operations.attempt-section')}
+          class="gap-y-4"
         >
           <DetailListLabel
             >{translate('standalone-nexus-operations.attempt')}</DetailListLabel
