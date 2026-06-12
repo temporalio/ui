@@ -130,7 +130,7 @@ export const savedActivityQueries = persistStore<Record<string, SavedQuery[]>>(
 // Nexus operation saved queries
 export const DEFAULT_NEXUS_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
-  name: 'All Standalone Nexus Operations',
+  name: 'All',
   query: '',
   icon: 'nexus',
   type: 'system',
@@ -141,14 +141,14 @@ export const systemNexusViews: SavedQuery[] = [
   {
     id: 'today',
     name: 'Today',
-    query: `ScheduleTime >= "${getToday()}"`,
+    query: `StartTime >= "${getToday()}"`,
     icon: 'calendar',
     type: 'system',
   },
   {
     id: 'last-hour',
     name: 'Last Hour',
-    query: `ScheduleTime >= "${getLastHour()}"`,
+    query: `StartTime >= "${getLastHour()}"`,
     icon: 'clock',
     type: 'system',
   },
