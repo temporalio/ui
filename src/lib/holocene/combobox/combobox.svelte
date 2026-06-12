@@ -462,6 +462,9 @@
     });
   }
 
+  const errorId = $derived(`${id}-error`);
+  const showError = $derived(!!error && !valid);
+
   const handleInputClick: MouseEventHandler<HTMLInputElement> = (event) => {
     event.stopPropagation();
     if (!$open) openList();
@@ -556,6 +559,8 @@
           aria-controls="{id}-listbox"
           aria-expanded={$open}
           aria-required={required}
+          aria-invalid={showError ? 'true' : undefined}
+          aria-describedby={showError ? errorId : undefined}
           aria-autocomplete="list"
           onfocus={handleFocus}
           onblur={handleBlur}
@@ -680,8 +685,8 @@
     {/if}
   </Menu>
 
-  {#if error && !valid}
-    <span class="error">{error}</span>
+  {#if showError}
+    <span id={errorId} role="alert" class="error">{error}</span>
   {/if}
 </MenuContainer>
 

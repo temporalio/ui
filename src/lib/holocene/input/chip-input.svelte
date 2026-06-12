@@ -47,6 +47,7 @@
   let displayValue = $state('');
 
   const invalid = $derived(chips.some((chip) => !validator(chip)));
+  const errorId = $derived(`${id}-error`);
 
   const handleKeydown = (e: KeyboardEvent) => {
     e.stopPropagation();
@@ -144,6 +145,8 @@
       {id}
       {name}
       {required}
+      aria-invalid={invalid ? 'true' : undefined}
+      aria-describedby={invalid && hintText ? errorId : undefined}
       multiple
       data-testid={id}
       bind:value={displayValue}
@@ -159,9 +162,11 @@
   {#if (invalid && hintText) || (maxLength && !disabled)}
     <div class="flex justify-between gap-2">
       <div
+        id={errorId}
         class="error-msg"
         class:min-width={maxLength}
         aria-live={invalid ? 'assertive' : 'off'}
+        role={invalid ? 'alert' : null}
       >
         {#if invalid && hintText}
           <p>{hintText}</p>
