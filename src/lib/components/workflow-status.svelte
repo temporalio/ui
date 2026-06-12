@@ -90,6 +90,8 @@
     data-testid={testId || 'workflow-status'}
   >
     <span
+      role="status"
+      aria-atomic="true"
       class={merge(
         workflowStatus({
           status,
