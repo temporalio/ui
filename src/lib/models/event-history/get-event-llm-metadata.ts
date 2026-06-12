@@ -9,6 +9,7 @@ import {
 
 export interface LLMMetadata {
   model?: string;
+  agentType?: string;
   totalTokens?: number;
   promptTokens?: number;
   completionTokens?: number;
@@ -39,6 +40,7 @@ const extractFromLLMConvention = (
   if (!isObject(llm)) return null;
 
   const model = getString(llm.model);
+  const agentType = getString(llm.agentType) ?? getString(llm.agent_type);
   const totalTokens = getNumber(llm.totalTokens) ?? getNumber(llm.total_tokens);
   const promptTokens =
     getNumber(llm.promptTokens) ?? getNumber(llm.prompt_tokens);
@@ -52,6 +54,8 @@ const extractFromLLMConvention = (
 
   const knownKeys = new Set([
     'model',
+    'agentType',
+    'agent_type',
     'totalTokens',
     'total_tokens',
     'promptTokens',
@@ -72,6 +76,7 @@ const extractFromLLMConvention = (
 
   return {
     model,
+    agentType,
     totalTokens:
       totalTokens ??
       (promptTokens && completionTokens
@@ -139,6 +144,10 @@ export const getGroupLLMMetadata = (
   let promptTokens = 0;
   let completionTokens = 0;
   let model: string | undefined;
+  let cost: number | undefined;
+  let score: number | undefined;
+  let traceUrl: string | undefined;
+  let extra: Record<string, unknown> | undefined;
   let found = false;
 
   for (const event of group.eventList) {
@@ -150,6 +159,10 @@ export const getGroupLLMMetadata = (
       if (metadata.promptTokens) promptTokens += metadata.promptTokens;
       if (metadata.completionTokens)
         completionTokens += metadata.completionTokens;
+      if (metadata.cost) cost = (cost ?? 0) + metadata.cost;
+      if (metadata.score != null) score = metadata.score;
+      if (metadata.traceUrl) traceUrl = metadata.traceUrl;
+      if (metadata.extra) extra = { ...extra, ...metadata.extra };
     }
   }
 
@@ -160,5 +173,9 @@ export const getGroupLLMMetadata = (
     totalTokens: totalTokens || undefined,
     promptTokens: promptTokens || undefined,
     completionTokens: completionTokens || undefined,
+    cost,
+    score,
+    traceUrl,
+    ...(extra && Object.keys(extra).length > 0 ? { extra } : {}),
   };
 };

@@ -14,6 +14,7 @@
     activityName: string;
     input: string;
     output: string;
+    agentType?: string;
     model?: string;
     totalTokens?: number;
     cost?: number;
@@ -93,6 +94,7 @@
       activityName,
       input,
       output,
+      agentType: llmMetadata?.agentType,
       model: llmMetadata?.model,
       totalTokens: llmMetadata?.totalTokens,
       cost: llmMetadata?.cost,
@@ -127,6 +129,13 @@
             <span class="text-xs font-medium text-secondary/60"
               >{step.activityName}</span
             >
+            {#if step.agentType}
+              <Badge
+                type="subtle"
+                class="bg-purple-500/20 text-xs text-purple-300"
+                >{step.agentType}</Badge
+              >
+            {/if}
             {#if step.model}
               <Badge type="subtle" class="text-xs">{step.model}</Badge>
             {/if}

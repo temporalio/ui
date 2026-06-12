@@ -124,53 +124,112 @@
       {#if llmMetadata}
         <div
           data-testid="group-llm-details"
-          class="flex flex-wrap items-center gap-2"
+          class="rounded-lg border border-white/10 bg-slate-900 p-3 font-mono"
         >
-          {#if llmMetadata.model}
-            <Badge type="subtle">{llmMetadata.model}</Badge>
-          {/if}
-          {#if llmMetadata.promptTokens}
-            <span class="text-xs text-secondary/60"
-              >{llmMetadata.promptTokens.toLocaleString()} prompt</span
-            >
-          {/if}
-          {#if llmMetadata.completionTokens}
-            <span class="text-xs text-secondary/60"
-              >{llmMetadata.completionTokens.toLocaleString()} completion</span
-            >
-          {/if}
-          {#if llmMetadata.totalTokens}
-            <Badge type="subtle"
-              >{llmMetadata.totalTokens.toLocaleString()} tokens</Badge
-            >
-          {/if}
-          {#if llmMetadata.cost}
-            <Badge type="subtle">${llmMetadata.cost.toFixed(4)}</Badge>
-          {/if}
-          {#if llmMetadata.score != null}
-            <Badge type={llmMetadata.score >= 0.8 ? 'subtle' : 'warning'}
-              >Score: {llmMetadata.score.toFixed(2)}</Badge
-            >
-          {/if}
-          {#if llmMetadata.traceUrl}
-            <a
-              href={llmMetadata.traceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-xs text-information underline">View in eval tool</a
-            >
-          {/if}
-          {#if llmMetadata.extra}
-            {#each Object.entries(llmMetadata.extra) as [key, value]}
-              <span class="text-xs">
-                <span class="text-secondary/50">{key}:</span>
-                <span class="text-secondary/80"
-                  >{typeof value === 'object'
-                    ? JSON.stringify(value)
-                    : String(value)}</span
+          <div class="mb-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              {#if llmMetadata.model}
+                <span
+                  class="rounded bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-blue-300"
+                  >{llmMetadata.model}</span
                 >
-              </span>
-            {/each}
+              {/if}
+              {#if llmMetadata.score != null}
+                <span
+                  class="rounded px-2 py-0.5 text-xs font-medium {llmMetadata.score >=
+                  0.8
+                    ? 'bg-green-500/20 text-green-300'
+                    : 'bg-yellow-500/20 text-yellow-300'}"
+                  >score {llmMetadata.score.toFixed(2)}</span
+                >
+              {/if}
+            </div>
+            {#if llmMetadata.traceUrl}
+              <a
+                href={llmMetadata.traceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1 rounded bg-white/5 px-2 py-1 text-xs text-blue-300 transition-colors hover:bg-white/10 hover:text-blue-200"
+              >
+                <svg
+                  class="h-3 w-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                  /></svg
+                >
+                View Trace
+              </a>
+            {/if}
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {#if llmMetadata.promptTokens}
+              <div class="rounded bg-white/5 px-2 py-1.5">
+                <div
+                  class="text-[10px] uppercase tracking-wider text-slate-500"
+                >
+                  Prompt
+                </div>
+                <div class="text-sm text-slate-200">
+                  {llmMetadata.promptTokens.toLocaleString()}
+                </div>
+              </div>
+            {/if}
+            {#if llmMetadata.completionTokens}
+              <div class="rounded bg-white/5 px-2 py-1.5">
+                <div
+                  class="text-[10px] uppercase tracking-wider text-slate-500"
+                >
+                  Completion
+                </div>
+                <div class="text-sm text-slate-200">
+                  {llmMetadata.completionTokens.toLocaleString()}
+                </div>
+              </div>
+            {/if}
+            {#if llmMetadata.totalTokens}
+              <div class="rounded bg-white/5 px-2 py-1.5">
+                <div
+                  class="text-[10px] uppercase tracking-wider text-slate-500"
+                >
+                  Total
+                </div>
+                <div class="text-sm text-slate-200">
+                  {llmMetadata.totalTokens.toLocaleString()}
+                </div>
+              </div>
+            {/if}
+            {#if llmMetadata.cost}
+              <div class="rounded bg-white/5 px-2 py-1.5">
+                <div
+                  class="text-[10px] uppercase tracking-wider text-slate-500"
+                >
+                  Cost
+                </div>
+                <div class="text-sm text-slate-200">
+                  ${llmMetadata.cost.toFixed(4)}
+                </div>
+              </div>
+            {/if}
+          </div>
+          {#if llmMetadata.extra}
+            <div class="mt-2 flex flex-wrap gap-2">
+              {#each Object.entries(llmMetadata.extra) as [key, value]}
+                <span
+                  class="rounded bg-white/5 px-2 py-0.5 text-xs text-slate-400"
+                >
+                  <span class="text-slate-500">{key}:</span>
+                  {typeof value === 'object'
+                    ? JSON.stringify(value)
+                    : String(value)}
+                </span>
+              {/each}
+            </div>
           {/if}
         </div>
       {/if}

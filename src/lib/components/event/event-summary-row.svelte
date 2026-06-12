@@ -308,6 +308,14 @@
             Attempt {nonPendingActivityAttempt}
           </Badge>
         {/if}
+        {#if llmMetadata.agentType}
+          <Badge
+            type="subtle"
+            class="shrink-0 gap-1 bg-purple-500/20 px-1.5 text-purple-300"
+          >
+            {llmMetadata.agentType}
+          </Badge>
+        {/if}
         {#if llmMetadata.model}
           <Badge type="subtle" class="shrink-0 gap-1 px-1.5">
             {llmMetadata.model}

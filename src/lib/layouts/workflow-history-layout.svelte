@@ -204,12 +204,13 @@
             on:click={onChatClick}>Chat</TabButton
           >
         {/if}
-        <TabButton
+        <!-- Tree tab hidden for demo -->
+        <!-- <TabButton
           active={$eventViewType === 'tree'}
           data-testid="tree"
           class="h-10"
           on:click={onTreeClick}>Tree</TabButton
-        >
+        > -->
       </TabButtons>
     </div>
     <div class="flex items-center gap-2 pb-2">
