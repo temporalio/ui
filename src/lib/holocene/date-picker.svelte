@@ -52,7 +52,7 @@
     showDatePicker = true;
   };
 
-  const onInput = (e: Event) => {
+  const onBlur = (e: FocusEvent) => {
     const target = e.target as HTMLInputElement;
     const { date, error } = evaluateDatePickerInput(target.value, isAllowed);
     inputError = error;
@@ -97,7 +97,7 @@
     icon="calendar-plus"
     type="text"
     onfocus={onFocus}
-    oninput={onInput}
+    onblur={onBlur}
     placeholder={DATE_PICKER_INPUT_FORMAT}
     value={formatDatePickerInput(selected)}
     error={inputError}
