@@ -71,6 +71,7 @@
   });
 
   let isHeartbeatStale = $state(false);
+  let isCheckingHeartbeat = $state(false);
 
   function checkHeartbeatStaleness() {
     if (!heartbeat?.heartbeatTime) {
@@ -84,7 +85,13 @@
 
   $effect(() => {
     checkHeartbeatStaleness();
-    const interval = setInterval(checkHeartbeatStaleness, 10_000);
+    const interval = setInterval(() => {
+      isCheckingHeartbeat = true;
+      checkHeartbeatStaleness();
+      queueMicrotask(() => {
+        isCheckingHeartbeat = false;
+      });
+    }, 10_000);
     return () => clearInterval(interval);
   });
 
@@ -105,6 +112,7 @@
 
 <section
   aria-label={translate('workers.worker-details')}
+  aria-busy={isCheckingHeartbeat}
   class="flex flex-col gap-4"
 >
   <header
