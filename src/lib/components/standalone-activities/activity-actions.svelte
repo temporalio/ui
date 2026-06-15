@@ -20,7 +20,10 @@
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
   import { getIdentity } from '$lib/utilities/core-context';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
-  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
+  import {
+    standaloneActivityCommandsDisabled,
+    standaloneActivityWriteActionsDisabled,
+  } from '$lib/utilities/standalone-activities-commands-disabled';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
 
   import ActivityOptionsUpdateDrawer from './activity-options-update-drawer.svelte';
@@ -51,6 +54,9 @@
     activityExecutionInfo.runState === 'PENDING_ACTIVITY_STATE_PAUSED',
   );
   const commandsDisabled = $derived(standaloneActivityCommandsDisabled(page));
+  const writeActionsDisabled = $derived(
+    standaloneActivityWriteActionsDisabled(page),
+  );
 
   const { activityId, runId } = $derived(activityExecutionInfo);
 
@@ -119,7 +125,6 @@
       controls="activity-execution-actions"
       variant="secondary"
       size="sm"
-      disabled={commandsDisabled}
     >
       {translate('workflows.more-actions')}
     </MenuButton>
@@ -127,18 +132,21 @@
       {#if isRunning}
         <MenuItem
           onclick={() => (optionsUpdateDrawerOpen = true)}
+          disabled={commandsDisabled}
           data-testid="update-button"
         >
           {translate('common.update')}
         </MenuItem>
         <MenuItem
           onclick={() => (resetConfirmationModalOpen = true)}
+          disabled={commandsDisabled}
           data-testid="reset-button"
         >
           {translate('workflows.reset')}
         </MenuItem>
         <MenuItem
           onclick={() => (cancelConfirmationModalOpen = true)}
+          disabled={writeActionsDisabled}
           data-testid="request-cancellation-button"
         >
           {translate('standalone-activities.request-cancellation')}
@@ -147,6 +155,7 @@
         <MenuItem
           onclick={() => (terminateConfirmationModalOpen = true)}
           destructive
+          disabled={writeActionsDisabled}
           data-testid="terminate-button"
         >
           {translate('standalone-activities.terminate')}
@@ -168,6 +177,7 @@
                 activityExecutionInfo.scheduleToCloseTimeout,
             }),
           )}
+        disabled={writeActionsDisabled}
         data-testid="start-activity-button"
       >
         {translate('standalone-activities.start-activity-like-this-one')}
@@ -192,6 +202,17 @@
     {activityId}
     onConfirm={onConfirmReset}
   />
+  {#key optionsUpdateDrawerOpen}
+    <ActivityOptionsUpdateDrawer
+      bind:open={optionsUpdateDrawerOpen}
+      {namespace}
+      {activityExecutionInfo}
+      onUpdate={refresh}
+    />
+  {/key}
+{/if}
+
+{#if !writeActionsDisabled}
   <CancelConfirmationModal
     onConfirm={onConfirmCancelOrTerminate}
     {activityExecutionInfo}
@@ -204,12 +225,4 @@
     {namespace}
     bind:open={terminateConfirmationModalOpen}
   />
-  {#key optionsUpdateDrawerOpen}
-    <ActivityOptionsUpdateDrawer
-      bind:open={optionsUpdateDrawerOpen}
-      {namespace}
-      {activityExecutionInfo}
-      onUpdate={refresh}
-    />
-  {/key}
 {/if}

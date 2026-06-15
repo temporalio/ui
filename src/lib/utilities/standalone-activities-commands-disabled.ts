@@ -4,7 +4,9 @@ import type { Page } from '@sveltejs/kit';
 
 import { coreUserStore } from '$lib/stores/core-user';
 
-export const standaloneActivityCommandsDisabled = (
+import { activityCommandsEnabled } from './activity-commands-enabled';
+
+export const standaloneActivityWriteActionsDisabled = (
   page: Page,
   namespace?: string,
 ): boolean => {
@@ -15,4 +17,16 @@ export const standaloneActivityCommandsDisabled = (
     namespace ?? page.params.namespace,
   );
   return namespaceWriteDisabled;
+};
+
+export const standaloneActivityCommandsDisabled = (
+  page: Page,
+  namespace?: string,
+): boolean => {
+  const coreUser = coreUserStore();
+  return !activityCommandsEnabled(
+    page?.data?.settings,
+    get(coreUser),
+    namespace ?? page.params.namespace,
+  );
 };

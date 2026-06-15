@@ -5,7 +5,7 @@
 
   import StartActivityButton from '$lib/components/standalone-activities/start-activity-button.svelte';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
+  import { standaloneActivityWriteActionsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   interface Props {
     activity?: ActivityExecutionInfo;
@@ -17,7 +17,7 @@
 
   const namespace = $derived(page.params.namespace);
   const activityStartEnabled = $derived(
-    !standaloneActivityCommandsDisabled(page),
+    !standaloneActivityWriteActionsDisabled(page),
   );
 </script>
 

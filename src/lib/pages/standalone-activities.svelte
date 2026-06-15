@@ -37,7 +37,7 @@
   import { getActivityStatusAndCountOfGroup } from '$lib/utilities/get-activity-status-and-count';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
-  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
+  import { standaloneActivityWriteActionsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   interface Props {
     releaseStageBadge?: Snippet;
@@ -54,7 +54,7 @@
   const refreshTimeFormatted = $derived($timestamp(refreshTime));
   const availableColumns = $derived(availableActivityColumns(namespace));
   const activityStartEnabled = $derived(
-    !standaloneActivityCommandsDisabled(page),
+    !standaloneActivityWriteActionsDisabled(page),
   );
 
   onMount(() => {
