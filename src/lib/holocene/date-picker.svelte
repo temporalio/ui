@@ -45,18 +45,27 @@
   let month = $derived(selected.getMonth());
   let year = $derived(selected.getFullYear());
   let showDatePicker = $state(false);
-  let inputError = $state(false);
+  // resets whenever selected changes; can be overridden until then
+  let inputError = $derived.by(() => {
+    void selected;
+    return false;
+  });
 
   // handlers
   const onFocus = () => {
     showDatePicker = true;
   };
 
+  const onInput = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const { date } = evaluateDatePickerInput(target.value, isAllowed);
+    if (date) onDateChange?.(date);
+  };
+
   const onBlur = (e: FocusEvent) => {
     const target = e.target as HTMLInputElement;
-    const { date, error } = evaluateDatePickerInput(target.value, isAllowed);
+    const { error } = evaluateDatePickerInput(target.value, isAllowed);
     inputError = error;
-    if (date) onDateChange?.(date);
   };
 
   const next = () => {
@@ -79,7 +88,6 @@
 
   const handleDateChange = (d: Date) => {
     showDatePicker = false;
-    inputError = false;
     onDateChange?.(d);
   };
 
@@ -97,11 +105,13 @@
     icon="calendar-plus"
     type="text"
     onfocus={onFocus}
+    oninput={onInput}
     onblur={onBlur}
     placeholder={DATE_PICKER_INPUT_FORMAT}
     value={formatDatePickerInput(selected)}
     error={inputError}
     hintText={inputError ? invalidDate : ''}
+    onClear={() => (inputError = false)}
     clearable
     clearButtonLabel={clearLabel}
     {disabled}
@@ -141,8 +151,8 @@
           type="button"
           class="cursor-pointer text-[12px]"
           onclick={() => {
-            inputError = false;
             selected = new Date();
+            onDateChange?.(selected);
           }}
         >
           {todayLabel}
