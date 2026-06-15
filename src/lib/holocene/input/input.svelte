@@ -21,7 +21,7 @@
     suffix?: string;
     prefix?: string;
     valid?: boolean;
-    hintText?: string;
+    hintText?: string | Snippet<[{ valid: boolean; error: boolean }]>;
     maxLength?: number;
     hideCount?: boolean;
     noBorder?: boolean;
@@ -92,7 +92,7 @@
   const { copy, copied } = copyToClipboard();
 </script>
 
-<div class={merge('group flex flex-col gap-1', className)}>
+<div class={merge('group flex flex-col gap-1.5', className)}>
   <div
     class={merge(
       'flex items-center justify-start gap-2',
@@ -107,7 +107,7 @@
     <div
       class={merge(
         'input-container',
-        'surface-primary relative box-border inline-flex h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
+        'surface-primary relative box-border inline-flex min-h-10 w-full items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70',
         inputContainerClass,
       )}
       class:disabled={isDisabled}
@@ -178,7 +178,11 @@
         </div>
       {/if}
       {#if suffix}
-        <div class="suffix">
+        <div
+          class={merge(
+            'flex w-fit items-center self-stretch border-l border-subtle bg-subtle px-4',
+          )}
+        >
           {suffix}
         </div>
       {/if}
@@ -196,7 +200,11 @@
       class:error
       role={error ? 'alert' : null}
     >
-      {hintText}
+      {#if typeof hintText === 'string'}
+        {hintText}
+      {:else}
+        {@render hintText?.({ valid, error })}
+      {/if}
     </span>
     {#if maxLength && !isDisabled && !hideCount}
       <span
@@ -238,11 +246,7 @@
   }
 
   .prefix {
-    @apply block h-full w-fit border-r border-subtle px-4 py-2 text-secondary;
-  }
-
-  .suffix {
-    @apply block h-full w-fit border-l border-subtle bg-subtle px-4 py-2;
+    @apply flex w-fit items-center self-stretch border-r border-subtle px-4 text-secondary;
   }
 
   .noBorder {
