@@ -80,7 +80,7 @@ describe('evaluateDatePickerInput', () => {
     });
   });
 
-  test('returns no date and no error for incomplete entry (no dispatch)', () => {
+  test('flags incomplete entry as an error without a date', () => {
     expect(evaluateDatePickerInput('06/05')).toEqual({
       date: null,
       error: true,
