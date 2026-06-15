@@ -64,8 +64,9 @@
 
   const onBlur = (e: FocusEvent) => {
     const target = e.target as HTMLInputElement;
-    const { error } = evaluateDatePickerInput(target.value, isAllowed);
+    const { date, error } = evaluateDatePickerInput(target.value, isAllowed);
     inputError = error;
+    if (date) selected = date;
   };
 
   const next = () => {
@@ -88,6 +89,7 @@
 
   const handleDateChange = (d: Date) => {
     showDatePicker = false;
+    selected = d;
     onDateChange?.(d);
   };
 
