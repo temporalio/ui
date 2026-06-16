@@ -52,21 +52,20 @@
   });
 
   // handlers
-  const onFocus = () => {
-    showDatePicker = true;
+  const commitDate = (date: Date) => {
+    selected = date;
+    onDateChange?.(date);
   };
 
-  const onInput = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    const { date } = evaluateDatePickerInput(target.value, isAllowed);
-    if (date) onDateChange?.(date);
+  const onFocus = () => {
+    showDatePicker = true;
   };
 
   const onBlur = (e: FocusEvent) => {
     const target = e.target as HTMLInputElement;
     const { date, error } = evaluateDatePickerInput(target.value, isAllowed);
     inputError = error;
-    if (date) selected = date;
+    if (date) commitDate(date);
   };
 
   const next = () => {
@@ -89,8 +88,7 @@
 
   const handleDateChange = (d: Date) => {
     showDatePicker = false;
-    selected = d;
-    onDateChange?.(d);
+    commitDate(d);
   };
 
   const previousMonth = translate('date-picker.previous-month');
@@ -107,7 +105,6 @@
     icon="calendar-plus"
     type="text"
     onfocus={onFocus}
-    oninput={onInput}
     onblur={onBlur}
     placeholder={DATE_PICKER_INPUT_FORMAT}
     value={formatDatePickerInput(selected)}
@@ -152,10 +149,7 @@
         <button
           type="button"
           class="cursor-pointer text-[12px]"
-          onclick={() => {
-            selected = new Date();
-            onDateChange?.(selected);
-          }}
+          onclick={() => commitDate(new Date())}
         >
           {todayLabel}
         </button>
