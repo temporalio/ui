@@ -257,7 +257,7 @@
 
 <style lang="postcss">
   .caret {
-    @apply relative inline-flex items-center justify-center;
+    @apply inline-flex items-center justify-center;
 
     width: 24px;
     height: 24px;
@@ -268,7 +268,7 @@
   }
 
   .arrow {
-    @apply absolute left-0 top-0 h-0 w-0;
+    @apply h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;
