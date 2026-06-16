@@ -65,6 +65,32 @@ export const timestampFormats: Record<
 
 export type TimestampFormat = keyof typeof timestampFormats;
 
+const dateTimeFormatters = new Map<string, Intl.DateTimeFormat>();
+
+const getHour12Option = (hourFormat: HourFormat): boolean | undefined => {
+  if (hourFormat === 'system') return undefined;
+  return hourFormat === '12';
+};
+
+const getDateTimeFormatter = (
+  format: TimestampFormat,
+  hourFormat: HourFormat,
+  timeZone?: string,
+): Intl.DateTimeFormat => {
+  const cacheKey = `${timeZone ?? BASE_TIME_FORMAT_OPTIONS.LOCAL}|${format}|${hourFormat}`;
+  const cachedFormatter = dateTimeFormatters.get(cacheKey);
+  if (cachedFormatter) return cachedFormatter;
+
+  const hour12 = getHour12Option(hourFormat);
+  const formatter = new Intl.DateTimeFormat(undefined, {
+    ...timestampFormats[format],
+    ...(hour12 !== undefined && { hour12 }),
+    ...(timeZone && { timeZone }),
+  });
+  dateTimeFormatters.set(cacheKey, formatter);
+  return formatter;
+};
+
 /**
  * Determines if a given date/time value represents a future moment.
  * Handles ValidTime types including strings, numbers, Dates, and Timestamp objects.
@@ -124,23 +150,12 @@ export function formatDate(
       return parsed.toISOString();
     }
 
-    const hour12 =
-      hourFormat === 'system' ? undefined : hourFormat === '12' ? true : false;
-
-    const formatOptions = {
-      ...timestampFormats[format],
-      ...(hour12 !== undefined && { hour12 }),
-    };
-
     if (timeFormat === BASE_TIME_FORMAT_OPTIONS.LOCAL) {
-      return new Intl.DateTimeFormat(undefined, formatOptions).format(parsed);
+      return getDateTimeFormatter(format, hourFormat).format(parsed);
     }
 
     const timeZone = getTimezone(timeFormat);
-    return new Intl.DateTimeFormat(undefined, {
-      ...formatOptions,
-      timeZone,
-    }).format(parsed);
+    return getDateTimeFormatter(format, hourFormat, timeZone).format(parsed);
   } catch (e) {
     console.error('Error formatting date:', e);
     return '';
