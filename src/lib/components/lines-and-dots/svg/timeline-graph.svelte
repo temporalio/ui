@@ -104,9 +104,7 @@
 <div
   id="event-history-timeline-graph"
   class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary [contain:layout_style] [scrollbar-gutter:stable]"
-  style="content-visibility:auto;contain-intrinsic-size:auto 400px;{viewportHeight
-    ? `max-height:${viewportHeight}px;`
-    : ''}"
+  style={viewportHeight ? `max-height:${viewportHeight}px;` : ''}
   bind:clientWidth={canvasWidth}
   onscroll={handleScroll}
 >

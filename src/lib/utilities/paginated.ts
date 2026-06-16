@@ -9,19 +9,14 @@ import { handleError } from './handle-error';
 import { isFunction } from './is-function';
 import { merge } from './merge';
 
-type PaginatedOptions<T> = PaginationCallbacks<T> & {
-  token?: NextPageToken;
-  previousProps?: WithoutNextPageToken<T>;
-};
-
 /**
- * Takes a function that receives a `nextPageToken`. If the promise
- * returned from that function has a `nextPageToken`, this function
- * will recursively call the function again, passing in the new
- * `nextPageToken`.
+ * Takes a function that receives a `nextPageToken` and iterates through
+ * all pages, merging results. Replaces the previous recursive implementation
+ * to avoid holding N intermediate merged arrays on the async call stack,
+ * which caused O(N²) peak memory for large histories.
  *
  * - `onStart` fires at the beginning.
- * - `onUpdate` fires on each exection.
+ * - `onUpdate` fires on each execution with (accumulated, currentPage).
  * - `onComplete` fires when there are no more `nextPageTokens`.
  * - `onError` fires when a promise is rejected.
  */
@@ -33,34 +28,33 @@ export const paginated = async <T extends WithNextPageToken>(
     onUpdate,
     onComplete,
     onError = handleError,
-    token,
-    previousProps,
-  }: PaginatedOptions<T> = {},
+  }: PaginationCallbacks<T> = {},
 ): Promise<WithoutNextPageToken<T>> => {
-  if (!previousProps && isFunction(onStart)) onStart();
+  if (isFunction(onStart)) onStart();
 
-  try {
-    const response = await fn(token);
-    if (response) {
+  let token: NextPageToken | undefined = undefined;
+  let accumulated: WithoutNextPageToken<T> | undefined = undefined;
+
+  while (true) {
+    try {
+      const response = await fn(token);
+      if (!response) return accumulated;
+
       const { nextPageToken, ...props } = response;
-      const mergedProps = merge(previousProps, props);
+      accumulated = merge(accumulated, props as WithoutNextPageToken<T>);
 
-      if (isFunction(onUpdate)) onUpdate(mergedProps, props);
+      if (isFunction(onUpdate))
+        onUpdate(accumulated, props as WithoutNextPageToken<T>);
 
       if (!nextPageToken) {
-        if (isFunction(onComplete)) onComplete(mergedProps);
-        return mergedProps;
+        if (isFunction(onComplete)) onComplete(accumulated);
+        return accumulated;
       }
 
-      return paginated(fn, {
-        onStart,
-        onUpdate,
-        onComplete,
-        token: nextPageToken,
-        previousProps: mergedProps,
-      });
+      token = nextPageToken;
+    } catch (error: unknown) {
+      onError(error);
+      return accumulated;
     }
-  } catch (error: unknown) {
-    onError(error);
   }
 };

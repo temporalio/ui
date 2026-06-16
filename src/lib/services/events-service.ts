@@ -1,3 +1,5 @@
+import { get } from 'svelte/store';
+
 import throttle from 'just-throttle';
 
 import { toEventHistory } from '$lib/models/event-history';
@@ -95,27 +97,25 @@ export const fetchAllEvents = async ({
   signal,
   historySize,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
-  let processedCount = 0;
+  let incrementallyBuilt = false;
 
   const onStart = () => {
     if (!signal) return;
-    processedCount = 0;
+    incrementallyBuilt = false;
     fullEventHistory.set([]);
   };
 
-  const onUpdate = (full, current) => {
+  const onUpdate = (_full, current) => {
     if (!signal) return;
-    const allRaw = full.history?.events ?? [];
-    const newRaw = allRaw.slice(processedCount);
-    if (newRaw.length > 0) {
-      const newEvents = toEventHistory(newRaw);
-      processedCount = allRaw.length;
+    const pageEvents = current?.history?.events ?? [];
+    if (pageEvents.length > 0) {
+      const newEvents = toEventHistory(pageEvents);
+      incrementallyBuilt = true;
       fullEventHistory.update((existing) => [...existing, ...newEvents]);
     }
-    const next = current?.history?.events;
     const hasNewHistory =
       historySize &&
-      next?.every((e) => parseInt(e.eventId) > parseInt(historySize));
+      pageEvents.every((e) => parseInt(e.eventId) > parseInt(historySize));
     if (hasNewHistory) {
       throttleRefresh();
     }
@@ -144,8 +144,12 @@ export const fetchAllEvents = async ({
   );
 
   if (!response?.history) return [];
-  const allEvents = await toEventHistory(response.history.events);
-  return allEvents;
+
+  if (incrementallyBuilt) {
+    return get(fullEventHistory);
+  }
+
+  return toEventHistory(response.history.events);
 };
 
 export const fetchPartialRawEvents = async ({
