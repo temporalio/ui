@@ -37,6 +37,7 @@
   import {
     routeForCallStack,
     routeForEventHistory,
+    routeForFastHistory,
     routeForNexusLinks,
     routeForPendingActivities,
     routeForRelationships,
@@ -280,6 +281,15 @@
           {workflow?.historyEvents}
         </Badge>
       </Tab>
+      <Tab
+        label="Fast"
+        id="fast-history-tab"
+        href={routeForFastHistory(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForFastHistory(routeParameters),
+        )}
+      />
       <Tab
         label={translate('workflows.relationships')}
         id="relationships-tab"

@@ -22,6 +22,27 @@ import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
+export type BidirectionalProgress = {
+  ascEvents: number;
+  descEvents: number;
+  ascPages: number;
+  descPages: number;
+  elapsedMs: number;
+  ascMaxId: number;
+  descMinId: number;
+  totalEstimated: number;
+};
+
+export type BidirectionalStats = {
+  durationMs: number;
+  totalEvents: number;
+  overlap: number;
+  ascPages: number;
+  descPages: number;
+  eventsPerSecond: number;
+  winner: 'ascending' | 'descending' | 'tie';
+};
+
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
     workflowId: string;
@@ -227,4 +248,205 @@ export const fetchInitialEvent = async (
   });
   const start = await toEventHistory(startEventsRaw);
   return start[0];
+};
+
+export const fetchAllEventsBidirectional = async ({
+  namespace,
+  workflowId,
+  runId,
+  signal,
+  onProgress,
+  maximumPageSize,
+}: {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+  signal?: AbortSignal;
+  onProgress?: (p: BidirectionalProgress) => void;
+  maximumPageSize?: number;
+}): Promise<{ events: CommonHistoryEvent[]; stats: BidirectionalStats }> => {
+  const t0 = performance.now();
+
+  const ascCtrl = new AbortController();
+  const descCtrl = new AbortController();
+  signal?.addEventListener('abort', () => {
+    ascCtrl.abort();
+    descCtrl.abort();
+  });
+
+  let ascMaxId = 0;
+  let descMinId = Infinity;
+  let descMaxId = 0;
+  let ascPages = 0;
+  let descPages = 0;
+  let observedPageSize = 0;
+  let winnerChosen = false;
+
+  const ascBucket: CommonHistoryEvent[] = [];
+  const descBucket: CommonHistoryEvent[] = [];
+
+  type Token = string | undefined;
+
+  const gap = () => Math.max(0, descMinId - ascMaxId - 1);
+
+  const reportProgress = () => {
+    onProgress?.({
+      ascEvents: ascBucket.length,
+      descEvents: descBucket.length,
+      ascPages,
+      descPages,
+      elapsedMs: performance.now() - t0,
+      ascMaxId,
+      descMinId: descMinId === Infinity ? 0 : descMinId,
+      totalEstimated: descMaxId,
+    });
+  };
+
+  const runAscending = async () => {
+    const route = routeForApi('events.ascending', { namespace, workflowId });
+    let token: Token;
+    while (!ascCtrl.signal.aborted) {
+      const g = gap();
+      if (g <= 0) {
+        descCtrl.abort();
+        break;
+      }
+      if (observedPageSize > 0 && g <= observedPageSize && !winnerChosen) {
+        winnerChosen = true;
+        descCtrl.abort();
+      }
+
+      let response: GetWorkflowExecutionHistoryResponse;
+      try {
+        response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+          route,
+          {
+            token,
+            request: fetch,
+            params: {
+              'execution.runId': runId,
+              waitNewEvent: 'false',
+              ...(maximumPageSize && {
+                maximumPageSize: String(maximumPageSize),
+              }),
+            },
+            options: { signal: ascCtrl.signal },
+          },
+        );
+      } catch {
+        break;
+      }
+      const events = response?.history?.events ?? [];
+      if (!events.length) break;
+
+      ascPages++;
+      observedPageSize = Math.max(observedPageSize, events.length);
+      const ascNonOverlap = events.filter(
+        (e) => parseInt(e.eventId) < descMinId,
+      );
+      ascBucket.push(...toEventHistory(ascNonOverlap));
+      ascMaxId = Math.max(ascMaxId, ...events.map((e) => parseInt(e.eventId)));
+      reportProgress();
+
+      if (!response.nextPageToken || gap() <= 0) {
+        descCtrl.abort();
+        break;
+      }
+      token = response.nextPageToken as unknown as string;
+    }
+  };
+
+  const runDescending = async () => {
+    const route = routeForApi('events.descending', { namespace, workflowId });
+    let token: Token;
+    while (!descCtrl.signal.aborted) {
+      const g = gap();
+      if (g <= 0) {
+        ascCtrl.abort();
+        break;
+      }
+      if (observedPageSize > 0 && g <= observedPageSize && !winnerChosen) {
+        winnerChosen = true;
+        ascCtrl.abort();
+      }
+
+      let response: GetWorkflowExecutionHistoryResponse;
+      try {
+        response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+          route,
+          {
+            token,
+            request: fetch,
+            params: {
+              'execution.runId': runId,
+              waitNewEvent: 'false',
+              ...(maximumPageSize && {
+                maximumPageSize: String(maximumPageSize),
+              }),
+            },
+            options: { signal: descCtrl.signal },
+          },
+        );
+      } catch {
+        break;
+      }
+      const events = response?.history?.events ?? [];
+      if (!events.length) break;
+
+      descPages++;
+      observedPageSize = Math.max(observedPageSize, events.length);
+      const descNonOverlap = events.filter(
+        (e) => parseInt(e.eventId) > ascMaxId,
+      );
+      descBucket.push(...toEventHistory(descNonOverlap));
+      const descIds = events.map((e) => parseInt(e.eventId));
+      descMinId = Math.min(descMinId, ...descIds);
+      descMaxId = Math.max(descMaxId, ...descIds);
+      reportProgress();
+
+      if (!response.nextPageToken || gap() <= 0) {
+        ascCtrl.abort();
+        break;
+      }
+      token = response.nextPageToken as unknown as string;
+    }
+  };
+
+  await Promise.allSettled([runAscending(), runDescending()]);
+
+  // Merge and sort. Dedup is a safety net for the rare case where a page was
+  // already in-flight when the winner aborted the other direction.
+  const seen = new Set<string>();
+  const merged: CommonHistoryEvent[] = [];
+  for (const e of [...ascBucket, ...descBucket].sort(
+    (a, b) => parseInt(a.id) - parseInt(b.id),
+  )) {
+    if (!seen.has(e.id)) {
+      seen.add(e.id);
+      merged.push(e);
+    }
+  }
+
+  const durationMs = performance.now() - t0;
+  const overlap = ascBucket.length + descBucket.length - merged.length;
+
+  const winner: BidirectionalStats['winner'] =
+    ascPages === descPages
+      ? 'tie'
+      : ascPages > descPages
+        ? 'ascending'
+        : 'descending';
+
+  return {
+    events: merged,
+    stats: {
+      durationMs,
+      totalEvents: merged.length,
+      overlap,
+      ascPages,
+      descPages,
+      eventsPerSecond: Math.round(merged.length / (durationMs / 1000)),
+      winner,
+    },
+  };
 };

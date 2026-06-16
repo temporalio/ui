@@ -15,6 +15,7 @@ import {
   routeForEventHistory,
   routeForEventHistoryEvent,
   routeForEventHistoryImport,
+  routeForFastHistory,
   routeForLoginPage,
   routeForNamespace,
   routeForNamespaces,
@@ -103,6 +104,7 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     ],
     ['routeForEventHistory', () => routeForEventHistory(workflowParams)],
     ['routeForTimeline', () => routeForTimeline(workflowParams)],
+    ['routeForFastHistory', () => routeForFastHistory(workflowParams)],
     ['routeForWorkers', () => routeForWorkers(namespaceParams)],
     [
       'routeForWorkerDeployments',
@@ -312,6 +314,7 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     ],
     ['routeForEventHistory', () => routeForEventHistory(workflowParams)],
     ['routeForTimeline', () => routeForTimeline(workflowParams)],
+    ['routeForFastHistory', () => routeForFastHistory(workflowParams)],
     ['routeForWorkers', () => routeForWorkers(workflowParams)],
     [
       'routeForWorkerDeployments',

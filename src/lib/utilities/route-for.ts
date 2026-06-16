@@ -312,6 +312,16 @@ export const routeForTimeline = ({
   return toURL(path, queryParams);
 };
 
+export const routeForFastHistory = ({
+  queryParams,
+  ...parameters
+}: WorkflowParameters & {
+  queryParams?: Record<string, string>;
+}): ResolvedPathname => {
+  const path = `${baseRouteForWorkflow(parameters)}/fast-history`;
+  return toURL(path, queryParams);
+};
+
 export const routeForWorkflow = ({
   queryParams,
   ...parameters
