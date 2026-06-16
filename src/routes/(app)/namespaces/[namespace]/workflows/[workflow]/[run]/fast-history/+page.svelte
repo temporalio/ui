@@ -47,27 +47,7 @@
   }
 
   onMount(() => {
-    controller = new AbortController();
-
-    fetchAllEventsBidirectional({
-      namespace,
-      workflowId,
-      runId,
-      signal: controller.signal,
-      maximumPageSize: pageSize,
-      onProgress: (p) => {
-        progress = p;
-      },
-    })
-      .then(({ stats: s }) => {
-        stats = s;
-      })
-      .catch((e: unknown) => {
-        if (e instanceof Error && e.name !== 'AbortError') {
-          error = e.message;
-        }
-      });
-
+    start();
     return () => controller.abort();
   });
 
