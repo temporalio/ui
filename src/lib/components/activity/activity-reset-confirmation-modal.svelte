@@ -59,6 +59,7 @@
     <Checkbox
       bind:checked={resetHeartbeat}
       label={translate('activities.reset-heartbeat-details')}
+      data-testid="reset-heartbeat-details"
     />
   </div>
 </Modal>
