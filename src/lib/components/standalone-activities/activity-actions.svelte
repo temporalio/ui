@@ -58,7 +58,8 @@
     standaloneActivityWriteActionsDisabled(page),
   );
 
-  const { activityId, runId } = $derived(activityExecutionInfo);
+  const activityId = $derived(activityExecutionInfo.activityId ?? '');
+  const runId = $derived(activityExecutionInfo.runId ?? '');
 
   const refresh = () => poller.fetchOnce();
 

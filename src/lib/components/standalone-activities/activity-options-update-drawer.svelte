@@ -33,8 +33,8 @@
   const onSave = async (options: ActivityOptions) => {
     await updateActivityExecutionOptions(
       namespace,
-      activityExecutionInfo.activityId,
-      activityExecutionInfo.runId,
+      activityExecutionInfo.activityId ?? '',
+      activityExecutionInfo.runId ?? '',
       options,
       identity,
     );
@@ -44,7 +44,7 @@
 
 <ActivityOptionsForm
   bind:open
-  activityId={activityExecutionInfo.activityId}
+  activityId={activityExecutionInfo.activityId ?? ''}
   {activityOptions}
   {onSave}
 />
