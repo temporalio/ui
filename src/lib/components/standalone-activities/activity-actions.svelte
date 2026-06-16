@@ -110,14 +110,25 @@
 
 <div class="flex items-center gap-2">
   {#if isRunning}
-    <Button
-      on:click={onPause}
-      disabled={commandsDisabled}
-      leadingIcon={isPaused ? 'play' : 'pause'}
-      size="sm"
-    >
-      {isPaused ? translate('workflows.unpause') : translate('workflows.pause')}
-    </Button>
+    {#if commandsDisabled}
+      <Button
+        on:click={() => (cancelConfirmationModalOpen = true)}
+        disabled={writeActionsDisabled}
+        size="sm"
+      >
+        {translate('standalone-activities.request-cancellation')}
+      </Button>
+    {:else}
+      <Button
+        on:click={onPause}
+        leadingIcon={isPaused ? 'play' : 'pause'}
+        size="sm"
+      >
+        {isPaused
+          ? translate('workflows.unpause')
+          : translate('workflows.pause')}
+      </Button>
+    {/if}
   {/if}
   <MenuContainer>
     <MenuButton
@@ -130,28 +141,28 @@
     </MenuButton>
     <Menu id="activity-execution-actions" position="right" class="w-[16rem]">
       {#if isRunning}
-        <MenuItem
-          onclick={() => (optionsUpdateDrawerOpen = true)}
-          disabled={commandsDisabled}
-          data-testid="update-button"
-        >
-          {translate('common.update')}
-        </MenuItem>
-        <MenuItem
-          onclick={() => (resetConfirmationModalOpen = true)}
-          disabled={commandsDisabled}
-          data-testid="reset-button"
-        >
-          {translate('workflows.reset')}
-        </MenuItem>
-        <MenuItem
-          onclick={() => (cancelConfirmationModalOpen = true)}
-          disabled={writeActionsDisabled}
-          data-testid="request-cancellation-button"
-        >
-          {translate('standalone-activities.request-cancellation')}
-        </MenuItem>
-        <MenuDivider />
+        {#if !commandsDisabled}
+          <MenuItem
+            onclick={() => (optionsUpdateDrawerOpen = true)}
+            data-testid="update-button"
+          >
+            {translate('common.update')}
+          </MenuItem>
+          <MenuItem
+            onclick={() => (resetConfirmationModalOpen = true)}
+            data-testid="reset-button"
+          >
+            {translate('workflows.reset')}
+          </MenuItem>
+          <MenuItem
+            onclick={() => (cancelConfirmationModalOpen = true)}
+            disabled={writeActionsDisabled}
+            data-testid="request-cancellation-button"
+          >
+            {translate('standalone-activities.request-cancellation')}
+          </MenuItem>
+          <MenuDivider />
+        {/if}
         <MenuItem
           onclick={() => (terminateConfirmationModalOpen = true)}
           destructive
