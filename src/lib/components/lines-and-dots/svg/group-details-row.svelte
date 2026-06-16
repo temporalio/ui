@@ -118,7 +118,7 @@
       {#if childWorkflowStartedEvent}
         <div class="surface-primary p-4">
           <div class="font-medium leading-4 text-secondary">Child Workflow</div>
-          {#key group.eventList.length}
+          {#key group.eventIds.size}
             <GraphWidget
               {namespace}
               workflowId={childWorkflowStartedEvent.attributes.workflowExecution

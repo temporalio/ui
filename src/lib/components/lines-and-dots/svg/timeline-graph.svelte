@@ -158,7 +158,7 @@
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
       {#each visibleGroups as { group, y } (group.id)}
-        {#key group.eventList.length}
+        {#key group.eventIds.size}
           <TimelineGraphRow
             {y}
             {group}

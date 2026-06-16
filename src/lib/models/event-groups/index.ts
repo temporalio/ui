@@ -36,6 +36,7 @@ const addToExistingGroup = (
 
   group.events.set(event.id, event);
   group.eventIds.add(event.id);
+  group.eventList.push(event);
 
   group.timestamp = event.timestamp;
 
@@ -43,7 +44,7 @@ const addToExistingGroup = (
     group.pendingActivity = pendingActivity;
   }
 
-  if (group.pendingActivity && group.eventList.length === 3) {
+  if (group.pendingActivity && group.events.size === 3) {
     delete group.pendingActivity;
   }
 

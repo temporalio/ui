@@ -1,4 +1,4 @@
-import type { Payload } from '$lib/types';
+import type { EventLink, Payload } from '$lib/types';
 import type {
   ActivityTaskScheduledEvent,
   CommonHistoryEvent,
@@ -7,6 +7,7 @@ import type {
   SignalExternalWorkflowExecutionInitiatedEvent,
   StartChildWorkflowExecutionInitiatedEvent,
   TimerStartedEvent,
+  WorkflowEvent,
   WorkflowExecutionSignaledEvent,
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowTaskScheduledEvent,
@@ -63,6 +64,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
 
   const groupEvents: EventGroup['events'] = new Map();
   const groupEventIds: EventGroup['eventIds'] = new Set();
+  const groupEventList: WorkflowEvent[] = [event];
 
   groupEvents.set(event.id, event);
   groupEventIds.add(event.id);
@@ -74,6 +76,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     displayName,
     events: groupEvents,
     eventIds: groupEventIds,
+    eventList: groupEventList,
     initialEvent: event,
     timestamp,
     category: isLocalActivityMarkerEvent(event) ? 'local-activity' : category,
@@ -88,11 +91,14 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get attributes() {
       return getLastEvent(this)?.attributes;
     },
-    get eventList() {
-      return Array.from(this.events, ([_key, value]) => value);
-    },
     get links() {
-      return Array.from(this.events, ([_key, value]) => value.links).flat();
+      const result: EventLink[] = [];
+      for (const e of this.events.values()) {
+        for (const link of e.links) {
+          result.push(link);
+        }
+      }
+      return result;
     },
     get lastEvent() {
       return getLastEvent(this);
