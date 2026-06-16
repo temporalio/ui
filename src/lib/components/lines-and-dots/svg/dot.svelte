@@ -2,9 +2,12 @@
   import type { Snippet } from 'svelte';
 
   import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { HistoryConfig } from '../constants';
+
+  import TimelineDotIcon, {
+    type TimelineIconName,
+  } from './timeline-dot-icon.svelte';
 
   const { radius } = HistoryConfig;
 
@@ -44,13 +47,12 @@
     {@render children?.()}
   </rect>
   {#if icon}
-    <Icon
-      name={icon}
+    <TimelineDotIcon
+      name={icon as TimelineIconName}
       x={x - r / 2}
       y={y - r / 2}
       width={r}
       height={r}
-      class="text-black"
     />
   {/if}
 </g>

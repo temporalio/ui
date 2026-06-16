@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -15,62 +15,85 @@
 
   import GraphWidget from './graph-widget.svelte';
 
-  export let group: EventGroup;
-  export let canvasWidth: number;
-  export let endTime: string | Date | number = Date.now();
-  export let x = 0;
-  export let y: number;
+  interface Props {
+    group: EventGroup;
+    canvasWidth: number;
+    endTime?: string | Date | number;
+    x?: number;
+    y: number;
+  }
 
-  let offsetHeight;
-  $: contentHeight = offsetHeight || 0;
+  let { group, canvasWidth, endTime = Date.now(), x = 0, y }: Props = $props();
 
-  const setActiveGroupHeight = (height) => {
-    $activeGroupHeight = height;
-  };
+  let container = $state<HTMLElement | undefined>();
+  let contentHeight = $state(0);
 
-  $: setActiveGroupHeight(contentHeight || 0);
+  const status = $derived(group?.finalClassification || group?.classification);
+  const { namespace } = $derived(page.params);
+  const width = $derived(canvasWidth);
+  const title = $derived(group.displayName);
 
-  $: status = group?.finalClassification || group?.classification;
-  $: ({ namespace } = $page.params);
-  $: width = canvasWidth;
-  $: title = group.displayName;
+  const childWorkflowStartedEvent = $derived(
+    group?.eventList.find(isChildWorkflowExecutionStartedEvent),
+  );
 
-  $: childWorkflowStartedEvent =
-    group && group.eventList.find(isChildWorkflowExecutionStartedEvent);
+  const duration = $derived(
+    formatEventGroupDuration({
+      group,
+      endTime,
+      includeMilliseconds: true,
+    }),
+  );
 
-  $: duration = formatEventGroupDuration({
-    group,
-    endTime,
-    includeMilliseconds: true,
+  const pendingStatus = $derived.by(() => {
+    if (group?.pendingActivity) {
+      if (group.pendingActivity.paused) return translate('workflows.paused');
+      if (group.pendingActivity.attempt > 1)
+        return translate('events.event-classification.retrying');
+      return translate('events.event-classification.pending');
+    }
+    return null;
   });
 
-  $: {
-    if (group?.pendingActivity) {
-      if (group.pendingActivity.paused) {
-        status = translate('workflows.paused');
-      } else if (group.pendingActivity.attempt > 1) {
-        status = translate('events.event-classification.retrying');
-      } else {
-        status = translate('events.event-classification.pending');
+  const displayStatus = $derived(pendingStatus ?? status);
+
+  // Write activeGroupHeight outside the reactive chain so it doesn't cause a
+  // synchronous cascade during the same frame as the click. ResizeObserver
+  // callbacks are batched by the browser after layout, avoiding forced reflow.
+  $effect(() => {
+    if (!container) return;
+    const ro = new ResizeObserver((entries) => {
+      const h = entries[0]?.contentRect.height ?? 0;
+      if (h !== contentHeight) {
+        contentHeight = h;
+        activeGroupHeight.set(h);
       }
-    }
-  }
+    });
+    ro.observe(container);
+    return () => ro.disconnect();
+  });
 
   const onDecode = async () => {
     await tick();
-    contentHeight = offsetHeight;
+    if (container) {
+      const h = container.offsetHeight;
+      if (h !== contentHeight) {
+        contentHeight = h;
+        activeGroupHeight.set(h);
+      }
+    }
   };
 </script>
 
 <g role="button" tabindex="0" class="relative z-50">
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div bind:offsetHeight class="flex flex-col">
+    <div bind:this={container} class="flex flex-col">
       <div
         class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
       >
         <div class="flex h-full items-center gap-4 px-2">
-          {#if status}
-            <WorkflowStatus {status} />
+          {#if displayStatus}
+            <WorkflowStatus status={displayStatus} />
           {/if}
           {title}
           {#if duration}

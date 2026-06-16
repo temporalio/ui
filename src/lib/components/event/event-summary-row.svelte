@@ -285,7 +285,10 @@
   <td
     class="w-full items-center gap-2 text-right text-sm font-normal xl:text-left"
   >
-    <div class="flex items-center gap-2">
+    <div
+      class="flex items-center gap-2"
+      style="content-visibility:auto;contain-intrinsic-size:auto 24px"
+    >
       {#if pendingAttempt}
         <Badge
           class="mr-1"

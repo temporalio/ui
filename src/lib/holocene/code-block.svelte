@@ -193,6 +193,8 @@
 
   // lifecycle
 
+  let initialized = $state(false);
+
   // keep dynamic extensions up to date in codemirror
   $effect(() => {
     editorView?.dispatch({
@@ -228,7 +230,7 @@
   // handlers
 
   const handleCopy = (e: Event) => {
-    copy(e, getFormattedDoc());
+    copy(e, editorView ? getFormattedDoc() : format(content, language, inline));
   };
 
   const handleEditorBlur = () => {
@@ -236,10 +238,27 @@
   };
 
   onMount(() => {
-    editorView = createEditorView();
-    editorView.contentDOM.onblur = handleEditorBlur;
-    ensureFullParse();
+    // Defer expensive CodeMirror creation so the pane opens instantly.
+    // A plain <pre> renders first; the editor upgrades when the browser is idle.
+    let idleHandle: ReturnType<typeof requestIdleCallback> | undefined;
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+
+    const init = () => {
+      editorView = createEditorView();
+      editorView.contentDOM.onblur = handleEditorBlur;
+      ensureFullParse();
+      initialized = true;
+    };
+
+    if (typeof requestIdleCallback !== 'undefined') {
+      idleHandle = requestIdleCallback(init, { timeout: 500 });
+    } else {
+      timeoutHandle = setTimeout(init, 0);
+    }
+
     return () => {
+      if (idleHandle !== undefined) cancelIdleCallback(idleHandle);
+      if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
       editorView?.destroy();
     };
   });
@@ -284,8 +303,18 @@
     </div>
   {/if}
   <Maximizable bind:maximized enabled={maximizable}>
+    {#if !initialized}
+      <pre
+        class={merge(
+          'overflow-auto whitespace-pre-wrap break-all p-2 font-mono text-xs leading-relaxed',
+          className,
+        )}
+        style={maxHeight ? `max-height:${maxHeight}px` : undefined}
+        aria-label={label}>{format(content, language, inline)}</pre>
+    {/if}
     <div
       bind:this={editorElement}
+      class:hidden={!initialized}
       class:inline
       class:editable
       class:readOnly={!editable}

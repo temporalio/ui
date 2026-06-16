@@ -74,20 +74,40 @@
     new Map(filteredGroups.map((g, i) => [g.id, i])),
   );
 
-  const activeGroupsHeightAboveGroup = (groupIndex: number) => {
-    const hasActiveAbove = $activeGroups?.some((id) => {
-      const activeIndex = groupIndexMap.get(id);
-      return activeIndex !== undefined && activeIndex < groupIndex;
-    });
-    return hasActiveAbove ? expandedGroupHeight : 0;
-  };
+  // Single Set for O(1) active-group lookup inside the each loop.
+  const activeGroupSet = $derived(new Set($activeGroups));
+
+  // Precompute every row's y position in one pass.
+  const groupYPositions = $derived(
+    filteredGroups.map((_, index) => {
+      const hasActiveAbove = $activeGroups?.some((id) => {
+        const activeIndex = groupIndexMap.get(id);
+        return activeIndex !== undefined && activeIndex < index;
+      });
+      return (index + 2) * height + (hasActiveAbove ? expandedGroupHeight : 0);
+    }),
+  );
+
+  // Pre-filter to visible rows so {#each} never iterates 10k items on every
+  // reactive update — only the ~50 rows actually in the viewport are processed.
+  const visibleGroups = $derived(
+    filteredGroups
+      .map((group, index) => ({ group, index, y: groupYPositions[index] }))
+      .filter(
+        ({ y }) =>
+          !viewportHeight ||
+          (y > scrollY - 2 * height && y < scrollY + viewportHeight * height),
+      ),
+  );
 </script>
 
 <div
   id="event-history-timeline-graph"
-  class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary [scrollbar-gutter:stable]"
+  class="relative h-auto overflow-auto border border-t-0 border-subtle bg-primary [contain:layout_style] [scrollbar-gutter:stable]"
+  style="content-visibility:auto;contain-intrinsic-size:auto 400px;{viewportHeight
+    ? `max-height:${viewportHeight}px;`
+    : ''}"
   bind:clientWidth={canvasWidth}
-  style={viewportHeight ? `max-height: ${viewportHeight}px;` : ''}
   onscroll={handleScroll}
 >
   <EndTimeInterval
@@ -137,21 +157,18 @@
         duration={duration ?? 0}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
-      {#each filteredGroups as group, index (group.id)}
-        {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(index)}
-        {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
-          {#key group.eventList.length}
-            <TimelineGraphRow
-              {y}
-              {group}
-              {canvasWidth}
-              {startTime}
-              {endTime}
-              {readOnly}
-            />
-          {/key}
-        {/if}
-        {#if !readOnly && $activeGroups.includes(group.id)}
+      {#each visibleGroups as { group, y } (group.id)}
+        {#key group.eventList.length}
+          <TimelineGraphRow
+            {y}
+            {group}
+            {canvasWidth}
+            {startTime}
+            {endTime}
+            {readOnly}
+          />
+        {/key}
+        {#if !readOnly && activeGroupSet.has(group.id)}
           <GroupDetailsRow
             y={y + 1.33 * radius}
             {group}
