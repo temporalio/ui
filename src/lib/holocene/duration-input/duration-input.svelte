@@ -93,10 +93,14 @@
 
   const convert = (durationValue: string, durationUnit: string) => {
     const unit = units.find((u) => u.label === durationUnit);
+    if (!unit) return;
 
-    if (unit) {
-      value = `${unit.convert(Number(durationValue))}s`;
+    if (durationValue === '' || isNaN(Number(durationValue))) {
+      value = '';
+      return;
     }
+
+    value = `${unit.convert(Number(durationValue))}s`;
   };
 
   const handleNumberInput: ChangeEventHandler<HTMLInputElement> = (e) => {
