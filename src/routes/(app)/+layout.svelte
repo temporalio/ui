@@ -6,6 +6,7 @@
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import TimelineDotDefs from '$lib/components/lines-and-dots/svg/timeline-dot-defs.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
@@ -302,6 +303,7 @@
   });
 </script>
 
+<TimelineDotDefs />
 <DarkMode />
 <SkipNavigation />
 

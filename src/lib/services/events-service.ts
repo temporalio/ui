@@ -95,14 +95,23 @@ export const fetchAllEvents = async ({
   signal,
   historySize,
 }: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
+  let processedCount = 0;
+
   const onStart = () => {
     if (!signal) return;
+    processedCount = 0;
     fullEventHistory.set([]);
   };
 
   const onUpdate = (full, current) => {
     if (!signal) return;
-    fullEventHistory.set([...toEventHistory(full.history?.events)]);
+    const allRaw = full.history?.events ?? [];
+    const newRaw = allRaw.slice(processedCount);
+    if (newRaw.length > 0) {
+      const newEvents = toEventHistory(newRaw);
+      processedCount = allRaw.length;
+      fullEventHistory.update((existing) => [...existing, ...newEvents]);
+    }
     const next = current?.history?.events;
     const hasNewHistory =
       historySize &&
