@@ -319,6 +319,13 @@
   bucket: 2
   severity: serious
   scope: ui-main
+- slug: 2.5.8-toast-close-button
+  sc: '2.5.8'
+  bucket: 3
+  severity: moderate
+  scope: ui-main
+  files-touched:
+    - src/lib/holocene/toast.svelte
 - slug: 3.2.2-namespace-picker-on-change-navigation
   sc: '3.2.2'
   bucket: 2
