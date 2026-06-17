@@ -57,7 +57,8 @@
   {@const failed = attempt > 1 && !!lastFailure}
   {@const badgeType = failed ? 'danger' : 'default'}
 
-  <DetailListLabel>{translate('standalone-activities.attempt')}</DetailListLabel
+  <DetailListLabel class="flex items-center"
+    >{translate('standalone-activities.attempt')}</DetailListLabel
   >
   <DetailListValue>
     <Badge type={badgeType} class="flex items-center gap-2">
@@ -121,6 +122,36 @@
               : 2}
             aria-label={translate('standalone-activities.timing-and-progress')}
           >
+            {#if isClosed}
+              <DetailListLabel
+                >{translate(
+                  'standalone-activities.execution-duration',
+                )}</DetailListLabel
+              >
+              <DetailListTextValue
+                text={fromSeconds(
+                  $activityExecution.info.executionDuration ?? '',
+                )}
+              />
+              {#if $activityExecution.info.attempt !== undefined}
+                {#if $activityExecution.info.attempt > 1}
+                  {@render activityExecutionAttemptsBadge(
+                    $activityExecution.info.attempt,
+                    $activityExecution.info.retryPolicy?.maximumAttempts,
+                    $activityExecution.info.lastFailure,
+                  )}
+                {:else}
+                  <DetailListLabel
+                    >{translate(
+                      'standalone-activities.attempt',
+                    )}</DetailListLabel
+                  >
+                  <DetailListTextValue
+                    text={String($activityExecution.info.attempt)}
+                  />
+                {/if}
+              {/if}
+            {/if}
             <DetailListLabel
               >{translate(
                 'standalone-activities.schedule-time',
@@ -140,29 +171,12 @@
             {#if isClosed}
               <DetailListLabel
                 >{translate(
-                  'standalone-activities.execution-duration',
-                )}</DetailListLabel
-              >
-              <DetailListTextValue
-                text={fromSeconds(
-                  $activityExecution.info.executionDuration ?? '',
-                )}
-              />
-              <DetailListLabel
-                >{translate(
                   'standalone-activities.close-time',
                 )}</DetailListLabel
               >
               <DetailListTimestampValue
                 timestamp={$activityExecution.info.lastStartedTime}
               />
-              {#if $activityExecution.info.attempt > 1}
-                {@render activityExecutionAttemptsBadge(
-                  $activityExecution.info.attempt,
-                  $activityExecution.info.retryPolicy?.maximumAttempts,
-                  $activityExecution.info.lastFailure,
-                )}
-              {/if}
             {/if}
           </DetailList>
         </div>
