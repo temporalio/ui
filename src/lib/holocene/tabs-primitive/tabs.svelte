@@ -19,18 +19,7 @@
 
   const id = $props.id();
 
-  function setSelectedTab(selected: T) {
-    selectedTab = selected;
-    onSelectedTabChange?.(selected);
-  }
-
   setTabsContext<T>({
-    getIdForTab(tab: T) {
-      return `${id}-tab-${tab}`;
-    },
-    getPanelIdForTab(tab: T) {
-      return `${id}-panel-${tab}`;
-    },
     get selectedTab() {
       return selectedTab;
     },
@@ -39,7 +28,18 @@
       return tabs;
     },
 
-    setSelectedTab,
+    getIdForTab(tab: string) {
+      return `${id}-tab-${tab}`;
+    },
+
+    getPanelIdForTab(tab: string) {
+      return `${id}-panel-${tab}`;
+    },
+
+    setSelectedTab(selected: string) {
+      selectedTab = selected as T;
+      onSelectedTabChange?.(selected as T);
+    },
   });
 </script>
 
