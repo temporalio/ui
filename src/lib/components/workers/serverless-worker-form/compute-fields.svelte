@@ -1,10 +1,12 @@
 <script lang="ts">
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import terraformTemplate from './serverless-worker-lambda.tf?raw';
@@ -194,84 +196,67 @@
       placeholder={translate('workers.external-id-placeholder')}
       required
     />
-    <button
-      type="button"
-      class="surface-primary flex w-full items-center justify-between rounded border border-subtle px-4 py-3 text-sm hover:surface-interactive-secondary"
-      onclick={() => (showRoleHelp = !showRoleHelp)}
+    <Accordion
+      icon="info"
+      title={translate('workers.no-role-prompt')}
+      bind:open={showRoleHelp}
+      class="[&_h3]:text-sm"
     >
-      <span class="flex items-center gap-2">
-        <Icon name="info" />
-        {translate('workers.no-role-prompt')}
-      </span>
-      <Icon name={showRoleHelp ? 'chevron-up' : 'chevron-down'} />
-    </button>
-    {#if showRoleHelp}
-      <div class="rounded border border-subtle">
-        <div class="flex border-b border-subtle">
-          <button
-            type="button"
-            class="px-4 py-2 text-sm {activeRoleHelpTab === 'cloudformation'
-              ? 'surface-interactive-secondary font-medium'
-              : 'text-secondary'}"
-            onclick={() => (activeRoleHelpTab = 'cloudformation')}
+      <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+        <ToggleButtons>
+          <ToggleButton
+            active={activeRoleHelpTab === 'cloudformation'}
+            on:click={() => (activeRoleHelpTab = 'cloudformation')}
           >
             {translate('workers.cfn-tab')}
-          </button>
-          <button
-            type="button"
-            class="px-4 py-2 text-sm {activeRoleHelpTab === 'terraform'
-              ? 'surface-interactive-secondary font-medium'
-              : 'text-secondary'}"
-            onclick={() => (activeRoleHelpTab = 'terraform')}
+          </ToggleButton>
+          <ToggleButton
+            active={activeRoleHelpTab === 'terraform'}
+            on:click={() => (activeRoleHelpTab = 'terraform')}
           >
             {translate('workers.terraform-tab')}
-          </button>
-        </div>
+          </ToggleButton>
+        </ToggleButtons>
         {#if activeRoleHelpTab === 'cloudformation'}
-          <div class="flex flex-col gap-3 p-4">
-            <p class="text-sm text-secondary">
-              {translate('workers.launch-stack-description')}
-            </p>
-            <div class="flex items-center gap-4">
-              <Button
-                variant="secondary"
-                size="sm"
-                type="button"
-                href={launchStackHref}
-                target="_blank"
-                trailingIcon="external-link"
-              >
-                {translate('workers.launch-stack')}
-              </Button>
-              <button
-                type="button"
-                class="text-sm underline"
-                onclick={downloadCfnTemplate}
-              >
-                {translate('workers.download-template')}
-              </button>
-            </div>
+          <p class="text-sm text-secondary">
+            {translate('workers.launch-stack-description')}
+          </p>
+          <div class="flex items-center gap-4">
+            <Button
+              variant="secondary"
+              size="sm"
+              href={launchStackHref}
+              target="_blank"
+              trailingIcon="external-link"
+            >
+              {translate('workers.launch-stack')}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              on:click={downloadCfnTemplate}
+            >
+              {translate('workers.download-template')}
+            </Button>
           </div>
         {:else}
-          <div class="flex flex-col gap-3 p-4">
-            <p class="text-sm text-secondary">
-              {translate('workers.terraform-description-before')}<Link
-                href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/aws/lambda"
-                newTab>{translate('workers.terraform-iam-module-link')}</Link
-              >{translate('workers.terraform-description-after')}
-            </p>
-            <CodeBlock
-              content={terraformTemplate}
-              language="text"
-              maxHeight={300}
-              copyable
-              copyIconTitle={translate('workers.copy-snippet')}
-              copySuccessIconTitle={translate('workers.copied')}
-            />
-          </div>
+          <p class="text-sm text-secondary">
+            {translate('workers.terraform-description-before')}<Link
+              href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/aws/lambda"
+              newTab>{translate('workers.terraform-iam-module-link')}</Link
+            >{translate('workers.terraform-description-after')}
+          </p>
+          <CodeBlock
+            content={terraformTemplate}
+            language="text"
+            maxHeight={300}
+            copyable
+            copyIconTitle={translate('workers.copy-snippet')}
+            copySuccessIconTitle={translate('workers.copied')}
+          />
         {/if}
       </div>
-    {/if}
+    </Accordion>
   </div>
 {:else}
   <Input
