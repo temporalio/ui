@@ -11,7 +11,6 @@
   interface Props {
     class?: string;
     schedule: DescribeFullSchedule;
-    workflowQuery: string;
     openBackfillConfirmationModal: () => void;
     openTriggerConfirmationModal: () => void;
   }

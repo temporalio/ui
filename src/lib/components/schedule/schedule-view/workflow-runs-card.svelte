@@ -72,7 +72,6 @@
   {:else}
     <WorkflowRunsUpcoming
       {schedule}
-      {workflowQuery}
       {openBackfillConfirmationModal}
       {openTriggerConfirmationModal}
     />
