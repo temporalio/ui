@@ -33,7 +33,7 @@
     return runs
       .filter(Boolean)
       .sort(
-        (a, b) => getMilliseconds(a.actualTime) - getMilliseconds(b.actualTime),
+        (a, b) => getMilliseconds(b.actualTime) - getMilliseconds(a.actualTime),
       )
       .slice(0, 5);
   });
