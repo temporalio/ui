@@ -20,6 +20,11 @@
   export let endTime: string | Date | number = Date.now();
   export let x = 0;
   export let y: number;
+  // PERF: Callback so timeline-graph can update the <g transform> on the row
+  // section below this panel. This is the only way panel height flows back up —
+  // it goes into a single SVG transform attribute (O(1)), NOT into per-row Y
+  // positions (which was the O(N) cascade we eliminated).
+  export let onHeight: ((h: number) => void) | undefined = undefined;
 
   // PERF: bind:offsetHeight is kept only to size the foreignObject correctly.
   // Previously, contentHeight was also written to $activeGroupHeight, which
@@ -28,6 +33,7 @@
   // That cascade is now broken: rows no longer use $activeGroupHeight at all.
   let offsetHeight;
   $: contentHeight = offsetHeight || 0;
+  $: onHeight?.(contentHeight);
 
   $: status = group?.finalClassification || group?.classification;
   $: ({ namespace } = $page.params);

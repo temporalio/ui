@@ -103,16 +103,6 @@
   const startTime = $derived(
     (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime,
   );
-  // PERF: Use a fixed 800px buffer instead of measuring the expanded panel height.
-  // Previously, GroupDetailsRow measured its height via bind:offsetHeight and wrote
-  // it to $activeGroupHeight, which then updated expandedGroupHeight, which triggered
-  // a full reactive flush updating Y on all 10k rows. The buffer covers the max
-  // panel height (header ~50px + event details ~400px + child workflow 320px).
-  const timelineHeight = $derived(
-    Math.max(height * (filteredGroups.length + 2), 120) +
-      ($activeGroups.length > 0 ? 800 : 0),
-  );
-  const canvasHeight = $derived(timelineHeight + 120);
 
   const handleScroll = (e: Event) => {
     scrollY = (e?.target as HTMLElement)?.scrollTop;
@@ -121,6 +111,73 @@
   const groupIndexMap = $derived(
     new Map(filteredGroups.map((g, i) => [g.id, i])),
   );
+
+  // PERF: Index of the currently active group in filteredGroups (-1 = none).
+  // Derived here so only the two rendering sections below subscribe to
+  // $activeGroups, not the main row {#each}.
+  const activeIdx = $derived(
+    $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
+  );
+
+  // PERF: Actual panel height from GroupDetailsRow's bind:offsetHeight reactive
+  // chain. Only used in the $effect below to stamp the transform value.
+  let panelHeight = $state(0);
+
+  $effect(() => {
+    if ($activeGroups.length === 0) panelHeight = 0;
+  });
+
+  // PERF IMPERATIVE TRANSFORM APPROACH:
+  // A plain Map of group-id → SVG <g> wrapper element, populated by the
+  // use:registerRow action on each row. Not reactive — Svelte never observes
+  // this Map, so registering/deregistering rows causes no reactive cascade.
+  const rowWrappers = new Map<string, SVGGElement>();
+
+  function registerRow(el: SVGGElement, id: string) {
+    rowWrappers.set(id, el);
+    return {
+      destroy() {
+        rowWrappers.delete(id);
+      },
+    };
+  }
+
+  // PERF: This $effect subscribes only to activeIdx, panelHeight, and
+  // groupIndexMap (which changes when filteredGroups changes). It never makes
+  // individual rows reactive to $activeGroups.
+  //
+  // On click: one JS loop over all registered row wrappers + one
+  // setAttribute/removeAttribute per row that actually changes its transform.
+  // No component destroy/recreate, no cache clearing, no onMount re-runs.
+  //
+  // Cost: O(N) JS iterations (~50ms for 10k rows) regardless of which row
+  // is clicked — uniformly better than the two-loop approach for top clicks
+  // and comparable for bottom clicks.
+  $effect(() => {
+    const idx = activeIdx;
+    const shift = panelHeight;
+    const idxMap = groupIndexMap; // reactive dep so effect re-runs on filter changes
+
+    for (const [id, el] of rowWrappers) {
+      const i = idxMap.get(id);
+      if (i === undefined) continue;
+      if (idx >= 0 && i > idx && shift > 0) {
+        el.setAttribute('transform', `translate(0, ${shift})`);
+      } else {
+        el.removeAttribute('transform');
+      }
+    }
+  });
+
+  // PERF: timelineHeight uses panelHeight (actual measured panel size) so the
+  // SVG is tall enough to contain the shifted lower rows. Clamped to at least
+  // 800px when a panel is open so the SVG doesn't clip on the first frame
+  // before ResizeObserver delivers its first measurement.
+  const timelineHeight = $derived(
+    Math.max(height * (filteredGroups.length + 2), 120) +
+      (activeIdx >= 0 ? Math.max(panelHeight, 800) : 0),
+  );
+  const canvasHeight = $derived(timelineHeight + 120);
 </script>
 
 <div
@@ -185,54 +242,57 @@
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
       <!--
-        PERF: The {#each} loop no longer reads $activeGroups at all.
-        Previously, activeGroupsHeightAboveGroup(index) and the
-        $activeGroups.includes(group.id) check inside this loop made every
-        row subscribe to the activeGroups store. Clicking one group dirtied
-        all 10k rows → ~522ms of setAttribute (Y position updates) +
-        2× UpdateLayoutTree over 63k nodes (~504ms). Now only the post-loop
-        {#each $activeGroups} section re-renders on click (O(1) work).
+        PERF IMPERATIVE TRANSFORM APPROACH:
+        Single {#each} loop — rows are never destroyed/recreated on click.
+        Each row's <g> wrapper is registered in rowWrappers via use:registerRow.
+        The $effect in <script> iterates those refs and stamps transform
+        attributes directly when activeIdx or panelHeight changes.
+
+        Cost on click: O(N) Map iteration + N-K setAttribute calls (compositor
+        path, no layout pass). No component lifecycle operations at all.
+        Uniformly fast for both top and bottom clicks.
       -->
-      {#each filteredGroups as group, index (group.id)}
-        {@const y = (index + 2) * height}
-        {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
-          <!--
-            PERF: Key on group.events.size (native Map property) rather than
-            group.eventList.length (a getter that allocates an array). This
-            busts the key only when new events arrive, not on every render.
-          -->
-          {#key group.events.size}
-            <TimelineGraphRow
-              {y}
-              {group}
-              {canvasWidth}
-              {startTime}
-              {endTime}
-              {readOnly}
-            />
-          {/key}
-        {/if}
-      {/each}
-      <!--
-        PERF: Render expanded group panels after all rows so they paint on
-        top (SVG painters model). Only these O(1) elements re-render when
-        activeGroups changes — the main {#each} above is untouched.
-      -->
-      {#if !readOnly}
-        {#each $activeGroups as id (id)}
-          {@const idx = groupIndexMap.get(id)}
-          {#if idx !== undefined}
-            {@const grp = filteredGroups[idx]}
-            {#if grp}
-              <GroupDetailsRow
-                y={(idx + 2) * height + 1.33 * radius}
-                group={grp}
+      {#each filteredGroups as group, i (group.id)}
+        {@const y = (i + 2) * height}
+        <g use:registerRow={group.id}>
+          {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
+            <!--
+              PERF: Key on group.events.size (native Map property) rather than
+              group.eventList.length (a getter that allocates an array). This
+              busts the key only when new events arrive, not on every render.
+            -->
+            {#key group.events.size}
+              <TimelineGraphRow
+                {y}
+                {group}
                 {canvasWidth}
-                endTime={workflow?.endTime ? endTime : currentTime}
+                {startTime}
+                {endTime}
+                {readOnly}
               />
-            {/if}
+            {/key}
           {/if}
-        {/each}
+        </g>
+      {/each}
+
+      <!--
+        Details panel sits above all rows in SVG paint order (last child = top).
+        onHeight delivers the actual panel height back so the $effect can update
+        transforms. Only panelHeight changes — no row attributes touched.
+      -->
+      {#if !readOnly && activeIdx >= 0}
+        {@const grp = filteredGroups[activeIdx]}
+        {#if grp}
+          <GroupDetailsRow
+            y={(activeIdx + 2) * height + 1.33 * radius}
+            group={grp}
+            {canvasWidth}
+            endTime={workflow?.endTime ? endTime : currentTime}
+            onHeight={(h) => {
+              panelHeight = h;
+            }}
+          />
+        {/if}
       {/if}
     </svg>
   </EndTimeInterval>
