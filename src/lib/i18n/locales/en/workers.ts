@@ -322,7 +322,8 @@ export const Strings = {
   'terraform-iam-module-link': 'AWS IAM Role Module',
   'terraform-description-after':
     ' to create the IAM role Temporal Cloud assumes to invoke your Lambda functions.',
-  customize: 'Customize',
+  'hide-defaults': 'Hide Defaults',
+  'show-defaults': 'Show Defaults',
   'gcp-project-label': 'Project ID',
   'gcp-project-placeholder': 'my-gcp-project',
   'gcp-region-label': 'Region',

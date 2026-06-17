@@ -95,7 +95,7 @@
 </p>
 
 {#if provider === 'lambda'}
-  <div class="flex items-end gap-4">
+  <div class="flex flex-wrap items-end gap-4">
     <Input
       bind:value={lambdaArn}
       id="lambdaArn"
@@ -139,7 +139,7 @@
       placeholder={translate('workers.gcp-region-placeholder')}
       required
     />
-    <div class="flex items-end gap-4">
+    <div class="flex flex-wrap items-end gap-4">
       <Input
         bind:value={gcpWorkerPool}
         id="gcpWorkerPool"
@@ -221,7 +221,7 @@
           <p class="text-sm text-secondary">
             {translate('workers.launch-stack-description')}
           </p>
-          <div class="flex items-center gap-4">
+          <div class="flex flex-wrap items-center gap-4">
             <Button
               variant="secondary"
               size="sm"
@@ -274,7 +274,7 @@
 
 <hr class="my-5 border-subtle" />
 
-<div class="flex items-start justify-between gap-4">
+<div class="flex flex-wrap items-center justify-between gap-4">
   <div>
     <div class="flex items-center gap-2">
       <h2 class="text-base font-medium">
@@ -293,9 +293,12 @@
     size="sm"
     type="button"
     disabled={provider === 'cloud-run'}
+    trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
     on:click={() => (showScaling = !showScaling)}
   >
-    {translate('workers.customize')}
+    {showScaling
+      ? translate('workers.hide-defaults')
+      : translate('workers.show-defaults')}
   </Button>
 </div>
 {#if showScaling && provider === 'lambda'}
