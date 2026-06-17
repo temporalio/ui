@@ -282,8 +282,8 @@ export const fetchAllEventsBidirectional = async ({
   let observedPageSize = 0;
   let winnerChosen = false;
 
-  const ascBucket: CommonHistoryEvent[] = [];
-  const descBucket: CommonHistoryEvent[] = [];
+  const ascBucket: HistoryEvent[] = [];
+  const descBucket: HistoryEvent[] = [];
 
   type Token = string | undefined;
 
@@ -341,11 +341,10 @@ export const fetchAllEventsBidirectional = async ({
 
       ascPages++;
       observedPageSize = Math.max(observedPageSize, events.length);
-      const ascNonOverlap = events.filter(
-        (e) => parseInt(e.eventId) < descMinId,
-      );
-      ascBucket.push(...toEventHistory(ascNonOverlap));
       ascMaxId = Math.max(ascMaxId, ...events.map((e) => parseInt(e.eventId)));
+      for (const e of events) {
+        if (parseInt(e.eventId) < descMinId) ascBucket.push(e);
+      }
       reportProgress();
 
       if (!response.nextPageToken || gap() <= 0) {
@@ -395,13 +394,12 @@ export const fetchAllEventsBidirectional = async ({
 
       descPages++;
       observedPageSize = Math.max(observedPageSize, events.length);
-      const descNonOverlap = events.filter(
-        (e) => parseInt(e.eventId) > ascMaxId,
-      );
-      descBucket.push(...toEventHistory(descNonOverlap));
       const descIds = events.map((e) => parseInt(e.eventId));
       descMinId = Math.min(descMinId, ...descIds);
       descMaxId = Math.max(descMaxId, ...descIds);
+      for (const e of events) {
+        if (parseInt(e.eventId) > ascMaxId) descBucket.push(e);
+      }
       reportProgress();
 
       if (!response.nextPageToken || gap() <= 0) {
@@ -414,18 +412,18 @@ export const fetchAllEventsBidirectional = async ({
 
   await Promise.allSettled([runAscending(), runDescending()]);
 
-  // Merge and sort. Dedup is a safety net for the rare case where a page was
-  // already in-flight when the winner aborted the other direction.
+  // Merge, dedup, sort, then transform once.
   const seen = new Set<string>();
-  const merged: CommonHistoryEvent[] = [];
+  const rawMerged: HistoryEvent[] = [];
   for (const e of [...ascBucket, ...descBucket].sort(
-    (a, b) => parseInt(a.id) - parseInt(b.id),
+    (a, b) => parseInt(a.eventId) - parseInt(b.eventId),
   )) {
-    if (!seen.has(e.id)) {
-      seen.add(e.id);
-      merged.push(e);
+    if (!seen.has(e.eventId)) {
+      seen.add(e.eventId);
+      rawMerged.push(e);
     }
   }
+  const merged: CommonHistoryEvent[] = toEventHistory(rawMerged);
 
   const durationMs = performance.now() - t0;
   const overlap = ascBucket.length + descBucket.length - merged.length;

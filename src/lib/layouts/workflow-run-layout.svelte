@@ -130,14 +130,16 @@
       });
     }
 
-    $fullEventHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      sort: 'ascending',
-      signal: workflowRunController.signal,
-      historySize: workflow.historyEvents,
-    });
+    if (!page.url.pathname.endsWith('/fast-history')) {
+      $fullEventHistory = await fetchAllEvents({
+        namespace,
+        workflowId,
+        runId,
+        sort: 'ascending',
+        signal: workflowRunController.signal,
+        historySize: workflow.historyEvents,
+      });
+    }
   };
 
   const getOnlyWorkflowWithPendingActivities = async (
