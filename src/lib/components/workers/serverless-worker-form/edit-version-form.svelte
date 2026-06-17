@@ -14,9 +14,14 @@
 
   interface Props {
     initialData: {
+      provider?: 'lambda' | 'cloud-run';
       lambdaArn: string;
       iamRoleArn: string;
       roleExternalId: string;
+      gcpProject?: string;
+      gcpRegion?: string;
+      gcpWorkerPool?: string;
+      gcpServiceAccount?: string;
       scaleUpCooloffMs?: number;
       scaleUpBacklogThreshold?: number;
       maxWorkerLifetimeMs?: number;
@@ -30,13 +35,16 @@
 
   let { initialData, onSubmit, onDelete, cancelHref, error }: Props = $props();
 
-  let provider = $state('lambda');
-
   const superform = superForm(
     {
+      provider: initialData.provider ?? ('lambda' as 'lambda' | 'cloud-run'),
       lambdaArn: initialData.lambdaArn,
       iamRoleArn: initialData.iamRoleArn,
       roleExternalId: initialData.roleExternalId ?? '',
+      gcpProject: initialData.gcpProject ?? '',
+      gcpRegion: initialData.gcpRegion ?? '',
+      gcpWorkerPool: initialData.gcpWorkerPool ?? '',
+      gcpServiceAccount: initialData.gcpServiceAccount ?? '',
       scaleUpCooloffMs: initialData.scaleUpCooloffMs,
       scaleUpBacklogThreshold: initialData.scaleUpBacklogThreshold,
       maxWorkerLifetimeMs: initialData.maxWorkerLifetimeMs,
@@ -71,18 +79,22 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider>
-        <ComputeFields
-          bind:lambdaArn={$form.lambdaArn}
-          bind:iamRoleArn={$form.iamRoleArn}
-          bind:roleExternalId={$form.roleExternalId}
-          bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
-          bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
-          bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
-          bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
-          errors={$errors}
-        />
-      </ComputeProviderPicker>
+      <ComputeProviderPicker bind:provider={$form.provider} />
+      <ComputeFields
+        provider={$form.provider}
+        bind:lambdaArn={$form.lambdaArn}
+        bind:iamRoleArn={$form.iamRoleArn}
+        bind:roleExternalId={$form.roleExternalId}
+        bind:gcpProject={$form.gcpProject}
+        bind:gcpRegion={$form.gcpRegion}
+        bind:gcpWorkerPool={$form.gcpWorkerPool}
+        bind:gcpServiceAccount={$form.gcpServiceAccount}
+        bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
+        bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
+        bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}
+        bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
+        errors={$errors}
+      />
     </Card>
 
     <div class="flex items-center justify-between">
