@@ -2,7 +2,6 @@ import { createContext } from 'svelte';
 
 export interface TabsContextType<T extends string = string> {
   getIdForTab: (tab: T) => string;
-  getPanelIdForTab: (tab: T) => string;
   selectedTab: T;
   tabs: T[];
   setSelectedTab: (selectedTab: T) => void;
@@ -19,11 +18,11 @@ export function getTabsContext<
     throw new Error('Tabs context not found — did you call setTabsContext?');
   }
 
-  return ctx as TabsContextType<T>;
+  return ctx as unknown as TabsContextType<T>;
 }
 
 export function setTabsContext<T extends string = string>(
   ctx: TabsContextType<T>,
 ) {
-  return setCtx(ctx);
+  return setCtx(ctx as unknown as TabsContextType<string>);
 }
