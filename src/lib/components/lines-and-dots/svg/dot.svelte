@@ -1,10 +1,9 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-
   import { HistoryConfig } from '../constants';
+
+  import TimelineIcon, { type TimelineIconName } from './timeline-icon.svelte';
 
   const { radius } = HistoryConfig;
 
@@ -13,7 +12,7 @@
     category?: string;
     classification?: string;
     r?: number;
-    icon?: IconName;
+    icon?: TimelineIconName;
     strokeWidth?: number;
     children?: Snippet;
   };
@@ -44,7 +43,7 @@
     {@render children?.()}
   </rect>
   {#if icon}
-    <Icon
+    <TimelineIcon
       name={icon}
       x={x - r / 2}
       y={y - r / 2}

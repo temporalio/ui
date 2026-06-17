@@ -1,4 +1,4 @@
-import type { IconName } from '$lib/holocene/icon';
+import type { TimelineIconName } from '$lib/components/lines-and-dots/svg/timeline-icon.svelte';
 import type {
   EventGroup,
   EventGroups,
@@ -52,7 +52,7 @@ export const DetailsConfig: GraphConfig = {
 
 export const CategoryIcon: Record<
   EventTypeCategory,
-  { name: IconName; title: string }
+  { name: TimelineIconName; title: string }
 > = {
   workflow: { name: 'workflow', title: 'Workflow' },
   signal: { name: 'signal', title: 'Signal' },

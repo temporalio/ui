@@ -59,10 +59,10 @@
       const statusColor = getStatusStrokeColor(classification);
       if (statusColor !== DEFAULT_STROKE_COLOR) color = statusColor;
     }
-    if (delayed && [classification, status].includes('Running')) {
+    if (delayed && (classification === 'Running' || status === 'Running')) {
       color = getStatusStrokeColor('Delayed');
     }
-    if (category && ['pending', 'retry'].includes(category)) {
+    if (category === 'pending' || category === 'retry') {
       // these categories take precedence over classification
       color = getCategoryStrokeColor(category);
     }

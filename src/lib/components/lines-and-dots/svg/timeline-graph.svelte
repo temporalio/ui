@@ -140,7 +140,7 @@
       {#each filteredGroups as group, index (group.id)}
         {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(index)}
         {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
-          {#key group.eventList.length}
+          {#key group.events.size}
             <TimelineGraphRow
               {y}
               {group}

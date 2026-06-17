@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
@@ -9,6 +8,7 @@
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
+  import TimelineIcon from './timeline-icon.svelte';
 
   interface Props {
     workflow: WorkflowExecution;
@@ -47,23 +47,21 @@
     delayed={isWorkflowDelayed(workflow)}
   />
   <Dot point={[start, y]} classification={workflow.status} r={radius} />
-  <Icon
+  <TimelineIcon
     name="workflow"
     x={start - radius / 2}
     y={y - radius / 2}
     width={radius}
     height={radius}
-    strokeWidth="4"
     class="text-black"
   />
   <Dot point={[end, y]} classification={workflow.status} r={radius} />
-  <Icon
+  <TimelineIcon
     name="workflow"
     x={end - radius / 2}
     y={y - radius / 2}
     width={radius}
     height={radius}
-    strokeWidth="4"
     class="text-black"
   />
 </g>

@@ -1,13 +1,12 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import type { IconName } from '$lib/holocene/icon';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { WorkflowStatus } from '$lib/types/workflows';
 
   import type { GraphConfig } from '../constants';
 
   import Line from './line.svelte';
+  import TimelineIcon, { type TimelineIconName } from './timeline-icon.svelte';
 
   type Props = {
     point?: [number, number];
@@ -18,7 +17,7 @@
     textAnchor?: string;
     backdrop?: boolean;
     backdropHeight?: number;
-    icon?: IconName;
+    icon?: TimelineIconName;
     config?: GraphConfig;
     label?: boolean;
     children?: Snippet;
@@ -60,7 +59,7 @@
   />
 {/if}
 {#if showIcon}
-  <Icon
+  <TimelineIcon
     name={icon}
     x={textAnchor === 'end' ? x - textWidth - backdropHeight : x}
     y={y - 8}
