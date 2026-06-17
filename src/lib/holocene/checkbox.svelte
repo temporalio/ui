@@ -103,6 +103,7 @@
         'group',
       ],
       disabled && 'cursor-not-allowed',
+      labelHidden && 'justify-center',
       className,
     )}
   >
