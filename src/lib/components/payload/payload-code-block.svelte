@@ -38,9 +38,16 @@
     maxHeight?: number;
     testId?: string;
     filenameData?: PayloadDownloadFilenameData;
+    lazy?: boolean;
   }
 
-  let { value, maxHeight, testId, filenameData = undefined }: Props = $props();
+  let {
+    value,
+    maxHeight,
+    testId,
+    filenameData = undefined,
+    lazy = false,
+  }: Props = $props();
 
   let downloadError: string | undefined = $state(undefined);
   let downloadLoading: boolean = $state(false);
@@ -97,6 +104,7 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       {testId}
       language="json"
+      {lazy}
     />
   {/snippet}
   {#snippet children(results)}
@@ -113,6 +121,7 @@
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             {testId}
             language="json"
+            {lazy}
           >
             {#snippet headerActions()}
               <Tooltip
@@ -157,6 +166,7 @@
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             {testId}
             language="json"
+            {lazy}
           />
         {:else}
           <CodeBlock
@@ -166,6 +176,7 @@
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             {testId}
             language="json"
+            {lazy}
           />
         {/if}
       {/each}
@@ -179,6 +190,7 @@
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
       {testId}
       language="json"
+      {lazy}
     >
       {#snippet headerActions()}
         <IconButton

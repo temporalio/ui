@@ -158,10 +158,24 @@
     const shift = panelHeight;
     const idxMap = groupIndexMap; // reactive dep so effect re-runs on filter changes
 
+    if (idx < 0) {
+      // Panel closed — clear all transforms. Iterating only values is cheaper
+      // than the full [id, el] destructure when we don't need the key.
+      for (const el of rowWrappers.values()) {
+        el.removeAttribute('transform');
+      }
+      return;
+    }
+
+    // PERF: Panel just opened but ResizeObserver hasn't fired yet (shift=0).
+    // Skip the loop entirely — rows have no transforms yet so removing them
+    // is a no-op, and we don't know the correct shift to apply.
+    if (shift === 0) return;
+
     for (const [id, el] of rowWrappers) {
       const i = idxMap.get(id);
       if (i === undefined) continue;
-      if (idx >= 0 && i > idx && shift > 0) {
+      if (i > idx) {
         el.setAttribute('transform', `translate(0, ${shift})`);
       } else {
         el.removeAttribute('transform');
@@ -169,13 +183,15 @@
     }
   });
 
-  // PERF: timelineHeight uses panelHeight (actual measured panel size) so the
-  // SVG is tall enough to contain the shifted lower rows. Clamped to at least
-  // 800px when a panel is open so the SVG doesn't clip on the first frame
-  // before ResizeObserver delivers its first measurement.
+  // PERF: timelineHeight is driven purely by panelHeight (delivered async by
+  // the ResizeObserver in group-details-row). On click, panelHeight starts at
+  // 0, so timelineHeight does NOT change — Line and TimelineAxis are not
+  // dirtied. They only update once the panel is actually measured, which is
+  // the correct moment. The old Math.max(panelHeight, 800) caused a spurious
+  // +800px jump every click, triggering unnecessary setAttribute calls on
+  // both Line components and all Axis tick marks.
   const timelineHeight = $derived(
-    Math.max(height * (filteredGroups.length + 2), 120) +
-      (activeIdx >= 0 ? Math.max(panelHeight, 800) : 0),
+    Math.max(height * (filteredGroups.length + 2), 120) + panelHeight,
   );
   const canvasHeight = $derived(timelineHeight + 120);
 </script>
