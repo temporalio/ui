@@ -6,17 +6,14 @@
     DetailListTextValue,
     DetailListTimestampValue,
   } from '$lib/components/detail-list';
-  import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import NexusOperationInputAndOutcome from '$lib/components/standalone-nexus-operations/nexus-operation-input-and-outcome.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
+  import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import {
     routeForNamespace,
     routeForStandaloneNexusOperationsWithQuery,
-    routeForWorkflow,
   } from '$lib/utilities/route-for';
   import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
@@ -34,17 +31,14 @@
     Object.keys(info?.nexusHeader ?? {}).length > 0,
   );
 
+  const nexusOperationLink = $derived(info?.links?.[0]);
   const handlerWorkflowEvent = $derived(
-    info?.links?.find((l) => l.workflowEvent)?.workflowEvent ?? null,
+    nexusOperationLink?.workflowEvent ?? null,
   );
   const handlerNamespace = $derived(handlerWorkflowEvent?.namespace ?? null);
   const handlerWorkflowLink = $derived(
     handlerWorkflowEvent?.namespace && handlerWorkflowEvent?.workflowId
-      ? routeForWorkflow({
-          namespace: handlerWorkflowEvent.namespace,
-          workflow: handlerWorkflowEvent.workflowId,
-          run: handlerWorkflowEvent.runId ?? '',
-        })
+      ? getEventLinkHref(nexusOperationLink)
       : null,
   );
   const handlerNamespaceLink = $derived(
@@ -82,15 +76,16 @@
 {#if $nexusOperationExecution && info}
   <NexusOperationInputAndOutcome
     input={$nexusOperationExecution.input}
-    outcome={$nexusOperationExecution.outcome}
+    result={$nexusOperationExecution.result}
+    failure={$nexusOperationExecution.failure}
   />
   <Card class="space-y-6">
     <h5>{translate('standalone-nexus-operations.operation-event-history')}</h5>
 
     <div class="space-y-4">
-      <h6 class="text-secondary">
+      <h5 class="text-secondary">
         {translate('standalone-nexus-operations.run-details-section')}
-      </h6>
+      </h5>
       <DetailList
         rowCount={7}
         aria-label={translate(
@@ -151,9 +146,9 @@
     </div>
 
     <div class="space-y-4">
-      <h6 class="text-secondary">
+      <h5 class="text-secondary">
         {translate('standalone-nexus-operations.operation-details-section')}
-      </h6>
+      </h5>
       {#if handlerWorkflowLink}
         <p class="text-sm text-secondary">
           {translate('standalone-nexus-operations.handler-namespace-note')}
@@ -264,9 +259,9 @@
     </div>
 
     <div class="space-y-4">
-      <h6 class="text-secondary">
+      <h5 class="text-secondary">
         {translate('standalone-nexus-operations.timeout-configuration')}
-      </h6>
+      </h5>
       <DetailList
         rowCount={3}
         aria-label={translate(
@@ -297,9 +292,9 @@
 
     {#if info.attempt > 1}
       <div class="space-y-4">
-        <h6 class="text-secondary">
+        <h5 class="text-secondary">
           {translate('standalone-nexus-operations.attempt-section')}
-        </h6>
+        </h5>
         <DetailList
           rowCount={3}
           aria-label={translate('standalone-nexus-operations.attempt-section')}
@@ -343,9 +338,9 @@
 
     {#if info.cancellationInfo}
       <div class="space-y-4">
-        <h6 class="text-secondary">
+        <h5 class="text-secondary">
           {translate('standalone-nexus-operations.cancellation-info')}
-        </h6>
+        </h5>
         <DetailList
           rowCount={5}
           aria-label={translate(

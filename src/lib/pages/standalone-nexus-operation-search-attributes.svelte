@@ -10,7 +10,9 @@
 
 <div class="flex flex-col gap-2">
   {#if searchAttributes}
-    <PayloadCodeBlock value={searchAttributes.indexedFields} />
+    <PayloadCodeBlock
+      value={searchAttributes?.indexedFields ?? searchAttributes}
+    />
   {:else}
     <p>{translate('events.empty-search-attributes')}</p>
   {/if}

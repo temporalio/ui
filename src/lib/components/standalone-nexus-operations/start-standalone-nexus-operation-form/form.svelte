@@ -70,60 +70,39 @@
   let searchAttributes = $state<SearchAttributesSchema>([]);
   let advancedOptionsVisible = $state(false);
 
-  const schema = z
-    .object({
-      identity: z.string(),
-      namespace: z.string(),
-      operationId: z.string().min(1, {
-        message: translate(
-          'standalone-nexus-operations.form-operation-id-required',
-        ),
-      }),
-      endpoint: z.string().min(1, {
-        message: translate(
-          'standalone-nexus-operations.form-endpoint-required',
-        ),
-      }),
-      service: z.string().min(1, {
-        message: translate('standalone-nexus-operations.form-service-required'),
-      }),
-      operation: z.string().min(1, {
-        message: translate(
-          'standalone-nexus-operations.form-operation-name-required',
-        ),
-      }),
-      input: z.string().optional(),
-      encoding: z.enum(encodings).default('json/plain'),
-      messageType: z.string().optional(),
-      startToCloseTimeout: z.string().optional(),
-      scheduleToCloseTimeout: z.string().optional(),
-      scheduleToStartTimeout: z.string().optional(),
-      idReusePolicy: z.string().optional(),
-      idConflictPolicy: z.string().optional(),
-      summary: z.string().optional(),
-      details: z.string().optional(),
-      nexusHeader: z
-        .array(z.object({ key: z.string(), value: z.string() }))
-        .default([]),
-    })
-    .superRefine((data, context) => {
-      if (!data.startToCloseTimeout && !data.scheduleToCloseTimeout) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['startToCloseTimeout'],
-          message: translate(
-            'standalone-nexus-operations.form-timeout-required',
-          ),
-        });
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['scheduleToCloseTimeout'],
-          message: translate(
-            'standalone-nexus-operations.form-timeout-required',
-          ),
-        });
-      }
-    });
+  const schema = z.object({
+    identity: z.string(),
+    namespace: z.string(),
+    operationId: z.string().min(1, {
+      message: translate(
+        'standalone-nexus-operations.form-operation-id-required',
+      ),
+    }),
+    endpoint: z.string().min(1, {
+      message: translate('standalone-nexus-operations.form-endpoint-required'),
+    }),
+    service: z.string().min(1, {
+      message: translate('standalone-nexus-operations.form-service-required'),
+    }),
+    operation: z.string().min(1, {
+      message: translate(
+        'standalone-nexus-operations.form-operation-name-required',
+      ),
+    }),
+    input: z.string().optional(),
+    encoding: z.enum(encodings).default('json/plain'),
+    messageType: z.string().optional(),
+    startToCloseTimeout: z.string().optional(),
+    scheduleToCloseTimeout: z.string().optional(),
+    scheduleToStartTimeout: z.string().optional(),
+    idReusePolicy: z.string().optional(),
+    idConflictPolicy: z.string().optional(),
+    summary: z.string().optional(),
+    details: z.string().optional(),
+    nexusHeader: z
+      .array(z.object({ key: z.string(), value: z.string() }))
+      .default([]),
+  });
 
   const { form, enhance, errors, message } = superForm(
     {
@@ -307,12 +286,7 @@
     {encoding}
   />
 
-  <Card
-    class={twMerge(
-      'space-y-4',
-      $errors.startToCloseTimeout ? 'border-danger' : '',
-    )}
-  >
+  <Card class="space-y-4">
     <h5>{translate('standalone-nexus-operations.form-timeouts-heading')}</h5>
 
     <DurationInput
@@ -320,7 +294,6 @@
       label={translate(
         'standalone-nexus-operations.form-start-to-close-timeout-label',
       )}
-      required={!$form.scheduleToCloseTimeout}
       bind:value={$form.startToCloseTimeout}
     />
 
@@ -329,7 +302,6 @@
       label={translate(
         'standalone-nexus-operations.form-schedule-to-close-timeout-label',
       )}
-      required={!$form.startToCloseTimeout}
       bind:value={$form.scheduleToCloseTimeout}
     />
 

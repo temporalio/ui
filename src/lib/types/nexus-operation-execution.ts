@@ -54,10 +54,6 @@ export interface NexusOperationExecutionCancellationInfo {
   reason: string;
 }
 
-export type NexusOperationExecutionOutcome =
-  | { result: Payload }
-  | { failure: Failure };
-
 export interface NexusOperationExecutionInfo {
   operationId: string;
   runId: string;
@@ -107,10 +103,10 @@ export interface NexusOperationExecution {
   runId: string;
   info: NexusOperationExecutionInfo;
   input?: Payload;
-  outcome?: NexusOperationExecutionOutcome;
+  result?: Payload;
+  failure?: Failure;
   longPollToken?: string;
 }
-
 export interface StartNexusOperationExecutionRequest {
   namespace: string;
   identity: string;
