@@ -3,7 +3,6 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { navOpen } from '$lib/stores/nav-open';
 
   import Icon from '../icon/icon.svelte';
 
@@ -18,32 +17,34 @@
   export { className as class };
 </script>
 
-<div
-  role="button"
-  on:click={onClick}
-  on:keypress={onClick}
-  tabindex="0"
-  data-testid={$$props['data-testid']}
-  data-track-name="navigation-button"
-  data-track-intent="action"
-  data-track-text={label}
-  class={merge(
-    'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
-    disabled && 'pointer-events-none cursor-not-allowed opacity-50',
-    className,
-  )}
+<Tooltip
+  text={tooltip}
+  right
+  class="block"
+  tooltipClass="rounded-none text-white ml-4 group-data-[nav=open]:hidden"
 >
-  {#if icon}
-    <Tooltip
-      text={tooltip}
-      right
-      hide={$navOpen}
-      class="flex h-6 w-6 items-center"
-    >
-      <Icon name={icon} {animate} {active} />
-    </Tooltip>
-  {/if}
-  <div class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100">
-    {label}
+  <div
+    role="button"
+    on:click={onClick}
+    on:keypress={onClick}
+    tabindex="0"
+    data-testid={$$props['data-testid']}
+    data-track-name="navigation-button"
+    data-track-intent="action"
+    data-track-text={label}
+    class={merge(
+      'relative mb-2 flex items-center whitespace-nowrap pl-1 text-sm hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+      disabled && 'pointer-events-none cursor-not-allowed opacity-50',
+      className,
+    )}
+  >
+    {#if icon}
+      <div class="flex h-6 w-6 items-center">
+        <Icon name={icon} {animate} {active} />
+      </div>
+    {/if}
+    <div class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100">
+      {label}
+    </div>
   </div>
-</div>
+</Tooltip>
