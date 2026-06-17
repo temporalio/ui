@@ -27,6 +27,9 @@
     readOnly?: boolean;
     error?: boolean;
     reverseSort?: boolean;
+    startedAt?: number;
+    onFirstRender?: (ms: number) => void;
+    onAllRendered?: (ms: number) => void;
   }
 
   let {
@@ -38,12 +41,18 @@
     readOnly = false,
     error = false,
     reverseSort = false,
+    startedAt,
+    onFirstRender,
+    onAllRendered,
   }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
 
+  const INITIAL_COUNT = 100;
+
   let canvasWidth = $state(0);
   let scrollY = $state(0);
+  let renderedCount = $state(0);
 
   // PERF: bind:clientWidth={canvasWidth} compiled to bind_element_size which reads
   // element.clientWidth inside a Svelte effect during every reactive flush (~150×
@@ -90,6 +99,61 @@
   const filteredGroups = $derived(
     getFailedOrPendingGroups(groups, $eventStatusFilter),
   );
+
+  // Progressive rendering: render the viewport-visible slice first, then
+  // expand in idle-callback chunks so the first paint is <100ms even for 10k rows.
+  // For descending sort the visible rows are the high-index end of the array,
+  // so we slice from the tail and expand toward index 0.
+  const visibleGroups = $derived.by(() => {
+    const total = filteredGroups.length;
+    if (renderedCount >= total) return filteredGroups;
+    if (reverseSort)
+      return filteredGroups.slice(Math.max(0, total - renderedCount));
+    return filteredGroups.slice(0, renderedCount);
+  });
+
+  $effect(() => {
+    const total = filteredGroups.length;
+    // Depend on reverseSort so we reset when sort direction changes.
+    const _rs = reverseSort;
+    const t0 = startedAt;
+    renderedCount = Math.min(INITIAL_COUNT, total);
+
+    // Report first-row timing after the initial batch is painted.
+    if (t0 && onFirstRender) {
+      requestAnimationFrame(() => {
+        onFirstRender(performance.now() - t0);
+      });
+    }
+
+    if (total <= INITIAL_COUNT) {
+      if (t0 && onAllRendered) {
+        requestAnimationFrame(() => {
+          onAllRendered(performance.now() - t0);
+        });
+      }
+      return;
+    }
+
+    let handle = 0;
+    let cancelled = false;
+
+    const expand = () => {
+      if (cancelled) return;
+      renderedCount = total;
+      if (t0 && onAllRendered) {
+        requestAnimationFrame(() => {
+          if (!cancelled) onAllRendered(performance.now() - t0);
+        });
+      }
+    };
+
+    handle = requestIdleCallback(expand, { timeout: 200 });
+    return () => {
+      cancelled = true;
+      cancelIdleCallback(handle);
+    };
+  });
   const firstStartTime = $derived.by(() => {
     const firstEventTime = $fullEventHistory[0]?.eventTime;
 
@@ -163,6 +227,9 @@
     // In ascending mode rows AFTER (i > idx) move down. In descending mode
     // rows BEFORE (i < idx) are visually below the panel and move down instead.
     const isDesc = reverseSort;
+    // Progressive rendering: re-run when new rows mount so they receive the
+    // correct transform immediately rather than appearing at the wrong position.
+    const _count = renderedCount;
 
     if (idx < 0) {
       for (const el of rowWrappers.values()) {
@@ -277,7 +344,10 @@
         The transform $effect handles the panel-shift side; it already accounts
         for reverseSort by checking (i < idx) instead of (i > idx).
       -->
-      {#each filteredGroups as group, i (group.id)}
+      {#each visibleGroups as group, localI (group.id)}
+        {@const i = reverseSort
+          ? filteredGroups.length - visibleGroups.length + localI
+          : localI}
         {@const y = reverseSort
           ? (filteredGroups.length + 1 - i) * height
           : (i + 2) * height}

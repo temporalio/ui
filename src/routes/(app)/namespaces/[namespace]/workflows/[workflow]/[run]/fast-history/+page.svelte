@@ -49,12 +49,21 @@
   let isRendering = $state(false);
   let controller: AbortController;
 
+  let t0 = 0;
+  let loadMs = $state<number | null>(null);
+  let firstRenderMs = $state<number | null>(null);
+  let allRenderMs = $state<number | null>(null);
+
   export { stats, progress };
 
   function start() {
+    t0 = performance.now();
     progress = null;
     stats = null;
     error = null;
+    loadMs = null;
+    firstRenderMs = null;
+    allRenderMs = null;
     showTimeline = false;
     controller?.abort();
     controller = new AbortController();
@@ -71,6 +80,7 @@
     })
       .then(({ events, stats: s }) => {
         stats = s;
+        loadMs = performance.now() - t0;
         fullEventHistory.set(events);
         // Also populate currentEventHistory so filteredEventHistory (used by
         // EventTypeFilter and WorkflowError) derives correctly from these events.
@@ -235,6 +245,13 @@
           </ToggleButton>
         </ToggleButtons>
       </div>
+      {#if loadMs !== null}
+        <p class="w-full text-right font-mono text-xs text-secondary">
+          fetch {fmtMs(loadMs)}{#if firstRenderMs !== null}
+            · first row {fmtMs(firstRenderMs)}{/if}{#if allRenderMs !== null}
+            · all rows {fmtMs(allRenderMs)}{/if}
+        </p>
+      {/if}
     </div>
     {#if workflow}
       <div class="flex w-full flex-col">
@@ -242,6 +259,13 @@
           {workflow}
           {groups}
           {reverseSort}
+          startedAt={t0}
+          onFirstRender={(ms) => {
+            firstRenderMs = ms;
+          }}
+          onAllRendered={(ms) => {
+            allRenderMs = ms;
+          }}
           viewportHeight={undefined}
           error={Boolean(workflowTaskFailedError)}
         />
