@@ -40,10 +40,49 @@
 
   const [x, y] = $derived(point);
 
+  // PERF: getBBox() forces the browser to flush SVG layout and compute exact glyph
+  // metrics for every call — the SVG equivalent of element.clientWidth. With 10k
+  // rows each calling getBBox() after mount, this was 10k forced SVG reflows.
+  //
+  // Fix: OffscreenCanvas.measureText() queries the same underlying font metrics
+  // engine but without touching the DOM layout tree. One canvas context is shared
+  // across all Text instances (module-level singleton). Results are cached by
+  // (text, font) because the same event-type label strings repeat thousands of
+  // times in a 40k event timeline — each unique string is measured exactly once.
+  const _textWidthCache = new Map<string, number>();
+  let _ctx: OffscreenCanvasRenderingContext2D | null = null;
+
+  function measureText(text: string, weight: string, size: string): number {
+    if (!text) return 0;
+    const font = `${weight} ${size} ui-sans-serif,system-ui,sans-serif`;
+    const cacheKey = `${font}|${text}`;
+    const cached = _textWidthCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+    if (!_ctx) {
+      _ctx = new OffscreenCanvas(0, 0).getContext('2d');
+    }
+    if (!_ctx) return text.length * 7.5;
+    _ctx.font = font;
+    const width = _ctx.measureText(text).width;
+    _textWidthCache.set(cacheKey, width);
+    return width;
+  }
+
   let textElement: SVGTextElement = $state();
 
   const showIcon = $derived(icon && config);
-  const textWidth = $derived(textElement?.getBBox()?.width || 0);
+  // Only measure when the width is actually used (backdrop rectangle or icon
+  // x-offset). Skipping the canvas call for plain text rows avoids any work
+  // for the majority of timeline rows that have neither.
+  const textWidth = $derived(
+    backdrop || showIcon
+      ? measureText(
+          textElement?.textContent ?? '',
+          String(fontWeight),
+          fontSize,
+        )
+      : 0,
+  );
   const backdropWidth = $derived(showIcon ? textWidth + 36 : textWidth + 12);
   const textX = $derived(
     showIcon && textAnchor === 'start' ? x + config.radius * 2 : x,

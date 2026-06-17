@@ -5,13 +5,16 @@
 
   import { page } from '$app/state';
 
-  import WorkflowTimelineLayout from '$lib/layouts/workflow-timeline-layout.svelte';
+  import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
+  import { groupEvents } from '$lib/models/event-groups';
   import {
     type BidirectionalProgress,
     type BidirectionalStats,
     fetchAllEventsBidirectional,
   } from '$lib/services/events-service';
   import { fullEventHistory } from '$lib/stores/events';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   const { namespace, workflow: workflowId, run: runId } = $derived(page.params);
 
@@ -96,10 +99,36 @@
   }
 
   const meetCol = $derived(Math.floor((ascCols + (COLS - descCols)) / 2));
+
+  const workflow = $derived($workflowRun.workflow);
+
+  // PERF: Render TimelineGraph directly instead of WorkflowTimelineLayout.
+  // WorkflowTimelineLayout includes EventTypeFilter → Menu (bind:clientHeight on
+  // the dropdown <ul>), InputAndResults, EventHistoryLegend, and ToggleButtons.
+  // During the initial mount of 10k SVG rows the DOM shifts constantly, firing
+  // the Menu's ResizeObserver → Svelte effect → clientHeight read on every flush.
+  // In CPUTrace3 this accumulated to 3557 samples (3.5% of total CPU).
+  //
+  // Compute groups directly from $fullEventHistory so filteredEventHistory and
+  // EventTypeFilter are never instantiated for this route.
+  const groups = $derived.by(() => {
+    if (!showTimeline || !workflow) return [];
+    return orderGroupsByPending(
+      groupEvents(
+        $fullEventHistory,
+        'ascending',
+        workflow.pendingActivities ?? [],
+        workflow.pendingNexusOperations ?? [],
+      ),
+      false,
+    );
+  });
 </script>
 
 {#if showTimeline}
-  <WorkflowTimelineLayout />
+  {#if workflow}
+    <TimelineGraph {workflow} {groups} viewportHeight={undefined} />
+  {/if}
 {:else}
   <div class="flex h-[60dvh] flex-col justify-center gap-3 px-6">
     {#if error}

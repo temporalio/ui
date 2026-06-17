@@ -28,11 +28,53 @@
   }: Props = $props();
 
   const [x, y] = $derived(point);
+
+  // PERF: The previous approach used class names (.Started, .Completed, .activity …)
+  // and ~18 scoped CSS selectors. The browser checks every selector against every
+  // dot element on each style recalculation — with 94k+ elements × 18 selectors
+  // this was ~1.7M selector evaluations per recalc (visible in CSS selector stats).
+  //
+  // Fix: compute fill/stroke in JS and write a single `style` attribute per rect.
+  // The stylesheet is reduced to two structural rules (.dot, g), so the selector
+  // engine has almost nothing to evaluate for these elements.
+  type ColorPair = readonly [fill: string, stroke: string];
+
+  const DEFAULT: ColorPair = ['#e8efff', '#141414'];
+
+  const CLASSIFICATION_COLORS: Record<string, ColorPair> = {
+    Started: ['#92a4c3', '#141414'],
+    Completed: ['#1ff1a5', '#00964e'],
+    Fired: ['#f8a208', '#fed64b'],
+    Signaled: ['#d300d8', '#ff26ff'],
+    Failed: ['#f55', '#c71607'],
+    Terminated: ['#f55', '#c71607'],
+    TimedOut: ['#c2570c', '#f97316'],
+    Canceled: ['#fed64b', '#fff4c6'],
+  };
+
+  const CATEGORY_COLORS: Record<string, ColorPair> = {
+    marker: ['#ebebeb', '#141414'],
+    command: ['#ebebeb', '#141414'],
+    timer: ['#fbbf24', '#141414'],
+    signal: ['#d300d8', '#141414'],
+    activity: ['#a78bfa', '#141414'],
+    pending: ['#141414', '#a78bfa'],
+    'child-workflow': ['#b2f8d9', '#141414'],
+    update: ['#06b6d4', '#141414'],
+    workflow: ['#059669', '#141414'],
+  };
+
+  const [fill, stroke] = $derived(
+    (classification && CLASSIFICATION_COLORS[classification]) ||
+      (category && CATEGORY_COLORS[category]) ||
+      DEFAULT,
+  );
 </script>
 
 <g>
   <rect
-    class="dot {category} {classification}"
+    class="dot"
+    style="fill:{fill};stroke:{stroke}"
     stroke-width={strokeWidth}
     x={x - r}
     y={y - r}
@@ -49,7 +91,7 @@
       y={y - r / 2}
       width={r}
       height={r}
-      class="text-black"
+      style="color:#000"
     />
   {/if}
 </g>
@@ -63,76 +105,5 @@
     cursor: pointer;
     outline: none;
     opacity: 1;
-    stroke: #141414;
-    fill: #e8efff;
-  }
-
-  .marker,
-  .command {
-    fill: #ebebeb;
-  }
-
-  .timer {
-    fill: #fbbf24;
-  }
-
-  .signal {
-    fill: #d300d8;
-  }
-
-  .activity {
-    fill: #a78bfa;
-  }
-
-  .pending {
-    stroke: #a78bfa;
-    fill: #141414;
-  }
-
-  .child-workflow {
-    fill: #b2f8d9;
-  }
-
-  .update {
-    fill: #06b6d4;
-  }
-
-  .workflow {
-    fill: #059669;
-  }
-
-  .Started {
-    fill: #92a4c3;
-  }
-
-  .Completed {
-    stroke: #00964e;
-    fill: #1ff1a5;
-  }
-
-  .Fired {
-    stroke: #fed64b;
-    fill: #f8a208;
-  }
-
-  .Signaled {
-    stroke: #ff26ff;
-    fill: #d300d8;
-  }
-
-  .Failed,
-  .Terminated {
-    stroke: #c71607;
-    fill: #f55;
-  }
-
-  .TimedOut {
-    stroke: #f97316;
-    fill: #c2570c;
-  }
-
-  .Canceled {
-    stroke: #fff4c6;
-    fill: #fed64b;
   }
 </style>
