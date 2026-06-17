@@ -56,14 +56,28 @@
   const timelineWidth = $derived(canvasWidth - 2 * gutter);
   const pendingActivity = $derived(group?.pendingActivity);
 
-  const accessibleName = $derived(
-    translate('events.row-accessible-name', {
-      eventType: group.displayName,
-      classification: getEventClassificationLabel(
-        group.finalClassification || group.classification,
-      ),
-    }),
-  );
+  // PERF MODERATE: i18next appeared in the CPU trace (resetRegExp,
+  // extractFromKey) because it re-processes its interpolation regex pattern on
+  // every translate() call. For a completed group, displayName and classification
+  // never change, so the result is stable. Cache manually because $derived
+  // re-evaluates when the group prop reference changes (e.g. after a store
+  // update), even if the string values are identical.
+  let _accessibleName = '';
+  let _accessibleNameKey = '';
+  const accessibleName = $derived.by(() => {
+    const classification = getEventClassificationLabel(
+      group.finalClassification || group.classification,
+    );
+    const key = `${group.displayName}|${classification}`;
+    if (key !== _accessibleNameKey) {
+      _accessibleName = translate('events.row-accessible-name', {
+        eventType: group.displayName,
+        classification,
+      });
+      _accessibleNameKey = key;
+    }
+    return _accessibleName;
+  });
   const pauseTime = $derived(
     pendingActivity && pendingActivity.pauseInfo?.pauseTime,
   );
@@ -85,11 +99,33 @@
     }
   });
 
+  // PERF HIGH: getDistancePointsAndPositions calls getMillisecondDuration
+  // (date-fns parseJSON → Date allocation) for every event in the group, plus
+  // timelineTextPosition. On a canvas resize, Svelte's $derived re-runs this for
+  // every visible row simultaneously. With 4k+ rows that means 4k × N Date
+  // allocations in a single microtask flush. The closure-level cache below skips
+  // the recompute when the three inputs that actually affect pixel positions have
+  // not changed. events.size is included so the cache busts if new events arrive
+  // while the workflow is still running.
+  let _posCache:
+    | {
+        points: number[];
+        textAnchor: string;
+        textIndex: number;
+        textPosition: [number, number];
+        backdrop: boolean;
+      }
+    | undefined;
+  let _posCacheKey = '';
+
   const getDistancePointsAndPositions = (
     endTime: string | Date | number,
     timelineWidth: number,
     y: number,
   ) => {
+    const cacheKey = `${endTime}|${timelineWidth}|${y}|${group.events.size}`;
+    if (_posCache && cacheKey === _posCacheKey) return _posCache;
+
     const workflowDistance = getMillisecondDuration({
       start: startTime,
       end: endTime,
@@ -128,7 +164,9 @@
         TimelineConfig,
       );
 
-    return { points, textAnchor, textIndex, textPosition, backdrop };
+    _posCache = { points, textAnchor, textIndex, textPosition, backdrop };
+    _posCacheKey = cacheKey;
+    return _posCache;
   };
 
   const { points, textAnchor, textIndex, textPosition, backdrop } = $derived(

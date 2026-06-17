@@ -5,17 +5,20 @@
 
   import { page } from '$app/state';
 
+  import WorkflowTimelineLayout from '$lib/layouts/workflow-timeline-layout.svelte';
   import {
     type BidirectionalProgress,
     type BidirectionalStats,
     fetchAllEventsBidirectional,
   } from '$lib/services/events-service';
+  import { fullEventHistory } from '$lib/stores/events';
 
   const { namespace, workflow: workflowId, run: runId } = $derived(page.params);
 
   let progress = $state<BidirectionalProgress | null>(null);
   let stats = $state<BidirectionalStats | null>(null);
   let error = $state<string | null>(null);
+  let showTimeline = $state(false);
   let controller: AbortController;
 
   export { stats, progress };
@@ -24,6 +27,7 @@
     progress = null;
     stats = null;
     error = null;
+    showTimeline = false;
     controller?.abort();
     controller = new AbortController();
 
@@ -37,8 +41,13 @@
         progress = p;
       },
     })
-      .then(({ stats: s }) => {
+      .then(({ events, stats: s }) => {
         stats = s;
+        fullEventHistory.set(events);
+        const waveMs = Math.floor((COLS / 2) * 18) + 400;
+        setTimeout(() => {
+          showTimeline = true;
+        }, waveMs);
       })
       .catch((e: unknown) => {
         if (e instanceof Error && e.name !== 'AbortError') {
@@ -89,97 +98,101 @@
   const meetCol = $derived(Math.floor((ascCols + (COLS - descCols)) / 2));
 </script>
 
-<div class="flex h-[60dvh] flex-col justify-center gap-3 px-6">
-  {#if error}
-    <p class="text-sm text-danger">{error}</p>
-  {:else}
-    <div class="flex items-center justify-between text-xs text-secondary">
-      <span class="flex items-center gap-1.5">
-        <span class="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
-        Ascending
-        {#if progress || stats}· {fmt(
-            stats?.ascPages ?? progress?.ascPages ?? 0,
-          )}p{/if}
-      </span>
-      <span class="tabular-nums">
-        {#if done}
-          {fmtMs(stats.durationMs)} · {fmt(stats.totalEvents)} events · {fmt(
-            stats.eventsPerSecond,
-          )}/s
-        {:else if progress}
-          {fmtMs(progress.elapsedMs)} · {fmt(
-            progress.ascEvents + progress.descEvents,
-          )} events
-        {:else}
-          Starting…
-        {/if}
-      </span>
-      <span class="flex items-center gap-1.5">
-        {#if progress || stats}{fmt(
-            stats?.descPages ?? progress?.descPages ?? 0,
-          )}p ·{/if}
-        Descending
-        <span class="inline-block h-2 w-2 rounded-full bg-purple-500"></span>
-      </span>
-    </div>
-
-    <div
-      class="grid flex-1 gap-0.5 {!progress && !done ? 'breathe' : ''}"
-      style="grid-template-columns: repeat({COLS}, 1fr); grid-template-rows: repeat({ROWS}, 1fr); contain: layout style paint;"
-      role="progressbar"
-      aria-label="Bidirectional fetch progress"
-      aria-valuenow={ascPct + descPct}
-      aria-valuemin={0}
-      aria-valuemax={100}
-    >
-      {#each { length: ROWS } as _, row}
-        {#each { length: COLS } as _, col}
-          {@const state = boxState(col)}
-          {@const isFrontierAsc = !done && col === ascCols - 1}
-          {@const isFrontierDesc = !done && col === COLS - descCols}
-          {@const doneDelay = Math.abs(col - meetCol) * 18}
-          <div
-            class="box rounded-sm {state === 'asc'
-              ? 'box-asc'
-              : state === 'desc'
-                ? 'box-desc'
-                : state === 'done'
-                  ? 'box-done'
-                  : !progress
-                    ? 'box-idle'
-                    : 'box-empty'} {isFrontierAsc
-              ? 'frontier-asc'
-              : isFrontierDesc
-                ? 'frontier-desc'
-                : ''}"
-            style={state === 'done' ? `animation-delay: ${doneDelay}ms` : ''}
-          ></div>
-        {/each}
-      {/each}
-    </div>
-
-    {#if total}
-      <div class="relative flex justify-between text-xs text-secondary">
-        <span>1</span>
-        {#if !done && progress?.ascMaxId && progress?.descMinId}
-          <span
-            class="absolute font-medium text-blue-500"
-            style="left:{ascPct}%;transform:translateX(-50%)"
-          >
-            {fmt(progress.ascMaxId)} ↑
-          </span>
-          <span
-            class="absolute font-medium text-purple-500"
-            style="right:{descPct}%;transform:translateX(50%)"
-          >
-            ↓ {fmt(progress.descMinId)}
-          </span>
-        {/if}
-        <span>{fmt(total)}</span>
+{#if showTimeline}
+  <WorkflowTimelineLayout />
+{:else}
+  <div class="flex h-[60dvh] flex-col justify-center gap-3 px-6">
+    {#if error}
+      <p class="text-sm text-danger">{error}</p>
+    {:else}
+      <div class="flex items-center justify-between text-xs text-secondary">
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+          Ascending
+          {#if progress || stats}· {fmt(
+              stats?.ascPages ?? progress?.ascPages ?? 0,
+            )}p{/if}
+        </span>
+        <span class="tabular-nums">
+          {#if done}
+            {fmtMs(stats.durationMs)} · {fmt(stats.totalEvents)} events · {fmt(
+              stats.eventsPerSecond,
+            )}/s
+          {:else if progress}
+            {fmtMs(progress.elapsedMs)} · {fmt(
+              progress.ascEvents + progress.descEvents,
+            )} events
+          {:else}
+            Starting…
+          {/if}
+        </span>
+        <span class="flex items-center gap-1.5">
+          {#if progress || stats}{fmt(
+              stats?.descPages ?? progress?.descPages ?? 0,
+            )}p ·{/if}
+          Descending
+          <span class="inline-block h-2 w-2 rounded-full bg-purple-500"></span>
+        </span>
       </div>
+
+      <div
+        class="grid flex-1 gap-0.5 {!progress && !done ? 'breathe' : ''}"
+        style="grid-template-columns: repeat({COLS}, 1fr); grid-template-rows: repeat({ROWS}, 1fr); contain: layout style paint;"
+        role="progressbar"
+        aria-label="Bidirectional fetch progress"
+        aria-valuenow={ascPct + descPct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        {#each { length: ROWS } as _, row}
+          {#each { length: COLS } as _, col}
+            {@const state = boxState(col)}
+            {@const isFrontierAsc = !done && col === ascCols - 1}
+            {@const isFrontierDesc = !done && col === COLS - descCols}
+            {@const doneDelay = Math.abs(col - meetCol) * 18}
+            <div
+              class="box rounded-sm {state === 'asc'
+                ? 'box-asc'
+                : state === 'desc'
+                  ? 'box-desc'
+                  : state === 'done'
+                    ? 'box-done'
+                    : !progress
+                      ? 'box-idle'
+                      : 'box-empty'} {isFrontierAsc
+                ? 'frontier-asc'
+                : isFrontierDesc
+                  ? 'frontier-desc'
+                  : ''}"
+              style={state === 'done' ? `animation-delay: ${doneDelay}ms` : ''}
+            ></div>
+          {/each}
+        {/each}
+      </div>
+
+      {#if total}
+        <div class="relative flex justify-between text-xs text-secondary">
+          <span>1</span>
+          {#if !done && progress?.ascMaxId && progress?.descMinId}
+            <span
+              class="absolute font-medium text-blue-500"
+              style="left:{ascPct}%;transform:translateX(-50%)"
+            >
+              {fmt(progress.ascMaxId)} ↑
+            </span>
+            <span
+              class="absolute font-medium text-purple-500"
+              style="right:{descPct}%;transform:translateX(50%)"
+            >
+              ↓ {fmt(progress.descMinId)}
+            </span>
+          {/if}
+          <span>{fmt(total)}</span>
+        </div>
+      {/if}
     {/if}
-  {/if}
-</div>
+  </div>
+{/if}
 
 <style>
   .box-idle {

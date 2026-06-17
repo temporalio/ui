@@ -282,8 +282,22 @@ export const fetchAllEventsBidirectional = async ({
   let observedPageSize = 0;
   let winnerChosen = false;
 
-  const ascBucket: HistoryEvent[] = [];
-  const descBucket: HistoryEvent[] = [];
+  // Single pre-allocated slot array indexed by eventId - 1. Allocated lazily
+  // once the first descending page reveals the total event count. Events from
+  // both directions write directly into their slot, so writes are idempotent
+  // and no merge copy is needed.
+  let slots: (HistoryEvent | undefined)[] | null = null;
+  // Small temp buffer for ascending events that arrive before slots is ready.
+  const tempBuf: HistoryEvent[] = [];
+  let ascEventCount = 0;
+  let descEventCount = 0;
+
+  const initSlots = (n: number) => {
+    if (slots !== null) return;
+    slots = new Array(n);
+    for (const e of tempBuf) slots[parseInt(e.eventId) - 1] = e;
+    tempBuf.length = 0;
+  };
 
   type Token = string | undefined;
 
@@ -291,8 +305,8 @@ export const fetchAllEventsBidirectional = async ({
 
   const reportProgress = () => {
     onProgress?.({
-      ascEvents: ascBucket.length,
-      descEvents: descBucket.length,
+      ascEvents: ascEventCount,
+      descEvents: descEventCount,
       ascPages,
       descPages,
       elapsedMs: performance.now() - t0,
@@ -341,9 +355,12 @@ export const fetchAllEventsBidirectional = async ({
 
       ascPages++;
       observedPageSize = Math.max(observedPageSize, events.length);
-      ascMaxId = Math.max(ascMaxId, ...events.map((e) => parseInt(e.eventId)));
+      ascEventCount += events.length;
       for (const e of events) {
-        if (parseInt(e.eventId) < descMinId) ascBucket.push(e);
+        const id = parseInt(e.eventId);
+        if (id > ascMaxId) ascMaxId = id;
+        if (slots !== null) slots[id - 1] = e;
+        else tempBuf.push(e);
       }
       reportProgress();
 
@@ -394,11 +411,16 @@ export const fetchAllEventsBidirectional = async ({
 
       descPages++;
       observedPageSize = Math.max(observedPageSize, events.length);
-      const descIds = events.map((e) => parseInt(e.eventId));
-      descMinId = Math.min(descMinId, ...descIds);
-      descMaxId = Math.max(descMaxId, ...descIds);
+      descEventCount += events.length;
+      // Compute bounds before writing so initSlots has the correct total.
       for (const e of events) {
-        if (parseInt(e.eventId) > ascMaxId) descBucket.push(e);
+        const id = parseInt(e.eventId);
+        if (id < descMinId) descMinId = id;
+        if (id > descMaxId) descMaxId = id;
+      }
+      initSlots(descMaxId);
+      for (const e of events) {
+        slots![parseInt(e.eventId) - 1] = e;
       }
       reportProgress();
 
@@ -412,21 +434,24 @@ export const fetchAllEventsBidirectional = async ({
 
   await Promise.allSettled([runAscending(), runDescending()]);
 
-  // Merge, dedup, sort, then transform once.
-  const seen = new Set<string>();
-  const rawMerged: HistoryEvent[] = [];
-  for (const e of [...ascBucket, ...descBucket].sort(
-    (a, b) => parseInt(a.eventId) - parseInt(b.eventId),
-  )) {
-    if (!seen.has(e.eventId)) {
-      seen.add(e.eventId);
-      rawMerged.push(e);
-    }
+  // Compact: remove unfilled slots (can occur at the fetch boundary where the
+  // winner aborted before the other side finished its last page).
+  const rawFinal = slots ?? (tempBuf as (HistoryEvent | undefined)[]);
+  let write = 0;
+  for (let i = 0; i < rawFinal.length; i++) {
+    const e = rawFinal[i];
+    if (e !== undefined) rawFinal[write++] = e;
   }
-  const merged: CommonHistoryEvent[] = toEventHistory(rawMerged);
+  rawFinal.length = write;
+
+  const totalFetched = ascEventCount + descEventCount;
+  const merged: CommonHistoryEvent[] = toEventHistory(
+    rawFinal as HistoryEvent[],
+  );
+  rawFinal.length = 0;
 
   const durationMs = performance.now() - t0;
-  const overlap = ascBucket.length + descBucket.length - merged.length;
+  const overlap = totalFetched - merged.length;
 
   const winner: BidirectionalStats['winner'] =
     ascPages === descPages

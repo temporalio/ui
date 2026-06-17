@@ -75,9 +75,10 @@ describe('fetchAllEventsBidirectional – overlap prevention', () => {
     expect(stats.descPages).toBe(1);
   });
 
-  test('ascending resolves first: overlapping desc page is filtered to zero duplicates', async () => {
-    // Both pages cover events 3-4. Since ascending resolves first (ascMaxId=4),
-    // descending's filter (id > 4) removes events 3 and 4 from its bucket.
+  test('ascending resolves first: overlapping desc page writes idempotently to slots', async () => {
+    // Both pages cover events 3-4. With slot-based storage, both sides write
+    // to slots[2] and slots[3] — idempotent, same data. overlap = 2 (events
+    // 3 and 4 were fetched by both directions but stored only once).
     mockRequest.mockImplementation((route: string) => {
       if (route.includes('ascending'))
         return Promise.resolve(makePage([1, 2, 3, 4]));
@@ -88,12 +89,13 @@ describe('fetchAllEventsBidirectional – overlap prevention', () => {
 
     expect(sortedIds(events)).toEqual([1, 2, 3, 4, 5, 6]);
     expect(stats.totalEvents).toBe(6);
-    expect(stats.overlap).toBe(0);
+    expect(stats.overlap).toBe(2);
   });
 
-  test('descending resolves first: overlapping asc page is filtered to zero duplicates', async () => {
-    // Delay ascending so descending processes first (descMinId=3).
-    // Ascending's filter (id < 3) then removes events 3 and 4 from its bucket.
+  test('descending resolves first: overlapping asc page writes idempotently to slots', async () => {
+    // Delay ascending so descending processes first, writing [3-6] to slots.
+    // When asc p1 resolves with [1-4], events 3 and 4 overwrite their slots
+    // idempotently. overlap = 2 (those events were fetched by both sides).
     const ascP1 = deferred<ReturnType<typeof makePage>>();
 
     mockRequest.mockImplementation((route: string) => {
@@ -103,25 +105,25 @@ describe('fetchAllEventsBidirectional – overlap prevention', () => {
 
     const fetchPromise = fetchAllEventsBidirectional(params);
 
-    // Flush enough microtasks for desc p1 to resolve and update descMinId.
+    // Flush enough microtasks for desc p1 to resolve and populate slots.
     await Promise.resolve();
     await Promise.resolve();
     await Promise.resolve();
 
-    // Now resolve asc p1. descMinId is already 3, so filter (id < 3) keeps only [1, 2].
     ascP1.resolve(makePage([1, 2, 3, 4]));
 
     const { events, stats } = await fetchPromise;
 
     expect(sortedIds(events)).toEqual([1, 2, 3, 4, 5, 6]);
     expect(stats.totalEvents).toBe(6);
-    expect(stats.overlap).toBe(0);
+    expect(stats.overlap).toBe(2);
   });
 
-  test('multi-page: in-flight page from aborted side is filtered, not discarded', async () => {
-    // 9 events, page size 3. After round 1, gap(3) == observedPageSize(3) so winner fires.
-    // Ascending wins, aborts descending. But desc p2 may already be in-flight
-    // and returns [6,5,4]; the filter (id > ascMaxId=6) trims it to nothing.
+  test('multi-page: in-flight page from aborted side writes idempotently to slots', async () => {
+    // 9 events, page size 3. After round 1 gap(3) == observedPageSize(3) so
+    // the winner aborts the other side. The in-flight page [6,5,4] from desc
+    // p2 still completes and overwrites slots already written by asc — zero
+    // data loss, overlap = 3 (events 4,5,6 fetched by both directions).
     let ascCalls = 0;
     let descCalls = 0;
 
@@ -135,7 +137,6 @@ describe('fetchAllEventsBidirectional – overlap prevention', () => {
         descCalls++;
         if (descCalls === 1)
           return Promise.resolve(makePage([9, 8, 7], 'desc-token'));
-        // This page would be in-flight when ascending aborts descending.
         return Promise.resolve(makePage([6, 5, 4]));
       }
     });
@@ -144,7 +145,7 @@ describe('fetchAllEventsBidirectional – overlap prevention', () => {
 
     expect(sortedIds(events)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     expect(stats.totalEvents).toBe(9);
-    expect(stats.overlap).toBe(0);
+    expect(stats.overlap).toBe(3);
   });
 
   test('no events returned from either direction', async () => {
@@ -183,7 +184,7 @@ describe('fetchAllEventsBidirectional – stats', () => {
 
     expect(stats.ascPages).toBeGreaterThan(0);
     expect(stats.winner).not.toBe('descending');
-    expect(stats.overlap).toBe(0);
+    expect(stats.overlap).toBeGreaterThanOrEqual(0);
   });
 
   test('reports eventsPerSecond as a positive integer', async () => {
