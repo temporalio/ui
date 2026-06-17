@@ -1,6 +1,8 @@
 <svelte:options runes />
 
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   import { onMount } from 'svelte';
 
   import { beforeNavigate, goto } from '$app/navigation';
@@ -44,6 +46,7 @@
   let stats = $state<BidirectionalStats | null>(null);
   let error = $state<string | null>(null);
   let showTimeline = $state(false);
+  let isRendering = $state(false);
   let controller: AbortController;
 
   export { stats, progress };
@@ -73,6 +76,7 @@
         // EventTypeFilter and WorkflowError) derives correctly from these events.
         currentEventHistory.set(events);
         const waveMs = Math.floor((COLS / 2) * 18) + 400;
+        isRendering = true;
         setTimeout(() => {
           showTimeline = true;
           workflowActionsReady.set(true);
@@ -101,6 +105,25 @@
   const urlParams = $derived(parseEventFilterParams(page.url));
   $effect(() => {
     $eventFilterSort = urlParams.sort;
+  });
+
+  $effect(() => {
+    if (!showTimeline) return;
+    let handle: number;
+    if (typeof requestIdleCallback !== 'undefined') {
+      handle = requestIdleCallback(
+        () => {
+          isRendering = false;
+        },
+        { timeout: 8000 },
+      );
+      return () => cancelIdleCallback(handle);
+    } else {
+      handle = window.setTimeout(() => {
+        isRendering = false;
+      }, 5000);
+      return () => clearTimeout(handle);
+    }
   });
 
   const reverseSort = $derived($eventFilterSort === 'descending');
@@ -269,7 +292,9 @@
       </div>
 
       <div
-        class="grid flex-1 gap-0.5 {!progress && !done ? 'breathe' : ''}"
+        class="relative grid flex-1 gap-0.5 overflow-hidden {!progress && !done
+          ? 'breathe'
+          : ''}"
         style="grid-template-columns: repeat({COLS}, 1fr); grid-template-rows: repeat({ROWS}, 1fr); contain: layout style paint;"
         role="progressbar"
         aria-label="Bidirectional fetch progress"
@@ -277,6 +302,13 @@
         aria-valuemin={0}
         aria-valuemax={100}
       >
+        {#if isRendering}
+          <div
+            class="rendering-overlay"
+            in:fade={{ duration: 200 }}
+            out:fade={{ duration: 700 }}
+          ></div>
+        {/if}
         {#each { length: ROWS } as _, row}
           {#each { length: COLS } as _, col}
             {@const state = boxState(col)}
@@ -411,6 +443,43 @@
 
     50% {
       filter: brightness(1.6) saturate(1.2);
+    }
+  }
+
+  /* stylelint-disable-next-line rule-empty-line-before */
+  .rendering-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .rendering-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in oklab, #3b82f6 12%, transparent) 25%,
+      color-mix(in oklab, #6d28d9 18%, transparent) 50%,
+      color-mix(in oklab, #22c55e 12%, transparent) 75%,
+      transparent 100%
+    );
+    animation: rendering-wave 1.3s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes rendering-wave {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(182%);
     }
   }
 </style>
