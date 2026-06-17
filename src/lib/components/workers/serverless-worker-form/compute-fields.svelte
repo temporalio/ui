@@ -85,7 +85,7 @@
 
 <hr class="my-5 border-subtle" />
 
-<h2 class="mb-1 text-base font-medium">
+<h2 class="text-base font-medium">
   {translate('workers.resource-section')}
 </h2>
 <p class="mb-4 text-sm text-secondary">
@@ -93,19 +93,18 @@
 </p>
 
 {#if provider === 'lambda'}
-  <div class="flex items-end gap-2">
-    <div class="flex-1">
-      <Input
-        bind:value={lambdaArn}
-        id="lambdaArn"
-        name="lambdaArn"
-        label={translate('workers.lambda-arn-label')}
-        hintText={errors.lambdaArn?.[0]}
-        error={!!errors.lambdaArn?.[0]}
-        placeholder={translate('workers.lambda-arn-placeholder')}
-        required
-      />
-    </div>
+  <div class="flex items-end gap-4">
+    <Input
+      bind:value={lambdaArn}
+      id="lambdaArn"
+      name="lambdaArn"
+      label={translate('workers.lambda-arn-label')}
+      hintText={errors.lambdaArn?.[0]}
+      error={!!errors.lambdaArn?.[0]}
+      placeholder={translate('workers.lambda-arn-placeholder')}
+      required
+      class="flex-1"
+    />
     <Button
       variant="secondary"
       type="button"
@@ -138,19 +137,18 @@
       placeholder={translate('workers.gcp-region-placeholder')}
       required
     />
-    <div class="flex items-end gap-2">
-      <div class="flex-1">
-        <Input
-          bind:value={gcpWorkerPool}
-          id="gcpWorkerPool"
-          name="gcpWorkerPool"
-          label={translate('workers.gcp-worker-pool-label')}
-          hintText={errors.gcpWorkerPool?.[0]}
-          error={!!errors.gcpWorkerPool?.[0]}
-          placeholder={translate('workers.gcp-worker-pool-placeholder')}
-          required
-        />
-      </div>
+    <div class="flex items-end gap-4">
+      <Input
+        bind:value={gcpWorkerPool}
+        id="gcpWorkerPool"
+        name="gcpWorkerPool"
+        label={translate('workers.gcp-worker-pool-label')}
+        hintText={errors.gcpWorkerPool?.[0]}
+        error={!!errors.gcpWorkerPool?.[0]}
+        placeholder={translate('workers.gcp-worker-pool-placeholder')}
+        required
+        class="flex-1"
+      />
       <Button
         variant="secondary"
         type="button"
@@ -166,7 +164,7 @@
 
 <hr class="my-5 border-subtle" />
 
-<h2 class="mb-1 text-base font-medium">
+<h2 class="text-base font-medium">
   {translate('workers.access-section')}
 </h2>
 <p class="mb-4 text-sm text-secondary">
@@ -293,7 +291,7 @@
 
 <div class="flex items-start justify-between gap-4">
   <div>
-    <div class="mb-1 flex items-center gap-2">
+    <div class="flex items-center gap-2">
       <h2 class="text-base font-medium">
         {translate('workers.scaling-lifecycle-section')}
       </h2>
