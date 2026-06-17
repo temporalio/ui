@@ -10,7 +10,6 @@
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import MenuDivider from '$lib/holocene/menu/menu-divider.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
-  import Menu from '$lib/holocene/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     allEventTypeOptions,
@@ -25,6 +24,8 @@
   import { isVersionNewer } from '$lib/utilities/version-check';
 
   import { CategoryIcon } from './constants';
+
+  import TimelineMenu from './timeline-menu.svelte';
 
   interface Props {
     compact?: boolean;
@@ -124,7 +125,7 @@
     {/snippet}
     <span class="hidden text-sm md:block">{translate('common.filter')}</span>
   </MenuButton>
-  <Menu
+  <TimelineMenu
     id="event-type-menu"
     keepOpen
     position="right"
@@ -196,5 +197,5 @@
         {option.label}
       </MenuItem>
     {/each}
-  </Menu>
+  </TimelineMenu>
 </MenuContainer>

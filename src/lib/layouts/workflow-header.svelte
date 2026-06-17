@@ -24,6 +24,7 @@
   import { workflowViewPreference } from '$lib/stores/event-view';
   import { fullEventHistory } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
+  import { workflowActionsReady } from '$lib/stores/workflow-actions-ready';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
@@ -145,13 +146,15 @@
           taskFailure={workflow ? isWorkflowTaskFailure(workflow) : false}
         />
         <div class="xl:hidden">
-          <WorkflowActions
-            {cancelInProgress}
-            workflow={workflow!}
-            {namespace}
-            first={workflowRelationships.first}
-            next={workflowRelationships.next}
-          />
+          {#if $workflowActionsReady}
+            <WorkflowActions
+              {cancelInProgress}
+              workflow={workflow!}
+              {namespace}
+              first={workflowRelationships.first}
+              next={workflowRelationships.next}
+            />
+          {/if}
         </div>
       </div>
       <div class="flex flex-col flex-wrap gap-0">
@@ -171,13 +174,15 @@
       </div>
     </div>
     <div class="max-xl:hidden">
-      <WorkflowActions
-        {cancelInProgress}
-        workflow={workflow!}
-        {namespace}
-        first={workflowRelationships.first}
-        next={workflowRelationships.next}
-      />
+      {#if $workflowActionsReady}
+        <WorkflowActions
+          {cancelInProgress}
+          workflow={workflow!}
+          {namespace}
+          first={workflowRelationships.first}
+          next={workflowRelationships.next}
+        />
+      {/if}
     </div>
   </div>
   <CodecServerErrorBanner />

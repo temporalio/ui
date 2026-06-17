@@ -29,6 +29,7 @@
     filteredEventHistory,
     fullEventHistory,
   } from '$lib/stores/events';
+  import { workflowActionsReady } from '$lib/stores/workflow-actions-ready';
   import { workflowRun } from '$lib/stores/workflow-run';
   import {
     parseEventFilterParams,
@@ -74,6 +75,7 @@
         const waveMs = Math.floor((COLS / 2) * 18) + 400;
         setTimeout(() => {
           showTimeline = true;
+          workflowActionsReady.set(true);
         }, waveMs);
       })
       .catch((e: unknown) => {
@@ -84,8 +86,12 @@
   }
 
   onMount(() => {
+    workflowActionsReady.set(false);
     start();
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      workflowActionsReady.set(true);
+    };
   });
 
   beforeNavigate(() => {
