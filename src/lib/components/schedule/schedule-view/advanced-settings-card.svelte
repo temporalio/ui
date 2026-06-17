@@ -105,7 +105,7 @@
       </dd>
     </div>
 
-    {#if state.limitedActions}
+    {#if state?.limitedActions}
       <div>
         <dt class="text-secondary">
           {translate('schedules.remaining-actions')}

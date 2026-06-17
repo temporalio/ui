@@ -65,7 +65,7 @@
         data-testid="schedule-name"
       >
         <WorkflowStatus
-          status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
+          status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
         />
         {scheduleId}
       </h1>
@@ -124,7 +124,7 @@
           </dd>
         </div>
 
-        {#if schedule?.info.updateTime}
+        {#if schedule?.info?.updateTime}
           <div class="flex items-center gap-2">
             <dt class="text-sm font-medium text-secondary">Last Updated</dt>
             <dd>
