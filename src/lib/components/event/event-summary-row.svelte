@@ -201,6 +201,22 @@
   });
 </script>
 
+{#snippet expandButton()}
+  <IconButton
+    icon={expanded ? 'chevron-up' : 'chevron-down'}
+    label={expanded
+      ? translate('events.collapse-details')
+      : translate('events.expand-details')}
+    aria-expanded={expanded}
+    aria-controls={expanded ? detailsId : undefined}
+    class="h-6 w-6"
+    on:click={(e) => {
+      e.stopPropagation();
+      onLinkClick(e);
+    }}
+  />
+{/snippet}
+
 <tr
   class={merge(
     'hover:cursor-pointer',
@@ -216,43 +232,35 @@
   onmouseleave={handleMouseLeave}
   onclick={onLinkClick}
 >
-  <td class="w-8 text-center">
-    <IconButton
-      icon={expanded ? 'chevron-up' : 'chevron-down'}
-      label={expanded
-        ? translate('events.collapse-details')
-        : translate('events.expand-details')}
-      aria-expanded={expanded}
-      aria-controls={expanded ? detailsId : undefined}
-      on:click={(e) => {
-        e.stopPropagation();
-        onLinkClick(e);
-      }}
-    />
-  </td>
   {#if isEventGroup(event)}
     <td class="font-mono">
-      <div class="flex items-center gap-0.5">
-        {#each event.eventList as groupEvent}
-          <Link
-            data-testid="link"
-            href={routeForEventHistoryEvent({
-              eventId: groupEvent.id,
-              namespace,
-              workflow,
-              run,
-            })}
-          >
-            {groupEvent.id}
-          </Link>
-        {/each}
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <div class="flex items-center gap-0.5">
+          {#each event.eventList as groupEvent}
+            <Link
+              data-testid="link"
+              href={routeForEventHistoryEvent({
+                eventId: groupEvent.id,
+                namespace,
+                workflow,
+                run,
+              })}
+            >
+              {groupEvent.id}
+            </Link>
+          {/each}
+        </div>
       </div>
     </td>
   {:else}
     <td class="font-mono">
-      <Link data-testid="link" {href}>
-        {event.id}
-      </Link>
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <Link data-testid="link" {href}>
+          {event.id}
+        </Link>
+      </div>
     </td>
   {/if}
   <td class="text-right md:hidden">
@@ -394,7 +402,7 @@
     class="w-full text-sm no-underline"
     data-testid="event-summary-row-expanded"
   >
-    <td class="!p-0" colspan={$isCloud ? 6 : 5}>
+    <td class="!p-0" colspan={$isCloud ? 5 : 4}>
       <EventDetailsFull {group} event={currentEvent} />
     </td>
   </tr>
