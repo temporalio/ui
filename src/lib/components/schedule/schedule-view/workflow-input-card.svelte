@@ -5,7 +5,7 @@
   import type { Payloads } from '$lib/types';
 
   interface Props {
-    input: Payloads;
+    input?: Payloads;
     scheduleId: string;
   }
 
