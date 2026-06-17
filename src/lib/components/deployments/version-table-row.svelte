@@ -453,7 +453,7 @@
 
 <ValidateConnectionModal
   buildId={versionBuildId}
-  open={showValidateModal}
+  bind:open={showValidateModal}
   loading={validateLoading}
   result={validateResult}
   onClose={() => (showValidateModal = false)}
