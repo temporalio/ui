@@ -9,7 +9,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
+  import { setActiveGroup } from '$lib/stores/active-events';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
@@ -21,14 +21,13 @@
   export let x = 0;
   export let y: number;
 
+  // PERF: bind:offsetHeight is kept only to size the foreignObject correctly.
+  // Previously, contentHeight was also written to $activeGroupHeight, which
+  // caused expandedGroupHeight in timeline-graph.svelte to change, dirtying
+  // all 10k rows and producing 2× UpdateLayoutTree over 63k nodes (~504ms).
+  // That cascade is now broken: rows no longer use $activeGroupHeight at all.
   let offsetHeight;
   $: contentHeight = offsetHeight || 0;
-
-  const setActiveGroupHeight = (height) => {
-    $activeGroupHeight = height;
-  };
-
-  $: setActiveGroupHeight(contentHeight || 0);
 
   $: status = group?.finalClassification || group?.classification;
   $: ({ namespace } = $page.params);

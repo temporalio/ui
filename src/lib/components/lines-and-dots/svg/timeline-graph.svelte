@@ -1,7 +1,7 @@
 <script lang="ts">
   import { timestamp } from '$lib/components/timestamp.svelte';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
-  import { activeGroupHeight, activeGroups } from '$lib/stores/active-events';
+  import { activeGroups } from '$lib/stores/active-events';
   import { fullEventHistory } from '$lib/stores/events';
   import { eventStatusFilter } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
@@ -85,7 +85,6 @@
     };
   });
 
-  const expandedGroupHeight = $derived(readOnly ? 0 : $activeGroupHeight);
   const filteredGroups = $derived(
     getFailedOrPendingGroups(groups, $eventStatusFilter),
   );
@@ -104,8 +103,14 @@
   const startTime = $derived(
     (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime,
   );
+  // PERF: Use a fixed 800px buffer instead of measuring the expanded panel height.
+  // Previously, GroupDetailsRow measured its height via bind:offsetHeight and wrote
+  // it to $activeGroupHeight, which then updated expandedGroupHeight, which triggered
+  // a full reactive flush updating Y on all 10k rows. The buffer covers the max
+  // panel height (header ~50px + event details ~400px + child workflow 320px).
   const timelineHeight = $derived(
-    Math.max(height * (filteredGroups.length + 2), 120) + expandedGroupHeight,
+    Math.max(height * (filteredGroups.length + 2), 120) +
+      ($activeGroups.length > 0 ? 800 : 0),
   );
   const canvasHeight = $derived(timelineHeight + 120);
 
@@ -116,14 +121,6 @@
   const groupIndexMap = $derived(
     new Map(filteredGroups.map((g, i) => [g.id, i])),
   );
-
-  const activeGroupsHeightAboveGroup = (groupIndex: number) => {
-    const hasActiveAbove = $activeGroups?.some((id) => {
-      const activeIndex = groupIndexMap.get(id);
-      return activeIndex !== undefined && activeIndex < groupIndex;
-    });
-    return hasActiveAbove ? expandedGroupHeight : 0;
-  };
 </script>
 
 <div
@@ -187,8 +184,17 @@
         duration={duration ?? 0}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
+      <!--
+        PERF: The {#each} loop no longer reads $activeGroups at all.
+        Previously, activeGroupsHeightAboveGroup(index) and the
+        $activeGroups.includes(group.id) check inside this loop made every
+        row subscribe to the activeGroups store. Clicking one group dirtied
+        all 10k rows → ~522ms of setAttribute (Y position updates) +
+        2× UpdateLayoutTree over 63k nodes (~504ms). Now only the post-loop
+        {#each $activeGroups} section re-renders on click (O(1) work).
+      -->
       {#each filteredGroups as group, index (group.id)}
-        {@const y = (index + 2) * height + activeGroupsHeightAboveGroup(index)}
+        {@const y = (index + 2) * height}
         {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
           <!--
             PERF: Key on group.events.size (native Map property) rather than
@@ -206,15 +212,28 @@
             />
           {/key}
         {/if}
-        {#if !readOnly && $activeGroups.includes(group.id)}
-          <GroupDetailsRow
-            y={y + 1.33 * radius}
-            {group}
-            {canvasWidth}
-            endTime={workflow?.endTime ? endTime : currentTime}
-          />
-        {/if}
       {/each}
+      <!--
+        PERF: Render expanded group panels after all rows so they paint on
+        top (SVG painters model). Only these O(1) elements re-render when
+        activeGroups changes — the main {#each} above is untouched.
+      -->
+      {#if !readOnly}
+        {#each $activeGroups as id (id)}
+          {@const idx = groupIndexMap.get(id)}
+          {#if idx !== undefined}
+            {@const grp = filteredGroups[idx]}
+            {#if grp}
+              <GroupDetailsRow
+                y={(idx + 2) * height + 1.33 * radius}
+                group={grp}
+                {canvasWidth}
+                endTime={workflow?.endTime ? endTime : currentTime}
+              />
+            {/if}
+          {/if}
+        {/each}
+      {/if}
     </svg>
   </EndTimeInterval>
 </div>
