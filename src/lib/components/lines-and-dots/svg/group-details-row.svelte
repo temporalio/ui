@@ -62,7 +62,7 @@
   };
 </script>
 
-<g role="button" tabindex="0" class="relative z-50">
+<g class="relative z-50">
   <foreignObject {x} {y} {width} height={contentHeight}>
     <div bind:offsetHeight class="flex flex-col">
       <div

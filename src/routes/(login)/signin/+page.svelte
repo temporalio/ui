@@ -16,7 +16,7 @@
   const error = $derived(page.url.searchParams.get('error'));
 </script>
 
-<PageTitle title="Login" url={page.url.href} />
+<PageTitle title="Sign In" url={page.url.href} />
 <header class="flex h-16 w-full items-center justify-between bg-primary px-10">
   <img src={Logo} alt="" class="max-h-10" />
   <FeedbackButton />
