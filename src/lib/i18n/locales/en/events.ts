@@ -57,6 +57,7 @@ export const Strings = {
   attribute: 'attribute',
   'event-group': 'Events related to {{eventName}}',
   'error-event': 'Error Event',
+  'back-to-import': 'Back to Import',
   'import-event-history': 'Import Event History',
   'import-event-history-file-upload':
     'Select an event history JSON file to upload',

@@ -136,14 +136,14 @@
       <div class="my-1 flex justify-between px-2">
         <button
           type="button"
-          class="cursor-pointer text-[12px]"
+          class="cursor-pointer text-xs"
           onclick={() => (selected = new Date())}
         >
           {todayLabel}
         </button>
         <button
           type="button"
-          class="cursor-pointer text-[12px]"
+          class="cursor-pointer text-xs"
           onclick={() => (showDatePicker = false)}
         >
           {closeLabel}

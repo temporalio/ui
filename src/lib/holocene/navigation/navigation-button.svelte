@@ -15,6 +15,13 @@
   export let disabled = false;
   export let className = '';
   export { className as class };
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClick();
+    }
+  };
 </script>
 
 <Tooltip
@@ -26,7 +33,7 @@
   <div
     role="button"
     on:click={onClick}
-    on:keypress={onClick}
+    on:keydown={handleKeydown}
     tabindex="0"
     data-testid={$$props['data-testid']}
     data-track-name="navigation-button"

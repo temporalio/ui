@@ -3,6 +3,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    buildGcpCloudRunComputeConfig,
     buildLambdaComputeConfig,
     createWorkerDeploymentVersion,
     deleteWorkerDeploymentVersion,
@@ -37,17 +38,21 @@
     cancelHref={backHref}
     onSubmit={async (data) => {
       error = undefined;
-      const computeConfig = buildLambdaComputeConfig(
-        data.lambdaArn,
-        data.iamRoleArn,
-        {
-          roleExternalId: data.roleExternalId,
-          scaleUpCooloffMs: data.scaleUpCooloffMs,
-          scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
-          maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
-          metricsPollIntervalMs: data.metricsPollIntervalMs,
-        },
-      );
+      const computeConfig =
+        data.provider === 'cloud-run'
+          ? buildGcpCloudRunComputeConfig(
+              data.gcpProject,
+              data.gcpRegion,
+              data.gcpWorkerPool,
+              data.gcpServiceAccount,
+            )
+          : buildLambdaComputeConfig(data.lambdaArn, data.iamRoleArn, {
+              roleExternalId: data.roleExternalId,
+              scaleUpCooloffMs: data.scaleUpCooloffMs,
+              scaleUpBacklogThreshold: data.scaleUpBacklogThreshold,
+              maxWorkerLifetimeMs: data.maxWorkerLifetimeMs,
+              metricsPollIntervalMs: data.metricsPollIntervalMs,
+            });
       await createWorkerDeploymentVersion(
         {
           namespace,

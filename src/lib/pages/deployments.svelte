@@ -61,9 +61,14 @@
         {#each columns as { label } (label)}
           <th>{label}</th>
         {/each}
+        <th>{translate('deployments.actions')}</th>
       </tr>
       {#each visibleItems as deployment}
-        <DeploymentTableRow {deployment} {columns} />
+        <DeploymentTableRow
+          {deployment}
+          {columns}
+          onChange={() => refresh.update((n) => n + 1)}
+        />
       {/each}
 
       <svelte:fragment slot="empty">

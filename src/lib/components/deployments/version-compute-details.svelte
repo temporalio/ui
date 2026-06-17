@@ -2,6 +2,7 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
+    decodeGcpCloudRunProviderDetails,
     decodeLambdaProviderDetails,
     decodeScalerDetails,
   } from '$lib/services/deployments-service';
@@ -11,8 +12,11 @@
     $props();
 
   const lambdaDetails = $derived(decodeLambdaProviderDetails(computeConfig));
+  const gcpDetails = $derived(decodeGcpCloudRunProviderDetails(computeConfig));
   const scalerParams = $derived(decodeScalerDetails(computeConfig));
-  const isCompute = $derived(!!lambdaDetails.lambdaArn);
+  const isCompute = $derived(
+    !!lambdaDetails.lambdaArn || !!gcpDetails.gcpWorkerPool,
+  );
   const hasScalerParams = $derived(
     scalerParams.scaleUpCooloffMs !== undefined ||
       scalerParams.scaleUpBacklogThreshold !== undefined ||
@@ -57,6 +61,50 @@
           >{translate('deployments.role-external-id')}</span
         >
         <code class="text-primary">{lambdaDetails.roleExternalId}</code>
+      </div>
+    {/if}
+    {#if gcpDetails.gcpWorkerPool}
+      <div class="flex items-center gap-1">
+        <span class="font-medium text-secondary"
+          >{translate('workers.gcp-worker-pool-label')}</span
+        >
+        <Copyable
+          content={gcpDetails.gcpWorkerPool}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        >
+          <code class="text-primary">{gcpDetails.gcpWorkerPool}</code>
+        </Copyable>
+      </div>
+    {/if}
+    {#if gcpDetails.gcpProject}
+      <div class="flex gap-1">
+        <span class="font-medium text-secondary"
+          >{translate('workers.gcp-project-label')}</span
+        >
+        <code class="text-primary">{gcpDetails.gcpProject}</code>
+      </div>
+    {/if}
+    {#if gcpDetails.gcpRegion}
+      <div class="flex gap-1">
+        <span class="font-medium text-secondary"
+          >{translate('workers.gcp-region-label')}</span
+        >
+        <code class="text-primary">{gcpDetails.gcpRegion}</code>
+      </div>
+    {/if}
+    {#if gcpDetails.gcpServiceAccount}
+      <div class="flex items-center gap-1">
+        <span class="font-medium text-secondary"
+          >{translate('workers.gcp-service-account-label')}</span
+        >
+        <Copyable
+          content={gcpDetails.gcpServiceAccount}
+          copyIconTitle={translate('common.copy-icon-title')}
+          copySuccessIconTitle={translate('common.copy-success-icon-title')}
+        >
+          <code class="text-primary">{gcpDetails.gcpServiceAccount}</code>
+        </Copyable>
       </div>
     {/if}
     {#if hasScalerParams}

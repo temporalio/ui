@@ -355,7 +355,7 @@
 
 <style lang="postcss">
   .arrow {
-    @apply absolute left-0 top-0 h-0 w-0;
+    @apply h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;
@@ -374,10 +374,10 @@
   }
 
   .caret {
-    @apply relative;
+    @apply inline-flex items-center justify-center;
 
-    width: 12px;
-    height: 12px;
+    width: 24px;
+    height: 24px;
   }
 
   .caret:disabled {

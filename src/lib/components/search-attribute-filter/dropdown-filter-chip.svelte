@@ -453,7 +453,7 @@
                 />
                 <div class="ml-6 flex flex-col gap-2">
                   <DatePicker
-                    label=""
+                    label={translate('common.start')}
                     labelHidden
                     onDateChange={onStartDateChange}
                     selected={new Date(start.date)}

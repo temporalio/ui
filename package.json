@@ -12,16 +12,6 @@
     "ui",
     ""
   ],
-  "exports": {
-    "./*.svelte": {
-      "types": "./dist/*.svelte.d.ts",
-      "svelte": "./dist/*.svelte"
-    },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "import": "./dist/*.js"
-    }
-  },
   "files": [
     "dist/**/*",
     "!dist/**/*.test.*",
@@ -67,6 +57,7 @@
     "package:patch": "pnpm version patch && svelte-package",
     "package:minor": "pnpm version minor && svelte-package",
     "package:major": "pnpm version major && svelte-package",
+    "prepack": "svelte-package && node scripts/generate-exports.mjs",
     "stories:dev": "storybook dev -p 6006",
     "stories:build": "storybook build",
     "stories:test": "test-storybook --index-json",
@@ -261,5 +252,16 @@
       "svelte-preprocess"
     ]
   },
-  "packageManager": "pnpm@10.10.0"
+  "packageManager": "pnpm@10.10.0",
+  "exports": {
+    "./_": "Wildcard entries below are replaced with explicit paths by scripts/generate-exports.mjs during prepack",
+    "./*.svelte": {
+      "types": "./dist/*.svelte.d.ts",
+      "svelte": "./dist/*.svelte"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
+  }
 }

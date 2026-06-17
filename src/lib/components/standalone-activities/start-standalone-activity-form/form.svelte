@@ -12,7 +12,9 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput, {
+    parseDuration,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -76,6 +78,11 @@
   let taskQueueActive = $state<boolean | null>(null);
   let advancedOptionsVisible = $state(false);
 
+  const isPositiveDuration = (value: string | undefined): boolean => {
+    const seconds = Number(parseDuration(value ?? ''));
+    return !isNaN(seconds) && seconds > 0;
+  };
+
   const schema = z
     .object({
       identity: z.string(),
@@ -106,7 +113,10 @@
       idConflictPolicy: z.string().optional(),
     })
     .superRefine((data, context) => {
-      if (!data.startToCloseTimeout && !data.scheduleToCloseTimeout) {
+      if (
+        !isPositiveDuration(data.startToCloseTimeout) &&
+        !isPositiveDuration(data.scheduleToCloseTimeout)
+      ) {
         context.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['startToCloseTimeout'],
@@ -312,7 +322,7 @@
       label={translate(
         'standalone-activities.form-start-to-close-timeout-label',
       )}
-      required={!$form.scheduleToCloseTimeout}
+      required={!isPositiveDuration($form.scheduleToCloseTimeout)}
       hintText={translate(
         'standalone-activities.form-start-to-close-timeout-hint',
       )}
@@ -324,7 +334,7 @@
       label={translate(
         'standalone-activities.form-schedule-to-close-timeout-label',
       )}
-      required={!$form.startToCloseTimeout}
+      required={!isPositiveDuration($form.startToCloseTimeout)}
       hintText={translate(
         'standalone-activities.form-schedule-to-close-timeout-hint',
       )}

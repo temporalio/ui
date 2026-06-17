@@ -12,6 +12,7 @@
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchActivityCountByStatus } from '$lib/services/activity-counts';
@@ -32,13 +33,14 @@
   import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
   import { getActivityStatusAndCountOfGroup } from '$lib/utilities/get-activity-status-and-count';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
+  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   interface Props {
-    headerActions?: Snippet;
     releaseStageBadge?: Snippet;
   }
 
-  let { headerActions, releaseStageBadge }: Props = $props();
+  let { releaseStageBadge }: Props = $props();
 
   const query = $derived(page.url.searchParams.get('query') ?? '');
   const namespace = $derived(page.params.namespace);
@@ -48,6 +50,9 @@
 
   const refreshTimeFormatted = $derived($timestamp(refreshTime));
   const availableColumns = $derived(availableActivityColumns(namespace));
+  const activityStartEnabled = $derived(
+    !standaloneActivityCommandsDisabled(page),
+  );
 
   onMount(() => {
     $lastUsedNamespace = page.params.namespace;
@@ -110,10 +115,10 @@
         data-testid="activity-status"
       />
     </div>
-    {#if headerActions}
-      <div class="flex items-center gap-4">
-        {@render headerActions()}
-      </div>
+    {#if activityStartEnabled}
+      <Button href={routeForStartStandaloneActivity({ namespace })}>
+        {translate('standalone-activities.start-standalone-activity')}
+      </Button>
     {/if}
   </div>
 </header>
