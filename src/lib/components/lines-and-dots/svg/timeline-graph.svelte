@@ -26,6 +26,7 @@
     viewportHeight: number | undefined;
     readOnly?: boolean;
     error?: boolean;
+    reverseSort?: boolean;
   }
 
   let {
@@ -36,6 +37,7 @@
     viewportHeight,
     readOnly = false,
     error = false,
+    reverseSort = false,
   }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
@@ -157,25 +159,24 @@
     const idx = activeIdx;
     const shift = panelHeight;
     const idxMap = groupIndexMap; // reactive dep so effect re-runs on filter changes
+    // PERF SORT: reverseSort flips which side of activeIdx receives the shift.
+    // In ascending mode rows AFTER (i > idx) move down. In descending mode
+    // rows BEFORE (i < idx) are visually below the panel and move down instead.
+    const isDesc = reverseSort;
 
     if (idx < 0) {
-      // Panel closed — clear all transforms. Iterating only values is cheaper
-      // than the full [id, el] destructure when we don't need the key.
       for (const el of rowWrappers.values()) {
         el.removeAttribute('transform');
       }
       return;
     }
 
-    // PERF: Panel just opened but ResizeObserver hasn't fired yet (shift=0).
-    // Skip the loop entirely — rows have no transforms yet so removing them
-    // is a no-op, and we don't know the correct shift to apply.
     if (shift === 0) return;
 
     for (const [id, el] of rowWrappers) {
       const i = idxMap.get(id);
       if (i === undefined) continue;
-      if (i > idx) {
+      if (isDesc ? i < idx : i > idx) {
         el.setAttribute('transform', `translate(0, ${shift})`);
       } else {
         el.removeAttribute('transform');
@@ -268,8 +269,18 @@
         path, no layout pass). No component lifecycle operations at all.
         Uniformly fast for both top and bottom clicks.
       -->
+      <!--
+        PERF SORT: rows always iterate in ascending key order — Svelte never
+        reorders DOM nodes when sort changes. y is computed from the loop index
+        using the ascending formula (i+2)*height or the descending mirror
+        (N+1-i)*height so that the visual order flips without any insertBefore.
+        The transform $effect handles the panel-shift side; it already accounts
+        for reverseSort by checking (i < idx) instead of (i > idx).
+      -->
       {#each filteredGroups as group, i (group.id)}
-        {@const y = (i + 2) * height}
+        {@const y = reverseSort
+          ? (filteredGroups.length + 1 - i) * height
+          : (i + 2) * height}
         <g use:registerRow={group.id}>
           {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
             <!--
@@ -299,8 +310,11 @@
       {#if !readOnly && activeIdx >= 0}
         {@const grp = filteredGroups[activeIdx]}
         {#if grp}
+          {@const panelY = reverseSort
+            ? (filteredGroups.length + 1 - activeIdx) * height + 1.33 * radius
+            : (activeIdx + 2) * height + 1.33 * radius}
           <GroupDetailsRow
-            y={(activeIdx + 2) * height + 1.33 * radius}
+            y={panelY}
             group={grp}
             {canvasWidth}
             endTime={workflow?.endTime ? endTime : currentTime}

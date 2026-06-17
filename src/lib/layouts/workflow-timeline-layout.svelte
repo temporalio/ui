@@ -51,12 +51,10 @@
     ),
   );
 
-  const groups = $derived(
-    orderGroupsByPending(
-      reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
-      reverseSort,
-    ),
-  );
+  // PERF SORT: never reverse the array — always pass ascending key order so
+  // Svelte's {#each} never reorders DOM nodes. reverseSort is threaded into
+  // TimelineGraph which flips y coordinates instead.
+  const groups = $derived(orderGroupsByPending(ascendingGroups, !reverseSort));
 
   const workflowTaskFailedError = $derived(
     getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
@@ -155,6 +153,7 @@
       <TimelineGraph
         {workflow}
         {groups}
+        {reverseSort}
         viewportHeight={undefined}
         error={Boolean(workflowTaskFailedError)}
       />

@@ -13,6 +13,23 @@ import { fromSeconds } from './to-duration';
 
 export type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
 
+// PERF SORT: timestamp strings are stable across a session; re-parsing them on
+// every sort/y-change (N rows × 2 parseJSON calls) was visible in CPUTraceSort.
+// This module-level cache converts each unique string once and returns the same
+// Date object on subsequent calls.
+const parseJSONCache = new Map<string, Date>();
+function cachedParseJSON(value: ValidTime): Date {
+  if (typeof value === 'string') {
+    let d = parseJSONCache.get(value);
+    if (!d) {
+      d = parseJSON(value);
+      parseJSONCache.set(value, d);
+    }
+    return d;
+  }
+  return parseJSON(value as string | number | Date);
+}
+
 export function timestampToDate(ts: Timestamp): Date {
   if (!isTimestamp(ts)) {
     throw new TypeError('provided value is not a timestamp');
@@ -96,8 +113,8 @@ export function getDuration({
       end = timestampToDate(end);
     }
 
-    const parsedStart = parseJSON(start);
-    const parsedEnd = parseJSON(end);
+    const parsedStart = cachedParseJSON(start);
+    const parsedEnd = cachedParseJSON(end);
 
     const duration = intervalToDuration({ start: parsedStart, end: parsedEnd });
     return flexibleUnits
@@ -135,8 +152,8 @@ export function getMillisecondDuration({
       end = timestampToDate(end);
     }
 
-    const parsedStart = parseJSON(start);
-    const parsedEnd = parseJSON(end);
+    const parsedStart = cachedParseJSON(start);
+    const parsedEnd = cachedParseJSON(end);
     const ms = parsedEnd.getTime() - parsedStart.getTime();
     return onlyUnderSecond ? Math.abs(ms % 1000) : Math.abs(ms);
   } catch {

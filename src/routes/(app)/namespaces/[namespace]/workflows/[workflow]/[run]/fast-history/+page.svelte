@@ -3,17 +3,38 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
+  import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
+  import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
+  import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
+  import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
+  import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { groupEvents } from '$lib/models/event-groups';
   import {
     type BidirectionalProgress,
     type BidirectionalStats,
     fetchAllEventsBidirectional,
   } from '$lib/services/events-service';
-  import { fullEventHistory } from '$lib/stores/events';
+  import { clearActives } from '$lib/stores/active-events';
+  import { eventFilterSort } from '$lib/stores/event-view';
+  import {
+    currentEventHistory,
+    filteredEventHistory,
+    fullEventHistory,
+  } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import {
+    parseEventFilterParams,
+    updateEventFilterParams,
+  } from '$lib/utilities/event-filter-params';
+  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
   import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   const { namespace, workflow: workflowId, run: runId } = $derived(page.params);
@@ -47,6 +68,9 @@
       .then(({ events, stats: s }) => {
         stats = s;
         fullEventHistory.set(events);
+        // Also populate currentEventHistory so filteredEventHistory (used by
+        // EventTypeFilter and WorkflowError) derives correctly from these events.
+        currentEventHistory.set(events);
         const waveMs = Math.floor((COLS / 2) * 18) + 400;
         setTimeout(() => {
           showTimeline = true;
@@ -63,6 +87,24 @@
     start();
     return () => controller.abort();
   });
+
+  beforeNavigate(() => {
+    clearActives();
+  });
+
+  const urlParams = $derived(parseEventFilterParams(page.url));
+  $effect(() => {
+    $eventFilterSort = urlParams.sort;
+  });
+
+  const reverseSort = $derived($eventFilterSort === 'descending');
+
+  const onSort = () => {
+    const newSort = reverseSort ? 'ascending' : 'descending';
+    updateEventFilterParams(page.url, { sort: newSort }, goto);
+  };
+
+  let showDownloadPrompt = $state(false);
 
   const fmt = (n: number) => n.toLocaleString();
   const fmtMs = (ms: number) =>
@@ -102,32 +144,88 @@
 
   const workflow = $derived($workflowRun.workflow);
 
-  // PERF: Render TimelineGraph directly instead of WorkflowTimelineLayout.
-  // WorkflowTimelineLayout includes EventTypeFilter → Menu (bind:clientHeight on
-  // the dropdown <ul>), InputAndResults, EventHistoryLegend, and ToggleButtons.
-  // During the initial mount of 10k SVG rows the DOM shifts constantly, firing
-  // the Menu's ResizeObserver → Svelte effect → clientHeight read on every flush.
-  // In CPUTrace3 this accumulated to 3557 samples (3.5% of total CPU).
-  //
-  // Compute groups directly from $fullEventHistory so filteredEventHistory and
-  // EventTypeFilter are never instantiated for this route.
-  const groups = $derived.by(() => {
+  const workflowTaskFailedError = $derived(
+    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
+  );
+
+  const ascendingGroups = $derived.by(() => {
     if (!showTimeline || !workflow) return [];
-    return orderGroupsByPending(
-      groupEvents(
-        $fullEventHistory,
-        'ascending',
-        workflow.pendingActivities ?? [],
-        workflow.pendingNexusOperations ?? [],
-      ),
-      false,
+    return groupEvents(
+      $filteredEventHistory,
+      'ascending',
+      workflow.pendingActivities ?? [],
+      workflow.pendingNexusOperations ?? [],
     );
   });
+
+  // PERF SORT: never reverse the array — always pass ascending key order so
+  // Svelte's {#each} never needs to reorder DOM nodes. reverseSort is threaded
+  // into TimelineGraph which flips y coordinates instead. The !reverseSort arg
+  // to orderGroupsByPending puts pending groups at the visually correct position
+  // for each mode: front (low i, low y) in ascending, back (high i, low y in
+  // descending mirror) so they always appear at the top of the viewport.
+  const groups = $derived(orderGroupsByPending(ascendingGroups, !reverseSort));
 </script>
 
 {#if showTimeline}
+  <InputAndResults />
+  <div class="flex flex-col gap-2">
+    {#if workflowTaskFailedError}
+      <WorkflowError
+        error={workflowTaskFailedError}
+        pendingTask={workflow?.pendingWorkflowTask}
+      />
+    {/if}
+    {#if workflow?.callbacks?.length}
+      <WorkflowCallbacks callbacks={workflow.callbacks} />
+    {/if}
+  </div>
+  <div class="relative pb-24">
+    <div
+      class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    >
+      <div class="flex items-center gap-2">
+        <h2>{translate('workflows.timeline-tab')}</h2>
+        <EventHistoryLegend />
+      </div>
+      <div class="flex items-center gap-2">
+        <ToggleButtons>
+          <ToggleButton
+            leadingIcon={reverseSort ? 'descending' : 'ascending'}
+            on:click={onSort}
+            size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+          >
+          <EventTypeFilter compact={false} />
+          <ToggleButton
+            data-testid="download"
+            leadingIcon="download"
+            size="sm"
+            on:click={() => (showDownloadPrompt = true)}
+          >
+            {translate('common.download')}
+          </ToggleButton>
+        </ToggleButtons>
+      </div>
+    </div>
+    {#if workflow}
+      <div class="flex w-full flex-col">
+        <TimelineGraph
+          {workflow}
+          {groups}
+          {reverseSort}
+          viewportHeight={undefined}
+          error={Boolean(workflowTaskFailedError)}
+        />
+      </div>
+    {/if}
+  </div>
   {#if workflow}
-    <TimelineGraph {workflow} {groups} viewportHeight={undefined} />
+    <DownloadEventHistoryModal
+      bind:open={showDownloadPrompt}
+      {namespace}
+      workflowId={workflow.id}
+      runId={workflow.runId}
+    />
   {/if}
 {:else}
   <div class="flex h-[60dvh] flex-col justify-center gap-3 px-6">
