@@ -20,6 +20,13 @@
     'aria-label': string;
     orientation?: Orientation;
     activation?: Activation;
+    /**
+     * Renders each tab. Spread the first arg (the prop-getter) onto a
+     * `<button>` or `<a>` element — selection is wired through the composed
+     * `onclick`, which only fires on Enter/Space when the element is natively
+     * interactive. Non-interactive elements (e.g. `div`/`span`) receive the
+     * correct ARIA roles but will not activate via the keyboard.
+     */
     tabButtonSnippet: Snippet<
       [
         GetTabButtonProps,
