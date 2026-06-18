@@ -171,17 +171,24 @@
         />
         {#if $form.endKind === 'after'}
           <div>
-            <NumberInput
+            <Input
               id="endAfterOccurrences"
+              type="number"
+              inputmode="numeric"
+              pattern="0-9+"
               label={translate('schedules.occurrences-label')}
               labelHidden
-              bind:value={$form.endAfterOccurrences}
+              bind:value={
+                () => $form.endAfterOccurrences?.toString(),
+                (v) => ($form.endAfterOccurrences = Number(v))
+              }
               placeholder={translate('schedules.occurrences-placeholder')}
               min={1}
               required
               error={!!$errors.endAfterOccurrences?.[0]}
               hintText={$errors.endAfterOccurrences?.[0]}
               class="w-full"
+              suffix={translate('schedules.occurrences-suffix')}
             />
           </div>
         {/if}

@@ -247,7 +247,8 @@ export const Strings = {
   'end-date-label': 'End Date',
   'end-date-picker-label': 'End date',
   'occurrences-label': 'Occurrences',
-  'occurrences-placeholder': '### occurrences',
+  'occurrences-suffix': 'occurrences',
+  'occurrences-placeholder': '###',
   'timezone-label': 'Timezone',
   'timezone-placeholder': 'Search timezone…',
   'jitter-tooltip':
