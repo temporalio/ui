@@ -60,7 +60,7 @@
   </header>
 
   <Tabs {tabs} selectedTab={view} onSelectedTabChange={handleViewClick}>
-    <PillContainer class="mr-auto flex flex-row p-1">
+    <PillContainer class="mr-auto flex flex-row rounded-full p-1">
       <TabButtonList aria-label="Workflow Runs" class="contents">
         {#snippet tabButtonSnippet(getTabButtonProps, { isSelected, tab })}
           <Pill
