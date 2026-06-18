@@ -40,10 +40,6 @@
   }
 
   const tabs: View[] = ['recent', 'upcoming'];
-  const tabLabel: Record<View, string> = {
-    recent: 'Recent Runs',
-    upcoming: 'Upcoming Runs',
-  };
 </script>
 
 <Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
@@ -61,14 +57,21 @@
 
   <Tabs {tabs} selectedTab={view} onSelectedTabChange={handleViewClick}>
     <PillContainer class="mr-auto flex flex-row rounded-full p-1">
-      <TabButtonList aria-label="Workflow Runs" class="contents">
+      <TabButtonList
+        aria-label={translate('schedules.workflow-runs')}
+        class="contents"
+      >
         {#snippet tabButtonSnippet(getTabButtonProps, { isSelected, tab })}
           <Pill
             {...getTabButtonProps()}
             active={isSelected}
             id={`${id}-${tab}`}
           >
-            {tabLabel[tab]}
+            {translate(
+              tab === 'recent'
+                ? 'schedules.recent-runs'
+                : 'schedules.upcoming-runs',
+            )}
           </Pill>
         {/snippet}
       </TabButtonList>
