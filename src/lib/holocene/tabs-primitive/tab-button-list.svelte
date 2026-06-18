@@ -21,11 +21,11 @@
     orientation?: Orientation;
     activation?: Activation;
     /**
-     * Renders each tab. Spread the first arg (the prop-getter) onto a
-     * `<button>` or `<a>` element — selection is wired through the composed
-     * `onclick`, which only fires on Enter/Space when the element is natively
-     * interactive. Non-interactive elements (e.g. `div`/`span`) receive the
-     * correct ARIA roles but will not activate via the keyboard.
+     * Renders each tab. Spread the first arg (the prop-getter) onto the
+     * element of your choice. A `<button>` or `<a>` is recommended for native
+     * semantics, but non-interactive elements (e.g. `div`/`span`) are also
+     * supported: the prop-getter applies the correct ARIA roles and roving
+     * tabindex, and wires Enter/Space keyboard activation for them.
      */
     tabButtonSnippet: Snippet<
       [
@@ -54,7 +54,13 @@
     isSelected: boolean,
     overrides: TabButtonProps = {},
   ): TabButtonProps {
-    const { class: className, onclick, onfocus, ...rest } = overrides;
+    const {
+      class: className,
+      onclick,
+      onfocus,
+      onkeydown,
+      ...rest
+    } = overrides;
     return {
       ...rest,
       id: context.getButtonIdForTab(tab),
@@ -63,7 +69,41 @@
       'aria-controls': context.getPanelIdForTab(tab),
       tabindex: tab === activeTab ? 0 : -1,
       class: className,
-      onclick: composeEventHandlers(onclick, () => context.setSelectedTab(tab)),
+      onkeydown: composeEventHandlers(
+        onkeydown,
+        (e: KeyboardEvent & { currentTarget: HTMLElement }) => {
+          const element = e.currentTarget;
+
+          if (
+            element instanceof HTMLAnchorElement ||
+            element instanceof HTMLButtonElement
+          ) {
+            // if <a> or <button> let click handler handle
+            return;
+          }
+
+          if (isDisabled(element)) {
+            return;
+          }
+
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            context.setSelectedTab(tab);
+          }
+        },
+      ),
+      onclick: composeEventHandlers(
+        onclick,
+        (e: MouseEvent & { currentTarget: HTMLElement }) => {
+          const element = e.currentTarget;
+
+          if (isDisabled(element)) {
+            return;
+          }
+
+          context.setSelectedTab(tab);
+        },
+      ),
       onfocus: composeEventHandlers(onfocus, () => (focusedTab = tab)),
     };
   }
