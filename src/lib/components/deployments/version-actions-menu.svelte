@@ -12,7 +12,11 @@
     editHref: string;
     workflowHref: string;
     isCurrent: boolean;
+    hasComputeConfig: boolean;
+    isRamping: boolean;
     onSetCurrent: () => void;
+    onSetRamping: () => void;
+    onUnsetCurrent: () => void;
     onValidate: () => void;
     onDelete: () => void;
   }
@@ -22,7 +26,11 @@
     editHref,
     workflowHref,
     isCurrent,
+    hasComputeConfig,
+    isRamping,
     onSetCurrent,
+    onSetRamping,
+    onUnsetCurrent,
     onValidate,
     onDelete,
   }: Props = $props();
@@ -45,13 +53,42 @@
           {translate('deployments.edit')}
         </MenuItem>
       </CapabilityGuard>
-      <MenuItem onclick={onSetCurrent} disabled={isCurrent}>
-        {translate('deployments.set-as-current')}
-      </MenuItem>
       <CapabilityGuard capability="serverScaledDeployments">
-        <MenuItem onclick={onValidate}>
-          {translate('deployments.validate-connection')}
-        </MenuItem>
+        {#if hasComputeConfig}
+          {#if isCurrent}
+            <MenuItem onclick={onUnsetCurrent}>
+              {translate('deployments.unset-current')}
+            </MenuItem>
+          {:else}
+            <MenuItem onclick={onSetCurrent}>
+              {translate('deployments.set-as-current')}
+            </MenuItem>
+          {/if}
+          <MenuItem onclick={onSetRamping} disabled={isCurrent}>
+            {isRamping
+              ? translate('deployments.edit-ramping-percentage')
+              : translate('deployments.set-ramping-version')}
+          </MenuItem>
+          <MenuItem onclick={onValidate}>
+            {translate('deployments.validate-connection')}
+          </MenuItem>
+        {/if}
+        {#snippet fallback()}
+          {#if isCurrent}
+            <MenuItem onclick={onUnsetCurrent}>
+              {translate('deployments.unset-current')}
+            </MenuItem>
+          {:else}
+            <MenuItem onclick={onSetCurrent}>
+              {translate('deployments.set-as-current')}
+            </MenuItem>
+          {/if}
+          <MenuItem onclick={onSetRamping} disabled={isCurrent}>
+            {isRamping
+              ? translate('deployments.edit-ramping-percentage')
+              : translate('deployments.set-ramping-version')}
+          </MenuItem>
+        {/snippet}
       </CapabilityGuard>
       <MenuItem href={workflowHref}>
         {translate('deployments.view-workflows')}

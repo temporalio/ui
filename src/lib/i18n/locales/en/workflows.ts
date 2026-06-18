@@ -161,6 +161,10 @@ export const Strings = {
     'There are no workers polling the {{taskQueue}} task queue.',
   'workers-alert-description':
     'Check your deployment or orchestration system (Kubernetes, ECS, etc.). Review worker logs for crash information. Restart or redeploy workers.',
+  'workflow-error-no-workers-serverless-title': 'No workers currently polling',
+  'workflow-error-no-workers-serverless-description':
+    'The {{taskQueue}} task queue is served by the serverless worker deployment {{deployment}}, which scales down to zero when idle. Workers will start automatically when there are tasks to process.',
+  'view-worker-deployment': 'View Worker Deployment',
   'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
   'workflow-error-no-compatible-workers-description':
     'There are no compatible Workers polling the {{taskQueue}} Task Queue.',

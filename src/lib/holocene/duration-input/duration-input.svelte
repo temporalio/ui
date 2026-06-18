@@ -121,7 +121,7 @@
     const unit = units.find((u) => u.label === durationUnit);
     if (!unit) return;
 
-    if (!durationValue) {
+    if (durationValue.trim() === '' || isNaN(Number(durationValue))) {
       value = '';
       return;
     }

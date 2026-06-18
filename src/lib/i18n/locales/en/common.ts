@@ -70,6 +70,7 @@ export const Strings = {
   refresh: 'Refresh',
   'error-occurred': 'An Error Occurred',
   save: 'Save',
+  create: 'Create',
   'workflow-type': 'Workflow Type',
   'workflow-id': 'Workflow ID',
   'run-id': 'Run ID',

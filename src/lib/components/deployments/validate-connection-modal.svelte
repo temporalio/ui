@@ -27,7 +27,7 @@
   hideConfirm
 >
   <h3 slot="title">
-    {translate('deployments.validate-connection')}
+    {translate('deployments.validate-connection-for')}
     <span class="font-mono text-secondary">{buildId}</span>
   </h3>
   <svelte:fragment slot="footer">

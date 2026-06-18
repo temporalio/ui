@@ -1,9 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { page } from '$app/state';
-
   import type { Capabilities } from '$lib/types';
+  import { hasCapability } from '$lib/utilities/has-capability.svelte';
 
   interface Props {
     capability: keyof Capabilities;
@@ -13,9 +12,7 @@
 
   let { capability, children, fallback }: Props = $props();
 
-  const enabled = $derived(
-    Boolean(page.data?.systemInfo?.capabilities?.[capability]),
-  );
+  const enabled = $derived(hasCapability(capability));
 </script>
 
 {#if enabled}

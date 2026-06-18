@@ -9,6 +9,7 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -169,11 +170,14 @@
     $timestamp(currentEvent?.eventTime, { format: 'short' }),
   );
 
-  const onLinkClick = (event) => {
+  const onLinkClick = (event?) => {
     expanded = !expanded;
-    event.stopPropagation();
+    event?.stopPropagation?.();
     onRowClick();
   };
+
+  const detailsId = $derived(`event-details-${event.id}-${index}`);
+
   const handleMouseEnter = () => {
     hoveredEventId = event.id;
   };
@@ -197,6 +201,22 @@
   });
 </script>
 
+{#snippet expandButton()}
+  <IconButton
+    icon={expanded ? 'chevron-up' : 'chevron-down'}
+    label={expanded
+      ? translate('events.collapse-details')
+      : translate('events.expand-details')}
+    aria-expanded={expanded}
+    aria-controls={expanded ? detailsId : undefined}
+    class="h-6 w-6"
+    on:click={(e) => {
+      e.stopPropagation();
+      onLinkClick(e);
+    }}
+  />
+{/snippet}
+
 <tr
   class={merge(
     'hover:cursor-pointer',
@@ -214,27 +234,33 @@
 >
   {#if isEventGroup(event)}
     <td class="font-mono">
-      <div class="flex items-center gap-0.5">
-        {#each event.eventList as groupEvent}
-          <Link
-            data-testid="link"
-            href={routeForEventHistoryEvent({
-              eventId: groupEvent.id,
-              namespace,
-              workflow,
-              run,
-            })}
-          >
-            {groupEvent.id}
-          </Link>
-        {/each}
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <div class="flex items-center gap-0.5">
+          {#each event.eventList as groupEvent}
+            <Link
+              data-testid="link"
+              href={routeForEventHistoryEvent({
+                eventId: groupEvent.id,
+                namespace,
+                workflow,
+                run,
+              })}
+            >
+              {groupEvent.id}
+            </Link>
+          {/each}
+        </div>
       </div>
     </td>
   {:else}
     <td class="font-mono">
-      <Link data-testid="link" {href}>
-        {event.id}
-      </Link>
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <Link data-testid="link" {href}>
+          {event.id}
+        </Link>
+      </div>
     </td>
   {/if}
   <td class="text-right md:hidden">
@@ -372,6 +398,7 @@
 </tr>
 {#if expanded}
   <tr
+    id={detailsId}
     class="w-full text-sm no-underline"
     data-testid="event-summary-row-expanded"
   >

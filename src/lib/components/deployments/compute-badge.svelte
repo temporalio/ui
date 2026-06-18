@@ -12,11 +12,13 @@
 </script>
 
 {#if config}
-  <div
-    class="flex items-center gap-1 rounded-sm border border-subtle px-1 text-primary"
-  >
-    <Icon name={config.icon} class="h-4 w-4" />
-    {config.label}
+  <div class="flex items-center gap-1">
+    <span
+      class="surface-primary flex items-center rounded border border-subtle p-0.5"
+    >
+      <Icon name={config.icon} class="h-4 w-4" />
+    </span>
+    <span class="text-primary">{config.label}</span>
   </div>
 {:else}
   <span class="text-secondary">—</span>
