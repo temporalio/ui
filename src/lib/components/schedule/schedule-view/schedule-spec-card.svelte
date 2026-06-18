@@ -14,6 +14,9 @@
 
   let { schedule }: Props = $props();
 
+  const id = $props.id();
+  const scheduleFullSpecId = `${id}-schedule-full-spec`;
+
   let isFullSpecVisible = $state(false);
 
   const specs = $derived(getFormSpecFromSpec(schedule?.schedule?.spec));
@@ -25,9 +28,11 @@
       {translate('schedules.schedule-specs')}
     </h2>
     <Button
-      variant="ghost"
+      variant="secondary"
       size="sm"
       trailingIcon="code"
+      aria-expanded={isFullSpecVisible}
+      aria-controls={scheduleFullSpecId}
       on:click={() => (isFullSpecVisible = !isFullSpecVisible)}
     >
       {isFullSpecVisible
@@ -49,10 +54,12 @@
   </ul>
 
   {#if isFullSpecVisible}
-    <CodeBlock
-      maxHeight={300}
-      language="json"
-      content={JSON.stringify(schedule?.schedule?.spec, null, 2)}
-    />
+    <div id={scheduleFullSpecId}>
+      <CodeBlock
+        maxHeight={300}
+        language="json"
+        content={JSON.stringify(schedule?.schedule?.spec, null, 2)}
+      />
+    </div>
   {/if}
 </Panel>
