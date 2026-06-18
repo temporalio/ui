@@ -50,7 +50,7 @@
     const { class: className, onclick, onfocus, ...rest } = overrides;
     return {
       ...rest,
-      id: context.getIdForTab(tab),
+      id: context.getButtonIdForTab(tab),
       role: 'tab',
       'aria-selected': isSelected,
       'aria-controls': context.getPanelIdForTab(tab),

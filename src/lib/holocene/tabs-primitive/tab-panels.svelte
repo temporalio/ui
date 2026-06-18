@@ -30,7 +30,7 @@
       ...rest,
       id: context.getPanelIdForTab(tab),
       role: 'tabpanel',
-      'aria-labelledby': context.getIdForTab(tab),
+      'aria-labelledby': context.getButtonIdForTab(tab),
       tabindex: 0,
       hidden: !isSelected,
       class: className,

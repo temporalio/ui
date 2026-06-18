@@ -3,7 +3,7 @@ import { createContext } from 'svelte';
 export interface TabsContextType<T extends string = string> {
   selectedTab: T;
   tabs: T[];
-  getIdForTab: (tab: string) => string;
+  getButtonIdForTab: (tab: string) => string;
   getPanelIdForTab: (tab: string) => string;
   setSelectedTab: (tab: string) => void;
 }

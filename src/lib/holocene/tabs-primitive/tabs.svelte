@@ -28,8 +28,8 @@
       return tabs;
     },
 
-    getIdForTab(tab: string) {
-      return `${id}-tab-${tab}`;
+    getButtonIdForTab(tab: string) {
+      return `${id}-button-${tab}`;
     },
 
     getPanelIdForTab(tab: string) {
