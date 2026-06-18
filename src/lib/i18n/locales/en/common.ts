@@ -80,6 +80,7 @@ export const Strings = {
   'task-queue': 'Task Queue',
   preview: 'Preview',
   status: 'Status',
+  'created-label': 'Created',
   created: 'Created: {{created}}',
   'last-updated': 'Last Updated: {{updated}}',
   edit: 'Edit',

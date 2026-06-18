@@ -1,8 +1,13 @@
 <script lang="ts">
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import {
+    DetailList,
+    DetailListLabel,
+    DetailListTimestampValue,
+    DetailListValue,
+  } from '$lib/components/detail-list';
   import StatusCounts from '$lib/components/status-counts.svelte';
-  import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon';
@@ -20,7 +25,6 @@
     refresh as workflowRefresh,
   } from '$lib/stores/workflows';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import {
     routeForScheduleEdit,
     routeForSchedules,
@@ -50,8 +54,6 @@
   const editDisabled = $derived(
     $coreUser.namespaceWriteDisabled(namespace) || !writeActionsAreAllowed(),
   );
-
-  const { copy, copied } = copyToClipboard();
 </script>
 
 <header class="mb-2 flex flex-col gap-4">
@@ -70,69 +72,57 @@
         {scheduleId}
       </h1>
 
-      <dl class="contents">
-        <div class="flex items-center gap-2">
-          <dt class="text-sm font-medium text-secondary">Workflow Type</dt>
-          <dd class="inline-flex items-center gap-1">
-            {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
-            <div class="flex items-center gap-2">
-              <Link
-                class="block p-1"
-                href={routeForWorkflowsWithQuery({
-                  namespace,
-                  query: [
-                    `WorkflowType="${
-                      schedule?.schedule?.action?.startWorkflow?.workflowType
-                        ?.name
-                    }"`,
-                    `TemporalScheduledById="${scheduleId}"`,
-                  ].join(' AND '),
-                })}
-              >
-                <Icon
-                  name="filter"
-                  title="Filter scheduled workflows by this type"
-                  class="h-4 w-4"
-                />
-              </Link>
-              <button
-                class="p-1 text-secondary"
-                onclick={(e) => {
-                  copy(
-                    e,
-                    schedule?.schedule?.action?.startWorkflow?.workflowType
-                      ?.name,
-                  );
-                }}
-              >
-                <Icon
-                  title={$copied
-                    ? translate('common.copy-success-icon-title')
-                    : translate('common.copy-icon-title')}
-                  name={$copied ? 'checkmark' : 'copy'}
-                  class="h-4 w-4"
-                />
-              </button>
-            </div>
-          </dd>
-        </div>
+      <DetailList rowCount={3}>
+        <DetailListLabel class="flex min-h-6 items-center text-sm font-medium"
+          >{translate('common.workflow-type')}</DetailListLabel
+        >
+        <DetailListValue
+          class="flex min-h-6 items-center text-sm"
+          copyable={Boolean(
+            schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
+          )}
+          copyableText={schedule?.schedule?.action?.startWorkflow?.workflowType
+            ?.name}
+        >
+          {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+          <Link
+            class="mx-1 block p-1"
+            href={routeForWorkflowsWithQuery({
+              namespace,
+              query: [
+                `WorkflowType="${
+                  schedule?.schedule?.action?.startWorkflow?.workflowType?.name
+                }"`,
+                `TemporalScheduledById="${scheduleId}"`,
+              ].join(' AND '),
+            })}
+          >
+            <Icon
+              name="filter"
+              title="Filter scheduled workflows by this type"
+              class="h-4 w-4"
+            />
+          </Link>
+        </DetailListValue>
 
-        <div class="flex items-center gap-2">
-          <dt class="text-sm font-medium text-secondary">Created</dt>
-          <dd>
-            {$timestamp(schedule?.info?.createTime)}
-          </dd>
-        </div>
+        <DetailListLabel class="items-center text-sm font-medium">
+          {translate('common.created-label')}
+        </DetailListLabel>
+        <DetailListTimestampValue
+          class="font-sans text-sm"
+          timestamp={schedule?.info?.createTime}
+        />
 
         {#if schedule?.info?.updateTime}
-          <div class="flex items-center gap-2">
-            <dt class="text-sm font-medium text-secondary">Last Updated</dt>
-            <dd>
-              {$timestamp(schedule?.info?.updateTime)}
-            </dd>
-          </div>
+          <DetailListLabel class="text-sm font-medium">
+            {translate('common.last-updated')}
+          </DetailListLabel>
+          <DetailListTimestampValue
+            class="text-sm"
+            timestamp={schedule?.info?.updateTime}
+          />
         {/if}
-      </dl>
+      </DetailList>
     </div>
 
     <SplitButton
