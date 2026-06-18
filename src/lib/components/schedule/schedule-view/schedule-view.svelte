@@ -60,70 +60,16 @@
   <Link href={routeForSchedules({ namespace })} icon="chevron-left">
     {translate('schedules.back-to-schedules')}
   </Link>
-  <div class="flex items-start justify-between">
-    <div class="flex flex-col gap-2">
-      <h1
-        class="flex select-all flex-wrap items-center gap-2 text-3xl"
-        data-testid="schedule-name"
-      >
-        <WorkflowStatus
-          status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
-        />
-        {scheduleId}
-      </h1>
-
-      <DetailList rowCount={3}>
-        <DetailListLabel class="flex min-h-6 items-center text-sm font-medium"
-          >{translate('common.workflow-type')}</DetailListLabel
-        >
-        <DetailListValue
-          class="flex min-h-6 items-center text-sm"
-          copyable={Boolean(
-            schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
-          )}
-          copyableText={schedule?.schedule?.action?.startWorkflow?.workflowType
-            ?.name}
-        >
-          {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
-          <Link
-            class="mx-1 block p-1"
-            href={routeForWorkflowsWithQuery({
-              namespace,
-              query: [
-                `WorkflowType="${
-                  schedule?.schedule?.action?.startWorkflow?.workflowType?.name
-                }"`,
-                `TemporalScheduledById="${scheduleId}"`,
-              ].join(' AND '),
-            })}
-          >
-            <Icon
-              name="filter"
-              title="Filter scheduled workflows by this type"
-              class="h-4 w-4"
-            />
-          </Link>
-        </DetailListValue>
-
-        <DetailListLabel class="items-center text-sm font-medium">
-          {translate('common.created-label')}
-        </DetailListLabel>
-        <DetailListTimestampValue
-          class="font-sans text-sm"
-          timestamp={schedule?.info?.createTime}
-        />
-
-        {#if schedule?.info?.updateTime}
-          <DetailListLabel class="text-sm font-medium">
-            {translate('common.last-updated')}
-          </DetailListLabel>
-          <DetailListTimestampValue
-            class="text-sm"
-            timestamp={schedule?.info?.updateTime}
-          />
-        {/if}
-      </DetailList>
-    </div>
+  <div class="flex items-start justify-between gap-4">
+    <h1
+      class="flex select-all flex-wrap items-center gap-2 text-3xl"
+      data-testid="schedule-name"
+    >
+      <WorkflowStatus
+        status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
+      />
+      {scheduleId}
+    </h1>
 
     <SplitButton
       position="right"
@@ -162,6 +108,58 @@
       </MenuItem>
     </SplitButton>
   </div>
+
+  <DetailList rowCount={3}>
+    <DetailListLabel class="flex min-h-6 items-center text-sm font-medium"
+      >{translate('common.workflow-type')}</DetailListLabel
+    >
+    <DetailListValue
+      class="flex min-h-6 items-center text-sm"
+      copyable={Boolean(
+        schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
+      )}
+      copyableText={schedule?.schedule?.action?.startWorkflow?.workflowType
+        ?.name}
+    >
+      {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+      <Link
+        class="mx-1 block p-1"
+        href={routeForWorkflowsWithQuery({
+          namespace,
+          query: [
+            `WorkflowType="${
+              schedule?.schedule?.action?.startWorkflow?.workflowType?.name
+            }"`,
+            `TemporalScheduledById="${scheduleId}"`,
+          ].join(' AND '),
+        })}
+      >
+        <Icon
+          name="filter"
+          title="Filter scheduled workflows by this type"
+          class="h-4 w-4"
+        />
+      </Link>
+    </DetailListValue>
+
+    <DetailListLabel class="items-center text-sm font-medium">
+      {translate('common.created-label')}
+    </DetailListLabel>
+    <DetailListTimestampValue
+      class="text-sm"
+      timestamp={schedule?.info?.createTime}
+    />
+
+    {#if schedule?.info?.updateTime}
+      <DetailListLabel class="text-sm font-medium">
+        {translate('common.last-updated')}
+      </DetailListLabel>
+      <DetailListTimestampValue
+        class="text-sm"
+        timestamp={schedule?.info?.updateTime}
+      />
+    {/if}
+  </DetailList>
 
   <dl class="flex flex-col gap-2">
     <dt class="text-sm font-medium text-secondary">Total Workflows</dt>
