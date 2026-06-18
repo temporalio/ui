@@ -322,6 +322,12 @@ export const routeForFastHistory = ({
   return toURL(path, queryParams);
 };
 
+export const routeForFasterer = (
+  parameters: WorkflowParameters,
+): ResolvedPathname => {
+  return `${baseRouteForWorkflow(parameters)}/fasterer`;
+};
+
 export const routeForWorkflow = ({
   queryParams,
   ...parameters

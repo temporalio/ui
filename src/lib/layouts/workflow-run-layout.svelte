@@ -130,7 +130,10 @@
       });
     }
 
-    if (!page.url.pathname.endsWith('/fast-history')) {
+    if (
+      !page.url.pathname.endsWith('/fast-history') &&
+      !page.url.pathname.endsWith('/fasterer')
+    ) {
       $fullEventHistory = await fetchAllEvents({
         namespace,
         workflowId,

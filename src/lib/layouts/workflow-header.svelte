@@ -38,6 +38,7 @@
   import {
     routeForCallStack,
     routeForEventHistory,
+    routeForFasterer,
     routeForFastHistory,
     routeForNexusLinks,
     routeForPendingActivities,
@@ -293,6 +294,15 @@
         active={pathMatches(
           page.url.pathname,
           routeForFastHistory(routeParameters),
+        )}
+      />
+      <Tab
+        label="Fasterer"
+        id="fasterer-tab"
+        href={routeForFasterer(routeParameters)}
+        active={pathMatches(
+          page.url.pathname,
+          routeForFasterer(routeParameters),
         )}
       />
       <Tab

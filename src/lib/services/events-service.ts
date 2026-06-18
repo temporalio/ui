@@ -22,26 +22,12 @@ import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
-export type BidirectionalProgress = {
-  ascEvents: number;
-  descEvents: number;
-  ascPages: number;
-  descPages: number;
-  elapsedMs: number;
-  ascMaxId: number;
-  descMinId: number;
-  totalEstimated: number;
-};
+import type {
+  BidirectionalProgress,
+  BidirectionalStats,
+} from './fetch-bidirectional';
 
-export type BidirectionalStats = {
-  durationMs: number;
-  totalEvents: number;
-  overlap: number;
-  ascPages: number;
-  descPages: number;
-  eventsPerSecond: number;
-  winner: 'ascending' | 'descending' | 'tie';
-};
+export type { BidirectionalProgress, BidirectionalStats };
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
