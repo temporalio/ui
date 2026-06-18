@@ -297,7 +297,7 @@
         )}
       />
       <Tab
-        label="Fasterer"
+        label="Fasterer 🧚🏼‍♀️"
         id="fasterer-tab"
         href={routeForFasterer(routeParameters)}
         active={pathMatches(
