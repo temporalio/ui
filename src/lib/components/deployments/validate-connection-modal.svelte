@@ -13,14 +13,21 @@
     onRetry: () => void;
   }
 
-  let { buildId, open, loading, result, onClose, onRetry }: Props = $props();
+  let {
+    buildId,
+    open = $bindable(),
+    loading,
+    result,
+    onClose,
+    onRetry,
+  }: Props = $props();
 
   const isValid = $derived(!result?.message);
 </script>
 
 <Modal
   id="validate-connection-modal-{buildId}"
-  {open}
+  bind:open
   confirmText=""
   cancelText=""
   hideCancel
