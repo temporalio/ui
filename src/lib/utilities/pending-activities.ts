@@ -63,7 +63,7 @@ export const getGroupForEventOrPendingEvent = (
 ): EventGroup | undefined => {
   return groups.find((g) => {
     if (isEvent(event)) {
-      return g.eventIds.has(event.id);
+      return g.eventList.some((e) => e.id === event.id);
     } else if (isPendingActivity(event)) {
       return g.pendingActivity?.id === event.id;
     } else if (isPendingNexusOperation(event)) {

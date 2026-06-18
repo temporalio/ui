@@ -129,7 +129,9 @@
           {event}
           {index}
           expanded={event.id === initialEvent?.id}
-          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
+          group={groups.find(
+            (g) => isEvent(event) && g.eventList.some((e) => e.id === event.id),
+          )}
           initialItem={$fullEventHistory[0]}
         />
       {/each}

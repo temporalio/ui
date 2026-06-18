@@ -1,4 +1,4 @@
-import type { EventLink, Payload } from '$lib/types';
+import type { Payload } from '$lib/types';
 import type {
   ActivityTaskScheduledEvent,
   CommonHistoryEvent,
@@ -58,38 +58,18 @@ const createGroupFor = <K extends keyof StartingEvents>(
   const name = getEventGroupName(event);
   const label = getEventGroupLabel(event);
   const displayName = getEventGroupDisplayName(event);
-
   const { timestamp, category, classification } = event;
 
-  const groupEvents: EventGroup['events'] = new Map();
-  const groupEventIds: EventGroup['eventIds'] = new Set();
-
-  groupEvents.set(event.id, event);
-  groupEventIds.add(event.id);
-
-  // PERF CRITICAL: eventList and links were the #1 source of GC pressure on the
-  // 40k-event timeline — a CPU trace showed 19s of GC time caused by these two
-  // getters. Each call previously did Array.from(this.events, ...) allocating a
-  // brand-new array. They are called from at least 6 places per render
-  // (getDistancePointsAndPositions, isPending, isFailureOrTimedOut, isCanceled,
-  // isTerminated, billableActions), multiplied across ~10k groups = ~60k short-
-  // lived arrays per frame continuously feeding the major GC.
-  //
-  // Fix: cache behind events.size. This is safe because events are append-only
-  // (Map.set is the only mutation, never Map.delete), so size increasing is a
-  // reliable signal that the cached array is stale.
-  let _eventList: EventGroup['eventList'] | undefined;
-  let _eventListSize = 0;
-  let _links: EventLink[] | undefined;
-  let _linksSize = 0;
+  // Single flat array — no Map, no Set, no closure cache.
+  // Groups have 1–5 events so array ops are O(1) in practice.
+  const eventList: EventGroup['eventList'] = [event as never];
 
   return {
     id,
     name,
     label,
     displayName,
-    events: groupEvents,
-    eventIds: groupEventIds,
+    eventList,
     initialEvent: event,
     timestamp,
     category: isLocalActivityMarkerEvent(event) ? 'local-activity' : category,
@@ -104,19 +84,10 @@ const createGroupFor = <K extends keyof StartingEvents>(
     get attributes() {
       return getLastEvent(this)?.attributes;
     },
-    get eventList() {
-      if (!_eventList || this.events.size !== _eventListSize) {
-        _eventList = Array.from(this.events, ([_key, value]) => value);
-        _eventListSize = this.events.size;
-      }
-      return _eventList;
-    },
     get links() {
-      if (!_links || this.events.size !== _linksSize) {
-        _links = Array.from(this.events, ([_key, value]) => value.links).flat();
-        _linksSize = this.events.size;
-      }
-      return _links;
+      const out = [];
+      for (const e of eventList) for (const l of e.links) out.push(l);
+      return out;
     },
     get lastEvent() {
       return getLastEvent(this);
@@ -128,26 +99,24 @@ const createGroupFor = <K extends keyof StartingEvents>(
       return (
         !!this.pendingActivity ||
         !!this.pendingNexusOperation ||
-        (isTimerStartedEvent(this.initialEvent) &&
-          this.eventList.length === 1) ||
+        (isTimerStartedEvent(this.initialEvent) && eventList.length === 1) ||
         (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&
-          this.eventList.length === 2)
+          eventList.length === 2)
       );
     },
     get isFailureOrTimedOut() {
-      return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
+      return Boolean(eventList.find(eventIsFailureOrTimedOut));
     },
     get isCanceled() {
-      return Boolean(this.eventList.find(eventIsCanceled));
+      return Boolean(eventList.find(eventIsCanceled));
     },
     get isTerminated() {
-      return Boolean(this.eventList.find(eventIsTerminated));
+      return Boolean(eventList.find(eventIsTerminated));
     },
     get billableActions() {
-      return this.eventList.reduce(
-        (acc, event) => event.billableActions + acc,
-        0,
-      );
+      let n = 0;
+      for (const e of eventList) n += e.billableActions;
+      return n;
     },
   };
 };

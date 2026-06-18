@@ -143,7 +143,9 @@
           bind:hoveredEventId
           {event}
           {index}
-          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
+          group={groups.find(
+            (g) => isEvent(event) && g.eventList.some((e) => e.id === event.id),
+          )}
           {compact}
           {initialItem}
         />

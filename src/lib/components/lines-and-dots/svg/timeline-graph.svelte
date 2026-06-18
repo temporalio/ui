@@ -467,11 +467,10 @@
         <g use:registerRow={group.id}>
           {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
             <!--
-              PERF: Key on group.events.size (native Map property) rather than
-              group.eventList.length (a getter that allocates an array). This
-              busts the key only when new events arrive, not on every render.
+              PERF: Key on group.eventList.length so Svelte only re-renders
+              this row when new events are appended to the group.
             -->
-            {#key group.events.size}
+            {#key group.eventList.length}
               <TimelineGraphRow
                 {y}
                 {group}

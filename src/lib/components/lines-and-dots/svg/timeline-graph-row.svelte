@@ -123,7 +123,7 @@
     timelineWidth: number,
     y: number,
   ) => {
-    const cacheKey = `${endTime}|${timelineWidth}|${y}|${group.events.size}`;
+    const cacheKey = `${endTime}|${timelineWidth}|${y}|${group.eventList.length}`;
     if (_posCache && cacheKey === _posCacheKey) return _posCache;
 
     const workflowDistance = getMillisecondDuration({

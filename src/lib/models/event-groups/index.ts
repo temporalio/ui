@@ -90,8 +90,7 @@ function addToExistingGroup(
   const group = groups[id];
   if (!group) return;
 
-  group.events.set(event.id, event);
-  group.eventIds.add(event.id);
+  group.eventList.push(event);
   group.timestamp = event.timestamp;
 
   if (pa) group.pendingActivity = pa;
@@ -138,7 +137,7 @@ export const isEventGroup = (
   eventOrGroup: unknown,
 ): eventOrGroup is EventGroup => {
   if (eventOrGroup === undefined || eventOrGroup === null) return false;
-  return has(eventOrGroup, 'events');
+  return has(eventOrGroup, 'eventList');
 };
 
 export const isEventGroups = (
