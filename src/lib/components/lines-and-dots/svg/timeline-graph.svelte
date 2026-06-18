@@ -124,8 +124,9 @@
 
   // Progressive rendering: render the viewport-visible slice first, then
   // expand in idle-callback chunks so the first paint is <100ms even for 10k rows.
-  // For descending sort the visible rows are the high-index end of the array,
-  // so we slice from the tail and expand toward index 0.
+  // For descending sort the visible rows are the high-index end of the array
+  // (newest events, closest to the top of the descending viewport), so we slice
+  // from the tail and expand toward index 0.
   const visibleGroups = $derived.by(() => {
     const total = filteredGroups.length;
     if (renderedCount >= total) return filteredGroups;
@@ -432,7 +433,10 @@
         PERF SORT: rows always iterate in ascending key order — Svelte never
         reorders DOM nodes when sort changes. y is computed from the loop index
         using the ascending formula (i+2)*height or the descending mirror
-        (N+1-i)*height so that the visual order flips without any insertBefore.
+        (totalForY+1-i)*height so that the visual order flips without any
+        insertBefore. totalForY = filteredGroups.length + pendingGroupCount keeps
+        all existing rows at a stable y as new data streams in: pendingGroupCount
+        shrinks as filteredGroups grows, so totalForY ≈ constant throughout.
         The transform $effect handles the panel-shift side; it already accounts
         for reverseSort by checking (i < idx) instead of (i > idx).
       -->
