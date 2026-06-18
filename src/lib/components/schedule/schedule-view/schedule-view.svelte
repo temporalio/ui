@@ -1,10 +1,10 @@
 <script lang="ts">
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
+  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
@@ -179,19 +179,13 @@
       <span class="font-mono" data-testid="workflow-count"
         >{$workflowCount.count.toLocaleString()}
       </span>
-      <Button
-        size="xs"
-        variant="ghost"
-        leadingIcon="retry"
-        on:click={() => {
+      <CountRefreshButton
+        refresh={workflowRefresh}
+        count={$workflowCount.newCount}
+        onRefresh={() => {
           refreshCurrentScheduleFetch({ namespace, scheduleId });
-          $workflowRefresh = Date.now();
         }}
-      >
-        {#if $workflowCount.newCount > 0}
-          +{$workflowCount.newCount.toLocaleString()}
-        {/if}
-      </Button>
+      />
       <StatusCounts class="p-0" staticQuery={workflowQuery} />
     </dd>
   </dl>
