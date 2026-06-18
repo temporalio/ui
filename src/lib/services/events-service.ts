@@ -256,6 +256,7 @@ export const fetchAllEventsBidirectional = async ({
   runId,
   signal,
   onProgress,
+  onFirstPage,
   maximumPageSize,
 }: {
   namespace: string;
@@ -263,6 +264,7 @@ export const fetchAllEventsBidirectional = async ({
   runId: string;
   signal?: AbortSignal;
   onProgress?: (p: BidirectionalProgress) => void;
+  onFirstPage?: (events: CommonHistoryEvent[]) => void;
   maximumPageSize?: number;
 }): Promise<{ events: CommonHistoryEvent[]; stats: BidirectionalStats }> => {
   const t0 = performance.now();
@@ -363,6 +365,9 @@ export const fetchAllEventsBidirectional = async ({
         else tempBuf.push(e);
       }
       reportProgress();
+      if (ascPages === 1 && onFirstPage) {
+        onFirstPage(toEventHistory(events as HistoryEvent[]));
+      }
 
       if (!response.nextPageToken || gap() <= 0) {
         descCtrl.abort();

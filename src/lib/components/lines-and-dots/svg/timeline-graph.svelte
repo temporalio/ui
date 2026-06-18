@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   import { timestamp } from '$lib/components/timestamp.svelte';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { activeGroups } from '$lib/stores/active-events';
@@ -30,6 +32,8 @@
     startedAt?: number;
     onFirstRender?: (ms: number) => void;
     onAllRendered?: (ms: number) => void;
+    loading?: boolean;
+    totalExpectedEvents?: number;
   }
 
   let {
@@ -44,6 +48,8 @@
     startedAt,
     onFirstRender,
     onAllRendered,
+    loading = false,
+    totalExpectedEvents = 0,
   }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
@@ -100,6 +106,22 @@
     getFailedOrPendingGroups(groups, $eventStatusFilter),
   );
 
+  // Skeleton rows: how many unfetched event groups we expect below the loaded ones.
+  // Density = current groups per loaded event (from the first page). Applied to the
+  // remaining unloaded events to estimate how many rows will appear when they arrive.
+  // Falls back to 0.5 (2 events/group) when no events are loaded yet so skeletons
+  // appear immediately rather than waiting for the first page to derive a real density.
+  const pendingGroupCount = $derived.by(() => {
+    if (!loading || !totalExpectedEvents) return 0;
+    const loadedEvents = $fullEventHistory.length;
+    const density =
+      loadedEvents && filteredGroups.length
+        ? filteredGroups.length / loadedEvents
+        : 0.5;
+    const expectedTotal = Math.round(totalExpectedEvents * density);
+    return Math.max(0, expectedTotal - filteredGroups.length);
+  });
+
   // Progressive rendering: render the viewport-visible slice first, then
   // expand in idle-callback chunks so the first paint is <100ms even for 10k rows.
   // For descending sort the visible rows are the high-index end of the array,
@@ -112,24 +134,71 @@
     return filteredGroups.slice(0, renderedCount);
   });
 
+  // Tracks whether onAllRendered has fired for the current data set,
+  // preventing double-calls when the effect re-runs due to loading→false.
+  let _allRenderedCalled = false;
+
   $effect(() => {
     const total = filteredGroups.length;
-    // Depend on reverseSort so we reset when sort direction changes.
-    const _rs = reverseSort;
     const t0 = startedAt;
-    renderedCount = Math.min(INITIAL_COUNT, total);
+    // Read loading as a reactive dep so the effect re-runs when the fetch
+    // completes. This is required for the case where all events fit in the
+    // first page: rendering finishes before fetchComplete, so we need loading
+    // to flip false to know it's safe to report "all loaded".
+    const isLoading = loading;
+    // Read current count without making it a reactive dep. This way the effect
+    // only re-runs when filteredGroups/loading/startedAt changes, not on every
+    // renderedCount tick. If the set shrank (filter applied) we reset; if it
+    // grew (data arrived) we pick up from the existing count so already-rendered
+    // rows stay in the DOM.
+    const cur = untrack(() => renderedCount);
 
-    // Report first-row timing after the initial batch is painted.
-    if (t0 && onFirstRender) {
-      requestAnimationFrame(() => {
-        onFirstRender(performance.now() - t0);
-      });
+    if (cur === 0 || total < cur) {
+      _allRenderedCalled = false;
+      renderedCount = Math.min(INITIAL_COUNT, total);
+      if (t0 && onFirstRender) {
+        requestAnimationFrame(() => {
+          onFirstRender(performance.now() - t0);
+        });
+      }
+      if (total <= INITIAL_COUNT) {
+        if (
+          !isLoading &&
+          total > 0 &&
+          t0 &&
+          onAllRendered &&
+          !_allRenderedCalled
+        ) {
+          _allRenderedCalled = true;
+          // Double-rAF: first frame lets Svelte flush DOM updates, second frame
+          // fires after the browser has actually painted the new rows.
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              onAllRendered(performance.now() - t0);
+            });
+          });
+        }
+        return;
+      }
     }
 
-    if (total <= INITIAL_COUNT) {
-      if (t0 && onAllRendered) {
+    const effective = untrack(() => renderedCount);
+    // All rows already rendered — fire onAllRendered if fetch is also done.
+    // This path handles small datasets where rendering finished before the
+    // fetch completed, and the effect re-runs when loading flips to false.
+    if (effective >= total) {
+      if (
+        !isLoading &&
+        effective > 0 &&
+        t0 &&
+        onAllRendered &&
+        !_allRenderedCalled
+      ) {
+        _allRenderedCalled = true;
         requestAnimationFrame(() => {
-          onAllRendered(performance.now() - t0);
+          requestAnimationFrame(() => {
+            onAllRendered(performance.now() - t0);
+          });
         });
       }
       return;
@@ -141,9 +210,17 @@
     const expand = () => {
       if (cancelled) return;
       renderedCount = total;
-      if (t0 && onAllRendered) {
+      // Only report "all loaded" once the fetch is also complete. Reading
+      // `loading` here (not `isLoading`) gets the current prop value at the
+      // time the idle callback fires, which may be after fetchComplete.
+      if (!loading && t0 && onAllRendered && !_allRenderedCalled) {
+        _allRenderedCalled = true;
+        // Double-rAF: Svelte flushes DOM on the first frame, browser paints on
+        // the second, so the timestamp reflects when rows are visible on screen.
         requestAnimationFrame(() => {
-          if (!cancelled) onAllRendered(performance.now() - t0);
+          requestAnimationFrame(() => {
+            if (!cancelled) onAllRendered(performance.now() - t0);
+          });
         });
       }
     };
@@ -251,6 +328,20 @@
     }
   });
 
+  // For descending sort, rows must be placed using the *estimated* total group
+  // count so they land at the correct final y from the very first paint.
+  // Without this, the oldest events (the only ones available on the first
+  // ascending page) are placed at the top of the SVG, then jump to the bottom
+  // as more events arrive and filteredGroups.length grows.
+  // pendingGroupCount is derived from totalExpectedEvents so it includes the
+  // full expected dataset; for ascending sort the standard length is correct
+  // because new rows always append below existing ones.
+  const totalForY = $derived(
+    reverseSort && pendingGroupCount > 0
+      ? filteredGroups.length + pendingGroupCount
+      : filteredGroups.length,
+  );
+
   // PERF: timelineHeight is driven purely by panelHeight (delivered async by
   // the ResizeObserver in group-details-row). On click, panelHeight starts at
   // 0, so timelineHeight does NOT change — Line and TimelineAxis are not
@@ -259,7 +350,8 @@
   // +800px jump every click, triggering unnecessary setAttribute calls on
   // both Line components and all Axis tick marks.
   const timelineHeight = $derived(
-    Math.max(height * (filteredGroups.length + 2), 120) + panelHeight,
+    Math.max(height * (filteredGroups.length + pendingGroupCount + 2), 120) +
+      panelHeight,
   );
   const canvasHeight = $derived(timelineHeight + 120);
 </script>
@@ -349,7 +441,7 @@
           ? filteredGroups.length - visibleGroups.length + localI
           : localI}
         {@const y = reverseSort
-          ? (filteredGroups.length + 1 - i) * height
+          ? (totalForY + 1 - i) * height
           : (i + 2) * height}
         <g use:registerRow={group.id}>
           {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
@@ -372,6 +464,21 @@
         </g>
       {/each}
 
+      {#if loading && pendingGroupCount > 0}
+        {@const rectY = reverseSort
+          ? 2 * height - radius
+          : (filteredGroups.length + 2) * height - radius}
+        {@const rectH = pendingGroupCount * height + radius}
+        <rect
+          x={gutter}
+          y={rectY}
+          width={canvasWidth - gutter * 2}
+          height={rectH}
+          rx={4}
+          class="pending-block"
+        />
+      {/if}
+
       <!--
         Details panel sits above all rows in SVG paint order (last child = top).
         onHeight delivers the actual panel height back so the $effect can update
@@ -381,7 +488,7 @@
         {@const grp = filteredGroups[activeIdx]}
         {#if grp}
           {@const panelY = reverseSort
-            ? (filteredGroups.length + 1 - activeIdx) * height + 1.33 * radius
+            ? (totalForY + 1 - activeIdx) * height + 1.33 * radius
             : (activeIdx + 2) * height + 1.33 * radius}
           <GroupDetailsRow
             y={panelY}
@@ -401,5 +508,25 @@
 <style lang="postcss">
   .error {
     @apply bg-danger;
+  }
+
+  .pending-block {
+    fill: theme(colors.slate.200);
+    animation: pending-pulse 1.8s ease-in-out infinite;
+
+    :global(.dark) & {
+      fill: theme(colors.slate.700);
+    }
+  }
+
+  @keyframes pending-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+
+    50% {
+      opacity: 0.65;
+    }
   }
 </style>
