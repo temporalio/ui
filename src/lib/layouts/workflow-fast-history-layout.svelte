@@ -83,10 +83,13 @@
       onFirstPage: (firstEvents) => {
         if (!firstEvents.length) return;
         fullEventHistory.set(firstEvents);
-        // Also populate currentEventHistory so filteredEventHistory (used by
-        // EventTypeFilter and WorkflowError) derives correctly from these events.
         currentEventHistory.set(firstEvents);
         workflowActionsReady.set(true);
+      },
+      onFirstDescPage: (bookendEvents) => {
+        if (!bookendEvents.length) return;
+        fullEventHistory.set(bookendEvents);
+        currentEventHistory.set(bookendEvents);
       },
     })
       .then(({ events, stats: s }) => {
@@ -253,6 +256,7 @@
         {reverseSort}
         loading={!fetchComplete}
         totalExpectedEvents={progress?.totalEstimated ?? 0}
+        descMinId={progress?.descMinId ?? 0}
         startedAt={t0}
         onFirstRender={(ms) => {
           firstRenderMs = ms;

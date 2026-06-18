@@ -12,6 +12,12 @@
 
   import { TimelineConfig } from '../constants';
   import EndTimeInterval from '../end-time-interval.svelte';
+  import {
+    getDescStart,
+    getPendingBlockY,
+    getRowY,
+    getTotalForY,
+  } from './timeline-positioning';
 
   import GroupDetailsRow from './group-details-row.svelte';
   import Line from './line.svelte';
@@ -34,6 +40,7 @@
     onAllRendered?: (ms: number) => void;
     loading?: boolean;
     totalExpectedEvents?: number;
+    descMinId?: number;
   }
 
   let {
@@ -50,6 +57,7 @@
     onAllRendered,
     loading = false,
     totalExpectedEvents = 0,
+    descMinId = 0,
   }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
@@ -329,18 +337,24 @@
     }
   });
 
-  // For descending sort, rows must be placed using the *estimated* total group
-  // count so they land at the correct final y from the very first paint.
-  // Without this, the oldest events (the only ones available on the first
-  // ascending page) are placed at the top of the SVG, then jump to the bottom
-  // as more events arrive and filteredGroups.length grows.
-  // pendingGroupCount is derived from totalExpectedEvents so it includes the
-  // full expected dataset; for ascending sort the standard length is correct
-  // because new rows always append below existing ones.
+  const descStart = $derived(
+    getDescStart(filteredGroups, descMinId, loading, pendingGroupCount),
+  );
+
   const totalForY = $derived(
-    reverseSort && pendingGroupCount > 0
-      ? filteredGroups.length + pendingGroupCount
-      : filteredGroups.length,
+    getTotalForY(filteredGroups.length, pendingGroupCount, descStart),
+  );
+
+  const getY = $derived.by(
+    () =>
+      (i: number): number =>
+        getRowY(i, {
+          descStart,
+          pendingGroupCount,
+          totalForY,
+          reverseSort,
+          height,
+        }),
   );
 
   // PERF: timelineHeight is driven purely by panelHeight (delivered async by
@@ -444,9 +458,7 @@
         {@const i = reverseSort
           ? filteredGroups.length - visibleGroups.length + localI
           : localI}
-        {@const y = reverseSort
-          ? (totalForY + 1 - i) * height
-          : (i + 2) * height}
+        {@const y = getY(i)}
         <g use:registerRow={group.id}>
           {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
             <!--
@@ -469,9 +481,13 @@
       {/each}
 
       {#if loading && pendingGroupCount > 0}
-        {@const rectY = reverseSort
-          ? 2 * height - radius
-          : (filteredGroups.length + 2) * height - radius}
+        {@const rectY = getPendingBlockY({
+          descStart,
+          filteredGroupsLength: filteredGroups.length,
+          reverseSort,
+          height,
+          radius,
+        })}
         {@const rectH = pendingGroupCount * height + radius}
         <rect
           x={gutter}
@@ -491,9 +507,7 @@
       {#if !readOnly && activeIdx >= 0}
         {@const grp = filteredGroups[activeIdx]}
         {#if grp}
-          {@const panelY = reverseSort
-            ? (totalForY + 1 - activeIdx) * height + 1.33 * radius
-            : (activeIdx + 2) * height + 1.33 * radius}
+          {@const panelY = getY(activeIdx) + 1.33 * radius}
           <GroupDetailsRow
             y={panelY}
             group={grp}

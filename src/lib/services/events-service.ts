@@ -257,6 +257,8 @@ export const fetchAllEventsBidirectional = async ({
   signal,
   onProgress,
   onFirstPage,
+  onFirstDescPage,
+  onPage,
   maximumPageSize,
 }: {
   namespace: string;
@@ -264,7 +266,21 @@ export const fetchAllEventsBidirectional = async ({
   runId: string;
   signal?: AbortSignal;
   onProgress?: (p: BidirectionalProgress) => void;
+  /** Fires after the first ascending page resolves with just that page's events. */
   onFirstPage?: (events: CommonHistoryEvent[]) => void;
+  /**
+   * Fires after the first descending page resolves with a snapshot of ALL events
+   * accumulated so far from both cursors — sorted ascending, no duplicates.
+   * Use together with onFirstPage to render both bookends (oldest + newest) before
+   * the full fetch completes, then let .then() render the complete set.
+   */
+  onFirstDescPage?: (accumulated: CommonHistoryEvent[]) => void;
+  /**
+   * Fires after every page from either direction with a snapshot of ALL events
+   * accumulated so far — sorted ascending, no duplicates — ready for groupEvents.
+   * Use this instead of onFirstPage for per-page streaming render.
+   */
+  onPage?: (accumulated: CommonHistoryEvent[]) => void;
   maximumPageSize?: number;
 }): Promise<{ events: CommonHistoryEvent[]; stats: BidirectionalStats }> => {
   const t0 = performance.now();
@@ -304,6 +320,18 @@ export const fetchAllEventsBidirectional = async ({
   type Token = string | undefined;
 
   const gap = () => Math.max(0, descMinId - ascMaxId - 1);
+
+  // Snapshot the current slots array as a sorted, duplicate-free CommonHistoryEvent[].
+  // slots is indexed by eventId-1 so iteration order is ascending — no sort needed.
+  // Gaps in the middle (events not yet fetched by either cursor) are simply skipped.
+  const snapshotAccumulated = (): CommonHistoryEvent[] => {
+    const source = slots ?? (tempBuf as (HistoryEvent | undefined)[]);
+    const filled: HistoryEvent[] = [];
+    for (let i = 0; i < source.length; i++) {
+      if (source[i] !== undefined) filled.push(source[i]!);
+    }
+    return toEventHistory(filled);
+  };
 
   const reportProgress = () => {
     onProgress?.({
@@ -368,6 +396,7 @@ export const fetchAllEventsBidirectional = async ({
       if (ascPages === 1 && onFirstPage) {
         onFirstPage(toEventHistory(events as HistoryEvent[]));
       }
+      onPage?.(snapshotAccumulated());
 
       if (!response.nextPageToken || gap() <= 0) {
         descCtrl.abort();
@@ -428,6 +457,12 @@ export const fetchAllEventsBidirectional = async ({
         slots![parseInt(e.eventId) - 1] = e;
       }
       reportProgress();
+      const snap =
+        (onFirstDescPage && descPages === 1) || onPage
+          ? snapshotAccumulated()
+          : null;
+      if (descPages === 1) onFirstDescPage?.(snap!);
+      if (snap) onPage?.(snap);
 
       if (!response.nextPageToken || gap() <= 0) {
         ascCtrl.abort();
