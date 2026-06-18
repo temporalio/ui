@@ -120,7 +120,12 @@
   // Falls back to 0.5 (2 events/group) when no events are loaded yet so skeletons
   // appear immediately rather than waiting for the first page to derive a real density.
   const pendingGroupCount = $derived.by(() => {
-    if (!loading || !totalExpectedEvents) return 0;
+    if (!loading) return 0;
+    if (!totalExpectedEvents) {
+      // No total known yet (pre-first-progress) — show enough rows to fill a viewport
+      // so there's a skeleton from the very first paint rather than an empty timeline.
+      return filteredGroups.length === 0 ? 50 : 0;
+    }
     const loadedEvents = $fullEventHistory.length;
     const density =
       loadedEvents && filteredGroups.length
@@ -489,14 +494,14 @@
           radius,
         })}
         {@const rectH = pendingGroupCount * height + radius}
-        <rect
+        <foreignObject
           x={gutter}
           y={rectY}
           width={canvasWidth - gutter * 2}
           height={rectH}
-          rx={4}
-          class="pending-block"
-        />
+        >
+          <div class="skeleton-rows" style="height: 100%; width: 100%;"></div>
+        </foreignObject>
       {/if}
 
       <!--
@@ -528,23 +533,53 @@
     @apply bg-danger;
   }
 
-  .pending-block {
-    fill: theme(colors.slate.200);
-    animation: pending-pulse 1.8s ease-in-out infinite;
+  .skeleton-rows {
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    background-image: repeating-linear-gradient(
+      180deg,
+      transparent 0,
+      transparent 3px,
+      color-mix(in srgb, theme(colors.slate.400) 28%, transparent) 3px,
+      color-mix(in srgb, theme(colors.slate.400) 28%, transparent) 21px,
+      transparent 21px,
+      transparent 24px
+    );
 
     :global(.dark) & {
-      fill: theme(colors.slate.700);
+      background-image: repeating-linear-gradient(
+        180deg,
+        transparent 0,
+        transparent 3px,
+        color-mix(in srgb, theme(colors.slate.400) 40%, transparent) 3px,
+        color-mix(in srgb, theme(colors.slate.400) 40%, transparent) 21px,
+        transparent 21px,
+        transparent 24px
+      );
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgb(255 255 255 / 70%) 50%,
+        transparent 100%
+      );
+      animation: shimmer-lr 1.6s ease-in-out infinite;
     }
   }
 
-  @keyframes pending-pulse {
-    0%,
-    100% {
-      opacity: 0.35;
+  @keyframes shimmer-lr {
+    from {
+      transform: translateX(-100%);
     }
 
-    50% {
-      opacity: 0.65;
+    to {
+      transform: translateX(200%);
     }
   }
 </style>
