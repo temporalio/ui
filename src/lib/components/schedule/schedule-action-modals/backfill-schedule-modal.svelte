@@ -110,41 +110,49 @@
     {translate('schedules.backfill')}
   </h3>
   <div slot="content">
-    <div class="flex flex-col gap-2 p-2">
-      <DatePicker
-        id="backfill-start-date"
-        label={translate('common.start')}
-        onDateChange={(d) => (startDate = startOfDay(d))}
-        selected={startDate}
-        todayLabel={translate('common.today')}
-        closeLabel={translate('common.close')}
-        clearLabel={translate('common.clear-input-button-label')}
-      />
-      <TimePicker
-        idPrefix="backfill-start-"
-        bind:hour={startHour}
-        bind:minute={startMinute}
-        bind:second={startSecond}
-        twelveHourClock={false}
-      />
-      <DatePicker
-        id="backfill-end-date"
-        label={translate('common.end')}
-        onDateChange={(d) => (endDate = startOfDay(d))}
-        selected={endDate}
-        todayLabel={translate('common.today')}
-        closeLabel={translate('common.close')}
-        clearLabel={translate('common.clear-input-button-label')}
-        isAllowed={(d) => !isBefore(d, startDate)}
-      />
-      <TimePicker
-        idPrefix="backfill-end-"
-        bind:hour={endHour}
-        bind:minute={endMinute}
-        bind:second={endSecond}
-        twelveHourClock={false}
-        error={invalidEndTime}
-      />
+    <div class="flex flex-col gap-6 p-2">
+      <div class="flex w-full flex-col gap-2">
+        <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem))]">
+          <DatePicker
+            id="backfill-start-date"
+            label={translate('common.start')}
+            onDateChange={(d) => (startDate = startOfDay(d))}
+            selected={startDate}
+            todayLabel={translate('common.today')}
+            closeLabel={translate('common.close')}
+            clearLabel={translate('common.clear-input-button-label')}
+          />
+        </div>
+        <TimePicker
+          idPrefix="backfill-start-"
+          bind:hour={startHour}
+          bind:minute={startMinute}
+          bind:second={startSecond}
+          twelveHourClock={false}
+        />
+      </div>
+      <div class="flex w-full flex-col gap-2">
+        <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem))]">
+          <DatePicker
+            id="backfill-end-date"
+            label={translate('common.end')}
+            onDateChange={(d) => (endDate = startOfDay(d))}
+            selected={endDate}
+            todayLabel={translate('common.today')}
+            closeLabel={translate('common.close')}
+            clearLabel={translate('common.clear-input-button-label')}
+            isAllowed={(d) => !isBefore(d, startDate)}
+          />
+        </div>
+        <TimePicker
+          idPrefix="backfill-end-"
+          bind:hour={endHour}
+          bind:minute={endMinute}
+          bind:second={endSecond}
+          twelveHourClock={false}
+          error={invalidEndTime}
+        />
+      </div>
       {#if invalidEndTime}
         <span class="text-xs text-danger" role="alert">
           {translate('schedules.backfill-end-before-start')}
