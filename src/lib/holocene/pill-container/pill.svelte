@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { HTMLButtonAttributes } from 'svelte/elements';
+  import type {
+    HTMLButtonAttributes,
+    MouseEventHandler,
+  } from 'svelte/elements';
 
   import { getContext, type Snippet } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
@@ -13,7 +16,6 @@
 
   type Props = HTMLButtonAttributes & {
     id: string;
-    onClick?: () => void;
     disabled?: boolean;
     loading?: boolean;
     active?: boolean;
@@ -25,7 +27,7 @@
 
   const {
     id,
-    onClick = () => {},
+    onclick,
     disabled = false,
     loading = false,
     active = null,
@@ -33,26 +35,32 @@
     count = null,
     class: className = '',
     children,
+    ...buttonProps
   }: Props = $props();
 
   const { activePill, registerPill, selectPill } =
     getContext<PillsContext>(PILLS);
 
+  // svelte-ignore state_referenced_locally
   registerPill(id, disabled);
 
   let isActive = $derived(isNull(active) ? $activePill === id : active);
 
-  const handleClick = () => {
-    if (disabled) return;
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
+    if (disabled) {
+      return;
+    }
+
     selectPill(id);
-    onClick && onClick();
+    onclick?.(e);
   };
 </script>
 
 <button
+  {...buttonProps}
   onclick={(e) => {
     e.stopPropagation();
-    handleClick();
+    handleClick(e);
   }}
   class={merge(
     'flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm',

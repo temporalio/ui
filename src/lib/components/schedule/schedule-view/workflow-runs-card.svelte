@@ -3,6 +3,9 @@
   import Link from '$lib/holocene/link.svelte';
   import PillContainer from '$lib/holocene/pill-container/pill-container.svelte';
   import Pill from '$lib/holocene/pill-container/pill.svelte';
+  import TabButtonList from '$lib/holocene/tabs-primitive/tab-button-list.svelte';
+  import TabPanels from '$lib/holocene/tabs-primitive/tab-panels.svelte';
+  import Tabs from '$lib/holocene/tabs-primitive/tabs.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
   import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
@@ -32,10 +35,15 @@
 
   type View = 'recent' | 'upcoming';
   let view: View = $derived(recentRuns?.length ? 'recent' : 'upcoming');
-
   function handleViewClick(nextView: View) {
     view = nextView;
   }
+
+  const tabs: View[] = ['recent', 'upcoming'];
+  const tabLabel: Record<View, string> = {
+    recent: 'Recent Runs',
+    upcoming: 'Upcoming Runs',
+  };
 </script>
 
 <Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
@@ -51,31 +59,40 @@
     </Link>
   </header>
 
-  <PillContainer class="mr-auto flex flex-row p-1">
-    <Pill
-      active={view === 'recent'}
-      onClick={() => handleViewClick('recent')}
-      id={`${id}-recent`}>Recent Runs</Pill
-    >
-    <Pill
-      active={view === 'upcoming'}
-      onClick={() => handleViewClick('upcoming')}
-      id={`${id}-upcoming`}>Upcoming Runs</Pill
-    >
-  </PillContainer>
+  <Tabs {tabs} selectedTab={view} onSelectedTabChange={handleViewClick}>
+    <PillContainer class="mr-auto flex flex-row p-1">
+      <TabButtonList aria-label="Workflow Runs" class="contents">
+        {#snippet tabButtonSnippet(getTabButtonProps, { isSelected, tab })}
+          <Pill
+            {...getTabButtonProps()}
+            active={isSelected}
+            id={`${id}-${tab}`}
+          >
+            {tabLabel[tab]}
+          </Pill>
+        {/snippet}
+      </TabButtonList>
+    </PillContainer>
 
-  {#if view === 'recent'}
-    <WorkflowRunsRecent
-      {schedule}
-      {namespace}
-      {openBackfillConfirmationModal}
-      {openTriggerConfirmationModal}
-    />
-  {:else}
-    <WorkflowRunsUpcoming
-      {schedule}
-      {openBackfillConfirmationModal}
-      {openTriggerConfirmationModal}
-    />
-  {/if}
+    <TabPanels>
+      {#snippet tabPanelSnippet(getTabPanelProps, { tab })}
+        <div {...getTabPanelProps()}>
+          {#if tab === 'recent'}
+            <WorkflowRunsRecent
+              {schedule}
+              {namespace}
+              {openBackfillConfirmationModal}
+              {openTriggerConfirmationModal}
+            />
+          {:else}
+            <WorkflowRunsUpcoming
+              {schedule}
+              {openBackfillConfirmationModal}
+              {openTriggerConfirmationModal}
+            />
+          {/if}
+        </div>
+      {/snippet}
+    </TabPanels>
+  </Tabs>
 </Panel>
