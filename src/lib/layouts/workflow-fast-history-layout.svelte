@@ -84,14 +84,24 @@
         progress = p;
       },
       onFirstPage: (firstEvents) => {
-        if (!firstEvents.length || reverseSort) return;
-        fullEventHistory.set(firstEvents);
+        if (!firstEvents.length) return;
+        // Merge ascending first page into fullEventHistory so input-and-results
+        // can find the WorkflowExecutionStarted event (and its input payload)
+        // regardless of sort order.
+        fullEventHistory.update((curr) =>
+          curr.length ? [...firstEvents, ...curr] : firstEvents,
+        );
+        if (reverseSort) return;
         currentEventHistory.set(firstEvents);
         workflowActionsReady.set(true);
       },
       onFirstDescPage: (bookendEvents) => {
         if (!bookendEvents.length) return;
-        fullEventHistory.set(bookendEvents);
+        // Merge descending first page into fullEventHistory so input-and-results
+        // can also find the completion event (and its result payload).
+        fullEventHistory.update((curr) =>
+          curr.length ? [...curr, ...bookendEvents] : bookendEvents,
+        );
         currentEventHistory.set(bookendEvents);
         if (reverseSort) workflowActionsReady.set(true);
       },
