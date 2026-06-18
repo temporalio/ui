@@ -81,7 +81,7 @@
         progress = p;
       },
       onFirstPage: (firstEvents) => {
-        if (!firstEvents.length) return;
+        if (!firstEvents.length || reverseSort) return;
         fullEventHistory.set(firstEvents);
         currentEventHistory.set(firstEvents);
         workflowActionsReady.set(true);
@@ -90,6 +90,7 @@
         if (!bookendEvents.length) return;
         fullEventHistory.set(bookendEvents);
         currentEventHistory.set(bookendEvents);
+        if (reverseSort) workflowActionsReady.set(true);
       },
     })
       .then(({ events, stats: s }) => {
