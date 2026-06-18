@@ -10,7 +10,7 @@
   type Orientation = 'horizontal' | 'vertical';
   type Activation = 'automatic' | 'manual';
 
-  type TabButtonProps = HTMLAttributes<HTMLElement>;
+  type TabButtonProps = HTMLAttributes<HTMLElement> & { class?: string };
   type GetTabButtonProps = (overrides?: TabButtonProps) => TabButtonProps;
 
   interface Props extends Omit<
