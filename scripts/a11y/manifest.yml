@@ -314,6 +314,20 @@
   bucket: 3
   severity: serious
   scope: ui-main
+- slug: 2.5.8-chip-remove-button
+  sc: '2.5.8'
+  bucket: 1
+  severity: moderate
+  scope: ui-main
+  files-touched:
+    - src/lib/holocene/chip.svelte
+- slug: 2.5.8-labelhidden-checkbox
+  sc: '2.5.8'
+  bucket: 1
+  severity: serious
+  scope: ui-main
+  files-touched:
+    - src/lib/holocene/checkbox.svelte
 - slug: 2.5.8-pagination-caret-buttons
   sc: '2.5.8'
   bucket: 2
