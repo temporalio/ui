@@ -570,6 +570,7 @@
         transparent 100%
       );
       animation: shimmer-lr 1.6s ease-in-out infinite;
+      will-change: transform;
     }
   }
 

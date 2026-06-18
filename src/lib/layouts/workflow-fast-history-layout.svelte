@@ -52,6 +52,7 @@
 
   let error = $state<string | null>(null);
   let fetchComplete = $state(false);
+  let barPhase = $state<'fetching' | 'rendering' | 'done'>('fetching');
   let controller: AbortController;
 
   let t0 = 0;
@@ -68,6 +69,8 @@
     firstRenderMs = null;
     allRenderMs = null;
     fetchComplete = false;
+    barPhase = 'fetching';
+    frozenMeetCol = COLS / 2;
     controller?.abort();
     controller = new AbortController();
 
@@ -93,9 +96,24 @@
         if (reverseSort) workflowActionsReady.set(true);
       },
     })
-      .then(({ events, stats: s }) => {
+      .then(async ({ events, stats: s }) => {
         stats = s;
         loadMs = performance.now() - t0;
+        // Freeze the meeting column at the actual cursor junction, then enter
+        // rendering phase so the done-wave ripples out from that exact point.
+        const asc = Math.floor(
+          (s.ascPages / (s.ascPages + s.descPages)) * COLS,
+        );
+        const desc = Math.floor(
+          (s.descPages / (s.ascPages + s.descPages)) * COLS,
+        );
+        frozenMeetCol = Math.floor((asc + (COLS - desc)) / 2);
+        barPhase = 'rendering';
+
+        await new Promise<void>((r) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => r())),
+        );
+
         fullEventHistory.set(events);
         currentEventHistory.set(events);
         fetchComplete = true;
@@ -155,6 +173,20 @@
     if (!progress || !total || !progress.descMinId) return 0;
     return Math.min(100, ((total - progress.descMinId + 1) / total) * 100);
   });
+
+  const COLS = 40;
+  const ascCols = $derived(Math.floor((ascPct / 100) * COLS));
+  const descCols = $derived(Math.floor((descPct / 100) * COLS));
+
+  let frozenMeetCol = $state(COLS / 2);
+
+  function boxState(col: number): string {
+    if (barPhase === 'rendering') return 'box-done';
+    if (col < ascCols) return 'box-asc';
+    if (col >= COLS - descCols) return 'box-desc';
+    if (!progress) return 'box-idle';
+    return 'box-empty';
+  }
 
   const workflow = $derived($workflowRun.workflow);
 
@@ -230,23 +262,40 @@
       </p>
     {/if}
   </div>
-  {#if !fetchComplete}
+  {#if barPhase !== 'done'}
     <div
-      class="relative h-6 w-full overflow-hidden rounded-sm bg-subtle"
+      class="progress-root"
       role="progressbar"
       aria-label="Bidirectional fetch progress"
       aria-valuenow={ascPct + descPct}
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      <div
-        class="absolute left-0 top-0 h-full bg-blue-500 opacity-70 transition-[width] duration-300"
-        style="width: {ascPct}%"
-      ></div>
-      <div
-        class="absolute right-0 top-0 h-full bg-purple-500 opacity-70 transition-[width] duration-300"
-        style="width: {descPct}%"
-      ></div>
+      {#if barPhase === 'rendering'}
+        <div class="rendering-overlay" aria-hidden="true"></div>
+      {/if}
+      {#each { length: COLS } as _, col}
+        {@const state = boxState(col)}
+        {@const isFrontierAsc =
+          barPhase === 'fetching' && col === ascCols - 1 && ascCols > 0}
+        {@const isFrontierDesc =
+          barPhase === 'fetching' &&
+          col === COLS - descCols &&
+          descCols > 0 &&
+          COLS - descCols < COLS}
+        {@const delay =
+          barPhase === 'rendering' ? Math.abs(col - frozenMeetCol) * 18 : 0}
+        <div
+          class="box {state} {isFrontierAsc
+            ? 'frontier-asc'
+            : isFrontierDesc
+              ? 'frontier-desc'
+              : ''}"
+          style={barPhase === 'rendering'
+            ? `animation-delay: ${delay}ms`
+            : undefined}
+        ></div>
+      {/each}
     </div>
   {/if}
   {#if workflow}
@@ -264,6 +313,7 @@
         }}
         onAllRendered={(ms) => {
           allRenderMs = ms;
+          barPhase = 'done';
         }}
         viewportHeight={undefined}
         error={Boolean(workflowTaskFailedError)}
@@ -279,3 +329,128 @@
     runId={workflow.runId}
   />
 {/if}
+
+<style lang="postcss">
+  .progress-root {
+    @apply w-full;
+
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(40, 1fr);
+    gap: 2px;
+    height: 24px;
+  }
+
+  .box {
+    @apply rounded-sm;
+  }
+
+  .box-idle {
+    background-color: color-mix(
+      in oklab,
+      var(--color-primary, #6366f1) 8%,
+      transparent
+    );
+  }
+
+  .box-empty {
+    background-color: color-mix(in oklab, currentColor 10%, transparent);
+  }
+
+  .box-asc {
+    background-color: var(--color-blue-500, #3b82f6);
+    animation: pop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .box-desc {
+    background-color: var(--color-purple-500, #a855f7);
+    animation: pop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .box-done {
+    background-color: var(--color-green-500, #22c55e);
+    animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .frontier-asc {
+    animation: pulseBlue 0.9s ease-in-out infinite;
+    will-change: filter;
+  }
+
+  .frontier-desc {
+    animation: pulsePurple 0.9s ease-in-out infinite;
+    will-change: filter;
+  }
+
+  .rendering-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 55%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in oklab, #6366f1 20%, transparent) 25%,
+        color-mix(in oklab, #a855f7 45%, transparent) 50%,
+        color-mix(in oklab, #6366f1 20%, transparent) 75%,
+        transparent 100%
+      );
+      animation: rendering-wave 1.3s ease-in-out infinite;
+      will-change: transform;
+    }
+  }
+
+  @keyframes rendering-wave {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(182%);
+    }
+  }
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.55);
+      opacity: 0.6;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulseBlue {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+
+    50% {
+      filter: brightness(1.6) saturate(1.2);
+    }
+  }
+
+  @keyframes pulsePurple {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+
+    50% {
+      filter: brightness(1.6) saturate(1.2);
+    }
+  }
+</style>
