@@ -26,6 +26,8 @@
     openTriggerConfirmationModal,
   }: Props = $props();
 
+  const id = $props.id();
+
   const recentRuns = $derived(schedule?.info?.recentActions);
 
   type View = 'recent' | 'upcoming';
@@ -53,12 +55,12 @@
     <Pill
       active={view === 'recent'}
       onClick={() => handleViewClick('recent')}
-      id="recent">Recent Runs</Pill
+      id={`${id}-recent`}>Recent Runs</Pill
     >
     <Pill
       active={view === 'upcoming'}
       onClick={() => handleViewClick('upcoming')}
-      id="upcoming">Upcoming Runs</Pill
+      id={`${id}-upcoming`}>Upcoming Runs</Pill
     >
   </PillContainer>
 
