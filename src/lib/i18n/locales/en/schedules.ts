@@ -205,7 +205,7 @@ export const Strings = {
   'cron-shortcut-monthly': 'Monthly on {{- day}}',
   'cron-expression-label': 'Cron expression',
   'cron-format-hint':
-    'Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6)',
+    'Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6) separated by a space',
   'cron-formatting-help': 'Formatting help',
   'after-n-occurrence_one': 'After {{count}} occurrence',
   'after-n-occurrence_other': 'After {{count}} occurrences',
