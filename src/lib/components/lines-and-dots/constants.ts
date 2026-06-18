@@ -119,9 +119,12 @@ export const timelineTextPosition = (
 
 export const isMiddleEvent = (
   event: WorkflowEvent,
-  groups: EventGroups,
+  groups: EventGroups | Map<string, EventGroup>,
 ): boolean => {
-  const group = groups.find((g) => g.eventList.some((e) => e.id === event.id));
+  const group =
+    groups instanceof Map
+      ? groups.get(event.id)
+      : groups.find((g) => g.eventList.some((e) => e.id === event.id));
   if (!group) return false;
   return (
     group.eventList.findIndex((e) => e.id === event.id) === 1 &&

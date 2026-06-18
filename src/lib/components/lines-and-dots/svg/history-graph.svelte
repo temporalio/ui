@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { groupWorkflowTaskEvents } from '$lib/models/event-groups';
+  import {
+    buildGroupIndex,
+    groupWorkflowTaskEvents,
+  } from '$lib/models/event-groups';
   import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { eventFilterSort } from '$lib/stores/event-view';
   import { filteredEventHistory } from '$lib/stores/events';
@@ -22,6 +25,7 @@
     groupWorkflowTaskEvents($filteredEventHistory, $eventFilterSort),
   );
   const allGroups = $derived([...workflowTaskGroups, ...groups]);
+  const groupIndex = $derived(buildGroupIndex(allGroups));
 
   const { height, radius } = HistoryConfig;
 
@@ -68,7 +72,7 @@
       width={canvasWidth}
     >
       {#each history as event, index}
-        {@const group = getGroupForEventOrPendingEvent(allGroups, event)}
+        {@const group = getGroupForEventOrPendingEvent(groupIndex, event)}
         <HistoryGraphRowVisual
           {event}
           {group}

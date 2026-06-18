@@ -16,13 +16,14 @@ import {
 } from '$lib/utilities/is-event-type';
 
 import {
+  addEventToGroup,
   createEventGroup,
   createWorkflowTaskGroup,
 } from './create-event-group';
 import type { EventGroup, EventGroups } from './event-groups';
 import { getGroupId } from './get-group-id';
 
-export { getGroupForEvent } from './get-group-for-event';
+export { buildGroupIndex, getGroupForEvent } from './get-group-for-event';
 
 // Build O(1) lookup maps from pending arrays so the hot loop in groupEvents
 // does a single Map.get per event instead of Array.find (O(M) per event).
@@ -92,6 +93,7 @@ function addToExistingGroup(
 
   group.eventList.push(event);
   group.timestamp = event.timestamp;
+  addEventToGroup(group, event);
 
   if (pa) group.pendingActivity = pa;
   if (group.pendingActivity && group.eventList.length === 3)
