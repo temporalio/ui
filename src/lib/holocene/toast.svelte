@@ -60,6 +60,8 @@
     variant="ghost"
     icon="close"
     label={dismissLabel}
+    size="sm"
+    class="text-inherit"
     on:click={handleDismiss}
   />
 </div>
