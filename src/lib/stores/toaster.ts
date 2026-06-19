@@ -1,9 +1,13 @@
-import { get, writable, type Writable } from 'svelte/store';
+import { get, type Readable, writable, type Writable } from 'svelte/store';
 
 import type { Toast, ToastPosition } from '$lib/types/holocene';
 
+import { type Announcement, createAnnouncer } from './announcer';
+
 const toasts = writable<Toast[]>([]);
 const toastPosition = writable<ToastPosition>('bottom-right');
+const announcer = createAnnouncer();
+
 export interface Toaster extends Writable<Toast[]> {
   push: (toast: Toast) => void;
   pop: (id: string) => void;
@@ -11,6 +15,7 @@ export interface Toaster extends Writable<Toast[]> {
   toasts: Writable<Toast[]>;
   setPosition: (newPosition: ToastPosition) => void;
   position: Writable<ToastPosition>;
+  announcements: Readable<Announcement[]>;
 }
 
 const setPosition = (position: ToastPosition): void => {
@@ -25,6 +30,10 @@ const push = (toast: Toast) => {
     ...toast,
   };
   toasts.update((ts) => [...ts, toastWithDefaults]);
+  announcer.announce(
+    toastWithDefaults.message,
+    toastWithDefaults.variant === 'error' ? 'assertive' : 'polite',
+  );
   const timeoutId = setTimeout(() => {
     pop(toastWithDefaults.id);
     if (get(toasts).length === 0) {
@@ -40,6 +49,7 @@ const pop = (id: string) => {
 
 const clear = (): void => {
   toasts.set([]);
+  announcer.clear();
 };
 
 export const toaster: Toaster = {
@@ -52,4 +62,5 @@ export const toaster: Toaster = {
   update: toasts.update,
   setPosition,
   position: toastPosition,
+  announcements: announcer.messages,
 };

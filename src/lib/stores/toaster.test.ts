@@ -69,4 +69,20 @@ describe('toaster', () => {
       expect(get(toaster)).not.toContain(toast);
     });
   });
+
+  describe('announcements', () => {
+    it('announces an error toast assertively', () => {
+      toaster.push({ variant: 'error', message: 'This is an error' });
+      const announcements = get(toaster.announcements);
+      expect(announcements).toHaveLength(1);
+      expect(announcements[0].message).toBe('This is an error');
+      expect(announcements[0].politeness).toBe('assertive');
+    });
+
+    it('announces a non-error toast politely', () => {
+      toaster.push({ variant: 'success', message: 'Everything went well' });
+      const announcements = get(toaster.announcements);
+      expect(announcements[0].politeness).toBe('polite');
+    });
+  });
 });
