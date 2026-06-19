@@ -4,10 +4,11 @@
   import { cva } from 'class-variance-authority';
 
   import type { Announcement } from '$lib/stores/announcer';
-  import { toaster as toasterStore } from '$lib/stores/toaster';
+  import {
+    type Toaster as Toast,
+    toaster as toasterStore,
+  } from '$lib/stores/toaster';
   import type { ToastPosition } from '$lib/types/holocene';
-
-  import type { Toaster as Toast } from '../stores/toaster';
 
   import Link from './link.svelte';
   import LiveRegion from './live-region.svelte';
