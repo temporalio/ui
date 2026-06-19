@@ -137,6 +137,23 @@ export function makeWorkflowTaskStarted(
   } as unknown as HistoryEvent;
 }
 
+export function makeWorkflowTaskFailed(
+  eventId: number,
+  scheduledEventId: number,
+  cause = 'WorkflowWorkerUnhandledFailure',
+): HistoryEvent {
+  return {
+    ...base(eventId, 'WorkflowTaskFailed'),
+    workflowTaskFailedEventAttributes: {
+      scheduledEventId: String(scheduledEventId),
+      startedEventId: String(scheduledEventId + 1),
+      cause,
+      failure: null,
+      identity: 'worker@host',
+    },
+  } as unknown as HistoryEvent;
+}
+
 export function makeWorkflowTaskCompleted(
   eventId: number,
   scheduledEventId: number,

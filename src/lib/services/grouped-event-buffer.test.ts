@@ -5,10 +5,13 @@ import { toEventHistory } from '$lib/models/event-history';
 
 import {
   _debugState,
+  enrichGroups,
+  getGroupArray,
   getGroupCount,
   getLatestEvent,
   getLatestGroup,
   getRows,
+  getWorkflowTaskFailedEvent,
   isWorkflowTaskGroup,
   mergeHeads,
   onLatestGroup,
@@ -26,6 +29,11 @@ import {
   makeTimerGroup,
   makeWorkflowCompleted,
   makeWorkflowStarted,
+  makeWorkflowTaskCompleted,
+  makeWorkflowTaskFailed,
+  makeWorkflowTaskGroup,
+  makeWorkflowTaskScheduled,
+  makeWorkflowTaskStarted,
 } from './test-helpers/synthetic-events';
 
 // ---------------------------------------------------------------------------
@@ -617,5 +625,205 @@ describe('getGroupCount', () => {
     processEvent(makeWorkflowStarted(1), true);
     processEvent(makeWorkflowCompleted(2), true);
     expect(getGroupCount()).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 14. enrichGroups — pending activity + nexus annotation
+// ---------------------------------------------------------------------------
+
+describe('enrichGroups', () => {
+  it('sets pendingActivity on an in-flight activity group (1 event)', async () => {
+    reset(10);
+    processEvent(makeActivityScheduled(1, 'MyActivity'), true);
+
+    const pendingActivities = [
+      { activityId: '1', state: 'Started', activityType: 'MyActivity' },
+    ] as Parameters<typeof enrichGroups>[0];
+
+    enrichGroups(pendingActivities, []);
+
+    const [group] = await Promise.all(getRows(0, 1));
+    expect(group.pendingActivity).toBeDefined();
+    expect(group.pendingActivity?.activityId).toBe('1');
+  });
+
+  it('does not set pendingActivity on a completed activity group (3 events)', async () => {
+    reset(10);
+    const [s, st, c] = makeActivityGroup(1);
+    processEvent(s, true);
+    processEvent(st, true);
+    processEvent(c, true);
+
+    const pendingActivities = [
+      { activityId: '1', state: 'Started', activityType: 'TestActivity' },
+    ] as Parameters<typeof enrichGroups>[0];
+
+    enrichGroups(pendingActivities, []);
+
+    const [group] = await Promise.all(getRows(0, 1));
+    expect(group.pendingActivity).toBeUndefined();
+  });
+
+  it('clears a previously set pendingActivity when no longer pending', async () => {
+    reset(10);
+    const [s, st, c] = makeActivityGroup(1);
+    processEvent(s, true);
+    processEvent(st, true);
+    processEvent(c, true);
+
+    // First enrichment marks it pending
+    const pa = [{ activityId: '1', state: 'Started' }] as Parameters<
+      typeof enrichGroups
+    >[0];
+    enrichGroups(pa, []);
+
+    // Second enrichment with empty array (activity completed server-side)
+    enrichGroups([], []);
+
+    const [group] = await Promise.all(getRows(0, 1));
+    expect(group.pendingActivity).toBeUndefined();
+  });
+
+  it('ignores activities not in the pending list', async () => {
+    reset(10);
+    processEvent(makeActivityScheduled(1, 'MyActivity'), true);
+    enrichGroups([], []);
+
+    const [group] = await Promise.all(getRows(0, 1));
+    expect(group.pendingActivity).toBeUndefined();
+  });
+
+  it('does not touch non-activity groups', async () => {
+    reset(10);
+    const [ts, tf] = makeTimerGroup(1);
+    processEvent(ts, true);
+    processEvent(tf, true);
+
+    enrichGroups(
+      [{ activityId: '1', state: 'Started' }] as Parameters<
+        typeof enrichGroups
+      >[0],
+      [],
+    );
+
+    const [group] = await Promise.all(getRows(0, 1));
+    expect(group.pendingActivity).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 15. getWorkflowTaskFailedEvent — derives active WFT failure from buffer
+// ---------------------------------------------------------------------------
+
+describe('getWorkflowTaskFailedEvent (buffer)', () => {
+  it('returns undefined when no WFT groups exist', () => {
+    reset(10);
+    processEvent(makeActivityScheduled(1), true);
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+  });
+
+  it('returns undefined when WFT group completed normally', () => {
+    reset(10);
+    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+  });
+
+  it('returns the failed event when a WFT group has no subsequent completion', () => {
+    reset(10);
+    // WFT: Scheduled(1), Started(2), Failed(3)
+    processEvent(makeWorkflowTaskScheduled(1), true);
+    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    processEvent(makeWorkflowTaskFailed(3, 1), true);
+
+    const failed = getWorkflowTaskFailedEvent();
+    expect(failed).toBeDefined();
+    expect(failed?.eventType).toBe('WorkflowTaskFailed');
+  });
+
+  it('returns undefined when a later WFT completed after the failure (workflow recovered)', () => {
+    reset(20);
+    // First WFT: fails
+    processEvent(makeWorkflowTaskScheduled(1), true);
+    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    processEvent(makeWorkflowTaskFailed(3, 1), true);
+    // Second WFT: completes successfully (workflow recovered)
+    processEvent(makeWorkflowTaskScheduled(4), true);
+    processEvent(makeWorkflowTaskStarted(5, 4), true);
+    processEvent(makeWorkflowTaskCompleted(6, 4), true);
+
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+  });
+
+  it('returns undefined for ResetWorkflow cause (not a real failure)', () => {
+    reset(10);
+    processEvent(makeWorkflowTaskScheduled(1), true);
+    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    processEvent(makeWorkflowTaskFailed(3, 1, 'ResetWorkflow'), true);
+
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+  });
+
+  it('returns the most recent failure when multiple WFT groups fail', () => {
+    reset(20);
+    // First WFT fails
+    processEvent(makeWorkflowTaskScheduled(1), true);
+    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    processEvent(makeWorkflowTaskFailed(3, 1), true);
+    // Second WFT also fails (eventId 6 > 3)
+    processEvent(makeWorkflowTaskScheduled(4), true);
+    processEvent(makeWorkflowTaskStarted(5, 4), true);
+    processEvent(makeWorkflowTaskFailed(6, 4), true);
+
+    const failed = getWorkflowTaskFailedEvent();
+    expect(failed?.eventType).toBe('WorkflowTaskFailed');
+    expect(failed?.id).toBe('6');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 16. getGroupArray — synchronous sorted group access
+// ---------------------------------------------------------------------------
+
+describe('getGroupArray', () => {
+  it('returns groups sorted by eventId ascending', () => {
+    reset(20);
+    // Load in non-sequential order (simulates interleaved cursors)
+    const [s2, st2, c2] = makeActivityGroup(4);
+    const [s1, st1, c1] = makeActivityGroup(1);
+    for (const e of [s2, st2, c2]) processEvent(e, false); // desc cursor
+    for (const e of [s1, st1, c1]) processEvent(e, true); // asc cursor
+
+    const groups = getGroupArray();
+    expect(groups.length).toBe(2);
+    expect(Number(groups[0].id)).toBeLessThan(Number(groups[1].id));
+  });
+
+  it('excludeWorkflowTasks filters WFT groups', () => {
+    reset(20);
+    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
+    for (const e of makeActivityGroup(4)) processEvent(e, true);
+
+    const all = getGroupArray();
+    const noWft = getGroupArray({ excludeWorkflowTasks: true });
+    expect(all.length).toBe(2);
+    expect(noWft.length).toBe(1);
+    expect(noWft[0].initialEvent.eventType).toBe('ActivityTaskScheduled');
+  });
+
+  it('is stable across multiple calls', () => {
+    reset(10);
+    for (const e of makeActivityGroup(1)) processEvent(e, true);
+
+    const a = getGroupArray();
+    const b = getGroupArray();
+    expect(a.length).toBe(b.length);
+    expect(a[0].id).toBe(b[0].id);
+  });
+
+  it('returns empty array when no groups loaded', () => {
+    reset(10);
+    processEvent(makeWorkflowStarted(1), true);
+    expect(getGroupArray()).toHaveLength(0);
   });
 });

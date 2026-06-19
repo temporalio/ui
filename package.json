@@ -107,6 +107,7 @@
     "kebab-case": "^1.0.2",
     "mdast-util-from-markdown": "^2.0.1",
     "mdast-util-to-hast": "^13.2.0",
+    "pixi.js": "^8.19.0",
     "remark-stringify": "^10.0.3",
     "sveltekit-superforms": "^2.27.4",
     "tailwind-merge": "^1.14.0",

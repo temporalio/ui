@@ -4,20 +4,23 @@
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import {
-    type BidirectionalProgress,
-    type BidirectionalStats,
-    fetchBidirectional,
+  import Timeline from '$lib/components/pixi-timeline/Timeline.svelte';
+  import type { PixiRenderArgs } from '$lib/components/pixi-timeline/types';
+  import type {
+    BidirectionalProgress,
+    BidirectionalStats,
   } from '$lib/services/fetch-bidirectional';
+  import { fetchBidirectional } from '$lib/services/fetch-bidirectional';
   import {
+    assignTrackIndices,
+    getAscGroupCount,
+    getDescGroupCount,
     getGroupCount,
-    getRows,
     processEvent,
     reset as resetBuffer,
+    setEstimatedGroupCount,
   } from '$lib/services/grouped-event-buffer';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { HistoryEvent } from '$lib/types/events';
 
   const { namespace, workflow: workflowId, run: runId } = $derived(page.params);
 
@@ -39,7 +42,7 @@
   let controller: AbortController;
 
   const COLS = 40;
-  let frozenMeetCol = $state(COLS / 2);
+  let _frozenMeetCol = $state(COLS / 2);
 
   const total = $derived(
     fetchStats?.totalEvents ?? progress?.totalEstimated ?? 0,
@@ -81,10 +84,38 @@
     );
   }
 
-  const ROW_LIMIT = 1000;
-  // undefined = not yet resolved, null = resolved but filtered (WFT), EventGroup = real row
-  let rows = $state<(EventGroup | null | undefined)[]>([]);
-  let rowsResolved = $state(0);
+  let estimatedGroups = $state(0);
+
+  let pixiArgs = $state<PixiRenderArgs>({
+    poolCount: 0,
+    totalRows: 0,
+    ascCount: 0,
+    descCount: 0,
+    finalized: false,
+  });
+
+  let _pixiRafId: number | null = null;
+  function schedulePixiUpdate() {
+    if (_pixiRafId !== null) return;
+    _pixiRafId = requestAnimationFrame(() => {
+      _pixiRafId = null;
+      if (pixiArgs.finalized) return;
+      pixiArgs = {
+        poolCount: getGroupCount(),
+        totalRows: estimatedGroups,
+        ascCount: getAscGroupCount(),
+        descCount: getDescGroupCount(),
+        finalized: false,
+      };
+    });
+  }
+
+  function cancelScheduledUpdate() {
+    if (_pixiRafId !== null) {
+      cancelAnimationFrame(_pixiRafId);
+      _pixiRafId = null;
+    }
+  }
 
   function run() {
     phase = 'fetching';
@@ -97,28 +128,24 @@
     bufferAvgUsPerEvent = null;
     heapDeltaMB = null;
     eventCount = null;
-    frozenMeetCol = COLS / 2;
+    _frozenMeetCol = COLS / 2;
     controller?.abort();
     controller = new AbortController();
 
-    // Pre-allocate the buffer using historyEvents count from the workflow
-    // metadata so the first processEvent calls never need to grow the arrays.
-    const estimatedSize =
+    const historySize =
       parseInt($workflowRun.workflow?.historyEvents ?? '0') || 0;
-    resetBuffer(estimatedSize);
+    resetBuffer(historySize);
 
-    // Request the first 1000 rows RIGHT NOW before any data has arrived.
-    // Each Promise is registered in pendingResolvers and will resolve the
-    // moment processEvent() completes its group — data streams in live.
-    rows = new Array<EventGroup | null | undefined>(ROW_LIMIT).fill(undefined);
-    rowsResolved = 0;
-    const promises = getRows(0, ROW_LIMIT, { excludeWorkflowTasks: true });
-    promises.forEach((p, i) => {
-      p.then((group) => {
-        rows[i] = group ?? null;
-        rowsResolved += 1;
-      });
-    });
+    estimatedGroups = Math.max(0, Math.ceil(historySize / 2));
+    setEstimatedGroupCount(estimatedGroups);
+
+    pixiArgs = {
+      poolCount: 0,
+      totalRows: estimatedGroups,
+      ascCount: 0,
+      descCount: 0,
+      finalized: false,
+    };
 
     const heapBefore = heapNow();
     const t0 = performance.now();
@@ -140,6 +167,7 @@
         }
         bufferEventCount += events.length;
         bufferTotalMs = (bufferTotalMs ?? 0) + (performance.now() - t1);
+        schedulePixiUpdate();
       },
     })
       .then((stats) => {
@@ -153,7 +181,7 @@
         const desc = Math.floor(
           (stats.descPages / (stats.ascPages + stats.descPages)) * COLS,
         );
-        frozenMeetCol = Math.floor((asc + (COLS - desc)) / 2);
+        _frozenMeetCol = Math.floor((asc + (COLS - desc)) / 2);
 
         bufferGroupCount = getGroupCount();
         bufferAvgUsPerEvent =
@@ -166,11 +194,17 @@
           heapDeltaMB = (heapAfter - heapBefore) / (1024 * 1024);
         }
 
+        cancelScheduledUpdate();
+        assignTrackIndices();
         phase = 'done';
 
-        // Trim rows to actual group count (may be less than ROW_LIMIT)
-        const actual = getGroupCount();
-        if (actual < ROW_LIMIT) rows = rows.slice(0, actual);
+        pixiArgs = {
+          poolCount: getGroupCount(),
+          totalRows: getGroupCount(),
+          ascCount: getAscGroupCount(),
+          descCount: getDescGroupCount(),
+          finalized: true,
+        };
       })
       .catch((e: unknown) => {
         if (e instanceof Error && e.name !== 'AbortError') {
@@ -182,7 +216,10 @@
 
   onMount(() => {
     run();
-    return () => controller?.abort();
+    return () => {
+      controller?.abort();
+      if (_pixiRafId !== null) cancelAnimationFrame(_pixiRafId);
+    };
   });
 
   const fmtMs = (ms: number) =>
@@ -194,280 +231,211 @@
 
   const fmtUs = (us: number) =>
     us < 1000 ? `${us.toFixed(1)}µs` : `${(us / 1000).toFixed(2)}ms`;
+
+  let statsCollapsed = $state(false);
 </script>
 
 <PageTitle title={`Fasterer | ${workflowId}`} url={page.url.href} />
 
-<div class="flex flex-col gap-6 py-4">
-  <div class="flex items-center gap-4">
-    <h2 class="text-xl font-semibold">⚡ Fasterer</h2>
-    <p class="flex-1 text-sm text-secondary">
-      Bidirectional fetch → grouped-event-buffer
-    </p>
-    <button
-      class="rounded-md border border-subtle px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:border-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
-      onclick={run}
-      disabled={phase === 'fetching'}
-    >
-      Re-run
-    </button>
-  </div>
-
-  {#if errorMsg}
-    <p class="rounded-md bg-danger/10 px-4 py-3 text-sm text-danger">
-      {errorMsg}
-    </p>
-  {/if}
-
-  {#if phase !== 'idle'}
-    <div
-      class="progress-root"
-      role="progressbar"
-      aria-label="Bidirectional fetch progress"
-      aria-valuenow={ascPct + descPct}
-      aria-valuemin={0}
-      aria-valuemax={100}
-    >
-      {#if phase === 'done'}
-        <div class="rendering-overlay" aria-hidden="true"></div>
-      {/if}
-      {#each { length: COLS } as _, col}
-        {@const state = boxState(col)}
-        {@const isFrontierAsc =
-          phase === 'fetching' && col === ascCols - 1 && ascCols > 0}
-        {@const isFrontierDesc =
-          phase === 'fetching' &&
-          col === COLS - descCols &&
-          descCols > 0 &&
-          COLS - descCols < COLS}
-        {@const delay =
-          phase === 'done' ? Math.abs(col - frozenMeetCol) * 18 : 0}
-        <div
-          class="box {state} {isFrontierAsc
-            ? 'frontier-asc'
-            : isFrontierDesc
-              ? 'frontier-desc'
-              : ''}"
-          style={phase === 'done' ? `animation-delay: ${delay}ms` : undefined}
-        ></div>
-      {/each}
+<div class="flex h-[calc(100vh-3.5rem)] flex-col">
+  <div class="bg-surface shrink-0 border-b border-subtle">
+    <div class="flex items-center gap-4 px-4 py-2">
+      <h2 class="text-lg font-semibold">⚡ Fasterer</h2>
+      <p class="flex-1 text-sm text-secondary">
+        Bidirectional fetch → Pixi renderer
+      </p>
+      <button
+        class="rounded-md border border-subtle px-3 py-1 text-sm font-medium text-primary transition-colors hover:border-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+        onclick={run}
+        disabled={phase === 'fetching'}
+      >
+        Re-run
+      </button>
+      <button
+        class="rounded-md px-2 py-1 text-xs text-secondary hover:bg-subtle"
+        onclick={() => (statsCollapsed = !statsCollapsed)}
+      >
+        {statsCollapsed ? 'Show stats' : 'Hide stats'}
+      </button>
     </div>
-  {/if}
 
-  {#if fetchStats !== null && fetchMs !== null}
-    <div class="stats-grid">
-      <div
-        class="stat-card flex flex-col gap-3 rounded-xl border border-subtle p-5"
-      >
-        <h3
-          class="text-xs font-semibold uppercase tracking-wider text-secondary"
-        >
-          Network
-        </h3>
-        <div class="flex flex-wrap gap-5">
-          <div class="flex flex-col gap-0.5">
-            <span class="font-mono text-2xl font-bold tabular-nums text-primary"
-              >{fmtMs(fetchMs)}</span
-            >
-            <span class="text-xs text-secondary">total fetch</span>
-          </div>
-          <div class="flex flex-col gap-0.5">
-            <span class="font-mono text-2xl font-bold tabular-nums text-primary"
-              >{fetchStats.totalEvents.toLocaleString()}</span
-            >
-            <span class="text-xs text-secondary">events</span>
-          </div>
-          <div class="flex flex-col gap-0.5">
-            <span class="font-mono text-2xl font-bold tabular-nums text-primary"
-              >{fetchStats.eventsPerSecond.toLocaleString()}</span
-            >
-            <span class="text-xs text-secondary">events / sec</span>
-          </div>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <span class="badge badge-asc">↑ {fetchStats.ascPages} pages</span>
-          <span class="badge badge-desc">↓ {fetchStats.descPages} pages</span>
-          {#if fetchStats.overlap > 0}
-            <span class="badge">{fetchStats.overlap} overlap</span>
-          {/if}
-          <span class="badge badge-winner">{fetchStats.winner} won</span>
-        </div>
-      </div>
-
-      {#if bufferTotalMs !== null}
-        <div
-          class="stat-card flex flex-col gap-3 rounded-xl border border-subtle p-5"
-        >
-          <h3
-            class="text-xs font-semibold uppercase tracking-wider text-secondary"
-          >
-            Buffer
-          </h3>
-          <div class="flex flex-wrap gap-5">
-            <div class="flex flex-col gap-0.5">
-              <span
-                class="font-mono text-2xl font-bold tabular-nums text-primary"
-                >{fmtMs(bufferTotalMs)}</span
-              >
-              <span class="text-xs text-secondary">total process</span>
-            </div>
-            <div class="flex flex-col gap-0.5">
-              <span
-                class="font-mono text-2xl font-bold tabular-nums text-primary"
-              >
-                {bufferAvgUsPerEvent !== null
-                  ? fmtUs(bufferAvgUsPerEvent)
-                  : '—'}
-              </span>
-              <span class="text-xs text-secondary">avg / event</span>
-            </div>
-            <div class="flex flex-col gap-0.5">
-              <span
-                class="font-mono text-2xl font-bold tabular-nums text-primary"
-                >{bufferGroupCount?.toLocaleString()}</span
-              >
-              <span class="text-xs text-secondary">groups</span>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            {#if eventCount && bufferGroupCount}
-              <span class="badge"
-                >{(eventCount / bufferGroupCount).toFixed(1)} events / group avg</span
-              >
-            {/if}
-            {#if eventCount && bufferTotalMs}
-              <span class="badge"
-                >{Math.round(
-                  eventCount / (bufferTotalMs / 1000),
-                ).toLocaleString()} ev/s throughput</span
-              >
-            {/if}
-          </div>
-        </div>
-      {/if}
-
-      <div
-        class="stat-card flex flex-col gap-3 rounded-xl border border-subtle p-5"
-        class:opacity-60={heapDeltaMB === null}
-      >
-        <h3
-          class="text-xs font-semibold uppercase tracking-wider text-secondary"
-        >
-          Memory
-        </h3>
-        {#if heapDeltaMB !== null}
-          <div class="flex flex-wrap gap-5">
-            <div class="flex flex-col gap-0.5">
-              <span
-                class="font-mono text-2xl font-bold tabular-nums"
-                class:text-primary={heapDeltaMB <= 50}
-                class:text-warning={heapDeltaMB > 50}
-              >
-                {heapDeltaMB > 0 ? '+' : ''}{heapDeltaMB.toFixed(1)} MB
-              </span>
-              <span class="text-xs text-secondary">heap Δ (buffer pass)</span>
-            </div>
-            {#if eventCount && heapDeltaMB > 0}
-              <div class="flex flex-col gap-0.5">
-                <span
-                  class="font-mono text-2xl font-bold tabular-nums text-primary"
-                >
-                  {((heapDeltaMB * 1024 * 1024) / eventCount).toFixed(0)} B
-                </span>
-                <span class="text-xs text-secondary">bytes / event</span>
-              </div>
-            {/if}
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <span class="badge">Chrome performance.memory</span>
-          </div>
-        {:else}
-          <p class="text-sm text-secondary">
-            Not available — use Chrome for heap stats
+    {#if !statsCollapsed}
+      <div class="px-4 pb-3">
+        {#if errorMsg}
+          <p class="mb-2 rounded-md bg-danger/10 px-4 py-2 text-sm text-danger">
+            {errorMsg}
           </p>
         {/if}
-      </div>
-    </div>
-  {/if}
 
-  {#if rows.length > 0}
-    <div class="flex flex-col gap-3">
-      <div class="flex items-center justify-between">
-        <h3 class="text-sm font-semibold">
-          First {rows.length} groups
-          <span class="font-normal text-secondary"
-            >(workflow tasks excluded)</span
+        {#if phase === 'fetching'}
+          <div
+            class="progress-root mb-3"
+            role="progressbar"
+            aria-label="Bidirectional fetch progress"
+            aria-valuenow={ascPct + descPct}
+            aria-valuemin={0}
+            aria-valuemax={100}
           >
-        </h3>
-        <span class="font-mono text-xs text-secondary"
-          >{rowsResolved} / {rows.length} resolved</span
-        >
-      </div>
-      <div
-        class="rows-table overflow-x-auto rounded-xl border border-subtle"
-        role="table"
-        aria-label="Event groups"
-      >
-        <div
-          class="rows-thead surface-background border-b border-subtle px-3 py-2 font-semibold uppercase tracking-wider text-secondary"
-          role="row"
-        >
-          <span role="columnheader">#</span>
-          <span role="columnheader">name</span>
-          <span role="columnheader">classification</span>
-          <span role="columnheader">events</span>
-          <span role="columnheader">timestamp</span>
-        </div>
-        {#each rows as group, i}
-          {#if group === undefined}
+            {#each { length: COLS } as _, col (col)}
+              {@const state = boxState(col)}
+              {@const isFrontierAsc = col === ascCols - 1 && ascCols > 0}
+              {@const isFrontierDesc =
+                col === COLS - descCols &&
+                descCols > 0 &&
+                COLS - descCols < COLS}
+              <div
+                class="box {state} {isFrontierAsc
+                  ? 'frontier-asc'
+                  : isFrontierDesc
+                    ? 'frontier-desc'
+                    : ''}"
+              ></div>
+            {/each}
+          </div>
+        {/if}
+
+        {#if fetchStats !== null && fetchMs !== null}
+          <div class="stats-grid">
             <div
-              class="row border-b border-subtle px-3 py-1.5 font-mono text-secondary opacity-40 last:border-0"
-              role="row"
+              class="stat-card flex flex-col gap-2 rounded-lg border border-subtle p-3"
             >
-              <span role="cell">{i + 1}</span>
-              <span role="cell">resolving…</span>
+              <h3
+                class="text-xs font-semibold uppercase tracking-wider text-secondary"
+              >
+                Network
+              </h3>
+              <div class="flex flex-wrap gap-4">
+                <div class="flex flex-col gap-0.5">
+                  <span
+                    class="font-mono text-xl font-bold tabular-nums text-primary"
+                    >{fmtMs(fetchMs)}</span
+                  >
+                  <span class="text-xs text-secondary">total fetch</span>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <span
+                    class="font-mono text-xl font-bold tabular-nums text-primary"
+                    >{fetchStats.totalEvents.toLocaleString()}</span
+                  >
+                  <span class="text-xs text-secondary">events</span>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <span
+                    class="font-mono text-xl font-bold tabular-nums text-primary"
+                    >{fetchStats.eventsPerSecond.toLocaleString()}</span
+                  >
+                  <span class="text-xs text-secondary">ev/s</span>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="badge badge-asc">↑ {fetchStats.ascPages}p</span>
+                <span class="badge badge-desc">↓ {fetchStats.descPages}p</span>
+                {#if fetchStats.overlap > 0}
+                  <span class="badge">{fetchStats.overlap} overlap</span>
+                {/if}
+                <span class="badge badge-winner">{fetchStats.winner} won</span>
+              </div>
             </div>
-          {:else if group !== null}
+
+            {#if bufferTotalMs !== null}
+              <div
+                class="stat-card flex flex-col gap-2 rounded-lg border border-subtle p-3"
+              >
+                <h3
+                  class="text-xs font-semibold uppercase tracking-wider text-secondary"
+                >
+                  Buffer
+                </h3>
+                <div class="flex flex-wrap gap-4">
+                  <div class="flex flex-col gap-0.5">
+                    <span
+                      class="font-mono text-xl font-bold tabular-nums text-primary"
+                      >{fmtMs(bufferTotalMs)}</span
+                    >
+                    <span class="text-xs text-secondary">process</span>
+                  </div>
+                  <div class="flex flex-col gap-0.5">
+                    <span
+                      class="font-mono text-xl font-bold tabular-nums text-primary"
+                    >
+                      {bufferAvgUsPerEvent !== null
+                        ? fmtUs(bufferAvgUsPerEvent)
+                        : '—'}
+                    </span>
+                    <span class="text-xs text-secondary">avg/ev</span>
+                  </div>
+                  <div class="flex flex-col gap-0.5">
+                    <span
+                      class="font-mono text-xl font-bold tabular-nums text-primary"
+                      >{bufferGroupCount?.toLocaleString()}</span
+                    >
+                    <span class="text-xs text-secondary">groups</span>
+                  </div>
+                </div>
+              </div>
+            {/if}
+
             <div
-              class="row border-b border-subtle px-3 py-1.5 font-mono transition-colors last:border-0"
-              class:text-danger={group.isFailureOrTimedOut}
-              class:text-warning={group.isCanceled}
-              class:italic={group.isPending}
-              role="row"
+              class="stat-card flex flex-col gap-2 rounded-lg border border-subtle p-3"
+              class:opacity-60={heapDeltaMB === null}
             >
-              <span class="text-secondary" role="cell">{i + 1}</span>
-              <span
-                class="overflow-hidden text-ellipsis whitespace-nowrap"
-                role="cell"
-                >{group.displayName || group.name || group.label || '—'}</span
+              <h3
+                class="text-xs font-semibold uppercase tracking-wider text-secondary"
               >
-              <span class="text-secondary" role="cell"
-                >{group.finalClassification ?? '—'}</span
-              >
-              <span class="text-right text-secondary" role="cell"
-                >{group.eventList.length}</span
-              >
-              <span
-                class="overflow-hidden text-ellipsis whitespace-nowrap text-secondary"
-                role="cell">{group.timestamp ?? '—'}</span
-              >
+                Memory
+              </h3>
+              {#if heapDeltaMB !== null}
+                <div class="flex flex-wrap gap-4">
+                  <div class="flex flex-col gap-0.5">
+                    <span
+                      class="font-mono text-xl font-bold tabular-nums"
+                      class:text-primary={heapDeltaMB <= 50}
+                      class:text-warning={heapDeltaMB > 50}
+                    >
+                      {heapDeltaMB > 0 ? '+' : ''}{heapDeltaMB.toFixed(1)} MB
+                    </span>
+                    <span class="text-xs text-secondary">heap Δ</span>
+                  </div>
+                  {#if eventCount && heapDeltaMB > 0}
+                    <div class="flex flex-col gap-0.5">
+                      <span
+                        class="font-mono text-xl font-bold tabular-nums text-primary"
+                      >
+                        {((heapDeltaMB * 1024 * 1024) / eventCount).toFixed(0)} B
+                      </span>
+                      <span class="text-xs text-secondary">bytes/ev</span>
+                    </div>
+                  {/if}
+                </div>
+              {:else}
+                <p class="text-xs text-secondary">Chrome only</p>
+              {/if}
             </div>
-          {/if}
-        {/each}
+          </div>
+        {/if}
       </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
+
+  <div class="bg-gray-950 min-h-0 flex-1">
+    {#if pixiArgs.poolCount > 0 || phase === 'fetching'}
+      <Timeline renderArgs={pixiArgs} class="h-full" />
+    {:else if phase === 'idle'}
+      <div class="flex h-full items-center justify-center text-secondary">
+        <span class="text-sm">Waiting for data…</span>
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style lang="postcss">
-  /* Progress bar */
   .progress-root {
     position: relative;
     width: 100%;
     display: grid;
     grid-template-columns: repeat(40, 1fr);
     gap: 2px;
-    height: 24px;
+    height: 20px;
   }
 
   .box {
@@ -539,11 +507,10 @@
     }
   }
 
-  /* Stats cards */
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
   }
 
   .stat-card {
@@ -558,7 +525,7 @@
     border-radius: 9999px;
     padding: 2px 8px;
     font-family: monospace;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     background: color-mix(in oklab, currentColor 10%, transparent);
   }
 
@@ -589,25 +556,6 @@
     );
   }
 
-  /* Rows table */
-  .rows-table {
-    font-size: 0.78rem;
-  }
-
-  .rows-thead {
-    display: grid;
-    grid-template-columns: 3rem 1fr 10rem 4rem 12rem;
-    gap: 8px;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 3rem 1fr 10rem 4rem 12rem;
-    gap: 8px;
-    animation: rowIn 0.12s ease-out both;
-  }
-
-  /* Animations */
   @keyframes rendering-wave {
     from {
       transform: translateX(-100%);
@@ -649,18 +597,6 @@
 
     50% {
       filter: brightness(1.6) saturate(1.2);
-    }
-  }
-
-  @keyframes rowIn {
-    from {
-      opacity: 0;
-      transform: translateY(-2px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
     }
   }
 </style>

@@ -35,6 +35,10 @@ export type FetchBidirectionalParams = {
   /** Fires after every page with that page's raw events and direction flag.
    *  Feed directly into processEvent() to resolve buffer Promises live. */
   onRawPage: (events: HistoryEvent[], isAscending: boolean) => void;
+  /** Fires once with the raw events from the first descending page — the most
+   *  recent events in the history. Use to call setFailedEvent() before the
+   *  ascending cursor processes events that affect billableActions. */
+  onFirstDescPage?: (events: HistoryEvent[]) => void;
   maximumPageSize?: number;
 };
 
@@ -45,6 +49,7 @@ export const fetchBidirectional = async ({
   signal,
   onProgress,
   onRawPage,
+  onFirstDescPage,
   maximumPageSize,
 }: FetchBidirectionalParams): Promise<BidirectionalStats> => {
   const t0 = performance.now();
@@ -200,6 +205,7 @@ export const fetchBidirectional = async ({
         }
       }
       if (fresh.length) onRawPage(fresh, false);
+      if (descPages === 1) onFirstDescPage?.(fresh);
       reportProgress();
 
       if (!response.nextPageToken || gap() <= 0) {
