@@ -989,7 +989,14 @@ export class PixiRenderer {
     const viewEndMs = startMs + screenW / zoom;
 
     const topEdge = RULER_H;
-    const bottomEdge = screenH;
+    // Clamp bottom edge to the visible portion of the canvas inside the browser viewport.
+    // The canvas may overflow the window when the stats panel is open, so we must not
+    // draw the bottom gutter below what the user can actually see.
+    const visibleH = Math.min(
+      screenH,
+      Math.max(0, window.innerHeight - this.canvasRect.top),
+    );
+    const bottomEdge = visibleH;
 
     const aboveTracks: PinEvent[] = [];
     const belowTracks: PinEvent[] = [];
@@ -1022,6 +1029,10 @@ export class PixiRenderer {
       if (isAbove) aboveTracks.push(best);
       else belowTracks.push(best);
     }
+
+    // Sort by horizontal position so the row-packing algorithm fills left-to-right.
+    aboveTracks.sort((a, b) => a.startMs - b.startMs);
+    belowTracks.sort((a, b) => a.startMs - b.startMs);
 
     const renderPins = (
       events: PinEvent[],
