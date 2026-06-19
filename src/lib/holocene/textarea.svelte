@@ -83,7 +83,7 @@
       id={errorId}
       class="error-msg"
       class:min-width={maxLength}
-      role={!isValid ? 'alert' : null}
+      role="alert"
     >
       {#if !isValid}
         {#if error}

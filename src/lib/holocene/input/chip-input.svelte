@@ -159,31 +159,29 @@
     />
   </div>
 
-  {#if (invalid && hintText) || (maxLength && !disabled)}
-    <div class="flex justify-between gap-2">
-      <div
-        id={errorId}
-        class="error-msg"
-        class:min-width={maxLength}
-        role={invalid ? 'alert' : null}
-      >
-        {#if invalid && hintText}
-          <p>{hintText}</p>
-        {/if}
-      </div>
-      {#if maxLength && !disabled}
-        <span class="count">
-          <span
-            class="text-information"
-            class:warn={maxLength - chips.length <= 5}
-            class:error={maxLength === chips?.length}
-          >
-            {chips.length}
-          </span>&nbsp;/&nbsp;{maxLength}
-        </span>
+  <div class="flex justify-between gap-2">
+    <div
+      id={errorId}
+      class="error-msg"
+      class:min-width={maxLength}
+      role="alert"
+    >
+      {#if invalid && hintText}
+        <p>{hintText}</p>
       {/if}
     </div>
-  {/if}
+    {#if maxLength && !disabled}
+      <span class="count">
+        <span
+          class="text-information"
+          class:warn={maxLength - chips.length <= 5}
+          class:error={maxLength === chips?.length}
+        >
+          {chips.length}
+        </span>&nbsp;/&nbsp;{maxLength}
+      </span>
+    {/if}
+  </div>
 
   {#if chips.length > 0 && external}
     <div class="flex flex-row flex-wrap gap-1">

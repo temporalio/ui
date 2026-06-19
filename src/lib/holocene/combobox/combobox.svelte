@@ -685,9 +685,9 @@
     {/if}
   </Menu>
 
-  {#if showError}
-    <span id={errorId} role="alert" class="error">{error}</span>
-  {/if}
+  <span id={errorId} role="alert" class="error">
+    {#if showError}{error}{/if}
+  </span>
 </MenuContainer>
 
 <style lang="postcss">

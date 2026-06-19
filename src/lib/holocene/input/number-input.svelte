@@ -89,11 +89,14 @@
     {/if}
   </div>
 </div>
-{#if !valid && hintText}
-  <span id={errorId} role="alert" class="mt-1 text-xs text-danger"
-    >{hintText}</span
-  >
-{/if}
+<span
+  id={errorId}
+  role="alert"
+  class="text-xs text-danger"
+  class:mt-1={!valid && !!hintText}
+>
+  {#if !valid && hintText}{hintText}{/if}
+</span>
 
 <style lang="postcss">
   .search {
