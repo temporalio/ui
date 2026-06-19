@@ -142,6 +142,8 @@
         data-track-name="select"
         data-track-intent="select"
         data-track-text={label}
+        aria-invalid={showError ? 'true' : undefined}
+        aria-describedby={showError ? errorId : undefined}
       >
         {#snippet leading()}
           {#if leadingIcon}
@@ -158,8 +160,6 @@
           class:disabled
           {required}
           aria-required={required}
-          aria-invalid={showError ? 'true' : undefined}
-          aria-describedby={showError ? errorId : undefined}
           {...rest}
         />
         {#snippet trailing()}
