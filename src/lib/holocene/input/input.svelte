@@ -80,6 +80,7 @@
   const isDisabled = $derived(disabled || copyable);
   const testId = $derived(dataTestId || id);
   const errorId = $derived(`${id}-error`);
+  const hintId = $derived(`${id}-hint`);
   const showError = $derived(error || !valid);
 
   function callFocus(input: HTMLInputElement) {
@@ -137,7 +138,7 @@
         {spellcheck}
         {required}
         aria-invalid={showError ? 'true' : undefined}
-        aria-describedby={showError && hintText ? errorId : undefined}
+        aria-describedby={hintText ? (showError ? errorId : hintId) : undefined}
         {autocomplete}
         bind:value
         onclick={(e) => {
@@ -196,12 +197,14 @@
   >
     <span
       id={errorId}
-      class="hint-text inline-block"
-      class:invalid={!valid}
-      class:error
-      role={error ? 'alert' : 'status'}
+      role="alert"
+      class="hint-text error inline-block"
+      class:hidden={!showError}
     >
-      {hintText}
+      {#if showError}{hintText}{/if}
+    </span>
+    <span id={hintId} class="hint-text inline-block" class:hidden={showError}>
+      {#if !showError}{hintText}{/if}
     </span>
     {#if maxLength && !isDisabled && !hideCount}
       <span

@@ -117,7 +117,7 @@
       data-track-name="checkbox"
       data-track-intent="toggle"
       data-track-text={label}
-      aria-invalid={showError ? 'true' : undefined}
+      aria-invalid={!valid ? 'true' : undefined}
       aria-describedby={showError ? errorId : undefined}
       bind:checked
       {disabled}

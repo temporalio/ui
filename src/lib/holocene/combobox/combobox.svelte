@@ -559,7 +559,7 @@
           aria-controls="{id}-listbox"
           aria-expanded={$open}
           aria-required={required}
-          aria-invalid={showError ? 'true' : undefined}
+          aria-invalid={!valid ? 'true' : undefined}
           aria-describedby={showError ? errorId : undefined}
           aria-autocomplete="list"
           onfocus={handleFocus}

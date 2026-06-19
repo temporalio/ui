@@ -142,7 +142,7 @@
         data-track-name="select"
         data-track-intent="select"
         data-track-text={label}
-        aria-invalid={showError ? 'true' : undefined}
+        aria-invalid={!valid ? 'true' : undefined}
         aria-describedby={showError ? errorId : undefined}
       >
         {#snippet leading()}
