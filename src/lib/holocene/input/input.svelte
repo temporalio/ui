@@ -199,7 +199,7 @@
       class="hint-text inline-block"
       class:invalid={!valid}
       class:error
-      role={showError ? 'alert' : null}
+      role={error ? 'alert' : !valid ? 'status' : null}
     >
       {hintText}
     </span>
