@@ -25,7 +25,7 @@
     class?: string;
   }
 
-  export let id = '';
+  export let id: string = crypto.randomUUID();
   export let checked = false;
   export let label = '';
   export let labelHidden = false;
