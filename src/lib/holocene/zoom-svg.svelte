@@ -12,14 +12,16 @@
   export let pannable = true;
 
   let zoomLevel = initialZoom;
+  let panX = 0;
+  let panY = 0;
 
   let svg;
 
   $: viewBox = {
-    x: 0,
-    y: 0,
-    width,
-    height,
+    x: panX,
+    y: panY,
+    width: (width * zoomLevel) / initialZoom,
+    height: (height * zoomLevel) / initialZoom,
   };
 
   let isPanning = false;
@@ -33,19 +35,16 @@
 
   function panBy(dx: number, dy: number) {
     if (!pannable) return;
-    viewBox.x += dx * viewBox.width;
-    viewBox.y += dy * viewBox.height;
+    panX += dx * viewBox.width;
+    panY += dy * viewBox.height;
   }
 
   function zoomBy(factor: number, centerX = width / 2, centerY = height / 2) {
     if (!zoomable) return;
     const newZoomLevel = zoomLevel + factor;
     if (newZoomLevel < maxZoomIn || newZoomLevel > maxZoomOut) return;
-    const zoomRatio = newZoomLevel / zoomLevel;
-    viewBox.x = centerX - (centerX - viewBox.x) * zoomRatio;
-    viewBox.y = centerY - (centerY - viewBox.y) * zoomRatio;
-    viewBox.width *= zoomRatio;
-    viewBox.height *= zoomRatio;
+    panX += (centerX * (zoomLevel - newZoomLevel)) / initialZoom;
+    panY += (centerY * (zoomLevel - newZoomLevel)) / initialZoom;
     zoomLevel = newZoomLevel;
   }
 
@@ -57,20 +56,12 @@
     const mouseX = event.clientX - rect.left;
     const mouseY = event.clientY - rect.top;
 
-    const zoomAmount = event.deltaY * 0.001;
-    let newZoomLevel = zoomLevel + zoomAmount;
+    const newZoomLevel = zoomLevel + event.deltaY * 0.001;
 
     if (newZoomLevel < maxZoomIn || newZoomLevel > maxZoomOut) return;
 
-    const zoomRatio = newZoomLevel / zoomLevel;
-    const newWidth = viewBox.width * zoomRatio;
-    const newHeight = viewBox.height * zoomRatio;
-
-    viewBox.x = mouseX - (mouseX - viewBox.x) * zoomRatio;
-    viewBox.y = mouseY - (mouseY - viewBox.y) * zoomRatio;
-    viewBox.width = newWidth;
-    viewBox.height = newHeight;
-
+    panX += (mouseX * (zoomLevel - newZoomLevel)) / initialZoom;
+    panY += (mouseY * (zoomLevel - newZoomLevel)) / initialZoom;
     zoomLevel = newZoomLevel;
   };
 
@@ -79,8 +70,8 @@
     isPanning = true;
     startX = event.clientX;
     startY = event.clientY;
-    panOffsetX = viewBox.x;
-    panOffsetY = viewBox.y;
+    panOffsetX = panX;
+    panOffsetY = panY;
   }
 
   function handleMouseMove(event: MouseEvent) {
@@ -89,8 +80,8 @@
     const dx = (startX - event.clientX) * (viewBox.width / svg.clientWidth);
     const dy = (startY - event.clientY) * (viewBox.height / svg.clientHeight);
 
-    viewBox.x = panOffsetX + dx;
-    viewBox.y = panOffsetY + dy;
+    panX = panOffsetX + dx;
+    panY = panOffsetY + dy;
   }
 
   function handleMouseUp() {
@@ -102,10 +93,8 @@
   }
 
   function onCenter() {
-    viewBox.x = 0;
-    viewBox.y = 0;
-    viewBox.width = width;
-    viewBox.height = height;
+    panX = 0;
+    panY = 0;
     zoomLevel = initialZoom;
   }
 
@@ -141,6 +130,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions -->
 <div
   class="relative overflow-hidden"
   tabindex="0"
