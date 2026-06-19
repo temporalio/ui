@@ -165,7 +165,6 @@
         id={errorId}
         class="error-msg"
         class:min-width={maxLength}
-        aria-live={invalid ? 'assertive' : 'off'}
         role={invalid ? 'alert' : null}
       >
         {#if invalid && hintText}

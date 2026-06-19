@@ -83,7 +83,6 @@
       id={errorId}
       class="error-msg"
       class:min-width={maxLength}
-      aria-live={isValid ? 'off' : 'assertive'}
       role={!isValid ? 'alert' : null}
     >
       {#if !isValid}
