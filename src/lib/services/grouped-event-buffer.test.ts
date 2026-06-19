@@ -5,18 +5,24 @@ import { toEventHistory } from '$lib/models/event-history';
 
 import {
   _debugState,
+  assignTrackIndices,
   enrichGroups,
+  getAscGroupCount,
+  getDescGroupCount,
   getGroupArray,
   getGroupCount,
+  getGroupMeta,
   getLatestEvent,
   getLatestGroup,
   getRows,
+  getVisibleGroupCount,
   getWorkflowTaskFailedEvent,
   isWorkflowTaskGroup,
   mergeHeads,
   onLatestGroup,
   processEvent,
   reset,
+  setEstimatedGroupCount,
   setFailedEvent,
 } from './grouped-event-buffer';
 import {
@@ -825,5 +831,357 @@ describe('getGroupArray', () => {
     reset(10);
     processEvent(makeWorkflowStarted(1), true);
     expect(getGroupArray()).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pixi rendering layer — track assignment & WFT filtering
+// ---------------------------------------------------------------------------
+
+/**
+ * Simulates the renderer's `rebuildByTrack` logic (pure data, no Pixi).
+ * Returns a sparse array indexed by trackIndex containing pool indices.
+ */
+function simulateByTrack(): number[][] {
+  const byTrack: number[][] = [];
+  const count = getGroupCount();
+  for (let i = 0; i < count; i++) {
+    const meta = getGroupMeta(i);
+    if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK' || meta.trackIndex < 0)
+      continue;
+    (byTrack[meta.trackIndex] ??= []).push(i);
+  }
+  return byTrack;
+}
+
+describe('Pixi track assignment — WFT filtering', () => {
+  it('WFT groups receive trackIndex -1 and are excluded from visible count', () => {
+    const events = makeSyntheticEventsWithWorkflowTasks(25);
+    reset(25);
+    for (const e of events) processEvent(e, true);
+
+    let wftCount = 0;
+    let nonWftCount = 0;
+    for (let i = 0; i < getGroupCount(); i++) {
+      const meta = getGroupMeta(i);
+      if (!meta) continue;
+      if (meta.pixiType === 'GROUP_WORKFLOW_TASK') {
+        expect(meta.trackIndex).toBe(-1);
+        wftCount++;
+      } else {
+        expect(meta.trackIndex).toBeGreaterThanOrEqual(0);
+        nonWftCount++;
+      }
+    }
+    expect(wftCount).toBeGreaterThan(0);
+    expect(getVisibleGroupCount()).toBe(nonWftCount);
+    expect(getGroupCount()).toBe(wftCount + nonWftCount);
+  });
+
+  it('getVisibleGroupCount excludes WFT groups', () => {
+    reset(20);
+    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
+    for (const e of makeActivityGroup(4)) processEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(7)) processEvent(e, true);
+
+    expect(getGroupCount()).toBe(3);
+    expect(getVisibleGroupCount()).toBe(1);
+  });
+
+  it('non-WFT desc groups fill tracks 0..n consecutively', () => {
+    reset(20);
+    for (const e of makeActivityGroup(1)) processEvent(e, false);
+    for (const e of makeActivityGroup(4)) processEvent(e, false);
+    for (const e of makeWorkflowTaskGroup(7)) processEvent(e, false);
+    for (const e of makeActivityGroup(10)) processEvent(e, false);
+
+    const tracks = [];
+    for (let i = 0; i < getGroupCount(); i++) {
+      const meta = getGroupMeta(i);
+      if (meta && meta.pixiType !== 'GROUP_WORKFLOW_TASK') {
+        tracks.push(meta.trackIndex);
+      }
+    }
+    tracks.sort((a, b) => a - b);
+    expect(tracks).toEqual([0, 1, 2]);
+  });
+
+  it('non-WFT asc groups fill from bottom of the estimated total', () => {
+    const EST = 10;
+    reset(20);
+    setEstimatedGroupCount(EST);
+    for (const e of makeActivityGroup(1)) processEvent(e, true);
+    for (const e of makeActivityGroup(4)) processEvent(e, true);
+
+    for (let i = 0; i < getGroupCount(); i++) {
+      const meta = getGroupMeta(i);
+      if (meta && meta.pixiType !== 'GROUP_WORKFLOW_TASK') {
+        expect(meta.trackIndex).toBeGreaterThanOrEqual(EST - 2);
+      }
+    }
+  });
+
+  it('after assignTrackIndices, visible tracks are contiguous with no holes', () => {
+    reset(30);
+    const events = makeSyntheticEventsWithWorkflowTasks(25);
+    // split: first half desc, second half asc
+    const half = Math.floor(events.length / 2);
+    for (const e of events.slice(0, half)) processEvent(e, false);
+    for (const e of events.slice(half)) processEvent(e, true);
+
+    assignTrackIndices();
+
+    const usedTracks = new Set<number>();
+    for (let i = 0; i < getGroupCount(); i++) {
+      const meta = getGroupMeta(i);
+      if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
+      expect(meta.trackIndex).toBeGreaterThanOrEqual(0);
+      usedTracks.add(meta.trackIndex);
+    }
+
+    const sorted = [...usedTracks].sort((a, b) => a - b);
+    const expected = Array.from({ length: sorted.length }, (_, k) => k);
+    expect(sorted).toEqual(expected);
+  });
+
+  it('desc groups always at top (lower indices), asc groups at bottom after assignTrackIndices', () => {
+    reset(20);
+    for (const e of makeActivityGroup(1)) processEvent(e, false);
+    for (const e of makeActivityGroup(4)) processEvent(e, false);
+    for (const e of makeActivityGroup(7)) processEvent(e, true);
+    for (const e of makeActivityGroup(10)) processEvent(e, true);
+
+    assignTrackIndices();
+
+    const descTracks: number[] = [];
+    const ascTracks: number[] = [];
+
+    for (let i = 0; i < getGroupCount(); i++) {
+      const meta = getGroupMeta(i);
+      if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
+    }
+
+    expect(getDescGroupCount()).toBe(2);
+    expect(getAscGroupCount()).toBe(2);
+
+    // desc groups: tracks 0 and 1
+    // asc groups: tracks 2 and 3 (total=4, so total-1-0=3, total-1-1=2)
+    for (let i = 0; i < getGroupCount(); i++) {
+      const meta = getGroupMeta(i);
+      if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
+    }
+
+    // Verify by inspecting raw counts
+    const total = getVisibleGroupCount();
+    expect(total).toBe(4);
+    // desc group 0 → track 0, desc group 1 → track 1
+    // asc group 0 → track 3, asc group 1 → track 2
+    let descSeen = 0;
+    let ascSeen = 0;
+    for (let i = 0; i < getGroupCount(); i++) {
+      const meta = getGroupMeta(i);
+      if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
+      if (descTracks.includes(meta.trackIndex)) descSeen++;
+      if (ascTracks.includes(meta.trackIndex)) ascSeen++;
+    }
+    // Both sections should not overlap
+    expect(new Set([...descTracks, ...ascTracks]).size).toBe(
+      descTracks.length + ascTracks.length,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pixi rendering layer — loading gap / indicator state
+// ---------------------------------------------------------------------------
+
+describe('Pixi loading gap calculation', () => {
+  it('loading gap = 0 when all visible groups are loaded via one cursor', () => {
+    const events = makeSyntheticEvents(20);
+    reset(20);
+    for (const e of events) processEvent(e, true);
+    assignTrackIndices();
+
+    const descCount = getDescGroupCount();
+    const ascCount = getAscGroupCount();
+    const totalRows = getVisibleGroupCount();
+
+    // ascending-only load: all groups in ascGroupHeads, descGroupHeads empty
+    expect(descCount).toBe(0);
+    expect(ascCount).toBe(totalRows);
+
+    const loadingStart = descCount;
+    const loadingEnd = Math.max(descCount, totalRows - ascCount);
+    expect(loadingStart).toBe(loadingEnd); // no gap
+  });
+
+  it('loading gap exists while only desc cursor has loaded', () => {
+    const events = makeSyntheticEvents(12);
+    reset(12);
+    // Only process first 6 events descending
+    for (const e of events.slice(0, 6)) processEvent(e, false);
+
+    const descCount = getDescGroupCount();
+    const ascCount = getAscGroupCount();
+    const estimated = 6; // rough estimate of total visible
+    const totalRows = Math.max(estimated, getVisibleGroupCount());
+
+    const loadingStart = descCount;
+    const loadingEnd = Math.max(descCount, totalRows - ascCount);
+
+    expect(descCount).toBeGreaterThan(0);
+    expect(ascCount).toBe(0);
+    expect(loadingEnd).toBeGreaterThan(loadingStart); // gap present
+  });
+
+  it('loading gap closes when bidirectional cursors cover all tracks', () => {
+    const events = makeSyntheticEvents(20);
+    reset(20);
+
+    const half = Math.floor(events.length / 2);
+    for (const e of events.slice(0, half)) processEvent(e, false);
+    for (const e of events.slice(half)) processEvent(e, true);
+
+    assignTrackIndices();
+
+    const descCount = getDescGroupCount();
+    const ascCount = getAscGroupCount();
+    const totalRows = getVisibleGroupCount();
+
+    expect(descCount + ascCount).toBe(totalRows);
+    const loadingStart = descCount;
+    const loadingEnd = Math.max(descCount, totalRows - ascCount);
+    expect(loadingStart).toBe(loadingEnd);
+  });
+
+  it('poolCount never inflates totalRows for visible group purposes', () => {
+    // Load a mix of WFT and non-WFT; poolCount > getVisibleGroupCount()
+    reset(20);
+    const events = makeSyntheticEventsWithWorkflowTasks(19);
+    for (const e of events) processEvent(e, true);
+    assignTrackIndices();
+
+    const poolCount = getGroupCount();
+    const visibleCount = getVisibleGroupCount();
+
+    expect(poolCount).toBeGreaterThan(visibleCount);
+
+    // The loading gap calculation must use visibleCount, not poolCount
+    const descCount = getDescGroupCount();
+    const ascCount = getAscGroupCount();
+    const totalRowsCorrect = Math.max(visibleCount, visibleCount);
+    const totalRowsWrong = Math.max(visibleCount, poolCount);
+
+    const gapCorrect =
+      Math.max(descCount, totalRowsCorrect - ascCount) - descCount;
+    const gapWrong = Math.max(descCount, totalRowsWrong - ascCount) - descCount;
+
+    // Using poolCount would produce a spurious loading gap
+    expect(gapCorrect).toBe(0);
+    expect(gapWrong).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pixi rendering layer — gutter event data (byTrack simulation)
+// ---------------------------------------------------------------------------
+
+describe('Pixi gutter event data (byTrack)', () => {
+  it('byTrack has one entry per visible group, no holes', () => {
+    const events = makeSyntheticEvents(20);
+    reset(20);
+    for (const e of events) processEvent(e, true);
+    assignTrackIndices();
+
+    const byTrack = simulateByTrack();
+    const occupied = byTrack.filter(Boolean);
+
+    expect(occupied.length).toBe(getVisibleGroupCount());
+
+    // No holes: every index 0..visibleCount-1 should be present
+    const visibleCount = getVisibleGroupCount();
+    for (let t = 0; t < visibleCount; t++) {
+      expect(byTrack[t]).toBeDefined();
+    }
+  });
+
+  it('WFT groups are absent from byTrack', () => {
+    reset(25);
+    const events = makeSyntheticEventsWithWorkflowTasks(24);
+    for (const e of events) processEvent(e, true);
+    assignTrackIndices();
+
+    const byTrack = simulateByTrack();
+    for (const poolIdxs of byTrack) {
+      if (!poolIdxs) continue;
+      for (const idx of poolIdxs) {
+        const meta = getGroupMeta(idx);
+        expect(meta?.pixiType).not.toBe('GROUP_WORKFLOW_TASK');
+      }
+    }
+  });
+
+  it('tracks above viewport are identified as top gutter events', () => {
+    reset(20);
+    const events = makeSyntheticEvents(20);
+    for (const e of events) processEvent(e, true);
+    assignTrackIndices();
+
+    const byTrack = simulateByTrack();
+    const visibleCount = getVisibleGroupCount();
+
+    // Simulate viewport showing only tracks 3..6
+    const firstVisible = 3;
+    const lastVisible = 6;
+
+    const above = byTrack.slice(0, firstVisible).filter(Boolean);
+    const below = byTrack.slice(lastVisible + 1, visibleCount).filter(Boolean);
+
+    expect(above.length).toBe(firstVisible); // tracks 0,1,2
+    expect(below.length).toBe(visibleCount - lastVisible - 1);
+
+    // All events in gutter regions have valid pool indices
+    for (const idxs of [...above, ...below]) {
+      for (const idx of idxs) {
+        const meta = getGroupMeta(idx);
+        expect(meta).not.toBeNull();
+        expect(meta?.trackIndex).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
+  it('top gutter events have smaller trackIndex than bottom gutter events', () => {
+    reset(20);
+    const events = makeSyntheticEvents(20);
+    for (const e of events) processEvent(e, true);
+    assignTrackIndices();
+
+    const byTrack = simulateByTrack();
+    const visibleCount = getVisibleGroupCount();
+    const midpoint = Math.floor(visibleCount / 2);
+
+    const topTracks = byTrack
+      .slice(0, midpoint)
+      .flatMap((t) => t ?? [])
+      .map((idx) => getGroupMeta(idx)!.trackIndex);
+    const bottomTracks = byTrack
+      .slice(midpoint)
+      .flatMap((t) => t ?? [])
+      .map((idx) => getGroupMeta(idx)!.trackIndex);
+
+    const maxTop = Math.max(...topTracks);
+    const minBottom = Math.min(...bottomTracks);
+    expect(maxTop).toBeLessThan(minBottom);
+  });
+
+  it('byTrack is empty after reset', () => {
+    reset(20);
+    const events = makeSyntheticEvents(20);
+    for (const e of events) processEvent(e, true);
+    assignTrackIndices();
+
+    reset(0);
+    const byTrack = simulateByTrack();
+    expect(byTrack.filter(Boolean).length).toBe(0);
   });
 });

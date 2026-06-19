@@ -4,11 +4,8 @@
   import { page } from '$app/state';
 
   import { EVENT_COLORS } from '../eventColors';
-  import {
-    formatDuration,
-    getEventDisplayName,
-    getEventIcon,
-  } from '../eventUtils';
+  import { formatDuration, getEventDisplayName } from '../eventUtils';
+  import { getEventIconSvg } from '../renderer/icon-svgs';
   import { TIMELINE_CTX, type TimelineCtx } from '../timeline-ctx.svelte';
   import type { TemporalEvent } from '../types';
 
@@ -29,7 +26,7 @@
   );
 
   const displayName = $derived(getEventDisplayName(event));
-  const icon = $derived(getEventIcon(event));
+  const iconSvg = $derived(getEventIconSvg(event.eventType));
 
   const categoryLabel = $derived.by(() => {
     const t = event.eventType;
@@ -85,10 +82,16 @@
   <!-- Header -->
   <div class="flex shrink-0 items-center gap-2.5 border-b border-white/10 p-3">
     <div
-      class="flex h-7 w-7 shrink-0 items-center justify-center rounded text-[11px] font-bold"
+      class="flex h-7 w-7 shrink-0 items-center justify-center rounded p-1.5"
       style="background:{color}20; color:{color}"
     >
-      {icon}
+      {#if iconSvg}
+        {@html iconSvg}
+      {:else}
+        <span class="text-[11px] font-bold">
+          {event.eventType.replace(/^(EVENT_TYPE_|GROUP_)/, '')[0]}
+        </span>
+      {/if}
     </div>
     <div class="min-w-0 flex-1">
       <p class="truncate text-sm font-semibold text-white">{displayName}</p>

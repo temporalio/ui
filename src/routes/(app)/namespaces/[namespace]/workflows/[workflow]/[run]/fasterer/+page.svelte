@@ -16,6 +16,7 @@
     getAscGroupCount,
     getDescGroupCount,
     getGroupCount,
+    getVisibleGroupCount,
     processEvent,
     reset as resetBuffer,
     setEstimatedGroupCount,
@@ -200,7 +201,7 @@
 
         pixiArgs = {
           poolCount: getGroupCount(),
-          totalRows: getGroupCount(),
+          totalRows: getVisibleGroupCount(),
           ascCount: getAscGroupCount(),
           descCount: getDescGroupCount(),
           finalized: true,

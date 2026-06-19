@@ -1,6 +1,7 @@
 <script lang="ts">
   import { EVENT_COLORS } from '../eventColors';
   import { getEventDisplayName } from '../eventUtils';
+  import { getEventIconSvg } from '../renderer/icon-svgs';
   import type { TemporalEvent } from '../types';
 
   interface Props {
@@ -45,6 +46,7 @@
 
   const durationMs = $derived(event.endMs - event.startMs);
   const displayName = $derived(getEventDisplayName(event));
+  const iconSvg = $derived(getEventIconSvg(event.eventType));
 </script>
 
 <div
@@ -52,7 +54,16 @@
   style="left:{left}px; top:{top}px; width:{TOOLTIP_W}px"
 >
   <div class="mb-2 flex items-center gap-2">
-    <div class="h-3 w-3 shrink-0 rounded-sm" style="background:{color}"></div>
+    <div
+      class="h-4 w-4 shrink-0 rounded p-0.5"
+      style="background:{color}25; color:{color}"
+    >
+      {#if iconSvg}
+        {@html iconSvg}
+      {:else}
+        <div class="h-full w-full rounded-sm" style="background:{color}"></div>
+      {/if}
+    </div>
     <span class="truncate text-sm font-semibold text-white">{displayName}</span>
   </div>
 

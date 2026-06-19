@@ -14,6 +14,7 @@ import {
 import {
   getGroupCount,
   getGroupMeta,
+  getVisibleGroupCount,
 } from '$lib/services/grouped-event-buffer';
 
 import { EVENT_COLORS, STATUS_ALPHA } from '../eventColors';
@@ -35,6 +36,8 @@ import {
   formatTickLabel,
   pickTickInterval,
 } from './fonts';
+import { gutterIconLayout } from './gutter-layout';
+import { clampViewportStartMs } from './viewport-clamp';
 
 export const DEFAULT_CONFIG: TimelineConfig = {
   trackHeight: 28,
@@ -153,6 +156,10 @@ export class PixiRenderer {
   /** Gutter Graphics drawn above/below the main scroll container (screen-space). */
   private gutterTopGfx: Graphics;
   private gutterBottomGfx: Graphics;
+  /** Icon sprites for top/bottom gutter pins — live in screen space, not scroll space. */
+  private gutterIconContainer: Container;
+  private gutterIconSpritePool: Sprite[] = [];
+  private gutterIconSpriteIndex = 0;
 
   private viewportInitialized = false;
 
@@ -197,6 +204,7 @@ export class PixiRenderer {
     this.labelContainer = new Container();
     this.gutterTopGfx = new Graphics();
     this.gutterBottomGfx = new Graphics();
+    this.gutterIconContainer = new Container();
     this.resizeObserver = new ResizeObserver(() => {
       this.app.resize();
       this.canvasRect = this.canvas.getBoundingClientRect();
@@ -229,12 +237,13 @@ export class PixiRenderer {
       this.loadingContainer,
       this.eventLabelContainer,
     );
-    // Layer order: grid → scrolled events → gutter pins → ruler → ruler labels
+    // Layer order: grid → scrolled events → gutter bars → gutter icons → ruler → ruler labels
     this.app.stage.addChild(
       this.gridGfx,
       this.scrollContainer,
       this.gutterTopGfx,
       this.gutterBottomGfx,
+      this.gutterIconContainer,
       this.rulerGfx,
       this.labelContainer,
     );
@@ -306,7 +315,12 @@ export class PixiRenderer {
     if (isNaN(origin)) return;
     for (let i = 0; i < count; i++) {
       const meta = getGroupMeta(i);
-      if (!meta) continue;
+      if (
+        !meta ||
+        meta.pixiType === 'GROUP_WORKFLOW_TASK' ||
+        meta.trackIndex < 0
+      )
+        continue;
       const t = meta.trackIndex;
       (this.byTrack[t] ??= []).push({
         poolIdx: i,
@@ -334,7 +348,7 @@ export class PixiRenderer {
       Math.max(1, trackGap * this.state.viewport.scaleY);
     const totalTracks = Math.max(
       this.currentArgs.totalRows,
-      this.currentArgs.poolCount,
+      getVisibleGroupCount(),
     );
     return Math.max(
       0,
@@ -394,6 +408,17 @@ export class PixiRenderer {
       this.eventLabelContainer.addChild(s);
     }
     return this.iconSpritePool[idx];
+  }
+
+  private getGutterIconSprite(): Sprite {
+    const idx = this.gutterIconSpriteIndex++;
+    if (idx >= this.gutterIconSpritePool.length) {
+      const s = new Sprite();
+      s.anchor.set(0, 0.5);
+      this.gutterIconSpritePool.push(s);
+      this.gutterIconContainer.addChild(s);
+    }
+    return this.gutterIconSpritePool[idx];
   }
 
   /** Single-letter icon from pixiType — matches the prototype's text strategy. */
@@ -623,7 +648,12 @@ export class PixiRenderer {
     if (!isNaN(origin) && count > 0) {
       for (let i = 0; i < count; i++) {
         const meta = getGroupMeta(i);
-        if (!meta || meta.trackIndex !== trackIndex) continue;
+        if (
+          !meta ||
+          meta.pixiType === 'GROUP_WORKFLOW_TASK' ||
+          meta.trackIndex !== trackIndex
+        )
+          continue;
         const relStart = meta.startMs - origin;
         const relEnd = Math.max(meta.endMs - origin, relStart + 1);
         // Extend the hit zone to cover the visual minimum-width bar.
@@ -704,8 +734,10 @@ export class PixiRenderer {
     if (this.hasPendingWheel) {
       this.hasPendingWheel = false;
       if (this.pendingWheelDX !== 0) {
-        this.state.viewport.startMs +=
-          this.pendingWheelDX / this.state.viewport.zoom;
+        this.state.viewport.startMs = this.clampStartMs(
+          this.state.viewport.startMs +
+            this.pendingWheelDX / this.state.viewport.zoom,
+        );
         this.pendingWheelDX = 0;
       }
       if (this.pendingZoomFactor !== 1) {
@@ -773,7 +805,10 @@ export class PixiRenderer {
     if (!needsGeometry && !tileChanged) return;
 
     const poolCount = this.currentArgs.poolCount;
-    const totalRows = Math.max(this.currentArgs.totalRows, poolCount);
+    const totalRows = Math.max(
+      this.currentArgs.totalRows,
+      getVisibleGroupCount(),
+    );
     const descCount = this.currentArgs.descCount;
     const ascCount = this.currentArgs.ascCount;
     // Loading gap sits between the desc section (top) and asc section (bottom).
@@ -835,7 +870,7 @@ export class PixiRenderer {
     if (!isNaN(origin)) {
       for (let i = 0; i < poolCount; i++) {
         const meta = getGroupMeta(i);
-        if (!meta) continue;
+        if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
 
         const relStart = meta.startMs - origin;
         const relEnd = Math.max(meta.endMs - origin, relStart + 1);
@@ -978,14 +1013,18 @@ export class PixiRenderer {
     this.gutterBottomGfx.clear();
     this.topPins = [];
     this.bottomPins = [];
+    this.gutterIconSpriteIndex = 0;
     // NOTE: pinnedPoolIdxs is cleared at the start of the render loop
     // (before left/right pins are collected). Top/bottom pins are additive.
 
-    if (this.byTrack.length === 0) return;
+    if (this.byTrack.length === 0) {
+      for (const s of this.gutterIconSpritePool) s.visible = false;
+      return;
+    }
 
-    const PIN_H = Math.max(6, Math.min(12, effectiveTrackH * 0.6));
+    const PIN_H = Math.max(12, Math.min(18, effectiveTrackH * 0.75));
     const PIN_MARGIN = 4;
-    const MIN_PIN_W = 8;
+    const MIN_PIN_W = PIN_H;
     const viewEndMs = startMs + screenW / zoom;
 
     const topEdge = RULER_H;
@@ -1083,8 +1122,23 @@ export class PixiRenderer {
           const alpha = (STATUS_ALPHA[ev.pixiStatus] ?? 1.0) * 0.85;
           gfx.roundRect(px, py, pw, PIN_H, 2).fill({ color, alpha });
 
-          if (pw >= 18) {
-            // Label would require a pooled BitmapText — for now rely on tooltip
+          if (this.iconTextures) {
+            const iconName = PIXI_TYPE_TO_ICON[ev.pixiType];
+            if (iconName && this.iconTextures[iconName]) {
+              const {
+                x: ix,
+                y: iy,
+                size: iSize,
+              } = gutterIconLayout(px, py, pw, PIN_H);
+              const sprite = this.getGutterIconSprite();
+              sprite.texture = this.iconTextures[iconName];
+              sprite.x = ix;
+              sprite.y = iy;
+              sprite.width = iSize;
+              sprite.height = iSize;
+              sprite.visible = true;
+              sprite.alpha = alpha;
+            }
           }
           store.push({ poolIdx: ev.poolIdx, px, py, pw, ph: PIN_H });
           this.pinnedPoolIdxs.add(ev.poolIdx);
@@ -1094,6 +1148,14 @@ export class PixiRenderer {
 
     renderPins(aboveTracks, 'top', this.topPins, this.gutterTopGfx);
     renderPins(belowTracks, 'bottom', this.bottomPins, this.gutterBottomGfx);
+
+    for (
+      let i = this.gutterIconSpriteIndex;
+      i < this.gutterIconSpritePool.length;
+      i++
+    ) {
+      this.gutterIconSpritePool[i].visible = false;
+    }
   }
 
   /**
@@ -1168,8 +1230,9 @@ export class PixiRenderer {
             const deltaXMs =
               (x - this.panState.startX) / this.state.viewport.zoom;
             const deltaYPx = y - this.panState.startY;
-            this.state.viewport.startMs =
-              this.panState.originStartMs - deltaXMs;
+            this.state.viewport.startMs = this.clampStartMs(
+              this.panState.originStartMs - deltaXMs,
+            );
             this.state.viewport.scrollY = Math.max(
               0,
               Math.min(
@@ -1276,6 +1339,15 @@ export class PixiRenderer {
     );
   }
 
+  private clampStartMs(startMs: number): number {
+    return clampViewportStartMs(
+      startMs,
+      this.state.dataRange,
+      this.state.viewport.zoom,
+      this.app.screen.width || 1200,
+    );
+  }
+
   private applyZoom(factor: number, clientX: number, clientY: number) {
     const pos = {
       x: clientX - this.canvasRect.left,
@@ -1291,7 +1363,9 @@ export class PixiRenderer {
     if (newZoom !== viewport.zoom) {
       const mouseMs = viewport.startMs + pos.x / viewport.zoom;
       this.state.viewport.zoom = newZoom;
-      this.state.viewport.startMs = mouseMs - pos.x / newZoom;
+      this.state.viewport.startMs = this.clampStartMs(
+        mouseMs - pos.x / newZoom,
+      );
     }
 
     const minScaleY = 12 / trackHeight;

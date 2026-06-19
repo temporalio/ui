@@ -342,7 +342,10 @@ export function processEvent(
 
   eventToGroup[slotIdx] = poolIdx + 1;
 
-  if (isAscending) {
+  if (meta.pixiType === 'GROUP_WORKFLOW_TASK') {
+    // WFT groups are tracked in the pool but not rendered; skip track assignment.
+    meta.trackIndex = -1;
+  } else if (isAscending) {
     ascGroupHeads.push(slotIdx);
     // Fill from bottom: first asc group (oldest) → row (estimated - 1), etc.
     const estTotal =
@@ -614,7 +617,8 @@ export function getDescGroupCount(): number {
  * Also updates pixiStatus now that final classification is known.
  */
 export function assignTrackIndices(): void {
-  const total = poolTop;
+  // Only non-WFT groups are in the head lists, so this total is the visible track count.
+  const total = descGroupHeads.length + ascGroupHeads.length;
 
   // Descending groups arrive newest-first, so descGroupHeads[0] = newest event.
   for (let i = 0; i < descGroupHeads.length; i++) {
@@ -635,6 +639,11 @@ export function assignTrackIndices(): void {
     meta.trackIndex = total - 1 - i;
     if (meta.group) meta.pixiStatus = groupToPixiStatus(meta.group);
   }
+}
+
+/** Number of visible (non-WFT) groups registered so far. */
+export function getVisibleGroupCount(): number {
+  return descGroupHeads.length + ascGroupHeads.length;
 }
 
 /** Read-only view of internal state for assertions in tests. */
