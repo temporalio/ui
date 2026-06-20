@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { clampViewportStartMs } from './viewport-clamp';
+import {
+  clampScaleY,
+  clampViewportStartMs,
+  MAX_SCALE_Y,
+} from './viewport-clamp';
 
 const DATA: { startMs: number; endMs: number } = { startMs: 0, endMs: 1000 };
 const ZOOM = 1; // 1 px/ms  →  halfSpanMs = screenW / 2
@@ -106,5 +110,75 @@ describe('clampViewportStartMs — edge: data fits entirely within viewport', ()
     const result = clampViewportStartMs(0, tiny, ZOOM, SCREEN_W);
     expect(result).toBe(max); // clamped to max since 0 > max (-90)
     expect(result).toBeGreaterThanOrEqual(min);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// clampScaleY — Y zoom limits
+// ---------------------------------------------------------------------------
+
+const TRACK_H = 28; // matches PixiRenderer default config
+const MIN_ROW_PX = 12; // default minRowPx
+
+describe('clampScaleY — maximum (rows never taller than default)', () => {
+  it('MAX_SCALE_Y is 1.0', () => {
+    expect(MAX_SCALE_Y).toBe(1.0);
+  });
+
+  it('at MAX_SCALE_Y, row height equals trackHeight exactly', () => {
+    const rowHeight = TRACK_H * MAX_SCALE_Y;
+    expect(rowHeight).toBe(TRACK_H);
+  });
+
+  it('clamps to MAX_SCALE_Y when candidate exceeds it', () => {
+    expect(clampScaleY(2, TRACK_H)).toBe(MAX_SCALE_Y);
+    expect(clampScaleY(5, TRACK_H)).toBe(MAX_SCALE_Y);
+    expect(clampScaleY(100, TRACK_H)).toBe(MAX_SCALE_Y);
+  });
+
+  it('passes through a value exactly at MAX_SCALE_Y', () => {
+    expect(clampScaleY(MAX_SCALE_Y, TRACK_H)).toBe(MAX_SCALE_Y);
+  });
+
+  it('passes through a value below MAX_SCALE_Y', () => {
+    expect(clampScaleY(0.5, TRACK_H)).toBe(0.5);
+    expect(clampScaleY(0.8, TRACK_H)).toBe(0.8);
+  });
+});
+
+describe('clampScaleY — minimum (rows stay readable)', () => {
+  it('default min gives 12px rows', () => {
+    const minScaleY = MIN_ROW_PX / TRACK_H;
+    expect(clampScaleY(0, TRACK_H)).toBe(minScaleY);
+    expect(clampScaleY(-99, TRACK_H)).toBe(minScaleY);
+  });
+
+  it('passes through a value exactly at the minimum', () => {
+    const min = MIN_ROW_PX / TRACK_H;
+    expect(clampScaleY(min, TRACK_H)).toBe(min);
+  });
+
+  it('custom minRowPx changes the floor', () => {
+    const result = clampScaleY(0, TRACK_H, 8);
+    expect(result).toBe(8 / TRACK_H);
+  });
+});
+
+describe('clampScaleY — row height invariant', () => {
+  it('resulting row height is always between minRowPx and trackHeight', () => {
+    const candidates = [-5, 0, 0.3, 0.5, 0.71, 1.0, 1.5, 5, 100];
+    for (const c of candidates) {
+      const scale = clampScaleY(c, TRACK_H);
+      const rowH = scale * TRACK_H;
+      expect(rowH).toBeGreaterThanOrEqual(MIN_ROW_PX);
+      expect(rowH).toBeLessThanOrEqual(TRACK_H);
+    }
+  });
+
+  it('at max zoom, row height is exactly trackHeight (2× icon size)', () => {
+    const ICON_SIZE = 14;
+    const maxScale = clampScaleY(999, TRACK_H);
+    expect(maxScale * TRACK_H).toBe(TRACK_H);
+    expect(TRACK_H).toBe(ICON_SIZE * 2); // documents the 2× relationship
   });
 });

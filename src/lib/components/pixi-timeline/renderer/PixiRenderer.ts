@@ -37,7 +37,7 @@ import {
   pickTickInterval,
 } from './fonts';
 import { gutterIconLayout } from './gutter-layout';
-import { clampViewportStartMs } from './viewport-clamp';
+import { clampScaleY, clampViewportStartMs } from './viewport-clamp';
 
 export const DEFAULT_CONFIG: TimelineConfig = {
   trackHeight: 28,
@@ -1368,11 +1368,7 @@ export class PixiRenderer {
       );
     }
 
-    const minScaleY = 12 / trackHeight;
-    const newScaleY = Math.max(
-      minScaleY,
-      Math.min(5, viewport.scaleY * factor),
-    );
+    const newScaleY = clampScaleY(viewport.scaleY * factor, trackHeight);
     if (newScaleY !== viewport.scaleY) {
       const oldRowSize =
         trackHeight * viewport.scaleY + Math.max(1, trackGap * viewport.scaleY);
