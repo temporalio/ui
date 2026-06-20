@@ -87,4 +87,13 @@ describe('createAnnouncer', () => {
     vi.advanceTimersByTime(2000);
     expect(get(announcer.messages)).toHaveLength(0);
   });
+
+  it('keeps a longer-duration message until its duration on a default announcer', () => {
+    const announcer = createAnnouncer();
+    announcer.announce('Long', 'polite', 10000);
+    vi.advanceTimersByTime(7000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(3000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
 });
