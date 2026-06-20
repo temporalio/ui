@@ -33,6 +33,7 @@ const push = (toast: Toast) => {
   announcer.announce(
     toastWithDefaults.message,
     toastWithDefaults.variant === 'error' ? 'assertive' : 'polite',
+    toastWithDefaults.duration,
   );
   const timeoutId = setTimeout(() => {
     pop(toastWithDefaults.id);

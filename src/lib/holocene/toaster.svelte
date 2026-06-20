@@ -50,7 +50,7 @@
 </script>
 
 <div class={toast({ position: $position })}>
-  <LiveRegion messages={liveMessages} />
+  <LiveRegion messages={liveMessages} data-testid="toast-live-region" />
   {#each $toasts as { message, variant, id, link } (id)}
     <ToastComponent {closeButtonLabel} {variant} {id} on:dismiss={dismissToast}>
       {#if link}

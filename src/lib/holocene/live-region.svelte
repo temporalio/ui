@@ -6,7 +6,7 @@
     'data-testid'?: string;
   }
 
-  let { messages, ...rest }: Props = $props();
+  let { messages, 'data-testid': testid }: Props = $props();
 
   const polite = $derived(
     messages.filter((message) => message.politeness === 'polite'),
@@ -16,12 +16,22 @@
   );
 </script>
 
-<div class="sr-only" aria-live="polite" aria-relevant="additions" {...rest}>
+<div
+  class="sr-only"
+  aria-live="polite"
+  aria-relevant="additions"
+  data-testid={testid ? `${testid}-polite` : undefined}
+>
   {#each polite as { id, message } (id)}
     <div>{message}</div>
   {/each}
 </div>
-<div class="sr-only" aria-live="assertive" aria-relevant="additions">
+<div
+  class="sr-only"
+  aria-live="assertive"
+  aria-relevant="additions"
+  data-testid={testid ? `${testid}-assertive` : undefined}
+>
   {#each assertive as { id, message } (id)}
     <div>{message}</div>
   {/each}

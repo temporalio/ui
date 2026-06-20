@@ -1,12 +1,17 @@
 import { get } from 'svelte/store';
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { toaster } from './toaster';
 
 describe('toaster', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
   afterEach(() => {
     toaster.clear();
+    vi.useRealTimers();
   });
 
   it('should have a subscribe function', () => {
@@ -83,6 +88,14 @@ describe('toaster', () => {
       toaster.push({ variant: 'success', message: 'Everything went well' });
       const announcements = get(toaster.announcements);
       expect(announcements[0].politeness).toBe('polite');
+    });
+
+    it('announcement persists at least as long as the toast duration', () => {
+      toaster.push({ variant: 'success', message: 'Saved', duration: 10000 });
+      vi.advanceTimersByTime(7000);
+      expect(get(toaster.announcements)).toHaveLength(1);
+      vi.advanceTimersByTime(3000);
+      expect(get(toaster.announcements)).toHaveLength(0);
     });
   });
 });

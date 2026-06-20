@@ -58,4 +58,33 @@ describe('createAnnouncer', () => {
     announcer.clear();
     expect(get(announcer.messages)).toHaveLength(0);
   });
+
+  it('respects duration when duration exceeds timeout', () => {
+    const announcer = createAnnouncer({ timeout: 1000 });
+    announcer.announce('Long', 'polite', 5000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(1000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(4000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
+
+  it('uses timeout when timeout exceeds duration', () => {
+    const announcer = createAnnouncer({ timeout: 5000 });
+    announcer.announce('Short', 'polite', 1000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(1000);
+    expect(get(announcer.messages)).toHaveLength(1);
+    vi.advanceTimersByTime(4000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
+
+  it('clear() cancels pending timers so messages do not reappear', () => {
+    const announcer = createAnnouncer({ timeout: 2000 });
+    announcer.announce('Will be cleared');
+    announcer.clear();
+    expect(get(announcer.messages)).toHaveLength(0);
+    vi.advanceTimersByTime(2000);
+    expect(get(announcer.messages)).toHaveLength(0);
+  });
 });
