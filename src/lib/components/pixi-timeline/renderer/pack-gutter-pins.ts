@@ -97,14 +97,14 @@ export function packGutterPins<T extends PackGutterInput>(
   }
 
   // ── Pass 2: greedy pixel-space deduplication within each row ──────────────
-  // Sort each row by px ascending, then skip any bar that overlaps an already-
-  // drawn bar. Because events were pre-sorted by duration desc, longer events
-  // were assigned first and take priority in pixel space.
+  // Process entries in importance order (the order they were inserted into each
+  // row during pass 1, which reflects the collectGutterBest priority sort).
+  // This guarantees a high-priority timer always wins over a lower-priority
+  // activity at a nearby pixel position.
   const result: PackedGutterPin<T>[] = [];
   for (let r = 0; r < rows.length; r++) {
-    const entries = rows[r].slice().sort((a, b) => a.px - b.px);
     const drawnRanges: [number, number][] = [];
-    for (const { ev, px, pw } of entries) {
+    for (const { ev, px, pw } of rows[r]) {
       if (drawnRanges.some(([s, e]) => px < e && px + pw > s)) continue;
       drawnRanges.push([px, px + pw]);
       result.push({ ev, px, pw, row: r });

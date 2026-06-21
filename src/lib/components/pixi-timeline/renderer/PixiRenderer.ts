@@ -29,6 +29,7 @@ import {
   type TimelineState,
 } from '../timeline-ctx.svelte';
 import type { EventStatus, PixiRenderArgs, TimelineConfig } from '../types';
+import { collectGutterBest } from './collect-gutter-best';
 import {
   ensureBitmapFonts,
   FONT_EVENT,
@@ -997,7 +998,7 @@ export class PixiRenderer {
 
         // ── Left/right edge pin detection ───────────────────────────────────
         const isLeftPin = rawX + rawW < PIN_MARGIN + MIN_BAR_W;
-        const isRightPin = rawX > screenW - PIN_MARGIN;
+        const isRightPin = rawX > screenW - PIN_MARGIN - MIN_BAR_W;
 
         let drawX = rawX;
         let drawW = rawW;
@@ -1186,30 +1187,25 @@ export class PixiRenderer {
     // Sort key (primary → secondary):
     //   1. Duration DESC — longer events claim row 0 (closest to viewport edge)
     //   2. Type priority ASC — failures/signals/child-workflows before plain activities
-    const collectBest = (trackIdxs: number[]): PinEvent[] => {
-      const out: PinEvent[] = [];
-      for (const t of trackIdxs) {
-        let best: PinEvent | null = null;
-        for (const ev of this.byTrack[t] ?? []) {
-          if (!best || ev.endMs - ev.startMs > best.endMs - best.startMs)
-            best = ev;
-        }
-        if (best) out.push(best);
-      }
-      out.sort((a, b) => {
-        const durDiff = b.endMs - b.startMs - (a.endMs - a.startMs);
-        if (durDiff !== 0) return durDiff;
-        const pa =
-          GUTTER_TYPE_PRIORITY[a.pixiType] ?? GUTTER_TYPE_PRIORITY_DEFAULT;
-        const pb =
-          GUTTER_TYPE_PRIORITY[b.pixiType] ?? GUTTER_TYPE_PRIORITY_DEFAULT;
-        return pa - pb;
-      });
-      return out.length > PACK_SAMPLE ? out.slice(0, PACK_SAMPLE) : out;
-    };
-
-    const aboveInput = collectBest(aboveTrackIdxs);
-    const belowInput = collectBest(belowTrackIdxs);
+    // Reverse above so closest-to-viewport tracks come first (they're last in
+    // the ascending output from gatherGutterTracks).  When all durations are
+    // equal the stable sort in collectGutterBest preserves this order, so the
+    // PACK_SAMPLE cap retains contextually relevant events rather than always
+    // the farthest-from-viewport ones.  Below is already closest-first.
+    const aboveInput = collectGutterBest(
+      [...aboveTrackIdxs].reverse(),
+      this.byTrack,
+      GUTTER_TYPE_PRIORITY,
+      GUTTER_TYPE_PRIORITY_DEFAULT,
+      PACK_SAMPLE,
+    );
+    const belowInput = collectGutterBest(
+      belowTrackIdxs,
+      this.byTrack,
+      GUTTER_TYPE_PRIORITY,
+      GUTTER_TYPE_PRIORITY_DEFAULT,
+      PACK_SAMPLE,
+    );
 
     const drawPackedPins = (
       events: PinEvent[],
@@ -1236,7 +1232,12 @@ export class PixiRenderer {
       );
 
       for (const { ev, px, pw, row } of packed) {
-        const py = stripBase + row * (PIN_H + PIN_GAP);
+        // Bottom gutter: Row 0 (most important) sits at the outer/bottom edge;
+        // top gutter: Row 0 sits at the outer/top edge (current behaviour).
+        const py =
+          side === 'bottom'
+            ? stripBase + (GUTTER_ROWS - 1 - row) * (PIN_H + PIN_GAP)
+            : stripBase + row * (PIN_H + PIN_GAP);
         const color = EVENT_COLORS[ev.pixiType] ?? EVENT_COLORS.default;
         const alpha = (STATUS_ALPHA[ev.pixiStatus] ?? 1.0) * 0.85;
 

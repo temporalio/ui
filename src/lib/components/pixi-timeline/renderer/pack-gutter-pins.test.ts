@@ -167,6 +167,28 @@ describe('packGutterPins', () => {
 
   // ── Pixel-space deduplication (pass 2) ───────────────────────────────────
 
+  it('importance-first: high-priority event (input-first) wins over nearby low-priority', () => {
+    // Event A (important, input-first): t=[100,1100] → long duration 1000ms, px=100
+    // Event B (less important, input-second): t=[98,99] → 1ms, px=98
+    // They do NOT overlap in time (B ends at 99, A starts at 100), so both go to row 0.
+    // In pass 2, importance-first ordering means A is processed first and claims [100,996].
+    // B at [98,116] then overlaps A → B is dropped.
+    const events = [ev(100, 1100), ev(98, 99)];
+    const result = packGutterPins(events, 0, 1, SCREEN_W, MARGIN, MIN_W, 2);
+    expect(result).toHaveLength(1);
+    expect(result[0].ev).toEqual(events[0]);
+  });
+
+  it('importance-first: low-priority event does not block distant high-priority event', () => {
+    // A (low-priority, input-second): t=[50,51] → px=50
+    // B (high-priority, input-first): t=[500,1500] → long duration, px=500
+    // Both fit in row 0 (non-overlapping time). B at px=500 does not overlap A at [50,68].
+    // Both should survive.
+    const events = [ev(500, 1500), ev(50, 51)];
+    const result = packGutterPins(events, 0, 1, SCREEN_W, MARGIN, MIN_W, 2);
+    expect(result).toHaveLength(2);
+  });
+
   it('pixel-overlapping events in the same row: only the first drawn survives', () => {
     // Two events at the same time position → same px, pixel-overlap → one survives
     const events = [ev(100, 101), ev(100, 101)];
