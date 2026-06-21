@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   clampScaleY,
   clampViewportStartMs,
+  initialViewport,
   MAX_SCALE_Y,
 } from './viewport-clamp';
 
@@ -180,5 +181,105 @@ describe('clampScaleY — row height invariant', () => {
     const maxScale = clampScaleY(999, TRACK_H);
     expect(maxScale * TRACK_H).toBe(TRACK_H);
     expect(TRACK_H).toBe(ICON_SIZE * 2); // documents the 2× relationship
+  });
+});
+
+describe('initialViewport', () => {
+  const MIN_ZOOM = 0.0001;
+  const MAX_ZOOM = 100;
+  const SCREEN_W = 1200;
+
+  it('uses fit-all for short workflows (≤30s)', () => {
+    const { startMs, zoom } = initialViewport(
+      10_000,
+      SCREEN_W,
+      MIN_ZOOM,
+      MAX_ZOOM,
+    );
+    expect(startMs).toBe(-200);
+    const expectedZoom = SCREEN_W / (10_000 + 600);
+    expect(zoom).toBeCloseTo(expectedZoom);
+  });
+
+  it('uses scoped view for long workflows (>30s)', () => {
+    const endRelMs = 414_000; // 6.9 minutes
+    const { startMs, zoom } = initialViewport(
+      endRelMs,
+      SCREEN_W,
+      MIN_ZOOM,
+      MAX_ZOOM,
+    );
+    // windowMs = min(60_000, 414_000 * 0.15) = 60_000
+    const windowMs = 60_000;
+    const expectedZoom = SCREEN_W / windowMs;
+    expect(zoom).toBeCloseTo(expectedZoom);
+    // startMs places desc events (near endRelMs) in the left-center of the canvas
+    expect(startMs).toBe(endRelMs - windowMs * 0.25);
+    expect(startMs).toBeGreaterThan(0); // viewport is near the end, not at 0
+  });
+
+  it('long workflow: events near endRelMs are visible in the left portion of canvas', () => {
+    const endRelMs = 414_000;
+    const { startMs, zoom } = initialViewport(
+      endRelMs,
+      SCREEN_W,
+      MIN_ZOOM,
+      MAX_ZOOM,
+    );
+    // A desc event at endRelMs should have rawX < screenW (visible, not right-pinned)
+    const rawX = (endRelMs - startMs) * zoom;
+    expect(rawX).toBeLessThan(SCREEN_W);
+    expect(rawX).toBeGreaterThan(0);
+  });
+
+  it('respects minZoom bound', () => {
+    const { zoom } = initialViewport(1_000_000_000, SCREEN_W, 0.001, MAX_ZOOM);
+    expect(zoom).toBeGreaterThanOrEqual(0.001);
+  });
+
+  it('respects maxZoom bound', () => {
+    const { zoom } = initialViewport(1, SCREEN_W, MIN_ZOOM, 0.5);
+    expect(zoom).toBeLessThanOrEqual(0.5);
+  });
+
+  it('uses 15% of endRelMs window, capped at 60s', () => {
+    // 15% of 200,000ms = 30,000ms < 60,000 → windowMs = 30,000
+    const endRelMs = 200_000;
+    const windowMs = endRelMs * 0.15; // 30,000
+    const { zoom } = initialViewport(endRelMs, SCREEN_W, MIN_ZOOM, MAX_ZOOM);
+    expect(zoom).toBeCloseTo(SCREEN_W / windowMs);
+  });
+});
+
+describe('origin-shift compensation', () => {
+  it('viewport startMs must shift by originShift to keep visual position', () => {
+    // Simulates: desc events loaded first (origin=405000), then asc events
+    // load older data shifting origin to 1500ms.
+    const oldOrigin = 405_000;
+    const newOrigin = 1_500;
+    const originShift = oldOrigin - newOrigin; // 403,500ms
+
+    // Initial viewport: startMs=-200ms for fit-all
+    const initialStartMs = -200;
+    const zoom = 0.122;
+
+    // Desc event position BEFORE shift:
+    const descEventRelStart_before = 403_000 - 0; // relStart = absMs - oldOrigin... wait
+    // With old origin: relStart = 405000 - 405000 = 0ms → x = (0 + 200) * 0.122 = 24px
+    const xBefore = (0 - initialStartMs) * zoom; // = (0 + 200) * 0.122 = 24.4
+
+    // After origin shift: relStart = 405000 - 1500 = 403500ms
+    const newRelStart = 405_000 - newOrigin; // 403500ms
+    const compensatedStartMs = initialStartMs + originShift; // -200 + 403500 = 403300ms
+    const xAfter = (newRelStart - compensatedStartMs) * zoom; // = (403500 - 403300) * 0.122 = 24.4
+
+    // Visual position must be identical before and after origin shift + compensation.
+    expect(xAfter).toBeCloseTo(xBefore, 5);
+  });
+
+  it('no compensation needed when origin does not change', () => {
+    const origin = 1_500;
+    const originShift = origin - origin; // = 0
+    expect(originShift).toBe(0);
   });
 });

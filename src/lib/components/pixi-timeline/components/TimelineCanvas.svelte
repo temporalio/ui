@@ -55,12 +55,18 @@
       renderer.loadEventsLegacy(events);
     }
   });
+
+  $effect(() => {
+    if (!rendererReady || !renderer) return;
+    renderer.setSortOrder(renderArgs?.sortOrder ?? 'desc');
+  });
 </script>
 
 <div class="relative h-full w-full overflow-hidden">
   <canvas
     bind:this={canvas}
-    class="absolute inset-0 z-0 block h-full w-full cursor-grab active:cursor-grabbing"
+    tabindex="0"
+    class="absolute inset-0 z-0 block h-full w-full cursor-grab outline-none active:cursor-grabbing"
     style="background:#0c0c14"
   ></canvas>
 

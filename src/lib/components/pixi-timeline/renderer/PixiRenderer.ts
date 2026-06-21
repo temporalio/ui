@@ -35,9 +35,16 @@ import {
   FONT_RULER,
   formatTickLabel,
   pickTickInterval,
+  type TimeScale,
 } from './fonts';
+import { gatherGutterTracks } from './gutter-culling';
 import { gutterIconLayout } from './gutter-layout';
-import { clampScaleY, clampViewportStartMs } from './viewport-clamp';
+import { packGutterPins } from './pack-gutter-pins';
+import {
+  clampScaleY,
+  clampViewportStartMs,
+  initialViewport,
+} from './viewport-clamp';
 
 export const DEFAULT_CONFIG: TimelineConfig = {
   trackHeight: 28,
@@ -51,6 +58,60 @@ const RULER_H = 28;
 const ICON_SIZE = 14; // icon render target size (px)
 const ICON_PAD = 2; // padding on each side of icon
 const MIN_BAR_W = ICON_SIZE + ICON_PAD * 2; // bar always wide enough for icon
+
+/**
+ * Lower number = higher priority in the gutter.
+ * Failures/timeouts first, then rare events, then common activities.
+ */
+const GUTTER_TYPE_PRIORITY: Record<string, number> = {
+  // Failures — always surface immediately
+  EVENT_TYPE_WORKFLOW_EXECUTION_FAILED: 0,
+  EVENT_TYPE_WORKFLOW_EXECUTION_TIMED_OUT: 0,
+  EVENT_TYPE_WORKFLOW_TASK_FAILED: 0,
+  EVENT_TYPE_WORKFLOW_TASK_TIMED_OUT: 0,
+  EVENT_TYPE_ACTIVITY_TASK_FAILED: 0,
+  EVENT_TYPE_ACTIVITY_TASK_TIMED_OUT: 0,
+  EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_FAILED: 0,
+  // Cancellations / signals / updates
+  EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED: 1,
+  EVENT_TYPE_WORKFLOW_EXECUTION_SIGNALED: 1,
+  EVENT_TYPE_ACTIVITY_TASK_CANCEL_REQUESTED: 1,
+  EVENT_TYPE_ACTIVITY_TASK_CANCELED: 1,
+  EVENT_TYPE_TIMER_CANCELED: 1,
+  // Child workflows — visually distinctive
+  GROUP_CHILD_WORKFLOW: 2,
+  EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED: 2,
+  EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_STARTED: 2,
+  EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_COMPLETED: 2,
+  EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_CANCELED: 2,
+  // Markers, nexus, updates
+  EVENT_TYPE_MARKER_RECORDED: 3,
+  EVENT_TYPE_NEXUS_OPERATION_SCHEDULED: 3,
+  EVENT_TYPE_NEXUS_OPERATION_STARTED: 3,
+  EVENT_TYPE_NEXUS_OPERATION_COMPLETED: 3,
+  EVENT_TYPE_NEXUS_OPERATION_FAILED: 3,
+  EVENT_TYPE_NEXUS_OPERATION_CANCELED: 3,
+  EVENT_TYPE_NEXUS_OPERATION_TIMED_OUT: 3,
+  EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_ACCEPTED: 3,
+  EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_COMPLETED: 3,
+  EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_REQUESTED: 3,
+  EVENT_TYPE_WORKFLOW_EXECUTION_UPDATE_REJECTED: 3,
+  // Timers
+  GROUP_TIMER: 4,
+  EVENT_TYPE_TIMER_STARTED: 4,
+  EVENT_TYPE_TIMER_FIRED: 4,
+  // Regular activities
+  GROUP_ACTIVITY: 5,
+  EVENT_TYPE_ACTIVITY_TASK_SCHEDULED: 5,
+  EVENT_TYPE_ACTIVITY_TASK_STARTED: 5,
+  EVENT_TYPE_ACTIVITY_TASK_COMPLETED: 5,
+  // Workflow lifecycle
+  EVENT_TYPE_WORKFLOW_EXECUTION_STARTED: 6,
+  EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED: 6,
+  // Everything else (workflow tasks, etc.) — least important
+};
+const GUTTER_TYPE_PRIORITY_DEFAULT = 7;
+
 // ---------------------------------------------------------------------------
 // Renderer
 // ---------------------------------------------------------------------------
@@ -90,6 +151,7 @@ export class PixiRenderer {
   private gridGfx: Graphics;
   private scrollContainer: Container; // shifted by -scrollY; holds baseGfx, loadingContainer, eventLabelContainer
   private baseGfx: Graphics;
+  private selectionGfx: Graphics;
   private loadingContainer: Container;
   private eventLabelContainer: Container;
   private rulerGfx: Graphics;
@@ -112,6 +174,7 @@ export class PixiRenderer {
     ascCount: 0,
     descCount: 0,
     finalized: false,
+    sortOrder: 'desc',
   };
 
   private config: TimelineConfig;
@@ -163,12 +226,18 @@ export class PixiRenderer {
 
   private viewportInitialized = false;
 
+  // Full relative time range of all loaded events — used to position gutter
+  // pins stably (independent of the current viewport pan/zoom).
+  private dataRelMinMs = 0;
+  private dataRelMaxMs = 100_000;
+
   private dirty = true;
   private lastStartMs = NaN;
   private lastScrollY = NaN;
   private lastZoom = NaN;
   private lastScreenW = 0;
   private lastScreenH = 0;
+  private lastTimeScale = '';
 
   private readonly state: TimelineState;
   private readonly ctx: TimelineCtx | undefined;
@@ -198,6 +267,7 @@ export class PixiRenderer {
     this.gridGfx = new Graphics();
     this.scrollContainer = new Container();
     this.baseGfx = new Graphics();
+    this.selectionGfx = new Graphics();
     this.loadingContainer = new Container();
     this.eventLabelContainer = new Container();
     this.rulerGfx = new Graphics();
@@ -234,6 +304,7 @@ export class PixiRenderer {
     // Grouped by type (Graphics→TilingSprite→BitmapText) to minimise batch breaks.
     this.scrollContainer.addChild(
       this.baseGfx,
+      this.selectionGfx,
       this.loadingContainer,
       this.eventLabelContainer,
     );
@@ -265,6 +336,13 @@ export class PixiRenderer {
   }
 
   /** Called by TimelineCanvas when renderArgs change. Initialises viewport on first call. */
+  setSortOrder(_order: 'desc' | 'asc') {
+    // currentArgs is the reactive pixiArgs proxy — sortOrder is already updated
+    // on the proxy by the time this is called. We just need to mark dirty so
+    // the next render picks up the new sort order from this.currentArgs.sortOrder.
+    this.dirty = true;
+  }
+
   loadEvents(args: PixiRenderArgs, _opts?: { preserveViewport?: boolean }) {
     this.currentArgs = args;
     this.dirty = true;
@@ -283,28 +361,34 @@ export class PixiRenderer {
     }
     if (minMs === Infinity) return;
 
+    // Compensate viewport when origin shifts (happens when ASC events load older than DESC events).
+    const prevOrigin = isNaN(this.dataOriginMs) ? minMs : this.dataOriginMs;
+    const originShift = prevOrigin - minMs; // positive when new origin is earlier in time
     this.dataOriginMs = minMs;
+
     const endRelMs = maxMs - minMs;
     this.state.dataRange = { startMs: 0, endMs: endRelMs + 400 };
     this.state.totalTracks = args.totalRows;
     this.state.totalEvents = count;
 
     if (!this.viewportInitialized) {
-      const span = endRelMs + 600;
       const screenW = this.app.screen.width || 1200;
-      const zoom = Math.max(
+      const { startMs, zoom } = initialViewport(
+        endRelMs,
+        screenW,
         this.config.minZoom,
-        Math.min(this.config.maxZoom, screenW / Math.max(span, 1)),
+        this.config.maxZoom,
       );
-      this.state.viewport.startMs = -200;
+      this.state.viewport.startMs = startMs;
       this.state.viewport.zoom = zoom;
       this.state.viewport.scrollY = 0;
       this.viewportInitialized = true;
+    } else if (originShift !== 0) {
+      // Keep the same visual position when the origin shifts.
+      this.state.viewport.startMs += originShift;
     }
 
-    if (args.finalized) {
-      this.rebuildByTrack();
-    }
+    this.rebuildByTrack();
   }
 
   /** Build a track-indexed lookup for gutter pin queries. */
@@ -313,6 +397,8 @@ export class PixiRenderer {
     const count = getGroupCount();
     const origin = this.dataOriginMs;
     if (isNaN(origin)) return;
+    let minMs = Infinity;
+    let maxMs = -Infinity;
     for (let i = 0; i < count; i++) {
       const meta = getGroupMeta(i);
       if (
@@ -322,10 +408,14 @@ export class PixiRenderer {
       )
         continue;
       const t = meta.trackIndex;
+      const relStart = meta.startMs - origin;
+      const relEnd = Math.max(meta.endMs - origin, relStart + 1);
+      if (relStart < minMs) minMs = relStart;
+      if (relEnd > maxMs) maxMs = relEnd;
       (this.byTrack[t] ??= []).push({
         poolIdx: i,
-        startMs: meta.startMs - origin,
-        endMs: Math.max(meta.endMs - origin, meta.startMs - origin + 1),
+        startMs: relStart,
+        endMs: relEnd,
         trackIndex: t,
         pixiType: meta.pixiType,
         pixiStatus: meta.pixiStatus,
@@ -333,6 +423,10 @@ export class PixiRenderer {
           meta.group?.displayName ??
           meta.pixiType.replace(/^(EVENT_TYPE_|GROUP_)/, '').replace(/_/g, ' '),
       });
+    }
+    if (isFinite(minMs)) {
+      this.dataRelMinMs = minMs;
+      this.dataRelMaxMs = maxMs;
     }
   }
 
@@ -640,7 +734,13 @@ export class PixiRenderer {
     if (canvasY < RULER_H) return null;
 
     const clickMs = startMs + canvasX / zoom;
-    const trackIndex = Math.floor((canvasY - RULER_H + scrollY) / rowSize);
+    const visualTrackIdx = Math.floor((canvasY - RULER_H + scrollY) / rowSize);
+    const so = (this.currentArgs.sortOrder ?? 'desc') as 'desc' | 'asc';
+    const ttCount = this.byTrack.length;
+    const trackIndex =
+      so === 'asc' && ttCount > 0
+        ? ttCount - 1 - visualTrackIdx
+        : visualTrackIdx;
     const slop = 2 / zoom;
 
     const origin = this.dataOriginMs;
@@ -684,8 +784,9 @@ export class PixiRenderer {
     zoom: number,
     screenW: number,
     screenH: number,
+    scale: TimeScale,
   ) {
-    const intervalMs = pickTickInterval(zoom);
+    const intervalMs = pickTickInterval(zoom, scale);
     const firstTick = Math.ceil(startMs / intervalMs) * intervalMs;
     const dataStart = this.state.dataRange.startMs;
 
@@ -717,7 +818,7 @@ export class PixiRenderer {
         .stroke({ color: 0x334155, width: 1 });
 
       const label = this.getLabel(li++);
-      label.text = formatTickLabel(tickMs - dataStart, intervalMs);
+      label.text = formatTickLabel(tickMs - dataStart, intervalMs, scale);
       label.x = x + 3;
       label.y = RULER_H / 2;
       label.visible = true;
@@ -730,6 +831,7 @@ export class PixiRenderer {
 
   private render() {
     ensureBitmapFonts();
+    this.canvasRect = this.canvas.getBoundingClientRect();
 
     if (this.hasPendingWheel) {
       this.hasPendingWheel = false;
@@ -774,7 +876,6 @@ export class PixiRenderer {
     // ── Hover flush — update cursor once per rAF, not per pointermove ────────
     if (this.hasPendingHover) {
       this.hasPendingHover = false;
-      this.canvasRect = this.canvas.getBoundingClientRect();
       const hx = this.pendingHoverClientX - this.canvasRect.left;
       const hy = this.pendingHoverClientY - this.canvasRect.top;
       const hit = this.hitTestEvent(hx, hy);
@@ -800,7 +901,8 @@ export class PixiRenderer {
       zoom !== this.lastZoom ||
       scrollY !== this.lastScrollY ||
       screenW !== this.lastScreenW ||
-      screenH !== this.lastScreenH;
+      screenH !== this.lastScreenH ||
+      this.state.timeScale !== this.lastTimeScale;
 
     if (!needsGeometry && !tileChanged) return;
 
@@ -811,6 +913,8 @@ export class PixiRenderer {
     );
     const descCount = this.currentArgs.descCount;
     const ascCount = this.currentArgs.ascCount;
+    const sortOrder = this.currentArgs.sortOrder ?? 'desc';
+    const totalTracks = this.byTrack.length || totalRows;
     // Loading gap sits between the desc section (top) and asc section (bottom).
     const loadingStart = descCount;
     const loadingEnd = Math.max(descCount, totalRows - ascCount);
@@ -839,10 +943,11 @@ export class PixiRenderer {
     this.lastZoom = zoom;
     this.lastScreenW = screenW;
     this.lastScreenH = screenH;
+    this.lastTimeScale = this.state.timeScale;
     if (tileChanged) this.lastTileOffset = tileOffset;
 
     this.scrollContainer.y = containerY;
-    this.drawRuler(startMs, zoom, screenW, screenH);
+    this.drawRuler(startMs, zoom, screenW, screenH, this.state.timeScale);
 
     // Loading bars — tracks in the gap between desc section and asc section.
     this.updateLoadingBars(
@@ -858,6 +963,7 @@ export class PixiRenderer {
 
     // Event bars — read directly from the buffer pool, no intermediate copy.
     this.baseGfx.clear();
+    this.selectionGfx.clear();
     this.eventLabelIndex = 0;
     this.iconSpriteIndex = 0;
     this.leftPins = [];
@@ -877,7 +983,11 @@ export class PixiRenderer {
 
         const rawX = (relStart - startMs) * zoom;
         const rawW = Math.max(MIN_BAR_W, (relEnd - relStart) * zoom);
-        const localY = meta.trackIndex * rowSize;
+        const effectiveIdx =
+          sortOrder === 'asc'
+            ? totalTracks - 1 - meta.trackIndex
+            : meta.trackIndex;
+        const localY = effectiveIdx * rowSize;
         const screenY = containerY + localY;
 
         if (screenY + effectiveTrackH < RULER_H || screenY > screenH) continue;
@@ -909,6 +1019,20 @@ export class PixiRenderer {
         this.baseGfx
           .roundRect(drawX, localY, drawW, effectiveTrackH, radius)
           .fill({ color, alpha });
+
+        const eventId = String(meta.headSlotIdx + 1);
+        if (this.state.selectedEvents[eventId]) {
+          const sw = 2;
+          this.selectionGfx
+            .roundRect(
+              drawX - sw,
+              localY - sw,
+              drawW + sw * 2,
+              effectiveTrackH + sw * 2,
+              radius + sw,
+            )
+            .stroke({ color: 0xffffff, width: sw * 2, alpha: 1 });
+        }
 
         const barMidY = localY + effectiveTrackH / 2;
 
@@ -989,6 +1113,7 @@ export class PixiRenderer {
       screenW,
       screenH,
       radius,
+      sortOrder,
     );
 
     this.app.renderer.render(this.app.stage);
@@ -996,8 +1121,13 @@ export class PixiRenderer {
 
   /**
    * Render thin pin bars at the top and bottom of the canvas for events whose
-   * track rows are off-screen.  Each off-screen track contributes at most one bar
-   * per gutter row (the longest-duration event wins).
+   * track rows are off-screen.
+   *
+   * Uses the same screen-space formula as event bars:
+   *   px = (startMs - viewportStart) * zoom
+   *   pw = max(MIN_BAR_W, duration * zoom)
+   * Events entirely off-screen clamp to the left or right margin at MIN_BAR_W.
+   * Row assignment uses time-range non-overlap so density is maximised.
    */
   private drawGutterPins(
     startMs: number,
@@ -1008,14 +1138,13 @@ export class PixiRenderer {
     screenW: number,
     screenH: number,
     _radius: number,
+    sortOrder: 'desc' | 'asc' = 'desc',
   ) {
     this.gutterTopGfx.clear();
     this.gutterBottomGfx.clear();
     this.topPins = [];
     this.bottomPins = [];
     this.gutterIconSpriteIndex = 0;
-    // NOTE: pinnedPoolIdxs is cleared at the start of the render loop
-    // (before left/right pins are collected). Top/bottom pins are additive.
 
     if (this.byTrack.length === 0) {
       for (const s of this.gutterIconSpritePool) s.visible = false;
@@ -1023,131 +1152,122 @@ export class PixiRenderer {
     }
 
     const PIN_H = Math.max(12, Math.min(18, effectiveTrackH * 0.75));
+    const PIN_GAP = 1;
+    const GUTTER_ROWS = 2;
+    const GUTTER_STRIP_H = GUTTER_ROWS * PIN_H + (GUTTER_ROWS - 1) * PIN_GAP;
     const PIN_MARGIN = 4;
-    const MIN_PIN_W = PIN_H;
-    const viewEndMs = startMs + screenW / zoom;
 
     const topEdge = RULER_H;
-    // Clamp bottom edge to the visible portion of the canvas inside the browser viewport.
-    // The canvas may overflow the window when the stats panel is open, so we must not
-    // draw the bottom gutter below what the user can actually see.
-    const visibleH = Math.min(
-      screenH,
-      Math.max(0, window.innerHeight - this.canvasRect.top),
+    const bottomEdge = screenH;
+
+    const reversed = sortOrder === 'asc';
+
+    // Max visual bars per row at the current zoom / screen size.
+    // We need at most this many representative events per side to fill the gutter.
+    // Oversample by 4× to account for pixel clustering and time-range deduplication.
+    const maxBarsPerRow = Math.ceil(screenW / MIN_BAR_W);
+    const PACK_SAMPLE = maxBarsPerRow * GUTTER_ROWS * 4; // typically ~440
+
+    const { aboveTrackIdxs, belowTrackIdxs } = gatherGutterTracks(
+      this.byTrack.length,
+      containerY,
+      rowSize,
+      effectiveTrackH,
+      topEdge,
+      bottomEdge,
+      Infinity,
+      (t) => (this.byTrack[t]?.length ?? 0) > 0,
+      reversed,
     );
-    const bottomEdge = visibleH;
 
-    const aboveTracks: PinEvent[] = [];
-    const belowTracks: PinEvent[] = [];
-
-    for (let t = 0; t < this.byTrack.length; t++) {
-      const trackEvents = this.byTrack[t];
-      if (!trackEvents || trackEvents.length === 0) continue;
-
-      const screenY = containerY + t * rowSize;
-      const isAbove = screenY + effectiveTrackH < topEdge;
-      const isBelow = screenY > bottomEdge;
-      if (!isAbove && !isBelow) continue;
-
-      // Pick the longest-duration event in this track that overlaps the viewport
-      let best: PinEvent | null = null;
-      for (const ev of trackEvents) {
-        if (ev.endMs < startMs || ev.startMs > viewEndMs) continue;
-        if (!best || ev.endMs - ev.startMs > best.endMs - best.startMs)
-          best = ev;
-      }
-      if (!best) {
-        // Fall back to longest event regardless of viewport overlap (gutter marker)
-        for (const ev of trackEvents) {
+    // Collect the best event from every off-screen track, rank by importance,
+    // then cap at PACK_SAMPLE so packGutterPins stays O(PACK_SAMPLE²).
+    //
+    // Sort key (primary → secondary):
+    //   1. Duration DESC — longer events claim row 0 (closest to viewport edge)
+    //   2. Type priority ASC — failures/signals/child-workflows before plain activities
+    const collectBest = (trackIdxs: number[]): PinEvent[] => {
+      const out: PinEvent[] = [];
+      for (const t of trackIdxs) {
+        let best: PinEvent | null = null;
+        for (const ev of this.byTrack[t] ?? []) {
           if (!best || ev.endMs - ev.startMs > best.endMs - best.startMs)
             best = ev;
         }
+        if (best) out.push(best);
       }
-      if (!best) continue;
+      out.sort((a, b) => {
+        const durDiff = b.endMs - b.startMs - (a.endMs - a.startMs);
+        if (durDiff !== 0) return durDiff;
+        const pa =
+          GUTTER_TYPE_PRIORITY[a.pixiType] ?? GUTTER_TYPE_PRIORITY_DEFAULT;
+        const pb =
+          GUTTER_TYPE_PRIORITY[b.pixiType] ?? GUTTER_TYPE_PRIORITY_DEFAULT;
+        return pa - pb;
+      });
+      return out.length > PACK_SAMPLE ? out.slice(0, PACK_SAMPLE) : out;
+    };
 
-      if (isAbove) aboveTracks.push(best);
-      else belowTracks.push(best);
-    }
+    const aboveInput = collectBest(aboveTrackIdxs);
+    const belowInput = collectBest(belowTrackIdxs);
 
-    // Sort by horizontal position so the row-packing algorithm fills left-to-right.
-    aboveTracks.sort((a, b) => a.startMs - b.startMs);
-    belowTracks.sort((a, b) => a.startMs - b.startMs);
-
-    const renderPins = (
+    const drawPackedPins = (
       events: PinEvent[],
       side: 'top' | 'bottom',
       store: PinBar[],
       gfx: Graphics,
     ) => {
-      const MAX_ROWS = 2;
-      const rows: { event: PinEvent; px: number; pw: number }[][] = [];
+      const stripBase = side === 'top' ? topEdge : bottomEdge - GUTTER_STRIP_H;
 
-      for (const ev of events) {
-        const exStart = (ev.startMs - startMs) * zoom;
-        const exEnd =
-          exStart + Math.max(MIN_PIN_W, (ev.endMs - ev.startMs) * zoom);
-        const px = Math.max(
-          PIN_MARGIN,
-          Math.min(screenW - PIN_MARGIN - MIN_PIN_W, exStart),
-        );
-        const pw = Math.max(
-          MIN_PIN_W,
-          Math.min(screenW - PIN_MARGIN - px, exEnd - px),
-        );
+      gfx
+        .rect(0, stripBase, screenW, GUTTER_STRIP_H)
+        .fill({ color: 0x0d0d0d, alpha: 0.9 });
 
-        let row = -1;
-        for (let r = 0; r < rows.length; r++) {
-          const last = rows[r][rows[r].length - 1];
-          if (!last || last.px + last.pw + 2 <= px) {
-            row = r;
-            break;
+      if (events.length === 0) return;
+
+      const packed = packGutterPins(
+        events,
+        startMs,
+        zoom,
+        screenW,
+        PIN_MARGIN,
+        MIN_BAR_W,
+        GUTTER_ROWS,
+      );
+
+      for (const { ev, px, pw, row } of packed) {
+        const py = stripBase + row * (PIN_H + PIN_GAP);
+        const color = EVENT_COLORS[ev.pixiType] ?? EVENT_COLORS.default;
+        const alpha = (STATUS_ALPHA[ev.pixiStatus] ?? 1.0) * 0.85;
+
+        gfx.roundRect(px, py, pw, PIN_H, 2).fill({ color, alpha });
+
+        if (this.iconTextures) {
+          const iconName = PIXI_TYPE_TO_ICON[ev.pixiType];
+          if (iconName && this.iconTextures[iconName]) {
+            const {
+              x: ix,
+              y: iy,
+              size: iSize,
+            } = gutterIconLayout(px, py, pw, PIN_H);
+            const sprite = this.getGutterIconSprite();
+            sprite.texture = this.iconTextures[iconName];
+            sprite.x = ix;
+            sprite.y = iy;
+            sprite.width = iSize;
+            sprite.height = iSize;
+            sprite.visible = true;
+            sprite.alpha = alpha;
           }
         }
-        if (row === -1) {
-          if (rows.length >= MAX_ROWS) continue;
-          row = rows.length;
-          rows.push([]);
-        }
-        rows[row].push({ event: ev, px, pw });
-      }
 
-      for (let r = 0; r < rows.length; r++) {
-        const py =
-          side === 'top'
-            ? topEdge + r * (PIN_H + 2)
-            : bottomEdge - (rows.length - r) * (PIN_H + 2);
-
-        for (const { event: ev, px, pw } of rows[r]) {
-          const color = EVENT_COLORS[ev.pixiType] ?? EVENT_COLORS.default;
-          const alpha = (STATUS_ALPHA[ev.pixiStatus] ?? 1.0) * 0.85;
-          gfx.roundRect(px, py, pw, PIN_H, 2).fill({ color, alpha });
-
-          if (this.iconTextures) {
-            const iconName = PIXI_TYPE_TO_ICON[ev.pixiType];
-            if (iconName && this.iconTextures[iconName]) {
-              const {
-                x: ix,
-                y: iy,
-                size: iSize,
-              } = gutterIconLayout(px, py, pw, PIN_H);
-              const sprite = this.getGutterIconSprite();
-              sprite.texture = this.iconTextures[iconName];
-              sprite.x = ix;
-              sprite.y = iy;
-              sprite.width = iSize;
-              sprite.height = iSize;
-              sprite.visible = true;
-              sprite.alpha = alpha;
-            }
-          }
-          store.push({ poolIdx: ev.poolIdx, px, py, pw, ph: PIN_H });
-          this.pinnedPoolIdxs.add(ev.poolIdx);
-        }
+        store.push({ poolIdx: ev.poolIdx, px, py, pw, ph: PIN_H });
+        this.pinnedPoolIdxs.add(ev.poolIdx);
       }
     };
 
-    renderPins(aboveTracks, 'top', this.topPins, this.gutterTopGfx);
-    renderPins(belowTracks, 'bottom', this.bottomPins, this.gutterBottomGfx);
+    drawPackedPins(aboveInput, 'top', this.topPins, this.gutterTopGfx);
+    drawPackedPins(belowInput, 'bottom', this.bottomPins, this.gutterBottomGfx);
 
     for (
       let i = this.gutterIconSpriteIndex;
@@ -1183,7 +1303,10 @@ export class PixiRenderer {
       this.state.viewport.startMs = centerMs - vpSpanMs / 2;
     }
 
-    const trackY = event.trackIndex * rowSize;
+    const so = this.currentArgs.sortOrder ?? 'desc';
+    const tt = this.byTrack.length || getVisibleGroupCount();
+    const effIdx = so === 'asc' ? tt - 1 - event.trackIndex : event.trackIndex;
+    const trackY = effIdx * rowSize;
     this.state.viewport.scrollY = Math.max(
       0,
       Math.min(this.maxScrollY(), trackY - eventAreaH / 3 + rowSize / 2),
@@ -1213,7 +1336,11 @@ export class PixiRenderer {
       };
       this.dirty = true;
       canvas.style.cursor = 'grabbing';
-      canvas.setPointerCapture(e.pointerId);
+      try {
+        canvas.setPointerCapture(e.pointerId);
+      } catch {
+        // Synthetic events may not have a registered pointer id.
+      }
     });
 
     canvas.addEventListener('pointermove', (e) => {
@@ -1270,12 +1397,10 @@ export class PixiRenderer {
       }
 
       if (!moved && hit) {
-        // Determine if this came from a left/right pin (need to center X axis).
-        const isXPin =
-          this.pinnedPoolIdxs.has(hit.poolIdx ?? -1) &&
-          (this.leftPins.some((p) => p.poolIdx === hit.poolIdx) ||
-            this.rightPins.some((p) => p.poolIdx === hit.poolIdx));
-        this.scrollToEvent(hit, isXPin);
+        // Any gutter-pin click should center the viewport on that event (both
+        // axes), since the user is explicitly navigating to an off-screen item.
+        const isGutterPin = this.pinnedPoolIdxs.has(hit.poolIdx ?? -1);
+        this.scrollToEvent(hit, isGutterPin);
 
         // Always clear current selection first (single panel at a time)
         for (const id of Object.keys(this.state.selectedEvents)) {
@@ -1337,6 +1462,41 @@ export class PixiRenderer {
       },
       { passive: false },
     );
+
+    canvas.addEventListener('keydown', (e) => {
+      const { viewport } = this.state;
+      const screenW = this.app.screen.width || 1200;
+
+      if (e.key === 'Home') {
+        e.preventDefault();
+        this.state.viewport.startMs = this.clampStartMs(
+          this.state.dataRange.startMs - screenW / viewport.zoom / 2,
+        );
+        this.state.viewport.scrollY = 0;
+        this.dirty = true;
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        this.state.viewport.startMs = this.clampStartMs(
+          this.state.dataRange.endMs - screenW / viewport.zoom / 2,
+        );
+        this.state.viewport.scrollY = this.maxScrollY();
+        this.dirty = true;
+      } else if (e.key === 'ArrowLeft' && !e.shiftKey) {
+        e.preventDefault();
+        const panMs = (screenW * 0.2) / viewport.zoom;
+        this.state.viewport.startMs = this.clampStartMs(
+          viewport.startMs - panMs,
+        );
+        this.dirty = true;
+      } else if (e.key === 'ArrowRight' && !e.shiftKey) {
+        e.preventDefault();
+        const panMs = (screenW * 0.2) / viewport.zoom;
+        this.state.viewport.startMs = this.clampStartMs(
+          viewport.startMs + panMs,
+        );
+        this.dirty = true;
+      }
+    });
   }
 
   private clampStartMs(startMs: number): number {

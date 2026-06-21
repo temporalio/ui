@@ -1,12 +1,23 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
+  import {
+    autoScaleUnit,
+    pickTickInterval,
+    type TimeScale,
+  } from '../renderer/fonts';
   import { TIMELINE_CTX, type TimelineCtx } from '../timeline-ctx.svelte';
 
   const _ctx = getContext<TimelineCtx>(TIMELINE_CTX);
   const timelineState = _ctx.state;
   const setViewport = (p: Parameters<typeof _ctx.setViewport>[0]) =>
     _ctx.setViewport(p);
+
+  const SCALE_OPTIONS: TimeScale[] = ['auto', 'ms', 's', 'm', 'h', 'd', 'w'];
+
+  const effectiveUnit = $derived(
+    autoScaleUnit(pickTickInterval(timelineState.viewport.zoom)),
+  );
 
   function zoom(factor: number) {
     const { viewport } = timelineState;
@@ -109,6 +120,41 @@
     class="rounded px-2 py-1 text-xs text-white/50 transition-colors hover:bg-white/10 hover:text-white"
   >
     Fit all
+  </button>
+
+  <div class="h-4 w-px bg-white/10"></div>
+
+  <div class="flex items-center gap-0.5">
+    {#each SCALE_OPTIONS as opt}
+      {@const active = timelineState.timeScale === opt}
+      <button
+        onclick={() => (timelineState.timeScale = opt)}
+        class="rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors {active
+          ? 'bg-sky-500/20 text-sky-300 ring-sky-500/40 ring-1'
+          : 'text-white/30 hover:bg-white/10 hover:text-white/70'}"
+      >
+        {opt === 'auto' ? `auto (${effectiveUnit})` : opt}
+      </button>
+    {/each}
+  </div>
+
+  <div class="h-4 w-px bg-white/10"></div>
+
+  <button
+    onclick={() =>
+      (timelineState.sortOrder =
+        timelineState.sortOrder === 'desc' ? 'asc' : 'desc')}
+    class="flex items-center gap-1 rounded px-2 py-1 font-mono text-xs transition-colors {timelineState.sortOrder ===
+    'asc'
+      ? 'bg-sky-500/20 text-sky-300 ring-sky-500/40 ring-1'
+      : 'text-white/30 hover:bg-white/10 hover:text-white/70'}"
+    title="Toggle sort order (newest-first / oldest-first)"
+  >
+    {#if timelineState.sortOrder === 'desc'}
+      ↓ newest first
+    {:else}
+      ↑ oldest first
+    {/if}
   </button>
 
   <div class="h-4 w-px bg-white/10"></div>

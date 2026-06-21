@@ -5,6 +5,10 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Timeline from '$lib/components/pixi-timeline/Timeline.svelte';
+  import {
+    setViewport,
+    timelineState,
+  } from '$lib/components/pixi-timeline/timeline-ctx.svelte';
   import type { PixiRenderArgs } from '$lib/components/pixi-timeline/types';
   import type {
     BidirectionalProgress,
@@ -93,6 +97,12 @@
     ascCount: 0,
     descCount: 0,
     finalized: false,
+    sortOrder: 'desc',
+  });
+
+  // Sync sort order into pixiArgs reactively without spreading (avoids cycle).
+  $effect(() => {
+    pixiArgs.sortOrder = timelineState.sortOrder;
   });
 
   let _pixiRafId: number | null = null;
@@ -107,6 +117,7 @@
         ascCount: getAscGroupCount(),
         descCount: getDescGroupCount(),
         finalized: false,
+        sortOrder: timelineState.sortOrder,
       };
     });
   }
@@ -146,6 +157,7 @@
       ascCount: 0,
       descCount: 0,
       finalized: false,
+      sortOrder: timelineState.sortOrder,
     };
 
     const heapBefore = heapNow();
@@ -205,6 +217,7 @@
           ascCount: getAscGroupCount(),
           descCount: getDescGroupCount(),
           finalized: true,
+          sortOrder: timelineState.sortOrder,
         };
       })
       .catch((e: unknown) => {
@@ -234,11 +247,66 @@
     us < 1000 ? `${us.toFixed(1)}µs` : `${(us / 1000).toFixed(2)}ms`;
 
   let statsCollapsed = $state(false);
+
+  // ── Page-level shared scrollbar ───────────────────────────────────────────
+  // #content-wrapper (overflow-auto) is the ONE scroll container for the whole
+  // page.  The stats panel and workflow header scroll away naturally; the canvas
+  // wrapper below is position:sticky so it locks to the viewport once the stats
+  // slide off.  A zero-height sentinel element sits at the natural boundary
+  // between the stats and the canvas; its viewport top gives us the timeline's
+  // scrollY without needing to track any heights explicitly:
+  //   timelineScrollY = max(0, -sentinelEl.getBoundingClientRect().top)
+
+  let sentinelEl = $state<HTMLDivElement | null>(null);
+  let scrollContainerEl: HTMLElement | null = null;
+  let _rendererScrollY = 0;
+
+  onMount(() => {
+    scrollContainerEl = document.getElementById('content-wrapper');
+    if (scrollContainerEl) {
+      scrollContainerEl.scrollTop = 0;
+      scrollContainerEl.addEventListener('scroll', handlePageScroll, {
+        passive: true,
+      });
+    }
+    return () => {
+      scrollContainerEl?.removeEventListener('scroll', handlePageScroll);
+    };
+  });
+
+  function handlePageScroll() {
+    if (!sentinelEl) return;
+    const scrollY = Math.max(0, -sentinelEl.getBoundingClientRect().top);
+    _rendererScrollY = scrollY;
+    setViewport({ scrollY });
+  }
+
+  // Push #content-wrapper scroll when the renderer moves programmatically
+  // (e.g. a gutter-pin click sets viewport.scrollY directly).
+  $effect(() => {
+    const scrollY = timelineState.viewport.scrollY;
+    if (!scrollContainerEl || !sentinelEl) return;
+    if (Math.abs(scrollY - _rendererScrollY) > 0.5) {
+      _rendererScrollY = scrollY;
+      const sentinelNaturalOffset =
+        sentinelEl.getBoundingClientRect().top + scrollContainerEl.scrollTop;
+      scrollContainerEl.scrollTop = sentinelNaturalOffset + scrollY;
+    }
+  });
 </script>
 
 <PageTitle title={`Fasterer | ${workflowId}`} url={page.url.href} />
 
-<div class="flex h-[calc(100vh-3.5rem)] flex-col">
+<!--
+  Page-level scrollbar layout:
+    - #content-wrapper (the app's overflow-auto scroll container) drives everything.
+    - Stats panel is in normal flow and scrolls away with the rest of the page.
+    - A zero-height sentinel marks the boundary between stats and the canvas.
+    - Canvas wrapper is position:sticky — once content above scrolls off, it locks
+      to the viewport top (below the 3rem top-nav).
+    - Spacer at the bottom extends #content-wrapper scroll range by maxScrollY.
+-->
+<div class="flex flex-col">
   <div class="bg-surface shrink-0 border-b border-subtle">
     <div class="flex items-center gap-4 px-4 py-2">
       <h2 class="text-lg font-semibold">⚡ Fasterer</h2>
@@ -418,7 +486,15 @@
     {/if}
   </div>
 
-  <div class="bg-gray-950 min-h-0 flex-1">
+  <!-- Sentinel: zero-height; its viewport top tells us timeline scrollY -->
+  <div bind:this={sentinelEl} class="pointer-events-none h-0"></div>
+
+  <!-- Canvas wrapper: sticky below the 3rem top-nav, fills remaining viewport -->
+  <!-- Negative margins cancel the p-4/md:p-8 from the app shell so the timeline goes edge-to-edge -->
+  <div
+    class="bg-gray-950 sticky -mx-4 w-[calc(100%+2rem)] overflow-hidden md:-mx-8 md:w-[calc(100%+4rem)]"
+    style="top: 3rem; height: calc(100dvh - 3rem);"
+  >
     {#if pixiArgs.poolCount > 0 || phase === 'fetching'}
       <Timeline renderArgs={pixiArgs} class="h-full" />
     {:else if phase === 'idle'}
@@ -427,6 +503,12 @@
       </div>
     {/if}
   </div>
+
+  <!-- Spacer: extends the scroll range so the native scrollbar covers maxScrollY -->
+  <div
+    class="pointer-events-none"
+    style="height: {timelineState.maxScrollY}px;"
+  ></div>
 </div>
 
 <style lang="postcss">

@@ -1,5 +1,6 @@
 import { SvelteMap } from 'svelte/reactivity';
 
+import type { TimeScale } from './renderer/fonts';
 import type { TemporalEvent, TimelineViewport } from './types';
 
 export const TIMELINE_CTX = Symbol('timeline-ctx');
@@ -30,6 +31,8 @@ export class TimelineState {
   expandedPanelHeights = $state<Record<string, number>>({});
   rendererInfo = $state('');
   grouped = $state(true);
+  timeScale = $state<TimeScale>('auto');
+  sortOrder = $state<'desc' | 'asc'>('desc');
   openedChildWorkflows = $state<
     {
       runId: string;

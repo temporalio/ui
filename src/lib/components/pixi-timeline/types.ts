@@ -47,4 +47,10 @@ export interface PixiRenderArgs {
   descCount: number;
   /** True once fetchBidirectional completes and assignTrackIndices() has been called. */
   finalized: boolean;
+  /**
+   * Sort order for the track layout.
+   * - 'desc' (default): newest events at top, oldest at bottom.
+   * - 'asc': oldest events at top (tracks rendered in reverse Y order).
+   */
+  sortOrder: 'desc' | 'asc';
 }

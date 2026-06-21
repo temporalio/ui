@@ -39,6 +39,38 @@ export function clampViewportStartMs(
 export const MAX_SCALE_Y = 1.0;
 
 /**
+ * Compute the initial viewport for a fresh timeline load.
+ *
+ * For long workflows (>30s) we zoom into the last 15% of the timeline
+ * (capped at 60s) where the first-loaded desc-section events live, so the
+ * canvas is populated immediately rather than showing an empty fit-all view.
+ * For short workflows we fall back to a plain fit-all.
+ *
+ * @param endRelMs   Duration of the fully-loaded dataset in ms (maxMs - minMs)
+ * @param screenW    Canvas width in pixels
+ * @param minZoom    Minimum allowed zoom (px/ms)
+ * @param maxZoom    Maximum allowed zoom (px/ms)
+ */
+export function initialViewport(
+  endRelMs: number,
+  screenW: number,
+  minZoom: number,
+  maxZoom: number,
+): { startMs: number; zoom: number } {
+  if (endRelMs > 30_000) {
+    const windowMs = Math.min(60_000, endRelMs * 0.15);
+    const zoom = Math.max(minZoom, Math.min(maxZoom, screenW / windowMs));
+    return { startMs: endRelMs - windowMs * 0.25, zoom };
+  }
+  const span = endRelMs + 600;
+  const zoom = Math.max(
+    minZoom,
+    Math.min(maxZoom, screenW / Math.max(span, 1)),
+  );
+  return { startMs: -200, zoom };
+}
+
+/**
  * Clamp a candidate scaleY to the valid [min, MAX_SCALE_Y] range.
  *
  * @param candidate   New scaleY after applying a zoom factor
