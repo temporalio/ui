@@ -98,9 +98,13 @@ export function packGutterPins<T extends PackGutterInput>(
 
   // ── Pass 2: greedy pixel-space deduplication within each row ──────────────
   // Process entries in importance order (the order they were inserted into each
-  // row during pass 1, which reflects the collectGutterBest priority sort).
-  // This guarantees a high-priority timer always wins over a lower-priority
-  // activity at a nearby pixel position.
+  // row during pass 1, which mirrors the collectGutterBest input sort).
+  //
+  // IMPORTANT: do NOT re-sort by px here. Re-sorting by px would let a
+  // lower-priority activity at px=100 block a high-priority timer at px=102,
+  // because the activity would be processed first and claim the pixel range.
+  // Importance-first ordering guarantees timers/child-workflows always win
+  // pixel conflicts against plain activities.
   const result: PackedGutterPin<T>[] = [];
   for (let r = 0; r < rows.length; r++) {
     const drawnRanges: [number, number][] = [];

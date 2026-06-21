@@ -41,6 +41,7 @@ import {
 import { gatherGutterTracks } from './gutter-culling';
 import { gutterIconLayout } from './gutter-layout';
 import { packGutterPins } from './pack-gutter-pins';
+import { calcScrollXPan, X_PAN_EASE } from './scroll-x-pan';
 import {
   clampScaleY,
   clampViewportStartMs,
@@ -201,6 +202,13 @@ export class PixiRenderer {
 
   private lastCursor = 'default';
 
+  /**
+   * Scroll-snap: after the user's vertical scroll gesture ends (wheel events
+   * stop firing), nudge the viewport so the Nth event lands at the target Y
+   * fraction.  We do NOT intercept the wheel event — native DOM scroll runs
+   * at full speed — we only adjust the final resting position.
+   */
+
   private panState: PanState = {
     active: false,
     startX: 0,
@@ -231,6 +239,8 @@ export class PixiRenderer {
   // pins stably (independent of the current viewport pan/zoom).
   private dataRelMinMs = 0;
   private dataRelMaxMs = 100_000;
+
+  private xPanTarget: number | null = null;
 
   private dirty = true;
   private lastStartMs = NaN;
@@ -853,6 +863,18 @@ export class PixiRenderer {
       }
     }
 
+    // Animate X pan toward target (exponential ease).
+    if (this.xPanTarget !== null) {
+      const delta = this.xPanTarget - this.state.viewport.startMs;
+      if (Math.abs(delta) < 0.5) {
+        this.state.viewport.startMs = this.xPanTarget;
+        this.xPanTarget = null;
+      } else {
+        this.state.viewport.startMs += delta * X_PAN_EASE;
+        this.dirty = true;
+      }
+    }
+
     const { viewport } = this.state;
     const { startMs, scrollY, zoom, scaleY } = viewport;
     const { trackHeight, trackGap } = this.config;
@@ -1129,6 +1151,22 @@ export class PixiRenderer {
    *   pw = max(MIN_BAR_W, duration * zoom)
    * Events entirely off-screen clamp to the left or right margin at MIN_BAR_W.
    * Row assignment uses time-range non-overlap so density is maximised.
+   *
+   * Priority rules (most important events are always visible):
+   *  1. collectGutterBest sorts by (duration DESC, type priority ASC), so
+   *     timers and child-workflows bubble ahead of plain activities.
+   *  2. For the above-gutter, track indices are reversed before collection so
+   *     that the closest-to-viewport tracks are processed first when the
+   *     PACK_SAMPLE cap is hit on equal-duration batches.
+   *  3. packGutterPins pass 2 preserves the importance ordering — it does NOT
+   *     re-sort by px — so a high-priority timer at px=102 always wins over a
+   *     low-priority activity at px=100 when both would occupy the same slot.
+   *
+   * Row stacking visual contract:
+   *  - Top gutter:    Row 0 = outer edge (nearest ruler).
+   *  - Bottom gutter: Row 0 = outer edge (nearest screen bottom).
+   *    The most-important events therefore sit at the edges of the screen,
+   *    making them the first things the eye falls on.
    */
   private drawGutterPins(
     startMs: number,
@@ -1432,9 +1470,67 @@ export class PixiRenderer {
       'wheel',
       (e) => {
         const isZoom = e.ctrlKey || e.shiftKey;
-        const isHorizontal = !isZoom && Math.abs(e.deltaX) > Math.abs(e.deltaY);
-        // Vertical-only scroll: let native overflow-y scroll handle it.
-        if (!isZoom && !isHorizontal) return;
+        // Require horizontal component to be at least 2× the vertical before
+        // treating it as a horizontal pan.  A factor of 1 was too sensitive on
+        // macOS trackpads — any slight diagonal swipe would accumulate deltaX
+        // and drift startMs past the event range.
+        const isHorizontal =
+          !isZoom && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 2;
+
+        // Vertical-only wheel: let native DOM scroll handle Y movement.
+        // On every event, immediately pan X so events at the new Y position
+        // stay visible in the canvas — no debounce, no cooldown.
+        if (!isZoom && !isHorizontal) {
+          const { trackHeight, trackGap } = this.config;
+          const { scaleY } = this.state.viewport;
+          const rowH = trackHeight * scaleY + Math.max(1, trackGap * scaleY);
+          const visibleH = this.app.screen.height - RULER_H;
+          const totalTracks = this.byTrack.length || 1;
+
+          // Anticipate scrollY after this delta so X pans ahead of native scroll.
+          const anticipatedScrollY = Math.max(
+            0,
+            Math.min(this.maxScrollY(), this.state.viewport.scrollY + e.deltaY),
+          );
+
+          const topTrack = Math.max(0, Math.floor(anticipatedScrollY / rowH));
+          const bottomTrack = Math.min(
+            totalTracks - 1,
+            Math.floor((anticipatedScrollY + visibleH) / rowH),
+          );
+
+          let evMinMs = Infinity;
+          let evMaxMs = -Infinity;
+          for (let t = topTrack; t <= bottomTrack; t++) {
+            const track = this.byTrack[t];
+            if (!track) continue;
+            for (const ev of track) {
+              if (ev.startMs < evMinMs) evMinMs = ev.startMs;
+              if (ev.endMs > evMaxMs) evMaxMs = ev.endMs;
+            }
+          }
+          if (evMinMs < Infinity) {
+            const screenW = this.app.screen.width || 1200;
+            const { zoom, startMs } = this.state.viewport;
+            const sortOrder =
+              (this.currentArgs.sortOrder as 'desc' | 'asc') ?? 'desc';
+            const result = calcScrollXPan({
+              evMinMs,
+              evMaxMs,
+              startMs,
+              screenW,
+              zoom,
+              deltaY: e.deltaY,
+              sortOrder,
+            });
+            if (result !== null) {
+              this.xPanTarget = this.clampStartMs(result);
+              this.dirty = true;
+            }
+          }
+
+          return; // native DOM handles Y movement
+        }
 
         e.preventDefault();
         e.stopPropagation();
@@ -1457,6 +1553,7 @@ export class PixiRenderer {
           this.pendingZoomCX = e.clientX;
           this.pendingZoomCY = e.clientY;
         } else {
+          this.xPanTarget = null; // user is manually panning X — cancel auto-pan
           this.pendingWheelDX += Math.abs(dx) > Math.abs(dy) ? dx : dy;
         }
         this.hasPendingWheel = true;
