@@ -66,12 +66,12 @@
         >
           <Link
             href={routeForWorkflow({
-              workflow: run.startWorkflowResult.workflowId,
-              run: run.startWorkflowResult.runId,
+              workflow: run.startWorkflowResult?.workflowId,
+              run: run.startWorkflowResult?.runId,
               namespace,
             })}
           >
-            {run.startWorkflowResult.workflowId}
+            {run.startWorkflowResult?.workflowId}
           </Link>
         </div>
 

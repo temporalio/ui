@@ -82,6 +82,7 @@ export const Strings = {
   status: 'Status',
   'created-label': 'Created',
   created: 'Created: {{created}}',
+  'last-updated-label': 'Last Updated',
   'last-updated': 'Last Updated: {{updated}}',
   edit: 'Edit',
   update: 'Update',

@@ -17,7 +17,7 @@
 
   let { schedule, namespace, scheduleId }: Props = $props();
 
-  // We are conditionally remndering each modal in order to reset modal state on open/close
+  // We are conditionally rendering each modal in order to reset modal state on open/close
   const scheduleOverlapPolicy = $derived(
     parseOverlapPolicy(schedule?.schedule?.policies?.overlapPolicy),
   );

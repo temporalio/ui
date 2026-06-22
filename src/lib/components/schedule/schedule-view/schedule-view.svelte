@@ -110,7 +110,7 @@
   </div>
 
   <DetailList rowCount={3}>
-    <DetailListLabel class="flex min-h-6 items-center text-sm font-medium"
+    <DetailListLabel class="flex min-h-6 items-center"
       >{translate('common.workflow-type')}</DetailListLabel
     >
     <DetailListValue
@@ -142,7 +142,7 @@
       </Link>
     </DetailListValue>
 
-    <DetailListLabel class="items-center text-sm font-medium">
+    <DetailListLabel class="items-center">
       {translate('common.created-label')}
     </DetailListLabel>
     <DetailListTimestampValue
@@ -151,8 +151,8 @@
     />
 
     {#if schedule?.info?.updateTime}
-      <DetailListLabel class="text-sm font-medium">
-        {translate('common.last-updated')}
+      <DetailListLabel>
+        {translate('common.last-updated-label')}
       </DetailListLabel>
       <DetailListTimestampValue
         class="text-sm"
@@ -161,8 +161,10 @@
     {/if}
   </DetailList>
 
-  <dl class="flex flex-col gap-2">
-    <dt class="text-sm font-medium text-secondary">Total Workflows</dt>
+  <dl class="-mt-2 flex flex-col gap-1">
+    <dt class="text-secondary">
+      {translate('workflows.total-workflows')}
+    </dt>
     <dd class="flex flex-wrap items-center gap-2">
       <span class="font-mono" data-testid="workflow-count"
         >{$workflowCount.count.toLocaleString()}
