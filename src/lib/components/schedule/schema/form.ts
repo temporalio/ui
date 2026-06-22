@@ -178,7 +178,7 @@ export const formScheduleSchema = z
     workflowType: z.string().trim().min(1, 'Workflow type is required'),
     workflowId: z.string().trim().default(''),
     taskQueue: z.string().trim().min(1, 'Task queue is required'),
-    input: jsonString().optional(),
+    inputs: z.array(jsonString()).default(['']),
     editInput: z.boolean().default(false),
     encoding: z.enum(['json/plain', 'json/protobuf']).default('json/plain'),
     messageType: z.string().trim().optional(),
