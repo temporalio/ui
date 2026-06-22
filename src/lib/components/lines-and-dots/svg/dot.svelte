@@ -74,7 +74,7 @@
   }
 
   .timer {
-    fill: #fbbf24;
+    fill: #b65507;
   }
 
   .signal {
@@ -82,20 +82,20 @@
   }
 
   .activity {
-    fill: #a78bfa;
+    fill: #713aed;
   }
 
   .pending {
-    stroke: #a78bfa;
+    stroke: #713aed;
     fill: #141414;
   }
 
   .child-workflow {
-    fill: #b2f8d9;
+    fill: #0e7d90;
   }
 
   .update {
-    fill: #06b6d4;
+    fill: #0899b2;
   }
 
   .workflow {
@@ -108,12 +108,12 @@
 
   .Completed {
     stroke: #00964e;
-    fill: #1ff1a5;
+    fill: #00964e;
   }
 
   .Fired {
-    stroke: #fed64b;
-    fill: #f8a208;
+    stroke: #dc7a03;
+    fill: #dc7a03;
   }
 
   .Signaled {
@@ -128,12 +128,12 @@
   }
 
   .TimedOut {
-    stroke: #f97316;
+    stroke: #ea670c;
     fill: #c2570c;
   }
 
   .Canceled {
-    stroke: #fff4c6;
-    fill: #fed64b;
+    stroke: #dc7a03;
+    fill: #b65507;
   }
 </style>

@@ -222,22 +222,22 @@ export const getStatusStrokeColor = (
 ): string => {
   switch (status) {
     case 'Completed':
-      return '#1ff1a5';
+      return '#00964e';
     case 'Failed':
     case 'Terminated':
       return '#c71607';
     case 'Signaled':
       return '#d300d8';
     case 'Fired':
-      return '#f8a208';
+      return '#dc7a03';
     case 'TimedOut':
-      return '#f97316';
+      return '#ea670c';
     case 'Canceled':
-      return '#fed64b';
+      return '#b65507';
     case 'Running':
       return '#3b82f6';
     case 'Delayed':
-      return '#fbbf24';
+      return '#b65507';
     default:
       return DEFAULT_STROKE_COLOR;
   }
@@ -248,23 +248,23 @@ export const getCategoryStrokeColor = (
 ): string => {
   switch (category) {
     case 'timer':
-      return '#fbbf24';
+      return '#b65507';
     case 'signal':
       return '#d300d8';
     case 'activity':
-      return '#a78bfa';
+      return '#713aed';
     case 'workflow':
     case 'marker':
     case 'command':
       return '#ebebeb';
     case 'child-workflow':
-      return '#0899B2';
+      return '#0899b2';
     case 'update':
-      return '#FF9B70';
+      return '#c2570c';
     case 'pending':
-      return '#a78bfa';
+      return '#713aed';
     case 'retry':
-      return '#FF9B70';
+      return '#c2570c';
     default:
       return DEFAULT_STROKE_COLOR;
   }
