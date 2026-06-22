@@ -91,6 +91,7 @@ import merge from './svg/merge.svelte';
 import microchip from './svg/microchip.svelte';
 import microsoft from './svg/microsoft.svelte';
 import minimize from './svg/minimize.svelte';
+import minus from './svg/minus.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
@@ -102,6 +103,7 @@ import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import play from './svg/play.svelte';
+import plus from './svg/plus.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -249,6 +251,7 @@ export const icons = {
   microchip,
   microsoft,
   minimize,
+  minus,
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
@@ -256,6 +259,7 @@ export const icons = {
   'office-buildings': officeBuildings,
   overview,
   play,
+  plus,
   pause,
   pencil,
   'pin-filled': pinFilled,
