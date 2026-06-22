@@ -41,6 +41,54 @@ test.describe('Creates Schedule Successfully', () => {
     await expect(page.getByTestId('loading')).toBeVisible();
   });
 
+  test.describe('Multiple Inputs', () => {
+    test('adds and removes input rows', async ({ page }) => {
+      await expect(page.getByTestId('add-input')).toBeVisible();
+      await expect(page.getByTestId('remove-input-0')).toBeHidden();
+
+      await page.getByTestId('add-input').click();
+      await expect(page.getByTestId('remove-input-0')).toBeVisible();
+      await expect(page.getByTestId('remove-input-1')).toBeVisible();
+
+      await page.getByTestId('remove-input-1').click();
+      await expect(page.getByTestId('remove-input-0')).toBeHidden();
+    });
+
+    test('does not duplicate editors after add -> remove -> add', async ({
+      page,
+    }) => {
+      const editors = page.locator('[id^="input-"] .cm-content');
+
+      await expect(editors).toHaveCount(1);
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+
+      await page.getByTestId('remove-input-1').click();
+      await expect(editors).toHaveCount(1);
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+    });
+
+    test('removing the first input keeps the correct remaining content', async ({
+      page,
+    }) => {
+      const editors = page.locator('[id^="input-"] .cm-content');
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+
+      await editors.nth(0).fill('"first"');
+      await editors.nth(1).fill('"second"');
+
+      await page.getByTestId('remove-input-0').click();
+
+      await expect(editors).toHaveCount(1);
+      await expect(editors.nth(0)).toHaveText('"second"');
+    });
+  });
+
   test('fills out schedule with custom search attributes and submits', async ({
     page,
   }) => {
