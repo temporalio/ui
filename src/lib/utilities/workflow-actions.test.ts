@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatIdentity } from './core-context';
 import { formatReason, getPlaceholder } from './workflow-actions';
 import { Action } from '../models/workflow-actions';
 
-function getIdentity(withUser: boolean = false): string {
-  return withUser ? formatIdentity('test@temporal.io') : formatIdentity();
+function getIdentity(withUser: boolean = false): string | undefined {
+  return withUser ? 'test@temporal.io' : undefined;
 }
 
 describe('getPlaceholder', () => {
@@ -13,11 +12,13 @@ describe('getPlaceholder', () => {
     const identity = getIdentity();
     it('should return the correct placeholder', () => {
       expect(getPlaceholder(Action.Cancel, identity)).toEqual(
-        'Canceled by webui',
+        'Canceled by Unknown',
       );
-      expect(getPlaceholder(Action.Reset, identity)).toEqual('Reset by webui');
+      expect(getPlaceholder(Action.Reset, identity)).toEqual(
+        'Reset by Unknown',
+      );
       expect(getPlaceholder(Action.Terminate, identity)).toEqual(
-        'Terminated by webui',
+        'Terminated by Unknown',
       );
     });
   });
@@ -26,13 +27,13 @@ describe('getPlaceholder', () => {
     const identity = getIdentity(true);
     it('should return the correct placeholder', () => {
       expect(getPlaceholder(Action.Cancel, identity)).toEqual(
-        'Canceled by test@temporal.io - webui',
+        'Canceled by test@temporal.io',
       );
       expect(getPlaceholder(Action.Reset, identity)).toEqual(
-        'Reset by test@temporal.io - webui',
+        'Reset by test@temporal.io',
       );
       expect(getPlaceholder(Action.Terminate, identity)).toEqual(
-        'Terminated by test@temporal.io - webui',
+        'Terminated by test@temporal.io',
       );
     });
   });
@@ -44,38 +45,38 @@ describe('formatReason', () => {
     it('should return the reason with the placeholder', () => {
       expect(
         formatReason({ action: Action.Cancel, reason: 'Testing', identity }),
-      ).toEqual('Testing Canceled by webui');
+      ).toEqual('Testing Canceled by Unknown');
       expect(
         formatReason({ action: Action.Reset, reason: 'Testing', identity }),
-      ).toEqual('Testing Reset by webui');
+      ).toEqual('Testing Reset by Unknown');
       expect(
         formatReason({ action: Action.Terminate, reason: 'Testing', identity }),
-      ).toEqual('Testing Terminated by webui');
+      ).toEqual('Testing Terminated by Unknown');
       expect(
         formatReason({ action: Action.Pause, reason: 'Testing', identity }),
-      ).toEqual('Testing Paused by webui');
+      ).toEqual('Testing Paused by Unknown');
       expect(
         formatReason({ action: Action.Unpause, reason: 'Testing', identity }),
-      ).toEqual('Testing Unpaused by webui');
+      ).toEqual('Testing Unpaused by Unknown');
     });
   });
 
   it('should return the placeholder if there is no reason', () => {
     const reason = '';
     expect(formatReason({ action: Action.Cancel, reason, identity })).toEqual(
-      'Canceled by webui',
+      'Canceled by Unknown',
     );
     expect(formatReason({ action: Action.Reset, reason, identity })).toEqual(
-      'Reset by webui',
+      'Reset by Unknown',
     );
     expect(
       formatReason({ action: Action.Terminate, reason, identity }),
-    ).toEqual('Terminated by webui');
+    ).toEqual('Terminated by Unknown');
     expect(formatReason({ action: Action.Pause, reason, identity })).toEqual(
-      'Paused by webui',
+      'Paused by Unknown',
     );
     expect(formatReason({ action: Action.Unpause, reason, identity })).toEqual(
-      'Unpaused by webui',
+      'Unpaused by Unknown',
     );
   });
 
@@ -90,35 +91,35 @@ describe('formatReason', () => {
           reason,
           identity,
         }),
-      ).toEqual('Testing Canceled by test@temporal.io - webui');
+      ).toEqual('Testing Canceled by test@temporal.io');
       expect(
         formatReason({
           action: Action.Reset,
           reason,
           identity,
         }),
-      ).toEqual('Testing Reset by test@temporal.io - webui');
+      ).toEqual('Testing Reset by test@temporal.io');
       expect(
         formatReason({
           action: Action.Terminate,
           reason,
           identity,
         }),
-      ).toEqual('Testing Terminated by test@temporal.io - webui');
+      ).toEqual('Testing Terminated by test@temporal.io');
       expect(
         formatReason({
           action: Action.Pause,
           reason,
           identity,
         }),
-      ).toEqual('Testing Paused by test@temporal.io - webui');
+      ).toEqual('Testing Paused by test@temporal.io');
       expect(
         formatReason({
           action: Action.Unpause,
           reason,
           identity,
         }),
-      ).toEqual('Testing Unpaused by test@temporal.io - webui');
+      ).toEqual('Testing Unpaused by test@temporal.io');
     });
 
     it('should return the placeholder if there is no reason', () => {
@@ -130,35 +131,35 @@ describe('formatReason', () => {
           reason,
           identity,
         }),
-      ).toEqual('Canceled by test@temporal.io - webui');
+      ).toEqual('Canceled by test@temporal.io');
       expect(
         formatReason({
           action: Action.Reset,
           reason,
           identity,
         }),
-      ).toEqual('Reset by test@temporal.io - webui');
+      ).toEqual('Reset by test@temporal.io');
       expect(
         formatReason({
           action: Action.Terminate,
           reason,
           identity,
         }),
-      ).toEqual('Terminated by test@temporal.io - webui');
+      ).toEqual('Terminated by test@temporal.io');
       expect(
         formatReason({
           action: Action.Pause,
           reason,
           identity,
         }),
-      ).toEqual('Paused by test@temporal.io - webui');
+      ).toEqual('Paused by test@temporal.io');
       expect(
         formatReason({
           action: Action.Unpause,
           reason,
           identity,
         }),
-      ).toEqual('Unpaused by test@temporal.io - webui');
+      ).toEqual('Unpaused by test@temporal.io');
     });
   });
 });
