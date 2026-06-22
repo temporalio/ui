@@ -38,16 +38,3 @@ export const getPlaceholder = (
     identity: identity || translate('common.unknown'),
   });
 };
-
-export const formatReason = ({
-  action,
-  reason,
-  identity,
-}: {
-  action: Action;
-  reason: string;
-  identity: string | undefined;
-}) => {
-  const placeholder = getPlaceholder(action, identity);
-  return reason ? [reason.trim(), placeholder].join(' ') : placeholder;
-};
