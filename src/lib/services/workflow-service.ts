@@ -50,19 +50,12 @@ import type {
   WorkflowExecution,
   WorkflowIdentifier,
 } from '$lib/types/workflows';
-import {
-  decodePayloadAndParseDataToJSON,
-  type PotentiallyDecodable,
-} from '$lib/utilities/decode-payload';
+import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 import {
   encodePayloads,
   setBase64Payload,
 } from '$lib/utilities/encode-payload';
-import {
-  handleUnauthorizedOrForbiddenError,
-  isForbidden,
-  isUnauthorized,
-} from '$lib/utilities/handle-error';
+import { isForbidden, isUnauthorized } from '$lib/utilities/handle-error';
 import { paginated } from '$lib/utilities/paginated';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
@@ -176,8 +169,6 @@ export const fetchAllWorkflows = async (
 
   let error = '';
   const onError: ErrorCallback = (err) => {
-    // Kick out to login if 401/403
-    handleUnauthorizedOrForbiddenError(err);
     if (err?.body?.message || err?.status) {
       error =
         err?.body?.message ??
@@ -1119,8 +1110,6 @@ export const fetchPaginatedWorkflows = async (
     workflowError.set('');
 
     const onError: ErrorCallback = (err) => {
-      handleUnauthorizedOrForbiddenError(err);
-
       if (get(hideWorkflowQueryErrors)) {
         workflowError.set(translate('workflows.workflows-error-querying'));
       } else {
@@ -1155,9 +1144,7 @@ export const fetchPaginatedArchivedWorkflows = async (
   request = fetch,
 ): Promise<PaginatedWorkflowsPromise> => {
   return (pageSize = 100, token = '') => {
-    const onError: ErrorCallback = (err) => {
-      handleUnauthorizedOrForbiddenError(err);
-    };
+    const onError: ErrorCallback = () => {};
 
     const route = routeForApi('workflows.archived', { namespace });
     return requestFromAPI<ListWorkflowExecutionsResponse>(route, {

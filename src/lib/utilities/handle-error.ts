@@ -4,9 +4,9 @@ import { networkError } from '$lib/stores/error';
 import { toaster } from '$lib/stores/toaster';
 import type { NetworkError } from '$lib/types/global';
 
+import type { APIErrorResponse, TemporalAPIError } from './api-request-manager';
 import { has } from './has';
 import { isNetworkError } from './is-network-error';
-import type { APIErrorResponse, TemporalAPIError } from './request-from-api';
 import { routeForLoginPage } from './route-for';
 
 interface NetworkErrorWithReport extends NetworkError {
@@ -17,7 +17,7 @@ export const handleError = (
   error: unknown,
   toasts = toaster,
   errors = networkError,
-  isBrowser = BROWSER,
+  _isBrowser = BROWSER,
 ): void => {
   if (error instanceof DOMException && error.name === 'AbortError') {
     return;
@@ -33,14 +33,6 @@ export const handleError = (
     toasts.push({ variant: 'error', message: error.message });
   }
 
-  if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
-  }
-
-  if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
-  }
-
   if (isNetworkError(error)) {
     toasts.push({
       variant: 'error',
@@ -53,18 +45,19 @@ export const handleError = (
   throw error;
 };
 
+type AuthErrorHandlingOptions = {
+  redirectToLogin?: boolean;
+};
+
 export const handleUnauthorizedOrForbiddenError = (
   error: APIErrorResponse,
   isBrowser = BROWSER,
+  options: AuthErrorHandlingOptions = {},
 ): void => {
-  if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
-    return;
-  }
+  if (!options.redirectToLogin || !isBrowser) return;
 
-  if (isForbidden(error) && isBrowser) {
+  if (isUnauthorized(error)) {
     window.location.assign(routeForLoginPage());
-    return;
   }
 };
 

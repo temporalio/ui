@@ -1,9 +1,13 @@
 import { URLSearchParams } from 'url';
 
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { handleError } from './handle-error';
-import { isTemporalAPIError, requestFromAPI } from './request-from-api';
+import {
+  isAuthenticationError,
+  isTemporalAPIError,
+  requestFromAPI,
+} from './request-from-api';
 import { routeForApi } from './route-for-api';
 
 import listWorkflowResponse from '$fixtures/list-workflows.json';
@@ -63,6 +67,10 @@ describe('requestFromAPI', () => {
         ...response,
       });
     }) as unknown as typeof fetch;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('should fetch the endpoint', async () => {
     const request = fetchMock();
@@ -183,9 +191,9 @@ describe('requestFromAPI', () => {
     expect((error as unknown as ErrorResponse).statusCode).toBe(status);
   });
 
-  it('should call handleError if onError is not provided', async () => {
-    const status = 403;
-    const statusText = 'Unauthorized';
+  it('should call handleError for non-authentication errors if onError is not provided', async () => {
+    const status = 500;
+    const statusText = 'Internal Server Error';
     const body = { error: statusText };
     const ok = false;
 
@@ -195,5 +203,20 @@ describe('requestFromAPI', () => {
     });
 
     expect(handleError).toHaveBeenCalled();
+  });
+
+  it('should throw authentication errors without calling handleError', async () => {
+    const status = 403;
+    const statusText = 'Forbidden';
+    const body = { error: statusText };
+    const ok = false;
+
+    const request = fetchMock(body, { status, ok, statusText });
+    const error = await requestFromAPI(endpoint, { request }).catch(
+      (error) => error,
+    );
+
+    expect(isAuthenticationError(error)).toBe(true);
+    expect(handleError).not.toHaveBeenCalled();
   });
 });
