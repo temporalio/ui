@@ -1,6 +1,7 @@
 import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 import type { Payload } from '$lib/types';
 import {
+  encodeMultiplePayloads,
   encodePayloads,
   setSearchAttributes,
 } from '$lib/utilities/encode-payload';
@@ -109,9 +110,9 @@ async function getScheduleActionRequest(
     describeFullSchedule?.schedule?.action?.startWorkflow ?? {};
 
   const [payloads, header] = await Promise.all([
-    scheduleForm.editInput && scheduleForm.input
-      ? encodePayloads({
-          input: scheduleForm.input,
+    scheduleForm.editInput && scheduleForm.inputs.some(Boolean)
+      ? encodeMultiplePayloads({
+          inputs: scheduleForm.inputs,
           encoding: scheduleForm.encoding,
           messageType: scheduleForm.messageType,
         })

@@ -223,7 +223,7 @@
     </div>
 
     <ScheduleInputPayload
-      bind:input={() => $form.input ?? '', (v) => ($form.input = v)}
+      bind:inputs={$form.inputs}
       bind:editInput={$form.editInput}
       bind:encoding={$form.encoding}
       bind:messageType={
