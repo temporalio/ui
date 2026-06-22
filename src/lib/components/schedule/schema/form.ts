@@ -105,7 +105,8 @@ export const formSpecSchema = z
         if (!isValidCronString(spec.cronString)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'Must be a valid cron string',
+            message:
+              'Cron string format invalid. Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6) separated by a space',
             path: ['cronString'],
           });
         }

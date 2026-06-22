@@ -205,7 +205,7 @@ export const Strings = {
   'cron-shortcut-monthly': 'Monthly on {{- day}}',
   'cron-expression-label': 'Cron expression',
   'cron-format-hint':
-    'Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6)',
+    'Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6) separated by a space',
   'cron-formatting-help': 'Formatting help',
   'after-n-occurrence_one': 'After {{count}} occurrence',
   'after-n-occurrence_other': 'After {{count}} occurrences',
@@ -247,7 +247,8 @@ export const Strings = {
   'end-date-label': 'End Date',
   'end-date-picker-label': 'End date',
   'occurrences-label': 'Occurrences',
-  'occurrences-placeholder': '### occurrences',
+  'occurrences-suffix': 'occurrences',
+  'occurrences-placeholder': '###',
   'timezone-label': 'Timezone',
   'timezone-placeholder': 'Search timezone…',
   'jitter-tooltip':
@@ -271,28 +272,4 @@ export const Strings = {
   'add-another-spec': '+ Add another schedule spec',
   'run-time-based-on-timezone':
     'Based on the specified timezone ({{- timezoneName}})',
-  'schedule-input': 'Schedule Input',
-  'trigger-unspecified-title': 'Use Policy',
-  'trigger-unspecified-description': "Use the Schedule's overlap policy.",
-  'trigger-skip-title': 'Skip',
-  'trigger-skip-description':
-    'When the workflow completes, the next occurrence that is scheduled after that time is considered.',
-  'trigger-buffer-one-title': 'Buffer One',
-  'trigger-buffer-one-description':
-    'Start the workflow again as soon as the current workflow completes, but buffer only one start. If another start is scheduled to happen while the workflow is running, and a workflow is already buffered, only the first workflow starts after the running workflow completes.',
-  'trigger-buffer-all-title': 'Buffer All',
-  'trigger-buffer-all-description':
-    'Buffer any number of workflow starts to happen sequentially, beginning immediately after the running workflow completes.',
-  'trigger-cancel-other-title': 'Cancel Other',
-  'trigger-cancel-other-description':
-    'If another workflow is running, cancel it. After the previous workflow completes cancellation, start the new workflow.',
-  'trigger-terminate-other-title': 'Terminate Other',
-  'trigger-terminate-other-description':
-    'If another workflow is running, terminate it and start the new workflow immediately.',
-  'trigger-allow-all-title': 'Allow All',
-  'trigger-allow-all-description':
-    "Start any number of concurrent workflows. Last completion result and last failure aren't available because the workflows aren't sequential.",
-  'catchup-window': 'Catchup Window',
-  'crow-view-example-description':
-    'Temporal Workflow Schedule Cron strings follow this format:',
 } as const;

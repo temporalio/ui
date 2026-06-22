@@ -10,9 +10,10 @@
   interface Props {
     count: number;
     refresh: Writable<number>;
+    onRefresh?: () => void;
   }
 
-  let { count, refresh }: Props = $props();
+  let { count, refresh, onRefresh }: Props = $props();
 
   const duration = 300;
 </script>
@@ -21,7 +22,10 @@
   size="xs"
   variant="ghost"
   leadingIcon="retry"
-  on:click={() => ($refresh = Date.now())}
+  on:click={() => {
+    $refresh = Date.now();
+    onRefresh?.();
+  }}
 >
   {translate('common.refresh')}
   <span

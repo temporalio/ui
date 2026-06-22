@@ -4,18 +4,23 @@
   import { translate } from '$lib/i18n/translate';
   import type { Payloads } from '$lib/types';
 
-  let { input, scheduleId }: { input: Payloads; scheduleId: string } = $props();
+  interface Props {
+    input?: Payloads;
+    scheduleId: string;
+  }
+
+  let { input, scheduleId }: Props = $props();
 </script>
 
-<Panel>
+<Panel class="flex w-full flex-col gap-4 border-subtle p-6" as="section">
   <InputAndResultsPayload
-    title={translate('schedules.schedule-input')}
+    title={translate('schedules.workflow-input')}
     content={input}
     payloadDownloadFilenameData={{ scheduleId, type: 'input' }}
   >
     {#snippet titleSnippet()}
-      <h2>
-        {translate('schedules.schedule-input')}
+      <h2 class="mb-[0.75rem] text-2xl font-medium">
+        {translate('schedules.workflow-input')}
       </h2>
     {/snippet}
   </InputAndResultsPayload>

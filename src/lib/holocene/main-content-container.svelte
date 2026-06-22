@@ -10,12 +10,9 @@
   let { children, main, footer }: Props = $props();
 </script>
 
-<div
-  id="content-wrapper"
-  class="relative flex min-h-full w-max flex-auto flex-col overflow-auto"
->
+<div id="content-wrapper" class="relative h-full w-max flex-auto overflow-auto">
   {@render children?.()}
-  <main id="content" tabindex="-1" class="grow pb-16 md:pb-0">
+  <main id="content" tabindex="-1" class="pb-16 md:pb-0">
     {@render main?.()}
   </main>
   {@render footer?.()}

@@ -365,4 +365,5 @@ export const Strings = {
   'show-common-errors': 'Show Common Errors',
   'show-common-errors-description':
     'Show alerts for common errors if present in the Event History',
+  'total-workflows': 'Total Workflows',
 } as const;

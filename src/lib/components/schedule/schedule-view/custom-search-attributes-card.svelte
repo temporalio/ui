@@ -1,12 +1,17 @@
 <script lang="ts">
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { SearchAttribute } from '$lib/types';
+  import type { DescribeScheduleResponse } from '$lib/types';
   import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
   import { payloadToString } from '$lib/utilities/payload-to-string';
   import { pluralize } from '$lib/utilities/pluralize';
 
-  let { searchAttributes }: { searchAttributes: SearchAttribute } = $props();
+  type Props = {
+    schedule: DescribeScheduleResponse;
+  };
+  let { schedule }: Props = $props();
+
+  const searchAttributes = $derived(schedule?.searchAttributes ?? {});
 
   const decodedSearchAttributes = $derived(
     parsePayloadAttributes({ searchAttributes }),
@@ -26,7 +31,7 @@
 >
   {#if searchAttributeCount}
     <ul class="w-full">
-      {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue]}
+      {#each Object.entries(indexedFields) as [searchAttrName, searchAttrValue] (`${searchAttrName}-${searchAttrValue}`)}
         {@const value = payloadToString(searchAttrValue)}
         <li
           class="flex flex-wrap items-center gap-2 border-b py-2 last-of-type:border-b-0"
