@@ -5,12 +5,11 @@
     DetailList,
     DetailListLabel,
     DetailListTimestampValue,
-    DetailListValue,
   } from '$lib/components/detail-list';
+  import DetailListLinkValue from '$lib/components/detail-list/detail-list-link-value.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Alert from '$lib/holocene/alert.svelte';
-  import Icon from '$lib/holocene/icon';
   import Link from '$lib/holocene/link.svelte';
   import MenuItem from '$lib/holocene/menu/menu-item.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
@@ -113,51 +112,35 @@
     <DetailListLabel class="flex min-h-6 items-center"
       >{translate('common.workflow-type')}</DetailListLabel
     >
-    <DetailListValue
-      class="flex min-h-6 items-center text-sm"
+    <DetailListLinkValue
+      href={routeForWorkflowsWithQuery({
+        namespace,
+        query: [
+          `WorkflowType="${
+            schedule?.schedule?.action?.startWorkflow?.workflowType?.name
+          }"`,
+          `TemporalScheduledById="${scheduleId}"`,
+        ].join(' AND '),
+      })}
+      text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+      iconName="filter"
       copyable={Boolean(
         schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
       )}
       copyableText={schedule?.schedule?.action?.startWorkflow?.workflowType
         ?.name}
-    >
-      {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
-      <Link
-        class="mx-1 block p-1"
-        href={routeForWorkflowsWithQuery({
-          namespace,
-          query: [
-            `WorkflowType="${
-              schedule?.schedule?.action?.startWorkflow?.workflowType?.name
-            }"`,
-            `TemporalScheduledById="${scheduleId}"`,
-          ].join(' AND '),
-        })}
-      >
-        <Icon
-          name="filter"
-          title="Filter scheduled workflows by this type"
-          class="h-4 w-4"
-        />
-      </Link>
-    </DetailListValue>
+    />
 
     <DetailListLabel class="items-center">
       {translate('common.created-label')}
     </DetailListLabel>
-    <DetailListTimestampValue
-      class="text-sm"
-      timestamp={schedule?.info?.createTime}
-    />
+    <DetailListTimestampValue timestamp={schedule?.info?.createTime} />
 
     {#if schedule?.info?.updateTime}
       <DetailListLabel>
         {translate('common.last-updated-label')}
       </DetailListLabel>
-      <DetailListTimestampValue
-        class="text-sm"
-        timestamp={schedule?.info?.updateTime}
-      />
+      <DetailListTimestampValue timestamp={schedule?.info?.updateTime} />
     {/if}
   </DetailList>
 
