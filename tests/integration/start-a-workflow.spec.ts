@@ -57,6 +57,67 @@ test.describe('Start a Workflow', () => {
     });
   });
 
+  test.describe('Multiple Inputs', () => {
+    test.beforeEach(async ({ page }) => {
+      await mockSettingsApi(page, { StartWorkflowDisabled: false });
+      await mockSearchAttributesApi(page);
+      await page.goto(startWorkflowUrl);
+    });
+
+    test('shows a single input with no remove button by default', async ({
+      page,
+    }) => {
+      await expect(page.getByTestId('add-input')).toBeVisible();
+      await expect(page.getByTestId('remove-input-0')).toBeHidden();
+    });
+
+    test('adds and removes input rows', async ({ page }) => {
+      await page.getByTestId('add-input').click();
+
+      await expect(page.getByTestId('remove-input-0')).toBeVisible();
+      await expect(page.getByTestId('remove-input-1')).toBeVisible();
+
+      await page.getByTestId('remove-input-1').click();
+
+      await expect(page.getByTestId('remove-input-0')).toBeHidden();
+      await expect(page.getByTestId('remove-input-1')).toBeHidden();
+    });
+
+    test('does not duplicate editors after add -> remove -> add', async ({
+      page,
+    }) => {
+      const editors = page.locator('.cm-content');
+
+      await expect(editors).toHaveCount(1);
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+
+      await page.getByTestId('remove-input-1').click();
+      await expect(editors).toHaveCount(1);
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+    });
+
+    test('removing the first input keeps the correct remaining content', async ({
+      page,
+    }) => {
+      const editors = page.locator('.cm-content');
+
+      await page.getByTestId('add-input').click();
+      await expect(editors).toHaveCount(2);
+
+      await editors.nth(0).fill('"first"');
+      await editors.nth(1).fill('"second"');
+
+      await page.getByTestId('remove-input-0').click();
+
+      await expect(editors).toHaveCount(1);
+      await expect(editors.nth(0)).toHaveText('"second"');
+    });
+  });
+
   test.describe('Custom Search Attributes', () => {
     test.beforeEach(async ({ page }) => {
       await mockSettingsApi(page, { StartWorkflowDisabled: false });
