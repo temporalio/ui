@@ -16,9 +16,7 @@
   import { batchResetWorkflows } from '$lib/services/batch-service';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
-  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
-  import { getPlaceholder } from '$lib/utilities/workflow-actions';
 
   import BatchOperationConfirmationForm from './batch-operation-confirmation-form.svelte';
 
@@ -32,9 +30,7 @@
   let error = $state('');
   let jobIdPlaceholder = $state(crypto.randomUUID());
   const resetType = writable<'first' | 'last'>('first');
-  const identity = getIdentity();
   const reason = writable('');
-  const reasonPlaceholder = getPlaceholder(Action.Reset, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
 
@@ -57,7 +53,7 @@
     error = '';
     const options = {
       namespace,
-      reason: $reason ? `${$reason} ${reasonPlaceholder}` : reasonPlaceholder,
+      reason: $reason?.trim(),
       jobId: $jobId || jobIdPlaceholder,
       resetType: $resetType,
       ...($allSelected
@@ -100,7 +96,6 @@
       bind:jobId={$jobId}
       bind:jobIdValid={$jobIdValid}
       {jobIdPlaceholder}
-      {reasonPlaceholder}
       action={Action.Reset}
     >
       <RadioGroup
