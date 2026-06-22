@@ -4,6 +4,7 @@ import { groupEvents } from '$lib/models/event-groups';
 import { toEventHistory } from '$lib/models/event-history';
 
 import {
+  _debugEventSlots,
   _debugState,
   assignTrackIndices,
   enrichGroups,
@@ -1183,5 +1184,88 @@ describe('Pixi gutter event data (byTrack)', () => {
     reset(0);
     const byTrack = simulateByTrack();
     expect(byTrack.filter(Boolean).length).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Option C — eventSlots memory release
+//
+// These tests verify that raw HistoryEvent objects stored in eventSlots are
+// nulled out once the event has been fully incorporated into its EventGroup.
+// They FAIL before Option C is implemented and PASS afterwards.
+// ---------------------------------------------------------------------------
+
+describe('Option C — eventSlots are released after grouping', () => {
+  it('[RED] eventSlots entries for head events are null after processEvent returns', () => {
+    const events = makeSyntheticEvents(10);
+    reset(10);
+    for (const e of events) processEvent(e, true);
+
+    const slots = _debugEventSlots();
+    const occupiedAfterProcessing = slots.filter((s) => s != null);
+
+    // After all events have been processed into groups, no slots should remain
+    // populated. This FAILS currently because we never null out eventSlots.
+    expect(occupiedAfterProcessing.length).toBe(0);
+  });
+
+  it('[RED] follower eventSlots are null after they are attached to their group', () => {
+    // Build a proper WFT-then-activity sequence with correct cross-references:
+    // 1: WorkflowExecutionStarted (solo head)
+    // 2: WorkflowTaskScheduled   (WFT head)
+    // 3: WorkflowTaskStarted     (follower of 2)
+    // 4: WorkflowTaskCompleted   (follower of 2)
+    // 5: ActivityTaskScheduled   (activity head)
+    // 6: ActivityTaskStarted     (follower of 5)
+    // 7: ActivityTaskCompleted   (follower of 5)
+    reset(10);
+    processEvent(makeWorkflowStarted(1), true);
+    processEvent(makeWorkflowTaskScheduled(2), true);
+    processEvent(makeWorkflowTaskStarted(3, 2), true);
+    processEvent(makeWorkflowTaskCompleted(4, 2), true);
+    processEvent(makeActivityScheduled(5), true);
+    processEvent(makeActivityStarted(6, 5), true);
+    processEvent(makeActivityCompleted(7, 5, 6), true);
+
+    const slots = _debugEventSlots();
+    const followerSlots = slots.slice(0, 7).filter((s) => s != null);
+
+    // All slots (heads + followers) should be null once attached to their group.
+    // FAILS currently because we never null out eventSlots.
+    expect(followerSlots.length).toBe(0);
+  });
+
+  it('[RED] eventSlots remain entirely null-filled after all groups are complete', () => {
+    const events = makeSyntheticEvents(30);
+    reset(30);
+    for (const e of events) processEvent(e, true);
+
+    const slots = _debugEventSlots();
+    const populated = Array.from(slots).filter((s) => s != null);
+
+    // Every slot should be released. FAILS currently.
+    expect(populated.length).toBe(0);
+  });
+
+  it('getGroupCount is unaffected by eventSlots nulling', () => {
+    const events = makeSyntheticEvents(20);
+    reset(20);
+    const before = getGroupCount();
+    for (const e of events) processEvent(e, true);
+    const after = getGroupCount();
+    // Groups still accumulate correctly regardless of slot nulling
+    expect(after).toBeGreaterThan(before);
+  });
+
+  it('getGroupMeta still returns correct data after eventSlots are released', () => {
+    const events = makeSyntheticEvents(10);
+    reset(10);
+    for (const e of events) processEvent(e, true);
+
+    for (let i = 0; i < getGroupCount(); i++) {
+      const meta = getGroupMeta(i);
+      expect(meta).not.toBeNull();
+      expect(meta!.startMs).toBeGreaterThan(0);
+    }
   });
 });

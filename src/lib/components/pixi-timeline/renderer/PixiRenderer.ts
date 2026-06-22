@@ -29,7 +29,6 @@ import {
   type TimelineState,
 } from '../timeline-ctx.svelte';
 import type { EventStatus, PixiRenderArgs, TimelineConfig } from '../types';
-import { collectGutterBest } from './collect-gutter-best';
 import {
   ensureBitmapFonts,
   FONT_EVENT,
@@ -42,6 +41,14 @@ import { gatherGutterTracks } from './gutter-culling';
 import { gutterIconLayout } from './gutter-layout';
 import { packGutterPins } from './pack-gutter-pins';
 import { calcScrollXPan, X_PAN_EASE } from './scroll-x-pan';
+import {
+  buildTrackIndex,
+  collectBestPerTrack,
+  getTrackEventBounds,
+  type GutterEventRef,
+  trackHasEvents,
+  type TrackIndex,
+} from './track-index';
 import {
   clampScaleY,
   clampViewportStartMs,
@@ -126,17 +133,6 @@ interface PanState {
   originScrollY: number;
 }
 
-/** Lightweight per-event record used by the gutter pin logic. */
-interface PinEvent {
-  poolIdx: number;
-  startMs: number;
-  endMs: number;
-  trackIndex: number;
-  pixiType: string;
-  pixiStatus: string;
-  displayName: string;
-}
-
 /** A rendered gutter pin bar (hit-testable). */
 interface PinBar {
   poolIdx: number;
@@ -218,7 +214,11 @@ export class PixiRenderer {
   };
 
   /** Flat list of gutter pin events built when data loads, keyed by track. */
-  private byTrack: PinEvent[][] = [];
+  private trackIdx: TrackIndex = {
+    offsets: new Int32Array(1),
+    poolIdxs: new Int32Array(0),
+    numTracks: 0,
+  };
   private topPins: PinBar[] = [];
   private bottomPins: PinBar[] = [];
   /** Left/right edge pins: events on visible tracks that are horizontally off-screen. */
@@ -402,14 +402,25 @@ export class PixiRenderer {
     this.rebuildByTrack();
   }
 
-  /** Build a track-indexed lookup for gutter pin queries. */
+  /** Build the CSR TrackIndex for gutter pin queries. Zero JS-object allocation. */
   private rebuildByTrack() {
-    this.byTrack = [];
     const count = getGroupCount();
     const origin = this.dataOriginMs;
-    if (isNaN(origin)) return;
+    if (isNaN(origin)) {
+      this.trackIdx = {
+        offsets: new Int32Array(1),
+        poolIdxs: new Int32Array(0),
+        numTracks: 0,
+      };
+      return;
+    }
+
+    let maxTrack = -1;
     let minMs = Infinity;
     let maxMs = -Infinity;
+
+    const groups: { poolIdx: number; trackIdx: number }[] = [];
+
     for (let i = 0; i < count; i++) {
       const meta = getGroupMeta(i);
       if (
@@ -423,22 +434,39 @@ export class PixiRenderer {
       const relEnd = Math.max(meta.endMs - origin, relStart + 1);
       if (relStart < minMs) minMs = relStart;
       if (relEnd > maxMs) maxMs = relEnd;
-      (this.byTrack[t] ??= []).push({
-        poolIdx: i,
-        startMs: relStart,
-        endMs: relEnd,
-        trackIndex: t,
-        pixiType: meta.pixiType,
-        pixiStatus: meta.pixiStatus,
-        displayName:
-          meta.group?.displayName ??
-          meta.pixiType.replace(/^(EVENT_TYPE_|GROUP_)/, '').replace(/_/g, ' '),
-      });
+      if (t > maxTrack) maxTrack = t;
+      groups.push({ poolIdx: i, trackIdx: t });
     }
+
+    this.trackIdx = buildTrackIndex(groups, maxTrack + 1);
+
     if (isFinite(minMs)) {
       this.dataRelMinMs = minMs;
       this.dataRelMaxMs = maxMs;
     }
+  }
+
+  /**
+   * On-demand event record for a poolIdx — looks up data from getGroupMeta.
+   * Used by collectBestPerTrack and drawPackedPins.
+   */
+  private pinEventFor(poolIdx: number) {
+    const origin = this.dataOriginMs;
+    const meta = getGroupMeta(poolIdx);
+    if (!meta) return null;
+    const relStart = meta.startMs - origin;
+    const relEnd = Math.max(meta.endMs - origin, relStart + 1);
+    return {
+      poolIdx,
+      startMs: relStart,
+      endMs: relEnd,
+      trackIndex: meta.trackIndex,
+      pixiType: meta.pixiType,
+      pixiStatus: meta.pixiStatus,
+      displayName:
+        meta.group?.displayName ??
+        meta.pixiType.replace(/^(EVENT_TYPE_|GROUP_)/, '').replace(/_/g, ' '),
+    };
   }
 
   /** Legacy path kept for child workflow canvases — no-op in demo mode. */
@@ -747,7 +775,7 @@ export class PixiRenderer {
     const clickMs = startMs + canvasX / zoom;
     const visualTrackIdx = Math.floor((canvasY - RULER_H + scrollY) / rowSize);
     const so = (this.currentArgs.sortOrder ?? 'desc') as 'desc' | 'asc';
-    const ttCount = this.byTrack.length;
+    const ttCount = this.trackIdx.numTracks;
     const trackIndex =
       so === 'asc' && ttCount > 0
         ? ttCount - 1 - visualTrackIdx
@@ -937,7 +965,7 @@ export class PixiRenderer {
     const descCount = this.currentArgs.descCount;
     const ascCount = this.currentArgs.ascCount;
     const sortOrder = this.currentArgs.sortOrder ?? 'desc';
-    const totalTracks = this.byTrack.length || totalRows;
+    const totalTracks = this.trackIdx.numTracks || totalRows;
     // Loading gap sits between the desc section (top) and asc section (bottom).
     const loadingStart = descCount;
     const loadingEnd = Math.max(descCount, totalRows - ascCount);
@@ -1185,7 +1213,7 @@ export class PixiRenderer {
     this.bottomPins = [];
     this.gutterIconSpriteIndex = 0;
 
-    if (this.byTrack.length === 0) {
+    if (this.trackIdx.numTracks === 0) {
       for (const s of this.gutterIconSpritePool) s.visible = false;
       return;
     }
@@ -1208,14 +1236,14 @@ export class PixiRenderer {
     const PACK_SAMPLE = maxBarsPerRow * GUTTER_ROWS * 4; // typically ~440
 
     const { aboveTrackIdxs, belowTrackIdxs } = gatherGutterTracks(
-      this.byTrack.length,
+      this.trackIdx.numTracks,
       containerY,
       rowSize,
       effectiveTrackH,
       topEdge,
       bottomEdge,
       Infinity,
-      (t) => (this.byTrack[t]?.length ?? 0) > 0,
+      (t) => trackHasEvents(this.trackIdx, t),
       reversed,
     );
 
@@ -1230,23 +1258,30 @@ export class PixiRenderer {
     // equal the stable sort in collectGutterBest preserves this order, so the
     // PACK_SAMPLE cap retains contextually relevant events rather than always
     // the farthest-from-viewport ones.  Below is already closest-first.
-    const aboveInput = collectGutterBest(
+    const getEventForGutter = (poolIdx: number) => {
+      const ev = this.pinEventFor(poolIdx);
+      return ev ?? { poolIdx, startMs: 0, endMs: 0, pixiType: 'UNKNOWN' };
+    };
+
+    const aboveInput = collectBestPerTrack(
       [...aboveTrackIdxs].reverse(),
-      this.byTrack,
+      this.trackIdx,
+      getEventForGutter,
       GUTTER_TYPE_PRIORITY,
       GUTTER_TYPE_PRIORITY_DEFAULT,
       PACK_SAMPLE,
     );
-    const belowInput = collectGutterBest(
+    const belowInput = collectBestPerTrack(
       belowTrackIdxs,
-      this.byTrack,
+      this.trackIdx,
+      getEventForGutter,
       GUTTER_TYPE_PRIORITY,
       GUTTER_TYPE_PRIORITY_DEFAULT,
       PACK_SAMPLE,
     );
 
     const drawPackedPins = (
-      events: PinEvent[],
+      events: GutterEventRef[],
       side: 'top' | 'bottom',
       store: PinBar[],
       gfx: Graphics,
@@ -1343,7 +1378,7 @@ export class PixiRenderer {
     }
 
     const so = this.currentArgs.sortOrder ?? 'desc';
-    const tt = this.byTrack.length || getVisibleGroupCount();
+    const tt = this.trackIdx.numTracks || getVisibleGroupCount();
     const effIdx = so === 'asc' ? tt - 1 - event.trackIndex : event.trackIndex;
     const trackY = effIdx * rowSize;
     this.state.viewport.scrollY = Math.max(
@@ -1485,7 +1520,7 @@ export class PixiRenderer {
           const { scaleY } = this.state.viewport;
           const rowH = trackHeight * scaleY + Math.max(1, trackGap * scaleY);
           const visibleH = this.app.screen.height - RULER_H;
-          const totalTracks = this.byTrack.length || 1;
+          const totalTracks = this.trackIdx.numTracks || 1;
 
           // Anticipate scrollY after this delta so X pans ahead of native scroll.
           const anticipatedScrollY = Math.max(
@@ -1499,17 +1534,22 @@ export class PixiRenderer {
             Math.floor((anticipatedScrollY + visibleH) / rowH),
           );
 
-          let evMinMs = Infinity;
-          let evMaxMs = -Infinity;
-          for (let t = topTrack; t <= bottomTrack; t++) {
-            const track = this.byTrack[t];
-            if (!track) continue;
-            for (const ev of track) {
-              if (ev.startMs < evMinMs) evMinMs = ev.startMs;
-              if (ev.endMs > evMaxMs) evMaxMs = ev.endMs;
-            }
-          }
-          if (evMinMs < Infinity) {
+          const bounds = getTrackEventBounds(
+            this.trackIdx,
+            topTrack,
+            bottomTrack,
+            (poolIdx) => {
+              const meta = getGroupMeta(poolIdx);
+              if (!meta) return { startMs: 0, endMs: 0 };
+              const o = this.dataOriginMs;
+              return {
+                startMs: meta.startMs - o,
+                endMs: Math.max(meta.endMs - o, meta.startMs - o + 1),
+              };
+            },
+          );
+          if (bounds) {
+            const { evMinMs, evMaxMs } = bounds;
             const screenW = this.app.screen.width || 1200;
             const { zoom, startMs } = this.state.viewport;
             const sortOrder =

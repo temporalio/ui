@@ -47,7 +47,7 @@ export type LatestGroupListener = (group: EventGroup) => void;
 // Module state (reset between workflows via reset())
 // ---------------------------------------------------------------------------
 
-let eventSlots: (HistoryEvent | undefined)[] = [];
+let eventSlots: (HistoryEvent | null)[] = [];
 let eventToGroup = new Int32Array(0);
 const groupPool: GroupMeta[] = [];
 let poolTop = 0;
@@ -64,6 +64,7 @@ const activePromises = new Map<number, Promise<EventGroup>>();
 
 let failedEvent: HistoryEvent | null = null;
 let latestEventSlotIdx = -1;
+let latestEventRef: HistoryEvent | null = null;
 const latestGroupListeners: LatestGroupListener[] = [];
 
 // Accumulated WFT IDs for marker billable-action dedup (ascending cursor only)
@@ -210,6 +211,8 @@ function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
 
   const followerMs = toMs(event.eventTime);
   if (followerMs > meta.endMs) meta.endMs = followerMs;
+
+  eventSlots[followerSlotIdx] = null;
 }
 
 function attachFollower(headSlotIdx: number, followerSlotIdx: number): void {
@@ -243,7 +246,7 @@ function notifyLatestGroupListeners(group: EventGroup): void {
 export function reset(historyLength: number): void {
   const N = Math.max(historyLength + 16, 16);
 
-  eventSlots = new Array(N);
+  eventSlots = new Array<null>(N).fill(null);
   eventToGroup = new Int32Array(N);
 
   const maxGroups = Math.ceil(N / 1.5);
@@ -259,6 +262,7 @@ export function reset(historyLength: number): void {
   processedWorkflowTaskIds.clear();
   failedEvent = null;
   latestEventSlotIdx = -1;
+  latestEventRef = null;
   latestGroupListeners.length = 0;
 }
 
@@ -298,6 +302,7 @@ export function processEvent(
 
   if (slotIdx > latestEventSlotIdx) {
     latestEventSlotIdx = slotIdx;
+    latestEventRef = raw;
   }
 
   const event = toWorkflowEvent(raw, isAscending);
@@ -307,6 +312,8 @@ export function processEvent(
   if (!isHead) {
     const headSlotIdx = parseInt(gid) - 1;
     attachFollower(headSlotIdx, slotIdx);
+    // If the head already existed, attachFollowerToPool already nulled this slot.
+    // If not, the slot stays live until the head arrives and flushes it.
     return null;
   }
 
@@ -318,11 +325,15 @@ export function processEvent(
   if (!group) {
     // Solo event: discard any orphaned pending followers
     pendingFollowers.delete(slotIdx);
+    eventSlots[slotIdx] = null;
     return null;
   }
 
   // Write-once guard: prevents double-registration at cursor boundary overlap
-  if (eventToGroup[slotIdx] !== 0) return null;
+  if (eventToGroup[slotIdx] !== 0) {
+    eventSlots[slotIdx] = null;
+    return null;
+  }
 
   if (poolTop >= groupPool.length) {
     groupPool.push(makeGroupMeta());
@@ -360,7 +371,8 @@ export function processEvent(
     meta.trackIndex = descGroupHeads.length - 1;
   }
 
-  // Flush any followers that arrived before this head
+  // Flush any followers that arrived before this head.
+  // attachFollowerToPool nulls each follower slot after processing.
   const pending = pendingFollowers.get(slotIdx);
   if (pending) {
     for (const followerSlotIdx of pending) {
@@ -368,6 +380,9 @@ export function processEvent(
     }
     pendingFollowers.delete(slotIdx);
   }
+
+  // Release the head slot — its data is now encoded in the EventGroup.
+  eventSlots[slotIdx] = null;
 
   // Resolve any pending getRows() promises for this group
   const resolvers = pendingResolvers.get(poolIdx);
@@ -450,8 +465,7 @@ function getGroupPromise(
 
 /** The raw HistoryEvent with the highest eventId seen so far. O(1). */
 export function getLatestEvent(): HistoryEvent | null {
-  if (latestEventSlotIdx < 0) return null;
-  return eventSlots[latestEventSlotIdx] ?? null;
+  return latestEventRef;
 }
 
 /**
@@ -656,4 +670,9 @@ export function _debugState() {
     pendingResolversSize: pendingResolvers.size,
     latestEventSlotIdx,
   };
+}
+
+/** Test-only: exposes raw eventSlots so tests can assert Option-C nulling. */
+export function _debugEventSlots(): readonly (HistoryEvent | null)[] {
+  return eventSlots;
 }
