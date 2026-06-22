@@ -112,7 +112,7 @@
   <div slot="content">
     <div class="flex flex-col gap-6 p-2">
       <div class="flex w-full flex-col gap-2">
-        <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem))]">
+        <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem),1px)]">
           <DatePicker
             id="backfill-start-date"
             label={translate('common.start')}
@@ -132,7 +132,7 @@
         />
       </div>
       <div class="flex w-full flex-col gap-2">
-        <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem))]">
+        <div class="sm:max-w-[round(up,calc(66.6666%_-_0.25rem),1px)]">
           <DatePicker
             id="backfill-end-date"
             label={translate('common.end')}
