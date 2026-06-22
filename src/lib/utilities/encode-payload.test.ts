@@ -6,6 +6,7 @@ import {
 } from '$lib/utilities/parse-with-big-int';
 
 import {
+  encodeMultiplePayloads,
   encodePayloads,
   getSinglePayload,
   isBase64EncodedPayload,
@@ -121,5 +122,63 @@ describe('encodePayloads', () => {
       },
     ];
     expect(payload).toEqual(expectedEncodedPayload);
+  });
+});
+
+describe('encodeMultiplePayloads', () => {
+  it('should produce the same single-element output as encodePayloads for one input', async () => {
+    const input = stringifyWithBigInt('cats');
+    const single = await encodePayloads({ input, encoding: 'json/plain' });
+    const multiple = await encodeMultiplePayloads({
+      inputs: [input],
+      encoding: 'json/plain',
+    });
+    expect(multiple).toEqual(single);
+  });
+
+  it('should encode each input as a separate payload', async () => {
+    const payloads = await encodeMultiplePayloads({
+      inputs: [stringifyWithBigInt('cats'), stringifyWithBigInt('dogs')],
+      encoding: 'json/plain',
+    });
+    expect(payloads).toEqual([
+      {
+        data: 'ImNhdHMi',
+        metadata: { encoding: 'anNvbi9wbGFpbg==' },
+      },
+      {
+        data: 'ImRvZ3Mi',
+        metadata: { encoding: 'anNvbi9wbGFpbg==' },
+      },
+    ]);
+  });
+
+  it('should skip empty inputs', async () => {
+    const payloads = await encodeMultiplePayloads({
+      inputs: ['', stringifyWithBigInt('cats'), ''],
+      encoding: 'json/plain',
+    });
+    expect(payloads).toEqual([
+      {
+        data: 'ImNhdHMi',
+        metadata: { encoding: 'anNvbi9wbGFpbg==' },
+      },
+    ]);
+  });
+
+  it('should return null when all inputs are empty', async () => {
+    const payloads = await encodeMultiplePayloads({
+      inputs: ['', ''],
+      encoding: 'json/plain',
+    });
+    expect(payloads).toBeNull();
+  });
+
+  it('should return null when given no inputs', async () => {
+    const payloads = await encodeMultiplePayloads({
+      inputs: [],
+      encoding: 'json/plain',
+    });
+    expect(payloads).toBeNull();
   });
 });
