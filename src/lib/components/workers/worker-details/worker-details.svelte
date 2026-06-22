@@ -466,7 +466,7 @@
     </h6>
     <dl class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
       <div>
-        <dt class="text-sm font-medium text-secondary">
+        <dt class="text-sm text-secondary">
           {translate('workers.cache-size')}
         </dt>
         <dd class="font-mono text-2xl font-semibold text-brand">
