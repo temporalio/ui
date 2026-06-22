@@ -3,7 +3,6 @@
 
   import { cva } from 'class-variance-authority';
 
-  import type { Announcement } from '$lib/stores/announcer';
   import {
     type Toaster as Toast,
     toaster as toasterStore,
@@ -19,14 +18,11 @@
     toasts: Toast['toasts'];
     closeButtonLabel: string;
     position: Writable<ToastPosition>;
-    announcements?: Announcement[];
   }
 
-  let { pop, toasts, closeButtonLabel, position, announcements }: Props =
-    $props();
+  let { pop, toasts, closeButtonLabel, position }: Props = $props();
 
-  const storeAnnouncements = toasterStore.announcements;
-  const liveMessages = $derived(announcements ?? $storeAnnouncements);
+  const announcements = toasterStore.announcements;
 
   const dismissToast = (event: CustomEvent<{ id: string }>) => {
     pop(event.detail.id);
@@ -50,7 +46,7 @@
 </script>
 
 <div class={toast({ position: $position })}>
-  <LiveRegion messages={liveMessages} data-testid="toast-live-region" />
+  <LiveRegion messages={$announcements} data-testid="toast-live-region" />
   {#each $toasts as { message, variant, id, link } (id)}
     <ToastComponent {closeButtonLabel} {variant} {id} on:dismiss={dismissToast}>
       {#if link}
