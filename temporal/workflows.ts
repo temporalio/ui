@@ -288,3 +288,132 @@ export async function MultiInputWorkflow(
 
   return activityResult;
 }
+
+export interface HighVolumeSignalResult {
+  received: number;
+  target: number;
+  firstSignalAt: string | null;
+  lastSignalAt: string | null;
+  durationMs: number | null;
+}
+
+const perfSignal =
+  workflow.defineSignal<[{ seq: number; data?: string }]>('perf-signal');
+
+export async function HighVolumeSignalWorkflow(
+  target = 10_000,
+  totalReceived = 0,
+  firstSignalAt: string | null = null,
+): Promise<HighVolumeSignalResult> {
+  const SIGNALS_PER_RUN = 9_000;
+  let batchReceived = 0;
+  let lastSignalAt: string | null = null;
+
+  workflow.setHandler(perfSignal, ({ seq: _seq }) => {
+    totalReceived++;
+    batchReceived++;
+    const now = new Date().toISOString();
+    if (firstSignalAt === null) firstSignalAt = now;
+    lastSignalAt = now;
+  });
+
+  await workflow.condition(
+    () => batchReceived >= SIGNALS_PER_RUN || totalReceived >= target,
+  );
+
+  if (totalReceived < target) {
+    await workflow.continueAsNew<typeof HighVolumeSignalWorkflow>(
+      target,
+      totalReceived,
+      firstSignalAt,
+    );
+  }
+
+  const durationMs =
+    firstSignalAt && lastSignalAt
+      ? new Date(lastSignalAt).getTime() - new Date(firstSignalAt).getTime()
+      : null;
+
+  return {
+    received: totalReceived,
+    target,
+    firstSignalAt,
+    lastSignalAt,
+    durationMs,
+  };
+}
+
+export interface HighVolumeEventResult {
+  historyLength: number;
+  signals: number;
+  activities: number;
+  timers: number;
+  children: number;
+  durationMs: number;
+}
+
+const highVolumeEventSignal =
+  workflow.defineSignal<[{ seq: number }]>('hv-event-signal');
+
+const { echo: pingActivity } = workflow.proxyActivities<typeof activities>({
+  startToCloseTimeout: '10 seconds',
+});
+
+export async function HighVolumeEventChildWorkflow(n: number): Promise<number> {
+  return n * 2;
+}
+
+export async function HighVolumeEventWorkflow(
+  targetEvents = 40_000,
+): Promise<HighVolumeEventResult> {
+  const t0 = new Date().getTime();
+  let signals = 0;
+  let activitiesRun = 0;
+  let timersRun = 0;
+  let childrenRun = 0;
+
+  workflow.setHandler(highVolumeEventSignal, () => {
+    signals++;
+  });
+
+  const historyLength = () => workflow.workflowInfo().historyLength;
+  let round = 0;
+
+  while (historyLength() < targetEvents) {
+    round++;
+
+    // 5 parallel activities → ~18 events per round
+    await Promise.all([
+      pingActivity('a'),
+      pingActivity('b'),
+      pingActivity('c'),
+      pingActivity('d'),
+      pingActivity('e'),
+    ]);
+    activitiesRun += 5;
+
+    // Timer every 5 rounds → ~3 events
+    if (round % 5 === 0) {
+      await workflow.sleep(1);
+      timersRun++;
+    }
+
+    // Child workflow every 20 rounds → ~5 events in parent
+    if (round % 20 === 0) {
+      await workflow.executeChild(HighVolumeEventChildWorkflow, {
+        args: [round],
+        workflowId: `${workflow.workflowInfo().workflowId}-child-${round}`,
+      });
+      childrenRun++;
+    }
+  }
+
+  return {
+    historyLength: historyLength(),
+    signals,
+    activities: activitiesRun,
+    timers: timersRun,
+    children: childrenRun,
+    durationMs: new Date().getTime() - t0,
+  };
+}
