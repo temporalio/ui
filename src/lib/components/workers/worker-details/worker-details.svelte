@@ -252,7 +252,7 @@
 
   <div class="flex flex-col gap-4 xl:flex-row">
     <section
-      class="grid flex-1 grid-cols-1 gap-4 xl:self-start 2xl:grid-flow-col 2xl:grid-cols-2 2xl:grid-rows-2"
+      class="grid flex-1 grid-cols-1 gap-4 xl:self-start 2xl:grid-flow-col 2xl:grid-cols-2 2xl:grid-rows-[auto_auto]"
     >
       {@render taskSlotCard(
         translate('common.workflows-plural', { count: 1 }),
@@ -297,13 +297,12 @@
     !slots?.currentUsedSlots && !slots?.currentAvailableSlots}
   <Card class="flex flex-col gap-2">
     <h5 class="mb-2">{title}</h5>
-
     <dl class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:grid-rows-1">
       <div>
         <dt id="slots-{title}" class="mb-1 h-6 text-sm text-secondary">
           {translate('workers.slots-used')}
         </dt>
-        <dd class="mb-2">
+        <dd>
           <p class="truncate font-mono text-lg text-secondary">
             <span class="text-2xl font-semibold text-brand">
               {#if noSlotsConfigured}
@@ -334,7 +333,6 @@
           {/if}
         </dd>
       </div>
-
       <div>
         <dt class="mb-1 flex h-6 items-center text-sm text-secondary">
           {translate('workers.tasks-processed')}
