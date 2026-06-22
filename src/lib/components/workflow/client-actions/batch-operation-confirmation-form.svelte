@@ -118,7 +118,7 @@
   <Input
     id="bulk-action-reason-{action}"
     bind:value={reason}
-    label={translate('common.reason')}
+    label={translate('common.reason-label')}
     placeholder={translate('common.reason-placeholder')}
   />
   <Input

@@ -131,7 +131,7 @@
       <Input
         id="reset-reason"
         bind:value={reason}
-        label={translate('common.reason')}
+        label={translate('common.reason-label')}
         labelHidden
         placeholder={translate('common.reason-placeholder')}
       />

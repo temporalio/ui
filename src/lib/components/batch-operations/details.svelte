@@ -21,7 +21,7 @@
     <p class="batch-operation-value">{operation.identity}</p>
   </div>
   <div class="batch-operation-detail">
-    <p class="batch-operation-key">{translate('common.reason')}</p>
+    <p class="batch-operation-key">{translate('common.reason-label')}</p>
     <p class="batch-operation-value">{operation.reason}</p>
   </div>
   <div class="batch-operation-detail">

@@ -44,7 +44,7 @@ export const Strings = {
   'is-not-null': 'Is not null',
   all: 'All',
   submit: 'Submit',
-  reason: 'Reason',
+  'reason-label': 'Reason (optional)',
   'reason-placeholder': 'Enter a reason',
   identity: 'Identity',
   'identity-placeholder': 'Enter an identity',

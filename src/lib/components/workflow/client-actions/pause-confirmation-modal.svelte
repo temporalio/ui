@@ -80,7 +80,7 @@
       id="workflow-pause-details"
       class="mt-4"
       placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason')}
+      label={translate('common.reason-label')}
       labelHidden
       bind:value={reason}
     />

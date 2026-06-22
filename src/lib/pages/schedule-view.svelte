@@ -458,8 +458,8 @@
         <Input
           id="pause-reason"
           bind:value={reason}
-          placeholder={translate('common.reason')}
-          label={translate('common.reason')}
+          placeholder={translate('common.reason-placeholder')}
+          label={translate('common.reason-label')}
           labelHidden
         />
       </div>
