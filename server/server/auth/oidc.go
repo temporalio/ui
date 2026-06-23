@@ -58,7 +58,7 @@ type Claims struct {
 	Picture       string `json:"picture"`
 }
 
-func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, provider *oidc.Provider) (*User, error) {
+func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, provider *oidc.Provider, pkceEnabled bool) (*User, error) {
 	state, err := r.Cookie("state")
 	if err != nil {
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie is not set in request")
@@ -67,9 +67,21 @@ func ExchangeCode(ctx context.Context, r *http.Request, config *oauth2.Config, p
 		return nil, echo.NewHTTPError(http.StatusBadRequest, "State cookie did not match")
 	}
 
-	oauth2Token, err := config.Exchange(ctx, r.URL.Query().Get("code"))
-	if err != nil {
-		return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
+	var oauth2Token *oauth2.Token
+	if pkceEnabled {
+		codeVerifier, err := r.Cookie("code_verifier")
+		if err != nil {
+			return nil, echo.NewHTTPError(http.StatusBadRequest, "Code verifier is not set in request")
+		}
+		oauth2Token, err = config.Exchange(ctx, r.URL.Query().Get("code"), oauth2.SetAuthURLParam("code_verifier", codeVerifier.Value))
+		if err != nil {
+			return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
+		}
+	} else {
+		oauth2Token, err = config.Exchange(ctx, r.URL.Query().Get("code"))
+		if err != nil {
+			return nil, echo.NewHTTPError(http.StatusInternalServerError, "Unable to exchange token: "+err.Error())
+		}
 	}
 
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
