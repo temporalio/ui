@@ -18,7 +18,7 @@
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { authUser, clearAuthUser } from '$lib/stores/auth-user';
+  import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
@@ -30,7 +30,6 @@
     routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForEventHistoryImport,
-    routeForLoginPage,
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
@@ -282,8 +281,7 @@
   }
 
   const logout = () => {
-    clearAuthUser();
-    goto(routeForLoginPage());
+    void logoutAuthUser();
   };
 
   $effect(() => {

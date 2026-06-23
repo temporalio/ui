@@ -4,6 +4,7 @@ const settings: Settings = {
   auth: {
     enabled: false,
     options: null,
+    redirectToProvider: false,
   },
   baseUrl: 'http://localhost:3000',
   codec: {
