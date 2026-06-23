@@ -1,18 +1,28 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { onMount, untrack } from 'svelte';
+  import { onMount, setContext, untrack } from 'svelte';
 
   import { page } from '$app/state';
 
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
+  import { toEvent } from '$lib/models/event-history';
+  import { throttleRefresh } from '$lib/services/events-service';
+  import type { PauseHandle } from '$lib/services/fetch-bidirectional';
+  import { fetchBidirectional } from '$lib/services/fetch-bidirectional';
   import {
-    fetchAllEvents,
-    throttleRefresh,
-  } from '$lib/services/events-service';
+    appendLiveEvent,
+    enrichGroups,
+    processEvent,
+    reset as resetBuffer,
+  } from '$lib/services/grouped-event-buffer';
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
@@ -30,11 +40,17 @@
     type RefreshAction,
     workflowRun,
   } from '$lib/stores/workflow-run';
+  import type {
+    GetWorkflowExecutionHistoryResponse,
+    HistoryEvent,
+  } from '$lib/types/events';
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { requestFromAPI } from '$lib/utilities/request-from-api';
+  import { routeForApi } from '$lib/utilities/route-for-api';
 
   interface Props {
     children: Snippet;
@@ -52,6 +68,42 @@
   let workflowError: NetworkError | null = $state(null);
   let workflowRunController: AbortController;
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  let livePollingController: AbortController | null = null;
+
+  let fetchComplete = $state(false);
+  let latestEventId = $state(0);
+  let totalExpectedEvents = $state(0);
+  let descMinId = $state(0);
+
+  let _pauseHandle: PauseHandle | null = null;
+  let _resumeRequested = false;
+
+  const ctx: HistoryContext = {
+    get fetchComplete() {
+      return fetchComplete;
+    },
+    get latestEventId() {
+      return latestEventId;
+    },
+    get totalExpectedEvents() {
+      return totalExpectedEvents;
+    },
+    get descMinId() {
+      return descMinId;
+    },
+    resume() {
+      if (_pauseHandle) {
+        const h = _pauseHandle;
+        _pauseHandle = null;
+        _resumeRequested = false;
+        h.resume();
+      } else {
+        _resumeRequested = true;
+      }
+    },
+  };
+
+  setContext(HISTORY_CTX, ctx);
 
   const { copy, copied } = copyToClipboard();
 
@@ -85,16 +137,66 @@
     }
   };
 
-  const getWorkflowAndEventHistory = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
+  const startLivePoll = (
+    ns: string,
+    wfId: string,
+    rId: string,
+    fromEventId: number,
   ) => {
-    const { settings } = page.data;
+    livePollingController?.abort();
+    livePollingController = new AbortController();
+    const signal = livePollingController.signal;
+    const route = routeForApi('events.ascending', {
+      namespace: ns,
+      workflowId: wfId,
+    });
+
+    (async () => {
+      let nextEventId = fromEventId + 1;
+      while (!signal.aborted) {
+        try {
+          const response =
+            await requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
+              request: fetch,
+              params: {
+                'execution.runId': rId,
+                waitNewEvent: 'true',
+                firstEventId: String(nextEventId),
+              },
+              options: { signal },
+            });
+          const events = (response?.history?.events ?? []) as HistoryEvent[];
+          for (const ev of events) {
+            appendLiveEvent(ev);
+            const id = parseInt(ev.eventId);
+            if (id >= nextEventId) nextEventId = id + 1;
+            latestEventId = id;
+          }
+          const processed = events.map((e) => toEvent(e)).filter(Boolean);
+          if (processed.length) {
+            fullEventHistory.update((curr) => [...curr, ...processed]);
+          }
+          if (!response.nextPageToken) {
+            await new Promise((r) => setTimeout(r, 2000));
+          }
+        } catch {
+          if (!signal.aborted) {
+            await new Promise((r) => setTimeout(r, 5000));
+          }
+        }
+      }
+    })();
+  };
+
+  const getWorkflowAndEventHistory = async (
+    ns: string,
+    wfId: string,
+    rId: string,
+  ) => {
     const { workflow, error } = await fetchWorkflow({
-      namespace,
-      workflowId,
-      runId,
+      namespace: ns,
+      workflowId: wfId,
+      runId: rId,
     });
 
     if (error) {
@@ -102,14 +204,12 @@
       return;
     }
 
-    if (!workflow) {
-      return;
-    }
+    if (!workflow) return;
 
     await decodeWorkflowUserMetadata(workflow);
 
     const { taskQueue } = workflow;
-    const workers = await getPollers({ queue: taskQueue!, namespace });
+    const workers = await getPollers({ queue: taskQueue!, namespace: ns });
 
     $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
@@ -117,36 +217,87 @@
 
     if (workflow.isRunning && workers?.pollers?.length) {
       getWorkflowMetadata(
-        {
-          namespace,
-          workflow: {
-            id: workflowId,
-            runId,
-          },
-        },
+        { namespace: ns, workflow: { id: wfId, runId: rId } },
         workflowRunController.signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;
       });
     }
 
-    $fullEventHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      sort: 'ascending',
+    const historySize = parseInt(workflow.historyEvents ?? '0') || 0;
+    resetBuffer(historySize);
+    fetchComplete = false;
+    _pauseHandle = null;
+
+    fetchBidirectional({
+      namespace: ns,
+      workflowId: wfId,
+      runId: rId,
       signal: workflowRunController.signal,
-      historySize: workflow.historyEvents,
-    });
+      maximumPageSize: 1000,
+      pauseAfterPages: 2,
+      onProgress: (p) => {
+        if (p.totalEstimated) totalExpectedEvents = p.totalEstimated;
+        if (p.descMinId) descMinId = p.descMinId;
+      },
+      onPause: (handle) => {
+        if (_resumeRequested) {
+          _resumeRequested = false;
+          handle.resume();
+        } else {
+          _pauseHandle = handle;
+        }
+      },
+      onFirstDescPage: (descFirst) => {
+        if (!descFirst.length) return;
+        const processed = descFirst.map((e) => toEvent(e)).filter(Boolean);
+        if (processed.length) {
+          fullEventHistory.update((curr) =>
+            curr.length ? [...curr, ...processed] : processed,
+          );
+          currentEventHistory.set(processed);
+        }
+      },
+      onRawPage: (events, isAscending) => {
+        for (const event of events) {
+          processEvent(event, isAscending);
+          const id = parseInt(event.eventId);
+          if (id > latestEventId) latestEventId = id;
+        }
+        const processed = events.map((e) => toEvent(e)).filter(Boolean);
+        if (processed.length && isAscending) {
+          fullEventHistory.update((curr) =>
+            curr.length ? [...curr, ...processed] : processed,
+          );
+        }
+      },
+    })
+      .then(() => {
+        enrichGroups(
+          $workflowRun.workflow?.pendingActivities ?? [],
+          $workflowRun.workflow?.pendingNexusOperations ?? [],
+        );
+        fetchComplete = true;
+        $currentEventHistory = $fullEventHistory;
+
+        if (workflow.isRunning) {
+          startLivePoll(ns, wfId, rId, latestEventId);
+        }
+      })
+      .catch((e: unknown) => {
+        if (e instanceof Error && e.name !== 'AbortError') {
+          workflowError = { message: e.message } as NetworkError;
+        }
+      });
   };
 
   const getOnlyWorkflowWithPendingActivities = async (
-    refresh: RefreshAction,
+    refreshAction: RefreshAction,
     pause: boolean,
   ) => {
     const shouldFetch =
-      refresh.timestamp &&
-      (refresh.action || (!pause && $workflowRun?.workflow?.isRunning));
+      refreshAction.timestamp &&
+      (refreshAction.action || (!pause && $workflowRun?.workflow?.isRunning));
 
     if (shouldFetch) {
       const { workflow, error } = await fetchWorkflow({
@@ -162,18 +313,24 @@
     }
   };
 
-  const abortPolling = () => {
-    $fullEventHistory = [];
-    if (workflowRunController) {
-      workflowRunController.abort();
-    }
+  const abortAll = () => {
+    if (workflowRunController) workflowRunController.abort();
+    livePollingController?.abort();
+    livePollingController = null;
   };
 
   const clearWorkflowData = () => {
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
+    $fullEventHistory = [];
     workflowError = null;
-    abortPolling();
+    fetchComplete = false;
+    latestEventId = 0;
+    totalExpectedEvents = 0;
+    descMinId = 0;
+    _pauseHandle = null;
+    _resumeRequested = false;
+    abortAll();
     resetLastDataEncoderSuccess();
     if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = null;

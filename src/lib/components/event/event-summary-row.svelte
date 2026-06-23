@@ -71,7 +71,7 @@
   let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
 
   const selectedId = $derived(
-    isEventGroup(event) ? Array.from(event.events.keys()).shift() : event.id,
+    isEventGroup(event) ? event.eventList[0]?.id : event.id,
   );
 
   const { workflow, run, namespace } = $derived(page.params);
@@ -83,7 +83,9 @@
   const attributes = $derived(formatAttributes(event));
 
   const currentEvent = $derived(
-    isEventGroup(event) ? event.events.get(selectedId) : event,
+    isEventGroup(event)
+      ? event.eventList.find((e) => e.id === selectedId)
+      : event,
   );
 
   const elapsedTime = $derived(
@@ -182,7 +184,7 @@
   };
 
   let hasRelatedActivities = (group, hoveredEventId) => {
-    return group?.eventIds?.has(hoveredEventId);
+    return group?.eventList?.some((e) => e.id === hoveredEventId);
   };
 
   onMount(async () => {

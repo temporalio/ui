@@ -59,10 +59,13 @@
       const statusColor = getStatusStrokeColor(classification);
       if (statusColor !== DEFAULT_STROKE_COLOR) color = statusColor;
     }
-    if (delayed && [classification, status].includes('Running')) {
+    // PERF: Use === comparisons instead of [a, b].includes(x). The inline array
+    // literal allocates a new array on every call; with thousands of Line instances
+    // rendered per frame this created measurable GC pressure (visible in CPUTrace2).
+    if (delayed && (classification === 'Running' || status === 'Running')) {
       color = getStatusStrokeColor('Delayed');
     }
-    if (category && ['pending', 'retry'].includes(category)) {
+    if (category === 'pending' || category === 'retry') {
       // these categories take precedence over classification
       color = getCategoryStrokeColor(category);
     }

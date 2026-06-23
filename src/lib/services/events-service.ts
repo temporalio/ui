@@ -22,6 +22,13 @@ import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
+import type {
+  BidirectionalProgress,
+  BidirectionalStats,
+} from './fetch-bidirectional';
+
+export type { BidirectionalProgress, BidirectionalStats };
+
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
     workflowId: string;
@@ -227,4 +234,268 @@ export const fetchInitialEvent = async (
   });
   const start = await toEventHistory(startEventsRaw);
   return start[0];
+};
+
+export const fetchAllEventsBidirectional = async ({
+  namespace,
+  workflowId,
+  runId,
+  signal,
+  onProgress,
+  onFirstPage,
+  onFirstDescPage,
+  onPage,
+  maximumPageSize,
+}: {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+  signal?: AbortSignal;
+  onProgress?: (p: BidirectionalProgress) => void;
+  /** Fires after the first ascending page resolves with just that page's events. */
+  onFirstPage?: (events: CommonHistoryEvent[]) => void;
+  /**
+   * Fires after the first descending page resolves with a snapshot of ALL events
+   * accumulated so far from both cursors — sorted ascending, no duplicates.
+   * Use together with onFirstPage to render both bookends (oldest + newest) before
+   * the full fetch completes, then let .then() render the complete set.
+   */
+  onFirstDescPage?: (accumulated: CommonHistoryEvent[]) => void;
+  /**
+   * Fires after every page from either direction with a snapshot of ALL events
+   * accumulated so far — sorted ascending, no duplicates — ready for groupEvents.
+   * Use this instead of onFirstPage for per-page streaming render.
+   */
+  onPage?: (accumulated: CommonHistoryEvent[]) => void;
+  maximumPageSize?: number;
+}): Promise<{ events: CommonHistoryEvent[]; stats: BidirectionalStats }> => {
+  const t0 = performance.now();
+
+  const ascCtrl = new AbortController();
+  const descCtrl = new AbortController();
+  signal?.addEventListener('abort', () => {
+    ascCtrl.abort();
+    descCtrl.abort();
+  });
+
+  let ascMaxId = 0;
+  let descMinId = Infinity;
+  let descMaxId = 0;
+  let ascPages = 0;
+  let descPages = 0;
+  let observedPageSize = 0;
+  let winnerChosen = false;
+
+  // Single pre-allocated slot array indexed by eventId - 1. Allocated lazily
+  // once the first descending page reveals the total event count. Events from
+  // both directions write directly into their slot, so writes are idempotent
+  // and no merge copy is needed.
+  let slots: (HistoryEvent | undefined)[] | null = null;
+  // Small temp buffer for ascending events that arrive before slots is ready.
+  const tempBuf: HistoryEvent[] = [];
+  let ascEventCount = 0;
+  let descEventCount = 0;
+
+  const initSlots = (n: number) => {
+    if (slots !== null) return;
+    slots = new Array(n);
+    for (const e of tempBuf) slots[parseInt(e.eventId) - 1] = e;
+    tempBuf.length = 0;
+  };
+
+  type Token = string | undefined;
+
+  const gap = () => Math.max(0, descMinId - ascMaxId - 1);
+
+  // Snapshot the current slots array as a sorted, duplicate-free CommonHistoryEvent[].
+  // slots is indexed by eventId-1 so iteration order is ascending — no sort needed.
+  // Gaps in the middle (events not yet fetched by either cursor) are simply skipped.
+  const snapshotAccumulated = (): CommonHistoryEvent[] => {
+    const source = slots ?? (tempBuf as (HistoryEvent | undefined)[]);
+    const filled: HistoryEvent[] = [];
+    for (let i = 0; i < source.length; i++) {
+      if (source[i] !== undefined) filled.push(source[i]!);
+    }
+    return toEventHistory(filled);
+  };
+
+  const reportProgress = () => {
+    onProgress?.({
+      ascEvents: ascEventCount,
+      descEvents: descEventCount,
+      ascPages,
+      descPages,
+      elapsedMs: performance.now() - t0,
+      ascMaxId,
+      descMinId: descMinId === Infinity ? 0 : descMinId,
+      totalEstimated: descMaxId,
+    });
+  };
+
+  const runAscending = async () => {
+    const route = routeForApi('events.ascending', { namespace, workflowId });
+    let token: Token;
+    while (!ascCtrl.signal.aborted) {
+      const g = gap();
+      if (g <= 0) {
+        descCtrl.abort();
+        break;
+      }
+      if (observedPageSize > 0 && g <= observedPageSize && !winnerChosen) {
+        winnerChosen = true;
+        descCtrl.abort();
+      }
+
+      let response: GetWorkflowExecutionHistoryResponse;
+      try {
+        response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+          route,
+          {
+            token,
+            request: fetch,
+            params: {
+              'execution.runId': runId,
+              waitNewEvent: 'false',
+              ...(maximumPageSize && {
+                maximumPageSize: String(maximumPageSize),
+              }),
+            },
+            options: { signal: ascCtrl.signal },
+          },
+        );
+      } catch {
+        break;
+      }
+      const events = response?.history?.events ?? [];
+      if (!events.length) break;
+
+      ascPages++;
+      observedPageSize = Math.max(observedPageSize, events.length);
+      ascEventCount += events.length;
+      for (const e of events) {
+        const id = parseInt(e.eventId);
+        if (id > ascMaxId) ascMaxId = id;
+        if (slots !== null) slots[id - 1] = e;
+        else tempBuf.push(e);
+      }
+      reportProgress();
+      if (ascPages === 1 && onFirstPage) {
+        onFirstPage(toEventHistory(events as HistoryEvent[]));
+      }
+      onPage?.(snapshotAccumulated());
+
+      if (!response.nextPageToken || gap() <= 0) {
+        descCtrl.abort();
+        break;
+      }
+      token = response.nextPageToken as unknown as string;
+    }
+  };
+
+  const runDescending = async () => {
+    const route = routeForApi('events.descending', { namespace, workflowId });
+    let token: Token;
+    while (!descCtrl.signal.aborted) {
+      const g = gap();
+      if (g <= 0) {
+        ascCtrl.abort();
+        break;
+      }
+      if (observedPageSize > 0 && g <= observedPageSize && !winnerChosen) {
+        winnerChosen = true;
+        ascCtrl.abort();
+      }
+
+      let response: GetWorkflowExecutionHistoryResponse;
+      try {
+        response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+          route,
+          {
+            token,
+            request: fetch,
+            params: {
+              'execution.runId': runId,
+              waitNewEvent: 'false',
+              ...(maximumPageSize && {
+                maximumPageSize: String(maximumPageSize),
+              }),
+            },
+            options: { signal: descCtrl.signal },
+          },
+        );
+      } catch {
+        break;
+      }
+      const events = response?.history?.events ?? [];
+      if (!events.length) break;
+
+      descPages++;
+      observedPageSize = Math.max(observedPageSize, events.length);
+      descEventCount += events.length;
+      // Compute bounds before writing so initSlots has the correct total.
+      for (const e of events) {
+        const id = parseInt(e.eventId);
+        if (id < descMinId) descMinId = id;
+        if (id > descMaxId) descMaxId = id;
+      }
+      initSlots(descMaxId);
+      for (const e of events) {
+        slots![parseInt(e.eventId) - 1] = e;
+      }
+      reportProgress();
+      const snap =
+        (onFirstDescPage && descPages === 1) || onPage
+          ? snapshotAccumulated()
+          : null;
+      if (descPages === 1) onFirstDescPage?.(snap!);
+      if (snap) onPage?.(snap);
+
+      if (!response.nextPageToken || gap() <= 0) {
+        ascCtrl.abort();
+        break;
+      }
+      token = response.nextPageToken as unknown as string;
+    }
+  };
+
+  await Promise.allSettled([runAscending(), runDescending()]);
+
+  // Compact: remove unfilled slots (can occur at the fetch boundary where the
+  // winner aborted before the other side finished its last page).
+  const rawFinal = slots ?? (tempBuf as (HistoryEvent | undefined)[]);
+  let write = 0;
+  for (let i = 0; i < rawFinal.length; i++) {
+    const e = rawFinal[i];
+    if (e !== undefined) rawFinal[write++] = e;
+  }
+  rawFinal.length = write;
+
+  const totalFetched = ascEventCount + descEventCount;
+  const merged: CommonHistoryEvent[] = toEventHistory(
+    rawFinal as HistoryEvent[],
+  );
+  rawFinal.length = 0;
+
+  const durationMs = performance.now() - t0;
+  const overlap = totalFetched - merged.length;
+
+  const winner: BidirectionalStats['winner'] =
+    ascPages === descPages
+      ? 'tie'
+      : ascPages > descPages
+        ? 'ascending'
+        : 'descending';
+
+  return {
+    events: merged,
+    stats: {
+      durationMs,
+      totalEvents: merged.length,
+      overlap,
+      ascPages,
+      descPages,
+      eventsPerSecond: Math.round(merged.length / (durationMs / 1000)),
+      winner,
+    },
+  };
 };

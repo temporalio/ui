@@ -1,4 +1,4 @@
-import type { IconName } from '$lib/holocene/icon';
+import type { TimelineIconName } from '$lib/components/lines-and-dots/svg/timeline-icon.svelte';
 import type {
   EventGroup,
   EventGroups,
@@ -52,7 +52,7 @@ export const DetailsConfig: GraphConfig = {
 
 export const CategoryIcon: Record<
   EventTypeCategory,
-  { name: IconName; title: string }
+  { name: TimelineIconName; title: string }
 > = {
   workflow: { name: 'workflow', title: 'Workflow' },
   signal: { name: 'signal', title: 'Signal' },
@@ -119,12 +119,17 @@ export const timelineTextPosition = (
 
 export const isMiddleEvent = (
   event: WorkflowEvent,
-  groups: EventGroups,
+  groups: EventGroups | Map<string, EventGroup>,
 ): boolean => {
-  const group = groups.find((g) => g.eventIds.has(event.id));
+  const group =
+    groups instanceof Map
+      ? groups.get(event.id)
+      : groups.find((g) => g.eventList.some((e) => e.id === event.id));
   if (!group) return false;
-  const ids = Array.from(group.eventIds);
-  return ids.indexOf(event.id) === 1 && group.eventList.length === 3;
+  return (
+    group.eventList.findIndex((e) => e.id === event.id) === 1 &&
+    group.eventList.length === 3
+  );
 };
 
 const pairIsConsecutive = (x: string, y: string): boolean => {
@@ -132,12 +137,14 @@ const pairIsConsecutive = (x: string, y: string): boolean => {
 };
 
 const isConsecutiveGroup = (group: EventGroup): boolean => {
-  const ids = Array.from(group.eventIds);
-  if (ids.length === 1) return true;
-  if (ids.length === 2) return pairIsConsecutive(ids[0], ids[1]);
-  if (ids.length === 3) {
+  const { eventList } = group;
+  if (eventList.length === 1) return true;
+  if (eventList.length === 2)
+    return pairIsConsecutive(eventList[0].id, eventList[1].id);
+  if (eventList.length === 3) {
     return (
-      pairIsConsecutive(ids[0], ids[1]) && pairIsConsecutive(ids[1], ids[2])
+      pairIsConsecutive(eventList[0].id, eventList[1].id) &&
+      pairIsConsecutive(eventList[1].id, eventList[2].id)
     );
   }
   return false;

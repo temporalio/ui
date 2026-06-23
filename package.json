@@ -38,6 +38,8 @@
     "serve:playwright:e2e": "vite build && vite preview --mode test.e2e",
     "serve:playwright:integration": "vite build && vite preview --mode test.integration --port 3333",
     "test": "TZ=UTC vitest",
+    "perf:signals": "esno scripts/perf-signals.ts",
+    "perf:events": "esno scripts/perf-events.ts",
     "test:ui": "TZ=UTC vitest --ui",
     "test:coverage": "TZ=UTC vitest run --coverage",
     "test:e2e": "PW_MODE=e2e playwright test tests/e2e",

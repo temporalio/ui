@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { onMount } from 'svelte';
 
   import { page } from '$app/stores';
 
@@ -9,7 +9,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
-  import { activeGroupHeight, setActiveGroup } from '$lib/stores/active-events';
+  import { setActiveGroup } from '$lib/stores/active-events';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { isChildWorkflowExecutionStartedEvent } from '$lib/utilities/is-event-type';
 
@@ -20,15 +20,34 @@
   export let endTime: string | Date | number = Date.now();
   export let x = 0;
   export let y: number;
+  // PERF: Callback so timeline-graph can update the <g transform> on the row
+  // section below this panel. This is the only way panel height flows back up —
+  // it goes into a single SVG transform attribute (O(1)), NOT into per-row Y
+  // positions (which was the O(N) cascade we eliminated).
+  export let onHeight: ((h: number) => void) | undefined = undefined;
 
-  let offsetHeight;
-  $: contentHeight = offsetHeight || 0;
+  // PERF: ResizeObserver replaces bind:offsetHeight. The old approach read
+  // element.offsetHeight inside Svelte's effect system on every reactive flush
+  // (258 samples in CPUTraceClick2), forcing synchronous layout each time.
+  // ResizeObserver delivers height from within its own callback — the browser
+  // has already computed layout, so the read is free. The callback also fires
+  // automatically when CodeMirror's lazy init swaps in the editor, eliminating
+  // the need for an onDecode callback.
+  let contentEl: HTMLDivElement | undefined;
+  let contentHeight = 0;
 
-  const setActiveGroupHeight = (height) => {
-    $activeGroupHeight = height;
-  };
-
-  $: setActiveGroupHeight(contentHeight || 0);
+  onMount(() => {
+    if (!contentEl) return;
+    const observer = new ResizeObserver(() => {
+      const h = contentEl!.offsetHeight;
+      if (h !== contentHeight) {
+        contentHeight = h;
+        onHeight?.(h);
+      }
+    });
+    observer.observe(contentEl);
+    return () => observer.disconnect();
+  });
 
   $: status = group?.finalClassification || group?.classification;
   $: ({ namespace } = $page.params);
@@ -55,16 +74,11 @@
       }
     }
   }
-
-  const onDecode = async () => {
-    await tick();
-    contentHeight = offsetHeight;
-  };
 </script>
 
 <g class="relative z-50">
   <foreignObject {x} {y} {width} height={contentHeight}>
-    <div bind:offsetHeight class="flex flex-col">
+    <div bind:this={contentEl} class="flex flex-col">
       <div
         class="relative flex h-full items-center justify-between bg-slate-50 text-sm dark:bg-slate-800"
       >
@@ -90,7 +104,11 @@
         </div>
       </div>
       <div class="surface-primary">
-        <EventDetailsFull {group} event={group.initialEvent} />
+        <!-- PERF: lazy=true defers CodeMirror init to after the first paint so
+             the panel opens immediately with a <pre> placeholder. The
+             ResizeObserver above re-fires when CodeMirror replaces the <pre>,
+             automatically re-measuring and calling onHeight. -->
+        <EventDetailsFull {group} event={group.initialEvent} lazy={true} />
       </div>
       {#if childWorkflowStartedEvent}
         <div class="surface-primary p-4">
@@ -104,7 +122,6 @@
                 .runId}
               viewportHeight={320}
               class="surface-primary overflow-x-hidden border-t border-subtle"
-              onLoad={onDecode}
             />
           {/key}
         </div>
