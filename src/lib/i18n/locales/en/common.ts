@@ -229,4 +229,5 @@ export const Strings = {
   'change-log': 'Change Log',
   comfortable: 'Comfortable',
   dense: 'Dense',
+  'random-uuid': 'Random UUID',
 } as const;
