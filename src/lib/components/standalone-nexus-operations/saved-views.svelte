@@ -14,7 +14,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import { nexusOperationFilters } from '$lib/stores/filters';
-  import { savedNexusQueryNavOpen } from '$lib/stores/nav-open';
+  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { nexusOperationRefresh } from '$lib/stores/nexus-operations';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
@@ -221,7 +221,7 @@
   };
 
   const onQueryBtnEnter = (e: MouseEvent, name: string) => {
-    if ($savedNexusQueryNavOpen) return;
+    if ($savedQueryNavOpen) return;
     const el = e.currentTarget as HTMLElement;
     tooltipText = name;
     positionTooltipFrom(el);
@@ -242,7 +242,7 @@
 <div
   class={merge(
     'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
-    $savedNexusQueryNavOpen
+    $savedQueryNavOpen
       ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
       : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
   )}
@@ -254,10 +254,10 @@
     <div
       class={merge(
         'flex w-full items-center justify-between',
-        $savedNexusQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
+        $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
       )}
     >
-      {#if $savedNexusQueryNavOpen}
+      {#if $savedQueryNavOpen}
         <p
           class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
           in:slide
@@ -268,15 +268,13 @@
       <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
       <button
         class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
-        aria-label={$savedNexusQueryNavOpen
+        aria-label={$savedQueryNavOpen
           ? 'Collapse saved views'
           : 'Expand saved views'}
-        title={$savedNexusQueryNavOpen ? 'Collapse' : 'Expand'}
-        onclick={() => ($savedNexusQueryNavOpen = !$savedNexusQueryNavOpen)}
+        title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
+        onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
       >
-        <Icon
-          name={$savedNexusQueryNavOpen ? 'chevron-left' : 'chevron-right'}
-        />
+        <Icon name={$savedQueryNavOpen ? 'chevron-left' : 'chevron-right'} />
       </button>
     </div>
   </div>
@@ -293,7 +291,7 @@
       </div>
     </div>
 
-    {#if $savedNexusQueryNavOpen}
+    {#if $savedQueryNavOpen}
       <p
         class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
         in:slide
@@ -334,7 +332,7 @@
       <p
         class={merge(
           'pl-1 text-center text-secondary lg:pl-4 lg:text-left',
-          !$savedNexusQueryNavOpen && 'lg:pl-1 lg:text-center',
+          !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
         )}
       >
         No Views
@@ -380,11 +378,11 @@
         name={view.icon || 'bookmark'}
         class={merge(
           'h-4 w-4 flex-shrink-0 transition-colors duration-200',
-          $savedNexusQueryNavOpen ? 'lg:hidden' : '',
+          $savedQueryNavOpen ? 'lg:hidden' : '',
         )}
       />
 
-      {#if $savedNexusQueryNavOpen}
+      {#if $savedQueryNavOpen}
         <span
           class="hidden truncate text-left text-sm font-normal lg:inline-block"
           in:slide>{view.name}</span
@@ -403,7 +401,7 @@
         in:slide
         class={merge(
           'flex flex-col items-center gap-1 pt-0.5 transition-all',
-          $savedNexusQueryNavOpen && 'lg:flex-row',
+          $savedQueryNavOpen && 'lg:flex-row',
         )}
       >
         {#if view.id === activeQueryView?.id && view.query !== query}
@@ -436,7 +434,7 @@
           variant="ghost"
           data-testid="share-view-button"
           on:click={handleCopy}
-          ><span class={merge('hidden', $savedNexusQueryNavOpen && 'lg:inline')}
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
             >Share</span
           ></Button
         >
@@ -458,9 +456,9 @@
           ><span
             class={merge(
               'inline lg:hidden',
-              !$savedNexusQueryNavOpen && 'lg:inline',
+              !$savedQueryNavOpen && 'lg:inline',
             )}>New</span
-          ><span class={merge('hidden', $savedNexusQueryNavOpen && 'lg:inline')}
+          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
             >Save as New</span
           ></Button
         >

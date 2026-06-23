@@ -21,6 +21,7 @@
   import { authUser, clearAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
+  import { initializeNavDefaults } from '$lib/stores/nav-open';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
   import { type NamespaceListItem, type NavLinkItem } from '$lib/types/global';
@@ -49,6 +50,8 @@
   }
 
   let { children }: Props = $props();
+
+  initializeNavDefaults(page.data?.settings?.navCollapsedByDefault);
 
   let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
   let activeNamespaceName = $derived(

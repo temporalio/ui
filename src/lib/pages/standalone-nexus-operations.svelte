@@ -22,7 +22,7 @@
   } from '$lib/stores/configurable-table-columns';
   import { nexusOperationFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { savedNexusQueryNavOpen } from '$lib/stores/nav-open';
+  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import {
     nexusOperationCount,
     nexusOperationRefresh,
@@ -126,7 +126,7 @@
   <div
     class={merge(
       'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-      !$savedNexusQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
+      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
     )}
   >
     <NexusOperationsSummaryConfigurableTable
