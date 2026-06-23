@@ -88,19 +88,17 @@ describe('fetchSettings', () => {
   });
 
   it('should map redirectToProvider auth settings', async () => {
-    const request = async () =>
-      new Response(
-        JSON.stringify({
-          Auth: {
-            Enabled: true,
-            Options: ['audience'],
-            RedirectToProvider: true,
-          },
-          Codec: {},
-        }),
-      );
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({
+        Auth: {
+          Enabled: true,
+          Options: ['audience'],
+          RedirectToProvider: true,
+        },
+      }),
+    );
 
-    const settings = await fetchSettings(request as typeof fetch);
+    const settings = await fetchSettings();
 
     expect(settings.auth).toEqual({
       enabled: true,
@@ -110,18 +108,16 @@ describe('fetchSettings', () => {
   });
 
   it('should default redirectToProvider to false', async () => {
-    const request = async () =>
-      new Response(
-        JSON.stringify({
-          Auth: {
-            Enabled: true,
-            Options: null,
-          },
-          Codec: {},
-        }),
-      );
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({
+        Auth: {
+          Enabled: true,
+          Options: null,
+        },
+      }),
+    );
 
-    const settings = await fetchSettings(request as typeof fetch);
+    const settings = await fetchSettings();
 
     expect(settings.auth.redirectToProvider).toBe(false);
   });
