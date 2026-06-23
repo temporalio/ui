@@ -130,13 +130,13 @@
             <Badge type="subtle">{llmMetadata.model}</Badge>
           {/if}
           {#if llmMetadata.promptTokens}
-            <span class="text-xs text-secondary/60"
-              >{llmMetadata.promptTokens.toLocaleString()} prompt</span
+            <Badge type="subtle"
+              >{llmMetadata.promptTokens.toLocaleString()} prompt</Badge
             >
           {/if}
           {#if llmMetadata.completionTokens}
-            <span class="text-xs text-secondary/60"
-              >{llmMetadata.completionTokens.toLocaleString()} completion</span
+            <Badge type="subtle"
+              >{llmMetadata.completionTokens.toLocaleString()} completion</Badge
             >
           {/if}
           {#if llmMetadata.totalTokens}

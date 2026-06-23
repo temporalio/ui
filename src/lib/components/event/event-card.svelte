@@ -104,7 +104,7 @@
           {#if llmMetadata.model}
             <div class="flex items-center gap-2">
               <p class="min-w-32 text-sm text-secondary/80">Model</p>
-              <Badge type="subtle">{llmMetadata.model}</Badge>
+              <p class="text-sm">{llmMetadata.model}</p>
             </div>
           {/if}
           {#if llmMetadata.promptTokens}
