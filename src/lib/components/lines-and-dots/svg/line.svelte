@@ -40,13 +40,7 @@
     delayed = false,
   }: Props = $props();
 
-  const [x1, y1] = $derived(startPoint);
-  const [x2, y2] = $derived(endPoint);
-  const completedWithRetries = $derived(
-    retried && classification === 'Completed',
-  );
-
-  const strokeColor = $derived.by(() => {
+  function computeStrokeColor(): string {
     let color = DEFAULT_STROKE_COLOR;
     if (status) {
       color = status === 'none' ? '#141414' : getStatusStrokeColor(status);
@@ -59,22 +53,20 @@
       const statusColor = getStatusStrokeColor(classification);
       if (statusColor !== DEFAULT_STROKE_COLOR) color = statusColor;
     }
-    // PERF: Use === comparisons instead of [a, b].includes(x). The inline array
-    // literal allocates a new array on every call; with thousands of Line instances
-    // rendered per frame this created measurable GC pressure (visible in CPUTrace2).
     if (delayed && (classification === 'Running' || status === 'Running')) {
       color = getStatusStrokeColor('Delayed');
     }
     if (category === 'pending' || category === 'retry') {
-      // these categories take precedence over classification
       color = getCategoryStrokeColor(category);
     }
-
     return color;
-  });
+  }
 </script>
 
-{#if completedWithRetries}
+{#if retried && classification === 'Completed'}
+  {@const x1 = startPoint[0]}
+  {@const y1 = startPoint[1]}
+  {@const x2 = endPoint[0]}
   <foreignObject
     x={x1}
     y={y1 - strokeWidth / 2}
@@ -91,16 +83,16 @@
 {:else}
   <line
     class="line"
-    stroke={strokeColor}
+    stroke={computeStrokeColor()}
     class:none={status === 'none'}
     class:scheduling
     class:animate-line={pending && !paused}
     stroke-width={strokeWidth}
     stroke-dasharray={pending ? '3' : strokeDasharray}
-    x1={Math.max(0, x1)}
-    x2={Math.max(0, x2)}
-    {y1}
-    {y2}
+    x1={Math.max(0, startPoint[0])}
+    x2={Math.max(0, endPoint[0])}
+    y1={startPoint[1]}
+    y2={endPoint[1]}
   />
 {/if}
 

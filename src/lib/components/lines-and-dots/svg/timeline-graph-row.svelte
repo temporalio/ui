@@ -56,27 +56,11 @@
   const timelineWidth = $derived(canvasWidth - 2 * gutter);
   const pendingActivity = $derived(group?.pendingActivity);
 
-  // PERF MODERATE: i18next appeared in the CPU trace (resetRegExp,
-  // extractFromKey) because it re-processes its interpolation regex pattern on
-  // every translate() call. For a completed group, displayName and classification
-  // never change, so the result is stable. Cache manually because $derived
-  // re-evaluates when the group prop reference changes (e.g. after a store
-  // update), even if the string values are identical.
-  let _accessibleName = '';
-  let _accessibleNameKey = '';
-  const accessibleName = $derived.by(() => {
-    const classification = getEventClassificationLabel(
+  const accessibleName = translate('events.row-accessible-name', {
+    eventType: group.displayName,
+    classification: getEventClassificationLabel(
       group.finalClassification || group.classification,
-    );
-    const key = `${group.displayName}|${classification}`;
-    if (key !== _accessibleNameKey) {
-      _accessibleName = translate('events.row-accessible-name', {
-        eventType: group.displayName,
-        classification,
-      });
-      _accessibleNameKey = key;
-    }
-    return _accessibleName;
+    ),
   });
   const pauseTime = $derived(
     pendingActivity && pendingActivity.pauseInfo?.pauseTime,
@@ -192,24 +176,11 @@
   const activityTaskScheduled = $derived(
     group.eventList.find(isActivityTaskStartedEvent),
   );
-
   const retryAttempt = $derived(
     activityTaskScheduled?.attributes?.attempt ?? 0,
   );
   const retried = $derived(retryAttempt > 1);
   const pendingLine = $derived(group.isPending || !!pauseTime);
-
-  const multiEventHoverWidth = $derived(
-    points.length >= 2 && points[points.length - 1] - points[0] + radius * 3,
-  );
-  const pendingHoverWidth = $derived(
-    group.isPending && canvasWidth - points[0] - radius * 1.5,
-  );
-  const singleEventHoverWidth = $derived(radius * 3);
-
-  const hoverWidth = $derived(
-    pendingHoverWidth || multiEventHoverWidth || singleEventHoverWidth,
-  );
 
   const groupHover = cva(['h-full w-full rounded-full border-2'], {
     variants: {
@@ -230,6 +201,12 @@
 </script>
 
 {#if hovering}
+  {@const multiEventHoverWidth =
+    points.length >= 2 && points[points.length - 1] - points[0] + radius * 3}
+  {@const hoverWidth =
+    (group.isPending && canvasWidth - points[0] - radius * 1.5) ||
+    multiEventHoverWidth ||
+    radius * 3}
   <foreignObject
     x={points[0] - radius * 1.5}
     y={y - radius * 1.5}

@@ -27,8 +27,6 @@
     children,
   }: Props = $props();
 
-  const [x, y] = $derived(point);
-
   // PERF: The previous approach used class names (.Started, .Completed, .activity …)
   // and ~18 scoped CSS selectors. The browser checks every selector against every
   // dot element on each style recalculation — with 94k+ elements × 18 selectors
@@ -64,7 +62,7 @@
     workflow: ['#059669', '#141414'],
   };
 
-  const [fill, stroke] = $derived(
+  const colorPair = $derived(
     (classification && CLASSIFICATION_COLORS[classification]) ||
       (category && CATEGORY_COLORS[category]) ||
       DEFAULT,
@@ -74,10 +72,10 @@
 <g>
   <rect
     class="dot"
-    style="fill:{fill};stroke:{stroke}"
+    style="fill:{colorPair[0]};stroke:{colorPair[1]}"
     stroke-width={strokeWidth}
-    x={x - r}
-    y={y - r}
+    x={point[0] - r}
+    y={point[1] - r}
     width={r * 2}
     height={r * 2}
     rx={r * 0.3}
@@ -87,8 +85,8 @@
   {#if icon}
     <TimelineIcon
       name={icon}
-      x={x - r / 2}
-      y={y - r / 2}
+      x={point[0] - r / 2}
+      y={point[1] - r / 2}
       width={r}
       height={r}
       style="color:#000"

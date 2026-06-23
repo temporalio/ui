@@ -156,17 +156,9 @@
   const pendingGroupCount = $derived.by(() => {
     if (!loading) return 0;
     if (!totalExpectedEvents) {
-      // No total known yet (pre-first-progress) — show enough rows to fill a viewport
-      // so there's a skeleton from the very first paint rather than an empty timeline.
       return filteredGroups.length === 0 ? 50 : 0;
     }
-    const loadedEvents = $fullEventHistory.length;
-    const density =
-      loadedEvents && filteredGroups.length
-        ? filteredGroups.length / loadedEvents
-        : 0.5;
-    const expectedTotal = Math.round(totalExpectedEvents * density);
-    return Math.max(0, expectedTotal - filteredGroups.length);
+    return Math.max(0, totalExpectedEvents - filteredGroups.length);
   });
 
   // Scroll-window virtualization: only the rows within OVERSCAN rows of the

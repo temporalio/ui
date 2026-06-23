@@ -38,8 +38,6 @@
     children,
   }: Props = $props();
 
-  const [x, y] = $derived(point);
-
   // PERF: getBBox() forces the browser to flush SVG layout and compute exact glyph
   // metrics for every call — the SVG equivalent of element.clientWidth. With 10k
   // rows each calling getBBox() after mount, this was 10k forced SVG reflows.
@@ -85,14 +83,16 @@
   );
   const backdropWidth = $derived(showIcon ? textWidth + 36 : textWidth + 12);
   const textX = $derived(
-    showIcon && textAnchor === 'start' ? x + config.radius * 2 : x,
+    showIcon && textAnchor === 'start'
+      ? point[0] + config.radius * 2
+      : point[0],
   );
 </script>
 
 {#if backdrop}
   <Line
-    startPoint={[x - backdropHeight, y]}
-    endPoint={[x + backdropWidth, y]}
+    startPoint={[point[0] - backdropHeight, point[1]]}
+    endPoint={[point[0] + backdropWidth, point[1]]}
     {status}
     strokeWidth={backdropHeight}
   />
@@ -100,8 +100,8 @@
 {#if showIcon}
   <TimelineIcon
     name={icon}
-    x={textAnchor === 'end' ? x - textWidth - backdropHeight : x}
-    y={y - 8}
+    x={textAnchor === 'end' ? point[0] - textWidth - backdropHeight : point[0]}
+    y={point[1] - 8}
     class={!backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
@@ -112,7 +112,7 @@
     class:label
     class:backdrop
     x={textX}
-    y={y + 1}
+    y={point[1] + 1}
     font-size={fontSize}
     font-weight={fontWeight}
     text-anchor={textAnchor}

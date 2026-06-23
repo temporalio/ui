@@ -104,10 +104,13 @@
   const ROW_PX = 24;
   let stickyHeight = $state(0);
   let graphPanelHeight = $state(0);
+  const totalRows = $derived(
+    historyCtx.fetchComplete
+      ? groups.length
+      : Math.max(historyCtx.totalExpectedEvents ?? 0, groups.length),
+  );
   const spacerHeight = $derived(
-    Math.max((groups.length + 2) * ROW_PX, 120) -
-      stickyHeight +
-      graphPanelHeight,
+    Math.max((totalRows + 2) * ROW_PX, 120) - stickyHeight + graphPanelHeight,
   );
 
   // Sentinel's layout position within the scroll container — measured once at
