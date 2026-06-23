@@ -1,5 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('$lib/stores/session-warning', () => ({
+  triggerSessionExpired: vi.fn(),
+  dismissSessionWarning: vi.fn(),
+  sessionWarningState: { subscribe: vi.fn(), set: vi.fn() },
+}));
+
+import { triggerSessionExpired } from '$lib/stores/session-warning';
+
 import { handleError } from './handle-error';
 import { routeForLoginPage } from './route-for';
 
@@ -20,26 +28,28 @@ describe('handleError', () => {
     vi.clearAllMocks();
   });
 
-  it('should redirect if it is an unauthorized error with status', () => {
+  it('should trigger session expired if it is an unauthorized error with status', () => {
     const error = {
       status: 401,
       statusText: 'Unauthorized',
       response: null as unknown as Response,
     };
 
-    expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    handleError(error);
+    expect(triggerSessionExpired).toHaveBeenCalled();
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
-  it('should redirect if it is an unauthorized error with statusCode', () => {
+  it('should trigger session expired if it is an unauthorized error with statusCode', () => {
     const error = {
       statusCode: 401,
       statusText: 'Unauthorized',
       response: null as unknown as Response,
     };
 
-    expect(() => handleError(error)).toThrowError();
-    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+    handleError(error);
+    expect(triggerSessionExpired).toHaveBeenCalled();
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
   it('should redirect if it is a forbidden error with status', () => {
