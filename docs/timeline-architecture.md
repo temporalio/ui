@@ -38,6 +38,54 @@ flowchart LR
 
 ---
 
+## Reactivity: Events and Callbacks, Not Svelte Primitives
+
+The buffer is **plain TypeScript** — no `$state`, no `$derived`, no stores inside the module.
+Svelte's reactive graph is only entered at the outermost boundary, via two narrow escape hatches.
+
+```mermaid
+flowchart TD
+    subgraph OLD["❌ Old approach (stores)"]
+        direction LR
+        O1["Svelte writable store<br/>holds full WorkflowEvent[]"] -->|every push triggers| O2["$derived chains re-run<br/>across all subscribers"]
+        O2 --> O3["Full array diff + re-render<br/>at 50k events = jank"]
+    end
+
+    subgraph NEW["✅ New approach (buffer + narrow signals)"]
+        direction LR
+        N1["Plain TS array mutated<br/>in-place — no reactive cost"] -->|batch complete| N2["bufferVersion.set(v+1)<br/>one integer write"]
+        N2 -->|$derived reads version| N3["Consumer calls getEventArray()<br/>reads already-built array — O(1)"]
+        N1 -->|group head appended| N4["onLatestGroup() fires<br/>registered callback"]
+        N4 --> N5["Layout calls getGroupArray()<br/>reads cached sorted slice — O(1)"]
+    end
+```
+
+### Why this matters at scale
+
+|                  | Svelte store approach                           | Buffer + signal approach                                                  |
+| ---------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
+| 10 k event push  | Re-runs every `$derived` chain for each push    | Mutates array silently; one `bufferVersion` tick at end                   |
+| Subscriber count | Every component watching the store re-evaluates | Only components that read `bufferVersion` or register via `onLatestGroup` |
+| Memory per event | Two copies — one in store, one in group         | One copy in `events[]`; group holds a reference to the same object        |
+| Render trigger   | Svelte decides (potentially every frame)        | Explicit: either a version bump or a callback — nothing else              |
+
+### The two signal types
+
+**`bufferVersion`** — a plain `writable(0)`. Consumers write:
+
+```svelte
+let rows = $derived.by(() => {
+  $bufferVersion;           // subscribe to the tick
+  return getEventArray();   // read the already-built array
+});
+```
+
+No array is passed through the signal. The signal carries only the intent to re-read.
+
+**`onLatestGroup(cb)`** — a callback registration (pub/sub, not Svelte reactive). Layouts register on mount and receive a teardown function. The buffer calls every registered callback synchronously after appending a new group head. No Svelte primitive involved — the callback fires imperative code that then reassigns a `$state` variable once, queueing exactly one Svelte flush.
+
+---
+
 ## Virtualization: Sticky Canvas + Sentinel Scroll
 
 The timeline SVG can have 50 k+ rows. Only ~17 rows live in the DOM at any time.
