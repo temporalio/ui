@@ -143,19 +143,21 @@
   };
 
   const handlePause = async (schedule: DescribeScheduleResponse) => {
-    schedule?.schedule?.state?.paused
-      ? await unpauseSchedule({
-          identity,
-          namespace,
-          scheduleId,
-          reason,
-        })
-      : await pauseSchedule({
-          identity,
-          namespace,
-          scheduleId,
-          reason,
-        });
+    if (schedule?.schedule?.state?.paused) {
+      await unpauseSchedule({
+        identity,
+        namespace,
+        scheduleId,
+        reason: reason.trim(),
+      });
+    } else {
+      await pauseSchedule({
+        identity,
+        namespace,
+        scheduleId,
+        reason: reason.trim(),
+      });
+    }
     scheduleFetch = fetchSchedule(parameters);
     reason = '';
     pauseConfirmationModalOpen = false;
@@ -431,7 +433,7 @@
         ? translate('schedules.unpause')
         : translate('schedules.pause')}
       cancelText={translate('common.cancel')}
-      confirmDisabled={!reason}
+      confirmDisabled={!reason.trim()}
       on:confirmModal={() => handlePause(schedule)}
       on:cancelModal={resetReason}
     >
@@ -450,17 +452,15 @@
                 schedule: scheduleId,
               })}
         </p>
-        <p class="my-4">
-          {schedule?.schedule.state.paused
-            ? translate('schedules.unpause-reason')
-            : translate('schedules.pause-reason')}
-        </p>
         <Input
           id="pause-reason"
           bind:value={reason}
-          placeholder={translate('common.reason-placeholder')}
-          label={translate('common.reason-label')}
-          labelHidden
+          placeholder={schedule?.schedule.state.paused
+            ? translate('schedules.unpause-reason')
+            : translate('schedules.pause-reason')}
+          label={translate('common.reason')}
+          required
+          class="mt-4"
         />
       </div>
     </Modal>
