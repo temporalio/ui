@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { toWorkflowExecution } from '$lib/models/workflow-execution';
 
-import { decodePayload } from './decode-payload';
+import { parseRawPayloadToJSON } from './decode-payload';
 import { getWorkflowRelationships } from './get-workflow-relationships';
 
 import childEvents from '$fixtures/events.children.json';
@@ -219,7 +219,7 @@ describe('getWorkflowRelationships', () => {
   });
 
   it('should return the decoded scheduleID for a scheduled workflows', () => {
-    const workflowScheduledId = decodePayload(
+    const workflowScheduledId = parseRawPayloadToJSON(
       scheduledWorkflow?.workflowExecutionInfo?.searchAttributes?.indexedFields
         ?.TemporalScheduledById,
     );

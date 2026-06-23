@@ -12,15 +12,17 @@ import { getLocalTime } from './timezone';
 // // force GH action runners to use en-US and 12-hour clocks starting at 0:00
 // but respect explicit hour12 option when provided
 const DateTimeFormat = Intl.DateTimeFormat;
-vi.spyOn(global.Intl, 'DateTimeFormat').mockImplementation((_, options) => {
-  const hour12 = options?.hour12 !== undefined ? options.hour12 : true;
-  const hourCycle = options?.hour12 !== undefined ? undefined : 'h11';
-  return new DateTimeFormat('en-US', {
-    ...options,
-    hour12,
-    ...(hourCycle && { hourCycle }),
+const dateTimeFormatSpy = vi
+  .spyOn(global.Intl, 'DateTimeFormat')
+  .mockImplementation((_, options) => {
+    const hour12 = options?.hour12 !== undefined ? options.hour12 : true;
+    const hourCycle = options?.hour12 !== undefined ? undefined : 'h11';
+    return new DateTimeFormat('en-US', {
+      ...options,
+      hour12,
+      ...(hourCycle && { hourCycle }),
+    });
   });
-});
 
 describe('formatDate', () => {
   const date = '2022-04-13T16:29:35.630571Z';
@@ -47,6 +49,22 @@ describe('formatDate', () => {
 
   it('should default to UTC', () => {
     expect(formatDate(date)).toEqual('Apr 13, 2022, 4:29:35.63 PM UTC');
+  });
+
+  it('should reuse formatters for matching format options', () => {
+    dateTimeFormatSpy.mockClear();
+
+    expect(formatDate(date, 'UTC', { format: 'short', hourFormat: '12' })).toBe(
+      '4/13/22, 4:29:35.63 PM UTC',
+    );
+    expect(
+      formatDate('2022-04-14T16:29:35.630571Z', 'UTC', {
+        format: 'short',
+        hourFormat: '12',
+      }),
+    ).toBe('4/14/22, 4:29:35.63 PM UTC');
+
+    expect(dateTimeFormatSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should format other timezones', () => {

@@ -1,6 +1,6 @@
 import type {
   Memo,
-  Payloads,
+  Payload,
   PendingWorkflowTaskInfo,
   Priority,
   WorkflowExecutionStatus,
@@ -11,7 +11,6 @@ import type { Callback } from '$lib/types/nexus';
 
 import type { VersioningInfo } from './deployments';
 import type {
-  Payload,
   PendingActivity,
   PendingActivityInfo,
   PendingChildren,
@@ -38,6 +37,8 @@ export type WorkflowExecutionInfo = Replace<
     closeTime: string;
     executionTime: string;
     historySizeBytes: string;
+    externalPayloadCount?: string;
+    externalPayloadSizeBytes?: string;
     historyLength: string;
     searchAttributes?: WorkflowSearchAttributes;
     memo?: Memo;
@@ -51,12 +52,12 @@ export type ListWorkflowExecutionsResponse = Replace<
 
 export type CountWorkflowExecutionsResponse = {
   count?: string;
-  groups?: { count: string; groupValues: Payloads }[];
+  groups?: { count: string; groupValues: Payload[] }[];
 };
 
 export type CountSchedulesResponse = {
   count?: string;
-  groups?: { count: string; groupValues: Payloads }[];
+  groups?: { count: string; groupValues: Payload[] }[];
 };
 
 export type WorkflowExecutionConfig = Replace<
@@ -173,6 +174,8 @@ export type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
+  externalPayloadCount: string | undefined;
+  externalPayloadSizeBytes: string | undefined;
   mostRecentWorkerVersionStamp?: MostRecentWOrkflowVersionStamp;
   assignedBuildId?: string;
   searchAttributes?: DecodedWorkflowSearchAttributes;

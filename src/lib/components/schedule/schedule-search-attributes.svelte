@@ -2,16 +2,19 @@
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttribute } from '$lib/types';
-  import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
+  import { parsePayloadAttributes } from '$lib/utilities/decode-payload';
   import { payloadToString } from '$lib/utilities/payload-to-string';
   import { pluralize } from '$lib/utilities/pluralize';
 
-  export let searchAttributes: SearchAttribute;
+  let { searchAttributes }: { searchAttributes: SearchAttribute } = $props();
 
-  $: decodedSearchAttributes = decodePayloadAttributes({ searchAttributes });
-  $: indexedFields =
-    decodedSearchAttributes?.searchAttributes.indexedFields ?? {};
-  $: searchAttributeCount = Object.keys(indexedFields).length;
+  const decodedSearchAttributes = $derived(
+    parsePayloadAttributes({ searchAttributes }),
+  );
+  const indexedFields = $derived(
+    decodedSearchAttributes?.searchAttributes.indexedFields ?? {},
+  );
+  const searchAttributeCount = $derived(Object.keys(indexedFields).length);
 </script>
 
 <Accordion

@@ -2,18 +2,18 @@
   import { page } from '$app/state';
 
   import DeploymentTableRow from '$lib/components/deployments/deployment-table-row.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/holocene/link.svelte';
+  import DeploymentsEmptyState from '$lib/components/deployments/deployments-empty-state.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchPaginatedDeployments } from '$lib/services/deployments-service';
-  import type { APIErrorResponse } from '$lib/utilities/request-from-api';
+  import { refresh } from '$lib/stores/workers';
+  import { has } from '$lib/utilities/has';
+  import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
   let error = $state('');
 
   const namespace = $derived(page.params.namespace);
+  const createHref = $derived(routeForWorkerDeploymentCreate({ namespace }));
 
   const onFetch = $derived.by(() => {
     return () => {
@@ -22,71 +22,58 @@
     };
   });
 
-  const onError = (err: APIErrorResponse) => {
-    error =
-      err?.body?.message || translate('deployments.error-message-fetching');
+  const onError = (err: unknown) => {
+    if (
+      has(err, 'body') &&
+      has(err.body, 'message') &&
+      typeof err.body.message === 'string'
+    ) {
+      error = err.body.message;
+      return;
+    }
+    error = translate('deployments.error-message-fetching');
   };
 
   const columns = [
-    { label: translate('deployments.name') },
-    {
-      label: translate('deployments.build-id'),
-    },
-    { label: translate('deployments.deployed') },
-    {
-      label: translate('deployments.actions'),
-    },
+    { label: translate('deployments.deployment') },
+    { label: translate('deployments.latest-version') },
+    { label: translate('deployments.created') },
   ];
 </script>
 
-<div class="flex flex-wrap items-center gap-2">
-  <h1>
-    {translate('deployments.worker-deployments')}
-  </h1>
-  <Badge class="shrink-0">Public Preview</Badge>
-</div>
-
-{#key [namespace]}
-  <PaginatedTable
-    let:visibleItems
-    {onFetch}
-    {onError}
-    aria-label={translate('deployments.deployments')}
-    pageSizeSelectLabel={translate('common.per-page')}
-    nextButtonLabel={translate('common.next')}
-    previousButtonLabel={translate('common.previous')}
-    emptyStateMessage={translate('deployments.empty-state-title')}
-    errorMessage={translate('deployments.error-message-fetching')}
-  >
-    <caption class="sr-only" slot="caption"
-      >{translate('deployments.deployments')}</caption
+{#key [namespace, $refresh]}
+  <div class="flex flex-col gap-4">
+    <PaginatedTable
+      let:visibleItems
+      {onFetch}
+      {onError}
+      aria-label={translate('deployments.deployments')}
+      pageSizeSelectLabel={translate('common.per-page')}
+      nextButtonLabel={translate('common.next')}
+      previousButtonLabel={translate('common.previous')}
+      emptyStateMessage={translate('deployments.empty-state-title')}
+      errorMessage={translate('deployments.error-message-fetching')}
     >
-    <tr slot="headers" class="text-left">
-      {#each columns as { label }}
-        <th>{label}</th>
-      {/each}
-    </tr>
-    {#each visibleItems as deployment}
-      <DeploymentTableRow {deployment} {columns} />
-    {/each}
-
-    <svelte:fragment slot="empty">
-      <EmptyState
-        title={translate('deployments.empty-state-title')}
-        class="px-4"
+      <caption class="sr-only" slot="caption"
+        >{translate('deployments.deployments')}</caption
       >
-        <p class="text-center">
-          Enable Worker Deployments to manage your workers more effectively. <Link
-            href="https://docs.temporal.io/worker-deployments"
-            newTab>Learn more</Link
-          >.
-        </p>
-        {#if error}
-          <Alert intent="warning" icon="warning" class="px-12">
-            {error}
-          </Alert>
-        {/if}
-      </EmptyState>
-    </svelte:fragment>
-  </PaginatedTable>
+      <tr slot="headers" class="text-left">
+        {#each columns as { label } (label)}
+          <th>{label}</th>
+        {/each}
+        <th>{translate('deployments.actions')}</th>
+      </tr>
+      {#each visibleItems as deployment}
+        <DeploymentTableRow
+          {deployment}
+          {columns}
+          onChange={() => refresh.update((n) => n + 1)}
+        />
+      {/each}
+
+      <svelte:fragment slot="empty">
+        <DeploymentsEmptyState {createHref} {error} />
+      </svelte:fragment>
+    </PaginatedTable>
+  </div>
 {/key}

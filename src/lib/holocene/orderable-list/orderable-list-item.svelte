@@ -13,47 +13,57 @@
     currentTarget: EventTarget & HTMLLIElement;
   };
 
-  type BaseProps = {
+  type Props = {
     label: string;
     index?: number;
     totalItems?: number;
-  };
+  } & (
+    | {
+        readonly: true;
+        static?: never;
+        addButtonLabel?: never;
+        moveUpButtonLabel?: never;
+        moveDownButtonLabel?: never;
+        removeButtonLabel?: never;
+      }
+    | {
+        readonly?: false;
+        static: true;
+        addButtonLabel: string;
+        moveUpButtonLabel?: never;
+        moveDownButtonLabel?: never;
+        removeButtonLabel?: never;
+      }
+    | {
+        readonly?: false;
+        static?: false;
+        moveUpButtonLabel: string;
+        moveDownButtonLabel: string;
+        addButtonLabel: string;
+        removeButtonLabel: string;
+      }
+  );
 
-  type ReadonlyProps = BaseProps & {
-    readonly: boolean;
-  };
-
-  type StaticProps = BaseProps & {
-    static: boolean;
-  } & Pick<I18nProps, 'addButtonLabel'>;
-
-  type I18nProps = {
-    moveUpButtonLabel: string;
-    moveDownButtonLabel: string;
-    addButtonLabel: string;
-    removeButtonLabel: string;
-  };
-
-  type $$Props = (BaseProps & I18nProps) | ReadonlyProps | StaticProps;
-
-  let isStatic = false;
-  export { isStatic as static };
-  export let label: string;
-  export let readonly = false;
-  export let index = 0;
-  export let totalItems = 0;
-  export let moveUpButtonLabel = '';
-  export let moveDownButtonLabel = '';
-  export let addButtonLabel = '';
-  export let removeButtonLabel = '';
+  let {
+    label,
+    index = 0,
+    totalItems = 0,
+    readonly = false,
+    static: isStatic = false,
+    moveUpButtonLabel = '',
+    moveDownButtonLabel = '',
+    addButtonLabel = '',
+    removeButtonLabel = '',
+  }: Props = $props();
 
   const handleDragStart = (event: ExtendedDragEvent, index: number) => {
-    if (isStatic || readonly) return;
+    if (isStatic || readonly || !event.dataTransfer) return;
     event.dataTransfer.setData('text/plain', index.toString());
     event.dataTransfer.dropEffect = 'move';
   };
 
   const handleDrop = (event: ExtendedDragEvent, to: number) => {
+    if (!event.dataTransfer) return;
     event.currentTarget.classList.remove('dragging-over');
     const from = parseInt(event.dataTransfer.getData('text/plain'));
     dispatch('moveItem', { from, to });
@@ -69,11 +79,25 @@
   draggable={!isStatic && !readonly}
   class="orderable-item group"
   class:readonly
-  on:dragstart={(e) => handleDragStart(e, index)}
-  on:drop|preventDefault={(e) => handleDrop(e, index)}
-  on:dragenter|preventDefault|stopPropagation={handleDragEnter}
-  on:dragleave|preventDefault|stopPropagation={handleDragLeave}
-  on:dragover|preventDefault|stopPropagation
+  ondragstart={(e) => handleDragStart(e, index)}
+  ondrop={(e) => {
+    e.preventDefault();
+    handleDrop(e, index);
+  }}
+  ondragenter={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleDragEnter(e);
+  }}
+  ondragleave={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleDragLeave(e);
+  }}
+  ondragover={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }}
   data-testid="orderable-list-item-{label}"
 >
   <div class="flex flex-row items-center gap-2">

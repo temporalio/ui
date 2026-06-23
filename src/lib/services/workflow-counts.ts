@@ -23,6 +23,8 @@ export const fetchWorkflowTaskFailures = async (
   } catch {
     // Don't fail the workflows call due to count
   }
+
+  return 0;
 };
 
 type WorkflowCountByExecutionStatusOptions = {
@@ -33,7 +35,9 @@ type WorkflowCountByExecutionStatusOptions = {
 export const fetchWorkflowCountByExecutionStatus = async ({
   namespace,
   query,
-}: WorkflowCountByExecutionStatusOptions): Promise<CountWorkflowExecutionsResponse> => {
+}: WorkflowCountByExecutionStatusOptions): Promise<
+  Required<CountWorkflowExecutionsResponse>
+> => {
   const groupByClause = 'GROUP BY ExecutionStatus';
   const countRoute = routeForApi('workflows.count', {
     namespace,
@@ -45,7 +49,7 @@ export const fetchWorkflowCountByExecutionStatus = async ({
       },
       notifyOnError: false,
     });
-  return { count: count ?? '0', groups };
+  return { count: count ?? '0', groups: groups ?? [] };
 };
 
 // Uses the API in a private/unsupported way that will stop working in a future server release.
@@ -76,18 +80,17 @@ export const fetchScheduleCount = async ({
   namespace: string;
   query?: string;
 }): Promise<string> => {
-  return fetchScheduleCountLegacy(namespace, query);
-  // try {
-  //   const countRoute = routeForApi('schedules.count', { namespace });
-  //   const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
-  //     params: query ? { query } : {},
-  //     notifyOnError: false,
-  //   });
-  //   return count ?? '0';
-  // } catch (error: unknown) {
-  //   if (isNotImplemented(error) || isNotFound(error)) {
-  //     return fetchScheduleCountLegacy(namespace, query);
-  //   }
-  //   throw error;
-  // }
+  try {
+    const countRoute = routeForApi('schedules.count', { namespace });
+    const { count } = await requestFromAPI<CountSchedulesResponse>(countRoute, {
+      params: query ? { query } : {},
+      notifyOnError: false,
+    });
+    return count ?? '0';
+  } catch (error: unknown) {
+    if (isNotImplemented(error) || isNotFound(error)) {
+      return fetchScheduleCountLegacy(namespace, query);
+    }
+    throw error;
+  }
 };

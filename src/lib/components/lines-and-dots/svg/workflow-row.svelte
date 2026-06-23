@@ -1,24 +1,43 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
 
   import { TimelineConfig } from '../constants';
 
   import Dot from './dot.svelte';
   import Line from './line.svelte';
 
-  export let workflow: WorkflowExecution;
-  export let length: number;
-  export let y: number;
+  interface Props {
+    workflow: WorkflowExecution;
+    length: number;
+    y: number;
+  }
+
+  let { workflow, length, y }: Props = $props();
 
   const { radius, height, gutter } = TimelineConfig;
 
-  $: start = gutter;
-  $: end = start + length - 2 * gutter;
+  const start = $derived(gutter);
+  const end = $derived(start + length - 2 * gutter);
+
+  const accessibleName = $derived(
+    translate('workflows.row-accessible-name', {
+      workflowId: workflow.id,
+      status: getWorkflowStatusLabel(workflow.status),
+    }),
+  );
 </script>
 
-<g role="button" tabindex="0" class="relative cursor-pointer" {height}>
+<g
+  role="button"
+  tabindex="0"
+  aria-label={accessibleName}
+  class="relative cursor-pointer"
+  {height}
+>
   <Line
     startPoint={[start, y]}
     endPoint={[end, y]}

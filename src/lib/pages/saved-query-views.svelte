@@ -28,6 +28,7 @@
   import { taskFailuresCount } from '$lib/stores/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   let activeQueryView: SavedQuery | undefined = $state();
@@ -48,9 +49,7 @@
   );
 
   const namespaceSavedQueries = $derived(
-    $savedWorkflowQueries?.[namespace]?.sort((a, b) =>
-      a.name.localeCompare(b.name),
-    ) || [],
+    sortAlphabetically($savedWorkflowQueries?.[namespace] || [], (q) => q.name),
   );
   const systemQueryView = $derived(
     (query && systemWorkflowViews.find((q) => q.query === query)) ||
@@ -226,7 +225,7 @@
     tooltipY = Math.round(rect.top + 16);
   };
 
-  const onQueryBtnEnter = (e: MouseEvent, name: string) => {
+  const onQueryBtnEnter = (e: MouseEvent | FocusEvent, name: string) => {
     if ($savedQueryNavOpen) return;
     const el = e.currentTarget as HTMLElement;
     tooltipText = name;
@@ -234,7 +233,7 @@
     showTooltip = true;
   };
 
-  const onQueryBtnMove = (e: MouseEvent) => {
+  const onQueryBtnMove = (e: MouseEvent | FocusEvent) => {
     if (!showTooltip) return;
     const el = e.currentTarget as HTMLElement;
     positionTooltipFrom(el);
@@ -374,6 +373,14 @@
       )}
     onmousemove={onQueryBtnMove}
     onmouseleave={onQueryBtnLeave}
+    onfocusin={(e) =>
+      onQueryBtnEnter(
+        e,
+        view.id === TASK_FAILURES_VIEW.id
+          ? `${view.name} • ${view.count ?? 0}`
+          : view.name,
+      )}
+    onfocusout={onQueryBtnLeave}
   >
     <Button
       variant="ghost"

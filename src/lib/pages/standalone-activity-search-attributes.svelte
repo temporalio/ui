@@ -1,6 +1,5 @@
 <script lang="ts">
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
@@ -9,18 +8,7 @@
 
 <div class="flex flex-col gap-2">
   {#if searchAttributes}
-    <PayloadDecoder
-      value={{ searchAttributes: searchAttributes }}
-      key="searchAttributes"
-    >
-      {#snippet children(decodedValue)}
-        <CodeBlock
-          content={decodedValue}
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-        />
-      {/snippet}
-    </PayloadDecoder>
+    <PayloadCodeBlock value={searchAttributes.indexedFields} />
   {:else}
     <p>{translate('events.empty-search-attributes')}</p>
   {/if}

@@ -13,16 +13,18 @@
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
 
-  let { defaultNamespace } = data;
-
-  const namespaceToRedirect =
-    $lastUsedNamespace && $lastUsedNamespace !== 'default'
-      ? $lastUsedNamespace
-      : defaultNamespace;
+  let { data }: Props = $props();
 
   onMount(async () => {
+    const namespaceToRedirect =
+      $lastUsedNamespace && $lastUsedNamespace !== 'default'
+        ? $lastUsedNamespace
+        : data.defaultNamespace;
+
     try {
       const { authorized } =
         await fetchWorkflowForAuthorization(namespaceToRedirect);

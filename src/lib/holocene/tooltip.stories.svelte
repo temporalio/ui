@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import Button from '$lib/holocene/button.svelte';
@@ -68,7 +70,7 @@
         table: { category: 'Positioning' },
       },
     },
-  } satisfies Meta<Omit<Tooltip, 'copyIconTitle'>>;
+  } satisfies Meta<Tooltip>;
 </script>
 
 <script lang="ts">
@@ -130,4 +132,12 @@
     </div>
     <Button>Tooltip</Button>
   </Tooltip>
+</Story>
+
+<Story name="Portal (avoids overflow clipping)">
+  <div class="overflow-hidden rounded border border-slate-600 p-4">
+    <Tooltip top usePortal text="This renders outside the overflow container">
+      <Button>Hover me (portal)</Button>
+    </Tooltip>
+  </div>
 </Story>

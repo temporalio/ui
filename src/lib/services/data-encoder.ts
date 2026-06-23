@@ -1,14 +1,13 @@
-import { get } from 'svelte/store';
-
-import { page } from '$app/stores';
+import { page } from '$app/state';
 
 import { translate } from '$lib/i18n/translate';
-import { authUser } from '$lib/stores/auth-user';
 import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
-import type { NetworkError, Settings } from '$lib/types/global';
+import type { Payload, Payloads } from '$lib/types';
+import type { NetworkError } from '$lib/types/global';
+import { getAccessToken, getIdToken } from '$lib/utilities/core-provider';
 import {
   getCodecEndpoint,
   getCodecIncludeCredentials,
@@ -19,18 +18,26 @@ import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 export type PotentialPayloads = { payloads: unknown[] };
 
+export const NO_CODEC_SERVER_CONFIGURED_ERROR = new Error(
+  'No codec server configured',
+);
+
 export async function codeServerRequest({
   type,
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
 }: {
-  type: 'decode' | 'encode';
+  type: 'decode' | 'encode' | 'download';
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
-}): Promise<PotentialPayloads> {
+}): Promise<Payloads> {
+  const settings = page.data.settings;
+  const namespace = page.params.namespace;
   const endpoint = getCodecEndpoint(settings);
+
+  if (!endpoint) {
+    if (type === 'decode') return payloads;
+    throw NO_CODEC_SERVER_CONFIGURED_ERROR;
+  }
+
   const passAccessToken = getCodecPassAccessToken(settings);
   const includeCredentials = getCodecIncludeCredentials(settings);
 
@@ -41,14 +48,14 @@ export async function codeServerRequest({
 
   if (passAccessToken) {
     if (validateHttps(endpoint)) {
-      let accessToken = get(authUser).accessToken;
-      const accessTokenExtras = get(authUser).idToken;
-      if (globalThis?.AccessToken) {
-        accessToken = await globalThis?.AccessToken();
-      } else if (accessTokenExtras) {
-        headers['Authorization-Extras'] = accessTokenExtras;
+      const accessToken = await getAccessToken();
+      const idToken = await getIdToken();
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
       }
-      headers['Authorization'] = `Bearer ${accessToken}`;
+      if (idToken) {
+        headers['Authorization-Extras'] = idToken;
+      }
     } else {
       setLastDataEncoderFailure();
       return payloads;
@@ -68,10 +75,11 @@ export async function codeServerRequest({
         body: stringifyWithBigInt(payloads),
       };
 
-  const decoderResponse: Promise<PotentialPayloads> = fetch(
-    endpoint + `/${type}`,
-    requestOptions,
-  )
+  // explicitly not constructing a new URL here because it
+  // drops any route prefix the user has configured, eg localhost:8080/codec-server
+  const url = `${endpoint}/${type}?preserveStorageRefs=true`;
+
+  const decoderResponse: Promise<PotentialPayloads> = fetch(url, requestOptions)
     .then((response) => {
       if (response.ok === false) {
         throw {
@@ -90,12 +98,10 @@ export async function codeServerRequest({
       return response;
     })
     .catch((err: unknown) => {
-      setLastDataEncoderFailure(err);
-      if (type === 'decode') {
-        return payloads;
-      } else {
-        throw err;
+      if (type !== 'download') {
+        setLastDataEncoderFailure(err);
       }
+      throw err;
     });
 
   return decoderResponse;
@@ -103,24 +109,25 @@ export async function codeServerRequest({
 
 export async function decodePayloadsWithCodec({
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
 }: {
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
-}): Promise<PotentialPayloads> {
-  return codeServerRequest({ type: 'decode', payloads, namespace, settings });
+}): Promise<Payloads> {
+  return codeServerRequest({ type: 'decode', payloads });
 }
 
 export async function encodePayloadsWithCodec({
   payloads,
-  namespace = get(page).params.namespace,
-  settings = get(page).data.settings,
 }: {
   payloads: PotentialPayloads;
-  namespace?: string;
-  settings?: Settings;
-}): Promise<PotentialPayloads> {
-  return codeServerRequest({ type: 'encode', payloads, namespace, settings });
+}): Promise<Payloads> {
+  return codeServerRequest({ type: 'encode', payloads });
+}
+
+export async function downloadExternalPayloadWithCodec(
+  payload: Payload,
+): Promise<Payloads> {
+  return codeServerRequest({
+    type: 'download',
+    payloads: { payloads: [payload] },
+  });
 }

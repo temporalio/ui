@@ -1,5 +1,7 @@
+import type { Payload } from '$lib/types';
 import type { ActivityExecutionStatus } from '$lib/types/activity-execution';
-import { decodePayload } from '$lib/utilities/decode-payload';
+import type { CountWorkflowExecutionsResponse } from '$lib/types/workflows';
+import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
 
 export type ActivityStatus =
   | 'Running'
@@ -37,10 +39,12 @@ export const toActivityStatus = (
   return executionStatusToActivityStatus[status] || 'Running';
 };
 
-export const getActivityStatusAndCountOfGroup = (groups = []) => {
+export const getActivityStatusAndCountOfGroup = (
+  groups: CountWorkflowExecutionsResponse['groups'] = [],
+): { status: ActivityStatus; count: number }[] => {
   return groups
     .map((group) => {
-      const rawStatus = decodePayload(
+      const rawStatus = parseRawPayloadToJSON(
         group?.groupValues[0],
       ) as unknown as ActivityStatus;
       const count = parseInt(group.count);

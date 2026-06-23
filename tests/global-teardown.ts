@@ -2,7 +2,7 @@ import { FullConfig } from '@playwright/test';
 
 import { disconnect, stopWorkflows } from '../temporal/client';
 import { getCodecServer } from '../temporal/codec-server';
-import { stopWorker } from '../temporal/workers';
+import { stopWorker } from '../temporal/worker';
 import { getTemporalServer } from '../utilities/temporal-server';
 import { getUIServer } from '../utilities/ui-server';
 

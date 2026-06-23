@@ -5,15 +5,18 @@
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { importEventGroups } from '$lib/stores/import-events';
 
-  $: sortedEvents =
+  const sortedEvents = $derived(
     $eventFilterSort === 'descending'
       ? [...$importEventGroups].reverse()
-      : $importEventGroups;
-  $: filteredEventGroups = sortedEvents.filter((event: EventGroup) => {
-    if ($eventCategoryFilter)
-      return $eventCategoryFilter.includes(event.category);
-    return event;
-  });
+      : $importEventGroups,
+  );
+  const filteredEventGroups = $derived(
+    sortedEvents.filter((event: EventGroup) => {
+      if ($eventCategoryFilter)
+        return $eventCategoryFilter.includes(event.category);
+      return event;
+    }),
+  );
 </script>
 
 <EventSummaryTable items={filteredEventGroups} groups={filteredEventGroups} />

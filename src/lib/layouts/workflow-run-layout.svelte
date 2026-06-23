@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import type { Snippet } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import WorkflowError from '$lib/components/workflow/workflow-error.svelte';
   import CopyButton from '$lib/holocene/copyable/button.svelte';
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
-  import { Action } from '$lib/models/workflow-actions';
   import {
     fetchAllEvents,
     throttleRefresh,
@@ -16,7 +16,6 @@
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import {
@@ -34,14 +33,23 @@
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
+  import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-  $: showJson = $page.url.searchParams.has('json');
-  $: fullJson = { ...$workflowRun, eventHistory: $fullEventHistory };
+  interface Props {
+    children: Snippet;
+    headerSnippet?: Snippet;
+  }
 
-  let workflowError: NetworkError | null = null;
+  let { children, headerSnippet = undefined }: Props = $props();
+
+  let namespace = $derived(page.params.namespace);
+  let workflowId = $derived(page.params.workflow);
+  let runId = $derived(page.params.run);
+  let showJson = $derived(page.url.searchParams.has('json'));
+  let fullJson = $derived({ ...$workflowRun, eventHistory: $fullEventHistory });
+
+  let workflowError: NetworkError | null = $state(null);
   let workflowRunController: AbortController;
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -51,11 +59,11 @@
     copy(e, stringifyWithBigInt(fullJson));
   };
 
-  const decodeUserMetadata = async (workflow: WorkflowExecution) => {
+  const decodeWorkflowUserMetadata = async (workflow: WorkflowExecution) => {
     const userMetadata = { summary: '', details: '' };
     try {
       if (workflow?.summary) {
-        const decodedSummary = await decodeSingleReadablePayloadWithCodec(
+        const decodedSummary = await decodePayloadAndParseDataToJSON(
           workflow.summary,
         );
         if (typeof decodedSummary === 'string') {
@@ -63,7 +71,7 @@
         }
       }
       if (workflow?.details) {
-        const decodedDetails = await decodeSingleReadablePayloadWithCodec(
+        const decodedDetails = await decodePayloadAndParseDataToJSON(
           workflow.details,
         );
         if (typeof decodedDetails === 'string') {
@@ -82,7 +90,7 @@
     workflowId: string,
     runId: string,
   ) => {
-    const { settings } = $page.data;
+    const { settings } = page.data;
     const { workflow, error } = await fetchWorkflow({
       namespace,
       workflowId,
@@ -98,10 +106,10 @@
       return;
     }
 
-    await decodeUserMetadata(workflow);
+    await decodeWorkflowUserMetadata(workflow);
 
     const { taskQueue } = workflow;
-    const workers = await getPollers({ queue: taskQueue, namespace });
+    const workers = await getPollers({ queue: taskQueue!, namespace });
 
     $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
@@ -116,8 +124,6 @@
             runId,
           },
         },
-        settings,
-        $authUser?.accessToken,
         workflowRunController.signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;
@@ -152,7 +158,7 @@
         workflowError = error;
         return;
       }
-      $workflowRun.workflow = workflow;
+      $workflowRun.workflow = workflow ?? null;
     }
   };
 
@@ -166,36 +172,53 @@
   const clearWorkflowData = () => {
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
-    workflowError = undefined;
+    workflowError = null;
     abortPolling();
     resetLastDataEncoderSuccess();
-    clearInterval(refreshInterval);
+    if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = null;
   };
 
-  $: (runId, clearWorkflowData());
+  $effect(() => {
+    runId;
+    untrack(() => {
+      clearWorkflowData();
+    });
+  });
 
-  $: getWorkflowAndEventHistory(namespace, workflowId, runId);
-  $: getOnlyWorkflowWithPendingActivities($refresh, $pauseLiveUpdates);
+  $effect(() => {
+    const ns = namespace;
+    const wfId = workflowId;
+    const rId = runId;
+    untrack(() => {
+      getWorkflowAndEventHistory(ns, wfId, rId);
+    });
+  });
 
-  const setCurrentEvents = (fullHistory, pause) => {
-    if (!pause) {
-      $currentEventHistory = fullHistory;
+  $effect(() => {
+    const refreshValue = $refresh;
+    const pause = $pauseLiveUpdates;
+    untrack(() => {
+      getOnlyWorkflowWithPendingActivities(refreshValue, pause);
+    });
+  });
+
+  $effect(() => {
+    if (!$pauseLiveUpdates) {
+      $currentEventHistory = $fullEventHistory;
     }
-  };
-
-  $: setCurrentEvents($fullEventHistory, $pauseLiveUpdates);
+  });
 
   onMount(() => {
-    const sort = $page.url.searchParams.get('sort');
+    const sort = page.url.searchParams.get('sort');
     if (sort) $eventFilterSort = sort as EventSortOrder;
     refreshInterval = setInterval(() => {
       throttleRefresh();
     }, 10000);
-  });
 
-  onDestroy(() => {
-    clearWorkflowData();
+    return () => {
+      clearWorkflowData();
+    };
   });
 </script>
 
@@ -210,13 +233,13 @@
       on:click={handleCopy}
       copied={$copied}
     />
-    {stringifyWithBigInt(fullJson, null, 2)}
+    {stringifyWithBigInt(fullJson, undefined, 2)}
   </div>
 {:else if workflowError}
   <WorkflowError error={workflowError} />
 {:else if !$workflowRun.workflow}
   <SkeletonWorkflow />
 {:else}
-  <WorkflowHeader />
-  <slot />
+  <WorkflowHeader {headerSnippet} />
+  {@render children()}
 {/if}

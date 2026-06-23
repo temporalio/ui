@@ -5,7 +5,11 @@ import {
   BlockingWorkflow,
   CompletedWorkflow,
   LLMWorkflow,
+  MultiInputWorkflow,
+  type PayloadCoverageResult,
+  PayloadCoverageWorkflow,
   RunningWorkflow,
+  UserMetadataWorkflow,
   Workflow,
 } from './workflows';
 
@@ -22,7 +26,7 @@ export const connect = async () => {
 
   const client = new Client({
     connection,
-    dataConverter: getDataConverter(),
+    dataConverter: await getDataConverter(),
   });
 
   return client;
@@ -32,15 +36,8 @@ const workflows: WorkflowHandle[] = [];
 
 export const startWorkflows = async (
   client: Client,
-): Promise<
-  (
-    | string
-    | number
-    | void
-    | Record<string, unknown>
-    | Record<string, unknown>[]
-  )[]
-> => {
+  config: { waitForResult?: boolean } = { waitForResult: true },
+): Promise<(string | number | PayloadCoverageResult)[]> => {
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
     args: ['Plain text input 1'],
@@ -65,15 +62,67 @@ export const startWorkflows = async (
     workflowId: 'running-workflow',
   });
 
-  const wf5 = await client.workflow.start(LLMWorkflow, {
+  const wf5 = await client.workflow.start(UserMetadataWorkflow, {
+    taskQueue: 'e2e-1',
+    args: ['Plain text input 5'],
+    workflowId: 'user-metadata-workflow',
+    staticSummary: '# Summary\n **this is the summary**',
+    staticDetails: '# Details\n **these are the details**',
+  });
+
+  const wf6 = await client.workflow.start(PayloadCoverageWorkflow, {
+    taskQueue: 'e2e-1',
+    workflowId: 'payload-coverage-workflow',
+    args: [
+      {
+        stringField: 'hello world',
+        numberField: 42,
+        floatField: 3.14159,
+        booleanField: true,
+        nullField: null,
+        arrayOfStrings: ['alpha', 'beta', 'gamma'],
+        arrayOfNumbers: [1, 2, 3, 100, -7],
+        mixedArray: ['text', 99, false, null, 'more'],
+        nestedObject: {
+          level1: {
+            level2: 'deep value',
+            array: [10, 20, 30],
+          },
+          flag: false,
+        },
+        emptyObject: {},
+        emptyArray: [],
+      },
+    ],
+    memo: {
+      description: 'Payload coverage test workflow',
+      tags: ['e2e', 'payload', 'coverage'],
+      version: 1,
+      testData: { nested: { value: 42 }, active: true },
+    },
+  });
+
+  const wf7 = await client.workflow.start(MultiInputWorkflow, {
+    taskQueue: 'e2e-1',
+    workflowId: 'multi-payload-workflow',
+    args: [
+      'hello world',
+      { foo: 'bar', baz: true, blue: 42 },
+      ['cats', 'dogs', 'lizards'],
+    ],
+  });
+
+  const wfLLM = await client.workflow.start(LLMWorkflow, {
     taskQueue: 'e2e-1',
     args: ['Tell me about Temporal'],
     workflowId: 'llm-workflow',
   });
 
-  workflows.push(wf1, wf2, wf3, wf4, wf5);
+  workflows.push(wf1, wf2, wf3, wf4, wf5, wf6, wf7, wfLLM);
 
-  return Promise.all([wf1.result(), wf3.result(), wf5.result()]);
+  if (config?.waitForResult) {
+    return Promise.all(workflows.map((wf) => wf.result()));
+  }
 };
 
 export const stopWorkflows = (): Promise<void[]> => {

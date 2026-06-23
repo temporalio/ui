@@ -25,15 +25,15 @@
       variants: {
         variant: {
           primary:
-            'surface-interactive border-transparent text-white focus-visible:ring-primary/70 data-[active=true]:bg-subtle data-[active=true]:text-primary',
+            'surface-interactive border-transparent text-white focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:bg-subtle data-[active=true]:text-primary',
           secondary:
-            'surface-primary border-subtle focus-visible:ring-primary/70 hover:surface-interactive-secondary focus-visible:surface-interactive-secondary data-[active=true]:bg-subtle',
+            'surface-primary border-subtle focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary hover:surface-interactive-secondary focus-visible:surface-interactive-secondary data-[active=true]:bg-subtle',
           destructive:
-            'surface-interactive-danger border-transparent focus-visible:ring-danger/70 data-[active=true]:surface-interactive-danger',
+            'surface-interactive-danger border-transparent focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:surface-interactive-danger',
           ghost:
-            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary/70 data-[active=true]:bg-subtle',
+            'bg-transparent border-transparent text-primary hover:surface-interactive-ghost focus-visible:surface-interactive-ghost focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary data-[active=true]:bg-subtle',
           'table-header':
-            'bg-transparent border-transparent focus-visible:ring-primary/70 focus-visible:border-transparent',
+            'bg-transparent border-transparent focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary focus-visible:border-transparent',
         },
         size: {
           xs: 'h-8 text-xs px-2 py-1',
@@ -157,15 +157,18 @@
     tabindex={href ? null : 0}
     {...$$restProps}
   >
-    {#if leadingIcon}
-      <span>
-        <Icon name={leadingIcon} />
+    {#if leadingIcon || (loading && !trailingIcon)}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
     <slot />
-    {#if trailingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : trailingIcon} />
+    {#if trailingIcon}
+      <span
+        class:animate-spin={loading && !leadingIcon}
+        class:invisible={loading && leadingIcon}
+      >
+        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}
@@ -194,16 +197,19 @@
     )}
     {...$$restProps}
   >
-    {#if leadingIcon}
-      <span>
-        <Icon name={leadingIcon} />
+    {#if leadingIcon || (loading && !trailingIcon)}
+      <span class:animate-spin={loading}>
+        <Icon name={loading ? 'spinner' : leadingIcon} />
       </span>
     {/if}
     <slot />
 
-    {#if trailingIcon || loading}
-      <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : trailingIcon} />
+    {#if trailingIcon}
+      <span
+        class:animate-spin={loading && !leadingIcon}
+        class:invisible={loading && leadingIcon}
+      >
+        <Icon name={loading && !leadingIcon ? 'spinner' : trailingIcon} />
       </span>
     {/if}
     {#if count > 0}

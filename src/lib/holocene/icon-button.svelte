@@ -24,7 +24,7 @@
 <Button
   {variant}
   leadingIcon={icon}
-  class={merge('h-9 w-9 shrink-0 rounded-full p-0', className)}
+  class={merge('h-9 w-9 shrink-0 p-0', className)}
   aria-label={label}
   disableTracking={true}
   data-track-name="icon-button"

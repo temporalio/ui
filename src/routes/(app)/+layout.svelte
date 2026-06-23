@@ -11,6 +11,7 @@
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
   import ErrorBoundary from '$lib/holocene/error-boundary.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import NavigationItem from '$lib/holocene/navigation/navigation-item.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
@@ -22,7 +23,7 @@
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
-  import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
+  import { type NamespaceListItem, type NavLinkItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
   import {
@@ -35,6 +36,7 @@
     routeForSchedules,
     routeForStandaloneActivities,
     routeForWorkerDeployments,
+    routeForWorkers,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import { minimumVersionRequired } from '$lib/utilities/version-check';
@@ -55,7 +57,7 @@
     isCloud
       ? [page.params.namespace]
       : $namespaces.map(
-          (namespace: Namespace) => namespace?.namespaceInfo?.name,
+          (namespace: Namespace) => namespace?.namespaceInfo?.name as string,
         ),
   );
   let namespaceList: NamespaceListItem[] = $derived(
@@ -78,6 +80,7 @@
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
+      workersRoute: routeForWorkers({ namespace }),
       workerDeploymentsRoute: routeForWorkerDeployments({ namespace }),
       archivalRoute: routeForArchivalWorkflows({ namespace }),
       namespacesRoute: routeForNamespaces(),
@@ -86,22 +89,23 @@
     };
   };
 
-  const getLinkList = (
+  const getNavPrimaryLinks = (
     {
       workflowsRoute,
       standaloneActivitiesRoute,
       schedulesRoute,
       batchOperationsRoute,
+      workersRoute,
       workerDeploymentsRoute,
       archivalRoute,
       namespacesRoute,
       nexusRoute,
-      historyImportRoute,
     }: {
       workflowsRoute: string;
       standaloneActivitiesRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
+      workersRoute: string;
       workerDeploymentsRoute: string;
       archivalRoute: string;
       namespacesRoute: string;
@@ -109,7 +113,7 @@
       historyImportRoute: string;
     },
     inProgressBatch: boolean,
-  ): NavLinkListItem[] => {
+  ): NavLinkItem[] => {
     return [
       {
         href: namespacesRoute,
@@ -120,6 +124,7 @@
           !path.includes(workflowsRoute) &&
           !path.includes(schedulesRoute) &&
           !path.includes(batchOperationsRoute) &&
+          !path.includes(workersRoute) &&
           !path.includes(workerDeploymentsRoute) &&
           !path.includes(standaloneActivitiesRoute) &&
           !path.includes(archivalRoute),
@@ -152,11 +157,12 @@
         isActive: (path) => path.includes(batchOperationsRoute),
       },
       {
-        href: workerDeploymentsRoute,
-        icon: 'merge',
-        label: translate('deployments.deployments'),
-        tooltip: translate('deployments.worker-deployments'),
-        isActive: (path) => path.includes(workerDeploymentsRoute),
+        href: workersRoute,
+        icon: 'workers',
+        label: translate('workers.workers'),
+        tooltip: translate('workers.workers'),
+        isActive: (path) =>
+          path.includes(workersRoute) || path.includes(workerDeploymentsRoute),
       },
       {
         href: nexusRoute,
@@ -168,9 +174,27 @@
           return !!match;
         },
       },
-      {
-        divider: true,
-      },
+    ];
+  };
+
+  const getNavSecondaryLinks = (
+    {
+      archivalRoute,
+      historyImportRoute,
+    }: {
+      workflowsRoute: string;
+      standaloneActivitiesRoute: string;
+      schedulesRoute: string;
+      batchOperationsRoute: string;
+      workerDeploymentsRoute: string;
+      archivalRoute: string;
+      namespacesRoute: string;
+      nexusRoute: string;
+      historyImportRoute: string;
+    },
+    _inProgressBatch: boolean,
+  ): NavLinkItem[] => {
+    return [
       {
         href: archivalRoute,
         icon: 'archives',
@@ -193,11 +217,17 @@
   };
 
   let routes = $derived(getRoutes(activeNamespaceName));
-  let linkList = $derived(getLinkList(routes, !!$inProgressBatchOperation));
+  let linkList = $derived(
+    getNavPrimaryLinks(routes, !!$inProgressBatchOperation),
+  );
+  let linkListForSecondGroup = $derived(
+    getNavSecondaryLinks(routes, !!$inProgressBatchOperation),
+  );
   let {
     workflowsRoute,
     schedulesRoute,
     batchOperationsRoute,
+    workersRoute,
     workerDeploymentsRoute,
     archivalRoute,
     standaloneActivitiesRoute,
@@ -206,6 +236,7 @@
     [
       workflowsRoute,
       schedulesRoute,
+      workersRoute,
       workerDeploymentsRoute,
       batchOperationsRoute,
       archivalRoute,
@@ -228,13 +259,21 @@
         fullRoute: routeForStandaloneActivities({ namespace }),
       },
       {
-        subPath: 'worker-deployments',
+        subPath: 'workers/deployments',
         fullRoute: routeForWorkerDeployments({ namespace }),
+      },
+      {
+        subPath: 'workers',
+        fullRoute: routeForWorkers({ namespace }),
       },
     ];
 
+    const segments = page.url.pathname.split('/').filter(Boolean);
+    const namespaceIndex = segments.indexOf(page.params.namespace);
+    const sectionSegments = segments.slice(namespaceIndex + 1);
+
     for (const { subPath, fullRoute } of namespacePages) {
-      if (page.url.pathname.endsWith(subPath)) {
+      if (sectionSegments.join('/').startsWith(subPath)) {
         return fullRoute;
       }
     }
@@ -266,7 +305,7 @@
 <DarkMode />
 <SkipNavigation />
 
-<div class="flex w-screen flex-row">
+<div class="flex h-dvh w-screen flex-row">
   <Toaster
     closeButtonLabel={translate('common.close')}
     pop={toaster.pop}
@@ -274,16 +313,18 @@
     position={toaster.position}
   />
   <div class="sticky top-0 z-30 hidden h-screen w-auto md:block">
-    <SideNavigation {linkList} {isCloud}>
+    <SideNavigation sections={[linkList, linkListForSecondGroup]} {isCloud}>
       {#snippet bottom()}
-        <NavigationItem
-          link={page.data?.settings?.feedbackURL ||
-            'https://github.com/temporalio/ui/issues/new/choose'}
-          label={translate('common.feedback')}
-          icon="feedback"
-          tooltip={translate('common.feedback')}
-          external
-        />
+        {#if !isCloud}
+          <NavigationItem
+            link={page.data?.settings?.feedbackURL ||
+              'https://github.com/temporalio/ui/issues/new/choose'}
+            label={translate('common.feedback')}
+            icon="feedback"
+            tooltip={translate('common.feedback')}
+            external
+          />
+        {/if}
       {/snippet}
     </SideNavigation>
   </div>
@@ -295,24 +336,46 @@
           <NamespacePicker {namespaceList} />
         {/if}
       {/snippet}
+      {#if isCloud}
+        <a
+          href={page.data?.settings?.supportURL ||
+            'https://support.temporal.io'}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center hover:text-white"
+          aria-label="Support"
+        >
+          <Icon name="support" />
+        </a>
+      {/if}
       <UserMenu {logout} />
     </TopNavigation>
-    <div
-      slot="main"
-      class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8"
-    >
-      <ErrorBoundary>
-        {@render children()}
-      </ErrorBoundary>
-    </div>
-    <BottomNavigation
-      slot="footer"
-      {linkList}
-      {namespaceList}
-      {isCloud}
-      {showNamespacePicker}
-    >
-      <UserMenuMobile {logout} />
-    </BottomNavigation>
+    {#snippet main()}
+      <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
+        <ErrorBoundary>
+          {@render children()}
+        </ErrorBoundary>
+      </div>
+    {/snippet}
+    {#snippet footer()}
+      <BottomNavigation {namespaceList} {isCloud} {showNamespacePicker}>
+        {#snippet linksSnippet()}
+          {#each [...linkListForSecondGroup]
+            .filter((item) => !item.hidden)
+            .reverse() as link, i (i)}
+            <NavigationItem {...link} link={link.href} />
+          {/each}
+
+          <hr class="border-subtle" />
+
+          {#each [...linkList]
+            .filter((item) => !item.hidden)
+            .reverse() as link, i (i)}
+            <NavigationItem {...link} link={link.href} />
+          {/each}
+        {/snippet}
+        <UserMenuMobile {logout} />
+      </BottomNavigation>
+    {/snippet}
   </MainContentContainer>
 </div>

@@ -44,4 +44,10 @@ describe('getApiOrigin', () => {
     const url = getApiOrigin(false);
     expect(url).toBe('');
   });
+
+  it('should return null when VITE_API is undefined', () => {
+    delete import.meta.env.VITE_API;
+    expect(() => getApiOrigin()).not.toThrow();
+    expect(getApiOrigin()).toBeNull();
+  });
 });

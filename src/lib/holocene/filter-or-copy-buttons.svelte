@@ -4,18 +4,31 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
-  export let show = false;
-  export let filterable = true;
-  export let copyable = true;
-  export let content: string;
-  export let onFilter: () => void = () => {};
-  export let filtered = false;
-  export let copyIconTitle: string;
-  export let copySuccessIconTitle: string;
-  export let filterIconTitle: string;
+  type Props = {
+    show?: boolean;
+    filterable?: boolean;
+    copyable?: boolean;
+    content: string;
+    onFilter?: () => void;
+    filtered?: boolean;
+    copyIconTitle: string;
+    copySuccessIconTitle: string;
+    filterIconTitle: string;
+    class?: string;
+  };
 
-  let className = '';
-  export { className as class };
+  let {
+    show = false,
+    filterable = true,
+    copyable = true,
+    content,
+    onFilter = () => {},
+    filtered = false,
+    copyIconTitle,
+    copySuccessIconTitle,
+    filterIconTitle,
+    class: className = '',
+  }: Props = $props();
 
   const { copy, copied } = copyToClipboard();
 </script>
@@ -24,26 +37,32 @@
   <div class={merge('copy-or-filter', className)}>
     {#if filterable}
       <button
-        on:click|preventDefault|stopPropagation={onFilter}
+        onclick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onFilter();
+        }}
         class="copy-or-filter-button"
         class:filtered
-        id="filter-button"
       >
         {#key filtered}
-          <Icon title={filterIconTitle} name="filter" class="m-1" />
+          <Icon title={filterIconTitle} name="filter" class="m-0.5" />
         {/key}
       </button>
     {/if}
     {#if copyable}
       <button
         class="copy-or-filter-button"
-        on:click|preventDefault|stopPropagation={(e) => copy(e, content)}
-        id="copy-button"
+        onclick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          copy(e, content);
+        }}
       >
         <Icon
           title={$copied ? copySuccessIconTitle : copyIconTitle}
           name={$copied ? 'checkmark' : 'copy'}
-          class="m-1"
+          class="m-0.5"
         />
       </button>
     {/if}
@@ -52,11 +71,11 @@
 
 <style lang="postcss">
   .copy-or-filter {
-    @apply absolute bottom-0 right-0 top-0 inline-flex gap-2 px-2;
+    @apply absolute bottom-0 right-0 top-0 inline-flex gap-1 px-1;
   }
 
   .copy-or-filter-button {
-    @apply surface-primary relative top-[50%] h-fit translate-y-[-50%] rounded-full p-1 text-primary hover:surface-inverse;
+    @apply surface-primary relative top-[50%] h-6 w-6 translate-y-[-50%] rounded-full p-0.5 text-primary hover:surface-inverse;
   }
 
   .filtered {

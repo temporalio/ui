@@ -1,6 +1,9 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
   import { within } from '@storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import DatePicker from '$lib/holocene/date-picker.svelte';
 
@@ -38,7 +41,7 @@
         table: { category: 'Accessibility' },
       },
     },
-  } satisfies Meta<DatePicker>;
+  } satisfies Meta<ComponentProps<typeof DatePicker>>;
 </script>
 
 <script lang="ts">
@@ -58,7 +61,7 @@
 </script>
 
 <Template let:args>
-  <DatePicker {...args} on:datechange={action('date-change')} />
+  <DatePicker {...args} onDateChange={action('date-change')} />
 </Template>
 
 <Story name="Default" play={focus} />

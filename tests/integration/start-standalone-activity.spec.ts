@@ -2,10 +2,12 @@ import { expect, test } from '@playwright/test';
 
 import { StartStandaloneActivityPage } from '~/pages/start-standalone-activity';
 import {
+  mockClusterApi,
   mockGlobalApis,
   mockNamespaceApi,
   mockSearchAttributesApi,
   mockSettingsApi,
+  mockTaskQueuesApi,
 } from '~/test-utilities/mock-apis';
 
 test.describe('Start a Standalone Activity', () => {
@@ -14,9 +16,11 @@ test.describe('Start a Standalone Activity', () => {
     await mockNamespaceApi(page);
     await mockSettingsApi(page);
     await mockSearchAttributesApi(page);
+    await mockTaskQueuesApi(page);
+    await mockClusterApi(page, { serverVersion: '1.30.0' });
   });
 
-  test.skip('Allows select form fields to be pre-filled via URL Search Parameters', async ({
+  test('Allows select form fields to be pre-filled via URL Search Parameters', async ({
     page,
   }) => {
     const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
@@ -46,7 +50,7 @@ test.describe('Start a Standalone Activity', () => {
     ).toHaveValue('10');
   });
 
-  test.skip('Displays errors when select form fields are incomplete', async ({
+  test('Displays errors when select form fields are incomplete', async ({
     page,
   }) => {
     const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
@@ -64,7 +68,7 @@ test.describe('Start a Standalone Activity', () => {
     await expect(startStandaloneActivityPage.timeoutError).toBeVisible();
   });
 
-  test.skip('Allows expanding more options', async ({ page }) => {
+  test('Allows expanding more options', async ({ page }) => {
     const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
     await startStandaloneActivityPage.goto();
 
@@ -79,5 +83,40 @@ test.describe('Start a Standalone Activity', () => {
       startStandaloneActivityPage.addSearchAttributesCard,
     ).toBeVisible();
     await expect(startStandaloneActivityPage.addMetadataCard).toBeVisible();
+  });
+
+  test('shows the timeout error when Start to Close Timeout is zero', async ({
+    page,
+  }) => {
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    await startStandaloneActivityPage.activityIdInput.fill('abc-123');
+    await startStandaloneActivityPage.activityTypeInput.fill('greet');
+    await startStandaloneActivityPage.taskQueueInput.fill('default');
+    await startStandaloneActivityPage.startToCloseTimeoutInput.fill('0');
+
+    await startStandaloneActivityPage.submitButton.click();
+
+    await expect(startStandaloneActivityPage.timeoutError).toBeVisible();
+  });
+
+  test('shows the timeout error after a value is added and then removed from Start to Close Timeout', async ({
+    page,
+  }) => {
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    await startStandaloneActivityPage.activityIdInput.fill('abc-123');
+    await startStandaloneActivityPage.activityTypeInput.fill('greet');
+    await startStandaloneActivityPage.taskQueueInput.fill('default');
+
+    await startStandaloneActivityPage.startToCloseTimeoutInput.fill('30');
+    await expect(startStandaloneActivityPage.timeoutError).toBeHidden();
+
+    await startStandaloneActivityPage.startToCloseTimeoutInput.fill('');
+    await startStandaloneActivityPage.submitButton.click();
+
+    await expect(startStandaloneActivityPage.timeoutError).toBeVisible();
   });
 });

@@ -8,3 +8,5 @@ export { default as callAgentStep } from './call-agent-step';
 export { default as runGuardrail } from './run-guardrail';
 export { default as searchKnowledgeBase } from './search-knowledge-base';
 export { default as executeTool } from './execute-tool';
+export { complex } from './complex';
+export { default as multi } from './multi';

@@ -12,7 +12,18 @@
   import { fetchRawEvents } from '$lib/services/events-service';
   import { fetchAllWorkflows } from '$lib/services/workflow-service';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { decodePayload } from '$lib/utilities/decode-payload';
+  function decodePayload(payload: unknown): unknown {
+    if (!payload || typeof payload !== 'object') return payload;
+    const p = payload as Record<string, unknown>;
+    if (typeof p.data === 'string') {
+      try {
+        return JSON.parse(atob(p.data));
+      } catch {
+        return atob(p.data);
+      }
+    }
+    return payload;
+  }
   import {
     computeSessionSummary,
     type SessionSummary,

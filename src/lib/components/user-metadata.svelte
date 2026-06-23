@@ -10,7 +10,7 @@
   let { summary, details }: Props = $props();
 </script>
 
-<div class="flex h-full flex-1 flex-col bg-primary">
+<div data-testid="user-metadata" class="flex h-full flex-1 flex-col bg-primary">
   <div>
     <div class="surface-information w-full px-6 py-2">
       <h3 data-testid="user-metadata-summary-heading">
@@ -18,7 +18,12 @@
       </h3>
     </div>
     {#if summary}
-      <Markdown class="p-3" overrideTheme="primary" content={summary} />
+      <Markdown
+        frameId="user-metadata-summary"
+        class="p-3"
+        overrideTheme="primary"
+        content={summary}
+      />
     {:else}
       <div class="py-6 pl-6 text-secondary/70">
         <p class="text-sm italic">
@@ -34,7 +39,12 @@
       </h3>
     </div>
     {#if details}
-      <Markdown class="p-3" overrideTheme="primary" content={details} />
+      <Markdown
+        frameId="user-metadata-details"
+        class="p-3"
+        overrideTheme="primary"
+        content={details}
+      />
     {:else}
       <div class="py-6 pl-6 text-secondary/70">
         <p class="text-sm italic">

@@ -1,8 +1,10 @@
+<svelte:options runes />
+
 <script lang="ts">
   import UserMetadata from '$lib/components/user-metadata.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import type { UserMetadata as IUserMetadata } from '$lib/types';
-  import { decodeSingleReadablePayloadWithCodec } from '$lib/utilities/decode-payload';
+  import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   const decodeMetadata = async (userMetadata: IUserMetadata) => {
@@ -14,7 +16,7 @@
     if (!userMetadata) return metadata;
 
     if (userMetadata.summary) {
-      const summary = await decodeSingleReadablePayloadWithCodec(
+      const summary = await decodePayloadAndParseDataToJSON(
         userMetadata.summary,
       );
       if (typeof summary === 'string') {
@@ -23,7 +25,7 @@
     }
 
     if (userMetadata.details) {
-      const details = await decodeSingleReadablePayloadWithCodec(
+      const details = await decodePayloadAndParseDataToJSON(
         userMetadata.details,
       );
 

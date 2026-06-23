@@ -1,8 +1,17 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { writable } from 'svelte/store';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { base } from '$app/paths';
 
+import type {
+  EventSortOrder,
+  WorkflowViewPreference,
+} from '$lib/stores/event-view';
+
+import { initCoreProvider } from './core-provider';
 import {
+  baseRouteForWorkflow,
   hasParameters,
   isEventHistoryParameters,
   isEventParameters,
@@ -16,16 +25,19 @@ import {
   routeForLoginPage,
   routeForNamespace,
   routeForNamespaces,
+  routeForNexus,
   routeForPendingActivities,
   routeForSchedule,
   routeForScheduleCreate,
   routeForSchedules,
   routeForTaskQueue,
-  routeForWorkers,
-  routeForWorkflow,
+  routeForWorkerDeploymentCreate,
+  routeForWorkerDeploymentVersionCreate,
+  routeForWorkerDeploymentVersionEdit,
   routeForWorkflowQuery,
   routeForWorkflows,
   routeForWorkflowsWithQuery,
+  routeForWorkflowWorkers,
 } from './route-for';
 
 describe('routeFor', () => {
@@ -62,7 +74,7 @@ describe('routeFor', () => {
   });
 
   it('should route to a "workflow"', () => {
-    const path = routeForWorkflow({
+    const path = baseRouteForWorkflow({
       namespace: 'default',
       workflow: 'abc',
       run: 'def',
@@ -121,7 +133,7 @@ describe('routeFor', () => {
   });
 
   it('should route to "workers"', () => {
-    const path = routeForWorkers({
+    const path = routeForWorkflowWorkers({
       namespace: 'default',
       workflow: 'abc',
       run: 'def',
@@ -433,5 +445,197 @@ describe('isNamespaceParameter', () => {
   it('should return false if it does not have a namespace parameter', () => {
     const result = isNamespaceParameter({});
     expect(result).toBe(false);
+  });
+});
+
+describe('routeForWorkflow', () => {
+  const workflowParams = {
+    namespace: 'default',
+    workflow: 'abc',
+    run: 'def',
+  };
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.resetModules();
+  });
+
+  async function getRouteForWorkflow(
+    tab: WorkflowViewPreference,
+    sort: EventSortOrder,
+  ) {
+    vi.doMock('$lib/stores/event-view', () => ({
+      workflowViewPreference: writable(tab),
+      eventFilterSort: writable(sort),
+    }));
+    return (await import('./route-for')).routeForWorkflow;
+  }
+
+  it('should route to timeline when preference is timeline', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'timeline',
+      'descending',
+    );
+    expect(routeForWorkflowFn(workflowParams)).toBe(
+      `${base}/namespaces/default/workflows/abc/def/timeline`,
+    );
+  });
+
+  it('should route to history when preference is history', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'history',
+      'descending',
+    );
+    expect(routeForWorkflowFn(workflowParams)).toBe(
+      `${base}/namespaces/default/workflows/abc/def/history`,
+    );
+  });
+
+  it('should include sort param when sort is ascending', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'timeline',
+      'ascending',
+    );
+    expect(routeForWorkflowFn(workflowParams)).toBe(
+      `${base}/namespaces/default/workflows/abc/def/timeline?sort=ascending`,
+    );
+  });
+
+  it('should not include sort param when sort is descending', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'history',
+      'descending',
+    );
+    expect(routeForWorkflowFn(workflowParams)).not.toContain('sort=');
+  });
+
+  it('should merge caller queryParams with sort preference', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'history',
+      'ascending',
+    );
+    const path = routeForWorkflowFn({
+      ...workflowParams,
+      queryParams: { category: 'activity' },
+    });
+    expect(path).toContain('sort=ascending');
+    expect(path).toContain('category=activity');
+  });
+
+  it('should allow caller queryParams sort to override eventFilterSort', async () => {
+    const routeForWorkflowFn = await getRouteForWorkflow(
+      'history',
+      'descending',
+    );
+    const path = routeForWorkflowFn({
+      ...workflowParams,
+      queryParams: { sort: 'ascending' },
+    });
+    expect(path).toContain('sort=ascending');
+    expect(path).not.toContain('sort=descending');
+  });
+});
+
+describe('routeFor worker deployment version and serverless routes', () => {
+  it('should route to worker deployment version create', () => {
+    const path = routeForWorkerDeploymentVersionCreate({
+      namespace: 'default',
+      deployment: 'my-deployment',
+    });
+    expect(path).toBe(
+      `${base}/namespaces/default/workers/deployments/my-deployment/versions/create`,
+    );
+  });
+
+  it('should route to worker deployment version edit', () => {
+    const path = routeForWorkerDeploymentVersionEdit({
+      namespace: 'default',
+      deployment: 'my-deployment',
+      buildId: 'build-1',
+    });
+    expect(path).toBe(
+      `${base}/namespaces/default/workers/deployments/my-deployment/versions/build-1/edit`,
+    );
+  });
+
+  it('should route to worker deployment create', () => {
+    const path = routeForWorkerDeploymentCreate({ namespace: 'default' });
+    expect(path).toBe(`${base}/namespaces/default/workers/deployments/create`);
+  });
+});
+
+describe('routeFor with prefix', () => {
+  const prefix = '/projects/my-project';
+
+  beforeEach(() => {
+    initCoreProvider({
+      getAccessToken: async () => '',
+      getRoutePrefix: () => prefix,
+    });
+  });
+
+  it('should prepend prefix to root route', () => {
+    expect(routeForNamespaces()).toBe(`${base}${prefix}/namespaces`);
+  });
+
+  it('should prepend prefix to namespace route', () => {
+    expect(routeForNamespace({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default`,
+    );
+  });
+
+  it('should propagate prefix through leaf functions', () => {
+    expect(routeForWorkflows({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default/workflows`,
+    );
+  });
+
+  it('should propagate prefix through deep leaf functions', () => {
+    expect(
+      routeForCallStack({
+        namespace: 'default',
+        workflow: 'abc',
+        run: 'def',
+      }),
+    ).toBe(`${base}${prefix}/namespaces/default/workflows/abc/def/call-stack`);
+  });
+
+  it('should propagate prefix to nexus routes', () => {
+    expect(routeForNexus()).toBe(`${base}${prefix}/nexus`);
+  });
+
+  it('should propagate prefix to schedule routes', () => {
+    expect(routeForSchedules({ namespace: 'default' })).toBe(
+      `${base}${prefix}/namespaces/default/schedules`,
+    );
+  });
+
+  it('should not apply prefix when store is empty', () => {
+    initCoreProvider({
+      getAccessToken: async () => '',
+      getRoutePrefix: () => '',
+    });
+    expect(routeForNamespaces()).toBe(`${base}/namespaces`);
+  });
+
+  it('should not apply prefix to auth routes', () => {
+    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const searchParams = new URLSearchParams();
+    const sso = routeForAuthentication({ settings, searchParams });
+    expect(sso).not.toContain(prefix);
+  });
+
+  it('should not apply prefix to login page', () => {
+    const login = routeForLoginPage('', false);
+    expect(login).not.toContain(prefix);
+  });
+
+  it('should revert to default behavior when prefix is cleared', () => {
+    expect(routeForNamespaces()).toBe(`${base}${prefix}/namespaces`);
+    initCoreProvider({
+      getAccessToken: async () => '',
+      getRoutePrefix: () => '',
+    });
+    expect(routeForNamespaces()).toBe(`${base}/namespaces`);
   });
 });

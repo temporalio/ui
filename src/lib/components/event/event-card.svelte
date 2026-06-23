@@ -1,6 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -9,7 +11,7 @@
   import { translate } from '$lib/i18n/translate';
   import { getEventLLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
   import type { EventLink as ELink } from '$lib/types';
-  import { type Payload } from '$lib/types';
+  import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
   import { getEventLinkHref } from '$lib/utilities/event-link-href';
   import {
@@ -24,20 +26,27 @@
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  import { routeForNamespace } from '$lib/utilities/route-for';
+  import {
+    routeForEventHistoryEvent,
+    routeForNamespace,
+  } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
-  import MetadataDecoder from './metadata-decoder.svelte';
-  import PayloadDecoder from './payload-decoder.svelte';
 
   let { event }: { event: WorkflowEvent } = $props();
+  const { namespace, workflow, run } = $derived(page.params);
 
   const displayName = $derived(
     isLocalActivityMarkerEvent(event)
       ? translate('events.category.local-activity')
       : spaceBetweenCapitalLetters(event.name),
   );
-  const attributes = $derived(formatAttributes(event));
+  const attributes = $derived.by(() => {
+    const attrs = formatAttributes(event);
+    if (event?.principal?.name) attrs.principalName = event.principal.name;
+    if (event?.principal?.type) attrs.principalType = event.principal.type;
+    return attrs;
+  });
   const fields = $derived(Object.entries(attributes));
   const payloadFields = $derived(
     fields.filter(
@@ -77,7 +86,14 @@
 >
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center gap-2 text-base">
-      <p class="font-mono">{event.id}</p>
+      <Link
+        href={routeForEventHistoryEvent({
+          eventId: event.id,
+          run,
+          workflow,
+          namespace,
+        })}>{event.id}</Link
+      >
       <p class="font-medium">
         {displayName}
       </p>
@@ -180,24 +196,20 @@
 {/snippet}
 
 {#snippet eventLinks(links: ELink[])}
-  {#each links as link}
+  {#each links as link (link)}
     {@render eventLink(link)}
     {@render eventNamespaceLink(link)}
   {/each}
 {/snippet}
 
-{#snippet eventSummary(value: Payload)}
+{#snippet eventSummary(value: RawPayload)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">Summary</p>
-    <p class="whitespace-pre-line">
-      <MetadataDecoder
-        {value}
-        let:decodedValue
-        fallback={translate('events.decode-failed')}
-      >
-        {decodedValue}
-      </MetadataDecoder>
-    </p>
+    <PayloadSummary
+      class="whitespace-pre-line"
+      {value}
+      fallback={translate('events.decode-failed')}
+    />
   </div>
 {/snippet}
 
@@ -209,41 +221,27 @@
       {format(key)}
     </p>
     {#if value?.payloads}
-      <PayloadDecoder {value} key="payloads">
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
-    {:else if key === 'searchAttributes'}
-      <PayloadDecoder
-        key="searchAttributes"
-        value={{ searchAttributes: codeBlockValue }}
-      >
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
+      <PayloadCodeBlock
+        filenameData={{
+          workflowId: workflow,
+          runId: run,
+          eventId: event.id,
+          type: key,
+        }}
+        {value}
+        maxHeight={384}
+      />
     {:else}
-      <PayloadDecoder value={codeBlockValue}>
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            maxHeight={384}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          />
-        {/snippet}
-      </PayloadDecoder>
+      <PayloadCodeBlock
+        filenameData={{
+          workflowId: workflow,
+          runId: run,
+          eventId: event.id,
+          type: key,
+        }}
+        value={codeBlockValue}
+        maxHeight={384}
+      />
     {/if}
   </div>
   {#if stackTrace}
@@ -252,11 +250,11 @@
         {translate('workflows.call-stack-tab')}
       </p>
       <CodeBlock
+        copyIconTitle={translate('common.copy-icon-title')}
+        copySuccessIconTitle={translate('common.copy-success-icon-title')}
         content={stackTrace}
         language="text"
         maxHeight={384}
-        copyIconTitle={translate('common.copy-icon-title')}
-        copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
     </div>
   {/if}

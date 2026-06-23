@@ -1,14 +1,10 @@
-import { writable } from 'svelte/store';
-
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { HistoryEvent } from '$lib/types/events';
-import type { Settings } from '$lib/types/global';
 
 import { fromEventToRawEvent, getEventAttributes, toEventHistory } from '.';
 
 import eventsFixture from '$fixtures/raw-events.descending.completed.json';
-import settingsFixture from '$fixtures/settings.json';
 
 const historyEvent = {
   eventId: '1',
@@ -82,20 +78,18 @@ const historyEvent = {
 } as unknown as HistoryEvent;
 
 const namespace = 'unit-tests';
-const settings = settingsFixture as unknown as Settings;
-const accessToken = 'token-test';
 
 describe('getEventAttributes', () => {
   beforeEach(() => {
     vi.mock('$lib/utilities/decode-payload', () => {
       const fn = async <T>(x: T): Promise<T> => x;
 
-      const convertPayloadToJsonWithCodec = vi.fn(fn);
-      const decodePayloadAttributes = vi.fn(fn);
+      const decodeEventAttributes = vi.fn(fn);
+      const parsePayloadAttributes = vi.fn(fn);
 
       return {
-        convertPayloadToJsonWithCodec,
-        decodePayloadAttributes,
+        decodeEventAttributes,
+        parsePayloadAttributes,
       };
     });
   });
@@ -106,29 +100,16 @@ describe('getEventAttributes', () => {
 
   it('should affix the type to the history event', async () => {
     const eventType = 'workflowExecutionStartedEventAttributes';
-    const event = await getEventAttributes({
-      historyEvent,
-      namespace,
-      settings,
-      accessToken,
-    });
+    const event = await getEventAttributes(historyEvent);
     expect(event.type).toBe(eventType);
   });
 
   it('should call convertWithCodec if not provided an endpoint in settings', async () => {
     const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
 
-    await getEventAttributes(
-      {
-        historyEvent,
-        namespace,
-        settings,
-        accessToken,
-      },
-      {
-        convertWithCodec,
-      },
-    );
+    await getEventAttributes(historyEvent, {
+      convertWithCodec,
+    });
 
     expect(convertWithCodec).toBeCalled();
   });
@@ -136,17 +117,9 @@ describe('getEventAttributes', () => {
   it('should call convertWithCodec if provided an endpoint in settings', async () => {
     const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
 
-    await getEventAttributes(
-      {
-        historyEvent,
-        namespace,
-        settings: { ...settings, codec: { endpoint: 'https://localhost' } },
-        accessToken,
-      },
-      {
-        convertWithCodec,
-      },
-    );
+    await getEventAttributes(historyEvent, {
+      convertWithCodec,
+    });
 
     expect(convertWithCodec).toBeCalled();
   });
@@ -154,18 +127,9 @@ describe('getEventAttributes', () => {
   it('should call convertWithCodec if provided an endpoint in settings', async () => {
     const convertWithCodec = vi.fn(async <T>(x: T): Promise<T> => x);
 
-    await getEventAttributes(
-      {
-        historyEvent,
-        namespace,
-        settings,
-        accessToken,
-      },
-      {
-        convertWithCodec,
-        encoderEndpoint: writable('https://localhost'),
-      },
-    );
+    await getEventAttributes(historyEvent, {
+      convertWithCodec,
+    });
 
     expect(convertWithCodec).toBeCalled();
   });

@@ -15,8 +15,8 @@
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleSearchAttributes from '$lib/components/schedule/schedule-search-attributes.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
+  import StatusCounts from '$lib/components/status-counts.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowCounts from '$lib/components/workflow/workflow-counts.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Button from '$lib/holocene/button.svelte';
   import DatePicker from '$lib/holocene/date-picker.svelte';
@@ -193,12 +193,12 @@
   let endMinute = '';
   let endSecond = '';
 
-  const onStartDateChange = (d: CustomEvent) => {
-    startDate = startOfDay(d.detail);
+  const onStartDateChange = (d: Date) => {
+    startDate = startOfDay(d);
   };
 
-  const onEndDateChange = (d: CustomEvent) => {
-    endDate = startOfDay(d.detail);
+  const onEndDateChange = (d: Date) => {
+    endDate = startOfDay(d);
   };
 
   const updateDefaultBackfillTimes = () => {
@@ -392,7 +392,7 @@
             {/if}
           </Button>
         </div>
-        <WorkflowCounts staticQuery={workflowQuery} />
+        <StatusCounts staticQuery={workflowQuery} />
       </div>
       <div class="flex flex-col gap-4 xl:flex-row">
         <div class="flex w-full flex-col items-start gap-4 xl:w-2/3">
@@ -416,15 +416,10 @@
         </div>
         <div class="flex w-full flex-col gap-4 xl:w-1/3">
           <ScheduleInput
+            {scheduleId}
             input={schedule?.schedule?.action?.startWorkflow?.input}
           />
-          <ScheduleFrequencyPanel
-            frequency={[
-              ...(schedule?.schedule?.spec?.structuredCalendar ?? []),
-              ...(schedule?.schedule?.spec?.interval ?? []),
-            ]}
-            timezoneName={schedule?.schedule?.spec?.timezoneName}
-          />
+          <ScheduleFrequencyPanel spec={schedule?.schedule?.spec} />
         </div>
       </div>
     </div>
@@ -519,7 +514,7 @@
         <div class="flex flex-col gap-2 p-2">
           <DatePicker
             label={translate('common.start')}
-            on:datechange={onStartDateChange}
+            onDateChange={onStartDateChange}
             selected={startDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}
@@ -533,7 +528,7 @@
           />
           <DatePicker
             label={translate('common.end')}
-            on:datechange={onEndDateChange}
+            onDateChange={onEndDateChange}
             selected={endDate}
             todayLabel={translate('common.today')}
             closeLabel={translate('common.close')}

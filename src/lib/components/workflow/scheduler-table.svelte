@@ -7,8 +7,12 @@
   import { translate } from '$lib/i18n/translate';
   import { routeForSchedule } from '$lib/utilities/route-for';
 
-  export let scheduleId: string;
-  export let namespace: string;
+  interface Props {
+    scheduleId: string;
+    namespace: string;
+  }
+
+  let { scheduleId, namespace }: Props = $props();
 </script>
 
 <Table class="w-full">
@@ -16,7 +20,7 @@
     >{translate('schedules.schedule')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('schedules.schedule')}</th>
+    <th scope="col">{translate('schedules.schedule')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>

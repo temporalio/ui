@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Writable } from 'svelte/store';
 
-  import PayloadDecoder from '$lib/components/event/payload-decoder.svelte';
+  import PayloadDecoder, {
+    type DecodedPayloadResult,
+  } from '$lib/components/payload/payload-decoder.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -10,14 +12,18 @@
     type PayloadInputEncoding,
   } from '$lib/models/payload-encoding';
   import type { Payloads } from '$lib/types';
-  import { atob } from '$lib/utilities/atob';
+  import {
+    base64ParsePayloadMetadata,
+    isParsedPayload,
+  } from '$lib/utilities/decode-payload';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {
     input: string;
     editInput: boolean;
     encoding: Writable<PayloadInputEncoding>;
     messageType: string;
-    payloads: Payloads;
+    payloads: Payloads | undefined;
     showEditActions?: boolean;
   }
 
@@ -35,24 +41,33 @@
   let initialMessageType = $state('');
   let loading = $state(true);
 
-  const setInitialInput = (decodedValue: string): void => {
-    initialInput = decodedValue;
-    input = initialInput;
-    const currentEncoding = atob(
-      String(payloads?.payloads[0]?.metadata?.encoding ?? 'json/plain'),
-    );
-    const currentMessageType = payloads?.payloads[0]?.metadata?.messageType
-      ? atob(String(payloads?.payloads[0]?.metadata?.messageType))
-      : '';
+  const setInitialInput = (result: DecodedPayloadResult): void => {
+    if (result && result[0] && isParsedPayload(result[0].decodedValue)) {
+      initialInput = stringifyWithBigInt(result[0].decodedValue.data) ?? '';
 
-    if (isPayloadInputEncodingType(currentEncoding)) {
-      $encoding = currentEncoding;
-      initialEncoding = $encoding;
-      if (currentEncoding === 'json/protobuf' && currentMessageType) {
-        messageType = currentMessageType;
-        initialMessageType = currentMessageType;
+      input = initialInput;
+      let currentEncoding: PayloadInputEncoding = 'json/plain';
+      let currentMessageType = '';
+
+      if (payloads) {
+        const parsedMetadata = base64ParsePayloadMetadata(payloads);
+
+        currentEncoding =
+          (parsedMetadata?.[0]?.encoding as PayloadInputEncoding) ??
+          'json/plain';
+        currentMessageType = parsedMetadata?.[0]?.messageType ?? '';
+      }
+
+      if (isPayloadInputEncodingType(currentEncoding)) {
+        $encoding = currentEncoding;
+        initialEncoding = $encoding;
+        if (currentEncoding === 'json/protobuf' && currentMessageType) {
+          messageType = currentMessageType;
+          initialMessageType = currentMessageType;
+        }
       }
     }
+
     loading = false;
   };
 
@@ -69,20 +84,22 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <PayloadDecoder value={payloads} key="payloads" onDecode={setInitialInput}>
-    <PayloadInputWithEncoding
-      bind:input
-      {encoding}
-      bind:messageType
-      bind:loading
-      editing={editInput}
-      id="schedule-payload-input"
-    >
-      <div slot="action" class:hidden={!showEditActions}>
-        <Button variant="secondary" on:click={handleEdit}>
-          {editInput ? translate('common.cancel') : translate('common.edit')}
-        </Button>
-      </div>
-    </PayloadInputWithEncoding>
+  <PayloadDecoder value={payloads} onDecode={setInitialInput}>
+    {#snippet children(_decodedValue)}
+      <PayloadInputWithEncoding
+        bind:input
+        {encoding}
+        bind:messageType
+        bind:loading
+        editing={editInput}
+        id="schedule-payload-input"
+      >
+        <div slot="action" class:hidden={!showEditActions}>
+          <Button variant="secondary" on:click={handleEdit}>
+            {editInput ? translate('common.cancel') : translate('common.edit')}
+          </Button>
+        </div>
+      </PayloadInputWithEncoding>
+    {/snippet}
   </PayloadDecoder>
 </div>

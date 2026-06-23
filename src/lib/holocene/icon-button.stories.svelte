@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import IconButton from '$lib/holocene/icon-button.svelte';

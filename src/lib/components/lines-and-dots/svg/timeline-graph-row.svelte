@@ -5,17 +5,17 @@
 
   import { page } from '$app/state';
 
-  import MetadataDecoder from '$lib/components/event/metadata-decoder.svelte';
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { setActiveGroup } from '$lib/stores/active-events';
-  import { authUser } from '$lib/stores/auth-user';
   import {
     decodeLocalActivity,
     getLocalActivityMarkerEvent,
   } from '$lib/utilities/decode-local-activity';
   import { getMillisecondDuration } from '$lib/utilities/format-time';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
+  import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
     isActivityTaskScheduledEvent,
     isActivityTaskStartedEvent,
@@ -35,7 +35,7 @@
     y: number;
     group: EventGroup;
     startTime: string | Timestamp;
-    endTime: string | Date;
+    endTime: string | Date | number;
     canvasWidth: number;
     readOnly: boolean;
   };
@@ -55,6 +55,15 @@
 
   const timelineWidth = $derived(canvasWidth - 2 * gutter);
   const pendingActivity = $derived(group?.pendingActivity);
+
+  const accessibleName = $derived(
+    translate('events.row-accessible-name', {
+      eventType: group.displayName,
+      classification: getEventClassificationLabel(
+        group.finalClassification || group.classification,
+      ),
+    }),
+  );
   const pauseTime = $derived(
     pendingActivity && pendingActivity.pauseInfo?.pauseTime,
   );
@@ -65,11 +74,7 @@
     const localActivityEvent = getLocalActivityMarkerEvent(group);
     if (localActivityEvent) {
       try {
-        decodedLocalActivity = await decodeLocalActivity(localActivityEvent, {
-          namespace: page.params.namespace,
-          settings: page.data.settings,
-          accessToken: $authUser.accessToken,
-        });
+        decodedLocalActivity = await decodeLocalActivity(localActivityEvent);
 
         if (decodedLocalActivity) {
           group.decodedLocalActivity = decodedLocalActivity;
@@ -81,7 +86,7 @@
   });
 
   const getDistancePointsAndPositions = (
-    endTime: string | Date,
+    endTime: string | Date | number,
     timelineWidth: number,
     y: number,
   ) => {
@@ -135,6 +140,13 @@
     setActiveGroup(group);
   };
 
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
   const onMouseEnter = () => {
     if (readOnly) return;
     hovering = true;
@@ -148,9 +160,11 @@
   const activityTaskScheduled = $derived(
     group.eventList.find(isActivityTaskStartedEvent),
   );
-  const retried = $derived(
-    activityTaskScheduled && activityTaskScheduled.attributes?.attempt > 1,
+
+  const retryAttempt = $derived(
+    activityTaskScheduled?.attributes?.attempt ?? 0,
   );
+  const retried = $derived(retryAttempt > 1);
   const pendingLine = $derived(group.isPending || !!pauseTime);
 
   const multiEventHoverWidth = $derived(
@@ -200,8 +214,9 @@
 <g
   role="button"
   tabindex="0"
+  aria-label={accessibleName}
   onclick={onClick}
-  onkeypress={onClick}
+  onkeydown={onKeydown}
   onmouseenter={onMouseEnter}
   onmouseleave={onMouseLeave}
   class="relative cursor-pointer"
@@ -259,7 +274,7 @@
       />
     {/if}
     {#if showText}
-      <MetadataDecoder
+      <PayloadSummary
         value={group?.userMetadata?.summary}
         prefix={isActivityTaskScheduledEvent(group.initialEvent)
           ? group?.displayName
@@ -267,32 +282,34 @@
         fallback={decodedLocalActivity
           ? translate('events.category.local-activity')
           : group?.displayName}
-        let:decodedValue
       >
-        <Text
-          point={textPosition}
-          {textAnchor}
-          {backdrop}
-          backdropHeight={radius * 2}
-          config={TimelineConfig}
-          icon={(pendingActivity && !pendingActivity.paused) || retried
-            ? 'retry'
-            : undefined}
-        >
-          {#if pendingActivity}
-            {translate('workflows.attempt')}
-            {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
-            {'• '}
-            {decodedValue}
-          {:else if retried}
-            {activityTaskScheduled.attributes.attempt} • {decodedValue}
-          {:else if decodedLocalActivity}
-            {decodedLocalActivity.value}
-          {:else}
-            {decodedValue}
-          {/if}
-        </Text>
-      </MetadataDecoder>
+        {#snippet children(decodedValue)}
+          <Text
+            point={textPosition}
+            {textAnchor}
+            {backdrop}
+            backdropHeight={radius * 2}
+            config={TimelineConfig}
+            icon={(pendingActivity && !pendingActivity.paused) || retried
+              ? 'retry'
+              : undefined}
+          >
+            {#if pendingActivity}
+              {translate('workflows.attempt')}
+              {pendingActivity.attempt} / {pendingActivity.maximumAttempts ||
+                '∞'}
+              {'• '}
+              {decodedValue}
+            {:else if retried}
+              {retryAttempt} • {decodedValue}
+            {:else if decodedLocalActivity}
+              {decodedLocalActivity.value}
+            {:else}
+              {decodedValue}
+            {/if}
+          </Text>
+        {/snippet}
+      </PayloadSummary>
     {/if}
     <Dot
       point={[x, y]}

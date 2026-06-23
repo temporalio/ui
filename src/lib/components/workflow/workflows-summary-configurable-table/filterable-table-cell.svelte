@@ -1,8 +1,10 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import { page } from '$app/state';
 
-  import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
@@ -15,30 +17,35 @@
     createFilter,
     updateQueryParamsFromFilter,
   } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    TRUNCATE_LENGTH,
+    truncateValue,
+  } from '$lib/utilities/truncate-value';
 
-  type Props = {
+  interface Props extends Omit<
+    ComponentProps<typeof TableCellWithFilterOrCopyButtons>,
+    | 'children'
+    | 'filterIconTitle'
+    | 'copyIconTitle'
+    | 'copySuccessIconTitle'
+    | 'copyValue'
+    | 'onFilter'
+    | 'isFiltered'
+  > {
     attribute: string;
-    filterOrCopyButtonsVisible: boolean;
     value: string;
     href?: string;
     type?: SearchAttributeType;
-  };
+    truncate?: boolean;
+  }
   let {
     attribute,
-    filterOrCopyButtonsVisible = false,
     value,
     href,
     type = SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    truncate = false,
+    ...cellProps
   }: Props = $props();
-
-  const truncateRunId = (runId: string): string => {
-    if (runId.length > 11) {
-      return `${runId.slice(0, 4)}...${runId.slice(-4)}`;
-    }
-    return runId;
-  };
-
-  const isRunId = attribute === 'RunId';
 
   const onRowFilterClick = () => {
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
@@ -59,25 +66,27 @@
 
     updateQueryParamsFromFilter(page.url, $workflowFilters);
   };
+
+  const hideTooltip = $derived(
+    !truncate || (truncate && truncateValue(value).length <= TRUNCATE_LENGTH),
+  );
 </script>
 
-{#if isRunId}
-  <Tooltip text={value} top class="min-w-0">
-    <Link {href} class="cursor-help">{truncateRunId(value)}</Link>
-  </Tooltip>
-{:else if href}
-  <Link {href}>{value}</Link>
-{:else}
-  {value}
-{/if}
-<FilterOrCopyButtons
-  copyIconTitle={translate('common.copy-icon-title')}
-  copySuccessIconTitle={translate('common.copy-success-icon-title')}
+<TableCellWithFilterOrCopyButtons
+  {...cellProps}
+  density={truncate ? 'dense' : 'comfortable'}
   filterIconTitle={translate('common.filter-workflows')}
-  show={filterOrCopyButtonsVisible}
-  content={value}
+  copyValue={value}
   onFilter={onRowFilterClick}
-  filtered={$workflowFilters.some(
+  isFiltered={$workflowFilters.some(
     (filter) => filter.attribute === attribute && filter.value === value,
   )}
-/>
+>
+  <Tooltip usePortal text={value} top class="min-w-0" hide={hideTooltip}>
+    {#if href}
+      <Link {href}>{truncate ? truncateValue(value) : value}</Link>
+    {:else}
+      {truncate ? truncateValue(value) : value}
+    {/if}
+  </Tooltip>
+</TableCellWithFilterOrCopyButtons>

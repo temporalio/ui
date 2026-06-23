@@ -1,5 +1,10 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
+  import type { ComponentProps } from 'svelte';
+
+  import Alert from './alert.svelte';
 
   export const meta = {
     title: 'Alert',
@@ -21,13 +26,11 @@
       },
       hidden: { table: { disable: true } },
     },
-  } satisfies Meta<Alert>;
+  } satisfies Meta<ComponentProps<typeof Alert>>;
 </script>
 
 <script lang="ts">
   import { Story, Template } from '@storybook/addon-svelte-csf';
-
-  import Alert from './alert.svelte';
 </script>
 
 <Template let:args>

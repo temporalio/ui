@@ -18,7 +18,7 @@
   import {
     routeForEventHistoryEvent,
     routeForNamespace,
-    routeForTimeline,
+    routeForWorkflow,
   } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
@@ -77,7 +77,7 @@
           <td class="break-all text-left" data-testid="link-event">
             {#if link?.workflowEvent}
               <Link
-                href={routeForTimeline({
+                href={routeForWorkflow({
                   namespace: link.workflowEvent.namespace,
                   workflow: link.workflowEvent.workflowId,
                   run: link.workflowEvent.runId,
@@ -162,7 +162,7 @@
           <td class="break-all text-left" data-testid="link-href">
             {#if link?.workflowEvent}
               <Link
-                href={routeForTimeline({
+                href={routeForWorkflow({
                   namespace: link.workflowEvent.namespace,
                   workflow: link.workflowEvent.workflowId,
                   run: link.workflowEvent.runId,

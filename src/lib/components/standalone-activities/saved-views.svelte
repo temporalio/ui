@@ -27,6 +27,7 @@
   import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   let activeQueryView: SavedQuery | undefined = $state();
@@ -43,9 +44,7 @@
   );
 
   const namespaceSavedQueries = $derived(
-    $savedActivityQueries?.[namespace]?.sort((a, b) =>
-      a.name.localeCompare(b.name),
-    ) || [],
+    sortAlphabetically($savedActivityQueries?.[namespace] || [], (q) => q.name),
   );
   const systemQueryView = $derived(
     (query && systemActivityViews.find((q) => q.query === query)) ||
@@ -228,7 +227,7 @@
     tooltipY = Math.round(rect.top + 16);
   };
 
-  const onQueryBtnEnter = (e: MouseEvent, name: string) => {
+  const onQueryBtnEnter = (e: MouseEvent | FocusEvent, name: string) => {
     if ($savedQueryNavOpen) return;
     const el = e.currentTarget as HTMLElement;
     tooltipText = name;
@@ -236,7 +235,7 @@
     showTooltip = true;
   };
 
-  const onQueryBtnMove = (e: MouseEvent) => {
+  const onQueryBtnMove = (e: MouseEvent | FocusEvent) => {
     if (!showTooltip) return;
     const el = e.currentTarget as HTMLElement;
     positionTooltipFrom(el);
@@ -365,6 +364,8 @@
     onmouseenter={(e) => onQueryBtnEnter(e, view.name)}
     onmousemove={onQueryBtnMove}
     onmouseleave={onQueryBtnLeave}
+    onfocusin={(e) => onQueryBtnEnter(e, view.name)}
+    onfocusout={onQueryBtnLeave}
   >
     <Button
       variant="ghost"

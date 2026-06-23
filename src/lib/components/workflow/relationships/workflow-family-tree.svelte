@@ -13,12 +13,16 @@
   import WorkflowFamilyNodeDescription from './workflow-family-node-description.svelte';
   import WorkflowFamilyNodeTree from './workflow-family-node-tree.svelte';
 
-  export let root: RootNode;
-  export let namespace: string;
+  interface Props {
+    root: RootNode;
+    namespace: string;
+  }
 
-  $: expandAll = !$showFullTree;
-  let activeWorkflow: WorkflowExecution | undefined = undefined;
-  let openRuns = new Map<number, string>();
+  let { root = $bindable(), namespace }: Props = $props();
+
+  let expandAll = $derived(!$showFullTree);
+  let activeWorkflow = $state<WorkflowExecution | undefined>(undefined);
+  let openRuns = $state(new Map<number, string>());
 
   const onExpandAll = () => {
     expandAll = !expandAll;
@@ -56,7 +60,7 @@
 
 <div class="flex flex-col bg-primary">
   <div
-    class="relative z-10 w-full overflow-hidden border-b border-subtle bg-primary lg:sticky lg:top-12"
+    class="relative z-10 w-full overflow-hidden border-b border-subtle bg-primary lg:sticky lg:top-[var(--top-nav-height)]"
   >
     <ZoomSvg
       initialZoom={2}

@@ -1,4 +1,6 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
   import Skeleton from './index.svelte';
@@ -13,7 +15,7 @@
         description: 'Tailwind compliant "height" class, i.e. h-10',
       },
     },
-  } satisfies Meta<Skeleton>;
+  } satisfies Meta<typeof Skeleton>;
 </script>
 
 <script lang="ts">

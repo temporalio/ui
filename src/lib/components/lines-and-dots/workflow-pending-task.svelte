@@ -5,7 +5,11 @@
   import { translate } from '$lib/i18n/translate';
   import type { PendingWorkflowTaskInfo } from '$lib/types';
 
-  export let pendingTask: PendingWorkflowTaskInfo | undefined = undefined;
+  interface Props {
+    pendingTask?: PendingWorkflowTaskInfo | undefined;
+  }
+
+  let { pendingTask = undefined }: Props = $props();
 </script>
 
 <Accordion title={translate('workflows.pending-workflow-task')}>

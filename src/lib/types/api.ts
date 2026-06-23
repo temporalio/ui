@@ -43,7 +43,10 @@ export type ParameterlessAPIRoutePath =
   | 'user'
   | 'nexus-endpoints'
   | 'namespaces';
-export type WorkerAPIRoutePath = 'worker-task-reachability';
+export type WorkerAPIRoutePath =
+  | 'worker-task-reachability'
+  | 'workers'
+  | 'worker';
 export type SchedulesAPIRoutePath = 'schedules' | 'schedules.count';
 export type ScheduleAPIRoutePath =
   | 'schedule'
@@ -52,8 +55,15 @@ export type ScheduleAPIRoutePath =
 export type SearchAttributesRoutePath = 'search-attributes';
 export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
-export type WorkerDeploymentAPIRoutePath = 'worker-deployment';
-export type WorkerDeploymentVersionAPIRoutePath = 'worker-deployment-version';
+export type WorkerDeploymentAPIRoutePath =
+  | 'worker-deployment'
+  | 'worker-deployment-set-current-version'
+  | 'worker-deployment-set-ramping-version';
+export type WorkerDeploymentVersionAPIRoutePath =
+  | 'worker-deployment-version'
+  | 'worker-deployment-version-compute-config'
+  | 'worker-deployment-version-validate-compute-config';
+export type WorkerDeploymentVersionsAPIRoutePath = 'worker-deployment-versions';
 export type StandaloneActivitiesAPIRoutePath =
   | 'standalone-activities'
   | 'standalone-activities.count';
@@ -81,10 +91,11 @@ export type APIRoutePath =
   | WorkerDeploymentsAPIRoutePath
   | WorkerDeploymentAPIRoutePath
   | WorkerDeploymentVersionAPIRoutePath
+  | WorkerDeploymentVersionsAPIRoutePath
   | StandaloneActivityAPIRoutePath
   | StandaloneActivitiesAPIRoutePath;
 
-export type APIRouteParameters = {
+export interface APIRouteParameters {
   namespace: string;
   workflowId: string;
   scheduleId: string;
@@ -98,8 +109,10 @@ export type APIRouteParameters = {
   activityId: string;
   endpointId: string;
   deploymentName: string;
+  buildId: string;
   version: string;
-};
+  workerInstanceKey: string;
+}
 
 export type StandaloneActivitiesParameters = Pick<
   APIRouteParameters,
@@ -181,5 +194,5 @@ export type WorkerDeploymentRouteParameters = Pick<
 
 export type WorkerDeploymentVersionRouteParameters = Pick<
   APIRouteParameters,
-  'namespace' | 'version'
+  'namespace' | 'deploymentName' | 'buildId'
 >;

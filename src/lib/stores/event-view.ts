@@ -23,3 +23,10 @@ export const eventShowElapsed = persistStore<BooleanString>(
   'eventShowElapsed',
   'false',
 );
+
+export type WorkflowViewPreference = 'timeline' | 'history';
+
+export const workflowViewPreference = persistStore<WorkflowViewPreference>(
+  'workflowViewPreference',
+  'timeline',
+);

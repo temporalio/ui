@@ -7,15 +7,25 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let id: string = crypto.randomUUID();
-  export let error = false;
-  export let input: string;
-  export let label = translate('workflows.signal-payload-input-label');
-  export let loading = false;
-  export let hintText = translate('workflows.signal-payload-input-label-hint');
-  export let editing = true;
+  interface Props {
+    id?: string;
+    error?: boolean;
+    input: string;
+    label?: string;
+    loading?: boolean;
+    hintText?: string;
+    editing?: boolean;
+  }
 
-  $: error = !isValidInput(input);
+  let {
+    id = crypto.randomUUID(),
+    error = $bindable(false),
+    input = $bindable(),
+    label = translate('workflows.signal-payload-input-label'),
+    loading = $bindable(false),
+    hintText = translate('workflows.signal-payload-input-label-hint'),
+    editing = true,
+  }: Props = $props();
 
   const isValidInput = (value: string) => {
     if (!input) return true;
@@ -26,6 +36,12 @@
       return false;
     }
   };
+
+  const computedError = $derived(!isValidInput(input));
+
+  $effect(() => {
+    error = computedError;
+  });
 
   const handleInputChange = (text: string): void => {
     if (text !== input) {

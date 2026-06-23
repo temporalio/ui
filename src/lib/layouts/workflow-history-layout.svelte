@@ -36,6 +36,7 @@
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
   import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
+  import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
 
   const { namespace } = $derived(page.params);
   const { workflow } = $derived($workflowRun);
@@ -87,7 +88,7 @@
 
   let items = $derived(
     (compact
-      ? groups
+      ? orderGroupsByPending(groups, reverseSort)
       : reverseSort
         ? [...pendingNexusOperations, ...pendingActivities, ...history]
         : [...history, ...pendingActivities, ...pendingNexusOperations]) as
@@ -168,7 +169,7 @@
 </div>
 <div class="relative">
   <div
-    class="surface-background sticky top-0 z-[11] flex flex-wrap-reverse items-center justify-between gap-2 border-b border-subtle md:top-12 md:pt-2 xl:gap-8"
+    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="items-bottom flex gap-4 pt-2">
       <h2>

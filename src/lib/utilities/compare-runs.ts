@@ -4,7 +4,18 @@ import { toEventHistory } from '$lib/models/event-history';
 import type { LLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
 import { getGroupLLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
 import type { HistoryEvent, WorkflowEvents } from '$lib/types/events';
-import { decodePayload } from '$lib/utilities/decode-payload';
+function decodePayload(payload: unknown): unknown {
+  if (!payload || typeof payload !== 'object') return payload;
+  const p = payload as Record<string, unknown>;
+  if (typeof p.data === 'string') {
+    try {
+      return JSON.parse(atob(p.data));
+    } catch {
+      return atob(p.data);
+    }
+  }
+  return payload;
+}
 
 export type CompareStep = {
   activityName: string;

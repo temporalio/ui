@@ -5,19 +5,22 @@
 
   import { page } from '$app/state';
 
+  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import ActivitiesSummaryConfigurableTable from '$lib/components/standalone-activities/activities-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-activities/activities-summary-filter-bar/filter-bar.svelte';
-  import ActivityCountRefresh from '$lib/components/standalone-activities/activity-count-refresh.svelte';
-  import ActivityCounts from '$lib/components/standalone-activities/activity-counts.svelte';
   import SavedActivityViews from '$lib/components/standalone-activities/saved-views.svelte';
+  import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import { fetchActivityCountByStatus } from '$lib/services/activity-counts';
   import {
     activitiesQuery,
     activitiesSearchParams,
     activityCount,
+    activityRefresh,
   } from '$lib/stores/activities';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import {
@@ -28,14 +31,16 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { activityExecutionSearchAttributes } from '$lib/stores/search-attributes';
+  import { getActivityStatusAndCountOfGroup } from '$lib/utilities/get-activity-status-and-count';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { routeForStartStandaloneActivity } from '$lib/utilities/route-for';
+  import { standaloneActivityCommandsDisabled } from '$lib/utilities/standalone-activities-commands-disabled';
 
   interface Props {
-    headerActions?: Snippet;
     releaseStageBadge?: Snippet;
   }
 
-  let { headerActions, releaseStageBadge }: Props = $props();
+  let { releaseStageBadge }: Props = $props();
 
   const query = $derived(page.url.searchParams.get('query') ?? '');
   const namespace = $derived(page.params.namespace);
@@ -45,6 +50,9 @@
 
   const refreshTimeFormatted = $derived($timestamp(refreshTime));
   const availableColumns = $derived(availableActivityColumns(namespace));
+  const activityStartEnabled = $derived(
+    !standaloneActivityCommandsDisabled(page),
+  );
 
   onMount(() => {
     $lastUsedNamespace = page.params.namespace;
@@ -88,18 +96,29 @@
             <Translate key="standalone-activities.recent-activities" />
           {/if}
         </h1>
-        <p class="text-xs text-secondary">
+        <p class="mt-2 text-xs text-secondary">
           {refreshTimeFormatted}
         </p>
       </div>
       {@render releaseStageBadge?.()}
-      <ActivityCountRefresh count={$activityCount.newCount} />
-      <ActivityCounts bind:refreshTime />
+      <CountRefreshButton
+        count={$activityCount.newCount}
+        refresh={activityRefresh}
+      />
+      <StatusCounts
+        bind:refreshTime
+        countStore={activityCount}
+        refresh={activityRefresh}
+        filters={activityFilters}
+        fetchCounts={fetchActivityCountByStatus}
+        getStatusAndCount={getActivityStatusAndCountOfGroup}
+        data-testid="activity-status"
+      />
     </div>
-    {#if headerActions}
-      <div class="flex items-center gap-4">
-        {@render headerActions()}
-      </div>
+    {#if activityStartEnabled}
+      <Button href={routeForStartStandaloneActivity({ namespace })}>
+        {translate('standalone-activities.start-standalone-activity')}
+      </Button>
     {/if}
   </div>
 </header>

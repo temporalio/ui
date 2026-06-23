@@ -8,49 +8,33 @@
   import Spinner from '$lib/holocene/icon/svg/spinner.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { EventClassification } from '$lib/models/event-history/get-event-classification';
-  import type { ScheduleStatus } from '$lib/types/schedule';
-  import type { WorkflowStatus } from '$lib/types/workflows';
+  import { getStatusLabel, type Status } from '$lib/utilities/get-status-label';
 
   import HeartBeat from './heart-beat-indicator.svelte';
 
-  type Status =
-    | WorkflowStatus
-    | ScheduleStatus
-    | EventClassification
-    | 'Pending'
-    | 'Retrying';
+  interface Props {
+    delay?: number;
+    status?: Status;
+    count?: number | undefined;
+    loading?: boolean;
+    newCount?: number | undefined;
+    big?: boolean;
+    delayed?: boolean;
+    taskFailure?: boolean;
+    'test-id'?: string;
+  }
 
-  export let delay = 0;
-  export let status: Status = 'Running';
-  export let count: number | undefined = undefined;
-  export let loading = false;
-  export let newCount: number | undefined = undefined;
-  export let big = false;
-  export let delayed = false;
-  export let taskFailure = false;
-
-  const label: Record<Status, string> = {
-    Running: translate('workflows.running'),
-    TimedOut: translate('workflows.timed-out'),
-    Completed: translate('workflows.completed'),
-    Failed: translate('workflows.failed'),
-    ContinuedAsNew: translate('workflows.continued-as-new'),
-    Canceled: translate('workflows.canceled'),
-    Terminated: translate('workflows.terminated'),
-    Paused: translate('workflows.paused'),
-    Scheduled: translate('events.event-classification.scheduled'),
-    Started: translate('events.event-classification.started'),
-    Unspecified: translate('events.event-classification.unspecified'),
-    Open: translate('events.event-classification.open'),
-    New: translate('events.event-classification.new'),
-    Initiated: translate('events.event-classification.initiated'),
-    Fired: translate('events.event-classification.fired'),
-    CancelRequested: translate('events.event-classification.cancelrequested'),
-    Signaled: translate('events.event-classification.signaled'),
-    Pending: translate('events.event-classification.pending'),
-    Retrying: translate('events.event-classification.retrying'),
-  };
+  let {
+    delay = 0,
+    status = 'Running',
+    count = undefined,
+    loading = false,
+    newCount = undefined,
+    big = false,
+    delayed = false,
+    taskFailure = false,
+    'test-id': testId,
+  }: Props = $props();
 
   const workflowStatus = cva(
     [
@@ -83,11 +67,13 @@
     },
   );
 
-  $: tooltipText = delayed
-    ? translate('workflows.delayed')
-    : taskFailure
-      ? translate('workflows.task-failure')
-      : '';
+  const tooltipText = $derived(
+    delayed
+      ? translate('workflows.delayed')
+      : taskFailure
+        ? translate('workflows.task-failure')
+        : '',
+  );
 </script>
 
 <Tooltip
@@ -101,7 +87,7 @@
       'relative flex items-center gap-0 text-center text-xs leading-4',
       big && 'text-lg',
     )}
-    data-testid={$$props['test-id'] || 'workflow-status'}
+    data-testid={testId || 'workflow-status'}
   >
     <span
       class={merge(
@@ -118,7 +104,7 @@
         {count.toLocaleString()}
       {/if}
 
-      {label[status]}
+      {getStatusLabel(status)}
       {#if status === 'Running' && !delayed && !taskFailure}
         <HeartBeat {delay} />
       {/if}

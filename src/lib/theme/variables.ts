@@ -29,7 +29,7 @@ export const variables = {
   },
   '--color-text-subtle': {
     light: 'slate.700',
-    dark: 'slate.700',
+    dark: 'slate.400',
   },
   '--color-text-danger': {
     light: 'red.700',
@@ -44,7 +44,7 @@ export const variables = {
     dark: 'green.600',
   },
   '--color-text-warning': {
-    light: 'yellow.600',
+    light: 'yellow.700',
     dark: 'yellow.500',
   },
   '--color-text-pink': {
@@ -212,7 +212,7 @@ export const variables = {
   },
   '--color-border-focus-info': {
     light: 'indigo.600',
-    dark: 'indigo.600',
+    dark: 'indigo.400',
   },
   '--color-border-focus-danger': {
     light: 'red.600',

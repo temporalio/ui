@@ -1,23 +1,38 @@
 <script lang="ts">
-  import { twMerge as merge } from 'tailwind-merge';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
+  import PayloadInline from '$lib/components/payload/payload-inline.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
-  import type { Payloads } from '$lib/types';
+  import { isRawPayload, isRawPayloads } from '$lib/utilities/decode-payload';
   import { format } from '$lib/utilities/format-camel-case';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
-  import { displayLinkType } from '$lib/utilities/get-single-attribute-for-event';
+  import {
+    displayLinkType,
+    formatSummaryAttributeDisplayValue,
+    type SummaryAttribute,
+  } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetailsLink from './event-details-link.svelte';
-  import PayloadDecoder from './payload-decoder.svelte';
 
-  export let key: string;
-  export let value: string | Record<string, unknown> | Payloads;
-  export let attributes: CombinedAttributes;
-  export let showKey = true;
+  interface Props {
+    key: string;
+    value: SummaryAttribute['value'] | number | boolean | null;
+    attributes: CombinedAttributes;
+    showKey?: boolean;
+    class?: ClassNameValue;
+  }
 
-  $: linkType = displayLinkType(key, attributes);
+  let {
+    key,
+    value,
+    attributes,
+    showKey = true,
+    class: className = '',
+  }: Props = $props();
+
+  const linkType = $derived(displayLinkType(key, attributes));
 </script>
 
 {#if key}
@@ -29,21 +44,13 @@
         {format(key)}
       </p>
     {/if}
-    {#if typeof value === 'object'}
+    {#if isRawPayload(value) || isRawPayloads(value)}
       <div
         class="flex max-w-sm items-center justify-between gap-2 overflow-hidden pr-1 xl:flex-nowrap"
       >
-        <PayloadDecoder {value} key="payloads">
-          {#snippet children(decodedValue)}
-            <div class={merge('payload', $$props.class)}>
-              <code>
-                <pre class="truncate">{decodedValue.slice(0, 60)}</pre>
-              </code>
-            </div>
-          {/snippet}
-        </PayloadDecoder>
+        <PayloadInline {value} class={merge(className)} />
       </div>
-    {:else if linkType !== 'none'}
+    {:else if typeof value === 'string' && linkType !== 'none'}
       <Copyable
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -59,22 +66,8 @@
       </Copyable>
     {:else}
       <Badge type="subtle" class="block select-none truncate">
-        {value}
+        {formatSummaryAttributeDisplayValue(value)}
       </Badge>
     {/if}
   </div>
 {/if}
-
-<style lang="postcss">
-  .payload {
-    @apply overflow-hidden border border-subtle bg-code-block px-1 py-0.5 font-mono text-xs;
-  }
-
-  .payload code {
-    @apply text-primary;
-  }
-
-  .payload pre {
-    @apply text-primary;
-  }
-</style>

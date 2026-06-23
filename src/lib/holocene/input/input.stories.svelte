@@ -1,6 +1,9 @@
-<script lang="ts" context="module">
+<svelte:options runes />
+
+<script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
   import { expect, userEvent, within } from '@storybook/test';
+  import type { ComponentProps } from 'svelte';
 
   import { iconNames } from '$lib/holocene/icon';
 
@@ -66,7 +69,7 @@
         table: { category: 'Styling (Deprecated)' },
       },
     },
-  } satisfies Meta<Input>;
+  } satisfies Meta<ComponentProps<typeof Input>>;
 </script>
 
 <script lang="ts">
@@ -140,7 +143,11 @@
 
 <Story name="With Buttons" let:args let:context>
   <Input {...args} id={context.id} data-testid={context.id}>
-    <Button slot="before-input" type="button">Before</Button>
-    <Button slot="after-input" type="button">After</Button>
+    {#snippet beforeInput()}
+      <Button type="button">Before</Button>
+    {/snippet}
+    {#snippet afterInput()}
+      <Button type="button">After</Button>
+    {/snippet}
   </Input>
 </Story>

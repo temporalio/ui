@@ -6,10 +6,18 @@
 
   import InputAndResultsPayload from './input-and-results-payload.svelte';
 
-  $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory);
-  $: isPending =
-    $workflowRun.workflow.isRunning || $workflowRun.workflow.isPaused;
+  const workflowEvents = $derived(
+    getWorkflowStartedCompletedAndTaskFailedEvents($fullEventHistory),
+  );
+  const isPending = $derived(
+    $workflowRun.workflow?.isRunning ||
+      $workflowRun.workflow?.isPaused ||
+      false,
+  );
+  const payloadDownloadFilenameData = $derived({
+    workflowId: $workflowRun.workflow?.id ?? '',
+    runId: $workflowRun.workflow?.runId ?? '',
+  });
 </script>
 
 <div class="flex flex-col gap-4 lg:flex-row" data-testid="input-and-result">
@@ -17,10 +25,18 @@
     title={translate('workflows.input')}
     content={workflowEvents.input}
     {isPending}
+    payloadDownloadFilenameData={{
+      ...payloadDownloadFilenameData,
+      type: 'input',
+    }}
   />
   <InputAndResultsPayload
     title={translate('workflows.result')}
     content={workflowEvents.results}
     {isPending}
+    payloadDownloadFilenameData={{
+      ...payloadDownloadFilenameData,
+      type: 'result',
+    }}
   />
 </div>

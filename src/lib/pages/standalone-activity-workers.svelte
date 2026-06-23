@@ -1,37 +1,42 @@
 <script lang="ts">
-  import WorkerTable from '$lib/components/worker-table.svelte';
-  import { getPollers } from '$lib/services/pollers-service';
-  import { decodePayload } from '$lib/utilities/decode-payload';
+  import { page } from '$app/state';
+
+  import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
+  import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
   import { isEmptyObject } from '$lib/utilities/is';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
   interface Props {
     namespace: string;
+    useFallback?: boolean;
   }
 
-  let { namespace }: Props = $props();
+  let { namespace, useFallback = false }: Props = $props();
 
   const searchAttributes = $derived($activityExecution?.info?.searchAttributes);
-  const queue = $derived($activityExecution?.info?.taskQueue);
-
-  const getPollersRequest = getPollers({ queue, namespace });
+  const taskQueue = $derived($activityExecution?.info?.taskQueue ?? '');
+  const workerHeartbeatsEnabled = $derived(
+    !!page.data.namespace.namespaceInfo?.capabilities?.workerHeartbeats,
+  );
 
   const decodedSearchAttributes = $derived.by(() => {
     if (isEmptyObject(searchAttributes)) return {};
 
-    const decoded = Object.entries(searchAttributes.indexedFields).reduce(
-      (searchAttributes, [searchAttributeName, payload]) => {
-        return {
-          ...searchAttributes,
-          [searchAttributeName]: decodePayload(payload),
-        };
-      },
-      {},
-    );
+    const decoded = Object.entries(
+      searchAttributes?.indexedFields ?? {},
+    ).reduce((searchAttributes, [searchAttributeName, payload]) => {
+      return {
+        ...searchAttributes,
+        [searchAttributeName]: parseRawPayloadToJSON(payload),
+      };
+    }, {});
     return decoded;
   });
 </script>
 
-{#await getPollersRequest then workers}
-  <WorkerTable {workers} searchAttributes={decodedSearchAttributes} />
-{/await}
+<WorkersTable
+  {namespace}
+  {taskQueue}
+  searchAttributes={decodedSearchAttributes}
+  useFallback={!workerHeartbeatsEnabled || useFallback}
+/>

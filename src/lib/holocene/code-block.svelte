@@ -2,7 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
-  import { historyKeymap, standardKeymap } from '@codemirror/commands';
+  import { history, historyKeymap, standardKeymap } from '@codemirror/commands';
   import {
     bracketMatching,
     ensureSyntaxTree,
@@ -11,7 +11,12 @@
     indentUnit,
     syntaxHighlighting,
   } from '@codemirror/language';
-  import { Compartment, EditorState, type Extension } from '@codemirror/state';
+  import {
+    Compartment,
+    EditorState,
+    type Extension,
+    Transaction,
+  } from '@codemirror/state';
   import { EditorView, keymap } from '@codemirror/view';
   import { onMount, type Snippet } from 'svelte';
   import { twMerge as merge, twMerge } from 'tailwind-merge';
@@ -67,8 +72,8 @@
     class: className = undefined,
     editable = false,
     copyable = true,
-    copyIconTitle = '',
-    copySuccessIconTitle = '',
+    copyIconTitle = undefined,
+    copySuccessIconTitle = undefined,
     inline = false,
     testId = undefined,
     minHeight = undefined,
@@ -116,6 +121,7 @@
           to: doc.length,
           insert: newContent,
         },
+        annotations: Transaction.addToHistory.of(false),
       });
     }
   };
@@ -156,6 +162,7 @@
 
   let dynamicExtensions: Extension[] = $derived(
     [
+      ...(editable ? [history()] : []),
       getEditorTheme($useDarkMode, hasHeader),
       getActionsTheme({ hasActions: copyable || maximizable }),
       EditorState.readOnly.of(!editable),
@@ -285,11 +292,12 @@
       class={merge('h-full', className)}
       data-testid={testId}
       {...editorProps}
-      onblur={handleEditorBlur}
     ></div>
 
     {#snippet actions()}
-      {#if copyable && !hasHeader}
+      {#if headerActions}
+        {@render headerActions()}
+      {:else if copyable && !hasHeader}
         <CopyButton
           {copyIconTitle}
           {copySuccessIconTitle}

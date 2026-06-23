@@ -52,6 +52,7 @@
   import Label from '$lib/holocene/label.svelte';
   import MenuContainer from '$lib/holocene/menu/menu-container.svelte';
   import Menu from '$lib/holocene/menu/menu.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import Badge from '../badge.svelte';
   import Button from '../button.svelte';
@@ -87,6 +88,7 @@
     hrefDisabled?: boolean;
     loading?: boolean;
     loadingText?: string;
+    allowCustomValue?: boolean;
     open?: Writable<boolean>;
     maxMenuHeight?: string;
     variant?: ComboboxStyles['variant'];
@@ -106,6 +108,7 @@
     removeChipLabel?: string;
     selectAllLabel?: string;
     deselectAllLabel?: string;
+    hideControls?: boolean;
     numberOfItemsSelectedLabel?: (count: number) => string;
   }
 
@@ -117,6 +120,7 @@
     removeChipLabel?: never;
     selectAllLabel?: never;
     deselectAllLabel?: never;
+    hideControls?: never;
     numberOfItemsSelectedLabel?: never;
   }
 
@@ -166,6 +170,7 @@
     displayChips = true,
     selectAllLabel = 'Select All',
     deselectAllLabel = 'Deselect All',
+    hideControls = false,
     removeChipLabel = 'Remove Option',
     numberOfItemsSelectedLabel = (count: number) =>
       `${count} option${count > 1 ? 's' : ''} selected`,
@@ -174,6 +179,7 @@
     hrefDisabled = false,
     loading = false,
     loadingText = 'Loading more results',
+    allowCustomValue = false,
     variant = 'default',
     optionClass = '',
     onchange,
@@ -189,9 +195,23 @@
   let filterValue: string = $state('');
   let menuElement: HTMLUListElement | null = $state(null);
   let inputElement: HTMLInputElement | null = $state(null);
+  let inputFocused: boolean = $state(false);
+  let customOptions: string[] = $state([]);
 
-  const selectedOption = $derived(getSelectedOption(options));
-  let list = $derived(filterOptions(filterValue, options));
+  const allOptions = $derived(
+    allowCustomValue ? [...customOptions, ...options] : options,
+  );
+  const selectedOption = $derived(getSelectedOption(allOptions));
+  let list = $derived(filterOptions(filterValue, allOptions));
+  const trimmedFilterValue = $derived(filterValue.trim());
+  const showAddCustom = $derived(
+    allowCustomValue &&
+      trimmedFilterValue &&
+      !list.some(
+        (o) =>
+          getDisplayValue(o).toLowerCase() === trimmedFilterValue.toLowerCase(),
+      ),
+  );
   let displayValue = $derived(
     !multiselect ? getDisplayValue(selectedOption) : undefined,
   );
@@ -240,11 +260,22 @@
 
   const resetValueAndOptions = () => {
     displayValue = getDisplayValue(selectedOption);
-    list = options;
+    list = allOptions;
   };
 
   const isArrayValue = (value: string | string[]): value is string[] => {
     return Array.isArray(value);
+  };
+
+  const addCustomValue = () => {
+    if (!trimmedFilterValue) return;
+    if (isArrayValue(value) && value.includes(trimmedFilterValue)) return;
+    if (!customOptions.includes(trimmedFilterValue)) {
+      customOptions = [trimmedFilterValue, ...customOptions];
+    }
+    handleSelectOption(trimmedFilterValue);
+    filterValue = '';
+    displayValue = '';
   };
 
   const isStringOption = (option: string | T): option is string => {
@@ -382,8 +413,12 @@
         focusFirstOption();
         break;
       case 'Enter':
-        openList();
-        focusFirstOption();
+        if (showAddCustom) {
+          addCustomValue();
+        } else {
+          openList();
+          focusFirstOption();
+        }
         break;
       case 'ArrowUp':
       case 'ArrowRight':
@@ -396,7 +431,12 @@
 
   const handleFocus: FocusEventHandler<HTMLInputElement> = (event) => {
     event.stopPropagation();
+    inputFocused = true;
     openList();
+  };
+
+  const handleBlur: FocusEventHandler<HTMLInputElement> = () => {
+    inputFocused = false;
   };
 
   const handleInput: FormEventHandler<HTMLInputElement> = (event) => {
@@ -477,7 +517,7 @@
       >
         {#if multiselect && isArrayValue(value) && value.length > 0}
           {#if displayChips}
-            {#each value.slice(0, chipLimit) as v}
+            {#each value.slice(0, chipLimit) as v, i (i)}
               <Chip
                 onremove={() => removeOption(v)}
                 removeButtonLabel={removeChipLabel}>{v}</Chip
@@ -508,7 +548,7 @@
             className,
           )}
           role="combobox"
-          autocomplete="off"
+          autocomplete={rest.autocomplete ?? 'off'}
           autocapitalize="off"
           spellcheck="false"
           data-lpignore="true"
@@ -518,6 +558,7 @@
           aria-required={required}
           aria-autocomplete="list"
           onfocus={handleFocus}
+          onblur={handleBlur}
           oninput={handleInput}
           onkeydown={handleInputKeydown}
           onclick={handleInputClick}
@@ -588,9 +629,9 @@
     class="w-full"
     maxHeight={maxMenuHeight}
   >
-    {#if multiselect && isArrayValue(value)}
+    {#if multiselect && isArrayValue(value) && !hideControls}
       <ComboboxOption
-        disabled={value.length === options.length}
+        disabled={value.length === allOptions.length}
         onclick={selectAll}
         label={selectAllLabel}
       />
@@ -602,7 +643,22 @@
       <MenuDivider />
     {/if}
 
-    {#each list as option}
+    {#if showAddCustom}
+      <ComboboxOption
+        active={inputFocused}
+        onclick={addCustomValue}
+        label="{translate('common.add')} {trimmedFilterValue}"
+      >
+        {#snippet leading()}
+          <Icon name="add" />
+        {/snippet}
+      </ComboboxOption>
+      {#if list.length > 0}
+        <MenuDivider />
+      {/if}
+    {/if}
+
+    {#each list as option, i (i)}
       <ComboboxOption
         onclick={() => handleSelectOption(option)}
         selected={isSelected(option, value)}
@@ -610,7 +666,7 @@
         class={optionClass}
       />
     {:else}
-      {#if loading === false}
+      {#if !showAddCustom && loading === false}
         <ComboboxOption disabled label={noResultsText} />
       {/if}
     {/each}

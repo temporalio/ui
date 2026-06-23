@@ -1,8 +1,10 @@
+import type { WorkerStatus as ReadableWorkerStatus } from '$lib/models/worker-status';
 import type {
   ArchivalState,
   CallbackState,
   NamespaceState,
   PendingNexusOperationState,
+  WorkerStatus,
   WorkflowExecutionStatus,
 } from '$lib/types';
 import type { BatchOperationState, BatchOperationType } from '$lib/types/batch';
@@ -81,20 +83,30 @@ export const toWorkflowTaskFailureReadable = (
 export const toPendingActivityStateReadable = (
   state?: PendingActivityState,
 ): PendingActivityState => {
-  if (!state) return state;
+  if (!state) return 'Unspecified';
   return fromScreamingEnum(state, 'PendingActivityState');
 };
 
 export const toPendingNexusOperationStateReadable = (
   state?: PendingNexusOperationState,
 ): PendingNexusOperationState => {
-  if (!state) return state;
+  if (!state) return 'Unspecified' as unknown as PendingNexusOperationState;
   return fromScreamingEnum(state, 'PendingNexusOperationState');
 };
 
 export const toCallbackStateReadable = (
   state?: CallbackState,
 ): CallbackState => {
-  if (!state) return state;
+  if (!state) return 'Unspecified' as unknown as CallbackState;
   return fromScreamingEnum(state, 'CallbackState');
+};
+
+export const toWorkerStatusReadable = (
+  state: WorkerStatus | undefined | null,
+): ReadableWorkerStatus => {
+  if (!state) return 'Unspecified';
+  return fromScreamingEnum(
+    state,
+    'WorkerStatus',
+  ) as unknown as ReadableWorkerStatus;
 };

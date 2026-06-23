@@ -13,6 +13,7 @@ import {
   isNexusOperationFailedEvent,
   isNexusOperationTimedOutEvent,
   isSignalExternalWorkflowExecutionFailedEvent,
+  isStartChildWorkflowExecutionFailedEvent,
   isTimerCanceledEvent,
   isWorkflowExecutionCanceledEvent,
   isWorkflowExecutionFailedEvent,
@@ -32,6 +33,7 @@ export const eventIsFailureOrTimedOut = (event: WorkflowEvent): boolean => {
     isWorkflowTaskFailedEvent(event) ||
     isChildWorkflowExecutionFailedEvent(event) ||
     isChildWorkflowExecutionTimedOutEvent(event) ||
+    isStartChildWorkflowExecutionFailedEvent(event) ||
     isSignalExternalWorkflowExecutionFailedEvent(event) ||
     isFailedWorkflowExecutionUpdateCompletedEvent(event) ||
     isNexusOperationFailedEvent(event) ||

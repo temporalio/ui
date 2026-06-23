@@ -4,7 +4,7 @@ import type { google } from '@temporalio/proto';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { ActivityOptions, EventLink } from '$lib/types';
 
-import type { Replace, Settings } from './global';
+import type { Replace } from './global';
 
 export type EventHistory = Replace<
   import('$lib/types').History,
@@ -13,7 +13,12 @@ export type EventHistory = Replace<
 
 export type HistoryEvent = Replace<
   import('$lib/types').HistoryEvent,
-  { eventType: EventType; eventId: string; links?: EventLink[] }
+  {
+    eventType: EventType;
+    eventId: string;
+    links?: EventLink[];
+    principal?: Principal;
+  }
 >;
 
 export type GetWorkflowExecutionHistoryResponse = Replace<
@@ -63,15 +68,11 @@ export type PendingNexusOperation = import('$lib/types').PendingNexusInfo & {
 };
 export type Callbacks = import('$lib/types').CallbackInfo[];
 
-export type EventRequestMetadata = {
-  namespace: string;
-  settings: Settings;
-  accessToken: string;
+// Remove once TS SDK has support
+export type Principal = {
+  type?: string;
+  name?: string;
 };
-
-export type EventWithMetadata = {
-  historyEvent: HistoryEvent;
-} & EventRequestMetadata;
 
 export type EventType = import('$lib/utilities/is-event-type').EventType;
 
@@ -90,13 +91,14 @@ export interface WorkflowEvent extends HistoryEvent {
   name: EventType;
   links?: EventLink[];
   billableActions?: number;
+  principal?: Principal;
 }
 
 export type WorkflowEvents = WorkflowEvent[];
 
 export type PendingActivityWithMetadata = {
   activity: PendingActivity;
-} & EventRequestMetadata;
+};
 
 export type CommonEventKey =
   | 'id'
@@ -111,7 +113,8 @@ export type CommonEventKey =
   | 'category'
   | 'workerMayIgnore'
   | 'name'
-  | 'links';
+  | 'links'
+  | 'principal';
 
 export type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 
@@ -268,5 +271,9 @@ export type NexusOperationTimedOutEvent =
   EventWithAttributes<'nexusOperationTimedOutEventAttributes'>;
 export type NexusOperationCancelRequestedEvent =
   EventWithAttributes<'nexusOperationCancelRequestedEventAttributes'>;
+export type NexusOperationCancelRequestCompletedEvent =
+  EventWithAttributes<'nexusOperationCancelRequestCompletedEventAttributes'>;
+export type NexusOperationCancelRequestFailedEvent =
+  EventWithAttributes<'nexusOperationCancelRequestFailedEventAttributes'>;
 export type WorkflowPropertiesModifiedEvent =
   EventWithAttributes<'workflowPropertiesModifiedEventAttributes'>;

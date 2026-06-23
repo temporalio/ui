@@ -51,10 +51,10 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('toggle-manual-query').click();
   await page
-    .getByTestId('manual-search-input')
+    .getByTestId('workflow-manual-search-input')
     .fill('`CloseTime`>="2025-12-25T12:00:00.000Z"');
 
-  await page.getByTestId('manual-search-button').click();
+  await page.getByTestId('workflow-manual-search-button').click();
 
   await expect
     .poll(() => getQueryParam(page.url()))
@@ -65,7 +65,9 @@ test('it should update the datetime filter based on the selected timezone', asyn
       name: 'CloseTime >= 12/25/25, 6:00:00.00 AM CST',
     }),
   ).toBeVisible();
-  let query = await page.getByTestId('manual-search-input').inputValue();
+  let query = await page
+    .getByTestId('workflow-manual-search-input')
+    .inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 
   await page.getByTestId('nav-profile-button').click();
@@ -86,7 +88,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('nav-profile-button').click();
 
-  query = await page.getByTestId('manual-search-input').inputValue();
+  query = await page.getByTestId('workflow-manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 });
 
@@ -177,9 +179,7 @@ test('it should filter by HistoryLength (number)', async ({ page }) => {
     .fill('10');
   await page.getByTestId('apply-filter-button').click();
 
-  await expect
-    .poll(() => getQueryParam(page.url()))
-    .toBe('`HistoryLength`="10"');
+  await expect.poll(() => getQueryParam(page.url())).toBe('`HistoryLength`=10');
 });
 
 test('it should combine filters and then clear them all', async ({ page }) => {

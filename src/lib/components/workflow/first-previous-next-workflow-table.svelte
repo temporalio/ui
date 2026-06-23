@@ -5,14 +5,17 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { routeForTimeline } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  export let workflow: string;
-  export let namespace: string;
+  interface Props {
+    workflow: string;
+    namespace: string;
+    first: string;
+    next: string;
+    previous: string;
+  }
 
-  export let first: string;
-  export let next: string;
-  export let previous: string;
+  let { workflow, namespace, first, next, previous }: Props = $props();
 </script>
 
 <Table class="w-full">
@@ -20,15 +23,15 @@
     >{translate('workflows.relationships')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('workflows.first-execution')}</th>
-    <th>{translate('workflows.previous-execution')}</th>
-    <th>{translate('workflows.next-execution')}</th>
+    <th scope="col">{translate('workflows.first-execution')}</th>
+    <th scope="col">{translate('workflows.previous-execution')}</th>
+    <th scope="col">{translate('workflows.next-execution')}</th>
   </TableHeaderRow>
   <TableRow>
     <td class="w-1/3">
       {#if first}
         <Link
-          href={routeForTimeline({
+          href={routeForWorkflow({
             namespace,
             workflow: workflow,
             run: first,
@@ -46,7 +49,7 @@
     <td class="w-1/3">
       {#if previous}
         <Link
-          href={routeForTimeline({
+          href={routeForWorkflow({
             namespace,
             workflow: workflow,
             run: previous,
@@ -64,7 +67,7 @@
     <td class="w-1/3">
       {#if next}
         <Link
-          href={routeForTimeline({
+          href={routeForWorkflow({
             namespace,
             workflow: workflow,
             run: next,

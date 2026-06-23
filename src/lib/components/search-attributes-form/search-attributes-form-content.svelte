@@ -54,6 +54,7 @@
               .min(1, translate('search-attributes.validation-name-required')),
             type: z.enum(typeValues as [string, ...string[]]),
             isDeletable: z.boolean().optional().default(true),
+            initialName: z.string().optional().default(''),
           }),
         )
         .refine(

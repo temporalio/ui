@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
+  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import SearchAttributeFilter from '$lib/components/search-attribute-filter/index.svelte';
+  import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -16,8 +16,9 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
-  import { isCloud } from '$lib/stores/advanced-visibility';
+  import { fetchScheduleCount } from '$lib/services/workflow-counts';
   import {
     availableScheduleColumns,
     configurableTableColumns,
@@ -25,22 +26,34 @@
   } from '$lib/stores/configurable-table-columns';
   import { coreUserStore } from '$lib/stores/core-user';
   import { scheduleFilters } from '$lib/stores/filters';
-  import { schedulesCount } from '$lib/stores/schedules';
+  import { schedulesCount, schedulesRefresh } from '$lib/stores/schedules';
   import {
-    customSearchAttributes,
+    scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
-    type SearchAttributeOption,
   } from '$lib/stores/search-attributes';
-  import { temporalVersion } from '$lib/stores/versions';
-  import { SEARCH_ATTRIBUTE_TYPE } from '$lib/types/workflows';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import type { APIErrorResponse } from '$lib/utilities/request-from-api';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
-  import { minimumVersionRequired } from '$lib/utilities/version-check';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  const { namespace } = $derived(page.params);
+  const query = $derived(page.url.searchParams.get('query') ?? '');
+
+  const countPoller = createCountPoller({
+    getStore: () => schedulesCount,
+    fetch: () => fetchScheduleCount({ namespace, query }),
+    transform: (countStr) => parseInt(countStr ?? '0', 10),
+    watch: () => {
+      void namespace;
+      void query;
+      void $schedulesRefresh;
+    },
+  });
+
+  const refreshTime = $derived(new Date(countPoller.refreshTime));
+  const refreshTimeFormatted = $derived($timestamp(refreshTime));
+
   const coreUser = coreUserStore();
-  let refresh = $state(Date.now());
   let customizationDrawerOpen = $state(false);
   let error = $state('');
 
@@ -48,26 +61,10 @@
     customizationDrawerOpen = true;
   };
 
-  const { namespace } = $derived(page.params);
   const columns = $derived(
     $configurableTableColumns?.[namespace]?.schedules ?? [],
   );
   const createDisabled = $derived($coreUser.namespaceWriteDisabled(namespace));
-  const searchAttributeOptions = $derived(
-    Object.entries({
-      ...(($isCloud || minimumVersionRequired('1.25.0', $temporalVersion)) && {
-        ScheduleId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
-      }),
-      ...$customSearchAttributes,
-    }).map(([key, value]) => {
-      return {
-        label: key,
-        value: key,
-        type: value,
-      } as SearchAttributeOption;
-    }),
-  );
-  const query = $derived(page.url.searchParams.get('query'));
   const onFetch = $derived(() => {
     error = '';
     return fetchPaginatedSchedules(namespace, query, onError);
@@ -76,7 +73,6 @@
 
   onMount(() => {
     if (query) {
-      // Set filters from inital page load query if it exists
       $scheduleFilters = toListWorkflowFilters(
         query,
         $scheduleSearchAttributes,
@@ -84,49 +80,70 @@
     }
   });
 
-  const onError = (err: APIErrorResponse) => {
-    error = err?.body?.message || translate('schedules.error-message-fetching');
+  const onError = (err: unknown) => {
+    error =
+      (err as APIErrorResponse)?.body?.message ||
+      translate('schedules.error-message-fetching');
   };
 
-  const showFilters = $derived(Number($schedulesCount) > 0 || query);
+  const showFilters = $derived($schedulesCount.count > 0 || query);
 </script>
 
-<div class="flex flex-col gap-4">
-  <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-    <SchedulesCount />
-  </h1>
-  <div
-    class="flex flex-col gap-2 md:flex-row {showFilters
-      ? 'justify-between'
-      : 'justify-end'}"
-  >
-    {#if showFilters}
-      <SearchAttributeFilter
-        bind:filters={$scheduleFilters}
-        {searchAttributeOptions}
-        refresh={() => {
-          refresh = Date.now();
-        }}
-      />
-    {/if}
+<header class="flex flex-col gap-2">
+  <div class="flex flex-col justify-between gap-2 md:flex-row">
+    <div class="flex flex-row flex-wrap items-start gap-2">
+      <div>
+        <div class="flex flex-row flex-wrap items-start gap-2">
+          <h1
+            class="flex items-center gap-2 leading-7"
+            data-cy="schedules-title"
+          >
+            <span data-testid="schedule-count"
+              >{$schedulesCount.count.toLocaleString()}</span
+            >
+            {translate('common.schedules-plural', {
+              count: $schedulesCount.count,
+            })}
+          </h1>
+          <CountRefreshButton
+            count={$schedulesCount.newCount}
+            refresh={schedulesRefresh}
+          />
+        </div>
+        <p class="mt-2 text-xs text-secondary">
+          {refreshTimeFormatted}
+        </p>
+      </div>
+    </div>
     {#if !createDisabled}
-      <Button
-        data-testid="create-schedule"
-        href={routeForScheduleCreate({ namespace })}
-        disabled={!writeActionsAreAllowed()}
-      >
-        {translate('schedules.create')}
-      </Button>
+      <div class="flex items-center gap-4">
+        <Button
+          data-testid="create-schedule"
+          href={routeForScheduleCreate({ namespace })}
+          disabled={!writeActionsAreAllowed()}
+        >
+          {translate('schedules.create')}
+        </Button>
+      </div>
     {/if}
   </div>
-</div>
+</header>
 
-{#key [namespace, query, refresh]}
+{#if showFilters}
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
+  />
+{/if}
+
+{#key [namespace, query, $schedulesRefresh]}
   <PaginatedTable
     let:visibleItems
     {onFetch}
     {onError}
-    total={$schedulesCount}
+    total={$schedulesCount.count}
     aria-label={translate('common.schedules')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
@@ -170,15 +187,6 @@
               >Temporal CLI</Link
             >.
           </p>
-          {#if !createDisabled}
-            <Button
-              data-testid="create-schedule"
-              on:click={() => goto(routeForScheduleCreate({ namespace }))}
-              disabled={!writeActionsAreAllowed()}
-            >
-              {translate('schedules.create')}
-            </Button>
-          {/if}
         </EmptyState>
       {/if}
     </svelte:fragment>

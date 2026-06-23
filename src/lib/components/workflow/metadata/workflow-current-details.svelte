@@ -9,7 +9,6 @@
   import Markdown from '$lib/holocene/markdown-editor/preview.svelte';
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowMetadata } from '$lib/services/query-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
 
   const { namespace } = $derived(page.params);
@@ -24,18 +23,13 @@
     if (!workflow || loading) return;
     loading = true;
     try {
-      const { settings } = page.data;
-      const metadata = await getWorkflowMetadata(
-        {
-          namespace,
-          workflow: {
-            id: workflow.id,
-            runId: workflow.runId,
-          },
+      const metadata = await getWorkflowMetadata({
+        namespace,
+        workflow: {
+          id: workflow.id,
+          runId: workflow.runId,
         },
-        settings,
-        $authUser?.accessToken ?? '',
-      );
+      });
       $workflowRun.metadata = metadata;
       lastFetched = new Date();
     } catch (error) {
@@ -91,6 +85,11 @@
     </div>
   </div>
   {#key currentDetails}
-    <Markdown class="p-3" overrideTheme="primary" content={currentDetails} />
+    <Markdown
+      frameId="user-metadata-current-details"
+      class="p-3"
+      overrideTheme="primary"
+      content={currentDetails}
+    />
   {/key}
 </div>

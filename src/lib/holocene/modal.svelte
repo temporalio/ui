@@ -14,6 +14,7 @@
     confirmDisabled?: boolean;
     confirmText: string;
     confirmType?: ComponentProps<Button>['variant'];
+    hideCancel?: boolean;
     hideConfirm?: boolean;
     hightlightNav?: boolean;
     id: string;
@@ -25,6 +26,7 @@
     class?: string;
   }
 
+  export let hideCancel = false;
   export let hideConfirm = false;
   export let confirmText: string;
   export let cancelText: string;
@@ -131,12 +133,14 @@
         <div></div>
       </slot>
       <div class="flex items-center justify-end space-x-2">
-        <Button
-          data-testid="cancel-modal-button"
-          variant="ghost"
-          disabled={loading}
-          on:click={closeModal}>{cancelText}</Button
-        >
+        {#if !hideCancel}
+          <Button
+            data-testid="cancel-modal-button"
+            variant="ghost"
+            disabled={loading}
+            on:click={closeModal}>{cancelText}</Button
+          >
+        {/if}
         {#if !hideConfirm}
           <Button
             variant={confirmType}
@@ -157,7 +161,11 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer transition-opacity duration-200;
+    @apply cursor-pointer bg-black/50 transition-opacity duration-200;
+
+    :global([data-theme='dark']) & {
+      background-color: rgb(var(--color-surface-background) / 50%);
+    }
   }
 
   .body.hightlightNav::backdrop {

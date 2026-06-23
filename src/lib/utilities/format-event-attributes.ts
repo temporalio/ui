@@ -25,6 +25,8 @@ export type CombinedAttributes = EventAttribute & {
   continuedExecutionRunId?: string;
   newExecutionRunId?: string;
   namespace?: string;
+  principalName?: string;
+  principalType?: string;
 };
 
 const keysToExpand: Readonly<Set<string>> = new Set([

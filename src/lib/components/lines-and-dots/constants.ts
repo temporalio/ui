@@ -14,6 +14,7 @@ import type {
 } from '$lib/types/events';
 import type { WorkflowStatus } from '$lib/types/workflows';
 import {
+  type CombinedAttributes,
   formatGroupAttributes,
   formatPendingAttributes,
 } from '$lib/utilities/format-event-attributes';
@@ -269,11 +270,19 @@ export const getCategoryStrokeColor = (
   }
 };
 
-export const mergeEventGroupDetails = (group: EventGroup) => {
+export const mergeEventGroupDetails = (
+  group: EventGroup,
+): CombinedAttributes => {
   const attributes = formatGroupAttributes(group);
-  return group.pendingActivity
-    ? { ...formatPendingAttributes(group.pendingActivity), ...attributes }
-    : attributes;
+
+  if (group.pendingActivity) {
+    return {
+      ...formatPendingAttributes(group.pendingActivity),
+      ...attributes,
+    };
+  }
+
+  return attributes;
 };
 
 export const staticCodeBlockHeight = 200;

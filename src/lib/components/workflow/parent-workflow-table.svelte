@@ -6,11 +6,15 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import { routeForTimeline } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  export let parent: WorkflowIdentifier;
-  export let parentNamespaceName: string | undefined;
-  export let namespace: string;
+  interface Props {
+    parent: WorkflowIdentifier;
+    parentNamespaceName: string | undefined;
+    namespace: string;
+  }
+
+  let { parent, parentNamespaceName, namespace }: Props = $props();
 </script>
 
 <Table class="w-full">
@@ -18,13 +22,13 @@
     >{translate('workflows.parent-workflow')}</caption
   >
   <TableHeaderRow slot="headers">
-    <th>{translate('workflows.parent-id')}</th>
-    <th>{translate('workflows.parent-run-id')}</th>
+    <th scope="col">{translate('workflows.parent-id')}</th>
+    <th scope="col">{translate('workflows.parent-run-id')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>
       <Link
-        href={routeForTimeline({
+        href={routeForWorkflow({
           namespace: parentNamespaceName ?? namespace,
           workflow: parent.workflowId,
           run: parent.runId,
@@ -40,7 +44,7 @@
     </td>
     <td>
       <Link
-        href={routeForTimeline({
+        href={routeForWorkflow({
           namespace: parentNamespaceName ?? namespace,
           workflow: parent.workflowId,
           run: parent.runId,

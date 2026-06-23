@@ -4,7 +4,6 @@
 
   import { page } from '$app/state';
 
-  import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Table from '$lib/holocene/table/table.svelte';
@@ -20,15 +19,15 @@
     createHref?: string;
     headers?: Snippet;
     columns?: Snippet<[NexusEndpoint]>;
+    actions?: Snippet;
   };
 
   let {
     endpoints = [],
     searchPlaceholder = translate('common.search'),
-    createDisabled = false,
-    createHref = '/nexus/create',
     headers,
     columns,
+    actions,
   }: Props = $props();
 
   let search = $state('');
@@ -48,15 +47,17 @@
 </script>
 
 {#if !endpoints?.length && !searchParam}
-  <NexusEmptyState {createDisabled} {createHref} />
+  <NexusEmptyState>
+    {#snippet actions()}
+      {@render actions?.()}
+    {/snippet}
+  </NexusEmptyState>
 {:else}
   <div class="mb-8 flex items-center justify-between">
     <h1 data-testid="namespace-selector-title">
       {translate('nexus.endpoints')}
     </h1>
-    <Button disabled={createDisabled} variant="primary" href={createHref}
-      >{translate('nexus.create-endpoint')}</Button
-    >
+    {@render actions?.()}
   </div>
   <div class="flex flex-col gap-4">
     <Input

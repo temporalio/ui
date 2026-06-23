@@ -18,7 +18,6 @@
     getWorkflowMetadata,
     type ParsedQuery,
   } from '$lib/services/query-service';
-  import { authUser } from '$lib/stores/auth-user';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type { Payloads } from '$lib/types';
   import type { WorkflowInteractionDefinition } from '$lib/types/workflows';
@@ -74,18 +73,13 @@
   });
 
   const fetchCurrentDetails = async () => {
-    const { settings } = $page.data;
-    const metadata = await getWorkflowMetadata(
-      {
-        namespace,
-        workflow: {
-          id: workflowId,
-          runId: runId,
-        },
+    const metadata = await getWorkflowMetadata({
+      namespace,
+      workflow: {
+        id: workflowId,
+        runId: runId,
       },
-      settings,
-      $authUser?.accessToken,
-    );
+    });
     $workflowRun.metadata = metadata;
   };
 
@@ -113,16 +107,12 @@
       return;
     }
 
-    queryResult = getQuery(
-      {
-        namespace,
-        workflow: params,
-        queryType,
-        queryArgs: payloads ? { payloads } : null,
-      },
-      $page.data?.settings,
-      $authUser?.accessToken,
-    ).finally(() => {
+    queryResult = getQuery({
+      namespace,
+      workflow: params,
+      queryType,
+      queryArgs: payloads ? { payloads } : null,
+    }).finally(() => {
       reset();
     });
   };
@@ -155,7 +145,7 @@
             <Option {value} {description}>{value}</Option>
           {/each}
         </Select>
-        <div class="flex flex-col gap-1">
+        <div data-testid="query-input" class="flex flex-col gap-1">
           <PayloadInput bind:input label={translate('workflows.query-arg')} />
         </div>
         <div class="flex w-full flex-wrap items-end justify-end gap-4">

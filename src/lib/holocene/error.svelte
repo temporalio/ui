@@ -11,14 +11,18 @@
     }
   };
 
-  export let error: App.Error | NetworkError | unknown;
-  export let status = 500;
-  export let reset = reload;
-
-  let message = has(error, 'message') ? String(error.message) : '';
-  if (has(error, 'statusCode')) {
-    status = Number(error.statusCode);
+  interface Props {
+    error: App.Error | NetworkError | unknown;
+    status?: number;
+    reset?: () => void;
   }
+
+  let { error, status: statusProp = 500, reset = reload }: Props = $props();
+
+  const message = $derived(has(error, 'message') ? String(error.message) : '');
+  const status = $derived(
+    has(error, 'statusCode') ? Number(error.statusCode) : statusProp,
+  );
 </script>
 
 <section

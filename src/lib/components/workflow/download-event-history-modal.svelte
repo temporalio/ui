@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import Modal from '$lib/holocene/modal.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
@@ -10,10 +8,19 @@
 
   import WorkflowRawHistoryLink from '../workflow-raw-history-link.svelte';
 
-  export let open = false;
-  export let namespace: string;
-  export let workflowId: string;
-  export let runId: string;
+  interface Props {
+    open?: boolean;
+    namespace: string;
+    workflowId: string;
+    runId: string;
+  }
+
+  let {
+    open = $bindable(false),
+    namespace,
+    workflowId,
+    runId,
+  }: Props = $props();
 
   const onDownloadClick = () => {
     open = false;
@@ -21,7 +28,6 @@
       namespace,
       workflowId,
       runId,
-      settings: $page.data.settings,
       decodeSetting: $downloadEventHistorySetting,
     });
   };

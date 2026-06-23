@@ -2,17 +2,25 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
+  import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
 
-  export let open = false;
-  export let namespaceList: NamespaceListItem[] = [];
+  interface Props {
+    open?: boolean;
+    namespaceList?: NamespaceListItem[];
+  }
 
-  let search = '';
+  let { open = false, namespaceList = [] }: Props = $props();
 
-  $: namespaces = (
-    search
-      ? namespaceList.filter(({ namespace }) => namespace.includes(search))
-      : namespaceList
-  ).sort((a, b) => a.namespace.localeCompare(b.namespace));
+  let search = $state('');
+
+  const namespaces = $derived(
+    sortAlphabetically(
+      search
+        ? namespaceList.filter(({ namespace }) => namespace.includes(search))
+        : namespaceList,
+      (ns) => ns.namespace,
+    ),
+  );
 </script>
 
 {#if open}
@@ -33,7 +41,11 @@
           <button
             class="namespace"
             class:selected={namespace === $lastUsedNamespace}
-            on:click|preventDefault|stopPropagation={() => onClick(namespace)}
+            onclick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClick(namespace);
+            }}
           >
             {namespace}
           </button>

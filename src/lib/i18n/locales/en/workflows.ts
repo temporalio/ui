@@ -41,6 +41,7 @@ export const Strings = {
   'configure-headers-description':
     'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), {{type}} to personalize the {{title}} Table.',
   'all-statuses': 'All Statuses',
+  'row-accessible-name': 'Workflow {{workflowId}}: {{status}}',
   running: 'Running',
   'timed-out': 'Timed Out',
   completed: 'Completed',
@@ -155,15 +156,23 @@ export const Strings = {
   'workflow-404-title': 'This is not the Workflow you are looking for',
   'workflow-error-title':
     'We are having technical difficulties retrieving this Workflow',
-  'workflow-error-no-workers-title': 'No Workers Running',
+  'workflow-error-no-workers-title': 'No workers polling',
   'workflow-error-no-workers-description':
-    'There are no Workers polling the {{taskQueue}} Task Queue.',
+    'There are no workers polling the {{taskQueue}} task queue.',
+  'workers-alert-description':
+    'Check your deployment or orchestration system (Kubernetes, ECS, etc.). Review worker logs for crash information. Restart or redeploy workers.',
+  'workflow-error-no-workers-serverless-title': 'No workers currently polling',
+  'workflow-error-no-workers-serverless-description':
+    'The {{taskQueue}} task queue is served by the serverless worker deployment {{deployment}}, which scales down to zero when idle. Workers will start automatically when there are tasks to process.',
+  'view-worker-deployment': 'View Worker Deployment',
   'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
   'workflow-error-no-compatible-workers-description':
     'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
+  'dismiss-common-errors': 'Dismiss Common Errors',
   'state-transitions': 'State Transitions',
   'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
+  'family-node-label': 'Workflow {{id}}: {{status}}',
   parents_zero: '0 Parents',
   parents_one: '1 Parent',
   'pending-children_one': '1 Pending Child',
@@ -203,7 +212,6 @@ export const Strings = {
   'workflow-task-handler': 'Workflow Task Handler',
   'activity-handler': 'Activity Handler',
   'nexus-handler': 'Nexus Handler',
-  'workers-empty-state': 'No Workers Found',
   'call-stack-empty-state': 'No Call Stacks Found',
   'no-workers-failure-message':
     'This will fail if you have no workers running.',
@@ -222,6 +230,7 @@ export const Strings = {
   'query-arg': 'Query Arg',
   'run-query': 'Run Query',
   'refresh-query': 'Refresh Query',
+  'refresh-call-stack': 'Refresh Call Stack',
   'pending-activities-empty-state': 'No Pending Activities',
   'activity-id': 'Activity ID',
   summary: 'Summary',
@@ -348,4 +357,12 @@ export const Strings = {
   'timeline-minimized':
     'Timeline and Event History are collapsed to minimized height',
   'timeline-expanded': 'Timeline and Event History are expanded to full height',
+  'external-payload-size': 'External Payloads Size',
+  'external-payload-count': 'External Payloads',
+  'external-payload-tooltip':
+    'History Size does not include externally stored payload size.',
+  sdk: 'Workflow SDK',
+  'show-common-errors': 'Show Common Errors',
+  'show-common-errors-description':
+    'Show alerts for common errors if present in the Event History',
 } as const;

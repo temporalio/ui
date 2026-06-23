@@ -7,7 +7,7 @@
   import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import {
-    routeForTimeline,
+    routeForWorkflow,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
@@ -15,9 +15,13 @@
 
   import type { ScheduleActionResult } from '$types';
 
-  export let recentRuns: ScheduleActionResult[] = [];
-  export let namespace: string;
-  export let workflowQuery: string;
+  type Props = {
+    recentRuns?: ScheduleActionResult[];
+    namespace: string;
+    workflowQuery: string;
+  };
+
+  let { recentRuns = [], namespace, workflowQuery }: Props = $props();
 
   const sortRecentRuns = (recentRuns: ScheduleActionResult[]) => {
     return (
@@ -53,7 +57,7 @@
         </div>
         <div class="mx-2 w-auto break-words">
           <Link
-            href={routeForTimeline({
+            href={routeForWorkflow({
               workflow: run.startWorkflowResult.workflowId,
               run: run.startWorkflowResult.runId,
               namespace,

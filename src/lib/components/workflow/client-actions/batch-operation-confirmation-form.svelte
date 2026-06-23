@@ -1,7 +1,7 @@
 <script lang="ts">
   import { derived, type Readable } from 'svelte/store';
 
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -13,12 +13,25 @@
   } from '$lib/pages/workflows-with-new-search.svelte';
   import { workflowsQuery } from '$lib/stores/workflows';
 
-  export let action: Action;
-  export let reason: string;
-  export let jobId: string;
-  export let reasonPlaceholder: string;
-  export let jobIdPlaceholder: string;
-  export let jobIdValid: boolean;
+  interface Props {
+    action: Action;
+    reason: string;
+    jobId: string;
+    reasonPlaceholder: string;
+    jobIdPlaceholder: string;
+    jobIdValid: boolean;
+    children?: Snippet;
+  }
+
+  let {
+    action,
+    reason = $bindable(),
+    jobId = $bindable(),
+    reasonPlaceholder,
+    jobIdPlaceholder,
+    jobIdValid = $bindable(),
+    children,
+  }: Props = $props();
 
   const {
     allSelected,
@@ -26,9 +39,6 @@
     cancelableWorkflows,
     selectedWorkflows,
   } = getContext<BatchOperationContext>(BATCH_OPERATION_CONTEXT);
-
-  $: actionText = getActionText(action);
-  $: operableWorkflowsCount = getOperableWorkflowsCount(action);
 
   const getActionText = (action: Action): string => {
     switch (action) {
@@ -38,6 +48,8 @@
         return translate('workflows.terminate');
       case Action.Reset:
         return translate('workflows.reset');
+      default:
+        return '';
     }
   };
 
@@ -52,13 +64,19 @@
             return $terminable.length;
           case Action.Reset:
             return $selected.length;
+          default:
+            return 0;
         }
       },
     );
   };
 
-  const handleJobIdChange = (event: Event & { target: HTMLInputElement }) => {
-    jobIdValid = /^[\w.~-]*$/.test(event.target.value);
+  const actionText = $derived(getActionText(action));
+  const operableWorkflowsCount = $derived(getOperableWorkflowsCount(action));
+
+  const handleJobIdChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    jobIdValid = /^[\w.~-]*$/.test(target.value);
   };
 </script>
 
@@ -116,8 +134,8 @@
       : translate('batch.job-id-input-error')}
     bind:value={jobId}
     placeholder={jobIdPlaceholder}
-    on:input={handleJobIdChange}
+    oninput={handleJobIdChange}
     valid={jobIdValid}
   />
-  <slot />
+  {@render children?.()}
 </div>

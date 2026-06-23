@@ -11,6 +11,10 @@ import {
 
 type Tokens = string[];
 
+const OPERATOR_CONDITIONALS = new Set(['>=', '<=', '!=', '==']);
+const isOperatorConditional = (value: string): boolean =>
+  OPERATOR_CONDITIONALS.has(value);
+
 export const tokenize = (string: string): Tokens => {
   const tokens: Tokens = [];
   const addBufferToTokens = (): void => {
@@ -91,9 +95,11 @@ export const tokenize = (string: string): Tokens => {
       isConditional(minConditional) &&
       (isSpace(string[cursor + 2]) ||
         isQuote(string[cursor + 2]) ||
-        isParenthesis(string[cursor + 2]))
+        isParenthesis(string[cursor + 2]) ||
+        isOperatorConditional(minConditional))
     ) {
-      // To prevent false positives like "inspect" being a "in" conditional, check for space, quote, or parenthesis after the midConditional
+      // To prevent false positives like "inspect" being a "in" conditional, check for space, quote, or parenthesis after the midConditional.
+      // Operator-style conditionals like >=, <=, != never collide with identifiers, so accept them even without a trailing space.
       buffer += minConditional;
       addBufferToTokens();
       cursor += 2;
@@ -101,6 +107,7 @@ export const tokenize = (string: string): Tokens => {
     } else if (isConditional(character)) {
       addBufferToTokens();
       buffer += character;
+      addBufferToTokens();
       cursor++;
       continue;
     }

@@ -4,18 +4,21 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   interface $$Props extends HTMLButtonAttributes {
-    copyIconTitle: string;
-    copySuccessIconTitle: string;
+    copyIconTitle?: string;
+    copySuccessIconTitle?: string;
     copied: boolean;
     'data-testid'?: string;
     'data-theme'?: string;
     class?: string;
   }
 
-  export let copyIconTitle: string;
-  export let copySuccessIconTitle: string;
+  export let copyIconTitle: string = translate('common.copy-icon-title');
+  export let copySuccessIconTitle: string = translate(
+    'common.copy-success-icon-title',
+  );
   export let copied: boolean;
 
   let className = '';

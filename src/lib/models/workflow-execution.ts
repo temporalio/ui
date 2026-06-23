@@ -14,7 +14,7 @@ import type {
   WorkflowExecutionAPIResponse,
   WorkflowSearchAttributes,
 } from '$lib/types/workflows';
-import { decodePayload } from '$lib/utilities/decode-payload';
+import { parseRawPayloadToJSON } from '$lib/utilities/decode-payload';
 import {
   toCallbackStateReadable,
   toPendingActivityStateReadable,
@@ -70,7 +70,7 @@ const toSearchAttributes = (
     (searchAttributes, [searchAttributeName, payload]) => {
       return {
         ...searchAttributes,
-        [searchAttributeName]: decodePayload(payload),
+        [searchAttributeName]: parseRawPayloadToJSON(payload),
       };
     },
     {},
@@ -145,6 +145,10 @@ export const toWorkflowExecution = (
   const priority = response.workflowExecutionInfo?.priority;
   const workflowExtendedInfo = response.workflowExtendedInfo ?? {};
   const startDelay = getStartDelay({ executionTime, startTime });
+  const externalPayloadCount =
+    response?.workflowExecutionInfo?.externalPayloadCount;
+  const externalPayloadSizeBytes =
+    response?.workflowExecutionInfo?.externalPayloadSizeBytes;
 
   let summary;
   let details;
@@ -163,6 +167,8 @@ export const toWorkflowExecution = (
     status,
     historyEvents,
     historySizeBytes,
+    externalPayloadCount,
+    externalPayloadSizeBytes,
     searchAttributes,
     memo,
     rootExecution,

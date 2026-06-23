@@ -1,98 +1,51 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  import PayloadCodeBlock, {
+    type PayloadDownloadFilenameData,
+  } from '$lib/components/payload/payload-code-block.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import { translate } from '$lib/i18n/translate';
-  import type { Payload } from '$lib/types';
-  import type { PotentiallyDecodable } from '$lib/utilities/decode-payload';
-  import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
+  import type { Payloads } from '$lib/types';
+  import type { CompletionEventAttributes } from '$lib/utilities/get-started-completed-and-task-failed-events';
 
-  import PayloadDecoder from '../event/payload-decoder.svelte';
-
-  export let title: string;
-  export let content: string = '';
-  export let isPending: boolean = false;
-
-  const parseContent = (c: string): PotentiallyDecodable | undefined => {
-    try {
-      return parseWithBigInt(c);
-    } catch {
-      return undefined;
-    }
+  type Props = {
+    title: string;
+    titleSnippet?: Snippet;
+    content: Payloads | CompletionEventAttributes;
+    isPending?: boolean;
+    payloadDownloadFilenameData: PayloadDownloadFilenameData;
   };
+  let {
+    title,
+    titleSnippet = defaultTitleSnippet,
+    content,
+    isPending = false,
+    payloadDownloadFilenameData,
+  }: Props = $props();
 
-  const parsePayloads = (c: string): unknown[] => {
-    try {
-      const data = parseWithBigInt(c);
-      return Array.isArray(data) ? data : [data];
-    } catch {
-      return [];
-    }
-  };
-
-  const getPayloads = (value: PotentiallyDecodable | undefined): Payload[] => {
-    try {
-      const payloads = value?.payloads;
-      return Array.isArray(payloads) ? payloads : [];
-    } catch {
-      return [];
-    }
-  };
-
-  $: parsedContent = parseContent(content);
-  $: payloads = getPayloads(parsedContent);
-  $: payloadsSize = payloads.length;
+  const MAX_HEIGHT = 300;
 </script>
 
-<div class="flex w-full grow flex-col gap-2">
+{#snippet defaultTitleSnippet()}
   <h3 class="flex items-center gap-2 text-xs text-secondary">
     {title}
   </h3>
+{/snippet}
+
+<div class="flex w-full grow flex-col gap-2">
+  {@render titleSnippet()}
   {#if content}
-    {#if payloadsSize > 0}
-      <PayloadDecoder value={parsedContent} key="payloads">
-        {#snippet children(decodedValue)}
-          {#if payloadsSize > 1}
-            {#each parsePayloads(decodedValue) as decodedContent}
-              <CodeBlock
-                content={stringifyWithBigInt(decodedContent)}
-                copyIconTitle={translate('common.copy-icon-title')}
-                copySuccessIconTitle={translate(
-                  'common.copy-success-icon-title',
-                )}
-                maxHeight={300}
-              />
-            {/each}
-          {:else}
-            <CodeBlock
-              content={decodedValue}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
-              maxHeight={300}
-            />
-          {/if}
-        {/snippet}
-      </PayloadDecoder>
-    {:else}
-      <PayloadDecoder value={parseWithBigInt(content)}>
-        {#snippet children(decodedValue)}
-          <CodeBlock
-            content={decodedValue}
-            copyIconTitle={translate('common.copy-icon-title')}
-            copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            minHeight={120}
-            maxHeight={120}
-          />
-        {/snippet}
-      </PayloadDecoder>
-    {/if}
+    <PayloadCodeBlock
+      maxHeight={MAX_HEIGHT}
+      value={content}
+      filenameData={payloadDownloadFilenameData}
+    />
   {:else}
     <CodeBlock
       content={isPending ? 'Results will appear upon completion.' : 'null'}
       language="text"
       copyable={false}
-      maxHeight={300}
+      maxHeight={MAX_HEIGHT}
     />
   {/if}
 </div>

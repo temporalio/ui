@@ -8,6 +8,7 @@
 
 @layer base {
   :root {
+    --top-nav-height: 3rem;
     --panel-collapsed-w: 60px;
     --panel-expanded-w: 240px;
     --panel-h: 73dvh;
@@ -21,6 +22,14 @@
 
   body {
     @apply body-normal surface-background relative overscroll-none;
+  }
+
+  body[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  body[data-theme='dark'] {
+    color-scheme: dark;
   }
 
   input[type='search']::-webkit-search-cancel-button {

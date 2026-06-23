@@ -12,6 +12,7 @@
     danger: 'bg-red-200',
     count: 'h-6 w-6 min-w-max rounded-full bg-blue-300',
     subtle: 'surface-subtle dark:text-white font-normal select-all',
+    ghost: 'surface-primary text-primary border border-subtle',
   };
 
   const types = cva(
@@ -26,7 +27,7 @@
       'p-1',
       'text-sm',
       'font-medium',
-      'leading-4',
+      'leading-[1.5]',
       'transition-colors',
       'text-black',
     ],

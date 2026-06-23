@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { writable, type Writable } from 'svelte/store';
+
   import { getContext } from 'svelte';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import {
     Menu,
@@ -18,89 +20,133 @@
     SEARCH_ATTRIBUTE_TYPE,
     type SearchAttributeType,
   } from '$lib/types/workflows';
-  import { getFocusedElementId } from '$lib/utilities/query/search-attribute-filter';
-  import { createFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    createFilter,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
   import { MAX_QUERY_LENGTH } from '$lib/utilities/request-from-api';
 
-  import { FILTER_CONTEXT, type FilterContext } from './index.svelte';
+  import {
+    SEARCH_ATTRIBUTE_FILTER_CONTEXT,
+    type SearchAttributeFilterContext,
+  } from './filter.svelte';
 
-  export let filters: SearchAttributeFilter[];
-  export let options: SearchAttributeOption[];
-
-  const { filter, activeQueryIndex, focusedElementId } =
-    getContext<FilterContext>(FILTER_CONTEXT);
-
-  function isOptionDisabled(value: string, filters: SearchAttributeFilter[]) {
-    return filters.some(
-      (filter) =>
-        ['=', '!=', 'is', 'is not'].includes(filter.conditional) &&
-        filter.attribute === value,
-    );
+  interface Props {
+    options: SearchAttributeOption[];
+    filters: Writable<SearchAttributeFilter[]>;
+    statusAttribute?: string;
   }
+
+  let { options, filters, statusAttribute }: Props = $props();
+
+  const query = $derived(page.url.searchParams.get('query') ?? '');
+  let searchAttributeValue = $state('');
+
+  const { filter, activeQueryIndex, handleSubmit, id } =
+    getContext<SearchAttributeFilterContext>(SEARCH_ATTRIBUTE_FILTER_CONTEXT);
+
+  const open = writable(false);
+
+  const getDefaultConditional = (type: SearchAttributeType) => {
+    switch (type) {
+      case SEARCH_ATTRIBUTE_TYPE.BOOL:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.DATETIME:
+        return '>=';
+      case SEARCH_ATTRIBUTE_TYPE.INT:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.DOUBLE:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST:
+        return 'in';
+      case SEARCH_ATTRIBUTE_TYPE.KEYWORD:
+        return '=';
+      case SEARCH_ATTRIBUTE_TYPE.TEXT:
+        return '=';
+      default:
+        return '=';
+    }
+  };
 
   function handleNewQuery(value: string, type: SearchAttributeType) {
     searchAttributeValue = '';
-    const conditional = type === SEARCH_ATTRIBUTE_TYPE.KEYWORDLIST ? 'in' : '=';
-    filter.set(createFilter({ attribute: value, conditional, type }));
-    $focusedElementId = getFocusedElementId($filter);
+    filter.set(
+      createFilter({
+        attribute: value,
+        conditional: getDefaultConditional(type),
+        type,
+      }),
+    );
+    handleSubmit();
+    $open = false;
   }
 
-  let searchAttributeValue = '';
+  const filteredOptions = $derived(
+    !searchAttributeValue
+      ? options
+      : options.filter((option) =>
+          option.value
+            .toLowerCase()
+            .includes(searchAttributeValue.toLowerCase()),
+        ),
+  );
 
-  $: filteredOptions = !searchAttributeValue
-    ? options
-    : options.filter((option) =>
-        option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
-      );
-
-  $: query = $page.url.searchParams.get('query');
+  function clearAllFilters() {
+    $filters = [];
+    updateQueryParamsFromFilter(page.url, $filters, true);
+    $activeQueryIndex = null;
+    $filter = createFilter();
+  }
 </script>
 
-<MenuContainer>
+<MenuContainer {open}>
   <MenuButton
-    id="search-attribute-filter-button"
-    controls="search-attribute-menu"
-    disabled={$activeQueryIndex !== null || query?.length >= MAX_QUERY_LENGTH}
+    id="{id}-search-attribute-filter-button"
+    controls="{id}-search-attribute-menu"
+    leadingIcon="add"
+    variant="secondary"
+    data-testid="add-filter-button"
+    disabled={$activeQueryIndex !== null || query.length >= MAX_QUERY_LENGTH}
     onclick={() => (searchAttributeValue = '')}
     class="text-nowrap"
+    size="xs"
   >
-    {#snippet leading()}
-      {#if !$filter.attribute}
-        <Icon name="add" />
-      {/if}
-    {/snippet}
-    {$filter.attribute || 'Search Attribute'}
+    Add Filter
   </MenuButton>
-  <Menu id="search-attribute-menu" keepOpen>
+  <Menu id="{id}-search-attribute-menu">
     <MenuItem
       class="p-0"
       hoverable={false}
       onclick={() => {
-        document.getElementById('filter-search')?.focus();
+        document.getElementById(`${id}-filter-search`)?.focus();
       }}
     >
       <Input
         label={translate('common.search')}
         labelHidden
-        id="filter-search"
+        id="{id}-filter-search"
         noBorder
         bind:value={searchAttributeValue}
         icon="search"
         placeholder={translate('common.search')}
-        class="w-full"
+        class="w-full min-w-[300px]"
       />
     </MenuItem>
     <hr class="border-subtle" />
 
-    {#each filteredOptions as { value, label, type }}
-      {@const disabled = isOptionDisabled(value, filters)}
+    {#each filteredOptions as { value, label, type } (value)}
       <MenuItem
         onclick={() => {
           handleNewQuery(value, type);
         }}
-        {disabled}
+        disabled={Boolean(statusAttribute) &&
+          value === statusAttribute &&
+          !!$filters.find((f) => f.attribute === statusAttribute)}
       >
-        {label}
+        <div>
+          <p class="leading-3">{label}</p>
+          <small class="text-secondary">{type}</small>
+        </div>
       </MenuItem>
     {:else}
       <MenuItem class="whitespace-nowrap" disabled
@@ -109,3 +155,13 @@
     {/each}
   </Menu>
 </MenuContainer>
+{#if $filters.length > 0}
+  <Button
+    variant="ghost"
+    size="xs"
+    on:click={clearAllFilters}
+    data-testid="clear-all-filters-button"
+  >
+    {translate('common.clear-all')}
+  </Button>
+{/if}

@@ -3,12 +3,16 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import { translate } from '$lib/i18n/translate';
   import NexusEndpoints from '$lib/pages/nexus-endpoints.svelte';
-  import { routeForNexusEndpoint } from '$lib/utilities/route-for';
+  import {
+    routeForNexusEndpoint,
+    routeForNexusEndpointCreate,
+  } from '$lib/utilities/route-for';
 
   import type { PageData } from '../$types';
 
@@ -19,6 +23,11 @@
 
 <PageTitle title={translate('nexus.endpoints')} url={page.url.href} />
 <NexusEndpoints {endpoints}>
+  {#snippet actions()}
+    <Button variant="primary" href={routeForNexusEndpointCreate()}>
+      {translate('nexus.create-endpoint')}
+    </Button>
+  {/snippet}
   {#snippet headers()}
     <TableHeaderRow>
       <th>Name</th>

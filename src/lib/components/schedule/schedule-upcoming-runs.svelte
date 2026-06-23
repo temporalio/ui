@@ -6,7 +6,7 @@
 
   import type { Timestamp as ITimestamp } from '$types';
 
-  export let futureRuns: ITimestamp[] = [];
+  let { futureRuns = [] }: { futureRuns?: ITimestamp[] } = $props();
 </script>
 
 <Panel class="w-full">

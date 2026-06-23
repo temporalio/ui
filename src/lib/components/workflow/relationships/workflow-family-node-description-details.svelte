@@ -6,24 +6,39 @@
   import { translate } from '$lib/i18n/translate';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { routeForTimeline } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import { showFullTree } from '../workflow-relationships.svelte';
 
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let isRootWorkflow = false;
-  export let isActive = false;
-  export let children = 0;
-  export let expanded = false;
+  type Props = {
+    workflow: WorkflowExecution;
+    namespace: string;
+    isRootWorkflow?: boolean;
+    isActive?: boolean;
+    childrenCount?: number;
+    expanded?: boolean;
+  };
 
-  $: elapsedTime = formatDistanceAbbreviated({
-    start: workflow?.startTime,
-    end: workflow?.endTime || Date.now(),
-    includeMilliseconds: true,
-  });
+  let {
+    workflow,
+    namespace,
+    isRootWorkflow = false,
+    isActive = false,
+    childrenCount = 0,
+    expanded = false,
+  }: Props = $props();
 
-  $: showExpandIcon = !isRootWorkflow && $showFullTree && children;
+  const elapsedTime = $derived(
+    formatDistanceAbbreviated({
+      start: workflow?.startTime,
+      end: workflow?.endTime || Date.now(),
+      includeMilliseconds: true,
+    }),
+  );
+
+  const showExpandIcon = $derived(
+    !isRootWorkflow && $showFullTree && childrenCount,
+  );
 </script>
 
 <div
@@ -46,7 +61,7 @@
         <p class="text-xs">{translate('common.id')}</p>
       {/if}
       <Link
-        href={routeForTimeline({
+        href={routeForWorkflow({
           namespace,
           workflow: workflow.id,
           run: workflow.runId,
@@ -62,7 +77,7 @@
           <p class="text-xs">{translate('common.child-count')}</p>
         {/if}
         <div class="flex basis-16 items-center gap-1 leading-4 lg:justify-end">
-          <span class="font-mono">{children}</span>
+          <span class="font-mono">{childrenCount}</span>
         </div>
       </div>
     {/if}

@@ -13,8 +13,12 @@
   } from '$lib/types/batch';
   import { routeForBatchOperation } from '$lib/utilities/route-for';
 
-  export let namespace: string;
-  export let operations: BatchOperationInfo[];
+  interface Props {
+    namespace: string;
+    operations: BatchOperationInfo[];
+  }
+
+  let { namespace, operations }: Props = $props();
 
   const jobStateToBadgeType: Record<BatchOperationState, BadgeType> = {
     Completed: 'success',
@@ -29,10 +33,14 @@
     {translate('batch.list-page-title')}
   </caption>
   <TableHeaderRow slot="headers">
-    <th class="w-28">{translate('common.status')}</th>
-    <th class="w-auto">{translate('common.job-id')}</th>
-    <th class="max-sm:hidden lg:w-56">{translate('common.start-time')}</th>
-    <th class="max-sm:hidden lg:w-56">{translate('common.close-time')}</th>
+    <th scope="col" class="w-28">{translate('common.status')}</th>
+    <th scope="col" class="w-auto">{translate('common.job-id')}</th>
+    <th scope="col" class="max-sm:hidden lg:w-56"
+      >{translate('common.start-time')}</th
+    >
+    <th scope="col" class="max-sm:hidden lg:w-56"
+      >{translate('common.close-time')}</th
+    >
   </TableHeaderRow>
   {#each operations as { state, jobId, startTime, closeTime }}
     <TableRow>

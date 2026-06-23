@@ -1,8 +1,20 @@
 <script lang="ts">
-  export let title = '';
+  import type { SVGAttributes } from 'svelte/elements';
 
-  export let width = 16;
-  export let height = 16;
+  interface Props extends SVGAttributes<SVGSVGElement> {
+    title?: string;
+    width?: number;
+    height?: number;
+  }
+
+  let {
+    title = '',
+    width = 16,
+    height = 16,
+    class: className = '',
+    children,
+    ...rest
+  }: Props = $props();
 </script>
 
 <svg
@@ -11,11 +23,11 @@
   viewBox="0 0 24 24"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
-  class={$$props.class}
+  class={className}
   role="img"
   aria-hidden={!title}
-  {...$$restProps}
+  {...rest}
 >
   <title>{title}</title>
-  <slot />
+  {@render children?.()}
 </svg>

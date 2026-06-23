@@ -5,7 +5,11 @@ import {
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
 
-import { encodePayloads, getSinglePayload } from './encode-payload';
+import {
+  encodePayloads,
+  getSinglePayload,
+  isBase64EncodedPayload,
+} from './encode-payload';
 
 describe('getSinglePayload', () => {
   it('should return single payload from single payload', () => {
@@ -29,7 +33,64 @@ describe('getSinglePayload', () => {
   });
 });
 
+describe('isBase64EncodedPayload', () => {
+  it('should return true for a base64-encoded payload', () => {
+    expect(
+      isBase64EncodedPayload({
+        metadata: { encoding: 'anNvbi9wbGFpbg==' },
+        data: 'eyJmb28iOiJiYXIifQ==',
+      }),
+    ).toBe(true);
+  });
+
+  it('should return true for a binary/null encoded payload', () => {
+    expect(
+      isBase64EncodedPayload({
+        metadata: { encoding: 'YmluYXJ5L251bGw=' },
+        data: '',
+      }),
+    ).toBe(true);
+  });
+
+  it('should return false for a decoded payload', () => {
+    expect(
+      isBase64EncodedPayload({
+        metadata: { encoding: 'json/plain' },
+        data: { foo: 'bar' },
+      }),
+    ).toBe(false);
+  });
+
+  it('should return false for a raw string value', () => {
+    expect(isBase64EncodedPayload('hello')).toBe(false);
+  });
+
+  it('should return false for a raw object value', () => {
+    expect(isBase64EncodedPayload({ foo: 'bar' })).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isBase64EncodedPayload(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isBase64EncodedPayload(undefined)).toBe(false);
+  });
+});
+
 describe('encodePayloads', () => {
+  it('should return already-encoded payload as-is', async () => {
+    const alreadyEncoded = {
+      metadata: { encoding: 'anNvbi9wbGFpbg==' },
+      data: 'eyJmb28iOiJiYXIifQ==',
+    };
+    const payload = await encodePayloads({
+      input: stringifyWithBigInt(alreadyEncoded),
+      encoding: 'json/plain',
+    });
+    expect(payload).toEqual([alreadyEncoded]);
+  });
+
   it('should encode single simple string payload', async () => {
     const payload = await encodePayloads({
       input: stringifyWithBigInt('cats'),

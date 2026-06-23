@@ -5,18 +5,38 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let placeholder = `${translate('common.search')}…`;
-  export let label = translate('common.search');
-  export let value = '';
-  export let name = 'query';
-  export let icon = false;
-  export let id = kebabCase(`${label}-${name}`);
+  interface Props {
+    placeholder?: string;
+    label?: string;
+    value?: string;
+    name?: string;
+    icon?: boolean;
+    id?: string;
+    'data-testid'?: string;
+    oninput?: (e: Event) => void;
+    onsubmit?: (e: SubmitEvent) => void;
+  }
 
-  let testId = $$props['data-testid'] || id;
+  let {
+    placeholder = `${translate('common.search')}…`,
+    label = translate('common.search'),
+    value = $bindable(''),
+    name = 'query',
+    icon = false,
+    id = kebabCase(`${label}-${name}`),
+    'data-testid': dataTestId,
+    oninput,
+    onsubmit,
+  }: Props = $props();
+
+  const testId = $derived(dataTestId || id);
 </script>
 
 <form
-  on:submit|preventDefault
+  onsubmit={(e) => {
+    e.preventDefault();
+    onsubmit?.(e);
+  }}
   role="search"
   class="flex items-center"
   data-testid={`${testId}-form`}
@@ -32,10 +52,12 @@
     {value}
     {placeholder}
     data-testid={`${testId}-input`}
-    on:input
+    {oninput}
   >
-    <Button slot="after-input" type="submit" data-testid={`${testId}-button`}>
-      {label}
-    </Button>
+    {#snippet afterInput()}
+      <Button type="submit" data-testid={`${testId}-button`}>
+        {label}
+      </Button>
+    {/snippet}
   </Input>
 </form>

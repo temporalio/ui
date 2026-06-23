@@ -1,33 +1,83 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
-  import { twMerge as merge } from 'tailwind-merge';
+  import type { Snippet } from 'svelte';
+  import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import { beforeNavigate } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { translate } from '$lib/i18n/translate';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import type { NamespaceListItem, NavLinkListItem } from '$lib/types/global';
+  import type { NamespaceListItem } from '$lib/types/global';
   import { routeForNamespace } from '$lib/utilities/route-for';
   import ziggy from '$lib/vendor/ziggy-full-face.png';
 
-  import BottomNavLinks from './bottom-nav-links.svelte';
   import BottomNavNamespaces from './bottom-nav-namespaces.svelte';
   import BottomNavSettings from './bottom-nav-settings.svelte';
 
-  export let namespaceList: NamespaceListItem[] | undefined = [];
-  export let linkList: NavLinkListItem[];
-  export let isCloud = false;
-  export let showNamespacePicker = true;
+  interface Props {
+    namespaceList?: NamespaceListItem[];
+    linksSnippet: Snippet;
+    isCloud?: boolean;
+    showNamespacePicker?: boolean;
+    children?: Snippet;
+    nsPicker?: Snippet<
+      [
+        {
+          open: boolean;
+          closeMenu: () => void;
+        },
+      ]
+    >;
+    centerButton?: Snippet<
+      [
+        {
+          open: boolean;
+          onClick: () => void;
+        },
+      ]
+    >;
+    menuButton?: Snippet<
+      [
+        {
+          open: boolean;
+          onClick: () => void;
+        },
+      ]
+    >;
+    linksContent?: Snippet<
+      [
+        {
+          open: boolean;
+          closeMenu: () => void;
+        },
+      ]
+    >;
+    profilePicture?: Snippet;
+    class?: ClassNameValue;
+  }
 
-  let viewLinks = false;
-  let viewNamespaces = writable(false);
-  let viewSettings = false;
+  let {
+    namespaceList = [],
+    linksSnippet,
+    isCloud = false,
+    showNamespacePicker = true,
+    children,
+    nsPicker,
+    centerButton,
+    menuButton,
+    linksContent,
+    profilePicture,
+    class: className = '',
+  }: Props = $props();
+
+  let viewLinks = $state(false);
+  let viewNamespaces = $state(false);
+  let viewSettings = $state(false);
 
   function escapeHandler(e: KeyboardEvent) {
     if (
@@ -42,36 +92,38 @@
     closeMenu();
   });
 
-  $: namespace = $page.params.namespace || $lastUsedNamespace;
-  $: namespaceExists = namespaceList.some(
-    (namespaceListItem) => namespaceListItem.namespace === namespace,
+  const namespace = $derived(page.params.namespace || $lastUsedNamespace);
+  const namespaceExists = $derived(
+    namespaceList.some(
+      (namespaceListItem) => namespaceListItem.namespace === namespace,
+    ),
   );
 
   const onLinksClick = () => {
     viewLinks = !viewLinks;
-    $viewNamespaces = false;
+    viewNamespaces = false;
     viewSettings = false;
   };
 
   const onNamespaceClick = () => {
     viewLinks = false;
-    $viewNamespaces = !$viewNamespaces;
+    viewNamespaces = !viewNamespaces;
     viewSettings = false;
   };
 
   const onSettingsClick = () => {
     viewLinks = false;
-    $viewNamespaces = false;
+    viewNamespaces = false;
     viewSettings = !viewSettings;
   };
 
   function closeMenu() {
     viewLinks = false;
-    $viewNamespaces = false;
+    viewNamespaces = false;
     viewSettings = false;
   }
 
-  $: menuIsOpen = viewLinks || $viewNamespaces || viewSettings;
+  const menuIsOpen = $derived(viewLinks || viewNamespaces || viewSettings);
 
   const truncateNamespace = (namespace: string) => {
     if (namespace.length > 16) {
@@ -81,7 +133,7 @@
   };
 </script>
 
-<svelte:window on:keypress={escapeHandler} />
+<svelte:window onkeydown={escapeHandler} />
 
 {#if menuIsOpen}
   <div
@@ -96,12 +148,20 @@
     in:slide={{ duration: 200, delay: 0 }}
     out:slide={{ duration: 200, delay: 0 }}
   >
-    <BottomNavLinks open={viewLinks} {linkList} />
-    <slot name="nsPicker" open={$viewNamespaces} {closeMenu}>
-      <BottomNavNamespaces open={$viewNamespaces} {namespaceList} />
-    </slot>
+    {#if linksContent}
+      {@render linksContent({ open: viewLinks, closeMenu })}
+    {:else if viewLinks}
+      <div class="flex flex-col gap-6 px-4 py-8">
+        {@render linksSnippet?.()}
+      </div>
+    {/if}
+    {#if nsPicker}
+      {@render nsPicker({ open: viewNamespaces, closeMenu })}
+    {:else}
+      <BottomNavNamespaces open={viewNamespaces} {namespaceList} />
+    {/if}
     <BottomNavSettings open={viewSettings}>
-      <slot />
+      {@render children?.()}
     </BottomNavSettings>
   </div>
 {/if}
@@ -112,49 +172,61 @@
     isCloud
       ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 text-off-white focus-visible:[&_a]:ring-success focus-visible:[&_button]:ring-success'
       : 'surface-black border-t border-subtle',
+    className,
   )}
   data-testid="top-nav"
   aria-label={translate('common.main')}
 >
-  <button
-    class="nav-button relative"
-    data-testid="nav-menu-button"
-    class:active-shadow={viewLinks}
-    type="button"
-    on:click={onLinksClick}
-  >
-    {#if viewLinks}
-      <Icon name="close" height={32} width={32} />
-    {:else}
-      <Logo height={32} width={32} />
-    {/if}
-  </button>
+  {#if menuButton}
+    {@render menuButton({ open: viewLinks, onClick: onLinksClick })}
+  {:else}
+    <button
+      class="nav-button relative"
+      data-testid="nav-menu-button"
+      class:active-shadow={viewLinks}
+      type="button"
+      onclick={onLinksClick}
+    >
+      {#if viewLinks}
+        <Icon name="close" height={32} width={32} />
+      {:else}
+        <Logo height={32} width={32} />
+      {/if}
+    </button>
+  {/if}
   {#if showNamespacePicker}
-    <div class="namespace-wrapper">
-      <Button
-        variant="ghost"
-        data-testid="namespace-switcher"
-        leadingIcon="namespace-switcher"
-        size="xs"
-        class="grow text-white"
-        on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
-      >
-      <div class="ml-1 h-full w-1 border-l border-subtle"></div>
-      <Button
-        variant="ghost"
-        size="xs"
-        href={routeForNamespace({ namespace })}
-        disabled={!namespaceExists}
-        ><Icon class="text-white" name="external-link" /></Button
-      >
-    </div>
+    {#if centerButton}
+      {@render centerButton({
+        open: viewNamespaces,
+        onClick: onNamespaceClick,
+      })}
+    {:else}
+      <div class="namespace-wrapper">
+        <Button
+          variant="ghost"
+          data-testid="namespace-switcher"
+          leadingIcon="namespace-switcher"
+          size="xs"
+          class="grow text-white"
+          on:click={onNamespaceClick}>{truncateNamespace(namespace)}</Button
+        >
+        <div class="ml-1 h-full w-1 border-l border-subtle"></div>
+        <Button
+          variant="ghost"
+          size="xs"
+          href={routeForNamespace({ namespace })}
+          disabled={!namespaceExists}
+          ><Icon class="text-white" name="external-link" /></Button
+        >
+      </div>
+    {/if}
   {/if}
   <button
     class="nav-button"
     data-testid="nav-profile-button"
     class:active-shadow={viewSettings}
     type="button"
-    on:click={onSettingsClick}
+    onclick={onSettingsClick}
   >
     {#if viewSettings}
       <Icon name="close" height={32} width={32} />
@@ -162,13 +234,15 @@
       <div
         class="flex aspect-square w-[32px] min-w-[32px] items-center justify-center"
       >
-        <slot name="profile-picture">
+        {#if profilePicture}
+          {@render profilePicture()}
+        {:else}
           <img
             src={ziggy}
             alt={translate('common.user-profile')}
             class="h-[32px] w-[32px]"
           />
-        </slot>
+        {/if}
       </div>
     {/if}
   </button>

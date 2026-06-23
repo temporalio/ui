@@ -4,10 +4,12 @@
 
   import { page } from '$app/state';
 
+  import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -20,9 +22,9 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { getGroupLLMMetadata } from '$lib/models/event-history/get-event-llm-metadata';
   import { isCloud } from '$lib/stores/advanced-visibility';
-  import { authUser } from '$lib/stores/auth-user';
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
+  import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -44,7 +46,6 @@
   import EventDetailsFull from './event-details-full.svelte';
   import EventDetailsRow from './event-details-row.svelte';
   import EventLink from './event-link.svelte';
-  import MetadataDecoder from './metadata-decoder.svelte';
 
   interface Props {
     event: IterableEvent;
@@ -99,9 +100,8 @@
 
   const duration = $derived(
     isEventGroup(event)
-      ? formatDistanceAbbreviated({
-          start: event.initialEvent?.eventTime,
-          end: event.lastEvent?.eventTime,
+      ? formatEventGroupDuration({
+          group: event,
           includeMillisecondsForUnderSecond: true,
         })
       : '',
@@ -113,7 +113,11 @@
 
   const displayName = $derived(
     isEventGroup(event)
-      ? event.label
+      ? event.pendingActivity
+        ? translate('workflows.pending-activity')
+        : event.pendingNexusOperation
+          ? translate('workflows.pending-nexus-operation')
+          : event.label
       : isLocalActivityMarkerEvent(event)
         ? translate('events.category.local-activity')
         : spaceBetweenCapitalLetters(event.name),
@@ -169,11 +173,14 @@
     $timestamp(currentEvent?.eventTime, { format: 'short' }),
   );
 
-  const onLinkClick = (event) => {
+  const onLinkClick = (event?) => {
     expanded = !expanded;
-    event.stopPropagation();
+    event?.stopPropagation?.();
     onRowClick();
   };
+
+  const detailsId = $derived(`event-details-${event.id}-${index}`);
+
   const handleMouseEnter = () => {
     hoveredEventId = event.id;
   };
@@ -187,23 +194,31 @@
 
   onMount(async () => {
     if (isLocalActivityMarkerEvent(event)) {
-      primaryLocalAttribute = await decodeLocalActivity(event, {
-        namespace: page.params.namespace,
-        settings: page.data.settings,
-        accessToken: $authUser.accessToken,
-      });
+      primaryLocalAttribute = await decodeLocalActivity(event);
     } else if (
       isEventGroup(event) &&
       isLocalActivityMarkerEvent(event.initialEvent)
     ) {
-      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent, {
-        namespace: page.params.namespace,
-        settings: page.data.settings,
-        accessToken: $authUser.accessToken,
-      });
+      primaryLocalAttribute = await decodeLocalActivity(event.initialEvent);
     }
   });
 </script>
+
+{#snippet expandButton()}
+  <IconButton
+    icon={expanded ? 'chevron-up' : 'chevron-down'}
+    label={expanded
+      ? translate('events.collapse-details')
+      : translate('events.expand-details')}
+    aria-expanded={expanded}
+    aria-controls={expanded ? detailsId : undefined}
+    class="h-6 w-6"
+    on:click={(e) => {
+      e.stopPropagation();
+      onLinkClick(e);
+    }}
+  />
+{/snippet}
 
 <tr
   class={merge(
@@ -222,23 +237,33 @@
 >
   {#if isEventGroup(event)}
     <td class="font-mono">
-      <Link
-        data-testid="link"
-        href={routeForEventHistoryEvent({
-          eventId: event.initialEvent?.id || event.id,
-          namespace,
-          workflow,
-          run,
-        })}
-      >
-        {event.initialEvent?.id || event.id}
-      </Link>
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <div class="flex items-center gap-0.5">
+          {#each event.eventList as groupEvent}
+            <Link
+              data-testid="link"
+              href={routeForEventHistoryEvent({
+                eventId: groupEvent.id,
+                namespace,
+                workflow,
+                run,
+              })}
+            >
+              {groupEvent.id}
+            </Link>
+          {/each}
+        </div>
+      </div>
     </td>
   {:else}
     <td class="font-mono">
-      <Link data-testid="link" {href}>
-        {event.id}
-      </Link>
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <Link data-testid="link" {href}>
+          {event.id}
+        </Link>
+      </div>
     </td>
   {/if}
   <td class="truncate">
@@ -246,7 +271,10 @@
       <Icon
         name={CategoryIcon[event.category].name}
         title={CategoryIcon[event.category].title}
-        class="mr-1 inline"
+        class={merge(
+          'mr-1 inline',
+          isEventGroup(event) && event.isPending && 'animate-pulse',
+        )}
       />
       {displayName}
     </p>
@@ -302,7 +330,6 @@
         </Badge>
       {/if}
       {#if llmMetadata}
-        <!-- Clean LLM row: model + tokens + cost + extras -->
         {#if nonPendingActivityAttempt && nonPendingActivityAttempt > 1}
           <Badge type="warning" class="shrink-0 gap-1 px-1.5">
             Attempt {nonPendingActivityAttempt}
@@ -344,28 +371,19 @@
           {/each}
         {/if}
       {:else}
-        {#if !primaryLocalAttribute && primaryAttribute?.key && primaryAttribute.key !== 'activityType'}
+        {#if !primaryLocalAttribute && primaryAttribute?.key}
           <EventDetailsRow {...primaryAttribute} {attributes} />
         {/if}
-        {#if primaryLocalAttribute && primaryLocalAttribute.key && primaryLocalAttribute.key !== 'activityType'}
+        {#if primaryLocalAttribute && primaryLocalAttribute.key}
           <EventDetailsRow {...primaryLocalAttribute} {attributes} />
         {/if}
         {#if currentEvent?.userMetadata?.summary}
-          <MetadataDecoder
-            value={currentEvent.userMetadata.summary}
-            let:decodedValue
+          <div
+            class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
           >
-            {#if decodedValue}
-              <div
-                class="flex max-w-xl items-center gap-2 first:pt-0 last:border-b-0 md:w-auto"
-              >
-                <p class="whitespace-nowrap text-right text-xs">Summary</p>
-                <Badge type="secondary" class="block select-none truncate">
-                  {decodedValue}
-                </Badge>
-              </div>
-            {/if}
-          </MetadataDecoder>
+            <p class="whitespace-nowrap text-right text-xs">Summary</p>
+            <PayloadSummary value={currentEvent.userMetadata.summary} />
+          </div>
         {/if}
         {#if currentEvent?.links?.length}
           <EventLink
@@ -374,10 +392,12 @@
             linkClass="truncate"
           />
         {/if}
-        {#if nonPendingActivityAttempt && nonPendingActivityAttempt > 1}
-          <Badge type="warning" class="shrink-0 gap-1 px-1.5">
-            Attempt {nonPendingActivityAttempt}
-          </Badge>
+        {#if nonPendingActivityAttempt}
+          <EventDetailsRow
+            key="attempt"
+            value={nonPendingActivityAttempt.toString()}
+            {attributes}
+          />
         {/if}
         {#if showSecondaryAttribute}
           <EventDetailsRow {...secondaryAttribute} {attributes} />
@@ -410,6 +430,7 @@
 </tr>
 {#if expanded}
   <tr
+    id={detailsId}
     class="w-full text-sm no-underline"
     data-testid="event-summary-row-expanded"
   >

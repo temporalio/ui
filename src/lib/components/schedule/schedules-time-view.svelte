@@ -3,14 +3,23 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  export let hour = '';
-  export let minute = '';
-  export let timezoneName: string;
+  interface Props {
+    hour?: string;
+    minute?: string;
+    timezoneName: string;
+  }
 
-  $: timezoneHint =
+  let {
+    hour = $bindable(''),
+    minute = $bindable(''),
+    timezoneName,
+  }: Props = $props();
+
+  const timezoneHint = $derived(
     timezoneName.toLowerCase() === 'utc'
       ? 'Universal Standard Time (UTC)'
-      : timezoneName;
+      : timezoneName,
+  );
 </script>
 
 <div class="flex flex-col gap-4">
