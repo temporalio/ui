@@ -79,6 +79,11 @@ let _cachedPoolTopNoWFT = -1;
 // Accumulated WFT IDs for marker billable-action dedup (ascending cursor only)
 const processedWorkflowTaskIds = new Set<string>();
 
+// Solo events that don't form groups (e.g. WorkflowExecutionStarted/Completed).
+// Kept separately so getEventArray() can return a complete flat event list.
+const soloEvents: WorkflowEvent[] = [];
+const soloEventIds = new Set<string>();
+
 // ---------------------------------------------------------------------------
 // Live-event state (separate from pre-allocated initial buffer)
 // New events for running workflows are appended here — no reset of eventSlots.
@@ -86,6 +91,9 @@ const processedWorkflowTaskIds = new Set<string>();
 
 const liveGroups: EventGroup[] = [];
 const liveGroupListeners: LatestGroupListener[] = [];
+// Tracks event IDs already seen by appendLiveEvent to prevent duplicates when
+// live polling re-sends events that overlap with the initial fetch or prior polls.
+const liveSeenIds = new Set<string>();
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -290,6 +298,9 @@ export function reset(historyLength: number): void {
   latestGroupListeners.length = 0;
   liveGroups.length = 0;
   liveGroupListeners.length = 0;
+  soloEvents.length = 0;
+  soloEventIds.clear();
+  liveSeenIds.clear();
   _cachedGroups = null;
   _cachedPoolTop = -1;
   _cachedGroupsNoWFT = null;
@@ -353,8 +364,11 @@ export function processEvent(
     createWorkflowTaskGroup(event as CommonHistoryEvent);
 
   if (!group) {
-    // Solo event: discard any orphaned pending followers
     pendingFollowers.delete(slotIdx);
+    if (!soloEventIds.has(event.id)) {
+      soloEvents.push(event);
+      soloEventIds.add(event.id);
+    }
     eventSlots[slotIdx] = null;
     return null;
   }
@@ -757,6 +771,8 @@ export function getEventArray(): WorkflowEvent[] {
   for (const g of liveGroups) {
     for (const ev of g.eventList) result.push(ev);
   }
+  for (const ev of soloEvents) result.push(ev);
+  result.sort((a, b) => parseInt(a.id) - parseInt(b.id));
   return result;
 }
 
@@ -771,6 +787,14 @@ export function getEventArray(): WorkflowEvent[] {
  * Does NOT call growArrays or touch eventSlots.
  */
 export function appendLiveEvent(raw: HistoryEvent): void {
+  if (liveSeenIds.has(raw.eventId)) return;
+  liveSeenIds.add(raw.eventId);
+
+  // If this event was already processed into groupPool during the initial fetch,
+  // skip it — otherwise getEventArray() would return it from both groupPool and liveGroups.
+  const slotIdx = parseInt(raw.eventId) - 1;
+  if (slotIdx < eventToGroup.length && eventToGroup[slotIdx] !== 0) return;
+
   const event = toWorkflowEvent(raw, true);
   const gid = getGroupId(event as CommonHistoryEvent);
   const isHead = gid === event.id;
@@ -791,7 +815,13 @@ export function appendLiveEvent(raw: HistoryEvent): void {
   const group =
     createEventGroup(event as CommonHistoryEvent) ??
     createWorkflowTaskGroup(event as CommonHistoryEvent);
-  if (!group) return;
+  if (!group) {
+    if (!soloEventIds.has(event.id)) {
+      soloEvents.push(event);
+      soloEventIds.add(event.id);
+    }
+    return;
+  }
 
   liveGroups.push(group);
   for (const cb of liveGroupListeners) cb(group);
@@ -819,4 +849,5 @@ export function onLiveGroup(cb: LatestGroupListener): () => void {
 export function resetLive(): void {
   liveGroups.length = 0;
   liveGroupListeners.length = 0;
+  liveSeenIds.clear();
 }

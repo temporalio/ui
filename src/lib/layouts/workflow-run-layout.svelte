@@ -13,13 +13,13 @@
   import SkeletonWorkflow from '$lib/holocene/skeleton/workflow.svelte';
   import { translate } from '$lib/i18n/translate';
   import WorkflowHeader from '$lib/layouts/workflow-header.svelte';
-  import { toEvent } from '$lib/models/event-history';
   import { throttleRefresh } from '$lib/services/events-service';
   import type { PauseHandle } from '$lib/services/fetch-bidirectional';
   import { fetchBidirectional } from '$lib/services/fetch-bidirectional';
   import {
     appendLiveEvent,
     enrichGroups,
+    getEventArray,
     processEvent,
     reset as resetBuffer,
   } from '$lib/services/grouped-event-buffer';
@@ -29,6 +29,7 @@
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import {
+    bufferVersion,
     currentEventHistory,
     fullEventHistory,
     pauseLiveUpdates,
@@ -63,7 +64,10 @@
   let workflowId = $derived(page.params.workflow);
   let runId = $derived(page.params.run);
   let showJson = $derived(page.url.searchParams.has('json'));
-  let fullJson = $derived({ ...$workflowRun, eventHistory: $fullEventHistory });
+  let fullJson = $derived.by(() => {
+    $bufferVersion;
+    return { ...$workflowRun, eventHistory: getEventArray() };
+  });
 
   let workflowError: NetworkError | null = $state(null);
   let workflowRunController: AbortController;
@@ -172,10 +176,7 @@
             if (id >= nextEventId) nextEventId = id + 1;
             latestEventId = id;
           }
-          const processed = events.map((e) => toEvent(e)).filter(Boolean);
-          if (processed.length) {
-            fullEventHistory.update((curr) => [...curr, ...processed]);
-          }
+          if (events.length) bufferVersion.update((v) => v + 1);
           if (!response.nextPageToken) {
             await new Promise((r) => setTimeout(r, 2000));
           }
@@ -248,28 +249,13 @@
           _pauseHandle = handle;
         }
       },
-      onFirstDescPage: (descFirst) => {
-        if (!descFirst.length) return;
-        const processed = descFirst.map((e) => toEvent(e)).filter(Boolean);
-        if (processed.length) {
-          fullEventHistory.update((curr) =>
-            curr.length ? [...curr, ...processed] : processed,
-          );
-          currentEventHistory.set(processed);
-        }
-      },
       onRawPage: (events, isAscending) => {
         for (const event of events) {
           processEvent(event, isAscending);
           const id = parseInt(event.eventId);
           if (id > latestEventId) latestEventId = id;
         }
-        const processed = events.map((e) => toEvent(e)).filter(Boolean);
-        if (processed.length && isAscending) {
-          fullEventHistory.update((curr) =>
-            curr.length ? [...curr, ...processed] : processed,
-          );
-        }
+        if (events.length) bufferVersion.update((v) => v + 1);
       },
     })
       .then(() => {
@@ -278,7 +264,7 @@
           $workflowRun.workflow?.pendingNexusOperations ?? [],
         );
         fetchComplete = true;
-        $currentEventHistory = $fullEventHistory;
+        bufferVersion.update((v) => v + 1);
 
         if (workflow.isRunning) {
           startLivePoll(ns, wfId, rId, latestEventId);
@@ -319,10 +305,21 @@
     livePollingController = null;
   };
 
+  $effect(() => {
+    $bufferVersion;
+    untrack(() => {
+      const events = getEventArray();
+      $fullEventHistory = events;
+      if (!$pauseLiveUpdates) $currentEventHistory = events;
+    });
+  });
+
   const clearWorkflowData = () => {
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $fullEventHistory = [];
+    $currentEventHistory = [];
+    $bufferVersion = 0;
     workflowError = null;
     fetchComplete = false;
     latestEventId = 0;
@@ -358,12 +355,6 @@
     untrack(() => {
       getOnlyWorkflowWithPendingActivities(refreshValue, pause);
     });
-  });
-
-  $effect(() => {
-    if (!$pauseLiveUpdates) {
-      $currentEventHistory = $fullEventHistory;
-    }
   });
 
   onMount(() => {

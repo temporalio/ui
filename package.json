@@ -67,6 +67,7 @@
     "stylelint:fix": "stylelint --fix \"src/**/*.{css,postcss,svelte}\"",
     "generate:locales": "esno scripts/generate-locales.ts",
     "run-workflows": "esno scripts/run-workflows.ts",
+    "run-workflows:long-running": "esno scripts/start-long-running.ts",
     "audit:tailwind": "esno scripts/audit-tailwind-colors",
     "audit:holocene-props": "esno scripts/generate-holocene-props.ts",
     "validate:versions": "./scripts/validate-versions.sh",
