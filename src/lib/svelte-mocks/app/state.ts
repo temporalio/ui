@@ -15,6 +15,7 @@ const settings: Settings = {
   defaultNamespace: 'default',
   disableWriteActions: false,
   showTemporalSystemNamespace: false,
+  navCollapsedByDefault: false,
   batchActionsDisabled: false,
   workflowResetDisabled: false,
   workflowPauseDisabled: false,

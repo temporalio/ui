@@ -30,6 +30,7 @@ const defaultSettings = {
   HideWorkflowQueryErrors: false,
   RefreshWorkflowCountsDisabled: false,
   ActivityCommandsDisabled: false,
+  NavCollapsedByDefault: false,
 };
 
 export const mockSettingsApi = async (

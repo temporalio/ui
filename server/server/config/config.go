@@ -46,6 +46,8 @@ type (
 		FeedbackURL         string `yaml:"feedbackUrl"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
+		// Collapse the left navigation and saved views navigation by default
+		NavCollapsedByDefault bool `yaml:"navCollapsedByDefault"`
 		// How often to reload the config
 		RefreshInterval     time.Duration `yaml:"refreshInterval"`
 		Codec               Codec         `yaml:"codec"`
