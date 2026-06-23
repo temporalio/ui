@@ -72,6 +72,9 @@ const latestGroupListeners: LatestGroupListener[] = [];
 // stable (i.e. after fetch completes).
 let _cachedGroups: EventGroup[] | null = null;
 let _cachedPoolTop = -1;
+// Separate cache for the WFT-excluded variant (used by the timeline).
+let _cachedGroupsNoWFT: EventGroup[] | null = null;
+let _cachedPoolTopNoWFT = -1;
 
 // Accumulated WFT IDs for marker billable-action dedup (ascending cursor only)
 const processedWorkflowTaskIds = new Set<string>();
@@ -199,6 +202,13 @@ function toWorkflowEvent(
   });
 }
 
+function insertEventById(list: WorkflowEvent[], event: WorkflowEvent): void {
+  const id = Number(event.id);
+  let i = list.length;
+  while (i > 0 && Number(list[i - 1].id) > id) i--;
+  list.splice(i, 0, event);
+}
+
 function growArrays(newSize: number): void {
   if (newSize <= eventSlots.length) return;
   eventSlots.length = newSize;
@@ -213,7 +223,7 @@ function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
   if (!raw || !meta.group) return;
 
   const event = toWorkflowEvent(raw, false);
-  meta.group.eventList.push(event);
+  insertEventById(meta.group.eventList, event);
   meta.group.timestamp = event.timestamp;
   addEventToGroup(meta.group, event);
 
@@ -282,6 +292,8 @@ export function reset(historyLength: number): void {
   liveGroupListeners.length = 0;
   _cachedGroups = null;
   _cachedPoolTop = -1;
+  _cachedGroupsNoWFT = null;
+  _cachedPoolTopNoWFT = -1;
 }
 
 /**
@@ -611,11 +623,16 @@ export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
  * layout already limits this to once per frame.  After the fetch completes,
  * poolTop is stable, so every subsequent call is O(1) with zero allocation.
  *
- * The cache is intentionally bypassed when opts.excludeWorkflowTasks is set
- * (used only by EventSummaryTable, not the hot scroll path).
+ * Both variants (all groups and WFT-excluded) are independently cached so
+ * the timeline can call with excludeWorkflowTasks:true on the hot path.
  */
 export function getGroupArray(opts?: GetRowsOptions): EventGroup[] {
-  if (!opts?.excludeWorkflowTasks) {
+  const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
+  if (excludeWFT) {
+    if (_cachedGroupsNoWFT !== null && _cachedPoolTopNoWFT === poolTop) {
+      return _cachedGroupsNoWFT;
+    }
+  } else {
     if (_cachedGroups !== null && _cachedPoolTop === poolTop) {
       return _cachedGroups;
     }
@@ -627,11 +644,14 @@ export function getGroupArray(opts?: GetRowsOptions): EventGroup[] {
   const result: EventGroup[] = [];
   for (const meta of metas) {
     if (!meta.group) continue;
-    if (opts?.excludeWorkflowTasks && isWorkflowTaskGroup(meta.group)) continue;
+    if (excludeWFT && isWorkflowTaskGroup(meta.group)) continue;
     result.push(meta.group);
   }
 
-  if (!opts?.excludeWorkflowTasks) {
+  if (excludeWFT) {
+    _cachedGroupsNoWFT = result;
+    _cachedPoolTopNoWFT = poolTop;
+  } else {
     _cachedGroups = result;
     _cachedPoolTop = poolTop;
   }
@@ -761,7 +781,7 @@ export function appendLiveEvent(raw: HistoryEvent): void {
       (g) => Number(g.initialEvent.id) === headId,
     );
     if (existing) {
-      existing.eventList.push(event);
+      insertEventById(existing.eventList, event);
       existing.timestamp = event.timestamp;
       addEventToGroup(existing, event);
     }

@@ -582,6 +582,27 @@ describe('activity group integrity', () => {
     expect(group.eventList.length).toBe(3);
   });
 
+  it('eventList is sorted by event ID when desc cursor delivers Completed before Started', async () => {
+    // Real-world scenario: descending cursor fetches events newest-first,
+    // so ActivityTaskCompleted (higher ID) arrives before ActivityTaskStarted
+    // (lower ID). insertEventById must keep the list in ascending ID order so
+    // that isMiddleEvent, isConsecutiveGroup, and the detail panel all see
+    // [Scheduled, Started, Completed] rather than [Scheduled, Completed, Started].
+    reset(10);
+    const [scheduled, started, completed] = makeActivityGroup(1);
+
+    processEvent(scheduled, true); // asc cursor: head arrives first
+    processEvent(completed, false); // desc cursor: Completed arrives before Started
+    processEvent(started, false); // desc cursor: Started arrives last despite lower ID
+
+    const [group] = await Promise.all(getRows(0, 1));
+    expect(group.eventList.map((e) => e.id)).toEqual([
+      String(scheduled.eventId),
+      String(started.eventId),
+      String(completed.eventId),
+    ]);
+  });
+
   it('multiple groups maintain correct event membership', async () => {
     reset(20);
     const group1Events = makeActivityGroup(1);

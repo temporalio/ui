@@ -97,10 +97,18 @@
   let timelineScrollY = $state(0);
 
   // Total pixel height for the spacer that extends the page scroll range.
-  // Matches TimelineConfig.height (24px) × group count so the outer scroll
-  // covers the full SVG coordinate space driven by the viewBox pan.
+  // spacer = timelineHeight − stickyHeight so that when scrollTop reaches its
+  // maximum the bottom axis line aligns with the bottom of the viewport.
+  // timelineHeight = (groups + 2) * ROW_PX (mirrors timeline-graph.svelte).
+  // stickyHeight is measured via bind:clientHeight on the sticky canvas div.
   const ROW_PX = 24;
-  const spacerHeight = $derived(groups.length * ROW_PX);
+  let stickyHeight = $state(0);
+  let graphPanelHeight = $state(0);
+  const spacerHeight = $derived(
+    Math.max((groups.length + 2) * ROW_PX, 120) -
+      stickyHeight +
+      graphPanelHeight,
+  );
 
   // Sentinel's layout position within the scroll container — measured once at
   // mount so the hot-path scroll handler uses only arithmetic (no
@@ -109,7 +117,7 @@
 
   onMount(() => {
     historyCtx.resume();
-    bufferGroups = getGroupArray();
+    bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
 
     scrollContainerEl = document.getElementById('content-wrapper');
 
@@ -174,7 +182,7 @@
           groupUpdatePending = true;
           requestAnimationFrame(() => {
             groupUpdatePending = false;
-            bufferGroups = getGroupArray();
+            bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
           });
         }
       });
@@ -192,7 +200,7 @@
         groupUpdatePending = true;
         requestAnimationFrame(() => {
           groupUpdatePending = false;
-          bufferGroups = getGroupArray();
+          bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
         });
       }
     });
@@ -205,7 +213,7 @@
         $workflowRun.workflow?.pendingActivities ?? [],
         $workflowRun.workflow?.pendingNexusOperations ?? [],
       );
-      bufferGroups = getGroupArray();
+      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
     }
   });
 </script>
@@ -281,6 +289,7 @@
 <div
   class="sticky -mx-4 overflow-hidden md:-mx-8"
   style="top: var(--top-nav-height, 3rem); height: calc(100dvh - var(--top-nav-height, 3rem));"
+  bind:clientHeight={stickyHeight}
 >
   {#if workflow}
     <TimelineGraph
@@ -292,6 +301,7 @@
       totalExpectedEvents={historyCtx.totalExpectedEvents}
       descMinId={historyCtx.descMinId}
       error={Boolean(workflowTaskFailedError)}
+      bind:panelHeight={graphPanelHeight}
     />
   {/if}
 </div>

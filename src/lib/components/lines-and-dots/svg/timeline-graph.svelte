@@ -39,6 +39,7 @@
     loading?: boolean;
     totalExpectedEvents?: number;
     descMinId?: number;
+    panelHeight?: number;
   }
 
   let {
@@ -54,12 +55,41 @@
     loading = false,
     totalExpectedEvents = 0,
     descMinId = 0,
+    panelHeight = $bindable(0),
   }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
 
   let canvasWidth = $state(0);
   const scrollY = $derived(scrollYProp ?? 0);
+
+  const AXIS_TICKS = 20;
+  const axisX1 = $derived(gutter - radius / 4);
+  const axisX2 = $derived(canvasWidth - gutter + radius / 4);
+  const tickDistance = $derived((axisX2 - axisX1) / AXIS_TICKS);
+
+  // CSS background string for the 19 dashed tick lines.
+  // Recomputes only on canvasWidth change (resize), never during scroll.
+  const gridBackgroundStyle = $derived.by(() => {
+    if (canvasWidth === 0 || tickDistance <= 0) return '';
+    const td = tickDistance;
+    const count = AXIS_TICKS - 1;
+    const images = Array.from(
+      { length: count },
+      () =>
+        'repeating-linear-gradient(to bottom, currentColor 0px, currentColor 2px, transparent 2px, transparent 4px)',
+    ).join(', ');
+    const sizes = Array.from({ length: count }, () => '1px 4px').join(', ');
+    const positions = Array.from(
+      { length: count },
+      (_, i) => `${(axisX1 + (i + 1) * td).toFixed(1)}px 0`,
+    ).join(', ');
+    const repeats = Array.from(
+      { length: count },
+      () => 'no-repeat repeat',
+    ).join(', ');
+    return `background-image:${images};background-size:${sizes};background-position:${positions};background-repeat:${repeats};`;
+  });
 
   // PERF: bind:clientWidth={canvasWidth} compiled to bind_element_size which reads
   // element.clientWidth inside a Svelte effect during every reactive flush (~150×
@@ -140,15 +170,12 @@
   });
 
   // Scroll-window virtualization: only the rows within OVERSCAN rows of the
-  // current viewport are mounted in the SVG DOM. The SVG viewBox pans to show
-  // the correct slice; this state controls which <g> elements exist.
+  // current viewport are mounted in the SVG DOM. The SVG viewBox handles
+  // per-frame visual panning; this derived controls which <g> elements exist.
   //
-  // OVERSCAN = 20 rows × 24 px = 480 px buffer per side.
-  //
-  // OVERSCAN: rows kept in the DOM above and below the visible viewport.
-  // With viewBox panning the SVG clips naturally to the visible area each frame;
-  // this buffer just ensures rows are mounted before they scroll into view.
-  const OVERSCAN = 20;
+  // OVERSCAN = 8 rows × 24 px = 192 px buffer per side. Rows are cheap
+  // (icon + text only, no long connector lines) so a small buffer is enough.
+  const OVERSCAN = 8;
 
   // O(1) closed-form inverse of getRowY for each of the two cursor segments.
   // Both segments are linear (y = m*i + b), so inverting is pure arithmetic.
@@ -206,50 +233,6 @@
     return s >= e ? [0, 0] : [s, e];
   }
 
-  // Window bounds: which slice of filteredGroups is currently mounted in the DOM.
-  // Plain (non-reactive) latches track the last-computed values so the effect
-  // only writes $state when the bounds actually change — avoiding spurious
-  // {#each} reconciliations on every scroll event.
-  let windowStart = $state(0);
-  let windowEnd = $state(0);
-  let prevWindowScrollY = 0;
-  let prevTotal = 0;
-  let prevVp = 0;
-
-  $effect(() => {
-    const s = scrollY; // reactive dep
-    const vp = effectiveViewportHeight; // reactive dep
-    const total = filteredGroups.length; // reactive dep
-
-    // Hysteresis: only recompute the DOM window when scroll has moved at least
-    // OVERSCAN/2 rows, new data arrived, or the viewport height changed.
-    // The viewBox handles per-frame visual panning; this effect only fires when
-    // the mounted row set actually needs to shift.
-    const scrolledFar =
-      Math.abs(s - prevWindowScrollY) >= (OVERSCAN / 2) * height;
-    const dataChanged = total !== prevTotal;
-    const vpChanged = vp !== prevVp;
-    if (!scrolledFar && !dataChanged && !vpChanged) return;
-
-    prevWindowScrollY = s;
-    prevTotal = total;
-    prevVp = vp;
-    const [ns, ne] = getWindowBounds(
-      s,
-      vp,
-      total,
-      height,
-      OVERSCAN,
-      reverseSort,
-      descStart,
-      pendingGroupCount,
-      totalForY,
-    );
-    if (ns !== windowStart) windowStart = ns;
-    if (ne !== windowEnd) windowEnd = ne;
-  });
-
-  const windowedGroups = $derived(filteredGroups.slice(windowStart, windowEnd));
   const firstStartTime = $derived.by(() => {
     const firstEventTime = $fullEventHistory[0]?.eventTime;
 
@@ -276,10 +259,6 @@
   const activeIdx = $derived(
     $activeGroups.length > 0 ? (groupIndexMap.get($activeGroups[0]) ?? -1) : -1,
   );
-
-  // PERF: Actual panel height from GroupDetailsRow's bind:offsetHeight reactive
-  // chain. Only used in the $effect below to stamp the transform value.
-  let panelHeight = $state(0);
 
   $effect(() => {
     if ($activeGroups.length === 0) panelHeight = 0;
@@ -352,6 +331,22 @@
     getTotalForY(filteredGroups.length, pendingGroupCount, descStart),
   );
 
+  const [windowStart, windowEnd] = $derived(
+    getWindowBounds(
+      scrollY,
+      effectiveViewportHeight,
+      filteredGroups.length,
+      height,
+      OVERSCAN,
+      reverseSort,
+      descStart,
+      pendingGroupCount,
+      totalForY,
+    ),
+  );
+
+  const windowedGroups = $derived(filteredGroups.slice(windowStart, windowEnd));
+
   const getY = $derived.by(
     () =>
       (i: number): number =>
@@ -375,6 +370,11 @@
     Math.max(height * (filteredGroups.length + pendingGroupCount + 2), 120) +
       panelHeight,
   );
+
+  // Border lines clipped to the overscan window — updated only at hysteresis
+  // rate (same cadence as row add/remove), never on every scroll frame.
+  const lineTop = $derived(windowStart * height);
+  const lineBottom = $derived(windowEnd * height);
 </script>
 
 <div
@@ -382,6 +382,10 @@
   class="relative h-full overflow-hidden border border-t-0 border-subtle bg-primary"
   bind:this={containerEl}
 >
+  <div
+    class="pointer-events-none absolute inset-0 opacity-30"
+    style={gridBackgroundStyle}
+  ></div>
   <EndTimeInterval
     {workflow}
     {startTime}
@@ -442,13 +446,13 @@
       -->
       <TimelineIconDefs />
       <Line
-        startPoint={[gutter, 0]}
-        endPoint={[gutter, timelineHeight]}
+        startPoint={[gutter, lineTop]}
+        endPoint={[gutter, lineBottom]}
         strokeWidth={radius / 2}
       />
       <Line
-        startPoint={[canvasWidth - gutter, 0]}
-        endPoint={[canvasWidth - gutter, timelineHeight]}
+        startPoint={[canvasWidth - gutter, lineTop]}
+        endPoint={[canvasWidth - gutter, lineBottom]}
         strokeWidth={radius / 2}
       />
       <TimelineAxis
@@ -487,9 +491,11 @@
         <g use:registerRow={group.id}>
           <!--
             PERF: Key on group.eventList.length so Svelte only re-renders
-            this row when new events are appended to the group.
+            this row when new events are appended to the group. Frozen to 0
+            during loading to prevent destroy+recreate on every streaming
+            batch — after loading, individual live-event arrivals are fine.
           -->
-          {#key group.eventList.length}
+          {#key loading ? 0 : group.eventList.length}
             <TimelineGraphRow
               {y}
               {group}
@@ -511,14 +517,14 @@
           radius,
         })}
         {@const rectH = pendingGroupCount * height + radius}
-        <foreignObject
+        <rect
           x={gutter}
           y={rectY}
           width={canvasWidth - gutter * 2}
           height={rectH}
-        >
-          <div class="skeleton-rows" style="height: 100%; width: 100%;"></div>
-        </foreignObject>
+          rx="4"
+          class="animate-pulse fill-slate-400/30"
+        />
       {/if}
 
       <!--

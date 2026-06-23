@@ -37,14 +37,6 @@
   {@const tickX = x1 + i * tickDistance}
   {@const tickY = timelineHeight + radius * 2}
   {#if i !== 0}
-    <Line
-      strokeWidth={0.5}
-      startPoint={[tickX, 0]}
-      endPoint={[tickX, timelineHeight]}
-      strokeDasharray="2"
-    />
-  {/if}
-  {#if i !== 0}
     <text
       fill="#fff"
       font-size="12"
