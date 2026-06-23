@@ -27,6 +27,7 @@
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
   import { eventFilterSort } from '$lib/stores/event-view';
+  import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
@@ -47,7 +48,16 @@
   const urlParams = $derived(parseEventFilterParams(page.url));
   $effect(() => {
     $eventFilterSort = urlParams.sort;
+    $pauseLiveUpdates = urlParams.refresh_off;
   });
+
+  const onAutoRefreshToggle = () => {
+    updateEventFilterParams(
+      page.url,
+      { refresh_off: !$pauseLiveUpdates },
+      goto,
+    );
+  };
 
   const reverseSort = $derived($eventFilterSort === 'descending');
 
@@ -108,6 +118,15 @@
     historyCtx.fetchComplete
       ? groups.length
       : Math.max(historyCtx.totalExpectedEvents ?? 0, groups.length),
+  );
+  // Natural pixel height of all timeline content (rows + axis + detail panel).
+  // +120 matches timeline-graph's canvasHeight = timelineHeight + 120, which
+  // provides space for the date labels zone above and the time axis below.
+  // When fewer events fit in one viewport the canvas shrinks to this height,
+  // matching master's compact look. For large histories it is capped at the
+  // viewport via CSS min(), enabling virtual-scroll without changing the logic.
+  const canvasContentHeight = $derived(
+    Math.max((totalRows + 2) * ROW_PX, 120) + graphPanelHeight + 120,
   );
   const spacerHeight = $derived(
     Math.max((totalRows + 2) * ROW_PX, 120) - stickyHeight + graphPanelHeight,
@@ -255,14 +274,14 @@
         data-testid="pause"
         class="border-l-0"
         size="sm"
-        on:click={() => {}}
+        on:click={onAutoRefreshToggle}
       >
         <span
-          class="h-1.5 w-1.5 rounded-full {isNotPending
+          class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
             ? 'bg-slate-300'
             : 'bg-green-600'}"
         ></span>
-        {isNotPending
+        {$pauseLiveUpdates || isNotPending
           ? translate('workflows.auto-refresh-off')
           : translate('workflows.auto-refresh-on')}
       </ToggleButton>
@@ -290,8 +309,8 @@
   overflow-hidden clips TimelineGraph so it doesn't expand the page height.
 -->
 <div
-  class="sticky -mx-4 overflow-hidden md:-mx-8"
-  style="top: var(--top-nav-height, 3rem); height: calc(100dvh - var(--top-nav-height, 3rem));"
+  class="sticky overflow-hidden"
+  style="top: var(--top-nav-height, 3rem); height: min({canvasContentHeight}px, calc(100dvh - var(--top-nav-height, 3rem)));"
   bind:clientHeight={stickyHeight}
 >
   {#if workflow}

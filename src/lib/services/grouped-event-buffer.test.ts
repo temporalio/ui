@@ -406,6 +406,41 @@ describe('getRows with excludeWorkflowTasks', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Compact view regression: WFT groups must not appear in filtered output
+//
+// Regression: workflow-history-layout called getGroupArray() without
+// excludeWorkflowTasks:true, leaking WFT groups into the Compact view.
+// ---------------------------------------------------------------------------
+
+describe('compact view: getGroupArray excludeWorkflowTasks regression', () => {
+  it('returns no WFT groups when excludeWorkflowTasks is true, even with interleaved events', () => {
+    reset(30);
+    // Interleave WFT groups and activity groups to simulate a real workflow
+    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
+    for (const e of makeActivityGroup(4)) processEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(7)) processEvent(e, true);
+    for (const e of makeActivityGroup(10)) processEvent(e, true);
+    for (const e of makeWorkflowTaskGroup(13)) processEvent(e, true);
+
+    const compactGroups = getGroupArray({ excludeWorkflowTasks: true });
+
+    expect(compactGroups.every((g) => !isWorkflowTaskGroup(g))).toBe(true);
+    expect(compactGroups).toHaveLength(2); // only the two activity groups
+  });
+
+  it('includes WFT groups in unfiltered output (for All events view)', () => {
+    reset(20);
+    for (const e of makeWorkflowTaskGroup(1)) processEvent(e, true);
+    for (const e of makeActivityGroup(4)) processEvent(e, true);
+
+    const allGroups = getGroupArray();
+    const wftGroups = allGroups.filter(isWorkflowTaskGroup);
+
+    expect(wftGroups.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // 7. Boundary dedup (cursor overlap)
 // ---------------------------------------------------------------------------
 

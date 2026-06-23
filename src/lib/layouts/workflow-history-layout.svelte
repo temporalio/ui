@@ -71,17 +71,17 @@
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
 
-  let bufferGroups = $state(getGroupArray());
+  let bufferGroups = $state(getGroupArray({ excludeWorkflowTasks: true }));
   let bufferEvents = $state(getEventArray());
   let updating = $derived(!historyCtx.fetchComplete);
 
   onMount(() => {
     historyCtx.resume();
-    bufferGroups = getGroupArray();
+    bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
     bufferEvents = getEventArray();
 
     const unsub = onLatestGroup(() => {
-      bufferGroups = getGroupArray();
+      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
       bufferEvents = getEventArray();
     });
     return () => unsub();
@@ -90,7 +90,7 @@
   $effect(() => {
     if (historyCtx.fetchComplete) {
       enrichGroups(pendingActivities, pendingNexusOperations);
-      bufferGroups = getGroupArray();
+      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
       bufferEvents = getEventArray();
     }
   });
@@ -278,7 +278,7 @@
   <div class="flex w-full flex-col">
     {#if $eventViewType === 'json'}
       <div class="border-t border-subtle px-4">
-        <WorkflowHistoryJson />
+        <WorkflowHistoryJson events={filteredEvents} />
       </div>
     {:else}
       <div data-testid="event-summary-table">
