@@ -114,6 +114,7 @@
   const ROW_PX = 24;
   let stickyHeight = $state(0);
   let graphPanelHeight = $state(0);
+  let controlsHeight = $state(0);
   const totalRows = $derived(
     historyCtx.fetchComplete
       ? groups.length
@@ -127,6 +128,11 @@
   // viewport via CSS min(), enabling virtual-scroll without changing the logic.
   const canvasContentHeight = $derived(
     Math.max((totalRows + 2) * ROW_PX, 120) + graphPanelHeight + 120,
+  );
+  // The canvas sticks below both the top-nav and the controls bar, so the
+  // maximum viewport-filling height must subtract both of their heights.
+  const canvasMaxHeight = $derived(
+    `calc(100dvh - var(--top-nav-height, 3rem) - ${controlsHeight}px)`,
   );
   const spacerHeight = $derived(
     Math.max((totalRows + 2) * ROW_PX, 120) - stickyHeight + graphPanelHeight,
@@ -253,86 +259,99 @@
   {/if}
 </div>
 
-<div
-  class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
->
-  <div class="flex items-center gap-2">
-    <h2>{translate('workflows.timeline-tab')}</h2>
-    <EventHistoryLegend />
-  </div>
-  <div class="flex items-center gap-2">
-    <ToggleButtons>
-      <ToggleButton
-        leadingIcon={reverseSort ? 'descending' : 'ascending'}
-        data-testid="zoom-in"
-        on:click={onSort}
-        size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
-      >
-      <EventTypeFilter compact={false} />
-      <ToggleButton
-        disabled={isNotPending}
-        data-testid="pause"
-        class="border-l-0"
-        size="sm"
-        on:click={onAutoRefreshToggle}
-      >
-        <span
-          class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
-            ? 'bg-slate-300'
-            : 'bg-green-600'}"
-        ></span>
-        {$pauseLiveUpdates || isNotPending
-          ? translate('workflows.auto-refresh-off')
-          : translate('workflows.auto-refresh-on')}
-      </ToggleButton>
-      <ToggleButton
-        data-testid="download"
-        leadingIcon="download"
-        size="sm"
-        on:click={() => (showDownloadPrompt = true)}
-      >
-        {translate('common.download')}
-      </ToggleButton>
-    </ToggleButtons>
-  </div>
-</div>
-
 <!--
+  Wrapper: single flex child so the parent's gap-4 only applies once (above
+  this block). Internally the children are in normal block flow with no gaps,
+  meaning the controls bar, sentinel, and sticky canvas are flush against each
+  other with no phantom spacing from the flex gap.
+-->
+<div>
+  <div
+    class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
+    bind:clientHeight={controlsHeight}
+  >
+    <div class="flex items-center gap-2">
+      <h2>{translate('workflows.timeline-tab')}</h2>
+      <EventHistoryLegend />
+    </div>
+    <div class="flex items-center gap-2">
+      <ToggleButtons>
+        <ToggleButton
+          leadingIcon={reverseSort ? 'descending' : 'ascending'}
+          data-testid="zoom-in"
+          on:click={onSort}
+          size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
+        >
+        <EventTypeFilter compact={false} />
+        <ToggleButton
+          disabled={isNotPending}
+          data-testid="pause"
+          class="border-l-0"
+          size="sm"
+          on:click={onAutoRefreshToggle}
+        >
+          <span
+            class="h-1.5 w-1.5 rounded-full {$pauseLiveUpdates || isNotPending
+              ? 'bg-slate-300'
+              : 'bg-green-600'}"
+          ></span>
+          {$pauseLiveUpdates || isNotPending
+            ? translate('workflows.auto-refresh-off')
+            : translate('workflows.auto-refresh-on')}
+        </ToggleButton>
+        <ToggleButton
+          data-testid="download"
+          leadingIcon="download"
+          size="sm"
+          on:click={() => (showDownloadPrompt = true)}
+        >
+          {translate('common.download')}
+        </ToggleButton>
+      </ToggleButtons>
+    </div>
+  </div>
+
+  <!--
   Sentinel: zero-height element marking the top of the canvas area.
   Its viewport-relative top gives us timelineScrollY without tracking heights.
+  Lives inside the wrapper (block flow) so the parent's flex gap-4 does not
+  push the canvas away from the controls bar.
 -->
-<div bind:this={sentinelEl} class="pointer-events-none h-0"></div>
+  <div bind:this={sentinelEl} class="pointer-events-none h-0"></div>
 
-<!--
-  Sticky canvas: locks below top-nav once the content above scrolls off.
-  Negative horizontal margins make it edge-to-edge (cancels page shell padding).
+  <!--
+  Sticky canvas: locks below the top-nav AND the controls bar once the content
+  above scrolls off. border-t supplies the top border that timeline-graph omits
+  (border-t-0) so it shares the controls bar's border-b in master's layout.
   overflow-hidden clips TimelineGraph so it doesn't expand the page height.
 -->
-<div
-  class="sticky overflow-hidden"
-  style="top: var(--top-nav-height, 3rem); height: min({canvasContentHeight}px, calc(100dvh - var(--top-nav-height, 3rem)));"
-  bind:clientHeight={stickyHeight}
->
-  {#if workflow}
-    <TimelineGraph
-      {workflow}
-      {groups}
-      {reverseSort}
-      loading={!historyCtx.fetchComplete}
-      scrollY={timelineScrollY}
-      totalExpectedEvents={historyCtx.totalExpectedEvents}
-      descMinId={historyCtx.descMinId}
-      error={Boolean(workflowTaskFailedError)}
-      bind:panelHeight={graphPanelHeight}
-    />
-  {/if}
-</div>
+  <div
+    class="sticky overflow-hidden border-t border-subtle"
+    style="top: calc(var(--top-nav-height, 3rem) + {controlsHeight}px); height: min({canvasContentHeight}px, {canvasMaxHeight});"
+    bind:clientHeight={stickyHeight}
+  >
+    {#if workflow}
+      <TimelineGraph
+        {workflow}
+        {groups}
+        {reverseSort}
+        loading={!historyCtx.fetchComplete}
+        scrollY={timelineScrollY}
+        totalExpectedEvents={historyCtx.totalExpectedEvents}
+        descMinId={historyCtx.descMinId}
+        error={Boolean(workflowTaskFailedError)}
+        bind:panelHeight={graphPanelHeight}
+      />
+    {/if}
+  </div>
 
-<!--
+  <!--
   Spacer: extends #content-wrapper's scroll range to cover the full timeline height.
   The sentinel + scroll handler convert that scrollTop into timelineScrollY.
 -->
-<div class="pointer-events-none" style="height: {spacerHeight}px;"></div>
+  <div class="pointer-events-none" style="height: {spacerHeight}px;"></div>
+</div>
+<!-- end wrapper -->
 
 {#if workflow}
   <DownloadEventHistoryModal
