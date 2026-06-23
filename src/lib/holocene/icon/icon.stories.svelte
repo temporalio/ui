@@ -1,7 +1,8 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import { type Args, defineMeta } from '@storybook/addon-svelte-csf';
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import type { ComponentProps } from 'svelte';
 
   import { type IconName, iconNames } from './';
 
@@ -28,7 +29,7 @@
 </script>
 
 <Story name="Default" args={{ name: 'add', height: 24, width: 24 }}>
-  {#snippet template(args: Args<typeof Story>)}
+  {#snippet template(args: ComponentProps<typeof Icon>)}
     <Icon {...args} />
   {/snippet}
 </Story>
