@@ -63,10 +63,37 @@
   const { height, gutter, radius } = TimelineConfig;
 
   const INITIAL_COUNT = 100;
+  const OVERSCAN = 15;
 
   let canvasWidth = $state(0);
-  let scrollY = $state(0);
   let renderedCount = $state(0);
+
+  // PERF: Effective page scroll relative to SVG container top.
+  // Updated by the page-scroll $effect below with hysteresis.
+  let _scrollY = $state(0);
+
+  // PERF: O(1) window bounds for virtualization.
+  // Ascending:  row i is at y = (i + 2) * h → visible i ∈ [sy/h − 2 ± overscan]
+  // Descending: row i is at y = (total + 1 − i) * h → visible i ∈ [total+1 − (sy+vh)/h ± overscan]
+  function computeWindowBounds(
+    sy: number,
+    vh: number,
+    n: number,
+    isReverse: boolean,
+    total: number,
+    h: number,
+  ): [number, number] {
+    let first: number;
+    let last: number;
+    if (!isReverse) {
+      first = Math.max(0, Math.floor(sy / h) - 2 - OVERSCAN);
+      last = Math.min(n, Math.ceil((sy + vh) / h) - 2 + OVERSCAN + 1);
+    } else {
+      first = Math.max(0, total + 1 - Math.ceil((sy + vh) / h) - OVERSCAN);
+      last = Math.min(n, total + 1 - Math.floor(sy / h) + OVERSCAN);
+    }
+    return [Math.min(first, n), Math.max(last, 0)];
+  }
 
   // PERF: bind:clientWidth={canvasWidth} compiled to bind_element_size which reads
   // element.clientWidth inside a Svelte effect during every reactive flush (~150×
@@ -135,17 +162,85 @@
     return Math.max(0, expectedTotal - filteredGroups.length);
   });
 
-  // Progressive rendering: render the viewport-visible slice first, then
-  // expand in idle-callback chunks so the first paint is <100ms even for 10k rows.
-  // For descending sort the visible rows are the high-index end of the array
-  // (newest events, closest to the top of the descending viewport), so we slice
-  // from the tail and expand toward index 0.
+  // Progressive rendering: expand to all groups via idle callback.
+  // With window-based virtualization only ~80 rows are ever in the DOM,
+  // so the progressive phase is just a safety valve for very first paint.
   const visibleGroups = $derived.by(() => {
     const total = filteredGroups.length;
     if (renderedCount >= total) return filteredGroups;
     if (reverseSort)
       return filteredGroups.slice(Math.max(0, total - renderedCount));
     return filteredGroups.slice(0, renderedCount);
+  });
+
+  // PERF: Window-based virtualization.
+  // Page-scroll $effect keeps _scrollY fresh with RAF + hysteresis.
+  // windowedGroups is the only slice Svelte ever puts into the DOM.
+  const windowStart = $derived.by(() => {
+    const [s] = computeWindowBounds(
+      _scrollY,
+      typeof window !== 'undefined' ? window.innerHeight : 800,
+      visibleGroups.length,
+      reverseSort,
+      totalForY,
+      height,
+    );
+    return s;
+  });
+
+  const windowedGroups = $derived.by(() => {
+    const n = visibleGroups.length;
+    const [s, e] = computeWindowBounds(
+      _scrollY,
+      typeof window !== 'undefined' ? window.innerHeight : 800,
+      n,
+      reverseSort,
+      totalForY,
+      height,
+    );
+    return visibleGroups.slice(s, Math.min(e, n));
+  });
+
+  // PERF: Page-level scroll tracking for external scroll mode.
+  // When viewportHeight is not set the page scrolls, not the inner div.
+  // Only updates _scrollY when scroll moves by HYST pixels so window
+  // remounts (DOM mutations) happen infrequently.
+  $effect(() => {
+    if (viewportHeight || !containerEl) return;
+
+    const HYST = Math.floor(OVERSCAN / 2) * height;
+    let svgAbsTop = 0;
+    let lastWritten = -Infinity;
+    let rafId = 0;
+
+    const updateTop = () => {
+      svgAbsTop = containerEl!.getBoundingClientRect().top + window.scrollY;
+    };
+    updateTop();
+
+    const ro = new ResizeObserver(updateTop);
+    ro.observe(document.documentElement);
+
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        const sy = Math.max(0, window.scrollY - svgAbsTop);
+        if (Math.abs(sy - lastWritten) >= HYST) {
+          lastWritten = sy;
+          _scrollY = sy;
+        }
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      ro.disconnect();
+      cancelAnimationFrame(rafId);
+    };
   });
 
   // Tracks whether onAllRendered has fired for the current data set,
@@ -261,8 +356,11 @@
     (!isWorkflowDelayed(workflow) && firstStartTime) || workflow.startTime,
   );
 
+  // Internal scroll handler (only active when viewportHeight is set).
   const handleScroll = (e: Event) => {
-    scrollY = (e?.target as HTMLElement)?.scrollTop;
+    const raw = (e?.target as HTMLElement)?.scrollTop ?? 0;
+    const HYST = Math.floor(OVERSCAN / 2) * height;
+    if (Math.abs(raw - _scrollY) >= HYST) _scrollY = raw;
   };
 
   const groupIndexMap = $derived(
@@ -411,6 +509,13 @@
       width={canvasWidth}
       class="-mt-4"
       class:error
+      data-fg={filteredGroups.length}
+      data-vg={visibleGroups.length}
+      data-wg={windowedGroups.length}
+      data-ws={windowStart}
+      data-sy={_scrollY}
+      data-tf={totalForY}
+      data-rc={renderedCount}
     >
       <!--
         PERF: Defines all 11 timeline icon <symbol> elements once per SVG.
@@ -459,28 +564,20 @@
         The transform $effect handles the panel-shift side; it already accounts
         for reverseSort by checking (i < idx) instead of (i > idx).
       -->
-      {#each visibleGroups as group, localI (group.id)}
-        {@const i = reverseSort
-          ? filteredGroups.length - visibleGroups.length + localI
-          : localI}
+      {#each windowedGroups as group, localI (group.id)}
+        {@const i = windowStart + localI}
         {@const y = getY(i)}
         <g use:registerRow={group.id}>
-          {#if !viewportHeight || (y > scrollY - 2 * height && y < scrollY + viewportHeight * height)}
-            <!--
-              PERF: Key on group.eventList.length so Svelte only re-renders
-              this row when new events are appended to the group.
-            -->
-            {#key group.eventList.length}
-              <TimelineGraphRow
-                {y}
-                {group}
-                {canvasWidth}
-                {startTime}
-                {endTime}
-                {readOnly}
-              />
-            {/key}
-          {/if}
+          {#key group.eventList.length}
+            <TimelineGraphRow
+              {y}
+              {group}
+              {canvasWidth}
+              {startTime}
+              {endTime}
+              {readOnly}
+            />
+          {/key}
         </g>
       {/each}
 
@@ -493,14 +590,14 @@
           radius,
         })}
         {@const rectH = pendingGroupCount * height + radius}
-        <foreignObject
+        <rect
           x={gutter}
           y={rectY}
           width={canvasWidth - gutter * 2}
           height={rectH}
-        >
-          <div class="skeleton-rows" style="height: 100%; width: 100%;"></div>
-        </foreignObject>
+          rx="4"
+          fill="color-mix(in srgb, currentColor 6%, transparent)"
+        />
       {/if}
 
       <!--
@@ -530,56 +627,5 @@
 <style lang="postcss">
   .error {
     @apply bg-danger;
-  }
-
-  .skeleton-rows {
-    border-radius: 4px;
-    overflow: hidden;
-    position: relative;
-    background-image: repeating-linear-gradient(
-      180deg,
-      transparent 0,
-      transparent 3px,
-      color-mix(in srgb, theme(colors.slate.400) 28%, transparent) 3px,
-      color-mix(in srgb, theme(colors.slate.400) 28%, transparent) 21px,
-      transparent 21px,
-      transparent 24px
-    );
-
-    :global(.dark) & {
-      background-image: repeating-linear-gradient(
-        180deg,
-        transparent 0,
-        transparent 3px,
-        color-mix(in srgb, theme(colors.slate.400) 40%, transparent) 3px,
-        color-mix(in srgb, theme(colors.slate.400) 40%, transparent) 21px,
-        transparent 21px,
-        transparent 24px
-      );
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgb(255 255 255 / 70%) 50%,
-        transparent 100%
-      );
-      animation: shimmer-lr 1.6s ease-in-out infinite;
-      will-change: transform;
-    }
-  }
-
-  @keyframes shimmer-lr {
-    from {
-      transform: translateX(-100%);
-    }
-
-    to {
-      transform: translateX(200%);
-    }
   }
 </style>

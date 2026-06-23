@@ -107,9 +107,15 @@ export const fetchAllEvents = async ({
     fullEventHistory.set([]);
   };
 
+  let _pageCount = 0;
   const onUpdate = (full, current) => {
     if (!signal) return;
-    fullEventHistory.set([...toEventHistory(full.history?.events)]);
+    _pageCount++;
+    // PERF: Only update the store every 5 pages to avoid O(N²) re-renders during
+    // streaming load. The first page always updates for immediate display.
+    if (_pageCount === 1 || _pageCount % 5 === 0) {
+      fullEventHistory.set([...toEventHistory(full.history?.events)]);
+    }
     const next = current?.history?.events;
     const hasNewHistory =
       historySize &&
