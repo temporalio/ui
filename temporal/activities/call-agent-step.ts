@@ -8,10 +8,7 @@ type AgentStepInput = {
   context?: Record<string, unknown>;
 };
 
-const models: Record<
-  string,
-  (prompt: string) => Promise<Record<string, unknown>>
-> = {
+const models: Record<string, (prompt: string) => Promise<string>> = {
   'gpt-4o': callLLM,
   'claude-3-5-sonnet': callLLMClaude,
   'gemini-1.5-pro': callLLMGemini,
@@ -19,7 +16,7 @@ const models: Record<
 
 export default async function callAgentStep(
   input: AgentStepInput,
-): Promise<Record<string, unknown>> {
+): Promise<string> {
   const fn = models[input.context?.model as string] ?? callLLM;
   return fn(input.prompt);
 }

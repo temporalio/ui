@@ -77,9 +77,7 @@ export async function RunningWorkflow(): Promise<void> {
   return await workflow.sleep('10 days');
 }
 
-export async function LLMWorkflow(
-  prompt: string,
-): Promise<Record<string, unknown>[]> {
+export async function LLMWorkflow(prompt: string): Promise<unknown[]> {
   const r1 = await callLLM(prompt);
   await echo('Processing intermediate result...');
   const r2 = await callLLMClaude(prompt);
@@ -101,7 +99,7 @@ export async function LLMWorkflow(
 export async function ChatSessionWorkflow(input: {
   turnNumber: number;
   userMessage: string;
-}): Promise<Record<string, unknown>[]> {
+}): Promise<unknown[]> {
   const { turnNumber, userMessage } = input;
   if (turnNumber === 1) {
     // Turn 1: User asks a question - guardrail, LLM, guardrail

@@ -10,6 +10,7 @@ Runtime.install({ logger });
 
 import * as activities from './activities/index';
 import { getDataConverter } from './data-converter';
+import { CompletionDetailsInterceptor } from './details-interceptor';
 
 // Initialize Braintrust if API key is available
 const braintrustApiKey = process.env.BRAINTRUST_API_KEY;
@@ -31,6 +32,9 @@ const createWorker = async (): Promise<Worker> => {
     activities,
     taskQueue: 'e2e-1',
     ...(braintrustPlugin ? { plugins: [braintrustPlugin] } : {}),
+    interceptors: {
+      activity: [() => ({ inbound: new CompletionDetailsInterceptor() })],
+    },
   });
 };
 
