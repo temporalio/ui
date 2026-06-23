@@ -3,6 +3,7 @@
   import { page } from '$app/state';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import TreeView from '$lib/components/event/tree-view.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
@@ -134,6 +135,10 @@
   const onJSONClick = () => {
     $eventViewType = 'json';
   };
+
+  const onTreeClick = () => {
+    $eventViewType = 'tree';
+  };
 </script>
 
 <InputAndResults />
@@ -177,6 +182,12 @@
           icon="json"
           class="h-10"
           on:click={onJSONClick}>JSON</TabButton
+        >
+        <TabButton
+          active={$eventViewType === 'tree'}
+          data-testid="tree"
+          class="h-10"
+          on:click={onTreeClick}>Tree</TabButton
         >
       </TabButtons>
     </div>
@@ -227,6 +238,8 @@
       <div class="border-t border-subtle px-4">
         <WorkflowHistoryJson />
       </div>
+    {:else if $eventViewType === 'tree'}
+      <TreeView items={groups} {namespace} />
     {:else}
       <div data-testid="event-summary-table">
         <EventSummaryTable {updating} {items} {groups} {compact} />

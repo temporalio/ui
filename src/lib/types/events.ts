@@ -156,7 +156,7 @@ export type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
 
-export type EventView = 'compact' | 'feed' | 'json';
+export type EventView = 'compact' | 'feed' | 'json' | 'tree';
 export type TaskQueueView = 'workers' | 'versioning';
 
 export type IterableEvent = WorkflowEvent | EventGroup;
