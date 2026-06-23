@@ -340,6 +340,7 @@ export type SettingsResponse = {
   RefreshWorkflowCountsDisabled: boolean;
   ActivityCommandsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
+  NavCollapsedByDefault: boolean;
   FeedbackURL: string;
   Version: string;
 };

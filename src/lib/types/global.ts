@@ -100,6 +100,7 @@ export type Settings = {
   batchActionsDisabled: boolean;
   activityCommandsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
+  navCollapsedByDefault: boolean;
   feedbackURL: string;
   runtimeEnvironment: {
     isCloud: boolean;
