@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Timestamp } from '@temporalio/common';
   import { cva } from 'class-variance-authority';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -56,12 +56,20 @@
   const timelineWidth = $derived(canvasWidth - 2 * gutter);
   const pendingActivity = $derived(group?.pendingActivity);
 
-  const accessibleName = translate('events.row-accessible-name', {
-    eventType: group.displayName,
-    classification: getEventClassificationLabel(
-      group.finalClassification || group.classification,
-    ),
-  });
+  // group.displayName and group.classification are set at group creation and
+  // never mutated — the parent's {#key group.eventList.length} destroys and
+  // recreates this component whenever classification changes (e.g. activity
+  // completes), so the fresh values are always picked up on remount.
+  // untrack() silences Svelte's "only captures initial value" warning while
+  // explicitly communicating that the snapshot is intentional.
+  const accessibleName = untrack(() =>
+    translate('events.row-accessible-name', {
+      eventType: group.displayName,
+      classification: getEventClassificationLabel(
+        group.finalClassification || group.classification,
+      ),
+    }),
+  );
   const pauseTime = $derived(
     pendingActivity && pendingActivity.pauseInfo?.pauseTime,
   );
