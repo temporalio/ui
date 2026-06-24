@@ -64,6 +64,18 @@ export const fetchBidirectional = async ({
   pauseAfterPages,
   onPause,
 }: FetchBidirectionalParams): Promise<BidirectionalStats> => {
+  if (signal?.aborted) {
+    return {
+      durationMs: 0,
+      totalEvents: 0,
+      overlap: 0,
+      ascPages: 0,
+      descPages: 0,
+      eventsPerSecond: 0,
+      winner: 'tie',
+    };
+  }
+
   const t0 = performance.now();
 
   const ascCtrl = new AbortController();

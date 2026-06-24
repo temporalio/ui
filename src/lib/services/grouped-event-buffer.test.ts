@@ -6,10 +6,12 @@ import { toEventHistory } from '$lib/models/event-history';
 import {
   _debugEventSlots,
   _debugState,
+  appendLiveEvent,
   assignTrackIndices,
   enrichGroups,
   getAscGroupCount,
   getDescGroupCount,
+  getEventArray,
   getGroupArray,
   getGroupCount,
   getGroupMeta,
@@ -23,6 +25,7 @@ import {
   onLatestGroup,
   processEvent,
   reset,
+  resetLive,
   setEstimatedGroupCount,
   setFailedEvent,
 } from './grouped-event-buffer';
@@ -1267,6 +1270,7 @@ describe('Option C — eventSlots are released after grouping', () => {
 
   it('[RED] follower eventSlots are null after they are attached to their group', () => {
     // Build a proper WFT-then-activity sequence with correct cross-references:
+
     // 1: WorkflowExecutionStarted (solo head)
     // 2: WorkflowTaskScheduled   (WFT head)
     // 3: WorkflowTaskStarted     (follower of 2)
@@ -1323,5 +1327,282 @@ describe('Option C — eventSlots are released after grouping', () => {
       expect(meta).not.toBeNull();
       expect(meta!.startMs).toBeGreaterThan(0);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// appendLiveEvent — boolean return value (live-poll tight-loop fix)
+//
+// Regression: the live poll was firing thousands of requests because
+// appendLiveEvent returned void, so the caller always called
+// bufferVersion.update() even for duplicate events returned by the server.
+// The fix: return true for genuinely new events, false for duplicates.
+// ---------------------------------------------------------------------------
+
+describe('appendLiveEvent boolean return', () => {
+  beforeEach(() => {
+    reset(10);
+    resetLive();
+  });
+
+  it('returns true for a genuinely new live event', () => {
+    // Event 11 was never in the initial fetch — it is a new live event.
+    const newEvent = makeWorkflowCompleted(11);
+    expect(appendLiveEvent(newEvent)).toBe(true);
+  });
+
+  it('returns false when the same event is appended a second time (duplicate)', () => {
+    const ev = makeWorkflowCompleted(11);
+    appendLiveEvent(ev);
+    // Second call with the same eventId must be a no-op.
+    expect(appendLiveEvent(ev)).toBe(false);
+  });
+
+  it('returns false for a different object with the same eventId (duplicate by ID)', () => {
+    const ev1 = makeWorkflowCompleted(11);
+    const ev2 = makeWorkflowCompleted(11); // distinct object, same ID
+    appendLiveEvent(ev1);
+    expect(appendLiveEvent(ev2)).toBe(false);
+  });
+
+  it('returns false for a grouped event already processed in the initial fetch', () => {
+    // The eventToGroup guard prevents re-processing grouped events (ActivityScheduled
+    // is the head of a group so eventToGroup gets a non-zero entry for it).
+    const group = makeActivityGroup(2); // eventIds 2, 3, 4
+    reset(5);
+    for (const e of group) processEvent(e, true);
+
+    // ActivityScheduled (eventId=2) is the group head → eventToGroup[1] !== 0.
+    expect(appendLiveEvent(group[0])).toBe(false);
+  });
+
+  it('only returns true for grouped events that are actually new in a mixed batch', () => {
+    // Use an activity group (events 1-3) as the "already in initial fetch" set.
+    // WorkflowStarted solo events are excluded because the eventToGroup guard
+    // does not cover solo events (they live in soloEvents, not groupPool).
+    const existing = makeActivityGroup(1); // eventIds 1, 2, 3
+    reset(6);
+    for (const e of existing) processEvent(e, true);
+    resetLive();
+
+    const newEv = makeActivityScheduled(4);
+    const results = [...existing, newEv].map((e) => appendLiveEvent(e));
+
+    // Events 1-3 are grouped and already in groupPool → all false
+    expect(results.slice(0, 3).every((r) => r === false)).toBe(true);
+    // Event 4 is genuinely new → true
+    expect(results[3]).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Concurrent live poll + bidirectional fetch
+//
+// The live poll now starts at the same time as the bidirectional fetch so new
+// events are captured immediately even when the initial load is slow.
+// appendLiveEvent can therefore be called BEFORE processEvent for the same
+// event — both write to separate arrays (liveGroups vs groupPool). Once
+// processEvent claims an event, getEventArray() must not return it twice.
+// ---------------------------------------------------------------------------
+
+describe('concurrent live poll and bidirectional fetch', () => {
+  beforeEach(() => {
+    reset(10);
+    resetLive();
+  });
+
+  it('events only in live poll (genuinely new) appear in getEventArray()', () => {
+    // Bidirectional has not started — buffer is empty.
+    // Live poll delivers a brand-new event (not in the initial fetch).
+    const newEv = makeActivityScheduled(1);
+    appendLiveEvent(newEv);
+
+    const ids = getEventArray().map((e) => e.id);
+    expect(ids).toContain('1');
+  });
+
+  it('an event absorbed by processEvent is not double-counted in getEventArray()', () => {
+    // Race: live poll arrives first (event 2 added to liveGroups),
+    // then the bidirectional fetch arrives (processEvent claims event 2 into groupPool).
+    const group = makeActivityGroup(2); // eventIds 2, 3, 4
+    reset(5);
+
+    // Step 1 — live poll wins the race
+    for (const ev of group) appendLiveEvent(ev);
+    // All three events are in liveGroups now.
+
+    // Step 2 — bidirectional fetch arrives and claims the same events
+    for (const ev of group) processEvent(ev, true);
+    // Events are now in BOTH groupPool (via processEvent) and liveGroups.
+
+    // getEventArray() must return each event exactly once.
+    const allIds = getEventArray().map((e) => e.id);
+    const unique = new Set(allIds);
+    expect(allIds.length).toBe(unique.size);
+
+    // The group's events must still be present.
+    expect(unique.has('2')).toBe(true);
+    expect(unique.has('3')).toBe(true);
+    expect(unique.has('4')).toBe(true);
+  });
+
+  it('new events from live poll remain after bidirectional fetch completes', () => {
+    // Bidirectional loads events 1-6; live poll delivers event 7 (new).
+    const existing = makeSyntheticEvents(6);
+    reset(8);
+    for (const ev of existing) processEvent(ev, true);
+
+    const newEv = makeActivityScheduled(7);
+    resetLive();
+    appendLiveEvent(newEv);
+
+    const ids = getEventArray().map((e) => e.id);
+    // Events 1-6 from bidirectional + event 7 from live poll.
+    expect(ids).toContain('7');
+    // Events from bidirectional still present.
+    expect(ids).toContain('1');
+  });
+
+  it('live poll events that race with bidirectional do not cause duplicates across a full batch', () => {
+    // Simulate: live poll delivers events 1-5 before the bidirectional fetch
+    // has processed any of them. Then the bidirectional processes all 5.
+    const events = makeSyntheticEvents(5);
+    reset(5);
+
+    // Live poll wins — all 5 events added to liveGroups.
+    for (const ev of events) appendLiveEvent(ev);
+
+    // Bidirectional catches up — all 5 events claimed into groupPool.
+    for (const ev of events) processEvent(ev, true);
+
+    const allIds = getEventArray().map((e) => e.id);
+    const unique = new Set(allIds);
+    expect(allIds.length).toBe(unique.size);
+  });
+
+  it('only genuinely new events cause onNewEvents to fire', () => {
+    // When the bidirectional fetch has already loaded events 1-3,
+    // a live-poll batch of [2 (dup), 3 (dup), 4 (new)] should count added=1.
+    const group = makeActivityGroup(1); // eventIds 1, 2, 3
+    reset(5);
+    for (const ev of group) processEvent(ev, true);
+    resetLive();
+
+    const results = [
+      appendLiveEvent(group[0]), // eventId 1 → duplicate → false
+      appendLiveEvent(group[1]), // eventId 2 → duplicate → false
+      appendLiveEvent(group[2]), // eventId 3 → duplicate → false
+      appendLiveEvent(makeActivityScheduled(4)), // new → true
+    ];
+
+    const added = results.filter(Boolean).length;
+    expect(added).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// livePendingFollowers — unified bidirectional-style park-and-flush for live poll
+//
+// When the live poll delivers a follower event before the head has been
+// processed by either appendLiveEvent or processEvent, the follower is
+// parked invisibly in livePendingFollowers. No group is created and nothing
+// appears in getGroupArray() until the head arrives.
+//
+// Head can arrive two ways:
+//   A. Via appendLiveEvent(head) — head and parked followers form a complete live group.
+//   B. Via processEvent(head) — head enters groupPool; parked followers are
+//      flushed directly into the pool group (no live group needed).
+// ---------------------------------------------------------------------------
+
+describe('appendLiveEvent — livePendingFollowers (unified bidirectional pattern)', () => {
+  beforeEach(() => {
+    reset(10);
+    resetLive();
+  });
+
+  it('follower before head: nothing visible in getGroupArray until head arrives', () => {
+    const [, started] = makeActivityGroup(1);
+    const before = getGroupArray().length;
+    appendLiveEvent(started); // head not yet seen
+    expect(getGroupArray().length).toBe(before); // no partial stub rendered
+  });
+
+  it('multiple followers before head: still nothing visible', () => {
+    const [, started, completed] = makeActivityGroup(1);
+    const before = getGroupArray().length;
+    appendLiveEvent(started);
+    appendLiveEvent(completed);
+    expect(getGroupArray().length).toBe(before);
+  });
+
+  it('path A: head arrives via appendLiveEvent — complete live group with all followers', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    appendLiveEvent(started);
+    appendLiveEvent(completed);
+    appendLiveEvent(scheduled); // head arrives last
+
+    const groups = getGroupArray();
+    const g = groups.find((g) => g.id === '1');
+    expect(g).toBeDefined();
+    expect(g?.eventList).toHaveLength(3);
+    expect(g?.eventList.map((e) => e.id)).toEqual(['1', '2', '3']);
+  });
+
+  it('path A: head arrives before followers — followers extend live group normally', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    appendLiveEvent(scheduled); // head first
+    appendLiveEvent(started);
+    appendLiveEvent(completed);
+
+    const g = getGroupArray().find((g) => g.id === '1');
+    expect(g?.eventList).toHaveLength(3);
+  });
+
+  it('path B: head arrives via processEvent — followers flushed into groupPool group', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    appendLiveEvent(started);
+    appendLiveEvent(completed);
+    processEvent(scheduled, true); // head enters groupPool, flushes livePendingFollowers
+
+    const g = getGroupArray().find((g) => g.id === '1');
+    expect(g).toBeDefined();
+    expect(g?.eventList).toHaveLength(3);
+    expect(g?.eventList.map((e) => e.id)).toEqual(['1', '2', '3']);
+  });
+
+  it('path B: option A — follower extends groupPool group when head already there', () => {
+    const [scheduled, started] = makeActivityGroup(1);
+    processEvent(scheduled, true); // head in groupPool
+    appendLiveEvent(started); // follower via live poll
+
+    const g = getGroupArray().find((g) => g.id === '1');
+    expect(g?.eventList).toHaveLength(2);
+    expect(g?.eventList[1].id).toBe('2');
+  });
+
+  it('no duplicate events in getEventArray when live poll and bidirectional both deliver followers', () => {
+    const [scheduled, started, completed] = makeActivityGroup(1);
+    appendLiveEvent(started);
+    appendLiveEvent(completed);
+    processEvent(scheduled, true);
+    processEvent(started, true);
+    processEvent(completed, true);
+
+    const allIds = getEventArray().map((e) => e.id);
+    const unique = new Set(allIds);
+    expect(allIds.length).toBe(unique.size);
+    expect(unique.has('1')).toBe(true);
+    expect(unique.has('2')).toBe(true);
+    expect(unique.has('3')).toBe(true);
+  });
+
+  it('duplicate appendLiveEvent calls for same follower are ignored', () => {
+    const [scheduled, started] = makeActivityGroup(1);
+    appendLiveEvent(started);
+    appendLiveEvent(started); // second call for same event
+    appendLiveEvent(scheduled);
+
+    const g = getGroupArray().find((g) => g.id === '1');
+    expect(g?.eventList).toHaveLength(2); // not 3
   });
 });

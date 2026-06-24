@@ -67,14 +67,24 @@ let latestEventSlotIdx = -1;
 let latestEventRef: HistoryEvent | null = null;
 const latestGroupListeners: LatestGroupListener[] = [];
 
-// Cache for getGroupArray() — invalidated whenever poolTop changes.
+// Followers from the live poll whose head event has not yet been processed by
+// either appendLiveEvent or processEvent. Keyed by head event id string.
+// Mirrors pendingFollowers (slot-index map) but stores WorkflowEvents directly
+// because appendLiveEvent converts immediately and never writes to eventSlots.
+const livePendingFollowers = new Map<string, WorkflowEvent[]>();
+
+// Cache for getGroupArray() — invalidated whenever poolTop or liveGroups change.
 // Avoids the 200KB+ slice+sort allocation on every call when the pool is
 // stable (i.e. after fetch completes).
 let _cachedGroups: EventGroup[] | null = null;
 let _cachedPoolTop = -1;
+let _cachedLiveVersion = -1;
 // Separate cache for the WFT-excluded variant (used by the timeline).
 let _cachedGroupsNoWFT: EventGroup[] | null = null;
 let _cachedPoolTopNoWFT = -1;
+let _cachedLiveVersionNoWFT = -1;
+// Incremented each time liveGroups is modified so getGroupArray knows to bust.
+let _liveVersion = 0;
 
 // Accumulated WFT IDs for marker billable-action dedup (ascending cursor only)
 const processedWorkflowTaskIds = new Set<string>();
@@ -226,6 +236,12 @@ function growArrays(newSize: number): void {
 }
 
 function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
+  // Guard: already claimed (e.g. livePendingFollowers flush already added this event).
+  if (eventToGroup[followerSlotIdx] !== 0) {
+    eventSlots[followerSlotIdx] = null;
+    return;
+  }
+
   const meta = groupPool[poolIdx];
   const raw = eventSlots[followerSlotIdx];
   if (!raw || !meta.group) return;
@@ -301,10 +317,14 @@ export function reset(historyLength: number): void {
   soloEvents.length = 0;
   soloEventIds.clear();
   liveSeenIds.clear();
+  livePendingFollowers.clear();
+  _liveVersion = 0;
   _cachedGroups = null;
   _cachedPoolTop = -1;
+  _cachedLiveVersion = -1;
   _cachedGroupsNoWFT = null;
   _cachedPoolTopNoWFT = -1;
+  _cachedLiveVersionNoWFT = -1;
 }
 
 /**
@@ -415,7 +435,7 @@ export function processEvent(
     meta.trackIndex = descGroupHeads.length - 1;
   }
 
-  // Flush any followers that arrived before this head.
+  // Flush any followers that arrived before this head via the bidirectional fetch.
   // attachFollowerToPool nulls each follower slot after processing.
   const pending = pendingFollowers.get(slotIdx);
   if (pending) {
@@ -423,6 +443,29 @@ export function processEvent(
       attachFollowerToPool(poolIdx, followerSlotIdx);
     }
     pendingFollowers.delete(slotIdx);
+  }
+
+  // Flush any followers that arrived before this head via the live poll.
+  // They are already converted WorkflowEvents — just insert and claim their slots.
+  const liveFollowers = livePendingFollowers.get(event.id);
+  if (liveFollowers) {
+    for (const follower of liveFollowers) {
+      const followerSlotIdx = parseInt(follower.id) - 1;
+      if (followerSlotIdx >= eventToGroup.length) {
+        growArrays(followerSlotIdx + 1);
+      }
+      // Guard: bidirectional flush may have already claimed this slot.
+      if (eventToGroup[followerSlotIdx] !== 0) continue;
+      insertEventById(group.eventList, follower);
+      group.timestamp = follower.timestamp;
+      addEventToGroup(group, follower);
+      eventToGroup[followerSlotIdx] = poolIdx + 1;
+      const followerMs = toMs(follower.eventTime);
+      if (followerMs > meta.endMs) meta.endMs = followerMs;
+    }
+    livePendingFollowers.delete(event.id);
+    _cachedGroups = null;
+    _cachedGroupsNoWFT = null;
   }
 
   // Release the head slot — its data is now encoded in the EventGroup.
@@ -643,11 +686,19 @@ export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
 export function getGroupArray(opts?: GetRowsOptions): EventGroup[] {
   const excludeWFT = Boolean(opts?.excludeWorkflowTasks);
   if (excludeWFT) {
-    if (_cachedGroupsNoWFT !== null && _cachedPoolTopNoWFT === poolTop) {
+    if (
+      _cachedGroupsNoWFT !== null &&
+      _cachedPoolTopNoWFT === poolTop &&
+      _cachedLiveVersionNoWFT === _liveVersion
+    ) {
       return _cachedGroupsNoWFT;
     }
   } else {
-    if (_cachedGroups !== null && _cachedPoolTop === poolTop) {
+    if (
+      _cachedGroups !== null &&
+      _cachedPoolTop === poolTop &&
+      _cachedLiveVersion === _liveVersion
+    ) {
       return _cachedGroups;
     }
   }
@@ -662,12 +713,33 @@ export function getGroupArray(opts?: GetRowsOptions): EventGroup[] {
     result.push(meta.group);
   }
 
+  // Include live groups whose head slot is not yet claimed by groupPool.
+  // Once processEvent claims the head, eventToGroup[slot] becomes non-zero
+  // and the live group is excluded here to avoid duplicates.
+  for (const g of liveGroups) {
+    const headSlotIdx = parseInt(g.id) - 1;
+    if (
+      headSlotIdx >= 0 &&
+      headSlotIdx < eventToGroup.length &&
+      eventToGroup[headSlotIdx] !== 0
+    ) {
+      continue; // head claimed by groupPool — skip to avoid duplicate
+    }
+    if (excludeWFT && isWorkflowTaskGroup(g)) continue;
+    result.push(g);
+  }
+
+  // Re-sort: live groups can sit anywhere in the event sequence.
+  result.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
   if (excludeWFT) {
     _cachedGroupsNoWFT = result;
     _cachedPoolTopNoWFT = poolTop;
+    _cachedLiveVersionNoWFT = _liveVersion;
   } else {
     _cachedGroups = result;
     _cachedPoolTop = poolTop;
+    _cachedLiveVersion = _liveVersion;
   }
   return result;
 }
@@ -768,8 +840,17 @@ export function getEventArray(): WorkflowEvent[] {
       for (const ev of meta.group.eventList) result.push(ev);
     }
   }
+  // When the live poll runs concurrently with the bidirectional fetch an event
+  // can land in liveGroups before processEvent writes it into groupPool. Once
+  // processEvent claims it (eventToGroup[slotIdx] !== 0) we skip it here so it
+  // is not counted twice.
   for (const g of liveGroups) {
-    for (const ev of g.eventList) result.push(ev);
+    for (const ev of g.eventList) {
+      const slotIdx = parseInt(ev.id) - 1;
+      if (slotIdx < eventToGroup.length && eventToGroup[slotIdx] !== 0)
+        continue;
+      result.push(ev);
+    }
   }
   for (const ev of soloEvents) result.push(ev);
   result.sort((a, b) => parseInt(a.id) - parseInt(b.id));
@@ -786,32 +867,65 @@ export function getEventArray(): WorkflowEvent[] {
  * the result in liveGroups rather than the pre-allocated groupPool.
  * Does NOT call growArrays or touch eventSlots.
  */
-export function appendLiveEvent(raw: HistoryEvent): void {
-  if (liveSeenIds.has(raw.eventId)) return;
+/** Returns true if the event was new and added, false if it was a duplicate. */
+export function appendLiveEvent(raw: HistoryEvent): boolean {
+  if (liveSeenIds.has(raw.eventId)) return false;
   liveSeenIds.add(raw.eventId);
 
   // If this event was already processed into groupPool during the initial fetch,
   // skip it — otherwise getEventArray() would return it from both groupPool and liveGroups.
   const slotIdx = parseInt(raw.eventId) - 1;
-  if (slotIdx < eventToGroup.length && eventToGroup[slotIdx] !== 0) return;
+  if (slotIdx < eventToGroup.length && eventToGroup[slotIdx] !== 0)
+    return false;
 
   const event = toWorkflowEvent(raw, true);
   const gid = getGroupId(event as CommonHistoryEvent);
   const isHead = gid === event.id;
 
   if (!isHead) {
-    const headId = parseInt(gid);
-    const existing = liveGroups.find(
-      (g) => Number(g.initialEvent.id) === headId,
-    );
+    // Option A: head already in a live group — extend it directly.
+    const existing = liveGroups.find((g) => g.id === gid);
     if (existing) {
       insertEventById(existing.eventList, event);
       existing.timestamp = event.timestamp;
       addEventToGroup(existing, event);
+      _liveVersion++;
+      _cachedGroups = null;
+      _cachedGroupsNoWFT = null;
+      return true;
     }
-    return;
+
+    // Option B: head already in groupPool — extend the real group directly.
+    const headSlotIdx = parseInt(gid) - 1;
+    if (
+      headSlotIdx >= 0 &&
+      headSlotIdx < eventToGroup.length &&
+      eventToGroup[headSlotIdx] !== 0
+    ) {
+      const meta = groupPool[eventToGroup[headSlotIdx] - 1];
+      if (meta?.group) {
+        insertEventById(meta.group.eventList, event);
+        addEventToGroup(meta.group, event);
+        eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
+        _cachedGroups = null;
+        _cachedGroupsNoWFT = null;
+      }
+      return true;
+    }
+
+    // Head not yet loaded — park this follower until the head arrives (via
+    // appendLiveEvent or processEvent). Mirrors the bidirectional pendingFollowers
+    // pattern: no group is created, no UI update until we have the head.
+    const parked = livePendingFollowers.get(gid);
+    if (parked) {
+      parked.push(event);
+    } else {
+      livePendingFollowers.set(gid, [event]);
+    }
+    return true;
   }
 
+  // This event is the head of a group.
   const group =
     createEventGroup(event as CommonHistoryEvent) ??
     createWorkflowTaskGroup(event as CommonHistoryEvent);
@@ -820,12 +934,27 @@ export function appendLiveEvent(raw: HistoryEvent): void {
       soloEvents.push(event);
       soloEventIds.add(event.id);
     }
-    return;
+    return true;
+  }
+
+  // Flush any followers that parked while waiting for this head.
+  const parked = livePendingFollowers.get(event.id);
+  if (parked) {
+    for (const follower of parked) {
+      insertEventById(group.eventList, follower);
+      group.timestamp = follower.timestamp;
+      addEventToGroup(group, follower);
+    }
+    livePendingFollowers.delete(event.id);
   }
 
   liveGroups.push(group);
+  _liveVersion++;
+  _cachedGroups = null;
+  _cachedGroupsNoWFT = null;
   for (const cb of liveGroupListeners) cb(group);
   for (const cb of latestGroupListeners) cb(group);
+  return true;
 }
 
 /** Number of live groups appended since the initial fetch completed. */
@@ -850,4 +979,10 @@ export function resetLive(): void {
   liveGroups.length = 0;
   liveGroupListeners.length = 0;
   liveSeenIds.clear();
+  livePendingFollowers.clear();
+  _liveVersion = 0;
+  _cachedGroups = null;
+  _cachedGroupsNoWFT = null;
+  _cachedLiveVersion = -1;
+  _cachedLiveVersionNoWFT = -1;
 }

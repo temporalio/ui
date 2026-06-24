@@ -23,6 +23,7 @@
     processEvent,
     reset as resetBuffer,
   } from '$lib/services/grouped-event-buffer';
+  import { runLivePoll } from '$lib/services/live-poll';
   import { getPollers } from '$lib/services/pollers-service';
   import { getWorkflowMetadata } from '$lib/services/query-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
@@ -41,16 +42,11 @@
     type RefreshAction,
     workflowRun,
   } from '$lib/stores/workflow-run';
-  import type {
-    GetWorkflowExecutionHistoryResponse,
-    HistoryEvent,
-  } from '$lib/types/events';
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-  import { requestFromAPI } from '$lib/utilities/request-from-api';
   import { routeForApi } from '$lib/utilities/route-for-api';
 
   interface Props {
@@ -81,6 +77,8 @@
 
   let _pauseHandle: PauseHandle | null = null;
   let _resumeRequested = false;
+  let _lastPollToken = '';
+  let _pollPaused = false;
 
   const ctx: HistoryContext = {
     get fetchComplete() {
@@ -145,48 +143,28 @@
     ns: string,
     wfId: string,
     rId: string,
-    fromEventId: number,
+    startToken: string,
   ) => {
     livePollingController?.abort();
     livePollingController = new AbortController();
-    const signal = livePollingController.signal;
-    const route = routeForApi('events.ascending', {
-      namespace: ns,
-      workflowId: wfId,
+    runLivePoll({
+      route: routeForApi('events.ascending', {
+        namespace: ns,
+        workflowId: wfId,
+      }),
+      runId: rId,
+      startToken,
+      signal: livePollingController.signal,
+      onEvent: (ev) => {
+        const isNew = appendLiveEvent(ev);
+        if (isNew)
+          latestEventId = Math.max(latestEventId, parseInt(ev.eventId));
+        return isNew;
+      },
+      onNewEvents: () => bufferVersion.update((v) => v + 1),
+    }).then((lastToken) => {
+      _lastPollToken = lastToken;
     });
-
-    (async () => {
-      let nextEventId = fromEventId + 1;
-      while (!signal.aborted) {
-        try {
-          const response =
-            await requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
-              request: fetch,
-              params: {
-                'execution.runId': rId,
-                waitNewEvent: 'true',
-                firstEventId: String(nextEventId),
-              },
-              options: { signal },
-            });
-          const events = (response?.history?.events ?? []) as HistoryEvent[];
-          for (const ev of events) {
-            appendLiveEvent(ev);
-            const id = parseInt(ev.eventId);
-            if (id >= nextEventId) nextEventId = id + 1;
-            latestEventId = id;
-          }
-          if (events.length) bufferVersion.update((v) => v + 1);
-          if (!response.nextPageToken) {
-            await new Promise((r) => setTimeout(r, 2000));
-          }
-        } catch {
-          if (!signal.aborted) {
-            await new Promise((r) => setTimeout(r, 5000));
-          }
-        }
-      }
-    })();
   };
 
   const getWorkflowAndEventHistory = async (
@@ -230,6 +208,17 @@
     fetchComplete = false;
     _pauseHandle = null;
 
+    // Start live poll immediately — concurrent with the bidirectional fetch.
+    // Any events that arrive while the fetch is in progress are captured right
+    // away rather than waiting for the full history to load first.
+    // appendLiveEvent deduplicates events that the bidirectional fetch also
+    // delivers; getEventArray() filters the live side at read time for safety.
+    // Skip if the user has already paused auto-refresh — the pause $effect
+    // will restart from _lastPollToken when they unpause.
+    if (workflow.isRunning && !$pauseLiveUpdates) {
+      startLivePoll(ns, wfId, rId, '');
+    }
+
     fetchBidirectional({
       namespace: ns,
       workflowId: wfId,
@@ -265,10 +254,6 @@
         );
         fetchComplete = true;
         bufferVersion.update((v) => v + 1);
-
-        if (workflow.isRunning) {
-          startLivePoll(ns, wfId, rId, latestEventId);
-        }
       })
       .catch((e: unknown) => {
         if (e instanceof Error && e.name !== 'AbortError') {
@@ -327,6 +312,8 @@
     descMinId = 0;
     _pauseHandle = null;
     _resumeRequested = false;
+    _lastPollToken = '';
+    _pollPaused = false;
     abortAll();
     resetLastDataEncoderSuccess();
     if (refreshInterval) clearInterval(refreshInterval);
@@ -354,6 +341,23 @@
     const pause = $pauseLiveUpdates;
     untrack(() => {
       getOnlyWorkflowWithPendingActivities(refreshValue, pause);
+    });
+  });
+
+  // Stop the live poll when the user pauses auto-refresh, and resume it from
+  // the last cursor when they unpause. This avoids holding an open server
+  // connection and accumulating events in liveGroups during a pause.
+  $effect(() => {
+    const paused = $pauseLiveUpdates;
+    untrack(() => {
+      if (paused && livePollingController) {
+        _pollPaused = true;
+        livePollingController.abort();
+        livePollingController = null;
+      } else if (!paused && _pollPaused && $workflowRun.workflow?.isRunning) {
+        _pollPaused = false;
+        startLivePoll(namespace, workflowId, runId, _lastPollToken);
+      }
     });
   });
 
