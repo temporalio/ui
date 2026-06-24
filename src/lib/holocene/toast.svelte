@@ -32,7 +32,6 @@
   export let closeButtonLabel: string = '';
 
   $: dismissLabel = closeButtonLabel || translate('common.close');
-
   $: icon = variantIcon[variant];
 
   const handleDismiss = () => {
