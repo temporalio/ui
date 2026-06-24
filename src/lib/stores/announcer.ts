@@ -1,4 +1,4 @@
-import { type Readable, writable } from 'svelte/store';
+import { type Readable, readonly, writable } from 'svelte/store';
 
 export type Politeness = 'polite' | 'assertive';
 
@@ -49,7 +49,7 @@ export function createAnnouncer(options: { timeout?: number } = {}): Announcer {
   };
 
   return {
-    messages: { subscribe: messages.subscribe },
+    messages: readonly(messages),
     announce,
     clear,
   };
