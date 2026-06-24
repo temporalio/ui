@@ -65,6 +65,13 @@ auth:
       - {{ . }}
     {{- end }}
     {{- end }}
+    allowedClaimKey: {{ env "TEMPORAL_AUTH_ALLOWED_CLAIM_KEY" | default "" }}
+    allowedClaimValues:
+    {{- if env "TEMPORAL_AUTH_ALLOWED_CLAIM_VALUES" }}
+    {{- range env "TEMPORAL_AUTH_ALLOWED_CLAIM_VALUES" | split "," }}
+      - {{ . }}
+    {{- end }}
+    {{- end }}
 codec:
   endpoint: {{ env "TEMPORAL_CODEC_ENDPOINT" | default "" }}
   passAccessToken: {{ env "TEMPORAL_CODEC_PASS_ACCESS_TOKEN" | default "false" }}
