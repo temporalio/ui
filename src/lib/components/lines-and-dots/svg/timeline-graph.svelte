@@ -148,11 +148,9 @@
     getFailedOrPendingGroups(groups, $eventStatusFilter),
   );
 
-  // Skeleton rows: how many unfetched event groups we expect below the loaded ones.
-  // Density = current groups per loaded event (from the first page). Applied to the
-  // remaining unloaded events to estimate how many rows will appear when they arrive.
-  // Falls back to 0.5 (2 events/group) when no events are loaded yet so skeletons
-  // appear immediately rather than waiting for the first page to derive a real density.
+  // Skeleton rows: how many unfetched groups remain.
+  // totalExpectedEvents is already a density-adjusted group count (computed in
+  // workflow-timeline-layout) so subtracting filteredGroups.length is correct.
   const pendingGroupCount = $derived.by(() => {
     if (!loading) return 0;
     if (!totalExpectedEvents) {

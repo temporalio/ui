@@ -38,7 +38,7 @@
     parseEventFilterParams,
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
-  import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
+  import { getTimelineGroups } from '$lib/utilities/sort-timeline-groups';
 
   const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
 
@@ -69,7 +69,12 @@
   });
 
   const groups = $derived(
-    orderGroupsByPending(filteredBufferGroups, !reverseSort),
+    getTimelineGroups(
+      filteredBufferGroups,
+      reverseSort,
+      historyCtx.fetchComplete,
+      historyCtx.descMinId,
+    ),
   );
 
   const workflowTaskFailedError = $derived(
@@ -115,10 +120,14 @@
   let stickyHeight = $state(0);
   let graphPanelHeight = $state(0);
   let controlsHeight = $state(0);
+  const estimatedTotalGroups = $derived.by(() => {
+    if (historyCtx.fetchComplete) return groups.length;
+    const totalEvents = historyCtx.totalExpectedEvents ?? 0;
+    return Math.max(groups.length, Math.ceil(totalEvents * 0.5));
+  });
+
   const totalRows = $derived(
-    historyCtx.fetchComplete
-      ? groups.length
-      : Math.max(historyCtx.totalExpectedEvents ?? 0, groups.length),
+    historyCtx.fetchComplete ? groups.length : estimatedTotalGroups,
   );
   // Natural pixel height of all timeline content (rows + axis + detail panel).
   // +120 matches timeline-graph's canvasHeight = timelineHeight + 120, which
@@ -337,7 +346,7 @@
         {reverseSort}
         loading={!historyCtx.fetchComplete}
         scrollY={timelineScrollY}
-        totalExpectedEvents={historyCtx.totalExpectedEvents}
+        totalExpectedEvents={estimatedTotalGroups}
         descMinId={historyCtx.descMinId}
         error={Boolean(workflowTaskFailedError)}
         bind:panelHeight={graphPanelHeight}
