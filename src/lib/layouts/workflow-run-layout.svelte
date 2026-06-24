@@ -31,7 +31,6 @@
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import {
     bufferVersion,
-    currentEventHistory,
     fullEventHistory,
     pauseLiveUpdates,
     timelineEvents,
@@ -295,7 +294,6 @@
     untrack(() => {
       const events = getEventArray();
       $fullEventHistory = events;
-      if (!$pauseLiveUpdates) $currentEventHistory = events;
     });
   });
 
@@ -303,7 +301,6 @@
     $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $fullEventHistory = [];
-    $currentEventHistory = [];
     $bufferVersion = 0;
     workflowError = null;
     fetchComplete = false;

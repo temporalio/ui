@@ -275,13 +275,11 @@
   // groupIndexMap (which changes when filteredGroups changes). It never makes
   // individual rows reactive to $activeGroups.
   //
-  // On click: one JS loop over all registered row wrappers + one
-  // setAttribute/removeAttribute per row that actually changes its transform.
-  // No component destroy/recreate, no cache clearing, no onMount re-runs.
-  //
-  // Cost: O(N) JS iterations (~50ms for 10k rows) regardless of which row
-  // is clicked — uniformly better than the two-loop approach for top clicks
-  // and comparable for bottom clicks.
+  // On click: one JS loop over the ~33 registered row wrappers (17 visible +
+  // 8 overscan per side) + one setAttribute/removeAttribute per row that
+  // actually changes its transform. No component destroy/recreate, no cache
+  // clearing, no onMount re-runs. Imperative Map iteration is uniformly cheaper
+  // than letting Svelte propagate $activeGroups through a per-row derived.
   $effect(() => {
     const idx = activeIdx;
     const shift = panelHeight;

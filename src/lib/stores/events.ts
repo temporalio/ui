@@ -73,7 +73,6 @@ export const bufferVersion = writable(0);
  * independently via fetchAllEvents.
  */
 export const fullEventHistory = writable<WorkflowEvents>([]);
-export const currentEventHistory = writable<WorkflowEvents>([]);
 
 export const resetEvents = derived(bufferVersion, () =>
   getEventArray().filter(isResetEvent),
