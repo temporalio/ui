@@ -136,6 +136,7 @@
           !path.includes(workersRoute) &&
           !path.includes(workerDeploymentsRoute) &&
           !path.includes(standaloneActivitiesRoute) &&
+          !path.includes(standaloneNexusOperationsRoute) &&
           !path.includes(archivalRoute),
       },
       {
@@ -158,7 +159,6 @@
           'standalone-nexus-operations.standalone-nexus-operations',
         ),
         isActive: (path) => path.includes(standaloneNexusOperationsRoute),
-        hidden: !minimumVersionRequired('1.31.0', $temporalVersion),
       },
       {
         href: schedulesRoute,

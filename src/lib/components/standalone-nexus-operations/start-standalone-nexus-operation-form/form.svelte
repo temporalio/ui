@@ -11,7 +11,9 @@
 
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput, {
+    parseDuration,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
@@ -70,39 +72,68 @@
   let searchAttributes = $state<SearchAttributesSchema>([]);
   let advancedOptionsVisible = $state(false);
 
-  const schema = z.object({
-    identity: z.string(),
-    namespace: z.string(),
-    operationId: z.string().min(1, {
-      message: translate(
-        'standalone-nexus-operations.form-operation-id-required',
-      ),
-    }),
-    endpoint: z.string().min(1, {
-      message: translate('standalone-nexus-operations.form-endpoint-required'),
-    }),
-    service: z.string().min(1, {
-      message: translate('standalone-nexus-operations.form-service-required'),
-    }),
-    operation: z.string().min(1, {
-      message: translate(
-        'standalone-nexus-operations.form-operation-name-required',
-      ),
-    }),
-    input: z.string().optional(),
-    encoding: z.enum(encodings).default('json/plain'),
-    messageType: z.string().optional(),
-    startToCloseTimeout: z.string().optional(),
-    scheduleToCloseTimeout: z.string().optional(),
-    scheduleToStartTimeout: z.string().optional(),
-    idReusePolicy: z.string().optional(),
-    idConflictPolicy: z.string().optional(),
-    summary: z.string().optional(),
-    details: z.string().optional(),
-    nexusHeader: z
-      .array(z.object({ key: z.string(), value: z.string() }))
-      .default([]),
-  });
+  const isPositiveDuration = (value: string | undefined): boolean => {
+    const seconds = Number(parseDuration(value ?? ''));
+    return !isNaN(seconds) && seconds > 0;
+  };
+
+  const schema = z
+    .object({
+      identity: z.string(),
+      namespace: z.string(),
+      operationId: z.string().min(1, {
+        message: translate(
+          'standalone-nexus-operations.form-operation-id-required',
+        ),
+      }),
+      endpoint: z.string().min(1, {
+        message: translate(
+          'standalone-nexus-operations.form-endpoint-required',
+        ),
+      }),
+      service: z.string().min(1, {
+        message: translate('standalone-nexus-operations.form-service-required'),
+      }),
+      operation: z.string().min(1, {
+        message: translate(
+          'standalone-nexus-operations.form-operation-name-required',
+        ),
+      }),
+      input: z.string().optional(),
+      encoding: z.enum(encodings).default('json/plain'),
+      messageType: z.string().optional(),
+      startToCloseTimeout: z.string().optional(),
+      scheduleToCloseTimeout: z.string().optional(),
+      scheduleToStartTimeout: z.string().optional(),
+      idReusePolicy: z.string().optional(),
+      idConflictPolicy: z.string().optional(),
+      summary: z.string().optional(),
+      details: z.string().optional(),
+      nexusHeader: z
+        .array(z.object({ key: z.string(), value: z.string() }))
+        .default([]),
+    })
+    .superRefine((data, context) => {
+      if (
+        !isPositiveDuration(data.startToCloseTimeout) &&
+        !isPositiveDuration(data.scheduleToCloseTimeout)
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['startToCloseTimeout'],
+          message: translate(
+            'standalone-nexus-operations.form-timeout-required',
+          ),
+        });
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['scheduleToCloseTimeout'],
+          message: translate(
+            'standalone-nexus-operations.form-timeout-required',
+          ),
+        });
+      }
+    });
 
   const { form, enhance, errors, message } = superForm(
     {
