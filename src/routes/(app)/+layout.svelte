@@ -293,10 +293,15 @@
     }
   });
 
-  afterNavigate(({ from, to, type }) => {
+  let initialNavigation = true;
+
+  afterNavigate(({ from, to }) => {
     const main = document.getElementById('content');
     main?.scrollTo(0, 0);
-    if (type === 'enter') return;
+    if (initialNavigation) {
+      initialNavigation = false;
+      return;
+    }
     if (from?.url.pathname === to?.url.pathname) return;
     main?.focus({ preventScroll: true });
   });
