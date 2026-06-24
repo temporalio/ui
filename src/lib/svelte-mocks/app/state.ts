@@ -25,6 +25,7 @@ const settings: Settings = {
   hideWorkflowQueryErrors: false,
   activityCommandsDisabled: false,
   feedbackURL: '',
+  disableNewsFetch: false,
   runtimeEnvironment: {
     isCloud: false,
     isLocal: true,

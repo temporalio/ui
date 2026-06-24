@@ -42,6 +42,7 @@ const settingsResponse = (
   ShowTemporalSystemNamespace: false,
   NavCollapsedByDefault: false,
   FeedbackURL: '',
+  DisableNewsFetch: false,
   Version: '2.51.0',
   ...overrides,
 });
@@ -85,5 +86,15 @@ describe('fetchSettings', () => {
     const settings = await fetchSettings();
 
     expect(settings.navCollapsedByDefault).toBe(false);
+  });
+
+  it('maps disableNewsFetch from settings response', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({ DisableNewsFetch: true }),
+    );
+
+    const settings = await fetchSettings();
+
+    expect(settings.disableNewsFetch).toBe(true);
   });
 });

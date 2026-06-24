@@ -7,6 +7,7 @@
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
+  import NewsFeedWidget from '$lib/components/news-feed/news-feed-widget.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
@@ -53,6 +54,10 @@
   initializeNavDefaults(page.data?.settings?.navCollapsedByDefault);
 
   let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
+  let newsFeedClusterId = $derived(page.data?.cluster?.clusterId ?? '');
+  let showNewsFeed = $derived(
+    !isCloud && !page.data?.settings?.disableNewsFetch && !!newsFeedClusterId,
+  );
   let activeNamespaceName = $derived(
     page.params?.namespace ?? $lastUsedNamespace,
   );
@@ -339,6 +344,9 @@
           <NamespacePicker {namespaceList} />
         {/if}
       {/snippet}
+      {#if showNewsFeed}
+        <NewsFeedWidget clusterId={newsFeedClusterId} />
+      {/if}
       {#if isCloud}
         <a
           href={page.data?.settings?.supportURL ||

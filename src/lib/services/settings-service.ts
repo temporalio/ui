@@ -52,6 +52,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
     navCollapsedByDefault: !!settingsResponse?.NavCollapsedByDefault,
     feedbackURL: settingsResponse?.FeedbackURL,
+    disableNewsFetch: !!settingsResponse?.DisableNewsFetch,
     runtimeEnvironment: {
       get isCloud() {
         if (EnvironmentOverride) {

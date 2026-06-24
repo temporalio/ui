@@ -342,6 +342,7 @@ export type SettingsResponse = {
   ShowTemporalSystemNamespace: boolean;
   NavCollapsedByDefault: boolean;
   FeedbackURL: string;
+  DisableNewsFetch: boolean;
   Version: string;
 };
 
