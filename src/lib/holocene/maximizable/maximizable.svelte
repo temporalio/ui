@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Snippet } from 'svelte';
+  import { type Snippet, tick } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { portal } from '$lib/holocene/portal/portal-action';
@@ -23,14 +23,40 @@
     actions = undefined,
   }: Props = $props();
 
+  // Captured here (before toggling) because maximizing re-renders the content
+  // (e.g. CodeMirror), which blurs focus to <body> before the focus-trap action
+  // activates — so the action can't observe the real trigger on its own.
+  let previouslyFocused: HTMLElement | null = null;
+
+  const maximize = () => {
+    previouslyFocused =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    maximized = true;
+  };
+
+  const minimize = async () => {
+    maximized = false;
+    await tick();
+    if (previouslyFocused && document.body.contains(previouslyFocused)) {
+      previouslyFocused.focus();
+    }
+    previouslyFocused = null;
+  };
+
   let escapeListener = (event: KeyboardEvent) => {
     if (maximized && event.key === 'Escape') {
-      maximized = false;
+      minimize();
     }
   };
 
   const handleClick = () => {
-    maximized = !maximized;
+    if (maximized) {
+      minimize();
+    } else {
+      maximize();
+    }
   };
 
   const handleFocusOut = (event: FocusEvent) => {
