@@ -83,15 +83,6 @@
       {#each $newsFeed.items as item (item.id)}
         <article class="min-h-fit border-b border-subtle py-2 last:border-b-0">
           <h4>{item.title}</h4>
-          {#if item.tags.length}
-            <div class="mt-2 flex flex-wrap gap-2">
-              {#each item.tags as tag (tag)}
-                <Badge type="secondary" class="text-xs uppercase">
-                  {formatNewsFeedTag(tag)}
-                </Badge>
-              {/each}
-            </div>
-          {/if}
           <Markdown
             frameId="news-feed-{item.id}"
             overrideTheme="primary"
