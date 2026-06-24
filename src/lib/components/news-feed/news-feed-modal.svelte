@@ -58,7 +58,7 @@
   large
 >
   <h3 slot="title" class="flex items-center gap-2">
-    <Icon name="temporal-logo" />{translate('common.news')}
+    <Icon name="temporal-logo" class="h-8 w-8" />{translate('common.news')}
   </h3>
   <div
     slot="content"
