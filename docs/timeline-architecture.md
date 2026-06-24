@@ -122,18 +122,21 @@ Svelte's reactive graph is only entered at the outermost boundary, via two narro
 
 ```mermaid
 flowchart TD
-    subgraph OLD["❌ Old approach (stores)"]
-        direction LR
-        O1["Svelte writable store<br/>holds full WorkflowEvent[]"] -->|every push triggers| O2["$derived chains re-run<br/>across all subscribers"]
-        O2 --> O3["Full array diff + re-render<br/>at 50k events = jank"]
-    end
-
     subgraph NEW["✅ New approach (buffer + narrow signals)"]
         direction LR
         N1["Plain TS array mutated<br/>in-place — no reactive cost"] -->|batch complete| N2["bufferVersion.set(v+1)<br/>one integer write"]
         N2 -->|$derived reads version| N3["Consumer calls getEventArray()<br/>reads already-built array — O(1)"]
         N1 -->|group head appended| N4["onLatestGroup() fires<br/>registered callback"]
         N4 --> N5["Layout calls getGroupArray()<br/>reads cached sorted slice — O(1)"]
+    end
+```
+
+```mermaid
+flowchart TD
+    subgraph OLD["❌ Old approach (stores)"]
+        direction LR
+        O1["Svelte writable store<br/>holds full WorkflowEvent[]"] -->|every push triggers| O2["$derived chains re-run<br/>across all subscribers"]
+        O2 --> O3["Full array diff + re-render<br/>at 50k events = jank"]
     end
 ```
 
