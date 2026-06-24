@@ -7,14 +7,18 @@
   let position: 'bottom' | 'right' = getContext('drawer-pos');
 </script>
 
-<div class="title-wrapper {position}">
-  <h2>{title}</h2>
-  {#if $$slots['subtitle']}
-    <p class="text-xs font-normal">
-      <slot name="subtitle" />
-    </p>
-  {/if}
-</div>
+{#if title || $$slots['subtitle']}
+  <div class="title-wrapper {position}">
+    {#if title}
+      <h2>{title}</h2>
+    {/if}
+    {#if $$slots['subtitle']}
+      <p class="text-xs font-normal">
+        <slot name="subtitle" />
+      </p>
+    {/if}
+  </div>
+{/if}
 
 <div class={twMerge('content', position, $$props.class)}>
   <slot />
