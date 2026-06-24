@@ -47,7 +47,7 @@
       {translate('standalone-activities.standalone-activities')}
     </caption>
     <TableHeaderRow slot="headers">
-      <th></th>
+      <th scope="col"></th>
       {#each columns as column}
         <TableHeaderCell {column} />
       {/each}

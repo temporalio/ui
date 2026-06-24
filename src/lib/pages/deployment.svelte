@@ -84,13 +84,13 @@
         {translate('deployments.deployments')}
       </caption>
       <tr slot="headers">
-        <th>{translate('deployments.build-id')}</th>
-        <th>{translate('deployments.build-status')}</th>
+        <th scope="col">{translate('deployments.build-id')}</th>
+        <th scope="col">{translate('deployments.build-status')}</th>
         <CapabilityGuard capability="serverScaledDeployments">
-          <th>{translate('deployments.compute')}</th>
+          <th scope="col">{translate('deployments.compute')}</th>
         </CapabilityGuard>
-        <th>{translate('deployments.deployed')}</th>
-        <th>{translate('deployments.actions')}</th>
+        <th scope="col">{translate('deployments.deployed')}</th>
+        <th scope="col">{translate('deployments.actions')}</th>
       </tr>
       {#each visibleItems as version (version.version)}
         <VersionTableRow

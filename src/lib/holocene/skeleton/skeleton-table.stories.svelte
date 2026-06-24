@@ -30,7 +30,7 @@
   <SkeletonTable {columnWidths} {...args}>
     <svelte:fragment slot="headers">
       {#each Array(args.columns) as _, index}
-        <th>Heading {index + 1}</th>
+        <th scope="col">Heading {index + 1}</th>
       {/each}
     </svelte:fragment>
   </SkeletonTable>

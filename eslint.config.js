@@ -8,6 +8,8 @@ import pluginVitest from 'eslint-plugin-vitest';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+import local from './eslint-rules/th-has-scope.js';
+
 const sharedGlobals = {
   ...globals.browser,
   ...globals.es2017,
@@ -123,9 +125,10 @@ export default [
         extraFileExtensions: ['.svelte'],
       },
     },
-    plugins: sharedPlugins,
+    plugins: { ...sharedPlugins, local },
     rules: {
       ...sharedRules,
+      'local/th-has-scope': 'warn',
       'svelte/require-each-key': 'warn',
       'svelte/no-reactive-reassign': 'warn',
       'svelte/no-reactive-functions': 'warn',
@@ -145,6 +148,7 @@ export default [
   {
     ignores: [
       '**/*.cjs',
+      'eslint-rules/**',
       'server/**',
       '**/error-boundary.svelte',
       '.svelte-kit/**',

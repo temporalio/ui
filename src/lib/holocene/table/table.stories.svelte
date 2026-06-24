@@ -29,7 +29,7 @@
   <Table class="w-full" updating={args.updating} data-testid={context.id}>
     <tr slot="headers">
       {#each Array(args.columns) as _, index}
-        <th>Heading {index + 1}</th>
+        <th scope="col">Heading {index + 1}</th>
       {/each}
     </tr>
     {#each Array(args.rows) as _}

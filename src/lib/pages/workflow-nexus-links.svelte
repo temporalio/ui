@@ -59,10 +59,10 @@
         >{translate('workflows.workers-tab')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th class="w-24">{translate('nexus.caller-event')}</th>
-        <th>{translate('nexus.caller-workflow')}</th>
-        <th>{translate('nexus.caller-namespace')}</th>
-        <th>{translate('nexus.handler-event')}</th>
+        <th scope="col" class="w-24">{translate('nexus.caller-event')}</th>
+        <th scope="col">{translate('nexus.caller-workflow')}</th>
+        <th scope="col">{translate('nexus.caller-namespace')}</th>
+        <th scope="col">{translate('nexus.handler-event')}</th>
       </TableHeaderRow>
       {#each inboundLinkEvents as event}
         {@const link = getInboundLinkForEvent(event)}
@@ -117,13 +117,13 @@
         >{translate('workflows.workers-tab')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th class="w-28">{translate('nexus.source-event')}</th>
-        <th>{translate('nexus.nexus-endpoint-simple')}</th>
-        <th>{translate('nexus.nexus-service')}</th>
-        <th>{translate('nexus.nexus-operation')}</th>
-        <th>{translate('nexus.handler-namespace')}</th>
-        <th>{translate('nexus.handler-workflow')}</th>
-        <th>{translate('nexus.handler-event')}</th>
+        <th scope="col" class="w-28">{translate('nexus.source-event')}</th>
+        <th scope="col">{translate('nexus.nexus-endpoint-simple')}</th>
+        <th scope="col">{translate('nexus.nexus-service')}</th>
+        <th scope="col">{translate('nexus.nexus-operation')}</th>
+        <th scope="col">{translate('nexus.handler-namespace')}</th>
+        <th scope="col">{translate('nexus.handler-workflow')}</th>
+        <th scope="col">{translate('nexus.handler-event')}</th>
       </TableHeaderRow>
       {#each nexusGroups as group}
         {@const link = group.links?.[0]}

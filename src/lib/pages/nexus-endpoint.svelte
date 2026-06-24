@@ -114,7 +114,7 @@
           >{translate('nexus.allowed-caller-namespaces')}</caption
         >
         <TableHeaderRow slot="headers">
-          <th class="w-full">{translate('common.name')}</th>
+          <th scope="col" class="w-full">{translate('common.name')}</th>
         </TableHeaderRow>
         {#each visibleItems as namespace (namespace)}
           <TableRow>

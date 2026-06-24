@@ -33,7 +33,7 @@
         >{translate('common.namespaces')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th>{translate('common.name')}</th>
+        <th scope="col">{translate('common.name')}</th>
       </TableHeaderRow>
       {#each visibleItems as namespace (namespace.namespaceInfo.name)}
         <TableRow>

@@ -83,7 +83,7 @@
         )}`}</caption
       >
       <tr slot="headers">
-        <th colspan="2">
+        <th scope="col" colspan="2">
           <h3>{translate('common.details')}</h3>
         </th>
       </tr>
@@ -158,7 +158,7 @@
         >{translate('namespaces.versions')}</caption
       >
       <tr slot="headers">
-        <th colspan="2">
+        <th scope="col" colspan="2">
           <h3>{translate('namespaces.versions')}</h3>
         </th>
       </tr>
@@ -181,7 +181,7 @@
       >
 
       <tr slot="headers">
-        <th colspan="2">
+        <th scope="col" colspan="2">
           <h3>
             {translate('namespaces.client-actions')}
           </h3>
@@ -264,8 +264,8 @@
         >{translate('events.attribute-group.search-attributes')}</caption
       >
       <TableHeaderRow slot="headers">
-        <th>{translate('common.key')}</th>
-        <th>{translate('common.type')}</th>
+        <th scope="col">{translate('common.key')}</th>
+        <th scope="col">{translate('common.type')}</th>
       </TableHeaderRow>
       {#each Object.entries($searchAttributes) as [key, type]}
         <TableRow>

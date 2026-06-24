@@ -30,9 +30,9 @@
   {/snippet}
   {#snippet headers()}
     <TableHeaderRow>
-      <th>Name</th>
-      <th>Last Updated</th>
-      <th>Created On</th>
+      <th scope="col">Name</th>
+      <th scope="col">Last Updated</th>
+      <th scope="col">Created On</th>
     </TableHeaderRow>
   {/snippet}
   {#snippet columns(endpoint)}
