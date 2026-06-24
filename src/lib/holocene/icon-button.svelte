@@ -11,7 +11,6 @@
     'data-testid'?: string;
     label: string;
     variant?: 'primary' | 'secondary' | 'ghost';
-    size?: 'sm' | 'md';
     class?: string;
   }
 
@@ -20,18 +19,12 @@
   export let icon: IconName;
   export let label: string;
   export let variant: 'primary' | 'secondary' | 'ghost' = 'ghost';
-  export let size: 'sm' | 'md' = 'md';
-
-  const sizes: Record<'sm' | 'md', string> = {
-    sm: 'h-6 w-6',
-    md: 'h-9 w-9',
-  };
 </script>
 
 <Button
   {variant}
   leadingIcon={icon}
-  class={merge('shrink-0 p-0', sizes[size], className)}
+  class={merge('h-9 w-9 shrink-0 p-0', className)}
   aria-label={label}
   disableTracking={true}
   data-track-name="icon-button"

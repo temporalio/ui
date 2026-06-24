@@ -4,9 +4,9 @@
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import IconButton from '$lib/holocene/icon-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ToastVariant } from '$lib/types/holocene';
 
@@ -56,12 +56,12 @@
   <p class="text-sm">
     <slot />
   </p>
-  <IconButton
+  <Button
     variant="ghost"
-    icon="close"
-    label={dismissLabel}
-    size="sm"
-    class="text-inherit"
+    leadingIcon="close"
+    aria-label={dismissLabel}
+    class="text-inherit h-6 w-6 shrink-0 p-0"
+    disableTracking
     on:click={handleDismiss}
   />
 </div>
