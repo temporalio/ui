@@ -97,7 +97,7 @@
       id="workflow-termination-reason"
       class="mt-4"
       placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason-label')}
+      label={translate('common.reason-optional')}
       bind:value={reason}
     />
   </div>

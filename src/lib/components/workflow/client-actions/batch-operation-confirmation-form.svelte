@@ -17,6 +17,7 @@
     action: Action;
     reason: string;
     jobId: string;
+    reasonPlaceholder: string;
     jobIdPlaceholder: string;
     jobIdValid: boolean;
     children?: Snippet;
@@ -26,6 +27,7 @@
     action,
     reason = $bindable(),
     jobId = $bindable(),
+    reasonPlaceholder,
     jobIdPlaceholder,
     jobIdValid = $bindable(),
     children,
@@ -118,8 +120,11 @@
   <Input
     id="bulk-action-reason-{action}"
     bind:value={reason}
-    label={translate('common.reason-label')}
-    placeholder={translate('common.reason-placeholder')}
+    label={translate('common.reason')}
+    hintText={translate('workflows.batch-operation-confirmation-input-hint', {
+      placeholder: reasonPlaceholder,
+    })}
+    placeholder={reasonPlaceholder}
   />
   <Input
     id="batch-operation-job-id"

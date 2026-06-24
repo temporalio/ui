@@ -15,6 +15,7 @@ export const Strings = {
   'batch-terminate-modal-title': 'Terminate Workflows',
   'batch-cancel-modal-title': 'Cancel Workflows',
   'batch-reset-modal-title': 'Reset Workflows',
+  'workflow-action-reason-placeholder': '{{action}} by {{identity}}',
   'batch-operation-confirmation-all':
     'Are you sure you want to {{action}} all workflows matching the following query? This action cannot be undone.',
   'batch-operation-count-disclaimer':
@@ -27,6 +28,8 @@ export const Strings = {
     'Are you sure you want to reset one workflow?',
   'batch-reset-confirmation_other':
     'Are you sure you want to reset {{count, number}} workflows?',
+  'batch-operation-confirmation-input-hint':
+    'If you supply a custom reason, "{{placeholder}}" will be appended to it. If you omit a reason, the placeholder will be used.',
   'batch-terminate-all-success':
     'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':

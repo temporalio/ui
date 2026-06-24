@@ -14,7 +14,9 @@
   import { batchTerminateWorkflows } from '$lib/services/batch-service';
   import { toaster } from '$lib/stores/toaster';
   import { workflowsQuery } from '$lib/stores/workflows';
+  import { getIdentity } from '$lib/utilities/core-context';
   import { isNetworkError } from '$lib/utilities/is-network-error';
+  import { getPlaceholder } from '$lib/utilities/workflow-actions';
 
   import BatchOperationConfirmationModalBody from './batch-operation-confirmation-form.svelte';
 
@@ -25,7 +27,9 @@
 
   let { namespace, open = $bindable() }: Props = $props();
 
+  const identity = getIdentity();
   const reason = writable('');
+  const reasonPlaceholder = getPlaceholder(Action.Terminate, identity);
   const jobId = writable('');
   const jobIdValid = writable(true);
   let jobIdPlaceholder = $state(crypto.randomUUID());
@@ -50,7 +54,7 @@
     try {
       const options = {
         namespace,
-        reason: $reason?.trim(),
+        reason: $reason ? $reason : reasonPlaceholder,
         jobId: $jobId || jobIdPlaceholder,
         ...($allSelected
           ? { query: $workflowsQuery }
@@ -91,6 +95,7 @@
       bind:reason={$reason}
       bind:jobId={$jobId}
       bind:jobIdValid={$jobIdValid}
+      {reasonPlaceholder}
       {jobIdPlaceholder}
       action={Action.Terminate}
     />

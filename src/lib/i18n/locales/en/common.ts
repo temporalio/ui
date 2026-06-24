@@ -45,7 +45,7 @@ export const Strings = {
   all: 'All',
   submit: 'Submit',
   reason: 'Reason',
-  'reason-label': 'Reason (optional)',
+  'reason-optional': 'Reason (optional)',
   'reason-placeholder': 'Enter a reason',
   identity: 'Identity',
   'identity-placeholder': 'Enter an identity',
