@@ -1,0 +1,51 @@
+publicPath:
+port: 8083
+enableUi: true
+cors:
+  cookieInsecure: true
+  allowOrigins:
+    - http://localhost:8083
+refreshInterval: 0s
+defaultNamespace: default
+showTemporalSystemNamespace: false
+feedbackUrl:
+disableWriteActions: false
+workflowTerminateDisabled: false
+workflowCancelDisabled: false
+workflowSignalDisabled: false
+workflowUpdateDisabled: false
+workflowResetDisabled: false
+batchActionsDisabled: false
+startWorkflowDisabled: false
+hideWorkflowQueryErrors: false
+refreshWorkflowCountsDisabled: false
+auth:
+  enabled: true
+  maxSessionDuration: 25s
+  providers:
+    - label: Keycloak
+      type: oidc
+      providerUrl: http://localhost:8080/realms/temporal
+      issuerUrl: ""
+      clientId: temporal-ui
+      clientSecret: temporal-secret
+      scopes:
+        - openid
+        - profile
+        - email
+      callbackUrl: http://localhost:8083/auth/sso/callback
+tls:
+  caFile:
+  certFile:
+  keyFile:
+  caData:
+  certData:
+  keyData:
+  enableHostVerification: false
+  serverName:
+codec:
+  endpoint:
+  passAccessToken: false
+  includeCredentials: false
+forwardHeaders:
+  - X-Forwarded-For

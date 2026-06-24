@@ -1,0 +1,87 @@
+version: '3.8'
+
+# =============================================================================
+# E2E Auth Test Stack — Real Keycloak
+# =============================================================================
+#
+# Starts a Keycloak 26 instance pre-loaded with the "temporal" realm and a
+# Temporal UI server configured against it. Used to verify that the UI server
+# correctly derives refresh cookie MaxAge from Keycloak's JWT refresh token
+# `exp` claim rather than from the `expires_in` (access token) field.
+#
+# Token lifetimes (defined in keycloak/realm-temporal.json):
+#   Access token:   5s   — forces token refresh within the first test step
+#   SSO session:   30s   — controls refresh token lifetime in Keycloak
+#   maxSessionDuration: 25s — UI enforces session boundary before Keycloak's
+#
+# TEMPORAL_AUTH_REFRESH_TOKEN_DURATION is intentionally NOT set so that only
+# the JWT exp path is exercised (no config fallback).
+#
+# Ports:
+#   8080 — Keycloak admin console / OIDC endpoints
+#   8083 — Temporal UI server
+# =============================================================================
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: '8080'
+      KC_HTTP_MANAGEMENT_PORT: '9000'
+      KC_HOSTNAME_URL: 'http://localhost:8080'
+      KC_HOSTNAME_ADMIN_URL: 'http://localhost:8080'
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HOSTNAME_STRICT_HTTPS: 'false'
+      KC_HTTP_ENABLED: 'true'
+      KC_HEALTH_ENABLED: 'true'
+      KC_METRICS_ENABLED: 'false'
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import:ro
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'exec 3<>/dev/tcp/127.0.0.1/9000 && printf "GET /health/ready HTTP/1.0\r\nHost: localhost\r\n\r\n" >&3 && grep -q "UP" <&3 || exit 1',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 18
+      start_period: 60s
+
+  ui-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      target: ui-server
+    environment:
+      TEMPORAL_ADDRESS: '127.0.0.1:7233'
+      TEMPORAL_UI_PORT: '8083'
+      TEMPORAL_AUTH_ENABLED: 'true'
+      TEMPORAL_MAX_SESSION_DURATION: '25s'
+      TEMPORAL_AUTH_PROVIDER_URL: 'http://localhost:8080/realms/temporal'
+      TEMPORAL_AUTH_ISSUER_URL: 'http://localhost:8080/realms/temporal'
+      TEMPORAL_AUTH_CLIENT_ID: 'temporal-ui'
+      TEMPORAL_AUTH_CLIENT_SECRET: 'temporal-secret'
+      TEMPORAL_AUTH_CALLBACK_URL: 'http://localhost:8083/auth/sso/callback'
+      TEMPORAL_AUTH_SCOPES: 'openid,profile,email'
+      TEMPORAL_CSRF_COOKIE_INSECURE: 'true'
+      TEMPORAL_CORS_ORIGINS: 'http://localhost:8083'
+    ports:
+      - '8083:8083'
+    extra_hosts:
+      - 'localhost:host-gateway'
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ['CMD', 'curl', '--fail', '--silent', 'http://localhost:8083/healthz']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
