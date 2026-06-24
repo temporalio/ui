@@ -74,7 +74,8 @@ export interface NetworkError {
 export type Settings = {
   auth: {
     enabled: boolean;
-    options: string[];
+    options: string[] | null;
+    redirectToProvider: boolean;
   };
   baseUrl: string;
   codec: {

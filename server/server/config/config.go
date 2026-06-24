@@ -104,6 +104,8 @@ type (
 	Auth struct {
 		// Enabled - UI checks this first before reading your provider config
 		Enabled bool `yaml:"enabled"`
+		// RedirectToProvider - skip the UI login page and redirect unauthenticated users directly to the auth provider
+		RedirectToProvider bool `yaml:"redirectToProvider"`
 		// A list of auth providers. Currently enables only the first provider in the list.
 		Providers []AuthProvider `yaml:"providers"`
 		// MaxSessionDuration - optional maximum session duration. If set, users will be
