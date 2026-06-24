@@ -21,7 +21,14 @@ function makeUserCookie(accessToken: string) {
   );
 }
 
-async function mockAuthApis(page: Page) {
+async function mockAuthApis(
+  page: Page,
+  authSettings: {
+    Enabled?: boolean;
+    Options?: string[] | null;
+    RedirectToProvider?: boolean;
+  } = {},
+) {
   await Promise.all([
     mockClusterApi(page),
     mockNamespacesApi(page),
@@ -29,9 +36,48 @@ async function mockAuthApis(page: Page) {
     mockNamespaceApi(page),
     mockSearchAttributesApi(page),
     mockWorkflowsCountApi(page),
-    mockSettingsApi(page, { Auth: { Enabled: true, Options: null } }),
+    mockSettingsApi(page, {
+      Auth: {
+        Enabled: true,
+        Options: null,
+        RedirectToProvider: false,
+        ...authSettings,
+      },
+    }),
   ]);
 }
+
+test('routes unauthenticated users to login by default', async ({
+  page,
+  baseURL,
+}) => {
+  await mockAuthApis(page);
+
+  await page.goto(`${baseURL}/namespaces/default/workflows`);
+
+  await expect(page).toHaveURL(/\/login\?returnUrl=/);
+  await expect(page.getByTestId('login-button')).toBeVisible();
+});
+
+test('routes unauthenticated users directly to SSO when configured', async ({
+  page,
+  baseURL,
+}) => {
+  await mockAuthApis(page, { RedirectToProvider: true });
+
+  let ssoUrl = '';
+  await page.route('**/auth/sso**', async (route) => {
+    ssoUrl = route.request().url();
+    await route.fulfill({ status: 200, body: 'sso' });
+  });
+
+  const protectedUrl = `${baseURL}/namespaces/default/workflows?query=ExecutionStatus%3D%22Running%22`;
+  await page.goto(protectedUrl);
+
+  await expect.poll(() => ssoUrl).toContain('/auth/sso');
+  const parsedUrl = new URL(ssoUrl);
+  expect(parsedUrl.searchParams.get('returnUrl')).toBe(protectedUrl);
+});
 
 test('sets Authorization Bearer header from user cookie', async ({
   page,
@@ -122,4 +168,40 @@ test('refreshes token and retries request on 401', async ({
   expect(workflowCallCount).toBe(2);
   expect(authHeaders[0]).toBe('Bearer expired-token');
   expect(authHeaders[1]).toBe('Bearer refreshed-token-456');
+});
+
+test('log out calls backend logout endpoint', async ({ page, baseURL }, {
+  project: {
+    use: { isMobile },
+  },
+}) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip(isMobile, 'This test is for Desktop only');
+
+  await mockAuthApis(page);
+
+  await page.route(WORKFLOWS_API, async (route) => {
+    await route.fulfill({ json: { executions: [], nextPageToken: null } });
+  });
+
+  let logoutCalled = false;
+  await page.route('**/auth/logout**', async (route) => {
+    logoutCalled = true;
+    await route.fulfill({ status: 204, body: '' });
+  });
+
+  await page.context().addCookies([
+    {
+      name: 'user0',
+      value: makeUserCookie('test-access-token-123'),
+      domain: 'localhost',
+      path: '/',
+    },
+  ]);
+
+  await page.goto(baseURL);
+  await page.getByTestId('user-menu-trigger').click();
+  await page.getByRole('menuitem', { name: /log out/i }).click();
+
+  await expect.poll(() => logoutCalled).toBe(true);
 });

@@ -97,4 +97,39 @@ describe('fetchSettings', () => {
 
     expect(settings.disableNewsFetch).toBe(true);
   });
+
+  it('should map redirectToProvider auth settings', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({
+        Auth: {
+          Enabled: true,
+          Options: ['audience'],
+          RedirectToProvider: true,
+        },
+      }),
+    );
+
+    const settings = await fetchSettings();
+
+    expect(settings.auth).toEqual({
+      enabled: true,
+      options: ['audience'],
+      redirectToProvider: true,
+    });
+  });
+
+  it('should default redirectToProvider to false', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({
+        Auth: {
+          Enabled: true,
+          Options: null,
+        },
+      }),
+    );
+
+    const settings = await fetchSettings();
+
+    expect(settings.auth.redirectToProvider).toBe(false);
+  });
 });
