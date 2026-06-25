@@ -75,6 +75,7 @@
         </div>
         {#if editing && inputs.length > 1}
           <IconButton
+            class="mt-7"
             icon="trash"
             label={translate('workflows.remove-input')}
             data-testid="remove-input-{index}"
