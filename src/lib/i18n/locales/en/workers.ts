@@ -269,6 +269,7 @@ export const Strings = {
   'build-id-label': 'Build ID',
   'build-id-hint': 'A unique identifier for this version of your Worker.',
   'existing-versions': 'Existing Versions',
+  'existing-versions-more': '+{{count}} more',
   'max-concurrent-activities-label': 'Max Concurrent Activities',
   'max-concurrent-activities-hint':
     'Maximum concurrent activities per worker instance.',
