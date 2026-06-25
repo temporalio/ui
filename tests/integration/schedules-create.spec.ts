@@ -130,7 +130,7 @@ test.describe('Creates Schedule Successfully', () => {
     await page.getByTestId('create-schedule-button').click();
 
     await expect(
-      page.getByText('Must be a valid cron string').first(),
+      page.getByText('Cron string format invalid').first(),
     ).toBeVisible();
     await expect(page.getByTestId('loading')).toBeHidden();
   });

@@ -123,8 +123,12 @@
     {required}
   />
   {#if showDatePicker}
+    <!-- keep focus on the input while interacting with the calendar so blur
+    validation doesn't fire (and shift layout) mid-click -->
     <div
       class="surface-primary absolute z-30 inline-block rounded border border-subtle shadow"
+      onmousedown={(e) => e.preventDefault()}
+      role="presentation"
     >
       <div class="mx-3 my-2 flex items-center justify-around">
         <div class="flex items-center justify-center">
