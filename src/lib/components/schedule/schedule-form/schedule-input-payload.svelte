@@ -49,6 +49,7 @@
   let initialInputs = $state<string[]>(['']);
   let initialEncoding = $state<PayloadInputEncoding>('json/plain');
   let initialMessageType = $state('');
+  let loading = $state(true);
 
   const setInitialInput = (result: DecodedPayloadResult): void => {
     const decodedInputs = (result ?? [])
@@ -81,6 +82,8 @@
         }
       }
     }
+
+    loading = false;
   };
 
   const handleEdit = () => {
@@ -102,6 +105,7 @@
         bind:inputs
         encoding={encodingStore}
         bind:messageType
+        bind:loading
         editing={editInput}
       >
         {#snippet action()}

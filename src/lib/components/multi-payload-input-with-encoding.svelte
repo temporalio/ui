@@ -21,6 +21,7 @@
     error?: boolean;
     label?: string;
     editing?: boolean;
+    loading?: boolean;
     action?: Snippet;
   }
 
@@ -31,6 +32,7 @@
     error = $bindable(false),
     label = translate('workflows.input'),
     editing = true,
+    loading = $bindable(false),
     action,
   }: Props = $props();
 
@@ -70,6 +72,7 @@
             bind:input={inputs[index]}
             id="input-{index}"
             {editing}
+            {loading}
             clearOnDestroy={false}
           />
         </div>
