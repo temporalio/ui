@@ -10,7 +10,7 @@
   type Props = {
     point: [number, number];
     category?: string;
-    classification?: string;
+    classification?: string | null;
     r?: number;
     icon?: TimelineIconName;
     strokeWidth?: number;

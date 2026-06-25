@@ -5,10 +5,9 @@
   import { getWorkflowStatusLabel } from '$lib/utilities/get-status-label';
 
   import { TimelineConfig } from '../constants';
-
-  import Dot from './dot.svelte';
-  import Line from './line.svelte';
-  import TimelineIcon from './timeline-icon.svelte';
+  import Dot from '../svg/dot.svelte';
+  import Line from '../svg/line.svelte';
+  import TimelineIcon from '../svg/timeline-icon.svelte';
 
   interface Props {
     workflow: WorkflowExecution;

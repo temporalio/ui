@@ -371,7 +371,7 @@ describe('category → dot icon selection', () => {
   it('paused state overrides to "pause" icon (second dot)', () => {
     const pauseTime = '2024-01-01T00:00:10Z';
     // index !== 0 && pauseTime → 'pause'
-    const index = 1;
+    const index: number = 1;
     const icon = pauseTime && index !== 0 ? 'pause' : 'activity';
     expect(icon).toBe('pause');
   });

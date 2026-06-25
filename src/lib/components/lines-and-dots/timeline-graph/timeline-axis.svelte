@@ -3,22 +3,25 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { TimelineConfig } from '../constants';
+  import Line from '../svg/line.svelte';
 
-  import Line from './line.svelte';
+  import type { TimelineScale } from './timeline-scale.svelte';
 
   type Props = {
     x1: number;
     x2: number;
+    gutter: number;
     timelineHeight: number;
     startTime: string | Timestamp;
-    duration: number;
+    scale: TimelineScale;
   };
   let {
     x1 = 0,
     x2 = 1000,
+    gutter = 0,
     timelineHeight = 1000,
     startTime,
-    duration,
+    scale,
   }: Props = $props();
 
   const { radius } = TimelineConfig;
@@ -26,6 +29,10 @@
 
   const distance = $derived(x2 - x1);
   const tickDistance = $derived(distance / ticks);
+
+  const startMs = $derived(scale.unproject(x1 - gutter));
+  const endMs = $derived(scale.unproject(x2 - gutter));
+  const includeMilliseconds = $derived((endMs - startMs) / ticks < 1000);
 </script>
 
 <Line
@@ -46,10 +53,8 @@
     >
       {formatDistanceAbbreviated({
         start: startTime,
-        end: new Date(
-          new Date(startTime.toString()).getTime() + (duration / ticks) * i,
-        ),
-        includeMilliseconds: duration / ticks < 1000,
+        end: new Date(scale.unproject(tickX - gutter)),
+        includeMilliseconds,
       })}
     </text>
   {/if}

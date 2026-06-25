@@ -6,22 +6,27 @@
   import { eventStatusFilter } from '$lib/stores/filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
+  import { type ValidTime, validTimeToDate } from '$lib/utilities/format-time';
   import { getFailedOrPendingGroups } from '$lib/utilities/get-failed-or-pending';
 
   import { TimelineConfig } from '../constants';
   import EndTimeInterval from '../end-time-interval.svelte';
+  import Line from '../svg/line.svelte';
+  import TimelineIconDefs from '../svg/timeline-icon-defs.svelte';
   import {
     getDescStart,
     getPendingBlockY,
     getRowY,
     getTotalForY,
-  } from './timeline-positioning';
+  } from '../svg/timeline-positioning';
 
   import GroupDetailsRow from './group-details-row.svelte';
-  import Line from './line.svelte';
   import TimelineAxis from './timeline-axis.svelte';
+  import TimelineCollapsedLayer from './timeline-collapsed-layer.svelte';
   import TimelineGraphRow from './timeline-graph-row.svelte';
-  import TimelineIconDefs from './timeline-icon-defs.svelte';
+  import { TimelineScale } from './timeline-scale.svelte';
+  import { Timeline } from './timeline.svelte';
+  import { Viewport } from './viewport.svelte';
   import WorkflowRow from './workflow-row.svelte';
 
   interface Props {
@@ -40,6 +45,7 @@
     totalExpectedEvents?: number;
     descMinId?: number;
     panelHeight?: number;
+    onTimelineInit?: (timeline: Timeline) => void;
   }
 
   let {
@@ -56,6 +62,7 @@
     totalExpectedEvents = 0,
     descMinId = 0,
     panelHeight = $bindable(0),
+    onTimelineInit,
   }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
@@ -143,6 +150,42 @@
       cancelAnimationFrame(rafId);
     };
   });
+
+  const timelineWidth = $derived(canvasWidth - 2 * gutter);
+
+  let nowMs = $state(Date.now());
+
+  const timeline = new Timeline({
+    getFullEventHistory: () => $fullEventHistory,
+    getWorkflow: () => workflow,
+    getEventGroups: () => groups,
+    getCurrentTimeMs: () => nowMs,
+  });
+
+  const viewport = new Viewport({ startTimeMs: 0, endTimeMs: 0 });
+  const scale = new TimelineScale({ timeline, viewport });
+
+  $effect(() => {
+    onTimelineInit?.(timeline);
+  });
+
+  $effect(() => {
+    viewport.setSize(timelineWidth, 0);
+  });
+
+  const projectX = (time: ValidTime | undefined | null): number => {
+    if (!time) return gutter;
+    return scale.project(validTimeToDate(time).getTime()) + gutter;
+  };
+
+  const toggleSegment = (segmentKey: string) => {
+    const segment = timeline.segments.find(
+      (s) => s.timespan.key === segmentKey,
+    );
+    if (segment) {
+      timeline.toggleTimeSegment(segment);
+    }
+  };
 
   const filteredGroups = $derived(
     getFailedOrPendingGroups(groups, $eventStatusFilter),
@@ -374,13 +417,7 @@
     class="pointer-events-none absolute inset-0 opacity-30"
     style={gridBackgroundStyle}
   ></div>
-  <EndTimeInterval
-    {workflow}
-    {startTime}
-    let:endTime
-    let:duration
-    let:currentTime
-  >
+  <EndTimeInterval {workflow} {startTime} bind:currentTime={nowMs} let:endTime>
     <div
       class="pointer-events-none sticky top-[120px]"
       class:invisible={!!$activeGroups.length}
@@ -446,11 +483,21 @@
       <TimelineAxis
         x1={gutter - radius / 4}
         x2={canvasWidth - gutter + radius / 4}
+        {gutter}
         {timelineHeight}
         {startTime}
-        duration={duration ?? 0}
+        {scale}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
+      <g transform="translate({gutter}, 0)">
+        <TimelineCollapsedLayer
+          {scale}
+          {timelineHeight}
+          {readOnly}
+          onToggle={toggleSegment}
+        />
+      </g>
+
       <!--
         PERF IMPERATIVE TRANSFORM APPROACH:
         Single {#each} loop — rows are never destroyed/recreated on click.
@@ -488,8 +535,7 @@
               {y}
               {group}
               {canvasWidth}
-              {startTime}
-              {endTime}
+              project={projectX}
               {readOnly}
             />
           {/key}
@@ -528,7 +574,7 @@
             y={panelY}
             group={grp}
             {canvasWidth}
-            endTime={workflow?.endTime ? endTime : currentTime}
+            endTime={workflow?.endTime ? endTime : nowMs}
             onHeight={(h) => {
               panelHeight = h;
             }}

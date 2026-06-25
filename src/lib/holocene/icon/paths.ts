@@ -91,6 +91,7 @@ import merge from './svg/merge.svelte';
 import microchip from './svg/microchip.svelte';
 import microsoft from './svg/microsoft.svelte';
 import minimize from './svg/minimize.svelte';
+import minus from './svg/minus.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
@@ -102,6 +103,7 @@ import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import play from './svg/play.svelte';
+import plus from './svg/plus.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -133,6 +135,7 @@ import tag from './svg/tag.svelte';
 import target from './svg/target.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
+import timelineCollapse from './svg/timeline-collapse.svelte';
 import timeline from './svg/timeline.svelte';
 import toolbox from './svg/toolbox.svelte';
 import transcoderError from './svg/transcoder-error.svelte';
@@ -249,6 +252,7 @@ export const icons = {
   microchip,
   microsoft,
   minimize,
+  minus,
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
@@ -256,6 +260,7 @@ export const icons = {
   'office-buildings': officeBuildings,
   overview,
   play,
+  plus,
   pause,
   pencil,
   'pin-filled': pinFilled,
@@ -292,6 +297,7 @@ export const icons = {
   'temporal-logo': temporalLogo,
   terminal,
   timeline,
+  'timeline-collapse': timelineCollapse,
   toolbox,
   'transcoder-error': transcoderError,
   'transcoder-on': transcoderOn,

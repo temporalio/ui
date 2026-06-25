@@ -67,7 +67,7 @@
     if (group?.pendingActivity) {
       if (group.pendingActivity.paused) {
         status = translate('workflows.paused');
-      } else if (group.pendingActivity.attempt > 1) {
+      } else if ((group.pendingActivity.attempt ?? 0) > 1) {
         status = translate('events.event-classification.retrying');
       } else {
         status = translate('events.event-classification.pending');
@@ -114,15 +114,17 @@
         <div class="surface-primary p-4">
           <div class="font-medium leading-4 text-secondary">Child Workflow</div>
           {#key group.eventList.length}
-            <GraphWidget
-              {namespace}
-              workflowId={childWorkflowStartedEvent.attributes.workflowExecution
-                .workflowId}
-              runId={childWorkflowStartedEvent.attributes.workflowExecution
-                .runId}
-              viewportHeight={320}
-              class="surface-primary overflow-x-hidden border-t border-subtle"
-            />
+            {#if childWorkflowStartedEvent.attributes.workflowExecution?.workflowId}
+              <GraphWidget
+                {namespace}
+                workflowId={childWorkflowStartedEvent.attributes
+                  .workflowExecution.workflowId}
+                runId={childWorkflowStartedEvent.attributes.workflowExecution
+                  .runId ?? undefined}
+                viewportHeight={320}
+                class="surface-primary overflow-x-hidden border-t border-subtle"
+              />
+            {/if}
           {/key}
         </div>
       {/if}

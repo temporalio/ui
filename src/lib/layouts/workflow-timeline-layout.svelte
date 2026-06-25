@@ -6,7 +6,8 @@
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
+  import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
+  import type { Timeline } from '$lib/components/lines-and-dots/timeline-graph/timeline.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
@@ -26,7 +27,7 @@
     onLatestGroup,
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
-  import { eventFilterSort } from '$lib/stores/event-view';
+  import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -253,6 +254,26 @@
       bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
     }
   });
+
+  let timeline = $state<Timeline>();
+
+  const handleTimelineInit = (t: Timeline) => {
+    timeline = t;
+    if ($collapseIdleTime === 'on') {
+      timeline.collapseAllSegmentsByDefault();
+    }
+  };
+
+  const onToggleIdleTime = () => {
+    if (!timeline) return;
+    if (timeline.allCollapsibleSegmentsCollapsed) {
+      timeline.expandAllSegments();
+      $collapseIdleTime = 'off';
+    } else {
+      timeline.collapseAllSegments();
+      $collapseIdleTime = 'on';
+    }
+  };
 </script>
 
 <InputAndResults />
@@ -291,6 +312,17 @@
           on:click={onSort}
           size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
         >
+        <ToggleButton
+          leadingIcon="timeline-collapse"
+          data-testid="toggle-idle-time"
+          disabled={!timeline?.hasCollapsibleSegments}
+          on:click={onToggleIdleTime}
+          size="sm"
+        >
+          {timeline?.allCollapsibleSegmentsCollapsed
+            ? translate('workflows.show-idle-time')
+            : translate('workflows.hide-idle-time')}
+        </ToggleButton>
         <EventTypeFilter compact={false} />
         <ToggleButton
           disabled={isNotPending}
@@ -350,6 +382,7 @@
         descMinId={historyCtx.descMinId}
         error={Boolean(workflowTaskFailedError)}
         bind:panelHeight={graphPanelHeight}
+        onTimelineInit={handleTimelineInit}
       />
     {/if}
   </div>

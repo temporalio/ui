@@ -1,4 +1,6 @@
 import {
+  max as dateFnsMax,
+  min as dateFnsMin,
   differenceInDays,
   formatDuration as durationToString,
   getMilliseconds as getSecondAsMilliseconds,
@@ -49,8 +51,78 @@ export function isTimestamp(arg: unknown): arg is Timestamp {
   return false;
 }
 
+/**
+ * Converts a {@link ValidTime} (a {@link Timestamp} object, ISO 8601 string,
+ * epoch number, or `Date`) into a `Date` instance.
+ *
+ * If the input is a {@link Timestamp}, its `seconds` and `nanos` fields are
+ * combined into a millisecond-precision `Date`. Otherwise the value is parsed
+ * via `date-fns`'s `parseJSON`.
+ *
+ * @param validTime - The time value to convert.
+ * @returns A `Date` representing `validTime`. The returned `Date` is
+ *   guaranteed to be valid (i.e. its time value is never `NaN`).
+ * @throws {TypeError} If `validTime` is a string/number that cannot be parsed
+ *   into a valid date.
+ */
+export function validTimeToDate(validTime: ValidTime): Date {
+  if (isTimestamp(validTime)) {
+    return timestampToDate(validTime);
+  }
+
+  const parsedDate = cachedParseJSON(validTime);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    throw new TypeError(`Invalid time: ${String(validTime)}`);
+  }
+
+  return parsedDate;
+}
+
+/**
+ * Returns the earliest `Date` from the given times.
+ *
+ * Each argument is normalized via {@link validTimeToDate} before comparison,
+ * so a mix of {@link Timestamp} objects, ISO 8601 strings, epoch numbers, and
+ * `Date` instances is accepted.
+ *
+ * @param validTimes - One or more times to compare.
+ * @returns The earliest time as a `Date`.
+ * @throws {RangeError} If called with no arguments.
+ * @throws {TypeError} If any argument cannot be converted to a valid `Date`
+ *   (propagated from {@link validTimeToDate}).
+ */
+export function minDate(...validTimes: ValidTime[]): Date {
+  if (!validTimes.length) {
+    throw new RangeError('Requires at least one time');
+  }
+
+  return dateFnsMin(validTimes.map((validTime) => validTimeToDate(validTime)));
+}
+
+/**
+ * Returns the latest `Date` from the given times.
+ *
+ * Each argument is normalized via {@link validTimeToDate} before comparison,
+ * so a mix of {@link Timestamp} objects, ISO 8601 strings, epoch numbers, and
+ * `Date` instances is accepted.
+ *
+ * @param validTimes - One or more times to compare.
+ * @returns The latest time as a `Date`.
+ * @throws {RangeError} If called with no arguments.
+ * @throws {TypeError} If any argument cannot be converted to a valid `Date`
+ *   (propagated from {@link validTimeToDate}).
+ */
+export function maxDate(...validTimes: ValidTime[]): Date {
+  if (!validTimes.length) {
+    throw new RangeError('Requires at least one time');
+  }
+
+  return dateFnsMax(validTimes.map((validTime) => validTimeToDate(validTime)));
+}
+
 export function formatDuration(
-  duration: Duration | string,
+  duration: Duration | string | null,
   delimiter = ', ',
 ): string {
   if (duration === null || !duration) return '';
@@ -105,16 +177,8 @@ export function getDuration({
   if (!start || !end) return null;
 
   try {
-    if (isTimestamp(start)) {
-      start = timestampToDate(start);
-    }
-
-    if (isTimestamp(end)) {
-      end = timestampToDate(end);
-    }
-
-    const parsedStart = cachedParseJSON(start);
-    const parsedEnd = cachedParseJSON(end);
+    const parsedStart = validTimeToDate(start);
+    const parsedEnd = validTimeToDate(end);
 
     const duration = intervalToDuration({ start: parsedStart, end: parsedEnd });
     return flexibleUnits
@@ -144,16 +208,8 @@ export function getMillisecondDuration({
   if (!start || !end) return null;
 
   try {
-    if (isTimestamp(start)) {
-      start = timestampToDate(start);
-    }
-
-    if (isTimestamp(end)) {
-      end = timestampToDate(end);
-    }
-
-    const parsedStart = cachedParseJSON(start);
-    const parsedEnd = cachedParseJSON(end);
+    const parsedStart = validTimeToDate(start);
+    const parsedEnd = validTimeToDate(end);
     const ms = parsedEnd.getTime() - parsedStart.getTime();
     return onlyUnderSecond ? Math.abs(ms % 1000) : Math.abs(ms);
   } catch {
@@ -216,12 +272,7 @@ export function formatDistanceAbbreviated({
 
 export function getMilliseconds(date: ValidTime | undefined | null): number {
   if (!date) return 0;
-  if (isTimestamp(date)) {
-    date = timestampToDate(date);
-  }
-  const parsedDate = parseJSON(date);
-
-  return getSecondAsMilliseconds(parsedDate);
+  return getSecondAsMilliseconds(validTimeToDate(date));
 }
 
 export function fromSecondsToMinutesAndSeconds(seconds: number): string {
@@ -281,7 +332,7 @@ export const fromDurationToNumber = (duration: string): string => {
   return duration?.replace('s', '');
 };
 
-export const fromNumberToDuration = (duration: string): string => {
+export const fromNumberToDuration = (duration: string): string | undefined => {
   if (!duration) return undefined;
   return duration + 's';
 };

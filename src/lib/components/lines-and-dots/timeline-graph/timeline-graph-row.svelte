@@ -1,9 +1,6 @@
 <script lang="ts">
-  import type { Timestamp } from '@temporalio/common';
   import { cva } from 'class-variance-authority';
   import { onMount, untrack } from 'svelte';
-
-  import { page } from '$app/state';
 
   import PayloadSummary from '$lib/components/payload/payload-summary.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -13,7 +10,7 @@
     decodeLocalActivity,
     getLocalActivityMarkerEvent,
   } from '$lib/utilities/decode-local-activity';
-  import { getMillisecondDuration } from '$lib/utilities/format-time';
+  import type { ValidTime } from '$lib/utilities/format-time';
   import type { SummaryAttribute } from '$lib/utilities/get-single-attribute-for-event';
   import { getEventClassificationLabel } from '$lib/utilities/get-status-label';
   import {
@@ -26,32 +23,30 @@
     TimelineConfig,
     timelineTextPosition,
   } from '../constants';
-
-  import Dot from './dot.svelte';
-  import Line from './line.svelte';
-  import Text from './text.svelte';
+  import Dot from '../svg/dot.svelte';
+  import Line from '../svg/line.svelte';
+  import Text from '../svg/text.svelte';
 
   type Props = {
     y: number;
     group: EventGroup;
-    startTime: string | Timestamp;
-    endTime: string | Date | number;
     canvasWidth: number;
+    project: (time: ValidTime | undefined | null) => number;
     readOnly: boolean;
   };
 
   let {
     y = 0,
     group,
-    startTime,
-    endTime,
     canvasWidth,
+    project,
     readOnly = false,
   }: Props = $props();
 
   const { height, gutter, radius } = TimelineConfig;
 
   let hovering = $state(false);
+  let focused = $state(false);
 
   const timelineWidth = $derived(canvasWidth - 2 * gutter);
   const pendingActivity = $derived(group?.pendingActivity);
@@ -92,60 +87,13 @@
     }
   });
 
-  // PERF HIGH: getDistancePointsAndPositions calls getMillisecondDuration
-  // (date-fns parseJSON → Date allocation) for every event in the group, plus
-  // timelineTextPosition. On a canvas resize, Svelte's $derived re-runs this for
-  // every visible row simultaneously. With 4k+ rows that means 4k × N Date
-  // allocations in a single microtask flush. The closure-level cache below skips
-  // the recompute when the three inputs that actually affect pixel positions have
-  // not changed. events.size is included so the cache busts if new events arrive
-  // while the workflow is still running.
-  let _posCache:
-    | {
-        points: number[];
-        textAnchor: string;
-        textIndex: number;
-        textPosition: [number, number];
-        backdrop: boolean;
-      }
-    | undefined;
-  let _posCacheKey = '';
-
-  const getDistancePointsAndPositions = (
-    endTime: string | Date | number,
-    timelineWidth: number,
-    y: number,
-  ) => {
-    const cacheKey = `${endTime}|${timelineWidth}|${y}|${group.eventList.length}`;
-    if (_posCache && cacheKey === _posCacheKey) return _posCache;
-
-    const workflowDistance = getMillisecondDuration({
-      start: startTime,
-      end: endTime,
-      onlyUnderSecond: false,
-    });
-
-    const points = group.eventList.map((event) => {
-      const distance = getMillisecondDuration({
-        start: startTime,
-        end: event.eventTime,
-        onlyUnderSecond: false,
-      });
-
-      const ratio = distance / workflowDistance;
-      return Math.round(ratio * timelineWidth) + gutter;
-    });
+  const getDistancePointsAndPositions = (timelineWidth: number, y: number) => {
+    const points = group.eventList.map((event) =>
+      Math.round(project(event.eventTime)),
+    );
 
     if (pauseTime) {
-      const distance = getMillisecondDuration({
-        start: startTime,
-        end: pauseTime,
-        onlyUnderSecond: false,
-      });
-
-      const ratio = distance / workflowDistance;
-      const pausePoint = Math.round(ratio * timelineWidth) + gutter;
-      points.push(pausePoint);
+      points.push(Math.round(project(pauseTime)));
     }
 
     const { textAnchor, textIndex, textPosition, backdrop } =
@@ -157,18 +105,23 @@
         TimelineConfig,
       );
 
-    _posCache = { points, textAnchor, textIndex, textPosition, backdrop };
-    _posCacheKey = cacheKey;
-    return _posCache;
+    return { points, textAnchor, textIndex, textPosition, backdrop };
   };
 
   const { points, textAnchor, textIndex, textPosition, backdrop } = $derived(
-    getDistancePointsAndPositions(endTime, timelineWidth, y),
+    getDistancePointsAndPositions(timelineWidth, y),
   );
 
   const onClick = () => {
     if (readOnly) return;
     setActiveGroup(group);
+  };
+
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClick();
+    }
   };
 
   const onMouseEnter = () => {
@@ -179,6 +132,15 @@
   const onMouseLeave = () => {
     if (readOnly) return;
     hovering = false;
+  };
+
+  const onFocus = (event: FocusEvent) => {
+    if (readOnly) return;
+    focused = (event.currentTarget as Element)?.matches(':focus-visible');
+  };
+
+  const onBlur = () => {
+    focused = false;
   };
 
   const activityTaskScheduled = $derived(
@@ -208,7 +170,7 @@
   });
 </script>
 
-{#if hovering}
+{#if hovering || focused}
   {@const multiEventHoverWidth =
     points.length >= 2 && points[points.length - 1] - points[0] + radius * 3}
   {@const hoverWidth =
@@ -233,9 +195,11 @@
   tabindex="0"
   aria-label={accessibleName}
   onclick={onClick}
-  onkeypress={onClick}
+  onkeydown={onKeydown}
   onmouseenter={onMouseEnter}
   onmouseleave={onMouseLeave}
+  onfocus={onFocus}
+  onblur={onBlur}
   class="relative cursor-pointer"
   {height}
 >
@@ -252,7 +216,7 @@
       pointer-events="all"
     />
   {/if}
-  {#each points as x, index}
+  {#each points as x, index (index)}
     {@const nextPoint = points[index + 1]}
     {@const showText = textIndex === index}
     {#if nextPoint}
@@ -274,7 +238,7 @@
         startPoint={[x, y]}
         endPoint={[canvasWidth - gutter, y]}
         category={pendingActivity
-          ? pendingActivity.attempt > 1
+          ? (pendingActivity.attempt ?? 0) > 1
             ? 'retry'
             : 'pending'
           : group.category}

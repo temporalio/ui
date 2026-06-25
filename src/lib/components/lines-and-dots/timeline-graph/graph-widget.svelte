@@ -44,12 +44,14 @@
 </script>
 
 {#await getWorkflowAndEventHistory() then { workflow, history }}
-  <div class="cursor-pointer overflow-auto {className}">
-    <TimelineGraph
-      {viewportHeight}
-      {workflow}
-      groups={createGroups(workflow, history)}
-      readOnly
-    />
-  </div>
+  {#if workflow}
+    <div class="cursor-pointer overflow-auto {className}">
+      <TimelineGraph
+        {viewportHeight}
+        {workflow}
+        groups={createGroups(workflow, history)}
+        readOnly
+      />
+    </div>
+  {/if}
 {/await}
