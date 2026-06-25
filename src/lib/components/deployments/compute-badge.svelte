@@ -13,11 +13,9 @@
 
 {#if config}
   <div
-    class="flex items-center gap-1 rounded-sm border border-subtle px-1 text-primary"
+    class="flex min-w-24 items-center justify-center gap-2 border border-subtle px-1"
   >
-    <Icon name={config.icon} class="h-4 w-4" />
-    {config.label}
+    <Icon name={config.icon} />
+    <p>{config.label}</p>
   </div>
-{:else}
-  <span class="text-secondary">—</span>
 {/if}

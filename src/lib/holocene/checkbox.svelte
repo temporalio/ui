@@ -25,7 +25,7 @@
     class?: string;
   }
 
-  export let id = '';
+  export let id: string = crypto.randomUUID();
   export let checked = false;
   export let label = '';
   export let labelHidden = false;
@@ -75,6 +75,9 @@
     : checked
       ? ('checkmark' as const)
       : null;
+
+  $: errorId = `${id}-error`;
+  $: showError = !valid && !!error;
 </script>
 
 <div
@@ -98,9 +101,12 @@
         'gap-3',
         'text-sm',
         'leading-[18px]',
+        'min-h-6',
+        'min-w-6',
         'group',
       ],
       disabled && 'cursor-not-allowed',
+      labelHidden && 'justify-center',
       className,
     )}
   >
@@ -114,6 +120,8 @@
       data-track-name="checkbox"
       data-track-intent="toggle"
       data-track-text={label}
+      aria-invalid={!valid ? 'true' : undefined}
+      aria-describedby={showError ? errorId : undefined}
       bind:checked
       {disabled}
       {required}
@@ -175,7 +183,7 @@
       </span>
     </slot>
   </Label>
-  {#if !valid && error}
-    <span class="text-xs text-danger">{error}</span>
-  {/if}
+  <span id={errorId} role="alert" class="text-xs text-danger">
+    {#if showError}{error}{/if}
+  </span>
 </div>

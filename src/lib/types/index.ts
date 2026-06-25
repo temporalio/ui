@@ -15,6 +15,7 @@ export type GetSystemInfoResponse =
 export type Capabilities =
   temporal.api.workflowservice.v1.GetSystemInfoResponse.ICapabilities & {
     serverScaledDeployments?: boolean | null;
+    serverScaledProviderCloudRun?: boolean | null;
   };
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
@@ -317,7 +318,11 @@ export type Duration = google.protobuf.IDuration;
 
 // extra APIs
 export type SettingsResponse = {
-  Auth: { Enabled: boolean; Options: string[] };
+  Auth: {
+    Enabled: boolean;
+    Options: string[] | null;
+    RedirectToProvider?: boolean;
+  };
   Codec: {
     Endpoint: string;
     PassAccessToken?: boolean;
@@ -339,6 +344,7 @@ export type SettingsResponse = {
   RefreshWorkflowCountsDisabled: boolean;
   ActivityCommandsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
+  NavCollapsedByDefault: boolean;
   FeedbackURL: string;
   Version: string;
 };

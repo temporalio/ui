@@ -82,6 +82,13 @@
     onNodeClick(node, generation);
   };
 
+  const handleNodeKeydown = (event: KeyboardEvent, target: RootNode) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      nodeClick(event, target);
+    }
+  };
+
   $: isExpanded = (node: RootNode) => {
     const opened = openRuns.get(generation) === node.workflow.runId;
     return expandAll || opened;
@@ -166,7 +173,7 @@
     })}
     class="outline-none transition-all"
     on:click={(e) => nodeClick(e, child)}
-    on:keypress={(e) => nodeClick(e, child)}
+    on:keydown={(e) => handleNodeKeydown(e, child)}
   >
     {#if child?.children?.length && isExpanded(child)}
       <line
@@ -294,7 +301,7 @@
       status: root.workflow.status,
     })}
     on:click={(e) => nodeClick(e, root)}
-    on:keypress={(e) => nodeClick(e, root)}
+    on:keydown={(e) => handleNodeKeydown(e, root)}
   >
     {#if root?.scheduleId}
       <line

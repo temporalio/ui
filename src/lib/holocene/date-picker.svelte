@@ -4,6 +4,11 @@
   import { clickoutside } from '$lib/holocene/outside-click';
   import { translate } from '$lib/i18n/translate';
   import { getMonthName } from '$lib/utilities/calendar';
+  import {
+    DATE_PICKER_INPUT_FORMAT,
+    evaluateDatePickerInput,
+    formatDatePickerInput,
+  } from '$lib/utilities/date-picker-input';
 
   import Calender from './calendar.svelte';
   import Icon from './icon/icon.svelte';
@@ -40,24 +45,27 @@
   let month = $derived(selected.getMonth());
   let year = $derived(selected.getFullYear());
   let showDatePicker = $state(false);
+  // resets whenever selected changes; can be overridden until then
+  let inputError = $derived.by(() => {
+    void selected;
+    return false;
+  });
 
   // handlers
+  const commitDate = (date: Date) => {
+    selected = date;
+    onDateChange?.(date);
+  };
+
   const onFocus = () => {
     showDatePicker = true;
   };
 
-  const onInput = (e: Event) => {
+  const onBlur = (e: FocusEvent) => {
     const target = e.target as HTMLInputElement;
-    const inputDate = target.value;
-    if (inputDate.length === 8) {
-      const inputDateSplit = inputDate?.split('/');
-      const yearEnd = parseInt(inputDateSplit[2]);
-      const year = 2000 + yearEnd;
-      const month = parseInt(inputDateSplit[0]) - 1;
-      const date = parseInt(inputDateSplit[1]);
-      const newDate = new Date(year, month, date);
-      onDateChange?.(newDate);
-    }
+    const { date, error } = evaluateDatePickerInput(target.value, isAllowed);
+    inputError = error;
+    if (date) commitDate(date);
   };
 
   const next = () => {
@@ -80,11 +88,12 @@
 
   const handleDateChange = (d: Date) => {
     showDatePicker = false;
-    onDateChange?.(d);
+    commitDate(d);
   };
 
   const previousMonth = translate('date-picker.previous-month');
   const nextMonth = translate('date-picker.next-month');
+  const invalidDate = translate('date-picker.invalid-date');
 </script>
 
 <div class="relative" use:clickoutside={() => (showDatePicker = false)}>
@@ -96,9 +105,12 @@
     icon="calendar-plus"
     type="text"
     onfocus={onFocus}
-    oninput={onInput}
-    placeholder="MM/DD/YY"
-    value={selected.toDateString()}
+    onblur={onBlur}
+    placeholder={DATE_PICKER_INPUT_FORMAT}
+    value={formatDatePickerInput(selected)}
+    error={inputError}
+    hintText={inputError ? invalidDate : ''}
+    onClear={() => (inputError = false)}
     clearable
     clearButtonLabel={clearLabel}
     {disabled}
@@ -137,13 +149,13 @@
         <button
           type="button"
           class="cursor-pointer text-[12px]"
-          onclick={() => (selected = new Date())}
+          onclick={() => commitDate(new Date())}
         >
           {todayLabel}
         </button>
         <button
           type="button"
-          class="cursor-pointer text-[12px]"
+          class="cursor-pointer text-xs"
           onclick={() => (showDatePicker = false)}
         >
           {closeLabel}

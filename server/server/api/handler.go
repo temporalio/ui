@@ -45,8 +45,9 @@ import (
 )
 
 type Auth struct {
-	Enabled bool
-	Options []string
+	Enabled            bool
+	Options            []string
+	RedirectToProvider bool
 }
 
 type CodecResponse struct {
@@ -61,6 +62,7 @@ type SettingsResponse struct {
 	Auth                          *Auth
 	DefaultNamespace              string
 	ShowTemporalSystemNamespace   bool
+	NavCollapsedByDefault         bool
 	FeedbackURL                   string
 	Codec                         *CodecResponse
 	Version                       string
@@ -127,11 +129,13 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 
 		settings := &SettingsResponse{
 			Auth: &Auth{
-				Enabled: cfg.Auth.Enabled,
-				Options: options,
+				Enabled:            cfg.Auth.Enabled,
+				Options:            options,
+				RedirectToProvider: cfg.Auth.RedirectToProvider,
 			},
 			DefaultNamespace:            cfg.DefaultNamespace,
 			ShowTemporalSystemNamespace: cfg.ShowTemporalSystemNamespace,
+			NavCollapsedByDefault:       cfg.NavCollapsedByDefault,
 			FeedbackURL:                 cfg.FeedbackURL,
 			Codec: &CodecResponse{
 				Endpoint:            cfg.Codec.Endpoint,

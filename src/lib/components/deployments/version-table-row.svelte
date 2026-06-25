@@ -4,11 +4,15 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     deleteWorkerDeploymentVersion,
     fetchDeploymentVersion,
+    removeRampingDeploymentVersion,
     setCurrentDeploymentVersion,
+    setRampingDeploymentVersion,
+    unsetCurrentDeploymentVersion,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
   import { toaster } from '$lib/stores/toaster';
@@ -34,6 +38,7 @@
   import DeleteVersionModal from './delete-version-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
   import SetCurrentVersionModal from './set-current-version-modal.svelte';
+  import SetRampingVersionModal from './set-ramping-version-modal.svelte';
   import ValidateConnectionModal from './validate-connection-modal.svelte';
   import VersionActionsMenu from './version-actions-menu.svelte';
   import VersionRowDetails from './version-row-details.svelte';
@@ -145,14 +150,31 @@
     }),
   );
 
+  const canRampToVersion = $derived(
+    parseVersionStatus(drainageStatus).status !== 'Created',
+  );
+  const otherVersionRamping = $derived(
+    rampingBuildId && !isRamping
+      ? `${rampingDeploymentName}.${rampingBuildId}`
+      : undefined,
+  );
+
   let expanded = $state(false);
   let showSetCurrentModal = $state(false);
   let setCurrentError = $state('');
+  let showUnsetCurrentModal = $state(false);
+  let unsetCurrentError = $state('');
   let showDeleteVersionModal = $state(false);
   let deleteVersionError = $state('');
   let showValidateModal = $state(false);
   let validateLoading = $state(false);
   let validateResult = $state<{ message?: string } | null>(null);
+  let showSetRampingModal = $state(false);
+  let setRampingError = $state('');
+  let setRampingLoading = $state(false);
+  let rampingPercentage = $state(0);
+
+  const newVersionGracePeriodMs = 2 * 60 * 1000;
 
   async function handleValidateConnection() {
     validateResult = null;
@@ -166,6 +188,26 @@
     const computeConfig =
       versionDetails.workerDeploymentVersionInfo.computeConfig;
     if (!computeConfig) {
+      validateResult = {
+        message: translate('deployments.validate-connection-no-config'),
+      };
+      validateLoading = false;
+      return;
+    }
+    const taskQueueInfos =
+      versionDetails.workerDeploymentVersionInfo.taskQueueInfos;
+    if (!taskQueueInfos?.length) {
+      const createTime = versionDetails.workerDeploymentVersionInfo.createTime;
+      const isNewlyCreated =
+        Date.now() - new Date(String(createTime)).getTime() <
+        newVersionGracePeriodMs;
+      validateResult = {
+        message: translate(
+          isNewlyCreated
+            ? 'deployments.validate-connection-no-task-queue-pending'
+            : 'deployments.validate-connection-no-task-queue',
+        ),
+      };
       validateLoading = false;
       return;
     }
@@ -197,6 +239,88 @@
     toaster.push({
       variant: 'primary',
       message: translate('deployments.set-current-version-success', {
+        buildId: versionBuildId,
+      }),
+    });
+    onChange?.();
+  }
+
+  async function handleUnsetCurrentVersion() {
+    unsetCurrentError = '';
+    await unsetCurrentDeploymentVersion(
+      { namespace, deploymentName, conflictToken },
+      (err) => {
+        unsetCurrentError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.unset-current-error');
+      },
+    );
+    if (unsetCurrentError) return;
+    showUnsetCurrentModal = false;
+    onChange?.();
+  }
+
+  function openSetRamping() {
+    rampingPercentage = isRamping
+      ? (routingConfig.rampingVersionPercentage ?? 0)
+      : 0;
+    setRampingError = '';
+    showSetRampingModal = true;
+  }
+
+  async function handleSetRamping() {
+    setRampingError = '';
+    setRampingLoading = true;
+    try {
+      await setRampingDeploymentVersion(
+        {
+          namespace,
+          deploymentName,
+          buildId: versionBuildId,
+          rampingVersionPercentage: rampingPercentage,
+          conflictToken,
+        },
+        (err) => {
+          setRampingError =
+            (err as { body?: { message?: string } })?.body?.message ??
+            translate('deployments.set-ramping-error');
+        },
+      );
+    } finally {
+      setRampingLoading = false;
+    }
+    if (setRampingError) return;
+    showSetRampingModal = false;
+    toaster.push({
+      variant: 'primary',
+      message: translate('deployments.set-ramping-success', {
+        buildId: versionBuildId,
+        percentage: rampingPercentage,
+      }),
+    });
+    onChange?.();
+  }
+
+  async function handleRemoveRamping() {
+    setRampingError = '';
+    setRampingLoading = true;
+    try {
+      await removeRampingDeploymentVersion(
+        { namespace, deploymentName, conflictToken },
+        (err) => {
+          setRampingError =
+            (err as { body?: { message?: string } })?.body?.message ??
+            translate('deployments.remove-ramping-error');
+        },
+      );
+    } finally {
+      setRampingLoading = false;
+    }
+    if (setRampingError) return;
+    showSetRampingModal = false;
+    toaster.push({
+      variant: 'primary',
+      message: translate('deployments.remove-ramping-success', {
         buildId: versionBuildId,
       }),
     });
@@ -268,7 +392,13 @@
     {editHref}
     {workflowHref}
     {isCurrent}
+    hasComputeConfig={isVersionSummaryNew(version)
+      ? !!version.computeConfig
+      : true}
+    {isRamping}
     onSetCurrent={() => (showSetCurrentModal = true)}
+    onSetRamping={openSetRamping}
+    onUnsetCurrent={() => (showUnsetCurrentModal = true)}
     onValidate={handleValidateConnection}
     onDelete={() => (showDeleteVersionModal = true)}
   />
@@ -299,9 +429,31 @@
   }}
 />
 
+<SetRampingVersionModal
+  buildId={versionBuildId}
+  {deploymentName}
+  open={showSetRampingModal}
+  error={setRampingError}
+  loading={setRampingLoading}
+  hasActivePollers={canRampToVersion}
+  {isRamping}
+  existingRampingVersion={otherVersionRamping}
+  existingRampingPercentage={routingConfig.rampingVersionPercentage}
+  currentPercentage={isRamping
+    ? (routingConfig.rampingVersionPercentage ?? undefined)
+    : undefined}
+  bind:percentage={rampingPercentage}
+  onConfirm={handleSetRamping}
+  onRemove={handleRemoveRamping}
+  onCancel={() => {
+    showSetRampingModal = false;
+    setRampingError = '';
+  }}
+/>
+
 <ValidateConnectionModal
   buildId={versionBuildId}
-  open={showValidateModal}
+  bind:open={showValidateModal}
   loading={validateLoading}
   result={validateResult}
   onClose={() => (showValidateModal = false)}
@@ -318,3 +470,23 @@
     deleteVersionError = '';
   }}
 />
+
+<Modal
+  id="unset-current-version-modal"
+  open={showUnsetCurrentModal}
+  confirmText={translate('common.confirm')}
+  cancelText={translate('common.cancel')}
+  on:confirmModal={handleUnsetCurrentVersion}
+  on:cancelModal={() => {
+    showUnsetCurrentModal = false;
+    unsetCurrentError = '';
+  }}
+>
+  <h3 slot="title">{translate('deployments.unset-current')}</h3>
+  <div slot="content" class="flex flex-col gap-4">
+    <p class="text-sm">{translate('deployments.unset-current-description')}</p>
+    {#if unsetCurrentError}
+      <p class="text-sm text-danger">{unsetCurrentError}</p>
+    {/if}
+  </div>
+</Modal>
