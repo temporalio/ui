@@ -2,7 +2,9 @@ export const Namespace = 'activities' as const;
 
 export const Strings = {
   'pause-modal-confirmation': 'Pause Activity {{activityId}}',
-  'pause-modal-description': 'Pause executing this Activity.',
+  'pause-modal-description':
+    'Pause stops new attempts, but Activity timeout deadlines continue. Use Update Activity Options to extend timeouts before a long pause.',
+  'pause-modal-docs-link': 'Important considerations',
   'unpause-modal-confirmation': 'Unpause Activity {{activityId}}',
   'unpause-modal-description': 'Resume executing this Activity.',
   'paused-since': 'Paused Since',

@@ -53,7 +53,7 @@
     width={200}
     text={activity.paused
       ? 'Resume this Activity'
-      : 'Pauses this Activity, starting before it retries or the next time it heartbeats. It won’t time out while it’s paused.'}
+      : 'Pauses this Activity before its next retry or heartbeat. Timeout deadlines continue while paused.'}
   >
     <Button
       variant="secondary"
