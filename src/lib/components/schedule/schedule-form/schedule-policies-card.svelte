@@ -65,21 +65,18 @@
   });
 </script>
 
-<div class="flex flex-col gap-1">
-  <h2 class="text-3xl font-medium">
+<Card class="w-full">
+  <h2 class="text-2xl font-medium">
     {translate('schedules.policies-heading')}
   </h2>
+  <div class="mt-4 flex flex-col gap-4">
+    <p class="text-sm text-secondary">
+      {translate('schedules.policies-description')}
+      <Link href="https://docs.temporal.io/schedule#policies" newTab>
+        {translate('schedules.policies-learn-more')}
+      </Link>
+    </p>
 
-  <p class="text-secondary">
-    {translate('schedules.policies-description')}
-    <Link href="https://docs.temporal.io/schedule#policies" newTab>
-      {translate('schedules.policies-learn-more')}
-    </Link>
-  </p>
-</div>
-
-<Card class="w-full">
-  <div class="flex flex-col gap-4">
     <dl
       class="flex flex-col gap-y-4 lg:grid lg:grid-cols-[max-content,1fr] lg:grid-rows-none lg:gap-x-6 lg:gap-y-2"
     >
