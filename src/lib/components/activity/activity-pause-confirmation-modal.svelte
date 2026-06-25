@@ -62,16 +62,16 @@
       activityId: activity.id,
     })}
   </h3>
-  <div slot="content" class="flex flex-col gap-4">
+  <div slot="content">
     <p>{translate('activities.pause-modal-description')}</p>
-    <p>
-      <Link
-        newTab
-        href="https://docs.temporal.io/activity-operations#important-considerations"
-      >
-        {translate('activities.pause-modal-docs-link')}
-      </Link>
-    </p>
+    <Link
+      newTab
+      trailingIcon="book"
+      href="https://docs.temporal.io/activity-operations#important-considerations"
+      class="mt-1"
+    >
+      {translate('activities.pause-modal-docs-link')}
+    </Link>
     <Input
       id="activity-pause-reason"
       class="mt-4"

@@ -15,4 +15,7 @@ export const Strings = {
     'Reset the execution of this Activity back to the initial attempt.',
   'reset-heartbeat-details': 'Reset Heartbeat Details (optional)',
   'reset-success': 'Activity {{activityId}} has been reset successfully.',
+  'resume-tooltip': 'Resume this Activity',
+  'pause-tooltip':
+    'Pauses this Activity before its next retry or heartbeat. Timeout deadlines continue while paused.',
 };
