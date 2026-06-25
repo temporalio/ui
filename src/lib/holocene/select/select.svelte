@@ -123,6 +123,9 @@
     // After all the Options are mounted use context to read the label assocaited with the value
     $labelCtx = getLabelFromOptions(value);
   });
+
+  const errorId = $derived(`${id}-error`);
+  const showError = $derived(!!error && !valid);
 </script>
 
 <MenuContainer class="w-full" {open}>
@@ -139,6 +142,8 @@
         data-track-name="select"
         data-track-intent="select"
         data-track-text={label}
+        aria-invalid={!valid ? 'true' : undefined}
+        aria-describedby={showError ? errorId : undefined}
       >
         {#snippet leading()}
           {#if leadingIcon}
@@ -173,9 +178,9 @@
     </Menu>
   {/if}
 
-  {#if error && !valid}
-    <span class="text-xs text-danger">{error}</span>
-  {/if}
+  <span id={errorId} role="alert" class="text-xs text-danger">
+    {#if showError}{error}{/if}
+  </span>
 </MenuContainer>
 
 <style lang="postcss">

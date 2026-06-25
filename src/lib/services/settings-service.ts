@@ -21,6 +21,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     auth: {
       enabled: !!settingsResponse?.Auth?.Enabled,
       options: settingsResponse?.Auth?.Options,
+      redirectToProvider: !!settingsResponse?.Auth?.RedirectToProvider,
     },
     baseUrl: getApiOrigin(),
     codec: {
@@ -50,6 +51,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
+    navCollapsedByDefault: !!settingsResponse?.NavCollapsedByDefault,
     feedbackURL: settingsResponse?.FeedbackURL,
     runtimeEnvironment: {
       get isCloud() {

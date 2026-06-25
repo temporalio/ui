@@ -23,7 +23,6 @@
   export let step: number = 1;
   export let search = false;
   export let autocomplete: FullAutoFill = 'off';
-  export let error: boolean = false;
 
   let valid = true;
 
@@ -38,16 +37,18 @@
   $: {
     validate(value);
   }
+
+  $: errorId = `${id}-error`;
 </script>
 
 <div class={merge('flex flex-col gap-1', $$props.class)}>
   <Label {required} {label} hidden={labelHidden} for={id} />
   <div class="flex items-center">
     <div
-      class="surface-primary relative box-border flex h-10 w-full min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
+      class="surface-primary relative box-border flex h-10 min-w-16 items-center border border-subtle text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-primary/70"
       class:opacity-50={disabled}
       class:search
-      class:invalid={error || !valid}
+      class:invalid={!valid}
     >
       {#if icon}
         <span class="icon-container">
@@ -67,6 +68,8 @@
         {name}
         {step}
         {required}
+        aria-invalid={!valid ? 'true' : undefined}
+        aria-describedby={!valid && hintText ? errorId : undefined}
         {autocomplete}
         spellcheck="false"
         bind:value
@@ -86,9 +89,14 @@
     {/if}
   </div>
 </div>
-{#if (error || !valid) && hintText}
-  <span class="mt-1 text-xs text-danger">{hintText}</span>
-{/if}
+<span
+  id={errorId}
+  role="alert"
+  class="text-xs text-danger"
+  class:mt-1={!valid && !!hintText}
+>
+  {#if !valid && hintText}{hintText}{/if}
+</span>
 
 <style lang="postcss">
   .search {
