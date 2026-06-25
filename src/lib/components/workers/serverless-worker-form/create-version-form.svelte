@@ -7,19 +7,22 @@
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { VersionSummary } from '$lib/types/deployments';
 
   import { type CreateVersionFormData, createVersionSchema } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
+  import ExistingVersions from './existing-versions.svelte';
 
   interface Props {
     onSubmit: (data: CreateVersionFormData) => Promise<void>;
     cancelHref: string;
     error?: string;
+    versions?: VersionSummary[];
   }
 
-  let { onSubmit, cancelHref, error }: Props = $props();
+  let { onSubmit, cancelHref, error, versions = [] }: Props = $props();
 
   const superform = superForm(
     {
@@ -65,7 +68,7 @@
         {translate('workers.configuration-section')}
       </h3>
       <p class="mb-4 text-sm text-secondary">
-        {translate('workers.configuration-description')}
+        {translate('workers.version-configuration-description')}
       </p>
       <Input
         bind:value={$form.buildId}
@@ -77,6 +80,7 @@
         placeholder="1.0.0"
         required
       />
+      <ExistingVersions {versions} />
     </Card>
 
     <Card class="p-5">

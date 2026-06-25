@@ -7,8 +7,10 @@
     buildLambdaComputeConfig,
     createWorkerDeploymentVersion,
     deleteWorkerDeploymentVersion,
+    fetchDeployment,
     validateWorkerDeploymentVersionComputeConfig,
   } from '$lib/services/deployments-service';
+  import type { VersionSummary } from '$lib/types/deployments';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
   interface Props {
@@ -20,10 +22,30 @@
   let { namespace, deployment, onSuccess }: Props = $props();
 
   let error = $state<string | undefined>();
+  let versions = $state<VersionSummary[]>();
 
   const backHref = $derived(
     routeForWorkerDeployment({ namespace, deployment }),
   );
+
+  $effect(() => {
+    const controller = new AbortController();
+    fetchDeployment(
+      { namespace, deploymentName: deployment },
+      fetch,
+      undefined,
+      false,
+      controller.signal,
+    )
+      .then((response) => {
+        versions = response?.workerDeploymentInfo?.versionSummaries ?? [];
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        versions = [];
+      });
+    return () => controller.abort();
+  });
 </script>
 
 <div class="flex max-w-[45rem] flex-col gap-4">
@@ -35,6 +57,7 @@
   </h1>
   <CreateVersionForm
     {error}
+    {versions}
     cancelHref={backHref}
     onSubmit={async (data) => {
       error = undefined;

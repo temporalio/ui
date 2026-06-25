@@ -235,8 +235,9 @@ export const Strings = {
     "How Temporal connects to this Worker's compute provider",
   'worker-scaling-limits': 'Worker Scaling and Limits',
   'configuration-section': 'Configuration',
-  'configuration-description':
+  'deployment-configuration-description':
     'Name this Worker deployment and set its Build ID.',
+  'version-configuration-description': 'Set the Build ID for this version.',
   'compute-section': 'Compute',
   'compute-description': 'Choose where your workers run.',
   'scaling-section': 'Scaling and Limits',
@@ -266,8 +267,8 @@ export const Strings = {
   'create-version-rollback-failed':
     '{{message}} The version could not be cleaned up automatically — delete it manually from the deployment.',
   'build-id-label': 'Build ID',
-  'build-id-hint':
-    'A unique identifier for this version of your Worker. Edit or leave as-is.',
+  'build-id-hint': 'A unique identifier for this version of your Worker.',
+  'existing-versions': 'Existing Versions',
   'max-concurrent-activities-label': 'Max Concurrent Activities',
   'max-concurrent-activities-hint':
     'Maximum concurrent activities per worker instance.',
