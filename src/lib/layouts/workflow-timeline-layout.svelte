@@ -259,10 +259,17 @@
 
   const handleTimelineInit = (t: Timeline) => {
     timeline = t;
-    if ($collapseIdleTime === 'on') {
+  };
+
+  // Defer the default collapse until the history fetch finishes. Segments are
+  // derived from the streaming event list, so collapsing mid-stream makes the
+  // idle-time zigzag appear and shift as partial-data gaps resolve. Waiting for
+  // fetchComplete collapses once against the final, stable segment set.
+  $effect(() => {
+    if (timeline && historyCtx.fetchComplete && $collapseIdleTime === 'on') {
       timeline.collapseAllSegmentsByDefault();
     }
-  };
+  });
 
   const onToggleIdleTime = () => {
     if (!timeline) return;
@@ -315,7 +322,9 @@
         <ToggleButton
           leadingIcon="timeline-collapse"
           data-testid="toggle-idle-time"
-          disabled={!timeline?.hasCollapsibleSegments}
+          loading={!historyCtx.fetchComplete}
+          disabled={!historyCtx.fetchComplete ||
+            !timeline?.hasCollapsibleSegments}
           on:click={onToggleIdleTime}
           size="sm"
         >

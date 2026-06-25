@@ -489,14 +489,16 @@
         {scale}
       />
       <WorkflowRow {workflow} y={height} length={canvasWidth} />
-      <g transform="translate({gutter}, 0)">
-        <TimelineCollapsedLayer
-          {scale}
-          {timelineHeight}
-          {readOnly}
-          onToggle={toggleSegment}
-        />
-      </g>
+      {#if !loading}
+        <g transform="translate({gutter}, 0)">
+          <TimelineCollapsedLayer
+            {scale}
+            {timelineHeight}
+            {readOnly}
+            onToggle={toggleSegment}
+          />
+        </g>
+      {/if}
 
       <!--
         PERF IMPERATIVE TRANSFORM APPROACH:
