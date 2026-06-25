@@ -6,8 +6,11 @@
   import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
+  import { DetailListTimestampValue } from '$lib/components/detail-list';
+  import DetailListLabel from '$lib/components/detail-list/detail-list-label.svelte';
+  import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
+  import DetailList from '$lib/components/detail-list/detail-list.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
-  import { timestamp } from '$lib/components/timestamp.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -194,6 +197,7 @@
     </div>
   {/if}
   {#if isPaused}
+    {@const pauseInfo = workflow?.workflowExtendedInfo.pauseInfo}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
         icon="info"
@@ -209,15 +213,24 @@
             <li>{translate('workflows.workflow-pause-description-item-2')}</li>
             <li>{translate('workflows.workflow-pause-description-item-3')}</li>
           </ul>
-          {#if workflow?.workflowExtendedInfo?.pauseInfo?.reason}
-            <div>
-              <p>{translate('workflows.workflow-paused-reason')}</p>
-              <p class="text-secondary">
-                {workflow.workflowExtendedInfo.pauseInfo.reason} • {$timestamp(
-                  workflow.workflowExtendedInfo.pauseInfo.pausedTime,
-                )}
-              </p>
-            </div>
+          {#if pauseInfo}
+            <DetailList aria-label="pause details" rowCount={3}>
+              {#if pauseInfo.identity}
+                <DetailListLabel>{translate('common.identity')}</DetailListLabel
+                >
+                <DetailListValue
+                  >{pauseInfo.identity ?? 'test@temporal.io'}</DetailListValue
+                >
+              {/if}
+              <DetailListLabel
+                >{translate('workflows.paused-time')}</DetailListLabel
+              >
+              <DetailListTimestampValue timestamp={pauseInfo.pausedTime} />
+              {#if pauseInfo.reason}
+                <DetailListLabel>{translate('common.reason')}</DetailListLabel>
+                <DetailListValue>{pauseInfo.reason}</DetailListValue>
+              {/if}
+            </DetailList>
           {/if}
         </div>
       </Alert>

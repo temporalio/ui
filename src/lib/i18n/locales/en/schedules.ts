@@ -40,12 +40,12 @@ export const Strings = {
   'schedule-actions': 'Schedule Actions',
   'pause-modal-title': 'Pause Schedule?',
   'pause-modal-confirmation': 'Are you sure you want to pause {{schedule}}?',
-  'pause-reason': 'Enter a reason for pausing the schedule.',
+  'pause-reason': 'Enter a reason for pausing the schedule',
   'pause-schedule-error': 'There was an error pausing the schedule. {{error}}',
   'unpause-modal-title': 'Unpause Schedule?',
   'unpause-modal-confirmation':
     'Are you sure you want to unpause {{schedule}}?',
-  'unpause-reason': 'Enter a reason for unpausing the schedule.',
+  'unpause-reason': 'Enter a reason for unpausing the schedule',
   'unpause-schedule-error':
     'There was an error unpausing the schedule. {{error}}',
   trigger: 'Trigger',

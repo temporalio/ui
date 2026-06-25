@@ -5,6 +5,7 @@
 
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import PayloadInput from '$lib/components/payload-input.svelte';
+  import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -45,7 +46,7 @@
   >(undefined);
 
   let name = $state('');
-  let updateId = $state(crypto.randomUUID());
+  let updateId = $state('');
   let input = $state('');
   let customUpdate = $state(false);
   let encoding: Writable<PayloadInputEncoding> = writable(defaultEncoding);
@@ -53,6 +54,7 @@
   const hideModal = () => {
     open = false;
     name = '';
+    updateId = '';
     input = '';
     customUpdate = false;
     $encoding = defaultEncoding;
@@ -78,7 +80,7 @@
 
       failure = result?.outcome?.failure;
       success = result?.outcome?.success || !failure;
-      updateId = crypto.randomUUID();
+      updateId = '';
 
       if (success) {
         toaster.push({
@@ -126,6 +128,7 @@
         data-testid="update-select"
         placeholder="Select an Update"
         required
+        disabled={loading}
       >
         {#each updateDefinitions as { name: value, description = '' } (value)}
           <Option {value} {description}>{value}</Option>
@@ -140,6 +143,7 @@
           label={translate('common.name')}
           required
           bind:value={name}
+          disabled={loading}
         />
         {#if customUpdate}
           <Button
@@ -149,6 +153,7 @@
             }}
             variant="secondary"
             leadingIcon="close"
+            disabled={loading}
           />
         {/if}
       </div>
@@ -156,9 +161,17 @@
     <Input
       id="update-id"
       label={translate('workflows.update-id')}
-      required
       bind:value={updateId}
-    />
+      disabled={loading}
+    >
+      {#snippet afterInput()}
+        <RandomUuidButton
+          class="ml-2.5"
+          bind:value={updateId}
+          disabled={loading}
+        />
+      {/snippet}
+    </Input>
     <PayloadInput bind:input />
     {#if loading}
       <Alert intent="info" title="In Progress"

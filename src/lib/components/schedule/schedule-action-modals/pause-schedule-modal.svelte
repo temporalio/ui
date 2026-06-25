@@ -37,12 +37,12 @@
     ? translate('schedules.unpause')
     : translate('schedules.pause')}
   cancelText={translate('common.cancel')}
-  confirmDisabled={!reason}
+  confirmDisabled={!reason.trim()}
   loading={$actionPending}
   error={$serverError}
   on:cancelModal={() => closeConfirmationModal('pause')}
   on:confirmModal={() =>
-    submitPauseSchedule(reason, {
+    submitPauseSchedule(reason.trim(), {
       identity,
       scheduleId,
       namespace,
@@ -64,17 +64,15 @@
             schedule: scheduleId,
           })}
     </p>
-    <p class="my-4">
-      {isSchedulePaused
-        ? translate('schedules.unpause-reason')
-        : translate('schedules.pause-reason')}
-    </p>
     <Input
       id="pause-reason"
       bind:value={reason}
-      placeholder={translate('common.reason')}
+      placeholder={isSchedulePaused
+        ? translate('schedules.unpause-reason')
+        : translate('schedules.pause-reason')}
       label={translate('common.reason')}
-      labelHidden
+      required
+      class="mt-4"
     />
   </div>
 </Modal>

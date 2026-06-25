@@ -131,8 +131,7 @@
       <Input
         id="reset-reason"
         bind:value={reason}
-        label={translate('common.reason')}
-        labelHidden
+        label={translate('common.reason-optional')}
         placeholder={translate('common.reason-placeholder')}
       />
     </div>

@@ -47,6 +47,7 @@ export const Strings = {
   all: 'All',
   submit: 'Submit',
   reason: 'Reason',
+  'reason-optional': 'Reason (optional)',
   'reason-placeholder': 'Enter a reason',
   identity: 'Identity',
   'identity-placeholder': 'Enter an identity',
@@ -244,4 +245,5 @@ export const Strings = {
   'change-log': 'Change Log',
   comfortable: 'Comfortable',
   dense: 'Dense',
+  'random-uuid': 'Random UUID',
 } as const;
