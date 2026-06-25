@@ -50,6 +50,7 @@
   import type { StandaloneActivityFormDefaults } from './types';
   import Message from '../../form/message.svelte';
   import PayloadInputWithEncoding from '../../payload-input-with-encoding.svelte';
+  import RandomUuidButton from '../../random-uuid-button.svelte';
   import RetryPolicyInput from '../../retry-policy-input.svelte';
   import AddSearchAttributes from '../../workflow/add-search-attributes.svelte';
 
@@ -229,10 +230,6 @@
     unsubscribe?.();
   });
 
-  const generateRandomId = () => {
-    $form.activityId = crypto.randomUUID();
-  };
-
   const checkTaskQueue = async (queue: string) => {
     if (!queue) return;
     taskQueueActive = null;
@@ -258,13 +255,7 @@
     hintText={$errors?.activityId?.[0]}
   >
     {#snippet afterInput()}
-      <Button
-        class="ml-2.5"
-        variant="secondary"
-        on:click={generateRandomId}
-        leadingIcon="retry"
-        >{translate('standalone-activities.form-random-uuid')}</Button
-      >
+      <RandomUuidButton class="ml-2.5" bind:value={$form.activityId} />
     {/snippet}
   </Input>
 
