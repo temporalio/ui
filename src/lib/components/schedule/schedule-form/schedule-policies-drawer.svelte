@@ -61,6 +61,11 @@
     dataType: 'json',
     validators: zodClient(formSchedulePoliciesSchema),
     resetForm: false,
+    // This is a self-contained SPA form whose result is handled in onUpdate.
+    // Leaving these on lets a submit touch the page store, which remounts the
+    // awaited edit form (it re-fetches on page.params) and discards the change.
+    applyAction: false,
+    invalidateAll: false,
     onUpdate: ({ form: validated }) => {
       if (!validated.valid) return;
       form.update(($form) => ({ ...$form, ...validated.data }));

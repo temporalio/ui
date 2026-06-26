@@ -91,6 +91,32 @@ test.describe('Schedules List with schedules', () => {
     await submitButton.click();
   });
 
+  test('applies an overlap policy change made in the drawer on save', async ({
+    page,
+  }) => {
+    await mockScheduleApi(page);
+    await page.goto(scheduleEditUrl);
+    await expect(page.locator('h1')).toHaveText('Edit Schedule');
+
+    await page.getByRole('button', { name: 'Edit Schedule Policies' }).click();
+    await expect(page.getByRole('region')).toBeVisible();
+
+    await page.locator('#overlap-policy-BufferOne').click();
+    await page.getByRole('button', { name: 'Update Policies' }).click();
+
+    // The drawer closes and the form is not remounted/reset, so the change
+    // survives until the schedule is saved.
+    await expect(page.getByRole('region')).toBeHidden();
+
+    const updateRequest = page.waitForRequest(
+      (request) =>
+        request.method() === 'POST' && request.url().includes('/update'),
+    );
+    await page.getByTestId('create-schedule-button').click();
+    const body = (await updateRequest).postDataJSON();
+    expect(body.schedule.policies.overlapPolicy).toBe('BufferOne');
+  });
+
   test('loads a weekly calendar schedule into a week spec', async ({
     page,
   }) => {
