@@ -175,7 +175,7 @@
               id="endAfterOccurrences"
               type="number"
               inputmode="numeric"
-              pattern="0-9+"
+              pattern="[0-9]+"
               label={translate('schedules.occurrences-label')}
               labelHidden
               bind:value={
@@ -219,7 +219,7 @@
         min={0}
         suffix={translate('common.seconds-abbreviated')}
         bind:value={
-          () => $form.jitter.toString(), (v) => ($form.jitter = Number(v))
+          () => $form.jitter?.toString() ?? '', (v) => ($form.jitter = Number(v))
         }
         error={!!$errors.jitter?.[0]}
         hintText={$errors.jitter?.[0]}
