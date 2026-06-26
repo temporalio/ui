@@ -294,8 +294,13 @@
     }
   });
 
-  afterNavigate(() => {
-    document.getElementById('content')?.scrollTo(0, 0);
+  afterNavigate(({ from, to, type }) => {
+    const main = document.getElementById('content');
+    main?.scrollTo(0, 0);
+    if (type === 'enter') return;
+    if (from?.url.pathname === '/') return;
+    if (from?.url.pathname === to?.url.pathname) return;
+    main?.focus({ preventScroll: true });
   });
 
   setCoreContext({
