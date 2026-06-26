@@ -7,7 +7,6 @@
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import NumberInput from '$lib/holocene/input/number-input.svelte';
   import RadioGroup from '$lib/holocene/radio-input/radio-group.svelte';
   import RadioInput from '$lib/holocene/radio-input/radio-input.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -219,7 +218,8 @@
         min={0}
         suffix={translate('common.seconds-abbreviated')}
         bind:value={
-          () => $form.jitter?.toString() ?? '', (v) => ($form.jitter = Number(v))
+          () => $form.jitter?.toString() ?? '',
+          (v) => ($form.jitter = Number(v))
         }
         error={!!$errors.jitter?.[0]}
         hintText={$errors.jitter?.[0]}
