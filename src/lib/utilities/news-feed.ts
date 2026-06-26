@@ -134,41 +134,53 @@ export const setLastSeenServerTime = (
 
 const isValidIsoDate = (value: string) => Number.isFinite(Date.parse(value));
 
-export const isNewsFeedItem = (value: unknown): value is NewsFeedItem => {
-  const item = value as NewsFeedItem;
+const isRecord = (value: unknown): value is Record<PropertyKey, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const isNewsFeedItem = (value: unknown): value is NewsFeedItem => {
+  if (!isRecord(value)) return false;
+
+  const { id, title, content, priority, tags, published_at, expires_at } =
+    value;
+
+  const hasValidId = typeof id === 'number' && Number.isInteger(id) && id >= 0;
+  const hasValidPriority =
+    typeof priority === 'number' &&
+    Number.isInteger(priority) &&
+    priority >= 1 &&
+    priority <= 9;
 
   return (
-    typeof item?.id === 'number' &&
-    Number.isInteger(item.id) &&
-    item.id >= 0 &&
-    typeof item.title === 'string' &&
-    typeof item.content_html === 'string' &&
-    typeof item.priority === 'number' &&
-    Number.isInteger(item.priority) &&
-    item.priority >= 1 &&
-    item.priority <= 9 &&
-    Array.isArray(item.tags) &&
-    item.tags.every((tag) => typeof tag === 'string') &&
-    typeof item.published_at === 'string' &&
-    isValidIsoDate(item.published_at) &&
-    typeof item.expires_at === 'string' &&
-    isValidIsoDate(item.expires_at)
+    hasValidId &&
+    typeof title === 'string' &&
+    typeof content === 'string' &&
+    hasValidPriority &&
+    Array.isArray(tags) &&
+    tags.every((tag) => typeof tag === 'string') &&
+    typeof published_at === 'string' &&
+    isValidIsoDate(published_at) &&
+    typeof expires_at === 'string' &&
+    isValidIsoDate(expires_at)
   );
 };
 
 export const parseNewsFeedResponse = (value: unknown): NewsFeedResponse => {
-  const response = value as NewsFeedResponse;
+  if (!isRecord(value)) {
+    throw new Error('Invalid news feed response');
+  }
+
+  const { server_time, items } = value;
 
   if (
-    typeof response?.server_time !== 'string' ||
-    !isValidIsoDate(response.server_time) ||
-    !Array.isArray(response.items) ||
-    !response.items.every(isNewsFeedItem)
+    typeof server_time !== 'string' ||
+    !isValidIsoDate(server_time) ||
+    !Array.isArray(items) ||
+    !items.every(isNewsFeedItem)
   ) {
     throw new Error('Invalid news feed response');
   }
 
-  return response;
+  return { items, server_time };
 };
 
 export const readNewsFeedCache = (
@@ -178,17 +190,21 @@ export const readNewsFeedCache = (
   if (!value) return null;
 
   try {
-    const cache = JSON.parse(value) as NewsFeedCache;
+    const cache = JSON.parse(value) as unknown;
+
+    if (!isRecord(cache)) return null;
+
+    const { fetchedAt, serverTime, items } = cache;
 
     if (
-      typeof cache?.fetchedAt === 'number' &&
-      Number.isFinite(cache.fetchedAt) &&
-      typeof cache.serverTime === 'string' &&
-      isValidIsoDate(cache.serverTime) &&
-      Array.isArray(cache.items) &&
-      cache.items.every(isNewsFeedItem)
+      typeof fetchedAt === 'number' &&
+      Number.isFinite(fetchedAt) &&
+      typeof serverTime === 'string' &&
+      isValidIsoDate(serverTime) &&
+      Array.isArray(items) &&
+      items.every(isNewsFeedItem)
     ) {
-      return cache;
+      return { fetchedAt, items, serverTime };
     }
   } catch {
     // Ignore malformed cached data.

@@ -383,6 +383,13 @@
             <NavigationItem {...link} link={link.href} />
           {/each}
         {/snippet}
+        {#if showNewsFeed}
+          <NewsFeedWidget
+            clusterId={newsFeedClusterId}
+            variant="navigation"
+            previewTheme="dark"
+          />
+        {/if}
         <UserMenuMobile {logout} />
       </BottomNavigation>
     {/snippet}

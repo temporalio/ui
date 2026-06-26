@@ -17,6 +17,7 @@
       | ''
       | undefined;
     frameId?: string;
+    previewTheme?: 'dark' | 'light';
   }
 
   let {
@@ -24,6 +25,7 @@
     class: className = '',
     overrideTheme = '',
     frameId = '',
+    previewTheme,
   }: Props = $props();
 
   let iframe: HTMLIFrameElement | null = $state(null);
@@ -55,10 +57,12 @@
   };
 
   const templatedContent = $derived(replaceTemplate(content));
-  const previewTheme = $derived($useDarkMode ? 'dark' : 'light');
+  const resolvedPreviewTheme = $derived(
+    previewTheme ?? ($useDarkMode ? 'dark' : 'light'),
+  );
   const previewPath = $derived(
     resolve(
-      `/render?content=${encodeURIComponent(templatedContent)}&theme=${previewTheme}&overrideTheme=${overrideTheme}`,
+      `/render?content=${encodeURIComponent(templatedContent)}&theme=${resolvedPreviewTheme}&overrideTheme=${overrideTheme}`,
       {},
     ),
   );

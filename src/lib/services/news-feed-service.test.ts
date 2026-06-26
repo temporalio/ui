@@ -22,8 +22,13 @@ const createStorage = () => {
 };
 
 describe('fetchNewsFeed', () => {
-  it('returns the mock feed without requesting the live feed', async () => {
-    const request = vi.fn();
+  const response = () => ({
+    ok: true,
+    json: () => Promise.resolve(MOCK_NEWS_FEED_RESPONSE),
+  });
+
+  it('returns the requested feed', async () => {
+    const request = vi.fn().mockResolvedValue(response());
 
     const cache = await fetchNewsFeed({
       clusterId: '75d9c0b6-577f-42d4-a049-9f6e47e97c46',
@@ -32,7 +37,10 @@ describe('fetchNewsFeed', () => {
       storage: createStorage(),
     });
 
-    expect(request).not.toHaveBeenCalled();
+    expect(request).toHaveBeenCalledWith(
+      'https://newsfeed.tomwheeler.com/feed_en.json?client=d104aa3a-da5f-4a19-948c-7c6144f962d3&cluster=75d9c0b6-577f-42d4-a049-9f6e47e97c46&source=web-ui',
+      { credentials: 'omit' },
+    );
     expect(cache).toEqual({
       fetchedAt: 1780442153000,
       items: MOCK_NEWS_FEED_RESPONSE.items,
@@ -40,16 +48,25 @@ describe('fetchNewsFeed', () => {
     });
   });
 
-  it('does not request the live feed when cache reload is requested', async () => {
-    const request = vi.fn();
+  it('passes cache reload through to the request', async () => {
+    const request = vi.fn().mockResolvedValue(response());
 
-    await fetchNewsFeed({
+    const cache = await fetchNewsFeed({
       cache: 'reload',
       clusterId: '75d9c0b6-577f-42d4-a049-9f6e47e97c46',
+      now: () => 1780442153000,
       request,
       storage: createStorage(),
     });
 
-    expect(request).not.toHaveBeenCalled();
+    expect(request).toHaveBeenCalledWith(
+      'https://newsfeed.tomwheeler.com/feed_en.json?client=d104aa3a-da5f-4a19-948c-7c6144f962d3&cluster=75d9c0b6-577f-42d4-a049-9f6e47e97c46&source=web-ui',
+      { cache: 'reload', credentials: 'omit' },
+    );
+    expect(cache).toEqual({
+      fetchedAt: 1780442153000,
+      items: MOCK_NEWS_FEED_RESPONSE.items,
+      serverTime: MOCK_NEWS_FEED_RESPONSE.server_time,
+    });
   });
 });

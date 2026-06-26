@@ -30,7 +30,7 @@ const createStorage = (entries: Record<string, string> = {}) => {
 const item = (overrides: Partial<NewsFeedItem> = {}): NewsFeedItem => ({
   id: 1,
   title: 'Temporal releases Rust SDK',
-  content_html: '[Temporal](https://temporal.io) announced...',
+  content: '[Temporal](https://temporal.io) announced...',
   priority: 3,
   tags: ['sdk'],
   published_at: '2026-05-21T08:31:26Z',

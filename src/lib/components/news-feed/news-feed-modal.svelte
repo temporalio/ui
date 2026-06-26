@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -19,12 +18,10 @@
   interface Props {
     newsFeed: NewsFeedStore;
     open?: boolean;
+    previewTheme?: 'dark' | 'light';
   }
 
-  let { newsFeed, open = $bindable(false) }: Props = $props();
-
-  const formatNewsFeedTag = (tag: string) =>
-    tag.split('-').filter(Boolean).join(' ');
+  let { newsFeed, open = $bindable(false), previewTheme }: Props = $props();
 
   const lastFetchedLabel = $derived(
     $newsFeed.fetchedAt
@@ -86,7 +83,8 @@
           <Markdown
             frameId="news-feed-{item.id}"
             overrideTheme="primary"
-            content={item.content_html}
+            {previewTheme}
+            content={item.content}
           />
         </article>
       {/each}

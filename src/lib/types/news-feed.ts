@@ -1,7 +1,7 @@
 export type NewsFeedItem = {
   id: number;
   title: string;
-  content_html: string;
+  content: string;
   priority: number;
   tags: string[];
   published_at: string;
