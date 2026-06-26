@@ -1,6 +1,7 @@
 <script lang="ts">
   import DeploymentStatus from '$lib/components/deployments/deployment-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     isVersionSummaryNew,
@@ -16,16 +17,21 @@
 
   let { versions }: Props = $props();
 
-  const MAX_VERSIONS = 5;
+  const DEFAULT_VISIBLE = 5;
+  let visibleCount = $state(DEFAULT_VISIBLE);
   const sortedVersions = $derived(
     [...versions].sort(
       (a, b) => getMilliseconds(b.createTime) - getMilliseconds(a.createTime),
     ),
   );
-  const visibleVersions = $derived(sortedVersions.slice(0, MAX_VERSIONS));
+  const visibleVersions = $derived(sortedVersions.slice(0, visibleCount));
   const hiddenCount = $derived(
-    Math.max(sortedVersions.length - MAX_VERSIONS, 0),
+    Math.max(sortedVersions.length - visibleCount, 0),
   );
+
+  const loadMore = () => {
+    visibleCount += DEFAULT_VISIBLE;
+  };
 
   const getBuildId = (version: VersionSummary): string =>
     isVersionSummaryNew(version)
@@ -40,10 +46,10 @@
 
 {#if visibleVersions.length}
   <div class="mt-4">
-    <h3 id="existing-versions-title" class="text-sm font-medium">
-      {translate('workers.existing-versions')}
+    <h3 id="recent-versions-title" class="text-sm font-medium">
+      {translate('workers.recent-versions')}
     </h3>
-    <ol class="flex flex-col" aria-labelledby="existing-versions-title">
+    <ol class="flex flex-col" aria-labelledby="recent-versions-title">
       {#each visibleVersions as version, index (index)}
         {@const { status, label } = getStatus(version)}
         <li
@@ -65,9 +71,9 @@
       {/each}
     </ol>
     {#if hiddenCount > 0}
-      <span class="mt-1 text-xs text-secondary">
-        {translate('workers.existing-versions-more', { count: hiddenCount })}
-      </span>
+      <Button variant="secondary" size="xs" on:click={loadMore}>
+        {translate('workers.recent-versions-more', { count: hiddenCount })}
+      </Button>
     {/if}
   </div>
 {/if}

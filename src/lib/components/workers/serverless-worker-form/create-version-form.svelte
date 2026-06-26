@@ -13,7 +13,7 @@
 
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
-  import ExistingVersions from './existing-versions.svelte';
+  import RecentVersions from './recent-versions.svelte';
 
   interface Props {
     onSubmit: (data: CreateVersionFormData) => Promise<void>;
@@ -80,7 +80,7 @@
         placeholder="1.0.0"
         required
       />
-      <ExistingVersions {versions} />
+      <RecentVersions {versions} />
     </Card>
 
     <Card class="p-5">

@@ -268,8 +268,8 @@ export const Strings = {
     '{{message}} The version could not be cleaned up automatically — delete it manually from the deployment.',
   'build-id-label': 'Build ID',
   'build-id-hint': 'A unique identifier for this version of your Worker.',
-  'existing-versions': 'Existing Versions',
-  'existing-versions-more': '+{{count}} more',
+  'recent-versions': 'Recent Versions',
+  'recent-versions-more': '+{{count}} more',
   'max-concurrent-activities-label': 'Max Concurrent Activities',
   'max-concurrent-activities-hint':
     'Maximum concurrent activities per worker instance.',
