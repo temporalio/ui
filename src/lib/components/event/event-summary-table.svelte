@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { tick } from 'svelte';
-
   import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
+  import LiveCountAnnouncer from '$lib/components/live-count-announcer.svelte';
   import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -50,31 +49,6 @@
     hoveredEventId?: string;
   } = $props();
 
-  let prevItemCount = 0;
-  let pendingNewEvents = 0;
-  let announceTimer: ReturnType<typeof setTimeout>;
-  let newEventsAnnouncement = $state('');
-
-  $effect(() => {
-    const current = items.length;
-    if (current > prevItemCount && prevItemCount > 0) {
-      pendingNewEvents += current - prevItemCount;
-      clearTimeout(announceTimer);
-      announceTimer = setTimeout(() => {
-        const message = translate('workflows.new-events-announcement', {
-          count: pendingNewEvents,
-        });
-        pendingNewEvents = 0;
-        newEventsAnnouncement = '';
-        tick().then(() => {
-          newEventsAnnouncement = message;
-        });
-      }, 250);
-    }
-    prevItemCount = current;
-    return () => clearTimeout(announceTimer);
-  });
-
   const showGraph = $derived(!minimized && !compact);
   const initialItem = $derived($fullEventHistory?.[0]);
   const url = $derived(page.url);
@@ -109,9 +83,11 @@
   };
 </script>
 
-<span class="sr-only" role="status" aria-live="polite" aria-atomic="true">
-  {newEventsAnnouncement}
-</span>
+<LiveCountAnnouncer
+  count={items.length}
+  getMessage={(count) =>
+    translate('workflows.new-events-announcement', { count })}
+/>
 <div class="flex">
   <div class="pt-9">
     {#if showGraph}
