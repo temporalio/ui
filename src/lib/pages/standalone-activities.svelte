@@ -81,15 +81,18 @@
         <h1 class="flex items-center gap-2 leading-7">
           {#if $supportsAdvancedVisibility}
             <span
-              data-testid="activity-count"
               role="status"
-              aria-live="polite"
-              aria-atomic="true">{$activityCount.count.toLocaleString()}</span
+              aria-atomic="true"
+              class="flex items-center gap-2"
             >
-            <Translate
-              key="standalone-activities.activities-plural"
-              count={$activityCount.count}
-            />
+              <span data-testid="activity-count"
+                >{$activityCount.count.toLocaleString()}</span
+              >
+              <Translate
+                key="standalone-activities.activities-plural"
+                count={$activityCount.count}
+              />
+            </span>
           {:else}
             <Translate key="standalone-activities.recent-activities" />
           {/if}

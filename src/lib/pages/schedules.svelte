@@ -99,14 +99,17 @@
             data-cy="schedules-title"
           >
             <span
-              data-testid="schedule-count"
               role="status"
-              aria-live="polite"
-              aria-atomic="true">{$schedulesCount.count.toLocaleString()}</span
+              aria-atomic="true"
+              class="flex items-center gap-2"
             >
-            {translate('common.schedules-plural', {
-              count: $schedulesCount.count,
-            })}
+              <span data-testid="schedule-count"
+                >{$schedulesCount.count.toLocaleString()}</span
+              >
+              {translate('common.schedules-plural', {
+                count: $schedulesCount.count,
+              })}
+            </span>
           </h1>
           <CountRefreshButton
             count={$schedulesCount.newCount}

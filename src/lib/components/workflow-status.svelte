@@ -21,6 +21,7 @@
     big?: boolean;
     delayed?: boolean;
     taskFailure?: boolean;
+    announce?: boolean;
     'test-id'?: string;
   }
 
@@ -33,6 +34,7 @@
     big = false,
     delayed = false,
     taskFailure = false,
+    announce = false,
     'test-id': testId,
   }: Props = $props();
 
@@ -90,8 +92,8 @@
     data-testid={testId || 'workflow-status'}
   >
     <span
-      role="status"
-      aria-atomic="true"
+      role={announce ? 'status' : undefined}
+      aria-atomic={announce ? 'true' : undefined}
       class={merge(
         workflowStatus({
           status,

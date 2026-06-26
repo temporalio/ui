@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { tick } from 'svelte';
+
   import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
@@ -48,15 +50,29 @@
     hoveredEventId?: string;
   } = $props();
 
-  let prevItemCount = $state(0);
-  let newEventCount = $state(0);
+  let prevItemCount = 0;
+  let pendingNewEvents = 0;
+  let announceTimer: ReturnType<typeof setTimeout>;
+  let newEventsAnnouncement = $state('');
 
   $effect(() => {
     const current = items.length;
     if (current > prevItemCount && prevItemCount > 0) {
-      newEventCount = current - prevItemCount;
+      pendingNewEvents += current - prevItemCount;
+      clearTimeout(announceTimer);
+      announceTimer = setTimeout(() => {
+        const message = translate('workflows.new-events-announcement', {
+          count: pendingNewEvents,
+        });
+        pendingNewEvents = 0;
+        newEventsAnnouncement = '';
+        tick().then(() => {
+          newEventsAnnouncement = message;
+        });
+      }, 250);
     }
     prevItemCount = current;
+    return () => clearTimeout(announceTimer);
   });
 
   const showGraph = $derived(!minimized && !compact);
@@ -94,9 +110,7 @@
 </script>
 
 <span class="sr-only" role="status" aria-live="polite" aria-atomic="true">
-  {#if newEventCount > 0}
-    {translate('workflows.new-events-announcement', { count: newEventCount })}
-  {/if}
+  {newEventsAnnouncement}
 </span>
 <div class="flex">
   <div class="pt-9">

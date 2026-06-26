@@ -255,15 +255,18 @@
           >
             {#if $supportsAdvancedVisibility}
               <span
-                data-testid="workflow-count"
                 role="status"
-                aria-live="polite"
-                aria-atomic="true">{$workflowCount.count.toLocaleString()}</span
+                aria-atomic="true"
+                class="flex items-center gap-2"
               >
-              <Translate
-                key="common.workflows-plural"
-                count={$workflowCount.count}
-              />
+                <span data-testid="workflow-count"
+                  >{$workflowCount.count.toLocaleString()}</span
+                >
+                <Translate
+                  key="common.workflows-plural"
+                  count={$workflowCount.count}
+                />
+              </span>
             {:else}
               <Translate key="workflows.recent-workflows" />
             {/if}
