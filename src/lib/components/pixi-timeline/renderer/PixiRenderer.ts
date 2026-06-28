@@ -242,6 +242,13 @@ export class PixiRenderer {
 
   private xPanTarget: number | null = null;
 
+  // ── Frame-timing circular buffer (120 slots ≈ 2s at 60fps) ────────────────
+  private readonly FRAME_BUF = 120;
+  private frameBuf = new Float32Array(120);
+  private frameBufHead = 0;
+  private frameBufCount = 0;
+  private frameScratch = new Float32Array(120);
+
   private dirty = true;
   private lastStartMs = NaN;
   private lastScrollY = NaN;
@@ -303,6 +310,16 @@ export class PixiRenderer {
       antialias: true,
       autoDensity: true,
       resolution: dpr,
+      // Keep unused GPU resources longer than the 60s default — the timeline
+      // recycles icon textures and render textures on every data reload, so
+      // aggressive GC just causes unnecessary re-uploads.
+      gcMaxUnusedTime: 120_000,
+      gcFrequency: 60_000,
+      // @ts-expect-error accessibilityOptions is not yet typed in pixi.js 8.x
+      accessibilityOptions: {
+        enabledByDefault: false,
+        deactivateOnMouseMove: true,
+      },
       eventFeatures: {
         move: false,
         globalMove: false,
@@ -783,19 +800,23 @@ export class PixiRenderer {
     const slop = 2 / zoom;
 
     const origin = this.dataOriginMs;
-    const count = this.currentArgs.poolCount;
-    if (!isNaN(origin) && count > 0) {
-      for (let i = 0; i < count; i++) {
+    // Use trackIdx to jump directly to events on the clicked track row —
+    // O(events on one track) instead of O(all 16k groups).
+    if (
+      !isNaN(origin) &&
+      trackIndex >= 0 &&
+      trackIndex < this.trackIdx.offsets.length - 1
+    ) {
+      for (
+        let j = this.trackIdx.offsets[trackIndex];
+        j < this.trackIdx.offsets[trackIndex + 1];
+        j++
+      ) {
+        const i = this.trackIdx.poolIdxs[j];
         const meta = getGroupMeta(i);
-        if (
-          !meta ||
-          meta.pixiType === 'GROUP_WORKFLOW_TASK' ||
-          meta.trackIndex !== trackIndex
-        )
-          continue;
+        if (!meta) continue;
         const relStart = meta.startMs - origin;
         const relEnd = Math.max(meta.endMs - origin, relStart + 1);
-        // Extend the hit zone to cover the visual minimum-width bar.
         const renderedEndMs = Math.max(relEnd, relStart + MIN_BAR_W / zoom);
         if (clickMs >= relStart - slop && clickMs <= renderedEndMs + slop) {
           return {
@@ -868,7 +889,42 @@ export class PixiRenderer {
     }
   }
 
+  private updateFrameStats(elapsedMs: number) {
+    this.frameBuf[this.frameBufHead % this.FRAME_BUF] = elapsedMs;
+    this.frameBufHead++;
+    if (this.frameBufCount < this.FRAME_BUF) this.frameBufCount++;
+
+    if (this.frameBufHead % 30 !== 0) return;
+
+    const n = this.frameBufCount;
+    this.frameScratch.set(this.frameBuf.subarray(0, n));
+    // Sort only the valid portion in-place using a simple insertion sort
+    // (n ≤ 120, so O(n²) is negligible; avoids JS array allocation).
+    for (let i = 1; i < n; i++) {
+      const v = this.frameScratch[i];
+      let j = i - 1;
+      while (j >= 0 && this.frameScratch[j] > v) {
+        this.frameScratch[j + 1] = this.frameScratch[j];
+        j--;
+      }
+      this.frameScratch[j + 1] = v;
+    }
+
+    let sum = 0;
+    for (let i = 0; i < n; i++) sum += this.frameScratch[i];
+
+    const round1 = (v: number) => Math.round(v * 10) / 10;
+    this.state.frameStats = {
+      avgMs: round1(sum / n),
+      p95Ms: round1(this.frameScratch[Math.min(n - 1, Math.floor(n * 0.95))]),
+      p99Ms: round1(this.frameScratch[Math.min(n - 1, Math.floor(n * 0.99))]),
+      maxMs: round1(this.frameScratch[n - 1]),
+      sampleCount: n,
+    };
+  }
+
   private render() {
+    const renderStart = performance.now();
     ensureBitmapFonts();
     this.canvasRect = this.canvas.getBoundingClientRect();
 
@@ -944,20 +1000,21 @@ export class PixiRenderer {
     const tileOffset = (performance.now() / 1000) * 48;
     const tileChanged = Math.abs(tileOffset - this.lastTileOffset) >= 0.5;
 
-    // Requires a full draw-call rebuild when geometry changes or scroll position changes.
-    // Scroll must rebuild so Y-culling uses the current scrollY (only visible tracks drawn).
-    const needsGeometry =
+    // Split dirty tracking: X-geometry (pan/zoom/resize) vs Y-scroll.
+    // Ruler and grid lines only depend on X state; skipping their rebuild on
+    // scroll-only frames saves ~20 draw calls per scroll tick at 60fps.
+    const needsXGeometry =
       this.dirty ||
       startMs !== this.lastStartMs ||
       zoom !== this.lastZoom ||
-      scrollY !== this.lastScrollY ||
       screenW !== this.lastScreenW ||
       screenH !== this.lastScreenH ||
       this.state.timeScale !== this.lastTimeScale;
+    const needsYScroll = scrollY !== this.lastScrollY;
+    const needsGeometry = needsXGeometry || needsYScroll;
 
     if (!needsGeometry && !tileChanged) return;
 
-    const poolCount = this.currentArgs.poolCount;
     const totalRows = Math.max(
       this.currentArgs.totalRows,
       getVisibleGroupCount(),
@@ -965,7 +1022,6 @@ export class PixiRenderer {
     const descCount = this.currentArgs.descCount;
     const ascCount = this.currentArgs.ascCount;
     const sortOrder = this.currentArgs.sortOrder ?? 'desc';
-    const totalTracks = this.trackIdx.numTracks || totalRows;
     // Loading gap sits between the desc section (top) and asc section (bottom).
     const loadingStart = descCount;
     const loadingEnd = Math.max(descCount, totalRows - ascCount);
@@ -998,7 +1054,9 @@ export class PixiRenderer {
     if (tileChanged) this.lastTileOffset = tileOffset;
 
     this.scrollContainer.y = containerY;
-    this.drawRuler(startMs, zoom, screenW, screenH, this.state.timeScale);
+    if (needsXGeometry) {
+      this.drawRuler(startMs, zoom, screenW, screenH, this.state.timeScale);
+    }
 
     // Loading bars — tracks in the gap between desc section and asc section.
     this.updateLoadingBars(
@@ -1012,7 +1070,13 @@ export class PixiRenderer {
       tileOffset,
     );
 
-    // Event bars — read directly from the buffer pool, no intermediate copy.
+    // Event bars — track-indexed: iterate only visible track rows instead of
+    // scanning every event in the pool. For a 13k-group timeline at typical
+    // zoom only ~50 tracks are on-screen, so this is O(50) not O(13000).
+    //
+    // Proof that visIdx === effectiveIdx:
+    //   desc: effectiveIdx = trackIndex = dataTrack = visIdx ✓
+    //   asc:  effectiveIdx = numTracks-1-trackIndex = numTracks-1-(numTracks-1-visIdx) = visIdx ✓
     this.baseGfx.clear();
     this.selectionGfx.clear();
     this.eventLabelIndex = 0;
@@ -1024,119 +1088,151 @@ export class PixiRenderer {
     const radius = Math.max(2, Math.min(4, effectiveTrackH * 0.15));
     const PIN_MARGIN = 4;
     const origin = this.dataOriginMs;
-    if (!isNaN(origin)) {
-      for (let i = 0; i < poolCount; i++) {
-        const meta = getGroupMeta(i);
-        if (!meta || meta.pixiType === 'GROUP_WORKFLOW_TASK') continue;
+    const numTracks = this.trackIdx.numTracks;
 
-        const relStart = meta.startMs - origin;
-        const relEnd = Math.max(meta.endMs - origin, relStart + 1);
+    if (!isNaN(origin) && numTracks > 0) {
+      const firstVisEffIdx = Math.max(
+        0,
+        Math.floor((scrollY - effectiveTrackH) / rowSize),
+      );
+      const lastVisEffIdx = Math.min(
+        numTracks - 1,
+        Math.floor((scrollY + screenH - RULER_H) / rowSize),
+      );
 
-        const rawX = (relStart - startMs) * zoom;
-        const rawW = Math.max(MIN_BAR_W, (relEnd - relStart) * zoom);
-        const effectiveIdx =
-          sortOrder === 'asc'
-            ? totalTracks - 1 - meta.trackIndex
-            : meta.trackIndex;
-        const localY = effectiveIdx * rowSize;
+      for (let visIdx = firstVisEffIdx; visIdx <= lastVisEffIdx; visIdx++) {
+        const dataTrack = sortOrder === 'asc' ? numTracks - 1 - visIdx : visIdx;
+        if (dataTrack < 0 || dataTrack >= this.trackIdx.offsets.length - 1)
+          continue;
+
+        const localY = visIdx * rowSize;
         const screenY = containerY + localY;
 
-        if (screenY + effectiveTrackH < RULER_H || screenY > screenH) continue;
+        for (
+          let j = this.trackIdx.offsets[dataTrack];
+          j < this.trackIdx.offsets[dataTrack + 1];
+          j++
+        ) {
+          const i = this.trackIdx.poolIdxs[j];
+          const meta = getGroupMeta(i);
+          if (!meta) continue;
 
-        const color = EVENT_COLORS[meta.pixiType] ?? EVENT_COLORS.default;
-        const alpha = STATUS_ALPHA[meta.pixiStatus] ?? 1.0;
+          const relStart = meta.startMs - origin;
+          const relEnd = Math.max(meta.endMs - origin, relStart + 1);
 
-        // ── Left/right edge pin detection ───────────────────────────────────
-        const isLeftPin = rawX + rawW < PIN_MARGIN + MIN_BAR_W;
-        const isRightPin = rawX > screenW - PIN_MARGIN - MIN_BAR_W;
+          const rawX = (relStart - startMs) * zoom;
+          const rawW = Math.max(MIN_BAR_W, (relEnd - relStart) * zoom);
 
-        let drawX = rawX;
-        let drawW = rawW;
-        if (isLeftPin) {
-          drawX = PIN_MARGIN;
-          drawW = MIN_BAR_W;
-          this.leftPins.push({ poolIdx: i, py: screenY, ph: effectiveTrackH });
-          this.pinnedPoolIdxs.add(i);
-        } else if (isRightPin) {
-          drawX = screenW - PIN_MARGIN - MIN_BAR_W;
-          drawW = MIN_BAR_W;
-          this.rightPins.push({ poolIdx: i, py: screenY, ph: effectiveTrackH });
-          this.pinnedPoolIdxs.add(i);
-        } else if (rawX + rawW < 0 || rawX > screenW) {
-          continue;
-        }
+          const color = EVENT_COLORS[meta.pixiType] ?? EVENT_COLORS.default;
+          const alpha = STATUS_ALPHA[meta.pixiStatus] ?? 1.0;
 
-        visibleCount++;
-        this.baseGfx
-          .roundRect(drawX, localY, drawW, effectiveTrackH, radius)
-          .fill({ color, alpha });
+          // ── Left/right edge pin detection ──────────────────────────────────
+          const isLeftPin = rawX + rawW < PIN_MARGIN + MIN_BAR_W;
+          const isRightPin = rawX > screenW - PIN_MARGIN - MIN_BAR_W;
 
-        const eventId = String(meta.headSlotIdx + 1);
-        if (this.state.selectedEvents[eventId]) {
-          const sw = 2;
-          this.selectionGfx
-            .roundRect(
-              drawX - sw,
-              localY - sw,
-              drawW + sw * 2,
-              effectiveTrackH + sw * 2,
-              radius + sw,
-            )
-            .stroke({ color: 0xffffff, width: sw * 2, alpha: 1 });
-        }
-
-        const barMidY = localY + effectiveTrackH / 2;
-
-        // ── SVG icon + display name ──────────────────────────────────────────
-        const barLeft = Math.max(0, drawX);
-        const barRight = Math.min(screenW, drawX + drawW);
-        const visibleW = barRight - barLeft;
-
-        // SVG icon: always render when the icon texture is available.
-        // MIN_BAR_W == ICON_SIZE + ICON_PAD*2 so the icon always fits.
-        let iconPlaced = false;
-        if (this.iconTextures && visibleW >= MIN_BAR_W) {
-          const iconName = PIXI_TYPE_TO_ICON[meta.pixiType];
-          if (iconName) {
-            const sprite = this.getIconSprite();
-            sprite.texture = this.iconTextures[iconName];
-            sprite.x = barLeft + ICON_PAD;
-            sprite.y = barMidY;
-            sprite.width = ICON_SIZE;
-            sprite.height = ICON_SIZE;
-            sprite.visible = true;
-            sprite.alpha = alpha;
-            iconPlaced = true;
+          let drawX = rawX;
+          let drawW = rawW;
+          if (isLeftPin) {
+            drawX = PIN_MARGIN;
+            drawW = MIN_BAR_W;
+            this.leftPins.push({
+              poolIdx: i,
+              py: screenY,
+              ph: effectiveTrackH,
+            });
+            this.pinnedPoolIdxs.add(i);
+          } else if (isRightPin) {
+            drawX = screenW - PIN_MARGIN - MIN_BAR_W;
+            drawW = MIN_BAR_W;
+            this.rightPins.push({
+              poolIdx: i,
+              py: screenY,
+              ph: effectiveTrackH,
+            });
+            this.pinnedPoolIdxs.add(i);
+          } else if (rawX + rawW < 0 || rawX > screenW) {
+            continue;
           }
-        }
 
-        // Text label: show display name after the icon (or letter+name if no icon).
-        if (visibleW >= 8) {
-          const name =
-            meta.group?.displayName ??
-            meta.pixiType
-              .replace(/^(EVENT_TYPE_|GROUP_)/, '')
-              .replace(/_/g, ' ');
-          const textStart = iconPlaced
-            ? barLeft + ICON_PAD + ICON_SIZE + 2
-            : barLeft + 4;
-          // Allow label to overflow bar rightward up to screen edge.
-          const textAvailW = screenW - textStart - 4;
-          if (textAvailW >= 6) {
-            const labelText = iconPlaced
-              ? PixiRenderer.fitName(name, textAvailW)
-              : PixiRenderer.fitLabel(
-                  PixiRenderer.iconLetter(meta.pixiType),
-                  name,
-                  textAvailW,
-                );
-            if (labelText) {
-              const label = this.getEventLabel();
-              label.text = labelText;
-              label.x = textStart;
-              label.y = barMidY;
-              label.visible = true;
-              label.alpha = 1;
+          visibleCount++;
+          this.baseGfx
+            .roundRect(drawX, localY, drawW, effectiveTrackH, radius)
+            .fill({ color, alpha });
+
+          const eventId = String(meta.headSlotIdx + 1);
+          if (this.state.selectedEvents[eventId]) {
+            const sw = 2;
+            this.selectionGfx
+              .roundRect(
+                drawX - sw,
+                localY - sw,
+                drawW + sw * 2,
+                effectiveTrackH + sw * 2,
+                radius + sw,
+              )
+              .stroke({ color: 0xffffff, width: sw * 2, alpha: 1 });
+          } else if (this.state.keyboardFocusPoolIdx === i) {
+            const sw = 1.5;
+            this.selectionGfx
+              .roundRect(
+                drawX - sw,
+                localY - sw,
+                drawW + sw * 2,
+                effectiveTrackH + sw * 2,
+                radius + sw,
+              )
+              .stroke({ color: 0x38bdf8, width: sw * 2, alpha: 0.9 });
+          }
+
+          const barMidY = localY + effectiveTrackH / 2;
+
+          // ── SVG icon + display name ────────────────────────────────────────
+          const barLeft = Math.max(0, drawX);
+          const barRight = Math.min(screenW, drawX + drawW);
+          const visibleW = barRight - barLeft;
+
+          let iconPlaced = false;
+          if (this.iconTextures && visibleW >= MIN_BAR_W) {
+            const iconName = PIXI_TYPE_TO_ICON[meta.pixiType];
+            if (iconName) {
+              const sprite = this.getIconSprite();
+              sprite.texture = this.iconTextures[iconName];
+              sprite.x = barLeft + ICON_PAD;
+              sprite.y = barMidY;
+              sprite.width = ICON_SIZE;
+              sprite.height = ICON_SIZE;
+              sprite.visible = true;
+              sprite.alpha = alpha;
+              iconPlaced = true;
+            }
+          }
+
+          if (visibleW >= 8) {
+            const name =
+              meta.group?.displayName ??
+              meta.pixiType
+                .replace(/^(EVENT_TYPE_|GROUP_)/, '')
+                .replace(/_/g, ' ');
+            const textStart = iconPlaced
+              ? barLeft + ICON_PAD + ICON_SIZE + 2
+              : barLeft + 4;
+            const textAvailW = screenW - textStart - 4;
+            if (textAvailW >= 6) {
+              const labelText = iconPlaced
+                ? PixiRenderer.fitName(name, textAvailW)
+                : PixiRenderer.fitLabel(
+                    PixiRenderer.iconLetter(meta.pixiType),
+                    name,
+                    textAvailW,
+                  );
+              if (labelText) {
+                const label = this.getEventLabel();
+                label.text = labelText;
+                label.x = textStart;
+                label.y = barMidY;
+                label.visible = true;
+                label.alpha = 1;
+              }
             }
           }
         }
@@ -1168,6 +1264,7 @@ export class PixiRenderer {
     );
 
     this.app.renderer.render(this.app.stage);
+    this.updateFrameStats(performance.now() - renderStart);
   }
 
   /**
@@ -1184,8 +1281,8 @@ export class PixiRenderer {
    *  1. collectGutterBest sorts by (duration DESC, type priority ASC), so
    *     timers and child-workflows bubble ahead of plain activities.
    *  2. For the above-gutter, track indices are reversed before collection so
-   *     that the closest-to-viewport tracks are processed first when the
-   *     PACK_SAMPLE cap is hit on equal-duration batches.
+   *     that closest-to-viewport tracks are processed first and claim the best
+   *     gutter slots when durations are equal.
    *  3. packGutterPins pass 2 preserves the importance ordering — it does NOT
    *     re-sort by px — so a high-priority timer at px=102 always wins over a
    *     low-priority activity at px=100 when both would occupy the same slot.
@@ -1229,12 +1326,15 @@ export class PixiRenderer {
 
     const reversed = sortOrder === 'asc';
 
-    // Max visual bars per row at the current zoom / screen size.
-    // We need at most this many representative events per side to fill the gutter.
-    // Oversample by 4× to account for pixel clustering and time-range deduplication.
-    const maxBarsPerRow = Math.ceil(screenW / MIN_BAR_W);
-    const PACK_SAMPLE = maxBarsPerRow * GUTTER_ROWS * 4; // typically ~440
+    // Derive the sample cap from screen geometry: 4× the maximum visible pins
+    // (screenW/minBarW × GUTTER_ROWS).  This bounds gatherGutterTracks to
+    // O(gutterSampleCap) instead of O(numTracks), and bounds packGutterPins to
+    // O(gutterSampleCap²) which is fixed by screen width, not event count.
+    const gutterSampleCap = Math.ceil(screenW / MIN_BAR_W) * GUTTER_ROWS * 4;
 
+    // gatherGutterTracks uses O(1) arithmetic to find the visible range and
+    // early-exits after collecting gutterSampleCap tracks per side.  Output is
+    // already in closest-to-viewport-first order, so no .reverse() needed.
     const { aboveTrackIdxs, belowTrackIdxs } = gatherGutterTracks(
       this.trackIdx.numTracks,
       containerY,
@@ -1242,34 +1342,23 @@ export class PixiRenderer {
       effectiveTrackH,
       topEdge,
       bottomEdge,
-      Infinity,
+      gutterSampleCap,
       (t) => trackHasEvents(this.trackIdx, t),
       reversed,
     );
 
-    // Collect the best event from every off-screen track, rank by importance,
-    // then cap at PACK_SAMPLE so packGutterPins stays O(PACK_SAMPLE²).
-    //
-    // Sort key (primary → secondary):
-    //   1. Duration DESC — longer events claim row 0 (closest to viewport edge)
-    //   2. Type priority ASC — failures/signals/child-workflows before plain activities
-    // Reverse above so closest-to-viewport tracks come first (they're last in
-    // the ascending output from gatherGutterTracks).  When all durations are
-    // equal the stable sort in collectGutterBest preserves this order, so the
-    // PACK_SAMPLE cap retains contextually relevant events rather than always
-    // the farthest-from-viewport ones.  Below is already closest-first.
     const getEventForGutter = (poolIdx: number) => {
       const ev = this.pinEventFor(poolIdx);
       return ev ?? { poolIdx, startMs: 0, endMs: 0, pixiType: 'UNKNOWN' };
     };
 
     const aboveInput = collectBestPerTrack(
-      [...aboveTrackIdxs].reverse(),
+      aboveTrackIdxs,
       this.trackIdx,
       getEventForGutter,
       GUTTER_TYPE_PRIORITY,
       GUTTER_TYPE_PRIORITY_DEFAULT,
-      PACK_SAMPLE,
+      gutterSampleCap,
     );
     const belowInput = collectBestPerTrack(
       belowTrackIdxs,
@@ -1277,7 +1366,7 @@ export class PixiRenderer {
       getEventForGutter,
       GUTTER_TYPE_PRIORITY,
       GUTTER_TYPE_PRIORITY_DEFAULT,
-      PACK_SAMPLE,
+      gutterSampleCap,
     );
 
     const drawPackedPins = (
@@ -1481,12 +1570,14 @@ export class PixiRenderer {
           this.ctx?.deselectEvent(id);
         }
         this.ctx?.toggleSelected(hit);
+        this.state.keyboardFocusPoolIdx = hit.poolIdx ?? null;
         this.dirty = true;
       } else if (!moved) {
-        // Click on empty area — deselect all
+        // Click on empty area — deselect all and clear keyboard cursor
         for (const id of Object.keys(this.state.selectedEvents)) {
           this.ctx?.deselectEvent(id);
         }
+        this.state.keyboardFocusPoolIdx = null;
         this.dirty = true;
       }
     });
@@ -1633,6 +1724,26 @@ export class PixiRenderer {
           viewport.startMs + panMs,
         );
         this.dirty = true;
+      } else if ((e.key === 'ArrowDown' || e.key === 'Tab') && !e.shiftKey) {
+        e.preventDefault();
+        this.moveFocusToAdjacentTrack(1);
+      } else if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
+        e.preventDefault();
+        this.moveFocusToAdjacentTrack(-1);
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.selectKeyboardFocusedEvent();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        const hasSelection = Object.keys(this.state.selectedEvents).length > 0;
+        if (hasSelection) {
+          for (const id of Object.keys(this.state.selectedEvents)) {
+            this.ctx?.deselectEvent(id);
+          }
+        } else {
+          this.state.keyboardFocusPoolIdx = null;
+        }
+        this.dirty = true;
       }
     });
   }
@@ -1680,6 +1791,79 @@ export class PixiRenderer {
         Math.min(this.maxScrollY(), trackUnderCursor * newRowSize - eventY),
       );
     }
+  }
+
+  private moveFocusToAdjacentTrack(delta: number) {
+    const numTracks = this.trackIdx.numTracks;
+    if (numTracks === 0) return;
+
+    const currentIdx = this.state.keyboardFocusPoolIdx;
+    const so = (this.currentArgs.sortOrder ?? 'desc') as 'desc' | 'asc';
+    // Flip step so visual Down always moves to higher visual track index.
+    const step = so === 'asc' ? -delta : delta;
+
+    let targetTrack: number;
+    if (currentIdx === null) {
+      targetTrack = step > 0 ? 0 : numTracks - 1;
+    } else {
+      targetTrack = (getGroupMeta(currentIdx)?.trackIndex ?? 0) + step;
+    }
+
+    // Walk the offsets array from targetTrack in the direction of travel to
+    // find the nearest occupied track. O(1) average (dense timelines), O(numTracks)
+    // absolute worst case (all tracks empty — never happens in practice).
+    let foundTrack = -1;
+    if (step > 0) {
+      for (let t = Math.max(0, targetTrack); t < numTracks; t++) {
+        if (this.trackIdx.offsets[t + 1] > this.trackIdx.offsets[t]) {
+          foundTrack = t;
+          break;
+        }
+      }
+    } else {
+      for (let t = Math.min(numTracks - 1, targetTrack); t >= 0; t--) {
+        if (this.trackIdx.offsets[t + 1] > this.trackIdx.offsets[t]) {
+          foundTrack = t;
+          break;
+        }
+      }
+    }
+    if (foundTrack < 0) return;
+
+    // Pick the first event poolIdx stored for that track.
+    const bestIdx = this.trackIdx.poolIdxs[this.trackIdx.offsets[foundTrack]];
+    this.state.keyboardFocusPoolIdx = bestIdx;
+    const ev = this.pinEventFor(bestIdx);
+    if (ev) this.scrollToEvent(ev);
+    this.dirty = true;
+  }
+
+  private selectKeyboardFocusedEvent() {
+    const idx = this.state.keyboardFocusPoolIdx;
+    if (idx === null) return;
+    const meta = getGroupMeta(idx);
+    if (!meta) return;
+
+    const origin = this.dataOriginMs;
+    const relStart = meta.startMs - origin;
+    const relEnd = Math.max(meta.endMs - origin, relStart + 1);
+    const event: import('../types').TemporalEvent = {
+      eventId: String(meta.headSlotIdx + 1),
+      eventType: meta.pixiType,
+      eventTime: meta.startMs,
+      startMs: relStart,
+      endMs: relEnd,
+      status: meta.pixiStatus as EventStatus,
+      trackIndex: meta.trackIndex,
+      attributes: { type: meta.pixiType, durationMs: relEnd - relStart },
+      poolIdx: idx,
+    };
+
+    for (const id of Object.keys(this.state.selectedEvents)) {
+      this.ctx?.deselectEvent(id);
+    }
+    this.ctx?.toggleSelected(event);
+    this.dirty = true;
   }
 
   destroy() {

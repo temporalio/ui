@@ -58,6 +58,9 @@ export function packGutterPins<T extends PackGutterInput>(
   type Entry = { ev: T; px: number; pw: number };
   const rows: Entry[][] = [];
   const rowIntervals: [number, number][][] = [];
+  // Per-row maximum endMs of all placed intervals.  Enables an O(1) fast-path:
+  // if ev.startMs >= rowMaxEnd[r], there is no overlap without needing .some().
+  const rowMaxEnd: number[] = [];
 
   // ── Pass 1: row assignment by time-range non-overlap ──────────────────────
   for (const ev of events) {
@@ -81,6 +84,12 @@ export function packGutterPins<T extends PackGutterInput>(
     // Find the first row where this event's time range doesn't overlap.
     let row = -1;
     for (let r = 0; r < rowIntervals.length; r++) {
+      // Fast path: if this event starts after every existing interval ends,
+      // it cannot overlap any of them — skip the O(n) .some() entirely.
+      if (ev.startMs >= rowMaxEnd[r]) {
+        row = r;
+        break;
+      }
       if (!rowIntervals[r].some(([s, e]) => ev.startMs < e && ev.endMs > s)) {
         row = r;
         break;
@@ -90,9 +99,11 @@ export function packGutterPins<T extends PackGutterInput>(
       if (rowIntervals.length >= maxRows) continue;
       row = rowIntervals.length;
       rowIntervals.push([]);
+      rowMaxEnd.push(-Infinity);
       rows.push([]);
     }
     rowIntervals[row].push([ev.startMs, ev.endMs]);
+    if (ev.endMs > rowMaxEnd[row]) rowMaxEnd[row] = ev.endMs;
     rows[row].push({ ev, px, pw });
   }
 

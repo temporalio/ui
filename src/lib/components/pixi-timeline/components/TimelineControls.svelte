@@ -71,8 +71,9 @@
   <div class="flex items-center">
     <button
       onclick={() => zoom(1 / 1.5)}
+      aria-label="Zoom out"
       class="flex h-7 w-7 items-center justify-center rounded text-white/50 transition-colors hover:bg-white/10 hover:text-white"
-      title="Zoom out (scroll down)"
+      title="Zoom out (Ctrl+scroll down)"
     >
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
         <circle
@@ -92,8 +93,9 @@
     </button>
     <button
       onclick={() => zoom(1.5)}
+      aria-label="Zoom in"
       class="flex h-7 w-7 items-center justify-center rounded text-white/50 transition-colors hover:bg-white/10 hover:text-white"
-      title="Zoom in (scroll up)"
+      title="Zoom in (Ctrl+scroll up)"
     >
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
         <circle
@@ -129,9 +131,9 @@
       {@const active = timelineState.timeScale === opt}
       <button
         onclick={() => (timelineState.timeScale = opt)}
-        class="rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors {active
+        class="min-h-[24px] rounded px-2 py-1 font-mono text-[11px] transition-colors {active
           ? 'bg-sky-500/20 text-sky-300 ring-sky-500/40 ring-1'
-          : 'text-white/30 hover:bg-white/10 hover:text-white/70'}"
+          : 'text-white/50 hover:bg-white/10 hover:text-white/80'}"
       >
         {opt === 'auto' ? `auto (${effectiveUnit})` : opt}
       </button>
@@ -144,10 +146,13 @@
     onclick={() =>
       (timelineState.sortOrder =
         timelineState.sortOrder === 'desc' ? 'asc' : 'desc')}
+    aria-label="Toggle sort order, currently {timelineState.sortOrder === 'desc'
+      ? 'newest first'
+      : 'oldest first'}"
     class="flex items-center gap-1 rounded px-2 py-1 font-mono text-xs transition-colors {timelineState.sortOrder ===
     'asc'
       ? 'bg-sky-500/20 text-sky-300 ring-sky-500/40 ring-1'
-      : 'text-white/30 hover:bg-white/10 hover:text-white/70'}"
+      : 'text-white/50 hover:bg-white/10 hover:text-white/80'}"
     title="Toggle sort order (newest-first / oldest-first)"
   >
     {#if timelineState.sortOrder === 'desc'}
@@ -169,6 +174,29 @@
       <span class="text-white/15">/</span>
       {timelineState.totalEvents.toLocaleString()} groups
     </span>
+
+    {#if timelineState.frameStats.sampleCount > 0}
+      {@const { avgMs, p99Ms } = timelineState.frameStats}
+      {@const hasDips = p99Ms > avgMs * 2 || p99Ms > 16.7}
+      {@const avgColor =
+        avgMs > 16.7
+          ? 'text-red-400'
+          : avgMs > 10
+            ? 'text-yellow-400/80'
+            : 'text-green-400/60'}
+      <span
+        class="font-mono text-[10px]"
+        title="render ms (last {timelineState.frameStats
+          .sampleCount} active frames) · p95:{timelineState.frameStats
+          .p95Ms}ms · max:{timelineState.frameStats.maxMs}ms"
+      >
+        <span class={avgColor}>{avgMs}ms</span>
+        {#if hasDips}
+          <span class="text-red-400/80"> p99:{p99Ms}ms</span>
+        {/if}
+      </span>
+    {/if}
+
     {#if timelineState.rendererInfo}
       <span
         class="rounded-sm px-1.5 py-0.5 text-[10px] font-medium"

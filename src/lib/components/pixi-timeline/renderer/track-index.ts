@@ -114,8 +114,9 @@ export type GutterEventRef = {
  *   1. Longest duration (endMs - startMs) wins
  *   2. Ties broken by typePriority (lower number = more important)
  *
- * Output is sorted by duration DESC and capped at `maxSample`.
- * Empty tracks are silently skipped — no allocations needed.
+ * Output is sorted by duration DESC. Pass `Infinity` for `maxSample` to
+ * return all candidates (the caller is then responsible for limiting output,
+ * e.g. via packGutterPins). Empty tracks are silently skipped.
  */
 export function collectBestPerTrack(
   trackIdxs: number[],

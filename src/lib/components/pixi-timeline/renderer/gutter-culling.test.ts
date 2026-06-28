@@ -115,7 +115,7 @@ describe('gatherGutterTracks', () => {
   it('selects the CLOSEST above-tracks (highest track indices before viewport top)', () => {
     const MAX = 5;
     // Scroll past 50 tracks (scrollY=1600): tracks 0..49 are above
-    // With MAX=5, should return the 5 closest: tracks 45,46,47,48,49
+    // With MAX=5, should return the 5 closest: [49,48,47,46,45] (closest-first)
     const scrollY = 50 * ROW_SIZE;
     const result = gatherGutterTracks(
       100,
@@ -127,8 +127,8 @@ describe('gatherGutterTracks', () => {
       MAX,
     );
     expect(result.aboveTrackIdxs).toHaveLength(MAX);
-    // The 5 closest above-tracks are the last 5 of [0..49] = [45,46,47,48,49]
-    expect(result.aboveTrackIdxs).toEqual([45, 46, 47, 48, 49]);
+    // Closest-first order: highest t (closest to viewport) first
+    expect(result.aboveTrackIdxs).toEqual([49, 48, 47, 46, 45]);
   });
 
   it('returns no above pins and some below pins at the very top (scrollY=0)', () => {
@@ -204,7 +204,8 @@ describe('gatherGutterTracks', () => {
     );
     expect(result.aboveTrackIdxs.every((t) => t < 50)).toBe(true);
     expect(result.aboveTrackIdxs).toHaveLength(5);
-    expect(result.aboveTrackIdxs).toEqual([45, 46, 47, 48, 49]);
+    // Closest-first: highest t values (closest to viewport) come first
+    expect(result.aboveTrackIdxs).toEqual([49, 48, 47, 46, 45]);
   });
 
   it('returns empty above array when all above tracks are in the loading gap', () => {

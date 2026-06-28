@@ -62,11 +62,23 @@
   });
 </script>
 
-<div class="relative h-full w-full overflow-hidden">
+<div
+  class="relative h-full w-full overflow-hidden"
+  role="application"
+  aria-label="Workflow event timeline"
+  aria-describedby="timeline-kbd-hint"
+>
+  <p id="timeline-kbd-hint" class="sr-only">
+    Pan left and right with arrow keys. Navigate tracks with Up and Down arrow
+    keys. Select the focused event with Enter or Space. Deselect with Escape.
+    Zoom with Ctrl+scroll or Shift+scroll.
+  </p>
   <canvas
     bind:this={canvas}
+    id="timeline-canvas"
     tabindex="0"
-    class="absolute inset-0 z-0 block h-full w-full cursor-grab outline-none active:cursor-grabbing"
+    aria-label="Event timeline canvas"
+    class="focus-visible:outline-sky-500 absolute inset-0 z-0 block h-full w-full cursor-grab focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] active:cursor-grabbing"
     style="background:#0c0c14"
   ></canvas>
 

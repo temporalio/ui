@@ -1,6 +1,7 @@
 <script lang="ts">
   import { setContext } from 'svelte';
 
+  import { getEventDisplayName } from './eventUtils';
   import type { PixiRenderArgs } from './types';
 
   import ChildWorkflowLane from './components/ChildWorkflowLane.svelte';
@@ -53,6 +54,13 @@
         trackIndex={cw.trackIndex}
       />
     {/each}
+
+    <div aria-live="polite" aria-atomic="true" class="sr-only">
+      {#each Object.values(timelineState.selectedEvents) as event (event.eventId)}
+        Selected: {getEventDisplayName(event)}, status {event.status}, duration
+        {Math.round(event.endMs - event.startMs)}ms.
+      {/each}
+    </div>
   </div>
 
   <TimelineScrollbarX />

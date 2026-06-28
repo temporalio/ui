@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, onMount } from 'svelte';
 
   import { page } from '$app/state';
 
@@ -10,7 +10,32 @@
   import type { TemporalEvent } from '../types';
 
   const _ctx = getContext<TimelineCtx>(TIMELINE_CTX);
-  const deselectEvent = (id: string) => _ctx.deselectEvent(id);
+
+  let panelEl = $state<HTMLDivElement | null>(null);
+
+  onMount(() => {
+    panelEl?.focus();
+  });
+
+  function returnFocusToCanvas() {
+    requestAnimationFrame(() => {
+      (
+        document.getElementById('timeline-canvas') as HTMLElement | null
+      )?.focus();
+    });
+  }
+
+  function closePanel() {
+    _ctx.deselectEvent(event.eventId ?? '');
+    returnFocusToCanvas();
+  }
+
+  function onPanelKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      closePanel();
+    }
+  }
 
   interface Props {
     event: TemporalEvent;
@@ -77,7 +102,10 @@
 </script>
 
 <div
-  class="bg-gray-950/95 absolute right-0 top-0 z-30 flex h-full w-72 flex-col overflow-hidden rounded-l-lg border-l border-white/10 shadow-2xl backdrop-blur-sm"
+  bind:this={panelEl}
+  tabindex="-1"
+  onkeydown={onPanelKeydown}
+  class="bg-gray-950/95 absolute right-0 top-0 z-30 flex h-full w-72 flex-col overflow-hidden rounded-l-lg border-l border-white/10 shadow-2xl outline-none backdrop-blur-sm"
 >
   <!-- Header -->
   <div class="flex shrink-0 items-center gap-2.5 border-b border-white/10 p-3">
@@ -99,7 +127,7 @@
     </div>
     <button
       class="flex h-6 w-6 shrink-0 items-center justify-center rounded text-white/40 hover:bg-white/10 hover:text-white"
-      onclick={() => deselectEvent(event.eventId ?? '')}
+      onclick={closePanel}
       aria-label="Close panel"
     >
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none">

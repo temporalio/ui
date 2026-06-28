@@ -33,6 +33,15 @@ export class TimelineState {
   grouped = $state(true);
   timeScale = $state<TimeScale>('auto');
   sortOrder = $state<'desc' | 'asc'>('desc');
+  keyboardFocusPoolIdx = $state<number | null>(null);
+
+  frameStats = $state({
+    avgMs: 0,
+    p95Ms: 0,
+    p99Ms: 0,
+    maxMs: 0,
+    sampleCount: 0,
+  });
   openedChildWorkflows = $state<
     {
       runId: string;
