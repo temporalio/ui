@@ -20,7 +20,7 @@
 <div class={twMerge('flex flex-col', className)}>
   <div class="flex flex-col gap-2">
     <ul>
-      {#each summarizeScheduleSpec(spec) as summary (summary)}
+      {#each summarizeScheduleSpec(spec) as summary, i (i)}
         <li>{summary}</li>
       {:else}
         <li>{translate('common.none')}</li>
