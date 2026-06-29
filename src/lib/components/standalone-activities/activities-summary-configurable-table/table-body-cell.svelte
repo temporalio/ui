@@ -45,11 +45,11 @@
   {#if label === 'Activity ID'}
     {@render renderFilterableTableCell({
       attribute: 'ActivityId',
-      value: activity.activityId,
+      value: activity.activityId ?? '',
       href: routeForStandaloneActivityDetails({
         namespace,
-        activityId: activity.activityId,
-        runId: activity.runId,
+        activityId: activity.activityId ?? '',
+        runId: activity.runId ?? '',
       }),
     })}
   {:else if label === 'Run ID'}
@@ -58,8 +58,8 @@
       value: activity.runId ?? '',
       href: routeForStandaloneActivityDetails({
         namespace,
-        activityId: activity.activityId,
-        runId: activity.runId,
+        activityId: activity.activityId ?? '',
+        runId: activity.runId ?? '',
       }),
     })}
   {:else if label === 'Type'}

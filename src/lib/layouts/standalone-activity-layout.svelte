@@ -147,7 +147,7 @@
       {#await getPollersRequest then response}
         <NoWorkersPollingAlert
           {namespace}
-          taskQueue={$activityExecution.info.taskQueue}
+          taskQueue={$activityExecution.info.taskQueue ?? ''}
           runningWithNoWorkers={!response.pollers &&
             $activityExecution.info.status ===
               'ACTIVITY_EXECUTION_STATUS_RUNNING'}
