@@ -37,7 +37,7 @@ export const Strings = {
     'Explore code samples for Standalone Nexus Operations',
   'start-standalone-nexus-operation': 'Start a Standalone Nexus Operation',
   'custom-views': 'Custom Views',
-  'back-to-nexus-operations': 'Back to Nexus Operations',
+  'back-to-nexus-operations': 'Back to Standalone Nexus Operations',
   'layout-tabs-label': 'Nexus Operation Details',
   'layout-details-tab': 'Details',
   'layout-search-attributes-tab': 'Search Attributes',
@@ -103,15 +103,17 @@ export const Strings = {
   'form-operation-id-required': 'Operation ID is required.',
   'form-endpoint-label': 'Target Endpoint Name',
   'form-endpoint-body': 'The endpoint name in the target (handler) namespace.',
-  'form-endpoint-required': 'Endpoint is required.',
+  'form-endpoint-required': 'Target endpoint name is required.',
   'form-service-label': 'Service Name',
   'form-service-body':
     "The name of the Service in the handler's namespace. A non-exact match will result in an operation failure.",
-  'form-service-required': 'Service is required.',
+  'form-service-required':
+    'Nexus Service Name from the handler Namespace is required.',
   'form-operation-name-label': 'Operation Name',
   'form-operation-name-body':
     "The name of the Operation in the handler's namespace. A non-exact match will result in an operation failure.",
-  'form-operation-name-required': 'Operation Name is required.',
+  'form-operation-name-required':
+    "Operation Name from the handler Namespace's services is required.",
   'form-timeout-required':
     'At least one timeout (Start To Close or Schedule To Close) is required.',
   'form-timeouts-heading': 'Timeouts',
