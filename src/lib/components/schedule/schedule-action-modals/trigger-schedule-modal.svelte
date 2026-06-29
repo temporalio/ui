@@ -29,7 +29,8 @@
 
   let { scheduleId, namespace, scheduleOverlapPolicy }: Props = $props();
 
-  let selectedOverlapPolicy = writable<OverlapPolicy>('AllowAll');
+  // svelte-ignore state_referenced_locally
+  let selectedOverlapPolicy = writable<OverlapPolicy>(scheduleOverlapPolicy);
 
   $effect(() => {
     return () => clearConfirmationModalActionTimeout('trigger');
