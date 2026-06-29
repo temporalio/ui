@@ -4,7 +4,7 @@
   import { page } from '$app/state';
 
   import ActivityExecutionHeader from '$lib/components/standalone-activities/activity-header.svelte';
-  import Alert from '$lib/holocene/alert.svelte';
+  import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import ErrorComponent from '$lib/holocene/error.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
@@ -145,16 +145,13 @@
     </Tabs>
     {#if getPollersRequest}
       {#await getPollersRequest then response}
-        {#if !response.pollers && $activityExecution.info.status === 'ACTIVITY_EXECUTION_STATUS_RUNNING'}
-          <Alert
-            intent="error"
-            title={translate('workflows.workflow-error-no-workers-title')}
-          >
-            {translate('workflows.workflow-error-no-workers-description', {
-              taskQueue: $activityExecution.info.taskQueue,
-            })}
-          </Alert>
-        {/if}
+        <NoWorkersPollingAlert
+          {namespace}
+          taskQueue={$activityExecution.info.taskQueue}
+          runningWithNoWorkers={!response.pollers &&
+            $activityExecution.info.status ===
+              'ACTIVITY_EXECUTION_STATUS_RUNNING'}
+        />
       {/await}
     {/if}
     {@render children()}
