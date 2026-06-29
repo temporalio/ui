@@ -12,6 +12,7 @@
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import { activityRefresh } from '$lib/stores/activities';
   import { activityFilters } from '$lib/stores/filters';
@@ -200,50 +201,6 @@
     });
   };
 
-  function portal(
-    node: HTMLElement,
-    target: HTMLElement | string = document.body,
-  ) {
-    const targetEl =
-      typeof target === 'string'
-        ? (document.querySelector(target) as HTMLElement | null)
-        : (target as HTMLElement | null);
-    if (targetEl) targetEl.appendChild(node);
-    return {
-      destroy() {
-        if (node.parentNode) node.parentNode.removeChild(node);
-      },
-    };
-  }
-
-  let showTooltip = $state(false);
-  let tooltipText: string | undefined = $state();
-  let tooltipX = $state(0);
-  let tooltipY = $state(0);
-
-  const positionTooltipFrom = (el: HTMLElement) => {
-    const rect = el.getBoundingClientRect();
-    tooltipX = Math.round(rect.right + 8);
-    tooltipY = Math.round(rect.top + 16);
-  };
-
-  const onQueryBtnEnter = (e: MouseEvent | FocusEvent, name: string) => {
-    if ($savedQueryNavOpen) return;
-    const el = e.currentTarget as HTMLElement;
-    tooltipText = name;
-    positionTooltipFrom(el);
-    showTooltip = true;
-  };
-
-  const onQueryBtnMove = (e: MouseEvent | FocusEvent) => {
-    if (!showTooltip) return;
-    const el = e.currentTarget as HTMLElement;
-    positionTooltipFrom(el);
-  };
-
-  const onQueryBtnLeave = () => {
-    showTooltip = false;
-  };
 </script>
 
 <div
@@ -357,16 +314,14 @@
 />
 
 {#snippet queryButton(view: SavedQuery)}
-  <div
+  <Tooltip
+    text={view.name}
+    right
+    usePortal
+    hide={$savedQueryNavOpen}
     class="w-full"
-    role="menuitem"
-    tabindex="-1"
-    onmouseenter={(e) => onQueryBtnEnter(e, view.name)}
-    onmousemove={onQueryBtnMove}
-    onmouseleave={onQueryBtnLeave}
-    onfocusin={(e) => onQueryBtnEnter(e, view.name)}
-    onfocusout={onQueryBtnLeave}
   >
+    <div class="w-full" role="menuitem" tabindex="-1">
     <Button
       variant="ghost"
       data-testid={view.type === 'system'
@@ -474,6 +429,7 @@
       </div>
     {/if}
   </div>
+  </Tooltip>
 {/snippet}
 
 {#snippet queryBadge({
@@ -503,14 +459,3 @@
     {/if}
   </span>
 {/snippet}
-
-{#if showTooltip && tooltipText}
-  <div
-    use:portal
-    class="pointer-events-none z-[9999] inline-block select-none rounded-md bg-slate-800 p-2 text-xs text-slate-50 opacity-95"
-    style={`position: fixed; top: ${tooltipY}px; left: ${tooltipX}px; transform: translateY(-50%); max-width: 280px;`}
-    role="tooltip"
-  >
-    {tooltipText}
-  </div>
-{/if}
