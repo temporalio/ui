@@ -103,7 +103,7 @@
   {:else if type === SEARCH_ATTRIBUTE_TYPE.DATETIME}
     <DatetimeInput bind:value />
   {:else if type === SEARCH_ATTRIBUTE_TYPE.INT || type === SEARCH_ATTRIBUTE_TYPE.DOUBLE}
-    <div>
+    <div class="w-full">
       <NumberInput
         label={translate('common.value')}
         id="attribute-value-{id}"

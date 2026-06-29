@@ -10,6 +10,7 @@ refreshInterval: 1m
 defaultNamespace: default
 showTemporalSystemNamespace: false
 feedbackUrl:
+navCollapsedByDefault: false
 disableWriteActions: false
 workflowTerminateDisabled: false
 workflowCancelDisabled: false
@@ -24,6 +25,7 @@ refreshWorkflowCountsDisabled: false
 activityCommandsDisabled: false
 auth:
   enabled: false
+  redirectToProvider: false
   providers:
     - label: Auth0 oidc # for internal use; in future may expose as button text
       type: oidc # for futureproofing; only oidc is supported today

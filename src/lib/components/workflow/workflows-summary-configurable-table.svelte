@@ -289,7 +289,7 @@
           : translate('common.comfortable')}
         top
       >
-        <FeatureTag feature="tableDensity" alpha />
+        <FeatureTag feature="tableDensity" />
         <Button
           on:click={setTableDensity}
           data-testid="table-density-button"

@@ -3,7 +3,7 @@
 
   interface Props {
     children: Snippet;
-    'aria-label': string;
+    'aria-label'?: string;
     rowCount: number;
   }
   let { children, 'aria-label': ariaLabel, rowCount }: Props = $props();
