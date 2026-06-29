@@ -119,7 +119,7 @@
 
   const convert = (durationValue: string, durationUnit: string) => {
     const unit = units.find((u) => u.label === durationUnit);
-    if (!unit) return;
+    if (!unit || typeof durationValue !== 'string') return;
 
     if (durationValue.trim() === '' || isNaN(Number(durationValue))) {
       value = '';
@@ -130,11 +130,11 @@
   };
 
   const handleNumberInput: ChangeEventHandler<HTMLInputElement> = (e) => {
-    convert(e.currentTarget.value, unit);
+    convert(e.currentTarget.value ?? '', unit);
   };
 
   const handleUnitChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
-    convert(rawValue, e.currentTarget.value);
+    convert(rawValue ?? '', e.currentTarget.value);
   };
 </script>
 
