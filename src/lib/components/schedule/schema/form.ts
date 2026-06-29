@@ -192,15 +192,22 @@ export const formScheduleSchema = z
       });
     }
 
-    if (
-      schedule.endKind === 'after' &&
-      typeof schedule.endAfterOccurrences !== 'number'
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Number of occurrences is required',
-        path: ['endAfterOccurrences'],
-      });
+    if (schedule.endKind === 'after') {
+      if (typeof schedule.endAfterOccurrences !== 'number') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Number of occurrences is required',
+          path: ['endAfterOccurrences'],
+        });
+      }
+
+      if (schedule.endAfterOccurrences <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Number of occurrences must be greater than 0',
+          path: ['endAfterOccurrences'],
+        });
+      }
     }
   });
 

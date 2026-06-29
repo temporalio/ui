@@ -174,7 +174,6 @@
               id="endAfterOccurrences"
               type="number"
               inputmode="numeric"
-              pattern="[0-9]+"
               label={translate('schedules.occurrences-label')}
               labelHidden
               bind:value={
@@ -182,7 +181,6 @@
                 (v) => ($form.endAfterOccurrences = Number(v))
               }
               placeholder={translate('schedules.occurrences-placeholder')}
-              min={1}
               required
               error={!!$errors.endAfterOccurrences?.[0]}
               hintText={$errors.endAfterOccurrences?.[0]}
