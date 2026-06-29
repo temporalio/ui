@@ -23,6 +23,7 @@
     valid?: boolean;
     error?: string;
     class?: string;
+    description?: string;
   }
 
   export let id: string = crypto.randomUUID();
@@ -36,6 +37,7 @@
   export let valid = true;
   export let error = '';
   export let required = false;
+  export let description = '';
 
   let className = '';
   export { className as class };
@@ -178,9 +180,14 @@
     </span>
 
     <slot name="flex">
-      <span class="label" class:sr-only={labelHidden}>
-        {label}
-      </span>
+      <div>
+        <span class="label" class:sr-only={labelHidden}>
+          {label}
+        </span>
+        {#if description}
+          <p class="text-xs font-normal text-secondary">{description}</p>
+        {/if}
+      </div>
     </slot>
   </Label>
   <span id={errorId} role="alert" class="text-xs text-danger">
