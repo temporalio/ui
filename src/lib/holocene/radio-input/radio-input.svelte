@@ -41,7 +41,7 @@
     <input
       bind:group={$group}
       type="radio"
-      class="surface-primary"
+      class="surface-primary shrink-0"
       aria-describedby={description ? `${id}-description` : null}
       data-track-name="radio-input"
       data-track-intent="select"

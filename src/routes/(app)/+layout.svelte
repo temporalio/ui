@@ -27,6 +27,7 @@
   import { type NamespaceListItem, type NavLinkItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
+  import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
@@ -77,6 +78,17 @@
       };
     }),
   );
+
+  const nexusOperationsLinkHidden = $derived.by(() => {
+    const namespace = $namespaces.find(
+      (namespace) => namespace.namespaceInfo.name === activeNamespaceName,
+    );
+    const capabilityState = namespaceCapabilityState(
+      namespace?.namespaceInfo?.capabilities,
+      'standaloneNexusOperation',
+    );
+    return capabilityState === 'unsupported';
+  });
 
   const getRoutes = (namespace: string) => {
     return {
@@ -159,6 +171,7 @@
           'standalone-nexus-operations.standalone-nexus-operations',
         ),
         isActive: (path) => path.includes(standaloneNexusOperationsRoute),
+        hidden: nexusOperationsLinkHidden,
       },
       {
         href: schedulesRoute,

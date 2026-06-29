@@ -2,6 +2,7 @@
   import { page } from '$app/state';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import StandaloneNexusOperations from '$lib/pages/standalone-nexus-operations.svelte';
@@ -22,6 +23,9 @@
 />
 
 <StandaloneNexusOperations>
+  {#snippet releaseStageBadge()}
+    <Badge type="secondary">Pre-release</Badge>
+  {/snippet}
   {#snippet headerActions()}
     {#if !startDisabled}
       <Button href={routeForStartStandaloneNexusOperation({ namespace })}>

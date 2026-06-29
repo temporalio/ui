@@ -4,21 +4,17 @@
   import { onDestroy, onMount } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
-  import { twMerge } from 'tailwind-merge';
   import z from 'zod/v3';
 
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import DurationInput, {
-    parseDuration,
-  } from '$lib/holocene/duration-input/duration-input.svelte';
+  import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import MarkdownEditor from '$lib/holocene/markdown-editor/markdown-editor.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
-  import Select from '$lib/holocene/select/select.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
     encodings,
@@ -35,9 +31,7 @@
   import { toaster } from '$lib/stores/toaster';
   import {
     type NexusOperationIdConflictPolicy,
-    nexusOperationIdConflictPolicyOptions,
     type NexusOperationIdReusePolicy,
-    nexusOperationIdReusePolicyOptions,
   } from '$lib/types/nexus-operation-execution';
   import { getIdentity } from '$lib/utilities/core-context';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
@@ -47,6 +41,8 @@
   import Message from '../../form/message.svelte';
   import PayloadInputWithEncoding from '../../payload-input-with-encoding.svelte';
   import AddSearchAttributes from '../../workflow/add-search-attributes.svelte';
+
+  import OperationPoliciesModal from './operation-policies-modal.svelte';
 
   interface Props {
     namespace: string;
@@ -70,22 +66,24 @@
   const encoding = writable<PayloadInputEncoding>('json/plain');
 
   let searchAttributes = $state<SearchAttributesSchema>([]);
-  let advancedOptionsVisible = $state(false);
+  let operationPoliciesModalOpen = $state(false);
 
   const isPositiveDuration = (value: string | undefined): boolean => {
     const seconds = Number(parseDuration(value ?? ''));
     return !isNaN(seconds) && seconds > 0;
   };
 
+  const startDate = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
   const schema = z
     .object({
       identity: z.string(),
       namespace: z.string(),
-      operationId: z.string().min(1, {
-        message: translate(
-          'standalone-nexus-operations.form-operation-id-required',
-        ),
-      }),
+      operationId: z.string().optional(),
       endpoint: z.string().min(1, {
         message: translate(
           'standalone-nexus-operations.form-endpoint-required',
@@ -157,7 +155,8 @@
         if (!form.valid) return;
 
         try {
-          const { operationId, idReusePolicy, idConflictPolicy } = form.data;
+          const operationId = form.data.operationId || crypto.randomUUID();
+          const { idReusePolicy, idConflictPolicy } = form.data;
 
           const nexusHeaderRecord = form.data.nexusHeader.reduce<
             Record<string, string>
@@ -168,6 +167,7 @@
 
           const { runId } = await startStandaloneNexusOperation({
             ...form.data,
+            operationId,
             idReusePolicy: idReusePolicy as
               | NexusOperationIdReusePolicy
               | undefined,
@@ -235,13 +235,6 @@
         }));
       searchAttributes = [...searchAttributes, ...newAttrs];
     }
-
-    const hasAdvancedData =
-      Object.keys(initialValues.searchAttributes ?? {}).length > 0 ||
-      !!initialValues.summary ||
-      !!initialValues.details;
-
-    advancedOptionsVisible = advancedOptionsVisible || hasAdvancedData;
   });
 
   onDestroy(() => {
@@ -261,236 +254,361 @@
   };
 </script>
 
-<form class="max-w-[45rem] space-y-4" use:enhance novalidate>
+<form class="space-y-4" use:enhance novalidate>
   <Message value={$message} />
 
-  <Input
-    class="grow"
-    label={translate('standalone-nexus-operations.form-operation-id-label')}
-    required
-    id="operationId"
-    bind:value={$form.operationId}
-    error={!!$errors?.operationId}
-    hintText={$errors?.operationId?.[0]}
-  >
-    {#snippet afterInput()}
-      <Button
-        class="ml-2.5"
-        variant="secondary"
-        on:click={generateRandomId}
-        leadingIcon="retry"
-        >{translate('standalone-nexus-operations.form-random-uuid')}</Button
-      >
-    {/snippet}
-  </Input>
+  <div class="flex items-start gap-6">
+    <div class="min-w-0 flex-1 space-y-4">
+      <Card class="space-y-4">
+        <h5>
+          {translate(
+            'standalone-nexus-operations.form-nexus-operation-details-heading',
+          )}
+        </h5>
 
-  <Input
-    id="endpoint"
-    required
-    label={translate('standalone-nexus-operations.form-endpoint-label')}
-    bind:value={$form.endpoint}
-    error={!!$errors.endpoint}
-    hintText={$errors.endpoint?.[0]}
-  />
-
-  <Input
-    id="service"
-    required
-    label={translate('standalone-nexus-operations.form-service-label')}
-    bind:value={$form.service}
-    error={!!$errors.service}
-    hintText={$errors.service?.[0]}
-  />
-
-  <Input
-    id="operation"
-    required
-    label={translate('standalone-nexus-operations.form-operation-name-label')}
-    bind:value={$form.operation}
-    error={!!$errors.operation}
-    hintText={$errors.operation?.[0]}
-  />
-
-  <PayloadInputWithEncoding
-    bind:input={$form.input}
-    bind:messageType={$form.messageType}
-    {encoding}
-  />
-
-  <Card class="space-y-4">
-    <h5>{translate('standalone-nexus-operations.form-timeouts-heading')}</h5>
-
-    <DurationInput
-      id="startToCloseTimeout"
-      label={translate(
-        'standalone-nexus-operations.form-start-to-close-timeout-label',
-      )}
-      bind:value={$form.startToCloseTimeout}
-    />
-
-    <DurationInput
-      id="scheduleToCloseTimeout"
-      label={translate(
-        'standalone-nexus-operations.form-schedule-to-close-timeout-label',
-      )}
-      bind:value={$form.scheduleToCloseTimeout}
-    />
-
-    <DurationInput
-      id="scheduleToStartTimeout"
-      label={translate(
-        'standalone-nexus-operations.form-schedule-to-start-timeout-label',
-      )}
-      bind:value={$form.scheduleToStartTimeout}
-    />
-
-    {#if $errors.startToCloseTimeout}
-      <p class="text-xs text-danger">
-        {$errors.startToCloseTimeout}
-      </p>
-    {/if}
-  </Card>
-
-  {#if advancedOptionsVisible}
-    <Card class="space-y-4">
-      <h5>
-        {translate('standalone-nexus-operations.form-nexus-header-heading')}
-      </h5>
-      {#each $form.nexusHeader as _, index (index)}
-        <div class="flex items-center gap-2">
-          <Input
-            id="nexus-header-key-{index}"
-            label=""
-            labelHidden
-            placeholder={translate(
-              'standalone-nexus-operations.form-nexus-header-key-placeholder',
+        <div class="space-y-1">
+          <Label
+            label={translate(
+              'standalone-nexus-operations.form-operation-id-label',
             )}
-            bind:value={$form.nexusHeader[index].key}
+            for="operationId"
           />
+          <p class="text-sm text-secondary">
+            {translate('standalone-nexus-operations.form-operation-id-body')}
+          </p>
           <Input
-            id="nexus-header-value-{index}"
-            label=""
-            labelHidden
-            placeholder={translate(
-              'standalone-nexus-operations.form-nexus-header-value-placeholder',
+            class="grow"
+            label={translate(
+              'standalone-nexus-operations.form-operation-id-label',
             )}
-            bind:value={$form.nexusHeader[index].value}
+            labelHidden
+            id="operationId"
+            bind:value={$form.operationId}
+          >
+            {#snippet afterInput()}
+              <Button
+                class="ml-2.5"
+                variant="secondary"
+                on:click={generateRandomId}
+                leadingIcon="retry"
+                >{translate(
+                  'standalone-nexus-operations.form-random-uuid',
+                )}</Button
+              >
+            {/snippet}
+          </Input>
+        </div>
+
+        <div class="space-y-1">
+          <Label
+            label={translate('standalone-nexus-operations.form-endpoint-label')}
+            for="endpoint"
+            required
           />
-          <Button
-            type="button"
-            variant="ghost"
-            leadingIcon="close"
-            on:click={() => removeNexusHeader(index)}
+          <p class="text-sm text-secondary">
+            {translate('standalone-nexus-operations.form-endpoint-body')}
+          </p>
+          <Input
+            id="endpoint"
+            required
+            label={translate('standalone-nexus-operations.form-endpoint-label')}
+            labelHidden
+            bind:value={$form.endpoint}
+            error={!!$errors.endpoint}
+            hintText={$errors.endpoint?.[0]}
           />
         </div>
-      {/each}
-      <Button type="button" variant="secondary" on:click={addNexusHeader}>
-        {translate('standalone-nexus-operations.form-add-nexus-header')}
-      </Button>
-    </Card>
 
-    <Card
-      class="space-y-4"
-      data-testid="start-standalone-nexus-operation-add-search-attributes"
-    >
-      <div class="space-y-2">
-        <h5>
+        <div class="space-y-1">
+          <Label
+            label={translate('standalone-nexus-operations.form-service-label')}
+            for="service"
+            required
+          />
+          <p class="text-sm text-secondary">
+            {translate('standalone-nexus-operations.form-service-body')}
+          </p>
+          <Input
+            id="service"
+            required
+            label={translate('standalone-nexus-operations.form-service-label')}
+            labelHidden
+            bind:value={$form.service}
+            error={!!$errors.service}
+            hintText={$errors.service?.[0]}
+          />
+        </div>
+
+        <div class="space-y-1">
+          <Label
+            label={translate(
+              'standalone-nexus-operations.form-operation-name-label',
+            )}
+            for="operation"
+            required
+          />
+          <p class="text-sm text-secondary">
+            {translate('standalone-nexus-operations.form-operation-name-body')}
+          </p>
+          <Input
+            id="operation"
+            required
+            label={translate(
+              'standalone-nexus-operations.form-operation-name-label',
+            )}
+            labelHidden
+            bind:value={$form.operation}
+            error={!!$errors.operation}
+            hintText={$errors.operation?.[0]}
+          />
+        </div>
+
+        <PayloadInputWithEncoding
+          bind:input={$form.input}
+          bind:messageType={$form.messageType}
+          {encoding}
+        />
+      </Card>
+
+      <Card class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h5>
+            {translate(
+              'standalone-nexus-operations.form-operation-policies-heading',
+            )}
+          </h5>
+          <Button
+            type="button"
+            variant="secondary"
+            on:click={() => (operationPoliciesModalOpen = true)}
+          >
+            {translate(
+              'standalone-nexus-operations.form-edit-operation-policies',
+            )}
+          </Button>
+        </div>
+        <p class="text-sm text-secondary">
           {translate(
-            'standalone-nexus-operations.form-search-attributes-heading',
+            'standalone-nexus-operations.form-operation-policies-description',
           )}
-        </h5>
-        <p class="text-secondary">
-          {translate(
-            'standalone-nexus-operations.form-search-attributes-description',
-          )}
+          <Link
+            href="https://docs.temporal.io/nexus/operations"
+            newTab
+            class="inline"
+          >
+            {translate(
+              'standalone-nexus-operations.form-operation-policies-link',
+            )}
+          </Link>
         </p>
-      </div>
-      <AddSearchAttributes
-        variant="secondary"
-        bind:attributesToAdd={searchAttributes}
-      />
-    </Card>
+        <dl class="flex flex-col gap-2 text-sm">
+          <div class="flex items-center gap-6">
+            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+              {translate(
+                'standalone-nexus-operations.form-closed-operation-id-reuse-label',
+              )}
+            </dt>
+            <dd>
+              {$form.idReusePolicy
+                ? fromScreamingEnum(
+                    $form.idReusePolicy,
+                    'NexusOperationIdReusePolicy',
+                  )
+                : translate(
+                    'standalone-nexus-operations.form-id-reuse-policy-default',
+                  )}
+            </dd>
+          </div>
+          <div class="flex items-center gap-6">
+            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+              {translate(
+                'standalone-nexus-operations.form-running-operation-id-conflict-label',
+              )}
+            </dt>
+            <dd>
+              {$form.idConflictPolicy
+                ? fromScreamingEnum(
+                    $form.idConflictPolicy,
+                    'NexusOperationIdConflictPolicy',
+                  )
+                : translate(
+                    'standalone-nexus-operations.form-id-conflict-policy-default',
+                  )}
+            </dd>
+          </div>
+          <div class="flex items-center gap-6">
+            <dt class="w-[260px] shrink-0 font-medium text-secondary">
+              {translate(
+                'standalone-nexus-operations.form-timeouts-summary-label',
+              )}
+            </dt>
+            <dd>
+              {isPositiveDuration($form.startToCloseTimeout) ||
+              isPositiveDuration($form.scheduleToCloseTimeout) ||
+              isPositiveDuration($form.scheduleToStartTimeout)
+                ? [
+                    $form.startToCloseTimeout,
+                    $form.scheduleToCloseTimeout,
+                    $form.scheduleToStartTimeout,
+                  ]
+                    .filter(isPositiveDuration)
+                    .join(', ')
+                : translate(
+                    'standalone-nexus-operations.form-timeouts-default',
+                  )}
+            </dd>
+          </div>
+        </dl>
+        {#if $errors.startToCloseTimeout}
+          <p class="text-xs text-danger">{$errors.startToCloseTimeout}</p>
+        {/if}
+      </Card>
 
-    <Card
-      class="space-y-4"
-      data-testid="start-standalone-nexus-operation-add-metadata"
-    >
-      <div class="space-y-2">
+      <Card class="space-y-4">
         <h5>
-          {translate('standalone-nexus-operations.form-user-metadata-heading')}
+          {translate('standalone-nexus-operations.form-nexus-header-heading')}
         </h5>
-        <p class="text-secondary">
-          {translate(
-            'standalone-nexus-operations.form-user-metadata-description',
-          )}
-        </p>
-      </div>
-      <div class="space-y-2">
-        <Label label={translate('workflows.summary')} for="summary" />
-        <MarkdownEditor bind:content={$form.summary} />
-      </div>
-      <div class="space-y-2">
-        <Label label={translate('workflows.details')} for="details" />
-        <MarkdownEditor bind:content={$form.details} />
-      </div>
-    </Card>
+        {#each $form.nexusHeader as _, index (index)}
+          <div class="flex items-center gap-2">
+            <Input
+              id="nexus-header-key-{index}"
+              label=""
+              labelHidden
+              placeholder={translate(
+                'standalone-nexus-operations.form-nexus-header-key-placeholder',
+              )}
+              bind:value={$form.nexusHeader[index].key}
+            />
+            <Input
+              id="nexus-header-value-{index}"
+              label=""
+              labelHidden
+              placeholder={translate(
+                'standalone-nexus-operations.form-nexus-header-value-placeholder',
+              )}
+              bind:value={$form.nexusHeader[index].value}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              leadingIcon="close"
+              on:click={() => removeNexusHeader(index)}
+            />
+          </div>
+        {/each}
+        <Button type="button" variant="secondary" on:click={addNexusHeader}>
+          {translate('standalone-nexus-operations.form-add-nexus-header')}
+        </Button>
+      </Card>
 
-    <Card class="space-y-4">
+      <Card
+        class="space-y-4"
+        data-testid="start-standalone-nexus-operation-add-search-attributes"
+      >
+        <div class="space-y-2">
+          <h5>
+            {translate(
+              'standalone-nexus-operations.form-search-attributes-heading',
+            )}
+          </h5>
+          <p class="text-secondary">
+            {translate(
+              'standalone-nexus-operations.form-search-attributes-description',
+            )}
+          </p>
+        </div>
+        <AddSearchAttributes
+          variant="secondary"
+          bind:attributesToAdd={searchAttributes}
+        />
+      </Card>
+
+      <Card
+        class="space-y-4"
+        data-testid="start-standalone-nexus-operation-add-metadata"
+      >
+        <div class="space-y-2">
+          <h5>
+            {translate(
+              'standalone-nexus-operations.form-user-metadata-heading',
+            )}
+          </h5>
+          <p class="text-secondary">
+            {translate(
+              'standalone-nexus-operations.form-user-metadata-description',
+            )}
+          </p>
+        </div>
+        <div class="space-y-2">
+          <Label label={translate('workflows.summary')} for="summary" />
+          <MarkdownEditor bind:content={$form.summary} />
+        </div>
+        <div class="space-y-2">
+          <Label label={translate('workflows.details')} for="details" />
+          <MarkdownEditor bind:content={$form.details} />
+        </div>
+      </Card>
+
+      <div class="flex justify-end">
+        <Button
+          data-testid="start-standalone-nexus-operation-submit-button"
+          type="submit"
+        >
+          {translate(
+            'standalone-nexus-operations.start-standalone-nexus-operation',
+          )}
+        </Button>
+      </div>
+    </div>
+
+    <Card class="sticky top-16 w-[440px] shrink-0 space-y-4">
       <h5>
-        {translate('standalone-nexus-operations.form-id-policies-heading')}
+        {translate('standalone-nexus-operations.operation-summary-heading')}
       </h5>
-
-      <Select
-        label={translate(
-          'standalone-nexus-operations.form-id-reuse-policy-label',
-        )}
-        id="start-standalone-nexus-operation-id-reuse-policy-select"
-        bind:value={$form.idReusePolicy}
-      >
-        {#each nexusOperationIdReusePolicyOptions as option (option)}
-          <Option value={option}
-            >{fromScreamingEnum(option, 'NexusOperationIdReusePolicy')}</Option
-          >
-        {/each}
-      </Select>
-
-      <Select
-        label={translate(
-          'standalone-nexus-operations.form-id-conflict-policy-label',
-        )}
-        id="start-standalone-nexus-operation-id-conflict-policy-select"
-        bind:value={$form.idConflictPolicy}
-      >
-        {#each nexusOperationIdConflictPolicyOptions as option (option)}
-          <Option value={option}
-            >{fromScreamingEnum(
-              option,
-              'NexusOperationIdConflictPolicy',
-            )}</Option
-          >
-        {/each}
-      </Select>
+      <dl class="space-y-3 text-sm">
+        <div class="flex justify-between gap-4">
+          <dt class="text-secondary">
+            {translate(
+              'standalone-nexus-operations.operation-summary-start-date',
+            )}
+          </dt>
+          <dd>{startDate}</dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-secondary">
+            {translate(
+              'standalone-nexus-operations.operation-summary-target-endpoint',
+            )}
+          </dt>
+          <dd class="text-right">{$form.endpoint || '—'}</dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-secondary">
+            {translate(
+              'standalone-nexus-operations.operation-summary-service-name',
+            )}
+          </dt>
+          <dd class="text-right">{$form.service || '—'}</dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-secondary">
+            {translate(
+              'standalone-nexus-operations.operation-summary-operation-name',
+            )}
+          </dt>
+          <dd class="text-right">{$form.operation || '—'}</dd>
+        </div>
+      </dl>
     </Card>
-  {/if}
-
-  <div class="flex items-center justify-between">
-    <Button
-      type="button"
-      variant="ghost"
-      trailingIcon={advancedOptionsVisible ? 'chevron-up' : 'chevron-down'}
-      data-testid="start-standalone-nexus-operation-more-options"
-      on:click={() => (advancedOptionsVisible = !advancedOptionsVisible)}
-    >
-      {translate('common.more-options')}
-    </Button>
-
-    <Button
-      data-testid="start-standalone-nexus-operation-submit-button"
-      type="submit"
-    >
-      {translate(
-        'standalone-nexus-operations.start-standalone-nexus-operation',
-      )}
-    </Button>
   </div>
+
+  <OperationPoliciesModal
+    bind:open={operationPoliciesModalOpen}
+    bind:startToCloseTimeout={$form.startToCloseTimeout}
+    bind:scheduleToCloseTimeout={$form.scheduleToCloseTimeout}
+    bind:scheduleToStartTimeout={$form.scheduleToStartTimeout}
+    bind:idReusePolicy={$form.idReusePolicy}
+    bind:idConflictPolicy={$form.idConflictPolicy}
+    timeoutError={$errors.startToCloseTimeout?.[0]}
+  />
 </form>
