@@ -53,10 +53,12 @@ describe('getRequestBody', () => {
   });
 
   it('drops invalid cron specs', async () => {
-    const body = await getRequestBody(
-      buildForm({ specs: [{ kind: 'cron', cronString: '0 12 * * *' }] }),
-    );
-    expect(body.schedule.spec.cronString).toHaveLength(1);
+    const form = buildForm();
+    form.specs = [{ ...form.specs[0], cronString: 'not a valid cron' }];
+
+    const body = await getRequestBody(form);
+
+    expect(body.schedule.spec.cronString).toEqual([]);
   });
 
   it('maps interval specs', async () => {
