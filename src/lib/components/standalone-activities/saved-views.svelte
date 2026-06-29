@@ -200,7 +200,6 @@
       clearParameters: [currentPageKey],
     });
   };
-
 </script>
 
 <div
@@ -322,113 +321,113 @@
     class="w-full"
   >
     <div class="w-full" role="menuitem" tabindex="-1">
-    <Button
-      variant="ghost"
-      data-testid={view.type === 'system'
-        ? view.id
-        : view.name.toLowerCase().replace(/\s+/g, '-')}
-      data-track-name={view.type === 'system'
-        ? 'system-query-button'
-        : 'user-query-button'}
-      data-track-intent="action"
-      data-track-text={view.name}
-      on:click={() => setActiveQueryView(view)}
-      class="flex w-full justify-start"
-      active={view.active}
-      disabled={view.disabled}
-      size="sm"
-    >
-      <Icon
-        name={view.icon || 'bookmark'}
-        class={merge(
-          'h-4 w-4 flex-shrink-0  transition-colors duration-200',
-          $savedQueryNavOpen ? 'lg:hidden' : '',
-        )}
-      />
-
-      {#if $savedQueryNavOpen}
-        <span
-          class="hidden truncate text-left text-sm font-normal lg:inline-block"
-          in:slide>{view.name}</span
-        >
-        {#if view.badge}
-          {@render queryBadge({
-            className: 'italic',
-            content: view.badge,
-          })}
-        {/if}
-      {/if}
-    </Button>
-
-    {#if activeQueryView?.id === view.id && view.type === 'user'}
-      <div
-        in:slide
-        class={merge(
-          'flex flex-col items-center gap-1 pt-0.5 transition-all',
-          $savedQueryNavOpen && 'lg:flex-row',
-        )}
+      <Button
+        variant="ghost"
+        data-testid={view.type === 'system'
+          ? view.id
+          : view.name.toLowerCase().replace(/\s+/g, '-')}
+        data-track-name={view.type === 'system'
+          ? 'system-query-button'
+          : 'user-query-button'}
+        data-track-intent="action"
+        data-track-text={view.name}
+        on:click={() => setActiveQueryView(view)}
+        class="flex w-full justify-start"
+        active={view.active}
+        disabled={view.disabled}
+        size="sm"
       >
-        {#if view.id === activeQueryView?.id && view.query !== query}
+        <Icon
+          name={view.icon || 'bookmark'}
+          class={merge(
+            'h-4 w-4 flex-shrink-0  transition-colors duration-200',
+            $savedQueryNavOpen ? 'lg:hidden' : '',
+          )}
+        />
+
+        {#if $savedQueryNavOpen}
+          <span
+            class="hidden truncate text-left text-sm font-normal lg:inline-block"
+            in:slide>{view.name}</span
+          >
+          {#if view.badge}
+            {@render queryBadge({
+              className: 'italic',
+              content: view.badge,
+            })}
+          {/if}
+        {/if}
+      </Button>
+
+      {#if activeQueryView?.id === view.id && view.type === 'user'}
+        <div
+          in:slide
+          class={merge(
+            'flex flex-col items-center gap-1 pt-0.5 transition-all',
+            $savedQueryNavOpen && 'lg:flex-row',
+          )}
+        >
+          {#if view.id === activeQueryView?.id && view.query !== query}
+            <Button
+              size="xs"
+              class="w-full"
+              variant="primary"
+              data-testid="save-view-button"
+              on:click={() => {
+                onSaveView({
+                  ...view,
+                  query,
+                });
+              }}>Save</Button
+            >
+          {/if}
           <Button
             size="xs"
             class="w-full"
-            variant="primary"
-            data-testid="save-view-button"
+            variant="secondary"
+            data-testid="edit-view-button"
             on:click={() => {
-              onSaveView({
-                ...view,
-                query,
-              });
-            }}>Save</Button
+              editViewModalOpen = true;
+            }}>Edit</Button
           >
-        {/if}
-        <Button
-          size="xs"
-          class="w-full"
-          variant="secondary"
-          data-testid="edit-view-button"
-          on:click={() => {
-            editViewModalOpen = true;
-          }}>Edit</Button
+          <Button
+            leadingIcon={$copied ? 'checkmark' : 'copy'}
+            size="xs"
+            class="w-full opacity-80"
+            variant="ghost"
+            data-testid="share-view-button"
+            on:click={handleCopy}
+            ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
+              >Share</span
+            ></Button
+          >
+        </div>
+      {:else if unsavedQuery && view.id === 'unsaved'}
+        <div
+          class="flex items-center gap-1 overflow-hidden pt-0.5"
+          transition:slide
         >
-        <Button
-          leadingIcon={$copied ? 'checkmark' : 'copy'}
-          size="xs"
-          class="w-full opacity-80"
-          variant="ghost"
-          data-testid="share-view-button"
-          on:click={handleCopy}
-          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-            >Share</span
-          ></Button
-        >
-      </div>
-    {:else if unsavedQuery && view.id === 'unsaved'}
-      <div
-        class="flex items-center gap-1 overflow-hidden pt-0.5"
-        transition:slide
-      >
-        <Button
-          size="xs"
-          class="w-full break-all transition-all"
-          variant="secondary"
-          disabled={maxViewsReached}
-          data-testid="create-view-button"
-          on:click={() => {
-            saveViewModalOpen = true;
-          }}
-          ><span
-            class={merge(
-              'inline lg:hidden',
-              !$savedQueryNavOpen && 'lg:inline',
-            )}>New</span
-          ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
-            >Save as New</span
-          ></Button
-        >
-      </div>
-    {/if}
-  </div>
+          <Button
+            size="xs"
+            class="w-full break-all transition-all"
+            variant="secondary"
+            disabled={maxViewsReached}
+            data-testid="create-view-button"
+            on:click={() => {
+              saveViewModalOpen = true;
+            }}
+            ><span
+              class={merge(
+                'inline lg:hidden',
+                !$savedQueryNavOpen && 'lg:inline',
+              )}>New</span
+            ><span class={merge('hidden', $savedQueryNavOpen && 'lg:inline')}
+              >Save as New</span
+            ></Button
+          >
+        </div>
+      {/if}
+    </div>
   </Tooltip>
 {/snippet}
 
