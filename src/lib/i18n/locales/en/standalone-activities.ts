@@ -24,7 +24,6 @@ export const Strings = {
   'task-queue': 'Task Queue',
   duration: 'Duration',
   'last-started-time': 'Last Started Time',
-  'scheduled-time': 'Scheduled Time',
   'activities-table': 'Standalone Activities Table',
   'back-to-activities': 'Back to Standalone Activities',
   'start-activity-like-this-one': 'Start Standalone Activity Like This One',

@@ -69,19 +69,11 @@
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
-  <DetailList aria-label="activity execution details" rowCount={4}>
+  <DetailList aria-label="activity execution details" rowCount={3}>
     <DetailListColumn>
-      <DetailListLabel
-        >{translate('standalone-activities.scheduled-time')}</DetailListLabel
-      >
+      <DetailListLabel>{translate('common.start')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.scheduleTime}
-      />
-      <DetailListLabel
-        >{translate('standalone-activities.last-started-time')}</DetailListLabel
-      >
-      <DetailListTimestampValue
-        timestamp={activityExecutionInfo.lastStartedTime}
       />
       <DetailListLabel>{translate('common.end')}</DetailListLabel>
       <DetailListTimestampValue
