@@ -22,7 +22,6 @@ export const Strings = {
   'run-id': 'Run ID',
   'activity-type': 'Activity Type',
   'task-queue': 'Task Queue',
-  'close-time': 'Close Time',
   duration: 'Duration',
   'last-started-time': 'Last Started Time',
   'scheduled-time': 'Scheduled Time',

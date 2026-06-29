@@ -83,9 +83,7 @@
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.lastStartedTime}
       />
-      <DetailListLabel
-        >{translate('standalone-activities.close-time')}</DetailListLabel
-      >
+      <DetailListLabel>{translate('common.end')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.closeTime}
         fallback="-"
