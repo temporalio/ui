@@ -22,19 +22,21 @@ test.describe('Schedule actions', () => {
     );
   });
 
-  test('trigger pre-selects Allow All and sends it', async ({ page }) => {
+  test("trigger pre-selects the schedule's overlap policy and sends it", async ({
+    page,
+  }) => {
     await page.getByLabel('Schedule Actions').click();
     await page.getByTestId('trigger-schedule').click();
 
     const modal = page.locator('#trigger-schedule-modal');
     await expect(modal).toBeVisible();
-    await expect(modal.locator('#overlap-policy-AllowAll')).toBeChecked();
+    await expect(modal.locator('#overlap-policy-Skip')).toBeChecked();
 
     const patchRequest = page.waitForRequest(isPatchRequest);
     await modal.getByTestId('confirm-modal-button').click();
     const body = (await patchRequest).postDataJSON();
 
-    expect(body.patch.triggerImmediately.overlapPolicy).toBe('AllowAll');
+    expect(body.patch.triggerImmediately.overlapPolicy).toBe('Skip');
   });
 
   test('trigger modal resets its overlap policy when reopened', async ({
@@ -45,8 +47,8 @@ test.describe('Schedule actions', () => {
 
     const modal = page.locator('#trigger-schedule-modal');
     await expect(modal).toBeVisible();
-    await modal.locator('#overlap-policy-Skip').check();
-    await expect(modal.locator('#overlap-policy-Skip')).toBeChecked();
+    await modal.locator('#overlap-policy-AllowAll').check();
+    await expect(modal.locator('#overlap-policy-AllowAll')).toBeChecked();
 
     await modal.getByTestId('cancel-modal-button').click();
     await expect(modal).toBeHidden();
@@ -54,7 +56,7 @@ test.describe('Schedule actions', () => {
     await page.getByLabel('Schedule Actions').click();
     await page.getByTestId('trigger-schedule').click();
     await expect(modal).toBeVisible();
-    await expect(modal.locator('#overlap-policy-AllowAll')).toBeChecked();
+    await expect(modal.locator('#overlap-policy-Skip')).toBeChecked();
   });
 
   test('action modals stay usable after a successful backfill', async ({
