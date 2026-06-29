@@ -38,6 +38,7 @@
       controller.signal,
     )
       .then((response) => {
+        if (controller.signal.aborted) return;
         versions = response?.workerDeploymentInfo?.versionSummaries ?? [];
       })
       .catch(() => {
