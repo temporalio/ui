@@ -177,6 +177,7 @@ export const DEFAULT_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Service' },
   { label: 'Operation' },
   { label: 'Schedule Time' },
+  { label: 'Close Time' },
 ];
 
 const DEFAULT_AVAILABLE_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
