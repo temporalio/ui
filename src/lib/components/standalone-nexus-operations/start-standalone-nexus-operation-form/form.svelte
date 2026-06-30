@@ -1,7 +1,7 @@
 <script lang="ts">
   import { get, writable } from 'svelte/store';
 
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import z from 'zod/v3';
@@ -34,6 +34,7 @@
     type NexusOperationIdReusePolicy,
   } from '$lib/types/nexus-operation-execution';
   import { getIdentity } from '$lib/utilities/core-context';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
@@ -154,10 +155,9 @@
       onUpdate: async ({ form }) => {
         if (!form.valid) return;
 
+        const { idReusePolicy, idConflictPolicy } = form.data;
         try {
           const operationId = form.data.operationId || crypto.randomUUID();
-          const { idReusePolicy, idConflictPolicy } = form.data;
-
           const nexusHeaderRecord = form.data.nexusHeader.reduce<
             Record<string, string>
           >((acc, { key, value }) => {
@@ -196,12 +196,43 @@
             }),
           });
           return { type: 'success' };
-        } catch {
+        } catch (error) {
+          if (isNetworkError(error) && error.statusCode === 409) {
+            if (
+              idReusePolicy ===
+              'NEXUS_OPERATION_ID_REUSE_POLICY_REJECT_DUPLICATE'
+            ) {
+              toaster.push({
+                variant: 'error',
+                message: translate(
+                  'standalone-nexus-operations.form-operation-id-duplicate-toast',
+                ),
+                duration: 10000,
+              });
+              operationIdErrorSnapshot = form.data.operationId;
+              operationIdServerError = translate(
+                'standalone-nexus-operations.form-operation-id-duplicate-error',
+              );
+            }
+            await tick();
+            document.getElementById('operationId')?.focus();
+            return;
+          }
           return { type: 'error' };
         }
       },
     },
   );
+
+  let operationIdServerError = $state('');
+  let operationIdErrorSnapshot = '';
+
+  $effect(() => {
+    const current = $form.operationId;
+    if (operationIdServerError && current !== operationIdErrorSnapshot) {
+      operationIdServerError = '';
+    }
+  });
 
   const unsubscribe = encoding.subscribe((e) => {
     $form.encoding = e;
@@ -284,6 +315,8 @@
             labelHidden
             id="operationId"
             bind:value={$form.operationId}
+            error={!!operationIdServerError}
+            hintText={operationIdServerError || undefined}
           >
             {#snippet afterInput()}
               <Button

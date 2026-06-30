@@ -152,6 +152,10 @@ export const Strings = {
   'operation-summary-service-name': 'Service Name',
   'operation-summary-operation-name': 'Operation Name',
   'form-nexus-operation-started': 'Nexus Operation started.',
+  'form-operation-id-duplicate-toast':
+    'Unable to create Standalone Nexus Operation because the Operation ID is already in use by an existing operation.',
+  'form-operation-id-duplicate-error':
+    'Operation ID already in use. Change Operation ID Reuse Policy to any option but Do not allow duplicate Operation IDs to resolve.',
   'form-id-reuse-policy-heading': 'Closed Operation ID Reuse Policy',
   'form-id-reuse-policy-description':
     'Determine whether or not to allow this Standalone Nexus Operation to share the same Operation ID with an Operation in a completed, canceled, terminated, timed out, or failed state.',

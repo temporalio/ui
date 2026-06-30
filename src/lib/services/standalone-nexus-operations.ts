@@ -211,6 +211,7 @@ export const startStandaloneNexusOperation = async (
       method: 'POST',
       body: stringifyWithBigInt(request),
     },
+    notifyOnError: false,
   });
 };
 
