@@ -138,4 +138,12 @@ export const Strings = {
   'invalid-compute-configuration': 'Invalid compute configuration',
   'validation-failed-cleanup-failed':
     'Compute config validation failed and resources could not be cleaned up automatically. Delete the deployment and version manually, then try again.',
+  connection: 'Connection',
+  'connection-connected': 'Connected',
+  'connection-failed': 'Failed',
+  'connection-pending': 'Pending',
+  'connection-tooltip-pending':
+    'Not validated yet. First automatic check runs within 6h, or use Validate Connection to check now.',
+  'connection-tooltip-connected': 'Checked {{ time }}',
+  'connection-tooltip-failed-checked': 'Checked {{ time }}',
 } as const;
