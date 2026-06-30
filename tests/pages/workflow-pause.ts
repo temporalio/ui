@@ -53,7 +53,9 @@ export class WorkflowPausePage {
       name: 'Cancel',
     });
     this.pausedAlert = page.getByTestId('workflow-paused-alert');
-    this.pausedAlertReason = page.getByText('Reason this Workflow is paused');
+    this.pausedAlertReason = this.pausedAlert.getByText('Reason', {
+      exact: true,
+    });
     this.pausedStatus = page.getByTestId('workflow-status');
     this.moreActionsButton = page.getByRole('button', { name: 'More Actions' });
     this.updateMenuItem = page

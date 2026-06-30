@@ -12,6 +12,8 @@
   export let twelveHourClock = true;
   export let includeSeconds = true;
   export let disabled = false;
+  export let error = false;
+  export let idPrefix = '';
 
   const dispatch = createEventDispatcher();
 
@@ -23,7 +25,7 @@
 
 <div class="flex gap-2">
   <Input
-    id="hour"
+    id="{idPrefix}hour"
     label="hrs"
     labelHidden
     bind:value={hour}
@@ -31,12 +33,13 @@
     suffix="hrs"
     maxLength={2}
     hideCount
-    error={twelveHourClock ? parseInt(hour) > 12 : parseInt(hour) > 23}
+    error={error ||
+      (twelveHourClock ? parseInt(hour) > 12 : parseInt(hour) > 23)}
     {disabled}
     oninput={onInput}
   />
   <Input
-    id="minute"
+    id="{idPrefix}minute"
     label="min"
     labelHidden
     bind:value={minute}
@@ -44,13 +47,13 @@
     suffix="min"
     maxLength={2}
     hideCount
-    error={Boolean(parseInt(hour) > 59)}
+    error={error || Boolean(parseInt(minute) > 59)}
     {disabled}
     oninput={onInput}
   />
   {#if includeSeconds}
     <Input
-      id="second"
+      id="{idPrefix}second"
       label="sec"
       labelHidden
       bind:value={second}
@@ -58,7 +61,7 @@
       suffix="sec"
       maxLength={2}
       hideCount
-      error={Boolean(parseInt(hour) > 59)}
+      error={error || Boolean(parseInt(second) > 59)}
       {disabled}
       oninput={onInput}
     />

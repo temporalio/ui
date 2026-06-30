@@ -8,6 +8,7 @@ import {
   routeForArchivalEventHistory,
   routeForArchivalWorkflows,
   routeForAuthentication,
+  routeForAuthenticationRedirect,
   routeForBatchOperation,
   routeForBatchOperations,
   routeForCallStack,
@@ -234,6 +235,17 @@ describe('routeFor functions should resolve the base path exactly once', () => {
           settings: { auth: {}, baseUrl: 'https://example.com' },
           searchParams: new URLSearchParams(),
         }),
+    ],
+    [
+      'routeForAuthenticationRedirect',
+      () =>
+        routeForAuthenticationRedirect(
+          {
+            auth: { redirectToProvider: true },
+            baseUrl: 'https://example.com',
+          },
+          new URL('https://example.com/namespaces/default/workflows'),
+        ),
     ],
     ['routeForLoginPage', () => routeForLoginPage('', false)],
     ['routeForCommonErrors', () => routeForCommonErrors()],
@@ -480,6 +492,17 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
           settings: { auth: {}, baseUrl: 'https://example.com' },
           searchParams: new URLSearchParams(),
         }),
+    ],
+    [
+      'routeForAuthenticationRedirect',
+      () =>
+        routeForAuthenticationRedirect(
+          {
+            auth: { redirectToProvider: true },
+            baseUrl: 'https://example.com',
+          },
+          new URL('https://example.com/namespaces/default/workflows'),
+        ),
     ],
     ['routeForLoginPage', () => routeForLoginPage('', false)],
   ];

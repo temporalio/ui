@@ -8,6 +8,7 @@ const defaultSettings = {
   Auth: {
     Enabled: false,
     Options: null,
+    RedirectToProvider: false,
   },
   DefaultNamespace: '',
   ShowTemporalSystemNamespace: false,

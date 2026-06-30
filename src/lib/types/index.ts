@@ -324,7 +324,11 @@ export type Duration = google.protobuf.IDuration;
 
 // extra APIs
 export type SettingsResponse = {
-  Auth: { Enabled: boolean; Options: string[] };
+  Auth: {
+    Enabled: boolean;
+    Options: string[] | null;
+    RedirectToProvider?: boolean;
+  };
   Codec: {
     Endpoint: string;
     PassAccessToken?: boolean;

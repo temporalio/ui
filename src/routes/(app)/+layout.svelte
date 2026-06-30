@@ -18,7 +18,7 @@
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { authUser, clearAuthUser } from '$lib/stores/auth-user';
+  import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { initializeNavDefaults } from '$lib/stores/nav-open';
@@ -32,7 +32,6 @@
     routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForEventHistoryImport,
-    routeForLoginPage,
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
@@ -319,8 +318,7 @@
   }
 
   const logout = () => {
-    clearAuthUser();
-    goto(routeForLoginPage());
+    void logoutAuthUser();
   };
 
   $effect(() => {
@@ -330,8 +328,13 @@
     }
   });
 
-  afterNavigate(() => {
-    document.getElementById('content')?.scrollTo(0, 0);
+  afterNavigate(({ from, to, type }) => {
+    const main = document.getElementById('content');
+    main?.scrollTo(0, 0);
+    if (type === 'enter') return;
+    if (from?.url.pathname === '/') return;
+    if (from?.url.pathname === to?.url.pathname) return;
+    main?.focus({ preventScroll: true });
   });
 
   setCoreContext({

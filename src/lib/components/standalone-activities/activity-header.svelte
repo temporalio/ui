@@ -30,7 +30,7 @@
 
   let { activityExecutionInfo, namespace, poller }: Props = $props();
 
-  const activityType = $derived(activityExecutionInfo.activityType.name);
+  const activityType = $derived(activityExecutionInfo.activityType?.name);
   const activityTypeFilterLink = $derived(
     routeForStandaloneActivitiesWithQuery(
       { namespace },
@@ -59,7 +59,7 @@
           <Copyable
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
-            content={activityExecutionInfo.activityId}
+            content={activityExecutionInfo.activityId ?? ''}
             clickAllToCopy
             container-class="w-full"
             class="overflow-hidden text-ellipsis text-left"
@@ -69,23 +69,13 @@
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
-  <DetailList aria-label="activity execution details" rowCount={4}>
+  <DetailList aria-label="activity execution details" rowCount={3}>
     <DetailListColumn>
-      <DetailListLabel
-        >{translate('standalone-activities.scheduled-time')}</DetailListLabel
-      >
+      <DetailListLabel>{translate('common.start')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.scheduleTime}
       />
-      <DetailListLabel
-        >{translate('standalone-activities.last-started-time')}</DetailListLabel
-      >
-      <DetailListTimestampValue
-        timestamp={activityExecutionInfo.lastStartedTime}
-      />
-      <DetailListLabel
-        >{translate('standalone-activities.close-time')}</DetailListLabel
-      >
+      <DetailListLabel>{translate('common.end')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.closeTime}
         fallback="-"
@@ -103,7 +93,7 @@
       <DetailListLabel
         >{translate('standalone-activities.run-id')}</DetailListLabel
       >
-      <DetailListTextValue copyable text={activityExecutionInfo.runId} />
+      <DetailListTextValue copyable text={activityExecutionInfo.runId ?? ''} />
       {#if activityType}
         <DetailListLabel
           >{translate('standalone-activities.activity-type')}</DetailListLabel
@@ -111,7 +101,7 @@
         <DetailListLinkValue
           copyable
           iconName="filter"
-          text={activityType}
+          text={activityType ?? ''}
           href={activityTypeFilterLink}
         />
       {/if}
@@ -121,7 +111,7 @@
       <DetailListLinkValue
         copyable
         iconName="filter"
-        text={activityExecutionInfo.taskQueue}
+        text={activityExecutionInfo.taskQueue ?? ''}
         href={taskQueueFilterLink}
       />
     </DetailListColumn>

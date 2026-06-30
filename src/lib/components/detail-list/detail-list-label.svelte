@@ -13,10 +13,10 @@
   const { children, href, class: className = '' }: Props = $props();
 </script>
 
-<dd class={twMerge('col-[1] text-secondary', className)}>
+<dt class={twMerge('col-[1] text-secondary', className)}>
   {#if href}
     <Link {href} newTab>{@render children()}</Link>
   {:else}
     {@render children()}
   {/if}
-</dd>
+</dt>

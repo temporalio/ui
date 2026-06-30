@@ -50,6 +50,7 @@ uiServerTLS:
   keyFile: {{ env "TEMPORAL_UI_SERVER_TLS_KEY" | default "" }}
 auth:
   enabled: {{ env "TEMPORAL_AUTH_ENABLED" | default "false" }}
+  redirectToProvider: {{ env "TEMPORAL_AUTH_REDIRECT_TO_PROVIDER" | default "false" }}
   providers:
   - label: {{ env "TEMPORAL_AUTH_LABEL" | default "sso" }}
     type: {{ env "TEMPORAL_AUTH_TYPE" | default "oidc" }}

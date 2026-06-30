@@ -37,6 +37,7 @@ refreshWorkflowCountsDisabled: false
 # =============================================================================
 auth:
   enabled: true
+  redirectToProvider: false
   maxSessionDuration: 2m # Max time before forced re-login (0 = unlimited)
   providers:
     - label: Dummy OIDC
@@ -70,4 +71,3 @@ codec:
   includeCredentials: false
 forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
   - X-Forwarded-For
-

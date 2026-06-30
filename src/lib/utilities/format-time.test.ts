@@ -8,6 +8,7 @@ import {
   fromSecondsToDaysOrHours,
   fromSecondsToMinutesAndSeconds,
   getDuration,
+  getEpochMilliseconds,
   getTimestampDifference,
 } from './format-time';
 
@@ -315,6 +316,35 @@ describe('fromSecondsToDaysOrHours', () => {
   it('should return "33 days" for 2851200s', () => {
     const seconds = '2851200s';
     expect(fromSecondsToDaysOrHours(seconds)).toBe('33 days');
+  });
+});
+
+describe('getEpochMilliseconds', () => {
+  it('should return epoch milliseconds, not the sub-second component', () => {
+    expect(getEpochMilliseconds('2026-06-30T08:03:25.812286937Z')).toBe(
+      Date.parse('2026-06-30T08:03:25.812Z'),
+    );
+  });
+
+  it('should sort timestamps chronologically regardless of sub-second fraction', () => {
+    const times = [
+      '2026-06-30T11:05:30.793784947Z',
+      '2026-06-30T08:03:25.812286937Z',
+      '2026-06-30T13:01:01.591393007Z',
+    ];
+    const sorted = [...times].sort(
+      (a, b) => getEpochMilliseconds(a) - getEpochMilliseconds(b),
+    );
+    expect(sorted).toEqual([
+      '2026-06-30T08:03:25.812286937Z',
+      '2026-06-30T11:05:30.793784947Z',
+      '2026-06-30T13:01:01.591393007Z',
+    ]);
+  });
+
+  it('should return 0 for nullish input', () => {
+    expect(getEpochMilliseconds(undefined)).toBe(0);
+    expect(getEpochMilliseconds(null)).toBe(0);
   });
 });
 

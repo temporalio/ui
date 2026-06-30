@@ -54,7 +54,13 @@ export {
   mockSearchAttributesApi,
   SEARCH_ATTRIBUTES_API,
 } from './mocks/search-attributes';
-export { mockSchedule, mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
+export {
+  mockMonthlyCalendarSchedule,
+  mockSchedule,
+  mockScheduleApi,
+  mockWeeklyCalendarSchedule,
+  SCHEDULE_API,
+} from './mocks/schedules';
 export {
   mockSchedulesCountApi,
   SCHEDULES_COUNT_API,

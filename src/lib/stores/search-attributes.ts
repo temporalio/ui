@@ -241,7 +241,6 @@ export const activitySearchAttributes: Readable<SearchAttributes> = derived(
     RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-    ExecutionTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
     CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
     ExecutionDuration: SEARCH_ATTRIBUTE_TYPE.INT,
     StateTransitionCount: SEARCH_ATTRIBUTE_TYPE.INT,

@@ -641,6 +641,21 @@ export const routeForLoginPage = (
   return resolve('/login', {});
 };
 
+export const routeForAuthenticationRedirect = (
+  settings: Settings,
+  currentUrl?: URL,
+): string => {
+  if (settings.auth.redirectToProvider) {
+    return routeForAuthentication({
+      settings,
+      searchParams: currentUrl?.searchParams,
+      originUrl: currentUrl?.href,
+    });
+  }
+
+  return routeForLoginPage();
+};
+
 export const routeForEventHistoryImport = (
   namespace?: string,
   view?: EventView,

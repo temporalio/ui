@@ -4,7 +4,7 @@
 
   interface Props {
     children: Snippet;
-    'aria-label': string;
+    'aria-label'?: string;
     rowCount: number;
     class?: ClassNameValue;
   }
