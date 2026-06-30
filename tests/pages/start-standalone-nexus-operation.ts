@@ -9,14 +9,11 @@ export class StartStandaloneNexusOperationPage {
   readonly startToCloseTimeoutInput: Locator;
   readonly scheduleToCloseTimeoutInput: Locator;
   readonly submitButton: Locator;
-  readonly operationIdInputError: Locator;
+  readonly editPoliciesButton: Locator;
   readonly endpointInputError: Locator;
   readonly serviceInputError: Locator;
   readonly operationNameInputError: Locator;
   readonly timeoutError: Locator;
-  readonly moreOptionsButton: Locator;
-  readonly addSearchAttributesCard: Locator;
-  readonly addMetadataCard: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -24,28 +21,25 @@ export class StartStandaloneNexusOperationPage {
     this.endpointInput = page.locator('#endpoint');
     this.serviceInput = page.locator('#service');
     this.operationNameInput = page.locator('#operation');
-    this.startToCloseTimeoutInput = page.locator('#startToCloseTimeout');
-    this.scheduleToCloseTimeoutInput = page.locator('#scheduleToCloseTimeout');
+    this.startToCloseTimeoutInput = page.locator('#drawer-startToCloseTimeout');
+    this.scheduleToCloseTimeoutInput = page.locator(
+      '#drawer-scheduleToCloseTimeout',
+    );
     this.submitButton = page.getByTestId(
       'start-standalone-nexus-operation-submit-button',
     );
-    this.operationIdInputError = page.getByText('Operation ID is required.');
-    this.endpointInputError = page.getByText('Endpoint is required.');
-    this.serviceInputError = page.getByText('Service is required.');
+    this.editPoliciesButton = page.getByText('Edit Operation Policies');
+    this.endpointInputError = page.getByText(
+      'Target endpoint name is required.',
+    );
+    this.serviceInputError = page.getByText(
+      'Nexus Service Name from the handler Namespace is required.',
+    );
     this.operationNameInputError = page.getByText(
-      'Operation Name is required.',
+      "Operation Name from the handler Namespace's services is required.",
     );
     this.timeoutError = page.getByText(
       'At least one timeout (Start To Close or Schedule To Close) is required.',
-    );
-    this.moreOptionsButton = page.getByTestId(
-      'start-standalone-nexus-operation-more-options',
-    );
-    this.addSearchAttributesCard = page.getByTestId(
-      'start-standalone-nexus-operation-add-search-attributes',
-    );
-    this.addMetadataCard = page.getByTestId(
-      'start-standalone-nexus-operation-add-metadata',
     );
   }
 

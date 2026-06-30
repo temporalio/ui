@@ -60,24 +60,10 @@ test.describe('Start a Standalone Nexus Operation', () => {
 
     await startNexusOperationPage.submitButton.click();
 
-    await expect(startNexusOperationPage.operationIdInputError).toBeVisible();
     await expect(startNexusOperationPage.endpointInputError).toBeVisible();
     await expect(startNexusOperationPage.serviceInputError).toBeVisible();
     await expect(startNexusOperationPage.operationNameInputError).toBeVisible();
     await expect(startNexusOperationPage.timeoutError).toBeVisible();
-  });
-
-  test('Allows expanding more options', async ({ page }) => {
-    const startNexusOperationPage = new StartStandaloneNexusOperationPage(page);
-    await startNexusOperationPage.goto();
-
-    await expect(startNexusOperationPage.moreOptionsButton).toBeVisible();
-    await expect(startNexusOperationPage.addSearchAttributesCard).toBeHidden();
-    await expect(startNexusOperationPage.addMetadataCard).toBeHidden();
-
-    await startNexusOperationPage.moreOptionsButton.click();
-    await expect(startNexusOperationPage.addSearchAttributesCard).toBeVisible();
-    await expect(startNexusOperationPage.addMetadataCard).toBeVisible();
   });
 
   test('shows the timeout error when Start to Close Timeout is zero', async ({
@@ -90,6 +76,8 @@ test.describe('Start a Standalone Nexus Operation', () => {
     await startNexusOperationPage.endpointInput.fill('my-endpoint');
     await startNexusOperationPage.serviceInput.fill('my-service');
     await startNexusOperationPage.operationNameInput.fill('my-operation');
+
+    await startNexusOperationPage.editPoliciesButton.click();
     await startNexusOperationPage.startToCloseTimeoutInput.fill('0');
 
     await startNexusOperationPage.submitButton.click();
@@ -108,6 +96,7 @@ test.describe('Start a Standalone Nexus Operation', () => {
     await startNexusOperationPage.serviceInput.fill('my-service');
     await startNexusOperationPage.operationNameInput.fill('my-operation');
 
+    await startNexusOperationPage.editPoliciesButton.click();
     await startNexusOperationPage.startToCloseTimeoutInput.fill('30');
     await expect(startNexusOperationPage.timeoutError).toBeHidden();
 
