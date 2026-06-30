@@ -54,7 +54,7 @@ export const Strings = {
   'blocked-reason': 'Blocked Reason',
   'schedule-time': 'Schedule Time',
   'expiration-time': 'Expiration Time',
-  'close-time': 'Close Time',
+  'close-time': 'End',
   'execution-duration': 'Execution Duration',
   'state-transitions': 'State Transitions',
   attempt: 'Attempt',
