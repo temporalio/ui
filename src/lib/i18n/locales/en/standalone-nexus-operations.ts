@@ -160,6 +160,13 @@ export const Strings = {
     'Unable to create Standalone Nexus Operation because the Operation ID is already in use by a completed operation.',
   'form-operation-id-duplicate-completed-error':
     'Operation ID already in use by a completed operation. Change Operation ID Reuse Policy to allow duplicates or choose a different Operation ID.',
+  'form-operation-id-conflict-toast':
+    'Unable to create Standalone Nexus Operation because the Operation ID is already in use by an existing operation.',
+  'form-operation-id-conflict-hint': 'Operation ID already in use.',
+  'form-operation-id-conflict-banner-prefix':
+    'This Operation ID is already in use by',
+  'form-operation-id-conflict-banner-suffix':
+    ". Because this operation was still running at the time of Standalone Nexus Operation creation, it conflicts with your ID Conflict policy and cannot be created. If the running operation may be closing shortly, you can try again. Otherwise, use a different Operation ID, cancel or terminate the currently running operation, or leave this field blank and we'll generate a unique operation ID for you.",
   'form-id-reuse-policy-heading': 'Closed Operation ID Reuse Policy',
   'form-id-reuse-policy-description':
     'Determine whether or not to allow this Standalone Nexus Operation to share the same Operation ID with an Operation in a completed, canceled, terminated, timed out, or failed state.',

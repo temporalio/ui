@@ -8,6 +8,7 @@
 
   import { page } from '$app/state';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
@@ -228,6 +229,29 @@
               operationIdServerError = translate(
                 'standalone-nexus-operations.form-operation-id-duplicate-completed-error',
               );
+            } else if (
+              idConflictPolicy ===
+              'NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING'
+            ) {
+              const errorMessage = isNetworkError(error)
+                ? (error.message ?? '')
+                : '';
+              const runId = errorMessage.match(/run_id=([^,\s]+)/)?.[1] ?? '';
+              toaster.push({
+                variant: 'error',
+                message: translate(
+                  'standalone-nexus-operations.form-operation-id-conflict-toast',
+                ),
+                duration: 10000,
+              });
+              operationIdErrorSnapshot = form.data.operationId;
+              operationIdConflictInfo = {
+                operationId: form.data.operationId,
+                runId,
+              };
+              operationIdServerError = translate(
+                'standalone-nexus-operations.form-operation-id-conflict-hint',
+              );
             }
             await tick();
             document.getElementById('operationId')?.focus();
@@ -240,12 +264,19 @@
   );
 
   let operationIdServerError = $state('');
+  let operationIdConflictInfo = $state<{
+    operationId: string;
+    runId: string;
+  } | null>(null);
   let operationIdErrorSnapshot = '';
 
   $effect(() => {
     const current = $form.operationId;
     if (operationIdServerError && current !== operationIdErrorSnapshot) {
       operationIdServerError = '';
+    }
+    if (operationIdConflictInfo && current !== operationIdErrorSnapshot) {
+      operationIdConflictInfo = null;
     }
   });
 
@@ -345,6 +376,29 @@
               >
             {/snippet}
           </Input>
+          {#if operationIdConflictInfo}
+            <Alert intent="info">
+              <span>
+                {translate(
+                  'standalone-nexus-operations.form-operation-id-conflict-banner-prefix',
+                )}
+                {#if operationIdConflictInfo.runId}
+                  <Link
+                    href={routeForStandaloneNexusOperationDetails({
+                      namespace,
+                      operationId: operationIdConflictInfo.operationId,
+                      runId: operationIdConflictInfo.runId,
+                    })}>{operationIdConflictInfo.operationId}</Link
+                  >
+                {:else}
+                  {operationIdConflictInfo.operationId}
+                {/if}
+                {translate(
+                  'standalone-nexus-operations.form-operation-id-conflict-banner-suffix',
+                )}
+              </span>
+            </Alert>
+          {/if}
         </div>
 
         <div class="space-y-1">
