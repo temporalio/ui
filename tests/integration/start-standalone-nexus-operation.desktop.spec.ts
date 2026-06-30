@@ -44,6 +44,7 @@ test.describe('Start a Standalone Nexus Operation', () => {
     await expect(startNexusOperationPage.operationNameInput).toHaveValue(
       'my-operation',
     );
+    startNexusOperationPage.editPoliciesButton.click();
     await expect(startNexusOperationPage.startToCloseTimeoutInput).toHaveValue(
       '30',
     );
