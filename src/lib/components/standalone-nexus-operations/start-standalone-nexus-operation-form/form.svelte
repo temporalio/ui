@@ -135,6 +135,69 @@
       }
     });
 
+  let operationIdServerError = $state('');
+  let operationIdConflictInfo = $state<{
+    operationId: string;
+    runId: string;
+  } | null>(null);
+  let operationIdErrorSnapshot = '';
+
+  function setOperationIdError(operationId: string, errorText: string) {
+    operationIdErrorSnapshot = operationId;
+    operationIdServerError = errorText;
+  }
+
+  function handleRejectDuplicate(operationId: string) {
+    toaster.push({
+      variant: 'error',
+      duration: 10000,
+      message: translate(
+        'standalone-nexus-operations.form-operation-id-duplicate-toast',
+      ),
+    });
+    setOperationIdError(
+      operationId,
+      translate(
+        'standalone-nexus-operations.form-operation-id-duplicate-error',
+      ),
+    );
+  }
+
+  function handleAllowDuplicateFailedOnly(operationId: string) {
+    toaster.push({
+      variant: 'error',
+      duration: 10000,
+      message: translate(
+        'standalone-nexus-operations.form-operation-id-duplicate-completed-toast',
+      ),
+    });
+    setOperationIdError(
+      operationId,
+      translate(
+        'standalone-nexus-operations.form-operation-id-duplicate-completed-error',
+      ),
+    );
+  }
+
+  function handleUseExistingConflict(operationId: string, error: unknown) {
+    const runId =
+      (isNetworkError(error) ? error.message : null)?.match(
+        /run_id=([^,\s]+)/,
+      )?.[1] ?? '';
+    toaster.push({
+      variant: 'error',
+      duration: 10000,
+      message: translate(
+        'standalone-nexus-operations.form-operation-id-conflict-toast',
+      ),
+    });
+    operationIdConflictInfo = { operationId, runId };
+    setOperationIdError(
+      operationId,
+      translate('standalone-nexus-operations.form-operation-id-conflict-hint'),
+    );
+  }
+
   const { form, enhance, errors, message } = superForm(
     {
       ...formDefaults,
@@ -157,6 +220,7 @@
         if (!form.valid) return;
 
         const { idReusePolicy, idConflictPolicy } = form.data;
+
         try {
           const operationId = form.data.operationId || crypto.randomUUID();
           const nexusHeaderRecord = form.data.nexusHeader.reduce<
@@ -198,77 +262,34 @@
           });
           return { type: 'success' };
         } catch (error) {
-          if (isNetworkError(error) && error.statusCode === 409) {
-            if (
-              idReusePolicy ===
-              'NEXUS_OPERATION_ID_REUSE_POLICY_REJECT_DUPLICATE'
-            ) {
-              toaster.push({
-                variant: 'error',
-                message: translate(
-                  'standalone-nexus-operations.form-operation-id-duplicate-toast',
-                ),
-                duration: 10000,
-              });
-              operationIdErrorSnapshot = form.data.operationId;
-              operationIdServerError = translate(
-                'standalone-nexus-operations.form-operation-id-duplicate-error',
-              );
-            } else if (
-              idReusePolicy ===
-              'NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY'
-            ) {
-              toaster.push({
-                variant: 'error',
-                message: translate(
-                  'standalone-nexus-operations.form-operation-id-duplicate-completed-toast',
-                ),
-                duration: 10000,
-              });
-              operationIdErrorSnapshot = form.data.operationId;
-              operationIdServerError = translate(
-                'standalone-nexus-operations.form-operation-id-duplicate-completed-error',
-              );
-            } else if (
-              idConflictPolicy ===
-              'NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING'
-            ) {
-              const errorMessage = isNetworkError(error)
-                ? (error.message ?? '')
-                : '';
-              const runId = errorMessage.match(/run_id=([^,\s]+)/)?.[1] ?? '';
-              toaster.push({
-                variant: 'error',
-                message: translate(
-                  'standalone-nexus-operations.form-operation-id-conflict-toast',
-                ),
-                duration: 10000,
-              });
-              operationIdErrorSnapshot = form.data.operationId;
-              operationIdConflictInfo = {
-                operationId: form.data.operationId,
-                runId,
-              };
-              operationIdServerError = translate(
-                'standalone-nexus-operations.form-operation-id-conflict-hint',
-              );
-            }
-            await tick();
-            document.getElementById('operationId')?.focus();
-            return;
+          if (!isNetworkError(error) || error.statusCode !== 409) {
+            return { type: 'error' };
           }
-          return { type: 'error' };
+
+          const { operationId } = form.data;
+
+          if (
+            idReusePolicy === 'NEXUS_OPERATION_ID_REUSE_POLICY_REJECT_DUPLICATE'
+          ) {
+            handleRejectDuplicate(operationId);
+          } else if (
+            idReusePolicy ===
+            'NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY'
+          ) {
+            handleAllowDuplicateFailedOnly(operationId);
+          } else if (
+            idConflictPolicy ===
+            'NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING'
+          ) {
+            handleUseExistingConflict(operationId, error);
+          }
+
+          await tick();
+          document.getElementById('operationId')?.focus();
         }
       },
     },
   );
-
-  let operationIdServerError = $state('');
-  let operationIdConflictInfo = $state<{
-    operationId: string;
-    runId: string;
-  } | null>(null);
-  let operationIdErrorSnapshot = '';
 
   $effect(() => {
     const current = $form.operationId;
