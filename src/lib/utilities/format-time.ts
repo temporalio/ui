@@ -1,6 +1,7 @@
 import {
   differenceInDays,
   formatDuration as durationToString,
+  getMilliseconds as getSecondAsMilliseconds,
   intervalToDuration,
   parseJSON,
 } from 'date-fns';
@@ -196,6 +197,18 @@ export function formatDistanceAbbreviated({
   }
 }
 
+export function getMilliseconds(date: ValidTime | undefined | null): number {
+  if (!date) return 0;
+  if (isTimestamp(date)) {
+    date = timestampToDate(date);
+  }
+  const parsedDate = parseJSON(date);
+
+  return getSecondAsMilliseconds(parsedDate);
+}
+
+// Milliseconds since the Unix epoch, for comparing/sorting instants.
+// Unlike getMilliseconds, which returns only the 0-999 sub-second component.
 export function getEpochMilliseconds(
   date: ValidTime | undefined | null,
 ): number {
