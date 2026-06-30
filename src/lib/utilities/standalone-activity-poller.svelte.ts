@@ -46,6 +46,7 @@ export class StandaloneActivityPoller {
       );
     } catch (error) {
       this.onError(error);
+      return;
     }
 
     this.onUpdate(activityExecution);

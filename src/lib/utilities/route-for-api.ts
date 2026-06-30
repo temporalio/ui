@@ -23,6 +23,10 @@ import type {
   StandaloneActivitiesParameters,
   StandaloneActivityAPIRoutePath,
   StandaloneActivityParameters,
+  StandaloneNexusOperationAPIRoutePath,
+  StandaloneNexusOperationParameters,
+  StandaloneNexusOperationsAPIRoutePath,
+  StandaloneNexusOperationsParameters,
   TaskQueueAPIRoutePath,
   TaskQueueRouteParameters,
   WorkerAPIRoutePath,
@@ -124,6 +128,7 @@ const encode = (
       batchJobId: '',
       runId: '',
       activityId: '',
+      operationId: '',
       endpointId: '',
       deploymentName: '',
       buildId: '',
@@ -196,6 +201,12 @@ export function pathForApi(
     'standalone-activities.count': `/namespaces/${parameters?.namespace}/activity-count`,
     'standalone-activity.cancel': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/cancel`,
     'standalone-activity.terminate': `/namespaces/${parameters?.namespace}/activities/${parameters?.activityId}/terminate`,
+    'standalone-nexus-operations': `/namespaces/${parameters?.namespace}/nexus-operations`,
+    'standalone-nexus-operation': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}`,
+    'standalone-nexus-operation.poll': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}/poll`,
+    'standalone-nexus-operation.cancel': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}/cancel`,
+    'standalone-nexus-operation.terminate': `/namespaces/${parameters?.namespace}/nexus-operations/${parameters?.operationId}/terminate`,
+    'standalone-nexus-operations.count': `/namespaces/${parameters?.namespace}/nexus-operation-count`,
   };
 
   return getPath(routes[route]);
@@ -302,6 +313,16 @@ export function routeForApi(
 export function routeForApi(
   route: WorkerDeploymentVersionsAPIRoutePath,
   parameters: WorkerDeploymentRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: StandaloneNexusOperationsAPIRoutePath,
+  parameters: StandaloneNexusOperationsParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: StandaloneNexusOperationAPIRoutePath,
+  parameters: StandaloneNexusOperationParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(route: ParameterlessAPIRoutePath): string;

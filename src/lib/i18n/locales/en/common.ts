@@ -155,6 +155,7 @@ export const Strings = {
   'filter-items': 'Filter items',
   'filter-workflows': 'Filter workflows',
   'filter-activities': 'Filter activities',
+  'filter-nexus-operations': 'Filter nexus operations',
   'event-category-filter-label': 'Open event category filter menu',
   'event-date-filter-label': 'Open event date filter menu',
   'date-time-menu-label': 'Open time format menu',
