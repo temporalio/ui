@@ -62,11 +62,21 @@
 
   const resolvedCfnTemplate = $derived(cfnTemplateProp ?? cfnTemplate);
 
-  const launchStackHref = $derived(
-    cfnTemplateUrl
-      ? `https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?templateURL=${encodeURIComponent(cfnTemplateUrl)}`
-      : 'https://console.aws.amazon.com/cloudformation/',
-  );
+  const launchStackHref = $derived.by(() => {
+    if (!cfnTemplateUrl) {
+      return 'https://console.aws.amazon.com/cloudformation/';
+    }
+    const params = [`templateURL=${encodeURIComponent(cfnTemplateUrl)}`];
+    if (roleExternalId) {
+      params.push(
+        `param_AssumeRoleExternalId=${encodeURIComponent(roleExternalId)}`,
+      );
+    }
+    if (lambdaArn) {
+      params.push(`param_LambdaFunctionARNs=${encodeURIComponent(lambdaArn)}`);
+    }
+    return `https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?${params.join('&')}`;
+  });
 
   let showRoleHelp = $state(false);
   let showScaling = $state(false);
