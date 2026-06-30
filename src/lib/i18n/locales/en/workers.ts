@@ -89,7 +89,7 @@ export const Strings = {
     'Slot count is set to auto-adjust on based on CPU/memory usage.',
   'slot-supplier-kind-custom':
     'Slot count is set based on custom slot supplier implementation.',
-  'last-refreshed': 'Last refreshed: {{time}}',
+  'last-refreshed': 'Last refreshed',
   'pulling-latest-snapshot': 'Pulling latest snapshot from the server...',
   'serverless-workers': 'Serverless Workers',
   'serverless-worker': 'Serverless Worker',
