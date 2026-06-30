@@ -213,6 +213,21 @@
               operationIdServerError = translate(
                 'standalone-nexus-operations.form-operation-id-duplicate-error',
               );
+            } else if (
+              idReusePolicy ===
+              'NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY'
+            ) {
+              toaster.push({
+                variant: 'error',
+                message: translate(
+                  'standalone-nexus-operations.form-operation-id-duplicate-completed-toast',
+                ),
+                duration: 10000,
+              });
+              operationIdErrorSnapshot = form.data.operationId;
+              operationIdServerError = translate(
+                'standalone-nexus-operations.form-operation-id-duplicate-completed-error',
+              );
             }
             await tick();
             document.getElementById('operationId')?.focus();
