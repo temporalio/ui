@@ -11,7 +11,10 @@
   import type { EventLink as ELink } from '$lib/types';
   import { type Payload as RawPayload } from '$lib/types';
   import type { WorkflowEvent } from '$lib/types/events';
-  import { getEventLinkHref } from '$lib/utilities/event-link-href';
+  import {
+    type EventLinkDisplay,
+    toEventLinkViews,
+  } from '$lib/utilities/event-link';
   import {
     format,
     spaceBetweenCapitalLetters,
@@ -24,10 +27,7 @@
     shouldDisplayAsTime,
   } from '$lib/utilities/get-single-attribute-for-event';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  import {
-    routeForEventHistoryEvent,
-    routeForNamespace,
-  } from '$lib/utilities/route-for';
+  import { routeForEventHistoryEvent } from '$lib/utilities/route-for';
 
   import EventDetailsLink from './event-details-link.svelte';
 
@@ -121,45 +121,31 @@
   </div>
 </div>
 
-{#snippet eventLink(link: ELink)}
-  {@const href = getEventLinkHref(link)}
-  {@const value = href.split('workflows/')?.[1] || href}
+{#snippet eventLink(view: EventLinkDisplay)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
-      {translate('nexus.link')}
+      {view.label}
     </p>
     <Copyable
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      content={value}
+      content={view.value}
     >
-      <Link {href} class="whitespace-pre-line">{value}</Link>
-    </Copyable>
-  </div>
-{/snippet}
-
-{#snippet eventNamespaceLink(link: ELink)}
-  {@const href = routeForNamespace({ namespace: link.workflowEvent.namespace })}
-  <div class="flex items-start gap-4">
-    <p class="min-w-56 text-sm text-secondary/80">
-      {translate('nexus.link-namespace')}
-    </p>
-    <Copyable
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      content={link.workflowEvent.namespace}
-    >
-      <Link {href} class="whitespace-pre-line"
-        >{link.workflowEvent.namespace}</Link
-      >
+      {#if view.href}
+        <Link href={view.href} class="whitespace-pre-line">{view.value}</Link>
+      {:else}
+        <span class="whitespace-pre-line">{view.value}</span>
+      {/if}
     </Copyable>
   </div>
 {/snippet}
 
 {#snippet eventLinks(links: ELink[])}
-  {#each links as link (link)}
-    {@render eventLink(link)}
-    {@render eventNamespaceLink(link)}
+  {#each toEventLinkViews(links, { namespace }) as view (view.key)}
+    {@render eventLink(view)}
+    {#if view.namespace}
+      {@render eventLink(view.namespace)}
+    {/if}
   {/each}
 {/snippet}
 

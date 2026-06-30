@@ -1,37 +1,7 @@
-import type { EventLink, EventType } from '$lib/types';
+import type { EventLink } from '$lib/types';
 
-import { routeForEventHistoryEvent, routeForWorkflow } from './route-for';
+import { toEventLinkView } from './event-link';
 
 export const getEventLinkHref = (link: EventLink): string => {
-  if (link.workflowEvent?.eventRef?.eventId) {
-    return routeForEventHistoryEvent({
-      namespace: link.workflowEvent.namespace,
-      workflow: link.workflowEvent.workflowId,
-      run: link.workflowEvent.runId,
-      eventId: String(link.workflowEvent.eventRef.eventId),
-    });
-  } else if (
-    link.workflowEvent?.eventRef?.eventType ===
-    ('EVENT_TYPE_WORKFLOW_EXECUTION_STARTED' as unknown as EventType)
-  ) {
-    return routeForEventHistoryEvent({
-      namespace: link.workflowEvent.namespace,
-      workflow: link.workflowEvent.workflowId,
-      run: link.workflowEvent.runId,
-      eventId: '1',
-    });
-  } else if (link.workflowEvent?.requestIdRef?.requestId) {
-    return routeForEventHistoryEvent({
-      namespace: link.workflowEvent.namespace,
-      workflow: link.workflowEvent.workflowId,
-      run: link.workflowEvent.runId,
-      requestId: link.workflowEvent?.requestIdRef?.requestId,
-    });
-  } else {
-    return routeForWorkflow({
-      namespace: link.workflowEvent.namespace,
-      workflow: link.workflowEvent.workflowId,
-      run: link.workflowEvent.runId,
-    });
-  }
+  return toEventLinkView(link).href ?? '';
 };

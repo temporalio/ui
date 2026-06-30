@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import { page } from '$app/state';
+
   import { timestamp } from '$lib/components/timestamp.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -9,7 +11,7 @@
   import type { CallbackState } from '$lib/types';
   import type { EventLink as Link } from '$lib/types';
   import type { Callback } from '$lib/types/nexus';
-  import { routeForNamespace } from '$lib/utilities/route-for';
+  import { toEventLinkViews } from '$lib/utilities/event-link';
 
   import EventLink from '../event/event-link.svelte';
 
@@ -40,29 +42,23 @@
   );
   const links = $derived(callback?.callback?.links || []);
   const showCallbackUrl = $derived(!links.length && !link && callbackUrl);
+  const namespace = $derived(page.params.namespace);
+  const callbackLinks = $derived(links.length ? links : link ? [link] : []);
+  const linkViews = $derived(toEventLinkViews(callbackLinks, { namespace }));
 </script>
+
+{#snippet callbackLink(view)}
+  <EventLink {view} />
+  {#if view.namespace}
+    <EventLink view={view.namespace} />
+  {/if}
+{/snippet}
 
 <Alert icon="nexus" intent={failed ? 'error' : 'info'} {title}>
   <div class="flex flex-col gap-2 pt-2">
-    {#if links.length}
-      {#each links as link, i (link.workflowEvent?.eventRef?.eventId || link.workflowEvent?.requestIdRef?.requestId || i)}
-        <EventLink {link} />
-        <EventLink
-          {link}
-          label={translate('nexus.link-namespace')}
-          value={link.workflowEvent.namespace}
-          href={routeForNamespace({ namespace: link.workflowEvent.namespace })}
-        />
-      {/each}
-    {:else if link}
-      <EventLink {link} />
-      <EventLink
-        {link}
-        label={translate('nexus.link-namespace')}
-        value={link.workflowEvent.namespace}
-        href={routeForNamespace({ namespace: link.workflowEvent.namespace })}
-      />
-    {/if}
+    {#each linkViews as view (view.key)}
+      {@render callbackLink(view)}
+    {/each}
     <div class="flex flex-col items-start gap-2 md:flex-row md:items-center">
       <p class="flex items-center gap-2">
         {translate('common.state')}<Badge type="subtle">{callback.state}</Badge>
