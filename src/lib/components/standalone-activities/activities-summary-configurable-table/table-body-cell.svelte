@@ -7,9 +7,9 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import { formatDistance } from '$lib/utilities/format-time';
   import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
   import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
+  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import FilterableTableCell from './filterable-table-cell.svelte';
 
@@ -78,16 +78,12 @@
     {#if label === 'Status'}
       <WorkflowStatus status={toActivityStatus(activity.status)} />
     {:else if label === 'Start'}
-      <Timestamp dateTime={activity.lastStartedTime || activity.scheduleTime} />
+      <Timestamp dateTime={activity.scheduleTime} />
     {:else if label === 'End'}
       <Timestamp dateTime={activity.closeTime} />
     {:else if label === 'Execution Duration'}
       {#if activity.executionDuration}
-        {formatDistance({
-          start: activity.lastStartedTime || activity.scheduleTime,
-          end: activity.closeTime,
-          includeMillisecondsForUnderSecond: true,
-        })}
+        {fromSeconds(activity.executionDuration)}
       {/if}
     {:else if label === 'State Transitions'}
       {activity.stateTransitionCount ?? ''}
