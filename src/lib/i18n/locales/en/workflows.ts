@@ -170,7 +170,6 @@ export const Strings = {
     'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
   'dismiss-common-errors': 'Dismiss Common Errors',
   'state-transitions': 'State Transitions',
-  'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
   'family-node-label': 'Workflow {{id}}: {{status}}',
   parents_zero: '0 Parents',

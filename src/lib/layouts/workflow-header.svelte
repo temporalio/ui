@@ -37,6 +37,7 @@
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
   } from '$lib/utilities/get-workflow-relationships';
+  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
@@ -65,6 +66,10 @@
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
 
   const { workflow } = $derived($workflowRun);
+  const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
+  const workerDeployment = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
+  );
   const routeParameters = $derived({
     namespace,
     workflow: workflowId,
@@ -272,7 +277,12 @@
   {#if headerSnippet}
     {@render headerSnippet()}
   {/if}
-  <NoWorkersPollingAlert />
+  <NoWorkersPollingAlert
+    {namespace}
+    taskQueue={workflow?.taskQueue ?? ''}
+    {runningWithNoWorkers}
+    deployment={workerDeployment}
+  />
   <Tabs>
     <TabList label="workflow detail">
       <Tab
