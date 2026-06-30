@@ -126,10 +126,10 @@ const DEFAULT_SCHEDULES_COLUMNS: ConfigurableTableHeader[] = [
 export const ActivityHeaderLabels = [
   'Activity ID',
   'Run ID',
-  'Activity Type',
+  'Type',
   'Task Queue',
-  'Start Time',
-  'Close Time',
+  'Start',
+  'End',
   'Status',
   'Execution Duration',
   'State Transitions',
@@ -140,14 +140,14 @@ export type ActivityHeaderLabel = (typeof ActivityHeaderLabels)[number];
 export const DEFAULT_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Status' },
   { label: 'Activity ID' },
-  { label: 'Activity Type' },
-  { label: 'Task Queue' },
-  { label: 'Start Time' },
-  { label: 'Close Time' },
+  { label: 'Run ID' },
+  { label: 'Type' },
+  { label: 'Start' },
+  { label: 'End' },
 ];
 
 const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
-  { label: 'Run ID' },
+  { label: 'Task Queue' },
   { label: 'Execution Duration' },
   { label: 'State Transitions' },
 ];

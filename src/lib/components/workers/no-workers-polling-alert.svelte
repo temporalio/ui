@@ -1,22 +1,21 @@
 <script lang="ts">
-  import { page } from '$app/state';
-
   import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { fetchDeployment } from '$lib/services/deployments-service';
-  import { workflowRun } from '$lib/stores/workflow-run';
   import { deploymentHasComputeConfig } from '$lib/utilities/deployment-has-compute-config';
-  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { routeForWorkerDeployment } from '$lib/utilities/route-for';
 
-  const { workflow } = $derived($workflowRun);
-  const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
-  const namespace = $derived(page.params.namespace);
-  const deployment = $derived(
-    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
-  );
+  interface Props {
+    namespace: string;
+    taskQueue: string;
+    runningWithNoWorkers: boolean;
+    deployment?: string;
+  }
+
+  let { namespace, taskQueue, runningWithNoWorkers, deployment }: Props =
+    $props();
 
   let serverlessDeployment = $state(false);
   let deploymentChecked = $state(false);
@@ -64,7 +63,7 @@
     hidden={!runningWithNoWorkers}
   >
     {translate('workflows.workflow-error-no-workers-serverless-description', {
-      taskQueue: workflow?.taskQueue ?? '',
+      taskQueue,
       deployment,
     })}
     <Link
@@ -84,7 +83,7 @@
     hidden={!runningWithNoWorkers || !deploymentChecked}
   >
     {translate('workflows.workflow-error-no-workers-description', {
-      taskQueue: workflow?.taskQueue ?? '',
+      taskQueue,
     })}
     {translate('workflows.workers-alert-description')}
     <Link
