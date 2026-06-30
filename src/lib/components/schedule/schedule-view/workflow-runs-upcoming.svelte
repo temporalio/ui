@@ -4,7 +4,7 @@
   import { timestamp } from '$lib/components/timestamp.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import { getMilliseconds } from '$lib/utilities/format-time';
+  import { getEpochMilliseconds } from '$lib/utilities/format-time';
 
   import WorkflowRunsEmpty from './workflow-runs-empty.svelte';
 
@@ -26,7 +26,7 @@
     const runs = schedule?.info?.futureActionTimes ?? [];
     return runs
       .filter(Boolean)
-      .sort((a, b) => getMilliseconds(a) - getMilliseconds(b))
+      .sort((a, b) => getEpochMilliseconds(a) - getEpochMilliseconds(b))
       .slice(0, 5);
   });
 </script>
