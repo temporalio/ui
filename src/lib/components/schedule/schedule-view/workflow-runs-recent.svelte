@@ -6,7 +6,7 @@
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import { getMilliseconds } from '$lib/utilities/format-time';
+  import { getEpochMilliseconds } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
   import { toWorkflowStatusReadable } from '$lib/utilities/screaming-enums';
 
@@ -33,7 +33,9 @@
     return runs
       .filter(Boolean)
       .sort(
-        (a, b) => getMilliseconds(b.actualTime) - getMilliseconds(a.actualTime),
+        (a, b) =>
+          getEpochMilliseconds(b.actualTime) -
+          getEpochMilliseconds(a.actualTime),
       )
       .slice(0, 5);
   });
