@@ -122,6 +122,7 @@
                   <ConnectionBadge
                     computeStatus={deployment.currentVersionSummary
                       ?.computeStatus}
+                    showDot
                   />
                 </ComputeBadge>
               {/if}

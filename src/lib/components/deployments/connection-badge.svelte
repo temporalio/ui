@@ -12,8 +12,9 @@
 
   interface Props {
     computeStatus?: ComputeStatus;
+    showDot?: boolean;
   }
-  let { computeStatus }: Props = $props();
+  let { computeStatus, showDot = false }: Props = $props();
 
   const state = $derived(deriveConnectionStatus(computeStatus));
 
@@ -60,7 +61,9 @@
 
 <Tooltip text={tooltipText} topLeft width={250} usePortal>
   <p class="flex items-center justify-center gap-1 px-1 transition-colors">
-    <span class="size-2 rounded-full {dotClass[state]}"></span>
+    {#if showDot}
+      <span class="size-1.5 shrink-0 rounded-full {dotClass[state]}"></span>
+    {/if}
     <span class={connectionLabel({ state })}>{labelText}</span>
   </p>
 </Tooltip>
