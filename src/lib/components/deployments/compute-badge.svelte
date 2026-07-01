@@ -5,7 +5,6 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { ComputeStatus } from '$lib/types/deployments';
-  import type { ConnectionState } from '$lib/utilities/connection-status';
   import {
     deriveConnectionStatus,
     formatConnectionCheckTime,
@@ -26,18 +25,12 @@
     computeStatus ? deriveConnectionStatus(computeStatus) : undefined,
   );
 
-  const dotClass: Record<ConnectionState, string> = {
-    connected: 'bg-green-500',
-    failed: 'bg-red-500',
-    pending: 'bg-gray-400',
-  };
-
   const connectionText = cva([], {
     variants: {
       state: {
-        connected: 'text-green-600 dark:text-green-400',
-        failed: 'text-red-600 dark:text-red-400',
-        pending: 'text-secondary',
+        connected: 'text-success',
+        failed: 'text-danger',
+        pending: 'text-subtle',
       },
     },
   });
@@ -74,7 +67,11 @@
     <Icon name={config.icon} />
     <p>{config.label}</p>
     {#if state}
-      <span class="size-1.5 shrink-0 rounded-full {dotClass[state]}"></span>
+      <span
+        class="size-1.5 shrink-0 rounded-full bg-current {connectionText({
+          state,
+        })}"
+      ></span>
       <span class={connectionText({ state })}>{connectionLabel}</span>
     {/if}
   </div>

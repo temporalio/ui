@@ -19,9 +19,9 @@
   const connectionLabel = cva([], {
     variants: {
       state: {
-        connected: 'text-green-600 dark:text-green-400',
-        failed: 'text-red-600 dark:text-red-400',
-        pending: 'text-secondary',
+        connected: 'text-success',
+        failed: 'text-danger',
+        pending: 'text-subtle',
       },
     },
   });

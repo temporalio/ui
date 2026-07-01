@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import { Story, Template } from '@storybook/addon-svelte-csf';
   import type { Meta } from '@storybook/svelte';
+  import { expect, within } from '@storybook/test';
   import type { ComponentProps } from 'svelte';
 
   import type { ComputeStatus } from '$lib/types/deployments';
@@ -75,17 +76,47 @@
 <Story
   name="Lambda Connected"
   args={{ type: 'aws-lambda', computeStatus: connected }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Lambda')).toBeInTheDocument();
+    await expect(canvas.getByText('Connected')).toBeInTheDocument();
+  }}
 />
 <Story
   name="Lambda Failed"
   args={{ type: 'aws-lambda', computeStatus: failed }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Lambda')).toBeInTheDocument();
+    await expect(canvas.getByText('Failed')).toBeInTheDocument();
+  }}
 />
 <Story
   name="Lambda Pending"
   args={{ type: 'aws-lambda', computeStatus: pending }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Lambda')).toBeInTheDocument();
+    await expect(canvas.getByText('Pending')).toBeInTheDocument();
+  }}
 />
 <Story
   name="Cloud Run Pending"
   args={{ type: 'gcp-cloud-run', computeStatus: pending }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Cloud Run')).toBeInTheDocument();
+    await expect(canvas.getByText('Pending')).toBeInTheDocument();
+  }}
 />
-<Story name="Compute Only" args={{ type: 'aws-lambda' }} />
+<Story
+  name="Compute Only"
+  args={{ type: 'aws-lambda' }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Lambda')).toBeInTheDocument();
+    await expect(canvas.queryByText('Connected')).not.toBeInTheDocument();
+    await expect(canvas.queryByText('Pending')).not.toBeInTheDocument();
+    await expect(canvas.queryByText('Failed')).not.toBeInTheDocument();
+  }}
+/>
