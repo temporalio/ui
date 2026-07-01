@@ -128,38 +128,32 @@
   <DrawerContent title="Update Activity {activityId}">
     <form onsubmit={onUpdate} class="flex flex-col gap-4">
       <div>
-        <Label for="heartbeat-timeout" label="Heartbeat Timeout Duration" />
+        <Label
+          for="maximum-attempts"
+          label={translate('activities.retry-max-attempts')}
+        />
         <p class="mb-1 text-xs text-secondary">
-          Maximum permitted time between successful Worker Heartbeats.
+          {translate('activities.retry-max-attempts-description')}
         </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="heartbeat-timeout"
-            label="Heartbeat Timeout Duration"
-            labelHidden
-            bind:value={heartbeatTimeout}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(heartbeatTimeout))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(heartbeatTimeout)}
-          </p>
-        </div>
+        <NumberInput
+          id="maximum-attempts"
+          label={translate('activities.retry-max-attempts')}
+          labelHidden
+          bind:value={maximumAttempts}
+          class="w-24"
+        />
       </div>
       <div>
         <Label
           for="retry-backoff-coefficient"
-          label="Retry Backoff Coefficient"
+          label={translate('activities.retry-backoff-coefficient')}
         />
         <p class="mb-1 text-xs text-secondary">
-          Coefficient used to calculate the next retry interval. The next retry
-          interval is previous interval multiplied by the coefficient. Must be 1
-          or larger.
+          {translate('activities.retry-backoff-coefficient-description')}
         </p>
         <NumberInput
           id="retry-backoff-coefficient"
-          label="Retry Backoff Coefficient"
+          label={translate('activities.retry-backoff-coefficient')}
           labelHidden
           bind:value={backoffCoefficient}
           step={0.01}
@@ -170,16 +164,15 @@
       <div>
         <Label
           for="retry-initial-interval"
-          label="Retry Initial Interval Duration"
+          label={translate('activities.retry-initial-interval-duration')}
         />
         <p class="mb-1 text-xs text-secondary">
-          Interval of the first retry. If retryBackoffCoefficient is 1.0 then it
-          is used for all retries.
+          {translate('activities.retry-initial-interval-duration-description')}
         </p>
         <div class="flex flex-wrap items-center gap-2">
           <Input
             id="retry-initial-interval"
-            label="Retry Initial Interval Duration"
+            label={translate('activities.retry-initial-interval-duration')}
             labelHidden
             bind:value={initialInterval}
             suffix="sec"
@@ -192,58 +185,19 @@
         </div>
       </div>
       <div>
-        <Label for="maximum-attempts" label="Retry Maximum Attempts" />
-        <p class="mb-1 text-xs text-secondary">
-          Maximum number of attempts. When exceeded the retries stop even if not
-          expired yet. 1 disables retries. 0 means unlimited (up to the
-          timeouts).
-        </p>
-        <NumberInput
-          id="maximum-attempts"
-          label="Retry Maximum Attempts"
-          labelHidden
-          bind:value={maximumAttempts}
-          class="w-24"
-        />
-      </div>
-      <div>
-        <Label
-          for="schedule-to-close-timeout"
-          label="Schedule to Close Timeout Duration"
-        />
-        <p class="mb-1 text-xs text-secondary">
-          Indicates how long the caller is willing to wait for an Activity
-          completion. Limits how long retries will be attempted.
-        </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="schedule-to-close-timeout"
-            label="Schedule to Close Timeout Duration"
-            labelHidden
-            bind:value={scheduleToCloseTimeout}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(scheduleToCloseTimeout))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(scheduleToCloseTimeout)}
-          </p>
-        </div>
-      </div>
-      <div>
         <Label
           for="schedule-to-start-timeout"
-          label="Schedule to Start Timeout Duration"
+          label={translate('activities.schedule-to-start-timeout-duration')}
         />
         <p class="mb-1 text-xs text-secondary">
-          Limits time an Activity Task can stay in a task queue before a Worker
-          picks it up. This timeout is always non retryable, as all a retry
-          would achieve is to put it back into the same queue.
+          {translate(
+            'activities.schedule-to-start-timeout-duration-description',
+          )}
         </p>
         <div class="flex flex-wrap items-center gap-2">
           <Input
             id="schedule-to-start-timeout"
-            label="Schedule to Start Timeout Duration"
+            label={translate('activities.schedule-to-start-timeout-duration')}
             labelHidden
             bind:value={scheduleToStartTimeout}
             suffix="sec"
@@ -257,17 +211,41 @@
       </div>
       <div>
         <Label
-          for="start-to-close-timeout"
-          label="Start to Close Timeout Duration"
+          for="schedule-to-close-timeout"
+          label={translate('activities.schedule-to-close-timeout-duration')}
         />
         <p class="mb-1 text-xs text-secondary">
-          Maximum time an Activity is allowed to execute after being picked up
-          by a Worker. This Timeout is always retryable.
+          {translate(
+            'activities.schedule-to-close-timeout-duration-description',
+          )}
+        </p>
+        <div class="flex flex-wrap items-center gap-2">
+          <Input
+            id="schedule-to-close-timeout"
+            label={translate('activities.schedule-to-close-timeout-duration')}
+            labelHidden
+            bind:value={scheduleToCloseTimeout}
+            suffix="sec"
+            class="w-36"
+            error={isNaN(Number(scheduleToCloseTimeout))}
+          />
+          <p class="text-nowrap text-secondary">
+            {formatSecondsAbbreviated(scheduleToCloseTimeout)}
+          </p>
+        </div>
+      </div>
+      <div>
+        <Label
+          for="start-to-close-timeout"
+          label={translate('activities.start-to-close-timeout-duration')}
+        />
+        <p class="mb-1 text-xs text-secondary">
+          {translate('activities.start-to-close-timeout-duration-description')}
         </p>
         <div class="flex flex-wrap items-center gap-2">
           <Input
             id="start-to-close-timeout"
-            label="Start to Close Timeout Duration"
+            label={translate('activities.start-to-close-timeout-duration')}
             labelHidden
             bind:value={startToCloseTimeout}
             suffix="sec"
@@ -280,10 +258,36 @@
         </div>
       </div>
       <div>
-        <Label for="task-queue-name" label="Task Queue Name" />
+        <Label
+          for="heartbeat-timeout"
+          label={translate('activities.heartbeat-timeout-duration')}
+        />
+        <p class="mb-1 text-xs text-secondary">
+          {translate('activities.heartbeat-timeout-duration-description')}
+        </p>
+        <div class="flex flex-wrap items-center gap-2">
+          <Input
+            id="heartbeat-timeout"
+            label={translate('activities.heartbeat-timeout-duration')}
+            labelHidden
+            bind:value={heartbeatTimeout}
+            suffix="sec"
+            class="w-36"
+            error={isNaN(Number(heartbeatTimeout))}
+          />
+          <p class="text-nowrap text-secondary">
+            {formatSecondsAbbreviated(heartbeatTimeout)}
+          </p>
+        </div>
+      </div>
+      <div>
+        <Label
+          for="task-queue-name"
+          label={translate('activities.task-queue-name')}
+        />
         <Input
           id="task-queue-name"
-          label="Task Queue Name"
+          label={translate('activities.task-queue-name')}
           labelHidden
           bind:value={taskQueue}
           class="w-full"

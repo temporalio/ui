@@ -120,14 +120,10 @@
         {translate('standalone-activities.request-cancellation')}
       </Button>
     {:else}
-      <Button
-        on:click={onPause}
-        leadingIcon={isPaused ? 'play' : 'pause'}
-        size="sm"
-      >
+      <Button on:click={onPause} size="sm">
         {isPaused
-          ? translate('workflows.unpause')
-          : translate('workflows.pause')}
+          ? translate('standalone-activities.unpause-activity')
+          : translate('standalone-activities.pause-activity')}
       </Button>
     {/if}
   {/if}
@@ -144,10 +140,11 @@
       {#if isRunning}
         {#if !commandsDisabled}
           <MenuItem
-            onclick={() => (optionsUpdateDrawerOpen = true)}
-            data-testid="update-button"
+            onclick={() => (cancelConfirmationModalOpen = true)}
+            disabled={writeActionsDisabled}
+            data-testid="request-cancellation-button"
           >
-            {translate('common.update')}
+            {translate('standalone-activities.request-cancellation')}
           </MenuItem>
           <MenuItem
             onclick={() => (resetConfirmationModalOpen = true)}
@@ -156,11 +153,10 @@
             {translate('workflows.reset')}
           </MenuItem>
           <MenuItem
-            onclick={() => (cancelConfirmationModalOpen = true)}
-            disabled={writeActionsDisabled}
-            data-testid="request-cancellation-button"
+            onclick={() => (optionsUpdateDrawerOpen = true)}
+            data-testid="update-button"
           >
-            {translate('standalone-activities.request-cancellation')}
+            {translate('common.update')}
           </MenuItem>
           <MenuDivider />
         {/if}
