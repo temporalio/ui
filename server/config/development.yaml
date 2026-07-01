@@ -92,3 +92,13 @@ customUi:
           maxHeight: 480
         permissions:
           - context:workflow
+
+      - id: top-sub-nav
+        title: Notification Center
+        slot: app.top-nav.sub-nav
+        src: /custom-ui-examples/top-sub-nav.html
+        allowedOrigin: self
+        sizing:
+          defaultHeight: 32
+          minHeight: 32
+          maxHeight: 32
