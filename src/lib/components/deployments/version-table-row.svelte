@@ -391,7 +391,7 @@
   </CapabilityGuard>
   <CapabilityGuard capability="serverScaledDeployments">
     <td class="text-left">
-      {#if connectionVisible && isVersionSummaryNew(version)}
+      {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
         <ConnectionBadge computeStatus={version.computeStatus} />
       {:else}
         <span class="text-secondary">—</span>
