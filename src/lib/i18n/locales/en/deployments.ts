@@ -145,6 +145,5 @@ export const Strings = {
   'connection-pending': 'Pending',
   'connection-tooltip-pending':
     'Not validated yet. First automatic check runs within 6h.',
-  'connection-tooltip-connected': 'Checked {{ time }}',
-  'connection-tooltip-failed-checked': 'Checked {{ time }}',
+  'connection-tooltip-checked': 'Checked {{ time }}',
 } as const;

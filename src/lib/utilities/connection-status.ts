@@ -50,15 +50,12 @@ export const connectionTooltip = (computeStatus?: ComputeStatus): string => {
   if (state === 'pending') {
     return translate('deployments.connection-tooltip-pending');
   }
-  const time = formatConnectionCheckTime(
-    computeStatus?.providerValidation?.lastCheckTime,
-  );
-  if (state === 'connected') {
-    return translate('deployments.connection-tooltip-connected', { time });
-  }
+  const checked = translate('deployments.connection-tooltip-checked', {
+    time: formatConnectionCheckTime(
+      computeStatus?.providerValidation?.lastCheckTime,
+    ),
+  });
+  if (state === 'connected') return checked;
   const errorMessage = computeStatus?.providerValidation?.errorMessage ?? '';
-  return (
-    (errorMessage ? `${errorMessage}. ` : '') +
-    translate('deployments.connection-tooltip-failed-checked', { time })
-  );
+  return (errorMessage ? `${errorMessage}. ` : '') + checked;
 };
