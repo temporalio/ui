@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { cva } from 'class-variance-authority';
-
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import { translate } from '$lib/i18n/translate';
   import type { ComputeStatus } from '$lib/types/deployments';
   import {
+    connectionStateColor,
+    connectionStateLabel,
+    connectionTooltip,
     deriveConnectionStatus,
-    formatConnectionCheckTime,
   } from '$lib/utilities/connection-status';
 
   interface Props {
@@ -15,44 +14,12 @@
   let { computeStatus }: Props = $props();
 
   const state = $derived(deriveConnectionStatus(computeStatus));
-
-  const connectionLabel = cva([], {
-    variants: {
-      state: {
-        connected: 'text-success',
-        failed: 'text-danger',
-        pending: 'text-subtle',
-      },
-    },
-  });
-
-  const tooltipText = $derived.by((): string => {
-    if (state === 'pending') {
-      return translate('deployments.connection-tooltip-pending');
-    }
-    const time = formatConnectionCheckTime(
-      computeStatus?.providerValidation?.lastCheckTime,
-    );
-    if (state === 'connected') {
-      return translate('deployments.connection-tooltip-connected', { time });
-    }
-    const errorMessage = computeStatus?.providerValidation?.errorMessage ?? '';
-    return (
-      (errorMessage ? `${errorMessage}. ` : '') +
-      translate('deployments.connection-tooltip-failed-checked', { time })
-    );
-  });
-
-  const labelText = $derived.by((): string => {
-    if (state === 'connected')
-      return translate('deployments.connection-connected');
-    if (state === 'failed') return translate('deployments.connection-failed');
-    return translate('deployments.connection-pending');
-  });
 </script>
 
-<Tooltip text={tooltipText} topLeft width={250} usePortal>
+<Tooltip text={connectionTooltip(computeStatus)} topLeft width={250} usePortal>
   <p class="flex items-center justify-center gap-1 px-1 transition-colors">
-    <span class={connectionLabel({ state })}>{labelText}</span>
+    <span class={connectionStateColor[state]}
+      >{connectionStateLabel(state)}</span
+    >
   </p>
 </Tooltip>
