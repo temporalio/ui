@@ -18,12 +18,7 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { resetLastDataEncoderSuccess } from '$lib/stores/data-encoder-config';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
-  import {
-    currentEventHistory,
-    fullEventHistory,
-    pauseLiveUpdates,
-    timelineEvents,
-  } from '$lib/stores/events';
+  import { fullEventHistory, timelineEvents } from '$lib/stores/events';
   import {
     initialWorkflowRun,
     refresh,
@@ -34,6 +29,7 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
+  import { parseEventFilterParams } from '$lib/utilities/event-filter-params';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   interface Props {
@@ -47,6 +43,7 @@
   let workflowId = $derived(page.params.workflow);
   let runId = $derived(page.params.run);
   let showJson = $derived(page.url.searchParams.has('json'));
+  let pauseLiveUpdates = $derived(parseEventFilterParams(page.url).refresh_off);
   let fullJson = $derived({ ...$workflowRun, eventHistory: $fullEventHistory });
 
   let workflowError: NetworkError | null = $state(null);
@@ -90,7 +87,6 @@
     workflowId: string,
     runId: string,
   ) => {
-    const { settings } = page.data;
     const { workflow, error } = await fetchWorkflow({
       namespace,
       workflowId,
@@ -114,6 +110,7 @@
     $workflowRun = { ...$workflowRun, workflow, workers, workersLoaded: true };
 
     workflowRunController = new AbortController();
+    const signal = pauseLiveUpdates ? undefined : workflowRunController.signal;
 
     if (workflow.isRunning && workers?.pollers?.length) {
       getWorkflowMetadata(
@@ -124,20 +121,24 @@
             runId,
           },
         },
-        workflowRunController.signal,
+        signal,
       ).then((metadata) => {
         $workflowRun.metadata = metadata;
       });
     }
 
-    $fullEventHistory = await fetchAllEvents({
+    const events = await fetchAllEvents({
       namespace,
       workflowId,
       runId,
       sort: 'ascending',
-      signal: workflowRunController.signal,
+      signal,
       historySize: workflow.historyEvents,
     });
+
+    if (signal?.aborted) return;
+
+    $fullEventHistory = events;
   };
 
   const getOnlyWorkflowWithPendingActivities = async (
@@ -147,7 +148,6 @@
     const shouldFetch =
       refresh.timestamp &&
       (refresh.action || (!pause && $workflowRun?.workflow?.isRunning));
-
     if (shouldFetch) {
       const { workflow, error } = await fetchWorkflow({
         namespace,
@@ -197,16 +197,13 @@
 
   $effect(() => {
     const refreshValue = $refresh;
-    const pause = $pauseLiveUpdates;
+    const pause = pauseLiveUpdates;
+    if (pause && workflowRunController) {
+      workflowRunController.abort();
+    }
     untrack(() => {
       getOnlyWorkflowWithPendingActivities(refreshValue, pause);
     });
-  });
-
-  $effect(() => {
-    if (!$pauseLiveUpdates) {
-      $currentEventHistory = $fullEventHistory;
-    }
   });
 
   onMount(() => {
