@@ -14,14 +14,16 @@ export type QueryKey =
   | 'StartTime'
   | 'CloseTime'
   | 'ExecutionTime'
-  | 'ExecutionStatus';
+  | 'ExecutionStatus'
+  | 'ActivityId';
 
 export type FilterKey =
   | 'workflowId'
   | 'workflowType'
   | 'timeRange'
   | 'executionStatus'
-  | 'closeTime';
+  | 'closeTime'
+  | 'activityId';
 
 type FilterValue = string | Duration;
 
@@ -31,6 +33,7 @@ const queryKeys: Readonly<Record<string, QueryKey>> = {
   timeRange: 'StartTime',
   executionStatus: 'ExecutionStatus',
   closeTime: 'CloseTime',
+  activityId: 'ActivityId',
 } as const;
 
 const filterKeys: readonly FilterKey[] = [
@@ -39,6 +42,7 @@ const filterKeys: readonly FilterKey[] = [
   'timeRange',
   'executionStatus',
   'closeTime',
+  'activityId',
 ] as const;
 
 const isValid = (value: unknown): boolean => {
