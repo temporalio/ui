@@ -29,6 +29,7 @@ export const Strings = {
   version: 'Version',
   status: 'Status',
   'build-status': 'Build Status',
+  lifecycle: 'Lifecycle',
   'config-status': 'Config Status',
   current: 'Current',
   latest: 'Latest',

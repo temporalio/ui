@@ -118,11 +118,12 @@
             </Copyable>
             <CapabilityGuard capability="serverScaledDeployments">
               {#if currentComputeProviderType}
-                <ComputeBadge type={currentComputeProviderType} />
-                <ConnectionBadge
-                  computeStatus={deployment.currentVersionSummary
-                    ?.computeStatus}
-                />
+                <ComputeBadge type={currentComputeProviderType}>
+                  <ConnectionBadge
+                    computeStatus={deployment.currentVersionSummary
+                      ?.computeStatus}
+                  />
+                </ComputeBadge>
               {/if}
             </CapabilityGuard>
           </div>

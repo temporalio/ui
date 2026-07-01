@@ -143,7 +143,7 @@
       </caption>
       <tr slot="headers">
         <th>{translate('deployments.build-id')}</th>
-        <th>{translate('deployments.build-status')}</th>
+        <th>{translate('deployments.lifecycle')}</th>
         <CapabilityGuard capability="serverScaledDeployments">
           <th>{translate('deployments.compute')}</th>
         </CapabilityGuard>
