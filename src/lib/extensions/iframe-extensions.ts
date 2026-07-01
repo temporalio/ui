@@ -72,6 +72,25 @@ export const isIframeExtensionAllowed = (
   return src.origin === allowedOrigin;
 };
 
+export const effectiveAllowSameOrigin = (
+  extension: Pick<IframeExtension, 'allowedOrigin' | 'sandbox' | 'src'>,
+  currentOrigin: string,
+): boolean => {
+  if (!extension.sandbox.allowSameOrigin) return false;
+
+  const allowedOrigin = resolveAllowedOrigin(
+    extension.allowedOrigin,
+    currentOrigin,
+  );
+  const src = resolveExtensionSrc(extension.src, currentOrigin);
+
+  if (!allowedOrigin || !src) return false;
+  if (src.origin !== allowedOrigin) return false;
+  if (src.origin === currentOrigin) return false;
+
+  return src.protocol === 'https:';
+};
+
 export const extensionMatchesRoute = (
   extension: Pick<IframeExtension, 'routePatterns'>,
   pathname: string,
@@ -109,7 +128,10 @@ export const extensionsForSlot = (
   );
 };
 
-export const buildIframeSandbox = (sandbox: IframeExtensionSandbox): string => {
+export const buildIframeSandbox = (
+  sandbox: IframeExtensionSandbox,
+  allowSameOrigin = sandbox.allowSameOrigin,
+): string => {
   const tokens = new Set(['allow-scripts']);
 
   if (sandbox.allowDownloads) tokens.add('allow-downloads');
@@ -121,7 +143,7 @@ export const buildIframeSandbox = (sandbox: IframeExtensionSandbox): string => {
   if (sandbox.allowPopupsToEscapeSandbox) {
     tokens.add('allow-popups-to-escape-sandbox');
   }
-  if (sandbox.allowSameOrigin) tokens.add('allow-same-origin');
+  if (allowSameOrigin) tokens.add('allow-same-origin');
 
   return [...tokens].join(' ');
 };

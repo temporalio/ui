@@ -271,6 +271,13 @@ that sandbox arrive with origin `null`, so Temporal UI validates both the
 configured iframe `src` and the `event.source` window. If `allowSameOrigin` is
 enabled, messages must come from the configured `allowedOrigin`.
 
+Temporal UI only honors `allowSameOrigin` for extensions hosted on a dedicated
+HTTPS origin that is different from the Temporal UI origin. It is ignored for
+`allowedOrigin: self`, relative same-origin `src` values, and local HTTP
+development origins. Extensions that need `allowSameOrigin` should be hosted on
+a separate HTTPS subdomain, for example
+`https://temporal-ui-extensions.example.com`.
+
 Only enable sandbox permissions the extension actually needs.
 
 ## Sizing

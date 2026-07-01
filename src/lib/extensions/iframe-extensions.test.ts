@@ -5,6 +5,7 @@ import type { IframeExtension } from '$lib/types/global';
 import {
   buildIframeSandbox,
   clampHeight,
+  effectiveAllowSameOrigin,
   extensionMatchesRoute,
   initialHeight,
   initialWidth,
@@ -141,6 +142,55 @@ describe('iframe sandbox and sizing', () => {
     ).toBe(
       'allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox',
     );
+  });
+
+  it('ignores allow-same-origin for same-origin extensions', () => {
+    const sameOriginExtension = extension({
+      sandbox: {
+        ...extension().sandbox,
+        allowSameOrigin: true,
+      },
+    });
+
+    const allowSameOrigin = effectiveAllowSameOrigin(
+      sameOriginExtension,
+      currentOrigin,
+    );
+
+    expect(allowSameOrigin).toBe(false);
+    expect(
+      buildIframeSandbox(sameOriginExtension.sandbox, allowSameOrigin),
+    ).toBe('allow-scripts');
+  });
+
+  it('requires a dedicated https extension origin for allow-same-origin', () => {
+    expect(
+      effectiveAllowSameOrigin(
+        extension({
+          src: 'https://extensions.example.com/panel.html',
+          allowedOrigin: 'https://extensions.example.com',
+          sandbox: {
+            ...extension().sandbox,
+            allowSameOrigin: true,
+          },
+        }),
+        currentOrigin,
+      ),
+    ).toBe(true);
+
+    expect(
+      effectiveAllowSameOrigin(
+        extension({
+          src: 'http://localhost:3000/panel.html',
+          allowedOrigin: 'http://localhost:3000',
+          sandbox: {
+            ...extension().sandbox,
+            allowSameOrigin: true,
+          },
+        }),
+        currentOrigin,
+      ),
+    ).toBe(false);
   });
 
   it('clamps resize heights to configured bounds', () => {

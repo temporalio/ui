@@ -7,6 +7,7 @@
     buildIframeSandbox,
     clampHeight,
     clampWidth,
+    effectiveAllowSameOrigin,
     initialHeight,
     initialWidth,
     isIframeExtensionAllowed,
@@ -43,18 +44,21 @@
   );
   const src = $derived(resolveExtensionSrc(extension.src, currentOrigin));
   const allowed = $derived(isIframeExtensionAllowed(extension, currentOrigin));
-  const sandbox = $derived(buildIframeSandbox(extension.sandbox));
+  const allowSameOrigin = $derived(
+    effectiveAllowSameOrigin(extension, currentOrigin),
+  );
+  const sandbox = $derived(
+    buildIframeSandbox(extension.sandbox, allowSameOrigin),
+  );
   const theme = $derived($useDarkMode ? 'dark' : 'light');
   const containerStyle = $derived(
     `height: ${height}px; width: ${width == null ? '100%' : `${width}px`};`,
   );
-  const messageTargetOrigin = $derived(
-    extension.sandbox.allowSameOrigin ? allowedOrigin : '*',
-  );
+  const messageTargetOrigin = $derived(allowSameOrigin ? allowedOrigin : '*');
 
   const messageOriginMatches = (event: MessageEvent) => {
     if (event.origin === allowedOrigin) return true;
-    return !extension.sandbox.allowSameOrigin && event.origin === 'null';
+    return !allowSameOrigin && event.origin === 'null';
   };
 
   const postMessageToIframe = (message: HostMessage) => {
