@@ -71,6 +71,41 @@ export interface NetworkError {
   message?: string;
 }
 
+export type IframeExtensionSandbox = {
+  allowDownloads: boolean;
+  allowForms: boolean;
+  allowModals: boolean;
+  allowPopups: boolean;
+  allowPopupsToEscapeSandbox: boolean;
+  allowSameOrigin: boolean;
+};
+
+export type IframeExtensionSizing = {
+  defaultHeight?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  defaultWidth?: number;
+  minWidth?: number;
+  maxWidth?: number;
+};
+
+export type IframeExtension = {
+  id: string;
+  title: string;
+  slot: string;
+  src: string;
+  allowedOrigin: string;
+  routePatterns: string[];
+  sandbox: IframeExtensionSandbox;
+  sizing: IframeExtensionSizing;
+  permissions: string[];
+};
+
+export type CustomUISettings = {
+  enabled: boolean;
+  iframeExtensions: IframeExtension[];
+};
+
 export type Settings = {
   auth: {
     enabled: boolean;
@@ -99,11 +134,15 @@ export type Settings = {
   workflowPauseDisabled: boolean;
   hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
+  startWorkflowDisabled: boolean;
+  refreshWorkflowCountsDisabled: boolean;
   activityCommandsDisabled: boolean;
+  customUi: CustomUISettings;
   showTemporalSystemNamespace: boolean;
   navCollapsedByDefault: boolean;
   feedbackURL: string;
   disableNewsFetch: boolean;
+  supportURL?: string;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;

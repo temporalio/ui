@@ -1,7 +1,7 @@
 import { BROWSER } from 'esm-env';
 
 import type { SettingsResponse } from '$lib/types';
-import type { Settings } from '$lib/types/global';
+import type { IframeExtension, Settings } from '$lib/types/global';
 import { getApiOrigin } from '$lib/utilities/get-api-origin';
 import { getEnvironment } from '$lib/utilities/get-environment';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -35,6 +35,45 @@ const emptySettingsResponse: SettingsResponse = {
   FeedbackURL: '',
   DisableNewsFetch: false,
   Version: '',
+};
+
+const positiveNumberOrUndefined = (value?: number): number | undefined => {
+  return typeof value === 'number' && value > 0 ? value : undefined;
+};
+
+const mapIframeExtensions = (
+  settingsResponse: SettingsResponse,
+): IframeExtension[] => {
+  return (
+    settingsResponse?.CustomUI?.IframeExtensions?.map((extension) => ({
+      id: extension.ID,
+      title: extension.Title || extension.ID,
+      slot: extension.Slot,
+      src: extension.Src,
+      allowedOrigin: extension.AllowedOrigin,
+      routePatterns: extension.RoutePatterns ?? [],
+      sandbox: {
+        allowDownloads: !!extension.Sandbox?.AllowDownloads,
+        allowForms: !!extension.Sandbox?.AllowForms,
+        allowModals: !!extension.Sandbox?.AllowModals,
+        allowPopups: !!extension.Sandbox?.AllowPopups,
+        allowPopupsToEscapeSandbox:
+          !!extension.Sandbox?.AllowPopupsToEscapeSandbox,
+        allowSameOrigin: !!extension.Sandbox?.AllowSameOrigin,
+      },
+      sizing: {
+        defaultHeight: positiveNumberOrUndefined(
+          extension.Sizing?.DefaultHeight,
+        ),
+        minHeight: positiveNumberOrUndefined(extension.Sizing?.MinHeight),
+        maxHeight: positiveNumberOrUndefined(extension.Sizing?.MaxHeight),
+        defaultWidth: positiveNumberOrUndefined(extension.Sizing?.DefaultWidth),
+        minWidth: positiveNumberOrUndefined(extension.Sizing?.MinWidth),
+        maxWidth: positiveNumberOrUndefined(extension.Sizing?.MaxWidth),
+      },
+      permissions: extension.Permissions ?? [],
+    })) ?? []
+  );
 };
 
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
@@ -78,11 +117,16 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     refreshWorkflowCountsDisabled:
       !!settingsResponse?.RefreshWorkflowCountsDisabled,
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
+    customUi: {
+      enabled: !!settingsResponse?.CustomUI?.Enabled,
+      iframeExtensions: mapIframeExtensions(settingsResponse),
+    },
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
     navCollapsedByDefault: !!settingsResponse?.NavCollapsedByDefault,
     feedbackURL: settingsResponse?.FeedbackURL,
     disableNewsFetch: !!settingsResponse?.DisableNewsFetch,
+    supportURL: settingsResponse?.SupportURL,
     runtimeEnvironment: {
       get isCloud() {
         if (EnvironmentOverride) {
