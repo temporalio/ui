@@ -51,6 +51,7 @@ func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
 	e.GET("/android*", assetsHandler)
 	e.GET("/apple*", assetsHandler)
 	e.GET("/banner*", assetsHandler)
+	e.GET("/custom-ui-examples/*", assetsHandler)
 	e.GET("/favicon*", assetsHandler)
 	e.GET("/logo*", assetsHandler)
 	e.GET("/Temporal_Logo_Animation.gif", assetsHandler)

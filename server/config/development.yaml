@@ -62,3 +62,33 @@ codec:
   defaultErrorLink:
 forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
   - X-Forwarded-For
+customUi:
+    enabled: true
+    iframeExtensions:
+      - id: top-nav-status
+        title: Notification Center
+        slot: app.top-nav.actions.after
+        src: /custom-ui-examples/top-nav.html
+        allowedOrigin: self
+        sizing:
+          defaultWidth: 220
+          minWidth: 220
+          maxWidth: 220
+          defaultHeight: 32
+          minHeight: 32
+          maxHeight: 32
+
+      - id: workflow-header-summary
+        title: PulseMeter metrics login
+        slot: workflow.header.after-details
+        src: /custom-ui-examples/workflow-header.html
+        allowedOrigin: self
+        routePatterns:
+          - /namespaces/:namespace/workflows/:workflow/:run/*
+        sizing:
+          defaultWidth: 400
+          defaultHeight: 140
+          minHeight: 96
+          maxHeight: 480
+        permissions:
+          - context:workflow

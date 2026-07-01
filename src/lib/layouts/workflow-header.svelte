@@ -10,6 +10,7 @@
   import DetailListLabel from '$lib/components/detail-list/detail-list-label.svelte';
   import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
   import DetailList from '$lib/components/detail-list/detail-list.svelte';
+  import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
@@ -184,6 +185,19 @@
   </div>
   <CodecServerErrorBanner />
   <WorkflowDetails workflow={workflow!} next={workflowRelationships.next} />
+  <ExtensionSlot
+    name="workflow.header.after-details"
+    class="flex w-full flex-col gap-2"
+    context={{
+      workflow: {
+        workflowId,
+        runId,
+        status: workflow?.status,
+        taskQueue: workflow?.taskQueue,
+        workflowType: workflow?.name,
+      },
+    }}
+  />
   {#if cancelInProgress}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
