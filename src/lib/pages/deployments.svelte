@@ -36,7 +36,7 @@
 
   const columns = [
     { label: translate('deployments.deployment') },
-    { label: translate('deployments.latest-version') },
+    { label: translate('deployments.current-version') },
     { label: translate('deployments.created') },
   ];
 </script>

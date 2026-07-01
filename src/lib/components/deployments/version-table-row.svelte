@@ -35,6 +35,7 @@
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 
   import ComputeBadge from './compute-badge.svelte';
+  import ConnectionBadge from './connection-badge.svelte';
   import DeleteVersionModal from './delete-version-modal.svelte';
   import DeploymentStatus from './deployment-status.svelte';
   import SetCurrentVersionModal from './set-current-version-modal.svelte';
@@ -133,6 +134,12 @@
   );
   const computeProviderType = $derived(
     computeScalingGroup?.providerType ?? computeScalingGroup?.provider?.type,
+  );
+
+  const connectionVisible = $derived(
+    isCurrent ||
+      isRamping ||
+      parseVersionStatus(drainageStatus).status === 'Draining',
   );
 
   const workflowHref = $derived(
@@ -382,6 +389,15 @@
       <ComputeBadge type={computeProviderType} />
     </td>
   </CapabilityGuard>
+  <CapabilityGuard capability="serverScaledDeployments">
+    <td class="text-left">
+      {#if connectionVisible && isVersionSummaryNew(version)}
+        <ConnectionBadge computeStatus={version.computeStatus} />
+      {:else}
+        <span class="text-secondary">—</span>
+      {/if}
+    </td>
+  </CapabilityGuard>
   <Timestamp
     as="td"
     class="whitespace-pre-line break-words text-left"
@@ -406,7 +422,7 @@
 
 {#if expanded}
   <tr class="surface-primary border-y border-subtle">
-    <td colspan={5} class="!p-1">
+    <td colspan={6} class="!p-1">
       <VersionRowDetails
         {namespace}
         {deploymentName}

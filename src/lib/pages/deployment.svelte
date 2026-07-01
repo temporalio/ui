@@ -147,6 +147,9 @@
         <CapabilityGuard capability="serverScaledDeployments">
           <th>{translate('deployments.compute')}</th>
         </CapabilityGuard>
+        <CapabilityGuard capability="serverScaledDeployments">
+          <th>{translate('deployments.connection')}</th>
+        </CapabilityGuard>
         <th>{translate('deployments.deployed')}</th>
         <th>{translate('deployments.actions')}</th>
       </tr>

@@ -17,15 +17,14 @@
   } from '$lib/services/deployments-service';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { WorkerDeploymentSummary } from '$lib/types/deployments';
-  import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
     routeForWorkerDeployment,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
 
   import ComputeBadge from './compute-badge.svelte';
+  import ConnectionBadge from './connection-badge.svelte';
   import DeleteDeploymentModal from './delete-deployment-modal.svelte';
-  import DeploymentStatus from './deployment-status.svelte';
 
   interface Props {
     deployment: WorkerDeploymentSummary;
@@ -67,26 +66,17 @@
     onChange?.();
   }
 
-  const latestBuildId = $derived(
-    deployment?.latestVersionSummary?.deploymentVersion?.buildId,
+  const currentBuildId = $derived(
+    deployment?.currentVersionSummary?.deploymentVersion?.buildId,
   );
 
-  const latestVersionStatus = $derived(
-    deployment?.latestVersionSummary?.status
-      ? parseVersionStatus(
-          deployment.latestVersionSummary.status,
-          deployment?.routingConfig?.rampingVersionPercentage,
-        )
-      : null,
-  );
-
-  const latestScalingGroup = $derived(
+  const currentScalingGroup = $derived(
     Object.values(
-      deployment.latestVersionSummary?.computeConfig?.scalingGroups ?? {},
+      deployment.currentVersionSummary?.computeConfig?.scalingGroups ?? {},
     )[0],
   );
-  const latestComputeProviderType = $derived(
-    latestScalingGroup?.providerType ?? latestScalingGroup?.provider?.type,
+  const currentComputeProviderType = $derived(
+    currentScalingGroup?.providerType ?? currentScalingGroup?.provider?.type,
   );
 </script>
 
@@ -107,39 +97,40 @@
           >
         </Copyable>
       </td>
-    {:else if label === translate('deployments.latest-version')}
+    {:else if label === translate('deployments.current-version')}
       <td class="py-1 text-left">
-        {#if latestBuildId}
+        {#if currentBuildId}
           <div class="flex items-center gap-2">
             <Copyable
               container-class="min-w-32 shrink-0"
-              content={latestBuildId}
+              content={currentBuildId}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
             >
               <Link
                 href={routeForWorkflowsWithQuery({
                   namespace: page.params.namespace,
-                  query: `TemporalWorkerDeploymentVersion="${deployment.name}:${latestBuildId}"`,
+                  query: `TemporalWorkerDeploymentVersion="${deployment.name}:${currentBuildId}"`,
                 }) ?? ''}
               >
-                {latestBuildId}
+                {currentBuildId}
               </Link>
             </Copyable>
-            {#if latestVersionStatus}
-              <DeploymentStatus
-                status={latestVersionStatus.status}
-                label={latestVersionStatus.label}
-              />
-            {/if}
             <CapabilityGuard capability="serverScaledDeployments">
-              {#if latestComputeProviderType}
-                <ComputeBadge type={latestComputeProviderType} />
+              {#if currentComputeProviderType}
+                <ComputeBadge type={currentComputeProviderType} />
               {/if}
+            </CapabilityGuard>
+            <CapabilityGuard capability="serverScaledDeployments">
+              <ConnectionBadge
+                computeStatus={deployment.currentVersionSummary?.computeStatus}
+              />
             </CapabilityGuard>
           </div>
         {:else}
-          <span class="text-secondary">—</span>
+          <span class="text-secondary"
+            >{translate('deployments.unversioned')}</span
+          >
         {/if}
       </td>
     {:else if label === translate('deployments.created')}
