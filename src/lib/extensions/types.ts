@@ -3,6 +3,7 @@ export const TEMPORAL_EXTENSION_MESSAGE_VERSION = 1;
 export const TEMPORAL_EXTENSION_SLOTS = [
   'app.top-nav.actions.after',
   'workflow.header.after-details',
+  'app.top-nav.sub-nav',
 ] as const;
 
 export type TemporalExtensionSlot = (typeof TEMPORAL_EXTENSION_SLOTS)[number];
