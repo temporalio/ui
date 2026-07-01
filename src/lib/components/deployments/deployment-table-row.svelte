@@ -23,7 +23,6 @@
   } from '$lib/utilities/route-for';
 
   import ComputeBadge from './compute-badge.svelte';
-  import ConnectionBadge from './connection-badge.svelte';
   import DeleteDeploymentModal from './delete-deployment-modal.svelte';
 
   interface Props {
@@ -118,13 +117,11 @@
             </Copyable>
             <CapabilityGuard capability="serverScaledDeployments">
               {#if currentComputeProviderType}
-                <ComputeBadge type={currentComputeProviderType}>
-                  <ConnectionBadge
-                    computeStatus={deployment.currentVersionSummary
-                      ?.computeStatus}
-                    showDot
-                  />
-                </ComputeBadge>
+                <ComputeBadge
+                  type={currentComputeProviderType}
+                  computeStatus={deployment.currentVersionSummary
+                    ?.computeStatus}
+                />
               {/if}
             </CapabilityGuard>
           </div>
