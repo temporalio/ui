@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import { z } from 'zod/v3';
@@ -7,6 +8,7 @@
   import TaintedBadge from '$lib/components/form/tainted-badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import type {
@@ -18,29 +20,58 @@
 
   interface Props {
     class?: string;
+    description?: Snippet;
     initialAttributes: SearchAttributeDefinition[];
     onSave: (attributes: SearchAttributeDefinition[]) => Promise<void>;
     onSuccess?: (attributes: SearchAttributeDefinition[]) => void;
     onCancel?: () => void;
     hideTainted?: boolean;
-    hideCancelButton?: boolean;
     disableTypeForExisting?: boolean;
-    getSupportedTypes: () => SearchAttributeTypeOption[];
+    isCloud?: boolean;
   }
 
   let {
     class: className = '',
+    description,
     initialAttributes,
     onSave,
     onSuccess = () => {},
     onCancel,
     hideTainted = false,
-    hideCancelButton = false,
     disableTypeForExisting = false,
-    getSupportedTypes,
+    isCloud = false,
   }: Props = $props();
 
-  const supportedTypes = $derived(getSupportedTypes());
+  const supportedTypes: SearchAttributeTypeOption[] = [
+    {
+      label: translate('search-attributes.type-keyword'),
+      value: 'Keyword',
+    },
+    {
+      label: translate('search-attributes.type-text'),
+      value: 'Text',
+    },
+    {
+      label: translate('search-attributes.type-int'),
+      value: 'Int',
+    },
+    {
+      label: translate('search-attributes.type-double'),
+      value: 'Double',
+    },
+    {
+      label: translate('search-attributes.type-bool'),
+      value: 'Bool',
+    },
+    {
+      label: translate('search-attributes.type-datetime'),
+      value: 'Datetime',
+    },
+    {
+      label: translate('search-attributes.type-keywordlist'),
+      value: 'KeywordList',
+    },
+  ];
   const defaultType = $derived(supportedTypes[0]?.value || '');
 
   // Create form schema
@@ -54,6 +85,7 @@
               .min(1, translate('search-attributes.validation-name-required')),
             type: z.enum(typeValues as [string, ...string[]]),
             isDeletable: z.boolean().optional().default(true),
+            isExisting: z.boolean().optional().default(false),
             initialName: z.string().optional().default(''),
           }),
         )
@@ -69,8 +101,9 @@
     });
   };
 
-  const typeValues = getSupportedTypes().map((type) => type.value);
+  const typeValues = supportedTypes.map((type) => type.value);
 
+  // svelte-ignore state_referenced_locally
   const {
     form: formData,
     errors,
@@ -109,7 +142,7 @@
   const addAttribute = () => {
     $formData.attributes = [
       ...$formData.attributes,
-      { name: '', type: defaultType, isDeletable: true },
+      { name: '', type: defaultType, isDeletable: true, isExisting: false },
     ];
   };
 
@@ -140,9 +173,19 @@
         <h2 class="text-base font-medium">
           {translate('search-attributes.title')}
         </h2>
-        <p class="text-sm text-secondary">
-          {translate('search-attributes.description')}
-        </p>
+        {#if description}
+          {@render description()}
+        {:else}
+          <p class="text-sm text-secondary">
+            {translate('search-attributes.description')}
+            <Link
+              href="https://docs.temporal.io/search-attribute"
+              newTab
+              trailingIcon="book"
+              >{translate('search-attributes.docs-link')}</Link
+            >.
+          </p>
+        {/if}
       </div>
 
       <div class="space-y-3 pb-3">
@@ -155,7 +198,7 @@
           <div class="w-8"></div>
         </div>
 
-        {#each $formData.attributes as _, index}
+        {#each $formData.attributes as _, index (index)}
           <SearchAttributeRow
             name={$formData.attributes[index].name}
             type={$formData.attributes[index].type}
@@ -164,7 +207,9 @@
             submitting={$submitting}
             error={$errors?.attributes?.[index]?.['name']?.[0]}
             {disableTypeForExisting}
-            isDeletable={$formData.attributes[index].isDeletable ?? true}
+            {isCloud}
+            isDeletable={$formData.attributes[index].isDeletable}
+            isExisting={$formData.attributes[index].isExisting}
             onRemove={() => removeAttribute(index)}
             onNameChange={(value) => {
               $formData.attributes[index].name = value;
@@ -192,18 +237,15 @@
           <TaintedBadge show={!hideTainted} count={taintedCount} />
           {translate('search-attributes.save-button')}
         </Button>
-
-        {#if !hideCancelButton}
-          <Button
-            variant="secondary"
-            size="sm"
-            on:click={handleCancel}
-            disabled={$submitting}
-            type="button"
-          >
-            {translate('common.cancel')}
-          </Button>
-        {/if}
+        <Button
+          variant="secondary"
+          size="sm"
+          on:click={handleCancel}
+          disabled={$submitting}
+          type="button"
+        >
+          {translate('common.cancel')}
+        </Button>
       </div>
     </div>
   </form>
