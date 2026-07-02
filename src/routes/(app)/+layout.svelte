@@ -6,6 +6,7 @@
 
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
+  import ExtensionSlot from '$lib/components/extensions/extension-slot.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
@@ -390,6 +391,7 @@
       {/if}
       <UserMenu {logout} />
     </TopNavigation>
+    <ExtensionSlot name="app.top-nav.sub-nav" />
     {#snippet main()}
       <div class="flex h-[calc(100%-2.5rem)] w-full flex-col gap-4 p-4 md:p-8">
         <ErrorBoundary>

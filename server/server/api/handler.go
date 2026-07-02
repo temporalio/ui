@@ -65,6 +65,7 @@ type SettingsResponse struct {
 	NavCollapsedByDefault         bool
 	FeedbackURL                   string
 	Codec                         *CodecResponse
+	CustomUI                      *CustomUIResponse
 	Version                       string
 	DisableWriteActions           bool
 	WorkflowTerminateDisabled     bool
@@ -78,6 +79,41 @@ type SettingsResponse struct {
 	HideWorkflowQueryErrors       bool
 	RefreshWorkflowCountsDisabled bool
 	ActivityCommandsDisabled      bool
+}
+
+type CustomUIResponse struct {
+	Enabled          bool
+	IframeExtensions []IframeExtensionResponse
+}
+
+type IframeExtensionResponse struct {
+	ID            string
+	Title         string
+	Slot          string
+	Src           string
+	AllowedOrigin string
+	RoutePatterns []string
+	Sandbox       IframeSandboxResponse
+	Sizing        IframeExtensionSizingResponse
+	Permissions   []string
+}
+
+type IframeSandboxResponse struct {
+	AllowDownloads             bool
+	AllowForms                 bool
+	AllowModals                bool
+	AllowPopups                bool
+	AllowPopupsToEscapeSandbox bool
+	AllowSameOrigin            bool
+}
+
+type IframeExtensionSizingResponse struct {
+	DefaultHeight int
+	MinHeight     int
+	MaxHeight     int
+	DefaultWidth  int
+	MinWidth      int
+	MaxWidth      int
 }
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware, conn *grpc.ClientConn) echo.HandlerFunc {
@@ -112,6 +148,46 @@ func CreateGRPCConnection(cfgProvider *config.ConfigProviderWithRefresh) (*grpc.
 	return conn, nil
 }
 
+func customUIResponse(customUI config.CustomUI) *CustomUIResponse {
+	if customUI.IframeExtensions == nil {
+		customUI.IframeExtensions = []config.IframeExtension{}
+	}
+
+	iframeExtensions := make([]IframeExtensionResponse, 0, len(customUI.IframeExtensions))
+	for _, extension := range customUI.IframeExtensions {
+		iframeExtensions = append(iframeExtensions, IframeExtensionResponse{
+			ID:            extension.ID,
+			Title:         extension.Title,
+			Slot:          extension.Slot,
+			Src:           extension.Src,
+			AllowedOrigin: extension.AllowedOrigin,
+			RoutePatterns: extension.RoutePatterns,
+			Sandbox: IframeSandboxResponse{
+				AllowDownloads:             extension.Sandbox.AllowDownloads,
+				AllowForms:                 extension.Sandbox.AllowForms,
+				AllowModals:                extension.Sandbox.AllowModals,
+				AllowPopups:                extension.Sandbox.AllowPopups,
+				AllowPopupsToEscapeSandbox: extension.Sandbox.AllowPopupsToEscapeSandbox,
+				AllowSameOrigin:            extension.Sandbox.AllowSameOrigin,
+			},
+			Sizing: IframeExtensionSizingResponse{
+				DefaultHeight: extension.Sizing.DefaultHeight,
+				MinHeight:     extension.Sizing.MinHeight,
+				MaxHeight:     extension.Sizing.MaxHeight,
+				DefaultWidth:  extension.Sizing.DefaultWidth,
+				MinWidth:      extension.Sizing.MinWidth,
+				MaxWidth:      extension.Sizing.MaxWidth,
+			},
+			Permissions: extension.Permissions,
+		})
+	}
+
+	return &CustomUIResponse{
+		Enabled:          customUI.Enabled,
+		IframeExtensions: iframeExtensions,
+	}
+}
+
 func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Context) error {
 	return func(c echo.Context) error {
 		cfg, err := cfgProvider.GetConfig()
@@ -144,6 +220,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 				DefaultErrorMessage: cfg.Codec.DefaultErrorMessage,
 				DefaultErrorLink:    cfg.Codec.DefaultErrorLink,
 			},
+			CustomUI:                      customUIResponse(cfg.CustomUI),
 			Version:                       version.UIVersion,
 			DisableWriteActions:           cfg.DisableWriteActions,
 			WorkflowTerminateDisabled:     cfg.WorkflowTerminateDisabled,

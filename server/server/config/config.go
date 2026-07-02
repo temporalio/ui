@@ -69,6 +69,8 @@ type (
 		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
 		// Whether to disable activity commands in the UI
 		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
+		// Custom UI extensions that can mount iframe content into stable UI slots
+		CustomUI CustomUI `yaml:"customUi"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
 		HideLogs       bool     `yaml:"hideLogs"`
@@ -141,6 +143,41 @@ type (
 		IncludeCredentials  bool   `yaml:"includeCredentials"`
 		DefaultErrorMessage string `yaml:"defaultErrorMessage"`
 		DefaultErrorLink    string `yaml:"defaultErrorLink"`
+	}
+
+	CustomUI struct {
+		Enabled          bool              `yaml:"enabled"`
+		IframeExtensions []IframeExtension `yaml:"iframeExtensions"`
+	}
+
+	IframeExtension struct {
+		ID            string                `yaml:"id"`
+		Title         string                `yaml:"title"`
+		Slot          string                `yaml:"slot"`
+		Src           string                `yaml:"src"`
+		AllowedOrigin string                `yaml:"allowedOrigin"`
+		RoutePatterns []string              `yaml:"routePatterns"`
+		Sandbox       IframeSandbox         `yaml:"sandbox"`
+		Sizing        IframeExtensionSizing `yaml:"sizing"`
+		Permissions   []string              `yaml:"permissions"`
+	}
+
+	IframeSandbox struct {
+		AllowDownloads             bool `yaml:"allowDownloads"`
+		AllowForms                 bool `yaml:"allowForms"`
+		AllowModals                bool `yaml:"allowModals"`
+		AllowPopups                bool `yaml:"allowPopups"`
+		AllowPopupsToEscapeSandbox bool `yaml:"allowPopupsToEscapeSandbox"`
+		AllowSameOrigin            bool `yaml:"allowSameOrigin"`
+	}
+
+	IframeExtensionSizing struct {
+		DefaultHeight int `yaml:"defaultHeight"`
+		MinHeight     int `yaml:"minHeight"`
+		MaxHeight     int `yaml:"maxHeight"`
+		DefaultWidth  int `yaml:"defaultWidth"`
+		MinWidth      int `yaml:"minWidth"`
+		MaxWidth      int `yaml:"maxWidth"`
 	}
 
 	Filesystem struct {

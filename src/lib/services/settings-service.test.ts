@@ -39,6 +39,10 @@ const settingsResponse = (
   HideWorkflowQueryErrors: false,
   RefreshWorkflowCountsDisabled: false,
   ActivityCommandsDisabled: false,
+  CustomUI: {
+    Enabled: false,
+    IframeExtensions: [],
+  },
   ShowTemporalSystemNamespace: false,
   NavCollapsedByDefault: false,
   FeedbackURL: '',
@@ -120,5 +124,72 @@ describe('fetchSettings', () => {
     const settings = await fetchSettings();
 
     expect(settings.auth.redirectToProvider).toBe(false);
+  });
+
+  it('maps custom UI iframe extension settings', async () => {
+    vi.mocked(requestFromAPI).mockResolvedValue(
+      settingsResponse({
+        CustomUI: {
+          Enabled: true,
+          IframeExtensions: [
+            {
+              ID: 'incident-panel',
+              Title: 'Incident Panel',
+              Slot: 'workflow.header.after-details',
+              Src: '/custom-ui-examples/workflow-header.html',
+              AllowedOrigin: 'self',
+              RoutePatterns: [
+                '/namespaces/:namespace/workflows/:workflow/:run/*',
+              ],
+              Sandbox: {
+                AllowPopups: true,
+              },
+              Sizing: {
+                DefaultHeight: 160,
+                MinHeight: 0,
+                MaxHeight: 480,
+                DefaultWidth: 0,
+                MinWidth: 0,
+                MaxWidth: 0,
+              },
+              Permissions: ['context:workflow'],
+            },
+          ],
+        },
+      }),
+    );
+
+    const settings = await fetchSettings();
+
+    expect(settings.customUi).toEqual({
+      enabled: true,
+      iframeExtensions: [
+        {
+          id: 'incident-panel',
+          title: 'Incident Panel',
+          slot: 'workflow.header.after-details',
+          src: '/custom-ui-examples/workflow-header.html',
+          allowedOrigin: 'self',
+          routePatterns: ['/namespaces/:namespace/workflows/:workflow/:run/*'],
+          sandbox: {
+            allowDownloads: false,
+            allowForms: false,
+            allowModals: false,
+            allowPopups: true,
+            allowPopupsToEscapeSandbox: false,
+            allowSameOrigin: false,
+          },
+          sizing: {
+            defaultHeight: 160,
+            minHeight: undefined,
+            maxHeight: 480,
+            defaultWidth: undefined,
+            minWidth: undefined,
+            maxWidth: undefined,
+          },
+          permissions: ['context:workflow'],
+        },
+      ],
+    });
   });
 });
