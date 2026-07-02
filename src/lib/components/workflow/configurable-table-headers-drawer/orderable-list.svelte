@@ -14,6 +14,7 @@
     type ConfigurableTableType,
     moveColumn,
     removeColumn,
+    TABLE_TYPE,
   } from '$lib/stores/configurable-table-columns';
 
   interface Props {
@@ -87,22 +88,24 @@
       />
     {/each}
   </OrderableList>
-  <OrderableList>
-    <svelte:fragment slot="heading">
-      {translate('events.custom-search-attributes')}
-      <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
-    {#each $availableCustomColumns as { label } (label)}
-      <OrderableListItem
-        static
-        on:addItem={() => addColumn(label, namespace, table)}
-        addButtonLabel={translate('workflows.add-column-label', {
-          column: label,
-        })}
-        {label}
-      />
-    {:else}
-      <OrderableListItem readonly label="No Custom Search Attributes" />
-    {/each}
-  </OrderableList>
+  {#if table !== TABLE_TYPE.DEPLOYMENTS}
+    <OrderableList>
+      <svelte:fragment slot="heading">
+        {translate('events.custom-search-attributes')}
+        <span class="font-normal">(not in view)</span>
+      </svelte:fragment>
+      {#each $availableCustomColumns as { label } (label)}
+        <OrderableListItem
+          static
+          on:addItem={() => addColumn(label, namespace, table)}
+          addButtonLabel={translate('workflows.add-column-label', {
+            column: label,
+          })}
+          {label}
+        />
+      {:else}
+        <OrderableListItem readonly label="No Custom Search Attributes" />
+      {/each}
+    </OrderableList>
+  {/if}
 </div>
