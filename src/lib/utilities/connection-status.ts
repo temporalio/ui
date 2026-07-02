@@ -1,5 +1,3 @@
-import { formatDistanceToNowStrict } from 'date-fns';
-
 import { translate } from '$lib/i18n/translate';
 import type { ComputeStatus } from '$lib/types/deployments';
 import type { ValidTime } from '$lib/utilities/format-time';
@@ -29,19 +27,24 @@ export const connectionStateLabel = (state: ConnectionState): string => {
 };
 
 export const formatConnectionCheckTime = (time: ValidTime): string => {
-  if (!time) return 'less than an hour ago';
+  if (!time) return translate('deployments.connection-checked-recently');
   try {
     const parsedDate = isTimestamp(time)
       ? timestampToDate(time)
       : new Date(time as string | number | Date);
     const diff = Date.now() - parsedDate.getTime();
-    if (diff < 0 || diff < 3_600_000) return 'less than an hour ago';
-    return formatDistanceToNowStrict(parsedDate, {
-      unit: 'hour',
-      addSuffix: true,
-    });
+    if (diff < 3_600_000) {
+      return translate('deployments.connection-checked-recently');
+    }
+    const hours = Math.round(diff / 3_600_000);
+    return translate(
+      hours === 1
+        ? 'deployments.connection-checked-hour'
+        : 'deployments.connection-checked-hours',
+      { hours },
+    );
   } catch {
-    return 'less than an hour ago';
+    return translate('deployments.connection-checked-recently');
   }
 };
 
