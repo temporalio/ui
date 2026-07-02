@@ -29,17 +29,40 @@
   }: Props = $props();
 
   let iframe: HTMLIFrameElement | null = $state(null);
+  let iframeWidth = 0;
 
   const resizeIframe = () => {
     if (!iframe) return;
+    const iframeDocument = iframe.contentDocument;
+    if (!iframeDocument) return;
+
     const minHeight = 100;
+    iframe.height = '0';
+    iframe.style.height = '0px';
+
     const height = Math.max(
-      iframe.contentWindow.document.body.scrollHeight + 2,
+      iframeDocument.documentElement.scrollHeight,
+      iframeDocument.body.scrollHeight,
       minHeight,
     );
-    iframe.height = '';
-    iframe.height = height + 'px';
+    iframe.height = `${height + 2}`;
+    iframe.style.height = `${height + 2}px`;
   };
+
+  $effect(() => {
+    if (!iframe || typeof ResizeObserver === 'undefined') return;
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      const width = Math.round(entry.contentRect.width);
+      if (width === iframeWidth) return;
+
+      iframeWidth = width;
+      resizeIframe();
+    });
+
+    resizeObserver.observe(iframe);
+    return () => resizeObserver.disconnect();
+  });
 
   const { workflow: workflowId, run: runId, namespace } = page.params;
 

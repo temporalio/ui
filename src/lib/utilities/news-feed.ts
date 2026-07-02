@@ -7,8 +7,7 @@ import type {
   NewsFeedSource,
 } from '$lib/types/news-feed';
 
-// export const NEWS_FEED_URL = 'https://newsfeed.temporal.io/feed_en.json';
-export const NEWS_FEED_URL = 'https://newsfeed.tomwheeler.com/feed_en.json';
+export const NEWS_FEED_URL = 'https://newsfeed.temporal.io/feed_en.json';
 export const NEWS_FEED_AUTO_FETCH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
 export const NEWS_FEED_STORAGE_KEYS = {

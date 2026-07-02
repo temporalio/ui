@@ -28,6 +28,7 @@
   import { type NamespaceListItem, type NavLinkItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
+  import { useDarkMode } from '$lib/utilities/dark-mode';
   import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
   import {
     routeForArchivalWorkflows,
@@ -382,7 +383,10 @@
         {/if}
       {/snippet}
       {#if showNewsFeed}
-        <NewsFeedWidget clusterId={newsFeedClusterId} />
+        <NewsFeedWidget
+          clusterId={newsFeedClusterId}
+          previewTheme={$useDarkMode ? 'dark' : 'light'}
+        />
       {/if}
       {#if isCloud}
         <a
