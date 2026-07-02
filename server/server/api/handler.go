@@ -64,6 +64,7 @@ type SettingsResponse struct {
 	ShowTemporalSystemNamespace   bool
 	NavCollapsedByDefault         bool
 	FeedbackURL                   string
+	DisableNewsFetch              bool
 	Codec                         *CodecResponse
 	Version                       string
 	DisableWriteActions           bool
@@ -137,6 +138,7 @@ func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Contex
 			ShowTemporalSystemNamespace: cfg.ShowTemporalSystemNamespace,
 			NavCollapsedByDefault:       cfg.NavCollapsedByDefault,
 			FeedbackURL:                 cfg.FeedbackURL,
+			DisableNewsFetch:            cfg.DisableNewsFetch,
 			Codec: &CodecResponse{
 				Endpoint:            cfg.Codec.Endpoint,
 				PassAccessToken:     cfg.Codec.PassAccessToken,

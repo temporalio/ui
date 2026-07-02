@@ -10,6 +10,7 @@ refreshInterval: 1m
 defaultNamespace: default
 showTemporalSystemNamespace: false
 feedbackUrl:
+disableNewsFetch: false
 navCollapsedByDefault: false
 disableWriteActions: false
 workflowTerminateDisabled: false
