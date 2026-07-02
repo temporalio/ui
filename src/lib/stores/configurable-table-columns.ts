@@ -41,6 +41,7 @@ export const TABLE_TYPE = {
   WORKFLOWS: 'workflows',
   SCHEDULES: 'schedules',
   ACTIVITIES: 'activities',
+  DEPLOYMENTS: 'deployments',
 } as const;
 
 type Keys = keyof typeof TABLE_TYPE;
@@ -152,6 +153,25 @@ const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'State Transitions' },
 ];
 
+export const DeploymentHeaderLabels = [
+  'Deployment',
+  'Current Version',
+  'Latest Version',
+  'Created At',
+] as const;
+
+export type DeploymentHeaderLabel = (typeof DeploymentHeaderLabels)[number];
+
+export const DEFAULT_DEPLOYMENTS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Deployment' },
+  { label: 'Current Version' },
+  { label: 'Created At' },
+];
+
+const DEFAULT_AVAILABLE_DEPLOYMENTS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Latest Version' },
+];
+
 export const persistedWorkflowTableColumns = persistStore<State>(
   'namespace-workflow-table-columns',
   {},
@@ -167,6 +187,11 @@ export const persistedActivitiesTableColumns = persistStore<State>(
   {},
 );
 
+export const persistedDeploymentsTableColumns = persistStore<State>(
+  'namespace-deployment-table-columns',
+  {},
+);
+
 export const configurableTableColumns: Readable<TableColumns> = derived(
   [
     namespaces,
@@ -174,6 +199,7 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
     persistedWorkflowTableColumns,
     persistedSchedulesTableColumns,
     persistedActivitiesTableColumns,
+    persistedDeploymentsTableColumns,
   ],
   ([
     $namespaces,
@@ -181,6 +207,7 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
     $persistedWorkflowTableColumns,
     $persistedSchedulesTableColumns,
     $persistedActivitiesTableColumns,
+    $persistedDeploymentsTableColumns,
   ]) => {
     const state: TableColumns = {};
     const useOrAddDefaultTableColumnsToNamespace = (
@@ -211,6 +238,11 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
         $persistedActivitiesTableColumns,
         namespace,
         DEFAULT_ACTIVITIES_COLUMNS,
+      ),
+      deployments: useOrAddDefaultTableColumnsToNamespace(
+        $persistedDeploymentsTableColumns,
+        namespace,
+        DEFAULT_DEPLOYMENTS_COLUMNS,
       ),
     });
 
@@ -280,6 +312,21 @@ export const availableActivityColumns: (
     ),
   );
 
+export const availableDeploymentColumns: (
+  namespace: string,
+) => Readable<ConfigurableTableHeader[]> = (namespace) =>
+  derived(configurableTableColumns, ($configurableTableColumns) =>
+    [
+      ...DEFAULT_DEPLOYMENTS_COLUMNS,
+      ...DEFAULT_AVAILABLE_DEPLOYMENTS_COLUMNS,
+    ].filter(
+      (header) =>
+        !$configurableTableColumns[namespace]?.deployments?.some(
+          (column) => column.label === header.label,
+        ),
+    ),
+  );
+
 export const availableCustomSearchAttributeColumns: (
   namespace: string,
   table?: ConfigurableTableType,
@@ -310,6 +357,8 @@ const getDefaultColumns = (table: ConfigurableTableType) => {
       return DEFAULT_SCHEDULES_COLUMNS;
     case TABLE_TYPE.ACTIVITIES:
       return DEFAULT_ACTIVITIES_COLUMNS;
+    case TABLE_TYPE.DEPLOYMENTS:
+      return DEFAULT_DEPLOYMENTS_COLUMNS;
   }
 };
 
@@ -359,6 +408,8 @@ const getPersistedColumns = (table: ConfigurableTableType): Writable<State> => {
       return persistedSchedulesTableColumns;
     case TABLE_TYPE.ACTIVITIES:
       return persistedActivitiesTableColumns;
+    case TABLE_TYPE.DEPLOYMENTS:
+      return persistedDeploymentsTableColumns;
   }
 };
 

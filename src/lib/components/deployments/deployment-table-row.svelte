@@ -17,6 +17,7 @@
   } from '$lib/services/deployments-service';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { WorkerDeploymentSummary } from '$lib/types/deployments';
+  import { parseVersionStatus } from '$lib/utilities/deployments';
   import {
     routeForWorkerDeployment,
     routeForWorkflowsWithQuery,
@@ -24,6 +25,7 @@
 
   import ComputeBadge from './compute-badge.svelte';
   import DeleteDeploymentModal from './delete-deployment-modal.svelte';
+  import DeploymentStatus from './deployment-status.svelte';
 
   interface Props {
     deployment: WorkerDeploymentSummary;
@@ -77,11 +79,34 @@
   const currentComputeProviderType = $derived(
     currentScalingGroup?.providerType ?? currentScalingGroup?.provider?.type,
   );
+
+  const latestBuildId = $derived(
+    deployment?.latestVersionSummary?.deploymentVersion?.buildId,
+  );
+  const latestVersionStatus = $derived(
+    deployment?.latestVersionSummary?.status
+      ? parseVersionStatus(
+          deployment.latestVersionSummary.status,
+          deployment?.routingConfig?.rampingVersionPercentage,
+        )
+      : null,
+  );
+  const latestScalingGroup = $derived(
+    Object.values(
+      deployment.latestVersionSummary?.computeConfig?.scalingGroups ?? {},
+    )[0],
+  );
+  const latestComputeProviderType = $derived(
+    latestScalingGroup?.providerType ?? latestScalingGroup?.provider?.type,
+  );
+  const isSameAsCurrent = $derived(
+    !!latestBuildId && latestBuildId === currentBuildId,
+  );
 </script>
 
 <tr>
   {#each columns as { label } (label)}
-    {#if label === translate('deployments.deployment')}
+    {#if label === 'Deployment'}
       <td class="py-1 text-left">
         <Copyable
           content={deployment.name}
@@ -96,25 +121,18 @@
           >
         </Copyable>
       </td>
-    {:else if label === translate('deployments.current-version')}
+    {:else if label === 'Current Version'}
       <td class="py-1 text-left">
         {#if currentBuildId}
           <div class="flex items-center gap-2">
-            <Copyable
-              container-class="min-w-32 shrink-0"
-              content={currentBuildId}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            <Link
+              href={routeForWorkflowsWithQuery({
+                namespace: page.params.namespace,
+                query: `TemporalWorkerDeploymentVersion="${deployment.name}:${currentBuildId}"`,
+              }) ?? ''}
             >
-              <Link
-                href={routeForWorkflowsWithQuery({
-                  namespace: page.params.namespace,
-                  query: `TemporalWorkerDeploymentVersion="${deployment.name}:${currentBuildId}"`,
-                }) ?? ''}
-              >
-                {currentBuildId}
-              </Link>
-            </Copyable>
+              {currentBuildId}
+            </Link>
             <CapabilityGuard capability="serverScaledDeployments">
               {#if currentComputeProviderType}
                 <ComputeBadge
@@ -131,7 +149,41 @@
           >
         {/if}
       </td>
-    {:else if label === translate('deployments.created')}
+    {:else if label === 'Latest Version'}
+      <td class="py-1 text-left">
+        {#if isSameAsCurrent}
+          <span
+            class="inline-flex items-center border border-subtle px-2 py-0.5 text-secondary"
+          >
+            {translate('deployments.same-as-current')}
+          </span>
+        {:else if latestBuildId}
+          <div class="flex items-center gap-2">
+            <Link
+              href={routeForWorkflowsWithQuery({
+                namespace: page.params.namespace,
+                query: `TemporalWorkerDeploymentVersion="${deployment.name}:${latestBuildId}"`,
+              }) ?? ''}
+            >
+              {latestBuildId}
+            </Link>
+            {#if latestVersionStatus}
+              <DeploymentStatus
+                status={latestVersionStatus.status}
+                label={latestVersionStatus.label}
+              />
+            {/if}
+            <CapabilityGuard capability="serverScaledDeployments">
+              {#if latestComputeProviderType}
+                <ComputeBadge type={latestComputeProviderType} />
+              {/if}
+            </CapabilityGuard>
+          </div>
+        {:else}
+          <span class="text-secondary">—</span>
+        {/if}
+      </td>
+    {:else if label === 'Created At'}
       <td class="truncate py-1 text-left">
         <Timestamp as="p" dateTime={deployment.createTime} />
       </td>
