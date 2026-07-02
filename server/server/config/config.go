@@ -44,6 +44,7 @@ type (
 		CORS                CORS   `yaml:"cors"`
 		DefaultNamespace    string `yaml:"defaultNamespace"`
 		FeedbackURL         string `yaml:"feedbackUrl"`
+		DisableNewsFetch    bool   `yaml:"disableNewsFetch"`
 		// Show temporal-system namespace in namespace selector
 		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
 		// How often to reload the config

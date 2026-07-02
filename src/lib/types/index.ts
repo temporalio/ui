@@ -340,6 +340,7 @@ export type SettingsResponse = {
   ActivityCommandsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
   FeedbackURL: string;
+  DisableNewsFetch: boolean;
   Version: string;
 };
 

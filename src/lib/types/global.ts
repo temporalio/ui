@@ -101,6 +101,7 @@ export type Settings = {
   activityCommandsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
   feedbackURL: string;
+  disableNewsFetch: boolean;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;
