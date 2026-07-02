@@ -125,21 +125,14 @@
       <td class="py-1 text-left">
         {#if currentBuildId}
           <div class="flex items-center gap-2">
-            <Copyable
-              container-class="min-w-32 shrink-0"
-              content={currentBuildId}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            <Link
+              href={routeForWorkflowsWithQuery({
+                namespace: page.params.namespace,
+                query: `TemporalWorkerDeploymentVersion="${deployment.name}:${currentBuildId}"`,
+              }) ?? ''}
             >
-              <Link
-                href={routeForWorkflowsWithQuery({
-                  namespace: page.params.namespace,
-                  query: `TemporalWorkerDeploymentVersion="${deployment.name}:${currentBuildId}"`,
-                }) ?? ''}
-              >
-                {currentBuildId}
-              </Link>
-            </Copyable>
+              {currentBuildId}
+            </Link>
             <CapabilityGuard capability="serverScaledDeployments">
               {#if currentComputeProviderType}
                 <ComputeBadge
@@ -166,21 +159,14 @@
           </span>
         {:else if latestBuildId}
           <div class="flex items-center gap-2">
-            <Copyable
-              container-class="min-w-32 shrink-0"
-              content={latestBuildId}
-              copyIconTitle={translate('common.copy-icon-title')}
-              copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            <Link
+              href={routeForWorkflowsWithQuery({
+                namespace: page.params.namespace,
+                query: `TemporalWorkerDeploymentVersion="${deployment.name}:${latestBuildId}"`,
+              }) ?? ''}
             >
-              <Link
-                href={routeForWorkflowsWithQuery({
-                  namespace: page.params.namespace,
-                  query: `TemporalWorkerDeploymentVersion="${deployment.name}:${latestBuildId}"`,
-                }) ?? ''}
-              >
-                {latestBuildId}
-              </Link>
-            </Copyable>
+              {latestBuildId}
+            </Link>
             {#if latestVersionStatus}
               <DeploymentStatus
                 status={latestVersionStatus.status}
