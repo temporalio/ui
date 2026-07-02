@@ -37,7 +37,13 @@ import {
   routeForStandaloneActivityMetadata,
   routeForStandaloneActivitySearchAttributes,
   routeForStandaloneActivityWorkers,
+  routeForStandaloneNexusOperationDetails,
+  routeForStandaloneNexusOperationMetadata,
+  routeForStandaloneNexusOperations,
+  routeForStandaloneNexusOperationSearchAttributes,
+  routeForStandaloneNexusOperationsWithQuery,
   routeForStartStandaloneActivity,
+  routeForStartStandaloneNexusOperation,
   routeForTaskQueue,
   routeForTimeline,
   routeForUserMetadata,
@@ -74,6 +80,11 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     namespace: 'default',
     activityId: 'act-1',
     runId: 'run-1',
+  };
+
+  const nexusOperationParams = {
+    namespace: 'default',
+    operationId: 'op-1',
   };
 
   const cases: [string, () => string | undefined][] = [
@@ -179,6 +190,35 @@ describe('routeFor functions should resolve the base path exactly once', () => {
     [
       'routeForStandaloneActivityMetadata',
       () => routeForStandaloneActivityMetadata(activityParams),
+    ],
+    [
+      'routeForStandaloneNexusOperations',
+      () => routeForStandaloneNexusOperations(namespaceParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationsWithQuery',
+      () =>
+        routeForStandaloneNexusOperationsWithQuery(
+          namespaceParams,
+          'test-query',
+        ),
+    ],
+    [
+      'routeForStartStandaloneNexusOperation',
+      () => routeForStartStandaloneNexusOperation(namespaceParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationDetails',
+      () => routeForStandaloneNexusOperationDetails(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationSearchAttributes',
+      () =>
+        routeForStandaloneNexusOperationSearchAttributes(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationMetadata',
+      () => routeForStandaloneNexusOperationMetadata(nexusOperationParams),
     ],
     [
       'routeForWorkflowStart',
@@ -287,6 +327,11 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     namespace: 'default',
     activityId: 'act-1',
     runId: 'run-1',
+  };
+
+  const nexusOperationParams = {
+    namespace: 'default',
+    operationId: 'op-1',
   };
 
   afterEach(() => {
@@ -399,6 +444,35 @@ describe('routeFor functions with prefix should resolve base + prefix correctly'
     [
       'routeForStandaloneActivityMetadata',
       () => routeForStandaloneActivityMetadata(activityParams),
+    ],
+    [
+      'routeForStandaloneNexusOperations',
+      () => routeForStandaloneNexusOperations(namespaceParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationsWithQuery',
+      () =>
+        routeForStandaloneNexusOperationsWithQuery(
+          namespaceParams,
+          'test-query',
+        ),
+    ],
+    [
+      'routeForStartStandaloneNexusOperation',
+      () => routeForStartStandaloneNexusOperation(namespaceParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationDetails',
+      () => routeForStandaloneNexusOperationDetails(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationSearchAttributes',
+      () =>
+        routeForStandaloneNexusOperationSearchAttributes(nexusOperationParams),
+    ],
+    [
+      'routeForStandaloneNexusOperationMetadata',
+      () => routeForStandaloneNexusOperationMetadata(nexusOperationParams),
     ],
     [
       'routeForWorkflowStart',
