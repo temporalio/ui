@@ -59,7 +59,7 @@
         </div>
       {/if}
       <div
-        class="opacity-0 transition-opacity group-data-[nav=closed]:pointer-events-none group-data-[nav=open]:opacity-100"
+        class="opacity-0 transition-opacity group-[[data-cloud=true][data-nav=open]]:delay-75 group-[[data-cloud=true][data-nav=closed]]:duration-75 group-[[data-cloud=true][data-nav=open]]:duration-150 group-[[data-cloud=true][data-nav=closed]]:ease-out group-[[data-cloud=true][data-nav=open]]:ease-linear group-data-[nav=closed]:pointer-events-none group-data-[nav=open]:opacity-100"
       >
         {label}
       </div>

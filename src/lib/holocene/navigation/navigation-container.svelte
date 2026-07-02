@@ -42,6 +42,7 @@
       : 'surface-black',
   )}
   data-nav={$navOpen ? 'open' : 'closed'}
+  data-cloud={isCloud ? 'true' : 'false'}
   data-testid="navigation-header"
   {...restProps}
 >
