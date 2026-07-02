@@ -298,6 +298,8 @@ export const getActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'true',
     includeOutcome: 'true',
+    includeHeartbeatDetails: 'true',
+    includeLastFailure: 'true',
     runId,
   });
 
@@ -321,6 +323,8 @@ export const pollActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'false',
     includeOutcome: 'true',
+    includeHeartbeatDetails: 'true',
+    includeLastFailure: 'true',
     runId,
     longPollToken: token,
   });

@@ -25,7 +25,9 @@ test('hides the Nexus link when the server lacks the nexus capability', async ({
 
   await openBottomNavDrawer(page);
 
-  await expect(page.getByRole('link', { name: 'Nexus' })).toHaveCount(0);
+  await expect(
+    page.getByRole('link', { name: 'Nexus', exact: true }),
+  ).toHaveCount(0);
 });
 
 test('shows the Nexus link when the server supports nexus', async ({
@@ -36,7 +38,9 @@ test('shows the Nexus link when the server supports nexus', async ({
 
   await openBottomNavDrawer(page);
 
-  await expect(page.getByRole('link', { name: 'Nexus' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Nexus', exact: true }),
+  ).toBeVisible();
 });
 
 test('hides the Standalone Activities link on servers older than 1.30.0', async ({

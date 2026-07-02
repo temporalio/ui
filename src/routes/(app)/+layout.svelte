@@ -28,6 +28,7 @@
   import { type NamespaceListItem, type NavLinkItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
+  import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
@@ -36,6 +37,7 @@
     routeForNexus,
     routeForSchedules,
     routeForStandaloneActivities,
+    routeForStandaloneNexusOperations,
     routeForWorkerDeployments,
     routeForWorkers,
     routeForWorkflows,
@@ -81,10 +83,24 @@
     }),
   );
 
+  const nexusOperationsLinkHidden = $derived.by(() => {
+    const namespace = $namespaces.find(
+      (namespace) => namespace.namespaceInfo.name === activeNamespaceName,
+    );
+    const capabilityState = namespaceCapabilityState(
+      namespace?.namespaceInfo?.capabilities,
+      'standaloneNexusOperation',
+    );
+    return capabilityState === 'unsupported';
+  });
+
   const getRoutes = (namespace: string) => {
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
+      standaloneNexusOperationsRoute: routeForStandaloneNexusOperations({
+        namespace,
+      }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
       workersRoute: routeForWorkers({ namespace }),
@@ -100,6 +116,7 @@
     {
       workflowsRoute,
       standaloneActivitiesRoute,
+      standaloneNexusOperationsRoute,
       schedulesRoute,
       batchOperationsRoute,
       workersRoute,
@@ -110,6 +127,7 @@
     }: {
       workflowsRoute: string;
       standaloneActivitiesRoute: string;
+      standaloneNexusOperationsRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
       workersRoute: string;
@@ -134,6 +152,7 @@
           !path.includes(workersRoute) &&
           !path.includes(workerDeploymentsRoute) &&
           !path.includes(standaloneActivitiesRoute) &&
+          !path.includes(standaloneNexusOperationsRoute) &&
           !path.includes(archivalRoute),
       },
       {
@@ -148,6 +167,15 @@
         label: translate('standalone-activities.standalone-activities'),
         isActive: (path) => path.includes(standaloneActivitiesRoute),
         hidden: !minimumVersionRequired('1.30.0', $temporalVersion),
+      },
+      {
+        href: standaloneNexusOperationsRoute,
+        icon: 'nexus',
+        label: translate(
+          'standalone-nexus-operations.standalone-nexus-operations',
+        ),
+        isActive: (path) => path.includes(standaloneNexusOperationsRoute),
+        hidden: nexusOperationsLinkHidden,
       },
       {
         href: schedulesRoute,
@@ -238,6 +266,7 @@
     workerDeploymentsRoute,
     archivalRoute,
     standaloneActivitiesRoute,
+    standaloneNexusOperationsRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
@@ -248,6 +277,7 @@
       batchOperationsRoute,
       archivalRoute,
       standaloneActivitiesRoute,
+      standaloneNexusOperationsRoute,
     ].some((route) => page.url.href.includes(route)),
   );
 
@@ -264,6 +294,10 @@
       {
         subPath: 'activities',
         fullRoute: routeForStandaloneActivities({ namespace }),
+      },
+      {
+        subPath: 'nexus-operations',
+        fullRoute: routeForStandaloneNexusOperations({ namespace }),
       },
       {
         subPath: 'workers/deployments',
@@ -299,8 +333,13 @@
     }
   });
 
-  afterNavigate(() => {
-    document.getElementById('content')?.scrollTo(0, 0);
+  afterNavigate(({ from, to, type }) => {
+    const main = document.getElementById('content');
+    main?.scrollTo(0, 0);
+    if (type === 'enter') return;
+    if (from?.url.pathname === '/') return;
+    if (from?.url.pathname === to?.url.pathname) return;
+    main?.focus({ preventScroll: true });
   });
 
   setCoreContext({

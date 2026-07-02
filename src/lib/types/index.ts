@@ -17,6 +17,12 @@ export type Capabilities =
     serverScaledDeployments?: boolean | null;
     serverScaledProviderCloudRun?: boolean | null;
   };
+
+export type NamespaceCapabilities = NonNullable<
+  NonNullable<DescribeNamespaceResponse['namespaceInfo']>['capabilities']
+> & {
+  standaloneNexusOperation?: boolean | null;
+};
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =

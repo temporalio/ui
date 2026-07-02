@@ -26,7 +26,7 @@
   };
 </script>
 
-<dt class={twMerge('col-[2] flex', className)}>
+<dd class={twMerge('col-[2] flex', className)}>
   {@render children()}
   {#if copyable}
     <!-- 
@@ -43,4 +43,4 @@
       />
     </div>
   {/if}
-</dt>
+</dd>

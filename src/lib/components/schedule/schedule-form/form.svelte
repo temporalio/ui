@@ -1,9 +1,5 @@
 <script lang="ts">
-  import type { Writable } from 'svelte/store';
-  import { writable } from 'svelte/store';
-
-  import { onDestroy } from 'svelte';
-  import { arrayProxy, superForm } from 'sveltekit-superforms';
+  import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
   import { page } from '$app/state';
@@ -11,48 +7,41 @@
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Card from '$lib/holocene/card.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import { formatList } from '$lib/i18n/format-list';
   import { translate } from '$lib/i18n/translate';
-  import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
-  import { error, loading } from '$lib/stores/schedules';
+  import {
+    loading,
+    openConfirmationModal,
+    serverError,
+  } from '$lib/stores/schedules';
   import { customSearchAttributes } from '$lib/stores/search-attributes';
-  import type {
-    FullSchedule,
-    ScheduleParameters,
-    SchedulePreset,
-  } from '$lib/types/schedule';
+  import type { DescribeFullSchedule } from '$lib/types/schedule';
+  import type { SearchAttributes } from '$lib/types/workflows';
   import {
     routeForSchedule,
     routeForSchedules,
   } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  import {
-    getDefaultValues,
-    type ScheduleFormData,
-    scheduleFormSchema,
-  } from './schema';
+  import DeleteScheduleModal from '../schedule-action-modals/delete-schedule-modal.svelte';
+  import { type FormScheduleSchema, formScheduleSchema } from '../schema/form';
+  import { getFormScheduleDefaults } from '../utilities/get-form-schedule-defaults';
 
-  import ScheduleInputPayload from './schedule-input-payload.svelte';
-  import SchedulesCalendarView from './schedules-calendar-view.svelte';
-  import SchedulesSearchAttributesInputs from './schedules-search-attributes-inputs.svelte';
-
-  import type { Schedule, SearchAttribute } from '$types';
+  import ScheduleDetailsCard from './schedule-details-card.svelte';
+  import SchedulePoliciesCard from './schedule-policies-card.svelte';
+  import ScheduleSpecCard from './schedule-spec-card.svelte';
+  import ScheduleSummarySidebar from './schedule-summary-sidebar.svelte';
+  import SchedulesSearchAttributesCard from './schedules-search-attributes-card.svelte';
 
   interface Props {
-    schedule?: FullSchedule | null;
-    searchAttributes?: SearchAttribute;
-    onConfirm: (
-      preset: SchedulePreset,
-      formData: ScheduleFormData,
-      schedule?: Schedule,
-    ) => void;
+    schedule?: DescribeFullSchedule | null;
+    searchAttributes?: SearchAttributes;
+    onSubmit: (formData: FormScheduleSchema) => Promise<void>;
   }
 
-  let { schedule = null, searchAttributes = {}, onConfirm }: Props = $props();
+  let { schedule = null, searchAttributes = {}, onSubmit }: Props = $props();
 
   const namespace = $derived(page.params.namespace);
   const scheduleId = $derived(page.params.schedule);
@@ -74,83 +63,61 @@
     schedule ? translate('common.save') : translate('schedules.create'),
   );
 
-  const encoding: Writable<PayloadInputEncoding> = writable('json/plain');
-
-  let preset = $state<SchedulePreset>(
-    page.params.schedule ? 'existing' : 'interval',
-  );
-
-  const initialValues = $derived(
-    getDefaultValues({
-      schedule,
+  const initialFormValues = $derived(
+    getFormScheduleDefaults(schedule, {
       searchAttributes,
       customSearchAttributes: $customSearchAttributes,
-      scheduleId,
     }),
   );
 
-  // initialValues is reactive but we only need its initial value
   // svelte-ignore state_referenced_locally
-  const superform = superForm(initialValues, {
+  const superform = superForm(initialFormValues, {
     SPA: true,
     dataType: 'json',
-    validators: zodClient(scheduleFormSchema),
+    validators: zodClient(formScheduleSchema),
     resetForm: false,
     onUpdate: async ({ form }) => {
       if (!form.valid) return;
-      handleConfirm(form.data);
+      await onSubmit(form.data);
     },
   });
 
   const {
     form,
     errors: formErrors,
-    constraints,
+    allErrors,
     enhance,
     submitting,
+    validateForm,
   } = superform;
 
-  const { values: scheduleSearchAttributes } = arrayProxy(
-    superform,
-    'searchAttributes',
-  );
-  const { values: workflowSearchAttributes } = arrayProxy(
-    superform,
-    'workflowSearchAttributes',
-  );
+  // The search attribute inputs edit rows in place (e.g. selecting an
+  // attribute or typing a value). Those deep mutations propagate through
+  // Svelte's reactive proxies but never reach superForm's `$form` store, so
+  // binding the inputs directly to `$form` would drop every edit that isn't a
+  // whole-array add/remove. Bridge through local $state proxies and sync the
+  // snapshots back to `$form` so the changes are committed before submit.
+  let scheduleSearchAttributes = $state($form.searchAttributes);
+  let workflowSearchAttributes = $state($form.workflowSearchAttributes);
 
-  const handleConfirm = (form: ScheduleFormData) => {
-    const formData: ScheduleFormData = {
-      name: form.name.trimEnd(),
-      workflowType: form.workflowType,
-      workflowId: form.workflowId,
-      taskQueue: form.taskQueue,
-      ...(form.editInput && { input: form.input }),
-      encoding: $encoding,
-      messageType: form.messageType,
-      hour: form.hour,
-      minute: form.minute,
-      second: form.second,
-      phase: form.phase,
-      cronString: form.cronString,
-      daysOfWeek: form.daysOfWeek,
-      daysOfMonth: form.daysOfMonth,
-      days: form.days,
-      months: form.months,
-      searchAttributes: form.searchAttributes,
-      workflowSearchAttributes: form.workflowSearchAttributes,
-    };
-
-    onConfirm(preset, formData, schedule);
-  };
+  $effect(() => {
+    $form.searchAttributes = $state.snapshot(scheduleSearchAttributes);
+  });
+  $effect(() => {
+    $form.workflowSearchAttributes = $state.snapshot(workflowSearchAttributes);
+  });
 
   const onInput = () => {
-    if ($error) {
-      $error = '';
+    if ($serverError) {
+      $serverError = '';
     }
   };
 
-  onDestroy(() => ($error = ''));
+  $effect(() => {
+    return () => {
+      $serverError = '';
+    };
+  });
 </script>
 
 <div class="flex flex-col gap-4 pb-10">
@@ -161,100 +128,80 @@
       {backTitle}
     </Link>
     <h1>{title}</h1>
-    <Card class="w-full xl:w-3/4 2xl:w-1/2">
-      <form novalidate use:enhance class="mb-4 flex w-full flex-col gap-4">
-        <Input
-          id="name"
-          bind:value={$form.name}
-          data-testid="schedule-name-input"
-          label={translate('schedules.name-label')}
-          error={!!$formErrors.name?.[0]}
-          hintText={$formErrors.name?.[0]}
-          maxLength={232}
-          disabled={Boolean(scheduleId)}
-          oninput={onInput}
-          {...$constraints.name}
-          required
-        />
-        <Input
-          id="workflowType"
-          bind:value={$form.workflowType}
-          data-testid="schedule-type-input"
-          label={translate('schedules.workflow-type-label')}
-          error={!!$formErrors.workflowType?.[0]}
-          hintText={$formErrors.workflowType?.[0]}
-          oninput={onInput}
-          {...$constraints.workflowType}
-          required
-        />
-        <Input
-          id="workflowId"
-          bind:value={$form.workflowId}
-          data-testid="schedule-workflow-id-input"
-          label={translate('schedules.workflow-id-label')}
-          error={!!$formErrors.workflowId?.[0]}
-          hintText={$formErrors.workflowId?.[0]}
-          oninput={onInput}
-          {...$constraints.workflowId}
-          required
-        />
-        <Input
-          id="taskQueue"
-          bind:value={$form.taskQueue}
-          data-testid="schedule-task-queue-input"
-          label={translate('schedules.task-queue-label')}
-          error={!!$formErrors.taskQueue?.[0]}
-          hintText={$formErrors.taskQueue?.[0]}
-          oninput={onInput}
-          {...$constraints.taskQueue}
-          required
-        />
-        <ScheduleInputPayload
-          bind:input={$form.input}
-          bind:editInput={$form.editInput}
-          {encoding}
-          bind:messageType={$form.messageType}
-          payloads={schedule?.action?.startWorkflow?.input}
-          showEditActions={Boolean(schedule)}
-        />
-        <SchedulesCalendarView
-          {schedule}
-          bind:daysOfWeek={$form.daysOfWeek}
-          bind:daysOfMonth={$form.daysOfMonth}
-          bind:months={$form.months}
-          bind:days={$form.days}
-          bind:hour={$form.hour}
-          bind:minute={$form.minute}
-          bind:second={$form.second}
-          bind:phase={$form.phase}
-          bind:cronString={$form.cronString}
-          bind:preset
-          timezoneName={$form.timezoneName}
-        >
-          <SchedulesSearchAttributesInputs
-            bind:scheduleSearchAttributes={$scheduleSearchAttributes}
-            bind:workflowSearchAttributes={$workflowSearchAttributes}
+
+    <form novalidate use:enhance oninput={onInput}>
+      <div
+        class="relative grid grid-cols-1 gap-6 xl:grid-cols-[minmax(min-content,54rem),minmax(19rem,23rem)]"
+      >
+        <div class="flex w-full flex-col gap-6">
+          <ScheduleDetailsCard {form} errors={formErrors} {schedule} />
+          <ScheduleSpecCard
+            {form}
+            errors={formErrors}
+            {validateForm}
+            {schedule}
           />
-          <div class="mt-4 flex flex-row items-center gap-4 max-sm:flex-col">
+          <SchedulesSearchAttributesCard
+            bind:scheduleSearchAttributes
+            bind:workflowSearchAttributes
+          />
+          <SchedulePoliciesCard {form} />
+        </div>
+
+        <div class="w-full xl:col-start-2 xl:row-start-1">
+          <ScheduleSummarySidebar {form} />
+        </div>
+
+        <Alert
+          class="xl:col-start-1"
+          intent="error"
+          title={translate('schedules.fix-form-errors')}
+          hidden={!$allErrors.length}
+        >
+          <ul class="list-inside list-disc">
+            {#each $allErrors as { path, messages } (path)}
+              <li>
+                {formatList(messages)}
+              </li>
+            {/each}
+          </ul>
+        </Alert>
+        <div
+          class="flex flex-row items-center gap-4 max-sm:flex-col xl:col-start-1"
+        >
+          <Button
+            disabled={$submitting || !writeActionsAreAllowed()}
+            type="submit"
+            class="max-sm:w-full"
+            data-testid="create-schedule-button">{confirmText}</Button
+          >
+          <Button
+            variant="ghost"
+            type="button"
+            href={backHref}
+            class="max-sm:w-full"
+            data-testid="cancel-schedule-button"
+            >{translate('common.cancel')}</Button
+          >
+          {#if Boolean(schedule)}
             <Button
               disabled={$submitting || !writeActionsAreAllowed()}
-              type="submit"
-              class="max-sm:w-full"
-              data-testid="create-schedule-button">{confirmText}</Button
-            >
-            <Button
-              variant="ghost"
+              variant="destructive"
               type="button"
-              href={backHref}
-              class="max-sm:w-full"
-              data-testid="cancel-schedule-button"
-              >{translate('common.cancel')}</Button
+              data-testid="delete-schedule-button"
+              leadingIcon="trash"
+              class="ml-auto hidden sm:inline-flex"
+              on:click={() => openConfirmationModal('delete')}
             >
-          </div>
-        </SchedulesCalendarView>
-        <Alert intent="error" title={$error} hidden={!$error} />
-        <CodecServerErrorBanner />
-      </form>
-    </Card>
+              {translate('schedules.delete')}
+            </Button>
+            <DeleteScheduleModal {scheduleId} {namespace} />
+          {/if}
+        </div>
+      </div>
+    </form>
+
+    <Alert intent="error" title={$serverError} hidden={!$serverError} />
+    <CodecServerErrorBanner />
   {/if}
 </div>

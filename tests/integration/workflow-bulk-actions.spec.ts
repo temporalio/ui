@@ -35,6 +35,23 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await expect(
         page.locator('#batch-terminate-success-toast'),
       ).toBeVisible();
+      await expect(
+        page.locator('[data-testid="toast-live-region-polite"]'),
+      ).toBeAttached();
+      await expect(
+        page.locator('[data-testid="toast-live-region-assertive"]'),
+      ).toBeAttached();
+      const politeRegion = page.locator(
+        '[data-testid="toast-live-region-polite"]',
+      );
+      await expect(politeRegion).toContainText(
+        'The batch terminate request is processing in the background.',
+      );
+      await expect(
+        page.locator('[data-testid="toast-live-region-assertive"]'),
+      ).not.toContainText(
+        'The batch terminate request is processing in the background.',
+      );
     });
 
     test('allows running workflows to be terminated by a query', async ({

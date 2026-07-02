@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { relativeTime } from '$lib/stores/time-format';
@@ -13,9 +14,10 @@
     timestamp: ValidTime | undefined | null;
     children?: Snippet;
     fallback?: string;
+    class?: string;
   }
 
-  let { timestamp: t, children, fallback }: Props = $props();
+  let { timestamp: t, children, class: className, fallback }: Props = $props();
 
   let formattedTimestamp = $derived(
     t ? $timestamp(t) : fallback ? fallback : '',
@@ -31,7 +33,7 @@
   </div>
 {/snippet}
 
-<DetailListValue class="font-mono">
+<DetailListValue class={twMerge('font-mono', className)}>
   <Tooltip
     hide={!t}
     text={$relativeTime ? formattedTimestamp : relativeTimestamp}

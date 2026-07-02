@@ -121,9 +121,7 @@
     id="bulk-action-reason-{action}"
     bind:value={reason}
     label={translate('common.reason')}
-    hintText={translate('workflows.batch-operation-confirmation-input-hint', {
-      placeholder: reasonPlaceholder,
-    })}
+    hintText={translate('workflows.batch-operation-confirmation-input-hint')}
     placeholder={reasonPlaceholder}
   />
   <Input

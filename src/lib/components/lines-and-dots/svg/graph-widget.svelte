@@ -1,16 +1,19 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   import { groupEvents } from '$lib/models/event-groups';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { fetchWorkflow } from '$lib/services/workflow-service';
-  import type { WorkflowEvents } from '$lib/types/events';
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   import TimelineGraph from './timeline-graph.svelte';
 
   interface Props {
     namespace: string;
-    workflowId: string;
-    runId?: string;
+    workflowId?: string | null;
+    runId?: string | null;
+    eventCount?: number;
     viewportHeight?: number;
     onLoad?: () => void;
     class?: string;
@@ -20,36 +23,55 @@
     namespace,
     workflowId,
     runId = '',
+    eventCount = 0,
     viewportHeight = 360,
     onLoad = () => {},
     class: className = '',
   }: Props = $props();
 
+  let snapshot = $state<{ workflow: WorkflowExecution; groups: EventGroups }>();
+
   const getWorkflowAndEventHistory = async () => {
-    const [workflow, history] = await Promise.all([
+    if (!workflowId || !runId) return;
+
+    const [{ workflow }, history] = await Promise.all([
       fetchWorkflow({ namespace, workflowId, runId }),
       fetchAllEvents({ namespace, workflowId, runId }),
     ]);
-    return { workflow: workflow.workflow, history };
+    if (!workflow) return;
+
+    const pendingActivities = workflow?.pendingActivities ?? [];
+    return {
+      workflow,
+      groups: groupEvents(history, 'ascending', pendingActivities),
+    };
   };
 
-  const createGroups = (
-    workflow: WorkflowExecution,
-    history: WorkflowEvents,
-  ) => {
-    onLoad();
-    const pendingActivities = workflow?.pendingActivities ?? [];
-    return groupEvents(history, 'ascending', pendingActivities);
-  };
+  const fetchKey = $derived(
+    `${namespace}|${workflowId}|${runId}|${eventCount}`,
+  );
+
+  $effect(() => {
+    void fetchKey;
+    let cancelled = false;
+    untrack(() => getWorkflowAndEventHistory()).then((next) => {
+      if (cancelled) return;
+      snapshot = next;
+      onLoad();
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
 </script>
 
-{#await getWorkflowAndEventHistory() then { workflow, history }}
+{#if snapshot}
   <div class="cursor-pointer overflow-auto {className}">
     <TimelineGraph
       {viewportHeight}
-      {workflow}
-      groups={createGroups(workflow, history)}
+      workflow={snapshot.workflow}
+      groups={snapshot.groups}
       readOnly
     />
   </div>
-{/await}
+{/if}
