@@ -38,7 +38,7 @@ describe('fetchNewsFeed', () => {
     });
 
     expect(request).toHaveBeenCalledWith(
-      'https://newsfeed.tomwheeler.com/feed_en.json?client=d104aa3a-da5f-4a19-948c-7c6144f962d3&cluster=75d9c0b6-577f-42d4-a049-9f6e47e97c46&source=web-ui',
+      'https://newsfeed.temporal.io/feed_en.json?client=d104aa3a-da5f-4a19-948c-7c6144f962d3&cluster=75d9c0b6-577f-42d4-a049-9f6e47e97c46&source=web-ui',
       { credentials: 'omit' },
     );
     expect(cache).toEqual({
@@ -60,7 +60,7 @@ describe('fetchNewsFeed', () => {
     });
 
     expect(request).toHaveBeenCalledWith(
-      'https://newsfeed.tomwheeler.com/feed_en.json?client=d104aa3a-da5f-4a19-948c-7c6144f962d3&cluster=75d9c0b6-577f-42d4-a049-9f6e47e97c46&source=web-ui',
+      'https://newsfeed.temporal.io/feed_en.json?client=d104aa3a-da5f-4a19-948c-7c6144f962d3&cluster=75d9c0b6-577f-42d4-a049-9f6e47e97c46&source=web-ui',
       { cache: 'reload', credentials: 'omit' },
     );
     expect(cache).toEqual({
