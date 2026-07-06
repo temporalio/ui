@@ -80,7 +80,7 @@
       {#if operation.scheduleToStartTimeout}
         {@render detail(
           translate('workflows.schedule-to-start-timeout'),
-          operation.scheduleToCloseTimeout as string,
+          operation.scheduleToStartTimeout as string,
         )}
       {/if}
       {#if operation.startToCloseTimeout}
