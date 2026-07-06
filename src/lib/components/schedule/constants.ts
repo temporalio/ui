@@ -82,6 +82,6 @@ const SECONDS_PER_YEAR = 365 * SECONDS_PER_DAY;
 
 export const MIN_CATCHUP_SECONDS = 10;
 export const DEFAULT_CATCHUP_WINDOW: DurationString = `${SECONDS_PER_YEAR}s`;
-export const DEFAULT_TASK_TIMEOUT: DurationString = '30s';
-export const DEFAULT_RUN_TIMEOUT: DurationString = '120s';
-export const DEFAULT_EXECUTION_TIMEOUT: DurationString = '14400s';
+export const DEFAULT_TASK_TIMEOUT: DurationString = '10s';
+export const DEFAULT_RUN_TIMEOUT: DurationString = '0s';
+export const DEFAULT_EXECUTION_TIMEOUT: DurationString = '0s';
