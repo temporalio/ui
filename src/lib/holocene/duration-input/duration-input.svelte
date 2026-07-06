@@ -47,27 +47,37 @@
 </script>
 
 <script lang="ts">
-  import type { ChangeEventHandler } from 'svelte/elements';
+  import type {
+    ChangeEventHandler,
+    HTMLInputAttributes,
+  } from 'svelte/elements';
 
+  import type { Snippet } from 'svelte';
   import { type ClassNameValue, twMerge } from 'tailwind-merge';
+
+  import { composeEventHandlers } from '$lib/utilities/event-handlers';
 
   import Label from '../label.svelte';
 
   type K = $$Generic<string>;
   type T = $$Generic<Units<K>>;
 
-  interface BaseProps {
+  interface BaseProps extends Omit<HTMLInputAttributes, 'class'> {
     value: string;
     label: string;
+    afterLabel?: Snippet;
     id: string;
     required?: boolean;
     hintText?: string;
+    hintTextAbove?: string;
+    error?: boolean;
     class?: ClassNameValue;
+    inputClass?: ClassNameValue;
   }
 
   interface PropsWithoutCustomUnits extends BaseProps {
     units?: never;
-    initialUnit?: never;
+    initialUnit?: DefaultUnits;
   }
 
   interface PropsWithCustomUnits extends BaseProps {
@@ -79,46 +89,79 @@
 
   let {
     label,
+    afterLabel,
     id,
     hintText,
+    hintTextAbove,
+    error = false,
     units = DEFAULT_UNITS as T,
     initialUnit = 'second(s)' as ExtractLabel<T>,
     required = false,
     value = $bindable(),
     class: className = '',
+    inputClass = '',
+    ...inputProps
   }: Props = $props();
 
-  let rawValue = $state(parseDuration(value));
+  const toUnitValue = (durationValue: string, unitLabel: string): string => {
+    if (!durationValue) return '';
+    const seconds = Number(parseDuration(durationValue));
+    if (!Number.isFinite(seconds)) return '';
+    const unitDef = units.find((u) => u.label === unitLabel);
+    const factor = unitDef ? unitDef.convert(1) : 1;
+    return factor ? String(seconds / factor) : String(seconds);
+  };
+
+  // svelte-ignore state_referenced_locally
+  let rawValue = $state(toUnitValue(value, initialUnit));
+  // svelte-ignore state_referenced_locally
   let unit = $state(initialUnit);
 
   const convert = (durationValue: string, durationUnit: string) => {
     const unit = units.find((u) => u.label === durationUnit);
+    if (!unit || typeof durationValue !== 'string') return;
 
-    if (unit) {
-      value = `${unit.convert(Number(durationValue))}s`;
+    if (durationValue.trim() === '' || isNaN(Number(durationValue))) {
+      value = '';
+      return;
     }
+
+    value = `${unit.convert(Number(durationValue))}s`;
   };
 
   const handleNumberInput: ChangeEventHandler<HTMLInputElement> = (e) => {
-    convert(e.currentTarget.value, unit);
+    convert(e.currentTarget.value ?? '', unit);
   };
 
   const handleUnitChange: ChangeEventHandler<HTMLSelectElement> = (e) => {
-    convert(rawValue, e.currentTarget.value);
+    convert(rawValue ?? '', e.currentTarget.value);
   };
 </script>
 
-<div class={twMerge('flex flex-col gap-1', className)}>
-  <Label {required} {label} for={id} />
+<div class={twMerge('flex flex-col gap-1.5', className)}>
+  <div class="flex items-center justify-start gap-2">
+    <Label class="grow-0" {required} {label} for={id} />
+    {@render afterLabel?.()}
+  </div>
+  {#if hintTextAbove}
+    <p class="text-xs text-secondary">
+      {hintTextAbove}
+    </p>
+  {/if}
   <div
-    class="surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50"
+    class={twMerge(
+      'surface-primary flex h-10 items-center border border-subtle focus-within:ring-2 focus-within:ring-brand/50',
+      inputClass,
+      error && 'border-danger focus-within:ring-danger/50',
+    )}
   >
     <input
       {id}
       class="flex h-full grow border-r border-subtle bg-transparent p-2 focus-visible:outline-none"
       type="number"
       bind:value={rawValue}
-      oninput={handleNumberInput}
+      {...inputProps}
+      oninput={composeEventHandlers(handleNumberInput, inputProps.oninput)}
     />
     <select
       id="{id}-unit-select"
@@ -132,6 +175,8 @@
     </select>
   </div>
   {#if hintText}
-    <p class="text-xs text-secondary">{hintText}</p>
+    <p class={twMerge('text-xs text-secondary', error && 'text-danger')}>
+      {hintText}
+    </p>
   {/if}
 </div>

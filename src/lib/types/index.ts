@@ -17,6 +17,12 @@ export type Capabilities =
     serverScaledDeployments?: boolean | null;
     serverScaledProviderCloudRun?: boolean | null;
   };
+
+export type NamespaceCapabilities = NonNullable<
+  NonNullable<DescribeNamespaceResponse['namespaceInfo']>['capabilities']
+> & {
+  standaloneNexusOperation?: boolean | null;
+};
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =
@@ -318,7 +324,11 @@ export type Duration = google.protobuf.IDuration;
 
 // extra APIs
 export type SettingsResponse = {
-  Auth: { Enabled: boolean; Options: string[] };
+  Auth: {
+    Enabled: boolean;
+    Options: string[] | null;
+    RedirectToProvider?: boolean;
+  };
   Codec: {
     Endpoint: string;
     PassAccessToken?: boolean;
@@ -340,7 +350,9 @@ export type SettingsResponse = {
   RefreshWorkflowCountsDisabled: boolean;
   ActivityCommandsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
+  NavCollapsedByDefault: boolean;
   FeedbackURL: string;
+  DisableNewsFetch: boolean;
   Version: string;
 };
 

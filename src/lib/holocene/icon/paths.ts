@@ -32,6 +32,7 @@ import circleCheck from './svg/circle-check.svelte';
 import cirlceQuestion from './svg/circle-question.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
+import code from './svg/code.svelte';
 import collapse from './svg/collapse.svelte';
 import cometSolid from './svg/comet-solid.svelte';
 import comet from './svg/comet.svelte';
@@ -87,10 +88,13 @@ import linux from './svg/linux.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import marker from './svg/marker.svelte';
+import megaphoneUnread from './svg/megaphone-unread.svelte';
+import megaphone from './svg/megaphone.svelte';
 import merge from './svg/merge.svelte';
 import microchip from './svg/microchip.svelte';
 import microsoft from './svg/microsoft.svelte';
 import minimize from './svg/minimize.svelte';
+import minus from './svg/minus.svelte';
 import moon from './svg/moon.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
@@ -102,6 +106,7 @@ import pencil from './svg/pencil.svelte';
 import pinFilled from './svg/pin-filled.svelte';
 import pin from './svg/pin.svelte';
 import play from './svg/play.svelte';
+import plus from './svg/plus.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -190,6 +195,7 @@ export const icons = {
   'circle-question': cirlceQuestion,
   clock,
   close,
+  code,
   collapse,
   'comet-solid': cometSolid,
   comet,
@@ -245,10 +251,13 @@ export const icons = {
   lock,
   logout,
   marker,
+  megaphone,
+  'megaphone-unread': megaphoneUnread,
   merge,
   microchip,
   microsoft,
   minimize,
+  minus,
   moon,
   'namespace-switcher': namespaceSwitcher,
   namespace,
@@ -256,6 +265,7 @@ export const icons = {
   'office-buildings': officeBuildings,
   overview,
   play,
+  plus,
   pause,
   pencil,
   'pin-filled': pinFilled,

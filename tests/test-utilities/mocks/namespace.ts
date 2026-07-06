@@ -100,6 +100,25 @@ export const mockNamespaceWithPauseCapability = (page: Page) => {
   });
 };
 
+const MOCK_NAMESPACE_WITH_NEXUS_OPERATIONS = {
+  ...MOCK_DEFAULT_NAMESPACE,
+  namespaceInfo: {
+    ...MOCK_DEFAULT_NAMESPACE.namespaceInfo,
+    capabilities: {
+      ...MOCK_DEFAULT_NAMESPACE.namespaceInfo.capabilities,
+      standaloneNexusOperation: true,
+    },
+  },
+};
+
+export const mockNamespaceWithNexusOperations = (page: Page) => {
+  return page.route(NAMESPACE_API, (route) => {
+    route.fulfill({
+      json: MOCK_NAMESPACE_WITH_NEXUS_OPERATIONS,
+    });
+  });
+};
+
 const MOCK_NAMESPACE_WITH_NO_WORKER_HEARTBEATS = {
   ...MOCK_DEFAULT_NAMESPACE,
   namespaceInfo: {

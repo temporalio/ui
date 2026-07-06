@@ -126,3 +126,38 @@ export const savedActivityQueries = persistStore<Record<string, SavedQuery[]>>(
   {},
   true,
 );
+
+// Nexus operation saved queries
+export const DEFAULT_NEXUS_SYSTEM_VIEW: SavedQuery = {
+  id: 'all',
+  name: 'All',
+  query: '',
+  icon: 'nexus',
+  type: 'system',
+};
+
+export const systemNexusViews: SavedQuery[] = [
+  DEFAULT_NEXUS_SYSTEM_VIEW,
+  {
+    id: 'today',
+    name: 'Today',
+    query: `StartTime >= "${getToday()}"`,
+    icon: 'calendar',
+    type: 'system',
+  },
+  {
+    id: 'last-hour',
+    name: 'Last Hour',
+    query: `StartTime >= "${getLastHour()}"`,
+    icon: 'clock',
+    type: 'system',
+  },
+];
+
+export const MAX_SAVED_NEXUS_QUERIES = 50;
+
+export const savedNexusQueries = persistStore<Record<string, SavedQuery[]>>(
+  'saved-nexus-queries',
+  {},
+  true,
+);
