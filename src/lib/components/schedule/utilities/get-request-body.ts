@@ -1,3 +1,4 @@
+import { parseDuration } from '$lib/holocene/duration-input/duration-input.svelte';
 import { setSearchAttributes } from '$lib/services/workflow-service';
 import type { Payload } from '$lib/types';
 import { encodePayloads } from '$lib/utilities/encode-payload';
@@ -86,6 +87,16 @@ function getSchedulePoliciesRequest(
   } satisfies SchedulePoliciesRequest;
 }
 
+// Omit zero/empty workflow timeouts so the server applies its defaults
+// (execution/run: unlimited, task: 10s) rather than sending an explicit 0.
+function toWorkflowTimeout(value: string | undefined): string | undefined {
+  if (!value || Number(parseDuration(value)) <= 0) {
+    return undefined;
+  }
+
+  return value;
+}
+
 async function getScheduleActionRequest(
   scheduleForm: FormScheduleSchema,
   describeFullSchedule: DescribeFullSchedule | null = null,
@@ -120,15 +131,11 @@ async function getScheduleActionRequest(
       searchAttributes: getSearchAttributes(
         scheduleForm.workflowSearchAttributes,
       ),
-      ...(scheduleForm.taskTimeout && {
-        workflowTaskTimeout: scheduleForm.taskTimeout,
-      }),
-      ...(scheduleForm.runTimeout && {
-        workflowRunTimeout: scheduleForm.runTimeout,
-      }),
-      ...(scheduleForm.executionTimeout && {
-        workflowExecutionTimeout: scheduleForm.executionTimeout,
-      }),
+      workflowTaskTimeout: toWorkflowTimeout(scheduleForm.taskTimeout),
+      workflowRunTimeout: toWorkflowTimeout(scheduleForm.runTimeout),
+      workflowExecutionTimeout: toWorkflowTimeout(
+        scheduleForm.executionTimeout,
+      ),
       ...(header && { header }),
     },
   } satisfies ScheduleActionRequest;
