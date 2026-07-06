@@ -31,6 +31,7 @@ overrides:
   fast-uri: ^3.1.2
   uuid@>=11 <12: ^11.1.1
   postcss: ^8.5.10
+  '@lezer/common': 1.5.2
 
 importers:
 
@@ -1258,9 +1259,6 @@ packages:
     engines: {node: '>= 20'}
     peerDependencies:
       koa: ^3.2.0
-
-  '@lezer/common@1.4.0':
-    resolution: {integrity: sha512-DVeMRoGrgn/k45oQNu189BoW4SZwgZFzJ1+1TV5j2NJ/KFC83oa/enRqZSGshyeMk5cPWMhsKs9nx+8o0unwGg==}
 
   '@lezer/common@1.5.2':
     resolution: {integrity: sha512-sxQE460fPZyU3sdc8lafxiPwJHBzZRy/udNFynGQky1SePYBdhkBl1kOagA9uT3pxR8K09bOrmTUqA9wb/PjSQ==}
@@ -7975,14 +7973,14 @@ snapshots:
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
       '@codemirror/view': 6.43.4
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
 
   '@codemirror/commands@6.10.4':
     dependencies:
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
       '@codemirror/view': 6.43.4
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
 
   '@codemirror/lang-angular@0.1.4':
     dependencies:
@@ -8011,7 +8009,7 @@ snapshots:
       '@codemirror/autocomplete': 6.20.3
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/go': 1.0.1
 
   '@codemirror/lang-html@6.4.11':
@@ -8022,7 +8020,7 @@ snapshots:
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
       '@codemirror/view': 6.43.4
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/css': 1.3.0
       '@lezer/html': 1.3.12
 
@@ -8080,7 +8078,7 @@ snapshots:
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
       '@codemirror/view': 6.43.4
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/markdown': 1.6.1
 
   '@codemirror/lang-php@6.0.2':
@@ -8088,7 +8086,7 @@ snapshots:
       '@codemirror/lang-html': 6.4.11
       '@codemirror/language': 6.12.4
       '@codemirror/state': 6.7.0
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/php': 1.0.5
 
   '@codemirror/lang-python@6.2.1':
@@ -8771,8 +8769,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@lezer/common@1.4.0': {}
-
   '@lezer/common@1.5.2': {}
 
   '@lezer/cpp@1.1.4':
@@ -8783,29 +8779,29 @@ snapshots:
 
   '@lezer/css@1.3.0':
     dependencies:
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.5
 
   '@lezer/go@1.0.1':
     dependencies:
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.5
 
   '@lezer/highlight@1.2.3':
     dependencies:
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
 
   '@lezer/html@1.3.12':
     dependencies:
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.5
 
   '@lezer/java@1.1.3':
     dependencies:
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.5
 
@@ -8817,7 +8813,7 @@ snapshots:
 
   '@lezer/json@1.0.3':
     dependencies:
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.5
 
@@ -8827,12 +8823,12 @@ snapshots:
 
   '@lezer/markdown@1.6.1':
     dependencies:
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
 
   '@lezer/php@1.0.5':
     dependencies:
-      '@lezer/common': 1.4.0
+      '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.5
 
