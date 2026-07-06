@@ -102,6 +102,4 @@ export const Strings = {
   'empty-search-attributes': 'No Search Attributes Found',
   'empty-memo-attributes': 'No Memo Attributes Found',
   'empty-header-attributes': 'No Header Attributes Found',
-  'expand-details': 'Expand details',
-  'collapse-details': 'Collapse details',
 } as const;
