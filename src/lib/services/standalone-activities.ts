@@ -1,4 +1,13 @@
 import type { StandaloneActivityFormData } from '$lib/components/standalone-activities/start-standalone-activity-form/types';
+import {
+  type DefaultUnits,
+  getFirstWholeNumberUnit,
+  HOURS,
+  MILLISECONDS,
+  MINUTES,
+  SECONDS,
+  type Units,
+} from '$lib/holocene/duration-input/duration-input.svelte';
 import { translate } from '$lib/i18n/translate';
 import {
   isPayloadInputEncodingType,
@@ -21,6 +30,21 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { setSearchAttributes } from './workflow-service';
+
+// Timeout duration inputs on the activity forms; largest-first so
+// getFirstWholeNumberUnit resolves to the coarsest whole unit, defaulting to
+// seconds when there is no value.
+export const TIMEOUT_UNITS: Units<DefaultUnits> = [
+  HOURS,
+  MINUTES,
+  SECONDS,
+  MILLISECONDS,
+];
+
+export const initialTimeoutUnit = (
+  duration: string,
+): DefaultUnits | undefined =>
+  getFirstWholeNumberUnit(duration, TIMEOUT_UNITS, SECONDS.label);
 
 export type ListActivitiesResponse = {
   executions: ActivityExecutionInfo[];
