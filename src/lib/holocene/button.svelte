@@ -115,6 +115,12 @@
   export let target: string = null;
   export let disableTracking = false;
 
+  let element: HTMLElement;
+
+  export function focus() {
+    element?.focus();
+  }
+
   let className = '';
   export { className as class };
 
@@ -137,6 +143,7 @@
 
 {#if href && !disabled}
   <a
+    bind:this={element}
     {href}
     {id}
     role="button"
@@ -180,6 +187,7 @@
   </a>
 {:else}
   <button
+    bind:this={element}
     {disabled}
     {id}
     type="button"

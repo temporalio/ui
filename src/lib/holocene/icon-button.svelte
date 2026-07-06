@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
 
+  import type { ComponentProps } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
@@ -12,6 +13,7 @@
     label: string;
     variant?: 'primary' | 'secondary' | 'ghost';
     class?: string;
+    size?: ComponentProps<typeof Button>['size'];
   }
 
   let className = '';

@@ -170,11 +170,7 @@
               timestamp={$activityExecution.info.lastStartedTime}
             />
             {#if isClosed}
-              <DetailListLabel
-                >{translate(
-                  'standalone-activities.close-time',
-                )}</DetailListLabel
-              >
+              <DetailListLabel>{translate('common.end')}</DetailListLabel>
               <DetailListTimestampValue
                 timestamp={$activityExecution.info.lastStartedTime}
               />

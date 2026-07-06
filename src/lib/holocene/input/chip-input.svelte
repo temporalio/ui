@@ -47,6 +47,7 @@
   let displayValue = $state('');
 
   const invalid = $derived(chips.some((chip) => !validator(chip)));
+  const errorId = $derived(`${id}-error`);
 
   const handleKeydown = (e: KeyboardEvent) => {
     e.stopPropagation();
@@ -144,6 +145,8 @@
       {id}
       {name}
       {required}
+      aria-invalid={invalid ? 'true' : undefined}
+      aria-describedby={invalid && hintText ? errorId : undefined}
       multiple
       data-testid={id}
       bind:value={displayValue}
@@ -156,30 +159,29 @@
     />
   </div>
 
-  {#if (invalid && hintText) || (maxLength && !disabled)}
-    <div class="flex justify-between gap-2">
-      <div
-        class="error-msg"
-        class:min-width={maxLength}
-        aria-live={invalid ? 'assertive' : 'off'}
-      >
-        {#if invalid && hintText}
-          <p>{hintText}</p>
-        {/if}
-      </div>
-      {#if maxLength && !disabled}
-        <span class="count">
-          <span
-            class="text-information"
-            class:warn={maxLength - chips.length <= 5}
-            class:error={maxLength === chips?.length}
-          >
-            {chips.length}
-          </span>&nbsp;/&nbsp;{maxLength}
-        </span>
+  <div class="flex justify-between gap-2">
+    <div
+      id={errorId}
+      class="error-msg"
+      class:min-width={maxLength}
+      role="alert"
+    >
+      {#if invalid && hintText}
+        <p>{hintText}</p>
       {/if}
     </div>
-  {/if}
+    {#if maxLength && !disabled}
+      <span class="count">
+        <span
+          class="text-information"
+          class:warn={maxLength - chips.length <= 5}
+          class:error={maxLength === chips?.length}
+        >
+          {chips.length}
+        </span>&nbsp;/&nbsp;{maxLength}
+      </span>
+    {/if}
+  </div>
 
   {#if chips.length > 0 && external}
     <div class="flex flex-row flex-wrap gap-1">

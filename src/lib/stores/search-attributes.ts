@@ -241,7 +241,6 @@ export const activitySearchAttributes: Readable<SearchAttributes> = derived(
     RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     TaskQueue: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
     StartTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
-    ExecutionTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
     CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
     ExecutionDuration: SEARCH_ATTRIBUTE_TYPE.INT,
     StateTransitionCount: SEARCH_ATTRIBUTE_TYPE.INT,
@@ -264,3 +263,39 @@ export const activitySearchAttributeOptions: Readable<SearchAttributeOption[]> =
         return 0;
       });
   });
+
+export const nexusOperationSearchAttributes: Readable<SearchAttributes> =
+  derived(customSearchAttributes, ($customSearchAttributes) => ({
+    ExecutionStatus: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    OperationId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    RunId: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    Endpoint: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    Service: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    Operation: SEARCH_ATTRIBUTE_TYPE.KEYWORD,
+    ScheduleTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    CloseTime: SEARCH_ATTRIBUTE_TYPE.DATETIME,
+    ExecutionDuration: SEARCH_ATTRIBUTE_TYPE.INT,
+    StateTransitionCount: SEARCH_ATTRIBUTE_TYPE.INT,
+    ...$customSearchAttributes,
+  }));
+
+export const nexusOperationSearchAttributeOptions: Readable<
+  SearchAttributeOption[]
+> = derived(
+  nexusOperationSearchAttributes,
+  ($nexusOperationSearchAttributes) => {
+    return Object.entries($nexusOperationSearchAttributes)
+      .map(([key, value]) => {
+        return {
+          label: key,
+          value: key,
+          type: value,
+        };
+      })
+      .sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        return 0;
+      });
+  },
+);
