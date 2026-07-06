@@ -46,6 +46,8 @@
     submitting || (disableTypeForExisting && isExisting),
   );
 
+  const showButton = $derived(!isExisting || isDeletable);
+
   const hasError = $derived(!!error);
 
   const handleNameInput: FormEventHandler<HTMLInputElement> = (e) => {
@@ -53,7 +55,7 @@
   };
 </script>
 
-<div class="grid grid-cols-[1fr,200px,auto] items-center gap-3">
+<div class="grid grid-cols-[1fr,200px,2rem] items-center gap-3">
   <Input
     id={`attribute-name-${index}`}
     value={name}
@@ -66,21 +68,23 @@
     oninput={handleNameInput}
   />
 
-  <Select
-    id={`attribute-type-${index}`}
-    value={type}
-    label={translate('search-attributes.type-label', {
-      index: index + 1,
-    })}
-    labelHidden
-    disabled={isTypeDisabled}
-    placeholder={translate('search-attributes.select-type-placeholder')}
-    onChange={onTypeChange}
-  >
-    {#each supportedTypes as type (`${type.label}:${type.value}`)}
-      <Option value={type.value}>{type.label}</Option>
-    {/each}
-  </Select>
+  <div class:col-span-2={!showButton}>
+    <Select
+      id={`attribute-type-${index}`}
+      value={type}
+      label={translate('search-attributes.type-label', {
+        index: index + 1,
+      })}
+      labelHidden
+      disabled={isTypeDisabled}
+      placeholder={translate('search-attributes.select-type-placeholder')}
+      onChange={onTypeChange}
+    >
+      {#each supportedTypes as type (`${type.label}:${type.value}`)}
+        <Option value={type.value}>{type.label}</Option>
+      {/each}
+    </Select>
+  </div>
 
   {#if !isExisting}
     <Button
