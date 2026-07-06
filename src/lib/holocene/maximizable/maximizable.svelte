@@ -100,6 +100,7 @@
       'fixed left-0 right-0 top-0 z-100 h-full w-full overflow-y-auto bg-white dark:bg-black',
     className,
   )}
+  tabindex="-1"
   onfocusout={handleFocusOut}
   use:focusTrap={maximized}
 >

@@ -77,6 +77,7 @@
     in:fly={flyParamsIn}
     out:fly={flyParamsOut}
     role="region"
+    tabindex="-1"
     use:portal
     use:focusTrap={true}
     use:clickoutside={onClick}
