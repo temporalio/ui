@@ -71,8 +71,8 @@
   let reverseSort = $derived($eventFilterSort === 'descending');
   let compact = $derived($eventViewType === 'compact');
 
-  let bufferGroups = $state(getGroupArray({ excludeWorkflowTasks: true }));
-  let bufferEvents = $state(getEventArray());
+  let bufferGroups = $state.raw(getGroupArray({ excludeWorkflowTasks: true }));
+  let bufferEvents = $state.raw(getEventArray());
   let updating = $derived(!historyCtx.fetchComplete);
 
   onMount(() => {

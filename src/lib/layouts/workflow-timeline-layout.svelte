@@ -6,7 +6,8 @@
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
+  import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
+  import type { Timeline } from '$lib/components/lines-and-dots/timeline-graph/timeline.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
@@ -26,7 +27,7 @@
     onLatestGroup,
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
-  import { eventFilterSort } from '$lib/stores/event-view';
+  import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
   import { pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -61,7 +62,7 @@
 
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  let bufferGroups = $state<EventGroup[]>([]);
+  let bufferGroups = $state.raw<EventGroup[]>([]);
 
   const filteredBufferGroups = $derived.by(() => {
     const active = $eventTypeFilter;
@@ -101,136 +102,25 @@
     updateEventFilterParams(page.url, { sort: newSort }, goto);
   };
 
-  // ── Sticky canvas + sentinel scroll (mirrors fasterer page pattern) ────────
-  // The outer #content-wrapper scrolls. The sentinel sits at the top of the
-  // canvas area. Once content above it scrolls off, the sticky wrapper locks
-  // to the viewport. The sentinel's getBoundingClientRect().top drives scrollY
-  // so TimelineGraph's per-row guard knows which rows are visible.
-
-  let sentinelEl = $state<HTMLDivElement | null>(null);
-  let scrollContainerEl: HTMLElement | null = null;
-  let timelineScrollY = $state(0);
-
-  // Total pixel height for the spacer that extends the page scroll range.
-  // spacer = timelineHeight − stickyHeight so that when scrollTop reaches its
-  // maximum the bottom axis line aligns with the bottom of the viewport.
-  // timelineHeight = (groups + 2) * ROW_PX (mirrors timeline-graph.svelte).
-  // stickyHeight is measured via bind:clientHeight on the sticky canvas div.
-  const ROW_PX = 24;
-  let stickyHeight = $state(0);
-  let graphPanelHeight = $state(0);
-  let controlsHeight = $state(0);
+  // The timeline renders in normal page flow: the page (#content-wrapper)
+  // scrolls it and the controls bar sticks to the top-nav. TimelineGraph
+  // virtualizes internally via IntersectionObserver, so there's no bounded
+  // scroll container, no scroll-offset bridge, and no height plumbing here.
   const estimatedTotalGroups = $derived.by(() => {
     if (historyCtx.fetchComplete) return groups.length;
     const totalEvents = historyCtx.totalExpectedEvents ?? 0;
     return Math.max(groups.length, Math.ceil(totalEvents * 0.5));
   });
 
-  const totalRows = $derived(
-    historyCtx.fetchComplete ? groups.length : estimatedTotalGroups,
-  );
-  // Natural pixel height of all timeline content (rows + axis + detail panel).
-  // +120 matches timeline-graph's canvasHeight = timelineHeight + 120, which
-  // provides space for the date labels zone above and the time axis below.
-  // When fewer events fit in one viewport the canvas shrinks to this height,
-  // matching master's compact look. For large histories it is capped at the
-  // viewport via CSS min(), enabling virtual-scroll without changing the logic.
-  const canvasContentHeight = $derived(
-    Math.max((totalRows + 2) * ROW_PX, 120) + graphPanelHeight + 120,
-  );
-  // The canvas sticks below both the top-nav and the controls bar, so the
-  // maximum viewport-filling height must subtract both of their heights.
-  const canvasMaxHeight = $derived(
-    `calc(100dvh - var(--top-nav-height, 3rem) - ${controlsHeight}px)`,
-  );
-  const spacerHeight = $derived(
-    Math.max((totalRows + 2) * ROW_PX, 120) - stickyHeight + graphPanelHeight,
-  );
-
-  // Sentinel's layout position within the scroll container — measured once at
-  // mount so the hot-path scroll handler uses only arithmetic (no
-  // getBoundingClientRect(), which forces layout after DOM mutations).
-  let sentinelOffset = 0;
-
   onMount(() => {
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
 
-    scrollContainerEl = document.getElementById('content-wrapper');
-
-    if (scrollContainerEl && sentinelEl) {
-      // One-time layout read: sentinel position relative to scroll container.
-      // scrollTop is 0 at mount, so BoundingClientRect.top equals the
-      // document-relative offset minus the container's top.
-      const containerRect = scrollContainerEl.getBoundingClientRect();
-      const sentinelRect = sentinelEl.getBoundingClientRect();
-      sentinelOffset =
-        sentinelRect.top - containerRect.top + scrollContainerEl.scrollTop;
-
-      // Scroll tracking: dirty-flag + perpetual RAF tick.
-      //
-      // The scroll event handler does NOTHING except flip a boolean — zero layout
-      // reads, zero Svelte writes. This means CodeMirror's observers.scroll (which
-      // also listens on #content-wrapper) reads scrollTop / getBoundingClientRect
-      // against an untouched DOM → no forced style recalculation of SVG children.
-      //
-      // The RAF tick runs once per animation frame (before paint). At that point:
-      //   • The previous frame's Svelte writes have been painted → DOM is clean.
-      //   • We read scrollTop (clean read, no pending mutations from us).
-      //   • Then we write timelineScrollY (dirty write — Svelte queues effects).
-      //   • Browser recalculates SVG styles naturally as part of the render pipeline.
-      //
-      // Result: zero forced reflows in the scroll hot-path.
-      let scrollDirty = false;
-      let prevScrollY = -1;
-      let rafId = 0;
-
-      const markDirty = () => {
-        scrollDirty = true;
-      };
-      scrollContainerEl.addEventListener('scroll', markDirty, {
-        passive: true,
-      });
-
-      const tick = () => {
-        if (scrollDirty) {
-          scrollDirty = false;
-          const rawY = Math.max(
-            0,
-            scrollContainerEl.scrollTop - sentinelOffset,
-          );
-          if (rawY !== prevScrollY) {
-            prevScrollY = rawY;
-            timelineScrollY = rawY;
-          }
-        }
-        rafId = requestAnimationFrame(tick);
-      };
-      rafId = requestAnimationFrame(tick);
-
-      // Throttle buffer → Svelte updates to at most once per animation frame.
-      // onLatestGroup fires for every new group head (~N times during load),
-      // each triggering getGroupArray() (O(N log N) sort) + full Svelte
-      // reactive cascade. Batching via rAF reduces that to ≤60 updates/sec
-      // regardless of how fast the bidirectional cursors push data.
-      let groupUpdatePending = false;
-      const unsub = onLatestGroup(() => {
-        if (!groupUpdatePending) {
-          groupUpdatePending = true;
-          requestAnimationFrame(() => {
-            groupUpdatePending = false;
-            bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-          });
-        }
-      });
-
-      return () => {
-        scrollContainerEl?.removeEventListener('scroll', markDirty);
-        cancelAnimationFrame(rafId);
-        unsub();
-      };
-    }
-
+    // Throttle buffer → Svelte updates to at most once per animation frame.
+    // onLatestGroup fires for every new group head (~N times during load), each
+    // triggering getGroupArray() (O(N log N) sort) + a full reactive cascade;
+    // batching via rAF caps that at ≤60 updates/sec regardless of how fast the
+    // bidirectional cursors push data.
     let groupUpdatePending = false;
     const unsub = onLatestGroup(() => {
       if (!groupUpdatePending) {
@@ -241,7 +131,10 @@
         });
       }
     });
-    return () => unsub();
+
+    return () => {
+      unsub();
+    };
   });
 
   $effect(() => {
@@ -253,6 +146,23 @@
       bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
     }
   });
+
+  let timeline = $state<Timeline>();
+
+  const handleTimelineInit = (t: Timeline) => {
+    timeline = t;
+  };
+
+  const onToggleIdleTime = () => {
+    if (!timeline) return;
+    if (timeline.allCollapsibleSegmentsCollapsed) {
+      timeline.expandAllSegments();
+      $collapseIdleTime = 'off';
+    } else {
+      timeline.collapseAllSegments();
+      $collapseIdleTime = 'on';
+    }
+  };
 </script>
 
 <InputAndResults />
@@ -270,14 +180,12 @@
 
 <!--
   Wrapper: single flex child so the parent's gap-4 only applies once (above
-  this block). Internally the children are in normal block flow with no gaps,
-  meaning the controls bar, sentinel, and sticky canvas are flush against each
-  other with no phantom spacing from the flex gap.
+  this block). The controls bar sticks below the top-nav while the page scrolls
+  the timeline past it; the timeline virtualizes itself via IntersectionObserver.
 -->
 <div>
   <div
     class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
-    bind:clientHeight={controlsHeight}
   >
     <div class="flex items-center gap-2">
       <h2>{translate('workflows.timeline-tab')}</h2>
@@ -291,6 +199,19 @@
           on:click={onSort}
           size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
         >
+        <ToggleButton
+          leadingIcon="timeline-collapse"
+          data-testid="toggle-idle-time"
+          loading={!historyCtx.fetchComplete}
+          disabled={!historyCtx.fetchComplete ||
+            !timeline?.hasCollapsibleSegments}
+          on:click={onToggleIdleTime}
+          size="sm"
+        >
+          {timeline?.allCollapsibleSegmentsCollapsed
+            ? translate('workflows.show-idle-time')
+            : translate('workflows.hide-idle-time')}
+        </ToggleButton>
         <EventTypeFilter compact={false} />
         <ToggleButton
           disabled={isNotPending}
@@ -321,44 +242,22 @@
   </div>
 
   <!--
-  Sentinel: zero-height element marking the top of the canvas area.
-  Its viewport-relative top gives us timelineScrollY without tracking heights.
-  Lives inside the wrapper (block flow) so the parent's flex gap-4 does not
-  push the canvas away from the controls bar.
+  Timeline in page flow: it's a tall element the page scrolls, and it
+  virtualizes itself via IntersectionObserver (no bounded scroll container,
+  no scroll-offset bridge).
 -->
-  <div bind:this={sentinelEl} class="pointer-events-none h-0"></div>
-
-  <!--
-  Sticky canvas: locks below the top-nav AND the controls bar once the content
-  above scrolls off. border-t supplies the top border that timeline-graph omits
-  (border-t-0) so it shares the controls bar's border-b in master's layout.
-  overflow-hidden clips TimelineGraph so it doesn't expand the page height.
--->
-  <div
-    class="sticky overflow-hidden border-t border-subtle"
-    style="top: calc(var(--top-nav-height, 3rem) + {controlsHeight}px); height: min({canvasContentHeight}px, {canvasMaxHeight});"
-    bind:clientHeight={stickyHeight}
-  >
-    {#if workflow}
-      <TimelineGraph
-        {workflow}
-        {groups}
-        {reverseSort}
-        loading={!historyCtx.fetchComplete}
-        scrollY={timelineScrollY}
-        totalExpectedEvents={estimatedTotalGroups}
-        descMinId={historyCtx.descMinId}
-        error={Boolean(workflowTaskFailedError)}
-        bind:panelHeight={graphPanelHeight}
-      />
-    {/if}
-  </div>
-
-  <!--
-  Spacer: extends #content-wrapper's scroll range to cover the full timeline height.
-  The sentinel + scroll handler convert that scrollTop into timelineScrollY.
--->
-  <div class="pointer-events-none" style="height: {spacerHeight}px;"></div>
+  {#if workflow}
+    <TimelineGraph
+      {workflow}
+      {groups}
+      {reverseSort}
+      loading={!historyCtx.fetchComplete}
+      totalExpectedEvents={estimatedTotalGroups}
+      descMinId={historyCtx.descMinId}
+      error={Boolean(workflowTaskFailedError)}
+      onTimelineInit={handleTimelineInit}
+    />
+  {/if}
 </div>
 <!-- end wrapper -->
 
