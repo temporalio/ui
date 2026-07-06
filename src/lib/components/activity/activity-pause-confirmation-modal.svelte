@@ -2,6 +2,7 @@
   import type { WorkflowExecution } from '@temporalio/client';
 
   import Input from '$lib/holocene/input/input.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import { Action } from '$lib/models/workflow-actions';
@@ -61,13 +62,21 @@
       activityId: activity.id,
     })}
   </h3>
-  <div slot="content" class="flex flex-col gap-4">
+  <div slot="content">
     <p>{translate('activities.pause-modal-description')}</p>
+    <Link
+      newTab
+      trailingIcon="book"
+      href="https://docs.temporal.io/activity-operations#important-considerations"
+      class="mt-1"
+    >
+      {translate('activities.pause-modal-docs-link')}
+    </Link>
     <Input
       id="activity-pause-reason"
       class="mt-4"
       placeholder={translate('common.reason-placeholder')}
-      label={translate('common.reason')}
+      label={translate('common.reason-optional')}
       bind:value={reason}
     />
   </div>

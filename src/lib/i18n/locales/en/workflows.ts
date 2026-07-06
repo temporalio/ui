@@ -29,7 +29,7 @@ export const Strings = {
   'batch-reset-confirmation_other':
     'Are you sure you want to reset {{count, number}} workflows?',
   'batch-operation-confirmation-input-hint':
-    'If you supply a custom reason, "{{placeholder}}" will be appended to it. If you omit a reason, the placeholder will be used.',
+    'If you omit a reason, the placeholder will be used.',
   'batch-terminate-all-success':
     'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':
@@ -118,7 +118,7 @@ export const Strings = {
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Data',
-  'signal-payload-input-label-hint': '(only single JSON payload supported)',
+  'signal-payload-input-label-hint': 'Single JSON payload supported.',
   'update-modal-title': 'Send an Update',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
@@ -127,7 +127,7 @@ export const Strings = {
   'reset-success-alert-description':
     'You can find the resulting Workflow Execution <1>here</1>.',
   'workflow-paused': 'This Workflow is Paused',
-  'workflow-paused-reason': 'Reason this Workflow is paused',
+  'paused-time': 'Paused Time',
   'workflow-paused-description':
     'The worker will no longer process tasks on this Workflow. There are still some events that will continue to run:',
   'workflow-pause-description':
@@ -170,7 +170,6 @@ export const Strings = {
     'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
   'dismiss-common-errors': 'Dismiss Common Errors',
   'state-transitions': 'State Transitions',
-  'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
   'family-node-label': 'Workflow {{id}}: {{status}}',
   parents_zero: '0 Parents',
@@ -365,4 +364,5 @@ export const Strings = {
   'show-common-errors': 'Show Common Errors',
   'show-common-errors-description':
     'Show alerts for common errors if present in the Event History',
+  'total-workflows': 'Total Workflows',
 } as const;

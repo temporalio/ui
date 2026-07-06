@@ -87,8 +87,6 @@
     return () => clearInterval(interval);
   });
 
-  const lastRefreshFormatted = $derived($timestamp(lastRefresh));
-
   const SupplierKindTooltipText: Record<string, string> = {
     Fixed: translate('workers.slot-supplier-kind-fixed'),
     ResourceBased: translate('workers.slot-supplier-kind-resource-based'),
@@ -245,7 +243,7 @@
       </p>
     {:else}
       <p>
-        {translate('workers.last-refreshed', { time: lastRefreshFormatted })}
+        {translate('workers.last-refreshed')}: {$timestamp(lastRefresh)}
       </p>
     {/if}
   </div>

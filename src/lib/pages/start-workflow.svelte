@@ -7,6 +7,7 @@
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
+  import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -145,11 +146,10 @@
     }
   };
 
-  const generateRandomWorkflowId = () => {
-    workflowId = crypto.randomUUID();
+  const syncWorkflowId = (value: string) => {
     updateQueryParameters({
       parameter: 'workflowId',
-      value: workflowId,
+      value,
       url: $page.url,
       allowEmpty: true,
       options: { keepFocus: true, noScroll: true, replaceState: true },
@@ -266,12 +266,11 @@
         class="w-full grow"
         onblur={(e) => onInputChange(e, 'workflowId')}
       />
-      <Button
+      <RandomUuidButton
         class="mt-0 md:mt-6"
-        variant="secondary"
-        leadingIcon="retry"
-        on:click={generateRandomWorkflowId}>Random UUID</Button
-      >
+        bind:value={workflowId}
+        onGenerate={syncWorkflowId}
+      />
     </div>
     <div class="flex w-full items-center justify-between gap-4">
       <Input

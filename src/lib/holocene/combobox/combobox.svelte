@@ -495,7 +495,7 @@
 </script>
 
 <MenuContainer {open} onclose={handleMenuClose}>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1.5">
     <Label hidden={labelHidden} {required} {label} for={id} />
     <div
       class={merge(
@@ -696,7 +696,7 @@
   }
 
   .input-wrapper {
-    @apply flex w-full flex-wrap items-center;
+    @apply flex grow flex-wrap items-center;
   }
 
   .combobox-input {
