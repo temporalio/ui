@@ -607,7 +607,7 @@ export function enrichGroups(
 
     if (isActivityTaskScheduledEvent(initial)) {
       const pa = byActivityId.get(
-        initial.activityTaskScheduledEventAttributes?.activityId,
+        initial.activityTaskScheduledEventAttributes?.activityId ?? '',
       );
       if (pa && group.eventList.length < 3) {
         group.pendingActivity = pa;
@@ -905,8 +905,13 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
       const meta = groupPool[eventToGroup[headSlotIdx] - 1];
       if (meta?.group) {
         insertEventById(meta.group.eventList, event);
+        meta.group.timestamp = event.timestamp;
         addEventToGroup(meta.group, event);
         eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
+        const followerMs = toMs(event.eventTime);
+        if (followerMs > meta.endMs) {
+          meta.endMs = followerMs;
+        }
         _cachedGroups = null;
         _cachedGroupsNoWFT = null;
       }

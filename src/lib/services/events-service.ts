@@ -273,10 +273,11 @@ export const fetchAllEventsBidirectional = async ({
 
   const ascCtrl = new AbortController();
   const descCtrl = new AbortController();
-  signal?.addEventListener('abort', () => {
+  const onAbort = () => {
     ascCtrl.abort();
     descCtrl.abort();
-  });
+  };
+  signal?.addEventListener('abort', onAbort);
 
   let ascMaxId = 0;
   let descMinId = Infinity;
@@ -309,12 +310,18 @@ export const fetchAllEventsBidirectional = async ({
 
   // Snapshot the current slots array as a sorted, duplicate-free CommonHistoryEvent[].
   // slots is indexed by eventId-1 so iteration order is ascending — no sort needed.
-  // Gaps in the middle (events not yet fetched by either cursor) are simply skipped.
+  // The ascending cursor fills a contiguous prefix [0, ascMaxId) and the descending
+  // cursor a contiguous suffix [descMinId-1, descMaxId); iterating only those ranges
+  // avoids rescanning the not-yet-fetched middle on every page.
   const snapshotAccumulated = (): CommonHistoryEvent[] => {
-    const source = slots ?? (tempBuf as (HistoryEvent | undefined)[]);
+    if (slots === null) return toEventHistory(tempBuf);
     const filled: HistoryEvent[] = [];
-    for (let i = 0; i < source.length; i++) {
-      if (source[i] !== undefined) filled.push(source[i]!);
+    for (let i = 0; i < ascMaxId; i++) {
+      if (slots[i] !== undefined) filled.push(slots[i]!);
+    }
+    const descStart = Math.max(ascMaxId, descMinId - 1);
+    for (let i = descStart; i < descMaxId; i++) {
+      if (slots[i] !== undefined) filled.push(slots[i]!);
     }
     return toEventHistory(filled);
   };
@@ -459,6 +466,7 @@ export const fetchAllEventsBidirectional = async ({
   };
 
   await Promise.allSettled([runAscending(), runDescending()]);
+  signal?.removeEventListener('abort', onAbort);
 
   // Compact: remove unfilled slots (can occur at the fetch boundary where the
   // winner aborted before the other side finished its last page).

@@ -80,10 +80,11 @@ export const fetchBidirectional = async ({
 
   const ascCtrl = new AbortController();
   const descCtrl = new AbortController();
-  signal?.addEventListener('abort', () => {
+  const onAbort = () => {
     ascCtrl.abort();
     descCtrl.abort();
-  });
+  };
+  signal?.addEventListener('abort', onAbort);
 
   let ascMaxId = 0;
   let descMinId = Infinity;
@@ -276,6 +277,7 @@ export const fetchBidirectional = async ({
   };
 
   await Promise.allSettled([runAscending(), runDescending()]);
+  signal?.removeEventListener('abort', onAbort);
 
   const durationMs = performance.now() - t0;
   const total = seen.size;
