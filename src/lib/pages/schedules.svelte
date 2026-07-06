@@ -4,7 +4,7 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
-  import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
+  import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
@@ -98,12 +98,18 @@
             class="flex items-center gap-2 leading-7"
             data-cy="schedules-title"
           >
-            <span data-testid="schedule-count"
-              >{$schedulesCount.count.toLocaleString()}</span
+            <span
+              role="status"
+              aria-atomic="true"
+              class="flex items-center gap-2"
             >
-            {translate('common.schedules-plural', {
-              count: $schedulesCount.count,
-            })}
+              <span data-testid="schedule-count"
+                >{$schedulesCount.count.toLocaleString()}</span
+              >
+              {translate('common.schedules-plural', {
+                count: $schedulesCount.count,
+              })}
+            </span>
           </h1>
           <CountRefreshButton
             count={$schedulesCount.newCount}

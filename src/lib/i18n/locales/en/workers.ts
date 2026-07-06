@@ -89,7 +89,7 @@ export const Strings = {
     'Slot count is set to auto-adjust on based on CPU/memory usage.',
   'slot-supplier-kind-custom':
     'Slot count is set based on custom slot supplier implementation.',
-  'last-refreshed': 'Last refreshed: {{time}}',
+  'last-refreshed': 'Last refreshed',
   'pulling-latest-snapshot': 'Pulling latest snapshot from the server...',
   'serverless-workers': 'Serverless Workers',
   'serverless-worker': 'Serverless Worker',
@@ -235,8 +235,9 @@ export const Strings = {
     "How Temporal connects to this Worker's compute provider",
   'worker-scaling-limits': 'Worker Scaling and Limits',
   'configuration-section': 'Configuration',
-  'configuration-description':
+  'deployment-configuration-description':
     'Name this Worker deployment and set its Build ID.',
+  'version-configuration-description': 'Set the Build ID for this version.',
   'compute-section': 'Compute',
   'compute-description': 'Choose where your workers run.',
   'scaling-section': 'Scaling and Limits',
@@ -266,8 +267,9 @@ export const Strings = {
   'create-version-rollback-failed':
     '{{message}} The version could not be cleaned up automatically — delete it manually from the deployment.',
   'build-id-label': 'Build ID',
-  'build-id-hint':
-    'A unique identifier for this version of your Worker. Edit or leave as-is.',
+  'build-id-hint': 'A unique identifier for this version of your Worker.',
+  'recent-versions': 'Recent Versions',
+  'recent-versions-more': '+{{count}} more',
   'max-concurrent-activities-label': 'Max Concurrent Activities',
   'max-concurrent-activities-hint':
     'Maximum concurrent activities per worker instance.',
@@ -322,7 +324,8 @@ export const Strings = {
   'terraform-iam-module-link': 'AWS IAM Role Module',
   'terraform-description-after':
     ' to create the IAM role Temporal Cloud assumes to invoke your Lambda functions.',
-  customize: 'Customize',
+  'hide-defaults': 'Hide Defaults',
+  'show-defaults': 'Show Defaults',
   'gcp-project-label': 'Project ID',
   'gcp-project-placeholder': 'my-gcp-project',
   'gcp-region-label': 'Region',

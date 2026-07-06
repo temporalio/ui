@@ -5,18 +5,24 @@
   export let title: string = '';
 
   let position: 'bottom' | 'right' = getContext('drawer-pos');
+
+  $: hasHeader = Boolean(title) || $$slots['subtitle'];
 </script>
 
-<div class="title-wrapper {position}">
-  <h2>{title}</h2>
-  {#if $$slots['subtitle']}
-    <p class="text-xs font-normal">
-      <slot name="subtitle" />
-    </p>
-  {/if}
-</div>
+{#if hasHeader}
+  <div class="title-wrapper {position}">
+    {#if title}
+      <h2>{title}</h2>
+    {/if}
+    {#if $$slots['subtitle']}
+      <p class="text-xs font-normal">
+        <slot name="subtitle" />
+      </p>
+    {/if}
+  </div>
+{/if}
 
-<div class={twMerge('content', position, $$props.class)}>
+<div class={twMerge('content', position, !hasHeader && 'pt-6', $$props.class)}>
   <slot />
 </div>
 

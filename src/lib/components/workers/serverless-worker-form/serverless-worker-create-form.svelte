@@ -92,7 +92,7 @@
         {translate('workers.configuration-section')}
       </h2>
       <p class="mb-4 text-sm text-secondary">
-        {translate('workers.configuration-description')}
+        {translate('workers.deployment-configuration-description')}
       </p>
       <div class="flex flex-col gap-4">
         <Input

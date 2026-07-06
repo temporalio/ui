@@ -21,6 +21,7 @@
     big?: boolean;
     delayed?: boolean;
     taskFailure?: boolean;
+    announce?: boolean;
     'test-id'?: string;
   }
 
@@ -33,12 +34,13 @@
     big = false,
     delayed = false,
     taskFailure = false,
+    announce = false,
     'test-id': testId,
   }: Props = $props();
 
   const workflowStatus = cva(
     [
-      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap text-black gap-1 font-medium',
+      'flex items-center rounded-sm px-1 py-0.5 h-5 whitespace-nowrap text-black gap-0.5 font-medium',
     ],
     {
       variants: {
@@ -90,6 +92,8 @@
     data-testid={testId || 'workflow-status'}
   >
     <span
+      role={announce ? 'status' : undefined}
+      aria-atomic={announce ? 'true' : undefined}
       class={merge(
         workflowStatus({
           status,

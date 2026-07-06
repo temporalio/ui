@@ -4,6 +4,7 @@
   import { createEventDispatcher } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
+  import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -32,10 +33,10 @@
   export let closeButtonLabel: string = '';
 
   $: dismissLabel = closeButtonLabel || translate('common.close');
-
   $: icon = variantIcon[variant];
 
-  const handleDismiss = () => {
+  const handleDismiss = (e: Event) => {
+    e.stopPropagation();
     dispatch('dismiss', { id });
   };
 </script>
@@ -54,11 +55,12 @@
   <p class="text-sm">
     <slot />
   </p>
-  <button
-    type="button"
-    on:click|stopPropagation={handleDismiss}
+  <Button
+    variant="ghost"
+    leadingIcon="close"
     aria-label={dismissLabel}
-  >
-    <Icon name="close" />
-  </button>
+    class="text-inherit h-6 w-6 shrink-0 p-0"
+    disableTracking
+    on:click={handleDismiss}
+  />
 </div>

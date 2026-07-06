@@ -68,6 +68,8 @@ export const Strings = {
   'event-history-load-error': 'Could not parse JSON',
   'event-classification-label': 'Event Classification',
   'row-accessible-name': 'Event {{eventType}}: {{classification}}',
+  'expand-details': 'Expand details',
+  'collapse-details': 'Collapse details',
   'event-classification': {
     unspecified: 'Unspecified',
     scheduled: 'Scheduled',

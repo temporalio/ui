@@ -224,6 +224,20 @@ export function getMilliseconds(date: ValidTime | undefined | null): number {
   return getSecondAsMilliseconds(parsedDate);
 }
 
+// Milliseconds since the Unix epoch, for comparing/sorting instants.
+// Unlike getMilliseconds, which returns only the 0-999 sub-second component.
+export function getEpochMilliseconds(
+  date: ValidTime | undefined | null,
+): number {
+  if (!date) return 0;
+  if (isTimestamp(date)) {
+    date = timestampToDate(date);
+  }
+  const parsedDate = parseJSON(date);
+
+  return parsedDate.getTime();
+}
+
 export function fromSecondsToMinutesAndSeconds(seconds: number): string {
   if (!seconds) return '';
   const start = new Date(Date.UTC(0, 0, 0, 0, 0, 0));

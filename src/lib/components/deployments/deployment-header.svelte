@@ -60,8 +60,13 @@
 
   <div class="flex w-full items-center justify-between">
     <h1>{deploymentName}</h1>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-4">
       <CapabilityGuard capability="serverScaledDeployments">
+        {#snippet fallback()}
+          <Button href={workflowHref}>
+            {translate('deployments.view-workflows')}
+          </Button>
+        {/snippet}
         <Button
           href={routeForWorkerDeploymentVersionCreate({
             namespace,
@@ -70,31 +75,27 @@
         >
           {translate('deployments.create-new-version')}
         </Button>
-      </CapabilityGuard>
-      <MenuContainer>
-        <MenuButton
-          controls="deployment-header-actions"
-          variant="secondary"
-          hasIndicator
-        >
-          {translate('deployments.more-actions')}
-        </MenuButton>
-        <Menu id="deployment-header-actions" position="right" usePortal>
-          <MenuItem href={workflowHref}>
-            {translate('deployments.view-workflows')}
-          </MenuItem>
-          <CapabilityGuard capability="serverScaledDeployments">
+        <MenuContainer>
+          <MenuButton
+            controls="deployment-header-actions"
+            variant="secondary"
+            hasIndicator
+          >
+            {translate('deployments.more-actions')}
+          </MenuButton>
+          <Menu id="deployment-header-actions" position="right" usePortal>
+            <MenuItem href={workflowHref}>
+              {translate('deployments.view-workflows')}
+            </MenuItem>
             <MenuItem onclick={onRampToUnversioned}>
               {translate('deployments.ramp-to-unversioned')}
             </MenuItem>
-          </CapabilityGuard>
-          <CapabilityGuard capability="serverScaledDeployments">
             <MenuItem onclick={onDeleteClick} destructive>
               {translate('deployments.delete-deployment')}
             </MenuItem>
-          </CapabilityGuard>
-        </Menu>
-      </MenuContainer>
+          </Menu>
+        </MenuContainer>
+      </CapabilityGuard>
     </div>
   </div>
 </header>

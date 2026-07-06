@@ -2,6 +2,7 @@
   import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
+  import LiveCountAnnouncer from '$lib/components/live-count-announcer.svelte';
   import Paginated from '$lib/holocene/table/paginated-table/paginated.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -83,6 +84,11 @@
   };
 </script>
 
+<LiveCountAnnouncer
+  count={items.length}
+  getMessage={(count) =>
+    translate('workflows.new-events-announcement', { count })}
+/>
 <div class="flex">
   <div class="pt-9">
     {#if showGraph}

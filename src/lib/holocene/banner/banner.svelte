@@ -34,6 +34,8 @@
 </script>
 
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
@@ -57,6 +59,11 @@
 
   type $$Props = BaseProps | DismissibleBanner;
 
+  function getRole(t: BannerType): HTMLAttributes<HTMLElement>['role'] {
+    if (t === 'danger') return 'alert';
+    return 'status';
+  }
+
   export let id: string;
   export let message: string;
   export let dismissLabel: string = '';
@@ -68,6 +75,7 @@
   export { className as class };
 
   $: show = message && !$dismissedBanners[id];
+  $: role = getRole(type);
 
   const dismissBanner = () => {
     $dismissedBanners[id] = true;
@@ -75,7 +83,12 @@
 </script>
 
 {#if show}
-  <section class={merge(types({ type }), className)} {...$$restProps}>
+  <section
+    class={merge(types({ type }), className)}
+    {role}
+    aria-atomic="true"
+    {...$$restProps}
+  >
     <span class="flex items-center gap-2">
       {#if icon}
         <Icon name={icon} />

@@ -1,10 +1,12 @@
 <script lang="ts">
+  import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import terraformTemplate from './serverless-worker-lambda.tf?raw';
@@ -85,7 +87,7 @@
 
 <hr class="my-5 border-subtle" />
 
-<h2 class="mb-1 text-base font-medium">
+<h2 class="text-base font-medium">
   {translate('workers.resource-section')}
 </h2>
 <p class="mb-4 text-sm text-secondary">
@@ -93,19 +95,18 @@
 </p>
 
 {#if provider === 'lambda'}
-  <div class="flex items-end gap-2">
-    <div class="flex-1">
-      <Input
-        bind:value={lambdaArn}
-        id="lambdaArn"
-        name="lambdaArn"
-        label={translate('workers.lambda-arn-label')}
-        hintText={errors.lambdaArn?.[0]}
-        error={!!errors.lambdaArn?.[0]}
-        placeholder={translate('workers.lambda-arn-placeholder')}
-        required
-      />
-    </div>
+  <div class="flex flex-wrap items-end gap-4">
+    <Input
+      bind:value={lambdaArn}
+      id="lambdaArn"
+      name="lambdaArn"
+      label={translate('workers.lambda-arn-label')}
+      hintText={errors.lambdaArn?.[0]}
+      error={!!errors.lambdaArn?.[0]}
+      placeholder={translate('workers.lambda-arn-placeholder')}
+      required
+      class="flex-1"
+    />
     <Button
       variant="secondary"
       type="button"
@@ -138,19 +139,18 @@
       placeholder={translate('workers.gcp-region-placeholder')}
       required
     />
-    <div class="flex items-end gap-2">
-      <div class="flex-1">
-        <Input
-          bind:value={gcpWorkerPool}
-          id="gcpWorkerPool"
-          name="gcpWorkerPool"
-          label={translate('workers.gcp-worker-pool-label')}
-          hintText={errors.gcpWorkerPool?.[0]}
-          error={!!errors.gcpWorkerPool?.[0]}
-          placeholder={translate('workers.gcp-worker-pool-placeholder')}
-          required
-        />
-      </div>
+    <div class="flex flex-wrap items-end gap-4">
+      <Input
+        bind:value={gcpWorkerPool}
+        id="gcpWorkerPool"
+        name="gcpWorkerPool"
+        label={translate('workers.gcp-worker-pool-label')}
+        hintText={errors.gcpWorkerPool?.[0]}
+        error={!!errors.gcpWorkerPool?.[0]}
+        placeholder={translate('workers.gcp-worker-pool-placeholder')}
+        required
+        class="flex-1"
+      />
       <Button
         variant="secondary"
         type="button"
@@ -166,7 +166,7 @@
 
 <hr class="my-5 border-subtle" />
 
-<h2 class="mb-1 text-base font-medium">
+<h2 class="text-base font-medium">
   {translate('workers.access-section')}
 </h2>
 <p class="mb-4 text-sm text-secondary">
@@ -196,84 +196,67 @@
       placeholder={translate('workers.external-id-placeholder')}
       required
     />
-    <button
-      type="button"
-      class="surface-primary flex w-full items-center justify-between rounded border border-subtle px-4 py-3 text-sm hover:surface-interactive-secondary"
-      onclick={() => (showRoleHelp = !showRoleHelp)}
+    <Accordion
+      icon="info"
+      title={translate('workers.no-role-prompt')}
+      bind:open={showRoleHelp}
+      class="[&_h3]:text-sm"
     >
-      <span class="flex items-center gap-2">
-        <Icon name="info" />
-        {translate('workers.no-role-prompt')}
-      </span>
-      <Icon name={showRoleHelp ? 'chevron-up' : 'chevron-down'} />
-    </button>
-    {#if showRoleHelp}
-      <div class="rounded border border-subtle">
-        <div class="flex border-b border-subtle">
-          <button
-            type="button"
-            class="px-4 py-2 text-sm {activeRoleHelpTab === 'cloudformation'
-              ? 'surface-interactive-secondary font-medium'
-              : 'text-secondary'}"
-            onclick={() => (activeRoleHelpTab = 'cloudformation')}
+      <div class="-mt-8 flex flex-col gap-3 border-t border-subtle pt-3">
+        <ToggleButtons>
+          <ToggleButton
+            active={activeRoleHelpTab === 'cloudformation'}
+            on:click={() => (activeRoleHelpTab = 'cloudformation')}
           >
             {translate('workers.cfn-tab')}
-          </button>
-          <button
-            type="button"
-            class="px-4 py-2 text-sm {activeRoleHelpTab === 'terraform'
-              ? 'surface-interactive-secondary font-medium'
-              : 'text-secondary'}"
-            onclick={() => (activeRoleHelpTab = 'terraform')}
+          </ToggleButton>
+          <ToggleButton
+            active={activeRoleHelpTab === 'terraform'}
+            on:click={() => (activeRoleHelpTab = 'terraform')}
           >
             {translate('workers.terraform-tab')}
-          </button>
-        </div>
+          </ToggleButton>
+        </ToggleButtons>
         {#if activeRoleHelpTab === 'cloudformation'}
-          <div class="flex flex-col gap-3 p-4">
-            <p class="text-sm text-secondary">
-              {translate('workers.launch-stack-description')}
-            </p>
-            <div class="flex items-center gap-4">
-              <Button
-                variant="secondary"
-                size="sm"
-                type="button"
-                href={launchStackHref}
-                target="_blank"
-                trailingIcon="external-link"
-              >
-                {translate('workers.launch-stack')}
-              </Button>
-              <button
-                type="button"
-                class="text-sm underline"
-                onclick={downloadCfnTemplate}
-              >
-                {translate('workers.download-template')}
-              </button>
-            </div>
+          <p class="text-sm text-secondary">
+            {translate('workers.launch-stack-description')}
+          </p>
+          <div class="flex flex-wrap items-center gap-4">
+            <Button
+              variant="secondary"
+              size="sm"
+              href={launchStackHref}
+              target="_blank"
+              trailingIcon="external-link"
+            >
+              {translate('workers.launch-stack')}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              on:click={downloadCfnTemplate}
+            >
+              {translate('workers.download-template')}
+            </Button>
           </div>
         {:else}
-          <div class="flex flex-col gap-3 p-4">
-            <p class="text-sm text-secondary">
-              {translate('workers.terraform-description-before')}<Link
-                href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/aws/lambda"
-                newTab>{translate('workers.terraform-iam-module-link')}</Link
-              >{translate('workers.terraform-description-after')}
-            </p>
-            <CodeBlock
-              content={terraformTemplate}
-              language="text"
-              maxHeight={300}
-              copyable
-              copyIconTitle={translate('workers.copy-snippet')}
-              copySuccessIconTitle={translate('workers.copied')}
-            />
-          </div>
+          <p class="text-sm text-secondary">
+            {translate('workers.terraform-description-before')}<Link
+              href="https://github.com/temporalio/terraform-modules/tree/main/modules/serverless-workers/aws/lambda"
+              newTab>{translate('workers.terraform-iam-module-link')}</Link
+            >{translate('workers.terraform-description-after')}
+          </p>
+          <CodeBlock
+            content={terraformTemplate}
+            language="text"
+            maxHeight={300}
+            copyable
+            copyIconTitle={translate('workers.copy-snippet')}
+            copySuccessIconTitle={translate('workers.copied')}
+          />
         {/if}
       </div>
-    {/if}
+    </Accordion>
   </div>
 {:else}
   <Input
@@ -291,9 +274,9 @@
 
 <hr class="my-5 border-subtle" />
 
-<div class="flex items-start justify-between gap-4">
+<div class="flex flex-wrap items-center justify-between gap-4">
   <div>
-    <div class="mb-1 flex items-center gap-2">
+    <div class="flex items-center gap-2">
       <h2 class="text-base font-medium">
         {translate('workers.scaling-lifecycle-section')}
       </h2>
@@ -310,9 +293,12 @@
     size="sm"
     type="button"
     disabled={provider === 'cloud-run'}
+    trailingIcon={showScaling ? 'chevron-up' : 'chevron-down'}
     on:click={() => (showScaling = !showScaling)}
   >
-    {translate('workers.customize')}
+    {showScaling
+      ? translate('workers.hide-defaults')
+      : translate('workers.show-defaults')}
   </Button>
 </div>
 {#if showScaling && provider === 'lambda'}

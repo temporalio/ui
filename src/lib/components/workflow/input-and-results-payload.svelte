@@ -11,7 +11,7 @@
   type Props = {
     title: string;
     titleSnippet?: Snippet;
-    content: Payloads | CompletionEventAttributes;
+    content?: Payloads | CompletionEventAttributes;
     isPending?: boolean;
     payloadDownloadFilenameData: PayloadDownloadFilenameData;
   };

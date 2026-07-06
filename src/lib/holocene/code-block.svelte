@@ -17,7 +17,11 @@
     type Extension,
     Transaction,
   } from '@codemirror/state';
-  import { EditorView, keymap } from '@codemirror/view';
+  import {
+    EditorView,
+    keymap,
+    placeholder as placeholderExtension,
+  } from '@codemirror/view';
   import { onMount, type Snippet, tick } from 'svelte';
   import { twMerge as merge, twMerge } from 'tailwind-merge';
 
@@ -58,6 +62,7 @@
     activeTab?: string;
     headerActions?: Snippet<[]>;
     lazy?: boolean;
+    placeholder?: string;
   }
 
   interface PropsWithCopyable extends Override<
@@ -85,6 +90,7 @@
     activeTab = $bindable(),
     headerActions,
     lazy = false,
+    placeholder,
     ...editorProps
   }: Props = $props();
 
@@ -181,6 +187,7 @@
       !inline ? EditorView.lineWrapping : undefined,
       !inline && !editable ? foldGutter() : undefined,
       getHeightTheme({ maxHeight, minHeight, maximized }),
+      placeholder ? placeholderExtension(placeholder) : undefined,
     ].filter((ext) => ext != null),
   );
 

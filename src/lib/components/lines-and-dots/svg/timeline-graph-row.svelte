@@ -171,6 +171,13 @@
     setActiveGroup(group);
   };
 
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
   const onMouseEnter = () => {
     if (readOnly) return;
     hovering = true;
@@ -233,7 +240,7 @@
   tabindex="0"
   aria-label={accessibleName}
   onclick={onClick}
-  onkeypress={onClick}
+  onkeydown={onKeydown}
   onmouseenter={onMouseEnter}
   onmouseleave={onMouseLeave}
   class="relative cursor-pointer"
@@ -310,6 +317,7 @@
             icon={(pendingActivity && !pendingActivity.paused) || retried
               ? 'retry'
               : undefined}
+            contentKey={decodedValue}
           >
             {#if pendingActivity}
               {translate('workflows.attempt')}
