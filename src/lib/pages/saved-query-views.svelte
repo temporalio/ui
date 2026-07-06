@@ -324,6 +324,7 @@
     usePortal
     hide={$savedQueryNavOpen}
     class="w-full"
+    tooltipClass="max-w-[280px]"
   >
     <div class="w-full" role="menuitem" tabindex="-1">
       <Button
