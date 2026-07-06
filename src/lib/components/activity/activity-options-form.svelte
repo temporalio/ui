@@ -4,17 +4,18 @@
   import Button from '$lib/holocene/button.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
+  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import NumberInput from '$lib/holocene/input/number-input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import { translate } from '$lib/i18n/translate';
+  import {
+    initialTimeoutUnit,
+    TIMEOUT_UNITS,
+  } from '$lib/services/standalone-activities';
   import { toaster } from '$lib/stores/toaster';
   import type { ActivityOptions } from '$lib/types';
-  import {
-    formatSecondsAbbreviated,
-    fromDurationToNumber,
-    fromNumberToDuration,
-  } from '$lib/utilities/format-time';
+  import { fromDurationToNumber } from '$lib/utilities/format-time';
   import { has } from '$lib/utilities/has';
 
   type Props = {
@@ -78,15 +79,15 @@
 
   const activityOptions = $derived({
     taskQueue: { name: taskQueue },
-    scheduleToCloseTimeout: fromNumberToDuration(scheduleToCloseTimeout),
-    scheduleToStartTimeout: fromNumberToDuration(scheduleToStartTimeout),
-    startToCloseTimeout: fromNumberToDuration(startToCloseTimeout),
-    heartbeatTimeout: fromNumberToDuration(heartbeatTimeout),
+    scheduleToCloseTimeout: scheduleToCloseTimeout || undefined,
+    scheduleToStartTimeout: scheduleToStartTimeout || undefined,
+    startToCloseTimeout: startToCloseTimeout || undefined,
+    heartbeatTimeout: heartbeatTimeout || undefined,
     retryPolicy: {
       maximumAttempts,
-      initialInterval: fromNumberToDuration(initialInterval),
       backoffCoefficient,
-      maximumInterval: fromNumberToDuration(maximumInterval),
+      initialInterval: initialInterval || undefined,
+      maximumInterval: maximumInterval || undefined,
     },
   }) as unknown as ActivityOptions;
 
@@ -161,125 +162,71 @@
           class="w-24"
         />
       </div>
-      <div>
-        <Label
-          for="retry-initial-interval"
-          label={translate('activities.retry-initial-interval-duration')}
-        />
-        <p class="mb-1 text-xs text-secondary">
-          {translate('activities.retry-initial-interval-duration-description')}
-        </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="retry-initial-interval"
-            label={translate('activities.retry-initial-interval-duration')}
-            labelHidden
-            bind:value={initialInterval}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(initialInterval))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(initialInterval)}
-          </p>
-        </div>
-      </div>
-      <div>
-        <Label
-          for="schedule-to-start-timeout"
-          label={translate('activities.schedule-to-start-timeout-duration')}
-        />
-        <p class="mb-1 text-xs text-secondary">
-          {translate(
-            'activities.schedule-to-start-timeout-duration-description',
-          )}
-        </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="schedule-to-start-timeout"
-            label={translate('activities.schedule-to-start-timeout-duration')}
-            labelHidden
-            bind:value={scheduleToStartTimeout}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(scheduleToStartTimeout))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(scheduleToStartTimeout)}
-          </p>
-        </div>
-      </div>
-      <div>
-        <Label
-          for="schedule-to-close-timeout"
-          label={translate('activities.schedule-to-close-timeout-duration')}
-        />
-        <p class="mb-1 text-xs text-secondary">
-          {translate(
-            'activities.schedule-to-close-timeout-duration-description',
-          )}
-        </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="schedule-to-close-timeout"
-            label={translate('activities.schedule-to-close-timeout-duration')}
-            labelHidden
-            bind:value={scheduleToCloseTimeout}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(scheduleToCloseTimeout))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(scheduleToCloseTimeout)}
-          </p>
-        </div>
-      </div>
-      <div>
-        <Label
-          for="start-to-close-timeout"
-          label={translate('activities.start-to-close-timeout-duration')}
-        />
-        <p class="mb-1 text-xs text-secondary">
-          {translate('activities.start-to-close-timeout-duration-description')}
-        </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="start-to-close-timeout"
-            label={translate('activities.start-to-close-timeout-duration')}
-            labelHidden
-            bind:value={startToCloseTimeout}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(startToCloseTimeout))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(startToCloseTimeout)}
-          </p>
-        </div>
-      </div>
-      <div>
-        <Label
-          for="heartbeat-timeout"
-          label={translate('activities.heartbeat-timeout-duration')}
-        />
-        <p class="mb-1 text-xs text-secondary">
-          {translate('activities.heartbeat-timeout-duration-description')}
-        </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="heartbeat-timeout"
-            label={translate('activities.heartbeat-timeout-duration')}
-            labelHidden
-            bind:value={heartbeatTimeout}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(heartbeatTimeout))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(heartbeatTimeout)}
-          </p>
-        </div>
-      </div>
+      <DurationInput
+        id="retry-initial-interval"
+        label={translate('activities.retry-initial-interval-duration')}
+        hintTextAbove={translate(
+          'activities.retry-initial-interval-duration-description',
+        )}
+        inputmode="numeric"
+        bind:value={initialInterval}
+        initialUnit={initialTimeoutUnit(initialInterval)}
+        units={TIMEOUT_UNITS}
+        min={0}
+        class="max-w-80"
+      />
+      <DurationInput
+        id="schedule-to-start-timeout"
+        label={translate('activities.schedule-to-start-timeout-duration')}
+        hintTextAbove={translate(
+          'activities.schedule-to-start-timeout-duration-description',
+        )}
+        inputmode="numeric"
+        bind:value={scheduleToStartTimeout}
+        initialUnit={initialTimeoutUnit(scheduleToStartTimeout)}
+        units={TIMEOUT_UNITS}
+        min={0}
+        class="max-w-80"
+      />
+      <DurationInput
+        id="schedule-to-close-timeout"
+        label={translate('activities.schedule-to-close-timeout-duration')}
+        hintTextAbove={translate(
+          'activities.schedule-to-close-timeout-duration-description',
+        )}
+        inputmode="numeric"
+        bind:value={scheduleToCloseTimeout}
+        initialUnit={initialTimeoutUnit(scheduleToCloseTimeout)}
+        units={TIMEOUT_UNITS}
+        min={0}
+        class="max-w-80"
+      />
+      <DurationInput
+        id="start-to-close-timeout"
+        label={translate('activities.start-to-close-timeout-duration')}
+        hintTextAbove={translate(
+          'activities.start-to-close-timeout-duration-description',
+        )}
+        inputmode="numeric"
+        bind:value={startToCloseTimeout}
+        initialUnit={initialTimeoutUnit(startToCloseTimeout)}
+        units={TIMEOUT_UNITS}
+        min={0}
+        class="max-w-80"
+      />
+      <DurationInput
+        id="heartbeat-timeout"
+        label={translate('activities.heartbeat-timeout-duration')}
+        hintTextAbove={translate(
+          'activities.heartbeat-timeout-duration-description',
+        )}
+        inputmode="numeric"
+        bind:value={heartbeatTimeout}
+        initialUnit={initialTimeoutUnit(heartbeatTimeout)}
+        units={TIMEOUT_UNITS}
+        min={0}
+        class="max-w-80"
+      />
       <div>
         <Label
           for="task-queue-name"
