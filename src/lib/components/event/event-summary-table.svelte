@@ -23,7 +23,7 @@
     isPendingNexusOperation,
   } from '$lib/utilities/is-pending-activity';
 
-  import HistoryGraph from '../lines-and-dots/svg/history-graph.svelte';
+  import HistoryGraph from '../lines-and-dots/history-graph/history-graph.svelte';
   import TableHeaderCell from '../workflow/workflows-summary-configurable-table/table-header-cell.svelte';
 
   import EventEmptyRow from './event-empty-row.svelte';

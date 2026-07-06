@@ -187,7 +187,10 @@
     hoveredEventId = undefined;
   };
 
-  let hasRelatedActivities = (group, hoveredEventId) => {
+  const hasRelatedActivities = (
+    group: EventGroup | undefined,
+    hoveredEventId: string | undefined,
+  ) => {
     return group?.eventList?.some((e) => e.id === hoveredEventId);
   };
 
