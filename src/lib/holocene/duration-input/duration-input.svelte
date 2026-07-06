@@ -43,6 +43,47 @@
     return duration.split('s')[0] ?? '';
   };
 
+  // `0.1 / 0.001` is `100.00000000000001` in binary floating point; round to
+  // nanosecond precision to strip that noise before comparing or displaying.
+  const stripFloatNoise = (n: number): number => Math.round(n * 1e9) / 1e9;
+
+  export function getFirstWholeNumberUnit<UnitLabelT extends string>(
+    duration: string,
+    units: Units<UnitLabelT>,
+    defaultUnit?: UnitLabelT,
+  ): UnitLabelT | undefined {
+    const secondsValue = Number(parseDuration(duration));
+
+    if (secondsValue === 0) {
+      // no value: use the provided default, else the last unit label
+      return defaultUnit ?? units.at(-1)?.label;
+    }
+
+    for (const unit of units) {
+      if (Number.isInteger(stripFloatNoise(secondsValue / unit.convert(1)))) {
+        return unit.label;
+      }
+    }
+
+    return defaultUnit;
+  }
+
+  // Converts a value entered in a given unit to a seconds duration string
+  // (e.g. `60` + `minute(s)` -> `3600s`)
+  export function unitValueToDuration<UnitLabelT extends string>(
+    rawValue: string | number,
+    unitLabel: string,
+    units: Units<UnitLabelT>,
+  ): string | undefined {
+    const unit = units.find((u) => u.label === unitLabel);
+    if (!unit) return undefined;
+
+    const raw = String(rawValue ?? '').trim();
+    if (raw === '' || isNaN(Number(raw))) return '';
+
+    return `${unit.convert(Number(raw))}s`;
+  }
+
   type ExtractLabel<T> = T extends { label: infer K }[] ? K : never;
 </script>
 
@@ -109,7 +150,7 @@
     if (!Number.isFinite(seconds)) return '';
     const unitDef = units.find((u) => u.label === unitLabel);
     const factor = unitDef ? unitDef.convert(1) : 1;
-    return factor ? String(seconds / factor) : String(seconds);
+    return factor ? String(stripFloatNoise(seconds / factor)) : String(seconds);
   };
 
   // svelte-ignore state_referenced_locally
@@ -117,16 +158,9 @@
   // svelte-ignore state_referenced_locally
   let unit = $state(initialUnit);
 
-  const convert = (durationValue: string, durationUnit: string) => {
-    const unit = units.find((u) => u.label === durationUnit);
-    if (!unit || typeof durationValue !== 'string') return;
-
-    if (durationValue.trim() === '' || isNaN(Number(durationValue))) {
-      value = '';
-      return;
-    }
-
-    value = `${unit.convert(Number(durationValue))}s`;
+  const convert = (durationValue: string | number, durationUnit: string) => {
+    const result = unitValueToDuration(durationValue, durationUnit, units);
+    if (result !== undefined) value = result;
   };
 
   const handleNumberInput: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -169,8 +203,8 @@
       bind:value={unit}
       onchange={handleUnitChange}
     >
-      {#each units as unit}
-        <option value={unit.label}>{unit.label}</option>
+      {#each units as { label }, i (i)}
+        <option value={label}>{label}</option>
       {/each}
     </select>
   </div>
