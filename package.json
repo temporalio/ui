@@ -55,6 +55,8 @@
     "prettier:fix": "prettier --write --plugin prettier-plugin-svelte --plugin prettier-plugin-tailwindcss .",
     "preview:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview",
     "preview:docker": "VITE_API=http://localhost:8080 VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview",
+    "preview:local-temporal": "VITE_API=http://localhost:8081 vite build --sourcemap && VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview --port 3001",
+    "preview:local-temporal:full": "trap 'kill 0' EXIT INT TERM; pnpm temporal-server & pnpm dev:local-temporal & pnpm preview:local-temporal",
     "package": "svelte-package",
     "package:patch": "pnpm version patch && svelte-package",
     "package:minor": "pnpm version minor && svelte-package",

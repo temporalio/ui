@@ -3,8 +3,9 @@
 ## Core Principle: One Copy, One Truth
 
 All event data lives in a **single module-level singleton** (`grouped-event-buffer.ts`).
-No Svelte stores hold event arrays. No component keeps a second copy.
-Consumers call `getEventArray()` / `getGroupArray()` to read directly from the buffer.
+Consumers read it via `getEventArray()` / `getGroupArray()`. A thin `bufferVersion`
+signal and `fullEventHistory` store expose it to Svelte, but they carry references
+to the same objects — never copies.
 
 ```mermaid
 flowchart LR
@@ -166,90 +167,52 @@ No array is passed through the signal. The signal carries only the intent to re-
 
 ---
 
-## Virtualization: Sticky Canvas + Sentinel Scroll
+## Virtualization: Scroll-Driven Window + Row Pool
 
-The timeline SVG can have 50 k+ rows. Only ~17 rows live in the DOM at any time.
+The timeline can have tens of thousands of rows; only a small pooled window is
+ever in the DOM. Rows are plain absolutely-positioned **HTML** divs (not SVG).
 
 ```mermaid
 flowchart TD
-    A["User scrolls #content-wrapper"] --> B["markDirty: flip boolean\n(zero layout reads, zero Svelte writes)"]
-    B --> C["RAF tick fires once per frame"]
-    C --> D["Read scrollContainerEl.scrollTop\n(clean — no pending mutations)"]
-    D --> E["timelineScrollY = max(0, scrollTop − sentinelOffset)"]
-    E --> F{changed?}
-    F -- no --> C
-    F -- yes --> G["SVG style: translateY(−scrollY px)\ncompositor-promoted GPU layer pans"]
-    G --> H["getWindowBounds(scrollY, stickyHeight)\ncomputes visible row index range"]
-    H --> I["Svelte renders rows [lo−OVERSCAN … hi+OVERSCAN]\n~17 nodes in DOM"]
-    I --> C
+    A["scroll / wheel / touchmove"] --> B["pokeSampler: (re)start the rAF loop"]
+    B --> C["rAF: read container offset via getBoundingClientRect\n→ visible pixel band"]
+    C --> D{band changed?}
+    D -- no, N frames --> E["idle out (loop stops)"]
+    D -- yes --> F["getWindowBounds(band) → [start, end) row indices"]
+    F --> G["pool re-points its slots to those groups\n(no create/destroy — props update in place)"]
+    G --> C
 ```
 
-### Layout elements
+- **The container is the full drawn height** (`svgHeight`) and scrolls with the
+  page inside its overflow ancestor (found via `findScrollParent`, in practice
+  `#content-wrapper`). There is no `translateY`, no sentinel, and no spacer div —
+  the page scrolls the tall container directly.
+- **Band measurement is scroll-driven, per frame.** A self-driven `requestAnimationFrame`
+  loop reads the container's offset within its scroll parent each frame and idles
+  out after a few still frames. It's kept alive by `scroll` **and** `wheel` /
+  `touchmove`, because a wheel/trackpad fling fires `wheel` but coalesces `scroll`
+  — an event-only measure goes stale mid-fling and rows blank out. (This replaced
+  an earlier IntersectionObserver approach, which the browser throttles during
+  fast scroll.)
+- **`getWindowBounds`** is the closed-form inverse of `getRowY` — it maps the
+  visible band to a `[start, end)` row-index range (ascending/descending/pending-gap
+  aware), plus `OVERSCAN` rows on each side.
+- **Row pool.** Instead of a keyed `{#each}` that creates/destroys rows as the
+  window slides, a fixed-size set of slots (keyed by slot **index**) is reused. As
+  you scroll, each slot re-points to a new group — the `<li>` and its component
+  instance stay mounted and only props update. This removed the `cloneNode` /
+  insert / effect-teardown churn that was tripping frequent major-GC pauses.
 
-```
-┌─────────────────────────────────────┐
-│  Top nav  (fixed, --top-nav-height) │
-├─────────────────────────────────────┤
-│  Controls bar  (sticky, z-11)       │  ← bind:clientHeight → controlsHeight
-├─────────────────────────────────────┤  ← sentinel div (h-0) marks this line
-│                                     │
-│  Sticky canvas  overflow-hidden     │  ← top: calc(nav + controlsHeight)
-│  ┌───────────────────────────────┐  │    height: min(contentPx, 100dvh−nav−controls)
-│  │  SVG  translateY(−scrollY)   │  │
-│  │  [ OVERSCAN rows above ]     │  │
-│  │  [ visible rows          ]   │  │
-│  │  [ OVERSCAN rows below ]     │  │
-│  └───────────────────────────────┘  │
-│                                     │
-├─────────────────────────────────────┤
-│  Spacer div  height = spacerHeight  │  ← extends page scroll range
-│  (pushes content below sticky area) │
-└─────────────────────────────────────┘
-```
+### Positioning math (`timeline-graph/timeline-positioning.ts`)
 
-**Scroll math**
+- `getRowY(i, …)` — y (px) for the group at index `i`; descending-cursor rows
+  shift down by `pendingGroupCount` to open the loading gap.
+- `getPendingBlockY(…)` — top of the skeleton gap rectangle.
+- `getDescStart` / `getTotalForY` — locate the cursor split and the descending-sort
+  denominator.
+- Row height and dot radius come from `timeline-graph/constants.ts`
+  (`ROW_HEIGHT`, `RADIUS`, `GUTTER`); the color helpers live in `lines-and-dots/colors.ts`.
 
-- `sentinelOffset` — measured once at mount: distance from scroll container top to the sentinel (canvas entry point)
-- `timelineScrollY = max(0, scrollTop − sentinelOffset)` — how far the virtual window has moved
-- `spacerHeight = totalRows × ROW_PX − stickyHeight + panelHeight` — keeps the scrollbar thumb sized correctly
-- `canvasContentHeight = max(totalRows × ROW_PX, 120) + panelHeight + 120` — natural height; CSS `min()` caps it at the viewport
-
----
-
-## What Else Was Done (Full Change Summary)
-
-### Regressions fixed vs master branch (A/B verified)
-
-| Area                 | Issue                                                                                 | Fix                                                                                               |
-| -------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Compact view         | WFT groups leaked into Event History compact tab                                      | All `getGroupArray()` call sites pass `{ excludeWorkflowTasks: true }`                            |
-| Event History rows   | Expand/collapse chevron missing                                                       | Restored `expandButton` snippet + `IconButton` in `event-summary-row.svelte`                      |
-| Relationships tab    | Pan/zoom controls missing                                                             | Implemented `panBy`, `zoomBy`, keyboard handler, and button cluster in `zoom-svg.svelte`          |
-| Auto Refresh button  | No-op; state not reflected in URL                                                     | Wired `pauseLiveUpdates` store, synced `refresh_off` URL param, implemented `onAutoRefreshToggle` |
-| Timeline border      | Canvas rendered edge-to-edge (negative margins hid border)                            | Removed `-mx-4 md:-mx-8`; border now visible                                                      |
-| Timeline gap         | 32 px phantom gap between controls and canvas (flex `gap-4` × sentinel)               | Wrapped controls + sentinel + canvas in single block-flow div                                     |
-| Timeline top border  | `border-t-0` on graph with no parent supplying the top edge                           | Added `border-t border-subtle` to sticky canvas wrapper                                           |
-| Controls overlap     | Canvas sticky at same `top` as controls bar; controls hid top of canvas when scrolled | Canvas sticky top = `calc(nav + controlsHeight)` measured live                                    |
-| Canvas height        | Full-viewport height even for 2-event workflows                                       | `min(canvasContentHeight, 100dvh − nav − controls)` — compact for small, full-height for large    |
-| Child workflow input | `null` for `WorkflowExecutionStarted` solo events                                     | `soloEvents[]` added to buffer; included in `getEventArray()` output                              |
-| Duplicate key errors | Live streaming allowed duplicate event IDs                                            | `liveSeenIds` Set guards both `appendLiveEvent` and `processEvent`                                |
-| i18n                 | Missing `expand-details` / `collapse-details` keys                                    | Added to `src/lib/i18n/locales/en/events.ts`                                                      |
-
-### New tests
-
-| File                                   | Covers                                                                                                                          |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `grouped-event-buffer.test.ts`         | Compact view WFT regression; desc-cursor out-of-order arrival; concurrent live poll dedup; `livePendingFollowers` park-flush    |
-| `live-poll.test.ts`                    | Token-based long-poll loop; pause/resume cursor retention; backoff; abort behavior                                              |
-| `fetch-bidirectional.test.ts`          | Ascending/descending race; abort guard; multi-page token following                                                              |
-| `constants.test.ts`                    | `timelineTextPosition` all placement zones; status/category stroke colors; `CategoryIcon` mapping; `isMiddleEvent`              |
-| `timeline-graph-row-rendering.test.ts` | Dot-position pixel math; dot count per group shape; pending-line conditions; live park-flush rendering inputs; retry/icon/color |
-| `timeline-positioning.test.ts`         | `getDescStart`; `getTotalForY`; `getRowY` ascending/descending; `getPendingBlockY`; no-overlap invariants                       |
-| `event-filter-params.test.ts`          | `refresh_off` URL param round-trips via `parseEventFilterParams` / `updateEventFilterParams`                                    |
-| `events.test.ts` (locale)              | `expand-details` and `collapse-details` i18n keys present                                                                       |
-
-### Test infrastructure
-
-- `temporal/activities/long-sleep.ts` — heartbeating `longSleep` + `alwaysFails` activities
-- `temporal/workflows.ts` — 8 long-running open-state workflows for auto-refresh and timeline testing
-- `scripts/start-long-running.ts` — runner registered as `pnpm run-workflows:long-running`
+> Point-in-time change summaries (regressions fixed, tests added, test-workflow
+> setup) intentionally live in the PR description and git history, not here, so
+> this document can stay a description of the _current_ architecture.

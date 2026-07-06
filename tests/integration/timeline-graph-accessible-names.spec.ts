@@ -6,9 +6,9 @@ import { mockWorkflow } from '~/test-utilities/mocks/workflow';
 const { workflowId, runId } = mockWorkflow.workflowExecutionInfo.execution;
 const timelineUrl = `/namespaces/default/workflows/${workflowId}/${runId}/timeline`;
 
-// The timeline graph renders SVG `<g role="button">` nodes (workflow-row and
-// timeline-graph-row). Without an aria-label these announce as a bare "button"
-// to screen readers; these assertions fail if that label regresses.
+// The timeline graph labels its nodes for screen readers. The workflow bar is
+// informational (role="img"); event nodes are interactive (role="button").
+// These assertions fail if those accessible names regress.
 test.describe('Timeline graph node accessible names', () => {
   test.beforeEach(async ({ page }) => {
     await mockWorkflowApis(page);
@@ -17,7 +17,7 @@ test.describe('Timeline graph node accessible names', () => {
 
   test('workflow node announces its id and status', async ({ page }) => {
     await expect(
-      page.getByRole('button', { name: `Workflow ${workflowId}: Running` }),
+      page.getByRole('img', { name: `Workflow ${workflowId}: Running` }),
     ).toBeVisible();
   });
 
