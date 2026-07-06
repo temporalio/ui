@@ -12,6 +12,7 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
+  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -32,10 +33,6 @@
   import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
-  import {
-    formatSecondsAbbreviated,
-    fromNumberToDuration,
-  } from '$lib/utilities/format-time';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForTaskQueue,
@@ -125,7 +122,7 @@
         messageType,
         searchAttributes,
         identity,
-        workflowStartDelay: fromNumberToDuration(workflowStartDelay),
+        workflowStartDelay: workflowStartDelay || undefined,
       });
       toaster.push({
         variant: 'success',
@@ -335,20 +332,15 @@
             Time to wait before dispatching the first workflow task.
           </p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="workflow-start-delay"
-            label={translate('workflows.workflow-start-delay')}
-            labelHidden
-            bind:value={workflowStartDelay}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(workflowStartDelay))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(workflowStartDelay)}
-          </p>
-        </div>
+        <DurationInput
+          id="workflow-start-delay"
+          label={translate('workflows.workflow-start-delay')}
+          labelHidden
+          inputmode="numeric"
+          bind:value={workflowStartDelay}
+          min={0}
+          class="max-w-80"
+        />
       </Card>
       <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">

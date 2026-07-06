@@ -106,6 +106,7 @@
   interface BaseProps extends Omit<HTMLInputAttributes, 'class'> {
     value: string;
     label: string;
+    labelHidden?: boolean;
     afterLabel?: Snippet;
     id: string;
     required?: boolean;
@@ -130,6 +131,7 @@
 
   let {
     label,
+    labelHidden = false,
     afterLabel,
     id,
     hintText,
@@ -174,7 +176,7 @@
 
 <div class={twMerge('flex flex-col gap-1.5', className)}>
   <div class="flex items-center justify-start gap-2">
-    <Label class="grow-0" {required} {label} for={id} />
+    <Label class="grow-0" {required} {label} hidden={labelHidden} for={id} />
     {@render afterLabel?.()}
   </div>
   {#if hintTextAbove}
