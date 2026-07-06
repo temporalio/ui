@@ -5,7 +5,10 @@
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Portal from '$lib/holocene/portal/portal.svelte';
-  import type { PortalPosition } from '$lib/holocene/portal/types';
+  import type {
+    PortalOffset,
+    PortalPosition,
+  } from '$lib/holocene/portal/types';
   import type { Only } from '$lib/types/global';
 
   const HOVER_HIDE_DELAY_MS = 120;
@@ -20,6 +23,7 @@
     show?: boolean;
     usePortal?: boolean;
     scrollContainer?: string;
+    portalOffset?: PortalOffset;
   };
 
   type BasePositionProps = {
@@ -80,6 +84,7 @@
   export let show = false;
   export let usePortal = false;
   export let scrollContainer: string | undefined = undefined;
+  export let portalOffset: PortalOffset = {};
 
   let wrapperElement: HTMLElement | null = null;
   let isHovered = false;
@@ -169,6 +174,7 @@
         anchor={wrapperElement}
         open={isOpen}
         position={portalPosition}
+        offset={portalOffset}
         {scrollContainer}
       >
         <div

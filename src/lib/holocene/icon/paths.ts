@@ -138,6 +138,7 @@ import tag from './svg/tag.svelte';
 import target from './svg/target.svelte';
 import temporalLogo from './svg/temporal-logo.svelte';
 import terminal from './svg/terminal.svelte';
+import timelineCollapse from './svg/timeline-collapse.svelte';
 import timeline from './svg/timeline.svelte';
 import toolbox from './svg/toolbox.svelte';
 import transcoderError from './svg/transcoder-error.svelte';
@@ -302,6 +303,7 @@ export const icons = {
   'temporal-logo': temporalLogo,
   terminal,
   timeline,
+  'timeline-collapse': timelineCollapse,
   toolbox,
   'transcoder-error': transcoderError,
   'transcoder-on': transcoderOn,

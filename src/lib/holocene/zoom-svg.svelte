@@ -13,7 +13,7 @@
 
   let zoomLevel = initialZoom;
 
-  let svg;
+  let svg: SVGSVGElement;
 
   $: viewBox = {
     x: 0,

@@ -54,17 +54,22 @@
   .fade-in {
     @apply absolute right-0 top-0 h-full w-full bg-blue-300;
 
+    transform-origin: right;
     animation: heartRateIn 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
+    will-change: transform;
   }
 
   .fade-out {
     position: absolute;
     height: 100%;
+    width: 100%;
     top: 0;
     left: 0;
+    transform-origin: left;
     animation: heartRateOut 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
+    will-change: transform;
     background: rgb(147 187 253);
     background: linear-gradient(
       to left,
@@ -100,25 +105,25 @@
 
   @keyframes heartRateIn {
     0% {
-      width: 100%;
+      transform: scaleX(1);
     }
 
     50% {
-      width: 0;
+      transform: scaleX(0);
     }
 
     100% {
-      width: 0;
+      transform: scaleX(0);
     }
   }
 
   @keyframes heartRateOut {
     0% {
-      width: 0%;
+      transform: scaleX(0);
     }
 
     100% {
-      width: 100%;
+      transform: scaleX(1);
     }
   }
 </style>

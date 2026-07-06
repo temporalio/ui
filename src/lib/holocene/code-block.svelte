@@ -158,7 +158,7 @@
   let maximized = $state(false);
 
   const maximizable = $derived(
-    (maxHeight && !hasHeader && editorView?.contentHeight > maxHeight) ?? false,
+    !!maxHeight && !hasHeader && (editorView?.contentHeight ?? 0) > maxHeight,
   );
 
   // a compartment allows us to update extensions like the theme
