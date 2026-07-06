@@ -7,10 +7,11 @@
 <div
   data-testid="loading"
   class="flex justify-center"
-  aria-busy="true"
-  aria-live="polite"
+  role="status"
+  aria-label="Loading"
 >
   <div
+    aria-hidden="true"
     class={twMerge(
       'w-[45dvw] min-w-fit max-w-[500px] scale-[.30] antialiased',
       className,
