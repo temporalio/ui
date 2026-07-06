@@ -151,4 +151,34 @@ describe('focusTrap focus management (inert-based)', () => {
     action.destroy();
     expect(preInert.inert).toBe(true); // we didn't set it, so we must not clear it
   });
+
+  // Overlapping traps: a Maximizable inside a Drawer. The inner trap must not
+  // disturb the outer trap's inert state, and tearing the inner down must leave
+  // the outer's containment intact.
+  it('nests traps without clobbering the outer trap on inner teardown', () => {
+    const appRoot = document.createElement('div');
+    appRoot.appendChild(document.createElement('button'));
+
+    const outerNode = document.createElement('div'); // drawer
+    const outerButton = document.createElement('button');
+    const innerNode = document.createElement('div'); // maximizable inside drawer
+    innerNode.appendChild(document.createElement('button'));
+    outerNode.append(outerButton, innerNode);
+    document.body.append(appRoot, outerNode);
+
+    const outer = focusTrap(outerNode, true);
+    expect(appRoot.inert).toBe(true); // background inerted by the outer trap
+
+    const inner = focusTrap(innerNode, true);
+    expect(outerButton.inert).toBe(true); // inner inerts its siblings within the drawer
+    expect(appRoot.inert).toBe(true); // outer's inert is preserved, not re-marked
+    expect(innerNode.contains(document.activeElement)).toBe(true);
+
+    inner.destroy();
+    expect(outerButton.inert).toBe(false); // inner clears only what it set
+    expect(appRoot.inert).toBe(true); // outer trap still contains the background
+
+    outer.destroy();
+    expect(appRoot.inert).toBe(false);
+  });
 });
