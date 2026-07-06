@@ -3,6 +3,8 @@ export const Namespace = 'schedules' as const;
 export const Strings = {
   edit: 'Edit Schedule',
   create: 'Create Schedule',
+  delete: 'Delete Schedule',
+  'fix-form-errors': 'Please fix the following errors:',
   editing: 'Editing Schedule...',
   creating: 'Creating Schedule...',
   'back-to-schedule': 'Back to Schedule',
@@ -12,13 +14,22 @@ export const Strings = {
   frequency: 'Frequency',
   'schedule-spec': 'Schedule Spec',
   'cron-string': 'Cron String',
-  'schedule-input': 'Schedule Input',
+  'workflow-input': 'Workflow Input',
   'empty-state-title': 'No Schedules Found',
   'empty-state-description':
     'Try adjusting or clearing the filters to see the Schedules running on this Namespace.',
   'error-message-fetching': 'Error fetching schedules',
+  'workflow-runs': 'Workflow Runs',
   'recent-runs': 'Recent Runs',
   'recent-runs-empty-state-title': 'No Recent Runs',
+  'workflow-runs-empty-state-recent-title':
+    'This Schedule hasn’t triggered any Workflow Execution runs yet.',
+  'workflow-runs-empty-state-recent-description':
+    'Runs will appear here once triggered.',
+  'workflow-runs-empty-state-upcoming-title':
+    'This Schedule does not have upcoming runs.',
+  'workflow-runs-empty-state-upcoming-description':
+    'Upcoming runs will apear here once available.',
   'upcoming-runs': 'Upcoming Runs',
   'upcoming-runs-empty-state-title': 'No Upcoming Runs',
   loading: 'Loading Schedule...',
@@ -29,35 +40,25 @@ export const Strings = {
   'schedule-actions': 'Schedule Actions',
   'pause-modal-title': 'Pause Schedule?',
   'pause-modal-confirmation': 'Are you sure you want to pause {{schedule}}?',
-  'pause-reason': 'Enter a reason for pausing the schedule.',
+  'pause-reason': 'Enter a reason for pausing the schedule',
+  'pause-schedule-error': 'There was an error pausing the schedule. {{error}}',
   'unpause-modal-title': 'Unpause Schedule?',
   'unpause-modal-confirmation':
     'Are you sure you want to unpause {{schedule}}?',
-  'unpause-reason': 'Enter a reason for unpausing the schedule.',
+  'unpause-reason': 'Enter a reason for unpausing the schedule',
+  'unpause-schedule-error':
+    'There was an error unpausing the schedule. {{error}}',
   trigger: 'Trigger',
+  'trigger-now': 'Trigger a run now',
   backfill: 'Backfill',
+  'backfill-schedule': 'Backfill this schedule',
+  'backfill-schedule-error':
+    'There was an error backfilling the schedule. {{error}}',
+  'backfill-end-before-start': 'End time must be after the start time.',
   'more-options': 'More options',
   'trigger-modal-title': 'Trigger Immediately',
-  'trigger-unspecified-title': 'Use Policy',
-  'trigger-unspecified-description': "Use the Schedule's overlap policy.",
-  'trigger-skip-title': 'Skip',
-  'trigger-skip-description':
-    'When the workflow completes, the next occurrence that is scheduled after that time is considered.',
-  'trigger-buffer-one-title': 'Buffer One',
-  'trigger-buffer-one-description':
-    'Start the workflow again as soon as the current workflow completes, but buffer only one start. If another start is scheduled to happen while the workflow is running, and a workflow is already buffered, only the first workflow starts after the running workflow completes.',
-  'trigger-buffer-all-title': 'Buffer All',
-  'trigger-buffer-all-description':
-    'Buffer any number of workflow starts to happen sequentially, beginning immediately after the running workflow completes.',
-  'trigger-cancel-other-title': 'Cancel Other',
-  'trigger-cancel-other-description':
-    'If another workflow is running, cancel it. After the previous workflow completes cancellation, start the new workflow.',
-  'trigger-terminate-other-title': 'Terminate Other',
-  'trigger-terminate-other-description':
-    'If another workflow is running, terminate it and start the new workflow immediately.',
-  'trigger-allow-all-title': 'Allow All',
-  'trigger-allow-all-description':
-    "Start any number of concurrent workflows. Last completion result and last failure aren't available because the workflows aren't sequential.",
+  'trigger-schedule-error':
+    'There was an error triggering the schedule. {{error}}',
   'delete-modal-title': 'Delete Schedule?',
   'delete-modal-confirmation': 'Are you sure you want to delete {{schedule}}?',
   'advanced-settings': 'Advanced Settings ',
@@ -67,7 +68,7 @@ export const Strings = {
   'exclusion-calendar': 'Exclusion Calendar',
   'remaining-actions': 'Remaining Actions',
   'overlap-policy': 'Overlap Policy',
-  'catchup-window': 'Catchup Window',
+  'catchup-window-policy': 'Catchup Window Policy',
   'pause-on-failure': 'Pause on Failure',
   'keep-original-workflow-id': 'Keep Original Workflow ID',
   'recurring-dates-heading': 'Recurring date(s)',
@@ -87,7 +88,7 @@ export const Strings = {
   'offset-description':
     'Specify the time to offset when this schedule will run (for example 15 min past the hour).',
   'cron-view-title': 'Cron String',
-  'crow-view-example-description':
+  'cron-view-example-description':
     'Temporal Workflow Schedule Cron strings follow this format:',
   'cron-view-description':
     'Write or paste in a cron string to generate a schedule.',
@@ -101,6 +102,174 @@ export const Strings = {
   'getting-started-cli-link-preface': 'or get started with',
   'add-schedule-attr': 'Schedule Attributes',
   'add-workflow-attr': 'Workflow Attributes',
+  'schedule-specs': 'Schedule Specs',
+  'schedule-specs-description':
+    'This Schedule will run at the union of all times and intervals represented in the inputs provided to the Schedule.',
   'view-full-spec': 'View Full Spec',
   'hide-full-spec': 'Hide Full Spec',
+  'spec-summary-at-time': 'At {{- time}}',
+  'spec-summary-every-seconds_one': 'Every second',
+  'spec-summary-every-seconds_other': 'Every {{count}} seconds',
+  'spec-summary-every-minutes_one': 'Every minute',
+  'spec-summary-every-minutes_other': 'Every {{count}} minutes',
+  'spec-summary-every-hours_one': 'Every hour',
+  'spec-summary-every-hours_other': 'Every {{count}} hours',
+  'spec-summary-every-day': 'every day',
+  'spec-summary-on-weekdays': 'on weekdays',
+  'spec-summary-on-weekends': 'on weekends',
+  'spec-summary-on-days-of-week': 'on {{- days}}',
+  'spec-summary-on-days-of-month_one': 'on day {{- days}}',
+  'spec-summary-on-days-of-month_other': 'on days {{- days}}',
+  'spec-summary-of-months': 'of {{- months}}',
+  'spec-summary-in-months': 'in {{- months}}',
+  'spec-summary-year': 'in {{- years}}',
+  'spec-summary-interval':
+    'Every {{- interval}} {{- intervalUnit}} offset by {{- offset}} {{- offsetUnit}}',
+  'overlap-skip-label': 'Skip',
+  'overlap-skip-description':
+    'Workflow Executions are not started when a previously started Workflow Execution started by this schedule is already running.',
+  'overlap-buffer-one-label': 'Buffer One',
+  'overlap-buffer-one-description':
+    'Starts the Workflow Execution as soon as the current one completes. Limited to one.',
+  'overlap-buffer-all-label': 'Buffer All',
+  'overlap-buffer-all-description':
+    'Allows an unlimited number of Workflows to buffer; Workflows start in order they were added to buffer.',
+  'overlap-cancel-other-label': 'Cancel Other',
+  'overlap-cancel-other-description':
+    'Cancels currently running Workflow Execution, starts new one after cancellation completes.',
+  'overlap-terminate-other-label': 'Terminate Other',
+  'overlap-terminate-other-description':
+    'Terminates currently running Workflow Execution, starts new one immediately.',
+  'overlap-allow-all-label': 'Allow All',
+  'overlap-allow-all-description':
+    'Starts any number of concurrent Workflow Executions; more than one Workflow Execution can run simultaneously.',
+  'overlap-default-suffix': '(Default)',
+  'overlap-schedule-policy-suffix': "(Schedule's current policy)",
+  'recurrence-label': 'Recurrence',
+  'recurrence-everyday': 'Every day',
+  'recurrence-weekdays': 'Weekdays',
+  'recurrence-weekends': 'Weekends',
+  'recurrence-custom': 'Custom days',
+  'month-selection-label': 'Month selection',
+  'month-selection-every': 'Every month',
+  'month-selection-custom': 'Custom months',
+  'run-time-heading': 'Run time',
+  'run-time-description':
+    'Specify the time ({{- timezoneName }}) for this schedule to run. The schedule will run at 00:00 {{- timezoneName }} if left blank.',
+  'policies-title': 'Edit Schedule Policies',
+  'policies-drawer-close': 'Cancel policy edits',
+  'overlap-policy-description':
+    'Define what to do when a Workflow Execution started by this Schedule is running when the Schedule is triggered.',
+  'on-start-behavior': 'On Start Behavior',
+  'on-start-behavior-description':
+    'Define what happens when the Schedule starts.',
+  'on-schedule-start': 'On Schedule Start',
+  'pause-schedule-label': 'Pause Schedule',
+  'pause-schedule-description': 'Schedule will not run if paused.',
+  'pause-on-failure-description':
+    'If true, pauses Schedule after any Workflow failure.',
+  'do-not-pause': 'Do not pause',
+  'catchup-window-policy-description':
+    'Define what happens to actions missed during an outage when the service returns.',
+  'catchup-window-policy-detail':
+    'Actions skipped due to an outage within the Catchup Window will be taken once the service returns. Minimum 10 seconds.',
+  'catchup-window-label': 'Window',
+  'catchup-window-tooltip':
+    'Selecting 1 month will default to 31 days. If you wish to select less than 31 days but remain near the month window, use the Day unit.',
+  timeouts: 'Timeouts',
+  'timeouts-description':
+    'Define how long a scheduled task, run, or execution should continue before considering it failed.',
+  'task-timeout': 'Task Timeout',
+  'run-timeout': 'Run Timeout',
+  'execution-timeout': 'Execution Timeout',
+  'update-policies': 'Update Policies',
+  'policies-heading': 'Schedule Policies',
+  'policies-description':
+    'Schedule policies allow you to customize Schedule and Workflow behavior.',
+  'policies-learn-more': 'Read more about Schedule policies',
+  'pause-on-start': 'Pause on start',
+  'do-not-pause-on-start': 'Do not pause on start',
+  'pause-on-failure-question': 'Pause on Failure?',
+  'timeout-task': 'Task: {{- duration}}',
+  'timeout-run': 'Run: {{- duration}}',
+  'timeout-execution': 'Execution: {{- duration}}',
+  'no-timeouts': 'No timeouts set',
+  'zero-duration': '0 seconds',
+  'catchup-window-default': '1 year',
+  'interval-label': 'Time Interval',
+  'cron-shortcuts': 'Cron Shortcuts',
+  'cron-shortcut-every-minute': 'Every minute',
+  'cron-shortcut-every-hour': 'Every hour',
+  'cron-shortcut-daily': 'Daily',
+  'cron-shortcut-weekly': 'Every {{- weekday}}',
+  'cron-shortcut-monthly': 'Monthly on {{- day}}',
+  'cron-expression-label': 'Cron expression',
+  'cron-format-hint':
+    'Format: minute (0-59) hour (0-23) day-of-month (1-31) month (1-12) day-of-week (0-6) separated by a space',
+  'cron-formatting-help': 'Formatting help',
+  'after-n-occurrence_one': 'After {{count}} occurrence',
+  'after-n-occurrence_other': 'After {{count}} occurrences',
+  'cron-format-modal-title': 'Cron expression format',
+  'cron-format-diagram': `┌───────────── minute (0 - 59)
+│ ┌───────────── hour (0 - 23)
+│ │ ┌───────────── day of the month (1 - 31)
+│ │ │ ┌───────────── month (1 - 12)
+│ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday)
+│ │ │ │ │
+* * * * *`,
+  'spec-preview-example': 'Example: {{- summary}}',
+  'spec-preview-interval-empty': 'Set an interval for a summary',
+  'interval-examples-title': 'Interval and phase examples',
+  'interval-examples-interval-label': 'Interval:',
+  'interval-examples-phase-label': 'Phase:',
+  'interval-examples-matches-label': 'Matches:',
+  'interval-examples-hourly-title': 'Every hour on the hour',
+  'interval-examples-hourly-interval': '1 hour',
+  'interval-examples-hourly-phase': '0 seconds',
+  'interval-examples-hourly-matches': '00:00:00, 01:00:00, 02:00:00…',
+  'interval-examples-hourly-offset-title': 'Every hour, but 19 minutes in',
+  'interval-examples-hourly-offset-interval': '1 hour',
+  'interval-examples-hourly-offset-phase': '19 minutes',
+  'interval-examples-hourly-offset-matches': '00:19:00, 01:19:00, 02:19:00…',
+  'interval-examples-minutes-offset-title':
+    'Every 15 minutes, offset by 5 minutes',
+  'interval-examples-minutes-offset-interval': '15 minutes',
+  'interval-examples-minutes-offset-phase': '5 minutes',
+  'interval-examples-minutes-offset-matches': '00:20:00, 00:35:00, 00:50:00…',
+  'details-title': 'Schedule Details',
+  'name-input-label': 'Schedule Name',
+  'workflow-id-hint':
+    'The unique ID of the Workflow Execution. If left blank, we will generate a unique ID.',
+  'task-queue-hint': 'The task queue this schedule should poll.',
+  'start-date-label': 'Schedule Start Date',
+  'start-date-tooltip':
+    'If a Schedule Spec start time has already passed for the start date, the schedule will run at the next time specified in the Schedule Spec.',
+  'end-date-label': 'End Date',
+  'end-date-picker-label': 'End date',
+  'occurrences-label': 'Occurrences',
+  'occurrences-suffix': 'occurrences',
+  'occurrences-placeholder': '###',
+  'timezone-label': 'Timezone',
+  'timezone-placeholder': 'Search timezone…',
+  'jitter-tooltip':
+    'A random offset between zero and this value added to each action time, bound by the next scheduled Action time, used to avoid load spikes.',
+  'summary-title': 'Schedule Summary',
+  'summary-start-date-label': 'Start date',
+  'summary-end-label': 'End',
+  'summary-workflow-type-label': 'Assigned Workflow Type',
+  'summary-spec-conjunction': 'AND',
+  'search-attributes-title': 'Search Attributes',
+  'spec-type-label': 'Schedule Spec Type',
+  'spec-type-placeholder': 'Select a spec type',
+  'spec-type-none': 'No type selected',
+  'spec-type-week': 'Days of Week',
+  'spec-type-month': 'Days of Month',
+  'spec-type-interval': 'Interval',
+  'explore-interval-examples': 'Explore interval examples',
+  'spec-description':
+    'Define rules for when this Workflow should run. You can add as many Schedule Specifications as you need to comprehensively describe the schedule. Specs can be calendar-based, cron-based, or interval-based.',
+  'spec-learn-more': 'Learn more about the Schedule Spec',
+  'add-another-spec': '+ Add another schedule spec',
+  'run-time-based-on-timezone':
+    'Based on the specified timezone ({{- timezoneName}})',
 } as const;

@@ -49,7 +49,7 @@ export const mockWorkflow = {
       name: 'RainbowStatusesWorkflow',
     },
     startTime: '2022-04-28T05:50:48.264756929Z',
-    closeTime: null,
+    closeTime: '',
     status: 'Running',
     historyLength: '6',
     parentNamespaceId: '',

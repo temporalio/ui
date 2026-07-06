@@ -54,7 +54,7 @@
     try {
       const options = {
         namespace,
-        reason: $reason ? `${$reason} ${reasonPlaceholder}` : reasonPlaceholder,
+        reason: $reason ? $reason : reasonPlaceholder,
         jobId: $jobId || jobIdPlaceholder,
         ...($allSelected
           ? { query: $workflowsQuery }

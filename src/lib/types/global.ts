@@ -103,6 +103,7 @@ export type Settings = {
   showTemporalSystemNamespace: boolean;
   navCollapsedByDefault: boolean;
   feedbackURL: string;
+  disableNewsFetch: boolean;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;

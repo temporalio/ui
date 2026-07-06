@@ -76,8 +76,7 @@
 
     <Input
       id="terminate-activity-execution-reason"
-      label={translate('common.reason-placeholder')}
-      labelHidden
+      label={translate('common.reason-optional')}
       bind:value={reason}
       placeholder={translate('common.reason-placeholder')}
     />
