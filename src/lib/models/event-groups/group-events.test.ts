@@ -88,7 +88,7 @@ const eventHistory = [
 describe('groupEvents', () => {
   it('should create a new entry when given a scheduled event', () => {
     const groups = groupEvents([scheduledEvent] as unknown as WorkflowEvents);
-    const group = groups.find(({ id }) => id === scheduledEvent.id);
+    const group = groups.find(({ id }) => id === scheduledEvent.id)!;
 
     expect(group.eventList.find((e) => e.id === scheduledEvent.id)).toBe(
       scheduledEvent,
@@ -128,7 +128,7 @@ describe('groupEvents', () => {
       completedEvent,
     ] as unknown as WorkflowEvents);
 
-    const group = groups.find(({ id }) => id === scheduledEvent.id);
+    const group = groups.find(({ id }) => id === scheduledEvent.id)!;
 
     expect(group.eventList.length).toBe(2);
     expect(group.eventList.find((e) => e.id === completedEvent.id)).toBe(
@@ -142,7 +142,7 @@ describe('groupEvents', () => {
       'descending',
     );
 
-    const group = groups.find(({ id }) => id === scheduledEvent.id);
+    const group = groups.find(({ id }) => id === scheduledEvent.id)!;
 
     expect(group.eventList.length).toBe(2);
     expect(group.eventList.find((e) => e.id === completedEvent.id)).toBe(
@@ -168,7 +168,9 @@ describe('getEventGroupDisplayName', () => {
   });
 
   it('should guard against empty arguments', () => {
-    expect(getEventGroupDisplayName(undefined as CommonHistoryEvent)).toBe('');
+    expect(
+      getEventGroupDisplayName(undefined as unknown as CommonHistoryEvent),
+    ).toBe('');
   });
 
   it('should get the name of a TimerStartedEvent', () => {

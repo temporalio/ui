@@ -121,7 +121,9 @@ export const addEventToGroup = (group: EventGroup, event: WorkflowEvent) => {
   }
 };
 
-export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
+export const createEventGroup = (
+  event: CommonHistoryEvent,
+): EventGroup | undefined => {
   if (isActivityTaskScheduledEvent(event))
     return createGroupFor<'Activity'>(event);
 
@@ -152,7 +154,7 @@ export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
 
 export const createWorkflowTaskGroup = (
   event: CommonHistoryEvent,
-): EventGroup => {
+): EventGroup | undefined => {
   if (isWorkflowTaskScheduledEvent(event))
     return createGroupFor<'WorkflowTask'>(event);
 };

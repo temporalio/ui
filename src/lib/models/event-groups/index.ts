@@ -50,7 +50,9 @@ function resolveEvent(
   const group = createEventGroup(event);
 
   const pa = isActivityTaskScheduledEvent(event)
-    ? byActivityId.get(event.activityTaskScheduledEventAttributes.activityId)
+    ? byActivityId.get(
+        event.activityTaskScheduledEventAttributes?.activityId ?? '',
+      )
     : undefined;
   const pn = isNexusOperationScheduledEvent(event)
     ? byNexusScheduledId.get(event.id)
