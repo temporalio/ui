@@ -37,18 +37,16 @@
             formatDuration($form.taskTimeout) ||
             translate('schedules.zero-duration'),
         }),
-      $form.runTimeout &&
-        translate('schedules.timeout-run', {
-          duration:
-            formatDuration($form.runTimeout) ||
-            translate('schedules.zero-duration'),
-        }),
-      $form.executionTimeout &&
-        translate('schedules.timeout-execution', {
-          duration:
-            formatDuration($form.executionTimeout) ||
-            translate('schedules.zero-duration'),
-        }),
+      translate('schedules.timeout-run', {
+        duration:
+          formatDuration($form.runTimeout) ||
+          translate('schedules.zero-duration'),
+      }),
+      translate('schedules.timeout-execution', {
+        duration:
+          formatDuration($form.executionTimeout) ||
+          translate('schedules.zero-duration'),
+      }),
     ]
       .filter(Boolean)
       .join(', ') || translate('schedules.no-timeouts'),

@@ -6,8 +6,6 @@ import { searchAttributesSchema } from '$lib/stores/search-attributes';
 import { durationString, jsonString, structuredCalendarSchema } from './common';
 import {
   DEFAULT_CATCHUP_WINDOW,
-  DEFAULT_EXECUTION_TIMEOUT,
-  DEFAULT_RUN_TIMEOUT,
   DEFAULT_TASK_TIMEOUT,
   MIN_CATCHUP_SECONDS,
 } from '../constants';
@@ -22,6 +20,16 @@ const durationStringWithDefault = (fallback: DurationString) =>
     (input) => (input == null || input === '' ? fallback : input),
     durationString(),
   );
+
+// Run/execution timeouts may be left empty to mean "use the server default".
+// Keep an emptied input as '' rather than coercing it to 0s.
+const optionalDurationString = () =>
+  z
+    .preprocess(
+      (input) => input ?? '',
+      z.union([z.literal(''), durationString()]),
+    )
+    .default('');
 
 export const overlapPolicy = z
   .enum([
@@ -51,8 +59,8 @@ export const formSchedulePoliciesSchema = z.object({
     },
   ),
   taskTimeout: durationStringWithDefault(DEFAULT_TASK_TIMEOUT),
-  runTimeout: durationStringWithDefault(DEFAULT_RUN_TIMEOUT),
-  executionTimeout: durationStringWithDefault(DEFAULT_EXECUTION_TIMEOUT),
+  runTimeout: optionalDurationString(),
+  executionTimeout: optionalDurationString(),
   keepOriginalWorkflowId: z.boolean().optional(),
 });
 
