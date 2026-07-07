@@ -9,7 +9,7 @@
 
   interface Props {
     clusterId: string;
-    source?: NewsFeedSource;
+    source: NewsFeedSource;
     class?: string;
     previewTheme?: 'dark' | 'light';
     variant?: 'button' | 'navigation';
@@ -17,7 +17,7 @@
 
   let {
     clusterId,
-    source = 'web-ui',
+    source,
     class: className = '',
     previewTheme,
     variant = 'button',

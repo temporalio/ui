@@ -23,7 +23,7 @@ import {
 
 type CreateNewsFeedStoreOptions = {
   clusterId: string;
-  source?: NewsFeedSource;
+  source: NewsFeedSource;
   request?: typeof fetch;
   now?: () => number;
   storage?: NewsFeedStorage;
@@ -60,7 +60,7 @@ const createInitialState = (
 
 export const createNewsFeedStore = ({
   clusterId,
-  source = 'web-ui',
+  source,
   now = Date.now,
   request = fetch,
   storage = newsFeedStorage,

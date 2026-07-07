@@ -385,6 +385,7 @@
       {#if showNewsFeed}
         <NewsFeedWidget
           clusterId={newsFeedClusterId}
+          source="web-ui"
           previewTheme={$useDarkMode ? 'dark' : 'light'}
         />
       {/if}
@@ -429,6 +430,7 @@
         {#if showNewsFeed}
           <NewsFeedWidget
             clusterId={newsFeedClusterId}
+            source="web-ui"
             variant="navigation"
             previewTheme="dark"
           />

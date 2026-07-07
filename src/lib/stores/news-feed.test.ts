@@ -41,6 +41,7 @@ describe('createNewsFeedStore', () => {
       clusterId: '75d9c0b6-577f-42d4-a049-9f6e47e97c46',
       now: () => currentTime,
       request,
+      source: 'web-ui',
       storage,
     });
 
@@ -74,6 +75,23 @@ describe('createNewsFeedStore', () => {
     newsFeed.destroy();
   });
 
+  it('requests the feed with the cloud UI source', async () => {
+    const request = vi.fn().mockResolvedValue(response());
+    const newsFeed = createNewsFeedStore({
+      clusterId: '75d9c0b6-577f-42d4-a049-9f6e47e97c46',
+      request,
+      source: 'cloud-ui',
+      storage: createStorage(),
+    });
+
+    await newsFeed.refresh();
+
+    const url = new URL(request.mock.calls[0][0]);
+    expect(url.searchParams.get('source')).toBe('cloud-ui');
+
+    newsFeed.destroy();
+  });
+
   it('does not update storage when already marked seen', () => {
     const storage = createStorage();
     const cache = {
@@ -91,6 +109,7 @@ describe('createNewsFeedStore', () => {
     const setItem = vi.spyOn(storage, 'setItem');
     const newsFeed = createNewsFeedStore({
       clusterId: '75d9c0b6-577f-42d4-a049-9f6e47e97c46',
+      source: 'web-ui',
       storage,
     });
 
