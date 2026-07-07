@@ -138,12 +138,32 @@ describe('getFormScheduleDefaults', () => {
       expect(defaults.pauseSchedule).toBe(true);
       expect(defaults.catchupWindow).toBe('600s');
       expect(defaults.runTimeout).toBe('300s');
+      expect(defaults.executionTimeout).toBe('');
     });
 
     it('derives the end condition from limited actions', () => {
       expect(defaults.endKind).toBe('after');
       expect(defaults.endAfterOccurrences).toBe(3);
     });
+  });
+
+  it('normalizes a stored 0s run/execution timeout to empty', () => {
+    const defaults = getFormScheduleDefaults(
+      {
+        schedule: {
+          action: {
+            startWorkflow: {
+              workflowRunTimeout: '0s',
+              workflowExecutionTimeout: '0s',
+            },
+          },
+        },
+      } as unknown as DescribeFullSchedule,
+      noAttributes,
+    );
+
+    expect(defaults.runTimeout).toBe('');
+    expect(defaults.executionTimeout).toBe('');
   });
 
   it('prefills the end date with today in the schedule timezone', () => {

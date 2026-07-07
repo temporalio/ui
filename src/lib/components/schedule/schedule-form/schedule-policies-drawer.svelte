@@ -20,8 +20,6 @@
 
   import {
     DEFAULT_CATCHUP_WINDOW,
-    DEFAULT_EXECUTION_TIMEOUT,
-    DEFAULT_RUN_TIMEOUT,
     DEFAULT_TASK_TIMEOUT,
     durationUnits,
     getOverlapPolicyContent,
@@ -311,7 +309,6 @@
         hintText={$errors.runTimeout?.[0] ?? ''}
         class="max-w-80"
         min={0}
-        onblur={snapToDefault('runTimeout', DEFAULT_RUN_TIMEOUT)}
       />
     {/key}
 
@@ -330,7 +327,6 @@
         hintText={$errors.executionTimeout?.[0] ?? ''}
         class="max-w-80"
         min={0}
-        onblur={snapToDefault('executionTimeout', DEFAULT_EXECUTION_TIMEOUT)}
       />
     {/key}
 
