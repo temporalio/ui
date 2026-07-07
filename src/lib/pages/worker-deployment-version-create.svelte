@@ -17,9 +17,10 @@
     namespace: string;
     deployment: string;
     onSuccess: () => void;
+    gcpRegions?: string[];
   }
 
-  let { namespace, deployment, onSuccess }: Props = $props();
+  let { namespace, deployment, onSuccess, gcpRegions }: Props = $props();
 
   let error = $state<string | undefined>();
   let versions = $state<VersionSummary[]>();
@@ -59,6 +60,7 @@
   <CreateVersionForm
     {error}
     {versions}
+    {gcpRegions}
     cancelHref={backHref}
     onSubmit={async (data) => {
       error = undefined;

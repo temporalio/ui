@@ -20,9 +20,16 @@
     cancelHref: string;
     error?: string;
     versions?: VersionSummary[];
+    gcpRegions?: string[];
   }
 
-  let { onSubmit, cancelHref, error, versions = [] }: Props = $props();
+  let {
+    onSubmit,
+    cancelHref,
+    error,
+    versions = [],
+    gcpRegions,
+  }: Props = $props();
 
   const superform = superForm(
     {
@@ -98,6 +105,7 @@
           bind:roleExternalId={$form.roleExternalId}
           bind:gcpProject={$form.gcpProject}
           bind:gcpRegion={$form.gcpRegion}
+          {gcpRegions}
           bind:gcpWorkerPool={$form.gcpWorkerPool}
           bind:gcpServiceAccount={$form.gcpServiceAccount}
           bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}

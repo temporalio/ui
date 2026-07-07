@@ -29,10 +29,17 @@
     cancelHref: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    gcpRegions?: string[];
   }
 
-  let { onSubmit, onSuccess, cancelHref, cfnTemplateUrl, cfnTemplate }: Props =
-    $props();
+  let {
+    onSubmit,
+    onSuccess,
+    cancelHref,
+    cfnTemplateUrl,
+    cfnTemplate,
+    gcpRegions,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
 
@@ -133,6 +140,7 @@
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}
         bind:gcpRegion={$form.gcpRegion}
+        {gcpRegions}
         bind:gcpWorkerPool={$form.gcpWorkerPool}
         bind:gcpServiceAccount={$form.gcpServiceAccount}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}

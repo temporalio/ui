@@ -20,6 +20,7 @@
     onSuccess: () => void;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    gcpRegions?: string[];
   }
 
   interface SubmitFieldErrors {
@@ -27,7 +28,8 @@
     iamRoleArn?: string[];
   }
 
-  let { namespace, onSuccess, cfnTemplateUrl, cfnTemplate }: Props = $props();
+  let { namespace, onSuccess, cfnTemplateUrl, cfnTemplate, gcpRegions }: Props =
+    $props();
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -197,4 +199,5 @@
   onSubmit={handleCreate}
   {cfnTemplateUrl}
   {cfnTemplate}
+  {gcpRegions}
 />

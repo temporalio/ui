@@ -31,9 +31,17 @@
     onDelete: () => void;
     cancelHref: string;
     error?: string;
+    gcpRegions?: string[];
   }
 
-  let { initialData, onSubmit, onDelete, cancelHref, error }: Props = $props();
+  let {
+    initialData,
+    onSubmit,
+    onDelete,
+    cancelHref,
+    error,
+    gcpRegions,
+  }: Props = $props();
 
   const superform = superForm(
     {
@@ -87,6 +95,7 @@
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}
         bind:gcpRegion={$form.gcpRegion}
+        {gcpRegions}
         bind:gcpWorkerPool={$form.gcpWorkerPool}
         bind:gcpServiceAccount={$form.gcpServiceAccount}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}

@@ -21,6 +21,7 @@
     roleExternalId: string;
     gcpProject?: string;
     gcpRegion?: string;
+    gcpRegions?: string[];
     gcpWorkerPool?: string;
     gcpServiceAccount?: string;
     scaleUpCooloffMs?: number;
@@ -51,6 +52,7 @@
     roleExternalId = $bindable(),
     gcpProject = $bindable(''),
     gcpRegion = $bindable(''),
+    gcpRegions = [...GCP_REGIONS],
     gcpWorkerPool = $bindable(''),
     gcpServiceAccount = $bindable(''),
     scaleUpCooloffMs = $bindable(),
@@ -138,7 +140,7 @@
         name="gcpRegion"
         label={translate('workers.gcp-region-label')}
         placeholder={translate('workers.gcp-region-placeholder')}
-        options={[...GCP_REGIONS]}
+        options={gcpRegions}
         noResultsText={translate('common.no-results')}
         valid={!errors.gcpRegion?.[0]}
         error={errors.gcpRegion?.[0]}
