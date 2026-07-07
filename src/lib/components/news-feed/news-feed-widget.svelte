@@ -3,11 +3,13 @@
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { createNewsFeedStore } from '$lib/stores/news-feed';
+  import type { NewsFeedSource } from '$lib/types/news-feed';
 
   import NewsFeedModal from './news-feed-modal.svelte';
 
   interface Props {
     clusterId: string;
+    source: NewsFeedSource;
     class?: string;
     previewTheme?: 'dark' | 'light';
     variant?: 'button' | 'navigation';
@@ -15,12 +17,13 @@
 
   let {
     clusterId,
+    source,
     class: className = '',
     previewTheme,
     variant = 'button',
   }: Props = $props();
 
-  const newsFeed = $derived(createNewsFeedStore({ clusterId }));
+  const newsFeed = $derived(createNewsFeedStore({ clusterId, source }));
   let open = $state(false);
 
   $effect(() => {

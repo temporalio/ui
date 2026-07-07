@@ -3,7 +3,7 @@ import { get, writable } from 'svelte/store';
 import { BROWSER } from 'esm-env';
 
 import { fetchNewsFeed } from '$lib/services/news-feed-service';
-import type { NewsFeedState } from '$lib/types/news-feed';
+import type { NewsFeedSource, NewsFeedState } from '$lib/types/news-feed';
 import {
   getAutoFetchEnabled,
   getDisplayableNewsFeedItems,
@@ -23,6 +23,7 @@ import {
 
 type CreateNewsFeedStoreOptions = {
   clusterId: string;
+  source: NewsFeedSource;
   request?: typeof fetch;
   now?: () => number;
   storage?: NewsFeedStorage;
@@ -59,6 +60,7 @@ const createInitialState = (
 
 export const createNewsFeedStore = ({
   clusterId,
+  source,
   now = Date.now,
   request = fetch,
   storage = newsFeedStorage,
@@ -84,6 +86,7 @@ export const createNewsFeedStore = ({
       const feedCache = await fetchNewsFeed({
         cache,
         clusterId,
+        source,
         now,
         request,
         storage,
