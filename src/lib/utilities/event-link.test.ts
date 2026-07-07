@@ -72,6 +72,30 @@ describe('toEventLinkView', () => {
     expect(view.event).toBeUndefined();
   });
 
+  it('returns a workflow route for workflow links', () => {
+    const view = toEventLinkView({
+      workflow: {
+        namespace: 'test-ns',
+        workflowId: 'test-wf',
+        runId: 'test-run',
+        reason: 'query',
+      },
+    });
+
+    expect(view).toMatchObject({
+      variant: 'workflow',
+      label: 'Workflow ID',
+      value: 'test-wf/test-run/timeline',
+      href: `${base}/namespaces/test-ns/workflows/test-wf/test-run/timeline`,
+      namespace: {
+        label: 'Link Namespace',
+        value: 'test-ns',
+        href: `${base}/namespaces/test-ns`,
+      },
+    });
+    expect(view.event).toBeUndefined();
+  });
+
   it('returns a standalone Nexus operation route', () => {
     const view = toEventLinkView({
       nexusOperation: {
@@ -135,6 +159,21 @@ describe('toEventLinkView', () => {
       variant: 'nexusOperation',
       label: 'Nexus Operation',
       value: 'operation-1',
+      href: undefined,
+    });
+  });
+
+  it('returns a text-only view for malformed workflow links', () => {
+    const view = toEventLinkView({
+      workflow: {
+        workflowId: 'test-wf',
+      },
+    });
+
+    expect(view).toMatchObject({
+      variant: 'workflow',
+      label: 'Workflow ID',
+      value: 'test-wf',
       href: undefined,
     });
   });
