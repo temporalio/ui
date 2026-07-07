@@ -84,6 +84,21 @@ export const activityFilters = writable<SearchAttributeFilter[]>(
   updateActivityFilters,
 );
 
+const updateNexusOperationFilters: StartStopNotifier<
+  SearchAttributeFilter[]
+> = (set) => {
+  return parameters.subscribe(({ query }) => {
+    if (!query && get(nexusOperationFilters).length) {
+      set([]);
+    }
+  });
+};
+
+export const nexusOperationFilters = writable<SearchAttributeFilter[]>(
+  [],
+  updateNexusOperationFilters,
+);
+
 const updateWorkerFilters: StartStopNotifier<SearchAttributeFilter[]> = (
   set,
 ) => {

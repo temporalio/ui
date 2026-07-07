@@ -143,6 +143,7 @@
     'flex min-h-[24px] flex-wrap items-center gap-2 pt-1.5',
     className,
   )}
+  aria-busy={countPoller.loading}
 >
   {#each allStatusGroups as { count, status } (status)}
     {#if !countPoller.loading}

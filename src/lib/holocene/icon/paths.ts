@@ -88,6 +88,8 @@ import linux from './svg/linux.svelte';
 import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import marker from './svg/marker.svelte';
+import megaphoneUnread from './svg/megaphone-unread.svelte';
+import megaphone from './svg/megaphone.svelte';
 import merge from './svg/merge.svelte';
 import microchip from './svg/microchip.svelte';
 import microsoft from './svg/microsoft.svelte';
@@ -249,6 +251,8 @@ export const icons = {
   lock,
   logout,
   marker,
+  megaphone,
+  'megaphone-unread': megaphoneUnread,
   merge,
   microchip,
   microsoft,

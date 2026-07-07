@@ -148,6 +148,7 @@
         <WorkflowStatus
           status={workflow?.status}
           big
+          announce
           delayed={workflow ? isWorkflowDelayed(workflow) : false}
           taskFailure={workflow ? isWorkflowTaskFailure(workflow) : false}
         />

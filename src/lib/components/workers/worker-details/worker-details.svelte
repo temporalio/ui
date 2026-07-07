@@ -104,6 +104,7 @@
 
 <section
   aria-label={translate('workers.worker-details')}
+  aria-busy={refreshing}
   class="flex flex-col gap-4"
 >
   <header

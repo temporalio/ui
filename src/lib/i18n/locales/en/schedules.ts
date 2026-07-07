@@ -194,7 +194,7 @@ export const Strings = {
   'timeout-run': 'Run: {{- duration}}',
   'timeout-execution': 'Execution: {{- duration}}',
   'no-timeouts': 'No timeouts set',
-  'zero-duration': '0 seconds',
+  'zero-duration': 'No timeout',
   'catchup-window-default': '1 year',
   'interval-label': 'Time Interval',
   'cron-shortcuts': 'Cron Shortcuts',
