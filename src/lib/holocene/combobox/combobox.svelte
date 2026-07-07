@@ -275,7 +275,9 @@
     }
     handleSelectOption(trimmedFilterValue);
     filterValue = '';
-    displayValue = '';
+    if (multiselect) {
+      displayValue = '';
+    }
   };
 
   const isStringOption = (option: string | T): option is string => {
