@@ -29,7 +29,9 @@
   import { getActivityPollers } from '$lib/services/pollers-service';
   import {
     fetchInitialValuesForStartActivity,
+    initialTimeoutUnit,
     startStandaloneActivity,
+    TIMEOUT_UNITS,
   } from '$lib/services/standalone-activities';
   import {
     customSearchAttributes,
@@ -318,6 +320,8 @@
         'standalone-activities.form-start-to-close-timeout-hint',
       )}
       bind:value={$form.startToCloseTimeout}
+      initialUnit={initialTimeoutUnit($form.startToCloseTimeout)}
+      units={TIMEOUT_UNITS}
     />
 
     <DurationInput
@@ -330,6 +334,8 @@
         'standalone-activities.form-schedule-to-close-timeout-hint',
       )}
       bind:value={$form.scheduleToCloseTimeout}
+      initialUnit={initialTimeoutUnit($form.scheduleToCloseTimeout)}
+      units={TIMEOUT_UNITS}
     />
 
     <DurationInput
@@ -341,6 +347,8 @@
         'standalone-activities.form-schedule-to-start-timeout-hint',
       )}
       bind:value={$form.scheduleToStartTimeout}
+      initialUnit={initialTimeoutUnit($form.scheduleToStartTimeout)}
+      units={TIMEOUT_UNITS}
     />
 
     {#if $errors.startToCloseTimeout}
@@ -409,6 +417,8 @@
           'standalone-activities.form-heartbeat-timeout-hint',
         )}
         bind:value={$form.heartbeatTimeout}
+        initialUnit={initialTimeoutUnit($form.heartbeatTimeout)}
+        units={TIMEOUT_UNITS}
       />
     </Card>
 
@@ -420,7 +430,7 @@
         id="start-standalone-activity-id-reuse-policy-select"
         bind:value={$form.idReusePolicy}
       >
-        {#each activityIDReusePolicyOptions as option}
+        {#each activityIDReusePolicyOptions as option, i (i)}
           <Option value={option}
             >{fromScreamingEnum(option, 'ActivityIdReusePolicy')}</Option
           >
@@ -432,7 +442,7 @@
         id="start-standalone-activity-id-conflict-policy-select"
         bind:value={$form.idConflictPolicy}
       >
-        {#each activityIDConflictPolicyOptions as option}
+        {#each activityIDConflictPolicyOptions as option, i (i)}
           <Option value={option}
             >{fromScreamingEnum(option, 'ActivityIdConflictPolicy')}</Option
           >

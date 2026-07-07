@@ -8,8 +8,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import DurationInput, {
-    parseDuration,
-    type Units,
+    getFirstWholeNumberUnit,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
@@ -108,26 +107,6 @@
   const onCancel = () => {
     isOpen = false;
   };
-
-  function getFirstWholeNumberUnit<UnitLabelT extends string>(
-    duration: string,
-    units: Units<UnitLabelT>,
-  ): UnitLabelT | undefined {
-    const secondsValue = Number(parseDuration(duration));
-
-    if (secondsValue === 0) {
-      // if 0, use last unit label
-      return units.at(-1)?.label;
-    }
-
-    for (const unit of units) {
-      if (Number.isInteger(secondsValue / unit.convert(1))) {
-        return unit.label;
-      }
-    }
-
-    return undefined;
-  }
 </script>
 
 <Drawer
