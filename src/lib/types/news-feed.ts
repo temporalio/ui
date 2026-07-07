@@ -19,7 +19,7 @@ export type NewsFeedCache = {
   serverTime: string;
 };
 
-export type NewsFeedSource = 'web-ui';
+export type NewsFeedSource = 'web-ui' | 'cloud-ui';
 
 export type NewsFeedState = {
   autoFetchEnabled: boolean;
