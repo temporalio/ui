@@ -254,13 +254,19 @@
             data-cy="workflows-title"
           >
             {#if $supportsAdvancedVisibility}
-              <span data-testid="workflow-count"
-                >{$workflowCount.count.toLocaleString()}</span
+              <span
+                role="status"
+                aria-atomic="true"
+                class="flex items-center gap-2"
               >
-              <Translate
-                key="common.workflows-plural"
-                count={$workflowCount.count}
-              />
+                <span data-testid="workflow-count"
+                  >{$workflowCount.count.toLocaleString()}</span
+                >
+                <Translate
+                  key="common.workflows-plural"
+                  count={$workflowCount.count}
+                />
+              </span>
             {:else}
               <Translate key="workflows.recent-workflows" />
             {/if}

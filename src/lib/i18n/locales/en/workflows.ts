@@ -364,5 +364,7 @@ export const Strings = {
   'show-common-errors': 'Show Common Errors',
   'show-common-errors-description':
     'Show alerts for common errors if present in the Event History',
+  'new-events-announcement_one': '{{count, number}} new event loaded',
+  'new-events-announcement_other': '{{count, number}} new events loaded',
   'total-workflows': 'Total Workflows',
 } as const;

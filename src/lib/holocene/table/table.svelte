@@ -27,6 +27,7 @@
     className,
   )}
   class:bordered
+  aria-busy={updating ? 'true' : undefined}
   {...$$restProps}
 >
   <slot name="caption" />

@@ -299,6 +299,13 @@
   bucket: 2
   severity: moderate
   scope: ui-main
+- slug: 2.4.6-cloud-drawer-content-empty-title
+  sc: '2.4.6'
+  bucket: 2
+  severity: moderate
+  scope: universal
+  files-touched:
+    - src/lib/holocene/drawer-content.svelte
 - slug: 2.4.6-ui-main-datepicker-empty-label
   sc: '2.4.6'
   bucket: 2

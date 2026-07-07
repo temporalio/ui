@@ -143,6 +143,32 @@ describe('getRequestBody', () => {
     );
   });
 
+  it('omits run and execution timeouts when zeroed (no timeout)', async () => {
+    const { startWorkflow } = (await getRequestBody(buildForm())).schedule
+      .action;
+
+    expect(startWorkflow.workflowTaskTimeout).toBe(DEFAULT_TASK_TIMEOUT);
+    expect(startWorkflow.workflowRunTimeout).toBeUndefined();
+    expect(startWorkflow.workflowExecutionTimeout).toBeUndefined();
+  });
+
+  it('clears a previously set timeout when the form value is zeroed', async () => {
+    const describeFullSchedule = {
+      schedule: {
+        action: { startWorkflow: { workflowRunTimeout: '300s' } },
+      },
+    } as unknown as DescribeFullSchedule;
+
+    const { startWorkflow } = (
+      await getRequestBody(
+        buildForm({ runTimeout: '0s' }),
+        describeFullSchedule,
+      )
+    ).schedule.action;
+
+    expect(startWorkflow.workflowRunTimeout).toBeUndefined();
+  });
+
   it('maps policy fields', async () => {
     const body = await getRequestBody(
       buildForm({ overlapPolicy: 'BufferOne', pauseOnFailure: true }),
