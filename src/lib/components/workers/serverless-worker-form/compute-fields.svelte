@@ -75,7 +75,7 @@
     if (lambdaArn) {
       params.push(`param_LambdaFunctionARNs=${encodeURIComponent(lambdaArn)}`);
     }
-    return `https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?${params.join('&')}`;
+    return `https://console.aws.amazon.com/cloudformation/home#/stacks/create/review?${params.join('&')}`;
   });
 
   let showRoleHelp = $state(false);
