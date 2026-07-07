@@ -29,7 +29,6 @@ export const Strings = {
   workflows: 'Go to Workflows',
   version: 'Version',
   status: 'Status',
-  'build-status': 'Build Status',
   lifecycle: 'Lifecycle',
   'config-status': 'Config Status',
   current: 'Current',

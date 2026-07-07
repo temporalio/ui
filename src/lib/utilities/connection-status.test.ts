@@ -86,4 +86,10 @@ describe('formatConnectionCheckTime', () => {
     };
     expect(formatConnectionCheckTime(ts)).toBe('5 hours ago');
   });
+
+  it('returns less than an hour ago for an invalid date', () => {
+    expect(formatConnectionCheckTime(new Date('invalid'))).toBe(
+      'less than an hour ago',
+    );
+  });
 });

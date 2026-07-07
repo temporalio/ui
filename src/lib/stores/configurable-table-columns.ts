@@ -448,7 +448,7 @@ const reducer = (action: Action, state: State): State => {
     }
     case 'CONFIGURABLE_COLUMN.MOVE': {
       const { from, to, namespace } = action.payload;
-      const columns = state?.[namespace] ?? DEFAULT_WORKFLOWS_COLUMNS;
+      const columns = state?.[namespace] ?? defaultColumns;
       const tempColumns = [...columns];
 
       tempColumns.splice(to, 0, tempColumns.splice(from, 1)[0]);

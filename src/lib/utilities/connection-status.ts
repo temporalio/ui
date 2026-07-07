@@ -33,10 +33,10 @@ export const formatConnectionCheckTime = (time: ValidTime): string => {
       ? timestampToDate(time)
       : new Date(time as string | number | Date);
     const diff = Date.now() - parsedDate.getTime();
-    if (diff < 3_600_000) {
+    if (Number.isNaN(diff) || diff < 3_600_000) {
       return translate('deployments.connection-checked-recently');
     }
-    const hours = Math.round(diff / 3_600_000);
+    const hours = Math.floor(diff / 3_600_000);
     return translate(
       hours === 1
         ? 'deployments.connection-checked-hour'
