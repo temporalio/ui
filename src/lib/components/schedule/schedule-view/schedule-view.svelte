@@ -61,13 +61,15 @@
   </Link>
   <div class="flex items-start justify-between gap-4">
     <h1
-      class="flex select-all flex-wrap items-center gap-2 text-3xl"
+      class="flex flex-wrap items-center gap-2 text-3xl"
       data-testid="schedule-name"
     >
       <WorkflowStatus
         status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
       />
-      {scheduleId}
+      <span class="select-all">
+        {scheduleId}
+      </span>
     </h1>
 
     <SplitButton
