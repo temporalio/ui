@@ -4,7 +4,9 @@ import { describe, expect, test } from 'vitest';
 
 import {
   addColumn,
+  DEFAULT_DEPLOYMENTS_COLUMNS,
   moveColumn,
+  persistedDeploymentsTableColumns,
   persistedWorkflowTableColumns,
   removeColumn,
   TABLE_TYPE,
@@ -50,6 +52,36 @@ describe('Workflow Table Columns store', () => {
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [{ label: 'Start' }, { label: 'End' }],
       });
+    });
+  });
+});
+
+describe('Deployment Table Columns store', () => {
+  test('Latest Version is hidden by default', () => {
+    expect(
+      DEFAULT_DEPLOYMENTS_COLUMNS.some(
+        ({ label }) => label === 'Latest Version',
+      ),
+    ).toBe(false);
+  });
+
+  describe('addColumn', () => {
+    test('adds the Latest Version column and persists it', () => {
+      persistedDeploymentsTableColumns.set({ default: [] });
+      addColumn('Latest Version', 'default', TABLE_TYPE.DEPLOYMENTS);
+      expect(get(persistedDeploymentsTableColumns)).toEqual({
+        default: [{ label: 'Latest Version' }],
+      });
+    });
+  });
+
+  describe('removeColumn', () => {
+    test('removes the Latest Version column', () => {
+      persistedDeploymentsTableColumns.set({
+        default: [{ label: 'Latest Version' }],
+      });
+      removeColumn('Latest Version', 'default', TABLE_TYPE.DEPLOYMENTS);
+      expect(get(persistedDeploymentsTableColumns)).toEqual({ default: [] });
     });
   });
 });

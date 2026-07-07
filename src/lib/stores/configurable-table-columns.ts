@@ -41,6 +41,7 @@ export const TABLE_TYPE = {
   WORKFLOWS: 'workflows',
   SCHEDULES: 'schedules',
   ACTIVITIES: 'activities',
+  DEPLOYMENTS: 'deployments',
   NEXUS_OPERATIONS: 'nexus-operations',
 } as const;
 
@@ -169,6 +170,25 @@ const DEFAULT_AVAILABLE_ACTIVITIES_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'State Transitions' },
 ];
 
+export const DeploymentHeaderLabels = [
+  'Deployment',
+  'Current Version',
+  'Latest Version',
+  'Created At',
+] as const;
+
+export type DeploymentHeaderLabel = (typeof DeploymentHeaderLabels)[number];
+
+export const DEFAULT_DEPLOYMENTS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Deployment' },
+  { label: 'Current Version' },
+  { label: 'Created At' },
+];
+
+const DEFAULT_AVAILABLE_DEPLOYMENTS_COLUMNS: ConfigurableTableHeader[] = [
+  { label: 'Latest Version' },
+];
+
 export const DEFAULT_NEXUS_OPERATIONS_COLUMNS: ConfigurableTableHeader[] = [
   { label: 'Status' },
   { label: 'Operation ID' },
@@ -201,6 +221,11 @@ export const persistedActivitiesTableColumns = persistStore<State>(
   {},
 );
 
+export const persistedDeploymentsTableColumns = persistStore<State>(
+  'namespace-deployment-table-columns',
+  {},
+);
+
 export const persistedNexusOperationsTableColumns = persistStore<State>(
   'namespace-nexus-operations-table-columns',
   {},
@@ -213,6 +238,7 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
     persistedWorkflowTableColumns,
     persistedSchedulesTableColumns,
     persistedActivitiesTableColumns,
+    persistedDeploymentsTableColumns,
     persistedNexusOperationsTableColumns,
   ],
   ([
@@ -221,6 +247,7 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
     $persistedWorkflowTableColumns,
     $persistedSchedulesTableColumns,
     $persistedActivitiesTableColumns,
+    $persistedDeploymentsTableColumns,
     $persistedNexusOperationsTableColumns,
   ]) => {
     const state: TableColumns = {};
@@ -252,6 +279,11 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
         $persistedActivitiesTableColumns,
         namespace,
         DEFAULT_ACTIVITIES_COLUMNS,
+      ),
+      deployments: useOrAddDefaultTableColumnsToNamespace(
+        $persistedDeploymentsTableColumns,
+        namespace,
+        DEFAULT_DEPLOYMENTS_COLUMNS,
       ),
       'nexus-operations': useOrAddDefaultTableColumnsToNamespace(
         $persistedNexusOperationsTableColumns,
@@ -326,6 +358,21 @@ export const availableActivityColumns: (
     ),
   );
 
+export const availableDeploymentColumns: (
+  namespace: string,
+) => Readable<ConfigurableTableHeader[]> = (namespace) =>
+  derived(configurableTableColumns, ($configurableTableColumns) =>
+    [
+      ...DEFAULT_DEPLOYMENTS_COLUMNS,
+      ...DEFAULT_AVAILABLE_DEPLOYMENTS_COLUMNS,
+    ].filter(
+      (header) =>
+        !$configurableTableColumns[namespace]?.deployments?.some(
+          (column) => column.label === header.label,
+        ),
+    ),
+  );
+
 export const availableNexusOperationColumns: (
   namespace: string,
 ) => Readable<ConfigurableTableHeader[]> = (namespace) =>
@@ -371,6 +418,8 @@ const getDefaultColumns = (table: ConfigurableTableType) => {
       return DEFAULT_SCHEDULES_COLUMNS;
     case TABLE_TYPE.ACTIVITIES:
       return DEFAULT_ACTIVITIES_COLUMNS;
+    case TABLE_TYPE.DEPLOYMENTS:
+      return DEFAULT_DEPLOYMENTS_COLUMNS;
     case TABLE_TYPE.NEXUS_OPERATIONS:
       return DEFAULT_NEXUS_OPERATIONS_COLUMNS;
   }
@@ -399,7 +448,7 @@ const reducer = (action: Action, state: State): State => {
     }
     case 'CONFIGURABLE_COLUMN.MOVE': {
       const { from, to, namespace } = action.payload;
-      const columns = state?.[namespace] ?? DEFAULT_WORKFLOWS_COLUMNS;
+      const columns = state?.[namespace] ?? defaultColumns;
       const tempColumns = [...columns];
 
       tempColumns.splice(to, 0, tempColumns.splice(from, 1)[0]);
@@ -422,6 +471,8 @@ const getPersistedColumns = (table: ConfigurableTableType): Writable<State> => {
       return persistedSchedulesTableColumns;
     case TABLE_TYPE.ACTIVITIES:
       return persistedActivitiesTableColumns;
+    case TABLE_TYPE.DEPLOYMENTS:
+      return persistedDeploymentsTableColumns;
     case TABLE_TYPE.NEXUS_OPERATIONS:
       return persistedNexusOperationsTableColumns;
   }
