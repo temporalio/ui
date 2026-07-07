@@ -178,10 +178,7 @@
         {:else}
           <p class="text-sm text-secondary">
             {translate('search-attributes.description')}
-            <Link
-              href="https://docs.temporal.io/search-attribute"
-              newTab
-              trailingIcon="book"
+            <Link href="https://docs.temporal.io/search-attribute" newTab
               >{translate('search-attributes.docs-link')}</Link
             >.
           </p>
