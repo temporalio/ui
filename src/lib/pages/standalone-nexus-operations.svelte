@@ -12,6 +12,7 @@
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
   import { fetchNexusOperationCountByStatus } from '$lib/services/nexus-operation-counts';
@@ -25,6 +26,7 @@
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import {
     nexusOperationCount,
+    nexusOperationLoading,
     nexusOperationRefresh,
     nexusOperationsQuery,
     nexusOperationsSearchParams,
@@ -78,39 +80,46 @@
   <div class="flex flex-col justify-between gap-2 md:flex-row">
     <div class="flex flex-row flex-wrap items-start gap-2">
       <div>
-        <h1 class="flex items-center gap-2 leading-7">
-          {#if $supportsAdvancedVisibility}
-            <span data-testid="nexus-operation-count"
-              >{$nexusOperationCount.count.toLocaleString()}</span
-            >
-            <Translate
-              key="standalone-nexus-operations.nexus-operations-plural"
-              count={$nexusOperationCount.count}
-            />
-          {:else}
-            <Translate
-              key="standalone-nexus-operations.recent-nexus-operations"
-            />
-          {/if}
-        </h1>
-        <p class="mt-2 text-xs text-secondary">
-          {refreshTimeFormatted}
-        </p>
+        {#if $nexusOperationLoading}
+          <Skeleton class="h-7 w-48 rounded" />
+          <Skeleton class="mt-2 h-3 w-32 rounded" />
+        {:else}
+          <h1 class="flex items-center gap-2 leading-7">
+            {#if $supportsAdvancedVisibility}
+              <span data-testid="nexus-operation-count"
+                >{$nexusOperationCount.count.toLocaleString()}</span
+              >
+              <Translate
+                key="standalone-nexus-operations.nexus-operations-plural"
+                count={$nexusOperationCount.count}
+              />
+            {:else}
+              <Translate
+                key="standalone-nexus-operations.recent-nexus-operations"
+              />
+            {/if}
+          </h1>
+          <p class="mt-2 text-xs text-secondary">
+            {refreshTimeFormatted}
+          </p>
+        {/if}
       </div>
       {@render releaseStageBadge?.()}
-      <CountRefreshButton
-        count={$nexusOperationCount.newCount}
-        refresh={nexusOperationRefresh}
-      />
-      <StatusCounts
-        bind:refreshTime
-        countStore={nexusOperationCount}
-        refresh={nexusOperationRefresh}
-        filters={nexusOperationFilters}
-        fetchCounts={fetchNexusOperationCountByStatus}
-        getStatusAndCount={getNexusOperationStatusAndCountOfGroup}
-        data-testid="nexus-operation-status"
-      />
+      {#if !$nexusOperationLoading}
+        <CountRefreshButton
+          count={$nexusOperationCount.newCount}
+          refresh={nexusOperationRefresh}
+        />
+        <StatusCounts
+          bind:refreshTime
+          countStore={nexusOperationCount}
+          refresh={nexusOperationRefresh}
+          filters={nexusOperationFilters}
+          fetchCounts={fetchNexusOperationCountByStatus}
+          getStatusAndCount={getNexusOperationStatusAndCountOfGroup}
+          data-testid="nexus-operation-status"
+        />
+      {/if}
     </div>
     {#if headerActions}
       <div class="flex items-center gap-4">
