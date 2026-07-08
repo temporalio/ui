@@ -10,18 +10,11 @@
   interface Props {
     clusterId: string;
     source: NewsFeedSource;
-    class?: string;
     previewTheme?: 'dark' | 'light';
     variant?: 'button' | 'navigation';
   }
 
-  let {
-    clusterId,
-    source,
-    class: className = '',
-    previewTheme,
-    variant = 'button',
-  }: Props = $props();
+  let { clusterId, source, previewTheme, variant = 'button' }: Props = $props();
 
   const newsFeed = $derived(createNewsFeedStore({ clusterId, source }));
   let open = $state(false);
@@ -51,15 +44,15 @@
     label={translate('common.news')}
     icon={unread ? 'megaphone-unread' : 'megaphone'}
     data-testid="news-feed-trigger"
-    class={className}
   />
 {:else}
   <Button
     variant="ghost"
     leadingIcon={unread ? 'megaphone-unread' : 'megaphone'}
     aria-label={label}
-    class={className}
+    class="h-9 w-9 shrink-0 p-0"
     data-testid="news-feed-trigger"
+    size="sm"
     on:click={openNewsFeed}
   />
 {/if}
