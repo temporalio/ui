@@ -3,14 +3,17 @@ import {
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
 import { nexusOperationError } from '$lib/stores/nexus-operations';
-import type { Payload, SearchAttribute } from '$lib/types';
+import type {
+  NexusOperationIdConflictPolicy,
+  NexusOperationIdReusePolicy,
+  Payload,
+  SearchAttribute,
+  StartNexusOperationExecutionResponse,
+} from '$lib/types';
 import type {
   NexusOperationExecution,
   NexusOperationExecutionListInfo,
-  NexusOperationIdConflictPolicy,
-  NexusOperationIdReusePolicy,
-  StartNexusOperationExecutionRequest,
-  StartNexusOperationExecutionResponse,
+  StartNexusOperationRequest,
 } from '$lib/types/nexus-operation-execution';
 import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 import { encodePayloads } from '$lib/utilities/encode-payload';
@@ -95,7 +98,7 @@ export type StartNexusOperationFormData = {
 
 const toStartNexusOperationRequest = async (
   formData: StartNexusOperationFormData,
-): Promise<StartNexusOperationExecutionRequest> => {
+): Promise<StartNexusOperationRequest> => {
   let inputPayload: Payload | undefined = undefined;
   let summaryPayload: Payload | null = null;
   let detailsPayload: Payload | null = null;
@@ -177,7 +180,9 @@ const toStartNexusOperationRequest = async (
     ...(formData.startToCloseTimeout && {
       startToCloseTimeout: formData.startToCloseTimeout,
     }),
-    ...(formData.idReusePolicy && { idReusePolicy: formData.idReusePolicy }),
+    ...(formData.idReusePolicy && {
+      idReusePolicy: formData.idReusePolicy,
+    }),
     ...(formData.idConflictPolicy && {
       idConflictPolicy: formData.idConflictPolicy,
     }),
