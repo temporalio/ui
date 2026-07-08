@@ -75,12 +75,23 @@
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
-  <DetailList aria-label="activity execution details" rowCount={3}>
+  <DetailList
+    aria-label="activity execution details"
+    rowCount={activityExecutionInfo.startDelay ? 4 : 3}
+  >
     <DetailListColumn>
       <DetailListLabel>{translate('common.start')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.scheduleTime}
       />
+      {#if activityExecutionInfo.startDelay}
+        <DetailListLabel
+          >{translate('standalone-activities.execution-time')}</DetailListLabel
+        >
+        <DetailListTimestampValue
+          timestamp={activityExecutionInfo.executionTime}
+        />
+      {/if}
       <DetailListLabel>{translate('common.end')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.closeTime}
