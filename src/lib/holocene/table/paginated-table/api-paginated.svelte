@@ -33,6 +33,7 @@
     onError?: ((error: Error | unknown) => void) | undefined;
     onFetch: () => Promise<PaginatedRequest<T>>;
     onItemsChange?: (items: T[]) => void;
+    onLoadingChange?: ((loading: boolean) => void) | undefined;
     onShiftUp?: KeyboardHandler;
     onShiftDown?: KeyboardHandler;
     onSpace?: KeyboardHandler;
@@ -53,6 +54,8 @@
   export let onError: ((error: Error) => void) | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest<T>>;
   export let onItemsChange: ((items: T[]) => void) | undefined = undefined;
+  export let onLoadingChange: ((loading: boolean) => void) | undefined =
+    undefined;
   export let onShiftUp: KeyboardHandler = undefined;
   export let onShiftDown: KeyboardHandler = undefined;
   export let onSpace: KeyboardHandler = undefined;
@@ -183,6 +186,8 @@
         break;
     }
   }
+
+  $: if (onLoadingChange) onLoadingChange($store.loading);
 
   let previousItems: T[] | undefined;
   $: if (onItemsChange && $store.visibleItems !== previousItems) {
