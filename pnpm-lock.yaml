@@ -407,9 +407,6 @@ importers:
       svelte-preprocess:
         specifier: ^6.0.3
         version: 6.0.5(@babel/core@7.29.7)(postcss-load-config@3.1.4(postcss@8.5.16))(postcss@8.5.16)(svelte@5.55.7(@typescript-eslint/types@8.62.0))(typescript@6.0.3)
-      svelte2tsx:
-        specifier: ^0.7.35
-        version: 0.7.57(svelte@5.55.7(@typescript-eslint/types@8.62.0))(typescript@6.0.3)
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.19(yaml@2.8.3)
