@@ -23,6 +23,9 @@
     StandaloneNexusOperationPoller,
   } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
 
+  import NexusOperationDetailsLoading from '../components/standalone-nexus-operations/nexus-operation-details-loading.svelte';
+  import NexusOperationLayoutLoading from '../components/standalone-nexus-operations/nexus-operation-header-loading.svelte';
+
   interface Props {
     namespace: string;
     operationId: string;
@@ -33,6 +36,7 @@
   let { children, namespace, operationId, runId }: Props = $props();
 
   let error = $state<Error | undefined>();
+  let loading = $state(true);
 
   const nexusOperationPollerAbortController = new AbortController();
   const poller = $derived(
@@ -43,9 +47,11 @@
       nexusOperationPollerAbortController,
       (execution) => {
         $nexusOperationExecution = execution;
+        loading = false;
       },
       (e) => {
         error = e;
+        loading = false;
       },
     ),
   );
@@ -78,53 +84,59 @@
   });
 </script>
 
-{#if $nexusOperationExecution}
-  <div class="flex flex-col gap-4">
-    <div class="flex items-center gap-2">
-      <Link
-        href={nexusOperationsHref}
-        data-testid="back-to-nexus-operations"
-        icon="chevron-left"
-      >
-        {translate('standalone-nexus-operations.back-to-nexus-operations')}
-      </Link>
-    </div>
+<div class="flex flex-col gap-4">
+  <div class="flex items-center gap-2">
+    <Link
+      href={nexusOperationsHref}
+      data-testid="back-to-nexus-operations"
+      icon="chevron-left"
+    >
+      {translate('standalone-nexus-operations.back-to-nexus-operations')}
+    </Link>
+  </div>
+
+  {#if $nexusOperationExecution}
     <NexusOperationHeader
       {namespace}
       {poller}
       nexusOperationInfo={$nexusOperationExecution.info}
     />
+  {:else if loading}
+    <NexusOperationLayoutLoading />
+  {/if}
 
-    <Tabs>
-      <TabList
-        label={translate('standalone-nexus-operations.layout-tabs-label')}
-      >
-        <Tab
-          label={translate('standalone-nexus-operations.layout-details-tab')}
-          id="nexus-operation-details-tab"
-          href={detailsRoute}
-          active={pathMatches(page.url.pathname, detailsRoute)}
-        />
-        <Tab
-          label={translate(
-            'standalone-nexus-operations.layout-search-attributes-tab',
-          )}
-          id="nexus-operation-search-attributes-tab"
-          href={searchAttributesRoute}
-          active={pathMatches(page.url.pathname, searchAttributesRoute)}
-        />
-        <Tab
-          label={translate(
-            'standalone-nexus-operations.layout-user-metadata-tab',
-          )}
-          id="nexus-operation-metadata-tab"
-          href={metadataRoute}
-          active={pathMatches(page.url.pathname, metadataRoute)}
-        />
-      </TabList>
-    </Tabs>
+  <Tabs>
+    <TabList label={translate('standalone-nexus-operations.layout-tabs-label')}>
+      <Tab
+        label={translate('standalone-nexus-operations.layout-details-tab')}
+        id="nexus-operation-details-tab"
+        href={detailsRoute}
+        active={pathMatches(page.url.pathname, detailsRoute)}
+      />
+      <Tab
+        label={translate(
+          'standalone-nexus-operations.layout-search-attributes-tab',
+        )}
+        id="nexus-operation-search-attributes-tab"
+        href={searchAttributesRoute}
+        active={pathMatches(page.url.pathname, searchAttributesRoute)}
+      />
+      <Tab
+        label={translate(
+          'standalone-nexus-operations.layout-user-metadata-tab',
+        )}
+        id="nexus-operation-metadata-tab"
+        href={metadataRoute}
+        active={pathMatches(page.url.pathname, metadataRoute)}
+      />
+    </TabList>
+  </Tabs>
+
+  {#if $nexusOperationExecution}
     {@render children()}
-  </div>
-{:else if error}
-  <ErrorComponent {error} />
-{/if}
+  {:else if loading}
+    <NexusOperationDetailsLoading />
+  {:else if error}
+    <ErrorComponent {error} />
+  {/if}
+</div>
