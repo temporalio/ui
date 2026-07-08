@@ -2,8 +2,8 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
   import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import { translate } from '$lib/i18n/translate';

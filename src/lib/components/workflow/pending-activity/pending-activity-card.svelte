@@ -5,9 +5,9 @@
   import { page } from '$app/state';
 
   import ActivityCommands from '$lib/components/activity/activity-commands.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import PayloadCodeBlock from '$lib/components/payload/payload-code-block.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Accordion from '$lib/holocene/accordion/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';

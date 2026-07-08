@@ -1,5 +1,5 @@
 <script lang="ts">
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import WorkflowStatus from '$lib/components/execution-status.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NexusOperationExecutionInfo } from '$lib/types/nexus-operation-execution';

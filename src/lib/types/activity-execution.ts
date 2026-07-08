@@ -82,6 +82,7 @@ export interface ActivityExecutionInfo extends Omit<
   searchAttributes: WorkflowSearchAttributes;
   sdkName?: string;
   sdkVersion?: string;
+  executionTime?: string;
 }
 
 export interface ActivityExecution {
