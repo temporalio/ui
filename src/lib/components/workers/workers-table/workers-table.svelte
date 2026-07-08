@@ -19,9 +19,16 @@
     namespace: string;
     onFetch: () => Promise<PaginatedRequest<WorkerListInfo | WorkerHeartbeat>>;
     onError?: (err: unknown) => void;
+    total?: number;
   }
 
-  let { filterable = false, namespace, onFetch, onError }: Props = $props();
+  let {
+    filterable = false,
+    namespace,
+    onFetch,
+    onError,
+    total,
+  }: Props = $props();
 
   const columns = [
     { label: translate('workers.status') },
@@ -43,6 +50,7 @@
   let:visibleItems
   {onFetch}
   {onError}
+  {total}
   aria-label={translate('workers.workers')}
   pageSizeSelectLabel={translate('common.per-page')}
   nextButtonLabel={translate('common.next')}
