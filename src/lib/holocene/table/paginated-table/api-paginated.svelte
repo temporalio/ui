@@ -221,7 +221,7 @@
   });
 
   const adjustedTotal = $derived(
-    !$store.hasNext && $store.indexEnd !== total ? $store.indexEnd : total,
+    !$store.hasNext && $store.indexEnd != total ? $store.indexEnd : total,
   );
 </script>
 
