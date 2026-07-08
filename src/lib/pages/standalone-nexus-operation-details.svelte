@@ -12,6 +12,7 @@
   import { translate } from '$lib/i18n/translate';
   import { toEventLinkView } from '$lib/utilities/event-link';
   import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
+  import { toNexusOperationCancellationStateReadable } from '$lib/utilities/screaming-enums';
   import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
@@ -354,7 +355,11 @@
               'standalone-nexus-operations.cancellation-state',
             )}</DetailListLabel
           >
-          <DetailListTextValue text={info.cancellationInfo.state} />
+          <DetailListTextValue
+            text={toNexusOperationCancellationStateReadable(
+              info.cancellationInfo.state,
+            )}
+          />
           <DetailListLabel
             >{translate('standalone-nexus-operations.attempt')}</DetailListLabel
           >

@@ -3,7 +3,7 @@ import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 import type {
   NexusOperationIdConflictPolicy,
   NexusOperationIdReusePolicy,
-} from '$lib/types/nexus-operation-execution';
+} from '$lib/types';
 
 export interface StartNexusOperationFormData {
   namespace: string;
