@@ -2,6 +2,7 @@ import { strict as assert } from 'node:assert';
 import * as querystring from 'node:querystring';
 import { inspect } from 'node:util';
 
+import { isEmpty } from 'es-toolkit/compat';
 import {
   type Application,
   type NextFunction,
@@ -9,7 +10,6 @@ import {
   type Response,
   urlencoded,
 } from 'express';
-import isEmpty from 'lodash/isEmpty.js';
 import type Provider from 'oidc-provider';
 import { errors } from 'oidc-provider';
 
