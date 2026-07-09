@@ -119,4 +119,29 @@ test.describe('Start a Standalone Activity', () => {
 
     await expect(startStandaloneActivityPage.timeoutError).toBeVisible();
   });
+
+  test('hides the Start Delay input on server versions below the minimum', async ({
+    page,
+  }) => {
+    await mockClusterApi(page, { serverVersion: '1.30.0' });
+
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    await expect(
+      startStandaloneActivityPage.startToCloseTimeoutInput,
+    ).toBeVisible();
+    await expect(startStandaloneActivityPage.startDelayInput).toBeHidden();
+  });
+
+  test('shows the Start Delay input on supported server versions', async ({
+    page,
+  }) => {
+    await mockClusterApi(page, { serverVersion: '1.31.2' });
+
+    const startStandaloneActivityPage = new StartStandaloneActivityPage(page);
+    await startStandaloneActivityPage.goto();
+
+    await expect(startStandaloneActivityPage.startDelayInput).toBeVisible();
+  });
 });

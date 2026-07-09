@@ -193,6 +193,9 @@ export const toStartActivityExecutionRequest = async (
     ...(activityFormData.scheduleToStartTimeout && {
       scheduleToStartTimeout: activityFormData.scheduleToStartTimeout,
     }),
+    ...(activityFormData.startDelay && {
+      startDelay: activityFormData.startDelay,
+    }),
     retryPolicy: {
       ...(activityFormData.initialInterval && {
         initialInterval: activityFormData.initialInterval,
