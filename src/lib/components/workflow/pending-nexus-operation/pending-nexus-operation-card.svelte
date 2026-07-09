@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { omit } from 'es-toolkit';
   import type { Snippet } from 'svelte';
 
   import { timestamp } from '$lib/components/timestamp.svelte';
@@ -7,7 +8,6 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { PendingNexusOperation } from '$lib/types/events';
-  import { omit } from '$lib/utilities/omit';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
@@ -167,7 +167,7 @@
         </p>
         <CodeBlock
           content={stringifyWithBigInt(
-            omit(operation.lastAttemptFailure, 'stackTrace'),
+            omit(operation.lastAttemptFailure, ['stackTrace']),
           )}
           maxHeight={384}
           copyIconTitle={translate('common.copy-icon-title')}

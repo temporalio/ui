@@ -1,10 +1,10 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
 
+  import { omit } from 'es-toolkit';
   import { getContext } from 'svelte';
 
   import Label from '$lib/holocene/label.svelte';
-  import { omit } from '$lib/utilities/omit';
 
   import type { RadioGroupContext, RadioInputProps } from './types';
 
@@ -51,7 +51,7 @@
         {value}
         {id}
         {disabled}
-        {...omit($$restProps, 'class')}
+        {...omit($$restProps, ['class'])}
       />
       <span class="font-normal" class:hidden={labelHidden}>
         {label}
