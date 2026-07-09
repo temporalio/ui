@@ -14,6 +14,8 @@
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
   import DurationInput, {
+    DAYS,
+    DEFAULT_UNITS,
     parseDuration,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -365,8 +367,7 @@
         id="startDelay"
         label={translate('standalone-activities.form-start-delay-label')}
         bind:value={$form.startDelay}
-        initialUnit={initialTimeoutUnit($form.startDelay)}
-        units={TIMEOUT_UNITS}
+        units={[...DEFAULT_UNITS, DAYS]}
         hintText={translate('standalone-activities.form-start-delay-hint')}
       />
     </IsTemporalServerVersionGuard>

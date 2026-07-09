@@ -12,7 +12,10 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput, {
+    DAYS,
+    DEFAULT_UNITS,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -340,6 +343,7 @@
           labelHidden
           inputmode="numeric"
           bind:value={workflowStartDelay}
+          units={[...DEFAULT_UNITS, DAYS]}
           min={0}
           class="max-w-80"
         />

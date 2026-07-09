@@ -26,6 +26,11 @@
     convert: (n) => n * 60 * 60,
   };
 
+  export const DAYS: Unit<'day(s)'> = {
+    label: 'day(s)',
+    convert: (n) => n * 60 * 60 * 24,
+  };
+
   export type DefaultUnits =
     | 'millisecond(s)'
     | 'second(s)'
