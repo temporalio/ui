@@ -10,6 +10,7 @@
   import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
   import {
     nexusOperationCount,
+    nexusOperationLoading,
     nexusOperationRefresh,
   } from '$lib/stores/nexus-operations';
 
@@ -51,6 +52,9 @@
       'standalone-nexus-operations.empty-state-title',
     )}
     maxHeight="var(--panel-h)"
+    onLoadingChange={(loading) => {
+      $nexusOperationLoading = loading;
+    }}
   >
     <caption class="sr-only" slot="caption">
       {translate('standalone-nexus-operations.nexus-operations-table')}

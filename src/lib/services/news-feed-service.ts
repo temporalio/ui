@@ -69,10 +69,10 @@ export const MOCK_NEWS_FEED_RESPONSE = {
 
 export type FetchNewsFeedOptions = {
   clusterId: string;
+  source: NewsFeedSource;
   cache?: RequestCache;
   now?: () => number;
   request?: typeof fetch;
-  source?: NewsFeedSource;
   storage?: NewsFeedStorage;
 };
 
@@ -90,7 +90,7 @@ export const fetchNewsFeed = async ({
   cache,
   now = Date.now,
   request = fetch,
-  source = 'web-ui',
+  source,
   storage = newsFeedStorage,
 }: FetchNewsFeedOptions): Promise<NewsFeedCache> => {
   if (!clusterId) {

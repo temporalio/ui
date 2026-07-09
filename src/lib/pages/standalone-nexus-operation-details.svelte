@@ -10,11 +10,9 @@
   import Card from '$lib/holocene/card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { getEventLinkHref } from '$lib/utilities/event-link-href';
-  import {
-    routeForNamespace,
-    routeForStandaloneNexusOperationsWithQuery,
-  } from '$lib/utilities/route-for';
+  import { toEventLinkView } from '$lib/utilities/event-link';
+  import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
+  import { toNexusOperationCancellationStateReadable } from '$lib/utilities/screaming-enums';
   import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
   import { fromSeconds } from '$lib/utilities/to-duration';
 
@@ -32,20 +30,12 @@
   );
 
   const nexusOperationLink = $derived(info?.links?.[0]);
-  const handlerWorkflowEvent = $derived(
-    nexusOperationLink?.workflowEvent ?? null,
-  );
-  const handlerNamespace = $derived(handlerWorkflowEvent?.namespace ?? null);
-  const handlerWorkflowLink = $derived(
-    handlerWorkflowEvent?.namespace && handlerWorkflowEvent?.workflowId
-      ? getEventLinkHref(nexusOperationLink)
+  const handlerLink = $derived(
+    nexusOperationLink
+      ? toEventLinkView(nexusOperationLink, { namespace })
       : null,
   );
-  const handlerNamespaceLink = $derived(
-    handlerNamespace
-      ? routeForNamespace({ namespace: handlerNamespace })
-      : null,
-  );
+  const handlerNamespace = $derived(handlerLink?.namespace ?? null);
 
   const endpointFilterLink = $derived(
     info
@@ -149,7 +139,7 @@
       <h5 class="text-secondary">
         {translate('standalone-nexus-operations.operation-details-section')}
       </h5>
-      {#if handlerWorkflowLink}
+      {#if handlerLink?.href}
         <p class="text-sm text-secondary">
           {translate('standalone-nexus-operations.handler-namespace-note')}
         </p>
@@ -226,25 +216,29 @@
               'standalone-nexus-operations.handler-namespace',
             )}</DetailListLabel
           >
-          {#if handlerNamespaceLink}
+          {#if handlerNamespace.href}
             <DetailListLinkValue
-              text={handlerNamespace}
-              href={handlerNamespaceLink}
+              text={handlerNamespace.value}
+              href={handlerNamespace.href}
             />
           {:else}
-            <DetailListTextValue text={handlerNamespace} />
+            <DetailListTextValue text={handlerNamespace.value} />
           {/if}
         {/if}
-        {#if handlerWorkflowLink}
+        {#if handlerLink}
           <DetailListLabel
             >{translate(
               'standalone-nexus-operations.handler-operation-link',
             )}</DetailListLabel
           >
-          <DetailListLinkValue
-            text={handlerWorkflowEvent?.workflowId ?? ''}
-            href={handlerWorkflowLink}
-          />
+          {#if handlerLink.href}
+            <DetailListLinkValue
+              text={handlerLink.value}
+              href={handlerLink.href}
+            />
+          {:else}
+            <DetailListTextValue text={handlerLink.value} />
+          {/if}
         {/if}
       </DetailList>
 
@@ -361,7 +355,11 @@
               'standalone-nexus-operations.cancellation-state',
             )}</DetailListLabel
           >
-          <DetailListTextValue text={info.cancellationInfo.state} />
+          <DetailListTextValue
+            text={toNexusOperationCancellationStateReadable(
+              info.cancellationInfo.state,
+            )}
+          />
           <DetailListLabel
             >{translate('standalone-nexus-operations.attempt')}</DetailListLabel
           >

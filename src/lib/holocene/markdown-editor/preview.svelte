@@ -16,35 +16,55 @@
       | 'details'
       | ''
       | undefined;
+    fill?: boolean;
     frameId?: string;
+    minHeight?: number;
     previewTheme?: 'dark' | 'light';
   }
 
   let {
     content,
     class: className = '',
+    fill = true,
     overrideTheme = '',
     frameId = '',
+    minHeight = 100,
     previewTheme,
   }: Props = $props();
 
   let iframe: HTMLIFrameElement | null = $state(null);
   let iframeWidth = 0;
 
+  const parsePixels = (value: string | undefined) => {
+    const parsed = Number.parseFloat(value ?? '0');
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const getRenderedHeight = (iframeDocument: Document) => {
+    const { body } = iframeDocument;
+    const main = iframeDocument.querySelector('main');
+    const view = iframeDocument.defaultView;
+    const bodyStyles = view?.getComputedStyle(body);
+    const verticalBodyPadding =
+      parsePixels(bodyStyles?.paddingTop) +
+      parsePixels(bodyStyles?.paddingBottom);
+    const contentHeight = main
+      ? Math.max(main.scrollHeight, main.getBoundingClientRect().height) +
+        verticalBodyPadding
+      : body.getBoundingClientRect().height;
+
+    return Math.ceil(Math.max(contentHeight, minHeight));
+  };
+
   const resizeIframe = () => {
     if (!iframe) return;
     const iframeDocument = iframe.contentDocument;
     if (!iframeDocument) return;
 
-    const minHeight = 100;
     iframe.height = '0';
     iframe.style.height = '0px';
 
-    const height = Math.max(
-      iframeDocument.documentElement.scrollHeight,
-      iframeDocument.body.scrollHeight,
-      minHeight,
-    );
+    const height = getRenderedHeight(iframeDocument);
     iframe.height = `${height + 2}`;
     iframe.style.height = `${height + 2}px`;
   };
@@ -91,12 +111,12 @@
   );
 </script>
 
-<section class={twMerge('h-full w-full', className)}>
+<section class={twMerge(fill ? 'h-full w-full' : 'w-full', className)}>
   <iframe
     bind:this={iframe}
     onload={resizeIframe}
     title="output"
-    class="w-full"
+    class="block w-full"
     src={previewPath}
     id={frameId}
   ></iframe>

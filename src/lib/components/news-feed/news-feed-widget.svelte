@@ -3,24 +3,20 @@
   import NavigationButton from '$lib/holocene/navigation/navigation-button.svelte';
   import { translate } from '$lib/i18n/translate';
   import { createNewsFeedStore } from '$lib/stores/news-feed';
+  import type { NewsFeedSource } from '$lib/types/news-feed';
 
   import NewsFeedModal from './news-feed-modal.svelte';
 
   interface Props {
     clusterId: string;
-    class?: string;
+    source: NewsFeedSource;
     previewTheme?: 'dark' | 'light';
     variant?: 'button' | 'navigation';
   }
 
-  let {
-    clusterId,
-    class: className = '',
-    previewTheme,
-    variant = 'button',
-  }: Props = $props();
+  let { clusterId, source, previewTheme, variant = 'button' }: Props = $props();
 
-  const newsFeed = $derived(createNewsFeedStore({ clusterId }));
+  const newsFeed = $derived(createNewsFeedStore({ clusterId, source }));
   let open = $state(false);
 
   $effect(() => {
@@ -48,15 +44,15 @@
     label={translate('common.news')}
     icon={unread ? 'megaphone-unread' : 'megaphone'}
     data-testid="news-feed-trigger"
-    class={className}
   />
 {:else}
   <Button
     variant="ghost"
     leadingIcon={unread ? 'megaphone-unread' : 'megaphone'}
     aria-label={label}
-    class={className}
+    class="h-9 w-9 shrink-0 p-0"
     data-testid="news-feed-trigger"
+    size="sm"
     on:click={openNewsFeed}
   />
 {/if}

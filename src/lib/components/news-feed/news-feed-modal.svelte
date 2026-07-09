@@ -82,6 +82,8 @@
           <h4>{item.title}</h4>
           <Markdown
             frameId="news-feed-{item.id}"
+            fill={false}
+            minHeight={0}
             overrideTheme="primary"
             {previewTheme}
             content={item.content}

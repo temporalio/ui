@@ -7,12 +7,7 @@ import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
 import { isoStringToCalendarDateStr } from './date';
 import { getFormSpecsFromDescribeFullSchedule } from './get-form-spec';
 import { getFormSpecInitialData } from './get-form-spec-initial-data';
-import {
-  DEFAULT_CATCHUP_WINDOW,
-  DEFAULT_EXECUTION_TIMEOUT,
-  DEFAULT_RUN_TIMEOUT,
-  DEFAULT_TASK_TIMEOUT,
-} from '../constants';
+import { DEFAULT_CATCHUP_WINDOW, DEFAULT_TASK_TIMEOUT } from '../constants';
 import { durationString } from '../schema/common';
 import {
   type FormScheduleSchema,
@@ -37,13 +32,25 @@ export function parseOverlapPolicy(
 
 const durationSchema = durationString();
 
-function toDurationString(
+function toDurationString<Fallback extends DurationString | ''>(
   value: unknown,
-  fallback: DurationString,
-): DurationString {
+  fallback: Fallback,
+): DurationString | Fallback {
   const parsed = durationSchema.safeParse(value);
 
   return parsed.success ? parsed.data : fallback;
+}
+
+// Run/execution timeouts have no default; leave them empty when unset. A stored
+// 0s means "unlimited", so normalize it to empty too.
+function toOptionalDurationString(value: unknown): DurationString | '' {
+  const parsed = durationSchema.safeParse(value);
+
+  if (!parsed.success || Number(parseDuration(parsed.data)) <= 0) {
+    return '';
+  }
+
+  return parsed.data;
 }
 
 function decodeSearchAttributeRows(
@@ -160,13 +167,9 @@ export function getFormScheduleDefaults(
       startWorkflow?.workflowTaskTimeout,
       DEFAULT_TASK_TIMEOUT,
     ),
-    runTimeout: toDurationString(
-      startWorkflow?.workflowRunTimeout,
-      DEFAULT_RUN_TIMEOUT,
-    ),
-    executionTimeout: toDurationString(
+    runTimeout: toOptionalDurationString(startWorkflow?.workflowRunTimeout),
+    executionTimeout: toOptionalDurationString(
       startWorkflow?.workflowExecutionTimeout,
-      DEFAULT_EXECUTION_TIMEOUT,
     ),
 
     searchAttributes: decodeSearchAttributeRows(

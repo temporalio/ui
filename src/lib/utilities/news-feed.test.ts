@@ -58,6 +58,18 @@ describe('news feed utilities', () => {
     expect(url.searchParams.get('source')).toBe('web-ui');
   });
 
+  it('builds the feed request URL with the cloud UI source', () => {
+    const url = new URL(
+      buildNewsFeedUrl({
+        clientId: 'd104aa3a-da5f-4a19-948c-7c6144f962d3',
+        clusterId: '75d9c0b6-577f-42d4-a049-9f6e47e97c46',
+        source: 'cloud-ui',
+      }),
+    );
+
+    expect(url.searchParams.get('source')).toBe('cloud-ui');
+  });
+
   it('persists a generated client ID when none exists', () => {
     const storage = createStorage();
     const clientId = getNewsFeedClientId({

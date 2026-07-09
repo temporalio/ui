@@ -8,8 +8,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import DurationInput, {
-    parseDuration,
-    type Units,
+    getFirstWholeNumberUnit,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import RadioCard from '$lib/holocene/radio-input/radio-card.svelte';
@@ -20,8 +19,6 @@
 
   import {
     DEFAULT_CATCHUP_WINDOW,
-    DEFAULT_EXECUTION_TIMEOUT,
-    DEFAULT_RUN_TIMEOUT,
     DEFAULT_TASK_TIMEOUT,
     durationUnits,
     getOverlapPolicyContent,
@@ -108,26 +105,6 @@
   const onCancel = () => {
     isOpen = false;
   };
-
-  function getFirstWholeNumberUnit<UnitLabelT extends string>(
-    duration: string,
-    units: Units<UnitLabelT>,
-  ): UnitLabelT | undefined {
-    const secondsValue = Number(parseDuration(duration));
-
-    if (secondsValue === 0) {
-      // if 0, use last unit label
-      return units.at(-1)?.label;
-    }
-
-    for (const unit of units) {
-      if (Number.isInteger(secondsValue / unit.convert(1))) {
-        return unit.label;
-      }
-    }
-
-    return undefined;
-  }
 </script>
 
 <Drawer
@@ -311,7 +288,6 @@
         hintText={$errors.runTimeout?.[0] ?? ''}
         class="max-w-80"
         min={0}
-        onblur={snapToDefault('runTimeout', DEFAULT_RUN_TIMEOUT)}
       />
     {/key}
 
@@ -330,7 +306,6 @@
         hintText={$errors.executionTimeout?.[0] ?? ''}
         class="max-w-80"
         min={0}
-        onblur={snapToDefault('executionTimeout', DEFAULT_EXECUTION_TIMEOUT)}
       />
     {/key}
 

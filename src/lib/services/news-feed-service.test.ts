@@ -34,6 +34,7 @@ describe('fetchNewsFeed', () => {
       clusterId: '75d9c0b6-577f-42d4-a049-9f6e47e97c46',
       now: () => 1780442153000,
       request,
+      source: 'web-ui',
       storage: createStorage(),
     });
 
@@ -56,6 +57,7 @@ describe('fetchNewsFeed', () => {
       clusterId: '75d9c0b6-577f-42d4-a049-9f6e47e97c46',
       now: () => 1780442153000,
       request,
+      source: 'web-ui',
       storage: createStorage(),
     });
 

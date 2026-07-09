@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.51.1",
+  "version": "2.52.0",
   "engines": {
     "pnpm": ">=10.10.0",
     "node": ">=22.14.0"
@@ -71,7 +71,6 @@
     "run-workflows": "esno scripts/run-workflows.ts",
     "run-workflows:long-running": "esno scripts/start-long-running.ts",
     "audit:tailwind": "esno scripts/audit-tailwind-colors",
-    "audit:holocene-props": "esno scripts/generate-holocene-props.ts",
     "validate:versions": "./scripts/validate-versions.sh",
     "knip": "knip",
     "a11y:manifest:test": "node scripts/a11y/manifest.test.mjs"
@@ -138,12 +137,12 @@
     "@sveltejs/adapter-vercel": "^6.3.2",
     "@sveltejs/kit": "2.57.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
-    "@temporalio/activity": "1.17.2",
-    "@temporalio/client": "1.17.2",
-    "@temporalio/common": "1.17.2",
-    "@temporalio/proto": "1.17.2",
-    "@temporalio/worker": "1.17.2",
-    "@temporalio/workflow": "1.17.2",
+    "@temporalio/activity": "1.19.0",
+    "@temporalio/client": "1.19.0",
+    "@temporalio/common": "1.19.0",
+    "@temporalio/proto": "1.19.0",
+    "@temporalio/worker": "1.19.0",
+    "@temporalio/workflow": "1.19.0",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/js-yaml": "^4.0.9",
@@ -202,7 +201,6 @@
     "svelte": "5.55.7",
     "svelte-check": "^4.1.5",
     "svelte-preprocess": "^6.0.3",
-    "svelte2tsx": "^0.7.35",
     "tailwindcss": "^3.4.1",
     "tar-fs": "^3.1.2",
     "typescript": "6.0.3",

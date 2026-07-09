@@ -1,38 +1,24 @@
+import { temporal } from '@temporalio/proto';
+
 import type {
-  EventLink,
-  Failure,
-  Payload,
-  SearchAttribute,
+  DescribeNexusOperationResponse,
+  NexusOperationIdConflictPolicy,
+  NexusOperationIdReusePolicy,
+  StartNexusOperationExecutionRequest,
   UserMetadata,
 } from '.';
 import type { WorkflowSearchAttributes } from './workflows';
 
 export type NexusOperationExecutionStatus =
-  | 'NEXUS_OPERATION_EXECUTION_STATUS_UNSPECIFIED'
-  | 'NEXUS_OPERATION_EXECUTION_STATUS_RUNNING'
-  | 'NEXUS_OPERATION_EXECUTION_STATUS_COMPLETED'
-  | 'NEXUS_OPERATION_EXECUTION_STATUS_FAILED'
-  | 'NEXUS_OPERATION_EXECUTION_STATUS_CANCELED'
-  | 'NEXUS_OPERATION_EXECUTION_STATUS_TERMINATED'
-  | 'NEXUS_OPERATION_EXECUTION_STATUS_TIMED_OUT';
+  keyof typeof temporal.api.enums.v1.NexusOperationExecutionStatus;
 
-export const NEXUS_OPERATION_ID_REUSE_POLICIES = [
-  'NEXUS_OPERATION_ID_REUSE_POLICY_UNSPECIFIED',
-  'NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE',
-  'NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY',
-  'NEXUS_OPERATION_ID_REUSE_POLICY_REJECT_DUPLICATE',
-] as const;
+export const NEXUS_OPERATION_ID_REUSE_POLICIES = Object.keys(
+  temporal.api.enums.v1.NexusOperationIdReusePolicy,
+) as (keyof typeof temporal.api.enums.v1.NexusOperationIdReusePolicy)[];
 
-export const NEXUS_OPERATION_ID_CONFLICT_POLICIES = [
-  'NEXUS_OPERATION_ID_CONFLICT_POLICY_UNSPECIFIED',
-  'NEXUS_OPERATION_ID_CONFLICT_POLICY_FAIL',
-  'NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING',
-] as const;
-
-export type NexusOperationIdReusePolicy =
-  (typeof NEXUS_OPERATION_ID_REUSE_POLICIES)[number];
-export type NexusOperationIdConflictPolicy =
-  (typeof NEXUS_OPERATION_ID_CONFLICT_POLICIES)[number];
+export const NEXUS_OPERATION_ID_CONFLICT_POLICIES = Object.keys(
+  temporal.api.enums.v1.NexusOperationIdConflictPolicy,
+) as (keyof typeof temporal.api.enums.v1.NexusOperationIdConflictPolicy)[];
 
 export const nexusOperationIdReusePolicyOptions =
   NEXUS_OPERATION_ID_REUSE_POLICIES.filter(
@@ -43,90 +29,82 @@ export const nexusOperationIdConflictPolicyOptions =
     (policy) => policy !== 'NEXUS_OPERATION_ID_CONFLICT_POLICY_UNSPECIFIED',
   );
 
-export interface NexusOperationExecutionCancellationInfo {
+export interface NexusOperationExecutionCancellationInfo extends Omit<
+  temporal.api.nexus.v1.INexusOperationExecutionCancellationInfo,
+  'requestedTime' | 'lastAttemptCompleteTime' | 'nextAttemptScheduleTime'
+> {
   requestedTime: string;
-  state: string;
-  attempt: number;
   lastAttemptCompleteTime: string;
-  lastAttemptFailure?: Failure;
   nextAttemptScheduleTime: string;
-  blockedReason: string;
-  reason: string;
 }
 
-export interface NexusOperationExecutionInfo {
-  operationId: string;
-  runId: string;
-  endpoint: string;
-  service: string;
-  operation: string;
+export interface NexusOperationExecutionInfo extends Omit<
+  temporal.api.nexus.v1.INexusOperationExecutionInfo,
+  | 'status'
+  | 'scheduleToCloseTimeout'
+  | 'scheduleToStartTimeout'
+  | 'startToCloseTimeout'
+  | 'executionDuration'
+  | 'stateTransitionCount'
+  | 'scheduleTime'
+  | 'expirationTime'
+  | 'closeTime'
+  | 'lastAttemptCompleteTime'
+  | 'nextAttemptScheduleTime'
+  | 'searchAttributes'
+  | 'cancellationInfo'
+> {
   status: NexusOperationExecutionStatus;
-  state: string;
   scheduleToCloseTimeout: string;
   scheduleToStartTimeout: string;
   startToCloseTimeout: string;
-  attempt: number;
+  executionDuration: string;
+  stateTransitionCount: string;
   scheduleTime: string;
   expirationTime: string;
   closeTime: string;
   lastAttemptCompleteTime: string;
-  lastAttemptFailure?: Failure;
   nextAttemptScheduleTime: string;
-  executionDuration: string;
-  cancellationInfo?: NexusOperationExecutionCancellationInfo;
-  blockedReason: string;
-  requestId: string;
-  operationToken: string;
-  stateTransitionCount: string;
   searchAttributes: WorkflowSearchAttributes;
-  nexusHeader: Record<string, string>;
-  userMetadata: UserMetadata;
-  links: EventLink[];
-  identity: string;
+  cancellationInfo?: NexusOperationExecutionCancellationInfo;
 }
 
-export interface NexusOperationExecutionListInfo {
-  operationId: string;
-  runId: string;
-  endpoint: string;
-  service: string;
-  operation: string;
+export interface NexusOperationExecutionListInfo extends Omit<
+  temporal.api.nexus.v1.INexusOperationExecutionListInfo,
+  | 'status'
+  | 'scheduleTime'
+  | 'closeTime'
+  | 'stateTransitionCount'
+  | 'executionDuration'
+  | 'searchAttributes'
+> {
+  status: NexusOperationExecutionStatus;
   scheduleTime: string;
   closeTime: string;
-  status: NexusOperationExecutionStatus;
-  searchAttributes: WorkflowSearchAttributes;
   stateTransitionCount: string;
   executionDuration: string;
+  searchAttributes: WorkflowSearchAttributes;
 }
 
-export interface NexusOperationExecution {
-  runId: string;
+export interface NexusOperationExecution extends Omit<
+  DescribeNexusOperationResponse,
+  'info' | 'longPollToken'
+> {
   info: NexusOperationExecutionInfo;
-  input?: Payload;
-  result?: Payload;
-  failure?: Failure;
   longPollToken?: string;
 }
-export interface StartNexusOperationExecutionRequest {
-  namespace: string;
-  identity: string;
-  requestId: string;
-  operationId: string;
-  endpoint: string;
-  service: string;
-  operation: string;
+
+export interface StartNexusOperationRequest extends Omit<
+  StartNexusOperationExecutionRequest,
+  | 'scheduleToCloseTimeout'
+  | 'startToCloseTimeout'
+  | 'scheduleToStartTimeout'
+  | 'idReusePolicy'
+  | 'idConflictPolicy'
+> {
   scheduleToCloseTimeout?: string;
-  scheduleToStartTimeout?: string;
   startToCloseTimeout?: string;
-  input?: Payload;
+  scheduleToStartTimeout?: string;
   idReusePolicy?: NexusOperationIdReusePolicy;
   idConflictPolicy?: NexusOperationIdConflictPolicy;
-  searchAttributes?: SearchAttribute;
-  nexusHeader?: Record<string, string>;
-  userMetadata?: UserMetadata;
-}
-
-export interface StartNexusOperationExecutionResponse {
-  runId: string;
-  started: boolean;
 }

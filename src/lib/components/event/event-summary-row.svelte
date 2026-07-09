@@ -24,6 +24,7 @@
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
+  import { toEventLinkView } from '$lib/utilities/event-link';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -242,7 +243,7 @@
       <div class="flex items-center gap-1">
         {@render expandButton()}
         <div class="flex items-center gap-0.5">
-          {#each event.eventList as groupEvent}
+          {#each event.eventList as groupEvent (groupEvent.id)}
             <Link
               data-testid="link"
               href={routeForEventHistoryEvent({
@@ -367,7 +368,7 @@
       {/if}
       {#if currentEvent?.links?.length}
         <EventLink
-          link={currentEvent.links[0]}
+          view={toEventLinkView(currentEvent.links[0], { namespace })}
           class="max-w-xl"
           linkClass="truncate"
         />
