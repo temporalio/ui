@@ -3,11 +3,14 @@
 
   import { cva } from 'class-variance-authority';
 
+  import {
+    type Toaster as Toast,
+    toaster as toasterStore,
+  } from '$lib/stores/toaster';
   import type { ToastPosition } from '$lib/types/holocene';
 
-  import type { Toaster as Toast } from '../stores/toaster';
-
   import Link from './link.svelte';
+  import LiveRegion from './live-region.svelte';
   import ToastComponent from './toast.svelte';
 
   interface Props {
@@ -18,6 +21,8 @@
   }
 
   let { pop, toasts, closeButtonLabel, position }: Props = $props();
+
+  const announcements = toasterStore.announcements;
 
   const dismissToast = (event: CustomEvent<{ id: string }>) => {
     pop(event.detail.id);
@@ -40,7 +45,8 @@
   });
 </script>
 
-<div class={toast({ position: $position })} role="log">
+<div class={toast({ position: $position })}>
+  <LiveRegion messages={$announcements} data-testid="toast-live-region" />
   {#each $toasts as { message, variant, id, link } (id)}
     <ToastComponent {closeButtonLabel} {variant} {id} on:dismiss={dismissToast}>
       {#if link}

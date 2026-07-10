@@ -5,7 +5,9 @@
   import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import DeleteDeploymentModal from '$lib/components/deployments/delete-deployment-modal.svelte';
   import DeploymentHeader from '$lib/components/deployments/deployment-header.svelte';
+  import RampUnversionedModal from '$lib/components/deployments/ramp-unversioned-modal.svelte';
   import VersionTableRow from '$lib/components/deployments/version-table-row.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
   import Error from '$lib/holocene/error.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/paginated.svelte';
@@ -13,6 +15,8 @@
   import {
     deleteWorkerDeployment,
     fetchDeployment,
+    removeRampingUnversionedWorkers,
+    setRampingUnversionedWorkers,
   } from '$lib/services/deployments-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { routeForWorkerDeployments } from '$lib/utilities/route-for';
@@ -54,20 +58,74 @@
       goto(routeForWorkerDeployments({ namespace }));
     }
   }
+
+  let showRampUnversionedModal = $state(false);
+  let rampUnversionedPercentage = $state(0);
+  let rampUnversionedError = $state('');
+
+  async function handleRampUnversioned(percentage: number) {
+    rampUnversionedError = '';
+    await setRampingUnversionedWorkers(
+      { namespace, deploymentName, percentage },
+      (err) => {
+        rampUnversionedError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.ramp-to-unversioned-error');
+      },
+    );
+    if (rampUnversionedError) return;
+    showRampUnversionedModal = false;
+    reload();
+  }
+
+  async function handleRemoveRampUnversioned(conflictToken?: string) {
+    rampUnversionedError = '';
+    await removeRampingUnversionedWorkers(
+      { namespace, deploymentName, conflictToken },
+      (err) => {
+        rampUnversionedError =
+          (err as { body?: { message?: string } })?.body?.message ??
+          translate('deployments.ramp-to-unversioned-error');
+      },
+    );
+    if (rampUnversionedError) return;
+    showRampUnversionedModal = false;
+    reload();
+  }
 </script>
 
 {#await effectiveDeploymentPromise}
   <SkeletonTable rows={15} />
 {:then deployment}
   {@const info = deployment.workerDeploymentInfo}
+  {@const unversionedRampingPercentage =
+    !info.routingConfig?.rampingDeploymentVersion &&
+    info.routingConfig?.rampingVersionPercentage != null
+      ? info.routingConfig.rampingVersionPercentage
+      : null}
 
   <DeploymentHeader
     {namespace}
     {deploymentName}
-    hasVersions={!!info.versionSummaries?.length}
     {showInstancesLink}
     onDeleteClick={() => (showDeleteModal = true)}
+    onRampToUnversioned={() => {
+      rampUnversionedPercentage = unversionedRampingPercentage ?? 0;
+      showRampUnversionedModal = true;
+    }}
   />
+
+  {#if unversionedRampingPercentage !== null}
+    <CapabilityGuard capability="serverScaledDeployments">
+      <Alert
+        intent="warning"
+        title={translate('deployments.unversioned-ramping-banner', {
+          percentage: unversionedRampingPercentage,
+        })}
+        class="mt-4"
+      />
+    </CapabilityGuard>
+  {/if}
 
   <div class="mt-4">
     <PaginatedTable
@@ -85,9 +143,12 @@
       </caption>
       <tr slot="headers">
         <th>{translate('deployments.build-id')}</th>
-        <th>{translate('deployments.build-status')}</th>
+        <th>{translate('deployments.lifecycle')}</th>
         <CapabilityGuard capability="serverScaledDeployments">
           <th>{translate('deployments.compute')}</th>
+        </CapabilityGuard>
+        <CapabilityGuard capability="serverScaledDeployments">
+          <th>{translate('deployments.connection')}</th>
         </CapabilityGuard>
         <th>{translate('deployments.deployed')}</th>
         <th>{translate('deployments.actions')}</th>
@@ -112,8 +173,24 @@
   <DeleteDeploymentModal
     open={showDeleteModal}
     {deploymentName}
+    hasVersions={!!info.versionSummaries?.length}
+    error={deleteError}
     onConfirm={() => handleDeleteDeployment(deployment.conflictToken)}
     onCancel={() => (showDeleteModal = false)}
+  />
+
+  <RampUnversionedModal
+    open={showRampUnversionedModal}
+    bind:percentage={rampUnversionedPercentage}
+    error={rampUnversionedError}
+    onConfirm={handleRampUnversioned}
+    onCancel={() => {
+      showRampUnversionedModal = false;
+      rampUnversionedError = '';
+    }}
+    onRemove={unversionedRampingPercentage !== null
+      ? () => handleRemoveRampUnversioned(deployment.conflictToken)
+      : undefined}
   />
 {:catch error}
   <Error {error} />

@@ -7,28 +7,34 @@
   import Card from '$lib/holocene/card.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { translate } from '$lib/i18n/translate';
+  import type { VersionSummary } from '$lib/types/deployments';
 
   import { type CreateVersionFormData, createVersionSchema } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
+  import RecentVersions from './recent-versions.svelte';
 
   interface Props {
     onSubmit: (data: CreateVersionFormData) => Promise<void>;
     cancelHref: string;
     error?: string;
+    versions?: VersionSummary[];
   }
 
-  let { onSubmit, cancelHref, error }: Props = $props();
-
-  let provider = $state('lambda');
+  let { onSubmit, cancelHref, error, versions = [] }: Props = $props();
 
   const superform = superForm(
     {
       buildId: '',
+      provider: 'lambda' as 'lambda' | 'cloud-run',
       lambdaArn: '',
       iamRoleArn: '',
       roleExternalId: '',
+      gcpProject: '',
+      gcpRegion: '',
+      gcpWorkerPool: '',
+      gcpServiceAccount: '',
       scaleUpCooloffMs: undefined as number | undefined,
       scaleUpBacklogThreshold: undefined as number | undefined,
       maxWorkerLifetimeMs: undefined as number | undefined,
@@ -62,7 +68,7 @@
         {translate('workers.configuration-section')}
       </h3>
       <p class="mb-4 text-sm text-secondary">
-        {translate('workers.configuration-description')}
+        {translate('workers.version-configuration-description')}
       </p>
       <Input
         bind:value={$form.buildId}
@@ -74,6 +80,7 @@
         placeholder="1.0.0"
         required
       />
+      <RecentVersions {versions} />
     </Card>
 
     <Card class="p-5">
@@ -83,11 +90,16 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider>
+      <ComputeProviderPicker bind:provider={$form.provider}>
         <ComputeFields
+          provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}
           bind:iamRoleArn={$form.iamRoleArn}
           bind:roleExternalId={$form.roleExternalId}
+          bind:gcpProject={$form.gcpProject}
+          bind:gcpRegion={$form.gcpRegion}
+          bind:gcpWorkerPool={$form.gcpWorkerPool}
+          bind:gcpServiceAccount={$form.gcpServiceAccount}
           bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}
           bind:scaleUpBacklogThreshold={$form.scaleUpBacklogThreshold}
           bind:maxWorkerLifetimeMs={$form.maxWorkerLifetimeMs}

@@ -7,7 +7,6 @@ import {
   isPayloadInputEncodingType,
   type PayloadInputEncoding,
 } from '$lib/models/payload-encoding';
-import { Action } from '$lib/models/workflow-actions';
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
@@ -73,7 +72,6 @@ import {
   isVersionNewer,
   minimumVersionRequired,
 } from '$lib/utilities/version-check';
-import { formatReason } from '$lib/utilities/workflow-actions';
 
 import { fetchInitialEvent } from './events-service';
 import { fetchWorkflowCountByExecutionStatus } from './workflow-counts';
@@ -311,16 +309,11 @@ export async function terminateWorkflow({
     namespace,
     workflowId: workflow.id,
   });
-  const formattedReason = formatReason({
-    reason,
-    action: Action.Terminate,
-    identity,
-  });
   return await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
-        reason: formattedReason,
+        reason: reason?.trim(),
         ...(identity && { identity }),
         firstExecutionRunId: first,
       }),
@@ -473,12 +466,6 @@ export async function resetWorkflow({
     workflowId,
   });
 
-  const formattedReason = formatReason({
-    action: Action.Reset,
-    reason,
-    identity,
-  });
-
   const body: Replace<
     ResetWorkflowRequest,
     { workflowTaskFinishEventId: string }
@@ -489,7 +476,7 @@ export async function resetWorkflow({
     },
     workflowTaskFinishEventId: eventId,
     requestId: crypto.randomUUID(),
-    reason: formattedReason,
+    reason: reason?.trim(),
     ...(identity && { identity }),
   };
 
@@ -557,16 +544,11 @@ export async function pauseWorkflow(
   }: PauseWorkflowOptions,
   request = fetch,
 ) {
-  const formattedReason = formatReason({
-    action: Action.Pause,
-    reason,
-    identity,
-  });
   const body: PauseWorkflowRequest = {
     namespace,
     workflowId,
     runId,
-    reason: formattedReason,
+    reason: reason?.trim(),
     requestId: crypto.randomUUID(),
     ...(identity && { identity }),
   };
@@ -598,16 +580,11 @@ export async function unpauseWorkflow(
   }: PauseWorkflowOptions,
   request = fetch,
 ) {
-  const formattedReason = formatReason({
-    action: Action.Unpause,
-    reason,
-    identity,
-  });
   const body: UnpauseWorkflowRequest = {
     namespace,
     workflowId,
     runId,
-    reason: formattedReason,
+    reason: reason?.trim(),
     requestId: crypto.randomUUID(),
     ...(identity && { identity }),
   };

@@ -23,9 +23,10 @@
     valid?: boolean;
     error?: string;
     class?: string;
+    description?: string;
   }
 
-  export let id = '';
+  export let id: string = crypto.randomUUID();
   export let checked = false;
   export let label = '';
   export let labelHidden = false;
@@ -36,6 +37,7 @@
   export let valid = true;
   export let error = '';
   export let required = false;
+  export let description = '';
 
   let className = '';
   export { className as class };
@@ -75,6 +77,9 @@
     : checked
       ? ('checkmark' as const)
       : null;
+
+  $: errorId = `${id}-error`;
+  $: showError = !valid && !!error;
 </script>
 
 <div
@@ -98,9 +103,12 @@
         'gap-3',
         'text-sm',
         'leading-[18px]',
+        'min-h-6',
+        'min-w-6',
         'group',
       ],
       disabled && 'cursor-not-allowed',
+      labelHidden && 'justify-center',
       className,
     )}
   >
@@ -114,6 +122,8 @@
       data-track-name="checkbox"
       data-track-intent="toggle"
       data-track-text={label}
+      aria-invalid={!valid ? 'true' : undefined}
+      aria-describedby={showError ? errorId : undefined}
       bind:checked
       {disabled}
       {required}
@@ -170,12 +180,17 @@
     </span>
 
     <slot name="flex">
-      <span class="label" class:sr-only={labelHidden}>
-        {label}
-      </span>
+      <div>
+        <span class="label" class:sr-only={labelHidden}>
+          {label}
+        </span>
+        {#if description}
+          <p class="text-xs font-normal text-secondary">{description}</p>
+        {/if}
+      </div>
     </slot>
   </Label>
-  {#if !valid && error}
-    <span class="text-xs text-danger">{error}</span>
-  {/if}
+  <span id={errorId} role="alert" class="text-xs text-danger">
+    {#if showError}{error}{/if}
+  </span>
 </div>

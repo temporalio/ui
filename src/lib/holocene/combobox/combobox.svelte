@@ -462,6 +462,9 @@
     });
   }
 
+  const errorId = $derived(`${id}-error`);
+  const showError = $derived(!!error && !valid);
+
   const handleInputClick: MouseEventHandler<HTMLInputElement> = (event) => {
     event.stopPropagation();
     if (!$open) openList();
@@ -492,7 +495,7 @@
 </script>
 
 <MenuContainer {open} onclose={handleMenuClose}>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1.5">
     <Label hidden={labelHidden} {required} {label} for={id} />
     <div
       class={merge(
@@ -556,6 +559,8 @@
           aria-controls="{id}-listbox"
           aria-expanded={$open}
           aria-required={required}
+          aria-invalid={!valid ? 'true' : undefined}
+          aria-describedby={showError ? errorId : undefined}
           aria-autocomplete="list"
           onfocus={handleFocus}
           onblur={handleBlur}
@@ -680,9 +685,9 @@
     {/if}
   </Menu>
 
-  {#if error && !valid}
-    <span class="error">{error}</span>
-  {/if}
+  <span id={errorId} role="alert" class="error">
+    {#if showError}{error}{/if}
+  </span>
 </MenuContainer>
 
 <style lang="postcss">
@@ -691,7 +696,7 @@
   }
 
   .input-wrapper {
-    @apply flex w-full flex-wrap items-center;
+    @apply flex grow flex-wrap items-center;
   }
 
   .combobox-input {

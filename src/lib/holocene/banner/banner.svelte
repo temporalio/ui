@@ -34,6 +34,8 @@
 </script>
 
 <script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+
   import { BROWSER } from 'esm-env';
   import { twMerge as merge } from 'tailwind-merge';
 
@@ -58,6 +60,11 @@
 
   type $$Props = BaseProps | DismissibleBanner;
 
+  function getRole(t: BannerType): HTMLAttributes<HTMLElement>['role'] {
+    if (t === 'danger') return 'alert';
+    return 'status';
+  }
+
   export let id: string;
   export let message: string;
   export let dismissLabel: string = '';
@@ -69,6 +76,7 @@
   export { className as class };
 
   $: show = message && !$dismissedBanners[id];
+  $: role = getRole(type);
 
   let bannerHeight = 0;
 
@@ -87,6 +95,8 @@
 {#if show}
   <section
     class={merge(types({ type }), className)}
+    {role}
+    aria-atomic="true"
     bind:clientHeight={bannerHeight}
     {...$$restProps}
   >

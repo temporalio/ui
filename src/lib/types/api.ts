@@ -57,7 +57,8 @@ export type NexusAPIRoutePath = 'nexus-endpoint' | 'nexus-endpoint.update';
 export type WorkerDeploymentsAPIRoutePath = 'worker-deployments';
 export type WorkerDeploymentAPIRoutePath =
   | 'worker-deployment'
-  | 'worker-deployment-set-current-version';
+  | 'worker-deployment-set-current-version'
+  | 'worker-deployment-set-ramping-version';
 export type WorkerDeploymentVersionAPIRoutePath =
   | 'worker-deployment-version'
   | 'worker-deployment-version-compute-config'
@@ -70,6 +71,15 @@ export type StandaloneActivityAPIRoutePath =
   | 'standalone-activity'
   | 'standalone-activity.cancel'
   | 'standalone-activity.terminate';
+
+export type StandaloneNexusOperationsAPIRoutePath =
+  | 'standalone-nexus-operations'
+  | 'standalone-nexus-operations.count';
+export type StandaloneNexusOperationAPIRoutePath =
+  | 'standalone-nexus-operation'
+  | 'standalone-nexus-operation.poll'
+  | 'standalone-nexus-operation.cancel'
+  | 'standalone-nexus-operation.terminate';
 
 export type APIRoutePath =
   | ParameterlessAPIRoutePath
@@ -92,7 +102,9 @@ export type APIRoutePath =
   | WorkerDeploymentVersionAPIRoutePath
   | WorkerDeploymentVersionsAPIRoutePath
   | StandaloneActivityAPIRoutePath
-  | StandaloneActivitiesAPIRoutePath;
+  | StandaloneActivitiesAPIRoutePath
+  | StandaloneNexusOperationAPIRoutePath
+  | StandaloneNexusOperationsAPIRoutePath;
 
 export interface APIRouteParameters {
   namespace: string;
@@ -106,6 +118,7 @@ export interface APIRouteParameters {
   signalName: string;
   updateName: string;
   activityId: string;
+  operationId: string;
   endpointId: string;
   deploymentName: string;
   buildId: string;
@@ -194,4 +207,13 @@ export type WorkerDeploymentRouteParameters = Pick<
 export type WorkerDeploymentVersionRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'deploymentName' | 'buildId'
+>;
+
+export type StandaloneNexusOperationsParameters = Pick<
+  APIRouteParameters,
+  'namespace'
+>;
+export type StandaloneNexusOperationParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'operationId'
 >;
