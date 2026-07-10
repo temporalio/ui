@@ -34,6 +34,12 @@ and viewport information, but no route, namespace, or workflow context. HTTP is
 accepted only for loopback development origins and never for a privileged
 extension.
 
+Code inside an opaque sandbox has the browser origin `null`. Classic external
+scripts can run without CORS, but module scripts and other CORS-enabled fetches
+require the extension server to return an appropriate
+`Access-Control-Allow-Origin` header. Do not grant `allowSameOrigin` merely to
+work around a missing asset header.
+
 The iframe sandbox limits what extension code can do to Temporal UI. It does not
 prevent an extension from sending context it has been granted to its own
 backend. Context permissions are therefore operator trust decisions, not data
@@ -74,8 +80,8 @@ pnpm dev:extension-example
 ```
 
 ```sh
-# Terminal 2: Temporal, UI Server, and Temporal UI
-pnpm dev:ui-server:extension-example
+# Terminal 2: UI Server and Temporal UI against local Temporal
+pnpm dev:ui:extension-example
 ```
 
 Open `http://localhost:3000`. The example appears in the sub-navigation slot on
