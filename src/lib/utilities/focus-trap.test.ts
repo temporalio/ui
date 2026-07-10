@@ -138,6 +138,57 @@ describe('focusTrap focus management (inert-based)', () => {
     expect(document.activeElement).toBe(trigger);
   });
 
+  it('does not inert a background sibling marked data-inert-skip (hoisted live region)', () => {
+    const liveRegion = document.createElement('div');
+    liveRegion.setAttribute('data-inert-skip', '');
+    liveRegion.setAttribute('aria-live', 'polite');
+    const background = document.createElement('div');
+    background.appendChild(document.createElement('button'));
+    const trapNode = document.createElement('div');
+    trapNode.appendChild(document.createElement('button'));
+    document.body.append(background, liveRegion, trapNode);
+
+    const action = focusTrap(trapNode, true);
+    expect(background.inert).toBe(true); // ordinary background inerted
+    expect(liveRegion.inert).toBeFalsy(); // live region skipped → still announces
+
+    action.destroy();
+    expect(background.inert).toBe(false);
+  });
+
+  it('does not inert a background sibling that is itself an aria-live region', () => {
+    const liveRegion = document.createElement('div');
+    liveRegion.setAttribute('aria-live', 'assertive');
+    const trapNode = document.createElement('div');
+    trapNode.appendChild(document.createElement('button'));
+    document.body.append(liveRegion, trapNode);
+
+    const action = focusTrap(trapNode, true);
+    expect(liveRegion.inert).toBeFalsy();
+
+    action.destroy();
+  });
+
+  // Containment guard: a container that merely *contains* a live region must
+  // still be inerted (the real app shell holds form-error live regions etc.).
+  // Skipping it would leave the whole background reachable. Only the live-region
+  // root itself is spared, which is why it must be hoisted out first.
+  it('still inerts a background container that merely contains a nested live region', () => {
+    const shell = document.createElement('div');
+    const nestedLive = document.createElement('div');
+    nestedLive.setAttribute('aria-live', 'polite');
+    shell.append(document.createElement('button'), nestedLive);
+    const trapNode = document.createElement('div');
+    trapNode.appendChild(document.createElement('button'));
+    document.body.append(shell, trapNode);
+
+    const action = focusTrap(trapNode, true);
+    expect(shell.inert).toBe(true); // container inerted despite holding a live region
+
+    action.destroy();
+    expect(shell.inert).toBe(false);
+  });
+
   it('does not clear inert that was already set before activation', () => {
     const preInert = document.createElement('div');
     preInert.inert = true;

@@ -9,6 +9,13 @@ export const getFocusableElements = (node: HTMLElement) =>
       !(element.getAttribute('tabindex') === '-1'),
   );
 
+// A live-region root that must keep announcing while a trap is active (e.g. the
+// toast region hoisted to <body>). Matched on the element itself, never on a
+// descendant — a container that merely *holds* a live region (the app shell,
+// with its form-error regions) must still be inerted, so the region has to be
+// hoisted out to a sibling of the trap for this to spare it.
+const LIVE_REGION_SELECTOR = '[data-inert-skip], [aria-live]';
+
 // Make everything outside `node`'s ancestor chain `inert` — removing it from
 // the focus order, tab sequence, pointer events, and the accessibility tree.
 // Walks up to <body>, marking the siblings at each level. Returns a function
@@ -24,7 +31,8 @@ const inertBackground = (node: HTMLElement): (() => void) => {
       if (
         sibling !== current &&
         sibling instanceof HTMLElement &&
-        !sibling.inert
+        !sibling.inert &&
+        !sibling.matches(LIVE_REGION_SELECTOR)
       ) {
         sibling.inert = true;
         inerted.push(sibling);
