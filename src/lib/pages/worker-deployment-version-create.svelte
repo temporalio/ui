@@ -1,5 +1,6 @@
 <script lang="ts">
   import CreateVersionForm from '$lib/components/workers/serverless-worker-form/create-version-form.svelte';
+  import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
   import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
@@ -17,9 +18,10 @@
     namespace: string;
     deployment: string;
     onSuccess: () => void;
+    computeProviders?: ComputeProviderOption[];
   }
 
-  let { namespace, deployment, onSuccess }: Props = $props();
+  let { namespace, deployment, onSuccess, computeProviders }: Props = $props();
 
   let error = $state<string | undefined>();
   let versions = $state<VersionSummary[]>();
@@ -59,6 +61,7 @@
   <CreateVersionForm
     {error}
     {versions}
+    {computeProviders}
     cancelHref={backHref}
     onSubmit={async (data) => {
       error = undefined;

@@ -120,3 +120,12 @@ export const editVersionSchema = z
 export type CreateDeploymentFormData = z.infer<typeof createDeploymentSchema>;
 export type CreateVersionFormData = z.infer<typeof createVersionSchema>;
 export type EditVersionFormData = z.infer<typeof editVersionSchema>;
+
+export type ComputeProviderValue = 'lambda' | 'cloud-run';
+
+export type ComputeProviderOption = {
+  value: ComputeProviderValue;
+  disabled?: boolean;
+  disabledReason?: string;
+  hidden?: boolean;
+};

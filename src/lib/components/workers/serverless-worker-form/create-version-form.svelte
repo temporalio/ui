@@ -9,7 +9,11 @@
   import { translate } from '$lib/i18n/translate';
   import type { VersionSummary } from '$lib/types/deployments';
 
-  import { type CreateVersionFormData, createVersionSchema } from './shared';
+  import {
+    type ComputeProviderOption,
+    type CreateVersionFormData,
+    createVersionSchema,
+  } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
@@ -20,9 +24,16 @@
     cancelHref: string;
     error?: string;
     versions?: VersionSummary[];
+    computeProviders?: ComputeProviderOption[];
   }
 
-  let { onSubmit, cancelHref, error, versions = [] }: Props = $props();
+  let {
+    onSubmit,
+    cancelHref,
+    error,
+    versions = [],
+    computeProviders,
+  }: Props = $props();
 
   const superform = superForm(
     {
@@ -90,7 +101,10 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider={$form.provider}>
+      <ComputeProviderPicker
+        bind:provider={$form.provider}
+        providers={computeProviders}
+      >
         <ComputeFields
           provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}

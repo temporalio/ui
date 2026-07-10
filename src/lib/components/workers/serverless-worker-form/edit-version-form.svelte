@@ -7,7 +7,11 @@
   import Card from '$lib/holocene/card.svelte';
   import { translate } from '$lib/i18n/translate';
 
-  import { type EditVersionFormData, editVersionSchema } from './shared';
+  import {
+    type ComputeProviderOption,
+    type EditVersionFormData,
+    editVersionSchema,
+  } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
@@ -31,9 +35,17 @@
     onDelete: () => void;
     cancelHref: string;
     error?: string;
+    computeProviders?: ComputeProviderOption[];
   }
 
-  let { initialData, onSubmit, onDelete, cancelHref, error }: Props = $props();
+  let {
+    initialData,
+    onSubmit,
+    onDelete,
+    cancelHref,
+    error,
+    computeProviders,
+  }: Props = $props();
 
   const superform = superForm(
     {
@@ -79,7 +91,10 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider={$form.provider} />
+      <ComputeProviderPicker
+        bind:provider={$form.provider}
+        providers={computeProviders}
+      />
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
