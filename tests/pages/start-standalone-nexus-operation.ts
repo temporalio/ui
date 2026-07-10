@@ -10,6 +10,7 @@ export class StartStandaloneNexusOperationPage {
   readonly scheduleToCloseTimeoutInput: Locator;
   readonly submitButton: Locator;
   readonly editPoliciesButton: Locator;
+  readonly updatePoliciesButton: Locator;
   readonly endpointInputError: Locator;
   readonly serviceInputError: Locator;
   readonly operationNameInputError: Locator;
@@ -28,6 +29,9 @@ export class StartStandaloneNexusOperationPage {
       'start-standalone-nexus-operation-submit-button',
     );
     this.editPoliciesButton = page.getByText('Edit Operation Policies');
+    this.updatePoliciesButton = page.getByRole('button', {
+      name: 'Update Policies',
+    });
     this.endpointInputError = page.getByText(
       'Target endpoint name is required.',
     );

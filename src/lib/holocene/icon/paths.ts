@@ -60,7 +60,6 @@ import feedbackCircle from './svg/feedback-circle.svelte';
 import feedback from './svg/feedback.svelte';
 import fileImport from './svg/file-import.svelte';
 import fileUpload from './svg/file-upload.svelte';
-import filterLines from './svg/filter-lines.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import filter from './svg/filter.svelte';
 import fireExtinguisher from './svg/fire-extinguisher.svelte';
@@ -225,7 +224,6 @@ export const icons = {
   'file-import': fileImport,
   'file-upload': fileUpload,
   filter,
-  'filter-lines': filterLines,
   'filter-solid': filterSolid,
   'fire-extinguisher': fireExtinguisher,
   folders,

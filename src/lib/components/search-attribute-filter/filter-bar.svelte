@@ -40,16 +40,13 @@
   <div
     class="flex w-full flex-wrap items-center justify-between gap-2 border border-subtle bg-primary p-1.5"
   >
-    <div class="flex grow items-center justify-start gap-4 px-2">
-      <Icon name="filter-lines" class="text-primary-text h-4 w-4 shrink-0" />
-      <Filter
-        {filters}
-        {options}
-        {id}
-        {statusAttribute}
-        {includeNullConditions}
-      />
-    </div>
+    <Filter
+      {filters}
+      {options}
+      {id}
+      {statusAttribute}
+      {includeNullConditions}
+    />
     <div class="flex items-center gap-1">
       <Tooltip
         text={viewManualQuery ? 'Hide raw query' : 'View raw query'}

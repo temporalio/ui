@@ -27,9 +27,9 @@ describe('getFormSpecFromSpec', () => {
         calendar: {
           dayOfMonth: [{ start: 1, end: 31, step: 1 }],
           dayOfWeek: [{ start: 0, end: 6, step: 1 }],
-          hour: [],
-          minute: [],
-          second: [],
+          hour: [{ start: 0, end: 0, step: 1 }],
+          minute: [{ start: 0, end: 0, step: 1 }],
+          second: [{ start: 0, end: 0, step: 1 }],
           month: [{ start: 1, end: 12, step: 1 }],
           year: undefined,
           comment: '',
