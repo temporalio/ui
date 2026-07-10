@@ -154,9 +154,9 @@ function toStructuredCalendar(
   const { comment, ...ranges } = calendar;
   return {
     ...ranges,
-    second: ranges.second?.length ? ranges.second : DEFAULT_TIME_RANGE,
-    minute: ranges.minute?.length ? ranges.minute : DEFAULT_TIME_RANGE,
-    hour: ranges.hour?.length ? ranges.hour : DEFAULT_TIME_RANGE,
+    second: ranges.second?.length ? ranges.second : defaultTimeRange(),
+    minute: ranges.minute?.length ? ranges.minute : defaultTimeRange(),
+    hour: ranges.hour?.length ? ranges.hour : defaultTimeRange(),
     ...(comment ? { comment } : {}),
   };
 }
