@@ -53,6 +53,11 @@ describe('routeForApi', () => {
     expect(route).toBe(`${origin}${base}/api/v1/settings`);
   });
 
+  it('should return a route for the private UI extension registry', () => {
+    const route = routeForApi('ui-extensions');
+    expect(route).toBe(`${origin}${base}/api/v1/ui-extensions`);
+  });
+
   it('should return a route for user', () => {
     const route = routeForApi('user');
     expect(route).toBe(`${origin}${base}/api/v1/me`);

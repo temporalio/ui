@@ -197,7 +197,7 @@
       workflow: {
         workflowId,
         runId,
-        status: workflow?.status,
+        status: workflow?.status ?? undefined,
         taskQueue: workflow?.taskQueue,
         workflowType: workflow?.name,
       },

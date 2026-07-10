@@ -55,6 +55,26 @@ func TestLoaderSuite(t *testing.T) {
 	suite.Run(t, new(LoaderSuite))
 }
 
+func TestDevelopmentExtensionExampleIsOptIn(t *testing.T) {
+	t.Setenv("TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED", "")
+
+	cfg, err := LoadConfig("../../config", "development")
+	require.NoError(t, err)
+	require.False(t, cfg.CustomUI.Enabled)
+	require.Len(t, cfg.CustomUI.IframeExtensions, 1)
+}
+
+func TestDevelopmentExtensionExampleCanBeEnabled(t *testing.T) {
+	t.Setenv("TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED", "true")
+
+	cfg, err := LoadConfig("../../config", "development")
+	require.NoError(t, err)
+	require.True(t, cfg.CustomUI.Enabled)
+	require.Equal(t, "local-extension-example", cfg.CustomUI.IframeExtensions[0].ID)
+	require.Equal(t, "http://127.0.0.1:8090", cfg.CustomUI.IframeExtensions[0].AllowedOrigin)
+	require.Empty(t, cfg.CustomUI.IframeExtensions[0].Permissions)
+}
+
 func (s *LoaderSuite) SetupTest() {
 	s.Assertions = require.New(s.T())
 }

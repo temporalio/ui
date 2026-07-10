@@ -1,12 +1,23 @@
 export const TEMPORAL_EXTENSION_MESSAGE_VERSION = 1;
 
 export const TEMPORAL_EXTENSION_SLOTS = [
+  'app.top-nav.actions.before',
   'app.top-nav.actions.after',
   'workflow.header.after-details',
   'app.top-nav.sub-nav',
 ] as const;
 
 export type TemporalExtensionSlot = (typeof TEMPORAL_EXTENSION_SLOTS)[number];
+
+export const TEMPORAL_EXTENSION_PERMISSIONS = [
+  'context:route',
+  'context:namespace',
+  'context:workflow',
+  'navigation:write',
+] as const;
+
+export type TemporalExtensionPermission =
+  (typeof TEMPORAL_EXTENSION_PERMISSIONS)[number];
 
 export type ExtensionRouteContext = {
   pathname: string;
@@ -22,58 +33,76 @@ export type ExtensionWorkflowContext = {
   workflowType?: string;
 };
 
-export type ExtensionUserContext = {
-  email?: string;
-};
-
 export type ExtensionContext = {
   uiVersion: string;
   temporalVersion?: string;
   basePath: string;
-  route: ExtensionRouteContext;
+  route?: ExtensionRouteContext;
   namespace?: string;
   workflow?: ExtensionWorkflowContext;
-  user?: ExtensionUserContext;
 };
 
-export type HostContextMessage = {
-  type: 'temporal-ui/context';
+type HostMessageBase = {
   version: typeof TEMPORAL_EXTENSION_MESSAGE_VERSION;
   extensionId: string;
+  instanceId: string;
+};
+
+export type HostWelcomeMessage = HostMessageBase & {
+  type: 'temporal-ui/welcome';
+  permissions: TemporalExtensionPermission[];
+};
+
+export type HostContextMessage = HostMessageBase & {
+  type: 'temporal-ui/context';
   context: ExtensionContext;
 };
 
-export type HostThemeMessage = {
+export type HostThemeMessage = HostMessageBase & {
   type: 'temporal-ui/theme';
-  version: typeof TEMPORAL_EXTENSION_MESSAGE_VERSION;
-  extensionId: string;
   theme: 'light' | 'dark';
 };
 
-export type HostMessage = HostContextMessage | HostThemeMessage;
-
-export type ExtensionReadyMessage = {
-  type: 'temporal-extension/ready';
-  version: typeof TEMPORAL_EXTENSION_MESSAGE_VERSION;
-  extensionId: string;
+export type HostViewportMessage = HostMessageBase & {
+  type: 'temporal-ui/viewport';
+  slot: TemporalExtensionSlot;
+  width: number;
+  height: number;
 };
 
-export type ExtensionResizeMessage = {
-  type: 'temporal-extension/resize';
+export type HostMessage =
+  | HostWelcomeMessage
+  | HostContextMessage
+  | HostThemeMessage
+  | HostViewportMessage;
+
+type ExtensionMessageBase = {
   version: typeof TEMPORAL_EXTENSION_MESSAGE_VERSION;
   extensionId: string;
+  instanceId: string;
+};
+
+export type ExtensionHelloMessage = Omit<ExtensionMessageBase, 'instanceId'> & {
+  type: 'temporal-extension/hello';
+};
+
+export type ExtensionReadyMessage = ExtensionMessageBase & {
+  type: 'temporal-extension/ready';
+};
+
+export type ExtensionResizeMessage = ExtensionMessageBase & {
+  type: 'temporal-extension/resize';
   height?: number;
   width?: number;
 };
 
-export type ExtensionNavigateMessage = {
+export type ExtensionNavigateMessage = ExtensionMessageBase & {
   type: 'temporal-extension/navigate';
-  version: typeof TEMPORAL_EXTENSION_MESSAGE_VERSION;
-  extensionId: string;
   href: string;
 };
 
 export type ExtensionMessage =
+  | ExtensionHelloMessage
   | ExtensionReadyMessage
   | ExtensionResizeMessage
   | ExtensionNavigateMessage;

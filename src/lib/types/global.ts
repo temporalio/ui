@@ -1,3 +1,7 @@
+import type {
+  TemporalExtensionPermission,
+  TemporalExtensionSlot,
+} from '$lib/extensions/types';
 import type { IconName } from '$lib/holocene/icon';
 
 export type NamespaceListItem = {
@@ -76,7 +80,6 @@ export type IframeExtensionSandbox = {
   allowForms: boolean;
   allowModals: boolean;
   allowPopups: boolean;
-  allowPopupsToEscapeSandbox: boolean;
   allowSameOrigin: boolean;
 };
 
@@ -92,13 +95,13 @@ export type IframeExtensionSizing = {
 export type IframeExtension = {
   id: string;
   title: string;
-  slot: string;
+  slot: TemporalExtensionSlot;
   src: string;
   allowedOrigin: string;
   routePatterns: string[];
   sandbox: IframeExtensionSandbox;
   sizing: IframeExtensionSizing;
-  permissions: string[];
+  permissions: TemporalExtensionPermission[];
 };
 
 export type CustomUISettings = {

@@ -1,6 +1,10 @@
 import { BROWSER } from 'esm-env';
 
-import type { SettingsResponse } from '$lib/types';
+import {
+  isTemporalExtensionPermission,
+  isTemporalExtensionSlot,
+} from '$lib/extensions/iframe-extensions';
+import type { CustomUIResponse, SettingsResponse } from '$lib/types';
 import type { IframeExtension, Settings } from '$lib/types/global';
 import { getApiOrigin } from '$lib/utilities/get-api-origin';
 import { getEnvironment } from '$lib/utilities/get-environment';
@@ -14,38 +18,66 @@ const positiveNumberOrUndefined = (value?: number): number | undefined => {
 };
 
 const mapIframeExtensions = (
-  settingsResponse: SettingsResponse,
+  customUIResponse: CustomUIResponse | undefined,
 ): IframeExtension[] => {
   return (
-    settingsResponse?.CustomUI?.IframeExtensions?.map((extension) => ({
-      id: extension.ID,
-      title: extension.Title || extension.ID,
-      slot: extension.Slot,
-      src: extension.Src,
-      allowedOrigin: extension.AllowedOrigin,
-      routePatterns: extension.RoutePatterns ?? [],
-      sandbox: {
-        allowDownloads: !!extension.Sandbox?.AllowDownloads,
-        allowForms: !!extension.Sandbox?.AllowForms,
-        allowModals: !!extension.Sandbox?.AllowModals,
-        allowPopups: !!extension.Sandbox?.AllowPopups,
-        allowPopupsToEscapeSandbox:
-          !!extension.Sandbox?.AllowPopupsToEscapeSandbox,
-        allowSameOrigin: !!extension.Sandbox?.AllowSameOrigin,
-      },
-      sizing: {
-        defaultHeight: positiveNumberOrUndefined(
-          extension.Sizing?.DefaultHeight,
-        ),
-        minHeight: positiveNumberOrUndefined(extension.Sizing?.MinHeight),
-        maxHeight: positiveNumberOrUndefined(extension.Sizing?.MaxHeight),
-        defaultWidth: positiveNumberOrUndefined(extension.Sizing?.DefaultWidth),
-        minWidth: positiveNumberOrUndefined(extension.Sizing?.MinWidth),
-        maxWidth: positiveNumberOrUndefined(extension.Sizing?.MaxWidth),
-      },
-      permissions: extension.Permissions ?? [],
-    })) ?? []
+    customUIResponse?.IframeExtensions?.flatMap((extension) => {
+      if (!isTemporalExtensionSlot(extension.Slot)) return [];
+      const permissions = (extension.Permissions ?? []).filter(
+        isTemporalExtensionPermission,
+      );
+      if (permissions.length !== (extension.Permissions ?? []).length) {
+        return [];
+      }
+
+      return [
+        {
+          id: extension.ID,
+          title: extension.Title || extension.ID,
+          slot: extension.Slot,
+          src: extension.Src,
+          allowedOrigin: extension.AllowedOrigin,
+          routePatterns: extension.RoutePatterns ?? [],
+          sandbox: {
+            allowDownloads: !!extension.Sandbox?.AllowDownloads,
+            allowForms: !!extension.Sandbox?.AllowForms,
+            allowModals: !!extension.Sandbox?.AllowModals,
+            allowPopups: !!extension.Sandbox?.AllowPopups,
+            allowSameOrigin: !!extension.Sandbox?.AllowSameOrigin,
+          },
+          sizing: {
+            defaultHeight: positiveNumberOrUndefined(
+              extension.Sizing?.DefaultHeight,
+            ),
+            minHeight: positiveNumberOrUndefined(extension.Sizing?.MinHeight),
+            maxHeight: positiveNumberOrUndefined(extension.Sizing?.MaxHeight),
+            defaultWidth: positiveNumberOrUndefined(
+              extension.Sizing?.DefaultWidth,
+            ),
+            minWidth: positiveNumberOrUndefined(extension.Sizing?.MinWidth),
+            maxWidth: positiveNumberOrUndefined(extension.Sizing?.MaxWidth),
+          },
+          permissions,
+        },
+      ];
+    }) ?? []
   );
+};
+
+export const fetchUiExtensions = async (
+  request = fetch,
+): Promise<IframeExtension[]> => {
+  try {
+    const route = routeForApi('ui-extensions');
+    const customUIResponse: CustomUIResponse = await requestFromAPI(route, {
+      request,
+      notifyOnError: false,
+    });
+    if (!customUIResponse?.Enabled) return [];
+    return mapIframeExtensions(customUIResponse);
+  } catch {
+    return [];
+  }
 };
 
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
@@ -90,7 +122,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     activityCommandsDisabled: !!settingsResponse?.ActivityCommandsDisabled,
     customUi: {
       enabled: !!settingsResponse?.CustomUI?.Enabled,
-      iframeExtensions: mapIframeExtensions(settingsResponse),
+      iframeExtensions: [],
     },
 
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,

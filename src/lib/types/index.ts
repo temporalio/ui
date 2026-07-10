@@ -330,7 +330,6 @@ export type IframeExtensionSandboxResponse = {
   AllowForms?: boolean;
   AllowModals?: boolean;
   AllowPopups?: boolean;
-  AllowPopupsToEscapeSandbox?: boolean;
   AllowSameOrigin?: boolean;
 };
 
@@ -355,8 +354,11 @@ export type IframeExtensionResponse = {
   Permissions?: string[];
 };
 
-export type CustomUIResponse = {
+export type CustomUISettingsResponse = {
   Enabled?: boolean;
+};
+
+export type CustomUIResponse = CustomUISettingsResponse & {
   IframeExtensions?: IframeExtensionResponse[];
 };
 
@@ -373,7 +375,7 @@ export type SettingsResponse = {
     DefaultErrorMessage?: string;
     DefaultErrorLink?: string;
   };
-  CustomUI?: CustomUIResponse;
+  CustomUI?: CustomUISettingsResponse;
   DefaultNamespace: string;
   DisableWriteActions: boolean;
   WorkflowTerminateDisabled: boolean;

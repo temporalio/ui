@@ -2,13 +2,19 @@
   import { base } from '$app/paths';
   import { page } from '$app/state';
 
-  import { extensionsForSlot } from '$lib/extensions/iframe-extensions';
-  import type { ExtensionContext } from '$lib/extensions/types';
+  import {
+    extensionsForSlot,
+    isIframeExtensionAllowed,
+  } from '$lib/extensions/iframe-extensions';
+  import type {
+    ExtensionContext,
+    TemporalExtensionSlot,
+  } from '$lib/extensions/types';
 
   import IframeExtension from './iframe-extension.svelte';
 
   interface Props {
-    name: string;
+    name: TemporalExtensionSlot;
     context?: Partial<ExtensionContext>;
     class?: string;
   }
@@ -24,11 +30,19 @@
   );
   const iframeExtensions = $derived(
     page.data?.settings?.customUi?.enabled
-      ? (page.data.settings.customUi.iframeExtensions ?? [])
+      ? (page.data.settings.customUi.iframeExtensions ?? []).filter(
+          (extension) =>
+            isIframeExtensionAllowed(
+              extension,
+              page.url.origin,
+              base,
+              page.data.settings.auth.enabled,
+            ),
+        )
       : [],
   );
   const extensions = $derived(
-    extensionsForSlot(iframeExtensions, name, page.url.pathname),
+    extensionsForSlot(iframeExtensions, name, page.url.pathname, base),
   );
   const extensionContext = $derived<ExtensionContext>({
     ...context,
@@ -45,18 +59,22 @@
   });
 </script>
 
-<div
-  data-temporal-extension-slot={name}
-  data-temporal-namespace={extensionContext.namespace}
-  data-temporal-workflow-id={extensionContext.workflow?.workflowId}
-  data-temporal-run-id={extensionContext.workflow?.runId}
-  class={className}
->
-  {#each extensions as extension (extension.id)}
-    <IframeExtension
-      {extension}
-      context={extensionContext}
-      currentOrigin={page.url.origin}
-    />
-  {/each}
-</div>
+{#if extensions.length}
+  <div
+    data-temporal-extension-slot={name}
+    data-temporal-namespace={extensionContext.namespace}
+    data-temporal-workflow-id={extensionContext.workflow?.workflowId}
+    data-temporal-run-id={extensionContext.workflow?.runId}
+    class={className}
+  >
+    {#each extensions as extension (extension.id)}
+      <IframeExtension
+        {extension}
+        context={extensionContext}
+        currentOrigin={page.url.origin}
+        basePath={base}
+        authEnabled={page.data.settings.auth.enabled}
+      />
+    {/each}
+  </div>
+{/if}

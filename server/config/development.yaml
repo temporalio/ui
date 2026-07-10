@@ -1,3 +1,7 @@
+# enable-template
+# Set TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED=true to load the runnable example
+# from examples/custom-ui-extension. It intentionally has no context or action
+# permissions because loopback HTTP is only supported for unprivileged demos.
 publicPath:
 port: 8081
 enableUi: true
@@ -62,3 +66,16 @@ codec:
   defaultErrorLink:
 forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
   - X-Forwarded-For
+customUi:
+  enabled: {{ env "TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED" | default "false" }}
+  iframeExtensions:
+    - id: local-extension-example
+      title: Local extension example
+      slot: app.top-nav.sub-nav
+      src: http://127.0.0.1:8090/
+      allowedOrigin: http://127.0.0.1:8090
+      sizing:
+        defaultHeight: 112
+        minHeight: 72
+        maxHeight: 200
+      permissions: []

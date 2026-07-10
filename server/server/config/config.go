@@ -163,12 +163,11 @@ type (
 	}
 
 	IframeSandbox struct {
-		AllowDownloads             bool `yaml:"allowDownloads"`
-		AllowForms                 bool `yaml:"allowForms"`
-		AllowModals                bool `yaml:"allowModals"`
-		AllowPopups                bool `yaml:"allowPopups"`
-		AllowPopupsToEscapeSandbox bool `yaml:"allowPopupsToEscapeSandbox"`
-		AllowSameOrigin            bool `yaml:"allowSameOrigin"`
+		AllowDownloads  bool `yaml:"allowDownloads"`
+		AllowForms      bool `yaml:"allowForms"`
+		AllowModals     bool `yaml:"allowModals"`
+		AllowPopups     bool `yaml:"allowPopups"`
+		AllowSameOrigin bool `yaml:"allowSameOrigin"`
 	}
 
 	IframeExtensionSizing struct {
@@ -192,6 +191,9 @@ func (c *Config) Validate() error {
 	}
 
 	if err := c.Auth.Validate(); err != nil {
+		return err
+	}
+	if err := c.CustomUI.Validate(c.Auth.Enabled); err != nil {
 		return err
 	}
 

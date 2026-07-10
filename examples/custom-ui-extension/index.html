@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!--
+      These values are part of the extension's trust configuration. In a real
+      deployment, set temporal-ui-origin to the exact origin that embeds this
+      page and keep the ID in sync with the Temporal UI server configuration.
+    -->
+    <meta name="temporal-ui-origin" content="http://localhost:3000" />
+    <meta name="temporal-extension-id" content="local-extension-example" />
+
+    <title>Temporal UI extension example</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="extension" aria-labelledby="extension-title">
+      <section class="summary">
+        <div class="identity">
+          <span class="logo" aria-hidden="true">T</span>
+          <div>
+            <h1 id="extension-title">Custom UI extension</h1>
+            <p>This page is running on a separate origin.</p>
+          </div>
+        </div>
+
+        <dl class="readouts" aria-label="Host state">
+          <div>
+            <dt>Connection</dt>
+            <dd id="connection-status" class="status" data-state="waiting">
+              Waiting for Temporal UI
+            </dd>
+          </div>
+          <div>
+            <dt>Theme</dt>
+            <dd id="theme-value">Not received</dd>
+          </div>
+          <div>
+            <dt>Viewport</dt>
+            <dd id="viewport-value">Not received</dd>
+          </div>
+        </dl>
+
+        <div class="actions" aria-label="Extension actions">
+          <button
+            id="resize-button"
+            type="button"
+            aria-controls="context-panel"
+            aria-expanded="false"
+            disabled
+          >
+            Show context
+          </button>
+          <button
+            id="navigate-button"
+            type="button"
+            title="Grant navigation:write to enable this host action."
+            disabled
+          >
+            Open workflows
+          </button>
+        </div>
+      </section>
+
+      <section id="context-panel" class="context-panel" hidden>
+        <div>
+          <h2>Granted context</h2>
+          <p id="permission-value">No context permissions granted.</p>
+        </div>
+        <pre id="context-value">Context has not been received.</pre>
+      </section>
+
+      <p id="action-status" class="action-status" aria-live="polite"></p>
+    </main>
+
+    <noscript
+      >This example requires JavaScript to use the extension protocol.</noscript
+    >
+    <script type="module" src="/extension.js"></script>
+  </body>
+</html>

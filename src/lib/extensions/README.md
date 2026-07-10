@@ -1,197 +1,179 @@
-# Temporal UI Extensions
+# Temporal UI iframe extensions
 
-Temporal UI extensions let operators mount customer-owned iframe content into
-stable locations in the UI. Extensions are configured on the UI server, rendered
-inside sandboxed iframes, and receive read-only page context through a small
-versioned `postMessage` protocol.
+Temporal UI iframe extensions let operators place customer-owned UI in a small
+set of stable locations without loading customer JavaScript into the Temporal UI
+document.
 
-Use extensions when you need to show environment-specific controls or context
-near Temporal UI workflows without changing the main UI bundle. Common examples
-include incident status widgets, internal runbooks, workflow telemetry panels,
-approval links, support links, and namespace-specific shortcuts.
+The iframe boundary is intentional. Extension code never receives Temporal
+access tokens, ID tokens, cookies, or direct access to the parent DOM. Context
+and host actions are granted explicitly through a versioned `postMessage`
+protocol.
 
-## How It Works
+## Security model
 
-At runtime, Temporal UI:
+Production extensions that receive context or request navigation must:
 
-1. Fetches UI settings from the server.
-2. Reads `customUi.iframeExtensions` from those settings.
-3. Finds every extension whose `slot` matches a mounted `ExtensionSlot`.
-4. Filters extensions by the current route when `routePatterns` are configured.
-5. Validates the iframe `src` and `allowedOrigin`.
-6. Renders the extension in a sandboxed iframe.
-7. Sends context and theme updates to the iframe with `postMessage`.
-8. Accepts a small set of messages back from the iframe, such as resize and
-   same-origin navigation requests.
+- be hosted on a dedicated HTTPS origin that is different from the Temporal UI
+  origin;
+- configure that exact origin as `allowedOrigin`;
+- set `sandbox.allowSameOrigin: true`, which lets the host validate the real
+  message origin while the remaining sandbox restrictions stay active;
+- return a `Content-Security-Policy` with a `frame-ancestors` directive that
+  names the Temporal UI origin;
+- validate the Temporal UI origin and `event.source === window.parent` before
+  accepting host messages.
 
-Extensions do not run inside the Temporal UI JavaScript context. They are normal
-HTML pages hosted either by Temporal UI itself, by a local development server,
-or by a remote HTTPS origin.
+Do not host customer-controlled JavaScript on the Temporal UI origin. A sandbox
+applies only while a page is embedded; the same page opened directly would run
+without the iframe sandbox on the origin that owns the Temporal UI session.
+Consequently, same-origin extensions are rejected when UI authentication is
+enabled.
 
-## Quick Start
+An extension without permissions may use an opaque sandbox. It receives theme
+and viewport information, but no route, namespace, or workflow context. HTTP is
+accepted only for loopback development origins and never for a privileged
+extension.
 
-Create an HTML page for the extension. For local development, static files under
-`static/` are served by Temporal UI and can be referenced by path:
+The iframe sandbox limits what extension code can do to Temporal UI. It does not
+prevent an extension from sending context it has been granted to its own
+backend. Context permissions are therefore operator trust decisions, not data
+loss prevention controls.
 
-```html
-<!-- static/custom-ui-examples/status.html -->
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-        font-family: system-ui, sans-serif;
-      }
+The public UI document's `frame-src` CSP names configured extension origins, so
+origin hostnames are visible before login. Full definitions remain behind the
+registry authorization check, but origin names must not be treated as secrets.
 
-      button {
-        height: 32px;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        background: white;
-      }
+## Runtime flow
 
-      [data-theme='dark'] button {
-        border-color: #475569;
-        background: #1e293b;
-        color: white;
-      }
-    </style>
-  </head>
-  <body>
-    <button type="button">Incident Status</button>
+1. Public UI settings expose only whether custom UI is enabled.
+2. After the user is authorized, Temporal UI fetches the extension definitions
+   from `GET /api/v1/ui-extensions`. When authentication is enabled, the server
+   verifies the request through the configured Temporal API authentication and
+   authorization path before returning the registry.
+3. The host selects definitions for the current typed slot and route.
+4. It verifies the source, origin, permission, and layout contract.
+5. The iframe loads with sandbox, referrer, and Permissions Policy restrictions.
+6. The host creates a new random `instanceId` and sends `temporal-ui/welcome`.
+7. The extension echoes that ID in `temporal-extension/ready`.
+8. Only then does the host send granted context, theme, and viewport updates.
 
-    <script>
-      const extensionId = 'incident-status';
-      let hostOrigin = '*';
+The `instanceId` changes after every iframe load. Messages for an older document
+are ignored.
 
-      const send = (message) => {
-        window.parent.postMessage(
-          {
-            version: 1,
-            extensionId,
-            ...message,
-          },
-          hostOrigin,
-        );
-      };
+## Run the example extension
 
-      window.addEventListener('message', (event) => {
-        const message = event.data;
-        if (!message || message.extensionId !== extensionId) return;
+The repository includes a complete extension under
+`examples/custom-ui-extension`. It uses the real handshake and shows the host
+theme, viewport, granted permissions, and connection status. It can also
+request bounded resizes. Start the extension and Temporal UI in separate
+terminals:
 
-        hostOrigin = event.origin;
-
-        if (message.type === 'temporal-ui/theme') {
-          document.documentElement.dataset.theme = message.theme;
-        }
-
-        send({
-          type: 'temporal-extension/resize',
-          width: 180,
-          height: 32,
-        });
-      });
-
-      send({ type: 'temporal-extension/ready' });
-    </script>
-  </body>
-</html>
+```sh
+# Terminal 1: extension origin (http://127.0.0.1:8090)
+pnpm dev:extension-example
 ```
 
-Enable the extension in the server configuration:
+```sh
+# Terminal 2: Temporal, UI Server, and Temporal UI
+pnpm dev:ui-server:extension-example
+```
+
+Open `http://localhost:3000`. The example appears in the sub-navigation slot on
+every application route. Its standalone URL is `http://127.0.0.1:8090`; when
+opened directly it reports `Not embedded` because there is no Temporal UI parent
+to complete the handshake.
+
+The opt-in command enables the example block in
+`server/config/development.yaml`. Normal development leaves it disabled. The
+example runs on a separate loopback origin and the example server returns a
+`frame-ancestors http://localhost:3000` CSP. Keep both origins exact; opening
+Temporal UI as `http://127.0.0.1:3000` is intentionally not equivalent.
+
+Local HTTP extensions cannot receive context or navigation grants. This demo
+therefore exercises the safe, unprivileged surface: mounting, handshake, theme,
+viewport, and resize. To exercise context or navigation, deploy the same
+example to a dedicated HTTPS origin, add the deployed Temporal UI origin to the
+extension's host allowlist and `frame-ancestors` policy, then use the privileged
+configuration below.
+
+For a disposable mount-only check without running the example server,
+`https://example.com/` can be configured as an unprivileged iframe. It does not
+implement the Temporal extension protocol, so it cannot prove handshake,
+theming, resizing, context, or navigation behavior and should not be an
+automated-test dependency.
+
+## Configuration
 
 ```yaml
 customUi:
   enabled: true
   iframeExtensions:
-    - id: incident-status
-      title: Incident Status
-      slot: app.top-nav.actions.after
-      src: /custom-ui-examples/status.html
-      allowedOrigin: self
-      sizing:
-        defaultWidth: 180
-        minWidth: 180
-        maxWidth: 180
-        defaultHeight: 32
-        minHeight: 32
-        maxHeight: 32
-```
-
-Start Temporal UI with that config and visit the app. The extension appears in
-the top navigation after the built-in action controls.
-
-## Configuration Reference
-
-Extensions are configured under `customUi`:
-
-```yaml
-customUi:
-  enabled: true
-  iframeExtensions:
-    - id: workflow-header-summary
-      title: Workflow Metrics
+    - id: workflow-operations
+      title: Workflow operations
       slot: workflow.header.after-details
-      src: /custom-ui-examples/workflow-header.html
-      allowedOrigin: self
+      src: https://temporal-extensions.example.com/workflow-operations
+      allowedOrigin: https://temporal-extensions.example.com
       routePatterns:
         - /namespaces/:namespace/workflows/:workflow/:run/*
+      sandbox:
+        allowSameOrigin: true
       sizing:
-        defaultWidth: 400
-        defaultHeight: 140
+        defaultHeight: 160
         minHeight: 96
         maxHeight: 480
-      sandbox:
-        allowForms: true
-        allowPopups: true
       permissions:
+        - context:namespace
         - context:workflow
 ```
 
+Configuration is validated when it is loaded. Invalid or duplicate IDs,
+unsupported slots or permissions, unsafe URLs, mismatched origins, malformed
+route patterns, incompatible sandbox settings, excessive extension counts, and
+invalid dimensions reject the configuration instead of silently hiding an
+extension.
+
+`customUi.enabled: false` is an emergency kill switch. While disabled,
+definitions are neither validated nor returned, and their origins are omitted
+from the iframe CSP allowlist.
+
+### Fields
+
 | Field | Required | Description |
 | --- | --- | --- |
-| `customUi.enabled` | Yes | Enables or disables all configured iframe extensions. |
-| `iframeExtensions[].id` | Yes | Stable extension identifier. Every message must include this exact value as `extensionId`. |
-| `title` | No | Iframe title for accessibility. If omitted in the client mapping, the `id` is used as a fallback. |
-| `slot` | Yes | Stable UI location where the extension should render. |
-| `src` | Yes | Iframe URL. Relative URLs resolve against the Temporal UI origin. Absolute URLs must be HTTPS, except local HTTP development origins. |
-| `allowedOrigin` | Yes | `self` for the current Temporal UI origin, or an explicit HTTPS origin such as `https://extensions.example.com`. Local HTTP origins are accepted for localhost development. |
-| `routePatterns` | No | Optional route filters. If empty or omitted, the extension renders on every route where the slot exists. |
-| `sizing` | No | Initial and allowed iframe dimensions. Height defaults to `160`; width defaults to `100%` unless `defaultWidth` is set. |
-| `sandbox` | No | Optional iframe sandbox capabilities. `allow-scripts` is always included. |
-| `permissions` | No | Optional capabilities such as `context:workflow`, `context:user`, and `navigation:write`. |
+| `id` | Yes | Unique stable ID using letters, digits, `.`, `_`, or `-`. |
+| `title` | No | Accessible iframe title; defaults to `id`. |
+| `slot` | Yes | One of the typed slots below. |
+| `src` | Yes | Absolute HTTPS entrypoint for production extensions. |
+| `allowedOrigin` | Yes | Exact origin of `src`; wildcards are rejected. |
+| `routePatterns` | No | Base-path-independent routes on which the extension appears. |
+| `sandbox` | No | Explicit sandbox capabilities. `allow-scripts` is always present. |
+| `sizing` | No | Initial dimensions and extension-requested resize bounds. |
+| `permissions` | No | Explicit context or host-action grants. |
 
-## Slots
+## Slots and layout limits
 
-The current UI mounts these extension slots:
+The host owns layout. Configuration and resize messages can narrow these bounds
+but cannot exceed them.
 
-| Slot | Location | Notes |
-| --- | --- | --- |
-| `app.top-nav.actions.before` | Desktop top navigation, before built-in action controls. | Useful for compact controls. |
-| `app.top-nav.actions.after` | Desktop top navigation, after built-in action controls. | Useful for compact controls. |
-| `app.top-nav.sub-nav` | Full-width row directly below the top navigation. | Useful for banners or secondary navigation. |
-| `workflow.header.after-details` | Workflow execution header, immediately after the workflow details block. | Can receive workflow context when `context:workflow` is granted. |
+| Slot | Default size | Hard limits | Maximum |
+| --- | --- | --- | ---: |
+| `app.top-nav.actions.before` | 160×32 px | 320×40 px | 2 |
+| `app.top-nav.actions.after` | 160×32 px | 320×40 px | 2 |
+| `app.top-nav.sub-nav` | 100%×48 px | 1200×240 px when fixed | 2 |
+| `workflow.header.after-details` | 100%×160 px | 1200×640 px when fixed | 4 |
 
-Each slot renders a stable host element with a `data-temporal-extension-slot`
-attribute. The workflow header slot also exposes:
+Leave `defaultWidth` unset for a fluid block extension. It fills 100% of its
+slot container without requiring `maxWidth`; optional width bounds apply only
+after configuring or requesting a fixed pixel width.
 
-```html
-data-temporal-namespace
-data-temporal-workflow-id
-data-temporal-run-id
-```
+The two top-navigation action slots are desktop-only. The sub-navigation and
+workflow block slots can render at mobile widths; a future contribution API
+will support host-rendered mobile navigation.
 
-Those attributes are available on the host slot element for browser-extension
-style integrations. Iframe extensions should prefer the `postMessage` context
-protocol described below.
+## Route patterns and public paths
 
-## Route Patterns
-
-`routePatterns` limit an extension to matching Temporal UI routes. Patterns use
-path-style parameters:
+Patterns are written against the application path without the configured UI
+public path:
 
 ```yaml
 routePatterns:
@@ -199,305 +181,249 @@ routePatterns:
   - /namespaces/:namespace/workflows/:workflow/:run/*
 ```
 
-If a pattern ends in `/*`, Temporal UI also treats the same path without the
-trailing wildcard as a match. For example, this pattern:
+A terminal `/*` also matches the corresponding route without a trailing
+segment. Temporal UI removes its configured base path before matching.
 
-```txt
-/namespaces/:namespace/workflows/:workflow/:run/*
-```
+For the limited same-origin, unauthenticated development mode, a root-relative
+`src` is resolved beneath the Temporal UI base path. Production entrypoints must
+be absolute HTTPS URLs.
 
-matches both the workflow run root page and nested workflow run pages.
+## Permissions
 
-## URL And Origin Rules
+Permissions default to none:
 
-Temporal UI validates extension URLs before rendering:
+| Permission | Effect |
+| --- | --- |
+| `context:route` | Sends raw application pathname, search string, and route parameters. These can contain workflow identifiers or user-entered queries. |
+| `context:namespace` | Sends the active namespace. |
+| `context:workflow` | Sends workflow ID, run ID, status, task queue, and workflow type when available. |
+| `navigation:write` | Accepts navigation requests to approved Temporal UI application routes under the configured base path. |
 
-- `src` must resolve to an HTTPS URL, or to a local HTTP development URL such as
-  `http://localhost`, `http://127.0.0.1`, or `http://[::1]`.
-- Relative `src` values resolve against the current Temporal UI origin.
-- `allowedOrigin: self` resolves to the current Temporal UI origin.
-- Explicit `allowedOrigin` values must be HTTPS, except local HTTP development
-  origins.
-- Wildcard and empty origins are rejected.
-- The resolved `src.origin` must exactly match the resolved `allowedOrigin`.
+Any permission makes an extension privileged, requiring a dedicated HTTPS
+origin and `allowSameOrigin: true`. Granting `context:workflow` does not
+implicitly grant the raw route or query string.
 
-For a static file served by Temporal UI, use:
+The origin—not an individual URL path or iframe—is the browser security
+principal. Pages on the same extension origin can share storage, workers, and
+messaging. Treat every permission granted to one extension as available to all
+code hosted on that origin, and use separate origins for different trust or
+permission boundaries.
 
-```yaml
-src: /custom-ui-examples/status.html
-allowedOrigin: self
-```
+Host-provided context is display data, not an authentication credential. An
+extension backend must use its own session or an operator-controlled,
+audience-restricted credential.
 
-For a remote extension, use:
+## Sandbox and browser capabilities
 
-```yaml
-src: https://extensions.example.com/status.html
-allowedOrigin: https://extensions.example.com
-```
+Every iframe has `allow-scripts`. Operators may additionally enable:
 
-Some remote sites cannot be embedded because their own `X-Frame-Options` or
-Content Security Policy `frame-ancestors` headers block iframes. In that case,
-Temporal UI configuration is correct but the browser will still refuse to render
-the page.
-
-## Sandbox
-
-Every extension iframe runs with `allow-scripts`. Other sandbox capabilities are
-disabled unless explicitly configured:
-
-```yaml
-sandbox:
-  allowDownloads: false
-  allowForms: true
-  allowModals: false
-  allowPopups: true
-  allowPopupsToEscapeSandbox: false
-  allowSameOrigin: false
-```
-
-Supported sandbox fields:
-
-| Field | Iframe sandbox token |
+| Configuration | Sandbox token |
 | --- | --- |
 | `allowDownloads` | `allow-downloads` |
 | `allowForms` | `allow-forms` |
 | `allowModals` | `allow-modals` |
 | `allowPopups` | `allow-popups` |
-| `allowPopupsToEscapeSandbox` | `allow-popups allow-popups-to-escape-sandbox` |
 | `allowSameOrigin` | `allow-same-origin` |
 
-By default, extensions do not use `allow-same-origin`. Browser messages from
-that sandbox arrive with origin `null`, so Temporal UI validates both the
-configured iframe `src` and the `event.source` window. If `allowSameOrigin` is
-enabled, messages must come from the configured `allowedOrigin`.
+`allow-popups-to-escape-sandbox` is intentionally unsupported. External URLs
+should be normal links inside the sandbox or, in a future protocol version, a
+host-mediated action.
 
-Temporal UI only honors `allowSameOrigin` for extensions hosted on a dedicated
-HTTPS origin that is different from the Temporal UI origin. It is ignored for
-`allowedOrigin: self`, relative same-origin `src` values, and local HTTP
-development origins. Extensions that need `allowSameOrigin` should be hosted on
-a separate HTTPS subdomain, for example
-`https://temporal-ui-extensions.example.com`.
+The host also sets `referrerPolicy="no-referrer"` and denies powerful delegated
+browser features such as camera, microphone, geolocation, payment, USB, and
+screen capture through the iframe Permissions Policy.
 
-Only enable sandbox permissions the extension actually needs.
+## Message protocol
 
-## Sizing
-
-The host iframe container uses configured initial dimensions and accepts resize
-messages from the extension.
-
-Default and bounds:
-
-| Dimension | Default | Minimum fallback | Maximum fallback |
-| --- | ---: | ---: | ---: |
-| Height | `160` | `32` | `800` |
-| Width | `100%` | `32` | `1200` |
-
-If `defaultWidth` is omitted, the iframe container fills the available width.
-If `defaultWidth` is set, the host uses a fixed pixel width clamped by
-`minWidth` and `maxWidth`.
-
-Resize messages are throttled by the host, so extensions should send them when
-content changes rather than in a tight loop.
-
-## Host Messages
-
-Temporal UI sends messages to the iframe after it loads, when the extension sends
-`ready`, and when context or theme changes.
-
-Context message:
+Every message contains:
 
 ```ts
 {
-  type: 'temporal-ui/context',
-  version: 1,
-  extensionId: string,
-  context: {
-    uiVersion: string,
-    temporalVersion?: string,
-    basePath: string,
-    route: {
-      pathname: string,
-      search: string,
-      params: Record<string, string>
-    },
-    namespace?: string,
-    workflow?: {
-      workflowId: string,
-      runId: string,
-      status?: string,
-      taskQueue?: string,
-      workflowType?: string
-    },
-    user?: {
-      email?: string
-    }
-  }
+  version: 1;
+  extensionId: string;
 }
 ```
 
-Theme message:
+All messages after `hello` also contain the current random `instanceId`.
+
+### Handshake
+
+An extension may send `hello` whenever it needs the current welcome message:
+
+```ts
+window.parent.postMessage(
+  {
+    type: 'temporal-extension/hello',
+    version: 1,
+    extensionId: 'workflow-operations',
+  },
+  '*',
+);
+```
+
+`hello` contains no sensitive information. The host validates the iframe window
+and configured origin, then responds:
 
 ```ts
 {
-  type: 'temporal-ui/theme',
+  type: 'temporal-ui/welcome',
   version: 1,
-  extensionId: string,
-  theme: 'light' | 'dark'
+  extensionId: 'workflow-operations',
+  instanceId: 'random-per-load-id',
+  permissions: ['context:namespace', 'context:workflow']
 }
 ```
 
-Workflow context is only included when the slot has workflow data and the
-extension has the `context:workflow` permission. User context is only included
-when the host provides user data and the extension has the `context:user`
-permission.
-
-## Extension Messages
-
-All extension-to-host messages must include:
-
-```ts
-{
-  version: 1,
-  extensionId: 'the-configured-extension-id'
-}
-```
-
-### Ready
-
-Send this when the extension has initialized and wants the latest host state:
+After validating the host origin and message source, echo `instanceId` in
+`ready`. Context is not sent before this acknowledgement.
 
 ```ts
 window.parent.postMessage(
   {
     type: 'temporal-extension/ready',
     version: 1,
-    extensionId: 'workflow-header-summary',
+    extensionId: 'workflow-operations',
+    instanceId,
   },
-  '*',
+  temporalUiOrigin,
 );
 ```
 
-### Resize
+### Host messages
 
-Send this when the extension needs a different iframe size:
+- `temporal-ui/context` contains only the fields granted by permissions.
+- `temporal-ui/theme` contains `theme: 'light' | 'dark'`.
+- `temporal-ui/viewport` contains the slot name and current host-owned width and
+  height.
+
+Each host message includes `version`, `extensionId`, and `instanceId`.
+
+### Extension messages
+
+Resize requests are RAF-coalesced and clamped to both the configured bounds and
+the hard slot policy:
 
 ```ts
 window.parent.postMessage(
   {
     type: 'temporal-extension/resize',
     version: 1,
-    extensionId: 'workflow-header-summary',
+    extensionId: 'workflow-operations',
+    instanceId,
     height: document.documentElement.scrollHeight,
-    width: 400,
   },
-  '*',
+  temporalUiOrigin,
 );
 ```
 
-`height` and `width` are optional, but at least one must be present. Values must
-be finite numbers. The host clamps them to the configured sizing bounds.
-
-### Navigate
-
-Send this to request navigation within Temporal UI:
+Internal navigation additionally requires `navigation:write`:
 
 ```ts
 window.parent.postMessage(
   {
     type: 'temporal-extension/navigate',
     version: 1,
-    extensionId: 'workflow-header-summary',
+    extensionId: 'workflow-operations',
+    instanceId,
     href: '/namespaces/default/workflows',
   },
+  temporalUiOrigin,
+);
+```
+
+Navigation is restricted to Temporal UI application roots under its configured
+base path. API, authentication, asset, unrelated same-origin, and external URLs
+are rejected.
+
+## Minimal extension listener
+
+Put the listener in an external script so it remains compatible with a strict
+`default-src 'self'` Content Security Policy. The checked-in example contains a
+more complete implementation.
+
+```js
+const extensionId = 'workflow-operations';
+const allowedTemporalUiOrigins = new Set(['https://temporal.example.com']);
+let instanceId;
+let temporalUiOrigin;
+
+const send = (type, values = {}) => {
+  if (!instanceId || !temporalUiOrigin) return;
+  window.parent.postMessage(
+    { type, version: 1, extensionId, instanceId, ...values },
+    temporalUiOrigin,
+  );
+};
+
+window.addEventListener('message', (event) => {
+  if (event.source !== window.parent) return;
+  if (!allowedTemporalUiOrigins.has(event.origin)) return;
+  if (event.data?.version !== 1) return;
+  if (event.data?.extensionId !== extensionId) return;
+
+  if (event.data.type === 'temporal-ui/welcome') {
+    if (typeof event.data.instanceId !== 'string' || !event.data.instanceId) {
+      return;
+    }
+    temporalUiOrigin = event.origin;
+    instanceId = event.data.instanceId;
+    send('temporal-extension/ready');
+    return;
+  }
+
+  if (event.data.instanceId !== instanceId) return;
+
+  if (event.data.type === 'temporal-ui/theme') {
+    document.documentElement.dataset.theme = event.data.theme;
+  }
+
+  if (event.data.type === 'temporal-ui/context') {
+    // Render from the explicitly granted context using textContent.
+  }
+});
+
+window.parent.postMessage(
+  { type: 'temporal-extension/hello', version: 1, extensionId },
   '*',
 );
 ```
 
-Navigation is ignored unless the extension has the `navigation:write`
-permission. Even with that permission, only same-origin Temporal UI paths are
-accepted. External navigation requests are ignored.
+The extension server should also return a policy similar to:
 
-## Permissions
-
-Permissions are opt-in. Configure only what an extension needs:
-
-| Permission | Effect |
-| --- | --- |
-| `context:workflow` | Includes workflow context in host context messages when the slot provides it. |
-| `context:user` | Includes user context when the host provides it. |
-| `navigation:write` | Allows the extension to request same-origin Temporal UI navigation. |
-
-Without `context:workflow`, workflow fields are stripped from context messages
-even in workflow slots.
-
-## Extension Author Checklist
-
-When building an extension page:
-
-1. Render a standalone HTML page that works inside an iframe.
-2. Keep the body margin at `0` and avoid page scrollbars unless intentional.
-3. Use the configured extension `id` as every message's `extensionId`.
-4. Send `temporal-extension/ready` after startup.
-5. Listen for `temporal-ui/theme` and apply light or dark styling.
-6. Listen for `temporal-ui/context` and update UI from the read-only context.
-7. Send `temporal-extension/resize` after content changes.
-8. Host the page on the same origin as `allowedOrigin`.
-9. Avoid broad sandbox permissions.
-
-## Adding A New Slot To Temporal UI
-
-UI contributors can add new extension points by rendering `ExtensionSlot` in a
-stable location:
-
-```svelte
-<ExtensionSlot
-  name="workflow.header.after-details"
-  class="flex w-full flex-col gap-2"
-  context={{
-    workflow: {
-      workflowId,
-      runId,
-      status: workflow?.status,
-      taskQueue: workflow?.taskQueue,
-      workflowType: workflow?.name,
-    },
-  }}
-/>
+```http
+Content-Security-Policy: default-src 'self'; frame-ancestors https://temporal.example.com
 ```
 
-Choose slot names that describe the UI surface and placement. Keep names stable;
-they become configuration contracts for operators. When the slot provides
-sensitive or high-cardinality context, pair it with an explicit permission and
-filter that context through the host protocol.
+Define a suitably narrow `connect-src`, `img-src`, and other directives for the
+extension itself.
 
-## Troubleshooting
+## Adding a slot inside Temporal UI
 
-If an extension does not appear:
+Slots are a public contract. Add the slot name and layout policy to the typed
+registry, add matching server validation, render `ExtensionSlot` in a stable
+location, and add browser coverage for disabled, desktop, mobile, and maximum
+layout behavior. Do not accept an arbitrary string-only slot.
 
-- Confirm `customUi.enabled` is `true`.
-- Confirm the configured `slot` exactly matches a mounted slot.
-- Confirm the current route matches `routePatterns`.
-- Confirm `src` and `allowedOrigin` resolve to the same origin.
-- Use HTTPS for remote extensions.
-- Check browser console errors for iframe blocking headers such as
-  `X-Frame-Options` or CSP `frame-ancestors`.
-- Set a visible `defaultHeight`; an iframe with tiny content can otherwise look
-  empty.
+## Testing and troubleshooting
 
-If messages are ignored:
+If an extension does not render, check:
 
-- Confirm `extensionId` matches the configured `id`.
-- Confirm `version` is `1`.
-- Confirm the message `type` is one of the supported protocol messages.
-- For workflow data, confirm `permissions` includes `context:workflow`.
-- For navigation, confirm `permissions` includes `navigation:write` and `href`
-  points to the same Temporal UI origin.
+- the server configuration validation error;
+- that authentication has completed before `/api/v1/ui-extensions` is fetched;
+- the exact `src` and `allowedOrigin` origins;
+- HTTPS and `allowSameOrigin: true` for every permissioned extension;
+- the extension response's CSP `frame-ancestors` and `X-Frame-Options` headers;
+- the base-path-independent route pattern;
+- the browser console for CSP or iframe errors.
 
-## Related Files
+If messages are ignored, check the message source, both exact origins, version,
+extension ID, current instance ID, ready state, and configured permission.
 
-- `docs/custom-ui-iframes.md` contains a shorter overview.
-- `server/config/development.yaml` contains local example configuration.
-- `static/custom-ui-examples/` contains example iframe pages.
-- `src/lib/components/extensions/` contains the Svelte host components.
-- `src/lib/extensions/` contains URL validation, sizing, routing, and message
-  helpers.
+Relevant implementation files:
+
+- `server/server/config/custom_ui.go`
+- `server/server/api/handler.go`
+- `src/lib/components/extensions/`
+- `src/lib/extensions/iframe-extensions.ts`
+- `src/lib/extensions/messages.ts`
+- `src/lib/extensions/types.ts`
