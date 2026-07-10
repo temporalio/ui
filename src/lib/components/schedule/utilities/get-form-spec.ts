@@ -26,9 +26,21 @@ export function getFormSpecFromSpec(
           calendar?.dayOfWeek ?? [{ start: 0, end: 6, step: 1 }],
           0,
         ),
-        hour: defaultMissingRangeStart(calendar.hour, 0),
-        minute: defaultMissingRangeStart(calendar.minute, 0),
-        second: defaultMissingRangeStart(calendar.second, 0),
+        // An absent second/minute/hour must default to 0, not an empty range.
+        // if we use an empty range, that tells the server to exclude everything
+        // and no future runs will occur.
+        hour: defaultMissingRangeStart(
+          calendar.hour ?? [{ start: 0, end: 0, step: 1 }],
+          0,
+        ),
+        minute: defaultMissingRangeStart(
+          calendar.minute ?? [{ start: 0, end: 0, step: 1 }],
+          0,
+        ),
+        second: defaultMissingRangeStart(
+          calendar.second ?? [{ start: 0, end: 0, step: 1 }],
+          0,
+        ),
         month: calendar.month ?? [{ start: 1, end: 12, step: 1 }],
         year: calendar.year,
         comment: calendar.comment ?? '',
