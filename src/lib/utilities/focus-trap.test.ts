@@ -141,7 +141,6 @@ describe('focusTrap focus management (inert-based)', () => {
   it('does not inert a background sibling marked data-inert-skip (hoisted live region)', () => {
     const liveRegion = document.createElement('div');
     liveRegion.setAttribute('data-inert-skip', '');
-    liveRegion.setAttribute('aria-live', 'polite');
     const background = document.createElement('div');
     background.appendChild(document.createElement('button'));
     const trapNode = document.createElement('div');
