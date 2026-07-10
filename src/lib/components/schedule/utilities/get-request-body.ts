@@ -143,11 +143,22 @@ async function getScheduleActionRequest(
 
 type SpecFormItem = FormScheduleSchema['specs'][number];
 
+const defaultTimeRange = () => [{ start: 0, end: 0, step: 1 }];
+
+// An empty second/minute/hour range tells the server to exclude everything, so
+// the schedule gets no future runs. Default emptied fields to 0 so a cleared
+// calendar (or a spec loaded without these fields) still fires.
 function toStructuredCalendar(
   calendar: SpecFormItem['calendar'],
 ): StructuredCalendar {
   const { comment, ...ranges } = calendar;
-  return { ...ranges, ...(comment ? { comment } : {}) };
+  return {
+    ...ranges,
+    second: ranges.second?.length ? ranges.second : defaultTimeRange(),
+    minute: ranges.minute?.length ? ranges.minute : defaultTimeRange(),
+    hour: ranges.hour?.length ? ranges.hour : defaultTimeRange(),
+    ...(comment ? { comment } : {}),
+  };
 }
 
 function toInterval(interval: SpecFormItem['interval']): ScheduleInterval {
