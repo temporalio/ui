@@ -22,6 +22,12 @@
     config?: GraphConfig;
     label?: boolean;
     children?: Snippet;
+    /**
+     * Pass any value that captures the rendered content (e.g. the decoded text).
+     * Whenever it changes, the text bbox is re-measured so the background rect
+     * stays sized to the actual text.
+     */
+    contentKey?: unknown;
   };
 
   let {
@@ -37,17 +43,24 @@
     config = undefined,
     label = false,
     children,
+    contentKey,
   }: Props = $props();
 
   const [x, y] = $derived(point);
 
-  let textElement: SVGTextElement = $state();
+  let textElement: SVGTextElement | undefined = $state();
 
-  const showIcon = $derived(icon && config);
-  const textWidth = $derived(textElement?.getBBox()?.width || 0);
-  const backdropWidth = $derived(showIcon ? textWidth + 36 : textWidth + 12);
+  const iconInfo = $derived(icon && config ? { icon, config } : undefined);
+  let textBBox = $state<DOMRect | undefined>();
+  $effect(() => {
+    void contentKey;
+    if (textElement) textBBox = textElement.getBBox();
+  });
+  const textWidth = $derived(textBBox?.width || 0);
+  const textHeight = $derived(textBBox?.height || 0);
+  const backdropWidth = $derived(iconInfo ? textWidth + 36 : textWidth + 12);
   const textX = $derived(
-    showIcon && textAnchor === 'start' ? x + config.radius * 2 : x,
+    iconInfo && textAnchor === 'start' ? x + iconInfo.config.radius * 2 : x,
   );
 </script>
 
@@ -59,15 +72,25 @@
     strokeWidth={backdropHeight}
   />
 {/if}
-{#if showIcon}
+{#if iconInfo}
   <Icon
-    name={icon}
+    name={iconInfo.icon}
     x={textAnchor === 'end' ? x - textWidth - backdropHeight : x}
     y={y - 8}
     class={!backdrop ? 'text-primary' : 'text-white'}
   />
 {/if}
 {#key textX}
+  {#if !backdrop}
+    <rect
+      x={textBBox?.x ?? 0}
+      y={y - textHeight / 2}
+      width={textWidth}
+      height={textHeight}
+      class="text-background"
+      pointer-events="none"
+    />
+  {/if}
   <text
     bind:this={textElement}
     class="cursor-pointer select-none outline-none {category} text-primary"
@@ -91,6 +114,10 @@
     stroke: none;
     dominant-baseline: middle;
     alignment-baseline: baseline;
+  }
+
+  rect.text-background {
+    fill: rgb(var(--color-surface-primary));
   }
 
   text.backdrop {

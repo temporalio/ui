@@ -103,6 +103,8 @@
         <Button variant="destructive" on:click={onRemove}>
           {translate('deployments.remove-ramping')}
         </Button>
+      {:else}
+        <div></div>
       {/if}
     </svelte:fragment>
   </Modal>

@@ -30,10 +30,10 @@
 </script>
 
 <div
-  class="flex items-center justify-between pb-2 group-data-[nav=closed]:flex-col group-data-[nav=closed]:gap-2"
+  class="flex min-h-7 items-center justify-between pb-2 group-data-[nav=closed]:justify-center"
 >
   <div
-    class="flex flex-row items-center justify-start group-data-[nav=open]:min-h-7"
+    class="flex flex-row items-center justify-start group-data-[nav=closed]:hidden"
   >
     <a href={resolve('', {})} class="text-inherit flex items-center">
       <Logo

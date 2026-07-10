@@ -299,6 +299,13 @@
   bucket: 2
   severity: moderate
   scope: ui-main
+- slug: 2.4.6-cloud-drawer-content-empty-title
+  sc: '2.4.6'
+  bucket: 2
+  severity: moderate
+  scope: universal
+  files-touched:
+    - src/lib/holocene/drawer-content.svelte
 - slug: 2.4.6-ui-main-datepicker-empty-label
   sc: '2.4.6'
   bucket: 2
@@ -314,11 +321,32 @@
   bucket: 3
   severity: serious
   scope: ui-main
+- slug: 2.5.8-chip-remove-button
+  sc: '2.5.8'
+  bucket: 1
+  severity: moderate
+  scope: ui-main
+  files-touched:
+    - src/lib/holocene/chip.svelte
+- slug: 2.5.8-labelhidden-checkbox
+  sc: '2.5.8'
+  bucket: 1
+  severity: serious
+  scope: ui-main
+  files-touched:
+    - src/lib/holocene/checkbox.svelte
 - slug: 2.5.8-pagination-caret-buttons
   sc: '2.5.8'
   bucket: 2
   severity: serious
   scope: ui-main
+- slug: 2.5.8-toast-close-button
+  sc: '2.5.8'
+  bucket: 3
+  severity: moderate
+  scope: ui-main
+  files-touched:
+    - src/lib/holocene/toast.svelte
 - slug: 3.2.2-namespace-picker-on-change-navigation
   sc: '3.2.2'
   bucket: 2

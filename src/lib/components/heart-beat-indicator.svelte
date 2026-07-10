@@ -8,7 +8,7 @@
   const cssVarStyles = $derived(`--animation-delay:${delay}ms;`);
 </script>
 
-<div class="heart-beat" style={cssVarStyles}>
+<div class="heart-beat" style={cssVarStyles} aria-hidden="true">
   <div class="heart-rate">
     <svg
       version="1.0"

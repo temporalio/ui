@@ -12,7 +12,9 @@
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
-  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
+  import DurationInput, {
+    parseDuration,
+  } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -27,7 +29,9 @@
   import { getActivityPollers } from '$lib/services/pollers-service';
   import {
     fetchInitialValuesForStartActivity,
+    initialTimeoutUnit,
     startStandaloneActivity,
+    TIMEOUT_UNITS,
   } from '$lib/services/standalone-activities';
   import {
     customSearchAttributes,
@@ -48,6 +52,7 @@
   import type { StandaloneActivityFormDefaults } from './types';
   import Message from '../../form/message.svelte';
   import PayloadInputWithEncoding from '../../payload-input-with-encoding.svelte';
+  import RandomUuidButton from '../../random-uuid-button.svelte';
   import RetryPolicyInput from '../../retry-policy-input.svelte';
   import AddSearchAttributes from '../../workflow/add-search-attributes.svelte';
 
@@ -75,6 +80,11 @@
   let searchAttributes = $state<SearchAttributesSchema>([]);
   let taskQueueActive = $state<boolean | null>(null);
   let advancedOptionsVisible = $state(false);
+
+  const isPositiveDuration = (value: string | undefined): boolean => {
+    const seconds = Number(parseDuration(value ?? ''));
+    return !isNaN(seconds) && seconds > 0;
+  };
 
   const schema = z
     .object({
@@ -106,7 +116,10 @@
       idConflictPolicy: z.string().optional(),
     })
     .superRefine((data, context) => {
-      if (!data.startToCloseTimeout && !data.scheduleToCloseTimeout) {
+      if (
+        !isPositiveDuration(data.startToCloseTimeout) &&
+        !isPositiveDuration(data.scheduleToCloseTimeout)
+      ) {
         context.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['startToCloseTimeout'],
@@ -219,10 +232,6 @@
     unsubscribe?.();
   });
 
-  const generateRandomId = () => {
-    $form.activityId = crypto.randomUUID();
-  };
-
   const checkTaskQueue = async (queue: string) => {
     if (!queue) return;
     taskQueueActive = null;
@@ -248,13 +257,7 @@
     hintText={$errors?.activityId?.[0]}
   >
     {#snippet afterInput()}
-      <Button
-        class="ml-2.5"
-        variant="secondary"
-        on:click={generateRandomId}
-        leadingIcon="retry"
-        >{translate('standalone-activities.form-random-uuid')}</Button
-      >
+      <RandomUuidButton class="ml-2.5" bind:value={$form.activityId} />
     {/snippet}
   </Input>
 
@@ -312,11 +315,13 @@
       label={translate(
         'standalone-activities.form-start-to-close-timeout-label',
       )}
-      required={!$form.scheduleToCloseTimeout}
+      required={!isPositiveDuration($form.scheduleToCloseTimeout)}
       hintText={translate(
         'standalone-activities.form-start-to-close-timeout-hint',
       )}
       bind:value={$form.startToCloseTimeout}
+      initialUnit={initialTimeoutUnit($form.startToCloseTimeout)}
+      units={TIMEOUT_UNITS}
     />
 
     <DurationInput
@@ -324,11 +329,13 @@
       label={translate(
         'standalone-activities.form-schedule-to-close-timeout-label',
       )}
-      required={!$form.startToCloseTimeout}
+      required={!isPositiveDuration($form.startToCloseTimeout)}
       hintText={translate(
         'standalone-activities.form-schedule-to-close-timeout-hint',
       )}
       bind:value={$form.scheduleToCloseTimeout}
+      initialUnit={initialTimeoutUnit($form.scheduleToCloseTimeout)}
+      units={TIMEOUT_UNITS}
     />
 
     <DurationInput
@@ -340,6 +347,8 @@
         'standalone-activities.form-schedule-to-start-timeout-hint',
       )}
       bind:value={$form.scheduleToStartTimeout}
+      initialUnit={initialTimeoutUnit($form.scheduleToStartTimeout)}
+      units={TIMEOUT_UNITS}
     />
 
     {#if $errors.startToCloseTimeout}
@@ -408,6 +417,8 @@
           'standalone-activities.form-heartbeat-timeout-hint',
         )}
         bind:value={$form.heartbeatTimeout}
+        initialUnit={initialTimeoutUnit($form.heartbeatTimeout)}
+        units={TIMEOUT_UNITS}
       />
     </Card>
 
@@ -419,7 +430,7 @@
         id="start-standalone-activity-id-reuse-policy-select"
         bind:value={$form.idReusePolicy}
       >
-        {#each activityIDReusePolicyOptions as option}
+        {#each activityIDReusePolicyOptions as option, i (i)}
           <Option value={option}
             >{fromScreamingEnum(option, 'ActivityIdReusePolicy')}</Option
           >
@@ -431,7 +442,7 @@
         id="start-standalone-activity-id-conflict-policy-select"
         bind:value={$form.idConflictPolicy}
       >
-        {#each activityIDConflictPolicyOptions as option}
+        {#each activityIDConflictPolicyOptions as option, i (i)}
           <Option value={option}
             >{fromScreamingEnum(option, 'ActivityIdConflictPolicy')}</Option
           >

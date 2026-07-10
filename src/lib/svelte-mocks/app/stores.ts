@@ -15,6 +15,7 @@ const settings: Settings = {
   auth: {
     enabled: false,
     options: null,
+    redirectToProvider: false,
   },
   baseUrl: 'http://localhost:3000',
   codec: {
@@ -25,6 +26,7 @@ const settings: Settings = {
   defaultNamespace: 'default',
   disableWriteActions: false,
   showTemporalSystemNamespace: false,
+  navCollapsedByDefault: false,
   batchActionsDisabled: false,
   workflowResetDisabled: false,
   workflowPauseDisabled: false,
@@ -35,6 +37,7 @@ const settings: Settings = {
   hideWorkflowQueryErrors: false,
   activityCommandsDisabled: false,
   feedbackURL: '',
+  disableNewsFetch: false,
   runtimeEnvironment: {
     isCloud: false,
     isLocal: true,

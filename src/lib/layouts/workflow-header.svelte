@@ -6,8 +6,11 @@
   import { page } from '$app/state';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
+  import { DetailListTimestampValue } from '$lib/components/detail-list';
+  import DetailListLabel from '$lib/components/detail-list/detail-list-label.svelte';
+  import DetailListValue from '$lib/components/detail-list/detail-list-value.svelte';
+  import DetailList from '$lib/components/detail-list/detail-list.svelte';
   import WorkflowDetails from '$lib/components/lines-and-dots/workflow-details.svelte';
-  import { timestamp } from '$lib/components/timestamp.svelte';
   import NoWorkersPollingAlert from '$lib/components/workers/no-workers-polling-alert.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -33,6 +36,7 @@
     getWorkflowNexusLinksFromHistory,
     getWorkflowRelationships,
   } from '$lib/utilities/get-workflow-relationships';
+  import { isRunningWithNoWorkers } from '$lib/utilities/is-running-with-no-workers';
   import { pathMatches } from '$lib/utilities/path-matches';
   import {
     routeForCallStack,
@@ -61,6 +65,10 @@
   let { headerSnippet }: { headerSnippet?: Snippet } = $props();
 
   const { workflow } = $derived($workflowRun);
+  const runningWithNoWorkers = $derived(isRunningWithNoWorkers($workflowRun));
+  const workerDeployment = $derived(
+    workflow?.searchAttributes?.indexedFields?.['TemporalWorkerDeployment'],
+  );
   const routeParameters = $derived({
     namespace,
     workflow: workflowId,
@@ -140,6 +148,7 @@
         <WorkflowStatus
           status={workflow?.status}
           big
+          announce
           delayed={workflow ? isWorkflowDelayed(workflow) : false}
           taskFailure={workflow ? isWorkflowTaskFailure(workflow) : false}
         />
@@ -194,6 +203,7 @@
     </div>
   {/if}
   {#if isPaused}
+    {@const pauseInfo = workflow?.workflowExtendedInfo.pauseInfo}
     <div in:fly={{ duration: 200, delay: 100 }}>
       <Alert
         icon="info"
@@ -209,15 +219,24 @@
             <li>{translate('workflows.workflow-pause-description-item-2')}</li>
             <li>{translate('workflows.workflow-pause-description-item-3')}</li>
           </ul>
-          {#if workflow?.workflowExtendedInfo?.pauseInfo?.reason}
-            <div>
-              <p>{translate('workflows.workflow-paused-reason')}</p>
-              <p class="text-secondary">
-                {workflow.workflowExtendedInfo.pauseInfo.reason} • {$timestamp(
-                  workflow.workflowExtendedInfo.pauseInfo.pausedTime,
-                )}
-              </p>
-            </div>
+          {#if pauseInfo}
+            <DetailList aria-label="pause details" rowCount={3}>
+              {#if pauseInfo.identity}
+                <DetailListLabel>{translate('common.identity')}</DetailListLabel
+                >
+                <DetailListValue
+                  >{pauseInfo.identity ?? 'test@temporal.io'}</DetailListValue
+                >
+              {/if}
+              <DetailListLabel
+                >{translate('workflows.paused-time')}</DetailListLabel
+              >
+              <DetailListTimestampValue timestamp={pauseInfo.pausedTime} />
+              {#if pauseInfo.reason}
+                <DetailListLabel>{translate('common.reason')}</DetailListLabel>
+                <DetailListValue>{pauseInfo.reason}</DetailListValue>
+              {/if}
+            </DetailList>
           {/if}
         </div>
       </Alert>
@@ -245,7 +264,12 @@
   {#if headerSnippet}
     {@render headerSnippet()}
   {/if}
-  <NoWorkersPollingAlert />
+  <NoWorkersPollingAlert
+    {namespace}
+    taskQueue={workflow?.taskQueue ?? ''}
+    {runningWithNoWorkers}
+    deployment={workerDeployment}
+  />
   <Tabs>
     <TabList label="workflow detail">
       <Tab

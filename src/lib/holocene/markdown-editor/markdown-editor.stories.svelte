@@ -45,4 +45,5 @@
   <MarkdownEditor {...args} />
 </Template>
 
-<Story name="default" {play} />
+<!-- preview iframe hits the /render server route, which 404s in Chromatic's static build -->
+<Story name="default" {play} parameters={{ chromatic: { disable: true } }} />

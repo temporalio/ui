@@ -13,21 +13,28 @@
     onRetry: () => void;
   }
 
-  let { buildId, open, loading, result, onClose, onRetry }: Props = $props();
+  let {
+    buildId,
+    open = $bindable(),
+    loading,
+    result,
+    onClose,
+    onRetry,
+  }: Props = $props();
 
   const isValid = $derived(!result?.message);
 </script>
 
 <Modal
   id="validate-connection-modal-{buildId}"
-  {open}
+  bind:open
   confirmText=""
   cancelText=""
   hideCancel
   hideConfirm
 >
   <h3 slot="title">
-    {translate('deployments.validate-connection')}
+    {translate('deployments.validate-connection-for')}
     <span class="font-mono text-secondary">{buildId}</span>
   </h3>
   <svelte:fragment slot="footer">

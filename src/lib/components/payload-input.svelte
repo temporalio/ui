@@ -15,6 +15,8 @@
     loading?: boolean;
     hintText?: string;
     editing?: boolean;
+    placeholder?: string;
+    copyable?: boolean;
   }
 
   let {
@@ -25,6 +27,8 @@
     loading = $bindable(false),
     hintText = translate('workflows.signal-payload-input-label-hint'),
     editing = true,
+    placeholder,
+    copyable = false,
   }: Props = $props();
 
   const isValidInput = (value: string) => {
@@ -71,12 +75,13 @@
         content={input}
         onchange={handleInputChange}
         editable={editing}
-        copyable={false}
+        {copyable}
+        {placeholder}
       />
     {/key}
     {#if editing}
       <Tooltip text={translate('common.upload-json')} topRight>
-        <FileInput id="{id}-input-file-upload" {onUpload} />
+        <FileInput class="h-full" id="{id}-input-file-upload" {onUpload} />
       </Tooltip>
     {/if}
   </div>

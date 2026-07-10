@@ -62,7 +62,7 @@
   };
 </script>
 
-<g role="button" tabindex="0" class="relative z-50">
+<g class="relative z-50">
   <foreignObject {x} {y} {width} height={contentHeight}>
     <div bind:offsetHeight class="flex flex-col">
       <div
@@ -95,18 +95,17 @@
       {#if childWorkflowStartedEvent}
         <div class="surface-primary p-4">
           <div class="font-medium leading-4 text-secondary">Child Workflow</div>
-          {#key group.eventList.length}
-            <GraphWidget
-              {namespace}
-              workflowId={childWorkflowStartedEvent.attributes.workflowExecution
-                .workflowId}
-              runId={childWorkflowStartedEvent.attributes.workflowExecution
-                .runId}
-              viewportHeight={320}
-              class="surface-primary overflow-x-hidden border-t border-subtle"
-              onLoad={onDecode}
-            />
-          {/key}
+          <GraphWidget
+            {namespace}
+            workflowId={childWorkflowStartedEvent.attributes.workflowExecution
+              ?.workflowId}
+            runId={childWorkflowStartedEvent.attributes.workflowExecution
+              ?.runId}
+            eventCount={group.eventList.length}
+            viewportHeight={320}
+            class="surface-primary overflow-x-hidden border-t border-subtle"
+            onLoad={onDecode}
+          />
         </div>
       {/if}
     </div>

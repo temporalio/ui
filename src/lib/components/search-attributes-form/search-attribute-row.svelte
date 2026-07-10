@@ -5,6 +5,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
   import type { SearchAttributeTypeOption } from './types';
@@ -18,6 +19,8 @@
     error?: string;
     disableTypeForExisting?: boolean;
     isDeletable?: boolean;
+    isExisting?: boolean;
+    isCloud?: boolean;
     onRemove: () => void;
     onNameChange: (value: string) => void;
     onTypeChange: (value: string) => void;
@@ -32,16 +35,18 @@
     error,
     disableTypeForExisting = false,
     isDeletable = true,
+    isCloud = false,
+    isExisting = false,
     onRemove,
     onNameChange,
     onTypeChange,
   }: Props = $props();
 
   const isTypeDisabled = $derived(
-    submitting || (disableTypeForExisting && !isDeletable),
+    submitting || (disableTypeForExisting && isExisting),
   );
 
-  const isDeleteDisabled = $derived(submitting || !isDeletable);
+  const showButton = $derived(!isExisting || isDeletable);
 
   const hasError = $derived(!!error);
 
@@ -50,7 +55,7 @@
   };
 </script>
 
-<div class="grid grid-cols-[1fr,200px,auto] gap-3">
+<div class="grid grid-cols-[1fr,200px,2rem] items-center gap-3">
   <Input
     id={`attribute-name-${index}`}
     value={name}
@@ -63,30 +68,48 @@
     oninput={handleNameInput}
   />
 
-  <Select
-    id={`attribute-type-${index}`}
-    value={type}
-    label={translate('search-attributes.type-label', {
-      index: index + 1,
-    })}
-    labelHidden
-    disabled={isTypeDisabled}
-    placeholder={translate('search-attributes.select-type-placeholder')}
-    onChange={onTypeChange}
-  >
-    {#each supportedTypes as type}
-      <Option value={type.value}>{type.label}</Option>
-    {/each}
-  </Select>
+  <div class:col-span-2={!showButton}>
+    <Select
+      id={`attribute-type-${index}`}
+      value={type}
+      label={translate('search-attributes.type-label', {
+        index: index + 1,
+      })}
+      labelHidden
+      disabled={isTypeDisabled}
+      placeholder={translate('search-attributes.select-type-placeholder')}
+      onChange={onTypeChange}
+    >
+      {#each supportedTypes as type (`${type.label}:${type.value}`)}
+        <Option value={type.value}>{type.label}</Option>
+      {/each}
+    </Select>
+  </div>
 
-  <Button
-    variant="ghost"
-    size="xs"
-    on:click={onRemove}
-    disabled={isDeleteDisabled}
-    type="button"
-    leadingIcon="trash"
-  />
+  {#if !isExisting}
+    <Button
+      variant="ghost"
+      size="xs"
+      on:click={onRemove}
+      disabled={submitting}
+      leadingIcon="close"
+      class="rounded-full"
+    />
+  {:else if isDeletable}
+    <Tooltip
+      text={translate('search-attributes.cloud-delete-tooltip')}
+      hide={!isCloud}
+      topRight
+    >
+      <Button
+        variant="ghost"
+        size="xs"
+        on:click={onRemove}
+        disabled={submitting || isCloud}
+        leadingIcon="trash"
+      />
+    </Tooltip>
+  {/if}
 </div>
 
 {#if error}

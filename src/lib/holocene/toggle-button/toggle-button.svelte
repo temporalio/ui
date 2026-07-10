@@ -36,19 +36,21 @@
   export let base = href;
   export let active = false;
   export let variant: ComponentProps<Button>['variant'] = 'secondary';
+
+  $: pressed = href ? $page.url.pathname.includes(base) : active;
 </script>
 
 <Button
   on:click
   class={merge(
-    (href ? $page.url.pathname.includes(base) : active) &&
-      'bg-interactive-secondary-active',
+    pressed && 'bg-interactive-secondary-active',
     group && '[&:not(:last-child)]:border-r-0',
     className,
   )}
   data-track-name="toggle-button"
   {variant}
   href={href ? href + $page.url.search : null}
+  aria-pressed={pressed ? 'true' : 'false'}
   {...$$restProps}
 >
   {#if $$restProps.leadingIcon}

@@ -133,7 +133,7 @@
   };
 </script>
 
-<svelte:window onkeypress={escapeHandler} />
+<svelte:window onkeydown={escapeHandler} />
 
 {#if menuIsOpen}
   <div

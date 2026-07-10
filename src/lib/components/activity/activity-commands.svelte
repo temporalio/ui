@@ -52,8 +52,8 @@
     bottomLeft
     width={200}
     text={activity.paused
-      ? 'Resume this Activity'
-      : 'Pauses this Activity, starting before it retries or the next time it heartbeats. It won’t time out while it’s paused.'}
+      ? translate('activities.resume-tooltip')
+      : translate('activities.pause-tooltip')}
   >
     <Button
       variant="secondary"
