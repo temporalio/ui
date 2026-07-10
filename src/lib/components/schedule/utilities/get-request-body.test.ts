@@ -88,6 +88,29 @@ describe('getRequestBody', () => {
     ]);
   });
 
+  it('defaults emptied second/minute/hour ranges to zero', async () => {
+    const body = await getRequestBody(
+      buildForm({
+        specs: [
+          {
+            kind: 'week',
+            calendar: {
+              dayOfWeek: [{ start: 1, end: 5 }],
+              second: [],
+              minute: [],
+              hour: [],
+            },
+          },
+        ],
+      }),
+    );
+
+    const [calendar] = body.schedule.spec.structuredCalendar;
+    expect(calendar.second).toEqual([{ start: 0, end: 0, step: 1 }]);
+    expect(calendar.minute).toEqual([{ start: 0, end: 0, step: 1 }]);
+    expect(calendar.hour).toEqual([{ start: 0, end: 0, step: 1 }]);
+  });
+
   it('anchors the start time to midnight of the timezone', async () => {
     const body = await getRequestBody(buildForm());
 
