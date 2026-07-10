@@ -21,6 +21,23 @@ if (totalChanges > bigPRThreshold) {
   );
 }
 
+// Remind to cut a release when the Temporal API dependency is bumped
+async function checkApiVersionBump() {
+  if (!modified.includes('server/go.mod')) {
+    return;
+  }
+
+  const diff = await danger.git.diffForFile('server/go.mod');
+  if (diff?.added.includes('go.temporal.io/api')) {
+    warn(
+      '📦 `go.temporal.io/api` was bumped in `server/go.mod`. ' +
+        'Remember to cut a new release after this merges.',
+    );
+  }
+}
+
+schedule(checkApiVersionBump());
+
 interface StrictError {
   filename: string;
   start: { line: number; character: number };
