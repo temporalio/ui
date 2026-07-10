@@ -36,6 +36,8 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
+  import { BROWSER } from 'esm-env';
+  import { onDestroy } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
@@ -77,6 +79,18 @@
   $: show = message && !$dismissedBanners[id];
   $: role = getRole(type);
 
+  let bannerHeight = 0;
+
+  const setBannerHeight = (value: string) => {
+    if (BROWSER) {
+      document.documentElement.style.setProperty('--banner-height', value);
+    }
+  };
+
+  $: setBannerHeight(show ? `${bannerHeight}px` : '0px');
+
+  onDestroy(() => setBannerHeight('0px'));
+
   const dismissBanner = () => {
     $dismissedBanners[id] = true;
   };
@@ -87,6 +101,7 @@
     class={merge(types({ type }), className)}
     {role}
     aria-atomic="true"
+    bind:clientHeight={bannerHeight}
     {...$$restProps}
   >
     <span class="flex items-center gap-2">
