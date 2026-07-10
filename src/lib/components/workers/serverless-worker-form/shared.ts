@@ -37,13 +37,6 @@ const validateProviderFields = (
         path: ['lambdaArn'],
         message: 'Invalid Lambda ARN format',
       });
-    } else if (/:\$LATEST$/.test(data.lambdaArn)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['lambdaArn'],
-        message:
-          'Lambda ARN must reference a published version or alias, not $LATEST',
-      });
     }
     if (!data.iamRoleArn) {
       ctx.addIssue({
