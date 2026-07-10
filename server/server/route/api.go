@@ -65,15 +65,16 @@ func DisableWriteMiddleware(cfgProvider *config.ConfigProviderWithRefresh) echo.
 
 // SetAPIRoutes sets api routes
 func SetAPIRoutes(e *echo.Echo, cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []api.Middleware) error {
-
-	route := e.Group("/api/v1")
-	route.GET("/settings", api.GetSettings(cfgProvider))
-
-	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
 	conn, err := api.CreateGRPCConnection(cfgProvider)
 	if err != nil {
 		return fmt.Errorf("Failed to create gRPC connection to Temporal server: %w", err)
 	}
+
+	route := e.Group("/api/v1")
+	route.GET("/settings", api.GetSettings(cfgProvider))
+	route.GET("/ui-extensions", api.GetUIExtensions(cfgProvider, api.TemporalAccessCheck(conn, apiMiddleware)))
+
+	writeControlMiddleware := DisableWriteMiddleware(cfgProvider)
 
 	route.GET(
 		api.WorkflowRawHistoryUrl,

@@ -40,10 +40,17 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 
 	"github.com/labstack/echo/v4"
+
+	"github.com/temporalio/ui-server/v2/server/config"
 )
 
 // SetUIRoutes sets UI routes
-func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
+func SetUIRoutes(
+	e *echo.Echo,
+	publicPath string,
+	assets fs.FS,
+	cfgProvider *config.ConfigProviderWithRefresh,
+) error {
 	assetsHandler := buildUIAssetsHandler(assets)
 	e.GET("/_app/*", assetsHandler)
 	e.GET("/css/*", assetsHandler)
@@ -51,13 +58,12 @@ func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
 	e.GET("/android*", assetsHandler)
 	e.GET("/apple*", assetsHandler)
 	e.GET("/banner*", assetsHandler)
-	e.GET("/custom-ui-examples/*", assetsHandler)
 	e.GET("/favicon*", assetsHandler)
 	e.GET("/logo*", assetsHandler)
 	e.GET("/Temporal_Logo_Animation.gif", assetsHandler)
 	e.GET("/site.webmanifest", assetsHandler)
 	e.GET("/i18n/*", assetsHandler)
-	indexHandler, err := buildUIIndexHandler(publicPath, assets)
+	indexHandler, err := buildUIIndexHandler(publicPath, assets, cfgProvider)
 	if err != nil {
 		return err
 	}
@@ -72,7 +78,11 @@ func removeCSPMeta(htmlStr string) string {
 	return re.ReplaceAllString(htmlStr, "")
 }
 
-func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, error) {
+func buildUIIndexHandler(
+	publicPath string,
+	assets fs.FS,
+	cfgProvider *config.ConfigProviderWithRefresh,
+) (echo.HandlerFunc, error) {
 	indexHTMLBytes, err := fs.ReadFile(assets, "index.html")
 	if err != nil {
 		return nil, err
@@ -96,8 +106,24 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 			}
 			return c.Redirect(http.StatusPermanentRedirect, target)
 		}
+
+		cfg, err := cfgProvider.GetConfig()
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "unable to load UI configuration").SetInternal(err)
+		}
+		frameSources, err := cfg.CustomUI.IframeFrameSources(cfg.Auth.Enabled)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "invalid custom UI configuration").SetInternal(err)
+		}
+		c.Response().Header().Set("Content-Security-Policy", frameSourceCSP(frameSources))
+
 		return c.Stream(http.StatusOK, "text/html", bytes.NewBuffer(indexHTMLBytes))
 	}, nil
+}
+
+func frameSourceCSP(origins []string) string {
+	sources := append([]string{"'self'"}, origins...)
+	return "frame-src " + strings.Join(sources, " ") + ";"
 }
 
 func hasPathPrefix(p, prefix string) bool {

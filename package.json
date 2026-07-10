@@ -29,6 +29,8 @@
     "dev:temporal-cli": "vite dev --mode temporal-server",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --mode docker",
     "dev:with-auth": "vite dev --mode with-auth",
+    "dev:ui:extension-example": "TEMPORAL_UI_EXTENSION_EXAMPLE_ENABLED=true pnpm dev:local-temporal",
+    "dev:extension-example": "vite --config examples/custom-ui-extension/vite.config.ts",
     "build:local": "vite build",
     "build:docker": "VITE_API=http://localhost:8080 vite build",
     "build:server": "VITE_API= BUILD_PATH=server/ui/assets/local vite build",
