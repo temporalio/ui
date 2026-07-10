@@ -157,11 +157,14 @@ export const createWorkerDeploymentVersion = async (
 
 const toScalingGroupsPayload = (
   computeConfig: ComputeConfig,
-): Record<string, { scalingGroup: ComputeConfigScalingGroup }> =>
+): Record<
+  string,
+  { scalingGroup: ComputeConfigScalingGroup; updateMask: string }
+> =>
   Object.fromEntries(
     Object.entries(computeConfig.scalingGroups ?? {}).map(([name, group]) => [
       name,
-      { scalingGroup: group },
+      { scalingGroup: group, updateMask: 'provider,scaler' },
     ]),
   );
 
