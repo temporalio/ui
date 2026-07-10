@@ -64,6 +64,10 @@
 </script>
 
 {#if open && portalElement}
+  <!-- Order matters: use:portal must run before use:focusTrap. Actions set up
+  top-to-bottom, and focusTrap inerts everything outside this node by walking up
+  to <body> — so the node must already be portaled into its final location, or
+  the wrong siblings get inerted. -->
   <aside
     {id}
     class={merge(
@@ -77,6 +81,7 @@
     in:fly={flyParamsIn}
     out:fly={flyParamsOut}
     role="region"
+    tabindex="-1"
     use:portal
     use:focusTrap={true}
     use:clickoutside={onClick}
