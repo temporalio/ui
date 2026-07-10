@@ -59,7 +59,14 @@
     portalElement?.destroy();
     portalElement = null;
     if (wrapperEl && originalParent?.isConnected) {
-      originalParent.insertBefore(wrapperEl, originalNextSibling);
+      // The captured sibling may have been removed while maximized (e.g. a
+      // re-render); insertBefore throws if the ref node is no longer a child.
+      // Fall back to null (append to the end) in that case.
+      const referenceNode =
+        originalNextSibling?.parentNode === originalParent
+          ? originalNextSibling
+          : null;
+      originalParent.insertBefore(wrapperEl, referenceNode);
     }
     originalParent = null;
     originalNextSibling = null;
