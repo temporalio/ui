@@ -298,6 +298,72 @@ test.describe('iframe extension browser boundary', () => {
     expect(containerWidth).toBeCloseTo(contentWidth, 0);
   });
 
+  test('executes the checked-in example in an opaque unprivileged sandbox', async ({
+    page,
+  }, testInfo) => {
+    const temporalUIOrigin = originForBaseURL(testInfo.project.use.baseURL);
+    await installCustomUIExampleRoutes(page, temporalUIOrigin);
+
+    const opaqueExample = extension({
+      ID: 'local-extension-example',
+      Title: 'Opaque custom UI extension example',
+      Slot: 'app.top-nav.sub-nav',
+      Src: `${CUSTOM_UI_EXAMPLE_ORIGIN}/index.html`,
+      AllowedOrigin: CUSTOM_UI_EXAMPLE_ORIGIN,
+      Sandbox: {
+        AllowDownloads: false,
+        AllowForms: false,
+        AllowModals: false,
+        AllowPopups: false,
+        AllowSameOrigin: false,
+      },
+      Sizing: {
+        DefaultHeight: 112,
+        MinHeight: 72,
+        MaxHeight: 200,
+        DefaultWidth: 0,
+        MinWidth: 0,
+        MaxWidth: 0,
+      },
+      Permissions: [],
+    });
+    await gotoWorkflow(page, {
+      Enabled: true,
+      IframeExtensions: [opaqueExample],
+    });
+
+    const frame = await extensionFrame(page, opaqueExample.Title);
+    await expect(frame.locator('#connection-status')).toHaveText('Connected');
+    await expect(frame.locator('#theme-value')).toHaveText(/^(light|dark)$/);
+    await expect(frame.locator('#viewport-value')).toHaveText(/^\d+ × \d+ px$/);
+    await expect(frame.locator('#context-value')).toHaveText(
+      'No context permissions were granted.',
+    );
+    await expect(frame.locator('#navigate-button')).toBeDisabled();
+    const resizeButton = frame.locator('#resize-button');
+    const container = page.locator(
+      `[data-temporal-extension-id="${opaqueExample.ID}"]`,
+    );
+    await expect(resizeButton).toBeEnabled();
+    await expect(container).toHaveCSS('height', '112px');
+    await resizeButton.click();
+    await expect(container).toHaveCSS('height', '184px');
+    await expect(page.getByTitle(opaqueExample.Title)).toHaveAttribute(
+      'sandbox',
+      'allow-scripts',
+    );
+    await expect
+      .poll(async () =>
+        (await hostObservedMessages(page)).some(
+          (message) =>
+            message.origin === 'null' &&
+            message.type === 'temporal-extension/ready' &&
+            message.extensionId === opaqueExample.ID,
+        ),
+      )
+      .toBe(true);
+  });
+
   test('executes the checked-in example with granted context and gated host actions', async ({
     page,
   }, testInfo) => {
