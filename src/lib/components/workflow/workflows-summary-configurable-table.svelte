@@ -296,7 +296,7 @@
           size="xs"
           variant="ghost"
           leadingIcon={dense ? 'table-dense' : 'table-comfy'}
-          label={dense
+          aria-label={dense
             ? translate('common.dense')
             : translate('common.comfortable')}
         ></Button>
@@ -307,7 +307,7 @@
           data-testid="export-history-button"
           size="xs"
           variant="ghost"
-          label={translate('common.download-json')}
+          aria-label={translate('common.download-json')}
         >
           <Icon name="download" />
         </Button>
@@ -318,7 +318,7 @@
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"
-          label={translate('common.configure-columns')}
+          aria-label={translate('common.configure-columns')}
         >
           <Icon name="settings" />
         </Button>

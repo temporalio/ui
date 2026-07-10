@@ -382,7 +382,7 @@
             size="xs"
             variant="ghost"
             leadingIcon="retry"
-            label={translate('common.refresh')}
+            aria-label={translate('common.refresh')}
             on:click={() => {
               scheduleFetch = fetchSchedule(parameters);
               $refresh = Date.now();

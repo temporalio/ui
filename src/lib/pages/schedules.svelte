@@ -197,7 +197,7 @@
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"
-          label={translate('common.configure-columns')}
+          aria-label={translate('common.configure-columns')}
         >
           <Icon name="settings" />
         </Button>

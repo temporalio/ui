@@ -60,7 +60,6 @@
     'data-testid'?: string;
     class?: string;
     disableTracking?: boolean;
-    label?: string;
   };
 
   // Prevent Svelte 5 event handler props - use on:click instead
@@ -93,7 +92,6 @@
   } from 'svelte/elements';
 
   import { cva, type VariantProps } from 'class-variance-authority';
-  import { onMount } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import { goto } from '$app/navigation';
@@ -117,34 +115,8 @@
   export let target: string = null;
   export let disableTracking = false;
 
-  export let label: string | undefined = undefined;
-
   let className = '';
   export { className as class };
-
-  let buttonElement: HTMLElement | undefined;
-
-  onMount(() => {
-    if (!buttonElement) return;
-    const hasName =
-      Boolean(label) ||
-      Boolean($$restProps['aria-label']) ||
-      Boolean($$restProps['aria-labelledby']) ||
-      Boolean($$restProps['title']) ||
-      Boolean(buttonElement.textContent?.trim()) ||
-      Boolean(leadingIcon) ||
-      Boolean(trailingIcon) ||
-      count > 0;
-    if (!hasName) {
-      const message =
-        'Button primitive rendered without an accessible name. Provide `label`, slot text, `leadingIcon`, `trailingIcon`, or `aria-label`. See 4.1.2-button-anchor-empty.md.';
-      if (import.meta.env.DEV) {
-        throw new Error(message);
-      } else {
-        console.error(message, buttonElement);
-      }
-    }
-  });
 
   const onLinkClick = (e: MouseEvent) => {
     // Skip if middle mouse click or new tab
@@ -165,12 +137,10 @@
 
 {#if href && !disabled}
   <a
-    bind:this={buttonElement}
     {href}
     {id}
     role="button"
     type="button"
-    aria-label={label}
     target={target ? '_blank' : null}
     rel={target ? 'noreferrer' : null}
     data-variant={variant}
@@ -210,11 +180,9 @@
   </a>
 {:else}
   <button
-    bind:this={buttonElement}
     {disabled}
     {id}
     type="button"
-    aria-label={label}
     on:click|stopPropagation
     on:keydown|stopPropagation
     data-variant={variant}
