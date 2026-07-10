@@ -37,6 +37,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { BROWSER } from 'esm-env';
+  import { onDestroy } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
@@ -80,12 +81,15 @@
 
   let bannerHeight = 0;
 
-  $: if (BROWSER) {
-    document.documentElement.style.setProperty(
-      '--banner-height',
-      show ? `${bannerHeight}px` : '0px',
-    );
-  }
+  const setBannerHeight = (value: string) => {
+    if (BROWSER) {
+      document.documentElement.style.setProperty('--banner-height', value);
+    }
+  };
+
+  $: setBannerHeight(show ? `${bannerHeight}px` : '0px');
+
+  onDestroy(() => setBannerHeight('0px'));
 
   const dismissBanner = () => {
     $dismissedBanners[id] = true;
