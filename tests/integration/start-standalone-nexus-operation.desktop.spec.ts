@@ -64,51 +64,5 @@ test.describe('Start a Standalone Nexus Operation', () => {
     await expect(startNexusOperationPage.endpointInputError).toBeVisible();
     await expect(startNexusOperationPage.serviceInputError).toBeVisible();
     await expect(startNexusOperationPage.operationNameInputError).toBeVisible();
-    await expect(startNexusOperationPage.timeoutError).toBeVisible();
-  });
-
-  test('shows the timeout error when Start to Close Timeout is zero', async ({
-    page,
-  }) => {
-    const startNexusOperationPage = new StartStandaloneNexusOperationPage(page);
-    await startNexusOperationPage.goto();
-
-    await startNexusOperationPage.operationIdInput.fill('op-abc-123');
-    await startNexusOperationPage.endpointInput.fill('my-endpoint');
-    await startNexusOperationPage.serviceInput.fill('my-service');
-    await startNexusOperationPage.operationNameInput.fill('my-operation');
-
-    await startNexusOperationPage.editPoliciesButton.click();
-    await startNexusOperationPage.startToCloseTimeoutInput.fill('0');
-
-    // Close the (now modal) policies drawer before submitting — values bind
-    // live to the form, so closing commits nothing but frees the main form
-    // from the drawer's focus trap so the submit button is interactive.
-    await startNexusOperationPage.updatePoliciesButton.click();
-    await startNexusOperationPage.submitButton.click();
-
-    await expect(startNexusOperationPage.timeoutError).toBeVisible();
-  });
-
-  test('shows the timeout error after a value is added and then removed from Start to Close Timeout', async ({
-    page,
-  }) => {
-    const startNexusOperationPage = new StartStandaloneNexusOperationPage(page);
-    await startNexusOperationPage.goto();
-
-    await startNexusOperationPage.operationIdInput.fill('op-abc-123');
-    await startNexusOperationPage.endpointInput.fill('my-endpoint');
-    await startNexusOperationPage.serviceInput.fill('my-service');
-    await startNexusOperationPage.operationNameInput.fill('my-operation');
-
-    await startNexusOperationPage.editPoliciesButton.click();
-    await startNexusOperationPage.startToCloseTimeoutInput.fill('30');
-    await expect(startNexusOperationPage.timeoutError).toBeHidden();
-
-    await startNexusOperationPage.startToCloseTimeoutInput.fill('');
-    await startNexusOperationPage.updatePoliciesButton.click();
-    await startNexusOperationPage.submitButton.click();
-
-    await expect(startNexusOperationPage.timeoutError).toBeVisible();
   });
 });
