@@ -147,7 +147,7 @@
   })();
 </script>
 
-<svelte:window on:keydown={handleWindowKeydown} />
+<svelte:window on:keydown|capture={handleWindowKeydown} />
 
 {#if hide}
   <slot />
