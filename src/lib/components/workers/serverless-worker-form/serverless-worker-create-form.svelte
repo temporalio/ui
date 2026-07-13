@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -12,6 +13,7 @@
     type ComputeProviderOption,
     type CreateDeploymentFormData,
     createDeploymentSchema,
+    getInitialComputeProvider,
   } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
@@ -30,7 +32,7 @@
     cancelHref: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
-    computeProviders?: ComputeProviderOption[];
+    computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
 
@@ -50,7 +52,9 @@
     {
       name: '',
       buildId: crypto.randomUUID() as string,
-      provider: 'lambda' as 'lambda' | 'cloud-run',
+      provider: getInitialComputeProvider({
+        providers: untrack(() => computeProviders),
+      }),
       lambdaArn: '',
       iamRoleArn: '',
       roleExternalId: '',

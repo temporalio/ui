@@ -136,3 +136,29 @@ export type ComputeProviderOption = {
   disabledReason?: string;
   hidden?: boolean;
 };
+
+interface InitialComputeProviderOptions {
+  provider?: ComputeProviderValue;
+  providers?: readonly ComputeProviderOption[];
+}
+
+export const getInitialComputeProvider = ({
+  provider,
+  providers,
+}: InitialComputeProviderOptions = {}): ComputeProviderValue => {
+  const configuredProvider = providers?.find(
+    (option) => option.value === provider,
+  );
+
+  if (
+    provider &&
+    (!providers || (configuredProvider && !configuredProvider.hidden))
+  ) {
+    return provider;
+  }
+
+  return (
+    providers?.find(({ disabled, hidden }) => !disabled && !hidden)?.value ??
+    'lambda'
+  );
+};

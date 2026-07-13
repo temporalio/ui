@@ -18,7 +18,7 @@
     namespace: string;
     deployment: string;
     onSuccess: () => void;
-    computeProviders?: ComputeProviderOption[];
+    computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
 

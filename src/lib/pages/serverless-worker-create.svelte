@@ -23,7 +23,7 @@
     onSuccess: () => void;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
-    computeProviders?: ComputeProviderOption[];
+    computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -13,6 +14,7 @@
     type ComputeProviderOption,
     type CreateVersionFormData,
     createVersionSchema,
+    getInitialComputeProvider,
   } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
@@ -24,7 +26,7 @@
     cancelHref: string;
     error?: string;
     versions?: VersionSummary[];
-    computeProviders?: ComputeProviderOption[];
+    computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
 
@@ -40,7 +42,9 @@
   const superform = superForm(
     {
       buildId: '',
-      provider: 'lambda' as 'lambda' | 'cloud-run',
+      provider: getInitialComputeProvider({
+        providers: untrack(() => computeProviders),
+      }),
       lambdaArn: '',
       iamRoleArn: '',
       roleExternalId: '',

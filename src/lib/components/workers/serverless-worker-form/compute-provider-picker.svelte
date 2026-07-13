@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
 
-  import type { Snippet } from 'svelte';
+  import { type Snippet, untrack } from 'svelte';
 
   import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
@@ -15,11 +15,13 @@
 
   interface Props {
     provider?: string;
-    providers?: ComputeProviderOption[];
+    providers?: readonly ComputeProviderOption[];
     children?: Snippet;
   }
 
   let { provider = $bindable('lambda'), providers, children }: Props = $props();
+
+  const configuredProviders = untrack(() => providers);
 
   const providerIcon: Record<ComputeProviderValue, IconName> = {
     lambda: 'aws',
@@ -59,7 +61,7 @@
     },
   ]);
 
-  const resolvedProviders = $derived(providers ?? defaultProviders);
+  const resolvedProviders = $derived(configuredProviders ?? defaultProviders);
   const visibleProviders = $derived(
     resolvedProviders.filter((option) => !option.hidden),
   );
@@ -74,13 +76,6 @@
     return providerStore.subscribe((value) => {
       provider = value;
     });
-  });
-
-  $effect(() => {
-    const selectable = visibleProviders.filter((option) => !option.disabled);
-    if (selectable.length && !selectable.some((o) => o.value === provider)) {
-      provider = selectable[0].value;
-    }
   });
 </script>
 

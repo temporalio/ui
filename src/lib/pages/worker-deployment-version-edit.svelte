@@ -25,7 +25,7 @@
     namespace: string;
     deployment: string;
     buildId: string;
-    computeProviders?: ComputeProviderOption[];
+    computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
 
