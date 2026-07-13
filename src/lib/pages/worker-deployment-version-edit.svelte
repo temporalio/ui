@@ -24,9 +24,10 @@
     namespace: string;
     deployment: string;
     buildId: string;
+    gcpRegions?: string[];
   }
 
-  let { namespace, deployment, buildId }: Props = $props();
+  let { namespace, deployment, buildId, gcpRegions }: Props = $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -55,6 +56,7 @@
     </h1>
     <EditVersionForm
       {error}
+      {gcpRegions}
       initialData={{
         provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',
