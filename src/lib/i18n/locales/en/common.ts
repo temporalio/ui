@@ -254,5 +254,6 @@ export const Strings = {
   'change-log': 'Change Log',
   comfortable: 'Comfortable',
   dense: 'Dense',
+  'configure-columns': 'Configure Columns',
   'random-uuid': 'Random UUID',
 } as const;

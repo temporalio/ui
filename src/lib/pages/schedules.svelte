@@ -197,12 +197,13 @@
       {/if}
     </svelte:fragment>
     <svelte:fragment slot="actions-end-additional">
-      <Tooltip text="Configure Columns" top>
+      <Tooltip text={translate('common.configure-columns')} top>
         <Button
           on:click={openCustomizationDrawer}
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"
+          aria-label={translate('common.configure-columns')}
         >
           <Icon name="settings" />
         </Button>
