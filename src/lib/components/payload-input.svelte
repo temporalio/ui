@@ -3,7 +3,6 @@
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import FileInput from '$lib/holocene/file-input.svelte';
-  import Label from '$lib/holocene/label.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
 
@@ -66,13 +65,14 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <Label for={id} {label} />
+  <span class="text-sm font-medium">{label}</span>
   <div class="flex gap-2">
     {#key [loading, editing]}
       <CodeBlock
         {id}
         maxHeight={320}
         content={input}
+        {label}
         onchange={handleInputChange}
         editable={editing}
         {copyable}

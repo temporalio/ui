@@ -173,7 +173,11 @@
       getActionsTheme({ hasActions: copyable || maximizable }),
       EditorState.readOnly.of(!editable),
       EditorView.editable.of(editable),
-      EditorView.contentAttributes.of({ 'aria-label': label }),
+      EditorView.contentAttributes.of(
+        editable
+          ? { 'aria-label': label }
+          : { 'aria-label': label, 'aria-readonly': 'true', tabindex: '0' },
+      ),
       getLineBreakExtension(editable),
       getLanguageExtension(language),
       !inline ? EditorView.lineWrapping : undefined,
