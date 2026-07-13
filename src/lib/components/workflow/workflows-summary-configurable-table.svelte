@@ -296,6 +296,9 @@
           size="xs"
           variant="ghost"
           leadingIcon={dense ? 'table-dense' : 'table-comfy'}
+          aria-label={dense
+            ? translate('common.dense')
+            : translate('common.comfortable')}
         ></Button>
       </Tooltip>
       <Tooltip text={translate('common.download-json')} top>
@@ -304,16 +307,18 @@
           data-testid="export-history-button"
           size="xs"
           variant="ghost"
+          aria-label={translate('common.download-json')}
         >
           <Icon name="download" />
         </Button>
       </Tooltip>
-      <Tooltip text="Configure Columns" top>
+      <Tooltip text={translate('common.configure-columns')} top>
         <Button
           on:click={onClickConfigure}
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"
+          aria-label={translate('common.configure-columns')}
         >
           <Icon name="settings" />
         </Button>

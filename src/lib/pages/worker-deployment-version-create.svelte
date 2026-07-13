@@ -19,9 +19,16 @@
     deployment: string;
     onSuccess: () => void;
     computeProviders?: ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
-  let { namespace, deployment, onSuccess, computeProviders }: Props = $props();
+  let {
+    namespace,
+    deployment,
+    onSuccess,
+    computeProviders,
+    gcpRegions,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
   let versions = $state<VersionSummary[]>();
@@ -62,6 +69,7 @@
     {error}
     {versions}
     {computeProviders}
+    {gcpRegions}
     cancelHref={backHref}
     onSubmit={async (data) => {
       error = undefined;

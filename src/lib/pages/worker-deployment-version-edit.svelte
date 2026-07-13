@@ -26,9 +26,11 @@
     deployment: string;
     buildId: string;
     computeProviders?: ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
-  let { namespace, deployment, buildId, computeProviders }: Props = $props();
+  let { namespace, deployment, buildId, computeProviders, gcpRegions }: Props =
+    $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -58,6 +60,7 @@
     <EditVersionForm
       {error}
       {computeProviders}
+      {gcpRegions}
       initialData={{
         provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',

@@ -31,6 +31,7 @@
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     computeProviders?: ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
   let {
@@ -40,6 +41,7 @@
     cfnTemplateUrl,
     cfnTemplate,
     computeProviders,
+    gcpRegions,
   }: Props = $props();
 
   let error = $state<string | undefined>();
@@ -144,6 +146,7 @@
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}
         bind:gcpRegion={$form.gcpRegion}
+        {gcpRegions}
         bind:gcpWorkerPool={$form.gcpWorkerPool}
         bind:gcpServiceAccount={$form.gcpServiceAccount}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}

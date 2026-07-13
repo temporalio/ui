@@ -25,6 +25,7 @@
     error?: string;
     versions?: VersionSummary[];
     computeProviders?: ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
   let {
@@ -33,6 +34,7 @@
     error,
     versions = [],
     computeProviders,
+    gcpRegions,
   }: Props = $props();
 
   const superform = superForm(
@@ -112,6 +114,7 @@
           bind:roleExternalId={$form.roleExternalId}
           bind:gcpProject={$form.gcpProject}
           bind:gcpRegion={$form.gcpRegion}
+          {gcpRegions}
           bind:gcpWorkerPool={$form.gcpWorkerPool}
           bind:gcpServiceAccount={$form.gcpServiceAccount}
           bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}

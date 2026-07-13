@@ -24,6 +24,7 @@
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
     computeProviders?: ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
   interface SubmitFieldErrors {
@@ -37,6 +38,7 @@
     cfnTemplateUrl,
     cfnTemplate,
     computeProviders,
+    gcpRegions,
   }: Props = $props();
 
   async function rollbackDeployment(
@@ -208,4 +210,5 @@
   {cfnTemplateUrl}
   {cfnTemplate}
   {computeProviders}
+  {gcpRegions}
 />
