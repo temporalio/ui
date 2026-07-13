@@ -120,3 +120,38 @@ export const editVersionSchema = z
 export type CreateDeploymentFormData = z.infer<typeof createDeploymentSchema>;
 export type CreateVersionFormData = z.infer<typeof createVersionSchema>;
 export type EditVersionFormData = z.infer<typeof editVersionSchema>;
+
+export type ComputeProviderValue = 'lambda' | 'cloud-run';
+
+export type ComputeProviderOption = {
+  value: ComputeProviderValue;
+  disabled?: boolean;
+  disabledReason?: string;
+  hidden?: boolean;
+};
+
+interface InitialComputeProviderOptions {
+  provider?: ComputeProviderValue;
+  providers?: readonly ComputeProviderOption[];
+}
+
+export const getInitialComputeProvider = ({
+  provider,
+  providers,
+}: InitialComputeProviderOptions = {}): ComputeProviderValue => {
+  const configuredProvider = providers?.find(
+    (option) => option.value === provider,
+  );
+
+  if (
+    provider &&
+    (!providers || (configuredProvider && !configuredProvider.hidden))
+  ) {
+    return provider;
+  }
+
+  return (
+    providers?.find(({ disabled, hidden }) => !disabled && !hidden)?.value ??
+    'lambda'
+  );
+};

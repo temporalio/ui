@@ -5,7 +5,6 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
-  import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
@@ -103,7 +102,6 @@
   aria-labelledby="modal-title-{id}"
   data-testid={$$props['data-testid']}
   {...$$restProps}
-  use:focusTrap={true}
 >
   {#if !loading}
     <IconButton

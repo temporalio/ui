@@ -102,4 +102,6 @@ export const Strings = {
   'empty-search-attributes': 'No Search Attributes Found',
   'empty-memo-attributes': 'No Memo Attributes Found',
   'empty-header-attributes': 'No Header Attributes Found',
+  'import-format-1': 'Import Format 1',
+  'import-format-2': 'Import Format 2',
 } as const;

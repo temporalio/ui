@@ -41,12 +41,14 @@
     <div class="h-40 text-center">
       <CodeBlock
         content={stringifyWithBigInt(format1)}
+        label={translate('events.import-format-1')}
         inline
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
       />
       <CodeBlock
         content={stringifyWithBigInt(format2)}
+        label={translate('events.import-format-2')}
         inline
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}

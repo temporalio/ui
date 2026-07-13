@@ -176,6 +176,7 @@
           eventId: event.id,
           type: key,
         }}
+        label={format(key)}
         {value}
         maxHeight={384}
         {lazy}
@@ -188,6 +189,7 @@
           eventId: event.id,
           type: key,
         }}
+        label={format(key)}
         value={codeBlockValue}
         maxHeight={384}
         {lazy}
@@ -203,6 +205,7 @@
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
         content={stackTrace}
+        label={translate('workflows.call-stack-tab')}
         language="text"
         maxHeight={384}
         {lazy}

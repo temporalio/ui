@@ -27,6 +27,7 @@
   export { className as class };
 
   let tableContainer: HTMLDivElement;
+  let footerHeight = 0;
 
   $: tableOffset = tableContainer?.offsetTop
     ? tableContainer.offsetTop + 32
@@ -45,6 +46,8 @@
   id="{$$restProps['id']}-container"
   bind:this={tableContainer}
   style="max-height: {maxHeight || `calc(100vh - ${tableOffset}px)`};
+  scroll-padding-top: var(--table-header-h, 2.25rem);
+  scroll-padding-bottom: {footerHeight}px;
 
   --table-header-h: 2.25rem;"
 >
@@ -63,6 +66,7 @@
     {#if visibleItems.length}
       <div
         class="surface-primary sticky bottom-0 left-0 flex w-full grow items-center justify-between gap-2 border-t border-subtle px-4 py-2"
+        bind:clientHeight={footerHeight}
       >
         <slot name="actions-start" />
         <slot name="actions-center" />
