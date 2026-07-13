@@ -394,6 +394,7 @@
           >
           <Button
             leadingIcon={$copied ? 'checkmark' : 'copy'}
+            aria-label="Share"
             size="xs"
             class="w-full opacity-80"
             variant="ghost"
