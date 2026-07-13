@@ -308,12 +308,34 @@ describe('deployments service', () => {
             method: 'POST',
             body: JSON.stringify({
               computeConfigScalingGroups: {
-                default: { scalingGroup },
+                default: { scalingGroup, updateMask: 'provider,scaler' },
               },
             }),
           }),
           notifyOnError: false,
         }),
+      );
+    });
+
+    test('includes an update mask so edits to an existing version persist', async () => {
+      vi.mocked(requestFromAPI).mockResolvedValueOnce(undefined as never);
+
+      const computeConfig = {
+        scalingGroups: { default: { taskQueueTypes: [] } },
+      };
+
+      await updateWorkerDeploymentVersionComputeConfig({
+        namespace,
+        deploymentName,
+        buildId,
+        computeConfig,
+      });
+
+      const body = JSON.parse(
+        vi.mocked(requestFromAPI).mock.calls[0][1].options.body as string,
+      );
+      expect(body.computeConfigScalingGroups.default.updateMask).toBe(
+        'provider,scaler',
       );
     });
   });
@@ -350,7 +372,7 @@ describe('deployments service', () => {
             method: 'POST',
             body: JSON.stringify({
               computeConfigScalingGroups: {
-                default: { scalingGroup },
+                default: { scalingGroup, updateMask: 'provider,scaler' },
               },
             }),
           }),

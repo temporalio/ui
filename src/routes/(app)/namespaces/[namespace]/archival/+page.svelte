@@ -54,6 +54,7 @@
     content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
     language="text"
     inline
+    label={translate('workflows.archival-link')}
     copyIconTitle={translate('common.copy-icon-title')}
     copySuccessIconTitle={translate('common.copy-success-icon-title')}
   />
@@ -66,6 +67,7 @@
     content={`temporal operator namespace update --history-archival-state enabled ${namespaceName}`}
     language="text"
     inline
+    label={translate('workflows.archival-link')}
     copyIconTitle={translate('common.copy-icon-title')}
     copySuccessIconTitle={translate('common.copy-success-icon-title')}
   />
@@ -82,6 +84,7 @@
       content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
       language="text"
       inline
+      label={translate('workflows.archival-link')}
       copyIconTitle={translate('common.copy-icon-title')}
       copySuccessIconTitle={translate('common.copy-success-icon-title')}
     />

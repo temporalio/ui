@@ -31,6 +31,7 @@
     variant="ghost"
     class="start-button"
     leadingIcon="lightning-bolt"
+    aria-label={translate('workflows.start-workflow-like-this-one')}
     on:click={() => goto(href)}
     {...$$restProps}
   ></Button>

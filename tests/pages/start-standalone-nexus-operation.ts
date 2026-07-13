@@ -13,7 +13,6 @@ export class StartStandaloneNexusOperationPage {
   readonly endpointInputError: Locator;
   readonly serviceInputError: Locator;
   readonly operationNameInputError: Locator;
-  readonly timeoutError: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -37,9 +36,6 @@ export class StartStandaloneNexusOperationPage {
     );
     this.operationNameInputError = page.getByText(
       "Operation Name from the handler Namespace's services is required.",
-    );
-    this.timeoutError = page.getByText(
-      'At least one timeout (Start To Close or Schedule To Close) is required.',
     );
   }
 

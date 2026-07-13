@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -9,8 +10,10 @@
   import { translate } from '$lib/i18n/translate';
 
   import {
+    type ComputeProviderOption,
     type CreateDeploymentFormData,
     createDeploymentSchema,
+    getInitialComputeProvider,
   } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
@@ -29,10 +32,19 @@
     cancelHref: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    computeProviders?: readonly ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
-  let { onSubmit, onSuccess, cancelHref, cfnTemplateUrl, cfnTemplate }: Props =
-    $props();
+  let {
+    onSubmit,
+    onSuccess,
+    cancelHref,
+    cfnTemplateUrl,
+    cfnTemplate,
+    computeProviders,
+    gcpRegions,
+  }: Props = $props();
 
   let error = $state<string | undefined>();
 
@@ -40,7 +52,9 @@
     {
       name: '',
       buildId: crypto.randomUUID() as string,
-      provider: 'lambda' as 'lambda' | 'cloud-run',
+      provider: getInitialComputeProvider({
+        providers: untrack(() => computeProviders),
+      }),
       lambdaArn: '',
       iamRoleArn: '',
       roleExternalId: '',
@@ -125,7 +139,10 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider={$form.provider} />
+      <ComputeProviderPicker
+        bind:provider={$form.provider}
+        providers={computeProviders}
+      />
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
@@ -133,6 +150,7 @@
         bind:roleExternalId={$form.roleExternalId}
         bind:gcpProject={$form.gcpProject}
         bind:gcpRegion={$form.gcpRegion}
+        {gcpRegions}
         bind:gcpWorkerPool={$form.gcpWorkerPool}
         bind:gcpServiceAccount={$form.gcpServiceAccount}
         bind:scaleUpCooloffMs={$form.scaleUpCooloffMs}

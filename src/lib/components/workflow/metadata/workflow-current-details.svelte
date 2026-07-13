@@ -77,6 +77,7 @@
             variant="ghost"
             on:click={fetchCurrentDetails}
             disabled={loading}
+            aria-label={translate('common.refresh')}
           >
             <Icon name="retry" />
           </Button>

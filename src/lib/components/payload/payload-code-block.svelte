@@ -35,12 +35,19 @@
 
   interface Props {
     value: Payload | Payloads | PayloadContainingObject;
+    label?: string;
     maxHeight?: number;
     testId?: string;
     filenameData?: PayloadDownloadFilenameData;
   }
 
-  let { value, maxHeight, testId, filenameData = undefined }: Props = $props();
+  let {
+    value,
+    label = '',
+    maxHeight,
+    testId,
+    filenameData = undefined,
+  }: Props = $props();
 
   let downloadError: string | undefined = $state(undefined);
   let downloadLoading: boolean = $state(false);
@@ -96,6 +103,7 @@
     {#snippet loading()}
       <CodeBlock
         content={stringifyWithBigInt(value)}
+        {label}
         {maxHeight}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -112,6 +120,7 @@
             )}
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue.data)}
+              {label}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -159,6 +168,7 @@
           {:else if isParsedPayload(result.decodedValue)}
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue.data)}
+              {label}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -168,6 +178,7 @@
           {:else}
             <CodeBlock
               content={stringifyWithBigInt(result.decodedValue)}
+              {label}
               {maxHeight}
               copyIconTitle={translate('common.copy-icon-title')}
               copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -181,6 +192,7 @@
     {#snippet error({ error, retry })}
       <CodeBlock
         content={stringifyWithBigInt(value)}
+        {label}
         {maxHeight}
         copyIconTitle={translate('common.copy-icon-title')}
         copySuccessIconTitle={translate('common.copy-success-icon-title')}
