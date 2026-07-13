@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -9,7 +10,12 @@
   import { translate } from '$lib/i18n/translate';
   import type { VersionSummary } from '$lib/types/deployments';
 
-  import { type CreateVersionFormData, createVersionSchema } from './shared';
+  import {
+    type ComputeProviderOption,
+    type CreateVersionFormData,
+    createVersionSchema,
+    getInitialComputeProvider,
+  } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
   import ComputeProviderPicker from './compute-provider-picker.svelte';
@@ -20,6 +26,7 @@
     cancelHref: string;
     error?: string;
     versions?: VersionSummary[];
+    computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
 
@@ -28,13 +35,16 @@
     cancelHref,
     error,
     versions = [],
+    computeProviders,
     gcpRegions,
   }: Props = $props();
 
   const superform = superForm(
     {
       buildId: '',
-      provider: 'lambda' as 'lambda' | 'cloud-run',
+      provider: getInitialComputeProvider({
+        providers: untrack(() => computeProviders),
+      }),
       lambdaArn: '',
       iamRoleArn: '',
       roleExternalId: '',
@@ -97,7 +107,10 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider={$form.provider}>
+      <ComputeProviderPicker
+        bind:provider={$form.provider}
+        providers={computeProviders}
+      >
         <ComputeFields
           provider={$form.provider}
           bind:lambdaArn={$form.lambdaArn}

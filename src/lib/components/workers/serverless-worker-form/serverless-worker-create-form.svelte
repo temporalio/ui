@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -9,8 +10,10 @@
   import { translate } from '$lib/i18n/translate';
 
   import {
+    type ComputeProviderOption,
     type CreateDeploymentFormData,
     createDeploymentSchema,
+    getInitialComputeProvider,
   } from './shared';
 
   import ComputeFields from './compute-fields.svelte';
@@ -29,6 +32,7 @@
     cancelHref: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
 
@@ -38,6 +42,7 @@
     cancelHref,
     cfnTemplateUrl,
     cfnTemplate,
+    computeProviders,
     gcpRegions,
   }: Props = $props();
 
@@ -47,7 +52,9 @@
     {
       name: '',
       buildId: crypto.randomUUID() as string,
-      provider: 'lambda' as 'lambda' | 'cloud-run',
+      provider: getInitialComputeProvider({
+        providers: untrack(() => computeProviders),
+      }),
       lambdaArn: '',
       iamRoleArn: '',
       roleExternalId: '',
@@ -132,7 +139,10 @@
       <p class="mb-4 text-sm text-secondary">
         {translate('workers.compute-description')}
       </p>
-      <ComputeProviderPicker bind:provider={$form.provider} />
+      <ComputeProviderPicker
+        bind:provider={$form.provider}
+        providers={computeProviders}
+      />
       <ComputeFields
         provider={$form.provider}
         bind:lambdaArn={$form.lambdaArn}
