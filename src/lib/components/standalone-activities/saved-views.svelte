@@ -324,6 +324,7 @@
     <div class="w-full" role="menuitem" tabindex="-1">
       <Button
         variant="ghost"
+        aria-label={view.name}
         data-testid={view.type === 'system'
           ? view.id
           : view.name.toLowerCase().replace(/\s+/g, '-')}
