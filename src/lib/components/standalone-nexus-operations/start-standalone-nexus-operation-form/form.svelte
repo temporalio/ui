@@ -705,6 +705,5 @@
     bind:scheduleToStartTimeout={$form.scheduleToStartTimeout}
     bind:idReusePolicy={$form.idReusePolicy}
     bind:idConflictPolicy={$form.idConflictPolicy}
-    timeoutError={$errors.startToCloseTimeout?.[0]}
   />
 </form>
