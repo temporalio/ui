@@ -84,6 +84,31 @@ export const TimezoneOptions: TimeFormatOptions = Object.entries(Timezones)
     return 0;
   });
 
+const offsetToMinutes = (offset: string): number => {
+  const match = offset.match(/GMT([+-])(\d{2}):(\d{2})/);
+  if (!match) return 0;
+  const [, sign, hours, minutes] = match;
+  return (sign === '-' ? -1 : 1) * (Number(hours) * 60 + Number(minutes));
+};
+
+export function getTimezoneOffsetRange(timeZone: string): string {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    timeZoneName: 'longOffset',
+  });
+  const year = new Date().getUTCFullYear();
+  const offsets = new Set<string>();
+  for (let month = 0; month < 12; month++) {
+    const parts = formatter.formatToParts(new Date(Date.UTC(year, month, 1)));
+    const value =
+      parts.find((part) => part.type === 'timeZoneName')?.value ?? '';
+    offsets.add(value === 'GMT' ? 'GMT+00:00' : value);
+  }
+  return [...offsets]
+    .sort((a, b) => offsetToMinutes(a) - offsetToMinutes(b))
+    .join('/');
+}
+
 export function getLocalTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }

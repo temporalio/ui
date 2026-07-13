@@ -12,7 +12,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import { formatOffset, TimezoneOptions } from '$lib/utilities/timezone';
+  import { getTimezoneOffsetRange } from '$lib/utilities/timezone';
 
   import type { FormScheduleSchema } from '../schema/form';
   import { fromCalendarDateStr, toCalendarDateStr } from '../utilities/date';
@@ -29,11 +29,10 @@
 
   const timezoneComboboxOptions = $derived.by(() => {
     const opts = [{ label: translate('common.utc'), value: 'UTC' }];
-    for (const tz of TimezoneOptions) {
-      const offsetStr = formatOffset(tz.offset);
+    for (const zone of Intl.supportedValuesOf('timeZone')) {
       opts.push({
-        label: `${tz.label} (${tz.abbr}) ${offsetStr}`,
-        value: tz.zones?.[0] ?? tz.label,
+        label: `${zone} (${getTimezoneOffsetRange(zone)})`,
+        value: zone,
       });
     }
     return opts;
