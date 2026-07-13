@@ -81,6 +81,7 @@
     minSize?: number;
     maxSize?: number;
     'data-testid'?: string;
+    hintText?: string;
     error?: string;
     valid?: boolean;
     actionTooltip?: string;
@@ -161,6 +162,7 @@
     optionLabelKey = optionValueKey,
     minSize = 0,
     maxSize = 120,
+    hintText = '',
     error = '',
     valid = true,
     open = writable(false),
@@ -465,6 +467,7 @@
   }
 
   const errorId = $derived(`${id}-error`);
+  const hintId = $derived(`${id}-hint`);
   const showError = $derived(!!error && !valid);
 
   const handleInputClick: MouseEventHandler<HTMLInputElement> = (event) => {
@@ -562,7 +565,7 @@
           aria-expanded={$open}
           aria-required={required}
           aria-invalid={!valid ? 'true' : undefined}
-          aria-describedby={showError ? errorId : undefined}
+          aria-describedby={showError ? errorId : hintText ? hintId : undefined}
           aria-autocomplete="list"
           onfocus={handleFocus}
           onblur={handleBlur}
@@ -626,6 +629,19 @@
         </button>
       {/if}
     </div>
+    <div class="inline-flex" class:hidden={!hintText && !showError}>
+      <span
+        id={errorId}
+        role="alert"
+        class="hint-text error"
+        class:hidden={!showError}
+      >
+        {#if showError}{error}{/if}
+      </span>
+      <span id={hintId} class="hint-text" class:hidden={showError}>
+        {#if !showError}{hintText}{/if}
+      </span>
+    </div>
   </div>
 
   <Menu
@@ -686,15 +702,15 @@
       </ComboboxOption>
     {/if}
   </Menu>
-
-  <span id={errorId} role="alert" class="error">
-    {#if showError}{error}{/if}
-  </span>
 </MenuContainer>
 
 <style lang="postcss">
-  .error {
-    @apply text-xs text-danger;
+  .hint-text {
+    @apply text-xs text-primary;
+
+    &.error {
+      @apply text-danger;
+    }
   }
 
   .input-wrapper {

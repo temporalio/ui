@@ -19,6 +19,7 @@
       disabled: false,
       valid: true,
       error: '',
+      hintText: '',
       leadingIcon: 'search',
       labelHidden: false,
     },
@@ -30,6 +31,7 @@
       required: { name: 'Required', control: 'boolean' },
       disabled: { name: 'Disabled', control: 'boolean' },
       error: { name: 'Error', control: 'text' },
+      hintText: { name: 'Hint Text', control: 'text' },
       valid: { name: 'Valid', control: 'boolean' },
       labelHidden: { name: 'Label Hidden', control: 'boolean' },
       minSize: { name: 'Minimum Size', control: 'number' },
@@ -75,6 +77,44 @@
     const canvas = within(canvasElement);
     const combobox = canvas.getByTestId(id);
     await userEvent.type(combobox, 'English');
+  }}
+/>
+
+<Story
+  name="With Hint Text"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+    hintText: 'Choose the language used for this workflow.',
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    expect(combobox).toHaveAccessibleDescription(
+      'Choose the language used for this workflow.',
+    );
+  }}
+/>
+
+<Story
+  name="Error Overrides Hint Text"
+  args={{
+    options: ['English', 'English (UK)', 'German', 'French', 'Japanese'],
+    hintText: 'Choose the language used for this workflow.',
+    error: 'Select a language.',
+    valid: false,
+  }}
+  play={async ({ canvasElement, id }) => {
+    const canvas = within(canvasElement);
+    const combobox = canvas.getByTestId(id);
+
+    expect(combobox).toHaveAccessibleDescription('Select a language.');
+    expect(combobox).not.toHaveAccessibleDescription(
+      'Choose the language used for this workflow.',
+    );
+    expect(
+      canvas.queryByText('Choose the language used for this workflow.'),
+    ).not.toBeInTheDocument();
   }}
 />
 
