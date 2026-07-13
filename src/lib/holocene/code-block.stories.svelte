@@ -339,6 +339,7 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
   <CodeBlock
     copyable
     language="typescript"
+    label="Code example"
     tabs={['File A', 'File B']}
     bind:activeTab
     content={hidden
@@ -379,7 +380,13 @@ var myClient = TemporalClient.ConnectAsync(new("<endpoint>")
       content<br />
       content
     </p>
-    <CodeBlock copyable language="json" content={largeJson} maxHeight={300} />
+    <CodeBlock
+      copyable
+      language="json"
+      label="JSON content"
+      content={largeJson}
+      maxHeight={300}
+    />
     <p>
       content<br />
       content<br />

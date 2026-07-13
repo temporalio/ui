@@ -44,6 +44,7 @@ export class StandaloneNexusOperationPoller {
       nexusOperationExecution = await getNexusOperationExecution(
         this.namespace,
         this.operationId,
+        this.runId,
       );
     } catch (error) {
       this.onError(error);
@@ -92,6 +93,7 @@ export class StandaloneNexusOperationPoller {
     const nexusOperationExecution = await getNexusOperationExecution(
       this.namespace,
       this.operationId,
+      this.runId,
     );
     this.onUpdate(nexusOperationExecution);
   }

@@ -63,12 +63,13 @@
       <TableEmptyState />
     </svelte:fragment>
     <svelte:fragment slot="actions-end-additional">
-      <Tooltip text="Configure Columns" top>
+      <Tooltip text={translate('common.configure-columns')} top>
         <Button
           on:click={onClickConfigure}
           data-testid="activities-summary-table-configuration-button"
           size="xs"
           variant="ghost"
+          aria-label={translate('common.configure-columns')}
         >
           <Icon name="settings" />
         </Button>

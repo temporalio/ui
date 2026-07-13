@@ -227,6 +227,7 @@ export const Strings = {
   'json-formatting': 'JSON Formatting',
   'query-type': 'Query Type',
   'query-arg': 'Query Arg',
+  'query-result': 'Query Result',
   'run-query': 'Run Query',
   'refresh-query': 'Refresh Query',
   'refresh-call-stack': 'Refresh Call Stack',
@@ -324,6 +325,9 @@ export const Strings = {
   'markdown-description':
     'Markdown is supported in the summary and details fields. You can use {namespace}, {workflowId} or {runId} syntax in link href to create dynamic links based on the page you are on. Images are not allowed.',
   'update-id': 'Update ID (optional)',
+  'update-input': 'Update Input',
+  'update-result': 'Update Result',
+  'callback-metadata': 'Callback Metadata',
   'update-name-label': 'Update name',
   'no-current-details': 'No Current Details',
   'update-details': 'Update Details',

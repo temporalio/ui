@@ -1,6 +1,9 @@
 <script lang="ts">
   import ServerlessWorkerCreateForm from '$lib/components/workers/serverless-worker-form/serverless-worker-create-form.svelte';
-  import type { CreateDeploymentFormData } from '$lib/components/workers/serverless-worker-form/shared';
+  import type {
+    ComputeProviderOption,
+    CreateDeploymentFormData,
+  } from '$lib/components/workers/serverless-worker-form/shared';
   import { translate } from '$lib/i18n/translate';
   import {
     buildGcpCloudRunComputeConfig,
@@ -20,6 +23,8 @@
     onSuccess: () => void;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    computeProviders?: readonly ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
   interface SubmitFieldErrors {
@@ -27,7 +32,14 @@
     iamRoleArn?: string[];
   }
 
-  let { namespace, onSuccess, cfnTemplateUrl, cfnTemplate }: Props = $props();
+  let {
+    namespace,
+    onSuccess,
+    cfnTemplateUrl,
+    cfnTemplate,
+    computeProviders,
+    gcpRegions,
+  }: Props = $props();
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -197,4 +209,6 @@
   onSubmit={handleCreate}
   {cfnTemplateUrl}
   {cfnTemplate}
+  {computeProviders}
+  {gcpRegions}
 />

@@ -3,12 +3,14 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Button from '$lib/holocene/button.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Combobox from '$lib/holocene/combobox/combobox.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Link from '$lib/holocene/link.svelte';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
 
+  import { GCP_REGIONS } from './gcp-regions';
   import terraformTemplate from './serverless-worker-lambda.tf?raw';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
 
@@ -19,6 +21,7 @@
     roleExternalId: string;
     gcpProject?: string;
     gcpRegion?: string;
+    gcpRegions?: string[];
     gcpWorkerPool?: string;
     gcpServiceAccount?: string;
     scaleUpCooloffMs?: number;
@@ -49,6 +52,7 @@
     roleExternalId = $bindable(),
     gcpProject = $bindable(''),
     gcpRegion = $bindable(''),
+    gcpRegions = [...GCP_REGIONS],
     gcpWorkerPool = $bindable(''),
     gcpServiceAccount = $bindable(''),
     scaleUpCooloffMs = $bindable(),
@@ -139,16 +143,27 @@
       placeholder={translate('workers.gcp-project-placeholder')}
       required
     />
-    <Input
-      bind:value={gcpRegion}
-      id="gcpRegion"
-      name="gcpRegion"
-      label={translate('workers.gcp-region-label')}
-      hintText={errors.gcpRegion?.[0] || translate('workers.gcp-region-hint')}
-      error={!!errors.gcpRegion?.[0]}
-      placeholder={translate('workers.gcp-region-placeholder')}
-      required
-    />
+    <div class="flex flex-col gap-1.5">
+      <Combobox
+        bind:value={gcpRegion}
+        id="gcpRegion"
+        name="gcpRegion"
+        label={translate('workers.gcp-region-label')}
+        placeholder={translate('workers.gcp-region-placeholder')}
+        options={gcpRegions}
+        noResultsText={translate('common.no-results')}
+        valid={!errors.gcpRegion?.[0]}
+        error={errors.gcpRegion?.[0]}
+        allowCustomValue
+        showChevron
+        required
+      />
+      {#if !errors.gcpRegion?.[0]}
+        <p class="text-xs text-primary">
+          {translate('workers.gcp-region-hint')}
+        </p>
+      {/if}
+    </div>
     <div class="flex flex-wrap items-end gap-4">
       <Input
         bind:value={gcpWorkerPool}
@@ -261,6 +276,7 @@
             language="text"
             maxHeight={300}
             copyable
+            label={translate('workers.terraform-iam-module-link')}
             copyIconTitle={translate('workers.copy-snippet')}
             copySuccessIconTitle={translate('workers.copied')}
           />

@@ -3,6 +3,7 @@
 
   import DeleteWorkerModal from '$lib/components/workers/delete-worker-modal.svelte';
   import EditVersionForm from '$lib/components/workers/serverless-worker-form/edit-version-form.svelte';
+  import type { ComputeProviderOption } from '$lib/components/workers/serverless-worker-form/shared';
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -24,9 +25,12 @@
     namespace: string;
     deployment: string;
     buildId: string;
+    computeProviders?: readonly ComputeProviderOption[];
+    gcpRegions?: string[];
   }
 
-  let { namespace, deployment, buildId }: Props = $props();
+  let { namespace, deployment, buildId, computeProviders, gcpRegions }: Props =
+    $props();
 
   let error = $state<string | undefined>();
   let showDeleteModal = $state(false);
@@ -55,6 +59,8 @@
     </h1>
     <EditVersionForm
       {error}
+      {computeProviders}
+      {gcpRegions}
       initialData={{
         provider: gcpDetails.gcpWorkerPool ? 'cloud-run' : 'lambda',
         lambdaArn: providerDetails.lambdaArn ?? '',
