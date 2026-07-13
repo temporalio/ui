@@ -56,7 +56,7 @@
     testId?: string;
     minHeight?: number;
     maxHeight?: number;
-    label: string;
+    label?: string;
     class?: string;
     tabs?: string[];
     activeTab?: string;
@@ -83,7 +83,7 @@
     testId = undefined,
     minHeight = undefined,
     maxHeight = undefined,
-    label,
+    label = '',
     onchange = undefined,
     tabs,
     activeTab = $bindable(),
@@ -247,15 +247,6 @@
   };
 
   onMount(() => {
-    if (!label || !label.trim()) {
-      const message =
-        'CodeBlock rendered without an accessible name. Provide a non-empty `label` prop. See 4.1.2-codemirror-no-name.md.';
-      if (import.meta.env.DEV) {
-        throw new Error(message);
-      } else {
-        console.error(message);
-      }
-    }
     editorView = createEditorView();
     editorView.contentDOM.onblur = handleEditorBlur;
     ensureFullParse();
