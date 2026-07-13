@@ -314,6 +314,7 @@
     const initialValues = await fetchInitialValuesForStartNexusOperation(
       namespace,
       operationIdParam,
+      runIdParam,
     );
 
     $form.input = initialValues.input;

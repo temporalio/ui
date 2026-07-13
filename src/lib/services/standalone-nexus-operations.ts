@@ -223,6 +223,8 @@ export const startStandaloneNexusOperation = async (
 export const getNexusOperationExecution = (
   namespace: string,
   operationId: string,
+  runId: string,
+  includeOutcome: boolean = true,
 ): Promise<NexusOperationExecution> => {
   const route = routeForApi('standalone-nexus-operation', {
     namespace,
@@ -230,8 +232,9 @@ export const getNexusOperationExecution = (
   });
 
   const params = new URLSearchParams({
+    runId,
     includeInput: 'true',
-    includeOutcome: 'true',
+    includeOutcome: String(includeOutcome),
   });
 
   return requestFromAPI(route, { params });
@@ -281,6 +284,7 @@ const extractMetadataString = async (
 export const fetchInitialValuesForStartNexusOperation = async (
   namespace: string,
   operationId: string,
+  runId: string,
 ): Promise<NexusOperationInitialValues> => {
   const emptyValues: NexusOperationInitialValues = {
     input: '',
@@ -292,7 +296,12 @@ export const fetchInitialValuesForStartNexusOperation = async (
   };
 
   try {
-    const operation = await getNexusOperationExecution(namespace, operationId);
+    const operation = await getNexusOperationExecution(
+      namespace,
+      operationId,
+      runId,
+      false,
+    );
     const { input, encoding, messageType } = await extractNexusInputValues(
       operation.input,
     );
