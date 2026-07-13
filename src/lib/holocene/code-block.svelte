@@ -176,7 +176,7 @@
       EditorView.contentAttributes.of(
         editable
           ? { 'aria-label': label }
-          : { 'aria-label': label, 'aria-readonly': 'true' },
+          : { 'aria-label': label, 'aria-readonly': 'true', tabindex: '0' },
       ),
       getLineBreakExtension(editable),
       getLanguageExtension(language),
