@@ -179,3 +179,29 @@ export const savedNexusQueries = persistStore<Record<string, SavedQuery[]>>(
   {},
   true,
 );
+
+// Worker saved queries
+export const DEFAULT_WORKER_SYSTEM_VIEW: SavedQuery = {
+  id: 'all',
+  name: 'All',
+  query: '',
+  icon: 'workers',
+  type: 'system',
+};
+
+export const systemWorkerViews: SavedQuery[] = [
+  DEFAULT_WORKER_SYSTEM_VIEW,
+  {
+    id: 'running',
+    name: 'Running',
+    query: '`WorkerStatus`="Running"',
+    icon: 'heartbeat',
+    type: 'system',
+  },
+];
+
+export const savedWorkerQueries = persistStore<Record<string, SavedQuery[]>>(
+  'saved-worker-queries',
+  {},
+  true,
+);
