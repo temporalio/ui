@@ -22,6 +22,7 @@
     tooltipClass?: string;
     show?: boolean;
     usePortal?: boolean;
+    portalOffset?: PortalOffset;
     scrollContainer?: string;
     portalOffset?: PortalOffset;
   };
@@ -83,6 +84,7 @@
   export let tooltipClass = '';
   export let show = false;
   export let usePortal = false;
+  export let portalOffset: PortalOffset | undefined = undefined;
   export let scrollContainer: string | undefined = undefined;
   export let portalOffset: PortalOffset = {};
 
@@ -171,6 +173,7 @@
 
     {#if usePortal && wrapperElement}
       <Portal
+        offset={portalOffset}
         anchor={wrapperElement}
         open={isOpen}
         position={portalPosition}

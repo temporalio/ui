@@ -23,6 +23,7 @@
     onSuccess: () => void;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    terraformTemplate?: string;
     computeProviders?: readonly ComputeProviderOption[];
     gcpRegions?: string[];
   }
@@ -37,6 +38,7 @@
     onSuccess,
     cfnTemplateUrl,
     cfnTemplate,
+    terraformTemplate,
     computeProviders,
     gcpRegions,
   }: Props = $props();
@@ -209,6 +211,7 @@
   onSubmit={handleCreate}
   {cfnTemplateUrl}
   {cfnTemplate}
+  {terraformTemplate}
   {computeProviders}
   {gcpRegions}
 />
