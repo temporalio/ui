@@ -140,6 +140,7 @@
                         content={stringifyWithBigInt(
                           pendingActivity.heartbeatDetails,
                         )}
+                        label={translate('workflows.heartbeat-details')}
                         copyIconTitle={translate('common.copy-icon-title')}
                         copySuccessIconTitle={translate(
                           'common.copy-success-icon-title',
@@ -157,6 +158,7 @@
                         content={stringifyWithBigInt(
                           pendingActivity.lastFailure,
                         )}
+                        label={translate('workflows.last-failure')}
                         copyIconTitle={translate('common.copy-icon-title')}
                         copySuccessIconTitle={translate(
                           'common.copy-success-icon-title',

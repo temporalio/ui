@@ -74,6 +74,7 @@
           <CodeBlock
             content={result}
             language="text"
+            label={translate('workflows.call-stack-tab')}
             testId="query-call-stack"
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}

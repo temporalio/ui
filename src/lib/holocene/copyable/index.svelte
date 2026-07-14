@@ -16,41 +16,34 @@
   }
 </script>
 
-{#if clickAllToCopy}
-  <button
-    class="group flex items-center gap-1 break-all {$$props['container-class']}"
+<div class="group flex items-center gap-1 {$$props['container-class']}">
+  {#if clickAllToCopy}
+    <button
+      type="button"
+      class="break-all text-left"
+      on:click={handleOnClick}
+      aria-label={$$slots.default ? undefined : `Copy ${content}`}
+    >
+      <slot>
+        <span class={$$props.class} class:select-all={!$$slots.default}
+          >{content}</span
+        >
+      </slot>
+    </button>
+  {:else}
+    <slot>
+      <span class={$$props.class} class:select-all={!$$slots.default}
+        >{content}</span
+      >
+    </slot>
+  {/if}
+  <CopyButton
+    {copyIconTitle}
+    {copySuccessIconTitle}
+    class={visible
+      ? 'visible'
+      : 'invisible group-focus-within:visible group-hover:visible'}
     on:click={handleOnClick}
-  >
-    <slot>
-      <span class={$$props.class} class:select-all={!$$slots.default}
-        >{content}</span
-      >
-    </slot>
-    <CopyButton
-      {copyIconTitle}
-      {copySuccessIconTitle}
-      class={visible
-        ? 'visible'
-        : 'invisible group-focus-within:visible group-hover:visible'}
-      on:click={handleOnClick}
-      copied={$copied}
-    />
-  </button>
-{:else}
-  <div class="group flex items-center gap-1 {$$props['container-class']}">
-    <slot>
-      <span class={$$props.class} class:select-all={!$$slots.default}
-        >{content}</span
-      >
-    </slot>
-    <CopyButton
-      {copyIconTitle}
-      {copySuccessIconTitle}
-      class={visible
-        ? 'visible'
-        : 'invisible group-focus-within:visible group-hover:visible'}
-      on:click={handleOnClick}
-      copied={$copied}
-    />
-  </div>
-{/if}
+    copied={$copied}
+  />
+</div>
