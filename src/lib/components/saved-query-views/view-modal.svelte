@@ -11,7 +11,6 @@
   import {
     MAX_SAVED_QUERIES,
     type SavedQuery,
-    savedWorkflowQueries,
   } from '$lib/stores/saved-queries';
 
   interface Props {
@@ -21,7 +20,7 @@
     onCreateView?: (view: SavedQuery) => void;
     onDeleteView?: (view: SavedQuery) => void;
     id?: string;
-    savedQueries?: Writable<Record<string, SavedQuery[]>>;
+    savedQueries: Writable<Record<string, SavedQuery[]>>;
     maxQueries?: number;
   }
 
@@ -32,7 +31,7 @@
     onCreateView,
     onDeleteView,
     id = 'view-modal',
-    savedQueries = savedWorkflowQueries,
+    savedQueries,
     maxQueries = MAX_SAVED_QUERIES,
   }: Props = $props();
 
