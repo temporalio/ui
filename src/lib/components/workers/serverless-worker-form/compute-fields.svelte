@@ -11,7 +11,7 @@
   import { translate } from '$lib/i18n/translate';
 
   import { GCP_REGIONS } from './gcp-regions';
-  import terraformTemplate from './serverless-worker-lambda.tf?raw';
+  import defaultTerraformTemplate from './serverless-worker-lambda.tf?raw';
   import cfnTemplate from './temporal-worker-role.yaml?raw';
 
   interface Props {
@@ -30,6 +30,7 @@
     metricsPollIntervalMs?: number;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    terraformTemplate?: string;
     errors?: {
       lambdaArn?: string[];
       iamRoleArn?: string[];
@@ -61,10 +62,14 @@
     metricsPollIntervalMs = $bindable(),
     cfnTemplateUrl,
     cfnTemplate: cfnTemplateProp,
+    terraformTemplate,
     errors = {},
   }: Props = $props();
 
   const resolvedCfnTemplate = $derived(cfnTemplateProp ?? cfnTemplate);
+  const resolvedTerraformTemplate = $derived(
+    terraformTemplate ?? defaultTerraformTemplate,
+  );
 
   const launchStackHref = $derived.by(() => {
     if (!cfnTemplateUrl) {
@@ -272,7 +277,7 @@
             >{translate('workers.terraform-description-after')}
           </p>
           <CodeBlock
-            content={terraformTemplate}
+            content={resolvedTerraformTemplate}
             language="text"
             maxHeight={300}
             copyable
