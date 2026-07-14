@@ -59,6 +59,18 @@ table {
   border-spacing: 0;
 }
 
+th,
+td {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid;
+  border-color: color-mix(in srgb, currentColor 20%, transparent);
+  text-align: left;
+}
+
+th {
+  font-weight: 600;
+}
+
 ul,
 ol {
   white-space: normal;
