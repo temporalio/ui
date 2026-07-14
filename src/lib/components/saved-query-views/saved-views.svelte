@@ -239,7 +239,7 @@
         title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
         onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
       >
-        <Icon name={$savedQueryNavOpen ? 'chevron-left' : 'chevron-right'} />
+        <Icon name="collapse" />
       </button>
     </div>
   </div>
