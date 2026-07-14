@@ -587,7 +587,12 @@
       {:else if href}
         <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
           {#if actionTooltip}
-            <Tooltip text={actionTooltip} right>
+            <Tooltip
+              text={actionTooltip}
+              right
+              usePortal
+              portalOffset={{ x: 6 }}
+            >
               <Button
                 variant="ghost"
                 size="xs"
