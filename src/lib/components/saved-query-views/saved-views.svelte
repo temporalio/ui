@@ -156,11 +156,9 @@
 
   const handleCopy = (e: Event) => {
     if (activeQueryView) {
-      const sharableViewUrl =
-        new URL(page.url.href) +
-        '&savedQuery=' +
-        encodeURIComponent(activeQueryView.name);
-      copy(e, sharableViewUrl);
+      const sharableViewUrl = new URL(page.url.href);
+      sharableViewUrl.searchParams.set('savedQuery', activeQueryView.name);
+      copy(e, sharableViewUrl.href);
     }
   };
 
