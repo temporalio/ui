@@ -29,6 +29,7 @@
     cancelHref: string;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    terraformTemplate?: string;
     gcpRegions?: string[];
   }
 
@@ -38,6 +39,7 @@
     cancelHref,
     cfnTemplateUrl,
     cfnTemplate,
+    terraformTemplate,
     gcpRegions,
   }: Props = $props();
 
@@ -149,6 +151,7 @@
         bind:metricsPollIntervalMs={$form.metricsPollIntervalMs}
         {cfnTemplateUrl}
         {cfnTemplate}
+        {terraformTemplate}
         errors={$errors}
       />
     </Card>

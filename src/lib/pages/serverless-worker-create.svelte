@@ -20,6 +20,7 @@
     onSuccess: () => void;
     cfnTemplateUrl?: string;
     cfnTemplate?: string;
+    terraformTemplate?: string;
     gcpRegions?: string[];
   }
 
@@ -28,8 +29,14 @@
     iamRoleArn?: string[];
   }
 
-  let { namespace, onSuccess, cfnTemplateUrl, cfnTemplate, gcpRegions }: Props =
-    $props();
+  let {
+    namespace,
+    onSuccess,
+    cfnTemplateUrl,
+    cfnTemplate,
+    terraformTemplate,
+    gcpRegions,
+  }: Props = $props();
 
   async function rollbackDeployment(
     deploymentName: string,
@@ -199,5 +206,6 @@
   onSubmit={handleCreate}
   {cfnTemplateUrl}
   {cfnTemplate}
+  {terraformTemplate}
   {gcpRegions}
 />
