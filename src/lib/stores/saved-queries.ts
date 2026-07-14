@@ -28,7 +28,7 @@ const getLastHour = () => {
   return lastHour.toISOString();
 };
 
-export const DEFAULT_SYSTEM_VIEW: SavedQuery = {
+export const DEFAULT_WORKFLOW_SYSTEM_VIEW: SavedQuery = {
   id: 'all',
   name: 'All Workflows',
   query: '',
@@ -36,7 +36,7 @@ export const DEFAULT_SYSTEM_VIEW: SavedQuery = {
   type: 'system',
 };
 
-export const TASK_FAILURES_VIEW: SavedQuery = {
+const TASK_FAILURES_VIEW: SavedQuery = {
   id: 'task-failures',
   name: 'Task Failures',
   query: TASK_FAILURES_QUERY,
@@ -44,9 +44,8 @@ export const TASK_FAILURES_VIEW: SavedQuery = {
   type: 'system',
 };
 
-export const systemWorkflowViews: SavedQuery[] = [
-  DEFAULT_SYSTEM_VIEW,
-  TASK_FAILURES_VIEW,
+const systemWorkflowViews: SavedQuery[] = [
+  DEFAULT_WORKFLOW_SYSTEM_VIEW,
   {
     id: 'running',
     name: 'Running',
@@ -77,7 +76,30 @@ export const systemWorkflowViews: SavedQuery[] = [
   },
 ];
 
-export const MAX_SAVED_WORKFLOW_QUERIES = 50;
+export const getSystemWorkflowViews = (
+  hasTaskFailureAttribute: boolean,
+  taskFailuresCount: number,
+): SavedQuery[] => {
+  const [defaultView, ...rest] = systemWorkflowViews;
+  return [
+    defaultView,
+    ...(hasTaskFailureAttribute
+      ? [
+          {
+            ...TASK_FAILURES_VIEW,
+            count: taskFailuresCount,
+            icon:
+              taskFailuresCount > 0
+                ? 'exclamation-octagon'
+                : TASK_FAILURES_VIEW.icon,
+          },
+        ]
+      : []),
+    ...rest,
+  ];
+};
+
+export const MAX_SAVED_QUERIES = 50;
 
 export const savedWorkflowQueries = persistStore<Record<string, SavedQuery[]>>(
   'saved-workflow-queries',
@@ -119,8 +141,6 @@ export const systemActivityViews: SavedQuery[] = [
   },
 ];
 
-export const MAX_SAVED_ACTIVITY_QUERIES = 50;
-
 export const savedActivityQueries = persistStore<Record<string, SavedQuery[]>>(
   'saved-activity-queries',
   {},
@@ -153,8 +173,6 @@ export const systemNexusViews: SavedQuery[] = [
     type: 'system',
   },
 ];
-
-export const MAX_SAVED_NEXUS_QUERIES = 50;
 
 export const savedNexusQueries = persistStore<Record<string, SavedQuery[]>>(
   'saved-nexus-queries',

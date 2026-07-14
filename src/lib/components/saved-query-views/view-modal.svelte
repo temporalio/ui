@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Writable } from 'svelte/store';
+
   import { page } from '$app/state';
 
   import Button from '$lib/holocene/button.svelte';
@@ -7,7 +9,7 @@
   import Modal from '$lib/holocene/modal.svelte';
   import { translate } from '$lib/i18n/translate';
   import {
-    MAX_SAVED_WORKFLOW_QUERIES,
+    MAX_SAVED_QUERIES,
     type SavedQuery,
     savedWorkflowQueries,
   } from '$lib/stores/saved-queries';
@@ -19,24 +21,28 @@
     onCreateView?: (view: SavedQuery) => void;
     onDeleteView?: (view: SavedQuery) => void;
     id?: string;
+    savedQueries?: Writable<Record<string, SavedQuery[]>>;
+    maxQueries?: number;
   }
 
   let {
-    open = $bindable(),
+    open = $bindable(false),
     view,
     onSaveView,
     onCreateView,
     onDeleteView,
     id = 'view-modal',
+    savedQueries = savedWorkflowQueries,
+    maxQueries = MAX_SAVED_QUERIES,
   }: Props = $props();
 
   let name = $state('');
   let touched = $state(false);
 
-  const query = $derived(page.url.searchParams.get('query'));
+  const query = $derived(page.url.searchParams.get('query') ?? '');
   const namespace = $derived(page.params.namespace);
   const maxViewsReached = $derived(
-    $savedWorkflowQueries?.[namespace]?.length >= MAX_SAVED_WORKFLOW_QUERIES,
+    $savedQueries?.[namespace]?.length >= maxQueries,
   );
 
   let wasOpen = $state(false);
@@ -58,7 +64,7 @@
   const startsWithInvalid = /^[.-]/;
   const endsWithInvalid = /[.-]$/;
   const existing = $derived(
-    ($savedWorkflowQueries?.[namespace] || []).filter((q) => q.type === 'user'),
+    ($savedQueries?.[namespace] || []).filter((q) => q.type === 'user'),
   );
 
   const trimmedName = $derived(name?.trim() ?? '');
@@ -149,7 +155,7 @@
   };
 
   const onDelete = () => {
-    onDeleteView(view);
+    if (view) onDeleteView?.(view);
     hideModal();
   };
 </script>

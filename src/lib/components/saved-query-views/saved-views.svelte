@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Readable, Writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
   import { onMount } from 'svelte';
@@ -7,30 +8,45 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import EditViewModal from '$lib/components/workflow/filter-bar/edit-view-modal.svelte';
-  import SaveViewModal from '$lib/components/workflow/filter-bar/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { workflowFilters } from '$lib/stores/filters';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
-    DEFAULT_SYSTEM_VIEW,
-    MAX_SAVED_WORKFLOW_QUERIES,
+    MAX_SAVED_QUERIES,
     type SavedQuery,
-    savedWorkflowQueries,
-    systemWorkflowViews,
-    TASK_FAILURES_VIEW,
   } from '$lib/stores/saved-queries';
-  import { searchAttributes } from '$lib/stores/search-attributes';
-  import { taskFailuresCount } from '$lib/stores/workflows';
+  import type { SearchAttributes } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  import ViewModal from './view-modal.svelte';
+
+  interface Props {
+    filters: Writable<SearchAttributeFilter[]>;
+    savedQueries: Writable<Record<string, SavedQuery[]>>;
+    systemViews: SavedQuery[];
+    defaultView: SavedQuery;
+    maxQueries?: number;
+    searchAttributes: Readable<SearchAttributes>;
+    id: string;
+  }
+
+  let {
+    filters,
+    savedQueries,
+    systemViews,
+    defaultView,
+    maxQueries = MAX_SAVED_QUERIES,
+    searchAttributes,
+    id,
+  }: Props = $props();
 
   let activeQueryView: SavedQuery | undefined = $state();
   let saveViewModalOpen = $state(false);
@@ -40,21 +56,17 @@
   const query = $derived(page.url.searchParams.get('query') || '');
   const savedQueryParam = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
-  const hasTaskFailureAttribute = $derived(
-    !!page.data.namespace.namespaceInfo?.capabilities
-      ?.reportedProblemsSearchAttribute,
-  );
 
   const maxViewsReached = $derived(
-    $savedWorkflowQueries?.[namespace]?.length >= MAX_SAVED_WORKFLOW_QUERIES,
+    $savedQueries?.[namespace]?.length >= maxQueries,
   );
 
   const namespaceSavedQueries = $derived(
-    sortAlphabetically($savedWorkflowQueries?.[namespace] || [], (q) => q.name),
+    sortAlphabetically($savedQueries?.[namespace] || [], (q) => q.name),
   );
   const systemQueryView = $derived(
-    (query && systemWorkflowViews.find((q) => q.query === query)) ||
-      (!query && DEFAULT_SYSTEM_VIEW),
+    (query && systemViews.find((q) => q.query === query)) ||
+      (!query && defaultView),
   );
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
@@ -79,14 +91,10 @@
         type: 'user',
       };
 
-      if (!$savedWorkflowQueries[namespace])
-        $savedWorkflowQueries[namespace] = [];
+      if (!$savedQueries[namespace]) $savedQueries[namespace] = [];
 
       if (!maxViewsReached) {
-        $savedWorkflowQueries[namespace] = [
-          ...$savedWorkflowQueries[namespace],
-          queryToSave,
-        ];
+        $savedQueries[namespace] = [...$savedQueries[namespace], queryToSave];
       }
 
       activeQueryView = queryToSave;
@@ -108,8 +116,8 @@
       return;
     }
 
-    if (!query && activeQueryView?.id !== DEFAULT_SYSTEM_VIEW.id) {
-      activeQueryView = DEFAULT_SYSTEM_VIEW;
+    if (!query && activeQueryView?.id !== defaultView.id) {
+      activeQueryView = defaultView;
       return;
     }
 
@@ -132,7 +140,7 @@
     pendingQueryTarget = view.query || '';
 
     if (view.query) {
-      $workflowFilters = toListWorkflowFilters(view.query, $searchAttributes);
+      $filters = toListWorkflowFilters(view.query, $searchAttributes);
     }
 
     updateQueryParameters({
@@ -147,48 +155,44 @@
   const { copy, copied } = copyToClipboard();
 
   const handleCopy = (e: Event) => {
-    const sharableViewUrl =
-      new URL(page.url.href) +
-      '&savedQuery=' +
-      encodeURIComponent(activeQueryView.name);
-    copy(e, sharableViewUrl);
+    if (activeQueryView) {
+      const sharableViewUrl =
+        new URL(page.url.href) +
+        '&savedQuery=' +
+        encodeURIComponent(activeQueryView.name);
+      copy(e, sharableViewUrl);
+    }
   };
 
   const onCreateView = (view: SavedQuery) => {
-    if (!$savedWorkflowQueries[namespace]) {
-      $savedWorkflowQueries[namespace] = [];
+    if (!$savedQueries[namespace]) {
+      $savedQueries[namespace] = [];
     }
 
-    $savedWorkflowQueries[namespace] = [
-      ...$savedWorkflowQueries[namespace],
-      view,
-    ];
+    $savedQueries[namespace] = [...$savedQueries[namespace], view];
     activeQueryView = view;
   };
 
   const onSaveView = (view: SavedQuery) => {
-    if (!$savedWorkflowQueries[namespace]) {
-      $savedWorkflowQueries[namespace] = [];
+    if (!$savedQueries[namespace]) {
+      $savedQueries[namespace] = [];
     }
 
     if (view.id === activeQueryView?.id) {
-      $savedWorkflowQueries[namespace] = $savedWorkflowQueries[namespace].map(
-        (q) => (q.id === view.id ? view : q),
+      $savedQueries[namespace] = $savedQueries[namespace].map((q) =>
+        q.id === view.id ? view : q,
       );
     } else {
-      $savedWorkflowQueries[namespace] = [
-        ...$savedWorkflowQueries[namespace],
-        view,
-      ];
+      $savedQueries[namespace] = [...$savedQueries[namespace], view];
     }
     activeQueryView = view;
   };
 
   const onDeleteView = (view: SavedQuery) => {
-    $savedWorkflowQueries[namespace] = $savedWorkflowQueries[namespace].filter(
+    $savedQueries[namespace] = $savedQueries[namespace].filter(
       (q) => q?.id !== view.id,
     );
-    $workflowFilters = [];
+    $filters = [];
     activeQueryView = undefined;
     updateQueryParameters({
       url: page.url,
@@ -243,16 +247,11 @@
   <div class="space-y-2 p-1.5">
     <div class="pb-2 text-center">
       <div class="space-y-1">
-        {#each systemWorkflowViews as view (view.id)}
-          {#if view.id !== TASK_FAILURES_VIEW.id || hasTaskFailureAttribute}
-            {@render queryButton({
-              ...view,
-              active: query === view.query,
-              ...(view.id === TASK_FAILURES_VIEW.id && {
-                count: $taskFailuresCount,
-              }),
-            })}
-          {/if}
+        {#each systemViews as view (view.id)}
+          {@render queryButton({
+            ...view,
+            active: query === view.query,
+          })}
         {/each}
       </div>
     </div>
@@ -262,10 +261,10 @@
         class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
         in:slide
       >
-        {translate('workflows.custom-views')}
+        {translate('common.custom-views')}
         {@render queryBadge({
           className: 'font-mono',
-          content: `${namespaceSavedQueries.length}/${MAX_SAVED_WORKFLOW_QUERIES}`,
+          content: `${namespaceSavedQueries.length}/${maxQueries}`,
         })}
       </p>
     {/if}
@@ -279,7 +278,7 @@
     {#if namespaceSavedQueries.length > 0}
       <div class="text-center">
         <div class="space-y-1">
-          {#each namespaceSavedQueries as savedQuery}
+          {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
             {@render queryButton({
               ...savedQuery,
               active: savedQuery.id === activeQueryView?.id,
@@ -306,20 +305,27 @@
     {/if}
   </div>
 </div>
-<SaveViewModal bind:open={saveViewModalOpen} {onCreateView} />
-<EditViewModal
+<ViewModal
+  id="{id}-save-view-modal"
+  bind:open={saveViewModalOpen}
+  {onCreateView}
+  {savedQueries}
+  {maxQueries}
+/>
+<ViewModal
+  id="{id}-edit-view-modal"
   view={activeQueryView}
   bind:open={editViewModalOpen}
   {onSaveView}
   {onCreateView}
   {onDeleteView}
+  {savedQueries}
+  {maxQueries}
 />
 
 {#snippet queryButton(view: SavedQuery)}
   <Tooltip
-    text={view.id === TASK_FAILURES_VIEW.id
-      ? `${view.name} • ${view.count ?? 0}`
-      : view.name}
+    text={view.count != undefined ? `${view.name} • ${view.count}` : view.name}
     right
     usePortal
     hide={$savedQueryNavOpen}
@@ -341,16 +347,14 @@
         on:click={() => setActiveQueryView(view)}
         class={merge(
           'flex w-full justify-start',
-          view.count > 0 && 'text-red-900 dark:text-red-300',
+          (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
         )}
         active={view.active}
         disabled={view.disabled}
         size="sm"
       >
         <Icon
-          name={view.id === TASK_FAILURES_VIEW.id && view.count > 0
-            ? 'exclamation-octagon'
-            : view.icon || 'bookmark'}
+          name={view.icon || 'bookmark'}
           class={merge(
             'h-4 w-4 flex-shrink-0  transition-colors duration-200',
             $savedQueryNavOpen ? 'lg:hidden' : '',

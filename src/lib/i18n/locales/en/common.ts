@@ -13,6 +13,7 @@ export const Strings = {
   'all-time': 'All Time',
   time: 'Time',
   custom: 'Custom',
+  'custom-views': 'Custom Views',
   'start-time': 'Start Time',
   'end-time': 'End Time',
   'close-time': 'Close Time',

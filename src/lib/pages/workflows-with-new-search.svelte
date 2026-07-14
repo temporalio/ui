@@ -29,6 +29,7 @@
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import BatchCancelConfirmationModal from '$lib/components/workflow/client-actions/batch-cancel-confirmation-modal.svelte';
@@ -42,13 +43,17 @@
   import Button from '$lib/holocene/button.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
-  import SavedQueryViews from '$lib/pages/saved-query-views.svelte';
   import { fetchWorkflowTaskFailures } from '$lib/services/workflow-counts';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
+  import {
+    DEFAULT_WORKFLOW_SYSTEM_VIEW,
+    getSystemWorkflowViews,
+    savedWorkflowQueries,
+  } from '$lib/stores/saved-queries';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import {
     refresh,
@@ -85,6 +90,10 @@
       (count) => ($taskFailuresCount = count ?? 0),
     );
   });
+
+  const systemViews = $derived(
+    getSystemWorkflowViews(hasTaskFailureAttribute, $taskFailuresCount),
+  );
 
   const availableColumns = $derived(
     availableWorkflowSystemSearchAttributeColumns(
@@ -294,7 +303,14 @@
 
 <FilterBar />
 <div class="flex overflow-auto">
-  <SavedQueryViews />
+  <SavedQueryViews
+    filters={workflowFilters}
+    savedQueries={savedWorkflowQueries}
+    {systemViews}
+    defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
+    {searchAttributes}
+    id="workflow"
+  />
   <div
     class={merge(
       'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',

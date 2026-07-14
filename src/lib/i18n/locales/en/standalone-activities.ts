@@ -16,7 +16,6 @@ export const Strings = {
   'timed-out-activities': 'Timed Out',
   'empty-state-title': 'No Activities Found',
   'empty-state-description': 'No activities match the current filters.',
-  'custom-views': 'Custom Views',
   'recent-activities': 'Recent Standalone Activities',
   'activity-id': 'Activity ID',
   'run-id': 'Run ID',
