@@ -64,11 +64,15 @@ td {
   padding: 0.375rem 0.75rem;
   border: 1px solid;
   border-color: color-mix(in srgb, currentColor 20%, transparent);
-  text-align: left;
 }
 
 th {
   font-weight: 600;
+}
+
+th:not([align]),
+td:not([align]) {
+  text-align: left;
 }
 
 ul,
