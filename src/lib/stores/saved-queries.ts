@@ -205,3 +205,29 @@ export const savedWorkerQueries = persistStore<Record<string, SavedQuery[]>>(
   {},
   true,
 );
+
+// Schedule saved queries
+export const DEFAULT_SCHEDULE_SYSTEM_VIEW: SavedQuery = {
+  id: 'all',
+  name: 'All',
+  query: '',
+  icon: 'schedules',
+  type: 'system',
+};
+
+export const systemScheduleViews: SavedQuery[] = [
+  DEFAULT_SCHEDULE_SYSTEM_VIEW,
+  {
+    id: 'paused',
+    name: 'Paused',
+    query: '`TemporalSchedulePaused`=true',
+    icon: 'pause',
+    type: 'system',
+  },
+];
+
+export const savedScheduleQueries = persistStore<Record<string, SavedQuery[]>>(
+  'saved-schedule-queries',
+  {},
+  true,
+);
