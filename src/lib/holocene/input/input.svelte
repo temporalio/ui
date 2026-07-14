@@ -95,7 +95,7 @@
   const { copy, copied } = copyToClipboard();
 </script>
 
-<div class={merge('group flex flex-col gap-1.5', className)}>
+<div class={merge('group flex flex-col gap-1', className)}>
   <div
     class={merge(
       'flex items-center justify-start gap-2',
