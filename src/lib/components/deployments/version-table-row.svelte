@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CapabilityGuard from '$lib/components/capability-guard.svelte';
   import Timestamp from '$lib/components/timestamp.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -353,23 +352,21 @@
 <tr>
   <td class="text-left">
     <div class="flex items-center gap-1">
-      <CapabilityGuard capability="serverScaledDeployments">
-        {#if computeProviderType}
-          <button
-            type="button"
-            aria-label={expanded
-              ? translate('common.collapse')
-              : translate('common.expand')}
-            onclick={() => (expanded = !expanded)}
-            class="shrink-0"
-          >
-            <Icon
-              name="chevron-right"
-              class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
-            />
-          </button>
-        {/if}
-      </CapabilityGuard>
+      {#if computeProviderType}
+        <button
+          type="button"
+          aria-label={expanded
+            ? translate('common.collapse')
+            : translate('common.expand')}
+          onclick={() => (expanded = !expanded)}
+          class="shrink-0"
+        >
+          <Icon
+            name="chevron-right"
+            class="h-4 w-4 transition-transform {expanded ? 'rotate-90' : ''}"
+          />
+        </button>
+      {/if}
       <Copyable
         content={versionBuildId}
         copyIconTitle={translate('common.copy-icon-title')}
@@ -384,20 +381,16 @@
   <td class="text-left">
     <DeploymentStatus {status} label={statusLabel} />
   </td>
-  <CapabilityGuard capability="serverScaledDeployments">
-    <td class="text-left">
-      <ComputeBadge type={computeProviderType} />
-    </td>
-  </CapabilityGuard>
-  <CapabilityGuard capability="serverScaledDeployments">
-    <td class="text-left">
-      {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
-        <ConnectionBadge computeStatus={version.computeStatus} />
-      {:else}
-        <span class="text-secondary">—</span>
-      {/if}
-    </td>
-  </CapabilityGuard>
+  <td class="text-left">
+    <ComputeBadge type={computeProviderType} />
+  </td>
+  <td class="text-left">
+    {#if connectionVisible && isVersionSummaryNew(version) && computeProviderType}
+      <ConnectionBadge computeStatus={version.computeStatus} />
+    {:else}
+      <span class="text-secondary">—</span>
+    {/if}
+  </td>
   <Timestamp
     as="td"
     class="whitespace-pre-line break-words text-left"
