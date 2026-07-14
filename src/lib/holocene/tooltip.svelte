@@ -24,7 +24,6 @@
     usePortal?: boolean;
     portalOffset?: PortalOffset;
     scrollContainer?: string;
-    portalOffset?: PortalOffset;
   };
 
   type BasePositionProps = {
@@ -86,7 +85,6 @@
   export let usePortal = false;
   export let portalOffset: PortalOffset | undefined = undefined;
   export let scrollContainer: string | undefined = undefined;
-  export let portalOffset: PortalOffset = {};
 
   let wrapperElement: HTMLElement | null = null;
   let isHovered = false;
@@ -177,7 +175,6 @@
         anchor={wrapperElement}
         open={isOpen}
         position={portalPosition}
-        offset={portalOffset}
         {scrollContainer}
       >
         <div
