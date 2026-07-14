@@ -145,8 +145,8 @@ test.describe('Creates Schedule Successfully', () => {
 
     await page.locator('#end-date-on').check();
 
-    await page.locator('#timezoneName').fill('Japan');
-    await page.getByRole('option', { name: /Japan/ }).first().click();
+    await page.locator('#timezoneName').fill('Tokyo');
+    await page.getByRole('option', { name: /Tokyo/ }).first().click();
 
     const createRequest = page.waitForRequest(isCreateRequest);
     await page.getByTestId('create-schedule-button').click();
