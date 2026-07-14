@@ -12,7 +12,7 @@
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { DescribeFullSchedule } from '$lib/types/schedule';
-  import { getTimezoneOffsetRange } from '$lib/utilities/timezone';
+  import { ianaTimezoneComboboxOptions } from '$lib/utilities/timezone';
 
   import type { FormScheduleSchema } from '../schema/form';
   import { fromCalendarDateStr, toCalendarDateStr } from '../utilities/date';
@@ -26,17 +26,6 @@
   }
 
   let { form, errors, schedule = null }: Props = $props();
-
-  const timezoneComboboxOptions = $derived.by(() => {
-    const opts = [{ label: translate('common.utc'), value: 'UTC' }];
-    for (const zone of Intl.supportedValuesOf('timeZone')) {
-      opts.push({
-        label: `${zone} (${getTimezoneOffsetRange(zone)})`,
-        value: zone,
-      });
-    }
-    return opts;
-  });
 
   // svelte-ignore state_referenced_locally
   const endKindStore = fieldProxy(form, 'endKind');
@@ -198,7 +187,7 @@
         id="timezoneName"
         label={translate('schedules.timezone-label')}
         bind:value={$form.timezoneName}
-        options={timezoneComboboxOptions}
+        options={ianaTimezoneComboboxOptions}
         optionValueKey="value"
         optionLabelKey="label"
         noResultsText={translate('common.no-results')}

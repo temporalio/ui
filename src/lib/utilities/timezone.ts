@@ -111,6 +111,14 @@ export function getTimezoneOffsetRange(timeZone: string): string {
     .join('/');
 }
 
+export const ianaTimezoneComboboxOptions: { label: string; value: string }[] = [
+  { label: 'UTC', value: 'UTC' },
+  ...Intl.supportedValuesOf('timeZone').map((zone) => ({
+    label: `${zone} (${getTimezoneOffsetRange(zone)})`,
+    value: zone,
+  })),
+];
+
 export function getLocalTimezone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
