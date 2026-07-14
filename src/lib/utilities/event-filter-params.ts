@@ -10,6 +10,8 @@ export const SHARED_FILTER_PARAMS = [
   'category',
   'status',
   'refresh_off',
+  'time_start',
+  'time_end',
 ] as const;
 
 export function getSharedFilterParams(url: URL): Record<string, string> {
@@ -36,6 +38,8 @@ export function parseEventFilterParams(url: URL) {
       : null,
     statusFilter: url.searchParams.get('status') === 'pending',
     refresh_off: url.searchParams.get('refresh_off') === 'true',
+    timeStart: url.searchParams.get('time_start'),
+    timeEnd: url.searchParams.get('time_end'),
   };
 }
 
@@ -44,6 +48,8 @@ type FilterUpdate = {
   categories?: EventTypeCategory[] | null;
   statusFilter?: boolean;
   refresh_off?: boolean;
+  timeStart?: string | null;
+  timeEnd?: string | null;
 };
 
 export function updateEventFilterParams(
@@ -81,6 +87,20 @@ export function updateEventFilterParams(
     parameters.push({
       parameter: 'refresh_off',
       value: filters.refresh_off ? 'true' : undefined,
+    });
+  }
+
+  if (filters.timeStart !== undefined) {
+    parameters.push({
+      parameter: 'time_start',
+      value: filters.timeStart ?? undefined,
+    });
+  }
+
+  if (filters.timeEnd !== undefined) {
+    parameters.push({
+      parameter: 'time_end',
+      value: filters.timeEnd ?? undefined,
     });
   }
 

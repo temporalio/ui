@@ -1,6 +1,18 @@
+import { writable } from 'svelte/store';
+
 import { persistStore } from '$lib/stores/persist-store';
 import type { EventView } from '$lib/types/events';
 import type { BooleanString } from '$lib/types/global';
+
+export type EventTimeFilter = {
+  startTime: Date | null;
+  endTime: Date | null;
+};
+
+export const eventTimeFilter = writable<EventTimeFilter>({
+  startTime: null,
+  endTime: null,
+});
 
 export type EventSortOrder = 'ascending' | 'descending';
 export type EventSortOrderOptions = {
