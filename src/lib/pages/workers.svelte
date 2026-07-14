@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -10,7 +9,6 @@
   import WorkersTable from '$lib/components/workers/workers-table/workers-table.svelte';
   import { fetchPaginatedWorkers } from '$lib/services/worker-service';
   import { workerFilters } from '$lib/stores/filters';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import {
     DEFAULT_WORKER_SYSTEM_VIEW,
     savedWorkerQueries,
@@ -48,30 +46,22 @@
     includeNullConditions={false}
   />
 
-  <div class="flex overflow-auto">
-    <SavedQueryViews
-      filters={workerFilters}
-      savedQueries={savedWorkerQueries}
-      systemViews={systemWorkerViews}
-      defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
-      searchAttributes={workerSearchAttributes}
-      id="worker"
-    />
-    <div
-      class={merge(
-        'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-        !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-      )}
-    >
-      {#key [namespace, query, $refresh]}
-        <WorkersTable
-          {namespace}
-          onFetch={() => fetchPaginatedWorkers({ namespace, query })}
-          filterable
-        />
-      {/key}
-    </div>
-  </div>
+  <SavedQueryViews
+    filters={workerFilters}
+    savedQueries={savedWorkerQueries}
+    systemViews={systemWorkerViews}
+    defaultView={DEFAULT_WORKER_SYSTEM_VIEW}
+    searchAttributes={workerSearchAttributes}
+    id="worker"
+  >
+    {#key [namespace, query, $refresh]}
+      <WorkersTable
+        {namespace}
+        onFetch={() => fetchPaginatedWorkers({ namespace, query })}
+        filterable
+      />
+    {/key}
+  </SavedQueryViews>
 {:else}
   <WorkerHeartbeatsDisabled />
 {/if}

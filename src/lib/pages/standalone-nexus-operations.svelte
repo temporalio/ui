@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -22,7 +21,6 @@
   } from '$lib/stores/configurable-table-columns';
   import { nexusOperationFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import {
     nexusOperationCount,
     nexusOperationRefresh,
@@ -126,26 +124,18 @@
 </header>
 
 <FilterBar />
-<div class="flex overflow-auto">
-  <SavedQueryViews
-    filters={nexusOperationFilters}
-    savedQueries={savedNexusQueries}
-    systemViews={systemNexusViews}
-    defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
-    searchAttributes={nexusOperationSearchAttributes}
-    id="nexus"
+<SavedQueryViews
+  filters={nexusOperationFilters}
+  savedQueries={savedNexusQueries}
+  systemViews={systemNexusViews}
+  defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
+  searchAttributes={nexusOperationSearchAttributes}
+  id="nexus"
+>
+  <NexusOperationsSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
   />
-  <div
-    class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-    )}
-  >
-    <NexusOperationsSummaryConfigurableTable
-      onClickConfigure={openCustomizationDrawer}
-    />
-  </div>
-</div>
+</SavedQueryViews>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

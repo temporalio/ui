@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -28,7 +27,6 @@
   } from '$lib/stores/configurable-table-columns';
   import { coreUserStore } from '$lib/stores/core-user';
   import { scheduleFilters } from '$lib/stores/filters';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import {
     DEFAULT_SCHEDULE_SYSTEM_VIEW,
     savedScheduleQueries,
@@ -93,8 +91,6 @@
       (err as APIErrorResponse)?.body?.message ||
       translate('schedules.error-message-fetching');
   };
-
-  const showFilters = $derived($schedulesCount.count > 0 || query);
 </script>
 
 <header class="flex flex-col gap-2">
@@ -143,56 +139,47 @@
   </div>
 </header>
 
-{#if showFilters}
-  <FilterBar
-    filters={scheduleFilters}
-    options={$scheduleSearchAttributeOptions}
-    searchAttributes={$scheduleSearchAttributes}
-    id="schedules"
-  />
-{/if}
-
-<div class="flex overflow-auto">
-  <SavedQueryViews
-    filters={scheduleFilters}
-    savedQueries={savedScheduleQueries}
-    systemViews={systemScheduleViews}
-    defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
-    searchAttributes={scheduleSearchAttributes}
-    id="schedule"
-  />
-  <div
-    class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-    )}
-  >
-    {#key [namespace, query, $schedulesRefresh]}
-      <PaginatedTable
-        let:visibleItems
-        {onFetch}
-        {onError}
-        total={$schedulesCount.count}
-        aria-label={translate('common.schedules')}
-        pageSizeSelectLabel={translate('common.per-page')}
-        nextButtonLabel={translate('common.next')}
-        previousButtonLabel={translate('common.previous')}
-        emptyStateMessage={translate('schedules.empty-state-title')}
-        errorMessage={translate('schedules.error-message-fetching')}
+<FilterBar
+  filters={scheduleFilters}
+  options={$scheduleSearchAttributeOptions}
+  searchAttributes={$scheduleSearchAttributes}
+  id="schedules"
+/>
+<SavedQueryViews
+  filters={scheduleFilters}
+  savedQueries={savedScheduleQueries}
+  systemViews={systemScheduleViews}
+  defaultView={DEFAULT_SCHEDULE_SYSTEM_VIEW}
+  searchAttributes={scheduleSearchAttributes}
+  id="schedule"
+>
+  {#key [namespace, query, $schedulesRefresh]}
+    <PaginatedTable
+      let:visibleItems
+      {onFetch}
+      {onError}
+      total={$schedulesCount.count}
+      aria-label={translate('common.schedules')}
+      pageSizeSelectLabel={translate('common.per-page')}
+      nextButtonLabel={translate('common.next')}
+      previousButtonLabel={translate('common.previous')}
+      emptyStateMessage={translate('schedules.empty-state-title')}
+      errorMessage={translate('schedules.error-message-fetching')}
+    >
+      <caption class="sr-only" slot="caption"
+        >{translate('common.schedules')}</caption
       >
-        <caption class="sr-only" slot="caption"
-          >{translate('common.schedules')}</caption
-        >
-        <tr slot="headers" class="text-left">
-          {#each columns as { label }, i (`${label}:${i}`)}
-            <th>{label}</th>
-          {/each}
-        </tr>
-        {#each visibleItems as schedule (schedule.scheduleId)}
-          <SchedulesTableRow {schedule} {columns} />
+      <tr slot="headers" class="text-left">
+        {#each columns as { label }, i (`${label}:${i}`)}
+          <th>{label}</th>
         {/each}
+      </tr>
+      {#each visibleItems as schedule (schedule.scheduleId)}
+        <SchedulesTableRow {schedule} {columns} />
+      {/each}
 
-        <svelte:fragment slot="empty">
+      <svelte:fragment slot="empty">
+        <div class="flex h-full flex-col items-center justify-center">
           {#if error}
             <EmptyState title={translate('schedules.empty-state-title')}>
               <Alert intent="warning" icon="warning" class="mx-12">
@@ -218,24 +205,24 @@
               </p>
             </EmptyState>
           {/if}
-        </svelte:fragment>
-        <svelte:fragment slot="actions-end-additional">
-          <Tooltip text={translate('common.configure-columns')} top>
-            <Button
-              on:click={openCustomizationDrawer}
-              data-testid="workflows-summary-table-configuration-button"
-              size="xs"
-              variant="ghost"
-              aria-label={translate('common.configure-columns')}
-            >
-              <Icon name="settings" />
-            </Button>
-          </Tooltip>
-        </svelte:fragment>
-      </PaginatedTable>
-    {/key}
-  </div>
-</div>
+        </div>
+      </svelte:fragment>
+      <svelte:fragment slot="actions-end-additional">
+        <Tooltip text={translate('common.configure-columns')} top>
+          <Button
+            on:click={openCustomizationDrawer}
+            data-testid="workflows-summary-table-configuration-button"
+            size="xs"
+            variant="ghost"
+            aria-label={translate('common.configure-columns')}
+          >
+            <Icon name="settings" />
+          </Button>
+        </Tooltip>
+      </svelte:fragment>
+    </PaginatedTable>
+  {/key}
+</SavedQueryViews>
 
 <ConfigurableTableHeadersDrawer
   {availableColumns}

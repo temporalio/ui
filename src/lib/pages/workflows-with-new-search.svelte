@@ -1,8 +1,6 @@
 <script lang="ts" module>
   import type { Readable, Writable } from 'svelte/store';
 
-  import { twMerge as merge } from 'tailwind-merge';
-
   import type { WorkflowExecution } from '$lib/types/workflows';
 
   export const BATCH_OPERATION_CONTEXT = 'BATCH_OPERATION_CONTEXT';
@@ -48,7 +46,6 @@
   import { availableWorkflowSystemSearchAttributeColumns } from '$lib/stores/configurable-table-columns';
   import { workflowFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import {
     DEFAULT_WORKFLOW_SYSTEM_VIEW,
     getSystemWorkflowViews,
@@ -302,27 +299,19 @@
 </header>
 
 <FilterBar />
-<div class="flex overflow-auto">
-  <SavedQueryViews
-    filters={workflowFilters}
-    savedQueries={savedWorkflowQueries}
-    {systemViews}
-    defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
-    {searchAttributes}
-    id="workflow"
+<SavedQueryViews
+  filters={workflowFilters}
+  savedQueries={savedWorkflowQueries}
+  {systemViews}
+  defaultView={DEFAULT_WORKFLOW_SYSTEM_VIEW}
+  {searchAttributes}
+  id="workflow"
+>
+  <WorkflowsSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
+    {cloud}
   />
-  <div
-    class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-    )}
-  >
-    <WorkflowsSummaryConfigurableTable
-      onClickConfigure={openCustomizationDrawer}
-      {cloud}
-    />
-  </div>
-</div>
+</SavedQueryViews>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

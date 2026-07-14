@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
@@ -29,7 +28,6 @@
   } from '$lib/stores/configurable-table-columns';
   import { activityFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import {
     DEFAULT_ACTIVITY_SYSTEM_VIEW,
     savedActivityQueries,
@@ -135,26 +133,18 @@
 </header>
 
 <FilterBar />
-<div class="flex overflow-auto">
-  <SavedQueryViews
-    filters={activityFilters}
-    savedQueries={savedActivityQueries}
-    systemViews={systemActivityViews}
-    defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
-    searchAttributes={activityExecutionSearchAttributes}
-    id="activity"
+<SavedQueryViews
+  filters={activityFilters}
+  savedQueries={savedActivityQueries}
+  systemViews={systemActivityViews}
+  defaultView={DEFAULT_ACTIVITY_SYSTEM_VIEW}
+  searchAttributes={activityExecutionSearchAttributes}
+  id="activity"
+>
+  <ActivitiesSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
   />
-  <div
-    class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-    )}
-  >
-    <ActivitiesSummaryConfigurableTable
-      onClickConfigure={openCustomizationDrawer}
-    />
-  </div>
-</div>
+</SavedQueryViews>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

@@ -27,7 +27,7 @@
         {#if $activityError}
           {$activityError}
         {:else}
-          {translate('standalone-activities.empty-state-description')}
+          {translate('standalone-activities.empty-state-query-description')}
         {/if}
       </p>
       <NoQueryResults class="m-auto mt-8 text-subtle" />
