@@ -410,20 +410,27 @@
     return Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
   });
 
-  // Slot n shows filteredGroups[windowStart + n], or null past the window/list.
-  // Keyed by slot index (below) so the DOM stays put; poolSize ≥ window span.
+  // Slot i%poolSize always holds group i (keyed by slot index below, so the DOM
+  // stays put; span capped at poolSize so slots never collide). Reuse the prior
+  // slot object when unchanged — a fresh object each pass would change the {#each}
+  // item and re-run the row derived for rows that didn't move.
+  let prevSlots: ({ index: number; group: EventGroups[number] } | null)[] = [];
   const pool = $derived.by(() => {
-    const start = windowStart;
     const total = filteredGroups.length;
-    const slots: ({ index: number; group: EventGroups[number] } | null)[] = [];
-    for (let slot = 0; slot < poolSize; slot++) {
-      const index = start + slot;
-      slots.push(
-        index < windowEnd && index < total
-          ? { index, group: filteredGroups[index] }
-          : null,
-      );
+    const slots: ({ index: number; group: EventGroups[number] } | null)[] =
+      new Array(poolSize).fill(null);
+    const end = Math.min(windowEnd, total, windowStart + poolSize);
+    for (let index = windowStart; index < end; index++) {
+      const slot = index % poolSize;
+      const group = filteredGroups[index];
+      const prev = prevSlots[slot];
+      if (prev && prev.index === index && prev.group === group) {
+        slots[slot] = prev;
+      } else {
+        slots[slot] = { index, group };
+      }
     }
+    prevSlots = slots;
     return slots;
   });
 
