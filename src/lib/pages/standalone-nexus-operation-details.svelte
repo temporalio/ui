@@ -11,6 +11,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { translate } from '$lib/i18n/translate';
   import { toEventLinkView } from '$lib/utilities/event-link';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
   import { toNexusOperationCancellationStateReadable } from '$lib/utilities/screaming-enums';
   import { nexusOperationExecution } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
@@ -111,7 +112,7 @@
         >
         <DetailListTextValue
           text={info.executionDuration
-            ? fromSeconds(info.executionDuration)
+            ? formatDurationAbbreviated(info.executionDuration)
             : '-'}
         />
         <DetailListLabel

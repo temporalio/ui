@@ -4,10 +4,10 @@
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { routeForStandaloneActivitiesWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
-  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
     DetailList,
@@ -85,7 +85,7 @@
       >
       <DetailListTextValue
         text={activityExecutionInfo.executionDuration
-          ? fromSeconds(activityExecutionInfo.executionDuration)
+          ? formatDurationAbbreviated(activityExecutionInfo.executionDuration)
           : '-'}
       />
     </DetailListColumn>
