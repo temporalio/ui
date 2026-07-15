@@ -58,6 +58,16 @@
 
   $effect(() => {
     if (!rendererReady || !renderer) return;
+    // Wake the render loop whenever the viewport changes externally (e.g. page scroll).
+    void ctx.state.viewport.scrollY;
+    void ctx.state.viewport.startMs;
+    void ctx.state.viewport.zoom;
+    void ctx.state.viewport.scaleY;
+    renderer.scheduleRender();
+  });
+
+  $effect(() => {
+    if (!rendererReady || !renderer) return;
     renderer.setSortOrder(renderArgs?.sortOrder ?? 'desc');
   });
 </script>

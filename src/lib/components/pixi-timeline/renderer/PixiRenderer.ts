@@ -249,7 +249,14 @@ export class PixiRenderer {
   private frameBufCount = 0;
   private frameScratch = new Float32Array(120);
 
-  private dirty = true;
+  private _dirty = true;
+  private get dirty(): boolean {
+    return this._dirty;
+  }
+  private set dirty(v: boolean) {
+    this._dirty = v;
+    if (v) this.scheduleRender();
+  }
   private lastStartMs = NaN;
   private lastScrollY = NaN;
   private lastZoom = NaN;
@@ -268,7 +275,6 @@ export class PixiRenderer {
       }
     } else {
       this.dirty = true;
-      this.startLoop();
     }
   };
 
@@ -355,7 +361,7 @@ export class PixiRenderer {
     this.canvasRect = this.canvas.getBoundingClientRect();
     this.setupInteraction();
     document.addEventListener('visibilitychange', this.onVisibilityChange);
-    this.startLoop(true);
+    this.scheduleRender(true);
 
     this.state.rendererInfo =
       this.app.renderer.type === RendererType.WEBGPU ? 'WebGPU' : 'WebGL2';
@@ -506,20 +512,20 @@ export class PixiRenderer {
     );
   }
 
-  private startLoop(skipFirstFrame = false) {
+  scheduleRender(skipFrame = false) {
     if (this.rafId !== null) return;
-    const tick = () => {
-      this.render();
-      this.rafId = requestAnimationFrame(tick);
-    };
-    if (skipFirstFrame) {
+    if (skipFrame) {
       this.rafId = requestAnimationFrame(() => {
         this.rafId = null;
-        tick();
+        this.scheduleRender();
       });
-    } else {
-      this.rafId = requestAnimationFrame(tick);
+      return;
     }
+    this.rafId = requestAnimationFrame(() => {
+      this.rafId = null;
+      this.render();
+      if (!this.currentArgs.finalized) this.scheduleRender();
+    });
   }
 
   private getLabel(index: number): BitmapText {
@@ -998,7 +1004,9 @@ export class PixiRenderer {
     const containerY = RULER_H - scrollY;
 
     const tileOffset = (performance.now() / 1000) * 48;
-    const tileChanged = Math.abs(tileOffset - this.lastTileOffset) >= 0.5;
+    const hasLoadingBars = !this.currentArgs.finalized;
+    const tileChanged =
+      hasLoadingBars && Math.abs(tileOffset - this.lastTileOffset) >= 0.5;
 
     // Split dirty tracking: X-geometry (pan/zoom/resize) vs Y-scroll.
     // Ruler and grid lines only depend on X state; skipping their rebuild on
@@ -1044,7 +1052,7 @@ export class PixiRenderer {
     }
 
     // Full geometry path — pan, zoom, resize, scroll, or dirty.
-    this.dirty = false;
+    this._dirty = false;
     this.lastStartMs = startMs;
     this.lastScrollY = scrollY;
     this.lastZoom = zoom;
@@ -1538,6 +1546,7 @@ export class PixiRenderer {
       this.pendingHoverClientX = e.clientX;
       this.pendingHoverClientY = e.clientY;
       this.hasPendingHover = true;
+      this.scheduleRender();
     });
 
     canvas.addEventListener('pointerup', (e) => {
@@ -1688,6 +1697,7 @@ export class PixiRenderer {
           this.pendingWheelDX += Math.abs(dx) > Math.abs(dy) ? dx : dy;
         }
         this.hasPendingWheel = true;
+        this.scheduleRender();
       },
       { passive: false },
     );

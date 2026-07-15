@@ -42,7 +42,7 @@ export default {
     },
     csp: {
       mode: 'auto',
-      directives: { 'script-src': ['strict-dynamic', 'unsafe-eval'] },
+      directives: { 'script-src': ['strict-dynamic'] },
     },
   },
 };

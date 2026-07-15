@@ -51,6 +51,7 @@ export const parameters: Readable<FetchEventsParameters> = derived(
 
 export const timelineEvents = writable(null);
 export const fullEventHistory = writable<WorkflowEvents>([]);
+export const loadedWorkflowKey = writable<string | null>(null);
 
 export const pauseLiveUpdates = writable(false);
 export const currentEventHistory = writable<WorkflowEvents>([]);
