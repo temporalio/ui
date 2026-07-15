@@ -19,6 +19,7 @@
     formatAttemptsLeft,
     formatMaximumAttempts,
   } from '$lib/utilities/format-event-attributes';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { routeForTaskQueue } from '$lib/utilities/route-for';
   import { fromScreamingEnum } from '$lib/utilities/screaming-enums';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
@@ -129,8 +130,8 @@
                 )}</DetailListLabel
               >
               <DetailListTextValue
-                text={fromSeconds(
-                  $activityExecution.info.executionDuration ?? '',
+                text={formatDurationAbbreviated(
+                  $activityExecution.info.executionDuration,
                 )}
               />
               {#if $activityExecution.info.attempt != undefined}
