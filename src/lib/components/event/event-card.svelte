@@ -31,7 +31,8 @@
 
   import EventDetailsLink from './event-details-link.svelte';
 
-  let { event }: { event: WorkflowEvent } = $props();
+  let { event, lazy = false }: { event: WorkflowEvent; lazy?: boolean } =
+    $props();
   const { namespace, workflow, run } = $derived(page.params);
 
   const displayName = $derived(
@@ -178,6 +179,7 @@
         label={format(key)}
         {value}
         maxHeight={384}
+        {lazy}
       />
     {:else}
       <PayloadCodeBlock
@@ -190,6 +192,7 @@
         label={format(key)}
         value={codeBlockValue}
         maxHeight={384}
+        {lazy}
       />
     {/if}
   </div>
@@ -205,6 +208,7 @@
         label={translate('workflows.call-stack-tab')}
         language="text"
         maxHeight={384}
+        {lazy}
       />
     </div>
   {/if}

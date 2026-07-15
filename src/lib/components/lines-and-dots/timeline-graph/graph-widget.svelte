@@ -66,9 +66,14 @@
 </script>
 
 {#if snapshot}
-  <div class="cursor-pointer overflow-auto {className}">
+  <!-- Bounded scroll box for the child-workflow mini-timeline; the graph
+       virtualizes against this scroll parent (our TimelineGraph takes no
+       viewportHeight prop). -->
+  <div
+    class="cursor-pointer overflow-auto {className}"
+    style:max-height="{viewportHeight}px"
+  >
     <TimelineGraph
-      {viewportHeight}
       workflow={snapshot.workflow}
       groups={snapshot.groups}
       readOnly

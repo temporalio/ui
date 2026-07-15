@@ -6,10 +6,10 @@
   import type { WorkflowEventWithPending } from '$lib/types/events';
   import { getGroupForEventOrPendingEvent } from '$lib/utilities/pending-activities';
 
-  import { getNextDistanceAndOffset, HistoryConfig } from '../constants';
+  import { RADIUS, ROW_HEIGHT } from './constants';
+  import { getNextDistanceAndOffset } from './positioning';
 
   import HistoryGraphRowVisual from './history-graph-row-visual.svelte';
-  import Line from './line.svelte';
 
   interface Props {
     groups: EventGroups;
@@ -23,9 +23,7 @@
   );
   const allGroups = $derived([...workflowTaskGroups, ...groups]);
 
-  const { height, radius } = HistoryConfig;
-
-  const nodeBuffer = 4 * radius;
+  const nodeBuffer = 4 * RADIUS;
   const maxWidth = 600;
 
   const canvasWidth = $derived.by(() => {
@@ -35,21 +33,22 @@
         history,
         event,
         groups,
-        height,
+        ROW_HEIGHT,
         $eventFilterSort,
       );
-      width = Math.max(width, offset * 1.75 * radius + nodeBuffer);
+      width = Math.max(width, offset * 1.75 * RADIUS + nodeBuffer);
     });
     return width;
   });
-  const visualWidth = $derived(Math.min(canvasWidth - 2 * radius, maxWidth));
+  const visualWidth = $derived(Math.min(canvasWidth - 2 * RADIUS, maxWidth));
 
-  const canvasHeight = $derived(history.length * height);
+  const canvasHeight = $derived(history.length * ROW_HEIGHT);
 </script>
 
 <div
   class="hidden text-right xl:block"
-  style="width: {canvasWidth}px; max-width: {maxWidth}px;"
+  style:width="{canvasWidth}px"
+  style:max-width="{maxWidth}px"
   class:overflow-hidden={canvasWidth > maxWidth}
 >
   <svg
@@ -57,10 +56,13 @@
     height={canvasHeight}
     width={canvasWidth}
   >
-    <Line
-      startPoint={[visualWidth, 0]}
-      endPoint={[visualWidth, canvasHeight]}
-      strokeWidth={3}
+    <line
+      stroke="currentColor"
+      stroke-width={3}
+      x1={visualWidth}
+      x2={visualWidth}
+      y1={0}
+      y2={canvasHeight}
     />
     <svg
       viewBox="0 0 {canvasWidth} {canvasHeight}"

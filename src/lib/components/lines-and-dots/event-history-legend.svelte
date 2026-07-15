@@ -1,10 +1,10 @@
 <script lang="ts">
   import { eventCategoryColor } from '$lib/components/event/event-styles';
   import {
-    CategoryIcon,
     getCategoryStrokeColor,
     getStatusStrokeColor,
-  } from '$lib/components/lines-and-dots/constants';
+  } from '$lib/components/lines-and-dots/colors';
+  import { CategoryIcon } from '$lib/components/lines-and-dots/constants';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
