@@ -7,7 +7,9 @@ export const downloadJson = (
   const content = stringifyWithBigInt(data, undefined, 2);
   const a = document.createElement('a');
   const file = new Blob([content], { type: 'text/plain' });
-  a.href = URL.createObjectURL(file);
+  const url = URL.createObjectURL(file);
+  a.href = url;
   a.download = fileName;
   a.click();
+  URL.revokeObjectURL(url);
 };
