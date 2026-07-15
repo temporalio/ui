@@ -221,6 +221,50 @@ export const persistedActivitiesTableColumns = persistStore<State>(
   {},
 );
 
+export const migrateColumnLabels =
+  (renamedLabels: Record<string, AnyWorkflowHeaderLabel>) =>
+  (state: State): State => {
+    let didChange = false;
+
+    const migrated = Object.fromEntries(
+      Object.entries(state).map(([namespace, columns]) => {
+        if (!columns) return [namespace, columns];
+
+        const seen = new Set<AnyWorkflowHeaderLabel>();
+        const nextColumns = columns.reduce<ConfigurableTableHeader[]>(
+          (acc, column) => {
+            const label = renamedLabels[column.label];
+            if (label) didChange = true;
+            const nextLabel = label ?? column.label;
+
+            if (seen.has(nextLabel)) {
+              didChange = true;
+              return acc;
+            }
+
+            seen.add(nextLabel);
+            acc.push(label ? { ...column, label: nextLabel } : column);
+            return acc;
+          },
+          [],
+        );
+
+        return [namespace, nextColumns];
+      }),
+    );
+
+    return didChange ? migrated : state;
+  };
+
+// TODO: Remove after a few releases once we are confident that all users have migrated to the new column labels.
+persistedActivitiesTableColumns.update(
+  migrateColumnLabels({
+    'Start Time': 'Start',
+    'Close Time': 'End',
+    'Activity Type': 'Type',
+  }),
+);
+
 export const persistedDeploymentsTableColumns = persistStore<State>(
   'namespace-deployment-table-columns',
   {},
