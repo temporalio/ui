@@ -73,6 +73,10 @@
   let latestEventId = $state(0);
   let totalExpectedEvents = $state(0);
   let descMinId = $state(0);
+  let fetchStartedAt = $state(0);
+  let fetchCompletedAt = $state(0);
+  let fetchedEvents = $state(0);
+  let fetchedPages = $state(0);
 
   let _pauseHandle: PauseHandle | null = null;
   let _resumeRequested = false;
@@ -91,6 +95,18 @@
     },
     get descMinId() {
       return descMinId;
+    },
+    get fetchStartedAt() {
+      return fetchStartedAt;
+    },
+    get fetchCompletedAt() {
+      return fetchCompletedAt;
+    },
+    get fetchedEvents() {
+      return fetchedEvents;
+    },
+    get fetchedPages() {
+      return fetchedPages;
     },
     resume() {
       if (_pauseHandle) {
@@ -205,6 +221,10 @@
     const historySize = parseInt(workflow.historyEvents ?? '0') || 0;
     resetBuffer(historySize);
     fetchComplete = false;
+    fetchStartedAt = performance.now();
+    fetchCompletedAt = 0;
+    fetchedEvents = 0;
+    fetchedPages = 0;
     _pauseHandle = null;
 
     // Start live poll immediately — concurrent with the bidirectional fetch.
@@ -238,6 +258,8 @@
         }
       },
       onRawPage: (events, isAscending) => {
+        fetchedEvents += events.length;
+        fetchedPages++;
         for (const event of events) {
           processEvent(event, isAscending);
           const id = parseInt(event.eventId);
@@ -252,6 +274,7 @@
           $workflowRun.workflow?.pendingNexusOperations ?? [],
         );
         fetchComplete = true;
+        fetchCompletedAt = performance.now();
         bufferVersion.update((v) => v + 1);
       })
       .catch((e: unknown) => {
@@ -307,6 +330,10 @@
     latestEventId = 0;
     totalExpectedEvents = 0;
     descMinId = 0;
+    fetchStartedAt = 0;
+    fetchCompletedAt = 0;
+    fetchedEvents = 0;
+    fetchedPages = 0;
     _pauseHandle = null;
     _resumeRequested = false;
     _lastPollToken = '';

@@ -6,6 +6,7 @@
 
   import { GUTTER, ROW_HEIGHT } from './constants';
   import { dotBox, lineBox } from './primitives';
+  import { timelineIconImage } from './timeline-icon-images';
   import { dotColors, strokeColor } from '../colors';
 
   interface Props {
@@ -65,10 +66,20 @@
       style:border-color={colors.stroke}
       style:background={colors.fill}
     >
-      <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
-        viewBox="0 0 24 24"><use href="#ti-workflow" /></svg
-      >
+      <span
+        class="tl-icon-image absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2"
+        style:--tl-icon-image={timelineIconImage.workflow}
+      ></span>
     </div>
   {/each}
 </div>
+
+<style lang="postcss">
+  .tl-icon-image {
+    display: inline-block;
+    background-image: var(--tl-icon-image);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+</style>

@@ -25,7 +25,6 @@
   import TimelineAxis from './timeline-axis.svelte';
   import TimelineCollapsedLayer from './timeline-collapsed-layer.svelte';
   import TimelineGraphRow from './timeline-graph-row.svelte';
-  import TimelineIconDefs from './timeline-icon-defs.svelte';
   import { TimelineScale } from './timeline-scale.svelte';
   import { Timeline } from './timeline.svelte';
   import { Viewport } from './viewport.svelte';
@@ -42,7 +41,51 @@
     descMinId?: number;
     panelHeight?: number;
     onTimelineInit?: (timeline: Timeline) => void;
+    showPerfStats?: boolean;
+    perfStats?: TimelinePerfStatsInput;
   }
+
+  type TimelinePerfStatsInput = {
+    fetchStartedAt: number;
+    fetchCompletedAt: number;
+    fetchedEvents: number;
+    fetchedPages: number;
+    totalExpectedEvents: number;
+  };
+
+  type TimelinePerfSnapshot = {
+    mountedAt: number;
+    firstRenderMs: number;
+    loadMs: number;
+    fetchComplete: boolean;
+    fetchedEvents: number;
+    fetchedPages: number;
+    totalExpectedEvents: number;
+    groups: number;
+    pendingGroups: number;
+    mountedRows: number;
+    poolSize: number;
+    timelineHeight: number;
+    frameCount: number;
+    avgFrameMs: number;
+    avgFps: number;
+    p95FrameMs: number;
+    p99FrameMs: number;
+    maxFrameMs: number;
+    framesOver16: number;
+    longFrames: number;
+    scrollFrames: number;
+    scrollFramesOver16: number;
+    scrollLongFrames: number;
+    maxScrollFrameMs: number;
+    bandSamples: number;
+    maxBandSampleMs: number;
+  };
+
+  type TimelineStatsWindow = Window &
+    typeof globalThis & {
+      __TEMPORAL_TIMELINE_STATS__?: () => TimelinePerfSnapshot;
+    };
 
   let {
     workflow,
@@ -55,7 +98,77 @@
     descMinId = 0,
     panelHeight = $bindable(0),
     onTimelineInit,
+    showPerfStats = false,
+    perfStats = {
+      fetchStartedAt: 0,
+      fetchCompletedAt: 0,
+      fetchedEvents: 0,
+      fetchedPages: 0,
+      totalExpectedEvents: 0,
+    },
   }: Props = $props();
+
+  const timelineMountedAt = performance.now();
+  let firstRenderAt = $state(0);
+  let perfSnapshot = $state.raw<TimelinePerfSnapshot>({
+    mountedAt: timelineMountedAt,
+    firstRenderMs: 0,
+    loadMs: 0,
+    fetchComplete: false,
+    fetchedEvents: 0,
+    fetchedPages: 0,
+    totalExpectedEvents: 0,
+    groups: 0,
+    pendingGroups: 0,
+    mountedRows: 0,
+    poolSize: 0,
+    timelineHeight: 0,
+    frameCount: 0,
+    avgFrameMs: 0,
+    avgFps: 0,
+    p95FrameMs: 0,
+    p99FrameMs: 0,
+    maxFrameMs: 0,
+    framesOver16: 0,
+    longFrames: 0,
+    scrollFrames: 0,
+    scrollFramesOver16: 0,
+    scrollLongFrames: 0,
+    maxScrollFrameMs: 0,
+    bandSamples: 0,
+    maxBandSampleMs: 0,
+  });
+
+  let frameRafId: ReturnType<typeof requestAnimationFrame> | undefined;
+  let lastFrameAt = 0;
+  let lastSnapshotAt = 0;
+  let frameCount = 0;
+  let maxFrameMs = 0;
+  let framesOver16 = 0;
+  let longFrames = 0;
+  let scrollFrames = 0;
+  let scrollFramesOver16 = 0;
+  let scrollLongFrames = 0;
+  let maxScrollFrameMs = 0;
+  let scrollingUntil = 0;
+  let bandSamples = 0;
+  let maxBandSampleMs = 0;
+  const frameSamples: number[] = [];
+
+  const formatMs = (value: number): string =>
+    value > 1000 ? `${(value / 1000).toFixed(2)}s` : `${Math.round(value)}ms`;
+
+  const p95 = (values: number[]): number => {
+    if (!values.length) return 0;
+    const sorted = values.toSorted((a, b) => a - b);
+    return sorted[Math.floor((sorted.length - 1) * 0.95)] ?? 0;
+  };
+
+  const p99 = (values: number[]): number => {
+    if (!values.length) return 0;
+    const sorted = values.toSorted((a, b) => a - b);
+    return sorted[Math.floor((sorted.length - 1) * 0.99)] ?? 0;
+  };
 
   const DOT_STROKE = 2; // dot border
   // Dot geometry, published as CSS vars on .canvas (consumed by every row's dot).
@@ -146,7 +259,7 @@
 
   // Rows mounted beyond the viewport, so edge rows survive small scrolls and
   // direction reversals and are ready ahead of a fast fling.
-  const OVERSCAN = 12;
+  const OVERSCAN = 4;
 
   // Closed-form inverse of getRowY (both cursor segments are linear) → the
   // [start, end) row-index range to mount for a given visible band.
@@ -304,11 +417,22 @@
   // the window trailed the viewport and rows blanked until it settled.
   let visibleBand = $state.raw<[number, number] | null>(null);
 
-  // Visible pixel band, used to window full-height overlays (the collapsed-idle
-  // zigzag) so they don't rasterize the entire tens-of-thousands-px canvas.
-  const layerBandTop = $derived(visibleBand ? visibleBand[0] : 0);
+  // Visible pixel band, overscanned for full-height overlays (grid/rails and the
+  // collapsed-idle zigzag). Exact viewport-sized segments can fall out of view
+  // for a frame during fast scroll; one viewport of overscan on both sides keeps
+  // the vertical guides present without rasterizing the full timeline height.
+  // At very high CPU throttles, scroll position can jump several thousand px
+  // between samples, so use a wide guide-only overscan.
+  const layerBandOverscan = $derived(
+    visibleBand ? (visibleBand[1] - visibleBand[0]) * 5 : 0,
+  );
+  const layerBandTop = $derived(
+    visibleBand ? visibleBand[0] - layerBandOverscan : 0,
+  );
   const layerBandHeight = $derived(
-    visibleBand ? visibleBand[1] - visibleBand[0] : timelineHeight,
+    visibleBand
+      ? visibleBand[1] - visibleBand[0] + layerBandOverscan * 2
+      : timelineHeight,
   );
 
   let scroller: HTMLElement | null = null;
@@ -321,6 +445,7 @@
   // Self-driven rAF loop, not a per-scroll-event measure: a wheel fling fires
   // `wheel` but coalesces `scroll`, so an event-driven measure goes stale mid-fling.
   function sampleBand() {
+    const sampleStartedAt = showPerfStats ? performance.now() : 0;
     bandRafId = undefined;
     if (!containerEl) return;
     const elTop = containerEl.getBoundingClientRect().top;
@@ -329,6 +454,7 @@
     const top = viewTop - elTop; // container-local top of the visible area
 
     if (top !== lastTop || viewHeight !== lastHeight) {
+      scrollingUntil = performance.now() + 250;
       lastTop = top;
       lastHeight = viewHeight;
       stableFrames = 0;
@@ -340,6 +466,14 @@
     // Loop while moving; idle out once still. pokeSampler restarts it on activity.
     if (stableFrames < STABLE_FRAMES) {
       bandRafId = requestAnimationFrame(sampleBand);
+    }
+
+    if (sampleStartedAt) {
+      bandSamples++;
+      maxBandSampleMs = Math.max(
+        maxBandSampleMs,
+        performance.now() - sampleStartedAt,
+      );
     }
   }
 
@@ -410,16 +544,18 @@
     return Math.ceil(bandHeight / ROW_HEIGHT) + 2 * windowOverscan + POOL_SLACK;
   });
 
-  // Slot n shows filteredGroups[windowStart + n], or null past the window/list.
-  // Keyed by slot index (below) so the DOM stays put; poolSize ≥ window span.
+  // A row keeps the same slot while it remains in the window. The previous
+  // sliding slot->row mapping re-pointed every mounted row whenever windowStart
+  // changed, turning a small scroll into ~50 row updates per frame.
   const pool = $derived.by(() => {
     const start = windowStart;
+    const end = windowEnd;
     const total = filteredGroups.length;
     const slots: ({ index: number; group: EventGroups[number] } | null)[] = [];
     for (let slot = 0; slot < poolSize; slot++) {
-      const index = start + slot;
+      const index = start + ((slot - (start % poolSize) + poolSize) % poolSize);
       slots.push(
-        index < windowEnd && index < total
+        index < end && index < total
           ? { index, group: filteredGroups[index] }
           : null,
       );
@@ -438,10 +574,154 @@
         }),
   );
 
-  // Border rails span the full timeline height so they meet the bottom axis.
-  const lineTop = 0;
-  const lineBottom = $derived(timelineHeight);
+  const lineTop = $derived(Math.min(Math.max(layerBandTop, 0), timelineHeight));
+  const lineBottom = $derived(
+    Math.max(
+      0,
+      Math.min(layerBandTop + layerBandHeight, timelineHeight) - lineTop,
+    ),
+  );
+
+  const buildPerfSnapshot = (): TimelinePerfSnapshot => {
+    const now = performance.now();
+    const loadMs = perfStats.fetchStartedAt
+      ? (perfStats.fetchCompletedAt || now) - perfStats.fetchStartedAt
+      : 0;
+    const avgFrameMs =
+      frameSamples.reduce((sum, value) => sum + value, 0) /
+      (frameSamples.length || 1);
+
+    return {
+      mountedAt: timelineMountedAt,
+      firstRenderMs: firstRenderAt ? firstRenderAt - timelineMountedAt : 0,
+      loadMs,
+      fetchComplete: Boolean(perfStats.fetchCompletedAt),
+      fetchedEvents: perfStats.fetchedEvents,
+      fetchedPages: perfStats.fetchedPages,
+      totalExpectedEvents: perfStats.totalExpectedEvents,
+      groups: filteredGroups.length,
+      pendingGroups: pendingGroupCount,
+      mountedRows: Math.max(0, windowEnd - windowStart),
+      poolSize,
+      timelineHeight,
+      frameCount,
+      avgFrameMs,
+      avgFps: avgFrameMs ? 1000 / avgFrameMs : 0,
+      p95FrameMs: p95(frameSamples),
+      p99FrameMs: p99(frameSamples),
+      maxFrameMs,
+      framesOver16,
+      longFrames,
+      scrollFrames,
+      scrollFramesOver16,
+      scrollLongFrames,
+      maxScrollFrameMs,
+      bandSamples,
+      maxBandSampleMs,
+    };
+  };
+
+  const publishPerfSnapshot = () => {
+    perfSnapshot = buildPerfSnapshot();
+  };
+
+  const observeFrame = (now: number) => {
+    frameRafId = requestAnimationFrame(observeFrame);
+    if (lastFrameAt) {
+      const frameMs = now - lastFrameAt;
+      frameCount++;
+      maxFrameMs = Math.max(maxFrameMs, frameMs);
+      if (frameMs > 16.7) framesOver16++;
+      if (frameMs > 50) longFrames++;
+      frameSamples.push(frameMs);
+      if (frameSamples.length > 300) frameSamples.shift();
+
+      if (now < scrollingUntil) {
+        scrollFrames++;
+        maxScrollFrameMs = Math.max(maxScrollFrameMs, frameMs);
+        if (frameMs > 16.7) scrollFramesOver16++;
+        if (frameMs > 50) scrollLongFrames++;
+      }
+    }
+    lastFrameAt = now;
+
+    if (now - lastSnapshotAt > 500) {
+      lastSnapshotAt = now;
+      publishPerfSnapshot();
+    }
+  };
+
+  $effect(() => {
+    if (!showPerfStats) return;
+    performance.mark('temporal.timeline.mounted');
+    const statsWindow = window as TimelineStatsWindow;
+    statsWindow.__TEMPORAL_TIMELINE_STATS__ = buildPerfSnapshot;
+    publishPerfSnapshot();
+    return () => {
+      if (statsWindow.__TEMPORAL_TIMELINE_STATS__ === buildPerfSnapshot) {
+        delete statsWindow.__TEMPORAL_TIMELINE_STATS__;
+      }
+    };
+  });
+
+  $effect(() => {
+    if (!showPerfStats || firstRenderAt || !containerEl || canvasWidth <= 0) {
+      return;
+    }
+    let second: ReturnType<typeof requestAnimationFrame> | undefined;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => {
+        firstRenderAt = performance.now();
+        performance.mark('temporal.timeline.first-render');
+        publishPerfSnapshot();
+      });
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      if (second !== undefined) cancelAnimationFrame(second);
+    };
+  });
+
+  $effect(() => {
+    if (!showPerfStats) return;
+    lastFrameAt = 0;
+    lastSnapshotAt = performance.now();
+    frameRafId = requestAnimationFrame(observeFrame);
+    return () => {
+      if (frameRafId !== undefined) cancelAnimationFrame(frameRafId);
+    };
+  });
 </script>
+
+{#if showPerfStats}
+  <div
+    data-testid="timeline-perf-stats"
+    class="surface-background grid grid-cols-2 gap-x-4 gap-y-1 border-x border-t border-subtle px-3 py-2 font-mono text-[11px] md:grid-cols-4"
+  >
+    <span>load {formatMs(perfSnapshot.loadMs)}</span>
+    <span>first render {formatMs(perfSnapshot.firstRenderMs)}</span>
+    <span>
+      fetch {perfSnapshot.fetchComplete ? 'done' : 'loading'}
+      {perfSnapshot.fetchedEvents.toLocaleString()}/{(
+        perfSnapshot.totalExpectedEvents || 0
+      ).toLocaleString()}
+      ev
+    </span>
+    <span>{perfSnapshot.fetchedPages.toLocaleString()} pages</span>
+    <span>{perfSnapshot.groups.toLocaleString()} groups</span>
+    <span>{perfSnapshot.mountedRows}/{perfSnapshot.poolSize} rows</span>
+    <span>
+      fps {Math.round(perfSnapshot.avgFps)} avg {formatMs(
+        perfSnapshot.avgFrameMs,
+      )} p95 {formatMs(perfSnapshot.p95FrameMs)}
+    </span>
+    <span>
+      scroll &gt;16.7 {perfSnapshot.scrollFramesOver16} p99 {formatMs(
+        perfSnapshot.p99FrameMs,
+      )}
+    </span>
+  </div>
+{/if}
 
 <div
   id="event-history-timeline-graph"
@@ -475,8 +755,6 @@
       style:--dot="{dotSize}px"
       style:--dot-r="{dotRadius}px"
     >
-      <TimelineIconDefs />
-
       <!-- Border rails -->
       <div
         class="absolute bg-current"
@@ -498,6 +776,8 @@
         x2={canvasWidth - GUTTER + RADIUS / 4}
         gutter={GUTTER}
         {timelineHeight}
+        bandTop={layerBandTop}
+        bandHeight={layerBandHeight}
         {startTime}
         {scale}
       />

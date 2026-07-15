@@ -11,4 +11,8 @@ export type HistoryContext = {
   readonly totalExpectedEvents: number;
   /** Lowest event ID seen by the descending cursor — drives skeleton gap. */
   readonly descMinId: number;
+  readonly fetchStartedAt: number;
+  readonly fetchCompletedAt: number;
+  readonly fetchedEvents: number;
+  readonly fetchedPages: number;
 };

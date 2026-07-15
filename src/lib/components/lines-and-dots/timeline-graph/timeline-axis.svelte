@@ -13,6 +13,8 @@
     timelineHeight: number;
     startTime: string | Timestamp;
     scale: TimelineScale;
+    bandTop?: number;
+    bandHeight?: number;
   };
   let {
     x1 = 0,
@@ -21,6 +23,8 @@
     timelineHeight = 1000,
     startTime,
     scale,
+    bandTop = 0,
+    bandHeight,
   }: Props = $props();
 
   const TARGET_TICK_PX = 60;
@@ -62,6 +66,17 @@
   );
 
   const baselineWidth = RADIUS / 2;
+  const gridTop = $derived(
+    bandHeight != null ? Math.min(Math.max(bandTop, 0), timelineHeight) : 0,
+  );
+  const gridHeight = $derived(
+    Math.max(
+      0,
+      (bandHeight != null
+        ? Math.min(bandTop + bandHeight, timelineHeight)
+        : timelineHeight) - gridTop,
+    ),
+  );
 </script>
 
 <!-- baseline -->
@@ -77,7 +92,8 @@
   <div
     class="grid-line top-0"
     style:left="{tickX}px"
-    style:height="{timelineHeight}px"
+    style:top="{gridTop}px"
+    style:height="{gridHeight}px"
   ></div>
   <div
     class="tick-label"

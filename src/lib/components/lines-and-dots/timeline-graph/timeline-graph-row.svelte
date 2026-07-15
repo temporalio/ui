@@ -41,6 +41,7 @@
   import { type DotColors, dotColors, strokeColor } from '../colors';
   import { CategoryIcon, type TimelineIconName } from '../constants';
   import { GUTTER, RADIUS, ROW_HEIGHT } from './constants';
+  import { timelineIconImage } from './timeline-icon-images';
   import { timelineTextPosition } from './timeline-positioning';
 
   type Props = {
@@ -185,6 +186,11 @@
         : RADIUS * 3),
   );
   const spanCy = HALO; // button-local vertical center
+  const labelFallback = $derived(
+    decodedLocalActivity
+      ? translate('events.category.local-activity')
+      : group?.displayName,
+  );
 </script>
 
 <!-- lines/dots are inline snippets, not child components — plain divs, no
@@ -229,11 +235,48 @@
     style:background={colors.fill}
   >
     {#if icon}
-      <svg
-        class="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 text-black"
-        viewBox="0 0 24 24"><use href="#ti-{icon}" /></svg
-      >
+      <span
+        class="tl-icon-image absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2"
+        style:--tl-icon-image={timelineIconImage[icon]}
+      ></span>
     {/if}
+  </div>
+{/snippet}
+
+{#snippet rowLabel(decodedValue: string)}
+  {@const iconName =
+    (pendingActivity && !pendingActivity.paused) || retried
+      ? 'retry'
+      : undefined}
+  <div
+    class="pointer-events-auto absolute flex select-none items-center gap-1 whitespace-nowrap text-[13px] leading-none {textAnchor ===
+    'end'
+      ? '-translate-x-full -translate-y-1/2 flex-row-reverse'
+      : '-translate-y-1/2'}"
+    style:left="{textPosition[0] - spanLeft}px"
+    style:top="{spanCy}px"
+  >
+    {#if iconName}
+      <span
+        class="tl-icon-image h-[14px] w-[14px]"
+        style:--tl-icon-image={timelineIconImage[iconName]}
+      ></span>
+    {/if}
+    <span
+      class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-current"
+    >
+      {#if pendingActivity}
+        {translate('workflows.attempt')}
+        {pendingActivity.attempt} / {pendingActivity.maximumAttempts || '∞'}
+        •&nbsp;{decodedValue}
+      {:else if retried}
+        {retryAttempt} • {decodedValue}
+      {:else if decodedLocalActivity}
+        {decodedLocalActivity.value}
+      {:else}
+        {decodedValue}
+      {/if}
+    </span>
   </div>
 {/snippet}
 
@@ -290,52 +333,21 @@
     {/each}
     <!-- Inside the button so hovering/clicking the label hits the same target;
          positioned button-local (offset by spanLeft), may overflow the box. -->
-    <PayloadSummary
-      value={group?.userMetadata?.summary}
-      prefix={isActivityTaskScheduledEvent(group.initialEvent)
-        ? group?.displayName
-        : ''}
-      fallback={decodedLocalActivity
-        ? translate('events.category.local-activity')
-        : group?.displayName}
-    >
-      {#snippet children(decodedValue)}
-        {@const iconName =
-          (pendingActivity && !pendingActivity.paused) || retried
-            ? 'retry'
-            : undefined}
-        <div
-          class="pointer-events-auto absolute flex select-none items-center gap-1 whitespace-nowrap text-[13px] leading-none {textAnchor ===
-          'end'
-            ? '-translate-x-full -translate-y-1/2 flex-row-reverse'
-            : '-translate-y-1/2'}"
-          style:left="{textPosition[0] - spanLeft}px"
-          style:top="{spanCy}px"
-        >
-          {#if iconName}
-            <svg class="h-[14px] w-[14px] text-current" viewBox="0 0 24 24">
-              <use href="#ti-{iconName}" />
-            </svg>
-          {/if}
-          <span
-            class="inline-flex min-h-[var(--dot)] items-center rounded-full bg-[rgb(var(--color-surface-primary))] px-1.5 text-current"
-          >
-            {#if pendingActivity}
-              {translate('workflows.attempt')}
-              {pendingActivity.attempt} / {pendingActivity.maximumAttempts ||
-                '∞'}
-              •&nbsp;{decodedValue}
-            {:else if retried}
-              {retryAttempt} • {decodedValue}
-            {:else if decodedLocalActivity}
-              {decodedLocalActivity.value}
-            {:else}
-              {decodedValue}
-            {/if}
-          </span>
-        </div>
-      {/snippet}
-    </PayloadSummary>
+    {#if group?.userMetadata?.summary}
+      <PayloadSummary
+        value={group.userMetadata.summary}
+        prefix={isActivityTaskScheduledEvent(group.initialEvent)
+          ? group?.displayName
+          : ''}
+        fallback={labelFallback}
+      >
+        {#snippet children(decodedValue)}
+          {@render rowLabel(decodedValue)}
+        {/snippet}
+      </PayloadSummary>
+    {:else}
+      {@render rowLabel(labelFallback)}
+    {/if}
   </button>
 </div>
 
@@ -367,5 +379,13 @@
   .event:not(:disabled):hover .highlight,
   .event:not(:disabled):focus-visible .highlight {
     opacity: 1;
+  }
+
+  .tl-icon-image {
+    display: inline-block;
+    background-image: var(--tl-icon-image);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
   }
 </style>

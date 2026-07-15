@@ -360,6 +360,7 @@ export async function HighVolumeSignalWorkflow(
 }
 
 export interface HighVolumeEventResult {
+  profile: HighVolumeEventProfile;
   historyLength: number;
   signals: number;
   activities: number;
@@ -367,6 +368,14 @@ export interface HighVolumeEventResult {
   children: number;
   durationMs: number;
 }
+
+export type HighVolumeEventProfile =
+  | 'mixed'
+  | 'activity-heavy'
+  | 'timer-heavy'
+  | 'child-heavy'
+  | 'signal-heavy'
+  | 'bursty';
 
 const highVolumeEventSignal =
   workflow.defineSignal<[{ seq: number }]>('hv-event-signal');
@@ -381,6 +390,7 @@ export async function HighVolumeEventChildWorkflow(n: number): Promise<number> {
 
 export async function HighVolumeEventWorkflow(
   targetEvents = 40_000,
+  profile: HighVolumeEventProfile = 'mixed',
 ): Promise<HighVolumeEventResult> {
   const t0 = new Date().getTime();
   let signals = 0;
@@ -398,33 +408,80 @@ export async function HighVolumeEventWorkflow(
   while (historyLength() < targetEvents) {
     round++;
 
-    // 5 parallel activities → ~18 events per round
-    await Promise.all([
-      pingActivity('a'),
-      pingActivity('b'),
-      pingActivity('c'),
-      pingActivity('d'),
-      pingActivity('e'),
-    ]);
-    activitiesRun += 5;
+    if (profile === 'activity-heavy') {
+      await Promise.all(
+        Array.from({ length: 12 }, (_, index) =>
+          pingActivity(`activity-heavy-${round}-${index}`),
+        ),
+      );
+      activitiesRun += 12;
+    } else if (profile === 'timer-heavy') {
+      await Promise.all(Array.from({ length: 16 }, () => workflow.sleep(1)));
+      timersRun += 16;
+      if (round % 4 === 0) {
+        await pingActivity(`timer-checkpoint-${round}`);
+        activitiesRun++;
+      }
+    } else if (profile === 'child-heavy') {
+      await Promise.all(
+        Array.from({ length: 4 }, (_, index) =>
+          workflow.executeChild(HighVolumeEventChildWorkflow, {
+            args: [round * 10 + index],
+            workflowId: `${workflow.workflowInfo().workflowId}-child-${round}-${index}`,
+          }),
+        ),
+      );
+      childrenRun += 4;
+    } else if (profile === 'signal-heavy') {
+      const before = signals;
+      await workflow.condition(() => signals >= before + 25, '1 second');
+      if (signals === before) {
+        await pingActivity(`signal-checkpoint-${round}`);
+        activitiesRun++;
+      }
+    } else if (profile === 'bursty') {
+      await Promise.all([
+        ...Array.from({ length: 10 }, (_, index) =>
+          pingActivity(`burst-${round}-${index}`),
+        ),
+        ...Array.from({ length: 6 }, () => workflow.sleep(1)),
+        ...Array.from({ length: 2 }, (_, index) =>
+          workflow.executeChild(HighVolumeEventChildWorkflow, {
+            args: [round * 10 + index],
+            workflowId: `${workflow.workflowInfo().workflowId}-child-${round}-${index}`,
+          }),
+        ),
+      ]);
+      activitiesRun += 10;
+      timersRun += 6;
+      childrenRun += 2;
+    } else {
+      await Promise.all([
+        pingActivity('a'),
+        pingActivity('b'),
+        pingActivity('c'),
+        pingActivity('d'),
+        pingActivity('e'),
+      ]);
+      activitiesRun += 5;
 
-    // Timer every 5 rounds → ~3 events
-    if (round % 5 === 0) {
-      await workflow.sleep(1);
-      timersRun++;
-    }
+      if (round % 5 === 0) {
+        await workflow.sleep(1);
+        timersRun++;
+      }
 
-    // Child workflow every 20 rounds → ~5 events in parent
-    if (round % 20 === 0) {
-      await workflow.executeChild(HighVolumeEventChildWorkflow, {
-        args: [round],
-        workflowId: `${workflow.workflowInfo().workflowId}-child-${round}`,
-      });
-      childrenRun++;
+      if (round % 20 === 0) {
+        await workflow.executeChild(HighVolumeEventChildWorkflow, {
+          args: [round],
+          workflowId: `${workflow.workflowInfo().workflowId}-child-${round}`,
+        });
+        childrenRun++;
+      }
     }
   }
 
   return {
+    profile,
     historyLength: historyLength(),
     signals,
     activities: activitiesRun,

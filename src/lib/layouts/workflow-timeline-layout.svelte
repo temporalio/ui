@@ -45,6 +45,10 @@
 
   const namespace = $derived(page.params.namespace);
   const workflow = $derived($workflowRun.workflow);
+  const showPerfStats = $derived(
+    page.url.searchParams.has('timeline_perf') ||
+      page.url.searchParams.get('perf') === 'timeline',
+  );
 
   const urlParams = $derived(parseEventFilterParams(page.url));
   $effect(() => {
@@ -110,6 +114,14 @@
     if (historyCtx.fetchComplete) return groups.length;
     const totalEvents = historyCtx.totalExpectedEvents ?? 0;
     return Math.max(groups.length, Math.ceil(totalEvents * 0.5));
+  });
+
+  const perfStats = $derived({
+    fetchStartedAt: historyCtx.fetchStartedAt,
+    fetchCompletedAt: historyCtx.fetchCompletedAt,
+    fetchedEvents: historyCtx.fetchedEvents,
+    fetchedPages: historyCtx.fetchedPages,
+    totalExpectedEvents: historyCtx.totalExpectedEvents,
   });
 
   onMount(() => {
@@ -256,6 +268,8 @@
       descMinId={historyCtx.descMinId}
       error={Boolean(workflowTaskFailedError)}
       onTimelineInit={handleTimelineInit}
+      {showPerfStats}
+      {perfStats}
     />
   {/if}
 </div>
