@@ -19,7 +19,7 @@
   } from '$lib/types/workflows';
   import { isWorkflowDelayed } from '$lib/utilities/delayed-workflows';
   import { formatBytes } from '$lib/utilities/format-bytes';
-  import { formatDistance } from '$lib/utilities/format-time';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getBuildIdFromVersion } from '$lib/utilities/get-deployment-build-id';
   import {
     routeForWorkerDeployment,
@@ -227,10 +227,10 @@
         options={{ format: truncate ? 'short' : 'long' }}
       />
     {:else if label === 'Execution Duration'}
-      {formatDistance({
-        start: workflow.startTime,
-        end: workflow.endTime,
-        includeMillisecondsForUnderSecond: true,
+      {formatDistanceAbbreviated({
+        start: workflow?.startTime,
+        end: workflow?.endTime,
+        includeMilliseconds: true,
       })}
     {:else if label === 'History Length'}
       {parseInt(workflow.historyEvents, 10) > 0 ? workflow.historyEvents : ''}

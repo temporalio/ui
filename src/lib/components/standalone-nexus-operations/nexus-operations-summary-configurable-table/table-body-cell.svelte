@@ -5,7 +5,7 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { NexusOperationExecutionListInfo } from '$lib/types/nexus-operation-execution';
-  import { formatDistance } from '$lib/utilities/format-time';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
   import { routeForStandaloneNexusOperationDetails } from '$lib/utilities/route-for';
 
@@ -108,10 +108,10 @@
       <Timestamp dateTime={operation.closeTime} />
     {:else if label === 'Execution Duration'}
       {#if operation.executionDuration}
-        {formatDistance({
+        {formatDistanceAbbreviated({
           start: operation.scheduleTime,
           end: operation.closeTime,
-          includeMillisecondsForUnderSecond: true,
+          includeMilliseconds: true,
         })}
       {/if}
     {:else if label === 'State Transitions'}
