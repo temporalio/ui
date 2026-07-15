@@ -3,10 +3,10 @@
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { NexusOperationExecutionInfo } from '$lib/types/nexus-operation-execution';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toNexusOperationStatus } from '$lib/utilities/get-nexus-operation-status-and-count';
   import { routeForStandaloneNexusOperationsWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneNexusOperationPoller } from '$lib/utilities/standalone-nexus-operation-poller.svelte';
-  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
     DetailList,
@@ -81,7 +81,7 @@
       >
       <DetailListTextValue
         text={nexusOperationInfo.executionDuration
-          ? fromSeconds(nexusOperationInfo.executionDuration)
+          ? formatDurationAbbreviated(nexusOperationInfo.executionDuration)
           : '-'}
       />
       <DetailListLabel
