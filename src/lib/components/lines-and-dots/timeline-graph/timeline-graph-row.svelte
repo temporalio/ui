@@ -221,10 +221,11 @@
   icon: TimelineIconName | undefined,
 )}
   {@const bounds = dotBox(pointX, spanCy)}
+  <!-- transform (not left/top) so streaming/live reprojection composites the dot
+       instead of triggering layout; anchored at 0,0 by left-0 top-0. -->
   <div
-    class="absolute h-[var(--dot)] w-[var(--dot)] rounded-[var(--dot-r)] border-2 border-solid"
-    style:left="{bounds.left}px"
-    style:top="{bounds.top}px"
+    class="absolute left-0 top-0 h-[var(--dot)] w-[var(--dot)] rounded-[var(--dot-r)] border-2 border-solid"
+    style:transform="translate({bounds.left}px, {bounds.top}px)"
     style:border-color={colors.stroke}
     style:background={colors.fill}
   >
