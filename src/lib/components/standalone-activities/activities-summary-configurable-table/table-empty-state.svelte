@@ -2,12 +2,40 @@
   import { page } from '$app/state';
 
   import NoQueryResults from '$lib/components/empty-states/no-query-results.svelte';
+  import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import { translate } from '$lib/i18n/translate';
   import { activityError } from '$lib/stores/activities';
   import noResultsImages from '$lib/vendor/empty-state.svg';
 
   let query = $derived(page.url.searchParams.get('query'));
+  const SDK_LINKS = [
+    {
+      sdk: 'Go',
+      href: 'https://docs.temporal.io/develop/go/activities/standalone-activities',
+    },
+    {
+      sdk: 'Python',
+      href: 'https://docs.temporal.io/develop/python/activities/standalone-activities',
+    },
+    {
+      sdk: 'Java',
+      href: 'https://docs.temporal.io/develop/java/activities/standalone-activities',
+    },
+    {
+      sdk: '.NET',
+      href: 'https://docs.temporal.io/develop/dotnet/activities/standalone-activities',
+    },
+    {
+      sdk: 'Typescript',
+      href: 'https://docs.temporal.io/develop/typescript/activities/standalone-activities',
+    },
+    {
+      sdk: 'Ruby',
+      href: 'https://docs.temporal.io/develop/ruby/activities/standalone-activities',
+    },
+  ];
 </script>
 
 {#if query}
@@ -41,10 +69,10 @@
     <div
       class="surface-primary flex w-auto min-w-[280px] flex-col gap-4 p-8 xl:min-w-[520px] xl:flex-1"
     >
-      <h2>
-        {translate('standalone-activities.empty-state-title')}
-      </h2>
       {#if $activityError}
+        <h2>
+          {translate('standalone-activities.empty-state-title')}
+        </h2>
         <Alert
           intent="warning"
           icon="warning"
@@ -54,9 +82,40 @@
           {$activityError}
         </Alert>
       {:else}
+        <h2>
+          {translate('standalone-activities.no-activities-title')}
+        </h2>
         <p>
-          {translate('standalone-activities.empty-state-description')}
+          <Link href="https://docs.temporal.io/standalone-activity" newTab>
+            {translate('standalone-activities.standalone-activities')}
+          </Link>
+          {translate(
+            'standalone-activities.no-activities-description-part-1-preface',
+          )}
+          <Link
+            href="https://docs.temporal.io/evaluate/development-production-features/job-queue"
+            newTab
+          >
+            {translate('standalone-activities.job-queue-link')}
+          </Link>
+          {translate(
+            'standalone-activities.no-activities-description-part-1-postface',
+          )}
         </p>
+        <p>
+          {translate('standalone-activities.no-activities-description-part-2')}
+        </p>
+        <p>
+          {translate('standalone-activities.no-activities-description-part-3')}
+        </p>
+        <h3>
+          {translate('standalone-activities.get-started-title')}
+        </h3>
+        {#each SDK_LINKS as { sdk, href } (sdk)}
+          <Link newTab {href}>
+            <SdkLogo {sdk} version="" hideDocsLink />
+          </Link>
+        {/each}
       {/if}
     </div>
     <div class="flex h-full flex-col">
