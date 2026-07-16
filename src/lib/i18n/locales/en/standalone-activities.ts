@@ -17,11 +17,11 @@ export const Strings = {
   'empty-state-title': 'No Activities Found',
   'empty-state-description': 'No activities match the current filters.',
   'no-activities-title':
-    'This namespace doesn’t have any Standalone Activities yet.',
-  'no-activities-description-part-1-preface': 'are Temporal’s',
+    'This Namespace doesn’t have any Standalone Activities yet.',
+  'no-activities-description-part-1-preface': ' are Temporal’s ',
   'job-queue-link': 'job queue',
   'no-activities-description-part-1-postface':
-    '– the simplest way to run durable, retryable tasks on Temporal. Create an Activity function once and invoke it standalone (as a job) or as a step in a Workflow.',
+    ' – the simplest way to run durable, retryable tasks on Temporal. Create an Activity function once and invoke it standalone (as a job) or as a step in a Workflow.',
   'no-activities-description-part-2':
     'Standalone Activities come with the durability benefits of Temporal plus declarative retries, deduplication, priority & fairness, and heartbeats with checkpointing for longer running jobs.',
   'no-activities-description-part-3':

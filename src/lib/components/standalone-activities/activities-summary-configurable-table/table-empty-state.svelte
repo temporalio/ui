@@ -63,7 +63,7 @@
   </div>
 {:else}
   <div
-    class="h-full w-full overflow-hidden xl:flex xl:flex-row"
+    class="h-full w-full overflow-y-auto xl:flex xl:flex-row xl:overflow-hidden"
     aria-live="polite"
   >
     <div
@@ -86,19 +86,14 @@
           {translate('standalone-activities.no-activities-title')}
         </h2>
         <p>
-          <Link href="https://docs.temporal.io/standalone-activity" newTab>
-            {translate('standalone-activities.standalone-activities')}
-          </Link>
-          {translate(
+          <Link href="https://docs.temporal.io/standalone-activity" newTab
+            >{translate('standalone-activities.standalone-activities')}</Link
+          >{translate(
             'standalone-activities.no-activities-description-part-1-preface',
-          )}
-          <Link
+          )}<Link
             href="https://docs.temporal.io/evaluate/development-production-features/job-queue"
-            newTab
-          >
-            {translate('standalone-activities.job-queue-link')}
-          </Link>
-          {translate(
+            newTab>{translate('standalone-activities.job-queue-link')}</Link
+          >{translate(
             'standalone-activities.no-activities-description-part-1-postface',
           )}
         </p>
@@ -118,7 +113,7 @@
         {/each}
       {/if}
     </div>
-    <div class="flex h-full flex-col">
+    <div class="flex h-full flex-col max-xl:hidden">
       <div class="bg-off-white dark:bg-[#0f1725]">
         <img src={noResultsImages} alt="" class="w-full" />
       </div>
