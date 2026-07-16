@@ -51,6 +51,7 @@
     "format": "pnpm prettier:fix; pnpm eslint:fix; pnpm stylelint:fix",
     "check": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --tsgo --incremental",
     "check:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --tsgo --incremental --watch",
+    "check:a11y": "node ./scripts/a11y/assert-no-a11y-warnings.mjs",
     "prettier": "prettier --check --plugin prettier-plugin-svelte --plugin prettier-plugin-tailwindcss .",
     "prettier:fix": "prettier --write --plugin prettier-plugin-svelte --plugin prettier-plugin-tailwindcss .",
     "preview:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview",
