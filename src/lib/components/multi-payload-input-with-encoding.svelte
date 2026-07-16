@@ -65,7 +65,7 @@
 <div>
   <h5 class="pb-1 text-sm font-medium">{label}</h5>
   <Card class="flex flex-col gap-2">
-    {#each inputs as _, index (ids[index])}
+    {#each inputs as _, index (ids[index] ?? -index - 1)}
       <div class="flex items-start gap-2">
         <div class="grow">
           <PayloadInput
