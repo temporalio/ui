@@ -196,7 +196,7 @@
   }
 
   $: adjustedTotal =
-    !$store.hasNext && $store.indexEnd !== total ? $store.indexEnd : total;
+    !$store.hasNext && $store.indexEnd != total ? $store.indexEnd : total;
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

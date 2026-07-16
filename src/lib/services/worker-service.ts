@@ -44,6 +44,27 @@ export const fetchPaginatedWorkers = async (
   };
 };
 
+export const fetchWorkerCount = async (
+  { namespace, query }: ListWorkersRequest,
+  request = fetch,
+): Promise<{ count: number }> => {
+  let count = 0;
+  try {
+    const route = routeForApi('workers.count', { namespace });
+    const result = await requestFromAPI<{ count: string }>(route, {
+      params: query ? { query } : {},
+      onError: () => {},
+      handleError: () => {},
+      request,
+    });
+    count = parseInt(result?.count || '0');
+  } catch {
+    // Don't fail the workers view due to count
+  }
+
+  return { count };
+};
+
 export async function describeWorker(
   parameters: DescribeWorkerRequest,
   request = fetch,

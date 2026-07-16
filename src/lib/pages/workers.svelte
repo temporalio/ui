@@ -12,7 +12,7 @@
     workerSearchAttributeOptions,
     workerSearchAttributes,
   } from '$lib/stores/search-attributes';
-  import { refresh } from '$lib/stores/workers';
+  import { refresh, workerCount } from '$lib/stores/workers';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   const { namespace } = $derived(page.params);
@@ -44,6 +44,7 @@
     <WorkersTable
       {namespace}
       onFetch={() => fetchPaginatedWorkers({ namespace, query })}
+      total={$workerCount.count}
       filterable
     />
   {/key}

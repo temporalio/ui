@@ -166,6 +166,7 @@ export function pathForApi(
     'task-queue.rules': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}/worker-versioning-rules`,
     user: '/me',
     workers: `/namespaces/${parameters?.namespace}/workers`,
+    'workers.count': `/namespaces/${parameters?.namespace}/worker-count`,
     worker: `/namespaces/${parameters?.namespace}/workers/describe/${parameters?.workerInstanceKey}`,
     'worker-task-reachability': `/namespaces/${parameters?.namespace}/worker-task-reachability`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/terminate`,

@@ -9,7 +9,11 @@
   import { translate } from '$lib/i18n/translate';
   import { getWorkflowPollersWithVersions } from '$lib/runes/workflow-versions.svelte';
   import { getPollers } from '$lib/services/pollers-service';
-  import { fetchPaginatedWorkers } from '$lib/services/worker-service';
+  import {
+    fetchPaginatedWorkers,
+    fetchWorkerCount,
+  } from '$lib/services/worker-service';
+  import { workerCountEnabled } from '$lib/stores/workers';
 
   import WorkersTable from './workers-table.svelte';
 
@@ -27,9 +31,23 @@
     taskQueue,
   }: Props = $props();
 
-  const onFetch = $derived(() =>
-    fetchPaginatedWorkers({ namespace, query: `TaskQueue="${taskQueue}"` }),
-  );
+  const query = $derived(`TaskQueue="${taskQueue}"`);
+  const onFetch = $derived(() => fetchPaginatedWorkers({ namespace, query }));
+
+  let total = $state<number | undefined>();
+  $effect(() => {
+    if (useFallback || !$workerCountEnabled) {
+      total = undefined;
+      return;
+    }
+    const controller = new AbortController();
+    fetchWorkerCount({ namespace, query }, (input, init) =>
+      fetch(input, { ...init, signal: controller.signal }),
+    ).then(({ count }) => {
+      if (!controller.signal.aborted) total = count;
+    });
+    return () => controller.abort();
+  });
 
   const View = {
     Workers: 'workers',
@@ -99,7 +117,7 @@
     </ToggleButton>
   </ToggleButtons>
   {#if selected === View.Workers}
-    <WorkersTable {namespace} {onFetch} />
+    <WorkersTable {namespace} {onFetch} {total} />
   {:else}
     {@render pollersTable()}
   {/if}
