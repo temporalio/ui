@@ -41,7 +41,9 @@ if (a11yDiagnostics.length > 0) {
 }
 
 if (result.status !== 0 && output.trim() === '') {
-  console.error('svelte-check produced no output and exited non-zero — cannot verify a11y state.');
+  console.error(
+    'svelte-check produced no output and exited non-zero — cannot verify a11y state.',
+  );
   process.exit(result.status ?? 1);
 }
 
