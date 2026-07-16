@@ -1,3 +1,5 @@
+import { mapValues } from 'es-toolkit';
+
 import type {
   Callbacks,
   PendingActivity,
@@ -66,15 +68,9 @@ const toSearchAttributes = (
   apiSearchAttributes: WorkflowSearchAttributes,
 ): DecodedWorkflowSearchAttributes => {
   if (!apiSearchAttributes || !apiSearchAttributes.indexedFields) return {};
-  const decoded = Object.entries(apiSearchAttributes.indexedFields).reduce(
-    (searchAttributes, [searchAttributeName, payload]) => {
-      return {
-        ...searchAttributes,
-        [searchAttributeName]: parseRawPayloadToJSON(payload),
-      };
-    },
-    {},
-  );
+  const decoded = mapValues(apiSearchAttributes.indexedFields, (payload) =>
+    parseRawPayloadToJSON(payload),
+  ) as Record<string, string>;
 
   return {
     indexedFields: decoded,

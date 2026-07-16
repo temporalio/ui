@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements';
 
+  import { omit } from 'es-toolkit';
+
   import Label from '$lib/holocene/label.svelte';
-  import { omit } from '$lib/utilities/omit';
 
   interface $$Props extends HTMLInputAttributes {
     value: number;
@@ -92,7 +93,7 @@
           {min}
           {max}
           {step}
-          {...omit($$restProps, 'class')}
+          {...omit($$restProps, ['class'])}
         />
         <Label hidden {label} for="{id}-range" />
       </div>

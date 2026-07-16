@@ -8,7 +8,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
 
-  import debounce from 'just-debounce';
+  import { debounce } from 'es-toolkit';
   import { onMount } from 'svelte';
 
   import Alert from '$lib/holocene/alert.svelte';

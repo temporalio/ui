@@ -1,4 +1,4 @@
-import throttle from 'just-throttle';
+import { throttle } from 'es-toolkit';
 
 import { toEventHistory } from '$lib/models/event-history';
 import type { EventSortOrder } from '$lib/stores/event-view';
