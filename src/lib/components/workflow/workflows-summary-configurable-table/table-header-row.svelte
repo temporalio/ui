@@ -43,7 +43,7 @@
 
 <tr>
   {#if !empty && $supportsBulkActions}
-    <th class="batch-actions-checkbox-table-cell">
+    <th scope="col" class="batch-actions-checkbox-table-cell">
       <Checkbox
         {label}
         labelHidden
@@ -55,9 +55,9 @@
       />
     </th>
   {/if}
-  <th class="w-6"></th>
+  <th scope="col" class="w-6"></th>
   {#if $supportsBulkActions && $batchActionsVisible}
-    <th class="batch-actions-table-cell" colspan={columnsCount}>
+    <th scope="col" class="batch-actions-table-cell" colspan={columnsCount}>
       <BatchActions {workflows} />
     </th>
   {:else}

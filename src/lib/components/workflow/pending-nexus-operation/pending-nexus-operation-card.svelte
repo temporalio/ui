@@ -80,7 +80,7 @@
       {#if operation.scheduleToStartTimeout}
         {@render detail(
           translate('workflows.schedule-to-start-timeout'),
-          operation.scheduleToCloseTimeout as string,
+          operation.scheduleToStartTimeout as string,
         )}
       {/if}
       {#if operation.startToCloseTimeout}
@@ -102,6 +102,7 @@
           <CodeBlock
             language="text"
             content={operation.blockedReason}
+            label={translate('nexus.blocked-reason')}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -115,6 +116,7 @@
           <CodeBlock
             language="text"
             content={stringifyWithBigInt(operation.cancellationInfo)}
+            label={translate('nexus.cancellation-info')}
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
           />
@@ -169,6 +171,7 @@
           content={stringifyWithBigInt(
             omit(operation.lastAttemptFailure, 'stackTrace'),
           )}
+          label={translate('workflows.last-failure')}
           maxHeight={384}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
@@ -184,6 +187,7 @@
           language="text"
           maxHeight={384}
           content={operation.lastAttemptFailure.stackTrace}
+          label={translate('common.stack-trace')}
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
         />

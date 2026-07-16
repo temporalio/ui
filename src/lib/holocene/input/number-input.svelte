@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { FullAutoFill } from 'svelte/elements';
+
   import { twMerge as merge } from 'tailwind-merge';
 
   import type { IconName } from '$lib/holocene/icon';
@@ -20,6 +22,7 @@
   export let min: number = undefined;
   export let step: number = 1;
   export let search = false;
+  export let autocomplete: FullAutoFill = 'off';
 
   let valid = true;
 
@@ -34,6 +37,8 @@
   $: {
     validate(value);
   }
+
+  $: errorId = `${id}-error`;
 </script>
 
 <div class={merge('flex flex-col gap-1', $$props.class)}>
@@ -62,7 +67,10 @@
         {id}
         {name}
         {step}
-        autocomplete="off"
+        {required}
+        aria-invalid={!valid ? 'true' : undefined}
+        aria-describedby={!valid && hintText ? errorId : undefined}
+        {autocomplete}
         spellcheck="false"
         bind:value
         on:input
@@ -81,9 +89,14 @@
     {/if}
   </div>
 </div>
-{#if !valid && hintText}
-  <span class="mt-1 text-xs text-danger">{hintText}</span>
-{/if}
+<span
+  id={errorId}
+  role="alert"
+  class="text-xs text-danger"
+  class:mt-1={!valid && !!hintText}
+>
+  {#if !valid && hintText}{hintText}{/if}
+</span>
 
 <style lang="postcss">
   .search {

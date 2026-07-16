@@ -50,8 +50,8 @@ test.describe('Saved Query Views', () => {
   test('User saved queries: create new, edit view, then delete', async ({
     page,
   }) => {
-    await page.locator('#search-attribute-filter-button').click();
-    await page.locator('#filter-search').fill('WorkflowId');
+    await page.locator('#workflow-search-attribute-filter-button').click();
+    await page.locator('#workflow-filter-search').fill('WorkflowId');
     await page.getByRole('menuitem', { name: 'WorkflowId Keyword' }).click();
     await page
       .getByTestId('dropdown-filter-chip-WorkflowId-0-text')
@@ -74,8 +74,8 @@ test.describe('Saved Query Views', () => {
       .toBe('`WorkflowId`="user-view-1"');
     await expect(page.getByTestId('my-view')).toBeVisible();
 
-    await page.locator('#search-attribute-filter-button').click();
-    await page.locator('#filter-search').fill('TaskQueue');
+    await page.locator('#workflow-search-attribute-filter-button').click();
+    await page.locator('#workflow-filter-search').fill('TaskQueue');
     await page.getByRole('menuitem', { name: 'TaskQueue Keyword' }).click();
     await page
       .getByTestId('dropdown-filter-chip-TaskQueue-1-text')
@@ -112,8 +112,8 @@ test.describe('Saved Query Views', () => {
   test('User saved queries: create new, create copied view and delete', async ({
     page,
   }) => {
-    await page.locator('#search-attribute-filter-button').click();
-    await page.locator('#filter-search').fill('WorkflowId');
+    await page.locator('#workflow-search-attribute-filter-button').click();
+    await page.locator('#workflow-filter-search').fill('WorkflowId');
     await page.getByRole('menuitem', { name: 'WorkflowId Keyword' }).click();
     await page
       .getByTestId('dropdown-filter-chip-WorkflowId-0-text')
@@ -136,8 +136,8 @@ test.describe('Saved Query Views', () => {
       .toBe('`WorkflowId`="user-view-1"');
     await expect(page.getByTestId('original-view')).toBeVisible();
 
-    await page.locator('#search-attribute-filter-button').click();
-    await page.locator('#filter-search').fill('TaskQueue');
+    await page.locator('#workflow-search-attribute-filter-button').click();
+    await page.locator('#workflow-filter-search').fill('TaskQueue');
     await page.getByRole('menuitem', { name: 'TaskQueue Keyword' }).click();
     await page
       .getByTestId('dropdown-filter-chip-TaskQueue-1-text')

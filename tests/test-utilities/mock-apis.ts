@@ -12,9 +12,14 @@ import {
 } from './mocks/event-history';
 import {
   mockNamespaceApi,
+  mockNamespaceWithNexusOperations,
   mockNamespaceWithNoWorkerHeartbeats,
 } from './mocks/namespace';
 import { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';
+import {
+  mockNexusOperationCountApi,
+  mockNexusOperationsApi,
+} from './mocks/nexus-operations';
 import { mockSchedulesApi } from './mocks/schedules';
 import { mockSchedulesCountApi } from './mocks/schedules-count';
 import { mockSearchAttributesApi } from './mocks/search-attributes';
@@ -49,7 +54,13 @@ export {
   mockSearchAttributesApi,
   SEARCH_ATTRIBUTES_API,
 } from './mocks/search-attributes';
-export { mockSchedule, mockScheduleApi, SCHEDULE_API } from './mocks/schedules';
+export {
+  mockMonthlyCalendarSchedule,
+  mockSchedule,
+  mockScheduleApi,
+  mockWeeklyCalendarSchedule,
+  SCHEDULE_API,
+} from './mocks/schedules';
 export {
   mockSchedulesCountApi,
   SCHEDULES_COUNT_API,
@@ -77,6 +88,16 @@ export {
 export { EVENT_HISTORY_API, mockEventHistoryApi } from './mocks/event-history';
 export { mockTaskQueuesApi, TASK_QUEUES_API } from './mocks/task-queues';
 export { mockWorkersApi, WORKERS_API } from './mocks/workers';
+export {
+  mockNexusOperationsApi,
+  mockNexusOperationApi,
+  mockNexusOperationCountApi,
+  NEXUS_OPERATIONS_API,
+  NEXUS_OPERATION_API,
+  NEXUS_OPERATION_COUNT_API,
+  MOCK_NEXUS_OPERATION,
+} from './mocks/nexus-operations';
+export { mockNamespaceWithNexusOperations } from './mocks/namespace';
 
 export const mockGlobalApis = (page: Page) => {
   return Promise.all([
@@ -131,6 +152,16 @@ export const mockWorkersPageApis = (
       : mockNamespaceWithNoWorkerHeartbeats(page),
     mockSearchAttributesApi(page),
     mockWorkersApi(page, empty),
+  ]);
+};
+
+export const mockNexusOperationsApis = (page: Page, { empty = false } = {}) => {
+  return Promise.all([
+    mockGlobalApis(page),
+    mockNamespaceWithNexusOperations(page),
+    mockNexusOperationsApi(page, empty),
+    mockNexusOperationCountApi(page, empty),
+    mockSearchAttributesApi(page),
   ]);
 };
 

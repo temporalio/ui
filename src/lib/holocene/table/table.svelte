@@ -27,6 +27,7 @@
     className,
   )}
   class:bordered
+  aria-busy={updating ? 'true' : undefined}
   {...$$restProps}
 >
   <slot name="caption" />
@@ -82,7 +83,7 @@
     }
   }
 
-  .holocene-table-body {
+  :where(.holocene-table-body) {
     :global(tr) {
       @apply border-b border-subtle last-of-type:border-0 hover:bg-interactive-table-hover hover:bg-fixed;
     }

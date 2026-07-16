@@ -15,9 +15,13 @@
     interactive?: boolean;
     newTab?: boolean;
     class?: string;
+    /** @deprecated Use `leadingIcon` */
     icon?: IconName;
+    leadingIcon?: IconName;
+    trailingIcon?: IconName;
     text?: string;
     light?: boolean;
+    gotoParams?: Parameters<typeof goto>[1];
     'data-testid'?: string;
   };
 
@@ -28,15 +32,21 @@
   export let interactive = false;
   export let newTab = false;
   export let icon: IconName = null;
+  export let leadingIcon: IconName = null;
+  export let trailingIcon: IconName = null;
   export let text: string = '';
   export let light = false;
+  export let gotoParams = {};
+
+  $: effectiveLeading = leadingIcon ?? icon;
+  $: hasIcon = !!(effectiveLeading || trailingIcon);
 
   const onLinkClick = (e: MouseEvent) => {
     if (e.button === 1 || newTab || e.metaKey || e.ctrlKey || e.shiftKey)
       return;
 
     e.preventDefault();
-    goto(href);
+    goto(href, gotoParams);
   };
 </script>
 
@@ -44,7 +54,7 @@
   {href}
   target={newTab ? '_blank' : null}
   rel={newTab ? 'noreferrer noopener' : null}
-  class={merge('link', icon ? 'inline-flex' : 'inline', className)}
+  class={merge('link', hasIcon ? 'inline-flex' : 'inline', className)}
   class:active
   class:interactive
   class:light
@@ -55,13 +65,11 @@
   tabindex={href ? null : 0}
   {...$$restProps}
 >
-  {#if icon}
-    <Icon class="mt-0.5" name={icon} />
+  {#if effectiveLeading}
+    <Icon class="mt-0.5" name={effectiveLeading} />
+  {/if}{#if text}{text}{/if}<slot />{#if trailingIcon}
+    <Icon class="mt-0.5" name={trailingIcon} />
   {/if}
-  {#if text}
-    {text}
-  {/if}
-  <slot />
 </a>
 
 <style lang="postcss">

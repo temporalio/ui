@@ -5,7 +5,6 @@
   import { twMerge as merge } from 'tailwind-merge';
 
   import Button from '$lib/holocene/button.svelte';
-  import { focusTrap } from '$lib/utilities/focus-trap';
 
   import IconButton from './icon-button.svelte';
 
@@ -103,7 +102,6 @@
   aria-labelledby="modal-title-{id}"
   data-testid={$$props['data-testid']}
   {...$$restProps}
-  use:focusTrap={true}
 >
   {#if !loading}
     <IconButton
@@ -161,7 +159,11 @@
   }
 
   .body::backdrop {
-    @apply cursor-pointer transition-opacity duration-200;
+    @apply cursor-pointer bg-black/50 transition-opacity duration-200;
+
+    :global([data-theme='dark']) & {
+      background-color: rgb(var(--color-surface-background) / 50%);
+    }
   }
 
   .body.hightlightNav::backdrop {

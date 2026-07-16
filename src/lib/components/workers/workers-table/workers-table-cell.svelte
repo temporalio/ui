@@ -3,8 +3,8 @@
 
   import { page } from '$app/state';
 
-  import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import TableCellWithFilterOrCopyButtons from '$lib/holocene/table/table-cell-with-filter-or-copy-buttons.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
   import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
@@ -17,7 +17,6 @@
 
   interface Props {
     attribute?: string;
-    copyable?: boolean;
     filters?: SearchAttributeFilter[];
     value?: string | null;
     filterable?: boolean;
@@ -27,7 +26,6 @@
 
   let {
     attribute,
-    copyable = true,
     filters,
     value,
     filterable = false,
@@ -50,7 +48,7 @@
     ),
   );
 
-  const onRowFilterClick = async () => {
+  const onRowFilterClick = () => {
     const toRemove = toggleFilters.filter((f) =>
       $workerFilters.some((wf) => matchesFilter(wf, f)),
     );
@@ -68,28 +66,17 @@
     updateQueryParamsFromFilter(page.url, $workerFilters);
   };
 
-  let filterOrCopyButtonsVisible = $state(false);
-  const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
-  const hideFilterOrCopy = () => (filterOrCopyButtonsVisible = false);
-  const handleFocusOut = (e: FocusEvent) => {
-    const nextTarget = e.relatedTarget as HTMLElement;
-    if (
-      nextTarget &&
-      !['filter-button', 'copy-button'].includes(nextTarget.id)
-    ) {
-      hideFilterOrCopy();
-    }
-  };
+  const hasContent = $derived(
+    Boolean(value) || Boolean(filters && filters.length > 0),
+  );
 </script>
 
-<td
-  class="relative h-8"
-  onfocus={showFilterOrCopy}
-  onfocusin={showFilterOrCopy}
-  onfocusout={handleFocusOut}
-  onmouseover={showFilterOrCopy}
-  onmouseleave={hideFilterOrCopy}
-  onblur={hideFilterOrCopy}
+<TableCellWithFilterOrCopyButtons
+  class="h-8"
+  copyValue={value ?? undefined}
+  onFilter={hasContent && filterable ? onRowFilterClick : undefined}
+  {isFiltered}
+  filterIconTitle={translate('common.filter-workflows')}
 >
   {#if attribute === 'BuildId' || attribute === 'WorkerInstanceKey'}
     {#if href}
@@ -108,17 +95,4 @@
   {:else}
     {value}
   {/if}
-  {#if value || (filters && filters.length > 0)}
-    <FilterOrCopyButtons
-      copyIconTitle={translate('common.copy-icon-title')}
-      copySuccessIconTitle={translate('common.copy-success-icon-title')}
-      filterIconTitle={translate('common.filter-workflows')}
-      show={filterOrCopyButtonsVisible}
-      content={value ?? ''}
-      onFilter={onRowFilterClick}
-      {copyable}
-      {filterable}
-      filtered={isFiltered}
-    />
-  {/if}
-</td>
+</TableCellWithFilterOrCopyButtons>

@@ -1,65 +1,90 @@
 <script lang="ts">
+  import { getContext, onMount } from 'svelte';
+
   import { beforeNavigate, goto } from '$app/navigation';
   import { page } from '$app/state';
 
   import EventHistoryLegend from '$lib/components/lines-and-dots/event-history-legend.svelte';
   import EventTypeFilter from '$lib/components/lines-and-dots/event-type-filter.svelte';
-  import TimelineGraph from '$lib/components/lines-and-dots/svg/timeline-graph.svelte';
+  import TimelineGraph from '$lib/components/lines-and-dots/timeline-graph/timeline-graph.svelte';
+  import type { Timeline } from '$lib/components/lines-and-dots/timeline-graph/timeline.svelte';
   import WorkflowError from '$lib/components/lines-and-dots/workflow-error.svelte';
   import DownloadEventHistoryModal from '$lib/components/workflow/download-event-history-modal.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowCallbacks from '$lib/components/workflow/workflow-callbacks.svelte';
+  import {
+    HISTORY_CTX,
+    type HistoryContext,
+  } from '$lib/contexts/history-context';
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { groupEvents } from '$lib/models/event-groups';
-  import { clearActives } from '$lib/stores/active-events';
-  import { eventFilterSort } from '$lib/stores/event-view';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import {
-    currentEventHistory,
-    filteredEventHistory,
-    pauseLiveUpdates,
-  } from '$lib/stores/events';
+    enrichGroups,
+    getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
+    getGroupArray,
+    onLatestGroup,
+  } from '$lib/services/grouped-event-buffer';
+  import { clearActives } from '$lib/stores/active-events';
+  import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
+  import { pauseLiveUpdates } from '$lib/stores/events';
+  import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import type {
+    WorkflowTaskFailedEvent,
+    WorkflowTaskTimedOutEvent,
+  } from '$lib/types/events';
   import {
     parseEventFilterParams,
     updateEventFilterParams,
   } from '$lib/utilities/event-filter-params';
-  import { getWorkflowTaskFailedEvent } from '$lib/utilities/get-workflow-task-failed-event';
-  import { orderGroupsByPending } from '$lib/utilities/order-groups-by-pending';
+  import { getTimelineGroups } from '$lib/utilities/sort-timeline-groups';
+
+  const historyCtx = getContext<HistoryContext>(HISTORY_CTX);
 
   const namespace = $derived(page.params.namespace);
   const workflow = $derived($workflowRun.workflow);
-  const pendingActivities = $derived(workflow?.pendingActivities);
-  const pendingNexusOperations = $derived(workflow?.pendingNexusOperations);
 
   const urlParams = $derived(parseEventFilterParams(page.url));
-
   $effect(() => {
     $eventFilterSort = urlParams.sort;
     $pauseLiveUpdates = urlParams.refresh_off;
   });
 
+  const onAutoRefreshToggle = () => {
+    updateEventFilterParams(
+      page.url,
+      { refresh_off: !$pauseLiveUpdates },
+      goto,
+    );
+  };
+
   const reverseSort = $derived($eventFilterSort === 'descending');
 
-  const ascendingGroups = $derived(
-    groupEvents(
-      $filteredEventHistory,
-      'ascending',
-      pendingActivities,
-      pendingNexusOperations,
-    ),
-  );
+  let bufferGroups = $state.raw<EventGroup[]>([]);
+
+  const filteredBufferGroups = $derived.by(() => {
+    const active = $eventTypeFilter;
+    return bufferGroups.filter((g) => active.includes(g.category));
+  });
 
   const groups = $derived(
-    orderGroupsByPending(
-      reverseSort ? [...ascendingGroups].reverse() : ascendingGroups,
+    getTimelineGroups(
+      filteredBufferGroups,
       reverseSort,
+      historyCtx.fetchComplete,
+      historyCtx.descMinId,
     ),
   );
 
   const workflowTaskFailedError = $derived(
-    getWorkflowTaskFailedEvent($currentEventHistory, 'ascending'),
+    historyCtx.fetchComplete
+      ? (getBufferWftFailedEvent() as
+          | WorkflowTaskFailedEvent
+          | WorkflowTaskTimedOutEvent
+          | undefined)
+      : undefined,
   );
 
   const isNotPending = $derived(
@@ -70,12 +95,6 @@
     clearActives();
   });
 
-  $effect(() => {
-    if (isNotPending && $pauseLiveUpdates) {
-      $pauseLiveUpdates = false;
-    }
-  });
-
   let showDownloadPrompt = $state(false);
 
   const onSort = () => {
@@ -83,12 +102,66 @@
     updateEventFilterParams(page.url, { sort: newSort }, goto);
   };
 
-  const onAutoRefreshToggle = () => {
-    updateEventFilterParams(
-      page.url,
-      { refresh_off: !$pauseLiveUpdates },
-      goto,
-    );
+  // The timeline renders in normal page flow: the page (#content-wrapper)
+  // scrolls it and the controls bar sticks to the top-nav. TimelineGraph
+  // virtualizes internally via IntersectionObserver, so there's no bounded
+  // scroll container, no scroll-offset bridge, and no height plumbing here.
+  const estimatedTotalGroups = $derived.by(() => {
+    if (historyCtx.fetchComplete) return groups.length;
+    const totalEvents = historyCtx.totalExpectedEvents ?? 0;
+    return Math.max(groups.length, Math.ceil(totalEvents * 0.5));
+  });
+
+  onMount(() => {
+    historyCtx.resume();
+    bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+
+    // Throttle buffer → Svelte updates to at most once per animation frame.
+    // onLatestGroup fires for every new group head (~N times during load), each
+    // triggering getGroupArray() (O(N log N) sort) + a full reactive cascade;
+    // batching via rAF caps that at ≤60 updates/sec regardless of how fast the
+    // bidirectional cursors push data.
+    let groupUpdatePending = false;
+    const unsub = onLatestGroup(() => {
+      if (!groupUpdatePending) {
+        groupUpdatePending = true;
+        requestAnimationFrame(() => {
+          groupUpdatePending = false;
+          bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+        });
+      }
+    });
+
+    return () => {
+      unsub();
+    };
+  });
+
+  $effect(() => {
+    if (historyCtx.fetchComplete) {
+      enrichGroups(
+        $workflowRun.workflow?.pendingActivities ?? [],
+        $workflowRun.workflow?.pendingNexusOperations ?? [],
+      );
+      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+    }
+  });
+
+  let timeline = $state<Timeline>();
+
+  const handleTimelineInit = (t: Timeline) => {
+    timeline = t;
+  };
+
+  const onToggleIdleTime = () => {
+    if (!timeline) return;
+    if (timeline.allCollapsibleSegmentsCollapsed) {
+      timeline.expandAllSegments();
+      $collapseIdleTime = 'off';
+    } else {
+      timeline.collapseAllSegments();
+      $collapseIdleTime = 'on';
+    }
   };
 </script>
 
@@ -104,14 +177,18 @@
     <WorkflowCallbacks callbacks={workflow.callbacks} />
   {/if}
 </div>
-<div class="relative pb-24">
+
+<!--
+  Wrapper: single flex child so the parent's gap-4 only applies once (above
+  this block). The controls bar sticks below the top-nav while the page scrolls
+  the timeline past it; the timeline virtualizes itself via IntersectionObserver.
+-->
+<div>
   <div
     class="surface-background sticky top-0 z-[11] flex flex-wrap items-center justify-between gap-2 border-b border-subtle pb-2 md:top-[var(--top-nav-height)] md:pt-2 xl:gap-8"
   >
     <div class="flex items-center gap-2">
-      <h2>
-        {translate('workflows.timeline-tab')}
-      </h2>
+      <h2>{translate('workflows.timeline-tab')}</h2>
       <EventHistoryLegend />
     </div>
     <div class="flex items-center gap-2">
@@ -122,6 +199,19 @@
           on:click={onSort}
           size="sm">{reverseSort ? 'Descending' : 'Ascending'}</ToggleButton
         >
+        <ToggleButton
+          leadingIcon="timeline-collapse"
+          data-testid="toggle-idle-time"
+          loading={!historyCtx.fetchComplete}
+          disabled={!historyCtx.fetchComplete ||
+            !timeline?.hasCollapsibleSegments}
+          on:click={onToggleIdleTime}
+          size="sm"
+        >
+          {timeline?.allCollapsibleSegmentsCollapsed
+            ? translate('workflows.show-idle-time')
+            : translate('workflows.hide-idle-time')}
+        </ToggleButton>
         <EventTypeFilter compact={false} />
         <ToggleButton
           disabled={isNotPending}
@@ -150,17 +240,27 @@
       </ToggleButtons>
     </div>
   </div>
+
+  <!--
+  Timeline in page flow: it's a tall element the page scrolls, and it
+  virtualizes itself via IntersectionObserver (no bounded scroll container,
+  no scroll-offset bridge).
+-->
   {#if workflow}
-    <div class="flex w-full flex-col">
-      <TimelineGraph
-        {workflow}
-        {groups}
-        viewportHeight={undefined}
-        error={Boolean(workflowTaskFailedError)}
-      />
-    </div>
+    <TimelineGraph
+      {workflow}
+      {groups}
+      {reverseSort}
+      loading={!historyCtx.fetchComplete}
+      totalExpectedEvents={estimatedTotalGroups}
+      descMinId={historyCtx.descMinId}
+      error={Boolean(workflowTaskFailedError)}
+      onTimelineInit={handleTimelineInit}
+    />
   {/if}
 </div>
+<!-- end wrapper -->
+
 {#if workflow}
   <DownloadEventHistoryModal
     bind:open={showDownloadPrompt}

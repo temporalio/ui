@@ -1,248 +1,136 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 import { goto } from '$app/navigation';
 
+import type { FormScheduleSchema } from '$lib/components/schedule/schema/form';
+import { getRequestBody } from '$lib/components/schedule/utilities/get-request-body';
 import { translate } from '$lib/i18n/translate';
-import { createSchedule, editSchedule } from '$lib/services/schedule-service';
-import { setSearchAttributes } from '$lib/services/workflow-service';
-import type { Schedule } from '$lib/types';
+import {
+  backfillRequest,
+  createSchedule,
+  deleteSchedule,
+  editSchedule,
+  fetchSchedule,
+  pauseSchedule,
+  triggerImmediately,
+  unpauseSchedule,
+} from '$lib/services/schedule-service';
 import type {
   DescribeFullSchedule,
-  ScheduleActionParameters,
-  ScheduleInterval,
-  SchedulePresetsParameters,
-  ScheduleSpecParameters,
+  OverlapPolicy,
+  ScheduleRequestBody,
 } from '$lib/types/schedule';
-import { encodePayloads } from '$lib/utilities/encode-payload';
-import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
-import {
-  convertDaysAndMonths,
-  timeToInterval,
-} from '$lib/utilities/schedule-data-formatting';
 
-type ScheduleParameterArgs = {
-  action: ScheduleActionParameters;
-  spec: Partial<ScheduleSpecParameters>;
-  presets: SchedulePresetsParameters;
+type ScheduleContext = {
+  namespace: string;
+  identity?: string;
+  scheduleId: string;
 };
 
-const getSearchAttributes = (
-  attrs: (typeof setSearchAttributes.arguments)[0],
-) => {
-  return attrs.length === 0
-    ? null
-    : { indexedFields: { ...setSearchAttributes(attrs) } };
-};
+type ScheduleAction =
+  | 'create'
+  | 'edit'
+  | 'delete'
+  | 'pause'
+  | 'trigger'
+  | 'backfill';
 
-const setBodySpec = (
-  body: DescribeFullSchedule,
-  spec: Partial<ScheduleSpecParameters>,
-  presets: SchedulePresetsParameters,
-) => {
-  const { hour, minute, second, phase, cronString } = spec;
-  const { preset, months, days, daysOfMonth, daysOfWeek } = presets;
-  if (preset === 'string') {
-    // Add the cronString as a comment to the cronString to view it for frequency
-    const cronStringWithComment = `${cronString}#${cronString}`;
-    body.schedule.spec.cronString = [cronStringWithComment];
-    body.schedule.spec.calendar = [];
-    body.schedule.spec.interval = [];
-  } else if (preset === 'interval') {
-    const interval = timeToInterval(days, hour, minute, second);
-    // The Schedule IntervalSpec implements IIntervalSpec which encodes/decodes string to Interval
-    body.schedule.spec.interval = [
-      { interval, phase: phase || '0s' },
-    ] as ScheduleInterval[];
-    body.schedule.spec.cronString = [];
-    body.schedule.spec.calendar = [];
-  } else {
-    const { month, dayOfMonth, dayOfWeek } = convertDaysAndMonths({
-      months,
-      daysOfMonth,
-      daysOfWeek,
-    });
-    body.schedule.spec.calendar = [
-      {
-        year: '*',
-        month: preset === 'month' ? month : '',
-        dayOfMonth: preset === 'month' ? dayOfMonth : '',
-        dayOfWeek: preset === 'week' ? dayOfWeek : '',
-        hour,
-        minute,
-        second,
-      },
-    ];
-    body.schedule.spec.interval = [];
-    body.schedule.spec.cronString = [];
-  }
-};
+const scheduleTimeouts = new Map<
+  ScheduleAction,
+  ReturnType<typeof setTimeout>
+>();
 
-let createTimeout: ReturnType<typeof setTimeout>;
-let editTimeout: ReturnType<typeof setTimeout>;
+function setScheduleTimeout(
+  action: ScheduleAction,
+  callback: () => void,
+  delay = 2000,
+) {
+  clearTimeout(scheduleTimeouts.get(action));
+  scheduleTimeouts.set(action, setTimeout(callback, delay));
+}
 
-export const submitCreateSchedule = async ({
-  action,
-  spec,
-  presets,
-}: ScheduleParameterArgs): Promise<void> => {
-  const {
-    identity,
-    namespace,
-    name,
-    workflowId,
-    workflowType,
-    taskQueue,
-    input,
-    encoding,
-    messageType,
-    searchAttributes,
-    workflowSearchAttributes,
-  } = action;
+function clearScheduleTimeout(action: ScheduleAction) {
+  clearTimeout(scheduleTimeouts.get(action));
+}
 
-  let payloads;
+type ConfirmationModal = 'none' | 'delete' | 'pause' | 'trigger' | 'backfill';
+export const confirmationModal = writable<ConfirmationModal>('none');
 
-  if (input) {
-    try {
-      payloads = await encodePayloads({ input, encoding, messageType });
-    } catch (e) {
-      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
-      return;
-    }
+export function clearConfirmationModalActionTimeout(
+  modal: Exclude<ConfirmationModal, 'none'>,
+) {
+  actionPending.set(false);
+  clearScheduleTimeout(modal);
+}
+
+export function openConfirmationModal(
+  modal: Exclude<ConfirmationModal, 'none'>,
+) {
+  serverError.set('');
+  confirmationModal.set(modal);
+}
+
+export function closeConfirmationModal(
+  modal?: Exclude<ConfirmationModal, 'none'>,
+) {
+  if (modal && get(confirmationModal) !== modal) {
+    return;
   }
 
-  const body: DescribeFullSchedule = {
-    schedule_id: name.trim(),
-    searchAttributes:
-      searchAttributes.length === 0
-        ? null
-        : {
-            indexedFields: {
-              ...setSearchAttributes(searchAttributes),
-            },
-          },
-    schedule: {
-      spec: {
-        calendar: [],
-        interval: [],
-        cronString: [],
-      },
-      action: {
-        startWorkflow: {
-          workflowId: workflowId,
-          workflowType: { name: workflowType },
-          taskQueue: { name: taskQueue },
-          input: payloads ? { payloads } : null,
-          searchAttributes:
-            workflowSearchAttributes.length === 0
-              ? null
-              : {
-                  indexedFields: {
-                    ...setSearchAttributes(workflowSearchAttributes),
-                  },
-                },
-        },
-      },
-    },
-  };
+  serverError.set('');
+  confirmationModal.set('none');
+}
 
-  setBodySpec(body, spec, presets);
+export async function submitCreateSchedule(
+  formData: FormScheduleSchema,
+  context: Omit<ScheduleContext, 'scheduleId'>,
+): Promise<void> {
+  const { namespace, identity } = context;
 
-  // Wait 2 seconds for create to get it on fetchAllSchedules
+  let body: ScheduleRequestBody;
+  try {
+    body = await getRequestBody(formData);
+  } catch (e) {
+    serverError.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+    return;
+  }
+
   loading.set(true);
   const { error: err } = await createSchedule({
     identity,
-    scheduleId: name,
+    scheduleId: formData.name,
     namespace,
     body,
   });
 
   if (err) {
-    error.set(err);
+    serverError.set(err);
     loading.set(false);
   } else {
-    clearTimeout(createTimeout);
-    createTimeout = setTimeout(() => {
-      error.set('');
+    setScheduleTimeout('create', () => {
+      serverError.set('');
       loading.set(false);
       goto(routeForSchedules({ namespace }));
-    }, 2000);
+    });
   }
-};
+}
 
-export const submitEditSchedule = async (
-  { action, spec, presets }: ScheduleParameterArgs,
-  schedule: Schedule,
-  scheduleId: string,
-): Promise<void> => {
-  const {
-    identity,
-    namespace,
-    name,
-    workflowId,
-    workflowType,
-    taskQueue,
-    input,
-    encoding,
-    messageType,
-    searchAttributes,
-    workflowSearchAttributes,
-  } = action;
+export async function submitEditSchedule(
+  formData: FormScheduleSchema,
+  schedule: DescribeFullSchedule,
+  context: ScheduleContext,
+): Promise<void> {
+  const { namespace, identity, scheduleId } = context;
 
-  let payloads;
-
-  if (input) {
-    try {
-      payloads = await encodePayloads({ input, encoding, messageType });
-    } catch (e) {
-      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
-      return;
-    }
+  let body: ScheduleRequestBody;
+  try {
+    body = await getRequestBody(formData, schedule);
+  } catch (e) {
+    serverError.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
+    return;
   }
 
-  const { preset } = presets;
-  const body: DescribeFullSchedule = {
-    schedule_id: scheduleId,
-    searchAttributes: getSearchAttributes(searchAttributes),
-    schedule: {
-      ...schedule,
-      action: {
-        startWorkflow: {
-          ...schedule.action.startWorkflow,
-          workflowId,
-          workflowType: { name: workflowType },
-          taskQueue: { name: taskQueue },
-          ...(input !== undefined && { input: payloads ? { payloads } : null }),
-          searchAttributes: getSearchAttributes(workflowSearchAttributes),
-        },
-      },
-    },
-  };
-
-  const fields = body.schedule.action.startWorkflow?.header?.fields;
-  if (fields && Object.keys(fields).length > 0) {
-    try {
-      for (const [key, value] of Object.entries(fields)) {
-        const encodedValue = await encodePayloads({
-          input: stringifyWithBigInt(value),
-          encoding: 'json/plain',
-        });
-        fields[key] = encodedValue[0];
-      }
-    } catch (e) {
-      error.set(`${translate('data-encoder.encode-error')}: ${e?.message}`);
-      return;
-    }
-  }
-
-  if (preset === 'existing') {
-    body.schedule.spec = schedule.spec;
-  } else {
-    setBodySpec(body, spec, presets);
-    body.schedule.spec.structuredCalendar = [];
-  }
-
-  // Wait 2 seconds for edit to get it on fetchSchedule
   loading.set(true);
   const { error: err } = await editSchedule({
     identity,
@@ -252,18 +140,186 @@ export const submitEditSchedule = async (
   });
 
   if (err) {
-    error.set(err);
+    serverError.set(err);
     loading.set(false);
   } else {
-    clearTimeout(editTimeout);
-    editTimeout = setTimeout(() => {
-      goto(routeForSchedule({ namespace, scheduleId: name }));
-      error.set('');
+    setScheduleTimeout('edit', () => {
+      goto(routeForSchedule({ namespace, scheduleId: formData.name }));
+      serverError.set('');
       loading.set(false);
-    }, 2000);
+    });
   }
-};
+}
+
+export async function submitDeleteSchedule(context: ScheduleContext) {
+  const { namespace, identity, scheduleId } = context;
+  serverError.set('');
+
+  try {
+    actionPending.set(true);
+    await deleteSchedule({ identity, namespace, scheduleId });
+
+    setScheduleTimeout('delete', () => {
+      actionPending.set(false);
+      closeConfirmationModal('delete');
+      serverError.set('');
+      currentScheduleFetch.set(Promise.resolve(null));
+      goto(routeForSchedules({ namespace }));
+    });
+  } catch (e) {
+    actionPending.set(false);
+    serverError.set(
+      translate('schedules.delete-schedule-error', {
+        error: e?.message,
+      }),
+    );
+  }
+}
+
+export async function submitPauseSchedule(
+  reason: string,
+  context: ScheduleContext & { isPaused: boolean },
+) {
+  const { namespace, identity, scheduleId, isPaused } = context;
+  serverError.set('');
+
+  try {
+    actionPending.set(true);
+
+    await (isPaused
+      ? unpauseSchedule({
+          identity,
+          namespace,
+          scheduleId,
+          reason,
+        })
+      : pauseSchedule({
+          identity,
+          namespace,
+          scheduleId,
+          reason,
+        }));
+
+    refreshCurrentScheduleFetch({ namespace, scheduleId });
+    closeConfirmationModal('pause');
+    serverError.set('');
+  } catch (e) {
+    serverError.set(
+      translate(
+        isPaused
+          ? 'schedules.pause-schedule-error'
+          : 'schedules.unpause-schedule-error',
+        {
+          error: e?.message,
+        },
+      ),
+    );
+  } finally {
+    actionPending.set(false);
+  }
+}
+
+export async function submitTriggerImmediatelySchedule(
+  overlapPolicy: OverlapPolicy,
+  context: ScheduleContext,
+) {
+  const { namespace, identity, scheduleId } = context;
+  serverError.set('');
+
+  try {
+    actionPending.set(true);
+
+    await triggerImmediately({
+      identity,
+      namespace,
+      scheduleId,
+      overlapPolicy,
+    });
+
+    setScheduleTimeout(
+      'trigger',
+      () => {
+        actionPending.set(false);
+        serverError.set('');
+        refreshCurrentScheduleFetch({ namespace, scheduleId });
+        closeConfirmationModal('trigger');
+      },
+      1000,
+    );
+  } catch (e) {
+    actionPending.set(false);
+    serverError.set(
+      translate('schedules.trigger-schedule-error', {
+        error: e?.message,
+      }),
+    );
+  }
+}
+
+export async function submitBackfillSchedule(
+  {
+    startTime,
+    endTime,
+    overlapPolicy,
+  }: {
+    startTime: string;
+    endTime: string;
+    overlapPolicy: OverlapPolicy;
+  },
+  context: ScheduleContext,
+) {
+  const { namespace, identity, scheduleId } = context;
+  serverError.set('');
+
+  try {
+    actionPending.set(true);
+
+    await backfillRequest({
+      identity,
+      namespace,
+      scheduleId,
+      overlapPolicy,
+      startTime,
+      endTime,
+    });
+
+    setScheduleTimeout(
+      'backfill',
+      () => {
+        actionPending.set(false);
+        serverError.set('');
+        refreshCurrentScheduleFetch({ namespace, scheduleId });
+        closeConfirmationModal('backfill');
+      },
+      1000,
+    );
+  } catch (e) {
+    actionPending.set(false);
+    serverError.set(
+      translate('schedules.backfill-schedule-error', {
+        error: e?.message,
+      }),
+    );
+  }
+}
+
+export const currentScheduleFetch =
+  writable<Promise<DescribeFullSchedule | null>>(null);
+
+export function refreshCurrentScheduleFetch(
+  context: Pick<ScheduleContext, 'namespace' | 'scheduleId'>,
+) {
+  currentScheduleFetch.set(fetchSchedule(context));
+}
+
+export const schedulesRefresh = writable(0);
 
 export const loading = writable(false);
-export const error = writable('');
-export const schedulesCount = writable('0');
+export const actionPending = writable(false);
+
+export const serverError = writable('');
+
+export const schedulesCount = writable({
+  count: 0,
+  newCount: 0,
+});

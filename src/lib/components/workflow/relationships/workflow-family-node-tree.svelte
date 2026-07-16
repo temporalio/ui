@@ -4,6 +4,7 @@
   import { page } from '$app/state';
 
   import Icon from '$lib/holocene/icon';
+  import { translate } from '$lib/i18n/translate';
   import type { RootNode } from '$lib/services/workflow-service';
   import { fullEventHistory } from '$lib/stores/events';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -79,6 +80,13 @@
   const nodeClick = (e, node: RootNode) => {
     e.stopPropagation();
     onNodeClick(node, generation);
+  };
+
+  const handleNodeKeydown = (event: KeyboardEvent, target: RootNode) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      nodeClick(event, target);
+    }
   };
 
   $: isExpanded = (node: RootNode) => {
@@ -159,9 +167,13 @@
   <g
     role="button"
     tabindex="0"
+    aria-label={translate('workflows.family-node-label', {
+      id: child.workflow.id,
+      status: child.workflow.status,
+    })}
     class="outline-none transition-all"
     on:click={(e) => nodeClick(e, child)}
-    on:keypress={(e) => nodeClick(e, child)}
+    on:keydown={(e) => handleNodeKeydown(e, child)}
   >
     {#if child?.children?.length && isExpanded(child)}
       <line
@@ -284,8 +296,12 @@
     role="button"
     class="outline-none"
     tabindex="0"
+    aria-label={translate('workflows.family-node-label', {
+      id: root.workflow.id,
+      status: root.workflow.status,
+    })}
     on:click={(e) => nodeClick(e, root)}
-    on:keypress={(e) => nodeClick(e, root)}
+    on:keydown={(e) => handleNodeKeydown(e, root)}
   >
     {#if root?.scheduleId}
       <line

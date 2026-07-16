@@ -3,9 +3,10 @@
 
   import { page } from '$app/state';
 
-  import SchedulesCount from '$lib/components/schedule/schedules-count.svelte';
-  import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
+  import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import SchedulesTableRow from '$lib/components/schedule/schedules-list/schedules-table-row.svelte';
   import FilterBar from '$lib/components/search-attribute-filter/filter-bar.svelte';
+  import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -15,7 +16,9 @@
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { createCountPoller } from '$lib/runes/count-poller.svelte';
   import { fetchPaginatedSchedules } from '$lib/services/schedule-service';
+  import { fetchScheduleCount } from '$lib/services/workflow-counts';
   import {
     availableScheduleColumns,
     configurableTableColumns,
@@ -23,7 +26,7 @@
   } from '$lib/stores/configurable-table-columns';
   import { coreUserStore } from '$lib/stores/core-user';
   import { scheduleFilters } from '$lib/stores/filters';
-  import { schedulesCount } from '$lib/stores/schedules';
+  import { schedulesCount, schedulesRefresh } from '$lib/stores/schedules';
   import {
     scheduleSearchAttributeOptions,
     scheduleSearchAttributes,
@@ -33,6 +36,23 @@
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
+  const { namespace } = $derived(page.params);
+  const query = $derived(page.url.searchParams.get('query') ?? '');
+
+  const countPoller = createCountPoller({
+    getStore: () => schedulesCount,
+    fetch: () => fetchScheduleCount({ namespace, query }),
+    transform: (countStr) => parseInt(countStr ?? '0', 10),
+    watch: () => {
+      void namespace;
+      void query;
+      void $schedulesRefresh;
+    },
+  });
+
+  const refreshTime = $derived(new Date(countPoller.refreshTime));
+  const refreshTimeFormatted = $derived($timestamp(refreshTime));
+
   const coreUser = coreUserStore();
   let customizationDrawerOpen = $state(false);
   let error = $state('');
@@ -41,12 +61,10 @@
     customizationDrawerOpen = true;
   };
 
-  const { namespace } = $derived(page.params);
   const columns = $derived(
     $configurableTableColumns?.[namespace]?.schedules ?? [],
   );
   const createDisabled = $derived($coreUser.namespaceWriteDisabled(namespace));
-  const query = $derived(page.url.searchParams.get('query'));
   const onFetch = $derived(() => {
     error = '';
     return fetchPaginatedSchedules(namespace, query, onError);
@@ -68,42 +86,70 @@
       translate('schedules.error-message-fetching');
   };
 
-  const showFilters = $derived(Number($schedulesCount) > 0 || query);
+  const showFilters = $derived($schedulesCount.count > 0 || query);
 </script>
 
-<div class="flex flex-col gap-4">
-  <div
-    class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
-  >
-    <h1 class="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-      <SchedulesCount />
-    </h1>
+<header class="flex flex-col gap-2">
+  <div class="flex flex-col justify-between gap-2 md:flex-row">
+    <div class="flex flex-row flex-wrap items-start gap-2">
+      <div>
+        <div class="flex flex-row flex-wrap items-start gap-2">
+          <h1
+            class="flex items-center gap-2 leading-7"
+            data-cy="schedules-title"
+          >
+            <span
+              role="status"
+              aria-atomic="true"
+              class="flex items-center gap-2"
+            >
+              <span data-testid="schedule-count"
+                >{$schedulesCount.count.toLocaleString()}</span
+              >
+              {translate('common.schedules-plural', {
+                count: $schedulesCount.count,
+              })}
+            </span>
+          </h1>
+          <CountRefreshButton
+            count={$schedulesCount.newCount}
+            refresh={schedulesRefresh}
+          />
+        </div>
+        <p class="mt-2 text-xs text-secondary">
+          {refreshTimeFormatted}
+        </p>
+      </div>
+    </div>
     {#if !createDisabled}
-      <Button
-        data-testid="create-schedule"
-        href={routeForScheduleCreate({ namespace })}
-        disabled={!writeActionsAreAllowed()}
-      >
-        {translate('schedules.create')}
-      </Button>
+      <div class="flex items-center gap-4">
+        <Button
+          data-testid="create-schedule"
+          href={routeForScheduleCreate({ namespace })}
+          disabled={!writeActionsAreAllowed()}
+        >
+          {translate('schedules.create')}
+        </Button>
+      </div>
     {/if}
   </div>
-  {#if showFilters}
-    <FilterBar
-      filters={scheduleFilters}
-      options={$scheduleSearchAttributeOptions}
-      searchAttributes={$scheduleSearchAttributes}
-      id="schedules"
-    />
-  {/if}
-</div>
+</header>
 
-{#key [namespace, query]}
+{#if showFilters}
+  <FilterBar
+    filters={scheduleFilters}
+    options={$scheduleSearchAttributeOptions}
+    searchAttributes={$scheduleSearchAttributes}
+    id="schedules"
+  />
+{/if}
+
+{#key [namespace, query, $schedulesRefresh]}
   <PaginatedTable
     let:visibleItems
     {onFetch}
     {onError}
-    total={$schedulesCount}
+    total={$schedulesCount.count}
     aria-label={translate('common.schedules')}
     pageSizeSelectLabel={translate('common.per-page')}
     nextButtonLabel={translate('common.next')}
@@ -151,12 +197,13 @@
       {/if}
     </svelte:fragment>
     <svelte:fragment slot="actions-end-additional">
-      <Tooltip text="Configure Columns" top>
+      <Tooltip text={translate('common.configure-columns')} top>
         <Button
           on:click={openCustomizationDrawer}
           data-testid="workflows-summary-table-configuration-button"
           size="xs"
           variant="ghost"
+          aria-label={translate('common.configure-columns')}
         >
           <Icon name="settings" />
         </Button>

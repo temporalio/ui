@@ -7,6 +7,7 @@
   import BottomNavigation from '$lib/components/bottom-nav.svelte';
   import DataEncoderSettings from '$lib/components/data-encoder-settings.svelte';
   import NamespacePicker from '$lib/components/namespace-picker.svelte';
+  import NewsFeedWidget from '$lib/components/news-feed/news-feed-widget.svelte';
   import SideNavigation from '$lib/components/side-nav.svelte';
   import SkipNavigation from '$lib/components/skip-nav.svelte';
   import TopNavigation from '$lib/components/top-nav.svelte';
@@ -18,23 +19,26 @@
   import UserMenuMobile from '$lib/holocene/user-menu-mobile.svelte';
   import UserMenu from '$lib/holocene/user-menu.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { authUser, clearAuthUser } from '$lib/stores/auth-user';
+  import { authUser, logout as logoutAuthUser } from '$lib/stores/auth-user';
   import { inProgressBatchOperation } from '$lib/stores/batch-operations';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
+  import { initializeNavDefaults } from '$lib/stores/nav-open';
   import { toaster } from '$lib/stores/toaster';
   import { temporalVersion } from '$lib/stores/versions';
   import { type NamespaceListItem, type NavLinkItem } from '$lib/types/global';
   import { setCoreContext } from '$lib/utilities/core-context';
   import DarkMode from '$lib/utilities/dark-mode';
+  import { useDarkMode } from '$lib/utilities/dark-mode';
+  import { namespaceCapabilityState } from '$lib/utilities/namespace-capabilities';
   import {
     routeForArchivalWorkflows,
     routeForBatchOperations,
     routeForEventHistoryImport,
-    routeForLoginPage,
     routeForNamespaces,
     routeForNexus,
     routeForSchedules,
     routeForStandaloneActivities,
+    routeForStandaloneNexusOperations,
     routeForWorkerDeployments,
     routeForWorkers,
     routeForWorkflows,
@@ -49,7 +53,13 @@
 
   let { children }: Props = $props();
 
+  initializeNavDefaults(page.data?.settings?.navCollapsedByDefault);
+
   let isCloud = $derived(page.data?.settings?.runtimeEnvironment?.isCloud);
+  let newsFeedClusterId = $derived(page.data?.cluster?.clusterId ?? '');
+  let showNewsFeed = $derived(
+    !isCloud && !page.data?.settings?.disableNewsFetch && !!newsFeedClusterId,
+  );
   let activeNamespaceName = $derived(
     page.params?.namespace ?? $lastUsedNamespace,
   );
@@ -74,10 +84,24 @@
     }),
   );
 
+  const nexusOperationsLinkHidden = $derived.by(() => {
+    const namespace = $namespaces.find(
+      (namespace) => namespace.namespaceInfo.name === activeNamespaceName,
+    );
+    const capabilityState = namespaceCapabilityState(
+      namespace?.namespaceInfo?.capabilities,
+      'standaloneNexusOperation',
+    );
+    return capabilityState === 'unsupported';
+  });
+
   const getRoutes = (namespace: string) => {
     return {
       workflowsRoute: routeForWorkflows({ namespace }),
       standaloneActivitiesRoute: routeForStandaloneActivities({ namespace }),
+      standaloneNexusOperationsRoute: routeForStandaloneNexusOperations({
+        namespace,
+      }),
       schedulesRoute: routeForSchedules({ namespace }),
       batchOperationsRoute: routeForBatchOperations({ namespace }),
       workersRoute: routeForWorkers({ namespace }),
@@ -93,6 +117,7 @@
     {
       workflowsRoute,
       standaloneActivitiesRoute,
+      standaloneNexusOperationsRoute,
       schedulesRoute,
       batchOperationsRoute,
       workersRoute,
@@ -103,6 +128,7 @@
     }: {
       workflowsRoute: string;
       standaloneActivitiesRoute: string;
+      standaloneNexusOperationsRoute: string;
       schedulesRoute: string;
       batchOperationsRoute: string;
       workersRoute: string;
@@ -127,6 +153,7 @@
           !path.includes(workersRoute) &&
           !path.includes(workerDeploymentsRoute) &&
           !path.includes(standaloneActivitiesRoute) &&
+          !path.includes(standaloneNexusOperationsRoute) &&
           !path.includes(archivalRoute),
       },
       {
@@ -141,6 +168,15 @@
         label: translate('standalone-activities.standalone-activities'),
         isActive: (path) => path.includes(standaloneActivitiesRoute),
         hidden: !minimumVersionRequired('1.30.0', $temporalVersion),
+      },
+      {
+        href: standaloneNexusOperationsRoute,
+        icon: 'nexus',
+        label: translate(
+          'standalone-nexus-operations.standalone-nexus-operations',
+        ),
+        isActive: (path) => path.includes(standaloneNexusOperationsRoute),
+        hidden: nexusOperationsLinkHidden,
       },
       {
         href: schedulesRoute,
@@ -231,6 +267,7 @@
     workerDeploymentsRoute,
     archivalRoute,
     standaloneActivitiesRoute,
+    standaloneNexusOperationsRoute,
   } = $derived(routes);
   let showNamespacePicker = $derived(
     [
@@ -241,6 +278,7 @@
       batchOperationsRoute,
       archivalRoute,
       standaloneActivitiesRoute,
+      standaloneNexusOperationsRoute,
     ].some((route) => page.url.href.includes(route)),
   );
 
@@ -257,6 +295,10 @@
       {
         subPath: 'activities',
         fullRoute: routeForStandaloneActivities({ namespace }),
+      },
+      {
+        subPath: 'nexus-operations',
+        fullRoute: routeForStandaloneNexusOperations({ namespace }),
       },
       {
         subPath: 'workers/deployments',
@@ -282,8 +324,7 @@
   }
 
   const logout = () => {
-    clearAuthUser();
-    goto(routeForLoginPage());
+    void logoutAuthUser();
   };
 
   $effect(() => {
@@ -293,8 +334,13 @@
     }
   });
 
-  afterNavigate(() => {
-    document.getElementById('content')?.scrollTo(0, 0);
+  afterNavigate(({ from, to, type }) => {
+    const main = document.getElementById('content');
+    main?.scrollTo(0, 0);
+    if (type === 'enter') return;
+    if (from?.url.pathname === '/') return;
+    if (from?.url.pathname === to?.url.pathname) return;
+    main?.focus({ preventScroll: true });
   });
 
   setCoreContext({
@@ -336,6 +382,13 @@
           <NamespacePicker {namespaceList} />
         {/if}
       {/snippet}
+      {#if showNewsFeed}
+        <NewsFeedWidget
+          clusterId={newsFeedClusterId}
+          source="web-ui"
+          previewTheme={$useDarkMode ? 'dark' : 'light'}
+        />
+      {/if}
       {#if isCloud}
         <a
           href={page.data?.settings?.supportURL ||
@@ -360,16 +413,28 @@
     {#snippet footer()}
       <BottomNavigation {namespaceList} {isCloud} {showNamespacePicker}>
         {#snippet linksSnippet()}
-          {#each linkList as link, i (i)}
+          {#each [...linkListForSecondGroup]
+            .filter((item) => !item.hidden)
+            .reverse() as link, i (i)}
             <NavigationItem {...link} link={link.href} />
           {/each}
 
           <hr class="border-subtle" />
 
-          {#each linkListForSecondGroup as link, i (i)}
+          {#each [...linkList]
+            .filter((item) => !item.hidden)
+            .reverse() as link, i (i)}
             <NavigationItem {...link} link={link.href} />
           {/each}
         {/snippet}
+        {#if showNewsFeed}
+          <NewsFeedWidget
+            clusterId={newsFeedClusterId}
+            source="web-ui"
+            variant="navigation"
+            previewTheme="dark"
+          />
+        {/if}
         <UserMenuMobile {logout} />
       </BottomNavigation>
     {/snippet}

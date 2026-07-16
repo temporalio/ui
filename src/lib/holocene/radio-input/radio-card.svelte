@@ -13,6 +13,7 @@
   export let value: T;
   export let id: string;
   export let label: string;
+  export let labelContainerClass: string = '';
   export let description: string = '';
   export let disabled: boolean = false;
 
@@ -37,6 +38,7 @@
     class={merge(
       'flex items-start gap-3 border p-4',
       'border-subtle',
+      labelContainerClass,
       disabled && 'opacity-50',
     )}
   >

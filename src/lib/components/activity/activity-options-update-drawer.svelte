@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { WorkflowExecution } from '@temporalio/client';
+  import { untrack } from 'svelte';
 
   import Button from '$lib/holocene/button.svelte';
-  import Checkbox from '$lib/holocene/checkbox.svelte';
   import DrawerContent from '$lib/holocene/drawer-content.svelte';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -31,39 +31,57 @@
 
   let { open = $bindable(), namespace, execution, activity }: Props = $props();
   let { activityId: id, activityType: type } = $derived(activity);
-  let taskQueue = $state(activity.activityOptions?.taskQueue?.name);
+
+  // Form fields are seeded from activity.activityOptions once when the drawer
+  // opens. They must NOT reset reactively if the activity prop changes while
+  // the user is mid-edit — untrack() captures the initial value intentionally.
+  let taskQueue = $state(
+    untrack(() => activity.activityOptions?.taskQueue?.name),
+  );
   let scheduleToCloseTimeout = $state(
-    fromDurationToNumber(
-      String(activity?.activityOptions?.scheduleToCloseTimeout),
+    untrack(() =>
+      fromDurationToNumber(
+        String(activity?.activityOptions?.scheduleToCloseTimeout),
+      ),
     ),
   );
   let scheduleToStartTimeout = $state(
-    fromDurationToNumber(
-      String(activity?.activityOptions?.scheduleToStartTimeout),
+    untrack(() =>
+      fromDurationToNumber(
+        String(activity?.activityOptions?.scheduleToStartTimeout),
+      ),
     ),
   );
   let startToCloseTimeout = $state(
-    fromDurationToNumber(
-      String(activity?.activityOptions?.startToCloseTimeout),
+    untrack(() =>
+      fromDurationToNumber(
+        String(activity?.activityOptions?.startToCloseTimeout),
+      ),
     ),
   );
   let heartbeatTimeout = $state(
-    fromDurationToNumber(String(activity?.activityOptions?.heartbeatTimeout)),
+    untrack(() =>
+      fromDurationToNumber(String(activity?.activityOptions?.heartbeatTimeout)),
+    ),
   );
   let maximumAttempts = $state(
-    activity?.activityOptions?.retryPolicy?.maximumAttempts,
+    untrack(() => activity?.activityOptions?.retryPolicy?.maximumAttempts),
   );
   let backoffCoefficient = $state(
-    activity?.activityOptions?.retryPolicy?.backoffCoefficient,
+    untrack(() => activity?.activityOptions?.retryPolicy?.backoffCoefficient),
   );
   let initialInterval = $state(
-    fromDurationToNumber(
-      String(activity?.activityOptions?.retryPolicy?.initialInterval),
+    untrack(() =>
+      fromDurationToNumber(
+        String(activity?.activityOptions?.retryPolicy?.initialInterval),
+      ),
     ),
   );
   let maximumInterval = $state(
-    fromDurationToNumber(
-      String(activity?.activityOptions?.retryPolicy?.maximumInterval),
+    untrack(() =>
+      fromDurationToNumber(
+        String(activity?.activityOptions?.retryPolicy?.maximumInterval),
+      ),
     ),
   );
 
@@ -123,7 +141,7 @@
   id="activity-options-update-drawer"
   dark={false}
   closeButtonLabel={translate('common.close')}
-  class="w-[480px]"
+  class="w-screen sm:w-[480px]"
 >
   <DrawerContent title="Update Activity {activity.activityId}">
     <form onsubmit={onUpdate} class="flex flex-col gap-4">

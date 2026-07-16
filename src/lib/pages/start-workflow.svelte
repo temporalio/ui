@@ -7,10 +7,12 @@
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
   import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
+  import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
+  import DurationInput from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -31,10 +33,6 @@
   import { toaster } from '$lib/stores/toaster';
   import { workflowsSearchParams } from '$lib/stores/workflows';
   import { getIdentity } from '$lib/utilities/core-context';
-  import {
-    formatSecondsAbbreviated,
-    fromNumberToDuration,
-  } from '$lib/utilities/format-time';
   import { pluralize } from '$lib/utilities/pluralize';
   import {
     routeForTaskQueue,
@@ -124,7 +122,7 @@
         messageType,
         searchAttributes,
         identity,
-        workflowStartDelay: fromNumberToDuration(workflowStartDelay),
+        workflowStartDelay: workflowStartDelay || undefined,
       });
       toaster.push({
         variant: 'success',
@@ -145,11 +143,10 @@
     }
   };
 
-  const generateRandomWorkflowId = () => {
-    workflowId = crypto.randomUUID();
+  const syncWorkflowId = (value: string) => {
     updateQueryParameters({
       parameter: 'workflowId',
-      value: workflowId,
+      value,
       url: $page.url,
       allowEmpty: true,
       options: { keepFocus: true, noScroll: true, replaceState: true },
@@ -264,14 +261,13 @@
         bind:value={workflowId}
         label="Workflow ID"
         class="w-full grow"
-        on:blur={(e) => onInputChange(e, 'workflowId')}
+        onblur={(e) => onInputChange(e, 'workflowId')}
       />
-      <Button
+      <RandomUuidButton
         class="mt-0 md:mt-6"
-        variant="secondary"
-        leadingIcon="retry"
-        on:click={generateRandomWorkflowId}>Random UUID</Button
-      >
+        bind:value={workflowId}
+        onGenerate={syncWorkflowId}
+      />
     </div>
     <div class="flex w-full items-center justify-between gap-4">
       <Input
@@ -280,7 +276,7 @@
         bind:value={taskQueue}
         label="Task Queue"
         class="grow"
-        on:blur={(e) => onInputChange(e, 'taskQueue')}
+        onblur={(e) => onInputChange(e, 'taskQueue')}
       />
     </div>
     {#if pollerCount !== undefined}
@@ -307,7 +303,7 @@
       required
       bind:value={workflowType}
       label="Workflow Type"
-      on:blur={(e) => onInputChange(e, 'workflowType')}
+      onblur={(e) => onInputChange(e, 'workflowType')}
     />
     <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
     {#if viewAdvancedOptions}
@@ -336,20 +332,15 @@
             Time to wait before dispatching the first workflow task.
           </p>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <Input
-            id="workflow-start-delay"
-            label={translate('workflows.workflow-start-delay')}
-            labelHidden
-            bind:value={workflowStartDelay}
-            suffix="sec"
-            class="w-36"
-            error={isNaN(Number(workflowStartDelay))}
-          />
-          <p class="text-nowrap text-secondary">
-            {formatSecondsAbbreviated(workflowStartDelay)}
-          </p>
-        </div>
+        <DurationInput
+          id="workflow-start-delay"
+          label={translate('workflows.workflow-start-delay')}
+          labelHidden
+          inputmode="numeric"
+          bind:value={workflowStartDelay}
+          min={0}
+          class="max-w-80"
+        />
       </Card>
       <Card class="flex flex-col gap-2">
         <div class="flex flex-wrap justify-between">

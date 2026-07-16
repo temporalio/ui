@@ -5,7 +5,7 @@
 
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { navOpen } from '$lib/stores/nav-open';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let link: string;
   export let label: string;
@@ -27,39 +27,42 @@
   data-testid={$$props?.['data-testid'] || `${icon}-button`}
   class="relative"
 >
-  <a
-    href={link}
-    {rel}
-    {target}
-    aria-hidden={disabled ? 'true' : 'false'}
-    aria-disabled={disabled}
-    class:disabled
-    tabindex={disabled ? -1 : 0}
-    data-track-name="navigation-item"
-    data-track-intent="navigate"
-    data-track-text={label}
-    class={merge(
-      'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm',
-      'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
-      active &&
-        'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
-      disabled && 'pointer-events-none cursor-not-allowed opacity-50',
-    )}
-    class:text-disabled={disabled}
+  <Tooltip
+    text={tooltip}
+    right
+    class="block"
+    tooltipClass="rounded-none text-white ml-4 group-data-[nav=open]:hidden"
   >
-    {#if icon}
-      <div
-        class="flex h-6 w-6 items-center after:absolute after:left-[calc(100%_+_1.5rem)] after:top-0 after:hidden after:h-8 after:items-center after:bg-slate-800 after:p-1 after:px-2 after:text-xs after:text-white after:content-[attr(data-tooltip)] group-data-[nav=closed]:hover:after:flex"
-        data-tooltip={tooltip}
-      >
-        <Icon name={icon} {animate} />
-      </div>
-    {/if}
-    <div
-      class="opacity-0 transition-opacity group-data-[nav=open]:opacity-100"
-      class:pointer-events-none={!$navOpen}
+    <a
+      href={link}
+      {rel}
+      {target}
+      aria-hidden={disabled ? 'true' : 'false'}
+      aria-disabled={disabled}
+      class:disabled
+      tabindex={disabled ? -1 : 0}
+      data-track-name="navigation-item"
+      data-track-intent="navigate"
+      data-track-text={label}
+      class={merge(
+        'mb-2 flex items-center whitespace-nowrap px-2 py-1 text-sm',
+        'hover:bg-black hover:bg-opacity-25 group-[.surface-black]:hover:bg-white group-[.surface-black]:hover:bg-opacity-25',
+        active &&
+          'bg-black bg-opacity-25 group-[.surface-black]:bg-white group-[.surface-black]:bg-opacity-25',
+        disabled && 'pointer-events-none cursor-not-allowed opacity-50',
+      )}
+      class:text-disabled={disabled}
     >
-      {label}
-    </div>
-  </a>
+      {#if icon}
+        <div class="flex h-6 w-6 items-center">
+          <Icon name={icon} {animate} />
+        </div>
+      {/if}
+      <div
+        class="opacity-0 transition-opacity group-data-[nav=closed]:pointer-events-none group-data-[nav=open]:opacity-100 group-data-[nav=open]:delay-75 group-data-[nav=closed]:duration-75 group-data-[nav=open]:duration-150 group-data-[nav=closed]:ease-out group-data-[nav=open]:ease-linear motion-reduce:transition-none"
+      >
+        {label}
+      </div>
+    </a>
+  </Tooltip>
 </div>

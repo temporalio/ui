@@ -38,6 +38,8 @@
 
   let className = 'text-primary';
   export { className as class };
+
+  $: errorId = `${id}-error`;
 </script>
 
 <div class={merge('group flex flex-col gap-1', className)}>
@@ -63,6 +65,9 @@
       {placeholder}
       {rows}
       {spellcheck}
+      {required}
+      aria-invalid={!isValid ? 'true' : undefined}
+      aria-describedby={!isValid && error ? errorId : undefined}
       on:input
       on:change
       on:focus
@@ -75,9 +80,10 @@
   </div>
   <div class="flex justify-between gap-2">
     <div
+      id={errorId}
       class="error-msg"
       class:min-width={maxLength}
-      aria-live={isValid ? 'off' : 'assertive'}
+      role="alert"
     >
       {#if !isValid}
         {#if error}

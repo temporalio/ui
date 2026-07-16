@@ -1,11 +1,10 @@
 import { translate } from '$lib/i18n/translate';
+import type { ListScheduleResponse, ScheduleListEntry } from '$lib/types';
 import type {
-  CreateScheduleRequest,
-  ListScheduleResponse,
-  ScheduleListEntry,
-  UpdateScheduleRequest,
-} from '$lib/types';
-import type { DescribeFullSchedule, OverlapPolicy } from '$lib/types/schedule';
+  DescribeFullSchedule,
+  OverlapPolicy,
+  ScheduleRequestBody,
+} from '$lib/types/schedule';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -86,7 +85,12 @@ export async function fetchSchedule(
   request = fetch,
 ): Promise<DescribeFullSchedule> {
   const route = routeForApi('schedule', parameters);
-  return requestFromAPI(route, { request });
+  const response = await requestFromAPI<
+    Omit<DescribeFullSchedule, 'schedule_id'>
+  >(route, { request });
+  // schedule_id is not actually populated by all routes, even though
+  // DescribeFullSchedule says it should, since we know it we can attach it here.
+  return { ...response, schedule_id: parameters.scheduleId };
 }
 
 export async function deleteSchedule(
@@ -110,7 +114,7 @@ export async function deleteSchedule(
 type CreateScheduleOptions = {
   namespace: string;
   scheduleId: string;
-  body: CreateScheduleRequest;
+  body: ScheduleRequestBody;
   identity?: string;
 };
 
@@ -152,7 +156,7 @@ type EditScheduleOptions = {
   namespace: string;
   scheduleId: string;
   request_id: string;
-  body: UpdateScheduleRequest;
+  body: ScheduleRequestBody;
 };
 
 export async function editSchedule({

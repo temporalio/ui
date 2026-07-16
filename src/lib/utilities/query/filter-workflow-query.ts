@@ -97,6 +97,14 @@ const toFilterQueryStatement = (
     return `\`${queryKey}\` ${conditional} null`;
   }
 
+  if (attribute === 'ExecutionDuration') {
+    const isNanoseconds = /^\d+$/.test(String(value));
+    if (isNanoseconds) {
+      return `\`${queryKey}\`${conditional}${value}`;
+    }
+    return `\`${queryKey}\`${conditional}"${value}"`;
+  }
+
   if (isDuration(value) || isDurationString(value)) {
     if (archived || get(supportsAdvancedVisibility)) {
       return `${queryKey} ${conditional} "${toDate(value)}"`;

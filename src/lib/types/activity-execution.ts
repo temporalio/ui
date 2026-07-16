@@ -1,9 +1,9 @@
+import type { temporal } from '@temporalio/proto';
+
 import type {
   ActivityType,
   Failure,
-  Header,
   Payloads,
-  Priority,
   SearchAttribute,
   TaskQueue,
   UserMetadata,
@@ -61,35 +61,30 @@ interface RetryPolicy {
   maximumAttempts: number;
 }
 
-export interface ActivityExecutionInfo {
-  activityId: string;
-  runId: string;
-  activityType: ActivityType;
+export interface ActivityExecutionInfo extends Omit<
+  temporal.api.activity.v1.IActivityExecutionInfo,
+  | 'status'
+  | 'runState'
+  | 'scheduleToCloseTimeout'
+  | 'scheduleToStartTimeout'
+  | 'startToCloseTimeout'
+  | 'heartbeatTimeout'
+  | 'executionDuration'
+  | 'stateTransitionCount'
+  | 'currentRetryInterval'
+> {
   status: ActivityExecutionStatus;
   runState?: string; // only for running activities
-  taskQueue: string;
   scheduleToCloseTimeout: string;
   scheduleToStartTimeout: string;
   startToCloseTimeout: string;
-  lastHeartbeatTime: string;
-  heartbeatDetails?: Payloads;
   heartbeatTimeout: string;
-  retryPolicy: RetryPolicy;
-  lastStartedTime: string;
-  attempt: number;
   executionDuration?: string;
-  scheduleTime: string;
-  closeTime: string;
-  lastWorkerIdentity: string;
-  lastAttemptCompleteTime: string;
-  nextAttemptScheduleTime: string;
   stateTransitionCount: string;
   currentRetryInterval: string;
   searchAttributes: WorkflowSearchAttributes;
-  userMetadata: UserMetadata;
-  lastFailure?: Failure;
-  header?: Header;
-  priority?: Priority;
+  sdkName?: string;
+  sdkVersion?: string;
 }
 
 export interface ActivityExecution {
@@ -112,6 +107,6 @@ export interface StartActivityExecutionRequest {
   scheduleToStartTimeout: string;
   input?: Payloads;
   userMetadata?: UserMetadata;
-  retryPolicy?: RetryPolicy;
+  retryPolicy?: Partial<RetryPolicy>;
   searchAttributes?: SearchAttribute;
 }

@@ -1,11 +1,13 @@
 <script lang="ts">
+  import SdkLogo from '$lib/components/lines-and-dots/sdk-logo.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import { translate } from '$lib/i18n/translate';
   import { isCloud } from '$lib/stores/advanced-visibility';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
+  import { formatSDKName } from '$lib/utilities/get-sdk-version';
   import { routeForStandaloneActivitiesWithQuery } from '$lib/utilities/route-for';
   import type { StandaloneActivityPoller } from '$lib/utilities/standalone-activity-poller.svelte';
-  import { fromSeconds } from '$lib/utilities/to-duration';
 
   import {
     DetailList,
@@ -14,6 +16,7 @@
     DetailListLinkValue,
     DetailListTextValue,
     DetailListTimestampValue,
+    DetailListValue,
   } from '../detail-list';
 
   import ActivityExecutionActions from './activity-actions.svelte';
@@ -27,7 +30,7 @@
 
   let { activityExecutionInfo, namespace, poller }: Props = $props();
 
-  const activityType = $derived(activityExecutionInfo.activityType.name);
+  const activityType = $derived(activityExecutionInfo.activityType?.name);
   const activityTypeFilterLink = $derived(
     routeForStandaloneActivitiesWithQuery(
       { namespace },
@@ -46,41 +49,33 @@
   <div
     class="flex items-center justify-between gap-4 max-xl:w-full max-xl:flex-wrap"
   >
-    <ActivityExecutionStatus status={activityExecutionInfo.status} />
-    <div class="text-2xl font-medium">
-      <h1
-        data-testid="activity-id-heading"
-        class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
-      >
-        <Copyable
-          copyIconTitle={translate('common.copy-icon-title')}
-          copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={activityExecutionInfo.activityId}
-          clickAllToCopy
-          container-class="w-full"
-          class="overflow-hidden text-ellipsis text-left"
-        />
-      </h1>
+    <div class="flex items-center gap-4">
+      <ActivityExecutionStatus status={activityExecutionInfo.status} />
+      <div class="text-2xl font-medium">
+        <h1
+          data-testid="activity-id-heading"
+          class="gap-0 overflow-hidden max-sm:text-xl sm:max-md:text-2xl"
+        >
+          <Copyable
+            copyIconTitle={translate('common.copy-icon-title')}
+            copySuccessIconTitle={translate('common.copy-success-icon-title')}
+            content={activityExecutionInfo.activityId ?? ''}
+            clickAllToCopy
+            container-class="w-full"
+            class="overflow-hidden text-ellipsis text-left"
+          />
+        </h1>
+      </div>
     </div>
     <ActivityExecutionActions {activityExecutionInfo} {namespace} {poller} />
   </div>
-  <DetailList aria-label="activity execution details" rowCount={4}>
+  <DetailList aria-label="activity execution details" rowCount={3}>
     <DetailListColumn>
-      <DetailListLabel
-        >{translate('standalone-activities.scheduled-time')}</DetailListLabel
-      >
+      <DetailListLabel>{translate('common.start')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.scheduleTime}
       />
-      <DetailListLabel
-        >{translate('standalone-activities.last-started-time')}</DetailListLabel
-      >
-      <DetailListTimestampValue
-        timestamp={activityExecutionInfo.lastStartedTime}
-      />
-      <DetailListLabel
-        >{translate('standalone-activities.close-time')}</DetailListLabel
-      >
+      <DetailListLabel>{translate('common.end')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.closeTime}
         fallback="-"
@@ -90,7 +85,7 @@
       >
       <DetailListTextValue
         text={activityExecutionInfo.executionDuration
-          ? fromSeconds(activityExecutionInfo.executionDuration)
+          ? formatDurationAbbreviated(activityExecutionInfo.executionDuration)
           : '-'}
       />
     </DetailListColumn>
@@ -98,7 +93,7 @@
       <DetailListLabel
         >{translate('standalone-activities.run-id')}</DetailListLabel
       >
-      <DetailListTextValue copyable text={activityExecutionInfo.runId} />
+      <DetailListTextValue copyable text={activityExecutionInfo.runId ?? ''} />
       {#if activityType}
         <DetailListLabel
           >{translate('standalone-activities.activity-type')}</DetailListLabel
@@ -106,7 +101,7 @@
         <DetailListLinkValue
           copyable
           iconName="filter"
-          text={activityType}
+          text={activityType ?? ''}
           href={activityTypeFilterLink}
         />
       {/if}
@@ -116,9 +111,11 @@
       <DetailListLinkValue
         copyable
         iconName="filter"
-        text={activityExecutionInfo.taskQueue}
+        text={activityExecutionInfo.taskQueue ?? ''}
         href={taskQueueFilterLink}
       />
+    </DetailListColumn>
+    <DetailListColumn>
       {#if $isCloud}
         <DetailListLabel
           >{translate('workflows.billable-actions')}</DetailListLabel
@@ -131,6 +128,15 @@
         <DetailListTextValue
           text={activityExecutionInfo.stateTransitionCount}
         />
+      {/if}
+      {#if activityExecutionInfo.sdkName && activityExecutionInfo.sdkVersion}
+        <DetailListLabel>{translate('workflows.sdk')}</DetailListLabel>
+        <DetailListValue>
+          <SdkLogo
+            sdk={formatSDKName(activityExecutionInfo.sdkName)}
+            version={activityExecutionInfo.sdkVersion}
+          />
+        </DetailListValue>
       {/if}
     </DetailListColumn>
   </DetailList>

@@ -1,5 +1,18 @@
 import type { StandaloneActivityFormData } from '$lib/components/standalone-activities/start-standalone-activity-form/types';
+import {
+  type DefaultUnits,
+  getFirstWholeNumberUnit,
+  HOURS,
+  MILLISECONDS,
+  MINUTES,
+  SECONDS,
+  type Units,
+} from '$lib/holocene/duration-input/duration-input.svelte';
 import { translate } from '$lib/i18n/translate';
+import {
+  isPayloadInputEncodingType,
+  type PayloadInputEncoding,
+} from '$lib/models/payload-encoding';
 import { activityError } from '$lib/stores/activities';
 import type { Payload, SearchAttribute } from '$lib/types';
 import type {
@@ -7,6 +20,7 @@ import type {
   ActivityExecutionInfo,
   StartActivityExecutionRequest,
 } from '$lib/types/activity-execution';
+import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
 import { encodePayloads } from '$lib/utilities/encode-payload';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import {
@@ -16,6 +30,21 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { setSearchAttributes } from './workflow-service';
+
+// Timeout duration inputs on the activity forms; largest-first so
+// getFirstWholeNumberUnit resolves to the coarsest whole unit, defaulting to
+// seconds when there is no value.
+export const TIMEOUT_UNITS: Units<DefaultUnits> = [
+  HOURS,
+  MINUTES,
+  SECONDS,
+  MILLISECONDS,
+];
+
+export const initialTimeoutUnit = (
+  duration: string,
+): DefaultUnits | undefined =>
+  getFirstWholeNumberUnit(duration, TIMEOUT_UNITS, SECONDS.label);
 
 export type ListActivitiesResponse = {
   executions: ActivityExecutionInfo[];
@@ -57,7 +86,6 @@ export const fetchPaginatedActivities = async (
       },
       request,
       onError,
-      handleError: onError,
     }).then((response) => {
       const { executions = [], nextPageToken = '' } = response || {};
       return {
@@ -74,7 +102,7 @@ const toStartActivityExecutionRequest = async (
   let inputPayloads: Payload[] | null = null;
   let summaryPayload: Payload | null = null;
   let detailsPayload: Payload | null = null;
-  let searchAttributes: SearchAttribute | null = null;
+  let searchAttributes: SearchAttribute | undefined = undefined;
 
   if (activityFormData.input) {
     const { input, encoding, messageType } = activityFormData;
@@ -187,6 +215,94 @@ export const startStandaloneActivity = async (
   });
 };
 
+interface ActivityInputValues {
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
+}
+
+const extractInputValues = async (
+  payloads: Payload[] | null | undefined,
+): Promise<ActivityInputValues> => {
+  const defaults: ActivityInputValues = {
+    input: '',
+    encoding: 'json/plain',
+    messageType: '',
+  };
+
+  const payload = payloads?.[0];
+  if (!payload) return defaults;
+
+  const decoded = await decodePayloadAndParseDataToJSON(payload, false);
+  if (!decoded) return defaults;
+
+  const encodingValue = decoded.metadata?.encoding;
+  return {
+    input: decoded.data ? stringifyWithBigInt(decoded.data) : '',
+    encoding:
+      encodingValue && isPayloadInputEncodingType(encodingValue)
+        ? encodingValue
+        : 'json/plain',
+    messageType: decoded.metadata?.messageType ?? '',
+  };
+};
+
+const extractMetadataString = async (
+  payload: Payload | null | undefined,
+): Promise<string> => {
+  if (!payload) return '';
+  const decoded = await decodePayloadAndParseDataToJSON(payload);
+  return typeof decoded === 'string' ? decoded : '';
+};
+
+export interface ActivityInitialValues {
+  input: string;
+  encoding: PayloadInputEncoding;
+  messageType: string;
+  summary: string;
+  details: string;
+  searchAttributes: Record<string, string | Payload> | undefined;
+}
+
+export const fetchInitialValuesForStartActivity = async (
+  namespace: string,
+  activityId: string,
+  runId: string,
+): Promise<ActivityInitialValues> => {
+  const emptyValues: ActivityInitialValues = {
+    input: '',
+    encoding: 'json/plain',
+    messageType: '',
+    summary: '',
+    details: '',
+    searchAttributes: undefined,
+  };
+
+  try {
+    const activity = await getActivityExecution(namespace, activityId, runId);
+    const { input, encoding, messageType } = await extractInputValues(
+      activity.input?.payloads,
+    );
+    const summary = await extractMetadataString(
+      activity.info.userMetadata?.summary,
+    );
+    const details = await extractMetadataString(
+      activity.info.userMetadata?.details,
+    );
+
+    return {
+      input,
+      encoding,
+      messageType,
+      summary,
+      details,
+      searchAttributes: activity.info.searchAttributes?.indexedFields,
+    };
+  } catch {
+    return emptyValues;
+  }
+};
+
 export const getActivityExecutions = (namespace: string) => {
   const route = routeForApi('standalone-activities', { namespace });
 
@@ -206,6 +322,8 @@ export const getActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'true',
     includeOutcome: 'true',
+    includeHeartbeatDetails: 'true',
+    includeLastFailure: 'true',
     runId,
   });
 
@@ -229,6 +347,8 @@ export const pollActivityExecution = (
   const params = new URLSearchParams({
     includeInput: 'false',
     includeOutcome: 'true',
+    includeHeartbeatDetails: 'true',
+    includeLastFailure: 'true',
     runId,
     longPollToken: token,
   });

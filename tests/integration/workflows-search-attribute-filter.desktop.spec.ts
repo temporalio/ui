@@ -37,10 +37,10 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('toggle-manual-query').click();
   await page
-    .getByTestId('manual-search-input')
+    .getByTestId('workflow-manual-search-input')
     .fill('`CloseTime`>="2025-12-25T12:00:00.000Z"');
 
-  await page.getByTestId('manual-search-button').click();
+  await page.getByTestId('workflow-manual-search-button').click();
 
   await expect
     .poll(() => getQueryParam(page.url()))
@@ -54,7 +54,9 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('toggle-manual-query').click();
 
-  let query = await page.getByTestId('manual-search-input').inputValue();
+  let query = await page
+    .getByTestId('workflow-manual-search-input')
+    .inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 
   await page.getByTestId('timezones-menu-button').click();
@@ -72,7 +74,7 @@ test('it should update the datetime filter based on the selected timezone', asyn
 
   await page.getByTestId('toggle-manual-query').click();
 
-  query = await page.getByTestId('manual-search-input').inputValue();
+  query = await page.getByTestId('workflow-manual-search-input').inputValue();
   expect(getDatetime(query)).toMatch(validDatetime);
 });
 

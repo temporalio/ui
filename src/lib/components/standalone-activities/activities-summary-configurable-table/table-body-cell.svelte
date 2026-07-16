@@ -1,11 +1,13 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import { page } from '$app/state';
 
   import Timestamp from '$lib/components/timestamp.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import type { ConfigurableTableHeader } from '$lib/stores/configurable-table-columns';
   import type { ActivityExecutionInfo } from '$lib/types/activity-execution';
-  import { formatDistance } from '$lib/utilities/format-time';
+  import { formatDurationAbbreviated } from '$lib/utilities/format-time';
   import { toActivityStatus } from '$lib/utilities/get-activity-status-and-count';
   import { routeForStandaloneActivityDetails } from '$lib/utilities/route-for';
 
@@ -20,80 +22,68 @@
   const { label } = $derived(column);
   const namespace = $derived(page.params.namespace);
 
-  let filterOrCopyButtonsVisible = $state(false);
-  const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
-  const hideFilterOrCopy = () => (filterOrCopyButtonsVisible = false);
-  const handleFocusOut = (e: FocusEvent) => {
-    const nextTarget = e.relatedTarget as HTMLElement;
-    if (
-      nextTarget &&
-      !['filter-button', 'copy-button'].includes(nextTarget.id)
-    ) {
-      hideFilterOrCopy();
-    }
-  };
+  const filterableLabels = ['Activity ID', 'Run ID', 'Type', 'Task Queue'];
 
-  const filterableLabels = ['Activity ID', 'Activity Type', 'Task Queue'];
+  const className = 'h-8 whitespace-nowrap';
+  const testId = 'activities-summary-table-body-cell';
 </script>
 
+{#snippet renderFilterableTableCell(
+  filterableCellProps: Pick<
+    ComponentProps<typeof FilterableTableCell>,
+    'attribute' | 'value' | 'href'
+  >,
+)}
+  <FilterableTableCell
+    class={className}
+    data-testid={testId}
+    {...filterableCellProps}
+  />
+{/snippet}
+
 {#if filterableLabels.includes(label)}
-  <td
-    class="relative h-8 whitespace-nowrap pr-24"
-    data-testid="activities-summary-table-body-cell"
-    onmouseover={showFilterOrCopy}
-    onfocus={showFilterOrCopy}
-    onfocusin={showFilterOrCopy}
-    onfocusout={handleFocusOut}
-    onmouseleave={hideFilterOrCopy}
-    onblur={hideFilterOrCopy}
-  >
-    {#if label === 'Activity ID'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="ActivityId"
-        value={activity.activityId}
-        href={routeForStandaloneActivityDetails({
-          namespace,
-          activityId: activity.activityId,
-          runId: activity.runId,
-        })}
-      />
-    {:else if label === 'Activity Type'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="ActivityType"
-        value={activity.activityType?.name ?? ''}
-      />
-    {:else if label === 'Task Queue'}
-      <FilterableTableCell
-        {filterOrCopyButtonsVisible}
-        attribute="TaskQueue"
-        value={activity.taskQueue ?? ''}
-      />
-    {/if}
-  </td>
+  {#if label === 'Activity ID'}
+    {@render renderFilterableTableCell({
+      attribute: 'ActivityId',
+      value: activity.activityId ?? '',
+      href: routeForStandaloneActivityDetails({
+        namespace,
+        activityId: activity.activityId ?? '',
+        runId: activity.runId ?? '',
+      }),
+    })}
+  {:else if label === 'Run ID'}
+    {@render renderFilterableTableCell({
+      attribute: 'RunId',
+      value: activity.runId ?? '',
+      href: routeForStandaloneActivityDetails({
+        namespace,
+        activityId: activity.activityId ?? '',
+        runId: activity.runId ?? '',
+      }),
+    })}
+  {:else if label === 'Type'}
+    {@render renderFilterableTableCell({
+      attribute: 'ActivityType',
+      value: activity.activityType?.name ?? '',
+    })}
+  {:else if label === 'Task Queue'}
+    {@render renderFilterableTableCell({
+      attribute: 'TaskQueue',
+      value: activity.taskQueue ?? '',
+    })}
+  {/if}
 {:else}
-  <td
-    class="h-8 whitespace-nowrap"
-    data-testid="activities-summary-table-body-cell"
-  >
+  <td class={className} data-testid={testId}>
     {#if label === 'Status'}
       <WorkflowStatus status={toActivityStatus(activity.status)} />
-    {:else if label === 'Run ID'}
-      {activity.runId ?? ''}
-    {:else if label === 'Start Time'}
-      <Timestamp dateTime={activity.lastStartedTime || activity.scheduleTime} />
-    {:else if label === 'Execution Time'}
-      <Timestamp dateTime={activity.lastStartedTime} />
-    {:else if label === 'Close Time'}
+    {:else if label === 'Start'}
+      <Timestamp dateTime={activity.scheduleTime} />
+    {:else if label === 'End'}
       <Timestamp dateTime={activity.closeTime} />
     {:else if label === 'Execution Duration'}
       {#if activity.executionDuration}
-        {formatDistance({
-          start: activity.lastStartedTime || activity.scheduleTime,
-          end: activity.closeTime,
-          includeMillisecondsForUnderSecond: true,
-        })}
+        {formatDurationAbbreviated(activity.executionDuration)}
       {/if}
     {:else if label === 'State Transitions'}
       {activity.stateTransitionCount ?? ''}

@@ -121,9 +121,7 @@
     id="bulk-action-reason-{action}"
     bind:value={reason}
     label={translate('common.reason')}
-    hintText={translate('workflows.batch-operation-confirmation-input-hint', {
-      placeholder: reasonPlaceholder,
-    })}
+    hintText={translate('workflows.batch-operation-confirmation-input-hint')}
     placeholder={reasonPlaceholder}
   />
   <Input
@@ -134,7 +132,7 @@
       : translate('batch.job-id-input-error')}
     bind:value={jobId}
     placeholder={jobIdPlaceholder}
-    on:input={handleJobIdChange}
+    oninput={handleJobIdChange}
     valid={jobIdValid}
   />
   {@render children?.()}

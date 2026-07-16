@@ -44,8 +44,15 @@
   });
 
   const handleKeydown = (event: KeyboardEvent) => {
+    const { target } = event;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      (target instanceof HTMLElement && target.isContentEditable)
+    ) {
+      return;
+    }
     if (event.key === 'r' || event.key === 'R') {
-      event.preventDefault();
       fetchCurrentDetails();
     }
   };
@@ -70,6 +77,7 @@
             variant="ghost"
             on:click={fetchCurrentDetails}
             disabled={loading}
+            aria-label={translate('common.refresh')}
           >
             <Icon name="retry" />
           </Button>

@@ -29,7 +29,7 @@ export const Strings = {
   'batch-reset-confirmation_other':
     'Are you sure you want to reset {{count, number}} workflows?',
   'batch-operation-confirmation-input-hint':
-    'If you supply a custom reason, "{{placeholder}}" will be appended to it. If you omit a reason, the placeholder will be used.',
+    'If you omit a reason, the placeholder will be used.',
   'batch-terminate-all-success':
     'The batch terminate request is processing in the background.',
   'batch-cancel-all-success':
@@ -41,6 +41,7 @@ export const Strings = {
   'configure-headers-description':
     'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), {{type}} to personalize the {{title}} Table.',
   'all-statuses': 'All Statuses',
+  'row-accessible-name': 'Workflow {{workflowId}}: {{status}}',
   running: 'Running',
   'timed-out': 'Timed Out',
   completed: 'Completed',
@@ -117,7 +118,7 @@ export const Strings = {
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Data',
-  'signal-payload-input-label-hint': '(only single JSON payload supported)',
+  'signal-payload-input-label-hint': 'Single JSON payload supported.',
   'update-modal-title': 'Send an Update',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':
@@ -126,7 +127,7 @@ export const Strings = {
   'reset-success-alert-description':
     'You can find the resulting Workflow Execution <1>here</1>.',
   'workflow-paused': 'This Workflow is Paused',
-  'workflow-paused-reason': 'Reason this Workflow is paused',
+  'paused-time': 'Paused Time',
   'workflow-paused-description':
     'The worker will no longer process tasks on this Workflow. There are still some events that will continue to run:',
   'workflow-pause-description':
@@ -140,6 +141,10 @@ export const Strings = {
   'pause-success': 'Workflow paused',
   'unpause-success': 'Workflow unpaused',
   'timeline-tab': 'Timeline',
+  'hide-idle-time': 'Hide idle time',
+  'show-idle-time': 'Show idle time',
+  'hide-idle-time-segment': 'Hide {{distance}} time segment',
+  'show-idle-time-segment': 'Show {{distance}} time segment',
   'history-tab': 'Event History',
   'workflow-history': 'Workflow History',
   'workers-tab': 'Workers',
@@ -160,13 +165,17 @@ export const Strings = {
     'There are no workers polling the {{taskQueue}} task queue.',
   'workers-alert-description':
     'Check your deployment or orchestration system (Kubernetes, ECS, etc.). Review worker logs for crash information. Restart or redeploy workers.',
+  'workflow-error-no-workers-serverless-title': 'No workers currently polling',
+  'workflow-error-no-workers-serverless-description':
+    'The {{taskQueue}} task queue is served by the serverless worker deployment {{deployment}}, which scales down to zero when idle. Workers will start automatically when there are tasks to process.',
+  'view-worker-deployment': 'View Worker Deployment',
   'workflow-error-no-compatible-workers-title': 'No Compatible Workers Running',
   'workflow-error-no-compatible-workers-description':
     'There are no compatible Workers polling the {{taskQueue}} Task Queue.',
   'dismiss-common-errors': 'Dismiss Common Errors',
   'state-transitions': 'State Transitions',
-  'start-and-close-time': 'Start & Close Time',
   relationships: 'Relationships',
+  'family-node-label': 'Workflow {{id}}: {{status}}',
   parents_zero: '0 Parents',
   parents_one: '1 Parent',
   'pending-children_one': '1 Pending Child',
@@ -222,6 +231,7 @@ export const Strings = {
   'json-formatting': 'JSON Formatting',
   'query-type': 'Query Type',
   'query-arg': 'Query Arg',
+  'query-result': 'Query Result',
   'run-query': 'Run Query',
   'refresh-query': 'Refresh Query',
   'refresh-call-stack': 'Refresh Call Stack',
@@ -319,6 +329,9 @@ export const Strings = {
   'markdown-description':
     'Markdown is supported in the summary and details fields. You can use {namespace}, {workflowId} or {runId} syntax in link href to create dynamic links based on the page you are on. Images are not allowed.',
   'update-id': 'Update ID (optional)',
+  'update-input': 'Update Input',
+  'update-result': 'Update Result',
+  'callback-metadata': 'Callback Metadata',
   'update-name-label': 'Update name',
   'no-current-details': 'No Current Details',
   'update-details': 'Update Details',
@@ -359,4 +372,7 @@ export const Strings = {
   'show-common-errors': 'Show Common Errors',
   'show-common-errors-description':
     'Show alerts for common errors if present in the Event History',
+  'new-events-announcement_one': '{{count, number}} new event loaded',
+  'new-events-announcement_other': '{{count, number}} new events loaded',
+  'total-workflows': 'Total Workflows',
 } as const;

@@ -9,6 +9,7 @@
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/holocene/copyable/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
@@ -23,6 +24,7 @@
   import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
   import { decodeLocalActivity } from '$lib/utilities/decode-local-activity';
   import { formatEventGroupDuration } from '$lib/utilities/event-group-duration';
+  import { toEventLinkView } from '$lib/utilities/event-link';
   import { spaceBetweenCapitalLetters } from '$lib/utilities/format-camel-case';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
@@ -71,7 +73,7 @@
   let primaryLocalAttribute = $state<SummaryAttribute | undefined>(undefined);
 
   const selectedId = $derived(
-    isEventGroup(event) ? Array.from(event.events.keys()).shift() : event.id,
+    isEventGroup(event) ? event.eventList[0]?.id : event.id,
   );
 
   const { workflow, run, namespace } = $derived(page.params);
@@ -83,7 +85,9 @@
   const attributes = $derived(formatAttributes(event));
 
   const currentEvent = $derived(
-    isEventGroup(event) ? event.events.get(selectedId) : event,
+    isEventGroup(event)
+      ? event.eventList.find((e) => e.id === selectedId)
+      : event,
   );
 
   const elapsedTime = $derived(
@@ -169,11 +173,14 @@
     $timestamp(currentEvent?.eventTime, { format: 'short' }),
   );
 
-  const onLinkClick = (event) => {
+  const onLinkClick = (event?) => {
     expanded = !expanded;
-    event.stopPropagation();
+    event?.stopPropagation?.();
     onRowClick();
   };
+
+  const detailsId = $derived(`event-details-${event.id}-${index}`);
+
   const handleMouseEnter = () => {
     hoveredEventId = event.id;
   };
@@ -181,8 +188,11 @@
     hoveredEventId = undefined;
   };
 
-  let hasRelatedActivities = (group, hoveredEventId) => {
-    return group?.eventIds?.has(hoveredEventId);
+  const hasRelatedActivities = (
+    group: EventGroup | undefined,
+    hoveredEventId: string | undefined,
+  ) => {
+    return group?.eventList?.some((e) => e.id === hoveredEventId);
   };
 
   onMount(async () => {
@@ -196,6 +206,22 @@
     }
   });
 </script>
+
+{#snippet expandButton()}
+  <IconButton
+    icon={expanded ? 'chevron-up' : 'chevron-down'}
+    label={expanded
+      ? translate('events.collapse-details')
+      : translate('events.expand-details')}
+    aria-expanded={expanded}
+    aria-controls={expanded ? detailsId : undefined}
+    class="h-6 w-6"
+    on:click={(e) => {
+      e.stopPropagation();
+      onLinkClick(e);
+    }}
+  />
+{/snippet}
 
 <tr
   class={merge(
@@ -214,27 +240,33 @@
 >
   {#if isEventGroup(event)}
     <td class="font-mono">
-      <div class="flex items-center gap-0.5">
-        {#each event.eventList as groupEvent}
-          <Link
-            data-testid="link"
-            href={routeForEventHistoryEvent({
-              eventId: groupEvent.id,
-              namespace,
-              workflow,
-              run,
-            })}
-          >
-            {groupEvent.id}
-          </Link>
-        {/each}
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <div class="flex items-center gap-0.5">
+          {#each event.eventList as groupEvent (groupEvent.id)}
+            <Link
+              data-testid="link"
+              href={routeForEventHistoryEvent({
+                eventId: groupEvent.id,
+                namespace,
+                workflow,
+                run,
+              })}
+            >
+              {groupEvent.id}
+            </Link>
+          {/each}
+        </div>
       </div>
     </td>
   {:else}
     <td class="font-mono">
-      <Link data-testid="link" {href}>
-        {event.id}
-      </Link>
+      <div class="flex items-center gap-1">
+        {@render expandButton()}
+        <Link data-testid="link" {href}>
+          {event.id}
+        </Link>
+      </div>
     </td>
   {/if}
   <td class="text-right md:hidden">
@@ -336,7 +368,7 @@
       {/if}
       {#if currentEvent?.links?.length}
         <EventLink
-          link={currentEvent.links[0]}
+          view={toEventLinkView(currentEvent.links[0], { namespace })}
           class="max-w-xl"
           linkClass="truncate"
         />
@@ -372,6 +404,7 @@
 </tr>
 {#if expanded}
   <tr
+    id={detailsId}
     class="w-full text-sm no-underline"
     data-testid="event-summary-row-expanded"
   >

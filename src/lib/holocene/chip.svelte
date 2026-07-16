@@ -31,6 +31,9 @@
 </script>
 
 <span class={merge('chip', intent)}>
+  {#if intent === 'warning'}
+    <Icon name="warning" class="shrink-0" />
+  {/if}
   {#if button}
     <button
       class="flex items-center gap-1"
@@ -46,7 +49,10 @@
   {/if}
   <button
     aria-label={removeButtonLabel}
-    class={disabled ? 'hidden' : ''}
+    class={merge(
+      'inline-flex items-center justify-center p-1',
+      disabled ? 'hidden' : '',
+    )}
     data-track-name="chip"
     data-track-intent="remove"
     data-track-text={removeButtonLabel}
@@ -58,7 +64,7 @@
 
 <style lang="postcss">
   .chip {
-    @apply surface-subtle flex h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm p-1.5 text-sm;
+    @apply surface-subtle flex min-h-7 w-fit min-w-fit flex-row items-center justify-between gap-1 whitespace-nowrap break-all rounded-sm p-1 pl-2 text-sm leading-[1.5];
 
     :global(.icon-button) {
       @apply ml-1 h-auto w-fit;

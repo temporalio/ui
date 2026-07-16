@@ -108,6 +108,7 @@
     removeChipLabel?: string;
     selectAllLabel?: string;
     deselectAllLabel?: string;
+    hideControls?: boolean;
     numberOfItemsSelectedLabel?: (count: number) => string;
   }
 
@@ -119,6 +120,7 @@
     removeChipLabel?: never;
     selectAllLabel?: never;
     deselectAllLabel?: never;
+    hideControls?: never;
     numberOfItemsSelectedLabel?: never;
   }
 
@@ -168,6 +170,7 @@
     displayChips = true,
     selectAllLabel = 'Select All',
     deselectAllLabel = 'Deselect All',
+    hideControls = false,
     removeChipLabel = 'Remove Option',
     numberOfItemsSelectedLabel = (count: number) =>
       `${count} option${count > 1 ? 's' : ''} selected`,
@@ -272,7 +275,9 @@
     }
     handleSelectOption(trimmedFilterValue);
     filterValue = '';
-    displayValue = '';
+    if (multiselect) {
+      displayValue = '';
+    }
   };
 
   const isStringOption = (option: string | T): option is string => {
@@ -459,6 +464,9 @@
     });
   }
 
+  const errorId = $derived(`${id}-error`);
+  const showError = $derived(!!error && !valid);
+
   const handleInputClick: MouseEventHandler<HTMLInputElement> = (event) => {
     event.stopPropagation();
     if (!$open) openList();
@@ -489,7 +497,7 @@
 </script>
 
 <MenuContainer {open} onclose={handleMenuClose}>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1.5">
     <Label hidden={labelHidden} {required} {label} for={id} />
     <div
       class={merge(
@@ -545,7 +553,7 @@
             className,
           )}
           role="combobox"
-          autocomplete="off"
+          autocomplete={rest.autocomplete ?? 'off'}
           autocapitalize="off"
           spellcheck="false"
           data-lpignore="true"
@@ -553,6 +561,8 @@
           aria-controls="{id}-listbox"
           aria-expanded={$open}
           aria-required={required}
+          aria-invalid={!valid ? 'true' : undefined}
+          aria-describedby={showError ? errorId : undefined}
           aria-autocomplete="list"
           onfocus={handleFocus}
           onblur={handleBlur}
@@ -577,7 +587,12 @@
       {:else if href}
         <div class="ml-1 flex h-full items-center border-l border-subtle p-0.5">
           {#if actionTooltip}
-            <Tooltip text={actionTooltip} right>
+            <Tooltip
+              text={actionTooltip}
+              right
+              usePortal
+              portalOffset={{ x: 6 }}
+            >
               <Button
                 variant="ghost"
                 size="xs"
@@ -626,7 +641,7 @@
     class="w-full"
     maxHeight={maxMenuHeight}
   >
-    {#if multiselect && isArrayValue(value)}
+    {#if multiselect && isArrayValue(value) && !hideControls}
       <ComboboxOption
         disabled={value.length === allOptions.length}
         onclick={selectAll}
@@ -677,9 +692,9 @@
     {/if}
   </Menu>
 
-  {#if error && !valid}
-    <span class="error">{error}</span>
-  {/if}
+  <span id={errorId} role="alert" class="error">
+    {#if showError}{error}{/if}
+  </span>
 </MenuContainer>
 
 <style lang="postcss">
@@ -688,7 +703,7 @@
   }
 
   .input-wrapper {
-    @apply flex w-full flex-wrap items-center;
+    @apply flex grow flex-wrap items-center;
   }
 
   .combobox-input {

@@ -1,5 +1,5 @@
 import type { PayloadInputEncoding } from '$lib/models/payload-encoding';
-import type { SearchAttributeInput } from '$lib/stores/search-attributes';
+import type { SearchAttributesSchema } from '$lib/stores/search-attributes';
 
 export interface StandaloneActivityFormData {
   identity: string;
@@ -7,20 +7,20 @@ export interface StandaloneActivityFormData {
   activityId: string;
   taskQueue: string;
   activityType: string;
-  startToCloseTimeout: string;
-  scheduleToCloseTimeout: string;
-  scheduleToStartTimeout: string;
-  input: string;
+  startToCloseTimeout: string | undefined;
+  scheduleToCloseTimeout: string | undefined;
+  scheduleToStartTimeout: string | undefined;
+  input: string | undefined;
   encoding: PayloadInputEncoding;
-  messageType: string;
-  searchAttributes: SearchAttributeInput[];
-  summary: string;
-  details: string;
+  messageType: string | undefined;
+  searchAttributes: SearchAttributesSchema;
+  summary: string | undefined;
+  details: string | undefined;
   // retry policy
   initialInterval: string;
-  backoffCoefficient: string;
+  backoffCoefficient: number | null | undefined;
   maximumInterval: string;
-  maximumAttempts: string;
+  maximumAttempts: number | null | undefined;
 }
 
 export type StandaloneActivityFormDefaults = Pick<
