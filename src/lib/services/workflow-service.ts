@@ -54,6 +54,7 @@ import {
   type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
 import {
+  encodeMultiplePayloads,
   encodePayloads,
   setBase64Payload,
 } from '$lib/utilities/encode-payload';
@@ -118,7 +119,7 @@ type StartWorkflowOptions = {
   workflowId: string;
   taskQueue: string;
   workflowType: string;
-  input: string;
+  inputs: string[];
   encoding: PayloadInputEncoding;
   messageType: string;
   summary: string;
@@ -670,7 +671,7 @@ export async function startWorkflow({
   workflowId,
   taskQueue,
   workflowType,
-  input,
+  inputs,
   summary,
   details,
   encoding,
@@ -687,9 +688,13 @@ export async function startWorkflow({
   let summaryPayload;
   let detailsPayload;
 
-  if (input) {
+  if (inputs.some(Boolean)) {
     try {
-      payloads = await encodePayloads({ input, encoding, messageType });
+      payloads = await encodeMultiplePayloads({
+        inputs,
+        encoding,
+        messageType,
+      });
     } catch {
       throw new Error('Could not encode input for starting workflow');
     }
@@ -762,7 +767,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
   workflowType?: string;
   workflowId?: string;
 }): Promise<{
-  input: string;
+  inputs: string[];
   encoding: PayloadInputEncoding;
   messageType: string;
   searchAttributes: Record<string, string | Payload> | undefined;
@@ -773,7 +778,7 @@ export const fetchInitialValuesForStartWorkflow = async ({
     console.error(err);
   };
   const emptyValues = {
-    input: '',
+    inputs: [''],
     encoding: 'json/plain' as PayloadInputEncoding,
     messageType: '',
     searchAttributes: undefined,
@@ -813,10 +818,12 @@ export const fetchInitialValuesForStartWorkflow = async ({
     const firstEvent = await fetchInitialEvent(params);
 
     const startEvent = firstEvent as WorkflowExecutionStartedEvent;
-    const decodedInput = await decodePayloadAndParseDataToJSON(
-      startEvent.attributes.input?.payloads[0],
-      false,
-    ); // only single payloads are supported starting a workflow;
+    const inputPayloads = startEvent.attributes.input?.payloads ?? [];
+    const decodedInputs = await Promise.all(
+      inputPayloads.map((payload) =>
+        decodePayloadAndParseDataToJSON(payload, false),
+      ),
+    );
 
     let summary = '';
     if (workflow.summary) {
@@ -838,31 +845,29 @@ export const fetchInitialValuesForStartWorkflow = async ({
       }
     }
 
-    let input = '';
+    const inputs = decodedInputs.map((decodedInput) =>
+      decodedInput?.data ? stringifyWithBigInt(decodedInput.data) : '',
+    );
+
     let encoding: PayloadInputEncoding = 'json/plain';
     let messageType = '';
 
-    if (decodedInput) {
-      if (decodedInput.data) {
-        input = stringifyWithBigInt(decodedInput.data);
+    const firstMetadata = decodedInputs[0]?.metadata;
+    if (firstMetadata) {
+      if (
+        firstMetadata.encoding &&
+        isPayloadInputEncodingType(firstMetadata.encoding)
+      ) {
+        encoding = firstMetadata.encoding;
       }
 
-      if (decodedInput.metadata) {
-        if (
-          decodedInput.metadata.encoding &&
-          isPayloadInputEncodingType(decodedInput.metadata.encoding)
-        ) {
-          encoding = decodedInput.metadata.encoding;
-        }
-
-        if (decodedInput.metadata.messageType) {
-          messageType = decodedInput.metadata.messageType;
-        }
+      if (firstMetadata.messageType) {
+        messageType = firstMetadata.messageType;
       }
     }
 
     return {
-      input,
+      inputs: inputs.length ? inputs : [''],
       encoding,
       messageType,
       searchAttributes: workflow?.searchAttributes?.indexedFields,

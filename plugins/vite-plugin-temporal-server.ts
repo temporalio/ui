@@ -88,6 +88,7 @@ export function temporalServer(): Plugin {
       temporal = await createTemporalServer({
         port,
         uiPort,
+        headless: server.config.mode === 'ui-server',
         dbFilename: persistentDB(server),
       });
 

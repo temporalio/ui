@@ -6,7 +6,7 @@
   import { page } from '$app/stores';
 
   import CodecServerErrorBanner from '$lib/components/codec-server-error-banner.svelte';
-  import PayloadInputWithEncoding from '$lib/components/payload-input-with-encoding.svelte';
+  import MultiPayloadInputWithEncoding from '$lib/components/multi-payload-input-with-encoding.svelte';
   import RandomUuidButton from '$lib/components/random-uuid-button.svelte';
   import AddSearchAttributes from '$lib/components/workflow/add-search-attributes.svelte';
   import Alert from '$lib/holocene/alert.svelte';
@@ -49,7 +49,7 @@
   let workflowId = '';
   let taskQueue = '';
   let workflowType = '';
-  let input = '';
+  let inputs: string[] = [''];
   let summary = '';
   let details = '';
   let encoding: Writable<PayloadInputEncoding> = writable('json/plain');
@@ -115,7 +115,7 @@
         workflowId,
         taskQueue,
         workflowType,
-        input,
+        inputs,
         summary,
         details,
         encoding: $encoding,
@@ -175,7 +175,7 @@
       workflowId,
       workflowType,
     });
-    input = initialValues.input;
+    inputs = initialValues.inputs;
     encoding.set(initialValues.encoding);
     messageType = initialValues.messageType;
     summary = initialValues.summary;
@@ -226,7 +226,7 @@
     }
   };
 
-  $: inputValid = !input || inputIsJSON(input);
+  $: inputValid = inputs.every((input) => !input || inputIsJSON(input));
 
   $: enableStart =
     !!workflowId &&
@@ -305,7 +305,7 @@
       label="Workflow Type"
       onblur={(e) => onInputChange(e, 'workflowType')}
     />
-    <PayloadInputWithEncoding bind:input bind:encoding bind:messageType />
+    <MultiPayloadInputWithEncoding bind:inputs {encoding} bind:messageType />
     {#if viewAdvancedOptions}
       <Card class="flex flex-col gap-2">
         <div>

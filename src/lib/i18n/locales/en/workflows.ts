@@ -71,6 +71,8 @@ export const Strings = {
   'back-to-workflows': 'Back to Workflows',
   'back-to-archived-workflows': 'Back to Archived Workflows',
   input: 'Input',
+  'add-input': 'Add Input',
+  'remove-input': 'Remove Input',
   result: 'Result',
   'initial-input': 'Initial Input',
   'example-input': 'Example Input',
@@ -118,7 +120,8 @@ export const Strings = {
   'signal-modal-title': 'Send a Signal',
   'signal-name-label': 'Signal name',
   'signal-payload-input-label': 'Data',
-  'signal-payload-input-label-hint': 'Single JSON payload supported.',
+  'signal-payload-input-label-hint':
+    '(only single JSON payload supported per input, add a new input if needed)',
   'update-modal-title': 'Send an Update',
   'cancel-request-sent': 'Cancel Request Sent',
   'cancel-request-sent-description':

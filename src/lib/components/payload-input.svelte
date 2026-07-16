@@ -16,6 +16,7 @@
     editing?: boolean;
     placeholder?: string;
     copyable?: boolean;
+    clearOnDestroy?: boolean;
   }
 
   let {
@@ -28,6 +29,7 @@
     editing = true,
     placeholder,
     copyable = false,
+    clearOnDestroy = true,
   }: Props = $props();
 
   const isValidInput = (value: string) => {
@@ -61,7 +63,9 @@
     input = uploadInput;
   };
 
-  onDestroy(clearValues);
+  onDestroy(() => {
+    if (clearOnDestroy) clearValues();
+  });
 </script>
 
 <div class="flex flex-col gap-2">

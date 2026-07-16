@@ -89,3 +89,40 @@ export const encodePayloads = async ({
   }
   return payloads;
 };
+
+type EncodeMultiplePayloads = {
+  inputs: string[];
+  encoding: PayloadInputEncoding;
+  messageType?: string;
+  encodeWithCodec?: boolean;
+};
+
+export const encodeMultiplePayloads = async ({
+  inputs,
+  encoding,
+  messageType = '',
+  encodeWithCodec = true,
+}: EncodeMultiplePayloads): Promise<Payload[]> => {
+  const nonEmptyInputs = inputs.filter((input) => Boolean(input));
+  if (!nonEmptyInputs.length) return null;
+
+  let payloads: Payload[] = nonEmptyInputs.map((input) => {
+    const parsedInput = parseWithBigInt(input);
+    return isBase64EncodedPayload(parsedInput)
+      ? parsedInput
+      : (setBase64Payload(
+          parsedInput,
+          encoding,
+          messageType,
+        ) as unknown as Payload);
+  });
+
+  const endpoint = get(dataEncoder).endpoint;
+  if (endpoint && encodeWithCodec) {
+    const awaitData = await encodePayloadsWithCodec({
+      payloads: { payloads },
+    });
+    payloads = (awaitData?.payloads as Payload[]) ?? null;
+  }
+  return payloads;
+};
