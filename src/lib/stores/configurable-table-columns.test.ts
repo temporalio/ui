@@ -6,10 +6,12 @@ import {
   addColumn,
   DEFAULT_DEPLOYMENTS_COLUMNS,
   migrateColumnLabels,
+  MIN_COLUMN_WIDTH,
   moveColumn,
   persistedDeploymentsTableColumns,
   persistedWorkflowTableColumns,
   removeColumn,
+  resizeColumn,
   TABLE_TYPE,
 } from './configurable-table-columns';
 
@@ -52,6 +54,48 @@ describe('Workflow Table Columns store', () => {
       moveColumn(0, 1, 'default', TABLE_TYPE.WORKFLOWS);
       expect(get(persistedWorkflowTableColumns)).toEqual({
         default: [{ label: 'Start' }, { label: 'End' }],
+      });
+    });
+  });
+
+  describe('resizeColumn', () => {
+    test('sets the width of the targeted column only', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start' }, { label: 'End' }],
+      });
+      resizeColumn('Start', 240, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start', width: 240 }, { label: 'End' }],
+      });
+    });
+
+    test('clamps the width to the minimum column width', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start' }],
+      });
+      resizeColumn('Start', 10, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start', width: MIN_COLUMN_WIDTH }],
+      });
+    });
+
+    test('removes the width when resizing to undefined', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start', width: 240 }],
+      });
+      resizeColumn('Start', undefined, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start' }],
+      });
+    });
+
+    test('preserves other column properties', () => {
+      persistedWorkflowTableColumns.set({
+        default: [{ label: 'Start', pinned: true, width: 100 }],
+      });
+      resizeColumn('Start', 240, 'default', TABLE_TYPE.WORKFLOWS);
+      expect(get(persistedWorkflowTableColumns)).toEqual({
+        default: [{ label: 'Start', pinned: true, width: 240 }],
       });
     });
   });

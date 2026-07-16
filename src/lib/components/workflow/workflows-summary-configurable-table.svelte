@@ -21,7 +21,11 @@
     fetchAllChildWorkflows,
     fetchPaginatedWorkflows,
   } from '$lib/services/workflow-service';
-  import { configurableTableColumns } from '$lib/stores/configurable-table-columns';
+  import {
+    configurableTableColumns,
+    resizeColumn,
+    TABLE_TYPE,
+  } from '$lib/stores/configurable-table-columns';
   import { viewFeature } from '$lib/stores/new-feature-tags';
   import { tableDensity } from '$lib/stores/table-density';
   import { refresh, workflowCount } from '$lib/stores/workflows';
@@ -118,6 +122,18 @@
   const setTableDensity = () => {
     $tableDensity = dense ? 'comfortable' : 'dense';
     viewFeature('tableDensity');
+  };
+
+  const hasResizedColumns = $derived(
+    baseColumns.some((column) => column.width !== undefined),
+  );
+
+  const resetColumnWidths = () => {
+    baseColumns
+      .filter((column) => column.width !== undefined)
+      .forEach((column) =>
+        resizeColumn(column.label, undefined, namespace, TABLE_TYPE.WORKFLOWS),
+      );
   };
 
   let visiblePaginatedItems: WorkflowExecution[] = $state([]);
@@ -225,7 +241,18 @@
       onSelectPage={handleSelectPage}
     >
       {#each columns as column (column.label)}
-        <TableHeaderCell {column} />
+        <TableHeaderCell
+          {column}
+          onResize={baseColumns.some((c) => c.label === column.label)
+            ? (width) =>
+                resizeColumn(
+                  column.label,
+                  width,
+                  namespace,
+                  TABLE_TYPE.WORKFLOWS,
+                )
+            : undefined}
+        />
       {/each}
     </TableHeaderRow>
     {#each visibleRows as row, visibleRowIndex (row.value.runId)}
@@ -301,6 +328,19 @@
             : translate('common.comfortable')}
         ></Button>
       </Tooltip>
+      {#if hasResizedColumns}
+        <Tooltip text={translate('common.reset-column-widths')} top>
+          <Button
+            on:click={resetColumnWidths}
+            data-testid="reset-column-widths-button"
+            size="xs"
+            variant="ghost"
+            aria-label={translate('common.reset-column-widths')}
+          >
+            <Icon name="retry" />
+          </Button>
+        </Tooltip>
+      {/if}
       <DownloadJsonButton
         items={visibleItems}
         {page}
