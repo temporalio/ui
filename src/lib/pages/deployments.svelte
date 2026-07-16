@@ -20,6 +20,12 @@
   import { has } from '$lib/utilities/has';
   import { routeForWorkerDeploymentCreate } from '$lib/utilities/route-for';
 
+  interface Props {
+    canCreateServerlessDeployment?: boolean;
+  }
+
+  let { canCreateServerlessDeployment = true }: Props = $props();
+
   let error = $state('');
 
   const namespace = $derived(page.params.namespace);
@@ -102,7 +108,11 @@
       {/each}
 
       <svelte:fragment slot="empty">
-        <DeploymentsEmptyState {createHref} {error} />
+        <DeploymentsEmptyState
+          {createHref}
+          {error}
+          {canCreateServerlessDeployment}
+        />
       </svelte:fragment>
       <svelte:fragment slot="actions-end-additional">
         <Tooltip text="Configure Columns" top>

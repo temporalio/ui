@@ -27,6 +27,7 @@
     error?: string;
     versions?: VersionSummary[];
     computeProviders?: readonly ComputeProviderOption[];
+    initialProvider?: ComputeProviderOption['value'];
     gcpRegions?: string[];
   }
 
@@ -36,6 +37,7 @@
     error,
     versions = [],
     computeProviders,
+    initialProvider,
     gcpRegions,
   }: Props = $props();
 
@@ -43,6 +45,7 @@
     {
       buildId: '',
       provider: getInitialComputeProvider({
+        provider: untrack(() => initialProvider),
         providers: untrack(() => computeProviders),
       }),
       lambdaArn: '',
