@@ -18,7 +18,7 @@
   <div class="flex flex-col gap-2">
     <h5>Input</h5>
     <PayloadCodeBlock
-      value={input}
+      value={input ?? {}}
       label={translate('standalone-activities.activity-input')}
     />
   </div>

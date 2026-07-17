@@ -45,7 +45,9 @@
     itemsPerPage !== null
       ? String(itemsPerPage)
       : String(
-          perPageFromSearchParameter($page.url.searchParams.get(perPageKey)),
+          perPageFromSearchParameter(
+            $page.url.searchParams.get(perPageKey) ?? undefined,
+          ),
         ).toString();
 
   $: {

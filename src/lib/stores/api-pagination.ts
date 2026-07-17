@@ -42,7 +42,7 @@ type PaginationItems<T> = {
   activeIndex: number;
 };
 
-const defaultStore = {
+const getDefaultStore = <T>(): PaginationItems<T> => ({
   key: perPageKey,
   loading: true,
   updating: false,
@@ -57,7 +57,7 @@ const defaultStore = {
   indexStart: 0,
   indexEnd: 0,
   activeIndex: 0,
-};
+});
 
 export type PaginationStore<T> = PaginationMethods<T> &
   Readable<PaginationItems<T>>;
@@ -96,8 +96,8 @@ export function createPaginationStore<T>(
     pageSizeOptions,
     get(pageSize) || defaultPageSize,
   );
-  const paginationStore = writable({
-    ...defaultStore,
+  const paginationStore = writable<PaginationItems<T>>({
+    ...getDefaultStore<T>(),
     previousPageSize: initialPageSize,
     pageSize: initialPageSize,
   });
@@ -241,7 +241,7 @@ export function createPaginationStore<T>(
     nextPage: () => update((store) => setNextPage(store)),
     previousPage: () => update((store) => setPreviousPage(store)),
     setUpdating: () => update((store) => ({ ...store, updating: true })),
-    reset: () => set(defaultStore),
+    reset: () => set(getDefaultStore<T>()),
     resetPageSize: (pageSize) =>
       update((store) => resetPageSize(store, pageSize)),
     nextRow: () => update((store) => setNextRow(store)),

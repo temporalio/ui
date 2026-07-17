@@ -26,13 +26,13 @@ describe('getRequestBody', () => {
     const body = await getRequestBody(buildForm());
 
     expect(body.schedule_id).toBe('my-schedule');
-    expect(body.schedule.action.startWorkflow.workflowId).toBe(
+    expect(body.schedule.action!.startWorkflow.workflowId).toBe(
       'my-workflow-id',
     );
-    expect(body.schedule.action.startWorkflow.workflowType).toEqual({
+    expect(body.schedule.action!.startWorkflow.workflowType).toEqual({
       name: 'MyWorkflow',
     });
-    expect(body.schedule.action.startWorkflow.taskQueue).toEqual({
+    expect(body.schedule.action!.startWorkflow.taskQueue).toEqual({
       name: 'my-task-queue',
     });
   });
@@ -49,7 +49,7 @@ describe('getRequestBody', () => {
   it('emits the cron string for cron specs', async () => {
     const body = await getRequestBody(buildForm());
 
-    expect(body.schedule.spec.cronString).toEqual(['0 12 * * *']);
+    expect(body.schedule.spec!.cronString).toEqual(['0 12 * * *']);
   });
 
   it('drops invalid cron specs', async () => {
@@ -58,7 +58,7 @@ describe('getRequestBody', () => {
 
     const body = await getRequestBody(form);
 
-    expect(body.schedule.spec.cronString).toEqual([]);
+    expect(body.schedule.spec!.cronString).toEqual([]);
   });
 
   it('maps interval specs', async () => {
@@ -68,7 +68,7 @@ describe('getRequestBody', () => {
       }),
     );
 
-    expect(body.schedule.spec.interval).toEqual([
+    expect(body.schedule.spec!.interval).toEqual([
       { interval: '3600s', phase: '0s' },
     ]);
   });
@@ -82,8 +82,8 @@ describe('getRequestBody', () => {
       }),
     );
 
-    expect(body.schedule.spec.structuredCalendar).toHaveLength(1);
-    expect(body.schedule.spec.structuredCalendar[0].dayOfWeek).toEqual([
+    expect(body.schedule.spec!.structuredCalendar).toHaveLength(1);
+    expect(body.schedule.spec!.structuredCalendar![0].dayOfWeek).toEqual([
       { start: 1, end: 5 },
     ]);
   });
@@ -105,7 +105,7 @@ describe('getRequestBody', () => {
       }),
     );
 
-    const [calendar] = body.schedule.spec.structuredCalendar;
+    const [calendar] = body.schedule.spec!.structuredCalendar!;
     expect(calendar.second).toEqual([{ start: 0, end: 0, step: 1 }]);
     expect(calendar.minute).toEqual([{ start: 0, end: 0, step: 1 }]);
     expect(calendar.hour).toEqual([{ start: 0, end: 0, step: 1 }]);
@@ -114,13 +114,13 @@ describe('getRequestBody', () => {
   it('anchors the start time to midnight of the timezone', async () => {
     const body = await getRequestBody(buildForm());
 
-    expect(body.schedule.spec.startTime).toBe('2026-01-01T00:00:00.000Z');
-    expect(body.schedule.spec.timezoneName).toBe('UTC');
+    expect(body.schedule.spec!.startTime).toBe('2026-01-01T00:00:00.000Z');
+    expect(body.schedule.spec!.timezoneName).toBe('UTC');
   });
 
   it('omits the end time unless endKind is "on"', async () => {
     const body = await getRequestBody(buildForm());
-    expect(body.schedule.spec.endTime).toBeUndefined();
+    expect(body.schedule.spec!.endTime).toBeUndefined();
   });
 
   it('anchors the end time to end-of-day when endKind is "on"', async () => {
@@ -128,7 +128,7 @@ describe('getRequestBody', () => {
       buildForm({ endKind: 'on', endTime: '2026-12-31' }),
     );
 
-    expect(body.schedule.spec.endTime).toBe('2026-12-31T23:59:59.000Z');
+    expect(body.schedule.spec!.endTime).toBe('2026-12-31T23:59:59.000Z');
   });
 
   it('limits actions when endKind is "after"', async () => {
@@ -136,23 +136,23 @@ describe('getRequestBody', () => {
       buildForm({ endKind: 'after', endAfterOccurrences: 5 }),
     );
 
-    expect(body.schedule.state.limitedActions).toBe(true);
-    expect(body.schedule.state.remainingActions).toBe(5);
+    expect(body.schedule.state!.limitedActions).toBe(true);
+    expect(body.schedule.state!.remainingActions).toBe(5);
   });
 
   it('does not limit actions otherwise', async () => {
     const body = await getRequestBody(buildForm());
 
-    expect(body.schedule.state.limitedActions).toBe(false);
-    expect(body.schedule.state.remainingActions).toBeUndefined();
+    expect(body.schedule.state!.limitedActions).toBe(false);
+    expect(body.schedule.state!.remainingActions).toBeUndefined();
   });
 
   it('emits jitter only when positive', async () => {
     const withJitter = await getRequestBody(buildForm({ jitter: 10 }));
-    expect(withJitter.schedule.spec.jitter).toBe('10s');
+    expect(withJitter.schedule.spec!.jitter).toBe('10s');
 
     const withoutJitter = await getRequestBody(buildForm({ jitter: 0 }));
-    expect(withoutJitter.schedule.spec.jitter).toBeUndefined();
+    expect(withoutJitter.schedule.spec!.jitter).toBeUndefined();
   });
 
   it('falls back to defaults for emptied duration fields', async () => {
@@ -160,15 +160,15 @@ describe('getRequestBody', () => {
       buildForm({ catchupWindow: '', taskTimeout: '' }),
     );
 
-    expect(body.schedule.policies.catchupWindow).toBe(DEFAULT_CATCHUP_WINDOW);
-    expect(body.schedule.action.startWorkflow.workflowTaskTimeout).toBe(
+    expect(body.schedule.policies!.catchupWindow).toBe(DEFAULT_CATCHUP_WINDOW);
+    expect(body.schedule.action!.startWorkflow.workflowTaskTimeout).toBe(
       DEFAULT_TASK_TIMEOUT,
     );
   });
 
   it('omits run and execution timeouts when zeroed (no timeout)', async () => {
     const { startWorkflow } = (await getRequestBody(buildForm())).schedule
-      .action;
+      .action!;
 
     expect(startWorkflow.workflowTaskTimeout).toBe(DEFAULT_TASK_TIMEOUT);
     expect(startWorkflow.workflowRunTimeout).toBeUndefined();
@@ -187,7 +187,7 @@ describe('getRequestBody', () => {
         buildForm({ runTimeout: '0s' }),
         describeFullSchedule,
       )
-    ).schedule.action;
+    ).schedule.action!;
 
     expect(startWorkflow.workflowRunTimeout).toBeUndefined();
   });
@@ -197,13 +197,13 @@ describe('getRequestBody', () => {
       buildForm({ overlapPolicy: 'BufferOne', pauseOnFailure: true }),
     );
 
-    expect(body.schedule.policies.overlapPolicy).toBe('BufferOne');
-    expect(body.schedule.policies.pauseOnFailure).toBe(true);
+    expect(body.schedule.policies!.overlapPolicy).toBe('BufferOne');
+    expect(body.schedule.policies!.pauseOnFailure).toBe(true);
   });
 
   it('reflects the paused state', async () => {
     const body = await getRequestBody(buildForm({ pauseSchedule: true }));
-    expect(body.schedule.state.paused).toBe(true);
+    expect(body.schedule.state!.paused).toBe(true);
   });
 
   describe('editing an existing schedule', () => {
@@ -222,10 +222,10 @@ describe('getRequestBody', () => {
         }),
       );
 
-      expect(body.schedule.spec.excludeStructuredCalendar).toEqual([
+      expect(body.schedule.spec!.excludeStructuredCalendar).toEqual([
         { dayOfWeek: [{ start: 6 }] },
       ]);
-      expect(body.schedule.spec.timezoneData).toBe('dGVzdA==');
+      expect(body.schedule.spec!.timezoneData).toBe('dGVzdA==');
     });
 
     it('keeps the exact start time when its calendar date is unchanged', async () => {
@@ -234,7 +234,7 @@ describe('getRequestBody', () => {
         describeWithSpec({ startTime: '2026-01-01T05:30:00.000Z' }),
       );
 
-      expect(body.schedule.spec.startTime).toBe('2026-01-01T05:30:00.000Z');
+      expect(body.schedule.spec!.startTime).toBe('2026-01-01T05:30:00.000Z');
     });
 
     it('re-anchors the start time when the date is changed', async () => {
@@ -243,7 +243,7 @@ describe('getRequestBody', () => {
         describeWithSpec({ startTime: '2026-01-01T05:30:00.000Z' }),
       );
 
-      expect(body.schedule.spec.startTime).toBe('2026-02-01T00:00:00.000Z');
+      expect(body.schedule.spec!.startTime).toBe('2026-02-01T00:00:00.000Z');
     });
 
     it('does not invent a start time for a schedule without one', async () => {
@@ -253,7 +253,7 @@ describe('getRequestBody', () => {
         describeWithSpec({}),
       );
 
-      expect(body.schedule.spec.startTime).toBeUndefined();
+      expect(body.schedule.spec!.startTime).toBeUndefined();
     });
 
     it('keeps the exact end time when its calendar date is unchanged', async () => {
@@ -262,7 +262,7 @@ describe('getRequestBody', () => {
         describeWithSpec({ endTime: '2026-12-31T12:00:00.000Z' }),
       );
 
-      expect(body.schedule.spec.endTime).toBe('2026-12-31T12:00:00.000Z');
+      expect(body.schedule.spec!.endTime).toBe('2026-12-31T12:00:00.000Z');
     });
 
     it('re-anchors the end time to end-of-day when the date is changed', async () => {
@@ -271,7 +271,7 @@ describe('getRequestBody', () => {
         describeWithSpec({ endTime: '2026-12-31T12:00:00.000Z' }),
       );
 
-      expect(body.schedule.spec.endTime).toBe('2026-12-30T23:59:59.000Z');
+      expect(body.schedule.spec!.endTime).toBe('2026-12-30T23:59:59.000Z');
     });
   });
 });

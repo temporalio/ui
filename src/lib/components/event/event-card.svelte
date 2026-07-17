@@ -161,7 +161,7 @@
   </div>
 {/snippet}
 
-{#snippet payloads(key, value)}
+{#snippet payloads(key: string, value: Record<string, unknown>)}
   {@const codeBlockValue = getCodeBlockValue(value)}
   {@const stackTrace = getStackTrace(codeBlockValue)}
   <div>
@@ -214,7 +214,7 @@
   {/if}
 {/snippet}
 
-{#snippet link(key, value)}
+{#snippet link(key: string, value: string | number)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}
@@ -234,7 +234,7 @@
   </div>
 {/snippet}
 
-{#snippet details(key, value)}
+{#snippet details(key: string, value: string | number)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {format(key)}

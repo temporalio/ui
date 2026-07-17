@@ -216,7 +216,9 @@ export const validResetEventTypes: EventType[] = [
   'WorkflowTaskTimedOut',
 ];
 
-export const findAttributeKey = (event: HistoryEvent): EventAttributeKey => {
+export const findAttributeKey = (
+  event: HistoryEvent,
+): EventAttributeKey | undefined => {
   for (const key of eventAttributeKeys) {
     if (key in event) return key;
   }
@@ -232,7 +234,8 @@ export const findAttributes = (
 export const findAttributesAndKey = (
   event: HistoryEvent,
 ): { key: EventAttributeKey; attributes: EventAttribute } => {
-  const key = findAttributeKey(event);
+  // Every HistoryEvent carries exactly one attribute key.
+  const key = findAttributeKey(event)!;
   const attributes = findAttributes(event, key);
 
   return { key, attributes };
@@ -243,7 +246,9 @@ const hasAttributes =
   (
     event: IterableEvent | CommonHistoryEvent | HistoryEvent | undefined,
   ): event is T => {
-    return Boolean(event?.[key]);
+    return Boolean(
+      (event as Partial<Record<EventAttributeKey, unknown>>)?.[key],
+    );
   };
 
 export const isWorkflowExecutionStartedEvent =
@@ -462,7 +467,7 @@ export const isLocalActivityMarkerEvent = (
 
   if (
     !localActivityMarkerNames.includes(
-      event.markerRecordedEventAttributes.markerName,
+      event.markerRecordedEventAttributes?.markerName ?? '',
     )
   ) {
     return false;
@@ -496,7 +501,7 @@ export const isFailedWorkflowExecutionUpdateCompletedEvent = (
 ): boolean =>
   isWorkflowExecutionUpdateCompletedEvent(event) &&
   Boolean(
-    event.workflowExecutionUpdateCompletedEventAttributes.outcome?.failure,
+    event.workflowExecutionUpdateCompletedEventAttributes?.outcome?.failure,
   );
 
 export const isNexusOperationScheduledEvent =

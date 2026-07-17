@@ -29,8 +29,10 @@
   <div
     class="inline-flex min-w-24 items-center justify-center gap-2 border border-subtle px-1"
   >
-    <Icon name={config.icon} />
-    <p>{config.label}</p>
+    {#if config}
+      <Icon name={config.icon} />
+      <p>{config.label}</p>
+    {/if}
     {#if state}
       <span
         class="size-1.5 shrink-0 rounded-full bg-current {connectionStateColor[

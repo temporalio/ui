@@ -35,6 +35,7 @@ export type StartNexusOperationFormDefaults = Pick<
   | 'endpoint'
   | 'service'
   | 'operation'
-  | 'scheduleToCloseTimeout'
-  | 'startToCloseTimeout'
->;
+> & {
+  scheduleToCloseTimeout: string;
+  startToCloseTimeout: string;
+};

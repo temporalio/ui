@@ -152,12 +152,12 @@
     disabled = false,
     labelHidden = false,
     options,
-    placeholder = null,
+    placeholder = undefined,
     readonly = false,
     required = false,
-    leadingIcon = null,
+    leadingIcon = undefined,
     showChevron = false,
-    optionValueKey = null,
+    optionValueKey = undefined,
     optionLabelKey = optionValueKey,
     minSize = 0,
     maxSize = 120,
@@ -242,19 +242,19 @@
     if ($open) return;
     $open = true;
     filterValue = '';
-    inputElement.focus();
-    inputElement.select();
+    inputElement?.focus();
+    inputElement?.select();
   };
 
   const closeList = () => {
     if (!$open) return;
     $open = false;
-    onclose?.(selectedOption);
+    onclose?.(selectedOption as string | T);
     resetValueAndOptions();
   };
 
   const handleMenuClose = () => {
-    onclose?.(selectedOption);
+    onclose?.(selectedOption as string | T);
     resetValueAndOptions();
   };
 
@@ -293,8 +293,8 @@
     if (typeof option !== 'object') return false;
 
     return (
-      optionValueKey !== null &&
-      optionLabelKey !== null &&
+      optionValueKey != null &&
+      optionLabelKey != null &&
       optionValueKey in option &&
       optionLabelKey in option
     );
@@ -314,8 +314,10 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      return String(option[optionLabelKey]);
+      return String(option[optionLabelKey!]);
     }
+
+    return '';
   }
 
   function getSelectedOption(options: (string | T)[]) {
@@ -325,7 +327,7 @@
       }
 
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return option[optionValueKey] === value;
+        return option[optionValueKey!] === value;
       }
     });
   }
@@ -349,7 +351,7 @@
     }
 
     if (isObjectOption(option) && canRenderCustomOption(option)) {
-      const opt = String(option[optionValueKey]);
+      const opt = String(option[optionValueKey!]);
       if (isArrayValue(value)) {
         if (value.includes(opt)) {
           value = value.filter((o) => o !== opt);
@@ -381,7 +383,7 @@
 
     value = list.map((option) => {
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return String(option[optionValueKey]);
+        return String(option[optionValueKey!]);
       } else if (isStringOption(option)) {
         return option;
       }
@@ -393,7 +395,7 @@
   };
 
   const focusFirstOption = () => {
-    const listItemElement: HTMLLIElement = menuElement.querySelector(
+    const listItemElement = menuElement?.querySelector<HTMLLIElement>(
       'li[role="option"]:not([aria-disabled="true"])',
     );
 
@@ -457,7 +459,7 @@
       }
 
       if (isObjectOption(option) && canRenderCustomOption(option)) {
-        return String(option[optionLabelKey])
+        return String(option[optionLabelKey!])
           .toLowerCase()
           .includes(value.toLowerCase());
       }
@@ -485,7 +487,7 @@
     option: string | T,
     value: string | string[],
   ): boolean => {
-    if (isObjectOption(option)) {
+    if (isObjectOption(option) && optionValueKey != null) {
       const o = String(option[optionValueKey]);
       return isArrayValue(value) ? value.includes(o) : value === o;
     } else if (isStringOption(option)) {

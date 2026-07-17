@@ -159,7 +159,7 @@ export const fetchBidirectional = async ({
         descCtrl.abort();
       }
 
-      let response: GetWorkflowExecutionHistoryResponse;
+      let response: GetWorkflowExecutionHistoryResponse | undefined;
       try {
         response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
           route,
@@ -199,7 +199,7 @@ export const fetchBidirectional = async ({
       reportProgress();
       maybePause();
 
-      if (!response.nextPageToken || gap() <= 0) {
+      if (!response?.nextPageToken || gap() <= 0) {
         descCtrl.abort();
         break;
       }
@@ -223,7 +223,7 @@ export const fetchBidirectional = async ({
         ascCtrl.abort();
       }
 
-      let response: GetWorkflowExecutionHistoryResponse;
+      let response: GetWorkflowExecutionHistoryResponse | undefined;
       try {
         response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
           route,
@@ -268,7 +268,7 @@ export const fetchBidirectional = async ({
       reportProgress();
       maybePause();
 
-      if (!response.nextPageToken || gap() <= 0) {
+      if (!response?.nextPageToken || gap() <= 0) {
         ascCtrl.abort();
         break;
       }

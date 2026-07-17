@@ -45,7 +45,7 @@
       onConfirm();
     } catch (err: unknown) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;

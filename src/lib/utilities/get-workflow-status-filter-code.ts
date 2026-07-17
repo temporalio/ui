@@ -4,7 +4,7 @@ type ExecutionStatusCodes = '1' | '2' | '3' | '4' | '5' | '6' | '7';
 
 export const getStatusFilterCode = (
   status: WorkflowStatus,
-): ExecutionStatusCodes => {
+): ExecutionStatusCodes | undefined => {
   if (status === 'Running') return '1';
   if (status === 'Completed') return '2';
   if (status === 'Failed') return '3';

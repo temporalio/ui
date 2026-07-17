@@ -126,7 +126,7 @@
   );
 
   const isNotPending = $derived(
-    workflow && !workflow.isRunning && !workflow.isPaused,
+    !!workflow && !workflow.isRunning && !workflow.isPaused,
   );
 
   let groups = $derived(
@@ -290,6 +290,6 @@
 <DownloadEventHistoryModal
   bind:open={showDownloadPrompt}
   {namespace}
-  workflowId={workflow?.id}
-  runId={workflow?.runId}
+  workflowId={workflow?.id ?? ''}
+  runId={workflow?.runId ?? ''}
 />

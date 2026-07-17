@@ -39,10 +39,12 @@
   let error = $state('');
   let loading = $state(false);
   let failure = $state<
-    UpdateWorkflowResponse['outcome']['failure'] | undefined
+    NonNullable<UpdateWorkflowResponse['outcome']>['failure'] | undefined
   >(undefined);
   let success = $state<
-    UpdateWorkflowResponse['outcome']['success'] | boolean | undefined
+    | NonNullable<UpdateWorkflowResponse['outcome']>['success']
+    | boolean
+    | undefined
   >(undefined);
 
   let name = $state('');
@@ -91,7 +93,7 @@
       }
     } catch (err) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;
@@ -119,7 +121,7 @@
 >
   <h3 slot="title">{translate('workflows.update-modal-title')}</h3>
   <div class="flex flex-col gap-4" slot="content">
-    {#if updateDefinitions?.length > 0 && !customUpdate}
+    {#if (updateDefinitions?.length ?? 0) > 0 && !customUpdate}
       <Select
         id="update-select"
         label={translate('common.name')}

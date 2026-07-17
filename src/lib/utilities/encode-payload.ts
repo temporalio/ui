@@ -66,7 +66,7 @@ export const encodePayloads = async ({
   encoding,
   messageType = '',
   encodeWithCodec = true,
-}: EncodePayloads): Promise<Payload[]> => {
+}: EncodePayloads): Promise<Payload[] | null> => {
   if (!input) return null;
 
   const parsedInput = parseWithBigInt(input);

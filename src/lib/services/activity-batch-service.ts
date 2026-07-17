@@ -27,7 +27,7 @@ interface StartActivityBatchOperationRequest {
 const activityActionToOperation = (
   action: Action,
 ): Partial<StartActivityBatchOperationRequest> => {
-  const identity = getAuthUser().email;
+  const identity = getAuthUser().email ?? '';
 
   switch (action) {
     case Action.Cancel:
@@ -46,7 +46,10 @@ const activityActionToOperation = (
 const toActivityExecutionInput = ({
   activityId,
   runId,
-}: ActivityExecutionInfo) => ({ activityId, runId });
+}: ActivityExecutionInfo): { activityId: string; runId: string } => ({
+  activityId: activityId ?? '',
+  runId: runId ?? '',
+});
 
 const createActivityBatchOperationRequest = (
   action: Action,

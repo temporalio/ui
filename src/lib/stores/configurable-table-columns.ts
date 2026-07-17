@@ -338,7 +338,8 @@ export const configurableTableColumns: Readable<TableColumns> = derived(
 
     const namespaceColumns =
       $namespaces?.reduce(
-        (namespaceToColumnsMap, { namespaceInfo: { name } }): TableColumns => {
+        (namespaceToColumnsMap, { namespaceInfo }): TableColumns => {
+          const name = namespaceInfo?.name ?? '';
           return {
             ...namespaceToColumnsMap,
             [name]: getTableColumns(name),

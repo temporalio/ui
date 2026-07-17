@@ -104,7 +104,7 @@
     >
       {#if loading}
         <Spinner class="h-4 w-4 animate-spin" />
-      {:else if count >= 0}
+      {:else if count !== undefined && count >= 0}
         {count.toLocaleString()}
       {/if}
 

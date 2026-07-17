@@ -72,10 +72,11 @@
           goto(
             routeForStartStandaloneActivity({
               namespace,
-              activityId: activityExecutionInfo.activityId,
+              activityId: activityExecutionInfo.activityId ?? undefined,
               runId: activityExecutionInfo.runId ?? undefined,
-              activityType: activityExecutionInfo.activityType.name,
-              taskQueue: activityExecutionInfo.taskQueue,
+              activityType:
+                activityExecutionInfo.activityType?.name ?? undefined,
+              taskQueue: activityExecutionInfo.taskQueue ?? undefined,
               startToCloseTimeout: activityExecutionInfo.startToCloseTimeout,
               scheduleToCloseTimeout:
                 activityExecutionInfo.scheduleToCloseTimeout,

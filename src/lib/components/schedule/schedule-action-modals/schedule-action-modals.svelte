@@ -27,7 +27,7 @@
   <PauseScheduleModal
     {scheduleId}
     {namespace}
-    isSchedulePaused={schedule?.schedule?.state?.paused}
+    isSchedulePaused={schedule?.schedule?.state?.paused ?? undefined}
   />
 {:else if $confirmationModal === 'trigger'}
   <TriggerScheduleModal {scheduleId} {namespace} {scheduleOverlapPolicy} />
@@ -36,7 +36,7 @@
     {scheduleId}
     {namespace}
     {scheduleOverlapPolicy}
-    timezoneName={schedule?.schedule?.spec?.timezoneName}
+    timezoneName={schedule?.schedule?.spec?.timezoneName ?? undefined}
   />
 {:else if $confirmationModal === 'delete'}
   <DeleteScheduleModal {scheduleId} {namespace} />

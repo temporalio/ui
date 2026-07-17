@@ -74,7 +74,7 @@ export async function runLivePoll({
       }
       if (added > 0) onNewEvents();
 
-      if (response.nextPageToken) {
+      if (response?.nextPageToken) {
         token = response.nextPageToken as unknown as string;
       } else {
         token = '';

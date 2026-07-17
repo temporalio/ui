@@ -10,7 +10,6 @@
   import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { isNull } from '$lib/utilities/is';
 
   import { PILLS, type PillsContext } from './pill-container.svelte';
 
@@ -30,9 +29,9 @@
     onclick,
     disabled = false,
     loading = false,
-    active = null,
-    icon = null,
-    count = null,
+    active = undefined,
+    icon = undefined,
+    count = undefined,
     class: className = '',
     children,
     ...buttonProps
@@ -44,7 +43,7 @@
   // svelte-ignore state_referenced_locally
   registerPill(id, disabled);
 
-  let isActive = $derived(isNull(active) ? $activePill === id : active);
+  let isActive = $derived(active == null ? $activePill === id : active);
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     if (disabled) {
@@ -76,7 +75,7 @@
     </span>
   {/if}
   {@render children?.()}
-  {#if !isNull(count)}
+  {#if count != null}
     <Badge type="count">{count}</Badge>
   {/if}
 </button>

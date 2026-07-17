@@ -35,13 +35,13 @@
       <TableHeaderRow slot="headers">
         <th>{translate('common.name')}</th>
       </TableHeaderRow>
-      {#each visibleItems as namespace (namespace.namespaceInfo.name)}
+      {#each visibleItems as namespace (namespace.namespaceInfo?.name)}
         <TableRow>
           <td>
             <Link
               href={routeForNamespace({
-                namespace: namespace.namespaceInfo.name,
-              })}>{namespace.namespaceInfo.name}</Link
+                namespace: namespace.namespaceInfo?.name ?? '',
+              })}>{namespace.namespaceInfo?.name}</Link
             >
           </td>
         </TableRow>

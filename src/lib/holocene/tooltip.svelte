@@ -61,7 +61,7 @@
   let className = '';
   export { className as class };
   export let text = '';
-  export let icon: IconName = null;
+  export let icon: IconName | undefined = undefined;
   /** bottom center of the tooltip aligned to the top center of the wrapper */
   export let top = false;
   /** bottom right of the tooltip aligned to the top right of the wrapper */

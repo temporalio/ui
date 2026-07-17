@@ -19,7 +19,7 @@
     type ParsedQuery,
   } from '$lib/services/query-service';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import type { Payloads } from '$lib/types';
+  import type { Payload } from '$lib/types';
   import type { WorkflowInteractionDefinition } from '$lib/types/workflows';
   import { encodePayloads } from '$lib/utilities/encode-payload';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -47,22 +47,24 @@
     }) || [],
   );
 
-  $: queryType = queryType || queryTypes?.[0]?.name;
+  $: queryType = queryType || queryTypes?.[0]?.name || '';
 
   let queryResult: Promise<ParsedQuery>;
-  let encodePayloadResult: Promise<Payloads>;
+  let encodePayloadResult: Promise<Payload[] | null>;
 
   const sortByName = (
     list: WorkflowInteractionDefinition[],
   ): WorkflowInteractionDefinition[] => {
     return [...list].sort((a, b) => {
-      const aStartsWithDunder = a.name.startsWith('__');
-      const bStartsWithDunder = b.name.startsWith('__');
+      const aName = a.name ?? '';
+      const bName = b.name ?? '';
+      const aStartsWithDunder = aName.startsWith('__');
+      const bStartsWithDunder = bName.startsWith('__');
 
       if (aStartsWithDunder && !bStartsWithDunder) return 1;
       if (!aStartsWithDunder && bStartsWithDunder) return -1;
 
-      return a.name.localeCompare(b.name);
+      return aName.localeCompare(bName);
     });
   };
 
@@ -111,7 +113,7 @@
       namespace,
       workflow: params,
       queryType,
-      queryArgs: payloads ? { payloads } : null,
+      queryArgs: payloads ? { payloads } : undefined,
     }).finally(() => {
       reset();
     });
@@ -153,7 +155,7 @@
             on:click={() => query(queryType)}
             {loading}
             variant={edited ? 'primary' : 'secondary'}
-            leadingIcon={edited ? null : 'retry'}
+            leadingIcon={edited ? undefined : 'retry'}
             disabled={loading}
           >
             {edited
@@ -182,7 +184,7 @@
             copyIconTitle={translate('common.copy-icon-title')}
             copySuccessIconTitle={translate('common.copy-success-icon-title')}
             testId="query-result"
-            class={edited && 'opacity-50'}
+            class={edited ? 'opacity-50' : undefined}
           />
         {:catch _error}
           <EmptyState

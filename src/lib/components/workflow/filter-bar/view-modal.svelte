@@ -22,7 +22,7 @@
   }
 
   let {
-    open = $bindable(),
+    open = $bindable(false),
     view,
     onSaveView,
     onCreateView,
@@ -33,7 +33,7 @@
   let name = $state('');
   let touched = $state(false);
 
-  const query = $derived(page.url.searchParams.get('query'));
+  const query = $derived(page.url.searchParams.get('query') ?? '');
   const namespace = $derived(page.params.namespace);
   const maxViewsReached = $derived(
     $savedWorkflowQueries?.[namespace]?.length >= MAX_SAVED_WORKFLOW_QUERIES,
@@ -149,6 +149,9 @@
   };
 
   const onDelete = () => {
+    if (!view || !onDeleteView) {
+      return;
+    }
     onDeleteView(view);
     hideModal();
   };

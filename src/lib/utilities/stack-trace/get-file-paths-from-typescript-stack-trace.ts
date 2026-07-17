@@ -9,7 +9,7 @@ import { parseWithBigInt } from '../parse-with-big-int';
 
 export const getFilePathsFromTypeScriptStackTrace = (
   stackTraceText: string,
-): { filePath: string; codeLine: number; character: number }[] => {
+): { filePath: string; codeLine: number; character: number }[] | undefined => {
   const pattern = new RegExp(/\((\w:|\/)(.)+.ts:([\d])+:([\d])+\)/g);
   if (isFromTypeScriptSDK(stackTraceText)) {
     const paths: { filePath: string; codeLine: number; character: number }[] =
