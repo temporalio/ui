@@ -24,11 +24,10 @@
     enrichGroups,
     getWorkflowTaskFailedEvent as getBufferWftFailedEvent,
     getGroupArray,
-    onLatestGroup,
   } from '$lib/services/grouped-event-buffer';
   import { clearActives } from '$lib/stores/active-events';
   import { collapseIdleTime, eventFilterSort } from '$lib/stores/event-view';
-  import { pauseLiveUpdates } from '$lib/stores/events';
+  import { bufferVersion, pauseLiveUpdates } from '$lib/stores/events';
   import { eventTypeFilter } from '$lib/stores/filters';
   import { workflowRun } from '$lib/stores/workflow-run';
   import type {
@@ -63,6 +62,18 @@
   const reverseSort = $derived($eventFilterSort === 'descending');
 
   let bufferGroups = $state.raw<EventGroup[]>([]);
+  let groupUpdatePending = false;
+  let groupUpdateFrame: number | null = null;
+
+  function scheduleBufferGroupRefresh() {
+    if (groupUpdatePending) return;
+    groupUpdatePending = true;
+    groupUpdateFrame = requestAnimationFrame(() => {
+      groupUpdateFrame = null;
+      groupUpdatePending = false;
+      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+    });
+  }
 
   const filteredBufferGroups = $derived.by(() => {
     const active = $eventTypeFilter;
@@ -116,28 +127,18 @@
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
 
-    // Throttle buffer → Svelte updates to at most once per animation frame.
-    // onLatestGroup fires for every new group head (~N times during load), each
-    // triggering getGroupArray() (O(N log N) sort) + a full reactive cascade;
-    // batching via rAF caps that at ≤60 updates/sec regardless of how fast the
-    // bidirectional cursors push data.
-    let groupUpdatePending = false;
-    const unsub = onLatestGroup(() => {
-      if (!groupUpdatePending) {
-        groupUpdatePending = true;
-        requestAnimationFrame(() => {
-          groupUpdatePending = false;
-          bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-        });
-      }
-    });
-
     return () => {
-      unsub();
+      if (groupUpdateFrame !== null) cancelAnimationFrame(groupUpdateFrame);
     };
   });
 
   $effect(() => {
+    const _bufferVersion = $bufferVersion;
+    scheduleBufferGroupRefresh();
+  });
+
+  $effect(() => {
+    const _bufferVersion = $bufferVersion;
     if (historyCtx.fetchComplete) {
       enrichGroups(
         $workflowRun.workflow?.pendingActivities ?? [],

@@ -15,7 +15,11 @@ import type {
 } from '$lib/types/events';
 import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
 import {
+  isActivityTaskCanceledEvent,
+  isActivityTaskCompletedEvent,
+  isActivityTaskFailedEvent,
   isActivityTaskScheduledEvent,
+  isActivityTaskTimedOutEvent,
   isNexusOperationCanceledEvent,
   isNexusOperationCompletedEvent,
   isNexusOperationFailedEvent,
@@ -227,6 +231,40 @@ function insertEventById(list: WorkflowEvent[], event: WorkflowEvent): void {
   list.splice(i, 0, event);
 }
 
+function invalidateGroupArrayCaches(): void {
+  _cachedGroups = null;
+  _cachedGroupsNoWFT = null;
+}
+
+function hasTerminalActivityEvent(group: EventGroup): boolean {
+  return group.eventList.some(
+    (event) =>
+      isActivityTaskCompletedEvent(event) ||
+      isActivityTaskFailedEvent(event) ||
+      isActivityTaskCanceledEvent(event) ||
+      isActivityTaskTimedOutEvent(event),
+  );
+}
+
+function clearResolvedPendingState(group: EventGroup): void {
+  if (group.pendingActivity && hasTerminalActivityEvent(group)) {
+    delete group.pendingActivity;
+  }
+
+  if (
+    group.pendingNexusOperation &&
+    group.eventList.some(
+      (event) =>
+        isNexusOperationCompletedEvent(event) ||
+        isNexusOperationFailedEvent(event) ||
+        isNexusOperationCanceledEvent(event) ||
+        isNexusOperationTimedOutEvent(event),
+    )
+  ) {
+    delete group.pendingNexusOperation;
+  }
+}
+
 function growArrays(newSize: number): void {
   if (newSize <= eventSlots.length) return;
   eventSlots.length = newSize;
@@ -256,10 +294,12 @@ function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
   if (meta.group.pendingActivity && meta.group.eventList.length === 3) {
     delete meta.group.pendingActivity;
   }
+  clearResolvedPendingState(meta.group);
 
   const followerMs = toMs(event.eventTime);
   if (followerMs > meta.endMs) meta.endMs = followerMs;
 
+  invalidateGroupArrayCaches();
   eventSlots[followerSlotIdx] = null;
 }
 
@@ -273,6 +313,67 @@ function attachFollower(headSlotIdx: number, followerSlotIdx: number): void {
       pending.push(followerSlotIdx);
     } else {
       pendingFollowers.set(headSlotIdx, [followerSlotIdx]);
+    }
+  }
+}
+
+function absorbLiveGroupIntoPool(poolIdx: number, liveGroup: EventGroup): void {
+  const meta = groupPool[poolIdx];
+  const group = meta.group;
+  if (!group) return;
+
+  for (const event of liveGroup.eventList) {
+    const slotIdx = parseInt(event.id) - 1;
+    if (slotIdx >= eventToGroup.length) {
+      growArrays(slotIdx + Math.ceil(slotIdx * 0.25) + 16);
+    }
+    if (eventToGroup[slotIdx] !== 0) continue;
+    if (group.eventList.some((existing) => existing.id === event.id)) continue;
+
+    insertEventById(group.eventList, event);
+    group.timestamp = event.timestamp;
+    addEventToGroup(group, event);
+    eventToGroup[slotIdx] = poolIdx + 1;
+    const eventMs = toMs(event.eventTime);
+    if (eventMs > meta.endMs) meta.endMs = eventMs;
+  }
+
+  clearResolvedPendingState(group);
+  invalidateGroupArrayCaches();
+}
+
+function enrichGroup(
+  group: EventGroup,
+  byActivityId: Map<string, PendingActivity>,
+  byNexusScheduledId: Map<string, PendingNexusOperation>,
+): void {
+  const initial = group.initialEvent;
+
+  if (isActivityTaskScheduledEvent(initial)) {
+    const pa = byActivityId.get(
+      initial.activityTaskScheduledEventAttributes?.activityId ?? '',
+    );
+    if (pa && !hasTerminalActivityEvent(group)) {
+      group.pendingActivity = pa;
+    } else {
+      delete group.pendingActivity;
+    }
+    return;
+  }
+
+  if (isNexusOperationScheduledEvent(initial)) {
+    const pn = byNexusScheduledId.get(group.id);
+    const isComplete = group.eventList.some(
+      (e) =>
+        isNexusOperationCompletedEvent(e) ||
+        isNexusOperationFailedEvent(e) ||
+        isNexusOperationCanceledEvent(e) ||
+        isNexusOperationTimedOutEvent(e),
+    );
+    if (pn && !isComplete) {
+      group.pendingNexusOperation = pn;
+    } else {
+      delete group.pendingNexusOperation;
     }
   }
 }
@@ -463,9 +564,17 @@ export function processEvent(
       const followerMs = toMs(follower.eventTime);
       if (followerMs > meta.endMs) meta.endMs = followerMs;
     }
+    clearResolvedPendingState(group);
     livePendingFollowers.delete(event.id);
-    _cachedGroups = null;
-    _cachedGroupsNoWFT = null;
+    invalidateGroupArrayCaches();
+  }
+
+  const liveGroupIdx = liveGroups.findIndex((g) => g.id === event.id);
+  if (liveGroupIdx !== -1) {
+    const [liveGroup] = liveGroups.splice(liveGroupIdx, 1);
+    absorbLiveGroupIntoPool(poolIdx, liveGroup);
+    _liveVersion++;
+    invalidateGroupArrayCaches();
   }
 
   // Release the head slot — its data is now encoded in the EventGroup.
@@ -602,37 +711,13 @@ export function enrichGroups(
   for (let i = 0; i < poolTop; i++) {
     const { group } = groupPool[i];
     if (!group) continue;
-
-    const initial = group.initialEvent;
-
-    if (isActivityTaskScheduledEvent(initial)) {
-      const pa = byActivityId.get(
-        initial.activityTaskScheduledEventAttributes?.activityId ?? '',
-      );
-      if (pa && group.eventList.length < 3) {
-        group.pendingActivity = pa;
-      } else {
-        delete group.pendingActivity;
-      }
-      continue;
-    }
-
-    if (isNexusOperationScheduledEvent(initial)) {
-      const pn = byNexusScheduledId.get(group.id);
-      const isComplete = group.eventList.some(
-        (e) =>
-          isNexusOperationCompletedEvent(e) ||
-          isNexusOperationFailedEvent(e) ||
-          isNexusOperationCanceledEvent(e) ||
-          isNexusOperationTimedOutEvent(e),
-      );
-      if (pn && !isComplete) {
-        group.pendingNexusOperation = pn;
-      } else {
-        delete group.pendingNexusOperation;
-      }
-    }
+    enrichGroup(group, byActivityId, byNexusScheduledId);
   }
+
+  for (const group of liveGroups) {
+    enrichGroup(group, byActivityId, byNexusScheduledId);
+  }
+  invalidateGroupArrayCaches();
 }
 
 /**
@@ -889,9 +974,9 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
       insertEventById(existing.eventList, event);
       existing.timestamp = event.timestamp;
       addEventToGroup(existing, event);
+      clearResolvedPendingState(existing);
       _liveVersion++;
-      _cachedGroups = null;
-      _cachedGroupsNoWFT = null;
+      invalidateGroupArrayCaches();
       return true;
     }
 
@@ -907,13 +992,16 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
         insertEventById(meta.group.eventList, event);
         meta.group.timestamp = event.timestamp;
         addEventToGroup(meta.group, event);
+        clearResolvedPendingState(meta.group);
+        if (slotIdx >= eventToGroup.length) {
+          growArrays(slotIdx + Math.ceil(slotIdx * 0.25) + 16);
+        }
         eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
         const followerMs = toMs(event.eventTime);
         if (followerMs > meta.endMs) {
           meta.endMs = followerMs;
         }
-        _cachedGroups = null;
-        _cachedGroupsNoWFT = null;
+        invalidateGroupArrayCaches();
       }
       return true;
     }
@@ -950,13 +1038,13 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
       group.timestamp = follower.timestamp;
       addEventToGroup(group, follower);
     }
+    clearResolvedPendingState(group);
     livePendingFollowers.delete(event.id);
   }
 
   liveGroups.push(group);
   _liveVersion++;
-  _cachedGroups = null;
-  _cachedGroupsNoWFT = null;
+  invalidateGroupArrayCaches();
   for (const cb of liveGroupListeners) cb(group);
   for (const cb of latestGroupListeners) cb(group);
   return true;
