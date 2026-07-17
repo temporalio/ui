@@ -246,21 +246,22 @@ function hasTerminalActivityEvent(group: EventGroup): boolean {
   );
 }
 
+function hasTerminalNexusEvent(group: EventGroup): boolean {
+  return group.eventList.some(
+    (event) =>
+      isNexusOperationCompletedEvent(event) ||
+      isNexusOperationFailedEvent(event) ||
+      isNexusOperationCanceledEvent(event) ||
+      isNexusOperationTimedOutEvent(event),
+  );
+}
+
 function clearResolvedPendingState(group: EventGroup): void {
   if (group.pendingActivity && hasTerminalActivityEvent(group)) {
     delete group.pendingActivity;
   }
 
-  if (
-    group.pendingNexusOperation &&
-    group.eventList.some(
-      (event) =>
-        isNexusOperationCompletedEvent(event) ||
-        isNexusOperationFailedEvent(event) ||
-        isNexusOperationCanceledEvent(event) ||
-        isNexusOperationTimedOutEvent(event),
-    )
-  ) {
+  if (group.pendingNexusOperation && hasTerminalNexusEvent(group)) {
     delete group.pendingNexusOperation;
   }
 }
@@ -271,6 +272,12 @@ function growArrays(newSize: number): void {
   const grown = new Int32Array(newSize);
   grown.set(eventToGroup);
   eventToGroup = grown;
+}
+
+// Grow the slot arrays so `slotIdx` is addressable, with ~25% headroom.
+function growArraysFor(slotIdx: number): void {
+  if (slotIdx < eventSlots.length) return;
+  growArrays(slotIdx + Math.ceil(slotIdx * 0.25) + 16);
 }
 
 function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
@@ -291,9 +298,6 @@ function attachFollowerToPool(poolIdx: number, followerSlotIdx: number): void {
 
   eventToGroup[followerSlotIdx] = poolIdx + 1;
 
-  if (meta.group.pendingActivity && meta.group.eventList.length === 3) {
-    delete meta.group.pendingActivity;
-  }
   clearResolvedPendingState(meta.group);
 
   const followerMs = toMs(event.eventTime);
@@ -324,9 +328,7 @@ function absorbLiveGroupIntoPool(poolIdx: number, liveGroup: EventGroup): void {
 
   for (const event of liveGroup.eventList) {
     const slotIdx = parseInt(event.id) - 1;
-    if (slotIdx >= eventToGroup.length) {
-      growArrays(slotIdx + Math.ceil(slotIdx * 0.25) + 16);
-    }
+    growArraysFor(slotIdx);
     if (eventToGroup[slotIdx] !== 0) continue;
     if (group.eventList.some((existing) => existing.id === event.id)) continue;
 
@@ -363,14 +365,7 @@ function enrichGroup(
 
   if (isNexusOperationScheduledEvent(initial)) {
     const pn = byNexusScheduledId.get(group.id);
-    const isComplete = group.eventList.some(
-      (e) =>
-        isNexusOperationCompletedEvent(e) ||
-        isNexusOperationFailedEvent(e) ||
-        isNexusOperationCanceledEvent(e) ||
-        isNexusOperationTimedOutEvent(e),
-    );
-    if (pn && !isComplete) {
+    if (pn && !hasTerminalNexusEvent(group)) {
       group.pendingNexusOperation = pn;
     } else {
       delete group.pendingNexusOperation;
@@ -456,9 +451,7 @@ export function processEvent(
 ): EventGroup | null {
   const slotIdx = parseInt(raw.eventId) - 1;
 
-  if (slotIdx >= eventSlots.length) {
-    growArrays(slotIdx + Math.ceil(slotIdx * 0.25) + 16);
-  }
+  growArraysFor(slotIdx);
 
   eventSlots[slotIdx] = raw;
 
@@ -574,7 +567,6 @@ export function processEvent(
     const [liveGroup] = liveGroups.splice(liveGroupIdx, 1);
     absorbLiveGroupIntoPool(poolIdx, liveGroup);
     _liveVersion++;
-    invalidateGroupArrayCaches();
   }
 
   // Release the head slot — its data is now encoded in the EventGroup.
@@ -730,10 +722,7 @@ export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
   let lastFailedEvent: WorkflowEvent | undefined;
   let maxCompletedId = -1;
 
-  for (let i = 0; i < poolTop; i++) {
-    const { group } = groupPool[i];
-    if (!group || !isWorkflowTaskGroup(group)) continue;
-
+  const scanGroup = (group: EventGroup): void => {
     for (const event of group.eventList) {
       if (event.eventType === 'WorkflowTaskCompleted') {
         const id = Number(event.id);
@@ -749,6 +738,28 @@ export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
         }
       }
     }
+  };
+
+  for (let i = 0; i < poolTop; i++) {
+    const { group } = groupPool[i];
+    if (!group || !isWorkflowTaskGroup(group)) continue;
+    scanGroup(group);
+  }
+
+  // Live WFT groups whose head slot has not yet been claimed by the pool —
+  // covers workflow-task failures that arrive via the live poll after the
+  // initial fetch completes.
+  for (const group of liveGroups) {
+    if (!isWorkflowTaskGroup(group)) continue;
+    const headSlotIdx = parseInt(group.id) - 1;
+    if (
+      headSlotIdx >= 0 &&
+      headSlotIdx < eventToGroup.length &&
+      eventToGroup[headSlotIdx] !== 0
+    ) {
+      continue;
+    }
+    scanGroup(group);
   }
 
   if (!lastFailedEvent) return undefined;
@@ -993,9 +1004,7 @@ export function appendLiveEvent(raw: HistoryEvent): boolean {
         meta.group.timestamp = event.timestamp;
         addEventToGroup(meta.group, event);
         clearResolvedPendingState(meta.group);
-        if (slotIdx >= eventToGroup.length) {
-          growArrays(slotIdx + Math.ceil(slotIdx * 0.25) + 16);
-        }
+        growArraysFor(slotIdx);
         eventToGroup[slotIdx] = eventToGroup[headSlotIdx];
         const followerMs = toMs(event.eventTime);
         if (followerMs > meta.endMs) {
