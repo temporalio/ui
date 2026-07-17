@@ -13,7 +13,7 @@
 
   let { operation }: { operation: PendingNexusOperation } = $props();
 
-  const failed = $derived(operation.attempt > 1);
+  const failed = $derived((operation.attempt ?? 0) > 1);
 </script>
 
 <div
@@ -126,7 +126,7 @@
   </div>
 </div>
 
-{#snippet nextRetry(timeDifference)}
+{#snippet nextRetry(timeDifference: string)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {translate('workflows.next-retry')}

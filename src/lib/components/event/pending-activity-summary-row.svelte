@@ -114,21 +114,21 @@
         class="mr-1"
         type={event.paused
           ? 'warning'
-          : event.attempt > 1
+          : (event.attempt ?? 0) > 1
             ? 'danger'
             : 'default'}
       >
         <Icon
           class={merge(
             'mr-1 inline',
-            event.attempt > 1 && 'font-bold text-red-400',
+            (event.attempt ?? 0) > 1 && 'font-bold text-red-400',
             event.paused && 'font-bold text-yellow-700',
           )}
           name={event.paused ? 'pause' : 'retry'}
         />
         {translate('workflows.attempt')}
         {event.attempt} / {event.maximumAttempts || '∞'}
-        {#if event.attempt > 1}
+        {#if (event.attempt ?? 0) > 1 && event.scheduledTime}
           {@const timeDifference = toTimeDifference({
             date: event.scheduledTime,
             negativeDefault: '',
@@ -141,7 +141,7 @@
       </Badge>
       <EventDetailsRow
         key="activityType"
-        value={event.activityType}
+        value={event.activityType ?? null}
         showKey
         attributes={event}
       />

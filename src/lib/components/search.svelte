@@ -46,7 +46,7 @@
     {label}
     {id}
     labelHidden
-    icon={icon ? 'search' : null}
+    icon={icon ? 'search' : undefined}
     type="search"
     {name}
     {value}

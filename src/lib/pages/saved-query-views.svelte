@@ -150,7 +150,7 @@
     const sharableViewUrl =
       new URL(page.url.href) +
       '&savedQuery=' +
-      encodeURIComponent(activeQueryView.name);
+      encodeURIComponent(activeQueryView?.name ?? '');
     copy(e, sharableViewUrl);
   };
 
@@ -341,14 +341,14 @@
         on:click={() => setActiveQueryView(view)}
         class={merge(
           'flex w-full justify-start',
-          view.count > 0 && 'text-red-900 dark:text-red-300',
+          (view.count ?? 0) > 0 && 'text-red-900 dark:text-red-300',
         )}
         active={view.active}
         disabled={view.disabled}
         size="sm"
       >
         <Icon
-          name={view.id === TASK_FAILURES_VIEW.id && view.count > 0
+          name={view.id === TASK_FAILURES_VIEW.id && (view.count ?? 0) > 0
             ? 'exclamation-octagon'
             : view.icon || 'bookmark'}
           class={merge(

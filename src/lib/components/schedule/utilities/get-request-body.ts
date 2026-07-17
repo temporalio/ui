@@ -34,7 +34,9 @@ function getSearchAttributes(attrs: Parameters<typeof setSearchAttributes>[0]) {
 }
 
 type StartWorkflowHeader = NonNullable<
-  NonNullable<DescribeFullSchedule['schedule']['action']>['startWorkflow']
+  NonNullable<
+    NonNullable<DescribeFullSchedule['schedule']>['action']
+  >['startWorkflow']
 >['header'];
 
 async function encodeHeaderFields(
@@ -51,7 +53,7 @@ async function encodeHeaderFields(
         input: stringifyWithBigInt(value),
         encoding: 'json/plain',
       });
-      return [key, encodedValue[0]] as const;
+      return [key, (encodedValue ?? [])[0]] as const;
     }),
   );
 
@@ -102,7 +104,7 @@ async function getScheduleActionRequest(
   describeFullSchedule: DescribeFullSchedule | null = null,
 ): Promise<ScheduleActionRequest> {
   const startWorkflow =
-    describeFullSchedule?.schedule.action?.startWorkflow ?? {};
+    describeFullSchedule?.schedule?.action?.startWorkflow ?? {};
 
   const [payloads, header] = await Promise.all([
     scheduleForm.editInput && scheduleForm.input
@@ -173,7 +175,7 @@ function toInterval(interval: SpecFormItem['interval']): ScheduleInterval {
 // form can't represent.
 function getSpecStartTime(
   scheduleForm: FormScheduleSchema,
-  existingSpec: DescribeFullSchedule['schedule']['spec'],
+  existingSpec: NonNullable<DescribeFullSchedule['schedule']>['spec'],
   timeZone: string,
 ): Pick<ScheduleSpecRequest, 'startTime'> {
   const existing = existingSpec?.startTime
@@ -205,7 +207,7 @@ function getSpecStartTime(
 
 function getSpecEndTime(
   scheduleForm: FormScheduleSchema,
-  existingSpec: DescribeFullSchedule['schedule']['spec'],
+  existingSpec: NonNullable<DescribeFullSchedule['schedule']>['spec'],
   timeZone: string,
 ): Pick<ScheduleSpecRequest, 'endTime'> {
   if (scheduleForm.endKind !== 'on' || !scheduleForm.endTime) {

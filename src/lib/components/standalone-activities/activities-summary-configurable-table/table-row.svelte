@@ -30,9 +30,9 @@
     <td class="relative flex items-center justify-center py-0.5">
       <StartActivityButton
         {namespace}
-        activityId={activity.activityId}
+        activityId={activity.activityId ?? ''}
         activityType={activity.activityType?.name ?? ''}
-        taskQueue={activity.taskQueue}
+        taskQueue={activity.taskQueue ?? ''}
         scheduleToCloseTimeout={activity.scheduleToCloseTimeout}
         startToCloseTimeout={activity.startToCloseTimeout}
       />

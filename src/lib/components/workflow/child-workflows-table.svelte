@@ -22,8 +22,8 @@
   const formattedPending = $derived(
     pendingChildren.map((c) => {
       return {
-        runId: c.runId,
-        workflowId: c.workflowId,
+        runId: c.runId ?? '',
+        workflowId: c.workflowId ?? '',
         status: 'Running' as const,
         type: c.workflowTypeName,
         namespace,
@@ -34,8 +34,8 @@
   const formattedCompleted = $derived(
     children.map((c) => {
       return {
-        runId: c.attributes.workflowExecution.runId,
-        workflowId: c.attributes.workflowExecution.workflowId,
+        runId: c.attributes.workflowExecution?.runId ?? '',
+        workflowId: c.attributes.workflowExecution?.workflowId ?? '',
         type: c.attributes.workflowType,
         status: c.classification,
         namespace: c.attributes?.namespace || namespace,

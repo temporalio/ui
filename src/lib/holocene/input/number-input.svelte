@@ -7,7 +7,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Label from '$lib/holocene/label.svelte';
 
-  export let icon: IconName = null;
+  export let icon: IconName | undefined = undefined;
   export let id: string;
   export let value: number;
   export let label: string;
@@ -18,8 +18,8 @@
   export let disabled = false;
   export let required = false;
   export let hintText = '';
-  export let max: number = undefined;
-  export let min: number = undefined;
+  export let max: number | undefined = undefined;
+  export let min: number | undefined = undefined;
   export let step: number = 1;
   export let search = false;
   export let autocomplete: FullAutoFill = 'off';

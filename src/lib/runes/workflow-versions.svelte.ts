@@ -7,10 +7,10 @@ type PollersWithVersions = {
   pollers: PollerWithTaskQueueTypes[];
   pinned: boolean;
   autoUpgrade: boolean;
-  currentDeployment: string;
-  currentBuildId: string;
-  rampingDeployment: string;
-  rampingBuildId: string;
+  currentDeployment: string | null | undefined;
+  currentBuildId: string | null | undefined;
+  rampingDeployment: string | null | undefined;
+  rampingBuildId: string | null | undefined;
 };
 
 export function getWorkflowPollersWithVersions(
@@ -69,7 +69,7 @@ export function getWorkflowPollersWithVersions(
   };
 
   const pollerHasWorkflowBuildId = $derived(
-    (poller) =>
+    (poller: PollerWithTaskQueueTypes) =>
       getPollerDeploymentName(poller) === workflowDeploymentName &&
       getPollerBuildId(poller) === workflowVersioningBuildId,
   );

@@ -123,14 +123,14 @@
           }"`,
           `TemporalScheduledById="${scheduleId}"`,
         ].join(' AND '),
-      })}
-      text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+      }) ?? ''}
+      text={schedule?.schedule?.action?.startWorkflow?.workflowType?.name ?? ''}
       iconName="filter"
       copyable={Boolean(
         schedule?.schedule?.action?.startWorkflow?.workflowType?.name,
       )}
       copyableText={schedule?.schedule?.action?.startWorkflow?.workflowType
-        ?.name}
+        ?.name ?? undefined}
     />
 
     <DetailListLabel class="items-center">
@@ -193,7 +193,7 @@
     <div class="flex w-full flex-col gap-4 xl:w-1/3">
       <WorkflowInputCard
         {scheduleId}
-        input={schedule?.schedule?.action?.startWorkflow?.input}
+        input={schedule?.schedule?.action?.startWorkflow?.input ?? undefined}
       />
       <ScheduleSpecCard {schedule} />
     </div>

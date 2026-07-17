@@ -23,6 +23,7 @@
   } from '$lib/models/payload-encoding';
   import {
     fetchInitialValuesForStartNexusOperation,
+    type StartNexusOperationFormData,
     startStandaloneNexusOperation,
   } from '$lib/services/standalone-nexus-operations';
   import {
@@ -54,7 +55,7 @@
 
   const formDefaults = $derived<StartNexusOperationFormDefaults>({
     namespace,
-    identity: getIdentity(),
+    identity: getIdentity() ?? '',
     encoding: 'json/plain',
     operationId: page.url.searchParams.get('operationId') ?? '',
     endpoint: page.url.searchParams.get('endpoint') ?? '',
@@ -84,7 +85,7 @@
   const schema = z.object({
     identity: z.string(),
     namespace: z.string(),
-    operationId: z.string().optional(),
+    operationId: z.string().default(''),
     endpoint: z.string().min(1, {
       message: translate('standalone-nexus-operations.form-endpoint-required'),
     }),
@@ -96,16 +97,16 @@
         'standalone-nexus-operations.form-operation-name-required',
       ),
     }),
-    input: z.string().optional(),
+    input: z.string().default(''),
     encoding: z.enum(encodings).default('json/plain'),
-    messageType: z.string().optional(),
-    startToCloseTimeout: z.string().optional(),
-    scheduleToCloseTimeout: z.string().optional(),
-    scheduleToStartTimeout: z.string().optional(),
-    idReusePolicy: z.string().optional(),
-    idConflictPolicy: z.string().optional(),
-    summary: z.string().optional(),
-    details: z.string().optional(),
+    messageType: z.string().default(''),
+    startToCloseTimeout: z.string().default(''),
+    scheduleToCloseTimeout: z.string().default(''),
+    scheduleToStartTimeout: z.string().default(''),
+    idReusePolicy: z.string().default(''),
+    idConflictPolicy: z.string().default(''),
+    summary: z.string().default(''),
+    details: z.string().default(''),
     nexusHeader: z
       .array(z.object({ key: z.string(), value: z.string() }))
       .default([]),
@@ -174,98 +175,96 @@
     );
   }
 
-  const { form, enhance, errors, message } = superForm(
-    {
-      ...formDefaults,
-      input: '',
-      messageType: '',
-      scheduleToStartTimeout: '',
-      summary: '',
-      details: '',
-      idReusePolicy: '',
-      idConflictPolicy: '',
-      nexusHeader: [],
-    },
-    {
-      SPA: true,
-      dataType: 'json',
-      resetForm: false,
-      invalidateAll: false,
-      validators: zodClient(schema),
-      onUpdate: async ({ form }) => {
-        if (!form.valid) return;
+  const initialData: z.infer<typeof schema> = {
+    ...formDefaults,
+    input: '',
+    messageType: '',
+    scheduleToStartTimeout: '',
+    summary: '',
+    details: '',
+    idReusePolicy: '',
+    idConflictPolicy: '',
+    nexusHeader: [],
+  };
 
-        const { idReusePolicy, idConflictPolicy } = form.data;
+  const { form, enhance, errors, message } = superForm(initialData, {
+    SPA: true,
+    dataType: 'json',
+    resetForm: false,
+    invalidateAll: false,
+    validators: zodClient(schema),
+    onUpdate: async ({ form }) => {
+      if (!form.valid) return;
 
-        try {
-          const operationId = form.data.operationId || crypto.randomUUID();
-          const nexusHeaderRecord = form.data.nexusHeader.reduce<
-            Record<string, string>
-          >((acc, { key, value }) => {
-            if (key) acc[key] = value;
-            return acc;
-          }, {});
+      const { idReusePolicy, idConflictPolicy } = form.data;
 
-          const { runId } = await startStandaloneNexusOperation({
-            ...form.data,
+      try {
+        const operationId = form.data.operationId || crypto.randomUUID();
+        const nexusHeaderRecord = form.data.nexusHeader.reduce<
+          Record<string, string>
+        >((acc, { key, value }) => {
+          if (key) acc[key] = value;
+          return acc;
+        }, {});
+
+        const { runId } = await startStandaloneNexusOperation({
+          ...form.data,
+          operationId,
+          idReusePolicy: idReusePolicy as
+            | NexusOperationIdReusePolicy
+            | undefined,
+          idConflictPolicy: idConflictPolicy as
+            | NexusOperationIdConflictPolicy
+            | undefined,
+          searchAttributes: searchAttributes.map(({ label, value }) => ({
+            [label]: value,
+          })),
+          nexusHeader:
+            Object.keys(nexusHeaderRecord).length > 0
+              ? nexusHeaderRecord
+              : undefined,
+        } as StartNexusOperationFormData);
+
+        toaster.push({
+          duration: 5000,
+          variant: 'success',
+          message: translate(
+            'standalone-nexus-operations.form-nexus-operation-started',
+          ),
+          link: routeForStandaloneNexusOperationDetails({
+            namespace,
             operationId,
-            idReusePolicy: idReusePolicy as
-              | NexusOperationIdReusePolicy
-              | undefined,
-            idConflictPolicy: idConflictPolicy as
-              | NexusOperationIdConflictPolicy
-              | undefined,
-            searchAttributes: searchAttributes.map(({ label, value }) => ({
-              [label]: value,
-            })),
-            nexusHeader:
-              Object.keys(nexusHeaderRecord).length > 0
-                ? nexusHeaderRecord
-                : undefined,
-          });
-
-          toaster.push({
-            duration: 5000,
-            variant: 'success',
-            message: translate(
-              'standalone-nexus-operations.form-nexus-operation-started',
-            ),
-            link: routeForStandaloneNexusOperationDetails({
-              namespace,
-              operationId,
-              runId,
-            }),
-          });
-          return { type: 'success' };
-        } catch (error) {
-          if (!isNetworkError(error) || error.statusCode !== 409) {
-            return { type: 'error' };
-          }
-
-          const { operationId } = form.data;
-
-          if (
-            idReusePolicy === 'NEXUS_OPERATION_ID_REUSE_POLICY_REJECT_DUPLICATE'
-          ) {
-            handleRejectDuplicate(operationId);
-          } else if (
-            idReusePolicy ===
-            'NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY'
-          ) {
-            handleAllowDuplicateFailedOnly(operationId);
-          } else if (
-            idConflictPolicy ===
-            'NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING'
-          ) {
-            handleUseExistingConflict(operationId, error);
-          }
-
-          await tick();
-          document.getElementById('operationId')?.focus();
+            runId: runId ?? '',
+          }),
+        });
+        return { type: 'success' };
+      } catch (error) {
+        if (!isNetworkError(error) || error.statusCode !== 409) {
+          return { type: 'error' };
         }
-      },
+
+        const { operationId } = form.data;
+
+        if (
+          idReusePolicy === 'NEXUS_OPERATION_ID_REUSE_POLICY_REJECT_DUPLICATE'
+        ) {
+          handleRejectDuplicate(operationId);
+        } else if (
+          idReusePolicy ===
+          'NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY'
+        ) {
+          handleAllowDuplicateFailedOnly(operationId);
+        } else if (
+          idConflictPolicy === 'NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING'
+        ) {
+          handleUseExistingConflict(operationId, error);
+        }
+
+        await tick();
+        document.getElementById('operationId')?.focus();
+      }
     },
-  );
+  });
 
   $effect(() => {
     const current = $form.operationId;

@@ -54,7 +54,9 @@
   {/snippet}
   {#snippet error({ error, retry })}
     {@render codeBlock(
-      isNetworkError(error) ? error.message : stringifyWithBigInt(error),
+      isNetworkError(error)
+        ? (error.message ?? '')
+        : (stringifyWithBigInt(error) ?? ''),
     )}
     <IconButton
       class="h-8 w-8"

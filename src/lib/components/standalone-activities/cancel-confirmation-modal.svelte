@@ -32,8 +32,8 @@
     try {
       await cancelActivityExecution(
         namespace,
-        activityExecutionInfo.activityId,
-        activityExecutionInfo.runId,
+        activityExecutionInfo.activityId ?? '',
+        activityExecutionInfo.runId ?? '',
         identity,
       );
       open = false;
@@ -44,7 +44,7 @@
       onConfirm();
     } catch (err: unknown) {
       error = isNetworkError(err)
-        ? err.message
+        ? (err.message ?? translate('common.unknown-error'))
         : translate('common.unknown-error');
     } finally {
       loading = false;

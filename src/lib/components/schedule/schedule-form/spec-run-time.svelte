@@ -34,8 +34,7 @@
       ...spec,
       calendar: {
         ...spec.calendar,
-        hour:
-          n !== undefined && Number.isFinite(n) ? [{ start: n }] : undefined,
+        hour: n !== undefined && Number.isFinite(n) ? [{ start: n }] : [],
       },
     };
   }
@@ -46,8 +45,7 @@
       ...spec,
       calendar: {
         ...spec.calendar,
-        minute:
-          n !== undefined && Number.isFinite(n) ? [{ start: n }] : undefined,
+        minute: n !== undefined && Number.isFinite(n) ? [{ start: n }] : [],
       },
     };
   }

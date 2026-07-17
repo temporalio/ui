@@ -55,7 +55,7 @@ export const connectionTooltip = (computeStatus?: ComputeStatus): string => {
   }
   const checked = translate('deployments.connection-tooltip-checked', {
     time: formatConnectionCheckTime(
-      computeStatus?.providerValidation?.lastCheckTime,
+      computeStatus?.providerValidation?.lastCheckTime ?? '',
     ),
   });
   if (state === 'connected') return checked;

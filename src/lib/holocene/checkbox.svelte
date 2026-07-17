@@ -12,6 +12,8 @@
   type T = $$Generic;
 
   interface $$Props extends HTMLInputAttributes {
+    id?: string;
+    disabled?: boolean;
     checked?: boolean;
     label?: string;
     labelHidden?: boolean;
@@ -32,8 +34,8 @@
   export let labelHidden = false;
   export let indeterminate = false;
   export let disabled = false;
-  export let value: T = undefined;
-  export let group: T[] = undefined;
+  export let value: T = undefined as T;
+  export let group: T[] | undefined = undefined;
   export let valid = true;
   export let error = '';
   export let required = false;

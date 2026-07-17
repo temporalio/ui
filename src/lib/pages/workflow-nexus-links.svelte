@@ -70,9 +70,9 @@
         <th>{translate('nexus.caller-namespace')}</th>
         <th>{translate('nexus.handler-event')}</th>
       </TableHeaderRow>
-      {#each inboundLinkEvents as event (event.id)}
-        {@const link = getInboundLinkForEvent(event)}
-        {@const linkView = toEventLinkView(link, { namespace })}
+      {#each inboundLinkEvents as event (event?.id)}
+        {@const link = event ? getInboundLinkForEvent(event) : undefined}
+        {@const linkView = toEventLinkView(link || undefined, { namespace })}
         <TableRow data-testid="worker-row">
           <td class="break-all text-left" data-testid="caller-event">
             {#if linkView.event}
@@ -93,10 +93,10 @@
                 namespace: namespace,
                 workflow: workflowId,
                 run,
-                eventId: event.id,
+                eventId: event?.id,
               })}
-              >{event.name}
-              ({event.id})
+              >{event?.name}
+              ({event?.id})
             </Link>
           </td>
         </TableRow>
@@ -131,8 +131,8 @@
                 namespace,
                 workflow: workflowId,
                 run,
-                eventId: scheduledEvent.id,
-              })}>{scheduledEvent.id}</Link
+                eventId: scheduledEvent?.id,
+              })}>{scheduledEvent?.id}</Link
             >
           </td>
           <td class="break-all text-left" data-testid="link-endpoint">

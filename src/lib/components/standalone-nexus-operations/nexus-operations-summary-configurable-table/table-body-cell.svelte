@@ -57,22 +57,22 @@
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="OperationId"
-        value={operation.operationId}
+        value={operation.operationId ?? ''}
         href={routeForStandaloneNexusOperationDetails({
           namespace,
-          operationId: operation.operationId,
-          runId: operation.runId,
+          operationId: operation.operationId ?? '',
+          runId: operation.runId ?? '',
         })}
       />
     {:else if label === 'Run ID'}
       <FilterableTableCell
         {filterOrCopyButtonsVisible}
         attribute="RunId"
-        value={operation.runId}
+        value={operation.runId ?? ''}
         href={routeForStandaloneNexusOperationDetails({
           namespace,
-          operationId: operation.operationId,
-          runId: operation.runId,
+          operationId: operation.operationId ?? '',
+          runId: operation.runId ?? '',
         })}
       />
     {:else if label === 'Endpoint'}

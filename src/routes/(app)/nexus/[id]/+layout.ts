@@ -22,7 +22,9 @@ export const load = async ({ params, fetch, parent }) => {
     } catch (e) {
       console.error('Error decoding Nexus Endpoint description:', e);
     }
-    endpoint.spec.descriptionString = description;
+    if (endpoint.spec) {
+      endpoint.spec.descriptionString = description;
+    }
     return {
       endpoint,
     };

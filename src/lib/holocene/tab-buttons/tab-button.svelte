@@ -39,7 +39,7 @@
 
   let className = '';
   export { className as class };
-  export let icon: IconName = null;
+  export let icon: IconName | undefined = undefined;
   export let group = getAppContext('group');
   export let href = '';
   export let base = href;

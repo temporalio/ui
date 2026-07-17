@@ -15,6 +15,9 @@
   }
 
   let { parent, parentNamespaceName, namespace }: Props = $props();
+
+  const workflowId = $derived(parent.workflowId ?? '');
+  const runId = $derived(parent.runId ?? '');
 </script>
 
 <Table class="w-full">
@@ -30,14 +33,14 @@
       <Link
         href={routeForWorkflow({
           namespace: parentNamespaceName ?? namespace,
-          workflow: parent.workflowId,
-          run: parent.runId,
+          workflow: workflowId,
+          run: runId,
         })}
       >
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={parent.workflowId}
+          content={workflowId}
           visible
         />
       </Link>
@@ -46,14 +49,14 @@
       <Link
         href={routeForWorkflow({
           namespace: parentNamespaceName ?? namespace,
-          workflow: parent.workflowId,
-          run: parent.runId,
+          workflow: workflowId,
+          run: runId,
         })}
       >
         <Copyable
           copyIconTitle={translate('common.copy-icon-title')}
           copySuccessIconTitle={translate('common.copy-success-icon-title')}
-          content={parent.runId}
+          content={runId}
           visible
         />
       </Link>

@@ -20,7 +20,7 @@
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   const workflow = $derived($workflowRun.workflow);
-  const pendingActivities = $derived(workflow?.pendingActivities);
+  const pendingActivities = $derived(workflow?.pendingActivities ?? []);
 
   const href = $derived(
     routeForPendingActivities({
@@ -31,7 +31,7 @@
   );
 
   const canceled = $derived(
-    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status),
+    ['Terminated', 'TimedOut', 'Canceled'].includes(workflow?.status ?? ''),
   );
 </script>
 
@@ -54,7 +54,7 @@
       </div>
       <div>
         {#each pendingActivities as { id, ...pendingActivity } (id)}
-          {@const failed = pendingActivity.attempt > 1}
+          {@const failed = (pendingActivity.attempt ?? 0) > 1}
           <div class="pending-activity-row-container">
             <h3 class="w-full self-start text-sm text-secondary">
               {pendingActivity.activityId}
@@ -93,8 +93,8 @@
                     </h4>
                     <Badge type={failed ? 'danger' : undefined}>
                       {formatAttemptsLeft(
-                        pendingActivity.maximumAttempts,
-                        pendingActivity.attempt,
+                        pendingActivity.maximumAttempts ?? null,
+                        pendingActivity.attempt ?? 0,
                       )}
                     </Badge>
                   </div>
@@ -119,12 +119,12 @@
                       {translate('workflows.expiration')}
                     </h4>
                     {formatRetryExpiration(
-                      pendingActivity.maximumAttempts,
+                      pendingActivity.maximumAttempts ?? 0,
                       formatDuration(
                         getDuration({
                           start: Date.now(),
                           end: pendingActivity.expirationTime,
-                        }),
+                        }) ?? '',
                       ),
                     )}
                   </div>

@@ -69,7 +69,7 @@
     placeholder = '',
     disabled = false,
     loading = false,
-    leadingIcon = null,
+    leadingIcon = undefined,
     onChange = () => {},
     menuButtonClass = undefined,
     menuClass = undefined,
@@ -89,7 +89,7 @@
   const labelCtx = writable<string>(value?.toString());
   const open = writable<boolean>(false);
 
-  $effect(() => updateContext(value));
+  $effect(() => updateContext(value as T));
 
   function updateContext(v: T) {
     $valueCtx = v;
@@ -121,7 +121,7 @@
 
   onMount(() => {
     // After all the Options are mounted use context to read the label assocaited with the value
-    $labelCtx = getLabelFromOptions(value);
+    $labelCtx = getLabelFromOptions(value as T);
   });
 
   const errorId = $derived(`${id}-error`);

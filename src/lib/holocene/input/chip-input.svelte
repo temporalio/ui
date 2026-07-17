@@ -72,7 +72,7 @@
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
     if (maxLength && chips.length >= maxLength) return;
-    const clipboardContents = e.clipboardData.getData('text/plain');
+    const clipboardContents = e.clipboardData?.getData('text/plain') ?? '';
     let newValues = clipboardContents
       .split(',')
       .map((content) => content.trim());

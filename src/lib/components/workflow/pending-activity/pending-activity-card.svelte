@@ -29,7 +29,9 @@
     activity,
     totalPending,
   }: { activity: PendingActivity; totalPending?: number } = $props();
-  const failed = $derived(activity.attempt > 1 && !!activity.lastFailure);
+  const failed = $derived(
+    (activity.attempt ?? 0) > 1 && !!activity.lastFailure,
+  );
   const isRunning = $derived($workflowRun?.workflow?.isRunning);
   const isPaused = $derived($workflowRun?.workflow?.isPaused);
 
@@ -93,12 +95,12 @@
         {@render detail(
           translate('workflows.retry-expiration'),
           formatRetryExpiration(
-            activity.maximumAttempts,
+            activity.maximumAttempts ?? 0,
             formatDuration(
               getDuration({
                 start: Date.now(),
                 end: activity.expirationTime,
-              }),
+              }) ?? '',
             ),
           ),
         )}
@@ -138,7 +140,7 @@
     </div>
     <div class="flex w-full flex-col gap-4 md:flex-1 xl:w-1/2">
       {#if failed}
-        {#if totalPending > 20}
+        {#if (totalPending ?? 0) > 20}
           {@render failuresAccordion()}
         {:else}
           {@render failuresCodeBlock()}
@@ -172,11 +174,13 @@
       {translate('workflows.heartbeat-details')}
     </p>
     {#key activity.attempt}
-      <PayloadCodeBlock
-        value={activity.heartbeatDetails}
-        label={translate('workflows.heartbeat-details')}
-        maxHeight={384}
-      />
+      {#if activity.heartbeatDetails}
+        <PayloadCodeBlock
+          value={activity.heartbeatDetails}
+          label={translate('workflows.heartbeat-details')}
+          maxHeight={384}
+        />
+      {/if}
     {/key}
   </div>
 {/snippet}
@@ -228,7 +232,7 @@
   </Accordion>
 {/snippet}
 
-{#snippet nextRetry(timeDifference)}
+{#snippet nextRetry(timeDifference: string)}
   <div class="flex items-start gap-4">
     <p class="min-w-56 text-sm text-secondary/80">
       {translate('workflows.next-retry')}
@@ -245,12 +249,12 @@
     <Badge type={failed ? 'danger' : 'default'}>
       <Icon class="mr-1 {failed && 'font-bold text-red-400'}" name="retry" />
       {activity.attempt ?? 0} of {formatMaximumAttempts(
-        activity.maximumAttempts,
+        activity.maximumAttempts ?? null,
       )}
     </Badge>
     {#if activity.maximumAttempts}
       <p class="ml-1 text-sm text-secondary">
-        {formatAttemptsLeft(activity.maximumAttempts, activity.attempt)} remaining
+        {formatAttemptsLeft(activity.maximumAttempts, activity.attempt ?? 0)} remaining
       </p>
     {/if}
   </div>

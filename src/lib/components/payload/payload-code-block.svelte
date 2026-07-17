@@ -3,7 +3,7 @@
     workflowId?: string;
     runId?: string;
     scheduleId?: string;
-    type: 'input' | 'result' | undefined;
+    type: string | undefined;
     eventId?: string | undefined;
   };
 </script>
@@ -77,7 +77,7 @@
     let data: Payloads | undefined = undefined;
     try {
       data = await downloadExternalPayloadWithCodec(payload);
-      const parsed = parseRawPayloadToJSON(data.payloads[0]);
+      const parsed = parseRawPayloadToJSON(data.payloads![0]);
       const content = stringifyWithBigInt(parsed, undefined, 2);
       const a = document.createElement('a');
       const file = new Blob([content], { type: 'json/plain' });

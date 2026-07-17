@@ -30,7 +30,12 @@ export const reducePollerTypes = ({
       const existing = pollerMap.get(poller.identity);
       if (existing) {
         existing.taskQueueTypes.push(type);
-        if (poller?.lastAccessTime > existing?.poller?.lastAccessTime) {
+        const nextAccessTime = poller?.lastAccessTime;
+        const existingAccessTime = existing?.poller?.lastAccessTime;
+        if (
+          nextAccessTime &&
+          (!existingAccessTime || nextAccessTime > existingAccessTime)
+        ) {
           existing.poller = poller;
         }
       } else {

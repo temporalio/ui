@@ -26,10 +26,10 @@
     label,
     id,
     href,
-    leadingIcon = null,
-    trailingIcon = null,
-    description = null,
-    active = null,
+    leadingIcon = undefined,
+    trailingIcon = undefined,
+    description = undefined,
+    active = undefined,
     disabled = false,
     class: className = '',
     'data-testid': dataTestId,
@@ -40,7 +40,7 @@
 
   const context = getContext<VerticalNavContext>(VERTICAL_NAV);
   const activeItem = $derived(context?.activeItem);
-  const isActive = $derived(active !== null ? active : $activeItem === id);
+  const isActive = $derived(active != null ? active : $activeItem === id);
 
   const handleClick = () => {
     if (disabled) return;

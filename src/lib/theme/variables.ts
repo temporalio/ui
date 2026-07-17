@@ -220,7 +220,7 @@ export const variables = {
   },
 } as const satisfies ColorVariables;
 
-for (const key in variables) {
+for (const key of Object.keys(variables) as Variable[]) {
   const value = variables[key];
   light[key] = toColor(value.light);
   dark[key] = toColor(value.dark);
