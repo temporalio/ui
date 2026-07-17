@@ -77,14 +77,14 @@
   </div>
   <DetailList
     aria-label="activity execution details"
-    rowCount={activityExecutionInfo.startDelay ? 4 : 3}
+    rowCount={activityExecutionInfo.executionTime ? 4 : 3}
   >
     <DetailListColumn>
       <DetailListLabel>{translate('common.start')}</DetailListLabel>
       <DetailListTimestampValue
         timestamp={activityExecutionInfo.scheduleTime}
       />
-      {#if activityExecutionInfo.startDelay}
+      {#if activityExecutionInfo.executionTime}
         <DetailListLabel
           >{translate('standalone-activities.execution-time')}</DetailListLabel
         >

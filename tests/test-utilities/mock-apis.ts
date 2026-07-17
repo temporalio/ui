@@ -44,6 +44,7 @@ export {
   mockNamespaceApi,
   mockNamespaceWithPauseCapability,
   mockNamespaceWithNoWorkerHeartbeats,
+  mockNamespaceWithoutStandaloneActivityStartDelay,
   NAMESPACE_API,
 } from './mocks/namespace';
 export { mockNamespacesApi, NAMESPACES_API } from './mocks/namespaces';

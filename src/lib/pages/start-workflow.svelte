@@ -15,6 +15,7 @@
   import DurationInput, {
     DAYS,
     DEFAULT_UNITS,
+    SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -344,6 +345,7 @@
           inputmode="numeric"
           bind:value={workflowStartDelay}
           units={[...DEFAULT_UNITS, DAYS]}
+          initialUnit={SECONDS.label}
           min={0}
           class="max-w-80"
         />

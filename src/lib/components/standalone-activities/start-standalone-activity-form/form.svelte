@@ -9,7 +9,6 @@
 
   import { page } from '$app/state';
 
-  import IsTemporalServerVersionGuard from '$lib/components/is-temporal-server-version-guard.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Card from '$lib/holocene/card.svelte';
@@ -17,6 +16,7 @@
     DAYS,
     DEFAULT_UNITS,
     parseDuration,
+    SECONDS,
   } from '$lib/holocene/duration-input/duration-input.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Label from '$lib/holocene/label.svelte';
@@ -58,6 +58,7 @@
   import RandomUuidButton from '../../random-uuid-button.svelte';
   import RetryPolicyInput from '../../retry-policy-input.svelte';
   import AddSearchAttributes from '../../workflow/add-search-attributes.svelte';
+  import StartDelayGuard from '../start-delay-guard.svelte';
 
   interface Props {
     namespace: string;
@@ -362,15 +363,16 @@
       </p>
     {/if}
 
-    <IsTemporalServerVersionGuard minimumVersion="1.31.2">
+    <StartDelayGuard namespace={page.data.namespace}>
       <DurationInput
         id="startDelay"
         label={translate('standalone-activities.form-start-delay-label')}
         bind:value={$form.startDelay}
+        initialUnit={SECONDS.label}
         units={[...DEFAULT_UNITS, DAYS]}
         hintText={translate('standalone-activities.form-start-delay-hint')}
       />
-    </IsTemporalServerVersionGuard>
+    </StartDelayGuard>
   </Card>
 
   {#if advancedOptionsVisible}
