@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { mapValues } from 'es-toolkit';
+
   import { page } from '$app/state';
 
   import WorkersTable from '$lib/components/workers/workers-table/task-queue-workers-table.svelte';
@@ -22,14 +24,10 @@
   const decodedSearchAttributes = $derived.by(() => {
     if (isEmptyObject(searchAttributes)) return {};
 
-    const decoded = Object.entries(
+    const decoded = mapValues(
       searchAttributes?.indexedFields ?? {},
-    ).reduce((searchAttributes, [searchAttributeName, payload]) => {
-      return {
-        ...searchAttributes,
-        [searchAttributeName]: parseRawPayloadToJSON(payload),
-      };
-    }, {});
+      (payload) => parseRawPayloadToJSON(payload),
+    ) as Record<string, string>;
     return decoded;
   });
 </script>

@@ -5,7 +5,7 @@
 
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { groupEvents } from '$lib/models/event-groups';
+  import { buildGroupIndex, groupEvents } from '$lib/models/event-groups';
   import { isEvent } from '$lib/models/event-history';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { eventFilterSort } from '$lib/stores/event-view';
@@ -61,6 +61,7 @@
       ? ascendingGroups
       : [...ascendingGroups].reverse(),
   );
+  const groupIndex = $derived(buildGroupIndex(groups));
 
   const initialEvent = $derived(
     $fullEventHistory.find(
@@ -129,7 +130,7 @@
           {event}
           {index}
           expanded={event.id === initialEvent?.id}
-          group={groups.find((g) => isEvent(event) && g.eventIds.has(event.id))}
+          group={isEvent(event) ? groupIndex.get(event.id) : undefined}
           initialItem={$fullEventHistory[0]}
         />
       {/each}

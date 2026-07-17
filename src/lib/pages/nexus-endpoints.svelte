@@ -1,5 +1,5 @@
 <script lang="ts">
-  import debounce from 'just-debounce';
+  import { debounce } from 'es-toolkit';
   import type { Snippet } from 'svelte';
 
   import { page } from '$app/state';

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
 
+  import DownloadJsonButton from '$lib/components/download-json-button.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PaginatedTable from '$lib/holocene/table/paginated-table/api-paginated.svelte';
@@ -48,13 +49,13 @@
     </caption>
     <TableHeaderRow slot="headers">
       <th></th>
-      {#each columns as column}
+      {#each columns as column, i (`${column.label}:${i}`)}
         <TableHeaderCell {column} />
       {/each}
     </TableHeaderRow>
-    {#each visibleItems as activity}
+    {#each visibleItems as activity (`${activity.activityId}:${activity.runId}`)}
       <TableRow {activity}>
-        {#each columns as column}
+        {#each columns as column, i (`${column.label}:${i}`)}
           <TableBodyCell {activity} {column} />
         {/each}
       </TableRow>
@@ -62,7 +63,8 @@
     <svelte:fragment slot="empty">
       <TableEmptyState />
     </svelte:fragment>
-    <svelte:fragment slot="actions-end-additional">
+    <svelte:fragment slot="actions-end-additional" let:visibleItems let:page>
+      <DownloadJsonButton items={visibleItems} {page} filePrefix="activities" />
       <Tooltip text={translate('common.configure-columns')} top>
         <Button
           on:click={onClickConfigure}

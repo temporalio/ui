@@ -52,41 +52,41 @@ const completedEvent = {
 
 describe('createEventGroup', () => {
   it('should grab the name of the groupTaskScheduledEvent', () => {
-    const group = createEventGroup(scheduledEvent);
+    const group = createEventGroup(scheduledEvent)!;
 
     expect(group.name).toBe('CompletedActivity');
   });
 
   it('should grab the id of the groupTaskScheduledEvent', () => {
-    const group = createEventGroup(scheduledEvent);
+    const group = createEventGroup(scheduledEvent)!;
 
     expect(group.id).toBe('5');
   });
 
   it('should store the groupTaskScheduled', () => {
-    const group = createEventGroup(scheduledEvent);
+    const group = createEventGroup(scheduledEvent)!;
 
-    expect(group.events.get(scheduledEvent.id)).toBe(scheduledEvent);
+    expect(group.eventList[0]).toBe(scheduledEvent);
   });
 
   it('should be able to add a started event', () => {
-    const group = createEventGroup(scheduledEvent);
-    group.events.set(completedEvent.eventType, completedEvent);
+    const group = createEventGroup(scheduledEvent)!;
+    group.eventList.push(completedEvent);
 
-    expect(group.events.size).toBe(2);
-    expect(group.events.get('ActivityTaskCompleted')).toBe(completedEvent);
+    expect(group.eventList.length).toBe(2);
+    expect(group.eventList[1]).toBe(completedEvent);
   });
 
   it('should have the event time of the last event', () => {
-    const group = createEventGroup(scheduledEvent);
-    group.events.set(completedEvent.eventType, completedEvent);
+    const group = createEventGroup(scheduledEvent)!;
+    group.eventList.push(completedEvent);
 
     expect(group.eventTime).toBe(completedEvent.eventTime);
   });
 
   it('should have the attributes of the last event', () => {
-    const group = createEventGroup(scheduledEvent);
-    group.events.set(completedEvent.eventType, completedEvent);
+    const group = createEventGroup(scheduledEvent)!;
+    group.eventList.push(completedEvent);
 
     expect(group.attributes).toBe(completedEvent.attributes);
   });
@@ -98,7 +98,7 @@ describe('createEventGroup', () => {
       startChildWorkflowExecutionInitiatedEventAttributes: {},
     } as unknown as WorkflowEvent;
 
-    expect(createEventGroup(event).id).toBe(event.id);
+    expect(createEventGroup(event)!.id).toBe(event.id);
   });
 
   it('should create a group from a timerStartedEvent', () => {
@@ -108,7 +108,7 @@ describe('createEventGroup', () => {
       timerStartedEventAttributes: {},
     } as unknown as WorkflowEvent;
 
-    expect(createEventGroup(event).id).toBe(event.id);
+    expect(createEventGroup(event)!.id).toBe(event.id);
   });
 
   it('should create a group from a signalExternalWorkflowExecutionInitiatedEvent', () => {
@@ -118,7 +118,7 @@ describe('createEventGroup', () => {
       signalExternalWorkflowExecutionInitiatedEventAttributes: {},
     } as unknown as WorkflowEvent;
 
-    expect(createEventGroup(event).id).toBe(event.id);
+    expect(createEventGroup(event)!.id).toBe(event.id);
   });
 
   it('should create a group from a workflowExecutionSignaledEvent', () => {
@@ -128,7 +128,7 @@ describe('createEventGroup', () => {
       workflowExecutionSignaledEventAttributes: {},
     } as unknown as WorkflowEvent;
 
-    expect(createEventGroup(event).id).toBe(event.id);
+    expect(createEventGroup(event)!.id).toBe(event.id);
   });
 
   it('should create a group from a markerRecordedEvent', () => {
@@ -138,7 +138,7 @@ describe('createEventGroup', () => {
       markerRecordedEventAttributes: {},
     } as unknown as WorkflowEvent;
 
-    expect(createEventGroup(event).id).toBe(event.id);
+    expect(createEventGroup(event)!.id).toBe(event.id);
   });
 
   it('should ignore an event that should not create an event group', () => {

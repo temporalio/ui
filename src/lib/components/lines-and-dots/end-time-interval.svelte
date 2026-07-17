@@ -9,7 +9,7 @@
   export let workflow: WorkflowExecution;
   export let startTime: string | Timestamp;
 
-  let currentTime = Date.now();
+  export let currentTime = Date.now();
 
   const rightNow = () => {
     currentTime = Date.now();

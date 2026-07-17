@@ -1,7 +1,9 @@
 import { sanitize } from 'hast-util-sanitize';
 import { toHtml } from 'hast-util-to-html';
 import { fromMarkdown } from 'mdast-util-from-markdown';
+import { gfmTableFromMarkdown } from 'mdast-util-gfm-table';
 import { toHast } from 'mdast-util-to-hast';
+import { gfmTable } from 'micromark-extension-gfm-table';
 import { remove } from 'unist-util-remove';
 import { visit } from 'unist-util-visit';
 
@@ -11,7 +13,10 @@ import { visit } from 'unist-util-visit';
  * @returns The rendered HTML.
  */
 export const process = async (markdown: string) => {
-  const ast = fromMarkdown(markdown);
+  const ast = fromMarkdown(markdown, {
+    extensions: [gfmTable()],
+    mdastExtensions: [gfmTableFromMarkdown()],
+  });
 
   remove(ast, 'image');
   remove(ast, 'html');

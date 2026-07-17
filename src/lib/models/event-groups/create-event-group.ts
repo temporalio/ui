@@ -1,4 +1,4 @@
-import type { Payload } from '$lib/types';
+import type { EventLink, Payload } from '$lib/types';
 import type {
   ActivityTaskScheduledEvent,
   CommonHistoryEvent,
@@ -7,6 +7,7 @@ import type {
   SignalExternalWorkflowExecutionInitiatedEvent,
   StartChildWorkflowExecutionInitiatedEvent,
   TimerStartedEvent,
+  WorkflowEvent,
   WorkflowExecutionSignaledEvent,
   WorkflowExecutionUpdateAcceptedEvent,
   WorkflowTaskScheduledEvent,
@@ -36,7 +37,6 @@ import {
   getEventGroupLabel,
   getEventGroupName,
 } from './get-group-name';
-import { getLastEvent } from './get-last-event';
 
 type StartingEvents = {
   Activity: ActivityTaskScheduledEvent;
@@ -58,22 +58,19 @@ const createGroupFor = <K extends keyof StartingEvents>(
   const name = getEventGroupName(event);
   const label = getEventGroupLabel(event);
   const displayName = getEventGroupDisplayName(event);
-
   const { timestamp, category, classification } = event;
 
-  const groupEvents: EventGroup['events'] = new Map();
-  const groupEventIds: EventGroup['eventIds'] = new Set();
-
-  groupEvents.set(event.id, event);
-  groupEventIds.add(event.id);
+  // Single flat array — no Map, no Set. Groups have 1–5 events.
+  const eventList: EventGroup['eventList'] = [event as never];
+  // eventList[0] is the same object as event, typed as WorkflowEvent at runtime.
+  const first = eventList[0];
 
   return {
     id,
     name,
     label,
     displayName,
-    events: groupEvents,
-    eventIds: groupEventIds,
+    eventList,
     initialEvent: event,
     timestamp,
     category: isLocalActivityMarkerEvent(event) ? 'local-activity' : category,
@@ -82,53 +79,51 @@ const createGroupFor = <K extends keyof StartingEvents>(
     pendingActivity: undefined,
     pendingNexusOperation: undefined,
     userMetadata: event?.userMetadata,
+    // Eager fields — zero-cost reads, updated by addEventToGroup on each push.
+    isFailureOrTimedOut: eventIsFailureOrTimedOut(first),
+    isCanceled: eventIsCanceled(first),
+    isTerminated: eventIsTerminated(first),
+    billableActions: first.billableActions ?? 0,
+    links: first.links ? [...first.links] : [],
     get eventTime() {
-      return this.lastEvent?.eventTime;
+      return eventList[eventList.length - 1]?.eventTime;
     },
     get attributes() {
-      return getLastEvent(this)?.attributes;
-    },
-    get eventList() {
-      return Array.from(this.events, ([_key, value]) => value);
-    },
-    get links() {
-      return Array.from(this.events, ([_key, value]) => value.links).flat();
+      return eventList[eventList.length - 1]?.attributes;
     },
     get lastEvent() {
-      return getLastEvent(this);
+      return eventList[eventList.length - 1];
     },
     get finalClassification() {
-      return getLastEvent(this).classification;
+      return eventList[eventList.length - 1].classification;
     },
     get isPending() {
       return (
         !!this.pendingActivity ||
         !!this.pendingNexusOperation ||
-        (isTimerStartedEvent(this.initialEvent) &&
-          this.eventList.length === 1) ||
+        (isTimerStartedEvent(this.initialEvent) && eventList.length === 1) ||
         (isStartChildWorkflowExecutionInitiatedEvent(this.initialEvent) &&
-          this.eventList.length === 2)
-      );
-    },
-    get isFailureOrTimedOut() {
-      return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
-    },
-    get isCanceled() {
-      return Boolean(this.eventList.find(eventIsCanceled));
-    },
-    get isTerminated() {
-      return Boolean(this.eventList.find(eventIsTerminated));
-    },
-    get billableActions() {
-      return this.eventList.reduce(
-        (acc, event) => event.billableActions + acc,
-        0,
+          eventList.length === 2)
       );
     },
   };
 };
 
-export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
+// Called by addToExistingGroup after pushing a new event into a group's eventList.
+// Updates all eagerly-maintained fields in one place so getters stay zero-cost.
+export const addEventToGroup = (group: EventGroup, event: WorkflowEvent) => {
+  if (eventIsFailureOrTimedOut(event)) group.isFailureOrTimedOut = true;
+  if (eventIsCanceled(event)) group.isCanceled = true;
+  if (eventIsTerminated(event)) group.isTerminated = true;
+  group.billableActions += event.billableActions ?? 0;
+  if (event.links?.length) {
+    for (const l of event.links) group.links.push(l);
+  }
+};
+
+export const createEventGroup = (
+  event: CommonHistoryEvent,
+): EventGroup | undefined => {
   if (isActivityTaskScheduledEvent(event))
     return createGroupFor<'Activity'>(event);
 
@@ -159,7 +154,7 @@ export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
 
 export const createWorkflowTaskGroup = (
   event: CommonHistoryEvent,
-): EventGroup => {
+): EventGroup | undefined => {
   if (isWorkflowTaskScheduledEvent(event))
     return createGroupFor<'WorkflowTask'>(event);
 };

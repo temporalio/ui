@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { omit } from 'es-toolkit';
   import type { Snippet } from 'svelte';
 
   import { page } from '$app/state';
@@ -22,7 +23,6 @@
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
   import { formatDuration, getDuration } from '$lib/utilities/format-time';
-  import { omit } from '$lib/utilities/omit';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   let {
@@ -190,7 +190,7 @@
         </p>
         {#key activity.attempt}
           <PayloadCodeBlock
-            value={omit(activity.lastFailure, 'stackTrace')}
+            value={omit(activity.lastFailure, ['stackTrace'])}
             label={translate('workflows.last-failure')}
             maxHeight={384}
           />

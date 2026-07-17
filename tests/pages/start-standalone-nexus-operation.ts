@@ -10,11 +10,9 @@ export class StartStandaloneNexusOperationPage {
   readonly scheduleToCloseTimeoutInput: Locator;
   readonly submitButton: Locator;
   readonly editPoliciesButton: Locator;
-  readonly updatePoliciesButton: Locator;
   readonly endpointInputError: Locator;
   readonly serviceInputError: Locator;
   readonly operationNameInputError: Locator;
-  readonly timeoutError: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -30,9 +28,6 @@ export class StartStandaloneNexusOperationPage {
       'start-standalone-nexus-operation-submit-button',
     );
     this.editPoliciesButton = page.getByText('Edit Operation Policies');
-    this.updatePoliciesButton = page.getByRole('button', {
-      name: 'Update Policies',
-    });
     this.endpointInputError = page.getByText(
       'Target endpoint name is required.',
     );
@@ -41,9 +36,6 @@ export class StartStandaloneNexusOperationPage {
     );
     this.operationNameInputError = page.getByText(
       "Operation Name from the handler Namespace's services is required.",
-    );
-    this.timeoutError = page.getByText(
-      'At least one timeout (Start To Close or Schedule To Close) is required.',
     );
   }
 

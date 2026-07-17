@@ -8,9 +8,14 @@
   interface Props {
     createHref: string;
     error?: string;
+    canCreateServerlessDeployment?: boolean;
   }
 
-  let { createHref, error = '' }: Props = $props();
+  let {
+    createHref,
+    error = '',
+    canCreateServerlessDeployment = true,
+  }: Props = $props();
 </script>
 
 <div class="flex flex-col items-center gap-4 py-16">
@@ -24,11 +29,13 @@
     </p>
   </div>
   <div class="flex flex-wrap items-center justify-center gap-4">
-    <CapabilityGuard capability="serverScaledDeployments">
-      <Button variant="secondary" href={createHref}>
-        {translate('deployments.create-serverless-deployment')}
-      </Button>
-    </CapabilityGuard>
+    {#if canCreateServerlessDeployment}
+      <CapabilityGuard capability="serverScaledDeployments">
+        <Button variant="secondary" href={createHref}>
+          {translate('deployments.create-serverless-deployment')}
+        </Button>
+      </CapabilityGuard>
+    {/if}
     <Button
       variant="ghost"
       href="https://docs.temporal.io/worker-deployments"

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import kebabCase from 'kebab-case';
+  import { kebabCase } from 'es-toolkit';
 
   import Button from '$lib/holocene/button.svelte';
   import Input from '$lib/holocene/input/input.svelte';

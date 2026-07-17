@@ -1,4 +1,4 @@
-import debounce from 'just-debounce';
+import { debounce } from 'es-toolkit';
 
 import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
 import { currentPageKey } from '$lib/stores/pagination';

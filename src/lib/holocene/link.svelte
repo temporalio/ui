@@ -67,12 +67,7 @@
 >
   {#if effectiveLeading}
     <Icon class="mt-0.5" name={effectiveLeading} />
-  {/if}
-  {#if text}
-    {text}
-  {/if}
-  <slot />
-  {#if trailingIcon}
+  {/if}{#if text}{text}{/if}<slot />{#if trailingIcon}
     <Icon class="mt-0.5" name={trailingIcon} />
   {/if}
 </a>
