@@ -11,8 +11,8 @@
     title: 'Workflow Status',
     component: WorkflowStatus,
     args: {
-      count: undefined,
-      newCount: undefined,
+      count: undefined as number | undefined,
+      newCount: undefined as number | undefined,
       big: false,
       loading: false,
       delay: 0,

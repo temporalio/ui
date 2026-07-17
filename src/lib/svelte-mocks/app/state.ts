@@ -36,7 +36,7 @@ const settings: Settings = {
 };
 
 export const page = {
-  error: null,
+  error: null as App.Error | null,
   params: {
     namespace: 'default',
   },

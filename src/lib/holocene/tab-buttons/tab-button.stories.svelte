@@ -1,7 +1,7 @@
 <svelte:options runes />
 
 <script lang="ts" module>
-  import type { Meta } from '@storybook/svelte';
+  import type { Meta, StoryContext } from '@storybook/svelte';
   import { expect, userEvent, within } from '@storybook/test';
 
   import { iconNames } from '$lib/holocene/icon';
@@ -35,7 +35,13 @@
     action('select')(index);
   };
 
-  const play: Story['play'] = async ({ canvasElement, step }) => {
+  const play = async ({
+    canvasElement,
+    step,
+  }: {
+    canvasElement: HTMLElement;
+    step: StoryContext['step'];
+  }) => {
     const canvas = within(canvasElement);
 
     selected.set(0);

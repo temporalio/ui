@@ -5,7 +5,6 @@ import type {
   NexusOperationIdConflictPolicy,
   NexusOperationIdReusePolicy,
   StartNexusOperationExecutionRequest,
-  UserMetadata,
 } from '.';
 import type { WorkflowSearchAttributes } from './workflows';
 

@@ -16,7 +16,7 @@
 
   export let id: string = crypto.randomUUID();
   export let open = false;
-  export let onToggle = undefined;
+  export let onToggle: (() => Promise<void>) | undefined = undefined;
   export let icon: IconName | undefined = undefined;
 
   const toggleAccordion = async () => {

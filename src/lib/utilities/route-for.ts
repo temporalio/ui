@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 
 import { BROWSER } from 'esm-env';
 
-import { base, resolve } from '$app/paths';
+import { resolve } from '$app/paths';
 import type { ResolvedPathname } from '$app/types';
 
 import {
