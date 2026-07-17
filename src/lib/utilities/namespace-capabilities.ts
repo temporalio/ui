@@ -6,7 +6,7 @@ type NamespaceCapabilityState = 'unsupported' | 'disabled' | 'enabled';
 
 export const namespaceCapabilityState = (
   capabilities: NamespaceCapabilities | undefined,
-  capabilitiy: keyof NamespaceCapabilities,
+  capabilitiy: keyof NonNullable<NamespaceCapabilities>,
 ): NamespaceCapabilityState => {
   if (!capabilities) return 'unsupported';
 

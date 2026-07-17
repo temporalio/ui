@@ -19,7 +19,7 @@
       isValid: true,
       rows: 5,
       spellcheck: false,
-      maxLength: undefined,
+      maxLength: undefined as number | undefined,
       labelHidden: false,
     },
     argTypes: {

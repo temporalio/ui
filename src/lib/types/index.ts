@@ -18,8 +18,9 @@ export type Capabilities =
     serverScaledProviderCloudRun?: boolean | null;
   };
 
-export type NamespaceCapabilities =
-  DescribeNamespaceResponse['namespaceInfo']['capabilities'];
+export type NamespaceCapabilities = NonNullable<
+  DescribeNamespaceResponse['namespaceInfo']
+>['capabilities'];
 export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
 export type GetSearchAttributesResponse =

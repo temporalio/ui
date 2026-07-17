@@ -49,7 +49,7 @@
 </script>
 
 <script lang="ts">
-  import { action } from '@storybook/addon-actions';
+  import { action as logAction } from '@storybook/addon-actions';
   import { Story, Template } from '@storybook/addon-svelte-csf';
 
   import Button from '../button.svelte';
@@ -61,7 +61,7 @@
   <Combobox
     id={context.id}
     data-testid={context.id}
-    onchange={action('change')}
+    onchange={logAction('change')}
     {...args}
   />
 </Template>
@@ -258,7 +258,7 @@
     <Combobox
       id={context.id}
       data-testid={context.id}
-      onchange={action('change')}
+      onchange={logAction('change')}
       leadingIcon="search"
       options={[
         'English',
@@ -275,14 +275,15 @@
       ]}
       {...args}
     >
-      <Button
-        on:click={() => {}}
-        slot="action"
-        variant="ghost"
-        size="xs"
-        leadingIcon="close"
-        aria-label="clear"
-      />
+      {#snippet action()}
+        <Button
+          on:click={() => {}}
+          variant="ghost"
+          size="xs"
+          leadingIcon="close"
+          aria-label="clear"
+        />
+      {/snippet}
     </Combobox>
   </div>
 </Story>
