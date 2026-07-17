@@ -162,7 +162,7 @@ export const getEventCategory = (eventType: EventType): EventTypeCategory => {
 
 export const isCategoryType = (value: string): value is EventTypeCategory => {
   for (const category in CATEGORIES) {
-    if (value === CATEGORIES[category]) return true;
+    if (value === CATEGORIES[category as keyof typeof CATEGORIES]) return true;
   }
   return false;
 };

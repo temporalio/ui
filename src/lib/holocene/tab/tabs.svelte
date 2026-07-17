@@ -20,8 +20,8 @@
 
   const tabs: string[] = [];
   const panels: string[] = [];
-  const activeTab = writable<string>(null);
-  const activePanel = writable<string>(null);
+  const activeTab = writable<string>('');
+  const activePanel = writable<string>('');
 
   setContext<TabContext>(TABS, {
     registerTab: (tab: string) => {

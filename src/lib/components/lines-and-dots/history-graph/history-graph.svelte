@@ -71,14 +71,16 @@
     >
       {#each history as event, index}
         {@const group = getGroupForEventOrPendingEvent(allGroups, event)}
-        <HistoryGraphRowVisual
-          {event}
-          {group}
-          groups={allGroups}
-          {history}
-          canvasWidth={visualWidth}
-          {index}
-        />
+        {#if group}
+          <HistoryGraphRowVisual
+            {event}
+            {group}
+            groups={allGroups}
+            {history}
+            canvasWidth={visualWidth}
+            {index}
+          />
+        {/if}
       {/each}
     </svg>
   </svg>

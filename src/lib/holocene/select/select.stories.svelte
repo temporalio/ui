@@ -3,6 +3,7 @@
 <script lang="ts" module>
   import type { Meta } from '@storybook/svelte';
 
+  import type { IconName } from '$lib/holocene/icon';
   import { iconNames } from '$lib/holocene/icon';
 
   import Option from './option.svelte';
@@ -15,7 +16,7 @@
       id: 'select',
       label: 'Select',
       placeholder: 'Select an option',
-      leadingIcon: undefined,
+      leadingIcon: undefined as IconName | undefined,
       labelHidden: false,
       disabled: false,
     },

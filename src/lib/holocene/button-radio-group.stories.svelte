@@ -22,11 +22,17 @@
 </script>
 
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import type {
     ButtonRadioItem,
     ButtonRadioOption,
   } from '$lib/holocene/button-radio-group.svelte';
   import Button, { type ButtonStyles } from '$lib/holocene/button.svelte';
+
+  type StoryArgs = ComponentProps<
+    typeof ButtonRadioGroup<ButtonRadioOption<string>>
+  >;
 
   const options: ButtonRadioOption<string>[] = [
     { label: 'Every day', value: 'everyday' },
@@ -69,7 +75,7 @@
 {/snippet}
 
 <Story name="Default">
-  {#snippet template(args)}
+  {#snippet template(args: StoryArgs)}
     <ButtonRadioGroup {...args} {options} {value} onChange={(n) => (value = n)}>
       {#snippet item(radioItem)}
         {@render radioButton(radioItem)}
@@ -79,7 +85,7 @@
 </Story>
 
 <Story name="Small">
-  {#snippet template(args)}
+  {#snippet template(args: StoryArgs)}
     <ButtonRadioGroup {...args} {options} {value} onChange={(n) => (value = n)}>
       {#snippet item(radioItem)}
         {@render radioButton(radioItem, 'secondary', 'sm')}
@@ -89,7 +95,7 @@
 </Story>
 
 <Story name="Large">
-  {#snippet template(args)}
+  {#snippet template(args: StoryArgs)}
     <ButtonRadioGroup {...args} {options} {value} onChange={(n) => (value = n)}>
       {#snippet item(radioItem)}
         {@render radioButton(radioItem, 'secondary', 'lg')}
@@ -99,7 +105,7 @@
 </Story>
 
 <Story name="Primary">
-  {#snippet template(args)}
+  {#snippet template(args: StoryArgs)}
     <ButtonRadioGroup {...args} {options} {value} onChange={(n) => (value = n)}>
       {#snippet item(radioItem)}
         {@render radioButton(radioItem, 'primary')}
@@ -109,7 +115,7 @@
 </Story>
 
 <Story name="Ghost">
-  {#snippet template(args)}
+  {#snippet template(args: StoryArgs)}
     <ButtonRadioGroup {...args} {options} {value} onChange={(n) => (value = n)}>
       {#snippet item(radioItem)}
         {@render radioButton(radioItem, 'ghost')}
@@ -119,7 +125,7 @@
 </Story>
 
 <Story name="With Disabled Option">
-  {#snippet template(args)}
+  {#snippet template(args: StoryArgs)}
     <ButtonRadioGroup
       {...args}
       options={optionsWithDisabled}

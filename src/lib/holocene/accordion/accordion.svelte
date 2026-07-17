@@ -23,7 +23,7 @@
   export let title: string;
   export let id: string = crypto.randomUUID();
   export let subtitle = '';
-  export let icon = null;
+  export let icon: IconName | undefined = undefined;
   export let open = false;
   export let expandable = true;
   export let error = '';

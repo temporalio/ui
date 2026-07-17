@@ -59,7 +59,7 @@
       >
         <div class="col-start-1 row-start-1 flex items-center">
           <WorkflowStatus
-            status={toWorkflowStatusReadable(run.startWorkflowStatus)}
+            status={toWorkflowStatusReadable(run.startWorkflowStatus ?? null)}
           />
         </div>
 
@@ -68,8 +68,8 @@
         >
           <Link
             href={routeForWorkflow({
-              workflow: run.startWorkflowResult?.workflowId,
-              run: run.startWorkflowResult?.runId,
+              workflow: run.startWorkflowResult?.workflowId ?? '',
+              run: run.startWorkflowResult?.runId ?? '',
               namespace,
             })}
           >

@@ -86,10 +86,10 @@
 
   const nexusOperationsLinkHidden = $derived.by(() => {
     const namespace = $namespaces.find(
-      (namespace) => namespace.namespaceInfo.name === activeNamespaceName,
+      (namespace) => namespace.namespaceInfo?.name === activeNamespaceName,
     );
     const capabilityState = namespaceCapabilityState(
-      namespace?.namespaceInfo?.capabilities,
+      namespace?.namespaceInfo?.capabilities ?? undefined,
       'standaloneNexusOperation',
     );
     return capabilityState === 'unsupported';

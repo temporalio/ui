@@ -9,6 +9,7 @@ import {
   decodeEventAttributes,
   type DecodeFunctions,
   parsePayloadAttributes,
+  type PotentiallyDecodable,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
 import { isWorkflowTaskFailedEventDueToReset } from '$lib/utilities/get-workflow-task-failed-event';
@@ -35,7 +36,9 @@ export async function getEventAttributes(
   const { key, attributes } = findAttributesAndKey(historyEvent);
   const convertedAttributes = await convertWithCodec(attributes);
 
-  const decodedAttributes = decodeAttributes(convertedAttributes) as object;
+  const decodedAttributes = decodeAttributes(
+    convertedAttributes as PotentiallyDecodable,
+  ) as object;
 
   return {
     type: key,
@@ -126,12 +129,14 @@ export const isEvent = (event: unknown): event is WorkflowEvent => {
 };
 
 export const fromEventToRawEvent = (event: WorkflowEvent): HistoryEvent => {
-  const workflowEvent = { ...event };
-  delete workflowEvent.name;
-  delete workflowEvent.id;
-  delete workflowEvent.timestamp;
-  delete workflowEvent.classification;
-  delete workflowEvent.category;
-  delete workflowEvent.attributes;
+  const {
+    name: _name,
+    id: _id,
+    timestamp: _timestamp,
+    classification: _classification,
+    category: _category,
+    attributes: _attributes,
+    ...workflowEvent
+  } = event;
   return workflowEvent;
 };

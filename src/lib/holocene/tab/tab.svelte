@@ -5,8 +5,6 @@
   import { getContext } from 'svelte';
   import { twMerge as merge } from 'tailwind-merge';
 
-  import { isNull } from '$lib/utilities/is';
-
   import { type TabContext, TABS } from './tabs.svelte';
 
   type OwnProps = {
@@ -29,10 +27,10 @@
   let {
     label,
     id,
-    href = null,
-    panelId = null,
+    href = undefined,
+    panelId = undefined,
     disabled = false,
-    active = null,
+    active = undefined,
     onClick = () => {},
     children,
     'data-testid': dataTestId,
@@ -44,7 +42,7 @@
 
   registerTab(id);
 
-  const isActive = $derived(isNull(active) ? $activeTab === id : active);
+  const isActive = $derived(active == null ? $activeTab === id : active);
 
   const handleClick = () => {
     if (disabled) return;

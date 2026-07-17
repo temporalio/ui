@@ -7,7 +7,9 @@
   import { decodePayloadAndParseDataToJSON } from '$lib/utilities/decode-payload';
   import { activityExecution } from '$lib/utilities/standalone-activity-poller.svelte';
 
-  const decodeMetadata = async (userMetadata: IUserMetadata) => {
+  const decodeMetadata = async (
+    userMetadata: IUserMetadata | null | undefined,
+  ) => {
     const metadata = {
       summary: '',
       details: '',

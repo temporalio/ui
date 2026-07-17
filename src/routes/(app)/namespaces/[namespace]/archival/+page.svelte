@@ -14,13 +14,12 @@
   let { data }: { data: PageData } = $props();
 
   const {
-    namespace: {
-      namespaceInfo: { name: namespaceName },
-    },
+    namespace,
     archivalEnabled,
     visibilityArchivalEnabled,
     archivalQueryingSupported,
   } = $derived(data);
+  const namespaceName = $derived(namespace.namespaceInfo?.name);
 </script>
 
 <PageTitle

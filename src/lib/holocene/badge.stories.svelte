@@ -34,7 +34,7 @@
 <Template let:args>
   <div class="flex flex-col gap-2">
     {#each types as type}
-      <Badge {type} class="capitalize">{type.replace(/-/g, ' ')}</Badge>
+      <Badge {type} class="capitalize">{(type ?? '').replace(/-/g, ' ')}</Badge>
     {/each}
     <Badge type="count">{args.count}</Badge>
   </div>

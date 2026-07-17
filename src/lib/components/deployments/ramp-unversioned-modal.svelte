@@ -29,7 +29,7 @@
   confirmText={translate('common.confirm')}
   cancelText={translate('common.cancel')}
   on:confirmModal={() => onConfirm?.(percentage)}
-  on:cancelModal={onCancel}
+  on:cancelModal={() => onCancel?.()}
 >
   {#if onRemove}
     <Button slot="footer" variant="destructive" size="sm" on:click={onRemove}>

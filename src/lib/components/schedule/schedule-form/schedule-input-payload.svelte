@@ -93,7 +93,7 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <PayloadDecoder value={payloads} onDecode={setInitialInput}>
+  <PayloadDecoder value={payloads ?? {}} onDecode={setInitialInput}>
     {#snippet children(_decodedValue)}
       <PayloadInputWithEncoding
         bind:input

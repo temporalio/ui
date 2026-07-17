@@ -86,6 +86,21 @@ export function makeActivityCompleted(
   } as unknown as HistoryEvent;
 }
 
+export function makeActivityTimedOut(
+  eventId: number,
+  scheduledEventId: number,
+): HistoryEvent {
+  return {
+    ...base(eventId, 'ActivityTaskTimedOut'),
+    activityTaskTimedOutEventAttributes: {
+      scheduledEventId: String(scheduledEventId),
+      startedEventId: '0',
+      retryState: 'MaximumAttemptsReached',
+      failure: null,
+    },
+  } as unknown as HistoryEvent;
+}
+
 export function makeTimerStarted(
   eventId: number,
   timerId?: string,
@@ -168,6 +183,112 @@ export function makeWorkflowTaskCompleted(
   } as unknown as HistoryEvent;
 }
 
+export function makeStartChildWorkflowInitiated(eventId: number): HistoryEvent {
+  return {
+    ...base(eventId, 'StartChildWorkflowExecutionInitiated'),
+    startChildWorkflowExecutionInitiatedEventAttributes: {
+      workflowId: `child-${eventId}`,
+      workflowType: { name: 'ChildWorkflow' },
+      taskQueue: { name: 'default', kind: 'Normal' },
+      input: null,
+    },
+  } as unknown as HistoryEvent;
+}
+
+export function makeChildWorkflowStarted(
+  eventId: number,
+  initiatedEventId: number,
+): HistoryEvent {
+  return {
+    ...base(eventId, 'ChildWorkflowExecutionStarted'),
+    childWorkflowExecutionStartedEventAttributes: {
+      initiatedEventId: String(initiatedEventId),
+      workflowExecution: {
+        workflowId: `child-${initiatedEventId}`,
+        runId: `run-${eventId}`,
+      },
+      workflowType: { name: 'ChildWorkflow' },
+    },
+  } as unknown as HistoryEvent;
+}
+
+export function makeChildWorkflowCompleted(
+  eventId: number,
+  initiatedEventId: number,
+  startedEventId: number,
+): HistoryEvent {
+  return {
+    ...base(eventId, 'ChildWorkflowExecutionCompleted'),
+    childWorkflowExecutionCompletedEventAttributes: {
+      initiatedEventId: String(initiatedEventId),
+      startedEventId: String(startedEventId),
+      result: null,
+    },
+  } as unknown as HistoryEvent;
+}
+
+export function makeWorkflowUpdateAccepted(eventId: number): HistoryEvent {
+  return {
+    ...base(eventId, 'WorkflowExecutionUpdateAccepted'),
+    workflowExecutionUpdateAcceptedEventAttributes: {
+      protocolInstanceId: `update-${eventId}`,
+      acceptedRequest: null,
+      acceptedRequestSequencingEventId: String(eventId - 1),
+    },
+  } as unknown as HistoryEvent;
+}
+
+export function makeWorkflowUpdateCompleted(
+  eventId: number,
+  acceptedEventId: number,
+): HistoryEvent {
+  return {
+    ...base(eventId, 'WorkflowExecutionUpdateCompleted'),
+    workflowExecutionUpdateCompletedEventAttributes: {
+      acceptedEventId: String(acceptedEventId),
+      outcome: null,
+    },
+  } as unknown as HistoryEvent;
+}
+
+export function makeNexusOperationScheduled(eventId: number): HistoryEvent {
+  return {
+    ...base(eventId, 'NexusOperationScheduled'),
+    nexusOperationScheduledEventAttributes: {
+      endpoint: 'endpoint',
+      service: 'service',
+      operation: 'operation',
+      input: null,
+    },
+  } as unknown as HistoryEvent;
+}
+
+export function makeNexusOperationStarted(
+  eventId: number,
+  scheduledEventId: number,
+): HistoryEvent {
+  return {
+    ...base(eventId, 'NexusOperationStarted'),
+    nexusOperationStartedEventAttributes: {
+      scheduledEventId: String(scheduledEventId),
+      operationId: `operation-${scheduledEventId}`,
+    },
+  } as unknown as HistoryEvent;
+}
+
+export function makeNexusOperationCompleted(
+  eventId: number,
+  scheduledEventId: number,
+): HistoryEvent {
+  return {
+    ...base(eventId, 'NexusOperationCompleted'),
+    nexusOperationCompletedEventAttributes: {
+      scheduledEventId: String(scheduledEventId),
+      result: null,
+    },
+  } as unknown as HistoryEvent;
+}
+
 // ---------------------------------------------------------------------------
 // Composite group builders (return events in ascending ID order)
 // ---------------------------------------------------------------------------
@@ -184,6 +305,15 @@ export function makeActivityGroup(
   ];
 }
 
+export function makeActivityTimeoutGroup(
+  startId: number,
+): [HistoryEvent, HistoryEvent] {
+  return [
+    makeActivityScheduled(startId),
+    makeActivityTimedOut(startId + 1, startId),
+  ];
+}
+
 /** Returns [Started, Fired] at IDs [startId, startId+1] */
 export function makeTimerGroup(startId: number): [HistoryEvent, HistoryEvent] {
   return [makeTimerStarted(startId), makeTimerFired(startId + 1, startId)];
@@ -197,6 +327,35 @@ export function makeWorkflowTaskGroup(
     makeWorkflowTaskScheduled(startId),
     makeWorkflowTaskStarted(startId + 1, startId),
     makeWorkflowTaskCompleted(startId + 2, startId),
+  ];
+}
+
+export function makeChildWorkflowGroup(
+  startId: number,
+): [HistoryEvent, HistoryEvent, HistoryEvent] {
+  return [
+    makeStartChildWorkflowInitiated(startId),
+    makeChildWorkflowStarted(startId + 1, startId),
+    makeChildWorkflowCompleted(startId + 2, startId, startId + 1),
+  ];
+}
+
+export function makeWorkflowUpdateGroup(
+  startId: number,
+): [HistoryEvent, HistoryEvent] {
+  return [
+    makeWorkflowUpdateAccepted(startId),
+    makeWorkflowUpdateCompleted(startId + 1, startId),
+  ];
+}
+
+export function makeNexusOperationGroup(
+  startId: number,
+): [HistoryEvent, HistoryEvent, HistoryEvent] {
+  return [
+    makeNexusOperationScheduled(startId),
+    makeNexusOperationStarted(startId + 1, startId),
+    makeNexusOperationCompleted(startId + 2, startId),
   ];
 }
 

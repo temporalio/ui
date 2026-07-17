@@ -23,18 +23,18 @@
     onlyUnderSecond: false,
   });
 
-  let endTimeInterval;
+  let endTimeInterval: ReturnType<typeof setInterval> | null;
 
   const clearEndTimeInterval = (endTime: string) => {
     if (endTime) {
-      clearInterval(endTimeInterval);
+      clearInterval(endTimeInterval ?? undefined);
       endTimeInterval = null;
     }
   };
 
-  const startStopInterval = (pauseLiveUpdates) => {
+  const startStopInterval = (pauseLiveUpdates: boolean) => {
     if (pauseLiveUpdates) {
-      clearInterval(endTimeInterval);
+      clearInterval(endTimeInterval ?? undefined);
       endTimeInterval = null;
     } else if (!endTimeInterval && (workflow.isRunning || workflow.isPaused)) {
       endTimeInterval = setInterval(() => {
@@ -47,7 +47,7 @@
   $: startStopInterval($pauseLiveUpdates);
 
   onDestroy(() => {
-    clearInterval(endTimeInterval);
+    clearInterval(endTimeInterval ?? undefined);
     endTimeInterval = null;
     $pauseLiveUpdates = false;
   });

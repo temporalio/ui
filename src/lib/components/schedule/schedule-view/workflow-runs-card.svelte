@@ -49,7 +49,7 @@
       href={routeForWorkflowsWithQuery({
         namespace,
         query: workflowQuery,
-      })}
+      }) ?? ''}
     >
       {translate('common.view-all-runs')}
     </Link>

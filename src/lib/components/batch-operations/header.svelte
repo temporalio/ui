@@ -18,10 +18,12 @@
     toggleAutoRefresh: { checked: boolean };
   }>();
 
-  const handleToggleAutoRefresh = (
-    event: Event & { target: EventTarget & HTMLInputElement },
-  ) => {
-    const { checked } = event.target;
+  const handleToggleAutoRefresh = (event: Event) => {
+    if (!(event.currentTarget instanceof HTMLInputElement)) {
+      return;
+    }
+
+    const { checked } = event.currentTarget;
     dispatch('toggleAutoRefresh', { checked });
     $autoRefresh = checked;
   };

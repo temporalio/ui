@@ -11,9 +11,9 @@
 
   interface Props {
     open: boolean;
-    startToCloseTimeout: string | undefined;
-    scheduleToCloseTimeout: string | undefined;
-    scheduleToStartTimeout: string | undefined;
+    startToCloseTimeout: string;
+    scheduleToCloseTimeout: string;
+    scheduleToStartTimeout: string;
     idReusePolicy: string;
     idConflictPolicy: string;
   }

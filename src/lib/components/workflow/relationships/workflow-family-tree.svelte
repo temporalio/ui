@@ -50,8 +50,8 @@
       root = await fetchAllDirectWorkflows({
         namespace,
         workflow: node.workflow,
-        parentWorkflowId: node.workflow?.parent?.workflowId,
-        parentRunId: node.workflow?.parent?.runId,
+        parentWorkflowId: node.workflow?.parent?.workflowId ?? '',
+        parentRunId: node.workflow?.parent?.runId ?? undefined,
       });
     }
     activeWorkflow = node.workflow;

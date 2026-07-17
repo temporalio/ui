@@ -13,7 +13,7 @@
         {translate('events.attribute-group.search-attributes')}
       </h3>
       <PayloadCodeBlock
-        value={workflow.searchAttributes.indexedFields}
+        value={workflow.searchAttributes.indexedFields ?? {}}
         label={translate('events.attribute-group.search-attributes')}
       />
     </div>

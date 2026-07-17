@@ -149,7 +149,7 @@ const toQueryStatementsFromFilters = (
             value,
             conditional,
             archived,
-            customDate,
+            customDate ?? false,
           );
           if (parenthesis === '(') {
             statement = `(${statement}`;
@@ -163,7 +163,7 @@ const toQueryStatementsFromFilters = (
         }
       },
     )
-    .filter(Boolean);
+    .filter((statement): statement is string => Boolean(statement));
 };
 
 export const toListWorkflowQueryFromFilters = (

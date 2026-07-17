@@ -131,7 +131,7 @@
               >
               <DetailListTextValue
                 text={formatDurationAbbreviated(
-                  $activityExecution.info.executionDuration,
+                  $activityExecution.info.executionDuration ?? '',
                 )}
               />
               {#if $activityExecution.info.attempt != undefined}

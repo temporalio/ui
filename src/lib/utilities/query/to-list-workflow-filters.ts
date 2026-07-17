@@ -42,8 +42,10 @@ const getThreeAhead = (tokens: Tokens, index: number): string =>
 const getTwoBehind = (tokens: Tokens, index: number): string =>
   tokens[index - 2];
 
-export const getLargestDurationUnit = (duration: Duration): Duration => {
-  if (!duration) return;
+export const getLargestDurationUnit = (
+  duration: Duration,
+): Duration | undefined => {
+  if (!duration) return undefined;
   for (const key of durationKeys) {
     if (duration[key]) {
       return { [key]: duration[key] };
@@ -107,7 +109,12 @@ export const toListWorkflowFilters = (
           const value = isNullConditional(combinedTokens)
             ? getThreeAhead(tokens, index)
             : tokenTwoAhead;
-          filter.value = value.toLocaleLowerCase() === 'null' ? null : value;
+          // A literal "null" value is stored as null so downstream isValid()
+          // treats the filter as empty; SearchAttributeFilter types value as
+          // string, so document that null is an intentional runtime state.
+          filter.value = (
+            value.toLocaleLowerCase() === 'null' ? null : value
+          ) as string;
         } else if (isDatetimeStatement(attributes[token])) {
           const start = tokenTwoAhead;
           const hasValidStartTime = isValidDate(start);

@@ -32,12 +32,12 @@
   let className = '';
   export { className as class };
   export let group = getAppContext('group');
-  export let href = null;
-  export let base = href;
+  export let href: string | null = null;
+  export let base: string | null = href;
   export let active = false;
   export let variant: ComponentProps<Button>['variant'] = 'secondary';
 
-  $: pressed = href ? $page.url.pathname.includes(base) : active;
+  $: pressed = href ? $page.url.pathname.includes(base ?? href) : active;
 </script>
 
 <Button
@@ -49,7 +49,7 @@
   )}
   data-track-name="toggle-button"
   {variant}
-  href={href ? href + $page.url.search : null}
+  href={href ? href + $page.url.search : undefined}
   aria-pressed={pressed ? 'true' : 'false'}
   {...$$restProps}
 >

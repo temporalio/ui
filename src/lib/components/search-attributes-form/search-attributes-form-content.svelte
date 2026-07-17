@@ -131,7 +131,8 @@
             type: 'error',
             error: {
               message:
-                error.message || translate('search-attributes.save-error'),
+                (error as Error).message ||
+                translate('search-attributes.save-error'),
             },
           };
         }
@@ -195,14 +196,15 @@
           <div class="w-8"></div>
         </div>
 
-        {#each $formData.attributes as _, index (index)}
+        {#each $formData.attributes as attribute, index (index)}
           <SearchAttributeRow
-            name={$formData.attributes[index].name}
-            type={$formData.attributes[index].type}
+            name={attribute.name ?? ''}
+            type={attribute.type ?? ''}
             {index}
             {supportedTypes}
             submitting={$submitting}
-            error={$errors?.attributes?.[index]?.['name']?.[0]}
+            error={($errors?.attributes?.[index] as { name?: string[] })
+              ?.name?.[0]}
             {disableTypeForExisting}
             {isCloud}
             isDeletable={$formData.attributes[index].isDeletable}

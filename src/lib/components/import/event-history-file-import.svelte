@@ -42,7 +42,7 @@
   const onConfirm = async () => {
     try {
       const events = await toEventHistory(
-        Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
+        Array.isArray(rawEvents) ? rawEvents : (rawEvents?.events ?? []),
       );
       const eventGroups = groupEvents(events);
       importEvents.set(events);

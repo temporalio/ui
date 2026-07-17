@@ -29,7 +29,7 @@
   const addSearchAttribute = () => {
     attributesToAdd = [
       ...attributesToAdd,
-      { label: null, value: null, type: SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED },
+      { label: '', value: null, type: SEARCH_ATTRIBUTE_TYPE.UNSPECIFIED },
     ];
   };
 

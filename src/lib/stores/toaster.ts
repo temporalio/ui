@@ -36,7 +36,9 @@ const push = (toast: Toast) => {
     toastWithDefaults.duration,
   );
   const timeoutId = setTimeout(() => {
-    pop(toastWithDefaults.id);
+    if (toastWithDefaults.id) {
+      pop(toastWithDefaults.id);
+    }
     if (get(toasts).length === 0) {
       setPosition('bottom-right');
     }
