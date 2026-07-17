@@ -62,18 +62,6 @@
   const reverseSort = $derived($eventFilterSort === 'descending');
 
   let bufferGroups = $state.raw<EventGroup[]>([]);
-  let groupUpdatePending = false;
-  let groupUpdateFrame: number | null = null;
-
-  function scheduleBufferGroupRefresh() {
-    if (groupUpdatePending) return;
-    groupUpdatePending = true;
-    groupUpdateFrame = requestAnimationFrame(() => {
-      groupUpdateFrame = null;
-      groupUpdatePending = false;
-      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-    });
-  }
 
   const filteredBufferGroups = $derived.by(() => {
     const active = $eventTypeFilter;
@@ -89,14 +77,14 @@
     ),
   );
 
-  const workflowTaskFailedError = $derived(
-    historyCtx.fetchComplete
-      ? (getBufferWftFailedEvent() as
-          | WorkflowTaskFailedEvent
-          | WorkflowTaskTimedOutEvent
-          | undefined)
-      : undefined,
-  );
+  const workflowTaskFailedError = $derived.by(() => {
+    void $bufferVersion;
+    if (!historyCtx.fetchComplete) return undefined;
+    return getBufferWftFailedEvent() as
+      | WorkflowTaskFailedEvent
+      | WorkflowTaskTimedOutEvent
+      | undefined;
+  });
 
   const isNotPending = $derived(
     Boolean(workflow && !workflow?.isRunning && !workflow?.isPaused),
@@ -126,26 +114,26 @@
   onMount(() => {
     historyCtx.resume();
     bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+  });
+
+  $effect(() => {
+    void $bufferVersion;
+    const fetchComplete = historyCtx.fetchComplete;
+    const pendingActivities = $workflowRun.workflow?.pendingActivities ?? [];
+    const pendingNexusOperations =
+      $workflowRun.workflow?.pendingNexusOperations ?? [];
+
+    let frame: number | null = requestAnimationFrame(() => {
+      frame = null;
+      if (fetchComplete) {
+        enrichGroups(pendingActivities, pendingNexusOperations);
+      }
+      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
+    });
 
     return () => {
-      if (groupUpdateFrame !== null) cancelAnimationFrame(groupUpdateFrame);
+      if (frame !== null) cancelAnimationFrame(frame);
     };
-  });
-
-  $effect(() => {
-    const _bufferVersion = $bufferVersion;
-    scheduleBufferGroupRefresh();
-  });
-
-  $effect(() => {
-    const _bufferVersion = $bufferVersion;
-    if (historyCtx.fetchComplete) {
-      enrichGroups(
-        $workflowRun.workflow?.pendingActivities ?? [],
-        $workflowRun.workflow?.pendingNexusOperations ?? [],
-      );
-      bufferGroups = getGroupArray({ excludeWorkflowTasks: true });
-    }
   });
 
   let timeline = $state<Timeline>();

@@ -730,10 +730,7 @@ export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
   let lastFailedEvent: WorkflowEvent | undefined;
   let maxCompletedId = -1;
 
-  for (let i = 0; i < poolTop; i++) {
-    const { group } = groupPool[i];
-    if (!group || !isWorkflowTaskGroup(group)) continue;
-
+  const scanGroup = (group: EventGroup): void => {
     for (const event of group.eventList) {
       if (event.eventType === 'WorkflowTaskCompleted') {
         const id = Number(event.id);
@@ -749,6 +746,28 @@ export function getWorkflowTaskFailedEvent(): WorkflowEvent | undefined {
         }
       }
     }
+  };
+
+  for (let i = 0; i < poolTop; i++) {
+    const { group } = groupPool[i];
+    if (!group || !isWorkflowTaskGroup(group)) continue;
+    scanGroup(group);
+  }
+
+  // Live WFT groups whose head slot has not yet been claimed by the pool —
+  // covers workflow-task failures that arrive via the live poll after the
+  // initial fetch completes.
+  for (const group of liveGroups) {
+    if (!isWorkflowTaskGroup(group)) continue;
+    const headSlotIdx = parseInt(group.id) - 1;
+    if (
+      headSlotIdx >= 0 &&
+      headSlotIdx < eventToGroup.length &&
+      eventToGroup[headSlotIdx] !== 0
+    ) {
+      continue;
+    }
+    scanGroup(group);
   }
 
   if (!lastFailedEvent) return undefined;

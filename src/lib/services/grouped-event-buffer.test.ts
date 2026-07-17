@@ -939,6 +939,63 @@ describe('getWorkflowTaskFailedEvent (buffer)', () => {
     expect(failed?.eventType).toBe('WorkflowTaskFailed');
     expect(failed?.id).toBe('6');
   });
+
+  it('returns a WFT failure whose group arrives entirely via the live poll', () => {
+    reset(10);
+    resetLive();
+    appendLiveEvent(makeWorkflowTaskScheduled(1));
+    appendLiveEvent(makeWorkflowTaskStarted(2, 1));
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+
+    expect(appendLiveEvent(makeWorkflowTaskFailed(3, 1))).toBe(true);
+
+    const failed = getWorkflowTaskFailedEvent();
+    expect(failed?.eventType).toBe('WorkflowTaskFailed');
+    expect(failed?.id).toBe('3');
+  });
+
+  it('returns a live WFT failure appended to a WFT head already in the pool', () => {
+    reset(10);
+    resetLive();
+    processEvent(makeWorkflowTaskScheduled(1), true);
+    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+
+    expect(appendLiveEvent(makeWorkflowTaskFailed(3, 1))).toBe(true);
+
+    const failed = getWorkflowTaskFailedEvent();
+    expect(failed?.eventType).toBe('WorkflowTaskFailed');
+    expect(failed?.id).toBe('3');
+  });
+
+  it('clears the WFT failure when a later WFT completes via the live poll', () => {
+    reset(20);
+    resetLive();
+    processEvent(makeWorkflowTaskScheduled(1), true);
+    processEvent(makeWorkflowTaskStarted(2, 1), true);
+    processEvent(makeWorkflowTaskFailed(3, 1), true);
+    expect(getWorkflowTaskFailedEvent()?.id).toBe('3');
+
+    // Workflow recovers: a new WFT completes, delivered live.
+    appendLiveEvent(makeWorkflowTaskScheduled(4));
+    appendLiveEvent(makeWorkflowTaskStarted(5, 4));
+    appendLiveEvent(makeWorkflowTaskCompleted(6, 4));
+
+    expect(getWorkflowTaskFailedEvent()).toBeUndefined();
+  });
+
+  it('does not double-count a live WFT group once the fetch claims its head', () => {
+    reset(10);
+    resetLive();
+    // Failure lands live first, then the bidirectional fetch reaches the head.
+    appendLiveEvent(makeWorkflowTaskScheduled(1));
+    appendLiveEvent(makeWorkflowTaskFailed(3, 1));
+    processEvent(makeWorkflowTaskScheduled(1), true);
+
+    const failed = getWorkflowTaskFailedEvent();
+    expect(failed?.eventType).toBe('WorkflowTaskFailed');
+    expect(failed?.id).toBe('3');
+  });
 });
 
 // ---------------------------------------------------------------------------
