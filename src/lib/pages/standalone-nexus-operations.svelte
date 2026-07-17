@@ -1,14 +1,13 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { onMount } from 'svelte';
-  import { twMerge as merge } from 'tailwind-merge';
 
   import { page } from '$app/state';
 
   import CountRefreshButton from '$lib/components/count-refresh-button.svelte';
+  import SavedQueryViews from '$lib/components/saved-query-views/saved-views.svelte';
   import NexusOperationsSummaryConfigurableTable from '$lib/components/standalone-nexus-operations/nexus-operations-summary-configurable-table.svelte';
   import FilterBar from '$lib/components/standalone-nexus-operations/nexus-operations-summary-filter-bar/filter-bar.svelte';
-  import SavedNexusViews from '$lib/components/standalone-nexus-operations/saved-views.svelte';
   import StatusCounts from '$lib/components/status-counts.svelte';
   import { timestamp } from '$lib/components/timestamp.svelte';
   import ConfigurableTableHeadersDrawer from '$lib/components/workflow/configurable-table-headers-drawer/index.svelte';
@@ -22,13 +21,17 @@
   } from '$lib/stores/configurable-table-columns';
   import { nexusOperationFilters } from '$lib/stores/filters';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import {
     nexusOperationCount,
     nexusOperationRefresh,
     nexusOperationsQuery,
     nexusOperationsSearchParams,
   } from '$lib/stores/nexus-operations';
+  import {
+    DEFAULT_NEXUS_SYSTEM_VIEW,
+    savedNexusQueries,
+    systemNexusViews,
+  } from '$lib/stores/saved-queries';
   import { nexusOperationSearchAttributes } from '$lib/stores/search-attributes';
   import { getNexusOperationStatusAndCountOfGroup } from '$lib/utilities/get-nexus-operation-status-and-count';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
@@ -121,19 +124,18 @@
 </header>
 
 <FilterBar />
-<div class="flex overflow-auto">
-  <SavedNexusViews />
-  <div
-    class={merge(
-      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
-      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
-    )}
-  >
-    <NexusOperationsSummaryConfigurableTable
-      onClickConfigure={openCustomizationDrawer}
-    />
-  </div>
-</div>
+<SavedQueryViews
+  filters={nexusOperationFilters}
+  savedQueries={savedNexusQueries}
+  systemViews={systemNexusViews}
+  defaultView={DEFAULT_NEXUS_SYSTEM_VIEW}
+  searchAttributes={nexusOperationSearchAttributes}
+  id="nexus"
+>
+  <NexusOperationsSummaryConfigurableTable
+    onClickConfigure={openCustomizationDrawer}
+  />
+</SavedQueryViews>
 <ConfigurableTableHeadersDrawer
   {availableColumns}
   bind:open={customizationDrawerOpen}

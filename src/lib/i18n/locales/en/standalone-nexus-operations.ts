@@ -36,7 +36,6 @@ export const Strings = {
   'empty-state-code-samples-title':
     'Explore code samples for Standalone Nexus Operations',
   'start-standalone-nexus-operation': 'Start a Standalone Nexus Operation',
-  'custom-views': 'Custom Views',
   'back-to-nexus-operations': 'Back to Standalone Nexus Operations',
   'layout-tabs-label': 'Nexus Operation Details',
   'layout-details-tab': 'Details',

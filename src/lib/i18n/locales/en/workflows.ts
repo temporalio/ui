@@ -355,7 +355,6 @@ export const Strings = {
   'task-failure': 'Task Failure',
   'execution-start': 'Execution Start',
   'workflow-timeout': 'Workflow Timeout',
-  'custom-views': 'Custom Views',
   'scheduled-by': 'Scheduled By',
   'auto-refresh-on': 'Auto Refresh On',
   'auto-refresh-off': 'Auto Refresh Off',

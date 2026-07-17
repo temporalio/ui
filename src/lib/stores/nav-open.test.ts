@@ -12,11 +12,11 @@ describe('nav-open stores', () => {
     localStorage.clear();
   });
 
-  it('defaults both navs to open', async () => {
+  it('defaults the main nav open and saved views collapsed', async () => {
     const { navOpen, savedQueryNavOpen } = await loadNavStores();
 
     expect(get(navOpen)).toBe(true);
-    expect(get(savedQueryNavOpen)).toBe(true);
+    expect(get(savedQueryNavOpen)).toBe(false);
   });
 
   it('collapses both navs by default without persisting a preference', async () => {

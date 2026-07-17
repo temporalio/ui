@@ -1,36 +1,54 @@
 <script lang="ts">
+  import type { Readable, Writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import { type ClassNameValue, twMerge as merge } from 'tailwind-merge';
 
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
-  import EditViewModal from '$lib/components/workflow/filter-bar/edit-view-modal.svelte';
-  import SaveViewModal from '$lib/components/workflow/filter-bar/save-view-modal.svelte';
   import Button from '$lib/holocene/button.svelte';
   import type { IconName } from '$lib/holocene/icon';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { workflowFilters } from '$lib/stores/filters';
+  import type { SearchAttributeFilter } from '$lib/models/search-attribute-filters';
   import { savedQueryNavOpen } from '$lib/stores/nav-open';
   import { currentPageKey } from '$lib/stores/pagination';
   import {
-    DEFAULT_SYSTEM_VIEW,
-    MAX_SAVED_WORKFLOW_QUERIES,
+    MAX_SAVED_QUERIES,
     type SavedQuery,
-    savedWorkflowQueries,
-    systemWorkflowViews,
-    TASK_FAILURES_VIEW,
   } from '$lib/stores/saved-queries';
-  import { searchAttributes } from '$lib/stores/search-attributes';
-  import { taskFailuresCount } from '$lib/stores/workflows';
+  import type { SearchAttributes } from '$lib/types/workflows';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { sortAlphabetically } from '$lib/utilities/sort-alphabetically';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  import ViewModal from './view-modal.svelte';
+
+  interface Props {
+    filters: Writable<SearchAttributeFilter[]>;
+    savedQueries: Writable<Record<string, SavedQuery[]>>;
+    systemViews: SavedQuery[];
+    defaultView: SavedQuery;
+    maxQueries?: number;
+    searchAttributes: Readable<SearchAttributes>;
+    id: string;
+    children: Snippet;
+  }
+
+  let {
+    filters,
+    savedQueries,
+    systemViews,
+    defaultView,
+    maxQueries = MAX_SAVED_QUERIES,
+    searchAttributes,
+    id,
+    children,
+  }: Props = $props();
 
   let activeQueryView: SavedQuery | undefined = $state();
   let saveViewModalOpen = $state(false);
@@ -40,21 +58,17 @@
   const query = $derived(page.url.searchParams.get('query') || '');
   const savedQueryParam = page.url.searchParams.get('savedQuery');
   const namespace = $derived(page.params.namespace);
-  const hasTaskFailureAttribute = $derived(
-    !!page.data.namespace.namespaceInfo?.capabilities
-      ?.reportedProblemsSearchAttribute,
-  );
 
   const maxViewsReached = $derived(
-    $savedWorkflowQueries?.[namespace]?.length >= MAX_SAVED_WORKFLOW_QUERIES,
+    $savedQueries?.[namespace]?.length >= maxQueries,
   );
 
   const namespaceSavedQueries = $derived(
-    sortAlphabetically($savedWorkflowQueries?.[namespace] || [], (q) => q.name),
+    sortAlphabetically($savedQueries?.[namespace] || [], (q) => q.name),
   );
   const systemQueryView = $derived(
-    (query && systemWorkflowViews.find((q) => q.query === query)) ||
-      (!query && DEFAULT_SYSTEM_VIEW),
+    (query && systemViews.find((q) => q.query === query)) ||
+      (!query && defaultView),
   );
   const savedQueryView = $derived(
     query && namespaceSavedQueries.find((q) => q.query === query),
@@ -79,14 +93,10 @@
         type: 'user',
       };
 
-      if (!$savedWorkflowQueries[namespace])
-        $savedWorkflowQueries[namespace] = [];
+      if (!$savedQueries[namespace]) $savedQueries[namespace] = [];
 
       if (!maxViewsReached) {
-        $savedWorkflowQueries[namespace] = [
-          ...$savedWorkflowQueries[namespace],
-          queryToSave,
-        ];
+        $savedQueries[namespace] = [...$savedQueries[namespace], queryToSave];
       }
 
       activeQueryView = queryToSave;
@@ -108,8 +118,8 @@
       return;
     }
 
-    if (!query && activeQueryView?.id !== DEFAULT_SYSTEM_VIEW.id) {
-      activeQueryView = DEFAULT_SYSTEM_VIEW;
+    if (!query && activeQueryView?.id !== defaultView.id) {
+      activeQueryView = defaultView;
       return;
     }
 
@@ -132,7 +142,7 @@
     pendingQueryTarget = view.query || '';
 
     if (view.query) {
-      $workflowFilters = toListWorkflowFilters(view.query, $searchAttributes);
+      $filters = toListWorkflowFilters(view.query, $searchAttributes);
     }
 
     updateQueryParameters({
@@ -147,48 +157,42 @@
   const { copy, copied } = copyToClipboard();
 
   const handleCopy = (e: Event) => {
-    const sharableViewUrl =
-      new URL(page.url.href) +
-      '&savedQuery=' +
-      encodeURIComponent(activeQueryView?.name ?? '');
-    copy(e, sharableViewUrl);
+    if (activeQueryView) {
+      const sharableViewUrl = new URL(page.url.href);
+      sharableViewUrl.searchParams.set('savedQuery', activeQueryView.name);
+      copy(e, sharableViewUrl.href);
+    }
   };
 
   const onCreateView = (view: SavedQuery) => {
-    if (!$savedWorkflowQueries[namespace]) {
-      $savedWorkflowQueries[namespace] = [];
+    if (!$savedQueries[namespace]) {
+      $savedQueries[namespace] = [];
     }
 
-    $savedWorkflowQueries[namespace] = [
-      ...$savedWorkflowQueries[namespace],
-      view,
-    ];
+    $savedQueries[namespace] = [...$savedQueries[namespace], view];
     activeQueryView = view;
   };
 
   const onSaveView = (view: SavedQuery) => {
-    if (!$savedWorkflowQueries[namespace]) {
-      $savedWorkflowQueries[namespace] = [];
+    if (!$savedQueries[namespace]) {
+      $savedQueries[namespace] = [];
     }
 
     if (view.id === activeQueryView?.id) {
-      $savedWorkflowQueries[namespace] = $savedWorkflowQueries[namespace].map(
-        (q) => (q.id === view.id ? view : q),
+      $savedQueries[namespace] = $savedQueries[namespace].map((q) =>
+        q.id === view.id ? view : q,
       );
     } else {
-      $savedWorkflowQueries[namespace] = [
-        ...$savedWorkflowQueries[namespace],
-        view,
-      ];
+      $savedQueries[namespace] = [...$savedQueries[namespace], view];
     }
     activeQueryView = view;
   };
 
   const onDeleteView = (view: SavedQuery) => {
-    $savedWorkflowQueries[namespace] = $savedWorkflowQueries[namespace].filter(
+    $savedQueries[namespace] = $savedQueries[namespace].filter(
       (q) => q?.id !== view.id,
     );
-    $workflowFilters = [];
+    $filters = [];
     activeQueryView = undefined;
     updateQueryParameters({
       url: page.url,
@@ -200,126 +204,138 @@
   };
 </script>
 
-<div
-  class={merge(
-    'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
-    $savedQueryNavOpen
-      ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
-      : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
-  )}
-  style="will-change: width"
->
+<div class="flex overflow-auto">
   <div
-    class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
+    class={merge(
+      'surface-primary relative h-[var(--panel-h)] h-auto max-h-[var(--panel-h)] min-h-[var(--panel-h)] w-[var(--panel-collapsed-w)] min-w-[var(--panel-collapsed-w)] max-w-[var(--panel-collapsed-w)] overflow-auto border border-r-0 border-subtle shadow-sm transition-all duration-300 ease-in-out',
+      $savedQueryNavOpen
+        ? 'lg:w-[var(--panel-expanded-w)] lg:min-w-[var(--panel-expanded-w)] lg:max-w-[var(--panel-expanded-w)]'
+        : 'lg:w-[var(--panel-collapsed-w)] lg:min-w-[var(--panel-collapsed-w)] lg:max-w-[var(--panel-collapsed-w)]',
+    )}
+    style="will-change: width"
   >
     <div
-      class={merge(
-        'flex w-full items-center justify-between',
-        $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
-      )}
+      class="flex items-center justify-center gap-2 border-b border-subtle px-2 py-[.35rem] text-center lg:justify-start lg:py-[.47rem]"
     >
-      {#if $savedQueryNavOpen}
-        <p
-          class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
-          in:slide
-        >
-          Saved Views
-        </p>
-      {/if}
-      <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
-      <button
-        class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
-        aria-label={$savedQueryNavOpen
-          ? 'Collapse saved views'
-          : 'Expand saved views'}
-        title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
-        onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
+      <div
+        class={merge(
+          'flex w-full items-center justify-between',
+          $savedQueryNavOpen ? 'lg:justify-between' : 'lg:justify-center',
+        )}
       >
-        <Icon name={$savedQueryNavOpen ? 'chevron-left' : 'chevron-right'} />
-      </button>
-    </div>
-  </div>
-
-  <div class="space-y-2 p-1.5">
-    <div class="pb-2 text-center">
-      <div class="space-y-1">
-        {#each systemWorkflowViews as view (view.id)}
-          {#if view.id !== TASK_FAILURES_VIEW.id || hasTaskFailureAttribute}
-            {@render queryButton({
-              ...view,
-              active: query === view.query,
-              ...(view.id === TASK_FAILURES_VIEW.id && {
-                count: $taskFailuresCount,
-              }),
-            })}
-          {/if}
-        {/each}
+        {#if $savedQueryNavOpen}
+          <p
+            class="hidden whitespace-nowrap text-xs font-medium leading-3 lg:block lg:text-sm"
+            in:slide
+          >
+            Saved Views
+          </p>
+        {/if}
+        <p class="block text-xs font-medium leading-3 lg:hidden">Saved Views</p>
+        <button
+          class="hidden rounded-sm p-0.5 hover:bg-secondary lg:inline-flex"
+          aria-label={$savedQueryNavOpen
+            ? 'Collapse saved views'
+            : 'Expand saved views'}
+          title={$savedQueryNavOpen ? 'Collapse' : 'Expand'}
+          onclick={() => ($savedQueryNavOpen = !$savedQueryNavOpen)}
+        >
+          <Icon name="collapse" />
+        </button>
       </div>
     </div>
 
-    {#if $savedQueryNavOpen}
-      <p
-        class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
-        in:slide
-      >
-        {translate('workflows.custom-views')}
-        {@render queryBadge({
-          className: 'font-mono',
-          content: `${namespaceSavedQueries.length}/${MAX_SAVED_WORKFLOW_QUERIES}`,
-        })}
-      </p>
-    {/if}
-
-    <div class="border-t border-subtle"></div>
-
-    {#if unsavedQuery}
-      {@render queryButton(unsaveView)}
-    {/if}
-
-    {#if namespaceSavedQueries.length > 0}
-      <div class="text-center">
+    <div class="space-y-2 p-1.5">
+      <div class="pb-2 text-center">
         <div class="space-y-1">
-          {#each namespaceSavedQueries as savedQuery}
+          {#each systemViews as view (view.id)}
             {@render queryButton({
-              ...savedQuery,
-              active: savedQuery.id === activeQueryView?.id,
-              badge:
-                savedQuery.id === activeQueryView?.id &&
-                savedQuery.query !== query
-                  ? 'Unsaved'
-                  : undefined,
+              ...view,
+              active: query === view.query,
             })}
           {/each}
         </div>
       </div>
-    {/if}
 
-    {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
-      <p
-        class={merge(
-          ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
-          !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
-        )}
-      >
-        No Views
-      </p>
-    {/if}
+      {#if $savedQueryNavOpen}
+        <p
+          class="hidden items-center justify-between whitespace-nowrap px-2 text-xs font-medium leading-3 lg:flex lg:text-sm"
+          in:slide
+        >
+          {translate('common.custom-views')}
+          {@render queryBadge({
+            className: 'font-mono',
+            content: `${namespaceSavedQueries.length}/${maxQueries}`,
+          })}
+        </p>
+      {/if}
+
+      <div class="border-t border-subtle"></div>
+
+      {#if unsavedQuery}
+        {@render queryButton(unsaveView)}
+      {/if}
+
+      {#if namespaceSavedQueries.length > 0}
+        <div class="text-center">
+          <div class="space-y-1">
+            {#each namespaceSavedQueries as savedQuery (savedQuery.id)}
+              {@render queryButton({
+                ...savedQuery,
+                active: savedQuery.id === activeQueryView?.id,
+                badge:
+                  savedQuery.id === activeQueryView?.id &&
+                  savedQuery.query !== query
+                    ? 'Unsaved'
+                    : undefined,
+              })}
+            {/each}
+          </div>
+        </div>
+      {/if}
+
+      {#if namespaceSavedQueries.length === 0 && !unsavedQuery}
+        <p
+          class={merge(
+            ' pl-1 text-center text-secondary lg:pl-4 lg:text-left',
+            !$savedQueryNavOpen && 'lg:pl-1 lg:text-center',
+          )}
+        >
+          No Views
+        </p>
+      {/if}
+    </div>
+  </div>
+  <div
+    class={merge(
+      'flex w-[calc(100%-var(--panel-collapsed-w))] shrink flex-col transition-all lg:w-[calc(100%-var(--panel-expanded-w))]',
+      !$savedQueryNavOpen && 'lg:w-[calc(100%-var(--panel-collapsed-w))]',
+    )}
+  >
+    {@render children()}
   </div>
 </div>
-<SaveViewModal bind:open={saveViewModalOpen} {onCreateView} />
-<EditViewModal
+<ViewModal
+  id="{id}-save-view-modal"
+  bind:open={saveViewModalOpen}
+  {onCreateView}
+  {savedQueries}
+  {maxQueries}
+/>
+<ViewModal
+  id="{id}-edit-view-modal"
   view={activeQueryView}
   bind:open={editViewModalOpen}
   {onSaveView}
   {onCreateView}
   {onDeleteView}
+  {savedQueries}
+  {maxQueries}
 />
 
 {#snippet queryButton(view: SavedQuery)}
   <Tooltip
-    text={view.id === TASK_FAILURES_VIEW.id
-      ? `${view.name} • ${view.count ?? 0}`
-      : view.name}
+    text={view.count != undefined ? `${view.name} • ${view.count}` : view.name}
     right
     usePortal
     hide={$savedQueryNavOpen}
@@ -348,9 +364,7 @@
         size="sm"
       >
         <Icon
-          name={view.id === TASK_FAILURES_VIEW.id && (view.count ?? 0) > 0
-            ? 'exclamation-octagon'
-            : view.icon || 'bookmark'}
+          name={view.icon || 'bookmark'}
           class={merge(
             'h-4 w-4 flex-shrink-0  transition-colors duration-200',
             $savedQueryNavOpen ? 'lg:hidden' : '',
