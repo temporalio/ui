@@ -29,7 +29,7 @@ test.describe('Standalone Activity Commands', () => {
     await mockNamespaceApi(page);
     await mockSearchAttributesApi(page);
     await mockTaskQueuesApi(page);
-    await mockClusterApi(page, { serverVersion: '1.31.2' });
+    await mockClusterApi(page, { serverVersion: '1.32.0' });
   });
 
   test('should pause a running activity', async ({ page }) => {

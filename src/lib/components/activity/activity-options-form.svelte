@@ -15,7 +15,6 @@
   } from '$lib/services/standalone-activities';
   import { toaster } from '$lib/stores/toaster';
   import type { ActivityOptions } from '$lib/types';
-  import { fromDurationToNumber } from '$lib/utilities/format-time';
   import { has } from '$lib/utilities/has';
 
   type Props = {
@@ -37,24 +36,16 @@
   // the user is mid-edit — untrack() captures the initial value intentionally.
   let taskQueue = $state(untrack(() => initialOptions?.taskQueue?.name ?? ''));
   let scheduleToCloseTimeout = $state(
-    untrack(() =>
-      fromDurationToNumber(String(initialOptions?.scheduleToCloseTimeout)),
-    ),
+    untrack(() => String(initialOptions?.scheduleToCloseTimeout ?? '')),
   );
   let scheduleToStartTimeout = $state(
-    untrack(() =>
-      fromDurationToNumber(String(initialOptions?.scheduleToStartTimeout)),
-    ),
+    untrack(() => String(initialOptions?.scheduleToStartTimeout ?? '')),
   );
   let startToCloseTimeout = $state(
-    untrack(() =>
-      fromDurationToNumber(String(initialOptions?.startToCloseTimeout)),
-    ),
+    untrack(() => String(initialOptions?.startToCloseTimeout ?? '')),
   );
   let heartbeatTimeout = $state(
-    untrack(() =>
-      fromDurationToNumber(String(initialOptions?.heartbeatTimeout)),
-    ),
+    untrack(() => String(initialOptions?.heartbeatTimeout ?? '')),
   );
   let maximumAttempts = $state(
     untrack(() => initialOptions?.retryPolicy?.maximumAttempts ?? 0),
@@ -63,18 +54,10 @@
     untrack(() => initialOptions?.retryPolicy?.backoffCoefficient ?? 0),
   );
   let initialInterval = $state(
-    untrack(() =>
-      fromDurationToNumber(
-        String(initialOptions?.retryPolicy?.initialInterval),
-      ),
-    ),
+    untrack(() => String(initialOptions?.retryPolicy?.initialInterval ?? '')),
   );
   let maximumInterval = $state(
-    untrack(() =>
-      fromDurationToNumber(
-        String(initialOptions?.retryPolicy?.maximumInterval),
-      ),
-    ),
+    untrack(() => String(initialOptions?.retryPolicy?.maximumInterval ?? '')),
   );
 
   const activityOptions = $derived({
